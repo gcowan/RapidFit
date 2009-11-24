@@ -10,6 +10,7 @@
 #include "StringProcessing.h"
 #include "PhaseSpaceBoundary.h"
 #include "ObservableContinuousConstraint.h"
+#include "ObservableDiscreteConstraint.h"
 #include <iostream>
 
 //Default constructor
@@ -77,6 +78,12 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 bool PhaseSpaceBoundary::SetConstraint( string Name, double Minimum, double Maximum, string Unit )
 {
 	ObservableContinuousConstraint * newConstraint = new ObservableContinuousConstraint( Name, Minimum, Maximum, Unit );
+	bool returnValue = SetConstraint( Name, newConstraint );
+	return returnValue;
+}
+bool PhaseSpaceBoundary::SetConstraint( string Name, vector<double> Values, string Unit )
+{
+	ObservableDiscreteConstraint * newConstraint = new ObservableDiscreteConstraint( Name, Values, Unit );
 	bool returnValue = SetConstraint( Name, newConstraint );
 	return returnValue;
 }

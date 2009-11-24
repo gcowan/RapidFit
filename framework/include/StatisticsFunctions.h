@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include "PhaseSpaceBoundary.h"
+#include "IPDF.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ class StatisticsFunctions
 		static double Maximum( vector<double> );
 		static double Minimum( vector<double> );
 		static vector< vector<double> > DiscreteCombinations( vector<string>*, PhaseSpaceBoundary*, vector<string>&, vector<string>&, vector< vector<double> >& );
+		static void DoDontIntegrateLists( IPDF*, PhaseSpaceBoundary*, vector<string>*, vector<string>&, vector<string>& );
 };
 
 #endif

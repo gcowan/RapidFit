@@ -47,13 +47,11 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBounda
 		{
 			string unit = generationBoundary->GetConstraint( discreteNames[discreteIndex] )->GetUnit();
 			temporaryDataPoint->SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 0.0, unit );
-			cout << discreteNames[discreteIndex] << " value: " << discreteCombinations[combinationIndex][discreteIndex] << " unit: " << unit << endl;
 		}
 		for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 		{
 			string unit = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetUnit();
 			temporaryDataPoint->SetObservable( continuousNames[continuousIndex], 0.0, 0.0, unit );
-			cout << continuousNames[continuousIndex] << " value: 0.0 unit: " << unit << endl;
 		}
 
 		//Make the function wrapper
@@ -70,7 +68,7 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBounda
 		foamGenerator->SetOptRej(1);
 		foamGenerator->SetOptDrive(2);
 		foamGenerator->SetEvPerBin(25);
-		foamGenerator->SetChat(1);
+		foamGenerator->SetChat(0);
 		foamGenerator->SetMaxWtRej(1.1);
 		foamGenerator->Initialize();
 

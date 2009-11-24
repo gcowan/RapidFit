@@ -27,6 +27,7 @@ class PhaseSpaceBoundary
 		vector<string> GetAllNames();
 		bool SetConstraint( string, IConstraint* );
 		bool SetConstraint( string, double, double, string );
+		bool SetConstraint( string, vector<double>, string );
 		IConstraint * GetConstraint(string);
 		bool IsPointInBoundary( DataPoint* );
 		//bool CheckBoundary( PhaseSpaceBoundary* );

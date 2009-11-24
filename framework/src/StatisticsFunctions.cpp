@@ -9,6 +9,7 @@
 
 #include "StatisticsFunctions.h"
 #include "math.h"
+#include "StringProcessing.h"
 #include <iostream>
 
 //Return the mean of a vector of doubles
@@ -163,4 +164,25 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 	}
 
 	return discreteCombinations;
+}
+
+//Return names of observables to integrate or not
+void StatisticsFunctions::DoDontIntegrateLists( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector<string> * DontIntegrateThese, vector<string> & DoIntegrateList, vector<string> & DontIntegrateList )
+{
+	//Make lists of observables to integrate and not to integrate
+	vector<string> observableNames = InputPDF->GetPrototypeDataPoint();
+	for ( int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
+	{
+		bool continuous = !( InputBoundary->GetConstraint( observableNames[observableIndex] )->IsDiscrete() );
+		bool integrate = ( StringProcessing::VectorContains( DontIntegrateThese, &( observableNames[observableIndex] ) ) == -1 );
+
+		if ( continuous && integrate )
+		{
+			DoIntegrateList.push_back( observableNames[observableIndex] );
+		}
+		else
+		{
+			DontIntegrateList.push_back( observableNames[observableIndex] );
+		}
+	}
 }

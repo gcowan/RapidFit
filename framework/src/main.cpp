@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 #include <string>
 #include <vector>
@@ -19,10 +19,9 @@
 #include "ClassLookUp.h"
 #include "RapidFitIntegrator.h"
 #include "Plotter.h"
-//#include "TProof.h"
-
 #include <stdio.h>
 #include <stdlib.h>
+#include "MakeFoam.h"
 
 using namespace std;
 
@@ -70,6 +69,7 @@ int main( int argc, char * argv[] )
 		bool testPlotFlag = false;
 		bool doPlottingFlag = false;
 		bool doPullsFlag = false;
+		bool testRapidIntegratorFlag = false;
 
 		//Parse command line arguments
 		string currentArgument;
@@ -184,6 +184,10 @@ int main( int argc, char * argv[] )
 			{
 				testIntegratorFlag = true;
 			}
+			else if ( currentArgument == "--testRapidIntegrator" )
+			{
+				testRapidIntegratorFlag = true;
+			}
 			else if ( currentArgument == "--testPlot" )
 			{
 				testPlotFlag = true;
@@ -250,7 +254,7 @@ int main( int argc, char * argv[] )
 				return 1;
 			}
 		}
-		
+
 		//Create a parameter set
 		ParameterSet * argumentParameterSet;
 		if (parameterTemplateFlag)
@@ -285,6 +289,23 @@ int main( int argc, char * argv[] )
 				IDataSet * quickDataSet = quickData->GetDataSet();
 				RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( quickData->GetPDF() );
 				testIntegrator->Integral( quickDataSet->GetDataPoint(0), quickDataSet->GetBoundary() );
+			}
+			else
+			{
+				cerr << "No data set specified" << endl;
+			}
+		}
+		else if (testRapidIntegratorFlag)
+		{
+			if (configFileNameFlag)
+			{
+				//Compare numerical and analytical integration
+				XMLConfigReader quickConfig(configFileName);
+				PDFWithData * quickData = quickConfig.GetPDFsAndData()[0];
+				quickData->SetPhysicsParameters( quickConfig.GetFitParameters() );
+				IDataSet * quickDataSet = quickData->GetDataSet();
+				MakeFoam * testFoam = new MakeFoam( quickData->GetPDF(), quickDataSet->GetBoundary(), quickDataSet->GetDataPoint(0) );
+				testFoam->Debug();
 			}
 			else
 			{
@@ -376,9 +397,9 @@ void OutputOneFit( FitResult * OneResult, bool DoPlotting, string PlotFileName )
 		//Loop over all PDFs, and plot
 		for ( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
 		{
-		        time_t timeNow1;
+			time_t timeNow1;
 			time(&timeNow1);
-        		cout << "Plotting parameter: " << ctime( &timeNow1 ) << endl;
+			cout << "Plotting parameter: " << ctime( &timeNow1 ) << endl;
 
 			Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
 			char fileNumber[100];
