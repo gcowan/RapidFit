@@ -1,0 +1,145 @@
+// $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+
+2009/11/23 - Greig Cowan
+ - Removed empty directories from SVN repo.
+ - Got first collisions today!!
+
+2009/11/19 - Conor Fitzpatrick
+ - Fixed a bug in the sWave PDF, added ganga script to run it
+
+2009/11/16 - Greig Cowan
+ - Now pruning the fixed parameters from correlation matrix.
+
+2009/11/16 - Greig Cowan
+ - Added feature to exract correlation matrix from Minuit and
+   Minuit2 and have it printede to screen in a LaTeX formatted
+   table. Still need to prune non-floated parameters.
+
+2009/11/14 - Greig Cowan
+ - Altered Plotter to prevent zero-suppressed plots and limited
+   display of stats box. Time plots use more points than angles.
+   Also tried to get time range altered to go down to t=-1. ROOT
+   is not playing nice. Also now using TMultiGraph and
+   TGraphErrors so this should make it easier to show signal and
+   background components on same plot.
+
+2009/11/13 - Greig Cowan
+ - Added Bs2JpsiPhi prompt background PDF with time resolution.
+ - Fixed Bs2JpsiPhi long lived background PDF with time resolution.
+ - Name of PDF does not have RaPDF_ at the start! Starting to
+   migrate all PDFs to this convention.
+
+2009/11/11 - Greig Cowan
+ - Verified the Bs2JpsiPhi LL background and tidied up the code.
+
+2009/11/11 - Ben Wynne
+ - Implemented interface to Foam event generator. Works a treat!
+
+2009/11/10 - Greig Cowan
+ - Restructured code to separate framework and physics PDFs.
+
+2009/11/05 - Greig Cowan
+ - Added feature to main.cpp to allow automatic plotting of a
+   PDF on a loaded dataset.
+ - Propertime resolution for Bs2JpsiPhi now appears to be working
+   for the case of using average resolution (i.e., just 
+   convolution of a double Gaussian) but fit takes long time.
+   Need to check caching. Per-event resolution needs to be 
+   validated also.
+ - Default sampling of PDF increased to 128 points from 16.
+
+2009/11/03 - Greig Cowan
+ - Added BD2JpsiPhi PDF with analytic time resolution. To be 
+   checked!!
+
+2009/11/01 - Greig Cowan
+ - Implemented RootFileDataSet and Root file -> MemoryDataSet
+   loader function. Both give identical results to Ascii file
+   method but RootFileDataSet currently about 50% slower. Ntuples
+   must have branch names the same as Observable names specified
+   in XML.
+ - Two helper pyROOT scripts for processing of ntuples to get
+   data into a form that can be processed by RapidFit (i.e.,
+   have observable names as the branch names in the ntuple).
+
+2009/10/30 - Conor Fitzpatrick
+ - Added S-wave PDF, RaPDF_Bs2JpsiPhi_sWave.cpp,.h and config file
+
+2009/10/28 - Greig Cowan
+ - Changes made to Fumili minimisation; still not working yet.
+ - Updated todo list after group meeting from 27th Oct.
+
+2009/10/27 - Conor Fitzpatrick
+ - Added #includes for <stdlib.h> in order to fix atoi problem on a 
+   local install
+
+2009/10/22 - Gemma Fardell
+ - Implemented Bs2DsPi PDF and added config file. To be checked!!
+
+2009/10/19 - Greig Cowan
+ - Updated default plot style and added errors to the histograms
+   produced by the Plotter.
+
+2009/10/09 - Greig Cowan
+ - Added classes for dealing with Fumili minimisation. Compiles but
+   does not work yet.
+	
+2009/10/08 - Greig Cowan
+ - Added config file for fitting to the MC09 EvtGen data. Data
+   file also added. Results to this fit are identical to those
+   obtained from Heidelberg and Nikhef fitters. See my log.
+ - Installed graphviz on Mac and configured new Doxygen config
+   file to produce diagrams.
+
+2009/10/07 - Greig Cowan
+ - Added python ROOT script for post-processing of results of
+   multiple toy studies that have been performed on batch and 
+   the outputs merged.
+ - Added todo.list. Please update as we go along.
+ - Added config files for MC09 and DC06 parameters (~same apart
+   from deltaM).
+
+2009/10/06 - Greig Cowan
+ - Fixed normalisation factor in angular terms for Bs2JpsiPhi PDF.
+ - Added JpsiPhi bkg mass PDF.
+ - Added ProdPDF class for creating product of 2 PDFs.
+ - Modified main.cpp so that LaTeX results printed by default.
+ - Physics parameter values changed to use the same ones as in the 
+   Heidelberg note.
+ - Added signal mass PDF and updated the background mass PDFs. Still
+   need to implement the background ones properly and to check them.
+ - Removed compilation of RooFit related classes from Makefile. Still
+   in release and in CVS.
+ - Added scripts directory and two scripts which allow for toy studies
+   to be submitted to Edinburgh Condor through Ganga. Default is to
+   submit 10 subjobs and merge the pullPlots.root output. This will
+   speed up the ability to run large numbers of toys.
+
+2009/10/05 - Greig Cowan
+ - Added placeholders for the prompt Jpsi and long lived background
+   PDFs. Still to be chcked.
+ - Removed the f_sig and f_prompt physics parameters since we now take
+   care of these fractions in the SumPDF class. They are added as 
+   parameters of the fit automatically.
+ - Added fractional part to LL bkg PDF since we did not want to 
+   implement a complex solution for adding two PDFs of the same name.
+
+2009/10/03 - Greig Cowan
+ - MAJOR CHANGE: Restructured the project to split up src, headers and
+   binary objects. 
+
+2009/10/02 - Greig Cowan
+ - MAJOR CHANGE: Added DataPoint to Integral() method of IPDF such that
+   we can have normalisation factors that depend on the DataPoint (such
+   as the B tag, mistag, ...). PDF writers should consider implementing
+   a caching mechanism to ensure that the integral does not have to be 
+   explicitly calculated for each event but rather you pick one of the 
+   pre-calculated factors depending on the value of the observables.
+
+2009/10/01 - Greig Cowan
+ - Added new RaPDF_Bs2JpsiPhi PDF which takes care of normalisation
+ - Based heavily on Andres' code from previous 3-angle analysis
+
+2009/08/01 - Greig Cowan
+ - Added tagging to the RapidFit Bs2JpsiPhi PDF
+ - Added the doc directory and release.notes

@@ -1,0 +1,45 @@
+/**
+        @class FitFunction
+
+        Parent class for the function to minimise
+        Overload the evaluate methods and UP value for Chi2, NLL, etc.
+
+        @author Benjamin M Wynne bwynne@cern.ch
+	@date 2009-10-02
+*/
+
+#ifndef FIT_FUNCTION_H
+#define FIT_FUNCTION_H
+
+#include "PhysicsBottle.h"
+#include "RapidFitIntegrator.h"
+
+class FitFunction
+{
+	public:
+		FitFunction();
+		~FitFunction();
+
+		void SetPhysicsBottle( PhysicsBottle* );
+		PhysicsBottle * GetPhysicsBottle();
+		bool SetParameterSet( ParameterSet* );
+		ParameterSet * GetParameterSet();
+		double Evaluate();
+		void Finalise();
+
+		//Overload this function in child classes
+		virtual double UpErrorValue();
+
+	protected:
+		//Overload these functions in child classes
+		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator* );
+		virtual double EvaluateParameterSet( ParameterSet*, vector<string> );
+
+		PhysicsBottle * allData;
+		vector<string> interestingParameters;
+		vector<string>::iterator nameIterator;
+		vector< RapidFitIntegrator* > allIntegrators;
+		double testDouble;
+};
+
+#endif

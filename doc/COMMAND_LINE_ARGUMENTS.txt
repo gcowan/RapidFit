@@ -1,0 +1,33 @@
+no argument:
+	Open a default config file.
+
+-f [filename]
+	Open the named config file.
+	If file not found or invalid, fail.
+	If no file named, open default.
+	If other arguments given, they override the file config.
+
+-p [name:value:min:max:type:unit]
+	Create a physics parameter as specified
+	multiple -p tags can be used
+	Fit parameter set includes all defined parameters
+
+-minimiser [name]
+	Create a minimiser as specified
+
+-function [name]
+	Create a fit function as specified
+
+-repeats [number]
+	Specify the number of repeats ( >1 for ToyStudy )
+
+-PDF [name{observableName:...}{parameterName:...}] [dataSource:argument:...] [{boundName:min<max:unit}{boundName:value:value:value:unit}...]
+
+--testIntegrator
+	Check a PDF's integration function
+
+--testPlot [file name]
+	Just generate data from a PDF (first in config file) and plot the PDF on it. File name optional
+
+--doPlotting [file name]
+	Plot fitted PDFs on their data sets. File name optional.

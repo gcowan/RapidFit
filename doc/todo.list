@@ -1,0 +1,92 @@
+//$Id: todo.list,v 1.11 2009/11/14 12:44:10 gcowan Exp $
+
+//**
+* @author Greig A Cowan, greig.cowan@cern.ch
+* @author Benjamin M Wynne, bwynne@cern.ch
+*//
+
+High priority
+=============
+
+* Ability to include an analytic acceptance surface.
+
+* Implement a weight per data point. This could just be implemented as
+another Observable that is configured in the XML file and is read in from
+data. Alternatively, we could allow the user to give every event in a
+dataset the same weight. This will be required for per-event acceptance.
+
+* Get the correlation matrix returned from Minuit and formatted as a
+LaTeX table.
+
+* Asymmetric errors and errors on the error. How do we do this?
+
+* Check the validity of the background PDFs - normalisation in particular.
+Pete working on this.
+
+* Correct the mass background PDF to include the long lived component.
+Pete working on this.
+
+* New signal PDFs, with and without time resolution. Students working on this.
+
+Medium priority
+===============
+* Ability to include an acceptance (and also a background?) as a
+multidimensional histogram.
+* Include Yuehong's angular acceptance corrections in our framework.
+* Improve the parsing of the "header" row in the DataFileLoader class.
+
+Low priority
+============
+* Implement Fumili minimisation routine. Should be easy if we use the TVirtualFitter from ROOT.
+* Implement ZooTuple file loader. Will need to link against libZoo.
+* Allow use to apply a pre-selection on the data? Do we really need this
+in RapidFit? User could do this outside of the fitter and create a new 
+input ntuple/file? PhaseSpaceBoundary already applies cuts on the
+Observables, but not on other variables that it knows nothing about.
+
+
+
+Plotting specific issues
+========================
+* Configuration using XML:
+	1. <Plotter> tag needed.
+	2. Specific <Plot> tags for each plot to produce.
+	3. <NumberOfPoints> tag needed to allow user to specify the number of data points to use 
+	for each plot in the <Plotter>. Should be set to 16 by default.
+	4. <PlotXaxisTitle> and/or <PlotTitle> tags needed so that user can customise the plot output.
+	This should be used both for projections and the pulls. Perhaps this title for the observable
+	should live in the <Observable>? 
+	5. We should allow the user to specify if they want the plot to be on a y-log axis or not. For 
+	JpsiPhi this is only really for the time observable, so we could just set this by default.
+* Optimisation in the integration method - perhaps IntergratorFunction needs to be improved? We could
+also consider making a data point when passing a vector of doubles. Protected method used by a friend
+class to improve security.
+* Set up some basics config files or main.cpp to run:
+	1. A toy study with X events and Y toys. No plotting, no LaTeX results, pulls produced.
+	2. A toy study with X events and 1 toy. Plotting and LaTeX results, no pulls.
+* Implementation of the ForceNumerical and ForceAnalytic flags can be left until later.
+
+Completed plotting issues
+* Use of errors on data points and default style.
+* Allow non-zero suppressed plots.
+* Do not have stats box plotting over the data/fitted curve.
+
+
+The following tasks have been completed
+=======================================
+* Do not zero-suppress plots.
+* Include time resolution in PDFs. Will have to look at old RooFit PDFs 
+for the analytic expressions.
+* Need to allow for no limits on physics parameters and observables. Just 
+don't specify limits in the XML. Minuit is able to deal with this.
+* Use numerical integration for product PDF normilisation.
+* Plot time and angular projections. This is a biggie.
+* Create XML files with MC09 and DC06 parameter values.
+* Fit to the MC09 and DC06 EvtGen data with the signal PDF.
+* Fix -f command line option to allow config file to be passed.
+* Implement the ability to generate and fit with different PDFs.
+* Implement the "do not integrate" list for each PDF.
+* Deal with discrete variables in a plot. (one plot for each
+combination of discrete values?)
+* Implemented RootFileDataSet and function for loading a Root
+ntuple into a MemoryDataSet. Gives identical results to Ascii file.

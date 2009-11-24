@@ -1,0 +1,266 @@
+<RapidFit>
+	/////////////////////////////////////////
+	// Example RapidFit configuration file //
+	// Author: Ben Wynne                   //
+	/////////////////////////////////////////
+	<ParameterSet>
+		<PhysicsParameter>
+			<Name>gamma</Name>
+			<Value>0.68</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.5</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>deltaGamma</Name>
+			<Value>0.049</Value>
+			<Minimum>-1.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Aperp_sq</Name>
+			<Value>0.207</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Azero_sq</Name>
+			<Value>0.56</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_para</Name>
+			<Value>-2.93</Value>
+			<Minimum>-3.14159</Minimum>
+			<Maximum>3.14159</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_perp</Name>
+			<Value>2.91</Value>
+			<Minimum>-3.14159</Minimum>
+			<Maximum>3.14159</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_zero</Name>
+			<Value>0.0</Value>
+			<Minimum>-3.14159</Minimum>
+			<Maximum>3.14159</Maximum>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+                <PhysicsParameter>
+                        <Name>Ms</Name>
+                        <Value>5369.0</Value>
+                        <Minimum>5000.0</Minimum>
+                        <Maximum>6000.0</Maximum>
+                        <Type>Fixed</Type>
+                        <Unit>MeV/c2</Unit>
+                </PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>deltaM</Name>
+			<Value>17.77</Value>
+			<Minimum>17.0</Minimum>
+			<Maximum>20.0</Maximum>
+			<Type>Free</Type>
+			<Unit>MeV/c2</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Phi_s</Name>
+			<Value>-0.0368</Value>
+			<Minimum>-3.14</Minimum>
+			<Maximum>3.14</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>tagFraction</Name>
+			<Value>0.0</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>0.5</Maximum>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>resolution</Name>
+			<Value>0.0</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>0.1</Maximum>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>mean</Name>
+			<Value>0.5</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>sigma</Name>
+			<Value>0.5</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>tau_LL1</Name>
+			<Value>1.114</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>2.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>tau_LL2</Name>
+			<Value>0.161</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>0.2</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+                <PhysicsParameter>
+                        <Name>f_LL1</Name>
+                        <Value>0.22</Value>
+                        <Minimum>0.0</Minimum>
+                        <Maximum>1.0</Maximum>
+                        <Type>Free</Type>
+                        <Unit>Unitless</Unit>
+                </PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>BackgroundFraction</Name>
+			<Value>0.19</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>PromptFraction</Name>
+			<Value>0.78</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+                <PhysicsParameter>
+                        <Name>alphaM_pr</Name>
+                        <Value>0.0006</Value>
+                        <Minimum>0.0</Minimum>
+                        <Maximum>1.0</Maximum>
+                        <Type>Free</Type>
+                        <Unit>c2/MeV</Unit>
+                </PhysicsParameter>
+
+
+
+	</ParameterSet>
+
+	<Minimiser>Minuit2</Minimiser>
+
+	<FitFunction>NegativeLogLikelihood</FitFunction>
+
+	<NumberRepeats>1</NumberRepeats>
+
+	<ToFit>
+		<SumPDF>
+			<PDF>
+				<Name>RaPDF_Bs2JpsiPhiNew</Name>
+			</PDF>
+
+			<SumPDF>
+				<FractionName>PromptFraction</FractionName>
+
+				<PDF>
+					<Name>RaPDF_Bs2JpsiPhiPromptBkg</Name>
+				</PDF>
+
+				<PDF>
+					<Name>RaPDF_Bs2JpsiPhiLongLivedBkg</Name>
+				</PDF>
+			</SumPDF>
+		</SumPDF>
+
+		<DataSet>
+			<Source>AcceptReject</Source>
+			<NumberEvents>100000</NumberEvents>
+			<PhaseSpaceBoundary>
+				<Observable>
+					<Name>time</Name>
+					<Minimum>0.0</Minimum>
+					<Maximum>15.0</Maximum>
+					<Unit>ms</Unit>
+				</Observable>
+
+				<Observable>
+					<Name>cosTheta</Name>
+					<Minimum>-1.0</Minimum>
+					<Maximum>1.0</Maximum>
+					<Unit>Unitless</Unit>
+				</Observable>
+
+				<Observable>
+					<Name>phi</Name>
+					<Minimum>-3.14159</Minimum>
+					<Maximum>3.14159</Maximum>
+					<Unit>rad</Unit>
+				</Observable>
+
+				<Observable>
+					<Name>cosPsi</Name>
+					<Minimum>-1.0</Minimum>
+					<Maximum>1.0</Maximum>
+					<Unit>Unitless</Unit>
+				</Observable>
+
+				<Observable>
+					<Name>tag</Name>
+					<Value>-1.0</Value>
+					<Value>0.0</Value>
+					<Value>1.0</Value>
+					<Unit>Unitless</Unit>
+				</Observable>
+
+				<Observable>
+					<Name>mistag</Name>
+					<Minimum>0.33</Minimum>
+					<Maximum>0.333</Maximum>
+					<Unit>Unitless</Unit>
+				</Observable>
+
+			</PhaseSpaceBoundary>
+		</DataSet>
+	</ToFit>
+</RapidFit>
