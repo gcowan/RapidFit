@@ -79,24 +79,37 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 	}
 	*/
 
-	// Fill a vector of doubles for each set of observables that you
+	// Fill a vector of doubles for each set of observables
         vector< vector<double> > positions;
 	PhysicsBottle* bottle = NewFunction->GetPhysicsBottle();
-	//PhaseSpaceBoundary* boundary = bottle->GetResultPDF(0)->GetPhaseSpaceBoundary();
-        vector<string> names;// = boundary->GetAllNames();   
-	int nsteps = 10;
-	for ( int j = 0; j < nsteps; j++)
-	{
-        	vector<double> tempPos;
-                for( int i = 0; i < names.size(); i++ )
-                {
-			double value = 0.;
-			//double min = boundary->
-			tempPos.push_back(value);
-		}
-		positions.push_back(tempPos);
-	}
+	PhaseSpaceBoundary* boundary = bottle->GetResultDataSet(0)->GetBoundary();
+        vector<string> names = boundary->GetAllNames();   
 
+	vector<double> observableSteps;
+	int nsteps = 10;
+	
+	// Could make this faster...
+	for ( int step = 0; step < nsteps; step++)
+	{
+		vector<double> tempPos;
+		for( int observable = 0; observable < names.size(); observable++ )
+       		{
+			if ( !boundary->GetConstraint(names[observable])->IsDiscrete() )
+			{
+				double min = boundary->GetConstraint(names[observable])->GetMinimum();
+				double max = boundary->GetConstraint(names[observable])->GetMinimum();
+				double delta = (max - min)/nsteps;
+				double position = min + step*delta;
+				tempPos.push_back( position );
+			}
+			else
+			{
+				double value = boundary->GetConstraint(names[observable])->CreateObservable()->GetValue();
+				tempPos.push_back( value );
+			}
+		}	
+		positions.push_back(tempPos);
+	}	
 
 	// Now, get the FumiliFCNBase function which will be passed to the Fumili minimiser
 	FumiliStandardMaximumLikelihoodFCN fumFCN( *function, positions );

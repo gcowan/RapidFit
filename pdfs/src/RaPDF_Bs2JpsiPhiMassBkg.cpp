@@ -56,5 +56,24 @@ double RaPDF_Bs2JpsiPhiMassBkg::Evaluate(DataPoint * measurement)
 
 double RaPDF_Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-	return 1.0;
+	double mhigh, mlow ;
+	
+	IConstraint * massBound = boundary->GetConstraint("mass");
+	if ( massBound->GetUnit() == "NameNotFoundError" )
+	{
+		cerr << "Bound on mass not provided in RaPDF_Bs2JpsiPhiMassBkg" << endl;
+		return 1.0 ;
+	}
+	else
+	{
+		mlow = massBound->GetMinimum();
+		mhigh = massBound->GetMaximum();
+	}
+	
+	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
+
+	double integral = (1.0/alphaM_pr)* (exp(-alphaM_pr*mlow) - exp(-alphaM_pr*mhigh)) ;
+	
+	return integral;
+	
 }

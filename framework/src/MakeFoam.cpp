@@ -6,9 +6,9 @@
 
 using namespace std;
 
-const int MAXIMUM_SAMPLES = 100;
+const int MAXIMUM_SAMPLES = 1000;
 const double MAXIMUM_GRADIENT_TOLERANCE = 0.01;
-const int MAXIMUM_CELLS = 100;
+const int MAXIMUM_CELLS = 1000;
 
 //Default constructor
 MakeFoam::MakeFoam()

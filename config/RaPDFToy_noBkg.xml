@@ -84,7 +84,7 @@
 		</PhysicsParameter>
 	</ParameterSet>
 
-	<Minimiser>Minuit2</Minimiser>
+	<Minimiser>Fumili</Minimiser>
 
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 

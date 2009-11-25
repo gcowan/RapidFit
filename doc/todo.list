@@ -15,9 +15,6 @@ another Observable that is configured in the XML file and is read in from
 data. Alternatively, we could allow the user to give every event in a
 dataset the same weight. This will be required for per-event acceptance.
 
-* Get the correlation matrix returned from Minuit and formatted as a
-LaTeX table.
-
 * Asymmetric errors and errors on the error. How do we do this?
 
 * Check the validity of the background PDFs - normalisation in particular.
@@ -74,6 +71,8 @@ Completed plotting issues
 
 The following tasks have been completed
 =======================================
+* Get the correlation matrix returned from Minuit and formatted as a
+LaTeX table.
 * Do not zero-suppress plots.
 * Include time resolution in PDFs. Will have to look at old RooFit PDFs 
 for the analytic expressions.
