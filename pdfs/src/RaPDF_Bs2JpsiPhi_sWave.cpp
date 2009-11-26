@@ -11,6 +11,9 @@
 #include "math.h"
 #include "TMath.h"
 
+
+using std::cout;
+using std::endl;
 //Constructor
 RaPDF_Bs2JpsiPhi_sWave::RaPDF_Bs2JpsiPhi_sWave() : 
 	// Physics parameters
@@ -46,9 +49,8 @@ RaPDF_Bs2JpsiPhi_sWave::RaPDF_Bs2JpsiPhi_sWave() :
 	, cosPsiName	( "cosPsi" )
 	, tagName	( "tag" )
 	, mistagName	( "mistag" )
-	//, timeres	( "resolution" )
 	, normalisationCacheValid(false)
-, evaluationCacheValid(false)
+	, evaluationCacheValid(false)
 {
 	MakePrototypes();
 }
@@ -96,8 +98,10 @@ bool RaPDF_Bs2JpsiPhi_sWave::SetPhysicsParameters( ParameterSet * NewParameterSe
 {
 	normalisationCacheValid = false;
 	evaluationCacheValid = false;
-	return allParameters.SetPhysicsParameters(NewParameterSet);
-}
+	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
+	//cout << "SetPhysicsParameters: " << result << endl;
+	return result;
+}	
 
 //Calculate the function value
 double RaPDF_Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
@@ -151,8 +155,9 @@ double RaPDF_Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
 		+ f9 * ImAsAperpBbar
 		+ f10 * ReAsAzeroBbar
 		;  
-
-	return ( w1*v1 + w2*v2 );
+	double eval = ( w1*v1 + w2*v2 );
+	//cout << "Evaluate: " << eval << endl;
+	return eval;
 }
 
 
@@ -193,7 +198,9 @@ double RaPDF_Bs2JpsiPhi_sWave::Normalisation(DataPoint * measurement, PhaseSpace
 		normalisationCacheValid = true;
 	}
 
-	return ( w1*cachedv1 + w2*cachedv2 );
+	double norm = ( w1*cachedv1 + w2*cachedv2 );
+	//cout << "Normalisation: " << norm << endl;
+	return norm;
 }
 
 void RaPDF_Bs2JpsiPhi_sWave::getAngularFunctions( double & f1

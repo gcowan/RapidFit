@@ -18,7 +18,7 @@
 #include "StatisticsFunctions.h"
 #include <math.h>
 #include "EdStyle.h"
-#include <boost/regex.hpp>
+//#include <boost/regex.hpp>
 
 //Output data as a RootNTuple
 void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
