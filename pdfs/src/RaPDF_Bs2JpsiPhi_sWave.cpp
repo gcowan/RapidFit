@@ -26,6 +26,19 @@ RaPDF_Bs2JpsiPhi_sWave::RaPDF_Bs2JpsiPhi_sWave() :
 	, delta_perpName( "delta_perp" )
 	, delta_sName	("delta_s")
 
+//Note: arXiv:0908.3627v3 uses the following parameters instead:
+// Ap_sq = Azero_sq + Aperp_sq + Apara_sq
+// Rpara = Apara_sq/Ap_sq
+// Rperp = Aperp_sq/Ap_sq
+// Rs = As_sq / (As_sq + Ap_sq)
+// To get from these to our params, note that:
+// Azero_sq + Aperp_sq + Apara_sq = 1 = Ap_sq
+// so:
+// Rpara = Apara_sq
+// Rperp = Aperp_sq
+// Rs = As_sq / (As_sq + 1) => 	As_sq = (1 - Rs)/Rs
+
+
 	// Observables
 	, timeName	( "time" )
 	, cosThetaName	( "cosTheta" )
@@ -461,7 +474,7 @@ void RaPDF_Bs2JpsiPhi_sWave::getPhysicsParameters( double & gamma
 	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
 	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue();
 	
-	Apara_sq = 1 - Azero_sq - Aperp_sq - As_sq; //Is this right?
+	Apara_sq = 1 - Azero_sq - Aperp_sq; //Is this right?
 
 	return;
 }

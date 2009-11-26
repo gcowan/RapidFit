@@ -24,17 +24,16 @@
 
 		<PhysicsParameter>
 			<Name>Aperp_sq</Name>
-			<Value>0.207</Value>
+			<Value>0.233</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
-
 		<PhysicsParameter>
 			<Name>As_sq</Name>
-			<Value>0.0</Value>
+			<Value>0.111</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Free</Type>
@@ -52,13 +51,13 @@
 
 		<PhysicsParameter>
 			<Name>delta_s</Name>
-			<Value>0.0</Value>
+			<Value>1.5707963267948966</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
-		
+
 		<PhysicsParameter>
 			<Name>delta_para</Name>
 			<Value>-2.93</Value>
@@ -109,7 +108,7 @@
 
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 
-	<NumberRepeats>1</NumberRepeats>
+	<NumberRepeats>10</NumberRepeats>
 
 	<ToFit>
 		<PDF>
@@ -118,7 +117,7 @@
 
 		<DataSet>
 			<Source>Foam</Source>
-			<NumberEvents>117000</NumberEvents>
+			<NumberEvents>1000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
