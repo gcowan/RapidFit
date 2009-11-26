@@ -82,9 +82,10 @@
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
+		
 	</ParameterSet>
 
-	<Minimiser>Fumili</Minimiser>
+	<Minimiser>Minuit2</Minimiser>
 
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 

@@ -1,6 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
 2009/11/25 - Greig Cowan
+ - Fixed LaTeX output. Now replace _ with \_ in parameter names.
+
+2009/11/25 - Greig Cowan
  - Added correct normalisation for background mass PDF (Pete).
 
 2009/11/23 - Greig Cowan

@@ -18,6 +18,7 @@
 #include "StatisticsFunctions.h"
 #include <math.h>
 #include "EdStyle.h"
+#include <boost/regex.hpp>
 
 //Output data as a RootNTuple
 void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
@@ -98,12 +99,13 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 		if (isFree)
 		{
 			columns += "c|";
-			parameterNames += " & " + *nameIterator;
+			string name = FindAndReplaceString( *nameIterator );
+			parameterNames += " & " + name;
 			numberOfFreeParameters += 1;
 		}
 	}
 	columns += "}\n\\hline";
-	parameterNames += "\\\\ \\hline";
+	parameterNames += "\\\\ \\hline \\hline";
 
 	cout << "Correlation matrix" << endl;
 	cout << "\n\\begin{center}" << endl;
@@ -116,7 +118,9 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 		bool isFree = ResultFormatter::IsParameterFree( OutputData, *nameIterator );
                 if (!isFree) continue;
 		
-		cout << setw(15) << *nameIterator;
+		string name = FindAndReplaceString( *nameIterator );
+		
+		cout << setw(15) << name;
 		double drow = GetElementFromCovarianceMatrix( covarianceMatrix, row, row );
 
 		for ( int col = 0; col < numberOfFreeParameters; col++)
@@ -172,7 +176,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
 	cout << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
 	cout << "\\begin{tabular}{|c|c|c|} \n\\hline" << endl;
-	cout << "Parameter & Fit result and error & $\\sigma$ from input \\hline \\hline" << endl;
+	cout << "Parameter & Fit result and error & $\\sigma$ from input \\\\ \\hline \\hline" << endl;
 
 	//Ouput each parameter
 	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
@@ -188,14 +192,39 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
 		//if (fitError > 0.0) sigmaFromInputValue = (fitValue - inputValue)/fitError;
-		cout << setw(15) << *nameIterator << " & " 
-			<< setw(10) << setprecision(5) << fitValue << " \\pm "
+		
+		//boost::regex pattern ("_",boost::regex_constants::icase|boost::regex_constants::perl);
+		//string replace ("\\_");
+		//string newName = boost::regex_replace (*nameIterator, pattern, replace);
+	
+		string name = FindAndReplaceString( *nameIterator );
+		cout << setw(15) << name << " & " 
+			<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
 			<< setw(10) <<  		  fitError << " & " 
 			<< setw(10) << setprecision(2) << sigmaFromInputValue << "\\\\" << endl;
 	}
 
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;
+}
+
+string ResultFormatter::FindAndReplaceString( string name )
+{
+	// This isn't very general, and probably won't work for names
+	// containing lots of "_".
+	int pos = 0;
+	int newPos = 0;
+	int size = name.size();
+	while ( pos < size )
+	{
+		newPos = name.find("_", pos);
+                if( newPos != string::npos ) {
+                	name.replace(newPos, 1, "\\_");
+		}
+		else break;
+		pos = newPos + 2;
+	}
+	return name;
 }
 
 //Make pull plots from the output of a toy study

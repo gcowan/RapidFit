@@ -57,7 +57,7 @@ endif
 
 ##Libraries
 #LIBS       += $(ROOTLIBS) -lHtml -lThread -lMinuit -lRooFit -lRooFitCore -lMathCore -lMinuit2 -lFoam #-lboost_thread-xgcc40-mt #-lMathMore
-LIBS       += $(ROOTLIBS) -lHtml -lThread -lMinuit -lMathCore -lMinuit2 -lRooFit -lRooFitCore -lFoam #-lProof #-lboost_thread #-lMathMore
+LIBS       += $(ROOTLIBS) -lHtml -lThread -lMinuit -lMathCore -lMinuit2 -lRooFit -lRooFitCore -lFoam -lboost_thread #-lProof #-lboost_thread #-lMathMore
 
 HEADERS    =  $(INCDIR)/RooBs2PhiPhiFullPdf.h $(INCDIR)/RooPdf_Bs2JPsiPhi.h $(INCDIR)/LinkDef.h
 
