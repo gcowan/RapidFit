@@ -2,6 +2,13 @@
 
 2009/11/25 - Greig Cowan
  - Fixed LaTeX output. Now replace _ with \_ in parameter names.
+ - Added ability to use per-event weights in the NLL calculation.
+   Weight is 1.0 by default and can be specified by having an
+   Observable with name "eventWeight" defined in the
+   PhaseSpaceBoundary. For generation this should be a discrete
+   value which will be the same for all events. For reading in 
+   from a file, it should have a Minimum of 0.0 and Maximum of 
+   1.0 (or whatever you think appropriate).
 
 2009/11/25 - Greig Cowan
  - Added correct normalisation for background mass PDF (Pete).

@@ -140,6 +140,12 @@
 					<Unit>Unitless</Unit>
 				</Observable>
 
+				<Observable>
+					<Name>eventWeight</Name>
+					<Value>0.3</Value>
+					<Unit>Unitless</Unit>
+				</Observable>
+
 			</PhaseSpaceBoundary>
 		</DataSet>
 	</ToFit>

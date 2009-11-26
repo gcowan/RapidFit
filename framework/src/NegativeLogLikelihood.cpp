@@ -37,9 +37,16 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		//double integral = TestPDF->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );
 		double integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );
 		
+		//Get the weight for this DataPoint (event)
+		Observable * weightObs = temporaryDataPoint->GetObservable("eventWeight");
+		double weight = 1.;	
+		if ( weightObs->GetUnit() != "NameNotFoundError")
+		{
+			double weight = weightObs->GetValue();
+		}
+		total += weight * log( value / integral );
+		
 		//delete temporaryDataPoint;
-
-		total += log( value / integral );
 	}
 	
 	//Return negative log likelihood
