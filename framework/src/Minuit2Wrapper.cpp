@@ -9,6 +9,7 @@
 
 #include "Minuit2Wrapper.h"
 #include "Minuit2/FunctionMinimum.h"
+#include "Minuit2/MnContours.h"
 #include <iostream>
 #include <limits>
 #include "ResultParameterSet.h"
@@ -67,7 +68,20 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 	// Get the covariance matrix. Stored as an n*(n+1)/2 vector
 	const MnUserCovariance * covMatrix = &minimum.UserCovariance();
 	vector<double> covData = covMatrix->Data();	
-	
+
+	// Get the 1 and 2 sigma contours from NLL calculationg for parameters 
+	// 0 and 1 (this should be gamma and deltaGamma for Bs2JpsiPhi)
+	const MnContours contoursFromMinuit = MnContours( *function, minimum);
+	int numberOfPointsInContour = 40;
+	function->SetErrorDef(0.5);
+	vector< pair< double, double> > oneSigmaContour = contoursFromMinuit(0, 1, numberOfPointsInContour);	
+	function->SetErrorDef(2); // not working at the moment
+	vector< pair< double, double> > twoSigmaContour = contoursFromMinuit(0, 1, numberOfPointsInContour);	
+
+	vector< vector< pair< double, double> > > contours;
+	contours.push_back( oneSigmaContour );
+	contours.push_back( twoSigmaContour );
+
 	//Work out the fit status - possibly dodgy
 	int fitStatus;
 	if ( !minimum.HasCovariance() )
@@ -87,7 +101,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 		fitStatus = 3;
 	}
 
-	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, *( NewFunction->GetPhysicsBottle() ), covData );
+	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, *( NewFunction->GetPhysicsBottle() ), covData, contours );
 }
 
 //Return the result of minimisation

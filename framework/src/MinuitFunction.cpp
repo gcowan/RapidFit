@@ -71,6 +71,12 @@ double MinuitFunction::operator()( const vector<double>& NewParameterValues ) co
 	}
 }
 
+//Set the up value for error calculation
+void MinuitFunction::SetErrorDef(double up)
+{
+	function->SetUpErrorValue(up);
+}
+
 //Return the up value for error calculation
 double MinuitFunction::Up() const
 {

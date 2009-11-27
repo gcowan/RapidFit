@@ -389,6 +389,7 @@ void OutputOneFit( FitResult * OneResult, bool DoPlotting, string PlotFileName )
 {
 	ResultFormatter::LatexOutputFitResult( OneResult );
 	ResultFormatter::LatexOutputCovarianceMatrix( OneResult );
+	ResultFormatter::PlotFitContours( OneResult, "contours" );
 
 	if (DoPlotting)
 	{

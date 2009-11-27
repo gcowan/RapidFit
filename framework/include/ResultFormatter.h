@@ -24,6 +24,7 @@ class ResultFormatter
 		static void DebugOutputFitResult( FitResult* );
 		static void LatexOutputFitResult( FitResult* );
 		static void LatexOutputCovarianceMatrix( FitResult* );
+		static void PlotFitContours( FitResult*, string );
 		static string FindAndReplaceString( string );
 		static double GetElementFromCovarianceMatrix( vector<double>, int, int);		
 		static bool IsParameterFree( FitResult*, string );

@@ -45,7 +45,7 @@
 			<Value>-2.93</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -54,7 +54,7 @@
 			<Value>2.91</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -70,7 +70,7 @@
 			<Value>17.77</Value>
 			<Minimum>17.0</Minimum>
 			<Maximum>20.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>MeV/c2</Unit>
 		</PhysicsParameter>
 
@@ -98,7 +98,7 @@
 
 		<DataSet>
 			<Source>Foam</Source>
-			<NumberEvents>10</NumberEvents>
+			<NumberEvents>1000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
@@ -142,7 +142,7 @@
 
 				<Observable>
 					<Name>eventWeight</Name>
-					<Value>0.3</Value>
+					<Value>1.0</Value>
 					<Unit>Unitless</Unit>
 				</Observable>
 

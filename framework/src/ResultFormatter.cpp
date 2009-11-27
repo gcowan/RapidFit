@@ -4,6 +4,7 @@
         A collection of static methods for outputting RapidFit data objects
 
         @author Benjamin M Wynne bwynne@cern.ch
+        @author Greig A Cowan greig.cowan@cern.ch
 	@date 2009-10-02
 */
 
@@ -19,6 +20,9 @@
 #include <math.h>
 #include "EdStyle.h"
 //#include <boost/regex.hpp>
+#include "TMultiGraph.h"
+#include "TGraphErrors.h"
+#include "TCanvas.h"
 
 //Output data as a RootNTuple
 void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
@@ -83,6 +87,51 @@ void ResultFormatter::DebugOutputFitResult( FitResult * OutputData )
 	}
 }
 
+void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFileName )
+{
+	string name = contourFileName + ".root";
+	TFile * contourFile = new TFile( name.c_str(), "RECREATE");
+	TMultiGraph * graph = new TMultiGraph();
+	TCanvas * bothPlots = new TCanvas("contours", "contours");
+	int colors[2] = {42,38};
+	vector< vector< pair<double, double> > > contours = OutputData->GetContours();
+	int numberOfContours = contours.size();
+	// Draw the large 2-sigma contour first
+	for (int contourNumber = numberOfContours-1; contourNumber >= 0; contourNumber--)
+	{
+		int numberOfPoints = contours[contourNumber].size();
+		double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
+		for (int point = 0; point < numberOfPoints; point++)
+		{
+			xCoordinates[point] = contours[contourNumber][point].first;
+			yCoordinates[point] = contours[contourNumber][point].second;
+		}
+
+		xCoordinates[numberOfPoints] = xCoordinates[0];		
+		yCoordinates[numberOfPoints] = yCoordinates[0];		
+
+        	TGraphErrors * contourGraph = new TGraphErrors( numberOfPoints, xCoordinates, yCoordinates );
+		contourGraph->SetFillColor(colors[contourNumber]);
+		graph->Add(contourGraph);
+	}
+        
+	graph->SetTitle("1 and 2 sigma contours");	
+        graph->Draw( "ALF" ); //Smooth fill area drawn
+	
+	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
+        vector<string> allNames = outputParameters->GetAllNames();
+	const char * xTitle = allNames[0].c_str();
+	const char * yTitle = allNames[1].c_str();
+	graph->GetXaxis()->SetTitle( xTitle );
+        graph->GetYaxis()->SetTitle( yTitle );
+ 
+        bothPlots->Modified();
+        bothPlots->Update();
+        bothPlots->Write();
+	bothPlots->SaveAs( (contourFileName + ".png").c_str());
+	contourFile->Close();
+}
+
 //Display the covariance matrix of a fit in a LaTeX table using cout
 void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 {
@@ -121,6 +170,12 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 		string name = FindAndReplaceString( *nameIterator );
 		
 		cout << setw(15) << name;
+		if ( covarianceMatrix.size() == 0 )
+		{	
+			cerr << "No correlation matrix returned from fit!" << endl;
+			break;
+		}
+		
 		double drow = GetElementFromCovarianceMatrix( covarianceMatrix, row, row );
 
 		for ( int col = 0; col < numberOfFreeParameters; col++)

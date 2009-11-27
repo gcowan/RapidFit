@@ -87,6 +87,12 @@ double FitFunction::EvaluateParameterSet( ParameterSet * TestParameterSet, vecto
 	return 1.0;
 }
 
+//Set the up value for error calculations
+void FitFunction::SetUpErrorValue(double value)
+{
+        return;
+}
+
 //Return the Up value for error calculation
 double FitFunction::UpErrorValue()
 {

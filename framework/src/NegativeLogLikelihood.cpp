@@ -14,7 +14,7 @@
 #include <iostream>
 
 //Default constructor
-NegativeLogLikelihood::NegativeLogLikelihood()
+NegativeLogLikelihood::NegativeLogLikelihood() : up(0.5)
 {
 }
 
@@ -71,8 +71,15 @@ double NegativeLogLikelihood::EvaluateParameterSet( ParameterSet * TestParameter
 	return -1.0 * total;
 }
 
+//Set the up value for error calculations
+void NegativeLogLikelihood::SetUpErrorValue(double value)
+{
+	up = value;
+}
+
 //Return the up value for error calculations
 double NegativeLogLikelihood::UpErrorValue()
 {
-	return 0.5;
+	return up;
 }
+

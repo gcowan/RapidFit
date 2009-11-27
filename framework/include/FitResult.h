@@ -20,10 +20,12 @@ class FitResult
 		FitResult();
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle );
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double> );
+		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double>, vector< vector< pair<double, double> > >);
 		~FitResult();
 
 		double GetMinimumValue();
 		vector<double> GetCovarianceMatrix();
+		vector< vector< pair<double, double> > > GetContours();
 		ResultParameterSet * GetResultParameterSet();
 		int GetFitStatus();
 		PhysicsBottle * GetPhysicsBottle();
@@ -32,6 +34,7 @@ class FitResult
 		double minimumValue;
 		ResultParameterSet * fittedParameters;
 		vector<double> covarianceMatrix;
+		vector< vector< pair<double, double> > > contours;
 		int fitStatus;
 		PhysicsBottle fittedBottle;
 };

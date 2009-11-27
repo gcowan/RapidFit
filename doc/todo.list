@@ -10,8 +10,6 @@ High priority
 
 * Ability to include an analytic acceptance surface.
 
-* Contour plots (probably use MNCONTOUR from Minuit) and LL scans.
-
 * Asymmetric errors and errors on the error. How do we do this?
 
 * Check the validity of the background PDFs - normalisation in particular.
@@ -68,6 +66,7 @@ Completed plotting issues
 
 The following tasks have been completed
 =======================================
+* Contour plots (probably use MNCONTOUR from Minuit) and LL scans.
 * Implement a weight per data point. This could just be implemented as
 another Observable that is configured in the XML file and is read in from
 data. Alternatively, we could allow the user to give every event in a

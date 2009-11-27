@@ -29,6 +29,7 @@ class FitFunction
 
 		//Overload this function in child classes
 		virtual double UpErrorValue();
+		virtual void SetUpErrorValue( double );
 
 	protected:
 		//Overload these functions in child classes

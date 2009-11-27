@@ -30,7 +30,8 @@ class MinuitFunction : public FCNBase
 		//Interface functions
 		virtual double operator()( const vector<double>& ) const;
 		virtual double Up() const;
-
+		virtual void SetErrorDef( double );
+	
 	protected:
 		FitFunction * function;
 		MnUserParameters * parameters;

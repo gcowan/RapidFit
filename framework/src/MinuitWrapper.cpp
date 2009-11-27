@@ -128,7 +128,29 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		}
 	}
 
-	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, *( function->GetPhysicsBottle() ), covarianceMatrix );
+	// Get the contours
+	int numberOfPoints = 40;
+	int iErrf;
+	double xCoordinates1[numberOfPoints], yCoordinates1[numberOfPoints];
+	double xCoordinates2[numberOfPoints], yCoordinates2[numberOfPoints];
+	vector< pair< double, double> > oneSigmaContour;
+	vector< pair< double, double> > twoSigmaContour;
+        vector< vector< pair< double, double> > > contours;
+	
+	minuit->SetErrorDef(0.5);
+	minuit->mncont(0, 1, numberOfPoints, xCoordinates1, yCoordinates1, iErrf);
+	minuit->SetErrorDef(2);
+	minuit->mncont(0, 1, numberOfPoints, xCoordinates2, yCoordinates2, iErrf);
+	
+	for ( int point = 0; point < numberOfPoints; point++)
+	{
+		oneSigmaContour.push_back( pair<double, double> (xCoordinates1[point], yCoordinates1[point]));
+		twoSigmaContour.push_back( pair<double, double> (xCoordinates2[point], yCoordinates2[point]));
+	}
+	contours.push_back(oneSigmaContour);
+	contours.push_back(twoSigmaContour);
+
+	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, *( function->GetPhysicsBottle() ), covarianceMatrix, contours );
 }
 
 //The function to pass to Minuit
