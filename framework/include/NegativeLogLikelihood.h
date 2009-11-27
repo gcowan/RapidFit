@@ -16,6 +16,7 @@ class NegativeLogLikelihood : public FitFunction
 {
 	public:
 		NegativeLogLikelihood();
+		NegativeLogLikelihood(string);
 		~NegativeLogLikelihood();
 
 		virtual double UpErrorValue();
@@ -26,5 +27,7 @@ class NegativeLogLikelihood : public FitFunction
 		virtual double EvaluateParameterSet( ParameterSet*, vector<string> );
 	private:
 		double up;
+		bool hasWeight;
+		string weightName;
 };
 #endif

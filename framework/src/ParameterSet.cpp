@@ -10,6 +10,7 @@
 #include "StringProcessing.h"
 #include "ParameterSet.h"
 #include <iostream>
+#include <stdlib.h>
 
 //Default constructor
 ParameterSet::ParameterSet()
@@ -46,7 +47,9 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter(string Name)
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		return new PhysicsParameter( Name, 0.0, 0.0, 0.0, "Error", "NameNotFoundError");
+		cerr << "PhysicsParameter " << Name << " not found" << endl;
+		exit(1);
+		//return new PhysicsParameter( Name, 0.0, 0.0, 0.0, "Error", "NameNotFoundError");
 	}
 	else
 	{
@@ -61,7 +64,9 @@ bool ParameterSet::SetPhysicsParameter( string Name, PhysicsParameter * NewPhysi
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
         if ( nameIndex == -1 )
 	{
-		return false;
+		cerr << "PhysicsParameter " << Name << " not found" << endl;
+		exit(1);
+		//return false;
 	}
 	else
 	{

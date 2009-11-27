@@ -27,7 +27,7 @@ ToyStudy::ToyStudy( string FileName )
 	if ( xml->IsLoaded() )
 	{
 		minimiserName = xml->GetMinimiserName();
-		functionName = xml->GetFitFunctionName();
+		theFunction = xml->GetFitFunction();
 		studyParameters = xml->GetFitParameters();
 		pdfsAndData = xml->GetPDFsAndData();
 		numberStudies = xml->GetNumberRepeats();
@@ -49,8 +49,8 @@ ToyStudy::ToyStudy( string FileName )
 }
 
 //Constructor with correct arguments
-ToyStudy::ToyStudy( string MinimiserName, string FunctionName, ParameterSet * StudyParameters, vector< PDFWithData* > PDFsAndData, int NumberStudies )
-	: minimiserName(MinimiserName), functionName(FunctionName), studyParameters(StudyParameters), pdfsAndData(PDFsAndData), numberStudies(NumberStudies)
+ToyStudy::ToyStudy( string MinimiserName, FitFunction * TheFunction, ParameterSet * StudyParameters, vector< PDFWithData* > PDFsAndData, int NumberStudies )
+	: minimiserName(MinimiserName), theFunction(TheFunction), studyParameters(StudyParameters), pdfsAndData(PDFsAndData), numberStudies(NumberStudies)
 {
 	if ( numberStudies < 1 )
 	{
@@ -88,7 +88,7 @@ ToyStudyResult * ToyStudy::DoWholeStudy()
 	{
 		cout << "Starting study #" << studyIndex << endl;
 		allResults->StartStopwatch();
-		allResults->AddFitResult( FitAssembler::DoFit( minimiserName, functionName, studyParameters, pdfsAndData ) );
+		allResults->AddFitResult( FitAssembler::DoFit( minimiserName, theFunction, studyParameters, pdfsAndData ) );
 	}
 
 	return allResults;

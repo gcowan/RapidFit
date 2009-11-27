@@ -108,7 +108,7 @@
 
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 
-	<NumberRepeats>100</NumberRepeats>
+	<NumberRepeats>1</NumberRepeats>
 
 	<ToFit>
 		<PDF>

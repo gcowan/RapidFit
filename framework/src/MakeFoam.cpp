@@ -1,8 +1,9 @@
 #include "MakeFoam.h"
-#include <stack>
+#include <queue>
 #include "StatisticsFunctions.h"
 #include <iostream>
 #include <cmath>
+#include "RapidFitIntegrator.h"
 
 using namespace std;
 
@@ -16,10 +17,10 @@ MakeFoam::MakeFoam()
 }
 
 //Constructor with correct argument
-MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoint * InputPoint )
+MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoint * InputPoint ) : integratePDF(InputPDF)
 {
 	//Make the container to hold the possible cells
-	stack<PhaseSpaceBoundary> possibleCells;
+	queue<PhaseSpaceBoundary> possibleCells;
 	PhaseSpaceBoundary firstCell = *InputBoundary;
 	possibleCells.push(firstCell);
 
@@ -29,12 +30,10 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 	StatisticsFunctions::DoDontIntegrateLists( InputPDF, InputBoundary, &(pdfDontIntegrate), doIntegrate, dontIntegrate );
 
 	//Continue until all possible cells have been examined
-	while ( !possibleCells.empty() && finishedCells.size() < MAXIMUM_CELLS )
+	while ( !possibleCells.empty() )
 	{
-		//cout << endl << endl << "Start loop" << endl;
-
 		//Remove the next possible cell
-		PhaseSpaceBoundary currentCell = possibleCells.top();
+		PhaseSpaceBoundary currentCell = possibleCells.front();
 		possibleCells.pop();
 
 		//MC sample the cell, store the DataPoints producing the highest and lowest values
@@ -76,7 +75,6 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 				{
 					maximumValue = sampleValue;
 					maximumPoint = samplePoint;
-					//cout << "Maximum value: " << maximumValue << endl;
 				}
 
 				//Find minimum
@@ -84,7 +82,6 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 				{
 					minimumValue = sampleValue;
 					minimumPoint = samplePoint;
-					//cout << "Minimum value: " << minimumValue << endl;
 				}
 			}
 		}
@@ -95,28 +92,22 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		double maximumGradient, lowPoint, midPoint, highPoint;
 		for ( int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
 		{
-			//cout << "Examining: " << doIntegrate[observableIndex] << endl;
-
 			//Find the size of the cell in this observable
 			IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
 			double cellMaximum = temporaryConstraint->GetMaximum();
 			double cellMinimum = temporaryConstraint->GetMinimum();
-
-			//cout << "Cell maximum: " << cellMaximum << endl;
-			//cout << "Cell minimum: " << cellMinimum << endl;
 
 			//Find the distance between the maximum and minimum points in this observable
 			double pointMaximum = maximumPoint.GetObservable( doIntegrate[observableIndex] )->GetValue();
 			double pointMinimum = minimumPoint.GetObservable( doIntegrate[observableIndex] )->GetValue();
 			double pointRange = pointMaximum - pointMinimum;
 
-			//cout << "Point maximum: " << pointMaximum << endl;
-			//cout << "Point minimum: " << pointMinimum << endl;
-
 			//Find the gradient
+			//NOTE: this is the crucial expression for determining foam generation. It might well be wrong!
+			//FIRST TRY: chose the observable with smallest relative distance between max and min point
+			//Failed because creates infinitely thin cells
+			//SECOND TRY: chose the observable with greatest absolute distance between min and max
 			double gradient = abs( ( maximumValue - minimumValue ) * pointRange );//( cellMaximum - cellMinimum ) / pointRange );
-
-			//cout << "Gradient: " << gradient << endl;
 
 			//Store the mid point
 			double observableMiddle = cellMinimum + ( ( cellMaximum - cellMinimum ) / 2.0 );
@@ -125,7 +116,6 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			//Update maximum
 			if ( observableIndex == 0 || gradient > maximumGradient )
 			{
-				//cout << "Is latest maximum" << endl;
 				maximumGradient = gradient;
 				maximumGradientObservable = doIntegrate[observableIndex];
 				unit = temporaryConstraint->GetUnit();
@@ -134,8 +124,6 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 				lowPoint = cellMinimum;
 			}
 		}
-
-		//cout << "Maximum gradient found: " << maximumGradient << endl;
 
 		//If the maximum gradient is within tolerance, the cell is finished
 		if ( maximumGradient < MAXIMUM_GRADIENT_TOLERANCE )
@@ -161,8 +149,6 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 
 			//Store the center point
 			centerPoints.push_back(cellCenter);
-
-			//cout << "Stored finished cell" << endl;
 		}
 		else
 		{
@@ -178,12 +164,12 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 					//Split the cells on the observable with the greatest gradient
 					if ( lowPoint == midPoint )
 					{
-						cout << "lowPoint == midPoint" << endl;
+						cerr << "lowPoint == midPoint" << endl;
 						return;
 					}
 					if ( midPoint == highPoint )
 					{
-						cout << "midPoint == highPoint" << endl;
+						cerr << "midPoint == highPoint" << endl;
 						return;
 					}
 					daughterCell1.SetConstraint( doIntegrate[observableIndex], lowPoint, midPoint, unit );
@@ -216,14 +202,71 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			//Add the two new cells to the possibles
 			possibleCells.push(daughterCell1);
 			possibleCells.push(daughterCell2);
-
-			//cout << "Made new possible cells" << endl;
 		}
 
-		//cout << "Number finished: " << finishedCells.size() << endl;
-		//cout << "Number possible: " << possibleCells.size() << endl;
-		//return;
+		//Make sure you don't exceed the maximum number of cells
+		if ( finishedCells.size() + possibleCells.size() >= MAXIMUM_CELLS )
+		{
+			//Dump out any possible cells into finished, without any further examination
+			while ( !possibleCells.empty() )
+			{
+				//Move the cell from "possible" to "finished"
+				PhaseSpaceBoundary temporaryCell = possibleCells.front();
+				possibleCells.pop();
+				finishedCells.push_back(temporaryCell);
+
+				//Create a data point at the center of the current cell
+				DataPoint cellCenter( InputPoint->GetAllNames() );
+				for ( int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+				{
+					//Calculate the cell mid point
+					IConstraint * temporaryConstraint = temporaryCell.GetConstraint( doIntegrate[observableIndex] );
+					double midPoint = temporaryConstraint->GetMinimum() + ( ( temporaryConstraint->GetMaximum() - temporaryConstraint->GetMinimum() ) / 2  );
+
+					//Use the mid points for the integrable values
+					Observable * temporaryObservable = cellCenter.GetObservable( doIntegrate[observableIndex] );
+					temporaryObservable->SetValue(midPoint);
+					cellCenter.SetObservable( doIntegrate[observableIndex], temporaryObservable );
+				}
+				for ( int observableIndex = 0; observableIndex < dontIntegrate.size(); observableIndex++ )
+				{
+					//Use given values for unintegrable observables
+					Observable * temporaryObservable = InputPoint->GetObservable( dontIntegrate[observableIndex] );
+					cellCenter.SetObservable( dontIntegrate[observableIndex], temporaryObservable );
+				}
+
+				//Store the center point
+				centerPoints.push_back(cellCenter);
+			}
+
+			//Exit the foam loop
+			break;
+		}
 	}
+
+	//Now all the cells have been made!
+	//Make a numerical integrator for the function
+	RapidFitIntegrator cellIntegrator( InputPDF, true );
+
+	//Prepare the sanity check
+	//double wholeIntegral = cellIntegrator.Integral( InputPoint, InputBoundary );
+	//double totalCellIntegral = 0.0;
+
+	//Find the function value at the center of each cell, and the integral of the function over the cell
+	for ( int cellIndex = 0; cellIndex < finishedCells.size(); cellIndex++ )
+	{
+		//Integrate the cell
+		double integral = cellIntegrator.Integral( InputPoint, &( finishedCells[cellIndex] ) );
+		cellIntegrals.push_back(integral);
+		//totalCellIntegral += integral;
+
+		//Evaluate the function at the center of the cell
+		double value = InputPDF->Evaluate( &( centerPoints[cellIndex] ) );
+		centerValues.push_back(value);
+	}
+
+	//cout << "Whole integral = " << wholeIntegral << endl;
+	//cout << "Total cells = " << totalCellIntegral << endl;
 }
 
 //Destructor
@@ -250,4 +293,30 @@ void MakeFoam::Debug()
 		}
 		cout << endl;
 	}
+
+	for ( int cellIndex = 0; cellIndex < finishedCells.size(); cellIndex++ )
+	{
+		cout << centerValues[cellIndex] << ", " << cellIntegrals[cellIndex] << endl;
+	}
+}
+
+//Integrate the function
+double MakeFoam::Integral()
+{
+	//Don't need any input: assume the phase space is unchanged (or else the whole initialisation is invalid)
+	//Assume the correct foam has already been chosen for the data point
+
+	//Evaluate each cell center point, weight precalculated integral by the change
+	double totalIntegral = 0.0;
+	for ( int cellIndex = 0; cellIndex < centerPoints.size(); cellIndex++ )
+	{
+		//Evaluate the function at the center of the cell
+		double newCenterValue = integratePDF->Evaluate( &( centerPoints[cellIndex] ) );
+
+		//Return the precalculated integral of the cell, scaled to the new function value
+		double newIntegral = cellIntegrals[cellIndex] * newCenterValue / centerValues[cellIndex];
+		totalIntegral += newIntegral;
+	}
+
+	return totalIntegral;
 }

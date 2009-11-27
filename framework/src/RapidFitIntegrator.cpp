@@ -25,11 +25,22 @@ RapidFitIntegrator::RapidFitIntegrator()
 }
 
 //Constructor with correct argument
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), functionToWrap(InputFunction)
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(ForceNumerical), functionToWrap(InputFunction), testFast(false)
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
 	oneDimensionIntegrator = new IntegratorOneDim(type);
+}
+
+
+//Constructor to test FoamIntegrator
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, IDataSet * InputData, bool ForceNumerical ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(ForceNumerical), functionToWrap(InputFunction), testFast(true)
+{
+        multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
+        ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
+        oneDimensionIntegrator = new IntegratorOneDim(type);
+
+	fastIntegrator = new FoamIntegrator( InputFunction, InputData );
 }
 
 //Destructor
@@ -51,7 +62,19 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 		//If the function has been tested already, use the result
 		if (functionCanIntegrate)
 		{
-			return functionToWrap->Integral( NewDataPoint, NewBoundary );
+			if ( testFast )
+			{
+				//double foamIntegral = 0.0;
+				//double foamIntegral = fastIntegrator->Integral( NewDataPoint, NewBoundary );
+				//double analyticalIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
+				//cout << "Foam integral = " << foamIntegral << " vs analytical = " << analyticalIntegral << endl;
+				//return analyticalIntegral;
+				return fastIntegrator->Integral( NewDataPoint, NewBoundary );
+			}
+			else
+			{
+				return functionToWrap->Integral( NewDataPoint, NewBoundary );
+			}
 		}
 		else
 		{

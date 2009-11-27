@@ -15,6 +15,7 @@
 #include "IntegratorFunction.h"
 #include "Math/AdaptiveIntegratorMultiDim.h"
 #include "Math/Integrator.h"
+#include "FoamIntegrator.h"
 
 using namespace ROOT::Math;
 
@@ -22,7 +23,8 @@ class RapidFitIntegrator
 {
 	public:
 		RapidFitIntegrator();
-		RapidFitIntegrator( IPDF* );
+		RapidFitIntegrator( IPDF*, bool ForceNumerical = false );
+		RapidFitIntegrator( IPDF*, IDataSet*, bool ForceNumerical = false );
 		~RapidFitIntegrator();
 
 		double Integral( DataPoint*, PhaseSpaceBoundary* );
@@ -31,6 +33,8 @@ class RapidFitIntegrator
 	private:
 		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string> );
 
+		bool testFast;
+		FoamIntegrator * fastIntegrator;
 		IPDF * functionToWrap;
 		AdaptiveIntegratorMultiDim * multiDimensionIntegrator;
 		IntegratorOneDim * oneDimensionIntegrator;

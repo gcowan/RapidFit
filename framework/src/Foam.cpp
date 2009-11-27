@@ -27,7 +27,7 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBounda
 	//Retrieve all combinations of discrete variables
 	allNames = generationBoundary->GetAllNames();
 	vector< vector<double> > discreteCombinations = StatisticsFunctions::DiscreteCombinations( &allNames, generationBoundary, discreteNames, continuousNames, discreteValues );
-	
+
 	//Retrieve the maxima and minima, to use in the coordinate transforms
 	for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 	{
@@ -71,6 +71,12 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBounda
 		foamGenerator->SetChat(0);
 		foamGenerator->SetMaxWtRej(1.1);
 		foamGenerator->Initialize();
+
+		//Debug
+		//char filename[100];
+		//sprintf( filename, "DebugFoamPlot.%d.c", combinationIndex );
+		//foamGenerator->RootPlot2dim(filename);
+		//foamGenerator->PrintCells();
 
 		//Store the foam generator
 		foamGenerators.push_back(foamGenerator);

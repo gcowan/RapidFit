@@ -89,7 +89,8 @@ double StatisticsFunctions::Minimum( vector<double> Numbers )
 }
 
 //Returns all possible combinations of discrete observable values from a PhaseSpaceBoundary
-vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<string> * AllNames, PhaseSpaceBoundary * InputBoundary, vector<string> & DiscreteNames, vector<string> & ContinuousNames, vector< vector<double> > & discreteValues )
+vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<string> * AllNames, PhaseSpaceBoundary * InputBoundary, vector<string> & DiscreteNames,
+		vector<string> & ContinuousNames, vector< vector<double> > & discreteValues )
 {
 	//Construct a vector<vector> containing all discrete values. List the names of discrete and continuous observables.
 	vector<string>::iterator nameIterator;
@@ -185,4 +186,112 @@ void StatisticsFunctions::DoDontIntegrateLists( IPDF * InputPDF, PhaseSpaceBound
 			DontIntegrateList.push_back( observableNames[observableIndex] );
 		}
 	}
+}
+
+//Perform data averaging
+vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector< vector<double> > DiscreteCombinations, vector< vector<double> > DiscreteValues, vector<string> DiscreteNames, vector<string> ContinuousNames,
+	       vector<string> & DataPointDescriptions, vector<double> & DataPointWeights )
+{
+	//Initialise the data averaging
+	vector<double> continuousSums;
+	vector<long> combinationCounts;
+	for ( int continuousIndex = 0; continuousIndex < ContinuousNames.size(); continuousIndex++ )
+	{
+		continuousSums.push_back(0.0);
+	}
+	for ( int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); combinationIndex++ )
+	{
+		combinationCounts.push_back(0);
+	}
+
+	//Examine the data set. Find the average value for each continuous observable, and the weight for each discrete combination
+	for ( int dataIndex = 0; dataIndex < InputData->GetDataNumber(); dataIndex++ )
+	{
+		DataPoint * readDataPoint = InputData->GetDataPoint(dataIndex);
+
+		//Sum the continuous values, in preparation for taking the average
+		for ( int continuousIndex = 0; continuousIndex < ContinuousNames.size(); continuousIndex++ )
+		{
+			continuousSums[continuousIndex] += readDataPoint->GetObservable( ContinuousNames[continuousIndex] )->GetValue();
+		}
+
+		//Calculate the index for the discrete combination, and increment the corresponding count
+		int combinationIndex = 0;
+		int incrementValue = 1;
+		for ( int discreteIndex = DiscreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		{
+			double currentValue = readDataPoint->GetObservable( DiscreteNames[discreteIndex] )->GetValue();
+
+			for ( int valueIndex = 0; valueIndex < DiscreteValues[discreteIndex].size(); valueIndex++ )
+			{
+				if ( DiscreteValues[discreteIndex][valueIndex] == currentValue )
+				{
+					combinationIndex += ( incrementValue * valueIndex );
+					incrementValue *= DiscreteValues[discreteIndex].size();
+					break;
+				}
+			}
+		}
+		combinationCounts[combinationIndex]++;
+	}
+
+	//Calculate averages and weights
+	vector<double> combinationWeights;
+	double dataNumber = (double)InputData->GetDataNumber();
+	for ( int continuousIndex = 0; continuousIndex < ContinuousNames.size(); continuousIndex++ )
+	{
+		continuousSums[continuousIndex] /= dataNumber;
+	}
+
+	for ( int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); combinationIndex++ )
+	{
+		combinationWeights.push_back( (double)combinationCounts[combinationIndex] / dataNumber );
+	}
+
+	//Create the data points to return
+	vector<DataPoint> newDataPoints;
+	vector<string> allDescriptions;
+	DataPoint templateDataPoint = *( InputData->GetDataPoint(0) );
+	for ( int continuousIndex = 0; continuousIndex < ContinuousNames.size(); continuousIndex++ )
+	{
+		Observable * newValue = templateDataPoint.GetObservable( ContinuousNames[continuousIndex] );
+		newValue->SetValue( continuousSums[continuousIndex] );
+		templateDataPoint.SetObservable( ContinuousNames[continuousIndex], newValue );
+	}
+	for ( int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); combinationIndex++ )
+	{
+		string description = "(";
+
+		//Output the discrete values for this combination
+		for ( int discreteIndex = 0; discreteIndex < DiscreteNames.size(); discreteIndex++ )
+		{
+			//Set the data point
+			Observable * newValue = templateDataPoint.GetObservable( DiscreteNames[discreteIndex] );
+			newValue->SetValue( DiscreteCombinations[combinationIndex][discreteIndex] );
+			templateDataPoint.SetObservable( DiscreteNames[discreteIndex], newValue );
+
+			//Make the description
+			char value[100];
+			sprintf( value, "%f", DiscreteCombinations[combinationIndex][discreteIndex] );
+			string addToDescription;
+			if ( discreteIndex == DiscreteNames.size() - 1 )
+			{
+				addToDescription = DiscreteNames[discreteIndex] + "=" + value;
+			}
+			else
+			{
+				addToDescription = DiscreteNames[discreteIndex] + "=" + value + "_";
+			}
+			description.append(addToDescription);
+		}
+
+		description.append(")");
+		allDescriptions.push_back(description);
+		newDataPoints.push_back(templateDataPoint);
+	}
+
+	//Output the results
+	DataPointDescriptions = allDescriptions;
+	DataPointWeights = combinationWeights;
+	return newDataPoints;
 }

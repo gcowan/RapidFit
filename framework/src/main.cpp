@@ -52,7 +52,7 @@ int main( int argc, char * argv[] )
 		string configFileName = "";
 		vector<string> parameterTemplates;
 		string minimiserName = "";
-		string functionName = "";
+		FitFunction * theFunction;
 		string saveOneDataSetFileName = "";
 		string plotFileName = "FitPlots.root";
 		string pullFileName = "PullPlots.root";
@@ -63,7 +63,7 @@ int main( int argc, char * argv[] )
 		bool configFileNameFlag = false;
 		bool parameterTemplateFlag = false;
 		bool minimiserNameFlag = false;
-		bool functionNameFlag = false;
+		bool theFunctionFlag = false;
 		bool saveOneDataSetFlag = false;
 		bool testIntegratorFlag = false;
 		bool testPlotFlag = false;
@@ -124,8 +124,8 @@ int main( int argc, char * argv[] )
 				if ( argumentIndex + 1 < argc )
 				{
 					argumentIndex++;
-					functionName = argv[argumentIndex];
-					functionNameFlag = true;
+					theFunction = ClassLookUp::LookUpFitFunctionName( argv[argumentIndex], "" );
+					theFunctionFlag = true;
 				}
 				else
 				{
@@ -338,9 +338,9 @@ int main( int argc, char * argv[] )
 			{
 				minimiserName = xmlFile->GetMinimiserName();
 			}
-			if (!functionNameFlag)
+			if (!theFunctionFlag)
 			{
-				functionName = xmlFile->GetFitFunctionName();
+				theFunction = xmlFile->GetFitFunction();
 			}
 			if (!parameterTemplateFlag)
 			{
@@ -358,7 +358,7 @@ int main( int argc, char * argv[] )
 			//Pick a toy study if there are repeats, or if pull plots are wanted
 			if ( numberRepeats > 1 || doPullsFlag )
 			{
-				ToyStudy newStudy( minimiserName, functionName, argumentParameterSet, pdfsAndData, numberRepeats );
+				ToyStudy newStudy( minimiserName, theFunction, argumentParameterSet, pdfsAndData, numberRepeats );
 				ToyStudyResult * fitResults = newStudy.DoWholeStudy();
 				ResultFormatter::MakePullPlots( pullFileName, fitResults );
 
@@ -366,7 +366,7 @@ int main( int argc, char * argv[] )
 			}
 			else
 			{
-				FitResult * oneResult = FitAssembler::DoFit( minimiserName, functionName, argumentParameterSet, pdfsAndData );
+				FitResult * oneResult = FitAssembler::DoFit( minimiserName, theFunction, argumentParameterSet, pdfsAndData );
 				OutputOneFit( oneResult, doPlottingFlag, plotFileName );
 			}
 		}

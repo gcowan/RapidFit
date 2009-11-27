@@ -12,6 +12,7 @@
 #include "ObservableContinuousConstraint.h"
 #include "ObservableDiscreteConstraint.h"
 #include <iostream>
+#include <stdlib.h>
 
 //Default constructor
 PhaseSpaceBoundary::PhaseSpaceBoundary()
@@ -48,7 +49,9 @@ IConstraint * PhaseSpaceBoundary::GetConstraint(string Name)
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		return new ObservableContinuousConstraint( Name, 0.0, 0.0, "NameNotFoundError" );
+		cerr << "Constraint on " << Name << " not found" << endl;
+		exit(1);
+		//return new ObservableContinuousConstraint( Name, 0.0, 0.0, "NameNotFoundError" );
 	}
 	else
 	{
@@ -63,7 +66,9 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		return false;
+		cerr << "Constraint on " << Name << " not found" << endl;
+		exit(1);
+		//return false;
 	}
 	else
 	{

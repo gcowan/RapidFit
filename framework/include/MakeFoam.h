@@ -12,10 +12,13 @@ class MakeFoam
 		~MakeFoam();
 
 		void Debug();
+		double Integral();
 
 	private:
 		vector<PhaseSpaceBoundary> finishedCells;
 		vector<DataPoint> centerPoints;
+		vector<double> centerValues, cellIntegrals;
+		IPDF * integratePDF;
 };
 
 #endif

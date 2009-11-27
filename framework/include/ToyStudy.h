@@ -13,6 +13,7 @@
 #include "PDFWithData.h"
 #include "ParameterSet.h"
 #include "ToyStudyResult.h"
+#include "FitFunction.h"
 #include <string>
 #include <vector>
 
@@ -23,7 +24,7 @@ class ToyStudy
 	public:
 		ToyStudy();
 		ToyStudy( string );
-		ToyStudy( string, string, ParameterSet*, vector< PDFWithData* >, int );
+		ToyStudy( string, FitFunction*, ParameterSet*, vector< PDFWithData* >, int );
 		~ToyStudy();
 
 		ToyStudyResult * DoWholeStudy();
@@ -35,7 +36,7 @@ class ToyStudy
 		vector< PDFWithData* > pdfsAndData;
 		ParameterSet * studyParameters;
 		string minimiserName;
-		string functionName;
+		FitFunction * theFunction;
 		ToyStudyResult * allResults;
 		int numberStudies;
 };

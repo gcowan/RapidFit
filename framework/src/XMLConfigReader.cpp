@@ -7,6 +7,7 @@
   @date 2009-10-02
  */
 
+#include <stdlib.h>
 #include "XMLConfigReader.h"
 #include "ClassLookUp.h"
 #include <fstream>
@@ -135,19 +136,73 @@ int XMLConfigReader::GetNumberRepeats()
 }
 
 //Return the function to minimise
-string XMLConfigReader::GetFitFunctionName()
+FitFunction * XMLConfigReader::GetFitFunction()
 {
-	//Get the name of the minimiser
-	string functionName = "Uninitialised";
+	//Find the FitFunction tag
 	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
 	{
 		if ( children[childIndex]->GetName() == "FitFunction" )
 		{
-			functionName = children[childIndex]->GetValue()[0];
+			return MakeFitFunction( children[childIndex] );
 		}
 	}
 
-	return functionName;
+	//Tag not found, fail
+	cerr << "FitFunction tag not found" << endl;
+	exit(1);
+}
+
+//Make the FitFunction
+FitFunction * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTag )
+{
+	if ( FunctionTag->GetName() == "FitFunction" )
+	{
+		string functionName = "Uninitialised";
+		string weightName = "Uninitialised";
+		bool hasWeight = false;
+		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
+		if ( functionInfo.size() == 0 )
+		{
+			//Old style - just specifies the function name
+			functionName = FunctionTag->GetValue()[0];
+		}
+		else
+		{
+			//New style - can have weights
+			for ( int childIndex = 0; childIndex < functionInfo.size(); childIndex++ )
+			{
+				if ( functionInfo[childIndex]->GetName() == "FunctionName" )
+				{
+					functionName = functionInfo[childIndex]->GetValue()[0];
+				}
+				else if ( functionInfo[childIndex]->GetName() == "WeightName" )
+				{
+					hasWeight = true;
+					weightName = functionInfo[childIndex]->GetValue()[0];
+				}
+				else
+				{
+					cerr << "Unrecognised FitFunction component: \"" << functionInfo[childIndex]->GetName() << endl;
+					exit(1);
+				}
+			}
+		}
+
+		//Make the function
+		if (hasWeight)
+		{
+			return ClassLookUp::LookUpFitFunctionName( functionName, weightName );
+		}
+		else
+		{
+			return ClassLookUp::LookUpFitFunctionName( functionName, "" );
+		}
+	}
+	else
+	{
+		cerr << "Tag name incorrect: \"" << FunctionTag->GetName() << " not \"FitFunction\"" << endl;
+		exit(1);
+	}
 }
 
 //Organise all the PDFs and DataSets

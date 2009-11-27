@@ -11,6 +11,7 @@
 #include "DataPoint.h"
 #include "StringProcessing.h"
 #include <iostream>
+#include <stdlib.h>
 
 //Default constructor
 DataPoint::DataPoint()
@@ -47,7 +48,9 @@ Observable * DataPoint::GetObservable(string Name)
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		return new Observable( Name, 0.0, 0.0, "NameNotFoundError");
+		cerr << "Observable name " << Name << " not found" << endl;
+		exit(1);
+		//return new Observable( Name, 0.0, 0.0, "NameNotFoundError");
 	}
 	else
 	{
@@ -62,7 +65,9 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		return false;
+		cerr << "Observable name " << Name << " not found" << endl;
+		exit(1);
+		//return false;
 	}
 	else
 	{

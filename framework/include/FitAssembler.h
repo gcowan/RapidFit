@@ -23,8 +23,8 @@ class FitAssembler
 {
 	public:
 		static FitResult * DoFit( IMinimiser*, FitFunction* );
-		static FitResult * DoFit( string, string, PhysicsBottle* );
-		static FitResult * DoFit( string, string, ParameterSet*, vector< PDFWithData* > );
+		static FitResult * DoFit( string, FitFunction*, PhysicsBottle* );
+		static FitResult * DoFit( string, FitFunction*, ParameterSet*, vector< PDFWithData* > );
 };
 
 #endif

@@ -126,11 +126,18 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 }
 
 //Look up the name of a fit function, and return an appropriate instance
-FitFunction * ClassLookUp::LookUpFitFunctionName( string Name )
+FitFunction * ClassLookUp::LookUpFitFunctionName( string Name, string Weight )
 {
 	if ( Name == "NegativeLogLikelihood" )
 	{
-		return new NegativeLogLikelihood();
+		if ( Weight == "" )
+		{
+			return new NegativeLogLikelihood();
+		}
+		else
+		{
+			return new NegativeLogLikelihood(Weight);
+		}
 	}
 	else
 	{

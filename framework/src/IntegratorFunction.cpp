@@ -74,7 +74,7 @@ IBaseFunctionMultiDim & IntegratorFunction::operator=( const IntegratorFunction 
 double IntegratorFunction::DoEval( const double * x ) const
 {
 	//Make a new data point
-	DataPoint * newDataPoint = new DataPoint( wrappedFunction->GetPrototypeDataPoint() );
+	DataPoint * newDataPoint = new DataPoint( currentPoint->GetAllNames() );//WrappedFunction->GetPrototypeDataPoint() );
 
 	//Load the array into the data point
 	for ( int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )

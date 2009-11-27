@@ -41,7 +41,7 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 	//Initialise the integrators
 	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); resultIndex++ )
 	{
-		RapidFitIntegrator * resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
+		RapidFitIntegrator * resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );//, NewBottle->GetResultDataSet(resultIndex) );
 		allIntegrators.push_back( resultIntegrator );
 	}
 }
