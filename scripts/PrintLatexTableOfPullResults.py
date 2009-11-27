@@ -39,6 +39,12 @@ def main():
     trees = []
     histos = []
     resultsList = []
+
+    dir = 'RapidFitPlots/'
+    if not os.path.isdir(dir):
+	    os.mkdir(dir)
+    outputFile = ROOT.TFile.Open( dir+args[2], 'RECREATE')
+
     for i in range( len(physicsParameters) ):
 	param = physicsParameters[i]
 	tree = rootFile.Get( param )
@@ -93,10 +99,7 @@ def main():
 
 	resultsList.append( [ param, error_mean, error_emean, pull_mean, pull_emean, pull_sigma, pull_esigma])
 
-	dir = 'RapidFitPlots/'
-	if not os.path.isdir(dir):
-                os.mkdir(dir)
-        outputFile = ROOT.TFile.Open( dir+args[2], 'RECREATE')
+
 	outputFile.Write()
  	canvas.Update()
     	canvas.SaveAs(dir+'%s.png' % param)
