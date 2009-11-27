@@ -1,5 +1,5 @@
 /**
-        @interface IDataSet
+        @interface IMinimiser
 
         Interface for all function minimisers
 
