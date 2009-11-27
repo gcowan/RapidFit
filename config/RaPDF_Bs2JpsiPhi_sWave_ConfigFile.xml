@@ -10,7 +10,7 @@
 			<Minimum>0.0</Minimum>
 			<Maximum>1.5</Maximum>
 			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
+			<Unit>ps^{-1}</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
@@ -19,7 +19,7 @@
 			<Minimum>-1.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
+			<Unit>ps^{-1}</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
@@ -36,7 +36,7 @@
 			<Value>0.111</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -51,10 +51,10 @@
 
 		<PhysicsParameter>
 			<Name>delta_s</Name>
-			<Value>1.5707963267948966</Value>
+			<Value>1.5</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -87,10 +87,10 @@
 
 		<PhysicsParameter>
 			<Name>deltaM</Name>
-			<Value>17.77</Value>
+			<Value>17.8</Value>
 			<Minimum>17.0</Minimum>
 			<Maximum>20.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>MeV/c2</Unit>
 		</PhysicsParameter>
 
@@ -117,7 +117,7 @@
 
 		<DataSet>
 			<Source>Foam</Source>
-			<NumberEvents>1000</NumberEvents>
+			<NumberEvents>30000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
@@ -149,9 +149,9 @@
 
 				<Observable>
 					<Name>tag</Name>
-					<Value>-1.0</Value>
-					<Value>0.0</Value>
 					<Value>1.0</Value>
+					<Value>0.0</Value>
+					<Value>-1.0</Value>
 					<Unit>Unitless</Unit>
 				</Observable>
 
