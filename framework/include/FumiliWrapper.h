@@ -42,11 +42,13 @@ class FumiliWrapper : public IMinimiser
 		//Interface functions
 		virtual void Minimise( FitFunction* );
 		virtual FitResult * GetFitResult();
+		virtual void ContourPlots( vector< pair< string, string > > );
 
 	private:
 		//MnMigrad minuit;
 		FumiliFunction * function;
 		FitResult * fitResult;
+		vector< pair< string, string > > contours;
 };
 
 #endif

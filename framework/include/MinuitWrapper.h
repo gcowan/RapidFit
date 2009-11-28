@@ -27,14 +27,15 @@ class MinuitWrapper : public IMinimiser
 		//Interface functions
 		virtual void Minimise( FitFunction* );
 		virtual FitResult * GetFitResult();
+		virtual void ContourPlots( vector< pair< string, string > > );
 
 	private:
 		friend void Function( int&, double*, double&, double*, int );
 
 		TMinuit * minuit;
 		static FitFunction * function;
-		//static vector<string> allNames;
 		FitResult * fitResult;
+		vector< pair< string, string > > contours; 
 };
 
 #endif

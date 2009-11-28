@@ -162,3 +162,9 @@ FitResult * FumiliWrapper::GetFitResult()
 {
 	return fitResult;
 }
+
+//Request contour plots
+void FumiliWrapper::ContourPlots( vector< pair< string, string > > ContourParameters )
+{
+	contours = ContourParameters;
+}

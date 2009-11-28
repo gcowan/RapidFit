@@ -10,7 +10,7 @@
 #include "PDFWithData.h"
 #include "DataFileLoader.h"
 #include "ClassLookUp.h"
-#include "InvalidObject.h"
+#include <stdlib.h>
 #include <iostream>
 
 using namespace std;
@@ -73,7 +73,7 @@ IDataSet * PDFWithData::GetDataSet()
 		else
 		{
 			cerr << "PDF parameters must be set before data can be generated" << endl;
-			newDataSet = new InvalidObject("PDF parameters must be set before data can be generated");
+			exit(1);
 		}
 	}
 
@@ -91,6 +91,6 @@ bool PDFWithData::SetPhysicsParameters( ParameterSet * NewParameters )
 	else
 	{
 		cerr << "Failed to set PDF physics parameters" << endl;
-		return false;
+		exit(1);
 	}
 }

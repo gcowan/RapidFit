@@ -1,22 +1,24 @@
 /**
-        @class MinuitWrapper
+  @class MinuitWrapper
 
-        A wrapper to integrate Minuit with RapidFit
+  A wrapper to integrate Minuit with RapidFit
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+ */
 
 #include "MinuitWrapper.h"
 #include <iostream>
 #include "Rtypes.h"
 #include <limits>
+#include "StringProcessing.h"
+#include "FunctionContour.h"
+#include <ctime>
 
 const double MAXIMUM_MINIMISATION_STEPS = 800.0;
 const double FINAL_GRADIENT_TOLERANCE = 0.001;
 const double STEP_SIZE = 0.01;
 FitFunction * MinuitWrapper::function = 0;
-//vector<string> MinuitWrapper::allNames;
 
 //Default constructor
 MinuitWrapper::MinuitWrapper()
@@ -40,7 +42,6 @@ MinuitWrapper::~MinuitWrapper()
 void MinuitWrapper::Minimise( FitFunction * NewFunction )
 {
 	function = NewFunction;
-	//allNames = NewFunction->GetParameterSet()->GetAllNames();
 	int errorFlag = 0;
 	double arguments[2] = {0.0, 0.0};
 
@@ -77,13 +78,18 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	}
 
 	//Set the error analysis
-	arguments[0] = NewFunction->UpErrorValue();
+	arguments[0] = NewFunction->UpErrorValue(1);
 	minuit->mnexcm("SET ERR", arguments, 1, errorFlag);
 
 	//Do the minimisation
 	arguments[0] = MAXIMUM_MINIMISATION_STEPS;
 	arguments[1] = FINAL_GRADIENT_TOLERANCE;
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
+
+	//Output time information
+	time_t timeNow;
+	time(&timeNow);
+	cout << "Minuit2 finished: " << ctime( &timeNow ) << endl;
 
 	//Get the fit status
 	double minimumValue = 0.0;
@@ -109,12 +115,11 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 
 		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-			       -numeric_limits<double>::max(), numeric_limits<double>::max(),
-			       oldParameter->GetType(), oldParameter->GetUnit() );
+				-numeric_limits<double>::max(), numeric_limits<double>::max(),
+				oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 
 	// Get the error matrix and construct a vector containing the correlation coefficients
-	// Need to work out a way of pruning the parameters that are not floated in the fit...
 	int numParams = allNames.size();
 	double matrix[numParams][numParams];
 	gMinuit->mnemat(&matrix[0][0],numParams);
@@ -123,34 +128,51 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	{
 		for (int col = 0; col < numParams; col++)
 		{
-		        if(row > col) covarianceMatrix[col+row*(row+1)/2] = matrix[row][col];
-        		else covarianceMatrix[row+col*(col+1)/2] = matrix[row][col];
+			if(row > col) covarianceMatrix[col+row*(row+1)/2] = matrix[row][col];
+			else covarianceMatrix[row+col*(col+1)/2] = matrix[row][col];
 		}
 	}
 
-	// Get the contours
-	int numberOfPoints = 40;
-	int iErrf;
-	double xCoordinates1[numberOfPoints], yCoordinates1[numberOfPoints];
-	double xCoordinates2[numberOfPoints], yCoordinates2[numberOfPoints];
-	vector< pair< double, double> > oneSigmaContour;
-	vector< pair< double, double> > twoSigmaContour;
-        vector< vector< pair< double, double> > > contours;
-	
-	minuit->SetErrorDef(0.5);
-	minuit->mncont(0, 1, numberOfPoints, xCoordinates1, yCoordinates1, iErrf);
-	minuit->SetErrorDef(2);
-	minuit->mncont(0, 1, numberOfPoints, xCoordinates2, yCoordinates2, iErrf);
-	
-	for ( int point = 0; point < numberOfPoints; point++)
+	//Make the contour plots
+	vector< FunctionContour* > allContours;
+	for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
 	{
-		oneSigmaContour.push_back( pair<double, double> (xCoordinates1[point], yCoordinates1[point]));
-		twoSigmaContour.push_back( pair<double, double> (xCoordinates2[point], yCoordinates2[point]));
-	}
-	contours.push_back(oneSigmaContour);
-	contours.push_back(twoSigmaContour);
+		//Find the index (in Minuit) of the parameter names requested for the plot
+		int xParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].first ) );
+		int yParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].second ) );
+		if ( xParameterIndex == -1 )
+		{
+			cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].first << "\" not found" << endl;
+		}
+		else if ( yParameterIndex == -1 )
+		{
+			cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].second << "\" not found" << endl;
+		}
+		else
+		{
+			//If the parameters have valid indices, ask minuit to plot them
+			int numberOfPoints = 4;
+			int iErrf;
+			double xCoordinates1[numberOfPoints], yCoordinates1[numberOfPoints];
+			double xCoordinates2[numberOfPoints], yCoordinates2[numberOfPoints];
 
-	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, *( function->GetPhysicsBottle() ), covarianceMatrix, contours );
+			//One sigma contour
+			minuit->SetErrorDef( NewFunction->UpErrorValue(1) );
+			minuit->mncont( xParameterIndex, yParameterIndex, numberOfPoints, xCoordinates1, yCoordinates1, iErrf );
+
+			//Two sigma contour
+			minuit->SetErrorDef( NewFunction->UpErrorValue(2) );
+			minuit->mncont( xParameterIndex, yParameterIndex, numberOfPoints, xCoordinates2, yCoordinates2, iErrf );
+
+			//Store the contours
+			FunctionContour * newContour = new FunctionContour( contours[plotIndex].first, contours[plotIndex].second, 2 );
+			newContour->SetPlot( 1, numberOfPoints, xCoordinates1, yCoordinates1 );
+			newContour->SetPlot( 2, numberOfPoints, xCoordinates2, yCoordinates2 );
+			allContours.push_back(newContour);
+		}
+	}
+
+	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, *( function->GetPhysicsBottle() ), covarianceMatrix, allContours );
 }
 
 //The function to pass to Minuit
@@ -172,4 +194,10 @@ void Function( int & npar, double * grad, double & fval, double * xval, int ifla
 FitResult * MinuitWrapper::GetFitResult()
 {
 	return fitResult;
+}
+
+//Request contour plots
+void MinuitWrapper::ContourPlots( vector< pair< string, string > > ContourParameters )
+{
+	contours = ContourParameters;
 }

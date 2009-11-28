@@ -16,7 +16,6 @@
 #include "XMLConfigReader.h"
 #include "ResultFormatter.h"
 #include "InputParsing.h"
-#include "ClassLookUp.h"
 #include "RapidFitIntegrator.h"
 #include "Plotter.h"
 #include <stdio.h>
@@ -51,8 +50,8 @@ int main( int argc, char * argv[] )
 		int numberRepeats = 0;
 		string configFileName = "";
 		vector<string> parameterTemplates;
-		string minimiserName = "";
-		FitFunction * theFunction;
+		MinimiserConfiguration * theMinimiser;
+		FitFunctionConfiguration * theFunction;
 		string saveOneDataSetFileName = "";
 		string plotFileName = "FitPlots.root";
 		string pullFileName = "PullPlots.root";
@@ -62,7 +61,7 @@ int main( int argc, char * argv[] )
 		bool numberRepeatsFlag = false;
 		bool configFileNameFlag = false;
 		bool parameterTemplateFlag = false;
-		bool minimiserNameFlag = false;
+		bool theMinimiserFlag = false;
 		bool theFunctionFlag = false;
 		bool saveOneDataSetFlag = false;
 		bool testIntegratorFlag = false;
@@ -110,8 +109,8 @@ int main( int argc, char * argv[] )
 				if ( argumentIndex + 1 < argc )
 				{
 					argumentIndex++;
-					minimiserName = argv[argumentIndex];
-					minimiserNameFlag = true;
+					theMinimiser = new MinimiserConfiguration( argv[argumentIndex] );
+					theMinimiserFlag = true;
 				}
 				else
 				{
@@ -124,7 +123,7 @@ int main( int argc, char * argv[] )
 				if ( argumentIndex + 1 < argc )
 				{
 					argumentIndex++;
-					theFunction = ClassLookUp::LookUpFitFunctionName( argv[argumentIndex], "" );
+					theFunction = new FitFunctionConfiguration( argv[argumentIndex] );
 					theFunctionFlag = true;
 				}
 				else
@@ -334,13 +333,13 @@ int main( int argc, char * argv[] )
 			//Actually configure a fit
 
 			//Command line argments override the config file
-			if (!minimiserNameFlag)
+			if (!theMinimiserFlag)
 			{
-				minimiserName = xmlFile->GetMinimiserName();
+				theMinimiser = xmlFile->GetMinimiserConfiguration();
 			}
 			if (!theFunctionFlag)
 			{
-				theFunction = xmlFile->GetFitFunction();
+				theFunction = xmlFile->GetFitFunctionConfiguration();
 			}
 			if (!parameterTemplateFlag)
 			{
@@ -358,7 +357,7 @@ int main( int argc, char * argv[] )
 			//Pick a toy study if there are repeats, or if pull plots are wanted
 			if ( numberRepeats > 1 || doPullsFlag )
 			{
-				ToyStudy newStudy( minimiserName, theFunction, argumentParameterSet, pdfsAndData, numberRepeats );
+				ToyStudy newStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, numberRepeats );
 				ToyStudyResult * fitResults = newStudy.DoWholeStudy();
 				ResultFormatter::MakePullPlots( pullFileName, fitResults );
 
@@ -366,7 +365,7 @@ int main( int argc, char * argv[] )
 			}
 			else
 			{
-				FitResult * oneResult = FitAssembler::DoFit( minimiserName, theFunction, argumentParameterSet, pdfsAndData );
+				FitResult * oneResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData );
 				OutputOneFit( oneResult, doPlottingFlag, plotFileName );
 			}
 		}

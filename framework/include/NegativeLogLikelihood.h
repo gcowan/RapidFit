@@ -19,15 +19,13 @@ class NegativeLogLikelihood : public FitFunction
 		NegativeLogLikelihood(string);
 		~NegativeLogLikelihood();
 
-		virtual double UpErrorValue();
-		void SetUpErrorValue( double );
+		virtual double UpErrorValue(int);
+	//	void SetUpErrorValue( double );
 
 	protected:
 		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator* );
 		virtual double EvaluateParameterSet( ParameterSet*, vector<string> );
-	private:
-		double up;
-		bool hasWeight;
-		string weightName;
+	//private:
+	//	double up;
 };
 #endif

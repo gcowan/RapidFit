@@ -26,10 +26,11 @@ class FitFunction
 		ParameterSet * GetParameterSet();
 		double Evaluate();
 		void Finalise();
+		void UseEventWeights(string);
 
 		//Overload this function in child classes
-		virtual double UpErrorValue();
-		virtual void SetUpErrorValue( double );
+		virtual double UpErrorValue(int);
+		//virtual void SetUpErrorValue( double );
 
 	protected:
 		//Overload these functions in child classes
@@ -41,6 +42,8 @@ class FitFunction
 		vector<string>::iterator nameIterator;
 		vector< RapidFitIntegrator* > allIntegrators;
 		double testDouble;
+		bool useWeights;
+		string weightObservableName;
 };
 
 #endif

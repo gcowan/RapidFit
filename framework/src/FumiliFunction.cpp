@@ -89,7 +89,7 @@ double FumiliFunction::operator()( const vector<double>& NewParameterValues) con
 
 double FumiliFunction::Up() const
 {
-	return function->UpErrorValue();;
+	return function->UpErrorValue(1);
 }
 
 //Return the parameters to minimise with

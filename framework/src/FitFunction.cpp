@@ -12,7 +12,7 @@
 #include "FitFunction.h"
 
 //Default constructor
-FitFunction::FitFunction()
+FitFunction::FitFunction() : useWeights(false)
 {
 }
 
@@ -87,14 +87,8 @@ double FitFunction::EvaluateParameterSet( ParameterSet * TestParameterSet, vecto
 	return 1.0;
 }
 
-//Set the up value for error calculations
-void FitFunction::SetUpErrorValue(double value)
-{
-        return;
-}
-
 //Return the Up value for error calculation
-double FitFunction::UpErrorValue()
+double FitFunction::UpErrorValue( int Sigma )
 {
 	return 1.0;
 }
@@ -103,4 +97,11 @@ double FitFunction::UpErrorValue()
 void FitFunction::Finalise()
 {
 	allData->Finalise();
+}
+
+//Set the FitFunction to use per-event weights
+void FitFunction::UseEventWeights( string WeightName )
+{
+	useWeights = true;
+	weightObservableName = WeightName;
 }

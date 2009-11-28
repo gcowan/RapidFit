@@ -1,5 +1,5 @@
 /**
-        @class MinuitFunction
+        @class Minuit2Function
 
         A wrapper making IPDFs work with the Minuit2 API
 
@@ -7,8 +7,8 @@
 	@date 2009-10-02
 */
 
-#ifndef MINUIT_FUNCTION_H
-#define MINUIT_FUNCTION_H
+#ifndef MINUIT2_FUNCTION_H
+#define MINUIT2_FUNCTION_H
 
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnUserParameters.h"
@@ -17,25 +17,26 @@
 
 using namespace ROOT::Minuit2;
 
-class MinuitFunction : public FCNBase
-//class MinuitFunction : public ParametricFunction
+class Minuit2Function : public FCNBase
 {
 	public:
-		MinuitFunction();
-		MinuitFunction( FitFunction* );
-		~MinuitFunction();
+		Minuit2Function();
+		Minuit2Function( FitFunction* );
+		~Minuit2Function();
 
+		void SetSigma(int);
 		MnUserParameters * GetMnUserParameters();
 
 		//Interface functions
 		virtual double operator()( const vector<double>& ) const;
 		virtual double Up() const;
 		virtual void SetErrorDef( double );
+		virtual double ErrorDef() const;
 	
-	protected:
+	private:
 		FitFunction * function;
 		MnUserParameters * parameters;
-		//int numParams;
+		double up;
 };
 
 #endif

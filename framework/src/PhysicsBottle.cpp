@@ -9,8 +9,8 @@
 
 #include "PhysicsBottle.h"
 #include <iostream>
-#include "InvalidObject.h"
 #include "StringProcessing.h"
+#include <stdlib.h>
 
 //Default constructor
 PhysicsBottle::PhysicsBottle() : finalised(false)
@@ -33,6 +33,7 @@ void PhysicsBottle::AddResult( IPDF * NewPDF, IDataSet * NewDataSet )
 	if ( finalised )
 	{
 		cerr << "Bottle finalised - cannot add result" << endl;
+		exit(1);
 	}
 	else
 	{
@@ -56,8 +57,8 @@ IPDF * PhysicsBottle::GetResultPDF(int Index)
 	}
 	else
 	{
-		cerr << "Index (" << Index << ") out of range in PhysicsBottle" << endl;
-		return new InvalidObject( "Index out of range in PhysicsBottle" );
+		cerr << "PDF index (" << Index << ") out of range in PhysicsBottle" << endl;
+		exit(1);
 	}
 }
 
@@ -70,10 +71,9 @@ IDataSet * PhysicsBottle::GetResultDataSet(int Index)
 	}
 	else
 	{
-		cerr << "Index (" << Index << ") out of range in PhysicsBottle" << endl;
-		return new InvalidObject( "Index out of range in PhysicsBottle" );
+		cerr << "DataSet index (" << Index << ") out of range in PhysicsBottle" << endl;
+		exit(1);
 	}
-
 }
 
 //Retrieve the parameter set
@@ -98,7 +98,7 @@ bool PhysicsBottle::SetParameterSet(ParameterSet * NewParameters)
 	else
 	{
 		cerr << "Bottle parameters not successfully updated" << endl;
-		return false;
+		exit(1);
 	}
 }
 
@@ -107,7 +107,7 @@ void PhysicsBottle::Finalise()
 {
 	if (finalised)
 	{
-		cerr << "Bottle already finalised" << endl;
+		cout << "Bottle already finalised" << endl;
 	}
 	else
 	{

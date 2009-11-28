@@ -9,16 +9,12 @@
 */
 
 #include "AcceptReject.h"
-#include "InvalidObject.h"
 #include "PhaseSpaceBoundary.h"
 #include <iostream>
 
 //Default constructor
-AcceptReject::AcceptReject() : generationFunction( new InvalidObject( "Accept reject generator not given valid PDF" ) ), generationBoundary( new PhaseSpaceBoundary() ),
-	dataNumber(0), moreThanMaximum(0.01), numberAttempts(0)
+AcceptReject::AcceptReject()
 {
-	newDataSet = new MemoryDataSet(generationBoundary);
-	rootRandom = new TRandom3(0);
 }
 
 //Constructor with correct argument

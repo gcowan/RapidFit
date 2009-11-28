@@ -13,7 +13,8 @@
 
 #include "FitResult.h"
 #include "IMinimiser.h"
-#include "FitFunction.h"
+#include "FitFunctionConfiguration.h"
+#include "MinimiserConfiguration.h"
 #include "PDFWithData.h"
 #include <vector>
 
@@ -23,8 +24,8 @@ class FitAssembler
 {
 	public:
 		static FitResult * DoFit( IMinimiser*, FitFunction* );
-		static FitResult * DoFit( string, FitFunction*, PhysicsBottle* );
-		static FitResult * DoFit( string, FitFunction*, ParameterSet*, vector< PDFWithData* > );
+		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle* );
+		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* > );
 };
 
 #endif

@@ -11,7 +11,7 @@
 
 #include "DataFileLoader.h"
 #include "StringProcessing.h"
-#include "InvalidObject.h"
+#include <stdlib.h>
 #include "RootFileDataSet.h"
 #include "MemoryDataSet.h"
 #include <boost/algorithm/string.hpp>
@@ -62,6 +62,7 @@ DataFileLoader::DataFileLoader( string fileName, PhaseSpaceBoundary * dataBounda
 	{
 		//Load a csv file into memory (or make a root file data set if too big?)
 		cerr << "CSV file not implemented yet" << endl;
+		exit(1);
 	}
 	else if ( fileNameExtension == "txt" )
         {
@@ -72,7 +73,7 @@ DataFileLoader::DataFileLoader( string fileName, PhaseSpaceBoundary * dataBounda
 	else
 	{
 		cerr << "Unrecognised file type: " << fileName << endl;
-		data = new InvalidObject( "Unrecognised file type: " + fileName );
+		exit(1);
 	}
 }
 
@@ -164,7 +165,6 @@ bool DataFileLoader::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceBo
         }
         return compatible;
 }
-
 
 void DataFileLoader::LoadAsciiFileIntoMemory( string fileName, long numberEventsToRead )
 {

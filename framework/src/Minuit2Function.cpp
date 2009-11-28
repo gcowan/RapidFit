@@ -7,19 +7,19 @@
 	@date 2009-10-02
 */
 
-#include "MinuitFunction.h"
+#include "Minuit2Function.h"
 #include <iostream>
 
 //This is the parameter uncertainty - i.e. I think it's a limit on MiGrad convergence
 const double ERROR_THINGY = 0.1;
 
 //Default constructor
-MinuitFunction::MinuitFunction()
+Minuit2Function::Minuit2Function() : up(1.0)
 {
 }
 
 //Constructor with correct argument
-MinuitFunction::MinuitFunction( FitFunction* NewFitFunction ) : function(NewFitFunction)
+Minuit2Function::Minuit2Function( FitFunction * NewFitFunction ) : function(NewFitFunction), up( NewFitFunction->UpErrorValue(1) )
 {
 	parameters = new MnUserParameters();
 
@@ -50,12 +50,12 @@ MinuitFunction::MinuitFunction( FitFunction* NewFitFunction ) : function(NewFitF
 }
 
 //Destructor
-MinuitFunction::~MinuitFunction()
+Minuit2Function::~Minuit2Function()
 {
 }
 
 //Return the value to minimise, given the parameters passed
-double MinuitFunction::operator()( const vector<double>& NewParameterValues ) const
+double Minuit2Function::operator()( const vector<double>& NewParameterValues ) const
 {
 	//Make parameter set and pass to wrapped function
 	ParameterSet * temporaryParameters = function->GetParameterSet();
@@ -67,24 +67,32 @@ double MinuitFunction::operator()( const vector<double>& NewParameterValues ) co
 	else
 	{
 		cerr << "Minuit does not provide the correct parameters" << endl;
-		return 0.0;
+		exit(1);
 	}
 }
 
 //Set the up value for error calculation
-void MinuitFunction::SetErrorDef(double up)
+void Minuit2Function::SetErrorDef( double Up )
 {
-	function->SetUpErrorValue(up);
+	up = Up;
+}
+void Minuit2Function::SetSigma( int Sigma )
+{
+	up = function->UpErrorValue(Sigma);
 }
 
 //Return the up value for error calculation
-double MinuitFunction::Up() const
+double Minuit2Function::Up() const
 {
-	return function->UpErrorValue();
+	return up;
+}
+double Minuit2Function::ErrorDef() const
+{
+	return up;
 }
 
 //Return the parameters to minimise with
-MnUserParameters * MinuitFunction::GetMnUserParameters()
+MnUserParameters * Minuit2Function::GetMnUserParameters()
 {
 	return parameters;
 }

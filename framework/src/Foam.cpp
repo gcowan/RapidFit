@@ -9,7 +9,6 @@
  */
 
 #include "Foam.h"
-#include "InvalidObject.h"
 #include "StatisticsFunctions.h"
 #include <iostream>
 

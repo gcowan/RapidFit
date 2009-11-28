@@ -15,7 +15,8 @@
 #include "XMLTag.h"
 #include "ParameterSet.h"
 #include "PDFWithData.h"
-#include "FitFunction.h"
+#include "FitFunctionConfiguration.h"
+#include "MinimiserConfiguration.h"
 
 using namespace std;
 
@@ -27,8 +28,8 @@ class XMLConfigReader
 		~XMLConfigReader();
 
 		ParameterSet * GetFitParameters();
-		string GetMinimiserName();
-		FitFunction * GetFitFunction();
+		MinimiserConfiguration * GetMinimiserConfiguration();
+		FitFunctionConfiguration * GetFitFunctionConfiguration();
 		vector< PDFWithData* > GetPDFsAndData();
 		int GetNumberRepeats();
 		bool IsLoaded();
@@ -44,7 +45,9 @@ class XMLConfigReader
 		IPDF * GetNormalisedSumPDF( XMLTag*, PhaseSpaceBoundary* );
 		IPDF * GetProdPDF( XMLTag*, PhaseSpaceBoundary* );
 		IPDF * GetPDF( XMLTag*, PhaseSpaceBoundary* );
-		FitFunction * MakeFitFunction( XMLTag* );
+		FitFunctionConfiguration * MakeFitFunction( XMLTag* );
+		MinimiserConfiguration * MakeMinimiser( XMLTag* );
+		pair< string, string > MakeContourPlot( XMLTag* );
 
 		vector< XMLTag* > children;
 		bool isLoaded;

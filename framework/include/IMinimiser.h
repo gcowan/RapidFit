@@ -18,6 +18,7 @@ class IMinimiser
 	public:
 		virtual void Minimise( FitFunction* ) = 0;
 		virtual FitResult * GetFitResult() = 0;
+		virtual void ContourPlots( vector< pair< string, string > > ) = 0;
 };
 
 #endif

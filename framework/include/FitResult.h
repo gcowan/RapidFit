@@ -13,6 +13,7 @@
 
 #include "ResultParameterSet.h"
 #include "PhysicsBottle.h"
+#include "FunctionContour.h"
 
 class FitResult
 {
@@ -20,12 +21,12 @@ class FitResult
 		FitResult();
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle );
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double> );
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double>, vector< vector< pair<double, double> > >);
+		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double>, vector< FunctionContour* >);
 		~FitResult();
 
 		double GetMinimumValue();
 		vector<double> GetCovarianceMatrix();
-		vector< vector< pair<double, double> > > GetContours();
+		vector< FunctionContour* > GetContours();
 		ResultParameterSet * GetResultParameterSet();
 		int GetFitStatus();
 		PhysicsBottle * GetPhysicsBottle();
@@ -34,7 +35,7 @@ class FitResult
 		double minimumValue;
 		ResultParameterSet * fittedParameters;
 		vector<double> covarianceMatrix;
-		vector< vector< pair<double, double> > > contours;
+		vector< FunctionContour* > contours;
 		int fitStatus;
 		PhysicsBottle fittedBottle;
 };

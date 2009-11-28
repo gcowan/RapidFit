@@ -9,18 +9,19 @@
 
 
 #include "NegativeLogLikelihood.h"
+#include <stdlib.h>
 #include <cmath>
 #include <iostream>
 
 //Default constructor
-NegativeLogLikelihood::NegativeLogLikelihood() : up(0.5), hasWeight(false), weightName("Uninitialised")
+NegativeLogLikelihood::NegativeLogLikelihood()// : up(0.5), hasWeight(false), weightName("Uninitialised")
 {
 }
 
 //Constructor speccifying the name of a weight observable
-NegativeLogLikelihood::NegativeLogLikelihood( string Weight ) : up(0.5), hasWeight(true), weightName(Weight)
-{
-}
+//NegativeLogLikelihood::NegativeLogLikelihood( string Weight ) : up(0.5), hasWeight(true), weightName(Weight)
+//{
+//}
 
 //Destructor
 NegativeLogLikelihood::~NegativeLogLikelihood()
@@ -42,9 +43,9 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		
 		//Get the weight for this DataPoint (event)
 		double weight = 1.0;	
-		if (hasWeight)
+		if (useWeights)
 		{
-			weight = temporaryDataPoint->GetObservable(weightName)->GetValue();
+			weight = temporaryDataPoint->GetObservable(weightObservableName)->GetValue();
 		}
 		total += weight * log( value / integral );
 	}
@@ -72,13 +73,25 @@ double NegativeLogLikelihood::EvaluateParameterSet( ParameterSet * TestParameter
 }
 
 //Set the up value for error calculations
-void NegativeLogLikelihood::SetUpErrorValue( double NewValue )
-{
-	up = NewValue;
-}
+//void NegativeLogLikelihood::SetUpErrorValue( double NewValue )
+//{
+//	up = NewValue;
+//}
 
 //Return the up value for error calculations
-double NegativeLogLikelihood::UpErrorValue()
+double NegativeLogLikelihood::UpErrorValue( int Sigma )
 {
-	return up;
+	if ( Sigma == 1 )
+	{
+		return 0.5;
+	}
+	else if ( Sigma == 2 )
+	{
+		return 2.0;
+	}
+	else
+	{
+		cerr << "I don't know UP for NLL sigma > 2" << endl;
+		exit(1);
+	}
 }

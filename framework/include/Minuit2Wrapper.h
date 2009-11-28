@@ -12,7 +12,7 @@
 
 #include "IMinimiser.h"
 #include "Minuit2/MnMigrad.h"
-#include "MinuitFunction.h"
+#include "Minuit2Function.h"
 #include "FitResult.h"
 
 using namespace ROOT::Minuit2;
@@ -26,12 +26,13 @@ class Minuit2Wrapper : public IMinimiser
 		//Interface functions
 		virtual void Minimise( FitFunction* );
 		virtual FitResult * GetFitResult();
-
+		virtual void ContourPlots( vector< pair< string, string > > );
 
 	private:
 		//MnMigrad minuit;
-		MinuitFunction * function;
+		Minuit2Function * function;
 		FitResult * fitResult;
+		vector< pair< string, string > > contours;
 };
 
 #endif

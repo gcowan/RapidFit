@@ -18,7 +18,6 @@
 #include "ProdPDF.h"
 #include "StringProcessing.h"
 #include "AcceptReject.h"
-#include "InvalidObject.h"
 #include "DataFileLoader.h"
 #include "ObservableContinuousConstraint.h"
 #include "ObservableDiscreteConstraint.h"
@@ -36,7 +35,7 @@ XMLConfigReader::XMLConfigReader( string FileName ) : isLoaded(false)
 	if ( !configFile.is_open() )
 	{
 		cerr << "Failed to open config file \"" << FileName << "\"" << endl;
-		return;
+		exit(1);
 	}
 
 	//Read the whole file into a vector
@@ -70,6 +69,7 @@ XMLConfigReader::XMLConfigReader( string FileName ) : isLoaded(false)
 	else
 	{
 		cerr << "Config file in wrong format: root tag is \"" << wholeFile[0] << "\" not \"<RapidFit>\"" << endl;
+		exit(1);
 	}
 
 	isLoaded = true;
@@ -98,45 +98,163 @@ ParameterSet * XMLConfigReader::GetFitParameters()
 		}
 	}
 
-	//If no such tag is found, error
-	cerr << "Config file does not specify parameters" << endl;
-	return new ParameterSet();
+	//If no such tag is found, fail
+	cerr << "ParameterSet tag not found in config file" << endl;
+	exit(1);
 }
 
 //Return the minimiser for the fit
-string XMLConfigReader::GetMinimiserName()
+MinimiserConfiguration * XMLConfigReader::GetMinimiserConfiguration()
 {
-	//Get the name of the minimiser
-	string minimiserName = "Uninitialised";
+	//Find the Minimiser tag
 	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
 	{
 		if ( children[childIndex]->GetName() == "Minimiser" )
 		{
-			minimiserName = children[childIndex]->GetValue()[0];
+			return MakeMinimiser( children[childIndex] );
 		}
 	}
 
-	return minimiserName;
+	//If no such tag is found, fail
+	cerr << "Minimiser tag not found in config file" << endl;
+	exit(1);
+}
+
+//Make a minimiser configuration object
+MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
+{
+	if ( MinimiserTag->GetName() == "Minimiser" )
+	{
+		//Examine all minimiser components
+		string minimiserName = "Uninitialised";
+		vector< pair< string, string > > contourPlots;
+		vector< XMLTag* > minimiserComponents = MinimiserTag->GetChildren();
+		if ( minimiserComponents.size() == 0 )
+		{
+			//Old style - just the minimiser name
+			minimiserName = MinimiserTag->GetValue()[0];
+		}
+		else
+		{
+			//New style - specify contour plots
+			for ( int childIndex = 0; childIndex < minimiserComponents.size(); childIndex++ )
+			{
+				if ( minimiserComponents[childIndex]->GetName() == "MinimiserName" )
+				{
+					minimiserName = minimiserComponents[childIndex]->GetValue()[0];
+				}
+				else if ( minimiserComponents[childIndex]->GetName() == "ContourPlot" )
+				{
+					contourPlots.push_back( MakeContourPlot( minimiserComponents[childIndex] ) );
+				}
+				else
+				{
+					cerr << "Unrecognised minimiser component: " << minimiserComponents[childIndex]->GetName() << endl;
+					exit(1);
+				}
+			}
+		}
+
+		//Return the configuration object
+		if ( contourPlots.size() == 0 )
+		{
+			return new MinimiserConfiguration( minimiserName );
+		}
+		else
+		{
+			return new MinimiserConfiguration( minimiserName, contourPlots );
+		}
+	}
+	else
+	{
+		cerr << "Incorrect xml tag provided: \"" << MinimiserTag->GetName() << "\" not \"Minimiser\"" << endl;
+		exit(1);
+	}
+}
+
+//Return the pair of observables to plot the function contours for
+pair< string, string > XMLConfigReader::MakeContourPlot( XMLTag * PlotTag )
+{
+	if ( PlotTag->GetName() == "ContourPlot" )
+	{
+		vector< XMLTag* > plotComponents = PlotTag->GetChildren();
+		if ( plotComponents.size() == 2 )
+		{
+			//Retrieve the names of the parameters to plot
+			string xName, yName;
+			bool hasX = false;
+			bool hasY = false;
+			for ( int childIndex = 0; childIndex < plotComponents.size(); childIndex++ )
+			{
+				if ( plotComponents[childIndex]->GetName() == "XParameter" )
+				{
+					xName = plotComponents[childIndex]->GetValue()[0];
+					hasX = true;
+				}
+				else if ( plotComponents[childIndex]->GetName() == "YParameter" )
+				{
+					yName = plotComponents[childIndex]->GetValue()[0];
+					hasY = true;
+				}
+				else
+				{
+					cerr << "Unrecognised ContourPlot component: " << plotComponents[childIndex]->GetName() << endl;
+					exit(1);
+				}
+			}
+
+			//Check both parameters are specified
+			if ( hasX && hasY )
+			{
+				return make_pair( xName, yName );
+			}
+			else
+			{
+				cerr << "ContourPlot tag is missing parameter name for ";
+				if ( !hasX )
+				{
+					cerr << "x";
+				}
+				else
+				{
+					cerr << "y";
+				}
+				cerr << " axis" << endl;
+				exit(1);
+			}
+		}
+		else
+		{
+			cerr << "ContourPlot tag should only contain the two parameters to plot contours for" << endl;
+			exit(1);
+		}
+	}
+	else
+	{
+		cerr << "Incorrect xml tag provided: \"" << PlotTag << "\" not \"ContourPlot\"" << endl;
+		exit(1);
+	}
 }
 
 //Return the number of repeats for the fit
 int XMLConfigReader::GetNumberRepeats()
 {
-	//Get the name of the minimiser
-	string repeatString = "0";
+	//Find the NumberRepeats tag
 	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
 	{
 		if ( children[childIndex]->GetName() == "NumberRepeats" )
 		{
-			repeatString = children[childIndex]->GetValue()[0];
+			return atoi( children[childIndex]->GetValue()[0].c_str() );
 		}
 	}
 
-	return atoi( repeatString.c_str() );
+	//If no such tag is found, fail
+	cerr << "NumberRepeats tag not found in config file" << endl;
+	exit(1);
 }
 
 //Return the function to minimise
-FitFunction * XMLConfigReader::GetFitFunction()
+FitFunctionConfiguration * XMLConfigReader::GetFitFunctionConfiguration()
 {
 	//Find the FitFunction tag
 	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
@@ -147,13 +265,13 @@ FitFunction * XMLConfigReader::GetFitFunction()
 		}
 	}
 
-	//Tag not found, fail
-	cerr << "FitFunction tag not found" << endl;
+	//If no such tag is found, fail
+	cerr << "FitFunction tag not found in config file" << endl;
 	exit(1);
 }
 
-//Make the FitFunction
-FitFunction * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTag )
+//Make FitFunction configuration object
+FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTag )
 {
 	if ( FunctionTag->GetName() == "FitFunction" )
 	{
@@ -191,16 +309,16 @@ FitFunction * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTag )
 		//Make the function
 		if (hasWeight)
 		{
-			return ClassLookUp::LookUpFitFunctionName( functionName, weightName );
+			return new FitFunctionConfiguration( functionName, weightName );
 		}
 		else
 		{
-			return ClassLookUp::LookUpFitFunctionName( functionName, "" );
+			return new FitFunctionConfiguration( functionName );
 		}
 	}
 	else
 	{
-		cerr << "Tag name incorrect: \"" << FunctionTag->GetName() << " not \"FitFunction\"" << endl;
+		cerr << "Incorrect xml tag provided: \"" << FunctionTag->GetName() << " not \"FitFunction\"" << endl;
 		exit(1);
 	}
 }
@@ -221,7 +339,8 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 
 	if ( toFits.size() == 0 )
 	{
-		cerr << "No fits configured" << endl;
+		cerr << "No ToFit tags found in config file" << endl;
+		exit(1);
 	}
 	else
 	{
@@ -251,6 +370,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 				else
 				{
 					cerr << "Unrecognised fit component: " << name << endl;
+					exit(1);
 				}
 			}
 
@@ -271,6 +391,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 					cerr << " PDF configuration missing.";
 				}
 				cerr << endl;
+				exit(1);
 			}
 		}
 	}
@@ -311,8 +432,8 @@ ParameterSet * XMLConfigReader::GetParameterSet( XMLTag * InputTag )
 	}
 	else
 	{
-		cout << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"ParameterSet\"" << endl;
-		return new ParameterSet();
+		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"ParameterSet\"" << endl;
+		exit(1);
 	}
 }
 
@@ -362,6 +483,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 			else
 			{
 				cerr << "Unrecognised physics parameter configuration: " << name << endl;
+				exit(1);
 			}
 		}
 
@@ -380,7 +502,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 	else
 	{
 		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"PhysicsParameter\"" << endl;
-		return new PhysicsParameter( "Invalid", 0.0, 0.0, 0.0, "Invalid", "Invalid" );
+		exit(1);
 	}
 }
 
@@ -428,6 +550,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			else
 			{
 				cerr << "Unrecognised data set component: " << name << endl;
+				exit(1);
 			}
 		}
 
@@ -435,7 +558,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		if (!boundaryFound)
 		{
 			cerr << "DataSet defined without PhaseSpaceBoundary" << endl;
-			return new PDFWithData();
+			exit(1);
 		}
 
 		//Make the fit PDF
@@ -456,7 +579,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 	else
 	{
 		cerr << "Incorrect xml tag provided: \"" << DataTag->GetName() << "\" not \"DataSet\"" << endl;
-		return new PDFWithData();
+		exit(1);
 	}
 }
 
@@ -494,7 +617,7 @@ PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag * InputTag )
 	else
 	{
 		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"PhaseSpaceBoundary\"" << endl;
-		return new PhaseSpaceBoundary();
+		exit(1);
 	}
 }
 
@@ -538,6 +661,7 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 			else
 			{
 				cerr << "Unrecognised constraint configuration: " <<  elements[elementIndex]->GetName() << endl;
+				exit(1);
 			}
 		}
 
@@ -554,7 +678,7 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 	else
 	{
 		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"Observable\"" << endl;
-		return new ObservableContinuousConstraint( "Invalid", 0.0, 0.0, "Invalid" );
+		exit(1);
 	}
 }
 
@@ -586,6 +710,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 			else
 			{
 				cerr << "Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
+				exit(1);
 			}
 		}
 
@@ -595,7 +720,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 	else
 	{
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"PDF\"" << endl;
-		return new InvalidObject( "Incorrect tag provided: \"" + InputTag->GetName() + "\" not \"PDF\"" );
+		exit(1);
 	}
 }
 
@@ -637,13 +762,13 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		else
 		{
 			cerr << "Incorrect number of PDFs to sum: " << componentPDFs.size() << " not 2" << endl;
-			return new InvalidObject( "SumPDF can only sum over 2 PDFs" );
+			exit(1);
 		}
 	}
 	else
 	{
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"SumPDF\"" << endl;
-		return new InvalidObject( "Incorrect tag provided: \"" + InputTag->GetName() + "\" not \"SumPDF\"" );
+		exit(1);
 	}
 }
 
@@ -685,13 +810,13 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		else
 		{
 			cerr << "Incorrect number of PDFs to sum: " << componentPDFs.size() << " not 2" << endl;
-			return new InvalidObject( "NormalisedSumPDF can only sum over 2 PDFs" );
+			exit(1);
 		}
 	}
 	else
 	{
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"NormalisedSumPDF\"" << endl;
-		return new InvalidObject( "Incorrect tag provided: \"" + InputTag->GetName() + "\" not \"NormalisedSumPDF\"" );
+		exit(1);
 	}
 }
 
@@ -718,13 +843,13 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		else
 		{
 			cerr << "Incorrect number of PDFs to multiply: " << componentPDFs.size() << " not 2" << endl;
-			return new InvalidObject( "ProdPDF can only multiply 2 PDFs" );
+			exit(1);
 		}
 	}
 	else
 	{
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"ProdPDF\"" << endl;
-		return new InvalidObject( "Incorrect tag provided: \"" + InputTag->GetName() + "\" not \"ProdPDF\"" );
+		exit(1);
 	}
 }
 
@@ -750,5 +875,6 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	else
 	{
 		cerr << "Unrecognised PDF configuration: " << InputTag->GetName() << endl;
+		exit(1);
 	}
 }

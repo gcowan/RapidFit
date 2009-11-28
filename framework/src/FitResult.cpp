@@ -30,10 +30,10 @@ FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters
 
 //Constructor with correct arguments, including covariance Matrix and contours
 FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix
-			, vector< vector< pair<double, double> > > oneAndTwoSigma ) :
+			, vector< FunctionContour* > ContourPlots ) :
 	minimumValue( MinimumValue ), fittedParameters( FittedParameters ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 	, covarianceMatrix( covMatrix )
-	, contours( oneAndTwoSigma )
+	, contours( ContourPlots )
 {
 }
 
@@ -43,7 +43,7 @@ FitResult::~FitResult()
 {
 }
 
-vector< vector< pair<double, double> > > FitResult::GetContours()
+vector< FunctionContour* > FitResult::GetContours()
 {
 	return contours;
 }

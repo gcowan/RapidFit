@@ -8,7 +8,7 @@
 			<Name>gamma</Name>
 			<Value>0.68</Value>
 			<Minimum>0.0</Minimum>
-                        <Maximum>2.0</Maximum>
+			<Maximum>2.0</Maximum>
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
@@ -45,7 +45,7 @@
 			<Value>-2.93</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
-			<Type>Fixed</Type>
+			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -54,7 +54,7 @@
 			<Value>2.91</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
-			<Type>Fixed</Type>
+			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -82,12 +82,27 @@
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
-		
+
 	</ParameterSet>
 
-	<Minimiser>Minuit2</Minimiser>
+	<Minimiser>
+		<MinimiserName>Minuit</MinimiserName>
 
-	<FitFunction>NegativeLogLikelihood</FitFunction>
+		<ContourPlot>
+			<XParameter>gamma</XParameter>
+			<YParameter>deltaGamma</YParameter>
+		</ContourPlot>
+
+		<ContourPlot>
+			<XParameter>delta_para</XParameter>
+			<YParameter>delta_perp</YParameter>
+		</ContourPlot>
+	</Minimiser>
+
+	<FitFunction>
+		<FunctionName>NegativeLogLikelihood</FunctionName>
+		<WeightName>eventWeight</WeightName>
+	</FitFunction>
 
 	<NumberRepeats>1</NumberRepeats>
 
@@ -98,7 +113,7 @@
 
 		<DataSet>
 			<Source>Foam</Source>
-			<NumberEvents>1000</NumberEvents>
+			<NumberEvents>10000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>

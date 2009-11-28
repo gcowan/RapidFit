@@ -23,7 +23,7 @@ class ClassLookUp
 {
 	public:
 		static IPDF * LookUpPDFName( string, vector<string>, vector<string> );
-		static FitFunction * LookUpFitFunctionName( string, string );
+		static FitFunction * LookUpFitFunctionName( string );
 		static IMinimiser * LookUpMinimiserName( string, int );
 		static IDataGenerator * LookUpDataGenerator( string, PhaseSpaceBoundary*, IPDF* );
 };

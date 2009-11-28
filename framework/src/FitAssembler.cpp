@@ -22,19 +22,21 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 }
 
 //Create the minimiser and fit function
-FitResult * FitAssembler::DoFit( string MinimiserName, FitFunction * TheFunction, PhysicsBottle * Bottle )
+FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, PhysicsBottle * Bottle )
 {
-	IMinimiser * minimiser = ClassLookUp::LookUpMinimiserName( MinimiserName, Bottle->GetParameterSet()->GetAllNames().size() );
-	TheFunction->SetPhysicsBottle(Bottle);
+	IMinimiser * minimiser = MinimiserConfig->GetMinimiser( Bottle->GetParameterSet()->GetAllNames().size() );
+	FitFunction * theFunction = FunctionConfig->GetFitFunction();
+	theFunction->SetPhysicsBottle(Bottle);
 
-	FitResult * result = DoFit( minimiser, TheFunction );
+	FitResult * result = DoFit( minimiser, theFunction );
 
+	delete theFunction;
 	delete minimiser;
 	return result;
 }
 
 //Create the physics bottle
-FitResult * FitAssembler::DoFit( string MinimiserName, FitFunction * TheFunction, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData )
+FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData )
 {
 	PhysicsBottle * bottle = new PhysicsBottle(BottleParameters);
 
@@ -46,7 +48,7 @@ FitResult * FitAssembler::DoFit( string MinimiserName, FitFunction * TheFunction
 	}
 
 	bottle->Finalise();
-	FitResult * result = DoFit( MinimiserName, TheFunction, bottle );
+	FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );
 
 	delete bottle;
 	return result;

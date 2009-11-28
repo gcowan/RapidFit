@@ -1,12 +1,12 @@
 /**
-        @class ResultFormatter
+  @class ResultFormatter
 
-        A collection of static methods for outputting RapidFit data objects
+  A collection of static methods for outputting RapidFit data objects
 
-        @author Benjamin M Wynne bwynne@cern.ch
-        @author Greig A Cowan greig.cowan@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @author Greig A Cowan greig.cowan@cern.ch
+  @date 2009-10-02
+ */
 
 #include "ResultFormatter.h"
 #include "TFile.h"
@@ -91,44 +91,56 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 {
 	string name = contourFileName + ".root";
 	TFile * contourFile = new TFile( name.c_str(), "RECREATE");
-	TMultiGraph * graph = new TMultiGraph();
-	TCanvas * bothPlots = new TCanvas("contours", "contours");
-	int colors[2] = {42,38};
-	vector< vector< pair<double, double> > > contours = OutputData->GetContours();
-	int numberOfContours = contours.size();
-	// Draw the large 2-sigma contour first
-	for (int contourNumber = numberOfContours-1; contourNumber >= 0; contourNumber--)
+	int colours[2] = {42,38};
+	vector< FunctionContour* > contours = OutputData->GetContours();
+
+	//Loop over all contour plots
+	for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
 	{
-		int numberOfPoints = contours[contourNumber].size();
-		double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
-		for (int point = 0; point < numberOfPoints; point++)
+		TMultiGraph * graph = new TMultiGraph();
+		FunctionContour * plotContour = contours[plotIndex];
+
+		//Make the plot canvas
+		string canvasName = plotContour->GetXName() + "vs" + plotContour->GetYName() + "Contour";
+		string canvasTitle = plotContour->GetXName() + " vs " + plotContour->GetYName() + " Contour";
+		TCanvas * bothPlots = new TCanvas( canvasName.c_str(), canvasTitle.c_str() );
+
+		//Plot each contour, starting at highest sigma
+		for ( int sigma = plotContour->GetContourNumber(); sigma > 0; sigma-- )
 		{
-			xCoordinates[point] = contours[contourNumber][point].first;
-			yCoordinates[point] = contours[contourNumber][point].second;
+			vector< pair< double, double > > sigmaContour = plotContour->GetPlot(sigma);
+
+			//Retrieve each point
+			double xCoordinates[ sigmaContour.size() ], yCoordinates[ sigmaContour.size() ];
+			for ( int pointIndex = 0; pointIndex < sigmaContour.size(); pointIndex++ )
+			{
+				xCoordinates[pointIndex] = sigmaContour[pointIndex].first;
+				yCoordinates[pointIndex] = sigmaContour[pointIndex].second;
+			}
+
+			//Make the graph
+			TGraphErrors * contourGraph = new TGraphErrors( sigmaContour.size(), xCoordinates, yCoordinates );
+			contourGraph->SetFillColor( colours[sigma] );
+			graph->Add(contourGraph);
 		}
 
-		xCoordinates[numberOfPoints] = xCoordinates[0];		
-		yCoordinates[numberOfPoints] = yCoordinates[0];		
+		//Format the graph
+		graph->SetTitle("1 and 2 sigma contours");	
+		graph->Draw( "ALF" ); //Smooth fill area drawn
 
-        	TGraphErrors * contourGraph = new TGraphErrors( numberOfPoints, xCoordinates, yCoordinates );
-		contourGraph->SetFillColor(colors[contourNumber]);
-		graph->Add(contourGraph);
+		//Titles in format: ParameterName (ParameterUnit)
+		string xTitle = plotContour->GetXName() + " ( " + OutputData->GetResultParameterSet()->GetResultParameter( plotContour->GetXName() )->GetUnit() + ")";
+		string yTitle = plotContour->GetYName() + " ( " + OutputData->GetResultParameterSet()->GetResultParameter( plotContour->GetYName() )->GetUnit() + ")";
+		graph->GetXaxis()->SetTitle( xTitle.c_str() );
+		graph->GetYaxis()->SetTitle( yTitle.c_str() );
+
+		//Store the graph
+		bothPlots->Modified();
+		bothPlots->Update();
+		bothPlots->Write();
+		bothPlots->SaveAs( (contourFileName + "." + plotContour->GetXName() + "." + plotContour->GetYName() + ".png").c_str() );
 	}
-        
-	graph->SetTitle("1 and 2 sigma contours");	
-        graph->Draw( "ALF" ); //Smooth fill area drawn
-	
-	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
-        vector<string> allNames = outputParameters->GetAllNames();
-	const char * xTitle = allNames[0].c_str();
-	const char * yTitle = allNames[1].c_str();
-	graph->GetXaxis()->SetTitle( xTitle );
-        graph->GetYaxis()->SetTitle( yTitle );
- 
-        bothPlots->Modified();
-        bothPlots->Update();
-        bothPlots->Write();
-	bothPlots->SaveAs( (contourFileName + ".png").c_str());
+
 	contourFile->Close();
 }
 
@@ -137,12 +149,12 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 {
 	vector<double> covarianceMatrix = OutputData->GetCovarianceMatrix();
 	vector<string> allNames = OutputData->GetResultParameterSet()->GetAllNames();
-        vector<string>::iterator nameIterator;
+	vector<string>::iterator nameIterator;
 	int numberOfFreeParameters = 0;
-	
+
 	string columns = "\\begin{tabular}{|c|";
 	string parameterNames = "";
-        for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
 	{	
 		bool isFree = ResultFormatter::IsParameterFree( OutputData, *nameIterator );
 		if (isFree)
@@ -160,26 +172,26 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 	cout << "\n\\begin{center}" << endl;
 	cout << columns << endl;
 	cout << setw(15) << parameterNames << endl;
-        
+
 	int row = 0;
 	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
 	{
 		bool isFree = ResultFormatter::IsParameterFree( OutputData, *nameIterator );
-                if (!isFree) continue;
-		
+		if (!isFree) continue;
+
 		string name = FindAndReplaceString( *nameIterator );
-		
+
 		cout << setw(15) << name;
 		if ( covarianceMatrix.size() == 0 )
 		{	
 			cerr << "No correlation matrix returned from fit!" << endl;
 			break;
 		}
-		
+
 		double drow = GetElementFromCovarianceMatrix( covarianceMatrix, row, row );
 
 		for ( int col = 0; col < numberOfFreeParameters; col++)
-        	{
+		{
 			double dcol = GetElementFromCovarianceMatrix( covarianceMatrix, col, col );
 			double covariance = GetElementFromCovarianceMatrix( covarianceMatrix, row, col );
 			double correlation = covariance/sqrt(fabs(drow * dcol));
@@ -196,23 +208,23 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 			}
 			else
 			{
-			       cout << " & " << setw(10) << " ";
+				cout << " & " << setw(10) << " ";
 			}
-			
-        	}
+
+		}
 		cout << " \\\\" << endl;
 		row += 1;
 	}
-	
-        cout << "\\hline \n\\end{tabular}" << endl;
-        cout << "\\end{center}\n" << endl;
+
+	cout << "\\hline \n\\end{tabular}" << endl;
+	cout << "\\end{center}\n" << endl;
 }
 
 bool ResultFormatter::IsParameterFree( FitResult * OutputData, string ParameterName )
 {
 	bool decision = true;
 	string type = OutputData->GetResultParameterSet()->GetResultParameter( ParameterName )->GetType();
-        if ( type == "Fixed") decision = false;
+	if ( type == "Fixed") decision = false;
 	return decision;
 }
 
@@ -247,11 +259,11 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
 		//if (fitError > 0.0) sigmaFromInputValue = (fitValue - inputValue)/fitError;
-		
+
 		//boost::regex pattern ("_",boost::regex_constants::icase|boost::regex_constants::perl);
 		//string replace ("\\_");
 		//string newName = boost::regex_replace (*nameIterator, pattern, replace);
-	
+
 		string name = FindAndReplaceString( *nameIterator );
 		cout << setw(15) << name << " & " 
 			<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
@@ -273,8 +285,8 @@ string ResultFormatter::FindAndReplaceString( string name )
 	while ( pos < size )
 	{
 		newPos = name.find("_", pos);
-                if( newPos != string::npos ) {
-                	name.replace(newPos, 1, "\\_");
+		if( newPos != string::npos ) {
+			name.replace(newPos, 1, "\\_");
 		}
 		else break;
 		pos = newPos + 2;
