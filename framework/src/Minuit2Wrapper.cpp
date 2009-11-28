@@ -69,43 +69,44 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 	const MnUserCovariance * covMatrix = &minimum.UserCovariance();
 	vector<double> covData = covMatrix->Data();	
 
-	//Make the contour plots
+	//Make a location to store the contour plots
 	vector< FunctionContour* > allContours;
-	const MnContours contoursFromMinuit = MnContours( *function, minimum );
+	int sigmaMax = 2;
 	for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
 	{
-		//Find the index (in Minuit) of the parameter names requested for the plot
-		int xParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].first ) );
-		int yParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].second ) );
-		if ( xParameterIndex == -1 )
-		{
-			cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].first << "\" not found" << endl;
-		}
-		else if ( yParameterIndex == -1 )
-		{
-			cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].second << "\" not found" << endl;
-		}
-		else
-		{
-			//If the parameters have valid indices, ask minuit to plot them
-			int numberOfPoints = 4;
-			int iErrf;
-			double xCoordinates1[numberOfPoints], yCoordinates1[numberOfPoints];
-			double xCoordinates2[numberOfPoints], yCoordinates2[numberOfPoints];
+		FunctionContour * newContour = new FunctionContour( contours[plotIndex].first, contours[plotIndex].second, sigmaMax );
+		allContours.push_back(newContour);
+	}
 
-			//One sigma contour
-			function->SetSigma(1);
-			vector< pair< double, double> > oneSigmaContour = contoursFromMinuit( xParameterIndex, yParameterIndex, numberOfPoints );	
+	//Make the contour plots
+	const MnContours contoursFromMinuit = MnContours( *function, minimum );
+	for ( int sigma = 1; sigma <= sigmaMax; sigma++ )
+	{
+		//Set the sigma value for the contours
+		function->SetSigma(sigma);
 
-			//Two sigma contour
-			function->SetSigma(2);
-			vector< pair< double, double> > twoSigmaContour = contoursFromMinuit( xParameterIndex, yParameterIndex, numberOfPoints );	
-
-			//Store the contours
-			FunctionContour * newContour = new FunctionContour( contours[plotIndex].first, contours[plotIndex].second, 2 );
-			newContour->SetPlot( 1, oneSigmaContour );
-			newContour->SetPlot( 2, twoSigmaContour );
-			allContours.push_back(newContour);
+		for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
+		{
+			//Find the index (in Minuit) of the parameter names requested for the plot
+			int xParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].first ) );
+			int yParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].second ) );
+			if ( xParameterIndex == -1 )
+			{
+				cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].first << "\" not found" << endl;
+			}
+			else if ( yParameterIndex == -1 )
+			{
+				cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].second << "\" not found" << endl;
+			}
+			else
+			{
+				//If the parameters have valid indices, ask minuit to plot them
+				int numberOfPoints = 4;
+				int iErrf;
+				double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
+				vector< pair< double, double> > oneContour = contoursFromMinuit( xParameterIndex, yParameterIndex, numberOfPoints );	
+				allContours[plotIndex]->SetPlot( sigma, oneContour );
+			}
 		}
 	}
 

@@ -86,7 +86,7 @@
 	</ParameterSet>
 
 	<Minimiser>
-		<MinimiserName>Minuit</MinimiserName>
+		<MinimiserName>Minuit2</MinimiserName>
 
 		<ContourPlot>
 			<XParameter>gamma</XParameter>
@@ -113,7 +113,7 @@
 
 		<DataSet>
 			<Source>Foam</Source>
-			<NumberEvents>10000</NumberEvents>
+			<NumberEvents>1000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
