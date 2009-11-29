@@ -7,9 +7,10 @@
 
 using namespace std;
 
-const int MAXIMUM_SAMPLES = 1000;
-const double MAXIMUM_GRADIENT_TOLERANCE = 0.01;
-const int MAXIMUM_CELLS = 1000;
+const int MAXIMUM_SAMPLES = 10000;
+const double MAXIMUM_GRADIENT_TOLERANCE = 0.05;
+const int MAXIMUM_CELLS = 100;
+const int HISTOGRAM_BINS = 8;
 
 //Default constructor
 MakeFoam::MakeFoam()
@@ -36,9 +37,30 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		PhaseSpaceBoundary currentCell = possibleCells.front();
 		possibleCells.pop();
 
-		//MC sample the cell, store the DataPoints producing the highest and lowest values
-		double maximumValue, minimumValue;
-		DataPoint maximumPoint, minimumPoint;
+		//Set up the histogram storage
+		vector< vector<double> > histogramBinHeights, histogramBinMiddles, histogramBinMaxes;
+		double normalisation = 0.0;
+		for ( int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+		{
+			vector<double> binHeights, binMiddles, binMaxes;
+			IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
+			double minimum = temporaryConstraint->GetMinimum();
+			double delta = ( temporaryConstraint->GetMaximum() - minimum ) / (double)HISTOGRAM_BINS;
+
+			//Loop over bins
+			for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; binIndex++ )
+			{
+				binHeights.push_back(0.0);
+				binMiddles.push_back( minimum + ( delta * ( binIndex + 0.5 ) ) );
+				binMaxes.push_back( minimum + ( delta * ( binIndex + 1.0 ) ) );
+			}
+
+			histogramBinHeights.push_back(binHeights);
+			histogramBinMiddles.push_back(binMiddles);
+			histogramBinMaxes.push_back(binMaxes);
+		}
+
+		//MC sample the cell, make projections, sort of
 		for ( int sampleIndex = 0; sampleIndex < MAXIMUM_SAMPLES; sampleIndex++ )
 		{
 			//Create a data point within the current cell
@@ -58,38 +80,37 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 
 			//Evaluate the function at this point
 			double sampleValue = InputPDF->Evaluate( &samplePoint );
+			normalisation += sampleValue;
 
-			//Update maximum and minimum
-			if ( sampleIndex == 0 )
+			//Populate the histogram
+			for ( int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
 			{
-				//Populate maximum and minimum
-				maximumValue = sampleValue;
-				minimumValue = sampleValue;
-				maximumPoint = samplePoint;
-				minimumPoint = samplePoint;
+				double observableValue = samplePoint.GetObservable( doIntegrate[observableIndex] )->GetValue();
+
+				for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; binIndex++ )
+				{
+					if ( observableValue < histogramBinMaxes[observableIndex][binIndex] )
+					{
+						histogramBinHeights[observableIndex][binIndex] += sampleValue;
+						break;
+					}
+				}
 			}
-			else
-			{
-				//Find maximum
-				if ( sampleValue > maximumValue )
-				{
-					maximumValue = sampleValue;
-					maximumPoint = samplePoint;
-				}
+		}
 
-				//Find minimum
-				if ( sampleValue < minimumValue )
-				{
-					minimumValue = sampleValue;
-					minimumPoint = samplePoint;
-				}
+		//Normalise the histograms
+		for ( int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+		{
+			for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; binIndex++ )
+			{
+				histogramBinHeights[observableIndex][binIndex] /= normalisation;
 			}
 		}
 
 		//Find the maximum gradient
 		vector<double> midPoints;
 		string maximumGradientObservable, unit;
-		double maximumGradient, lowPoint, midPoint, highPoint;
+		double maximumGradient, lowPoint, splitPoint, highPoint;
 		for ( int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
 		{
 			//Find the size of the cell in this observable
@@ -97,31 +118,24 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			double cellMaximum = temporaryConstraint->GetMaximum();
 			double cellMinimum = temporaryConstraint->GetMinimum();
 
-			//Find the distance between the maximum and minimum points in this observable
-			double pointMaximum = maximumPoint.GetObservable( doIntegrate[observableIndex] )->GetValue();
-			double pointMinimum = minimumPoint.GetObservable( doIntegrate[observableIndex] )->GetValue();
-			double pointRange = pointMaximum - pointMinimum;
-
-			//Find the gradient
-			//NOTE: this is the crucial expression for determining foam generation. It might well be wrong!
-			//FIRST TRY: chose the observable with smallest relative distance between max and min point
-			//Failed because creates infinitely thin cells
-			//SECOND TRY: chose the observable with greatest absolute distance between min and max
-			double gradient = abs( ( maximumValue - minimumValue ) * pointRange );//( cellMaximum - cellMinimum ) / pointRange );
-
 			//Store the mid point
 			double observableMiddle = cellMinimum + ( ( cellMaximum - cellMinimum ) / 2.0 );
 			midPoints.push_back(observableMiddle);
 
-			//Update maximum
-			if ( observableIndex == 0 || gradient > maximumGradient )
+			for ( int binIndex = 1; binIndex < HISTOGRAM_BINS; binIndex++ )
 			{
-				maximumGradient = gradient;
-				maximumGradientObservable = doIntegrate[observableIndex];
-				unit = temporaryConstraint->GetUnit();
-				highPoint = cellMaximum;
-				midPoint = observableMiddle;
-				lowPoint = cellMinimum;
+				double gradient = abs( histogramBinHeights[observableIndex][ binIndex - 1 ] - histogramBinHeights[observableIndex][binIndex] );
+
+				//Update maximum
+				if ( ( observableIndex == 0 && binIndex == 1 ) || gradient > maximumGradient )
+				{
+					maximumGradient = gradient;
+					maximumGradientObservable = doIntegrate[observableIndex];
+					unit = temporaryConstraint->GetUnit();
+					highPoint = cellMaximum;
+					splitPoint = ( histogramBinMiddles[observableIndex][ binIndex - 1 ] + histogramBinMiddles[observableIndex][binIndex] ) / 2.0;
+					lowPoint = cellMinimum;
+				}
 			}
 		}
 
@@ -162,18 +176,8 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 				if ( doIntegrate[observableIndex] == maximumGradientObservable )
 				{
 					//Split the cells on the observable with the greatest gradient
-					if ( lowPoint == midPoint )
-					{
-						cerr << "lowPoint == midPoint" << endl;
-						return;
-					}
-					if ( midPoint == highPoint )
-					{
-						cerr << "midPoint == highPoint" << endl;
-						return;
-					}
-					daughterCell1.SetConstraint( doIntegrate[observableIndex], lowPoint, midPoint, unit );
-					daughterCell2.SetConstraint( doIntegrate[observableIndex], midPoint, highPoint, unit );
+					daughterCell1.SetConstraint( doIntegrate[observableIndex], lowPoint, splitPoint, unit );
+					daughterCell2.SetConstraint( doIntegrate[observableIndex], splitPoint, highPoint, unit );
 				}
 				else
 				{
@@ -207,6 +211,8 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		//Make sure you don't exceed the maximum number of cells
 		if ( finishedCells.size() + possibleCells.size() >= MAXIMUM_CELLS )
 		{
+			cout << "MakeFoam warning: maximum cells reached with " << possibleCells.size() << " unexplored" << endl;
+
 			//Dump out any possible cells into finished, without any further examination
 			while ( !possibleCells.empty() )
 			{
@@ -248,25 +254,17 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 	//Make a numerical integrator for the function
 	RapidFitIntegrator cellIntegrator( InputPDF, true );
 
-	//Prepare the sanity check
-	//double wholeIntegral = cellIntegrator.Integral( InputPoint, InputBoundary );
-	//double totalCellIntegral = 0.0;
-
 	//Find the function value at the center of each cell, and the integral of the function over the cell
 	for ( int cellIndex = 0; cellIndex < finishedCells.size(); cellIndex++ )
 	{
 		//Integrate the cell
 		double integral = cellIntegrator.Integral( InputPoint, &( finishedCells[cellIndex] ) );
 		cellIntegrals.push_back(integral);
-		//totalCellIntegral += integral;
 
 		//Evaluate the function at the center of the cell
 		double value = InputPDF->Evaluate( &( centerPoints[cellIndex] ) );
 		centerValues.push_back(value);
 	}
-
-	//cout << "Whole integral = " << wholeIntegral << endl;
-	//cout << "Total cells = " << totalCellIntegral << endl;
 }
 
 //Destructor

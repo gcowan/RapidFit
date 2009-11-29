@@ -30,12 +30,12 @@ class FitFunction
 
 		//Overload this function in child classes
 		virtual double UpErrorValue(int);
-		//virtual void SetUpErrorValue( double );
 
 	protected:
 		//Overload these functions in child classes
-		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator* );
+		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator*, int );
 		virtual double EvaluateParameterSet( ParameterSet*, vector<string> );
+		virtual void Precalculation();
 
 		PhysicsBottle * allData;
 		vector<string> interestingParameters;
