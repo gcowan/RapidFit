@@ -106,6 +106,7 @@ ParameterSet * XMLConfigReader::GetFitParameters()
 //Return the minimiser for the fit
 MinimiserConfiguration * XMLConfigReader::GetMinimiserConfiguration()
 {
+	cout << "GetMinimiserConfiguration" << endl;
 	//Find the Minimiser tag
 	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
 	{
@@ -123,51 +124,83 @@ MinimiserConfiguration * XMLConfigReader::GetMinimiserConfiguration()
 //Make a minimiser configuration object
 MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 {
+	cout << "MakeMinimiser" << endl;
 	if ( MinimiserTag->GetName() == "Minimiser" )
 	{
 		//Examine all minimiser components
 		string minimiserName = "Uninitialised";
-		vector< pair< string, string > > contourPlots;
 		vector< XMLTag* > minimiserComponents = MinimiserTag->GetChildren();
-		if ( minimiserComponents.size() == 0 )
+		vector<string> valueLines = MinimiserTag->GetValue();
+		if ( valueLines.size() == 1 )
 		{
-			//Old style - just the minimiser name
 			minimiserName = MinimiserTag->GetValue()[0];
 		}
 		else
 		{
-			//New style - specify contour plots
-			for ( int childIndex = 0; childIndex < minimiserComponents.size(); childIndex++ )
+			cerr << "Minimiser tag contains " << valueLines.size() << " lines, not 1" << endl;
+			exit(1);
+		}
+		return new MinimiserConfiguration( minimiserName, GetOutputConfiguration() );
+	}
+	else
+	{
+		cerr << "Incorrect xml tag provided: \"" << MinimiserTag->GetName() << "\" not \"Minimiser\"" << endl;
+		exit(1);
+	}
+}
+
+//Return the output configuration for the fit
+OutputConfiguration * XMLConfigReader::GetOutputConfiguration()
+{
+	cout << "GetOutputConfiguration" << endl;
+	//Find the Output tag
+	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
+	{
+		if ( children[childIndex]->GetName() == "Output" )
+		{
+			return MakeOutputConfiguration( children[childIndex] );
+		}
+	}
+
+	//If no such tag is found, make default
+	cout << "Output tag not found in config file - using default" << endl;
+	return new OutputConfiguration();
+}
+
+//Make an output configuration object
+OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputTag )
+{
+	cout << "MakeOutputConfiguration" << endl;
+	if ( OutputTag->GetName() == "Output" )
+	{
+		vector< pair< string, string > > contourPlots;
+		vector< XMLTag* > outputComponents = OutputTag->GetChildren();
+		for ( int childIndex = 0; childIndex < outputComponents.size(); childIndex++ )
+		{
+			if ( outputComponents[childIndex]->GetName() == "ContourPlot" )
 			{
-				if ( minimiserComponents[childIndex]->GetName() == "MinimiserName" )
-				{
-					minimiserName = minimiserComponents[childIndex]->GetValue()[0];
-				}
-				else if ( minimiserComponents[childIndex]->GetName() == "ContourPlot" )
-				{
-					contourPlots.push_back( MakeContourPlot( minimiserComponents[childIndex] ) );
-				}
-				else
-				{
-					cerr << "Unrecognised minimiser component: " << minimiserComponents[childIndex]->GetName() << endl;
-					exit(1);
-				}
+				contourPlots.push_back( MakeContourPlot( outputComponents[childIndex] ) );
+			}
+			else
+			{
+				cerr << "Unrecognised output component: " << outputComponents[childIndex]->GetName() << endl;
+				exit(1);
 			}
 		}
 
 		//Return the configuration object
 		if ( contourPlots.size() == 0 )
 		{
-			return new MinimiserConfiguration( minimiserName );
+			return new OutputConfiguration();
 		}
 		else
 		{
-			return new MinimiserConfiguration( minimiserName, contourPlots );
+			return new OutputConfiguration( contourPlots );
 		}
 	}
 	else
 	{
-		cerr << "Incorrect xml tag provided: \"" << MinimiserTag->GetName() << "\" not \"Minimiser\"" << endl;
+		cerr << "Incorrect xml tag provided: \"" << OutputTag->GetName() << "\" not \"Output\"" << endl;
 		exit(1);
 	}
 }

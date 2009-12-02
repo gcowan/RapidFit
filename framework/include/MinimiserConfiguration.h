@@ -11,13 +11,14 @@
 #define MINIMISER_CONFIGURATION_H
 
 #include "IMinimiser.h"
+#include "OutputConfiguration.h"
 
 class MinimiserConfiguration
 {
 	public:
 		MinimiserConfiguration();
 		MinimiserConfiguration(string);
-		MinimiserConfiguration( string, vector< pair< string, string > > );
+		MinimiserConfiguration( string, OutputConfiguration* );
 		~MinimiserConfiguration();
 
 		IMinimiser * GetMinimiser(int);

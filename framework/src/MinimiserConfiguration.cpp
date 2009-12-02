@@ -21,7 +21,7 @@ MinimiserConfiguration::MinimiserConfiguration( string InputName ) : minimiserNa
 }
 
 //Constructor for a minimiser with requested contour plots
-MinimiserConfiguration::MinimiserConfiguration( string InputName, vector< pair< string, string > > InputContours ) : minimiserName(InputName), contours(InputContours)
+MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) : minimiserName(InputName), contours( Formatting->GetContourPlots() )
 {
 }
 
@@ -35,7 +35,7 @@ IMinimiser * MinimiserConfiguration::GetMinimiser( int ParameterNumber )
 {
 	IMinimiser * theMinimiser = ClassLookUp::LookUpMinimiserName( minimiserName, ParameterNumber );
 
-	//Request contour plots if they are specified
+	//Supply the output configuration
 	if ( contours.size() > 0 )
 	{
 		theMinimiser->ContourPlots(contours);
