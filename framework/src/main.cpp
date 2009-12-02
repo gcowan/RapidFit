@@ -353,6 +353,10 @@ int main( int argc, char * argv[] )
 			{
 				pdfsAndData = xmlFile->GetPDFsAndData();
 			}
+			if ( !doPullsFlag )
+			{
+				doPullsFlag = xmlFile->GetOutputConfiguration()->DoPullPlots();
+			}
 
 			//Pick a toy study if there are repeats, or if pull plots are wanted
 			if ( numberRepeats > 1 || doPullsFlag )

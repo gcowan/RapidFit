@@ -10,6 +10,7 @@
 #include "XMLTag.h"
 #include "StringProcessing.h"
 #include <iostream>
+#include <stdlib.h>
 
 //Default constructor
 XMLTag::XMLTag()
@@ -49,7 +50,15 @@ vector< XMLTag* > XMLTag::GetChildren()
 //Return the value
 vector<string> XMLTag::GetValue()
 {
-	return value;
+	if ( value.size() == 0 )
+	{
+		cerr << "Requested value of tag " << name << ", but the value is empty" << endl;
+		exit(1);
+	}
+	else
+	{
+		return value;
+	}
 }
 
 //Find first level tags in the content
@@ -68,7 +77,10 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 		{
 			//If no tag found, all content goes into value
 			StringProcessing::RemoveWhiteSpace(Content);
-			Value = Content;
+			for ( int contentIndex = 0; contentIndex < Content.size(); contentIndex++ )
+			{
+				Value.push_back( Content[contentIndex] );
+			}
 			break;
 		}
 		else
@@ -76,12 +88,15 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 			//Everything before the tag goes into value
 			vector<string> newValue = SplitContent( Content, lineNumber, linePosition, tagName.size() + 2 );
 			StringProcessing::RemoveWhiteSpace(newValue);
-			Value = newValue;
-		}
+			for ( int contentIndex = 0; contentIndex < newValue.size(); contentIndex++ )
+			{
+				Value.push_back( newValue[contentIndex] );
+			}
 
-		//Create the child tag
-		vector<string> childContent = FindTagContent( tagName, Content );
-		childTags.push_back( new XMLTag( tagName, childContent ) );
+			//Create the child tag
+			vector<string> childContent = FindTagContent( tagName, Content );
+			childTags.push_back( new XMLTag( tagName, childContent ) );
+		}
 	}
 
 	return childTags;
@@ -101,9 +116,28 @@ string XMLTag::FindNextTagOpen( vector<string> Content, int & LineNumber, int & 
 			{
 				//Tag is complete
 				string name( Content[lineIndex], openPosition + 1, closePosition - openPosition - 1 );
+
+				//Error check
+				if ( name.size() == 0 )
+				{
+					cerr << "Found tag with no name in line: \"" << Content[lineIndex] << "\"" << endl;
+					exit(1);
+				}
+				if ( name[0] == '/' )
+				{
+					cerr << "Found a closing tag <" << name << "> when opening tag expected" << endl;
+					exit(1);
+				}
+
 				LineNumber = lineIndex;
 				LinePosition = openPosition;
 				return name;
+			}
+			else
+			{
+				//Incomplete tag
+				cerr << "Incomplete XML tag in line: \"" << Content[lineIndex] << "\"" << endl;
+				exit(1);
 			}
 		}
 	}
@@ -149,6 +183,12 @@ void XMLTag::FindTagCloses( string TagName, vector<string> Content, vector<int> 
 			LineNumbers.push_back(lineIndex);
 			LinePositions.push_back( positions[positionIndex] );
 		}
+	}
+
+	if ( LineNumbers.size() < 1 )
+	{
+		cerr << "Tag " << TagName << " is not closed" << endl;
+		exit(1);
 	}
 }
 

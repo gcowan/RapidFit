@@ -106,7 +106,6 @@ ParameterSet * XMLConfigReader::GetFitParameters()
 //Return the minimiser for the fit
 MinimiserConfiguration * XMLConfigReader::GetMinimiserConfiguration()
 {
-	cout << "GetMinimiserConfiguration" << endl;
 	//Find the Minimiser tag
 	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
 	{
@@ -124,7 +123,6 @@ MinimiserConfiguration * XMLConfigReader::GetMinimiserConfiguration()
 //Make a minimiser configuration object
 MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 {
-	cout << "MakeMinimiser" << endl;
 	if ( MinimiserTag->GetName() == "Minimiser" )
 	{
 		//Examine all minimiser components
@@ -152,7 +150,6 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 //Return the output configuration for the fit
 OutputConfiguration * XMLConfigReader::GetOutputConfiguration()
 {
-	cout << "GetOutputConfiguration" << endl;
 	//Find the Output tag
 	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
 	{
@@ -170,16 +167,28 @@ OutputConfiguration * XMLConfigReader::GetOutputConfiguration()
 //Make an output configuration object
 OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputTag )
 {
-	cout << "MakeOutputConfiguration" << endl;
 	if ( OutputTag->GetName() == "Output" )
 	{
 		vector< pair< string, string > > contourPlots;
+		vector<string> projections;
+		bool doPulls = false;
 		vector< XMLTag* > outputComponents = OutputTag->GetChildren();
 		for ( int childIndex = 0; childIndex < outputComponents.size(); childIndex++ )
 		{
 			if ( outputComponents[childIndex]->GetName() == "ContourPlot" )
 			{
 				contourPlots.push_back( MakeContourPlot( outputComponents[childIndex] ) );
+			}
+			else if ( outputComponents[childIndex]->GetName() == "Projection" )
+			{
+				projections.push_back( outputComponents[childIndex]->GetValue()[0] );
+			}
+			else if ( outputComponents[childIndex]->GetName() == "DoPullPlots" )
+			{
+				if ( outputComponents[childIndex]->GetValue()[0] == "true" )
+				{
+					doPulls = true;
+				}
 			}
 			else
 			{
@@ -188,15 +197,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 		}
 
-		//Return the configuration object
-		if ( contourPlots.size() == 0 )
-		{
-			return new OutputConfiguration();
-		}
-		else
-		{
-			return new OutputConfiguration( contourPlots );
-		}
+		return new OutputConfiguration( contourPlots, projections, doPulls );
 	}
 	else
 	{

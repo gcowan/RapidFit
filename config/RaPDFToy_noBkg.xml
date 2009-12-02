@@ -85,8 +85,10 @@
 
 	</ParameterSet>
 
+	// Minimising with Minuit2
 	<Minimiser>Minuit2</Minimiser>
 
+	// Requesting two contour plots
 	<Output>
 		<ContourPlot>
 			<XParameter>gamma</XParameter>
@@ -97,15 +99,20 @@
 			<XParameter>delta_para</XParameter>
 			<YParameter>delta_perp</YParameter>
 		</ContourPlot>
+
+		<DoPullPlots>true</DoPullPlots>
 	</Output>
 
+	// Minimising weighted NLL
 	<FitFunction>
 		<FunctionName>NegativeLogLikelihood</FunctionName>
 		<WeightName>eventWeight</WeightName>
 	</FitFunction>
 
+	// Single fit
 	<NumberRepeats>1</NumberRepeats>
 
+	// 1000 Toys
 	<ToFit>
 		<PDF>
 			<Name>RaPDF_Bs2JpsiPhiNew</Name>

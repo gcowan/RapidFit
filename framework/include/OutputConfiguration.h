@@ -18,13 +18,17 @@ class OutputConfiguration
 {
 	public:
 		OutputConfiguration();
-		OutputConfiguration( vector< pair< string, string > > );
+		OutputConfiguration( vector< pair< string, string > >, vector<string>, bool );
 		~OutputConfiguration();
 
 		vector< pair< string, string > > GetContourPlots();
+		vector<string> GetProjections();
+		bool DoPullPlots();
 
 	private:
 		vector< pair< string, string > > contours;
+		vector<string> projections;
+		bool doPulls;
 };
 
 #endif
