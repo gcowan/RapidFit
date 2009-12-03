@@ -1,11 +1,11 @@
 /**
-        @class ToyStudyResult
+  @class ToyStudyResult
 
-        The result of a toy study.
+  The result of a toy study.
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+ */
 
 #include "ToyStudyResult.h"
 #include <iostream>
@@ -162,4 +162,30 @@ vector<double> ToyStudyResult::GetAllRealTimes()
 vector<double> ToyStudyResult::GetAllCPUTimes()
 {
 	return allCPUTimes;
+}
+
+
+vector<double> ToyStudyResult::GetFlatResult(int Index){
+	vector<double> Flatresult;
+	for(int i = 0; i<allNames.size(); i++){
+		Flatresult.push_back( (allValues[i][Index]));
+		Flatresult.push_back( (allErrors[i][Index]));
+		Flatresult.push_back( (allPulls[i][Index]));
+	}
+
+	Flatresult.push_back(allRealTimes[Index]);
+	Flatresult.push_back(allCPUTimes[Index]);
+	Flatresult.push_back(allResults[Index]->GetFitStatus());
+	return Flatresult;
+}
+TString ToyStudyResult::GetFlatResultHeader(){
+	TString header = "";
+	for(int i = 0; i<allNames.size(); i++){
+	TString name = allNames[i];
+	header += name + "_value:";
+	header += name + "_error:";
+	header += name + "_pull:";
+	}
+	header += "Fit_RealTime:Fit_CPUTime:Fit_Status";
+	return header;
 }
