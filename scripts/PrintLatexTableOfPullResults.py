@@ -35,8 +35,14 @@ def main():
     for e in dom.getElementsByTagName('PhysicsParameter'):
 	if e.getElementsByTagName('Type')[0].childNodes[0].data == 'Free':
 		physicsParameters.append(e.getElementsByTagName('Name')[0].childNodes[0].data)
-
-    trees = []
+		
+	if e.getElementsByTagName('Type')[0].childNodes[0].data == 'Unbounded':
+		physicsParameters.append(e.getElementsByTagName('Name')[0].childNodes[0].data)
+    
+	if e.getElementsByTagName('Type')[0].childNodes[0].data == 'GaussianConstrained':
+		physicsParameters.append(e.getElementsByTagName('Name')[0].childNodes[0].data)
+	
+	trees = []
     histos = []
     resultsList = []
 
@@ -85,7 +91,7 @@ def main():
 	
 	chisq = gfit_pull.GetChisquare()
 	ndf = gfit_pull.GetNDF()
-	chisqdf = chisq/ndf
+	#chisqdf = chisq/ndf
 
 	pull_constant = gfit_pull.GetParameter(0)
 	pull_econstant = gfit_pull.GetParError(0) 
@@ -100,10 +106,10 @@ def main():
 	resultsList.append( [ param, error_mean, error_emean, pull_mean, pull_emean, pull_sigma, pull_esigma])
 
 
-	outputFile.Write()
  	canvas.Update()
     	canvas.SaveAs(dir+'%s.png' % param)
 
+	outputFile.Write()
     outputFile.Close()
 
     print '\\begin{center}'
