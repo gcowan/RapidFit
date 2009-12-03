@@ -1,6 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
-2009/11/256 - Greig Cowan
+2009/12/03 - Greig Cowan
+ - Added beta_s validation configuration directory
+
+2009/11/26 - Greig Cowan
  - Added ability to plot 1 and 2 sigma contours from result of 
    a Miniut and Minuit2 fit. For moment, I have hard-coded that
    we plot the contours of parameters 0 and 1 and use 40 data
