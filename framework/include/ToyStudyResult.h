@@ -33,6 +33,8 @@ class ToyStudyResult
 		vector<double> GetParameterValues(string);
 		vector<double> GetParameterErrors(string);
 		vector<double> GetParameterPulls(string);
+		vector<double> GetFlatResult(int);
+		TString GetFlatResultHeader();
 
 	private:
 		vector< FitResult* > allResults;
