@@ -67,10 +67,8 @@
 
 		<PhysicsParameter>
 			<Name>deltaM</Name>
-			<Value>17.77</Value>
-			<Minimum>17.0</Minimum>
-			<Maximum>20.0</Maximum>
-			<Type>Fixed</Type>
+			<Mean>17.77</Mean>
+			<Sigma>1.0</Sigma>
 			<Unit>MeV/c2</Unit>
 		</PhysicsParameter>
 

@@ -29,6 +29,7 @@ class ResultFormatter
 		static double GetElementFromCovarianceMatrix( vector<double>, int, int);		
 		static bool IsParameterFree( FitResult*, string );
 		static void MakePullPlots( string, ToyStudyResult* );
+		static void OldMakePullPlots( string, ToyStudyResult* );
 };
 
 #endif

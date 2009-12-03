@@ -301,13 +301,90 @@ void ResultFormatter::MakePullPlots( string FileName, ToyStudyResult * ToyResult
 	TNtuple * parameterNTuple;
 	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader());
 	Float_t * resultArr;
-	for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); resultIndex++ ){
+	for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); resultIndex++ )
+	{
 		vector<double> result = ToyResult->GetFlatResult(resultIndex);
 		resultArr = new Float_t [result.size()];
 		copy( result.begin(), result.end(), resultArr);
 		parameterNTuple->Fill(resultArr);
 		delete [] resultArr;
 	}
+	rootFile->Write();
+	rootFile->Close();
+}
+
+//Make pull plots from the output of a toy study
+void ResultFormatter::OldMakePullPlots( string FileName, ToyStudyResult * ToyResult )
+{
+	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
+	string header = "value:error:pull";
+	vector<string> allNames = ToyResult->GetAllNames();
+	Float_t valueErrorPull[3];
+	vector<double> parameterValues, parameterErrors, parameterPulls;
+	TH1F * pullHistogram;
+	TNtuple * parameterNTuple;
+
+	//Plots for each observable
+	for (int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	{
+		//Prepare the NTuple
+		parameterNTuple = new TNtuple( allNames[nameIndex].c_str(), "Parameter fit results", header.c_str() );
+		parameterValues = ToyResult->GetParameterValues( allNames[nameIndex] );
+		parameterErrors = ToyResult->GetParameterErrors( allNames[nameIndex] );
+		parameterPulls = ToyResult->GetParameterPulls( allNames[nameIndex] );
+
+		//Prepare the pull histogram
+		string histogramName = allNames[nameIndex] + "PullPlot";
+		string histogramTitle = allNames[nameIndex] + " pull plot";
+		double maximumPull = StatisticsFunctions::Maximum(parameterPulls);
+		double minimumPull = StatisticsFunctions::Minimum(parameterPulls);
+		bool makeHistogram = !isnan(maximumPull) && !isnan(minimumPull);
+		if (makeHistogram)
+		{
+			pullHistogram = new TH1F( histogramName.c_str(), histogramTitle.c_str(),
+					StatisticsFunctions::OptimumBinNumber(parameterPulls) + 2, minimumPull, maximumPull );
+		}
+
+		//Plot the results
+		for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); resultIndex++ )
+		{
+			valueErrorPull[0] = parameterValues[resultIndex];
+			valueErrorPull[1] = parameterErrors[resultIndex];
+			valueErrorPull[2] = parameterPulls[resultIndex];
+
+			parameterNTuple->Fill(valueErrorPull);
+
+			if (makeHistogram)
+			{
+				pullHistogram->Fill( parameterPulls[resultIndex] );
+			}
+		}
+
+		//Fit a gaussian distribution to the distribution
+		if (makeHistogram)
+		{
+			pullHistogram->Fit("gaus");
+			EdStyle * greigFormat = new EdStyle();
+			pullHistogram->UseCurrentStyle();
+			delete greigFormat;
+		}
+	}
+
+	//Write out the fit times as well
+	vector<double> allRealTimes = ToyResult->GetAllRealTimes();
+	vector<double> allCPUTimes = ToyResult->GetAllCPUTimes();
+	TNtuple * fitInfoNTuple = new TNtuple( "fitInfo", "Information about fits", "realTime:cpuTime:fitStatus" );
+	Float_t timeCPUStatus[3];
+	for ( int timeIndex = 0; timeIndex < allRealTimes.size(); timeIndex++ )
+	{
+		timeCPUStatus[0] = allRealTimes[timeIndex];
+		timeCPUStatus[1] = allCPUTimes[timeIndex];
+		timeCPUStatus[2] = ToyResult->GetFitResult(timeIndex)->GetFitStatus();
+
+		fitInfoNTuple->Fill( timeCPUStatus );
+	}
+
+	//Write the file
 	rootFile->Write();
 	rootFile->Close();
 }

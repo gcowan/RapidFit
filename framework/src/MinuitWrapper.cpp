@@ -56,7 +56,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
 		//Make bounded or unbounded parameters
-		if ( newParameter->GetType() == "Unbounded" )
+		if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
 		{
 			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetValue(), STEP_SIZE, 0.0, 0.0, errorFlag);
 		}

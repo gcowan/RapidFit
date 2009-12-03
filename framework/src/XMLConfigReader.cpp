@@ -484,6 +484,13 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		double value = 0.0;
 		double minimum = 0.0;
 		double maximum = 0.0;
+		double mean = 0.0;
+		double sigma = 0.0;
+		bool hasValue = false;
+		bool hasMaximum = false;
+		bool hasMinimum = false;
+		bool hasMean = false;
+		bool hasSigma = false;
 
 		//Loop over the tag children, which correspond to the parameter elements
 		vector< XMLTag* > elements = InputTag->GetChildren();
@@ -496,15 +503,28 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 			}
 			else if ( name == "Value" )
 			{
+				hasValue = true;
 				value = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
 			}
 			else if ( name == "Minimum" )
 			{
+				hasMinimum = true;
 				minimum = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
 			}
 			else if ( name == "Maximum" )
 			{
+				hasMaximum = true;
 				maximum = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+			}
+			else if ( name == "Mean" )
+			{
+				hasMean = true;
+				mean = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+			}
+			else if ( name == "Sigma" )
+			{
+				hasSigma = true;
+				sigma = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
 			}
 			else if ( name == "Type" )
 			{
@@ -522,15 +542,54 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		}
 
 		//Now construct the physics parameter
-		if ( ( maximum == 0.0 && minimum == 0.0 ) || type == "Unbounded" )
+		if (hasValue)
 		{
-			//Unbounded parameter
-			return new PhysicsParameter( ParameterName, value, type, unit );
+			if ( hasMaximum && hasMinimum )
+			{
+				if ( ( maximum == 0.0 && minimum == 0.0 ) || type == "Unbounded" )
+				{
+					//Unbounded parameter
+					return new PhysicsParameter( ParameterName, value, type, unit );
+				}
+				else
+				{
+					//Bounded parameter
+					return new PhysicsParameter( ParameterName, value, minimum, maximum, type, unit );
+				}
+			}
+			else
+			{
+				//Check for ambiguity
+				if ( hasMaximum || hasMinimum )
+				{
+					cerr << "Ambiguous parameter definition: " << ParameterName << " has value and ";
+					if ( hasMaximum )
+					{
+						cerr << "maximum, but not minimum";
+					}
+					if ( hasMinimum )
+					{
+						cerr << "minimum, but not maximum";
+					}
+					cerr << " defined" << endl;
+					exit(1);
+				}
+				else
+				{
+					//Unbounded parameter
+					return new PhysicsParameter( ParameterName, value, type, unit );
+				}
+			}
+		}
+		else if ( hasMean && hasSigma )
+		{
+			//Gaussian constrained parameter
+			return new PhysicsParameter( ParameterName, mean, mean - sigma, mean + sigma, type, unit );
 		}
 		else
 		{
-			//Bounded parameter
-			return new PhysicsParameter( ParameterName, value, minimum, maximum, type, unit );
+			cerr << "Ambiguous definition for parameter " << ParameterName << endl;
+			exit(1);
 		}
 	}
 	else

@@ -165,9 +165,11 @@ vector<double> ToyStudyResult::GetAllCPUTimes()
 }
 
 
-vector<double> ToyStudyResult::GetFlatResult(int Index){
+vector<double> ToyStudyResult::GetFlatResult( int Index )
+{
 	vector<double> Flatresult;
-	for(int i = 0; i<allNames.size(); i++){
+	for(int i = 0; i<allNames.size(); i++)
+	{
 		Flatresult.push_back( (allValues[i][Index]));
 		Flatresult.push_back( (allErrors[i][Index]));
 		Flatresult.push_back( (allPulls[i][Index]));
@@ -178,13 +180,15 @@ vector<double> ToyStudyResult::GetFlatResult(int Index){
 	Flatresult.push_back(allResults[Index]->GetFitStatus());
 	return Flatresult;
 }
-TString ToyStudyResult::GetFlatResultHeader(){
+TString ToyStudyResult::GetFlatResultHeader()
+{
 	TString header = "";
-	for(int i = 0; i<allNames.size(); i++){
-	TString name = allNames[i];
-	header += name + "_value:";
-	header += name + "_error:";
-	header += name + "_pull:";
+	for(int i = 0; i<allNames.size(); i++)
+	{
+		TString name = allNames[i];
+		header += name + "_value:";
+		header += name + "_error:";
+		header += name + "_pull:";
 	}
 	header += "Fit_RealTime:Fit_CPUTime:Fit_Status";
 	return header;

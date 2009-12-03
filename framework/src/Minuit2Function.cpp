@@ -35,7 +35,7 @@ Minuit2Function::Minuit2Function( FitFunction * NewFitFunction ) : function(NewF
 			//Fixed parameter
 			parameters->Add( nameIterator->c_str(), newParameter->GetValue() );
 		}
-		else if ( newParameter->GetType() == "Unbounded" )
+		else if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
 		{
 			//Unbounded parameter
 			parameters->Add( nameIterator->c_str(), newParameter->GetValue(), ERROR_THINGY );
