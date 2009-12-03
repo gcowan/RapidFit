@@ -33,14 +33,9 @@ def main():
 
     physicsParameters = []
     for e in dom.getElementsByTagName('PhysicsParameter'):
-	if e.getElementsByTagName('Type')[0].childNodes[0].data == 'Free':
+	if e.getElementsByTagName('Type')[0].childNodes[0].data != 'Fixed':
 		physicsParameters.append(e.getElementsByTagName('Name')[0].childNodes[0].data)
 		
-	if e.getElementsByTagName('Type')[0].childNodes[0].data == 'Unbounded':
-		physicsParameters.append(e.getElementsByTagName('Name')[0].childNodes[0].data)
-    
-	if e.getElementsByTagName('Type')[0].childNodes[0].data == 'GaussianConstrained':
-		physicsParameters.append(e.getElementsByTagName('Name')[0].childNodes[0].data)
 	
 	trees = []
     histos = []
