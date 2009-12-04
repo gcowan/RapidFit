@@ -24,8 +24,6 @@
 
 using namespace std;
 
-void OutputOneFit( FitResult*, bool, string );
-
 int main( int argc, char * argv[] )
 {
 
@@ -41,7 +39,7 @@ int main( int argc, char * argv[] )
 		//Default behaviour if no command line arguments
 		ToyStudy * testStudy = new ToyStudy("../config/MC09Toy_noBkg.xml");
 		ToyStudyResult * fitResults = testStudy->DoWholeStudy();
-		ResultFormatter::MakePullPlots( "pullPlots.root", fitResults );
+		ResultFormatter::MakePullPlots( "SeparateParameter", "pullPlots.root", fitResults );
 		ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
 	}
 	else
@@ -267,14 +265,14 @@ int main( int argc, char * argv[] )
 			if (configFileNameFlag)
 			{
 				//Make a file containing toy data from the PDF
-				XMLConfigReader quickConfig(configFileName);
-				PDFWithData * quickData = quickConfig.GetPDFsAndData()[0];
-				quickData->SetPhysicsParameters( quickConfig.GetFitParameters() );
+				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
+				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 				ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickData->GetDataSet() );
 			}
 			else
 			{
 				cerr << "No data set specified" << endl;
+				return 1;
 			}
 		}
 		else if (testIntegratorFlag)
@@ -282,9 +280,8 @@ int main( int argc, char * argv[] )
 			if (configFileNameFlag)
 			{
 				//Compare numerical and analytical integration
-				XMLConfigReader quickConfig(configFileName);
-				PDFWithData * quickData = quickConfig.GetPDFsAndData()[0];
-				quickData->SetPhysicsParameters( quickConfig.GetFitParameters() );
+				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
+				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 				IDataSet * quickDataSet = quickData->GetDataSet();
 				RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( quickData->GetPDF() );
 				testIntegrator->Integral( quickDataSet->GetDataPoint(0), quickDataSet->GetBoundary() );
@@ -292,6 +289,7 @@ int main( int argc, char * argv[] )
 			else
 			{
 				cerr << "No data set specified" << endl;
+				return 1;
 			}
 		}
 		else if (testRapidIntegratorFlag)
@@ -299,9 +297,8 @@ int main( int argc, char * argv[] )
 			if (configFileNameFlag)
 			{
 				//Compare numerical and analytical integration
-				XMLConfigReader quickConfig(configFileName);
-				PDFWithData * quickData = quickConfig.GetPDFsAndData()[0];
-				quickData->SetPhysicsParameters( quickConfig.GetFitParameters() );
+				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
+				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 				IDataSet * quickDataSet = quickData->GetDataSet();
 				MakeFoam * testFoam = new MakeFoam( quickData->GetPDF(), quickDataSet->GetBoundary(), quickDataSet->GetDataPoint(0) );
 				testFoam->Debug();
@@ -309,6 +306,7 @@ int main( int argc, char * argv[] )
 			else
 			{
 				cerr << "No data set specified" << endl;
+				return 1;
 			}
 		}
 		else if (testPlotFlag)
@@ -316,9 +314,8 @@ int main( int argc, char * argv[] )
 			if (configFileNameFlag)
 			{
 				//Project the PDF onto the data
-				XMLConfigReader quickConfig(configFileName);
-				PDFWithData * quickData = quickConfig.GetPDFsAndData()[0];
-				quickData->SetPhysicsParameters( quickConfig.GetFitParameters() );
+				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
+				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 				IDataSet * quickDataSet = quickData->GetDataSet();
 				Plotter * testPlotter = new Plotter( quickData->GetPDF(), quickDataSet );
 				testPlotter->PlotAllObservables(plotFileName);
@@ -326,11 +323,13 @@ int main( int argc, char * argv[] )
 			else
 			{
 				cerr << "No data set specified" << endl;
+				return 1;
 			}
 		}
 		else if (configFileNameFlag)
 		{
-			//Actually configure a fit
+			//Actually configure a fit: first configure the output
+			OutputConfiguration * makeOutput = xmlFile->GetOutputConfiguration();
 
 			//Command line argments override the config file
 			if (!theMinimiserFlag)
@@ -353,24 +352,41 @@ int main( int argc, char * argv[] )
 			{
 				pdfsAndData = xmlFile->GetPDFsAndData();
 			}
-			if ( !doPullsFlag )
+
+			//Pulls
+			if ( doPullsFlag )
 			{
-				doPullsFlag = xmlFile->GetOutputConfiguration()->DoPullPlots();
+				makeOutput->SetPullFileName(pullFileName);
+			}
+			else
+			{
+				doPullsFlag = makeOutput->DoPullPlots();
+			}
+
+			//Plotting
+			if ( doPlottingFlag )
+			{
+				makeOutput->MakeAllPlots(plotFileName);
 			}
 
 			//Pick a toy study if there are repeats, or if pull plots are wanted
 			if ( numberRepeats > 1 || doPullsFlag )
 			{
+				//Do the toy study
 				ToyStudy newStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, numberRepeats );
 				ToyStudyResult * fitResults = newStudy.DoWholeStudy();
-				ResultFormatter::MakePullPlots( pullFileName, fitResults );
 
-				OutputOneFit( fitResults->GetFitResult(0), doPlottingFlag, plotFileName );
+				//Output results
+				makeOutput->OutputToyResult(fitResults);
+				makeOutput->OutputFitResult( fitResults->GetFitResult(0) );
 			}
 			else
 			{
+				//Do the fit
 				FitResult * oneResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData );
-				OutputOneFit( oneResult, doPlottingFlag, plotFileName );
+
+				//Output results
+				makeOutput->OutputFitResult(oneResult);
 			}
 		}
 		else
@@ -386,29 +402,4 @@ int main( int argc, char * argv[] )
 	cout << endl << "RapidFit" << endl;
 	cout << "Ending time: " << ctime( &timeNow ) << endl;
 	return 0;
-}
-
-void OutputOneFit( FitResult * OneResult, bool DoPlotting, string PlotFileName )
-{
-	ResultFormatter::LatexOutputFitResult( OneResult );
-	ResultFormatter::LatexOutputCovarianceMatrix( OneResult );
-	ResultFormatter::PlotFitContours( OneResult, "contours" );
-
-	if (DoPlotting)
-	{
-		PhysicsBottle * resultBottle = OneResult->GetPhysicsBottle();
-
-		//Loop over all PDFs, and plot
-		for ( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
-		{
-			time_t timeNow1;
-			time(&timeNow1);
-			cout << "Plotting parameter: " << ctime( &timeNow1 ) << endl;
-
-			Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
-			char fileNumber[100];
-			sprintf( fileNumber, "%d.", resultIndex );
-			testPlotter->PlotAllObservables( fileNumber + PlotFileName );
-		}
-	}
 }

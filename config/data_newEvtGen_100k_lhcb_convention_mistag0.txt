@@ -1,4 +1,4 @@
-# time cosTheta cosPsi phi tag mistag
+time cosTheta cosPsi phi tag mistag
 0.622396 -0.331703 -0.0539705 -2.79128 -1 0
 2.49127 -0.935929 0.874955 -1.94751 1 0
 0.706893 -0.978742 -0.633292 -0.842406 1 0

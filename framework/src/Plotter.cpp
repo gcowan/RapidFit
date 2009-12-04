@@ -66,7 +66,7 @@ void Plotter::PlotAllObservables( string FileName )
 }
 
 //Create a root file containing a projection plot over one observable
-void Plotter::PlotSingleObservable( string FileName, string ObservableName )
+void Plotter::PlotObservables( string FileName, vector<string> ObservableNames )
 {
 	//Work out what to plot
 	vector<double> combinationWeights;
@@ -74,17 +74,24 @@ void Plotter::PlotSingleObservable( string FileName, string ObservableName )
 	vector<DataPoint> allCombinations = GetDiscreteCombinations( combinationWeights, combinationDescriptions );
 	vector<string> doNotIntegrate = plotPDF->GetDoNotIntegrateList();
 
-	//Check the observable can be plotted
-	bool continuous = !( plotData->GetBoundary()->GetConstraint( ObservableName )->IsDiscrete() );
-	bool doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrate, &ObservableName ) == -1 );
-	if ( continuous && doIntegrate )
+	//Make the file
+	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
+
+	//Loop over all observables
+	for ( int observableIndex = 0; observableIndex < ObservableNames.size(); observableIndex++ )
 	{
-		//Make the file and do the plotting
-		TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
-		cout << "Projecting " << ObservableName << endl;
-		MakeObservablePlots( ObservableName, allCombinations, combinationWeights, combinationDescriptions, rootFile );
-		rootFile->Close();
+		//Check the observable can be plotted
+		bool continuous = !( plotData->GetBoundary()->GetConstraint( ObservableNames[observableIndex] )->IsDiscrete() );
+		bool doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrate, &( ObservableNames[observableIndex] ) ) == -1 );
+		if ( continuous && doIntegrate )
+		{
+			//Do the plotting
+			cout << "Projecting " << ObservableNames[observableIndex] << endl;
+			MakeObservablePlots( ObservableNames[observableIndex], allCombinations, combinationWeights, combinationDescriptions, rootFile );
+		}
 	}
+	
+	rootFile->Close();
 }
 
 //Make a directory containing all the plots for a particular observable

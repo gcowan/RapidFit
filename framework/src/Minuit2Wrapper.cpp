@@ -71,11 +71,35 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 
 	//Make a location to store the contour plots
 	vector< FunctionContour* > allContours;
+	vector< pair< int, int > > allIndices;
 	int sigmaMax = 2;
 	for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
 	{
-		FunctionContour * newContour = new FunctionContour( contours[plotIndex].first, contours[plotIndex].second, sigmaMax );
-		allContours.push_back(newContour);
+		//Find the index (in Minuit) of the parameter names requested for the plot
+		int xParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].first ) );
+		int yParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].second ) );
+		if ( xParameterIndex == -1 )
+		{
+			cerr << "Contour plotting skipped: x parameter \"" << contours[plotIndex].first << "\" not found" << endl;
+		}
+		else if ( newParameters->GetPhysicsParameter( contours[plotIndex].first )->GetType() == "Fixed" )
+		{
+			cerr << "Contour plotting skipped: x parameter \"" << contours[plotIndex].first << "\" is fixed" << endl;
+		}
+		else if ( yParameterIndex == -1 )
+		{
+			cerr << "Contour plotting skipped: y parameter \"" << contours[plotIndex].second << "\" not found" << endl;
+		}
+		else if ( newParameters->GetPhysicsParameter( contours[plotIndex].second )->GetType() == "Fixed" )
+		{
+			cerr << "Contour plotting skipped: y parameter \"" << contours[plotIndex].second << "\" is fixed" << endl;
+		}
+		else
+		{
+			allIndices.push_back( make_pair( xParameterIndex, yParameterIndex ) );
+			FunctionContour * newContour = new FunctionContour( contours[plotIndex].first, contours[plotIndex].second, sigmaMax );
+			allContours.push_back(newContour);
+		}
 	}
 
 	//Make the contour plots
@@ -85,28 +109,14 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 		//Set the sigma value for the contours
 		function->SetSigma(sigma);
 
-		for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
+		for ( int plotIndex = 0; plotIndex < allIndices.size(); plotIndex++ )
 		{
-			//Find the index (in Minuit) of the parameter names requested for the plot
-			int xParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].first ) );
-			int yParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].second ) );
-			if ( xParameterIndex == -1 )
-			{
-				cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].first << "\" not found" << endl;
-			}
-			else if ( yParameterIndex == -1 )
-			{
-				cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].second << "\" not found" << endl;
-			}
-			else
-			{
-				//If the parameters have valid indices, ask minuit to plot them
-				int numberOfPoints = 4;
-				int iErrf;
-				double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
-				vector< pair< double, double> > oneContour = contoursFromMinuit( xParameterIndex, yParameterIndex, numberOfPoints );	
-				allContours[plotIndex]->SetPlot( sigma, oneContour );
-			}
+			//If the parameters have valid indices, ask minuit to plot them
+			int numberOfPoints = 4;
+			int iErrf;
+			double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
+			vector< pair< double, double> > oneContour = contoursFromMinuit( allIndices[plotIndex].first, allIndices[plotIndex].second, numberOfPoints );	
+			allContours[plotIndex]->SetPlot( sigma, oneContour );
 		}
 	}
 

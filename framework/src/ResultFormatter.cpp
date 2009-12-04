@@ -23,6 +23,7 @@
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"
 #include "TCanvas.h"
+#include "StringProcessing.h"
 
 //Output data as a RootNTuple
 void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
@@ -89,7 +90,7 @@ void ResultFormatter::DebugOutputFitResult( FitResult * OutputData )
 
 void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFileName )
 {
-	string name = contourFileName + ".root";
+	string name = contourFileName;// + ".root";
 	TFile * contourFile = new TFile( name.c_str(), "RECREATE");
 	int colours[2] = {42,38};
 	vector< FunctionContour* > contours = OutputData->GetContours();
@@ -129,8 +130,8 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 		graph->Draw( "ALF" ); //Smooth fill area drawn
 
 		//Titles in format: ParameterName (ParameterUnit)
-		string xTitle = plotContour->GetXName() + " ( " + OutputData->GetResultParameterSet()->GetResultParameter( plotContour->GetXName() )->GetUnit() + ")";
-		string yTitle = plotContour->GetYName() + " ( " + OutputData->GetResultParameterSet()->GetResultParameter( plotContour->GetYName() )->GetUnit() + ")";
+		string xTitle = plotContour->GetXName() + " (" + OutputData->GetResultParameterSet()->GetResultParameter( plotContour->GetXName() )->GetUnit() + ")";
+		string yTitle = plotContour->GetYName() + " (" + OutputData->GetResultParameterSet()->GetResultParameter( plotContour->GetYName() )->GetUnit() + ")";
 		graph->GetXaxis()->SetTitle( xTitle.c_str() );
 		graph->GetYaxis()->SetTitle( yTitle.c_str() );
 
@@ -138,7 +139,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 		bothPlots->Modified();
 		bothPlots->Update();
 		bothPlots->Write();
-		bothPlots->SaveAs( (contourFileName + "." + plotContour->GetXName() + "." + plotContour->GetYName() + ".png").c_str() );
+		//bothPlots->SaveAs( (contourFileName + "." + plotContour->GetXName() + "." + plotContour->GetYName() + ".png").c_str() );
 	}
 
 	contourFile->Close();
@@ -160,7 +161,8 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 		if (isFree)
 		{
 			columns += "c|";
-			string name = FindAndReplaceString( *nameIterator );
+			//string name = FindAndReplaceString( *nameIterator );
+			string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
 			parameterNames += " & " + name;
 			numberOfFreeParameters += 1;
 		}
@@ -179,7 +181,8 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 		bool isFree = ResultFormatter::IsParameterFree( OutputData, *nameIterator );
 		if (!isFree) continue;
 
-		string name = FindAndReplaceString( *nameIterator );
+		//string name = FindAndReplaceString( *nameIterator );
+		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
 
 		cout << setw(15) << name;
 		if ( covarianceMatrix.size() == 0 )
@@ -264,7 +267,8 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		//string replace ("\\_");
 		//string newName = boost::regex_replace (*nameIterator, pattern, replace);
 
-		string name = FindAndReplaceString( *nameIterator );
+		//string name = FindAndReplaceString( *nameIterator );
+		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
 		cout << setw(15) << name << " & " 
 			<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
 			<< setw(10) <<  		  fitError << " & " 
@@ -275,7 +279,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "\\end{center}\n" << endl;
 }
 
-string ResultFormatter::FindAndReplaceString( string name )
+/*string ResultFormatter::FindAndReplaceString( string name )
 {
 	// This isn't very general, and probably won't work for names
 	// containing lots of "_".
@@ -292,10 +296,28 @@ string ResultFormatter::FindAndReplaceString( string name )
 		pos = newPos + 2;
 	}
 	return name;
+}*/
+
+//Chose which pull plot method to use
+void ResultFormatter::MakePullPlots( string Type, string FileName, ToyStudyResult * ToyResult )
+{
+	if ( Type == "FlatNTuple" )
+	{
+		return FlatNTuplePullPlots( FileName, ToyResult );
+	}
+	else if ( Type == "SeparateParameter" )
+	{
+		return SeparateParameterPullPlots( FileName, ToyResult );
+	}
+	else
+	{
+		cout << "Unrecognised pull plot type \"" << Type << "\" - defaulting to SeparateParameter" << endl;
+		return SeparateParameterPullPlots( FileName, ToyResult );
+	}
 }
 
 //Make pull plots from the output of a toy study
-void ResultFormatter::MakePullPlots( string FileName, ToyStudyResult * ToyResult )
+void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	TNtuple * parameterNTuple;
@@ -314,7 +336,7 @@ void ResultFormatter::MakePullPlots( string FileName, ToyStudyResult * ToyResult
 }
 
 //Make pull plots from the output of a toy study
-void ResultFormatter::OldMakePullPlots( string FileName, ToyStudyResult * ToyResult )
+void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResult * ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	string header = "value:error:pull";

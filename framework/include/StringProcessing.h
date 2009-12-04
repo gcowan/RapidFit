@@ -22,6 +22,7 @@ class StringProcessing
 		static int CharacterPosition( string, char );
 		static vector<int> StringPositions( string, string );
 		static void RemoveCharacter( string&, char );
+		static string ReplaceString( string&, string, string );
 		static void RemoveWhiteSpace( vector<string>& );
 		static vector<string> CombineUniques( vector<string>, vector<string> );
 		static int VectorContains( vector<string>*, string* );

@@ -89,7 +89,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	//Output time information
 	time_t timeNow;
 	time(&timeNow);
-	cout << "Minuit2 finished: " << ctime( &timeNow ) << endl;
+	cout << "Minuit finished: " << ctime( &timeNow ) << endl;
 
 	//Get the fit status
 	double minimumValue = 0.0;
@@ -142,11 +142,19 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		int yParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].second ) );
 		if ( xParameterIndex == -1 )
 		{
-			cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].first << "\" not found" << endl;
+			cerr << "Contour plotting skipped: x parameter \"" << contours[plotIndex].first << "\" not found" << endl;
+		}
+		else if ( newParameters->GetPhysicsParameter( contours[plotIndex].first )->GetType() == "Fixed" )
+		{
+			cerr << "Contour plotting skipped: x parameter \"" << contours[plotIndex].first << "\" is fixed" << endl;
 		}
 		else if ( yParameterIndex == -1 )
 		{
-			cerr << "Contour plotting failed: parameter \"" << contours[plotIndex].second << "\" not found" << endl;
+			cerr << "Contour plotting skipped: y parameter \"" << contours[plotIndex].second << "\" not found" << endl;
+		}
+		else if ( newParameters->GetPhysicsParameter( contours[plotIndex].second )->GetType() == "Fixed" )
+		{
+			cerr << "Contour plotting skipped: y parameter \"" << contours[plotIndex].second << "\" is fixed" << endl;
 		}
 		else
 		{

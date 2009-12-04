@@ -129,6 +129,44 @@ void StringProcessing::RemoveCharacter( string & Input, char SearchCharacter )
 	Input = passedCharacters;
 }
 
+//Replace any instances of a particular character in a string
+string StringProcessing::ReplaceString( string & Input, string FindString, string ReplaceString )
+{
+	string output;
+
+	//Search the input character by character
+	for ( int characterIndex = 0; characterIndex < Input.size(); characterIndex++ )
+	{
+		//Find out if the full search string is present
+		bool isInstance = true;
+		for ( int testIndex = 0; testIndex < FindString.size(); testIndex++ )
+		{
+			if ( Input[ characterIndex + testIndex ] != FindString[testIndex] )
+			{
+				isInstance = false;
+				break;
+			}
+		}
+
+		//Replace or push back
+		if (isInstance)
+		{
+			for ( int replaceIndex = 0; replaceIndex < ReplaceString.size(); replaceIndex++ )
+			{
+				output.push_back( ReplaceString[replaceIndex] );
+			}
+
+			characterIndex += FindString.size() - 1;
+		}
+		else
+		{
+			output.push_back( Input[characterIndex] );
+		}
+	}
+
+	return output;
+}
+
 //Remove white space from passed lines
 void StringProcessing::RemoveWhiteSpace( vector<string> & newContent )
 {

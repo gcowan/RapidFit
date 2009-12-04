@@ -1,5 +1,29 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2009/12/4 - Ben Wynne
+ - A round-up of lots of changes, because I always forget to write in here
+   - Fixed the various bugs in the function that loads a text file.
+     This included removing all references to the boost library (because it's more trouble than it's worth at the moment).
+   - Added an <Output> tag to the config file.
+     This allows the user to specify whether to do pull plots (and which of the formats - my old one or Conor's new one - to use)
+     The user can also specify contour plots here, fixing all the hard-coded stuff in Greig's code (see 2009/11/26). I've also suppressed the outputting of the contour plots as image files, as it seemed unnecessary.
+     Also added handling for when contour plots are requested for missing or fixed parameters
+     The user can specify which projections of the function to produce with the Plotter.
+   - The XML config reader has been beefed up a lot
+     The XML parsing will now catch and report malformed XML errors, rather than just segfaulting
+     The outputting of all free text inside the <RapidFit> base tag now works again, allowing config files to include helpful comments (as long as they don't contain xml tags).
+     There are now objects like OutputConfiguration (similar idea to PDFWithData) that hold appropriate configuration data and supply methods that rely on it.
+   - There is a general change (suggested by Conor) to a "Fail on any error" model.
+     In the event of unexpected input, RapidFit will fail rather than using default behaviour.
+   - Fixed the bugs with GaussianConstrained parameter
+     The minimum and maximum were being used as such, as well as just a way of defining sigma - fixed
+     The NLL calculation was wrong - fixed
+     Also added the ability to specify such a parameter in xml with mean and sigma, not value, min and max
+   - Changed the structure of FitFunction so that the up value is now returned appropriately for a given sigma value
+   - Added method to ResultFormatter so that different format pull outputs can be selected at run time, not compile time
+   - Structural change in preparation for sFit background subtraction - FitFunction now has a "Precalculation" method.
+   - Looking at producing faster numerical integration: --testRapidIntegrator
+
 2009/12/03 - Greig Cowan
  - Added beta_s validation configuration directory
 

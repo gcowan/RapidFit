@@ -171,7 +171,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 	{
 		vector< pair< string, string > > contourPlots;
 		vector<string> projections;
-		bool doPulls = false;
+		string pullType = "None";
 		vector< XMLTag* > outputComponents = OutputTag->GetChildren();
 		for ( int childIndex = 0; childIndex < outputComponents.size(); childIndex++ )
 		{
@@ -185,10 +185,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 			else if ( outputComponents[childIndex]->GetName() == "DoPullPlots" )
 			{
-				if ( outputComponents[childIndex]->GetValue()[0] == "true" )
-				{
-					doPulls = true;
-				}
+				pullType = outputComponents[childIndex]->GetValue()[0];
 			}
 			else
 			{
@@ -197,7 +194,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 		}
 
-		return new OutputConfiguration( contourPlots, projections, doPulls );
+		return new OutputConfiguration( contourPlots, projections, pullType );
 	}
 	else
 	{

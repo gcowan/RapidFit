@@ -41,6 +41,7 @@ PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMini
 	if ( unit == "" )
 	{
 		cerr << "Physics parameter \"" << Name << "\" has no unit! What kind of physicist are you?" << endl;
+		unit = "Not specified";
 	}
 
 	originalValue = value;

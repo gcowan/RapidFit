@@ -117,7 +117,7 @@
 
 		<DataSet>
 			<Source>File</Source>
-                        <FileName>../config/data_newEvtGen_100k_lhcb_convention_mistag0.txt</FileName>
+                        <FileName>config/data_newEvtGen_100k_lhcb_convention_mistag0.txt</FileName>
                         <NumberEvents>10000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>

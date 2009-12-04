@@ -24,7 +24,7 @@ class Plotter
 		~Plotter();
 
 		void PlotAllObservables( string );
-		void PlotSingleObservable( string, string );
+		void PlotObservables( string, vector<string> );
 		vector<double> ProjectObservable( DataPoint, string );
 
 	private:

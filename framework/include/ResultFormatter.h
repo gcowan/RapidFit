@@ -25,11 +25,13 @@ class ResultFormatter
 		static void LatexOutputFitResult( FitResult* );
 		static void LatexOutputCovarianceMatrix( FitResult* );
 		static void PlotFitContours( FitResult*, string );
-		static string FindAndReplaceString( string );
 		static double GetElementFromCovarianceMatrix( vector<double>, int, int);		
 		static bool IsParameterFree( FitResult*, string );
-		static void MakePullPlots( string, ToyStudyResult* );
-		static void OldMakePullPlots( string, ToyStudyResult* );
+
+		//MakePullPlots chooses the appropriate method based on the first string argument
+		static void MakePullPlots( string, string, ToyStudyResult* );
+		static void FlatNTuplePullPlots( string, ToyStudyResult* );
+		static void SeparateParameterPullPlots( string, ToyStudyResult* );
 };
 
 #endif

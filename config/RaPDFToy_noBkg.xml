@@ -86,7 +86,7 @@
 	// Minimising with Minuit2
 	<Minimiser>Minuit2</Minimiser>
 
-	// Requesting two contour plots
+	// Requesting two contour plots, pull plots and time projection
 	<Output>
 		<ContourPlot>
 			<XParameter>gamma</XParameter>
@@ -98,7 +98,9 @@
 			<YParameter>delta_perp</YParameter>
 		</ContourPlot>
 
-		<DoPullPlots>true</DoPullPlots>
+		<Projection>time</Projection>
+
+		<DoPullPlots>FlatNTuple</DoPullPlots>
 	</Output>
 
 	// Minimising weighted NLL
