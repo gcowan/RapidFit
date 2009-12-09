@@ -280,15 +280,8 @@ void RaPDF_Bs2JpsiPhi_withTimeRes::getTimeDependentAmplitudes(  double & AzeroAz
 			    , mean_time_res1, sigma_time_res1
 			    , mean_time_res2, sigma_time_res2
 			    , frac_time_res1);
-
-	/*
-	cout << gamma << " " << deltaGamma << " " << deltaMs<< " " <<  Phi_s<< " " << 
-        Azero_sq<< " " <<  Apara_sq<< " " <<  Aperp_sq << " " << 
-        delta_zero<< " " <<  delta_para<< " " <<  delta_perp<< " " << 
-        mean_time_res1<< " " <<  sigma_time_res1<< " " << 
-        mean_time_res2<< " " <<  sigma_time_res2<< " " << 
-        frac_time_res1 << endl;
-	*/
+	
+	//cout << "inputs; gamma " << gamma << " deltaMs " << deltaMs << " " << mean_time_res1 << " " << mean_time_res2 << " " << sigma_time_res1 << " " << sigma_time_res2 << " frac_time_res " << frac_time_res1<< " " <<  time << " " << timeErr << endl;
 
 	double gammaL =  gamma + deltaGamma/2.;
   	double gammaH =  gamma - deltaGamma/2.;
@@ -309,6 +302,10 @@ void RaPDF_Bs2JpsiPhi_withTimeRes::getTimeDependentAmplitudes(  double & AzeroAz
 		cachedsinPhis = sin( Phi_s );
 		cachedcosPhis = cos( Phi_s );
 		evaluationCacheValid = true;
+	}
+
+	if (isnan(deltaMs)){
+		cout << "inputs; gamma " << gamma << " deltaGamma " << deltaGamma << " deltaMs " << deltaMs << " " << mean_time_res1 << " " << mean_time_res2 << " " << sigma_time_res1 << " " << sigma_time_res2 << " frac_time_res " << frac_time_res1<< " " <<  time << " " << timeErr << endl;
 	}
 
 	// We always calculate things for the B first, so this should be OK
@@ -332,8 +329,9 @@ void RaPDF_Bs2JpsiPhi_withTimeRes::getTimeDependentAmplitudes(  double & AzeroAz
                               , mean_time_res2*timeErr, sigma_time_res2*timeErr
                               , frac_time_res1, time ); 
 		if (isnan(cachedExpCosh) || isnan(cachedExpSinh) || isnan(cachedExpCos) || isnan(cachedExpSin)){
-		cout << "inputs " << gamma << " " << deltaMs << " " << mean_time_res1 << " " << mean_time_res2 << " " << sigma_time_res1 << " " << sigma_time_res2 << " " << frac_time_res1<< " " <<  time << " " << timeErr << endl;
+		cout << "inputs; gamma " << gamma << " deltaGamma " << deltaGamma << " deltaMs " << deltaMs << " " << mean_time_res1 << " " << mean_time_res2 << " " << sigma_time_res1 << " " << sigma_time_res2 << " frac_time_res " << frac_time_res1<< " " <<  time << " " << timeErr << endl;
 		cout << "ExpTrig " << cachedExpCosh << " " << cachedExpSinh << " " << cachedExpCos << " " << cachedExpSin << endl;
+		exit(1);
 		}
 	}
 
@@ -647,7 +645,7 @@ void RaPDF_Bs2JpsiPhi_withTimeRes::getPhysicsParameters( double & gamma
 	mean_time_res2  = allParameters.GetPhysicsParameter( mean_time_res2Name )->GetValue();
 	sigma_time_res2 = allParameters.GetPhysicsParameter( sigma_time_res2Name )->GetValue();
 	frac_time_res1  = allParameters.GetPhysicsParameter( frac_time_res1Name )->GetValue();
-	if (isnan(gamma)){
+	if (isnan(deltaM)){
 		cout << "oh no, nan" << endl;
 	}
 	return;

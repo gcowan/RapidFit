@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2009/12/9 - Greig Cowan
+ - Removed angular normalisation constant from the Bs2JpsiPhi background
+   PDFs. 
+
 2009/12/4 - Ben Wynne
  - A round-up of lots of changes, because I always forget to write in here
    - Fixed the various bugs in the function that loads a text file.

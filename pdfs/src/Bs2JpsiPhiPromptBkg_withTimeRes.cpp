@@ -52,14 +52,10 @@ double Bs2JpsiPhiPromptBkg_withTimeRes::Evaluate(DataPoint * measurement)
 
         double sigmaPr = allParameters.GetPhysicsParameter( sigmaPrName )->GetValue();
 
-	// Backgrounds assumed to be flat in the angular observables
-	// which leads to this factor.
-	double angularNorm = 1./( 2. * 2. * 2.*TMath::Pi() );
-		
 	double timeNorm = 1./( sigmaPr * sqrt( 2.*TMath::Pi() ) );
         double gauss    = exp( -time*time / ( 2. * sigmaPr * sigmaPr ) );
 
-	return angularNorm * timeNorm * gauss;
+	return timeNorm * gauss;
 }
 
 // int(1/(sigmaPr*sqrt(2*Pi))*exp(-(time)^2/(2*sigmaPr*sigmaPr)),time=tmin..tmax);
@@ -83,8 +79,7 @@ double Bs2JpsiPhiPromptBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * bound
                 tmax = timeBound->GetMaximum();
         }
         double sigmaPr = allParameters.GetPhysicsParameter( sigmaPrName )->GetValue();
-	double angularNorm = 1./( 2. * 2. * 2.*TMath::Pi() );
 	double val = 0.5 * ( RooMath::erf( tmax/(sqrt(2.)*sigmaPr) ) - RooMath::erf( tmin/(sqrt(2.)*sigmaPr )) );
 
-	return angularNorm * val;
+	return val;
 }

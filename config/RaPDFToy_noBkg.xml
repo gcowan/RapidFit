@@ -7,18 +7,14 @@
 		<PhysicsParameter>
 			<Name>gamma</Name>
 			<Value>0.68</Value>
-			<Minimum>0.0</Minimum>
-			<Maximum>2.0</Maximum>
-			<Type>Free</Type>
+			<Type>Unbounded</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>deltaGamma</Name>
-			<Value>0.049</Value>
-			<Minimum>-1.0</Minimum>
-			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
+			<Value>0.068</Value>
+			<Type>Unbounded</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -67,8 +63,10 @@
 
 		<PhysicsParameter>
 			<Name>deltaM</Name>
-			<Mean>17.77</Mean>
-			<Sigma>1.0</Sigma>
+			<Value>17.77</Value>
+			<Minimum>17.0</Minimum>
+                        <Maximum>19.0</Maximum>
+			<Type>Free</Type>
 			<Unit>MeV/c2</Unit>
 		</PhysicsParameter>
 
@@ -80,6 +78,41 @@
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
+
+                <PhysicsParameter>
+                        <Name>mean_time_res1</Name>
+                        <Value>0.0</Value>
+                        <Type>Fixed</Type>
+                        <Unit>ps</Unit>
+                </PhysicsParameter>
+
+                <PhysicsParameter>
+                        <Name>sigma_time_res1</Name>
+                        <Value>0.0315</Value>
+                        <Type>Fixed</Type>
+                        <Unit>ps</Unit>
+                </PhysicsParameter>
+
+                <PhysicsParameter>
+                        <Name>mean_time_res2</Name>
+                        <Value>0.0</Value>
+                        <Type>Fixed</Type>
+                        <Unit>ps</Unit>
+                </PhysicsParameter>
+
+                <PhysicsParameter>
+                        <Name>sigma_time_res2</Name>
+                        <Value>0.0667</Value>
+                        <Type>Fixed</Type>
+                        <Unit>ps</Unit>
+                </PhysicsParameter>
+
+                <PhysicsParameter>
+                        <Name>frac_time_res1</Name>
+                        <Value>0.85</Value>
+                        <Type>Fixed</Type>
+                        <Unit>Unitless</Unit>
+                </PhysicsParameter>
 
 	</ParameterSet>
 
@@ -115,19 +148,25 @@
 	// 1000 Toys
 	<ToFit>
 		<PDF>
-			<Name>RaPDF_Bs2JpsiPhiNew</Name>
+			<Name>RaPDF_Bs2JpsiPhi_withTimeRes</Name>
 		</PDF>
 
 		<DataSet>
 			<Source>Foam</Source>
-			<NumberEvents>1000</NumberEvents>
+			<NumberEvents>100000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>0.0</Minimum>
+					<Minimum>-2.0</Minimum>
 					<Maximum>15.0</Maximum>
 					<Unit>ps</Unit>
 				</Observable>
+
+                                <Observable>
+                                        <Name>timeErr</Name>
+                        		<Value>1.0</Value>
+                                        <Unit>ps</Unit>
+                                </Observable>
 
 				<Observable>
 					<Name>cosTheta</Name>
@@ -153,6 +192,7 @@
 				<Observable>
 					<Name>tag</Name>
 					<Value>1.0</Value>
+					<Value>-1.0</Value>
 					<Unit>Unitless</Unit>
 				</Observable>
 

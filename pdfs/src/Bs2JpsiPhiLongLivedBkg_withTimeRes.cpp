@@ -57,10 +57,6 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Evaluate(DataPoint * measurement)
 	// Observable
         double time = measurement->GetObservable( timeName )->GetValue();
 
-	// Do we need the angular normalisation fraction or will this automatically
-	// be calculated?
-	double angularNorm = 1./( 2. * 2. * 2.*TMath::Pi() );
-
   	double tau1 = allParameters.GetPhysicsParameter( tau1Name )->GetValue();
   	double tau2 = allParameters.GetPhysicsParameter( tau2Name )->GetValue();
   	double f_LL1 = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
@@ -71,7 +67,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Evaluate(DataPoint * measurement)
 	double R2 = erfc( time, tau2, sigmaLL2); 
 	
 	double val = f_LL1 * R1 + (1. - f_LL1) * R2;
-  	return angularNorm * val;
+  	return val;
 }
 
 // Maple integral of the PDF _without_ time resolution
@@ -97,8 +93,6 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * bo
                 tmax = timeBound->GetMaximum();
         }
 	
-        double angularNorm = 1./( 2. * 2. * 2.*TMath::Pi() );
-
         double tau1 = allParameters.GetPhysicsParameter( tau1Name )->GetValue();
         double tau2 = allParameters.GetPhysicsParameter( tau2Name )->GetValue();
         double f_LL1 = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
@@ -112,7 +106,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * bo
 
   	double val = f_LL1 * (R2 - R1) + (1.-f_LL1) * ( R4 - R3 );
  
-	return angularNorm * val;
+	return val;
 }
 
 // Convolution of a gaussian resolution of width sigma with exp(-time*Gamma) gives:
