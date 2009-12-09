@@ -301,6 +301,7 @@ void RaPDF_Bs2JpsiPhiNew::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 	else
 	{
 		tlow = timeBound->GetMinimum();
+		if (tlow < 0.) tlow = 0.;
 		thigh = timeBound->GetMaximum();
 	}
 	

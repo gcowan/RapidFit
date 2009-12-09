@@ -3,6 +3,8 @@
 2009/12/9 - Greig Cowan
  - Removed angular normalisation constant from the Bs2JpsiPhi background
    PDFs. 
+ - Changed Bs2JpsiPhiNew PDF so that if integration limit tlow < 0 then it
+   is reset to 0.
 
 2009/12/4 - Ben Wynne
  - A round-up of lots of changes, because I always forget to write in here
