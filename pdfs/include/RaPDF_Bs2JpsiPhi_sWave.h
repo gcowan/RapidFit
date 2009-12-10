@@ -31,8 +31,8 @@ class RaPDF_Bs2JpsiPhi_sWave : public BasePDF
 
 		//Cached values
 		double cachedv1, cachedv2;
-		double cachedAzero, cachedApara, cachedAperp, cachedAs, cachedsinDeltaPerpPara, cachedcosDeltaPerpPara, cachedsinDeltaPerp;
-		double cachedcosDeltaPerp, cachedsinDeltaPerpS, cahcedsinDeltaParaS, cachedsinminusDeltaS, cachedcosminusDeltaS,cachedsinDeltaParaS,cachedcosDeltaParaS, cachedcosDeltaPara, cachedsinPhis, cachedcosPhis;
+		double cachedAzero, cachedApara, cachedAperp, cachedAs, cachedsinDeltaPerpPara, cachedcosDeltaPerpPara, cachedsinDeltaPerpZero;
+		double cachedcosDeltaPerpZero, cachedsinDeltaPerpS, cahcedsinDeltaParaS, cachedsinDeltaZeroS, cachedcosDeltaZeroS,cachedsinDeltaParaS,cachedcosDeltaParaS, cachedcosDeltaParaZero, cachedsinPhis, cachedcosPhis;
 		bool normalisationCacheValid, evaluationCacheValid;
 
 		// These contain the strings that correspond
