@@ -281,17 +281,16 @@ void RaPDF_Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(
 		cachedAzero = sqrt( Azero_sq );
 		cachedApara = sqrt( Apara_sq );
 		cachedAperp = sqrt( Aperp_sq );
-		cachedAs	= sqrt( As_sq );
-
+		cachedAs = sqrt( As_sq );
 		cachedsinDeltaPerpPara	= sin( delta_perp - delta_para );
 		cachedcosDeltaPerpPara	= cos( delta_perp - delta_para );
-		cachedsinDeltaPerp	= sin( delta_perp );
-		cachedcosDeltaPerp	= cos( delta_perp );
-		cachedcosDeltaPara	= cos( delta_para );
+		cachedsinDeltaPerpZero	= sin( delta_perp - delta_zero );
+		cachedcosDeltaPerpZero	= cos( delta_perp - delta_zero );
+		cachedcosDeltaParaZero	= cos( delta_para - delta_zero );
 		cachedsinDeltaPerpS	= sin(delta_perp - delta_s);
 		cachedsinDeltaParaS	= sin(delta_para - delta_s);
-		cachedsinminusDeltaS	= sin( - delta_s);
-		cachedcosminusDeltaS	= cos( - delta_s);
+		cachedsinDeltaZeroS	= sin(delta_zero - delta_s);
+		cachedcosminusZeroS	= cos(delta_zero - delta_s);
 		cachedsinPhis = sin( Phi_s );
 		cachedcosPhis = cos( Phi_s );
 		evaluationCacheValid = true;
@@ -301,20 +300,25 @@ void RaPDF_Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(
 	double expGT = exp( -gamma*time );
 	double coshDeltaGammaT = cosh( deltaGamma*time/2.);
 	double sinhDeltaGammaT = sinh( deltaGamma*time/2.);
-	double sinDeltaMsT = sin( deltaMs*time );
-	double cosDeltaMsT = cos( deltaMs*time );
-
+	double sinDeltaMsT = Btype * sin( deltaMs*time );
+	double cosDeltaMsT = Btype * cos( deltaMs*time );
+	double Term_AsAs_AperpAperp, Term_AzeroAzero_AparaApara;
 	// Now calculate the amplitudes
-	AzeroAzero = 	Azero_sq * expGT * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + Btype * cachedsinPhis * sinDeltaMsT ); 
-	AparaApara = 	Apara_sq * expGT * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + Btype * cachedsinPhis * sinDeltaMsT ); 
-	AperpAperp = 	Aperp_sq * expGT * ( coshDeltaGammaT + cachedcosPhis * sinhDeltaGammaT - Btype * cachedsinPhis * sinDeltaMsT ); 
-	ImAparaAperp = cachedApara*cachedAperp * expGT * ( - cachedcosDeltaPerpPara * cachedsinPhis * sinhDeltaGammaT + Btype * cachedsinDeltaPerpPara * cosDeltaMsT - Btype * cachedcosDeltaPerpPara * cachedcosPhis * sinDeltaMsT );
-	ReAzeroApara = cachedAzero*cachedApara * expGT * cachedcosDeltaPara * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + Btype * cachedsinPhis * sinDeltaMsT );
-	ImAzeroAperp = cachedAzero*cachedAperp * expGT * ( - cachedcosDeltaPerp * cachedsinPhis * sinhDeltaGammaT + Btype * cachedsinDeltaPerp * cosDeltaMsT - Btype * cachedcosDeltaPerp * cachedcosPhis * sinDeltaMsT );
-	AsAs = 		As_sq * expGT *   ( coshDeltaGammaT + cachedcosPhis * sinhDeltaGammaT  - Btype * cachedsinPhis * sinDeltaMsT ); //CHECK
-	ReAsApara =	 cachedAs*cachedApara * expGT   * ( - cachedsinDeltaParaS   * cachedsinPhis  * sinhDeltaGammaT + Btype *  cachedcosDeltaParaS   * cosDeltaMsT - Btype * cachedsinDeltaParaS	 * cachedcosPhis * sinDeltaMsT ); //CHECK
-	ImAsAperp = 	cachedAs*cachedAperp * expGT   * cachedsinDeltaPerpS * (coshDeltaGammaT + cachedcosPhis * sinhDeltaGammaT - Btype * cachedsinPhis * sinDeltaMsT ); //CHECK
-	ReAsAzero =  	cachedAs*cachedAzero * expGT   * (-cachedsinminusDeltaS * cachedsinPhis *  sinhDeltaGammaT + Btype * cachedcosminusDeltaS * cosDeltaMsT - Btype * cachedsinminusDeltaS * cachedcosPhis * sinDeltaMsT ); //CHECK
+	Term_AsAs_AperpAperp = expGT * ( coshDeltaGammaT + cachedcosPhis * sinhDeltaGammaT - cachedsinPhis * sinDeltaMsT );
+	AperpAperp = 	Aperp_sq * Term_AsAs_AperpAperp;
+	AsAs = 		As_sq *	Term_AsAs_AperpAperp;
+	
+	Term_AzeroAzero_AparaApara = expGT * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + cachedsinPhis * sinDeltaMsT );
+	AzeroAzero = 	Azero_sq * Term_AzeroAzero_AparaApara;
+	AparaApara = 	Apara_sq * Term_AzeroAzero_AparaApara;
+
+	ImAparaAperp = cachedApara*cachedAperp * expGT * ( -1.0*cachedcosDeltaPerpPara * cachedsinPhis * sinhDeltaGammaT + cachedsinDeltaPerpPara * cosDeltaMsT - cachedcosDeltaPerpPara * cachedcosPhis * sinDeltaMsT );
+	ReAzeroApara = cachedAzero*cachedApara * expGT * cachedcosDeltaParaZero * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + cachedsinPhis * sinDeltaMsT );
+	ImAzeroAperp = cachedAzero*cachedAperp * expGT * ( -1.0*cachedcosDeltaPerpZero * cachedsinPhis * sinhDeltaGammaT + cachedsinDeltaPerpZero * cosDeltaMsT - cachedcosDeltaPerpZero * cachedcosPhis * sinDeltaMsT );
+
+	ReAsApara = cachedAs*cachedApara * expGT   * ( -1.0*cachedsinDeltaParaS   * cachedsinPhis  * sinhDeltaGammaT + cachedcosDeltaParaS   * cosDeltaMsT - cachedsinDeltaParaS * cachedcosPhis * sinDeltaMsT );
+	ImAsAperp = cachedAs*cachedAperp * expGT   * cachedsinDeltaPerpS * (coshDeltaGammaT + cachedcosPhis * sinhDeltaGammaT - cachedsinPhis * sinDeltaMsT );
+	ReAsAzero = cachedAs*cachedAzero * expGT   * (-1.0*cachedsinDeltaZeroS * cachedsinPhis *  sinhDeltaGammaT + cachedcosDeltaZeroS * cosDeltaMsT - cachedsinDeltaZeroS * cachedcosPhis * sinDeltaMsT );
 	return;
 }
 
@@ -430,7 +434,7 @@ inline double RaPDF_Bs2JpsiPhi_sWave::getAperpAperpInt(double tmin, double tmax,
 	return (valA-valB);
 }
 
-inline double RaPDF_Bs2JpsiPhi_sWave::getAsAsInt(double tmin, double tmax,	//CHECK
+inline double RaPDF_Bs2JpsiPhi_sWave::getAsAsInt(double tmin, double tmax,
 		double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
 {
 
