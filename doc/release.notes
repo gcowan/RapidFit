@@ -1,12 +1,16 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
-2009/12/9 - Greig Cowan
+2009/12/10 - Greig Cowan
+ - Changed Bs2JpsiPhiNew PDF so that if integration limit tlow < 0 then 
+   the Evaluate method returns 0.
+
+2009/12/09 - Greig Cowan
  - Removed angular normalisation constant from the Bs2JpsiPhi background
    PDFs. 
  - Changed Bs2JpsiPhiNew PDF so that if integration limit tlow < 0 then it
    is reset to 0.
 
-2009/12/4 - Ben Wynne
+2009/12/04 - Ben Wynne
  - A round-up of lots of changes, because I always forget to write in here
    - Fixed the various bugs in the function that loads a text file.
      This included removing all references to the boost library (because it's more trouble than it's worth at the moment).

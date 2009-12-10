@@ -95,6 +95,10 @@ vector<string> RaPDF_Bs2JpsiPhiNew::GetDoNotIntegrateList()
 //Calculate the function value
 double RaPDF_Bs2JpsiPhiNew::Evaluate(DataPoint * measurement)
 {
+	// Does not make sense to evaluate this PDF for time < 0
+    	double time = measurement->GetObservable( timeName )->GetValue();	
+	if ( time < 0. ) return 0.;
+	
 	// The angular functions f1->f6 as defined in roadmap Table 1.
 	double f1, f2, f3, f4, f5, f6;
 	getAngularFunctions( f1, f2, f3, f4, f5, f6, measurement );	
