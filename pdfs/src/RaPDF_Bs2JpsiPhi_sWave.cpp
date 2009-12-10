@@ -290,7 +290,7 @@ void RaPDF_Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(
 		cachedsinDeltaPerpS	= sin(delta_perp - delta_s);
 		cachedsinDeltaParaS	= sin(delta_para - delta_s);
 		cachedsinDeltaZeroS	= sin(delta_zero - delta_s);
-		cachedcosminusZeroS	= cos(delta_zero - delta_s);
+		cachedcosDeltaZeroS	= cos(delta_zero - delta_s);
 		cachedsinPhis = sin( Phi_s );
 		cachedcosPhis = cos( Phi_s );
 		evaluationCacheValid = true;
