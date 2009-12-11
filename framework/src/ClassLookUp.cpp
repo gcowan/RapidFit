@@ -19,6 +19,7 @@
 #include "RaPDF_Bs2JpsiPhiPromptBkg.h"
 #include "Bs2JpsiPhiPromptBkg_withTimeRes.h"
 #include "RaPDF_Bs2JpsiPhiMassBkg.h"
+#include "RaPDF_Bs2PhiPhi.h"
 #include "MinuitWrapper.h"
 #include "Minuit2Wrapper.h"
 #include "FumiliWrapper.h"
@@ -33,15 +34,20 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 {
         if ( Name == "RaPDF_Bs2JpsiPhiNew" )
         {
-                //Default JPsiPhi
-                return new RaPDF_Bs2JpsiPhiNew();
+	        //Default JPsiPhi
+	        return new RaPDF_Bs2JpsiPhiNew();
+        }
+        else if ( Name == "RaPDF_Bs2PhiPhi" )
+        {
+	        //Default PhiPhi
+                return new RaPDF_Bs2PhiPhi();
         }
 	else if ( Name == "RaPDF_Bs2JpsiPhi_withTimeRes" )
         {
                 // Bs2JPsiPhi with analytic time resolution
                 return new RaPDF_Bs2JpsiPhi_withTimeRes();
         }
-	else if ( Name == "RaPDF_Bs2DsPi" )
+        else if ( Name == "RaPDF_Bs2DsPi" )
         {
                 // DsPi
                 return new RaPDF_Bs2DsPi();
@@ -53,35 +59,37 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         }
         else if ( Name == "RaPDF_Bs2JpsiPhiLongLivedBkg" )
         {
-		//Long lived background for JPsiPhi
+	        //Long lived background for JPsiPhi
                 return new RaPDF_Bs2JpsiPhiLongLivedBkg();
         }
         else if ( Name == "Bs2JpsiPhiLongLivedBkg_withTimeRes" )
         {
-		//Long lived background for JPsiPhi with time resolution (convolved gaussian)
+                //Long lived background for JPsiPhi with time resolution (convolved gaussian)
                 return new Bs2JpsiPhiLongLivedBkg_withTimeRes();
         }
         else if ( Name == "RaPDF_Bs2JpsiPhiPromptBkg" )
         {
-        	//This one does not work at the moment. Use time resolution.
+        	// This one does not work at the moment. Use time resolution.
 		cerr << "This one does not work at the moment. Use time resolution" << endl;
 	        return new RaPDF_Bs2JpsiPhiPromptBkg();
         }
+
         else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeRes" )
         {
-		//Prompt background for JPsiPhi, with time resolution (convolved gaussian)
+	        //Prompt background for JPsiPhi, with time resolution (convolved gaussian)
 		return new Bs2JpsiPhiPromptBkg_withTimeRes();
         }
+
 	else if ( Name == "RaPDF_Bs2JpsiPhi_sWave" )
         {
-		//JPsiPhi signal PDF including the s-wave contribution
+	        //JPsiPhi signal PDF including the s-wave contribution
                 return new RaPDF_Bs2JpsiPhi_sWave();
         }
         else if ( Name == "RaPDF_Bs2JpsiPhiMassBkg" )
         {
                 //Default JPsiPhi prompt bkg mass signal
                 return new RaPDF_Bs2JpsiPhiMassBkg();
-        }
+	}
 	else
 	{
 		cerr << "Unrecognised PDF name: " << Name << endl;
