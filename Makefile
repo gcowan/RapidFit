@@ -43,15 +43,14 @@ GARBAGE  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting pdfDict.h pdfDict.cp
 # Linux
 ifeq "$(UNAME)" "Linux"
 RANLIB       = ranlib
-CXXFLAGS    += -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS) -I/usr/local/include/boost #-I$(GSLINC)
+CXXFLAGS    += -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS) #-I$(GSLINC)
 LINKFLAGS    =
 endif
 
 # OS X
 ifeq "$(UNAME)" "Darwin"
-BOOST	     = /usr/local/include/boost
 RANLIB       = ranlib
-CXXFLAGS    += -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS) -I$(BOOST) #-I$(GSLINC)
+CXXFLAGS    += -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS) #-I$(GSLINC)
 LINKFLAGS    =
 endif
 

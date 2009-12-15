@@ -4,6 +4,7 @@
  - Refactored all PDFs to more regular naming convention. Updated 
    config files as well. Fixed bug in Bs2JpsiPhi_mistagObservable
    PDF where a tmax was used rather than a tmin.
+ - Removed Boost linking from Makefile.
 
 2009/12/10 - Greig Cowan
  - Changed Bs2JpsiPhiNew PDF so that if integration limit tlow < 0 then 
