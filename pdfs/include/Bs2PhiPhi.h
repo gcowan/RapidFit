@@ -1,4 +1,4 @@
-/** @class RaPDF_Bs2PhiPhi RaPDF_Bs2PhiPhi.h
+/** @class Bs2PhiPhi Bs2PhiPhi.h
  *
  *  RapidFit PDF for Bs2PhiPhi
  *
@@ -6,16 +6,16 @@
  *  @date 12 Nov 2009
  */
 
-#ifndef RaPDF_Bs2PhiPhi_H
-#define RaPDF_Bs2PhiPhi_H
+#ifndef Bs2PhiPhi_H
+#define Bs2PhiPhi_H
 
 #include "BasePDF.h"
 
-class RaPDF_Bs2PhiPhi : public BasePDF
+class Bs2PhiPhi : public BasePDF
 {
     public:
-        RaPDF_Bs2PhiPhi();
-        ~RaPDF_Bs2PhiPhi();
+        Bs2PhiPhi();
+        ~Bs2PhiPhi();
 
         //Calculate the PDF value
         virtual double Evaluate(DataPoint*);

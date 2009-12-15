@@ -1,5 +1,5 @@
-// $Id: RaPDF_Bs2JpsiPhi.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
-/** @class RaPDF_Bs2JpsiPhi RaPDF_Bs2JpsiPhi.cpp
+// $Id: Bs2JpsiPhi.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+/** @class Bs2JpsiPhi Bs2JpsiPhi.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
@@ -7,13 +7,13 @@
  *  @date 2009-07-30
  */
 
-#include "RaPDF_Bs2JpsiPhi.h"
+#include "Bs2JpsiPhi.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 
 //Constructor
-RaPDF_Bs2JpsiPhi::RaPDF_Bs2JpsiPhi() : 
+Bs2JpsiPhi::Bs2JpsiPhi() : 
 	  gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
 	, deltaMName    ( "deltaM")
@@ -29,7 +29,7 @@ RaPDF_Bs2JpsiPhi::RaPDF_Bs2JpsiPhi() :
 }
 
 //Make the data point and parameter set
-void RaPDF_Bs2JpsiPhi::MakePrototypes()
+void Bs2JpsiPhi::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	timeName     = "time";
@@ -63,12 +63,12 @@ void RaPDF_Bs2JpsiPhi::MakePrototypes()
 }
 
 //Destructor
-RaPDF_Bs2JpsiPhi::~RaPDF_Bs2JpsiPhi()
+Bs2JpsiPhi::~Bs2JpsiPhi()
 {
 }
 
 //Calculate the function value
-double RaPDF_Bs2JpsiPhi::Evaluate(DataPoint * measurement)
+double Bs2JpsiPhi::Evaluate(DataPoint * measurement)
 {
 	// The angular functions f1->f6 as defined in roadmap Table 1.
 	double f1, f2, f3, f4, f5, f6;
@@ -91,7 +91,7 @@ double RaPDF_Bs2JpsiPhi::Evaluate(DataPoint * measurement)
 	return 0.5*eval;
 }
 
-void RaPDF_Bs2JpsiPhi::getAngularFunctions( double & f1
+void Bs2JpsiPhi::getAngularFunctions( double & f1
 					, double & f2
 					, double & f3
 					, double & f4
@@ -124,7 +124,7 @@ void RaPDF_Bs2JpsiPhi::getAngularFunctions( double & f1
 	return;
 }
 
-void RaPDF_Bs2JpsiPhi::getTimeDependentAmplitudes(  double & AzeroAzero
+void Bs2JpsiPhi::getTimeDependentAmplitudes(  double & AzeroAzero
 						, double & AparaApara
 						, double & AperpAperp
 						, double & ImAparaAperp
@@ -183,7 +183,7 @@ void RaPDF_Bs2JpsiPhi::getTimeDependentAmplitudes(  double & AzeroAzero
 }
 
 // Start calculating the integrals of the time dependent parts of the amplitudes
-void RaPDF_Bs2JpsiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
+void Bs2JpsiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
                                                  , double & AparaAparaInt
                                                  , double & AperpAperpInt
                                                  , double & ImAparaAperpInt
@@ -220,7 +220,7 @@ void RaPDF_Bs2JpsiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 	return;
 }
 
-double RaPDF_Bs2JpsiPhi::getEvenTimeComponentInt( double gamma
+double Bs2JpsiPhi::getEvenTimeComponentInt( double gamma
                                         , double deltaGamma
                                         , double deltaM
                                         , double Phi_s
@@ -243,7 +243,7 @@ double RaPDF_Bs2JpsiPhi::getEvenTimeComponentInt( double gamma
       	return result;
 }
 
-double RaPDF_Bs2JpsiPhi::getOddTimeComponentInt( double gamma
+double Bs2JpsiPhi::getOddTimeComponentInt( double gamma
                                         , double deltaGamma
                                         , double deltaM
                                         , double Phi_s
@@ -266,7 +266,7 @@ double RaPDF_Bs2JpsiPhi::getOddTimeComponentInt( double gamma
         return result;
 }
 
-double RaPDF_Bs2JpsiPhi::getAzeroAzeroTimeInt( double Azero_sq
+double Bs2JpsiPhi::getAzeroAzeroTimeInt( double Azero_sq
                                         , double gamma
                                         , double deltaGamma
                                         , double deltaM
@@ -280,7 +280,7 @@ double RaPDF_Bs2JpsiPhi::getAzeroAzeroTimeInt( double Azero_sq
         return Azero_sq*evenComponentInt;
 }
 
-double RaPDF_Bs2JpsiPhi::getAparaAparaTimeInt( double Apara_sq
+double Bs2JpsiPhi::getAparaAparaTimeInt( double Apara_sq
                                         , double gamma
                                         , double deltaGamma
                                         , double deltaM
@@ -293,7 +293,7 @@ double RaPDF_Bs2JpsiPhi::getAparaAparaTimeInt( double Apara_sq
 	return Apara_sq*evenComponentInt;
 }
 
-double RaPDF_Bs2JpsiPhi::getAperpAperpTimeInt( double Aperp_sq
+double Bs2JpsiPhi::getAperpAperpTimeInt( double Aperp_sq
                                         , double gamma
                                         , double deltaGamma
                                         , double deltaM
@@ -306,7 +306,7 @@ double RaPDF_Bs2JpsiPhi::getAperpAperpTimeInt( double Aperp_sq
         return Aperp_sq*oddComponentInt;
 }
 
-double RaPDF_Bs2JpsiPhi::getAparaAperpTimeInt( double Apara
+double Bs2JpsiPhi::getAparaAperpTimeInt( double Apara
 					, double Aperp
                                         , double gamma
                                         , double deltaGamma
@@ -335,7 +335,7 @@ double RaPDF_Bs2JpsiPhi::getAparaAperpTimeInt( double Apara
         return Apara*Aperp*result;
 }
 
-double RaPDF_Bs2JpsiPhi::getAzeroAparaTimeInt( double Azero
+double Bs2JpsiPhi::getAzeroAparaTimeInt( double Azero
 					, double Apara
                                         , double gamma
                                         , double deltaGamma
@@ -350,7 +350,7 @@ double RaPDF_Bs2JpsiPhi::getAzeroAparaTimeInt( double Azero
         return Azero*Apara*result;
 }
 
-double RaPDF_Bs2JpsiPhi::getAzeroAperpTimeInt( double Azero
+double Bs2JpsiPhi::getAzeroAperpTimeInt( double Azero
 					, double Aperp
                                         , double gamma
                                         , double deltaGamma
@@ -383,13 +383,13 @@ double RaPDF_Bs2JpsiPhi::getAzeroAperpTimeInt( double Azero
 // when doing the PDF integration.
 
 // Integral of exp( -gamma*t ) from t1 to t2
-double RaPDF_Bs2JpsiPhi::getExpInt( double G, double t1, double t2 ) const
+double Bs2JpsiPhi::getExpInt( double G, double t1, double t2 ) const
 {
         return (1./G) * ( exp(-G*t1) - exp(-G*t2) ) ;
 }
 
 // Integral of exp( -gamma*t ) * cos( dm*t )  from t1 to t2
-double RaPDF_Bs2JpsiPhi::getExpCosInt( double G, double dm, double t1, double t2 ) const
+double Bs2JpsiPhi::getExpCosInt( double G, double dm, double t1, double t2 ) const
 {
         return (1./( G*G + dm*dm )) * (
                                 ( exp(-G*t1)* (G*cos(dm*t1) - dm*sin(dm*t1)))
@@ -398,7 +398,7 @@ double RaPDF_Bs2JpsiPhi::getExpCosInt( double G, double dm, double t1, double t2
 }
 
 // Integral of exp( -gamma*t ) * sin( dm*t )  from t1 to t2
-double RaPDF_Bs2JpsiPhi::getExpSinInt( double G, double dm, double t1, double t2 ) const
+double Bs2JpsiPhi::getExpSinInt( double G, double dm, double t1, double t2 ) const
 {
         return (1./(G*G + dm*dm)) * (
                                 ( exp(-G*t1)* (G*sin(dm*t1) + dm*cos(dm*t1)))
@@ -408,7 +408,7 @@ double RaPDF_Bs2JpsiPhi::getExpSinInt( double G, double dm, double t1, double t2
 // OK, we have now done the time integration part
 
 // Now pull all of the integrals together...
-double RaPDF_Bs2JpsiPhi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
         // The integrals of the time dependent amplitudes as defined in roadmap Eqns 48 -> 59
         double AzeroAzeroInt, AparaAparaInt, AperpAperpInt;
@@ -421,7 +421,7 @@ double RaPDF_Bs2JpsiPhi::Normalisation(DataPoint * measurement, PhaseSpaceBounda
 	return 0.5*( AzeroAzeroInt + AparaAparaInt + AperpAperpInt ); // Angle factors normalised to 1
 }
 
-void RaPDF_Bs2JpsiPhi::getPhysicsParameters( double & gamma
+void Bs2JpsiPhi::getPhysicsParameters( double & gamma
 					, double & deltaGamma
 					, double & deltaM
 					, double & Phi_s

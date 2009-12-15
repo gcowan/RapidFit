@@ -1,5 +1,5 @@
-// $Id: RaPDF_Bs2JpsiPhiLongLivedBkg.cpp,v 1.3 2009/11/11 18:30:10 bwynne Exp $
-/** @class RaPDF_Bs2JpsiPhiLongLivedBkg RaPDF_Bs2JpsiPhiLongLivedBkg.cpp
+// $Id: Bs2JpsiPhiLongLivedBkg.cpp,v 1.3 2009/11/11 18:30:10 bwynne Exp $
+/** @class Bs2JpsiPhiLongLivedBkg Bs2JpsiPhiLongLivedBkg.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi long lived background
  *
@@ -7,13 +7,13 @@
  *  @date 2009-07-30
  */
 
-#include "RaPDF_Bs2JpsiPhiLongLivedBkg.h"
+#include "Bs2JpsiPhiLongLivedBkg.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 
 //Constructor
-RaPDF_Bs2JpsiPhiLongLivedBkg::RaPDF_Bs2JpsiPhiLongLivedBkg() : 
+Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg() : 
 	// Observables
 	  timeName	( "time" )
 
@@ -26,7 +26,7 @@ RaPDF_Bs2JpsiPhiLongLivedBkg::RaPDF_Bs2JpsiPhiLongLivedBkg() :
 }
 
 //Make the data point and parameter set
-void RaPDF_Bs2JpsiPhiLongLivedBkg::MakePrototypes()
+void Bs2JpsiPhiLongLivedBkg::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -42,12 +42,12 @@ void RaPDF_Bs2JpsiPhiLongLivedBkg::MakePrototypes()
 }
 
 //Destructor
-RaPDF_Bs2JpsiPhiLongLivedBkg::~RaPDF_Bs2JpsiPhiLongLivedBkg()
+Bs2JpsiPhiLongLivedBkg::~Bs2JpsiPhiLongLivedBkg()
 {
 }
 
 //Calculate the function value
-double RaPDF_Bs2JpsiPhiLongLivedBkg::Evaluate(DataPoint * measurement)
+double Bs2JpsiPhiLongLivedBkg::Evaluate(DataPoint * measurement)
 {
 	// Observable
         double time = measurement->GetObservable( timeName )->GetValue();
@@ -66,7 +66,7 @@ double RaPDF_Bs2JpsiPhiLongLivedBkg::Evaluate(DataPoint * measurement)
 //                  tmin               tmin               tmin                           tmax               tmax               tmax
 // f_LL1 tau1 exp(- ----) + tau2 exp(- ----) - tau2 exp(- ----) f_LL1 - f_LL1 tau1 exp(- ----) - tau2 exp(- ----) + tau2 exp(- ----) f_LL1
 //                  tau1               tau2               tau2                           tau1               tau2               tau2
-double RaPDF_Bs2JpsiPhiLongLivedBkg::Normalisation(PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhiLongLivedBkg::Normalisation(PhaseSpaceBoundary * boundary)
 {
         double tmin = 0.;
         double tmax = 0.;

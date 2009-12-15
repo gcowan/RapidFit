@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhiClassic_Alt.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
-/** @class Bs2JpsiPhiClassic_Alt Bs2JpsiPhiClassic_Alt.cpp
+// $Id: Bs2JpsiPhi_mistagParameter_alt.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
+/** @class Bs2JpsiPhi_mistagParameter_alt Bs2JpsiPhi_mistagParameter_alt.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
@@ -7,14 +7,14 @@
  *  @date 2009-12-06
  */
 
-#include "Bs2JpsiPhiClassic_Alt.h"
+#include "Bs2JpsiPhi_mistagParameter_alt.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 #include "RooMath.h"
 
 //Constructor
-Bs2JpsiPhiClassic_Alt::Bs2JpsiPhiClassic_Alt() : 
+Bs2JpsiPhi_mistagParameter_alt::Bs2JpsiPhi_mistagParameter_alt() : 
 	// Physics parameters
 	  gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
@@ -42,7 +42,7 @@ Bs2JpsiPhiClassic_Alt::Bs2JpsiPhiClassic_Alt() :
 }
 
 //Make the data point and parameter set
-void Bs2JpsiPhiClassic_Alt::MakePrototypes()
+void Bs2JpsiPhi_mistagParameter_alt::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -70,26 +70,26 @@ void Bs2JpsiPhiClassic_Alt::MakePrototypes()
 }
 
 //Destructor
-Bs2JpsiPhiClassic_Alt::~Bs2JpsiPhiClassic_Alt()
+Bs2JpsiPhi_mistagParameter_alt::~Bs2JpsiPhi_mistagParameter_alt()
 {
 }
 
 //Not only set the physics parameters, but indicate that the cache is no longer valid
-bool Bs2JpsiPhiClassic_Alt::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2JpsiPhi_mistagParameter_alt::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	normalisationCacheValid = false;
 	return allParameters.SetPhysicsParameters(NewParameterSet);
 }
 
 //Return a list of observables not to be integrated
-vector<string> Bs2JpsiPhiClassic_Alt::GetDoNotIntegrateList()
+vector<string> Bs2JpsiPhi_mistagParameter_alt::GetDoNotIntegrateList()
 {
 	vector<string> list;
 	return list;
 }
 
 //Calculate the function value
-double Bs2JpsiPhiClassic_Alt::Evaluate(DataPoint * measurement)
+double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 {
 	
     // Get parameters into member variables
@@ -109,7 +109,7 @@ double Bs2JpsiPhiClassic_Alt::Evaluate(DataPoint * measurement)
 }
 
 
-double Bs2JpsiPhiClassic_Alt::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 
 	// IMPORTANT:  THIS PDF CAN ONLY HANDLE FULL INTEGRATION OVER TIME IF RESOLUTION IS SWITCHED ON
@@ -140,7 +140,7 @@ double Bs2JpsiPhiClassic_Alt::Normalisation(DataPoint * measurement, PhaseSpaceB
 	}
 	
 	if( (resolution > 0.) && ( tlo > -2  || thi < 10 ) ) {
-		std::cerr << " Bs2JpsiPhiClassic_Alt cannot handle tlo > -2 or thi < 10  with resolution on" << std::endl ;
+		std::cerr << " Bs2JpsiPhi_mistagParameter_alt cannot handle tlo > -2 or thi < 10  with resolution on" << std::endl ;
 		return -999.0 ;
 	}
 	
@@ -159,7 +159,7 @@ double Bs2JpsiPhiClassic_Alt::Normalisation(DataPoint * measurement, PhaseSpaceB
 
 
 
-void Bs2JpsiPhiClassic_Alt::getPhysicsParameters( double & gamma
+void Bs2JpsiPhi_mistagParameter_alt::getPhysicsParameters( double & gamma
 					, double & deltaGamma
 					, double & deltaM
 					, double & Phi_s
@@ -196,26 +196,26 @@ void Bs2JpsiPhiClassic_Alt::getPhysicsParameters( double & gamma
 //Internal helper functions
 
 //Amplitudes Used in one angle PDF
-double Bs2JpsiPhiClassic_Alt::AoAo() const  { return Rt; };   
-double Bs2JpsiPhiClassic_Alt::AeAe() const { return 1-Rt ; };
+double Bs2JpsiPhi_mistagParameter_alt::AoAo() const  { return Rt; };   
+double Bs2JpsiPhi_mistagParameter_alt::AeAe() const { return 1-Rt ; };
 
 //Amplitudes Used in three angle PDF
-double Bs2JpsiPhiClassic_Alt::AT() const { return sqrt(Rt) ; };
-double Bs2JpsiPhiClassic_Alt::AP() const { return sqrt(Rp) ; };
-double Bs2JpsiPhiClassic_Alt::A0() const { if( (1-Rt-Rp) < 0 ) return 0; else return sqrt(1-Rt-Rp) ; };
+double Bs2JpsiPhi_mistagParameter_alt::AT() const { return sqrt(Rt) ; };
+double Bs2JpsiPhi_mistagParameter_alt::AP() const { return sqrt(Rp) ; };
+double Bs2JpsiPhi_mistagParameter_alt::A0() const { if( (1-Rt-Rp) < 0 ) return 0; else return sqrt(1-Rt-Rp) ; };
 
-double Bs2JpsiPhiClassic_Alt::ctrsq() const { return (ctheta_tr*ctheta_tr) ; }
-double Bs2JpsiPhiClassic_Alt::strsq() const { return (1.0 - ctheta_tr*ctheta_tr) ; }
-double Bs2JpsiPhiClassic_Alt::ct1sq() const { return (ctheta_1*ctheta_1) ; }
-double Bs2JpsiPhiClassic_Alt::st1sq() const { return (1.0 - ctheta_1*ctheta_1) ; }
-double Bs2JpsiPhiClassic_Alt::cphsq() const { return (cos(phi_tr)*cos(phi_tr)) ; }
-double Bs2JpsiPhiClassic_Alt::sphsq() const { return (sin(phi_tr)*sin(phi_tr)) ; }
+double Bs2JpsiPhi_mistagParameter_alt::ctrsq() const { return (ctheta_tr*ctheta_tr) ; }
+double Bs2JpsiPhi_mistagParameter_alt::strsq() const { return (1.0 - ctheta_tr*ctheta_tr) ; }
+double Bs2JpsiPhi_mistagParameter_alt::ct1sq() const { return (ctheta_1*ctheta_1) ; }
+double Bs2JpsiPhi_mistagParameter_alt::st1sq() const { return (1.0 - ctheta_1*ctheta_1) ; }
+double Bs2JpsiPhi_mistagParameter_alt::cphsq() const { return (cos(phi_tr)*cos(phi_tr)) ; }
+double Bs2JpsiPhi_mistagParameter_alt::sphsq() const { return (sin(phi_tr)*sin(phi_tr)) ; }
 
-double Bs2JpsiPhiClassic_Alt::gamma_l() const { return gamma() + ( dgam / 2.0 ) ; }
-double Bs2JpsiPhiClassic_Alt::gamma_h() const { return gamma() - ( dgam / 2.0 ) ; }
-double Bs2JpsiPhiClassic_Alt::gamma() const   { return gamma_in ; }
+double Bs2JpsiPhi_mistagParameter_alt::gamma_l() const { return gamma() + ( dgam / 2.0 ) ; }
+double Bs2JpsiPhi_mistagParameter_alt::gamma_h() const { return gamma() - ( dgam / 2.0 ) ; }
+double Bs2JpsiPhi_mistagParameter_alt::gamma() const   { return gamma_in ; }
 
-double Bs2JpsiPhiClassic_Alt::q() const { return tag ;}
+double Bs2JpsiPhi_mistagParameter_alt::q() const { return tag ;}
 
 
 //-----------------------------------
@@ -223,7 +223,7 @@ double Bs2JpsiPhiClassic_Alt::q() const { return tag ;}
 //
 // Much of the single gausian resolutino code is copied from Yue Hongs pdf
 
-double Bs2JpsiPhiClassic_Alt::expL() const 
+double Bs2JpsiPhi_mistagParameter_alt::expL() const 
 {
     if(resolution>0.) {     
 		
@@ -242,7 +242,7 @@ double Bs2JpsiPhiClassic_Alt::expL() const
 	}
 }
 
-double Bs2JpsiPhiClassic_Alt::expH() const 
+double Bs2JpsiPhi_mistagParameter_alt::expH() const 
 {
     if(resolution>0.) {     
 		
@@ -261,7 +261,7 @@ double Bs2JpsiPhiClassic_Alt::expH() const
 	}
 }
 
-double Bs2JpsiPhiClassic_Alt::expSin() const  
+double Bs2JpsiPhi_mistagParameter_alt::expSin() const  
 {
     if( resolution > 0. ) {
 		
@@ -286,7 +286,7 @@ double Bs2JpsiPhiClassic_Alt::expSin() const
 	
 }
 
-double Bs2JpsiPhiClassic_Alt::expCos() const 
+double Bs2JpsiPhi_mistagParameter_alt::expCos() const 
 {
     if( resolution > 0. ) {
 		
@@ -314,26 +314,26 @@ double Bs2JpsiPhiClassic_Alt::expCos() const
 // All of these functions were taken from Yue Hongs code
 
 // Calculate exp(-u^2) cwerf(swt*c + i(u+c)), taking care of numerical instabilities
-//RooComplex Bs2JpsiPhiClassic_Alt::evalCerf(double swt, double u, double c) const {
+//RooComplex Bs2JpsiPhi_mistagParameter_alt::evalCerf(double swt, double u, double c) const {
 //  RooComplex z(swt*c,u+c);
 //  return (z.im()>-4.0) ? RooMath::FastComplexErrFunc(z)*exp(-u*u) : evalCerfApprox(swt,u,c) ;
 ///}  DIDNT APPEAR TO BE USED
 
 // Calculate Re(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-double Bs2JpsiPhiClassic_Alt::evalCerfRe(double swt, double u, double c) const {
+double Bs2JpsiPhi_mistagParameter_alt::evalCerfRe(double swt, double u, double c) const {
     RooComplex z(swt*c,u+c);
     return (z.im()>-4.0) ? RooMath::FastComplexErrFuncRe(z)*exp(-u*u) : evalCerfApprox(swt,u,c).re() ;
 }
 
 // Calculate Im(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-double Bs2JpsiPhiClassic_Alt::evalCerfIm(double swt, double u, double c) const {
+double Bs2JpsiPhi_mistagParameter_alt::evalCerfIm(double swt, double u, double c) const {
     RooComplex z(swt*c,u+c);
     return (z.im()>-4.0) ? RooMath::FastComplexErrFuncIm(z)*exp(-u*u) : evalCerfApprox(swt,u,c).im() ;
 }
 
 // use the approximation: erf(z) = exp(-z*z)/(sqrt(pi)*z) to explicitly cancel the divergent exp(y*y) behaviour of
 // CWERF for z = x + i y with large negative y
-RooComplex Bs2JpsiPhiClassic_Alt::evalCerfApprox(double swt, double u, double c) const
+RooComplex Bs2JpsiPhi_mistagParameter_alt::evalCerfApprox(double swt, double u, double c) const
 {
 	static double rootpi= sqrt(atan2(0.,-1.));
 	RooComplex z(swt*c,u+c);  
@@ -350,12 +350,12 @@ RooComplex Bs2JpsiPhiClassic_Alt::evalCerfApprox(double swt, double u, double c)
 // Some time integrals
 
 // Integral of exp( - G * t ) from t1 to t2
-double Bs2JpsiPhiClassic_Alt::intExp( double G, double t1, double t2 ) const {
+double Bs2JpsiPhi_mistagParameter_alt::intExp( double G, double t1, double t2 ) const {
     return (1/G) * (exp(-G*t1) - exp(-G*t2) ) ;
 }
 
 // Integral of exp( - G * t ) * cos( dm * t )  from t1 to t2
-double Bs2JpsiPhiClassic_Alt::intExpCos( double G, double dm, double t1, double t2 ) const {
+double Bs2JpsiPhi_mistagParameter_alt::intExpCos( double G, double dm, double t1, double t2 ) const {
     return (1/(G*G + dm*dm)) * (
 								( exp(-G*t1)* (G*cos(dm*t1) - dm*sin(dm*t1)))
 								-( exp(-G*t2)* (G*cos(dm*t2) - dm*sin(dm*t2)))
@@ -363,7 +363,7 @@ double Bs2JpsiPhiClassic_Alt::intExpCos( double G, double dm, double t1, double 
 }
 
 // Integral of exp( - G * t ) * sin( dm * t )  from t1 to t2
-double Bs2JpsiPhiClassic_Alt::intExpSin( double G, double dm, double t1, double t2 ) const {
+double Bs2JpsiPhi_mistagParameter_alt::intExpSin( double G, double dm, double t1, double t2 ) const {
     return (1/(G*G + dm*dm)) * (
 								( exp(-G*t1)* (G*sin(dm*t1) + dm*cos(dm*t1)))
 								-( exp(-G*t2)* (G*sin(dm*t2) + dm*cos(dm*t2)))
@@ -374,7 +374,7 @@ double Bs2JpsiPhiClassic_Alt::intExpSin( double G, double dm, double t1, double 
 // These are the time factors and their analytic integrals for the one angle PDF
 
 //..................................
-double Bs2JpsiPhiClassic_Alt::timeFactorEven(  )  const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorEven(  )  const
 {
 	//if( t < 0.0 ) return 0.0 ;
 	double result = 
@@ -384,7 +384,7 @@ double Bs2JpsiPhiClassic_Alt::timeFactorEven(  )  const
 	return result ;
 };
 
-double Bs2JpsiPhiClassic_Alt::timeFactorEvenInt(  )  const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorEvenInt(  )  const
 {
 
 	double _tlo = tlo ;
@@ -399,7 +399,7 @@ double Bs2JpsiPhiClassic_Alt::timeFactorEvenInt(  )  const
 
 
 //..................................
-double Bs2JpsiPhiClassic_Alt::timeFactorOdd(  )   const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorOdd(  )   const
 {
 	//if( t < 0.0 ) return 0.0 ;
 	double result = 
@@ -409,7 +409,7 @@ double Bs2JpsiPhiClassic_Alt::timeFactorOdd(  )   const
 	return result ;
 };
 
-double Bs2JpsiPhiClassic_Alt::timeFactorOddInt(  )  const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorOddInt(  )  const
 {
 	double _tlo = tlo ;
 	if(_tlo < 0.) _tlo = 0. ;
@@ -426,33 +426,33 @@ double Bs2JpsiPhiClassic_Alt::timeFactorOddInt(  )  const
 // These are the time factors and their analytic integrals for the three angle PDF
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::timeFactorA0A0( )    const { return timeFactorEven( ) ; } ;      
-double Bs2JpsiPhiClassic_Alt::timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorA0A0( )    const { return timeFactorEven( ) ; } ;      
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; } ;
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::timeFactorAPAP( )    const { return timeFactorEven( ) ; } ;
-double Bs2JpsiPhiClassic_Alt::timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorAPAP( )    const { return timeFactorEven( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; } ;
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::timeFactorATAT( )    const { return timeFactorOdd( ) ; } ;
-double Bs2JpsiPhiClassic_Alt::timeFactorATATInt( ) const { return timeFactorOddInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorATAT( )    const { return timeFactorOdd( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorATATInt( ) const { return timeFactorOddInt( ) ; } ;
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::timeFactorReA0AP( )  const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorReA0AP( )  const
 {
 	//if( t < 0.0 ) return 0.0 ;
 	double result = cos(delta2-delta1) * this->timeFactorEven(  ) ;
 	return result ;
 } ;
 
-double Bs2JpsiPhiClassic_Alt::timeFactorReA0APInt( ) const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorReA0APInt( ) const
 {
 	double result = cos(delta2-delta1) * this->timeFactorEvenInt( ) ;
 	return result ;
 } ;
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::timeFactorImAPAT( ) const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorImAPAT( ) const
 {
 	//if( t < 0.0 ) return 0.0 ;
 	double result = 
@@ -462,7 +462,7 @@ double Bs2JpsiPhiClassic_Alt::timeFactorImAPAT( ) const
 	return result ;
 } ;
 
-double Bs2JpsiPhiClassic_Alt::timeFactorImAPATInt( ) const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorImAPATInt( ) const
 {
 	double _tlo = tlo ;
 	if(_tlo < 0.) _tlo = 0. ;
@@ -475,7 +475,7 @@ double Bs2JpsiPhiClassic_Alt::timeFactorImAPATInt( ) const
 
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::timeFactorImA0AT(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorImA0AT(  ) const
 {
 	//if( t < 0.0 ) return 0.0 ;
 	double result =
@@ -484,7 +484,7 @@ double Bs2JpsiPhiClassic_Alt::timeFactorImA0AT(  ) const
 	return result ;
 } ;
 
-double Bs2JpsiPhiClassic_Alt::timeFactorImA0ATInt( ) const
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorImA0ATInt( ) const
 {
 	double _tlo = tlo ;
 	if(_tlo < 0.) _tlo = 0. ;
@@ -500,7 +500,7 @@ double Bs2JpsiPhiClassic_Alt::timeFactorImA0ATInt( ) const
 // Angle factors for one angle PDF
 
 //.................................
-double Bs2JpsiPhiClassic_Alt::angleFactorEven(  )  const
+double Bs2JpsiPhi_mistagParameter_alt::angleFactorEven(  )  const
 {
 	// Note that this is normalised to 1
 	double result = 3.0/8.0 * (1.0 + ctrsq() ) ;
@@ -508,7 +508,7 @@ double Bs2JpsiPhiClassic_Alt::angleFactorEven(  )  const
 };
 
 //.................................
-double Bs2JpsiPhiClassic_Alt::angleFactorOdd(  )   const
+double Bs2JpsiPhi_mistagParameter_alt::angleFactorOdd(  )   const
 {
 	// Note that this is normalised to 1
 	double result = 3.0/4.0 * (1.0 - ctrsq() ) ;
@@ -521,7 +521,7 @@ double Bs2JpsiPhiClassic_Alt::angleFactorOdd(  )   const
 
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::angleFactorA0A0(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::angleFactorA0A0(  ) const
 {
 	// Normalised to  1	
 	double result = 2.0 * ct1sq() * (1.0 - strsq()*cphsq() ) * (9.0/32.0/TMath::Pi());
@@ -529,7 +529,7 @@ double Bs2JpsiPhiClassic_Alt::angleFactorA0A0(  ) const
 };
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::angleFactorAPAP(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::angleFactorAPAP(  ) const
 {
 	// Normalised to  1
 	double result =  st1sq() * (1.0 - strsq()*sphsq() ) * (9.0/32.0/TMath::Pi());
@@ -537,7 +537,7 @@ double Bs2JpsiPhiClassic_Alt::angleFactorAPAP(  ) const
 };
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::angleFactorATAT(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::angleFactorATAT(  ) const
 {
 	// Normalised to  1
 	double result = st1sq() * strsq() * (9.0/32.0/TMath::Pi());
@@ -546,7 +546,7 @@ double Bs2JpsiPhiClassic_Alt::angleFactorATAT(  ) const
 };
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::angleFactorReA0AP( ) const
+double Bs2JpsiPhi_mistagParameter_alt::angleFactorReA0AP( ) const
 {
 	// Normalised to  0
 	double theta_1 = acos(ctheta_1) ;	
@@ -555,7 +555,7 @@ double Bs2JpsiPhiClassic_Alt::angleFactorReA0AP( ) const
 };
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::angleFactorImAPAT(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::angleFactorImAPAT(  ) const
 {
 	// Normalised to  0
 	double theta_tr = acos(ctheta_tr) ;		
@@ -564,7 +564,7 @@ double Bs2JpsiPhiClassic_Alt::angleFactorImAPAT(  ) const
 };
 
 //...........................
-double Bs2JpsiPhiClassic_Alt::angleFactorImA0AT(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::angleFactorImA0AT(  ) const
 {
 	// Normalised to  0
 	double theta_tr = acos(ctheta_tr) ;		
@@ -581,7 +581,7 @@ double Bs2JpsiPhiClassic_Alt::angleFactorImA0AT(  ) const
 //...................................
 // Diff cross sections
 
-double Bs2JpsiPhiClassic_Alt::diffXsec(  )  const
+double Bs2JpsiPhi_mistagParameter_alt::diffXsec(  )  const
 {   
 	double xsec = 
 	0.5 * A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
@@ -594,7 +594,7 @@ double Bs2JpsiPhiClassic_Alt::diffXsec(  )  const
 	return xsec ;
 };
 
-double  Bs2JpsiPhiClassic_Alt::diffXsecOne(  ) const
+double  Bs2JpsiPhi_mistagParameter_alt::diffXsecOne(  ) const
 {
 	double result = 
 	0.5 * AeAe() * timeFactorEven(  ) * angleFactorEven(  )  +
@@ -605,7 +605,7 @@ double  Bs2JpsiPhiClassic_Alt::diffXsecOne(  ) const
 //...................................
 // Integral over all variables: t + angles
 
-double Bs2JpsiPhiClassic_Alt::diffXsecNorm1(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::diffXsecNorm1(  ) const
 {      
 	double norm = 
 	0.5 * A0()*A0() * timeFactorA0A0Int(  ) +    // Angle factors normalised to 1
@@ -615,7 +615,7 @@ double Bs2JpsiPhiClassic_Alt::diffXsecNorm1(  ) const
 	return norm ;
 };
 
-double Bs2JpsiPhiClassic_Alt::diffXsecOneNorm1(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::diffXsecOneNorm1(  ) const
 {      
 	double norm = 
 	0.5 * AeAe() * timeFactorEvenInt(  )  +    // Angle factors normalised to 1
@@ -627,7 +627,7 @@ double Bs2JpsiPhiClassic_Alt::diffXsecOneNorm1(  ) const
 //...................................
 // Integral over angles only 3 
 
-double Bs2JpsiPhiClassic_Alt::diffXsecNorm2(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::diffXsecNorm2(  ) const
 {          
 	double norm = 
 	0.5 * A0()*A0() * timeFactorA0A0(  ) +    // Angle factors normalised to 1
@@ -637,7 +637,7 @@ double Bs2JpsiPhiClassic_Alt::diffXsecNorm2(  ) const
 	return norm ;
 };
 
-double Bs2JpsiPhiClassic_Alt::diffXsecOneNorm2(  ) const
+double Bs2JpsiPhi_mistagParameter_alt::diffXsecOneNorm2(  ) const
 {          
 	double norm = 
 	0.5 * AeAe() * timeFactorEven(  )  +     // Angle factors normalised to 1

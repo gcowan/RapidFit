@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhiClassic_Alt.h,v 1.1 2009/12/06  Pete Clarke Exp $
-/** @class Bs2JpsiPhiClassic_Alt RaPDF_.h
+// $Id: Bs2JpsiPhi_mistagParameter_alt.h,v 1.1 2009/12/06  Pete Clarke Exp $
+/** @class Bs2JpsiPhi_mistagParameter_alt RaPDF_.h
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
@@ -7,17 +7,17 @@
  *  @date 2009-12-06
  */
 
-#ifndef Bs2JpsiPhiClassic_Alt_H
-#define Bs2JpsiPhiClassic_Alt_H
+#ifndef Bs2JpsiPhi_mistagParameter_alt_H
+#define Bs2JpsiPhi_mistagParameter_alt_H
 
 #include "BasePDF.h"
 #include "RooComplex.h"
 
-class Bs2JpsiPhiClassic_Alt : public BasePDF
+class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 {
 	public:
-		Bs2JpsiPhiClassic_Alt();
-		~Bs2JpsiPhiClassic_Alt();
+		Bs2JpsiPhi_mistagParameter_alt();
+		~Bs2JpsiPhi_mistagParameter_alt();
 
 		//Mandatory method to evaluate the PDF value:
 		virtual double Evaluate(DataPoint*);

@@ -1,20 +1,20 @@
-/** @class RaPDF_Bs2DsPi RaPDF_Bs2DsPi.h
+/** @class Bs2DsPi Bs2DsPi.h
  *
  *  RapidFit PDF for Bs2DsPi
  *
  *  @author Gemma Fardell
  */
 
-#ifndef RaPDF_Bs2DsPi_H
-#define RaPDF_Bs2DsPi_H
+#ifndef Bs2DsPi_H
+#define Bs2DsPi_H
 
 #include "BasePDF.h"
 
-class RaPDF_Bs2DsPi : public BasePDF
+class Bs2DsPi : public BasePDF
 {
 	public:
-		RaPDF_Bs2DsPi();
-		~RaPDF_Bs2DsPi();
+		Bs2DsPi();
+		~Bs2DsPi();
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);

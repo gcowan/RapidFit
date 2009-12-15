@@ -1,4 +1,4 @@
-/** @class RaPDF_Bs2JpsiPhi_sWave RaPDF_Bs2JpsiPhi_sWave.cpp
+/** @class Bs2JpsiPhi_sWave Bs2JpsiPhi_sWave.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi with sWave contributions
  *
@@ -6,7 +6,7 @@
  *  @date 2009-10-27
  */
 
-#include "RaPDF_Bs2JpsiPhi_sWave.h"
+#include "Bs2JpsiPhi_sWave.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
@@ -15,7 +15,7 @@
 using std::cout;
 using std::endl;
 //Constructor
-RaPDF_Bs2JpsiPhi_sWave::RaPDF_Bs2JpsiPhi_sWave() : 
+Bs2JpsiPhi_sWave::Bs2JpsiPhi_sWave() : 
 	// Physics parameters
 	gammaName	 ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
@@ -56,7 +56,7 @@ RaPDF_Bs2JpsiPhi_sWave::RaPDF_Bs2JpsiPhi_sWave() :
 }
 
 //Make the data point and parameter set
-void RaPDF_Bs2JpsiPhi_sWave::MakePrototypes()
+void Bs2JpsiPhi_sWave::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -89,12 +89,12 @@ void RaPDF_Bs2JpsiPhi_sWave::MakePrototypes()
 }
 
 //Destructor
-RaPDF_Bs2JpsiPhi_sWave::~RaPDF_Bs2JpsiPhi_sWave()
+Bs2JpsiPhi_sWave::~Bs2JpsiPhi_sWave()
 {
 }
 
 //Not only set the physics parameters, but indicate that the cache is no longer valid
-bool RaPDF_Bs2JpsiPhi_sWave::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2JpsiPhi_sWave::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	normalisationCacheValid = false;
 	evaluationCacheValid = false;
@@ -104,7 +104,7 @@ bool RaPDF_Bs2JpsiPhi_sWave::SetPhysicsParameters( ParameterSet * NewParameterSe
 }	
 
 //Calculate the function value
-double RaPDF_Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
+double Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
 {
 	// The angular functions f1->f6 as defined in roadmap Table 1.
 	double f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
@@ -161,7 +161,7 @@ double RaPDF_Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
 }
 
 
-double RaPDF_Bs2JpsiPhi_sWave::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhi_sWave::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	// Now need to know the tag and the mistag
 	int q = (int)measurement->GetObservable( tagName )->GetValue();
@@ -203,7 +203,7 @@ double RaPDF_Bs2JpsiPhi_sWave::Normalisation(DataPoint * measurement, PhaseSpace
 	return norm;
 }
 
-void RaPDF_Bs2JpsiPhi_sWave::getAngularFunctions( double & f1
+void Bs2JpsiPhi_sWave::getAngularFunctions( double & f1
 		, double & f2
 		, double & f3
 		, double & f4
@@ -252,7 +252,7 @@ void RaPDF_Bs2JpsiPhi_sWave::getAngularFunctions( double & f1
 	return;
 }
 
-void RaPDF_Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(  
+void Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(  
 		double & AzeroAzero
 		, double & AparaApara
 		, double & AperpAperp
@@ -322,7 +322,7 @@ void RaPDF_Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(
 	return;
 }
 
-void RaPDF_Bs2JpsiPhi_sWave::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
+void Bs2JpsiPhi_sWave::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 		, double & AparaAparaInt
 		, double & AperpAperpInt
 		, double & AsAsInt
@@ -369,7 +369,7 @@ void RaPDF_Bs2JpsiPhi_sWave::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 }
 
 
-inline double RaPDF_Bs2JpsiPhi_sWave::getAzeroAzeroInt(double tmin, double tmax, 
+inline double Bs2JpsiPhi_sWave::getAzeroAzeroInt(double tmin, double tmax, 
 		double k0, double tauL, double tauH, double tauBar, double Dms, double phis, int Btype)
 {
 
@@ -391,7 +391,7 @@ inline double RaPDF_Bs2JpsiPhi_sWave::getAzeroAzeroInt(double tmin, double tmax,
 }
 
 
-inline double RaPDF_Bs2JpsiPhi_sWave::getAparaAparaInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_sWave::getAparaAparaInt(double tmin, double tmax,
 		double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
 {
 
@@ -413,7 +413,7 @@ inline double RaPDF_Bs2JpsiPhi_sWave::getAparaAparaInt(double tmin, double tmax,
 }
 
 
-inline double RaPDF_Bs2JpsiPhi_sWave::getAperpAperpInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_sWave::getAperpAperpInt(double tmin, double tmax,
 		double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
 {
 
@@ -434,7 +434,7 @@ inline double RaPDF_Bs2JpsiPhi_sWave::getAperpAperpInt(double tmin, double tmax,
 	return (valA-valB);
 }
 
-inline double RaPDF_Bs2JpsiPhi_sWave::getAsAsInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_sWave::getAsAsInt(double tmin, double tmax,
 		double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
 {
 
@@ -455,7 +455,7 @@ inline double RaPDF_Bs2JpsiPhi_sWave::getAsAsInt(double tmin, double tmax,
 	return (valA-valB);
 }
 
-void RaPDF_Bs2JpsiPhi_sWave::getPhysicsParameters( double & gamma
+void Bs2JpsiPhi_sWave::getPhysicsParameters( double & gamma
 		, double & deltaGamma
 		, double & deltaM
 		, double & Phi_s

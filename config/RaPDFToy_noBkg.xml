@@ -148,7 +148,7 @@
 	// 1000 Toys
 	<ToFit>
 		<PDF>
-			<Name>RaPDF_Bs2JpsiPhi_withTimeRes</Name>
+			<Name>Bs2JpsiPhi_withTimeRes</Name>
 		</PDF>
 
 		<DataSet>

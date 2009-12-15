@@ -110,7 +110,7 @@
 
 	<ToFit>
 		<PDF>
-			<Name>RaPDF_Bs2JpsiPhi</Name>
+			<Name>Bs2JpsiPhi</Name>
 		</PDF>
 		<DataSet>
 			<Source>File</Source>

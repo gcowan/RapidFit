@@ -1,5 +1,5 @@
-// $Id: RaPDF_Bs2JpsiPhiNew.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
-/** @class RaPDF_Bs2JpsiPhiNew RaPDF_Bs2JpsiPhiNew.h
+// $Id: Bs2JpsiPhi_mistagObservable.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+/** @class Bs2JpsiPhi_mistagObservable Bs2JpsiPhi_mistagObservable.h
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
@@ -7,16 +7,16 @@
  *  @date 2009-07-30
  */
 
-#ifndef RaPDF_Bs2JpsiPhiNew_H
-#define RaPDF_Bs2JpsiPhiNew_H
+#ifndef Bs2JpsiPhi_mistagObservable_H
+#define Bs2JpsiPhi_mistagObservable_H
 
 #include "BasePDF.h"
 
-class RaPDF_Bs2JpsiPhiNew : public BasePDF
+class Bs2JpsiPhi_mistagObservable : public BasePDF
 {
 	public:
-		RaPDF_Bs2JpsiPhiNew();
-		~RaPDF_Bs2JpsiPhiNew();
+		Bs2JpsiPhi_mistagObservable();
+		~Bs2JpsiPhi_mistagObservable();
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);

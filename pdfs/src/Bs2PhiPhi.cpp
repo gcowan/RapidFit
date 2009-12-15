@@ -1,4 +1,4 @@
-/** @class RaPDF_Bs2PhiPhi RaPDF_Bs2PhiPhi.cpp
+/** @class Bs2PhiPhi Bs2PhiPhi.cpp
  *
  *  RapidFit PDF for Bs2PhiPhi
  *
@@ -6,13 +6,13 @@
  *  @date 12 Nov 2009
  */
 
-#include "RaPDF_Bs2PhiPhi.h"
+#include "Bs2PhiPhi.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 
 //Constructor
-RaPDF_Bs2PhiPhi::RaPDF_Bs2PhiPhi() : 
+Bs2PhiPhi::Bs2PhiPhi() : 
     // Physics parameters
       gamma_sName     ( "gamma_s" )
     , gamma_lName     ( "gamma_l" )
@@ -40,7 +40,7 @@ RaPDF_Bs2PhiPhi::RaPDF_Bs2PhiPhi() :
 }
 
 //Make the data point and parameter set
-void RaPDF_Bs2PhiPhi::MakePrototypes()
+void Bs2PhiPhi::MakePrototypes()
 {
     //Make the DataPoint prototype
     allObservables.push_back( timeName );
@@ -73,12 +73,12 @@ void RaPDF_Bs2PhiPhi::MakePrototypes()
 }
 
 //Destructor
-RaPDF_Bs2PhiPhi::~RaPDF_Bs2PhiPhi()
+Bs2PhiPhi::~Bs2PhiPhi()
 {
 }
 
 //Not only set the physics parameters, but indicate that the cache is no longer valid
-bool RaPDF_Bs2PhiPhi::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2PhiPhi::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
     normalisationCacheValid = false;
     evaluationCacheValid = false;
@@ -86,7 +86,7 @@ bool RaPDF_Bs2PhiPhi::SetPhysicsParameters( ParameterSet * NewParameterSet )
 }
 
 //Return a list of parameters not to be integrated
-vector<string> RaPDF_Bs2PhiPhi::GetDoNotIntegrateList()
+vector<string> Bs2PhiPhi::GetDoNotIntegrateList()
 {
     vector<string> mistagList;
     mistagList.push_back(mistagName);
@@ -94,7 +94,7 @@ vector<string> RaPDF_Bs2PhiPhi::GetDoNotIntegrateList()
 }
 
 //Calculate the function value
-double RaPDF_Bs2PhiPhi::Evaluate(DataPoint * measurement)
+double Bs2PhiPhi::Evaluate(DataPoint * measurement)
 {
     // The angular functions f1->f6 as defined in roadmap Table 1.
     double f1, f2, f3, f4, f5, f6;
@@ -146,7 +146,7 @@ double RaPDF_Bs2PhiPhi::Evaluate(DataPoint * measurement)
 }
 
 
-double RaPDF_Bs2PhiPhi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2PhiPhi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
     // Now need to know the tag and the mistag
     int q = (int)measurement->GetObservable( tagName )->GetValue(); //-1, 0 or +1
@@ -184,7 +184,7 @@ double RaPDF_Bs2PhiPhi::Normalisation(DataPoint * measurement, PhaseSpaceBoundar
     return ( w1*cach_v1 + w2*cach_v2 );
 }
 
-void RaPDF_Bs2PhiPhi::getAngularFunctions( double & f1
+void Bs2PhiPhi::getAngularFunctions( double & f1
                                          , double & f2
                                          , double & f3
                                          , double & f4
@@ -228,7 +228,7 @@ void RaPDF_Bs2PhiPhi::getAngularFunctions( double & f1
     return;
 }
 
-void RaPDF_Bs2PhiPhi::getTimeDependentAmplitudes(  double & AzeroAzero //(These 6 are output parameters)
+void Bs2PhiPhi::getTimeDependentAmplitudes(  double & AzeroAzero //(These 6 are output parameters)
                                                  , double & AparaApara
                                                  , double & AperpAperp
                                                  , double & ImAparaAperp
@@ -311,7 +311,7 @@ void RaPDF_Bs2PhiPhi::getTimeDependentAmplitudes(  double & AzeroAzero //(These 
     return;
 }
 
-void RaPDF_Bs2PhiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
+void Bs2PhiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
                                                , double & AparaAparaInt
                                                , double & AperpAperpInt
                                                , PhaseSpaceBoundary * boundary
@@ -357,9 +357,9 @@ void RaPDF_Bs2PhiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
     return;
 }
 
-//inline double RaPDF_Bs2PhiPhi::getAzeroAzeroInt(double tmin, double tmax, 
+//inline double Bs2PhiPhi::getAzeroAzeroInt(double tmin, double tmax, 
 //                               double k0, double tauL, double tauH, double tauBar, double Dms, double phis, int Btype)
-inline double RaPDF_Bs2PhiPhi::getMainIntAnswer(double tmin, double tmax, double gamma_s, double gamma_l, double gamma_h, 
+inline double Bs2PhiPhi::getMainIntAnswer(double tmin, double tmax, double gamma_s, double gamma_l, double gamma_h, 
                                                 double Dms, double phis, int Btype, int Swap)
 {
     double gamma_sDms_sq = ( gamma_s*gamma_s + Dms*Dms );
@@ -388,7 +388,7 @@ inline double RaPDF_Bs2PhiPhi::getMainIntAnswer(double tmin, double tmax, double
 /*
 // Need to work out what interference terms these correspond to and which strong phase is which.
 // These are only needed (I think) for calculating the projections.
-inline double RaPDF_Bs2PhiPhi::A4def(double tmin, double tmax,
+inline double Bs2PhiPhi::A4def(double tmin, double tmax,
                     double k0, double tauL, double tauH, double tauBar, 
                     double Dms, double phis, double tphase1, double tphase2, int Btype)
 {
@@ -415,7 +415,7 @@ inline double RaPDF_Bs2PhiPhi::A4def(double tmin, double tmax,
     
 }
 
-inline double RaPDF_Bs2PhiPhi::A5def(double tmin, double tmax,
+inline double Bs2PhiPhi::A5def(double tmin, double tmax,
                     double k0, double tauL, double tauH, double tauBar, 
                     double Dms, double phis, double tphase1, double tphase2, int Btype)
 {
@@ -444,7 +444,7 @@ inline double RaPDF_Bs2PhiPhi::A5def(double tmin, double tmax,
 */
 
 
-void RaPDF_Bs2PhiPhi::getPhysicsParameters( double & gamma_s
+void Bs2PhiPhi::getPhysicsParameters( double & gamma_s
                                           , double & gamma_l
                                           , double & gamma_h
                                           , double & deltaM

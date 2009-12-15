@@ -151,12 +151,12 @@
         <NormalisedSumPDF>
             <FractionName>SignalFractionTagged</FractionName>
             <PDF>
-                <Name>RaPDF_Bs2JpsiPhiNew</Name>
+                <Name>Bs2JpsiPhi_mistagObservable</Name>
             </PDF>
             <NormalisedSumPDF>
                 <FractionName>LongLivedFractionTagged</FractionName>
                 <PDF>
-                    <Name>RaPDF_Bs2JpsiPhiLongLivedBkg</Name>
+                    <Name>Bs2JpsiPhiLongLivedBkg</Name>
                 </PDF>
                 <PDF>
                     <Name>Bs2JpsiPhiPromptBkg_withTimeRes</Name>
@@ -219,12 +219,12 @@
         <NormalisedSumPDF>
             <FractionName>SignalFractionUntagged</FractionName>
             <PDF>
-                <Name>RaPDF_Bs2JpsiPhiNew</Name>
+                <Name>Bs2JpsiPhi_mistagObservable</Name>
             </PDF>
             <NormalisedSumPDF>
                 <FractionName>LongLivedFractionUntagged</FractionName>
                 <PDF>
-                    <Name>RaPDF_Bs2JpsiPhiLongLivedBkg</Name>
+                    <Name>Bs2JpsiPhiLongLivedBkg</Name>
                 </PDF>
                 <PDF>
                     <Name>Bs2JpsiPhiPromptBkg_withTimeRes</Name>

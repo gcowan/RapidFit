@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2009/12/15 - Greig Cowan
+ - Refactored all PDFs to more regular naming convention. Updated 
+   config files as well. Fixed bug in Bs2JpsiPhi_mistagObservable
+   PDF where a tmax was used rather than a tmin.
+
 2009/12/10 - Greig Cowan
  - Changed Bs2JpsiPhiNew PDF so that if integration limit tlow < 0 then 
    the Evaluate method returns 0.

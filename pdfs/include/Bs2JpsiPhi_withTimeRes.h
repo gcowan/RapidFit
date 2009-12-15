@@ -1,5 +1,5 @@
-// $Id: RaPDF_Bs2JpsiPhi_withTimeRes.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
-/** @class RaPDF_Bs2JpsiPhi_withTimeRes RaPDF_Bs2JpsiPhi_withTimeRes.h
+// $Id: Bs2JpsiPhi_withTimeRes.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+/** @class Bs2JpsiPhi_withTimeRes Bs2JpsiPhi_withTimeRes.h
  *
  *  RapidFit PDF for Bs2JpsiPhi with time resolution
  *
@@ -7,17 +7,17 @@
  *  @date 2009-07-30
  */
 
-#ifndef RaPDF_Bs2JpsiPhi_withTimeRes_H
-#define RaPDF_Bs2JpsiPhi_withTimeRes_H
+#ifndef Bs2JpsiPhi_withTimeRes_H
+#define Bs2JpsiPhi_withTimeRes_H
 
 #include "BasePDF.h"
 #include "RooComplex.h"
 
-class RaPDF_Bs2JpsiPhi_withTimeRes : public BasePDF
+class Bs2JpsiPhi_withTimeRes : public BasePDF
 {
 	public:
-		RaPDF_Bs2JpsiPhi_withTimeRes();
-		~RaPDF_Bs2JpsiPhi_withTimeRes();
+		Bs2JpsiPhi_withTimeRes();
+		~Bs2JpsiPhi_withTimeRes();
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);

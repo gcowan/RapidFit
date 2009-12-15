@@ -1,5 +1,5 @@
-// $Id: RaPDF_Bs2JpsiPhiMassSignal.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
-/** @class RaPDF_Bs2JpsiPhiMassSignal RaPDF_Bs2JpsiPhiMassSignal.cpp
+// $Id: Bs2JpsiPhiMassSignal.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+/** @class Bs2JpsiPhiMassSignal Bs2JpsiPhiMassSignal.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi mass background
  *
@@ -7,13 +7,13 @@
  *  @date 2009-07-30
  */
 
-#include "RaPDF_Bs2JpsiPhiMassSignal.h"
+#include "Bs2JpsiPhiMassSignal.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 
 //Constructor
-RaPDF_Bs2JpsiPhiMassSignal::RaPDF_Bs2JpsiPhiMassSignal() : 
+Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal() : 
 	// Physics parameters
 	  f_sig_m1Name	( "f_sig_m1" )
 	, sigma_m1Name	( "sigma_m1" ) 
@@ -26,7 +26,7 @@ RaPDF_Bs2JpsiPhiMassSignal::RaPDF_Bs2JpsiPhiMassSignal() :
 }
 
 //Make the data point and parameter set
-void RaPDF_Bs2JpsiPhiMassSignal::MakePrototypes()
+void Bs2JpsiPhiMassSignal::MakePrototypes()
 {
 	// Observables
 	allObservables.push_back( recoMassName );
@@ -43,13 +43,13 @@ void RaPDF_Bs2JpsiPhiMassSignal::MakePrototypes()
 }
 
 //Destructor
-RaPDF_Bs2JpsiPhiMassSignal::~RaPDF_Bs2JpsiPhiMassSignal()
+Bs2JpsiPhiMassSignal::~Bs2JpsiPhiMassSignal()
 {
 }
 
 
 //Calculate the function value
-double RaPDF_Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
+double Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
 {
 	// Get the physics parameters
   	double f_sig_m1  = allParameters.GetPhysicsParameter( f_sig_m1Name )->GetValue();
@@ -72,7 +72,7 @@ double RaPDF_Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
   	return val;
 }
 
-double RaPDF_Bs2JpsiPhiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	return 1.0;
 }

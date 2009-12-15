@@ -8,18 +8,24 @@
 */
 
 #include "ClassLookUp.h"
-#include "RaPDF_Bs2DsPi.h"
-#include "RaPDF_Bs2JpsiPhi.h"
-#include "RaPDF_Bs2JpsiPhiNew.h"
-#include "RaPDF_Bs2JpsiPhi_withTimeRes.h"
-#include "RaPDF_Bs2JpsiPhi_sWave.h"
-#include "RaPDF_Bs2JpsiPhiMassSignal.h"
-#include "RaPDF_Bs2JpsiPhiLongLivedBkg.h"
+#include "Bs2JpsiPhi.h"
+#include "Bs2JpsiPhi_mistagObservable.h"
+#include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
+#include "Bs2JpsiPhi_withTimeRes.h"
+#include "Bs2JpsiPhi_sWave.h"
+#include "Bs2JpsiPhi_mistagParameter.h"
+#include "Bs2JpsiPhi_mistagParameter_alt.h"
+#include "Bs2JpsiPhiMassSignal.h"
+
+#include "Bs2DsPi.h"
+#include "Bs2PhiPhi.h"
+
+#include "Bs2JpsiPhiLongLivedBkg.h"
 #include "Bs2JpsiPhiLongLivedBkg_withTimeRes.h"
-#include "RaPDF_Bs2JpsiPhiPromptBkg.h"
+#include "Bs2JpsiPhiPromptBkg.h"
 #include "Bs2JpsiPhiPromptBkg_withTimeRes.h"
-#include "RaPDF_Bs2JpsiPhiMassBkg.h"
-#include "RaPDF_Bs2PhiPhi.h"
+#include "Bs2JpsiPhiMassBkg.h"
+
 #include "MinuitWrapper.h"
 #include "Minuit2Wrapper.h"
 #include "FumiliWrapper.h"
@@ -32,46 +38,61 @@
 //Look up the name of a PDF, return an appropriate instance of IPDF
 IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters )
 {
-        if ( Name == "RaPDF_Bs2JpsiPhiNew" )
+        if ( Name == "Bs2JpsiPhi_mistagObservable" )
         {
 	        //Default JPsiPhi
-	        return new RaPDF_Bs2JpsiPhiNew();
+	        return new Bs2JpsiPhi_mistagObservable();
         }
-        else if ( Name == "RaPDF_Bs2PhiPhi" )
+        if ( Name == "Bs2JpsiPhi_mistagObservable_withAngAcc" )
+        {
+	        //Default JPsiPhi
+	        return new Bs2JpsiPhi_mistagObservable();
+        }
+        if ( Name == "Bs2JpsiPhi_mistagParameter" )
+        {
+	        //Default JPsiPhi
+	        return new Bs2JpsiPhi_mistagParameter();
+        }
+        if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
+        {
+	        //Default JPsiPhi
+	        return new Bs2JpsiPhi_mistagParameter_alt();
+        }
+        else if ( Name == "Bs2PhiPhi" )
         {
 	        //Default PhiPhi
-                return new RaPDF_Bs2PhiPhi();
+                return new Bs2PhiPhi();
         }
-	else if ( Name == "RaPDF_Bs2JpsiPhi_withTimeRes" )
+	else if ( Name == "Bs2JpsiPhi_withTimeRes" )
         {
                 // Bs2JPsiPhi with analytic time resolution
-                return new RaPDF_Bs2JpsiPhi_withTimeRes();
+                return new Bs2JpsiPhi_withTimeRes();
         }
-        else if ( Name == "RaPDF_Bs2DsPi" )
+        else if ( Name == "Bs2DsPi" )
         {
                 // DsPi
-                return new RaPDF_Bs2DsPi();
+                return new Bs2DsPi();
         }
-	else if ( Name == "RaPDF_Bs2JpsiPhiMassSignal" )
+	else if ( Name == "Bs2JpsiPhiMassSignal" )
         {
                 //Default JPsiPhi signal mass PDF
-                return new RaPDF_Bs2JpsiPhiMassSignal();
+                return new Bs2JpsiPhiMassSignal();
         }
-        else if ( Name == "RaPDF_Bs2JpsiPhiLongLivedBkg" )
+        else if ( Name == "Bs2JpsiPhiLongLivedBkg" )
         {
 	        //Long lived background for JPsiPhi
-                return new RaPDF_Bs2JpsiPhiLongLivedBkg();
+                return new Bs2JpsiPhiLongLivedBkg();
         }
         else if ( Name == "Bs2JpsiPhiLongLivedBkg_withTimeRes" )
         {
                 //Long lived background for JPsiPhi with time resolution (convolved gaussian)
                 return new Bs2JpsiPhiLongLivedBkg_withTimeRes();
         }
-        else if ( Name == "RaPDF_Bs2JpsiPhiPromptBkg" )
+        else if ( Name == "Bs2JpsiPhiPromptBkg" )
         {
         	// This one does not work at the moment. Use time resolution.
 		cerr << "This one does not work at the moment. Use time resolution" << endl;
-	        return new RaPDF_Bs2JpsiPhiPromptBkg();
+	        return new Bs2JpsiPhiPromptBkg();
         }
 
         else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeRes" )
@@ -80,15 +101,15 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 		return new Bs2JpsiPhiPromptBkg_withTimeRes();
         }
 
-	else if ( Name == "RaPDF_Bs2JpsiPhi_sWave" )
+	else if ( Name == "Bs2JpsiPhi_sWave" )
         {
 	        //JPsiPhi signal PDF including the s-wave contribution
-                return new RaPDF_Bs2JpsiPhi_sWave();
+                return new Bs2JpsiPhi_sWave();
         }
-        else if ( Name == "RaPDF_Bs2JpsiPhiMassBkg" )
+        else if ( Name == "Bs2JpsiPhiMassBkg" )
         {
                 //Default JPsiPhi prompt bkg mass signal
-                return new RaPDF_Bs2JpsiPhiMassBkg();
+                return new Bs2JpsiPhiMassBkg();
 	}
 	else
 	{

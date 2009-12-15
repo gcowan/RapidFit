@@ -1,5 +1,5 @@
-// $Id: RaPDF_Bs2JpsiPhiMassSignal.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
-/** @class RaPDF_Bs2JpsiPhiMassSignal RaPDF_Bs2JpsiPhiMassSignal.h
+// $Id: Bs2JpsiPhiMassSignal.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+/** @class Bs2JpsiPhiMassSignal Bs2JpsiPhiMassSignal.h
  *
  *  RapidFit PDF for Bs2JpsiPhi long lived background
  *
@@ -7,16 +7,16 @@
  *  @date 2009-10-04
  */
 
-#ifndef RaPDF_Bs2JpsiPhiMassSignal_H
-#define RaPDF_Bs2JpsiPhiMassSignal_H
+#ifndef Bs2JpsiPhiMassSignal_H
+#define Bs2JpsiPhiMassSignal_H
 
 #include "BasePDF.h"
 
-class RaPDF_Bs2JpsiPhiMassSignal : public BasePDF
+class Bs2JpsiPhiMassSignal : public BasePDF
 {
 	public:
-		RaPDF_Bs2JpsiPhiMassSignal();
-		~RaPDF_Bs2JpsiPhiMassSignal();
+		Bs2JpsiPhiMassSignal();
+		~Bs2JpsiPhiMassSignal();
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);

@@ -1,5 +1,5 @@
-// $Id: RaPDF_Bs2JpsiPhiPromptBkg.h,v 1.2 2009/11/13 09:57:06 gcowan Exp $
-/** @class RaPDF_Bs2JpsiPhiPromptBkg RaPDF_Bs2JpsiPhiPromptBkg.h
+// $Id: Bs2JpsiPhiPromptBkg.h,v 1.2 2009/11/13 09:57:06 gcowan Exp $
+/** @class Bs2JpsiPhiPromptBkg Bs2JpsiPhiPromptBkg.h
  *
  *  RapidFit PDF for Bs2JpsiPhi prompt Jpsi background
  *
@@ -7,16 +7,16 @@
  *  @date 2009-10-04
  */
 
-#ifndef RaPDF_Bs2JpsiPhiPromptBkg_H
-#define RaPDF_Bs2JpsiPhiPromptBkg_H
+#ifndef Bs2JpsiPhiPromptBkg_H
+#define Bs2JpsiPhiPromptBkg_H
 
 #include "BasePDF.h"
 
-class RaPDF_Bs2JpsiPhiPromptBkg : public BasePDF
+class Bs2JpsiPhiPromptBkg : public BasePDF
 {
 	public:
-		RaPDF_Bs2JpsiPhiPromptBkg();
-		~RaPDF_Bs2JpsiPhiPromptBkg();
+		Bs2JpsiPhiPromptBkg();
+		~Bs2JpsiPhiPromptBkg();
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);

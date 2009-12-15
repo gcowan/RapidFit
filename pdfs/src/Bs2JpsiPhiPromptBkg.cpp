@@ -1,5 +1,5 @@
-// $Id: RaPDF_Bs2JpsiPhiPromptBkg.cpp,v 1.2 2009/11/13 09:57:06 gcowan Exp $
-/** @class RaPDF_Bs2JpsiPhiPromptBkg RaPDF_Bs2JpsiPhiPromptBkg.cpp
+// $Id: Bs2JpsiPhiPromptBkg.cpp,v 1.2 2009/11/13 09:57:06 gcowan Exp $
+/** @class Bs2JpsiPhiPromptBkg Bs2JpsiPhiPromptBkg.cpp
  *
  *  PDF for Bs2JpsiPhi prompt background
  *
@@ -7,13 +7,13 @@
  *  @date 2009-11-12
  */
 
-#include "RaPDF_Bs2JpsiPhiPromptBkg.h"
+#include "Bs2JpsiPhiPromptBkg.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 
 //Constructor
-RaPDF_Bs2JpsiPhiPromptBkg::RaPDF_Bs2JpsiPhiPromptBkg() : 
+Bs2JpsiPhiPromptBkg::Bs2JpsiPhiPromptBkg() : 
 	// Observables
 	  timeName	( "time" )
 	
@@ -25,7 +25,7 @@ RaPDF_Bs2JpsiPhiPromptBkg::RaPDF_Bs2JpsiPhiPromptBkg() :
 }
 
 //Make the data point and parameter set
-void RaPDF_Bs2JpsiPhiPromptBkg::MakePrototypes()
+void Bs2JpsiPhiPromptBkg::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -40,13 +40,13 @@ void RaPDF_Bs2JpsiPhiPromptBkg::MakePrototypes()
 }
 
 //Destructor
-RaPDF_Bs2JpsiPhiPromptBkg::~RaPDF_Bs2JpsiPhiPromptBkg()
+Bs2JpsiPhiPromptBkg::~Bs2JpsiPhiPromptBkg()
 {
 }
 
 
 //Calculate the function value
-double RaPDF_Bs2JpsiPhiPromptBkg::Evaluate(DataPoint * measurement)
+double Bs2JpsiPhiPromptBkg::Evaluate(DataPoint * measurement)
 {
 	// Observable
         double time = measurement->GetObservable( timeName )->GetValue();
@@ -62,7 +62,7 @@ double RaPDF_Bs2JpsiPhiPromptBkg::Evaluate(DataPoint * measurement)
 }
 
 
-double RaPDF_Bs2JpsiPhiPromptBkg::Normalisation(PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhiPromptBkg::Normalisation(PhaseSpaceBoundary * boundary)
 {
         double tmin = 0.;
         double tmax = 0.;

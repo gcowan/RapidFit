@@ -197,18 +197,18 @@
 	<ToFit>
 		<SumPDF>
 			<PDF>
-				<Name>RaPDF_Bs2JpsiPhiNew</Name>
+				<Name>Bs2JpsiPhi_mistagObservable</Name>
 			</PDF>
 
 			<SumPDF>
 				<FractionName>PromptFraction</FractionName>
 
 				<PDF>
-					<Name>RaPDF_Bs2JpsiPhiPromptBkg</Name>
+					<Name>Bs2JpsiPhiPromptBkg</Name>
 				</PDF>
 
 				<PDF>
-					<Name>RaPDF_Bs2JpsiPhiLongLivedBkg</Name>
+					<Name>Bs2JpsiPhiLongLivedBkg</Name>
 				</PDF>
 			</SumPDF>
 		</SumPDF>

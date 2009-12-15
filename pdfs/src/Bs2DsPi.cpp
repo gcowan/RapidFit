@@ -1,17 +1,17 @@
-/** @class RaPDF_Bs2DsPi RaPDF_Bs2DsPi.cpp
+/** @class Bs2DsPi Bs2DsPi.cpp
  *
  *  RapidFit PDF for Bs2DsPi
  *
  *  @author Gemma Fardell
  */
 
-#include "RaPDF_Bs2DsPi.h"
+#include "Bs2DsPi.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 
 //Constructor
-RaPDF_Bs2DsPi::RaPDF_Bs2DsPi() : 
+Bs2DsPi::Bs2DsPi() : 
 	// Physics parameters
 	  gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
@@ -29,7 +29,7 @@ RaPDF_Bs2DsPi::RaPDF_Bs2DsPi() :
 }
 
 //Make the data point and parameter set
-void RaPDF_Bs2DsPi::MakePrototypes()
+void Bs2DsPi::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -52,12 +52,12 @@ void RaPDF_Bs2DsPi::MakePrototypes()
 }
 
 //Destructor
-RaPDF_Bs2DsPi::~RaPDF_Bs2DsPi()
+Bs2DsPi::~Bs2DsPi()
 {
 }
 
 //Not only set the physics parameters, but indicate that the cache is no longer valid
-bool RaPDF_Bs2DsPi::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2DsPi::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	//normalisationCacheValid = false;
 	//evaluationCacheValid = false;
@@ -65,7 +65,7 @@ bool RaPDF_Bs2DsPi::SetPhysicsParameters( ParameterSet * NewParameterSet )
 }
 
 //Calculate the function value
-double RaPDF_Bs2DsPi::Evaluate(DataPoint * measurement)
+double Bs2DsPi::Evaluate(DataPoint * measurement)
 {
 	double expLT, expHT, t3;
 	getTimeDependentFuncs(  expLT, expHT, t3, measurement );	
@@ -80,7 +80,7 @@ double RaPDF_Bs2DsPi::Evaluate(DataPoint * measurement)
 }
 
 
-double RaPDF_Bs2DsPi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2DsPi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	double expLTInt, expHTInt, t3Int;
 	getTimeDependentFuncsInt(  expLTInt, expHTInt, t3Int, boundary );	
@@ -94,14 +94,14 @@ double RaPDF_Bs2DsPi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary 
 	return (0.25 * ( expHTInt + expLTInt + q * 2.0 * t3Int * D ) ); //Normalisation from dunietz
 }
 
-vector<string> RaPDF_Bs2DsPi::GetDoNotIntegrateList()
+vector<string> Bs2DsPi::GetDoNotIntegrateList()
 {
 	vector<string> returnList;
 	returnList.push_back(mistagName);
 	return returnList;
 }
 
-void RaPDF_Bs2DsPi::getTimeDependentFuncs(  double & expLT, double & expHT, double & t3, DataPoint * measurement)
+void Bs2DsPi::getTimeDependentFuncs(  double & expLT, double & expHT, double & t3, DataPoint * measurement)
 {
  
 	// Observable
@@ -132,7 +132,7 @@ void RaPDF_Bs2DsPi::getTimeDependentFuncs(  double & expLT, double & expHT, doub
 }
 
 
-void RaPDF_Bs2DsPi::getTimeDependentFuncsInt(  double & expLTInt, double & expHTInt, double & t3Int, PhaseSpaceBoundary * boundary)
+void Bs2DsPi::getTimeDependentFuncsInt(  double & expLTInt, double & expHTInt, double & t3Int, PhaseSpaceBoundary * boundary)
 {
 
 	double tlow = 0.;
@@ -165,7 +165,7 @@ void RaPDF_Bs2DsPi::getTimeDependentFuncsInt(  double & expLTInt, double & expHT
 }
 
 
-void RaPDF_Bs2DsPi::getPhysicsParameters( double & gamma
+void Bs2DsPi::getPhysicsParameters( double & gamma
 					, double & deltaGamma
 					, double & deltaM
 					  )

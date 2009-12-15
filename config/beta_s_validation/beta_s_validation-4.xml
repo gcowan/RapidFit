@@ -193,20 +193,20 @@
             <FractionName>SignalFractionTagged</FractionName>
             <ProdPDF>
                 <PDF>
-                    <Name>RaPDF_Bs2JpsiPhiNew</Name>
+                    <Name>Bs2JpsiPhi_mistagObservable</Name>
                 </PDF>
                 <PDF>
-                    <Name>RaPDF_Bs2JpsiPhiMassSignal</Name>
+                    <Name>Bs2JpsiPhiMassSignal</Name>
                 </PDF>
             </ProdPDF>
             <NormalisedSumPDF>
                 <FractionName>LongLivedFractionTagged</FractionName>
                 <ProdPDF>
                     <PDF>
-                        <Name>RaPDF_Bs2JpsiPhiLongLivedBkg</Name>
+                        <Name>Bs2JpsiPhiLongLivedBkg</Name>
                     </PDF>
                     <PDF>
-                        <Name>RaPDF_Bs2JpsiPhiMassBkg</Name>
+                        <Name>Bs2JpsiPhiMassBkg</Name>
                     </PDF>
                 </ProdPDF>
                 <ProdPDF>
@@ -214,7 +214,7 @@
                         <Name>Bs2JpsiPhiPromptBkg_withTimeRes</Name>
                     </PDF>
                     <PDF>
-                        <Name>RaPDF_Bs2JpsiPhiMassBkg</Name>
+                        <Name>Bs2JpsiPhiMassBkg</Name>
                     </PDF>
                 </ProdPDF>
             </NormalisedSumPDF>
@@ -283,20 +283,20 @@
             <FractionName>SignalFractionUntagged</FractionName>
             <ProdPDF>
                 <PDF>
-                    <Name>RaPDF_Bs2JpsiPhiNew</Name>
+                    <Name>Bs2JpsiPhi_mistagObservable</Name>
                 </PDF>
                 <PDF>
-                    <Name>RaPDF_Bs2JpsiPhiMassSignal</Name>
+                    <Name>Bs2JpsiPhiMassSignal</Name>
                 </PDF>
             </ProdPDF>
             <NormalisedSumPDF>
                 <FractionName>LongLivedFractionUntagged</FractionName>
                 <ProdPDF>
                     <PDF>
-                        <Name>RaPDF_Bs2JpsiPhiLongLivedBkg</Name>
+                        <Name>Bs2JpsiPhiLongLivedBkg</Name>
                     </PDF>
                     <PDF>
-                        <Name>RaPDF_Bs2JpsiPhiMassBkg</Name>
+                        <Name>Bs2JpsiPhiMassBkg</Name>
                     </PDF>
                 </ProdPDF>
                 <ProdPDF>
@@ -304,7 +304,7 @@
                         <Name>Bs2JpsiPhiPromptBkg_withTimeRes</Name>
                     </PDF>
                     <PDF>
-                        <Name>RaPDF_Bs2JpsiPhiMassBkg</Name>
+                        <Name>Bs2JpsiPhiMassBkg</Name>
                     </PDF>
                 </ProdPDF>
             </NormalisedSumPDF>

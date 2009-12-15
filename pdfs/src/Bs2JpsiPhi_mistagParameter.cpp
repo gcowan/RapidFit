@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhiClassic.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
-/** @class Bs2JpsiPhiClassic Bs2JpsiPhiClassic.cpp
+// $Id: Bs2JpsiPhi_mistagParameter.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+/** @class Bs2JpsiPhi_mistagParameter Bs2JpsiPhi_mistagParameter.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
@@ -9,13 +9,13 @@
  *  @date 2009-07-30
  */
 
-#include "Bs2JpsiPhiClassic.h"
+#include "Bs2JpsiPhi_mistagParameter.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhiClassic::Bs2JpsiPhiClassic() : 
+Bs2JpsiPhi_mistagParameter::Bs2JpsiPhi_mistagParameter() : 
 	// Physics parameters
 	  gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
@@ -46,7 +46,7 @@ Bs2JpsiPhiClassic::Bs2JpsiPhiClassic() :
 }
 
 //Make the data point and parameter set
-void Bs2JpsiPhiClassic::MakePrototypes()
+void Bs2JpsiPhi_mistagParameter::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -78,12 +78,12 @@ void Bs2JpsiPhiClassic::MakePrototypes()
 }
 
 //Destructor
-Bs2JpsiPhiClassic::~Bs2JpsiPhiClassic()
+Bs2JpsiPhi_mistagParameter::~Bs2JpsiPhi_mistagParameter()
 {
 }
 
 //Not only set the physics parameters, but indicate that the cache is no longer valid
-bool Bs2JpsiPhiClassic::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2JpsiPhi_mistagParameter::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	normalisationCacheValid = false;
 	evaluationCacheValid = false;
@@ -91,14 +91,14 @@ bool Bs2JpsiPhiClassic::SetPhysicsParameters( ParameterSet * NewParameterSet )
 }
 
 //Return a list of parameters not to be integrated
-vector<string> Bs2JpsiPhiClassic::GetDoNotIntegrateList()
+vector<string> Bs2JpsiPhi_mistagParameter::GetDoNotIntegrateList()
 {
 	vector<string> list;
 	return list;
 }
 
 //Calculate the function value
-double Bs2JpsiPhiClassic::Evaluate(DataPoint * measurement)
+double Bs2JpsiPhi_mistagParameter::Evaluate(DataPoint * measurement)
 {
     // Check that time > 0  ADDED BY PELC
 	double time = measurement->GetObservable( timeName )->GetValue();
@@ -159,7 +159,7 @@ double Bs2JpsiPhiClassic::Evaluate(DataPoint * measurement)
 }
 
 
-double Bs2JpsiPhiClassic::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhi_mistagParameter::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	// Now need to know the tag and the mistag
     int q = (int)measurement->GetObservable( tagName )->GetValue();
@@ -202,7 +202,7 @@ double Bs2JpsiPhiClassic::Normalisation(DataPoint * measurement, PhaseSpaceBound
 	return ( w1*cachedv1 + w2*cachedv2 );
 }
 
-void Bs2JpsiPhiClassic::getAngularFunctions( double & f1
+void Bs2JpsiPhi_mistagParameter::getAngularFunctions( double & f1
 					, double & f2
 					, double & f3
 					, double & f4
@@ -239,7 +239,7 @@ void Bs2JpsiPhiClassic::getAngularFunctions( double & f1
 	return;
 }
 
-void Bs2JpsiPhiClassic::getTimeDependentAmplitudes(  double & AzeroAzero
+void Bs2JpsiPhi_mistagParameter::getTimeDependentAmplitudes(  double & AzeroAzero
 						, double & AparaApara
 						, double & AperpAperp
 						, double & ImAparaAperp
@@ -301,7 +301,7 @@ void Bs2JpsiPhiClassic::getTimeDependentAmplitudes(  double & AzeroAzero
 	return;
 }
 
-void Bs2JpsiPhiClassic::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
+void Bs2JpsiPhi_mistagParameter::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
                                                  , double & AparaAparaInt
                                                  , double & AperpAperpInt
 												 , PhaseSpaceBoundary * boundary
@@ -347,7 +347,7 @@ void Bs2JpsiPhiClassic::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 }
 
 
-inline double Bs2JpsiPhiClassic::getAzeroAzeroInt(double tmin, double tmax, 
+inline double Bs2JpsiPhi_mistagParameter::getAzeroAzeroInt(double tmin, double tmax, 
 							   double k0, double tauL, double tauH, double tauBar, double Dms, double phis, int Btype)
 {
   
@@ -369,7 +369,7 @@ inline double Bs2JpsiPhiClassic::getAzeroAzeroInt(double tmin, double tmax,
 }
 
 
-inline double Bs2JpsiPhiClassic::getAparaAparaInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagParameter::getAparaAparaInt(double tmin, double tmax,
 					double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
 {
 	
@@ -390,7 +390,7 @@ inline double Bs2JpsiPhiClassic::getAparaAparaInt(double tmin, double tmax,
 	return (valA-valB);	
 }
 
-inline double Bs2JpsiPhiClassic::getAperpAperpInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagParameter::getAperpAperpInt(double tmin, double tmax,
 							   double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
 {
 	
@@ -414,7 +414,7 @@ inline double Bs2JpsiPhiClassic::getAperpAperpInt(double tmin, double tmax,
 
 // Need to work out what interference terms these correspond to and which strong phase is which.
 // These are only needed (I think) for calculating the projections.
-inline double Bs2JpsiPhiClassic::A4def(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagParameter::A4def(double tmin, double tmax,
 					double k0, double tauL, double tauH, double tauBar, 
 					double Dms, double phis, double tphase1, double tphase2, int Btype)
 {
@@ -441,7 +441,7 @@ inline double Bs2JpsiPhiClassic::A4def(double tmin, double tmax,
 	
 }
 
-inline double Bs2JpsiPhiClassic::A5def(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagParameter::A5def(double tmin, double tmax,
 					double k0, double tauL, double tauH, double tauBar, 
 					double Dms, double phis, double tphase1, double tphase2, int Btype)
 {
@@ -470,7 +470,7 @@ inline double Bs2JpsiPhiClassic::A5def(double tmin, double tmax,
 
 
 
-void Bs2JpsiPhiClassic::getPhysicsParameters( double & gamma
+void Bs2JpsiPhi_mistagParameter::getPhysicsParameters( double & gamma
 					, double & deltaGamma
 					, double & deltaM
 					, double & Phi_s
