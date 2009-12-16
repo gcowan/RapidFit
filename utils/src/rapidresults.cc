@@ -53,6 +53,7 @@ int main(int argc, char *argv[]){
 	if(argc !=3){
 		cout << "Binary, slighlty easier version of Grieg's python script. Usage:" << endl;
 		cout << "rapidresults PullPlots.root resultdir"	<< endl;
+		exit(1);
 	}
 	gROOT->SetStyle("Plain");
 	gStyle->SetTitleStyle(1);
