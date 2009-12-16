@@ -29,7 +29,7 @@ INCPDFDIR= pdfs/include
 OBJDIR   = framework/build
 OBJPDFDIR= pdfs/build
 EXEDIR   = bin
-
+UTILSSRC = utils/src
 SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)' -not -name 'Roo*.cpp')
 PDFSRCS := $(shell find $(SRCPDFDIR) -name '*.$(SRCEXT)' -not -name 'Roo*.cpp')
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
@@ -86,3 +86,6 @@ clean   :
 
 cleanall:
 	$(RM) $(GARBAGE)
+
+rapidresults:
+	$(CXX) $(CXXFLAGS)  -c $(UTILSSRC)/$@.cc -o $(EXEDIR)/$@
