@@ -429,7 +429,7 @@ inline double Bs2JpsiPhi_sWave::getAperpAperpInt(double tmin, double tmax,
 	double valA =  0.5*k0*((1.0-cosphis)*(tauL)*exp(-(1.0/tauL)*tmin)
 			+(1.0+cosphis)*(tauH)*exp(-(1.0/tauH)*tmin)
 			- Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(Dms*tmin)
-					+Dms*cos(Dms*tmax))));
+					+Dms*cos(Dms*tmin))));
 
 	return (valA-valB);
 }
@@ -450,7 +450,7 @@ inline double Bs2JpsiPhi_sWave::getAsAsInt(double tmin, double tmax,
 	double valA =  0.5*k0*((1.0-cosphis)*(tauL)*exp(-(1.0/tauL)*tmin)
 			+(1.0+cosphis)*(tauH)*exp(-(1.0/tauH)*tmin)
 			- Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(Dms*tmin)
-					+Dms*cos(Dms*tmax))));
+					+Dms*cos(Dms*tmin))));
 
 	return (valA-valB);
 }
