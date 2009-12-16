@@ -28,15 +28,17 @@ MemoryDataSet::~MemoryDataSet()
 }
 
 //Add a data point to the set
-void MemoryDataSet::AddDataPoint( DataPoint * NewDataPoint )
+bool MemoryDataSet::AddDataPoint( DataPoint * NewDataPoint )
 {
 	if ( dataBoundary->IsPointInBoundary(NewDataPoint) )
 	{
 		allData.push_back( *NewDataPoint );
+		return true;
 	}
 	else
 	{
 		cerr << "Data point is not within data set boundary" << endl;
+		return false;
 	}
 }
 

@@ -112,11 +112,12 @@ void DataFileLoader::LoadRootFileIntoMemory( string fileName, string ntuplePath,
 	}
 
 	// Now populate the dataset
-	int numberOfDataPoints = 0;
-	while ( numberOfDataPoints < numberEventsToRead && numberOfDataPoints < totalNumberOfEvents )
+	int numberOfDataPointsAdded = 0;
+	int numberOfDataPointsRead = 0;
+	while ( numberOfDataPointsAdded < numberEventsToRead && numberOfDataPointsAdded < totalNumberOfEvents )
 	{
 		DataPoint point( observableNames );
-		ntuple->GetEntry( numberOfDataPoints );
+		ntuple->GetEntry( numberOfDataPointsRead );
 
 		for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
 		{
@@ -124,13 +125,14 @@ void DataFileLoader::LoadRootFileIntoMemory( string fileName, string ntuplePath,
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
 			point.SetObservable( name, observableValues[obsIndex], 0.0, unit);
 		}
-		numberOfDataPoints += 1;
-		data->AddDataPoint( &point );
+		bool dataPointAdded = data->AddDataPoint( &point );
+		if (dataPointAdded) numberOfDataPointsAdded += 1;
+		numberOfDataPointsRead += 1;
 	}
 
 	inputFile->Close();
 	delete inputFile;
-	cout << "Read " << numberOfDataPoints << " events from ROOT file: " << fileName << endl;
+	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << endl;
 }
 
 bool DataFileLoader::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceBoundary * TestBoundary )

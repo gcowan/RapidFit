@@ -159,7 +159,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		else
 		{
 			//If the parameters have valid indices, ask minuit to plot them
-			int numberOfPoints = 4;
+			int numberOfPoints = 40;
 			int iErrf;
 			double xCoordinates1[numberOfPoints], yCoordinates1[numberOfPoints];
 			double xCoordinates2[numberOfPoints], yCoordinates2[numberOfPoints];

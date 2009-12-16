@@ -157,7 +157,7 @@ DataPoint * RootFileDataSet::GetDataPoint( int DataIndex )
 }
 
 //Add a data point to the NTuple
-void RootFileDataSet::AddDataPoint( DataPoint * NewDataPoint )
+bool RootFileDataSet::AddDataPoint( DataPoint * NewDataPoint )
 {
 	if ( dataBoundary->IsPointInBoundary(NewDataPoint) )
 	{
@@ -173,10 +173,12 @@ void RootFileDataSet::AddDataPoint( DataPoint * NewDataPoint )
 
 		//Put the array into the NTuple
 		rootNTuple->Fill(dataPointArray);
+		return true;
 	}
 	else
 	{
 		cerr << "DataPoint is incompatible with NTuple" << endl;
+		return false;
 	}
 }
 

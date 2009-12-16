@@ -112,7 +112,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 		for ( int plotIndex = 0; plotIndex < allIndices.size(); plotIndex++ )
 		{
 			//If the parameters have valid indices, ask minuit to plot them
-			int numberOfPoints = 4;
+			int numberOfPoints = 40;
 			int iErrf;
 			double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
 			vector< pair< double, double> > oneContour = contoursFromMinuit( allIndices[plotIndex].first, allIndices[plotIndex].second, numberOfPoints );	

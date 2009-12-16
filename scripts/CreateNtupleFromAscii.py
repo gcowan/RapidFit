@@ -2,6 +2,7 @@
 import ROOT
 from optparse import OptionParser
 from array import array
+from math import cos, pi
 
 __author__ = 'Greig A Cowan'
 __date__ = '1/11/2009'
@@ -32,13 +33,25 @@ def main():
     for datum in data:
 	observables = datum.rstrip("\n").split()
 	if not readFirstLine:
-		string = ":".join(observables[1:])
-		ntuple = ROOT.TNtuple("ntuple","data from ascii file", string);
+		names = observables
+		string = ":".join(names)
+		print string
+		ntuple = ROOT.TNtuple("dataNTuple","data from ascii file", string);
 		readFirstLine = True
 		continue
 	doubleList = []
-	for item in observables:
-		doubleList.append(float(item))
+	for i in range(len(observables)):
+		obs = observables[i]
+		# need to convert from Babar conventions that Yuehong uses
+		obsValue = float(obs)
+		if "cosTheta" == names[i]:
+			obsValue = cos( pi - float(obs) )
+		if "cosPsi" == names[i]:
+			obsValue = cos( float(obs) )
+		if "phi" == names[i]:
+			phi = float(obs)
+			obsValue = pi - phi if phi > 0 else -pi - phi
+		doubleList.append(obsValue)
         event = array('f', doubleList)
 	ntuple.Fill(event)	
 	if i >= 9999: 

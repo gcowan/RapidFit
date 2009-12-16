@@ -29,7 +29,7 @@ class RootFileDataSet : public IDataSet
 
 		//Interface functions
 		virtual DataPoint * GetDataPoint(int);
-		virtual void AddDataPoint( DataPoint* );
+		virtual bool AddDataPoint( DataPoint* );
 		virtual int GetDataNumber();
 		virtual PhaseSpaceBoundary * GetBoundary();
 	

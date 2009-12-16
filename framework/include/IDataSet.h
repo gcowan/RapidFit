@@ -17,7 +17,7 @@ class IDataSet
 {
 	public:
 		virtual DataPoint * GetDataPoint(int) = 0;
-		virtual void AddDataPoint( DataPoint* ) = 0;
+		virtual bool AddDataPoint( DataPoint* ) = 0;
 		virtual int GetDataNumber() = 0;
 		virtual PhaseSpaceBoundary * GetBoundary() = 0;
 };

@@ -1,5 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2009/12/16 - Greig Cowan
+ - Modified RootFileLoader class so that it creates dataset with
+   number of events specified. Previously was just reading through the
+   number of events but this is not sufficient if some events are
+   thrown away due to being outside of the PSB.
+
 2009/12/15 - Greig Cowan
  - Refactored all PDFs to more regular naming convention. Updated 
    config files as well. Fixed bug in Bs2JpsiPhi_mistagObservable
