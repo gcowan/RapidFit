@@ -18,6 +18,7 @@
 #include "Bs2JpsiPhiMassSignal.h"
 
 #include "Bs2DsPi.h"
+#include "Bs2DsPi_mistagParameter.h"
 #include "Bs2PhiPhi.h"
 
 #include "Bs2JpsiPhiLongLivedBkg.h"
@@ -73,7 +74,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
                 // DsPi
                 return new Bs2DsPi();
         }
-	else if ( Name == "Bs2JpsiPhiMassSignal" )
+        else if ( Name == "Bs2DsPi_mistagParameter" )
+        {
+			// DsPi
+			return new Bs2DsPi_mistagParameter();
+        }
+		else if ( Name == "Bs2JpsiPhiMassSignal" )
         {
                 //Default JPsiPhi signal mass PDF
                 return new Bs2JpsiPhiMassSignal();
