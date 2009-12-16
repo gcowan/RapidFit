@@ -96,7 +96,7 @@
 
 		<PhysicsParameter>
 			<Name>Phi_s</Name>
-			<Value>-0.0368</Value>
+			<Value>-0.5</Value>
 			<Minimum>-3.14</Minimum>
 			<Maximum>3.14</Maximum>
 			<Type>Free</Type>
@@ -110,9 +110,8 @@
 
 	<NumberRepeats>5</NumberRepeats>
 	<Output>
-		<DoPullPlots>FlatNTuple</DoPullPlots>
-	</Output>
-
+		        <DoPullPlots>FlatNTuple</DoPullPlots>
+		</Output>
 
 
 	<ToFit>

@@ -78,7 +78,7 @@
 
 		<PhysicsParameter>
 			<Name>As_sq</Name>
-			<Value>0.111</Value>
+			<Value>0.052</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Free</Type>
@@ -87,7 +87,7 @@
 
 		<PhysicsParameter>
 			<Name>delta_s</Name>
-			<Value>0.0</Value>
+			<Value>1.5707963267948966</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
 			<Type>Free</Type>
@@ -96,7 +96,7 @@
 
 		<PhysicsParameter>
 			<Name>Phi_s</Name>
-			<Value>-0.0368</Value>
+			<Value>-0.5</Value>
 			<Minimum>-3.14</Minimum>
 			<Maximum>3.14</Maximum>
 			<Type>Free</Type>
@@ -110,8 +110,8 @@
 
 	<NumberRepeats>5</NumberRepeats>
 	<Output>
-		<DoPullPlots>FlatNTuple</DoPullPlots>
-	</Output>
+		        <DoPullPlots>FlatNTuple</DoPullPlots>
+		</Output>
 
 
 

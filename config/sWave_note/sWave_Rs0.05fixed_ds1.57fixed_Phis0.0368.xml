@@ -109,6 +109,10 @@
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 
 	<NumberRepeats>5</NumberRepeats>
+	<Output>
+		        <DoPullPlots>FlatNTuple</DoPullPlots>
+		</Output>
+
 
 	<ToFit>
 		<PDF>
@@ -116,6 +120,10 @@
 		</PDF>
 
 		<DataSet>
+			<PDF>
+				                        <Name>RaPDF_Bs2JpsiPhi_sWave</Name>
+							                </PDF>
+									
 			<Source>Foam</Source>
 			<NumberEvents>30000</NumberEvents>
 			<PhaseSpaceBoundary>

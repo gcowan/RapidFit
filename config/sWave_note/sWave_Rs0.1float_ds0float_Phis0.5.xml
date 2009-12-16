@@ -30,7 +30,7 @@
 			<Type>Fixed</Type>
 			<Unit>ps^{-1}</Unit>
 		</PhysicsParameter>
-
+		
 		<PhysicsParameter>
 			<Name>delta_zero</Name>
 			<Value>0.0</Value>
@@ -39,7 +39,7 @@
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
-
+		
 		<PhysicsParameter>
 			<Name>delta_para</Name>
 			<Value>-2.93</Value>
@@ -57,7 +57,7 @@
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
-
+		
 		<PhysicsParameter>
 			<Name>Azero_sq</Name>
 			<Value>0.56</Value>
@@ -96,7 +96,7 @@
 
 		<PhysicsParameter>
 			<Name>Phi_s</Name>
-			<Value>-0.0368</Value>
+			<Value>-0.5</Value>
 			<Minimum>-3.14</Minimum>
 			<Maximum>3.14</Maximum>
 			<Type>Free</Type>
@@ -109,22 +109,13 @@
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 
 	<NumberRepeats>5</NumberRepeats>
-	<Output>
-		<DoPullPlots>FlatNTuple</DoPullPlots>
-	</Output>
-
-
 
 	<ToFit>
 		<PDF>
-			<Name>RaPDF_Bs2JpsiPhiNew</Name>
+			<Name>RaPDF_Bs2JpsiPhi_sWave</Name>
 		</PDF>
 
 		<DataSet>
-			<PDF>
-				<Name>RaPDF_Bs2JpsiPhi_sWave</Name>
-			</PDF>
-
 			<Source>Foam</Source>
 			<NumberEvents>30000</NumberEvents>
 			<PhaseSpaceBoundary>

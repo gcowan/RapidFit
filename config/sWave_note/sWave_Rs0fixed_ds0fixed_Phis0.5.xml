@@ -5,12 +5,21 @@
 	/////////////////////////////////////////
 	<ParameterSet>
 		<PhysicsParameter>
+			<Name>deltaM</Name>
+			<Value>17.8</Value>
+			<Minimum>17.0</Minimum>
+			<Maximum>20.0</Maximum>
+			<Type>Fixed</Type>
+			<Unit>MeV/c2</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
 			<Name>gamma</Name>
 			<Value>0.68</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.5</Maximum>
 			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
+			<Unit>ps^{-1}</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
@@ -19,42 +28,15 @@
 			<Minimum>-1.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
+			<Unit>ps^{-1}</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
-			<Name>Aperp_sq</Name>
-			<Value>0.233</Value>
-			<Minimum>0.0</Minimum>
-			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>As_sq</Name>
-			<Value>0.111</Value>
-			<Minimum>0.0</Minimum>
-			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>Azero_sq</Name>
-			<Value>0.56</Value>
-			<Minimum>0.0</Minimum>
-			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>delta_s</Name>
-			<Value>1.5</Value>
+			<Name>delta_zero</Name>
+			<Value>0.0</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -77,7 +59,34 @@
 		</PhysicsParameter>
 
 		<PhysicsParameter>
-			<Name>delta_zero</Name>
+			<Name>Azero_sq</Name>
+			<Value>0.56</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Aperp_sq</Name>
+			<Value>0.233</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>As_sq</Name>
+			<Value>0.0</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_s</Name>
 			<Value>0.0</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
@@ -86,17 +95,8 @@
 		</PhysicsParameter>
 
 		<PhysicsParameter>
-			<Name>deltaM</Name>
-			<Value>17.8</Value>
-			<Minimum>17.0</Minimum>
-			<Maximum>20.0</Maximum>
-			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
 			<Name>Phi_s</Name>
-			<Value>-0.0368</Value>
+			<Value>-0.5</Value>
 			<Minimum>-3.14</Minimum>
 			<Maximum>3.14</Maximum>
 			<Type>Free</Type>
@@ -108,14 +108,23 @@
 
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 
-	<NumberRepeats>1</NumberRepeats>
+	<NumberRepeats>5</NumberRepeats>
+	<Output>
+		<DoPullPlots>FlatNTuple</DoPullPlots>
+	</Output>
+
+
 
 	<ToFit>
+
 		<PDF>
-			<Name>Bs2JpsiPhi_sWave</Name>
+			<Name>RaPDF_Bs2JpsiPhiNew</Name>
 		</PDF>
 
 		<DataSet>
+			<PDF>
+				<Name>RaPDF_Bs2JpsiPhi_sWave</Name>
+			</PDF>
 			<Source>Foam</Source>
 			<NumberEvents>30000</NumberEvents>
 			<PhaseSpaceBoundary>
