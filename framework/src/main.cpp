@@ -17,6 +17,7 @@
 #include "ResultFormatter.h"
 #include "InputParsing.h"
 #include "RapidFitIntegrator.h"
+#include "BenIntegrator.h"
 #include "Plotter.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -300,8 +301,9 @@ int main( int argc, char * argv[] )
 				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
 				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 				IDataSet * quickDataSet = quickData->GetDataSet();
-				MakeFoam * testFoam = new MakeFoam( quickData->GetPDF(), quickDataSet->GetBoundary(), quickDataSet->GetDataPoint(0) );
-				testFoam->Debug();
+				//MakeFoam * testFoam = new MakeFoam( quickData->GetPDF(), quickDataSet->GetBoundary(), quickDataSet->GetDataPoint(0) );
+				//testFoam->Debug();
+				BenIntegrator * testBen = new BenIntegrator( quickData->GetPDF(), quickDataSet->GetBoundary(), xmlFile->GetFitParameters() );
 			}
 			else
 			{

@@ -18,6 +18,7 @@
 #include "FitFunctionConfiguration.h"
 #include "MinimiserConfiguration.h"
 #include "OutputConfiguration.h"
+#include "DataSetConfiguration.h"
 
 using namespace std;
 
@@ -51,6 +52,8 @@ class XMLConfigReader
 		MinimiserConfiguration * MakeMinimiser( XMLTag* );
 		pair< string, string > MakeContourPlot( XMLTag* );
 		OutputConfiguration * MakeOutputConfiguration( XMLTag* );
+		IPrecalculator * MakePrecalculator( XMLTag*, PhaseSpaceBoundary* );
+		DataSetConfiguration * MakeDataSetConfiguration( XMLTag*, PhaseSpaceBoundary* );
 
 		vector< XMLTag* > children;
 		bool isLoaded;

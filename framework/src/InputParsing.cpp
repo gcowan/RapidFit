@@ -213,16 +213,33 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 	if ( dataComponents.size() > 1 )
 	{
 		string dataSourceName = dataComponents[0];
-		int dataAmount = atoi( dataComponents[0].c_str() );
+		int dataAmount = atoi( dataComponents[1].c_str() );
 
 		//Put the leftovers down as extra arguments
-		vector<string> dataArguments;
+		vector<string> dataArguments, argumentNames;
 		for ( int argumentIndex = 2; argumentIndex < dataComponents.size(); argumentIndex++ )
 		{
 			dataArguments.push_back( dataComponents[argumentIndex] );
+
+			if ( argumentIndex == 2 )
+			{
+				argumentNames.push_back("FileName");
+			}
+			else if ( argumentIndex == 3 )
+			{
+				argumentNames.push_back("NTuplePath");
+			}
+			else
+			{
+				argumentNames.push_back("Unknown");
+			}
 		}
 
-		return new PDFWithData( newPDF, dataSourceName, dataAmount, dataArguments, newBoundary );
+		//Make the configuration objects
+		vector< IPrecalculator* > emptyPrecalculator;
+		vector< DataSetConfiguration* > singleDataSet;
+		singleDataSet.push_back( new DataSetConfiguration( dataSourceName, dataAmount, dataArguments, argumentNames ) );
+		return new PDFWithData( newPDF, newBoundary, singleDataSet, emptyPrecalculator );
 	}
 	else
 	{

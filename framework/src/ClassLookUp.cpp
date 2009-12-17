@@ -10,7 +10,6 @@
 #include "ClassLookUp.h"
 #include "Bs2JpsiPhi.h"
 #include "Bs2JpsiPhi_mistagObservable.h"
-#include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
 #include "Bs2JpsiPhi_withTimeRes.h"
 #include "Bs2JpsiPhi_sWave.h"
 #include "Bs2JpsiPhi_mistagParameter.h"
@@ -34,6 +33,7 @@
 #include "Foam.h"
 #include "AcceptReject.h"
 #include "JPsiPhiDataGenerator.h"
+#include "SWeightPrecalculator.h"
 #include <stdlib.h>
 
 //Look up the name of a PDF, return an appropriate instance of IPDF
@@ -44,17 +44,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagObservable();
         }
-        if ( Name == "Bs2JpsiPhi_mistagObservable_withAngAcc" )
-        {
-	        //Default JPsiPhi
-	        return new Bs2JpsiPhi_mistagObservable();
-        }
-        if ( Name == "Bs2JpsiPhi_mistagParameter" )
+	else if ( Name == "Bs2JpsiPhi_mistagParameter" )
         {
 	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagParameter();
         }
-        if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
+	else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
         {
 	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagParameter_alt();
@@ -98,15 +93,14 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
         	// This one does not work at the moment. Use time resolution.
 		cerr << "This one does not work at the moment. Use time resolution" << endl;
-	        return new Bs2JpsiPhiPromptBkg();
+		exit(1);
+	        //return new Bs2JpsiPhiPromptBkg();
         }
-
         else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeRes" )
         {
 	        //Prompt background for JPsiPhi, with time resolution (convolved gaussian)
 		return new Bs2JpsiPhiPromptBkg_withTimeRes();
         }
-
 	else if ( Name == "Bs2JpsiPhi_sWave" )
         {
 	        //JPsiPhi signal PDF including the s-wave contribution
@@ -178,6 +172,20 @@ IDataGenerator * ClassLookUp::LookUpDataGenerator( string Name, PhaseSpaceBounda
 	else
 	{
 		cerr << "Unrecognised data generator name: " << Name << endl;
+		exit(1);
+	}
+}
+
+//Look up the name of a precalculator, and return an appropriate instance
+IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, IPDF * FirstPDF, IPDF * SecondPDF, ParameterSet * FitParameters, string WeightName )
+{
+	if ( Name == "SWeightPrecalculator" )
+	{
+		return new SWeightPrecalculator( FirstPDF, SecondPDF, FitParameters, WeightName );
+	}
+	else
+	{
+		cerr << "Unrecognised precalculator name: " << Name << endl;
 		exit(1);
 	}
 }

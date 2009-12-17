@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2009/12/17 - Ben Wynne
+ - Added ability to combine multiple data sources
+ - Added sWeight precalculator for background subtraction
+ - Moved DataFileLoader code into new class that creates DataSets - DataSetConfiguration
+
 2009/12/16 - Greig Cowan
  - Modified RootFileLoader class so that it creates dataset with
    number of events specified. Previously was just reading through the

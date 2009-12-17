@@ -10,7 +10,7 @@
 
 #include "NegativeLogLikelihood.h"
 #include <stdlib.h>
-#include <cmath>
+#include <math.h>
 #include <iostream>
 
 //Default constructor
@@ -24,7 +24,7 @@ NegativeLogLikelihood::~NegativeLogLikelihood()
 }
 
 //Return the negative log likelihood for a PDF/DataSet result
-double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator, int Index )
+double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
 {
 	//Loop over all data points
 	double total = 0.0;
@@ -32,6 +32,12 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 	{
 		DataPoint * temporaryDataPoint = TestDataSet->GetDataPoint(dataIndex);
 		double value = TestPDF->Evaluate(temporaryDataPoint);
+
+		//Idiot check
+		if ( value < 0 || isnan(value) )
+		{
+			cerr << "PDF evaluates to " << value << endl;
+		}
 		
 		//Find out the integral
 		double integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );

@@ -41,12 +41,9 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 	//Initialise the integrators
 	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); resultIndex++ )
 	{
-		RapidFitIntegrator * resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
+		RapidFitIntegrator * resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );//, NewBottle->GetResultDataSet(resultIndex), NewBottle->GetParameterSet() );
 		allIntegrators.push_back( resultIntegrator );
 	}
-
-	//Allow child classes to do precalculation
-	Precalculation();
 }
 
 //Return the physics bottle
@@ -71,7 +68,7 @@ double FitFunction::Evaluate()
 	double minimiseValue = 0.0;
 	for (int resultIndex = 0; resultIndex < allData->NumberResults(); resultIndex++)
 	{
-		minimiseValue += EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[resultIndex], resultIndex );
+		minimiseValue += EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[resultIndex] );
 	}
 	minimiseValue += EvaluateParameterSet( allData->GetParameterSet(), interestingParameters );
 
@@ -79,7 +76,7 @@ double FitFunction::Evaluate()
 }
 
 //Return the value to minimise for a given PDF/DataSet result
-double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator, int Index )
+double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
 {
 	return 1.0;
 }
@@ -107,9 +104,4 @@ void FitFunction::UseEventWeights( string WeightName )
 {
 	useWeights = true;
 	weightObservableName = WeightName;
-}
-
-//Precalculate values for the function
-void FitFunction::Precalculation()
-{
 }

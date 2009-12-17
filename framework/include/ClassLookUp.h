@@ -15,6 +15,7 @@
 #include "FitFunction.h"
 #include "IMinimiser.h"
 #include "IDataGenerator.h"
+#include "IPrecalculator.h"
 #include <iostream>
 
 using namespace std;
@@ -26,6 +27,7 @@ class ClassLookUp
 		static FitFunction * LookUpFitFunctionName( string );
 		static IMinimiser * LookUpMinimiserName( string, int );
 		static IDataGenerator * LookUpDataGenerator( string, PhaseSpaceBoundary*, IPDF* );
+		static IPrecalculator * LookUpPrecalculator( string, IPDF*, IPDF*, ParameterSet*, string );
 };
 
 #endif

@@ -33,9 +33,8 @@ class FitFunction
 
 	protected:
 		//Overload these functions in child classes
-		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator*, int );
+		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator* );
 		virtual double EvaluateParameterSet( ParameterSet*, vector<string> );
-		virtual void Precalculation();
 
 		PhysicsBottle * allData;
 		vector<string> interestingParameters;

@@ -11,8 +11,9 @@
 #define PDF_WITH_DATA_H
 
 #include "IPDF.h"
-#include "IDataSet.h"
 #include "PhaseSpaceBoundary.h"
+#include "IPrecalculator.h"
+#include "DataSetConfiguration.h"
 #include <string>
 #include <vector>
 
@@ -20,8 +21,7 @@ class PDFWithData
 {
 	public:
 		PDFWithData();
-		PDFWithData( IPDF*, string, long, vector<string>, PhaseSpaceBoundary* );
-		PDFWithData( IPDF*, IPDF*, string, long, vector<string>, PhaseSpaceBoundary* );
+		PDFWithData( IPDF*, PhaseSpaceBoundary*, vector< DataSetConfiguration* >, vector< IPrecalculator* > );
 		~PDFWithData();
 
 		bool SetPhysicsParameters( ParameterSet* );
@@ -30,12 +30,10 @@ class PDFWithData
 
 	private:
 		IPDF * fitPDF;
-		IPDF * generatePDF;
 		PhaseSpaceBoundary * inputBoundary;
-		string dataSource;
-		vector<string> dataArguments;
-		long dataAmount;
 		bool parametersAreSet;
+		vector< IPrecalculator* > dataProcessors;
+		vector< DataSetConfiguration* > dataSetMakers;
 };
 
 #endif

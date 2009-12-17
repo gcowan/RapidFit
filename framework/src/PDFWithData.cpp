@@ -1,11 +1,11 @@
 /**
-	@class PDFWithData
+  @class PDFWithData
 
-	A class for creating/storing a PDF and its associated data set
+  A class for creating/storing a PDF and its associated data set
 
-	@author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-5
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-5
+ */
 
 #include "PDFWithData.h"
 #include "DataFileLoader.h"
@@ -21,17 +21,16 @@ PDFWithData::PDFWithData() : parametersAreSet(false)
 }
 
 //Constructor with correct aruments
-PDFWithData::PDFWithData( IPDF * InputPDF, string DataSource, long DataAmount, vector<string> DataArguments, PhaseSpaceBoundary * InputBoundary )
-	: generatePDF(InputPDF), fitPDF(InputPDF), dataSource(DataSource), dataAmount(DataAmount), dataArguments(DataArguments), inputBoundary(InputBoundary), parametersAreSet(false)
+PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(InputPDF),
+	inputBoundary(InputBoundary), dataSetMakers(DataConfig), parametersAreSet(false), dataProcessors(InputPrecalculators)
 {
+	if ( DataConfig.size() < 1 )
+	{
+		cerr << "No data sets configured" << endl;
+		exit(1);
+	}       
 }
 
-//Constructor with correct aruments
-PDFWithData::PDFWithData( IPDF * GeneratePDF, IPDF * FitPDF, string DataSource, long DataAmount, vector<string> DataArguments, PhaseSpaceBoundary * InputBoundary )
-	: generatePDF(GeneratePDF), fitPDF(FitPDF), dataSource(DataSource), dataAmount(DataAmount), dataArguments(DataArguments),
-	inputBoundary(InputBoundary), parametersAreSet(false)
-{
-}
 //Destructor
 PDFWithData::~PDFWithData()
 {
@@ -50,47 +49,48 @@ IPDF * PDFWithData::GetPDF()
 //Return the data set associated with the PDF
 IDataSet * PDFWithData::GetDataSet()
 {
-	//Some kind of decision about what kind of data set to use?
-	IDataSet * newDataSet;
-
-	if ( dataSource == "File" )
+	//Combine all data sources
+	IDataSet * newDataSet = dataSetMakers[0]->MakeDataSet( inputBoundary, fitPDF );
+	for ( int sourceIndex = 1; sourceIndex < dataSetMakers.size(); sourceIndex++ )
 	{
-		DataFileLoader * dataLoader = new DataFileLoader( dataArguments[0], inputBoundary, dataAmount );
-		newDataSet = dataLoader->GetDataSet();
-		delete dataLoader;
-	}
-	else
-	{
-		//PDF parameters must be set before data can be generated
-		if (parametersAreSet)
+		IDataSet * extraData = dataSetMakers[sourceIndex]->MakeDataSet( inputBoundary, fitPDF );
+		for ( int dataIndex = 0; dataIndex < extraData->GetDataNumber(); dataIndex++ )
 		{
-			//Assume it's an accept/reject generator, or some child of it
-			IDataGenerator * dataGenerator = ClassLookUp::LookUpDataGenerator( dataSource, inputBoundary, generatePDF );
-			dataGenerator->GenerateData(dataAmount);
-			newDataSet = dataGenerator->GetDataSet();
-			delete dataGenerator;
+			newDataSet->AddDataPoint( extraData->GetDataPoint(dataIndex) );
 		}
-		else
-		{
-			cerr << "PDF parameters must be set before data can be generated" << endl;
-			exit(1);
-		}
+		delete extraData;
 	}
 
+	//Precalculation, if required
+	for ( int precalculatorIndex = 0; precalculatorIndex < dataProcessors.size(); precalculatorIndex++ )
+	{
+		IDataSet * oldDataSet = newDataSet;
+		newDataSet = dataProcessors[precalculatorIndex]->ProcessDataSet(oldDataSet);
+		delete oldDataSet;
+	}
+
+	cout << "DataSet contains " << newDataSet->GetDataNumber() << " events" << endl;
 	return newDataSet;
 }
 
 //Set the physics parameters of the PDF
 bool PDFWithData::SetPhysicsParameters( ParameterSet * NewParameters )
 {
-	if ( fitPDF->SetPhysicsParameters(NewParameters) && generatePDF->SetPhysicsParameters(NewParameters) )
+	//Set the parameters for the stored PDF and all data set makers
+	bool success = fitPDF->SetPhysicsParameters(NewParameters);
+	for ( int dataIndex = 0; dataIndex < dataSetMakers.size(); dataIndex++ )
+	{
+		success &= dataSetMakers[dataIndex]->SetPhysicsParameters(NewParameters);
+	}
+
+	if (success)
 	{
 		parametersAreSet = true;
 		return true;
 	}
 	else
 	{
-		cerr << "Failed to set PDF physics parameters" << endl;
+		cerr << "Failed to set PDF parameters in initialisation" << endl;
 		exit(1);
 	}
 }

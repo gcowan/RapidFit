@@ -90,10 +90,15 @@ void ResultFormatter::DebugOutputFitResult( FitResult * OutputData )
 
 void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFileName )
 {
+	vector< FunctionContour* > contours = OutputData->GetContours();
+	if ( contours.size() == 0 )
+	{
+		return;
+	}
+
 	string name = contourFileName;// + ".root";
 	TFile * contourFile = new TFile( name.c_str(), "RECREATE");
 	int colours[2] = {42,38};
-	vector< FunctionContour* > contours = OutputData->GetContours();
 
 	//Loop over all contour plots
 	for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )

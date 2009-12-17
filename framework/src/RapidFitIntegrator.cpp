@@ -9,8 +9,8 @@
   @date 2009-10-8
   */
 
-#include "StringProcessing.h"
 #include "RapidFitIntegrator.h"
+#include "StringProcessing.h"
 #include <iostream>
 #include <cmath>
 
@@ -34,18 +34,24 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerica
 
 
 //Constructor to test FoamIntegrator
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, IDataSet * InputData, bool ForceNumerical ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(ForceNumerical), functionToWrap(InputFunction), testFast(true)
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, IDataSet * InputData, ParameterSet * InputParameters, bool ForceNumerical ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(ForceNumerical), functionToWrap(InputFunction), testFast(true)
 {
         multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
         ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
         oneDimensionIntegrator = new IntegratorOneDim(type);
 
-	fastIntegrator = new FoamIntegrator( InputFunction, InputData );
+	cumulativeError = 0.0;
+	numberCalls = 0.0;
+	//fastIntegrator = new FoamIntegrator( InputFunction, InputData );
+	fastIntegrator = new BenIntegrator( InputFunction, InputData->GetBoundary(), InputParameters );
 }
 
 //Destructor
 RapidFitIntegrator::~RapidFitIntegrator()
 {
+	//cout << "Cumulative error: " << cumulativeError << endl;
+	//cout << "Average error: " << cumulativeError / numberCalls  << endl;
+
 	delete multiDimensionIntegrator;
 	delete oneDimensionIntegrator;
 }
@@ -64,12 +70,13 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 		{
 			if ( testFast )
 			{
-				//double foamIntegral = 0.0;
-				//double foamIntegral = fastIntegrator->Integral( NewDataPoint, NewBoundary );
-				//double analyticalIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
-				//cout << "Foam integral = " << foamIntegral << " vs analytical = " << analyticalIntegral << endl;
-				//return analyticalIntegral;
-				return fastIntegrator->Integral( NewDataPoint, NewBoundary );
+				double foamIntegral = fastIntegrator->Integral();// NewDataPoint, NewBoundary );
+				double analyticalIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
+				cout << "Foam integral = " << foamIntegral << " vs analytical = " << analyticalIntegral << endl;
+				//numberCalls += 1.0;
+				//cumulativeError += foamIntegral - analyticalIntegral;
+				return analyticalIntegral;
+				//return fastIntegrator->Integral( NewDataPoint, NewBoundary );
 			}
 			else
 			{

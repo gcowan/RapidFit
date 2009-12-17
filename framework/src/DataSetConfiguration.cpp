@@ -1,18 +1,14 @@
-// $Id: DataFileLoader.cpp,v 1.1 2009/11/10 10:35:46 gcowan Exp $
 /**
-  @class DataFileLoader
+  @class DataSetConfiguration
 
-  Holds methods for loading given file formats into an IDataSet
+  A class for holding the data to create a data set, and creating that data set when requested
 
   @author Benjamin M Wynne bwynne@cern.ch
   @author Greig A Cowan greig.cowan@cern.ch
-  @date 2009-10-02
+  @data 2009-12-16
  */
 
-#include "DataFileLoader.h"
 #include "StringProcessing.h"
-#include <stdlib.h>
-#include "RootFileDataSet.h"
 #include "MemoryDataSet.h"
 #include <iostream>
 #include <fstream>
@@ -21,31 +17,120 @@
 #include "TFile.h"
 #include "TBranch.h"
 #include "TLeaf.h"
+#include "DataSetConfiguration.h"
+#include "ClassLookUp.h"
 #include <stdlib.h>
 
 //Default constructor
-DataFileLoader::DataFileLoader()
+DataSetConfiguration::DataSetConfiguration()
 {
 }
 
-/*
-   DataFileLoader::DataFileLoader( string fileName, string tuplePath, PhaseSpaceBoundary * dataBoundary, long numberEventsToRead )
-   {
-//Find the file type, and treat appropriately
-vector<string> splitFileName = StringProcessing::SplitString( fileName, '.' );
-string fileNameExtension = splitFileName[ splitFileName.size() - 1 ];
-if ( fileNameExtension == "root" )
+//Constructor with correct argument
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, vector<string> DataArguments, vector<string> DataArgumentNames ) : source(DataSource),
+	numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), separateGeneratePDF(false), parametersAreSet(false)
 {
-// Make a MemoryDataSet from a root file
-data = new MemoryDataSet( dataBoundary );
-LoadRootFile( fileName, tuplePath, numberEventsToRead );
 }
+
+//Constructor with separate data generation PDF
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource),
+	numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(DataPDF), separateGeneratePDF(true), parametersAreSet(false)
+{
 }
- */
+
+//Destructor
+DataSetConfiguration::~DataSetConfiguration()
+{
+}
+
+//Set the parameters of the generation PDF
+bool DataSetConfiguration::SetPhysicsParameters( ParameterSet * InputParameters )
+{
+	if (separateGeneratePDF)
+	{
+		if ( generatePDF->SetPhysicsParameters(InputParameters) )
+		{
+			parametersAreSet = true;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		parametersAreSet = true;
+		return true;
+	}
+}
+
+//Create the DataSet
+IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary, IPDF * FitPDF )
+{
+	//Some kind of decision about what kind of data set to use?
+	IDataSet * newDataSet;
+
+	if ( source == "File" )
+	{
+		//Load data from file
+		newDataSet = LoadDataFile( arguments, argumentNames, DataBoundary, numberEvents );
+	}
+	else
+	{
+		//PDF parameters must be set before data can be generated
+		if (parametersAreSet)
+		{
+			//Assume it's an accept/reject generator, or some child of it
+			IDataGenerator * dataGenerator;
+			if (separateGeneratePDF)
+			{
+				dataGenerator = ClassLookUp::LookUpDataGenerator( source, DataBoundary, generatePDF );
+			}
+			else
+			{
+				dataGenerator = ClassLookUp::LookUpDataGenerator( source, DataBoundary, FitPDF );
+			}
+			dataGenerator->GenerateData(numberEvents);
+			newDataSet = dataGenerator->GetDataSet();
+			delete dataGenerator;
+		}
+		else
+		{
+			cerr << "PDF parameters must be set before data can be generated" << endl;
+			exit(1);
+		}
+	}
+
+	return newDataSet;
+}
 
 //Constructor with correct arguments
-DataFileLoader::DataFileLoader( string fileName, PhaseSpaceBoundary * dataBoundary, long numberEventsToRead )
+IDataSet * DataSetConfiguration::LoadDataFile( vector<string> Arguments, vector<string> ArgumentNames, PhaseSpaceBoundary * DataBoundary, long NumberEventsToRead )
 {
+	//Find file name
+	string searchName = "FileName";
+	int fileNameIndex = StringProcessing::VectorContains( &ArgumentNames, &searchName );
+	string fileName = "NotFound";
+	if ( fileNameIndex >= 0 )
+	{
+		fileName = Arguments[fileNameIndex];
+	}
+	else
+	{
+		cerr << "FileName argument not found" << endl;
+		exit(1);
+	}
+
+	//Find nTuple path if specified
+	searchName = "NTuplePath";
+	int nTuplePathIndex = StringProcessing::VectorContains( &ArgumentNames, &searchName );
+	string nTuplePath = "NotFound";
+	if ( nTuplePathIndex >= 0 )
+	{
+		nTuplePath = Arguments[nTuplePathIndex];
+	}
+
 	//Find the file type, and treat appropriately
 	vector<string> splitFileName = StringProcessing::SplitString( fileName, '.' );
 	string fileNameExtension = splitFileName[ splitFileName.size() - 1 ];
@@ -53,8 +138,7 @@ DataFileLoader::DataFileLoader( string fileName, PhaseSpaceBoundary * dataBounda
 	{
 		//Make a RootFileDataSet from a root file
 		//data = new RootFileDataSet( fileName, dataBoundary );
-		data = new MemoryDataSet( dataBoundary );
-		LoadRootFileIntoMemory( fileName, "dataNTuple", numberEventsToRead );
+		return LoadRootFileIntoMemory( fileName, nTuplePath, NumberEventsToRead, DataBoundary );
 	}
 	else if ( fileNameExtension == "csv" )
 	{
@@ -65,8 +149,7 @@ DataFileLoader::DataFileLoader( string fileName, PhaseSpaceBoundary * dataBounda
 	else if ( fileNameExtension == "txt" )
 	{
 		//Load a ascii text file into memory (or make a root file data set if too big?)
-		data = new MemoryDataSet( dataBoundary );
-		LoadAsciiFileIntoMemory( fileName, numberEventsToRead );
+		return LoadAsciiFileIntoMemory( fileName, NumberEventsToRead, DataBoundary );
 	}
 	else
 	{
@@ -75,20 +158,10 @@ DataFileLoader::DataFileLoader( string fileName, PhaseSpaceBoundary * dataBounda
 	}
 }
 
-//Destructor
-DataFileLoader::~DataFileLoader()
+IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string ntuplePath, long numberEventsToRead, PhaseSpaceBoundary * DataBoundary )
 {
-}
-
-//Return the new DataSet
-IDataSet * DataFileLoader::GetDataSet()
-{
-	return data;
-}
-
-void DataFileLoader::LoadRootFileIntoMemory( string fileName, string ntuplePath, long numberEventsToRead )
-{
-	std::vector<string> observableNames = (data->GetBoundary())->GetAllNames();
+	MemoryDataSet * data = new MemoryDataSet(DataBoundary);
+	std::vector<string> observableNames = DataBoundary->GetAllNames();
 	int numberOfObservables = observableNames.size();
 
 	TFile * inputFile = new TFile( fileName.c_str(), "UPDATE" );
@@ -100,7 +173,7 @@ void DataFileLoader::LoadRootFileIntoMemory( string fileName, string ntuplePath,
 	if ( !CheckTNtupleWithBoundary( ntuple, data->GetBoundary() ) )
 	{
 		cerr << "NTuple is incompatible with boundary" << endl;
-		return;
+		exit(1);
 	}
 
 	// Need to set the branch addresses
@@ -133,9 +206,10 @@ void DataFileLoader::LoadRootFileIntoMemory( string fileName, string ntuplePath,
 	inputFile->Close();
 	delete inputFile;
 	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << endl;
+	return data;
 }
 
-bool DataFileLoader::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceBoundary * TestBoundary )
+bool DataSetConfiguration::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceBoundary * TestBoundary )
 {
 	bool compatible = true;
 
@@ -165,8 +239,9 @@ bool DataFileLoader::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceBo
 	return compatible;
 }
 
-void DataFileLoader::LoadAsciiFileIntoMemory( string fileName, long numberEventsToRead )
+IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long numberEventsToRead, PhaseSpaceBoundary * DataBoundary )
 {
+	MemoryDataSet * data = new MemoryDataSet(DataBoundary);
 	std::vector<string> observableNamesInFile;
 	std::map<string, string> observableNamesToUnits;
 	std::vector<string> observableNames = (data->GetBoundary())->GetAllNames();
@@ -191,6 +266,16 @@ void DataFileLoader::LoadAsciiFileIntoMemory( string fileName, long numberEvents
 			//Read a line, and split on white space
 			string line;
 			getline(file_to_read, line);
+
+			//Check for EOF
+			if ( line == "" && file_to_read.eof() )
+			{
+				cout << "End of data file reached after loading only " << numberOfDataPoints << " data points" << endl;
+				file_to_read.close();
+				return data;
+			}
+
+			//Split line on white space
 			vector<string> splitVec;
 			splitVec = StringProcessing::SplitString( line, ' ' );
 
@@ -230,6 +315,7 @@ void DataFileLoader::LoadAsciiFileIntoMemory( string fileName, long numberEvents
 		}
 		file_to_read.close();
 		cout << "Read " << numberOfDataPoints << " events from file: " << fileName << endl;
+		return data;
 	}
 	else
 	{

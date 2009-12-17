@@ -145,15 +145,24 @@
 	// Single fit
 	<NumberRepeats>1</NumberRepeats>
 
-	// 1000 Toys
+	// 100000 toy events
 	<ToFit>
 		<PDF>
-			<Name>Bs2JpsiPhi_withTimeRes</Name>
+			<Name>Bs2JpsiPhi_mistagObservable</Name>
 		</PDF>
 
 		<DataSet>
-			<Source>Foam</Source>
-			<NumberEvents>100000</NumberEvents>
+			<Subset>
+				<Source>File</Source>
+				<NumberEvents>10000</NumberEvents>
+				<FileName>config/data_newEvtGen_100k_lhcb_convention_mistag0.txt</FileName>
+			</Subset>
+
+			<Subset>
+				<Source>Foam</Source>
+				<NumberEvents>5000</NumberEvents>
+			</Subset>
+
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>

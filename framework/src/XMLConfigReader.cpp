@@ -605,10 +605,12 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		string dataSource = "Uninitialised";
 		long numberEvents = 0;
 		PhaseSpaceBoundary * dataBoundary;
-		vector<string> dataArguments;
+		vector<string> dataArguments, argumentNames;
 		bool boundaryFound = false;
-		XMLTag * generatePDFTag;
+		vector< IPrecalculator* > dataProcessors;
+		vector< DataSetConfiguration* > dataSetMakers;
 		bool generatePDFFlag = false;
+		IPDF * generatePDF;
 
 		//Retrieve the data set config
 		vector< XMLTag* > dataComponents = DataTag->GetChildren();
@@ -619,8 +621,13 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			{
 				dataSource = dataComponents[dataIndex]->GetValue()[0];
 			}
-			else if ( name == "FileName" )
+			else if ( name == "Subset" )
 			{
+				dataSetMakers.push_back( MakeDataSetConfiguration( dataComponents[dataIndex], dataBoundary ) );
+			}
+			else if ( name == "FileName" || name == "NTuplePath" )
+			{
+				argumentNames.push_back(name);
 				dataArguments.push_back( dataComponents[dataIndex]->GetValue()[0] );
 			}
 			else if ( name == "NumberEvents" )
@@ -634,8 +641,12 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			}
 			else if ( name == "PDF" || name == "SumPDF" || name == "NormalisedSumPDF" || name == "ProdPDF" )
 			{
-				generatePDFTag = dataComponents[dataIndex];
+				generatePDF = GetPDF( dataComponents[dataIndex], dataBoundary );
 				generatePDFFlag = true;
+			}
+			else if ( name == "Precalculator" )
+			{
+				dataProcessors.push_back( MakePrecalculator( dataComponents[dataIndex], dataBoundary ) );
 			}
 			else
 			{
@@ -651,24 +662,88 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			exit(1);
 		}
 
-		//Make the fit PDF
+		//If there are no separate data sources, go for backwards compatibility
+		if ( dataSetMakers.size() < 1 )
+		{
+			DataSetConfiguration * oldStyleConfig;
+
+			if (generatePDFFlag)
+			{
+				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, dataArguments, argumentNames, generatePDF );
+			}
+			else
+			{
+				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, dataArguments, argumentNames );
+			}
+
+			dataSetMakers.push_back(oldStyleConfig);
+		}
+
+		//Make the objects
 		IPDF * fitPDF = GetPDF( FitPDFTag, dataBoundary );
-
-		if (generatePDFFlag)
-		{
-			//Make a separate data generation PDF
-			IPDF * generatePDF = GetPDF( generatePDFTag, dataBoundary );
-
-			return new PDFWithData( generatePDF, fitPDF, dataSource, numberEvents, dataArguments, dataBoundary );
-		}
-		else
-		{
-			return new PDFWithData( fitPDF, dataSource, numberEvents, dataArguments, dataBoundary );
-		}
+		return new PDFWithData( fitPDF, dataBoundary, dataSetMakers, dataProcessors);
 	}
 	else
 	{
 		cerr << "Incorrect xml tag provided: \"" << DataTag->GetName() << "\" not \"DataSet\"" << endl;
+		exit(1);
+	}
+}
+
+//Collect the information needed to make a data set
+DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataTag, PhaseSpaceBoundary * DataBoundary )
+{
+	//Check the tag actually is a data set
+	if ( DataTag->GetName() == "Subset" )
+	{
+		string dataSource = "Uninitialised";
+		long numberEvents = 0;
+		vector<string> dataArguments, argumentNames;
+		bool generatePDFFlag = false;
+		IPDF * generatePDF;
+
+		//Retrieve the data set config
+		vector< XMLTag* > dataComponents = DataTag->GetChildren();
+		for ( int dataIndex = 0; dataIndex < dataComponents.size(); dataIndex++ )
+		{
+			string name = dataComponents[dataIndex]->GetName();
+			if ( name == "Source" )
+			{
+				dataSource = dataComponents[dataIndex]->GetValue()[0];
+			}
+			else if ( name == "FileName" || name == "NTuplePath" )
+			{
+				argumentNames.push_back(name);
+				dataArguments.push_back( dataComponents[dataIndex]->GetValue()[0] );
+			}
+			else if ( name == "NumberEvents" )
+			{
+				numberEvents = strtol( dataComponents[dataIndex]->GetValue()[0].c_str(), NULL, 10 );
+			}
+			else if ( name == "PDF" || name == "SumPDF" || name == "NormalisedSumPDF" || name == "ProdPDF" )
+			{
+				generatePDF = GetPDF( dataComponents[dataIndex], DataBoundary );
+				generatePDFFlag = true;
+			}
+			else
+			{
+				cerr << "Unrecognised data set component: " << name << endl;
+				exit(1);
+			}
+		}
+
+		if (generatePDFFlag)
+		{
+			return new DataSetConfiguration( dataSource, numberEvents, dataArguments, argumentNames, generatePDF );
+		}
+		else
+		{
+			return new DataSetConfiguration( dataSource, numberEvents, dataArguments, argumentNames );
+		}
+	}
+	else
+	{
+		cerr << "Incorrect xml tag provided: \"" << DataTag->GetName() << "\" not \"Subset\"" << endl;
 		exit(1);
 	}
 }
@@ -965,6 +1040,57 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	else
 	{
 		cerr << "Unrecognised PDF configuration: " << InputTag->GetName() << endl;
+		exit(1);
+	}
+}
+
+//Make a precalculator for a data set
+IPrecalculator * XMLConfigReader::MakePrecalculator( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
+{
+	//Check the correct tag has been provided
+	if ( InputTag->GetName() == "Precalculator" )
+	{
+		//Parse the tag components
+		vector< IPDF* > componentPDFs;
+		string precalculatorName = "Unspecified";
+		string weightName = "Unspecified";
+		vector< XMLTag* > children = InputTag->GetChildren();
+		for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
+		{
+			string name = children[childIndex]->GetName();
+			if ( name == "Name" )
+			{
+				precalculatorName = children[childIndex]->GetValue()[0];
+			}
+			else if ( name == "WeightName" )
+			{
+				weightName = children[childIndex]->GetValue()[0];
+			}
+			else if ( name == "PDF" || name == "SumPDF" || name == "NormalisedSumPDF" || name == "ProdPDF" )
+			{
+				componentPDFs.push_back( GetPDF( children[childIndex], InputBoundary ) );
+			}
+			else
+			{
+				cerr << "Unrecognised Precalculator component: " << name << endl;
+				exit(1);
+			}
+		}
+
+		//Check a signal and background PDF have been provided
+		if ( componentPDFs.size() == 2 )
+		{
+			return ClassLookUp::LookUpPrecalculator( precalculatorName, componentPDFs[0], componentPDFs[1], GetFitParameters(), weightName );
+		}
+		else
+		{
+			cerr << "Precalculator expecting 2 PDFs, not " << componentPDFs.size() << endl;
+			exit(1);
+		}
+	}
+	else
+	{
+		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"Precalculator\"" << endl;
 		exit(1);
 	}
 }
