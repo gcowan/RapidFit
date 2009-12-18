@@ -16,7 +16,7 @@
 #include "Math/AdaptiveIntegratorMultiDim.h"
 #include "Math/Integrator.h"
 #include "FoamIntegrator.h"
-#include "BenIntegrator.h"
+//#include "BenIntegrator.h"
 #include "IDataSet.h"
 
 using namespace ROOT::Math;
@@ -38,8 +38,8 @@ class RapidFitIntegrator
 		double cumulativeError;
 		double numberCalls;
 		bool testFast;
-		//FoamIntegrator * fastIntegrator;
-		BenIntegrator * fastIntegrator;
+		FoamIntegrator * fastIntegrator;
+		//BenIntegrator * fastIntegrator;
 		IPDF * functionToWrap;
 		AdaptiveIntegratorMultiDim * multiDimensionIntegrator;
 		IntegratorOneDim * oneDimensionIntegrator;

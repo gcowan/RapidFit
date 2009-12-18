@@ -223,7 +223,7 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 		//tmpHist->Fill(-2.);
 		//tmpHist->Draw();
 		Histogram->SetStats(1);
-		bothPlots->SetLogy();
+		//bothPlots->SetLogy();
 		Histogram->GetXaxis()->SetRangeUser(-2., 15.); // This does not work because of STUPID ROOT!!
 		Histogram->GetYaxis()->SetRangeUser(0.1, 2*ymax);
 		//projectionGraph->SetMinimum(-2.); // Don't think this works either	

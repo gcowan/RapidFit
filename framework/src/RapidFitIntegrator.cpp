@@ -42,8 +42,8 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, IDataSet * InputDa
 
 	cumulativeError = 0.0;
 	numberCalls = 0.0;
-	//fastIntegrator = new FoamIntegrator( InputFunction, InputData );
-	fastIntegrator = new BenIntegrator( InputFunction, InputData->GetBoundary(), InputParameters );
+	fastIntegrator = new FoamIntegrator( InputFunction, InputData );
+	//fastIntegrator = new BenIntegrator( InputFunction, InputData->GetBoundary(), InputParameters );
 }
 
 //Destructor
@@ -70,7 +70,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 		{
 			if ( testFast )
 			{
-				double foamIntegral = fastIntegrator->Integral();// NewDataPoint, NewBoundary );
+				double foamIntegral = fastIntegrator->Integral(NewDataPoint, NewBoundary );
 				double analyticalIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
 				cout << "Foam integral = " << foamIntegral << " vs analytical = " << analyticalIntegral << endl;
 				//numberCalls += 1.0;

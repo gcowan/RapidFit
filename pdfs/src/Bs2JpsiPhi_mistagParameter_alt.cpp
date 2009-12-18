@@ -263,7 +263,8 @@ double Bs2JpsiPhi_mistagParameter_alt::expH() const
 
 double Bs2JpsiPhi_mistagParameter_alt::expSin() const  
 {
-    if( resolution > 0. ) {
+    //if( resolution > 0. ) {
+    if( false ) {
 		
 		//double theExp = exp( -t*gamma() + resolution*resolution * ( gamma()*gamma() - delta_ms*delta_ms ) / 2. ) ;
 		//double theCos = cos( delta_ms * ( t - resolution*resolution*gamma() ) ) ;
@@ -288,7 +289,8 @@ double Bs2JpsiPhi_mistagParameter_alt::expSin() const
 
 double Bs2JpsiPhi_mistagParameter_alt::expCos() const 
 {
-    if( resolution > 0. ) {
+    //if( resolution > 0. ) {
+    if( false ) {
 		
 		//double theExp = exp( -t*gamma() + resolution*resolution * ( gamma()*gamma() - delta_ms*delta_ms ) / 2. ) ;
 		//double theCos = cos( delta_ms * ( t - resolution*resolution*gamma() ) ) ;

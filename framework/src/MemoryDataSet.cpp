@@ -37,7 +37,7 @@ bool MemoryDataSet::AddDataPoint( DataPoint * NewDataPoint )
 	}
 	else
 	{
-		cerr << "Data point is not within data set boundary" << endl;
+		//cerr << "Data point is not within data set boundary" << endl;
 		return false;
 	}
 }

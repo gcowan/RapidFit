@@ -110,7 +110,7 @@ bool PhaseSpaceBoundary::IsPointInBoundary( DataPoint * TestDataPoint )
 			//Check if the Observable fits
 			if ( !allConstraints[nameIndex]->CheckObservable(testObservable) )
 			{
-				cerr << "Observable \"" << allNames[nameIndex] << "\" value (" << testObservable->GetValue() << ") is outside boundary" << endl;
+				//cerr << "Observable \"" << allNames[nameIndex] << "\" value (" << testObservable->GetValue() << ") is outside boundary" << endl;
 				return false;
 			}
 		}
