@@ -1,5 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2009/12/22 - Pete Clarke
+  - Added Mathematics namespace code to do Exp(), ExpCos(), ExpSin() with or without time res
+  - Updated Bs2JPsiPhi_mistag_Parameter_alt to use Mathematics::
+  - Updated Bs2DsPi_mistagParameter to use Mathematics::
+  - Added Bs2DsPiBkg_withTimeRes
+
 2009/12/22 - Greig Cowan
  - Changed basic DsPi PDF to use integration between tmin and tmax.
  - Added Mathematics namespace to hold common code that is used in PDFs
