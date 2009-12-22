@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2009/12/22 - Greig Cowan
+ - Changed basic DsPi PDF to use integration between tmin and tmax.
+
 2009/12/18 - Greig Cowan
  - Fixed the trunk by removing references to BenIntegrator and DataFileLoader.
 

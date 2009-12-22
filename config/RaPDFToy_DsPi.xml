@@ -33,11 +33,15 @@
 	</ParameterSet>
 
 
-	<Minimiser>Minuit</Minimiser>
+	<Minimiser>Minuit2</Minimiser>
 
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 
 	<NumberRepeats>1</NumberRepeats>
+
+	<Output>
+		<Projection>time</Projection>
+	</Output>
 
 	<ToFit>
 		<PDF>
@@ -45,12 +49,14 @@
 		</PDF>
 
 		<DataSet>
-			<Source>Foam</Source>
+			<Source>File</Source>
+			<FileName>/tmp/offline_selected_Bs2DsPi_events.root</FileName>
+			<NTuplePath>DsPi</NTuplePath>
 			<NumberEvents>10000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>0.0</Minimum>
+					<Minimum>0.3</Minimum>
 					<Maximum>15.0</Maximum>
 					<Unit>ps</Unit>
 				</Observable>
