@@ -113,24 +113,11 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 		double expH() const ;
 		double expCos() const ;
 		double expSin() const ;
+		double intExpL() const ;
+		double intExpH() const ;
+		double intExpSin() const ;
+		double intExpCos() const ;
 	
-		// Functions to help convolve a single gaussian into time primitives
-		// DIDNT APPEAR TO BE USED RooComplex evalCerf( double, double, double ) const ;
-		RooComplex evalCerfApprox( double, double, double ) const ;
-		double evalCerfRe( double, double, double ) const ;
-		double evalCerfIm( double, double, double ) const ;
-	
-		//---------------------
-		// Some time primitive integrals
-	
-		// Integral of exp( - G * t ) from t1 to t2
-		double intExp( double G, double t1, double t2 ) const ;
-	
-		// Integral of exp( - G * t ) * cos( dm * t )  from t1 to t2
-		double intExpCos( double G, double dm, double t1, double t2 ) const ;
-	
-		// Integral of exp( - G * t ) * sin( dm * t )  from t1 to t2
-		double intExpSin( double G, double dm, double t1, double t2 ) const ;
 	
 		//--------------------
 		// Tag category, i.e B, Bbar or untagged.

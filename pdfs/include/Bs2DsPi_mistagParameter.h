@@ -77,10 +77,9 @@ class Bs2DsPi_mistagParameter : public BasePDF
 		
 		// Functions to help convolve a single gaussian into time primitives
 		// DIDNT APPEAR TO BE USED RooComplex evalCerf( double, double, double ) const ;
-		RooComplex evalCerfApprox( double, double, double ) const ;
-		double evalCerfRe( double, double, double ) const ;
-		double evalCerfIm( double, double, double ) const ;
-	
+		//RooComplex evalCerfApprox( double, double, double ) const ;
+		//double evalCerfRe( double, double, double ) const ;
+		//double evalCerfIm( double, double, double ) const ;
 	
 
 };
