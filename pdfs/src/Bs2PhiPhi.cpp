@@ -37,6 +37,7 @@ Bs2PhiPhi::Bs2PhiPhi() :
     , evaluationCacheValid(false)
 {
     MakePrototypes();
+    cout << "Making PhiPhi" << endl;
 }
 
 //Make the data point and parameter set
@@ -148,6 +149,7 @@ double Bs2PhiPhi::Evaluate(DataPoint * measurement)
 
 double Bs2PhiPhi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+    cout << "Normalisation" << endl;
     // Now need to know the tag and the mistag
     int q = (int)measurement->GetObservable( tagName )->GetValue(); //-1, 0 or +1
     double omega = measurement->GetObservable( mistagName )->GetValue();    
@@ -383,66 +385,6 @@ inline double Bs2PhiPhi::getMainIntAnswer(double tmin, double tmax, double gamma
     
     return (answer[0]-answer[1]);
 }
-
-
-/*
-// Need to work out what interference terms these correspond to and which strong phase is which.
-// These are only needed (I think) for calculating the projections.
-inline double Bs2PhiPhi::A4def(double tmin, double tmax,
-                    double k0, double tauL, double tauH, double tauBar, 
-                    double Dms, double phis, double tphase1, double tphase2, int Btype)
-{
-    
-    double gamma_sDms = pow ( ((1.0/tauBar)*(1.0/tauBar))+(Dms*Dms), -1.0 );
-    double cosphis = cos(phis);
-    double sinphis = sin(phis);
-    
-    double valB = 0.5*k0*cos(tphase2-tphase1)* ( tauH*exp(-(1.0/tauH)*tmax)
-                                                + tauL*exp(-(1.0/tauL)*tmax)
-                                                - cosphis* ( tauH*exp(-(1.0/tauH)*tmax) 
-                                                            - tauL*exp(-(1.0/tauL)*tmax) )
-                                                + Btype * 2.0 * sinphis * exp (-(1.0/tauBar)*tmax) * gamma_sDms 
-                                                * ( Dms* cos(Dms*tmax) + (1.0/tauBar)*sin(Dms*tmax)) );
-    
-    double valA = 0.5*k0*cos(tphase2-tphase1)* ( tauH*exp(-(1.0/tauH)*tmin)
-                                                + tauL*exp(-(1.0/tauL)*tmin)
-                                                - cosphis* ( tauH*exp(-(1.0/tauH)*tmin) 
-                                                            - tauL*exp(-(1.0/tauL)*tmin) )
-                                                + Btype * 2.0 * sinphis * exp (-(1.0/tauBar)*tmin) * gamma_sDms 
-                                                * ( Dms* cos(Dms*tmin) + (1.0/tauBar)*sin(Dms*tmin)) );
-    
-    return (valA-valB);
-    
-}
-
-inline double Bs2PhiPhi::A5def(double tmin, double tmax,
-                    double k0, double tauL, double tauH, double tauBar, 
-                    double Dms, double phis, double tphase1, double tphase2, int Btype)
-{
-    
-    double gamma_sDms = pow ( ((1.0/tauBar)*(1.0/tauBar))+(Dms*Dms), -1.0 );
-    double cosphis = cos(phis);
-    double sinphis = sin(phis);
-    
-    double valB = k0 * ( gamma_sDms*sin(tphase1)*exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)*cos(Dms*tmax) 
-                                                                         - Dms*sin(Dms*tmax))
-                        - gamma_sDms*cos(tphase1)*cosphis*exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)
-                                                                                  *sin(Dms*tmax)
-                                                                                  + Dms*cos(Dms*tmax))
-                        - Btype * 0.5*((tauH)*exp(-(1.0/tauH)*tmax)-(tauL)*exp(-(1.0/tauL)*tmax))
-                        *cos(tphase1)*sinphis);
-    
-    double valA = k0 * ( gamma_sDms*sin(tphase1)*exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*cos(Dms*tmin)
-                                                                         - Dms*sin(Dms*tmin))
-                        - gamma_sDms*cos(tphase1)*cosphis*exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(Dms*tmin)
-                                                                                  + Dms*cos(Dms*tmin))
-                        - Btype * 0.5*((tauH)*exp(-(1.0/tauH)*tmin)-(tauL)*exp(-(1.0/tauL)*tmin))*cos(tphase1)*sinphis);
-    
-    return (valA-valB);
-    
-}
-*/
-
 
 void Bs2PhiPhi::getPhysicsParameters( double & gamma_s
                                           , double & gamma_l

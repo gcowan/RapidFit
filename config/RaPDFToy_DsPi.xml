@@ -30,6 +30,24 @@
 			<Type>Free</Type>
 			<Unit>MeV/c2</Unit>
 		</PhysicsParameter>
+		
+		<PhysicsParameter>
+			<Name>mistag</Name>
+			<Value>0.33</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		
+		<PhysicsParameter>
+			<Name>timeres</Name>
+			<Value>0.033</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>ps</Unit>
+		</PhysicsParameter>
 	</ParameterSet>
 
 
@@ -45,7 +63,7 @@
 
 	<ToFit>
 		<PDF>
-			<Name>Bs2DsPi</Name>
+			<Name>Bs2DsPi_mistagParameter</Name>
 		</PDF>
 
 		<DataSet>
@@ -56,7 +74,7 @@
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>0.3</Minimum>
+					<Minimum>-2.0</Minimum>
 					<Maximum>15.0</Maximum>
 					<Unit>ps</Unit>
 				</Observable>

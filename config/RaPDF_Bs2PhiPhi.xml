@@ -14,7 +14,7 @@
 
                 <PhysicsParameter>
                         <Name>gamma_l</Name>
-                        <Value>0.68</Value>
+                        <Value>0.738</Value>
                         <Minimum>0.0</Minimum>
                         <Maximum>2.0</Maximum>
                         <Type>Free</Type>
@@ -23,7 +23,7 @@
 
                 <PhysicsParameter>
                         <Name>gamma_h</Name>
-                        <Value>0.68</Value>
+                        <Value>0.654</Value>
                         <Minimum>0.0</Minimum>
                         <Maximum>2.0</Maximum>
                         <Type>Free</Type>
@@ -33,7 +33,7 @@
 
 		<PhysicsParameter>
 			<Name>Aperp_sq</Name>
-			<Value>0.207</Value>
+			<Value>0.15</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Free</Type>
@@ -42,7 +42,7 @@
 
 		<PhysicsParameter>
 			<Name>Azero_sq</Name>
-			<Value>0.56</Value>
+			<Value>0.15</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Free</Type>
@@ -51,7 +51,7 @@
 
 		<PhysicsParameter>
 			<Name>delta_1</Name>
-			<Value>2.91</Value>
+			<Value>0.0</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
 			<Type>Free</Type>
@@ -61,7 +61,9 @@
 		<PhysicsParameter>
 			<Name>delta_2</Name>
 			<Value>0.0</Value>
-			<Type>Fixed</Type>
+                        <Minimum>-3.14159</Minimum>
+                        <Maximum>3.14159</Maximum>
+			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -77,8 +79,8 @@
 		<PhysicsParameter>
 			<Name>Phi_s</Name>
 			<Value>-0.0368</Value>
-			<Minimum>-3.14</Minimum>
-			<Maximum>3.14</Maximum>
+			<Minimum>-3.14159</Minimum>
+			<Maximum>3.14159</Maximum>
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
@@ -96,8 +98,8 @@
 		</PDF>
 
 		<DataSet>
-			<Source>Foam</Source>
-			<NumberEvents>10</NumberEvents>
+			<Source>AcceptReject</Source>
+			<NumberEvents>1000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
@@ -108,18 +110,17 @@
 
 				<Observable>
 					<Name>theta_1</Name>
-					<Minimum>-1.0</Minimum>
-					<Maximum>1.0</Maximum>
-					<Unit>Unitless</Unit>
+                                        <Minimum>-3.14159</Minimum>
+                                        <Maximum>3.14159</Maximum>
+					<Unit>rad</Unit>
 				</Observable>
 
                                 <Observable>
                                         <Name>theta_2</Name>
-                                        <Minimum>-1.0</Minimum>
-                                        <Maximum>1.0</Maximum>
-                                        <Unit>Unitless</Unit>
+                                        <Minimum>-3.14159</Minimum>
+                                        <Maximum>3.14159</Maximum>
+                                        <Unit>rad</Unit>
                                 </Observable>
-
 
 				<Observable>
 					<Name>phi</Name>
@@ -136,7 +137,7 @@
 
 				<Observable>
 					<Name>mistag</Name>
-					<Value>0.33</Value>
+                                        <Value>0.33</Value>
 					<Unit>Unitless</Unit>
 				</Observable>
 
