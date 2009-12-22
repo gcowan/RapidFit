@@ -12,8 +12,11 @@
 #include "math.h"
 #include "TMath.h"
 #include "RooMath.h"
+#include "Mathematics.h"
 
+//......................................
 //Constructor
+
 Bs2JpsiPhi_mistagParameter_alt::Bs2JpsiPhi_mistagParameter_alt() : 
 	// Physics parameters
 	  gammaName     ( "gamma" )
@@ -69,11 +72,14 @@ void Bs2JpsiPhi_mistagParameter_alt::MakePrototypes()
 	valid = true;
 }
 
+
+//........................................................
 //Destructor
 Bs2JpsiPhi_mistagParameter_alt::~Bs2JpsiPhi_mistagParameter_alt()
 {
 }
 
+//........................................................
 //Not only set the physics parameters, but indicate that the cache is no longer valid
 bool Bs2JpsiPhi_mistagParameter_alt::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
@@ -81,6 +87,7 @@ bool Bs2JpsiPhi_mistagParameter_alt::SetPhysicsParameters( ParameterSet * NewPar
 	return allParameters.SetPhysicsParameters(NewParameterSet);
 }
 
+//.........................................................
 //Return a list of observables not to be integrated
 vector<string> Bs2JpsiPhi_mistagParameter_alt::GetDoNotIntegrateList()
 {
@@ -88,7 +95,9 @@ vector<string> Bs2JpsiPhi_mistagParameter_alt::GetDoNotIntegrateList()
 	return list;
 }
 
-//Calculate the function value
+//.............................................................
+//Calculate the PDF value for a given set of observables
+
 double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 {
 	
@@ -109,12 +118,11 @@ double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 }
 
 
+//...............................................................
+//Calculate the normalisation for a given set of physics parameters and boundary
+
 double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-
-	// IMPORTANT:  THIS PDF CAN ONLY HANDLE FULL INTEGRATION OVER TIME IF RESOLUTION IS SWITCHED ON
-	// THIS IS BECAUSE IT SIMPLY USES THE ANALYTIC INTEGRAL AND IGNORES THE RESOLUTION CONVOLUTION
-	// THERE IS A TEST BELOW FOR THIS.
 	
     // Get parameters into member variables
 	double dummy_R0, delta_zero, delta_para, delta_perp ;	
@@ -128,7 +136,7 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 
-	// This is the patch code to set the integration time boundaries
+	// Get time boundaries into member variables
 	IConstraint * timeBound = boundary->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" ) {
 		cerr << "Bound on time not provided" << endl;
@@ -139,10 +147,6 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 		thi = timeBound->GetMaximum();
 	}
 	
-	if( (resolution > 0.) && ( tlo > -2  || thi < 10 ) ) {
-		std::cerr << " Bs2JpsiPhi_mistagParameter_alt cannot handle tlo > -2 or thi < 10  with resolution on" << std::endl ;
-		return -999.0 ;
-	}
 	
 	// Recalculate cached values if Physics parameters have changed
 	if( ! normalisationCacheValid )  {
@@ -158,7 +162,8 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 }
 
 
-
+//..............................................
+// Extract and return physics parameters
 void Bs2JpsiPhi_mistagParameter_alt::getPhysicsParameters( double & gamma
 					, double & deltaGamma
 					, double & deltaM
@@ -218,159 +223,57 @@ double Bs2JpsiPhi_mistagParameter_alt::gamma() const   { return gamma_in ; }
 double Bs2JpsiPhi_mistagParameter_alt::q() const { return tag ;}
 
 
-//-----------------------------------
+//--------------------------------------------------------------------------
 // Time primitives including single gaussian resolution
+// These now interface to an external helper library
 //
-// Much of the single gausian resolutino code is copied from Yue Hongs pdf
+//...................................................
+//Exponentials 
 
 double Bs2JpsiPhi_mistagParameter_alt::expL() const 
 {
-    if(resolution>0.) {     
-		
-		double theExp = exp( -t*gamma_l() + resolution*resolution * gamma_l()*gamma_l() / 2. ) ;
-		double theErfc = RooMath::erfc(  -( t - resolution*resolution*gamma_l() ) /sqrt(2.)/resolution )  ;
-		return theExp * theErfc  / 2.0 ;
-		
-		// Yue hongs code
-		//double c = gamma_l() * resolution /sqrt(2.); 
-		//double u = t / resolution / sqrt(2.);
-		//return exp( c*c - gamma_l()*t ) * RooMath::erfc(c-u) / 2.;
-    }	
-    else {
-		if( t < 0.0 ) return 0.0 ;
-		return exp( -gamma_l() * t ) ;
-	}
+	return Mathematics::Exp( t, gamma_l(), resolution ) ;
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::expH() const 
 {
-    if(resolution>0.) {     
-		
-		double theExp = exp( -t*gamma_h() + resolution*resolution * gamma_h()*gamma_h() / 2. ) ;
-		double theErfc = RooMath::erfc(  -( t - resolution*resolution*gamma_h() ) /sqrt(2.)/resolution )  ;
-		return theExp * theErfc  / 2.0 ;
-		
-		//Yue Hongs code
-		//double c = gamma_h() * resolution /sqrt(2.); 
-		//double u = t / resolution / sqrt(2.);
-		//return exp( c*c - gamma_h()*t ) * RooMath::erfc(c-u) / 2.;
-    }	
-    else {
-		if( t < 0.0 ) return 0.0 ;
-		return exp( -gamma_h() * t ) ;
-	}
+	return Mathematics::Exp( t, gamma_h(), resolution ) ;
 }
+
+double Bs2JpsiPhi_mistagParameter_alt::intExpL( ) const {
+	return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
+}
+
+double Bs2JpsiPhi_mistagParameter_alt::intExpH( ) const {
+	return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
+}
+
+
+//......................................................
+// Exponential x sine  and cosine
 
 double Bs2JpsiPhi_mistagParameter_alt::expSin() const  
 {
-    //if( resolution > 0. ) {
-    if( false ) {
-		
-		//double theExp = exp( -t*gamma() + resolution*resolution * ( gamma()*gamma() - delta_ms*delta_ms ) / 2. ) ;
-		//double theCos = cos( delta_ms * ( t - resolution*resolution*gamma() ) ) ;
-		//double theSin = sin( delta_ms * ( t - resolution*resolution*gamma() ) ) ;
-		//RooComplex z( -( t - resolution*resolution*gamma() )/sqrt(2.)/resolution,  - resolution*delta_ms/sqrt(2.) ) ;
-		//double theReErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncRe(z) ) : ( 1.0 - RooMath::FastComplexErrFuncRe(z) );
-		//double theImErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncIm(z) ) : ( 1.0 - RooMath::FastComplexErrFuncIm(z) );
-		//return theExp * ( theCos*theImErfc + theSin*theReErfc ) / 2.0 ;
-		
-		// Yue Hongs code
-		double c = gamma() * resolution/sqrt(2.);
-		double u = t / resolution / sqrt(2.) ;
-		double wt = delta_ms / gamma() ;
-		return ( evalCerfIm(wt,-u,c) - evalCerfIm(-wt,-u,c) ) /4. ;
-	}
-	else {
-		if( t < 0.0 ) return 0.0 ;
-		return exp( -gamma() *t ) * sin( delta_ms * t )  ;
-	}
-	
+    return Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::expCos() const 
 {
-    //if( resolution > 0. ) {
-    if( false ) {
-		
-		//double theExp = exp( -t*gamma() + resolution*resolution * ( gamma()*gamma() - delta_ms*delta_ms ) / 2. ) ;
-		//double theCos = cos( delta_ms * ( t - resolution*resolution*gamma() ) ) ;
-		//double theSin = sin( delta_ms * ( t - resolution*resolution*gamma() ) ) ;
-		//RooComplex z( -( t - resolution*resolution*gamma() )/sqrt(2.)/resolution,  - resolution*delta_ms/sqrt(2.) ) ;
-		//double theReErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncRe(z) ) : ( 1.0 - RooMath::FastComplexErrFuncRe(z) );
-		//double theImErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncIm(z) ) : ( 1.0 - RooMath::FastComplexErrFuncIm(z) );
-		//return theExp * ( theCos*theReErfc - theSin*theImErfc ) / 2.0 ;
-		
-		//Yue Hongs code
-		double c = gamma() * resolution/sqrt(2.);
-		double u = t / resolution / sqrt(2.) ;
-		double wt = delta_ms / gamma() ;
-		return ( evalCerfRe(wt,-u,c) + evalCerfRe(-wt,-u,c) ) / 4. ;
-	}
-	else {
-		if( t < 0.0 ) return 0.0 ;
-		return exp( -gamma() *t ) * cos( delta_ms * t )  ;
-	}
-	
+    return Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
 }
 
-// All of these functions were taken from Yue Hongs code
-
-// Calculate exp(-u^2) cwerf(swt*c + i(u+c)), taking care of numerical instabilities
-//RooComplex Bs2JpsiPhi_mistagParameter_alt::evalCerf(double swt, double u, double c) const {
-//  RooComplex z(swt*c,u+c);
-//  return (z.im()>-4.0) ? RooMath::FastComplexErrFunc(z)*exp(-u*u) : evalCerfApprox(swt,u,c) ;
-///}  DIDNT APPEAR TO BE USED
-
-// Calculate Re(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-double Bs2JpsiPhi_mistagParameter_alt::evalCerfRe(double swt, double u, double c) const {
-    RooComplex z(swt*c,u+c);
-    return (z.im()>-4.0) ? RooMath::FastComplexErrFuncRe(z)*exp(-u*u) : evalCerfApprox(swt,u,c).re() ;
-}
-
-// Calculate Im(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-double Bs2JpsiPhi_mistagParameter_alt::evalCerfIm(double swt, double u, double c) const {
-    RooComplex z(swt*c,u+c);
-    return (z.im()>-4.0) ? RooMath::FastComplexErrFuncIm(z)*exp(-u*u) : evalCerfApprox(swt,u,c).im() ;
-}
-
-// use the approximation: erf(z) = exp(-z*z)/(sqrt(pi)*z) to explicitly cancel the divergent exp(y*y) behaviour of
-// CWERF for z = x + i y with large negative y
-RooComplex Bs2JpsiPhi_mistagParameter_alt::evalCerfApprox(double swt, double u, double c) const
+double Bs2JpsiPhi_mistagParameter_alt::intExpSin( ) const 
 {
-	static double rootpi= sqrt(atan2(0.,-1.));
-	RooComplex z(swt*c,u+c);  
-	RooComplex zc(u+c,-swt*c);
-	RooComplex zsq= z*z;
-	RooComplex v= -zsq - u*u;
-	return v.exp()*(-zsq.exp()/(zc*rootpi) + 1)*2 ; //why shoule be a 2 here?
-	//   return v.exp()*(-zsq.exp()/(zc*rootpi) + 1);
-	
+	return Mathematics::ExpSinInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
+}
+
+// Integral of exp( - G * t ) * cos( dm * t )  
+double Bs2JpsiPhi_mistagParameter_alt::intExpCos( ) const 
+{
+	return Mathematics::ExpCosInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
 }
 
 
-//---------------------
-// Some time integrals
-
-// Integral of exp( - G * t ) from t1 to t2
-double Bs2JpsiPhi_mistagParameter_alt::intExp( double G, double t1, double t2 ) const {
-    return (1/G) * (exp(-G*t1) - exp(-G*t2) ) ;
-}
-
-// Integral of exp( - G * t ) * cos( dm * t )  from t1 to t2
-double Bs2JpsiPhi_mistagParameter_alt::intExpCos( double G, double dm, double t1, double t2 ) const {
-    return (1/(G*G + dm*dm)) * (
-								( exp(-G*t1)* (G*cos(dm*t1) - dm*sin(dm*t1)))
-								-( exp(-G*t2)* (G*cos(dm*t2) - dm*sin(dm*t2)))
-								);
-}
-
-// Integral of exp( - G * t ) * sin( dm * t )  from t1 to t2
-double Bs2JpsiPhi_mistagParameter_alt::intExpSin( double G, double dm, double t1, double t2 ) const {
-    return (1/(G*G + dm*dm)) * (
-								( exp(-G*t1)* (G*sin(dm*t1) + dm*cos(dm*t1)))
-								-( exp(-G*t2)* (G*sin(dm*t2) + dm*cos(dm*t2)))
-								);
-}
 
 //------------------------------------------------------------------------------
 // These are the time factors and their analytic integrals for the one angle PDF
@@ -389,13 +292,10 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorEven(  )  const
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorEvenInt(  )  const
 {
 
-	double _tlo = tlo ;
-	if(_tlo < 0.) _tlo = 0. ;
-	
 	double result = 
-	( 1.0 + cos(phi_s) )  * intExp( gamma_l(), _tlo, thi )     
-	+ ( 1.0 - cos(phi_s) )  * intExp( gamma_h(), _tlo, thi )          
-	+ q() * ( 2.0 * sin(phi_s)   ) * intExpSin( gamma(), delta_ms, _tlo, thi ) * (1.0 - 2.0*tagFraction) ;
+	( 1.0 + cos(phi_s) )  * intExpL()     
+	+ ( 1.0 - cos(phi_s) )  * intExpH()          
+	+ q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
 };
 
@@ -413,13 +313,10 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorOdd(  )   const
 
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorOddInt(  )  const
 {
-	double _tlo = tlo ;
-	if(_tlo < 0.) _tlo = 0. ;
-	
 	double result = 
-	( 1.0 - cos(phi_s) ) * intExp( gamma_l(), _tlo, thi )
-	+ ( 1.0 + cos(phi_s) ) * intExp( gamma_h(), _tlo, thi ) 
-	- q() * ( 2.0 * sin(phi_s)   ) * intExpSin( gamma(), delta_ms, _tlo, thi ) * (1.0 - 2.0*tagFraction) ;
+	( 1.0 - cos(phi_s) ) * intExpL()
+	+ ( 1.0 + cos(phi_s) ) * intExpH() 
+	- q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
 };
 
@@ -470,8 +367,8 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorImAPATInt( ) const
 	if(_tlo < 0.) _tlo = 0. ;
 	
 	double result = 
-	q() * 2.0  * ( sin(delta1)*intExpCos(gamma(),delta_ms,_tlo,thi) - cos(delta1)*cos(phi_s)*intExpSin(gamma(),delta_ms,_tlo,thi) ) * (1.0 - 2.0*tagFraction)
-	- 1.0 * ( intExp(gamma_h(),_tlo,thi) - intExp(gamma_l(),_tlo,thi) ) * cos(delta1) * sin(phi_s) ;	    
+	q() * 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
+	- 1.0 * ( intExpH() - intExpL() ) * cos(delta1) * sin(phi_s) ;	    
 	return result ;
 } ;
 
@@ -492,8 +389,8 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorImA0ATInt( ) const
 	if(_tlo < 0.) _tlo = 0. ;
 	
 	double result = 
-	q() * 2.0  * ( sin(delta2)*intExpCos(gamma(),delta_ms,_tlo,thi) - cos(delta2)*cos(phi_s)*intExpSin(gamma(),delta_ms,_tlo,thi)  ) * (1.0 - 2.0*tagFraction)
-	-1.0 * ( intExp(gamma_h(),_tlo,thi) - intExp(gamma_l(),_tlo,thi)  ) * cos(delta2) * sin(phi_s) ;
+	q() * 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cos(phi_s)*intExpSin()  ) * (1.0 - 2.0*tagFraction)
+	-1.0 * ( intExpH() - intExpL()  ) * cos(delta2) * sin(phi_s) ;
 	return result ;
 } ;
 
