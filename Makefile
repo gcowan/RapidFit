@@ -87,5 +87,8 @@ clean   :
 cleanall:
 	$(RM) $(GARBAGE)
 
-rapidresults:
-	$(CXX) $(CXXFLAGS)  -c $(UTILSSRC)/$@.cc -o $(EXEDIR)/$@
+rapidresults: $(UTILSSRC)/rapidresults.o
+	$(CXX) -o $(EXEDIR)/$@ $< $(ROOTLIBS)
+
+$(UTILSSRC)/rapidresults.o: $(UTILSSRC)/rapidresults.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c $<

@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/01/03 - Greig Cowan
+  - Fixed Makefile so that rapidresults compiles into an executable.
+
 2009/12/22 - Pete Clarke
   - Added Mathematics namespace code to do Exp(), ExpCos(), ExpSin() with or without time res
   - Updated Bs2JPsiPhi_mistag_Parameter_alt to use Mathematics::
