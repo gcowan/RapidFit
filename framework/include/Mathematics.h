@@ -22,5 +22,5 @@ namespace Mathematics
 	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )  ;
 	double ExpSin( double t, double gamma, double deltaM, double resolution )  ;
 	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )  ;
-
+	double expErfInt(double tlimit, double tau, double sigma);
 }

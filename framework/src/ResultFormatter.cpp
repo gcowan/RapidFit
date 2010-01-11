@@ -126,7 +126,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 
 			//Make the graph
 			TGraphErrors * contourGraph = new TGraphErrors( sigmaContour.size(), xCoordinates, yCoordinates );
-			contourGraph->SetFillColor( colours[sigma] );
+			contourGraph->SetFillColor( colours[sigma-1] );
 			graph->Add(contourGraph);
 		}
 

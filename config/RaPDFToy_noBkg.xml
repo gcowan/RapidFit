@@ -8,14 +8,14 @@
 			<Name>gamma</Name>
 			<Value>0.68</Value>
 			<Type>Unbounded</Type>
-			<Unit>Unitless</Unit>
+			<Unit>ps^{-1}</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>deltaGamma</Name>
 			<Value>0.068</Value>
 			<Type>Unbounded</Type>
-			<Unit>Unitless</Unit>
+			<Unit>ps^{-1}</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
@@ -23,7 +23,7 @@
 			<Value>0.207</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -32,7 +32,7 @@
 			<Value>0.56</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -41,7 +41,7 @@
 			<Value>-2.93</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -50,7 +50,7 @@
 			<Value>2.91</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -66,10 +66,19 @@
 			<Value>17.77</Value>
 			<Minimum>17.0</Minimum>
                         <Maximum>19.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>MeV/c2</Unit>
 		</PhysicsParameter>
 
+		<PhysicsParameter>
+			<Name>mistag</Name>
+			<Value>0.33</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		
 		<PhysicsParameter>
 			<Name>Phi_s</Name>
 			<Value>-0.0368</Value>
@@ -113,7 +122,7 @@
                         <Type>Fixed</Type>
                         <Unit>Unitless</Unit>
                 </PhysicsParameter>
-
+                
 	</ParameterSet>
 
 	// Minimising with Minuit2
@@ -125,15 +134,6 @@
 			<XParameter>gamma</XParameter>
 			<YParameter>deltaGamma</YParameter>
 		</ContourPlot>
-
-		<ContourPlot>
-			<XParameter>delta_para</XParameter>
-			<YParameter>delta_perp</YParameter>
-		</ContourPlot>
-
-		<Projection>time</Projection>
-
-		<DoPullPlots>FlatNTuple</DoPullPlots>
 	</Output>
 
 	// Minimising weighted NLL
@@ -148,25 +148,16 @@
 	// 100000 toy events
 	<ToFit>
 		<PDF>
-			<Name>Bs2JpsiPhi_mistagObservable</Name>
+			<Name>Bs2DsPi</Name>
 		</PDF>
 
 		<DataSet>
-			<Subset>
-				<Source>File</Source>
-				<NumberEvents>10000</NumberEvents>
-				<FileName>config/data_newEvtGen_100k_lhcb_convention_mistag0.txt</FileName>
-			</Subset>
-
-			<Subset>
-				<Source>Foam</Source>
-				<NumberEvents>5000</NumberEvents>
-			</Subset>
-
+			<Source>Foam</Source>
+			<NumberEvents>80000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>-2.0</Minimum>
+					<Minimum>0.0</Minimum>
 					<Maximum>15.0</Maximum>
 					<Unit>ps</Unit>
 				</Observable>

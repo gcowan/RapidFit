@@ -55,7 +55,7 @@
 
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 
-	<NumberRepeats>1</NumberRepeats>
+	<NumberRepeats>10</NumberRepeats>
 
 	<Output>
 		<Projection>time</Projection>
@@ -63,18 +63,16 @@
 
 	<ToFit>
 		<PDF>
-			<Name>Bs2DsPi_mistagParameter</Name>
+			<Name>Bs2DsPi</Name>
 		</PDF>
 
 		<DataSet>
-			<Source>File</Source>
-			<FileName>/tmp/offline_selected_Bs2DsPi_events.root</FileName>
-			<NTuplePath>DsPi</NTuplePath>
+			<Source>Foam</Source>
 			<NumberEvents>10000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>-2.0</Minimum>
+					<Minimum>0.1</Minimum>
 					<Maximum>15.0</Maximum>
 					<Unit>ps</Unit>
 				</Observable>

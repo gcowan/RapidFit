@@ -373,7 +373,7 @@ void Bs2JpsiPhi_mistagObservable_withAngAcc::getTimeAmplitudeIntegrals( double &
 	AzeroAzeroInt = getAzeroAzeroInt( tlow, thigh, Azero_sq, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
 	AparaAparaInt = getAparaAparaInt( tlow, thigh, Apara_sq, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
 	AperpAperpInt = getAperpAperpInt( tlow, thigh, Aperp_sq, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
-	AparaAperpInt = getAparaAperpInt( tlow, thigh, AparaAperp, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
+	AparaAperpInt = getAparaAperpInt( tlow, thigh, AparaAperp, tauL, tauH, tauBar, deltaMs, Phi_s, delta_zero, delta_para, Btype);
 	AzeroAparaInt = getAzeroAparaInt( tlow, thigh, AzeroApara, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
 	AzeroAperpInt = getAzeroAperpInt( tlow, thigh, AzeroAperp, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
 	// No contribution from interference terms here since they drop out when the angular integration is done.
@@ -446,25 +446,26 @@ inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAperpAperpInt(double tm
 }
 
 inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAparaAperpInt(double tmin, double tmax,
-		double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype) 
+		double k0, double tauL, double tauH, double tauBar,double Dms, double phis, 
+		double delta_perp, double delta_para, int Btype) 
 {
 	double gammaDms = (1.0 / (((1.0/tauBar)*(1.0/tauBar)) + (Dms*Dms)) );
 	double cosphis = cos(phis);
 	double sinphis = sin(phis);
 
 	double valB = 0.5*k0*cos(delta_perp - delta_para)* ( tauH*exp(-(1.0/tauH)*tmax)
-                                               + tauL*exp(-(1.0/tauL)*_tmax)
-                                               - cosphis* ( tauH*exp(-(1.0/tauH)*_tmax) 
-                                                            - tauL*exp(-(1.0/tauL)*_tmax) )
-                                               + 2.0 * sinphis * exp (-(1.0/tauBar)*_tmax) * gammaDms 
-                                               * ( Dms* cos(Dms*_tmax) + (1.0/tauBar)*sin(Dms*_tmax)) );
+                                               + tauL*exp(-(1.0/tauL)*tmax)
+                                               - cosphis* ( tauH*exp(-(1.0/tauH)*tmax) 
+                                                            - tauL*exp(-(1.0/tauL)*tmax) )
+                                               + 2.0 * sinphis * exp (-(1.0/tauBar)*tmax) * gammaDms 
+                                               * ( Dms * cos(Dms*tmax) + (1.0/tauBar)*sin(Dms*tmax)) );
   
-	double valA = 0.5*k0*cos(tphase2-tphase1)* ( tauH*exp(-(1.0/tauH)*_tmin)
-                                               + tauL*exp(-(1.0/tauL)*_tmin)
-                                               - cosphis* ( tauH*exp(-(1.0/tauH)*_tmin) 
-                                                            - tauL*exp(-(1.0/tauL)*_tmin) )
-                                               + 2.0 * sinphis * exp (-(1.0/tauBar)*_tmin) * gammaDms 
-                                               * ( Dms* cos(Dms*_tmin) + (1.0/tauBar)*sin(Dms*_tmin)) );
+	double valA = 0.5*k0*cos(delta_perp - delta_para)* ( tauH*exp(-(1.0/tauH)*tmin)
+                                               + tauL*exp(-(1.0/tauL)*tmin)
+                                               - cosphis* ( tauH*exp(-(1.0/tauH)*tmin) 
+                                                            - tauL*exp(-(1.0/tauL)*tmin) )
+                                               + 2.0 * sinphis * exp (-(1.0/tauBar)*tmin) * gammaDms 
+                                               * ( Dms * cos(Dms*tmin) + (1.0/tauBar)*sin(Dms*tmin)) );
   
   	return (valA-valB);
 }

@@ -168,7 +168,7 @@ int main(int argc, char *argv[]){
 
 	cout << "\\hline" << endl;
 	for(UInt_t i =0; i< param.size(); i++){
-		cout << param[i] << " & 	$ " << mean[i] << " \\pm " << emean[i] << " $	&	$ " << sigma[i] << " \\pm " << esigma[i] << " $   &       $ " << pull[i] << " \\pm " << epull[i] <<  " $   &       $ " << pullw[i] << " \\pm " << epullw[i] << " $	\\\\" << endl;
+		cout << std::setprecision(3) << param[i] << " & 	$ " << mean[i] << " \\pm " << emean[i] << " $	&	$ " << sigma[i] << " \\pm " << esigma[i] << " $   &       $ " << pull[i] << " \\pm " << epull[i] <<  " $   &       $ " << pullw[i] << " \\pm " << epullw[i] << " $	\\\\" << endl;
 	}
 
 	cout << "\\hline" << endl;

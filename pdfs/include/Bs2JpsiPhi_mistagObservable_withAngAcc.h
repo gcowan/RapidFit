@@ -81,7 +81,7 @@ class Bs2JpsiPhi_mistagObservable_withAngAcc : public BasePDF
 		inline double getAzeroAzeroInt(double, double, double, double, double, double, double, double, int);
 		inline double getAparaAparaInt(double, double, double, double, double, double, double, double, int);
 		inline double getAperpAperpInt(double, double, double, double, double, double, double, double, int);
-		inline double getAparaAperpInt(double, double, double, double, double, double, double, double, double, int);
+		inline double getAparaAperpInt(double, double, double, double, double, double, double, double, double, double, int);
 		inline double getAzeroAparaInt(double, double, double, double, double, double, double, double, int);
 		inline double getAzeroAperpInt(double, double, double, double, double, double, double, double, int);
 };

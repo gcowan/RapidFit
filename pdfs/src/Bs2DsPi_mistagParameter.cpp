@@ -21,7 +21,7 @@ Bs2DsPi_mistagParameter::Bs2DsPi_mistagParameter() :
 	, deltaGammaName( "deltaGamma" )
 	, deltaMName    ( "deltaM")
     , mistagName	( "mistag" )
-    , timeresName	( "timeres" )
+    , timeresName	( "timeresDsPi" )
 
 	// Observables
 	, timeName	( "time" )

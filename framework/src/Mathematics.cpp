@@ -16,6 +16,19 @@
 
 namespace Mathematics 
 {
+	// Mathematica integral of the exp * erf
+	//Integrate[(1*Exp[-(x/t) + s^2/(2*t^2)]* Erfc[-((x - s^2/t)/(Sqrt[2]*s))])/2, x] ==
+	//(t*(Erf[x/(Sqrt[2]*s)] - E^((s^2 - 2*t*x)/(2*t^2))* Erfc[(s^2 - t*x)/(Sqrt[2]*s*t)]))/2
+	double expErfInt( double tlimit, double tau, double sigma)
+	{
+        	double val = 0.5 * (tau * ( RooMath::erf( tlimit/(sqrt(2.)*sigma) )
+                                  - exp( (sigma*sigma - 2*tau*tlimit)/(2.*tau*tau) )
+                                  * RooMath::erfc( (sigma*sigma - tau*tlimit)/(sqrt(2.)*sigma*tau) )
+                                  )
+                           );
+        	return val;
+	}
+
 
 //--------------------------- exp and exp*sin and exp*cos time functions -------------------------
 // time functions for use in PDFs with resolution
@@ -86,29 +99,36 @@ namespace Mathematics
 	
 	double ExpInt( double tlow, double thigh, double gamma, double resolution  )  
 	{		
-		if( thigh < tlow ) {
+		if( thigh < tlow ) 
+		{
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
 			return -1.0 ;				
 		}
 		
-		if( resolution > 0. ) {
+		if( resolution > 0. ) 
+		{
 			// This is a placeholder as I havnt put the correct code in yet as i dont know it.
 			// So it only works if time limits are large and start from < 0
+			/*
 			if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
 				std::cerr << " Mathematics::ExpInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
 				return -1. ;				
 			}
 			return (1/gamma) * ( 1.0 - TMath::Exp(-gamma*thigh) ) ;
+			*/
+			return expErfInt(thigh, 1./gamma, resolution) - expErfInt(tlow, 1./gamma, resolution);
 			
 		}
-		
-		else {
+		else
+		{
 			if( tlow < 0. ) return (1/gamma) * ( 1.0 - TMath::Exp(-gamma*thigh) ) ;
 			else return (1/gamma) * ( TMath::Exp(-gamma*tlow) - TMath::Exp(-gamma*thigh) ) ;
 		}
 	}
-	
-	
+
+	// Mathematica integral of the exp * cos * erf
+        //Integrate[(1*Exp[-(x/t) + s^2/(2*t^2)]* Erfc[-((x - s^2/t)/(Sqrt[2]*s))])/2, x] ==
+
 	//.................................................................
 	// Evaluate exponential X cosine with single time resolution
 	
