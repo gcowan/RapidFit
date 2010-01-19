@@ -7,6 +7,8 @@
     PDFs to work.
   - Added average angular acceptance Bs2JpsiPhi PDF.
   - Added helper script to save plotting output to file.
+  - Added Bs2JpsiPhi_mistagParameter_withTimeRes PDF. Not finished yet.
+  - Renamed Bs2JpsiPhi_withTimeRes to Bs2JPsiPhi_mistagObservable_withTimeRes.
 
 2010/01/11 - Greig Cowan
   - Minor bug fixes, AngAcc PDF now compiles, plotting changes.

@@ -10,11 +10,12 @@
 #include "ClassLookUp.h"
 #include "Bs2JpsiPhi.h"
 #include "Bs2JpsiPhi_mistagObservable.h"
+#include "Bs2JpsiPhi_mistagObservable_withTimeRes.h"
 #include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
 #include "Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h"
-#include "Bs2JpsiPhi_withTimeRes.h"
 #include "Bs2JpsiPhi_sWave.h"
 #include "Bs2JpsiPhi_mistagParameter.h"
+#include "Bs2JpsiPhi_mistagParameter_withTimeRes.h"
 #include "Bs2JpsiPhi_mistagParameter_alt.h"
 #include "Bs2JpsiPhiMassSignal.h"
 
@@ -46,6 +47,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagObservable();
         }
+	else if ( Name == "Bs2JpsiPhi_mistagObservable_withTimeRes" )
+        {
+                // Bs2JPsiPhi with analytic double gaussian time resolution
+                return new Bs2JpsiPhi_mistagObservable_withTimeRes();
+        }
         else if ( Name == "Bs2JpsiPhi_mistagObservable_withAngAcc" )
         {
                 //JpsiPhi with angular acceptance fed in as "observables"
@@ -58,23 +64,23 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         }
 	else if ( Name == "Bs2JpsiPhi_mistagParameter" )
         {
-	        //Default JPsiPhi
+	        //Default JPsiPhi with mistag as a physics parameter
 	        return new Bs2JpsiPhi_mistagParameter();
+        }
+	else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes" )
+        {
+	        //Default JPsiPhi with mistag as physics parameter and time res on
+	        return new Bs2JpsiPhi_mistagParameter_withTimeRes();
         }
 	else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
         {
-	        //Default JPsiPhi
+	        //JPsiPhi from Pete with mistag as a physics paramter and single gaussian time res 
 	        return new Bs2JpsiPhi_mistagParameter_alt();
         }
         else if ( Name == "Bs2PhiPhi" )
         {
 	        //Default PhiPhi
                 return new Bs2PhiPhi();
-        }
-	else if ( Name == "Bs2JpsiPhi_withTimeRes" )
-        {
-                // Bs2JPsiPhi with analytic time resolution
-                return new Bs2JpsiPhi_withTimeRes();
         }
         else if ( Name == "Bs2DsPi" )
         {
