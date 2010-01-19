@@ -109,8 +109,10 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			{
 				//Use numerical integration
 				cerr << "Function provides poor integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
-				functionCanIntegrate = false;
-				return numericalIntegral;
+				//functionCanIntegrate = false;
+				//return numericalIntegral;
+				functionCanIntegrate = true;
+				return testIntegral;
 			}
 		}
 		else

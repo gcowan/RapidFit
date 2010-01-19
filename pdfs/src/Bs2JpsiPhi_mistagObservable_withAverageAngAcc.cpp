@@ -1,20 +1,19 @@
-// $Id: Bs2JpsiPhi_mistagObservable_withAngAcc.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
-/** @class Bs2JpsiPhi_mistagObservable_withAngAcc Bs2JpsiPhi_mistagObservable_withAngAcc.cpp
+// $Id: Bs2JpsiPhi_mistagObservable_withAverageAngAcc.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+/** @class Bs2JpsiPhi_mistagObservable_withAverageAngAcc Bs2JpsiPhi_mistagObservable_withAverageAngAcc.cpp
  *
- *  RapidFit PDF for Bs2JpsiPhi with angular acceptance as an observable which
- *  is read in from a file
+ *  RapidFit PDF for Bs2JpsiPhi with average angular acceptance input as a paramter
  *
  *  @author Greig A Cowan greig.alan.cowan@cern.ch
- *  @date 2009-12-14
+ *  @date 2010-01-12
  */
 
-#include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
+#include "Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhi_mistagObservable_withAngAcc::Bs2JpsiPhi_mistagObservable_withAngAcc() : 
+Bs2JpsiPhi_mistagObservable_withAverageAngAcc::Bs2JpsiPhi_mistagObservable_withAverageAngAcc() : 
 	// Physics parameters
 	gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
@@ -25,6 +24,12 @@ Bs2JpsiPhi_mistagObservable_withAngAcc::Bs2JpsiPhi_mistagObservable_withAngAcc()
 	, delta_zeroName( "delta_zero" )
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
+	, angAccI1Name	( "angAccI1" )
+	, angAccI2Name	( "angAccI2" )
+	, angAccI3Name	( "angAccI3" )
+	, angAccI4Name	( "angAccI4" )
+	, angAccI5Name	( "angAccI5" )
+	, angAccI6Name	( "angAccI6" )
 
 	// Observables
 	, timeName	( "time" )
@@ -33,12 +38,6 @@ Bs2JpsiPhi_mistagObservable_withAngAcc::Bs2JpsiPhi_mistagObservable_withAngAcc()
 	, cosPsiName	( "cosPsi" )
 	, tagName	( "tag" )
 	, mistagName	( "mistag" )
-	, angAccI1Name	( "angAccI1" )
-	, angAccI2Name	( "angAccI2" )
-	, angAccI3Name	( "angAccI3" )
-	, angAccI4Name	( "angAccI4" )
-	, angAccI5Name	( "angAccI5" )
-	, angAccI6Name	( "angAccI6" )
 	//, timeres	( "resolution" )
 	, normalisationCacheValid(false)
 , evaluationCacheValid(false)
@@ -47,7 +46,7 @@ Bs2JpsiPhi_mistagObservable_withAngAcc::Bs2JpsiPhi_mistagObservable_withAngAcc()
 }
 
 //Make the data point and parameter set
-void Bs2JpsiPhi_mistagObservable_withAngAcc::MakePrototypes()
+void Bs2JpsiPhi_mistagObservable_withAverageAngAcc::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -56,12 +55,6 @@ void Bs2JpsiPhi_mistagObservable_withAngAcc::MakePrototypes()
 	allObservables.push_back( cosPsiName );
 	allObservables.push_back( tagName );
 	allObservables.push_back( mistagName );
-	allObservables.push_back( angAccI1Name );
-	allObservables.push_back( angAccI2Name );
-	allObservables.push_back( angAccI3Name );
-	allObservables.push_back( angAccI4Name );
-	allObservables.push_back( angAccI5Name );
-	allObservables.push_back( angAccI6Name );
 
 	// Need to think about additional parameters like
 	// event-by-event propertime resolution and acceptance.
@@ -79,18 +72,24 @@ void Bs2JpsiPhi_mistagObservable_withAngAcc::MakePrototypes()
 	parameterNames.push_back( delta_zeroName );
 	parameterNames.push_back( deltaMName );
 	parameterNames.push_back( Phi_sName );
+	parameterNames.push_back( angAccI1Name );
+	parameterNames.push_back( angAccI2Name );
+	parameterNames.push_back( angAccI3Name );
+	parameterNames.push_back( angAccI4Name );
+	parameterNames.push_back( angAccI5Name );
+	parameterNames.push_back( angAccI6Name );
 	allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
 }
 
 //Destructor
-Bs2JpsiPhi_mistagObservable_withAngAcc::~Bs2JpsiPhi_mistagObservable_withAngAcc()
+Bs2JpsiPhi_mistagObservable_withAverageAngAcc::~Bs2JpsiPhi_mistagObservable_withAverageAngAcc()
 {
 }
 
 //Not only set the physics parameters, but indicate that the cache is no longer valid
-bool Bs2JpsiPhi_mistagObservable_withAngAcc::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2JpsiPhi_mistagObservable_withAverageAngAcc::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	normalisationCacheValid = false;
 	evaluationCacheValid = false;
@@ -98,21 +97,15 @@ bool Bs2JpsiPhi_mistagObservable_withAngAcc::SetPhysicsParameters( ParameterSet 
 }
 
 //Return a list of parameters not to be integrated
-vector<string> Bs2JpsiPhi_mistagObservable_withAngAcc::GetDoNotIntegrateList()
+vector<string> Bs2JpsiPhi_mistagObservable_withAverageAngAcc::GetDoNotIntegrateList()
 {
 	vector<string> doNotIntList;
 	doNotIntList.push_back(mistagName);
-	doNotIntList.push_back(angAccI1Name);
-	doNotIntList.push_back(angAccI2Name);
-	doNotIntList.push_back(angAccI3Name);
-	doNotIntList.push_back(angAccI4Name);
-	doNotIntList.push_back(angAccI5Name);
-	doNotIntList.push_back(angAccI6Name);
 	return doNotIntList;
 }
 
 //Calculate the function value
-double Bs2JpsiPhi_mistagObservable_withAngAcc::Evaluate(DataPoint * measurement)
+double Bs2JpsiPhi_mistagObservable_withAverageAngAcc::Evaluate(DataPoint * measurement)
 {
 	// Does not make sense to evaluate this PDF for time < 0
 	double time = measurement->GetObservable( timeName )->GetValue();	
@@ -168,17 +161,17 @@ double Bs2JpsiPhi_mistagObservable_withAngAcc::Evaluate(DataPoint * measurement)
 }
 
 
-double Bs2JpsiPhi_mistagObservable_withAngAcc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhi_mistagObservable_withAverageAngAcc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	// Now need to know the tag and the mistag
 	int q = (int)measurement->GetObservable( tagName )->GetValue();
 	double omega = measurement->GetObservable( mistagName )->GetValue();	
-	double angAccI1 = measurement->GetObservable( angAccI1Name )->GetValue();	
-	double angAccI2 = measurement->GetObservable( angAccI2Name )->GetValue();	
-	double angAccI3 = measurement->GetObservable( angAccI3Name )->GetValue();	
-	double angAccI4 = measurement->GetObservable( angAccI4Name )->GetValue();	
-	double angAccI5 = measurement->GetObservable( angAccI5Name )->GetValue();	
-	double angAccI6 = measurement->GetObservable( angAccI6Name )->GetValue();	
+	double angAccI1 = allParameters.GetPhysicsParameter( angAccI1Name )->GetValue();	
+	double angAccI2 = allParameters.GetPhysicsParameter( angAccI2Name )->GetValue();	
+	double angAccI3 = allParameters.GetPhysicsParameter( angAccI3Name )->GetValue();	
+	double angAccI4 = allParameters.GetPhysicsParameter( angAccI4Name )->GetValue();	
+	double angAccI5 = allParameters.GetPhysicsParameter( angAccI5Name )->GetValue();	
+	double angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();	
 
 	double epsilon[3];
 	epsilon[0] = omega;
@@ -228,7 +221,7 @@ double Bs2JpsiPhi_mistagObservable_withAngAcc::Normalisation(DataPoint * measure
 	return w1*v1 + w2*v2;
 }
 
-void Bs2JpsiPhi_mistagObservable_withAngAcc::getAngularFunctions( double & f1
+void Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getAngularFunctions( double & f1
 		, double & f2
 		, double & f3
 		, double & f4
@@ -266,7 +259,7 @@ void Bs2JpsiPhi_mistagObservable_withAngAcc::getAngularFunctions( double & f1
 	return;
 }
 
-void Bs2JpsiPhi_mistagObservable_withAngAcc::getTimeDependentAmplitudes(  double & AzeroAzero
+void Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getTimeDependentAmplitudes(  double & AzeroAzero
 		, double & AparaApara
 		, double & AperpAperp
 		, double & ImAparaAperp
@@ -327,7 +320,7 @@ void Bs2JpsiPhi_mistagObservable_withAngAcc::getTimeDependentAmplitudes(  double
 	return;
 }
 
-void Bs2JpsiPhi_mistagObservable_withAngAcc::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
+void Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 		, double & AparaAparaInt
 		, double & AperpAperpInt
 		, double & AparaAperpInt
@@ -389,7 +382,7 @@ AzeroAzero[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AzeroAzeroInt = CForm[FullSimplify[ Integrate[ AzeroAzero[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAzeroAzeroInt(double tmin, double tmax, 
+inline double Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getAzeroAzeroInt(double tmin, double tmax, 
 		double AA, double tauL, double tauH, double tauBar, double Dms, double phis, int Btype)
 {
 
@@ -416,7 +409,7 @@ AparaApara[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AparaAparaInt = CForm[FullSimplify[ Integrate[ AparaApara[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAparaAparaInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getAparaAparaInt(double tmin, double tmax,
 		double AA, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
 {
 
@@ -443,7 +436,7 @@ AperpAperp[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
                                     - Btype * sinPhis * Sin[deltaMs*t] );
 AperpAperpInt = CForm[FullSimplify[ Integrate[ AperpAperp[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAperpAperpInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getAperpAperpInt(double tmin, double tmax,
 		double AA, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
 {
 
@@ -470,7 +463,7 @@ AparaAperp[t_] := Exp[-gamma*t] * (-cosDeltaPerpMinusPara * sinPhis * Sinh[delta
                                     - Btype * cosDeltaPerpMinusPara * cosPhis * Sinh[deltaGamma*t/2] );
 AparaAperpInt = CForm[FullSimplify[ Integrate[ AparaAperp[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAparaAperpInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getAparaAperpInt(double tmin, double tmax,
 		double AA, double gamma, double deltaGamma, double deltaMs, double phis, 
 		double delta_perp, double delta_para, int Btype) 
 {
@@ -524,7 +517,7 @@ AzeroApara[t_] := Exp[-gamma*t] * cosDeltaPara * (Cosh[deltaGamma*t/2]
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AzeroAparaInt = CForm[FullSimplify[ Integrate[ AzeroApara[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAzeroAparaInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getAzeroAparaInt(double tmin, double tmax,
 		double AA, double gamma, double deltaGamma, double deltaMs, double phis, double delta_para, int Btype) 
 {
 	double cosPhis = cos(phis);
@@ -563,7 +556,7 @@ AzeroAperp[t_] := Exp[-gamma*t] * ( - cosDeltaPerp * sinPhis * Sinh[deltaGamma*t
                                     - Btype * cosDeltaPerp * cosPhis * Sin[deltaMs*t] );
 AzeroAperpInt = CForm[FullSimplify[ Integrate[ AzeroAperp[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAzeroAperpInt(double tmin, double tmax,
+inline double Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getAzeroAperpInt(double tmin, double tmax,
 		double AA, double gamma, double deltaGamma, double deltaMs, double phis, double delta_perp, int Btype)
 {
 	double cosPhis = cos(phis);
@@ -583,7 +576,7 @@ inline double Bs2JpsiPhi_mistagObservable_withAngAcc::getAzeroAperpInt(double tm
 	return AA * v;
 }
 
-void Bs2JpsiPhi_mistagObservable_withAngAcc::getPhysicsParameters( double & gamma
+void Bs2JpsiPhi_mistagObservable_withAverageAngAcc::getPhysicsParameters( double & gamma
 		, double & deltaGamma
 		, double & deltaM
 		, double & Phi_s

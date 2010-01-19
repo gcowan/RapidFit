@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhi_mistagObservable_withAngAcc.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
-/** @class Bs2JpsiPhi_mistagObservable_withAngAcc Bs2JpsiPhi_mistagObservable_withAngAcc.h
+// $Id: Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+/** @class Bs2JpsiPhi_mistagObservable_withAverageAngAcc Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
@@ -7,16 +7,16 @@
  *  @date 2009-07-30
  */
 
-#ifndef Bs2JpsiPhi_mistagObservable_withAngAcc_H
-#define Bs2JpsiPhi_mistagObservable_withAngAcc_H
+#ifndef Bs2JpsiPhi_mistagObservable_withAverageAngAcc_H
+#define Bs2JpsiPhi_mistagObservable_withAverageAngAcc_H
 
 #include "BasePDF.h"
 
-class Bs2JpsiPhi_mistagObservable_withAngAcc : public BasePDF
+class Bs2JpsiPhi_mistagObservable_withAverageAngAcc : public BasePDF
 {
 	public:
-		Bs2JpsiPhi_mistagObservable_withAngAcc();
-		~Bs2JpsiPhi_mistagObservable_withAngAcc();
+		Bs2JpsiPhi_mistagObservable_withAverageAngAcc();
+		~Bs2JpsiPhi_mistagObservable_withAverageAngAcc();
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
@@ -54,6 +54,12 @@ class Bs2JpsiPhi_mistagObservable_withAngAcc : public BasePDF
 		string delta_zeroName;	// strong phase, set to 0
 		string delta_paraName;	// strong phase
 		string delta_perpName;	// strong phase
+		string angAccI1Name;		// Pre-calculated angular integrals including acceptance
+		string angAccI2Name;		// 
+		string angAccI3Name;		// 
+		string angAccI4Name;		// 
+		string angAccI5Name;		// 
+		string angAccI6Name;		// 
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
@@ -65,12 +71,6 @@ class Bs2JpsiPhi_mistagObservable_withAngAcc : public BasePDF
 					// in phi rest frame
 		string tagName;		// B tag
 		string mistagName;		// B mistag
-		string angAccI1Name;		// Pre-calculated angular integrals including acceptance
-		string angAccI2Name;		// 
-		string angAccI3Name;		// 
-		string angAccI4Name;		// 
-		string angAccI5Name;		// 
-		string angAccI6Name;		// 
 	
 		void getPhysicsParameters( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
 		void getAngularFunctions( double&, double&, double&, double&, double&, double&, DataPoint*);

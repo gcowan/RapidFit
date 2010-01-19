@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/01/19 - Greig Cowan
+  - IMPORTANT: changed default integration to ANALYTIC when there is
+    a difference between the numerical and analytic integrations of a
+    PDF. This is needed for the moment to get the angular acceptance
+    PDFs to work.
+  - Added average angular acceptance Bs2JpsiPhi PDF.
+  - Added helper script to save plotting output to file.
+
 2010/01/11 - Greig Cowan
   - Minor bug fixes, AngAcc PDF now compiles, plotting changes.
   - Limited the precision that rapidresults prints out to improve

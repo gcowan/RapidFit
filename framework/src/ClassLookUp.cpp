@@ -10,6 +10,8 @@
 #include "ClassLookUp.h"
 #include "Bs2JpsiPhi.h"
 #include "Bs2JpsiPhi_mistagObservable.h"
+#include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
+#include "Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h"
 #include "Bs2JpsiPhi_withTimeRes.h"
 #include "Bs2JpsiPhi_sWave.h"
 #include "Bs2JpsiPhi_mistagParameter.h"
@@ -43,6 +45,16 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagObservable();
+        }
+        else if ( Name == "Bs2JpsiPhi_mistagObservable_withAngAcc" )
+        {
+                //JpsiPhi with angular acceptance fed in as "observables"
+                return new Bs2JpsiPhi_mistagObservable_withAngAcc();
+        }
+        else if ( Name == "Bs2JpsiPhi_mistagObservable_withAverageAngAcc" )
+        {
+                //JpsiPhi with angular acceptance fed in as fixed physics parameters
+                return new Bs2JpsiPhi_mistagObservable_withAverageAngAcc();
         }
 	else if ( Name == "Bs2JpsiPhi_mistagParameter" )
         {
