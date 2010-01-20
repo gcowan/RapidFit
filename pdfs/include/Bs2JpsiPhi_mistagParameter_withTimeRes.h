@@ -35,8 +35,9 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes : public BasePDF
 
 		//Cached values
 		double cachedv1, cachedv2;
-		double cachedAzero, cachedApara, cachedAperp, cachedsinDeltaPerpPara, cachedcosDeltaPerpPara, cachedsinDeltaPerp;
-		double cachedcosDeltaPerp, cachedcosDeltaPara, cachedsinPhis, cachedcosPhis;
+		double cachedAzero, cachedApara, cachedAperp, cachedSinDeltaPerpPara, cachedCosDeltaPerpPara, cachedSinDeltaPerp;
+		double cachedCosDeltaPerp, cachedCosDeltaPara, cachedSinPhis, cachedCosPhis;
+		double cachedExpCosh, cachedExpSinh, cachedExpCos, cachedExpSin;
 		bool normalisationCacheValid, evaluationCacheValid;
 
 		// These contain the strings that correspond
@@ -53,11 +54,7 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes : public BasePDF
 		string delta_paraName;	// strong phase
 		string delta_perpName;	// strong phase
 		string mistagName;	// B mistag
-                string mean_time_res1Name; // propertime resolution parameters. Double Gaussian used.
-                string mean_time_res2Name;
-                string sigma_time_res1Name;
-                string sigma_time_res2Name;
-                string frac_time_res1Name;
+                string timeResName; // propertime resolution parameters. Double Gaussian used.
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
@@ -69,15 +66,11 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes : public BasePDF
 					// in phi rest frame
 		string tagName;		// B tag
 	
-		void getPhysicsParameters( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double& );
+		void getPhysicsParameters( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double& );
 		void getAngularFunctions( double&, double&, double&, double&, double&, double&, DataPoint*);
 		
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, DataPoint*, int);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, PhaseSpaceBoundary*, int);
-
-		inline double getAzeroAzeroInt(double, double, double, double, double, double, double, double, int);
-		inline double getAparaAparaInt(double, double, double, double, double, double, double, double, int);
-		inline double getAperpAperpInt(double, double, double, double, double, double, double, double, int);
 };
 
 #endif

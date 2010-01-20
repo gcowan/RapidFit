@@ -1,5 +1,14 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/01/20 - Greig Cowan
+  - Finished Bs2JpsiPhi_mistagParameter_withTimeRes and corresponding
+    helper functions in Mathematics namespace. With time resolution off
+    this PDF gives identical result to Bs2JpsiPhi_mistagParameter (which
+    knows nothing about time resolution). This means we can remove 
+    Bs2JpsiPhi_mistagParameter altogether and if we want to use it again, 
+    just set timeRes=0 in Bs2JpsiPhi_mistagParameter_withTimeRes. Still
+    need to get ExpCosInt and ExpSinInt to work between arbitrary limits.
+
 2010/01/19 - Greig Cowan
   - IMPORTANT: changed default integration to ANALYTIC when there is
     a difference between the numerical and analytic integrations of a

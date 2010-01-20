@@ -18,6 +18,10 @@ namespace Mathematics
 	
 	double Exp( double t, double gamma, double resolution )  ;
 	double ExpInt( double tlow, double thigh, double gamma, double resolution  )  ;
+	double ExpCosh( double t, double gamma, double deltaGamma, double resolution ) ;
+	double ExpCoshInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )  ;
+	double ExpSinh( double t, double gamma, double deltaGamma, double resolution )  ;
+	double ExpSinhInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )  ;
 	double ExpCos( double t, double gamma, double deltaM, double resolution ) ;
 	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )  ;
 	double ExpSin( double t, double gamma, double deltaM, double resolution )  ;

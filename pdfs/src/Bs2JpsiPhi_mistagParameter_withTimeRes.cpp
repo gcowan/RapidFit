@@ -9,6 +9,7 @@
  */
 
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes.h"
+#include "Mathematics.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
@@ -27,11 +28,7 @@ Bs2JpsiPhi_mistagParameter_withTimeRes::Bs2JpsiPhi_mistagParameter_withTimeRes()
 	, delta_perpName( "delta_perp" )
     	, mistagName	( "mistag" )
         // Time resolution parameters (will be fitted for)
-        , mean_time_res1Name ( "mean_time_res1" )
-        , mean_time_res2Name ( "mean_time_res2" )
-        , sigma_time_res1Name( "sigma_time_res1" )
-        , sigma_time_res2Name( "sigma_time_res2" )
-        , frac_time_res1Name ( "frac_time_res1" )
+        , timeResName ( "timeRes" )
 
 	// Observables
 	, timeName	( "time" )
@@ -75,11 +72,7 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes::MakePrototypes()
 	parameterNames.push_back( deltaMName );
 	parameterNames.push_back( Phi_sName );
 	parameterNames.push_back( mistagName );
-	parameterNames.push_back( mean_time_res1Name );
-        parameterNames.push_back( mean_time_res2Name );
-        parameterNames.push_back( sigma_time_res1Name );
-        parameterNames.push_back( sigma_time_res2Name );
-        parameterNames.push_back( frac_time_res1Name );
+	parameterNames.push_back( timeResName );
 	allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -135,8 +128,8 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes::Evaluate(DataPoint * measurement)
 	double gamma, deltaGamma, deltaMs, Phi_s;
 	double Azero_sq, Apara_sq, Aperp_sq;
 	double delta_zero, delta_para, delta_perp;
-	double omega ;
-	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, delta_zero, delta_para, delta_perp, omega);
+	double omega, timeRes;
+	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, delta_zero, delta_para, delta_perp, omega, timeRes);
 	
 	double epsilon[3];
   	epsilon[0] = omega;
@@ -173,8 +166,8 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes::Normalisation(DataPoint * measure
 	double gamma, deltaGamma, deltaMs, Phi_s;
 	double Azero_sq, Apara_sq, Aperp_sq;
 	double delta_zero, delta_para, delta_perp;
-	double omega ;
-	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, delta_zero, delta_para, delta_perp, omega);
+	double omega, timeRes;
+	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, delta_zero, delta_para, delta_perp, omega, timeRes);
 		
 	double epsilon[3];
   	epsilon[0] = omega;
@@ -261,8 +254,8 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes::getTimeDependentAmplitudes(  double
 	double gamma, deltaGamma, deltaMs, Phi_s;
 	double Azero_sq, Apara_sq, Aperp_sq;
 	double delta_zero, delta_para, delta_perp;
-	double omega ;
-	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, delta_zero, delta_para, delta_perp, omega);
+	double omega, timeRes;
+	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, delta_zero, delta_para, delta_perp, omega, timeRes);
 	
 	// Quantities depending only on physics parameters can be cached
 	if ( !evaluationCacheValid )
@@ -271,47 +264,49 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes::getTimeDependentAmplitudes(  double
 		cachedApara = sqrt( Apara_sq );
 		cachedAperp = sqrt( Aperp_sq );
 	
-		cachedsinDeltaPerpPara	= sin( delta_perp - delta_para );
-		cachedcosDeltaPerpPara	= cos( delta_perp - delta_para );
-		cachedsinDeltaPerp	= sin( delta_perp );
-		cachedcosDeltaPerp	= cos( delta_perp );
-		cachedcosDeltaPara	= cos( delta_para );
+		cachedSinDeltaPerpPara	= sin( delta_perp - delta_para );
+		cachedCosDeltaPerpPara	= cos( delta_perp - delta_para );
+		cachedSinDeltaPerp	= sin( delta_perp );
+		cachedCosDeltaPerp	= cos( delta_perp );
+		cachedCosDeltaPara	= cos( delta_para );
 	
-		cachedsinPhis = sin( Phi_s );
-		cachedcosPhis = cos( Phi_s );
+		cachedSinPhis = sin( Phi_s );
+		cachedCosPhis = cos( Phi_s );
+
 		evaluationCacheValid = true;
 	}
+		
+        // We always calculate things for the B first, and these are the same for the Bbar
+        if ( Btype == 1 )
+        {
+		cachedExpCosh = Mathematics::ExpCosh( time, gamma, deltaGamma, timeRes );
+		cachedExpSinh = Mathematics::ExpSinh( time, gamma, deltaGamma, timeRes);
+		cachedExpCos  = Mathematics::ExpCos(  time, gamma, deltaMs, timeRes );
+		cachedExpSin  = Mathematics::ExpSin(  time, gamma, deltaMs, timeRes );
+	}
 
-	// Quantities depending on time cannot be cached
-	double expGT = exp( -gamma*time );
-	double coshDeltaGammaT = cosh( deltaGamma*time/2.);
-	double sinhDeltaGammaT = sinh( deltaGamma*time/2.);
-	double sinDeltaMsT = sin( deltaMs*time );
-	double cosDeltaMsT = cos( deltaMs*time );
-	
-	// Now calculate the amplitudes
-	AzeroAzero = Azero_sq * expGT * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + Btype * cachedsinPhis * sinDeltaMsT ); 
-	AparaApara = Apara_sq * expGT * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + Btype * cachedsinPhis * sinDeltaMsT ); 
-	AperpAperp = Aperp_sq * expGT * ( coshDeltaGammaT + cachedcosPhis * sinhDeltaGammaT - Btype * cachedsinPhis * sinDeltaMsT ); 
-	
-	ImAparaAperp = cachedApara*cachedAperp * expGT * ( - cachedcosDeltaPerpPara * cachedsinPhis * sinhDeltaGammaT 
-					       + Btype * cachedsinDeltaPerpPara * cosDeltaMsT
-					       - Btype * cachedcosDeltaPerpPara * cachedcosPhis * sinDeltaMsT );
+	AzeroAzero = Azero_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin ); 
+	AparaApara = Apara_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin ); 
+	AperpAperp = Aperp_sq * ( cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin ); 
 
-	ReAzeroApara = cachedAzero*cachedApara * expGT * cachedcosDeltaPara * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT
-							    + Btype * cachedsinPhis * sinDeltaMsT );
+	ImAparaAperp = cachedApara*cachedAperp * ( - cachedCosDeltaPerpPara * cachedSinPhis * cachedExpSinh 
+					       + Btype * cachedSinDeltaPerpPara * cachedExpCos
+					       - Btype * cachedCosDeltaPerpPara * cachedCosPhis * cachedExpSin );
 
-	ImAzeroAperp = cachedAzero*cachedAperp * expGT * ( - cachedcosDeltaPerp * cachedsinPhis * sinhDeltaGammaT
-                                               + Btype * cachedsinDeltaPerp * cosDeltaMsT 
-                                               - Btype * cachedcosDeltaPerp * cachedcosPhis * sinDeltaMsT );
+	ReAzeroApara = cachedAzero*cachedApara * cachedCosDeltaPara * ( cachedExpCosh - cachedCosPhis * cachedExpSinh
+							    + Btype * cachedSinPhis * cachedExpSin );
+
+	ImAzeroAperp = cachedAzero*cachedAperp * ( - cachedCosDeltaPerp * cachedSinPhis * cachedExpSinh
+                                               + Btype * cachedSinDeltaPerp * cachedExpCos 
+                                               - Btype * cachedCosDeltaPerp * cachedCosPhis * cachedExpSin );
 	return;
 }
 
 void Bs2JpsiPhi_mistagParameter_withTimeRes::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
                                                  , double & AparaAparaInt
                                                  , double & AperpAperpInt
-												 , PhaseSpaceBoundary * boundary
-												 , int Btype)
+						 , PhaseSpaceBoundary * boundary
+						 , int Btype)
 {
 	double tlow = 0.;
 	double thigh = 0.;
@@ -335,87 +330,20 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes::getTimeAmplitudeIntegrals( double &
 	double gamma, deltaGamma, deltaMs, Phi_s;
 	double Azero_sq, Apara_sq, Aperp_sq;
 	double delta_zero, delta_para, delta_perp;
-	double omega ;
-	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, delta_zero, delta_para, delta_perp, omega);
+	double omega, timeRes;
+	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, delta_zero, delta_para, delta_perp, omega, timeRes);
 	
-	double G_H    = gamma - 0.5*deltaGamma;
-	double G_L    = gamma + 0.5*deltaGamma;
+	double cosPhis = cos(Phi_s);
+	double sinPhis = sin(Phi_s);
+	double expCoshInt = Mathematics::ExpCoshInt( tlow, thigh, gamma, deltaGamma, timeRes );
+	double expSinhInt = Mathematics::ExpSinhInt( tlow, thigh, gamma, deltaGamma, timeRes );
+	double expSinInt  = Mathematics::ExpSinInt(  tlow, thigh, gamma, deltaMs, timeRes );
 	
-	double tauH   = (1.0 / G_H);
-	double tauL   = (1.0 / G_L);
-	double tauBar = (1.0 / gamma);
-
-	AzeroAzeroInt = getAzeroAzeroInt( tlow, thigh, Azero_sq, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
-	AparaAparaInt = getAparaAparaInt( tlow, thigh, Apara_sq, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
-	AperpAperpInt = getAperpAperpInt( tlow, thigh, Aperp_sq, tauL, tauH, tauBar, deltaMs, Phi_s, Btype);
+        AzeroAzeroInt = Azero_sq * ( expCoshInt - cosPhis * expSinhInt + Btype * sinPhis * expSinInt );
+        AparaAparaInt = Apara_sq * ( expCoshInt - cosPhis * expSinhInt + Btype * sinPhis * expSinInt );
+        AperpAperpInt = Aperp_sq * ( expCoshInt + cosPhis * expSinhInt - Btype * sinPhis * expSinInt );
 	// No contribution from interference terms here since they drop out when the angular integration is done.
 	return;
-}
-
-
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes::getAzeroAzeroInt(double tmin, double tmax, 
-							   double k0, double tauL, double tauH, double tauBar, double Dms, double phis, int Btype)
-{
-  
-	double gammaDms = (1.0 / (((1.0/tauBar)*(1.0/tauBar)) + (Dms*Dms)) );
-	double cosphis = cos(phis);
-	double sinphis = sin(phis);
-	
-	double valB = 0.5*k0*((1.0+cosphis)*(tauL)*exp(-(1.0/tauL)*tmax)
-                        +(1.0-cosphis)*(tauH)*exp(-(1.0/tauH)*tmax)
-                        + Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)*sin(Dms*tmax)
-                                                                          +Dms*cos(Dms*tmax))));
-  
-	double valA = 0.5*k0*((1.0+cosphis)*(tauL)*exp(-(1.0/tauL)*tmin)
-                        +(1.0-cosphis)*(tauH)*exp(-(1.0/tauH)*tmin)
-                        + Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(Dms*tmin)
-                                                                          +Dms*cos(Dms*tmin))));
-  
-	return (valA-valB);
-}
-
-
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes::getAparaAparaInt(double tmin, double tmax,
-					double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
-{
-	
-	double gammaDms = (1.0 / (((1.0/tauBar)*(1.0/tauBar)) + (Dms*Dms)) );
-	double cosphis = cos(phis);
-	double sinphis = sin(phis);
-	
-	double valB = 0.5*k0*((1.0+cosphis)*(tauL)*exp(-(1.0/tauL)*tmax)
-						  +(1.0-cosphis)*(tauH)*exp(-(1.0/tauH)*tmax)
-						  + Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)*sin(Dms*tmax)
-																			+Dms*cos(Dms*tmax))));
-	
-	double valA = 0.5*k0*((1.0+cosphis)*(tauL)*exp(-(1.0/tauL)*tmin)
-						  +(1.0-cosphis)*(tauH)*exp(-(1.0/tauH)*tmin)
-						  + Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(Dms*tmin)
-																			+Dms*cos(Dms*tmin))));
-	
-	return (valA-valB);	
-}
-
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes::getAperpAperpInt(double tmin, double tmax,
-							   double k0, double tauL, double tauH, double tauBar,double Dms, double phis, int Btype)
-{
-	
-	double gammaDms = (1.0 / (((1.0/tauBar)*(1.0/tauBar)) + (Dms*Dms)) );
-	double cosphis = cos(phis);
-	double sinphis = sin(phis);
-	
-	double valB =  0.5*k0*((1.0-cosphis)*(tauL)*exp(-(1.0/tauL)*tmax)
-						   +(1.0+cosphis)*(tauH)*exp(-(1.0/tauH)*tmax)
-						   - Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)*sin(Dms*tmax)
-																			 +Dms*cos(Dms*tmax))));
-	
-	double valA =  0.5*k0*((1.0-cosphis)*(tauL)*exp(-(1.0/tauL)*tmin)
-						   +(1.0+cosphis)*(tauH)*exp(-(1.0/tauH)*tmin)
-						   - Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(Dms*tmin)
-																			 +Dms*cos(Dms*tmin))));
-//	this was wrong															+Dms*cos(Dms*tmax))));
-	
-	return (valA-valB);
 }
 
 void Bs2JpsiPhi_mistagParameter_withTimeRes::getPhysicsParameters( double & gamma
@@ -428,11 +356,12 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes::getPhysicsParameters( double & gamm
 					, double & delta_zero 
 					, double & delta_para
 					, double & delta_perp
-					, double & omega  )
+					, double & omega  
+					, double & timeRes  )
 {
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
-    deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
+	deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 	deltaM     = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 	Phi_s      = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
 	Azero_sq   = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
@@ -442,6 +371,7 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes::getPhysicsParameters( double & gamm
 	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
 	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
 	omega = allParameters.GetPhysicsParameter( mistagName )->GetValue();
+	timeRes = allParameters.GetPhysicsParameter( timeResName )->GetValue();
 
 	Apara_sq = 1 - Azero_sq - Aperp_sq;
 

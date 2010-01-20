@@ -20,7 +20,7 @@
 
 		<PhysicsParameter>
 			<Name>Aperp_sq</Name>
-			<Value>0.207</Value>
+			<Value>0.16</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Fixed</Type>
@@ -29,7 +29,7 @@
 
 		<PhysicsParameter>
 			<Name>Azero_sq</Name>
-			<Value>0.56</Value>
+			<Value>0.60</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
 			<Type>Fixed</Type>
@@ -38,7 +38,7 @@
 
 		<PhysicsParameter>
 			<Name>delta_para</Name>
-			<Value>-2.93</Value>
+			<Value>2.50</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
 			<Type>Fixed</Type>
@@ -47,7 +47,7 @@
 
 		<PhysicsParameter>
 			<Name>delta_perp</Name>
-			<Value>2.91</Value>
+			<Value>-0.17</Value>
 			<Minimum>-3.14159</Minimum>
 			<Maximum>3.14159</Maximum>
 			<Type>Fixed</Type>
@@ -67,7 +67,7 @@
 			<Minimum>17.0</Minimum>
                         <Maximum>19.0</Maximum>
 			<Type>Fixed</Type>
-			<Unit>MeV/c2</Unit>
+			<Unit>MeV/c^{2}</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
@@ -81,48 +81,20 @@
 		
 		<PhysicsParameter>
 			<Name>Phi_s</Name>
-			<Value>-0.0368</Value>
+			<Value>-0.7</Value>
 			<Minimum>-3.14</Minimum>
 			<Maximum>3.14</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
                 <PhysicsParameter>
-                        <Name>mean_time_res1</Name>
+                        <Name>timeRes</Name>
                         <Value>0.0</Value>
                         <Type>Fixed</Type>
                         <Unit>ps</Unit>
                 </PhysicsParameter>
 
-                <PhysicsParameter>
-                        <Name>sigma_time_res1</Name>
-                        <Value>0.0315</Value>
-                        <Type>Fixed</Type>
-                        <Unit>ps</Unit>
-                </PhysicsParameter>
-
-                <PhysicsParameter>
-                        <Name>mean_time_res2</Name>
-                        <Value>0.0</Value>
-                        <Type>Fixed</Type>
-                        <Unit>ps</Unit>
-                </PhysicsParameter>
-
-                <PhysicsParameter>
-                        <Name>sigma_time_res2</Name>
-                        <Value>0.0667</Value>
-                        <Type>Fixed</Type>
-                        <Unit>ps</Unit>
-                </PhysicsParameter>
-
-                <PhysicsParameter>
-                        <Name>frac_time_res1</Name>
-                        <Value>0.85</Value>
-                        <Type>Fixed</Type>
-                        <Unit>Unitless</Unit>
-                </PhysicsParameter>
-                
 	</ParameterSet>
 
 	// Minimising with Minuit2
@@ -130,16 +102,11 @@
 
 	// Requesting two contour plots, pull plots and time projection
 	<Output>
-		<ContourPlot>
-			<XParameter>gamma</XParameter>
-			<YParameter>deltaGamma</YParameter>
-		</ContourPlot>
 	</Output>
 
 	// Minimising weighted NLL
 	<FitFunction>
 		<FunctionName>NegativeLogLikelihood</FunctionName>
-		<WeightName>eventWeight</WeightName>
 	</FitFunction>
 
 	// Single fit
@@ -148,12 +115,14 @@
 	// 100000 toy events
 	<ToFit>
 		<PDF>
-			<Name>Bs2DsPi</Name>
+			<Name>Bs2JpsiPhi_mistagParameter</Name>
 		</PDF>
 
 		<DataSet>
-			<Source>Foam</Source>
-			<NumberEvents>80000</NumberEvents>
+			<Source>File</Source>
+			<FileName>../../data/observables_MC09_Bs2JpsiPhi_lhcb_conventions.root</FileName>
+			<NTuplePath>dataNTuple</NTuplePath>
+			<NumberEvents>10000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
@@ -161,12 +130,6 @@
 					<Maximum>15.0</Maximum>
 					<Unit>ps</Unit>
 				</Observable>
-
-                                <Observable>
-                                        <Name>timeErr</Name>
-                        		<Value>1.0</Value>
-                                        <Unit>ps</Unit>
-                                </Observable>
 
 				<Observable>
 					<Name>cosTheta</Name>
@@ -191,20 +154,7 @@
 
 				<Observable>
 					<Name>tag</Name>
-					<Value>1.0</Value>
-					<Value>-1.0</Value>
-					<Unit>Unitless</Unit>
-				</Observable>
-
-				<Observable>
-					<Name>mistag</Name>
-					<Value>0.33</Value>
-					<Unit>Unitless</Unit>
-				</Observable>
-
-				<Observable>
-					<Name>eventWeight</Name>
-					<Value>1.0</Value>
+					<Value>0.0</Value>
 					<Unit>Unitless</Unit>
 				</Observable>
 
