@@ -16,6 +16,7 @@
 #include "Bs2JpsiPhi_sWave.h"
 #include "Bs2JpsiPhi_mistagParameter.h"
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes.h"
+#include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h"
 #include "Bs2JpsiPhi_mistagParameter_alt.h"
 #include "Bs2JpsiPhiMassSignal.h"
 
@@ -71,6 +72,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 	        //Default JPsiPhi with mistag as physics parameter and time res on
 	        return new Bs2JpsiPhi_mistagParameter_withTimeRes();
+        }
+	else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
+        {
+	        //Default JPsiPhi with mistag as physics parameter, average ang acc and time res on
+	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc();
         }
 	else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
         {
