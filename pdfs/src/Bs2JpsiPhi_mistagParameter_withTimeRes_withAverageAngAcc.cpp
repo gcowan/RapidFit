@@ -142,8 +142,6 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Evaluate(DataPo
         double cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
 	int q = (int)measurement->GetObservable( tagName )->GetValue();
 
-	if ( time < 0. ) return 0.;
-
 	// The angular functions f1->f6 as defined in roadmap Table 1.
 	double f1, f2, f3, f4, f5, f6;
 	Mathematics::getBs2JpsiPhiAngularFunctions( f1, f2, f3, f4, f5, f6, cosTheta, phi, cosPsi );	
@@ -263,39 +261,43 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getTimeDependentA
 		cachedApara = sqrt( Apara_sq );
 		cachedAperp = sqrt( Aperp_sq );
 
-		cachedsinDeltaPerpPara	= sin( delta_perp - delta_para );
-		cachedcosDeltaPerpPara	= cos( delta_perp - delta_para );
-		cachedsinDeltaPerp	= sin( delta_perp );
-		cachedcosDeltaPerp	= cos( delta_perp );
-		cachedcosDeltaPara	= cos( delta_para );
+		cachedSinDeltaPerpPara	= sin( delta_perp - delta_para );
+		cachedCosDeltaPerpPara	= cos( delta_perp - delta_para );
+		cachedSinDeltaPerp	= sin( delta_perp );
+		cachedCosDeltaPerp	= cos( delta_perp );
+		cachedCosDeltaPara	= cos( delta_para );
 
-		cachedsinPhis = sin( Phi_s );
-		cachedcosPhis = cos( Phi_s );
+		cachedSinPhis = sin( Phi_s );
+		cachedCosPhis = cos( Phi_s );
 		evaluationCacheValid = true;
 	}
 
-	// Quantities depending on time cannot be cached
-	double expGT = exp( -gamma*time );
-	double coshDeltaGammaT = cosh( deltaGamma*time/2.);
-	double sinhDeltaGammaT = sinh( deltaGamma*time/2.);
-	double sinDeltaMsT = sin( deltaMs*time );
-	double cosDeltaMsT = cos( deltaMs*time );
+        // We always calculate things for the B first, and these are the same for the Bbar
+        if ( Btype == 1 )
+        {
+                cachedExpCosh = Mathematics::ExpCosh( time, gamma, deltaGamma, timeRes );
+                cachedExpSinh = Mathematics::ExpSinh( time, gamma, deltaGamma, timeRes);
+                cachedExpCos  = Mathematics::ExpCos(  time, gamma, deltaMs, timeRes );
+                cachedExpSin  = Mathematics::ExpSin(  time, gamma, deltaMs, timeRes );
+        }
 
+	//cout << gamma << " " << deltaGamma << " " << Azero_sq << " " << Aperp_sq << endl;
+	//cout << cachedExpCosh << " " << cachedExpSinh << " " << cachedExpCos << " " << cachedExpSin << endl;
 	// Now calculate the amplitudes
-	AzeroAzero = Azero_sq * expGT * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + Btype * cachedsinPhis * sinDeltaMsT ); 
-	AparaApara = Apara_sq * expGT * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + Btype * cachedsinPhis * sinDeltaMsT ); 
-	AperpAperp = Aperp_sq * expGT * ( coshDeltaGammaT + cachedcosPhis * sinhDeltaGammaT - Btype * cachedsinPhis * sinDeltaMsT ); 
+        AzeroAzero = Azero_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
+        AparaApara = Apara_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
+        AperpAperp = Aperp_sq * ( cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin );
 
-	ImAparaAperp = cachedApara*cachedAperp * expGT * ( - cachedcosDeltaPerpPara * cachedsinPhis * sinhDeltaGammaT 
-			+ Btype * cachedsinDeltaPerpPara * cosDeltaMsT
-			- Btype * cachedcosDeltaPerpPara * cachedcosPhis * sinDeltaMsT );
+        ImAparaAperp = cachedApara*cachedAperp * ( - cachedCosDeltaPerpPara * cachedSinPhis * cachedExpSinh
+                                               + Btype * cachedSinDeltaPerpPara * cachedExpCos
+                                               - Btype * cachedCosDeltaPerpPara * cachedCosPhis * cachedExpSin );
 
-	ReAzeroApara = cachedAzero*cachedApara * expGT * cachedcosDeltaPara * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT
-			+ Btype * cachedsinPhis * sinDeltaMsT );
+        ReAzeroApara = cachedAzero*cachedApara * cachedCosDeltaPara * ( cachedExpCosh - cachedCosPhis * cachedExpSinh
+                                                            + Btype * cachedSinPhis * cachedExpSin );
 
-	ImAzeroAperp = cachedAzero*cachedAperp * expGT * ( - cachedcosDeltaPerp * cachedsinPhis * sinhDeltaGammaT
-			+ Btype * cachedsinDeltaPerp * cosDeltaMsT 
-			- Btype * cachedcosDeltaPerp * cachedcosPhis * sinDeltaMsT );
+        ImAzeroAperp = cachedAzero*cachedAperp * ( - cachedCosDeltaPerp * cachedSinPhis * cachedExpSinh
+                                               + Btype * cachedSinDeltaPerp * cachedExpCos
+                                               - Btype * cachedCosDeltaPerp * cachedCosPhis * cachedExpSin );
 	return;
 }
 
@@ -322,27 +324,31 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getTimeAmplitudeI
 	else
 	{
 		tlow = timeBound->GetMinimum();
-		if (tlow < 0.) tlow = 0.;
 		thigh = timeBound->GetMaximum();
 	}
 
-	double G_H    = gamma - 0.5*deltaGamma;
-	double G_L    = gamma + 0.5*deltaGamma;
 
-	double tauH   = (1.0 / G_H);
-	double tauL   = (1.0 / G_L);
-	double tauBar = (1.0 / gamma);
+        double cosPhis = cos(Phi_s);
+        double sinPhis = sin(Phi_s);
+	double cosDeltaPerpMinusPara = cos(delta_perp - delta_para);
+        double sinDeltaPerpMinusPara = sin(delta_perp - delta_para);
 
-	// Need to introduce some caching of these values (cosPhis) here
+        double expCoshInt = Mathematics::ExpCoshInt( tlow, thigh, gamma, deltaGamma, timeRes );
+        double expSinhInt = Mathematics::ExpSinhInt( tlow, thigh, gamma, deltaGamma, timeRes );
+        double expSinInt  = Mathematics::ExpSinInt(  tlow, thigh, gamma, deltaMs, timeRes );
+        double expCosInt  = Mathematics::ExpCosInt(  tlow, thigh, gamma, deltaMs, timeRes );
 
-	AzeroAzeroInt = getAzeroAzeroInt( tlow, thigh, tauL, tauH, tauBar, Btype);
-	AparaAparaInt = getAparaAparaInt( tlow, thigh, tauL, tauH, tauBar, Btype);
-	AperpAperpInt = getAperpAperpInt( tlow, thigh, tauL, tauH, tauBar, Btype);
-	AparaAperpInt = getAparaAperpInt( tlow, thigh, Btype);
-	AzeroAparaInt = getAzeroAparaInt( tlow, thigh, Btype);
-	AzeroAperpInt = getAzeroAperpInt( tlow, thigh, Btype);
-	// The interference terms above are expressed in terms of gamma, deltaGamma, not tauL, H. 
-	// I should eventually get round to have everything in terms of gamma etc. 
+        AzeroAzeroInt = Azero_sq * ( expCoshInt - cosPhis * expSinhInt + Btype * sinPhis * expSinInt );
+        AparaAparaInt = Apara_sq * ( expCoshInt - cosPhis * expSinhInt + Btype * sinPhis * expSinInt );
+        AperpAperpInt = Aperp_sq * ( expCoshInt + cosPhis * expSinhInt - Btype * sinPhis * expSinInt );
+	AparaAperpInt = AparaAperp * (         -cosDeltaPerpMinusPara * sinPhis * expSinhInt 
+				      + Btype * sinDeltaPerpMinusPara * expCosInt
+				      - Btype * cosDeltaPerpMinusPara * cosPhis * expSinInt);
+	AzeroAparaInt = AzeroApara * cos(delta_para) * ( expCoshInt - cosPhis * expSinhInt
+                                      			+ Btype * sinPhis * expSinInt);
+	AzeroAperpInt = AzeroAperp * (         -cos(delta_perp) * sinPhis * expSinhInt
+                                      + Btype * sin(delta_perp) * expCosInt
+                                      - Btype * cos(delta_perp) * cosPhis * expSinInt);
 	return;
 }
 
@@ -352,192 +358,33 @@ AzeroAzero[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AzeroAzeroInt = CForm[FullSimplify[ Integrate[ AzeroAzero[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getAzeroAzeroInt(double tmin, double tmax, 
-		double tauL, double tauH, double tauBar, int Btype)
-{
-
-	double gammadeltaMs = (1.0 / (((1.0/tauBar)*(1.0/tauBar)) + (deltaMs*deltaMs)) );
-	double cosPhi_s = cos(Phi_s);
-	double sinPhi_s = sin(Phi_s);
-
-	double valB = 0.5*Azero_sq*((1.0+cosPhi_s)*(tauL)*exp(-(1.0/tauL)*tmax)
-			+(1.0-cosPhi_s)*(tauH)*exp(-(1.0/tauH)*tmax)
-			+ Btype*2.0*gammadeltaMs*sinPhi_s*(exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)*sin(deltaMs*tmax)
-					+deltaMs*cos(deltaMs*tmax))));
-
-	double valA = 0.5*Azero_sq*((1.0+cosPhi_s)*(tauL)*exp(-(1.0/tauL)*tmin)
-			+(1.0-cosPhi_s)*(tauH)*exp(-(1.0/tauH)*tmin)
-			+ Btype*2.0*gammadeltaMs*sinPhi_s*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(deltaMs*tmin)
-					+deltaMs*cos(deltaMs*tmin))));
-
-	return (valA-valB);
-}
-
 /*
 AparaApara[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]              
                                     - cosPhis * Sinh[deltaGamma*t/2]      
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AparaAparaInt = CForm[FullSimplify[ Integrate[ AparaApara[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getAparaAparaInt(double tmin, double tmax,
-		double tauL, double tauH, double tauBar, int Btype)
-{
-
-	double gammadeltaMs = (1.0 / (((1.0/tauBar)*(1.0/tauBar)) + (deltaMs*deltaMs)) );
-	double cosPhi_s = cos(Phi_s);
-	double sinPhi_s = sin(Phi_s);
-
-	double valB = 0.5*Apara_sq*((1.0+cosPhi_s)*(tauL)*exp(-(1.0/tauL)*tmax)
-			+(1.0-cosPhi_s)*(tauH)*exp(-(1.0/tauH)*tmax)
-			+ Btype*2.0*gammadeltaMs*sinPhi_s*(exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)*sin(deltaMs*tmax)
-					+deltaMs*cos(deltaMs*tmax))));
-
-	double valA = 0.5*Apara_sq*((1.0+cosPhi_s)*(tauL)*exp(-(1.0/tauL)*tmin)
-			+(1.0-cosPhi_s)*(tauH)*exp(-(1.0/tauH)*tmin)
-			+ Btype*2.0*gammadeltaMs*sinPhi_s*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(deltaMs*tmin)
-					+deltaMs*cos(deltaMs*tmin))));
-	
-	return (valA-valB);	
-}
-
 /*
 AperpAperp[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]              
                                     + cosPhis * Sinh[deltaGamma*t/2]      
                                     - Btype * sinPhis * Sin[deltaMs*t] );
 AperpAperpInt = CForm[FullSimplify[ Integrate[ AperpAperp[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getAperpAperpInt(double tmin, double tmax,
-		double tauL, double tauH, double tauBar, int Btype)
-{
-
-	double gammadeltaMs = (1.0 / (((1.0/tauBar)*(1.0/tauBar)) + (deltaMs*deltaMs)) );
-	double cosPhi_s = cos(Phi_s);
-	double sinPhi_s = sin(Phi_s);
-
-	double valB =  0.5*Aperp_sq*((1.0-cosPhi_s)*(tauL)*exp(-(1.0/tauL)*tmax)
-			+(1.0+cosPhi_s)*(tauH)*exp(-(1.0/tauH)*tmax)
-			- Btype*2.0*gammadeltaMs*sinPhi_s*(exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)*sin(deltaMs*tmax)
-					+deltaMs*cos(deltaMs*tmax))));
-
-	double valA =  0.5*Aperp_sq*((1.0-cosPhi_s)*(tauL)*exp(-(1.0/tauL)*tmin)
-			+(1.0+cosPhi_s)*(tauH)*exp(-(1.0/tauH)*tmin)
-			- Btype*2.0*gammadeltaMs*sinPhi_s*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(deltaMs*tmin)
-					+deltaMs*cos(deltaMs*tmin))));
-
-	return (valA-valB);
-}
-
 /*
 AparaAperp[t_] := Exp[-gamma*t] * (-cosDeltaPerpMinusPara * sinPhis * Sinh[deltaGamma*t/2]              
                                     + Btype * sinDeltaPerpMinusPara * Cos[deltaMs*t]      
                                     - Btype * cosDeltaPerpMinusPara * cosPhis * Sinh[deltaGamma*t/2] );
 AparaAperpInt = CForm[FullSimplify[ Integrate[ AparaAperp[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getAparaAperpInt(double tmin, double tmax, int Btype) 
-{
-	double cosPhis = cos(Phi_s);
-	double sinPhis = sin(Phi_s);
-	double cosDeltaPerpMinusPara = cos(delta_perp - delta_para);
-	double sinDeltaPerpMinusPara = sin(delta_perp - delta_para);
-
-	double v = (-2. * cosDeltaPerpMinusPara * deltaGamma * (Btype * cosPhis + sinPhis) * cosh((deltaGamma*tmax)/2.))/
-     (exp(gamma * tmax) * (deltaGamma * deltaGamma - 4. * gamma * gamma)) + 
-    (-2. * cosDeltaPerpMinusPara * deltaGamma * exp(gamma * tmax)*
-        (deltaMs * deltaMs + gamma * gamma)*(Btype * cosPhis + sinPhis)*
-        cosh((deltaGamma * tmin)/2.) + 
-       Btype * (deltaGamma * deltaGamma - 4. * gamma * gamma) * sinDeltaPerpMinusPara*
-        (exp(gamma * tmin) * (gamma * cos(deltaMs * tmax) - 
-             deltaMs * sin(deltaMs * tmax)) + 
-          exp(gamma * tmax) * (-(gamma * cos(deltaMs * tmin)) + 
-             deltaMs * sin(deltaMs * tmin))) + 
-       4. * cosDeltaPerpMinusPara * gamma * (deltaMs * deltaMs + gamma * gamma)*
-        (Btype * cosPhis + sinPhis) *
-        (exp(gamma*tmin) * sinh((deltaGamma*tmax)/2.) - 
-          exp(gamma*tmax) * sinh((deltaGamma*tmin)/2.)))/
-     (exp(gamma*(tmax + tmin)) * (deltaMs * deltaMs + gamma * gamma)*
-       (-deltaGamma * deltaGamma + 4. * gamma * gamma));
-
-	return AparaAperp * v;
-
-	/*
-	double valB = 0.5*k0*cos(delta_perp - delta_para)* ( tauH*exp(-(1.0/tauH)*tmax)
-                                               + tauL*exp(-(1.0/tauL)*tmax)
-                                               - cosPhi_s* ( tauH*exp(-(1.0/tauH)*tmax) 
-                                                            - tauL*exp(-(1.0/tauL)*tmax) )
-                                               + 2.0 * sinPhi_s * exp (-(1.0/tauBar)*tmax) * gammadeltaMs 
-                                               * ( deltaMs * cos(deltaMs*tmax) + (1.0/tauBar)*sin(deltaMs*tmax)) );
-  
-	double valA = 0.5*k0*cos(delta_perp - delta_para)* ( tauH*exp(-(1.0/tauH)*tmin)
-                                               + tauL*exp(-(1.0/tauL)*tmin)
-                                               - cosPhi_s* ( tauH*exp(-(1.0/tauH)*tmin) 
-                                                            - tauL*exp(-(1.0/tauL)*tmin) )
-                                               + 2.0 * sinPhi_s * exp (-(1.0/tauBar)*tmin) * gammadeltaMs 
-                                               * ( deltaMs * cos(deltaMs*tmin) + (1.0/tauBar)*sin(deltaMs*tmin)) );
-  
-  	return (valA-valB);
-	*/
-}
-
-
 /*
 AzeroApara[t_] := Exp[-gamma*t] * cosDeltaPara * (Cosh[deltaGamma*t/2]              
                                     - cosPhis * sinh[deltaGamma*t/2]      
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AzeroAparaInt = CForm[FullSimplify[ Integrate[ AzeroApara[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getAzeroAparaInt(double tmin, double tmax, int Btype) 
-{
-	double cosPhis = cos(Phi_s);
-	double sinPhis = sin(Phi_s);
-	double cosDeltaPara = cos(delta_para);
-
-	double v = 
-		cosDeltaPara * (
-			(2. * (-(cosPhis * deltaGamma) + 2. * gamma) * cosh((deltaGamma * tmax)/2.))/
-       				(exp(gamma * tmax) * (deltaGamma * deltaGamma - 4. * gamma * gamma)) 
-			+ (2. * exp(gamma * tmax) * (-(cosPhis*deltaGamma) + 2. * gamma) * (deltaMs * deltaMs + gamma * gamma) * cosh((deltaGamma * tmin)/2.)
-			+ Btype * (deltaGamma * deltaGamma - 4. * gamma * gamma) * sinPhis * (exp(gamma * tmin) * (deltaMs * cos(deltaMs * tmax)
-			+ gamma * sin(deltaMs*tmax)) - exp(gamma * tmax) * (deltaMs * cos(deltaMs * tmin) + gamma * sin(deltaMs * tmin)))
-			- 2. * (deltaGamma - 2. * cosPhis * gamma) * (deltaMs * deltaMs + gamma * gamma) * (exp(gamma * tmin)* sinh((deltaGamma * tmax)/2.)
-			- exp(gamma * tmax) * sinh((deltaGamma * tmin)/2.)))/(exp(gamma * (tmax + tmin)) * (deltaMs * deltaMs + gamma * gamma)*(-deltaGamma * deltaGamma + 4. * gamma * gamma))
-			);
-	return AzeroApara * v;
-	/*
-	double valB = 0.5*k0*((1.0+cosPhi_s)*(tauL)*exp(-(1.0/tauL)*tmax)
-                        +(1.0-cosPhi_s)*(tauH)*exp(-(1.0/tauH)*tmax)
-                        + Btype*2.0*gammadeltaMs*sinPhi_s*(exp(-(1.0/tauBar)*tmax)*((1.0/tauBar)*sin(deltaMs*tmax)
-                                        +deltaMs*cos(deltaMs*tmax))));
-
-        double valA = 0.5*k0*((1.0+cosPhi_s)*(tauL)*exp(-(1.0/tauL)*tmin)
-                        +(1.0-cosPhi_s)*(tauH)*exp(-(1.0/tauH)*tmin)
-                        + Btype*2.0*gammadeltaMs*sinPhi_s*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(deltaMs*tmin)
-                                        +deltaMs*cos(deltaMs*tmin))));
-
-        return (valA-valB);
-	*/
-}
-
 /*
 AzeroAperp[t_] := Exp[-gamma*t] * ( - cosDeltaPerp * sinPhis * Sinh[deltaGamma*t/2]              
                                     + Btype * sinDeltaPerp * Cos[deltaMs*t]      
                                     - Btype * cosDeltaPerp * cosPhis * Sin[deltaMs*t] );
 AzeroAperpInt = CForm[FullSimplify[ Integrate[ AzeroAperp[t], {t, tmin, tmax}]]]
 */
-inline double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getAzeroAperpInt(double tmin, double tmax, int Btype)
-{
-	double cosPhis = cos(Phi_s);
-	double sinPhis = sin(Phi_s);
-	double cosDeltaPerp = cos(delta_perp);
-	double sinDeltaPerp = sin(delta_perp);
-
-        double v = 
-	  (Btype * sinDeltaPerp * ((-(gamma * cos(deltaMs * tmax)) + deltaMs * sin(deltaMs * tmax))/exp(gamma * tmax)
-	+ (gamma   * cos(deltaMs*tmin) - deltaMs * sin(deltaMs * tmin))/exp(gamma * tmin)))/(deltaMs * deltaMs + gamma * gamma)
-	- (Btype * cosDeltaPerp * cosPhis * (-((deltaMs * cos(deltaMs * tmax) + gamma * sin(deltaMs * tmax))/exp(gamma * tmax)) 
-        + (deltaMs * cos(deltaMs*tmin) + gamma   * sin(deltaMs * tmin))/exp(gamma * tmin)))/(deltaMs * deltaMs + gamma * gamma)
-	- (2. * cosDeltaPerp * sinPhis * ((deltaGamma * cosh((deltaGamma * tmax)/2.) 
-		+ 2. * gamma * sinh((deltaGamma * tmax)/2.))/exp(gamma * tmax) - (deltaGamma * cosh(( deltaGamma * tmin)/2.)
-		+ 2. * gamma * sinh((deltaGamma * tmin)/2.))/exp(gamma * tmin)))/(deltaGamma * deltaGamma - 4.*gamma*gamma);
-
-	return AzeroAperp * v;
-}

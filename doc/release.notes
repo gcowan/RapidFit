@@ -10,6 +10,9 @@
     angular functions have been moved to the Mathematics namespace so
     that there is a common place for this information that everyone should
     use. All PDFs should switch to using these functions.
+  - Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc PDF now
+    working with a single gaussian time resolution! Need to now get double
+    coded up.
 
 2010/01/20 - Greig Cowan
   - Finished Bs2JpsiPhi_mistagParameter_withTimeRes and corresponding

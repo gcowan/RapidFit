@@ -219,7 +219,7 @@ namespace Mathematics
 			// This is a placeholder as I havnt put the correct code in yet as i dont know it.
 			// So it only works if time limits are large and start from < 0
 			if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
-				std::cerr << " Mathematics::ExpInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
+				std::cerr << " Mathematics::ExpCosInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
 				return -1. ;				
 			}
 		}
@@ -277,7 +277,7 @@ namespace Mathematics
 			// This is a placeholder as I havnt put the correct code in yet as i dont know it.
 			// So it only works if time limits are large and start from < 0
 			if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
-				std::cerr << " Mathematics::ExpInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
+				std::cerr << " Mathematics::ExpSinInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
 				return -1.0 ;				
 			}
 		}

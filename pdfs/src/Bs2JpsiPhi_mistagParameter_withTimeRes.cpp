@@ -322,7 +322,6 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes::getTimeAmplitudeIntegrals( double &
 	else
 	{
 		tlow = timeBound->GetMinimum();
-		if (tlow < 0 ) tlow = 0;  // ADDED BY PELC
 		thigh = timeBound->GetMaximum();
 	}
 	

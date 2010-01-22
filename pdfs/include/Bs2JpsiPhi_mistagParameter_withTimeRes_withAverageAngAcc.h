@@ -37,9 +37,14 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc : public BasePDF
 		double cachedAzeroAzeroIntBbar, cachedAparaAparaIntBbar, cachedAperpAperpIntBbar;
 		double cachedAparaAperpIntBbar, cachedAzeroAparaIntBbar, cachedAzeroAperpIntBbar;
 
-		double cachedAzero, cachedApara, cachedAperp, cachedsinDeltaPerpPara, cachedcosDeltaPerpPara, cachedsinDeltaPerp;
-		double cachedcosDeltaPerp, cachedcosDeltaPara, cachedsinPhis, cachedcosPhis;
+		double cachedAzero, cachedApara, cachedAperp;
 		bool normalisationCacheValid, evaluationCacheValid;
+
+		double cachedExpCosh, cachedExpSinh, cachedExpCos, cachedExpSin;
+
+		double cachedSinDeltaPerpPara, cachedSinDeltaPerp, cachedSinDeltaPara;
+		double cachedCosDeltaPerpPara, cachedCosDeltaPerp, cachedCosDeltaPara;
+		double cachedSinPhis, cachedCosPhis;
 
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
@@ -98,13 +103,6 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc : public BasePDF
 	
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, DataPoint*, int);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, PhaseSpaceBoundary*, int);
-
-		inline double getAzeroAzeroInt(double, double, double, double, double, int);
-		inline double getAparaAparaInt(double, double, double, double, double, int);
-		inline double getAperpAperpInt(double, double, double, double, double, int);
-		inline double getAparaAperpInt(double, double, int);
-		inline double getAzeroAparaInt(double, double, int);
-		inline double getAzeroAperpInt(double, double, int);
 };
 
 #endif
