@@ -19,7 +19,7 @@ ConstraintFunction::ConstraintFunction()
 }
 
 //Constructor with correct arguments
-ConstraintFunction::ConstraintFunction( vector< ExternalConstraint* > NewConstraints) : allConstraints(NewConstraints)
+ConstraintFunction::ConstraintFunction( vector< ExternalConstraint* > NewConstraints ) : allConstraints(NewConstraints)
 {
 }
 
@@ -41,6 +41,7 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 		if ( name == "GammaL" )
 		{
 			//Insert code here
+			//GammaL = Gamma + ( deltaGamma / 2 )
 		}
 		else if ( StringProcessing::VectorContains( &parameterNames, &name ) >= 0 )
 		{
@@ -51,5 +52,5 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 		}
 	}
 
-	return constraintValue;
+	return -1.0 * constraintValue;
 }
