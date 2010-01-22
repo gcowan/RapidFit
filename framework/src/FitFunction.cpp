@@ -27,21 +27,10 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 	NewBottle->Finalise();
 	allData = NewBottle;
 
-	//Identify parameters that directly affect the fit value
-	vector<string> allNames = NewBottle->GetParameterSet()->GetAllNames();
-	for ( int nameIterator = 0; nameIterator < allNames.size(); nameIterator++ )
-	{
-		string type = NewBottle->GetParameterSet()->GetPhysicsParameter( allNames[nameIterator] )->GetType();
-		if ( type == "GaussianConstrained" )
-		{
-			interestingParameters.push_back( allNames[nameIterator] );
-		}
-	}
-
 	//Initialise the integrators
 	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); resultIndex++ )
 	{
-		RapidFitIntegrator * resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );//, NewBottle->GetResultDataSet(resultIndex), NewBottle->GetParameterSet() );
+		RapidFitIntegrator * resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
 		allIntegrators.push_back( resultIntegrator );
 	}
 }
@@ -66,23 +55,25 @@ ParameterSet * FitFunction::GetParameterSet()
 double FitFunction::Evaluate()
 {
 	double minimiseValue = 0.0;
+
+	//Calculate the function value for each PDF-DataSet pair
 	for (int resultIndex = 0; resultIndex < allData->NumberResults(); resultIndex++)
 	{
 		minimiseValue += EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[resultIndex] );
 	}
-	minimiseValue += EvaluateParameterSet( allData->GetParameterSet(), interestingParameters );
+
+	//Calculate the value of each constraint
+	vector< ConstraintFunction* > constraints = allData->GetConstraints();
+	for ( int constraintIndex = 0; constraintIndex < constraints.size(); constraintIndex++ )
+	{
+		minimiseValue += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
+	}
 
 	return minimiseValue;
 }
 
-//Return the value to minimise for a given PDF/DataSet result
+//Return the value to minimise for a given PDF/DataSet pair
 double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
-{
-	return 1.0;
-}
-
-//Return the value to minimise for a ParameterSet
-double FitFunction::EvaluateParameterSet( ParameterSet * TestParameterSet, vector<string> InterestingParameters )
 {
 	return 1.0;
 }

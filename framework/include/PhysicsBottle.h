@@ -13,6 +13,7 @@
 #include "IPDF.h"
 #include "IDataSet.h"
 #include "ParameterSet.h"
+#include "ConstraintFunction.h"
 #include <vector>
 
 class PhysicsBottle
@@ -23,9 +24,11 @@ class PhysicsBottle
 		~PhysicsBottle();
 
 		void AddResult( IPDF*, IDataSet* );
+		void AddConstraint( ConstraintFunction* );
 		int NumberResults();
 		IPDF * GetResultPDF(int);
 		IDataSet * GetResultDataSet(int);
+		vector< ConstraintFunction* > GetConstraints();
 		ParameterSet * GetParameterSet();
 		bool SetParameterSet( ParameterSet* );
 		void Finalise();
@@ -33,6 +36,7 @@ class PhysicsBottle
 	private:
 		vector< IPDF* > allPDFs;
 		vector< IDataSet* > allDataSets;
+		vector< ConstraintFunction* > allConstraints;
 		ParameterSet * bottleParameters;
 		bool finalised;
 };

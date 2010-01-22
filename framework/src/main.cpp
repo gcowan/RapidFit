@@ -17,7 +17,6 @@
 #include "ResultFormatter.h"
 #include "InputParsing.h"
 #include "RapidFitIntegrator.h"
-//#include "BenIntegrator.h"
 #include "Plotter.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -293,24 +292,6 @@ int main( int argc, char * argv[] )
 				return 1;
 			}
 		}
-		else if (testRapidIntegratorFlag)
-		{
-			if (configFileNameFlag)
-			{
-				//Compare numerical and analytical integration
-				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
-				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
-				IDataSet * quickDataSet = quickData->GetDataSet();
-				MakeFoam * testFoam = new MakeFoam( quickData->GetPDF(), quickDataSet->GetBoundary(), quickDataSet->GetDataPoint(0) );
-				testFoam->Debug();
-				//BenIntegrator * testBen = new BenIntegrator( quickData->GetPDF(), quickDataSet->GetBoundary(), xmlFile->GetFitParameters() );
-			}
-			else
-			{
-				cerr << "No data set specified" << endl;
-				return 1;
-			}
-		}
 		else if (testPlotFlag)
 		{
 			if (configFileNameFlag)
@@ -375,7 +356,7 @@ int main( int argc, char * argv[] )
 			if ( numberRepeats > 1 || doPullsFlag )
 			{
 				//Do the toy study
-				ToyStudy newStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, numberRepeats );
+				ToyStudy newStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), numberRepeats );
 				ToyStudyResult * fitResults = newStudy.DoWholeStudy();
 
 				//Output results
@@ -385,7 +366,7 @@ int main( int argc, char * argv[] )
 			else
 			{
 				//Do the fit
-				FitResult * oneResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData );
+				FitResult * oneResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
 
 				//Output results
 				makeOutput->OutputFitResult(oneResult);

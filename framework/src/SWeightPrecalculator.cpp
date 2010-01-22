@@ -69,7 +69,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	fitData.push_back(InputData);
 	MinimiserConfiguration * minimiser = new MinimiserConfiguration("Minuit2");
 	FitFunctionConfiguration * function = new FitFunctionConfiguration("NegativeLogLikelihood");
-	FitResult * findFractionResult = FitAssembler::DoFit( minimiser, function, fractionFitParameters, fitPDF, fitData );
+	FitResult * findFractionResult = FitAssembler::DoFit( minimiser, function, fractionFitParameters, fitPDF, fitData, vector< ConstraintFunction* >() );
 
 	//Retrieve the correct fraction
 	double signalFraction = findFractionResult->GetResultParameterSet()->GetResultParameter(fractionName)->GetValue();
@@ -117,9 +117,6 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 				newEvent->SetObservable( *observableIterator, copyObservable );
 			}
 		}
-
-		//Debug
-		//cout << newEvent->GetObservable(weightName)->GetValue() << ", " << newEvent->GetObservable("mass")->GetValue() << endl;
 	}
 
 	//Output time information

@@ -37,7 +37,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Create the physics bottle
-FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData )
+FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,
+		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
 {
 	PhysicsBottle * bottle = new PhysicsBottle(BottleParameters);
 
@@ -48,6 +49,12 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		bottle->AddResult( BottleData[resultIndex]->GetPDF(), BottleData[resultIndex]->GetDataSet() );
 	}
 
+	//Add the constraints
+	for ( int constraintIndex = 0; constraintIndex < BottleConstraints.size(); constraintIndex++ )
+	{
+		bottle->AddConstraint( BottleConstraints[constraintIndex] );
+	}
+
 	bottle->Finalise();
 	FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );
 
@@ -56,7 +63,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Create the physics bottle with pre-made data
-FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< IPDF* > AllPDFs, vector< IDataSet* > AllData )
+FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,
+		vector< IPDF* > AllPDFs, vector< IDataSet* > AllData, vector< ConstraintFunction* > BottleConstraints )
 {
 	if ( AllPDFs.size() == AllData.size() )
 	{
@@ -68,6 +76,12 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			AllPDFs[resultIndex]->SetPhysicsParameters(BottleParameters);
 			bottle->AddResult( AllPDFs[resultIndex], AllData[resultIndex] );
 		}
+
+		//Add the constraints
+		for ( int constraintIndex = 0; constraintIndex < BottleConstraints.size(); constraintIndex++ )
+		{
+			bottle->AddConstraint( BottleConstraints[constraintIndex] );
+		}  
 
 		bottle->Finalise();
 		FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );

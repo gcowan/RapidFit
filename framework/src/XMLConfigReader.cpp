@@ -367,6 +367,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 		}
 	}
 
+	//Go through the collected ToFit elements
 	if ( toFits.size() == 0 )
 	{
 		cerr << "No ToFit tags found in config file" << endl;
@@ -381,6 +382,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 			XMLTag * dataTag;
 			bool foundPDF = false;
 			bool foundData = false;
+			bool foundConstraint = false;
 
 			//Find the PDF and data set configuration
 			vector< XMLTag* > fitComponents = toFits[fitIndex]->GetChildren();
@@ -397,6 +399,11 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 					dataTag = fitComponents[componentIndex];
 					foundData = true;
 				}
+				else if ( name == "ConstraintFunction" )
+				{
+					//Just so can check for  bad ToFit tags
+					foundConstraint = true;
+				}
 				else
 				{
 					cerr << "Unrecognised fit component: " << name << endl;
@@ -409,16 +416,20 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 			{
 				pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag ) );
 			}
-			else
+			else if ( !foundConstraint )
 			{
 				cerr << "A ToFit xml tag is incomplete:";
-				if ( !foundData )
+				if ( !foundData && foundPDF )
 				{
-					cerr << " Data set configuration missing.";
+					cerr << " Data set configuration missing";
 				}
-				if ( !foundPDF )
+				else if ( !foundPDF && foundData )
 				{
-					cerr << " PDF configuration missing.";
+					cerr << " PDF configuration missing";
+				}
+				else
+				{
+					cerr << " No configuration found"; 
 				}
 				cerr << endl;
 				exit(1);
@@ -427,6 +438,117 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 	}
 
 	return pdfsAndData;
+}
+
+//Organise all the PDFs and DataSets
+vector< ConstraintFunction* > XMLConfigReader::GetConstraints()
+{
+	//Collect all ToFit elements
+	vector< XMLTag* > toFits;
+	vector< ConstraintFunction* > constraints;
+	for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
+	{
+		if ( children[childIndex]->GetName() == "ToFit" )
+		{
+			toFits.push_back( children[childIndex] );
+		}
+	}
+
+	//Go through the collected ToFit elements
+	if ( toFits.size() == 0 )
+	{
+		cerr << "No ToFit tags found in config file" << endl;
+		exit(1);
+	}
+	else
+	{
+		//Loop over all ToFits
+		for ( int fitIndex = 0; fitIndex < toFits.size(); fitIndex++ )
+		{
+			XMLTag * constraintTag;
+			bool foundConstraint = false;
+
+			//Find the PDF and data set configuration
+			vector< XMLTag* > fitComponents = toFits[fitIndex]->GetChildren();
+			for ( int componentIndex = 0; componentIndex < fitComponents.size(); componentIndex++ )
+			{
+				if ( fitComponents[componentIndex]->GetName() == "ConstraintFunction" )
+				{
+					constraintTag = fitComponents[componentIndex];
+					foundConstraint = true;
+				}       
+			}
+
+			if (foundConstraint)
+			{
+				constraints.push_back( GetConstraintFunction(constraintTag) );
+			}
+		}
+	}
+
+	return constraints;
+}
+
+//Create a ConstraintFunction for the appropriate xml tag
+ConstraintFunction * XMLConfigReader::GetConstraintFunction( XMLTag * InputTag )
+{
+	if ( InputTag->GetName() == "ConstraintFunction" )
+	{
+		vector< ExternalConstraint* > constraints;
+		vector< XMLTag* > functionComponents = InputTag->GetChildren();
+		for ( int componentIndex = 0; componentIndex < functionComponents.size(); componentIndex++ )
+		{
+			if ( functionComponents[componentIndex]->GetName() == "ExternalConstraint" )
+			{
+				constraints.push_back( GetExternalConstraint( functionComponents[componentIndex] ) );
+			}
+		}
+
+		return new ConstraintFunction(constraints);
+	}
+	else
+	{
+		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"ConstraintFunction\"" << endl;
+		exit(1);
+	}
+}
+
+//Create an ExternalConstraint for the appropriate xml tag
+ExternalConstraint * XMLConfigReader::GetExternalConstraint( XMLTag * InputTag )
+{
+	if ( InputTag->GetName() == "ExternalConstraint" )
+	{
+		string name;
+		double value, error;
+		vector< XMLTag* > externalComponents = InputTag->GetChildren();
+		for ( int componentIndex = 0; componentIndex < externalComponents.size(); componentIndex++ )
+		{
+			if ( externalComponents[componentIndex]->GetName() == "Name" )
+			{
+				name = externalComponents[componentIndex]->GetValue()[0];
+			}
+			else if ( externalComponents[componentIndex]->GetName() == "Value" )
+			{
+				value = strtod( externalComponents[componentIndex]->GetValue()[0].c_str(), NULL );
+			}
+			else if ( externalComponents[componentIndex]->GetName() == "Error" )
+			{
+				error = strtod( externalComponents[componentIndex]->GetValue()[0].c_str(), NULL );
+			}
+			else
+			{
+				cerr << "Unrecognised constraint component: " << externalComponents[componentIndex]->GetName() << endl;
+				exit(1);
+			}
+		}
+
+		return new ExternalConstraint( name, value, error );
+	}
+	else
+	{
+		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"ExternalConstraint\"" << endl;
+		exit(1);
+	}
 }
 
 //Create a ParameterSet from the appropriate xml tag
@@ -480,13 +602,9 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		double value = 0.0;
 		double minimum = 0.0;
 		double maximum = 0.0;
-		double mean = 0.0;
-		double sigma = 0.0;
 		bool hasValue = false;
 		bool hasMaximum = false;
 		bool hasMinimum = false;
-		bool hasMean = false;
-		bool hasSigma = false;
 
 		//Loop over the tag children, which correspond to the parameter elements
 		vector< XMLTag* > elements = InputTag->GetChildren();
@@ -511,16 +629,6 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 			{
 				hasMaximum = true;
 				maximum = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
-			}
-			else if ( name == "Mean" )
-			{
-				hasMean = true;
-				mean = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
-			}
-			else if ( name == "Sigma" )
-			{
-				hasSigma = true;
-				sigma = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
 			}
 			else if ( name == "Type" )
 			{
@@ -576,11 +684,6 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 					return new PhysicsParameter( ParameterName, value, type, unit );
 				}
 			}
-		}
-		else if ( hasMean && hasSigma )
-		{
-			//Gaussian constrained parameter
-			return new PhysicsParameter( ParameterName, mean, mean - sigma, mean + sigma, type, unit );
 		}
 		else
 		{

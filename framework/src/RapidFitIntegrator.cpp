@@ -7,12 +7,14 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-8
-  */
+ */
 
 #include "RapidFitIntegrator.h"
 #include "StringProcessing.h"
+#include "StatisticsFunctions.h"
 #include <iostream>
 #include <cmath>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -25,67 +27,46 @@ RapidFitIntegrator::RapidFitIntegrator()
 }
 
 //Constructor with correct argument
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(ForceNumerical), functionToWrap(InputFunction), testFast(false)
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false),
+	forceNumerical(ForceNumerical), functionToWrap(InputFunction), cacheSetUp(false)
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
 	oneDimensionIntegrator = new IntegratorOneDim(type);
 }
 
-
-//Constructor to test FoamIntegrator
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, IDataSet * InputData, ParameterSet * InputParameters, bool ForceNumerical ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(ForceNumerical), functionToWrap(InputFunction), testFast(true)
-{
-        multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
-        ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
-        oneDimensionIntegrator = new IntegratorOneDim(type);
-
-	cumulativeError = 0.0;
-	numberCalls = 0.0;
-	fastIntegrator = new FoamIntegrator( InputFunction, InputData );
-	//fastIntegrator = new BenIntegrator( InputFunction, InputData->GetBoundary(), InputParameters );
-}
-
 //Destructor
 RapidFitIntegrator::~RapidFitIntegrator()
 {
-	//cout << "Cumulative error: " << cumulativeError << endl;
-	//cout << "Average error: " << cumulativeError / numberCalls  << endl;
-
 	delete multiDimensionIntegrator;
 	delete oneDimensionIntegrator;
 }
 
 //Return the integral over all observables
-double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary )
+double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, bool UseCache )
 {
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 
 	//Test the integration method the function has provided
-	if (haveTestedIntegral)
+	if ( haveTestedIntegral || forceNumerical )
 	{
 		//If the function has been tested already, use the result
-		if (functionCanIntegrate)
+		if ( functionCanIntegrate && !forceNumerical )
 		{
-			if ( testFast )
-			{
-				double foamIntegral = fastIntegrator->Integral(NewDataPoint, NewBoundary );
-				double analyticalIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
-				cout << "Foam integral = " << foamIntegral << " vs analytical = " << analyticalIntegral << endl;
-				//numberCalls += 1.0;
-				//cumulativeError += foamIntegral - analyticalIntegral;
-				return analyticalIntegral;
-				//return fastIntegrator->Integral( NewDataPoint, NewBoundary );
-			}
-			else
-			{
-				return functionToWrap->Integral( NewDataPoint, NewBoundary );
-			}
+			return functionToWrap->Integral( NewDataPoint, NewBoundary );
 		}
 		else
 		{
-			return DoNumericalIntegral( NewDataPoint, NewBoundary, dontIntegrate );
+			//Check whether to use precalculated numerical integral, or to recalculate
+			if (UseCache)
+			{
+				return GetCachedIntegral(NewDataPoint);
+			}
+			else
+			{
+				return DoNumericalIntegral( NewDataPoint, NewBoundary, dontIntegrate );
+			}
 		}
 	}
 	else
@@ -108,11 +89,28 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			else
 			{
 				//Use numerical integration
-				cerr << "Function provides poor integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
-				//functionCanIntegrate = false;
-				//return numericalIntegral;
-				functionCanIntegrate = true;
-				return testIntegral;
+				cout << "Function provides poor integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
+				functionCanIntegrate = false;
+
+				if (UseCache)
+				{
+					//Calculate the discrete combinations
+					SetUpIntegralCache(NewBoundary);
+
+					//Check validity of cache
+					double cachedIntegral = GetCachedIntegral(NewDataPoint);
+					if ( abs( cachedIntegral - numericalIntegral ) / numericalIntegral < INTEGRAL_PRECISION_THRESHOLD )
+					{
+						cout << "Integral caching assumptions seem to be valid: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
+					}
+					else
+					{
+						cerr << "Integral caching error: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
+						exit(1);
+					}
+				}
+
+				return numericalIntegral;
 			}
 		}
 		else
@@ -120,6 +118,25 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			//Use numerical integration
 			cout << "Function provides no integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
 			functionCanIntegrate = false;
+
+			if (UseCache)
+			{
+				//Calculate the discrete combinations
+				SetUpIntegralCache(NewBoundary);
+
+				//Check validity of cache
+				double cachedIntegral = GetCachedIntegral(NewDataPoint);
+				if ( abs( cachedIntegral - numericalIntegral ) / numericalIntegral < INTEGRAL_PRECISION_THRESHOLD )
+				{
+					cout << "Integral caching assumptions seem to be valid: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
+				}
+				else
+				{
+					cerr << "Integral caching error: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
+					exit(1);
+				}
+			}
+
 			return numericalIntegral;
 		}
 	}
@@ -129,22 +146,8 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, vector<string> DontIntegrateThese )
 {
 	//Make lists of observables to integrate and not to integrate
-	vector<string> observableNames = functionToWrap->GetPrototypeDataPoint();
 	vector<string> doIntegrate, dontIntegrate;
-	for ( int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
-	{
-		bool continuous = !( NewBoundary->GetConstraint( observableNames[observableIndex] )->IsDiscrete() );
-		bool integrate = ( StringProcessing::VectorContains( &DontIntegrateThese, &(observableNames[observableIndex]) ) == -1 );
-
-		if ( continuous && integrate )
-		{
-			doIntegrate.push_back( observableNames[observableIndex] );
-		}
-		else
-		{
-			dontIntegrate.push_back( observableNames[observableIndex] );
-		}
-	}
+	StatisticsFunctions::DoDontIntegrateLists( functionToWrap, NewBoundary, &DontIntegrateThese, doIntegrate, dontIntegrate );
 
 	//If there are no observables left to integrate over, just evaluate the function
 	if ( doIntegrate.size() == 0 )
@@ -195,4 +198,103 @@ double RapidFitIntegrator::ProjectObservable( DataPoint * NewDataPoint, PhaseSpa
 	dontIntegrate.push_back(ProjectThis);
 
 	return DoNumericalIntegral( NewDataPoint, NewBoundary, dontIntegrate );
+}
+
+//Cache a numerical integral value for each discrete observable combination
+void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
+{
+	//Make a list of observables not to integrate
+	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
+
+	//Don't do it unless discrete combinations cached
+	if (cacheSetUp)
+	{
+		for ( int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
+		{
+			//Make a sample data point
+			DataPoint samplePoint( NewBoundary->GetAllNames() );
+
+			//Load the calculated discrete combinations
+			for ( int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
+			{
+				string unit = NewBoundary->GetConstraint( discreteNames[discreteIndex] )->GetUnit();
+				samplePoint.SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 0, unit );
+			}
+
+			//Just generate some random continuous values
+			for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+			{
+				samplePoint.SetObservable( continuousNames[continuousIndex], NewBoundary->GetConstraint( continuousNames[continuousIndex] )->CreateObservable() );
+			}
+
+			//Integrate and store the result
+			double integralToCache = DoNumericalIntegral( &samplePoint, NewBoundary, dontIntegrate );
+			cachedIntegrals.push_back(integralToCache);
+
+			//Debug
+			cout << "For combination: ";
+			for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+			{
+				cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
+			}
+			cout << "get integral: " << integralToCache << endl;
+		}
+	}
+}
+
+//Return the correct cached integral value
+double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
+{
+	//Don't do it unless cache done
+	if (cacheSetUp)
+	{
+		//Generate the discrete observables, and select the correct Foam generator to use
+		int combinationIndex = 0;
+		int incrementValue = 1;
+		//cout << "Discrete values are: ";
+		for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		{
+			//Retrieve the discrete value
+			double currentValue = NewDataPoint->GetObservable( discreteNames[discreteIndex] )->GetValue();
+			//cout << currentValue << ", ";
+
+			//Calculate the index
+			for ( int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
+			{
+				if ( discreteValues[discreteIndex][valueIndex] == currentValue )
+				{
+					combinationIndex += ( incrementValue * valueIndex );
+					incrementValue *= discreteValues[discreteIndex].size();
+					break;
+				}
+			}
+		}
+
+		//Debug
+		//cout << "versus: ";
+		//for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		//{
+		//	cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
+		//}
+		//cout << endl;
+
+		//Return the cached integral value for this index
+		return cachedIntegrals[combinationIndex];
+	}
+	else
+	{
+		return -1.0;
+	}
+}
+
+//Calculate the discrete combinations
+void RapidFitIntegrator::SetUpIntegralCache( PhaseSpaceBoundary * NewBoundary )
+{
+	//Retrieve all combinations of discrete variables
+	vector<string> allNames = NewBoundary->GetAllNames();
+	discreteCombinations = StatisticsFunctions::DiscreteCombinations( &allNames, NewBoundary, discreteNames, continuousNames, discreteValues );
+
+	//Now calculate the integral values to cache
+	cacheSetUp = true;
+	UpdateIntegralCache(NewBoundary);
 }

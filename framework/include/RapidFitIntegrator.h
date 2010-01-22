@@ -15,8 +15,6 @@
 #include "IntegratorFunction.h"
 #include "Math/AdaptiveIntegratorMultiDim.h"
 #include "Math/Integrator.h"
-#include "FoamIntegrator.h"
-//#include "BenIntegrator.h"
 #include "IDataSet.h"
 
 using namespace ROOT::Math;
@@ -26,26 +24,25 @@ class RapidFitIntegrator
 	public:
 		RapidFitIntegrator();
 		RapidFitIntegrator( IPDF*, bool ForceNumerical = false );
-		RapidFitIntegrator( IPDF*, IDataSet*, ParameterSet*, bool ForceNumerical = false );
 		~RapidFitIntegrator();
 
-		double Integral( DataPoint*, PhaseSpaceBoundary* );
+		double Integral( DataPoint*, PhaseSpaceBoundary*, bool UseCache = false );
 		double ProjectObservable( DataPoint*, PhaseSpaceBoundary*, string );
+		void UpdateIntegralCache( PhaseSpaceBoundary* );
 
 	private:
 		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string> );
+		double GetCachedIntegral( DataPoint* );
+		void SetUpIntegralCache( PhaseSpaceBoundary* );
 
-		double cumulativeError;
-		double numberCalls;
-		bool testFast;
-		FoamIntegrator * fastIntegrator;
-		//BenIntegrator * fastIntegrator;
 		IPDF * functionToWrap;
 		AdaptiveIntegratorMultiDim * multiDimensionIntegrator;
 		IntegratorOneDim * oneDimensionIntegrator;
-		bool functionCanIntegrate;
-		bool functionCanProject;
-		bool haveTestedIntegral;
+		bool functionCanIntegrate, functionCanProject, haveTestedIntegral, forceNumerical, cacheSetUp;
+
+		vector<string> discreteNames, continuousNames;
+		vector< vector<double> > discreteValues, discreteCombinations;
+		vector<double> cachedIntegrals;
 };
 
 #endif

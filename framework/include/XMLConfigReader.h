@@ -19,6 +19,7 @@
 #include "MinimiserConfiguration.h"
 #include "OutputConfiguration.h"
 #include "DataSetConfiguration.h"
+#include "ConstraintFunction.h"
 
 using namespace std;
 
@@ -34,6 +35,7 @@ class XMLConfigReader
 		FitFunctionConfiguration * GetFitFunctionConfiguration();
 		OutputConfiguration * GetOutputConfiguration();
 		vector< PDFWithData* > GetPDFsAndData();
+		vector< ConstraintFunction* > GetConstraints();
 		int GetNumberRepeats();
 		bool IsLoaded();
 
@@ -54,6 +56,8 @@ class XMLConfigReader
 		OutputConfiguration * MakeOutputConfiguration( XMLTag* );
 		IPrecalculator * MakePrecalculator( XMLTag*, PhaseSpaceBoundary* );
 		DataSetConfiguration * MakeDataSetConfiguration( XMLTag*, PhaseSpaceBoundary* );
+		ConstraintFunction * GetConstraintFunction( XMLTag* );
+		ExternalConstraint * GetExternalConstraint( XMLTag* );
 
 		vector< XMLTag* > children;
 		bool isLoaded;

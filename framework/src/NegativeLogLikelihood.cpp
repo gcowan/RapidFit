@@ -26,6 +26,9 @@ NegativeLogLikelihood::~NegativeLogLikelihood()
 //Return the negative log likelihood for a PDF/DataSet result
 double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
 {
+	//Initialise the integral caching
+	//ResultIntegrator->UpdateIntegralCache( TestDataSet->GetBoundary() );
+
 	//Loop over all data points
 	double total = 0.0;
 	for (int dataIndex = 0; dataIndex < TestDataSet->GetDataNumber(); dataIndex++)
@@ -40,7 +43,7 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		}
 		
 		//Find out the integral
-		double integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );
+		double integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary(), false );
 		
 		//Get the weight for this DataPoint (event)
 		double weight = 1.0;	
@@ -51,24 +54,6 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		total += weight * log( value / integral );
 	}
 	
-	//Return negative log likelihood
-	return -1.0 * total;
-}
-
-//Return the negative log likelihood
-double NegativeLogLikelihood::EvaluateParameterSet( ParameterSet * TestParameterSet, vector<string> InterestingParameters )
-{
-	//Loop over all parameters
-	double total = 0.0;
-	for (nameIterator = InterestingParameters.begin(); nameIterator != InterestingParameters.end(); nameIterator++)
-	{
-		PhysicsParameter * testParameter = TestParameterSet->GetPhysicsParameter( *nameIterator );
-
-		double difference = testParameter->GetValue() - testParameter->GetOriginalValue();
-		double error = testParameter->GetMaximum() - testParameter->GetMinimum();
-		total += log( difference * difference / error );
-	}
-
 	//Return negative log likelihood
 	return -1.0 * total;
 }
