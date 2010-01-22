@@ -29,7 +29,9 @@ Bs2JpsiPhi_mistagParameter_alt::Bs2JpsiPhi_mistagParameter_alt() :
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
     , mistagName	( "mistag" )
-	, timeresName	( "timeres" )
+	, res1Name	( "timeResolution1" )
+	, res2Name	( "timeResolution2" )
+	, res1FractionName	( "timeResolution1Fraction" )
 	// Observables
 	, timeName	    ( "time" )
 	, cosThetaName	( "cosTheta" )
@@ -66,7 +68,9 @@ void Bs2JpsiPhi_mistagParameter_alt::MakePrototypes()
 	parameterNames.push_back( deltaMName );
 	parameterNames.push_back( Phi_sName );
 	parameterNames.push_back( mistagName );
-	parameterNames.push_back( timeresName );
+	parameterNames.push_back( res1Name );
+	parameterNames.push_back( res2Name );
+	parameterNames.push_back( res1FractionName );
 	allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -103,7 +107,8 @@ double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 	
     // Get parameters into member variables
 	double dummy_R0, delta_zero, delta_para, delta_perp ;	
-	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, delta_para, delta_perp, tagFraction, resolution);
+	double res1, res2, res1Frac ;
+	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, delta_para, delta_perp, tagFraction, res1, res2, res1Frac);
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
 	
@@ -114,7 +119,25 @@ double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 
-	return this->diffXsec( );
+	double val1, val2 ;
+	
+
+	if(res1Frac >= 0.9999 ) {
+		// Set the member variable for time resolution to the first value and calculate
+		resolution = res1 ;
+		val1 = this->diffXsec( );
+		return val1 ;
+	}
+	else {
+		// Set the member variable for time resolution to the first value and calculate
+		resolution = res1 ;
+		val1 = this->diffXsec( );
+		// Set the member variable for time resolution to the second value and calculate
+		resolution = res2 ;
+		val2 = this->diffXsec( );
+		return res1Frac*val1 + (1. - res1Frac)*val2 ;
+	}
+	
 }
 
 
@@ -126,7 +149,8 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 	
     // Get parameters into member variables
 	double dummy_R0, delta_zero, delta_para, delta_perp ;	
-	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, delta_para, delta_perp, tagFraction, resolution);
+	double res1, res2, res1Frac ;
+	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, delta_para, delta_perp, tagFraction, res1, res2, res1Frac);
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
 	
@@ -151,14 +175,19 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 	// Recalculate cached values if Physics parameters have changed
 	if( ! normalisationCacheValid )  {
 		for( tag = -1; tag <= 1; tag ++ ) {
-			normalisationCacheValue[tag+1] = this->diffXsecNorm1( );
+            resolution =  res1 ;
+			normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
+            resolution =  res2 ;
+			normalisationCacheValueRes2[tag+1] = this->diffXsecNorm1( );
 		}
 		normalisationCacheValid = true ;
 	}	
 	
 	// Return normalisation value according to tag 
+
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
-	return normalisationCacheValue[tag+1] ;
+
+	return res1Frac*normalisationCacheValueRes1[tag+1] + (1. - res1Frac)*normalisationCacheValueRes2[tag+1] ;
 }
 
 
@@ -175,7 +204,9 @@ void Bs2JpsiPhi_mistagParameter_alt::getPhysicsParameters( double & gamma
 					, double & delta_para
 					, double & delta_perp
 					, double & mistag  
-					, double & timeres)
+					, double & res1
+					, double & res2
+					, double & res1Frac)
 {
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
@@ -189,7 +220,9 @@ void Bs2JpsiPhi_mistagParameter_alt::getPhysicsParameters( double & gamma
 	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
 	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
 	mistag = allParameters.GetPhysicsParameter( mistagName )->GetValue();
-	timeres = allParameters.GetPhysicsParameter( timeresName )->GetValue();
+	res1 = allParameters.GetPhysicsParameter( res1Name )->GetValue();
+	res2 = allParameters.GetPhysicsParameter( res2Name )->GetValue();
+	res1Frac = allParameters.GetPhysicsParameter( res1FractionName )->GetValue();
 
 	Apara_sq = 1 - Azero_sq - Aperp_sq;
 
