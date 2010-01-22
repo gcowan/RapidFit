@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/01/23 - Pete Clarke
+  - Updated Bs2JPsiPhi_mistagParameter_alt  to perfoem time resolution with 2
+    Gaussians
+
 2010/01/22 - Greig Cowan
   - Added Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc PDF.
     Time resolution part still to be implemented but should be easy
