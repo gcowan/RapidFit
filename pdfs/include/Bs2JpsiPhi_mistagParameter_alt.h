@@ -33,7 +33,7 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 	private:
 	
 		void MakePrototypes();
-		void getPhysicsParameters( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double & );
+		void getPhysicsParameters( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double &, double &, double & );
 
 		// These contain the strings that correspond to the physics parameter names.
 		string gammaName;		// gamma
@@ -47,8 +47,10 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 		string delta_paraName;	// strong phase
 		string delta_perpName;	// strong phase
 		string mistagName;		// mistag fraction
-		string timeresName;		// time resolution
-   
+		string res1Name;		  // time resolution core
+		string res2Name;		  // time resolution tail
+		string res1FractionName;  // fraction of core
+  
 		// These contain the strings that correspond to the observable names
 		string timeName;		// proper time
 		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
@@ -82,7 +84,8 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 
 		// Caching 
 		bool normalisationCacheValid ;
-		double normalisationCacheValue[3] ;
+		double normalisationCacheValueRes1[3] ;
+		double normalisationCacheValueRes2[3] ;
 
 
 		//------ This is all stuff from Petes J/PsiPhi PDF ---------------------------
