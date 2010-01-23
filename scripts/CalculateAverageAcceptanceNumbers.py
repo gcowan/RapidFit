@@ -39,20 +39,7 @@ def junk(acceptanceName):
     	acceptanceHisto.Write()
 	acceptanceFile.Close()
 
-def main():
-    parser = OptionParser(
-        usage = 'usage: %prog acceptance_histo.root <name_of_histogram>')
-
-    (options, args) = parser.parse_args()
-    acceptanceName = args[0]
-    if len(args) == 1:
-	nameOfHisto = "acceptance"
-    else:
-	nameOfHisto = args[1]
-
-    acceptanceFile = ROOT.TFile.Open(acceptanceName)
-    acceptanceHisto = acceptanceFile.Get(nameOfHisto)
-
+def calculate(acceptanceHisto, nameOfHisto): 
     xbins = acceptanceHisto.GetXaxis().GetNbins()
     ybins = acceptanceHisto.GetYaxis().GetNbins()
     zbins = acceptanceHisto.GetZaxis().GetNbins()
@@ -82,9 +69,28 @@ def main():
 
     # Use normalisation just to get numbers to same scale as 32pi/9. It's only the
     # relative sizes of the numbers that ultimately matters in the NLL minimisation
-    for i in fInt:
-	print i/largestNumEvents*normalisation,
+    vals = ["%.3f" % (i/largestNumEvents*normalisation) for i in fInt]
+    print vals
 
+
+def main():
+    parser = OptionParser(
+        usage = 'usage: %prog acceptance_histo.root <name_of_histogram>')
+
+    (options, args) = parser.parse_args()
+    acceptanceName = args[0]
+    numberOfHistos = int(args[1])
+    if len(args) == 2:
+	nameOfHisto = "acceptance"
+    else:
+	nameOfHisto = args[2]
+
+    acceptanceFile = ROOT.TFile.Open(acceptanceName)
+    
+    for i in range(numberOfHistos):
+    	acceptanceHisto = acceptanceFile.Get(nameOfHisto + str(i))
+    	calculate(acceptanceHisto, nameOfHisto)
+    
     acceptanceFile.Close()
 
 if __name__ == "__main__":

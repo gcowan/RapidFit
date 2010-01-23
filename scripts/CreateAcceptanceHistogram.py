@@ -21,8 +21,8 @@ def createPyl( leaves ):
        	pyl.__setattr__(name,leaf)
     return pyl
 
-def fillHistogram( pyl, ntuple, histo, weight ):
-    for event in range(ntuple.GetEntries()):
+def fillHistogram( pyl, ntuple, histo, weight, start, end ):
+    for event in range(start, end):
 	ntuple.GetEntry(event)
 	cosTheta = pyl.cosTheta.GetValue()
 	phi = pyl.phi.GetValue()
@@ -31,8 +31,8 @@ def fillHistogram( pyl, ntuple, histo, weight ):
 	#histo.Fill( array("f", [ cosTheta, phi, cosPsi, time ]) ) 
 	histo.Fill( cosTheta, phi, cosPsi, weight ) 
 
-def fillHistogramTime( pyl, ntuple, histo, weight ):
-    for event in range(ntuple.GetEntries()):
+def fillHistogramTime( pyl, ntuple, histo, weight, start, end ):
+    for event in range(start, end):
 	ntuple.GetEntry(event)
 	time = pyl.time.GetValue()
 	histo.Fill( time, weight ) 
@@ -68,69 +68,86 @@ def main():
     xmax = array("f", [ 1.,  pi,  1.,  15.])
     #mcHisto = ROOT.THnSparseD("mc", "mc", 4, bins, min, max)
     #toyHisto = ROOT.THnSparseD("toy", "toy", 4, bins, min, max)
-    mcHisto = ROOT.TH3D("mc", "mc", 20, -1., 1., 20, -pi, pi, 20, -1., 1.)
-    toyHisto = ROOT.TH3D("toy", "toy", 20, -1., 1., 20, -pi, pi, 20, -1., 1.)
-    mcHisto.Sumw2()
-    toyHisto.Sumw2()
-    mcHistoTime = ROOT.TH1D("mcTime", "mcTime", 20, -2., 18.)
-    toyHistoTime = ROOT.TH1D("toyTime", "toyTime", 20, -2., 18.)
-    mcHistoTime.Sumw2()
-    toyHistoTime.Sumw2()
 
     numMCEvents = mcNtuple.GetEntries()
     numToyEvents = toyNtuple.GetEntries()
+
+    numHistosToProduce = 5
  
     #toyWeight = float(numMCEvents)/numToyEvents
 
     #print "There are %d MC events and %d toy events. Weight will be %f" % (numMCEvents, numToyEvents, toyWeight)
 
-    fillHistogram( mcData, mcNtuple, mcHisto, 1. )
-    fillHistogram( toyData, toyNtuple, toyHisto, 1. )
+    acceptanceHistos = []
+    acceptanceTimeHistos = []
+    mcHistos = []
+    toyHistos = []
+    mcHistosTime = []
+    toyHistosTime = []
+    startMC = 0
+    startToy = 0
+    for i in range(numHistosToProduce):
+	num = str(i)
+    	mcHistos.append(ROOT.TH3D("mc"+num, "mc"+num, 20, -1., 1., 20, -pi, pi, 20, -1., 1.))
+    	toyHistos.append(ROOT.TH3D("toy"+num, "toy"+num, 20, -1., 1., 20, -pi, pi, 20, -1., 1.))
+    	mcHistos[i].Sumw2()
+    	toyHistos[i].Sumw2()
+    	mcHistosTime.append(ROOT.TH1D("mcTime"+num, "mcTime"+num, 20, -2., 18.))
+    	toyHistosTime.append(ROOT.TH1D("toyTime"+num, "toyTime"+num, 20, -2., 18.))
+    	mcHistosTime[i].Sumw2()
+    	toyHistosTime[i].Sumw2()
     
-    fillHistogramTime( mcData, mcNtuple, mcHistoTime, 1. )
-    fillHistogramTime( toyData, toyNtuple, toyHistoTime, 1. )
+	fillHistogram( mcData, mcNtuple, mcHistos[i], 1., startMC, startMC + numMCEvents/numHistosToProduce)
+    	fillHistogram( toyData, toyNtuple, toyHistos[i], 1., startToy, startToy + numToyEvents/numHistosToProduce)
     
-    #mcHisto.Scale(1./mcHisto.Integral())
-    #toyHisto.Scale(1./toyHisto.Integral())
+    	fillHistogramTime( mcData, mcNtuple, mcHistosTime[i], 1., startMC, startMC + numMCEvents/numHistosToProduce )
+    	fillHistogramTime( toyData, toyNtuple, toyHistosTime[i], 1., startToy, startToy + numToyEvents/numHistosToProduce )
+   
+	startMC += numMCEvents/numHistosToProduce
+	startToy += numToyEvents/numHistosToProduce
+ 
+    	#mcHisto.Scale(1./mcHisto.Integral())
+    	#toyHisto.Scale(1./toyHisto.Integral())
 
-    # Create the 4D histogram for the acceptance surface
-    acceptance = mcHisto.Clone()
-    acceptance.SetTitle("acceptance")
-    acceptance.SetName("acceptance")
-    acceptance.Divide(toyHisto)
-    acceptance.Scale(1./acceptance.Integral())
+    	# Create the 4D histogram for the acceptance surface
+    	acceptanceHistos.append(mcHistos[i].Clone("acceptance"+num))
+    	acceptanceHistos[i].SetTitle("acceptance"+num)
+    	acceptanceHistos[i].Divide(toyHistos[i])
+    	acceptanceHistos[i].Scale(1./acceptanceHistos[i].Integral())
     
-    acceptanceTime = mcHistoTime.Clone()
-    acceptanceTime.SetTitle("acceptanceTime")
-    acceptanceTime.SetName("acceptanceTime")
-    acceptanceTime.Divide(toyHistoTime)
-    acceptanceTime.Scale(1./acceptanceTime.Integral())
+    	acceptanceTimeHistos.append(mcHistosTime[i].Clone("acceptanceTime"+num))
+    	acceptanceTimeHistos[i].SetTitle("acceptanceTime"+num)
+    	acceptanceTimeHistos[i].Divide(toyHistosTime[i])
+    	acceptanceTimeHistos[i].Scale(1./acceptanceTimeHistos[i].Integral())
 
-    # Let's see the 1D projections for each of the angles
-    accCosTheta = acceptance.Project3D("x")
-    accCosTheta.SetTitle("cosTheta")
-    accCosTheta.SetName("cosTheta")
-    accPhi = acceptance.Project3D("y")
-    accPhi.SetTitle("phi")
-    accPhi.SetName("phi")
-    accCosPsi = acceptance.Project3D("z")
-    accCosPsi.SetTitle("cosPsi")
-    accCosPsi.SetName("cosPsi")
+    	# Let's see the 1D projections for each of the angles
+    	accCosTheta = acceptanceHistos[i].Project3D("x")
+    	accCosTheta.SetTitle("cosTheta"+num)
+    	accCosTheta.SetName("cosTheta"+num)
+    	accPhi = acceptanceHistos[i].Project3D("y")
+    	accPhi.SetTitle("phi"+num)
+    	accPhi.SetName("phi"+num)
+    	accCosPsi = acceptanceHistos[i].Project3D("z")
+    	accCosPsi.SetTitle("cosPsi"+num)
+    	accCosPsi.SetName("cosPsi"+num)
 
-    # Now let's see the 2D projections
-    accCosThetaPhi = acceptance.Project3D("xy")
-    accCosThetaPhi.SetTitle("phi vs cosTheta")
-    accCosThetaPhi.SetName("phi_cosTheta")
-    accPhiCosPsi = acceptance.Project3D("yz")
-    accPhiCosPsi.SetTitle("cosPsi vs phi")
-    accPhiCosPsi.SetName("cosPsi_phi")
-    accCosPsiCosTheta = acceptance.Project3D("zx")
-    accCosPsiCosTheta.SetTitle("cosTheta vs cosPsi")
-    accCosPsiCosTheta.SetName("cosTheta_cosPsi")
+    	# Now let's see the 2D projections
+    	accCosThetaPhi = acceptanceHistos[i].Project3D("xy")
+    	accCosThetaPhi.SetTitle("phi vs cosTheta"+num)
+    	accCosThetaPhi.SetName("phi_cosTheta"+num)
+    	accPhiCosPsi = acceptanceHistos[i].Project3D("yz")
+    	accPhiCosPsi.SetTitle("cosPsi vs phi"+num)
+    	accPhiCosPsi.SetName("cosPsi_phi"+num)
+    	accCosPsiCosTheta = acceptanceHistos[i].Project3D("zx")
+    	accCosPsiCosTheta.SetTitle("cosTheta vs cosPsi"+num)
+    	accCosPsiCosTheta.SetName("cosTheta_cosPsi"+num)
+    
+    acceptanceFile.Write()
+
  
     mcFile.Close()
     toyFile.Close()
-    acceptanceFile.Write()
+    acceptanceFile.Close()
 
 if __name__ == "__main__":
 	class PyListOfLeaves(dict) :

@@ -5,6 +5,8 @@
     Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc PDF.
     Fits to MC09 with flat acceptance look good. Furhter testing
     essential.
+  - Modified scripts for generating acceptance surface and calculating
+    angular integrals.
 
 2010/01/23 - Pete Clarke
   - Updated Bs2JPsiPhi_mistagParameter_alt to perform time resolution

@@ -153,7 +153,7 @@
 
 		<PhysicsParameter>
 			<Name>angAccI2</Name>
-			<Value>11.99</Value>
+			<Value>1.199</Value>
 			<Minimum>1.0</Minimum>
 			<Maximum>15.0</Maximum>
 			<Type>Fixed</Type>
@@ -162,7 +162,7 @@
 
 		<PhysicsParameter>
 			<Name>angAccI3</Name>
-			<Value>13.24</Value>
+			<Value>1.324</Value>
 			<Minimum>1.0</Minimum>
 			<Maximum>15.0</Maximum>
 			<Type>Fixed</Type>
@@ -171,21 +171,21 @@
 
 		<PhysicsParameter>
 			<Name>angAccI4</Name>
-			<Value>-0.053</Value>
+			<Value>-0.0053</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>angAccI5</Name>
-			<Value>0.022</Value>
+			<Value>0.0022</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>angAccI6</Name>
-			<Value>-0.0071</Value>
+			<Value>-0.00071</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
