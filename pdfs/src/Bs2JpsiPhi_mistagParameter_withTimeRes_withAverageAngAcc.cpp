@@ -32,7 +32,9 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParam
 	, angAccI5Name	( "angAccI5" )
 	, angAccI6Name	( "angAccI6" )
 	, mistagName	( "mistag" )
-	, timeResName	( "timeRes" )
+	, timeRes1Name	( "timeResolution1" )
+	, timeRes2Name	( "timeResolution2" )
+	, timeRes1FractionName	( "timeResolution1Fraction" )
 
 	// Observables
 	, timeName	( "time" )
@@ -74,7 +76,9 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::MakePrototypes()
 	parameterNames.push_back( deltaMName );
 	parameterNames.push_back( Phi_sName );
 	parameterNames.push_back( mistagName );
-	parameterNames.push_back( timeResName );
+	parameterNames.push_back( timeRes1Name );
+	parameterNames.push_back( timeRes2Name );
+	parameterNames.push_back( timeRes1FractionName );
 	parameterNames.push_back( angAccI1Name );
 	parameterNames.push_back( angAccI2Name );
 	parameterNames.push_back( angAccI3Name );
@@ -107,8 +111,10 @@ bool Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::SetPhysicsParamet
         delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
         delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
         delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
-        omega = allParameters.GetPhysicsParameter( mistagName )->GetValue();
-        timeRes = allParameters.GetPhysicsParameter( timeResName )->GetValue();
+        omega    = allParameters.GetPhysicsParameter( mistagName )->GetValue();
+        timeRes1 = allParameters.GetPhysicsParameter( timeRes1Name )->GetValue();
+        timeRes2 = allParameters.GetPhysicsParameter( timeRes2Name )->GetValue();
+        timeRes1Frac = allParameters.GetPhysicsParameter( timeRes1FractionName )->GetValue();
         angAccI1 = allParameters.GetPhysicsParameter( angAccI1Name )->GetValue();
         angAccI2 = allParameters.GetPhysicsParameter( angAccI2Name )->GetValue();
         angAccI3 = allParameters.GetPhysicsParameter( angAccI3Name )->GetValue();
@@ -135,13 +141,32 @@ vector<string> Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::GetDoNo
 //Calculate the function value
 double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Evaluate(DataPoint * measurement)
 {
-	// Does not make sense to evaluate this PDF for time < 0
-	double time = measurement->GetObservable( timeName )->GetValue();	
-        double cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
-        double phi      = measurement->GetObservable( phiName )->GetValue();
-        double cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
-	int q = (int)measurement->GetObservable( tagName )->GetValue();
+	time = measurement->GetObservable( timeName )->GetValue();	
+        cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
+        phi      = measurement->GetObservable( phiName )->GetValue();
+        cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
+	q = (int)measurement->GetObservable( tagName )->GetValue();
 
+        if(timeRes1Frac >= 0.9999)
+	{
+                // Set the member variable for time resolution to the first value and calculate
+                timeRes = timeRes1;
+                return buildPDFnumerator();
+        }
+        else
+	{
+                // Set the member variable for time resolution to the first value and calculate
+                timeRes = timeRes1;
+                double val1 = buildPDFnumerator();
+                // Set the member variable for time resolution to the second value and calculate
+                timeRes = timeRes2;
+                double val2 = buildPDFnumerator();
+                return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+        }
+}
+
+double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::buildPDFnumerator()
+{
 	// The angular functions f1->f6 as defined in roadmap Table 1.
 	double f1, f2, f3, f4, f5, f6;
 	Mathematics::getBs2JpsiPhiAngularFunctions( f1, f2, f3, f4, f5, f6, cosTheta, phi, cosPsi );	
@@ -152,14 +177,14 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Evaluate(DataPo
 	double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
 	getTimeDependentAmplitudes( AzeroAzeroB, AparaAparaB, AperpAperpB
 			, ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB
-			, measurement, 1);
+			, 1);
 
 	// Now for the Bbar
 	double AzeroAzeroBbar, AparaAparaBbar, AperpAperpBbar;
 	double ImAparaAperpBbar, ReAzeroAparaBbar, ImAzeroAperpBbar;
 	getTimeDependentAmplitudes( AzeroAzeroBbar, AparaAparaBbar, AperpAperpBbar
 			, ImAparaAperpBbar, ReAzeroAparaBbar, ImAzeroAperpBbar
-			, measurement, -1);
+			, -1);
 
 	// Flavour tagging
 	double epsilon[3];
@@ -192,8 +217,42 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Evaluate(DataPo
 double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	// Now need to know the tag and the mistag
-	int q = (int)measurement->GetObservable( tagName )->GetValue();
+	q = (int)measurement->GetObservable( tagName )->GetValue();
+	
+	IConstraint * timeBound = boundary->GetConstraint("time");
+	if ( timeBound->GetUnit() == "NameNotFoundError" )
+	{
+		cerr << "Bound on time not provided" << endl;
+		return -1.;
+	}
+	else
+	{
+		tlow = timeBound->GetMinimum();
+		thigh = timeBound->GetMaximum();
+	}
 
+
+        if(timeRes1Frac >= 0.9999)
+        {
+                // Set the member variable for time resolution to the first value and calculate
+                timeRes = timeRes1;
+                return buildPDFnumerator();
+        }
+        else
+        {
+                // Set the member variable for time resolution to the first value and calculate
+                timeRes = timeRes1;
+                double val1 = buildPDFdenominator();
+                // Set the member variable for time resolution to the second value and calculate
+                timeRes = timeRes2;
+                double val2 = buildPDFdenominator();
+                return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+        }
+}
+	
+double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::buildPDFdenominator()
+{
+	// Work out the mistag
 	double epsilon[3];
 	epsilon[0] = omega;
 	epsilon[1] = 0.5;
@@ -210,7 +269,6 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Normalisation(D
 				, cachedAparaAperpIntB
 				, cachedAzeroAparaIntB
 				, cachedAzeroAperpIntB
-				, boundary
 				, 1);
 
 		getTimeAmplitudeIntegrals(  cachedAzeroAzeroIntBbar
@@ -219,7 +277,6 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Normalisation(D
 				, cachedAparaAperpIntBbar
 				, cachedAzeroAparaIntBbar
 				, cachedAzeroAperpIntBbar
-				, boundary
 				, -1);
 
 		normalisationCacheValid = true;
@@ -248,12 +305,8 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getTimeDependentA
 		, double & ImAparaAperp
 		, double & ReAzeroApara
 		, double & ImAzeroAperp
-		, DataPoint * measurement
 		, int Btype )
 {
-	// Observable
-	double time = measurement->GetObservable( timeName )->GetValue();
-
 	// Quantities depending only on physics parameters can be cached
 	if ( !evaluationCacheValid )
 	{
@@ -307,26 +360,8 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getTimeAmplitudeI
 		, double & AparaAperpInt
 		, double & AzeroAparaInt
 		, double & AzeroAperpInt
-		, PhaseSpaceBoundary * boundary
 		, int Btype)
 {
-	double tlow = 0.;
-	double thigh = 0.;
-	IConstraint * timeBound = boundary->GetConstraint("time");
-	if ( timeBound->GetUnit() == "NameNotFoundError" )
-	{
-		cerr << "Bound on time not provided" << endl;
-		AzeroAzeroInt = -999.;
-		AparaAparaInt = -999.;
-		AperpAperpInt = -999.;
-		return;
-	}
-	else
-	{
-		tlow = timeBound->GetMinimum();
-		thigh = timeBound->GetMaximum();
-	}
-
 
         double cosPhis = cos(Phi_s);
         double sinPhis = sin(Phi_s);

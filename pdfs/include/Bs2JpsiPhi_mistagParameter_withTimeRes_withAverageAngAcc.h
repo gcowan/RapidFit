@@ -66,7 +66,9 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc : public BasePDF
 		string angAccI5Name;		// 
 		string angAccI6Name;		// 
 		string mistagName;
-		string timeResName;
+		string timeRes1Name;
+		string timeRes2Name;
+		string timeRes1FractionName;
 
 		// Member variables that will contain the parameter values
                 double gamma;
@@ -83,7 +85,10 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc : public BasePDF
                 double delta_para;
                 double delta_perp;
                 double omega;
-                double timeRes;
+                double timeRes;	 // This is the member variable used in the "builder" functions
+                double timeRes1; // These are the physics parameters varied in the fit and passed from the XML
+                double timeRes2;
+                double timeRes1Frac;
 		double angAccI1;
 		double angAccI2;
 		double angAccI3;
@@ -100,9 +105,20 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc : public BasePDF
 		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 					// in phi rest frame
 		string tagName;		// B tag
+
+		// Member variables for the observables
+		double time;
+		double cosTheta;
+		double phi;
+		double cosPsi;
+		int q; // flavour tag
+
+		double tlow, thigh; // Integration limits
 	
-		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, DataPoint*, int);
-		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, PhaseSpaceBoundary*, int);
+		double buildPDFnumerator();
+		double buildPDFdenominator();
+		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, int);
+		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, int);
 };
 
 #endif
