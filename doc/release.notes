@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/01/26 - Pete Clarke
+  - Updated Bs2JPsiPhi_mistagParameter_alt to include a time offset and the 
+    six angular acceptance functions.
+
 2010/01/23 - Greig Cowan
   - Added double gaussian time resolution to
     Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc PDF.
