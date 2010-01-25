@@ -28,10 +28,19 @@ Bs2JpsiPhi_mistagParameter_alt::Bs2JpsiPhi_mistagParameter_alt() :
 	, delta_zeroName( "delta_zero" )
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
-    , mistagName	( "mistag" )
+	// Detector parameters
+	, mistagName	( "mistag" )
 	, res1Name	( "timeResolution1" )
 	, res2Name	( "timeResolution2" )
 	, res1FractionName	( "timeResolution1Fraction" )
+	, timeOffsetName	( "timeOffset" )
+	// Angular acceptance factors
+	, angAccI1Name ( "angAccI1" )
+	, angAccI2Name ( "angAccI2" )
+	, angAccI3Name ( "angAccI3" )
+	, angAccI4Name ( "angAccI4" )
+	, angAccI5Name ( "angAccI5" )
+	, angAccI6Name ( "angAccI6" )
 	// Observables
 	, timeName	    ( "time" )
 	, cosThetaName	( "cosTheta" )
@@ -71,6 +80,13 @@ void Bs2JpsiPhi_mistagParameter_alt::MakePrototypes()
 	parameterNames.push_back( res1Name );
 	parameterNames.push_back( res2Name );
 	parameterNames.push_back( res1FractionName );
+	parameterNames.push_back( timeOffsetName );
+	parameterNames.push_back( angAccI1Name );
+	parameterNames.push_back( angAccI2Name );
+	parameterNames.push_back( angAccI3Name );
+	parameterNames.push_back( angAccI4Name );
+	parameterNames.push_back( angAccI5Name );
+	parameterNames.push_back( angAccI6Name );
 	allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -84,11 +100,49 @@ Bs2JpsiPhi_mistagParameter_alt::~Bs2JpsiPhi_mistagParameter_alt()
 }
 
 //........................................................
-//Not only set the physics parameters, but indicate that the cache is no longer valid
+//Set the physics parameters into member variables
+//Indicate that the cache is no longer valid
+
 bool Bs2JpsiPhi_mistagParameter_alt::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	normalisationCacheValid = false;
-	return allParameters.SetPhysicsParameters(NewParameterSet);
+	
+	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
+	
+	/// Some gymnastics here to match xml parameters to my original pdf parameters 
+	
+	// Physics parameters. 
+	gamma_in  = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+    dgam      = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
+	delta_ms  = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
+	phi_s     = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
+
+	double _R0  = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
+	Rt   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
+	Rp   = 1 - _R0 - Rt;	
+
+	double _delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
+	double _delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
+	double _delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
+	delta1 = _delta_perp -  _delta_para ;    
+	delta2 = _delta_perp -  _delta_zero ;
+	
+	// Detector parameters
+	tagFraction         = allParameters.GetPhysicsParameter( mistagName )->GetValue();
+	resolution1         = allParameters.GetPhysicsParameter( res1Name )->GetValue();
+	resolution2         = allParameters.GetPhysicsParameter( res2Name )->GetValue();
+	resolution1Fraction = allParameters.GetPhysicsParameter( res1FractionName )->GetValue();
+	timeOffset          = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
+	
+	// Angular acceptance factors
+	angAccI1 = allParameters.GetPhysicsParameter( angAccI1Name )->GetValue();
+	angAccI2 = allParameters.GetPhysicsParameter( angAccI2Name )->GetValue();
+	angAccI3 = allParameters.GetPhysicsParameter( angAccI3Name )->GetValue();
+	angAccI4 = allParameters.GetPhysicsParameter( angAccI4Name )->GetValue();
+	angAccI5 = allParameters.GetPhysicsParameter( angAccI5Name )->GetValue();
+	angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();
+	
+	return result;
 }
 
 //.........................................................
@@ -105,15 +159,18 @@ vector<string> Bs2JpsiPhi_mistagParameter_alt::GetDoNotIntegrateList()
 double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 {
 	
+/*
     // Get parameters into member variables
 	double dummy_R0, delta_zero, delta_para, delta_perp ;	
 	double res1, res2, res1Frac ;
-	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, delta_para, delta_perp, tagFraction, res1, res2, res1Frac);
+	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, delta_para, 
+						  delta_perp, tagFraction, res1, res2, res1Frac, timeOffset);
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
+*/
 	
 	// Get observables into member variables
-	t = measurement->GetObservable( timeName )->GetValue();
+	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
@@ -121,21 +178,20 @@ double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 
 	double val1, val2 ;
 	
-
-	if(res1Frac >= 0.9999 ) {
+	if(resolution1Fraction >= 0.9999 ) {
 		// Set the member variable for time resolution to the first value and calculate
-		resolution = res1 ;
+		resolution = resolution1 ;
 		val1 = this->diffXsec( );
 		return val1 ;
 	}
 	else {
 		// Set the member variable for time resolution to the first value and calculate
-		resolution = res1 ;
+		resolution = resolution1 ;
 		val1 = this->diffXsec( );
 		// Set the member variable for time resolution to the second value and calculate
-		resolution = res2 ;
+		resolution = resolution2 ;
 		val2 = this->diffXsec( );
-		return res1Frac*val1 + (1. - res1Frac)*val2 ;
+		return resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;
 	}
 	
 }
@@ -147,15 +203,19 @@ double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	
+/*
     // Get parameters into member variables
 	double dummy_R0, delta_zero, delta_para, delta_perp ;	
 	double res1, res2, res1Frac ;
-	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, delta_para, delta_perp, tagFraction, res1, res2, res1Frac);
+	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, 
+						  delta_para, delta_perp, tagFraction, res1, res2, res1Frac, timeOffset);
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
+*/
 	
+	this-> 
 	// Get observables into member variables
-	t = measurement->GetObservable( timeName )->GetValue();
+	t = measurement->GetObservable( timeName )->GetValue() - timeOffset;
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
@@ -173,11 +233,12 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 	
 	
 	// Recalculate cached values if Physics parameters have changed
+	// Must do this for each of the two resolutions.
 	if( ! normalisationCacheValid )  {
 		for( tag = -1; tag <= 1; tag ++ ) {
-            resolution =  res1 ;
+            resolution =  resolution1 ;
 			normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
-            resolution =  res2 ;
+            resolution =  resolution2 ;
 			normalisationCacheValueRes2[tag+1] = this->diffXsecNorm1( );
 		}
 		normalisationCacheValid = true ;
@@ -187,47 +248,51 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 
-	return res1Frac*normalisationCacheValueRes1[tag+1] + (1. - res1Frac)*normalisationCacheValueRes2[tag+1] ;
+	return resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
 }
 
-
+/*
 //..............................................
 // Extract and return physics parameters
-void Bs2JpsiPhi_mistagParameter_alt::getPhysicsParameters( double & gamma
-					, double & deltaGamma
-					, double & deltaM
-					, double & Phi_s
-					, double & Azero_sq
-					, double & Apara_sq
-					, double & Aperp_sq
-					, double & delta_zero 
-					, double & delta_para
-					, double & delta_perp
-					, double & mistag  
-					, double & res1
-					, double & res2
-					, double & res1Frac)
+void Bs2JpsiPhi_mistagParameter_alt::getPhysicsParameters( double & _gamma
+					, double & _deltaGamma
+					, double & _deltaM
+					, double & _Phi_s
+					, double & _Azero_sq
+					, double & _Apara_sq
+					, double & _Aperp_sq
+					, double & _delta_zero 
+					, double & _delta_para
+					, double & _delta_perp
+					, double & _mistag  
+					, double & _res1
+					, double & _res2
+					, double & _res1Frac
+					, double & _timeOffset)
 {
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
-	gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
-    deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
-	deltaM     = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
-	Phi_s      = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
-	Azero_sq   = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
+	_gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+    _deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
+	_deltaM     = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
+	_Phi_s      = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
+	_Azero_sq   = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
 	//Apara_sq   = allParameters.GetPhysicsParameter( Apara_sqName )->GetValue();
-	Aperp_sq   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
-	delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
-	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
-	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
-	mistag = allParameters.GetPhysicsParameter( mistagName )->GetValue();
-	res1 = allParameters.GetPhysicsParameter( res1Name )->GetValue();
-	res2 = allParameters.GetPhysicsParameter( res2Name )->GetValue();
-	res1Frac = allParameters.GetPhysicsParameter( res1FractionName )->GetValue();
+	_Aperp_sq   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
+	_delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
+	_delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
+	_delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
+	_mistag = allParameters.GetPhysicsParameter( mistagName )->GetValue();
+	_res1 = allParameters.GetPhysicsParameter( res1Name )->GetValue();
+	_res2 = allParameters.GetPhysicsParameter( res2Name )->GetValue();
+	_res1Frac = allParameters.GetPhysicsParameter( res1FractionName )->GetValue();
+	_timeOffset = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
 
-	Apara_sq = 1 - Azero_sq - Aperp_sq;
+	_Apara_sq = 1 - _Azero_sq - _Aperp_sq;
 
 	return;
 }
+*/
+
 
 
 //....................................
@@ -539,14 +604,21 @@ double  Bs2JpsiPhi_mistagParameter_alt::diffXsecOne(  ) const
 
 double Bs2JpsiPhi_mistagParameter_alt::diffXsecNorm1(  ) const
 {      
-	double norm = 
-	0.5 * A0()*A0() * timeFactorA0A0Int(  ) +    // Angle factors normalised to 1
-	0.5 * AP()*AP() * timeFactorAPAPInt(  ) +
-	0.5 * AT()*AT() * timeFactorATATInt(  ) ;
+	double reference =  32.0*TMath::Pi()/9.0 ;
 	
+	double norm = 
+	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1   +  
+	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2   +  
+	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3   +  
+
+	0.5 * A0()*AP() * timeFactorReA0APInt(  ) * angAccI4 +  
+	0.5 * AP()*AT() * timeFactorImAPATInt(  ) * angAccI5 +  
+	0.5 * A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 ;  	
+
 	return norm ;
 };
 
+//  13.432', '14.151', '14.210
 double Bs2JpsiPhi_mistagParameter_alt::diffXsecOneNorm1(  ) const
 {      
 	double norm = 

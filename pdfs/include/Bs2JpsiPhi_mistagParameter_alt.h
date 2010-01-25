@@ -33,7 +33,9 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 	private:
 	
 		void MakePrototypes();
-		void getPhysicsParameters( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, double &, double &, double & );
+
+	    //void getPhysicsParameters( double&, double&, double&, double&, double&, double&, double&, 
+		//						  double&, double&, double&, double&, double &, double &, double &, double & );
 
 		// These contain the strings that correspond to the physics parameter names.
 		string gammaName;		// gamma
@@ -46,10 +48,21 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 		string delta_zeroName;	// strong phase, set to 0
 		string delta_paraName;	// strong phase
 		string delta_perpName;	// strong phase
-		string mistagName;		// mistag fraction
+
+	    // These are detector parameters
+	    string mistagName;		// mistag fraction
 		string res1Name;		  // time resolution core
 		string res2Name;		  // time resolution tail
 		string res1FractionName;  // fraction of core
+		string timeOffsetName;    // time offset
+	
+	    // These are the angular accceptance factors
+	    string angAccI1Name ;
+		string angAccI2Name ;
+		string angAccI3Name ;
+		string angAccI4Name ;
+		string angAccI5Name ;
+		string angAccI6Name ;
   
 		// These contain the strings that correspond to the observable names
 		string timeName;		// proper time
@@ -78,6 +91,18 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 		// Other experimental parameters
 		double tagFraction ;
 		double resolution ;
+		double resolution1 ;
+		double resolution2 ;
+		double resolution1Fraction ;
+		double timeOffset ;
+	
+	    // Angular acceptance factors
+		double angAccI1 ;
+		double angAccI2 ;
+		double angAccI3 ;
+		double angAccI4 ;
+		double angAccI5 ;
+		double angAccI6 ;
 	
 		// Othere things calculated later on the fly
 		double tlo, thi ;
