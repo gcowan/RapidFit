@@ -61,16 +61,23 @@ def main():
 
 	# ThetaTr, ThetaK, ThetaVtr are the names that the P2VVAngleCalculator
 	# in DaVinci gives to the angles theta, psi and phi respectively.	
-	#valueList.append( math.cos( pyl.B_s_ThetaTr.GetValue() ))
-	#valueList.append( math.cos( pyl.B_s_ThetaK.GetValue() ))
-	#valueList.append( pyl.B_s_ThetaVtr.GetValue() )
-	#valueList.append( pyl.B_s0_LOKI_BPVLTIME.GetValue() )	
-	valueList.append( pyl.B_s0_LOKI_BPVLTIME.GetValue()*1000 )	#convert fs to ps
-	valueList.append( pyl.B_s0_TAGDECISION.GetValue() )
-	valueList.append( pyl.B_s0_TAGOMEGA.GetValue() )
-	valueList.append( pyl.B_s0_LOKI_MM.GetValue() )	
-	#valueList.append( pyl.B_s0_TRUETAU.GetValue() )
-		
+	'''
+  	valueList.append( pyl.B_s_TAU.GetValue() )
+	valueList.append( math.cos( pyl.B_s_ThetaTr.GetValue() ))
+	valueList.append( math.cos( pyl.B_s_ThetaK.GetValue() ))
+	valueList.append( pyl.B_s_ThetaVtr.GetValue() )
+	valueList.append( pyl.B_s_TAGDECISION.GetValue() )
+	valueList.append( pyl.B_s_TAGOMEGA.GetValue() )
+	'''
+  	valueList.append( pyl.time.GetValue() )
+	valueList.append( pyl.cosTheta.GetValue() )
+	valueList.append( pyl.cosPsi.GetValue() )
+	valueList.append( pyl.phi.GetValue() )
+	valueList.append( pyl.tag.GetValue() )
+	valueList.append( pyl.mistag.GetValue() )
+	valueList.append( pyl.mass.GetValue() )
+  
+  	if pyl.time.GetValue() < -0.2: continue
 	data = array("f", valueList)
 	outputNtuple.Fill(data)	
 

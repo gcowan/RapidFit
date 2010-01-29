@@ -13,6 +13,7 @@
 #include "math.h"
 #include "TMath.h"
 #include "RooMath.h"
+#include "Mathematics.h"
 
 namespace Mathematics 
 {
@@ -324,6 +325,39 @@ namespace Mathematics
 		f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.);
 		return;
 	}
+
+  void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF )
+  {
+    // This tries to implement the NIKHEF method for calculating the
+    // average acceptance weights for Bs2JpsiPhi.
+    int numAngularTerms = 6;
+    double  f[numAngularTerms]; // the angular functions
+    double xi[numAngularTerms]; // the angular weights
+    double cosTheta, phi, cosPsi;
+    double evalPDF;
+    int numEvents = dataSet->GetDataNumber();
+    for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
+    for (int e = 0; e < numEvents; e++)
+    //for (int e = 0; e < 1000; e++)
+    {
+      DataPoint * event = dataSet->GetDataPoint(e);
+      cosTheta = event->GetObservable("cosTheta")->GetValue();
+      phi      = event->GetObservable("phi")->GetValue();
+      cosPsi   = event->GetObservable("cosPsi")->GetValue();
+      getBs2JpsiPhiAngularFunctions( f[0], f[1], f[2], f[3], f[4], f[5], cosTheta, phi, cosPsi);
+      // The method sums the angular factor f_i divided by the sum_i(A_i*f_i)
+      // for each accepted event. I'm not sure if dividing by Evaluate is exactly the
+      // same here, particularly if you look at untagged events.
+      evalPDF = PDF->Evaluate( event );
+      for (int i = 0; i < numAngularTerms; i++)
+      {
+        xi[i] += f[i]/evalPDF; ///1501544.3013043751;
+      }
+      //cout << cosTheta << " " << phi << " " << cosPsi << " " << evalPDF  << " " << xi[0] << endl;
+    }
+    cout << xi[0] << " " << xi[1] << " " << xi[2] <<  " " << xi[3] << " " << xi[4] << " " << xi[5] << endl;
+    return;
+  }
 
 }
 

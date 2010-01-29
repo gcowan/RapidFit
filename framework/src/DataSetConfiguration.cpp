@@ -189,6 +189,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	int numberOfDataPointsRead = 0;
 	while ( numberOfDataPointsAdded < numberEventsToRead && numberOfDataPointsAdded < totalNumberOfEvents )
 	{
+		if ( numberOfDataPointsRead > totalNumberOfEvents) break;
 		DataPoint point( observableNames );
 		ntuple->GetEntry( numberOfDataPointsRead );
 

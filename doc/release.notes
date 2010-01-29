@@ -1,5 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/01/29 - Greig Cowan 
+ - Fixed reading in of data file. Now does not get stuck in 
+   infinite loop if you specify more events than are in the file.
+   It now just reads in the maximum amount that are consistent with
+   the PhaseSpaceBoundary.
+
 2010/01/29 - Ailsa Sparkes 
  - Created Bd2JPsiKstar PDF. Still testing!
 

@@ -11,6 +11,7 @@
 #include <vector>
 #include <iostream>
 #include <ctime>
+#include "Mathematics.h"
 #include "FitAssembler.h"
 #include "ToyStudy.h"
 #include "XMLConfigReader.h"
@@ -68,7 +69,8 @@ int main( int argc, char * argv[] )
 		bool doPlottingFlag = false;
 		bool doPullsFlag = false;
 		bool testRapidIntegratorFlag = false;
-
+    bool calculateAcceptanceWeights = false;
+  
 		//Parse command line arguments
 		string currentArgument;
 		for ( int argumentIndex = 1; argumentIndex < argc; argumentIndex++ )
@@ -185,6 +187,10 @@ int main( int argc, char * argv[] )
 			else if ( currentArgument == "--testRapidIntegrator" )
 			{
 				testRapidIntegratorFlag = true;
+			}
+			else if ( currentArgument == "--calculateAcceptanceWeights" )
+			{
+				calculateAcceptanceWeights = true;
 			}
 			else if ( currentArgument == "--testPlot" )
 			{
@@ -311,6 +317,23 @@ int main( int argc, char * argv[] )
 				return 1;
 			}
 		}
+    else if (calculateAcceptanceWeights)
+    {
+      if (configFileNameFlag)
+      {
+        // Calculate the acceptance weights from MC
+        PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
+        pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters() );
+        IDataSet * dataSet = pdfAndData->GetDataSet();
+        IPDF * pdf = pdfAndData->GetPDF();
+        Mathematics::calculateAcceptanceWeights(dataSet, pdf);
+      }
+      else
+      {
+        cerr << "No data set specified" << endl;
+        return 1;
+      }
+    }
 		else if (testPlotFlag)
 		{
 			if (configFileNameFlag)

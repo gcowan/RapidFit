@@ -90,106 +90,6 @@
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
-		<PhysicsParameter>
-			<Name>timeResolution1</Name>
-			<Value>0.025</Value>
-			<Type>Fixed</Type>
-			<Unit>ps</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>timeResolution2</Name>
-			<Value>0.069</Value>
-			<Type>Fixed</Type>
-			<Unit>ps</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>timeResolution1Fraction</Name>
-			<Value>0.78</Value>
-			<Type>Fixed</Type>
-			<Unit> </Unit>
-		</PhysicsParameter>
-
-		//........... Signal mass PDF parameters ...........
-<PhysicsParameter>
-<Name>f_sig_m1</Name>
-<Value>0.55</Value>
-<Type>Fixed</Type>
-<Unit>Unitless</Unit>
-</PhysicsParameter>
-
-<PhysicsParameter>
-<Name>sigma_m1</Name>
-<Value>11.0</Value>
-<Type>Fixed</Type>
-<Unit>Unitless</Unit>
-</PhysicsParameter>
-
-<PhysicsParameter>
-<Name>sigma_m2</Name>
-<Value>18.5</Value>
-<Type>Fixed</Type>
-<Unit>Unitless</Unit>
-</PhysicsParameter>
-
-<PhysicsParameter>
-<Name>m_Bs</Name>
-<Value>5364.4</Value>
-<Type>Fixed</Type>
-<Unit>MeV/c^{2}</Unit>
-</PhysicsParameter>
-
-
-		// 11.1701
-		<PhysicsParameter>
-			<Name>angAccI1</Name>
-			<Value>11.1701</Value>
-			<Minimum>1.0</Minimum>
-			<Maximum>15.0</Maximum>
-			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>angAccI2</Name>
-			<Value>11.1701</Value>
-			<Minimum>1.0</Minimum>
-			<Maximum>15.0</Maximum>
-			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>angAccI3</Name>
-			<Value>11.1701</Value>
-			<Minimum>1.0</Minimum>
-			<Maximum>15.0</Maximum>
-			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>angAccI4</Name>
-			<Value>0.0</Value>
-			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>angAccI5</Name>
-			<Value>0.0</Value>
-			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
-		<PhysicsParameter>
-			<Name>angAccI6</Name>
-			<Value>0.0</Value>
-			<Type>Fixed</Type>
-			<Unit>Unitless</Unit>
-		</PhysicsParameter>
-
 	</ParameterSet>
 
 	// Minimising with Minuit2
@@ -210,24 +110,23 @@
 
 	// 100000 toy events
 	<ToFit>
-		<ProdPDF>
 		<PDF>
-			<Name>Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc</Name>
+			<Name>Bs2JpsiPhi_mistagParameter</Name>
 		</PDF>
-		<PDF>
-			<Name>Bs2JpsiPhiMassSignal</Name>
-		</PDF>
-		</ProdPDF>
-
+		
+    //MC09_toy_data_for_acceptance.root
+    //dataNTuple	
+    //../../data/observables_MC09_Bs2JpsiPhi_lhcb_conventions_NP_phis.root
+    // ntuple
 		<DataSet>
 			<Source>File</Source>
 			<FileName>../../data/observables_MC09_Bs2JpsiPhi_lhcb_conventions_NP_phis.root</FileName>
 			<NTuplePath>ntuple</NTuplePath>
-			<NumberEvents>117000</NumberEvents>
+			<NumberEvents>100000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>-0.5</Minimum>
+					<Minimum>0.0</Minimum>
 					<Maximum>12.0</Maximum>
 					<Unit>ps</Unit>
 				</Observable>
@@ -255,16 +154,10 @@
 
 				<Observable>
 					<Name>tag</Name>
-					<Value>0.0</Value>
+					<Value>1.0</Value>
 					<Unit>Unitless</Unit>
 				</Observable>
 
-				<Observable>
-					<Name>mass</Name>
-					<Minimum>5300.0</Minimum>
-					<Maximum>5430.0</Maximum>
-					<Unit>MeV/c^{2}</Unit>
-				</Observable>
 			</PhaseSpaceBoundary>
 		</DataSet>
 	</ToFit>

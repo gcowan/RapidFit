@@ -27,7 +27,7 @@
 			<Value>0.16</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -36,7 +36,7 @@
 			<Value>0.60</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -141,51 +141,51 @@
 </PhysicsParameter>
 
 
+		//13.3184
+		//14.167
+		//14.2448
+		//-0.0458
+		//0.0756
+		//-0.0078
 		// 11.1701
 		<PhysicsParameter>
 			<Name>angAccI1</Name>
-			<Value>10.58</Value>
-			<Minimum>1.0</Minimum>
-			<Maximum>15.0</Maximum>
+			<Value>13.432</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>angAccI2</Name>
-			<Value>1.199</Value>
-			<Minimum>1.0</Minimum>
-			<Maximum>15.0</Maximum>
+			<Value>14.151</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>angAccI3</Name>
-			<Value>1.324</Value>
-			<Minimum>1.0</Minimum>
-			<Maximum>15.0</Maximum>
+			<Value>14.210</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>angAccI4</Name>
-			<Value>-0.0053</Value>
+			<Value>-0.044</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>angAccI5</Name>
-			<Value>0.0022</Value>
+			<Value>0.033</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>angAccI6</Name>
-			<Value>-0.00071</Value>
+			<Value>-0.011</Value>
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
@@ -211,7 +211,7 @@
 	<ToFit>
 		<ProdPDF>
 		<PDF>
-			<Name>Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc</Name>
+			<Name>Bs2JpsiPhi_mistagParameter_alt</Name>
 		</PDF>
 		<PDF>
 			<Name>Bs2JpsiPhiMassSignal</Name>

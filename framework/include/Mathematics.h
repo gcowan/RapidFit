@@ -9,6 +9,8 @@
   @date 2009-12-22
  */
 
+#include "IDataSet.h"
+#include "IPDF.h"
 
 namespace Mathematics 
 {
@@ -29,5 +31,6 @@ namespace Mathematics
 	double expErfInt(double tlimit, double tau, double sigma);
 	void getBs2JpsiPhiAngularFunctions( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6
 			, double cosTheta, double phi, double cosPsi);
+  void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
 }
 

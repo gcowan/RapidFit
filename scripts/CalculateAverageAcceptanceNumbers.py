@@ -47,18 +47,19 @@ def calculate(acceptanceHisto, nameOfHisto):
     fInt = [0. for i in range(6)]
     largestNumEvents = 1
     normalisation = 10000
-    for xbin in range(xbins):
-	for ybin in range(ybins):
-		for zbin in range(zbins):
+    # ROOT starts bin numbering from 1...
+    for xbin in range(1, xbins+1):
+	for ybin in range(1, ybins+1):
+		for zbin in range(1, zbins+1):
 			bin = acceptanceHisto.GetBin(xbin, ybin, zbin)
 			numEvents = acceptanceHisto.GetBinContent(bin)
 			if numEvents > largestNumEvents: largestNumEvents = numEvents
 			xWidth = acceptanceHisto.GetXaxis().GetBinWidth(xbin)
 			yWidth = acceptanceHisto.GetYaxis().GetBinWidth(ybin)
 			zWidth = acceptanceHisto.GetZaxis().GetBinWidth(zbin)
-			x = acceptanceHisto.GetXaxis().GetBinCenter(xbin) + xWidth
-			y = acceptanceHisto.GetYaxis().GetBinCenter(ybin) + yWidth
-			z = acceptanceHisto.GetZaxis().GetBinCenter(zbin) + zWidth
+			x = acceptanceHisto.GetXaxis().GetBinCenter(xbin)
+			y = acceptanceHisto.GetYaxis().GetBinCenter(ybin)
+			z = acceptanceHisto.GetZaxis().GetBinCenter(zbin)
 			f = angularFunctions(x, y, z)
 			for i in range(6):
 				if nameOfHisto == "flat": 
@@ -89,6 +90,7 @@ def main():
     
     for i in range(numberOfHistos):
     	acceptanceHisto = acceptanceFile.Get(nameOfHisto + str(i))
+    	#acceptanceHisto = acceptanceFile.Get(nameOfHisto)
     	calculate(acceptanceHisto, nameOfHisto)
     
     acceptanceFile.Close()
