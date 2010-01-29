@@ -1,0 +1,137 @@
+<RapidFit>
+	/////////////////////////////////////////
+	// Example RapidFit configuration file //
+	// Author: Ben Wynne                   //
+	/////////////////////////////////////////
+	<ParameterSet>
+		<PhysicsParameter>
+			<Name>gamma</Name>
+			<Value>0.68</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.5</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>deltaGamma</Name>
+			<Value>0.06</Value>
+			<Minimum>-1.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>deltaM</Name>
+			<Value>17.77</Value>
+			<Minimum>17.0</Minimum>
+			<Maximum>20.0</Maximum>
+			<Type>Fixed</Type>
+			<Unit>MeV/c2</Unit>
+		</PhysicsParameter>
+		
+		<PhysicsParameter>
+			<Name>mistag</Name>
+			<Value>0.35</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		
+		<PhysicsParameter>
+			<Name>timeresDsPi</Name>
+			<Value>0.033</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>0.3</Maximum>
+			<Type>Free</Type>
+			<Unit>ps</Unit>
+		</PhysicsParameter>
+				
+//........... Signal mass PDF parameters ...........
+		<PhysicsParameter>
+			<Name>f_sig_m1</Name>
+			<Value>0.55</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>sigma_m1</Name>
+			<Value>11.0</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>sigma_m2</Name>
+			<Value>18.5</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>m_Bs</Name>
+			<Value>5364.4</Value>
+			<Type>Fixed</Type>
+			<Unit>MeV/c^{2}</Unit>
+		</PhysicsParameter>
+
+
+	</ParameterSet>
+
+
+	<Minimiser>Minuit2</Minimiser>
+
+	<FitFunction>NegativeLogLikelihood</FitFunction>
+
+	<NumberRepeats>1</NumberRepeats>
+
+	<Output>
+		<Projection>time</Projection>
+	</Output>
+
+	<ToFit>
+	
+
+		<ProdPDF>
+			<PDF>
+				<Name>Bs2DsPi_mistagParameter</Name>
+			</PDF>
+			<PDF>
+				<Name>Bs2DsPiMassSignal</Name>
+			</PDF>
+		</ProdPDF>
+
+		<DataSet>
+			<Source>File</Source>
+			<FileName>~/work/bias/Full_Loose_cuts/withmass/DVTuple_RapidFit.root</FileName>
+			<NTuplePath>ntuple</NTuplePath>
+			
+			<NumberEvents>25000</NumberEvents>
+			<PhaseSpaceBoundary>
+				<Observable>
+					<Name>time</Name>
+					<Minimum>-0.5</Minimum>
+					<Maximum>15</Maximum>
+					<Unit>ps</Unit>
+				</Observable>
+
+				<Observable>
+					<Name>tag</Name>
+					<Value>0.0</Value>
+					<Unit>Unitless</Unit>
+				</Observable>
+
+				<Observable>
+					<Name>mass</Name>
+					<Minimum>5300.0</Minimum>
+					<Maximum>5430.0</Maximum>
+					<Unit>MeV/c2</Unit>
+				</Observable>
+
+			</PhaseSpaceBoundary>
+		</DataSet>
+	</ToFit>
+</RapidFit>
