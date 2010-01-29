@@ -44,11 +44,12 @@ def main():
     # This list MUST be in the correct order, as defined by the 
     # valueList lines in the loop below. It's not pretty, but it works.
     newBranches = [ "time"
-		  , "cosTheta"
-		  , "cosPsi"
-		  , "phi"
+		  #, "cosTheta"
+		  #, "cosPsi"
+		  #, "phi"
 		  , "tag"
 		  , "mistag"
+		  , "mass"
 		  ]
 
     outputNtupleStructure = ":".join(newBranches) 
@@ -60,13 +61,16 @@ def main():
 
 	# ThetaTr, ThetaK, ThetaVtr are the names that the P2VVAngleCalculator
 	# in DaVinci gives to the angles theta, psi and phi respectively.	
-	valueList.append( pyl.B_s_TAU.GetValue() )
-	valueList.append( math.cos( pyl.B_s_ThetaTr.GetValue() ))
-	valueList.append( math.cos( pyl.B_s_ThetaK.GetValue() ))
-	valueList.append( pyl.B_s_ThetaVtr.GetValue() )
-	valueList.append( pyl.B_s_TAGDECISION.GetValue() )
-	valueList.append( pyl.B_s_TAGOMEGA.GetValue() )
-	
+	#valueList.append( math.cos( pyl.B_s_ThetaTr.GetValue() ))
+	#valueList.append( math.cos( pyl.B_s_ThetaK.GetValue() ))
+	#valueList.append( pyl.B_s_ThetaVtr.GetValue() )
+	#valueList.append( pyl.B_s0_LOKI_BPVLTIME.GetValue() )	
+	valueList.append( pyl.B_s0_LOKI_BPVLTIME.GetValue()*1000 )	#convert fs to ps
+	valueList.append( pyl.B_s0_TAGDECISION.GetValue() )
+	valueList.append( pyl.B_s0_TAGOMEGA.GetValue() )
+	valueList.append( pyl.B_s0_LOKI_MM.GetValue() )	
+	#valueList.append( pyl.B_s0_TRUETAU.GetValue() )
+		
 	data = array("f", valueList)
 	outputNtuple.Fill(data)	
 
