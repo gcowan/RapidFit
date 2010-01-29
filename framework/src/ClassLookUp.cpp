@@ -20,6 +20,8 @@
 #include "Bs2JpsiPhi_mistagParameter_alt.h"
 #include "Bs2JpsiPhiMassSignal.h"
 
+#include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc.h"
+
 #include "Bs2DsPi.h"
 #include "Bs2DsPi_mistagParameter.h"
 #include "Bs2PhiPhi.h"
@@ -141,6 +143,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
                 //Default JPsiPhi prompt bkg mass signal
                 return new Bs2JpsiPhiMassBkg();
 	}
+		else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc" )
+        {
+			// Bd2JPsiKstar with analytic double gaussian time resolution
+			return new Bd2JpsiKstar_withTimeRes_withAverageAngAcc();
+        }
+	
 	else
 	{
 		cerr << "Unrecognised PDF name: " << Name << endl;
