@@ -17,6 +17,7 @@
 #include "TFile.h"
 #include "TBranch.h"
 #include "TLeaf.h"
+#include "TEventList.h"
 #include "DataSetConfiguration.h"
 #include "ClassLookUp.h"
 #include <stdlib.h>
@@ -27,14 +28,18 @@ DataSetConfiguration::DataSetConfiguration()
 }
 
 //Constructor with correct argument
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, vector<string> DataArguments, vector<string> DataArgumentNames ) : source(DataSource),
-	numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), separateGeneratePDF(false), parametersAreSet(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames ) : source(DataSource),
+	numberEvents(DataNumber),
+	cutString(cut),
+	arguments(DataArguments), argumentNames(DataArgumentNames), separateGeneratePDF(false), parametersAreSet(false)
 {
 }
 
 //Constructor with separate data generation PDF
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource),
-	numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(DataPDF), separateGeneratePDF(true), parametersAreSet(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource),
+	numberEvents(DataNumber),
+	cutString(cut),
+	arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(DataPDF), separateGeneratePDF(true), parametersAreSet(false)
 {
 }
 
@@ -167,6 +172,17 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	TFile * inputFile = new TFile( fileName.c_str(), "UPDATE" );
 	TNtuple * ntuple = (TNtuple*)inputFile->Get( ntuplePath.c_str() );
 	int totalNumberOfEvents = ntuple->GetEntries();
+	int numberOfEventsAfterCut = ntuple->Draw(">>evtList", cutString.c_str()); // apply the cut which automatically creates the evtList object
+	if ( numberOfEventsAfterCut == -1 )
+	{
+		cerr << "Please check the cut string you are using!" << endl;
+		exit(1);
+	}
+	TEventList * evtList = (TEventList*)gDirectory->Get("evtList"); // ROOT is weird
+
+	cout << "Total number of events in file: " << totalNumberOfEvents << endl;
+	cout << "You have applied this cut to the data: '" << cutString << "'" << endl;
+	cout << "Total number of events after cut: " << numberOfEventsAfterCut << endl;
 
 	// Check that ntuple is compatible with the PhaseSpaceBoundary that is defined
 	// in the XML file.
@@ -187,11 +203,11 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	// Now populate the dataset
 	int numberOfDataPointsAdded = 0;
 	int numberOfDataPointsRead = 0;
-	while ( numberOfDataPointsAdded < numberEventsToRead && numberOfDataPointsAdded < totalNumberOfEvents )
+	while ( numberOfDataPointsAdded < numberEventsToRead && numberOfDataPointsAdded < numberOfEventsAfterCut )
 	{
-		if ( numberOfDataPointsRead > totalNumberOfEvents) break;
+		if ( numberOfDataPointsRead > numberOfEventsAfterCut) break;
 		DataPoint point( observableNames );
-		ntuple->GetEntry( numberOfDataPointsRead );
+		ntuple->GetEntry( evtList->GetEntry(numberOfDataPointsRead) );
 
 		for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
 		{
@@ -206,7 +222,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 	inputFile->Close();
 	delete inputFile;
-	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << endl;
+	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << " which are consistent with the PhaseSpaceBoundary" << endl;
 	return data;
 }
 

@@ -603,6 +603,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 	{
 		string dataSource = "Uninitialised";
 		long numberEvents = 0;
+		string cutString = "";
 		PhaseSpaceBoundary * dataBoundary;
 		vector<string> dataArguments, argumentNames;
 		bool boundaryFound = false;
@@ -623,6 +624,10 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			else if ( name == "Subset" )
 			{
 				dataSetMakers.push_back( MakeDataSetConfiguration( dataComponents[dataIndex], dataBoundary ) );
+			}
+			else if ( name == "CutString" )
+			{
+				cutString = dataComponents[dataIndex]->GetValue()[0];
 			}
 			else if ( name == "FileName" || name == "NTuplePath" )
 			{
@@ -668,11 +673,11 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 
 			if (generatePDFFlag)
 			{
-				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, dataArguments, argumentNames, generatePDF );
+				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, generatePDF );
 			}
 			else
 			{
-				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, dataArguments, argumentNames );
+				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames );
 			}
 
 			dataSetMakers.push_back(oldStyleConfig);
@@ -696,6 +701,7 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 	if ( DataTag->GetName() == "Subset" )
 	{
 		string dataSource = "Uninitialised";
+		string cutString = "";
 		long numberEvents = 0;
 		vector<string> dataArguments, argumentNames;
 		bool generatePDFFlag = false;
@@ -709,6 +715,10 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 			if ( name == "Source" )
 			{
 				dataSource = dataComponents[dataIndex]->GetValue()[0];
+			}
+			else if ( name == "CutString" )
+			{
+				cutString = dataComponents[dataIndex]->GetValue()[0];
 			}
 			else if ( name == "FileName" || name == "NTuplePath" )
 			{
@@ -733,11 +743,11 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 
 		if (generatePDFFlag)
 		{
-			return new DataSetConfiguration( dataSource, numberEvents, dataArguments, argumentNames, generatePDF );
+			return new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, generatePDF );
 		}
 		else
 		{
-			return new DataSetConfiguration( dataSource, numberEvents, dataArguments, argumentNames );
+			return new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames );
 		}
 	}
 	else

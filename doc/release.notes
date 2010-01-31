@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/01/31 - Greig Cowan 
+ - Added ability to apply a cut to an ntuple which is being loaded
+   into memory. Use the <CutString> tag inside a <DataSet>.
+ 
 2010/01/29 - Greig Cowan 
  - Fixed reading in of data file. Now does not get stuck in 
    infinite loop if you specify more events than are in the file.

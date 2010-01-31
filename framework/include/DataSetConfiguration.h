@@ -20,8 +20,8 @@ class DataSetConfiguration
 {
 	public:
 		DataSetConfiguration();
-		DataSetConfiguration( string, long, vector<string>, vector<string> );
-		DataSetConfiguration( string, long, vector<string>, vector<string>, IPDF* );
+		DataSetConfiguration( string, long, string, vector<string>, vector<string> );
+		DataSetConfiguration( string, long, string, vector<string>, vector<string>, IPDF* );
 		~DataSetConfiguration();
 
 		bool SetPhysicsParameters( ParameterSet* );
@@ -34,6 +34,7 @@ class DataSetConfiguration
 		bool CheckTNtupleWithBoundary( TNtuple *, PhaseSpaceBoundary * );
 
 		string source;
+		string cutString;
 		long numberEvents;
 		vector<string> arguments, argumentNames;
 		IPDF * generatePDF;
