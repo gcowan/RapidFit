@@ -31,6 +31,8 @@ namespace Mathematics
 	double expErfInt(double tlimit, double tau, double sigma);
 	void getBs2JpsiPhiAngularFunctions( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6
 			, double cosTheta, double phi, double cosPsi);
-  void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
+	void getBs2JpsiPhiAngularFunctionsWithSwave( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6,
+			double & f7, double & f8, double & f9, double & f10, double cosTheta, double phi, double cosPsi);
+  	void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
 }
 

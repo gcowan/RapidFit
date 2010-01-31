@@ -3,6 +3,8 @@
 2010/01/31 - Greig Cowan 
  - Added ability to apply a cut to an ntuple which is being loaded
    into memory. Use the <CutString> tag inside a <DataSet>.
+ - Added Bs2JpsiPhi transversity S-wave terms to Mathematics namespace.
+ - Update todo list. 
  
 2010/01/29 - Greig Cowan 
  - Fixed reading in of data file. Now does not get stuck in 

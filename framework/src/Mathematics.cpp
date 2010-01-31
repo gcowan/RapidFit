@@ -325,6 +325,44 @@ namespace Mathematics
 		f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.);
 		return;
 	}
+	
+	void getBs2JpsiPhiAngularFunctionsWithSwave( double & f1
+                        , double & f2
+                        , double & f3
+                        , double & f4
+                        , double & f5
+                        , double & f6
+                        , double & f7
+                        , double & f8
+                        , double & f9
+                        , double & f10
+                        , double cosTheta
+                        , double phi
+                        , double cosPsi)
+        {
+                double sinTheta  = sqrt(1. - cosTheta*cosTheta);
+                double sinPsi    = sqrt(1. - cosPsi*cosPsi);
+
+                double cosPhi    = cos(phi);
+                double sinPhi    = sin(phi);
+
+                double sin2Theta = 2.*sinTheta*cosTheta;
+                double sin2Psi   = 2.*sinPsi*cosPsi;
+                double sin2Phi   = 2.*sinPhi*cosPhi;
+
+                f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi );
+                f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi );
+                f3 =      sinPsi*sinPsi * sinTheta*sinTheta;
+                f4 = -1.* sinPsi*sinPsi * sin2Theta * sinPhi;
+                f5 = sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.);
+                f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.);
+		// Need to make sure that we deal with the normalisation of the following terms properly in the code that uses them
+        	f7 =  (2./3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi); 			//Check: norm = (9./64./TMath::Pi())
+        	f8 =  (1./3.) * sqrt(6.) * sinTheta*sinTheta * sin2Phi * sinPsi;              	//Check: norm = 0
+        	f9 = -(1./3.) * sqrt(6.) * sin2Theta * cosPhi * sinPsi;                		//Check: norm = 0
+        	f10= -(4./3.) * sqrt(3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * cosPsi;   //Check: norm = 0
+                return;
+        }
 
   void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF )
   {

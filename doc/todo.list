@@ -7,25 +7,24 @@
 
 High priority
 =============
-* Allow use to apply a pre-selection on the data? Do we really need this
-in RapidFit? User could do this outside of the fitter and create a new 
-input ntuple/file? PhaseSpaceBoundary already applies cuts on the
-Observables, but not on other variables that it knows nothing about.
-
+* Improve some of the plotting features. See more details below.
 * Ability to include an analytic acceptance surface.
-
 * Asymmetric errors and errors on the error. How do we do this?
-
 
 Medium priority
 ===============
 * Include Yuehong's angular acceptance corrections in our framework.
+(This is just a placeholder since we have the functionality in there but
+it all needs to be tested.)
 
 Low priority
 ============
 * Implement Fumili minimisation routine. Should be easy if we use the TVirtualFitter from ROOT.
-* Implement ZooTuple file loader. Will need to link against libZoo.
 
+Discarded actions
+=================
+* Implement ZooTuple file loader. Will need to link against libZoo.
+(I don't think I want to implement this anymore)
 
 Plotting specific issues
 ========================
@@ -55,6 +54,10 @@ Completed plotting issues
 
 The following tasks have been completed
 =======================================
+* Allow use to apply a pre-selection on the data? Do we really need this
+in RapidFit? User could do this outside of the fitter and create a new 
+input ntuple/file? PhaseSpaceBoundary already applies cuts on the
+Observables, but not on other variables that it knows nothing about.
 * Improve the parsing of the "header" row in the DataFileLoader class.
 * Check the validity of the background PDFs - normalisation in particular.
 Pete working on this.
