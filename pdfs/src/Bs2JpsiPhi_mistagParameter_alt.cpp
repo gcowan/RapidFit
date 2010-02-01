@@ -611,10 +611,10 @@ double Bs2JpsiPhi_mistagParameter_alt::diffXsecNorm1(  ) const
 	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2   +  
 	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3   +  
 
-	0.5 * A0()*AP() * timeFactorReA0APInt(  ) * angAccI4 +  
-	0.5 * AP()*AT() * timeFactorImAPATInt(  ) * angAccI5 +  
+	0.5 * A0()*AP() * timeFactorReA0APInt(  ) * angAccI5 +  
+	0.5 * AP()*AT() * timeFactorImAPATInt(  ) * angAccI4 +  
 	0.5 * A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 ;  	
-
+	// In the canonical PDF, the ApAt term is number 4!
 	return norm ;
 };
 

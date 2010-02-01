@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/02/01 - Greig Cowan 
+ - Palindrome!
+ - Fixed bug in Bs2JpsiPhi_mistagParameter_alt which was incorrectly
+   handling average acceptance weights due to wrong order of f4/f5 terms.
+   Still need to find out why this PDF gives very slightly different
+   numbers compared to canonical PDF for a tagged fit. Untagged fits are
+   the same.
+
 2010/01/31 - Greig Cowan 
  - Added ability to apply a cut to an ntuple which is being loaded
    into memory. Use the <CutString> tag inside a <DataSet>.

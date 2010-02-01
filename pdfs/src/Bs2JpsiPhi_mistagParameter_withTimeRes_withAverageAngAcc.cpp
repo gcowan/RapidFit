@@ -296,8 +296,8 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::buildPDFdenomin
 		+ cachedAzeroAparaIntBbar * angAccI5 
 		+ cachedAzeroAperpIntBbar * angAccI6; 
 	
-	double norm = (angAccI1 + angAccI2 + angAccI3 + angAccI4 + angAccI5 + angAccI6)/(3*32*TMath::Pi()/9);
-
+	//double norm = (angAccI1 + angAccI2 + angAccI3 + angAccI4 + angAccI5 + angAccI6)/(3*32*TMath::Pi()/9);
+	double norm = 1.0;
 	return (w1*v1 + w2*v2)/norm;
 }
 
