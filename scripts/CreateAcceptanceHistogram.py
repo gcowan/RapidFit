@@ -72,7 +72,7 @@ def main():
     numMCEvents = mcNtuple.GetEntries()
     numToyEvents = toyNtuple.GetEntries()
 
-    numHistosToProduce = 5
+    numHistosToProduce = 1
  
     #toyWeight = float(numMCEvents)/numToyEvents
 

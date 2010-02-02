@@ -171,6 +171,11 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 	TFile * inputFile = new TFile( fileName.c_str(), "UPDATE" );
 	TNtuple * ntuple = (TNtuple*)inputFile->Get( ntuplePath.c_str() );
+	if ( ntuple == NULL )
+	{
+		cerr << "Ntuple not found. Are you specifying the correct file and ntuple path?" << endl;
+		exit(1);
+	}
 	int totalNumberOfEvents = ntuple->GetEntries();
 	int numberOfEventsAfterCut = ntuple->Draw(">>evtList", cutString.c_str()); // apply the cut which automatically creates the evtList object
 	if ( numberOfEventsAfterCut == -1 )
@@ -223,6 +228,9 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	inputFile->Close();
 	delete inputFile;
 	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << " which are consistent with the PhaseSpaceBoundary" << endl;
+	time_t timeNow;
+        time(&timeNow);
+        cout << "Time: " << ctime( &timeNow ) << endl;
 	return data;
 }
 

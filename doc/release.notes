@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/02/02 - Greig Cowan 
+ - Put in check in when loading ntuple from root file so that we do
+   not use a null pointer in the case where the user has not specified
+   the correct ntuple path location on the file.
+
 2010/02/01 - Greig Cowan 
  - Palindrome!
  - Fixed bug in Bs2JpsiPhi_mistagParameter_alt which was incorrectly
