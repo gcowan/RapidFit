@@ -31,10 +31,12 @@ class RapidFitIntegrator
 
 		double Integral( DataPoint*, PhaseSpaceBoundary* );
 		double ProjectObservable( DataPoint*, PhaseSpaceBoundary*, string );
+		double GetRatioOfIntegrals();
 
 	private:
 		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string> );
 
+		double ratioOfIntegrals;
 		double cumulativeError;
 		double numberCalls;
 		bool testFast;

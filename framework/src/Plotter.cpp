@@ -135,7 +135,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	vector<double> dataAverageProjection;
 	double averageIntegral = 0.0;
 	double plotInterval;
-	
+	double ratioOfIntegrals = 1.;
+		
 	int plotNumber;
 	if (ObservableName == "time" ) plotNumber = 128;
 	else plotNumber = 32;
@@ -152,14 +153,15 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		//Calculate the projection for this combination
 		vector<double> projectionValueVector = ProjectObservable( AllCombinations[combinationIndex], ObservableName, minimum, maximum, plotNumber, plotInterval );
 		double projectionIntegral = pdfIntegrator->Integral( &( AllCombinations[combinationIndex] ), plotData->GetBoundary() );
-
+		ratioOfIntegrals = pdfIntegrator->GetRatioOfIntegrals();
+		
 		//Update the data average values, and make the projection graph arrays
 		double projectionValueArray[plotNumber];
 		double observableValueArray[plotNumber];
 		for ( int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 		{
 			//Projection graph
-			projectionValueArray[pointIndex] = projectionValueVector[pointIndex] * binInterval * observableValues.size() / projectionIntegral;
+			projectionValueArray[pointIndex] = ratioOfIntegrals * projectionValueVector[pointIndex] * binInterval * observableValues.size() / projectionIntegral;
 			observableValueArray[pointIndex] = minimum + ( plotInterval * pointIndex );
 
 			//Data average
@@ -182,7 +184,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	double observableValueArray[plotNumber];
 	for ( int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 	{
-		projectionValueArray[pointIndex] = dataAverageProjection[pointIndex] * binInterval * observableValues.size() / averageIntegral;
+		projectionValueArray[pointIndex] = ratioOfIntegrals * dataAverageProjection[pointIndex] * binInterval * observableValues.size() / averageIntegral;
 		observableValueArray[pointIndex] = minimum + ( plotInterval * pointIndex );
 	}
 	MakePlotCanvas( ObservableName, "", dataHistogram, observableValueArray, projectionValueArray, plotNumber );

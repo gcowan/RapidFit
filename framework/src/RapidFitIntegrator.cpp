@@ -102,6 +102,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			{
 				//Trust the function's integration
 				cout << "Function provides acceptable integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
+				ratioOfIntegrals = 1.;
 				functionCanIntegrate = true;
 				return testIntegral;
 			}
@@ -109,6 +110,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			{
 				//Use numerical integration
 				cerr << "Function provides poor integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
+				ratioOfIntegrals = testIntegral/numericalIntegral;
 				//functionCanIntegrate = false;
 				//return numericalIntegral;
 				functionCanIntegrate = true;
@@ -123,6 +125,11 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			return numericalIntegral;
 		}
 	}
+}
+
+double RapidFitIntegrator::GetRatioOfIntegrals()
+{
+	return ratioOfIntegrals;
 }
 
 //Actually perform the numerical integration
