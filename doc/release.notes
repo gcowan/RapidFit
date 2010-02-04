@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/02/04 - Greig Cowan 
+ - Added overall normalisation into angular functions in Mathematics.
+ - Open ROOT data file in READ mode, not UPDATE.
+ - Fixed normalisation caching for case where double gaussian resolution
+   is used in Bs2JpsiPhi PDF.
 
 2010/02/04 - Pete Clarke
  - Modified Bs2JpsiPhi_mistagParameter_alt to increase spedd by factor of 3 !

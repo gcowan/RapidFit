@@ -243,6 +243,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Normalisation(D
                 // Set the member variable for time resolution to the first value and calculate
                 timeRes = timeRes1;
                 double val1 = buildPDFdenominator();
+		normalisationCacheValid = false;
                 // Set the member variable for time resolution to the second value and calculate
                 timeRes = timeRes2;
                 double val2 = buildPDFdenominator();

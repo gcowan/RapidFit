@@ -169,7 +169,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	std::vector<string> observableNames = DataBoundary->GetAllNames();
 	int numberOfObservables = observableNames.size();
 
-	TFile * inputFile = new TFile( fileName.c_str(), "UPDATE" );
+	TFile * inputFile = new TFile( fileName.c_str(), "READ" );
 	TNtuple * ntuple = (TNtuple*)inputFile->Get( ntuplePath.c_str() );
 	if ( ntuple == NULL )
 	{

@@ -312,17 +312,18 @@ namespace Mathematics
 		double sin2Psi   = 2.*sinPsi*cosPsi;
 		double sin2Phi   = 2.*sinPhi*cosPhi;
 
-		//double norm = 9./32./TMath::Pi();
-		//this is the factor that drops out when you integrate over the angles
+		double norm = 9./32./TMath::Pi();
+		// This is the factor that drops out when you integrate over the angles
+		// Multiply by it here to get overall normalisation of 1.
 		// i.e., int(2*cospsi*cospsi*(1-(1-costh*costh)*cos(phi)*cos(phi)),cospsi=-1..1, costh=-1..1,phi=-Pi..Pi);
 		// same factor for f1, f2, f3. The remaining terms f4, f5, f6 give 0
 		// int(-(1-cospsi*cospsi)*2*sqrt(1-costh*costh)*costh*sin(phi),cospsi=-1..1, costh=-1..1,phi=-Pi..Pi); 
-		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi );
-		f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi );
-		f3 =      sinPsi*sinPsi * sinTheta*sinTheta;
-		f4 = -1.* sinPsi*sinPsi * sin2Theta * sinPhi;
-		f5 = sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.);
-		f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.);
+		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi ) * norm;
+		f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi ) * norm;
+		f3 =      sinPsi*sinPsi * sinTheta*sinTheta * norm;
+		f4 = -1.* sinPsi*sinPsi * sin2Theta * sinPhi * norm;
+		f5 = sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.) * norm;
+		f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.) * norm;
 		return;
 	}
 	
@@ -350,17 +351,19 @@ namespace Mathematics
                 double sin2Psi   = 2.*sinPsi*cosPsi;
                 double sin2Phi   = 2.*sinPhi*cosPhi;
 
-                f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi );
-                f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi );
-                f3 =      sinPsi*sinPsi * sinTheta*sinTheta;
-                f4 = -1.* sinPsi*sinPsi * sin2Theta * sinPhi;
-                f5 = sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.);
-                f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.);
+		double norm = 9./32./TMath::Pi();
+                
+		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi ) * norm;
+                f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi ) * norm;
+                f3 =      sinPsi*sinPsi * sinTheta*sinTheta * norm;
+                f4 = -1.* sinPsi*sinPsi * sin2Theta * sinPhi * norm;
+                f5 = sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.) * norm;
+                f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.) * norm;
 		// Need to make sure that we deal with the normalisation of the following terms properly in the code that uses them
-        	f7 =  (2./3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi); 			//Check: norm = (9./64./TMath::Pi())
-        	f8 =  (1./3.) * sqrt(6.) * sinTheta*sinTheta * sin2Phi * sinPsi;              	//Check: norm = 0
-        	f9 = -(1./3.) * sqrt(6.) * sin2Theta * cosPhi * sinPsi;                		//Check: norm = 0
-        	f10= -(4./3.) * sqrt(3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * cosPsi;   //Check: norm = 0
+        	f7 =  (2./3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * norm * 2;			//Check: norm = (9./64./TMath::Pi())
+        	f8 =  (1./3.) * sqrt(6.) * sinTheta*sinTheta * sin2Phi * sinPsi * norm;        		//Check: norm = 0
+        	f9 = -(1./3.) * sqrt(6.) * sin2Theta * cosPhi * sinPsi * norm;         			//Check: norm = 0
+        	f10= -(4./3.) * sqrt(3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * cosPsi * norm;   	//Check: norm = 0
                 return;
         }
 
