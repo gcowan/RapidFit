@@ -112,6 +112,12 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 		double normalisationCacheValueRes1[3] ;
 		double normalisationCacheValueRes2[3] ;
 
+		// stored time primitives
+		double expL_stored ;
+		double expH_stored ;
+		double expSin_stored ;
+		double expCos_stored ;
+	
 
 		//------ This is all stuff from Petes J/PsiPhi PDF ---------------------------
 		    
