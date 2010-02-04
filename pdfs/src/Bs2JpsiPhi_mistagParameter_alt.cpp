@@ -159,15 +159,6 @@ vector<string> Bs2JpsiPhi_mistagParameter_alt::GetDoNotIntegrateList()
 double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 {
 	
-/*
-    // Get parameters into member variables
-	double dummy_R0, delta_zero, delta_para, delta_perp ;	
-	double res1, res2, res1Frac ;
-	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, delta_para, 
-						  delta_perp, tagFraction, res1, res2, res1Frac, timeOffset);
-	delta1 = delta_perp -  delta_para ;    
-	delta2 = delta_perp -  delta_zero ;
-*/
 	
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
@@ -176,20 +167,46 @@ double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 
+	
 	double val1, val2 ;
 	
 	if(resolution1Fraction >= 0.9999 ) {
+
 		// Set the member variable for time resolution to the first value and calculate
 		resolution = resolution1 ;
+
+		// Pre calculate the time primitives
+		expL_stored = Mathematics::Exp( t, gamma_l(), resolution ) ;
+		expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
+		expSin_stored = Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
+		expCos_stored = Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
+				
 		val1 = this->diffXsec( );
 		return val1 ;
+
 	}
 	else {
+
 		// Set the member variable for time resolution to the first value and calculate
 		resolution = resolution1 ;
+
+		// Pre calculate the time primitives
+		expL_stored = Mathematics::Exp( t, gamma_l(), resolution ) ;
+		expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
+		expSin_stored = Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
+		expCos_stored = Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
+				
 		val1 = this->diffXsec( );
+
 		// Set the member variable for time resolution to the second value and calculate
 		resolution = resolution2 ;
+
+		// Pre calculate the time primitives
+		expL_stored = Mathematics::Exp( t, gamma_l(), resolution ) ;
+		expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
+		expSin_stored = Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
+		expCos_stored = Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;		
+		
 		val2 = this->diffXsec( );
 		return resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;
 	}
@@ -203,17 +220,7 @@ double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	
-/*
-    // Get parameters into member variables
-	double dummy_R0, delta_zero, delta_para, delta_perp ;	
-	double res1, res2, res1Frac ;
-	getPhysicsParameters( gamma_in, dgam, delta_ms, phi_s, dummy_R0, Rp, Rt, delta_zero, 
-						  delta_para, delta_perp, tagFraction, res1, res2, res1Frac, timeOffset);
-	delta1 = delta_perp -  delta_para ;    
-	delta2 = delta_perp -  delta_zero ;
-*/
 	
-	this-> 
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset;
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
@@ -251,49 +258,6 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 	return resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
 }
 
-/*
-//..............................................
-// Extract and return physics parameters
-void Bs2JpsiPhi_mistagParameter_alt::getPhysicsParameters( double & _gamma
-					, double & _deltaGamma
-					, double & _deltaM
-					, double & _Phi_s
-					, double & _Azero_sq
-					, double & _Apara_sq
-					, double & _Aperp_sq
-					, double & _delta_zero 
-					, double & _delta_para
-					, double & _delta_perp
-					, double & _mistag  
-					, double & _res1
-					, double & _res2
-					, double & _res1Frac
-					, double & _timeOffset)
-{
-	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
-	_gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
-    _deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
-	_deltaM     = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
-	_Phi_s      = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
-	_Azero_sq   = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
-	//Apara_sq   = allParameters.GetPhysicsParameter( Apara_sqName )->GetValue();
-	_Aperp_sq   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
-	_delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
-	_delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
-	_delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
-	_mistag = allParameters.GetPhysicsParameter( mistagName )->GetValue();
-	_res1 = allParameters.GetPhysicsParameter( res1Name )->GetValue();
-	_res2 = allParameters.GetPhysicsParameter( res2Name )->GetValue();
-	_res1Frac = allParameters.GetPhysicsParameter( res1FractionName )->GetValue();
-	_timeOffset = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
-
-	_Apara_sq = 1 - _Azero_sq - _Aperp_sq;
-
-	return;
-}
-*/
-
-
 
 //....................................
 //Internal helper functions
@@ -330,12 +294,12 @@ double Bs2JpsiPhi_mistagParameter_alt::q() const { return tag ;}
 
 double Bs2JpsiPhi_mistagParameter_alt::expL() const 
 {
-	return Mathematics::Exp( t, gamma_l(), resolution ) ;
+	return expL_stored ; //Mathematics::Exp( t, gamma_l(), resolution ) ;
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::expH() const 
 {
-	return Mathematics::Exp( t, gamma_h(), resolution ) ;
+	return expH_stored ; //Mathematics::Exp( t, gamma_h(), resolution ) ;
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::intExpL( ) const {
@@ -352,12 +316,12 @@ double Bs2JpsiPhi_mistagParameter_alt::intExpH( ) const {
 
 double Bs2JpsiPhi_mistagParameter_alt::expSin() const  
 {
-    return Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
+    return expSin_stored ; // Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::expCos() const 
 {
-    return Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
+    return expCos_stored ; // Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::intExpSin( ) const 
