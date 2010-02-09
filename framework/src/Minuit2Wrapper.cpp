@@ -10,14 +10,15 @@
 #include "Minuit2Wrapper.h"
 #include "Minuit2/FunctionMinimum.h"
 #include "Minuit2/MnContours.h"
+#include "Minuit2/MnHesse.h"
 #include <iostream>
 #include <limits>
 #include "ResultParameterSet.h"
 #include <ctime>
 #include "StringProcessing.h"
 
-const double MAXIMUM_MINIMISATION_STEPS = 800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.001;
+const double MAXIMUM_MINIMISATION_STEPS = 1000.0;//800.0;
+const double FINAL_GRADIENT_TOLERANCE = 0.1;//;0.001;
 const double STEP_SIZE = 0.01;
 const int MINUIT_QUALITY = 2;
 
@@ -42,6 +43,13 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 
 	//Retrieve the result of the fit
 	FunctionMinimum minimum = mig( (int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
+	
+	// May also want to run Hesse before the minimisation to get better estimate
+	// of the error matrix.
+	//MnHesse hesse(2);
+	//hesse( *function, minimum, 1000); 
+
+	// Need to add in the running of Hesse and Minos here. Should be configurable.
 
 	//Output time information
 	time_t timeNow;

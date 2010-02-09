@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/02/09 - Greig Cowan 
+ - Added in explicit HESSE step after MIGRAD in MinuitWrapper. We should
+   also add in a switch at some point to allow for a HESSE step before
+   MIGRAD and a final MINOS step for the asymmetric errors.
+ - Changed the default final gradient tolerance to 0.1 and the maximum
+   number of steps to 1000.
+
 2010/02/04 - Greig Cowan 
  - Added overall normalisation into angular functions in Mathematics.
  - Open ROOT data file in READ mode, not UPDATE.

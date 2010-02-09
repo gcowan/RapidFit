@@ -15,8 +15,8 @@
 #include "FunctionContour.h"
 #include <ctime>
 
-const double MAXIMUM_MINIMISATION_STEPS = 800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.001;
+const double MAXIMUM_MINIMISATION_STEPS = 1000.0;//800.0;
+const double FINAL_GRADIENT_TOLERANCE = 0.1;//0.001;
 const double STEP_SIZE = 0.01;
 FitFunction * MinuitWrapper::function = 0;
 
@@ -81,10 +81,23 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	arguments[0] = NewFunction->UpErrorValue(1);
 	minuit->mnexcm("SET ERR", arguments, 1, errorFlag);
 
-	//Do the minimisation
+	
 	arguments[0] = MAXIMUM_MINIMISATION_STEPS;
 	arguments[1] = FINAL_GRADIENT_TOLERANCE;
+        
+	//Now call HESSE to get a rough starting estimate for the error matrix
+        //minuit->mnexcm("HESSE", arguments, 1, errorFlag);
+	
+	//Do the minimisation
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
+
+        //Now call HESSE to properly calculate the error matrix
+        minuit->mnexcm("HESSE", arguments, 1, errorFlag);
+
+        //Call MINOS to calculate the non-parabolic errors.
+        //MINOS rather than assuming parabolic shape about the minimum, MINOS climbs
+        //out of the minimum on either side up until the UP value.
+        //minuit->mnexcm("MINOS", arguments, 2, errorFlag);
 
 	//Output time information
 	time_t timeNow;

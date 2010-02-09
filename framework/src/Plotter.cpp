@@ -138,8 +138,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	double ratioOfIntegrals = 1.;
 		
 	int plotNumber;
-	if (ObservableName == "time" ) plotNumber = 128;
-	else plotNumber = 32;
+	if (ObservableName == "time" ) plotNumber = 256;
+	else plotNumber = 128;
 
 	//Initialise the data averaged projection
 	for ( int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
@@ -148,6 +148,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	}
 
 	//Loop over all discrete combinations
+	
 	for ( int combinationIndex = 0; combinationIndex < AllCombinations.size(); combinationIndex++ )
 	{
 		//Calculate the projection for this combination
@@ -172,6 +173,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		//Plot the projection
 		MakePlotCanvas( ObservableName, CombinationDescriptions[combinationIndex], dataHistogram, observableValueArray, projectionValueArray, plotNumber );
 	}
+	
 
 	//Projecting complete
 	/////////////////////////////////////////////////////////////////////
