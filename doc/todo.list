@@ -9,7 +9,8 @@ High priority
 =============
 * Improve some of the plotting features. See more details below.
 * Ability to include an analytic acceptance surface.
-* Asymmetric errors and errors on the error. How do we do this?
+* Implement switch to allow user to turn on Minos step at end of minimisation
+to allow for calculation of non-parabolic errors.
 
 Medium priority
 ===============

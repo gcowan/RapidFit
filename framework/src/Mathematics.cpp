@@ -392,11 +392,11 @@ namespace Mathematics
       evalPDF = PDF->Evaluate( event );
       for (int i = 0; i < numAngularTerms; i++)
       {
-        xi[i] += f[i]/evalPDF; ///1501544.3013043751;
+        xi[i] += f[i]/evalPDF/numEvents; ///1501544.3013043751;
       }
       //cout << cosTheta << " " << phi << " " << cosPsi << " " << evalPDF  << " " << xi[0] << endl;
     }
-    cout << xi[0] << " " << xi[1] << " " << xi[2] <<  " " << xi[3] << " " << xi[4] << " " << xi[5] << endl;
+    cout << "[" << xi[0]/xi[0] << ", " << xi[1]/xi[0] << ", " << xi[2]/xi[0] <<  ", " << xi[3]/xi[0] << ", " << xi[4]/xi[0] << ", " << xi[5]/xi[0] << "]" <<  endl;
     return;
   }
 
