@@ -42,6 +42,16 @@ void PhysicsBottle::AddResult( IPDF * NewPDF, IDataSet * NewDataSet )
 	}
 }
 
+//Store a ConstraintFunction
+void PhysicsBottle::AddConstraint( ConstraintFunction * NewConstraint )
+{
+	allConstraints.push_back(NewConstraint);
+}
+vector< ConstraintFunction* > PhysicsBottle::GetConstraints()
+{
+	return allConstraints;
+}
+
 //Retrieve the number of results stored
 int PhysicsBottle::NumberResults()
 {

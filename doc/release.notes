@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/02/24 - Greig Cowan 
+ - Merged Ben's branch into the trunk. Includes normalisation caching
+   and ability to add in external constraint.
+ - Gemma added a new DsPi PDF including analytic propertime acceptance.
+
 2010/02/11 - Greig Cowan 
  - Changed way that angular acceptance terms are calculated in Mathematics
 

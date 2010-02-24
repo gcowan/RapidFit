@@ -25,7 +25,7 @@ class ToyStudy
 	public:
 		ToyStudy();
 		ToyStudy( string );
-		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, int );
+		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
 		~ToyStudy();
 
 		ToyStudyResult * DoWholeStudy();
@@ -40,6 +40,7 @@ class ToyStudy
 		FitFunctionConfiguration * theFunction;
 		ToyStudyResult * allResults;
 		int numberStudies;
+		vector< ConstraintFunction* > allConstraints;
 };
 
 #endif

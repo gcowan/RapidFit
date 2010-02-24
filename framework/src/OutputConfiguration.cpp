@@ -60,21 +60,24 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 	for ( int projectionIndex = 0; projectionIndex < 1; projectionIndex++ )
 	{
 		PhysicsBottle * resultBottle = TheResult->GetPhysicsBottle();
-		
-		//Loop over all PDFs, and plot
-		for ( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
-		{
-			Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
-			char fileNumber[100];
-			sprintf( fileNumber, "fit%d.", resultIndex );
 
-			if (makeAllPlots)
+		//Loop over all PDFs, and plot
+		if ( makeAllPlots || projections.size() > 0 )
+		{
+			for ( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
 			{
-				testPlotter->PlotAllObservables( fileNumber + projectionFileName );
-			}
-			else
-			{
-				testPlotter->PlotObservables( fileNumber + projectionFileName, projections );
+				Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
+				char fileNumber[100];
+				sprintf( fileNumber, "fit%d.", resultIndex );
+
+				if (makeAllPlots)
+				{
+					testPlotter->PlotAllObservables( fileNumber + projectionFileName );
+				}
+				else
+				{
+					testPlotter->PlotObservables( fileNumber + projectionFileName, projections );
+				}
 			}
 		}
 	}
