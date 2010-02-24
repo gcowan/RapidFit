@@ -108,7 +108,7 @@ double Bs2DsPi_acc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 	
 	double D  = 1.0 - 2.0 * mistag;
   	
-  	return -1; \\can't deal with acceptance yet
+  	return -1; //can't deal with acceptance yet
 	//return (0.25 * ( expHint() + expLint() + tag * 2.0 * expCosInt() * D ) ); //Normalisation from dunietz
 }
 
