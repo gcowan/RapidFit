@@ -94,26 +94,27 @@
 
 	<ToFit>
 	
-
+Bs2DsPi_mistagParameter
 		<ProdPDF>
 			<PDF>
-				<Name>Bs2DsPi_mistagParameter</Name>
+				<Name>Bs2DsPi_acc</Name>
 			</PDF>
 			<PDF>
 				<Name>Bs2DsPiMassSignal</Name>
 			</PDF>
 		</ProdPDF>
 
+~/work/bias/MC_Loose_cuts/signal/Bs2Dspi/standard/DVTuples_RapidFit_1PV.root
 		<DataSet>
 			<Source>File</Source>
-			<FileName>~/work/bias/Full_Loose_cuts/withmass/DVTuple_RapidFit.root</FileName>
+			<FileName>~/work/bias/MC_Loose_cuts/signal/Bs2DsPi/MCTrue/DVTuples_RapidFit.root</FileName>
 			<NTuplePath>ntuple</NTuplePath>
 			
-			<NumberEvents>25000</NumberEvents>
+			<NumberEvents>100000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>-0.5</Minimum>
+					<Minimum>-1</Minimum>
 					<Maximum>15</Maximum>
 					<Unit>ps</Unit>
 				</Observable>
