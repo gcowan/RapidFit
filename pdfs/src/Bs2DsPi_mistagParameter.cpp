@@ -139,7 +139,7 @@ void Bs2DsPi_mistagParameter::getObservables( DataPoint* measurement)
 {
 	// Observables
 	time = measurement->GetObservable( timeName )->GetValue();
-	tag =  measurement->GetObservable( tagName )->GetValue();
+	tag =  (int) measurement->GetObservable( tagName )->GetValue();
 	
 	return;
 }

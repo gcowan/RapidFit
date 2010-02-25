@@ -39,8 +39,11 @@ class Bs2DsPi_acc : public BasePDF
 		string deltaGammaName;	// delta gamma
 		string deltaMName;		// delta mass
     	string mistagName;		// B mistag
-	    string timeresName;		// B mistag
-
+	    string timeresName;		// B timeres
+	    string accOffName;	// acc parameters
+	    string accSlopeName;		// acc parameters
+	    string accPowerName;		// acc parameters
+	    	    	    
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF. 
@@ -48,7 +51,7 @@ class Bs2DsPi_acc : public BasePDF
 		string tagName;		// B tag
 	   
 		// Physics parameters
-	    double gamma, deltaGamma, deltaM, mistag, timeRes ;
+	    double gamma, deltaGamma, deltaM, mistag, timeRes, AcceptanceOffset, AcceptanceSlope, AcceptancePower ;
 	
 	    // Observables
 		double time ;
@@ -75,7 +78,7 @@ class Bs2DsPi_acc : public BasePDF
 		double expHint() const ;
 		double expCosInt() const ;
 		
-		double acc(double) const;
+		double acc() const;
 				
 		// Functions to help convolve a single gaussian into time primitives
 		// DIDNT APPEAR TO BE USED RooComplex evalCerf( double, double, double ) const ;

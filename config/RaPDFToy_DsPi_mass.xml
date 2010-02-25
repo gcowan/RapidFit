@@ -9,7 +9,7 @@
 			<Value>0.68</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.5</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -18,7 +18,7 @@
 			<Value>0.06</Value>
 			<Minimum>-1.0</Minimum>
 			<Maximum>1.0</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -40,13 +40,41 @@
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 		
+		0.33
 		<PhysicsParameter>
 			<Name>timeresDsPi</Name>
-			<Value>0.033</Value>
+			<Value>0.0</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>0.3</Maximum>
-			<Type>Free</Type>
+			<Type>Fixed</Type>
 			<Unit>ps</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>AcceptanceOffset</Name>
+			<Value>0.00</Value>
+			<Minimum>-1.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>AcceptanceSlope</Name>
+			<Value>1</Value>
+			<Minimum>1.0</Minimum>
+			<Maximum>3.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>AcceptancePower</Name>
+			<Value>2</Value>
+			<Minimum>2.0</Minimum>
+			<Maximum>3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 				
 //........... Signal mass PDF parameters ...........
@@ -82,7 +110,7 @@
 	</ParameterSet>
 
 
-	<Minimiser>Minuit2</Minimiser>
+	<Minimiser>Minuit</Minimiser>
 
 	<FitFunction>NegativeLogLikelihood</FitFunction>
 
@@ -114,7 +142,7 @@ Bs2DsPi_mistagParameter
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>-1</Minimum>
+					<Minimum>0</Minimum>
 					<Maximum>15</Maximum>
 					<Unit>ps</Unit>
 				</Observable>
