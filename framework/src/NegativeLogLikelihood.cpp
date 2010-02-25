@@ -27,7 +27,7 @@ NegativeLogLikelihood::~NegativeLogLikelihood()
 double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
 {
 	//Initialise the integral caching
-	//ResultIntegrator->UpdateIntegralCache( TestDataSet->GetBoundary() );
+	ResultIntegrator->UpdateIntegralCache( TestDataSet->GetBoundary() );
 
 	//Loop over all data points
 	double total = 0.0;
@@ -43,7 +43,7 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		}
 		
 		//Find out the integral
-		double integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary(), false );
+		double integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary(), true );
 		
 		//Get the weight for this DataPoint (event)
 		double weight = 1.0;	
