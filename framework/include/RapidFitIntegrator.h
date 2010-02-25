@@ -30,6 +30,7 @@ class RapidFitIntegrator
 		double Integral( DataPoint*, PhaseSpaceBoundary*, bool UseCache = false );
 		double ProjectObservable( DataPoint*, PhaseSpaceBoundary*, string );
 		double GetRatioOfIntegrals();
+		IPDF * GetPDF();
 		void UpdateIntegralCache( PhaseSpaceBoundary* );
 	
 	private:
