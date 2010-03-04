@@ -9,7 +9,7 @@
 			<Value>0.68</Value>
 			<Minimum>0.0</Minimum>
 			<Maximum>1.5</Maximum>
-			<Type>Fixed</Type>
+			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
@@ -43,9 +43,9 @@
 		0.33
 		<PhysicsParameter>
 			<Name>timeresDsPi</Name>
-			<Value>0.0</Value>
+			<Value>0.33</Value>
 			<Minimum>0.0</Minimum>
-			<Maximum>0.3</Maximum>
+			<Maximum>0.5</Maximum>
 			<Type>Fixed</Type>
 			<Unit>ps</Unit>
 		</PhysicsParameter>
@@ -63,16 +63,16 @@
 			<Name>AcceptanceSlope</Name>
 			<Value>1</Value>
 			<Minimum>1.0</Minimum>
-			<Maximum>3.0</Maximum>
+			<Maximum>10.0</Maximum>
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
 
 		<PhysicsParameter>
 			<Name>AcceptancePower</Name>
-			<Value>2</Value>
+			<Value>2.2</Value>
 			<Minimum>2.0</Minimum>
-			<Maximum>3</Maximum>
+			<Maximum>5</Maximum>
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
@@ -122,7 +122,7 @@
 
 	<ToFit>
 	
-Bs2DsPi_mistagParameter
+Bs2DsPi_acc
 		<ProdPDF>
 			<PDF>
 				<Name>Bs2DsPi_acc</Name>
@@ -137,19 +137,23 @@ Bs2DsPi_mistagParameter
 			<Source>File</Source>
 			<FileName>~/work/bias/MC_Loose_cuts/signal/Bs2DsPi/MCTrue/DVTuples_RapidFit.root</FileName>
 			<NTuplePath>ntuple</NTuplePath>
+		
+			<CutString>time>0</CutString>
 			
 			<NumberEvents>100000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
 					<Name>time</Name>
-					<Minimum>0</Minimum>
-					<Maximum>15</Maximum>
+					<Minimum>-2</Minimum>
+					<Maximum>12</Maximum>
 					<Unit>ps</Unit>
 				</Observable>
 
 				<Observable>
 					<Name>tag</Name>
-					<Value>0.0</Value>
+					<Value>0.0</Value>	
+					<Value>-1.0</Value>										
+					<Value>+1.0</Value>	
 					<Unit>Unitless</Unit>
 				</Observable>
 
