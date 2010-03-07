@@ -74,5 +74,7 @@ double Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
 
 double Bs2JpsiPhiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+	// Assumes that the mass integration limits are +/- Infinity
+	// So take sufficiently large mass window.
 	return 1.0;
 }
