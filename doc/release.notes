@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/03/07 - Greig Cowan 
+ - Fixed bug in the numerical integration caching that only affected
+   fits with multiple discrete values of an observable.
+ - Changed default compilation to use -O3.
+
 2010/02/25 - Gemma Fardell
  - Changed DsPi PDF to add propertime acceptance parameters as physics parameters.
  - Changed tag in getObservables() to (int) in both DsPi PDFs.

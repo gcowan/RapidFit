@@ -221,8 +221,8 @@ void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 
-	if ( cachedIntegrals.size() > 0 ) cachedIntegrals.pop_back();
-	
+	if ( cachedIntegrals.size() > 0 ) cachedIntegrals.clear();
+
 	//Don't do it unless discrete combinations cached
 	if (cacheSetUp)
 	{
@@ -235,7 +235,7 @@ void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 			for ( int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
 			{
 				string unit = NewBoundary->GetConstraint( discreteNames[discreteIndex] )->GetUnit();
-				samplePoint.SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 0, unit );
+				samplePoint.SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 1, unit );
 			}
 
 			//Just generate some random continuous values
@@ -248,7 +248,7 @@ void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 			double integralToCache = DoNumericalIntegral( &samplePoint, NewBoundary, dontIntegrate );
 			cachedIntegrals.push_back(integralToCache);
 
-		/*	
+			/*
 			//Debug
 			cout << "For combination: ";
 			for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
@@ -256,7 +256,7 @@ void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 				cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
 			}
 			cout << "get integral: " << integralToCache << endl;
-		*/	
+			*/
 		}
 	}
 }

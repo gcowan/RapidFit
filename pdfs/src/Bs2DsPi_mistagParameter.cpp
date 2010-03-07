@@ -104,7 +104,6 @@ double Bs2DsPi_mistagParameter::Normalisation(DataPoint * measurement, PhaseSpac
 	}
 	
 	double D  = 1.0 - 2.0 * mistag;
-  	
 	return (0.25 * ( expHint() + expLint() + tag * 2.0 * expCosInt() * D ) ); //Normalisation from dunietz
 }
 
