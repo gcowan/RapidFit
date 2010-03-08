@@ -42,6 +42,9 @@ class IPDF
 
 		//Return a list of parameters not to be integrated
 		virtual vector<string> GetDoNotIntegrateList() = 0;
+
+		//Update the integral cache
+		virtual void UpdateIntegralCache() = 0;
 };
 
 #endif

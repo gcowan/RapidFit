@@ -82,9 +82,7 @@ double Bs2DsPi_acc::Evaluate(DataPoint * measurement)
 	getObservables( measurement ) ;
 				
   	double D  = 1.0 - 2.0 * mistag;
-  		
 	return (0.25 * acc() * ( expL() + expH() + tag * 2.0 * expCos() * D ) ); //Normalisation from dunietz
-
 }
 
 
@@ -114,7 +112,7 @@ double Bs2DsPi_acc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 	
 	double D  = 1.0 - 2.0 * mistag;
 
-  	return -1; //can't deal with acceptance yet
+ 	return -1; //can't deal with acceptance analytically yet
 	//return (0.25 * ( expHint() + expLint() + tag * 2.0 * expCosInt() * D ) ); //Normalisation from dunietz
 }
 
@@ -134,7 +132,7 @@ void Bs2DsPi_acc::getPhysicsParameters( )
 {
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	gamma      			= allParameters.GetPhysicsParameter( gammaName )->GetValue();
-    deltaGamma 			= allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
+    	deltaGamma 			= allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 	deltaM     			= allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 	mistag     			= allParameters.GetPhysicsParameter( mistagName )->GetValue();
 	timeRes    			= allParameters.GetPhysicsParameter( timeresName )->GetValue();
@@ -161,7 +159,7 @@ void Bs2DsPi_acc::getObservables( DataPoint* measurement)
 // Adds acceptance function
 
 double Bs2DsPi_acc::acc() const 
-{	
+{
 	if(time < 0) return 0.0;
 	else{
 		return pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower)/(1.0+ pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower));

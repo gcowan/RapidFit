@@ -133,3 +133,9 @@ vector<string> BasePDF::GetDoNotIntegrateList()
 	vector<string> emptyVector;
 	return emptyVector;
 }
+
+// Update integral cache
+void BasePDF::UpdateIntegralCache()
+{
+}
+

@@ -28,6 +28,8 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 {
 	//Initialise the integral caching
 	ResultIntegrator->UpdateIntegralCache( TestDataSet->GetBoundary() );
+	// Update the cache. For now, only the NormaliseSumPDF is affected here
+	TestPDF->UpdateIntegralCache();
 
 	//Loop over all data points
 	double total = 0.0;

@@ -139,7 +139,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	double ratioOfIntegrals = 1.;
 		
 	int plotNumber;
-	if (ObservableName == "time" ) plotNumber = 256;
+	if (ObservableName == "time" ) plotNumber = 128;
 	else plotNumber = 128;
 
 	//Initialise the data averaged projection
@@ -154,7 +154,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	{
 		//Calculate the projection for this combination
 		vector<double> projectionValueVector = ProjectObservable( AllCombinations[combinationIndex], ObservableName, minimum, maximum, plotNumber, plotInterval );
-		double projectionIntegral = pdfIntegrator->Integral( &( AllCombinations[combinationIndex] ), plotData->GetBoundary() );
+		double projectionIntegral = pdfIntegrator->Integral( &( AllCombinations[combinationIndex] ), plotData->GetBoundary(), true );
 		ratioOfIntegrals = pdfIntegrator->GetRatioOfIntegrals();
 		
 		//Update the data average values, and make the projection graph arrays

@@ -84,3 +84,8 @@ vector<string> ProdPDF::GetDoNotIntegrateList()
 {
         return doNotIntegrateList;
 }
+
+// Update integral cache
+void ProdPDF::UpdateIntegralCache()
+{
+}

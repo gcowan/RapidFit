@@ -158,3 +158,8 @@ vector<string> SumPDF::GetDoNotIntegrateList()
 {
 	return doNotIntegrateList;
 }
+
+// Update integral cache
+void SumPDF::UpdateIntegralCache()
+{
+}

@@ -41,6 +41,9 @@ class BasePDF : public IPDF
                 //Return a list of parameters not to be integrated
                 virtual vector<string> GetDoNotIntegrateList();
 
+                //Update integral cache
+                virtual void UpdateIntegralCache();
+
 	protected:
 		//Do the evaluation
 		//virtual double Value(DataPoint*);

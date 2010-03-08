@@ -3,6 +3,12 @@
 2010/03/08 - Greig Cowan 
  - Added random number to TCanvas name to prevent annoying messages about
    deleting canvas when plotting results of simultaneous fits.
+ - Added UpdateIntegralCache() to IPDF. This allows us to force the update
+   of the internal RapidFitIntegrators caches of NormalisaedSumPDF at 
+   each iteration of the minimisation. Previously these were not being 
+   updated which resulted in the wrong result when caching was used with
+   NormalisedSumPDF. For all other PDFs, UpdateIntegralCache() does
+   nothing.
 
 2010/03/07 - Greig Cowan 
  - Fixed bug in the numerical integration caching that only affected

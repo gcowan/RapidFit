@@ -10,6 +10,7 @@
 #include "NormalisedSumPDF.h"
 #include "StringProcessing.h"
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 
@@ -138,8 +139,8 @@ double NormalisedSumPDF::Integral( DataPoint* NewDataPoint, PhaseSpaceBoundary *
 double NormalisedSumPDF::Evaluate( DataPoint * NewDataPoint )
 {
 	//Calculate the integrals of the PDFs
-	double firstIntegral = firstIntegrator->Integral( NewDataPoint, integrationBoundary ) * firstIntegralCorrection;
-	double secondIntegral = secondIntegrator->Integral( NewDataPoint, integrationBoundary ) * secondIntegralCorrection;
+	double firstIntegral = firstIntegrator->Integral( NewDataPoint, integrationBoundary, true ) * firstIntegralCorrection;
+	double secondIntegral = secondIntegrator->Integral( NewDataPoint, integrationBoundary, true ) * secondIntegralCorrection;
 
 	//Get the PDFs' values, normalised and weighted by firstFrsction
 	double termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / firstIntegral;
@@ -165,4 +166,11 @@ vector<string> NormalisedSumPDF::GetPrototypeParameterSet()
 vector<string> NormalisedSumPDF::GetDoNotIntegrateList()
 {
 	return doNotIntegrateList;
+}
+
+// Update the integral cache for the two RapidFitIntegrators
+void NormalisedSumPDF::UpdateIntegralCache()
+{
+	firstIntegrator->UpdateIntegralCache(integrationBoundary);
+	secondIntegrator->UpdateIntegralCache(integrationBoundary);
 }

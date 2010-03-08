@@ -41,6 +41,9 @@ class SumPDF : public IPDF
 		//Return a list of parameters not to be integrated
                 virtual vector<string> GetDoNotIntegrateList();
 
+		//Update cache
+                virtual void UpdateIntegralCache();
+	
 	private:
 		void MakePrototypes( PhaseSpaceBoundary* );
 

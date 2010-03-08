@@ -42,6 +42,9 @@ class NormalisedSumPDF : public IPDF
 		//Return a list of parameters not to be integrated
                 virtual vector<string> GetDoNotIntegrateList();
 
+		// Update the two RapidFitIntegrator caches
+		virtual void UpdateIntegralCache();
+
 	private:
 		void MakePrototypes( PhaseSpaceBoundary* );
 
