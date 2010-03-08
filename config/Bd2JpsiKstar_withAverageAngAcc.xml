@@ -103,7 +103,7 @@
 
 <PhysicsParameter>
 <Name>m_Bs</Name>
-<Value>5364.4</Value>
+<Value>5279.5</Value>
 <Type>Fixed</Type>
 <Unit>MeV/c^{2}</Unit>
 </PhysicsParameter>
@@ -178,10 +178,10 @@
 	// Single fit
 	<NumberRepeats>1</NumberRepeats>
 
-	// 100000 toy events
+	// 100000 toy events Bd2JpsiKstar_withTimeRes_withAverageAngAcc
 	<ToFit>
 		<PDF>
-			<Name>Bd2JpsiKstar_withTimeRes_withAverageAngAcc</Name>
+			<Name>Bs2JpsiPhiMassSignal</Name>
 		</PDF>
 		
     
@@ -217,6 +217,13 @@
 					<Minimum>-1.0</Minimum>
 					<Maximum>1.0</Maximum>
 					<Unit>Unitless</Unit>
+				</Observable>
+
+				<Observable>
+					<Name>mass</Name>
+					<Minimum>5129.5</Minimum>
+					<Maximum>5429.5</Maximum>
+					<Unit>MeV/c^{2}</Unit>
 				</Observable>
 
                 </PhaseSpaceBoundary>

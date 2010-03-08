@@ -11,6 +11,7 @@
 #include "StatisticsFunctions.h"
 #include "EdStyle.h"
 #include <iostream>
+#include <sstream>
 #include "TFile.h"
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"
@@ -211,8 +212,13 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 	string drawOptions = "C";
 	//Note "same" option is not required if graph is drawn second. "A" option - requesting axes - will overwrite whatever was there before
 
+	// Just to get a unique name for the canvas
+	TRandom3 * random = new TRandom3(0);
+	double ran = random->Rndm();
+	ostringstream ranString;
+	ranString << ran;
 	//Stick both objects on one canvas
-	string canvasName = ObservableName + "Projection" + Description;
+	string canvasName = ObservableName + "Projection" + Description + ranString.str();
 	string canvasTitle = ObservableName + " projection " + Description;
 	TCanvas * bothPlots = new TCanvas( canvasName.c_str(), canvasTitle.c_str() );
  	gStyle->SetMarkerStyle(0);
