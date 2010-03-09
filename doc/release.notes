@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/03/09 - Greig Cowan 
+ - Added code from Pete for constraining Gamma_L.
+
 2010/03/08 - Greig Cowan 
  - Added random number to TCanvas name to prevent annoying messages about
    deleting canvas when plotting results of simultaneous fits.

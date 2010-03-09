@@ -40,8 +40,15 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 		string name = allConstraints[constraintIndex]->GetName();
 		if ( name == "GammaL" )
 		{
-			//Insert code here
 			//GammaL = Gamma + ( deltaGamma / 2 )
+			// Get gamma and delta gamma
+			double gamma = NewParameters->GetPhysicsParameter("gamma")->GetValue();
+			double dgam =  NewParameters->GetPhysicsParameter("deltaGamma")->GetValue();
+			double gaml_fit = gamma + (dgam/2.0);
+			double gaml_con = allConstraints[constraintIndex]->GetValue();
+			double gaussSqrt = ( gaml_fit -  gaml_con ) / allConstraints[constraintIndex]->GetError();
+			constraintValue += gaussSqrt * gaussSqrt;
+			
 		}
 		else if ( StringProcessing::VectorContains( &parameterNames, &name ) >= 0 )
 		{
@@ -52,5 +59,5 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 		}
 	}
 
-	return -1.0 * constraintValue;
+	return 0.5 * constraintValue;
 }
