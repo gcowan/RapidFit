@@ -218,6 +218,9 @@ double RapidFitIntegrator::ProjectObservable( DataPoint * NewDataPoint, PhaseSpa
 //Cache a numerical integral value for each discrete observable combination
 void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 {
+	//First update any internal RapdidFitIntegrator caches that the PDF is using
+	functionToWrap->UpdateIntegralCache();
+
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 
