@@ -25,6 +25,7 @@ Bs2DsPi_acc::Bs2DsPi_acc() :
     , timeresName	( "timeresDsPi" )
     , accOffName	( "AcceptanceOffset" )
     , accSlopeName	( "AcceptanceSlope" )
+    , accSlopeHighName	( "AcceptanceSlopeHigh" )
     , accPowerName	( "AcceptancePower" )
             
 	// Observables
@@ -53,6 +54,7 @@ void Bs2DsPi_acc::MakePrototypes()
 	parameterNames.push_back( timeresName );
 	parameterNames.push_back( accOffName );
 	parameterNames.push_back( accSlopeName );
+	parameterNames.push_back( accSlopeHighName );
 	parameterNames.push_back( accPowerName );
 	allParameters = *( new ParameterSet(parameterNames) );
 
@@ -138,6 +140,7 @@ void Bs2DsPi_acc::getPhysicsParameters( )
 	timeRes    			= allParameters.GetPhysicsParameter( timeresName )->GetValue();
 	AcceptanceOffset 	= allParameters.GetPhysicsParameter( accOffName )->GetValue();
 	AcceptanceSlope 	= allParameters.GetPhysicsParameter( accSlopeName )->GetValue();
+	AcceptanceSlopeHigh 	= allParameters.GetPhysicsParameter( accSlopeHighName )->GetValue();
 	AcceptancePower 	= allParameters.GetPhysicsParameter( accPowerName )->GetValue();
 	
 	return;
@@ -160,9 +163,11 @@ void Bs2DsPi_acc::getObservables( DataPoint* measurement)
 
 double Bs2DsPi_acc::acc() const 
 {
-	if(time < 0) return 0.0;
+	//if(time < 0) return 0.0;
+	if(time < AcceptanceOffset) return 0.0;
 	else{
-		return pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower)/(1.0+ pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower));
+		//return pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower)/(1.0+ pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower))*(1. + AcceptanceSlopeHigh * (time - AcceptanceOffset));
+		return pow((time*AcceptanceSlope),AcceptancePower)/(1.0+ pow((time*AcceptanceSlope),AcceptancePower))*(1. + AcceptanceSlopeHigh * time);
 	}
 }
 

@@ -50,6 +50,8 @@ def main():
 		  , "tag"
 		  , "mistag"
 		  , "mass"
+		  , "truetime"
+		  , "residual"
 		  ]
 
     outputNtupleStructure = ":".join(newBranches) 
@@ -69,15 +71,14 @@ def main():
 	valueList.append( pyl.B_s_TAGDECISION.GetValue() )
 	valueList.append( pyl.B_s_TAGOMEGA.GetValue() )
 	'''
-  	valueList.append( pyl.time.GetValue() )
-	valueList.append( pyl.cosTheta.GetValue() )
-	valueList.append( pyl.cosPsi.GetValue() )
-	valueList.append( pyl.phi.GetValue() )
-	valueList.append( pyl.tag.GetValue() )
-	valueList.append( pyl.mistag.GetValue() )
-	valueList.append( pyl.mass.GetValue() )
+  	valueList.append( pyl.B_s0_TAU.GetValue() )
+	valueList.append( pyl.B_s0_TAGDECISION.GetValue() )
+	valueList.append( pyl.B_s0_TAGOMEGA.GetValue() )
+	valueList.append( pyl.B_s0_MM.GetValue() )
+	valueList.append( pyl.B_s0_TRUETAU.GetValue() )
+	valueList.append( pyl.B_s0_TAU.GetValue() - pyl.B_s0_TRUETAU.GetValue() )
   
-  	if pyl.time.GetValue() < -0.2: continue
+  	if pyl.B_s0_TRUETAU.GetValue() < -0.2: continue
 	data = array("f", valueList)
 	outputNtuple.Fill(data)	
 

@@ -46,7 +46,7 @@ def calculate(acceptanceHisto, nameOfHisto):
 
     fInt = [0. for i in range(6)]
     largestNumEvents = 1
-    normalisation = 10000
+    normalisation = 1000 
     # ROOT starts bin numbering from 1...
     for xbin in range(1, xbins+1):
 	for ybin in range(1, ybins+1):
@@ -70,7 +70,8 @@ def calculate(acceptanceHisto, nameOfHisto):
 
     # Use normalisation just to get numbers to same scale as 32pi/9. It's only the
     # relative sizes of the numbers that ultimately matters in the NLL minimisation
-    vals = ["%.3f" % (i/largestNumEvents*normalisation) for i in fInt]
+    vals = ["%.5f" % (i/largestNumEvents*normalisation) for i in fInt]
+    vals = ["%.5f" % (i/fInt[0]) for i in fInt]
     print vals
 
 

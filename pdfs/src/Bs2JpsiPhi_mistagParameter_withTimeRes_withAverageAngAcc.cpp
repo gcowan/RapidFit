@@ -123,6 +123,7 @@ bool Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::SetPhysicsParamet
         angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();
 
         Apara_sq = 1 - Azero_sq - Aperp_sq;
+	if ( Apara_sq < 0.) return false;
 	AparaAperp = sqrt(Apara_sq)*sqrt(Aperp_sq);
         AzeroApara = sqrt(Azero_sq)*sqrt(Apara_sq);
         AzeroAperp = sqrt(Azero_sq)*sqrt(Aperp_sq);

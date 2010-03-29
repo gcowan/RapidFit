@@ -32,9 +32,9 @@ class RapidFitIntegrator
 		double GetRatioOfIntegrals();
 		IPDF * GetPDF();
 		void UpdateIntegralCache( PhaseSpaceBoundary* );
+		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string> );
 	
 	private:
-		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string> );
 		double GetCachedIntegral( DataPoint* );
 		void SetUpIntegralCache( PhaseSpaceBoundary* );
 

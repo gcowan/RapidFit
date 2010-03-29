@@ -11,6 +11,8 @@
 
 #include "IDataSet.h"
 #include "IPDF.h"
+#include "RapidFitIntegrator.h"
+#include "PhaseSpaceBoundary.h"
 
 namespace Mathematics 
 {

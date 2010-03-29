@@ -121,6 +121,8 @@ bool Bs2JpsiPhi_mistagParameter_alt::SetPhysicsParameters( ParameterSet * NewPar
 	Rt   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
 	Rp   = 1 - _R0 - Rt;	
 
+	if (Rp < 0.) return false;
+
 	double _delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
 	double _delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
 	double _delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
@@ -141,7 +143,7 @@ bool Bs2JpsiPhi_mistagParameter_alt::SetPhysicsParameters( ParameterSet * NewPar
 	angAccI4 = allParameters.GetPhysicsParameter( angAccI4Name )->GetValue();
 	angAccI5 = allParameters.GetPhysicsParameter( angAccI5Name )->GetValue();
 	angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();
-	
+
 	return result;
 }
 
