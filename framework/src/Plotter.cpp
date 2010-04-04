@@ -220,14 +220,14 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 	//Stick both objects on one canvas
 	string canvasName = ObservableName + "Projection" + Description + ranString.str();
 	string canvasTitle = ObservableName + " projection " + Description;
-	TCanvas * bothPlots = new TCanvas( canvasName.c_str(), canvasTitle.c_str() );
+	TCanvas * bothPlots = new TCanvas( canvasName.c_str(), canvasTitle.c_str(), 600, 600 );
  	gStyle->SetMarkerStyle(0);
 	Histogram->SetStats(0);
 
 	double ymin = Histogram->GetBinContent(Histogram->GetMinimumBin());
 	double ymax = Histogram->GetBinContent(Histogram->GetMaximumBin());
 	
-	if (ObservableName == "time" ){
+	if (ObservableName == "time" || ObservableName == "B_s_TAU"){
 		// Attempted hack to get round the fact that ROOT is rubbish!
 		//TH1F * tmpHist = new TH1F("tmp", "tmp", 1, -2., -1.);
 		//tmpHist->Fill(-2.);

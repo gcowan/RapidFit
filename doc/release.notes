@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/04/04 - Greig Cowan 
+ - Fixed Bs2JpsiPhiLongLivedBkg_withTimeRes. Using numerical integration.
+
 2010/03/29 - Greig Cowan 
  - Fix to the average angular acceptance calculation.
  - Fix to DsPi proper time acceptance.

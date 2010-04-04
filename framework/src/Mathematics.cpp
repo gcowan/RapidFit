@@ -115,6 +115,8 @@ namespace Mathematics
 
 		if( resolution > 0. ) 
 		{
+			// I think this is wrong, needs to be checked. Compare with Bs2JpsiPhi long lived background
+
 			// This is a placeholder as I havnt put the correct code in yet as i dont know it.
 			// So it only works if time limits are large and start from < 0
 			/*

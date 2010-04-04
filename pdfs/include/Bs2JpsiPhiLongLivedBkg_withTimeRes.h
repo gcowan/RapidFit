@@ -27,20 +27,33 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes : public BasePDF
 
 	private:
 		void MakePrototypes();
-		double erfc( double, double, double);
-		double erfcInt( double, double, double);
-		
+		bool SetPhysicsParameters(ParameterSet*);
+		double buildPDFnumerator();
+		double buildPDFdenominator();		
+
 		// Physics parameters
-		string tau1Name;		// decay constant 1
-		string tau2Name;		// decay constant 2
+		string tauLL1Name;		// decay constant 1
+		string tauLL2Name;		// decay constant 2
 		string f_LL1Name;		// fraction
 		string sigmaLL1Name;		// time res sigma 1
 		string sigmaLL2Name;		// time res sigma 2
+                string timeResLL1FracName;
+
+		double tauLL1;
+		double tauLL2;
+		double f_LL1;
+		double sigmaLL; // This is the member variable used in the "builder" functions 
+		double sigmaLL1; // These are the physics parameters varied in the fit and passed from the XML;
+		double sigmaLL2;
+                double timeResLL1Frac;
+
+		double tlow, thigh; // integration limits
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF. 
 		string timeName;	// proper time
+		double time;
 };
 
 #endif

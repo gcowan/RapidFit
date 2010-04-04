@@ -8,6 +8,7 @@
  */
 
 #include "Bs2JpsiPhiLongLivedBkg_withTimeRes.h"
+#include "Mathematics.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
@@ -19,11 +20,12 @@ Bs2JpsiPhiLongLivedBkg_withTimeRes::Bs2JpsiPhiLongLivedBkg_withTimeRes() :
 	  timeName	( "time" )
 
 	// Physics parameters
-	, tau1Name	( "tau_LL1" )
-	, tau2Name	( "tau_LL2" )
+	, tauLL1Name	( "tau_LL1" )
+	, tauLL2Name	( "tau_LL2" )
 	, f_LL1Name	( "f_LL1" )
-	, sigmaLL1Name	( "sigmaLL1" )
-	, sigmaLL2Name	( "sigmaLL2" )
+	, sigmaLL1Name	( "sigma_LL1" )
+	, sigmaLL2Name	( "sigma_LL2" )
+	, timeResLL1FracName( "timeResLL1Frac" )
 {
 	MakePrototypes();
 }
@@ -36,11 +38,12 @@ void Bs2JpsiPhiLongLivedBkg_withTimeRes::MakePrototypes()
 
         //Make the parameter set
         vector<string> parameterNames;
-        parameterNames.push_back( tau1Name );
-        parameterNames.push_back( tau2Name );
+        parameterNames.push_back( tauLL1Name );
+        parameterNames.push_back( tauLL2Name );
         parameterNames.push_back( f_LL1Name );
         parameterNames.push_back( sigmaLL1Name );
         parameterNames.push_back( sigmaLL2Name );
+        parameterNames.push_back( timeResLL1FracName );
         allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -51,37 +54,56 @@ Bs2JpsiPhiLongLivedBkg_withTimeRes::~Bs2JpsiPhiLongLivedBkg_withTimeRes()
 {
 }
 
+bool Bs2JpsiPhiLongLivedBkg_withTimeRes::SetPhysicsParameters( ParameterSet * NewParameterSet )
+{
+        bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
+        tauLL1      = allParameters.GetPhysicsParameter( tauLL1Name )->GetValue();
+        tauLL2      = allParameters.GetPhysicsParameter( tauLL2Name )->GetValue();
+        f_LL1       = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
+        sigmaLL1    = allParameters.GetPhysicsParameter( sigmaLL1Name )->GetValue();
+        sigmaLL2    = allParameters.GetPhysicsParameter( sigmaLL2Name )->GetValue();
+        timeResLL1Frac = allParameters.GetPhysicsParameter( timeResLL1FracName )->GetValue();
+	return isOK;
+}
+
 //Calculate the function value
 double Bs2JpsiPhiLongLivedBkg_withTimeRes::Evaluate(DataPoint * measurement)
 {
 	// Observable
-        double time = measurement->GetObservable( timeName )->GetValue();
+        time = measurement->GetObservable( timeName )->GetValue();
 
-  	double tau1 = allParameters.GetPhysicsParameter( tau1Name )->GetValue();
-  	double tau2 = allParameters.GetPhysicsParameter( tau2Name )->GetValue();
-  	double f_LL1 = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
-  	double sigmaLL1 = allParameters.GetPhysicsParameter( sigmaLL1Name )->GetValue();
-  	double sigmaLL2 = allParameters.GetPhysicsParameter( sigmaLL2Name )->GetValue();
-  
-	double R1 = erfc( time, tau1, sigmaLL1); 
-	double R2 = erfc( time, tau2, sigmaLL2); 
-	
-	double val = f_LL1 * R1 + (1. - f_LL1) * R2;
-  	return val;
+	if(timeResLL1Frac >= 0.9999)
+        {
+                // Set the member variable for time resolution to the first value and calculate
+                sigmaLL = sigmaLL1;
+                return buildPDFnumerator();
+        }
+        else
+        {
+                // Set the member variable for time resolution to the first value and calculate
+                sigmaLL = sigmaLL1;
+                double val1 = buildPDFnumerator();
+                // Set the member variable for time resolution to the second value and calculate
+                sigmaLL = sigmaLL2;
+                double val2 = buildPDFnumerator();
+                return timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2;
+        }
 }
 
-// Maple integral of the PDF _without_ time resolution
-// int(f_LL1 * exp( -time/tau1 ) + (1 - f_LL1)*exp( -time/tau2 ), time=tmin..tmax);
-//                  tmin               tmin               tmin                           tmax               tmax               tmax
-// f_LL1 tau1 exp(- ----) + tau2 exp(- ----) - tau2 exp(- ----) f_LL1 - f_LL1 tau1 exp(- ----) - tau2 exp(- ----) + tau2 exp(- ----) f_LL1
-//                  tau1               tau2               tau2                           tau1               tau2               tau2
-//
+double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFnumerator()
+{
+	// Sum of two exponentials, using the time resolution functions
+ 
+	double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
+	double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
+	 
+	double val = f_LL1 * val1 + (1. - f_LL1) * val2;
+	return val;
+}
 
 double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * boundary)
 {
-        double tmin = 0.;
-        double tmax = 0.;
-        IConstraint * timeBound = boundary->GetConstraint("time");
+        IConstraint * timeBound = boundary->GetConstraint( timeName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {
                 cerr << "Bound on time not provided" << endl;
@@ -89,44 +111,39 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * bo
         }
         else
         {
-                tmin = timeBound->GetMinimum();
-                tmax = timeBound->GetMaximum();
+                tlow = timeBound->GetMinimum();
+                thigh = timeBound->GetMaximum();
         }
 	
-        double tau1 = allParameters.GetPhysicsParameter( tau1Name )->GetValue();
-        double tau2 = allParameters.GetPhysicsParameter( tau2Name )->GetValue();
-        double f_LL1 = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
-        double sigmaLL1 = allParameters.GetPhysicsParameter( sigmaLL1Name )->GetValue();
-        double sigmaLL2 = allParameters.GetPhysicsParameter( sigmaLL2Name )->GetValue();
+	if(timeResLL1Frac >= 0.9999)
+        {
+                // Set the member variable for time resolution to the first value and calculate
+                sigmaLL = sigmaLL1;
+                //return buildPDFdenominator();
+  		return -1; // use numerical integration
+        }
+        else
+        {
+                // Set the member variable for time resolution to the first value and calculate
+                sigmaLL = sigmaLL1;
+                double val1 = buildPDFdenominator();
+                // Set the member variable for time resolution to the second value and calculate
+                sigmaLL = sigmaLL2;
+                double val2 = buildPDFdenominator();
+                //return timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2;
+		return -1; // use numerical integration
+        }
+}
 
-	double R1 = erfcInt( tmin, tau1, sigmaLL1);
-	double R2 = erfcInt( tmax, tau1, sigmaLL1);
-	double R3 = erfcInt( tmin, tau2, sigmaLL2);
-	double R4 = erfcInt( tmax, tau2, sigmaLL2);
-
-  	double val = f_LL1 * (R2 - R1) + (1.-f_LL1) * ( R4 - R3 );
+double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFdenominator()
+{
+	// Sum of two exponentials, using the time resolution functions
  
-	return val;
+	double val1 = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
+	double val2 = Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
+	 
+	double val = f_LL1 * val1 + (1. - f_LL1) * val2;
+  	return val;
 }
 
-// Convolution of a gaussian resolution of width sigma with exp(-time*Gamma) gives:
-// R = 1/2 * exp(-time*Gamma + sigma^2*Gamma^2/2)*erfc( -(time - sigma^2*Gamma )/(sqrt(2)*sigma))
-double Bs2JpsiPhiLongLivedBkg_withTimeRes::erfc( double time, double tau, double sigma)
-{
-	double R = 0.5 * exp( -time/tau + sigma*sigma/(2.*tau*tau) )
-                       * RooMath::erfc( -( time - sigma*sigma/tau )/(sqrt(2.)*sigma));
-	return R;
-}
 
-// Mathematica integral of the exp * erf
-//Integrate[(1*Exp[-(x/t) + s^2/(2*t^2)]* Erfc[-((x - s^2/t)/(Sqrt[2]*s))])/2, x] ==
-//(t*(Erf[x/(Sqrt[2]*s)] - E^((s^2 - 2*t*x)/(2*t^2))* Erfc[(s^2 - t*x)/(Sqrt[2]*s*t)]))/2
-double Bs2JpsiPhiLongLivedBkg_withTimeRes::erfcInt( double tlimit, double tau, double sigma)
-{
-	double val = 0.5 * (tau * ( RooMath::erf( tlimit/(sqrt(2.)*sigma) ) 
-				  - exp( (sigma*sigma - 2*tau*tlimit)/(2.*tau*tau) )
-				  * RooMath::erfc( (sigma*sigma - tau*tlimit)/(sqrt(2.)*sigma*tau) )
-				  )
-			   );
-	return val;
-}
