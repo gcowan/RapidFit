@@ -101,7 +101,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFnumerator()
 	return val;
 }
 
-double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
         IConstraint * timeBound = boundary->GetConstraint( timeName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
@@ -119,8 +119,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * bo
         {
                 // Set the member variable for time resolution to the first value and calculate
                 sigmaLL = sigmaLL1;
-                //return buildPDFdenominator();
-  		return -1; // use numerical integration
+                return buildPDFdenominator();
         }
         else
         {
@@ -130,8 +129,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * bo
                 // Set the member variable for time resolution to the second value and calculate
                 sigmaLL = sigmaLL2;
                 double val2 = buildPDFdenominator();
-                //return timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2;
-		return -1; // use numerical integration
+                return timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2;
         }
 }
 

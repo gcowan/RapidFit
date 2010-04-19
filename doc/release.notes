@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/04/19 - Greig Cowan 
+ - Fixed Bs2JpsiPhiLongLivedBkg_withTimeRes. Now using analytic integration.
+   Had to adjust the Normalisation method parameters.
+
 2010/04/04 - Greig Cowan 
  - Fixed Bs2JpsiPhiLongLivedBkg_withTimeRes. Using numerical integration.
 

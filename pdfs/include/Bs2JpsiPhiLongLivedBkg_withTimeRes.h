@@ -23,7 +23,7 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes : public BasePDF
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation(PhaseSpaceBoundary*);
+		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
 		void MakePrototypes();
