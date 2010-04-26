@@ -24,7 +24,7 @@ Bs2DsPi_acc::Bs2DsPi_acc() :
     , mistagName	( "mistag" )
     , timeresName	( "timeresDsPi" )
     , accOffName	( "AcceptanceOffset" )
-    , accSlopeName	( "AcceptanceSlope" )
+    , accSlopeLowName	( "AcceptanceSlopeLow" )
     , accSlopeHighName	( "AcceptanceSlopeHigh" )
     , accPowerName	( "AcceptancePower" )
             
@@ -53,7 +53,8 @@ void Bs2DsPi_acc::MakePrototypes()
 	parameterNames.push_back( mistagName );
 	parameterNames.push_back( timeresName );
 	parameterNames.push_back( accOffName );
-	parameterNames.push_back( accSlopeName );
+	parameterNames.push_back( accSlopeLowName );
+	parameterNames.push_back( accSlopeHighName );
 	parameterNames.push_back( accSlopeHighName );
 	parameterNames.push_back( accPowerName );
 	allParameters = *( new ParameterSet(parameterNames) );
@@ -134,12 +135,13 @@ void Bs2DsPi_acc::getPhysicsParameters( )
 {
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	gamma      			= allParameters.GetPhysicsParameter( gammaName )->GetValue();
-    	deltaGamma 			= allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
+    deltaGamma 			= allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 	deltaM     			= allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 	mistag     			= allParameters.GetPhysicsParameter( mistagName )->GetValue();
 	timeRes    			= allParameters.GetPhysicsParameter( timeresName )->GetValue();
 	AcceptanceOffset 	= allParameters.GetPhysicsParameter( accOffName )->GetValue();
-	AcceptanceSlope 	= allParameters.GetPhysicsParameter( accSlopeName )->GetValue();
+	AcceptanceSlopeLow 	= allParameters.GetPhysicsParameter( accSlopeLowName )->GetValue();
+	AcceptanceSlopeHigh = allParameters.GetPhysicsParameter( accSlopeHighName )->GetValue();
 	AcceptanceSlopeHigh 	= allParameters.GetPhysicsParameter( accSlopeHighName )->GetValue();
 	AcceptancePower 	= allParameters.GetPhysicsParameter( accPowerName )->GetValue();
 	
@@ -166,8 +168,11 @@ double Bs2DsPi_acc::acc() const
 	//if(time < 0) return 0.0;
 	if(time < AcceptanceOffset) return 0.0;
 	else{
+		return (pow(((time-AcceptanceOffset)*AcceptanceSlopeLow),AcceptancePower)/(1.0+ pow(((time-AcceptanceOffset)*AcceptanceSlopeLow),AcceptancePower))) * 	(1.0 + AcceptanceSlopeHigh *(time-AcceptanceOffset));
+
+
 		//return pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower)/(1.0+ pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower))*(1. + AcceptanceSlopeHigh * (time - AcceptanceOffset));
-		return pow((time*AcceptanceSlope),AcceptancePower)/(1.0+ pow((time*AcceptanceSlope),AcceptancePower))*(1. + AcceptanceSlopeHigh * time);
+		return pow((time*AcceptanceSlopeLow),AcceptancePower)/(1.0+ pow((time*AcceptanceSlopeLow),AcceptancePower))*(1. + AcceptanceSlopeHigh * time);
 	}
 }
 

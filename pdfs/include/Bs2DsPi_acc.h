@@ -41,8 +41,8 @@ class Bs2DsPi_acc : public BasePDF
     	string mistagName;		// B mistag
 	    string timeresName;		// B timeres
 	    string accOffName;	// acc parameters
-	    string accSlopeName;		// acc parameters
-	    string accSlopeHighName;		// acc parameters
+	    string accSlopeLowName;		// acc parameters
+	    string accSlopeHighName;		// acc parameters	    
 	    string accPowerName;		// acc parameters
 	    	    	    
 		// These contain the strings that correspond
@@ -52,7 +52,9 @@ class Bs2DsPi_acc : public BasePDF
 		string tagName;		// B tag
 	   
 		// Physics parameters
-	    double gamma, deltaGamma, deltaM, mistag, timeRes, AcceptanceOffset, AcceptanceSlope, AcceptanceSlopeHigh, AcceptancePower;
+
+	    double gamma, deltaGamma, deltaM, mistag, timeRes, AcceptanceOffset, AcceptanceSlopeLow, AcceptanceSlopeHigh, AcceptancePower ;
+
 	
 	    // Observables
 		double time ;
