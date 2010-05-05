@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "MakeFoam.h"
+#include "PerEventAngularAcceptance.h"
 
 using namespace std;
 
@@ -69,6 +70,7 @@ int main( int argc, char * argv[] )
 		bool doPullsFlag = false;
 		bool testRapidIntegratorFlag = false;
     bool calculateAcceptanceWeights = false;
+    bool calculatePerEventAcceptance = false;
   
 		//Parse command line arguments
 		string currentArgument;
@@ -190,6 +192,10 @@ int main( int argc, char * argv[] )
 			else if ( currentArgument == "--calculateAcceptanceWeights" )
 			{
 				calculateAcceptanceWeights = true;
+			}
+			else if ( currentArgument == "--calculatePerEventAcceptance" )
+			{
+				calculatePerEventAcceptance = true;
 			}
 			else if ( currentArgument == "--testPlot" )
 			{
@@ -315,6 +321,16 @@ int main( int argc, char * argv[] )
         return 1;
       }
     }
+	  else if (calculatePerEventAcceptance)
+    {
+      PerEventAngularAcceptance a = PerEventAngularAcceptance("/tmp/jpsikmc09_loose.root","Bu2JpsiKTuple/DecayTree", "out.root");
+      for (int iter = 1; iter < 3; iter++)
+      {
+        a.fillEffHistos( iter );
+        a.loopOnReconstructedBs();
+      }
+      a.writeHistos();
+    } 
 		else if (testPlotFlag)
 		{
 			if (configFileNameFlag)

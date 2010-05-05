@@ -236,6 +236,8 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::buildPDFdenominator()
 		normalisationCacheValid = true;
 	}
 
+	//cout << gamma << endl;
+
 	double v1 = cachedAzeroAzeroIntB * angAccI1
 		+ cachedAparaAparaIntB * angAccI2
 		+ cachedAperpAperpIntB * angAccI3 
