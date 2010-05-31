@@ -50,6 +50,18 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			constraintValue += gaussSqrt * gaussSqrt;
 			
 		}
+		else if ( name == "GammaObs" )
+		{
+			//GammaObs^-1 = Gamma^-1 * ( 1 + (deltaGamma/2*Gamma)^2 ) / ( 1 - (deltaGamma/2*Gamma)^2 )
+			// Get gamma and delta gamma
+			double gamma = NewParameters->GetPhysicsParameter("gamma")->GetValue();
+			double dgam =  NewParameters->GetPhysicsParameter("deltaGamma")->GetValue();
+			double gamobs_fit = gamma * (1-(dgam/2/gamma)*(dgam/2/gamma)) / (1+(dgam/2/gamma)*(dgam/2/gamma));
+			double gamobs_con = allConstraints[constraintIndex]->GetValue();
+			double gaussSqrt = ( gamobs_fit -  gamobs_con ) / allConstraints[constraintIndex]->GetError();
+			constraintValue += gaussSqrt * gaussSqrt;
+			
+		}
 		else if ( StringProcessing::VectorContains( &parameterNames, &name ) >= 0 )
 		{
 			//Do standard gaussian constraint calculation

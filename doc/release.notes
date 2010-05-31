@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/05/31 - Pete Clarke
+  - Added Gamma_obs  (from DsPi) as Gaussian constraint
+
 2010/05/05 - Greig Cowan 
  - Added PerEventAngularAcceptance class for performing the mu, K
    particle efficiency calibration from Bu->JpsiK control channel.
