@@ -172,7 +172,7 @@ double Bs2DsPi_acc::acc() const
 
 
 		//return pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower)/(1.0+ pow(((time-AcceptanceOffset)*AcceptanceSlope),AcceptancePower))*(1. + AcceptanceSlopeHigh * (time - AcceptanceOffset));
-		return pow((time*AcceptanceSlopeLow),AcceptancePower)/(1.0+ pow((time*AcceptanceSlopeLow),AcceptancePower))*(1. + AcceptanceSlopeHigh * time);
+		//return pow((time*AcceptanceSlopeLow),AcceptancePower)/(1.0+ pow((time*AcceptanceSlopeLow),AcceptancePower))*(1. + AcceptanceSlopeHigh * time);
 	}
 }
 
