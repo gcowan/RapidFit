@@ -80,6 +80,7 @@ PerEventAngularAcceptance::PerEventAngularAcceptance( string fileName, string tu
     pSumHistos[name]           = new TH1F((name+"_p_sum").c_str(),  name.c_str(), pbins, pmin, pmax);
     pHistosPredicted[name]     = new TH1F((name+"_p_pre").c_str(),  name.c_str(), pbins, pmin, pmax);
     pHistosEffRatio[name]      = new TH1F((name+"_p_eff").c_str(),  name.c_str(), pbins, pmin, pmax);
+    pHistosEffRatioPrev[name]  = new TH1F((name+"_p_eff_prev").c_str(),  name.c_str(), pbins, pmin, pmax);
     ptHistos[name]             = new TH1F((name+"_pt").c_str(),     name.c_str(), ptbins, ptmin, ptmax);
     ptTmpHistos[name]          = new TH1F((name+"_pt_tmp").c_str(), name.c_str(), ptbins, ptmin, ptmax);
     ptSumHistos[name]          = new TH1F((name+"_pt_sum").c_str(), name.c_str(), ptbins, ptmin, ptmax);
@@ -99,6 +100,8 @@ PerEventAngularAcceptance::PerEventAngularAcceptance( string fileName, string tu
     pSumHistos[name]->Sumw2();
     pHistosPredicted[name]->Sumw2();
     pHistosEffRatio[name]->Sumw2();
+    pHistosEffRatioPrev[name]->Sumw2();
+    pHistosEffRatioPrev[name]->SetBit(TH1::kIsAverage);
     ptHistos[name]->Sumw2();
     ptTmpHistos[name]->Sumw2();
     ptSumHistos[name]->Sumw2();
@@ -122,18 +125,21 @@ void PerEventAngularAcceptance::setupNtuple( string tupleFileName, string tupleN
     exit(1);
   }
 
-  string cut = " Bu_MM > 5200 && Bu_MM < 5360 && Bu_TAU > -0.2 && Bu_TAU < 20";
+  string cut = " Bu_M > 5200 && Bu_M < 5360";
+  cut += " && Bu_TAU > -0.2 && Bu_TAU < 20";
   cut += " && muonplus_P > 3000. && muonplus_PT > 500.";
   cut += " && muonminus_P > 3000. && muonminus_PT > 500.";
   cut += " && kaon_P > 3000. && kaon_PT > 500.";
   cut += " && Jpsi_P > 0. && Jpsi_PT > 1000.";
-  cut += " && abs(Jpsi_MM-3096.) < 50.";
-  //cut += " && Bu_BKGCAT==0";
+  cut += " && abs(Jpsi_M-3096.) < 50.";
+  cut += " && Bu_BKGCAT==0";
 
-  decaytree->Draw(">>evtList", cut.c_str());
+  string cut1 = "1==1";
+
+  decaytree->Draw(">>evtList", cut1.c_str());
   evtList = (TEventList*)gDirectory->Get("evtList");
   nev = evtList->GetN();
-  //nev = 5000;
+  nev = 10000;
   cout << "Number of events passing cut: " << nev << endl;
 
   decaytree->SetMakeClass(1);
@@ -156,6 +162,10 @@ void PerEventAngularAcceptance::setupNtuple( string tupleFileName, string tupleN
   decaytree->SetBranchAddress("kaon_PY",   &kaon_PY, &b_kaon_PY);
   decaytree->SetBranchAddress("kaon_PZ",   &kaon_PZ, &b_kaon_PZ);
   decaytree->SetBranchAddress("kaon_PE",   &kaon_PE, &b_kaon_PE);
+
+  decaytree->SetBranchAddress("Bu_BKGCAT",   &Bu_BKGCAT, &b_Bu_BKGCAT);
+  decaytree->SetBranchAddress("Bu_MM",   &Bu_MM, &b_Bu_MM);
+  decaytree->SetBranchAddress("Bu_TAU",   &Bu_TAU, &b_Bu_TAU);
 }
 
 void PerEventAngularAcceptance::fillEffHistos( int iteration )
@@ -172,6 +182,7 @@ void PerEventAngularAcceptance::fillEffHistos( int iteration )
   {
     string particle = *particleIterator;
     
+    pHistosEffRatioPrev[particle] = (TH1F*)pHistosEffRatio[particle]->Clone("pEffPrev");
     pTmp[particle] = (TH1F*)pHistosEffRatio[particle]->Clone("ptmp");
     ptTmp[particle] = (TH1F*)ptHistosEffRatio[particle]->Clone("pttmp");
     pptTmp[particle] = (TH2F*)pptHistosEffRatio[particle]->Clone("ppttmp");
@@ -188,15 +199,16 @@ void PerEventAngularAcceptance::fillEffHistos( int iteration )
     {
       weight = iteration == 1 ? 0.85 : pTmp[particle]->GetBinContent(pBinNumber);
       pHistosEffRatio[particle]->Fill(pbin, weight);
-      pBinNumber += 1;
       // Now also do the 2D histogram
       ptBinNumber = 1;
       for ( double ptbin = ptmin; ptbin < ptmax; ptbin += ptbinWidth )
       {
+	//cout << pbin << " " << ptbin << " " << pBinNumber << " " << ptBinNumber << endl;
         weight = iteration == 1 ? 0.85 : pptTmp[particle]->GetBinContent(pBinNumber, ptBinNumber);
         pptHistosEffRatio[particle]->Fill(pbin, ptbin, weight);
         ptBinNumber += 1;
       }
+      pBinNumber += 1;
     }
     // Now do the pt one on it's own
     ptBinNumber = 1;
@@ -205,6 +217,9 @@ void PerEventAngularAcceptance::fillEffHistos( int iteration )
       weight = iteration == 1 ? 0.85 : ptTmp[particle]->GetBinContent(ptBinNumber);
       ptHistosEffRatio[particle]->Fill(ptbin, weight);
       ptBinNumber += 1;
+    }
+    if (iteration == 1) {
+	pHistosEffRatioPrev[particle] = (TH1F*)pHistosEffRatio[particle]->Clone("pEffPrev");
     }
   }
 }
@@ -227,7 +242,7 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
 
   for (int i = 0; i < nev; i++)
   {
-    if (i % 1000 == 0) cout << "Processing event " << i << endl;
+    if (i % 10000 == 0) cout << "Processing event " << i << endl;
     decaytree->GetEntry(evtList->GetEntry(i));
 
     p["kaon"]      = new TLorentzVector(kaon_PX, kaon_PY, kaon_PZ, kaon_PE);
@@ -238,10 +253,41 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
     p["Jpsi"] = new TLorentzVector(*p["muonminus"] + *p["muonplus"]);
     p["B"] = new TLorentzVector(*p["Jpsi"] + *p["kaon"]);
 
+    if(Bu_BKGCAT!=0) continue; 
+    if(Bu_MM < 5200. || Bu_MM > 5360.) continue;
+    if(Bu_TAU < -0.2 || Bu_TAU > 20.) continue;
+
+    if(fabs(p["Jpsi"]->M()-3096)>50) continue;
+
+    if(p["muonplus"]->P() < pmin) continue;
+    if(p["muonplus"]->Pt() < ptmin) continue;
+    if(p["muonminus"]->P() < pmin) continue;
+    if(p["muonminus"]->Pt() < ptmin) continue;
+    if(p["kaon"]->P() < pmin) continue;
+    if(p["kaon"]->Pt() < ptmin) continue;
+
+    if(p["Jpsi"]->P() < pmin_jpsi) continue;
+    if(p["Jpsi"]->Pt() < ptmin_jpsi) continue;
+
     // want the reconstructed B's to be inside the fiducial volume of LHCb
     vector<int> inacc = fiducialCuts( *p["muonplus"], *p["muonminus"], *p["kaon"], *p["Jpsi"] );
+   
     if (inacc[0]+inacc[1]+inacc[2]+inacc[3] < 4) continue;
-
+    /*cout << i << " " << Bu_BKGCAT << " " << Bu_MM << " "
+	<< Bu_TAU << " "
+	<< p["Jpsi"]->M()-3096 << Bu_TAU << " "
+	<< p["muonplus"]->P() << " "
+	<< p["muonplus"]->Pt() << " "
+	<< p["muonminus"]->P() << " "
+	<< p["muonminus"]->Pt() << " "
+	<< p["kaon"]->P() << " "
+	<< p["kaon"]->Pt() << " "
+	<< p["Jpsi"]->P() << " "
+	<< p["Jpsi"]->Pt() << " "
+	
+	<< endl;
+	*/
+  
     // Fill some histograms of the reconstructed quantities
     for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
     {
@@ -269,6 +315,7 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
     // Now calculate f given p_B
     generateEventsAndCalculateFgivenB();
 
+    //cout << w_sum_gen << endl;
     // Now do the sum of the generated distributions
     vector<string>::iterator particleIterator;
     for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
@@ -290,7 +337,9 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
   for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
   {
       string particle = *particleIterator;
-      pHistosEffRatio[particle]->Divide(pHistos[particle], pHistosPredicted[particle]);
+      //pHistosPredicted[particle]->Divide(pHistosEffRatioPrev[particle]);//, 1., 1., "b");
+      pHistosEffRatio[particle]->Divide(pHistos[particle], pHistosPredicted[particle], 1., 1., "b");
+      pHistosEffRatio[particle]->Multiply(pHistosEffRatioPrev[particle]);
       ptHistosEffRatio[particle]->Divide(ptHistos[particle], ptHistosPredicted[particle]);
       pptHistosEffRatio[particle]->Divide(pptHistos[particle], pptHistosPredicted[particle]);
       delete p[particle];
@@ -347,17 +396,28 @@ void PerEventAngularAcceptance::generateEventsAndCalculateFgivenB()
     double yprim = pInJpsi["muonplus"]->P() * sqrt(1 - cosThetaMu*cosThetaMu)*sin(phiMu);
     double zprim = pInJpsi["muonplus"]->P() * cosThetaMu;
 
+    //cout << cosThetaMu << " " << phiMu << " " << xprim <<  " " << yprim << " " << zprim << endl;
+
     // Now do the Jpsi. Which particles do we need here? Check!!!!!!!!
     TLorentzVector p4BInNewJpsi = *p["B"];
     p4BInNewJpsi.Boost(boosttoNewJpsi);
 
+    //cout << p4BInNewJpsi.P() << endl;
+
     TVector3 uzInNewJpsi = -((p4BInNewJpsi.Vect()).Unit());
-    TVector3 uzInLab = TVector3(0,0,1);
+    TVector3 uzInLab(0,0,1);
     TVector3 uyInNewJpsi = (uzInNewJpsi.Cross(uzInLab) ).Unit();
     TVector3 uxInNewJpsi = (uyInNewJpsi.Cross(uzInNewJpsi) ).Unit();
-
+	/*
+    cout << uzInNewJpsi.X() << endl;
+    cout << uzInLab.X() << endl;
+    cout << uyInNewJpsi.X() << endl;
+    cout << uxInNewJpsi.X() << endl;
+	*/
     TVector3 v3newmup = xprim*uxInNewJpsi + yprim*uyInNewJpsi + zprim*uzInNewJpsi;
     TVector3 v3newmum = -xprim*uxInNewJpsi - yprim*uyInNewJpsi - zprim*uzInNewJpsi;
+
+    //cout << v3newmup.X() << " " << v3newmup.Y() << " " << v3newmup.Z() << endl;
 
     newP["muonplus"]  = new TLorentzVector(v3newmup.Px(),v3newmup.Py(),v3newmup.Pz(), pInJpsi["muonplus"]->E());
     newP["muonminus"] = new TLorentzVector(v3newmum.Px(),v3newmum.Py(),v3newmum.Pz(), pInJpsi["muonminus"]->E());
@@ -365,6 +425,8 @@ void PerEventAngularAcceptance::generateEventsAndCalculateFgivenB()
     newP["muonplus"]->Boost(boostBackToLabFromNewJpsi);
     newP["muonminus"]->Boost(boostBackToLabFromNewJpsi);
 
+    //cout << newP["muonplus"].P() << " " << newP["muonplus"].Pt() << " " << xprim <<  " " << yprim << " " << zprim << endl;
+    
     // apply the cuts to the generated events, which now have momentum in lab frame (sec 3.1, point 3)
     vector<int> inacc = fiducialCuts( *newP["muonplus"], *newP["muonminus"], *newP["kaon"], *newP["Jpsi"] );
 
@@ -372,14 +434,24 @@ void PerEventAngularAcceptance::generateEventsAndCalculateFgivenB()
     // Weight must be given by the product of the efficiencies of each particle
     // In the first iteration, the efficiencies are taken to be flat
     double w_angular = 1. - cosThetaMu*cosThetaMu; // why is this angular term needed?
-    double w_mup = effMuonP(*newP["muonplus"])*inacc[0];
-    double w_mum = effMuonM(*newP["muonminus"])*inacc[1];
-    double w_k = effKaon(*newP["kaon"])*inacc[2];
+    double w_mup = effMuonP(*newP["muonplus"]) * inacc[0];
+    double w_mum = effMuonM(*newP["muonminus"]) * inacc[1];
+    double w_k = effKaon(*newP["kaon"]) * inacc[2];
 
-    double w_ev = w_angular*inacc[3]*w_mup*w_mum*w_k;
-    //cout << w_angular << " "<< effMuonP(*newP["muonplus"]) << " " << effMuonM(*newP["muonminus"]) << " " << effKaon(*newP["kaon"]) << endl;
-    //cout << w_angular << " "<< inacc[0] << " " << inacc[1] << " " << inacc[2] << " " << inacc[3] << endl;
+    double w_ev = w_angular * inacc[3] * w_mup * w_mum * w_k;
     w_sum_gen += w_ev;
+  
+    // I really don't know why this is necessary
+    map<string, double> w_no_eff;
+    w_no_eff["muonplus"]  = w_angular * inacc[3] * w_mum * w_k   * inacc[0];
+    w_no_eff["muonminus"] = w_angular * inacc[3] * w_mup * w_k   * inacc[1];
+    w_no_eff["kaon"]      = w_angular * inacc[3] * w_mup * w_mum * inacc[2];
+
+    /* 
+    cout << w_angular << " "<< effMuonP(*newP["muonplus"]) << " " << effMuonM(*newP["muonminus"]) << " " << effKaon(*newP["kaon"]) << endl;
+    cout << w_angular << " "<< inacc[0] << " " << inacc[1] << " " << inacc[2] << " " << inacc[3] << endl;
+    cout << w_angular << " " << w_sum_gen << endl;
+    */
 
     vector<string>::iterator particleIterator;
     for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
@@ -387,9 +459,9 @@ void PerEventAngularAcceptance::generateEventsAndCalculateFgivenB()
       string particle = *particleIterator;
       cosThetaMuTmpHistos[particle]->Fill(cosThetaMu, w_ev);
       cosThetaKTmpHistos[particle]->Fill(cosThetaK, w_ev);
-      pTmpHistos[particle]->Fill(newP[particle]->P(), w_ev);
-      ptTmpHistos[particle]->Fill(newP[particle]->Pt(), w_ev);
-      pptTmpHistos[particle]->Fill(newP[particle]->P(), newP[particle]->Pt(), w_ev);
+      pTmpHistos[particle]->Fill(newP[particle]->P(), w_ev);//w_no_eff[particle]);//w_ev);
+      ptTmpHistos[particle]->Fill(newP[particle]->Pt(), w_no_eff[particle]);//w_ev);
+      pptTmpHistos[particle]->Fill(newP[particle]->P(), newP[particle]->Pt(), w_no_eff[particle]);//w_ev);
       delete newP[particle];
     }
     delete newP["Jpsi"];
@@ -449,6 +521,7 @@ void PerEventAngularAcceptance::writeHistos()
     ptHistosPredicted[particle]->Write();
     pptHistosPredicted[particle]->Write();
     pHistosEffRatio[particle]->Write();
+    pHistosEffRatioPrev[particle]->Write();
     ptHistosEffRatio[particle]->Write();
     pptHistosEffRatio[particle]->Write();
   }
@@ -462,6 +535,8 @@ double PerEventAngularAcceptance::effMuonP(TLorentzVector P)
   double pt = P.Pt();
   double py = P.Py();
   double pz = P.Pz();
+
+  //cout << pz <<  " " << p << " " << pt << " " << pt/p << " " << fabs(py/p) << endl;
   
   if (pz<0) return 0;
   if (p<pmin) return 0;

@@ -71,6 +71,7 @@ class PerEventAngularAcceptance
   map<string, TH1F *> pTmpHistos; // used to store quantities during event generation
   map<string, TH1F *> pSumHistos; // Weighted sum of all the 
   map<string, TH1F *> pHistosEffRatio; // The efficiency we are after 
+  map<string, TH1F *> pHistosEffRatioPrev; // The efficiency we are after 
   map<string, TH1F *> ptHistos;
   map<string, TH1F *> ptHistosPredicted;
   map<string, TH1F *> ptTmpHistos;
@@ -99,10 +100,11 @@ class PerEventAngularAcceptance
   float muonplus_PX, muonplus_PY, muonplus_PZ, muonplus_PE;
   float muonminus_PX, muonminus_PY, muonminus_PZ, muonminus_PE;
   float kaon_PX, kaon_PY, kaon_PZ, kaon_PE;
+  float Bu_MM, Bu_TAU, Bu_BKGCAT;
 
-  TBranch   *b_B_BKGCAT;
-  TBranch   *b_B_MM;
-  TBranch   *b_B_TAU;
+  TBranch   *b_Bu_BKGCAT;
+  TBranch   *b_Bu_MM;
+  TBranch   *b_Bu_TAU;
 
   TBranch   *b_muonplus_PX;
   TBranch   *b_muonplus_PY;

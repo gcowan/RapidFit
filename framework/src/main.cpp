@@ -323,8 +323,8 @@ int main( int argc, char * argv[] )
     }
 	  else if (calculatePerEventAcceptance)
     {
-      PerEventAngularAcceptance a = PerEventAngularAcceptance("/tmp/jpsikmc09_loose.root","Bu2JpsiKTuple/DecayTree", "out.root");
-      for (int iter = 1; iter < 3; iter++)
+      PerEventAngularAcceptance a = PerEventAngularAcceptance("jpsikmc09_loose.root","Bu2JpsiKTuple/DecayTree", "out2.root");
+      for (int iter = 1; iter <= 3; iter++)
       {
         a.fillEffHistos( iter );
         a.loopOnReconstructedBs();
