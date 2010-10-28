@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/10/28 -  Pete Clarke
+ - Added new prompt background pdf with 2 Gaussians :  called Bs2JpsiPhiPromptBkg_withTimeResDouble
+
 2010/06/02 - Greig Cowan 
  - Bug fixes in PerEventAngularAcceptance.
 
