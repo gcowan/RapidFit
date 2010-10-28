@@ -33,6 +33,7 @@
 #include "Bs2JpsiPhiLongLivedBkg_withTimeRes.h"
 #include "Bs2JpsiPhiPromptBkg.h"
 #include "Bs2JpsiPhiPromptBkg_withTimeRes.h"
+#include "Bs2JpsiPhiPromptBkg_withTimeResDouble.h"
 #include "Bs2JpsiPhiMassBkg.h"
 
 #include "MinuitWrapper.h"
@@ -113,7 +114,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
                 //Default DsPi signal mass PDF
                 return new Bs2DsPiMassSignal();
         }
-	else if ( Name == "Bs2JpsiPhiMassSignal" )
+		else if ( Name == "Bs2JpsiPhiMassSignal" )
         {
                 //Default JPsiPhi signal mass PDF
                 return new Bs2JpsiPhiMassSignal();
@@ -123,7 +124,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 		// DsPi
 		return new Bs2DsPiBkg_withTimeRes();
         }
-	else if ( Name == "Bs2JpsiPhiLongLivedBkg" )
+		else if ( Name == "Bs2JpsiPhiLongLivedBkg" )
         {
 	        //Long lived background for JPsiPhi
                 return new Bs2JpsiPhiLongLivedBkg();
@@ -145,7 +146,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //Prompt background for JPsiPhi, with time resolution (convolved gaussian)
 		return new Bs2JpsiPhiPromptBkg_withTimeRes();
         }
-	else if ( Name == "Bs2JpsiPhi_sWave" )
+        else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeResDouble" )
+        {
+	        //Prompt background for JPsiPhi, with time resolution (double convolved gaussian)
+			return new Bs2JpsiPhiPromptBkg_withTimeResDouble();
+        }
+		else if ( Name == "Bs2JpsiPhi_sWave" )
         {
 	        //JPsiPhi signal PDF including the s-wave contribution
                 return new Bs2JpsiPhi_sWave();
