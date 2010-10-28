@@ -20,12 +20,12 @@ Bs2JpsiPhiLongLivedBkg_withTimeRes::Bs2JpsiPhiLongLivedBkg_withTimeRes() :
 	  timeName	( "time" )
 
 	// Physics parameters
+	, f_LL1Name	( "f_LL1" )
 	, tauLL1Name	( "tau_LL1" )
 	, tauLL2Name	( "tau_LL2" )
-	, f_LL1Name	( "f_LL1" )
+	, timeResLL1FracName( "timeResLL1Frac" )
 	, sigmaLL1Name	( "sigma_LL1" )
 	, sigmaLL2Name	( "sigma_LL2" )
-	, timeResLL1FracName( "timeResLL1Frac" )
 {
 	MakePrototypes();
 }
@@ -38,12 +38,12 @@ void Bs2JpsiPhiLongLivedBkg_withTimeRes::MakePrototypes()
 
         //Make the parameter set
         vector<string> parameterNames;
+		parameterNames.push_back( f_LL1Name );
         parameterNames.push_back( tauLL1Name );
         parameterNames.push_back( tauLL2Name );
-        parameterNames.push_back( f_LL1Name );
+		parameterNames.push_back( timeResLL1FracName );
         parameterNames.push_back( sigmaLL1Name );
         parameterNames.push_back( sigmaLL2Name );
-        parameterNames.push_back( timeResLL1FracName );
         allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -72,7 +72,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Evaluate(DataPoint * measurement)
 	// Observable
         time = measurement->GetObservable( timeName )->GetValue();
 
-	if(timeResLL1Frac >= 0.9999)
+	if( timeResLL1Frac >= 0.9999 )
         {
                 // Set the member variable for time resolution to the first value and calculate
                 sigmaLL = sigmaLL1;
@@ -93,12 +93,25 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Evaluate(DataPoint * measurement)
 double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFnumerator()
 {
 	// Sum of two exponentials, using the time resolution functions
- 
-	double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
-	double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
-	 
-	double val = f_LL1 * val1 + (1. - f_LL1) * val2;
-	return val;
+
+	if( f_LL1 >= 0.9999 ) {
+		if( tauLL1 <= 0 ) {
+			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1 " << endl ;
+			exit(1) ;
+		}
+		double val = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
+		return val;
+	}
+	else {
+		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
+			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
+			exit(1) ;
+		}
+		double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);	 
+		double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
+		double val = f_LL1 * val1 + (1. - f_LL1) * val2;
+		return val;
+	}
 }
 
 double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
@@ -115,7 +128,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(DataPoint * measurement
                 thigh = timeBound->GetMaximum();
         }
 	
-	if(timeResLL1Frac >= 0.9999)
+	if( timeResLL1Frac >= 0.9999 )
         {
                 // Set the member variable for time resolution to the first value and calculate
                 sigmaLL = sigmaLL1;
@@ -136,12 +149,26 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(DataPoint * measurement
 double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFdenominator()
 {
 	// Sum of two exponentials, using the time resolution functions
- 
-	double val1 = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
-	double val2 = Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
-	 
-	double val = f_LL1 * val1 + (1. - f_LL1) * val2;
-  	return val;
+
+	if( f_LL1 >= 0.9999 ) {
+		if( tauLL1 <= 0 ) {
+			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1 " << endl ;
+			exit(1) ;
+		}
+		double val = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
+		return val;
+	}
+	else {
+		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
+			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
+			exit(1) ;
+		}
+		double val1 = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
+		double val2 = Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
+		double val = f_LL1 * val1 + (1. - f_LL1) * val2;
+		return val;
+	}
+		
 }
 
 
