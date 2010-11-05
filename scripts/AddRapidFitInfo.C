@@ -37,7 +37,7 @@ void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName
   float cosTheta; TBranch* branch_cosTheta =  newtree->Branch("cosTheta",&cosTheta, "cosTheta/F");
   float cosPsi; TBranch* branch_cosPsi =  newtree->Branch("cosPsi",&cosPsi, "cosPsi/F");
   float phi; TBranch* branch_phi =  newtree->Branch("phi",&phi, "phi/F");
-  int tag; TBranch* branch_tag =  newtree->Branch("tag",&tag, "tag/I");
+  float tag; TBranch* branch_tag =  newtree->Branch("tag",&tag, "tag/F");
   float mistag; TBranch* branch_mistag =  newtree->Branch("mistag",&mistag, "mistag/F");
   float mass; TBranch* branch_mass =  newtree->Branch("mass",&mass, "mass/F");
 
@@ -46,7 +46,7 @@ void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName
   newtree->SetBranchAddress("B_s0_ThetaTr",&cosTheta); 
   newtree->SetBranchAddress("B_s0_ThetaK",&cosPsi);
   newtree->SetBranchAddress("B_s0_ThetaVtr",&phi);
-  newtree->SetBranchAddress("B_s0_TAGDECISION",&tag);
+  int itag; newtree->SetBranchAddress("B_s0_TAGDECISION",&itag);
   newtree->SetBranchAddress("B_s0_TAGOMEGA",&mistag);
   newtree->SetBranchAddress("B_s0_LOKI_MASS_JpsiConstr",&mass);
 
@@ -54,6 +54,7 @@ void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName
   int num_entries  = newtree->GetEntries();
   for (int i = 0; i <num_entries; ++i) {
     newtree->GetEntry(i);
+    tag = (float) itag;
     time /= 0.299792458; 
     cosTheta = TMath::Cos(cosTheta);
     cosPsi = TMath::Cos(cosPsi);
