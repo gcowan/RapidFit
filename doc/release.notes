@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/11/05 M Needham
+ - Add a macro in scripts AddRapidFitInfo.C to append the rapid fit variable to the standard ntuple 
+
 2010/10/28 -  Pete Clarke
  - Added fix in pdfs/src/Bs2JpsiPhiLongLivedBkg_withTimeRes.cpp where it was possible to divide by zero in 1/tauLL
 
