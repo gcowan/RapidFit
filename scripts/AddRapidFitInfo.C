@@ -42,7 +42,7 @@ void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName
   float mass; TBranch* branch_mass =  newtree->Branch("mass",&mass, "mass/F");
 
   // address of the old variables
-  newtree->SetBranchAddress("B_s0_LOKI_DTF_CTAUS",&time); 
+  newtree->SetBranchAddress("B_s0_LOKI_DTF_CTAU",&time); 
   newtree->SetBranchAddress("B_s0_ThetaTr",&cosTheta); 
   newtree->SetBranchAddress("B_s0_ThetaK",&cosPsi);
   newtree->SetBranchAddress("B_s0_ThetaVtr",&phi);

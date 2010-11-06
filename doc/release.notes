@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/11/06 M Needham
+ - Bug fix in  AddRapidFitInfo.C
+
+
 2010/11/05 M Needham
  - Bug fix in  AddRapidFitInfo.C 
 
