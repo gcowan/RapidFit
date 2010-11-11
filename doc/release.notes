@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/11/11 Pete Clarke
+ - Modified pdfs/src/Bs2JpsiPhiMassBkg.cpp to catch a patalogical divide by zero when the slope parameter alpha was zero
+ - Added mods to IPDF, BasePDF, NormalisedSumPDF, SumPDF, ProdPDF to incliude vector<double> EvaluateComponents(..)
+
 2010/11/11 Greig Cowan
  - Modified Plotter and EdStyle to make plots look a bit better.
 

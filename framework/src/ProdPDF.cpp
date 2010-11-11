@@ -1,7 +1,7 @@
 /**
         @class ProdPDF
 
-        An implementation of IPDF for adding the values of two other IPDFs
+        An implementation of IPDF for multiplying the values of two other IPDFs
 
         @author Benjamin M Wynne bwynne@cern.ch
 	@date 2009-10-02
@@ -66,6 +66,27 @@ double ProdPDF::Evaluate( DataPoint * NewDataPoint )
 	double termTwo = secondPDF->Evaluate( NewDataPoint );
 	return termOne * termTwo;
 }
+
+//Return the function value at the given point
+vector<double> ProdPDF::EvaluateComponents( DataPoint * NewDataPoint )
+{
+
+	//Get the components of each term
+	vector<double> termOneComponents = firstPDF->EvaluateComponents( NewDataPoint ) ;
+	vector<double> termTwoComponents = secondPDF->EvaluateComponents( NewDataPoint );
+	
+	//Insert components in output vector with correct weights.	
+	vector<double> components ;
+	for( int ii=0; ii<termOneComponents.size(); ii++ ) {
+		for( int jj=0; ii<termTwoComponents.size(); ii++ ) {
+			components.push_back( termOneComponents[ii]*termTwoComponents[jj] ) ;
+		}
+	}
+
+	// Return the complete set of components
+	return components;
+}
+
 
 //Return a prototype data point
 vector<string> ProdPDF::GetPrototypeDataPoint()

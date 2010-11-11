@@ -150,6 +150,27 @@ double NormalisedSumPDF::Evaluate( DataPoint * NewDataPoint )
 	return termOne + termTwo;
 }
 
+//Return the function value at the given point
+vector<double> NormalisedSumPDF::EvaluateComponents( DataPoint * NewDataPoint )
+{
+	//Calculate the integrals of the PDFs
+	double firstIntegral = firstIntegrator->Integral( NewDataPoint, integrationBoundary, true ) * firstIntegralCorrection;
+	double secondIntegral = secondIntegrator->Integral( NewDataPoint, integrationBoundary, true ) * secondIntegralCorrection;
+
+	//Get the components of each term
+	vector<double> termOneComponents = firstPDF->EvaluateComponents( NewDataPoint ) ;
+	vector<double> termTwoComponents = secondPDF->EvaluateComponents( NewDataPoint );
+	
+	//Insert components in output vector with correct weights.	
+	vector<double> components ;
+	for( int ii=0; ii<termOneComponents.size(); ii++ ) components.push_back( termOneComponents[ii]*firstFraction/firstIntegral ) ;
+	for( int ii=0; ii<termTwoComponents.size(); ii++ ) components.push_back( termTwoComponents[ii]*(1.-firstFraction)/secondIntegral ) ;
+	
+	// Return the complete set of components
+	return components;
+}
+
+
 //Return a prototype data point
 vector<string> NormalisedSumPDF::GetPrototypeDataPoint()
 {

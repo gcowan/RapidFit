@@ -32,6 +32,9 @@ class SumPDF : public IPDF
 		//Return the function value at the given point
 		virtual double Evaluate(DataPoint*);
 
+		//Return the components of the function value at the given point
+		virtual vector<double> EvaluateComponents(DataPoint*);
+	
 		//Return a prototype data point
 		virtual vector<string> GetPrototypeDataPoint();
 

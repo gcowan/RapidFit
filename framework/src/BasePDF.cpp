@@ -115,6 +115,15 @@ double BasePDF::Evaluate(DataPoint * NewDataPoint)
 	return  -1.0;
 }
 
+//Calculate the function value
+vector<double> BasePDF::EvaluateComponents(DataPoint * NewDataPoint)
+{
+	//Just assume a single component equal to the ordinary evaluate method
+	vector<double> components ;
+	components.push_back( this->Evaluate( NewDataPoint ) ) ;
+	return  components ;
+}
+
 //Return a prototype data point
 vector<string> BasePDF::GetPrototypeDataPoint()
 {

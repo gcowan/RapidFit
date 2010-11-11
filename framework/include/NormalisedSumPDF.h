@@ -33,6 +33,9 @@ class NormalisedSumPDF : public IPDF
 		//Return the function value at the given point
 		virtual double Evaluate(DataPoint*);
 
+		//Return the components of the function value at the given point
+		virtual vector<double> EvaluateComponents(DataPoint*);
+	
 		//Return a prototype data point
 		virtual vector<string> GetPrototypeDataPoint();
 
@@ -40,7 +43,7 @@ class NormalisedSumPDF : public IPDF
 		virtual vector<string> GetPrototypeParameterSet();
 
 		//Return a list of parameters not to be integrated
-                virtual vector<string> GetDoNotIntegrateList();
+		virtual vector<string> GetDoNotIntegrateList();
 
 		// Update the two RapidFitIntegrator caches
 		virtual void UpdateIntegralCache();

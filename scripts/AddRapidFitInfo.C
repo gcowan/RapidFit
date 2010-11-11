@@ -45,7 +45,7 @@ void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName
   newtree->SetBranchAddress("B_s0_LOKI_DTF_CTAU",&time); 
   newtree->SetBranchAddress("B_s0_ThetaTr",&cosTheta); 
   newtree->SetBranchAddress("B_s0_ThetaK",&cosPsi);
-  newtree->SetBranchAddress("B_s0_ThetaVtr",&phi);
+  newtree->SetBranchAddress("B_s0_PhiTr",&phi);
   int itag; newtree->SetBranchAddress("B_s0_TAGDECISION",&itag);
   newtree->SetBranchAddress("B_s0_TAGOMEGA",&mistag);
   newtree->SetBranchAddress("B_s0_LOKI_MASS_JpsiConstr",&mass);

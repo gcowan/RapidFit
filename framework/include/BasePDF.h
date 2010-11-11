@@ -32,17 +32,20 @@ class BasePDF : public IPDF
 		//Return the function value at the given point
 		virtual double Evaluate( DataPoint* );
 
+		//Return the components of the function value at the given point
+		virtual vector<double> EvaluateComponents( DataPoint* );
+
 		//Return a prototype data point
 		virtual vector<string> GetPrototypeDataPoint();
 
 		//Return a prototype set of physics parameters
 		virtual vector<string> GetPrototypeParameterSet();
 
-                //Return a list of parameters not to be integrated
-                virtual vector<string> GetDoNotIntegrateList();
+		//Return a list of parameters not to be integrated
+		virtual vector<string> GetDoNotIntegrateList();
 
-                //Update integral cache
-                virtual void UpdateIntegralCache();
+		//Update integral cache
+		virtual void UpdateIntegralCache();
 
 	protected:
 		//Do the evaluation

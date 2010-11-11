@@ -141,6 +141,27 @@ double SumPDF::Evaluate( DataPoint * NewDataPoint )
 	return termOne + termTwo;
 }
 
+
+//Return the components of the function value at the given point
+vector<double> SumPDF::EvaluateComponents( DataPoint * NewDataPoint )
+{
+	//Get the components of each term
+	vector<double> termOneComponents = firstPDF->EvaluateComponents( NewDataPoint ) ;
+	vector<double> termTwoComponents = secondPDF->EvaluateComponents( NewDataPoint );
+	
+	//Insert components in output vector with correct weights.	
+	vector<double> components ;
+	for( int ii=0; ii<termOneComponents.size(); ii++ ) components.push_back( termOneComponents[ii]*firstFraction ) ;
+	for( int ii=0; ii<termTwoComponents.size(); ii++ ) components.push_back( termTwoComponents[ii]*(1.-firstFraction) ) ;
+	
+	// Return the complete set of components
+	return components;
+}
+
+
+
+
+
 //Return a prototype data point
 vector<string> SumPDF::GetPrototypeDataPoint()
 {
