@@ -16,6 +16,7 @@
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"
 #include "TCanvas.h"
+#include "TPaveText.h"
 #include "TFolder.h"
 #include "StringProcessing.h"
 
@@ -101,7 +102,9 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 {
 	//////////////////////////////////////////////////////////////////
 	//Make the histogram of this observable
-
+	EdStyle * greigFormat = new EdStyle();	
+        gStyle->SetMarkerStyle(15);
+        gStyle->SetMarkerSize(0.8);
 	//Get the data needed to make the histogram
 	double maximum, minimum;
 	int binNumber;
@@ -110,16 +113,17 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 
 	//Make the histogram
 	string histogramName = ObservableName + "ProjectionPlot";
-	string histogramTitle = ObservableName + " projection plot";
+	//string histogramTitle = ObservableName + " projection plot";
+	string histogramTitle = "";
 	TH1F * dataHistogram = new TH1F( histogramName.c_str(), histogramTitle.c_str(), binNumber, minimum, maximum );
 
+	dataHistogram->Sumw2();
+	
 	//Loop over all data points and add them to the histogram
 	for ( int dataIndex = 0; dataIndex < observableValues.size(); dataIndex++)
 	{
 		dataHistogram->Fill( observableValues[dataIndex] );
 	}
-
-	dataHistogram->Sumw2();
 
 	//Histogram complete
 	////////////////////////////////////////////////////////////////////
@@ -139,7 +143,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	double ratioOfIntegrals = 1.;
 		
 	int plotNumber;
-	if (ObservableName == "time" ) plotNumber = 128;
+	if (ObservableName == "time") plotNumber = 256;
 	else plotNumber = 128;
 
 	//Initialise the data averaged projection
@@ -198,16 +202,19 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * Histogram, double * ProjectionXValues, double * ProjectionYValues, int PlotNumber )
 {
 	//Make the graph
+ 	EdStyle * greigFormat = new EdStyle();
+	gStyle->SetMarkerStyle(15);
+        gStyle->SetMarkerSize(0.8);
 	TMultiGraph * graph = new TMultiGraph();
 	TGraphErrors * projectionGraph = new TGraphErrors( PlotNumber, ProjectionXValues, ProjectionYValues );
 	graph->Add(projectionGraph);
 	
 	//Formatting
-	EdStyle * greigFormat = new EdStyle();	
 	projectionGraph->SetLineColor(2);
 	projectionGraph->SetLineWidth(4);
 	string xTitle = ObservableName + " (" + plotData->GetDataPoint(0)->GetObservable(ObservableName)->GetUnit() + ")";
 	Histogram->GetXaxis()->SetTitle( xTitle.c_str() );
+	Histogram->GetYaxis()->SetTitle( "Events" );
 	
 	string drawOptions = "C";
 	//Note "same" option is not required if graph is drawn second. "A" option - requesting axes - will overwrite whatever was there before
@@ -218,10 +225,11 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 	ostringstream ranString;
 	ranString << ran;
 	//Stick both objects on one canvas
-	string canvasName = ObservableName + "Projection" + Description + ranString.str();
-	string canvasTitle = ObservableName + " projection " + Description;
+	string canvasName = ObservableName + "Projection" + Description;// + ranString.str();
+	//string canvasTitle = ObservableName + " projection " + Description;
+	string canvasTitle = "";
 	TCanvas * bothPlots = new TCanvas( canvasName.c_str(), canvasTitle.c_str(), 600, 600 );
- 	gStyle->SetMarkerStyle(0);
+ 	//gStyle->SetMarkerStyle(20);
 	Histogram->SetStats(0);
 
 	double ymin = Histogram->GetBinContent(Histogram->GetMinimumBin());
@@ -232,7 +240,7 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 		//TH1F * tmpHist = new TH1F("tmp", "tmp", 1, -2., -1.);
 		//tmpHist->Fill(-2.);
 		//tmpHist->Draw();
-		Histogram->SetStats(1);
+		//Histogram->SetStats(1);
 		bothPlots->SetLogy();
 		Histogram->GetXaxis()->SetRangeUser(-2., 15.); // This does not work because of STUPID ROOT!!
 		Histogram->GetYaxis()->SetRangeUser(0.1, 2*ymax);
@@ -242,10 +250,21 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 	{
 		Histogram->GetYaxis()->SetRangeUser(0., ymax + ymax/10.);
 	}
+
+	TPaveText *lhcb7TeVPrelimR = new TPaveText(0.65, 
+					   0.75, 
+					   0.90, 
+					   0.85, 
+					   "BRNDC");
+	lhcb7TeVPrelimR->SetFillColor(0);
+	lhcb7TeVPrelimR->SetTextAlign(12);
+	lhcb7TeVPrelimR->SetBorderSize(0);
+	lhcb7TeVPrelimR->AddText("#splitline{#splitline{LHCb}{Preliminary}}{#scale[0.7]{#sqrt{s} = 7 TeV}}");
 	
-	Histogram->Draw();
+	Histogram->Draw("E1");
 	graph->Draw( drawOptions.c_str() );
-	
+	lhcb7TeVPrelimR->Draw();
+
 	bothPlots->Update();
 	bothPlots->Write();
 }
@@ -290,6 +309,7 @@ vector<double> Plotter::GetStatistics( string ObservableName, double & Minimum, 
 	Maximum = StatisticsFunctions::Maximum(observableValues);
 	Minimum = StatisticsFunctions::Minimum(observableValues);
 	BinNumber = StatisticsFunctions::OptimumBinNumber(observableValues);
+	if ( ObservableName == "time" ) BinNumber = (int)BinNumber/2;
 	return observableValues;
 }
 
