@@ -15,7 +15,7 @@
 */
 
 
-void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName = "DecayTree"){
+std::string AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName = "DecayTree"){
 
   // get the input
   TChain* decaytree = new TChain(treeName.c_str());
@@ -44,7 +44,7 @@ void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName
   // address of the old variables
   newtree->SetBranchAddress("B_s0_LOKI_DTF_CTAU",&time); 
   newtree->SetBranchAddress("B_s0_ThetaTr",&cosTheta); 
-  newtree->SetBranchAddress("B_s0_ThetaK",&cosPsi);
+  newtree->SetBranchAddress("B_s0_ThetaVtr",&cosPsi);
   newtree->SetBranchAddress("B_s0_PhiTr",&phi);
   int itag; newtree->SetBranchAddress("B_s0_TAGDECISION",&itag);
   newtree->SetBranchAddress("B_s0_TAGOMEGA",&mistag);
@@ -54,8 +54,8 @@ void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName
   int num_entries  = newtree->GetEntries();
   for (int i = 0; i <num_entries; ++i) {
     newtree->GetEntry(i);
-    tag = (float) itag;
-    time /= 0.299792458; 
+    time /= 0.299792458;
+	tag = (float) itag;   
     cosTheta = TMath::Cos(cosTheta);
     cosPsi = TMath::Cos(cosPsi);
     branch_time->Fill();
@@ -70,4 +70,5 @@ void AddRapidFitInfo(std::string fileName = "theFile.root", std::string treeName
   newtree->Write();
   outFile->Close();
 
+  return outputName;
 }
