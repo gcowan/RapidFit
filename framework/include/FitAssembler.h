@@ -11,12 +11,14 @@
 #ifndef FIT_ASSEMBLER_H
 #define FIT_ASSEMBLER_H
 
+#include "LLscanResult.h"
 #include "FitResult.h"
 #include "IMinimiser.h"
 #include "FitFunctionConfiguration.h"
 #include "MinimiserConfiguration.h"
 #include "PDFWithData.h"
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -27,6 +29,8 @@ class FitAssembler
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle* );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* > );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< IPDF* >, vector< IDataSet* >, vector< ConstraintFunction* > );
+		static LLscanResult * DoScan( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, string, int, double );
+
 };
 
 #endif

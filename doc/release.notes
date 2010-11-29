@@ -1,8 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/11/29 Pete Clarke
+ - Added code to perform LLscans.  This meant changes to main.cpp, FitAssempler.cpp, OutputConfiguration.cpp, ResultFormatter.cpp
+    and added class LLscan.
+ - Also started adding commnd line help with --help
+
 2010/11/25 M Needham
  - Add scripts to roadmap selection or more (ApplySelection), plot the input (PlotRapidVar.C) and a wrapper
-   to add the rapid fit names, apply the selection and then plot the results (runRapidScripts.C)  
 
 2010/11/11 Pete Clarke
  - Modified pdfs/src/Bs2JpsiPhiMassBkg.cpp to catch a patalogical divide by zero when the slope parameter alpha was zero

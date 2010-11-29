@@ -95,3 +95,61 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		exit(1);
 	}
 }
+
+
+//Create the physics bottle with pre-made data
+LLscanResult * FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,
+		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, string scanName, int noneside, double oneSideRange )
+{
+	
+	cout << "Performing LL scan for parameter " << scanName << endl ;
+	
+	// Do the first (central value) fit
+	FitResult * centralResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData , BottleConstraints );
+
+	// Get the central fit results
+	ResultParameterSet * centralParameterSet = centralResult->GetResultParameterSet() ;
+		
+	// Get the fit central fit value and error of the parameter to be scanned
+	ResultParameter * centralScanParameter = centralParameterSet->GetResultParameter( scanName ) ;
+	double centralValue = centralScanParameter->GetValue() ;
+	double error = centralScanParameter->GetError() ;
+	double llmin = centralResult->GetMinimumValue() ;
+
+	// Get a pointer to the physics parameter to be scanned and fix it	
+	// CAREFUL:  this must be reset as it was at the end.
+	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName) ;
+	double originalValue = scanParameter->GetValue( ) ;
+	string originalType = scanParameter->GetType( ) ;
+	scanParameter->SetType( "Fixed" ) ;
+
+	// Need to set up a loop , fixing the scan parameter at each point
+	vector<double> scanParameterValues ;
+	vector<double> scanLLValues ;
+	double range = oneSideRange*2.;
+	int npoints = 2*noneside+1 ;
+	double deltaScan = range * error / (npoints-1.) ;
+		
+	for( int si=0; si<npoints; si++) {
+			
+		// Set scan parameter value
+		double scanVal = centralValue + (-noneside+si)*deltaScan ;
+		scanParameter->SetValue( scanVal ) ;
+		
+		// Do a scan point fit
+		FitResult * scanStepResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
+		
+		scanParameterValues.push_back( scanVal ) ;
+		scanLLValues.push_back( scanStepResult->GetMinimumValue() );
+	}
+
+	LLscanResult * result = new LLscanResult( scanName, centralValue, error, llmin, scanParameterValues, scanLLValues ) ;
+			
+	
+	//Reset the parameter as it was
+	scanParameter->SetType( originalType ) ;
+	scanParameter->SetValue( originalValue ) ;
+	
+	return result;
+								
+}

@@ -170,6 +170,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 	{
 		vector< pair< string, string > > contourPlots;
 		vector<string> projections;
+		vector<string> LLscanList;
 		string pullType = "None";
 		vector< XMLTag* > outputComponents = OutputTag->GetChildren();
 		for ( int childIndex = 0; childIndex < outputComponents.size(); childIndex++ )
@@ -182,6 +183,10 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			{
 				projections.push_back( outputComponents[childIndex]->GetValue()[0] );
 			}
+			else if ( outputComponents[childIndex]->GetName() == "LLscan" )
+			{
+				LLscanList.push_back( outputComponents[childIndex]->GetValue()[0] );
+			}
 			else if ( outputComponents[childIndex]->GetName() == "DoPullPlots" )
 			{
 				pullType = outputComponents[childIndex]->GetValue()[0];
@@ -193,7 +198,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 		}
 
-		return new OutputConfiguration( contourPlots, projections, pullType );
+		return new OutputConfiguration( contourPlots, projections, LLscanList, pullType );
 	}
 	else
 	{

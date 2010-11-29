@@ -293,7 +293,7 @@ namespace Mathematics
 				);
 	}
 
-
+//......................................................................
 	void getBs2JpsiPhiAngularFunctions( double & f1
 			, double & f2
 			, double & f3

@@ -55,7 +55,10 @@ int main( int argc, char * argv[] )
 		string saveOneDataSetFileName = "";
 		string plotFileName = "FitPlots.root";
 		string pullFileName = "PullPlots.root";
+		string LLscanFileName = "LLscanPlots.root";
 		vector< PDFWithData* > pdfsAndData;
+		int numberLLscanPoints = 10 ;
+		double LLscanRange = 2 ;
 
 		//Flags for which arguments have been received
 		bool numberRepeatsFlag = false;
@@ -68,9 +71,10 @@ int main( int argc, char * argv[] )
 		bool testPlotFlag = false;
 		bool doPlottingFlag = false;
 		bool doPullsFlag = false;
+		bool doLLscanFlag = false;
 		bool testRapidIntegratorFlag = false;
-    bool calculateAcceptanceWeights = false;
-    bool calculatePerEventAcceptance = false;
+		bool calculateAcceptanceWeights = false;
+		bool calculatePerEventAcceptance = false;
   
 		//Parse command line arguments
 		string currentArgument;
@@ -78,7 +82,44 @@ int main( int argc, char * argv[] )
 		{
 			currentArgument = argv[argumentIndex];
 
-			if ( currentArgument == "-f" )
+			if ( currentArgument == "--help" )
+			{
+					argumentIndex++;
+				
+				cout << "QUICK HELP FOR RAPIDFIT" << endl ;
+				
+				cout << endl ;
+				cout << " -f <filename>   " << endl ;
+				cout << "      Specifies the XML file to drive RapidFit " <<endl ;
+				
+				cout << endl ;
+				cout << " -repeats n   " << endl ;
+				cout << "      Specifies the number of repeats for a Toy study " <<endl ;
+				
+				cout << endl ;
+				cout << " --doLLscan <filename>  [ numberLLscanPoints <n> ] [ LLScanRange <r> ] " << endl ;
+				cout << "      Causes a set of LL scans to be perfomed around the fit minimum" << endl ;
+				cout << "      filename = file to write plots out to" << endl ;
+				cout << "      n = number of points to scan each side of minimum" << endl ;
+				cout << "      r = range in units of 1-sigma to scan over" << endl ;
+				cout << "      The parameters which will be scanned must be specified in the xml file as " << endl ;
+				cout << "            <Output> " << endl ;
+				cout << "              <LLscan>parameterName</LLscan> " << endl ;
+				cout << "            </Output> " << endl ;
+				
+				cout << endl ;
+				cout << " --saveOneDataSet <filename>   " << endl ;
+				cout << "      Causes one Toy dataset to be written out to a file " <<endl ;
+				cout << "      filename = file to write the dataset to" << endl ;
+
+				cout << endl ;
+				cout << " --testIntegrator   " << endl ;
+				cout << "      Usefl feature which only tests the numerical<=>analytic integrator for each PDF then exits " <<endl ;
+				
+				return 1;
+
+			}
+			else if ( currentArgument == "-f" )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
@@ -242,6 +283,49 @@ int main( int argc, char * argv[] )
 					return 1;
 				}
 			}
+			else if ( currentArgument == "--doLLscan" )
+			{
+				doLLscanFlag = true;
+					
+				if ( argumentIndex + 1 < argc )
+				{
+					argumentIndex++;
+					LLscanFileName = argv[argumentIndex];
+				}				
+				else
+				{
+					cerr << "Path to LLscan plots file not specified" << endl;
+					return 1;
+				}
+			}
+			else if ( currentArgument == "-numberLLscanPoints" )
+			{
+				if ( argumentIndex + 1 < argc )
+				{
+					argumentIndex++;
+					numberLLscanPoints = atoi( argv[argumentIndex] );
+					if( numberLLscanPoints <= 0 ) { cerr << "Number of ll scan points not >=0" << endl; return 1; }
+				}
+				else
+				{
+					cerr << "Number of ll scan points not specified" << endl;
+					return 1;
+				}
+			}
+			else if ( currentArgument == "-LLscanRange" )
+			{
+				if ( argumentIndex + 1 < argc )
+				{
+					argumentIndex++;
+					LLscanRange = atof( argv[argumentIndex] );
+					if( LLscanRange <= 0 ) { cerr << "ll scan range not >=0" << endl; return 1; }
+				}
+				else
+				{
+					cerr << "ll scan range not specified" << endl;
+					return 1;
+				}
+			}
 			else
 			{
 				cerr << "Unrecognised argument: " << currentArgument << endl;
@@ -390,7 +474,7 @@ int main( int argc, char * argv[] )
 			{
 				makeOutput->MakeAllPlots(plotFileName);
 			}
-
+			
 			//Pick a toy study if there are repeats, or if pull plots are wanted
 			if ( numberRepeats > 1 || doPullsFlag )
 			{
@@ -401,6 +485,7 @@ int main( int argc, char * argv[] )
 				//Output results
 				makeOutput->OutputToyResult(fitResults);
 				makeOutput->OutputFitResult( fitResults->GetFitResult(0) );
+							
 			}
 			else
 			{
@@ -409,6 +494,24 @@ int main( int argc, char * argv[] )
 
 				//Output results
 				makeOutput->OutputFitResult(oneResult);
+				
+				
+				//Do LL scan
+				if( doLLscanFlag ) {
+					LLscanResult * llResult ;
+					vector<LLscanResult*> scanResults ;					
+					vector<string> LLscanList = makeOutput->GetLLscanList() ;
+					
+					for(int ii=0; ii < LLscanList.size() ; ii++)
+					{
+						llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, LLscanRange );
+						scanResults.push_back(llResult) ;
+					}
+					
+					makeOutput->SetLLscanFileName(LLscanFileName);
+					makeOutput->OutputLLscanResult( scanResults ) ;				
+				}
+				
 			}
 		}
 		else

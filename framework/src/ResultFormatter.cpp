@@ -22,7 +22,10 @@
 //#include <boost/regex.hpp>
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"
+#include "TGraph.h"
 #include "TCanvas.h"
+#include <TFrame.h>
+#include <TAxis.h>
 #include "StringProcessing.h"
 
 //Output data as a RootNTuple
@@ -249,7 +252,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "Fit result" << endl;
 	cout << "\n\\begin{center}" << endl;
 	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
-	cout << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
+	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
 	cout << "\\begin{tabular}{|c|c|c|} \n\\hline" << endl;
 	cout << "Parameter & Fit result and error & $\\sigma$ from input \\\\ \\hline \\hline" << endl;
 
@@ -288,7 +291,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "Fit result" << endl;
 	cout << "\n\\begin{center}" << endl;
 	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
-	cout << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
+	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
 	cout << "\\begin{tabular}{|c|c|c|c|} \n\\hline" << endl;
 	cout << "Parameter & Fit result and error & $\\sigma$ from input & Abs from input \\\\ \\hline \\hline" << endl;
 	
@@ -453,3 +456,40 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 	rootFile->Write();
 	rootFile->Close();
 }
+
+
+//.........................................
+// New Method form PELC to plot LL scan results
+
+void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename )
+{	
+	// 1=BLACK    4=BLUE    3=GREEN     5=YELLOW
+	
+	TFile * LLscanFile = new TFile( filename.c_str(), "RECREATE");
+
+	//Set some numbers
+	int nscans = scanResults.size() ;
+
+	//Make a canvas for all the plots
+	TCanvas cv ;
+	
+	for( int ii=0; ii<nscans; ii++ )
+	{
+		//scanResults[ii]->print() ;
+		cv.SetGrid();
+		cv.GetFrame()->SetFillColor(21);
+		cv.GetFrame()->SetBorderSize(12);
+		
+		//cv.cd(ii+1) ;		
+		TGraph * grnew = scanResults[ii]->GetGraph() ;
+		grnew->Draw("ALP") ;
+		cv.Update();
+		cv.Write();
+	
+	}
+		
+	LLscanFile->Close();
+	
+}
+		
+	

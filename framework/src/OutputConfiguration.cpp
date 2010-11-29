@@ -12,13 +12,15 @@
 #include <time.h>
 
 //Default constructor
-OutputConfiguration::OutputConfiguration() : pullType("None"), makeAllPlots(false), pullFileName("pullPlots.root"), projectionFileName("projectionPlots.root"), contourFileName("contourPlots.root")
+OutputConfiguration::OutputConfiguration() : 
+pullType("None"), makeAllPlots(false), pullFileName("pullPlots.root"), projectionFileName("projectionPlots.root"), contourFileName("contourPlots.root"), LLscanFileName("LLscans.root")
 {
 }
 
 //Constructor with correct arguments
-OutputConfiguration::OutputConfiguration( vector< pair< string, string > > InputContours, vector<string> InputProjections, string PullPlotType ) : contours(InputContours), projections(InputProjections), pullType(PullPlotType),
-	makeAllPlots(false), pullFileName("pullPlots.root"), projectionFileName("projectionPlots.root"), contourFileName("contourPlots.root")
+OutputConfiguration::OutputConfiguration( vector< pair< string, string > > InputContours, vector<string> InputProjections, vector<string> InputLLscans, string PullPlotType ) : 
+    contours(InputContours), projections(InputProjections), LLscanList(InputLLscans), pullType(PullPlotType),
+	makeAllPlots(false), pullFileName("pullPlots.root"), projectionFileName("projectionPlots.root"), contourFileName("contourPlots.root"), LLscanFileName("LLscans.root")
 {
 }
 
@@ -37,6 +39,12 @@ vector< pair< string, string > > OutputConfiguration::GetContourPlots()
 vector<string> OutputConfiguration::GetProjections()
 {
 	return projections;
+}
+
+//Return the requested projections
+vector<string> OutputConfiguration::GetLLscanList()
+{
+	return LLscanList;
 }
 
 //Return whether to do pull plots
@@ -83,6 +91,14 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 	}
 }
 
+
+//Make the requested output from a single result
+void OutputConfiguration::OutputLLscanResult( vector<LLscanResult*> scanResults )
+{
+	ResultFormatter::MakeLLscanPlots( scanResults, LLscanFileName );
+}
+
+
 //Make the requested output from a toy study
 void OutputConfiguration::OutputToyResult( ToyStudyResult * TheResult )
 {
@@ -106,4 +122,10 @@ void OutputConfiguration::SetContourFileName( string FileName )
 void OutputConfiguration::SetPullFileName( string FileName )
 {
 	pullFileName = FileName;
+}
+
+//Set the location to store pull plots
+void OutputConfiguration::SetLLscanFileName( string FileName )
+{
+	LLscanFileName = FileName;
 }
