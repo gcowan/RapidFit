@@ -130,3 +130,13 @@ bool ParameterSet::SetPhysicsParameters( vector<double> NewValues )
 		return false;
 	}
 }
+
+//General Print method for a dataset
+void ParameterSet::print()
+{
+	for(int i=0; i< allParameters.size(); i++) {
+		cout << "Parameter name: " << allNames[i] <<  endl;
+		allParameters[i].print() ;
+	}
+}
+

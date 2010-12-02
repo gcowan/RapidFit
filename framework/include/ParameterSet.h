@@ -32,6 +32,8 @@ class ParameterSet
 		//Not very nice in OO programming terms, and unsafe. Much faster though
 		bool SetPhysicsParameters( double* );
 		bool SetPhysicsParameters( vector<double> );
+	
+		void print() ;
 
 	private:
 		vector<PhysicsParameter> allParameters;

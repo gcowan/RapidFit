@@ -17,8 +17,8 @@
 #include <ctime>
 #include "StringProcessing.h"
 
-const double MAXIMUM_MINIMISATION_STEPS = 1000.0;//800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.1;//;0.001;
+const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
+const double FINAL_GRADIENT_TOLERANCE = 0.01;//;0.001;
 const double STEP_SIZE = 0.01;
 const int MINUIT_QUALITY = 2;
 

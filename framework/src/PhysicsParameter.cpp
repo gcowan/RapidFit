@@ -2,6 +2,7 @@
   @class PhysicsParameter
 
   A parameter to be adjusted by the fitter, with a starting value and limits
+  Modified by Pete Clarke december 2010 to add blinding 
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
@@ -11,13 +12,13 @@
 #include <iostream>
 
 //Default constructor
-PhysicsParameter::PhysicsParameter() : value(0.0), originalValue(0.0), minimum(0.0), maximum(0.0), type("Uninitialised"), unit("Uninitialised")
+PhysicsParameter::PhysicsParameter() : value(0.0), originalValue(0.0), minimum(0.0), maximum(0.0), type("Uninitialised"), unit("Uninitialised"), toBeBlinded(false), blindOffset(0.0)
 {
 }
 
 //Constructor with correct argument
 PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMinimum, double NewMaximum, string NewType, string NewUnit )
-	: value(NewValue), minimum(NewMinimum), maximum(NewMaximum), type(NewType), unit(NewUnit)
+	: value(NewValue), minimum(NewMinimum), maximum(NewMaximum), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0)
 {
 	if ( maximum < minimum )
 	{
@@ -49,7 +50,7 @@ PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMini
 
 //Constructor for unbounded parameter
 PhysicsParameter::PhysicsParameter( string Name, double NewValue, string NewType, string NewUnit ) : value(NewValue), type(NewType), unit(NewUnit),
-	maximum(0.0), minimum(0.0)
+	maximum(0.0), minimum(0.0), toBeBlinded(false), blindOffset(0.0)
 {
 	//You could define a fixed parameter with no maximum or minimum, but it must be unbounded if not fixed.
 	if ( type != "Fixed" )
@@ -73,7 +74,11 @@ PhysicsParameter::~PhysicsParameter()
 //Get and set the value
 double PhysicsParameter::GetValue()
 {
-	return value;
+	if( toBeBlinded ) 
+	{
+		return value + blindOffset;
+	}
+	else return value ;
 }
 void PhysicsParameter::SetValue(double NewValue)
 {
@@ -193,4 +198,30 @@ double PhysicsParameter::GetOriginalValue()
 string PhysicsParameter::GetUnit()
 {
 	return unit;
+}
+
+//Set blinding offset
+void PhysicsParameter::SetBlindOffset( double offset )
+{
+	blindOffset = offset ;
+	toBeBlinded = true ;
+	return ;
+}
+
+//Set blinding on or off
+void PhysicsParameter::SetBlinding( bool state )
+{
+	toBeBlinded = state ;
+	return ;
+}
+
+//General print
+void PhysicsParameter::print()
+{
+	cout << "   value       " << value << endl ;
+	cout << "   blindOffset " << blindOffset << endl ;
+	cout << "   minimum     " << minimum << endl ;
+	cout << "   maximum     " << maximum << endl ;
+	cout << "   type        " << type << endl ;
+	cout << "   unit        " << unit << endl ;
 }

@@ -32,12 +32,17 @@ class PhysicsParameter
 		void SetMaximum(double);
 
 		void SetLimits(double, double);
+	
+		void SetBlindOffset( double ) ;
+		void SetBlinding( bool ) ;
 
 		string GetType();
 		void SetType(string);
 
 		double GetOriginalValue();
 		string GetUnit();
+	
+		void print() ;
 
 	private:
 		double value;
@@ -46,6 +51,9 @@ class PhysicsParameter
 		double maximum;
 		string type;
 		string unit;
+	
+		bool toBeBlinded ;
+		double blindOffset ;
 };
 
 #endif

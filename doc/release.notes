@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2010/12/02 Pete Clarke
+ - Added code to perform blinding.  Principally thins just changes the construction of each PhysicsParameter
+   to add a blindOffset.  Blinding is spefified in the xml with the <Parameter> tag
+
 2010/11/29 Pete Clarke
  - Added code to perform LLscans.  This meant changes to main.cpp, FitAssempler.cpp, OutputConfiguration.cpp, ResultFormatter.cpp
     and added class LLscan.

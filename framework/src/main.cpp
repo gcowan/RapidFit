@@ -361,9 +361,19 @@ int main( int argc, char * argv[] )
 			if (configFileNameFlag)
 			{
 				//Make a file containing toy data from the PDF
+				
+				//PELC to write 10 datasets
+				string seq("1") ;
+				for( int iii=0; iii < 10 ; iii++ ) {
+					seq+="1";
+					string fn = seq+saveOneDataSetFileName ;
+					cout << fn << endl ;
 				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
+				//PDFWithData * quickData = xmlFile->GetPDFsAndData()[iii];
 				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
-				ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickData->GetDataSet() );
+				//ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickData->GetDataSet() );
+				ResultFormatter::MakeRootDataFile( fn, quickData->GetDataSet() );
+				}
 			}
 			else
 			{

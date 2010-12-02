@@ -15,8 +15,8 @@
 #include "FunctionContour.h"
 #include <ctime>
 
-const double MAXIMUM_MINIMISATION_STEPS = 1000.0;//800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.1;//0.001;
+const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
+const double FINAL_GRADIENT_TOLERANCE = 0.01;//0.001;
 const double STEP_SIZE = 0.01;
 FitFunction * MinuitWrapper::function = 0;
 
@@ -200,6 +200,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 void Function( int & npar, double * grad, double & fval, double * xval, int iflag )
 {
 	ParameterSet * temporaryParameters = MinuitWrapper::function->GetParameterSet();
+	
 	if ( temporaryParameters->SetPhysicsParameters(xval) )
 	{
 		MinuitWrapper::function->SetParameterSet(temporaryParameters);

@@ -20,6 +20,7 @@
 #include "AcceptReject.h"
 #include "ObservableContinuousConstraint.h"
 #include "ObservableDiscreteConstraint.h"
+#include "Blinder.h"
 
 //Default constructor
 XMLConfigReader::XMLConfigReader() : isLoaded(false)
@@ -564,8 +565,8 @@ ParameterSet * XMLConfigReader::GetParameterSet( XMLTag * InputTag )
 	{
 		vector< PhysicsParameter* > physicsParameters;
 		vector<string> names;
-		string name = "";
-
+		string name = "";		
+		
 		//Create each physics parameter
 		vector< XMLTag* > parameters = InputTag->GetChildren();
 		for ( int parameterIndex = 0; parameterIndex < parameters.size(); parameterIndex++ )
@@ -604,12 +605,17 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		ParameterName = "Uninitialised";
 		string type = "Uninitialised";
 		string unit = "Uninitialised";
+		string blindString = "Uninitialised";
 		double value = 0.0;
 		double minimum = 0.0;
 		double maximum = 0.0;
+		double blindScale = 0.0 ;
+		double blindOffset = 0.0 ;
 		bool hasValue = false;
 		bool hasMaximum = false;
 		bool hasMinimum = false;
+		bool hasBlindString = false ;
+		bool hasBlindScale = false ;
 
 		//Loop over the tag children, which correspond to the parameter elements
 		vector< XMLTag* > elements = InputTag->GetChildren();
@@ -643,11 +649,31 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 			{
 				unit = elements[elementIndex]->GetValue()[0];
 			}
+			else if ( name == "BlindString" )
+			{
+				hasBlindString = true ;
+				blindString = elements[elementIndex]->GetValue()[0];
+			}
+			else if ( name == "BlindScale" )
+			{
+				hasBlindScale =  true ;
+				blindScale = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+			}
 			else
 			{
 				cerr << "Unrecognised physics parameter configuration: " << name << endl;
 				exit(1);
 			}
+		}
+
+		//See of blinding has been specified, and if so construct the blinding offset
+		if( hasBlindString && hasBlindScale ) 
+		{
+			blindOffset = Blinder::getBlindOffset( blindString.c_str(), blindScale ) ;
+		}
+		else if( (hasBlindString && ! hasBlindScale) || (! hasBlindString && hasBlindScale) ) 
+		{
+			cerr << "Blinding information incomplete for parameter: " << ParameterName << " Ignoring blinding for this parameter" << endl;
 		}
 
 		//Now construct the physics parameter
@@ -658,12 +684,16 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 				if ( ( maximum == 0.0 && minimum == 0.0 ) || type == "Unbounded" )
 				{
 					//Unbounded parameter
-					return new PhysicsParameter( ParameterName, value, type, unit );
+					PhysicsParameter * p = new PhysicsParameter( ParameterName, value, type, unit );
+					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
+					return p ;
 				}
 				else
 				{
 					//Bounded parameter
-					return new PhysicsParameter( ParameterName, value, minimum, maximum, type, unit );
+					PhysicsParameter * p =  new PhysicsParameter( ParameterName, value, minimum, maximum, type, unit );
+					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
+					return p ;
 				}
 			}
 			else
@@ -686,7 +716,9 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 				else
 				{
 					//Unbounded parameter
-					return new PhysicsParameter( ParameterName, value, type, unit );
+					PhysicsParameter * p =  new PhysicsParameter( ParameterName, value, type, unit );
+					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
+					return p ;
 				}
 			}
 		}
