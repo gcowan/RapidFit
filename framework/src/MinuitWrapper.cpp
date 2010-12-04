@@ -58,11 +58,11 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		//Make bounded or unbounded parameters
 		if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
 		{
-			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetValue(), STEP_SIZE, 0.0, 0.0, errorFlag);
+			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE, 0.0, 0.0, errorFlag);
 		}
 		else
 		{
-			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetValue(), STEP_SIZE,
+			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE,
 					newParameter->GetMinimum(), newParameter->GetMaximum(), errorFlag);
 		}
 

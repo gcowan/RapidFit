@@ -71,8 +71,34 @@ PhysicsParameter::~PhysicsParameter()
 {
 }
 
-//Get and set the value
+//............ Get ans Set methods became complex since adding blinding  .......
+
+//Get the unblinded value. 
 double PhysicsParameter::GetValue()
+{
+	return this->GetTrueValue() ;
+}
+
+// Set the blinded value 
+// {This sets a different thing to what GetValue gets for historic reasons.}
+void PhysicsParameter::SetValue(double NewValue)
+{
+	this->SetBlindedValue( NewValue) ;
+}
+
+//Get the blinded value
+double PhysicsParameter::GetBlindedValue()
+{
+	return value ;
+}
+//Set the blinded value
+void PhysicsParameter::SetBlindedValue(double NewValue)
+{
+	value = NewValue;
+}
+
+//Get the true value
+double PhysicsParameter::GetTrueValue()
 {
 	if( toBeBlinded ) 
 	{
@@ -80,11 +106,19 @@ double PhysicsParameter::GetValue()
 	}
 	else return value ;
 }
-void PhysicsParameter::SetValue(double NewValue)
+//Set the true value
+void PhysicsParameter::SetTrueValue(double NewValue)
 {
-	value = NewValue;
+	if( toBeBlinded ) 
+	{
+		value = NewValue - blindOffset;
+	}
+	else value = NewValue ;	
 }
 
+
+
+//.....................
 //Get and set the minimum
 double PhysicsParameter::GetMinimum()
 {

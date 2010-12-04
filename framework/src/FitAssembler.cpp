@@ -119,7 +119,7 @@ LLscanResult * FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, F
 	// Get a pointer to the physics parameter to be scanned and fix it	
 	// CAREFUL:  this must be reset as it was at the end.
 	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName) ;
-	double originalValue = scanParameter->GetValue( ) ;
+	double originalValue = scanParameter->GetBlindedValue( ) ;
 	string originalType = scanParameter->GetType( ) ;
 	scanParameter->SetType( "Fixed" ) ;
 
@@ -134,7 +134,7 @@ LLscanResult * FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, F
 			
 		// Set scan parameter value
 		double scanVal = centralValue + (-noneside+si)*deltaScan ;
-		scanParameter->SetValue( scanVal ) ;
+		scanParameter->SetBlindedValue( scanVal ) ;
 		
 		// Do a scan point fit
 		FitResult * scanStepResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
@@ -148,7 +148,7 @@ LLscanResult * FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, F
 	
 	//Reset the parameter as it was
 	scanParameter->SetType( originalType ) ;
-	scanParameter->SetValue( originalValue ) ;
+	scanParameter->SetBlindedValue( originalValue ) ;
 	
 	return result;
 								

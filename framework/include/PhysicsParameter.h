@@ -24,6 +24,10 @@ class PhysicsParameter
 
 		double GetValue();
 		void SetValue(double);
+		double GetBlindedValue();
+		void SetBlindedValue(double);
+		double GetTrueValue();
+		void SetTrueValue(double);
 
 		double GetMinimum();
 		void SetMinimum(double);
