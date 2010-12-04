@@ -1,4 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+2010/12/04 Pete Clarke
+  - Fix added following previous update. The LLscan stuff didnt work after I had moved blinding into PhysicsParameter
+    Needed fix to PhysicsParameter, FitAssembled::DoScan and MinuitWrapper. 
+ - Also added Blinder.h and Blinder.cpp which i forgot in last commit
 
 2010/12/02 Pete Clarke
  - Added code to perform blinding.  Principally thins just changes the construction of each PhysicsParameter
