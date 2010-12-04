@@ -97,7 +97,7 @@ int main( int argc, char * argv[] )
 				cout << "      Specifies the number of repeats for a Toy study " <<endl ;
 				
 				cout << endl ;
-				cout << " --doLLscan <filename>  [ numberLLscanPoints <n> ] [ LLScanRange <r> ] " << endl ;
+				cout << " --doLLscan <filename>  [ -numberLLscanPoints <n> ] [ -LLScanRange <r> ] " << endl ;
 				cout << "      Causes a set of LL scans to be perfomed around the fit minimum" << endl ;
 				cout << "      filename = file to write plots out to" << endl ;
 				cout << "      n = number of points to scan each side of minimum" << endl ;
@@ -360,20 +360,10 @@ int main( int argc, char * argv[] )
 		{
 			if (configFileNameFlag)
 			{
-				//Make a file containing toy data from the PDF
-				
-				//PELC to write 10 datasets
-				string seq("1") ;
-				for( int iii=0; iii < 10 ; iii++ ) {
-					seq+="1";
-					string fn = seq+saveOneDataSetFileName ;
-					cout << fn << endl ;
+				//Make a file containing toy data from the PDF				
 				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
-				//PDFWithData * quickData = xmlFile->GetPDFsAndData()[iii];
 				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
-				//ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickData->GetDataSet() );
-				ResultFormatter::MakeRootDataFile( fn, quickData->GetDataSet() );
-				}
+				ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickData->GetDataSet() );
 			}
 			else
 			{

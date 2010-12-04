@@ -249,7 +249,9 @@ double ResultFormatter::GetElementFromCovarianceMatrix( vector<double> matrix, i
 //Display the results of a fit in a LaTeX table using cout
 void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 {
-	cout << "Fit result" << endl;
+	//.............................................
+	// Standard table for MC toys with pulls
+	cout << "Fit result for MC toys with pulls" << endl;
 	cout << "\n\\begin{center}" << endl;
 	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
 	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
@@ -286,9 +288,10 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;
 
-	//PELC
+	//.................................................
+	//longer table for MC pull fits with absolute offsets
 	cout << endl ;
-	cout << "Fit result" << endl;
+	cout << "Fit result - for MC toys with pulls and absolute offsets " << endl;
 	cout << "\n\\begin{center}" << endl;
 	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
 	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
@@ -322,6 +325,36 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;
+
+	//........................................
+	//short table for data fits
+	cout << endl ;
+	cout << "\n\\begin{center}" << endl;
+	cout << "Fit result - for Data fits" << endl;
+	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
+	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
+	cout << "\\begin{tabular}{|c|c|} \n\\hline" << endl;
+	cout << "Parameter & Fit result and error  \\\\ \\hline \\hline" << endl;
+	
+	//Ouput each parameter
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	{
+		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
+		
+		double fitValue = outputParameter->GetValue();
+		double minValue = outputParameter->GetMinimum();
+		double inputValue = outputParameter->GetOriginalValue();
+		double fitError = outputParameter->GetError();
+		double sigmaFromInputValue = outputParameter->GetPull();
+		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
+		cout << setw(15) << name << " & " 
+		<< setw(10) << setprecision(3) << fitValue << " $\\pm$ "
+		<< setw(10) <<  		  fitError << "\\\\" << endl;
+	}	
+	cout << "\\hline \n\\end{tabular}" << endl;
+	cout << "\\end{center}\n" << endl;
+	
+	
 	
 }
 
