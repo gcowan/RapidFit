@@ -21,7 +21,10 @@ class FitFunctionConfiguration
 		~FitFunctionConfiguration();
 
 		FitFunction * GetFitFunction();
-
+	
+		bool GetWeightsWereUsed() ;
+		string GetWeightName() ;
+	
 	private:
 		string functionName, weightName;
 		bool hasWeight;

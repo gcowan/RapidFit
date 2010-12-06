@@ -23,6 +23,7 @@ class Plotter
 		Plotter( IPDF*, IDataSet* );
 		~Plotter();
 
+		void SetWeightsWereUsed( string ) ;
 		void PlotAllObservables( string );
 		void PlotObservables( string, vector<string> );
 		vector<double> ProjectObservable( DataPoint, string );
@@ -33,6 +34,9 @@ class Plotter
 		vector<double> GetStatistics( string, double&, double&, int& );
 		void MakeObservablePlots( string, vector<DataPoint>, vector<double>, vector<string>, TFile* );
 		void MakePlotCanvas( string, string, TH1F*, double*, double*, int );
+	
+		bool weightsWereUsed ;
+		string weightName ;
 
 		RapidFitIntegrator * pdfIntegrator;
 		IPDF * plotPDF;

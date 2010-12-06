@@ -28,7 +28,7 @@ Plotter::Plotter()
 }
 
 //Constructor with correct arguments
-Plotter::Plotter( IPDF * NewPDF, IDataSet * NewDataSet ) : plotPDF(NewPDF), plotData(NewDataSet), pdfIntegrator( new RapidFitIntegrator(NewPDF) )
+Plotter::Plotter( IPDF * NewPDF, IDataSet * NewDataSet ) : plotPDF(NewPDF), plotData(NewDataSet), pdfIntegrator( new RapidFitIntegrator(NewPDF) ), weightsWereUsed(false)
 {
 }
 
@@ -111,9 +111,20 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	vector<double> observableValues = GetStatistics( ObservableName, minimum, maximum, binNumber );
 	double binInterval = ( maximum - minimum ) / (double)binNumber;
 
+	
+	//New code to deal with weighted events
+	vector<double> observableWeights ;
+	double normalisationFactor ;
+	if( weightsWereUsed ) {
+		double dum1, dum2 ; int idum ;
+		observableWeights = GetStatistics( weightName, dum1, dum2, idum );
+		double sumWeights =0;
+		for(int iw=0;iw<observableWeights.size();iw++) sumWeights+=observableWeights[iw];
+		normalisationFactor = sumWeights/observableWeights.size() ;
+	}
+	
 	//Make the histogram
 	string histogramName = ObservableName + "ProjectionPlot";
-	//string histogramTitle = ObservableName + " projection plot";
 	string histogramTitle = "";
 	TH1F * dataHistogram = new TH1F( histogramName.c_str(), histogramTitle.c_str(), binNumber, minimum, maximum );
 
@@ -122,7 +133,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	//Loop over all data points and add them to the histogram
 	for ( int dataIndex = 0; dataIndex < observableValues.size(); dataIndex++)
 	{
-		dataHistogram->Fill( observableValues[dataIndex] );
+		if( weightsWereUsed ) dataHistogram->Fill( observableValues[dataIndex], observableWeights[dataIndex] / normalisationFactor ); 
+		else dataHistogram->Fill( observableValues[dataIndex] );   
 	}
 
 	//Histogram complete
@@ -426,4 +438,12 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 	DataPointDescriptions = allDescriptions;
 	DataPointWeights = combinationWeights;
 	return newDataPoints;
+}
+
+
+//Setting knowledge that weights were uses
+void Plotter::SetWeightsWereUsed( string _weightName ) 
+{
+	weightsWereUsed = true ;
+	weightName = _weightName ;
 }

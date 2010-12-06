@@ -197,12 +197,29 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		exit(1);
 	}
 
+	// Store the Data_Type that is in the branch
+	vector<string> Data_Type( numberOfObservables );
+
 	// Need to set the branch addresses
 	vector<TBranch *> branches( numberOfObservables );
-	vector<Float_t> observableValues( numberOfObservables );
+	vector<Float_t> observableValues_floats;
+	vector<Double_t> observableValues_doubles;
 	for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
 	{
-		ntuple->SetBranchAddress(observableNames[obsIndex].c_str(), &(observableValues[obsIndex]), &(branches[obsIndex]));
+		TLeaf* leaf= (TLeaf*) ntuple->GetLeaf( observableNames[obsIndex].c_str() );
+		Data_Type[obsIndex] = TString( leaf->GetTypeName()).Data();
+		string type = Data_Type[obsIndex];
+		if( type.compare("Double_t") == 0 )
+		{
+			if( observableValues_doubles.empty() )
+			{	observableValues_doubles.resize( numberOfObservables );	}
+		  ntuple->SetBranchAddress(observableNames[obsIndex].c_str(), &(observableValues_doubles[obsIndex]), &(branches[obsIndex]));
+		} else if( type.compare("Float_t") == 0 )
+		{
+			if( observableValues_floats.empty() )
+			{	observableValues_floats.resize( numberOfObservables );	}
+		  ntuple->SetBranchAddress(observableNames[obsIndex].c_str(), &(observableValues_floats[obsIndex]), &(branches[obsIndex]));
+		}
 	}
 
 	// Now populate the dataset
@@ -213,12 +230,20 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		if ( numberOfDataPointsRead > numberOfEventsAfterCut) break;
 		DataPoint point( observableNames );
 		ntuple->GetEntry( evtList->GetEntry(numberOfDataPointsRead) );
-
+		
 		for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
 		{
+			string type = Data_Type[obsIndex];
 			string name = observableNames[obsIndex];
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
-			point.SetObservable( name, observableValues[obsIndex], 0.0, unit);
+
+			if( type.compare("Double_t") == 0 )
+			{
+				point.SetObservable( name, observableValues_doubles[obsIndex], 0.0, unit);
+			} else if( type.compare("Float_t") == 0 )
+			{
+				point.SetObservable( name, observableValues_floats[obsIndex], 0.0, unit);
+			}
 		}
 		bool dataPointAdded = data->AddDataPoint( &point );
 		if (dataPointAdded) numberOfDataPointsAdded += 1;

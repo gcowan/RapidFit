@@ -13,14 +13,28 @@
 
 //Default constructor
 OutputConfiguration::OutputConfiguration() : 
-pullType("None"), makeAllPlots(false), pullFileName("pullPlots.root"), projectionFileName("projectionPlots.root"), contourFileName("contourPlots.root"), LLscanFileName("LLscans.root")
+   pullType("None"), 
+   makeAllPlots(false), 
+   pullFileName("pullPlots.root"), 
+   projectionFileName("projectionPlots.root"), 
+   contourFileName("contourPlots.root"), 
+   LLscanFileName("LLscans.root"),
+   weightedEventsWereUsed(false)
 {
 }
 
 //Constructor with correct arguments
 OutputConfiguration::OutputConfiguration( vector< pair< string, string > > InputContours, vector<string> InputProjections, vector<string> InputLLscans, string PullPlotType ) : 
-    contours(InputContours), projections(InputProjections), LLscanList(InputLLscans), pullType(PullPlotType),
-	makeAllPlots(false), pullFileName("pullPlots.root"), projectionFileName("projectionPlots.root"), contourFileName("contourPlots.root"), LLscanFileName("LLscans.root")
+    contours(InputContours), 
+    projections(InputProjections), 
+    LLscanList(InputLLscans), 
+    pullType(PullPlotType),
+	makeAllPlots(false), 
+    pullFileName("pullPlots.root"), 
+    projectionFileName("projectionPlots.root"), 
+    contourFileName("contourPlots.root"), 
+    LLscanFileName("LLscans.root"),
+    weightedEventsWereUsed(false)
 {
 }
 
@@ -62,11 +76,12 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 
 	//Output any calculated contours
 	ResultFormatter::PlotFitContours( TheResult, contourFileName );
-
+	
 	//Make any requested projections
 	//for ( int projectionIndex = 0; projectionIndex < projections.size(); projectionIndex++ )
 	for ( int projectionIndex = 0; projectionIndex < 1; projectionIndex++ )
 	{
+
 		PhysicsBottle * resultBottle = TheResult->GetPhysicsBottle();
 
 		//Loop over all PDFs, and plot
@@ -75,6 +90,8 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 			for ( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
 			{
 				Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
+				if( weightedEventsWereUsed ) testPlotter->SetWeightsWereUsed( weightName ) ;
+				
 				char fileNumber[100];
 				sprintf( fileNumber, "fit%d.", resultIndex );
 
@@ -128,4 +145,11 @@ void OutputConfiguration::SetPullFileName( string FileName )
 void OutputConfiguration::SetLLscanFileName( string FileName )
 {
 	LLscanFileName = FileName;
+}
+
+//Setso that it knows that weighted events were used
+void OutputConfiguration::SetWeightsWereUsed( string _weightName )
+{
+	weightedEventsWereUsed = true ;
+	weightName = _weightName ;
 }

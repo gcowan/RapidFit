@@ -445,6 +445,8 @@ int main( int argc, char * argv[] )
 			if (!theFunctionFlag)
 			{
 				theFunction = xmlFile->GetFitFunctionConfiguration();
+				// If weights were specified then we need to let the output plotting know
+				if( theFunction->GetWeightsWereUsed() ) makeOutput->SetWeightsWereUsed( theFunction->GetWeightName() ) ;
 			}
 			if (!parameterTemplateFlag)
 			{

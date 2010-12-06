@@ -43,3 +43,15 @@ FitFunction * FitFunctionConfiguration::GetFitFunction()
 
 	return theFunction;
 }
+
+//Return whether weights are being used
+bool FitFunctionConfiguration::GetWeightsWereUsed()
+{
+	return hasWeight ;
+}
+
+//Return weight name
+string FitFunctionConfiguration::GetWeightName()
+{
+	return weightName ;
+}

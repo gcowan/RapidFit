@@ -1,4 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+
+2010/12/06 Pete Clarke and Rob Currie
+  - Pete added new code to make the Plotter work for doing projections of weighted events
+  - Rob added code in DataSetConfiguration to deal with Float_t or Double_t Ntuples
+
 2010/12/04 Pete Clarke
   - Fix added following previous update. The LLscan stuff didnt work after I had moved blinding into PhysicsParameter
     Needed fix to PhysicsParameter, FitAssembled::DoScan and MinuitWrapper. 

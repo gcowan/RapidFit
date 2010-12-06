@@ -39,12 +39,15 @@ class OutputConfiguration
 		void SetPullFileName(string);
 		void SetContourFileName(string);
 		void SetLLscanFileName(string);
+		void SetWeightsWereUsed( string ) ;
 
 	private:
 		vector< pair< string, string > > contours;
 		vector<string> projections;
 		vector<string> LLscanList;
 		bool makeAllPlots;
+		bool weightedEventsWereUsed ;
+		string weightName ;
 		string LLscanFileName, pullFileName, projectionFileName, contourFileName, pullType;
 };
 

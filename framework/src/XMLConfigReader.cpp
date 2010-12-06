@@ -310,7 +310,7 @@ FitFunctionConfiguration * XMLConfigReader::GetFitFunctionConfiguration()
 FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTag )
 {
 	if ( FunctionTag->GetName() == "FitFunction" )
-	{
+	{		
 		string functionName = "Uninitialised";
 		string weightName = "Uninitialised";
 		bool hasWeight = false;
@@ -345,6 +345,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		//Make the function
 		if (hasWeight)
 		{
+			cerr <<"Weighted events have been asked for in XML using" << weightName << endl ;  
 			return new FitFunctionConfiguration( functionName, weightName );
 		}
 		else
