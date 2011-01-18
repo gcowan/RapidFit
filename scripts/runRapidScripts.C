@@ -13,7 +13,7 @@ void runRapidScripts(std::string filename = "theFile.root", std::string treename
   std::string rapidFile = AddRapidFitInfo(filename,treename); 
   
   // make the selection
-  std::string selectedFile = ApplySelection(rapidFile,trigger,trailer);
+  std::string selectedFile = ApplySelection(rapidFile,treename, trigger,trailer);
 
   // make plots
   PlotRapidVar(selectedFile,treename);
