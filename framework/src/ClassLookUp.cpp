@@ -161,17 +161,18 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
                 //Default JPsiPhi prompt bkg mass signal
                 return new Bs2JpsiPhiMassBkg();
 	}
-		else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc" )
+
+	else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc" )
         {
 			// Bd2JPsiKstar with analytic double gaussian time resolution
 			return new Bd2JpsiKstar_withTimeRes_withAverageAngAcc();
         }
 
-                 else if ( Name == "Bd2JpsiKstar_sWave" )
-         {
+        else if ( Name == "Bd2JpsiKstar_sWave" )
+        {
                          // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
                          return new Bd2JpsiKstar_sWave();
-         }
+        }
 
 	else
 	{
