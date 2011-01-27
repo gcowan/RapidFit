@@ -3,7 +3,7 @@
  *
  *  RapidFit PDF for Bd2JpsiKstar
  *
- *  @author Ailsa Sparkes 
+ *  @author Ailsa Sparkes
  *  @date 2009-07-30
  */
 
@@ -34,9 +34,9 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		//Cached values
 		double cachedAzeroAzeroIntB, cachedAparaAparaIntB, cachedAperpAperpIntB;
 		double cachedAparaAperpIntB, cachedAzeroAparaIntB, cachedAzeroAperpIntB;
-		
+
 		double cachedSinDeltaPerpPara, cachedCosDeltaPara, cachedSinDeltaPerp;
-	
+
 
 		double cachedAzero, cachedApara, cachedAperp;
 		bool normalisationCacheValid, evaluationCacheValid;
@@ -53,11 +53,11 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		string delta_paraName;	// strong phase
 		string delta_perpName;	// strong phase
 		string angAccI1Name;		// Pre-calculated angular integrals including acceptance
-		string angAccI2Name;		// 
-		string angAccI3Name;		// 
-		string angAccI4Name;		// 
-		string angAccI5Name;		// 
-		string angAccI6Name;		// 
+		string angAccI2Name;		//
+		string angAccI3Name;		//
+		string angAccI4Name;		//
+		string angAccI5Name;		//
+		string angAccI6Name;		//
 		string timeRes1Name;
 		string timeRes2Name;
 		string timeRes1FractionName;
@@ -88,21 +88,22 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
-		// PDF. 
+		// PDF.
 		string timeName;		// proper time
 		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
 		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-					// in phi rest frame
+		//kaonIDName;				// in phi rest frame
 
 		// Member variables for the observables
 		double time;
 		double cosTheta;
 		double phi;
 		double cosPsi;
+		//int kaonID;
 
 		double tlow, thigh; // Integration limits
-	
+
 		double buildPDFnumerator();
 		double buildPDFdenominator();
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&);

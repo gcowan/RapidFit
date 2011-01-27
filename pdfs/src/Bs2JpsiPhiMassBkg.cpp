@@ -13,7 +13,7 @@
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg() : 
+Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg() :
 	// Physics parameters
 	  alphaM_prName	( "alphaM_pr" )
         // Observables
@@ -45,10 +45,10 @@ Bs2JpsiPhiMassBkg::~Bs2JpsiPhiMassBkg()
 double Bs2JpsiPhiMassBkg::Evaluate(DataPoint * measurement)
 {
   	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
-	
+
 	// Get the observable
         double mass = measurement->GetObservable( recoMassName )->GetValue();
-	
+
 	double val = exp( -alphaM_pr * mass);
   	return val;
 }
@@ -57,7 +57,7 @@ double Bs2JpsiPhiMassBkg::Evaluate(DataPoint * measurement)
 double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	double mhigh, mlow ;
-	
+
 	IConstraint * massBound = boundary->GetConstraint("mass");
 	if ( massBound->GetUnit() == "NameNotFoundError" )
 	{
@@ -69,10 +69,10 @@ double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBound
 		mlow = massBound->GetMinimum();
 		mhigh = massBound->GetMaximum();
 	}
-	
+
 	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
 	double integral ;
-	
+
 	if( alphaM_pr == 0. ) {
 		integral = mhigh-mlow ;   // this was added by PELC to catch a divide by zero Nov-2010
 	}
@@ -80,5 +80,5 @@ double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBound
 		integral = (1.0/alphaM_pr)* (exp(-alphaM_pr*mlow) - exp(-alphaM_pr*mhigh)) ;
 	}
 	return integral;
-	
+
 }

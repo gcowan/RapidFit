@@ -82,7 +82,7 @@
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
-		
+
 		<PhysicsParameter>
 			<Name>mistag</Name>
 			<Value>0.35</Value>
@@ -113,9 +113,9 @@
 		<PDF>
 			<Name>Bs2JpsiPhi_mistagParameter</Name>
 		</PDF>
-		
+
     //MC09_toy_data_for_acceptance.root
-    //dataNTuple	
+    //dataNTuple
     //../../data/observables_MC09_Bs2JpsiPhi_lhcb_conventions_NP_phis.root
     // ntuple
 		<DataSet>

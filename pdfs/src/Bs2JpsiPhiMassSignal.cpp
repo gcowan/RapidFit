@@ -13,11 +13,11 @@
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal() : 
+Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal() :
 	// Physics parameters
 	  f_sig_m1Name	( "f_sig_m1" )
-	, sigma_m1Name	( "sigma_m1" ) 
-	, sigma_m2Name	( "sigma_m2" ) 
+	, sigma_m1Name	( "sigma_m1" )
+	, sigma_m2Name	( "sigma_m2" )
 	, m_BsName	( "m_Bs" )
 	// Observables
 	, recoMassName	( "mass")
@@ -56,7 +56,7 @@ double Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
   	double sigma_m1 = allParameters.GetPhysicsParameter( sigma_m1Name )->GetValue();
   	double sigma_m2 = allParameters.GetPhysicsParameter( sigma_m2Name )->GetValue();
   	double m_Bs = allParameters.GetPhysicsParameter( m_BsName )->GetValue();
-  	
+
 	// Get the observable
         double mass = measurement->GetObservable( recoMassName )->GetValue();
 
@@ -68,7 +68,7 @@ double Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
 	double exp2 = exp( -deltaMsq / ( 2. * sigma_m2 * sigma_m2 ) );
 
 	double val = f_sig_m1 * factor1 * exp1 + (1. - f_sig_m1) * factor2 * exp2;
-	
+
   	return val;
 }
 

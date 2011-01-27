@@ -8,7 +8,7 @@
   @date 2009-10-02
  */
 
-// Include files 
+// Include files
 
 
 
@@ -36,7 +36,7 @@ EdStyle::EdStyle( ) {
 	// use helvetica-bold-r-normal, precision 2 (rotatable)
 	Int_t lhcbFont = 62;
 	// line thickness
-	Double_t lhcbWidth = 1.75;
+	Double_t lhcbWidth = 1.75; //original= 1.75
 
 	// use plain black on white colors
 	gStyle->SetFrameBorderMode(0);
@@ -85,7 +85,7 @@ EdStyle::EdStyle( ) {
 	gStyle->SetLabelOffset(0.015);
 
 	// by default, do not display histogram decorations:
-	gStyle->SetOptStat(0);  
+	gStyle->SetOptStat(0);
 	gStyle->SetOptStat(1110);  // show only nent, mean, rms
 	//gStyle->SetOptTitle(0);
 	gStyle->SetOptFit(0);
@@ -220,7 +220,7 @@ gStyle->SetStatColor(icol);
 //   gStyle->SetPadRightMargin(0.05);
 //   gStyle->SetPadBottomMargin(0.16);
 //   gStyle->SetPadLeftMargin(0.12);
-/*   
+/*
 // use large fonts
 //Int_t font=72;
 Int_t font=42;
@@ -279,6 +279,6 @@ gStyle->SetPadTickY(1);
 //=============================================================================
 // Destructor
 //=============================================================================
-EdStyle::~EdStyle() {} 
+EdStyle::~EdStyle() {}
 
 //=============================================================================

@@ -13,7 +13,7 @@
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhi::Bs2JpsiPhi() : 
+Bs2JpsiPhi::Bs2JpsiPhi() :
 	  gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
 	, deltaMName    ( "deltaM")
@@ -72,7 +72,7 @@ double Bs2JpsiPhi::Evaluate(DataPoint * measurement)
 {
 	// The angular functions f1->f6 as defined in roadmap Table 1.
 	double f1, f2, f3, f4, f5, f6;
-	getAngularFunctions( f1, f2, f3, f4, f5, f6, measurement );	
+	getAngularFunctions( f1, f2, f3, f4, f5, f6, measurement );
 
 	// The time dependent amplitudes as defined in roadmap Eqns 48 -> 59
 	double AzeroAzero, AparaApara, AperpAperp;
@@ -113,7 +113,7 @@ void Bs2JpsiPhi::getAngularFunctions( double & f1
 	double sin2Theta = 2.*sinTheta*cosTheta;
 	double sin2Psi	 = 2.*sinPsi*cosPsi;
 	double sin2Phi	 = 2.*sinPhi*cosPhi;
-	 
+
 	double norm = 9./32./TMath::Pi();
 	f1 = 2. * cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi ) / norm;
 	f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi ) / norm;
@@ -135,7 +135,7 @@ void Bs2JpsiPhi::getTimeDependentAmplitudes(  double & AzeroAzero
 	// Observable
 	double time = measurement->GetObservable( timeName )->GetValue();
 	int tag  = (int)measurement->GetObservable( tagName )->GetValue();
-        
+
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	double gamma, deltaGamma, deltaM, Phi_s;
         double Azero_sq, Apara_sq, Aperp_sq;
@@ -146,30 +146,30 @@ void Bs2JpsiPhi::getTimeDependentAmplitudes(  double & AzeroAzero
 	double Azero = sqrt( Azero_sq );
 	double Apara = sqrt( Apara_sq );
 	double Aperp = sqrt( Aperp_sq );
-	
+
 	double sinDeltaPerpPara = sin( delta_perp - delta_para );
 	double cosDeltaPerpPara = cos( delta_perp - delta_para );
 	double sinDeltaPerp     = sin( delta_perp );
 	double cosDeltaPerp     = cos( delta_perp );
 	double cosDeltaPara	= cos( delta_para );
-	
+
 	double expGT = exp( -gamma*time );
-	
+
 	double coshDeltaGammaT = cosh( deltaGamma*time/2.);
 	double sinhDeltaGammaT = sinh( deltaGamma*time/2.);
-	
+
 	double sinPhis = sin( Phi_s );
 	double cosPhis = cos( Phi_s );
-	
+
 	double sinDeltaMT = sin( deltaM*time );
 	double cosDeltaMT = cos( deltaM*time );
-	
+
 	// Now calculate the amplitudes
-	AzeroAzero = Azero_sq * expGT * ( coshDeltaGammaT - cosPhis * sinhDeltaGammaT + tag * sinPhis * sinDeltaMT ); 
-	AparaApara = Apara_sq * expGT * ( coshDeltaGammaT - cosPhis * sinhDeltaGammaT + tag * sinPhis * sinDeltaMT ); 
-	AperpAperp = Aperp_sq * expGT * ( coshDeltaGammaT + cosPhis * sinhDeltaGammaT - tag * sinPhis * sinDeltaMT ); 
-	
-	ImAparaAperp = Apara*Aperp * expGT * ( - cosDeltaPerpPara * sinPhis * sinhDeltaGammaT 
+	AzeroAzero = Azero_sq * expGT * ( coshDeltaGammaT - cosPhis * sinhDeltaGammaT + tag * sinPhis * sinDeltaMT );
+	AparaApara = Apara_sq * expGT * ( coshDeltaGammaT - cosPhis * sinhDeltaGammaT + tag * sinPhis * sinDeltaMT );
+	AperpAperp = Aperp_sq * expGT * ( coshDeltaGammaT + cosPhis * sinhDeltaGammaT - tag * sinPhis * sinDeltaMT );
+
+	ImAparaAperp = Apara*Aperp * expGT * ( - cosDeltaPerpPara * sinPhis * sinhDeltaGammaT
 					       + tag * sinDeltaPerpPara * cosDeltaMT
 					       - tag * cosDeltaPerpPara * cosPhis * sinDeltaMT );
 
@@ -177,7 +177,7 @@ void Bs2JpsiPhi::getTimeDependentAmplitudes(  double & AzeroAzero
 							    + tag * sinPhis * sinDeltaMT );
 
 	ImAzeroAperp = Azero*Aperp * expGT * ( - cosDeltaPerp * sinPhis * sinhDeltaGammaT
-                                               + tag * sinDeltaPerp * cosDeltaMT 
+                                               + tag * sinDeltaPerp * cosDeltaMT
                                                - tag * cosDeltaPerp * cosPhis * sinDeltaMT );
 	return;
 }
@@ -193,7 +193,7 @@ void Bs2JpsiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 				       	         , PhaseSpaceBoundary * boundary)
 {
         // Observable
-        int tag = (int)measurement->GetObservable( tagName )->GetValue();	
+        int tag = (int)measurement->GetObservable( tagName )->GetValue();
 
 	// Get the latest values of the physics parameters that will be used in the evaluation of the integral
 	double gamma, deltaGamma, deltaM, Phi_s;
@@ -210,10 +210,10 @@ void Bs2JpsiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 	double timeMin = boundary->GetConstraint( timeName )->GetMinimum();
 	double timeMax = boundary->GetConstraint( timeName )->GetMaximum();
 
-	AzeroAzeroInt = getAzeroAzeroTimeInt( Azero_sq, gamma, deltaGamma, deltaM, Phi_s, timeMin, timeMax, tag );	
-	AparaAparaInt = getAparaAparaTimeInt( Apara_sq, gamma, deltaGamma, deltaM, Phi_s, timeMin, timeMax, tag );	
-	AperpAperpInt = getAperpAperpTimeInt( Aperp_sq, gamma, deltaGamma, deltaM, Phi_s, timeMin, timeMax, tag );	
-	
+	AzeroAzeroInt = getAzeroAzeroTimeInt( Azero_sq, gamma, deltaGamma, deltaM, Phi_s, timeMin, timeMax, tag );
+	AparaAparaInt = getAparaAparaTimeInt( Apara_sq, gamma, deltaGamma, deltaM, Phi_s, timeMin, timeMax, tag );
+	AperpAperpInt = getAperpAperpTimeInt( Aperp_sq, gamma, deltaGamma, deltaM, Phi_s, timeMin, timeMax, tag );
+
 	ImAparaAperpInt = getAparaAperpTimeInt( Apara, Aperp, gamma, deltaGamma, deltaM, Phi_s, delta_para, delta_perp, timeMin, timeMax, tag );
         ReAzeroAparaInt = getAzeroAparaTimeInt( Azero, Apara, gamma, deltaGamma, deltaM, Phi_s, delta_para, timeMin, timeMax, tag );
         ImAzeroAperpInt = getAzeroAperpTimeInt( Azero, Aperp, gamma, deltaGamma, deltaM, Phi_s, delta_perp, timeMin, timeMax, tag );
@@ -235,7 +235,7 @@ double Bs2JpsiPhi::getEvenTimeComponentInt( double gamma
 	double gammaH  = gamma - deltaGamma/2.;
 	double expLint = getExpInt( gammaL, tlo, thi );
 	double expHint = getExpInt( gammaH, tlo, thi );
-	double expSinInt = getExpSinInt( gamma, deltaM, tlo, thi );	
+	double expSinInt = getExpSinInt( gamma, deltaM, tlo, thi );
 
 	if( tlo < 0. ) tlo = 0. ;
 
@@ -329,7 +329,7 @@ double Bs2JpsiPhi::getAparaAperpTimeInt( double Apara
 	double expHint   = getExpInt(gammaH, timeMin, timeMax);
 	double expSinInt = getExpSinInt(gamma, deltaM, timeMin, timeMax);
 	double expCosInt = getExpCosInt(gamma, deltaM, timeMin, timeMax);
-	      	
+
 	double result = 2.*( sinDelta*expCosInt - cosDelta*cosPhis*expSinInt )*tag
         		-  ( expHint - expLint )*cosDelta*sinPhis;
         return Apara*Aperp*result;
@@ -417,7 +417,7 @@ double Bs2JpsiPhi::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * b
                                 , ImAparaAperpInt, ReAzeroAparaInt, ImAzeroAperpInt
 				, measurement
                                 , boundary);
-   
+
 	return 0.5*( AzeroAzeroInt + AparaAparaInt + AperpAperpInt ); // Angle factors normalised to 1
 }
 
@@ -428,7 +428,7 @@ void Bs2JpsiPhi::getPhysicsParameters( double & gamma
 				    	, double & Azero_sq
 				    	, double & Apara_sq
 				    	, double & Aperp_sq
-				    	, double & delta_zero 
+				    	, double & delta_zero
 				    	, double & delta_para
 				    	, double & delta_perp)
 {

@@ -36,7 +36,7 @@ SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst $(SRCDIR)/%.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 PDFOBJS := $(patsubst $(SRCPDFDIR)/%.$(SRCEXT),$(OBJPDFDIR)/%.o,$(PDFSRCS))
 
-GARBAGE  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting pdfDict.h pdfDict.cpp *.so *.rootmap 
+GARBAGE  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting pdfDict.h pdfDict.cpp *.so *.rootmap
 
 #################
 ##Dependencies
@@ -66,7 +66,7 @@ $(EXEDIR)/fitting : $(OBJS) $(PDFOBJS) $(OBJDIR)/RootFileDataSet.o
 	$(CXX) -o $@ $(OBJS) $(PDFOBJS) $(OBJDIR)/RootFileDataSet.o $(LINKFLAGS) $(LIBS)
 
 # Not using RooFit PDFs anymore so we can ignore this
-#$(EXEDIR)/fitting : pdfDict.o $(OBJS) 
+#$(EXEDIR)/fitting : pdfDict.o $(OBJS)
 #	$(CXX) -o $@ pdfDict.o $(OBJS) $(LINKFLAGS) $(LIBS)
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.$(SRCEXT)

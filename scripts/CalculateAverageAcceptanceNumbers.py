@@ -28,7 +28,7 @@ def angularFunctions( cosTheta, phi, cosPsi ):
         f4 = -1.* sinPsi*sinPsi * sin2Theta * sinPhi
         f5 =      sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.)
         f6 =      sin2Psi * sin2Theta * cosPhi/sqrt(2.)
-	
+
 	return f1, f2, f3, f4, f5, f6
 
 def junk(acceptanceName):
@@ -39,14 +39,14 @@ def junk(acceptanceName):
     	acceptanceHisto.Write()
 	acceptanceFile.Close()
 
-def calculate(acceptanceHisto, nameOfHisto): 
+def calculate(acceptanceHisto, nameOfHisto):
     xbins = acceptanceHisto.GetXaxis().GetNbins()
     ybins = acceptanceHisto.GetYaxis().GetNbins()
     zbins = acceptanceHisto.GetZaxis().GetNbins()
 
     fInt = [0. for i in range(6)]
     largestNumEvents = 1
-    normalisation = 1000 
+    normalisation = 1000
     # ROOT starts bin numbering from 1...
     for xbin in range(1, xbins+1):
 	for ybin in range(1, ybins+1):
@@ -62,7 +62,7 @@ def calculate(acceptanceHisto, nameOfHisto):
 			z = acceptanceHisto.GetZaxis().GetBinCenter(zbin)
 			f = angularFunctions(x, y, z)
 			for i in range(6):
-				if nameOfHisto == "flat": 
+				if nameOfHisto == "flat":
 					numEvents = 1
 					largestNumEvents = 1
 					normalisation = 1
@@ -88,12 +88,12 @@ def main():
 	nameOfHisto = args[2]
 
     acceptanceFile = ROOT.TFile.Open(acceptanceName)
-    
+
     for i in range(numberOfHistos):
     	acceptanceHisto = acceptanceFile.Get(nameOfHisto + str(i))
     	#acceptanceHisto = acceptanceFile.Get(nameOfHisto)
     	calculate(acceptanceHisto, nameOfHisto)
-    
+
     acceptanceFile.Close()
 
 if __name__ == "__main__":

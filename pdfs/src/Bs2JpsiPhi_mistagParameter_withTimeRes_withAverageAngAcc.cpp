@@ -14,7 +14,7 @@
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc() : 
+Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc() :
 	// Physics parameters
 	gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
@@ -142,7 +142,7 @@ vector<string> Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::GetDoNo
 //Calculate the function value
 double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Evaluate(DataPoint * measurement)
 {
-	time = measurement->GetObservable( timeName )->GetValue();	
+	time = measurement->GetObservable( timeName )->GetValue();
         cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
         phi      = measurement->GetObservable( phiName )->GetValue();
         cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
@@ -170,7 +170,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::buildPDFnumerat
 {
 	// The angular functions f1->f6 as defined in roadmap Table 1.
 	double f1, f2, f3, f4, f5, f6;
-	Mathematics::getBs2JpsiPhiAngularFunctions( f1, f2, f3, f4, f5, f6, cosTheta, phi, cosPsi );	
+	Mathematics::getBs2JpsiPhiAngularFunctions( f1, f2, f3, f4, f5, f6, cosTheta, phi, cosPsi );
 
 	// The time dependent amplitudes as defined in roadmap Eqns 48 -> 59
 	// First for the B
@@ -201,7 +201,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::buildPDFnumerat
 		+ f3 * AperpAperpB
 		+ f4 * ImAparaAperpB
 		+ f5 * ReAzeroAparaB
-		+ f6 * ImAzeroAperpB; 
+		+ f6 * ImAzeroAperpB;
 
 	//W-
 	double v2 = f1 * AzeroAzeroBbar
@@ -209,7 +209,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::buildPDFnumerat
 		+ f3 * AperpAperpBbar
 		+ f4 * ImAparaAperpBbar
 		+ f5 * ReAzeroAparaBbar
-		+ f6 * ImAzeroAperpBbar;  
+		+ f6 * ImAzeroAperpBbar;
 
 	return ( w1*v1 + w2*v2 );
 }
@@ -219,7 +219,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Normalisation(D
 {
 	// Now need to know the tag and the mistag
 	q = (int)measurement->GetObservable( tagName )->GetValue();
-	
+
 	IConstraint * timeBound = boundary->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
@@ -251,7 +251,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Normalisation(D
                 return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
         }
 }
-	
+
 double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::buildPDFdenominator()
 {
 	// Work out the mistag
@@ -286,18 +286,18 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::buildPDFdenomin
 
 	double v1 = cachedAzeroAzeroIntB * angAccI1
 		+ cachedAparaAparaIntB * angAccI2
-		+ cachedAperpAperpIntB * angAccI3 
-		+ cachedAparaAperpIntB * angAccI4 
-		+ cachedAzeroAparaIntB * angAccI5 
-		+ cachedAzeroAperpIntB * angAccI6; 
+		+ cachedAperpAperpIntB * angAccI3
+		+ cachedAparaAperpIntB * angAccI4
+		+ cachedAzeroAparaIntB * angAccI5
+		+ cachedAzeroAperpIntB * angAccI6;
 
 	double v2 = cachedAzeroAzeroIntBbar * angAccI1
 		+ cachedAparaAparaIntBbar * angAccI2
-		+ cachedAperpAperpIntBbar * angAccI3 
-		+ cachedAparaAperpIntBbar * angAccI4 
-		+ cachedAzeroAparaIntBbar * angAccI5 
-		+ cachedAzeroAperpIntBbar * angAccI6; 
-	
+		+ cachedAperpAperpIntBbar * angAccI3
+		+ cachedAparaAperpIntBbar * angAccI4
+		+ cachedAzeroAparaIntBbar * angAccI5
+		+ cachedAzeroAperpIntBbar * angAccI6;
+
 	//double norm = (angAccI1 + angAccI2 + angAccI3 + angAccI4 + angAccI5 + angAccI6)/(3*32*TMath::Pi()/9);
 	double norm = 1.0;
 	return (w1*v1 + w2*v2)/norm;
@@ -380,7 +380,7 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getTimeAmplitudeI
         AzeroAzeroInt = Azero_sq * ( expCoshInt - cosPhis * expSinhInt + Btype * sinPhis * expSinInt );
         AparaAparaInt = Apara_sq * ( expCoshInt - cosPhis * expSinhInt + Btype * sinPhis * expSinInt );
         AperpAperpInt = Aperp_sq * ( expCoshInt + cosPhis * expSinhInt - Btype * sinPhis * expSinInt );
-	AparaAperpInt = AparaAperp * (         -cosDeltaPerpMinusPara * sinPhis * expSinhInt 
+	AparaAperpInt = AparaAperp * (         -cosDeltaPerpMinusPara * sinPhis * expSinhInt
 				      + Btype * sinDeltaPerpMinusPara * expCosInt
 				      - Btype * cosDeltaPerpMinusPara * cosPhis * expSinInt);
 	AzeroAparaInt = AzeroApara * cos(delta_para) * ( expCoshInt - cosPhis * expSinhInt
@@ -392,38 +392,38 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::getTimeAmplitudeI
 }
 
 /*
-AzeroAzero[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]              
-                                    - cosPhis * Sinh[deltaGamma*t/2]      
+AzeroAzero[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
+                                    - cosPhis * Sinh[deltaGamma*t/2]
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AzeroAzeroInt = CForm[FullSimplify[ Integrate[ AzeroAzero[t], {t, tmin, tmax}]]]
 */
 /*
-AparaApara[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]              
-                                    - cosPhis * Sinh[deltaGamma*t/2]      
+AparaApara[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
+                                    - cosPhis * Sinh[deltaGamma*t/2]
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AparaAparaInt = CForm[FullSimplify[ Integrate[ AparaApara[t], {t, tmin, tmax}]]]
 */
 /*
-AperpAperp[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]              
-                                    + cosPhis * Sinh[deltaGamma*t/2]      
+AperpAperp[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
+                                    + cosPhis * Sinh[deltaGamma*t/2]
                                     - Btype * sinPhis * Sin[deltaMs*t] );
 AperpAperpInt = CForm[FullSimplify[ Integrate[ AperpAperp[t], {t, tmin, tmax}]]]
 */
 /*
-AparaAperp[t_] := Exp[-gamma*t] * (-cosDeltaPerpMinusPara * sinPhis * Sinh[deltaGamma*t/2]              
-                                    + Btype * sinDeltaPerpMinusPara * Cos[deltaMs*t]      
+AparaAperp[t_] := Exp[-gamma*t] * (-cosDeltaPerpMinusPara * sinPhis * Sinh[deltaGamma*t/2]
+                                    + Btype * sinDeltaPerpMinusPara * Cos[deltaMs*t]
                                     - Btype * cosDeltaPerpMinusPara * cosPhis * Sinh[deltaGamma*t/2] );
 AparaAperpInt = CForm[FullSimplify[ Integrate[ AparaAperp[t], {t, tmin, tmax}]]]
 */
 /*
-AzeroApara[t_] := Exp[-gamma*t] * cosDeltaPara * (Cosh[deltaGamma*t/2]              
-                                    - cosPhis * sinh[deltaGamma*t/2]      
+AzeroApara[t_] := Exp[-gamma*t] * cosDeltaPara * (Cosh[deltaGamma*t/2]
+                                    - cosPhis * sinh[deltaGamma*t/2]
                                     + Btype * sinPhis * Sin[deltaMs*t] );
 AzeroAparaInt = CForm[FullSimplify[ Integrate[ AzeroApara[t], {t, tmin, tmax}]]]
 */
 /*
-AzeroAperp[t_] := Exp[-gamma*t] * ( - cosDeltaPerp * sinPhis * Sinh[deltaGamma*t/2]              
-                                    + Btype * sinDeltaPerp * Cos[deltaMs*t]      
+AzeroAperp[t_] := Exp[-gamma*t] * ( - cosDeltaPerp * sinPhis * Sinh[deltaGamma*t/2]
+                                    + Btype * sinDeltaPerp * Cos[deltaMs*t]
                                     - Btype * cosDeltaPerp * cosPhis * Sin[deltaMs*t] );
 AzeroAperpInt = CForm[FullSimplify[ Integrate[ AzeroAperp[t], {t, tmin, tmax}]]]
 */

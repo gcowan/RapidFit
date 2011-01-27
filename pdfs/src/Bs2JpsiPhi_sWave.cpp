@@ -15,7 +15,7 @@
 using std::cout;
 using std::endl;
 //Constructor
-Bs2JpsiPhi_sWave::Bs2JpsiPhi_sWave() : 
+Bs2JpsiPhi_sWave::Bs2JpsiPhi_sWave() :
 	// Physics parameters
 	gammaName	 ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
@@ -101,14 +101,14 @@ bool Bs2JpsiPhi_sWave::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
 	//cout << "SetPhysicsParameters: " << result << endl;
 	return result;
-}	
+}
 
 //Calculate the function value
 double Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
 {
 	// The angular functions f1->f6 as defined in roadmap Table 1.
 	double f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
-	getAngularFunctions( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, measurement );	
+	getAngularFunctions( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, measurement );
 
 	// The time dependent amplitudes as defined in roadmap Eqns 48 -> 59
 	// First for the B
@@ -121,7 +121,7 @@ double Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
 
 	// Now need to know the tag and the mistag
 	int q = (int)measurement->GetObservable( tagName )->GetValue();
-	double omega = measurement->GetObservable( mistagName )->GetValue();	
+	double omega = measurement->GetObservable( mistagName )->GetValue();
 
 	double epsilon[3];
 	epsilon[0] = omega;
@@ -141,7 +141,7 @@ double Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
 		+ f8 * ReAsAparaB
 		+ f9 * ImAsAperpB
 		+ f10 * ReAsAzeroB
-		; 
+		;
 
 	//W-
 	double v2 = f1 * AzeroAzeroBbar
@@ -150,11 +150,11 @@ double Bs2JpsiPhi_sWave::Evaluate(DataPoint * measurement)
 		+ f4 * ImAparaAperpBbar
 		+ f5 * ReAzeroAparaBbar
 		+ f6 * ImAzeroAperpBbar
-		+ f7 * AsAsBbar 
+		+ f7 * AsAsBbar
 		+ f8 * ReAsAparaBbar
 		+ f9 * ImAsAperpBbar
 		+ f10 * ReAsAzeroBbar
-		;  
+		;
 	double eval = ( w1*v1 + w2*v2 );
 	//cout << "Evaluate: " << eval << endl;
 	return eval;
@@ -165,7 +165,7 @@ double Bs2JpsiPhi_sWave::Normalisation(DataPoint * measurement, PhaseSpaceBounda
 {
 	// Now need to know the tag and the mistag
 	int q = (int)measurement->GetObservable( tagName )->GetValue();
-	double omega = measurement->GetObservable( mistagName )->GetValue();	
+	double omega = measurement->GetObservable( mistagName )->GetValue();
 
 	double epsilon[3];
 	epsilon[0] = omega;
@@ -234,7 +234,7 @@ void Bs2JpsiPhi_sWave::getAngularFunctions( double & f1
 	double cosPhi_sq =  cosPhi*cosPhi;
 	double sinPhi_sq =  sinPhi*sinPhi;
 
-	double norm = 9./32./TMath::Pi(); 
+	double norm = 9./32./TMath::Pi();
 	//this is the factor that drops out when you integrate over the angles
 	// same factor for f1, f2, f3. The remaining terms f4, f5, f6 give 0.
 	//TRANSVERSITY BASIS
@@ -243,7 +243,7 @@ void Bs2JpsiPhi_sWave::getAngularFunctions( double & f1
 	f3 =	1. * sinPsi_sq * sinTheta_sq * norm;					//Check: norm = (9./64./TMath::Pi())
 	f4 =	-1. * sinPsi_sq * sin2Theta * sinPhi * norm;				//Check: norm = 0	//was factor of -1 different from roadmap
 	f5 = 	sinTheta_sq * sin2Phi * sin2Psi * norm/sqrt(2.);			//Check: norm = 0	//was factor of -1 different from roadmap
-	f6 = 	sin2Theta * cosPhi * sin2Psi * norm/sqrt(2.);				//Check: norm = 0	
+	f6 = 	sin2Theta * cosPhi * sin2Psi * norm/sqrt(2.);				//Check: norm = 0
 	f7 = 	(2./3.) * (1. - sinTheta_sq * cosPhi_sq) * norm;			//Check: norm = (9./64./TMath::Pi())
 	f8 = 	(1./3.)* sqrt(6.) * sinTheta_sq * sin2Phi * sinPsi * norm;		//Check: norm = 0	//was factor of -1 different from roadmap
 	f9 = 	-(1./3.) * sqrt(6.) * sin2Theta * cosPhi* sinPsi * norm;		//Check: norm = 0 	//was factor of -1 different from roadmap
@@ -252,7 +252,7 @@ void Bs2JpsiPhi_sWave::getAngularFunctions( double & f1
 	return;
 }
 
-void Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(  
+void Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(
 		double & AzeroAzero
 		, double & AparaApara
 		, double & AperpAperp
@@ -273,7 +273,7 @@ void Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(
 	double gamma, deltaGamma, deltaMs, Phi_s;
 	double Azero_sq, Apara_sq, Aperp_sq, As_sq;
 	double delta_zero, delta_para, delta_perp, delta_s;
-	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, As_sq, delta_zero, delta_para, delta_perp, delta_s); 
+	getPhysicsParameters( gamma, deltaGamma, deltaMs, Phi_s, Azero_sq, Apara_sq, Aperp_sq, As_sq, delta_zero, delta_para, delta_perp, delta_s);
 
 	// Quantities depending only on physics parameters can be cached
 	if ( !evaluationCacheValid )
@@ -307,7 +307,7 @@ void Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(
 	Term_AsAs_AperpAperp = expGT * ( coshDeltaGammaT + cachedcosPhis * sinhDeltaGammaT - cachedsinPhis * sinDeltaMsT );
 	AperpAperp = 	Aperp_sq * Term_AsAs_AperpAperp;
 	AsAs = 		As_sq *	Term_AsAs_AperpAperp;
-	
+
 	Term_AzeroAzero_AparaApara = expGT * ( coshDeltaGammaT - cachedcosPhis * sinhDeltaGammaT + cachedsinPhis * sinDeltaMsT );
 	AzeroAzero = 	Azero_sq * Term_AzeroAzero_AparaApara;
 	AparaApara = 	Apara_sq * Term_AzeroAzero_AparaApara;
@@ -369,7 +369,7 @@ void Bs2JpsiPhi_sWave::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 }
 
 
-inline double Bs2JpsiPhi_sWave::getAzeroAzeroInt(double tmin, double tmax, 
+inline double Bs2JpsiPhi_sWave::getAzeroAzeroInt(double tmin, double tmax,
 		double k0, double tauL, double tauH, double tauBar, double Dms, double phis, int Btype)
 {
 
@@ -409,7 +409,7 @@ inline double Bs2JpsiPhi_sWave::getAparaAparaInt(double tmin, double tmax,
 			+ Btype*2.0*gammaDms*sinphis*(exp(-(1.0/tauBar)*tmin)*((1.0/tauBar)*sin(Dms*tmin)
 					+Dms*cos(Dms*tmin))));
 
-	return (valA-valB);	
+	return (valA-valB);
 }
 
 
@@ -463,7 +463,7 @@ void Bs2JpsiPhi_sWave::getPhysicsParameters( double & gamma
 		, double & Apara_sq
 		, double & Aperp_sq
 		, double & As_sq
-		, double & delta_zero 
+		, double & delta_zero
 		, double & delta_para
 		, double & delta_perp
 		, double & delta_s
@@ -474,17 +474,17 @@ void Bs2JpsiPhi_sWave::getPhysicsParameters( double & gamma
 	deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 	deltaM	 = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 	Phi_s	  = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
-	
+
 	Azero_sq   = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
 	//Apara_sq   = allParameters.GetPhysicsParameter( Apara_sqName )->GetValue();
 	Aperp_sq   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
 	As_sq	   = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
-	
+
 	delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
 	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
 	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
 	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue();
-	
+
 	Apara_sq = 1 - Azero_sq - Aperp_sq; //Is this right?
 
 	return;

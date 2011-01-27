@@ -15,7 +15,7 @@
 #include "RooMath.h"
 
 //Constructor
-Bs2JpsiPhiLongLivedBkg_withTimeRes::Bs2JpsiPhiLongLivedBkg_withTimeRes() : 
+Bs2JpsiPhiLongLivedBkg_withTimeRes::Bs2JpsiPhiLongLivedBkg_withTimeRes() :
 	// Observables
 	  timeName	( "time" )
 
@@ -107,7 +107,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFnumerator()
 			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
 			exit(1) ;
 		}
-		double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);	 
+		double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
 		double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
 		double val = f_LL1 * val1 + (1. - f_LL1) * val2;
 		return val;
@@ -127,7 +127,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::Normalisation(DataPoint * measurement
                 tlow = timeBound->GetMinimum();
                 thigh = timeBound->GetMaximum();
         }
-	
+
 	if( timeResLL1Frac >= 0.9999 )
         {
                 // Set the member variable for time resolution to the first value and calculate
@@ -168,7 +168,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFdenominator()
 		double val = f_LL1 * val1 + (1. - f_LL1) * val2;
 		return val;
 	}
-		
+
 }
 
 

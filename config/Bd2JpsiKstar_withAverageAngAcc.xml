@@ -30,17 +30,17 @@
 			<Type>Free</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
-        
+
 		<PhysicsParameter>
 			<Name>deltaM</Name>
 			<Value>0.507</Value>
 			<Minimum>0</Minimum>
-            <Maximum>1</Maximum>
+           		<Maximum>1</Maximum>
 			<Type>Fixed</Type>
 			<Unit>MeV/c2</Unit>
 		</PhysicsParameter>
 
-<PhysicsParameter>
+		<PhysicsParameter>
 			<Name>delta_para</Name>
 			<Value>1.563</Value>
 			<Minimum>-3.14159</Minimum>
@@ -160,7 +160,7 @@
 	</ParameterSet>
 
 	// Minimising with Minuit2
-	<Minimiser>Minuit2</Minimiser>
+	<Minimiser>Minuit</Minimiser>
 
 	// Requesting two contour plots, pull plots and time projection
 	<Output>
@@ -168,6 +168,7 @@
         <Projection>cosTheta</Projection>
         <Projection>phi</Projection>
         <Projection>cosPsi</Projection>
+        <Projection>mass</Projection>
 	</Output>
 
 	// Minimising weighted NLL
@@ -180,15 +181,19 @@
 
 	// 100000 toy events Bd2JpsiKstar_withTimeRes_withAverageAngAcc
 	<ToFit>
+        <ProdPDF>
 		<PDF>
 			<Name>Bs2JpsiPhiMassSignal</Name>
 		</PDF>
-		
-    
+		<PDF>
+            		<Name>Bs2JpsiPhiMassSignal</Name>
+        	</PDF>
+        </ProdPDF>
+
 		<DataSet>
 			<Source>Foam</Source>
-			
-			
+
+
 			<NumberEvents>100000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
@@ -217,6 +222,13 @@
 					<Minimum>-1.0</Minimum>
 					<Maximum>1.0</Maximum>
 					<Unit>Unitless</Unit>
+				</Observable>
+
+                <Observable>
+					<Name>mass</Name>
+					<Minimum>5200.0</Minimum>
+					<Maximum>5400.0</Maximum>
+					<Unit>MeV/c^{2}</Unit>
 				</Observable>
 
 				<Observable>

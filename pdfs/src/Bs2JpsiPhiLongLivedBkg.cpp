@@ -13,7 +13,7 @@
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg() : 
+Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg() :
 	// Observables
 	  timeName	( "time" )
 
@@ -57,7 +57,7 @@ double Bs2JpsiPhiLongLivedBkg::Evaluate(DataPoint * measurement)
   	double tau2 = allParameters.GetPhysicsParameter( tau2Name )->GetValue();
   	double f_LL1 = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
   	double val = f_LL1 * exp( -time/tau1 ) + (1. - f_LL1)*exp( -time/tau2 );
-	
+
   	return val;
 }
 
@@ -81,7 +81,7 @@ double Bs2JpsiPhiLongLivedBkg::Normalisation(PhaseSpaceBoundary * boundary)
                 tmin = timeBound->GetMinimum();
                 tmax = timeBound->GetMaximum();
         }
-	
+
 	if ( tmin < 0. ) tmin = 0.;
 	if ( tmax < 0. ) tmax = 0.;
 
@@ -91,6 +91,6 @@ double Bs2JpsiPhiLongLivedBkg::Normalisation(PhaseSpaceBoundary * boundary)
 
   	double val = f_LL1 * tau1 * ( exp(-tmin/tau1) - exp(-tmax/tau1) )
 	      + (1.-f_LL1) * tau2 * ( exp(-tmin/tau2) - exp(-tmax/tau2) );
-  
+
 	return val;
 }

@@ -15,7 +15,7 @@
 #include "RooMath.h"
 #include "Mathematics.h"
 
-namespace Mathematics 
+namespace Mathematics
 {
 	// Mathematica integral of the exp * erf
 	//Integrate[(1*Exp[-(x/t) + s^2/(2*t^2)]* Erfc[-((x - s^2/t)/(Sqrt[2]*s))])/2, x] ==
@@ -44,10 +44,10 @@ namespace Mathematics
 
 	// use the approximation: erf(z) = exp(-z*z)/(sqrt(pi)*z) to explicitly cancel the divergent exp(y*y) behaviour of
 	// CWERF for z = x + i y with large negative y
-	RooComplex evalCerfApprox(double swt, double u, double c) 
+	RooComplex evalCerfApprox(double swt, double u, double c)
 	{
 		static double rootpi= sqrt(atan2(0.,-1.));
-		RooComplex z(swt*c,u+c);  
+		RooComplex z(swt*c,u+c);
 		RooComplex zc(u+c,-swt*c);
 		RooComplex zsq= z*z;
 		RooComplex v= -zsq - u*u;
@@ -69,20 +69,20 @@ namespace Mathematics
 
 	//........................................
 	//evaluate a simple exponential with single gaussian time resolution
-	double Exp( double t, double gamma, double resolution )  
+	double Exp( double t, double gamma, double resolution )
 	{
 
-		if(resolution > 0.) {     
+		if(resolution > 0.) {
 
 			double theExp = TMath::Exp( -t*gamma + resolution*resolution * gamma*gamma / 2. ) ;
 			double theErfc = RooMath::erfc(  -( t - resolution*resolution*gamma ) /sqrt(2.)/resolution )  ;
 			return theExp * theErfc  / 2.0 ;
 
 			// Yue hongs code
-			//double c = gamma * resolution /sqrt(2.); 
+			//double c = gamma * resolution /sqrt(2.);
 			//double u = t / resolution / sqrt(2.);
 			//return exp( c*c - gamma*t ) * RooMath::erfc(c-u) / 2.;
-		}	
+		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
 			return TMath::Exp( -gamma * t ) ;
@@ -96,24 +96,24 @@ namespace Mathematics
 	   R2[t_] := 1/2 * Exp[-t*gamma + timeRes*timeRes*gamma*gamma/2] * Erfc[-(t - timeRes*timeRes*gamma)/(Sqrt[2]*timeRes)]
 	   CForm[FullSimplify[Simplify[Integrate[R2[t], {t, tlow, thigh}]]]]
 	   (
-	   -2*exp((gamma*gamma*timeRes*timeRes)/2.) - 
-	   exp( gamma*thigh)*Erfc(thigh/(sqrt(2)*timeRes)) + 
-	   exp((gamma*gamma*timeRes*timeRes)/2.) 		      * Erfc((thigh - gamma*timeRes*timeRes)/(sqrt(2)*timeRes)) + 
-	   exp((gamma*(2*thigh + gamma*timeRes*timeRes - 2*tlow))/2.) * Erfc((gamma*timeRes*timeRes - tlow )/(sqrt(2)*timeRes)) + 
+	   -2*exp((gamma*gamma*timeRes*timeRes)/2.) -
+	   exp( gamma*thigh)*Erfc(thigh/(sqrt(2)*timeRes)) +
+	   exp((gamma*gamma*timeRes*timeRes)/2.) 		      * Erfc((thigh - gamma*timeRes*timeRes)/(sqrt(2)*timeRes)) +
+	   exp((gamma*(2*thigh + gamma*timeRes*timeRes - 2*tlow))/2.) * Erfc((gamma*timeRes*timeRes - tlow )/(sqrt(2)*timeRes)) +
 	   exp( gamma*thigh)*Erfc(tlow/(sqrt(2)*timeRes))
 	   )/(2.*exp(gamma*thigh)*gamma)
 
 	   We should be able to use the above as a direct replacement of the code below
 	 */
-	double ExpInt( double tlow, double thigh, double gamma, double resolution  )  
-	{		
-		if( thigh < tlow ) 
+	double ExpInt( double tlow, double thigh, double gamma, double resolution  )
+	{
+		if( thigh < tlow )
 		{
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
-			return -1.0 ;				
+			return -1.0 ;
 		}
 
-		if( resolution > 0. ) 
+		if( resolution > 0. )
 		{
 			// I think this is wrong, needs to be checked. Compare with Bs2JpsiPhi long lived background
 
@@ -122,7 +122,7 @@ namespace Mathematics
 			/*
 			   if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
 			   std::cerr << " Mathematics::ExpInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
-			   return -1. ;				
+			   return -1. ;
 			   }
 			   return (1/gamma) * ( 1.0 - TMath::Exp(-gamma*thigh) ) ;
 			 */
@@ -181,10 +181,10 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate exponential X cosine with single time resolution
-	double ExpCos( double t, double gamma, double deltaM, double resolution ) 
+	double ExpCos( double t, double gamma, double deltaM, double resolution )
 	{
 
-		if(resolution > 0.) {     
+		if(resolution > 0.) {
 
 			//Yue Hongs code
 			double c = gamma * resolution/sqrt(2.);
@@ -201,7 +201,7 @@ namespace Mathematics
 			//double theImErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncIm(z) ) : ( 1.0 - RooMath::FastComplexErrFuncIm(z) );
 			//return theExp * ( theCos*theReErfc - theSin*theImErfc ) / 2.0 ;
 
-		}	
+		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
 			return TMath::Exp( -gamma *t ) * cos( deltaM * t )  ;
@@ -211,11 +211,11 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate integral of exponential X cosine with single time resolution
-	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )  
-	{	
+	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )
+	{
 		if( thigh < tlow ) {
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
-			return -1.0 ;				
+			return -1.0 ;
 		}
 
 		if( resolution > 0. ) {
@@ -223,7 +223,7 @@ namespace Mathematics
 			// So it only works if time limits are large and start from < 0
 			if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
 			//	std::cerr << " Mathematics::ExpCosInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
-			//	return -1. ;				
+			//	return -1. ;
 			}
 		}
 
@@ -239,9 +239,9 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate exponential X sine with single time resolution
-	double ExpSin( double t, double gamma, double deltaM, double resolution )  
+	double ExpSin( double t, double gamma, double deltaM, double resolution )
 	{
-		if(resolution > 0.) {     
+		if(resolution > 0.) {
 
 			//Yue Hongs code
 			double c = gamma * resolution/sqrt(2.);
@@ -259,7 +259,7 @@ namespace Mathematics
 			//return theExp * ( theCos*theImErfc + theSin*theReErfc ) / 2.0 ;
 
 
-		}	
+		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
 			return TMath::Exp( -gamma *t ) * sin( deltaM * t )  ;
@@ -269,11 +269,11 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate integral of exponential X cosine with single time resolution
-	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )  
+	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )
 	{
 		if( thigh < tlow ) {
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
-			return -1.0 ;				
+			return -1.0 ;
 		}
 
 		if( resolution > 0. ) {
@@ -281,7 +281,7 @@ namespace Mathematics
 			// So it only works if time limits are large and start from < 0
 			if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
 			//	std::cerr << " Mathematics::ExpSinInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
-			//	return -1.0 ;				
+			//	return -1.0 ;
 			}
 		}
 
@@ -319,7 +319,7 @@ namespace Mathematics
 		// Multiply by it here to get overall normalisation of 1.
 		// i.e., int(2*cospsi*cospsi*(1-(1-costh*costh)*cos(phi)*cos(phi)),cospsi=-1..1, costh=-1..1,phi=-Pi..Pi);
 		// same factor for f1, f2, f3. The remaining terms f4, f5, f6 give 0
-		// int(-(1-cospsi*cospsi)*2*sqrt(1-costh*costh)*costh*sin(phi),cospsi=-1..1, costh=-1..1,phi=-Pi..Pi); 
+		// int(-(1-cospsi*cospsi)*2*sqrt(1-costh*costh)*costh*sin(phi),cospsi=-1..1, costh=-1..1,phi=-Pi..Pi);
 		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi ) * norm;
 		f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi ) * norm;
 		f3 =      sinPsi*sinPsi * sinTheta*sinTheta * norm;
@@ -328,7 +328,7 @@ namespace Mathematics
 		f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.) * norm;
 		return;
 	}
-	
+
 	void getBs2JpsiPhiAngularFunctionsWithSwave( double & f1
                         , double & f2
                         , double & f3
@@ -354,7 +354,7 @@ namespace Mathematics
                 double sin2Phi   = 2.*sinPhi*cosPhi;
 
 		double norm = 9./32./TMath::Pi();
-                
+
 		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi ) * norm;
                 f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi ) * norm;
                 f3 =      sinPsi*sinPsi * sinTheta*sinTheta * norm;
@@ -383,7 +383,7 @@ namespace Mathematics
     int numEvents = dataSet->GetDataNumber();
     for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
     for (int e = 0; e < numEvents; e++)
-    //for (int e = 0; e < 1000; e++)
+    //for (int e = 0; e < 10; e++)
     {
       if (e % 10000 == 0) cout << "Event # " << e << endl;
       DataPoint * event = dataSet->GetDataPoint(e);
@@ -405,7 +405,7 @@ namespace Mathematics
       {
         xi[i] += f[i]/val; ///1501544.3013043751;
       }
-      //cout << cosTheta << " " << phi << " " << cosPsi << " " << evalPDF  << " " << xi[0] << endl;
+      //cout << f[0]<<" " << cosTheta << " " << phi << " " << cosPsi << " " << evalPDF  << " " << xi[0] << endl;
     }
     //cout << "[" << xi[0]/xi[0] << ", " << xi[1]/xi[0] << ", " << xi[2]/xi[0] <<  ", " << xi[3]/xi[0] << ", " << xi[4]/xi[0] << ", " << xi[5]/xi[0] << "]" <<  endl;
     cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents << "]" <<  endl;

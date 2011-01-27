@@ -28,14 +28,14 @@ def fillHistogram( pyl, ntuple, histo, weight, start, end ):
 	phi = pyl.phi.GetValue()
 	cosPsi = pyl.cosPsi.GetValue()
 	time = pyl.time.GetValue()
-	#histo.Fill( array("f", [ cosTheta, phi, cosPsi, time ]) ) 
-	histo.Fill( cosTheta, phi, cosPsi, weight ) 
+	#histo.Fill( array("f", [ cosTheta, phi, cosPsi, time ]) )
+	histo.Fill( cosTheta, phi, cosPsi, weight )
 
 def fillHistogramTime( pyl, ntuple, histo, weight, start, end ):
     for event in range(start, end):
 	ntuple.GetEntry(event)
 	time = pyl.time.GetValue()
-	histo.Fill( time, weight ) 
+	histo.Fill( time, weight )
 
 def main():
     parser = OptionParser(
@@ -48,7 +48,7 @@ def main():
 
     mcFile = ROOT.TFile.Open(mcDataName)
     toyFile = ROOT.TFile.Open(toyDataName)
-    acceptanceFile = ROOT.TFile( acceptanceName, "RECREATE")  
+    acceptanceFile = ROOT.TFile( acceptanceName, "RECREATE")
 
     mcNtuple = mcFile.Get("ntuple")
     toyNtuple = toyFile.Get("dataNTuple")
@@ -73,7 +73,7 @@ def main():
     numToyEvents = toyNtuple.GetEntries()
 
     numHistosToProduce = 1
- 
+
     #toyWeight = float(numMCEvents)/numToyEvents
 
     #print "There are %d MC events and %d toy events. Weight will be %f" % (numMCEvents, numToyEvents, toyWeight)
@@ -96,16 +96,16 @@ def main():
     	toyHistosTime.append(ROOT.TH1D("toyTime"+num, "toyTime"+num, 20, -2., 18.))
     	mcHistosTime[i].Sumw2()
     	toyHistosTime[i].Sumw2()
-    
+
 	fillHistogram( mcData, mcNtuple, mcHistos[i], 1., startMC, startMC + numMCEvents/numHistosToProduce)
     	fillHistogram( toyData, toyNtuple, toyHistos[i], 1., startToy, startToy + numToyEvents/numHistosToProduce)
-    
+
     	fillHistogramTime( mcData, mcNtuple, mcHistosTime[i], 1., startMC, startMC + numMCEvents/numHistosToProduce )
     	fillHistogramTime( toyData, toyNtuple, toyHistosTime[i], 1., startToy, startToy + numToyEvents/numHistosToProduce )
-   
+
 	startMC += numMCEvents/numHistosToProduce
 	startToy += numToyEvents/numHistosToProduce
- 
+
     	#mcHisto.Scale(1./mcHisto.Integral())
     	#toyHisto.Scale(1./toyHisto.Integral())
 
@@ -114,7 +114,7 @@ def main():
     	acceptanceHistos[i].SetTitle("acceptance"+num)
     	acceptanceHistos[i].Divide(toyHistos[i])
     	acceptanceHistos[i].Scale(1./acceptanceHistos[i].Integral())
-    
+
     	acceptanceTimeHistos.append(mcHistosTime[i].Clone("acceptanceTime"+num))
     	acceptanceTimeHistos[i].SetTitle("acceptanceTime"+num)
     	acceptanceTimeHistos[i].Divide(toyHistosTime[i])
@@ -141,10 +141,10 @@ def main():
     	accCosPsiCosTheta = acceptanceHistos[i].Project3D("zx")
     	accCosPsiCosTheta.SetTitle("cosTheta vs cosPsi"+num)
     	accCosPsiCosTheta.SetName("cosTheta_cosPsi"+num)
-    
+
     acceptanceFile.Write()
 
- 
+
     mcFile.Close()
     toyFile.Close()
     acceptanceFile.Close()

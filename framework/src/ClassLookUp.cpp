@@ -21,7 +21,7 @@
 #include "Bs2JpsiPhiMassSignal.h"
 
 #include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc.h"
-
+#include "Bd2JpsiKstar_sWave.h"
 #include "Bs2DsPi.h"
 #include "Bs2DsPi_mistagParameter.h"
 #include "Bs2DsPi_acc.h"
@@ -86,7 +86,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         }
 	else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
         {
-	        //JPsiPhi from Pete with mistag as a physics paramter and single gaussian time res 
+	        //JPsiPhi from Pete with mistag as a physics paramter and single gaussian time res
 	        return new Bs2JpsiPhi_mistagParameter_alt();
         }
         else if ( Name == "Bs2PhiPhi" )
@@ -108,7 +108,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 			// DsPi w. acceptance
 			return new Bs2DsPi_acc();
-        }       
+        }
         else if ( Name == "Bs2DsPiMassSignal" )
         {
                 //Default DsPi signal mass PDF
@@ -166,7 +166,13 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 			// Bd2JPsiKstar with analytic double gaussian time resolution
 			return new Bd2JpsiKstar_withTimeRes_withAverageAngAcc();
         }
-	
+
+                 else if ( Name == "Bd2JpsiKstar_sWave" )
+         {
+                         // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
+                         return new Bd2JpsiKstar_sWave();
+         }
+
 	else
 	{
 		cerr << "Unrecognised PDF name: " << Name << endl;
