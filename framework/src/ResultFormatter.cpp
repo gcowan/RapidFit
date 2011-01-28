@@ -134,7 +134,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 		}
 
 		//Format the graph
-		graph->SetTitle("1 and 2 sigma contours");	
+		graph->SetTitle("1 and 2 sigma contours");
 		graph->Draw( "ALF" ); //Smooth fill area drawn
 
 		//Titles in format: ParameterName (ParameterUnit)
@@ -164,7 +164,7 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 	string columns = "\\begin{tabular}{|c|";
 	string parameterNames = "";
 	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
-	{	
+	{
 		bool isFree = ResultFormatter::IsParameterFree( OutputData, *nameIterator );
 		if (isFree)
 		{
@@ -194,7 +194,7 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 
 		cout << setw(15) << name;
 		if ( covarianceMatrix.size() == 0 )
-		{	
+		{
 			cerr << "No correlation matrix returned from fit!" << endl;
 			break;
 		}
@@ -243,7 +243,7 @@ double ResultFormatter::GetElementFromCovarianceMatrix( vector<double> matrix, i
 {
 	if(row > col) return matrix[col+row*(row+1)/2];
 	else return matrix[row+col*(col+1)/2];
-} 
+}
 
 
 //Display the results of a fit in a LaTeX table using cout
@@ -279,9 +279,9 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 
 		//string name = FindAndReplaceString( *nameIterator );
 		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
-		cout << setw(15) << name << " & " 
+		cout << setw(15) << name << " & "
 			<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
-			<< setw(10) <<  		  fitError << " & " 
+			<< setw(10) <<  		  fitError << " & "
 			<< setw(10) << setprecision(2) << sigmaFromInputValue << "\\\\" << endl;
 	}
 
@@ -297,32 +297,32 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
 	cout << "\\begin{tabular}{|c|c|c|c|} \n\\hline" << endl;
 	cout << "Parameter & Fit result and error & $\\sigma$ from input & Abs from input \\\\ \\hline \\hline" << endl;
-	
+
 	//Ouput each parameter
 	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
 	{
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
-		
+
 		double fitValue = outputParameter->GetValue();
 		double minValue = outputParameter->GetMinimum();
 		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
 		//if (fitError > 0.0) sigmaFromInputValue = (fitValue - inputValue)/fitError;
-		
+
 		//boost::regex pattern ("_",boost::regex_constants::icase|boost::regex_constants::perl);
 		//string replace ("\\_");
 		//string newName = boost::regex_replace (*nameIterator, pattern, replace);
-		
+
 		//string name = FindAndReplaceString( *nameIterator );
 		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
-		cout << setw(15) << name << " & " 
+		cout << setw(15) << name << " & "
 		<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
-		<< setw(10) <<  		  fitError << " & " 
+		<< setw(10) <<  		  fitError << " & "
 		<< setw(10) << setprecision(2) << sigmaFromInputValue << " & "
 		<< setw(10) << setprecision(5) << fitValue-inputValue << "\\\\" << endl;
 	}
-	
+
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;
 
@@ -335,27 +335,27 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
 	cout << "\\begin{tabular}{|c|c|} \n\\hline" << endl;
 	cout << "Parameter & Fit result and error  \\\\ \\hline \\hline" << endl;
-	
+
 	//Ouput each parameter
 	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
 	{
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
-		
+
 		double fitValue = outputParameter->GetValue();
 		double minValue = outputParameter->GetMinimum();
 		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
 		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
-		cout << setw(15) << name << " & " 
+		cout << setw(15) << name << " & "
 		<< setw(10) << setprecision(3) << fitValue << " $\\pm$ "
 		<< setw(10) <<  		  fitError << "\\\\" << endl;
-	}	
+	}
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;
-	
-	
-	
+
+
+
 }
 
 /*string ResultFormatter::FindAndReplaceString( string name )
@@ -495,9 +495,9 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 // New Method form PELC to plot LL scan results
 
 void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename )
-{	
+{
 	// 1=BLACK    4=BLUE    3=GREEN     5=YELLOW
-	
+
 	TFile * LLscanFile = new TFile( filename.c_str(), "RECREATE");
 
 	//Set some numbers
@@ -505,24 +505,24 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 
 	//Make a canvas for all the plots
 	TCanvas cv ;
-	
+
 	for( int ii=0; ii<nscans; ii++ )
 	{
 		//scanResults[ii]->print() ;
 		cv.SetGrid();
 		cv.GetFrame()->SetFillColor(21);
 		cv.GetFrame()->SetBorderSize(12);
-		
-		//cv.cd(ii+1) ;		
+
+		//cv.cd(ii+1) ;
 		TGraph * grnew = scanResults[ii]->GetGraph() ;
 		grnew->Draw("ALP") ;
 		cv.Update();
 		cv.Write();
-	
+
 	}
-		
+
 	LLscanFile->Close();
-	
+
 }
-		
-	
+
+

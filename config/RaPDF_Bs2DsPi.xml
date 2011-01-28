@@ -70,7 +70,7 @@
 			<Type>Free</Type>
 			<Unit>MeV/c2</Unit>
 		</PhysicsParameter>
-		
+
 		<PhysicsParameter>
 			<Name>mistag</Name>
 			<Value>0.35</Value>
@@ -79,7 +79,7 @@
 			<Type>Fixed</Type>
 			<Unit>Unitless</Unit>
 		</PhysicsParameter>
-		
+
 		0.33
 		<PhysicsParameter>
 			<Name>timeresDsPi</Name>
@@ -90,7 +90,7 @@
 			<Unit>ps</Unit>
 		</PhysicsParameter>
 
-						
+
 //........... Signal mass PDF parameters ...........
 		<PhysicsParameter>
 			<Name>f_sig_m1</Name>
@@ -157,9 +157,9 @@ Bs2DsPi_acc
 			<Source>File</Source>
 			<FileName>/Disk/speyside4/s0789504/bias/Toys/MC09/DVTuples_MC09_RapidFit.root</FileName>
 			<NTuplePath>ntuple</NTuplePath>
-		
+
 			<CutString>time>0.2039</CutString>
-			
+
 			<NumberEvents>100000</NumberEvents>
 			<PhaseSpaceBoundary>
 				<Observable>
@@ -173,9 +173,9 @@ Bs2DsPi_acc
 
 				<Observable>
 					<Name>tag</Name>
-					<Value>0.0</Value>	
-					<Value>-1.0</Value>				
-					<Value>1.0</Value>	
+					<Value>0.0</Value>
+					<Value>-1.0</Value>
+					<Value>1.0</Value>
 					<Unit>Unitless</Unit>
 				</Observable>
 

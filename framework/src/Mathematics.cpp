@@ -362,7 +362,7 @@ namespace Mathematics
                 f5 = sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.) * norm;
                 f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.) * norm;
 		// Need to make sure that we deal with the normalisation of the following terms properly in the code that uses them
-        	f7 =  (2./3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * norm * 2;			//Check: norm = (9./64./TMath::Pi())
+        	f7 =  (2./3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * norm ;			//Check: norm = (9./64./TMath::Pi())
         	f8 =  (1./3.) * sqrt(6.) * sinTheta*sinTheta * sin2Phi * sinPsi * norm;        		//Check: norm = 0
         	f9 = -(1./3.) * sqrt(6.) * sin2Theta * cosPhi * sinPsi * norm;         			//Check: norm = 0
         	f10= -(4./3.) * sqrt(3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * cosPsi * norm;   	//Check: norm = 0
@@ -409,6 +409,49 @@ namespace Mathematics
     }
     //cout << "[" << xi[0]/xi[0] << ", " << xi[1]/xi[0] << ", " << xi[2]/xi[0] <<  ", " << xi[3]/xi[0] << ", " << xi[4]/xi[0] << ", " << xi[5]/xi[0] << "]" <<  endl;
     cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents << "]" <<  endl;
+    return;
+  }
+
+void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF )
+  {
+    // This tries to implement the NIKHEF method for calculating the
+    // average acceptance weights for Bs2JpsiPhi.
+    RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
+    PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
+    int numAngularTerms = 10;
+    double  f[numAngularTerms]; // the angular functions
+    double xi[numAngularTerms]; // the angular weights
+    double cosTheta, phi, cosPsi;
+    double evalPDFraw, evalPDFnorm, val;
+    int numEvents = dataSet->GetDataNumber();
+    for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
+    for (int e = 0; e < numEvents; e++)
+    //for (int e = 0; e < 10; e++)
+    {
+      if (e % 10000 == 0) cout << "Event # " << e << endl;
+      DataPoint * event = dataSet->GetDataPoint(e);
+      cosTheta = event->GetObservable("cosTheta")->GetValue();
+      phi      = event->GetObservable("phi")->GetValue();
+      cosPsi   = event->GetObservable("cosPsi")->GetValue();
+      getBs2JpsiPhiAngularFunctionsWithSwave( f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], cosTheta, phi, cosPsi);
+      // The method sums the angular factor f_i divided by the sum_i(A_i*f_i)
+      // for each accepted event. I'm not sure if dividing by Evaluate is exactly the
+      // same here, particularly if you look at untagged events.
+      evalPDFraw = PDF->Evaluate( event );
+      // Now need to calculate the normalisation when integrated over the 3 angles
+      vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
+      dontIntegrate.push_back("time");
+      dontIntegrate.push_back("tag");
+      evalPDFnorm = rapidInt->DoNumericalIntegral( event, boundary, dontIntegrate );
+      val = evalPDFraw/evalPDFnorm;
+      for (int i = 0; i < numAngularTerms; i++)
+      {
+        xi[i] += f[i]/val; ///1501544.3013043751;
+      }
+      //cout << f[0]<<" " << cosTheta << " " << phi << " " << cosPsi << " " << evalPDF  << " " << xi[0] << endl;
+    }
+    //cout << "[" << xi[0]/xi[0] << ", " << xi[1]/xi[0] << ", " << xi[2]/xi[0] <<  ", " << xi[3]/xi[0] << ", " << xi[4]/xi[0] << ", " << xi[5]/xi[0] << "]" <<  endl;
+    cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents  << "," <<  xi[6]/numEvents << "," << xi[7]/numEvents << "," << xi[8]/numEvents << ","  << xi[9]/numEvents << "]" <<  endl;
     return;
   }
 

@@ -74,8 +74,9 @@ int main( int argc, char * argv[] )
 		bool doLLscanFlag = false;
 		bool testRapidIntegratorFlag = false;
 		bool calculateAcceptanceWeights = false;
+		bool calculateAcceptanceWeightsWithSwave = false;
 		bool calculatePerEventAcceptance = false;
-  
+
 		//Parse command line arguments
 		string currentArgument;
 		for ( int argumentIndex = 1; argumentIndex < argc; argumentIndex++ )
@@ -85,17 +86,17 @@ int main( int argc, char * argv[] )
 			if ( currentArgument == "--help" )
 			{
 					argumentIndex++;
-				
+
 				cout << "QUICK HELP FOR RAPIDFIT" << endl ;
-				
+
 				cout << endl ;
 				cout << " -f <filename>   " << endl ;
 				cout << "      Specifies the XML file to drive RapidFit " <<endl ;
-				
+
 				cout << endl ;
 				cout << " -repeats n   " << endl ;
 				cout << "      Specifies the number of repeats for a Toy study " <<endl ;
-				
+
 				cout << endl ;
 				cout << " --doLLscan <filename>  [ -numberLLscanPoints <n> ] [ -LLScanRange <r> ] " << endl ;
 				cout << "      Causes a set of LL scans to be perfomed around the fit minimum" << endl ;
@@ -106,7 +107,7 @@ int main( int argc, char * argv[] )
 				cout << "            <Output> " << endl ;
 				cout << "              <LLscan>parameterName</LLscan> " << endl ;
 				cout << "            </Output> " << endl ;
-				
+
 				cout << endl ;
 				cout << " --saveOneDataSet <filename>   " << endl ;
 				cout << "      Causes one Toy dataset to be written out to a file " <<endl ;
@@ -115,7 +116,7 @@ int main( int argc, char * argv[] )
 				cout << endl ;
 				cout << " --testIntegrator   " << endl ;
 				cout << "      Usefl feature which only tests the numerical<=>analytic integrator for each PDF then exits " <<endl ;
-				
+
 				return 1;
 
 			}
@@ -234,6 +235,10 @@ int main( int argc, char * argv[] )
 			{
 				calculateAcceptanceWeights = true;
 			}
+			else if ( currentArgument == "--calculateAcceptanceWeightsWithSwave" )
+                        {
+                                calculateAcceptanceWeights = true;
+                        }
 			else if ( currentArgument == "--calculatePerEventAcceptance" )
 			{
 				calculatePerEventAcceptance = true;
@@ -286,12 +291,12 @@ int main( int argc, char * argv[] )
 			else if ( currentArgument == "--doLLscan" )
 			{
 				doLLscanFlag = true;
-					
+
 				if ( argumentIndex + 1 < argc )
 				{
 					argumentIndex++;
 					LLscanFileName = argv[argumentIndex];
-				}				
+				}
 				else
 				{
 					cerr << "Path to LLscan plots file not specified" << endl;
@@ -360,7 +365,7 @@ int main( int argc, char * argv[] )
 		{
 			if (configFileNameFlag)
 			{
-				//Make a file containing toy data from the PDF				
+				//Make a file containing toy data from the PDF
 				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
 				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 				ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickData->GetDataSet() );
@@ -405,6 +410,25 @@ int main( int argc, char * argv[] )
         return 1;
       }
     }
+	else if (calculateAcceptanceWeightsWithSwave)
+    {
+      if (configFileNameFlag)
+      {
+        // Calculate the acceptance weights from MC
+        PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
+        pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters() );
+        IDataSet * dataSet = pdfAndData->GetDataSet();
+        IPDF * pdf = pdfAndData->GetPDF();
+        Mathematics::calculateAcceptanceWeightsWithSwave(dataSet, pdf);
+      }
+      else
+      {
+        cerr << "No data set specified" << endl;
+        return 1;
+      }
+    }
+
+
 	  else if (calculatePerEventAcceptance)
     {
       PerEventAngularAcceptance a = PerEventAngularAcceptance("jpsikmc09_loose.root","Bu2JpsiKTuple/DecayTree", "out2.root");
@@ -414,7 +438,7 @@ int main( int argc, char * argv[] )
         a.loopOnReconstructedBs();
       }
       a.writeHistos();
-    } 
+    }
 		else if (testPlotFlag)
 		{
 			if (configFileNameFlag)
@@ -476,7 +500,7 @@ int main( int argc, char * argv[] )
 			{
 				makeOutput->MakeAllPlots(plotFileName);
 			}
-			
+
 			//Pick a toy study if there are repeats, or if pull plots are wanted
 			if ( numberRepeats > 1 || doPullsFlag )
 			{
@@ -487,7 +511,7 @@ int main( int argc, char * argv[] )
 				//Output results
 				makeOutput->OutputToyResult(fitResults);
 				makeOutput->OutputFitResult( fitResults->GetFitResult(0) );
-							
+
 			}
 			else
 			{
@@ -496,24 +520,24 @@ int main( int argc, char * argv[] )
 
 				//Output results
 				makeOutput->OutputFitResult(oneResult);
-				
-				
+
+
 				//Do LL scan
 				if( doLLscanFlag ) {
 					LLscanResult * llResult ;
-					vector<LLscanResult*> scanResults ;					
+					vector<LLscanResult*> scanResults ;
 					vector<string> LLscanList = makeOutput->GetLLscanList() ;
-					
+
 					for(int ii=0; ii < LLscanList.size() ; ii++)
 					{
 						llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, LLscanRange );
 						scanResults.push_back(llResult) ;
 					}
-					
+
 					makeOutput->SetLLscanFileName(LLscanFileName);
-					makeOutput->OutputLLscanResult( scanResults ) ;				
+					makeOutput->OutputLLscanResult( scanResults ) ;
 				}
-				
+
 			}
 		}
 		else
