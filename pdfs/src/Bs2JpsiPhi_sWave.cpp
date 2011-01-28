@@ -289,6 +289,7 @@ void Bs2JpsiPhi_sWave::getTimeDependentAmplitudes(
 		cachedcosDeltaParaZero	= cos( delta_para - delta_zero );
 		cachedsinDeltaPerpS	= sin(delta_perp - delta_s);
 		cachedsinDeltaParaS	= sin(delta_para - delta_s);
+		cachedcosDeltaParaS	= cos(delta_para - delta_s);
 		cachedsinDeltaZeroS	= sin(delta_zero - delta_s);
 		cachedcosDeltaZeroS	= cos(delta_zero - delta_s);
 		cachedsinPhis = sin( Phi_s );
