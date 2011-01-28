@@ -123,7 +123,7 @@ bool Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::SetPhys
         delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
         delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
         delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
-        delta_s = allParameters.GetPhysicsParameter( delta_s )->GetValue();
+        delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue();
         omega    = allParameters.GetPhysicsParameter( mistagName )->GetValue();
         timeRes1 = allParameters.GetPhysicsParameter( timeRes1Name )->GetValue();
         timeRes2 = allParameters.GetPhysicsParameter( timeRes2Name )->GetValue();
@@ -380,9 +380,9 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 		, double & ImAparaAperp
 		, double & ReAzeroApara
 		, double & ImAzeroAperp
-		, double & ReAsAparaBbar
-                , double & ImAsAperpBbar
-                , double & ReAsAzeroBbar
+		, double & ReAsApara
+                , double & ImAsAperp
+                , double & ReAsAzero
 		, int Btype )
 {
 	// Quantities depending only on physics parameters can be cached
@@ -496,7 +496,7 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
                                             - Btype * sinDeltaParaS * cosPhis * expSinInt);
 	AsAperpInt = AsAperp * sinDeltaPerpS * (expCoshInt + cosPhis * expSinhInt
                                                         - Btype * sinPhis * expSinhInt );
-	AsAzeroInt = As*Azero * (- sinDeltaZeroS * sinPhis * expSinhInt
+	AsAzeroInt = AsAzero * (- sinDeltaZeroS * sinPhis * expSinhInt
                                                 + Btype * cosDeltaZeroS * expCosInt
                                                 - Btype * sinDeltaZeroS * cosPhis * expSinInt);
 	return;

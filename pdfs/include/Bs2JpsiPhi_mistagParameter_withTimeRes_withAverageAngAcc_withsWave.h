@@ -90,6 +90,7 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave : publi
                 double delta_zero;
                 double delta_para;
                 double delta_perp;
+		double delta_s;
                 double omega;
                 double timeRes;	 // This is the member variable used in the "builder" functions
                 double timeRes1; // These are the physics parameters varied in the fit and passed from the XML
