@@ -1,10 +1,10 @@
-// $Id: Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+// $Id: Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.cpp,v 1.0 cofitzpa
 /** @class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.cpp
  *
- *  RapidFit PDF for Bs2JpsiPhi with average angular acceptance input as a paramter
+ *  RapidFit PDF for Bs2JpsiPhi with average angular acceptance input as a paramter including s-wave component
  *
- *  @author Greig A Cowan greig.alan.cowan@cern.ch
- *  @date 2010-01-12
+ *  @author Conor Fitzpatrick
+ *  @date 2011-01-28
  */
 
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.h"
