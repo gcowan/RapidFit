@@ -33,7 +33,8 @@ OutputConfiguration::OutputConfiguration( vector< pair< string, string > > Input
     pullFileName("pullPlots.root"), 
     projectionFileName("projectionPlots.root"), 
     contourFileName("contourPlots.root"), 
-    LLscanFileName("LLscans.root"),
+    LLscanFileName("LLscanPlots.root"),
+	LLcontourFileName("LLcontourPlots.root"),
     weightedEventsWereUsed(false)
 {
 }
@@ -110,6 +111,13 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 
 
 //Make the requested output from a single result
+void OutputConfiguration::OutputLLcontourResult( vector<LLscanResult2D*> scanResults )
+{
+	ResultFormatter::MakeLLcontourPlots( scanResults, LLcontourFileName );
+}
+
+
+//Make the requested output from a single result
 void OutputConfiguration::OutputLLscanResult( vector<LLscanResult*> scanResults )
 {
 	ResultFormatter::MakeLLscanPlots( scanResults, LLscanFileName );
@@ -141,10 +149,16 @@ void OutputConfiguration::SetPullFileName( string FileName )
 	pullFileName = FileName;
 }
 
-//Set the location to store pull plots
+//Set the location to store LLscans plots
 void OutputConfiguration::SetLLscanFileName( string FileName )
 {
 	LLscanFileName = FileName;
+}
+
+//Set the location to store LLcontours plots
+void OutputConfiguration::SetLLcontourFileName( string FileName )
+{
+	LLcontourFileName = FileName;
 }
 
 //Setso that it knows that weighted events were used

@@ -260,7 +260,7 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 	}
 	else
 	{
-		Histogram->GetYaxis()->SetRangeUser(0., ymax + ymax/10.);
+		Histogram->GetYaxis()->SetRangeUser(0., ymax + ymax/3.);
 	}
 
 	TPaveText *lhcb7TeVPrelimR = new TPaveText(0.65, 

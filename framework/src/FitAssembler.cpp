@@ -97,25 +97,15 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 
-//Create the physics bottle with pre-made data
+
+//====================================================================================================
+//Do a likelihood scan
 LLscanResult * FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,
-		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, string scanName, int noneside, double oneSideRange )
+		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, string scanName, int npoints, double uplim, double lolim )
 {
 	
 	cout << "Performing LL scan for parameter " << scanName << endl ;
 	
-	// Do the first (central value) fit
-	FitResult * centralResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData , BottleConstraints );
-
-	// Get the central fit results
-	ResultParameterSet * centralParameterSet = centralResult->GetResultParameterSet() ;
-		
-	// Get the fit central fit value and error of the parameter to be scanned
-	ResultParameter * centralScanParameter = centralParameterSet->GetResultParameter( scanName ) ;
-	double centralValue = centralScanParameter->GetValue() ;
-	double error = centralScanParameter->GetError() ;
-	double llmin = centralResult->GetMinimumValue() ;
-
 	// Get a pointer to the physics parameter to be scanned and fix it	
 	// CAREFUL:  this must be reset as it was at the end.
 	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName) ;
@@ -126,25 +116,30 @@ LLscanResult * FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, F
 	// Need to set up a loop , fixing the scan parameter at each point
 	vector<double> scanParameterValues ;
 	vector<double> scanLLValues ;
-	double range = oneSideRange*2.;
-	int npoints = 2*noneside+1 ;
-	double deltaScan = range * error / (npoints-1.) ;
+	double deltaScan = (uplim - lolim) / (npoints-1.) ;
 		
 	for( int si=0; si<npoints; si++) {
 			
 		// Set scan parameter value
-		double scanVal = centralValue + (-noneside+si)*deltaScan ;
+		double scanVal = lolim + si*deltaScan ;
 		scanParameter->SetBlindedValue( scanVal ) ;
 		
 		// Do a scan point fit
 		FitResult * scanStepResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
-		
+					
 		scanParameterValues.push_back( scanVal ) ;
-		scanLLValues.push_back( scanStepResult->GetMinimumValue() );
+		if( scanStepResult->GetFitStatus() == 3 ) 
+		{
+			scanLLValues.push_back( scanStepResult->GetMinimumValue() );
+		}
+		else{
+			scanLLValues.push_back( LLSCAN_FIT_FAILURE_VALUE );
+		}			
+	
 	}
 
-	LLscanResult * result = new LLscanResult( scanName, centralValue, error, llmin, scanParameterValues, scanLLValues ) ;
-			
+	LLscanResult * result = new LLscanResult( scanName, scanParameterValues, scanLLValues ) ;
+	result->print() ; //PELC		
 	
 	//Reset the parameter as it was
 	scanParameter->SetType( originalType ) ;
@@ -153,3 +148,54 @@ LLscanResult * FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, F
 	return result;
 								
 }
+
+
+//===========================================================================================
+//Do a double likelihood scan
+LLscanResult2D * FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,
+									vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, 
+									string scanName, string scanName2, int npoints, double uplim, double lolim,  double uplim2, double lolim2 )
+{
+	
+	cout << "Performing LL scan for parameters " << scanName << "  and  " << scanName2 << endl ;
+	
+	// Get a pointer to the physics parameter to be scanned and fix it	
+	// CAREFUL:  this must be reset as it was at the end.
+	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName) ;
+	double originalValue = scanParameter->GetBlindedValue( ) ;
+	string originalType = scanParameter->GetType( ) ;
+	scanParameter->SetType( "Fixed" ) ;
+	
+	// Need to set up a loop , fixing the scan parameter at each point
+	vector<double> scanParameterValues ;
+	vector<LLscanResult*> listOfLLscans ;
+	double deltaScan = (uplim-lolim) / (npoints-1.) ;
+	
+	for( int si=0; si<npoints; si++) {
+		
+		// Set scan parameter value
+		double scanVal = lolim + si*deltaScan ;
+		scanParameter->SetBlindedValue( scanVal ) ;
+		
+		// Do a scan point fit
+		LLscanResult * oneScan = FitAssembler::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, scanName2, npoints, uplim2, lolim2 );
+		
+		scanParameterValues.push_back( scanVal ) ;
+		listOfLLscans.push_back( oneScan );
+		
+	}
+	
+	//To create theresult object, we need to get a list of the scan parameters for scan name 2
+	vector<double> scanParameterValues2 ;
+	if( npoints > 0 ) scanParameterValues2 = listOfLLscans[0]->GetParameterValues();
+	
+	LLscanResult2D * result = new LLscanResult2D( scanName, scanParameterValues, scanName2, scanParameterValues2, listOfLLscans ) ;
+	
+	//Reset the parameter as it was
+	scanParameter->SetType( originalType ) ;
+	scanParameter->SetBlindedValue( originalValue ) ;
+	
+	return result;
+	
+}
+

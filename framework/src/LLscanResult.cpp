@@ -22,14 +22,42 @@ LLscanResult::LLscanResult()
 }
 
 //Main constructor
-LLscanResult::LLscanResult( string _parameterName, double _centralParameterValue, double _parameterError, double _llmin, vector<double> _parameterValues, vector<double> _llvalues  ):
+LLscanResult::LLscanResult( string _parameterName, vector<double> _parameterValues, vector<double> _llvalues  ):
 	parameterName(_parameterName) ,
-	centralParameterValue( _centralParameterValue ),
-	parameterError( _parameterError ),
-	llmin(_llmin ),
 	parameterValues(_parameterValues),
 	llvalues(_llvalues)
 {
+	// Reality check
+	if( llvalues.size() != parameterValues.size() ) 
+	{
+		cout << endl << "In LLscanResult.print() llvalues.size()" << llvalues.size() << "  != parameterValues.size() " <<  parameterValues.size() << endl ;
+		exit(1);
+	}
+		
+	// Initialise llmin to a "safe"  large value. This is the only way to do it 
+	llmin = 0;
+	for( int i=0; i < llvalues.size() ;i++ ) { if( llvalues[i] > llmin ) llmin = llvalues[i] ; }
+
+	// Now find the minimum value in llvalues and set llmin to hold it.
+	for( int i=0; i < llvalues.size() ;i++ )
+	{
+		if( (llvalues[i] < llmin) && (llvalues[i] != LLSCAN_FIT_FAILURE_VALUE ) ) {
+			llmin = llvalues[i] ;
+		}
+	}
+	
+	//Create llvalues_offset (i.e. offset to the minimum )
+	for(int i=0; i < llvalues.size(); i++ )
+	{		
+		if( llvalues[i] == LLSCAN_FIT_FAILURE_VALUE ) {
+			llvalues_offset.push_back( 0. ) ;
+		}
+		else
+		{
+			llvalues_offset.push_back( llvalues[i] - llmin ) ;
+		}
+	}
+	
 }
 
 //Destructor
@@ -37,40 +65,34 @@ LLscanResult::~LLscanResult()
 {
 }
 
-
 //General Print Method
 void LLscanResult::print()
 {
-	cout << endl << "LL scan results for parameter: " << parameterName <<  "   Central param value = " << centralParameterValue <<  endl ;
+	cout << endl << "LL scan results for parameter: " << parameterName << endl ;
+
 	for( int i =0; i < llvalues.size() ; i++ ) {
-		cout << setprecision(3) << "  " << parameterValues[i] << "      "<< llvalues[i]-llmin << endl ;
+		cout << setprecision(3) << "  " << parameterValues[i] << "      "<< llvalues_offset[i] << endl ;
 	}
 }
 
 //Return scanned parameter values
 vector<double> LLscanResult::GetParameterValues() { return parameterValues ; }
 
-//Return LL values offset to zero
-vector<double> LLscanResult::GetLLvalues() { 
-	vector<double> offsetLL ;
-	for(int ii=0; ii < llvalues.size(); ii++ )
-	{
-		offsetLL.push_back( llvalues[ii] - llmin ) ;
-	}
-	return offsetLL ; 
-}
+//Return raw LLscan values (i.e. without offset central value
+vector<double> LLscanResult::GetRawLLvalues() { return llvalues ; }
 
+//Return LL values offset to zero at the central value point
+vector<double> LLscanResult::GetLLvalues() { return llvalues_offset ; } 
 
-
+//Return a graph of the llscan
 TGraph * LLscanResult::GetGraph() 
 {
-	
 	double pvs[parameterValues.size()] ;
 	double llvs[parameterValues.size()] ;
 	double llmax = 0 ;	
 	for( int i=0; i< parameterValues.size() ; i++ ){
 		pvs[i] = parameterValues[i] ;
-		llvs[i] =  llvalues[i] - llmin ;
+		llvs[i] = llvalues_offset[i] ;
 		if( llvs[i] > llmax ) llmax = llvs[i] ;
 	}	
 

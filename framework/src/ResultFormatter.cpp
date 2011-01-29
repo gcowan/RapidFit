@@ -16,6 +16,7 @@
 #include <sstream>
 #include <iomanip>
 #include "TH1F.h"
+#include "TH2D.h"
 #include "StatisticsFunctions.h"
 #include <math.h>
 #include "EdStyle.h"
@@ -336,6 +337,9 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "\\begin{tabular}{|c|c|} \n\\hline" << endl;
 	cout << "Parameter & Fit result and error  \\\\ \\hline \\hline" << endl;
 
+	//Will need to do some comparisons
+	double Rperp =0 , Rzp =0, ePerp =0 , eZp=0;
+	
 	//Ouput each parameter
 	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
 	{
@@ -352,10 +356,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		<< setw(10) <<  		  fitError << "\\\\" << endl;
 	}
 	cout << "\\hline \n\\end{tabular}" << endl;
-	cout << "\\end{center}\n" << endl;
-
-
-
+	cout << "\\end{center}\n" << endl;	
 }
 
 /*string ResultFormatter::FindAndReplaceString( string name )
@@ -504,25 +505,48 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 	int nscans = scanResults.size() ;
 
 	//Make a canvas for all the plots
-	TCanvas cv ;
+	//TCanvas cv ;
 
 	for( int ii=0; ii<nscans; ii++ )
 	{
 		//scanResults[ii]->print() ;
-		cv.SetGrid();
-		cv.GetFrame()->SetFillColor(21);
-		cv.GetFrame()->SetBorderSize(12);
+		//cv.SetGrid();
+		//cv.GetFrame()->SetFillColor(21);
+		//cv.GetFrame()->SetBorderSize(12);
 
 		//cv.cd(ii+1) ;
 		TGraph * grnew = scanResults[ii]->GetGraph() ;
 		grnew->Draw("ALP") ;
-		cv.Update();
-		cv.Write();
+		grnew->Draw() ;
+		//cv.Update();
+		//cv.Write();
 
 	}
 
 	LLscanFile->Close();
 
 }
+	
+//.........................................
+// Send LL contour results to a file
 
+void ResultFormatter::MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename )
+{	
+	// 1=BLACK    4=BLUE    3=GREEN     5=YELLOW
+	
+	TFile * LLcontourFile = new TFile( filename.c_str(), "RECREATE");
+	
+	//Set some numbers
+	int nscans = scanResults.size() ;
+	
+	for( int ii=0; ii<nscans; ii++ )
+	{
+		TH2D * hist = scanResults[ii]->GetTH2D() ;
+		hist->Draw("cont1") ;
+		hist->Write();		
+	}
+	
+	LLcontourFile->Close();
+	
+}
 

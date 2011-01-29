@@ -8,18 +8,18 @@
 */
 
 #include "ClassLookUp.h"
-#include "Bs2JpsiPhi.h"
+
 #include "Bs2JpsiPhi_mistagObservable.h"
 #include "Bs2JpsiPhi_mistagObservable_withTimeRes.h"
 #include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
 #include "Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h"
-#include "Bs2JpsiPhi_sWave.h"
-#include "Bs2JpsiPhi_mistagParameter.h"
-#include "Bs2JpsiPhi_mistagParameter_withTimeRes.h"
+#include "Bs2JpsiPhi_mistagObservable_alt.h"
+
 
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h"
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.h"
 #include "Bs2JpsiPhi_mistagParameter_alt.h"
+#include "Bs2JpsiPhi_mistagParameter_Swave_alt.h"
 #include "Bs2JpsiPhiMassSignal.h"
 
 #include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc.h"
@@ -33,10 +33,13 @@
 
 #include "Bs2JpsiPhiLongLivedBkg.h"
 #include "Bs2JpsiPhiLongLivedBkg_withTimeRes.h"
-#include "Bs2JpsiPhiPromptBkg.h"
+#include "Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist.h"
+
 #include "Bs2JpsiPhiPromptBkg_withTimeRes.h"
 #include "Bs2JpsiPhiPromptBkg_withTimeResDouble.h"
+#include "Bs2JpsiPhiPromptBkg_tripleGaussian.h"
 #include "Bs2JpsiPhiMassBkg.h"
+#include "Bs2JpsiPhiMassBkgLL.h"
 
 #include "MinuitWrapper.h"
 #include "Minuit2Wrapper.h"
@@ -56,7 +59,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagObservable();
         }
-	else if ( Name == "Bs2JpsiPhi_mistagObservable_withTimeRes" )
+		else if ( Name == "Bs2JpsiPhi_mistagObservable_withTimeRes" )
         {
                 // Bs2JPsiPhi with analytic double gaussian time resolution
                 return new Bs2JpsiPhi_mistagObservable_withTimeRes();
@@ -71,31 +74,30 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
                 //JpsiPhi with angular acceptance fed in as fixed physics parameters
                 return new Bs2JpsiPhi_mistagObservable_withAverageAngAcc();
         }
-	else if ( Name == "Bs2JpsiPhi_mistagParameter" )
+		else if ( Name == "Bs2JpsiPhi_mistagObservable_alt" )
         {
-	        //Default JPsiPhi with mistag as a physics parameter
-	        return new Bs2JpsiPhi_mistagParameter();
+	        //JPsiPhi from Pete with mistag as a physics observable  
+	        return new Bs2JpsiPhi_mistagObservable_alt();
         }
-	else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes" )
+		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
         {
-	        //Default JPsiPhi with mistag as physics parameter and time res on
-	        return new Bs2JpsiPhi_mistagParameter_withTimeRes();
-        }
-
-	else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
-        {
-	        //Default JPsiPhi with mistag as physics parameter, average ang acc and time res on
+	        //Default JPsiPhi 
 	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc();
         }
-	else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave" )
+		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave" )
         {
-	        //Default JPsiPhi with mistag as physics parameter, average ang acc and time res on
+	        //Default JPsiPhi with s wave
 	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave();
         }
-	else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
+		else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
         {
-	        //JPsiPhi from Pete with mistag as a physics paramter and single gaussian time res
+	        //JPsiPhi from Pete  
 	        return new Bs2JpsiPhi_mistagParameter_alt();
+        }
+		else if ( Name == "Bs2JpsiPhi_mistagParameter_Swave_alt" )
+        {
+	        //JPsiPhi from Pete with sWave 
+	        return new Bs2JpsiPhi_mistagParameter_Swave_alt();
         }
         else if ( Name == "Bs2PhiPhi" )
         {
@@ -142,12 +144,10 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
                 //Long lived background for JPsiPhi with time resolution (convolved gaussian)
                 return new Bs2JpsiPhiLongLivedBkg_withTimeRes();
         }
-        else if ( Name == "Bs2JpsiPhiPromptBkg" )
+        else if ( Name == "Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist" )
         {
-        	// This one does not work at the moment. Use time resolution.
-		cerr << "This one does not work at the moment. Use time resolution" << endl;
-		exit(1);
-	        //return new Bs2JpsiPhiPromptBkg();
+			//Long lived background for JPsiPhi with time resolution (convolved gaussian)
+			return new Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist();
         }
         else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeRes" )
         {
@@ -159,16 +159,21 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //Prompt background for JPsiPhi, with time resolution (double convolved gaussian)
 			return new Bs2JpsiPhiPromptBkg_withTimeResDouble();
         }
-		else if ( Name == "Bs2JpsiPhi_sWave" )
+        else if ( Name == "Bs2JpsiPhiPromptBkg_tripleGaussian" )
         {
-	        //JPsiPhi signal PDF including the s-wave contribution
-                return new Bs2JpsiPhi_sWave();
+	        //Prompt background for JPsiPhi, with time resolution (double convolved gaussian)
+			return new Bs2JpsiPhiPromptBkg_tripleGaussian();
         }
         else if ( Name == "Bs2JpsiPhiMassBkg" )
         {
                 //Default JPsiPhi prompt bkg mass signal
                 return new Bs2JpsiPhiMassBkg();
-	}
+		}
+        else if ( Name == "Bs2JpsiPhiMassBkgLL" )
+        {
+			//Default JPsiPhi prompt bkg mass signal
+			return new Bs2JpsiPhiMassBkgLL();
+		}
 
 	else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc" )
         {

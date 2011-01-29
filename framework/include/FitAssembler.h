@@ -12,6 +12,7 @@
 #define FIT_ASSEMBLER_H
 
 #include "LLscanResult.h"
+#include "LLscanResult2D.h"
 #include "FitResult.h"
 #include "IMinimiser.h"
 #include "FitFunctionConfiguration.h"
@@ -29,7 +30,8 @@ class FitAssembler
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle* );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* > );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< IPDF* >, vector< IDataSet* >, vector< ConstraintFunction* > );
-		static LLscanResult * DoScan( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, string, int, double );
+		static LLscanResult * DoScan( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, string, int, double, double );
+		static LLscanResult2D * DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, string, string, int, double, double, double, double );
 
 };
 

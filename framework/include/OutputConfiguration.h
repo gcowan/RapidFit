@@ -10,6 +10,7 @@
 #define OUTPUT_CONFIGURATION_H
 
 #include "LLscanResult.h"
+#include "LLscanResult2D.h"
 #include "ToyStudyResult.h"
 #include <vector>
 #include <string>
@@ -32,6 +33,7 @@ class OutputConfiguration
 		//Make output requested
 		void OutputFitResult( FitResult* );
 		void OutputLLscanResult( vector<LLscanResult*>  );
+		void OutputLLcontourResult( vector<LLscanResult2D*>  );
 		void OutputToyResult( ToyStudyResult* );
 
 		//Change the configuration
@@ -39,6 +41,7 @@ class OutputConfiguration
 		void SetPullFileName(string);
 		void SetContourFileName(string);
 		void SetLLscanFileName(string);
+		void SetLLcontourFileName(string);
 		void SetWeightsWereUsed( string ) ;
 
 	private:
@@ -48,7 +51,7 @@ class OutputConfiguration
 		bool makeAllPlots;
 		bool weightedEventsWereUsed ;
 		string weightName ;
-		string LLscanFileName, pullFileName, projectionFileName, contourFileName, pullType;
+		string LLcontourFileName, LLscanFileName, pullFileName, projectionFileName, contourFileName, pullType;
 };
 
 #endif

@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/01/29 Pete Clarke
+  - Big commit of 
+      - New PDFs with Swave and background with triple gaussian
+      - removed some old J/PsiPhi PDFs
+      - LL countour code
+ - Also Conor added an S wave PDF just before this.
+
 2010/12/06 Pete Clarke and Rob Currie
   - Pete added new code to make the Plotter work for doing projections of weighted events
   - Rob added code in DataSetConfiguration to deal with Float_t or Double_t Ntuples

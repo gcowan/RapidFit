@@ -102,7 +102,7 @@ double PhysicsParameter::GetTrueValue()
 {
 	if( toBeBlinded ) 
 	{
-		return value + blindOffset;
+		return value + blindOffset;   
 	}
 	else return value ;
 }
@@ -111,7 +111,7 @@ void PhysicsParameter::SetTrueValue(double NewValue)
 {
 	if( toBeBlinded ) 
 	{
-		value = NewValue - blindOffset;
+		value = NewValue - blindOffset;   
 	}
 	else value = NewValue ;	
 }

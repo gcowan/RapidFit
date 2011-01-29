@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhi_mistagParameter_alt.h,v 1.1 2009/12/06  Pete Clarke Exp $
-/** @class Bs2JpsiPhi_mistagParameter_alt RaPDF_.h
+// $Id: Bs2JpsiPhi_mistagObservable_alt.h,v 1.1 2009/12/06  Pete Clarke Exp $
+/** @class Bs2JpsiPhi_mistagObservable_alt RaPDF_.h
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
@@ -7,17 +7,17 @@
  *  @date 2009-12-06
  */
 
-#ifndef Bs2JpsiPhi_mistagParameter_alt_H
-#define Bs2JpsiPhi_mistagParameter_alt_H
+#ifndef Bs2JpsiPhi_mistagObservable_alt_H
+#define Bs2JpsiPhi_mistagObservable_alt_H
 
 #include "BasePDF.h"
 #include "RooComplex.h"
 
-class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
+class Bs2JpsiPhi_mistagObservable_alt : public BasePDF
 {
 	public:
-		Bs2JpsiPhi_mistagParameter_alt();
-		~Bs2JpsiPhi_mistagParameter_alt();
+		Bs2JpsiPhi_mistagObservable_alt();
+		~Bs2JpsiPhi_mistagObservable_alt();
 
 		//Mandatory method to evaluate the PDF value:
 		virtual double Evaluate(DataPoint*);
@@ -77,6 +77,7 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 		double phi_tr ;
 		double ctheta_1 ;
 		int tag ;
+		double tagFraction ;
 	
 		// Physics Fit Parameters 
 		double gamma_in ;
@@ -93,7 +94,6 @@ class Bs2JpsiPhi_mistagParameter_alt : public BasePDF
 		double phi_s ;
 	
 		// Other experimental parameters
-		double tagFraction ;
 		double resolution ;
 		double resolution1 ;
 		double resolution2 ;

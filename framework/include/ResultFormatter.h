@@ -16,6 +16,7 @@
 #include "FitResult.h"
 #include "ToyStudyResult.h"
 #include "LLscanResult.h"
+#include "LLscanResult2D.h"
 
 using namespace std;
 
@@ -35,6 +36,7 @@ class ResultFormatter
 		static void FlatNTuplePullPlots( string, ToyStudyResult* );
 		static void SeparateParameterPullPlots( string, ToyStudyResult* );
 		static void MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename ); 
+		static void MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename ); 
 };
 
 #endif
