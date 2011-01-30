@@ -558,8 +558,8 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASAP( ) const
 	
 	double delta = delta_para - delta_s ;
 	double result = 
-	q() * 2.0  * ( sin(delta)*expCos( ) - cos(delta)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)
-	- 1.0 * ( expH( ) - expL( ) ) * cos(delta) * sin(phi_s)  ;
+	q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)
+	- 1.0 * ( expH( ) - expL( ) ) * sin(delta) * sin(phi_s)  ;
 	
 	return result ;
 } ;
@@ -572,8 +572,8 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASAPInt( ) const
 	double delta = delta_para - delta_s ;
 
 	double result = 
-	q() * 2.0  * ( sin(delta)*intExpCos() - cos(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
-	- 1.0 * ( intExpH() - intExpL() ) * cos(delta) * sin(phi_s) ;	    
+	q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
+	- 1.0 * ( intExpH() - intExpL() ) * sin(delta) * sin(phi_s) ;	    
 	return result ;
 } ;
 
@@ -582,13 +582,13 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASAPInt( ) const
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImASAT( )  const
 {
 	//if( t < 0.0 ) return 0.0 ;
-	double result = cos(delta_perp-delta_s) * this->timeFactorOdd(  ) ;
+	double result = sin(delta_perp-delta_s) * this->timeFactorOdd(  ) ;
 	return result ;
 } ;
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImASATInt( ) const
 {
-	double result = cos(delta_perp-delta_s) * this->timeFactorOddInt( ) ;
+	double result = sin(delta_perp-delta_s) * this->timeFactorOddInt( ) ;
 	return result ;
 } ;
 
@@ -600,8 +600,8 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASA0( ) const
 	
 	double delta = delta_zero - delta_s ;
 	double result = 
-	q() * 2.0  * ( sin(delta)*expCos( ) - cos(delta)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)
-	- 1.0 * ( expH( ) - expL( ) ) * cos(delta) * sin(phi_s)  ;
+	q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)
+	- 1.0 * ( expH( ) - expL( ) ) * sin(delta) * sin(phi_s)  ;
 	
 	return result ;
 } ;
@@ -614,8 +614,8 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASA0Int( ) const
 	double delta = delta_zero - delta_s ;
 	
 	double result = 
-	q() * 2.0  * ( sin(delta)*intExpCos() - cos(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
-	- 1.0 * ( intExpH() - intExpL() ) * cos(delta) * sin(phi_s) ;	    
+	q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
+	- 1.0 * ( intExpH() - intExpL() ) * sin(delta) * sin(phi_s) ;	    
 	return result ;
 } ;
 
