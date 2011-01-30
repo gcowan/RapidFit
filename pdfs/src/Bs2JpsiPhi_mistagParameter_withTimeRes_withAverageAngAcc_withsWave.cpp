@@ -402,17 +402,24 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 	//cout << gamma << " " << deltaGamma << " " << Azero_sq << " " << Aperp_sq << endl;
 	//cout << cachedExpCosh << " " << cachedExpSinh << " " << cachedExpCos << " " << cachedExpSin << endl;
 	// Now calculate the amplitudes
-	AzeroAzero = Azero_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
-	AparaApara = Apara_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
-	AperpAperp = Aperp_sq * ( cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin );
-	AsAs       = As_sq    * ( cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin );
+	double cachedSinPhisExpSinh = cachedSinPhis * cachedExpSinh;
+	double cachedCosPhisExpSinh = cachedCosPhis * cachedExpSinh;
+	double cachedSinPhisExpSin = cachedSinPhis * cachedExpSin;
+	double cachedCosPhisExpSin = cachedCosPhis * cachedExpSin;
+	double Amp1 = cachedExpCosh - cachedCosPhisExpSinh + Btype * cachedSinPhisExpSin;
+	double Amp2 = cachedExpCosh + cachedCosPhisExpSinh - Btype * cachedSinPhisExpSin;
 
-	ImAparaAperp = AparaAperp * ( - cachedCosDeltaPerpPara * cachedSinPhis * cachedExpSinh + Btype * cachedSinDeltaPerpPara * cachedExpCos - Btype * cachedCosDeltaPerpPara * cachedCosPhis * cachedExpSin );
-	ReAzeroApara = AzeroApara * cachedCosDeltaPara * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
-	ImAzeroAperp = AzeroAperp * ( - cachedCosDeltaPerp * cachedSinPhis * cachedExpSinh + Btype * cachedSinDeltaPerp * cachedExpCos - Btype * cachedCosDeltaPerp * cachedCosPhis * cachedExpSin );
-	ReAsApara = AsApara * (- cachedSinDeltaParaS * cachedSinPhis * cachedExpSinh + Btype * cachedCosDeltaParaS * cachedExpCos - Btype * cachedSinDeltaParaS * cachedCosPhis * cachedExpSin );
-	ImAsAperp = AsAperp * cachedSinDeltaPerpS * (cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin );
-	ReAsAzero = AsAzero * (- cachedSinDeltaZeroS * cachedSinPhis * cachedExpSinh + Btype * cachedCosDeltaZeroS * cachedExpCos - Btype * cachedSinDeltaZeroS * cachedCosPhis*  cachedExpSin );
+	AzeroAzero = Azero_sq * Amp1;
+	AparaApara = Apara_sq * Amp1;
+	AperpAperp = Aperp_sq * Amp2;
+	AsAs       = As_sq    * Amp2;
+	ImAparaAperp = AparaAperp * ( - cachedCosDeltaPerpPara * cachedSinPhisExpSinh + Btype * cachedSinDeltaPerpPara * cachedExpCos - Btype * cachedCosDeltaPerpPara * cachedCosPhisExpSin);
+	ImAzeroAperp = AzeroAperp * ( - cachedCosDeltaPerp     * cachedSinPhisExpSinh + Btype * cachedSinDeltaPerp     * cachedExpCos - Btype * cachedCosDeltaPerp     * cachedCosPhisExpSin);
+	ReAsApara = AsApara *       ( - cachedSinDeltaParaS    * cachedSinPhisExpSinh + Btype * cachedCosDeltaParaS    * cachedExpCos - Btype * cachedSinDeltaParaS    * cachedCosPhisExpSin);
+	ReAsAzero = AsAzero *       ( - cachedSinDeltaZeroS    * cachedSinPhisExpSinh + Btype * cachedCosDeltaZeroS    * cachedExpCos - Btype * cachedSinDeltaZeroS    * cachedCosPhisExpSin);
+	ReAzeroApara = AzeroApara * cachedCosDeltaPara  * Amp1;
+	ImAsAperp = AsAperp       * cachedSinDeltaPerpS * Amp2;
+
 	return;
 }
 
@@ -435,17 +442,23 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 	double expSinInt  = Mathematics::ExpSinInt(  tlow, thigh, gamma, deltaMs, timeRes );
 	double expCosInt  = Mathematics::ExpCosInt(  tlow, thigh, gamma, deltaMs, timeRes );
 
-	AzeroAzeroInt = Azero_sq * ( expCoshInt - cachedCosPhis * expSinhInt + Btype * cachedSinPhis * expSinInt );
-	AparaAparaInt = Apara_sq * ( expCoshInt - cachedCosPhis * expSinhInt + Btype * cachedSinPhis * expSinInt );
-	AperpAperpInt = Aperp_sq * ( expCoshInt + cachedCosPhis * expSinhInt - Btype * cachedSinPhis * expSinInt );
-	AsAsInt       = As_sq    * ( expCoshInt + cachedCosPhis * expSinhInt - Btype * cachedSinPhis * expSinInt );
-	
-	AparaAperpInt = AparaAperp * ( -cachedCosDeltaPerpPara * cachedSinPhis * expSinhInt + Btype * cachedSinDeltaPerpPara * expCosInt - Btype * cachedCosDeltaPerpPara * cachedCosPhis * expSinInt);
-	AzeroAparaInt = AzeroApara * cachedCosDeltaPara * ( expCoshInt - cachedCosPhis * expSinhInt + Btype * cachedSinPhis * expSinInt);
-	AzeroAperpInt = AzeroAperp * ( -cachedCosDeltaPerp * cachedSinPhis * expSinhInt + Btype * cachedSinDeltaPerp * expCosInt - Btype * cachedCosDeltaPerp * cachedCosPhis * expSinInt);
-	AsAparaInt = AsApara * (- cachedSinDeltaParaS * cachedSinPhis * expSinInt + Btype * cachedCosDeltaParaS * expCosInt - Btype * cachedSinDeltaParaS * cachedCosPhis * expSinInt);
-	AsAperpInt = AsAperp * cachedSinDeltaPerpS * (expCoshInt + cachedCosPhis * expSinhInt - Btype * cachedSinPhis * expSinhInt );
-	AsAzeroInt = AsAzero * (- cachedSinDeltaZeroS * cachedSinPhis * expSinhInt + Btype * cachedCosDeltaZeroS * expCosInt - Btype * cachedSinDeltaZeroS * cachedCosPhis * expSinInt);
+	double cachedSinPhisExpSinhInt = cachedSinPhis * expSinhInt;
+        double cachedCosPhisExpSinhInt = cachedCosPhis * expSinhInt;
+        double cachedSinPhisExpSinInt = cachedSinPhis * expSinInt;
+        double cachedCosPhisExpSinInt = cachedCosPhis * expSinInt;
+	double Int1 = expCoshInt - cachedCosPhisExpSinhInt + Btype * cachedSinPhisExpSinInt;
+	double Int2 = expCoshInt + cachedCosPhisExpSinhInt - Btype * cachedSinPhisExpSinInt;
+
+	AzeroAzeroInt = Azero_sq * Int1;
+	AparaAparaInt = Apara_sq * Int1;
+	AperpAperpInt = Aperp_sq * Int2;
+	AsAsInt       = As_sq    * Int2;	
+	AparaAperpInt = AparaAperp * ( -cachedCosDeltaPerpPara * cachedSinPhisExpSinhInt + Btype * cachedSinDeltaPerpPara * expCosInt - Btype * cachedCosDeltaPerpPara * cachedCosPhisExpSinInt);
+	AzeroAperpInt = AzeroAperp * ( -cachedCosDeltaPerp     * cachedSinPhisExpSinhInt + Btype * cachedSinDeltaPerp     * expCosInt - Btype * cachedCosDeltaPerp     * cachedCosPhisExpSinInt);
+	AsAparaInt = AsApara       * ( -cachedSinDeltaParaS    * cachedSinPhisExpSinhInt + Btype * cachedCosDeltaParaS    * expCosInt - Btype * cachedSinDeltaParaS    * cachedCosPhisExpSinInt);
+	AsAzeroInt = AsAzero       * ( -cachedSinDeltaZeroS    * cachedSinPhisExpSinhInt + Btype * cachedCosDeltaZeroS    * expCosInt - Btype * cachedSinDeltaZeroS    * cachedCosPhisExpSinInt);
+	AzeroAparaInt = AzeroApara * cachedCosDeltaPara  * Int1;
+	AsAperpInt = AsAperp       * cachedSinDeltaPerpS * Int2;
 	return;
 }
 
