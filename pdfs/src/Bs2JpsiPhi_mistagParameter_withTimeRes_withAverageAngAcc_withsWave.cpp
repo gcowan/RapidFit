@@ -143,7 +143,11 @@ bool Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::SetPhys
 	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
 
 	Apara_sq = 1 - Azero_sq - Aperp_sq - As_sq;
-	if ( Apara_sq < 0.) return false;
+
+	if ( Apara_sq < 0.){
+	cerr << "Warning! Sum of A_para + A_perp + As_sq + Azero_sq is > 1! Remainder: " << -Apara_sq << endl;
+	return false;
+	}
 	AparaAperp = sqrt(Apara_sq)*sqrt(Aperp_sq);
 	AzeroApara = sqrt(Azero_sq)*sqrt(Apara_sq);
 	AzeroAperp = sqrt(Azero_sq)*sqrt(Aperp_sq);
@@ -409,17 +413,16 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 	double Amp1 = cachedExpCosh - cachedCosPhisExpSinh + Btype * cachedSinPhisExpSin;
 	double Amp2 = cachedExpCosh + cachedCosPhisExpSinh - Btype * cachedSinPhisExpSin;
 
-	AzeroAzero = Azero_sq * Amp1;
-	AparaApara = Apara_sq * Amp1;
-	AperpAperp = Aperp_sq * Amp2;
-	AsAs       = As_sq    * Amp2;
+	AzeroAzero   = Azero_sq   * Amp1;
+	AparaApara   = Apara_sq   * Amp1;
+	AperpAperp   = Aperp_sq   * Amp2;
 	ImAparaAperp = AparaAperp * ( - cachedCosDeltaPerpPara * cachedSinPhisExpSinh + Btype * cachedSinDeltaPerpPara * cachedExpCos - Btype * cachedCosDeltaPerpPara * cachedCosPhisExpSin);
-	ImAzeroAperp = AzeroAperp * ( - cachedCosDeltaPerp     * cachedSinPhisExpSinh + Btype * cachedSinDeltaPerp     * cachedExpCos - Btype * cachedCosDeltaPerp     * cachedCosPhisExpSin);
-	ReAsApara = AsApara *       ( - cachedSinDeltaParaS    * cachedSinPhisExpSinh + Btype * cachedCosDeltaParaS    * cachedExpCos - Btype * cachedSinDeltaParaS    * cachedCosPhisExpSin);
-	ReAsAzero = AsAzero *       ( - cachedSinDeltaZeroS    * cachedSinPhisExpSinh + Btype * cachedCosDeltaZeroS    * cachedExpCos - Btype * cachedSinDeltaZeroS    * cachedCosPhisExpSin);
 	ReAzeroApara = AzeroApara * cachedCosDeltaPara  * Amp1;
-	ImAsAperp = AsAperp       * cachedSinDeltaPerpS * Amp2;
-
+	ImAzeroAperp = AzeroAperp * ( - cachedCosDeltaPerp     * cachedSinPhisExpSinh + Btype * cachedSinDeltaPerp     * cachedExpCos - Btype * cachedCosDeltaPerp     * cachedCosPhisExpSin);
+	AsAs         = As_sq      * Amp2;
+	ReAsApara    = AsApara    * ( - cachedSinDeltaParaS    * cachedSinPhisExpSinh + Btype * cachedCosDeltaParaS    * cachedExpCos - Btype * cachedSinDeltaParaS    * cachedCosPhisExpSin);
+	ImAsAperp    = AsAperp    * cachedSinDeltaPerpS * Amp2;
+	ReAsAzero    = AsAzero    * ( - cachedSinDeltaZeroS    * cachedSinPhisExpSinh + Btype * cachedCosDeltaZeroS    * cachedExpCos - Btype * cachedSinDeltaZeroS    * cachedCosPhisExpSin);
 	return;
 }
 
@@ -452,13 +455,15 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 	AzeroAzeroInt = Azero_sq * Int1;
 	AparaAparaInt = Apara_sq * Int1;
 	AperpAperpInt = Aperp_sq * Int2;
-	AsAsInt       = As_sq    * Int2;	
 	AparaAperpInt = AparaAperp * ( -cachedCosDeltaPerpPara * cachedSinPhisExpSinhInt + Btype * cachedSinDeltaPerpPara * expCosInt - Btype * cachedCosDeltaPerpPara * cachedCosPhisExpSinInt);
-	AzeroAperpInt = AzeroAperp * ( -cachedCosDeltaPerp     * cachedSinPhisExpSinhInt + Btype * cachedSinDeltaPerp     * expCosInt - Btype * cachedCosDeltaPerp     * cachedCosPhisExpSinInt);
-	AsAparaInt = AsApara       * ( -cachedSinDeltaParaS    * cachedSinPhisExpSinhInt + Btype * cachedCosDeltaParaS    * expCosInt - Btype * cachedSinDeltaParaS    * cachedCosPhisExpSinInt);
-	AsAzeroInt = AsAzero       * ( -cachedSinDeltaZeroS    * cachedSinPhisExpSinhInt + Btype * cachedCosDeltaZeroS    * expCosInt - Btype * cachedSinDeltaZeroS    * cachedCosPhisExpSinInt);
 	AzeroAparaInt = AzeroApara * cachedCosDeltaPara  * Int1;
+	AzeroAperpInt = AzeroAperp * ( -cachedCosDeltaPerp     * cachedSinPhisExpSinhInt + Btype * cachedSinDeltaPerp     * expCosInt - Btype * cachedCosDeltaPerp     * cachedCosPhisExpSinInt);
+	AsAsInt       = As_sq    * Int2;	
+	AsAparaInt = AsApara       * ( -cachedSinDeltaParaS    * cachedSinPhisExpSinhInt + Btype * cachedCosDeltaParaS    * expCosInt - Btype * cachedSinDeltaParaS    * cachedCosPhisExpSinInt);
 	AsAperpInt = AsAperp       * cachedSinDeltaPerpS * Int2;
+	AsAzeroInt = AsAzero       * ( -cachedSinDeltaZeroS    * cachedSinPhisExpSinhInt + Btype * cachedCosDeltaZeroS    * expCosInt - Btype * cachedSinDeltaZeroS    * cachedCosPhisExpSinInt);
+
+
 	return;
 }
 
