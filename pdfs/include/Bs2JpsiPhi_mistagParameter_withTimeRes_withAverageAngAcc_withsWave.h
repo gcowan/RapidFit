@@ -32,7 +32,6 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave : publi
 		void MakePrototypes();
 
 		//Cached values
-		double cachedAzero, cachedApara, cachedAperp, cachedAs;
 		double cachedAzeroAzeroIntB, cachedAparaAparaIntB, cachedAperpAperpIntB, cachedAparaAperpIntB, cachedAzeroAparaIntB , cachedAzeroAperpIntB , cachedAsAsIntB, cachedAsAparaIntB, cachedAsAperpIntB, cachedAsAzeroIntB;
 		double cachedAzeroAzeroIntBbar, cachedAparaAparaIntBbar, cachedAperpAperpIntBbar, cachedAparaAperpIntBbar, cachedAzeroAparaIntBbar, cachedAzeroAperpIntBbar, cachedAsAsIntBbar, cachedAsAparaIntBbar, cachedAsAperpIntBbar, cachedAsAzeroIntBbar;
 
@@ -131,6 +130,7 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave : publi
 		double buildPDFdenominator();
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, int);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, double&, double&, double&, double&, int);
+		void evaluateCache();
 };
 
 #endif

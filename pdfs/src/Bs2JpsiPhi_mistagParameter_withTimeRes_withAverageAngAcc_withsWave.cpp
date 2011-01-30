@@ -18,15 +18,21 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::Bs2JpsiPhi_m
 	// Physics parameters
 	gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
-	, deltaMName    ( "deltaM")
-	, Phi_sName     ( "Phi_s")
-	, Azero_sqName  ( "Azero_sq" )
+					, deltaMName    ( "deltaM")
+								   , Phi_sName     ( "Phi_s")
+											     , Azero_sqName  ( "Azero_sq" )
 	, Aperp_sqName  ( "Aperp_sq" )
 	, As_sqName	( "As_sq" )
 	, delta_zeroName( "delta_zero" )
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
 	, delta_sName	( "delta_s" )
+	// Detector parameters
+	, mistagName	( "mistag" )
+	, timeRes1Name	( "timeResolution1" )
+	, timeRes2Name	( "timeResolution2" )
+	, timeRes1FractionName	( "timeResolution1Fraction" )
+	// Angular acceptance factors
 	, angAccI1Name	( "angAccI1" )
 	, angAccI2Name	( "angAccI2" )
 	, angAccI3Name	( "angAccI3" )
@@ -37,19 +43,16 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::Bs2JpsiPhi_m
 	, angAccI8Name	( "angAccI8" )
 	, angAccI9Name	( "angAccI9" )
 	, angAccI10Name	( "angAccI10" )
-	, mistagName	( "mistag" )
-	, timeRes1Name	( "timeResolution1" )
-	, timeRes2Name	( "timeResolution2" )
-	, timeRes1FractionName	( "timeResolution1Fraction" )
-
 	// Observables
 	, timeName	( "time" )
 	, cosThetaName	( "cosTheta" )
 	, phiName	( "phi" )
 	, cosPsiName	( "cosPsi" )
 	, tagName	( "tag" )
+
+	//Cache flags
 	, normalisationCacheValid(false)
-	, evaluationCacheValid(false)
+, evaluationCacheValid(false)
 {
 	MakePrototypes();
 }
@@ -112,38 +115,38 @@ bool Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::SetPhys
 	normalisationCacheValid = false;
 	evaluationCacheValid = false;
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
-        // Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
-        gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
-        deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
-        deltaMs    = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
-        Phi_s      = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
-        Azero_sq   = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
-        Aperp_sq   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
-        As_sq   = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
-        delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
-        delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
-        delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
-        delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue();
-        omega    = allParameters.GetPhysicsParameter( mistagName )->GetValue();
-        timeRes1 = allParameters.GetPhysicsParameter( timeRes1Name )->GetValue();
-        timeRes2 = allParameters.GetPhysicsParameter( timeRes2Name )->GetValue();
-        timeRes1Frac = allParameters.GetPhysicsParameter( timeRes1FractionName )->GetValue();
-        angAccI1 = allParameters.GetPhysicsParameter( angAccI1Name )->GetValue();
-        angAccI2 = allParameters.GetPhysicsParameter( angAccI2Name )->GetValue();
-        angAccI3 = allParameters.GetPhysicsParameter( angAccI3Name )->GetValue();
-        angAccI4 = allParameters.GetPhysicsParameter( angAccI4Name )->GetValue();
-        angAccI5 = allParameters.GetPhysicsParameter( angAccI5Name )->GetValue();
-        angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();
-        angAccI7 = allParameters.GetPhysicsParameter( angAccI7Name )->GetValue();
-        angAccI8 = allParameters.GetPhysicsParameter( angAccI8Name )->GetValue();
-        angAccI9 = allParameters.GetPhysicsParameter( angAccI9Name )->GetValue();
-        angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
+	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
+	gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+	deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
+	deltaMs    = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
+	Phi_s      = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
+	Azero_sq   = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
+	Aperp_sq   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
+	As_sq   = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
+	delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
+	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
+	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
+	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue();
+	omega    = allParameters.GetPhysicsParameter( mistagName )->GetValue();
+	timeRes1 = allParameters.GetPhysicsParameter( timeRes1Name )->GetValue();
+	timeRes2 = allParameters.GetPhysicsParameter( timeRes2Name )->GetValue();
+	timeRes1Frac = allParameters.GetPhysicsParameter( timeRes1FractionName )->GetValue();
+	angAccI1 = allParameters.GetPhysicsParameter( angAccI1Name )->GetValue();
+	angAccI2 = allParameters.GetPhysicsParameter( angAccI2Name )->GetValue();
+	angAccI3 = allParameters.GetPhysicsParameter( angAccI3Name )->GetValue();
+	angAccI4 = allParameters.GetPhysicsParameter( angAccI4Name )->GetValue();
+	angAccI5 = allParameters.GetPhysicsParameter( angAccI5Name )->GetValue();
+	angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();
+	angAccI7 = allParameters.GetPhysicsParameter( angAccI7Name )->GetValue();
+	angAccI8 = allParameters.GetPhysicsParameter( angAccI8Name )->GetValue();
+	angAccI9 = allParameters.GetPhysicsParameter( angAccI9Name )->GetValue();
+	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
 
-        Apara_sq = 1 - Azero_sq - Aperp_sq - As_sq;
+	Apara_sq = 1 - Azero_sq - Aperp_sq - As_sq;
 	if ( Apara_sq < 0.) return false;
 	AparaAperp = sqrt(Apara_sq)*sqrt(Aperp_sq);
-        AzeroApara = sqrt(Azero_sq)*sqrt(Apara_sq);
-        AzeroAperp = sqrt(Azero_sq)*sqrt(Aperp_sq);
+	AzeroApara = sqrt(Azero_sq)*sqrt(Apara_sq);
+	AzeroAperp = sqrt(Azero_sq)*sqrt(Aperp_sq);
 	AsApara = sqrt(As_sq)*sqrt(Apara_sq);
 	AsAperp = sqrt(As_sq)*sqrt(Aperp_sq);
 	AsAzero = sqrt(As_sq)*sqrt(Azero_sq);
@@ -163,27 +166,27 @@ vector<string> Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWav
 double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::Evaluate(DataPoint * measurement)
 {
 	time = measurement->GetObservable( timeName )->GetValue();
-        cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
-        phi      = measurement->GetObservable( phiName )->GetValue();
-        cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
+	cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
+	phi      = measurement->GetObservable( phiName )->GetValue();
+	cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
 	q = (int)measurement->GetObservable( tagName )->GetValue();
 
-        if(timeRes1Frac >= 0.9999)
+	if(timeRes1Frac >= 0.9999)
 	{
-                // Set the member variable for time resolution to the first value and calculate
-                timeRes = timeRes1;
-                return buildPDFnumerator();
-        }
-        else
+		// Set the member variable for time resolution to the first value and calculate
+		timeRes = timeRes1;
+		return buildPDFnumerator();
+	}
+	else
 	{
-                // Set the member variable for time resolution to the first value and calculate
-                timeRes = timeRes1;
-                double val1 = buildPDFnumerator();
-                // Set the member variable for time resolution to the second value and calculate
-                timeRes = timeRes2;
-                double val2 = buildPDFnumerator();
-                return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
-        }
+		// Set the member variable for time resolution to the first value and calculate
+		timeRes = timeRes1;
+		double val1 = buildPDFnumerator();
+		// Set the member variable for time resolution to the second value and calculate
+		timeRes = timeRes2;
+		double val2 = buildPDFnumerator();
+		return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+	}
 }
 
 double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::buildPDFnumerator()
@@ -243,9 +246,9 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::build
 		+ f5 * ReAzeroAparaB
 		+ f6 * ImAzeroAperpB
 		+ f7 * AsAsB
-                + f8 * ReAsAparaB
-                + f9 * ImAsAperpB
-                + f10 * ReAsAzeroB
+		+ f8 * ReAsAparaB
+		+ f9 * ImAsAperpB
+		+ f10 * ReAsAzeroB
 		;
 
 	//W-
@@ -256,9 +259,9 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::build
 		+ f5 * ReAzeroAparaBbar
 		+ f6 * ImAzeroAperpBbar
 		+ f7 * AsAsBbar
-                + f8 * ReAsAparaBbar
-                + f9 * ImAsAperpBbar
-                + f10 * ReAsAzeroBbar
+		+ f8 * ReAsAparaBbar
+		+ f9 * ImAsAperpBbar
+		+ f10 * ReAsAzeroBbar
 		;
 
 	return ( w1*v1 + w2*v2 );
@@ -283,23 +286,23 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::Norma
 	}
 
 
-        if(timeRes1Frac >= 0.9999)
-        {
-                // Set the member variable for time resolution to the first value and calculate
-                timeRes = timeRes1;
-                return buildPDFdenominator();
-        }
-        else
-        {
-                // Set the member variable for time resolution to the first value and calculate
-                timeRes = timeRes1;
-                double val1 = buildPDFdenominator();
+	if(timeRes1Frac >= 0.9999)
+	{
+		// Set the member variable for time resolution to the first value and calculate
+		timeRes = timeRes1;
+		return buildPDFdenominator();
+	}
+	else
+	{
+		// Set the member variable for time resolution to the first value and calculate
+		timeRes = timeRes1;
+		double val1 = buildPDFdenominator();
 		normalisationCacheValid = false;
-                // Set the member variable for time resolution to the second value and calculate
-                timeRes = timeRes2;
-                double val2 = buildPDFdenominator();
-                return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
-        }
+		// Set the member variable for time resolution to the second value and calculate
+		timeRes = timeRes2;
+		double val2 = buildPDFdenominator();
+		return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+	}
 }
 
 double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::buildPDFdenominator()
@@ -335,9 +338,8 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::build
 				, cachedAzeroAparaIntBbar
 				, cachedAzeroAperpIntBbar
 				, cachedAsAparaIntBbar
-                                , cachedAsAperpIntBbar
-                                , cachedAsAzeroIntBbar
-
+				, cachedAsAperpIntBbar
+				, cachedAsAzeroIntBbar
 				, -1);
 
 		normalisationCacheValid = true;
@@ -373,7 +375,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::build
 }
 
 void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTimeDependentAmplitudes(  
-		  double & AzeroAzero
+		double & AzeroAzero
 		, double & AparaApara
 		, double & AperpAperp
 		, double & AsAs
@@ -381,76 +383,41 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 		, double & ReAzeroApara
 		, double & ImAzeroAperp
 		, double & ReAsApara
-                , double & ImAsAperp
-                , double & ReAsAzero
+		, double & ImAsAperp
+		, double & ReAsAzero
 		, int Btype )
 {
 	// Quantities depending only on physics parameters can be cached
-	if ( !evaluationCacheValid )
+	if ( !evaluationCacheValid ){evaluateCache();}
+
+	// We always calculate things for the B first, and these are the same for the Bbar
+	if ( Btype == 1 )
 	{
-		cachedAzero = sqrt( Azero_sq );
-		cachedApara = sqrt( Apara_sq );
-		cachedAperp = sqrt( Aperp_sq );
-		cachedAs = sqrt(As_sq);
-
-
-		cachedSinDeltaPerpPara	= sin( delta_perp - delta_para );
-		cachedCosDeltaPerpPara	= cos( delta_perp - delta_para );
-		cachedSinDeltaPerp	= sin( delta_perp );
-		cachedCosDeltaPerp	= cos( delta_perp );
-		cachedCosDeltaPara	= cos( delta_para );
-		cachedSinDeltaPerpS     = sin(delta_perp - delta_s);
-                cachedSinDeltaParaS     = sin(delta_para - delta_s);
-                cachedCosDeltaParaS     = cos(delta_para - delta_s);
-                cachedSinDeltaZeroS     = sin(-delta_s);
-                cachedCosDeltaZeroS     = cos(-delta_s);
-		cachedSinPhis = sin( Phi_s );
-		cachedCosPhis = cos( Phi_s );
-		evaluationCacheValid = true;
+		cachedExpCosh = Mathematics::ExpCosh( time, gamma, deltaGamma, timeRes );
+		cachedExpSinh = Mathematics::ExpSinh( time, gamma, deltaGamma, timeRes);
+		cachedExpCos  = Mathematics::ExpCos(  time, gamma, deltaMs, timeRes );
+		cachedExpSin  = Mathematics::ExpSin(  time, gamma, deltaMs, timeRes );
 	}
-
-        // We always calculate things for the B first, and these are the same for the Bbar
-        if ( Btype == 1 )
-        {
-                cachedExpCosh = Mathematics::ExpCosh( time, gamma, deltaGamma, timeRes );
-                cachedExpSinh = Mathematics::ExpSinh( time, gamma, deltaGamma, timeRes);
-                cachedExpCos  = Mathematics::ExpCos(  time, gamma, deltaMs, timeRes );
-                cachedExpSin  = Mathematics::ExpSin(  time, gamma, deltaMs, timeRes );
-        }
 
 	//cout << gamma << " " << deltaGamma << " " << Azero_sq << " " << Aperp_sq << endl;
 	//cout << cachedExpCosh << " " << cachedExpSinh << " " << cachedExpCos << " " << cachedExpSin << endl;
 	// Now calculate the amplitudes
-        AzeroAzero = Azero_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
-        AparaApara = Apara_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
-        AperpAperp = Aperp_sq * ( cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin );
+	AzeroAzero = Azero_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
+	AparaApara = Apara_sq * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
+	AperpAperp = Aperp_sq * ( cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin );
 	AsAs       = As_sq    * ( cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin );
 
-        ImAparaAperp = cachedApara*cachedAperp * ( - cachedCosDeltaPerpPara * cachedSinPhis * cachedExpSinh
-                                               + Btype * cachedSinDeltaPerpPara * cachedExpCos
-                                               - Btype * cachedCosDeltaPerpPara * cachedCosPhis * cachedExpSin );
-
-        ReAzeroApara = cachedAzero*cachedApara * cachedCosDeltaPara * ( cachedExpCosh - cachedCosPhis * cachedExpSinh
-                                                            + Btype * cachedSinPhis * cachedExpSin );
-
-        ImAzeroAperp = cachedAzero*cachedAperp * ( - cachedCosDeltaPerp * cachedSinPhis * cachedExpSinh
-                                               + Btype * cachedSinDeltaPerp * cachedExpCos
-                                               - Btype * cachedCosDeltaPerp * cachedCosPhis * cachedExpSin );
-	  
-	ReAsApara = cachedAs*cachedApara * (- cachedSinDeltaParaS * cachedSinPhis * cachedExpSinh
-					    + Btype * cachedCosDeltaParaS * cachedExpCos
-					    - Btype * cachedSinDeltaParaS * cachedCosPhis * cachedExpSin );
-
-        ImAsAperp = cachedAs*cachedAperp * cachedSinDeltaPerpS * (cachedExpCosh + cachedCosPhis * cachedExpSinh
-							- Btype * cachedSinPhis * cachedExpSin );
-        ReAsAzero = cachedAs*cachedAzero * (- cachedSinDeltaZeroS * cachedSinPhis * cachedExpSinh 
-						+ Btype * cachedCosDeltaZeroS * cachedExpCos
-						- Btype * cachedSinDeltaZeroS * cachedCosPhis*  cachedExpSin );
+	ImAparaAperp = AparaAperp * ( - cachedCosDeltaPerpPara * cachedSinPhis * cachedExpSinh + Btype * cachedSinDeltaPerpPara * cachedExpCos - Btype * cachedCosDeltaPerpPara * cachedCosPhis * cachedExpSin );
+	ReAzeroApara = AzeroApara * cachedCosDeltaPara * ( cachedExpCosh - cachedCosPhis * cachedExpSinh + Btype * cachedSinPhis * cachedExpSin );
+	ImAzeroAperp = AzeroAperp * ( - cachedCosDeltaPerp * cachedSinPhis * cachedExpSinh + Btype * cachedSinDeltaPerp * cachedExpCos - Btype * cachedCosDeltaPerp * cachedCosPhis * cachedExpSin );
+	ReAsApara = AsApara * (- cachedSinDeltaParaS * cachedSinPhis * cachedExpSinh + Btype * cachedCosDeltaParaS * cachedExpCos - Btype * cachedSinDeltaParaS * cachedCosPhis * cachedExpSin );
+	ImAsAperp = AsAperp * cachedSinDeltaPerpS * (cachedExpCosh + cachedCosPhis * cachedExpSinh - Btype * cachedSinPhis * cachedExpSin );
+	ReAsAzero = AsAzero * (- cachedSinDeltaZeroS * cachedSinPhis * cachedExpSinh + Btype * cachedCosDeltaZeroS * cachedExpCos - Btype * cachedSinDeltaZeroS * cachedCosPhis*  cachedExpSin );
 	return;
 }
 
 void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTimeAmplitudeIntegrals( 
-		  double & AzeroAzeroInt
+		double & AzeroAzeroInt
 		, double & AparaAparaInt
 		, double & AperpAperpInt
 		, double & AsAsInt
@@ -462,79 +429,39 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 		, double & AsAzeroInt
 		, int Btype)
 {
-	double	cosPhis = cos(Phi_s);
-	double	sinPhis = sin(Phi_s);
-	double	sinDeltaPerpPara = sin( delta_perp - delta_para );
-	double	cosDeltaPerpPara = cos( delta_perp - delta_para );
-	double	sinDeltaPerp = sin( delta_perp );
-	double	cosDeltaPerp = cos( delta_perp );
-	double	cosDeltaPara = cos( delta_para );
-	double	sinDeltaPerpS = sin(delta_perp - delta_s);
-	double	sinDeltaParaS = sin(delta_para - delta_s);
-	double	cosDeltaParaS = cos(delta_para - delta_s);
-	double	sinDeltaZeroS = sin(-delta_s);
-	double	cosDeltaZeroS = cos(-delta_s);
-        double expCoshInt = Mathematics::ExpCoshInt( tlow, thigh, gamma, deltaGamma, timeRes );
-        double expSinhInt = Mathematics::ExpSinhInt( tlow, thigh, gamma, deltaGamma, timeRes );
-        double expSinInt  = Mathematics::ExpSinInt(  tlow, thigh, gamma, deltaMs, timeRes );
-        double expCosInt  = Mathematics::ExpCosInt(  tlow, thigh, gamma, deltaMs, timeRes );
+	if(!evaluationCacheValid){evaluateCache();}
+	double expCoshInt = Mathematics::ExpCoshInt( tlow, thigh, gamma, deltaGamma, timeRes );
+	double expSinhInt = Mathematics::ExpSinhInt( tlow, thigh, gamma, deltaGamma, timeRes );
+	double expSinInt  = Mathematics::ExpSinInt(  tlow, thigh, gamma, deltaMs, timeRes );
+	double expCosInt  = Mathematics::ExpCosInt(  tlow, thigh, gamma, deltaMs, timeRes );
 
-        AzeroAzeroInt = Azero_sq * ( expCoshInt - cosPhis * expSinhInt + Btype * sinPhis * expSinInt );
-        AparaAparaInt = Apara_sq * ( expCoshInt - cosPhis * expSinhInt + Btype * sinPhis * expSinInt );
-        AperpAperpInt = Aperp_sq * ( expCoshInt + cosPhis * expSinhInt - Btype * sinPhis * expSinInt );
-        AsAsInt       = As_sq    * ( expCoshInt + cosPhis * expSinhInt - Btype * sinPhis * expSinInt );
-	AparaAperpInt = AparaAperp * ( -cosDeltaPerpPara * sinPhis * expSinhInt
-				       + Btype * sinDeltaPerpPara * expCosInt
-				       - Btype * cosDeltaPerpPara * cosPhis * expSinInt);
-	AzeroAparaInt = AzeroApara * cosDeltaPara * ( expCoshInt - cosPhis * expSinhInt
-                                      			+ Btype * sinPhis * expSinInt);
-	AzeroAperpInt = AzeroAperp * ( -cosDeltaPerp * sinPhis * expSinhInt
-                                      + Btype * sinDeltaPerp * expCosInt
-                                      - Btype * cosDeltaPerp * cosPhis * expSinInt);
-	AsAparaInt = AsApara * (- sinDeltaParaS * sinPhis * expSinInt
-                                            + Btype * cosDeltaParaS * expCosInt
-                                            - Btype * sinDeltaParaS * cosPhis * expSinInt);
-	AsAperpInt = AsAperp * sinDeltaPerpS * (expCoshInt + cosPhis * expSinhInt
-                                                        - Btype * sinPhis * expSinhInt );
-	AsAzeroInt = AsAzero * (- sinDeltaZeroS * sinPhis * expSinhInt
-                                                + Btype * cosDeltaZeroS * expCosInt
-                                                - Btype * sinDeltaZeroS * cosPhis * expSinInt);
+	AzeroAzeroInt = Azero_sq * ( expCoshInt - cachedCosPhis * expSinhInt + Btype * cachedSinPhis * expSinInt );
+	AparaAparaInt = Apara_sq * ( expCoshInt - cachedCosPhis * expSinhInt + Btype * cachedSinPhis * expSinInt );
+	AperpAperpInt = Aperp_sq * ( expCoshInt + cachedCosPhis * expSinhInt - Btype * cachedSinPhis * expSinInt );
+	AsAsInt       = As_sq    * ( expCoshInt + cachedCosPhis * expSinhInt - Btype * cachedSinPhis * expSinInt );
+	
+	AparaAperpInt = AparaAperp * ( -cachedCosDeltaPerpPara * cachedSinPhis * expSinhInt + Btype * cachedSinDeltaPerpPara * expCosInt - Btype * cachedCosDeltaPerpPara * cachedCosPhis * expSinInt);
+	AzeroAparaInt = AzeroApara * cachedCosDeltaPara * ( expCoshInt - cachedCosPhis * expSinhInt + Btype * cachedSinPhis * expSinInt);
+	AzeroAperpInt = AzeroAperp * ( -cachedCosDeltaPerp * cachedSinPhis * expSinhInt + Btype * cachedSinDeltaPerp * expCosInt - Btype * cachedCosDeltaPerp * cachedCosPhis * expSinInt);
+	AsAparaInt = AsApara * (- cachedSinDeltaParaS * cachedSinPhis * expSinInt + Btype * cachedCosDeltaParaS * expCosInt - Btype * cachedSinDeltaParaS * cachedCosPhis * expSinInt);
+	AsAperpInt = AsAperp * cachedSinDeltaPerpS * (expCoshInt + cachedCosPhis * expSinhInt - Btype * cachedSinPhis * expSinhInt );
+	AsAzeroInt = AsAzero * (- cachedSinDeltaZeroS * cachedSinPhis * expSinhInt + Btype * cachedCosDeltaZeroS * expCosInt - Btype * cachedSinDeltaZeroS * cachedCosPhis * expSinInt);
 	return;
 }
 
-/*
-AzeroAzero[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
-                                    - cosPhis * Sinh[deltaGamma*t/2]
-                                    + Btype * sinPhis * Sin[deltaMs*t] );
-AzeroAzeroInt = CForm[FullSimplify[ Integrate[ AzeroAzero[t], {t, tmin, tmax}]]]
-*/
-/*
-AparaApara[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
-                                    - cosPhis * Sinh[deltaGamma*t/2]
-                                    + Btype * sinPhis * Sin[deltaMs*t] );
-AparaAparaInt = CForm[FullSimplify[ Integrate[ AparaApara[t], {t, tmin, tmax}]]]
-*/
-/*
-AperpAperp[t_] := Exp[-gamma*t] * (   Cosh[deltaGamma*t/2]
-                                    + cosPhis * Sinh[deltaGamma*t/2]
-                                    - Btype * sinPhis * Sin[deltaMs*t] );
-AperpAperpInt = CForm[FullSimplify[ Integrate[ AperpAperp[t], {t, tmin, tmax}]]]
-*/
-/*
-AparaAperp[t_] := Exp[-gamma*t] * (-cosDeltaPerpMinusPara * sinPhis * Sinh[deltaGamma*t/2]
-                                    + Btype * sinDeltaPerpMinusPara * Cos[deltaMs*t]
-                                    - Btype * cosDeltaPerpMinusPara * cosPhis * Sinh[deltaGamma*t/2] );
-AparaAperpInt = CForm[FullSimplify[ Integrate[ AparaAperp[t], {t, tmin, tmax}]]]
-*/
-/*
-AzeroApara[t_] := Exp[-gamma*t] * cosDeltaPara * (Cosh[deltaGamma*t/2]
-                                    - cosPhis * sinh[deltaGamma*t/2]
-                                    + Btype * sinPhis * Sin[deltaMs*t] );
-AzeroAparaInt = CForm[FullSimplify[ Integrate[ AzeroApara[t], {t, tmin, tmax}]]]
-*/
-/*
-AzeroAperp[t_] := Exp[-gamma*t] * ( - cosDeltaPerp * sinPhis * Sinh[deltaGamma*t/2]
-                                    + Btype * sinDeltaPerp * Cos[deltaMs*t]
-                                    - Btype * cosDeltaPerp * cosPhis * Sin[deltaMs*t] );
-AzeroAperpInt = CForm[FullSimplify[ Integrate[ AzeroAperp[t], {t, tmin, tmax}]]]
-*/
+void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::evaluateCache(){
+	cachedSinDeltaPerpPara  = sin( delta_perp - delta_para );
+	cachedCosDeltaPerpPara  = cos( delta_perp - delta_para );
+	cachedSinDeltaPerp      = sin( delta_perp );
+	cachedCosDeltaPerp      = cos( delta_perp );
+	cachedCosDeltaPara      = cos( delta_para );
+	cachedSinDeltaPerpS     = sin(delta_perp - delta_s);
+	cachedSinDeltaParaS     = sin(delta_para - delta_s);
+	cachedCosDeltaParaS     = cos(delta_para - delta_s);
+	cachedSinDeltaZeroS     = sin(-delta_s);
+	cachedCosDeltaZeroS     = cos(-delta_s);
+	cachedSinPhis = sin( Phi_s );
+	cachedCosPhis = cos( Phi_s );
+	evaluationCacheValid = true;
+}
+
