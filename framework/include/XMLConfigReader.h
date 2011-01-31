@@ -39,6 +39,9 @@ class XMLConfigReader
 		int GetNumberRepeats();
 		bool IsLoaded();
 
+		int GetSeed();	//  Return the Random Seed
+		void SetSeed( int new_seed );	//  Set Seed returned by XMLFile
+
 	private:
 		ParameterSet * GetParameterSet( XMLTag* );
 		PhysicsParameter * GetPhysicsParameter( XMLTag*, string& );
@@ -61,6 +64,8 @@ class XMLConfigReader
 
 		vector< XMLTag* > children;
 		bool isLoaded;
+
+		vector<int> seed;	//  Random Seed
 };
 
 #endif

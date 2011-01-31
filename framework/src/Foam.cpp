@@ -21,7 +21,7 @@ Foam::Foam()
 Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBoundary(NewBoundary), dataNumber(0)
 {
 	newDataSet = new MemoryDataSet(generationBoundary);
-	rootRandom = new TRandom3(0);
+	rootRandom = NewPDF->GetRandomFunction();
 
 	//Retrieve all combinations of discrete variables
 	allNames = generationBoundary->GetAllNames();

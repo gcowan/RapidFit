@@ -1000,6 +1000,7 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 //Create a PDF from an appropriate xml tag
 IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 {
+	IPDF* returnable_NamedPDF;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "PDF" )
 	{
@@ -1030,18 +1031,22 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		}
 
 		//Check if the name is recognised as a PDF
-		return ClassLookUp::LookUpPDFName( name, observableNames, parameterNames );
+		returnable_NamedPDF = ClassLookUp::LookUpPDFName( name, observableNames, parameterNames );
 	}
 	else
 	{
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"PDF\"" << endl;
 		exit(1);
 	}
+
+	returnable_NamedPDF->SetRandomFunction( GetSeed() );
+	return returnable_NamedPDF;
 }
 
 //Create a SumPDF from an appropriate xml tag
 IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
 {
+	IPDF* returnable_SUMPDF;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "SumPDF" )
 	{
@@ -1067,11 +1072,11 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		{
 			if ( fractionName == "unspecified" )
 			{
-				return new SumPDF( componentPDFs[0], componentPDFs[1], InputBoundary );
+				returnable_SUMPDF = new SumPDF( componentPDFs[0], componentPDFs[1], InputBoundary );
 			}
 			else
 			{
-				return new SumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
+				returnable_SUMPDF = new SumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
 			}
 		}
 		else
@@ -1085,11 +1090,15 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"SumPDF\"" << endl;
 		exit(1);
 	}
+
+	returnable_SUMPDF->SetRandomFunction( GetSeed() );
+	return returnable_SUMPDF;
 }
 
 //Create a NormalisedSumPDF from an appropriate xml tag
 IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
 {
+	IPDF* returnable_NormPDF;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "NormalisedSumPDF" )
 	{
@@ -1115,11 +1124,11 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		{
 			if ( fractionName == "unspecified" )
 			{
-				return new NormalisedSumPDF( componentPDFs[0], componentPDFs[1], InputBoundary );
+				returnable_NormPDF = new NormalisedSumPDF( componentPDFs[0], componentPDFs[1], InputBoundary );
 			}
 			else
 			{
-				return new NormalisedSumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
+				returnable_NormPDF =  new NormalisedSumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
 			}
 		}
 		else
@@ -1133,11 +1142,15 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"NormalisedSumPDF\"" << endl;
 		exit(1);
 	}
+
+	returnable_NormPDF->SetRandomFunction( GetSeed() );
+	return returnable_NormPDF;
 }
 
 //Create a ProdPDF from an appropriate xml tag
 IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
 {
+	IPDF* returnable_ProdPDF;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "ProdPDF" )
 	{
@@ -1153,7 +1166,7 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		//Check there are two component PDFs to sum
 		if ( componentPDFs.size() == 2 )
 		{
-			return new ProdPDF( componentPDFs[0], componentPDFs[1] );
+			returnable_ProdPDF = new ProdPDF( componentPDFs[0], componentPDFs[1] );
 		}
 		else
 		{
@@ -1166,32 +1179,39 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"ProdPDF\"" << endl;
 		exit(1);
 	}
+
+	returnable_ProdPDF->SetRandomFunction( GetSeed() );
+	return returnable_ProdPDF;
 }
 
 //Choose one of the PDF instantiation methods
 IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
 {
+	IPDF* returnable_pdf;
 	if ( InputTag->GetName() == "PDF" )
 	{
-		return GetNamedPDF(InputTag);
+		returnable_pdf = GetNamedPDF(InputTag);
 	}
 	else if ( InputTag->GetName() == "SumPDF" )
 	{
-		return GetSumPDF( InputTag, InputBoundary );
+		returnable_pdf = GetSumPDF( InputTag, InputBoundary );
 	}
 	else if ( InputTag->GetName() == "NormalisedSumPDF" )
 	{
-		return GetNormalisedSumPDF( InputTag, InputBoundary );        
+		returnable_pdf = GetNormalisedSumPDF( InputTag, InputBoundary );
 	}
 	else if ( InputTag->GetName() == "ProdPDF" )
 	{
-		return GetProdPDF( InputTag, InputBoundary );
+		returnable_pdf = GetProdPDF( InputTag, InputBoundary );
 	}
 	else
 	{
 		cerr << "Unrecognised PDF configuration: " << InputTag->GetName() << endl;
 		exit(1);
 	}
+
+	returnable_pdf->SetRandomFunction( GetSeed() );
+	return returnable_pdf;
 }
 
 //Make a precalculator for a data set
@@ -1243,4 +1263,34 @@ IPrecalculator * XMLConfigReader::MakePrecalculator( XMLTag * InputTag, PhaseSpa
 		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"Precalculator\"" << endl;
 		exit(1);
 	}
+}
+
+
+//	Return the Integer Seed used in RapidFit XML tag <Seed>SomeInt</Seed>
+int XMLConfigReader::GetSeed()
+{
+	if( seed.empty() )
+	{
+		//Find the NumberRepeats tag
+		for ( int childIndex = 0; childIndex < children.size(); childIndex++ )
+		{
+			if ( children[childIndex]->GetName() == "Seed" )
+			{
+				seed.push_back ( fabs( atoi( children[childIndex]->GetValue( )[0].c_str() ) ) );
+				cout << "Using seed: " << seed.back() << " from input file." << endl;
+				return seed.back();
+			}
+		}
+		seed.push_back( 0 );
+		//If no such tag is found, report
+		cout << "Seed tag not found in config file, deaulting to TRandom3(0) instead of TRandom3(seed)." << endl;
+	}
+	return seed.back();
+}
+
+//	Set a new TRandom seed that is returned by the XMLFile
+void XMLConfigReader::SetSeed( int new_seed )
+{
+	while( !seed.empty() )  {  seed.pop_back();  }	//  Remove the old seed
+	seed.push_back(new_seed);			//  Set the new Random Seed
 }

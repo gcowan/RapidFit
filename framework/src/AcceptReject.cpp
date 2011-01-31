@@ -22,7 +22,7 @@ AcceptReject::AcceptReject( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : 
 	generationBoundary(NewBoundary), dataNumber(0), moreThanMaximum(0.01), numberAttempts(0)
 {
 	newDataSet = new MemoryDataSet(generationBoundary);
-	rootRandom = new TRandom3(0);
+	rootRandom = NewPDF->GetRandomFunction();
 }
 
 //Destructor
