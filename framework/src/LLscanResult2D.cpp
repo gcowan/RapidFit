@@ -8,6 +8,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <cstdlib>
+
 #include "LLscanResult2D.h"
 #include <TFrame.h>
 #include <TAxis.h>

@@ -10,6 +10,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <cstdlib>
+
 #include "LLscanResult.h"
 #include <TGraph.h>
 #include <TFrame.h>
