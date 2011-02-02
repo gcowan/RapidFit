@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/02 Pete Clarke
+  - Commit of modifications to Mathematics and B2JpsiPhi_mistagParameter_alt.cppp to allow for upper PT accecptance
+
 2011/01/29 Pete Clarke
   - Big commit of 
       - New PDFs with Swave and background with triple gaussian

@@ -14,6 +14,8 @@
 #include "RooMath.h"
 #include "Mathematics.h"
 
+#define UPPER_TIME_ACCEPTANCE_FACTOR 0.000
+
 //......................................
 //Constructor
 
@@ -238,8 +240,11 @@ double Bs2JpsiPhi_mistagParameter_alt::Evaluate(DataPoint * measurement)
 		if( isnan(returnValue) ) exit(1) ;
 	}
 	
-	return returnValue ;
-	
+	//PELC MOD -  to test time acceptance
+	double eff = (1. -  UPPER_TIME_ACCEPTANCE_FACTOR*t) ;
+	return returnValue * eff ;
+	//return returnValue ;
+		
 }
 
 
@@ -372,11 +377,15 @@ double Bs2JpsiPhi_mistagParameter_alt::expH() const
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::intExpL( ) const {
-	return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
+	//PELC mod to add upper time acceptance factro
+	if( UPPER_TIME_ACCEPTANCE_FACTOR > 0. ) return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution,  UPPER_TIME_ACCEPTANCE_FACTOR )  ;
+	else return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::intExpH( ) const {
-	return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
+	//PELC mod to add upper time acceptance factro
+	if( UPPER_TIME_ACCEPTANCE_FACTOR > 0. ) return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution, UPPER_TIME_ACCEPTANCE_FACTOR )  ;
+	else return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
 }
 
 
@@ -407,7 +416,7 @@ double Bs2JpsiPhi_mistagParameter_alt::intExpCos( ) const
 
 
 //------------------------------------------------------------------------------
-// These are the time factors and their analytic integrals for the one angle PDF
+// These are the time factors and their analytic integrals 
 
 //..................................
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorEven(  )  const

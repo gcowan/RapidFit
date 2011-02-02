@@ -102,8 +102,6 @@ namespace Mathematics
 	   exp((gamma*(2*thigh + gamma*timeRes*timeRes - 2*tlow))/2.) * Erfc((gamma*timeRes*timeRes - tlow )/(sqrt(2)*timeRes)) +
 	   exp( gamma*thigh)*Erfc(tlow/(sqrt(2)*timeRes))
 	   )/(2.*exp(gamma*thigh)*gamma)
-
-	   We should be able to use the above as a direct replacement of the code below
 	 */
 	double ExpInt( double tlow, double thigh, double gamma, double resolution  )
 	{
@@ -115,19 +113,7 @@ namespace Mathematics
 
 		if( resolution > 0. )
 		{
-			// I think this is wrong, needs to be checked. Compare with Bs2JpsiPhi long lived background
-
-			// This is a placeholder as I havnt put the correct code in yet as i dont know it.
-			// So it only works if time limits are large and start from < 0
-			/*
-			   if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
-			   std::cerr << " Mathematics::ExpInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
-			   return -1. ;
-			   }
-			   return (1/gamma) * ( 1.0 - TMath::Exp(-gamma*thigh) ) ;
-			 */
 			return expErfInt(thigh, 1./gamma, resolution) - expErfInt(tlow, 1./gamma, resolution);
-
 		}
 		else
 		{
@@ -136,6 +122,39 @@ namespace Mathematics
 		}
 	}
 
+	//.....................................................
+	// Overloaded version of the above, allowing for an acceptance (1.0 - b*t) - formula form wolfram
+	// I = -1/G * exp (-tG) (1 - b(1/G +t ))  instead of I = -1/G * exp (-tG)
+	double ExpInt( double tlow, double thigh, double gamma, double resolution, double acceptanceParameter  )
+	{
+		if( thigh < tlow )
+		{
+			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
+			exit(1) ;
+		}
+		
+		if( resolution > 0. )
+		{
+			cout <<" Mathematics::ExpInt - with (1-bt) acceptance : This doesnt work when resolution .ne. 0 yet " << endl ;
+			exit(1) ;		
+		}		
+		else
+		{
+			double LoFactor=0, UpFactor=0 ;
+			
+			if( tlow < 0. ) {
+				LoFactor = (1. - acceptanceParameter*(1./gamma)) * (-1./gamma) ;
+			}
+			else {
+				LoFactor = (1. - acceptanceParameter*((1./gamma)+tlow)) * (-1./gamma) * TMath::Exp(-gamma*tlow) ;
+			}
+			UpFactor = (1. - acceptanceParameter*((1./gamma)+thigh)) * (-1./gamma) * TMath::Exp(-gamma*thigh) ;
+			
+			return UpFactor - LoFactor ;
+				
+		}
+	}
+	
 	//........................................
 	//evaluate a simple exponential X cosh with single gaussian time resolution
 	//When you express the cosh as a sum of exp and then multiply out, you are
