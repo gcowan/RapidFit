@@ -28,8 +28,8 @@ AcceptReject::AcceptReject( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : 
 //Destructor
 AcceptReject::~AcceptReject()
 {
-	//delete newDataSet;
-	delete rootRandom;
+	delete newDataSet;
+	//delete rootRandom;
 	//delete generationFunction;
 	//delete generationBoundary;
 }

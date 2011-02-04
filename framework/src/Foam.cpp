@@ -89,7 +89,7 @@ Foam::~Foam()
 	{
 		delete foamGenerators[generatorIndex];
 	}
-	delete rootRandom;
+	//delete rootRandom;
 }
 
 //Use accept/reject method to create data

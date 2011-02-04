@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/04 Rob Currie
+  - Belated Update for earlier changes made to allow the use of <Seed>12345</Seed> tags in XML file under <RapidFit>
+  - These changes include XMLConfigReader as appropriate and IPDF.h such that every instance of an IPDF object now has a TRandom3 object seeded after it's initialization
+  - AcceptReject/Foam now call the Randomly seeded number generator in IPDF as opposed to seeding their own such that the <Seed> tag is one per toy study (fitting session)
+    Multiple Toy Repeats will truely generate randomly unique toys i.e. toy1!=toy2 however toy2 is always the same due to the reproducability of TRandom3
+    When this tag is in an XML the output toy study Results are completely Reproducible
+    When it is not in an xml file IPDF will be seeded with TRandom3(0) (i.e. uses a seed which is time depenent) as before
+
 2011/02/02 Pete Clarke
   - Commit of modifications to Mathematics and B2JpsiPhi_mistagParameter_alt.cppp to allow for upper PT accecptance
 

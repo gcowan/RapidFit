@@ -1283,7 +1283,7 @@ int XMLConfigReader::GetSeed()
 		}
 		seed.push_back( 0 );
 		//If no such tag is found, report
-		cout << "Seed tag not found in config file, deaulting to TRandom3(0) instead of TRandom3(seed)." << endl;
+		cout << "Seed tag not found in config file, defaulting to TRandom3(0)." << endl;
 	}
 	return seed.back();
 }
