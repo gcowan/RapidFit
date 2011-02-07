@@ -1,7 +1,7 @@
 // $Id: Bd2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h,v 1.1 2009/11/10 10:35:49 gcowan Exp $
 /** @class Bd2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc Bd2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h
  *
- *  RapidFit PDF for Bd2JpsiKstar
+ *  RaKstarFlavourFit PDF for Bd2JpsiKstar
  *
  *  @author Ailsa Sparkes
  *  @date 2009-07-30
@@ -24,6 +24,7 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		//Return a list of parameters not to be integrated
                 virtual vector<string> GetDoNotIntegrateList();
 
+
 	protected:
 		//Calculate the PDF normalisation
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
@@ -36,11 +37,11 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		double cachedAparaAperpIntB, cachedAzeroAparaIntB, cachedAzeroAperpIntB;
 
 		double cachedSinDeltaPerpPara, cachedCosDeltaPara, cachedSinDeltaPerp;
-
+		double cachedCosSqDeltaM;
 
 		double cachedAzero, cachedApara, cachedAperp;
 		bool normalisationCacheValid, evaluationCacheValid;
-
+//		double q;
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
 		// used in the minimiser.
@@ -93,6 +94,7 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
 		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		string KstarFlavourName;
 		//kaonIDName;				// in phi rest frame
 
 		// Member variables for the observables
@@ -100,7 +102,9 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		double cosTheta;
 		double phi;
 		double cosPsi;
+		double KstarFlavour;
 		//int kaonID;
+		double q() const ;
 
 		double tlow, thigh; // Integration limits
 
