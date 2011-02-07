@@ -1,7 +1,7 @@
 // $Id: Bd2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
 /** @class Bd2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc Bd2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.cpp
  *
- *  RapidFit PDF for Bd2JpsiPhi with average angular acceptance input as a paramter
+ *  RatagFit PDF for Bd2JpsiPhi with average angular acceptance input as a paramter
  *
  *  @author Greig A Cowan greig.alan.cowan@cern.ch
  *  @date 2010-01-12
@@ -37,7 +37,7 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverage
 	, cosThetaName	( "cosTheta" )
 	, phiName	( "phi" )
 	, cosPsiName	( "cosPsi" )
-	//, timeres	( "resolution" )
+	, KstarFlavourName  ( "KstarFlavour" )
 	, normalisationCacheValid(false)
 , evaluationCacheValid(false)
 {
@@ -52,6 +52,7 @@ void Bd2JpsiKstar_withTimeRes_withAverageAngAcc::MakePrototypes()
 	allObservables.push_back( cosThetaName );
 	allObservables.push_back( phiName );
 	allObservables.push_back( cosPsiName );
+	allObservables.push_back( KstarFlavourName );
 
 	// Need to think about additional parameters like
 	// event-by-event propertime resolution and acceptance.
@@ -96,8 +97,8 @@ bool Bd2JpsiKstar_withTimeRes_withAverageAngAcc::SetPhysicsParameters( Parameter
         deltaMs    = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
         Aperp_sq   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
         Apara_sq   = allParameters.GetPhysicsParameter( Apara_sqName )->GetValue();
-		delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
-		delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
+	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
+	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
         timeRes1 = allParameters.GetPhysicsParameter( timeRes1Name )->GetValue();
         timeRes2 = allParameters.GetPhysicsParameter( timeRes2Name )->GetValue();
         timeRes1Frac = allParameters.GetPhysicsParameter( timeRes1FractionName )->GetValue();
@@ -109,12 +110,16 @@ bool Bd2JpsiKstar_withTimeRes_withAverageAngAcc::SetPhysicsParameters( Parameter
         angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();
 
         Azero_sq = 1 - Aperp_sq - Apara_sq;
+		 if ( Azero_sq < 0.) return false ;
 		AparaAperp = sqrt(Apara_sq)*sqrt(Aperp_sq);
         	AzeroApara = sqrt(Azero_sq)*sqrt(Apara_sq);
         	AzeroAperp = sqrt(Azero_sq)*sqrt(Aperp_sq);
 
 	return isOK;
 }
+
+double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::q() const { return KstarFlavour;}
+
 
 //Return a list of parameters not to be integrated
 vector<string> Bd2JpsiKstar_withTimeRes_withAverageAngAcc::GetDoNotIntegrateList()
@@ -130,7 +135,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Evaluate(DataPoint * measurem
         cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
         phi      = measurement->GetObservable( phiName )->GetValue();
         cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
-
+	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
 	//cout << gamma << " " << Aperp_sq << " " << Azero_sq << endl;
 
         if(timeRes1Frac >= 0.9999)
@@ -166,13 +171,14 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::buildPDFnumerator()
 			, ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB
 							   );
 
+//	double q = KstarFlavour;
 	//W+
 	double v1 = f1 * AzeroAzeroB
 		+ f2 * AparaAparaB
 		+ f3 * AperpAperpB
-		+ f4 * ImAparaAperpB
+		+ q() * f4 * ImAparaAperpB
 		+ f5 * ReAzeroAparaB
-		+ f6 * ImAzeroAperpB;
+		+ q() * f6 * ImAzeroAperpB;
 
 	/*
 	if (isnan(v1))
@@ -188,6 +194,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::buildPDFnumerator()
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 
+	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
 	IConstraint * timeBound = boundary->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
@@ -236,14 +243,14 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::buildPDFdenominator()
 		normalisationCacheValid = true;
 	}
 
-	//cout << gamma << endl;
+	 //double q = KstarFlavour;
 
 	double v1 = cachedAzeroAzeroIntB * angAccI1
 		+ cachedAparaAparaIntB * angAccI2
 		+ cachedAperpAperpIntB * angAccI3
-		+ cachedAparaAperpIntB * angAccI4
+		+ q() * cachedAparaAperpIntB * angAccI4
 		+ cachedAzeroAparaIntB * angAccI5
-		+ cachedAzeroAperpIntB * angAccI6;
+		+ q() * cachedAzeroAperpIntB * angAccI6;
 
 	return v1;
 }
@@ -266,6 +273,8 @@ void Bd2JpsiKstar_withTimeRes_withAverageAngAcc::getTimeDependentAmplitudes(  do
 		cachedCosDeltaPara	= cos( delta_para );
 		cachedSinDeltaPerp	= sin( delta_perp );
 
+	//	cachedCosSqDeltaM	= cos((deltaMs*timeRes)/2)*cos((deltaMs*timeRes)/2);
+
 
 		evaluationCacheValid = true;
 	}
@@ -277,7 +286,8 @@ void Bd2JpsiKstar_withTimeRes_withAverageAngAcc::getTimeDependentAmplitudes(  do
 
 	double Exp = Mathematics::Exp(time, gamma, timeRes);
 
-		AzeroAzero = Azero_sq * Exp;  // changed- see note 2009-015 eq 11-13
+
+	AzeroAzero = Azero_sq * Exp;  // changed- see note 2009-015 eq 11-13
         AparaApara = Apara_sq * Exp;  //
         AperpAperp = Aperp_sq * Exp;  //
 
