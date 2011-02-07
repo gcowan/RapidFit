@@ -35,7 +35,7 @@ OutputConfiguration::OutputConfiguration( vector< pair< string, string > > Input
     contourFileName("contourPlots.root"), 
     LLscanFileName("LLscanPlots.root"),
 	LLcontourFileName("LLcontourPlots.root"),
-    weightedEventsWereUsed(false)
+    weightedEventsWereUsed(false) 
 {
 }
 
@@ -90,19 +90,24 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 		{
 			for ( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
 			{
-				Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
-				if( weightedEventsWereUsed ) testPlotter->SetWeightsWereUsed( weightName ) ;
-				
 				char fileNumber[100];
 				sprintf( fileNumber, "fit%d.", resultIndex );
 
-				if (makeAllPlots)
+				if( resultBottle->GetResultDataSet(resultIndex)->GetDataNumber() > 0 )
 				{
-					testPlotter->PlotAllObservables( fileNumber + projectionFileName );
-				}
-				else
-				{
-					testPlotter->PlotObservables( fileNumber + projectionFileName, projections );
+					Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
+					if( weightedEventsWereUsed ) testPlotter->SetWeightsWereUsed( weightName ) ;
+				
+					if (makeAllPlots)
+					{
+						testPlotter->PlotAllObservables( fileNumber + projectionFileName );
+					}
+					else
+					{
+						testPlotter->PlotObservables( fileNumber + projectionFileName, projections );
+					}
+				} else {
+					cerr << "File " << fileNumber << " Contains No Events, so I refuse to run a Projection Plot!" << endl;
 				}
 			}
 		}

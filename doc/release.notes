@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/07 Rob Currie
+  - Fixed a bug when trying to call Plotter with a dataset containing 0 events
+
 2011/02/04 Rob Currie
   - Belated Update for earlier changes made to allow the use of <Seed>12345</Seed> tags in XML file under <RapidFit>
   - These changes include XMLConfigReader as appropriate and IPDF.h such that every instance of an IPDF object now has a TRandom3 object seeded after it's initialization
