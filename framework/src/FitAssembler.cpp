@@ -122,10 +122,13 @@ LLscanResult * FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, F
 			
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan ;
+		cout << "Scan value: " << scanVal << endl;
 		scanParameter->SetBlindedValue( scanVal ) ;
-		
+
+		cout << "Calling DoFit" << endl;
 		// Do a scan point fit
 		FitResult * scanStepResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
+		cout << "Called" << endl;
 					
 		scanParameterValues.push_back( scanVal ) ;
 		if( scanStepResult->GetFitStatus() == 3 ) 

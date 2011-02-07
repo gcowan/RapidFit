@@ -505,21 +505,22 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 	int nscans = scanResults.size() ;
 
 	//Make a canvas for all the plots
-	//TCanvas cv ;
+	TCanvas cv ;
 
 	for( int ii=0; ii<nscans; ii++ )
 	{
 		//scanResults[ii]->print() ;
-		//cv.SetGrid();
-		//cv.GetFrame()->SetFillColor(21);
-		//cv.GetFrame()->SetBorderSize(12);
+		cv.SetGrid();
+		cv.GetFrame()->SetFillColor(21);
+		cv.GetFrame()->SetBorderSize(12);
 
-		//cv.cd(ii+1) ;
+		cv.cd(ii+1) ;
 		TGraph * grnew = scanResults[ii]->GetGraph() ;
 		grnew->Draw("ALP") ;
 		grnew->Draw() ;
-		//cv.Update();
-		//cv.Write();
+		//grnew->Write();
+		cv.Update();
+		cv.Write();
 
 	}
 

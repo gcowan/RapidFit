@@ -17,7 +17,9 @@
 
 
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h"
+
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.h"
+#include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms.h"
 #include "Bs2JpsiPhi_mistagParameter_alt.h"
 #include "Bs2JpsiPhi_mistagParameter_Swave_alt.h"
 #include "Bs2JpsiPhiMassSignal.h"
@@ -84,10 +86,16 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //Default JPsiPhi 
 	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc();
         }
+
 		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave" )
         {
 	        //Default JPsiPhi with s wave
 	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave();
+        }
+		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms" )
+        {
+	        //Default JPsiPhi with s wave
+	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms();
         }
 		else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
         {
