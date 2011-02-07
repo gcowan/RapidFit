@@ -58,7 +58,7 @@ Bs2JpsiPhi_mistagParameter_Swave_alt::Bs2JpsiPhi_mistagParameter_Swave_alt() :
 {
 	MakePrototypes();
 	
-	std::cout << "Constructing alternative (PELC original) J/PsiPhi classic PDF" << std::endl ;
+	std::cout << "Constructing PDF: Bs2JpsiPhi_mistagParameter_Swave_alt " << std::endl ;
 }
 
 //Make the data point and parameter set
@@ -256,7 +256,9 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::Evaluate(DataPoint * measurement)
 		if( isnan(returnValue) ) exit(1) ;
 	}
 	
-	return returnValue ;
+	//PELC
+	return returnValue * timeAcceptance.acceptance(t);
+	//return returnValue ;
 	
 }
 
@@ -285,15 +287,18 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::Normalisation(DataPoint * measureme
 		thi = timeBound->GetMaximum();
 	}
 	
-	
 	// Recalculate cached values if Physics parameters have changed
 	// Must do this for each of the two resolutions.
 	if( ! normalisationCacheValid )  {
 		for( tag = -1; tag <= 1; tag ++ ) {
             resolution =  resolution1 ;
-			normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
+//PELC
+			//normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
+			normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
             resolution =  resolution2 ;
-			normalisationCacheValueRes2[tag+1] = this->diffXsecNorm1( );
+//PELC
+			//normalisationCacheValueRes2[tag+1] = this->diffXsecNorm1( );
+			normalisationCacheValueRes2[tag+1] = this->diffXsecCompositeNorm1( );
 		}
 		normalisationCacheValid = true ;
 	}	
@@ -762,7 +767,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecNorm1(  ) const
 	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +  
 	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
 	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
-
+	
 	return norm ;
 };
 
@@ -790,5 +795,30 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecNorm2(  ) const
 	
 	
 	return norm ;
+};
+
+
+//....................................................
+// New method to calculate normalisation using a histrogrammed low-end time acceptance function
+
+double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecCompositeNorm1(  )  
+{      	
+	double norm = 0 ;
+	double tlo_remember = tlo ;
+	
+	timeAcceptance.configure( tlo ) ;
+	
+	bool firstBin = true ;
+	for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); islice++ ) 
+	{
+		if( firstBin )firstBin = false ;
+		else tlo = timeAcceptance.sliceStart( islice ) ;
+		norm += this->diffXsecNorm1(  ) * timeAcceptance.fraction( islice ) ;
+	}
+
+	tlo =  tlo_remember ;
+	return norm ;	
+
+	return 1 ;
 };
 

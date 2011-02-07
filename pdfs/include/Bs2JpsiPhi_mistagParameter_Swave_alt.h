@@ -12,6 +12,8 @@
 
 #include "BasePDF.h"
 #include "RooComplex.h"
+#include "TimeAcceptance.h"
+
 
 class Bs2JpsiPhi_mistagParameter_Swave_alt : public BasePDF
 {
@@ -125,6 +127,9 @@ class Bs2JpsiPhi_mistagParameter_Swave_alt : public BasePDF
 	
 		// Othere things calculated later on the fly
 		double tlo, thi ;
+	
+		// lower Time acceptance function
+		TimeAcceptanceFunction timeAcceptance ;
 
 		// Caching 
 		bool normalisationCacheValid ;
@@ -255,13 +260,11 @@ class Bs2JpsiPhi_mistagParameter_Swave_alt : public BasePDF
 		//...................................
 		// Integral over all variables: t + angles
 		double diffXsecNorm1(  ) const ;
+		double diffXsecCompositeNorm1(  )  ;
 	
 		//...................................
 		// Integral over angles only
 		double diffXsecNorm2(  ) const ;
-	
-	
-
 };
 
 #endif
