@@ -42,7 +42,7 @@ int main( int argc, char * argv[] )
 		ToyStudy * testStudy = new ToyStudy("../config/MC09Toy_noBkg.xml");
 		ToyStudyResult * fitResults = testStudy->DoWholeStudy();
 		ResultFormatter::MakePullPlots( "SeparateParameter", "pullPlots.root", fitResults );
-ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
+		ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
 	}
 	else
 	{
@@ -60,6 +60,7 @@ ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
 		vector< PDFWithData* > pdfsAndData;
 		int numberLLscanPoints = 10 ;
 		double LLscanRange = 2 ;
+		vector<int> RuntimeSeed;
 
 		//Flags for which arguments have been received
 		bool numberRepeatsFlag = false;
@@ -125,6 +126,10 @@ ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
 				cout << endl ;
 				cout << " --testIntegrator   " << endl ;
 				cout << "      Usefl feature which only tests the numerical<=>analytic integrator for each PDF then exits " <<endl ;
+
+				cout << endl;
+				cout << " --SetSeed 12345" << endl;
+				cout << "      Set the Random seed to 12345 if you wish to make the output reproducable. Useful on Batch Systems" << endl;
 
 				return 1;
 
@@ -320,7 +325,18 @@ ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
 			else if ( currentArgument == "--doLLcontour" )
 			{
 				doLLcontourFlag = true;
-			}			
+			}
+			else if ( currentArgument == "--SetSeed" )
+			{
+				if ( argumentIndex + 1 < argc )
+				{
+					argumentIndex++;
+					RuntimeSeed.push_back( atoi( argv[argumentIndex] ) );
+				} else {
+					cerr << "Seed Not Correctly Defined at Runtime" << endl;
+					return 1;
+				}
+			}
 			else
 			{
 				cerr << "Unrecognised argument: " << currentArgument << endl;
@@ -342,6 +358,11 @@ ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
 				cerr << "XML config file " << configFileName << " not found" << endl;
 				return 1;
 			}
+		}
+		if( !RuntimeSeed.empty() && xmlFile->IsLoaded() )
+		{
+			cout << "Setting Seed At Runtime to be: " << RuntimeSeed[0] << endl;
+			xmlFile->SetSeed( RuntimeSeed[0] );
 		}
 
 		//Create a parameter set
@@ -524,14 +545,6 @@ ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
 						if( LLscanList[ii] == "gamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.8, 0.3 ); 
 						else if( LLscanList[ii] == "deltaGamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.5, -0.7 ); 
 						else if( LLscanList[ii] == "Phi_s" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 3.14159, -3.14159 ); 
-						else if( LLscanList[ii] == "As_sq" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.9, 0.1 ); 
-						else if( LLscanList[ii] == "Apara_sq" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 ); 
-						else if( LLscanList[ii] == "Aperp_sq" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 ); 
-						else if( LLscanList[ii] == "Azero_sq" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 ); 
-						else if( LLscanList[ii] == "R_alpha" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 ); 
-						else if( LLscanList[ii] == "R_beta" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 ); 
-						else if( LLscanList[ii] == "R_gamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 ); 
-						else if( LLscanList[ii] == "delta_s" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 3.14159, -3.14159); 
 						else llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, -1.0 ); 
 						scanResults.push_back(llResult) ;
 					}

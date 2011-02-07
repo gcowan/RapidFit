@@ -1,6 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
 2011/02/07 Rob Currie
+  - Added the ability to set the Random Seed at runtime using --SetSeed 1234567
+
+2011/02/07 Rob Currie
   - Fixed a bug when trying to call Plotter with a dataset containing 0 events
 
 2011/02/04 Rob Currie
