@@ -48,6 +48,15 @@ using std::endl;
 typedef vector<Double_t> array1d;
 typedef vector<TString> array1s;
 
+inline TString prettyPrint(Double_t value){
+        char pretty[20];
+        TString prettyString;
+        sprintf (pretty, "%4.3g",value);
+        prettyString = pretty;
+        return prettyString;
+}
+
+
 int main(int argc, char *argv[]){
 
 	if(argc !=3){
@@ -160,18 +169,59 @@ int main(int argc, char *argv[]){
 	output->Write();
 	output->Close();
 
-	cout << "\\begin{center}" << endl;
-	cout << "\\begin{tabular}{|l|c|c|c|c|}" << endl;
-
-	cout << "\\hline" << endl;
+	cout << "\\begin{table}" << endl;
+	cout << "\\begin{tabular}{lcccc}" << endl;
 	cout << "Parameter	&	Mean	&	Std. Dev 	&	Pull mean	&	Pull Std. Dev	\\\\" << endl;
-
-	cout << "\\hline" << endl;
 	for(UInt_t i =0; i< param.size(); i++){
-		cout << std::setprecision(3) << param[i] << " & 	$ " << mean[i] << " \\pm " << emean[i] << " $	&	$ " << sigma[i] << " \\pm " << esigma[i] << " $   &       $ " << pull[i] << " \\pm " << epull[i] <<  " $   &       $ " << pullw[i] << " \\pm " << epullw[i] << " $	\\\\" << endl;
+
+
+	TString strmean = " $ ";
+	strmean += prettyPrint(mean[i]);
+	strmean += " \\pm ";
+	strmean += prettyPrint(emean[i]);
+	strmean += " $ ";
+
+	TString strsigma = " $ ";
+	strsigma += prettyPrint(sigma[i]);
+	strsigma += " \\pm ";
+	strsigma += prettyPrint(esigma[i]);
+	strsigma += " $ ";
+	
+	bool warnpull = (fabs(pull[i])/epull[i] > 3.0);
+	TString strpull;
+	if(warnpull){ 	
+	strpull = "\\alert{$ ";
+	}else{
+	strpull = " $ ";
+	}
+	strpull += prettyPrint(pull[i]);
+	strpull +=  " \\pm ";
+	strpull +=  prettyPrint(epull[i]);
+	if(warnpull){
+	strpull += " $} ";
+	}else{
+	strpull += " $ ";
 	}
 
-	cout << "\\hline" << endl;
+	bool warnpullw = (fabs(pullw[i] -1)/epullw[i] > 3.0);
+        TString strpullw;
+        if(warnpullw){   
+        strpullw = "\\alert{$ ";
+        }else{
+        strpullw = " $ ";
+        }
+        strpullw += prettyPrint(pullw[i]);
+        strpullw +=  " \\pm ";
+        strpullw +=  prettyPrint(epull[i]);
+        if(warnpullw){
+        strpullw += " $} ";
+        }else{
+        strpullw += " $ ";
+        }
+		cout << param[i] << " 	& 	" << strmean << " 	& 	" << strsigma << "	 & 	" << strpull << "	 & 	" << strpullw << "	\\\\" << endl;
+
+//		cout << param[i] << " & 	$ " << prettyPrint(mean[i]) << " \\pm " << prettyPrint(emean[i]) << " $	&	$ " << prettyPrint(sigma[i]) << " \\pm " << prettyPrint(esigma[i]) << " $   &       $ " << prettyPrint(pull[i]) << " \\pm " << prettyPrint(epull[i]) <<  " $   &       $ " << prettyPrint(pullw[i]) << " \\pm " << prettyPrint(epullw[i]) << " $	\\\\" << endl;
+	}
 	cout << "\\end{tabular}" << endl;
-	cout << "\\end{center}" << endl;
+	cout << "\\end{table}" << endl;
 }
