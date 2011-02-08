@@ -12,7 +12,158 @@
 
 #include "BasePDF.h"
 #include "RooComplex.h"
-#include "TimeAcceptance.h"
+
+//  This is included directly below #include "TimeAcceptance.h"
+
+//--------------------------------------------
+// This is included here to avoid checking it in as a separate file to SVN - as this may
+// not be the final solution
+
+
+#include <iostream>
+
+
+class TimeAcceptanceFunction {
+	
+	private :
+	
+	vector<double> sliceTimeStart ;
+	vector<double> sliceAcceptance ;
+	vector<double> sliceFraction ;
+	
+	int nslices ;
+	int startSlice;
+	
+public:
+	
+	//.................................
+	// Constructor
+	TimeAcceptanceFunction() {
+		
+		// The data ....
+		
+		nslices = 10 ;
+		double ts[10] = {0.05,  0.15,  0.25,  0.40,   0.55,  0.70,   0.90,   1.25,  1.75,  8.00 };
+		double ac[10] = {0.001, 0.040, 0.176, 0.497, 0.732, 0.861, 0.933, 0.976, 0.993, 1.0 };
+		//double ac[10] = {1.0, 1.000, 1.00, 1.00, 1.00, 1.00, 1.000, 1.00, 1.00, 1.00 };
+		
+		//..............
+		
+		double previous = 0 ;
+		
+		for( int is=0; is < nslices ; is++)
+		{
+			sliceTimeStart.push_back( ts[is] ) ;
+			sliceAcceptance.push_back( ac[is] ) ;
+			sliceFraction.push_back(ac[is]-previous) ;
+			previous = ac[is] ;
+		}
+		
+		startSlice = -1 ;    //Uninitialised
+		
+	}
+	
+	//.................................
+	void configure ( double tstart ) 
+	{
+		if( tstart < sliceTimeStart[0] ) {cout << " InTimeAcceptance::configure : start time less than bins specified " << endl ; exit(1) ;}	
+		
+		// If in last time slice, or later, then slice = nslices-1
+		if ( sliceTimeStart[nslices-1] <= tstart ) { startSlice = nslices-1 ; }
+		
+		// Find the slice which corresponds to the lower chosen limit of integration.
+		else {
+			for( int is = 0; is < nslices-1; is++ ) { 
+				if( (sliceTimeStart[is] <= tstart ) && ( tstart < sliceTimeStart[is+1] )  )  
+				{
+					startSlice = is ;
+					break ;
+				}
+			}
+		}
+		
+		if( startSlice == -1. ) {cout << " InTimeAcceptance::configure : times in slices are screwed up " << endl ; exit(1) ;}	
+		
+		return ;
+	}
+	
+	//.................................
+	// Return the acceptance corresponding to this slice
+	double acceptance ( double time ) 
+	{
+		
+		// If less than first time slice then zero
+		if( time < sliceTimeStart[0] ) { return 0 ; }
+		
+		// If in last time slice, or later, then slice = last slice = nslices-1
+		else if ( sliceTimeStart[nslices-1] <= time ) { return sliceAcceptance[nslices-1] ; }
+		
+		// Find slice in range
+		else {
+			for( int is = 0; is < nslices-1; is++ ) { 
+				if( (sliceTimeStart[is] <= time ) && ( time < sliceTimeStart[is+1] )  ) return sliceAcceptance[is];  
+			}
+		}
+		
+		cout << " InTimeAcceptance::acceptance : times in slices are screwed up - couldnt find slice - time requested was : " << time << endl ; 
+		exit(1) ;	
+		
+		return 0 ;
+	}
+	
+	
+	//.....................................
+	int numberOfSlices() { return nslices - startSlice ; }
+	int firstSlice( ) { return startSlice ; }
+	int lastSlice( ) { return nslices-1 ; }
+	
+	//.....................................
+	// Return time of beginning of selected slice -  must be between startSlice and nslices-1
+	double sliceStart( int islice ) {
+		if( (islice < startSlice) || (islice >= nslices ) ) {cout << " InTimeAcceptance::sliceFraction : islice is crazy: " << islice << endl ; exit(1) ;} 
+		return sliceTimeStart[islice] ;
+	}
+	
+	
+	//.....................................
+	//The fraction to associate with this slice
+	double fraction( int islice ) {
+		
+		if( (islice < startSlice) || (islice >= nslices ) ) {cout << " InTimeAcceptance::sliceFraction : islice is crazy: " << islice << endl ; exit(1) ;} 
+		
+		// If this is first slice, then you need to do something differently - yuo need cumulative fraction (i.e. acceptance)
+		if( islice == startSlice ) {
+			return sliceAcceptance[islice] ;
+		}
+		else{
+			return sliceFraction[islice] ; 
+		}
+	}
+	
+	//.....................
+	void print() {
+		
+		if( startSlice == -1 ) {
+			cout << " InTimeAcceptance::print() - cant call this before configuring " << endl ;
+			return ;
+		}
+		
+		cout << endl ;
+		cout  << "Time Acceptane Histogram " << endl ;
+		for( int is=this->firstSlice() ; is <= this->lastSlice() ; is++ ) {
+			cout << "    Time slice : "  << this->sliceStart(is) << "  Fraction : " << this->fraction(is) << endl ;
+		}
+		return ;
+	}
+	
+};
+
+
+//---------------------------------------------
+
+
+
+
 
 
 class Bs2JpsiPhi_mistagParameter_Swave_alt : public BasePDF
