@@ -113,8 +113,10 @@ bool Bs2JpsiPhi_mistagParameter_alt::SetPhysicsParameters( ParameterSet * NewPar
 
 	/// Some gymnastics here to match xml parameters to my original pdf parameters
 
-	// Physics parameters.
-	gamma_in  = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+	// Physics parameters.	
+    gamma_in  = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+	//double taus = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+	//gamma_in = 1. /taus ;
     dgam      = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 	delta_ms  = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 	phi_s     = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
@@ -277,10 +279,18 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 	// Must do this for each of the two resolutions.
 	if( ! normalisationCacheValid )  {
 		for( tag = -1; tag <= 1; tag ++ ) {
-            resolution =  resolution1 ;
-			normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
-            resolution =  resolution2 ;
-			normalisationCacheValueRes2[tag+1] = this->diffXsecNorm1( );
+			if(resolution1Fraction >= 0.9999 )
+			{
+				resolution =  resolution1 ;
+				normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
+			}
+			else 
+			{
+				resolution =  resolution1 ;
+				normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
+				resolution =  resolution2 ;
+				normalisationCacheValueRes2[tag+1] = this->diffXsecNorm1( );
+			}
 		}
 		normalisationCacheValid = true ;
 	}
@@ -289,10 +299,18 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 
-	double returnValue  = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
+	double returnValue  ;
+	if(resolution1Fraction >= 0.9999 )
+	{
+		returnValue = normalisationCacheValueRes1[tag+1] ;
+	}
+	else
+	{
+		returnValue = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
+	}
 	
 	if( (returnValue <= 0.) || isnan(returnValue) ) {
-		cout << " Bs2JpsiPhi_mistagParameter_alt::Normalisation() returns <=0 or nan " << endl ;
+		cout << " Bs2JpsiPhi_mistagParameter_alt::Normalisation() returns <=0 or nan : " << returnValue << endl ;
 		cout << " gamma " << gamma() ;
 		cout << " gl    " << gamma_l() ;
 		cout << " gh    " << gamma_h() ;
@@ -378,13 +396,13 @@ double Bs2JpsiPhi_mistagParameter_alt::expH() const
 
 double Bs2JpsiPhi_mistagParameter_alt::intExpL( ) const {
 	//PELC mod to add upper time acceptance factro
-	if( UPPER_TIME_ACCEPTANCE_FACTOR > 0. ) return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution,  UPPER_TIME_ACCEPTANCE_FACTOR )  ;
+	if( UPPER_TIME_ACCEPTANCE_FACTOR > 0. ) return Mathematics::ExpInt_betaAcceptance( tlo, thi, gamma_l(), resolution,  UPPER_TIME_ACCEPTANCE_FACTOR )  ;
 	else return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
 }
 
 double Bs2JpsiPhi_mistagParameter_alt::intExpH( ) const {
 	//PELC mod to add upper time acceptance factro
-	if( UPPER_TIME_ACCEPTANCE_FACTOR > 0. ) return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution, UPPER_TIME_ACCEPTANCE_FACTOR )  ;
+	if( UPPER_TIME_ACCEPTANCE_FACTOR > 0. ) return Mathematics::ExpInt_betaAcceptance( tlo, thi, gamma_h(), resolution, UPPER_TIME_ACCEPTANCE_FACTOR )  ;
 	else return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
 }
 

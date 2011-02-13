@@ -67,6 +67,7 @@ namespace Mathematics
 		return (z.im()>-4.0) ? RooMath::FastComplexErrFuncIm(z)*TMath::Exp(-u*u) : evalCerfApprox(swt,u,c).im() ;
 	}
 
+	//----------------------------------------------------------------------------------------------
 	//........................................
 	//evaluate a simple exponential with single gaussian time resolution
 	double Exp( double t, double gamma, double resolution )
@@ -122,10 +123,28 @@ namespace Mathematics
 		}
 	}
 
+	//------------------------------------------------------------------------------------------
+	//........................................
+	//evaluate a simple exponential with single gaussian time resolution, allowing for an acceptance (1.0 - b*t) - formula from wolfram
+	double Exp_betaAcceptance( double t, double gamma, double resolution, double acceptanceParameter  )
+	{		
+		if(resolution > 0.) 
+		{
+			// At present we dont know how to do this with resolution included
+			cout <<" Mathematics::Exp_betaAcceptance - with (1-bt) acceptance : This doesnt work when resolution .ne. 0 yet " << endl ;
+			exit(1) ;		
+		}
+		else {
+			if( t < 0.0 ) return 0.0 ;
+			return TMath::Exp( -gamma * t ) * (1. - acceptanceParameter * t ) ;
+		}		
+	}
+	
+	
 	//.....................................................
-	// Overloaded version of the above, allowing for an acceptance (1.0 - b*t) - formula form wolfram
+	// Evaluate integral of a simple exponential with single gaussian time resolution, allowing for an acceptance (1.0 - b*t) - formula from wolfram
 	// I = -1/G * exp (-tG) (1 - b(1/G +t ))  instead of I = -1/G * exp (-tG)
-	double ExpInt( double tlow, double thigh, double gamma, double resolution, double acceptanceParameter  )
+	double ExpInt_betaAcceptance( double tlow, double thigh, double gamma, double resolution, double acceptanceParameter  )
 	{
 		if( thigh < tlow )
 		{
@@ -135,7 +154,8 @@ namespace Mathematics
 		
 		if( resolution > 0. )
 		{
-			cout <<" Mathematics::ExpInt - with (1-bt) acceptance : This doesnt work when resolution .ne. 0 yet " << endl ;
+			// At present we dont know how to do this with resolution included
+			cout <<" Mathematics::ExpInt_betaAcceptance - with (1-bt) acceptance : This doesnt work when resolution .ne. 0 yet " << endl ;
 			exit(1) ;		
 		}		
 		else
@@ -155,6 +175,7 @@ namespace Mathematics
 		}
 	}
 	
+	//----------------------------------------------------------------------------------------------------------
 	//........................................
 	//evaluate a simple exponential X cosh with single gaussian time resolution
 	//When you express the cosh as a sum of exp and then multiply out, you are

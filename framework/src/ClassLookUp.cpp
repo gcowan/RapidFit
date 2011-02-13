@@ -9,19 +9,24 @@
 
 #include "ClassLookUp.h"
 
+// Many of these will soon be depricated
 #include "Bs2JpsiPhi_mistagObservable.h"
 #include "Bs2JpsiPhi_mistagObservable_withTimeRes.h"
 #include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
 #include "Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h"
 #include "Bs2JpsiPhi_mistagObservable_alt.h"
 
-
+// Signal PDFs set 1  (originally Greig and Conor mostly)
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h"
-
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.h"
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms.h"
+
+//Signal  PDFs set 2 (originally Pete, Rob and Matt mostly)
 #include "Bs2JpsiPhi_mistagParameter_alt.h"
 #include "Bs2JpsiPhi_mistagParameter_Swave_alt.h"
+#include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
+
+
 #include "Bs2JpsiPhiMassSignal.h"
 
 #include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc.h"
@@ -106,6 +111,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 	        //JPsiPhi from Pete with sWave 
 	        return new Bs2JpsiPhi_mistagParameter_Swave_alt();
+        }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v1" )
+        {
+	        //JPsiPhi from Pete with sWave 
+	        return new Bs2JpsiPhi_SignalAlt_MP_v1();
         }
         else if ( Name == "Bs2PhiPhi" )
         {

@@ -59,6 +59,14 @@ Bs2JpsiPhi_mistagParameter_Swave_alt::Bs2JpsiPhi_mistagParameter_Swave_alt() :
 	MakePrototypes();
 	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_mistagParameter_Swave_alt " << std::endl ;
+	
+	if( useUpperTimeAcceptance() ) {
+		cout << "=====>WARNING " << endl ;
+		cout << "=====>WARNING YOU APPEAR TO BE USING THE UPPER TIME ACCEPTANCE. BE WARNED THAT: " << endl ;
+		cout << "       - It doesnt work for Tagged fits as we havnt looked up how to combine with Exp*Cos in the normalisation " << endl ;
+		cout << "       - It doesnt work with resolution as we dont know how to do the integral for normalisation " << endl << endl ;
+	}
+		
 }
 
 //Make the data point and parameter set
@@ -168,6 +176,18 @@ bool Bs2JpsiPhi_mistagParameter_Swave_alt::SetPhysicsParameters( ParameterSet * 
 	angAccI9 = allParameters.GetPhysicsParameter( angAccI9Name )->GetValue();
 	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
 	
+	// Do a test to ensure user is not using upper time acceptance wrongly
+	if( ((resolution1 != 0.0) || (resolution2 != 0.0) || (tagFraction != 0.5) || (phi_s != 0.0)) && useUpperTimeAcceptance() )
+	{
+		cout << " You appear to be trying to use the upper time acceptance but are using either resolution or are doing a tagged fit" << endl ;
+		cout << " This is not possible at present" << endl ;
+		cout << " Resolution1 : " << resolution1 << endl ;
+		cout << " Resolution2 : " << resolution2 << endl ;
+		cout << " Mistag : " << tagFraction << endl ;
+		cout << " Phi_s : " << phi_s <<  endl ;
+		exit(1) ;
+	}
+	
 	return result;
 }
 
@@ -184,60 +204,36 @@ vector<string> Bs2JpsiPhi_mistagParameter_Swave_alt::GetDoNotIntegrateList()
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::Evaluate(DataPoint * measurement)
 {
-	
-	
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
-
+	
+	//PELC : temp for now until this is added to the ntuple
+	timeAcceptanceCategory = TIME_ACCEPTANCE_CATEGORY ;
 	
 	double val1, val2 ;
 	double returnValue ;
 	
 	if(resolution1Fraction >= 0.9999 ) {
-
 		// Set the member variable for time resolution to the first value and calculate
 		resolution = resolution1 ;
-
-		// Pre calculate the time primitives
-		expL_stored = Mathematics::Exp( t, gamma_l(), resolution ) ;
-		expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
-		expSin_stored = Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
-		expCos_stored = Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
-				
-		val1 = this->diffXsec( );
-		returnValue = val1 ;
-
+		preCalculateTimeFactors() ;						
+		returnValue = this->diffXsec( );
 	}
 	else {
-
 		// Set the member variable for time resolution to the first value and calculate
 		resolution = resolution1 ;
-
-		// Pre calculate the time primitives
-		expL_stored = Mathematics::Exp( t, gamma_l(), resolution ) ;
-		expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
-		expSin_stored = Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
-		expCos_stored = Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
-				
+		preCalculateTimeFactors() ;						
 		val1 = this->diffXsec( );
-
 		// Set the member variable for time resolution to the second value and calculate
 		resolution = resolution2 ;
-
-		// Pre calculate the time primitives
-		expL_stored = Mathematics::Exp( t, gamma_l(), resolution ) ;
-		expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
-		expSin_stored = Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
-		expCos_stored = Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;		
-		
+		preCalculateTimeFactors() ;						
 		val2 = this->diffXsec( );
 		
-		returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;
-				
+		returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;				
 	}
 	
 
@@ -256,9 +252,8 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::Evaluate(DataPoint * measurement)
 		if( isnan(returnValue) ) exit(1) ;
 	}
 	
-	//PELC
-	return returnValue * timeAcceptance.acceptance(t);
-	//return returnValue ;
+	if( useLowerTimeAcceptance() ) return returnValue * timeAcceptance.acceptance(t);
+	else return returnValue ;
 	
 }
 
@@ -276,6 +271,10 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::Normalisation(DataPoint * measureme
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 
+	//PELC : temp for now until this is added to the ntuple
+	timeAcceptanceCategory = TIME_ACCEPTANCE_CATEGORY ;
+
+	
 	// Get time boundaries into member variables
 	IConstraint * timeBound = boundary->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" ) {
@@ -291,26 +290,38 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::Normalisation(DataPoint * measureme
 	// Must do this for each of the two resolutions.
 	if( ! normalisationCacheValid )  {
 		for( tag = -1; tag <= 1; tag ++ ) {
-            resolution =  resolution1 ;
-//PELC
-			//normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
-			normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
-            resolution =  resolution2 ;
-//PELC
-			//normalisationCacheValueRes2[tag+1] = this->diffXsecNorm1( );
-			normalisationCacheValueRes2[tag+1] = this->diffXsecCompositeNorm1( );
+			if(resolution1Fraction >= 0.9999 ){
+				resolution =  resolution1 ;
+				preCalculateTimeIntegrals() ;
+				normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
+			}
+			else {
+				resolution =  resolution1 ;
+				preCalculateTimeIntegrals() ;
+				normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
+				resolution =  resolution2 ;
+				preCalculateTimeIntegrals() ;
+				normalisationCacheValueRes2[tag+1] = this->diffXsecCompositeNorm1( );
+			}
 		}
 		normalisationCacheValid = true ;
 	}	
 	
-	// Return normalisation value according to tag 
+	// calculate return value according to tag 
 
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
-
-	double returnValue  = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
+	double returnValue  ;
+	if(resolution1Fraction >= 0.9999 )
+	{
+		returnValue = normalisationCacheValueRes1[tag+1] ;
+	}
+	else
+	{
+		returnValue = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
+	}
 	
 	if( (returnValue <= 0.) || isnan(returnValue) ) {
-		cout << " Bs2JpsiPhi_mistagParameter_Swave_alt::Normalisation() returns <=0 or nan " << endl ;
+		cout << " Bs2JpsiPhi_mistagParameter_Swave_alt::Normalisation() returns <=0 or nan " << returnValue << endl ;
 		cout << " gamma " << gamma() ;
 		cout << " gl    " << gamma_l() ;
 		cout << " gh    " << gamma_h() ;
@@ -369,18 +380,53 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::gamma_h() const {
 		return 0.0000001 ;
 	}
 	else
-		return gh ; 
+		return gh ;   
 }
 
-double Bs2JpsiPhi_mistagParameter_Swave_alt::gamma() const   { return gamma_in ; }
+double Bs2JpsiPhi_mistagParameter_Swave_alt::gamma() const { return gamma_in ; }
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::q() const { return tag ;}
+
+bool Bs2JpsiPhi_mistagParameter_Swave_alt::useLowerTimeAcceptance() const { return (USE_LOWER_TIME_ACCEPTANCE && (timeAcceptanceCategory > 0)) ; }
+
+bool Bs2JpsiPhi_mistagParameter_Swave_alt::useUpperTimeAcceptance() const { return (USE_UPPER_TIME_ACCEPTANCE && (UPPER_TIME_ACCEPTANCE_FACTOR != 0)) ; }
+
+double Bs2JpsiPhi_mistagParameter_Swave_alt::upperTimeAcceptanceBeta() const { return UPPER_TIME_ACCEPTANCE_FACTOR ; }
+
 
 
 //--------------------------------------------------------------------------
 // Time primitives including single gaussian resolution
 // These now interface to an external helper library
 //
+
+//.......................................................
+// Pre calculate the time integrals : this is becaue these functions are called many times for each event due to the 10 angular terms
+void Bs2JpsiPhi_mistagParameter_Swave_alt::preCalculateTimeFactors()
+{
+	if( useUpperTimeAcceptance() ) expL_stored = Mathematics::Exp_betaAcceptance( t, gamma_l(), resolution, upperTimeAcceptanceBeta() ) ;
+	else expL_stored = Mathematics::Exp( t, gamma_l(), resolution ) ;
+	if( useUpperTimeAcceptance() ) expH_stored = Mathematics::Exp_betaAcceptance( t, gamma_h(), resolution, upperTimeAcceptanceBeta() ) ;
+	else expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
+	expSin_stored = Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
+	expCos_stored = Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
+	return ;	
+}
+
+
+//.......................................................
+// Pre calculate the time integrals : this is becaue these functions are called many times for each event due to the 10 angular terms
+void Bs2JpsiPhi_mistagParameter_Swave_alt::preCalculateTimeIntegrals()
+{
+	if( useUpperTimeAcceptance() ) intExpL_stored = Mathematics::ExpInt_betaAcceptance( tlo, thi, gamma_l(), resolution, upperTimeAcceptanceBeta() )  ;
+	else intExpL_stored = Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
+	if( useUpperTimeAcceptance() ) intExpH_stored = Mathematics::ExpInt_betaAcceptance( tlo, thi, gamma_h(), resolution, upperTimeAcceptanceBeta() )  ;
+	else intExpH_stored = Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
+	intExpSin_stored = Mathematics::ExpSinInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
+	intExpCos_stored = Mathematics::ExpCosInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
+	return ;
+}
+
 //...................................................
 //Exponentials 
 
@@ -395,11 +441,15 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::expH() const
 }
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::intExpL( ) const {
-	return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
+	return intExpL_stored ;
+	//if( useUpperTimeAcceptance() ) return Mathematics::ExpInt_betaAcceptance( tlo, thi, gamma_l(), resolution, upperTimeAcceptanceBeta() )  ;
+	//else return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
 }
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::intExpH( ) const {
-	return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
+	return intExpH_stored ;
+	//if( useUpperTimeAcceptance() )return Mathematics::ExpInt_betaAcceptance( tlo, thi, gamma_h(), resolution, upperTimeAcceptanceBeta() )  ;
+	//else return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
 }
 
 
@@ -418,13 +468,13 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::expCos() const
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::intExpSin( ) const 
 {
-	return Mathematics::ExpSinInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
+	return intExpSin_stored ;   // Mathematics::ExpSinInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
 }
 
 // Integral of exp( - G * t ) * cos( dm * t )  
 double Bs2JpsiPhi_mistagParameter_Swave_alt::intExpCos( ) const 
 {
-	return Mathematics::ExpCosInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
+	return intExpCos_stored ;   // Mathematics::ExpCosInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
 }
 
 
@@ -792,33 +842,40 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecNorm2(  ) const
 	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +
 	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +
 	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
-	
-	
+		
 	return norm ;
 };
 
 
 //....................................................
-// New method to calculate normalisation using a histrogrammed low-end time acceptance function
+// New method to calculate normalisation using a histogrammed "low-end" time acceptance function
+// The acceptance function information is all containe din the timeAcceptance member object,
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecCompositeNorm1(  )  
-{      	
-	double norm = 0 ;
-	double tlo_remember = tlo ;
-	
-	timeAcceptance.configure( tlo ) ;
-	
-	bool firstBin = true ;
-	for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); islice++ ) 
+{   
+	if( useLowerTimeAcceptance() ) 
 	{
-		if( firstBin )firstBin = false ;
-		else tlo = timeAcceptance.sliceStart( islice ) ;
-		norm += this->diffXsecNorm1(  ) * timeAcceptance.fraction( islice ) ;
+		double norm = 0 ;
+		double tlo_remember = tlo ;
+	
+		timeAcceptance.configure( tlo ) ;
+	
+		bool firstBin = true ;
+		for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); islice++ ) 
+		{
+			if( firstBin )firstBin = false ;
+			else tlo = timeAcceptance.sliceStart( islice ) ;
+			norm += this->diffXsecNorm1(  ) * timeAcceptance.fraction( islice ) ;
+		}
+
+		tlo =  tlo_remember ;
+		return norm ;	
 	}
 
-	tlo =  tlo_remember ;
-	return norm ;	
-
-	return 1 ;
+	else 
+	{
+		return this->diffXsecNorm1() ;
+	}
+	
 };
 

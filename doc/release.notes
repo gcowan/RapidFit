@@ -1,5 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/13 Pete clarke
+  - big commit of a restructing of the xxxx_alt PDF series
+  - Initiated new name  Bs2JpsiPhi_SignalAlt.....
+  - Factorised common code into Bs2JpsiPhi_SignalAlt_BaseClass
+  - New code in Mathematics:: to deal with upper time acceptance
+  
 2011/02/07 Rob Currie
   - Added the ability to set the Random Seed at runtime using --SetSeed 1234567
 

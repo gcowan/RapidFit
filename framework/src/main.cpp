@@ -56,7 +56,7 @@ int main( int argc, char * argv[] )
 		string plotFileName = "FitPlots.root";
 		string pullFileName = "PullPlots.root";
 		string LLscanFileName = "LLscanPlots.root";
-		string LLcontourFileName = "LLcontourPlots.root";
+		string LLcontourFileName = "LLcontourPlots";
 		vector< PDFWithData* > pdfsAndData;
 		int numberLLscanPoints = 10 ;
 		double LLscanRange = 2 ;
@@ -545,7 +545,8 @@ int main( int argc, char * argv[] )
 						if( LLscanList[ii] == "gamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.8, 0.3 ); 
 						else if( LLscanList[ii] == "deltaGamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.5, -0.7 ); 
 						else if( LLscanList[ii] == "Phi_s" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 3.14159, -3.14159 ); 
-						else llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, -1.0 ); 
+						else if( LLscanList[ii] == "deltaM" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 19.0, 16.0 ); 
+						else llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.9, 0.1 ); 
 						scanResults.push_back(llResult) ;
 					}
 
@@ -558,20 +559,22 @@ int main( int argc, char * argv[] )
 					LLscanResult2D * llResult ;
 					vector<LLscanResult2D*> contourResults ;
 
-//					string name1("Phi_s") ;
-//					string name2("deltaGamma") ;
+					string name1("Phi_s") ;
+					string name2("deltaGamma") ;
 					//llResult->print() ;
-//					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 3.2, -3.2, 0.7, -0.9 ); 
-////					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 3.2, -3.2, 0.2, -0.2 );
-//					contourResults.push_back(llResult) ;
-//					LLcontourFileName.append("-phisDg") ;
+					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 3.2, -3.2, 0.7, -0.9 ); 
+//					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 3.2, -3.2, 0.2, -0.2 );
+					contourResults.push_back(llResult) ;
+					LLcontourFileName.append("-phisDg.root") ;
 					
+					/*
 					string name1("gamma") ;
 					string name2("deltaGamma") ;
 					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 0.7, 0.3, 0.3, -0.5 );
 					llResult->print() ;
 					contourResults.push_back(llResult) ;
-					LLcontourFileName.append("-gDg") ;
+					LLcontourFileName.append("-gDg.root") ;
+					*/
 
 					makeOutput->SetLLcontourFileName( LLcontourFileName );
 					makeOutput->OutputLLcontourResult( contourResults ) ;				

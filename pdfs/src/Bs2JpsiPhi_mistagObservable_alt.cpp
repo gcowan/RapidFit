@@ -158,6 +158,8 @@ bool Bs2JpsiPhi_mistagObservable_alt::SetPhysicsParameters( ParameterSet * NewPa
 vector<string> Bs2JpsiPhi_mistagObservable_alt::GetDoNotIntegrateList()
 {
 	vector<string> list;
+//PELC
+	list.push_back(mistagName) ;
 	return list;
 }
 
@@ -166,8 +168,6 @@ vector<string> Bs2JpsiPhi_mistagObservable_alt::GetDoNotIntegrateList()
 
 double Bs2JpsiPhi_mistagObservable_alt::Evaluate(DataPoint * measurement)
 {
-	
-	
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
@@ -175,6 +175,7 @@ double Bs2JpsiPhi_mistagObservable_alt::Evaluate(DataPoint * measurement)
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	tagFraction = (int)measurement->GetObservable( mistagName )->GetValue();
+	//tagFraction= 0.5;  //PELC
 
 	
 	double val1, val2 ;
@@ -255,6 +256,8 @@ double Bs2JpsiPhi_mistagObservable_alt::Normalisation(DataPoint * measurement, P
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
+	tagFraction = (int)measurement->GetObservable( mistagName )->GetValue();
+	//tagFraction= 0.5;  //PELC
 
 	// Get time boundaries into member variables
 	IConstraint * timeBound = boundary->GetConstraint("time");
@@ -270,7 +273,9 @@ double Bs2JpsiPhi_mistagObservable_alt::Normalisation(DataPoint * measurement, P
 	
 	// Recalculate cached values if Physics parameters have changed
 	// Must do this for each of the two resolutions.
-	if( ! normalisationCacheValid )  {
+//PELC
+// I dont think you can cache any more as normalisation depends upon the mistag which now changes per event.
+	if( true /*! normalisationCacheValid*/ )  {
 		for( tag = -1; tag <= 1; tag ++ ) {
             resolution =  resolution1 ;
 			normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );

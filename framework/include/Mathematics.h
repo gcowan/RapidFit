@@ -22,7 +22,10 @@ namespace Mathematics
 
 	double Exp( double t, double gamma, double resolution );
 	double ExpInt( double tlow, double thigh, double gamma, double resolution  );
-	double ExpInt( double tlow, double thigh, double gamma, double resolution, double acceptanceParameter  );  //Overloaded to include aceptance function
+	
+	//Added thes to include an upper time acceptance of form ( 1 - beta*t) 
+	double Exp_betaAcceptance( double t, double gamma, double resolution, double betaParameter );
+	double ExpInt_betaAcceptance( double tlow, double thigh, double gamma, double resolution, double betaParameter  );  
 	
 	double ExpCosh( double t, double gamma, double deltaGamma, double resolution );
 	double ExpCoshInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
