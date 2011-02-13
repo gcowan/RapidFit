@@ -4,7 +4,7 @@
  *  RapidFit PDF for Bs2JpsiPhi
  *
  *  @author Peter Clarke peter.clarke@ed.ac.uk
- *  @date 2011-01028
+ *  @date 2011-01-28
  */
 
 #include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
