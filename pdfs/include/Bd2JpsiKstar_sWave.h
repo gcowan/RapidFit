@@ -71,11 +71,11 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		// Member variables that will contain the parameter values
                 double gamma;
                 double deltaMs;
-                double Azero_sq;
+               double Azero_sq;
                 double Apara_sq;
                 double Aperp_sq;
 		double As_sq;
-                double AzeroApara;
+               double AzeroApara;
                 double AzeroAperp;
                 double AparaAperp;
 		double AparaAs;
@@ -108,14 +108,15 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
 		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-		//kaonIDName;				// in phi rest frame
+		string KstarFlavourName;
 
 		// Member variables for the observables
 		double time;
 		double cosTheta;
 		double phi;
 		double cosPsi;
-		//int kaonID;
+		double KstarFlavour;
+		double q() const ;
 
 		double tlow, thigh; // Integration limits
 
@@ -123,6 +124,7 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		double buildPDFdenominator();
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
+
 };
 
 #endif

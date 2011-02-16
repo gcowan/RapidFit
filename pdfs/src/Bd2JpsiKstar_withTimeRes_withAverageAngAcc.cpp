@@ -115,6 +115,18 @@ bool Bd2JpsiKstar_withTimeRes_withAverageAngAcc::SetPhysicsParameters( Parameter
         	AzeroApara = sqrt(Azero_sq)*sqrt(Apara_sq);
         	AzeroAperp = sqrt(Azero_sq)*sqrt(Aperp_sq);
 
+	Apara_sq = allParameters.GetPhysicsParameter( Apara_sqName )->GetValue();
+        if( (Apara_sq < 0.) || (Apara_sq > 1.)  ) { cout << "Warning in Bd2JpsiKstar_withTimeRes_withAverageAngAcc::SetPhysicsParameters: Apara_sq <0 or >1 but left as is" <<  endl ;      }
+        Aperp_sq = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
+        if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bd2JpsiKstar_withTimeRes_withAverageAngAcc::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;      }
+
+        Azero_sq = (1. - Apara_sq - Aperp_sq ) ;
+        if( Azero_sq < 0. ) {
+                cout << "Bd2JpsiKstar_withTimeRes_withAverageAngAcc::SetPhysicsParameters: derived parameter Apara_sq <0  and so set to zero" <<  endl ;
+                Azero_sq = 0. ;
+        }
+
+
 	return isOK;
 }
 
@@ -138,12 +150,15 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Evaluate(DataPoint * measurem
 	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
 	//cout << gamma << " " << Aperp_sq << " " << Azero_sq << endl;
 
+	double returnValue;
+
         if(timeRes1Frac >= 0.9999)
 	{
                 // Set the member variable for time resolution to the first value and calculate
                 timeRes = timeRes1;
-                return buildPDFnumerator();
-        }
+                returnValue =  buildPDFnumerator();
+	//	return returnValue;
+}
         else
 	{
                 // Set the member variable for time resolution to the first value and calculate
@@ -152,9 +167,41 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Evaluate(DataPoint * measurem
                 // Set the member variable for time resolution to the second value and calculate
                 timeRes = timeRes2;
                 double val2 = buildPDFnumerator();
-                return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+
+                returnValue = timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+	//	return returnValue; //added by Ailsa
         }
+
+
+	        if(  ( (returnValue <= 0.) && (time>0.) ) || isnan(returnValue) ) {
+                cout << endl ;
+                cout << " Bd2JpsiKstar_withTimeRes_withAverageAngAcc::evaluate() returns <=0 or nan :" << returnValue << endl ;
+                cout << "   Aperp    " << AT() ;
+                cout << "   APara    " << AP() ;
+                cout << "   A0    " << A0() << endl ;
+                cout << " For event with: " << endl ;
+                cout << "   time " << time << endl ;
+                if( isnan(returnValue) ) exit(1) ;
+        }
+
+	return returnValue;
+
 }
+
+//Amplitudes Used in three angle PDF
+double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::AT() const {
+        if( Aperp_sq <= 0. ) return 0. ;
+        else return sqrt(Aperp_sq) ;
+};
+double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::AP() const {
+        if( Apara_sq <= 0. ) return 0. ;
+        else return sqrt(Apara_sq) ;
+};
+double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::A0() const {
+        if( Azero_sq <= 0. ) return 0. ;
+        else return sqrt(Azero_sq) ;
+};
+
 
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::buildPDFnumerator()
 {
@@ -193,7 +240,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::buildPDFnumerator()
 
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-
+	double returnValue;
 	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
 	IConstraint * timeBound = boundary->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
@@ -212,8 +259,8 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Normalisation(DataPoint * mea
         {
                 // Set the member variable for time resolution to the first value and calculate
                 timeRes = timeRes1;
-                return buildPDFdenominator();
-        }
+                returnValue =  buildPDFdenominator();
+	}
         else
         {
                 // Set the member variable for time resolution to the first value and calculate
@@ -222,8 +269,20 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Normalisation(DataPoint * mea
                 // Set the member variable for time resolution to the second value and calculate
                 timeRes = timeRes2;
                 double val2 = buildPDFdenominator();
-                return timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+                returnValue =  timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
         }
+
+
+	if( (returnValue <= 0.) || isnan(returnValue) ) {
+                cout << " Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Normalisation() returns <=0 or nan " << endl ;
+                cout << " AT    " << AT() ;
+                cout << " AP    " << AP() ;
+                cout << " A0    " << A0() ;
+                exit(1) ;
+        }
+
+        return returnValue ;
+
 }
 
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::buildPDFdenominator()

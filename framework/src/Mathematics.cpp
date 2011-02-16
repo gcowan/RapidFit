@@ -151,17 +151,17 @@ namespace Mathematics
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
 			exit(1) ;
 		}
-		
+
 		if( resolution > 0. )
 		{
 			// At present we dont know how to do this with resolution included
 			cout <<" Mathematics::ExpInt_betaAcceptance - with (1-bt) acceptance : This doesnt work when resolution .ne. 0 yet " << endl ;
-			exit(1) ;		
-		}		
+			exit(1) ;
+		}
 		else
 		{
 			double LoFactor=0, UpFactor=0 ;
-			
+
 			if( tlow < 0. ) {
 				LoFactor = (1. - acceptanceParameter*(1./gamma)) * (-1./gamma) ;
 			}
@@ -169,12 +169,12 @@ namespace Mathematics
 				LoFactor = (1. - acceptanceParameter*((1./gamma)+tlow)) * (-1./gamma) * TMath::Exp(-gamma*tlow) ;
 			}
 			UpFactor = (1. - acceptanceParameter*((1./gamma)+thigh)) * (-1./gamma) * TMath::Exp(-gamma*thigh) ;
-			
+
 			return UpFactor - LoFactor ;
-				
+
 		}
 	}
-	
+
 	//----------------------------------------------------------------------------------------------------------
 	//........................................
 	//evaluate a simple exponential X cosh with single gaussian time resolution
@@ -439,6 +439,7 @@ namespace Mathematics
       vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
       dontIntegrate.push_back("time");
       dontIntegrate.push_back("tag");
+      dontIntegrate.push_back("KstarFlavour");
       evalPDFnorm = rapidInt->DoNumericalIntegral( event, boundary, dontIntegrate );
       val = evalPDFraw/evalPDFnorm;
       for (int i = 0; i < numAngularTerms; i++)

@@ -112,6 +112,12 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		double buildPDFdenominator();
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&);
+		double AT() const ;
+                double AP() const ;
+                double A0() const ;
+
+
 };
+
 
 #endif

@@ -31,6 +31,9 @@
 
 #include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc.h"
 #include "Bd2JpsiKstar_sWave.h"
+#include "Bd2JpsiKstar_sWave_rTerms.h"
+#include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms.h"
+
 #include "Bs2DsPi.h"
 #include "Bs2DsPi_mistagParameter.h"
 #include "Bs2DsPi_acc.h"
@@ -83,12 +86,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         }
 		else if ( Name == "Bs2JpsiPhi_mistagObservable_alt" )
         {
-	        //JPsiPhi from Pete with mistag as a physics observable  
+	        //JPsiPhi from Pete with mistag as a physics observable
 	        return new Bs2JpsiPhi_mistagObservable_alt();
         }
 		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
         {
-	        //Default JPsiPhi 
+	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc();
         }
 
@@ -104,12 +107,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         }
 		else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
         {
-	        //JPsiPhi from Pete  
+	        //JPsiPhi from Pete
 	        return new Bs2JpsiPhi_mistagParameter_alt();
         }
 		else if ( Name == "Bs2JpsiPhi_mistagParameter_Swave_alt" )
         {
-	        //JPsiPhi from Pete with sWave 
+	        //JPsiPhi from Pete with sWave
 	        return new Bs2JpsiPhi_mistagParameter_Swave_alt();
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v1" )
@@ -203,6 +206,19 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
                          // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
                          return new Bd2JpsiKstar_sWave();
+        }
+
+	else if ( Name == "Bd2JpsiKstar_sWave_rTerms" )
+        {
+                         // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
+                         return new Bd2JpsiKstar_sWave_rTerms();
+        }
+
+
+	else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms" )
+        {
+                         // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
+                         return new Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms();
         }
 
 	else
