@@ -318,10 +318,10 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		//string name = FindAndReplaceString( *nameIterator );
 		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
 		cout << setw(15) << name << " & "
-		<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
-		<< setw(10) <<  		  fitError << " & "
-		<< setw(10) << setprecision(2) << sigmaFromInputValue << " & "
-		<< setw(10) << setprecision(5) << fitValue-inputValue << "\\\\" << endl;
+			<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
+			<< setw(10) <<  		  fitError << " & "
+			<< setw(10) << setprecision(2) << sigmaFromInputValue << " & "
+			<< setw(10) << setprecision(5) << fitValue-inputValue << "\\\\" << endl;
 	}
 
 	cout << "\\hline \n\\end{tabular}" << endl;
@@ -339,7 +339,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 
 	//Will need to do some comparisons
 	double Rperp =0 , Rzp =0, ePerp =0 , eZp=0;
-	
+
 	//Ouput each parameter
 	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
 	{
@@ -352,30 +352,30 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		double sigmaFromInputValue = outputParameter->GetPull();
 		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
 		cout << setw(15) << name << " & "
-		<< setw(10) << setprecision(3) << fitValue << " $\\pm$ "
-		<< setw(10) <<  		  fitError << "\\\\" << endl;
+			<< setw(10) << setprecision(3) << fitValue << " $\\pm$ "
+			<< setw(10) <<  		  fitError << "\\\\" << endl;
 	}
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;	
 }
 
 /*string ResultFormatter::FindAndReplaceString( string name )
+  {
+// This isn't very general, and probably won't work for names
+// containing lots of "_".
+int pos = 0;
+int newPos = 0;
+int size = name.size();
+while ( pos < size )
 {
-	// This isn't very general, and probably won't work for names
-	// containing lots of "_".
-	int pos = 0;
-	int newPos = 0;
-	int size = name.size();
-	while ( pos < size )
-	{
-		newPos = name.find("_", pos);
-		if( newPos != string::npos ) {
-			name.replace(newPos, 1, "\\_");
-		}
-		else break;
-		pos = newPos + 2;
-	}
-	return name;
+newPos = name.find("_", pos);
+if( newPos != string::npos ) {
+name.replace(newPos, 1, "\\_");
+}
+else break;
+pos = newPos + 2;
+}
+return name;
 }*/
 
 //Chose which pull plot method to use
@@ -527,27 +527,27 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 	LLscanFile->Close();
 
 }
-	
+
 //.........................................
 // Send LL contour results to a file
 
 void ResultFormatter::MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename )
 {	
 	// 1=BLACK    4=BLUE    3=GREEN     5=YELLOW
-	
+
 	TFile * LLcontourFile = new TFile( filename.c_str(), "RECREATE");
-	
+
 	//Set some numbers
 	int nscans = scanResults.size() ;
-	
+
 	for( int ii=0; ii<nscans; ii++ )
 	{
 		TH2D * hist = scanResults[ii]->GetTH2D() ;
 		hist->Draw("cont1") ;
 		hist->Write();		
 	}
-	
+
 	LLcontourFile->Close();
-	
+
 }
 

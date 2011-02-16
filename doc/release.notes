@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/16 Conor Fitzpatrick
+  - Modified the flat ntuple output to also include the likelihood to which the toy minimises. 
+  - In the ntuple this is called "NLL". This will allow pete's 2D likelihood profile scans to be split into jobs and sent off to condor
+
 2011/02/13 Pete clarke
   - big commit of a restructing of the xxxx_alt PDF series
   - Initiated new name  Bs2JpsiPhi_SignalAlt.....

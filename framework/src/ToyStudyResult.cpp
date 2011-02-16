@@ -178,6 +178,7 @@ vector<double> ToyStudyResult::GetFlatResult( int Index )
 	Flatresult.push_back(allRealTimes[Index]);
 	Flatresult.push_back(allCPUTimes[Index]);
 	Flatresult.push_back(allResults[Index]->GetFitStatus());
+	Flatresult.push_back(allResults[Index]->GetMinimumValue());
 	return Flatresult;
 }
 TString ToyStudyResult::GetFlatResultHeader()
@@ -190,6 +191,6 @@ TString ToyStudyResult::GetFlatResultHeader()
 		header += name + "_error:";
 		header += name + "_pull:";
 	}
-	header += "Fit_RealTime:Fit_CPUTime:Fit_Status";
+	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:NLL";
 	return header;
 }
