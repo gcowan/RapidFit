@@ -191,8 +191,7 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement)
 	}
 	
 
-	if( true ) {
-//	if(  ( (returnValue <= 0.) && (t>0.) ) || isnan(returnValue) ) {
+	if(  ( (returnValue <= 0.) && (t>0.) ) || isnan(returnValue) ) {
 		cout << endl ;
 		cout << " Bs2JpsiPhi_SignalAlt_MP_v1::evaluate() returns <=0 or nan :" << returnValue << endl ;
 		cout << "   gamma " << gamma() << endl;
