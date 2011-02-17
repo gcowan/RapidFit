@@ -21,6 +21,8 @@
 #include "DataSetConfiguration.h"
 #include "ClassLookUp.h"
 #include <stdlib.h>
+#include "TCanvas.h"
+#include "TString.h"
 
 //Default constructor
 DataSetConfiguration::DataSetConfiguration()
@@ -177,6 +179,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		exit(1);
 	}
 	int totalNumberOfEvents = ntuple->GetEntries();
+	ntuple->SetEstimate(ntuple->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this many)
 	int numberOfEventsAfterCut = ntuple->Draw(">>evtList", cutString.c_str()); // apply the cut which automatically creates the evtList object
 	if ( numberOfEventsAfterCut == -1 )
 	{
@@ -197,59 +200,88 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		exit(1);
 	}
 
-	// Store the Data_Type that is in the branch
-	vector<string> Data_Type( numberOfObservables );
+	//  Container for all of the data read in from a root file
+	vector<vector<Double_t> > real_data_array;
 
-	// Need to set the branch addresses
-	vector<TBranch *> branches( numberOfObservables );
-	vector<Float_t> observableValues_floats;
-	vector<Double_t> observableValues_doubles;
-	for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
+	//time_t timeNow1;
+	//time(&timeNow1);
+	//cout << "Time Before Draw Read: " << ctime( &timeNow1 ) << endl;
+
+	//  Instead of Reading in in Row form as with events in NTuples
+	//  (Convenient for many columns and few Rows)
+	//  Read in the data in Column form
+	//
+	//  Fundamental logic behind this is reading in 200k events from MC takes forever but plotting these variables in TBrowser is click of a button fast
+	//  Use the internal Root Structures to return an array of Double_t objects from the plot (No matter what the Branch Type)
+	//  Plus as Tuple structures are disk objects this no longer calls many thousand of reads from a very large file to cache on disk
+	//  This now simply reads all the data in a few fast requests which removes the slowest part of startup (why this has to be so hard I will never know...)
+	for ( short int obsIndex = 0; obsIndex < numberOfObservables; obsIndex=obsIndex+3 )
 	{
-		TLeaf* leaf= (TLeaf*) ntuple->GetLeaf( observableNames[obsIndex].c_str() );
-		Data_Type[obsIndex] = TString( leaf->GetTypeName()).Data();
-		string type = Data_Type[obsIndex];
-		if( type.compare("Double_t") == 0 )
+		//  Hold the Data in a temp object
+		vector<Double_t *> data_array;
+
+		//  Construct a Plot String to use the TTree->Draw Method
+		TString PlotString = observableNames[obsIndex];
+		for( short int i=1; ((obsIndex+i)<numberOfObservables)&&((i<3)); i++ )
 		{
-			if( observableValues_doubles.empty() )
-			{	observableValues_doubles.resize( numberOfObservables );	}
-		  ntuple->SetBranchAddress(observableNames[obsIndex].c_str(), &(observableValues_doubles[obsIndex]), &(branches[obsIndex]));
-		} else if( type.compare("Float_t") == 0 )
-		{
-			if( observableValues_floats.empty() )
-			{	observableValues_floats.resize( numberOfObservables );	}
-		  ntuple->SetBranchAddress(observableNames[obsIndex].c_str(), &(observableValues_floats[obsIndex]), &(branches[obsIndex]));
+			PlotString.Append(":");
+			PlotString.Append(observableNames[obsIndex+i]);
 		}
-	}
-
-	// Now populate the dataset
-	int numberOfDataPointsAdded = 0;
-	int numberOfDataPointsRead = 0;
-	while ( numberOfDataPointsAdded < numberEventsToRead && numberOfDataPointsAdded < numberOfEventsAfterCut )
-	{
-		if ( numberOfDataPointsRead > numberOfEventsAfterCut) break;
-		DataPoint point( observableNames );
-		ntuple->GetEntry( evtList->GetEntry(numberOfDataPointsRead) );
+		//cout << "PlotString: " << PlotString << endl;
 		
-		for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
+		//  This is here to remove an annoying Root 'Information' line, if anyone finds out how to PERMINANTLY SHUT ROOT UP
+		//  PLEASE email me rob.currie@ed.ac.uk
+		TString canvas_string("throw_away_canvas_");
+		canvas_string+=obsIndex;
+		TCanvas* c1 = new TCanvas(canvas_string,canvas_string);
+
+		//  Draw 3 observables at a time in some large plot
+		//  (it doesn't matter what this looks like and we can throw it away from here)
+		ntuple->Draw( PlotString , cutString.c_str() );
+		
+		//  Store pointers to the objects for ease of access
+		data_array.push_back( ntuple->GetV1() );
+		//  GetV1 returns a pointer to an array of doubles for the first ('X') axis in the plot we've just drawn
+		if( (obsIndex+1) < numberOfObservables) {  data_array.push_back( ntuple->GetV2() ); }
+		if( (obsIndex+2) < numberOfObservables) {  data_array.push_back( ntuple->GetV3() ); }
+		
+		//  As You can only plot 3 at a time using this mechanism and Root will overide the results between drawing the plots
+		//  Save the actual data to somewhere protected in our memory
+		for( short int i=0; i < data_array.size(); i++ )
 		{
-			string type = Data_Type[obsIndex];
+			vector<Double_t> temp_vector;
+			for( unsigned int j=0; j < numberOfEventsAfterCut; j++ )
+			{
+				temp_vector.push_back( data_array[i][j] );
+			}
+			real_data_array.push_back( temp_vector );
+		}
+		//  Get rid of another annoying root output line
+		c1->Close();
+	}
+        //time_t timeNow2;
+	//time(&timeNow2);
+	//cout << "Time After Draw Read: " << ctime( &timeNow2 ) << endl;
+
+
+        // Now populate the dataset
+        int numberOfDataPointsAdded = 0;
+        int numberOfDataPointsRead = 0;
+	//  Now we have all of the data stored in memory in real_data_array which has a 1<->1 with observableName
+	//  Create and store data points for each event as before and throw away events outside of the PhaseSpace 
+	for( ; (numberOfDataPointsRead < numberOfEventsAfterCut) && (numberOfDataPointsAdded < numberEventsToRead) ; numberOfDataPointsRead++ )
+	{
+		DataPoint point( observableNames );
+		for( unsigned int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
+		{
 			string name = observableNames[obsIndex];
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
-
-			if( type.compare("Double_t") == 0 )
-			{
-				point.SetObservable( name, observableValues_doubles[obsIndex], 0.0, unit);
-			} else if( type.compare("Float_t") == 0 )
-			{
-				point.SetObservable( name, observableValues_floats[obsIndex], 0.0, unit);
-			}
+			point.SetObservable( name, real_data_array[obsIndex][numberOfDataPointsRead], 0.0, unit);
 		}
 		bool dataPointAdded = data->AddDataPoint( &point );
 		if (dataPointAdded) numberOfDataPointsAdded += 1;
-		numberOfDataPointsRead += 1;
 	}
-
+	
 	inputFile->Close();
 	delete inputFile;
 	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << " which are consistent with the PhaseSpaceBoundary" << endl;

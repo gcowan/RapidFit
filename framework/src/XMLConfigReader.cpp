@@ -7,7 +7,6 @@
   @date 2009-10-02
  */
 
-#include <stdlib.h>
 #include "XMLConfigReader.h"
 #include "ClassLookUp.h"
 #include <fstream>
@@ -21,6 +20,7 @@
 #include "ObservableContinuousConstraint.h"
 #include "ObservableDiscreteConstraint.h"
 #include "Blinder.h"
+#include "ScanParam.h"
 
 //Default constructor
 XMLConfigReader::XMLConfigReader() : isLoaded(false)
@@ -171,8 +171,11 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 	{
 		vector< pair< string, string > > contourPlots;
 		vector<string> projections;
-		vector<string> LLscanList;
+//		vector<string> LLscanList;
 		string pullType = "None";
+		vector<ScanParam*> ScanParameters;
+		vector<pair<ScanParam*, ScanParam*> > _2DScanParameters;
+
 		vector< XMLTag* > outputComponents = OutputTag->GetChildren();
 		for ( int childIndex = 0; childIndex < outputComponents.size(); childIndex++ )
 		{
@@ -184,13 +187,23 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			{
 				projections.push_back( outputComponents[childIndex]->GetValue()[0] );
 			}
-			else if ( outputComponents[childIndex]->GetName() == "LLscan" )
-			{
-				LLscanList.push_back( outputComponents[childIndex]->GetValue()[0] );
-			}
+//			else if ( outputComponents[childIndex]->GetName() == "LLscan" )
+//			{
+//				LLscanList.push_back( outputComponents[childIndex]->GetValue()[0] );
+//			}
 			else if ( outputComponents[childIndex]->GetName() == "DoPullPlots" )
 			{
 				pullType = outputComponents[childIndex]->GetValue()[0];
+			}
+			else if ( outputComponents[childIndex]->GetName() == "Scan" )
+			{
+				ScanParam* temp_SParam = GetScanParam( outputComponents[childIndex] );
+				ScanParameters.push_back( temp_SParam );
+			}
+			else if ( outputComponents[childIndex]->GetName() == "2DScan" )
+			{
+				pair<ScanParam*, ScanParam*> temp_2DScan = Get2DScanParam( outputComponents[childIndex] );
+				_2DScanParameters.push_back( temp_2DScan );
 			}
 			else
 			{
@@ -199,7 +212,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 		}
 
-		return new OutputConfiguration( contourPlots, projections, LLscanList, pullType );
+		return new OutputConfiguration( contourPlots, projections, pullType, ScanParameters, _2DScanParameters );
 	}
 	else
 	{
@@ -1284,8 +1297,7 @@ int XMLConfigReader::GetSeed()
 		seed.push_back( 0 );
 		//If no such tag is found, report
 		cout << "Seed tag not found in config file, defaulting to TRandom3(0)." << endl;
-	}
-	return seed.back();
+	} else  return seed.back();
 }
 
 //	Set a new TRandom seed that is returned by the XMLFile
@@ -1293,4 +1305,119 @@ void XMLConfigReader::SetSeed( int new_seed )
 {
 	while( !seed.empty() )  {  seed.pop_back();  }	//  Remove the old seed
 	seed.push_back(new_seed);			//  Set the new Random Seed
+}
+
+pair<ScanParam*, ScanParam*> XMLConfigReader::Get2DScanParam( XMLTag * InputTag )
+{
+	pair<ScanParam*, ScanParam*> Returnable_Pair;
+	ScanParam* Param_1;
+	ScanParam* Param_2;
+	if ( InputTag->GetName() == "2DScan" )
+	{
+		bool param1 = false;
+		bool param2 = false;
+		//Loop over the tag children, which correspond to the parameter elements
+		vector< XMLTag* > elements = InputTag->GetChildren();
+		for ( int elementIndex = 0; elementIndex < elements.size(); elementIndex++ )
+		{
+			string name = elements[elementIndex]->GetName();
+			if ( name == "X_Param" )  {
+				Param_1 = XMLConfigReader::GetScanParam( elements[elementIndex] );
+				param1 = true;
+			} else if ( name == "Y_Param" )  {
+				Param_2 = XMLConfigReader::GetScanParam( elements[elementIndex] );
+				param2 = true;
+			} else {
+				cerr << "Bad Configuration for 2DScan, XMLTag " << name << " is bad." << endl;
+				exit(-1);
+			}
+		}
+		
+		if( !param1 || !param2 )
+		{
+			cerr << "Sorry 2DScan not correctly defined" <<endl;
+			exit(-3);
+		}
+		
+		Returnable_Pair.first = Param_1;
+		Returnable_Pair.second = Param_2;
+		return Returnable_Pair;
+	}
+}
+
+//Make a physics parameter from an appropriate XML tag
+ScanParam * XMLConfigReader::GetScanParam( XMLTag * InputTag )
+{
+	ScanParam * ScanParamLocal;
+	//Check the tag is actually a physics parameter
+	if ( (InputTag->GetName() == "Scan") || (InputTag->GetName() == "X_Param") || (InputTag->GetName() == "Y_Param") )
+	{
+		//Create some default values;
+		vector<string> name_tag, type;
+		vector<double> maximum, minimum;
+		vector<int> points, sigma;
+
+		//Loop over the tag children, which correspond to the parameter elements
+		vector< XMLTag* > elements = InputTag->GetChildren();
+		for ( int elementIndex = 0; elementIndex < elements.size(); elementIndex++ )
+		{
+			string name = elements[elementIndex]->GetName();
+			if ( name == "Name" )
+			{
+				name_tag.push_back( elements[elementIndex]->GetValue()[0].c_str() );
+			} else if ( name == "Type" )
+			{
+				type.push_back( elements[elementIndex]->GetValue()[0].c_str() );
+			}
+			else if ( name == "Minimum" )
+			{
+				minimum.push_back( strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL ) );
+			}
+			else if ( name == "Maximum" )
+			{
+				maximum.push_back( strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL ) );
+			}
+			else if ( name == "Points" )
+			{
+				points.push_back( atoi( elements[elementIndex]->GetValue()[0].c_str() ) );
+			}
+			else if ( name == "Sigma" )
+			{
+				sigma.push_back( atoi( elements[elementIndex]->GetValue()[0].c_str() ) );
+			}
+			else
+			{
+				cerr << "Unrecognised Scan configuration: " << name << endl;
+				exit(1);
+			}
+		}
+
+		//Check for ambiguity
+		if ( ( maximum.empty() || minimum.empty() ) && ( sigma.empty() ) )
+		{
+			cerr << "Ambiguous Scan definition: " << name_tag[0] << " has value and ";
+			if ( maximum.empty() )
+			{
+				cerr << " maximum, but not minimum";
+			}
+			if ( minimum.empty() )
+			{
+				cerr << " minimum, but not maximum";
+			}
+			cerr << " defined" << endl;
+			exit(1);
+		}
+
+		if( ( !maximum.empty() || !minimum.empty() ) && !sigma.empty() )
+		{
+			cerr << "Ambiguous Scan definition:\t" << name_tag[0] <<"\t" << type[0] << endl;
+			cerr << "has both numerical and sigma based limits, defaulting to numerical!" << endl;
+			while( !sigma.empty() ) { sigma.pop_back(); }
+		}
+
+		ScanParamLocal = new ScanParam( name_tag, type, maximum, minimum, sigma, points );
+		return ScanParamLocal;
+
+	} else	{ cerr << "Unreconised Scan Config: " << InputTag->GetName() << endl; exit(1); }
+
 }

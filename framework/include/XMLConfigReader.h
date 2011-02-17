@@ -20,6 +20,7 @@
 #include "OutputConfiguration.h"
 #include "DataSetConfiguration.h"
 #include "ConstraintFunction.h"
+#include "ScanParam.h"
 
 using namespace std;
 
@@ -61,6 +62,8 @@ class XMLConfigReader
 		DataSetConfiguration * MakeDataSetConfiguration( XMLTag*, PhaseSpaceBoundary* );
 		ConstraintFunction * GetConstraintFunction( XMLTag* );
 		ExternalConstraint * GetExternalConstraint( XMLTag* );
+		ScanParam * GetScanParam( XMLTag * InputTag );
+		pair<ScanParam*, ScanParam*> Get2DScanParam( XMLTag * InputTag );
 
 		vector< XMLTag* > children;
 		bool isLoaded;

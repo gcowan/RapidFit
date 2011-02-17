@@ -1,0 +1,36 @@
+<Output>                                                                                                                                                              
+                                                                                                                                                                      
+        <Scan>                                                                                                                                                        
+                <Name>gamma</Name>                                                                                                                                    
+                <Type>LLscan</Type>                                                                                                                                   
+                <Maximum>1.0</Maximum>                                                                                                                                
+                <Minimum>0.0</Minimum>                                                                                                                                
+                <Points>5</Points>                                                                                                                                    
+        </Scan>                                                                                                                                                       
+                                                                                                                                                                      
+        <Scan>                                                                                                                                                        
+                <Name>deltaGamma</Name>                                                                                                                               
+                <Type>LLscan</Type>                                                                                                                                   
+                <Sigma>5</Sigma>                                                                                                                                      
+                <Points>5</Points>                                                                                                                                    
+        </Scan>                                                                                                                                                       
+                                                                                                                                                                      
+        <2DScan>                                                                                                                                                      
+                                                                                                                                                                      
+                <X_Param>                                                                                                                                             
+                        <Name>Phi_s</Name>                                                                                                                            
+                        <Type>LLscan</Type>                                                                                                                           
+                        <Sigma>3</Sigma>                                                                                                                              
+                        <Points>5</Points>                                                                                                                            
+                </X_Param>                                                                                                                                            
+                                                                                                                                                                      
+                <Y_Param>                                                                                                                                             
+                        <Name>deltaGamma</Name>                                                                                                                       
+                        <Type>LLscan</Type>                                                                                                                           
+                        <Sigma>3</Sigma>                                                                                                                              
+                        <Points>5</Points>                                                                                                                            
+                </Y_Param>                                                                                                                                            
+                                                                                                                                                                      
+        </2DScan>                                                                                                                                                     
+                                                                                                                                                                      
+</Output>

@@ -1,0 +1,76 @@
+This is a short intro on how to use 'cmake' to build RapidFit
+
+
+HOWTO:
+
+cd $RAPIDFITDIR/build
+cmake ..
+make
+
+Yes, thats all
+
+
+
+
+Why use CMAKE?
+
+1)
+Cmake offers better support for checking against altered header dependencies
+This means less situations where 'make clean && make' is required
+
+2)
+Cmake offers a nicer build interface (this can be changed to be a LOT more verbose by altering CmakeLists.txt)
+
+3)
+I will argue till blue in the face that:
+CMakeLists.txt is easier to read and maintain than MakeFile
+and:
+it offers MUCH more flexibility
+
+4)
+It builds a smaller binary without pulling in 'too much' root crap (but this is a small issue given the overheads in simply running most fits)
+
+5)
+It truely builds out of source in the $RAPIDFIT/build directory and doesn't require object directories to become mixed with code
+
+6)
+It will ONLY build out of source
+
+7)
+It automatically resolves dependencies better than most user written MakeFiles
+
+8)
+It's better for checking build dependencies than using a MakeFile
+
+
+
+Why not to use CMAKE?
+
+
+1) It's not installed in Edinburgh and I can't install it...
+
+OK if you can't setup Cmake for yourself email me for instructions or live with the standard make
+it IS installed as standard on most development environments I have come across in linux and is installed as part of XCode on OSX and has ports to a certain other OS to boot
+If you can't install it or have difficulties I sympathise but it really is an easy to install and setup program compared to some others
+
+
+2) But I have to run cmake every time I add a new file.
+
+If thats the attitude you have then just alias make in your .bashrc as such:
+
+alias make='if [ -f CMakeCache.txt ] ; then cmake .; fi && make'
+
+
+
+3) I don't want to...
+
+Why not? you can turn on/off build messages, you can build and make and link against libraries much quicker and easier and the difficult part has been done by myself in writing the CMakeLists.txt file :D
+
+
+
+
+4) But I really don't want to!
+
+Fine but your missing out :P
+
+

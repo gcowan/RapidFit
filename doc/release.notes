@@ -1,5 +1,28 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/17 Rob Currie
+  - Rewritten the code to read in root files into RapidFit DataSetConfiguration.h
+       after giving it near a fortnight of torture under various datasets and fitting I'm uploading it as it offers speed and logic improvements
+
+  - Fixed another gcc 4.4 bug in a pdf, Xcode seems to be on gcc<=4.3 still...
+
+  - large additions to XMLConfigReader to read in new Output <Scan> and <2DScan> tags and children which replace the <LLscan> tags
+  - large changes to FitFormatter to make DoScan more generic
+  - Added ScanParam class to cope with scan metadata
+  - Added a LOT of code to OutputFormatter to return on request ScanParameters and 2D scan pairs. This also requires storing a ResultParameterSet in the class
+  - Altered the code in main to run LLscan and LLcontour as requested, further options to these functions have been made redundant due to XML control
+  - Added ability to call FitResult objects from a Scan ala commented code in main.cpp
+
+  - Left hooks in FitFormatter for quick+dirty plotting code in RapidFit for scans
+
+  - Added CmakeLists.txt and scripts/FindROOT.cmake which allows RapidFit to be built with cmake which makes building on the existing code much easier imo
+  - Added doc/CMAKE-HOWTO.txt for those interested in using this I recommend it as it gets rid of 99%+ of make clean issues
+
+  - Added tinter-static.C file in utils  which is a copy of a plotting tool I use to return pullPlot graphs as used for note2
+
+  - Added initial implementation for throw-catch over single fits within a scan ala Pete's suggestion
+
+
 2011/02/16 Conor Fitzpatrick
   - Modified the flat ntuple output to also include the likelihood to which the toy minimises. 
   - In the ntuple this is called "NLL". This will allow pete's 2D likelihood profile scans to be split into jobs and sent off to condor

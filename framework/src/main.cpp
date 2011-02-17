@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include "MakeFoam.h"
 #include "PerEventAngularAcceptance.h"
+#include "OutputConfiguration.h"
+//#include "ScanParam.h"
+#include "TString.h"
 
 using namespace std;
 
@@ -101,22 +104,43 @@ int main( int argc, char * argv[] )
 				cout << "      Specifies the number of repeats for a Toy study " <<endl ;
 
 				cout << endl ;
-				cout << " --doLLscan  [ -numberLLscanPoints <n> ] " << endl ;
+				cout << " --doLLscan  " << endl; //[ -numberLLscanPoints <n> ] " << endl ;
 				cout << "      Causes a set of LL scans to be perfomed around the fit minimum" << endl ;
-				cout << "      n = number of points to scan each side of minimum" << endl ;
+//				cout << "      n = number of points to scan each side of minimum" << endl ;
 				cout << "      The parameters which will be scanned must be specified in the xml file as " << endl ;
-				cout << "            <Output> " << endl ;
-				cout << "              <LLscan>parameterName</LLscan> " << endl ;
-				cout << "            </Output> " << endl ;
+				cout << "      The range may be defined as hard numerical limits as shown below or as a " <<endl;
+				cout << "      Range of n sigma from the fit minima, as shown in Y_Param for LLcontour" << endl;
+				cout << "\n	<Output> " << endl ;
+				cout << "		<Scan>" << endl;
+				cout << "			<Name>parameterName</Name> " << endl ;
+				cout << "			<Type>parameterType</Type> " << endl ;
+				cout << "			<Maximum>parameterMax</Maximum> " << endl ;
+				cout << "			<Minimum>parameterMin</Minimum> " << endl ;
+				cout << "			<Points>parameterPoints</Points> " << endl ;
+				cout << "		</Scan>" << endl;
+				cout << "	</Output>" << endl ;
 
 				cout << endl ;
-				cout << " --doLLcontour  [ -numberLLscanPoints <n> ] " << endl ;
+				cout << " --doLLcontour  " << endl; //[ -numberLLscanPoints <n> ] " << endl ;
 				cout << "      Causes a set of LL scans to be perfomed around the fit minimum" << endl ;
-				cout << "      n = number of points to scan each side of minimum" << endl ;
-				//cout << "      The parameters which will be scanned must be specified in the xml file as " << endl ;
-				//cout << "            <Output> " << endl ;
-				//cout << "              <LLscan>parameterName</LLscan> " << endl ;
-				//cout << "            </Output> " << endl ;
+//				cout << "      n = number of points to scan each side of minimum" << endl ;
+				cout << "      The parameters which will be scanned must be specified in the xml file as " << endl ;
+				cout << "\n	<Output> " << endl ;
+				cout << "		<2DScan>" << endl;
+				cout << "			<X_Param>" << endl;
+				cout << "				<Name>parameterName</Name> " << endl ;
+				cout << "				<Type>parameterType</Type> " << endl ;
+				cout << "				<Maximum>Maxima of x axis</Maximum> " << endl ;
+				cout << "				<Minimum>Minima of x axis</Minimum> " << endl ;
+				cout << "				<Points>number of points in y axis</Points> " << endl ;
+				cout << "			</Y_Param>" <<endl;
+				cout << "				<Name>parameterName</Name> " << endl ;
+				cout << "				<Type>parameterType</Type> " << endl ;
+				cout << "				<Sigma>number of sigma from fit minima</Sigma> " << endl ;
+				cout << "				<Points>number of points in y axis</Points> " << endl ;
+				cout << "			</Y_Param>" <<endl;
+				cout << "		</2DScan>" << endl;
+				cout << "	</Output> " << endl ;
 
 				cout << endl ;
 				cout << " --saveOneDataSet <filename>   " << endl ;
@@ -308,20 +332,20 @@ int main( int argc, char * argv[] )
 
 			}
 
-			else if ( currentArgument == "-numberLLscanPoints" )
-			{
-				if ( argumentIndex + 1 < argc )
-				{
-					argumentIndex++;
-					numberLLscanPoints = atoi( argv[argumentIndex] );
-					if( numberLLscanPoints <= 0 ) { cerr << "Number of ll scan points not >=0" << endl; return 1; }
-				}
-				else
-				{
-					cerr << "Number of ll scan points not specified" << endl;
-					return 1;
-				}
-			}
+//			else if ( currentArgument == "-numberLLscanPoints" )
+//			{
+//				if ( argumentIndex + 1 < argc )
+//				{
+//					argumentIndex++;
+//					numberLLscanPoints = atoi( argv[argumentIndex] );
+//					if( numberLLscanPoints <= 0 ) { cerr << "Number of ll scan points not >=0" << endl; return 1; }
+//				}
+//				else
+//				{
+//					cerr << "Number of ll scan points not specified" << endl;
+//					return 1;
+//				}
+//			}
 			else if ( currentArgument == "--doLLcontour" )
 			{
 				doLLcontourFlag = true;
@@ -532,37 +556,30 @@ int main( int argc, char * argv[] )
 				FitResult * oneResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
 
 				//Output results
-				makeOutput->OutputFitResult(oneResult);
+				makeOutput->SetInputResults( oneResult->GetResultParameterSet() );
+				makeOutput->OutputFitResult( oneResult );
 
 
 				//Do LL scan
 				if( doLLscanFlag ) {
-					LLscanResult * llResult ;
-					vector<LLscanResult*> scanResults ;
-					vector<string> LLscanList = makeOutput->GetLLscanList() ;   //PELC ******************* need to get an object which specifies a scan range and number of points ************
+					//  Temporary Holder for the scan outputs to plot
+					LLscanResult * llResult;
+					vector<FitResult*> scanSoloResult;
+					//  Store
+					vector<LLscanResult*> scanResults;
+					vector<vector<FitResult*> > scanFitResults;
+					vector<string> LLscanList = makeOutput->GetLLscanList();
 
 					for(int ii=0; ii < LLscanList.size() ; ii++)
 					{
-						if( LLscanList[ii] == "gamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.8, 0.3 );
-						else if( LLscanList[ii] == "deltaGamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.5, -0.7 );
-						else if( LLscanList[ii] == "Phi_s" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 3.14159, -3.14159 );
-						else if( LLscanList[ii] == "As_sq" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.9, 0.1 );
-						else if( LLscanList[ii] == "Apara_sq" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 );
-						else if( LLscanList[ii] == "Aperp_sq" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 );
-						else if( LLscanList[ii] == "Azero_sq" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 );
-						else if( LLscanList[ii] == "R_alpha" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 );
-						else if( LLscanList[ii] == "R_beta" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 );
-						else if( LLscanList[ii] == "R_gamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, 0.0 );
-						else if( LLscanList[ii] == "delta_s" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 3.14159, -3.14159);
-						else llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 1.0, -1.0 );
-						if( LLscanList[ii] == "gamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.8, 0.3 );
-						else if( LLscanList[ii] == "deltaGamma" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.5, -0.7 );
-						else if( LLscanList[ii] == "Phi_s" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 3.14159, -3.14159 );
-						else if( LLscanList[ii] == "deltaM" ) llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 19.0, 16.0 );
-						else llResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), LLscanList[ii], numberLLscanPoints, 0.9, 0.1 );
-					}
+						llResult = FitAssembler::DoLLScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[ii] );
+						scanResults.push_back( llResult );
 
-					makeOutput->SetLLscanFileName(LLscanFileName);
+						//scanSoloResult = FitAssembler::DoScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[ii] );
+	
+						//scanFitResults.push_back( scanSoloResult );
+					}
+					makeOutput->SetLLscanFileName( LLscanFileName );
 					makeOutput->OutputLLscanResult( scanResults ) ;
 				}
 
@@ -571,27 +588,29 @@ int main( int argc, char * argv[] )
 					LLscanResult2D * llResult ;
 					vector<LLscanResult2D*> contourResults ;
 
-					string name1("Phi_s") ;
-					string name2("deltaGamma") ;
-					//llResult->print() ;
-//					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 3.2, -3.2, 0.7, -0.9 );
-////					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 3.2, -3.2, 0.2, -0.2 );
-//					contourResults.push_back(llResult) ;
-//					LLcontourFileName.append("-phisDg") ;
-					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 3.2, -3.2, 0.7, -0.9 );
-//					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 3.2, -3.2, 0.2, -0.2 );
-					contourResults.push_back(llResult) ;
-					LLcontourFileName.append("-phisDg.root") ;
+					vector<vector<FitResult*> > SoloContourResults;
+					vector<vector<vector<FitResult*> > > ContourFitResults;
+					vector<vector<FitResult*> > ContourLinearResults;
+					
+					vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DLLscanList();
 
-					/*
-					string name1("gamma") ;
-					string name2("deltaGamma") ;
-					llResult = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), name1, name2, numberLLscanPoints, 0.7, 0.3, 0.3, -0.5 );
-					llResult->print() ;
-					contourResults.push_back(llResult) ;
-					LLcontourFileName.append("-gDg.root") ;
-					*/
+					for( int ii=0; ii < _2DLLscanList.size() ; ii++ )
+					{
+						string name1 = _2DLLscanList[ii].first;
+						string name2 = _2DLLscanList[ii].second;
+						llResult = FitAssembler::DoLLScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
+						contourResults.push_back(llResult) ;
 
+						TString ext_string("-");
+						ext_string.Append( name1 );
+						ext_string.Append( name2 );
+						ext_string.Append( ".root" );
+						LLcontourFileName.append(ext_string) ;
+
+						//SoloContourResults = FitAssembler::DoScan2D( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
+						//ContourFitResults.push_back( SoloContourFitResults );
+						//ContourLinearResults.push_back( FitAssembler::Linearize( SoloContourFitResults ) );
+					}
 					makeOutput->SetLLcontourFileName( LLcontourFileName );
 					makeOutput->OutputLLcontourResult( contourResults ) ;
 				}

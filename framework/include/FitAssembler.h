@@ -18,6 +18,7 @@
 #include "FitFunctionConfiguration.h"
 #include "MinimiserConfiguration.h"
 #include "PDFWithData.h"
+#include "ScanParam.h"
 #include <vector>
 #include <string>
 
@@ -30,9 +31,13 @@ class FitAssembler
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle* );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* > );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< IPDF* >, vector< IDataSet* >, vector< ConstraintFunction* > );
-		static LLscanResult * DoScan( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, string, int, double, double );
-		static LLscanResult2D * DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, string, string, int, double, double, double, double );
-
+		static vector<LLscanResult*> DoCVScan( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string );
+		static vector<FitResult*> DoScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, ScanParam* );
+		static LLscanResult* DoLLScan( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, ScanParam* );
+		static LLscanResult* DoLLScan( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string );
+		static LLscanResult2D * DoLLScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string, string );
+		static vector<vector<FitResult*> > DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string, string, string="LLscan", string="LLscan" );
+		static vector<FitResult* > Linearize( vector<vector<FitResult*> > Input_Results );
 };
 
 #endif
