@@ -174,7 +174,7 @@ double Bs2JpsiPhi_mistagObservable_alt::Evaluate(DataPoint * measurement)
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
-	tagFraction = (int)measurement->GetObservable( mistagName )->GetValue();
+	tagFraction = measurement->GetObservable( mistagName )->GetValue();
 	//tagFraction= 0.5;  //PELC
 
 	
@@ -256,7 +256,7 @@ double Bs2JpsiPhi_mistagObservable_alt::Normalisation(DataPoint * measurement, P
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
-	tagFraction = (int)measurement->GetObservable( mistagName )->GetValue();
+	tagFraction = measurement->GetObservable( mistagName )->GetValue();
 	//tagFraction= 0.5;  //PELC
 
 	// Get time boundaries into member variables

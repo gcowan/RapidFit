@@ -21,6 +21,7 @@
 #include "ScanParam.h"
 #include <vector>
 #include <string>
+#include <exception>
 
 using namespace std;
 

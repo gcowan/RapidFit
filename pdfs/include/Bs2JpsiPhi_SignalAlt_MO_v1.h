@@ -1,33 +1,29 @@
-// $Id: Bs2JpsiPhi_SignalAlt_MP_v1.h,v 1.1 2009/12/06  Pete Clarke Exp $
-/** @class Bs2JpsiPhi_SignalAlt_MP_v1.h
+// $Id: Bs2JpsiPhi_SignalAlt_MO_v1.h,v 1.1 2009/12/06  Pete Clarke Exp $
+/** @class Bs2JpsiPhi_SignalAlt_MO_v1 
  *
- *  PDF for Bs2JpsiPhi Signal - new release for feb 2011
+ *  Bs2JpsiPhi_SignalAlt series with mistag as observable
  *
  *  @author Pete Clarke peter.clarke@ed.ac.uk
  *  @date 2011-02-13
- *
  */
 
-#ifndef Bs2JpsiPhi_SignalAlt_MP_v1_H
-#define Bs2JpsiPhi_SignalAlt_MP_v1_H
+#ifndef Bs2JpsiPhi_SignalAlt_MO_v1_H
+#define Bs2JpsiPhi_SignalAlt_MO_v1_H
 
 #include "BasePDF.h"
 #include "Bs2JpsiPhi_SignalAlt_BaseClass.h"
 #include "RooComplex.h"
 
 #include <exception>
-#include <iostream>
 
-
-
-class Bs2JpsiPhi_SignalAlt_MP_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass
+class Bs2JpsiPhi_SignalAlt_MO_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_MP_v1();
-		~Bs2JpsiPhi_SignalAlt_MP_v1();
+		Bs2JpsiPhi_SignalAlt_MO_v1();
+		~Bs2JpsiPhi_SignalAlt_MO_v1();
 
 		//Mandatory method to evaluate the PDF value:
-		virtual double Evaluate(DataPoint*) ;
+		virtual double Evaluate(DataPoint*);
 
 		//Other opeating methods
 		virtual bool SetPhysicsParameters(ParameterSet*);
@@ -35,7 +31,7 @@ class Bs2JpsiPhi_SignalAlt_MP_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*)  ;
+		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
 	
@@ -44,13 +40,19 @@ class Bs2JpsiPhi_SignalAlt_MP_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_
 		bool normalisationCacheValid ;
 		double normalisationCacheValueRes1[3] ;
 		double normalisationCacheValueRes2[3] ;
-
+	
 		double diffXsec(  )  const ;   
-		
+	
 		double diffXsecNorm1(  ) const ;
 		double diffXsecCompositeNorm1(  )  ;
 	
 		double diffXsecNorm2(  ) const ;
+	
+		// Additional parameters specific to this PDF
+		string mistagScaleName ;
+		string mistagOffsetName ;
+		double mistagScale ;
+		double mistagOffset ;
 };
 
 #endif

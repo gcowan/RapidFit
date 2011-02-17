@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+20/02/17  Pete Clarke
+   - Added Bs2JpsiPhi_SignalAlt_MO_v1.cpp/h
+   - This is the mistag observalble pdf
+
 2011/02/17 Rob Currie
   - Rewritten the code to read in root files into RapidFit DataSetConfiguration.h
        after giving it near a fortnight of torture under various datasets and fitting I'm uploading it as it offers speed and logic improvements

@@ -91,13 +91,13 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	//Do the minimisation
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
 
-        //Now call HESSE to properly calculate the error matrix
-        minuit->mnexcm("HESSE", arguments, 1, errorFlag);
+	//Now call HESSE to properly calculate the error matrix
+	minuit->mnexcm("HESSE", arguments, 1, errorFlag);
 
-        //Call MINOS to calculate the non-parabolic errors.
-        //MINOS rather than assuming parabolic shape about the minimum, MINOS climbs
-        //out of the minimum on either side up until the UP value.
-        //minuit->mnexcm("MINOS", arguments, 2, errorFlag);
+	//Call MINOS to calculate the non-parabolic errors.
+	//MINOS rather than assuming parabolic shape about the minimum, MINOS climbs
+	//out of the minimum on either side up until the UP value.
+	//minuit->mnexcm("MINOS", arguments, 2, errorFlag);
 
 	//Output time information
 	time_t timeNow;
