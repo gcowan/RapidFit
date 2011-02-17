@@ -116,12 +116,11 @@ TH2D * LLscanResult2D::GetTH2D()
 
 	//Extract lists of x,y, z (z is LL value)
 	int ind = 0 ;
-	cout << " >>>>>>TEMPORARY BLINDING OF SCALE ON DELTAGAMMA AXIS <<<<<<<<< " << endl ;
 	for( int ix=0; ix < parameterValues.size() ; ix++ ) {
 		vector<double> LLvalues= listOfLLscans[ix]->GetRawLLvalues() ;
 		for( int iy=0; iy < parameterValues2.size() ; iy++ ) {
 			pvx[ind] = parameterValues[ix]  ;  
-			pvy[ind] = parameterValues2[iy] * (3.14159/3.0); //PELC -  temporary blinding of scale
+			pvy[ind] = parameterValues2[iy] ; 
 			pvz[ind] = LLvalues[iy];
 			ind++;
 		}

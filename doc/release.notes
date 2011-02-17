@@ -3,6 +3,7 @@
 20/02/17  Pete Clarke
    - Added Bs2JpsiPhi_SignalAlt_MO_v1.cpp/h
    - This is the mistag observalble pdf
+   - also removed temporary blinding of y axixs scale in 2D plots
 
 2011/02/17 Rob Currie
   - Rewritten the code to read in root files into RapidFit DataSetConfiguration.h
