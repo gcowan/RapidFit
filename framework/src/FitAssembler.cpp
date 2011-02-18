@@ -178,7 +178,7 @@ LLscanResult * FitAssembler::DoLLScan( MinimiserConfiguration * MinimiserConfig,
 
 	for( int si=0; si<Fitting_Results.size(); si++) {
 
-		scanParameterValues.push_back( Fitting_Results[si]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName)->GetBlindedValue() );
+		scanParameterValues.push_back( Fitting_Results[si]->GetResultParameterSet()->GetResultParameter(scanName)->GetValue() );
 
 		if( Fitting_Results[si]->GetFitStatus() == 3 ) 
 		{
@@ -239,7 +239,12 @@ vector<FitResult*> FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfi
 			ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
 			scanStepResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, BottleParameters );
 		}
-		
+
+		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
+		string name = Wanted_Param->GetName();
+		string type = BottleParameters->GetPhysicsParameter( name )->GetType();
+		string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
+		scanStepResult->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal, 0., scanVal, scanVal, type, unit );
 		Returnable_Fit_Results.push_back( scanStepResult );
 
 	}
@@ -269,7 +274,7 @@ LLscanResult2D * FitAssembler::DoLLScan2D( MinimiserConfiguration * MinimiserCon
 
 		for( int si2=0; si2 < Fit_Results[si].size(); si2++) {
 
-			scanParameterValues2.push_back( Fit_Results[si][si2]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName2)->GetBlindedValue() );
+			scanParameterValues2.push_back( Fit_Results[si][si2]->GetResultParameterSet()->GetResultParameter(scanName2)->GetValue() );
 
 			if( Fit_Results[si][si2]->GetFitStatus() == 3 ) 
 			{
@@ -284,7 +289,7 @@ LLscanResult2D * FitAssembler::DoLLScan2D( MinimiserConfiguration * MinimiserCon
 		LLscanResult * _1D_temp_result = new LLscanResult( scanName2, scanParameterValues2, scanLLValues ) ;
 		LLScanResults.push_back( _1D_temp_result );
 
-		scanParameterValues.push_back( Fit_Results[si][0]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName)->GetBlindedValue() );
+		scanParameterValues.push_back( Fit_Results[si][0]->GetResultParameterSet()->GetResultParameter(scanName)->GetValue() );
 	}
 
 	LLscanResult2D * result = new LLscanResult2D( scanName, scanParameterValues, scanName2, scanParameterValues3, LLScanResults ) ;
@@ -327,6 +332,16 @@ vector<vector<FitResult* > > FitAssembler::DoScan2D( MinimiserConfiguration * Mi
 
 		// Do a scan point fit
 		vector<FitResult*> oneScan = FitAssembler::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second );
+
+		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
+                string name = Param_Set.first->GetName();
+                string type = BottleParameters->GetPhysicsParameter( name )->GetType();
+                string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
+
+                for( short int i=0; i < oneScan.size(); i++ )
+		{
+			oneScan[i]->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal, 0.0, scanVal, scanVal, type, unit );
+                }
 
 		Scan_Results.push_back( oneScan );
 	}
