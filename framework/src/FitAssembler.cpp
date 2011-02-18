@@ -237,7 +237,7 @@ vector<FitResult*> FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfi
 			int status = -1;
 			vector<string> NewNamesList = BottleParameters->GetAllNames();
 			ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
-			scanStepResult = new FitResult( status, DummyFitResults, LLSCAN_FIT_FAILURE_VALUE, BottleParameters );
+			scanStepResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, BottleParameters );
 		}
 		
 		Returnable_Fit_Results.push_back( scanStepResult );
@@ -261,7 +261,8 @@ LLscanResult2D * FitAssembler::DoLLScan2D( MinimiserConfiguration * MinimiserCon
 	vector<LLscanResult* > LLScanResults;
 	vector<double> scanParameterValues;
 	vector<double> scanParameterValues3;
-	for( int si=0; si<Fit_Results.size(); si++) {
+
+	for( int si=0; si < Fit_Results.size(); si++) {
 
 		vector<double> scanLLValues;
 		vector<double> scanParameterValues2;
@@ -287,7 +288,7 @@ LLscanResult2D * FitAssembler::DoLLScan2D( MinimiserConfiguration * MinimiserCon
 	}
 
 	LLscanResult2D * result = new LLscanResult2D( scanName, scanParameterValues, scanName2, scanParameterValues3, LLScanResults ) ;
-	
+
 	return result;
 }
 
@@ -318,7 +319,7 @@ vector<vector<FitResult* > > FitAssembler::DoScan2D( MinimiserConfiguration * Mi
 
 	double deltaScan = (uplim-lolim) / (npoints-1.) ;
 	
-	for( int si=0; si<npoints; si++) {
+	for( int si=0; si < npoints; si++) {
 		
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan ;
