@@ -7,7 +7,7 @@ Find_program(ROOT_CONFIG root-config)
 
 If (${ROOT_CONFIG} MATCHES "ROOT_CONFIG-NOTFOUND")
   Set(ROOT_FOUND FALSE)
-  Message(STATUS "Install Root and make sure it is in the PATH")
+  Message( FATAL_ERROR  "\n\nATTENTION: Install Root and make sure it is in the PATH\n\n")
 
 Else (${ROOT_CONFIG} MATCHES "ROOT_CONFIG-NOTFOUND")  
   

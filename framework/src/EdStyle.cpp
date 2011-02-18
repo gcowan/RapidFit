@@ -19,6 +19,7 @@
 #include "TPaveText.h"
 #include "TROOT.h"
 #include <iostream>
+#include <string.h>
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -282,3 +283,262 @@ gStyle->SetPadTickY(1);
 EdStyle::~EdStyle() {}
 
 //=============================================================================
+
+
+
+//  These functions are not guaranteed correct but will people please add to them
+//  it can save time in editing tables out of RapidFit if we can at least call one standard function for things like this
+
+TString EdStyle::GetParamRootUnit( string Param_Unit )
+{
+	if( Param_Unit == "ps^{-1}" ){
+		return TString( Param_Unit );
+	} else if ( Param_Unit == "MeV/c^{2}" ) {
+		return TString( "MeV{c}^{-2}" );
+	} else if ( Param_Unit == "ps" ) {
+		return TString( Param_Unit );
+	} else {
+		return TString( "" );
+	}
+}
+
+TString EdStyle::GetParamLatexUnit( string Param_Unit )
+{
+	TString Unit("$");
+	if( Param_Unit == "ps^{-1}" ){
+                Unit.Append( Param_Unit );
+        } else if ( Param_Unit == "MeV/c^{2}" ) {
+                Unit.Append( "MeV{c}^{-2}" );
+	} else if ( Param_Unit == "ps" ) {
+		Unit.Append( Param_Unit );
+	} else {
+		return TString( "" );
+	}
+	Unit.Append("$");
+	return Unit;
+}
+
+TString EdStyle::GetParamRootName( string Param_Name )
+{
+	if( Param_Name == "LLscan" ) {
+
+		return  TString("#Delta LL");
+	}
+	if( Param_Name == "gamma" ) {
+
+		return  TString("#Gamma");
+
+	} else if ( Param_Name == "deltaGamma" ) {
+
+		return  TString("#Delta#Gamma" );
+
+	} else if ( Param_Name == "Azero_sq" ) {
+
+		return TString("{A_0}^2");
+
+	} else if ( Param_Name == "Aperp_sq" ) {
+
+		return TString("{A_#perp}^2");
+
+	} else if ( Param_Name == "delta_para" ) {
+
+		return TString("#delta_#parallel");
+
+	} else if ( Param_Name == "delta_perp" ) {
+
+		return TString("#delta_#perp");
+
+	} else if ( Param_Name == "Phi_s" ) {
+
+		return TString("#phi_s");
+
+        } else if ( Param_Name == "m_Bs" ) {
+
+                return TString("m_{B_s}");
+
+        } else if (Param_Name == "sigma_m1" ) {
+
+                return TString("{#sigma_m}^1");
+
+        } else if (Param_Name == "sigma_m2" ) {
+
+                return TString("{#sigma_m}^2");
+
+        } else if (Param_Name == "f_sig_m1" ) {
+
+                return TString("f_{{#sigma_m}^1}");
+
+	} else if (Param_Name == "mistag" ) {
+
+                return TString("#omega");
+
+        } else if (Param_Name == "angAccI1" ) {
+
+                return TString("#zeta_1");
+
+        } else if (Param_Name == "angAccI2" ) {
+
+                return TString("#zeta_2");
+        
+        } else if (Param_Name == "angAccI3" ) {
+
+                return TString("#zeta_3");
+        
+        } else if (Param_Name == "angAccI4" ) {
+
+                return TString("#zeta_4");
+        
+        } else if (Param_Name == "angAccI5" ) {
+
+                return TString("#zeta_5");
+        
+        } else if (Param_Name == "angAccI6" ) {
+
+                return TString("#zeta_6");
+        
+        } else if (Param_Name == "angAccI7" ) {
+
+                return TString("#zeta_7");
+        
+        } else if (Param_Name == "angAccI8" ) {
+
+                return TString("#zeta_8");
+        
+        } else if (Param_Name == "angAccI9" ) {
+
+                return TString("#zeta_9");
+
+	} else if (Param_Name =="deltaM" ) {
+
+		return TString( "m_s" );
+
+	} else if (Param_Name =="delta_zero") {
+
+		return TString("#delta_0");
+
+        } else {
+
+		return TString(Param_Name);
+	}
+
+}
+
+TString EdStyle::GetParamLatexName( string Param_Name )
+{
+	TString Name("$");
+        if( Param_Name == "LLscan" ) {
+
+                Name.Append("\\Delta\\text{LL}");
+        }
+        if( Param_Name == "gamma" ) {
+
+                Name.Append("\\Gamma");
+
+        } else if ( Param_Name == "deltaGamma" ) {
+
+                Name.Append("\\Delta\\Gamma" );
+
+        } else if ( Param_Name == "Azero_sq" ) {
+
+                Name.Append("{A_0}^2");
+
+        } else if ( Param_Name == "Aperp_sq" ) {
+
+                Name.Append("{A_\\perp}^2");
+
+        } else if ( Param_Name == "delta_para" ) {
+
+                Name.Append("\\delta_\\parallel");
+
+        } else if ( Param_Name == "delta_perp" ) {
+
+                Name.Append("\\delta_\\perp");
+
+        } else if ( Param_Name == "Phi_s" ) {
+
+                Name.Append("\\phi_s");
+
+        } else if ( Param_Name == "m_Bs" ) {
+
+		Name.Append("m_{B_s}");
+
+	} else if (Param_Name == "sigma_m1" ) {
+
+		Name.Append("{\\sigma_m}^1");
+
+	} else if (Param_Name == "sigma_m2" ) {
+
+                Name.Append("{\\sigma_m}^2");
+
+	} else if (Param_Name == "f_sig_m1" ) {
+
+		Name.Append("f_{{\\sigma_m}^1}");
+	} else if (Param_Name == "timeResolution1" ) {
+
+		Name.Append("\\tau_1");
+
+	} else if (Param_Name == "timeResolution2" ) {
+
+		Name.Append("\\tau_2");
+
+	} else if (Param_Name == "timeResolution1Fraction" ) {
+
+		Name.Append("f_{\\tau_1}");
+
+	} else if (Param_Name == "mistag" ) {
+
+		Name.Append("\\omega");
+
+	} else if (Param_Name == "angAccI1" ) {
+
+		Name.Append("\\zeta_1");
+
+	} else if (Param_Name == "angAccI2" ) {
+
+                Name.Append("\\zeta_2");
+
+        } else if (Param_Name == "angAccI3" ) {
+
+                Name.Append("\\zeta_3");
+
+        } else if (Param_Name == "angAccI4" ) {
+
+                Name.Append("\\zeta_4");
+
+        } else if (Param_Name == "angAccI5" ) {
+
+                Name.Append("\\zeta_5");
+
+        } else if (Param_Name == "angAccI6" ) {
+
+                Name.Append("\\zeta_6");
+
+        } else if (Param_Name == "angAccI7" ) {
+
+                Name.Append("\\zeta_7");
+
+        } else if (Param_Name == "angAccI8" ) {
+
+                Name.Append("\\zeta_8");
+
+        } else if (Param_Name == "angAccI9" ) {
+
+                Name.Append("\\zeta_9");
+
+	} else if (Param_Name =="deltaM" ) {
+
+                Name.Append( "m_s" );
+
+        } else if (Param_Name =="delta_zero") {
+
+                Name.Append("\\delta_0");
+
+	} else {
+		Name.Append("\\text{");
+		Name.Append(Param_Name);
+		Name.Append("}");
+	}
+
+	Name.Append("$");
+	return Name;
+}

@@ -14,6 +14,9 @@
 // Include files
 
 #include "TStyle.h"
+#include <string.h>
+
+using namespace::std;
 
 /** @class style EdStyle.h
  *  
@@ -25,6 +28,11 @@ class EdStyle {
 public: 
    /// Standard constructor
    EdStyle( ); 
+
+   static TString GetParamLatexUnit( string );
+   static TString GetParamRootUnit( string );
+   static TString GetParamLatexName( string );
+   static TString GetParamRootName( string );
    
    virtual ~EdStyle( ); ///< Destructor
 

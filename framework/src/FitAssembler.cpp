@@ -178,7 +178,7 @@ LLscanResult * FitAssembler::DoLLScan( MinimiserConfiguration * MinimiserConfig,
 
 	for( int si=0; si<Fitting_Results.size(); si++) {
 
-		scanParameterValues.push_back( Fitting_Results[si]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName)->GetValue() );
+		scanParameterValues.push_back( Fitting_Results[si]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName)->GetBlindedValue() );
 
 		if( Fitting_Results[si]->GetFitStatus() == 3 ) 
 		{
@@ -268,7 +268,7 @@ LLscanResult2D * FitAssembler::DoLLScan2D( MinimiserConfiguration * MinimiserCon
 
 		for( int si2=0; si2 < Fit_Results[si].size(); si2++) {
 
-			scanParameterValues2.push_back( Fit_Results[si][si2]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName2)->GetValue() );
+			scanParameterValues2.push_back( Fit_Results[si][si2]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName2)->GetBlindedValue() );
 
 			if( Fit_Results[si][si2]->GetFitStatus() == 3 ) 
 			{
@@ -283,7 +283,7 @@ LLscanResult2D * FitAssembler::DoLLScan2D( MinimiserConfiguration * MinimiserCon
 		LLscanResult * _1D_temp_result = new LLscanResult( scanName2, scanParameterValues2, scanLLValues ) ;
 		LLScanResults.push_back( _1D_temp_result );
 
-		scanParameterValues.push_back( Fit_Results[si][0]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName)->GetValue() );
+		scanParameterValues.push_back( Fit_Results[si][0]->GetPhysicsBottle()->GetParameterSet()->GetPhysicsParameter(scanName)->GetBlindedValue() );
 	}
 
 	LLscanResult2D * result = new LLscanResult2D( scanName, scanParameterValues, scanName2, scanParameterValues3, LLScanResults ) ;

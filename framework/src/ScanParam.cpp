@@ -24,11 +24,16 @@ ScanParam::ScanParam( vector<string> nName, vector<string> nType, vector<double>
 {
 	if( !minimum.empty() && !maximum.empty() )
 	{
-	  if( minimum[0] < maximum[0] )
-	  {
-	    cerr << "Scan Limit \"" << nName[0] << "\" has maximum less than minimum: values swapped" << endl;
-	    minimum.swap( maximum );
-	  }
+		if( minimum[0] < maximum[0] )
+		{
+			cerr << "Scan Limit \"" << nName[0] << "\" has maximum less than minimum: values swapped" << endl;
+			minimum.swap( maximum );
+		}
+		if( (minimum[0] - maximum[0]) < 1E-6 )
+		{
+			cerr << "Scan Limit \"" << nName[0] << "\" has maximum = minimum, assuming you forgot a sign in the XML" << endl;
+			minimum[0]=-minimum[0];
+		}
 	}
 }
 
