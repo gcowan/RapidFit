@@ -28,6 +28,8 @@
 #include <TFrame.h>
 #include <TAxis.h>
 #include "StringProcessing.h"
+#include "LLscanResult.h"
+#include "LLscanResult2D.h"
 
 //Output data as a RootNTuple
 void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
@@ -401,7 +403,7 @@ void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * Toy
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	TNtuple * parameterNTuple;
-	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader());
+	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader() );
 	Float_t * resultArr;
 	for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); resultIndex++ )
 	{
@@ -549,5 +551,47 @@ void ResultFormatter::MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, s
 
 	LLcontourFile->Close();
 
+}
+
+
+//====================================================================================================
+//Do a likelihood scan
+LLscanResult* ResultFormatter::LLScan( ToyStudyResult* new_results, string scanName )
+{
+
+	cout << "Constructing LLscan for parameter " << scanName << endl ;
+
+	// Need to set up a loop , fixing the scan parameter at each point
+	vector<double> scanParameterValues = new_results->GetParameterValues( scanName );
+	vector<double> scanLLValues = new_results->GetAllMLL() ;
+
+	LLscanResult * result = new LLscanResult( scanName, scanParameterValues, scanLLValues ) ;
+	result->print() ; //PELC
+
+	return result;
+}
+
+LLscanResult2D* ResultFormatter::LLScan2D( vector<ToyStudyResult*> new_results, string scanName, string scanName2 )
+{
+
+	// THIS CODE WILL NOT WORK WITH ANYTHING LESS THAN A PERFECT SQUARE OF FIT RESULTS
+
+	cout << "Constructing LLcontour for parameters " << scanName << "\t" << scanName2 << endl ;
+
+	vector<LLscanResult* > LLScanResults;
+	vector<double> scanParameterValues;
+	vector<double> scanParameterValues2 = new_results[0]->GetParameterValues( scanName2 );
+
+	for( int si=0; si < new_results.size(); si++) {
+		vector<double> scanLLValues = new_results[si]->GetAllMLL();
+		LLscanResult * _1D_temp_result = new LLscanResult( scanName2, scanParameterValues2, scanLLValues ) ;
+		LLScanResults.push_back( _1D_temp_result );
+		vector<double> temp_values = new_results[si]->GetParameterValues( scanName );
+		scanParameterValues.push_back( temp_values[0] );
+	}
+
+	LLscanResult2D * result = new LLscanResult2D( scanName, scanParameterValues, scanName2, scanParameterValues2, LLScanResults );
+
+	return result;
 }
 

@@ -18,9 +18,9 @@ ENDIF( INSOURCE )
 #  COMPILER OPTIONS
 
 #  -O3 optimizations
-#SET( CMAKE_BUILD_TYPE Release )
+SET( CMAKE_BUILD_TYPE Release )
 #  -O2 optimizations and -g
-SET( CMAKE_BUILD_TYPE Debug )
+#SET( CMAKE_BUILD_TYPE Debug )
 
 #  Get back the old style verbosity :) by setting this to 1
 #SET( CMAKE_VERBOSE_MAKEFILE 1 )
@@ -79,37 +79,30 @@ SET( I 0 )
 WHILE( ${I} LESS ${SRC_LEN} )
 	MATH(EXPR PRESENT_FILENUM ${I}+1 )
 	LIST( GET FITTER_SRCS ${PRESENT_FILENUM} THIS_FILE )
-	MESSAGE( ${THIS_FILE} )
 	IF("${THIS_FILE}" MATCHES "Roo+")
 		LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
 		MATH( EXPR I ${I}-1 )
 		MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
-		MESSAGE( "1" )
 	ELSEIF(NOT "${THIS_FILE}" MATCHES "Roo+" )
 		IF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/Roo+")
                 	LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
                 	MATH( EXPR I ${I}-1 )
                 	MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
-                	MESSAGE( "3" )
         	ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/Roo+")
 	ENDIF("${THIS_FILE}" MATCHES "Roo+")
         IF("${THIS_FILE}" MATCHES "main+")
                 LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
                 MATH( EXPR I ${I}-1 )
                 MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
-		MESSAGE( "2" )
 	ELSEIF(NOT "${THIS_FILE}" MATCHES "main+" )
 		IF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/main+")
                 	LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
                 	MATH( EXPR I ${I}-1 )
                 	MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
-               		MESSAGE( "4" )
         	ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/main+")
         ENDIF("${THIS_FILE}" MATCHES "main+")
 	SET( I ${PRESENT_FILENUM}  )
 ENDWHILE( ${I} LESS ${SRC_LEN} )
-
-MESSAGE( ${FITTER_SRCS} )
 
 
 
@@ -138,7 +131,8 @@ TARGET_LINK_LIBRARIES( rapidresults ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter-static.C )
 TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 
-
+ADD_EXECUTABLE( plot_try ${PROJECT_SOURCE_DIR}/utils/src/plot_try.C )
+TARGET_LINK_LIBRARIES( plot_try ${ROOT_LIBRARIES} )
 
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone

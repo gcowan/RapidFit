@@ -19,8 +19,8 @@ ScanParam::ScanParam()
 {
 }
 
-ScanParam::ScanParam( vector<string> nName, vector<string> nType, vector<double> nMinimum, vector<double> nMaximum, vector<int> nSigma, vector<int> nPoints) :
-	name(nName), type(nType), minimum(nMinimum), maximum(nMaximum), sigma(nSigma), points(nPoints)
+ScanParam::ScanParam( vector<string> nName, vector<double> nMinimum, vector<double> nMaximum, vector<int> nSigma, vector<int> nPoints) :
+	name(nName), minimum(nMinimum), maximum(nMaximum), sigma(nSigma), points(nPoints)
 {
 	if( !minimum.empty() && !maximum.empty() )
 	{
@@ -37,10 +37,9 @@ ScanParam::ScanParam( vector<string> nName, vector<string> nType, vector<double>
 	}
 }
 
-ScanParam::ScanParam( string nName, string nType, double nMaximum, double nMinimum, int nPoints )
+ScanParam::ScanParam( string nName, double nMaximum, double nMinimum, int nPoints )
 {
 	name.push_back( nName );
-	type.push_back( nType );
 	points.push_back( nPoints );
 	if ( maximum < minimum )
 	{
@@ -53,18 +52,16 @@ ScanParam::ScanParam( string nName, string nType, double nMaximum, double nMinim
 	}
 }
 
-ScanParam::ScanParam( string nName, string nType, int nSigma, int nPoints )
+ScanParam::ScanParam( string nName, int nSigma, int nPoints )
 {
 	name.push_back( nName );
-	type.push_back( nType );
 	points.push_back( nPoints );
 	sigma.push_back( nSigma );
 }
 
-ScanParam::ScanParam( string nName, string nType, int nPoints)
+ScanParam::ScanParam( string nName, int nPoints)
 {
 	name.push_back( nName );
-	type.push_back( nType );
 	points.push_back( nPoints );
 }
 
@@ -82,7 +79,6 @@ ScanParam::~ScanParam()
 void ScanParam::print()
 {
 	if( !name.empty() )     cout << "   name        " << name[0] << endl ;
-	if( !type.empty() )     cout << "   type        " << type[0] << endl;
 	if( !minimum.empty() )  cout << "   minimum     " << minimum[0] << endl ;
 	if( !maximum.empty() )  cout << "   maximum     " << maximum[0] << endl ;
 	if( !sigma.empty() )    cout << "   sigma       " << sigma[0] << endl ;

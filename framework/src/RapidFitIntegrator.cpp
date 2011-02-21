@@ -109,7 +109,8 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 					else
 					{
 						cerr << "Integral caching error: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
-						exit(1);
+						throw( 13 );
+//						exit(1);
 					}
 				}
 
@@ -138,7 +139,8 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 				else
 				{
 					cerr << "Integral caching error: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
-					exit(1);
+					throw( 13 );
+//					exit(1);
 				}
 			}
 

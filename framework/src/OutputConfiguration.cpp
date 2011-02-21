@@ -12,6 +12,7 @@
 #include "ScanParam.h"
 #include <time.h>
 #include "ScanParam.h"
+#include "TTree.h"
 
 //Default constructor
 OutputConfiguration::OutputConfiguration() : 
@@ -59,30 +60,7 @@ vector<string> OutputConfiguration::GetProjections()
 	return projections;
 }
 
-//Return the requested Scans
-vector<string> OutputConfiguration::GetLLscanList()
-{
-//	return LLscanList;
-	vector<string> LLScanReturnList = GetScanList( "LLscan" );
-	return LLScanReturnList;
-}
-
-//Return the requested Scans
-vector<pair<string, string> > OutputConfiguration::Get2DLLscanList()
-{
-//	return LLscanList;
-	vector<pair<string, string> > LLScanReturnList = Get2DScanList( "LLscan" );
-	return LLScanReturnList;
-}
-
-vector<string> OutputConfiguration::GetCVScanList()
-{
-//	return LLscanList;
-	vector<string> ScanReturnList = GetScanList( "CVScan" );
-	return ScanReturnList;
-}
-
-ScanParam* OutputConfiguration::GetScanParam( string param_name, string param_type )
+ScanParam* OutputConfiguration::GetScanParam( string param_name )
 {
 
 	ScanParam* Returnable_Param;
@@ -90,7 +68,7 @@ ScanParam* OutputConfiguration::GetScanParam( string param_name, string param_ty
 	{
 		if( Global_Scan_List[i]->HasName() )
 		{
-			if( ( Global_Scan_List[i]->GetName() == param_name ) && ( Global_Scan_List[i]->GetType() == param_type ) )
+			if( Global_Scan_List[i]->GetName() == param_name )
 			{
 				Returnable_Param = Global_Scan_List[i];
 			}
@@ -105,7 +83,7 @@ ScanParam* OutputConfiguration::GetScanParam( string param_name, string param_ty
 	return Returnable_Param;
 }
 
-pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_1, string param_2, string param_1_type, string param_2_type )
+pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_1, string param_2 )
 {
 	pair<ScanParam*, ScanParam* > Returnable_Pair;
 	for( short int i=0; i < Global_2DScan_List.size(); i++)
@@ -114,10 +92,7 @@ pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_
 		{
 			if( ( Global_2DScan_List[i].first->GetName() == param_1 ) && ( Global_2DScan_List[i].second->GetName() == param_2 ) )
 			{
-				if( ( Global_2DScan_List[i].first->GetType() == param_1_type ) && ( Global_2DScan_List[i].second->GetType() == param_2_type ) )
-				{
-					Returnable_Pair = Global_2DScan_List[i];
-				}
+				Returnable_Pair = Global_2DScan_List[i];
 			}
 		}
 	}
@@ -137,40 +112,28 @@ pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_
 }
 
 //Return the requested Scans
-vector<string> OutputConfiguration::GetScanList( string input_type )
+vector<string> OutputConfiguration::GetScanList( )
 {
 	vector<string> ScanReturnList;
 	for( short int i=0; i < Global_Scan_List.size(); i++)
 	{
-		if( Global_Scan_List[i]->HasType() )
-		{
-			if( Global_Scan_List[i]->GetType() == input_type )
-			{
-				ScanReturnList.push_back( Global_Scan_List[i]->GetName() );
-			}
-		}
+		ScanReturnList.push_back( Global_Scan_List[i]->GetName() );
 	}
 	return ScanReturnList;
 }
 
 //Return the requested Scans
-vector<pair<string, string> > OutputConfiguration::Get2DScanList( string input_type )
+vector<pair<string, string> > OutputConfiguration::Get2DScanList( )
 {
 	vector<pair<string, string> > ScanReturnList;
 	for( short int i=0; i < Global_2DScan_List.size(); i++)
 	{
-		if( Global_2DScan_List[i].first->HasType() && Global_2DScan_List[i].second->HasType() )
-		{
-			if( ( Global_2DScan_List[i].first->GetType() == input_type ) && ( Global_2DScan_List[i].second->GetType() == input_type ) )
-			{
-				string new_first = Global_2DScan_List[i].first->GetName();
-				string new_second = Global_2DScan_List[i].second->GetName();
-				pair<string,string> new_pair;
-				new_pair.first = new_first;
-				new_pair.second = new_second;
-				ScanReturnList.push_back( new_pair );
-			}
-		}
+		string new_first = Global_2DScan_List[i].first->GetName();
+		string new_second = Global_2DScan_List[i].second->GetName();
+		pair<string,string> new_pair;
+		new_pair.first = new_first;
+		new_pair.second = new_second;
+		ScanReturnList.push_back( new_pair );
 	}
 	return ScanReturnList;
 }

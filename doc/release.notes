@@ -1,6 +1,18 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
-20/02/17  Pete Clarke
+2011/02/21 Rob Currie
+   - Heavily re-written scanning code within FitAssembler to now use ToyStudyResult
+   - 'Co-ordinates' of each fit are 'hard-coded' into each FitResult
+   - Added new features within ToyStudyResult
+   - Moved code to make backwards compatible LL scan/contour plots to ResultFormatter
+   - Added slight improvement to my code in DataSetConfiguration, slight speed improvement again
+   - Removed <Type> tag from XML in Output Scan and Scan2D as this concievably serves no purpouse
+   - Interface to scan code and to deal with results through main is now very simplified
+   - Changed fail on Caching integrals to a throw statement for long scans
+   - Can now write results of Contour scans to ntuples  -- IN DEVELOPMENT
+     This implementation only spits out values for floated parameters, this is a known issue but allows for plots to be made as code development/testing progresses
+
+2011/02/17  Pete Clarke
    - Added Bs2JpsiPhi_SignalAlt_MO_v1.cpp/h
    - This is the mistag observalble pdf
    - also removed temporary blinding of y axixs scale in 2D plots

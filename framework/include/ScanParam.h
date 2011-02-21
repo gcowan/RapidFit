@@ -24,10 +24,10 @@ class ScanParam
 {
 	public:
 		ScanParam();
-		ScanParam( vector<string>, vector<string>, vector<double>, vector<double>, vector<int>, vector<int> );
-		ScanParam( string, string, double, double, int );
-		ScanParam( string, string, int, int );
-		ScanParam( string, string, int );
+		ScanParam( vector<string>, vector<double>, vector<double>, vector<int>, vector<int> );
+		ScanParam( string, double, double, int );
+		ScanParam( string, int, int );
+		ScanParam( string, int );
 		ScanParam( string );
 		~ScanParam();
 
@@ -36,10 +36,6 @@ class ScanParam
 		bool HasName(){   return !name.empty();                                                           };
 		string GetName() { if( !name.empty() ){   return name[0]; }    else return "";                    };
 		void SetName(string new_val) { while( !name.empty() ){   name.pop_back(); };    name.push_back(    new_val ); };
-
-		bool HasType(){   return !type.empty();                                                           };
-		string GetType() { if( !type.empty() ){   return type[0]; }    else return "";                    };
-		void SetType(string new_val) { while( !type.empty() ){   type.pop_back(); };    type.push_back(    new_val ); };
 
 		bool HasMax(){    return !maximum.empty();                                                        };
 		double GetMax() { if( !maximum.empty() ){ return maximum[0]; } else return 0;                     };
@@ -61,7 +57,6 @@ class ScanParam
 
 	private:
 		vector<string> name;
-		vector<string> type;
 		vector<double> minimum;
 		vector<double> maximum;
 		vector<int> sigma;

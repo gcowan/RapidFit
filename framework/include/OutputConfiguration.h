@@ -12,6 +12,7 @@
 #include "LLscanResult.h"
 #include "LLscanResult2D.h"
 #include "ToyStudyResult.h"
+#include "FitResult.h"
 #include <vector>
 #include <string>
 #include "ScanParam.h"
@@ -27,15 +28,12 @@ class OutputConfiguration
 
 		//Return configuration data
 		vector< pair< string, string > > GetContourPlots();
-		vector<pair<string, string> > Get2DScanList( string input_type="LLscan" );
-		vector<pair<string, string> > Get2DLLscanList();
+		vector<pair<string, string> > Get2DScanList();
 		vector<string> GetProjections();
-		vector<string> GetLLscanList() ;
-		vector<string> GetCVScanList() ;
-		vector<string> GetScanList( string="LLscan" ) ;
+		vector<string> GetScanList();
 
-		ScanParam* GetScanParam( string param_name, string="LLscan" );
-		pair<ScanParam*, ScanParam*> Get2DScanParams( string , string, string="LLscan", string="LLscan" );
+		ScanParam* GetScanParam( string param_name );
+		pair<ScanParam*, ScanParam*> Get2DScanParams( string , string );
 
 		bool DoPullPlots();
 

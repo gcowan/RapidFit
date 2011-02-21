@@ -213,8 +213,10 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	//
 	//  Fundamental logic behind this is reading in 200k events from MC takes forever but plotting these variables in TBrowser is click of a button fast
 	//  Use the internal Root Structures to return an array of Double_t objects from the plot (No matter what the Branch Type)
-	//  Plus as Tuple structures are disk objects this no longer calls many thousand of reads from a very large file to cache on disk
-	//  This now simply reads all the data in a few fast requests which removes the slowest part of startup (why this has to be so hard I will never know...)
+	//  Plus as Tuple structures are disk objects this no longer calls many thousand of reads from a very large file to cache from disk
+	//  This now simply reads all the data in a few fast requests which removes the slowest part of startup
+	//  This could probably be done with branches and loops but this is gauranteed to be quick as it's used behind the scenes by TBrowser
+	//  (why this has to be so hard with root I will never know...)
 	for ( short int obsIndex = 0; obsIndex < numberOfObservables; obsIndex=obsIndex+3 )
 	{
 		//  Hold the Data in a temp object
@@ -228,16 +230,11 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 			PlotString.Append(observableNames[obsIndex+i]);
 		}
 		//cout << "PlotString: " << PlotString << endl;
-		
-		//  This is here to remove an annoying Root 'Information' line, if anyone finds out how to PERMINANTLY SHUT ROOT UP
-		//  PLEASE email me rob.currie@ed.ac.uk
-		TString canvas_string("throw_away_canvas_");
-		canvas_string+=obsIndex;
-		TCanvas* c1 = new TCanvas(canvas_string,canvas_string);
 
 		//  Draw 3 observables at a time in some large plot
+		//  use the 'goff' option to turn graphical output (and annoying text output from default co/de-structors) off
 		//  (it doesn't matter what this looks like and we can throw it away from here)
-		ntuple->Draw( PlotString , cutString.c_str() );
+		ntuple->Draw( PlotString , cutString.c_str(), "goff" );
 		
 		//  Store pointers to the objects for ease of access
 		data_array.push_back( ntuple->GetV1() );
@@ -256,8 +253,6 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 			}
 			real_data_array.push_back( temp_vector );
 		}
-		//  Get rid of another annoying root output line
-		c1->Close();
 	}
         //time_t timeNow2;
 	//time(&timeNow2);

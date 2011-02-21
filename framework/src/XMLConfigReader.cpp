@@ -1365,9 +1365,6 @@ ScanParam * XMLConfigReader::GetScanParam( XMLTag * InputTag )
 			if ( name == "Name" )
 			{
 				name_tag.push_back( elements[elementIndex]->GetValue()[0].c_str() );
-			} else if ( name == "Type" )
-			{
-				type.push_back( elements[elementIndex]->GetValue()[0].c_str() );
 			}
 			else if ( name == "Minimum" )
 			{
@@ -1415,7 +1412,7 @@ ScanParam * XMLConfigReader::GetScanParam( XMLTag * InputTag )
 			while( !sigma.empty() ) { sigma.pop_back(); }
 		}
 
-		ScanParamLocal = new ScanParam( name_tag, type, maximum, minimum, sigma, points );
+		ScanParamLocal = new ScanParam( name_tag, maximum, minimum, sigma, points );
 		return ScanParamLocal;
 
 	} else	{ cerr << "Unreconised Scan Config: " << InputTag->GetName() << endl; exit(1); }

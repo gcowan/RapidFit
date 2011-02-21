@@ -19,6 +19,7 @@ class ToyStudyResult
 {
 	public:
 		ToyStudyResult();
+		ToyStudyResult( vector<ToyStudyResult*> );
 		ToyStudyResult( vector<string> );
 		~ToyStudyResult();
 
@@ -30,6 +31,7 @@ class ToyStudyResult
 		vector<string> GetAllNames();
 		vector<double> GetAllRealTimes();
 		vector<double> GetAllCPUTimes();
+		vector<double> GetAllMLL();
 		vector<double> GetParameterValues(string);
 		vector<double> GetParameterErrors(string);
 		vector<double> GetParameterPulls(string);
@@ -37,6 +39,10 @@ class ToyStudyResult
 		TString GetFlatResultHeader();
 
 	private:
+		double GetCPUTime( int );
+		double GetRealTime( int );
+		void SetCPUTime( int, double );
+		void SetRealTime( int, double );
 		vector< FitResult* > allResults;
 		vector<string> allNames;
 		vector< vector<double> > allValues, allErrors, allPulls;

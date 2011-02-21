@@ -36,7 +36,10 @@ class ResultFormatter
 		static void FlatNTuplePullPlots( string, ToyStudyResult* );
 		static void SeparateParameterPullPlots( string, ToyStudyResult* );
 		static void MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename ); 
-		static void MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename ); 
+		static void MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename );
+
+		static LLscanResult* LLScan( ToyStudyResult*, string );
+		static LLscanResult2D* LLScan2D( vector<ToyStudyResult*>, string, string );
 };
 
 #endif

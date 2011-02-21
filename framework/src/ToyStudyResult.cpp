@@ -8,11 +8,53 @@
  */
 
 #include "ToyStudyResult.h"
+#include "LLscanResult.h"
 #include <iostream>
 
 //Default constructor
 ToyStudyResult::ToyStudyResult()
 {
+}
+
+//  Constructor to Return a single array from multiple arrays
+ToyStudyResult::ToyStudyResult( vector<ToyStudyResult*> Result_Array )
+{
+	if( !Result_Array.empty() )
+	{
+		allNames = Result_Array[0]->GetAllNames();
+		//Construct the result data structure
+		for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+		{
+			allValues.push_back( vector<double>() );
+			allErrors.push_back( vector<double>() );
+			allPulls.push_back( vector<double>() );
+		}
+		for( short int i=0; i < Result_Array.size(); i++ )
+		{
+			for( short int j=0; j < Result_Array[i]->NumberResults(); j++ )
+			{
+				allResults.push_back( Result_Array[i]->GetFitResult( j ) );
+
+				for( short int k=0; k < allNames.size(); k++ )
+				{
+					ResultParameter * newResult = Result_Array[i]->GetFitResult( j )->GetResultParameterSet()->GetResultParameter( allNames[k] );
+					allValues[k].push_back( newResult->GetValue() );
+					allErrors[k].push_back( newResult->GetError() );
+					allPulls[k].push_back( newResult->GetPull() );
+				}
+			}
+
+			vector<double> input_real_times = Result_Array[i]->GetAllRealTimes();
+			vector<double> input_cpu_times = Result_Array[i]->GetAllCPUTimes();
+			for( short int j2=0; j2 < input_real_times.size(); j2++)
+			{
+				allRealTimes.push_back( input_real_times[j2] );
+				allCPUTimes.push_back( input_cpu_times[j2] );
+			}
+
+		}
+		clock = new TStopwatch();
+	}
 }
 
 //Constructor with correct argument
@@ -83,6 +125,24 @@ bool ToyStudyResult::AddFitResult( FitResult * NewResult )
 	return true;
 }
 
+
+//  Return an array of the MLL values of the fits
+vector<double> ToyStudyResult::GetAllMLL()
+{
+	vector<double> output_MLL;
+	for ( short int i=0; i < allResults.size(); i++ )
+	{
+		if( allResults[i]->GetFitStatus() == 3 ) 
+		{
+			output_MLL.push_back( allResults[i]->GetMinimumValue() );
+		}
+		else{
+			output_MLL.push_back( LLSCAN_FIT_FAILURE_VALUE );
+		}
+	}
+	return output_MLL;
+}
+
 //Return vectors of values, errors and pulls for a particular parameter name
 vector<double> ToyStudyResult::GetParameterValues( string ParameterName )
 {
@@ -146,6 +206,26 @@ FitResult * ToyStudyResult::GetFitResult( int Index )
 		cerr << "Index (" << Index << ") out of range" << endl;
 		return new FitResult();
 	}
+}
+double ToyStudyResult::GetRealTime( int Index )
+{
+	if( Index < allRealTimes.size() ) return allRealTimes[ Index ];
+	else return -1;
+}
+void ToyStudyResult::SetRealTime( int Index, double input_time )
+{
+	if( allRealTimes.size() < Index ) allRealTimes.resize( Index );
+	allRealTimes[Index] = input_time;
+}
+double ToyStudyResult::GetCPUTime( int Index )
+{
+	if( Index < allCPUTimes.size() ) return allCPUTimes[ Index ];
+	else return -1;
+}
+void ToyStudyResult::SetCPUTime( int Index, double input_time )
+{
+	if( Index < allCPUTimes.size() ) allCPUTimes.resize( Index );
+	allCPUTimes[Index] = input_time;  
 }
 
 //Return names of all variables
