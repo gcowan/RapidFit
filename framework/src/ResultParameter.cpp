@@ -69,7 +69,8 @@ double ResultParameter::GetError()
 //Get the pull
 double ResultParameter::GetPull()
 {
-	return (value - originalValue) / error;
+	if( error < 1E-6 ) return 0;
+	else return (value - originalValue) / error;
 }
 
 //Get the minimum

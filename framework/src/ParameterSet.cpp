@@ -40,6 +40,29 @@ vector<string> ParameterSet::GetAllNames()
 	return allNames;
 }
 
+//Retrieve names of all parameters stored that are fixed in the PDF
+vector<string> ParameterSet::GetAllFixedNames()
+{
+	vector<string> Fixed_List;
+	for( short int i=0; i<allNames.size(); i++ )
+	{
+		if( ParameterSet::GetPhysicsParameter( allNames[i] )->GetType() == "Fixed" )  Fixed_List.push_back( allNames[i] );
+	}
+	return Fixed_List;
+}
+
+//Retrieve names of all parameters stored that are floated in the pdf
+vector<string> ParameterSet::GetAllFloatNames()
+{
+	vector<string> Not_Fixed_List;
+	for( short int i=0; i<allNames.size(); i++ )
+	{
+		if( ParameterSet::GetPhysicsParameter( allNames[i] )->GetType() != "Fixed" )  Not_Fixed_List.push_back( allNames[i] );
+	}
+	return Not_Fixed_List;
+}
+
+
 //Retrieve a physics parameter by its name
 PhysicsParameter * ParameterSet::GetPhysicsParameter(string Name)
 {

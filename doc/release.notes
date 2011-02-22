@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/22 Rob Currie
+   - Changed FitAssembler to add parameters missing in ResultParameter, this also included adding a new function to ResultParameter, added a functions to ParameterSet too for convenience
+   - The LLcontour code now correctly writes data to a file and looks to be storing the information required for the plots, however this code is still to be tested completely
+
 2011/02/21 Rob Currie
    - Heavily re-written scanning code within FitAssembler to now use ToyStudyResult
    - 'Co-ordinates' of each fit are 'hard-coded' into each FitResult

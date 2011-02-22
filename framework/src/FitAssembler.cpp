@@ -160,6 +160,28 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 		string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
 		scanStepResult->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal, 0., scanVal, scanVal, type, unit );
 
+		vector<string> Fixed_List = BottleParameters->GetAllFixedNames();
+		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
+		for( short int i=0; i < Fixed_List.size() ; i++ )
+		{
+			bool found=false;
+			for( short int j=0; j < Fit_List.size(); j++ )
+			{
+				if( Fit_List[j] == Fixed_List[i] )
+				{
+					found = true;
+				}
+			}
+			if( !found )
+			{
+				string fixed_type = BottleParameters->GetPhysicsParameter( Fixed_List[i] )->GetType();
+				string fixed_unit = BottleParameters->GetPhysicsParameter( Fixed_List[i] )->GetUnit();
+				double fixed_value = BottleParameters->GetPhysicsParameter( Fixed_List[i] )->GetValue();
+				scanStepResult->GetResultParameterSet()->ForceNewResultParameter( Fixed_List[i], fixed_value, fixed_value, 0, fixed_value, fixed_value, fixed_type, fixed_unit );
+			}
+		}
+
+
 		output_interface->AddFitResult( scanStepResult );
 	}
 	
@@ -172,17 +194,8 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 //  Interface for internal calls
 void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, pair<ScanParam*, ScanParam*> Param_Set, vector<ToyStudyResult*>* output_interface )
 {
-	vector<string> namez = BottleParameters->GetAllNames();
-	vector<string> result_names;
-	for( short int i=0; i < namez.size(); i++ )
-	{
-		cout << namez[i] << endl;
-		cout << BottleParameters->GetPhysicsParameter( namez[i] )->GetType() << endl;
-		if( ( BottleParameters->GetPhysicsParameter( namez[i] )->GetType() != "Fixed" ) || ( ( namez[i] == Param_Set.first->GetName() ) || ( namez[i] == Param_Set.second->GetName() ) ) )
-		{
-			result_names.push_back( namez[i] );
-		}
-	}
+//	vector<string> namez = BottleParameters->GetAllNames();
+	vector<string> result_names = BottleParameters->GetAllNames();
 
 	double uplim = Param_Set.first->GetMax();
 	double lolim = Param_Set.first->GetMin();

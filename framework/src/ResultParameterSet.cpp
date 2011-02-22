@@ -81,3 +81,21 @@ bool ResultParameterSet::SetResultParameter( string Name, double Value, double O
 	delete newParameter;
 	return returnValue;
 }
+
+//Initialise a physics parameter
+bool ResultParameterSet::ForceNewResultParameter( string Name, double Value, double OriginalValue, double Error, double Minimum, double Maximum, string Type, string Unit )
+{
+	ResultParameter * newParameter = new ResultParameter( Name, Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
+	bool found=false;
+	for( short int i=0; i< allNames.size(); i++ )
+	{
+		if( allNames[i] == Name )  found = true;
+	}
+	if( !found )
+	{
+		allNames.push_back( Name );
+		allParameters.push_back( *newParameter );
+	}
+	delete newParameter;
+	return !found;
+}
