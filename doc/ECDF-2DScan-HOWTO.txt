@@ -1,0 +1,95 @@
+
+
+This is how I perform 2D LL scans using RapidFit on ECDF
+
+Generate an XML with all of the parameters you want for the scan.
+
+Remove the Output tags from the file and add the string '___CHANGE_ME___' to
+your file instead.
+
+rename your xml file to 'XML_TEMPLATE.xml'
+
+COPY generate-xml.sh into a folder with this XML_TEMPLATE.xml file
+
+
+edit the start of generate-xml.sh to generate the set of scripts you need.
+(I've added a bit more text about that here but I think it's reasonably ok)
+
+
+Now you have editted the files execute my script as:
+
+./generate-xml.sh
+
+Now you will have many Output_x_y.xml files and the same amount of
+ganga_x_y.py files
+
+To submit all of these jobs on ECDF you can submit the job as:
+./run-me.sh
+
+This will take all of the jobs and submit them using ganga
+If the jobs have a random runtime fail, resubmit them with ganga
+
+I have several methods for merging the results of these jobs which are
+basically short scipts. However, these are not intuitive and basically all
+boil down to generating one command:
+
+hadd output.root file1.root file2.root .... filex.root
+
+
+I hope this has helped, from this I can generate a 20x20 Phis vs deltaGamma
+plot in about 40min with a few outlying fits and failing jobs
+
+
+
+
+---   WARNING:
+---   THERE EXISTS A BUG SHOULD YOU TRY TO GENERATE A LOT OF FITS OF 1x1 FITS
+---   THIS IS A KNOWN PROBLEM SOMEWHERE IN THE 2DSCAN CODE, BUT I THINK THIS
+---   IS S STRANGE USE CASE OF CONTOUR PLOT CODE AND SO DO NOT INTEND TO FIX
+
+
+---   This indicates the number of subjobs per axis to be generated and thrown through ganga
+---   This example givex 10x10 = 100 jobs
+
+wanted_X_segments=10
+wanted_Y_segments=10
+
+
+---   These Parameters are the parameters you wish to scan over as they're named in the XML
+---   Make sure they're in quotes
+
+X_PARAM="Phi_s"
+Y_PARAM="deltaGamma"
+
+
+---   These are the rest of the parameters as they appear in the XML
+---   NOTE: I WILL NOT SUPPORT RANGES HERE DUE TO THE COMPLEXITY OF WHAT THAT INVOLVES
+
+wanted_X_points=20
+wanted_Y_points=20
+X_max="3.14159"
+X_min="-3.14159"
+Y_max="1.0"
+Y_min="-1.0"
+
+
+---  This should be self-explanitory but you need to give the explict path
+#  FULL EXPLICIT PATH OF RAPIDFIT EXECUTABLE
+RAPIDFIT_BINARY="/exports/home/s0957039/trunk/bin/fitting"
+
+---  These paramaters decide on how you run RapidFit, in this example
+---  LLcontours are requested and the output file is called
+---  LLcontourScanData.root
+
+RAPIDFIT_ARGS="'--doLLcontour'"
+OUTPUT_FILES="'LLcontourScanData.root'"
+
+
+---  If you wish to pass RapidFit more parameters you will need to pass
+---  something such as:
+
+RAPIDFIT_ARGS="'--doLLcontour','--someoption1','--someoption2'"
+OUTPUT_FILES="'LLData1.root','LLData2.root','LLData3.root'"
+
+--- Note these are elements in a python array and as such require to be
+--- defined as: 'option','option'

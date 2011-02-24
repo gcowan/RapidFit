@@ -2,6 +2,7 @@
 
 2011/02/24 Rob Currie
    - Fixed the Blinding in the new 2DScan code, Now able to reproduce plots Pete generates with the old scanning code in a fraction of the time on ECDF correctly, the new scanning code should 'Just Work'(tm) for everyone
+   - Added short howto-use and bash script for breaking up a 2DScan plot to generate quick plots using as many cores as possible on ECDF
 
 2011/02/24 Rob Currie
    - Changed the way that FitAssembler deals with Throws, will now attempt a basic recovery of the coordinates of the point based on shifting the fixed value slightly either way of where a fit falls over
