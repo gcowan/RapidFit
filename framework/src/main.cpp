@@ -549,18 +549,18 @@ int main( int argc, char * argv[] )
 			else
 			{
 				//Do the fit
-				//FitResult * oneResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
+				FitResult * oneResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
 
 				//Output results
-				//makeOutput->SetInputResults( oneResult->GetResultParameterSet() );
-				//makeOutput->OutputFitResult( oneResult );
+				makeOutput->SetInputResults( oneResult->GetResultParameterSet() );
+				makeOutput->OutputFitResult( oneResult );
 
 
 				//Do LL scan
 				if( doLLscanFlag ) {
 					//  Temporary Holder for the scan outputs to plot
 					LLscanResult * llResult;
-					vector<FitResult*> scanSoloResult;
+					vector<ToyStudyResult*> scanSoloResult;
 					//  Store
 					vector<LLscanResult*> scanResults;
 					vector<string> LLscanList = makeOutput->GetScanList();
@@ -570,10 +570,12 @@ int main( int argc, char * argv[] )
 						ToyStudyResult* scan_result = FitAssembler::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[ii] );
 						llResult = ResultFormatter::LLScan( scan_result, LLscanList[ii] );
 						scanResults.push_back( llResult );
-
+						scanSoloResult.push_back( scan_result );
 					}
 					makeOutput->SetLLscanFileName( LLscanFileName );
 					makeOutput->OutputLLscanResult( scanResults ) ;
+                                        TString output_scan_dat( "LLScanData.root" );
+                                        ResultFormatter::FlatNTuplePullPlots( string( output_scan_dat ), scanSoloResult.back() );
 				}
 
 				//Do 2D LL scan for deltaGamma and phis

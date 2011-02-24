@@ -132,7 +132,7 @@ vector<double> ToyStudyResult::GetAllMLL()
 	vector<double> output_MLL;
 	for ( short int i=0; i < allResults.size(); i++ )
 	{
-		if( allResults[i]->GetFitStatus() == 3 ) 
+		if( allResults[i]->GetFitStatus() >0 ) 
 		{
 			output_MLL.push_back( allResults[i]->GetMinimumValue() );
 		}
@@ -271,6 +271,6 @@ TString ToyStudyResult::GetFlatResultHeader()
 		header += name + "_error:";
 		header += name + "_pull:";
 	}
-	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:NLL";
+	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:Fit_MLL";
 	return header;
 }

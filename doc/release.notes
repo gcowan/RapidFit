@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/24 Rob Currie
+   - Changed the way that FitAssembler deals with Throws, will now attempt a basic recovery of the coordinates of the point based on shifting the fixed value slightly either way of where a fit falls over
+   - Changed the code I put in ToyStudyResults to return All Fit Status which is more helpful
+   - Added the few lines to print the result of the last LLscan or LLcontour to a .root file, will make this more elegant very soon, but for now if you want all of this info, do one fit at a time
+
 2011/02/22 Rob Currie
    - Changed FitAssembler to add parameters missing in ResultParameter, this also included adding a new function to ResultParameter, added a functions to ParameterSet too for convenience
    - The LLcontour code now correctly writes data to a file and looks to be storing the information required for the plots, however this code is still to be tested completely
