@@ -147,7 +147,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 		//  I will repeat this 4 times until I have had 5 fit failiures then I will deam this to be a lost cause and the users problem
 		//  This can be coded up into an even more generic for try catch but I feal the algorithm would be painful to code and even more painful to read so I think this has the best performance/transparency
 
-
+		double stored_real_val;
 
 		for( short int i=0; i<=4; i++ )
 		{
@@ -159,6 +159,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 			if( i == 4 ) realscanVal = scanVal-2.*(deltaScan/retry_frac);
 
 			scanParameter->SetBlindedValue( realscanVal ) ;
+			stored_real_val = scanParameter->GetBlindedValue( );
 			try{
 				// Try a Fit, it it converges, continue to elsewhere in the program
 				scanStepResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
@@ -191,7 +192,8 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 		//  If the fit failed 5 times I will simply return a dummy fit result full of zerod objects. It is up to the user to watch for and remove these
 		if( fit_try_failed ){
 			cerr << "Nothing more I'm willing to do, considering a Fit here a lost cause..." <<endl;
-			realscanVal = scanVal;
+			scanParameter->SetBlindedValue( realscanVal ) ;
+			stored_real_val = scanParameter->GetBlindedValue( );
 			int status = -1;
 			vector<string> NewNamesList = BottleParameters->GetAllNames();
 			ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
@@ -202,7 +204,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 		string name = Wanted_Param->GetName();
 		string type = BottleParameters->GetPhysicsParameter( name )->GetType();
 		string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
-		scanStepResult->GetResultParameterSet()->SetResultParameter( name, realscanVal, realscanVal, 0., realscanVal, realscanVal, type, unit );
+		scanStepResult->GetResultParameterSet()->SetResultParameter( name, stored_real_val, stored_real_val, 0., stored_real_val, stored_real_val, type, unit );
 
 		vector<string> Fixed_List = BottleParameters->GetAllFixedNames();
 		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
@@ -266,6 +268,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan ;
 		scanParameter->SetBlindedValue( scanVal ) ;
+		double storedVal = scanParameter->GetBlindedValue( );
 
 		// Do a scan point fit
 		FitAssembler::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result );
@@ -277,7 +280,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 
 		for( short int i=0; i < Returnable_Result->NumberResults(); i++ )
 		{
-			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal, 0.0, scanVal, scanVal, type, unit );
+			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, storedVal, storedVal, 0.0, storedVal, storedVal, type, unit );
 		}
 
 		output_interface->push_back( Returnable_Result );
