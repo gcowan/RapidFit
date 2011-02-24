@@ -158,8 +158,8 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 			if( i == 3 ) realscanVal = scanVal+2.*(deltaScan/retry_frac);
 			if( i == 4 ) realscanVal = scanVal-2.*(deltaScan/retry_frac);
 
-			scanParameter->SetBlindedValue( realscanVal ) ;
-			stored_real_val = scanParameter->GetBlindedValue( );
+			scanParameter->SetTrueValue( realscanVal ) ;
+			stored_real_val = scanParameter->GetValue( );
 			try{
 				// Try a Fit, it it converges, continue to elsewhere in the program
 				scanStepResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
@@ -193,7 +193,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 		if( fit_try_failed ){
 			cerr << "Nothing more I'm willing to do, considering a Fit here a lost cause..." <<endl;
 			scanParameter->SetBlindedValue( realscanVal ) ;
-			stored_real_val = scanParameter->GetBlindedValue( );
+			stored_real_val = scanParameter->GetValue( );
 			int status = -1;
 			vector<string> NewNamesList = BottleParameters->GetAllNames();
 			ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
@@ -267,8 +267,8 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 		
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan ;
-		scanParameter->SetBlindedValue( scanVal ) ;
-		double storedVal = scanParameter->GetBlindedValue( );
+		scanParameter->SetTrueValue( scanVal ) ;
+		double storedVal = scanParameter->GetValue( );
 
 		// Do a scan point fit
 		FitAssembler::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result );

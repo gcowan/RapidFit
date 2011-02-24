@@ -1,6 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
 2011/02/24 Rob Currie
+   - Fixed the Blinding in the new 2DScan code, Now able to reproduce plots Pete generates with the old scanning code in a fraction of the time on ECDF correctly, the new scanning code should 'Just Work'(tm) for everyone
+
+2011/02/24 Rob Currie
    - Changed the way that FitAssembler deals with Throws, will now attempt a basic recovery of the coordinates of the point based on shifting the fixed value slightly either way of where a fit falls over
    - Changed the code I put in ToyStudyResults to return All Fit Status which is more helpful
    - Added the few lines to print the result of the last LLscan or LLcontour to a .root file, will make this more elegant very soon, but for now if you want all of this info, do one fit at a time
