@@ -265,7 +265,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 		
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan ;
-		scanParameter->SetTrueValue( scanVal ) ;
+		scanParameter->SetBlindedValue( scanVal ) ;
 
 		// Do a scan point fit
 		FitAssembler::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result );
