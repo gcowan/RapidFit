@@ -271,6 +271,6 @@ TString ToyStudyResult::GetFlatResultHeader()
 		header += name + "_error:";
 		header += name + "_pull:";
 	}
-	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:Fit_MLL";
+	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:NLL";
 	return header;
 }
