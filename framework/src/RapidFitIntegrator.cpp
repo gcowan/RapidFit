@@ -13,6 +13,7 @@
 #include "StringProcessing.h"
 #include "StatisticsFunctions.h"
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <stdlib.h>
 
@@ -79,10 +80,11 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 		if ( testIntegral > 0.0 )
 		{
 			//Check if the function's integrate method agrees with the numerical integral
-			if ( abs( numericalIntegral - testIntegral) / testIntegral < INTEGRAL_PRECISION_THRESHOLD )
+			if ( true /*abs( numericalIntegral - testIntegral) / testIntegral < INTEGRAL_PRECISION_THRESHOLD*/ )
 			{
 				//Trust the function's integration
-				cout << "Function provides acceptable integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
+				cout << std::setprecision(3) ;
+				cout << "Integration  Test: numerical : analytical   " << numericalIntegral << " :  " << testIntegral <<  "           Using ANALYTICAL in all cases" << endl;
 				ratioOfIntegrals = 1.;
 				functionCanIntegrate = true;
 				return testIntegral;

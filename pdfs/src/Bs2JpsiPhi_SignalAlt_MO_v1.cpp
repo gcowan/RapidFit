@@ -14,6 +14,8 @@
 #include "RooMath.h"
 #include "Mathematics.h"
 
+#define DEBUGFLAG true
+
 //......................................
 //Constructor
 
@@ -179,6 +181,8 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate(DataPoint * measurement)
 	
 	//tagFraction = measurement->GetObservable( mistagName )->GetValue();
 	tagFraction = mistagOffset + mistagScale*measurement->GetObservable( mistagName )->GetValue();
+	if( tagFraction < 0 )   cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate() : tagFraction < 0 so set to 0 " << endl ;
+	if( tagFraction > 0.5 ) cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate() : tagFraction > 0.5 so set to 0.5 " << endl ;
 	
 	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
@@ -201,8 +205,12 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate(DataPoint * measurement)
 		returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;				
 	}
 	
-
-	if(  ( (returnValue <= 0.) && (t>0.) ) || isnan(returnValue) ) {
+	//conditions to throw exception
+	bool c1 = isnan(returnValue) ;
+	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
+	bool c3 = ((resolution1==0.)&&(resolution2==0.)) && (returnValue <= 0.) && (t>0.) ;
+	
+	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
 		cout << " Bs2JpsiPhi_SignalAlt_MO_v1::evaluate() returns <=0 or nan :" << returnValue << endl ;
 		cout << "   gamma " << gamma() ;
@@ -212,7 +220,10 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate(DataPoint * measurement)
 		cout << "   AP    " << AP() ;
 		cout << "   A0    " << A0() << endl ;
 		cout << "   AS    " << AS() << endl ;
-		cout << " For event with: " << endl ;
+		cout << "   delta_ms       " << delta_ms << endl ;
+		cout << "   mistagScale    " << mistagScale << endl ;
+		cout << "   mistagOffset   " << mistagOffset << endl ;
+		cout << " For event with:  " << endl ;
 		cout << "   time " << t << endl ;
 		if( isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
@@ -238,6 +249,8 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
 
 	//tagFraction = measurement->GetObservable( mistagName )->GetValue();
 	tagFraction = mistagOffset + mistagScale*measurement->GetObservable( mistagName )->GetValue();
+	if( tagFraction < 0 )   cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Normalise() : tagFraction < 0 so set to 0 " << endl ;
+	if( tagFraction > 0.5 ) cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Normalise() : tagFraction > 0.5 so set to 0.5 " << endl ;
 
 	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
@@ -321,6 +334,23 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec(  )  const
 	0.5 * AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
 	0.5 * AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
 	0.5 * AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
+
+	//PELC DEBUG 
+	 if( DEBUGFLAG && (xsec < 0) ) {
+		 cout << " Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec( ) : return value < 0 " << endl ;
+		 cout << "  -> " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
+		 cout << "  -> " << "  time " << timeFactorA0A0(  ) << endl ;
+		 cout << "  -> " << "  angle " << angleFactorA0A0( ) << endl ;
+		 cout <<  "  -> " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
+		 cout <<  "  -> " <<AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) << endl << endl ;
+		 cout <<  "  -> " <<AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( )<< endl ;
+		 cout <<  "  -> " <<A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( )<< endl ;
+		 cout <<  "  -> " <<A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( )<< endl << endl;
+		 cout <<  "  -> " <<AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) << endl ;
+		 cout <<  "  -> " <<AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( )<< endl ;
+		 cout <<  "  -> " <<AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( )<< endl ;
+		 cout <<  "  -> " <<AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( )<< endl ;
+	 }
 	
 	return xsec ;
 };
@@ -347,6 +377,23 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm1(  ) const
 	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +  
 	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
 	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
+	
+	//PELC DEBUG 
+	/*
+	if( norm < 0 ) {
+		cout << endl ;
+		cout <<  A0()*A0() * timeFactorA0A0Int(  )* angAccI1  << endl ;
+		cout <<  AP()*AP() * timeFactorAPAPInt(  )* angAccI2 << endl ;
+		cout <<  AT()*AT() * timeFactorATATInt(  )* angAccI3 << endl << endl ;
+		cout <<  AP()*AT() * timeFactorImAPATInt(  ) * angAccI4<< endl ;
+		cout <<  A0()*AP() * timeFactorReA0APInt(  ) * angAccI5<< endl ;
+		cout <<  A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6<< endl << endl;
+		cout <<  AS()*AS() * timeFactorASASInt(  ) * angAccI7 << endl ;
+		cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl ;
+		cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
+		cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
+	}
+	 */
 	
 	return norm ;
 };

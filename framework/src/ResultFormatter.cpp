@@ -511,7 +511,6 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 
 	for( int ii=0; ii<nscans; ii++ )
 	{
-		//scanResults[ii]->print() ;
 		cv.SetGrid();
 		cv.GetFrame()->SetFillColor(21);
 		cv.GetFrame()->SetBorderSize(12);

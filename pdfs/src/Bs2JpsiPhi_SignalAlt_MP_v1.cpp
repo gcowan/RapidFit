@@ -14,6 +14,8 @@
 #include "RooMath.h"
 #include "Mathematics.h"
 
+#define DEBUGFLAG true
+
 //......................................
 //Constructor
 
@@ -190,8 +192,12 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement)
 		returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;				
 	}
 	
+	//conditions to throw exception
+	bool c1 = isnan(returnValue) ;
+	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
+	bool c3 = ((resolution1==0.)&&(resolution2==0.)) && (returnValue <= 0.) && (t>0.) ;
 
-	if(  ( (returnValue <= 0.) && (t>0.) ) || isnan(returnValue) ) {
+	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
 		cout << " Bs2JpsiPhi_SignalAlt_MP_v1::evaluate() returns <=0 or nan :" << returnValue << endl ;
 		cout << "   gamma " << gamma() << endl;

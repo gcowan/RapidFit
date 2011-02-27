@@ -14,6 +14,8 @@
 #include "RooMath.h"
 #include "Mathematics.h"
 
+#define DEBUGFLAG true
+
 //......................................
 //Constructor
 
@@ -56,7 +58,13 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() :
 	, timeAcceptanceCategoryName ( "timeAcceptanceCategory" )
 	// Other things
 {
-	if( useUpperTimeAcceptance() ) {
+	if( ! USE_LOWER_TIME_ACCEPTANCE ) {
+		cout << "=====>WARNING " << endl ;
+		cout << "=====>WARNING YOU APPEAR TO **NOT** BE USING THE LOWER TIME ACCEPTANCE" << endl ;
+		cout << "       - The define flag is turned off " << endl << endl ;
+	}
+
+	if( USE_UPPER_TIME_ACCEPTANCE ) {
 		cout << "=====>WARNING " << endl ;
 		cout << "=====>WARNING YOU APPEAR TO BE USING THE UPPER TIME ACCEPTANCE. BE WARNED THAT: " << endl ;
 		cout << "       - It doesnt work for Tagged fits as we havnt looked up how to combine with Exp*Cos in the normalisation " << endl ;
@@ -226,6 +234,18 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorEven(  )  const
 	( 1.0 + cos(phi_s) ) * expL( ) 
 	+ ( 1.0 - cos(phi_s) ) * expH( ) 
 	+ q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
+	
+	//DEBUG
+	if( DEBUGFLAG && (result < 0) ) {
+		cout << " Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorEven() : result < 0 " << endl ;
+		cout << " ->term1 " << ( 1.0 + cos(phi_s) ) * expL( ) << endl ;
+		cout << " ->term2 " << ( 1.0 - cos(phi_s) ) * expH( ) << endl ;
+		cout << " ->term3 " << q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) << endl ;
+		cout << "   -->sin(phis) "  << sin(phi_s) << endl ;
+		cout << "   -->expSin    "  << expSin() << endl ;
+		cout << "   -->tagFrac   "  << tagFraction << endl ;
+		cout << "   -->delta_ms  "  << delta_ms << endl ;
+	}
 	return result ;
 };
 
