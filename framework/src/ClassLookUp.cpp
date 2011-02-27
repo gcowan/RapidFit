@@ -10,11 +10,11 @@
 #include "ClassLookUp.h"
 
 // Many of these will soon be depricated
-#include "Bs2JpsiPhi_mistagObservable.h"
-#include "Bs2JpsiPhi_mistagObservable_withTimeRes.h"
-#include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
-#include "Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h"
-#include "Bs2JpsiPhi_mistagObservable_alt.h"
+//#include "Bs2JpsiPhi_mistagObservable.h"
+//#include "Bs2JpsiPhi_mistagObservable_withTimeRes.h"
+//#include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
+//#include "Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h"
+//#include "Bs2JpsiPhi_mistagObservable_alt.h"
 
 // Signal PDFs set 1  (originally Greig and Conor mostly)
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h"
@@ -65,7 +65,7 @@
 //Look up the name of a PDF, return an appropriate instance of IPDF
 IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters )
 {
-        if ( Name == "Bs2JpsiPhi_mistagObservable" )
+/*        if ( Name == "Bs2JpsiPhi_mistagObservable" )
         {
 	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagObservable();
@@ -90,7 +90,8 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //JPsiPhi from Pete with mistag as a physics observable
 	        return new Bs2JpsiPhi_mistagObservable_alt();
         }
-		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
+	*/
+		if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
         {
 	        //Default JPsiPhi
 	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc();
