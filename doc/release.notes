@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/28 Rob Currie
+   - Fixed a problem with the logic in LLcontour for 1x1 scans... I still maintain this is a 'special' use case
+   - Fixed the script that generates the jobs on ECDF. The code works and generates what the user asks for, however I maintain this algorithm is not as simple as you first think,
+	eventually I will translate this into a python job template for ganga, however as it 'just works' to a sufficient degree I commit a working example
+
 2011/02/24 Rob Currie
    - Fixed the Blinding in the new 2DScan code, Now able to reproduce plots Pete generates with the old scanning code in a fraction of the time on ECDF correctly, the new scanning code should 'Just Work'(tm) for everyone
    - Added short howto-use and bash script for breaking up a 2DScan plot to generate quick plots using as many cores as possible on ECDF

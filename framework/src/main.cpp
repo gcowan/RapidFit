@@ -27,6 +27,8 @@
 //#include "ScanParam.h"
 #include "TString.h"
 #include "ToyStudyResult.h"
+#include "LLscanResult.h"
+#include "LLscanResult2D.h"
 
 using namespace std;
 
@@ -574,8 +576,13 @@ int main( int argc, char * argv[] )
 					}
 					makeOutput->SetLLscanFileName( LLscanFileName );
 					makeOutput->OutputLLscanResult( scanResults ) ;
-                                        TString output_scan_dat( "LLScanData.root" );
-                                        ResultFormatter::FlatNTuplePullPlots( string( output_scan_dat ), scanSoloResult.back() );
+					for( int ii=0; ii < LLscanList.size(); ii++ )
+					{
+						TString output_scan_dat("LLScanData");
+						output_scan_dat.Append(LLscanList[ii]);
+						output_scan_dat.Append(".root" );
+						ResultFormatter::FlatNTuplePullPlots( string( output_scan_dat ), scanSoloResult[ii] );
+					}
 				}
 
 				//Do 2D LL scan for deltaGamma and phis
@@ -612,8 +619,19 @@ int main( int argc, char * argv[] )
 					}
 					makeOutput->SetLLcontourFileName( LLcontourFileName );
 					makeOutput->OutputLLcontourResult( contourResults ) ;
-					TString output_scan_dat( "LLcontourScanData.root" );
-					ResultFormatter::FlatNTuplePullPlots( string(output_scan_dat), AllContourFitResults.back() );
+					for( int ii=0; ii < _2DLLscanList.size(); ii++ )
+					{
+						TString output_scan_dat( "LLcontourScanData");
+						TString ext("_");
+						ext.Append(_2DLLscanList[ii].first);
+						ext.Append("_");
+						ext.Append(_2DLLscanList[ii].second);
+						ext.Append(".root" );
+						output_scan_dat.Append(ext);
+						ResultFormatter::FlatNTuplePullPlots( string( output_scan_dat ), AllContourFitResults[ii] );
+					}
+					
+					//ResultFormatter::FlatNTuplePullPlots( string(output_scan_dat), AllContourFitResults.back() );
 				}
 
 			}

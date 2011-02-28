@@ -119,14 +119,17 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 	scanParameter->SetType( "Fixed" ) ;
 
 	// Need to set up a loop , fixing the scan parameter at each point
-	double deltaScan = (uplim - lolim) / (npoints-1.) ;
+	double deltaScan;
 
-	for( int si=0; si<npoints; si++) {
+	for( int si=0; si<int(npoints); si++) {
 
 		// Set scan parameter value
-		double scanVal = lolim + si*deltaScan;
+		if( int(npoints)!=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
+		else deltaScan=0;
+		double scanVal = lolim+deltaScan*si;
 		//scanParameter->SetBlindedValue( scanVal ) ;
 
+		
 		output_interface->StartStopwatch();
 
 		// Do a scan point fit
@@ -161,7 +164,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 			try{
 				// Try a Fit, it it converges, continue to elsewhere in the program
 				scanStepResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
-				continue;
+				break;
 			}
 			//  If it didn't converge tell the user why!
 			catch( int e){
@@ -258,13 +261,15 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 	
 	// Need to set up a loop , fixing the scan parameter at each point
 
-	double deltaScan = (uplim-lolim) / (npoints-1.) ;
-	
-	for( int si=0; si < npoints; si++) {
+	double deltaScan;
+	if( int(npoints) !=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
+	else deltaScan=0.;
+
+	for( int si=0; si < int(npoints); si++) {
 		ToyStudyResult* Returnable_Result = new ToyStudyResult( result_names );
 		
 		// Set scan parameter value
-		double scanVal = lolim + si*deltaScan ;
+		double scanVal = lolim + si*deltaScan;
 		scanParameter->SetBlindedValue( scanVal ) ;
 
 		// Do a scan point fit
