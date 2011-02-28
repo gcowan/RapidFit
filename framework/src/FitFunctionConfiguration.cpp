@@ -55,3 +55,4 @@ string FitFunctionConfiguration::GetWeightName()
 {
 	return weightName ;
 }
+

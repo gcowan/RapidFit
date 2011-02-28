@@ -99,3 +99,4 @@ bool ResultParameterSet::ForceNewResultParameter( string Name, double Value, dou
 	delete newParameter;
 	return !found;
 }
+

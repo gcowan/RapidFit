@@ -37,7 +37,7 @@ EdStyle::EdStyle( ) {
 	// use helvetica-bold-r-normal, precision 2 (rotatable)
 	Int_t lhcbFont = 62;
 	// line thickness
-	Double_t lhcbWidth = 1.75; //original= 1.75
+	Width_t lhcbWidth = 2; //Width_t is a SHORT INT, not a double
 
 	// use plain black on white colors
 	gStyle->SetFrameBorderMode(0);
@@ -73,7 +73,7 @@ EdStyle::EdStyle( ) {
 
 	// use bold lines and markers
 	gStyle->SetLineWidth(lhcbWidth);
-	gStyle->SetFrameLineWidth(3.);
+	gStyle->SetFrameLineWidth(3);
 	gStyle->SetHistLineWidth(lhcbWidth);
 	gStyle->SetFuncWidth(lhcbWidth);
 	gStyle->SetGridWidth(lhcbWidth);

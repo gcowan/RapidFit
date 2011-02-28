@@ -1,6 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
 2011/02/28 Conor
+   - Took it upon myself to do some turd-polishing. As a result of either a more strict compiler or a newer root version, 
+     I was seeing a lot of warnings at compile time that weren't there before but were not recently introduced bugs. 
+     These were mostly due to doubles being cast as ints in places where they really shouldn't be. I've fixed these now. 
    - Added two new programs, designed to handle rapidfit flat ntuple results as produced when submitting to batch systems
    - These are rapidfit_toyresults and rapidfit_llscans. The first handles the making of pullplots and latex tables, the second handles 2D likelihood scans 
    - The code is beta, particularly for the llscans, but tests so far show it to work

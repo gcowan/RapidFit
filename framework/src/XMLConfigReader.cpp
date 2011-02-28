@@ -1289,7 +1289,7 @@ int XMLConfigReader::GetSeed()
 		{
 			if ( children[childIndex]->GetName() == "Seed" )
 			{
-				seed.push_back ( fabs( atoi( children[childIndex]->GetValue( )[0].c_str() ) ) );
+				seed.push_back ( abs( atoi( children[childIndex]->GetValue( )[0].c_str() ) ) );
 				cout << "Using seed: " << seed.back() << " from input file." << endl;
 				return seed.back();
 			}

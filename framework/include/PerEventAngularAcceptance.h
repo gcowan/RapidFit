@@ -87,12 +87,12 @@ class PerEventAngularAcceptance
   TVector3 boosttoB, boostBackToLabFromB;
   
   double GeV;
-  double pbins, pmin, pmax, pbinWidth;
-  double ptbins, ptmin, ptmax, ptbinWidth;
+  double pmin, pmax, pbinWidth;
+  double ptmin, ptmax, ptbinWidth;
   double amin, amax, aymax;
   double pmin_jpsi, ptmin_jpsi;
 
-  double cosbins;
+  int cosbins, pbins, ptbins;
 
   double w_sum_gen;
 
