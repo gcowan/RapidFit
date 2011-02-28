@@ -51,17 +51,32 @@ typedef vector<TString> array1s;
 inline TString prettyPrint(Double_t value){
         char pretty[20];
         TString prettyString;
-        sprintf (pretty, "%4.3g",value);
+        sprintf (pretty, "%1.1g",value);
         prettyString = pretty;
         return prettyString;
 }
 
 
+inline TString prettyPrint(Double_t val, Double_t err){
+	TString outstr = "$";
+	char errstr[20];
+	char valstr[20];
+	Int_t n = sprintf (errstr, "%1.1g",err);
+	sprintf(valstr,"%1.*f",n-2,val);
+	outstr += valstr;
+	outstr += "\\pm";
+	outstr += errstr;
+	outstr+= "$";
+	return outstr;
+
+	
+}
+
 int main(int argc, char *argv[]){
 
 	if(argc !=3){
-		cout << "Binary, slighlty easier version of Grieg's python script. Usage:" << endl;
-		cout << "rapidresults PullPlots.root resultdir"	<< endl;
+		  cout << "Plots, fits and tabulates the mean, width, pull of RapidFit toyresults automagically. Usage:" << endl;
+		                    cout <<  argv[0] << " <flatntuple.root> <outputdir>"    << endl;
 		exit(1);
 	}
 	gROOT->SetStyle("Plain");
@@ -87,8 +102,11 @@ int main(int argc, char *argv[]){
 	TNtuple* results;
 	input->GetObject("RapidFitResult", results);
 	if(!results){
+	input->GetObject("RapidFitResult/RapidFitResult",results);
+	if(!results){
 		cout << "Couldn't find ntuple RapidFitResult in TFile" << endl;
 		exit(1);
+		}
 	}
 	TObjArray *vars = results->GetListOfLeaves();
 	for(int i = 0; i < vars->GetEntries(); i++){
@@ -103,7 +121,7 @@ int main(int argc, char *argv[]){
 			var_error += "_error";
 			
 			output->cd();
-			results->Draw(var_pull+">>pull");
+			results->Draw(var_pull+">>pull","Fit_Status==3");
 			TH1F *pullhist = (TH1F*)gDirectory->Get("pull");
 			pullhist->Sumw2();
 
@@ -126,7 +144,7 @@ int main(int argc, char *argv[]){
 				pullCanvas->Print(outputdir+"/"+varname+"_pull.eps");
 				pullgauss->Delete();	
 
-				results->Draw(var_error+">>error");
+				results->Draw(var_error+">>error","Fit_Status==3");
 				TCanvas *errCanvas = new TCanvas(varname + " Error",varname + " Error",2048,1536);
 				TH1F *errhist = (TH1F*)gDirectory->Get("error");
 				errhist->Sumw2();
@@ -139,7 +157,7 @@ int main(int argc, char *argv[]){
 				errhist->Delete();
 
 
-				results->Draw(var_value+">>value");
+				results->Draw(var_value+">>value","Fit_Status==3");
 				TH1F *valhist = (TH1F*)gDirectory->Get("value");
 				valhist->Sumw2();
 				valhist->SetTitle(varname + " Value");
@@ -174,50 +192,22 @@ int main(int argc, char *argv[]){
 	cout << "Parameter	&	Mean	&	Std. Dev 	&	Pull mean	&	Pull Std. Dev	\\\\" << endl;
 	for(UInt_t i =0; i< param.size(); i++){
 
-
-	TString strmean = " $ ";
-	strmean += prettyPrint(mean[i]);
-	strmean += " \\pm ";
-	strmean += prettyPrint(emean[i]);
-	strmean += " $ ";
-
-	TString strsigma = " $ ";
-	strsigma += prettyPrint(sigma[i]);
-	strsigma += " \\pm ";
-	strsigma += prettyPrint(esigma[i]);
-	strsigma += " $ ";
-	
+	TString alertstr = " { ";
+	TString strmean = prettyPrint(mean[i], emean[i]);
+	TString strsigma = prettyPrint(sigma[i], esigma[i]);
+		
 	bool warnpull = (fabs(pull[i])/epull[i] > 3.0);
 	TString strpull;
-	if(warnpull){ 	
-	strpull = "\\alert{$ ";
-	}else{
-	strpull = " $ ";
-	}
-	strpull += prettyPrint(pull[i]);
-	strpull +=  " \\pm ";
-	strpull +=  prettyPrint(epull[i]);
-	if(warnpull){
-	strpull += " $} ";
-	}else{
-	strpull += " $ ";
-	}
+	if(warnpull) strpull = alertstr;
+	strpull += prettyPrint(pull[i],epull[i]);
+	if(warnpull) strpull += " } ";
 
 	bool warnpullw = (fabs(pullw[i] -1)/epullw[i] > 3.0);
         TString strpullw;
-        if(warnpullw){   
-        strpullw = "\\alert{$ ";
-        }else{
-        strpullw = " $ ";
-        }
-        strpullw += prettyPrint(pullw[i]);
-        strpullw +=  " \\pm ";
-        strpullw +=  prettyPrint(epull[i]);
-        if(warnpullw){
-        strpullw += " $} ";
-        }else{
-        strpullw += " $ ";
-        }
+        if(warnpullw) strpullw = alertstr;
+	strpullw += prettyPrint(pullw[i],epullw[i]);
+        if(warnpullw) strpullw += " } ";
+
 		cout << param[i] << " 	& 	" << strmean << " 	& 	" << strsigma << "	 & 	" << strpull << "	 & 	" << strpullw << "	\\\\" << endl;
 
 //		cout << param[i] << " & 	$ " << prettyPrint(mean[i]) << " \\pm " << prettyPrint(emean[i]) << " $	&	$ " << prettyPrint(sigma[i]) << " \\pm " << prettyPrint(esigma[i]) << " $   &       $ " << prettyPrint(pull[i]) << " \\pm " << prettyPrint(epull[i]) <<  " $   &       $ " << prettyPrint(pullw[i]) << " \\pm " << prettyPrint(epullw[i]) << " $	\\\\" << endl;

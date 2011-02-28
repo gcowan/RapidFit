@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/02/28 Conor
+   - Added two new programs, designed to handle rapidfit flat ntuple results as produced when submitting to batch systems
+   - These are rapidfit_toyresults and rapidfit_llscans. The first handles the making of pullplots and latex tables, the second handles 2D likelihood scans 
+   - The code is beta, particularly for the llscans, but tests so far show it to work
+   - running make will compile these along with the main rapidfit executable. Alternatively run "make utils" to just compile these independently
+   - To find out how to use them, just run them without arguments
+
+
 2011/02/28 Rob Currie
    - Fixed a problem with the logic in LLcontour for 1x1 scans... I still maintain this is a 'special' use case
    - Fixed the script that generates the jobs on ECDF. The code works and generates what the user asks for, however I maintain this algorithm is not as simple as you first think,

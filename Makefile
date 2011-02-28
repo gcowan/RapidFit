@@ -60,7 +60,7 @@ LIBS       += $(ROOTLIBS) -lHtml -lThread -lMinuit -lMathCore -lMinuit2 -lRooFit
 
 HEADERS    =  $(INCDIR)/RooBs2PhiPhiFullPdf.h $(INCDIR)/RooPdf_Bs2JPsiPhi.h $(INCDIR)/LinkDef.h
 
-all : $(EXEDIR)/fitting
+all : $(EXEDIR)/fitting utils
 
 $(EXEDIR)/fitting : $(OBJS) $(PDFOBJS) $(OBJDIR)/RootFileDataSet.o
 	$(CXX) -o $@ $(OBJS) $(PDFOBJS) $(OBJDIR)/RootFileDataSet.o $(LINKFLAGS) $(LIBS)
@@ -87,8 +87,17 @@ clean   :
 cleanall:
 	$(RM) $(GARBAGE)
 
-rapidresults: $(UTILSSRC)/rapidresults.o
-	$(CXX) -o $(EXEDIR)/$@ $< $(ROOTLIBS)
+$(EXEDIR)/rapidfit_toyresults: $(OBJDIR)/rapidfit_toyresults.o
+	$(CXX) -o $@ $< $(ROOTLIBS)
 
-$(UTILSSRC)/rapidresults.o: $(UTILSSRC)/rapidresults.cc
+$(OBJDIR)/rapidfit_toyresults.o: $(UTILSSRC)/rapidfit_toyresults.cc
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+$(EXEDIR)/rapidfit_llscanresults: $(OBJDIR)/rapidfit_llscanresults.o
+	$(CXX) -o $@ $< $(ROOTLIBS)
+
+$(OBJDIR)/rapidfit_llscanresults.o: $(UTILSSRC)/rapidfit_llscanresults.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults
+	
