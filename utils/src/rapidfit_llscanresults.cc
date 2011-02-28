@@ -143,13 +143,13 @@ int main(int argc, char *argv[]){
 	cout << "plot ranges are: " << param1string << ": " << p1minimum << " " << p1maximum << " " << param2string << ": " << p2minimum << " " << p2maximum << endl;
 	cout << "Minimum NLL is: " << minNLL << endl;	
 
-	TString bins = "(1000,0,0,1000,0,0)";
+	TString bins = "(200,0,0,200,0,0)";
 
 	results->Draw(param1string+"_value:"+param2string+"_value>>nllhist"+bins,"(NLL-"+minNLLString+")");
 	//TGraph2D *nllgraph = (TGraph2D*)gDirectory->Get("nllhist");
 	TGraph2D *nllgraph = new TGraph2D((TH2*)gDirectory->Get("nllhist"));
-	nllgraph->SetNpx(50);
-	nllgraph->SetNpy(50);
+	nllgraph->SetNpx(100);
+	nllgraph->SetNpy(100);
 	//Double_t * x = nllgraph->GetX();
 	//Double_t * y = nllgraph->GetY();
 	//Double_t * z = nllgraph->GetZ();
@@ -180,21 +180,22 @@ int main(int argc, char *argv[]){
 	contCanvas->Print(outputdir+"/"+param1string+"_"+param2string+"_cont.png");
 	contCanvas->Write();
 
-	TCanvas *confCanvas = new TCanvas("onfidence interval plot","confidence interval plot",2048,1536);
 	double conts[4] = {1.15,2.36,3.0,4.61};
 	double confs[4] = {68.0,90.0,95.0,99.0};
 	nllhist->SetContour(4,conts);
-	nllhist->Draw("CONT LIST");
-	confCanvas->Update();
 
+	TCanvas *confCanvas = new TCanvas("onfidence interval plot","confidence interval plot",2048,1536);
+	nllhist->Draw("cont LIST");
+	confCanvas->Update();
 	TObjArray *contObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
 	TList* contLevel = NULL;
 	TGraph* curv     = NULL;
 	TGraph* gc    = NULL;
 	int TotalConts = contObjArr->GetSize();
-	TLegend *leg = new TLegend(0.7,0.899,0.899,0.7);
+	TLegend *leg = new TLegend(0.80,0.89,0.95,0.7);
 	leg->SetHeader("Conf. Levels");
-	leg->SetBorderSize(0); 
+	leg->SetBorderSize(0);
+        leg->SetFillStyle(0);	
 	for(int i = 0; i < TotalConts; i++){
 		TString confname = "";
 		double cl = confs[i];
@@ -216,6 +217,46 @@ int main(int argc, char *argv[]){
 	confCanvas->Print(outputdir+"/"+param1string+"_"+param2string+"_conf.eps");
 	confCanvas->Print(outputdir+"/"+param1string+"_"+param2string+"_conf.png");
 	confCanvas->Write();
+
+	TCanvas *pubCanvas = new TCanvas("onfidence interval plot (pub)","confidence interval plot (pub)",2048,1536);
+	nllhist->Draw("cont2 LIST");
+	pubCanvas->Update();
+	contObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
+	pubCanvas->Clear();
+	contLevel = NULL;
+	curv     = NULL;
+	gc = NULL;
+	TotalConts = contObjArr->GetSize();
+	leg = new TLegend(0.80,0.89,0.95,0.7);
+	leg->SetHeader("Conf. Levels");
+	leg->SetBorderSize(0);
+	leg->SetFillStyle(0);
+	nllhist->Draw("AXIS");
+	for(int i = 0; i < TotalConts; i++){
+		TString confname = ""; 
+		double cl = confs[i];
+		confname +=cl;
+		confname += "\% C.L.";
+		contLevel = (TList*)contObjArr->At(i);
+		for(int j =0; j<contLevel->GetSize(); j++){
+		curv = (TGraph*)contLevel->At(j);
+		gc = (TGraph*)curv->Clone();
+		gc->SetLineStyle(i+1);
+		gc->Draw("L");
+		}
+		leg->AddEntry(gc,confname, "L");
+	}
+
+
+	addLHCbLabel("NLL Scan")->Draw();
+	leg->Draw();
+	pubCanvas->Update();
+	pubCanvas->Print(outputdir+"/"+param1string+"_"+param2string+"_pub.pdf");
+	pubCanvas->Print(outputdir+"/"+param1string+"_"+param2string+"_pub.eps");
+	pubCanvas->Print(outputdir+"/"+param1string+"_"+param2string+"_pub.png");
+	pubCanvas->Write();
+
+
 	output->Write();
 	output->Close();
 
