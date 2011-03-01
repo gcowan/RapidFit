@@ -28,7 +28,7 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBounda
 	vector< vector<double> > discreteCombinations = StatisticsFunctions::DiscreteCombinations( &allNames, generationBoundary, discreteNames, continuousNames, discreteValues );
 
 	//Retrieve the maxima and minima, to use in the coordinate transforms
-	for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+	for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 	{
 		double maximum = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetMaximum();
 		double minimum = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetMinimum();
@@ -38,16 +38,16 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBounda
 	}
 
 	//Make a Foam generator for each combination
-	for ( int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
 	{
 		//Make the data point for the combination
 		DataPoint * temporaryDataPoint = new DataPoint(allNames);
-		for ( int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
+		for (unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
 		{
 			string unit = generationBoundary->GetConstraint( discreteNames[discreteIndex] )->GetUnit();
 			temporaryDataPoint->SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 0.0, unit );
 		}
-		for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+		for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 		{
 			string unit = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetUnit();
 			temporaryDataPoint->SetObservable( continuousNames[continuousIndex], 0.0, 0.0, unit );
@@ -85,7 +85,7 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBounda
 //Destructor
 Foam::~Foam()
 {
-	for ( int generatorIndex = 0; generatorIndex < foamGenerators.size(); generatorIndex++ )
+	for (unsigned int generatorIndex = 0; generatorIndex < foamGenerators.size(); generatorIndex++ )
 	{
 		delete foamGenerators[generatorIndex];
 	}
@@ -95,7 +95,7 @@ Foam::~Foam()
 //Use accept/reject method to create data
 int Foam::GenerateData( int DataAmount )
 {
-	for ( int dataIndex = 0; dataIndex < DataAmount; dataIndex++ )
+	for (int dataIndex = 0; dataIndex < DataAmount; dataIndex++ )
 	{
 		//Generate the discrete observables, and select the correct Foam generator to use
 		int combinationIndex = 0;
@@ -109,7 +109,7 @@ int Foam::GenerateData( int DataAmount )
 			temporaryDataPoint->SetObservable( discreteNames[discreteIndex], temporaryObservable );
 
 			//Calculate the index
-			for ( int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
+			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 			{
 				if ( discreteValues[discreteIndex][valueIndex] == currentValue )
 				{
@@ -126,7 +126,7 @@ int Foam::GenerateData( int DataAmount )
 		foamGenerators[combinationIndex]->GetMCvect(generatedEvent);
 
 		//Store the continuous observables
-		for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+		for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 		{
 			string unit = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetUnit();
 			double newValue = minima[continuousIndex] + ( ranges[continuousIndex] * generatedEvent[continuousIndex] );

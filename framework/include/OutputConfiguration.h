@@ -51,6 +51,9 @@ class OutputConfiguration
 		void SetLLcontourFileName(string);
 		void SetWeightsWereUsed( string ) ;
 		void SetInputResults( ResultParameterSet* );
+		
+		void AddContour( string, string );
+		void AddScan( string );
 
 	private:
 		vector<double> GetRange( string );		//  Return Max, Min and Resolution
@@ -60,10 +63,11 @@ class OutputConfiguration
 		vector< pair< string, string > > contours;
 		vector<string> projections;
 		vector<string> LLscanList;
+		string pullType;
 		bool makeAllPlots;
-		bool weightedEventsWereUsed ;
 		string weightName ;
-		string LLcontourFileName, LLscanFileName, pullFileName, projectionFileName, contourFileName, pullType;
+		string pullFileName,projectionFileName,LLscanFileName,LLcontourFileName,contourFileName;
+		bool weightedEventsWereUsed ;
 		vector<ScanParam*> Global_Scan_List;
 		vector<pair<ScanParam*, ScanParam*> > Global_2DScan_List;
 

@@ -52,7 +52,7 @@ vector<string> StringProcessing::SplitString( string Input, char SplitCharacter 
 //Return the position of the first instance of a character in a string
 int StringProcessing::CharacterPosition( string Input, char SearchCharacter )
 {
-	for (int characterIndex = 0; characterIndex < Input.size(); characterIndex++)
+	for (unsigned int characterIndex = 0; characterIndex < Input.size(); characterIndex++)
 	{
 		//Look for the character
 		if ( Input[characterIndex] == SearchCharacter )
@@ -66,6 +66,7 @@ int StringProcessing::CharacterPosition( string Input, char SearchCharacter )
 			return -1;
 		}
 	}
+	return -1;
 }
 
 //Return the position of all instances of a string in another string
@@ -85,7 +86,7 @@ vector<int> StringProcessing::StringPositions( string Input, string SearchString
 		else
 		{
 			bool found = true;
-			for ( int characterIndex = 0; characterIndex < SearchString.size(); characterIndex++ )
+			for (unsigned int characterIndex = 0; characterIndex < SearchString.size(); characterIndex++ )
 			{
 				//Compare each subsequent character
 				if ( Input[ characterIndex + firstCharacterPosition ] != SearchString[characterIndex] )
@@ -116,7 +117,7 @@ void StringProcessing::RemoveCharacter( string & Input, char SearchCharacter )
 	char passedCharacters[ Input.size() + 1 ];
 	int addedCharacters = 0;
 
-	for ( int characterIndex = 0; characterIndex < Input.size(); characterIndex++ )
+	for (unsigned int characterIndex = 0; characterIndex < Input.size(); characterIndex++ )
 	{
 		if ( Input[characterIndex] != SearchCharacter )
 		{
@@ -135,11 +136,11 @@ string StringProcessing::ReplaceString( string & Input, string FindString, strin
 	string output;
 
 	//Search the input character by character
-	for ( int characterIndex = 0; characterIndex < Input.size(); characterIndex++ )
+	for (unsigned int characterIndex = 0; characterIndex < Input.size(); characterIndex++ )
 	{
 		//Find out if the full search string is present
 		bool isInstance = true;
-		for ( int testIndex = 0; testIndex < FindString.size(); testIndex++ )
+		for (unsigned int testIndex = 0; testIndex < FindString.size(); testIndex++ )
 		{
 			if ( Input[ characterIndex + testIndex ] != FindString[testIndex] )
 			{
@@ -151,7 +152,7 @@ string StringProcessing::ReplaceString( string & Input, string FindString, strin
 		//Replace or push back
 		if (isInstance)
 		{
-			for ( int replaceIndex = 0; replaceIndex < ReplaceString.size(); replaceIndex++ )
+			for (unsigned int replaceIndex = 0; replaceIndex < ReplaceString.size(); replaceIndex++ )
 			{
 				output.push_back( ReplaceString[replaceIndex] );
 			}
@@ -172,7 +173,7 @@ void StringProcessing::RemoveWhiteSpace( vector<string> & newContent )
 {
 	vector<string> output;
 
-	for ( int lineIndex = 0; lineIndex < newContent.size(); lineIndex++ )
+	for (unsigned int lineIndex = 0; lineIndex < newContent.size(); lineIndex++ )
 	{
 		//Remove tabs
 		RemoveCharacter( newContent[lineIndex], '\t' );
@@ -217,7 +218,7 @@ vector<string> StringProcessing::CombineUniques( vector<string> VectorOne, vecto
 //Return the position of a search string within a vector of strings, or -1 if not found
 int StringProcessing::VectorContains( vector<string> * InputVector, string * SearchString )
 {
-	for ( int searchIndex = 0; searchIndex < InputVector->size(); searchIndex++ )
+	for (unsigned int searchIndex = 0; searchIndex < InputVector->size(); searchIndex++ )
 	{
 		if ( (*InputVector)[searchIndex] == (*SearchString) )
 		{

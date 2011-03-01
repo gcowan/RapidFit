@@ -38,7 +38,7 @@ void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
 	//Make a string naming all observables
 	string observableNames = "";
 	vector<string> allNames = OutputData->GetBoundary()->GetAllNames();
-	for (int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		if (nameIndex == 0)
 		{
@@ -59,7 +59,7 @@ void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
 	{
 		//Retrieve the values of all observables
 		Float_t observables[ allNames.size() ];
-		for (int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 		{
 			DataPoint * temporaryDataPoint = OutputData->GetDataPoint(dataIndex);
 			observables[nameIndex] = temporaryDataPoint->GetObservable( allNames[nameIndex] )->GetValue();
@@ -107,7 +107,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 	int colours[2] = {42,38};
 
 	//Loop over all contour plots
-	for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
+	for (unsigned int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
 	{
 		TMultiGraph * graph = new TMultiGraph();
 		FunctionContour * plotContour = contours[plotIndex];
@@ -124,7 +124,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 
 			//Retrieve each point
 			double xCoordinates[ sigmaContour.size() ], yCoordinates[ sigmaContour.size() ];
-			for ( int pointIndex = 0; pointIndex < sigmaContour.size(); pointIndex++ )
+			for ( unsigned int pointIndex = 0; pointIndex < sigmaContour.size(); pointIndex++ )
 			{
 				xCoordinates[pointIndex] = sigmaContour[pointIndex].first;
 				yCoordinates[pointIndex] = sigmaContour[pointIndex].second;
@@ -270,8 +270,8 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
 
 		double fitValue = outputParameter->GetValue();
-		double minValue = outputParameter->GetMinimum();
-		double inputValue = outputParameter->GetOriginalValue();
+//		double minValue = outputParameter->GetMinimum();
+//		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
 		//if (fitError > 0.0) sigmaFromInputValue = (fitValue - inputValue)/fitError;
@@ -307,7 +307,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
 
 		double fitValue = outputParameter->GetValue();
-		double minValue = outputParameter->GetMinimum();
+//		double minValue = outputParameter->GetMinimum();
 		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
@@ -340,7 +340,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "Parameter & Fit result and error  \\\\ \\hline \\hline" << endl;
 
 	//Will need to do some comparisons
-	double Rperp =0 , Rzp =0, ePerp =0 , eZp=0;
+//	double Rperp =0 , Rzp =0, ePerp =0 , eZp=0;
 
 	//Ouput each parameter
 	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
@@ -348,10 +348,10 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
 
 		double fitValue = outputParameter->GetValue();
-		double minValue = outputParameter->GetMinimum();
-		double inputValue = outputParameter->GetOriginalValue();
+//		double minValue = outputParameter->GetMinimum();
+//		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
-		double sigmaFromInputValue = outputParameter->GetPull();
+//		double sigmaFromInputValue = outputParameter->GetPull();
 		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
 		cout << setw(15) << name << " & "
 			<< setw(10) << setprecision(3) << fitValue << " $\\pm$ "
@@ -399,7 +399,7 @@ void ResultFormatter::MakePullPlots( string Type, string FileName, ToyStudyResul
 }
 
 //Make pull plots from the output of a toy study
-void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * ToyResult )
+void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult* ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	TNtuple * parameterNTuple;
@@ -417,6 +417,11 @@ void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * Toy
 	rootFile->Close();
 }
 
+void ResultFormatter::WriteFlatNtuple( string Filename, ToyStudyResult* ToyResult )
+{
+	ResultFormatter::FlatNTuplePullPlots( Filename, ToyResult );
+}
+
 //Make pull plots from the output of a toy study
 void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResult * ToyResult )
 {
@@ -429,7 +434,7 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 	TNtuple * parameterNTuple;
 
 	//Plots for each observable
-	for (int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		//Prepare the NTuple
 		parameterNTuple = new TNtuple( allNames[nameIndex].c_str(), "Parameter fit results", header.c_str() );
@@ -479,7 +484,7 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 	vector<double> allCPUTimes = ToyResult->GetAllCPUTimes();
 	TNtuple * fitInfoNTuple = new TNtuple( "fitInfo", "Information about fits", "realTime:cpuTime:fitStatus" );
 	Float_t timeCPUStatus[3];
-	for ( int timeIndex = 0; timeIndex < allRealTimes.size(); timeIndex++ )
+	for (unsigned int timeIndex = 0; timeIndex < allRealTimes.size(); timeIndex++ )
 	{
 		timeCPUStatus[0] = allRealTimes[timeIndex];
 		timeCPUStatus[1] = allCPUTimes[timeIndex];
@@ -581,7 +586,7 @@ LLscanResult2D* ResultFormatter::LLScan2D( vector<ToyStudyResult*> new_results, 
 	vector<double> scanParameterValues;
 	vector<double> scanParameterValues2 = new_results[0]->GetParameterValues( scanName2 );
 
-	for( int si=0; si < new_results.size(); si++) {
+	for(unsigned int si=0; si < new_results.size(); si++) {
 		vector<double> scanLLValues = new_results[si]->GetAllMLL();
 		LLscanResult * _1D_temp_result = new LLscanResult( scanName2, scanParameterValues2, scanLLValues ) ;
 		LLScanResults.push_back( _1D_temp_result );

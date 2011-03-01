@@ -10,6 +10,7 @@
 #ifndef RESULT_PARAMETER_H
 #define RESULT_PARAMETER_H
 
+#include "PhysicsParameter.h"
 #include <string>
 
 using namespace std;
@@ -29,8 +30,10 @@ class ResultParameter
 		double GetMaximum();
 		string GetType();
 		string GetUnit();
+		PhysicsParameter* GetDummyPhysicsParameter();
 
 	private:
+		string name;
 		double value;
 		double originalValue;
 		double error;

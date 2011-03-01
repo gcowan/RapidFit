@@ -20,7 +20,7 @@ FoamIntegrator::FoamIntegrator( IPDF * InputPDF, IDataSet * InputData )
 	vector<DataPoint> combinationPoints =  StatisticsFunctions::DataAverage( InputData, discreteCombinations, discreteValues, discreteNames, continuousNames, dataPointDescriptions, dataPointWeights );
 
 	//Make a foam for each discrete combination
-	for ( int combinationIndex = 0; combinationIndex < combinationPoints.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < combinationPoints.size(); combinationIndex++ )
 	{
 		MakeFoam combinationFoam( InputPDF, InputData->GetBoundary(), &( combinationPoints[combinationIndex] ) );
 		allIntegrators.push_back(combinationFoam);
@@ -47,7 +47,7 @@ double FoamIntegrator::Integral( DataPoint * InputPoint, PhaseSpaceBoundary * In
 		double currentValue = temporaryObservable->GetValue();
 
 		//Calculate the index
-		for ( int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
+		for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 		{
 			if ( discreteValues[discreteIndex][valueIndex] == currentValue )
 			{

@@ -21,7 +21,7 @@ ParameterSet::ParameterSet()
 ParameterSet::ParameterSet( vector<string> NewNames )
 {
 	//Populate the map
-	for (int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
+	for (unsigned int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
 	{
 		allParameters.push_back( PhysicsParameter() );
 	}
@@ -44,7 +44,7 @@ vector<string> ParameterSet::GetAllNames()
 vector<string> ParameterSet::GetAllFixedNames()
 {
 	vector<string> Fixed_List;
-	for( short int i=0; i<allNames.size(); i++ )
+	for(unsigned short int i=0; i<allNames.size(); i++ )
 	{
 		if( ParameterSet::GetPhysicsParameter( allNames[i] )->GetType() == "Fixed" )  Fixed_List.push_back( allNames[i] );
 	}
@@ -55,7 +55,7 @@ vector<string> ParameterSet::GetAllFixedNames()
 vector<string> ParameterSet::GetAllFloatNames()
 {
 	vector<string> Not_Fixed_List;
-	for( short int i=0; i<allNames.size(); i++ )
+	for(unsigned short int i=0; i<allNames.size(); i++ )
 	{
 		if( ParameterSet::GetPhysicsParameter( allNames[i] )->GetType() != "Fixed" )  Not_Fixed_List.push_back( allNames[i] );
 	}
@@ -88,8 +88,8 @@ bool ParameterSet::SetPhysicsParameter( string Name, PhysicsParameter * NewPhysi
         if ( nameIndex == -1 )
 	{
 		cerr << "PhysicsParameter " << Name << " not found" << endl;
-		exit(1);
-		//return false;
+		//exit(1);
+		return false;
 	}
 	else
 	{
@@ -110,7 +110,7 @@ bool ParameterSet::SetPhysicsParameter( string Name, double Value, double Minimu
 //Set all physics parameters
 bool ParameterSet::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-	for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		PhysicsParameter * inputParameter = NewParameterSet->GetPhysicsParameter( allNames[nameIndex] );
 		if ( inputParameter->GetUnit() == "NameNotFoundError" )
@@ -131,7 +131,7 @@ bool ParameterSet::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Not very pleasant in OO terms, and unsafe. Quick however.
 bool ParameterSet::SetPhysicsParameters( double * NewValues )
 {
-	for ( int parameterIndex = 0; parameterIndex < allParameters.size(); parameterIndex++ )
+	for (unsigned int parameterIndex = 0; parameterIndex < allParameters.size(); parameterIndex++ )
 	{
 		allParameters[parameterIndex].SetValue( NewValues[parameterIndex] );
 	}
@@ -141,7 +141,7 @@ bool ParameterSet::SetPhysicsParameters( vector<double> NewValues )
 {
 	if ( NewValues.size() == allParameters.size() )
 	{
-		for ( int parameterIndex = 0; parameterIndex < allParameters.size(); parameterIndex++ )
+		for (unsigned short int parameterIndex = 0; parameterIndex < allParameters.size(); parameterIndex++ )
 		{
 			allParameters[parameterIndex].SetValue( NewValues[parameterIndex] );
 		}
@@ -157,7 +157,7 @@ bool ParameterSet::SetPhysicsParameters( vector<double> NewValues )
 //General Print method for a dataset
 void ParameterSet::print()
 {
-	for(int i=0; i< allParameters.size(); i++) {
+	for(unsigned short int i=0; i< allParameters.size(); i++) {
 		cout << "Parameter name: " << allNames[i] <<  endl;
 		allParameters[i].print() ;
 	}

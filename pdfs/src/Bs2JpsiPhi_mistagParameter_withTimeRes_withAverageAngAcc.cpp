@@ -15,8 +15,11 @@
 
 //Constructor
 Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc() :
+	normalisationCacheValid(false)
+	, evaluationCacheValid(false)
+
 	// Physics parameters
-	gammaName     ( "gamma" )
+	, gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
 	, deltaMName    ( "deltaM")
 	, Phi_sName     ( "Phi_s")
@@ -41,10 +44,8 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParam
 	, cosThetaName	( "cosTheta" )
 	, phiName	( "phi" )
 	, cosPsiName	( "cosPsi" )
-	, tagName	( "tag" )
 	//, timeres	( "resolution" )
-	, normalisationCacheValid(false)
-, evaluationCacheValid(false)
+	, tagName	( "tag" )
 {
 	MakePrototypes();
 }

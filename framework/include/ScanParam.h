@@ -33,25 +33,25 @@ class ScanParam
 
 		//  These should probably be implemented in the .cpp but I'm being VERY lazy
 
-		bool HasName(){   return !name.empty();                                                           };
-		string GetName() { if( !name.empty() ){   return name[0]; }    else return "";                    };
-		void SetName(string new_val) { while( !name.empty() ){   name.pop_back(); };    name.push_back(    new_val ); };
+		bool HasName();
+		string GetName();
+		void SetName(string new_val);
 
-		bool HasMax(){    return !maximum.empty();                                                        };
-		double GetMax() { if( !maximum.empty() ){ return maximum[0]; } else return 0;                     };
-		void SetMax(double new_val) { while( !maximum.empty() ){ maximum.pop_back(); }; maximum.push_back( new_val ); };
+		bool HasMax();
+		double GetMax();
+		void SetMax(double new_val);
 
-		bool HasMin(){    return !minimum.empty();                                                        };
-		double GetMin() { if( !minimum.empty() ){ return minimum[0]; } else return 0;                     };
-		void SetMin(double new_val) { while( !minimum.empty() ){ minimum.pop_back(); }; minimum.push_back( new_val ); };
+		bool HasMin();
+		double GetMin();
+		void SetMin(double new_val);
 
-		bool HasSigma(){  return !sigma.empty();                                                          };
-		int GetSigma() { if( !sigma.empty() ) {   return sigma[0]; }   else return 5;                     };
-		void SetSigma(int new_val) { while( !sigma.empty() ){    sigma.pop_back(); };   sigma.push_back(   new_val ); };
+		bool HasSigma();
+		int GetSigma();
+		void SetSigma(int new_val);
 
-		bool HasPoints(){ return !points.empty();                                                         };
-		int GetPoints() { if( !points.empty() ){  return points[0]; }   else return 10;                    };
-		void SetPoints(int new_val) { while( !points.empty() ){  points.pop_back(); };  points.push_back(  new_val ); };
+		bool HasPoints();
+		int GetPoints();
+		void SetPoints(int new_val);
 
 		void print();
 

@@ -20,17 +20,13 @@ NormalisedSumPDF::NormalisedSumPDF()
 }
 
 //Constructor not specifying fraction parameter name
-NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : firstPDF(FirstPDF),
-	secondPDF(SecondPDF), fractionName("FirstPDFFraction"), firstFraction(0.5), integrationBoundary(InputBoundary),
-	firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) )
+NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : firstPDF(FirstPDF), secondPDF(SecondPDF), firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ), firstFraction(0.5), fractionName("FirstPDFFraction"), integrationBoundary(InputBoundary)
 {
 	MakePrototypes(InputBoundary);
 }
 
 //Constructor specifying fraction parameter name
-NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : firstPDF(FirstPDF),
-	secondPDF(SecondPDF), fractionName(FractionName), firstFraction(0.5), integrationBoundary(InputBoundary),
-	firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) )
+NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : firstPDF(FirstPDF), secondPDF(SecondPDF), firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ), firstFraction(0.5), fractionName(FractionName), integrationBoundary(InputBoundary)
 {
 	MakePrototypes(InputBoundary);
 }
@@ -163,8 +159,8 @@ vector<double> NormalisedSumPDF::EvaluateComponents( DataPoint * NewDataPoint )
 	
 	//Insert components in output vector with correct weights.	
 	vector<double> components ;
-	for( int ii=0; ii<termOneComponents.size(); ii++ ) components.push_back( termOneComponents[ii]*firstFraction/firstIntegral ) ;
-	for( int ii=0; ii<termTwoComponents.size(); ii++ ) components.push_back( termTwoComponents[ii]*(1.-firstFraction)/secondIntegral ) ;
+	for(unsigned int ii=0; ii<termOneComponents.size(); ii++ ) components.push_back( termOneComponents[ii]*firstFraction/firstIntegral ) ;
+	for(unsigned int ii=0; ii<termTwoComponents.size(); ii++ ) components.push_back( termTwoComponents[ii]*(1.-firstFraction)/secondIntegral ) ;
 	
 	// Return the complete set of components
 	return components;

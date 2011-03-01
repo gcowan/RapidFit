@@ -49,8 +49,7 @@ PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMini
 }
 
 //Constructor for unbounded parameter
-PhysicsParameter::PhysicsParameter( string Name, double NewValue, string NewType, string NewUnit ) : value(NewValue), type(NewType), unit(NewUnit),
-	maximum(0.0), minimum(0.0), toBeBlinded(false), blindOffset(0.0)
+PhysicsParameter::PhysicsParameter( string Name, double NewValue, string NewType, string NewUnit ) : value(NewValue), minimum(0.0), maximum(0.0), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0)
 {
 	//You could define a fixed parameter with no maximum or minimum, but it must be unbounded if not fixed.
 	if ( type != "Fixed" )

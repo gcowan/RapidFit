@@ -51,7 +51,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	//Store the parameters
 	ParameterSet * newParameters = NewFunction->GetParameterSet();
 	vector<string> allNames = newParameters->GetAllNames();
-	for (int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
@@ -115,7 +115,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 
 	//Get the fitted parameters
 	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
-	for (int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		string parameterName = allNames[nameIndex];
 		double parameterValue = 0.0;
@@ -148,7 +148,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 
 	//Make the contour plots
 	vector< FunctionContour* > allContours;
-	for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
+	for (unsigned int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
 	{
 		//Find the index (in Minuit) of the parameter names requested for the plot
 		int xParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].first ) );

@@ -8,17 +8,17 @@
 */
 
 #include "ResultParameter.h"
+//  This probably breaks OO but it's nicer to have it in this class for F-C plots
+#include "PhysicsParameter.h"
 #include <iostream>
 
 //Default constructor
-ResultParameter::ResultParameter() : value(0.0), originalValue(0.0), error(0.0), minimum(0.0), maximum(0.0), type("Uninitialised"), unit("Uninitialised")
+ResultParameter::ResultParameter() : name("Undefined"), value(0.0), originalValue(0.0), error(0.0), minimum(0.0), maximum(0.0), type("Uninitialised"), unit("Uninitialised")
 {
 }
 
 //Constructor with correct argument
-ResultParameter::ResultParameter( string Name, double NewValue, double NewOriginalValue, double NewError, double NewMinimum, double NewMaximum,
-		string NewType, string NewUnit ) : value(NewValue), originalValue(NewOriginalValue), error(NewError), minimum(NewMinimum),
-		maximum(NewMaximum), type(NewType), unit(NewUnit)
+ResultParameter::ResultParameter( string Name, double NewValue, double NewOriginalValue, double NewError, double NewMinimum, double NewMaximum, string NewType, string NewUnit ) : name(Name), value(NewValue), originalValue(NewOriginalValue), error(NewError), minimum(NewMinimum), maximum(NewMaximum), type(NewType), unit(NewUnit)
 {
 	if (maximum < minimum)
 	{
@@ -46,6 +46,11 @@ ResultParameter::ResultParameter( string Name, double NewValue, double NewOrigin
 //Destructor
 ResultParameter::~ResultParameter()
 {
+}
+
+PhysicsParameter* ResultParameter::GetDummyPhysicsParameter()
+{
+	return new PhysicsParameter( name, value, type, unit );
 }
 
 //Get the value

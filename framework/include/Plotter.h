@@ -35,12 +35,14 @@ class Plotter
 		void MakeObservablePlots( string, vector<DataPoint>, vector<double>, vector<string>, TFile* );
 		void MakePlotCanvas( string, string, TH1F*, double*, double*, int );
 	
-		bool weightsWereUsed ;
 		string weightName ;
 
-		RapidFitIntegrator * pdfIntegrator;
+
 		IPDF * plotPDF;
 		IDataSet * plotData;
+		RapidFitIntegrator * pdfIntegrator;
+		bool weightsWereUsed ;
+
 };
 
 #endif

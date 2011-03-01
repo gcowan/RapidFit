@@ -34,6 +34,7 @@ class ResultFormatter
 		//MakePullPlots chooses the appropriate method based on the first string argument
 		static void MakePullPlots( string, string, ToyStudyResult* );
 		static void FlatNTuplePullPlots( string, ToyStudyResult* );
+		static void WriteFlatNtuple( string , ToyStudyResult* );
 		static void SeparateParameterPullPlots( string, ToyStudyResult* );
 		static void MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename ); 
 		static void MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename );

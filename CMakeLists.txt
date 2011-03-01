@@ -18,13 +18,15 @@ ENDIF( INSOURCE )
 #  COMPILER OPTIONS
 
 #  -O3 optimizations
-SET( CMAKE_BUILD_TYPE Release )
+#SET( CMAKE_BUILD_TYPE Release )
 #  -O2 optimizations and -g
-#SET( CMAKE_BUILD_TYPE Debug )
+SET( CMAKE_BUILD_TYPE Debug )
+
+SET(CMAKE_CXX_FLAGS "-Wall" )
 
 #  Get back the old style verbosity :) by setting this to 1
-#SET( CMAKE_VERBOSE_MAKEFILE 1 )
-SET( CMAKE_VERBOSE_MAKEFILE 0 )
+SET( CMAKE_VERBOSE_MAKEFILE 1 )
+#SET( CMAKE_VERBOSE_MAKEFILE 0 )
 
 
 
@@ -125,14 +127,20 @@ TARGET_LINK_LIBRARIES( fitting fits pdfs ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES}
 
 #  Add Conor's and My tools to the build to be able to get these out of a make
 
-ADD_EXECUTABLE( rapidresults ${PROJECT_SOURCE_DIR}/utils/src/rapidresults.cc )
-TARGET_LINK_LIBRARIES( rapidresults ${ROOT_LIBRARIES} ) 
+#ADD_EXECUTABLE( rapidresults ${PROJECT_SOURCE_DIR}/utils/src/rapidresults.cc )
+#TARGET_LINK_LIBRARIES( rapidresults ${ROOT_LIBRARIES} )
+
+ADD_EXECUTABLE( rapidfit_llscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_llscanresults.cc )
+TARGET_LINK_LIBRARIES( rapidfit_llscanresults ${ROOT_LIBRARIES} )
+
+ADD_EXECUTABLE( rapidfit_toyresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_toyresults.cc )
+TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
 
 ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter-static.C )
 TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 
-ADD_EXECUTABLE( plot_try ${PROJECT_SOURCE_DIR}/utils/src/plot_try.C )
-TARGET_LINK_LIBRARIES( plot_try ${ROOT_LIBRARIES} )
+#ADD_EXECUTABLE( plot_try ${PROJECT_SOURCE_DIR}/utils/src/plot_try.C )
+#TARGET_LINK_LIBRARIES( plot_try ${ROOT_LIBRARIES} )
 
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone

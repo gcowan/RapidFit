@@ -64,7 +64,7 @@ double FitFunction::Evaluate()
 
 	//Calculate the value of each constraint
 	vector< ConstraintFunction* > constraints = allData->GetConstraints();
-	for ( int constraintIndex = 0; constraintIndex < constraints.size(); constraintIndex++ )
+	for (unsigned int constraintIndex = 0; constraintIndex < constraints.size(); constraintIndex++ )
 	{
 		minimiseValue += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
 	}

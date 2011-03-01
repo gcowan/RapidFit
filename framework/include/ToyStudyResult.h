@@ -23,7 +23,7 @@ class ToyStudyResult
 		ToyStudyResult( vector<string> );
 		~ToyStudyResult();
 
-		bool AddFitResult( FitResult* );
+		bool AddFitResult( FitResult*, bool=true );
 		int NumberResults();
 		FitResult * GetFitResult(int);
 		void StartStopwatch();
@@ -38,14 +38,17 @@ class ToyStudyResult
 		vector<double> GetFlatResult(int);
 		TString GetFlatResultHeader();
 
-	private:
 		double GetCPUTime( int );
 		double GetRealTime( int );
+		void AddCPUTimes( vector<double> );
+		void AddRealTimes( vector<double> );
 		void SetCPUTime( int, double );
 		void SetRealTime( int, double );
+
+	private:
 		vector< FitResult* > allResults;
 		vector<string> allNames;
-		vector< vector<double> > allValues, allErrors, allPulls;
+		vector< vector<double> > allValues, allErrors, allPulls, allGenValues;
 		vector<double> allRealTimes;
 		vector<double> allCPUTimes;
 		TStopwatch * clock;

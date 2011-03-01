@@ -30,18 +30,12 @@ DataSetConfiguration::DataSetConfiguration()
 }
 
 //Constructor with correct argument
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames ) : source(DataSource),
-	numberEvents(DataNumber),
-	cutString(cut),
-	arguments(DataArguments), argumentNames(DataArgumentNames), separateGeneratePDF(false), parametersAreSet(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), separateGeneratePDF(false), parametersAreSet(false)
 {
 }
 
 //Constructor with separate data generation PDF
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource),
-	numberEvents(DataNumber),
-	cutString(cut),
-	arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(DataPDF), separateGeneratePDF(true), parametersAreSet(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(DataPDF), separateGeneratePDF(true), parametersAreSet(false)
 {
 }
 
@@ -186,7 +180,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		cerr << "Please check the cut string you are using!" << endl;
 		exit(1);
 	}
-	TEventList * evtList = (TEventList*)gDirectory->Get("evtList"); // ROOT is weird
+//	TEventList * evtList = (TEventList*)gDirectory->Get("evtList"); // ROOT is weird
 
 	cout << "Total number of events in file: " << totalNumberOfEvents << endl;
 	cout << "You have applied this cut to the data: '" << cutString << "'" << endl;
@@ -244,10 +238,10 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		
 		//  As You can only plot 3 at a time using this mechanism and Root will overide the results between drawing the plots
 		//  Save the actual data to somewhere protected in our memory
-		for( short int i=0; i < data_array.size(); i++ )
+		for(unsigned short int i=0; i < data_array.size(); i++ )
 		{
 			vector<Double_t> temp_vector;
-			for( unsigned int j=0; j < numberOfEventsAfterCut; j++ )
+			for(int j=0; j < numberOfEventsAfterCut; j++ )
 			{
 				temp_vector.push_back( data_array[i][j] );
 			}
@@ -267,7 +261,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	for( ; (numberOfDataPointsRead < numberOfEventsAfterCut) && (numberOfDataPointsAdded < numberEventsToRead) ; numberOfDataPointsRead++ )
 	{
 		DataPoint point( observableNames );
-		for( unsigned int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
+		for(int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
 		{
 			string name = observableNames[obsIndex];
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
@@ -291,13 +285,13 @@ bool DataSetConfiguration::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseS
 	bool compatible = true;
 
 	vector<string> allNames = TestBoundary->GetAllNames();
-	for ( int observableIndex = 0; observableIndex < allNames.size(); observableIndex++ )
+	for (unsigned int observableIndex = 0; observableIndex < allNames.size(); observableIndex++ )
 	{
 		bool found = false;
 		//Find the requested observable name in the ntuple
 		TIter observableIterator( TestTuple->GetListOfLeaves() );
 		TLeaf * observableLeaf;
-		while ( observableLeaf = (TLeaf*)observableIterator() )
+		while( ( observableLeaf = (TLeaf*)observableIterator() ) )
 		{
 			string leafName = observableLeaf->GetName();
 			if ( leafName == allNames[observableIndex] )
@@ -324,7 +318,7 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 	std::vector<string> observableNames = (data->GetBoundary())->GetAllNames();
 
 	//Make a map of the observable names to their units
-	for (int i = 0; i < observableNames.size(); i++ )
+	for (unsigned int i = 0; i < observableNames.size(); i++ )
 	{
 		string name = observableNames[i];
 		string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
@@ -360,7 +354,7 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 			{
 				//Make a data point with the values on the line
 				DataPoint point(observableNames);
-				for (int i = 0; i < splitVec.size(); i++)
+				for (unsigned int i = 0; i < splitVec.size(); i++)
 				{
 					string name = observableNamesInFile[i];
 					string unit = observableNamesToUnits[ name ];
@@ -372,13 +366,13 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 			else
 			{
 				//Load the obsevable names
-				for (int i = 0; i < splitVec.size(); i++)
+				for (unsigned int i = 0; i < splitVec.size(); i++)
 				{
 					observableNamesInFile.push_back( splitVec[i] );
 				}
 
 				//Check that all required observable names are specified
-				for ( int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
+				for (unsigned int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
 				{
 					if ( StringProcessing::VectorContains( &observableNamesInFile, &( observableNames[observableIndex] ) ) == -1 )
 					{

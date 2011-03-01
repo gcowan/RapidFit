@@ -28,6 +28,8 @@ class EdStyle {
 public: 
    /// Standard constructor
    EdStyle( ); 
+   
+   static void SetStyle();
 
    static TString GetParamLatexUnit( string );
    static TString GetParamRootUnit( string );

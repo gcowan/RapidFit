@@ -1,5 +1,27 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/01 Rob Currie
+   - Added initial implementation of the framework that will construct FeldmanCousins Plots in a distributed way
+     This has hardcoded 1k subjobs with 1k events at each scan point. This is likely to Change
+   - The Output Format for FeldmanCousins scans in "FCOutput.root" has been established as:
+		GlobalFitResult
+		ScanPointFitResult
+		TOY1
+		TOY2
+		...
+		TOYN
+		GlobalFitResult
+		ScanPoint2FitResult
+		...
+   - Fixed duplication bug which may/maynot have been in head for 2DScan, too many changes in this update to track down exact cause
+   - Added command line interface for controlling 2DScan functionality, this will be used eventually on ECDF to remove the need for the generation/use of several hundred XML per plot
+     Work is ongoing to produce a bash script that will generate a ganga script to bunch and throw jobs to the grid, remember that ganga has a subjob limit of 1k events so bunching jobs has this to take into account
+   - Fixed *all* complier build warnings in framework. Most were harmless integer comparissons but some did alert me to potential conditions which could have theoretically thrown fatal crashes
+     I recomend EVERYONE update because of this, it makes crashes so much nicer to debug :D (NEVER thought I would say something nice about Root, but give it overly standards compliant code and it's crashes are fairly helpful)
+   - Added DoSafeFit as a method to FitAssembler which allowed me to move the toy studies over to this new safer way of fitting for use in a distributed manner by changing DoFit to DoSafeFit.
+     This will benifit all users performing toy studies on smaller datasets where there is a larger risk of the fit collapsing. 
+   - Cleaned up the code in ToyStudyResults, considering moving the property of the length of time of the fit to the FitResult class to clean-up this class into a true FitResultVector which would be easier to maintain & use
+
 2011/02/28 Conor
    - Took it upon myself to do some turd-polishing. As a result of either a more strict compiler or a newer root version, 
      I was seeing a lot of warnings at compile time that weren't there before but were not recently introduced bugs. 
@@ -9,7 +31,6 @@
    - The code is beta, particularly for the llscans, but tests so far show it to work
    - running make will compile these along with the main rapidfit executable. Alternatively run "make utils" to just compile these independently
    - To find out how to use them, just run them without arguments
-
 
 2011/02/28 Rob Currie
    - Fixed a problem with the logic in LLcontour for 1x1 scans... I still maintain this is a 'special' use case

@@ -13,7 +13,7 @@
 #include <iostream>
 
 //Constructor
-BasePDF::BasePDF() : valid(false), cacheValid(false), cachedIntegral(-1.0)
+BasePDF::BasePDF() : cachedIntegral(-1.0), cacheValid(false), valid(false)
 {
 }
 

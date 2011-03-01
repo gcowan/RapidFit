@@ -52,7 +52,7 @@ int FunctionContour::GetContourNumber()
 //Store a contour
 void FunctionContour::SetPlot( int Sigma, int NumberPoints, double * XValues, double * YValues )
 {
-	if ( Sigma > allContours.size() || Sigma < 1 )
+	if ( Sigma > int(allContours.size()) || Sigma < 1 )
 	{
 		cerr << "Contour sigma value (" << Sigma << ") is invalid" << endl;
 	}
@@ -71,7 +71,7 @@ void FunctionContour::SetPlot( int Sigma, int NumberPoints, double * XValues, do
 }
 void FunctionContour::SetPlot( int Sigma, vector< pair< double, double > > Contour )
 {
-	if ( Sigma > allContours.size() || Sigma < 1 )
+	if ( Sigma > int(allContours.size()) || Sigma < 1 )
 	{
 		cerr << "Contour sigma value (" << Sigma << ") is invalid" << endl;
 	}       
@@ -84,7 +84,7 @@ void FunctionContour::SetPlot( int Sigma, vector< pair< double, double > > Conto
 //Retrieve a contour
 vector< pair< double, double > > FunctionContour::GetPlot( int Sigma )
 {
-	if ( Sigma > allContours.size() || Sigma < 1 )
+	if ( Sigma > int(allContours.size()) || Sigma < 1 )
 	{
 		cerr << "Contour sigma value (" << Sigma << ") is invalid" << endl;
 	}
@@ -92,4 +92,5 @@ vector< pair< double, double > > FunctionContour::GetPlot( int Sigma )
 	{
 		return allContours[ Sigma - 1 ];
 	}
+	return *(new vector<pair<double, double> >);
 }

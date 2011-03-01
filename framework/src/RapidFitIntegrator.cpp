@@ -28,8 +28,7 @@ RapidFitIntegrator::RapidFitIntegrator()
 }
 
 //Constructor with correct argument
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false),
-	forceNumerical(ForceNumerical), functionToWrap(InputFunction), cacheSetUp(false)
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : functionToWrap(InputFunction), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), forceNumerical(ForceNumerical), cacheSetUp(false)
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
@@ -195,7 +194,7 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 			//Make arrays of the observable ranges to integrate over
 			double minima[ doIntegrate.size() ];
 			double maxima[ doIntegrate.size() ];
-			for ( int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
 			{
 				IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[observableIndex] );
 				minima[observableIndex] = newConstraint->GetMinimum();
@@ -233,20 +232,20 @@ void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 	//Don't do it unless discrete combinations cached
 	if (cacheSetUp)
 	{
-		for ( int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
+		for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
 		{
 			//Make a sample data point
 			DataPoint samplePoint( NewBoundary->GetAllNames() );
 
 			//Load the calculated discrete combinations
-			for ( int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
+			for (unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
 			{
 				string unit = NewBoundary->GetConstraint( discreteNames[discreteIndex] )->GetUnit();
 				samplePoint.SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 1, unit );
 			}
 
 			//Just generate some random continuous values
-			for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+			for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 			{
 				samplePoint.SetObservable( continuousNames[continuousIndex], NewBoundary->GetConstraint( continuousNames[continuousIndex] )->CreateObservable() );
 			}
@@ -285,7 +284,7 @@ double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
 			//cout << currentValue << ", ";
 
 			//Calculate the index
-			for ( int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
+			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 			{
 				if ( discreteValues[discreteIndex][valueIndex] == currentValue )
 				{

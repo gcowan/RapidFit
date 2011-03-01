@@ -8,6 +8,7 @@
 */
 
 #include "ResultParameterSet.h"
+#include "ParameterSet.h"
 #include <iostream>
 
 //Default constructor
@@ -19,7 +20,7 @@ ResultParameterSet::ResultParameterSet()
 ResultParameterSet::ResultParameterSet( vector<string> NewNames )
 {
 	//Populate the map
-	for (int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
 	{
 		allParameters.push_back( ResultParameter() );
 	}
@@ -42,7 +43,7 @@ vector<string> ResultParameterSet::GetAllNames()
 ResultParameter * ResultParameterSet::GetResultParameter(string Name)
 {
 	//Check if the name is stored in the map
-	for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for ( unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		if ( allNames[nameIndex] == Name )
 		{
@@ -58,7 +59,7 @@ ResultParameter * ResultParameterSet::GetResultParameter(string Name)
 bool ResultParameterSet::SetResultParameter( string Name, ResultParameter * NewResultParameter )
 {
 	//Check if the name is stored in the map
-	for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for ( unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		if ( allNames[nameIndex] == Name )
 		{
@@ -87,7 +88,7 @@ bool ResultParameterSet::ForceNewResultParameter( string Name, double Value, dou
 {
 	ResultParameter * newParameter = new ResultParameter( Name, Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
 	bool found=false;
-	for( short int i=0; i< allNames.size(); i++ )
+	for( unsigned short int i=0; i< allNames.size(); i++ )
 	{
 		if( allNames[i] == Name )  found = true;
 	}
@@ -100,3 +101,12 @@ bool ResultParameterSet::ForceNewResultParameter( string Name, double Value, dou
 	return !found;
 }
 
+ParameterSet* ResultParameterSet::GetDummyParameterSet()
+{
+	ParameterSet* new_Set = new ParameterSet( allNames );
+	for( unsigned short int i=0; i < allParameters.size(); i++ )
+	{
+		new_Set->SetPhysicsParameter( allNames[i], GetResultParameter( allNames[i] )->GetDummyPhysicsParameter() );
+	}
+	return new_Set;
+}

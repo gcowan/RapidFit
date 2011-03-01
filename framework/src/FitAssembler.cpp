@@ -40,20 +40,19 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Create the physics bottle
-FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,
-		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
+FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
 {
 	PhysicsBottle * bottle = new PhysicsBottle( BottleParameters );
 
 	//Fill the bottle - data generation occurs in this step
-	for ( int resultIndex = 0; resultIndex < BottleData.size(); resultIndex++ )
+	for ( unsigned int resultIndex = 0; resultIndex < BottleData.size(); resultIndex++ )
 	{
 		BottleData[resultIndex]->SetPhysicsParameters(BottleParameters);
 		bottle->AddResult( BottleData[resultIndex]->GetPDF(), BottleData[resultIndex]->GetDataSet() );
 	}
 
 	//Add the constraints
-	for ( int constraintIndex = 0; constraintIndex < BottleConstraints.size(); constraintIndex++ )
+	for ( unsigned int constraintIndex = 0; constraintIndex < BottleConstraints.size(); constraintIndex++ )
 	{
 		bottle->AddConstraint( BottleConstraints[constraintIndex] );
 	}
@@ -66,22 +65,21 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Create the physics bottle with pre-made data
-FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,
-		vector< IPDF* > AllPDFs, vector< IDataSet* > AllData, vector< ConstraintFunction* > BottleConstraints )
+FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< IPDF* > AllPDFs, vector< IDataSet* > AllData, vector< ConstraintFunction* > BottleConstraints )
 {
 	if ( AllPDFs.size() == AllData.size() )
 	{
 		PhysicsBottle * bottle = new PhysicsBottle(BottleParameters);
 
 		//Fill the bottle - data already generated
-		for ( int resultIndex = 0; resultIndex < AllData.size(); resultIndex++ )
+		for ( unsigned int resultIndex = 0; resultIndex < AllData.size(); resultIndex++ )
 		{
 			AllPDFs[resultIndex]->SetPhysicsParameters(BottleParameters);
 			bottle->AddResult( AllPDFs[resultIndex], AllData[resultIndex] );
 		}
 
 		//Add the constraints
-		for ( int constraintIndex = 0; constraintIndex < BottleConstraints.size(); constraintIndex++ )
+		for ( unsigned int constraintIndex = 0; constraintIndex < BottleConstraints.size(); constraintIndex++ )
 		{
 			bottle->AddConstraint( BottleConstraints[constraintIndex] );
 		}  
@@ -99,6 +97,73 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	}
 }
 
+//  Perform a safer fit which is gauranteed to return something which you can use :D
+FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
+{
+	vector<string> other_params = BottleParameters->GetAllFloatNames();
+	vector<double> truth;
+	for( unsigned short int j=0; j < other_params.size(); j++ )
+	{
+		truth.push_back( BottleParameters->GetPhysicsParameter(other_params[j])->GetTrueValue() );
+	}
+
+
+	bool fit_try_failed=false;
+	FitResult* ReturnableFitResult;
+	//  Try to fit 5 times and then abort
+	for( unsigned short int i=0; i<=4; i++ )
+	{
+		//  Left in for correctness
+		fit_try_failed = false;
+
+		try{
+			// Try a Fit, it it converges, continue to elsewhere in the program
+			ReturnableFitResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
+			return ReturnableFitResult;
+		}
+		//  If it didn't fit tell the user why!
+		catch( int e){
+			if ( e == 10 ){
+				cerr << "\nCaught exception : fit failed for these parameters..." << endl;  }
+			else if ( e == 13 ){
+				cerr << "\nIntegration Error: Fit Failed..." << endl;  }
+				fit_try_failed = true;
+		} catch (...) {
+                        cerr << "\n\n\n\t\t\tCaught Unknown Exception, THIS IS SERIOUS!!!\n\n\n" << endl;
+			fit_try_failed = true;
+		}
+		cerr << "Fit Did Not converge, shaking the bottle and starting again!" <<endl;
+		cerr << "This is Retry " << i+1 << "of 4"<<endl;
+		//  Give the physics bottle a bit of a shake and see if it works this time
+		for( unsigned short int j=0; j < other_params.size(); j++ )
+		{
+			double old_max = BottleParameters->GetPhysicsParameter(other_params[j])->GetMaximum();
+			double old_min = BottleParameters->GetPhysicsParameter(other_params[j])->GetMaximum();
+			double range = old_max - old_min;
+			double random_num = BottleData[0]->GetPDF()->GetRandomFunction()->Rndm();
+			double new_num = range*random_num;
+			if( random_num < 1E-6 )	new_num=random_num*i;
+			BottleParameters->GetPhysicsParameter(other_params[j])->SetBlindedValue( new_num );
+		}
+
+	}
+
+	//  If the fit failed 5 times I will simply return a dummy fit result full of zerod objects. It is up to the user to watch for and remove these
+	if( fit_try_failed ){
+		cerr << "Nothing more I'm willing to do, considering a Fit here a lost cause..." <<endl;
+
+		for( unsigned short int j=0; j < other_params.size(); j++ )
+		{
+			BottleParameters->GetPhysicsParameter( other_params[j] )->SetTrueValue( truth[j] );
+		}
+		int status = -1;
+		vector<string> NewNamesList = BottleParameters->GetAllNames();
+		ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
+		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, BottleParameters );
+	}
+	return ReturnableFitResult;
+}
+
 
 //  Interface for internal calls
 void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, ToyStudyResult* output_interface )
@@ -109,7 +174,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 	double npoints = Wanted_Param->GetPoints();
 	string scanName = Wanted_Param->GetName();
 
-	cout << "Performing Scan for the parameter " << scanName << endl ;
+//	cout << "Performing Scan for the parameter " << scanName << endl ;
 	
 	// Get a pointer to the physics parameter to be scanned and fix it	
 	// CAREFUL:  this must be reset as it was at the end.
@@ -122,97 +187,30 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 	double deltaScan;
 
 	for( int si=0; si<int(npoints); si++) {
-
+		cout << "\n\nSINGLE SCAN NUMBER\t\t" << si+1 << "\t\tOF\t\t" <<int(npoints)<< endl<<endl;
 		// Set scan parameter value
 		if( int(npoints)!=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
 		else deltaScan=0;
 		double scanVal = lolim+deltaScan*si;
-		//scanParameter->SetBlindedValue( scanVal ) ;
+		scanParameter->SetBlindedValue( scanVal ) ;
 
-		
 		output_interface->StartStopwatch();
 
 		// Do a scan point fit
-		FitResult * scanStepResult;
-
-
-		double realscanVal=scanVal;
-		//  fraction of the full step to dance around the fixed value to find a working one
-		double retry_frac=10.;
-		//  Did any fit converge?
-		bool fit_try_failed=false;
-
-
-		//  Here there be Monsters!!!...
-		//
-		//  From here I will attempt to perform a fit and catch any fatal errors which cause the fit to abort
-		//  Should the fit abort I will shift the value I am fixing by some amount and try again
-		//  I will repeat this 4 times until I have had 5 fit failiures then I will deam this to be a lost cause and the users problem
-		//  This can be coded up into an even more generic for try catch but I feal the algorithm would be painful to code and even more painful to read so I think this has the best performance/transparency
-
-		for( short int i=0; i<=4; i++ )
-		{
-			fit_try_failed = false;
-			//  Give a Fit 3 chances to work, fit at origin, then fit a small step either side of a not working result to see if that helps
-			if( i == 1 ) realscanVal = scanVal+deltaScan/retry_frac; 
-			if( i == 2 ) realscanVal = scanVal-deltaScan/retry_frac;
-			if( i == 3 ) realscanVal = scanVal+2.*(deltaScan/retry_frac);
-			if( i == 4 ) realscanVal = scanVal-2.*(deltaScan/retry_frac);
-
-			scanParameter->SetBlindedValue( realscanVal ) ;
-
-			try{
-				// Try a Fit, it it converges, continue to elsewhere in the program
-				scanStepResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
-				break;
-			}
-			//  If it didn't converge tell the user why!
-			catch( int e){
-				if ( e == 10 ){
-				cerr << "\nCaught exception : fit failed for these parameters..." << endl;  }
-				else if ( e == 13 ){
-				cerr << "\nIntegration Error: Fit Failed..." << endl;  }
-				fit_try_failed = true;
-			} catch (...) {
-                        	cerr << "\n\n\n\t\t\tCaught Unknown Exception, THIS IS SERIOUS!!!\n\n\n" << endl;
-				fit_try_failed = true;
-			}
-			//  Exit at 4 as we no longer are retrying anything
-			if( i == 4 ) continue;
-
-			//  Let the user know that I'm trying another fit close to the value they originally asked for.
-			cerr << "Retrying the fit again with ";
-			if( (i == 0) || (i == 1) ) cerr << "1";
-			if( (i == 2) || (i == 3) ) cerr << "2";
-			cerr << " small steps ";
-			if( (i == 0) || (i == 2) ) cerr <<"forward";
-			if( (i == 1) || (i == 3) ) cerr << "backward";
-			cerr << " from the failing fixed value" << endl;
-		}
-
-		//  If the fit failed 5 times I will simply return a dummy fit result full of zerod objects. It is up to the user to watch for and remove these
-		if( fit_try_failed ){
-			cerr << "Nothing more I'm willing to do, considering a Fit here a lost cause..." <<endl;
-			realscanVal = scanVal;
-			scanParameter->SetBlindedValue( realscanVal ) ;
-			int status = -1;
-			vector<string> NewNamesList = BottleParameters->GetAllNames();
-			ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
-			scanStepResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, BottleParameters );
-		}
+		FitResult * scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
 
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
 		string name = Wanted_Param->GetName();
 		string type = BottleParameters->GetPhysicsParameter( name )->GetType();
 		string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
-		scanStepResult->GetResultParameterSet()->SetResultParameter( name, realscanVal, realscanVal, 0., realscanVal, realscanVal, type, unit );
+		scanStepResult->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal!=scanVal, 0., scanVal, scanVal, type, unit );
 
 		vector<string> Fixed_List = BottleParameters->GetAllFixedNames();
 		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
-		for( short int i=0; i < Fixed_List.size() ; i++ )
+		for( unsigned short int i=0; i < Fixed_List.size() ; i++ )
 		{
 			bool found=false;
-			for( short int j=0; j < Fit_List.size(); j++ )
+			for( unsigned short int j=0; j < Fit_List.size(); j++ )
 			{
 				if( Fit_List[j] == Fixed_List[i] )
 				{
@@ -243,7 +241,6 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 {
 //	vector<string> namez = BottleParameters->GetAllNames();
 	vector<string> result_names = BottleParameters->GetAllNames();
-
 	double uplim = Param_Set.first->GetMax();
 	double lolim = Param_Set.first->GetMin();
 	double npoints = Param_Set.first->GetPoints();
@@ -266,6 +263,8 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 	else deltaScan=0.;
 
 	for( int si=0; si < int(npoints); si++) {
+	  
+		cout << "\n\n2DSCAN OUTER NUMBER\t\t" << si+1 << "\t\tOF\t\t" << int(npoints) <<endl<<endl;
 		ToyStudyResult* Returnable_Result = new ToyStudyResult( result_names );
 		
 		// Set scan parameter value
@@ -282,7 +281,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 
 		for( short int i=0; i < Returnable_Result->NumberResults(); i++ )
 		{
-			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal, 0.0, scanVal, scanVal, type, unit );
+			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal!=scanVal, 0.0, scanVal, scanVal, type, unit );
 		}
 
 		output_interface->push_back( Returnable_Result );

@@ -96,7 +96,7 @@ LLscanResult2D::~LLscanResult2D()
 void LLscanResult2D::print()
 {
 	cout << endl << "2D LL scan results "  <<  endl ;
-	for( int i =0; i < listOfLLscans.size() ; i++ ) {
+	for(unsigned int i =0; i < listOfLLscans.size() ; i++ ) {
 		cout << setprecision(5) << endl << "Outer loop over parameter " << parameterName << "  fixed to " << parameterValues[i] << endl ;
 		listOfLLscans[i]->print() ;
 	}
@@ -116,9 +116,9 @@ TH2D * LLscanResult2D::GetTH2D()
 
 	//Extract lists of x,y, z (z is LL value)
 	int ind = 0 ;
-	for( int ix=0; ix < parameterValues.size() ; ix++ ) {
+	for(unsigned int ix=0; ix < parameterValues.size() ; ix++ ) {
 		vector<double> LLvalues= listOfLLscans[ix]->GetRawLLvalues() ;
-		for( int iy=0; iy < parameterValues2.size() ; iy++ ) {
+		for(unsigned int iy=0; iy < parameterValues2.size() ; iy++ ) {
 			pvx[ind] = parameterValues[ix]  ;  
 			pvy[ind] = parameterValues2[iy] ; 
 			pvz[ind] = LLvalues[iy];

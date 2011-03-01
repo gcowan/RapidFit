@@ -22,7 +22,7 @@ DataPoint::DataPoint()
 DataPoint::DataPoint( vector<string> NewNames )
 {
 	//Populate the map
-	for (int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
 	{
 		allObservables.push_back( Observable() );
 	}

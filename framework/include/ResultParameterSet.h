@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include "ResultParameter.h"
+#include "ParameterSet.h"
 
 using namespace std;
 
@@ -28,6 +29,7 @@ class ResultParameterSet
 		bool SetResultParameter( string, ResultParameter* );
 		bool SetResultParameter( string, double, double, double, double, double, string, string );
 		bool ForceNewResultParameter( string, double, double, double, double, double, string, string );
+		ParameterSet* GetDummyParameterSet();
 
 	private:
 		vector<ResultParameter> allParameters;

@@ -37,11 +37,12 @@ class XMLConfigReader
 		OutputConfiguration * GetOutputConfiguration();
 		vector< PDFWithData* > GetPDFsAndData();
 		vector< ConstraintFunction* > GetConstraints();
+		vector<PhaseSpaceBoundary*> GetPhaseSpaceBoundary();
 		int GetNumberRepeats();
 		bool IsLoaded();
 
-		int GetSeed();	//  Return the Random Seed
-		void SetSeed( int new_seed );	//  Set Seed returned by XMLFile
+		unsigned int GetSeed();	//  Return the Random Seed
+		void SetSeed( unsigned int new_seed );	//  Set Seed returned by XMLFile
 
 	private:
 		ParameterSet * GetParameterSet( XMLTag* );

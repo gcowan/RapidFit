@@ -39,7 +39,7 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 {
 	ParameterSet * newParameters = NewFunction->GetParameterSet();
         vector<string> allNames = newParameters->GetAllNames();
-	int numParams = allNames.size();
+//	int numParams = allNames.size();
 
 	// Instantiate the FumiliFunction (which is just a parametric function)
 	// There is another constructor that takes a vector of parameters
@@ -92,7 +92,7 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 	for ( int step = 0; step < nsteps; step++)
 	{
 		vector<double> tempPos;
-		for( int observable = 0; observable < names.size(); observable++ )
+		for( unsigned int observable = 0; observable < names.size(); observable++ )
        		{
 			if ( !boundary->GetConstraint(names[observable])->IsDiscrete() )
 			{
@@ -124,7 +124,7 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 	//Create the fit results
 	const MnUserParameters * minimisedParameters = &minimum.UserParameters();
 	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
-	for (int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for ( unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		string parameterName = allNames[nameIndex];
 		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );

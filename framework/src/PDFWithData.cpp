@@ -20,8 +20,7 @@ PDFWithData::PDFWithData() : parametersAreSet(false)
 }
 
 //Constructor with correct aruments
-PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(InputPDF),
-	inputBoundary(InputBoundary), dataSetMakers(DataConfig), parametersAreSet(false), dataProcessors(InputPrecalculators)
+PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(InputPDF), inputBoundary(InputBoundary),  parametersAreSet(false), dataProcessors(InputPrecalculators), dataSetMakers(DataConfig)
 {
 	if ( DataConfig.size() < 1 )
 	{
@@ -50,10 +49,10 @@ IDataSet * PDFWithData::GetDataSet()
 {
 	//Combine all data sources
 	IDataSet * newDataSet = dataSetMakers[0]->MakeDataSet( inputBoundary, fitPDF );
-	for ( int sourceIndex = 1; sourceIndex < dataSetMakers.size(); sourceIndex++ )
+	for (unsigned int sourceIndex = 1; sourceIndex < dataSetMakers.size(); sourceIndex++ )
 	{
 		IDataSet * extraData = dataSetMakers[sourceIndex]->MakeDataSet( inputBoundary, fitPDF );
-		for ( int dataIndex = 0; dataIndex < extraData->GetDataNumber(); dataIndex++ )
+		for (int dataIndex = 0; dataIndex < extraData->GetDataNumber(); dataIndex++ )
 		{
 			newDataSet->AddDataPoint( extraData->GetDataPoint(dataIndex) );
 		}
@@ -61,7 +60,7 @@ IDataSet * PDFWithData::GetDataSet()
 	}
 
 	//Precalculation, if required
-	for ( int precalculatorIndex = 0; precalculatorIndex < dataProcessors.size(); precalculatorIndex++ )
+	for (unsigned int precalculatorIndex = 0; precalculatorIndex < dataProcessors.size(); precalculatorIndex++ )
 	{
 		IDataSet * oldDataSet = newDataSet;
 		newDataSet = dataProcessors[precalculatorIndex]->ProcessDataSet(oldDataSet);
@@ -77,7 +76,7 @@ bool PDFWithData::SetPhysicsParameters( ParameterSet * NewParameters )
 {
 	//Set the parameters for the stored PDF and all data set makers
 	bool success = fitPDF->SetPhysicsParameters(NewParameters);
-	for ( int dataIndex = 0; dataIndex < dataSetMakers.size(); dataIndex++ )
+	for (unsigned int dataIndex = 0; dataIndex < dataSetMakers.size(); dataIndex++ )
 	{
 		success &= dataSetMakers[dataIndex]->SetPhysicsParameters(NewParameters);
 	}

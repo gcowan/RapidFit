@@ -11,6 +11,8 @@
 #include <vector>
 #include <iostream>
 #include <ctime>
+#include <sstream>
+#include <iomanip>
 #include "Mathematics.h"
 #include "FitAssembler.h"
 #include "ToyStudy.h"
@@ -56,17 +58,19 @@ int main( int argc, char * argv[] )
 		int numberRepeats = 0;
 		string configFileName = "";
 		vector<string> parameterTemplates;
-		MinimiserConfiguration * theMinimiser;
-		FitFunctionConfiguration * theFunction;
+		MinimiserConfiguration * theMinimiser=NULL;
+		FitFunctionConfiguration * theFunction=NULL;
 		string saveOneDataSetFileName = "";
 		string plotFileName = "FitPlots.root";
 		string pullFileName = "PullPlots.root";
 		string LLscanFileName = "LLscanPlots.root";
 		string LLcontourFileName = "LLcontourPlots";
+		string FCOutputFile = "FCscanOutputData.root";
 		vector< PDFWithData* > pdfsAndData;
-		int numberLLscanPoints = 10 ;
-		double LLscanRange = 2 ;
 		vector<int> RuntimeSeed;
+		vector<string> Scan_X;
+		vector<string> Contour_X;
+		vector<string> Contour_Y;
 
 		//Flags for which arguments have been received
 		bool numberRepeatsFlag = false;
@@ -85,6 +89,10 @@ int main( int argc, char * argv[] )
 		bool calculateAcceptanceWeights = false;
 		bool calculateAcceptanceWeightsWithSwave = false;
 		bool calculatePerEventAcceptance = false;
+		bool defineContourFlag = false;
+		bool defineScanFlag = false;
+		bool doFC_Flag = false;
+		bool UUID_Flag = false;
 
 		//Parse command line arguments
 		string currentArgument;
@@ -329,26 +337,31 @@ int main( int argc, char * argv[] )
 				doLLscanFlag = true;
 
 			}
-
-//			else if ( currentArgument == "-numberLLscanPoints" )
-//			{
-//				if ( argumentIndex + 1 < argc )
-//				{
-//					argumentIndex++;
-//					numberLLscanPoints = atoi( argv[argumentIndex] );
-//					if( numberLLscanPoints <= 0 ) { cerr << "Number of ll scan points not >=0" << endl; return 1; }
-//				}
-//				else
-//				{
-//					cerr << "Number of ll scan points not specified" << endl;
-//					return 1;
-//				}
-//			}
 			else if ( currentArgument == "--doLLcontour" )
 			{
 				doLLcontourFlag = true;
 			}
-
+			else if ( currentArgument == "--doFCscan" )
+			{
+				doFC_Flag = true;
+			}
+			else if ( currentArgument == "--useUUID" )
+			{
+				UUID_Flag = true;
+			}
+			else if ( currentArgument == "--defineScan" )
+			{
+				defineScanFlag = true;
+				Scan_X.push_back( argv[argumentIndex] );
+			}
+			else if ( currentArgument == "--defineContour" )
+			{
+				defineContourFlag = true;
+				argumentIndex++;
+				Contour_X.push_back( argv[argumentIndex] );
+				argumentIndex++;
+				Contour_Y.push_back( argv[argumentIndex] );
+			}
 			else if ( currentArgument == "--SetSeed" )
 			{
 				if ( argumentIndex + 1 < argc )
@@ -368,7 +381,7 @@ int main( int argc, char * argv[] )
 		}
 
 		//Load a config file
-		XMLConfigReader * xmlFile;
+		XMLConfigReader * xmlFile=NULL;
 		if (configFileNameFlag)
 		{
 			xmlFile = new XMLConfigReader(configFileName);
@@ -382,14 +395,21 @@ int main( int argc, char * argv[] )
 				return 1;
 			}
 		}
-		if( !RuntimeSeed.empty() && xmlFile->IsLoaded() )
+		if( ( !RuntimeSeed.empty() && xmlFile->IsLoaded() ) && !UUID_Flag )
 		{
 			cout << "Setting Seed At Runtime to be: " << RuntimeSeed[0] << endl;
 			xmlFile->SetSeed( RuntimeSeed[0] );
+		} else if ( !RuntimeSeed.empty() && UUID_Flag && xmlFile->IsLoaded() )
+		{
+			cout << "Using a Random seed of UUID x RuntimeSeed to be 'unique' for all machines"<<endl;
+			TUUID uid;
+			UChar_t uuid[16];
+			uid.GetUUID(uuid);
+			RuntimeSeed[0] = RuntimeSeed[0] * ( uuid[ 2*(RuntimeSeed[0]%8) ]*256 +uuid[ 2*(RuntimeSeed[0]%8) ] );
 		}
 
 		//Create a parameter set
-		ParameterSet * argumentParameterSet;
+		ParameterSet * argumentParameterSet=NULL;
 		if (parameterTemplateFlag)
 		{
 			argumentParameterSet = InputParsing::MakeParameterSet(parameterTemplates);
@@ -501,6 +521,20 @@ int main( int argc, char * argv[] )
 			{
 				theMinimiser = xmlFile->GetMinimiserConfiguration();
 			}
+			if ( defineContourFlag )
+			{
+				for( unsigned short int i=0; i < Contour_X.size(); i++)
+				{
+					makeOutput->AddContour( Contour_X[i], Contour_Y[i] );
+				}
+			}
+			if ( defineScanFlag )
+			{
+				for( unsigned short int i=0; i < Scan_X.size(); i++ )
+				{
+					makeOutput->AddScan( Scan_X[i] );
+				}
+			}
 			if (!theFunctionFlag)
 			{
 				theFunction = xmlFile->GetFitFunctionConfiguration();
@@ -550,12 +584,16 @@ int main( int argc, char * argv[] )
 			}
 			else
 			{
-				//Do the fit
-				FitResult * oneResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
+				cout << "\n\n\t\tStarting Fit to Find Global Minima!\n"<<endl;
+				//Do the fit to find GLOBAL MINIMA
+				ToyStudyResult* GlobalFitResult = new ToyStudyResult( argumentParameterSet->GetAllNames() );
+				GlobalFitResult->StartStopwatch();
+				FitResult * GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
+				GlobalFitResult->AddFitResult( GlobalResult );
 
 				//Output results
-				makeOutput->SetInputResults( oneResult->GetResultParameterSet() );
-				makeOutput->OutputFitResult( oneResult );
+				makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
+				makeOutput->OutputFitResult( GlobalResult );
 
 
 				//Do LL scan
@@ -567,7 +605,7 @@ int main( int argc, char * argv[] )
 					vector<LLscanResult*> scanResults;
 					vector<string> LLscanList = makeOutput->GetScanList();
 
-					for(int ii=0; ii < LLscanList.size() ; ii++)
+					for(unsigned int ii=0; ii < LLscanList.size() ; ii++)
 					{
 						ToyStudyResult* scan_result = FitAssembler::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[ii] );
 						llResult = ResultFormatter::LLScan( scan_result, LLscanList[ii] );
@@ -576,7 +614,7 @@ int main( int argc, char * argv[] )
 					}
 					makeOutput->SetLLscanFileName( LLscanFileName );
 					makeOutput->OutputLLscanResult( scanResults ) ;
-					for( int ii=0; ii < LLscanList.size(); ii++ )
+					for(unsigned int ii=0; ii < LLscanList.size(); ii++ )
 					{
 						TString output_scan_dat("LLScanData");
 						output_scan_dat.Append(LLscanList[ii]);
@@ -585,22 +623,28 @@ int main( int argc, char * argv[] )
 					}
 				}
 
+				ToyStudyResult* _2DResultForFC;
 				//Do 2D LL scan for deltaGamma and phis
-				if( doLLcontourFlag ) {
+				if( doLLcontourFlag || doFC_Flag ) {
 					LLscanResult2D * llContourResult ;
 					vector<LLscanResult2D*> contourResults ;
 
 					vector<ToyStudyResult*> SoloContourResults;
-					vector<ToyStudyResult*> AllContourFitResults;
-					ToyStudyResult* ContourLinearResults;
+//					vector<ToyStudyResult*> AllContourFitResults;
+					vector<ToyStudyResult*> ContourLinearResults;
 
 					vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
 
-					for( int ii=0; ii < _2DLLscanList.size() ; ii++ )
+					if( _2DLLscanList.size() > 1 )
 					{
-						string name1 = _2DLLscanList[ii].first;
-						string name2 = _2DLLscanList[ii].second;
+						cerr << "\n\n\t\tI WILL NOT DO ONE 2D SCAN PER XML FILE, GO AWAY AND FIX YOURSELF\n" << endl;
+					}
+//					for(unsigned int ii=0; ii < _2DLLscanList.size() ; ii++ )
+//					{
+						string name1 = _2DLLscanList[0].first;
+						string name2 = _2DLLscanList[0].second;
 						SoloContourResults = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
+
 
 						llContourResult = ResultFormatter::LLScan2D( SoloContourResults, name1, name2 );
 						contourResults.push_back( llContourResult );
@@ -612,27 +656,133 @@ int main( int argc, char * argv[] )
 						ext_string.Append( ".root" );
 						LLcontourFileName.append( ext_string );
 
-						ContourLinearResults = new ToyStudyResult( SoloContourResults );
+						ContourLinearResults.push_back( SoloContourResults[0] );
 
-						AllContourFitResults.push_back( ContourLinearResults );
+//						AllContourFitResults.push_back( ContourLinearResults );
 
-					}
+//					}
 					makeOutput->SetLLcontourFileName( LLcontourFileName );
 					makeOutput->OutputLLcontourResult( contourResults ) ;
-					for( int ii=0; ii < _2DLLscanList.size(); ii++ )
-					{
-						TString output_scan_dat( "LLcontourScanData");
-						TString ext("_");
-						ext.Append(_2DLLscanList[ii].first);
-						ext.Append("_");
-						ext.Append(_2DLLscanList[ii].second);
-						ext.Append(".root" );
-						output_scan_dat.Append(ext);
-						ResultFormatter::FlatNTuplePullPlots( string( output_scan_dat ), AllContourFitResults[ii] );
-					}
+//					for(unsigned int ii=0; ii < _2DLLscanList.size(); ii++ )
+//					{
+//						TString output_scan_dat( "LLcontourScanData");
+//						TString ext("_");
+//						ext.Append(_2DLLscanList[ii].first);
+//						ext.Append("_");
+//						ext.Append(_2DLLscanList[ii].second);
+//						ext.Append(".root" );
+//						output_scan_dat.Append(ext);
+						string output_scan_dat("LLcontourScanData.root");
+						_2DResultForFC = new ToyStudyResult( ContourLinearResults );
+						ResultFormatter::WriteFlatNtuple( output_scan_dat , ContourLinearResults[0] );
+//					}
 					
-					//ResultFormatter::FlatNTuplePullPlots( string(output_scan_dat), AllContourFitResults.back() );
 				}
+
+
+				if( doFC_Flag )
+				{
+					vector<ToyStudyResult*> AllResults;
+					for( int iFC=0; iFC < _2DResultForFC->NumberResults(); iFC++ )
+					{
+
+						//		GET INPUT
+						//
+						//  Get a ParameterSet that contains the input parameters from the output of a fit
+					  	vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
+						string name1 = _2DLLscanList[0].first;
+						string name2 = _2DLLscanList[0].second;
+
+						//  Use the inputs from Canonical Step 1
+						ParameterSet* InputParamSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+						double lim1 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name1 )->GetValue();
+						double lim2 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name2 )->GetValue();
+						InputParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+						InputParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+
+						ParameterSet* InputFreeSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+						InputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+						InputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+
+						//  Use the inputs from Canonical Step 2
+						//ParameterSet* InputParamSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
+						//ParameterSet* InputFreeSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
+
+						//  Just for clarity
+						//  also: there's a hungut with a bug somewehere in generating InputParamSey
+						InputParamSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+						InputParamSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+						InputFreeSet->GetPhysicsParameter( name1 )->SetType("Free");
+						InputFreeSet->GetPhysicsParameter( name2 )->SetType("Free");
+
+						//  Use Previsiously gotten values to allow run-time customisation to correctly apply
+						MinimiserConfiguration * ToyStudyMinimiser = theMinimiser;
+						FitFunctionConfiguration* ToyStudyFunction = theFunction;
+						
+						// !!!!!LEAVING THIS EMPTY CAUSES ME SERIOUS CONCERN AS I DO NOT KNOW WHAT THIS DOES BUT I DO SEE SWEIGHT CODE RELATED TO THESE OBJECTS!!!!!
+						vector< IPrecalculator* > ToyPrecalculator;
+
+						IPDF *PDF_from_XML = pdfsAndData[0]->GetPDF();
+						vector<PhaseSpaceBoundary*> PhaseSpaceForToys = xmlFile->GetPhaseSpaceBoundary();
+						vector<ConstraintFunction*> ConstraintsForToys = xmlFile->GetConstraints();
+
+						//  This requires some intelligence for sWeights
+						int EventsinToys = 1E3;
+
+						//		GENERATE DATA
+						//  We want to now generate a new DataSet for a Toy Study
+						//  I choose a Foam DataSet with no Cuts
+						vector<DataSetConfiguration*> DataSetForToys;
+						vector<string> empty_args; vector<string> empty_arg_names;
+						DataSetConfiguration* Toy_Foam_DataSet= new DataSetConfiguration( "Foam", EventsinToys, "", empty_args, empty_arg_names, PDF_from_XML );
+						//  Set the Input Physics Parameters to be as defined above
+						Toy_Foam_DataSet->SetPhysicsParameters( InputParamSet );
+						//  Generate the Data for this Study using the given PhaseSpace and PDF
+//						Toy_Foam_DataSet->MakeDataSet( PhaseSpaceForToys[0], PDF_from_XML );
+						DataSetForToys.push_back( Toy_Foam_DataSet );
+
+						//		ASSEMBLE PARAMETERS FOR TOY STUDY
+						vector<PDFWithData*> PDFsWithDataForToys;
+						PDFWithData* ToyPDFWithData = new PDFWithData( PDF_from_XML, PhaseSpaceForToys[0], DataSetForToys, ToyPrecalculator );
+						ToyPDFWithData->SetPhysicsParameters( InputParamSet );
+						PDFsWithDataForToys.push_back( ToyPDFWithData );
+
+						//  The number of toys this may be intelligently altered
+						int NumberOfToys = 1E2;
+						int TOY_STUDY_SEED = int( 1E3 * pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() );
+
+
+						//			STEP 6
+						//f
+						//		RUN TOY STUDY WITH CONTROL PARAMETERS FIXED
+						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
+						cout << "\n\tFIRST RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
+						ToyStudy* study1 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputParamSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
+						study1->DoWholeStudy();
+
+						//		RUN TOY STUDY WITH CONTROL PARAMETERS FREE
+						ToyPDFWithData->SetPhysicsParameters( InputFreeSet );
+						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
+						cout << "\n\tSECOND RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
+						ToyStudy* study2 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputFreeSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
+						study2->DoWholeStudy();
+
+						ToyStudyResult* ThisStudy = new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+						ThisStudy->AddFitResult( _2DResultForFC->GetFitResult( iFC ), false );
+						ThisStudy->AddCPUTimes( _2DResultForFC->GetAllCPUTimes() );
+						ThisStudy->AddRealTimes( _2DResultForFC->GetAllRealTimes() );
+						AllResults.push_back( GlobalFitResult );
+						AllResults.push_back( ThisStudy );
+						AllResults.push_back( study1->GetToyStudyResult() );
+						AllResults.push_back( study2->GetToyStudyResult() );
+					}
+
+					//		STORE THE OUTPUT OF THE TOY STUDIES
+					ToyStudyResult* AllFlatResult = new ToyStudyResult( AllResults );
+					ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFlatResult );
+
+				}
+				  
 
 			}
 		}

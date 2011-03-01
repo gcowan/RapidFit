@@ -38,10 +38,10 @@ LLscanResult::LLscanResult( string _parameterName, vector<double> _parameterValu
 		
 	// Initialise llmin to a "safe"  large value. This is the only way to do it 
 	llmin = 0;
-	for( int i=0; i < llvalues.size() ;i++ ) { if( llvalues[i] > llmin ) llmin = llvalues[i] ; }
+	for(unsigned int i=0; i < llvalues.size() ;i++ ) { if( llvalues[i] > llmin ) llmin = llvalues[i] ; }
 
 	// Now find the minimum value in llvalues and set llmin to hold it.
-	for( int i=0; i < llvalues.size() ;i++ )
+	for(unsigned int i=0; i < llvalues.size() ;i++ )
 	{
 		if( (llvalues[i] < llmin) && (llvalues[i] != LLSCAN_FIT_FAILURE_VALUE ) ) {
 			llmin = llvalues[i] ;
@@ -49,7 +49,7 @@ LLscanResult::LLscanResult( string _parameterName, vector<double> _parameterValu
 	}
 	
 	//Create llvalues_offset (i.e. offset to the minimum )
-	for(int i=0; i < llvalues.size(); i++ )
+	for(unsigned int i=0; i < llvalues.size(); i++ )
 	{		
 		if( llvalues[i] == LLSCAN_FIT_FAILURE_VALUE ) {
 			llvalues_offset.push_back( 0. ) ;
@@ -72,7 +72,7 @@ void LLscanResult::print()
 {
 	cout << endl << "LL scan results for parameter: " << parameterName << endl ;
 
-	for( int i =0; i < llvalues.size() ; i++ ) {
+	for(unsigned int i =0; i < llvalues.size() ; i++ ) {
 		cout << setprecision(3) << "  " << parameterValues[i] << "      "<< llvalues_offset[i] << endl ;
 	}
 }
@@ -92,7 +92,7 @@ TGraph * LLscanResult::GetGraph()
 	double pvs[parameterValues.size()] ;
 	double llvs[parameterValues.size()] ;
 	double llmax = 0 ;	
-	for( int i=0; i< parameterValues.size() ; i++ ){
+	for(unsigned int i=0; i< parameterValues.size() ; i++ ){
 		pvs[i] = parameterValues[i] ;
 		llvs[i] = llvalues_offset[i] ;
 		if( llvs[i] > llmax ) llmax = llvs[i] ;

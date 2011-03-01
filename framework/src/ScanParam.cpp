@@ -29,13 +29,70 @@ ScanParam::ScanParam( vector<string> nName, vector<double> nMinimum, vector<doub
 			cerr << "Scan Limit \"" << nName[0] << "\" has maximum less than minimum: values swapped" << endl;
 			minimum.swap( maximum );
 		}
-		if( (minimum[0] - maximum[0]) < 1E-6 )
-		{
-			cerr << "Scan Limit \"" << nName[0] << "\" has maximum = minimum, assuming you forgot a sign in the XML" << endl;
-			minimum[0]=-minimum[0];
-		}
 	}
 }
+
+
+bool ScanParam::HasName() {  return !name.empty();  }
+string ScanParam::GetName() {
+	if( !name.empty() ){  return name[0];  }
+	else return "";
+}
+
+void ScanParam::SetName( string new_val ) {
+	while( !name.empty() ){   name.pop_back(); }
+	name.push_back(    new_val );
+}
+
+bool ScanParam::HasMax() { return !maximum.empty(); }
+
+double ScanParam::GetMax() {
+	if( !maximum.empty() ){ return maximum[0]; }
+	else return 0;
+}
+
+void ScanParam::SetMax(double new_val) {
+	while( !maximum.empty() ){
+		maximum.pop_back(); };
+		maximum.push_back( new_val );
+}
+
+bool ScanParam::HasMin() {  return !minimum.empty();  }
+
+double ScanParam::GetMin() {
+	if( !minimum.empty() ){ return minimum[0]; }
+	else return 0;
+}
+
+void ScanParam::SetMin(double new_val) {
+	while( !minimum.empty() ){ minimum.pop_back(); };
+	minimum.push_back( new_val );
+}
+
+bool ScanParam::HasSigma(){  return !sigma.empty();  }
+
+int ScanParam::GetSigma() {
+	if( !sigma.empty() ) {   return sigma[0]; }
+	else return 5;
+};
+
+void ScanParam::SetSigma(int new_val) {
+	while( !sigma.empty() ){    sigma.pop_back(); };
+	sigma.push_back( new_val );
+}
+
+bool ScanParam::HasPoints(){ return !points.empty(); }
+
+int ScanParam::GetPoints() {
+	if( !points.empty() ){  return points[0];  }
+	else return 10;
+}
+
+void ScanParam::SetPoints(int new_val) {
+	while( !points.empty() ){  points.pop_back(); };
+	points.push_back(  new_val );
+}
+
 
 ScanParam::ScanParam( string nName, double nMaximum, double nMinimum, int nPoints )
 {

@@ -28,8 +28,8 @@ class SWeightPrecalculator : public IPrecalculator
 	private:
 		IPDF * signalPDF;
 		IPDF * backgroundPDF;
-		string weightName;
 		ParameterSet * fitParameters;
+		string weightName;
 };
 
 #endif

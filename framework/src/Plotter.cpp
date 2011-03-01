@@ -80,7 +80,7 @@ void Plotter::PlotObservables( string FileName, vector<string> ObservableNames )
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 
 	//Loop over all observables
-	for ( int observableIndex = 0; observableIndex < ObservableNames.size(); observableIndex++ )
+	for (unsigned int observableIndex = 0; observableIndex < ObservableNames.size(); observableIndex++ )
 	{
 		//Check the observable can be plotted
 		bool continuous = !( plotData->GetBoundary()->GetConstraint( ObservableNames[observableIndex] )->IsDiscrete() );
@@ -102,7 +102,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 {
 	//////////////////////////////////////////////////////////////////
 	//Make the histogram of this observable
-	EdStyle * greigFormat = new EdStyle();	
+	EdStyle * greigFormat = new EdStyle();
+	greigFormat->SetStyle();
         gStyle->SetMarkerStyle(15);
         gStyle->SetMarkerSize(0.8);
 	//Get the data needed to make the histogram
@@ -114,12 +115,12 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	
 	//New code to deal with weighted events
 	vector<double> observableWeights ;
-	double normalisationFactor ;
+	double normalisationFactor=0. ;
 	if( weightsWereUsed ) {
 		double dum1, dum2 ; int idum ;
 		observableWeights = GetStatistics( weightName, dum1, dum2, idum );
 		double sumWeights =0;
-		for(int iw=0;iw<observableWeights.size();iw++) sumWeights+=observableWeights[iw];
+		for( unsigned int iw=0;iw<observableWeights.size();iw++) sumWeights+=observableWeights[iw];
 		normalisationFactor = sumWeights/observableWeights.size() ;
 	}
 	
@@ -131,7 +132,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	dataHistogram->Sumw2();
 	
 	//Loop over all data points and add them to the histogram
-	for ( int dataIndex = 0; dataIndex < observableValues.size(); dataIndex++)
+	for (unsigned int dataIndex = 0; dataIndex < observableValues.size(); dataIndex++)
 	{
 		if( weightsWereUsed ) dataHistogram->Fill( observableValues[dataIndex], observableWeights[dataIndex] / normalisationFactor ); 
 		else dataHistogram->Fill( observableValues[dataIndex] );   
@@ -159,14 +160,14 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	else plotNumber = 128;
 
 	//Initialise the data averaged projection
-	for ( int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
+	for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 	{
 		dataAverageProjection.push_back(0.0);
 	}
 
 	//Loop over all discrete combinations
 	
-	for ( int combinationIndex = 0; combinationIndex < AllCombinations.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < AllCombinations.size(); combinationIndex++ )
 	{
 		//Calculate the projection for this combination
 		vector<double> projectionValueVector = ProjectObservable( AllCombinations[combinationIndex], ObservableName, minimum, maximum, plotNumber, plotInterval );
@@ -176,7 +177,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		//Update the data average values, and make the projection graph arrays
 		double projectionValueArray[plotNumber];
 		double observableValueArray[plotNumber];
-		for ( int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
+		for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 		{
 			//Projection graph
 			projectionValueArray[pointIndex] = ratioOfIntegrals * projectionValueVector[pointIndex] * binInterval * observableValues.size() / projectionIntegral;
@@ -201,7 +202,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	//Plot the data averaged projection
 	double projectionValueArray[plotNumber];
 	double observableValueArray[plotNumber];
-	for ( int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
+	for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 	{
 		projectionValueArray[pointIndex] = ratioOfIntegrals * dataAverageProjection[pointIndex] * binInterval * observableValues.size() / averageIntegral;
 		observableValueArray[pointIndex] = minimum + ( plotInterval * pointIndex );
@@ -214,7 +215,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * Histogram, double * ProjectionXValues, double * ProjectionYValues, int PlotNumber )
 {
 	//Make the graph
- 	EdStyle * greigFormat = new EdStyle();
+	EdStyle * greigFormat = new EdStyle();
+	greigFormat->SetStyle();
 	gStyle->SetMarkerStyle(15);
         gStyle->SetMarkerSize(0.8);
 	TMultiGraph * graph = new TMultiGraph();
@@ -244,7 +246,7 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
  	//gStyle->SetMarkerStyle(20);
 	Histogram->SetStats(0);
 
-	double ymin = Histogram->GetBinContent(Histogram->GetMinimumBin());
+//	double ymin = Histogram->GetBinContent(Histogram->GetMinimumBin());
 	double ymax = Histogram->GetBinContent(Histogram->GetMaximumBin());
 	
 	if (ObservableName == "time" || ObservableName == "B_s_TAU"){
@@ -297,7 +299,7 @@ vector<double> Plotter::ProjectObservable( DataPoint InputPoint, string Observab
 
 	//Find the value of the observable projection at each data point
 	vector<double> pointValues;
-	for ( int pointIndex = 0; pointIndex < PlotNumber; pointIndex++ )
+	for (int pointIndex = 0; pointIndex < PlotNumber; pointIndex++ )
 	{
 		//cout << "Integration " << pointIndex + 1 << " of " << PlotNumber << endl;
 		double observableValue = Minimum + ( PlotInterval * pointIndex );
@@ -339,22 +341,22 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 	//Initialise the data averaging
 	vector<double> continuousSums;
 	vector<long> combinationCounts;
-	for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+	for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 	{
 		continuousSums.push_back(0.0);
 	}
-	for ( int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
 	{
 		combinationCounts.push_back(0);
 	}
 
 	//Examine the data set. Find the average value for each continuous observable, and the weight for each discrete combination
-	for ( int dataIndex = 0; dataIndex < plotData->GetDataNumber(); dataIndex++ )
+	for (int dataIndex = 0; dataIndex < plotData->GetDataNumber(); dataIndex++ )
 	{
 		DataPoint * readDataPoint = plotData->GetDataPoint(dataIndex);
 
 		//Sum the continuous values, in preparation for taking the average
-		for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+		for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 		{
 			continuousSums[continuousIndex] += readDataPoint->GetObservable( continuousNames[continuousIndex] )->GetValue();
 		}
@@ -362,11 +364,11 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 		//Calculate the index for the discrete combination, and increment the corresponding count
 		int combinationIndex = 0;
 		int incrementValue = 1;
-		for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		for (unsigned int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
 		{
 			double currentValue = readDataPoint->GetObservable( discreteNames[discreteIndex] )->GetValue();
 
-			for ( int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
+			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 			{
 				if ( discreteValues[discreteIndex][valueIndex] == currentValue )
 				{
@@ -382,12 +384,12 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 	//Calculate averages and weights
 	vector<double> combinationWeights;
 	double dataNumber = (double)plotData->GetDataNumber();
-	for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+	for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 	{
 		continuousSums[continuousIndex] /= dataNumber;
 	}
 
-	for ( int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
 	{
 		combinationWeights.push_back( (double)combinationCounts[combinationIndex] / dataNumber );
 	}
@@ -396,18 +398,18 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 	vector<DataPoint> newDataPoints;
 	vector<string> allDescriptions;
 	DataPoint templateDataPoint = *( plotData->GetDataPoint(0) );
-	for ( int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+	for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
 	{
 		Observable * newValue = templateDataPoint.GetObservable( continuousNames[continuousIndex] );
 		newValue->SetValue( continuousSums[continuousIndex] );
 		templateDataPoint.SetObservable( continuousNames[continuousIndex], newValue );
 	}
-	for ( int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
 	{
 		string description = "(";
 
 		//Output the discrete values for this combination
-		for ( int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
+		for (unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
 		{
 			//Set the data point
 			Observable * newValue = templateDataPoint.GetObservable( discreteNames[discreteIndex] );

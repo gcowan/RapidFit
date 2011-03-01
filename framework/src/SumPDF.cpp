@@ -19,13 +19,13 @@ SumPDF::SumPDF()
 }
 
 //Constructor not specifying fraction parameter name
-SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : firstPDF(FirstPDF), secondPDF(SecondPDF), fractionName("FirstPDFFraction"), firstFraction(0.5)
+SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : firstPDF(FirstPDF), secondPDF(SecondPDF), firstFraction(0.5), fractionName("FirstPDFFraction")
 {
 	MakePrototypes(InputBoundary);
 }
 
 //Constructor specifying fraction parameter name
-SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : firstPDF(FirstPDF), secondPDF(SecondPDF), fractionName(FractionName), firstFraction(0.5)
+SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : firstPDF(FirstPDF), secondPDF(SecondPDF), firstFraction(0.5), fractionName(FractionName)
 {
 	MakePrototypes(InputBoundary);
 }
@@ -151,8 +151,8 @@ vector<double> SumPDF::EvaluateComponents( DataPoint * NewDataPoint )
 	
 	//Insert components in output vector with correct weights.	
 	vector<double> components ;
-	for( int ii=0; ii<termOneComponents.size(); ii++ ) components.push_back( termOneComponents[ii]*firstFraction ) ;
-	for( int ii=0; ii<termTwoComponents.size(); ii++ ) components.push_back( termTwoComponents[ii]*(1.-firstFraction) ) ;
+	for(unsigned int ii=0; ii<termOneComponents.size(); ii++ ) components.push_back( termOneComponents[ii]*firstFraction ) ;
+	for(unsigned int ii=0; ii<termTwoComponents.size(); ii++ ) components.push_back( termTwoComponents[ii]*(1.-firstFraction) ) ;
 	
 	// Return the complete set of components
 	return components;

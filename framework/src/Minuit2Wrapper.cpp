@@ -61,7 +61,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 	ParameterSet * newParameters = NewFunction->GetParameterSet();
 	vector<string> allNames = newParameters->GetAllNames();
 	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
-	for (int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 	{
 		string parameterName = allNames[nameIndex];
 		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
@@ -81,7 +81,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 	vector< FunctionContour* > allContours;
 	vector< pair< int, int > > allIndices;
 	int sigmaMax = 2;
-	for ( int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
+	for (unsigned int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
 	{
 		//Find the index (in Minuit) of the parameter names requested for the plot
 		int xParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].first ) );
@@ -117,12 +117,12 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 		//Set the sigma value for the contours
 		function->SetSigma(sigma);
 
-		for ( int plotIndex = 0; plotIndex < allIndices.size(); plotIndex++ )
+		for (unsigned int plotIndex = 0; plotIndex < allIndices.size(); plotIndex++ )
 		{
 			//If the parameters have valid indices, ask minuit to plot them
 			int numberOfPoints = 40;
-			int iErrf;
-			double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
+//			int iErrf;
+//			double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
 			vector< pair< double, double> > oneContour = contoursFromMinuit( allIndices[plotIndex].first, allIndices[plotIndex].second, numberOfPoints );	
 			allContours[plotIndex]->SetPlot( sigma, oneContour );
 		}

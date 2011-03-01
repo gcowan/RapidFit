@@ -32,12 +32,17 @@ using namespace std;
 // Standard constructor, initializes variables
 //=============================================================================
 
-EdStyle::EdStyle( ) {
+EdStyle::EdStyle( )
+{}
+
+void EdStyle::SetStyle()
+{
 
 	// use helvetica-bold-r-normal, precision 2 (rotatable)
 	Int_t lhcbFont = 62;
 	// line thickness
-	Width_t lhcbWidth = 2; //Width_t is a SHORT INT, not a double
+//	Width_t lhcbWidth = 2; //Width_t is a SHORT INT, not a double
+	Double_t lhcbWidth = 1.75;
 
 	// use plain black on white colors
 	gStyle->SetFrameBorderMode(0);
@@ -221,7 +226,7 @@ gStyle->SetStatColor(icol);
 //   gStyle->SetPadRightMargin(0.05);
 //   gStyle->SetPadBottomMargin(0.16);
 //   gStyle->SetPadLeftMargin(0.12);
-/*
+
 // use large fonts
 //Int_t font=72;
 Int_t font=42;
@@ -270,7 +275,7 @@ gStyle->SetPadTickY(1);
 //gStyle->SetPadTickY(1);
  */
 //gStyle->SetOptStat(1111);
-/*
+/* 
    gStyle->SetOptFit(1111);
    gStyle->SetMarkerStyle(20);
    gStyle->SetMarkerSize(1.);

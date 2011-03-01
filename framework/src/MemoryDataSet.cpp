@@ -45,7 +45,7 @@ bool MemoryDataSet::AddDataPoint( DataPoint * NewDataPoint )
 //Retrieve the data point with the given index
 DataPoint * MemoryDataSet::GetDataPoint(  int Index )
 {
-	if ( Index < allData.size() )
+	if ( Index < int(allData.size()) )
 	{
 		return &allData[Index];
 	}
@@ -53,6 +53,7 @@ DataPoint * MemoryDataSet::GetDataPoint(  int Index )
 	{
 		cerr << "Index (" << Index << ") out of range in DataSet" << endl;
 	}
+	return NULL;
 }
 
 //Get the number of data points in the set

@@ -77,8 +77,8 @@ vector<double> ProdPDF::EvaluateComponents( DataPoint * NewDataPoint )
 	
 	//Insert components in output vector with correct weights.	
 	vector<double> components ;
-	for( int ii=0; ii<termOneComponents.size(); ii++ ) {
-		for( int jj=0; ii<termTwoComponents.size(); ii++ ) {
+	for(unsigned int ii=0; ii<termOneComponents.size(); ii++ ) {
+		for(unsigned int jj=0; ii<termTwoComponents.size(); ii++ ) {
 			components.push_back( termOneComponents[ii]*termTwoComponents[jj] ) ;
 		}
 	}

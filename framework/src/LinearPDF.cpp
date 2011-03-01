@@ -12,13 +12,13 @@
 #include <iostream>
 
 //Constructor
-LinearPDF::LinearPDF() : interceptName( "cIntercept" ), gradientName( "mGradient" )
+LinearPDF::LinearPDF() : gradientName( "mGradient" ), interceptName( "cIntercept" )
 {
 	MakePrototypes();
 }
 
 //Constructor allowing you to specify the parameter names
-LinearPDF::LinearPDF(string CInterceptName, string MGradientName) : interceptName( CInterceptName ), gradientName( MGradientName )
+LinearPDF::LinearPDF(string CInterceptName, string MGradientName) : gradientName( MGradientName ), interceptName( CInterceptName )
 {
 	MakePrototypes();
 }

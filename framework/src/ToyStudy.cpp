@@ -51,7 +51,7 @@ ToyStudy::ToyStudy( string FileName )
 
 //Constructor with correct arguments
 ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, ParameterSet * StudyParameters, vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies )
-	: theMinimiser(TheMinimiser), theFunction(TheFunction), studyParameters(StudyParameters), pdfsAndData(PDFsAndData), numberStudies(NumberStudies), allConstraints(InputConstraints)
+: pdfsAndData(PDFsAndData), studyParameters(StudyParameters), theMinimiser(TheMinimiser), theFunction(TheFunction), numberStudies(NumberStudies), allConstraints(InputConstraints)
 {
 	if ( numberStudies < 1 )
 	{
@@ -75,7 +75,7 @@ ToyStudyResult * ToyStudy::DoWholeStudy()
 {
 	//Make a vector of unique parameter names
 	vector<string> uniqueNames;
-	for ( int pdfIndex = 0; pdfIndex < pdfsAndData.size(); pdfIndex++ )
+	for (unsigned int pdfIndex = 0; pdfIndex < pdfsAndData.size(); pdfIndex++ )
 	{
 		//This is not strictly necessary, but suppresses a warning message
 		pdfsAndData[pdfIndex]->SetPhysicsParameters(studyParameters);
@@ -87,9 +87,9 @@ ToyStudyResult * ToyStudy::DoWholeStudy()
 	//Loop over all studies
 	for ( int studyIndex = 0; studyIndex < numberStudies; studyIndex++ )
 	{
-		cout << "Starting study #" << studyIndex << endl;
+		cout << "\n\n\t\tStarting ToyStudy\t\t" << studyIndex+1 << "\tof:\t" << numberStudies << endl;
 		allResults->StartStopwatch();
-		allResults->AddFitResult( FitAssembler::DoFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints ) );
+		allResults->AddFitResult( FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints ) );
 	}
 
 	return allResults;

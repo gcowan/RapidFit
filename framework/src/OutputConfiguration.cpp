@@ -13,15 +13,17 @@
 #include <time.h>
 #include "ScanParam.h"
 #include "TTree.h"
+#include "StringProcessing.h"
+#include "stdlib.h"
 
 //Default constructor
 OutputConfiguration::OutputConfiguration() : 
    pullType("None"), 
    makeAllPlots(false), 
    pullFileName("pullPlots.root"), 
-   projectionFileName("projectionPlots.root"), 
-   contourFileName("contourPlots.root"), 
+   projectionFileName("projectionPlots.root"),  
    LLscanFileName("LLscans.root"),
+   contourFileName("contourPlots.root"),
    weightedEventsWereUsed(false)
 {
 }
@@ -34,9 +36,9 @@ OutputConfiguration::OutputConfiguration( vector< pair< string, string > > Input
 	makeAllPlots(false), 
     pullFileName("pullPlots.root"), 
     projectionFileName("projectionPlots.root"), 
-    contourFileName("contourPlots.root"), 
     LLscanFileName("LLscanPlots.root"),
 	LLcontourFileName("LLcontourPlots.root"),
+    contourFileName("contourPlots.root"),
     weightedEventsWereUsed(false), 
     Global_Scan_List( ScanParameters ),
     Global_2DScan_List( _2DScanParameters )
@@ -63,8 +65,8 @@ vector<string> OutputConfiguration::GetProjections()
 ScanParam* OutputConfiguration::GetScanParam( string param_name )
 {
 
-	ScanParam* Returnable_Param;
-	for( short int i=0; i < Global_Scan_List.size(); i++)
+	ScanParam* Returnable_Param=NULL;
+	for(unsigned short int i=0; i < Global_Scan_List.size(); i++)
 	{
 		if( Global_Scan_List[i]->HasName() )
 		{
@@ -86,7 +88,7 @@ ScanParam* OutputConfiguration::GetScanParam( string param_name )
 pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_1, string param_2 )
 {
 	pair<ScanParam*, ScanParam* > Returnable_Pair;
-	for( short int i=0; i < Global_2DScan_List.size(); i++)
+	for(unsigned short int i=0; i < Global_2DScan_List.size(); i++)
 	{
 		if( ( Global_2DScan_List[i].first->HasName() ) && ( Global_2DScan_List[i].second->HasName() ) )
 		{
@@ -115,7 +117,7 @@ pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_
 vector<string> OutputConfiguration::GetScanList( )
 {
 	vector<string> ScanReturnList;
-	for( short int i=0; i < Global_Scan_List.size(); i++)
+	for(unsigned short int i=0; i < Global_Scan_List.size(); i++)
 	{
 		ScanReturnList.push_back( Global_Scan_List[i]->GetName() );
 	}
@@ -126,7 +128,7 @@ vector<string> OutputConfiguration::GetScanList( )
 vector<pair<string, string> > OutputConfiguration::Get2DScanList( )
 {
 	vector<pair<string, string> > ScanReturnList;
-	for( short int i=0; i < Global_2DScan_List.size(); i++)
+	for(unsigned short int i=0; i < Global_2DScan_List.size(); i++)
 	{
 		string new_first = Global_2DScan_List[i].first->GetName();
 		string new_second = Global_2DScan_List[i].second->GetName();
@@ -219,7 +221,7 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 	
 	//Make any requested projections
 	//for ( int projectionIndex = 0; projectionIndex < projections.size(); projectionIndex++ )
-	for ( int projectionIndex = 0; projectionIndex < 1; projectionIndex++ )
+	for (unsigned int projectionIndex = 0; projectionIndex < 1; projectionIndex++ )
 	{
 
 		PhysicsBottle * resultBottle = TheResult->GetPhysicsBottle();
@@ -227,7 +229,7 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 		//Loop over all PDFs, and plot
 		if ( makeAllPlots || projections.size() > 0 )
 		{
-			for ( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
+			for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
 			{
 				Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
 				if( weightedEventsWereUsed ) testPlotter->SetWeightsWereUsed( weightName ) ;
@@ -298,6 +300,73 @@ void OutputConfiguration::SetLLscanFileName( string FileName )
 void OutputConfiguration::SetLLcontourFileName( string FileName )
 {
 	LLcontourFileName = FileName;
+}
+
+void OutputConfiguration::AddContour( string X_axis, string Y_axis )
+{
+	vector<string> Contour_X_Vals = StringProcessing::SplitString( X_axis, ',' );
+	vector<string> Contour_Y_Vals = StringProcessing::SplitString( Y_axis, ',' );
+
+	if( Contour_X_Vals.size() != 4 ){
+		cerr << "Runtime Defined Contour Badly Defined:" << endl;
+		for(unsigned short int i=0; i < Contour_X_Vals.size(); i++ )
+		{
+			cerr << Contour_X_Vals[i] << "\t";
+		}
+		cerr << endl;
+		exit(13);
+	}
+	if( Contour_Y_Vals.size() != 4 ){
+		cerr << "Runtime Defined Contour Badly Defined:" << endl;
+		for(unsigned short int i=0; i < Contour_Y_Vals.size(); i++ )
+		{
+			cerr << Contour_Y_Vals[i] << "\t";
+		}
+		cerr << endl;
+		exit(13);
+	}
+
+	string x_name = Contour_X_Vals[0];
+	double x_max = strtod( Contour_X_Vals[1].c_str(), NULL );
+	double x_min = strtod( Contour_X_Vals[2].c_str(), NULL );
+	int x_points = atoi( Contour_X_Vals[3].c_str() );
+	ScanParam* new_X = new ScanParam( x_name, x_max, x_min, x_points );
+	string y_name = Contour_Y_Vals[0];
+	double y_max = strtod( Contour_Y_Vals[1].c_str(), NULL );
+	double y_min = strtod( Contour_Y_Vals[2].c_str(), NULL );
+	int y_points = atoi( Contour_Y_Vals[3].c_str() );
+	ScanParam* new_Y = new ScanParam( y_name, y_max, y_min, y_points );
+	
+	pair<ScanParam*, ScanParam*> new_Contour;
+	new_Contour.first = new_X;
+	new_Contour.second = new_Y;
+	
+	Global_2DScan_List.push_back( new_Contour );
+
+}
+
+void OutputConfiguration::AddScan( string X_axis )
+{
+	vector<string> Contour_X_Vals = StringProcessing::SplitString( X_axis, ',' );
+
+	if( Contour_X_Vals.size() != 4 ){
+		cerr << "Runtime Defined Contour Badly Defined:" << endl;
+		for(unsigned short int i=0; i < Contour_X_Vals.size(); i++ )
+		{
+			cerr << Contour_X_Vals[i] << "\t";
+		}
+		cerr << endl;
+		exit(13);
+	}
+
+	string x_name = Contour_X_Vals[0];
+	double x_max = strtod( Contour_X_Vals[1].c_str(), NULL );
+	double x_min = strtod( Contour_X_Vals[2].c_str(), NULL );
+	int x_points = atoi( Contour_X_Vals[3].c_str() );
+	ScanParam* new_X = new ScanParam( x_name, x_max, x_min, x_points );
+
+	Global_Scan_List.push_back( new_X );
+
 }
 
 //Setso that it knows that weighted events were used

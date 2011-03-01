@@ -21,39 +21,32 @@ ToyStudyResult::ToyStudyResult( vector<ToyStudyResult*> Result_Array )
 {
 	if( !Result_Array.empty() )
 	{
+		clock = new TStopwatch();
 		allNames = Result_Array[0]->GetAllNames();
 		//Construct the result data structure
-		for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
 		{
 			allValues.push_back( vector<double>() );
 			allErrors.push_back( vector<double>() );
 			allPulls.push_back( vector<double>() );
+			allGenValues.push_back( vector<double>() );
 		}
-		for( short int i=0; i < Result_Array.size(); i++ )
+		for(unsigned int i=0; i < Result_Array.size(); i++ )
 		{
 			for( short int j=0; j < Result_Array[i]->NumberResults(); j++ )
 			{
-				allResults.push_back( Result_Array[i]->GetFitResult( j ) );
-
-				for( short int k=0; k < allNames.size(); k++ )
-				{
-					ResultParameter * newResult = Result_Array[i]->GetFitResult( j )->GetResultParameterSet()->GetResultParameter( allNames[k] );
-					allValues[k].push_back( newResult->GetValue() );
-					allErrors[k].push_back( newResult->GetError() );
-					allPulls[k].push_back( newResult->GetPull() );
-				}
+				AddFitResult(  Result_Array[i]->GetFitResult( j ), false );
 			}
 
 			vector<double> input_real_times = Result_Array[i]->GetAllRealTimes();
 			vector<double> input_cpu_times = Result_Array[i]->GetAllCPUTimes();
-			for( short int j2=0; j2 < input_real_times.size(); j2++)
+			for(unsigned int j2=0; j2 < input_real_times.size(); j2++)
 			{
 				allRealTimes.push_back( input_real_times[j2] );
 				allCPUTimes.push_back( input_cpu_times[j2] );
 			}
 
 		}
-		clock = new TStopwatch();
 	}
 }
 
@@ -61,11 +54,12 @@ ToyStudyResult::ToyStudyResult( vector<ToyStudyResult*> Result_Array )
 ToyStudyResult::ToyStudyResult( vector<string> AllParameterNames ) : allNames(AllParameterNames)
 {
 	//Construct the result data structure
-	for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
 	{
 		allValues.push_back( vector<double>() );
 		allErrors.push_back( vector<double>() );
 		allPulls.push_back( vector<double>() );
+		allGenValues.push_back( vector<double>() );
 	}
 
 	clock = new TStopwatch();
@@ -83,9 +77,9 @@ void ToyStudyResult::StartStopwatch()
 }
 
 //Add a new fit result
-bool ToyStudyResult::AddFitResult( FitResult * NewResult )
+bool ToyStudyResult::AddFitResult( FitResult * NewResult, bool with_clock )
 {
-	vector<double> newParameterValues, newParameterErrors, newParameterPulls;
+	vector<double> newParameterValues, newParameterErrors, newParameterPulls, newParameterGenValues;
 	vector<string>::iterator nameIterator;
 	ResultParameterSet * newSet = NewResult->GetResultParameterSet();
 
@@ -105,22 +99,27 @@ bool ToyStudyResult::AddFitResult( FitResult * NewResult )
 			newParameterValues.push_back( newResult->GetValue() );
 			newParameterErrors.push_back( newResult->GetError() );
 			newParameterPulls.push_back( newResult->GetPull() );
+			newParameterGenValues.push_back( newResult->GetOriginalValue() );
 		}
 	}
 
 	//If you've got this far, all the parameters have been found, so add them to the record
 	allResults.push_back(NewResult);
-	for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
 	{
 		allValues[nameIndex].push_back( newParameterValues[nameIndex] );
 		allErrors[nameIndex].push_back( newParameterErrors[nameIndex] );
 		allPulls[nameIndex].push_back( newParameterPulls[nameIndex] );
+		allGenValues[nameIndex].push_back( newParameterGenValues[nameIndex] );
 	}
 
-	//Store the duration
-	clock->Stop();
-	allRealTimes.push_back( clock->RealTime() );
-	allCPUTimes.push_back( clock->CpuTime() );
+	if( with_clock )
+	{
+		//Store the duration
+		clock->Stop();
+		allRealTimes.push_back( clock->RealTime() );
+		allCPUTimes.push_back( clock->CpuTime() );
+	}
 
 	return true;
 }
@@ -130,7 +129,7 @@ bool ToyStudyResult::AddFitResult( FitResult * NewResult )
 vector<double> ToyStudyResult::GetAllMLL()
 {
 	vector<double> output_MLL;
-	for ( short int i=0; i < allResults.size(); i++ )
+	for (unsigned short int i=0; i < allResults.size(); i++ )
 	{
 		if( allResults[i]->GetFitStatus() >0 ) 
 		{
@@ -146,7 +145,7 @@ vector<double> ToyStudyResult::GetAllMLL()
 //Return vectors of values, errors and pulls for a particular parameter name
 vector<double> ToyStudyResult::GetParameterValues( string ParameterName )
 {
-	for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
 	{
 		//If you find the parameter name, return the vector of values
 		if ( ParameterName == allNames[nameIndex] )
@@ -161,7 +160,7 @@ vector<double> ToyStudyResult::GetParameterValues( string ParameterName )
 }
 vector<double> ToyStudyResult::GetParameterErrors( string ParameterName )
 {
-	for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
 	{
 		//If you find the parameter name, return the vector of errors
 		if ( ParameterName == allNames[nameIndex] )
@@ -176,7 +175,7 @@ vector<double> ToyStudyResult::GetParameterErrors( string ParameterName )
 }
 vector<double> ToyStudyResult::GetParameterPulls( string ParameterName )
 {
-	for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
 	{
 		//If you find the parameter name, return the vector of pulls
 		if ( ParameterName == allNames[nameIndex] )
@@ -197,7 +196,7 @@ int ToyStudyResult::NumberResults()
 }
 FitResult * ToyStudyResult::GetFitResult( int Index )
 {
-	if ( Index < allResults.size() )
+	if ( Index < int(allResults.size()) )
 	{
 		return allResults[Index];
 	}
@@ -209,22 +208,36 @@ FitResult * ToyStudyResult::GetFitResult( int Index )
 }
 double ToyStudyResult::GetRealTime( int Index )
 {
-	if( Index < allRealTimes.size() ) return allRealTimes[ Index ];
+	if( Index < int(allRealTimes.size()) ) return allRealTimes[ Index ];
 	else return -1;
+}
+void ToyStudyResult::AddRealTimes( vector<double> input_times )
+{
+	for( unsigned int i=0; i< input_times.size(); i++)
+	{
+		allRealTimes.push_back( input_times[i] );
+	}
 }
 void ToyStudyResult::SetRealTime( int Index, double input_time )
 {
-	if( allRealTimes.size() < Index ) allRealTimes.resize( Index );
+	if( int(allRealTimes.size()) < Index ) allRealTimes.resize( Index );
 	allRealTimes[Index] = input_time;
 }
 double ToyStudyResult::GetCPUTime( int Index )
 {
-	if( Index < allCPUTimes.size() ) return allCPUTimes[ Index ];
+	if( Index < int(allCPUTimes.size()) ) return allCPUTimes[ Index ];
 	else return -1;
+}
+void ToyStudyResult::AddCPUTimes( vector<double> input_times )
+{
+	for( unsigned int i=0; i< input_times.size(); i++)
+	{
+		allCPUTimes.push_back( input_times[i] );
+	}
 }
 void ToyStudyResult::SetCPUTime( int Index, double input_time )
 {
-	if( Index < allCPUTimes.size() ) allCPUTimes.resize( Index );
+	if( Index < int(allCPUTimes.size()) ) allCPUTimes.resize( Index );
 	allCPUTimes[Index] = input_time;  
 }
 
@@ -248,11 +261,13 @@ vector<double> ToyStudyResult::GetAllCPUTimes()
 vector<double> ToyStudyResult::GetFlatResult( int Index )
 {
 	vector<double> Flatresult;
-	for(int i = 0; i<allNames.size(); i++)
+	for(unsigned int i = 0; i<allNames.size(); i++)
 	{
-		Flatresult.push_back( (allValues[i][Index]));
-		Flatresult.push_back( (allErrors[i][Index]));
-		Flatresult.push_back( (allPulls[i][Index]));
+		Flatresult.push_back( (allValues[i][Index]) );
+		Flatresult.push_back( (allErrors[i][Index]) );
+		Flatresult.push_back( (allPulls[i][Index]) );
+		Flatresult.push_back( (allGenValues[i][Index]) );
+
 	}
 
 	Flatresult.push_back(allRealTimes[Index]);
@@ -264,12 +279,13 @@ vector<double> ToyStudyResult::GetFlatResult( int Index )
 TString ToyStudyResult::GetFlatResultHeader()
 {
 	TString header = "";
-	for(int i = 0; i<allNames.size(); i++)
+	for(unsigned short int i = 0; i<allNames.size(); i++)
 	{
 		TString name = allNames[i];
 		header += name + "_value:";
 		header += name + "_error:";
 		header += name + "_pull:";
+		header += name + "_gen:";
 	}
 	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:NLL";
 	return header;

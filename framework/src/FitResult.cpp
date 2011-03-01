@@ -16,24 +16,17 @@ FitResult::FitResult()
 }
 
 //Constructor with correct arguments
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle ) : minimumValue( MinimumValue ),
-	fittedParameters( FittedParameters ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 {
 }
 
 //Constructor with correct arguments, including covariance Matrix
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix ) :
-	minimumValue( MinimumValue ), fittedParameters( FittedParameters ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
-	, covarianceMatrix( covMatrix )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 {
 }
 
 //Constructor with correct arguments, including covariance Matrix and contours
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix
-			, vector< FunctionContour* > ContourPlots ) :
-	minimumValue( MinimumValue ), fittedParameters( FittedParameters ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
-	, covarianceMatrix( covMatrix )
-	, contours( ContourPlots )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix, vector< FunctionContour* > ContourPlots ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 {
 }
 
