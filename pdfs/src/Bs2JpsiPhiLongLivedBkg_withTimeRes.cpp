@@ -97,7 +97,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFnumerator()
 	if( f_LL1 >= 0.9999 ) {
 		if( tauLL1 <= 0 ) {
 			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1 " << endl ;
-			exit(1) ;
+			throw(10) ;
 		}
 		double val = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
 		return val;
@@ -105,7 +105,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFnumerator()
 	else {
 		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
 			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
-			exit(1) ;
+			throw(10) ;
 		}
 		double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
 		double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
@@ -153,7 +153,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFdenominator()
 	if( f_LL1 >= 0.9999 ) {
 		if( tauLL1 <= 0 ) {
 			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1 " << endl ;
-			exit(1) ;
+			throw(10) ;
 		}
 		double val = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
 		return val;
@@ -161,7 +161,7 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes::buildPDFdenominator()
 	else {
 		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
 			cout << " In Bs2JpsiPhiLongLivedBkg_withTimeRes() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
-			exit(1) ;
+			throw(10) ;
 		}
 		double val1 = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
 		double val2 = Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
