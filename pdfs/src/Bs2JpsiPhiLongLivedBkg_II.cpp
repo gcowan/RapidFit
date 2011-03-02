@@ -20,12 +20,12 @@ Bs2JpsiPhiLongLivedBkg_II::Bs2JpsiPhiLongLivedBkg_II() :
 	  timeName	( "time" )
 
 	// Physics parameters
-	, f_LL1Name	( "f_LL1" )
+	, f_LL1Name	( "f_LL1_II" )
 	, tauLL1Name	( "tau_LL1_II" )
 	, tauLL2Name	( "tau_LL2_II" )
-	, timeResLL1FracName( "timeResLL1Frac_II" )
-	, sigmaLL1Name	( "sigma_LL1_II" )
-	, sigmaLL2Name	( "sigma_LL2_II" )
+	, timeResLL1FracName( "timeResLL1Frac" )
+	, sigmaLL1Name	( "sigma_LL1" )
+	, sigmaLL2Name	( "sigma_LL2" )
 {
 	MakePrototypes();
 }
