@@ -43,6 +43,7 @@
 #include "Bs2DsPiBkg_withTimeRes.h"
 
 #include "Bs2JpsiPhiLongLivedBkg.h"
+#include "Bs2JpsiPhiLongLivedBkg_II.h"
 #include "Bs2JpsiPhiLongLivedBkg_withTimeRes.h"
 #include "Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist.h"
 
@@ -166,6 +167,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 	        //Long lived background for JPsiPhi
                 return new Bs2JpsiPhiLongLivedBkg();
+        }
+		else if ( Name == "Bs2JpsiPhiLongLivedBkg_II" )
+        {
+	        //Long lived background for JPsiPhi with different parameters
+			return new Bs2JpsiPhiLongLivedBkg_II();
         }
         else if ( Name == "Bs2JpsiPhiLongLivedBkg_withTimeRes" )
         {
