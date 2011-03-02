@@ -71,7 +71,7 @@ ToyStudy::~ToyStudy()
 }
 
 //Automate the toy study
-ToyStudyResult * ToyStudy::DoWholeStudy()
+ToyStudyResult * ToyStudy::DoWholeStudy( bool force_n_studies )
 {
 	//Make a vector of unique parameter names
 	vector<string> uniqueNames;
@@ -90,6 +90,11 @@ ToyStudyResult * ToyStudy::DoWholeStudy()
 		cout << "\n\n\t\tStarting ToyStudy\t\t" << studyIndex+1 << "\tof:\t" << numberStudies << endl;
 		allResults->StartStopwatch();
 		allResults->AddFitResult( FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints ) );
+		if( ( allResults->GetFitResult( studyIndex )->GetFitStatus() < 0 ) && force_n_studies )
+		{
+			cout << "Fit fell over!\t Requesting another fit but keeping this result." << endl;
+			numberStudies++;
+		}
 	}
 
 	return allResults;

@@ -24,6 +24,7 @@ class Minuit2Wrapper : public IMinimiser
 		~Minuit2Wrapper();
 
 		//Interface functions
+		virtual void SetOutputLevel( int ){};
 		virtual void Minimise( FitFunction* );
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );

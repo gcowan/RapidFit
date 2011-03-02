@@ -21,10 +21,11 @@ class MinuitWrapper : public IMinimiser
 {
 	public:
 		MinuitWrapper();
-		MinuitWrapper( int );
+		MinuitWrapper( int, int=0 );
 		~MinuitWrapper();
 
 		//Interface functions
+		virtual void SetOutputLevel( int );
 		virtual void Minimise( FitFunction* );
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );
@@ -35,7 +36,8 @@ class MinuitWrapper : public IMinimiser
 		TMinuit * minuit;
 		static FitFunction * function;
 		FitResult * fitResult;
-		vector< pair< string, string > > contours; 
+		vector< pair< string, string > > contours;
+		short int print_verbosity;
 };
 
 #endif

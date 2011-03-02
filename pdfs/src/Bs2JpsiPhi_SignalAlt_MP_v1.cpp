@@ -145,7 +145,7 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 		cout << " Resolution2 : " << resolution2 << endl ;
 		cout << " Mistag : " << tagFraction << endl ;
 		cout << " Phi_s : " << phi_s <<  endl ;
-		exit(1) ;
+		throw(10);
 	}
 	
 	return result;

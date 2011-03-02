@@ -21,21 +21,28 @@ const double STEP_SIZE = 0.01;
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
-MinuitWrapper::MinuitWrapper()
+MinuitWrapper::MinuitWrapper(): print_verbosity( 0 )
 {
 	minuit = new TMinuit( 1 );
 }
 
 //Constructor with correct argument
-MinuitWrapper::MinuitWrapper( int NumberParameters )
+MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): print_verbosity( output_level )
 {
 	minuit = new TMinuit( NumberParameters );
+	minuit->SetPrintLevel( print_verbosity );
 }
 
 //Destructor
 MinuitWrapper::~MinuitWrapper()
 {
 	delete minuit;
+}
+
+void MinuitWrapper::SetOutputLevel( int output_level )
+{
+	print_verbosity = output_level;
+	minuit->SetPrintLevel( print_verbosity );
 }
 
 //Use Migrad to minimise the given function

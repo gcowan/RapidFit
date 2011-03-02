@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/02 Rob Currie
+   - Added control to Minuit Output level to program, although it appears to be on minimal already as default...
+   - Changed Bs2JpsiPhi_SignalAlt_MP_v1.cpp to throw not exit on nan
+   - Added the ability to force a toy study to request N many good toy fits, this could allow for the output to be filtered to remove all non-crashing fits
+
 2011/03/01 Rob Currie
    - Added initial implementation of the framework that will construct FeldmanCousins Plots in a distributed way
      This has hardcoded 1k subjobs with 1k events at each scan point. This is likely to Change

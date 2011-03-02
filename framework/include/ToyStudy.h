@@ -28,7 +28,7 @@ class ToyStudy
 		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
 		~ToyStudy();
 
-		ToyStudyResult * DoWholeStudy();
+		ToyStudyResult * DoWholeStudy( bool=false );
 		ToyStudyResult * GetToyStudyResult();
 
 	private:

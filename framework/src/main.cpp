@@ -751,22 +751,25 @@ int main( int argc, char * argv[] )
 						int NumberOfToys = 1E2;
 						int TOY_STUDY_SEED = int( 1E3 * pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() );
 
+						ToyStudyMinimiser->GetMinimiser( InputParamSet->GetAllNames().size() )->SetOutputLevel(-1);
 
 						//			STEP 6
-						//f
+						//
 						//		RUN TOY STUDY WITH CONTROL PARAMETERS FIXED
 						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
 						cout << "\n\tFIRST RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
 						ToyStudy* study1 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputParamSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
-						study1->DoWholeStudy();
+						study1->DoWholeStudy( true );		//  Passing true to this function now requires that the number of wanted successful toys be met
 
 						//		RUN TOY STUDY WITH CONTROL PARAMETERS FREE
 						ToyPDFWithData->SetPhysicsParameters( InputFreeSet );
 						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
 						cout << "\n\tSECOND RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
 						ToyStudy* study2 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputFreeSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
-						study2->DoWholeStudy();
+						study2->DoWholeStudy( true );
 
+						//		Standard Output Format which makes the results the same running either
+						//		the whole scan on one machine or running the whole set on a batch system
 						ToyStudyResult* ThisStudy = new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
 						ThisStudy->AddFitResult( _2DResultForFC->GetFitResult( iFC ), false );
 						ThisStudy->AddCPUTimes( _2DResultForFC->GetAllCPUTimes() );
