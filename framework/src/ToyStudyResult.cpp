@@ -218,6 +218,10 @@ void ToyStudyResult::AddRealTimes( vector<double> input_times )
 		allRealTimes.push_back( input_times[i] );
 	}
 }
+void ToyStudyResult::AddRealTime( double input_time )
+{
+	allRealTimes.push_back( input_time );
+}
 void ToyStudyResult::SetRealTime( int Index, double input_time )
 {
 	if( int(allRealTimes.size()) < Index ) allRealTimes.resize( Index );
@@ -234,6 +238,10 @@ void ToyStudyResult::AddCPUTimes( vector<double> input_times )
 	{
 		allCPUTimes.push_back( input_times[i] );
 	}
+}
+void ToyStudyResult::AddCPUTime( double input_time )
+{
+	allCPUTimes.push_back( input_time );
 }
 void ToyStudyResult::SetCPUTime( int Index, double input_time )
 {

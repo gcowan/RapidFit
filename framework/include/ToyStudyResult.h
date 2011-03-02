@@ -42,6 +42,8 @@ class ToyStudyResult
 		double GetRealTime( int );
 		void AddCPUTimes( vector<double> );
 		void AddRealTimes( vector<double> );
+		void AddCPUTime( double );
+		void AddRealTime( double );
 		void SetCPUTime( int, double );
 		void SetRealTime( int, double );
 

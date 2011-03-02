@@ -683,6 +683,8 @@ int main( int argc, char * argv[] )
 				if( doFC_Flag )
 				{
 					vector<ToyStudyResult*> AllResults;
+					vector<ToyStudyResult*> AllCleanResults;
+					vector<ToyStudyResult*> AllCleanResults2;
 					for( int iFC=0; iFC < _2DResultForFC->NumberResults(); iFC++ )
 					{
 
@@ -755,18 +757,25 @@ int main( int argc, char * argv[] )
 
 						//			STEP 6
 						//
-						//		RUN TOY STUDY WITH CONTROL PARAMETERS FIXED
-						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
-						cout << "\n\tFIRST RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
-						ToyStudy* study1 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputParamSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
-						study1->DoWholeStudy( true );		//  Passing true to this function now requires that the number of wanted successful toys be met
-
+						
 						//		RUN TOY STUDY WITH CONTROL PARAMETERS FREE
+						//		This is more unstable and is used to get the required number of toys needed for comparrison
 						ToyPDFWithData->SetPhysicsParameters( InputFreeSet );
 						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
 						cout << "\n\tSECOND RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
 						ToyStudy* study2 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputFreeSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
 						study2->DoWholeStudy( true );
+						
+						//		RUN TOY STUDY WITH CONTROL PARAMETERS FIXED
+						//		This is by definition more stable and as such the required number of toys is simply such
+						//		that the 100 working toys from the free case have a 1to1 comparrison
+						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
+						NumberOfToys = study2->GetToyStudyResult()->NumberResults();
+						cout << "\n\tFIRST RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
+						ToyStudy* study1 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputParamSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
+						study1->DoWholeStudy( true );		//  Passing true to this function now requires that the number of wanted successful toys be met
+
+
 
 						//		Standard Output Format which makes the results the same running either
 						//		the whole scan on one machine or running the whole set on a batch system
@@ -778,11 +787,59 @@ int main( int argc, char * argv[] )
 						AllResults.push_back( ThisStudy );
 						AllResults.push_back( study1->GetToyStudyResult() );
 						AllResults.push_back( study2->GetToyStudyResult() );
+
+						//		Cleaned Output
+						AllCleanResults.push_back( GlobalFitResult );
+						AllCleanResults.push_back( ThisStudy );
+						ToyStudyResult* CleanResults1= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+						ToyStudyResult* CleanResults2= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+						for( int toy_i=0; toy_i < NumberOfToys; toy_i++ )
+						{
+							if( study1->GetToyStudyResult()->GetFitResult( toy_i )->GetFitStatus() == 3 )
+							{
+								CleanResults1->AddFitResult( study1->GetToyStudyResult()->GetFitResult( toy_i ), false );
+								CleanResults1->AddCPUTime( study1->GetToyStudyResult()->GetCPUTime( toy_i ) );
+								CleanResults1->AddRealTime( study1->GetToyStudyResult()->GetRealTime( toy_i ) );
+								CleanResults2->AddFitResult( study2->GetToyStudyResult()->GetFitResult( toy_i ), false );
+								CleanResults2->AddCPUTime( study2->GetToyStudyResult()->GetCPUTime( toy_i ) );
+								CleanResults2->AddRealTime( study2->GetToyStudyResult()->GetRealTime( toy_i ) );
+							}
+						}
+						AllCleanResults.push_back( CleanResults1 );
+						AllCleanResults.push_back( CleanResults2 );
+
+						//		Cleaned Output
+						AllCleanResults2.push_back( GlobalFitResult );
+						AllCleanResults2.push_back( ThisStudy );
+						ToyStudyResult* CleanResults1b= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+						ToyStudyResult* CleanResults2b= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+						unsigned short int count=0;
+						for( int toy_i=0; (toy_i < NumberOfToys) && count < 100; toy_i++ )
+						{
+							if( study1->GetToyStudyResult()->GetFitResult( toy_i )->GetFitStatus() > 0 )
+							{
+								CleanResults1b->AddFitResult( study1->GetToyStudyResult()->GetFitResult( toy_i) , false );
+								CleanResults1b->AddCPUTime( study1->GetToyStudyResult()->GetCPUTime( toy_i ) );
+								CleanResults1b->AddRealTime( study1->GetToyStudyResult()->GetRealTime( toy_i ) );
+								CleanResults2b->AddFitResult( study2->GetToyStudyResult()->GetFitResult( toy_i), false );
+								CleanResults2b->AddCPUTime( study2->GetToyStudyResult()->GetCPUTime( toy_i ) );
+								CleanResults2b->AddRealTime( study2->GetToyStudyResult()->GetRealTime( toy_i ) );
+								count++;
+							}
+						}
+						AllCleanResults2.push_back( CleanResults1b );
+						AllCleanResults2.push_back( CleanResults2b );
+
 					}
 
 					//		STORE THE OUTPUT OF THE TOY STUDIES
 					ToyStudyResult* AllFlatResult = new ToyStudyResult( AllResults );
 					ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFlatResult );
+					//		STORE THE OUTPUT OF THE TOY STUDIES
+					ToyStudyResult* AllCleanFlatResult = new ToyStudyResult( AllCleanResults );
+					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_3.root", AllCleanFlatResult );					//		STORE THE OUTPUT OF THE TOY STUDIES
+					ToyStudyResult* AllCleanFlatResult2 = new ToyStudyResult( AllCleanResults2 );
+					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_gt_0.root", AllCleanFlatResult2 );
 
 				}
 				  
