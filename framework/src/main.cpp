@@ -839,7 +839,7 @@ int main( int argc, char * argv[] )
 					ToyStudyResult* AllCleanFlatResult = new ToyStudyResult( AllCleanResults );
 					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_3.root", AllCleanFlatResult );					//		STORE THE OUTPUT OF THE TOY STUDIES
 					ToyStudyResult* AllCleanFlatResult2 = new ToyStudyResult( AllCleanResults2 );
-					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_gt_0.root", AllCleanFlatResult2 );
+					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_first_100_gt_0.root", AllCleanFlatResult2 );
 
 				}
 				  
