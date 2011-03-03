@@ -29,7 +29,7 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist : public BasePDF
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 		double buildPDFnumerator();
-		double buildPDFdenominator();	
+		double buildPDFdenominator();
 		double angularFactor();
 
 		// Physics parameters
@@ -39,20 +39,23 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist : public BasePDF
 		string sigmaLL1Name;		// time res sigma 1
 		string sigmaLL2Name;		// time res sigma 2
                 string timeResLL1FracName;
+		string f_JpsiName;
+		string f_NoJpsiName;
 
 		double tauLL1;
 		double tauLL2;
 		double f_LL1;
-		double sigmaLL; // This is the member variable used in the "builder" functions 
+		double sigmaLL; // This is the member variable used in the "builder" functions
 		double sigmaLL1; // These are the physics parameters varied in the fit and passed from the XML;
 		double sigmaLL2;
                 double timeResLL1Frac;
-
+		double f_Jpsi;
+		double f_NoJpsi;
 		double tlow, thigh; // integration limits
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
-		// PDF. 
+		// PDF.
 		string timeName;	// proper time
 		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
@@ -61,7 +64,7 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist : public BasePDF
 		double cosTheta;
 		double phi;
 		double cosPsi;
-		
+
 };
 
 #endif
