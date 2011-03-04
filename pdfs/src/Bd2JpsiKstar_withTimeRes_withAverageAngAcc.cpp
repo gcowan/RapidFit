@@ -15,8 +15,19 @@
 
 //Constructor
 Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverageAngAcc() :
+
+          normalisationCacheValid(false)
+	, evaluationCacheValid(false)
+
+        // Observables (What we want to gain from the pdf after inserting physics parameter values)
+        , timeName      ( "time" )
+        , cosThetaName  ( "cosTheta" )
+        , phiName       ( "phi" )
+        , cosPsiName    ( "cosPsi" )
+        , KstarFlavourName  ( "KstarFlavour" )
+
 	// Physics parameters
-	gammaName     ( "gamma" )
+	, gammaName     ( "gamma" )
 	, deltaMName    ( "deltaM")
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
@@ -32,14 +43,6 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverage
 	, timeRes2Name	( "timeResolution2" )
 	, timeRes1FractionName	( "timeResolution1Fraction" )
 
-	// Observables (What we want to gain from the pdf after inserting physics parameter values)
-	, timeName	( "time" )
-	, cosThetaName	( "cosTheta" )
-	, phiName	( "phi" )
-	, cosPsiName	( "cosPsi" )
-	, KstarFlavourName  ( "KstarFlavour" )
-	, normalisationCacheValid(false)
-, evaluationCacheValid(false)
 {
 	MakePrototypes();
 }

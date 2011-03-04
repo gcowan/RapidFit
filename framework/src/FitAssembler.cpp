@@ -99,10 +99,10 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	}
 }
 
-void FitAssembler::ShakeBottle( ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, unsigned int some_number )
-{
-	// To be written in a 'safe' way
-}
+//void FitAssembler::ShakeBottle( ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, unsigned int some_number )
+//{
+//	// To be written in a 'safe' way
+//}
 //  Perform a safer fit which is gauranteed to return something which you can use :D
 FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
 {
@@ -142,8 +142,8 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
                         cerr << "\n\n\n\t\t\tCaught Unknown Exception, THIS IS SERIOUS!!!\n\n\n" << endl;
 			fit_fail_status = true;
 		}
-		cerr << "Fit Did Not converge, shaking the bottle and starting again!" <<endl;
-		cerr << "This is Retry " << i+1 << "of 4"<<endl;
+		//cerr << "Fit Did Not converge, shaking the bottle and starting again!" <<endl;
+		//cerr << "This is Retry " << i+1 << "of 4"<<endl;
 		//  Give the physics bottle a bit of a shake and see if it works this time
 		//ShakeBottle( BottleParameters, BottleData, (i+5) );
 	}
@@ -203,7 +203,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 		string name = Wanted_Param->GetName();
 		string type = BottleParameters->GetPhysicsParameter( name )->GetType();
 		string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
-		scanStepResult->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal!=scanVal, 0., scanVal, scanVal, type, unit );
+		scanStepResult->GetResultParameterSet()->SetResultParameter( name, scanVal, 0, 0., scanVal, scanVal, type, unit );
 
 		vector<string> Fixed_List = BottleParameters->GetAllFixedNames();
 		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
@@ -281,7 +281,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 
 		for( short int i=0; i < Returnable_Result->NumberResults(); i++ )
 		{
-			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, scanVal, scanVal!=scanVal, 0.0, scanVal, scanVal, type, unit );
+			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, scanVal, 0, 0.0, scanVal, scanVal, type, unit );
 		}
 
 		output_interface->push_back( Returnable_Result );

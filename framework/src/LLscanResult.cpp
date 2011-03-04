@@ -17,6 +17,7 @@
 #include <TFrame.h>
 #include <TAxis.h>
 
+#define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
 LLscanResult::LLscanResult()
@@ -43,7 +44,7 @@ LLscanResult::LLscanResult( string _parameterName, vector<double> _parameterValu
 	// Now find the minimum value in llvalues and set llmin to hold it.
 	for(unsigned int i=0; i < llvalues.size() ;i++ )
 	{
-		if( (llvalues[i] < llmin) && (llvalues[i] != LLSCAN_FIT_FAILURE_VALUE ) ) {
+		if( (llvalues[i] < llmin) && ((llvalues[i] - LLSCAN_FIT_FAILURE_VALUE ) > DOUBLE_TOLERANCE ) ) {
 			llmin = llvalues[i] ;
 		}
 	}
@@ -51,7 +52,7 @@ LLscanResult::LLscanResult( string _parameterName, vector<double> _parameterValu
 	//Create llvalues_offset (i.e. offset to the minimum )
 	for(unsigned int i=0; i < llvalues.size(); i++ )
 	{		
-		if( llvalues[i] == LLSCAN_FIT_FAILURE_VALUE ) {
+		if( ( llvalues[i] - LLSCAN_FIT_FAILURE_VALUE ) < DOUBLE_TOLERANCE ) {
 			llvalues_offset.push_back( 0. ) ;
 		}
 		else

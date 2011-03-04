@@ -11,6 +11,7 @@
 #include "Foam.h"
 #include "StatisticsFunctions.h"
 #include <iostream>
+#define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
 Foam::Foam()
@@ -111,7 +112,7 @@ int Foam::GenerateData( int DataAmount )
 			//Calculate the index
 			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 			{
-				if ( discreteValues[discreteIndex][valueIndex] == currentValue )
+				if ( ( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
 					incrementValue *= discreteValues[discreteIndex].size();

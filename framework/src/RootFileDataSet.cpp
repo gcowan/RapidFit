@@ -19,10 +19,7 @@ RootFileDataSet::RootFileDataSet()
 {
 }
 //Contructor with file name as argument
-RootFileDataSet::RootFileDataSet( string FileName, PhaseSpaceBoundary * Boundary ) : 
-	  dataBoundary( Boundary )
-	, observableValues( Boundary->GetAllNames().size() )
-	, branches( Boundary->GetAllNames().size() )
+RootFileDataSet::RootFileDataSet( string FileName, PhaseSpaceBoundary * Boundary ) :  dataBoundary( Boundary ), branches( Boundary->GetAllNames().size() ), observableValues( Boundary->GetAllNames().size() )
 {
 	//Initialise the output data point
 	vector<string> observableNames = Boundary->GetAllNames();
@@ -32,7 +29,7 @@ RootFileDataSet::RootFileDataSet( string FileName, PhaseSpaceBoundary * Boundary
 	inputFile = new TFile( FileName.c_str(), "UPDATE" );
 	TKey * testKey;
 	TIter fileKeys( inputFile->GetListOfKeys() );
-	while ( testKey = (TKey*)fileKeys() )
+	while ( (testKey = (TKey*)fileKeys()) )
 	{
 		string className = testKey->GetClassName();
 		if ( className == "TNtuple" )
@@ -87,7 +84,7 @@ bool RootFileDataSet::SetBranches()
 {
 	cout << "Setting branches" << endl;
 	vector<string> observableNames = dataBoundary->GetAllNames();
-        for ( int obsIndex = 0; obsIndex < observableNames.size(); obsIndex++ )
+        for ( unsigned short int obsIndex = 0; obsIndex < observableNames.size(); obsIndex++ )
         {
 		rootNTuple->SetBranchAddress(observableNames[obsIndex].c_str(), &(observableValues[obsIndex]), &(branches[obsIndex]));
 	}
@@ -101,13 +98,13 @@ bool RootFileDataSet::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceB
 	bool compatible = true;
 
 	vector<string> allNames = TestBoundary->GetAllNames();
-	for ( int observableIndex = 0; observableIndex < allNames.size(); observableIndex++ )
+	for ( unsigned short int observableIndex = 0; observableIndex < allNames.size(); observableIndex++ )
 	{
 		bool found = false;
 		//Find the requested observable name in the ntuple
 		TIter observableIterator( TestTuple->GetListOfLeaves() );
 		TLeaf * observableLeaf;
-		while ( observableLeaf = (TLeaf*)observableIterator() )
+		while ( ( observableLeaf = (TLeaf*)observableIterator() ) )
 		{
 			string leafName = observableLeaf->GetName();
 			if ( leafName == allNames[observableIndex] )
@@ -141,7 +138,7 @@ DataPoint * RootFileDataSet::GetDataPoint( int DataIndex )
 		outputDataPoint = new DataPoint(observableNames);
 
 		//Populate the output data point
-		for ( int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
+		for ( unsigned short int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
 		{
 			string name = observableNames[observableIndex];
 		        string unit = dataBoundary->GetConstraint(name)->GetUnit();
@@ -164,7 +161,7 @@ bool RootFileDataSet::AddDataPoint( DataPoint * NewDataPoint )
 		//Make an array of the observable values
 		vector<string> observableNames = dataBoundary->GetAllNames();
 		Float_t dataPointArray[ observableNames.size() ];
-		for ( int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
+		for ( unsigned short int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
 		{
 			string name = observableNames[observableIndex];
 			Observable * inputObservable = NewDataPoint->GetObservable(name);

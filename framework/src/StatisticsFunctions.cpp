@@ -12,6 +12,8 @@
 #include "StringProcessing.h"
 #include <iostream>
 
+#define DOUBLE_TOLERANCE 1E-6
+
 //Return the mean of a vector of doubles
 double StatisticsFunctions::Mean( vector<double> Numbers )
 {
@@ -224,7 +226,7 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 
 			for (unsigned int valueIndex = 0; valueIndex < DiscreteValues[discreteIndex].size(); valueIndex++ )
 			{
-				if ( DiscreteValues[discreteIndex][valueIndex] == currentValue )
+				if ( ( DiscreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
 					incrementValue *= DiscreteValues[discreteIndex].size();

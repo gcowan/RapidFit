@@ -16,8 +16,10 @@ using std::cout;
 using std::endl;
 //Constructor
 Bs2JpsiPhi_sWave::Bs2JpsiPhi_sWave() :
+          normalisationCacheValid(false)
+        , evaluationCacheValid(false)
 	// Physics parameters
-	gammaName	 ( "gamma" )
+	, gammaName	 ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
 	, deltaMName	( "deltaM")
 	, Phi_sName	 ( "Phi_s")
@@ -49,8 +51,6 @@ Bs2JpsiPhi_sWave::Bs2JpsiPhi_sWave() :
 	, cosPsiName	( "cosPsi" )
 	, tagName	( "tag" )
 	, mistagName	( "mistag" )
-	, normalisationCacheValid(false)
-	, evaluationCacheValid(false)
 {
 	MakePrototypes();
 }
@@ -227,7 +227,7 @@ void Bs2JpsiPhi_sWave::getAngularFunctions( double & f1
 	double sin2Theta = 2.*sinTheta*cosTheta;
 	double sin2Psi	 = 2.*sinPsi*cosPsi;
 	double sin2Phi	 = 2.*sinPhi*cosPhi;
-	double cosTheta_sq = cosTheta*cosTheta;
+//	double cosTheta_sq = cosTheta*cosTheta;
 	double sinTheta_sq  = sinTheta*sinTheta;
 	double cosPsi_sq   = cosPsi*cosPsi;
 	double sinPsi_sq = sinPsi*sinPsi;

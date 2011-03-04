@@ -75,12 +75,18 @@ double FitFunction::Evaluate()
 //Return the value to minimise for a given PDF/DataSet pair
 double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
 {
+	IPDF* null_p = TestPDF;
+	IDataSet* null_p2 = TestDataSet;
+	RapidFitIntegrator* null_p3 = ResultIntegrator;
+	null_p = NULL; null_p2 = NULL; null_p3 = NULL;
 	return 1.0;
 }
 
 //Return the Up value for error calculation
 double FitFunction::UpErrorValue( int Sigma )
 {
+	int null_i = Sigma;
+	null_i = 0;
 	return 1.0;
 }
 

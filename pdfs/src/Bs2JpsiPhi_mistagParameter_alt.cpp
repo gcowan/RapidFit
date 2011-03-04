@@ -664,7 +664,7 @@ double  Bs2JpsiPhi_mistagParameter_alt::diffXsecOne(  ) const
 
 double Bs2JpsiPhi_mistagParameter_alt::diffXsecNorm1(  ) const
 {
-	double reference =  32.0*TMath::Pi()/9.0 ;
+//	double reference =  32.0*TMath::Pi()/9.0 ;
 
 	double norm =
 	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1   +

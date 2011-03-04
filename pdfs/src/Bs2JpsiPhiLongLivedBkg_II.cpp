@@ -16,16 +16,17 @@
 
 //Constructor
 Bs2JpsiPhiLongLivedBkg_II::Bs2JpsiPhiLongLivedBkg_II() :
-	// Observables
-	  timeName	( "time" )
 
 	// Physics parameters
-	, f_LL1Name	( "f_LL1_II" )
-	, tauLL1Name	( "tau_LL1_II" )
+	  tauLL1Name	( "tau_LL1_II" )
 	, tauLL2Name	( "tau_LL2_II" )
-	, timeResLL1FracName( "timeResLL1Frac" )
+        , f_LL1Name     ( "f_LL1_II" )
 	, sigmaLL1Name	( "sigma_LL1" )
 	, sigmaLL2Name	( "sigma_LL2" )
+        , timeResLL1FracName( "timeResLL1Frac" )
+
+        // Observables
+        , timeName      ( "time" )
 {
 	MakePrototypes();
 }
@@ -116,6 +117,8 @@ double Bs2JpsiPhiLongLivedBkg_II::buildPDFnumerator()
 
 double Bs2JpsiPhiLongLivedBkg_II::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+	DataPoint* null_p = measurement;
+	null_p=NULL;
         IConstraint * timeBound = boundary->GetConstraint( timeName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {

@@ -1,6 +1,8 @@
 #include "FoamIntegrator.h"
 #include "StatisticsFunctions.h"
 
+#define DOUBLE_TOLERANCE 1E-6
+
 //Default constructor
 FoamIntegrator::FoamIntegrator()
 {
@@ -35,6 +37,8 @@ FoamIntegrator::~FoamIntegrator()
 //Select and run the correct integrator
 double FoamIntegrator::Integral( DataPoint * InputPoint, PhaseSpaceBoundary * InputBoundary )
 {
+	PhaseSpaceBoundary* null_p = InputBoundary;
+	null_p = NULL;
 	//The integral won't work if the boundary has changed, but you might want a check that it's the same
 
 	//Use the data point to find the index of the correct foam
@@ -49,7 +53,7 @@ double FoamIntegrator::Integral( DataPoint * InputPoint, PhaseSpaceBoundary * In
 		//Calculate the index
 		for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 		{
-			if ( discreteValues[discreteIndex][valueIndex] == currentValue )
+			if ( (discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 			{
 				combinationIndex += ( incrementValue * valueIndex );
 				incrementValue *= discreteValues[discreteIndex].size();

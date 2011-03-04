@@ -44,7 +44,7 @@ class FitAssembler
 
 		static void DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, pair<ScanParam*, ScanParam* >, vector<ToyStudyResult*>* );
 
-		static void ShakeBottle( ParameterSet*, vector< PDFWithData* >, unsigned int );
+//		static void ShakeBottle( ParameterSet*, vector< PDFWithData* >, unsigned int );
 };
 
 #endif

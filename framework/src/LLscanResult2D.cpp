@@ -17,6 +17,7 @@
 
 #include <TH2.h>
 
+#define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
 LLscanResult2D::LLscanResult2D()
@@ -132,7 +133,7 @@ TH2D * LLscanResult2D::GetTH2D()
 	int ipmin = -1 ;
 	for(int ip=0; ip < numberOfPoints ; ip++ ) { if( (pvz[ip] > llminNew) ) llminNew = pvz[ip] ;}  // This is only safe way to initialise llminNew to a large value
 	for(int ip=0; ip < numberOfPoints ; ip++ ) { 
-		if( (pvz[ip] < llminNew) && (pvz[ip] !=-9999.) ) 
+		if( (pvz[ip] < llminNew) && ((pvz[ip] + 9999.)<DOUBLE_TOLERANCE) ) 
 		{
 			llminNew = pvz[ip] ;
 			ipmin = ip ;
@@ -142,7 +143,7 @@ TH2D * LLscanResult2D::GetTH2D()
 	//Now adjust the LL values to be relative to the minimum
 	for(int ip=0; ip < numberOfPoints ; ip++ ) {
 		
-		if( pvz[ip] != -9999. ) 
+		if( ( pvz[ip] + 9999. ) < DOUBLE_TOLERANCE )
 		{
 			pvz[ip]-=llminNew ;
 		}
@@ -154,9 +155,9 @@ TH2D * LLscanResult2D::GetTH2D()
 
 	// Write out the adjusted values
 	for(int ii=0; ii<numberOfPoints; ii++) {
-		if( ii == ipmin ) cout << " >>>>>>>>>>>>>MINIMUM>>>>>>>>>>>>>>" <<endl;
+		if( ( ii - ipmin ) < DOUBLE_TOLERANCE ) cout << " >>>>>>>>>>>>>MINIMUM>>>>>>>>>>>>>>" <<endl;
 		cout << " i:  " << ii << " x:  "<< pvx[ii] << " y:  "  << pvy[ii]  << " LL: " <<pvz[ii] << endl ;
-		if( ii == ipmin ) cout << " >>>>>>>>>>>>>MINIMUM>>>>>>>>>>>>>>" <<endl;
+		if( ( ii - ipmin ) < DOUBLE_TOLERANCE ) cout << " >>>>>>>>>>>>>MINIMUM>>>>>>>>>>>>>>" <<endl;
 	}
  
 	

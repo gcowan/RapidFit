@@ -128,6 +128,9 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 double NormalisedSumPDF::Integral( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
 	//The evaluate method alreeady returns a normalised value
+	DataPoint* null_p = NewDataPoint;
+	PhaseSpaceBoundary* null_p2 = NewBoundary;
+	null_p = NULL; null_p2 = NULL;
 	return 1.0;
 }
 

@@ -16,12 +16,11 @@
 
 //Constructor
 Bs2DsPiBkg_withTimeRes::Bs2DsPiBkg_withTimeRes() : 
-	// Observables
-	  timeName	( "time" )
-
 	// Physics parameters
-	, lifetimeBdName	( "lifetimeBd" )
+	  lifetimeBdName	( "lifetimeBd" )
 	, timeResName	( "timeRes_DsPi_background" )
+        // Observables
+        , timeName      ( "time" )
 {
 	MakePrototypes();
 }

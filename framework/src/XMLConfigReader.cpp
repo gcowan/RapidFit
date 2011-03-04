@@ -22,6 +22,8 @@
 #include "Blinder.h"
 #include "ScanParam.h"
 
+#define DOUBLE_TOLERANCE 1E-6
+
 //Default constructor
 XMLConfigReader::XMLConfigReader() : isLoaded(false)
 {
@@ -692,7 +694,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		{
 			if ( hasMaximum && hasMinimum )
 			{
-				if ( ( maximum == 0.0 && minimum == 0.0 ) || type == "Unbounded" )
+				if ( ( (maximum - 0.0) < DOUBLE_TOLERANCE ) && ( ( (minimum - 0.0) < DOUBLE_TOLERANCE ) ) || type == "Unbounded" )
 				{
 					//Unbounded parameter
 					PhysicsParameter * p = new PhysicsParameter( ParameterName, value, type, unit );

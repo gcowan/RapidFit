@@ -15,11 +15,11 @@
 
 //Constructor
 Bs2JpsiPhiPromptBkg_withTimeRes::Bs2JpsiPhiPromptBkg_withTimeRes() : 
-	// Observables
-	  timeName	( "time" )
-	
 	// Physics parameters
-	, sigmaPrName	( "sigmaPr" )
+	  sigmaPrName	( "sigmaPr" )
+        // Observables
+        , timeName      ( "time" )
+
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with time resolution" << endl;

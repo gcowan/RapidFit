@@ -12,6 +12,8 @@
 #include "PhaseSpaceBoundary.h"
 #include <iostream>
 
+#define DOUBLE_TOLERANCE 1E-6
+
 //Default constructor
 AcceptReject::AcceptReject()
 {
@@ -62,7 +64,7 @@ int AcceptReject::GenerateData( int DataAmount )
 		{
 			//Accept/reject
 			double functionValue = generationFunction->Evaluate(testDataPoint);
-			if (functionValue == 0.0)
+			if ( (functionValue - 0.0) < DOUBLE_TOLERANCE )
 			{
 				//Will get stuck in infinite loop
 				cerr << "Function value zero" << endl;
@@ -120,5 +122,8 @@ IDataSet * AcceptReject::GetDataSet()
 //Overload in child functions to speed data generation for complex functions
 bool AcceptReject::Preselection( DataPoint * TestDataPoint, double TestValue )
 {
+	DataPoint* null_p = TestDataPoint;
+	double null_d = TestValue;
+	null_p=NULL; null_d=0;
 	return true;
 }

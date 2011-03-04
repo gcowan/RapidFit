@@ -430,8 +430,8 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 	vector<string> allNames = ToyResult->GetAllNames();
 	Float_t valueErrorPull[3];
 	vector<double> parameterValues, parameterErrors, parameterPulls;
-	TH1F * pullHistogram;
-	TNtuple * parameterNTuple;
+	TH1F * pullHistogram=NULL;
+	TNtuple * parameterNTuple=NULL;
 
 	//Plots for each observable
 	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)

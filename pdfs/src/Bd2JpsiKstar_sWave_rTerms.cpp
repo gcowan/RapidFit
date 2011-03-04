@@ -14,19 +14,21 @@
 
 //Constructor
 Bd2JpsiKstar_sWave_rTerms::Bd2JpsiKstar_sWave_rTerms() :
+         normalisationCacheValid(false)
+	, evaluationCacheValid(false)
 	// Physics parameters
-	gammaName     ( "gamma" )
+	, gammaName     ( "gamma" )
 	, deltaMName    ( "deltaM")
-	, delta_paraName( "delta_para" )
-	, delta_perpName( "delta_perp" )
+	, R_alphaName   ( "R_alpha"  )
+        , R_betaName    ( "R_beta"   )
+        , R_gammaName   ( "R_gamma"  )
 	, delta_zeroName( "delta_zero" )
-	, delta_sName( "delta_s" )
+ 	, delta_paraName( "delta_para" )
+        , delta_perpName( "delta_perp" )
 	//, Aperp_sqName  ( "Aperp_sq" )
 	//, Apara_sqName  ( "Apara_sq" )
 	//, As_sqName	( "As_sq" )
-	, R_alphaName   ( "R_alpha"  )
-	, R_betaName	( "R_beta"   )
-	, R_gammaName 	( "R_gamma"  )
+        , delta_sName( "delta_s" )
 	, angAccI1Name	( "angAccI1" )
 	, angAccI2Name	( "angAccI2" )
 	, angAccI3Name	( "angAccI3" )
@@ -47,8 +49,6 @@ Bd2JpsiKstar_sWave_rTerms::Bd2JpsiKstar_sWave_rTerms() :
 	, phiName	( "phi" )
 	, cosPsiName	( "cosPsi" )
 	, KstarFlavourName  ( "KstarFlavour" )
-	, normalisationCacheValid(false)
-, evaluationCacheValid(false)
 {
 	MakePrototypes();
 }
@@ -145,7 +145,7 @@ bool Bd2JpsiKstar_sWave_rTerms::SetPhysicsParameters( ParameterSet * NewParamete
         Apara_sq = (1.0 - R_alpha)*R_beta;                              //R_beta = 0 means Aperp_sq = 0
         Azero_sq = (1.0 - R_alpha)*(1.0 - R_beta)*R_gamma;                 //R_gamma = 0 means As_sq = 0
         As_sq = (1.0 - R_alpha)*(1.0 - R_beta)*(1.0 - R_gamma);
-        double sum = Apara_sq + Azero_sq + Aperp_sq + As_sq;
+//        double sum = Apara_sq + Azero_sq + Aperp_sq + As_sq;
         //Apara_sq = 1 - Azero_sq - Aperp_sq - As_sq;
         //cout << "Azero_sq: " << Azero_sq << " Aperp_sq: " << Aperp_sq << " As_sq: " << As_sq << " Apara_sq: " << Apara_sq << " sum: " << sum << endl;
         if (R_alpha > 1.0 || R_alpha < 0.0 || R_beta > 1.0 || R_beta < 0.0 || R_gamma > 1.0 || R_gamma < 0.0){
@@ -393,6 +393,8 @@ void Bd2JpsiKstar_sWave_rTerms::getTimeDependentAmplitudes(
 		, double & ReAzeroAs
 		)
 {
+	double null_d = AsAs;
+	null_d = 0;
 	// Quantities depending only on physics parameters can be cached
 	if ( !evaluationCacheValid )
 	{

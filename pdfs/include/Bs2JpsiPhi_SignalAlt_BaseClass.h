@@ -17,6 +17,8 @@
 #include <iostream>
 #include <cstdlib>
 
+#define DOUBLE_TOLERANCE 1E-6
+
 // Some hard code switches - 
 #define USE_LOWER_TIME_ACCEPTANCE true   // If true then lower time acceptance is used **IF* the event is ALSO marked as time biased 
 #define USE_UPPER_TIME_ACCEPTANCE false   // If true then upper time acceptance is used  
@@ -102,7 +104,7 @@ public:
 			}
 		}
 		
-		if( startSlice == -1. ) {cout << " InTimeAcceptance::configure : times in slices are screwed up " << endl ; exit(1) ;}	
+		if( (startSlice + -1. ) < DOUBLE_TOLERANCE )  {cout << " InTimeAcceptance::configure : times in slices are screwed up " << endl ; exit(1) ;}	
 		
 		return ;
 	}

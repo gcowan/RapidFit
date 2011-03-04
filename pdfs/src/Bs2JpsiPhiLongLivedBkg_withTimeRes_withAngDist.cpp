@@ -17,21 +17,21 @@
 //Constructor
 Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist() :
 
-// Observables
-	  timeName	( "time" )
-	, cosThetaName	( "cosTheta" )
-	, phiName	( "phi" )
-	, cosPsiName	( "cosPsi" )
-
 	// Physics parameters
-	, f_LL1Name	( "f_LL1" )
-	, tauLL1Name	( "tau_LL1" )
+	  tauLL1Name	( "tau_LL1" )
 	, tauLL2Name	( "tau_LL2" )
-	, timeResLL1FracName( "timeResLL1Frac" )
-	, sigmaLL1Name	( "sigma_LL1" )
-	, sigmaLL2Name	( "sigma_LL2" )
 //	, f_JpsiName	( "f_Jpsi"   )
+	, f_LL1Name      ( "f_LL1" )
+        , sigmaLL1Name  ( "sigma_LL1" )
+        , sigmaLL2Name  ( "sigma_LL2" )
+        , timeResLL1FracName( "timeResLL1Frac" )
 	, f_NoJpsiName  ( "f_NoJpsi" )
+
+// Observables
+        , timeName      ( "time" )
+        , cosThetaName  ( "cosTheta" )
+        , phiName       ( "phi" )
+        , cosPsiName    ( "cosPsi" )
 {
 	MakePrototypes();
 }
@@ -134,6 +134,8 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::buildPDFnumerator()
 
 double Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+	DataPoint* null_p = measurement;
+	null_p = NULL;
         IConstraint * timeBound = boundary->GetConstraint( timeName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {

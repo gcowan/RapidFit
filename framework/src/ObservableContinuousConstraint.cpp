@@ -9,6 +9,7 @@
 
 #include "ObservableContinuousConstraint.h"
 #include <iostream>
+#define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
 ObservableContinuousConstraint::ObservableContinuousConstraint() : minimum(0.0), maximum(0.0), unit("")
@@ -111,7 +112,7 @@ bool ObservableContinuousConstraint::CheckObservable( Observable * TestObservabl
 	}
 
 	double value = TestObservable->GetValue();
-	return (value <= maximum) && (value >= minimum);
+	return (value < (maximum + DOUBLE_TOLERANCE) ) && ( value > (minimum + DOUBLE_TOLERANCE) );
 }
 
 //Create an observable within this constraint, without specifying a random number generator

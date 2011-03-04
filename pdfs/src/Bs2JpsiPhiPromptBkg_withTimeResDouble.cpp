@@ -14,13 +14,13 @@
 
 //Constructor
 Bs2JpsiPhiPromptBkg_withTimeResDouble::Bs2JpsiPhiPromptBkg_withTimeResDouble() : 
-	// Observables
-	  timeName	( "time" )
-	
 	// Physics parameters
-	, frac_sigmaPrName	( "frac_sigmaPr" )
-	, sigmaPrName	( "sigmaPr" )
-	, sigmaPr2Name	( "sigmaPr2" )
+	  frac_sigmaPrName      ( "frac_sigmaPr" )
+        , sigmaPrName   ( "sigmaPr" )
+        , sigmaPr2Name  ( "sigmaPr2" )
+        // Observables
+        ,  timeName      ( "time" )
+
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with double time resolution" << endl;

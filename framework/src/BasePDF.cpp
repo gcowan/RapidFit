@@ -83,6 +83,8 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 double BasePDF::Normalisation(PhaseSpaceBoundary * NewBoundary)
 {
 	//Just a default value
+	PhaseSpaceBoundary* null_p = NewBoundary;
+	null_p=NULL;
 	return -1.0;
 }
 
@@ -90,6 +92,9 @@ double BasePDF::Normalisation(PhaseSpaceBoundary * NewBoundary)
 double BasePDF::Normalisation(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary)
 {
 	//Just a default value
+	DataPoint* null_p = NewDataPoint;
+	PhaseSpaceBoundary* null_p2 = NewBoundary;
+	null_p=NULL; null_p2=NULL;
 	return -1.0;
 }
 
@@ -112,6 +117,8 @@ double BasePDF::Evaluate(DataPoint * NewDataPoint)
 double BasePDF::Evaluate(DataPoint * NewDataPoint)
 {
 	//Just a default value
+	DataPoint* null_p = NewDataPoint;
+	null_p=NULL;
 	return  -1.0;
 }
 

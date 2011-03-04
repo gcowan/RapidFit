@@ -13,8 +13,10 @@
 
 //Constructor
 Bs2PhiPhi::Bs2PhiPhi() : 
+      normalisationCacheValid(false)
+    , evaluationCacheValid(false)
     // Physics parameters
-      gamma_sName     ( "gamma_s" )
+    , gamma_sName     ( "gamma_s" )
     , gamma_lName     ( "gamma_l" )
     , gamma_hName     ( "gamma_h" )
     , deltaMName      ( "deltaM")
@@ -33,8 +35,6 @@ Bs2PhiPhi::Bs2PhiPhi() :
     , tagName    ( "tag" )
     , mistagName ( "mistag" )
     //, timeres    ( "resolution" )
-    , normalisationCacheValid(false)
-    , evaluationCacheValid(false)
 {
     MakePrototypes();
     cout << "Making PhiPhi" << endl;

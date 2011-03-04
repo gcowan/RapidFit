@@ -8,6 +8,8 @@
 #include <typeinfo>
 #include "PerEventAngularAcceptance.h"
 
+#define DOUBLE_TOLERANCE 1E-6
+
 using namespace std;
 
 //Default constructor
@@ -23,6 +25,7 @@ PerEventAngularAcceptance::~PerEventAngularAcceptance()
 //Constructor with correct argument
 PerEventAngularAcceptance::PerEventAngularAcceptance( string fileName, string tupleName, string outFileName )
 {
+  string null_s = outFileName; null_s = "";
   setupNtuple( fileName, tupleName );
 
   gRandom->SetSeed(1);
@@ -253,7 +256,7 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
     p["Jpsi"] = new TLorentzVector(*p["muonminus"] + *p["muonplus"]);
     p["B"] = new TLorentzVector(*p["Jpsi"] + *p["kaon"]);
 
-    if(Bu_BKGCAT!=0) continue; 
+    if((Bu_BKGCAT-0)<DOUBLE_TOLERANCE) continue; 
     if(Bu_MM < 5200. || Bu_MM > 5360.) continue;
     if(Bu_TAU < -0.2 || Bu_TAU > 20.) continue;
 
@@ -605,7 +608,7 @@ double PerEventAngularAcceptance::cosk(TLorentzVector particle, TLorentzVector p
   double denominator = (particle3.Mag())*(zaxis.Mag());
   double temp = 2;
 
-  if(denominator!=0) temp= numerator/denominator;
+  if((denominator-0)<DOUBLE_TOLERANCE) temp= numerator/denominator;
 
   return temp;
 }
@@ -624,7 +627,7 @@ double PerEventAngularAcceptance::coshel(TLorentzVector particle, TLorentzVector
   Float_t numerator = particle3.Dot(grandparent3);
   Float_t denominator = (particle3.Mag())*(grandparent3.Mag());
   Float_t temp = 2;
-  if(denominator!=0) temp= numerator/denominator;
+  if((denominator-0)<DOUBLE_TOLERANCE) temp= numerator/denominator;
 
   return temp;
 }

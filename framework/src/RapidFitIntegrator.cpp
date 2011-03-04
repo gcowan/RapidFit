@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <cmath>
 #include <stdlib.h>
+#define DOUBLE_TOLERANCE 1E-6
 
 using namespace std;
 
@@ -286,7 +287,7 @@ double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
 			//Calculate the index
 			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 			{
-				if ( discreteValues[discreteIndex][valueIndex] == currentValue )
+				if ( ( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
 					incrementValue *= discreteValues[discreteIndex].size();

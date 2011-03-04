@@ -20,6 +20,8 @@
 #include "TFolder.h"
 #include "StringProcessing.h"
 
+#define DOUBLE_TOLERANCE 1E-6
+
 using namespace std;
 
 //Default constructor
@@ -364,13 +366,13 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 		//Calculate the index for the discrete combination, and increment the corresponding count
 		int combinationIndex = 0;
 		int incrementValue = 1;
-		for (unsigned int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		for (int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
 		{
 			double currentValue = readDataPoint->GetObservable( discreteNames[discreteIndex] )->GetValue();
 
 			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 			{
-				if ( discreteValues[discreteIndex][valueIndex] == currentValue )
+				if ( ( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
 					incrementValue *= discreteValues[discreteIndex].size();

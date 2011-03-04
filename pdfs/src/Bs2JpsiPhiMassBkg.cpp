@@ -12,6 +12,8 @@
 #include "math.h"
 #include "TMath.h"
 
+#define DOUBLE_TOLERANCE 1E-6
+
 //Constructor
 Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg() :
 	// Physics parameters
@@ -61,6 +63,8 @@ double Bs2JpsiPhiMassBkg::Evaluate(DataPoint * measurement)
 
 double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+	DataPoint* null_p = measurement;
+	null_p = NULL;
 	double mhigh, mlow ;
 
 	IConstraint * massBound = boundary->GetConstraint("mass");
@@ -78,7 +82,7 @@ double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBound
 	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
 	double integral ;
 
-	if( alphaM_pr == 0. ) {
+	if( ( alphaM_pr - 0. ) < DOUBLE_TOLERANCE ) {
 		integral = mhigh-mlow ;   // this was added by PELC to catch a divide by zero Nov-2010
 	}
 	else {

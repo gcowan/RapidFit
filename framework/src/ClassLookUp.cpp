@@ -66,6 +66,11 @@
 //Look up the name of a PDF, return an appropriate instance of IPDF
 IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters )
 {
+
+	vector<string> null_vec = PDFObservables;
+	vector<string> null_vec2 = PDFParameters;
+	while( !null_vec.empty() ) null_vec.pop_back();
+	while( !null_vec2.empty() ) null_vec2.pop_back();
 /*        if ( Name == "Bs2JpsiPhi_mistagObservable" )
         {
 	        //Default JPsiPhi

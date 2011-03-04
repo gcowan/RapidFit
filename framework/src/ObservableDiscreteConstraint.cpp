@@ -11,6 +11,8 @@
 #include <iostream>
 #include <math.h>
 
+#define DOUBLE_TOLERANCE 1E-6
+
 //Default constructor
 ObservableDiscreteConstraint::ObservableDiscreteConstraint() :  unit("Uninitialised")
 {
@@ -79,7 +81,7 @@ bool ObservableDiscreteConstraint::CheckObservable( Observable * TestObservable 
 	vector<double>::iterator valueIterator;
 	for ( valueIterator = allValues.begin(); valueIterator != allValues.end(); valueIterator++ )
 	{
-		if ( value == *valueIterator )
+		if ( ( value - *valueIterator ) < DOUBLE_TOLERANCE )
 		{
 			return true;
 		}

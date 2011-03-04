@@ -14,13 +14,13 @@
 
 //Constructor
 Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg() :
-	// Observables
-	  timeName	( "time" )
-
 	// Physics parameters
-	, tau1Name	( "tau_LL1" )
+	tau1Name	( "tau_LL1" )
 	, tau2Name	( "tau_LL2" )
 	, f_LL1Name	( "f_LL1" )
+
+        // Observables
+        , timeName      ( "time" )
 {
 	MakePrototypes();
 }
