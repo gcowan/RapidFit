@@ -59,7 +59,7 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationBounda
 
 		//Initialise Foam
 		TFoam * foamGenerator = new TFoam();
-		foamGenerator->SetkDim( continuousNames.size() );
+		foamGenerator->SetkDim( Int_t(continuousNames.size()) );
 		foamGenerator->SetPseRan(rootRandom);
 		foamGenerator->SetRho(combinationFunction);
 		foamGenerator->SetnCells(1000);
@@ -102,7 +102,7 @@ int Foam::GenerateData( int DataAmount )
 		int combinationIndex = 0;
 		int incrementValue = 1;
 		DataPoint * temporaryDataPoint = new DataPoint(allNames);
-		for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		for ( int discreteIndex = int(discreteNames.size() - 1); discreteIndex >= 0; discreteIndex-- )
 		{
 			//Create the discrete observable
 			Observable * temporaryObservable = generationBoundary->GetConstraint( discreteNames[discreteIndex] )->CreateObservable(rootRandom);
@@ -115,7 +115,7 @@ int Foam::GenerateData( int DataAmount )
 				if ( ( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
-					incrementValue *= discreteValues[discreteIndex].size();
+					incrementValue *= int(discreteValues[discreteIndex].size());
 					break;
 				}
 			}

@@ -694,7 +694,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		{
 			if ( hasMaximum && hasMinimum )
 			{
-				if ( ( (maximum - 0.0) < DOUBLE_TOLERANCE ) && ( ( (minimum - 0.0) < DOUBLE_TOLERANCE ) ) || type == "Unbounded" )
+				if ( ( ( (maximum - 0.0) < DOUBLE_TOLERANCE ) && ( ( (minimum - 0.0) < DOUBLE_TOLERANCE ) ) ) || type == "Unbounded" )
 				{
 					//Unbounded parameter
 					PhysicsParameter * p = new PhysicsParameter( ParameterName, value, type, unit );

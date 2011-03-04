@@ -96,8 +96,8 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); eventIndex++ )
 	{
 		//Calculate the sWeight
-		double numerator = ( matrixElements.first * signalValues[eventIndex] ) + ( matrixElements.second * backgroundValues[eventIndex] );
-		double denominator = ( numberSignalEvents * signalValues[eventIndex] ) + ( numberBackgroundEvents * backgroundValues[eventIndex] );
+		double numerator = double( ( matrixElements.first * signalValues[eventIndex] ) + ( matrixElements.second * backgroundValues[eventIndex] ) );
+		double denominator = double( ( double(numberSignalEvents) * signalValues[eventIndex] ) + ( double(numberBackgroundEvents) * backgroundValues[eventIndex] ) );
 		
 		//Make the new data point
 		DataPoint * currentEvent = InputData->GetDataPoint(eventIndex);
@@ -160,7 +160,7 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long Numbe
 		saveBackgroundValues.push_back(backgroundValue);
 
 		//Do the matrix calculations
-		double sqrtDenominator = ( NumberSignal * signalValue ) + ( NumberBackground * backgroundValue );
+		double sqrtDenominator = ( double(NumberSignal) * signalValue ) + ( double(NumberBackground) * backgroundValue );
 		signalSignal += ( signalValue * signalValue ) / ( sqrtDenominator * sqrtDenominator );
 		signalBackground += ( signalValue * backgroundValue ) / ( sqrtDenominator * sqrtDenominator );
 		backgroundBackground += ( backgroundValue * backgroundValue ) / ( sqrtDenominator * sqrtDenominator );

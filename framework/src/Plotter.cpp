@@ -107,7 +107,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	EdStyle * greigFormat = new EdStyle();
 	greigFormat->SetStyle();
         gStyle->SetMarkerStyle(15);
-        gStyle->SetMarkerSize(0.8);
+        gStyle->SetMarkerSize(Size_t(0.8));
 	//Get the data needed to make the histogram
 	double maximum, minimum;
 	int binNumber;
@@ -123,7 +123,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		observableWeights = GetStatistics( weightName, dum1, dum2, idum );
 		double sumWeights =0;
 		for( unsigned int iw=0;iw<observableWeights.size();iw++) sumWeights+=observableWeights[iw];
-		normalisationFactor = sumWeights/observableWeights.size() ;
+		normalisationFactor = sumWeights/double(observableWeights.size()) ;
 	}
 	
 	//Make the histogram
@@ -182,7 +182,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 		{
 			//Projection graph
-			projectionValueArray[pointIndex] = ratioOfIntegrals * projectionValueVector[pointIndex] * binInterval * observableValues.size() / projectionIntegral;
+			projectionValueArray[pointIndex] = ratioOfIntegrals * projectionValueVector[pointIndex] * binInterval * double(observableValues.size()) / projectionIntegral;
 			observableValueArray[pointIndex] = minimum + ( plotInterval * pointIndex );
 
 			//Data average
@@ -206,7 +206,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	double observableValueArray[plotNumber];
 	for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 	{
-		projectionValueArray[pointIndex] = ratioOfIntegrals * dataAverageProjection[pointIndex] * binInterval * observableValues.size() / averageIntegral;
+		projectionValueArray[pointIndex] = ratioOfIntegrals * dataAverageProjection[pointIndex] * binInterval * double(observableValues.size()) / averageIntegral;
 		observableValueArray[pointIndex] = minimum + ( plotInterval * pointIndex );
 	}
 	MakePlotCanvas( ObservableName, "", dataHistogram, observableValueArray, projectionValueArray, plotNumber );
@@ -220,7 +220,7 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 	EdStyle * greigFormat = new EdStyle();
 	greigFormat->SetStyle();
 	gStyle->SetMarkerStyle(15);
-        gStyle->SetMarkerSize(0.8);
+        gStyle->SetMarkerSize(Size_t(0.8));
 	TMultiGraph * graph = new TMultiGraph();
 	TGraphErrors * projectionGraph = new TGraphErrors( PlotNumber, ProjectionXValues, ProjectionYValues );
 	graph->Add(projectionGraph);
@@ -366,7 +366,7 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 		//Calculate the index for the discrete combination, and increment the corresponding count
 		int combinationIndex = 0;
 		int incrementValue = 1;
-		for (int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		for (int discreteIndex = int(discreteNames.size() - 1); discreteIndex >= 0; discreteIndex-- )
 		{
 			double currentValue = readDataPoint->GetObservable( discreteNames[discreteIndex] )->GetValue();
 
@@ -375,7 +375,7 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 				if ( ( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
-					incrementValue *= discreteValues[discreteIndex].size();
+					incrementValue *= int(discreteValues[discreteIndex].size());
 					break;
 				}
 			}

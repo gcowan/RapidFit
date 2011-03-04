@@ -56,15 +56,15 @@ void EdStyle::SetStyle()
 	//gStyle->SetFillColor(0);
 
 	// set the paper & margin sizes
-	gStyle->SetPaperSize(20,26);
-	gStyle->SetPadTopMargin(0.05);
-	gStyle->SetPadRightMargin(0.05); // increase for colz plots!!
-	gStyle->SetPadBottomMargin(0.16);
-	gStyle->SetPadLeftMargin(0.14);
+	gStyle->SetPaperSize(Float_t(20),Float_t(26));
+	gStyle->SetPadTopMargin(Float_t(0.05));
+	gStyle->SetPadRightMargin(Float_t(0.05)); // increase for colz plots!!
+	gStyle->SetPadBottomMargin(Float_t(0.16));
+	gStyle->SetPadLeftMargin(Float_t(0.14));
 
 	// use large fonts
-	gStyle->SetTextFont(lhcbFont);
-	gStyle->SetTextSize(0.08);
+	gStyle->SetTextFont(Font_t(lhcbFont));
+	gStyle->SetTextSize(Float_t(0.08));
 	gStyle->SetLabelFont(lhcbFont,"x");
 	gStyle->SetLabelFont(lhcbFont,"y");
 	gStyle->SetLabelFont(lhcbFont,"z");

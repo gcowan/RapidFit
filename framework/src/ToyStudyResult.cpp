@@ -192,7 +192,7 @@ vector<double> ToyStudyResult::GetParameterPulls( string ParameterName )
 //Allow access to the vector of results
 int ToyStudyResult::NumberResults()
 {
-	return allResults.size();
+	return int(allResults.size());
 }
 FitResult * ToyStudyResult::GetFitResult( int Index )
 {

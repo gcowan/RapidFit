@@ -62,7 +62,7 @@ void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
 		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 		{
 			DataPoint * temporaryDataPoint = OutputData->GetDataPoint(dataIndex);
-			observables[nameIndex] = temporaryDataPoint->GetObservable( allNames[nameIndex] )->GetValue();
+			observables[nameIndex] = Float_t(temporaryDataPoint->GetObservable( allNames[nameIndex] )->GetValue());
 			//delete temporaryDataPoint;
 		}
 
@@ -131,8 +131,8 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 			}
 
 			//Make the graph
-			TGraphErrors * contourGraph = new TGraphErrors( sigmaContour.size(), xCoordinates, yCoordinates );
-			contourGraph->SetFillColor( colours[sigma-1] );
+			TGraphErrors * contourGraph = new TGraphErrors( int(sigmaContour.size()), xCoordinates, yCoordinates );
+			contourGraph->SetFillColor( Color_t(colours[sigma-1]) );
 			graph->Add(contourGraph);
 		}
 
@@ -457,9 +457,9 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 		//Plot the results
 		for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); resultIndex++ )
 		{
-			valueErrorPull[0] = parameterValues[resultIndex];
-			valueErrorPull[1] = parameterErrors[resultIndex];
-			valueErrorPull[2] = parameterPulls[resultIndex];
+			valueErrorPull[0] = Float_t(parameterValues[resultIndex]);
+			valueErrorPull[1] = Float_t(parameterErrors[resultIndex]);
+			valueErrorPull[2] = Float_t(parameterPulls[resultIndex]);
 
 			parameterNTuple->Fill(valueErrorPull);
 
@@ -486,9 +486,9 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 	Float_t timeCPUStatus[3];
 	for (unsigned int timeIndex = 0; timeIndex < allRealTimes.size(); timeIndex++ )
 	{
-		timeCPUStatus[0] = allRealTimes[timeIndex];
-		timeCPUStatus[1] = allCPUTimes[timeIndex];
-		timeCPUStatus[2] = ToyResult->GetFitResult(timeIndex)->GetFitStatus();
+		timeCPUStatus[0] = Float_t(allRealTimes[timeIndex]);
+		timeCPUStatus[1] = Float_t(allCPUTimes[timeIndex]);
+		timeCPUStatus[2] = Float_t(ToyResult->GetFitResult(timeIndex)->GetFitStatus());
 
 		fitInfoNTuple->Fill( timeCPUStatus );
 	}
@@ -509,7 +509,7 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 	TFile * LLscanFile = new TFile( filename.c_str(), "RECREATE");
 
 	//Set some numbers
-	int nscans = scanResults.size() ;
+	int nscans = int(scanResults.size());
 
 	//Make a canvas for all the plots
 	TCanvas cv ;
@@ -544,7 +544,7 @@ void ResultFormatter::MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, s
 	TFile * LLcontourFile = new TFile( filename.c_str(), "RECREATE");
 
 	//Set some numbers
-	int nscans = scanResults.size() ;
+	int nscans = int(scanResults.size());
 
 	for( int ii=0; ii<nscans; ii++ )
 	{

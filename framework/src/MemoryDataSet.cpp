@@ -59,7 +59,7 @@ DataPoint * MemoryDataSet::GetDataPoint(  int Index )
 //Get the number of data points in the set
 int MemoryDataSet::GetDataNumber()
 {
-	return allData.size();
+	return int(allData.size());
 }
 
 //Get the data bound

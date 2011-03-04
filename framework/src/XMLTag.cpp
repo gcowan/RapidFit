@@ -86,7 +86,7 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 		else
 		{
 			//Everything before the tag goes into value
-			vector<string> newValue = SplitContent( Content, lineNumber, linePosition, tagName.size() + 2 );
+			vector<string> newValue = SplitContent( Content, lineNumber, linePosition, int(tagName.size() + 2) );
 			StringProcessing::RemoveWhiteSpace(newValue);
 			for ( unsigned int contentIndex = 0; contentIndex < newValue.size(); contentIndex++ )
 			{
@@ -232,7 +232,7 @@ vector<string> XMLTag::FindTagContent( string TagName, vector<string> & Content 
 	}
 
 	//Split off the tag content
-	return SplitContent( Content, closeLines[splitIndex], closePositions[splitIndex], TagName.size() + 3 );
+	return SplitContent( Content, closeLines[splitIndex], closePositions[splitIndex], int(TagName.size() + 3) );
 }
 
 //Split a vector string about the specified place
