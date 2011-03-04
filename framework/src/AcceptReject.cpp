@@ -64,7 +64,7 @@ int AcceptReject::GenerateData( int DataAmount )
 		{
 			//Accept/reject
 			double functionValue = generationFunction->Evaluate(testDataPoint);
-			if ( (functionValue - 0.0) < DOUBLE_TOLERANCE )
+			if ( fabs(functionValue - 0.0) < DOUBLE_TOLERANCE )
 			{
 				//Will get stuck in infinite loop
 				cerr << "Function value zero" << endl;

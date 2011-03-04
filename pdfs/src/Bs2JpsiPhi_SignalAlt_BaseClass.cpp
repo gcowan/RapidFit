@@ -133,7 +133,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::q() const { return tag ;}
 
 bool Bs2JpsiPhi_SignalAlt_BaseClass::useLowerTimeAcceptance() const { return (USE_LOWER_TIME_ACCEPTANCE && (timeAcceptanceCategory > 0)) ; }
 
-bool Bs2JpsiPhi_SignalAlt_BaseClass::useUpperTimeAcceptance() const { return (USE_UPPER_TIME_ACCEPTANCE && ( (UPPER_TIME_ACCEPTANCE_FACTOR - 0) < DOUBLE_TOLERANCE) ) ; }
+bool Bs2JpsiPhi_SignalAlt_BaseClass::useUpperTimeAcceptance() const { return (USE_UPPER_TIME_ACCEPTANCE && ( fabs(UPPER_TIME_ACCEPTANCE_FACTOR - 0) < DOUBLE_TOLERANCE) ) ; }
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::upperTimeAcceptanceBeta() const { return UPPER_TIME_ACCEPTANCE_FACTOR ; }
 

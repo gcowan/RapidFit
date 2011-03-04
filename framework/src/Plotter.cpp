@@ -372,7 +372,7 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 
 			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 			{
-				if ( ( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
+				if ( fabs( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
 					incrementValue *= int(discreteValues[discreteIndex].size());

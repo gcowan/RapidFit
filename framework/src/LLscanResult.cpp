@@ -52,7 +52,7 @@ LLscanResult::LLscanResult( string _parameterName, vector<double> _parameterValu
 	//Create llvalues_offset (i.e. offset to the minimum )
 	for(unsigned int i=0; i < llvalues.size(); i++ )
 	{		
-		if( ( llvalues[i] - LLSCAN_FIT_FAILURE_VALUE ) < DOUBLE_TOLERANCE ) {
+		if( fabs( llvalues[i] - LLSCAN_FIT_FAILURE_VALUE ) < DOUBLE_TOLERANCE ) {
 			llvalues_offset.push_back( 0. ) ;
 		}
 		else

@@ -53,7 +53,7 @@ double FoamIntegrator::Integral( DataPoint * InputPoint, PhaseSpaceBoundary * In
 		//Calculate the index
 		for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 		{
-			if ( (discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
+			if ( fabs(discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 			{
 				combinationIndex += ( incrementValue * valueIndex );
 				incrementValue *= discreteValues[discreteIndex].size();

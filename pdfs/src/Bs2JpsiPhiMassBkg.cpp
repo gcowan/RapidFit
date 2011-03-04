@@ -82,7 +82,7 @@ double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBound
 	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
 	double integral ;
 
-	if( ( alphaM_pr - 0. ) < DOUBLE_TOLERANCE ) {
+	if( fabs( alphaM_pr - 0. ) < DOUBLE_TOLERANCE ) {
 		integral = mhigh-mlow ;   // this was added by PELC to catch a divide by zero Nov-2010
 	}
 	else {

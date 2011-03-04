@@ -226,7 +226,7 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 
 			for (unsigned int valueIndex = 0; valueIndex < DiscreteValues[discreteIndex].size(); valueIndex++ )
 			{
-				if ( ( DiscreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
+				if ( fabs( DiscreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
 					incrementValue *= DiscreteValues[discreteIndex].size();

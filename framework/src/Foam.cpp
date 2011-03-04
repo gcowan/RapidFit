@@ -112,7 +112,7 @@ int Foam::GenerateData( int DataAmount )
 			//Calculate the index
 			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
 			{
-				if ( ( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
+				if ( fabs( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
 					incrementValue *= int(discreteValues[discreteIndex].size());
