@@ -1,5 +1,6 @@
 #include "FoamIntegrator.h"
 #include "StatisticsFunctions.h"
+#include <math.h>
 
 #define DOUBLE_TOLERANCE 1E-6
 

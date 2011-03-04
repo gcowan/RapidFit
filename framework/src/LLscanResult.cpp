@@ -11,6 +11,7 @@
 #include <iomanip>
 
 #include <cstdlib>
+#include <math.h>
 
 #include "LLscanResult.h"
 #include <TGraph.h>

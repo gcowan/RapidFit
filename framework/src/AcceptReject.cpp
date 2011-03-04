@@ -11,6 +11,7 @@
 #include "AcceptReject.h"
 #include "PhaseSpaceBoundary.h"
 #include <iostream>
+#include <math.h>
 
 #define DOUBLE_TOLERANCE 1E-6
 

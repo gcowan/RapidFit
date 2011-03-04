@@ -11,6 +11,7 @@
 #include "Foam.h"
 #include "StatisticsFunctions.h"
 #include <iostream>
+#include <math.h>
 #define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor

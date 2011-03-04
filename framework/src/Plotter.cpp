@@ -12,6 +12,7 @@
 #include "EdStyle.h"
 #include <iostream>
 #include <sstream>
+#include <math.h>
 #include "TFile.h"
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"

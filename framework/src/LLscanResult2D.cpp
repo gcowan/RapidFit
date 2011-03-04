@@ -9,6 +9,7 @@
 #include <iomanip>
 
 #include <cstdlib>
+#include <math.h>
 
 #include "LLscanResult2D.h"
 #include <TFrame.h>
