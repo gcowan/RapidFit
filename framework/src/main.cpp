@@ -351,16 +351,28 @@ int main( int argc, char * argv[] )
 			}
 			else if ( currentArgument == "--defineScan" )
 			{
-				defineScanFlag = true;
-				Scan_X.push_back( argv[argumentIndex] );
+				if ( argumentIndex + 1 < argc )
+				{
+					defineScanFlag = true;
+					Scan_X.push_back( argv[argumentIndex] );
+				} else {
+					cerr << "Scan Not Correctly Formatted" <<endl;
+					return 1;
+				}
 			}
 			else if ( currentArgument == "--defineContour" )
 			{
-				defineContourFlag = true;
-				argumentIndex++;
-				Contour_X.push_back( argv[argumentIndex] );
-				argumentIndex++;
-				Contour_Y.push_back( argv[argumentIndex] );
+				if ( argumentIndex + 2 < argc )
+				{
+					defineContourFlag = true;
+					argumentIndex++;
+					Contour_X.push_back( argv[argumentIndex] );
+					argumentIndex++;
+					Contour_Y.push_back( argv[argumentIndex] );
+				} else {
+					cerr << "Contour Not Correctly Formatted" << endl;
+					return 1;
+				}
 			}
 			else if ( currentArgument == "--SetSeed" )
 			{
@@ -571,7 +583,7 @@ int main( int argc, char * argv[] )
 			}
 
 			//Pick a toy study if there are repeats, or if pull plots are wanted
-			if ( numberRepeats > 1 || doPullsFlag )
+			if ( ( ( numberRepeats > 1 ) && ( !doFC_Flag ) ) || doPullsFlag )
 			{
 				//Do the toy study
 				ToyStudy newStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), numberRepeats );
@@ -683,12 +695,12 @@ int main( int argc, char * argv[] )
 				if( doFC_Flag )
 				{
 					vector<ToyStudyResult*> AllResults;
-					vector<ToyStudyResult*> AllCleanResults;
-					vector<ToyStudyResult*> AllCleanResults2;
+//					vector<ToyStudyResult*> AllCleanResults;
+//					vector<ToyStudyResult*> AllCleanResults2;
 					for( int iFC=0; iFC < _2DResultForFC->NumberResults(); iFC++ )
 					{
 
-						//		GET INPUT
+						//		GET INPUT Data from fit Results
 						//
 						//  Get a ParameterSet that contains the input parameters from the output of a fit
 					  	vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
@@ -700,80 +712,240 @@ int main( int argc, char * argv[] )
 						double lim1 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name1 )->GetValue();
 						double lim2 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name2 )->GetValue();
 						InputParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+						InputParamSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
 						InputParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-
+						InputParamSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+						ParameterSet* ControlParamSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+						ControlParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+						ControlParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
 						ParameterSet* InputFreeSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
 						InputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+						InputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
 						InputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+						InputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
 
 						//  Use the inputs from Canonical Step 2
 						//ParameterSet* InputParamSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
 						//ParameterSet* InputFreeSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
 
-						//  Just for clarity
-						//  also: there's a hungut with a bug somewehere in generating InputParamSey
+						//	Just for clarity
+						//	also when using values from Step1 these are not set correctly for the study
 						InputParamSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
 						InputParamSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
-						InputFreeSet->GetPhysicsParameter( name1 )->SetType("Free");
-						InputFreeSet->GetPhysicsParameter( name2 )->SetType("Free");
+						InputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
+						InputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
 
-						//  Use Previsiously gotten values to allow run-time customisation to correctly apply
+
+
+						//	Collect all of the relevent Data from the XML
+						//	Note: most of these had to be written for FCscans
 						MinimiserConfiguration * ToyStudyMinimiser = theMinimiser;
 						FitFunctionConfiguration* ToyStudyFunction = theFunction;
-						
-						// !!!!!LEAVING THIS EMPTY CAUSES ME SERIOUS CONCERN AS I DO NOT KNOW WHAT THIS DOES BUT I DO SEE SWEIGHT CODE RELATED TO THESE OBJECTS!!!!!
-						vector< IPrecalculator* > ToyPrecalculator;
-
-						IPDF *PDF_from_XML = pdfsAndData[0]->GetPDF();
-						vector<PhaseSpaceBoundary*> PhaseSpaceForToys = xmlFile->GetPhaseSpaceBoundary();
+						vector<vector<IPrecalculator*> > ToyPrecalculators = xmlFile->GetPrecalculators();
+						vector<PhaseSpaceBoundary*> PhaseSpaceForToys = xmlFile->GetPhaseSpaceBoundaries();
 						vector<ConstraintFunction*> ConstraintsForToys = xmlFile->GetConstraints();
 
-						//  This requires some intelligence for sWeights
-						int EventsinToys = 1E3;
+						//	Read the number of events from the existing DataSets
+						//	I think there needs be an equivalent function drafted to use sWeights
+						vector<unsigned int> EventsPerPDF;
+						for( unsigned int pdf_num=0; pdf_num < pdfsAndData.size(); pdf_num++ )
+						{
+							EventsPerPDF.push_back( pdfsAndData[pdf_num]->GetDataSet()->GetDataNumber() );
+						}
+
+
+
+						//		Number of datasets wanted i.e. Number of Toys
+						int wanted_number_of_toys = 100;
+						if( numberRepeatsFlag ) wanted_number_of_toys = numberRepeats;
+
+
 
 						//		GENERATE DATA
-						//  We want to now generate a new DataSet for a Toy Study
-						//  I choose a Foam DataSet with no Cuts
-						vector<DataSetConfiguration*> DataSetForToys;
-						vector<string> empty_args; vector<string> empty_arg_names;
-						DataSetConfiguration* Toy_Foam_DataSet= new DataSetConfiguration( "Foam", EventsinToys, "", empty_args, empty_arg_names, PDF_from_XML );
-						//  Set the Input Physics Parameters to be as defined above
-						Toy_Foam_DataSet->SetPhysicsParameters( InputParamSet );
-						//  Generate the Data for this Study using the given PhaseSpace and PDF
-//						Toy_Foam_DataSet->MakeDataSet( PhaseSpaceForToys[0], PDF_from_XML );
-						DataSetForToys.push_back( Toy_Foam_DataSet );
-
-						//		ASSEMBLE PARAMETERS FOR TOY STUDY
+						//	We want to now generate a new DataSet for a Toy Study
+						//	I choose a Foam DataSet with no Cuts or extra arguments as these are not required
+						//
+						//	Generate Once, Fit twice
+						//		This was a bit of a pain to code up.
+						//		Although I like the idea of coding it up into a GenerateToyData object
 						vector<PDFWithData*> PDFsWithDataForToys;
-						PDFWithData* ToyPDFWithData = new PDFWithData( PDF_from_XML, PhaseSpaceForToys[0], DataSetForToys, ToyPrecalculator );
-						ToyPDFWithData->SetPhysicsParameters( InputParamSet );
-						PDFsWithDataForToys.push_back( ToyPDFWithData );
+						vector<vector<IDataSet*> > Memory_Data;
+						Memory_Data.resize( pdfsAndData.size() );
 
-						//  The number of toys this may be intelligently altered
-						int NumberOfToys = 1E2;
-						int TOY_STUDY_SEED = int( 1E3 * pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() );
+						//	We may have multiple PDFs in the XML
+						for( unsigned short int pdf_num=0; pdf_num < pdfsAndData.size(); pdf_num++ )
+						{
+							//	Generate the Data for this Study using the given the XML PhaseSpace and PDF
+							IPDF* PDF_from_XML = pdfsAndData[pdf_num]->GetPDF();
 
+							//	Create a DataSetConfiguration to make the datasets
+							vector<string> empty_args;
+							vector<string> empty_arg_names;
+							DataSetConfiguration* Toy_Foam_DataSet= new DataSetConfiguration( "Foam", EventsPerPDF[pdf_num], "", empty_args, empty_arg_names, PDF_from_XML );
+							//	Set the Input Physics Parameters to be as defined above ControlSet
+							//	This is to seperate changing bottles for Physics from that used at Generation
+							//	as we want the data to have a wider scope than 1 fit with the data
+							Toy_Foam_DataSet->SetPhysicsParameters( ControlParamSet );
+
+
+							cout << "\n\n\t\tCACHING DATA FOR TOYS, THIS WILL LIKELY TAKE A LONG TIME!\n\n" <<endl;
+							cout << "Caching Data for: " << wanted_number_of_toys << " toys."<<endl;
+							for( short int dataset_num=0; dataset_num < wanted_number_of_toys; dataset_num++ )
+							{
+								//	Make the data
+								cout << "Making Data...\t";
+								//	...I can't seem to workout why these outputs are not linear
+								//	even without compiler optimisations this code is a single for loop?...
+								IDataSet* new_dataset = Toy_Foam_DataSet->MakeDataSet( PhaseSpaceForToys[pdf_num], PDF_from_XML );
+								//	Store the Data Object in Memory
+								Memory_Data[pdf_num].push_back( new_dataset );
+								cout << "Cached PDF: " << pdf_num << " DataSet: " << dataset_num <<"\t";
+							}
+							cout << endl;
+
+							//	Store the information for each PDFWithData
+							vector<DataSetConfiguration*> DataSetConfigForToys;
+							DataSetConfigForToys.push_back( Toy_Foam_DataSet );
+							PDFWithData* ToyPDFWithData = new PDFWithData( PDF_from_XML, PhaseSpaceForToys[pdf_num], DataSetConfigForToys, ToyPrecalculators[pdf_num] );
+
+							//	Store this PDFWithData
+							ToyPDFWithData->SetPhysicsParameters( InputParamSet );
+							PDFsWithDataForToys.push_back( ToyPDFWithData );
+						}
+
+						//		Result Vectors for the Fit for clarity and Output Formatting
+						ToyStudyResult* study1Results = new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+						ToyStudyResult* study2Results = new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+
+
+						//	Try to make minuit as quiet as possible here... does someone have a way to gag it's output?!?
 						ToyStudyMinimiser->GetMinimiser( InputParamSet->GetAllNames().size() )->SetOutputLevel(-1);
+
+
+						//		Perform Fits
+						//	This will record ONLY Data from working fits i.e. FitStatus==3
+						for( unsigned short int dataset_num=0; dataset_num < Memory_Data[0].size(); dataset_num++ )
+						{
+							
+							FitResult* fit1Result = NULL;
+							FitResult* fit2Result = NULL;
+							bool toy_failed = false;
+
+
+							//	Assuming Nuisence Parameters set to Global Minima
+							//	We need to set this for EVERY FIT in order to have correct generation/pull values
+							ParameterSet* LocalInputFreeSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+							LocalInputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+							LocalInputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+							LocalInputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+							LocalInputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+							LocalInputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
+							LocalInputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
+							ParameterSet* LocalInputFixedSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+							LocalInputFixedSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+							LocalInputFixedSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+							LocalInputFixedSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+							LocalInputFixedSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+							LocalInputFixedSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+							LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+
+							//	Assuming Nuisence Parameters set to Local Minima
+							//
+							//ParameterSet* LocalInputFreeSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
+							//LocalInputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+							//LocalInputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+							//LocalInputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
+							//LocalInputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
+							//ParameterSet* LocalInputFixedSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
+							//LocalInputFixedSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+							//LocalInputFixedSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+							//LocalInputFixedSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+							//LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+
+
+							//	We need to set some factors before we perform the fit
+							for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+							{
+								vector<IDataSet*> wanted_set;
+								wanted_set.push_back( Memory_Data[pdf_num][dataset_num] );
+								PDFsWithDataForToys[pdf_num]->AddCachedData( wanted_set );
+								PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFreeSet );
+							}
+
+							//	Fit once with control parameters Free
+							fit1Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFreeSet, PDFsWithDataForToys, ConstraintsForToys );
+
+							//	Only Fit again to this dataset if it fits well with +2 dof
+							//	This has the obvious savings in CPU resources
+							if( fit1Result->GetFitStatus() == 3 )
+							{
+								//  Fit second with control parameters Fixed
+								for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+								{
+									vector<IDataSet*> wanted_set;
+									wanted_set.push_back( Memory_Data[pdf_num][dataset_num] );
+									PDFsWithDataForToys[pdf_num]->AddCachedData( wanted_set );
+									PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFixedSet );
+								}
+
+								fit2Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFixedSet, PDFsWithDataForToys, ConstraintsForToys );
+
+								//	If either Fit Failed we want to dump the results and run an extra Fit.
+								if( fit2Result->GetFitStatus() != 3 ) toy_failed = true;
+							} else {
+								toy_failed = true;
+							}
+
+							//	Do we want to store the Data OR run another toy to get a better Fit
+							if( toy_failed )
+							{
+								cerr << "\n\n\t\tA Toy Study Failed... Requesting More Data for another pass." << endl;
+								for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+								{
+									cerr << "Adding More Data for pdf: " << pdf_num << "\t";
+									PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( ControlParamSet );
+									IDataSet* new_dataset = PDFsWithDataForToys[pdf_num]->GetDataSetConfig()->MakeDataSet( PhaseSpaceForToys[pdf_num], PDFsWithDataForToys[pdf_num]->GetPDF() );
+									Memory_Data[pdf_num].push_back( new_dataset );
+								}
+							} else {
+								study1Results->AddFitResult( fit1Result );
+								study2Results->AddFitResult( fit2Result );
+							}
+						}
+						
+						//  The number of toys this may be intelligently altered
+//						int NumberOfToys = 1E2;
+//						int TOY_STUDY_SEED = int( 1E3 * pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() );
 
 						//			STEP 6
 						//
 						
+						
+						//ToyStudyResult* study1Results = study1->GetToyStudyResult();
+						//ToyStudyResult* study2Results = study2->GetToyStudyResult();
+
+						
 						//		RUN TOY STUDY WITH CONTROL PARAMETERS FREE
 						//		This is more unstable and is used to get the required number of toys needed for comparrison
-						ToyPDFWithData->SetPhysicsParameters( InputFreeSet );
-						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
-						cout << "\n\tSECOND RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
-						ToyStudy* study2 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputFreeSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
-						study2->DoWholeStudy( true );
+						//		For a standard FC the failiure here has been witnessed to be 50%+
+//						ToyPDFWithData->SetPhysicsParameters( InputFreeSet );
+//						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
+						//		Output the first Random Number after Setting the seed for checking if the data is screwwy
+//						cout << "\n\tSECOND RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
+//						ToyStudy* study2 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputFreeSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
+//						study2->DoWholeStudy( true );
 						
 						//		RUN TOY STUDY WITH CONTROL PARAMETERS FIXED
 						//		This is by definition more stable and as such the required number of toys is simply such
 						//		that the 100 working toys from the free case have a 1to1 comparrison
-						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
-						NumberOfToys = study2->GetToyStudyResult()->NumberResults();
-						cout << "\n\tFIRST RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
-						ToyStudy* study1 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputParamSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
-						study1->DoWholeStudy( true );		//  Passing true to this function now requires that the number of wanted successful toys be met
+						//		This has not yet been observed to fail for jobs where the above fit converged,
+						//		Hence I will not give it the freedom to extend it's toy list
+//						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
+						//		Output the first Random Number after Setting the seed for checking if the data is screwwy
+//						NumberOfToys = study2Results->NumberResults();
+//						cout << "\n\tFIRST RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
+//						ToyStudy* study1 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputParamSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
+//						study1->DoWholeStudy( false );		//  Passing true to this function now requires that the number of wanted successful toys be met
 
 
 
@@ -785,61 +957,62 @@ int main( int argc, char * argv[] )
 						ThisStudy->AddRealTimes( _2DResultForFC->GetAllRealTimes() );
 						AllResults.push_back( GlobalFitResult );
 						AllResults.push_back( ThisStudy );
-						AllResults.push_back( study1->GetToyStudyResult() );
-						AllResults.push_back( study2->GetToyStudyResult() );
+						AllResults.push_back( study1Results );
+						AllResults.push_back( study2Results );
 
-						//		Cleaned Output
-						AllCleanResults.push_back( GlobalFitResult );
-						AllCleanResults.push_back( ThisStudy );
-						ToyStudyResult* CleanResults1= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
-						ToyStudyResult* CleanResults2= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
-						for( int toy_i=0; toy_i < NumberOfToys; toy_i++ )
-						{
-							if( study1->GetToyStudyResult()->GetFitResult( toy_i )->GetFitStatus() == 3 )
-							{
-								CleanResults1->AddFitResult( study1->GetToyStudyResult()->GetFitResult( toy_i ), false );
-								CleanResults1->AddCPUTime( study1->GetToyStudyResult()->GetCPUTime( toy_i ) );
-								CleanResults1->AddRealTime( study1->GetToyStudyResult()->GetRealTime( toy_i ) );
-								CleanResults2->AddFitResult( study2->GetToyStudyResult()->GetFitResult( toy_i ), false );
-								CleanResults2->AddCPUTime( study2->GetToyStudyResult()->GetCPUTime( toy_i ) );
-								CleanResults2->AddRealTime( study2->GetToyStudyResult()->GetRealTime( toy_i ) );
-							}
-						}
-						AllCleanResults.push_back( CleanResults1 );
-						AllCleanResults.push_back( CleanResults2 );
-
-						//		Cleaned Output
-						AllCleanResults2.push_back( GlobalFitResult );
-						AllCleanResults2.push_back( ThisStudy );
-						ToyStudyResult* CleanResults1b= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
-						ToyStudyResult* CleanResults2b= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
-						unsigned short int count=0;
-						for( int toy_i=0; (toy_i < NumberOfToys) && count < 100; toy_i++ )
-						{
-							if( study1->GetToyStudyResult()->GetFitResult( toy_i )->GetFitStatus() > 0 )
-							{
-								CleanResults1b->AddFitResult( study1->GetToyStudyResult()->GetFitResult( toy_i) , false );
-								CleanResults1b->AddCPUTime( study1->GetToyStudyResult()->GetCPUTime( toy_i ) );
-								CleanResults1b->AddRealTime( study1->GetToyStudyResult()->GetRealTime( toy_i ) );
-								CleanResults2b->AddFitResult( study2->GetToyStudyResult()->GetFitResult( toy_i), false );
-								CleanResults2b->AddCPUTime( study2->GetToyStudyResult()->GetCPUTime( toy_i ) );
-								CleanResults2b->AddRealTime( study2->GetToyStudyResult()->GetRealTime( toy_i ) );
-								count++;
-							}
-						}
-						AllCleanResults2.push_back( CleanResults1b );
-						AllCleanResults2.push_back( CleanResults2b );
-
+//						//		Cleaned Output
+//						AllCleanResults.push_back( GlobalFitResult );
+//						AllCleanResults.push_back( ThisStudy );
+//						ToyStudyResult* CleanResults1= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+//						ToyStudyResult* CleanResults2= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+//
+//						for( int toy_i=0; toy_i < study1Results->NumberResults(); toy_i++ )
+//						{
+//							if( study1Results->GetFitResult( toy_i )->GetFitStatus() == 3 )
+//							{
+//								CleanResults1->AddFitResult( study1Results->GetFitResult( toy_i ), false );
+//								CleanResults1->AddCPUTime( study1Results->GetCPUTime( toy_i ) );
+//								CleanResults1->AddRealTime( study1Results->GetRealTime( toy_i ) );
+//								CleanResults2->AddFitResult( study2Results->GetFitResult( toy_i ), false );
+//								CleanResults2->AddCPUTime( study2Results->GetCPUTime( toy_i ) );
+//								CleanResults2->AddRealTime( study2Results->GetRealTime( toy_i ) );
+//							}
+//						}
+//						AllCleanResults.push_back( CleanResults1 );
+//						AllCleanResults.push_back( CleanResults2 );
+//
+//						//		Cleaned Output
+//						AllCleanResults2.push_back( GlobalFitResult );
+//						AllCleanResults2.push_back( ThisStudy );
+//						ToyStudyResult* CleanResults1b= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+//						ToyStudyResult* CleanResults2b= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
+//						unsigned short int count=0;
+//						for( int toy_i=0; ( toy_i < study1Results->NumberResults() ) && count < 100; toy_i++ )
+//						{
+//							if( study1Results->GetFitResult( toy_i )->GetFitStatus() > 0 )
+//							{
+//								CleanResults1b->AddFitResult( study1Results->GetFitResult( toy_i) , false );
+//								CleanResults1b->AddCPUTime( study1Results->GetCPUTime( toy_i ) );
+//								CleanResults1b->AddRealTime( study1Results->GetRealTime( toy_i ) );
+//								CleanResults2b->AddFitResult( study2Results->GetFitResult( toy_i), false );
+//								CleanResults2b->AddCPUTime( study2Results->GetCPUTime( toy_i ) );
+//								CleanResults2b->AddRealTime( study2Results->GetRealTime( toy_i ) );
+//								count++;
+//							}
+//						}
+//						AllCleanResults2.push_back( CleanResults1b );
+//						AllCleanResults2.push_back( CleanResults2b );
+//
 					}
 
 					//		STORE THE OUTPUT OF THE TOY STUDIES
 					ToyStudyResult* AllFlatResult = new ToyStudyResult( AllResults );
 					ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFlatResult );
-					//		STORE THE OUTPUT OF THE TOY STUDIES
-					ToyStudyResult* AllCleanFlatResult = new ToyStudyResult( AllCleanResults );
-					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_3.root", AllCleanFlatResult );					//		STORE THE OUTPUT OF THE TOY STUDIES
-					ToyStudyResult* AllCleanFlatResult2 = new ToyStudyResult( AllCleanResults2 );
-					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_first_100_gt_0.root", AllCleanFlatResult2 );
+//					//		STORE THE OUTPUT OF THE TOY STUDIES
+//					ToyStudyResult* AllCleanFlatResult = new ToyStudyResult( AllCleanResults );
+//					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_3.root", AllCleanFlatResult );					//		STORE THE OUTPUT OF THE TOY STUDIES
+//					ToyStudyResult* AllCleanFlatResult2 = new ToyStudyResult( AllCleanResults2 );
+//					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_first_100_gt_0.root", AllCleanFlatResult2 );
 
 				}
 				  

@@ -227,6 +227,11 @@ double PhysicsParameter::GetOriginalValue()
 	return originalValue;
 }
 
+void PhysicsParameter::ForceOriginalValue( double new_original_value )
+{
+	originalValue = new_original_value;
+}
+
 //Get the unit
 string PhysicsParameter::GetUnit()
 {

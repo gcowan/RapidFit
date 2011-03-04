@@ -37,7 +37,8 @@ class XMLConfigReader
 		OutputConfiguration * GetOutputConfiguration();
 		vector< PDFWithData* > GetPDFsAndData();
 		vector< ConstraintFunction* > GetConstraints();
-		vector<PhaseSpaceBoundary*> GetPhaseSpaceBoundary();
+		vector<PhaseSpaceBoundary*> GetPhaseSpaceBoundaries();
+		vector<vector<IPrecalculator*> > GetPrecalculators();
 		int GetNumberRepeats();
 		bool IsLoaded();
 

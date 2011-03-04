@@ -111,7 +111,7 @@ bool ObservableContinuousConstraint::CheckObservable( Observable * TestObservabl
 	}
 
 	double value = TestObservable->GetValue();
-	return (value < maximum) && (value > minimum);
+	return (value <= maximum) && (value >= minimum);
 }
 
 //Create an observable within this constraint, without specifying a random number generator

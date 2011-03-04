@@ -24,9 +24,11 @@ class PDFWithData
 		PDFWithData( IPDF*, PhaseSpaceBoundary*, vector< DataSetConfiguration* >, vector< IPrecalculator* > );
 		~PDFWithData();
 
+		void AddCachedData( vector<IDataSet*> );
 		bool SetPhysicsParameters( ParameterSet* );
 		IPDF * GetPDF();
 		IDataSet * GetDataSet();
+		DataSetConfiguration* GetDataSetConfig();
 
 	private:
 		IPDF * fitPDF;
@@ -34,6 +36,7 @@ class PDFWithData
 		bool parametersAreSet;
 		vector< IPrecalculator* > dataProcessors;
 		vector< DataSetConfiguration* > dataSetMakers;
+		vector<IDataSet*> cached_data;
 };
 
 #endif

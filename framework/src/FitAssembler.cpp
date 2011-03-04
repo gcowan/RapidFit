@@ -48,7 +48,9 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	for ( unsigned int resultIndex = 0; resultIndex < BottleData.size(); resultIndex++ )
 	{
 		BottleData[resultIndex]->SetPhysicsParameters(BottleParameters);
-		bottle->AddResult( BottleData[resultIndex]->GetPDF(), BottleData[resultIndex]->GetDataSet() );
+		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
+		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
+		bottle->AddResult( Requested_PDF, Requested_DataSet );
 	}
 
 	//Add the constraints
@@ -97,6 +99,10 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	}
 }
 
+void FitAssembler::ShakeBottle( ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, unsigned int some_number )
+{
+	// To be written in a 'safe' way
+}
 //  Perform a safer fit which is gauranteed to return something which you can use :D
 FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
 {
@@ -108,17 +114,21 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 	}
 
 
-	bool fit_try_failed=false;
+	bool fit_fail_status=false;
 	FitResult* ReturnableFitResult;
 	//  Try to fit 5 times and then abort
-	for( unsigned short int i=0; i<=4; i++ )
+	for( unsigned short int i=0; i<=0; i++ )
 	{
 		//  Left in for correctness
-		fit_try_failed = false;
+		fit_fail_status = false;
 
 		try{
 			// Try a Fit, it it converges, continue to elsewhere in the program
 			ReturnableFitResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
+			if( ReturnableFitResult->GetFitStatus() != 3 )
+			{
+				cerr << "\n\n\t\tFit Did NOT Converge Correctly, CHECK YOUR RESULTS!\n\n";
+			}
 			return ReturnableFitResult;
 		}
 		//  If it didn't fit tell the user why!
@@ -127,29 +137,19 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 				cerr << "\nCaught exception : fit failed for these parameters..." << endl;  }
 			else if ( e == 13 ){
 				cerr << "\nIntegration Error: Fit Failed..." << endl;  }
-				fit_try_failed = true;
+			fit_fail_status = true;
 		} catch (...) {
                         cerr << "\n\n\n\t\t\tCaught Unknown Exception, THIS IS SERIOUS!!!\n\n\n" << endl;
-			fit_try_failed = true;
+			fit_fail_status = true;
 		}
 		cerr << "Fit Did Not converge, shaking the bottle and starting again!" <<endl;
 		cerr << "This is Retry " << i+1 << "of 4"<<endl;
 		//  Give the physics bottle a bit of a shake and see if it works this time
-		for( unsigned short int j=0; j < other_params.size(); j++ )
-		{
-			double old_max = BottleParameters->GetPhysicsParameter(other_params[j])->GetMaximum();
-			double old_min = BottleParameters->GetPhysicsParameter(other_params[j])->GetMaximum();
-			double range = old_max - old_min;
-			double random_num = BottleData[0]->GetPDF()->GetRandomFunction()->Rndm();
-			double new_num = range*random_num;
-			if( random_num < 1E-6 )	new_num=random_num*i;
-			BottleParameters->GetPhysicsParameter(other_params[j])->SetBlindedValue( new_num );
-		}
-
+		//ShakeBottle( BottleParameters, BottleData, (i+5) );
 	}
 
 	//  If the fit failed 5 times I will simply return a dummy fit result full of zerod objects. It is up to the user to watch for and remove these
-	if( fit_try_failed ){
+	if( fit_fail_status ){
 		cerr << "Nothing more I'm willing to do, considering a Fit here a lost cause..." <<endl;
 
 		for( unsigned short int j=0; j < other_params.size(); j++ )

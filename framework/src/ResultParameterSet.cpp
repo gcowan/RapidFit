@@ -40,7 +40,7 @@ vector<string> ResultParameterSet::GetAllNames()
 }
 
 //Retrieve a physics parameter by its name
-ResultParameter * ResultParameterSet::GetResultParameter(string Name)
+ResultParameter * ResultParameterSet::GetResultParameter( string Name )
 {
 	//Check if the name is stored in the map
 	for ( unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)

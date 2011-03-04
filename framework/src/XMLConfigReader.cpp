@@ -187,10 +187,6 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			{
 				projections.push_back( outputComponents[childIndex]->GetValue()[0] );
 			}
-//			else if ( outputComponents[childIndex]->GetName() == "LLscan" )
-//			{
-//				LLscanList.push_back( outputComponents[childIndex]->GetValue()[0] );
-//			}
 			else if ( outputComponents[childIndex]->GetName() == "DoPullPlots" )
 			{
 				pullType = outputComponents[childIndex]->GetValue()[0];
@@ -917,7 +913,7 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 //  I don't want to add bloat and store the PhaseSpaceBoudaries as the file is loaded,
 //  this just leads to storing lots of not wanted data within this class
 //  I try to make use of the structure correctly
-vector<PhaseSpaceBoundary*> XMLConfigReader::GetPhaseSpaceBoundary()
+vector<PhaseSpaceBoundary*> XMLConfigReader::GetPhaseSpaceBoundaries()
 {
 	vector< PhaseSpaceBoundary* > PhaseSpaceBoundary_vec;
 	//Find the ParameterSets
@@ -1267,6 +1263,55 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 
 	returnable_pdf->SetRandomFunction( GetSeed() );
 	return returnable_pdf;
+}
+
+//  Return the Precalculators defined in the XML
+//  I don't want to add bloat and store the Precalculators as the file is loaded,
+//  this just leads to storing lots of not wanted data within this class
+//  I try to make use of the structure correctly
+vector<vector<IPrecalculator*> > XMLConfigReader::GetPrecalculators()
+{
+  	vector<vector<IPrecalculator*> > IPrecalculator_vec;
+	//Find the ParameterSets
+	vector< XMLTag* > toFits;
+	//  Children Defined globally on initialization!
+	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	{
+		if ( children[childIndex]->GetName() == "ToFit" )
+		{
+			toFits.push_back( children[childIndex] );
+		}
+	}
+	//  Loop over all of the fits
+	for ( unsigned short int fitnum=0; fitnum < toFits.size(); fitnum++ )
+	{
+		vector<XMLTag*> allChildren = toFits[fitnum]->GetChildren();
+		for( unsigned short int Childnum=0; Childnum < allChildren.size(); Childnum++ )
+		{
+			if( allChildren[Childnum]->GetName() == "DataSet" )
+			{
+				vector<IPrecalculator*> IPrecalculator_local_vec;
+				vector<XMLTag*> allFitDataSets = allChildren[Childnum]->GetChildren();
+				PhaseSpaceBoundary * dataBoundary=NULL;
+				bool boundaryFound=false;
+				for( unsigned short int DataSetNum=0; DataSetNum < allFitDataSets.size(); DataSetNum++ )
+				{
+					if( allFitDataSets[DataSetNum]->GetName() == "PhaseSpaceBoundary" )
+					{
+						boundaryFound = true;
+						dataBoundary = GetPhaseSpaceBoundary( allFitDataSets[DataSetNum] );
+					}
+					else if( ( allFitDataSets[DataSetNum]->GetName() == "Precalculator" ) && boundaryFound )
+					{
+						IPrecalculator_local_vec.push_back( MakePrecalculator( allFitDataSets[DataSetNum], dataBoundary ) );
+					}
+				}
+				IPrecalculator_vec.push_back( IPrecalculator_local_vec );
+			}
+			
+		}
+	}
+	return IPrecalculator_vec;
 }
 
 //Make a precalculator for a data set

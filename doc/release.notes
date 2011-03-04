@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/04 Rob Currie
+   - Re-Written a LOT of the FC code and it is now very accessible from the command line
+   - Some minor bugfixes
+
 2011/03/02 Pete Clarke
    - Added second long lived background PDF   Bs2JpsiPhiLongLivedBkg_II
 

@@ -44,19 +44,40 @@ IPDF * PDFWithData::GetPDF()
 	return fitPDF;
 }
 
+void PDFWithData::AddCachedData( vector<IDataSet*> input_cache )
+{
+	for( unsigned short int element=0; element < input_cache.size(); element++ )
+	{
+		cached_data.push_back( input_cache[element] );
+	}
+}
+
+DataSetConfiguration* PDFWithData::GetDataSetConfig()
+{
+	return dataSetMakers[0];
+}
+
 //Return the data set associated with the PDF
 IDataSet * PDFWithData::GetDataSet()
 {
 	//Combine all data sources
-	IDataSet * newDataSet = dataSetMakers[0]->MakeDataSet( inputBoundary, fitPDF );
-	for (unsigned int sourceIndex = 1; sourceIndex < dataSetMakers.size(); sourceIndex++ )
+	IDataSet * newDataSet=NULL;
+	
+	if( cached_data.empty() )
 	{
-		IDataSet * extraData = dataSetMakers[sourceIndex]->MakeDataSet( inputBoundary, fitPDF );
-		for (int dataIndex = 0; dataIndex < extraData->GetDataNumber(); dataIndex++ )
+		newDataSet = dataSetMakers[0]->MakeDataSet( inputBoundary, fitPDF );
+		for (unsigned int sourceIndex = 1; sourceIndex < dataSetMakers.size(); sourceIndex++ )
 		{
-			newDataSet->AddDataPoint( extraData->GetDataPoint(dataIndex) );
+			IDataSet * extraData = dataSetMakers[sourceIndex]->MakeDataSet( inputBoundary, fitPDF );
+			for (int dataIndex = 0; dataIndex < extraData->GetDataNumber(); dataIndex++ )
+			{
+				newDataSet->AddDataPoint( extraData->GetDataPoint(dataIndex) );
+			}
+			delete extraData;
 		}
-		delete extraData;
+	} else {
+		newDataSet = cached_data.back();
+		cached_data.pop_back();
 	}
 
 	//Precalculation, if required

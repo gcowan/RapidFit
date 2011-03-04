@@ -44,6 +44,7 @@ class PhysicsParameter
 		void SetType(string);
 
 		double GetOriginalValue();
+		void ForceOriginalValue( double );
 		string GetUnit();
 	
 		void print() ;

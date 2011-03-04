@@ -20,9 +20,11 @@ ENDIF( INSOURCE )
 #  -O3 optimizations
 #SET( CMAKE_BUILD_TYPE Release )
 #  -O2 optimizations and -g
-SET( CMAKE_BUILD_TYPE Debug )
+#SET( CMAKE_BUILD_TYPE Debug )
 
-SET(CMAKE_CXX_FLAGS "-Wall" )
+SET( CMAKE_CXX_FLAGS_RELEASE "" )
+
+SET( CMAKE_CXX_FLAGS "-Wall -g" )
 
 #  Get back the old style verbosity :) by setting this to 1
 SET( CMAKE_VERBOSE_MAKEFILE 1 )
@@ -139,8 +141,8 @@ TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter-static.C )
 TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 
-#ADD_EXECUTABLE( plot_try ${PROJECT_SOURCE_DIR}/utils/src/plot_try.C )
-#TARGET_LINK_LIBRARIES( plot_try ${ROOT_LIBRARIES} )
+ADD_EXECUTABLE( new ${PROJECT_SOURCE_DIR}/utils/src/new.cpp )
+TARGET_LINK_LIBRARIES( new ${ROOT_LIBRARIES} )
 
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone
