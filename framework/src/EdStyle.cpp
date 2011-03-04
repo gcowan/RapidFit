@@ -41,8 +41,8 @@ void EdStyle::SetStyle()
 	// use helvetica-bold-r-normal, precision 2 (rotatable)
 	Int_t lhcbFont = 62;
 	// line thickness
-//	Width_t lhcbWidth = 2; //Width_t is a SHORT INT, not a double
-	Double_t lhcbWidth = 1.75;
+	Width_t lhcbWidth = 2; //Width_t is a SHORT INT, not a double
+	//Double_t lhcbWidth = 1.75;
 
 	// use plain black on white colors
 	gStyle->SetFrameBorderMode(0);

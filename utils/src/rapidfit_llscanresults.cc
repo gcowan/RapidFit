@@ -158,8 +158,8 @@ int main(int argc, char *argv[]){
 
 	output->cd();
 	nllhist->SetTitle("");
-	nllhist->GetXaxis()->SetTitle(param1string);
-	nllhist->GetYaxis()->SetTitle(param2string);
+	nllhist->GetXaxis()->SetTitle(param2string);
+	nllhist->GetYaxis()->SetTitle(param1string);
 	nllhist->Write();
 
 	TCanvas *tempCanvas = new TCanvas("temperature plot", "temperature plot",2048,1536);
