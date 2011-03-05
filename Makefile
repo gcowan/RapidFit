@@ -93,11 +93,17 @@ $(EXEDIR)/rapidfit_toyresults: $(OBJDIR)/rapidfit_toyresults.o
 $(OBJDIR)/rapidfit_toyresults.o: $(UTILSSRC)/rapidfit_toyresults.cc
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
+$(EXEDIR)/rapidfit_fcscanresults: $(OBJDIR)/rapidfit_fcscanresults.o
+	$(CXX) -o $@ $< $(ROOTLIBS)
+
+$(OBJDIR)/rapidfit_fcscanresults.o: $(UTILSSRC)/rapidfit_fcscanresults.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
 $(EXEDIR)/rapidfit_llscanresults: $(OBJDIR)/rapidfit_llscanresults.o
 	$(CXX) -o $@ $< $(ROOTLIBS)
 
 $(OBJDIR)/rapidfit_llscanresults.o: $(UTILSSRC)/rapidfit_llscanresults.cc
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
 	
