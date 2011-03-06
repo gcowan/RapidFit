@@ -709,7 +709,7 @@ int main( int argc, char * argv[] )
 				}
 
 
-				if( doFC_Flag && (int(_2DLLscanList.size()) > 1) )
+				if( doFC_Flag && (int(_2DResultForFC.size()) > 1) )
 				{
 					vector<ToyStudyResult*> AllResults;
 
