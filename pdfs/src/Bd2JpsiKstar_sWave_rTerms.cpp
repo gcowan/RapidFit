@@ -231,21 +231,21 @@ double Bd2JpsiKstar_sWave_rTerms::Evaluate(DataPoint * measurement)
 double Bd2JpsiKstar_sWave_rTerms::AT() const {
         if( Aperp_sq <= 0. ) return 0. ;
         else return sqrt(Aperp_sq) ;
-};
+}
 double Bd2JpsiKstar_sWave_rTerms::AP() const {
         if( Apara_sq <= 0. ) return 0. ;
         else return sqrt(Apara_sq) ;
-};
+}
 double Bd2JpsiKstar_sWave_rTerms::A0() const {
         if( Azero_sq <= 0. ) return 0. ;
         else return sqrt(Azero_sq) ;
-};
+}
 
 
 
 double Bd2JpsiKstar_sWave_rTerms::Gamma() const   {
         return gamma ;
-};
+}
 
 
 double Bd2JpsiKstar_sWave_rTerms::buildPDFnumerator()

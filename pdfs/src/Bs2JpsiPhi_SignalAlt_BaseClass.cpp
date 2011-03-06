@@ -86,19 +86,19 @@ Bs2JpsiPhi_SignalAlt_BaseClass::~Bs2JpsiPhi_SignalAlt_BaseClass()
 double Bs2JpsiPhi_SignalAlt_BaseClass::AT() const { 
 	if( Aperp_sq <= 0. ) return 0. ;
 	else return sqrt(Aperp_sq) ; 
-};
+}
 double Bs2JpsiPhi_SignalAlt_BaseClass::AP() const { 
 	if( Apara_sq <= 0. ) return 0. ;
 	else return sqrt(Apara_sq) ; 
-};
+}
 double Bs2JpsiPhi_SignalAlt_BaseClass::A0() const { 
 	if( Azero_sq <= 0. ) return 0. ;
 	else return sqrt(Azero_sq) ; 
-};
+}
 double Bs2JpsiPhi_SignalAlt_BaseClass::AS() const { 
 	if( As_sq <= 0. ) return 0. ;
 	else return sqrt(As_sq) ; 
-};
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::ctrsq() const { return (ctheta_tr*ctheta_tr) ; }
 double Bs2JpsiPhi_SignalAlt_BaseClass::strsq() const { return (1.0 - ctheta_tr*ctheta_tr) ; }
@@ -247,7 +247,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorEven(  )  const
 		cout << "   -->delta_ms  "  << delta_ms << endl ;
 	}
 	return result ;
-};
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorEvenInt(  )  const
 {
@@ -257,7 +257,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorEvenInt(  )  const
 	+ ( 1.0 - cos(phi_s) )  * intExpH()          
 	+ q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
-};
+}
 
 
 //..................................
@@ -269,7 +269,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorOdd(  )   const
 	+ ( 1.0 + cos(phi_s) ) * expH( ) 
 	- q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
-};
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorOddInt(  )  const
 {
@@ -278,23 +278,23 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorOddInt(  )  const
 	+ ( 1.0 + cos(phi_s) ) * intExpH() 
 	- q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
-};
+}
 
 
 //----------------------------------------------------------
 // These are the time factors and their analytic integrals for the three angle PDF
 
 //...........................
-double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorA0A0( )    const { return timeFactorEven( ) ; } ;      
-double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; } ;
+double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorA0A0( )    const { return timeFactorEven( ) ; }     
+double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; }
 
 //...........................
-double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorAPAP( )    const { return timeFactorEven( ) ; } ;
-double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; } ;
+double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorAPAP( )    const { return timeFactorEven( ) ; }
+double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; }
 
 //...........................
-double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorATAT( )    const { return timeFactorOdd( ) ; } ;
-double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorATATInt( ) const { return timeFactorOddInt( ) ; } ;
+double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorATAT( )    const { return timeFactorOdd( ) ; }
+double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorATATInt( ) const { return timeFactorOddInt( ) ; }
 
 //...........................
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImAPAT( ) const
@@ -305,7 +305,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImAPAT( ) const
 	- 1.0 * ( expH( ) - expL( ) ) * cos(delta1) * sin(phi_s)  ;
 	
 	return result ;
-} ;
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImAPATInt( ) const
 {
@@ -316,7 +316,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImAPATInt( ) const
 	q() * 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
 	- 1.0 * ( intExpH() - intExpL() ) * cos(delta1) * sin(phi_s) ;	    
 	return result ;
-} ;
+}
 
 
 //...........................
@@ -325,13 +325,13 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorReA0AP( )  const
 	//if( t < 0.0 ) return 0.0 ;
 	double result = cos(delta2-delta1) * this->timeFactorEven(  ) ;
 	return result ;
-} ;
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorReA0APInt( ) const
 {
 	double result = cos(delta2-delta1) * this->timeFactorEvenInt( ) ;
 	return result ;
-} ;
+}
 
 
 //...........................
@@ -342,7 +342,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImA0AT(  ) const
 	q() * 2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)	
 	-1.0 * ( expH( ) - expL( ) ) * cos(delta2) * sin(phi_s) ;
 	return result ;
-} ;
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImA0ATInt( ) const
 {
@@ -353,13 +353,13 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImA0ATInt( ) const
 	q() * 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cos(phi_s)*intExpSin()  ) * (1.0 - 2.0*tagFraction)
 	-1.0 * ( intExpH() - intExpL()  ) * cos(delta2) * sin(phi_s) ;
 	return result ;
-} ;
+}
 
 //.... S wave additions.......
 
 //...........................
-double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorASAS( )    const { return timeFactorOdd( ) ; } ;
-double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorASASInt( ) const { return timeFactorOddInt( ) ; } ;
+double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorASAS( )    const { return timeFactorOdd( ) ; }
+double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorASASInt( ) const { return timeFactorOddInt( ) ; }
 
 
 //...........................
@@ -373,7 +373,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorReASAP( ) const
 	- 1.0 * ( expH( ) - expL( ) ) * sin(delta) * sin(phi_s)  ;
 	
 	return result ;
-} ;
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorReASAPInt( ) const
 {
@@ -386,7 +386,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorReASAPInt( ) const
 	q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
 	- 1.0 * ( intExpH() - intExpL() ) * sin(delta) * sin(phi_s) ;	    
 	return result ;
-} ;
+}
 
 
 //...........................
@@ -395,13 +395,13 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImASAT( )  const
 	//if( t < 0.0 ) return 0.0 ;
 	double result = sin(delta_perp-delta_s) * this->timeFactorOdd(  ) ;
 	return result ;
-} ;
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorImASATInt( ) const
 {
 	double result = sin(delta_perp-delta_s) * this->timeFactorOddInt( ) ;
 	return result ;
-} ;
+}
 
 
 //...........................
@@ -415,7 +415,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorReASA0( ) const
 	- 1.0 * ( expH( ) - expL( ) ) * sin(delta) * sin(phi_s)  ;
 	
 	return result ;
-} ;
+}
 
 double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorReASA0Int( ) const
 {
@@ -428,7 +428,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorReASA0Int( ) const
 	q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
 	- 1.0 * ( intExpH() - intExpL() ) * sin(delta) * sin(phi_s) ;	    
 	return result ;
-} ;
+}
 
 
 //------------------------------------------------------
@@ -442,7 +442,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorA0A0(  ) const
 	// Normalised to  1	
 	double result = 2.0 * ct1sq() * (1.0 - strsq()*cphsq() ) * (9.0/32.0/TMath::Pi());
 	return result ;	
-};
+}
 
 //...........................
 double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorAPAP(  ) const
@@ -450,7 +450,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorAPAP(  ) const
 	// Normalised to  1
 	double result =  st1sq() * (1.0 - strsq()*sphsq() ) * (9.0/32.0/TMath::Pi());
 	return result ;	
-};
+}
 
 //...........................
 double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorATAT(  ) const
@@ -459,7 +459,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorATAT(  ) const
 	double result = st1sq() * strsq() * (9.0/32.0/TMath::Pi());
 	return result ;
 	
-};
+}
 
 //...........................
 double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorImAPAT(  ) const
@@ -468,7 +468,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorImAPAT(  ) const
 	double theta_tr = acos(ctheta_tr) ;		
 	double result =   -1.0 *  st1sq() * sin(2.0*theta_tr) * sin(phi_tr) * (9.0/32.0/TMath::Pi()) ;
 	return result ;	
-};
+}
 
 //...........................
 double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorReA0AP( ) const
@@ -477,7 +477,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorReA0AP( ) const
 	double theta_1 = acos(ctheta_1) ;	
 	double result =    sin(2.0*theta_1) * strsq() * sin(2.0*phi_tr) / sqrt(2.0) * (9.0/32.0/TMath::Pi());
 	return result ;	
-};
+}
 
 //...........................
 double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorImA0AT(  ) const
@@ -487,7 +487,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorImA0AT(  ) const
 	double theta_1 = acos(ctheta_1) ;		
 	double result =  +1.0*   sin(2.0*theta_1) * sin(2.0*theta_tr) * cos(phi_tr) / sqrt(2.0) * (9.0/32.0/TMath::Pi());
 	return result ;	
-};
+}
 
 //......  S wave additions ....
 
@@ -496,7 +496,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorASAS(  ) const
 {
 	double result =  (1.0 - strsq()*cphsq() ) * (2./3.) * (9.0/32.0/TMath::Pi());
 	return result ;	
-};
+}
 
 //...........................
 double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorReASAP(  ) const
@@ -504,7 +504,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorReASAP(  ) const
 	double stheta_1 =  sqrt(st1sq());		
 	double result =   strsq() * stheta_1 * sin(2.0*phi_tr) * (sqrt(6.)/3.) * (9.0/32.0/TMath::Pi()) ;
 	return result ;	
-};
+}
 
 //...........................
 double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorImASAT(  ) const
@@ -513,7 +513,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorImASAT(  ) const
 	double stheta_1 =  sqrt(st1sq());		
 	double result = -1.0 *  sin(2.0*theta_tr) * stheta_1 * cos(phi_tr) * (sqrt(6.)/3.) * (9.0/32.0/TMath::Pi()) ;
 	return result ;
-};
+}
 
 
 //...........................
@@ -521,6 +521,6 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::angleFactorReASA0(  ) const
 {
 	double result = -1.0 *  ( 1.0 -  strsq()* cphsq() ) * ctheta_1 *  (4.0*sqrt(3.)/3.) * (9.0/32.0/TMath::Pi()) ;
 	return result ;	
-};
+}
 	
 

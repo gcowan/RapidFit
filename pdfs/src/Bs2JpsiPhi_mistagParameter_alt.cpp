@@ -328,22 +328,22 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 //Internal helper functions
 
 //Amplitudes Used in one angle PDF
-double Bs2JpsiPhi_mistagParameter_alt::AoAo() const  { return Rt; };
-double Bs2JpsiPhi_mistagParameter_alt::AeAe() const { return 1-Rt ; };
+double Bs2JpsiPhi_mistagParameter_alt::AoAo() const  { return Rt; }
+double Bs2JpsiPhi_mistagParameter_alt::AeAe() const { return 1-Rt ; }
 
 //Amplitudes Used in three angle PDF
 double Bs2JpsiPhi_mistagParameter_alt::AT() const { 
 	if( Aperp_sq <= 0. ) return 0. ;
 	else return sqrt(Aperp_sq) ; 
-};
+}
 double Bs2JpsiPhi_mistagParameter_alt::AP() const { 
 	if( Apara_sq <= 0. ) return 0. ;
 	else return sqrt(Apara_sq) ; 
-};
+}
 double Bs2JpsiPhi_mistagParameter_alt::A0() const { 
 	if( Azero_sq <= 0. ) return 0. ;
 	else return sqrt(Azero_sq) ; 
-};
+}
 
 double Bs2JpsiPhi_mistagParameter_alt::ctrsq() const { return (ctheta_tr*ctheta_tr) ; }
 double Bs2JpsiPhi_mistagParameter_alt::strsq() const { return (1.0 - ctheta_tr*ctheta_tr) ; }
@@ -445,7 +445,7 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorEven(  )  const
 	+ ( 1.0 - cos(phi_s) ) * expH( )
 	+ q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
-};
+}
 
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorEvenInt(  )  const
 {
@@ -455,7 +455,7 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorEvenInt(  )  const
 	+ ( 1.0 - cos(phi_s) )  * intExpH()
 	+ q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
-};
+}
 
 
 //..................................
@@ -467,7 +467,7 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorOdd(  )   const
 	+ ( 1.0 + cos(phi_s) ) * expH( )
 	- q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
-};
+}
 
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorOddInt(  )  const
 {
@@ -476,23 +476,23 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorOddInt(  )  const
 	+ ( 1.0 + cos(phi_s) ) * intExpH()
 	- q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
 	return result ;
-};
+}
 
 
 //----------------------------------------------------------
 // These are the time factors and their analytic integrals for the three angle PDF
 
 //...........................
-double Bs2JpsiPhi_mistagParameter_alt::timeFactorA0A0( )    const { return timeFactorEven( ) ; } ;
-double Bs2JpsiPhi_mistagParameter_alt::timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorA0A0( )    const { return timeFactorEven( ) ; } 
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; } 
 
 //...........................
-double Bs2JpsiPhi_mistagParameter_alt::timeFactorAPAP( )    const { return timeFactorEven( ) ; } ;
-double Bs2JpsiPhi_mistagParameter_alt::timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorAPAP( )    const { return timeFactorEven( ) ; } 
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; } 
 
 //...........................
-double Bs2JpsiPhi_mistagParameter_alt::timeFactorATAT( )    const { return timeFactorOdd( ) ; } ;
-double Bs2JpsiPhi_mistagParameter_alt::timeFactorATATInt( ) const { return timeFactorOddInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorATAT( )    const { return timeFactorOdd( ) ; } 
+double Bs2JpsiPhi_mistagParameter_alt::timeFactorATATInt( ) const { return timeFactorOddInt( ) ; } 
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorReA0AP( )  const
@@ -500,13 +500,13 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorReA0AP( )  const
 	//if( t < 0.0 ) return 0.0 ;
 	double result = cos(delta2-delta1) * this->timeFactorEven(  ) ;
 	return result ;
-} ;
+} 
 
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorReA0APInt( ) const
 {
 	double result = cos(delta2-delta1) * this->timeFactorEvenInt( ) ;
 	return result ;
-} ;
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorImAPAT( ) const
@@ -517,7 +517,7 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorImAPAT( ) const
 	- 1.0 * ( expH( ) - expL( ) ) * cos(delta1) * sin(phi_s)  ;
 
 	return result ;
-} ;
+}
 
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorImAPATInt( ) const
 {
@@ -528,7 +528,7 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorImAPATInt( ) const
 	q() * 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
 	- 1.0 * ( intExpH() - intExpL() ) * cos(delta1) * sin(phi_s) ;
 	return result ;
-} ;
+}
 
 
 //...........................
@@ -539,7 +539,7 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorImA0AT(  ) const
 	q() * 2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)
 	-1.0 * ( expH( ) - expL( ) ) * cos(delta2) * sin(phi_s) ;
 	return result ;
-} ;
+}
 
 double Bs2JpsiPhi_mistagParameter_alt::timeFactorImA0ATInt( ) const
 {
@@ -550,7 +550,7 @@ double Bs2JpsiPhi_mistagParameter_alt::timeFactorImA0ATInt( ) const
 	q() * 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cos(phi_s)*intExpSin()  ) * (1.0 - 2.0*tagFraction)
 	-1.0 * ( intExpH() - intExpL()  ) * cos(delta2) * sin(phi_s) ;
 	return result ;
-} ;
+}
 
 
 //------------------------------------------------------
@@ -562,7 +562,7 @@ double Bs2JpsiPhi_mistagParameter_alt::angleFactorEven(  )  const
 	// Note that this is normalised to 1
 	double result = 3.0/8.0 * (1.0 + ctrsq() ) ;
 	return result ;
-};
+}
 
 //.................................
 double Bs2JpsiPhi_mistagParameter_alt::angleFactorOdd(  )   const
@@ -570,7 +570,7 @@ double Bs2JpsiPhi_mistagParameter_alt::angleFactorOdd(  )   const
 	// Note that this is normalised to 1
 	double result = 3.0/4.0 * (1.0 - ctrsq() ) ;
 	return result ;
-};
+}
 
 
 //------------------------------------------------------
@@ -583,7 +583,7 @@ double Bs2JpsiPhi_mistagParameter_alt::angleFactorA0A0(  ) const
 	// Normalised to  1
 	double result = 2.0 * ct1sq() * (1.0 - strsq()*cphsq() ) * (9.0/32.0/TMath::Pi());
 	return result ;
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_alt::angleFactorAPAP(  ) const
@@ -591,7 +591,7 @@ double Bs2JpsiPhi_mistagParameter_alt::angleFactorAPAP(  ) const
 	// Normalised to  1
 	double result =  st1sq() * (1.0 - strsq()*sphsq() ) * (9.0/32.0/TMath::Pi());
 	return result ;
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_alt::angleFactorATAT(  ) const
@@ -600,7 +600,7 @@ double Bs2JpsiPhi_mistagParameter_alt::angleFactorATAT(  ) const
 	double result = st1sq() * strsq() * (9.0/32.0/TMath::Pi());
 	return result ;
 
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_alt::angleFactorReA0AP( ) const
@@ -609,7 +609,7 @@ double Bs2JpsiPhi_mistagParameter_alt::angleFactorReA0AP( ) const
 	double theta_1 = acos(ctheta_1) ;
 	double result =    sin(2.0*theta_1) * strsq() * sin(2.0*phi_tr) / sqrt(2.0) * (9.0/32.0/TMath::Pi());
 	return result ;
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_alt::angleFactorImAPAT(  ) const
@@ -618,7 +618,7 @@ double Bs2JpsiPhi_mistagParameter_alt::angleFactorImAPAT(  ) const
 	double theta_tr = acos(ctheta_tr) ;
 	double result =   -1.0 *  st1sq() * sin(2.0*theta_tr) * sin(phi_tr) * (9.0/32.0/TMath::Pi()) ;
 	return result ;
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_alt::angleFactorImA0AT(  ) const
@@ -628,7 +628,7 @@ double Bs2JpsiPhi_mistagParameter_alt::angleFactorImA0AT(  ) const
 	double theta_1 = acos(ctheta_1) ;
 	double result =  +1.0*   sin(2.0*theta_1) * sin(2.0*theta_tr) * cos(phi_tr) / sqrt(2.0) * (9.0/32.0/TMath::Pi());
 	return result ;
-};
+}
 
 
 //-------------------------------------------------------------
@@ -649,7 +649,7 @@ double Bs2JpsiPhi_mistagParameter_alt::diffXsec(  )  const
 	0.5 * A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) ;
 
 	return xsec ;
-};
+}
 
 double  Bs2JpsiPhi_mistagParameter_alt::diffXsecOne(  ) const
 {
@@ -657,7 +657,7 @@ double  Bs2JpsiPhi_mistagParameter_alt::diffXsecOne(  ) const
 	0.5 * AeAe() * timeFactorEven(  ) * angleFactorEven(  )  +
 	0.5 * AoAo() * timeFactorOdd(  )  * angleFactorOdd(  ) ;
 	return result ;
-};
+}
 
 //...................................
 // Integral over all variables: t + angles
@@ -676,7 +676,7 @@ double Bs2JpsiPhi_mistagParameter_alt::diffXsecNorm1(  ) const
 	0.5 * A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 ;
 	// In the canonical PDF, the ApAt term is number 4!
 	return norm ;
-};
+}
 
 //  13.432', '14.151', '14.210
 double Bs2JpsiPhi_mistagParameter_alt::diffXsecOneNorm1(  ) const
@@ -685,7 +685,7 @@ double Bs2JpsiPhi_mistagParameter_alt::diffXsecOneNorm1(  ) const
 	0.5 * AeAe() * timeFactorEvenInt(  )  +    // Angle factors normalised to 1
 	0.5 * AoAo() * timeFactorOddInt(  )   ;
 	return norm ;
-};
+}
 
 
 //...................................
@@ -699,7 +699,7 @@ double Bs2JpsiPhi_mistagParameter_alt::diffXsecNorm2(  ) const
 	0.5 * AT()*AT() * timeFactorATAT(  ) ;
 
 	return norm ;
-};
+}
 
 double Bs2JpsiPhi_mistagParameter_alt::diffXsecOneNorm2(  ) const
 {
@@ -707,6 +707,6 @@ double Bs2JpsiPhi_mistagParameter_alt::diffXsecOneNorm2(  ) const
 	0.5 * AeAe() * timeFactorEven(  )  +     // Angle factors normalised to 1
 	0.5 * AoAo() * timeFactorOdd(  )   ;
 	return norm ;
-};
+}
 
 

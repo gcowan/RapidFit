@@ -92,7 +92,7 @@ IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary,
 			{
 				dataGenerator = ClassLookUp::LookUpDataGenerator( source, DataBoundary, FitPDF );
 			}
-			dataGenerator->GenerateData(numberEvents);
+			dataGenerator->GenerateData( int(numberEvents) );
 			newDataSet = dataGenerator->GetDataSet();
 			delete dataGenerator;
 		}
@@ -163,7 +163,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 {
 	MemoryDataSet * data = new MemoryDataSet(DataBoundary);
 	std::vector<string> observableNames = DataBoundary->GetAllNames();
-	int numberOfObservables = observableNames.size();
+	int numberOfObservables = int(observableNames.size());
 
 	TFile * inputFile = new TFile( fileName.c_str(), "READ" );
 	TNtuple * ntuple = (TNtuple*)inputFile->Get( ntuplePath.c_str() );
@@ -172,9 +172,9 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		cerr << "Ntuple not found. Are you specifying the correct file and ntuple path?" << endl;
 		exit(1);
 	}
-	int totalNumberOfEvents = ntuple->GetEntries();
+	int totalNumberOfEvents = int(ntuple->GetEntries());
 	ntuple->SetEstimate(ntuple->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this many)
-	int numberOfEventsAfterCut = ntuple->Draw(">>evtList", cutString.c_str()); // apply the cut which automatically creates the evtList object
+	int numberOfEventsAfterCut = int(ntuple->Draw(">>evtList", cutString.c_str())); // apply the cut which automatically creates the evtList object
 	if ( numberOfEventsAfterCut == -1 )
 	{
 		cerr << "Please check the cut string you are using!" << endl;
@@ -211,7 +211,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	//  This now simply reads all the data in a few fast requests which removes the slowest part of startup
 	//  This could probably be done with branches and loops but this is gauranteed to be quick as it's used behind the scenes by TBrowser
 	//  (why this has to be so hard with root I will never know...)
-	for ( short int obsIndex = 0; obsIndex < numberOfObservables; obsIndex=obsIndex+3 )
+	for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex=obsIndex+3 )
 	{
 		//  Hold the Data in a temp object
 		vector<Double_t *> data_array;

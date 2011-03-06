@@ -65,16 +65,16 @@ void EdStyle::SetStyle()
 	// use large fonts
 	gStyle->SetTextFont(Font_t(lhcbFont));
 	gStyle->SetTextSize(Float_t(0.08));
-	gStyle->SetLabelFont(lhcbFont,"x");
-	gStyle->SetLabelFont(lhcbFont,"y");
-	gStyle->SetLabelFont(lhcbFont,"z");
-	gStyle->SetLabelSize(0.05,"x");
-	gStyle->SetLabelSize(0.05,"y");
-	gStyle->SetLabelSize(0.05,"z");
-	gStyle->SetTitleFont(lhcbFont);
-	gStyle->SetTitleSize(0.06,"x");
-	gStyle->SetTitleSize(0.06,"y");
-	gStyle->SetTitleSize(0.06,"z");
+	gStyle->SetLabelFont(Style_t(lhcbFont),"x");
+	gStyle->SetLabelFont(Style_t(lhcbFont),"y");
+	gStyle->SetLabelFont(Style_t(lhcbFont),"z");
+	gStyle->SetLabelSize(Float_t(0.05),"x");
+	gStyle->SetLabelSize(Float_t(0.05),"y");
+	gStyle->SetLabelSize(Float_t(0.05),"z");
+	gStyle->SetTitleFont(Style_t(lhcbFont));
+	gStyle->SetTitleSize(Float_t(0.06),"x");
+	gStyle->SetTitleSize(Float_t(0.06),"y");
+	gStyle->SetTitleSize(Float_t(0.06),"z");
 
 	// use bold lines and markers
 	gStyle->SetLineWidth(lhcbWidth);
@@ -88,7 +88,7 @@ void EdStyle::SetStyle()
 	gStyle->SetMarkerSize(1.5);
 
 	// label offsets
-	gStyle->SetLabelOffset(0.015);
+	gStyle->SetLabelOffset(Float_t(0.015));
 
 	// by default, do not display histogram decorations:
 	gStyle->SetOptStat(0);
@@ -99,12 +99,12 @@ void EdStyle::SetStyle()
 
 	// look of the statistics box:
 	gStyle->SetStatBorderSize(1);
-	gStyle->SetStatFont(lhcbFont);
-	gStyle->SetStatFontSize(0.05);
-	gStyle->SetStatX(0.9);
-	gStyle->SetStatY(0.9);
-	gStyle->SetStatW(0.25);
-	gStyle->SetStatH(0.15);
+	gStyle->SetStatFont(Style_t(lhcbFont));
+	gStyle->SetStatFontSize(Float_t(0.05));
+	gStyle->SetStatX(Float_t(0.9));
+	gStyle->SetStatY(Float_t(0.9));
+	gStyle->SetStatW(Float_t(0.25));
+	gStyle->SetStatH(Float_t(0.15));
 
 	// put tick marks on top and RHS of plots
 	gStyle->SetPadTickX(1);
@@ -185,15 +185,15 @@ void EdStyle::SetStyle()
 	*/
 
 	TText *lhcbLabel = new TText();
-	lhcbLabel->SetTextFont(lhcbFont);
+	lhcbLabel->SetTextFont(Font_t(lhcbFont));
 	lhcbLabel->SetTextColor(1);
-	lhcbLabel->SetTextSize(0.04);
+	lhcbLabel->SetTextSize(Float_t(0.04));
 	lhcbLabel->SetTextAlign(12);
 
 	TLatex *lhcbLatex = new TLatex();
-	lhcbLatex->SetTextFont(lhcbFont);
+	lhcbLatex->SetTextFont(Font_t(lhcbFont));
 	lhcbLatex->SetTextColor(1);
-	lhcbLatex->SetTextSize(0.04);
+	lhcbLatex->SetTextSize(Float_t(0.04));
 	lhcbLatex->SetTextAlign(12);
 
 	//gROOT->SetStyle("gStyle");

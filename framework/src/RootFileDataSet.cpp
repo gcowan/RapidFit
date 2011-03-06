@@ -160,12 +160,12 @@ bool RootFileDataSet::AddDataPoint( DataPoint * NewDataPoint )
 	{
 		//Make an array of the observable values
 		vector<string> observableNames = dataBoundary->GetAllNames();
-		Float_t dataPointArray[ observableNames.size() ];
+		Float_t* dataPointArray = new Float_t[ observableNames.size() ];
 		for ( unsigned short int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
 		{
 			string name = observableNames[observableIndex];
 			Observable * inputObservable = NewDataPoint->GetObservable(name);
-			dataPointArray[observableIndex] = inputObservable->GetValue();
+			dataPointArray[observableIndex] = Float_t(inputObservable->GetValue());
 		}
 
 		//Put the array into the NTuple
@@ -182,7 +182,7 @@ bool RootFileDataSet::AddDataPoint( DataPoint * NewDataPoint )
 //Return the number of data points
 int RootFileDataSet::GetDataNumber()
 {
-	return rootNTuple->GetEntries();
+	return int(rootNTuple->GetEntries());
 }
 
 //Return the phase space boundary

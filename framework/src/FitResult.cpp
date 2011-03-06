@@ -61,6 +61,11 @@ int FitResult::GetFitStatus()
 	return fitStatus;
 }
 
+void FitResult::ForceFitStatus( int input_status )
+{
+	fitStatus = input_status;
+}
+
 PhysicsBottle * FitResult::GetPhysicsBottle()
 {
 	return &fittedBottle;

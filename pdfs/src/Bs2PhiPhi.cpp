@@ -345,7 +345,7 @@ void Bs2PhiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
                         , Azero_sq, Apara_sq, Aperp_sq, delta_1, delta_2);
     
     //!! Ok, need to redo this part then
-    int Swap = 1; //Sign Swap, for K3 use -1
+//    int Swap = 1; //Sign Swap, for K3 use -1
     
     AzeroAzeroInt = 0.5 * Azero_sq * getMainIntAnswer(tlow, thigh, gamma_s, gamma_l, gamma_h, deltaMs, Phi_s, Btype,  1);
     AparaAparaInt = 0.5 * Apara_sq * getMainIntAnswer(tlow, thigh, gamma_s, gamma_l, gamma_h, deltaMs, Phi_s, Btype,  1);

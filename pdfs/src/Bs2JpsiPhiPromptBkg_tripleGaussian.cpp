@@ -14,14 +14,14 @@
 
 //Constructor
 Bs2JpsiPhiPromptBkg_tripleGaussian::Bs2JpsiPhiPromptBkg_tripleGaussian() : 
-	// Observables
-	  timeName	( "time" )	
 	// Physics parameters
-	, frac_sigmaPr1Name	( "frac_sigmaPr1" )
+	  frac_sigmaPr1Name	( "frac_sigmaPr1" )
 	, frac_sigmaPr23Name	( "frac_sigmaPr23" )
 	, sigmaPr1Name	( "sigmaPr1" )
 	, sigmaPr2Name	( "sigmaPr2" )
 	, sigmaPr3Name	( "sigmaPr3" )
+	// Observables
+	, timeName	( "time" )	
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with triple Gaussian" << endl;

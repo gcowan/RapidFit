@@ -91,8 +91,8 @@ vector<double> LLscanResult::GetLLvalues() { return llvalues_offset ; }
 //Return a graph of the llscan
 TGraph * LLscanResult::GetGraph() 
 {
-	double pvs[parameterValues.size()] ;
-	double llvs[parameterValues.size()] ;
+	double*  pvs = new double[parameterValues.size()] ;
+	double* llvs = new double[parameterValues.size()] ;
 	double llmax = 0 ;	
 	for(unsigned int i=0; i< parameterValues.size() ; i++ ){
 		pvs[i] = parameterValues[i] ;
@@ -100,7 +100,7 @@ TGraph * LLscanResult::GetGraph()
 		if( llvs[i] > llmax ) llmax = llvs[i] ;
 	}	
 
-	TGraph* gr = new TGraph( parameterValues.size(), pvs, llvs ) ;
+	TGraph* gr = new TGraph( Int_t(parameterValues.size()), pvs, llvs ) ;
 	//gr->SetTitle("LL Scan for Parameter xxx");	
 	gr->SetMarkerStyle(1);
 	gr->SetLineWidth(2);

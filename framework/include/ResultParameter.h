@@ -30,6 +30,8 @@ class ResultParameter
 		double GetMaximum();
 		string GetType();
 		string GetUnit();
+		void ForceOriginalValue( double );
+		void ForcePullValue( double );
 		PhysicsParameter* GetDummyPhysicsParameter();
 
 	private:

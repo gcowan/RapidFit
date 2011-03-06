@@ -7,12 +7,20 @@
   @date 2009-10-02
  */
 
+//  Root Headers
+#include <TString.h>
+
+//  System Headers
 #include <string>
 #include <vector>
 #include <iostream>
 #include <ctime>
 #include <sstream>
 #include <iomanip>
+#include <stdio.h>
+#include <stdlib.h>
+
+//  RapidFit Headers
 #include "Mathematics.h"
 #include "FitAssembler.h"
 #include "ToyStudy.h"
@@ -21,13 +29,9 @@
 #include "InputParsing.h"
 #include "RapidFitIntegrator.h"
 #include "Plotter.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "MakeFoam.h"
 #include "PerEventAngularAcceptance.h"
 #include "OutputConfiguration.h"
-//#include "ScanParam.h"
-#include "TString.h"
 #include "ToyStudyResult.h"
 #include "LLscanResult.h"
 #include "LLscanResult2D.h"
@@ -93,6 +97,7 @@ int main( int argc, char * argv[] )
 		bool defineScanFlag = false;
 		bool doFC_Flag = false;
 		bool UUID_Flag = false;
+		bool FC_Debug_Flag = false;
 
 		//Parse command line arguments
 		string currentArgument;
@@ -349,6 +354,10 @@ int main( int argc, char * argv[] )
 			{
 				UUID_Flag = true;
 			}
+			else if ( currentArgument == "--debugFC" )
+			{
+				FC_Debug_Flag = true;
+			}
 			else if ( currentArgument == "--defineScan" )
 			{
 				if ( argumentIndex + 1 < argc )
@@ -596,13 +605,16 @@ int main( int argc, char * argv[] )
 			}
 			else
 			{
+				//		This is re-used for FC scans and forms FC Step 1
 				cout << "\n\n\t\tStarting Fit to Find Global Minima!\n"<<endl;
 				//Do the fit to find GLOBAL MINIMA
 				ToyStudyResult* GlobalFitResult = new ToyStudyResult( argumentParameterSet->GetAllNames() );
 				GlobalFitResult->StartStopwatch();
 				FitResult * GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
+
 				GlobalFitResult->AddFitResult( GlobalResult );
 
+				cout << "\n\n\t\tFit Output:" <<endl;
 				//Output results
 				makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
 				makeOutput->OutputFitResult( GlobalResult );
@@ -635,7 +647,8 @@ int main( int argc, char * argv[] )
 					}
 				}
 
-				ToyStudyResult* _2DResultForFC;
+				//		This is re-used for FC scans and forms FC Step 2
+				ToyStudyResult* _2DResultForFC=NULL;
 				//Do 2D LL scan for deltaGamma and phis
 				if( doLLcontourFlag || doFC_Flag ) {
 					LLscanResult2D * llContourResult ;
@@ -653,8 +666,8 @@ int main( int argc, char * argv[] )
 					}
 //					for(unsigned int ii=0; ii < _2DLLscanList.size() ; ii++ )
 //					{
-						string name1 = _2DLLscanList[0].first;
-						string name2 = _2DLLscanList[0].second;
+						string name1 = _2DLLscanList.back().first;
+						string name2 = _2DLLscanList.back().second;
 						SoloContourResults = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
 
 
@@ -671,8 +684,10 @@ int main( int argc, char * argv[] )
 						ContourLinearResults.push_back( SoloContourResults[0] );
 
 //						AllContourFitResults.push_back( ContourLinearResults );
-
 //					}
+
+					if( !doFC_Flag )
+					{
 					makeOutput->SetLLcontourFileName( LLcontourFileName );
 					makeOutput->OutputLLcontourResult( contourResults ) ;
 //					for(unsigned int ii=0; ii < _2DLLscanList.size(); ii++ )
@@ -688,15 +703,15 @@ int main( int argc, char * argv[] )
 						_2DResultForFC = new ToyStudyResult( ContourLinearResults );
 						ResultFormatter::WriteFlatNtuple( output_scan_dat , ContourLinearResults[0] );
 //					}
-					
+					}
 				}
 
 
 				if( doFC_Flag )
 				{
 					vector<ToyStudyResult*> AllResults;
-//					vector<ToyStudyResult*> AllCleanResults;
-//					vector<ToyStudyResult*> AllCleanResults2;
+
+					//		Want to loop over all points on a 2D Plot that have been allocated to this instance
 					for( int iFC=0; iFC < _2DResultForFC->NumberResults(); iFC++ )
 					{
 
@@ -707,7 +722,7 @@ int main( int argc, char * argv[] )
 						string name1 = _2DLLscanList[0].first;
 						string name2 = _2DLLscanList[0].second;
 
-						//  Use the inputs from Canonical Step 1
+						//		Use the inputs from Canonical Step 1
 						ParameterSet* InputParamSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
 						double lim1 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name1 )->GetValue();
 						double lim2 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name2 )->GetValue();
@@ -724,12 +739,12 @@ int main( int argc, char * argv[] )
 						InputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
 						InputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
 
-						//  Use the inputs from Canonical Step 2
+						//		Use the inputs from Canonical Step 2
 						//ParameterSet* InputParamSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
 						//ParameterSet* InputFreeSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
 
-						//	Just for clarity
-						//	also when using values from Step1 these are not set correctly for the study
+						//		Just for clarity
+						//		also when using values from Step1 these are not set correctly for the study
 						InputParamSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
 						InputParamSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
 						InputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
@@ -819,9 +834,10 @@ int main( int argc, char * argv[] )
 
 
 						//	Try to make minuit as quiet as possible here... does someone have a way to gag it's output?!?
-						ToyStudyMinimiser->GetMinimiser( InputParamSet->GetAllNames().size() )->SetOutputLevel(-1);
+						ToyStudyMinimiser->GetMinimiser( int(InputParamSet->GetAllNames().size()) )->SetOutputLevel(-1);
 
 
+						cout << "\n\n\t\tPerforming Fits to Toys in FC\n"<<endl;
 						//		Perform Fits
 						//	This will record ONLY Data from working fits i.e. FitStatus==3
 						for( unsigned short int dataset_num=0; dataset_num < Memory_Data[0].size(); dataset_num++ )
@@ -872,12 +888,13 @@ int main( int argc, char * argv[] )
 								PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFreeSet );
 							}
 
+							cout << "\n\n\t\tPerforming Fit To Toy "<< dataset_num <<" of " << Memory_Data[0].size() << endl;
 							//	Fit once with control parameters Free
 							fit1Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFreeSet, PDFsWithDataForToys, ConstraintsForToys );
 
 							//	Only Fit again to this dataset if it fits well with +2 dof
 							//	This has the obvious savings in CPU resources
-							if( fit1Result->GetFitStatus() == 3 )
+							if( ( fit1Result->GetFitStatus() == 3 ) || FC_Debug_Flag )
 							{
 								//  Fit second with control parameters Fixed
 								for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
@@ -888,10 +905,11 @@ int main( int argc, char * argv[] )
 									PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFixedSet );
 								}
 
+								cout << "\n\n\t\tFirst Fit Successful, Performing a Second Fit " << dataset_num << " of " << Memory_Data[0].size() <<endl;
 								fit2Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFixedSet, PDFsWithDataForToys, ConstraintsForToys );
 
-								//	If either Fit Failed we want to dump the results and run an extra Fit.
-								if( fit2Result->GetFitStatus() != 3 ) toy_failed = true;
+								//	If either Fit Failed we want to 'dump the results' and run an extra Fit.
+								if( (fit2Result->GetFitStatus() != 3) || (fit2Result->GetFitStatus() != 3) ) toy_failed = true;
 							} else {
 								toy_failed = true;
 							}
@@ -899,7 +917,7 @@ int main( int argc, char * argv[] )
 							//	Do we want to store the Data OR run another toy to get a better Fit
 							if( toy_failed )
 							{
-								cerr << "\n\n\t\tA Toy Study Failed... Requesting More Data for another pass." << endl;
+								cerr << "\n\n\t\tA Single Toy Study Failed... Requesting More Data for another pass.\n" << endl;
 								for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
 								{
 									cerr << "Adding More Data for pdf: " << pdf_num << "\t";
@@ -907,47 +925,21 @@ int main( int argc, char * argv[] )
 									IDataSet* new_dataset = PDFsWithDataForToys[pdf_num]->GetDataSetConfig()->MakeDataSet( PhaseSpaceForToys[pdf_num], PDFsWithDataForToys[pdf_num]->GetPDF() );
 									Memory_Data[pdf_num].push_back( new_dataset );
 								}
-							} else {
+							}
+							if( FC_Debug_Flag || !toy_failed ){
+								if( toy_failed )
+								{
+									fit1Result->ForceFitStatus(-2);
+									fit2Result->ForceFitStatus(-2);
+								}
 								study1Results->AddFitResult( fit1Result );
 								study2Results->AddFitResult( fit2Result );
 							}
 						}
-						
-						//  The number of toys this may be intelligently altered
-//						int NumberOfToys = 1E2;
-//						int TOY_STUDY_SEED = int( 1E3 * pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() );
+
 
 						//			STEP 6
 						//
-						
-						
-						//ToyStudyResult* study1Results = study1->GetToyStudyResult();
-						//ToyStudyResult* study2Results = study2->GetToyStudyResult();
-
-						
-						//		RUN TOY STUDY WITH CONTROL PARAMETERS FREE
-						//		This is more unstable and is used to get the required number of toys needed for comparrison
-						//		For a standard FC the failiure here has been witnessed to be 50%+
-//						ToyPDFWithData->SetPhysicsParameters( InputFreeSet );
-//						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
-						//		Output the first Random Number after Setting the seed for checking if the data is screwwy
-//						cout << "\n\tSECOND RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
-//						ToyStudy* study2 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputFreeSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
-//						study2->DoWholeStudy( true );
-						
-						//		RUN TOY STUDY WITH CONTROL PARAMETERS FIXED
-						//		This is by definition more stable and as such the required number of toys is simply such
-						//		that the 100 working toys from the free case have a 1to1 comparrison
-						//		This has not yet been observed to fail for jobs where the above fit converged,
-						//		Hence I will not give it the freedom to extend it's toy list
-//						pdfsAndData[0]->GetPDF()->SetRandomFunction( TOY_STUDY_SEED );
-						//		Output the first Random Number after Setting the seed for checking if the data is screwwy
-//						NumberOfToys = study2Results->NumberResults();
-//						cout << "\n\tFIRST RANDOM NUMBER: " << setprecision(6) << pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm() << endl<<endl;
-//						ToyStudy* study1 = new ToyStudy( ToyStudyMinimiser, ToyStudyFunction, InputParamSet, PDFsWithDataForToys, ConstraintsForToys, NumberOfToys );
-//						study1->DoWholeStudy( false );		//  Passing true to this function now requires that the number of wanted successful toys be met
-
-
 
 						//		Standard Output Format which makes the results the same running either
 						//		the whole scan on one machine or running the whole set on a batch system
@@ -955,64 +947,25 @@ int main( int argc, char * argv[] )
 						ThisStudy->AddFitResult( _2DResultForFC->GetFitResult( iFC ), false );
 						ThisStudy->AddCPUTimes( _2DResultForFC->GetAllCPUTimes() );
 						ThisStudy->AddRealTimes( _2DResultForFC->GetAllRealTimes() );
+						//	The Generated Value for the Global and Local fit are best defined as -9999 as a sensible default
+						for( unsigned short int num=0; num < GlobalResult->GetResultParameterSet()->GetAllNames().size(); num++ )
+						{
+							string name = GlobalResult->GetResultParameterSet()->GetAllNames()[num];
+							GlobalResult->GetResultParameterSet()->GetResultParameter( name )->ForcePullValue( -9999 );
+							GlobalResult->GetResultParameterSet()->GetResultParameter( name )->ForceOriginalValue( -9999 );
+							ThisStudy->GetFitResult(0)->GetResultParameterSet()->GetResultParameter( name )->ForcePullValue( -9999 );
+							ThisStudy->GetFitResult(0)->GetResultParameterSet()->GetResultParameter( name )->ForceOriginalValue( -9999 );
+						}
 						AllResults.push_back( GlobalFitResult );
 						AllResults.push_back( ThisStudy );
 						AllResults.push_back( study1Results );
 						AllResults.push_back( study2Results );
 
-//						//		Cleaned Output
-//						AllCleanResults.push_back( GlobalFitResult );
-//						AllCleanResults.push_back( ThisStudy );
-//						ToyStudyResult* CleanResults1= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
-//						ToyStudyResult* CleanResults2= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
-//
-//						for( int toy_i=0; toy_i < study1Results->NumberResults(); toy_i++ )
-//						{
-//							if( study1Results->GetFitResult( toy_i )->GetFitStatus() == 3 )
-//							{
-//								CleanResults1->AddFitResult( study1Results->GetFitResult( toy_i ), false );
-//								CleanResults1->AddCPUTime( study1Results->GetCPUTime( toy_i ) );
-//								CleanResults1->AddRealTime( study1Results->GetRealTime( toy_i ) );
-//								CleanResults2->AddFitResult( study2Results->GetFitResult( toy_i ), false );
-//								CleanResults2->AddCPUTime( study2Results->GetCPUTime( toy_i ) );
-//								CleanResults2->AddRealTime( study2Results->GetRealTime( toy_i ) );
-//							}
-//						}
-//						AllCleanResults.push_back( CleanResults1 );
-//						AllCleanResults.push_back( CleanResults2 );
-//
-//						//		Cleaned Output
-//						AllCleanResults2.push_back( GlobalFitResult );
-//						AllCleanResults2.push_back( ThisStudy );
-//						ToyStudyResult* CleanResults1b= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
-//						ToyStudyResult* CleanResults2b= new ToyStudyResult( GlobalResult->GetResultParameterSet()->GetAllNames() );
-//						unsigned short int count=0;
-//						for( int toy_i=0; ( toy_i < study1Results->NumberResults() ) && count < 100; toy_i++ )
-//						{
-//							if( study1Results->GetFitResult( toy_i )->GetFitStatus() > 0 )
-//							{
-//								CleanResults1b->AddFitResult( study1Results->GetFitResult( toy_i) , false );
-//								CleanResults1b->AddCPUTime( study1Results->GetCPUTime( toy_i ) );
-//								CleanResults1b->AddRealTime( study1Results->GetRealTime( toy_i ) );
-//								CleanResults2b->AddFitResult( study2Results->GetFitResult( toy_i), false );
-//								CleanResults2b->AddCPUTime( study2Results->GetCPUTime( toy_i ) );
-//								CleanResults2b->AddRealTime( study2Results->GetRealTime( toy_i ) );
-//								count++;
-//							}
-//						}
-//						AllCleanResults2.push_back( CleanResults1b );
-//						AllCleanResults2.push_back( CleanResults2b );
-//
 					}
 
 					//		STORE THE OUTPUT OF THE TOY STUDIES
 					ToyStudyResult* AllFlatResult = new ToyStudyResult( AllResults );
 					ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFlatResult );
-//					//		STORE THE OUTPUT OF THE TOY STUDIES
-//					ToyStudyResult* AllCleanFlatResult = new ToyStudyResult( AllCleanResults );
-//					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_3.root", AllCleanFlatResult );					//		STORE THE OUTPUT OF THE TOY STUDIES
-//					ToyStudyResult* AllCleanFlatResult2 = new ToyStudyResult( AllCleanResults2 );
-//					ResultFormatter::WriteFlatNtuple( "FCOutput_Clean_S_first_100_gt_0.root", AllCleanFlatResult2 );
 
 				}
 				  

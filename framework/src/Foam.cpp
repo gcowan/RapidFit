@@ -123,7 +123,7 @@ int Foam::GenerateData( int DataAmount )
 		}
 
 		//Use the index calculated to select a Foam generator and generate an event with it
-		Double_t generatedEvent[ continuousNames.size() ];
+		Double_t* generatedEvent = new Double_t[ continuousNames.size() ];
 		foamGenerators[combinationIndex]->MakeEvent();
 		foamGenerators[combinationIndex]->GetMCvect(generatedEvent);
 

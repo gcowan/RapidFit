@@ -28,7 +28,7 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 //Create the minimiser and fit function
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, PhysicsBottle * Bottle )
 {
-	IMinimiser * minimiser = MinimiserConfig->GetMinimiser( Bottle->GetParameterSet()->GetAllNames().size() );
+	IMinimiser * minimiser = MinimiserConfig->GetMinimiser( int(Bottle->GetParameterSet()->GetAllNames().size()) );
 	FitFunction * theFunction = FunctionConfig->GetFitFunction();
 	theFunction->SetPhysicsBottle(Bottle);
 
@@ -161,6 +161,7 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 		ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
 		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, BottleParameters );
 	}
+	
 	return ReturnableFitResult;
 }
 

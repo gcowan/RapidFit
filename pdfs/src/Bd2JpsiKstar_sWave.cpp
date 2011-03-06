@@ -14,15 +14,18 @@
 
 //Constructor
 Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave() :
+	  normalisationCacheValid(false)
+	, evaluationCacheValid(false)
+
 	// Physics parameters
-	gammaName     ( "gamma" )
+	, gammaName     ( "gamma" )
 	, deltaMName    ( "deltaM")
+	, Apara_sqName  ( "Apara_sq" )
+	, Aperp_sqName  ( "Aperp_sq" )
+	, As_sqName	( "As_sq" )
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
 	, delta_sName( "delta_s" )
-	, Aperp_sqName  ( "Aperp_sq" )
-	, Apara_sqName  ( "Apara_sq" )
-	, As_sqName	( "As_sq" )
 	, angAccI1Name	( "angAccI1" )
 	, angAccI2Name	( "angAccI2" )
 	, angAccI3Name	( "angAccI3" )
@@ -44,8 +47,6 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave() :
 	, cosPsiName	( "cosPsi" )
 	, KstarFlavourName  ( "KstarFlavour" )
 	//, timeres	( "resolution" )
-	, normalisationCacheValid(false)
-, evaluationCacheValid(false)
 {
 	MakePrototypes();
 }
@@ -218,6 +219,8 @@ double Bd2JpsiKstar_sWave::buildPDFnumerator()
 
 double Bd2JpsiKstar_sWave::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+	DataPoint* null_p = measurement;
+	null_p = NULL;
 
 	IConstraint * timeBound = boundary->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
@@ -301,6 +304,7 @@ void Bd2JpsiKstar_sWave::getTimeDependentAmplitudes(
 		, double & ReAzeroAs
 		)
 {
+	double null_d = AsAs; null_d = 0.0;
 	// Quantities depending only on physics parameters can be cached
 	if ( !evaluationCacheValid )
 	{

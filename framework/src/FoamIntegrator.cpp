@@ -45,7 +45,7 @@ double FoamIntegrator::Integral( DataPoint * InputPoint, PhaseSpaceBoundary * In
 	//Use the data point to find the index of the correct foam
 	int combinationIndex = 0;
 	int incrementValue = 1;
-	for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+	for ( int discreteIndex = int(discreteNames.size()) - 1; discreteIndex >= 0; discreteIndex-- )
 	{
 		//Retrieve the observable value
 		Observable * temporaryObservable = InputPoint->GetObservable( discreteNames[discreteIndex] );
@@ -57,7 +57,7 @@ double FoamIntegrator::Integral( DataPoint * InputPoint, PhaseSpaceBoundary * In
 			if ( fabs(discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 			{
 				combinationIndex += ( incrementValue * valueIndex );
-				incrementValue *= discreteValues[discreteIndex].size();
+				incrementValue *= int(discreteValues[discreteIndex].size());
 				break;
 			}
 		}

@@ -193,8 +193,8 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 		else
 		{
 			//Make arrays of the observable ranges to integrate over
-			double minima[ doIntegrate.size() ];
-			double maxima[ doIntegrate.size() ];
+			double* minima = new double[ doIntegrate.size() ];
+			double* maxima = new double[ doIntegrate.size() ];
 			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
 			{
 				IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[observableIndex] );
@@ -278,7 +278,7 @@ double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
 		int combinationIndex = 0;
 		int incrementValue = 1;
 		//cout << "Discrete values are: ";
-		for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		for ( int discreteIndex = int(discreteNames.size()) - 1; discreteIndex >= 0; discreteIndex-- )
 		{
 			//Retrieve the discrete value
 			double currentValue = NewDataPoint->GetObservable( discreteNames[discreteIndex] )->GetValue();
@@ -290,7 +290,7 @@ double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
 				if ( fabs( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
-					incrementValue *= discreteValues[discreteIndex].size();
+					incrementValue *= int(discreteValues[discreteIndex].size());
 					break;
 				}
 			}

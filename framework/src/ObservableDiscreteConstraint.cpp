@@ -103,7 +103,7 @@ Observable * ObservableDiscreteConstraint::CreateObservable()
 //Create an observable within this constraint, using the specified random number generator
 Observable * ObservableDiscreteConstraint::CreateObservable( TRandom3 * RandomNumberGenerator )
 {
-	int randomIndex = (int)floor( allValues.size() * RandomNumberGenerator->Rndm() );
+	int randomIndex = (int)floor( int(allValues.size()) * RandomNumberGenerator->Rndm() );
 	return new Observable( "Unknown", allValues[randomIndex], 0.0, unit );
 }
 

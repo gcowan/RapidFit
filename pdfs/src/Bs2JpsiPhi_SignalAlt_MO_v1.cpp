@@ -21,9 +21,9 @@
 
 Bs2JpsiPhi_SignalAlt_MO_v1::Bs2JpsiPhi_SignalAlt_MO_v1() : 
 	  Bs2JpsiPhi_SignalAlt_BaseClass()
+	, normalisationCacheValid(false)
 	, mistagScaleName	( "mistagScale" )
 	, mistagOffsetName	( "mistagOffset" )
-	, normalisationCacheValid(false)
 {
 	MakePrototypes();
 	
@@ -144,7 +144,7 @@ bool Bs2JpsiPhi_SignalAlt_MO_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
 	
 	// Do a test to ensure user is not using upper time acceptance wrongly
-	if( ((resolution1 != 0.0) || (resolution2 != 0.0) || (tagFraction != 0.5) || (phi_s != 0.0)) && useUpperTimeAcceptance() )
+	if( (((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE)) || (fabs(tagFraction-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
 	{
 		cout << " You appear to be trying to use the upper time acceptance but are using either resolution or are doing a tagged fit" << endl ;
 		cout << " This is not possible at present" << endl ;
@@ -208,7 +208,7 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate(DataPoint * measurement)
 	//conditions to throw exception
 	bool c1 = isnan(returnValue) ;
 	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
-	bool c3 = ((resolution1==0.)&&(resolution2==0.)) && (returnValue <= 0.) && (t>0.) ;
+	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&(fabs(resolution2-0.)<DOUBLE_TOLERANCE)) && (returnValue <= 0.) && (t>0.) ;
 	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
@@ -353,7 +353,7 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec(  )  const
 	 }
 	
 	return xsec ;
-};
+}
 
 //...................................
 // Integral over all variables: t + angles
@@ -396,7 +396,7 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm1(  ) const
 	 */
 	
 	return norm ;
-};
+}
 
 
 //...................................
@@ -423,7 +423,7 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm2(  ) const
 	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
 		
 	return norm ;
-};
+}
 
 
 //....................................................
@@ -456,5 +456,5 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecCompositeNorm1(  )
 		return this->diffXsecNorm1() ;
 	}
 	
-};
+}
 

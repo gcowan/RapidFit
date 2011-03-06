@@ -65,6 +65,16 @@ double ResultParameter::GetOriginalValue()
 	return originalValue;
 }
 
+void ResultParameter::ForceOriginalValue( double new_value )
+{
+	originalValue = new_value;
+}
+
+void ResultParameter::ForcePullValue( double new_value )
+{
+	originalValue = new_value;
+}
+
 //Get the error
 double ResultParameter::GetError()
 {

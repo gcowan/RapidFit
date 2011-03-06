@@ -15,8 +15,12 @@
 
 //Constructor
 Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms() :
+	//Cache flags
+	  normalisationCacheValid(false)
+	, evaluationCacheValid(false)
+
 	// Physics parameters
-	gammaName     ( "gamma" )
+	, gammaName     ( "gamma" )
 	, deltaGammaName( "deltaGamma" )
 	, deltaMName    ( "deltaM")
 	, Phi_sName     ( "Phi_s")
@@ -27,11 +31,6 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms::Bs2Jp
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
 	, delta_sName	( "delta_s" )
-	// Detector parameters
-	, mistagName	( "mistag" )
-	, timeRes1Name	( "timeResolution1" )
-	, timeRes2Name	( "timeResolution2" )
-	, timeRes1FractionName	( "timeResolution1Fraction" )
 	// Angular acceptance factors
 	, angAccI1Name	( "angAccI1" )
 	, angAccI2Name	( "angAccI2" )
@@ -43,6 +42,11 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms::Bs2Jp
 	, angAccI8Name	( "angAccI8" )
 	, angAccI9Name	( "angAccI9" )
 	, angAccI10Name	( "angAccI10" )
+	// Detector parameters
+	, mistagName	( "mistag" )
+	, timeRes1Name	( "timeResolution1" )
+	, timeRes2Name	( "timeResolution2" )
+	, timeRes1FractionName	( "timeResolution1Fraction" )
 	// Observables
 	, timeName	( "time" )
 	, cosThetaName	( "cosTheta" )
@@ -50,9 +54,6 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms::Bs2Jp
 	, cosPsiName	( "cosPsi" )
 	, tagName	( "tag" )
 
-	//Cache flags
-	, normalisationCacheValid(false)
-, evaluationCacheValid(false)
 {
 	MakePrototypes();
 }

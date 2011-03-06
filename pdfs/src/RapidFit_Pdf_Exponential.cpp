@@ -28,7 +28,7 @@ RapidFitPdfExponential::RapidFitPdfExponential()
 {
   resolution = 0.0; 
   valid = true ;
-};
+}
 
 //.................................
 // Constructor with resolution

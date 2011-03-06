@@ -8,25 +8,30 @@
   @date 2009-10-02
  */
 
-#include "ResultFormatter.h"
-#include "TFile.h"
-#include "TNtuple.h"
-#include "Rtypes.h"
+//  Root Headers
+#include <TFile.h>
+#include <TNtuple.h>
+#include <TH1F.h>
+#include <TH2D.h>
+#include <TFrame.h>
+#include <TAxis.h>
+#include <TMultiGraph.h>
+#include <TGraphErrors.h>
+#include <TGraph.h>
+#include <TCanvas.h>
+
+//  System Headers
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include "TH1F.h"
-#include "TH2D.h"
-#include "StatisticsFunctions.h"
 #include <math.h>
+
+
+#include "ResultFormatter.h"
+#include "Rtypes.h"
+#include "StatisticsFunctions.h"
 #include "EdStyle.h"
 //#include <boost/regex.hpp>
-#include "TMultiGraph.h"
-#include "TGraphErrors.h"
-#include "TGraph.h"
-#include "TCanvas.h"
-#include <TFrame.h>
-#include <TAxis.h>
 #include "StringProcessing.h"
 #include "LLscanResult.h"
 #include "LLscanResult2D.h"
@@ -58,7 +63,7 @@ void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
 	for ( int dataIndex = 0; dataIndex < OutputData->GetDataNumber(); dataIndex++)
 	{
 		//Retrieve the values of all observables
-		Float_t observables[ allNames.size() ];
+		Float_t* observables = new Float_t[ int(allNames.size()) ];
 		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
 		{
 			DataPoint * temporaryDataPoint = OutputData->GetDataPoint(dataIndex);
@@ -123,7 +128,8 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 			vector< pair< double, double > > sigmaContour = plotContour->GetPlot(sigma);
 
 			//Retrieve each point
-			double xCoordinates[ sigmaContour.size() ], yCoordinates[ sigmaContour.size() ];
+			double* xCoordinates = new double[ int(sigmaContour.size()) ];
+			double* yCoordinates = new double[ int(sigmaContour.size()) ];
 			for ( unsigned int pointIndex = 0; pointIndex < sigmaContour.size(); pointIndex++ )
 			{
 				xCoordinates[pointIndex] = sigmaContour[pointIndex].first;

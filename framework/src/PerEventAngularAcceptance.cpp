@@ -624,8 +624,8 @@ double PerEventAngularAcceptance::coshel(TLorentzVector particle, TLorentzVector
   TVector3 particle3 = particle.Vect();
   TVector3 grandparent3 = -grandparent.Vect();
 
-  Float_t numerator = particle3.Dot(grandparent3);
-  Float_t denominator = (particle3.Mag())*(grandparent3.Mag());
+  Float_t numerator = Float_t(particle3.Dot(grandparent3));
+  Float_t denominator = Float_t((particle3.Mag())*(grandparent3.Mag()));
   Float_t temp = 2;
   if(fabs(denominator-0)<DOUBLE_TOLERANCE) temp= numerator/denominator;
 

@@ -55,7 +55,7 @@ vector< ConstraintFunction* > PhysicsBottle::GetConstraints()
 //Retrieve the number of results stored
 int PhysicsBottle::NumberResults()
 {
-	return allPDFs.size();
+	return int(allPDFs.size());
 }
 
 //Retrieve the PDF corresponding to a particular result number

@@ -50,7 +50,7 @@ IntegratorFunction * IntegratorFunction::Clone() const
 //Return the number of dimensions
 unsigned int IntegratorFunction::NDim() const
 {
-	return doIntegrate.size();
+	return int(doIntegrate.size());
 }
 
 //Return the function value at x
@@ -114,7 +114,7 @@ Double_t IntegratorFunction::Density( Int_t ndim, Double_t * xArray )
 	if ( ndim == int(doIntegrate.size()) )
 	{
 		//Coordinate transform
-		double transformedArray[ndim];
+		double* transformedArray = new double[ndim];
 		for ( int observableIndex = 0; observableIndex < ndim; observableIndex++ )
 		{
 			transformedArray[observableIndex] = minima[observableIndex] + ( ranges[observableIndex] * xArray[observableIndex] );

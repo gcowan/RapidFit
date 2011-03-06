@@ -40,7 +40,7 @@ class FumiliWrapper : public IMinimiser
 		~FumiliWrapper();
 
 		//Interface functions
-		virtual void SetOutputLevel( int ){};
+		virtual void SetOutputLevel( short int ){};
 		virtual void Minimise( FitFunction* );
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );

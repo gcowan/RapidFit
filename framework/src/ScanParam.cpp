@@ -74,7 +74,7 @@ bool ScanParam::HasSigma(){  return !sigma.empty();  }
 int ScanParam::GetSigma() {
 	if( !sigma.empty() ) {   return sigma[0]; }
 	else return 5;
-};
+}
 
 void ScanParam::SetSigma(int new_val) {
 	while( !sigma.empty() ){    sigma.pop_back(); };

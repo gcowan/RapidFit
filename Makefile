@@ -3,7 +3,8 @@ SHELL = /bin/sh
 UNAME = $(shell uname)
 
 # Root variables
-ROOTCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags)
+TEMPCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags)
+ROOTCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags | awk -F "-I" '{print $$1" -isystem"$$2}' )
 ROOTLIBS     = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --libs)
 ROOTGLIBS    = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --glibs)
 
@@ -19,7 +20,7 @@ AR           = ar cru
 
 ##Flags
 #CXXFLAGS     += -D_DEBUG
-CXXFLAGS     = -O3 -g -fPIC -funroll-loops -D__ROOFIT_NOBANNER  -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+CXXFLAGS     = -O3 -g -fPIC -pedantic -funroll-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 
 SRCEXT   = cpp
 SRCDIR   = framework/src

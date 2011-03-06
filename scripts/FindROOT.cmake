@@ -142,7 +142,7 @@ Macro(ROOT_GENERATE_DICTIONARY INFILES LINKDEF_FILE OUTFILE INCLUDE_DIRS_IN)
   Set(infiles_nopath)
 
   Foreach (_current_FILE ${INCLUDE_DIRS_IN})
-    Set(INCLUDE_DIRS ${INCLUDE_DIRS} -I${_current_FILE})   
+    Set(INCLUDE_DIRS ${INCLUDE_DIRS} -isystem${_current_FILE})   
   Endforeach (_current_FILE ${INCLUDE_DIRS_IN})
  
   String(REGEX REPLACE "^(.*)\\.(.*)$" "\\1.h" bla "${OUTFILE}")

@@ -23,7 +23,7 @@ double StatisticsFunctions::Mean( vector<double> Numbers )
 		sum += Numbers[index];
 	}
 
-	return sum / Numbers.size();
+	return sum / double(Numbers.size());
 }
 
 //Return the variance of a vector of doubles
@@ -36,14 +36,14 @@ double StatisticsFunctions::Variance( vector<double> Numbers )
 		sum += pow( ( Numbers[index] - mean ), 2 );
 	}
 
-	return sum / ( Numbers.size() - 1 );
+	return sum / ( double(Numbers.size()) - 1 );
 }
 
 //Return the ideal number of bins for a histogram of a vector of doubles
 //Uses D. Scott's method, published 1979
 int StatisticsFunctions::OptimumBinNumber( vector<double> Numbers )
 {
-	double width = 3.49 * sqrt( Variance(Numbers) ) * pow( Numbers.size(), -(1.0/3.0) );
+	double width = 3.49 * sqrt( Variance(Numbers) ) * pow( double(Numbers.size()), -(1.0/3.0) );
 	double range = Maximum(Numbers) - Minimum(Numbers);
 	return (int)ceil( range / width );
 }
@@ -134,7 +134,7 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 			discreteCombinations.push_back(oneCombination);
 
 			//Increment the indices
-			for ( int observableIndex = discreteValues.size() - 1; observableIndex >= 0; observableIndex-- )
+			for ( int observableIndex = int(discreteValues.size()) - 1; observableIndex >= 0; observableIndex-- )
 			{
 				indices[observableIndex]++;
 
@@ -220,7 +220,7 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 		//Calculate the index for the discrete combination, and increment the corresponding count
 		int combinationIndex = 0;
 		int incrementValue = 1;
-		for ( int discreteIndex = DiscreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		for ( int discreteIndex = int(DiscreteNames.size()) - 1; discreteIndex >= 0; discreteIndex-- )
 		{
 			double currentValue = readDataPoint->GetObservable( DiscreteNames[discreteIndex] )->GetValue();
 
@@ -229,7 +229,7 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 				if ( fabs( DiscreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
 					combinationIndex += ( incrementValue * valueIndex );
-					incrementValue *= DiscreteValues[discreteIndex].size();
+					incrementValue *= int(DiscreteValues[discreteIndex].size());
 					break;
 				}
 			}

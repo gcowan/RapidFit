@@ -10,9 +10,10 @@
 #ifndef RESULT_FORMATTER_H
 #define RESULT_FORMATTER_H
 
-#include "IDataSet.h"
 #include <string>
 #include <vector>
+
+#include "IDataSet.h"
 #include "FitResult.h"
 #include "ToyStudyResult.h"
 #include "LLscanResult.h"

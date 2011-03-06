@@ -15,16 +15,20 @@
 
 //Constructor
 Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms() :
+
+	  normalisationCacheValid(false)
+	, evaluationCacheValid(false)
+
 	// Physics parameters
-	gammaName     ( "gamma" )
+	,  gammaName     ( "gamma" )
 	, deltaMName    ( "deltaM")
-	, delta_paraName( "delta_para" )
-	, delta_perpName( "delta_perp" )
-	, delta_zeroName( "delta_zero" )
-//	, Aperp_sqName  ( "Aperp_sq" )
-//	, Apara_sqName  ( "Apara_sq" )
 	, R_alphaName  ( "R_alpha" )
         , R_betaName  ( "R_beta" )
+	, delta_zeroName( "delta_zero" )
+	, delta_paraName( "delta_para" )
+	, delta_perpName( "delta_perp" )
+//	, Aperp_sqName  ( "Aperp_sq" )
+//	, Apara_sqName  ( "Apara_sq" )
 	, angAccI1Name	( "angAccI1" )
 	, angAccI2Name	( "angAccI2" )
 	, angAccI3Name	( "angAccI3" )
@@ -41,8 +45,6 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Bd2JpsiKstar_withTimeRes_with
 	, phiName	( "phi" )
 	, cosPsiName	( "cosPsi" )
 	, KstarFlavourName  ( "KstarFlavour" )
-	, normalisationCacheValid(false)
-, evaluationCacheValid(false)
 {
 	MakePrototypes();
 }
@@ -140,7 +142,7 @@ bool Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::SetPhysicsParameters( Pa
 	Aperp_sq = R_alpha;                                             //R_alpha = 0 means Azero_sq = 0
         Apara_sq = (1.0 - R_alpha)*R_beta;                              //R_beta = 0 means Aperp_sq = 0
         Azero_sq = (1.0 - R_alpha)*(1.0 - R_beta);
-        double sum = Apara_sq + Azero_sq + Aperp_sq;
+//        double sum = Apara_sq + Azero_sq + Aperp_sq;
         //Apara_sq = 1 - Azero_sq - Aperp_sq - As_sq;
 
 //        cout << "Azero_sq: " << Azero_sq << " Aperp_sq: " << Aperp_sq << " Apara_sq: " << Apara_sq << " sum: " << sum << endl;
@@ -220,33 +222,33 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Evaluate(DataPoint * m
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::AT() const {
         if( Aperp_sq <= 0. ) return 0. ;
         else return sqrt(Aperp_sq) ;
-};
+}
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::AP() const {
         if( Apara_sq <= 0. ) return 0. ;
         else return sqrt(Apara_sq) ;
-};
+}
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::A0() const {
         if( Azero_sq <= 0. ) return 0. ;
         else return sqrt(Azero_sq) ;
-};
+}
 
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::DT() const {
         if( delta_perp <= 0. ) return 0. ;
         else return delta_perp ;
-};
+}
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::DP() const {
         if( delta_para <= 0. ) return 0. ;
         else return delta_para ;
-};
+}
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::D0() const {
         if( delta_zero <= 0. ) return 0. ;
         else return delta_zero ;
-};
+}
 
 
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Gamma() const   {
 	return gamma ;
-};
+}
 
 
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::buildPDFnumerator()

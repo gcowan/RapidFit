@@ -46,7 +46,7 @@ string FunctionContour::GetYName()
 //Get the number of contours
 int FunctionContour::GetContourNumber()
 {
-	return allContours.size();
+	return int(allContours.size());
 }
 
 //Store a contour

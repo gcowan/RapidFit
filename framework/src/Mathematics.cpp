@@ -416,8 +416,8 @@ namespace Mathematics
     RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
     PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
     int numAngularTerms = 6;
-    double  f[numAngularTerms]; // the angular functions
-    double xi[numAngularTerms]; // the angular weights
+    double*  f = new double[numAngularTerms]; // the angular functions
+    double* xi = new double[numAngularTerms]; // the angular weights
     double cosTheta, phi, cosPsi;
     double evalPDFraw, evalPDFnorm, val;
     int numEvents = dataSet->GetDataNumber();
@@ -460,8 +460,8 @@ void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF )
     RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
     PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
     int numAngularTerms = 10;
-    double  f[numAngularTerms]; // the angular functions
-    double xi[numAngularTerms]; // the angular weights
+    double*  f = new double[numAngularTerms]; // the angular functions
+    double* xi = new double[numAngularTerms]; // the angular weights
     double cosTheta, phi, cosPsi;
     double evalPDFraw, evalPDFnorm, val;
     int numEvents = dataSet->GetDataNumber();

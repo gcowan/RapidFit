@@ -27,7 +27,7 @@ MinuitWrapper::MinuitWrapper(): print_verbosity( 0 )
 }
 
 //Constructor with correct argument
-MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): print_verbosity( output_level )
+MinuitWrapper::MinuitWrapper( int NumberParameters, short int output_level ): print_verbosity( output_level )
 {
 	minuit = new TMinuit( NumberParameters );
 	minuit->SetPrintLevel( print_verbosity );
@@ -39,7 +39,7 @@ MinuitWrapper::~MinuitWrapper()
 	delete minuit;
 }
 
-void MinuitWrapper::SetOutputLevel( int output_level )
+void MinuitWrapper::SetOutputLevel( short int output_level )
 {
 	print_verbosity = output_level;
 	minuit->SetPrintLevel( print_verbosity );
@@ -140,16 +140,22 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	}
 
 	// Get the error matrix and construct a vector containing the correlation coefficients
-	int numParams = allNames.size();
-	double matrix[numParams][numParams];
+	int numParams = int(allNames.size());
+
+	//	This Causes an outstanding compiler warning due to non standards compliance
+	//	I'm taking the approach once used by Pete to solve annoying problems:
+	//
+	//	A beer to whoever can fix this!		rob.currie@ed.ac.uk
+	Double_t matrix[numParams][numParams];
+
 	gMinuit->mnemat(&matrix[0][0],numParams);
 	vector<double> covarianceMatrix(numParams*(numParams+1)/2);
 	for (int row = 0; row < numParams; row++)
 	{
 		for (int col = 0; col < numParams; col++)
 		{
-			if(row > col) covarianceMatrix[col+row*(row+1)/2] = matrix[row][col];
-			else covarianceMatrix[row+col*(col+1)/2] = matrix[row][col];
+			if(row > col) {covarianceMatrix[col+row*(row+1)/2] = matrix[row][col];}
+			else {covarianceMatrix[row+col*(col+1)/2] = matrix[row][col];}
 		}
 	}
 
@@ -181,8 +187,10 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 			//If the parameters have valid indices, ask minuit to plot them
 			int numberOfPoints = 40;
 			int iErrf;
-			double xCoordinates1[numberOfPoints], yCoordinates1[numberOfPoints];
-			double xCoordinates2[numberOfPoints], yCoordinates2[numberOfPoints];
+			double* xCoordinates1 = new double[numberOfPoints];
+			double* yCoordinates1 = new double[numberOfPoints];
+			double* xCoordinates2 = new double[numberOfPoints];
+			double* yCoordinates2 = new double[numberOfPoints];
 
 			//One sigma contour
 			minuit->SetErrorDef( NewFunction->UpErrorValue(1) );

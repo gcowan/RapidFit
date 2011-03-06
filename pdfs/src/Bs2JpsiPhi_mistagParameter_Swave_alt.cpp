@@ -331,19 +331,19 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::Normalisation(DataPoint * measureme
 double Bs2JpsiPhi_mistagParameter_Swave_alt::AT() const { 
         if( Aperp_sq <= 0. ) return 0. ;
         else return sqrt(Aperp_sq) ; 
-};
+}
 double Bs2JpsiPhi_mistagParameter_Swave_alt::AP() const { 
         if( Apara_sq <= 0. ) return 0. ;
         else return sqrt(Apara_sq) ; 
-};
+}
 double Bs2JpsiPhi_mistagParameter_Swave_alt::A0() const { 
         if( Azero_sq <= 0. ) return 0. ;
         else return sqrt(Azero_sq) ; 
-};
+}
 double Bs2JpsiPhi_mistagParameter_Swave_alt::AS() const { 
         if( As_sq <= 0. ) return 0. ;
         else return sqrt(As_sq) ; 
-};
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::ctrsq() const { return (ctheta_tr*ctheta_tr) ; }
 double Bs2JpsiPhi_mistagParameter_Swave_alt::strsq() const { return (1.0 - ctheta_tr*ctheta_tr) ; }
@@ -441,7 +441,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorEven(  )  const
         + ( 1.0 - cos(phi_s) ) * expH( ) 
         + q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
         return result ;
-};
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorEvenInt(  )  const
 {
@@ -451,7 +451,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorEvenInt(  )  const
         + ( 1.0 - cos(phi_s) )  * intExpH()          
         + q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
         return result ;
-};
+}
 
 
 //..................................
@@ -463,7 +463,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorOdd(  )   const
         + ( 1.0 + cos(phi_s) ) * expH( ) 
         - q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
         return result ;
-};
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorOddInt(  )  const
 {
@@ -472,23 +472,23 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorOddInt(  )  const
         + ( 1.0 + cos(phi_s) ) * intExpH() 
         - q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
         return result ;
-};
+}
 
 
 //----------------------------------------------------------
 // These are the time factors and their analytic integrals for the three angle PDF
 
 //...........................
-double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorA0A0( )    const { return timeFactorEven( ) ; } ;      
-double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorA0A0( )    const { return timeFactorEven( ) ; }      
+double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; }
 
 //...........................
-double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorAPAP( )    const { return timeFactorEven( ) ; } ;
-double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorAPAP( )    const { return timeFactorEven( ) ; }
+double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; }
 
 //...........................
-double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorATAT( )    const { return timeFactorOdd( ) ; } ;
-double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorATATInt( ) const { return timeFactorOddInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorATAT( )    const { return timeFactorOdd( ) ; }
+double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorATATInt( ) const { return timeFactorOddInt( ) ; }
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImAPAT( ) const
@@ -499,7 +499,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImAPAT( ) const
         - 1.0 * ( expH( ) - expL( ) ) * cos(delta1) * sin(phi_s)  ;
         
         return result ;
-} ;
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImAPATInt( ) const
 {
@@ -510,7 +510,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImAPATInt( ) const
         q() * 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
         - 1.0 * ( intExpH() - intExpL() ) * cos(delta1) * sin(phi_s) ;      
         return result ;
-} ;
+}
 
 
 //...........................
@@ -519,13 +519,13 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReA0AP( )  const
         //if( t < 0.0 ) return 0.0 ;
         double result = cos(delta2-delta1) * this->timeFactorEven(  ) ;
         return result ;
-} ;
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReA0APInt( ) const
 {
         double result = cos(delta2-delta1) * this->timeFactorEvenInt( ) ;
         return result ;
-} ;
+}
 
 
 //...........................
@@ -536,7 +536,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImA0AT(  ) const
         q() * 2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)     
         -1.0 * ( expH( ) - expL( ) ) * cos(delta2) * sin(phi_s) ;
         return result ;
-} ;
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImA0ATInt( ) const
 {
@@ -547,13 +547,13 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImA0ATInt( ) const
         q() * 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cos(phi_s)*intExpSin()  ) * (1.0 - 2.0*tagFraction)
         -1.0 * ( intExpH() - intExpL()  ) * cos(delta2) * sin(phi_s) ;
         return result ;
-} ;
+}
 
 //.... S wave additions.......
 
 //...........................
-double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorASAS( )    const { return timeFactorOdd( ) ; } ;
-double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorASASInt( ) const { return timeFactorOddInt( ) ; } ;
+double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorASAS( )    const { return timeFactorOdd( ) ; }
+double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorASASInt( ) const { return timeFactorOddInt( ) ; }
 
 
 //...........................
@@ -567,7 +567,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASAP( ) const
         - 1.0 * ( expH( ) - expL( ) ) * sin(delta) * sin(phi_s)  ;
         
         return result ;
-} ;
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASAPInt( ) const
 {
@@ -580,7 +580,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASAPInt( ) const
         q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
         - 1.0 * ( intExpH() - intExpL() ) * sin(delta) * sin(phi_s) ;       
         return result ;
-} ;
+}
 
 
 //...........................
@@ -589,13 +589,13 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImASAT( )  const
         //if( t < 0.0 ) return 0.0 ;
         double result = sin(delta_perp-delta_s) * this->timeFactorOdd(  ) ;
         return result ;
-} ;
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorImASATInt( ) const
 {
         double result = sin(delta_perp-delta_s) * this->timeFactorOddInt( ) ;
         return result ;
-} ;
+}
 
 
 //...........................
@@ -609,7 +609,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASA0( ) const
         - 1.0 * ( expH( ) - expL( ) ) * sin(delta) * sin(phi_s)  ;
         
         return result ;
-} ;
+}
 
 double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASA0Int( ) const
 {
@@ -622,7 +622,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::timeFactorReASA0Int( ) const
         q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
         - 1.0 * ( intExpH() - intExpL() ) * sin(delta) * sin(phi_s) ;       
         return result ;
-} ;
+}
 
 
 //------------------------------------------------------
@@ -636,7 +636,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorA0A0(  ) const
         // Normalised to  1     
         double result = 2.0 * ct1sq() * (1.0 - strsq()*cphsq() ) * (9.0/32.0/TMath::Pi());
         return result ; 
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorAPAP(  ) const
@@ -644,7 +644,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorAPAP(  ) const
         // Normalised to  1
         double result =  st1sq() * (1.0 - strsq()*sphsq() ) * (9.0/32.0/TMath::Pi());
         return result ; 
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorATAT(  ) const
@@ -653,7 +653,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorATAT(  ) const
         double result = st1sq() * strsq() * (9.0/32.0/TMath::Pi());
         return result ;
         
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorImAPAT(  ) const
@@ -662,7 +662,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorImAPAT(  ) const
         double theta_tr = acos(ctheta_tr) ;             
         double result =   -1.0 *  st1sq() * sin(2.0*theta_tr) * sin(phi_tr) * (9.0/32.0/TMath::Pi()) ;
         return result ; 
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorReA0AP( ) const
@@ -671,7 +671,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorReA0AP( ) const
         double theta_1 = acos(ctheta_1) ;       
         double result =    sin(2.0*theta_1) * strsq() * sin(2.0*phi_tr) / sqrt(2.0) * (9.0/32.0/TMath::Pi());
         return result ; 
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorImA0AT(  ) const
@@ -681,7 +681,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorImA0AT(  ) const
         double theta_1 = acos(ctheta_1) ;               
         double result =  +1.0*   sin(2.0*theta_1) * sin(2.0*theta_tr) * cos(phi_tr) / sqrt(2.0) * (9.0/32.0/TMath::Pi());
         return result ; 
-};
+}
 
 //......  S wave additions ....
 
@@ -690,7 +690,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorASAS(  ) const
 {
         double result =  (1.0 - strsq()*cphsq() ) * (2./3.) * (9.0/32.0/TMath::Pi());
         return result ; 
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorReASAP(  ) const
@@ -698,7 +698,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorReASAP(  ) const
         double stheta_1 =  sqrt(st1sq());               
         double result =   strsq() * stheta_1 * sin(2.0*phi_tr) * (sqrt(6.)/3.) * (9.0/32.0/TMath::Pi()) ;
         return result ; 
-};
+}
 
 //...........................
 double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorImASAT(  ) const
@@ -707,7 +707,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorImASAT(  ) const
         double stheta_1 =  sqrt(st1sq());               
         double result = -1.0 *  sin(2.0*theta_tr) * stheta_1 * cos(phi_tr) * (sqrt(6.)/3.) * (9.0/32.0/TMath::Pi()) ;
         return result ;
-};
+}
 
 
 //...........................
@@ -715,7 +715,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::angleFactorReASA0(  ) const
 {
         double result = -1.0 *  ( 1.0 -  strsq()* cphsq() ) * ctheta_1 *  (4.0*sqrt(3.)/3.) * (9.0/32.0/TMath::Pi()) ;
         return result ; 
-};
+}
         
 
 
@@ -745,7 +745,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsec(  )  const
         0.5 * AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
         
         return xsec ;
-};
+}
 
 //...................................
 // Integral over all variables: t + angles
@@ -769,7 +769,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecNorm1(  ) const
         0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
         
         return norm ;
-};
+}
 
 
 //...................................
@@ -795,7 +795,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecNorm2(  ) const
         
         
         return norm ;
-};
+}
 
 
 //....................................................
@@ -820,6 +820,6 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecCompositeNorm1(  )
         return norm ;   
 
         return 1 ;
-};
+}
 
  

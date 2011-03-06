@@ -114,7 +114,7 @@ vector<int> StringProcessing::StringPositions( string Input, string SearchString
 //Remove any instances of a particular character in a string
 void StringProcessing::RemoveCharacter( string & Input, char SearchCharacter )
 {
-	char passedCharacters[ Input.size() + 1 ];
+	char* passedCharacters = new char[ Input.size() + 1 ];
 	int addedCharacters = 0;
 
 	for (unsigned int characterIndex = 0; characterIndex < Input.size(); characterIndex++ )
@@ -157,7 +157,7 @@ string StringProcessing::ReplaceString( string & Input, string FindString, strin
 				output.push_back( ReplaceString[replaceIndex] );
 			}
 
-			characterIndex += FindString.size() - 1;
+			characterIndex += int(FindString.size()) - 1;
 		}
 		else
 		{

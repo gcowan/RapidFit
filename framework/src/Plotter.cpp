@@ -178,8 +178,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		ratioOfIntegrals = pdfIntegrator->GetRatioOfIntegrals();
 		
 		//Update the data average values, and make the projection graph arrays
-		double projectionValueArray[plotNumber];
-		double observableValueArray[plotNumber];
+		double* projectionValueArray = new double[plotNumber];
+		double* observableValueArray = new double[plotNumber];
 		for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 		{
 			//Projection graph
@@ -203,8 +203,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	combinationDirectory->GetMotherDir()->cd();
 
 	//Plot the data averaged projection
-	double projectionValueArray[plotNumber];
-	double observableValueArray[plotNumber];
+	double* projectionValueArray = new double[plotNumber];
+	double* observableValueArray = new double[plotNumber];
 	for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 	{
 		projectionValueArray[pointIndex] = ratioOfIntegrals * dataAverageProjection[pointIndex] * binInterval * double(observableValues.size()) / averageIntegral;

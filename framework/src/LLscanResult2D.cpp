@@ -110,11 +110,11 @@ void LLscanResult2D::print()
 TH2D * LLscanResult2D::GetTH2D() 
 {
 
-	int numberOfPoints = parameterValues.size()*parameterValues2.size();
+	int numberOfPoints = int(parameterValues.size())*int(parameterValues2.size());
 
-	double pvx[numberOfPoints];
-	double pvy[numberOfPoints];
-	double pvz[numberOfPoints];
+	double* pvx = new double[numberOfPoints];
+	double* pvy = new double[numberOfPoints];
+	double* pvz = new double[numberOfPoints];
 
 	//Extract lists of x,y, z (z is LL value)
 	int ind = 0 ;

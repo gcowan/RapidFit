@@ -29,6 +29,7 @@ class FitResult
 		vector< FunctionContour* > GetContours();
 		ResultParameterSet * GetResultParameterSet();
 		int GetFitStatus();
+		void ForceFitStatus( int );
 		PhysicsBottle * GetPhysicsBottle();
 
 	private:

@@ -19,7 +19,7 @@ FumiliFunction::FumiliFunction() : ParametricFunction(1)
 }
 
 //Constructor with correct argument
-FumiliFunction::FumiliFunction( FitFunction* NewFitFunction ) : ParametricFunction( NewFitFunction->GetParameterSet()->GetAllNames().size() ), function(NewFitFunction)
+FumiliFunction::FumiliFunction( FitFunction* NewFitFunction ) : ParametricFunction( int(NewFitFunction->GetParameterSet()->GetAllNames().size()) ), function(NewFitFunction)
 {
 	// Need to change this constructor since we now pass the numParams and not the fit function
 	// Not entirely sure what to do here.

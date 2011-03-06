@@ -5,6 +5,15 @@
    - Currently this uses the CDF/Heidelberg ordering method which may or may not be wrong. It produces results for comparison with heidelberg but makes no claims that they (and by extension we) have it right.
    - I've also added a ganga script that allows you to split feldman-cousins jobs down into pxqxr subjobs, where p is the number of x axis gridpoints, q the y-axis gridpoints and r the number of subjobs to split toy generation into. This is, as Pete says "Embarrassingly parallel". 
 
+2011/03/06 Rob Currie
+   - RapidFit now only returns 1 warning (duplicated) when compiled with -pedantic I cannot resolve this warning and so I make an offer of a beer to whoever can fix it properly
+     (beware it's not as easy as you will first think root expects a 2D array allocated as double var[i][j]    NOT    double** var = new double[i] ; for a<i var[a] = new double[i])
+
+2011/03/06 Rob Currie
+   - Fixed A Lot of remaining compile-time warnings in RapidFit, moved Root from a local header to a System Header in Makefile and CMakeLists.txt so we can build against root with -Wall -Wextra without the complaints
+   - Changed a few defaults in FCcode and removed a LOT of redudant 'commented-out' code
+   - Turned off LL2DScan output when running FCscans
+
 2011/03/04 Rob Currie
    - Re-Written a LOT of the FC code and it is now very accessible from the command line
    - Some minor bugfixes

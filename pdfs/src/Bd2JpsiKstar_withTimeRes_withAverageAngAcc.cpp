@@ -19,20 +19,14 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverage
           normalisationCacheValid(false)
 	, evaluationCacheValid(false)
 
-        // Observables (What we want to gain from the pdf after inserting physics parameter values)
-        , timeName      ( "time" )
-        , cosThetaName  ( "cosTheta" )
-        , phiName       ( "phi" )
-        , cosPsiName    ( "cosPsi" )
-        , KstarFlavourName  ( "KstarFlavour" )
 
 	// Physics parameters
 	, gammaName     ( "gamma" )
 	, deltaMName    ( "deltaM")
+	, Apara_sqName  ( "Apara_sq" )
+	, Aperp_sqName  ( "Aperp_sq" )
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
-	, Aperp_sqName  ( "Aperp_sq" )
-	, Apara_sqName  ( "Apara_sq" )
 	, angAccI1Name	( "angAccI1" )
 	, angAccI2Name	( "angAccI2" )
 	, angAccI3Name	( "angAccI3" )
@@ -43,6 +37,12 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverage
 	, timeRes2Name	( "timeResolution2" )
 	, timeRes1FractionName	( "timeResolution1Fraction" )
 
+        // Observables (What we want to gain from the pdf after inserting physics parameter values)
+        , timeName      ( "time" )
+        , cosThetaName  ( "cosTheta" )
+        , phiName       ( "phi" )
+        , cosPsiName    ( "cosPsi" )
+        , KstarFlavourName  ( "KstarFlavour" )
 {
 	MakePrototypes();
 }
@@ -195,15 +195,15 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Evaluate(DataPoint * measurem
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::AT() const {
         if( Aperp_sq <= 0. ) return 0. ;
         else return sqrt(Aperp_sq) ;
-};
+}
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::AP() const {
         if( Apara_sq <= 0. ) return 0. ;
         else return sqrt(Apara_sq) ;
-};
+}
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::A0() const {
         if( Azero_sq <= 0. ) return 0. ;
         else return sqrt(Azero_sq) ;
-};
+}
 
 
 double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::buildPDFnumerator()
