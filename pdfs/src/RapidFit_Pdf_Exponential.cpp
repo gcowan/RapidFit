@@ -48,7 +48,7 @@ RapidFitPdfExponential::RapidFitPdfExponential( double res )
 //....................................
 //Copy constructor  
 RapidFitPdfExponential::RapidFitPdfExponential( const RapidFitPdfExponential & other  ) :
-   gamma( other.gamma ) 
+   IPDF(), gamma( other.gamma ) 
 {  
   resolution = other.resolution ;
   valid = other.valid ;

@@ -20,7 +20,7 @@ AR           = ar cru
 
 ##Flags
 #CXXFLAGS     += -D_DEBUG
-CXXFLAGS     = -O3 -g -fPIC -pedantic -funroll-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+CXXFLAGS     = -O3 -g -fPIC -funroll-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 
 SRCEXT   = cpp
 SRCDIR   = framework/src
