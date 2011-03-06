@@ -1,4 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+2011/03/06 Conor
+   - I've written the feldman cousins ordering/plotting macro. This accepts a merged ntuple in the format as output by Rob
+   - It doesn't need fixed numbers of toys per grid, and makes no implicit assumptions about ordering of the ntuple other than that the first entry is the global minimum
+   - Currently this uses the CDF/Heidelberg ordering method which may or may not be wrong. It produces results for comparison with heidelberg but makes no claims that they (and by extension we) have it right.
+   - I've also added a ganga script that allows you to split feldman-cousins jobs down into pxqxr subjobs, where p is the number of x axis gridpoints, q the y-axis gridpoints and r the number of subjobs to split toy generation into. This is, as Pete says "Embarrassingly parallel". 
 
 2011/03/04 Rob Currie
    - Re-Written a LOT of the FC code and it is now very accessible from the command line

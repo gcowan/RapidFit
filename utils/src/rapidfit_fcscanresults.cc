@@ -200,6 +200,7 @@ int main(int argc, char *argv[]){
 	TString param2genstr = param2string + "_gen";
 	TString param2errstr = param2string + "_error";
 
+	TString FRstr = "Fit_Status";
 	TString NLLstr = "NLL";
 
 
@@ -225,9 +226,8 @@ int main(int argc, char *argv[]){
 	Double_t notgen = 0.0;
 	Float_t param1val, param1err, param1gen;
 	Float_t param2val, param2err, param2gen;
-	Float_t nll, nlldatabest;
+	Float_t nll, nlldatabest, fitstatus;
 	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints;
-
 	allresults->SetBranchAddress(param1valstr,&param1val);
 	allresults->SetBranchAddress(param1errstr,&param1err);
 	allresults->SetBranchAddress(param1genstr,&param1gen);
@@ -235,6 +235,7 @@ int main(int argc, char *argv[]){
 	allresults->SetBranchAddress(param2errstr,&param2err);
 	allresults->SetBranchAddress(param2genstr,&param2gen);
 	allresults->SetBranchAddress(NLLstr,&nll);
+	allresults->SetBranchAddress(FRstr,&fitstatus);
 
 
 	// Find the global minimum from the first entry:
@@ -246,7 +247,7 @@ int main(int argc, char *argv[]){
 	// Find the positions of the gridpoints we scanned, and find the profileLL at each point for data:
 	for(Long64_t i = 1; i < entries; i++){
 		allresults->GetEntry(i);
-		if(param1gen == notgen && param2gen == notgen && param1err == 0.0 && param2err == 0.0){
+		if(param1gen == notgen && param2gen == notgen && param1err == 0.0 && param2err == 0.0 && fitstatus == 3.0){
 			// We've found a new gridpoint
 			// But is it unique?
 			bool unique = true;
@@ -268,7 +269,7 @@ int main(int argc, char *argv[]){
 	for(UInt_t i = 0; i<param1gridpoints.size(); i++){
 		//cout << "step " << i << " of " <<  param1gridpoints.size() << endl;
 		// Build up cutstrings for the toys
-		TString toyscutstr = param1genstr + "==";
+		TString toyscutstr = FRstr + "==3.0&&" +param1genstr + "==";
 		toyscutstr += param1gridpoints[i];
 		toyscutstr += "&&" + param2genstr + "==";
 		toyscutstr += param2gridpoints[i];
