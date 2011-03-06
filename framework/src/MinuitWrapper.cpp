@@ -148,6 +148,9 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	//	A beer to whoever can fix this!		rob.currie@ed.ac.uk
 	Double_t matrix[numParams][numParams];
 
+//	Double_t** matrix = new Double_t*[numParams];
+//	for( short int i=0; i < numParams; i++ )
+//		matrix[i] = new Double_t[numParams];
 	gMinuit->mnemat(&matrix[0][0],numParams);
 	vector<double> covarianceMatrix(numParams*(numParams+1)/2);
 	for (int row = 0; row < numParams; row++)
@@ -158,6 +161,10 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 			else {covarianceMatrix[row+col*(col+1)/2] = matrix[row][col];}
 		}
 	}
+
+//	for( short int i=0; i< numParams; i++ )
+//		delete[] matrix[i];
+//	delete[] matrix;
 
 	//Make the contour plots
 	vector< FunctionContour* > allContours;

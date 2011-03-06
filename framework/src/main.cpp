@@ -662,7 +662,7 @@ int main( int argc, char * argv[] )
 
 					if( _2DLLscanList.size() > 1 )
 					{
-						cerr << "\n\n\t\tI WILL NOT DO ONE 2D SCAN PER XML FILE, GO AWAY AND FIX YOURSELF\n" << endl;
+						cerr << "\n\n\t\tI WILL NOT DO MORE THAN ONE 2D SCAN PER XML FILE, DEFAULTING TO THE LAST ONE DEFINED\n" << endl;
 					}
 //					for(unsigned int ii=0; ii < _2DLLscanList.size() ; ii++ )
 //					{
@@ -670,9 +670,11 @@ int main( int argc, char * argv[] )
 						string name2 = _2DLLscanList.back().second;
 						SoloContourResults = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
 
-
-						llContourResult = ResultFormatter::LLScan2D( SoloContourResults, name1, name2 );
-						contourResults.push_back( llContourResult );
+						if( !doFC_Flag )
+						{
+							llContourResult = ResultFormatter::LLScan2D( SoloContourResults, name1, name2 );
+							contourResults.push_back( llContourResult );
+						}
 
 						TString ext_string("-");
 						ext_string.Append( name1 );
@@ -686,10 +688,11 @@ int main( int argc, char * argv[] )
 //						AllContourFitResults.push_back( ContourLinearResults );
 //					}
 
+					_2DResultForFC = new ToyStudyResult( SoloContourResults );
 					if( !doFC_Flag )
 					{
-					makeOutput->SetLLcontourFileName( LLcontourFileName );
-					makeOutput->OutputLLcontourResult( contourResults ) ;
+						makeOutput->SetLLcontourFileName( LLcontourFileName );
+						makeOutput->OutputLLcontourResult( contourResults ) ;
 //					for(unsigned int ii=0; ii < _2DLLscanList.size(); ii++ )
 //					{
 //						TString output_scan_dat( "LLcontourScanData");
@@ -700,14 +703,13 @@ int main( int argc, char * argv[] )
 //						ext.Append(".root" );
 //						output_scan_dat.Append(ext);
 						string output_scan_dat("LLcontourScanData.root");
-						_2DResultForFC = new ToyStudyResult( ContourLinearResults );
 						ResultFormatter::WriteFlatNtuple( output_scan_dat , ContourLinearResults[0] );
 //					}
 					}
 				}
 
 
-				if( doFC_Flag )
+				if( doFC_Flag && (int(_2DLLscanList.size()) > 1) )
 				{
 					vector<ToyStudyResult*> AllResults;
 
