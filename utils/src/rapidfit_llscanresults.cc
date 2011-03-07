@@ -80,7 +80,7 @@ TPaveText* addLHCbLabel(TString footer){
 	label->SetFillColor(0);
 	label->SetBorderSize(0);     
 	label->SetTextAlign(11);          
-	label->SetTextSize(0.04);
+	label->SetTextSize(Float_t(0.04));
 	TText * labeltext = 0;
 	labeltext = label->AddText("LHC#font[12]{b} 2010 Data");
 	labeltext = label->AddText("#sqrt{s} = 7TeV");
@@ -129,15 +129,18 @@ int main(int argc, char *argv[]){
 
 
 	Long64_t entries = allresults->GetEntries();
-	TNtuple *results = (TNtuple*)allresults->CopyTree("Fit_Status==3");
+	TString Cut_String(param1string);
+	Cut_String.Append("_gen>0");
+	TNtuple *intermediate_results = (TNtuple*)allresults->CopyTree("Fit_Status==3");
+	TNtuple *results = (TNtuple*)intermediate_results->CopyTree(Cut_String);
 	Long64_t goodentries = results->GetEntries();
 	cout << "Warning: Did not use " << entries - goodentries << " results as these had a bad fit status" << endl;
 
-	Float_t p1maximum = results->GetMaximum(param1string+"_value");
-	Float_t p1minimum = results->GetMinimum(param1string+"_value");
-	Float_t p2maximum = results->GetMaximum(param2string+"_value");
-	Float_t p2minimum = results->GetMinimum(param2string+"_value");
-	Float_t minNLL = results->GetMinimum("NLL");
+	Float_t p1maximum = Float_t(results->GetMaximum(param1string+"_value"));
+	Float_t p1minimum = Float_t(results->GetMinimum(param1string+"_value"));
+	Float_t p2maximum = Float_t(results->GetMaximum(param2string+"_value"));
+	Float_t p2minimum = Float_t(results->GetMinimum(param2string+"_value"));
+	Float_t minNLL = Float_t(intermediate_results->GetMinimum("NLL"));
 	TString minNLLString = "";
 	minNLLString += minNLL;
 	cout << "plot ranges are: " << param1string << ": " << p1minimum << " " << p1maximum << " " << param2string << ": " << p2minimum << " " << p2maximum << endl;
@@ -241,7 +244,7 @@ int main(int argc, char *argv[]){
 		for(int j =0; j<contLevel->GetSize(); j++){
 		curv = (TGraph*)contLevel->At(j);
 		gc = (TGraph*)curv->Clone();
-		gc->SetLineStyle(i+1);
+		gc->SetLineStyle(Style_t(i+1));
 		gc->Draw("L");
 		}
 		leg->AddEntry(gc,confname, "L");

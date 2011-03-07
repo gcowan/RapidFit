@@ -592,7 +592,7 @@ int main( int argc, char * argv[] )
 			}
 
 			//Pick a toy study if there are repeats, or if pull plots are wanted
-			if ( ( ( numberRepeats > 1 ) && ( !doFC_Flag ) ) || doPullsFlag )
+			if ( ( ( numberRepeats > 1 ) && ((!doFC_Flag) && (!doLLcontourFlag) && (!doLLscanFlag) ) ) || doPullsFlag )
 			{
 				//Do the toy study
 				ToyStudy newStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), numberRepeats );
@@ -651,60 +651,78 @@ int main( int argc, char * argv[] )
 				ToyStudyResult* _2DResultForFC=NULL;
 				//Do 2D LL scan for deltaGamma and phis
 				if( doLLcontourFlag || doFC_Flag ) {
+
+					//  Soon to be gladly deprecated!
 					LLscanResult2D * llContourResult ;
 					vector<LLscanResult2D*> contourResults ;
 
+					//  Array of individual Results
 					vector<ToyStudyResult*> SoloContourResults;
-//					vector<ToyStudyResult*> AllContourFitResults;
-					vector<ToyStudyResult*> ContourLinearResults;
 
 					vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
 
-					if( _2DLLscanList.size() > 1 )
+					unsigned int initial_scan=0;
+					if( ( _2DLLscanList.size() > 1 ) && doFC_Flag )
 					{
-						cerr << "\n\n\t\tI WILL NOT DO MORE THAN ONE 2D SCAN PER XML FILE, DEFAULTING TO THE LAST ONE DEFINED\n" << endl;
+						cerr << "\n\nPERFORMING ONLY ONE 2D SCAN, CHECK THIS IS EXPECTED!" <<endl;
+						initial_scan = int(_2DLLscanList.size()-2);
 					}
-//					for(unsigned int ii=0; ii < _2DLLscanList.size() ; ii++ )
-//					{
-						string name1 = _2DLLscanList.back().first;
-						string name2 = _2DLLscanList.back().second;
-						SoloContourResults = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
+
+
+					vector<TString> LLcontourFileNamez;
+
+					for(unsigned int ii=initial_scan; ii < _2DLLscanList.size() ; ii++ )
+					{
+						string name1 = _2DLLscanList[ii].first;
+						string name2 = _2DLLscanList[ii].second;
+
+						vector<ToyStudyResult*> Temp_Results = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
 
 						if( !doFC_Flag )
 						{
-							llContourResult = ResultFormatter::LLScan2D( SoloContourResults, name1, name2 );
+							llContourResult = ResultFormatter::LLScan2D( Temp_Results, name1, name2 );
 							contourResults.push_back( llContourResult );
 						}
+
+						GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
+						GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
+						GlobalResult->GetResultParameterSet()->GetResultParameter( name2 )->ForcePullValue( -9999 );
+						GlobalResult->GetResultParameterSet()->GetResultParameter( name2 )->ForceOriginalValue( -9999 );
 
 						TString ext_string("-");
 						ext_string.Append( name1 );
 						ext_string.Append("_");
 						ext_string.Append( name2 );
 						ext_string.Append( ".root" );
-						LLcontourFileName.append( ext_string );
+						TString TempName = LLcontourFileName;
+						TempName.Append( ext_string );
+						LLcontourFileNamez.push_back( TempName );
 
-						ContourLinearResults.push_back( SoloContourResults[0] );
+						SoloContourResults.push_back( new ToyStudyResult( Temp_Results ) );
+					}
 
-//						AllContourFitResults.push_back( ContourLinearResults );
-//					}
+					if( doFC_Flag )  {
+						_2DResultForFC = SoloContourResults.back();
+					} else  {
+						for(unsigned int ii=0; ii < _2DLLscanList.size(); ii++ )
+						{
+							makeOutput->SetLLcontourFileName( LLcontourFileNamez[ii].Data() );
+							makeOutput->OutputLLcontourResult( contourResults ) ;
 
-					_2DResultForFC = new ToyStudyResult( SoloContourResults );
-					if( !doFC_Flag )
-					{
-						makeOutput->SetLLcontourFileName( LLcontourFileName );
-						makeOutput->OutputLLcontourResult( contourResults ) ;
-//					for(unsigned int ii=0; ii < _2DLLscanList.size(); ii++ )
-//					{
-//						TString output_scan_dat( "LLcontourScanData");
-//						TString ext("_");
-//						ext.Append(_2DLLscanList[ii].first);
-//						ext.Append("_");
-//						ext.Append(_2DLLscanList[ii].second);
-//						ext.Append(".root" );
-//						output_scan_dat.Append(ext);
-						string output_scan_dat("LLcontourScanData.root");
-						ResultFormatter::WriteFlatNtuple( output_scan_dat , ContourLinearResults[0] );
-//					}
+							string output_scan_dat("LLcontourScanData.root");
+							if( ii > 0 )
+							{
+								TString _scan_dat("LLcontourScanData_");
+								_scan_dat+= ii+1;
+								_scan_dat.Append(".root");
+								output_scan_dat=_scan_dat;
+							}
+							vector<ToyStudyResult*> TempContourResults;
+							TempContourResults.push_back( GlobalFitResult );
+							TempContourResults.push_back( SoloContourResults[ii] );
+							ToyStudyResult* TempContourResults2 = new ToyStudyResult( TempContourResults );
+							ResultFormatter::WriteFlatNtuple( output_scan_dat , TempContourResults2 );
+						}
 					}
 				}
 
@@ -784,11 +802,13 @@ int main( int argc, char * argv[] )
 						//
 						//	Generate Once, Fit twice
 						//		This was a bit of a pain to code up.
-						//		Although I like the idea of coding it up into a GenerateToyData object
+						//		Although I like the idea of coding it up into a GenerateToyData object in future to avoid this
+
 						vector<PDFWithData*> PDFsWithDataForToys;
 						vector<vector<IDataSet*> > Memory_Data;
 						Memory_Data.resize( pdfsAndData.size() );
 
+						cout << "\n\n\t\tGenerating Data For First Toy\n" << endl;
 						//	We may have multiple PDFs in the XML
 						for( unsigned short int pdf_num=0; pdf_num < pdfsAndData.size(); pdf_num++ )
 						{
@@ -805,20 +825,12 @@ int main( int argc, char * argv[] )
 							Toy_Foam_DataSet->SetPhysicsParameters( ControlParamSet );
 
 
-							cout << "\n\n\t\tCACHING DATA FOR TOYS, THIS WILL LIKELY TAKE A LONG TIME!\n\n" <<endl;
-							cout << "Caching Data for: " << wanted_number_of_toys << " toys."<<endl;
-							for( short int dataset_num=0; dataset_num < wanted_number_of_toys; dataset_num++ )
-							{
-								//	Make the data
-								cout << "Making Data...\t";
-								//	...I can't seem to workout why these outputs are not linear
-								//	even without compiler optimisations this code is a single for loop?...
-								IDataSet* new_dataset = Toy_Foam_DataSet->MakeDataSet( PhaseSpaceForToys[pdf_num], PDF_from_XML );
-								//	Store the Data Object in Memory
-								Memory_Data[pdf_num].push_back( new_dataset );
-								cout << "Cached PDF: " << pdf_num << " DataSet: " << dataset_num <<"\t";
-							}
-							cout << endl;
+							cout << "generating data for pdf: " << pdf_num << "\n";
+
+							//	Make the data
+							IDataSet* new_dataset = Toy_Foam_DataSet->MakeDataSet( PhaseSpaceForToys[pdf_num], PDF_from_XML );
+							//	Store the Data Object in Memory
+							Memory_Data[pdf_num].push_back( new_dataset );
 
 							//	Store the information for each PDFWithData
 							vector<DataSetConfiguration*> DataSetConfigForToys;
@@ -842,7 +854,7 @@ int main( int argc, char * argv[] )
 						cout << "\n\n\t\tPerforming Fits to Toys in FC\n"<<endl;
 						//		Perform Fits
 						//	This will record ONLY Data from working fits i.e. FitStatus==3
-						for( unsigned short int dataset_num=0; dataset_num < Memory_Data[0].size(); dataset_num++ )
+						for( unsigned short int dataset_num=0; dataset_num < wanted_number_of_toys; dataset_num++ )
 						{
 							
 							FitResult* fit1Result = NULL;
@@ -890,7 +902,7 @@ int main( int argc, char * argv[] )
 								PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFreeSet );
 							}
 
-							cout << "\n\n\t\tPerforming Fit To Toy "<< dataset_num <<" of " << Memory_Data[0].size() << endl;
+							cout << "\n\n\t\tPerforming Fit To Toy "<< (dataset_num+1) <<" of " << wanted_number_of_toys << endl;
 							//	Fit once with control parameters Free
 							fit1Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFreeSet, PDFsWithDataForToys, ConstraintsForToys );
 
@@ -907,7 +919,7 @@ int main( int argc, char * argv[] )
 									PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFixedSet );
 								}
 
-								cout << "\n\n\t\tFirst Fit Successful, Performing a Second Fit " << dataset_num << " of " << Memory_Data[0].size() <<endl;
+								cout << "\n\n\t\tFirst Fit Successful, Performing the Second Fit " << dataset_num << " of " << wanted_number_of_toys <<endl;
 								fit2Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFixedSet, PDFsWithDataForToys, ConstraintsForToys );
 
 								//	If either Fit Failed we want to 'dump the results' and run an extra Fit.
@@ -920,14 +932,27 @@ int main( int argc, char * argv[] )
 							if( toy_failed )
 							{
 								cerr << "\n\n\t\tA Single Toy Study Failed... Requesting More Data for another pass.\n" << endl;
+								wanted_number_of_toys++;
+							}
+							cout << "Deleting Used Data"<<endl;
+							for( unsigned int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+							{
+								cout << "deleting data for pdf: " << pdf_num << "\n";
+								delete Memory_Data[pdf_num].back();
+								Memory_Data[pdf_num].back() = NULL;
+							}
+							if( dataset_num < (wanted_number_of_toys-1) )
+							{
+								cout << "\n\n\t\tGenerating Data For Next Toy\n" <<endl;
 								for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
 								{
-									cerr << "Adding More Data for pdf: " << pdf_num << "\t";
+									cout << "generating data for pdf: " << pdf_num << "\n";
 									PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( ControlParamSet );
 									IDataSet* new_dataset = PDFsWithDataForToys[pdf_num]->GetDataSetConfig()->MakeDataSet( PhaseSpaceForToys[pdf_num], PDFsWithDataForToys[pdf_num]->GetPDF() );
 									Memory_Data[pdf_num].push_back( new_dataset );
 								}
 							}
+
 							if( FC_Debug_Flag || !toy_failed ){
 								if( toy_failed )
 								{
