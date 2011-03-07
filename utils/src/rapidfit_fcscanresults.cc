@@ -128,23 +128,23 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 		for(int j =0; j<contLevel->GetSize(); j++){
 			curv = (TGraph*)contLevel->At(j);
 			gc = (TGraph*)curv->Clone();
-		if(pub){	
-			gc->SetLineStyle(i+1);
-		}else{
-			gc->SetLineColor(i+2);
-		}
+			if(pub){	
+				gc->SetLineStyle(i+1);
+			}else{
+				gc->SetLineColor(i+2);
+			}
 			gc->Draw("L");
 		}
 		leg->AddEntry(gc,confname, "L");
-		 }
-		addLHCbLabel(labelname)->Draw();
-		leg->Draw();
-		confCanvas->Update();
-		//hist->Delete();
-		hist->SetContour(20);
-		return confCanvas;
+	}
+	addLHCbLabel(labelname)->Draw();
+	leg->Draw();
+	confCanvas->Update();
+	//hist->Delete();
+	hist->SetContour(20);
+	return confCanvas;
 
-	
+
 }
 
 
@@ -223,21 +223,11 @@ int main(int argc, char *argv[]){
 
 	//The above then repeats for each added file. FIXME: Need to think carefully about the case when subjobs are repeated such that NToys = m*Ntoyspersj
 
-	Double_t notgen = 0.0;
-	Float_t param1val, param1err, param1gen;
-	Float_t param2val, param2err, param2gen;
-	Float_t nll, nlldatabest, fitstatus;
+	TString notgen = "0.0";
+	Float_t param1val, param2val;
+	Float_t nll, nlldatabest;
 	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints;
-	allresults->SetBranchAddress(param1valstr,&param1val);
-	allresults->SetBranchAddress(param1errstr,&param1err);
-	allresults->SetBranchAddress(param1genstr,&param1gen);
-	allresults->SetBranchAddress(param2valstr,&param2val);
-	allresults->SetBranchAddress(param2errstr,&param2err);
-	allresults->SetBranchAddress(param2genstr,&param2gen);
 	allresults->SetBranchAddress(NLLstr,&nll);
-	allresults->SetBranchAddress(FRstr,&fitstatus);
-
-
 	// Find the global minimum from the first entry:
 
 	allresults->GetEntry(0);
@@ -245,9 +235,13 @@ int main(int argc, char *argv[]){
 	cout << "GLOBAL DATA MINIMUM NLL: " << nlldatabest << endl;
 
 	// Find the positions of the gridpoints we scanned, and find the profileLL at each point for data:
-	for(Long64_t i = 1; i < entries; i++){
-		allresults->GetEntry(i);
-		if(param1gen == notgen && param2gen == notgen && param1err == 0.0 && param2err == 0.0 && fitstatus == 3.0){
+	TString datafixedstr = param1genstr + "==" + notgen + "&&" + param2genstr + "==" + notgen + "&&"+ param1errstr + "==0.0&&" +param2errstr +"==0.0&&" + FRstr + "==3.0";
+	TTree* datafixed = allresults->CopyTree(datafixedstr);
+	datafixed->SetBranchAddress(param1valstr,&param1val);
+	datafixed->SetBranchAddress(param2valstr,&param2val);
+	datafixed->SetBranchAddress(NLLstr,&nll);
+	for(Long64_t i = 1; i < datafixed->GetEntries(); i++){
+		datafixed->GetEntry(i);
 			// We've found a new gridpoint
 			// But is it unique?
 			bool unique = true;
@@ -255,15 +249,14 @@ int main(int argc, char *argv[]){
 				if(param1gridpoints[j] == param1val && param2gridpoints[j] == param2val){unique = false;}
 			}
 			if(unique){
-			param1gridpoints.push_back(param1val);
-			param2gridpoints.push_back(param2val);
-			dataRatiogridpoints.push_back(nll-nlldatabest);
-			//cout << "GRIDPOINT FOUND: " << param1val << " " << param2val << " " << nll << endl;
+				param1gridpoints.push_back(param1val);
+				param2gridpoints.push_back(param2val);
+				dataRatiogridpoints.push_back(nll-nlldatabest);
+				//cout << "GRIDPOINT FOUND: " << param1val << " " << param2val << " " << nll << endl;
 			}
-		}
 	}
 	Float_t NLLtoyfixed, NLLtoyfloat;
-
+	delete datafixed;
 	output->cd();
 	//Find the toys generated at the previously discovered gridpoints
 	for(UInt_t i = 0; i<param1gridpoints.size(); i++){
