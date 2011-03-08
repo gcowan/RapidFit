@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
 
 	Long64_t entries = allresults->GetEntries();
 	TString Cut_String(param1string);
-	Cut_String.Append("_gen>0");
+	Cut_String.Append("_gen>-9999");
 	TNtuple *intermediate_results = (TNtuple*)allresults->CopyTree("Fit_Status==3");
 	TNtuple *results = (TNtuple*)intermediate_results->CopyTree(Cut_String);
 	Long64_t goodentries = results->GetEntries();

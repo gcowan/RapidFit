@@ -422,11 +422,13 @@ int main( int argc, char * argv[] )
 			xmlFile->SetSeed( RuntimeSeed[0] );
 		} else if ( !RuntimeSeed.empty() && UUID_Flag && xmlFile->IsLoaded() )
 		{
+			//  I have used the TRandom3 code as inspiration for 'Salting the Seed' of the UUID at runtime
 			cout << "Using a Random seed of UUID x RuntimeSeed to be 'unique' for all machines"<<endl;
 			TUUID uid;
 			UChar_t uuid[16];
 			uid.GetUUID(uuid);
 			RuntimeSeed[0] = RuntimeSeed[0] * ( uuid[ 2*(RuntimeSeed[0]%8) ]*256 +uuid[ 2*(RuntimeSeed[0]%8) ] );
+			xmlFile->SetSeed( RuntimeSeed[0] );
 		}
 
 		//Create a parameter set
