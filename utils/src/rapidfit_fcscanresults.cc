@@ -221,9 +221,7 @@ int main(int argc, char *argv[]){
 	//Par values will be floated
 	//Par errors !=0
 
-	//The above then repeats for each added file. FIXME: Need to think carefully about the case when subjobs are repeated such that NToys = m*Ntoyspersj
-
-	TString notgen = "0.0";
+	TString notgen = "-9999.";
 	Float_t param1val, param2val;
 	Float_t nll, nlldatabest;
 	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints;
@@ -242,66 +240,80 @@ int main(int argc, char *argv[]){
 	datafixed->SetBranchAddress(NLLstr,&nll);
 	for(Long64_t i = 1; i < datafixed->GetEntries(); i++){
 		datafixed->GetEntry(i);
-			// We've found a new gridpoint
-			// But is it unique?
-			bool unique = true;
-			for(UInt_t j = 0; j< param1gridpoints.size(); j++){
-				if(param1gridpoints[j] == param1val && param2gridpoints[j] == param2val){unique = false;}
-			}
-			if(unique){
-				param1gridpoints.push_back(param1val);
-				param2gridpoints.push_back(param2val);
-				dataRatiogridpoints.push_back(nll-nlldatabest);
-				//cout << "GRIDPOINT FOUND: " << param1val << " " << param2val << " " << nll << endl;
-			}
+		// We've found a new gridpoint
+		// But is it unique?
+		bool unique = true;
+		for(UInt_t j = 0; j< param1gridpoints.size(); j++){
+			if(param1gridpoints[j] == param1val && param2gridpoints[j] == param2val){unique = false;}
+		}
+		if(unique){
+			param1gridpoints.push_back(param1val);
+			param2gridpoints.push_back(param2val);
+			dataRatiogridpoints.push_back(nll-nlldatabest);
+			//cout << "GRIDPOINT FOUND: " << param1val << " " << param2val << " " << nll << endl;
+		}
 	}
 	Float_t NLLtoyfixed, NLLtoyfloat;
 	delete datafixed;
 	output->cd();
-	//Find the toys generated at the previously discovered gridpoints
-	for(UInt_t i = 0; i<param1gridpoints.size(); i++){
-		//cout << "step " << i << " of " <<  param1gridpoints.size() << endl;
-		// Build up cutstrings for the toys
-		TString toyscutstr = FRstr + "==3.0&&" +param1genstr + "==";
-		toyscutstr += param1gridpoints[i];
-		toyscutstr += "&&" + param2genstr + "==";
-		toyscutstr += param2gridpoints[i];
-		toyscutstr += "&&";
-		//Reduce the ntuple to only toys generated at this gridpoint, and only toys that had floated params
-		TString floatedtoyscutstr = toyscutstr;
-		floatedtoyscutstr += param1errstr + "!=0.0&&" + param2errstr + "!=0.0";
-		TTree *floatedtoys = allresults->CopyTree(floatedtoyscutstr);
-		UInt_t floatedtoystot = floatedtoys->GetEntries();
-		//Do the same for toys that had fixed params
-		TString fixedtoyscutstr = toyscutstr;
-		fixedtoyscutstr += param1errstr + "==0.0&&" + param2errstr + "==0.0";
-		TTree* fixedtoys = allresults->CopyTree(fixedtoyscutstr);
-		UInt_t fixedtoystot = fixedtoys->GetEntries();
-		if(fixedtoystot == 0 || floatedtoystot ==0 || fixedtoystot != floatedtoystot){
-			//We've got serious problems! 
-			cout << "Different number of toy fits found for gridpoint " << param1gridpoints[i] << "," << param2gridpoints[i] << " (" << fixedtoystot << "," << floatedtoystot << ") Can't continue!" << endl;
 
-			exit(1);
+	bool hastoys = false;
+	TString isatoy = param1genstr +"!="+ notgen + "&&" + param2genstr +"!=" +notgen;
+	TTree* toys = allresults->CopyTree(isatoy);
+	cout << "FOUND " << toys->GetEntries() << " TOYS" << endl;
+	//Is this just an LLscan, or were toys for FC generated? 
+	if(toys->GetEntries() != 0){hastoys = true;}
+	if(hastoys){
+		//Find the toys generated at the previously discovered gridpoints
+		for(UInt_t i = 0; i<param1gridpoints.size(); i++){
+			//cout << "step " << i << " of " <<  param1gridpoints.size() << endl;
+			// Build up cutstrings for the toys
+			TString toyscutstr = FRstr + "==3.0&&" +param1genstr + "==";
+			toyscutstr += param1gridpoints[i];
+			toyscutstr += "&&" + param2genstr + "==";
+			toyscutstr += param2gridpoints[i];
+			toyscutstr += "&&";
+			//Reduce the ntuple to only toys generated at this gridpoint, and only toys that had floated params
+			TString floatedtoyscutstr = toyscutstr;
+			floatedtoyscutstr += param1errstr + "!=0.0&&" + param2errstr + "!=0.0";
+			TTree *floatedtoys = toys->CopyTree(floatedtoyscutstr);
+			UInt_t floatedtoystot = floatedtoys->GetEntries();
+			//Do the same for toys that had fixed params
+			TString fixedtoyscutstr = toyscutstr;
+			fixedtoyscutstr += param1errstr + "==0.0&&" + param2errstr + "==0.0";
+			TTree* fixedtoys = toys->CopyTree(fixedtoyscutstr);
+			UInt_t fixedtoystot = fixedtoys->GetEntries();
+			if(fixedtoystot != floatedtoystot){
+				//We've got serious problems! 
+				cout << "Different number of toy fits found for gridpoint " << param1gridpoints[i] << "," << param2gridpoints[i] << " (" << fixedtoystot << "," << floatedtoystot << ") Can't continue!" << endl;
+
+				exit(1);
+			}
+			if(fixedtoystot != 0){
+			//Loop over the toys, pulling out the NLL ratio
+			floatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);	
+			fixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
+			UInt_t toyNLLsmaller = 0;
+			for(UInt_t j = 0; j<fixedtoystot; j++){
+				floatedtoys->GetEntry(j);	
+				fixedtoys->GetEntry(j);	
+				//FIXME THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: FIXME 
+				//if the toyratio is smaller than the data ratio at this point, increment:
+				if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}
+			}
+			//The C.L. is the percentage of toys that were smaller
+			double cl = ((Double_t)toyNLLsmaller/(Double_t)fixedtoystot);
+			clgridpoints.push_back(cl);
+			}else{ 
+				cout << param1gridpoints[i] << " " << param2gridpoints[i] << " WARNING: Found no toys here. " << endl;
+				clgridpoints.push_back(-9999.0);
+			}
+
+			delete floatedtoys;
+			delete fixedtoys;
 		}
-		//Loop over the toys, pulling out the NLL ratio
-		floatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);	
-		fixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
-		UInt_t toyNLLsmaller = 0;
-		for(UInt_t j = 0; j<fixedtoystot; j++){
-			floatedtoys->GetEntry(j);	
-			fixedtoys->GetEntry(j);	
-			//FIXME THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: FIXME 
-			//if the toyratio is smaller than the data ratio at this point, increment:
-			if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}
-		}
-		//The C.L. is the percentage of toys that were smaller
-		double cl = ((Double_t)toyNLLsmaller/(Double_t)fixedtoystot);
-		//cout << param1gridpoints[i] << " " << param2gridpoints[i] << " " << cl << endl;
-		clgridpoints.push_back(cl);
-		delete floatedtoys;
-		delete fixedtoys;
 	}
-
+	delete toys;
 	//We now have 4 vectors: The gridpoints in x,y and the conf. limits in z or the profile LL in z. We need to make TGraphs from these bad boys. 
 
 	//Copy vectors to arrays: 
@@ -338,7 +350,6 @@ int main(int argc, char *argv[]){
 	double confs[4] = {68.0,90.0,95.0,99.0};
 
 	TCanvas *plltemp = makeTempCanvas(pllhist,"Profile Likelihood");
-
 	plltemp->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_temp.pdf");
 	plltemp->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_temp.png");
 	TCanvas *pllcont = makeContCanvas(pllhist,"Profile Likelihood");
@@ -352,32 +363,33 @@ int main(int argc, char *argv[]){
 	pllpub->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_pub.png");
 
 	// Now let's plot the feldman cousins in the same way: 
-	TGraph2D *fcgraph = new TGraph2D(npoints, p2points, p1points, clpoints);
-	fcgraph->SetName("fcgraph");
-	fcgraph->SetNpx(np);
-	fcgraph->SetNpy(np);
-	TH2D* fchist = fcgraph->GetHistogram();
-	fchist->SetName("fchist");
-	fchist->SetTitle("");
-	fchist->GetXaxis()->SetTitle(param2string);
-	fchist->GetYaxis()->SetTitle(param1string);
-	fchist->Write();
+	if(hastoys){
+		TGraph2D *fcgraph = new TGraph2D(npoints, p2points, p1points, clpoints);
+		fcgraph->SetName("fcgraph");
+		fcgraph->SetNpx(np);
+		fcgraph->SetNpy(np);
+		TH2D* fchist = fcgraph->GetHistogram();
+		fchist->SetName("fchist");
+		fchist->SetTitle("");
+		fchist->GetXaxis()->SetTitle(param2string);
+		fchist->GetYaxis()->SetTitle(param1string);
+		fchist->Write();
 
-	TCanvas *fctemp = makeTempCanvas(fchist,"Feldman Cousins");
-	fctemp->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_temp.pdf");
-	fctemp->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_temp.png");
-	TCanvas *fccont = makeContCanvas(fchist,"Feldman Cousins");
-	fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.pdf");
-	fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.png");
-	TCanvas *fcconf = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,false);
-	fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.pdf");
-	fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.png");
-	TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,true);
-	fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.pdf");
-	fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.png");
-	output->Write();
-	output->Close();
-
+		TCanvas *fctemp = makeTempCanvas(fchist,"Feldman Cousins");
+		fctemp->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_temp.pdf");
+		fctemp->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_temp.png");
+		TCanvas *fccont = makeContCanvas(fchist,"Feldman Cousins");
+		fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.pdf");
+		fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.png");
+		TCanvas *fcconf = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,false);
+		fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.pdf");
+		fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.png");
+		TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,true);
+		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.pdf");
+		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.png");
+		output->Write();
+		output->Close();
+	}
 
 }
 
