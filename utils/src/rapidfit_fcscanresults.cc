@@ -48,6 +48,7 @@ using std::cout;
 using std::endl;
 
 typedef vector<Float_t> array1f;
+typedef vector<TGraph*> array1g;
 typedef vector<TString> array1s;
 
 inline TString prettyPrint(Double_t value){
@@ -88,11 +89,25 @@ TPaveText* addLHCbLabel(TString footer){
 	return label;
 }
 
+TCanvas *makeTempCanvas(TGraph2D* graph, TString labelname){
+	TCanvas *tempCanvas = new TCanvas(labelname+" temperature",labelname+" temperature",1024,768);
+	graph->Draw("colz");
+	addLHCbLabel(labelname)->Draw();
+	return tempCanvas;
+}
+
 TCanvas *makeTempCanvas(TH2* hist, TString labelname){
 	TCanvas *tempCanvas = new TCanvas(labelname+" temperature",labelname+" temperature",1024,768);
 	hist->Draw("colz");
 	addLHCbLabel(labelname)->Draw();
 	return tempCanvas;
+}
+
+TCanvas *makeContCanvas(TGraph2D* graph, TString labelname){
+	TCanvas *contourCanvas = new TCanvas(labelname+" contour",labelname+" contour",1024,768);
+	graph->Draw("cont1z");
+	addLHCbLabel(labelname)->Draw();
+	return contourCanvas;
 }
 
 TCanvas *makeContCanvas(TH2* hist, TString labelname){
@@ -101,6 +116,7 @@ TCanvas *makeContCanvas(TH2* hist, TString labelname){
 	addLHCbLabel(labelname)->Draw();
 	return contourCanvas;
 }
+
 TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* conts, double* confs, bool pub){
 	//TH2* hist = (TH2*)_hist->Clone("confhist");
 	TString pname = "color";
@@ -148,6 +164,77 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 }
 
 
+TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t nconts, double* fcconts, double *llconts, double* confs){
+	//TH2* hist = (TH2*)_hist->Clone("confhist");
+	TString pname = "both";
+	TCanvas *confCanvas = new TCanvas(pname + " " + labelname+" CL contours",pname + " " + labelname+" CL contours",1024,768);
+	histll->SetContour(nconts,llconts);
+	histll->Draw("cont LIST");
+	confCanvas->Update();
+	TObjArray *llcontObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
+	TList* contLevel = NULL;
+	TGraph* curv     = NULL;
+	array1g gcarr;
+	int llTotalConts = llcontObjArr->GetSize();
+
+
+	TLegend *leg = new TLegend(0.75,0.89,0.95,0.7);
+	leg->SetHeader("Conf. Levels");
+	leg->SetBorderSize(0);
+	leg->SetFillStyle(0);
+	for(int i = 0; i < llTotalConts; i++){
+		TString confname = "";
+		double cl = confs[i];
+		confname +=cl;
+		confname += "\% C.L. (PLL)";
+		contLevel = (TList*)llcontObjArr->At(i);
+		for(int j =0; j<contLevel->GetSize(); j++){
+			curv = (TGraph*)contLevel->At(j);
+				TGraph *gc = (TGraph*)curv->Clone();
+				gc->SetLineStyle(i+1);
+				gcarr.push_back(gc);
+
+		if(j==0){leg->AddEntry(gc,confname, "L");}
+		}
+
+	}
+	
+	histfc->SetContour(nconts,fcconts);
+	histfc->Draw("cont LIST");
+	confCanvas->Update();
+	TObjArray *fccontObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
+	confCanvas->Update();
+	int fcTotalConts = fccontObjArr->GetSize();
+	for(int i = 0; i < fcTotalConts; i++){
+		TString confname = "";
+		double cl = confs[i];
+		confname +=cl;
+		confname += "\% C.L. (FC)";
+		contLevel = (TList*)fccontObjArr->At(i);
+		for(int j =0; j<contLevel->GetSize(); j++){
+			curv = (TGraph*)contLevel->At(j);
+				TGraph *gc = (TGraph*)curv->Clone();
+				gc->SetLineColor(i+2);
+				gcarr.push_back(gc);
+		if(j==0){leg->AddEntry(gc,confname, "L");}
+		}
+	}
+	histll->Draw("AXIS");
+	for(UInt_t i =0; i<gcarr.size(); i++){
+	gcarr[i]->Draw("L SAME");
+	}
+	addLHCbLabel(labelname)->Draw();
+	leg->Draw();
+	confCanvas->Update();
+	//hist->Delete();
+	histll->SetContour(20);
+	histfc->SetContour(20);
+	return confCanvas;
+
+
+}
+
+
 int main(int argc, char *argv[]){
 
 	if(argc !=5 ){
@@ -168,15 +255,11 @@ int main(int argc, char *argv[]){
 	gStyle->SetFrameFillColor(0);
 
 
-
-	TFile * input = TFile::Open( argv[1] );
 	TString outputdir = argv[4];
-
 	TString param1string = argv[2];
 	TString param2string = argv[3];
 	gSystem->mkdir( outputdir );
-	TFile * output = new TFile(outputdir+"/llscanresults.root","RECREATE");
-	input->cd();
+	TFile * input = TFile::Open( argv[1] );
 	TNtuple* allresults;
 	input->GetObject("RapidFitResult", allresults);
 	if(!allresults){
@@ -187,10 +270,10 @@ int main(int argc, char *argv[]){
 		}
 	}
 
+	TFile * output = new TFile(outputdir+"/llscanresults.root","RECREATE");
 
 	Long64_t entries = allresults->GetEntries();
-	cout << "INPUT NTUPLE CONTAINS: " << entries << "entries" << endl;
-
+	cout << "INPUT NTUPLE CONTAINS: " << entries << " ENTRIES" << endl;
 
 	TString param1valstr = param1string + "_value";
 	TString param1genstr = param1string + "_gen";
@@ -221,10 +304,14 @@ int main(int argc, char *argv[]){
 	//Par values will be floated
 	//Par errors !=0
 
+	Float_t shift = 0.000000001;
+	TString shiftstr = "";
+	shiftstr += shift;
+
 	TString notgen = "-9999.";
 	Float_t param1val, param2val;
 	Float_t nll, nlldatabest;
-	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints;
+	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints, toysgridpoints;
 	allresults->SetBranchAddress(NLLstr,&nll);
 	// Find the global minimum from the first entry:
 
@@ -244,7 +331,7 @@ int main(int argc, char *argv[]){
 		// But is it unique?
 		bool unique = true;
 		for(UInt_t j = 0; j< param1gridpoints.size(); j++){
-			if(param1gridpoints[j] == param1val && param2gridpoints[j] == param2val){unique = false;}
+			if((fabs(param1gridpoints[j] - param1val) < shift) && (fabs(param2gridpoints[j] - param2val) < shift)){unique = false;}
 		}
 		if(unique){
 			param1gridpoints.push_back(param1val);
@@ -253,12 +340,16 @@ int main(int argc, char *argv[]){
 			//cout << "GRIDPOINT FOUND: " << param1val << " " << param2val << " " << nll << endl;
 		}
 	}
+	cout << "FOUND " << param1gridpoints.size() << " UNIQUE GRIDPOINTS" << endl;
 	Float_t NLLtoyfixed, NLLtoyfloat;
 	delete datafixed;
-	output->cd();
 
 	bool hastoys = false;
-	TString isatoy = param1genstr +"!="+ notgen + "&&" + param2genstr +"!=" +notgen;
+
+	TString p1isatoy = "(abs("+param1genstr+"-"+notgen+")>"+shiftstr+")";
+	TString p2isatoy = "(abs("+param2genstr+"-"+notgen+")>"+shiftstr+")";
+	TString isatoy = p1isatoy + "&&" + p2isatoy;
+
 	TTree* toys = allresults->CopyTree(isatoy);
 	cout << "FOUND " << toys->GetEntries() << " TOYS" << endl;
 	//Is this just an LLscan, or were toys for FC generated? 
@@ -268,19 +359,20 @@ int main(int argc, char *argv[]){
 		for(UInt_t i = 0; i<param1gridpoints.size(); i++){
 			//cout << "step " << i << " of " <<  param1gridpoints.size() << endl;
 			// Build up cutstrings for the toys
-			TString toyscutstr = FRstr + "==3.0&&" +param1genstr + "==";
+			TString toyscutstr = FRstr + "==3.0&&(abs(" +param1genstr + "-";
 			toyscutstr += param1gridpoints[i];
-			toyscutstr += "&&" + param2genstr + "==";
+			toyscutstr += ")<"+shiftstr+")&&(abs(" + param2genstr + "-";
 			toyscutstr += param2gridpoints[i];
-			toyscutstr += "&&";
+			toyscutstr += ")<"+shiftstr+")&&";
 			//Reduce the ntuple to only toys generated at this gridpoint, and only toys that had floated params
 			TString floatedtoyscutstr = toyscutstr;
-			floatedtoyscutstr += param1errstr + "!=0.0&&" + param2errstr + "!=0.0";
+
+			floatedtoyscutstr += "(abs("+param1errstr +")>"+shiftstr + ")&&(abs(" + +param1errstr +")>"+shiftstr + ")";
 			TTree *floatedtoys = toys->CopyTree(floatedtoyscutstr);
 			UInt_t floatedtoystot = floatedtoys->GetEntries();
 			//Do the same for toys that had fixed params
 			TString fixedtoyscutstr = toyscutstr;
-			fixedtoyscutstr += param1errstr + "==0.0&&" + param2errstr + "==0.0";
+			fixedtoyscutstr += "(abs("+param1errstr +")<"+shiftstr + ")&&(abs(" + +param1errstr +")<"+shiftstr + ")";
 			TTree* fixedtoys = toys->CopyTree(fixedtoyscutstr);
 			UInt_t fixedtoystot = fixedtoys->GetEntries();
 			if(fixedtoystot != floatedtoystot){
@@ -294,10 +386,11 @@ int main(int argc, char *argv[]){
 			floatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);	
 			fixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
 			UInt_t toyNLLsmaller = 0;
+			toysgridpoints.push_back((Float_t)fixedtoystot);
 			for(UInt_t j = 0; j<fixedtoystot; j++){
 				floatedtoys->GetEntry(j);	
 				fixedtoys->GetEntry(j);	
-				//FIXME THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: FIXME 
+				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
 				//if the toyratio is smaller than the data ratio at this point, increment:
 				if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}
 			}
@@ -322,15 +415,11 @@ int main(int argc, char *argv[]){
 	copy( param2gridpoints.begin(), param2gridpoints.end(),p2points);
 	Double_t* p1points = new Double_t [npoints];
 	copy( param1gridpoints.begin(), param1gridpoints.end(),p1points);
-	Double_t* clpoints = new Double_t [npoints];
-	copy( clgridpoints.begin(), clgridpoints.end(),clpoints);
 	Double_t* pllpoints = new Double_t [npoints];
 	copy( dataRatiogridpoints.begin(), dataRatiogridpoints.end(),pllpoints);
 
-	output->cd();
-
 	int np = (int)sqrt((double)npoints);
-
+	
 	//We get the data profile likelihood free, so let's plot it: 
 	TGraph2D *pllgraph = new TGraph2D(npoints, p2points, p1points, pllpoints);
 	pllgraph->SetName("pllgraph");
@@ -364,6 +453,11 @@ int main(int argc, char *argv[]){
 
 	// Now let's plot the feldman cousins in the same way: 
 	if(hastoys){
+		Double_t* clpoints = new Double_t [npoints];
+		copy( clgridpoints.begin(), clgridpoints.end(),clpoints);
+		Double_t* toyspoints = new Double_t [npoints];
+		copy( toysgridpoints.begin(), toysgridpoints.end(),toyspoints);
+
 		TGraph2D *fcgraph = new TGraph2D(npoints, p2points, p1points, clpoints);
 		fcgraph->SetName("fcgraph");
 		fcgraph->SetNpx(np);
@@ -387,6 +481,26 @@ int main(int argc, char *argv[]){
 		TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,true);
 		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.pdf");
 		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.png");
+		TCanvas *both = makeBothCanvas(fchist,pllhist,"FC and PLL",4,fcconts,pllconts,confs);
+		both->Print(outputdir+"/"+param1string+"_"+param2string+"_both.pdf");
+		both->Print(outputdir+"/"+param1string+"_"+param2string+"_both.png");
+
+		TGraph2D *toygraph = new TGraph2D(npoints, p2points, p1points, toyspoints);
+		fcgraph->SetName("ntoysgraph");
+		fcgraph->SetNpx(np);
+		fcgraph->SetNpy(np);
+		TH2D* toyhist = toygraph->GetHistogram();
+		toyhist->SetName("ntoyshist");
+		toyhist->SetTitle("");
+		toyhist->GetXaxis()->SetTitle(param2string);
+		toyhist->GetYaxis()->SetTitle(param1string);
+		toyhist->Write();
+
+		TCanvas *toytemp = makeTempCanvas(toyhist,"Toys per gridpoint");
+		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.pdf");
+		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.png");
+	
+
 		output->Write();
 		output->Close();
 	}
