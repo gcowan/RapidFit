@@ -318,3 +318,313 @@ ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConf
 	return Returnable_Result;
 }
 
+//	This is the Main loop of Code which performs the Numerical work needed for the Feldman-Cousins Fit in RapidFit
+//	The output of this code is to be analysed by Conor's plotting tool
+//	I make no claims as to how FC plots are extracted from this I will just tell you what this code Does
+//
+//	Step1:		Find Global Minima
+//	Step2:		Find Minima at point i,j
+//	Step3:		Setup Framework to, and Generate Data for toy study with control paramater for i,j Fixed
+//			You can either set nuisence parameters to their central values when fit at Step 1 or 2
+//			At the time of writing the nuisence parameters are still under investigation
+//	Step4:		Repeat Step 3 as many times as requested, or do 100 toys as default
+//	Step5:		Format output into standard block format. This gives us 2 things.
+ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned short int> numberRepeats, unsigned short int NuisenceModel, bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData )
+{
+	FitResult* GlobalFitResult = GlobalResult->GetFitResult( 0 );
+	vector<ToyStudyResult*> AllResults;
+	//		Want to loop over all points on a 2D Plot that have been allocated to this instance
+	for( int iFC=0; iFC < _2DResultForFC->NumberResults(); iFC++ )
+	{
+
+		//		GET INPUT Data from fit Results
+		//
+		//  Get a ParameterSet that contains the input parameters from the output of a fit
+		vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
+		string name1 = _2DLLscanList[0].first;
+		string name2 = _2DLLscanList[0].second;
+
+		ParameterSet* InputParamSet = NULL;
+		ParameterSet* InputFreeSet = NULL;
+		ParameterSet* ControlParamSet = NULL;
+
+		//	True by definition:
+		double lim1 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name1 )->GetValue();
+		double lim2 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name2 )->GetValue();
+
+		if( NuisenceModel == 1 )
+		{
+			//		Use the inputs from Step 1
+			InputParamSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+			InputFreeSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+			ControlParamSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+		} else if( NuisenceModel == 2 ){
+			//		Use the inputs from Step 2
+			InputParamSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+			InputFreeSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+			ControlParamSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+		}
+
+
+		//		Just for clarity
+		//		also when using values from Step1 these are not set correctly for the study
+		ControlParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+		ControlParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+		InputParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+		InputParamSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+		InputParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+		InputParamSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+		InputParamSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+		InputParamSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+		InputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+		InputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+		InputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+		InputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+		InputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
+		InputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
+
+
+
+		//	Collect all of the relevent Data from the XML
+		//	Note: most of these had to be written for FCscans
+		MinimiserConfiguration * ToyStudyMinimiser = theMinimiser;
+		FitFunctionConfiguration* ToyStudyFunction = theFunction;
+		vector<vector<IPrecalculator*> > ToyPrecalculators = xmlFile->GetPrecalculators();
+		vector<PhaseSpaceBoundary*> PhaseSpaceForToys = xmlFile->GetPhaseSpaceBoundaries();
+		vector<ConstraintFunction*> ConstraintsForToys = xmlFile->GetConstraints();
+
+		//	Read the number of events from the existing DataSets
+		//	I think there needs be an equivalent function drafted to use sWeights
+		vector<unsigned int> EventsPerPDF;
+		for( unsigned int pdf_num=0; pdf_num < pdfsAndData.size(); pdf_num++ )
+		{
+			EventsPerPDF.push_back( pdfsAndData[pdf_num]->GetDataSet()->GetDataNumber() );
+		}
+
+
+
+		//		Number of datasets wanted i.e. Number of Toys
+		unsigned short int wanted_number_of_toys = 100;
+		if( !numberRepeats.empty() ) wanted_number_of_toys = numberRepeats[0];
+
+
+
+		//		GENERATE DATA
+		//	We want to now generate a new DataSet for a Toy Study
+		//	I choose a Foam DataSet with no Cuts or extra arguments as these are not required
+		//
+		//	Data is now only generated and held in memory for as long as it's needed as this
+		//	has a lighter memory footprint
+		//
+		//	Generate Once, Fit twice
+		//	This was a bit of a pain to code up.
+		//	Although I like the idea of coding it up into a GenerateToyData object in future to avoid this
+
+		vector<PDFWithData*> PDFsWithDataForToys;
+		vector<vector<IDataSet*> > Memory_Data;
+		Memory_Data.resize( pdfsAndData.size() );
+
+		//	NB:
+		//	Generating data the first time is more complex as we need to construct the correct PDFWithData
+		//	The object setup here will be used later in the code as a template with cached data being replaced
+		//	This reduces the amount of code and makes this procedure easier to understand as a whole
+
+		cout << "\n\n\t\tGenerating Data For First Toy\n" << endl;
+		//	We may have multiple PDFs in the XML
+		for( unsigned short int pdf_num=0; pdf_num < pdfsAndData.size(); pdf_num++ )
+		{
+			//	Generate the Data for this Study using the given the XML PhaseSpace and PDF
+			IPDF* PDF_from_XML = pdfsAndData[pdf_num]->GetPDF();
+
+			//	Create a DataSetConfiguration to make the datasets
+			vector<string> empty_args;
+			vector<string> empty_arg_names;
+			DataSetConfiguration* Toy_Foam_DataSet= new DataSetConfiguration( "Foam", EventsPerPDF[pdf_num], "", empty_args, empty_arg_names, PDF_from_XML );
+
+			//	Set the Input Physics Parameters to be as defined above ControlSet
+			//	This is to seperate changing bottles for Physics from that used at Generation
+			//	as we want the data to have a wider scope than 1 fit with the data
+			Toy_Foam_DataSet->SetPhysicsParameters( ControlParamSet );
+
+			//	Let the user know what's going on
+			cout << "generating data for pdf: " << pdf_num << "\n";
+
+			//	Make the data
+			IDataSet* new_dataset = Toy_Foam_DataSet->MakeDataSet( PhaseSpaceForToys[pdf_num], PDF_from_XML );
+			//	Store the Data Object in Memory
+			Memory_Data[pdf_num].push_back( new_dataset );
+
+			//	Store the information for each PDFWithData
+			vector<DataSetConfiguration*> DataSetConfigForToys;
+			DataSetConfigForToys.push_back( Toy_Foam_DataSet );
+			PDFWithData* ToyPDFWithData = new PDFWithData( PDF_from_XML, PhaseSpaceForToys[pdf_num], DataSetConfigForToys, ToyPrecalculators[pdf_num] );
+
+			//	Store this PDFWithData
+			ToyPDFWithData->SetPhysicsParameters( InputParamSet );
+			PDFsWithDataForToys.push_back( ToyPDFWithData );
+		}
+
+		//		Result Vectors for the Fit for clarity and Output Formatting
+		ToyStudyResult* study1Results = new ToyStudyResult( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
+		ToyStudyResult* study2Results = new ToyStudyResult( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
+
+
+		//	Try to make minuit as quiet as possible here... does someone have a way to gag it's output?!?
+		ToyStudyMinimiser->GetMinimiser( int(InputParamSet->GetAllNames().size()) )->SetOutputLevel(-1);
+
+
+		//	This Forms the main sequence of the fit
+
+		cout << "\n\n\t\tPerforming Fits to Toys in FC\n"<<endl;
+		//		Perform Fits
+		//	This will record ONLY Data from working fits i.e. FitStatus==3 unless the Debug flag is on
+		for( unsigned short int dataset_num=0; dataset_num < wanted_number_of_toys; dataset_num++ )
+		{
+
+			bool toy_failed = false;
+
+			FitResult* fit1Result = NULL;
+			FitResult* fit2Result = NULL;
+
+			ParameterSet* LocalInputFreeSet=NULL;
+			ParameterSet* LocalInputFixedSet=NULL;
+
+			if( NuisenceModel == 1 )	{
+				//	Assuming Nuisence Parameters set to Global Minima
+				//	We need to set this for EVERY FIT in order to have correct generation/pull values
+				LocalInputFreeSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+				LocalInputFixedSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+			} else if( NuisenceModel == 2 )	{
+				//	Assuming Nuisence Parameters set to Local Minima
+				//
+				LocalInputFreeSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+				LocalInputFixedSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+			} else if( NuisenceModel == 3 )	{
+				//	Generate a ParameterSet with random numbers based on
+				//	Fit Results and assign it to the ControlParamSet which is used for generation
+				//	Also need to Setup Local ParameterSets as with standard case
+			}
+
+			ControlParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+			ControlParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+			LocalInputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+			LocalInputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+			LocalInputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+			LocalInputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+			LocalInputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
+			LocalInputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
+
+			LocalInputFixedSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+			LocalInputFixedSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+			LocalInputFixedSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+			LocalInputFixedSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+			LocalInputFixedSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+			LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+
+			//	We need to set some factors before we perform the fit
+			for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+			{
+				vector<IDataSet*> wanted_set;
+				wanted_set.push_back( Memory_Data[pdf_num][dataset_num] );
+				PDFsWithDataForToys[pdf_num]->AddCachedData( wanted_set );
+				PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFreeSet );
+			}
+
+			cout << "\n\n\t\tPerforming Fit To Toy: "<< (dataset_num+1) <<" of " << wanted_number_of_toys << endl<<endl;
+			//	Fit once with control parameters Free
+			fit1Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFreeSet, PDFsWithDataForToys, ConstraintsForToys );
+
+			//	Only Fit again to this dataset if it fits well with +2 dof
+			//	This has the obvious savings in CPU resources
+			//	We may want to keep this information so leaving it configurable.
+			if( ( fit1Result->GetFitStatus() == 3 ) || FC_Debug_Flag )
+			{
+				if( FC_Debug_Flag )	cout << "\n\nYou are aware your requesting all output?\n"<<endl;
+
+				//  Fit secondGlobalResult with control parameters Fixed
+				for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+				{
+					vector<IDataSet*> wanted_set;
+					wanted_set.push_back( Memory_Data[pdf_num][dataset_num] );
+					PDFsWithDataForToys[pdf_num]->AddCachedData( wanted_set );
+					PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFixedSet );
+				}
+
+				cout << "\n\n\t\tFirst Fit Successful, Performing the Second Fit " << (dataset_num+1) << " of " << wanted_number_of_toys <<endl;
+				//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
+				fit2Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFixedSet, PDFsWithDataForToys, ConstraintsForToys );
+
+				//	If either Fit Failed we want to 'dump the results' and run an extra Fit.
+				if( (fit2Result->GetFitStatus() != 3) || (fit2Result->GetFitStatus() != 3) ) toy_failed = true;
+			}
+			else	toy_failed = false;
+
+			//	Do we want to store the Data OR run another toy to get a better Fit
+			if( toy_failed )
+			{
+				cerr << "\n\n\t\tA Single Toy Study Failed... Requesting More Data for another pass.\n" << endl;
+				//  Increment counter so we can guarantee we get 'wanted_number_of_toys' which have fitted correctly
+				wanted_number_of_toys++;
+			}
+
+			//	In my opinion the fact this is so easy and doesn't cause root to throw up is a testiment to the other authors in RapidFit :D
+			cout << "\n\n\t\tDeleting Used Data:\n"<<endl;
+			for( unsigned int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+			{
+				cout << "deleting data for pdf: " << pdf_num << "\n";
+				delete Memory_Data[pdf_num].back();
+				Memory_Data[pdf_num].back() = NULL;
+			}
+
+			// Only generate data if I'm going to fit to it
+			if( dataset_num < (wanted_number_of_toys-1) )
+			{
+				cout << "\n\n\t\tGenerating Data For Next Toy:\n" <<endl;
+
+				for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+				{
+					// See above for more detailed description
+					cout << "generating data for pdf: " << pdf_num << "\n";
+					PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( ControlParamSet );
+					IDataSet* new_dataset = PDFsWithDataForToys[pdf_num]->GetDataSetConfig()->MakeDataSet( PhaseSpaceForToys[pdf_num], PDFsWithDataForToys[pdf_num]->GetPDF() );
+					Memory_Data[pdf_num].push_back( new_dataset );
+				}
+			}
+
+			if( FC_Debug_Flag || !toy_failed ){
+				if( toy_failed )
+				{
+					fit1Result->ForceFitStatus(-2);
+					fit2Result->ForceFitStatus(-2);
+				}
+				study1Results->AddFitResult( fit1Result );
+				study2Results->AddFitResult( fit2Result );
+			}
+		}
+
+
+		//			STEP 6
+		//
+		//		Standard Output Format which makes the results the same running either
+		//		the whole scan on one machine or running the whole set on a batch system
+		ToyStudyResult* ThisStudy = new ToyStudyResult( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
+		ThisStudy->AddFitResult( _2DResultForFC->GetFitResult( iFC ), false );
+		ThisStudy->AddCPUTimes( _2DResultForFC->GetAllCPUTimes() );
+		ThisStudy->AddRealTimes( _2DResultForFC->GetAllRealTimes() );
+		//	The Generated Value for the Global and Local fit are best defined as -9999 as a sensible default
+		for( unsigned short int num=0; num < GlobalFitResult->GetResultParameterSet()->GetAllNames().size(); num++ )
+		{
+			string name = GlobalFitResult->GetResultParameterSet()->GetAllNames()[num];
+			GlobalFitResult->GetResultParameterSet()->GetResultParameter( name )->ForcePullValue( -9999 );
+			GlobalFitResult->GetResultParameterSet()->GetResultParameter( name )->ForceOriginalValue( -9999 );
+			ThisStudy->GetFitResult(0)->GetResultParameterSet()->GetResultParameter( name )->ForcePullValue( -9999 );
+			ThisStudy->GetFitResult(0)->GetResultParameterSet()->GetResultParameter( name )->ForceOriginalValue( -9999 );
+		}
+		AllResults.push_back( GlobalResult );
+		AllResults.push_back( ThisStudy );
+		AllResults.push_back( study1Results );
+		AllResults.push_back( study2Results );
+	}
+
+	return new ToyStudyResult( AllResults );
+}

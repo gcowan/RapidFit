@@ -19,6 +19,7 @@
 #include "PDFWithData.h"
 #include "ScanParam.h"
 #include "ToyStudyResult.h"
+#include "XMLConfigReader.h"
 #include <vector>
 #include <string>
 #include <exception>
@@ -38,6 +39,9 @@ class FitAssembler
 		static vector<ToyStudyResult*> ContourScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string, string );
 		static ToyStudyResult* SingleScan(  MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string );
 
+
+		//  Std Feldman-Cousins Code, relying on many already defined objects even though it pulls in the XMLConfigReader object
+		static ToyStudyResult* FeldmanCousins( ToyStudyResult*, ToyStudyResult*, vector<unsigned short int>, unsigned short int, bool, OutputConfiguration*, MinimiserConfiguration*, FitFunctionConfiguration*, XMLConfigReader*, vector< PDFWithData* >);
 
 	private:
 		static void DoScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, ScanParam*, ToyStudyResult* );

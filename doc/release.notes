@@ -1,4 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+
+2011/03/10 Rob Currie
+   - Moved FCscan into FitAssembler and cleaned up some more code, employed file compression on all data given FCscans will produce the results from several hundred toys and hadd doesn't compress
+   - Offered slightly more control over FC code now it is a function call, produced framework for assembling different schemes for defining NuisenceParameters, implement ShakeBottle, and use that :D
+
 2011/03/06 Conor
    - I've written the feldman cousins ordering/plotting macro. This accepts a merged ntuple in the format as output by Rob
    - It doesn't need fixed numbers of toys per grid, and makes no implicit assumptions about ordering of the ntuple other than that the first entry is the global minimum

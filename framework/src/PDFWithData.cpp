@@ -77,6 +77,12 @@ IDataSet * PDFWithData::GetDataSet()
 		}
 	} else {
 		newDataSet = cached_data.back();
+		//	Pop back?	Yes?	No?
+		//	I can't decide what the correct behaviour should be for 'cached data' I suppose it should still be kept
+		//	However, I am passing by pointer and cached data can be deleted by the calling function which makes any
+		//	future attempts to fit to this DANGEROUS so I remove any reference to it once I've fitted
+		//	This is contrary to the intent I think for RapidFit, but I wish to use this for FC and so it's
+		//	MUCH easier to re-use existing objects as much as possible.
 		cached_data.pop_back();
 	}
 

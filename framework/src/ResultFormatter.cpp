@@ -57,6 +57,7 @@ void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
 
 	//Make the file and NTuple
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
+	rootFile->SetCompressionLevel(9);
 	TNtuple * dataNTuple = new TNtuple( "dataNTuple", "All data", observableNames.c_str() );
 
 	//Loop over all data points and add them to the NTuple
@@ -109,6 +110,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 
 	string name = contourFileName;// + ".root";
 	TFile * contourFile = new TFile( name.c_str(), "RECREATE");
+	contourFile->SetCompressionLevel(9);
 	int colours[2] = {42,38};
 
 	//Loop over all contour plots
@@ -408,6 +410,7 @@ void ResultFormatter::MakePullPlots( string Type, string FileName, ToyStudyResul
 void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult* ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
+	rootFile->SetCompressionLevel(9);
 	TNtuple * parameterNTuple;
 	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader() );
 	Float_t * resultArr;
@@ -432,6 +435,7 @@ void ResultFormatter::WriteFlatNtuple( string Filename, ToyStudyResult* ToyResul
 void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResult * ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
+	rootFile->SetCompressionLevel(9);
 	string header = "value:error:pull";
 	vector<string> allNames = ToyResult->GetAllNames();
 	Float_t valueErrorPull[3];
@@ -513,6 +517,8 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 	// 1=BLACK    4=BLUE    3=GREEN     5=YELLOW
 
 	TFile * LLscanFile = new TFile( filename.c_str(), "RECREATE");
+	LLscanFile->SetCompressionLevel(9);
+
 
 	//Set some numbers
 	int nscans = int(scanResults.size());
@@ -548,6 +554,7 @@ void ResultFormatter::MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, s
 	// 1=BLACK    4=BLUE    3=GREEN     5=YELLOW
 
 	TFile * LLcontourFile = new TFile( filename.c_str(), "RECREATE");
+	LLcontourFile->SetCompressionLevel(9);
 
 	//Set some numbers
 	int nscans = int(scanResults.size());

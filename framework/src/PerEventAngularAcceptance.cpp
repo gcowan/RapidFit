@@ -509,6 +509,7 @@ void PerEventAngularAcceptance::writeHistos()
 {
   string outFileName = "out.root";
   TFile * outFile = new TFile( outFileName.c_str(), "RECREATE");
+  outFile->SetCompressionLevel(9);
   vector<string>::iterator particleIterator;
   for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
   {
