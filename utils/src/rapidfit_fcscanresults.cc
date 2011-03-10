@@ -416,8 +416,8 @@ int main(int argc, char *argv[]){
 			for(UInt_t j = 0; j<fixedtoystot; j++){
 //				floatedtoys->GetEntry(j);
 //				fixedtoys->GetEntry(j);
-				NLLtoyfixed = Float_t(NLLtoyfixed_pointer[i]);
-				NLLtoyfloat = Float_t(NLLtoyfloat_pointer[i]);
+				NLLtoyfixed = Float_t(NLLtoyfixed_pointer[j]);
+				NLLtoyfloat = Float_t(NLLtoyfloat_pointer[j]);
 				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
 				//if the toyratio is smaller than the data ratio at this point, increment:
 				if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}
