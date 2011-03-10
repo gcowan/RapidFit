@@ -690,7 +690,6 @@ int main( int argc, char * argv[] )
 						GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
 						GlobalResult->GetResultParameterSet()->GetResultParameter( name2 )->ForcePullValue( -9999 );
 						GlobalResult->GetResultParameterSet()->GetResultParameter( name2 )->ForceOriginalValue( -9999 );
-
 						TString ext_string("-");
 						ext_string.Append( name1 );
 						ext_string.Append("_");
@@ -701,6 +700,13 @@ int main( int argc, char * argv[] )
 						LLcontourFileNamez.push_back( TempName );
 
 						SoloContourResults.push_back( new ToyStudyResult( Temp_Results ) );
+						for( unsigned short int point_i=0; point_i < SoloContourResults.back()->NumberResults(); point_i++ )
+						{
+                                                	SoloContourResults.back()->GetFitResult(point_i)->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
+                                                	SoloContourResults.back()->GetFitResult(point_i)->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
+                                                	SoloContourResults.back()->GetFitResult(point_i)->GetResultParameterSet()->GetResultParameter( name2 )->ForcePullValue( -9999 );
+                                                	SoloContourResults.back()->GetFitResult(point_i)->GetResultParameterSet()->GetResultParameter( name2 )->ForceOriginalValue( -9999 );
+						}
 					}
 
 					if( doFC_Flag )  {
@@ -744,29 +750,36 @@ int main( int argc, char * argv[] )
 						string name1 = _2DLLscanList[0].first;
 						string name2 = _2DLLscanList[0].second;
 
-						//		Use the inputs from Canonical Step 1
-						ParameterSet* InputParamSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+						//		Use the inputs from Step 1
 						double lim1 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name1 )->GetValue();
 						double lim2 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name2 )->GetValue();
-						InputParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-						InputParamSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
-						InputParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-						InputParamSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
-						ParameterSet* ControlParamSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
-						ControlParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-						ControlParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-						ParameterSet* InputFreeSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
-						InputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-						InputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
-						InputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-						InputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+						//ParameterSet* InputParamSet* = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+						//ParameterSet* ControlParamSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+						//ParameterSet* InputFreeSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
 
-						//		Use the inputs from Canonical Step 2
-						//ParameterSet* InputParamSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
-						//ParameterSet* InputFreeSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
+						//		Use the inputs from Step 2
+						ParameterSet* InputParamSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+						ParameterSet* InputFreeSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+						ParameterSet* ControlParamSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+						
 
 						//		Just for clarity
 						//		also when using values from Step1 these are not set correctly for the study
+
+
+                                                ControlParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+                                                ControlParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+
+                                                InputParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+                                                InputParamSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+                                                InputParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+                                                InputParamSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+                                                InputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+                                                InputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+                                                InputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+                                                InputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+
+
 						InputParamSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
 						InputParamSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
 						InputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
@@ -866,33 +879,37 @@ int main( int argc, char * argv[] )
 
 							//	Assuming Nuisence Parameters set to Global Minima
 							//	We need to set this for EVERY FIT in order to have correct generation/pull values
-							ParameterSet* LocalInputFreeSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
-							LocalInputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-							LocalInputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
-							LocalInputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-							LocalInputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
-							LocalInputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
-							LocalInputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
-							ParameterSet* LocalInputFixedSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
-							LocalInputFixedSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-							LocalInputFixedSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
-							LocalInputFixedSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-							LocalInputFixedSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
-							LocalInputFixedSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
-							LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+							//ParameterSet* LocalInputFreeSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+							//LocalInputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+							//LocalInputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+							//LocalInputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+							//LocalInputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+							//LocalInputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
+							//LocalInputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
+							//ParameterSet* LocalInputFixedSet = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+							//LocalInputFixedSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+							//LocalInputFixedSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+							//LocalInputFixedSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+							//LocalInputFixedSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+							//LocalInputFixedSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+							//LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
 
 							//	Assuming Nuisence Parameters set to Local Minima
 							//
-							//ParameterSet* LocalInputFreeSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
-							//LocalInputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-							//LocalInputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-							//LocalInputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
-							//LocalInputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
-							//ParameterSet* LocalInputFixedSet = _2DResultForFC[iFC]->GetResultParameterSet()->GetDummyParameterSet();
-							//LocalInputFixedSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-							//LocalInputFixedSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-							//LocalInputFixedSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
-							//LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+							ParameterSet* LocalInputFreeSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+							LocalInputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+							LocalInputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+							LocalInputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+							LocalInputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+							LocalInputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
+							LocalInputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
+							ParameterSet* LocalInputFixedSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+							LocalInputFixedSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+							LocalInputFixedSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+							LocalInputFixedSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+							LocalInputFixedSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+							LocalInputFixedSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+							LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
 
 
 							//	We need to set some factors before we perform the fit
