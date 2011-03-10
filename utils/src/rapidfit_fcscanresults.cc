@@ -79,8 +79,8 @@ TPaveText* addLHCbLabel(TString footer){
 	TPaveText * label = new TPaveText(0.14, 0.88, 0.14, 0.73,"BRNDC");
 	//TPaveText * label = new TPaveText(0.12, 0.58, 0.12, 0.43,"BRNDC");
 	label->SetFillColor(0);
-	label->SetBorderSize(0);     
-	label->SetTextAlign(11);          
+	label->SetBorderSize(0);
+	label->SetTextAlign(11);
 	label->SetTextSize(0.04);
 	TText * labeltext = 0;
 	labeltext = label->AddText("LHC#font[12]{b} 2010 Data");
@@ -315,6 +315,7 @@ int main(int argc, char *argv[]){
 	allresults->SetBranchAddress(NLLstr,&nll);
 	// Find the global minimum from the first entry:
 
+	//	THIS SHOULD BE THE ONLY USE OF GetEntry it's slow and doesn't emply something 'intelligent'
 	allresults->GetEntry(0);
 	nlldatabest = nll;
 	cout << "GLOBAL DATA MINIMUM NLL: " << nlldatabest << endl;
@@ -322,11 +323,27 @@ int main(int argc, char *argv[]){
 	// Find the positions of the gridpoints we scanned, and find the profileLL at each point for data:
 	TString datafixedstr = param1genstr + "==" + notgen + "&&" + param2genstr + "==" + notgen + "&&"+ param1errstr + "==0.0&&" +param2errstr +"==0.0&&" + FRstr + "==3.0";
 	TTree* datafixed = allresults->CopyTree(datafixedstr);
-	datafixed->SetBranchAddress(param1valstr,&param1val);
-	datafixed->SetBranchAddress(param2valstr,&param2val);
-	datafixed->SetBranchAddress(NLLstr,&nll);
+//	datafixed->SetBranchAddress(param1valstr,&param1val);
+//	datafixed->SetBranchAddress(param2valstr,&param2val);
+//	datafixed->SetBranchAddress(NLLstr,&nll);
+
+	//	40 x 40 x 200toys translates into 320000 seperate read statements...
+	//	Use root's internal macros which are faster at processing root files esp for reading in bulk objects
+	TString Plot_Str(param1valstr+":"+param2valstr+":"+NLLstr);
+	datafixed->SetEstimate(datafixed->GetEntries());	//	Just incase you ever have more than 1E6 entries **
+	datafixed->Draw(Plot_Str,"goff");			//	Draw without plotting
+	//	That was 3 large read statements which is A LOT faster.
+	Double_t* param1val_pointer = datafixed->GetV1();	//	array of size	datafixed->GetEntries() **
+	Double_t* param2val_pointer = datafixed->GetV2();	//	array of size	datafixed->GetEntries()
+	Double_t* nllval_pointer    = datafixed->GetV3();	//	array of size	datafixed->GetEntries()
+
+
 	for(Long64_t i = 1; i < datafixed->GetEntries(); i++){
-		datafixed->GetEntry(i);
+//		datafixed->GetEntry(i);
+		//	Objects now exist in memory and can be accessed from there
+		param1val = Float_t(param1val_pointer[i]);
+		param2val = Float_t(param2val_pointer[i]);
+		nll       = Float_t(nllval_pointer[i]);
 		// We've found a new gridpoint
 		// But is it unique?
 		bool unique = true;
@@ -383,13 +400,24 @@ int main(int argc, char *argv[]){
 			}
 			if(fixedtoystot != 0){
 			//Loop over the toys, pulling out the NLL ratio
-			floatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);	
-			fixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
+//			floatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);
+//			fixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
+			//	Yes I am well aware that I am replacing 2 lines of code with 6
+			//	But this HAS been proven to be more benificial in RapidFit
+			floatedtoys->SetEstimate(floatedtoys->GetEntries());
+			floatedtoys->Draw(NLLstr);
+			Double_t* NLLtoyfloat_pointer = floatedtoys->GetV1();
+			fixedtoys->SetEstimate(fixedtoys->GetEntries());
+			fixedtoys->Draw(NLLstr);
+			Double_t* NLLtoyfixed_pointer = floatedtoys->GetV1();
+
 			UInt_t toyNLLsmaller = 0;
 			toysgridpoints.push_back((Float_t)fixedtoystot);
 			for(UInt_t j = 0; j<fixedtoystot; j++){
-				floatedtoys->GetEntry(j);	
-				fixedtoys->GetEntry(j);	
+//				floatedtoys->GetEntry(j);
+//				fixedtoys->GetEntry(j);
+				NLLtoyfixed = Float_t(NLLtoyfixed_pointer[i]);
+				NLLtoyfloat = Float_t(NLLtoyfloat_pointer[i]);
 				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
 				//if the toyratio is smaller than the data ratio at this point, increment:
 				if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}

@@ -3,6 +3,7 @@
 2011/03/10 Rob Currie
    - Moved FCscan into FitAssembler and cleaned up some more code, employed file compression on all data given FCscans will produce the results from several hundred toys and hadd doesn't compress
    - Offered slightly more control over FC code now it is a function call, produced framework for assembling different schemes for defining NuisenceParameters, implement ShakeBottle, and use that :D
+   - Changed Root I/O method employed in Conor's RapidFit FC scan plotting tool, it should be a lot faster for situations where ttree entries exceeds 50k rows
 
 2011/03/06 Conor
    - I've written the feldman cousins ordering/plotting macro. This accepts a merged ntuple in the format as output by Rob
