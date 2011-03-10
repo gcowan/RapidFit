@@ -719,17 +719,31 @@ int main( int argc, char * argv[] )
 						TempName.Append( ext_string );
 						LLcontourFileNamez.push_back( TempName );
 
+						//	Linearize the data and then Set the generate values to a default
 						SoloContourResults.push_back( new ToyStudyResult( Temp_Results ) );
+						//	This should probably be in the main as I don't want to pollute the FitResult with
+						//	'hard coded defaults that seem sensible now'
+						for( unsigned short int point_num=0; point_num < SoloContourResults.back()->NumberResults(); point_num++ )
+						{
+							SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
+							SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
+							SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name2 )->ForcePullValue( -9999 );
+							SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name2 )->ForceOriginalValue( -9999 );
+						}
 					}
 
+					//  Don't output the scan files when doing a FC scan (This is only noise on Condor btw!)
 					if( doFC_Flag )  {
 						_2DResultForFC = SoloContourResults.back();
 					} else  {
 						for(unsigned int ii=0; ii < _2DLLscanList.size(); ii++ )
 						{
+							//	STOP RELYING ON THIS OUTPUT, IT'S BADLY WRITTEN, AND IT WILL BE DISABLED SOONER RATHER THAN LATER
 							makeOutput->SetLLcontourFileName( LLcontourFileNamez[ii].Data() );
 							makeOutput->OutputLLcontourResult( contourResults ) ;
 
+							//	This output is A LOT safer as it intended to be fed to a sperate plotting program.
+							//	Formatting SHOULD be seperate to generation!
 							string output_scan_dat("LLcontourScanData.root");
 							if( ii > 0 )
 							{
@@ -738,6 +752,7 @@ int main( int argc, char * argv[] )
 								_scan_dat.Append(".root");
 								output_scan_dat=_scan_dat;
 							}
+							//	Add the Global Results and 'Linearize' the output
 							vector<ToyStudyResult*> TempContourResults;
 							TempContourResults.push_back( GlobalFitResult );
 							TempContourResults.push_back( SoloContourResults[ii] );
@@ -746,13 +761,9 @@ int main( int argc, char * argv[] )
 						}
 					}
 				}
-
-
+				//	Do the main work of the FC scan
 				if( doFC_Flag )
 				{
-//					vector<ToyStudyResult*> AllResults;
-
-					
 					vector<unsigned short int> numberRepeatsVec;
 					if( numberRepeatsFlag ) numberRepeatsVec.push_back( unsigned(short(numberRepeats)) );
 					
@@ -760,11 +771,8 @@ int main( int argc, char * argv[] )
 					ToyStudyResult* AllFCResults = FitAssembler::FeldmanCousins( GlobalFitResult, _2DResultForFC, numberRepeatsVec, Nuisencemodel, FC_Debug_Flag, makeOutput, theMinimiser, theFunction,  xmlFile, pdfsAndData );
 
 					//		STORE THE OUTPUT OF THE TOY STUDIES
-//					ToyStudyResult* AllFlatResult = new ToyStudyResult( AllFCResults );
 					ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );
-
 				}
-				  
 
 			}
 		}
