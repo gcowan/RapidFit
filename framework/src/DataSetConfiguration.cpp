@@ -67,10 +67,11 @@ bool DataSetConfiguration::SetPhysicsParameters( ParameterSet * InputParameters 
 }
 
 //Create the DataSet
-IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary, IPDF * FitPDF )
+IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary, IPDF * FitPDF, int real_numberEvents)
 {
 	//Some kind of decision about what kind of data set to use?
 	IDataSet * newDataSet;
+	if( real_numberEvents!=-1 ) numberEvents = real_numberEvents;
 
 	if ( source == "File" )
 	{

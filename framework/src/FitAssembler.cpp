@@ -15,6 +15,7 @@
 #include "ToyStudyResult.h"
 #include <iostream>
 #include <stdlib.h>
+#include <math.h>
 
 using namespace std;
 
@@ -331,12 +332,14 @@ ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConf
 //	Step5:		Format output into standard block format. This gives us 2 things.
 ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned short int> numberRepeats, unsigned short int NuisenceModel, bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData )
 {
+	double Random_Seed = pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm();
 	FitResult* GlobalFitResult = GlobalResult->GetFitResult( 0 );
 	vector<ToyStudyResult*> AllResults;
 	//		Want to loop over all points on a 2D Plot that have been allocated to this instance
 	for( int iFC=0; iFC < _2DResultForFC->NumberResults(); iFC++ )
 	{
 
+		TRandom3* new_rand = new TRandom3(UInt_t(Random_Seed));
 		//		GET INPUT Data from fit Results
 		//
 		//  Get a ParameterSet that contains the input parameters from the output of a fit
@@ -396,9 +399,36 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		//	Read the number of events from the existing DataSets
 		//	I think there needs be an equivalent function drafted to use sWeights
 		vector<unsigned int> EventsPerPDF;
-		for( unsigned int pdf_num=0; pdf_num < pdfsAndData.size(); pdf_num++ )
+		vector<unsigned int> sweight_error;
+
+		for( unsigned short int pdf_num=0; pdf_num < pdfsAndData.size(); ++pdf_num )
 		{
-			EventsPerPDF.push_back( pdfsAndData[pdf_num]->GetDataSet()->GetDataNumber() );
+			string sWeightObs="Nsig_sw";
+			bool sWeighted=false;
+			vector<string> phase_names = PhaseSpaceForToys[pdf_num]->GetAllNames();
+			for( unsigned short int phase_param=0; phase_param < phase_names.size(); ++phase_param )
+			{
+				if( phase_names[phase_param] == sWeightObs ) sWeighted = true;
+			}
+			if( sWeighted )
+			{
+				IDataSet* file_input = pdfsAndData[pdf_num]->GetDataSet();
+				int point_number = file_input->GetDataNumber();
+				double data_num=0; double data_err=0;
+				for( int i=0; i < point_number; ++i)
+				{
+					double sweight_val = file_input->GetDataPoint( i )->GetObservable(sWeightObs)->GetValue();
+					data_num+=sweight_val;
+					data_err+=sweight_val*sweight_val;
+				}
+				data_err=sqrt(data_err);
+				sweight_error.push_back( unsigned(int(data_err)) );
+				EventsPerPDF.push_back( unsigned(int(data_num)) );
+			}
+			else	{
+				EventsPerPDF.push_back( pdfsAndData[pdf_num]->GetDataSet()->GetDataNumber() );
+				sweight_error.push_back( 0. );
+			}
 		}
 
 
@@ -439,7 +469,9 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			//	Create a DataSetConfiguration to make the datasets
 			vector<string> empty_args;
 			vector<string> empty_arg_names;
-			DataSetConfiguration* Toy_Foam_DataSet= new DataSetConfiguration( "Foam", EventsPerPDF[pdf_num], "", empty_args, empty_arg_names, PDF_from_XML );
+			unsigned int wanted_events = EventsPerPDF[pdf_num];
+			if( sweight_error[pdf_num] > 0. )  wanted_events *= unsigned(int(new_rand->Gaus()*sweight_error[pdf_num]));
+			DataSetConfiguration* Toy_Foam_DataSet= new DataSetConfiguration( "Foam", wanted_events, "", empty_args, empty_arg_names, PDF_from_XML );
 
 			//	Set the Input Physics Parameters to be as defined above ControlSet
 			//	This is to seperate changing bottles for Physics from that used at Generation
@@ -470,7 +502,8 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 
 
 		//	Try to make minuit as quiet as possible here... does someone have a way to gag it's output?!?
-		ToyStudyMinimiser->GetMinimiser( int(InputParamSet->GetAllNames().size()) )->SetOutputLevel(-1);
+		//ToyStudyMinimiser->GetMinimiser( int(InputParamSet->GetAllNames().size()) )->SetOutputLevel(-1);
+		ToyStudyMinimiser->GetMinimiser( int(InputParamSet->GetAllNames().size()) )->SetOutputLevel(-999);
 
 
 		//	This Forms the main sequence of the fit
@@ -586,7 +619,9 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 					// See above for more detailed description
 					cout << "generating data for pdf: " << pdf_num << "\n";
 					PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( ControlParamSet );
-					IDataSet* new_dataset = PDFsWithDataForToys[pdf_num]->GetDataSetConfig()->MakeDataSet( PhaseSpaceForToys[pdf_num], PDFsWithDataForToys[pdf_num]->GetPDF() );
+					unsigned int wanted_events = EventsPerPDF[pdf_num];
+					if( sweight_error[pdf_num] > 0. )  wanted_events *= unsigned(int(new_rand->Gaus()*sweight_error[pdf_num]));
+					IDataSet* new_dataset = PDFsWithDataForToys[pdf_num]->GetDataSetConfig()->MakeDataSet( PhaseSpaceForToys[pdf_num], PDFsWithDataForToys[pdf_num]->GetPDF(), wanted_events );
 					Memory_Data[pdf_num].push_back( new_dataset );
 				}
 			}

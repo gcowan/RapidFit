@@ -46,7 +46,7 @@ RootFileDataSet::RootFileDataSet( string FileName, PhaseSpaceBoundary * Boundary
 	}
 
 	//If you get this far, no compatible ntuple found
-	cerr << "No compatible ntuple found" << endl;
+	cerr << "No compatible ntuple found, did you give the correct path?" << endl;
 }
 
 //Constructor that specifies an NTuple
@@ -67,7 +67,7 @@ RootFileDataSet::RootFileDataSet( string FileName, string TuplePath, PhaseSpaceB
 	}
 	else
 	{
-		cerr << "NTuple is incompatible with boundary" << endl;
+		cerr << "NTuple is incompatible with boundary, do you have all the columns in this ntuple?" << endl;
 	}
 }
 

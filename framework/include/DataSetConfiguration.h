@@ -25,7 +25,7 @@ class DataSetConfiguration
 		~DataSetConfiguration();
 
 		bool SetPhysicsParameters( ParameterSet* );
-		IDataSet * MakeDataSet( PhaseSpaceBoundary*, IPDF* );
+		IDataSet * MakeDataSet( PhaseSpaceBoundary*, IPDF*, int=-1 );
 
 	private:
 		IDataSet * LoadDataFile( vector<string>, vector<string>, PhaseSpaceBoundary*, long );

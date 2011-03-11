@@ -9,40 +9,42 @@
  *
  */
 
-#include <stdlib.h>
-#include <iostream>
-#include <TFile.h>
-#include <TROOT.h>
-#include <TSystem.h>
-#include <TCint.h>
-#include <TMath.h>
-#include <TTree.h>
-#include <TStopwatch.h>
-#include <TNtuple.h>
-#include <TCanvas.h>
-#include <TGraphErrors.h>
-#include <fstream>
-#include "stdio.h"
-#include "string"
+#include "TFile.h"
+#include "TROOT.h"
+#include "TSystem.h"
+#include "TCint.h"
+#include "TMath.h"
+#include "TTree.h"
+#include "TStopwatch.h"
+#include "TNtuple.h"
+#include "TCanvas.h"
+#include "TGraphErrors.h"
 #include "TStyle.h"
 #include "Riostream.h"
 #include "TAxis.h"
-#include <TRandom3.h>
+#include "TRandom3.h"
+#include "TArrow.h"
+#include "TEntryList.h"
+#include "TLegend.h"
+#include "THStack.h"
+#include "TColor.h"
+#include "Rtypes.h"
+#include "TObjArray.h"
+#include "TKey.h"
+#include "TVirtualHistPainter.h"
+#include "TH2F.h"
+#include "TGraph2D.h"
+#include "TPaveText.h"
+#include <list>
 #include <cctype>
 #include <cmath>
 #include <vector>
-#include <TArrow.h>
-#include <TEntryList.h>
-#include <TLegend.h>
-#include<THStack.h>
-#include<TColor.h>
-#include<Rtypes.h>
-#include<TObjArray.h>
-#include<TKey.h>
-#include<TVirtualHistPainter.h>
-#include<TH2F.h>
-#include<TGraph2D.h>
-#include<TPaveText.h>
+#include <fstream>
+#include <stdlib.h>
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <stdio.h>
 
 using std::cout;
 using std::endl;
@@ -50,6 +52,13 @@ using std::endl;
 typedef vector<Float_t> array1f;
 typedef vector<TGraph*> array1g;
 typedef vector<TString> array1s;
+
+bool unique_xy_coord( pair< pair<double,double>, double> first, pair< pair<double,double>, double> second )
+{
+	bool x_unique = ((first.first.first - second.first.first) < 1E-6 );
+	bool y_unique = ((first.first.second - second.first.second) < 1E-6 );
+	return !(x_unique || y_unique);
+}
 
 inline TString prettyPrint(Double_t value){
 	char pretty[20];
@@ -331,32 +340,45 @@ int main(int argc, char *argv[]){
 	//	Use root's internal macros which are faster at processing root files esp for reading in bulk objects
 	TString Plot_Str(param1valstr+":"+param2valstr+":"+NLLstr);
 	datafixed->SetEstimate(datafixed->GetEntries());	//	Just incase you ever have more than 1E6 entries **
-	datafixed->Draw(Plot_Str,"goff");			//	Draw without plotting
+	datafixed->Draw(Plot_Str,"","goff");			//	Draw without plotting
 	//	That was 3 large read statements which is A LOT faster.
 	Double_t* param1val_pointer = datafixed->GetV1();	//	array of size	datafixed->GetEntries() **
 	Double_t* param2val_pointer = datafixed->GetV2();	//	array of size	datafixed->GetEntries()
 	Double_t* nllval_pointer    = datafixed->GetV3();	//	array of size	datafixed->GetEntries()
 
+	list<pair<pair<double, double>, double > > Coordinates_NLL;
 
-	for(Long64_t i = 1; i < datafixed->GetEntries(); i++){
+	for(Long64_t i = 1; i < datafixed->GetEntries(); ++i){
 //		datafixed->GetEntry(i);
 		//	Objects now exist in memory and can be accessed from there
 		param1val = Float_t(param1val_pointer[i]);
 		param2val = Float_t(param2val_pointer[i]);
 		nll       = Float_t(nllval_pointer[i]);
+		Coordinates_NLL.push_back( make_pair( make_pair(param1val_pointer[i], param2val_pointer[i]), nllval_pointer[i] ) );
 		// We've found a new gridpoint
 		// But is it unique?
-		bool unique = true;
-		for(UInt_t j = 0; j< param1gridpoints.size(); j++){
-			if((fabs(param1gridpoints[j] - param1val) < shift) && (fabs(param2gridpoints[j] - param2val) < shift)){unique = false;}
-		}
-		if(unique){
-			param1gridpoints.push_back(param1val);
-			param2gridpoints.push_back(param2val);
-			dataRatiogridpoints.push_back(nll-nlldatabest);
-			//cout << "GRIDPOINT FOUND: " << param1val << " " << param2val << " " << nll << endl;
-		}
+		//bool unique = true;
+		//for(UInt_t j = 0; j< param1gridpoints.size(); j++){
+		//	if((fabs(param1gridpoints[j] - param1val) < shift) && (fabs(param2gridpoints[j] - param2val) < shift)){unique = false;}
+		//}
+		//if(unique){
+		//	param1gridpoints.push_back(param1val);
+		//	param2gridpoints.push_back(param2val);
+		//	dataRatiogridpoints.push_back(nll-nlldatabest);
+		//	//cout << "GRIDPOINT FOUND: " << param1val << " " << param2val << " " << nll << endl;
+		//}
 	}
+
+	Coordinates_NLL.unique( unique_xy_coord );
+
+	list<pair<pair<double,double>,double> >::iterator coord_iter=Coordinates_NLL.begin();
+	for( coord_iter = Coordinates_NLL.begin(); coord_iter != Coordinates_NLL.end(); ++coord_iter )
+	{
+		param1gridpoints.push_back( coord_iter->first.first );
+		param2gridpoints.push_back( coord_iter->first.second );
+		dataRatiogridpoints.push_back( coord_iter->second - nlldatabest);
+	}
+
 	cout << "FOUND " << param1gridpoints.size() << " UNIQUE GRIDPOINTS" << endl;
 	Float_t NLLtoyfixed, NLLtoyfloat;
 	delete datafixed;
@@ -405,10 +427,10 @@ int main(int argc, char *argv[]){
 			//	Yes I am well aware that I am replacing 2 lines of code with 6
 			//	But this HAS been proven to be more benificial in RapidFit
 			floatedtoys->SetEstimate(floatedtoys->GetEntries());
-			floatedtoys->Draw(NLLstr);
+			floatedtoys->Draw(NLLstr,"","goff");
 			Double_t* NLLtoyfloat_pointer = floatedtoys->GetV1();
 			fixedtoys->SetEstimate(fixedtoys->GetEntries());
-			fixedtoys->Draw(NLLstr);
+			fixedtoys->Draw(NLLstr,"","goff");
 			Double_t* NLLtoyfixed_pointer = floatedtoys->GetV1();
 
 			UInt_t toyNLLsmaller = 0;

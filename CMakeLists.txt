@@ -144,8 +144,8 @@ TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter-static.C )
 TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 
-#ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
-#TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
+ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
+TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
 
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone
