@@ -16,6 +16,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
+#include <fstream>
 
 using namespace std;
 
@@ -198,9 +199,25 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 
 		output_interface->StartStopwatch();
 
-		// Do a scan point fit
-		FitResult * scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
 
+
+		cout << "Starting Fit:" <<endl;
+		//	Redirect ALL output to /dev/null
+		streambuf *psbuf, *backup, *backup2;
+		ofstream filestr;
+		backup = cout.rdbuf();
+		backup2 = cerr.rdbuf();
+		filestr.open("/dev/null");
+		psbuf = filestr.rdbuf();
+		cout.rdbuf(psbuf);
+		cerr.rdbuf(psbuf);
+		//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
+		//	Do a scan point fit
+		FitResult * scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
+		cout.rdbuf(backup);
+		cerr.rdbuf(backup2);
+		filestr.close();
+		cout << "Fit Finished!" <<endl;
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
 		string name = Wanted_Param->GetName();
 		string type = BottleParameters->GetPhysicsParameter( name )->GetType();
@@ -564,8 +581,24 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			}
 
 			cout << "\n\n\t\tPerforming Fit To Toy: "<< (dataset_num+1) <<" of " << wanted_number_of_toys << endl<<endl;
+			
+			cout << "Starting Fit:" <<endl;
+			//	Redirect ALL output to /dev/null
+			streambuf *psbuf, *backup, *backup2;
+			ofstream filestr;
+			backup = cout.rdbuf();
+			backup2 = cerr.rdbuf();
+			filestr.open("/dev/null");
+			psbuf = filestr.rdbuf();
+			cout.rdbuf(psbuf);
+			cerr.rdbuf(psbuf);
 			//	Fit once with control parameters Free
 			fit1Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFreeSet, PDFsWithDataForToys, ConstraintsForToys );
+			cout.rdbuf(backup);
+			cerr.rdbuf(backup2);
+			filestr.close();
+			cout << "Fit Finished!" <<endl;
+
 
 			//	Only Fit again to this dataset if it fits well with +2 dof
 			//	This has the obvious savings in CPU resources
@@ -584,8 +617,21 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 				}
 
 				cout << "\n\n\t\tFirst Fit Successful, Performing the Second Fit " << (dataset_num+1) << " of " << wanted_number_of_toys <<endl;
+
+				cout << "Starting Fit:" <<endl;
+				//	Redirect ALL output to /dev/null
+				backup = cout.rdbuf();
+				backup2 = cerr.rdbuf();
+				filestr.open("/dev/null");
+				psbuf = filestr.rdbuf();
+				cout.rdbuf(psbuf);
+				cerr.rdbuf(psbuf);
 				//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
 				fit2Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFixedSet, PDFsWithDataForToys, ConstraintsForToys );
+				cout.rdbuf(backup);
+				cerr.rdbuf(backup2);
+				filestr.close();
+				cout << "Fit Finished!" <<endl;
 
 				//	If either Fit Failed we want to 'dump the results' and run an extra Fit.
 				if( (fit2Result->GetFitStatus() != 3) || (fit2Result->GetFitStatus() != 3) ) toy_failed = true;

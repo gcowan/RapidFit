@@ -42,7 +42,12 @@ MinuitWrapper::~MinuitWrapper()
 void MinuitWrapper::SetOutputLevel( short int output_level )
 {
 	print_verbosity = output_level;
-	minuit->SetPrintLevel( print_verbosity );
+	Double_t arg=output_level;
+	Int_t err;
+	minuit->mnexcm("SET PRINT", &arg, 1, err);
+	if( output_level < 0 )
+	minuit->mnexcm("SET NOWarnings", &arg, 1, err );
+//	minuit->SetPrintLevel( print_verbosity );
 }
 
 //Use Migrad to minimise the given function

@@ -4,6 +4,7 @@
    - Added preliminary sWeights code into FCscan
    - Added new compililation options after proving it doesn't effect fit results
    - Fixed my modifications to Conor's FC plotting tool
+   - Reduced output for Scans, would be nice to improve this somewhat
 
 2011/03/10 Rob Currie
    - Moved FCscan into FitAssembler and cleaned up some more code, employed file compression on all data given FCscans will produce the results from several hundred toys and hadd doesn't compress
