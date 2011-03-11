@@ -416,7 +416,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		//	Read the number of events from the existing DataSets
 		//	I think there needs be an equivalent function drafted to use sWeights
 		vector<unsigned int> EventsPerPDF;
-		vector<unsigned int> sweight_error;
+		vector<double> sweight_error;
 
 		for( unsigned short int pdf_num=0; pdf_num < pdfsAndData.size(); ++pdf_num )
 		{
