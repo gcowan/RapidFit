@@ -24,7 +24,7 @@ ENDIF( INSOURCE )
 
 SET( CMAKE_CXX_FLAGS_RELEASE "" )
 
-SET( CMAKE_CXX_FLAGS "-O3 -g -ansi -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+SET( CMAKE_CXX_FLAGS "-O3 -mtune=native -ffast-math -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
 
 #  Get back the old style verbosity :) by setting this to 1
 #SET( CMAKE_VERBOSE_MAKEFILE 1 )
@@ -132,11 +132,11 @@ TARGET_LINK_LIBRARIES( fitting fits pdfs ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES}
 #ADD_EXECUTABLE( rapidresults ${PROJECT_SOURCE_DIR}/utils/src/rapidresults.cc )
 #TARGET_LINK_LIBRARIES( rapidresults ${ROOT_LIBRARIES} )
 
-ADD_EXECUTABLE( rapidfit_llscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_llscanresults.cc )
-TARGET_LINK_LIBRARIES( rapidfit_llscanresults ${ROOT_LIBRARIES} )
+#ADD_EXECUTABLE( rapidfit_llscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_llscanresults.cc )
+#TARGET_LINK_LIBRARIES( rapidfit_llscanresults ${ROOT_LIBRARIES} )
 
 ADD_EXECUTABLE( rapidfit_fcscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_fcscanresults.cc )
-TARGET_LINK_LIBRARIES( rapidfit_llscanresults ${ROOT_LIBRARIES} )
+TARGET_LINK_LIBRARIES( rapidfit_fcscanresults ${ROOT_LIBRARIES} )
 
 ADD_EXECUTABLE( rapidfit_toyresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_toyresults.cc )
 TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
@@ -144,8 +144,8 @@ TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter-static.C )
 TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 
-ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
-TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
+#ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
+#TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
 
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone

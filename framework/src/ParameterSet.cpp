@@ -44,7 +44,7 @@ vector<string> ParameterSet::GetAllNames()
 vector<string> ParameterSet::GetAllFixedNames()
 {
 	vector<string> Fixed_List;
-	for(unsigned short int i=0; i<allNames.size(); i++ )
+	for(unsigned short int i=0; i<allNames.size(); ++i )
 	{
 		if( ParameterSet::GetPhysicsParameter( allNames[i] )->GetType() == "Fixed" )  Fixed_List.push_back( allNames[i] );
 	}
@@ -55,7 +55,7 @@ vector<string> ParameterSet::GetAllFixedNames()
 vector<string> ParameterSet::GetAllFloatNames()
 {
 	vector<string> Not_Fixed_List;
-	for(unsigned short int i=0; i<allNames.size(); i++ )
+	for(unsigned short int i=0; i<allNames.size(); ++i )
 	{
 		if( ParameterSet::GetPhysicsParameter( allNames[i] )->GetType() != "Fixed" )  Not_Fixed_List.push_back( allNames[i] );
 	}
@@ -131,7 +131,7 @@ bool ParameterSet::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Not very pleasant in OO terms, and unsafe. Quick however.
 bool ParameterSet::SetPhysicsParameters( double * NewValues )
 {
-	for (unsigned int parameterIndex = 0; parameterIndex < allParameters.size(); parameterIndex++ )
+	for (unsigned int parameterIndex = 0; parameterIndex < allParameters.size(); ++parameterIndex )
 	{
 		allParameters[parameterIndex].SetValue( NewValues[parameterIndex] );
 	}
@@ -141,7 +141,7 @@ bool ParameterSet::SetPhysicsParameters( vector<double> NewValues )
 {
 	if ( NewValues.size() == allParameters.size() )
 	{
-		for (unsigned short int parameterIndex = 0; parameterIndex < allParameters.size(); parameterIndex++ )
+		for (unsigned short int parameterIndex = 0; parameterIndex < allParameters.size(); ++parameterIndex )
 		{
 			allParameters[parameterIndex].SetValue( NewValues[parameterIndex] );
 		}
@@ -157,7 +157,7 @@ bool ParameterSet::SetPhysicsParameters( vector<double> NewValues )
 //General Print method for a dataset
 void ParameterSet::print()
 {
-	for(unsigned short int i=0; i< allParameters.size(); i++) {
+	for(unsigned short int i=0; i< allParameters.size(); ++i) {
 		cout << "Parameter name: " << allNames[i] <<  endl;
 		allParameters[i].print() ;
 	}

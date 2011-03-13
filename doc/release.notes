@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/13 Rob Currie
+   - Significantly Reduced Output from Scans, work still required to have this controled from XML or runtime but this is a finishing touch
+   - Moved a substancial amount of code to pre-incremental changes rather than post-incrementing variables as this is quicker and a relativley minor alteration
+       Mostly this should have been caught by all decent compilers, however should it not be this can fix performance issues with some implementations of using per-event tags
+   - Removed plotting tool for llscan results from default make as more recent plots all have results produced that are compliant with the fc plotting tool
+   - Added the ability to plot 100% Contour using fcscan plotter
+   - Changed ResultFormatter to output something which requires substantially less editing to be place in 'official' latex documents, also added a non-latex table to make reviewing output easier
+
 2011/03/11 Rob Currie
    - Added preliminary sWeights code into FCscan
    - Added new compililation options after proving it doesn't effect fit results

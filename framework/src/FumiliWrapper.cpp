@@ -53,12 +53,12 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 	ParameterSet* parameters = bottle->GetParameterSet();	
 	vector<string> names = parameters->GetAllNames();
 	double nsteps = 1;
-	for( int k = 0; k < names.size(); k++)
+	for( int k = 0; k < names.size(); ++k)
 	{
-		for( int j = 0; j < nsteps; j++)
+		for( int j = 0; j < nsteps; ++j)
 		{
 			vector<double> tempPos;
-			for( int i = 0; i < names.size(); i++ )
+			for( int i = 0; i < names.size(); ++i )
 			{
 				double value;
 				if ( i != k )
@@ -89,10 +89,10 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 	int nsteps = 10;
 	
 	// Could make this faster...
-	for ( int step = 0; step < nsteps; step++)
+	for ( int step = 0; step < nsteps; ++step)
 	{
 		vector<double> tempPos;
-		for( unsigned int observable = 0; observable < names.size(); observable++ )
+		for( unsigned int observable = 0; observable < names.size(); ++observable )
        		{
 			if ( !boundary->GetConstraint(names[observable])->IsDiscrete() )
 			{
@@ -124,7 +124,7 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 	//Create the fit results
 	const MnUserParameters * minimisedParameters = &minimum.UserParameters();
 	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
-	for ( unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for ( unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 	{
 		string parameterName = allNames[nameIndex];
 		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );

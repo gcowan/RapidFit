@@ -290,7 +290,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::Normalisation(DataPoint * measureme
         // Recalculate cached values if Physics parameters have changed
         // Must do this for each of the two resolutions.
         if( ! normalisationCacheValid )  {
-                for( tag = -1; tag <= 1; tag ++ ) {
+                for( tag = -1; tag <= 1; ++tag ) {
             resolution =  resolution1 ;
 //PELC
                         //normalisationCacheValueRes1[tag+1] = this->diffXsecNorm1( );
@@ -809,7 +809,7 @@ double Bs2JpsiPhi_mistagParameter_Swave_alt::diffXsecCompositeNorm1(  )
         timeAcceptance.configure( tlo ) ;
         
         bool firstBin = true ;
-        for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); islice++ ) 
+        for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); ++islice ) 
         {
                 if( firstBin )firstBin = false ;
                 else tlo = timeAcceptance.sliceStart( islice ) ;

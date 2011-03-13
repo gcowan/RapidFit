@@ -58,9 +58,9 @@ LLscanResult2D::LLscanResult2D( string _parameterName, vector<double> _parameter
 
 	//This is a way to set any safe llmin value to start with
 	double llmin = 0 ;
-	for( i1=0; i1 < parameterValues.size() ; i1++ ) {
+	for( i1=0; i1 < parameterValues.size() ; ++i1 ) {
 		vector<double> llscan = listOfLLscans[i1]->GetRawLLvalues() ; 
-		for(i2=0; i2 < parameterValues2.size() ; i2++ ) {
+		for(i2=0; i2 < parameterValues2.size() ; ++i2 ) {
 			if( llscan[i2] != LLSCAN_FIT_FAILURE_VALUE ) {
 				llmin = llscan[i2] ;
 				break ;
@@ -68,10 +68,10 @@ LLscanResult2D::LLscanResult2D( string _parameterName, vector<double> _parameter
 		}
 	}
 	
-	for( i1=0; i1 < parameterValues.size() ; i1++ ) {
+	for( i1=0; i1 < parameterValues.size() ; ++i1 ) {
 		vector<double> llscan_raw = listOfLLscans[i1]->GetRawLLvalues() ; 
 		vector<double> llscan_offset ;
-		for(i2=0; i2 < parameterValues2.size() ; i2++ ) {
+		for(i2=0; i2 < parameterValues2.size() ; ++i2 ) {
 			if( llscan_raw != LLSCAN_FIT_FAILURE_VALUE ) {
 				llscan_offset.push_back( llscan_raw - llmin ) ;
 			}
@@ -98,7 +98,7 @@ LLscanResult2D::~LLscanResult2D()
 void LLscanResult2D::print()
 {
 	cout << endl << "2D LL scan results "  <<  endl ;
-	for(unsigned int i =0; i < listOfLLscans.size() ; i++ ) {
+	for(unsigned int i =0; i < listOfLLscans.size() ; ++i ) {
 		cout << setprecision(5) << endl << "Outer loop over parameter " << parameterName << "  fixed to " << parameterValues[i] << endl ;
 		listOfLLscans[i]->print() ;
 	}
@@ -118,13 +118,13 @@ TH2D * LLscanResult2D::GetTH2D()
 
 	//Extract lists of x,y, z (z is LL value)
 	int ind = 0 ;
-	for(unsigned int ix=0; ix < parameterValues.size() ; ix++ ) {
+	for(unsigned int ix=0; ix < parameterValues.size() ; ++ix ) {
 		vector<double> LLvalues= listOfLLscans[ix]->GetRawLLvalues() ;
-		for(unsigned int iy=0; iy < parameterValues2.size() ; iy++ ) {
+		for(unsigned int iy=0; iy < parameterValues2.size() ; ++iy ) {
 			pvx[ind] = parameterValues[ix]  ;  
 			pvy[ind] = parameterValues2[iy] ; 
 			pvz[ind] = LLvalues[iy];
-			ind++;
+			++ind;
 		}
 	}
 	cout << endl ;
@@ -132,8 +132,8 @@ TH2D * LLscanResult2D::GetTH2D()
 	//Now find the minimum value in the grid, excluding the -9999. values which indicate a failed fit.
 	double llminNew = 0 ;
 	int ipmin = -1 ;
-	for(int ip=0; ip < numberOfPoints ; ip++ ) { if( (pvz[ip] > llminNew) ) llminNew = pvz[ip] ;}  // This is only safe way to initialise llminNew to a large value
-	for(int ip=0; ip < numberOfPoints ; ip++ ) { 
+	for(int ip=0; ip < numberOfPoints ; ++ip ) { if( (pvz[ip] > llminNew) ) llminNew = pvz[ip] ;}  // This is only safe way to initialise llminNew to a large value
+	for(int ip=0; ip < numberOfPoints ; ++ip ) { 
 		if( (pvz[ip] < llminNew) && (fabs(pvz[ip] + 9999.)<DOUBLE_TOLERANCE) ) 
 		{
 			llminNew = pvz[ip] ;
@@ -142,7 +142,7 @@ TH2D * LLscanResult2D::GetTH2D()
 	} 
 
 	//Now adjust the LL values to be relative to the minimum
-	for(int ip=0; ip < numberOfPoints ; ip++ ) {
+	for(int ip=0; ip < numberOfPoints ; ++ip ) {
 		
 		if( fabs( pvz[ip] + 9999. ) < DOUBLE_TOLERANCE )
 		{
@@ -155,7 +155,7 @@ TH2D * LLscanResult2D::GetTH2D()
 	}
 
 	// Write out the adjusted values
-	for(int ii=0; ii<numberOfPoints; ii++) {
+	for(int ii=0; ii<numberOfPoints; ++ii) {
 		if( fabs( ii - ipmin ) < DOUBLE_TOLERANCE ) cout << " >>>>>>>>>>>>>MINIMUM>>>>>>>>>>>>>>" <<endl;
 		cout << " i:  " << ii << " x:  "<< pvx[ii] << " y:  "  << pvy[ii]  << " LL: " <<pvz[ii] << endl ;
 		if( fabs( ii - ipmin ) < DOUBLE_TOLERANCE ) cout << " >>>>>>>>>>>>>MINIMUM>>>>>>>>>>>>>>" <<endl;

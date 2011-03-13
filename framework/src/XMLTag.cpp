@@ -29,7 +29,7 @@ XMLTag::~XMLTag()
 {
 	//Delete the children!
 	vector< XMLTag* >::iterator childIterator;
-	for ( childIterator = children.begin(); childIterator != children.end(); childIterator++ )
+	for ( childIterator = children.begin(); childIterator != children.end(); ++childIterator )
 	{
 		delete *childIterator;
 	}
@@ -77,7 +77,7 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 		{
 			//If no tag found, all content goes into value
 			StringProcessing::RemoveWhiteSpace(Content);
-			for ( unsigned int contentIndex = 0; contentIndex < Content.size(); contentIndex++ )
+			for ( unsigned int contentIndex = 0; contentIndex < Content.size(); ++contentIndex )
 			{
 				Value.push_back( Content[contentIndex] );
 			}
@@ -88,7 +88,7 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 			//Everything before the tag goes into value
 			vector<string> newValue = SplitContent( Content, lineNumber, linePosition, int(tagName.size() + 2) );
 			StringProcessing::RemoveWhiteSpace(newValue);
-			for ( unsigned int contentIndex = 0; contentIndex < newValue.size(); contentIndex++ )
+			for ( unsigned int contentIndex = 0; contentIndex < newValue.size(); ++contentIndex )
 			{
 				Value.push_back( newValue[contentIndex] );
 			}
@@ -106,7 +106,7 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 string XMLTag::FindNextTagOpen( vector<string> Content, int & LineNumber, int & LinePosition )
 {
 	//Loop over all lines
-	for ( unsigned int lineIndex = 0; lineIndex < Content.size(); lineIndex++ )
+	for ( unsigned int lineIndex = 0; lineIndex < Content.size(); ++lineIndex )
 	{
 		int openPosition = StringProcessing::CharacterPosition( Content[lineIndex], '<' );
 		if ( openPosition > -1 )
@@ -156,10 +156,10 @@ void XMLTag::FindTagOpens( string TagName, vector<string> Content, vector<int> &
 	string openTag = "<" + TagName + ">";
 
 	//Loop over all lines
-	for ( unsigned int lineIndex = 0; lineIndex < Content.size(); lineIndex++ )
+	for ( unsigned int lineIndex = 0; lineIndex < Content.size(); ++lineIndex )
 	{
 		vector<int> positions = StringProcessing::StringPositions( Content[lineIndex], openTag );
-		for ( unsigned int positionIndex = 0; positionIndex < positions.size(); positionIndex++ )
+		for ( unsigned int positionIndex = 0; positionIndex < positions.size(); ++positionIndex )
 		{
 			LineNumbers.push_back(lineIndex);
 			LinePositions.push_back( positions[positionIndex] );
@@ -175,10 +175,10 @@ void XMLTag::FindTagCloses( string TagName, vector<string> Content, vector<int> 
 	string closeTag = "</" + TagName + ">";
 
 	//Loop over all lines
-	for ( unsigned int lineIndex = 0; lineIndex < Content.size(); lineIndex++ )
+	for ( unsigned int lineIndex = 0; lineIndex < Content.size(); ++lineIndex )
 	{
 		vector<int> positions = StringProcessing::StringPositions( Content[lineIndex], closeTag );
-		for ( unsigned int positionIndex = 0; positionIndex < positions.size(); positionIndex++ )
+		for ( unsigned int positionIndex = 0; positionIndex < positions.size(); ++positionIndex )
 		{
 			LineNumbers.push_back(lineIndex);
 			LinePositions.push_back( positions[positionIndex] );
@@ -201,20 +201,20 @@ vector<string> XMLTag::FindTagContent( string TagName, vector<string> & Content 
 	int splitIndex=0;;
 
 	//Check to make sure tag order is preserved
-	for ( unsigned int closeIndex = 0; closeIndex < closeLines.size(); closeIndex++ )
+	for ( unsigned int closeIndex = 0; closeIndex < closeLines.size(); ++closeIndex )
 	{
 		unsigned int opens = 0;
-		for ( unsigned int openIndex = 0; openIndex < openLines.size(); openIndex++ )
+		for ( unsigned int openIndex = 0; openIndex < openLines.size(); ++openIndex )
 		{
 			if ( openLines[openIndex] < closeLines[closeIndex] )
 			{
 				//New tag of same name is opened before this close
-				opens++;
+				++opens;
 			}
 			else if ( openLines[openIndex] == closeLines[closeIndex] && openPositions[openIndex] < closePositions[closeIndex] )
 			{
 				//New tag of same name is opened before this close on same line
-				opens++;
+				++opens;
 			}
 			else
 			{
@@ -240,7 +240,7 @@ vector<string> XMLTag::SplitContent( vector<string> & Content, int LineNumber, i
 {
 	vector<string> head, tail;
 
-	for ( int lineIndex = 0; lineIndex < int(Content.size()); lineIndex++ )
+	for ( int lineIndex = 0; lineIndex < int(Content.size()); ++lineIndex )
 	{
 		if ( lineIndex > LineNumber )
 		{

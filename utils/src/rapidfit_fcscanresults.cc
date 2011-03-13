@@ -35,6 +35,7 @@
 #include "TH2F.h"
 #include "TGraph2D.h"
 #include "TPaveText.h"
+#include "TMarker.h"
 #include <list>
 #include <cctype>
 #include <cmath>
@@ -85,12 +86,13 @@ inline TString prettyPrint(Double_t val, Double_t err){
 }
 
 TPaveText* addLHCbLabel(TString footer){
-	TPaveText * label = new TPaveText(0.14, 0.88, 0.14, 0.73,"BRNDC");
+	TPaveText * label = new TPaveText(0.14, 0.73, 0.14, 0.88,"BRNDC");
 	//TPaveText * label = new TPaveText(0.12, 0.58, 0.12, 0.43,"BRNDC");
-	label->SetFillColor(0);
+	label->SetFillStyle(0);
+//	label->SetFillColor(0);
 	label->SetBorderSize(0);
 	label->SetTextAlign(11);
-	label->SetTextSize(0.04);
+	label->SetTextSize(Float_t(0.04));
 	TText * labeltext = 0;
 	labeltext = label->AddText("LHC#font[12]{b} 2010 Data");
 	labeltext = label->AddText("#sqrt{s} = 7TeV");
@@ -144,19 +146,19 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 	leg->SetBorderSize(0);
 	leg->SetFillStyle(0);
 	hist->Draw("AXIS");
-	for(int i = 0; i < TotalConts; i++){
+	for(int i = 0; i < TotalConts; ++i){
 		TString confname = "";
 		double cl = confs[i];
 		confname +=cl;
 		confname += "\% C.L.";
 		contLevel = (TList*)contObjArr->At(i);
-		for(int j =0; j<contLevel->GetSize(); j++){
+		for(int j =0; j<contLevel->GetSize(); ++j){
 			curv = (TGraph*)contLevel->At(j);
 			gc = (TGraph*)curv->Clone();
 			if(pub){	
-				gc->SetLineStyle(i+1);
+				gc->SetLineStyle(Style_t(i+1));
 			}else{
-				gc->SetLineColor(i+2);
+				gc->SetLineColor(Color_t(i+2));
 			}
 			gc->Draw("L");
 		}
@@ -191,16 +193,16 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 	leg->SetHeader("Conf. Levels");
 	leg->SetBorderSize(0);
 	leg->SetFillStyle(0);
-	for(int i = 0; i < llTotalConts; i++){
+	for(int i = 0; i < llTotalConts; ++i){
 		TString confname = "";
 		double cl = confs[i];
 		confname +=cl;
 		confname += "\% C.L. (PLL)";
 		contLevel = (TList*)llcontObjArr->At(i);
-		for(int j =0; j<contLevel->GetSize(); j++){
+		for(int j =0; j<contLevel->GetSize(); ++j){
 			curv = (TGraph*)contLevel->At(j);
 				TGraph *gc = (TGraph*)curv->Clone();
-				gc->SetLineStyle(i+1);
+				gc->SetLineStyle(Style_t(i+1));
 				gcarr.push_back(gc);
 
 		if(j==0){leg->AddEntry(gc,confname, "L");}
@@ -214,22 +216,22 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 	TObjArray *fccontObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
 	confCanvas->Update();
 	int fcTotalConts = fccontObjArr->GetSize();
-	for(int i = 0; i < fcTotalConts; i++){
+	for(int i = 0; i < fcTotalConts; ++i){
 		TString confname = "";
 		double cl = confs[i];
 		confname +=cl;
 		confname += "\% C.L. (FC)";
 		contLevel = (TList*)fccontObjArr->At(i);
-		for(int j =0; j<contLevel->GetSize(); j++){
+		for(int j =0; j<contLevel->GetSize(); ++j){
 			curv = (TGraph*)contLevel->At(j);
 				TGraph *gc = (TGraph*)curv->Clone();
-				gc->SetLineColor(i+2);
+				gc->SetLineColor(Color_t(i+2));
 				gcarr.push_back(gc);
 		if(j==0){leg->AddEntry(gc,confname, "L");}
 		}
 	}
 	histll->Draw("AXIS");
-	for(UInt_t i =0; i<gcarr.size(); i++){
+	for(UInt_t i =0; i<gcarr.size(); ++i){
 	gcarr[i]->Draw("L SAME");
 	}
 	addLHCbLabel(labelname)->Draw();
@@ -246,7 +248,7 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 
 int main(int argc, char *argv[]){
 
-	if(argc !=5 ){
+	if( (argc!=5) && (argc!=6) ){
 		cout << "Plots 2D FCScans from rapidfit flat ntuples. Usage:" << endl;
 		cout <<  argv[0] << " <flatntuple.root> <param1> <param2> <outputdir>"	<< endl;
 		exit(1);
@@ -262,6 +264,8 @@ int main(int argc, char *argv[]){
 	gStyle->SetTitleFillColor(0);
 	gStyle->SetFillColor(0);
 	gStyle->SetFrameFillColor(0);
+	bool plot_point=false;
+	if( (argc>5) && ( string(argv[5])=="Points" ) ) { plot_point=true; }
 
 
 	TString outputdir = argv[4];
@@ -313,28 +317,32 @@ int main(int argc, char *argv[]){
 	//Par values will be floated
 	//Par errors !=0
 
-	Float_t shift = 0.000000001;
+	Float_t shift = Float_t(0.000000001);
 	TString shiftstr = "";
 	shiftstr += shift;
 
 	TString notgen = "-9999.";
 	Float_t param1val, param2val;
-	Float_t nll, nlldatabest;
+	Float_t nll, nlldatabest, x_point, y_point, global_x,global_y;
 	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints, toysgridpoints;
 	allresults->SetBranchAddress(NLLstr,&nll);
+	allresults->SetBranchAddress(param2valstr,&global_x);
+	allresults->SetBranchAddress(param1valstr,&global_y);
 	// Find the global minimum from the first entry:
 
 	//	THIS SHOULD BE THE ONLY USE OF GetEntry it's slow and doesn't emply something 'intelligent'
 	allresults->GetEntry(0);
 	nlldatabest = nll;
-	cout << "GLOBAL DATA MINIMUM NLL: " << nlldatabest << endl;
+	x_point = global_x;
+	y_point = global_y;
+	cout << "GLOBAL DATA MINIMUM NLL: " << nlldatabest << "\t\tAT: " << x_point << ":" << y_point << endl;
 
 	// Find the positions of the gridpoints we scanned, and find the profileLL at each point for data:
 	TString datafixedstr = param1genstr + "==" + notgen + "&&" + param2genstr + "==" + notgen + "&&"+ param1errstr + "==0.0&&" +param2errstr +"==0.0&&" + FRstr + "==3.0";
 	TTree* datafixed = allresults->CopyTree(datafixedstr);
-//	datafixed->SetBranchAddress(param1valstr,&param1val);
-//	datafixed->SetBranchAddress(param2valstr,&param2val);
-//	datafixed->SetBranchAddress(NLLstr,&nll);
+	//datafixed->SetBranchAddress(param1valstr,&param1val);
+	//datafixed->SetBranchAddress(param2valstr,&param2val);
+	//datafixed->SetBranchAddress(NLLstr,&nll);
 
 	//	40 x 40 x 200toys translates into 320000 seperate read statements...
 	//	Use root's internal macros which are faster at processing root files esp for reading in bulk objects
@@ -349,7 +357,7 @@ int main(int argc, char *argv[]){
 	list<pair<pair<double, double>, double > > Coordinates_NLL;
 
 	for(Long64_t i = 1; i < datafixed->GetEntries(); ++i){
-//		datafixed->GetEntry(i);
+		//datafixed->GetEntry(i);
 		//	Objects now exist in memory and can be accessed from there
 		param1val = Float_t(param1val_pointer[i]);
 		param2val = Float_t(param2val_pointer[i]);
@@ -358,7 +366,7 @@ int main(int argc, char *argv[]){
 		// We've found a new gridpoint
 		// But is it unique?
 		//bool unique = true;
-		//for(UInt_t j = 0; j< param1gridpoints.size(); j++){
+		//for(UInt_t j = 0; j< param1gridpoints.size(); ++j){
 		//	if((fabs(param1gridpoints[j] - param1val) < shift) && (fabs(param2gridpoints[j] - param2val) < shift)){unique = false;}
 		//}
 		//if(unique){
@@ -369,14 +377,16 @@ int main(int argc, char *argv[]){
 		//}
 	}
 
+	//	Using the STL syntax for finding unique objects in a list seems nicer
 	Coordinates_NLL.unique( unique_xy_coord );
 
+	//	Move values into vectors
 	list<pair<pair<double,double>,double> >::iterator coord_iter=Coordinates_NLL.begin();
 	for( coord_iter = Coordinates_NLL.begin(); coord_iter != Coordinates_NLL.end(); ++coord_iter )
 	{
-		param1gridpoints.push_back( coord_iter->first.first );
-		param2gridpoints.push_back( coord_iter->first.second );
-		dataRatiogridpoints.push_back( coord_iter->second - nlldatabest);
+		param1gridpoints.push_back( float(coord_iter->first.first) );
+		param2gridpoints.push_back( float(coord_iter->first.second) );
+		dataRatiogridpoints.push_back( float(coord_iter->second - nlldatabest) );
 	}
 
 	cout << "FOUND " << param1gridpoints.size() << " UNIQUE GRIDPOINTS" << endl;
@@ -395,7 +405,7 @@ int main(int argc, char *argv[]){
 	if(toys->GetEntries() != 0){hastoys = true;}
 	if(hastoys){
 		//Find the toys generated at the previously discovered gridpoints
-		for(UInt_t i = 0; i<param1gridpoints.size(); i++){
+		for(UInt_t i = 0; i<param1gridpoints.size(); ++i){
 			//cout << "step " << i << " of " <<  param1gridpoints.size() << endl;
 			// Build up cutstrings for the toys
 			TString toyscutstr = FRstr + "==3.0&&(abs(" +param1genstr + "-";
@@ -408,12 +418,12 @@ int main(int argc, char *argv[]){
 
 			floatedtoyscutstr += "(abs("+param1errstr +")>"+shiftstr + ")&&(abs(" + +param1errstr +")>"+shiftstr + ")";
 			TTree *floatedtoys = toys->CopyTree(floatedtoyscutstr);
-			UInt_t floatedtoystot = floatedtoys->GetEntries();
+			UInt_t floatedtoystot = UInt_t(floatedtoys->GetEntries());
 			//Do the same for toys that had fixed params
 			TString fixedtoyscutstr = toyscutstr;
 			fixedtoyscutstr += "(abs("+param1errstr +")<"+shiftstr + ")&&(abs(" + +param1errstr +")<"+shiftstr + ")";
 			TTree* fixedtoys = toys->CopyTree(fixedtoyscutstr);
-			UInt_t fixedtoystot = fixedtoys->GetEntries();
+			UInt_t fixedtoystot = UInt_t(fixedtoys->GetEntries());
 			if(fixedtoystot != floatedtoystot){
 				//We've got serious problems! 
 				cout << "Different number of toy fits found for gridpoint " << param1gridpoints[i] << "," << param2gridpoints[i] << " (" << fixedtoystot << "," << floatedtoystot << ") Can't continue!" << endl;
@@ -422,8 +432,8 @@ int main(int argc, char *argv[]){
 			}
 			if(fixedtoystot != 0){
 			//Loop over the toys, pulling out the NLL ratio
-//			floatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);
-//			fixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
+			//floatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);
+			//fixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
 			//	Yes I am well aware that I am replacing 2 lines of code with 6
 			//	But this HAS been proven to be more benificial in RapidFit
 			floatedtoys->SetEstimate(floatedtoys->GetEntries());
@@ -442,11 +452,11 @@ int main(int argc, char *argv[]){
 				NLLtoyfloat = Float_t(NLLtoyfloat_pointer[j]);
 				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
 				//if the toyratio is smaller than the data ratio at this point, increment:
-				if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}
+				if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){++toyNLLsmaller;}
 			}
 			//The C.L. is the percentage of toys that were smaller
 			double cl = ((Double_t)toyNLLsmaller/(Double_t)fixedtoystot);
-			clgridpoints.push_back(cl);
+			clgridpoints.push_back(float(cl));
 			}else{ 
 				cout << param1gridpoints[i] << " " << param2gridpoints[i] << " WARNING: Found no toys here. " << endl;
 				clgridpoints.push_back(-9999.0);
@@ -460,7 +470,7 @@ int main(int argc, char *argv[]){
 	//We now have 4 vectors: The gridpoints in x,y and the conf. limits in z or the profile LL in z. We need to make TGraphs from these bad boys. 
 
 	//Copy vectors to arrays: 
-	int npoints = param1gridpoints.size();
+	int npoints = int(param1gridpoints.size());
 	Double_t* p2points = new Double_t [npoints];
 	copy( param2gridpoints.begin(), param2gridpoints.end(),p2points);
 	Double_t* p1points = new Double_t [npoints];
@@ -487,17 +497,37 @@ int main(int argc, char *argv[]){
 	double pllconts[4] = {1.15,2.36,3.0,4.61};
 	double fcconts[4] = {0.68,0.9,0.95,0.99};
 	double confs[4] = {68.0,90.0,95.0,99.0};
+	
+	TMarker* global_minima = new TMarker( x_point, y_point, 20 );
+	global_minima->SetMarkerSize(1);
+	global_minima->SetMarkerColor(1);
 
 	TCanvas *plltemp = makeTempCanvas(pllhist,"Profile Likelihood");
+	if( plot_point )  {
+		global_minima->Draw("SAME");
+		plltemp->Update();
+	}
 	plltemp->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_temp.pdf");
 	plltemp->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_temp.png");
 	TCanvas *pllcont = makeContCanvas(pllhist,"Profile Likelihood");
+	if( plot_point )  {
+		global_minima->Draw("SAME");
+		pllcont->Update();
+	}
 	pllcont->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_cont.pdf");
 	pllcont->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_cont.png");
 	TCanvas *pllconf = makeConfCanvas(pllhist,"Profile Likelihood",4,pllconts,confs,false);
+	if( plot_point )  {
+		global_minima->Draw("SAME");
+		pllconf->Update();
+	}
 	pllconf->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_conf.pdf");
 	pllconf->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_conf.png");
 	TCanvas *pllpub = makeConfCanvas(pllhist,"Profile Likelihood",4,pllconts,confs,true);
+	if( plot_point )  {
+		global_minima->Draw("SAME");
+		pllcont->Update();
+	}
 	pllpub->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_pub.pdf");
 	pllpub->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_pub.png");
 

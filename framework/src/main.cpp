@@ -102,13 +102,13 @@ int main( int argc, char * argv[] )
 
 		//Parse command line arguments
 		string currentArgument;
-		for ( int argumentIndex = 1; argumentIndex < argc; argumentIndex++ )
+		for ( int argumentIndex = 1; argumentIndex < argc; ++argumentIndex )
 		{
 			currentArgument = argv[argumentIndex];
 
 			if ( currentArgument == "--help" )
 			{
-					argumentIndex++;
+					++argumentIndex;
 
 				cout << "QUICK HELP FOR RAPIDFIT" << endl ;
 
@@ -174,7 +174,7 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					configFileName = argv[argumentIndex];
 					configFileNameFlag = true;
 				}
@@ -188,7 +188,7 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					parameterTemplates.push_back( argv[argumentIndex] );
 					parameterTemplateFlag = true;
 				}
@@ -202,7 +202,7 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					theMinimiser = new MinimiserConfiguration( argv[argumentIndex] );
 					theMinimiserFlag = true;
 				}
@@ -216,7 +216,7 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					theFunction = new FitFunctionConfiguration( argv[argumentIndex] );
 					theFunctionFlag = true;
 				}
@@ -230,7 +230,7 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					saveOneDataSetFileName = argv[argumentIndex];
 					saveOneDataSetFlag = true;
 				}
@@ -244,11 +244,11 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 3 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					string pdfName = argv[argumentIndex];
-					argumentIndex++;
+					++argumentIndex;
 					string dataSource = argv[argumentIndex];
-					argumentIndex++;
+					++argumentIndex;
 					string phaseSpace = argv[argumentIndex];
 
 					pdfsAndData.push_back( InputParsing::MakePDFWithData( pdfName, dataSource, phaseSpace ) );
@@ -263,7 +263,7 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					numberRepeats = atoi( argv[argumentIndex] );
 					numberRepeatsFlag = true;
 				}
@@ -299,7 +299,7 @@ int main( int argc, char * argv[] )
 
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					plotFileName = argv[argumentIndex];
 				}
 				else
@@ -314,7 +314,7 @@ int main( int argc, char * argv[] )
 
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					plotFileName = argv[argumentIndex];
 				}
 				else
@@ -329,7 +329,7 @@ int main( int argc, char * argv[] )
 
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					pullFileName = argv[argumentIndex];
 				}
 				else
@@ -375,9 +375,9 @@ int main( int argc, char * argv[] )
 				if ( argumentIndex + 2 < argc )
 				{
 					defineContourFlag = true;
-					argumentIndex++;
+					++argumentIndex;
 					Contour_X.push_back( argv[argumentIndex] );
-					argumentIndex++;
+					++argumentIndex;
 					Contour_Y.push_back( argv[argumentIndex] );
 				} else {
 					cerr << "Contour Not Correctly Formatted" << endl;
@@ -388,7 +388,7 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					Nuisencemodel = unsigned (short(atoi( argv[argumentIndex] )));
 				} else {
 					cerr << "Not correctly Formatted Nuisence Input" <<endl;
@@ -399,7 +399,7 @@ int main( int argc, char * argv[] )
 			{
 				if ( argumentIndex + 1 < argc )
 				{
-					argumentIndex++;
+					++argumentIndex;
 					RuntimeSeed.push_back( atoi( argv[argumentIndex] ) );
 				} else {
 					cerr << "Seed Not Correctly Defined at Runtime" << endl;
@@ -522,7 +522,7 @@ int main( int argc, char * argv[] )
 	  else if (calculatePerEventAcceptance)
     {
       PerEventAngularAcceptance a = PerEventAngularAcceptance("jpsikmc09_loose.root","Bu2JpsiKTuple/DecayTree", "out2.root");
-      for (int iter = 1; iter <= 3; iter++)
+      for (int iter = 1; iter <= 3; ++iter)
       {
         a.fillEffHistos( iter );
         a.loopOnReconstructedBs();
@@ -558,14 +558,14 @@ int main( int argc, char * argv[] )
 			}
 			if ( defineContourFlag )
 			{
-				for( unsigned short int i=0; i < Contour_X.size(); i++)
+				for( unsigned short int i=0; i < Contour_X.size(); ++i)
 				{
 					makeOutput->AddContour( Contour_X[i], Contour_Y[i] );
 				}
 			}
 			if ( defineScanFlag )
 			{
-				for( unsigned short int i=0; i < Scan_X.size(); i++ )
+				for( unsigned short int i=0; i < Scan_X.size(); ++i )
 				{
 					makeOutput->AddScan( Scan_X[i] );
 				}
@@ -624,6 +624,7 @@ int main( int argc, char * argv[] )
 				//Do the fit to find GLOBAL MINIMA
 				ToyStudyResult* GlobalFitResult = new ToyStudyResult( argumentParameterSet->GetAllNames() );
 				GlobalFitResult->StartStopwatch();
+
 				FitResult * GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
 
 				GlobalFitResult->AddFitResult( GlobalResult );
@@ -643,7 +644,7 @@ int main( int argc, char * argv[] )
 					vector<LLscanResult*> scanResults;
 					vector<string> LLscanList = makeOutput->GetScanList();
 
-					for(unsigned int ii=0; ii < LLscanList.size() ; ii++)
+					for(unsigned int ii=0; ii < LLscanList.size() ; ++ii)
 					{
 						ToyStudyResult* scan_result = FitAssembler::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[ii] );
 						llResult = ResultFormatter::LLScan( scan_result, LLscanList[ii] );
@@ -652,7 +653,7 @@ int main( int argc, char * argv[] )
 					}
 					makeOutput->SetLLscanFileName( LLscanFileName );
 					makeOutput->OutputLLscanResult( scanResults ) ;
-					for(unsigned int ii=0; ii < LLscanList.size(); ii++ )
+					for(unsigned int ii=0; ii < LLscanList.size(); ++ii )
 					{
 						TString output_scan_dat("LLScanData");
 						output_scan_dat.Append(LLscanList[ii]);
@@ -689,14 +690,12 @@ int main( int argc, char * argv[] )
 					}
 
 					vector<TString> LLcontourFileNamez;
-					
-					cout <<_2DLLscanList.size() <<endl;
 
-					for(unsigned int ii=initial_scan; ii < _2DLLscanList.size() ; ii++ )
+					for(unsigned int ii=initial_scan; ii < _2DLLscanList.size() ; ++ii )
 					{
 						string name1 = _2DLLscanList[ii].first;
 						string name2 = _2DLLscanList[ii].second;
-
+//theMinimiser = xmlFile->GetMinimiserConfiguration();
 						vector<ToyStudyResult*> Temp_Results = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
 
 						if( !doFC_Flag )
@@ -723,7 +722,7 @@ int main( int argc, char * argv[] )
 						SoloContourResults.push_back( new ToyStudyResult( Temp_Results ) );
 						//	This should probably be in the main as I don't want to pollute the FitResult with
 						//	'hard coded defaults that seem sensible now'
-						for( unsigned short int point_num=0; point_num < SoloContourResults.back()->NumberResults(); point_num++ )
+						for( unsigned short int point_num=0; point_num < SoloContourResults.back()->NumberResults(); ++point_num )
 						{
 							SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
 							SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
@@ -736,7 +735,7 @@ int main( int argc, char * argv[] )
 					if( doFC_Flag )  {
 						_2DResultForFC = SoloContourResults.back();
 					} else  {
-						for(unsigned int ii=0; ii < _2DLLscanList.size(); ii++ )
+						for(unsigned int ii=0; ii < _2DLLscanList.size(); ++ii )
 						{
 							//	STOP RELYING ON THIS OUTPUT, IT'S BADLY WRITTEN, AND IT WILL BE DISABLED SOONER RATHER THAN LATER
 							makeOutput->SetLLcontourFileName( LLcontourFileNamez[ii].Data() );

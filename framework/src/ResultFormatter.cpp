@@ -8,33 +8,27 @@
   @date 2009-10-02
  */
 
-//  Root Headers
-#include <TFile.h>
-#include <TNtuple.h>
-#include <TH1F.h>
-#include <TH2D.h>
-#include <TFrame.h>
-#include <TAxis.h>
-#include <TMultiGraph.h>
-#include <TGraphErrors.h>
-#include <TGraph.h>
-#include <TCanvas.h>
+#include "TFile.h"
+#include "TNtuple.h"
+#include "Rtypes.h"
+#include "TH1F.h"
+#include "TH2D.h"
+#include "TMultiGraph.h"
+#include "TGraphErrors.h"
+#include "TGraph.h"
+#include "TCanvas.h"
+#include "TFrame.h"
+#include "TAxis.h"
 
-//  System Headers
+#include "ResultFormatter.h"
+#include "StatisticsFunctions.h"
+#include "EdStyle.h"
+#include "StringProcessing.h"
+
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <math.h>
-
-
-#include "ResultFormatter.h"
-#include "Rtypes.h"
-#include "StatisticsFunctions.h"
-#include "EdStyle.h"
-//#include <boost/regex.hpp>
-#include "StringProcessing.h"
-#include "LLscanResult.h"
-#include "LLscanResult2D.h"
 
 //Output data as a RootNTuple
 void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
@@ -43,7 +37,7 @@ void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
 	//Make a string naming all observables
 	string observableNames = "";
 	vector<string> allNames = OutputData->GetBoundary()->GetAllNames();
-	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 	{
 		if (nameIndex == 0)
 		{
@@ -57,15 +51,14 @@ void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
 
 	//Make the file and NTuple
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
-	rootFile->SetCompressionLevel(9);
 	TNtuple * dataNTuple = new TNtuple( "dataNTuple", "All data", observableNames.c_str() );
 
 	//Loop over all data points and add them to the NTuple
-	for ( int dataIndex = 0; dataIndex < OutputData->GetDataNumber(); dataIndex++)
+	for ( int dataIndex = 0; dataIndex < OutputData->GetDataNumber(); ++dataIndex)
 	{
 		//Retrieve the values of all observables
-		Float_t* observables = new Float_t[ int(allNames.size()) ];
-		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+		Float_t observables[ allNames.size() ];
+		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 		{
 			DataPoint * temporaryDataPoint = OutputData->GetDataPoint(dataIndex);
 			observables[nameIndex] = Float_t(temporaryDataPoint->GetObservable( allNames[nameIndex] )->GetValue());
@@ -92,7 +85,7 @@ void ResultFormatter::DebugOutputFitResult( FitResult * OutputData )
 	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
 	vector<string> allNames = outputParameters->GetAllNames();
 	vector<string>::iterator nameIterator;
-	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 	{
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
 		cout << *nameIterator << " | " << outputParameter->GetValue() << " | ";
@@ -110,11 +103,10 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 
 	string name = contourFileName;// + ".root";
 	TFile * contourFile = new TFile( name.c_str(), "RECREATE");
-	contourFile->SetCompressionLevel(9);
 	int colours[2] = {42,38};
 
 	//Loop over all contour plots
-	for (unsigned int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
+	for (unsigned short int plotIndex = 0; plotIndex < contours.size(); ++plotIndex )
 	{
 		TMultiGraph * graph = new TMultiGraph();
 		FunctionContour * plotContour = contours[plotIndex];
@@ -125,14 +117,13 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 		TCanvas * bothPlots = new TCanvas( canvasName.c_str(), canvasTitle.c_str() );
 
 		//Plot each contour, starting at highest sigma
-		for ( int sigma = plotContour->GetContourNumber(); sigma > 0; sigma-- )
+		for ( int sigma = plotContour->GetContourNumber(); sigma > 0; --sigma )
 		{
 			vector< pair< double, double > > sigmaContour = plotContour->GetPlot(sigma);
 
 			//Retrieve each point
-			double* xCoordinates = new double[ int(sigmaContour.size()) ];
-			double* yCoordinates = new double[ int(sigmaContour.size()) ];
-			for ( unsigned int pointIndex = 0; pointIndex < sigmaContour.size(); pointIndex++ )
+			double xCoordinates[ sigmaContour.size() ], yCoordinates[ sigmaContour.size() ];
+			for (unsigned short int pointIndex = 0; pointIndex < sigmaContour.size(); ++pointIndex )
 			{
 				xCoordinates[pointIndex] = sigmaContour[pointIndex].first;
 				yCoordinates[pointIndex] = sigmaContour[pointIndex].second;
@@ -174,15 +165,18 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 
 	string columns = "\\begin{tabular}{|c|";
 	string parameterNames = "";
-	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 	{
 		bool isFree = ResultFormatter::IsParameterFree( OutputData, *nameIterator );
 		if (isFree)
 		{
 			columns += "c|";
 			//string name = FindAndReplaceString( *nameIterator );
-			string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
-			parameterNames += " & " + name;
+			//string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
+			string name = *nameIterator;
+			std::stringstream ResultStream;
+			ResultStream << setw(10) << EdStyle::GetParamLatexName( name );
+			parameterNames += " & " + ResultStream.str();
 			numberOfFreeParameters += 1;
 		}
 	}
@@ -192,18 +186,18 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 	cout << "Correlation matrix" << endl;
 	cout << "\n\\begin{center}" << endl;
 	cout << columns << endl;
-	cout << setw(15) << parameterNames << endl;
+	cout << setw(20) << " " <<  setw(16) << parameterNames << endl;
 
 	int row = 0;
-	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 	{
 		bool isFree = ResultFormatter::IsParameterFree( OutputData, *nameIterator );
 		if (!isFree) continue;
 
 		//string name = FindAndReplaceString( *nameIterator );
-		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
-
-		cout << setw(15) << name;
+		//string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
+		string name = *nameIterator;
+		cout << setw(20) << EdStyle::GetParamLatexName( name );
 		if ( covarianceMatrix.size() == 0 )
 		{
 			cerr << "No correlation matrix returned from fit!" << endl;
@@ -212,7 +206,7 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 
 		double drow = GetElementFromCovarianceMatrix( covarianceMatrix, row, row );
 
-		for ( int col = 0; col < numberOfFreeParameters; col++)
+		for ( int col = 0; col < numberOfFreeParameters; ++col)
 		{
 			double dcol = GetElementFromCovarianceMatrix( covarianceMatrix, col, col );
 			double covariance = GetElementFromCovarianceMatrix( covarianceMatrix, row, col );
@@ -221,16 +215,19 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 			{
 				if ( fabs(correlation) > 0.5 && ( col != row ) )
 				{
-					cout << " & " << setw(10) << std::setprecision(2) << "\\bf{" << correlation << "}";
+					std::stringstream ResultStream;
+					ResultStream << std::setprecision(2) << correlation;
+					TString formatted("\\bf{"); formatted.Append( ResultStream.str() ); formatted.Append("}") ;
+					cout << " & " << setw(12) << std::setprecision(2) << formatted;
 				}
 				else
 				{
-					cout << " & " << setw(10) << std::setprecision(2) << correlation;
+					cout << " & " << setw(12) << std::setprecision(2) << correlation;
 				}
 			}
 			else
 			{
-				cout << " & " << setw(10) << " ";
+				cout << " & " << setw(12) << " ";
 			}
 
 		}
@@ -267,13 +264,13 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
 	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
 	cout << "\\begin{tabular}{|c|c|c|} \n\\hline" << endl;
-	cout << "Parameter & Fit result and error & $\\sigma$ from input \\\\ \\hline \\hline" << endl;
+	cout << setw(20) << "Parameter"<< " & " << setw(25) << "Fit result and error" << setw(21) << " & " << setw(20) << "$\\sigma$ from input \\\\ \t\t\\hline \\hline\n" << endl;
 
 	//Ouput each parameter
 	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
 	vector<string> allNames = outputParameters->GetAllNames();
 	vector<string>::iterator nameIterator;
-	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 	{
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
 
@@ -282,6 +279,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 //		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
+		string unit = outputParameter->GetUnit(); 
 		//if (fitError > 0.0) sigmaFromInputValue = (fitValue - inputValue)/fitError;
 
 		//boost::regex pattern ("_",boost::regex_constants::icase|boost::regex_constants::perl);
@@ -289,11 +287,12 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		//string newName = boost::regex_replace (*nameIterator, pattern, replace);
 
 		//string name = FindAndReplaceString( *nameIterator );
-		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
-		cout << setw(15) << name << " & "
-			<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
-			<< setw(10) <<  		  fitError << " & "
-			<< setw(10) << setprecision(2) << sigmaFromInputValue << "\\\\" << endl;
+		//string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
+		string name = *nameIterator;
+		cout << setw(20) << EdStyle::GetParamLatexName(name) << " & "
+			<< setw(12) << setprecision(5) << fitValue << " $\\pm$ "
+			<< setw(10) <<  		  fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
+			<< setw(20) << setprecision(2) << sigmaFromInputValue << "\\\\" << endl;
 	}
 
 	cout << "\\hline \n\\end{tabular}" << endl;
@@ -307,10 +306,10 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
 	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
 	cout << "\\begin{tabular}{|c|c|c|c|} \n\\hline" << endl;
-	cout << "Parameter & Fit result and error & $\\sigma$ from input & Abs from input \\\\ \\hline \\hline" << endl;
+	cout << setw(20)<< "Parameter"<< " & " << setw(25) << "Fit result and error" << setw(21) << " & "<< setw(20) <<"$\\sigma$ from input" << " & " << setw(20) << "Abs from input \\\\ \t\t\\hline \\hline\n" << endl;
 
 	//Ouput each parameter
-	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 	{
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
 
@@ -319,6 +318,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
+		string unit = outputParameter->GetUnit();
 		//if (fitError > 0.0) sigmaFromInputValue = (fitValue - inputValue)/fitError;
 
 		//boost::regex pattern ("_",boost::regex_constants::icase|boost::regex_constants::perl);
@@ -326,12 +326,13 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		//string newName = boost::regex_replace (*nameIterator, pattern, replace);
 
 		//string name = FindAndReplaceString( *nameIterator );
-		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
-		cout << setw(15) << name << " & "
-			<< setw(10) << setprecision(5) << fitValue << " $\\pm$ "
-			<< setw(10) <<  		  fitError << " & "
-			<< setw(10) << setprecision(2) << sigmaFromInputValue << " & "
-			<< setw(10) << setprecision(5) << fitValue-inputValue << "\\\\" << endl;
+		//string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
+		string name = *nameIterator;
+		cout << setw(20) << EdStyle::GetParamLatexName(name) << " & "
+			<< setw(12) << setprecision(5) << fitValue << " $\\pm$ "
+			<< setw(10) <<  		  fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
+			<< setw(20) << setprecision(2) << sigmaFromInputValue << " & "
+			<< setw(15) << setprecision(5) << fitValue-inputValue << "\\\\" << endl;
 	}
 
 	cout << "\\hline \n\\end{tabular}" << endl;
@@ -345,13 +346,13 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "Fit status: " << OutputData->GetFitStatus() << endl;
 	cout << setprecision(8) << "Minimum function value: " << OutputData->GetMinimumValue() << endl;
 	cout << "\\begin{tabular}{|c|c|} \n\\hline" << endl;
-	cout << "Parameter & Fit result and error  \\\\ \\hline \\hline" << endl;
+	cout << setw(20) << "Parameter" << " & " << setw(21) << "Fit result and error" << setw(21) << " " << " \\\\ \\hline \\hline\n" << endl;
 
 	//Will need to do some comparisons
-//	double Rperp =0 , Rzp =0, ePerp =0 , eZp=0;
+//	double Rperp =0, Rzp =0, ePerp =0 , eZp=0;
 
 	//Ouput each parameter
-	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 	{
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
 
@@ -360,13 +361,36 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 //		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
 //		double sigmaFromInputValue = outputParameter->GetPull();
-		string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
-		cout << setw(15) << name << " & "
-			<< setw(10) << setprecision(3) << fitValue << " $\\pm$ "
-			<< setw(10) <<  		  fitError << "\\\\" << endl;
+		string unit = outputParameter->GetUnit();
+		//string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
+		string name = *nameIterator;
+		cout << setw(20) << EdStyle::GetParamLatexName(name) << " & "
+			<< setw(12) << setprecision(3) << fitValue << " $\\pm$ "
+			<< setw(10) <<  		  fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit)  << "\\\\" << endl;
 	}
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;	
+
+	cout << endl << endl;
+	cout << "--------------------------------------------------" <<endl;
+	cout << "\nFit Review:\t\tStatus:\t" <<OutputData->GetFitStatus()<<endl<<endl;
+
+	//Ouput each parameter
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
+	{
+		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
+		double fitValue = outputParameter->GetValue();
+		double fitError = outputParameter->GetError();
+		string unit = outputParameter->GetUnit();
+		string name = *nameIterator;
+		cout << setw(25) << name << " : "
+			<< setw(13) << setprecision(5) << fitValue << "  \\pm  "
+			<< setw(13) << setprecision(5) << fitError << endl;
+	}
+	cout << endl;
+	cout << "--------------------------------------------------" <<endl;
+	cout << endl <<endl;
+
 }
 
 /*string ResultFormatter::FindAndReplaceString( string name )
@@ -406,15 +430,19 @@ void ResultFormatter::MakePullPlots( string Type, string FileName, ToyStudyResul
 	}
 }
 
+void ResultFormatter::WriteFlatNtuple( string Filename, ToyStudyResult* ToyResult )
+{
+	ResultFormatter::FlatNTuplePullPlots( Filename, ToyResult );
+}
+
 //Make pull plots from the output of a toy study
-void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult* ToyResult )
+void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
-	rootFile->SetCompressionLevel(9);
 	TNtuple * parameterNTuple;
-	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader() );
+	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader());
 	Float_t * resultArr;
-	for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); resultIndex++ )
+	for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
 	{
 		vector<double> result = ToyResult->GetFlatResult(resultIndex);
 		resultArr = new Float_t [result.size()];
@@ -426,25 +454,19 @@ void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult* ToyR
 	rootFile->Close();
 }
 
-void ResultFormatter::WriteFlatNtuple( string Filename, ToyStudyResult* ToyResult )
-{
-	ResultFormatter::FlatNTuplePullPlots( Filename, ToyResult );
-}
-
 //Make pull plots from the output of a toy study
 void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResult * ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
-	rootFile->SetCompressionLevel(9);
 	string header = "value:error:pull";
 	vector<string> allNames = ToyResult->GetAllNames();
 	Float_t valueErrorPull[3];
 	vector<double> parameterValues, parameterErrors, parameterPulls;
-	TH1F * pullHistogram=NULL;
-	TNtuple * parameterNTuple=NULL;
+	TH1F * pullHistogram;
+	TNtuple * parameterNTuple;
 
 	//Plots for each observable
-	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 	{
 		//Prepare the NTuple
 		parameterNTuple = new TNtuple( allNames[nameIndex].c_str(), "Parameter fit results", header.c_str() );
@@ -465,7 +487,7 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 		}
 
 		//Plot the results
-		for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); resultIndex++ )
+		for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
 		{
 			valueErrorPull[0] = Float_t(parameterValues[resultIndex]);
 			valueErrorPull[1] = Float_t(parameterErrors[resultIndex]);
@@ -494,7 +516,7 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 	vector<double> allCPUTimes = ToyResult->GetAllCPUTimes();
 	TNtuple * fitInfoNTuple = new TNtuple( "fitInfo", "Information about fits", "realTime:cpuTime:fitStatus" );
 	Float_t timeCPUStatus[3];
-	for (unsigned int timeIndex = 0; timeIndex < allRealTimes.size(); timeIndex++ )
+	for (unsigned short  int timeIndex = 0; timeIndex < allRealTimes.size(); ++timeIndex )
 	{
 		timeCPUStatus[0] = Float_t(allRealTimes[timeIndex]);
 		timeCPUStatus[1] = Float_t(allCPUTimes[timeIndex]);
@@ -526,7 +548,7 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 	//Make a canvas for all the plots
 	TCanvas cv ;
 
-	for( int ii=0; ii<nscans; ii++ )
+	for( int ii=0; ii<nscans; ++ii )
 	{
 		cv.SetGrid();
 		cv.GetFrame()->SetFillColor(21);
@@ -559,7 +581,7 @@ void ResultFormatter::MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, s
 	//Set some numbers
 	int nscans = int(scanResults.size());
 
-	for( int ii=0; ii<nscans; ii++ )
+	for( int ii=0; ii<nscans; ++ii )
 	{
 		TH2D * hist = scanResults[ii]->GetTH2D() ;
 		hist->Draw("cont1") ;
@@ -599,7 +621,7 @@ LLscanResult2D* ResultFormatter::LLScan2D( vector<ToyStudyResult*> new_results, 
 	vector<double> scanParameterValues;
 	vector<double> scanParameterValues2 = new_results[0]->GetParameterValues( scanName2 );
 
-	for(unsigned int si=0; si < new_results.size(); si++) {
+	for(unsigned int si=0; si < new_results.size(); ++si) {
 		vector<double> scanLLValues = new_results[si]->GetAllMLL();
 		LLscanResult * _1D_temp_result = new LLscanResult( scanName2, scanParameterValues2, scanLLValues ) ;
 		LLScanResults.push_back( _1D_temp_result );

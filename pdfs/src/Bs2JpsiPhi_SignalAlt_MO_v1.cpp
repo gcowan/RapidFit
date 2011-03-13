@@ -268,7 +268,7 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
 	// Recalculate cached values if Physics parameters have changed
 	// Must do this for each of the two resolutions.
 	if( true /*! normalisationCacheValid*/ )  {
-		for( tag = -1; tag <= 1; tag ++ ) {
+		for( tag = -1; tag <= 1; ++tag ) {
 			if(resolution1Fraction >= 0.9999 ){
 				resolution =  resolution1 ;
 				normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
@@ -440,7 +440,7 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecCompositeNorm1(  )
 		timeAcceptance.configure( tlo ) ;
 	
 		bool firstBin = true ;
-		for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); islice++ ) 
+		for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); ++islice ) 
 		{
 			if( firstBin )firstBin = false ;
 			else tlo = timeAcceptance.sliceStart( islice ) ;

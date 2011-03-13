@@ -35,7 +35,7 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 	double constraintValue = 0.0;
 
 	//Loop over all ExternalConstraints
-	for (unsigned int constraintIndex = 0; constraintIndex < allConstraints.size(); constraintIndex++ )
+	for (unsigned int constraintIndex = 0; constraintIndex < allConstraints.size(); ++constraintIndex )
 	{
 		string name = allConstraints[constraintIndex]->GetName();
 		if ( name == "GammaL" )

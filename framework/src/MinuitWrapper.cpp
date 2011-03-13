@@ -30,7 +30,6 @@ MinuitWrapper::MinuitWrapper(): print_verbosity( 0 )
 MinuitWrapper::MinuitWrapper( int NumberParameters, short int output_level ): print_verbosity( output_level )
 {
 	minuit = new TMinuit( NumberParameters );
-	minuit->SetPrintLevel( print_verbosity );
 }
 
 //Destructor
@@ -44,9 +43,15 @@ void MinuitWrapper::SetOutputLevel( short int output_level )
 	print_verbosity = output_level;
 	Double_t arg=output_level;
 	Int_t err;
-	minuit->mnexcm("SET PRINT", &arg, 1, err);
 	if( output_level < 0 )
-	minuit->mnexcm("SET NOWarnings", &arg, 1, err );
+	{
+		arg=-1;
+		minuit->mnexcm("SET PRINT", &arg, 1, err);
+		minuit->mnexcm("SET NOWarnings", &arg, 1, err );
+		err = minuit->Command("SET OUTputfile /dev/zero");
+	} else {
+		minuit->mnexcm("SET PRINT", &arg, 1, err);
+	}
 //	minuit->SetPrintLevel( print_verbosity );
 }
 
@@ -63,7 +68,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	//Store the parameters
 	ParameterSet * newParameters = NewFunction->GetParameterSet();
 	vector<string> allNames = newParameters->GetAllNames();
-	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 	{
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
@@ -127,7 +132,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 
 	//Get the fitted parameters
 	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
-	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 	{
 		string parameterName = allNames[nameIndex];
 		double parameterValue = 0.0;
@@ -154,26 +159,26 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	Double_t matrix[numParams][numParams];
 
 //	Double_t** matrix = new Double_t*[numParams];
-//	for( short int i=0; i < numParams; i++ )
+//	for( short int i=0; i < numParams; ++i )
 //		matrix[i] = new Double_t[numParams];
 	gMinuit->mnemat(&matrix[0][0],numParams);
 	vector<double> covarianceMatrix(numParams*(numParams+1)/2);
-	for (int row = 0; row < numParams; row++)
+	for (int row = 0; row < numParams; ++row)
 	{
-		for (int col = 0; col < numParams; col++)
+		for (int col = 0; col < numParams; ++col)
 		{
 			if(row > col) {covarianceMatrix[col+row*(row+1)/2] = matrix[row][col];}
 			else {covarianceMatrix[row+col*(col+1)/2] = matrix[row][col];}
 		}
 	}
 
-//	for( short int i=0; i< numParams; i++ )
+//	for( short int i=0; i< numParams; ++i )
 //		delete[] matrix[i];
 //	delete[] matrix;
 
 	//Make the contour plots
 	vector< FunctionContour* > allContours;
-	for (unsigned int plotIndex = 0; plotIndex < contours.size(); plotIndex++ )
+	for (unsigned int plotIndex = 0; plotIndex < contours.size(); ++plotIndex )
 	{
 		//Find the index (in Minuit) of the parameter names requested for the plot
 		int xParameterIndex = StringProcessing::VectorContains( &allNames, &( contours[plotIndex].first ) );

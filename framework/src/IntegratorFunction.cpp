@@ -77,14 +77,14 @@ double IntegratorFunction::DoEval( const double * x ) const
 	DataPoint * newDataPoint = new DataPoint( currentPoint->GetAllNames() );//WrappedFunction->GetPrototypeDataPoint() );
 
 	//Load the array into the data point
-	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 	{
 		Observable * currentObservable = currentPoint->GetObservable( doIntegrate[observableIndex] );
 		newDataPoint->SetObservable( doIntegrate[observableIndex], x[observableIndex], currentObservable->GetError(), currentObservable->GetUnit() );
 	}
 
 	//Load values of other observables
-	for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); observableIndex++ )
+	for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 	{
 		Observable * currentObservable = currentPoint->GetObservable( dontIntegrate[observableIndex] );
 		newDataPoint->SetObservable( dontIntegrate[observableIndex], currentObservable->GetValue(), currentObservable->GetError(), currentObservable->GetUnit() );
@@ -115,7 +115,7 @@ Double_t IntegratorFunction::Density( Int_t ndim, Double_t * xArray )
 	{
 		//Coordinate transform
 		double* transformedArray = new double[ndim];
-		for ( int observableIndex = 0; observableIndex < ndim; observableIndex++ )
+		for ( int observableIndex = 0; observableIndex < ndim; ++observableIndex )
 		{
 			transformedArray[observableIndex] = minima[observableIndex] + ( ranges[observableIndex] * xArray[observableIndex] );
 		}

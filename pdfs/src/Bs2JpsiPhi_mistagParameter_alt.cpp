@@ -278,7 +278,7 @@ double Bs2JpsiPhi_mistagParameter_alt::Normalisation(DataPoint * measurement, Ph
 	// Recalculate cached values if Physics parameters have changed
 	// Must do this for each of the two resolutions.
 	if( ! normalisationCacheValid )  {
-		for( tag = -1; tag <= 1; tag ++ ) {
+		for( tag = -1; tag <= 1; ++tag ) {
 			if(resolution1Fraction >= 0.9999 )
 			{
 				resolution =  resolution1 ;

@@ -84,7 +84,7 @@ bool RootFileDataSet::SetBranches()
 {
 	cout << "Setting branches" << endl;
 	vector<string> observableNames = dataBoundary->GetAllNames();
-        for ( unsigned short int obsIndex = 0; obsIndex < observableNames.size(); obsIndex++ )
+        for ( unsigned short int obsIndex = 0; obsIndex < observableNames.size(); ++obsIndex )
         {
 		rootNTuple->SetBranchAddress(observableNames[obsIndex].c_str(), &(observableValues[obsIndex]), &(branches[obsIndex]));
 	}
@@ -98,7 +98,7 @@ bool RootFileDataSet::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceB
 	bool compatible = true;
 
 	vector<string> allNames = TestBoundary->GetAllNames();
-	for ( unsigned short int observableIndex = 0; observableIndex < allNames.size(); observableIndex++ )
+	for ( unsigned short int observableIndex = 0; observableIndex < allNames.size(); ++observableIndex )
 	{
 		bool found = false;
 		//Find the requested observable name in the ntuple
@@ -138,7 +138,7 @@ DataPoint * RootFileDataSet::GetDataPoint( int DataIndex )
 		outputDataPoint = new DataPoint(observableNames);
 
 		//Populate the output data point
-		for ( unsigned short int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
+		for ( unsigned short int observableIndex = 0; observableIndex < observableNames.size(); ++observableIndex )
 		{
 			string name = observableNames[observableIndex];
 		        string unit = dataBoundary->GetConstraint(name)->GetUnit();
@@ -161,7 +161,7 @@ bool RootFileDataSet::AddDataPoint( DataPoint * NewDataPoint )
 		//Make an array of the observable values
 		vector<string> observableNames = dataBoundary->GetAllNames();
 		Float_t* dataPointArray = new Float_t[ observableNames.size() ];
-		for ( unsigned short int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
+		for ( unsigned short int observableIndex = 0; observableIndex < observableNames.size(); ++observableIndex )
 		{
 			string name = observableNames[observableIndex];
 			Observable * inputObservable = NewDataPoint->GetObservable(name);

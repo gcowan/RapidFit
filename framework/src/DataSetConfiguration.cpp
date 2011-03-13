@@ -219,7 +219,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 		//  Construct a Plot String to use the TTree->Draw Method
 		TString PlotString = observableNames[obsIndex];
-		for( short int i=1; ((obsIndex+i)<numberOfObservables)&&((i<3)); i++ )
+		for( short int i=1; ((obsIndex+i)<numberOfObservables)&&((i<3)); ++i )
 		{
 			PlotString.Append(":");
 			PlotString.Append(observableNames[obsIndex+i]);
@@ -239,10 +239,10 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		
 		//  As You can only plot 3 at a time using this mechanism and Root will overide the results between drawing the plots
 		//  Save the actual data to somewhere protected in our memory
-		for(unsigned short int i=0; i < data_array.size(); i++ )
+		for(unsigned short int i=0; i < data_array.size(); ++i )
 		{
 			vector<Double_t> temp_vector;
-			for(int j=0; j < numberOfEventsAfterCut; j++ )
+			for(int j=0; j < numberOfEventsAfterCut; ++j )
 			{
 				temp_vector.push_back( data_array[i][j] );
 			}
@@ -259,17 +259,17 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
         int numberOfDataPointsRead = 0;
 	//  Now we have all of the data stored in memory in real_data_array which has a 1<->1 with observableName
 	//  Create and store data points for each event as before and throw away events outside of the PhaseSpace 
-	for( ; (numberOfDataPointsRead < numberOfEventsAfterCut) && (numberOfDataPointsAdded < numberEventsToRead) ; numberOfDataPointsRead++ )
+	for( ; (numberOfDataPointsRead < numberOfEventsAfterCut) && (numberOfDataPointsAdded < numberEventsToRead) ; ++numberOfDataPointsRead )
 	{
 		DataPoint point( observableNames );
-		for(int obsIndex = 0; obsIndex < numberOfObservables; obsIndex++ )
+		for(int obsIndex = 0; obsIndex < numberOfObservables; ++obsIndex )
 		{
 			string name = observableNames[obsIndex];
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
 			point.SetObservable( name, real_data_array[obsIndex][numberOfDataPointsRead], 0.0, unit);
 		}
 		bool dataPointAdded = data->AddDataPoint( &point );
-		if (dataPointAdded) numberOfDataPointsAdded += 1;
+		if (dataPointAdded) ++numberOfDataPointsAdded;
 	}
 	
 	inputFile->Close();
@@ -286,7 +286,7 @@ bool DataSetConfiguration::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseS
 	bool compatible = true;
 
 	vector<string> allNames = TestBoundary->GetAllNames();
-	for (unsigned int observableIndex = 0; observableIndex < allNames.size(); observableIndex++ )
+	for (unsigned int observableIndex = 0; observableIndex < allNames.size(); ++observableIndex )
 	{
 		bool found = false;
 		//Find the requested observable name in the ntuple
@@ -319,7 +319,7 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 	std::vector<string> observableNames = (data->GetBoundary())->GetAllNames();
 
 	//Make a map of the observable names to their units
-	for (unsigned int i = 0; i < observableNames.size(); i++ )
+	for (unsigned int i = 0; i < observableNames.size(); ++i )
 	{
 		string name = observableNames[i];
 		string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
@@ -355,25 +355,25 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 			{
 				//Make a data point with the values on the line
 				DataPoint point(observableNames);
-				for (unsigned int i = 0; i < splitVec.size(); i++)
+				for (unsigned int i = 0; i < splitVec.size(); ++i)
 				{
 					string name = observableNamesInFile[i];
 					string unit = observableNamesToUnits[ name ];
 					point.SetObservable( name, strtod( splitVec[i].c_str(), NULL ), 0.0, unit );
 				}
-				numberOfDataPoints += 1;
+				++numberOfDataPoints;
 				data->AddDataPoint( &point );
 			}
 			else
 			{
 				//Load the obsevable names
-				for (unsigned int i = 0; i < splitVec.size(); i++)
+				for (unsigned int i = 0; i < splitVec.size(); ++i)
 				{
 					observableNamesInFile.push_back( splitVec[i] );
 				}
 
 				//Check that all required observable names are specified
-				for (unsigned int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
+				for (unsigned int observableIndex = 0; observableIndex < observableNames.size(); ++observableIndex )
 				{
 					if ( StringProcessing::VectorContains( &observableNamesInFile, &( observableNames[observableIndex] ) ) == -1 )
 					{

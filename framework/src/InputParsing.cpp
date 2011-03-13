@@ -30,7 +30,7 @@ ParameterSet * InputParsing::MakeParameterSet( string Input )
 		vector<string> units;
 
 		//Retrieve all parameter components
-		for ( int parameterIndex = 0; parameterIndex < numberParameters; parameterIndex++ )
+		for ( int parameterIndex = 0; parameterIndex < numberParameters; ++parameterIndex )
 		{
 			names.push_back( splitInput[ parameterIndex ] );
 			values.push_back( strtod( splitInput[ parameterIndex + 1 ].c_str(), NULL ) );
@@ -43,7 +43,7 @@ ParameterSet * InputParsing::MakeParameterSet( string Input )
 		ParameterSet * newParameters = new ParameterSet( names );
 
 		//Populate the parameter set
-		for ( int parameterIndex = 0; parameterIndex < numberParameters; parameterIndex++ )
+		for ( int parameterIndex = 0; parameterIndex < numberParameters; ++parameterIndex )
 		{
 			newParameters->SetPhysicsParameter( names[parameterIndex], values[parameterIndex], minima[parameterIndex], 
 					maxima[parameterIndex], types[parameterIndex], units[parameterIndex] );
@@ -67,7 +67,7 @@ ParameterSet * InputParsing::MakeParameterSet( vector<string> Input )
 	double value, minimum, maximum;
 
 	//Parse the input
-	for (unsigned int parameterIndex = 0; parameterIndex < Input.size(); parameterIndex++ )
+	for (unsigned int parameterIndex = 0; parameterIndex < Input.size(); ++parameterIndex )
 	{
 		splitInput = StringProcessing::SplitString( Input[parameterIndex], ':' );
 		if ( splitInput.size() == 6 )
@@ -106,7 +106,7 @@ ParameterSet * InputParsing::MakeParameterSet( vector<string> Input )
 	ParameterSet * newSet = new ParameterSet(parameterNames);
 
 	//Populate the set
-	for (unsigned int parameterIndex = 0; parameterIndex < physicsParameters.size(); parameterIndex++ )
+	for (unsigned int parameterIndex = 0; parameterIndex < physicsParameters.size(); ++parameterIndex )
 	{
 		newSet->SetPhysicsParameter( parameterNames[parameterIndex], &physicsParameters[parameterIndex] );
 	}
@@ -122,7 +122,7 @@ PhaseSpaceBoundary * InputParsing::MakePhaseSpaceBoundary( string Input )
 
 	//Get the templates for the individual boundaries
 	vector<string> boundaryTemplates = StringProcessing::SplitString( Input, '{' );
-	for (unsigned int templateIndex = 0; templateIndex < boundaryTemplates.size(); templateIndex++ )
+	for (unsigned int templateIndex = 0; templateIndex < boundaryTemplates.size(); ++templateIndex )
 	{
 		StringProcessing::RemoveCharacter( boundaryTemplates[templateIndex], '}' );
 		splitTemplate = StringProcessing::SplitString( boundaryTemplates[templateIndex], ':' );
@@ -159,7 +159,7 @@ PhaseSpaceBoundary * InputParsing::MakePhaseSpaceBoundary( string Input )
 		{
 			//Discrete
 			vector<double> allValues;
-			for (unsigned int valueIndex = 1; valueIndex < splitTemplate.size() - 1; valueIndex++ )
+			for (unsigned int valueIndex = 1; valueIndex < splitTemplate.size() - 1; ++valueIndex )
 			{
 				allValues.push_back( strtod( splitTemplate[valueIndex].c_str(), NULL ) );
 			}
@@ -173,7 +173,7 @@ PhaseSpaceBoundary * InputParsing::MakePhaseSpaceBoundary( string Input )
 	PhaseSpaceBoundary * newBoundary = new PhaseSpaceBoundary(allNames);
 
 	//Populate the boundary
-	for (unsigned int constraintIndex = 0; constraintIndex < allNames.size(); constraintIndex++ )
+	for (unsigned int constraintIndex = 0; constraintIndex < allNames.size(); ++constraintIndex )
 	{
 		newBoundary->SetConstraint( allNames[constraintIndex], newConstraints[constraintIndex] );
 	}
@@ -217,7 +217,7 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 
 		//Put the leftovers down as extra arguments
 		vector<string> dataArguments, argumentNames;
-		for (unsigned int argumentIndex = 2; argumentIndex < dataComponents.size(); argumentIndex++ )
+		for (unsigned int argumentIndex = 2; argumentIndex < dataComponents.size(); ++argumentIndex )
 		{
 			dataArguments.push_back( dataComponents[argumentIndex] );
 

@@ -20,7 +20,7 @@ AR           = ar cru
 
 ##Flags
 #CXXFLAGS     += -D_DEBUG
-CXXFLAGS     = -O2 -mtune=generic -ffast-math -g -ansi -fPIC -funroll-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+CXXFLAGS     = -O3 -mtune=generic -ffast-math -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 
 SRCEXT   = cpp
 SRCDIR   = framework/src
@@ -100,11 +100,11 @@ $(EXEDIR)/rapidfit_fcscanresults: $(OBJDIR)/rapidfit_fcscanresults.o
 $(OBJDIR)/rapidfit_fcscanresults.o: $(UTILSSRC)/rapidfit_fcscanresults.cc
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-$(EXEDIR)/rapidfit_llscanresults: $(OBJDIR)/rapidfit_llscanresults.o
-	$(CXX) -o $@ $< $(ROOTLIBS)
+#$(EXEDIR)/rapidfit_llscanresults: $(OBJDIR)/rapidfit_llscanresults.o
+#	$(CXX) -o $@ $< $(ROOTLIBS)
 
-$(OBJDIR)/rapidfit_llscanresults.o: $(UTILSSRC)/rapidfit_llscanresults.cc
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+#$(OBJDIR)/rapidfit_llscanresults.o: $(UTILSSRC)/rapidfit_llscanresults.cc
+#	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
-	
+#utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults	

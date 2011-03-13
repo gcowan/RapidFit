@@ -29,24 +29,29 @@ using namespace std;
 class FitAssembler
 {
 	public:
+		//	New Interface to Fits, for a well behaved PDF it will not crash, it will always return a FitResult which makes it more stable for scanning and such
+		//	Also provides way to control the output level during the fit (default = Everything)
+		static FitResult * DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, int=1);
+
+		//	Provided for sWeightPrecalculator I would like to replace this with something closer to another DoSafeFit
+		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< IPDF* >, vector< IDataSet* >, vector< ConstraintFunction* > );
+
+
+		//	New Interface to Scanning Code
+		static vector<ToyStudyResult*> ContourScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string, string, int=-999 );
+		static ToyStudyResult* SingleScan(  MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string, int=-999 );
+
+		//  Std Feldman-Cousins Code, relying on many already defined objects even though it pulls in the XMLConfigReader object
+		static ToyStudyResult* FeldmanCousins( ToyStudyResult*, ToyStudyResult*, vector<unsigned short int>, unsigned short int, bool, OutputConfiguration*, MinimiserConfiguration*, FitFunctionConfiguration*, XMLConfigReader*, vector< PDFWithData* >, int=-999);
+
+	private:
 		static FitResult * DoFit( IMinimiser*, FitFunction* );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle* );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* > );
-		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< IPDF* >, vector< IDataSet* >, vector< ConstraintFunction* > );
-		static FitResult * DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* > );
 
-		//  New Interface to Scanning Code
-		static vector<ToyStudyResult*> ContourScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string, string );
-		static ToyStudyResult* SingleScan(  MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string );
+		static void DoScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, ScanParam*, ToyStudyResult*, int );
 
-
-		//  Std Feldman-Cousins Code, relying on many already defined objects even though it pulls in the XMLConfigReader object
-		static ToyStudyResult* FeldmanCousins( ToyStudyResult*, ToyStudyResult*, vector<unsigned short int>, unsigned short int, bool, OutputConfiguration*, MinimiserConfiguration*, FitFunctionConfiguration*, XMLConfigReader*, vector< PDFWithData* >);
-
-	private:
-		static void DoScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, ScanParam*, ToyStudyResult* );
-
-		static void DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, pair<ScanParam*, ScanParam* >, vector<ToyStudyResult*>* );
+		static void DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, pair<ScanParam*, ScanParam* >, vector<ToyStudyResult*>*, int );
 
 //		static void ShakeBottle( ParameterSet*, vector< PDFWithData* >, unsigned int );
 };

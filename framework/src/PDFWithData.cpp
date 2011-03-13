@@ -46,7 +46,7 @@ IPDF * PDFWithData::GetPDF()
 
 void PDFWithData::AddCachedData( vector<IDataSet*> input_cache )
 {
-	for( unsigned short int element=0; element < input_cache.size(); element++ )
+	for( unsigned short int element=0; element < input_cache.size(); ++element )
 	{
 		cached_data.push_back( input_cache[element] );
 	}
@@ -66,10 +66,10 @@ IDataSet * PDFWithData::GetDataSet()
 	if( cached_data.empty() )
 	{
 		newDataSet = dataSetMakers[0]->MakeDataSet( inputBoundary, fitPDF );
-		for (unsigned int sourceIndex = 1; sourceIndex < dataSetMakers.size(); sourceIndex++ )
+		for (unsigned int sourceIndex = 1; sourceIndex < dataSetMakers.size(); ++sourceIndex )
 		{
 			IDataSet * extraData = dataSetMakers[sourceIndex]->MakeDataSet( inputBoundary, fitPDF );
-			for (int dataIndex = 0; dataIndex < extraData->GetDataNumber(); dataIndex++ )
+			for (int dataIndex = 0; dataIndex < extraData->GetDataNumber(); ++dataIndex )
 			{
 				newDataSet->AddDataPoint( extraData->GetDataPoint(dataIndex) );
 			}
@@ -87,7 +87,7 @@ IDataSet * PDFWithData::GetDataSet()
 	}
 
 	//Precalculation, if required
-	for (unsigned int precalculatorIndex = 0; precalculatorIndex < dataProcessors.size(); precalculatorIndex++ )
+	for (unsigned int precalculatorIndex = 0; precalculatorIndex < dataProcessors.size(); ++precalculatorIndex )
 	{
 		IDataSet * oldDataSet = newDataSet;
 		newDataSet = dataProcessors[precalculatorIndex]->ProcessDataSet(oldDataSet);
@@ -103,7 +103,7 @@ bool PDFWithData::SetPhysicsParameters( ParameterSet * NewParameters )
 {
 	//Set the parameters for the stored PDF and all data set makers
 	bool success = fitPDF->SetPhysicsParameters(NewParameters);
-	for (unsigned int dataIndex = 0; dataIndex < dataSetMakers.size(); dataIndex++ )
+	for (unsigned int dataIndex = 0; dataIndex < dataSetMakers.size(); ++dataIndex )
 	{
 		success &= dataSetMakers[dataIndex]->SetPhysicsParameters(NewParameters);
 	}

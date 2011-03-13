@@ -28,7 +28,7 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 	allData = NewBottle;
 
 	//Initialise the integrators
-	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); resultIndex++ )
+	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); ++resultIndex )
 	{
 		RapidFitIntegrator * resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
 		allIntegrators.push_back( resultIntegrator );
@@ -57,14 +57,14 @@ double FitFunction::Evaluate()
 	double minimiseValue = 0.0;
 
 	//Calculate the function value for each PDF-DataSet pair
-	for (int resultIndex = 0; resultIndex < allData->NumberResults(); resultIndex++)
+	for (int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex)
 	{
 		minimiseValue += EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[resultIndex] );
 	}
 
 	//Calculate the value of each constraint
 	vector< ConstraintFunction* > constraints = allData->GetConstraints();
-	for (unsigned int constraintIndex = 0; constraintIndex < constraints.size(); constraintIndex++ )
+	for (unsigned int constraintIndex = 0; constraintIndex < constraints.size(); ++constraintIndex )
 	{
 		minimiseValue += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
 	}

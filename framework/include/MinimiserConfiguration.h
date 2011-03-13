@@ -22,8 +22,12 @@ class MinimiserConfiguration
 		~MinimiserConfiguration();
 
 		IMinimiser * GetMinimiser(int);
+		void SetOutputLevel(int);
+		void RemoveMinimiser();
 
 	private:
+		IMinimiser* theMinimiser;
+		int OutputLevel;
 		string minimiserName;
 		vector< pair< string, string > > contours;
 };

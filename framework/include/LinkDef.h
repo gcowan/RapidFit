@@ -8,13 +8,13 @@
 */
 
 
-#ifdef __CINT__
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
-#pragma link C++ class RooPdf_Bs2JPsiPhi;
+//#ifdef __CINT__
+//#pragma link off all globals;
+//#pragma link off all classes;
+//#pragma link off all functions;
+//#pragma link C++ class RooPdf_Bs2JPsiPhi;
 //#pragma link C++ class RooPdf_BDecay_SimpleFlavourSpecific;
 //#pragma link C++ class MCToyData;
-#pragma link C++ class RooBs2PhiPhiFullPdf;
+//#pragma link C++ class RooBs2PhiPhiFullPdf;
 //#pragma link C++ class Main;
-#endif
+//#endif

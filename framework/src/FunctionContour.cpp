@@ -19,7 +19,7 @@ FunctionContour::FunctionContour()
 FunctionContour::FunctionContour( string XName, string YName, int ContourNumber ) : xName(XName), yName(YName)
 {
 	//Initialise the contour storage
-	for ( int contourIndex = 0; contourIndex < ContourNumber; contourIndex++ )
+	for ( int contourIndex = 0; contourIndex < ContourNumber; ++contourIndex )
 	{
 		vector< pair< double, double > > empty;
 		allContours.push_back(empty);
@@ -61,7 +61,7 @@ void FunctionContour::SetPlot( int Sigma, int NumberPoints, double * XValues, do
 		vector< pair< double, double > > newContourPlot;
 
 		//Store each pair of points
-		for ( int pointIndex = 0; pointIndex < NumberPoints; pointIndex++ )
+		for ( int pointIndex = 0; pointIndex < NumberPoints; ++pointIndex )
 		{
 			newContourPlot.push_back( make_pair( XValues[pointIndex], YValues[pointIndex] ) );
 		}

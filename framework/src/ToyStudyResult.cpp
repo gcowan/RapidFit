@@ -24,23 +24,23 @@ ToyStudyResult::ToyStudyResult( vector<ToyStudyResult*> Result_Array )
 		clock = new TStopwatch();
 		allNames = Result_Array[0]->GetAllNames();
 		//Construct the result data structure
-		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 		{
 			allValues.push_back( vector<double>() );
 			allErrors.push_back( vector<double>() );
 			allPulls.push_back( vector<double>() );
 			allGenValues.push_back( vector<double>() );
 		}
-		for(unsigned int i=0; i < Result_Array.size(); i++ )
+		for(unsigned int i=0; i < Result_Array.size(); ++i )
 		{
-			for( short int j=0; j < Result_Array[i]->NumberResults(); j++ )
+			for( short int j=0; j < Result_Array[i]->NumberResults(); ++j )
 			{
 				AddFitResult(  Result_Array[i]->GetFitResult( j ), false );
 			}
 
 			vector<double> input_real_times = Result_Array[i]->GetAllRealTimes();
 			vector<double> input_cpu_times = Result_Array[i]->GetAllCPUTimes();
-			for(unsigned int j2=0; j2 < input_real_times.size(); j2++)
+			for(unsigned int j2=0; j2 < input_real_times.size(); ++j2)
 			{
 				allRealTimes.push_back( input_real_times[j2] );
 				allCPUTimes.push_back( input_cpu_times[j2] );
@@ -54,7 +54,7 @@ ToyStudyResult::ToyStudyResult( vector<ToyStudyResult*> Result_Array )
 ToyStudyResult::ToyStudyResult( vector<string> AllParameterNames ) : allNames(AllParameterNames)
 {
 	//Construct the result data structure
-	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
 		allValues.push_back( vector<double>() );
 		allErrors.push_back( vector<double>() );
@@ -84,7 +84,7 @@ bool ToyStudyResult::AddFitResult( FitResult * NewResult, bool with_clock )
 	ResultParameterSet * newSet = NewResult->GetResultParameterSet();
 
 	//Check all expected parameters are found
-	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 	{
 		ResultParameter * newResult = newSet->GetResultParameter( *nameIterator );
 		if ( newResult->GetUnit() == "NameNotFoundError" )
@@ -105,7 +105,7 @@ bool ToyStudyResult::AddFitResult( FitResult * NewResult, bool with_clock )
 
 	//If you've got this far, all the parameters have been found, so add them to the record
 	allResults.push_back(NewResult);
-	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
 		allValues[nameIndex].push_back( newParameterValues[nameIndex] );
 		allErrors[nameIndex].push_back( newParameterErrors[nameIndex] );
@@ -129,7 +129,7 @@ bool ToyStudyResult::AddFitResult( FitResult * NewResult, bool with_clock )
 vector<double> ToyStudyResult::GetAllMLL()
 {
 	vector<double> output_MLL;
-	for (unsigned short int i=0; i < allResults.size(); i++ )
+	for (unsigned short int i=0; i < allResults.size(); ++i )
 	{
 		if( allResults[i]->GetFitStatus() >0 ) 
 		{
@@ -145,7 +145,7 @@ vector<double> ToyStudyResult::GetAllMLL()
 //Return vectors of values, errors and pulls for a particular parameter name
 vector<double> ToyStudyResult::GetParameterValues( string ParameterName )
 {
-	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
 		//If you find the parameter name, return the vector of values
 		if ( ParameterName == allNames[nameIndex] )
@@ -160,7 +160,7 @@ vector<double> ToyStudyResult::GetParameterValues( string ParameterName )
 }
 vector<double> ToyStudyResult::GetParameterErrors( string ParameterName )
 {
-	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
 		//If you find the parameter name, return the vector of errors
 		if ( ParameterName == allNames[nameIndex] )
@@ -175,7 +175,7 @@ vector<double> ToyStudyResult::GetParameterErrors( string ParameterName )
 }
 vector<double> ToyStudyResult::GetParameterPulls( string ParameterName )
 {
-	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
 		//If you find the parameter name, return the vector of pulls
 		if ( ParameterName == allNames[nameIndex] )
@@ -213,7 +213,7 @@ double ToyStudyResult::GetRealTime( int Index )
 }
 void ToyStudyResult::AddRealTimes( vector<double> input_times )
 {
-	for( unsigned int i=0; i< input_times.size(); i++)
+	for( unsigned int i=0; i< input_times.size(); ++i)
 	{
 		allRealTimes.push_back( input_times[i] );
 	}
@@ -234,7 +234,7 @@ double ToyStudyResult::GetCPUTime( int Index )
 }
 void ToyStudyResult::AddCPUTimes( vector<double> input_times )
 {
-	for( unsigned int i=0; i< input_times.size(); i++)
+	for( unsigned int i=0; i< input_times.size(); ++i)
 	{
 		allCPUTimes.push_back( input_times[i] );
 	}
@@ -269,7 +269,7 @@ vector<double> ToyStudyResult::GetAllCPUTimes()
 vector<double> ToyStudyResult::GetFlatResult( int Index )
 {
 	vector<double> Flatresult;
-	for(unsigned int i = 0; i<allNames.size(); i++)
+	for(unsigned int i = 0; i<allNames.size(); ++i)
 	{
 		Flatresult.push_back( (allValues[i][Index]) );
 		Flatresult.push_back( (allErrors[i][Index]) );
@@ -287,7 +287,7 @@ vector<double> ToyStudyResult::GetFlatResult( int Index )
 TString ToyStudyResult::GetFlatResultHeader()
 {
 	TString header = "";
-	for(unsigned short int i = 0; i<allNames.size(); i++)
+	for(unsigned short int i = 0; i<allNames.size(); ++i)
 	{
 		TString name = allNames[i];
 		header += name + "_value:";

@@ -47,11 +47,11 @@ int AcceptReject::GenerateData( int DataAmount )
 	//Keep trying until required amount of data is generated
 	while (numberAccepted < DataAmount)
 	{
-		numberAttempts++;
+		++numberAttempts;
 
 		//Create a new point in N-space
 		DataPoint * testDataPoint = new DataPoint(allNames);
-		for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); nameIterator++ )
+		for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 		{
 			//Create a new observable value
 			Observable * newObservable = generationBoundary->GetConstraint(*nameIterator)->CreateObservable(rootRandom);
@@ -90,7 +90,7 @@ int AcceptReject::GenerateData( int DataAmount )
 				{
 					//Accept
 					newDataSet->AddDataPoint(testDataPoint);
-					numberAccepted++;
+					++numberAccepted;
 					delete testDataPoint;
 				}
 				else

@@ -54,7 +54,7 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 	IConstraint * inputConstraint;
 	firstIntegralCorrection = 1.0;
 	secondIntegralCorrection = 1.0;
-	for ( observableIterator = firstObservables.begin(); observableIterator != firstObservables.end(); observableIterator++ )
+	for ( observableIterator = firstObservables.begin(); observableIterator != firstObservables.end(); ++observableIterator )
 	{
 		if ( StringProcessing::VectorContains( &secondObservables, &(*observableIterator) ) == -1 )
 		{
@@ -69,7 +69,7 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 			}
 		}
 	}
-	for ( observableIterator = secondObservables.begin(); observableIterator != secondObservables.end(); observableIterator++ )
+	for ( observableIterator = secondObservables.begin(); observableIterator != secondObservables.end(); ++observableIterator )
 	{
 		if ( StringProcessing::VectorContains( &firstObservables, &(*observableIterator) ) == -1 )
 		{
@@ -162,8 +162,8 @@ vector<double> NormalisedSumPDF::EvaluateComponents( DataPoint * NewDataPoint )
 	
 	//Insert components in output vector with correct weights.	
 	vector<double> components ;
-	for(unsigned int ii=0; ii<termOneComponents.size(); ii++ ) components.push_back( termOneComponents[ii]*firstFraction/firstIntegral ) ;
-	for(unsigned int ii=0; ii<termTwoComponents.size(); ii++ ) components.push_back( termTwoComponents[ii]*(1.-firstFraction)/secondIntegral ) ;
+	for(unsigned int ii=0; ii<termOneComponents.size(); ++ii ) components.push_back( termOneComponents[ii]*firstFraction/firstIntegral ) ;
+	for(unsigned int ii=0; ii<termTwoComponents.size(); ++ii ) components.push_back( termTwoComponents[ii]*(1.-firstFraction)/secondIntegral ) ;
 	
 	// Return the complete set of components
 	return components;

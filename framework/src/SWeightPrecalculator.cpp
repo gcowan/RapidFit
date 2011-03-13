@@ -47,7 +47,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	vector<string>::iterator parameterIterator;
 	allParameters.push_back(fractionName);
 	ParameterSet * fractionFitParameters = new ParameterSet(allParameters);
-	for ( parameterIterator = allParameters.begin(); parameterIterator != allParameters.end(); parameterIterator++ )
+	for ( parameterIterator = allParameters.begin(); parameterIterator != allParameters.end(); ++parameterIterator )
 	{
 		if  ( *parameterIterator == fractionName )
 		{
@@ -93,7 +93,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	vector<string>::iterator observableIterator;
 	allObservables.push_back(weightName);
 	MemoryDataSet * newDataSet = new MemoryDataSet( InputData->GetBoundary() );
-	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); eventIndex++ )
+	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
 	{
 		//Calculate the sWeight
 		double numerator = double( ( matrixElements.first * signalValues[eventIndex] ) + ( matrixElements.second * backgroundValues[eventIndex] ) );
@@ -102,7 +102,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 		//Make the new data point
 		DataPoint * currentEvent = InputData->GetDataPoint(eventIndex);
 		DataPoint * newEvent = new DataPoint(allObservables);
-		for ( observableIterator = allObservables.begin(); observableIterator != allObservables.end(); observableIterator++ )
+		for ( observableIterator = allObservables.begin(); observableIterator != allObservables.end(); ++observableIterator )
 		{
 			if ( *observableIterator == weightName )
 			{
@@ -144,7 +144,7 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long Numbe
 	RapidFitIntegrator * backgroundIntegrator = new RapidFitIntegrator(backgroundPDF);
 
 	//The matrix is a sum over all events
-	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); eventIndex++ )
+	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
 	{
 		//Evaluate signal and background PDFs for the point
 		DataPoint * currentEvent = InputData->GetDataPoint(eventIndex);

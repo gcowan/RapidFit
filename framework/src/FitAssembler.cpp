@@ -47,7 +47,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	PhysicsBottle * bottle = new PhysicsBottle( BottleParameters );
 
 	//Fill the bottle - data generation occurs in this step
-	for ( unsigned int resultIndex = 0; resultIndex < BottleData.size(); resultIndex++ )
+	for ( unsigned int resultIndex = 0; resultIndex < BottleData.size(); ++resultIndex )
 	{
 		BottleData[resultIndex]->SetPhysicsParameters(BottleParameters);
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
@@ -56,7 +56,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	}
 
 	//Add the constraints
-	for ( unsigned int constraintIndex = 0; constraintIndex < BottleConstraints.size(); constraintIndex++ )
+	for ( unsigned int constraintIndex = 0; constraintIndex < BottleConstraints.size(); ++constraintIndex )
 	{
 		bottle->AddConstraint( BottleConstraints[constraintIndex] );
 	}
@@ -76,14 +76,14 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		PhysicsBottle * bottle = new PhysicsBottle(BottleParameters);
 
 		//Fill the bottle - data already generated
-		for ( unsigned int resultIndex = 0; resultIndex < AllData.size(); resultIndex++ )
+		for ( unsigned int resultIndex = 0; resultIndex < AllData.size(); ++resultIndex )
 		{
 			AllPDFs[resultIndex]->SetPhysicsParameters(BottleParameters);
 			bottle->AddResult( AllPDFs[resultIndex], AllData[resultIndex] );
 		}
 
 		//Add the constraints
-		for ( unsigned int constraintIndex = 0; constraintIndex < BottleConstraints.size(); constraintIndex++ )
+		for ( unsigned int constraintIndex = 0; constraintIndex < BottleConstraints.size(); ++constraintIndex )
 		{
 			bottle->AddConstraint( BottleConstraints[constraintIndex] );
 		}  
@@ -106,11 +106,12 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 //	// To be written in a 'safe' way
 //}
 //  Perform a safer fit which is gauranteed to return something which you can use :D
-FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
+FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, int OutputLevel )
 {
+	MinimiserConfig->SetOutputLevel( OutputLevel );
 	vector<string> other_params = BottleParameters->GetAllFloatNames();
 	vector<double> truth;
-	for( unsigned short int j=0; j < other_params.size(); j++ )
+	for( unsigned short int j=0; j < other_params.size(); ++j )
 	{
 		truth.push_back( BottleParameters->GetPhysicsParameter(other_params[j])->GetTrueValue() );
 	}
@@ -119,7 +120,7 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 	bool fit_fail_status=false;
 	FitResult* ReturnableFitResult;
 	//  Try to fit 5 times and then abort
-	for( unsigned short int i=0; i<=0; i++ )
+	for( unsigned short int i=0; i<=0; ++i )
 	{
 		//  Left in for correctness
 		fit_fail_status = false;
@@ -154,7 +155,7 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 	if( fit_fail_status ){
 		cerr << "Nothing more I'm willing to do, considering a Fit here a lost cause..." <<endl;
 
-		for( unsigned short int j=0; j < other_params.size(); j++ )
+		for( unsigned short int j=0; j < other_params.size(); ++j )
 		{
 			BottleParameters->GetPhysicsParameter( other_params[j] )->SetTrueValue( truth[j] );
 		}
@@ -169,7 +170,7 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 
 
 //  Interface for internal calls
-void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, ToyStudyResult* output_interface )
+void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, ToyStudyResult* output_interface, int OutputLevel )
 {
 
 	double uplim = Wanted_Param->GetMax();
@@ -189,7 +190,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 	// Need to set up a loop , fixing the scan parameter at each point
 	double deltaScan;
 
-	for( int si=0; si<int(npoints); si++) {
+	for( int si=0; si<int(npoints); ++si) {
 		cout << "\n\nSINGLE SCAN NUMBER\t\t" << si+1 << "\t\tOF\t\t" <<int(npoints)<< endl<<endl;
 		// Set scan parameter value
 		if( int(npoints)!=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
@@ -199,26 +200,34 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 
 		output_interface->StartStopwatch();
 
-
-
-		cout << "Starting Fit:" <<endl;
-		//	Redirect ALL output to /dev/null
-		streambuf *psbuf, *backup, *backup2;
+		streambuf *nullbuf=NULL, *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
 		ofstream filestr;
-		backup = cout.rdbuf();
-		backup2 = cerr.rdbuf();
-		filestr.open("/dev/null");
-		psbuf = filestr.rdbuf();
-		cout.rdbuf(psbuf);
-		cerr.rdbuf(psbuf);
+		filestr.open ("/dev/null");
+		cout << "\nStarting Fit:" <<endl;
+		//	If the user wanted silence we point the Std Output Streams to /dev/null
+		if( OutputLevel <= -1 )
+		{
+			cout_bak = cout.rdbuf();
+			cerr_bak = cerr.rdbuf();
+			clog_bak = clog.rdbuf();
+			nullbuf = filestr.rdbuf();
+			cout.rdbuf(nullbuf);
+			cerr.rdbuf(nullbuf);
+			clog.rdbuf(nullbuf);
+		}
 		//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
 		//	Do a scan point fit
-		FitResult * scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
-		cout.rdbuf(backup);
-		cerr.rdbuf(backup2);
-		filestr.close();
-		cout << "Fit Finished!" <<endl;
+		FitResult * scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
+		//	Reset Std Output Streams
+		if( OutputLevel <= -1 )
+		{
+			cout.rdbuf(cout_bak);
+			cerr.rdbuf(cerr_bak);
+			clog.rdbuf(clog_bak);
+		}
+		cout << "Fit Finished!\n" <<endl;
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
+
 		string name = Wanted_Param->GetName();
 		string type = BottleParameters->GetPhysicsParameter( name )->GetType();
 		string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
@@ -226,10 +235,10 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 
 		vector<string> Fixed_List = BottleParameters->GetAllFixedNames();
 		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
-		for( unsigned short int i=0; i < Fixed_List.size() ; i++ )
+		for( unsigned short int i=0; i < Fixed_List.size() ; ++i )
 		{
 			bool found=false;
-			for( unsigned short int j=0; j < Fit_List.size(); j++ )
+			for( unsigned short int j=0; j < Fit_List.size(); ++j )
 			{
 				if( Fit_List[j] == Fixed_List[i] )
 				{
@@ -256,8 +265,9 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 }
 
 //  Interface for internal calls
-void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, pair<ScanParam*, ScanParam*> Param_Set, vector<ToyStudyResult*>* output_interface )
+void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, pair<ScanParam*, ScanParam*> Param_Set, vector<ToyStudyResult*>* output_interface, int OutputLevel )
 {
+
 //	vector<string> namez = BottleParameters->GetAllNames();
 	vector<string> result_names = BottleParameters->GetAllNames();
 	double uplim = Param_Set.first->GetMax();
@@ -281,7 +291,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 	if( int(npoints) !=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
 	else deltaScan=0.;
 
-	for( int si=0; si < int(npoints); si++) {
+	for( int si=0; si < int(npoints); ++si) {
 	  
 		cout << "\n\n2DSCAN OUTER NUMBER\t\t" << si+1 << "\t\tOF\t\t" << int(npoints) <<endl<<endl;
 		ToyStudyResult* Returnable_Result = new ToyStudyResult( result_names );
@@ -291,14 +301,14 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 		scanParameter->SetBlindedValue( scanVal ) ;
 
 		// Do a scan point fit
-		FitAssembler::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result );
+		FitAssembler::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result, OutputLevel );
 
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
                 string name = Param_Set.first->GetName();
                 string type = BottleParameters->GetPhysicsParameter( name )->GetType();
                 string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
 
-		for( short int i=0; i < Returnable_Result->NumberResults(); i++ )
+		for( short int i=0; i < Returnable_Result->NumberResults(); ++i )
 		{
 			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, scanVal, 0, 0.0, scanVal, scanVal, type, unit );
 		}
@@ -313,25 +323,25 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 }
 
 // Interface for external calls
-vector<ToyStudyResult*> FitAssembler::ContourScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName, string scanName2 )
+vector<ToyStudyResult*> FitAssembler::ContourScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName, string scanName2, int OutputLevel )
 {
 	vector<ToyStudyResult*>* Returnable_Result = new vector<ToyStudyResult*>;
 
 	pair< ScanParam*, ScanParam* > Param_Set = OutputConfig->Get2DScanParams( scanName, scanName2 );
 
-	DoScan2D( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set, Returnable_Result );
+	DoScan2D( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set, Returnable_Result, OutputLevel );
 
 	return *Returnable_Result;
 }
 
 //  Interface for external calls
-ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName )
+ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName, int OutputLevel )
 {
 	ToyStudyResult* Returnable_Result = new ToyStudyResult( BottleParameters->GetAllNames() );
 
 	ScanParam* local_param = OutputConfig->GetScanParam( scanName );
 
-	DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, local_param, Returnable_Result );
+	DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, local_param, Returnable_Result, OutputLevel );
 
 	return Returnable_Result;
 }
@@ -347,13 +357,14 @@ ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConf
 //			At the time of writing the nuisence parameters are still under investigation
 //	Step4:		Repeat Step 3 as many times as requested, or do 100 toys as default
 //	Step5:		Format output into standard block format. This gives us 2 things.
-ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned short int> numberRepeats, unsigned short int NuisenceModel, bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData )
+ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned short int> numberRepeats, unsigned short int NuisenceModel, bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData, int OutputLevel )
 {
+
 	double Random_Seed = pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm();
 	FitResult* GlobalFitResult = GlobalResult->GetFitResult( 0 );
 	vector<ToyStudyResult*> AllResults;
 	//		Want to loop over all points on a 2D Plot that have been allocated to this instance
-	for( int iFC=0; iFC < _2DResultForFC->NumberResults(); iFC++ )
+	for( int iFC=0; iFC < _2DResultForFC->NumberResults(); ++iFC )
 	{
 
 		TRandom3* new_rand = new TRandom3(UInt_t(Random_Seed));
@@ -408,6 +419,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		//	Collect all of the relevent Data from the XML
 		//	Note: most of these had to be written for FCscans
 		MinimiserConfiguration * ToyStudyMinimiser = theMinimiser;
+		theMinimiser->SetOutputLevel(-999);
 		FitFunctionConfiguration* ToyStudyFunction = theFunction;
 		vector<vector<IPrecalculator*> > ToyPrecalculators = xmlFile->GetPrecalculators();
 		vector<PhaseSpaceBoundary*> PhaseSpaceForToys = xmlFile->GetPhaseSpaceBoundaries();
@@ -478,7 +490,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 
 		cout << "\n\n\t\tGenerating Data For First Toy\n" << endl;
 		//	We may have multiple PDFs in the XML
-		for( unsigned short int pdf_num=0; pdf_num < pdfsAndData.size(); pdf_num++ )
+		for( unsigned short int pdf_num=0; pdf_num < pdfsAndData.size(); ++pdf_num )
 		{
 			//	Generate the Data for this Study using the given the XML PhaseSpace and PDF
 			IPDF* PDF_from_XML = pdfsAndData[pdf_num]->GetPDF();
@@ -517,18 +529,12 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		ToyStudyResult* study1Results = new ToyStudyResult( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
 		ToyStudyResult* study2Results = new ToyStudyResult( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
 
-
-		//	Try to make minuit as quiet as possible here... does someone have a way to gag it's output?!?
-		//ToyStudyMinimiser->GetMinimiser( int(InputParamSet->GetAllNames().size()) )->SetOutputLevel(-1);
-		ToyStudyMinimiser->GetMinimiser( int(InputParamSet->GetAllNames().size()) )->SetOutputLevel(-999);
-
-
 		//	This Forms the main sequence of the fit
 
 		cout << "\n\n\t\tPerforming Fits to Toys in FC\n"<<endl;
 		//		Perform Fits
 		//	This will record ONLY Data from working fits i.e. FitStatus==3 unless the Debug flag is on
-		for( unsigned short int dataset_num=0; dataset_num < wanted_number_of_toys; dataset_num++ )
+		for( unsigned short int dataset_num=0; dataset_num < wanted_number_of_toys; ++dataset_num )
 		{
 
 			bool toy_failed = false;
@@ -572,7 +578,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
 
 			//	We need to set some factors before we perform the fit
-			for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+			for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); ++pdf_num )
 			{
 				vector<IDataSet*> wanted_set;
 				wanted_set.push_back( Memory_Data[pdf_num][dataset_num] );
@@ -582,23 +588,31 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 
 			cout << "\n\n\t\tPerforming Fit To Toy: "<< (dataset_num+1) <<" of " << wanted_number_of_toys << endl<<endl;
 			
-			cout << "Starting Fit:" <<endl;
-			//	Redirect ALL output to /dev/null
-			streambuf *psbuf, *backup, *backup2;
+			streambuf *nullbuf=NULL, *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
 			ofstream filestr;
-			backup = cout.rdbuf();
-			backup2 = cerr.rdbuf();
-			filestr.open("/dev/null");
-			psbuf = filestr.rdbuf();
-			cout.rdbuf(psbuf);
-			cerr.rdbuf(psbuf);
+			filestr.open ("/dev/null");
+			cout << "\n\tStarting Fit:" <<endl;
+			//	If the user wanted silence we point the Std Output Streams to /dev/null
+			if( OutputLevel <= -1 )
+			{
+				cout_bak = cout.rdbuf();
+				cerr_bak = cerr.rdbuf();
+				clog_bak = clog.rdbuf();
+				nullbuf = filestr.rdbuf();
+				cout.rdbuf(nullbuf);
+				cerr.rdbuf(nullbuf);
+				clog.rdbuf(nullbuf);
+			}
 			//	Fit once with control parameters Free
-			fit1Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFreeSet, PDFsWithDataForToys, ConstraintsForToys );
-			cout.rdbuf(backup);
-			cerr.rdbuf(backup2);
-			filestr.close();
-			cout << "Fit Finished!" <<endl;
-
+			fit1Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFreeSet, PDFsWithDataForToys, ConstraintsForToys, OutputLevel );
+			//	Reset Std Output Streams
+			if( OutputLevel <= -1 )
+			{
+				cout.rdbuf(cout_bak);
+				cerr.rdbuf(cerr_bak);
+				clog.rdbuf(clog_bak);
+			}
+			cout << "\tFit Finished!\n" <<endl;
 
 			//	Only Fit again to this dataset if it fits well with +2 dof
 			//	This has the obvious savings in CPU resources
@@ -608,7 +622,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 				if( FC_Debug_Flag )	cout << "\n\nYou are aware your requesting all output?\n"<<endl;
 
 				//  Fit secondGlobalResult with control parameters Fixed
-				for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+				for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); ++pdf_num )
 				{
 					vector<IDataSet*> wanted_set;
 					wanted_set.push_back( Memory_Data[pdf_num][dataset_num] );
@@ -616,22 +630,30 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 					PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( LocalInputFixedSet );
 				}
 
-				cout << "\n\n\t\tFirst Fit Successful, Performing the Second Fit " << (dataset_num+1) << " of " << wanted_number_of_toys <<endl;
+				cout << "\n\t\tFirst Fit Successful, Performing the Second Fit " << (dataset_num+1) << " of " << wanted_number_of_toys <<endl;
 
-				cout << "Starting Fit:" <<endl;
-				//	Redirect ALL output to /dev/null
-				backup = cout.rdbuf();
-				backup2 = cerr.rdbuf();
-				filestr.open("/dev/null");
-				psbuf = filestr.rdbuf();
-				cout.rdbuf(psbuf);
-				cerr.rdbuf(psbuf);
+				cout << "\n\tStarting Fit:" <<endl;
+				//	If the user wanted silence we point the Std Output Streams to /dev/null
+				if( OutputLevel <= -1 )
+				{
+					cout_bak = cout.rdbuf();
+					cerr_bak = cerr.rdbuf();
+					clog_bak = clog.rdbuf();
+					nullbuf = filestr.rdbuf();
+					cout.rdbuf(nullbuf);
+					cerr.rdbuf(nullbuf);
+					clog.rdbuf(nullbuf);
+				}
 				//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
-				fit2Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFixedSet, PDFsWithDataForToys, ConstraintsForToys );
-				cout.rdbuf(backup);
-				cerr.rdbuf(backup2);
-				filestr.close();
-				cout << "Fit Finished!" <<endl;
+				fit2Result = FitAssembler::DoSafeFit( ToyStudyMinimiser, ToyStudyFunction, LocalInputFixedSet, PDFsWithDataForToys, ConstraintsForToys, OutputLevel );
+				//	Reset Std Output Streams
+				if( OutputLevel <= -1 )
+				{
+					cout.rdbuf(cout_bak);
+					cerr.rdbuf(cerr_bak);
+					clog.rdbuf(clog_bak);
+				}
+				cout << "\tFit Finished!\n" <<endl;
 
 				//	If either Fit Failed we want to 'dump the results' and run an extra Fit.
 				if( (fit2Result->GetFitStatus() != 3) || (fit2Result->GetFitStatus() != 3) ) toy_failed = true;
@@ -641,14 +663,14 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			//	Do we want to store the Data OR run another toy to get a better Fit
 			if( toy_failed )
 			{
-				cerr << "\n\n\t\tA Single Toy Study Failed... Requesting More Data for another pass.\n" << endl;
+				cerr << "\n\t\tA Single Toy Study Failed... Requesting More Data for another pass.\n" << endl;
 				//  Increment counter so we can guarantee we get 'wanted_number_of_toys' which have fitted correctly
-				wanted_number_of_toys++;
+				++wanted_number_of_toys;
 			}
 
 			//	In my opinion the fact this is so easy and doesn't cause root to throw up is a testiment to the other authors in RapidFit :D
 			cout << "\n\n\t\tDeleting Used Data:\n"<<endl;
-			for( unsigned int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+			for( unsigned int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); ++pdf_num )
 			{
 				cout << "deleting data for pdf: " << pdf_num << "\n";
 				delete Memory_Data[pdf_num].back();
@@ -660,7 +682,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			{
 				cout << "\n\n\t\tGenerating Data For Next Toy:\n" <<endl;
 
-				for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); pdf_num++ )
+				for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); ++pdf_num )
 				{
 					// See above for more detailed description
 					cout << "generating data for pdf: " << pdf_num << "\n";
@@ -693,7 +715,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		ThisStudy->AddCPUTimes( _2DResultForFC->GetAllCPUTimes() );
 		ThisStudy->AddRealTimes( _2DResultForFC->GetAllRealTimes() );
 		//	The Generated Value for the Global and Local fit are best defined as -9999 as a sensible default
-		for( unsigned short int num=0; num < GlobalFitResult->GetResultParameterSet()->GetAllNames().size(); num++ )
+		for( unsigned short int num=0; num < GlobalFitResult->GetResultParameterSet()->GetAllNames().size(); ++num )
 		{
 			string name = GlobalFitResult->GetResultParameterSet()->GetAllNames()[num];
 			GlobalFitResult->GetResultParameterSet()->GetResultParameter( name )->ForcePullValue( -9999 );
@@ -707,5 +729,6 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		AllResults.push_back( study2Results );
 	}
 
+	cout << "\n\nNumercial par of FeldMan-Cousins Scan Complete,\n\n Now process data through the plotting tool :D\n\n";
 	return new ToyStudyResult( AllResults );
 }

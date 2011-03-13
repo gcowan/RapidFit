@@ -40,7 +40,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		//Set up the histogram storage
 		vector< vector<double> > histogramBinHeights, histogramBinMiddles, histogramBinMaxes;
 		double normalisation = 0.0;
-		for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+		for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 		{
 			vector<double> binHeights, binMiddles, binMaxes;
 			IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
@@ -48,7 +48,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			double delta = ( temporaryConstraint->GetMaximum() - minimum ) / (double)HISTOGRAM_BINS;
 
 			//Loop over bins
-			for (int binIndex = 0; binIndex < HISTOGRAM_BINS; binIndex++ )
+			for (int binIndex = 0; binIndex < HISTOGRAM_BINS; ++binIndex )
 			{
 				binHeights.push_back(0.0);
 				binMiddles.push_back( minimum + ( delta * ( binIndex + 0.5 ) ) );
@@ -61,17 +61,17 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		}
 
 		//MC sample the cell, make projections, sort of
-		for (int sampleIndex = 0; sampleIndex < MAXIMUM_SAMPLES; sampleIndex++ )
+		for (int sampleIndex = 0; sampleIndex < MAXIMUM_SAMPLES; ++sampleIndex )
 		{
 			//Create a data point within the current cell
 			DataPoint samplePoint( InputPoint->GetAllNames() );
-			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 			{
 				//Generate random values to explore integrable observables
 				IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
 				samplePoint.SetObservable( doIntegrate[observableIndex], temporaryConstraint->CreateObservable() );
 			}
-			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 			{
 				//Use given values for unintegrable observables
 				Observable * temporaryObservable = InputPoint->GetObservable( dontIntegrate[observableIndex] );
@@ -83,11 +83,11 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			normalisation += sampleValue;
 
 			//Populate the histogram
-			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 			{
 				double observableValue = samplePoint.GetObservable( doIntegrate[observableIndex] )->GetValue();
 
-				for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; binIndex++ )
+				for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; ++binIndex )
 				{
 					if ( observableValue < histogramBinMaxes[observableIndex][binIndex] )
 					{
@@ -99,9 +99,9 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		}
 
 		//Normalise the histograms
-		for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+		for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 		{
-			for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; binIndex++ )
+			for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; ++binIndex )
 			{
 				histogramBinHeights[observableIndex][binIndex] /= normalisation;
 			}
@@ -114,7 +114,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		double lowPoint=0.;
 		double splitPoint=0.;
 		double highPoint=0.;
-		for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+		for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 		{
 			//Find the size of the cell in this observable
 			IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
@@ -125,7 +125,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			double observableMiddle = cellMinimum + ( ( cellMaximum - cellMinimum ) / 2.0 );
 			midPoints.push_back(observableMiddle);
 
-			for ( int binIndex = 1; binIndex < HISTOGRAM_BINS; binIndex++ )
+			for ( int binIndex = 1; binIndex < HISTOGRAM_BINS; ++binIndex )
 			{
 				double gradient = abs( histogramBinHeights[observableIndex][ binIndex - 1 ] - histogramBinHeights[observableIndex][binIndex] );
 
@@ -150,14 +150,14 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 
 			//Create a data point at the center of the current cell
 			DataPoint cellCenter( InputPoint->GetAllNames() );
-			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 			{
 				//Use the mid points for the integrable values
 				Observable * temporaryObservable = cellCenter.GetObservable( doIntegrate[observableIndex] );
 				temporaryObservable->SetValue( midPoints[observableIndex] );
 				cellCenter.SetObservable( doIntegrate[observableIndex], temporaryObservable );
 			}
-			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 			{
 				//Use given values for unintegrable observables
 				Observable * temporaryObservable = InputPoint->GetObservable( dontIntegrate[observableIndex] );
@@ -173,7 +173,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			PhaseSpaceBoundary daughterCell1( currentCell.GetAllNames() );
 			PhaseSpaceBoundary daughterCell2( currentCell.GetAllNames() );
 
-			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 			{
 				IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
 				if ( doIntegrate[observableIndex] == maximumGradientObservable )
@@ -189,7 +189,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 					daughterCell2.SetConstraint( doIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
 				}
 			}
-			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 			{
 				IConstraint * temporaryConstraint = currentCell.GetConstraint( dontIntegrate[observableIndex] );
 				if ( temporaryConstraint->IsDiscrete() )
@@ -226,7 +226,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 
 				//Create a data point at the center of the current cell
 				DataPoint cellCenter( InputPoint->GetAllNames() );
-				for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+				for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 				{
 					//Calculate the cell mid point
 					IConstraint * temporaryConstraint = temporaryCell.GetConstraint( doIntegrate[observableIndex] );
@@ -237,7 +237,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 					temporaryObservable->SetValue(midPoint);
 					cellCenter.SetObservable( doIntegrate[observableIndex], temporaryObservable );
 				}
-				for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); observableIndex++ )
+				for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 				{
 					//Use given values for unintegrable observables
 					Observable * temporaryObservable = InputPoint->GetObservable( dontIntegrate[observableIndex] );
@@ -258,7 +258,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 	RapidFitIntegrator cellIntegrator( InputPDF, true );
 
 	//Find the function value at the center of each cell, and the integral of the function over the cell
-	for (unsigned int cellIndex = 0; cellIndex < finishedCells.size(); cellIndex++ )
+	for (unsigned int cellIndex = 0; cellIndex < finishedCells.size(); ++cellIndex )
 	{
 		//Integrate the cell
 		double integral = cellIntegrator.Integral( InputPoint, &( finishedCells[cellIndex] ) );
@@ -281,21 +281,21 @@ void MakeFoam::Debug()
 	cout << centerPoints.size() << " cells generated" << endl << endl;
 	vector<string> allNames = centerPoints[0].GetAllNames();
 	vector<string>::iterator observableIterator;
-	for ( observableIterator = allNames.begin(); observableIterator != allNames.end(); observableIterator++ )
+	for ( observableIterator = allNames.begin(); observableIterator != allNames.end(); ++observableIterator )
 	{
 		cout << *observableIterator << ", ";
 	}
 	cout << endl;
-	for (unsigned int pointIndex = 0; pointIndex < centerPoints.size(); pointIndex++ )
+	for (unsigned int pointIndex = 0; pointIndex < centerPoints.size(); ++pointIndex )
 	{
-		for ( observableIterator = allNames.begin(); observableIterator != allNames.end(); observableIterator++ )
+		for ( observableIterator = allNames.begin(); observableIterator != allNames.end(); ++observableIterator )
 		{
 			cout << centerPoints[pointIndex].GetObservable( *observableIterator )->GetValue() << ", ";
 		}
 		cout << endl;
 	}
 
-	for (unsigned int cellIndex = 0; cellIndex < finishedCells.size(); cellIndex++ )
+	for (unsigned int cellIndex = 0; cellIndex < finishedCells.size(); ++cellIndex )
 	{
 		cout << centerValues[cellIndex] << ", " << cellIntegrals[cellIndex] << endl;
 	}
@@ -309,7 +309,7 @@ double MakeFoam::Integral()
 
 	//Evaluate each cell center point, weight precalculated integral by the change
 	double totalIntegral = 0.0;
-	for (unsigned int cellIndex = 0; cellIndex < centerPoints.size(); cellIndex++ )
+	for (unsigned int cellIndex = 0; cellIndex < centerPoints.size(); ++cellIndex )
 	{
 		//Evaluate the function at the center of the cell
 		double newCenterValue = integratePDF->Evaluate( &( centerPoints[cellIndex] ) );

@@ -75,7 +75,7 @@ ToyStudyResult * ToyStudy::DoWholeStudy( bool force_n_studies )
 {
 	//Make a vector of unique parameter names
 	vector<string> uniqueNames;
-	for (unsigned int pdfIndex = 0; pdfIndex < pdfsAndData.size(); pdfIndex++ )
+	for (unsigned int pdfIndex = 0; pdfIndex < pdfsAndData.size(); ++pdfIndex )
 	{
 		//This is not strictly necessary, but suppresses a warning message
 		pdfsAndData[pdfIndex]->SetPhysicsParameters(studyParameters);
@@ -85,7 +85,7 @@ ToyStudyResult * ToyStudy::DoWholeStudy( bool force_n_studies )
 	allResults = new ToyStudyResult(uniqueNames);
 
 	//Loop over all studies
-	for ( int studyIndex = 0; studyIndex < numberStudies; studyIndex++ )
+	for ( int studyIndex = 0; studyIndex < numberStudies; ++studyIndex )
 	{
 		cout << "\n\n\t\tStarting ToyStudy\t\t" << studyIndex+1 << "\tof:\t" << numberStudies << endl;
 		allResults->StartStopwatch();
@@ -93,7 +93,7 @@ ToyStudyResult * ToyStudy::DoWholeStudy( bool force_n_studies )
 		if( ( allResults->GetFitResult( studyIndex )->GetFitStatus() != 3 ) && force_n_studies )
 		{
 			cout << "Fit fell over!\t Requesting another fit but keeping this result." << endl;
-			numberStudies++;
+			++numberStudies;
 		}
 	}
 

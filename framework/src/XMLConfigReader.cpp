@@ -55,7 +55,7 @@ XMLConfigReader::XMLConfigReader( string FileName ) : isLoaded(false)
 	{
 		//Parse the first level tags
 		vector<string> middleOfFile;
-		for ( unsigned int lineIndex = 1; lineIndex < wholeFile.size() - 1; lineIndex++ )
+		for ( unsigned int lineIndex = 1; lineIndex < wholeFile.size() - 1; ++lineIndex )
 		{
 			middleOfFile.push_back( wholeFile[lineIndex] );
 		}
@@ -63,7 +63,7 @@ XMLConfigReader::XMLConfigReader( string FileName ) : isLoaded(false)
 		children = XMLTag::FindTagsInContent( middleOfFile, value );
 
 		//Anything in "value" is considered debug data
-		for ( unsigned int valueIndex = 0; valueIndex < value.size(); valueIndex++ )
+		for ( unsigned int valueIndex = 0; valueIndex < value.size(); ++valueIndex )
 		{
 			cout << value[valueIndex] << endl;
 		}
@@ -92,7 +92,7 @@ bool XMLConfigReader::IsLoaded()
 ParameterSet * XMLConfigReader::GetFitParameters()
 {
 	//Find the ParameterSet tag
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ParameterSet" )
 		{
@@ -109,7 +109,7 @@ ParameterSet * XMLConfigReader::GetFitParameters()
 MinimiserConfiguration * XMLConfigReader::GetMinimiserConfiguration()
 {
 	//Find the Minimiser tag
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "Minimiser" )
 		{
@@ -153,7 +153,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 OutputConfiguration * XMLConfigReader::GetOutputConfiguration()
 {
 	//Find the Output tag
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "Output" )
 		{
@@ -179,7 +179,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 		vector<pair<ScanParam*, ScanParam*> > _2DScanParameters;
 
 		vector< XMLTag* > outputComponents = OutputTag->GetChildren();
-		for ( unsigned int childIndex = 0; childIndex < outputComponents.size(); childIndex++ )
+		for ( unsigned int childIndex = 0; childIndex < outputComponents.size(); ++childIndex )
 		{
 			if ( outputComponents[childIndex]->GetName() == "ContourPlot" )
 			{
@@ -231,7 +231,7 @@ pair< string, string > XMLConfigReader::MakeContourPlot( XMLTag * PlotTag )
 			string xName, yName;
 			bool hasX = false;
 			bool hasY = false;
-			for ( unsigned int childIndex = 0; childIndex < plotComponents.size(); childIndex++ )
+			for ( unsigned int childIndex = 0; childIndex < plotComponents.size(); ++childIndex )
 			{
 				if ( plotComponents[childIndex]->GetName() == "XParameter" )
 				{
@@ -287,7 +287,7 @@ pair< string, string > XMLConfigReader::MakeContourPlot( XMLTag * PlotTag )
 int XMLConfigReader::GetNumberRepeats()
 {
 	//Find the NumberRepeats tag
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "NumberRepeats" )
 		{
@@ -304,7 +304,7 @@ int XMLConfigReader::GetNumberRepeats()
 FitFunctionConfiguration * XMLConfigReader::GetFitFunctionConfiguration()
 {
 	//Find the FitFunction tag
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "FitFunction" )
 		{
@@ -334,7 +334,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		else
 		{
 			//New style - can have weights
-			for ( unsigned int childIndex = 0; childIndex < functionInfo.size(); childIndex++ )
+			for ( unsigned int childIndex = 0; childIndex < functionInfo.size(); ++childIndex )
 			{
 				if ( functionInfo[childIndex]->GetName() == "FunctionName" )
 				{
@@ -377,7 +377,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 	//Collect all ToFit elements
 	vector< XMLTag* > toFits;
 	vector< PDFWithData* > pdfsAndData;
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ToFit" )
 		{
@@ -394,7 +394,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 	else
 	{
 		//Loop over all ToFits
-		for ( unsigned int fitIndex = 0; fitIndex < toFits.size(); fitIndex++ )
+		for ( unsigned int fitIndex = 0; fitIndex < toFits.size(); ++fitIndex )
 		{
 			XMLTag * pdfTag=NULL;
 			XMLTag * dataTag=NULL;
@@ -404,7 +404,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 
 			//Find the PDF and data set configuration
 			vector< XMLTag* > fitComponents = toFits[fitIndex]->GetChildren();
-			for ( unsigned int componentIndex = 0; componentIndex < fitComponents.size(); componentIndex++ )
+			for ( unsigned int componentIndex = 0; componentIndex < fitComponents.size(); ++componentIndex )
 			{
 				string name = fitComponents[componentIndex]->GetName();
 				if ( name == "PDF" || name == "SumPDF" || name == "NormalisedSumPDF" || name == "ProdPDF" )
@@ -464,7 +464,7 @@ vector< ConstraintFunction* > XMLConfigReader::GetConstraints()
 	//Collect all ToFit elements
 	vector< XMLTag* > toFits;
 	vector< ConstraintFunction* > constraints;
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ToFit" )
 		{
@@ -481,14 +481,14 @@ vector< ConstraintFunction* > XMLConfigReader::GetConstraints()
 	else
 	{
 		//Loop over all ToFits
-		for ( unsigned int fitIndex = 0; fitIndex < toFits.size(); fitIndex++ )
+		for ( unsigned int fitIndex = 0; fitIndex < toFits.size(); ++fitIndex )
 		{
 			XMLTag* constraintTag=NULL;
 			bool foundConstraint = false;
 
 			//Find the PDF and data set configuration
 			vector< XMLTag* > fitComponents = toFits[fitIndex]->GetChildren();
-			for ( unsigned int componentIndex = 0; componentIndex < fitComponents.size(); componentIndex++ )
+			for ( unsigned int componentIndex = 0; componentIndex < fitComponents.size(); ++componentIndex )
 			{
 				if ( fitComponents[componentIndex]->GetName() == "ConstraintFunction" )
 				{
@@ -514,7 +514,7 @@ ConstraintFunction * XMLConfigReader::GetConstraintFunction( XMLTag * InputTag )
 	{
 		vector< ExternalConstraint* > constraints;
 		vector< XMLTag* > functionComponents = InputTag->GetChildren();
-		for ( unsigned int componentIndex = 0; componentIndex < functionComponents.size(); componentIndex++ )
+		for ( unsigned int componentIndex = 0; componentIndex < functionComponents.size(); ++componentIndex )
 		{
 			if ( functionComponents[componentIndex]->GetName() == "ExternalConstraint" )
 			{
@@ -540,7 +540,7 @@ ExternalConstraint * XMLConfigReader::GetExternalConstraint( XMLTag * InputTag )
 		double value=0.;
 		double error=0.;
 		vector< XMLTag* > externalComponents = InputTag->GetChildren();
-		for ( unsigned int componentIndex = 0; componentIndex < externalComponents.size(); componentIndex++ )
+		for ( unsigned int componentIndex = 0; componentIndex < externalComponents.size(); ++componentIndex )
 		{
 			if ( externalComponents[componentIndex]->GetName() == "Name" )
 			{
@@ -582,7 +582,7 @@ ParameterSet * XMLConfigReader::GetParameterSet( XMLTag * InputTag )
 		
 		//Create each physics parameter
 		vector< XMLTag* > parameters = InputTag->GetChildren();
-		for ( unsigned int parameterIndex = 0; parameterIndex < parameters.size(); parameterIndex++ )
+		for ( unsigned int parameterIndex = 0; parameterIndex < parameters.size(); ++parameterIndex )
 		{
 			PhysicsParameter * newParameter = GetPhysicsParameter( parameters[parameterIndex], name );
 			if ( newParameter->GetType() != "Invalid" )
@@ -594,7 +594,7 @@ ParameterSet * XMLConfigReader::GetParameterSet( XMLTag * InputTag )
 
 		//Create the parameter set
 		ParameterSet * newParameters = new ParameterSet(names);
-		for ( unsigned int nameIndex = 0; nameIndex < names.size(); nameIndex++ )
+		for ( unsigned int nameIndex = 0; nameIndex < names.size(); ++nameIndex )
 		{
 			newParameters->SetPhysicsParameter( names[nameIndex], physicsParameters[nameIndex] );
 
@@ -632,7 +632,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 
 		//Loop over the tag children, which correspond to the parameter elements
 		vector< XMLTag* > elements = InputTag->GetChildren();
-		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); elementIndex++ )
+		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); ++elementIndex )
 		{
 			string name = elements[elementIndex]->GetName();
 			if ( name == "Name" )
@@ -768,7 +768,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 
 		//Retrieve the data set config
 		vector< XMLTag* > dataComponents = DataTag->GetChildren();
-		for ( unsigned int dataIndex = 0; dataIndex < dataComponents.size(); dataIndex++ )
+		for ( unsigned int dataIndex = 0; dataIndex < dataComponents.size(); ++dataIndex )
 		{
 			string name = dataComponents[dataIndex]->GetName();
 			if ( name == "Source" )
@@ -863,7 +863,7 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 
 		//Retrieve the data set config
 		vector< XMLTag* > dataComponents = DataTag->GetChildren();
-		for ( unsigned int dataIndex = 0; dataIndex < dataComponents.size(); dataIndex++ )
+		for ( unsigned int dataIndex = 0; dataIndex < dataComponents.size(); ++dataIndex )
 		{
 			string name = dataComponents[dataIndex]->GetName();
 			if ( name == "Source" )
@@ -921,7 +921,7 @@ vector<PhaseSpaceBoundary*> XMLConfigReader::GetPhaseSpaceBoundaries()
 	//Find the ParameterSets
 	vector< XMLTag* > toFits;
 	//  Children Defined globally on initialization!
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ToFit" )
 		{
@@ -929,15 +929,15 @@ vector<PhaseSpaceBoundary*> XMLConfigReader::GetPhaseSpaceBoundaries()
 		}
 	}
 	//  Loop over all of the fits
-	for ( unsigned short int fitnum=0; fitnum < toFits.size(); fitnum++ )
+	for ( unsigned short int fitnum=0; fitnum < toFits.size(); ++fitnum )
 	{
 		vector<XMLTag*> allChildren = toFits[fitnum]->GetChildren();
-		for( unsigned short int Childnum=0; Childnum < allChildren.size(); Childnum++ )
+		for( unsigned short int Childnum=0; Childnum < allChildren.size(); ++Childnum )
 		{
 			if( allChildren[Childnum]->GetName() == "DataSet" )
 			{
 				vector<XMLTag*> allFitDataSets = allChildren[Childnum]->GetChildren();
-				for( unsigned short int DataSetNum=0; DataSetNum < allFitDataSets.size(); DataSetNum++ )
+				for( unsigned short int DataSetNum=0; DataSetNum < allFitDataSets.size(); ++DataSetNum )
 				{
 					if( allFitDataSets[DataSetNum]->GetName() == "PhaseSpaceBoundary" )
 					{
@@ -963,7 +963,7 @@ PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag * InputTag )
 
 		//Create each single bound
 		vector< XMLTag* > constraintTags = InputTag->GetChildren();
-		for ( unsigned int boundIndex = 0; boundIndex < constraintTags.size(); boundIndex++ )
+		for ( unsigned int boundIndex = 0; boundIndex < constraintTags.size(); ++boundIndex )
 		{
 			IConstraint * newConstraint = GetConstraint( constraintTags[boundIndex], name );
 			if ( newConstraint->GetUnit() != "Invalid" )
@@ -975,7 +975,7 @@ PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag * InputTag )
 
 		//Create the parameter set
 		PhaseSpaceBoundary * newBoundary = new PhaseSpaceBoundary(names);
-		for ( unsigned int nameIndex = 0; nameIndex < names.size(); nameIndex++ )
+		for ( unsigned int nameIndex = 0; nameIndex < names.size(); ++nameIndex )
 		{
 			newBoundary->SetConstraint( names[nameIndex], constraints[nameIndex] );
 
@@ -1004,7 +1004,7 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 
 		//Loop over the tag children, which correspond to the parameter elements
 		vector< XMLTag* > elements = InputTag->GetChildren();
-		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); elementIndex++ )
+		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); ++elementIndex )
 		{
 			if ( elements[elementIndex]->GetName() == "Name" )
 			{
@@ -1062,7 +1062,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		vector<string> observableNames, parameterNames;
 
 		//Load the PDF configuration
-		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); configIndex++ )
+		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
 			if ( pdfConfig[configIndex]->GetName() == "Name" )
 			{
@@ -1108,7 +1108,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		vector< IPDF* > componentPDFs;
 
 		//Load the PDF configuration
-		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); configIndex++ )
+		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
 			if ( pdfConfig[configIndex]->GetName() == "FractionName" )
 			{
@@ -1160,7 +1160,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		vector< IPDF* > componentPDFs;
 
 		//Load the PDF configuration
-		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); configIndex++ )
+		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
 			if ( pdfConfig[configIndex]->GetName() == "FractionName" )
 			{
@@ -1211,7 +1211,7 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		vector< IPDF* > componentPDFs;
 
 		//Load the PDF configuration
-		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); configIndex++ )
+		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
 			componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary ) );
 		}
@@ -1277,7 +1277,7 @@ vector<vector<IPrecalculator*> > XMLConfigReader::GetPrecalculators()
 	//Find the ParameterSets
 	vector< XMLTag* > toFits;
 	//  Children Defined globally on initialization!
-	for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ToFit" )
 		{
@@ -1285,10 +1285,10 @@ vector<vector<IPrecalculator*> > XMLConfigReader::GetPrecalculators()
 		}
 	}
 	//  Loop over all of the fits
-	for ( unsigned short int fitnum=0; fitnum < toFits.size(); fitnum++ )
+	for ( unsigned short int fitnum=0; fitnum < toFits.size(); ++fitnum )
 	{
 		vector<XMLTag*> allChildren = toFits[fitnum]->GetChildren();
-		for( unsigned short int Childnum=0; Childnum < allChildren.size(); Childnum++ )
+		for( unsigned short int Childnum=0; Childnum < allChildren.size(); ++Childnum )
 		{
 			if( allChildren[Childnum]->GetName() == "DataSet" )
 			{
@@ -1296,7 +1296,7 @@ vector<vector<IPrecalculator*> > XMLConfigReader::GetPrecalculators()
 				vector<XMLTag*> allFitDataSets = allChildren[Childnum]->GetChildren();
 				PhaseSpaceBoundary * dataBoundary=NULL;
 				bool boundaryFound=false;
-				for( unsigned short int DataSetNum=0; DataSetNum < allFitDataSets.size(); DataSetNum++ )
+				for( unsigned short int DataSetNum=0; DataSetNum < allFitDataSets.size(); ++DataSetNum )
 				{
 					if( allFitDataSets[DataSetNum]->GetName() == "PhaseSpaceBoundary" )
 					{
@@ -1327,7 +1327,7 @@ IPrecalculator * XMLConfigReader::MakePrecalculator( XMLTag * InputTag, PhaseSpa
 		string precalculatorName = "Unspecified";
 		string weightName = "Unspecified";
 		vector< XMLTag* > children = InputTag->GetChildren();
-		for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+		for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 		{
 			string name = children[childIndex]->GetName();
 			if ( name == "Name" )
@@ -1374,7 +1374,7 @@ unsigned int XMLConfigReader::GetSeed()
 	if( seed.empty() )
 	{
 		//Find the NumberRepeats tag
-		for ( unsigned int childIndex = 0; childIndex < children.size(); childIndex++ )
+		for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 		{
 			if ( children[childIndex]->GetName() == "Seed" )
 			{
@@ -1408,7 +1408,7 @@ pair<ScanParam*, ScanParam*> XMLConfigReader::Get2DScanParam( XMLTag * InputTag 
 		bool param2 = false;
 		//Loop over the tag children, which correspond to the parameter elements
 		vector< XMLTag* > elements = InputTag->GetChildren();
-		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); elementIndex++ )
+		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); ++elementIndex )
 		{
 			string name = elements[elementIndex]->GetName();
 			if ( name == "X_Param" )  {
@@ -1450,7 +1450,7 @@ ScanParam * XMLConfigReader::GetScanParam( XMLTag * InputTag )
 
 		//Loop over the tag children, which correspond to the parameter elements
 		vector< XMLTag* > elements = InputTag->GetChildren();
-		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); elementIndex++ )
+		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); ++elementIndex )
 		{
 			string name = elements[elementIndex]->GetName();
 			if ( name == "Name" )

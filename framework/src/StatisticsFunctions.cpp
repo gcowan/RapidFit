@@ -18,7 +18,7 @@
 double StatisticsFunctions::Mean( vector<double> Numbers )
 {
 	double sum = 0.0;
-	for (unsigned int index = 0; index < Numbers.size(); index++ )
+	for (unsigned int index = 0; index < Numbers.size(); ++index )
 	{
 		sum += Numbers[index];
 	}
@@ -31,7 +31,7 @@ double StatisticsFunctions::Variance( vector<double> Numbers )
 {
 	double sum = 0.0;
 	double mean = Mean(Numbers);
-	for (unsigned int index = 0; index < Numbers.size(); index++ )
+	for (unsigned int index = 0; index < Numbers.size(); ++index )
 	{
 		sum += pow( ( Numbers[index] - mean ), 2 );
 	}
@@ -54,7 +54,7 @@ double StatisticsFunctions::Maximum( vector<double> Numbers )
 	if ( Numbers.size() > 0 )
 	{
 		double maximum = Numbers[0];
-		for (unsigned int index = 0; index < Numbers.size(); index++ )
+		for (unsigned int index = 0; index < Numbers.size(); ++index )
 		{
 			if ( Numbers[index] > maximum )
 			{
@@ -74,7 +74,7 @@ double StatisticsFunctions::Minimum( vector<double> Numbers )
 	if ( Numbers.size() > 0 )
 	{
 		double minimum = Numbers[0];
-		for (unsigned int index = 0; index < Numbers.size(); index++ )
+		for (unsigned int index = 0; index < Numbers.size(); ++index )
 		{
 			if ( Numbers[index] < minimum )
 			{
@@ -96,7 +96,7 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 {
 	//Construct a vector<vector> containing all discrete values. List the names of discrete and continuous observables.
 	vector<string>::iterator nameIterator;
-	for ( nameIterator = AllNames->begin(); nameIterator != AllNames->end(); nameIterator++ )
+	for ( nameIterator = AllNames->begin(); nameIterator != AllNames->end(); ++nameIterator )
 	{
 		IConstraint * observableConstraint = InputBoundary->GetConstraint( *nameIterator );
 		if ( observableConstraint->IsDiscrete() )
@@ -118,7 +118,7 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 	{
 		bool finished = false;
 		vector<int> indices;
-		for (unsigned int observableIndex = 0; observableIndex < discreteValues.size(); observableIndex++ )
+		for (unsigned int observableIndex = 0; observableIndex < discreteValues.size(); ++observableIndex )
 		{
 			//Just initialise the counter
 			indices.push_back(0);
@@ -127,16 +127,16 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 		{
 			//Store one combination, based on the indices
 			vector<double> oneCombination;
-			for (unsigned int observableIndex = 0; observableIndex < discreteValues.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < discreteValues.size(); ++observableIndex )
 			{
 				oneCombination.push_back( discreteValues[observableIndex][ indices[observableIndex] ] );
 			}
 			discreteCombinations.push_back(oneCombination);
 
 			//Increment the indices
-			for ( int observableIndex = int(discreteValues.size()) - 1; observableIndex >= 0; observableIndex-- )
+			for ( int observableIndex = int(discreteValues.size()) - 1; observableIndex >= 0; --observableIndex )
 			{
-				indices[observableIndex]++;
+				++indices[observableIndex];
 
 				//Check if the index has reached its maximum
 				if ( indices[observableIndex] == int(discreteValues[observableIndex].size()) )
@@ -174,7 +174,7 @@ void StatisticsFunctions::DoDontIntegrateLists( IPDF * InputPDF, PhaseSpaceBound
 {
 	//Make lists of observables to integrate and not to integrate
 	vector<string> observableNames = InputPDF->GetPrototypeDataPoint();
-	for (unsigned int observableIndex = 0; observableIndex < observableNames.size(); observableIndex++ )
+	for (unsigned int observableIndex = 0; observableIndex < observableNames.size(); ++observableIndex )
 	{
 		bool continuous = !( InputBoundary->GetConstraint( observableNames[observableIndex] )->IsDiscrete() );
 		bool integrate = ( StringProcessing::VectorContains( DontIntegrateThese, &( observableNames[observableIndex] ) ) == -1 );
@@ -197,22 +197,22 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 	//Initialise the data averaging
 	vector<double> continuousSums;
 	vector<long> combinationCounts;
-	for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); continuousIndex++ )
+	for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); ++continuousIndex )
 	{
 		continuousSums.push_back(0.0);
 	}
-	for (unsigned int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); ++combinationIndex )
 	{
 		combinationCounts.push_back(0);
 	}
 
 	//Examine the data set. Find the average value for each continuous observable, and the weight for each discrete combination
-	for ( int dataIndex = 0; dataIndex < InputData->GetDataNumber(); dataIndex++ )
+	for ( int dataIndex = 0; dataIndex < InputData->GetDataNumber(); ++dataIndex )
 	{
 		DataPoint * readDataPoint = InputData->GetDataPoint(dataIndex);
 
 		//Sum the continuous values, in preparation for taking the average
-		for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); continuousIndex++ )
+		for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); ++continuousIndex )
 		{
 			continuousSums[continuousIndex] += readDataPoint->GetObservable( ContinuousNames[continuousIndex] )->GetValue();
 		}
@@ -220,11 +220,11 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 		//Calculate the index for the discrete combination, and increment the corresponding count
 		int combinationIndex = 0;
 		int incrementValue = 1;
-		for ( int discreteIndex = int(DiscreteNames.size()) - 1; discreteIndex >= 0; discreteIndex-- )
+		for ( int discreteIndex = int(DiscreteNames.size()) - 1; discreteIndex >= 0; --discreteIndex )
 		{
 			double currentValue = readDataPoint->GetObservable( DiscreteNames[discreteIndex] )->GetValue();
 
-			for (unsigned int valueIndex = 0; valueIndex < DiscreteValues[discreteIndex].size(); valueIndex++ )
+			for (unsigned int valueIndex = 0; valueIndex < DiscreteValues[discreteIndex].size(); ++valueIndex )
 			{
 				if ( fabs( DiscreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
@@ -234,18 +234,18 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 				}
 			}
 		}
-		combinationCounts[combinationIndex]++;
+		++combinationCounts[combinationIndex];
 	}
 
 	//Calculate averages and weights
 	vector<double> combinationWeights;
 	double dataNumber = (double)InputData->GetDataNumber();
-	for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); continuousIndex++ )
+	for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); ++continuousIndex )
 	{
 		continuousSums[continuousIndex] /= dataNumber;
 	}
 
-	for (unsigned int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); ++combinationIndex )
 	{
 		combinationWeights.push_back( (double)combinationCounts[combinationIndex] / dataNumber );
 	}
@@ -254,18 +254,18 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 	vector<DataPoint> newDataPoints;
 	vector<string> allDescriptions;
 	DataPoint templateDataPoint = *( InputData->GetDataPoint(0) );
-	for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); continuousIndex++ )
+	for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); ++continuousIndex )
 	{
 		Observable * newValue = templateDataPoint.GetObservable( ContinuousNames[continuousIndex] );
 		newValue->SetValue( continuousSums[continuousIndex] );
 		templateDataPoint.SetObservable( ContinuousNames[continuousIndex], newValue );
 	}
-	for (unsigned int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); combinationIndex++ )
+	for (unsigned int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); ++combinationIndex )
 	{
 		string description = "(";
 
 		//Output the discrete values for this combination
-		for (unsigned int discreteIndex = 0; discreteIndex < DiscreteNames.size(); discreteIndex++ )
+		for (unsigned int discreteIndex = 0; discreteIndex < DiscreteNames.size(); ++discreteIndex )
 		{
 			//Set the data point
 			Observable * newValue = templateDataPoint.GetObservable( DiscreteNames[discreteIndex] );

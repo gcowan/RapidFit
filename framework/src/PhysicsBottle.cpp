@@ -98,7 +98,7 @@ bool PhysicsBottle::SetParameterSet(ParameterSet * NewParameters)
 	if ( bottleParameters->SetPhysicsParameters( NewParameters ) )
 	{
 		//Propagate the change to all stored PDFs
-		for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); pdfIndex++)
+		for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); ++pdfIndex)
 		{
 			allPDFs[pdfIndex]->SetPhysicsParameters( bottleParameters );
 		}
@@ -123,14 +123,14 @@ void PhysicsBottle::Finalise()
 	{
 		//Create a unique vector of parameters that are used
 		vector<string> usedParameters;
-		for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); pdfIndex++ )
+		for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); ++pdfIndex )
 		{
 			usedParameters = StringProcessing::CombineUniques( usedParameters, allPDFs[pdfIndex]->GetPrototypeParameterSet() );
 		}
 
 		//Create a new parameter set, containing only those that are used
 		ParameterSet * culledParameters = new ParameterSet(usedParameters);
-		for (unsigned int usedIndex = 0; usedIndex < usedParameters.size(); usedIndex++ )
+		for (unsigned int usedIndex = 0; usedIndex < usedParameters.size(); ++usedIndex )
 		{
 			PhysicsParameter * usedParameter = bottleParameters->GetPhysicsParameter( usedParameters[usedIndex] );
 			culledParameters->SetPhysicsParameter( usedParameters[usedIndex], usedParameter );

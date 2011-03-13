@@ -23,7 +23,7 @@ PhaseSpaceBoundary::PhaseSpaceBoundary()
 PhaseSpaceBoundary::PhaseSpaceBoundary( vector<string> NewNames )
 {
 	//Populate the map
-	for (unsigned int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
+	for (unsigned int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex)
 	{
 		allConstraints.push_back(NULL);
 	}
@@ -96,7 +96,7 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, vector<double> Values, stri
 //Returns whether a point is within the boundary
 bool PhaseSpaceBoundary::IsPointInBoundary( DataPoint * TestDataPoint )
 {
-	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
 		//Check if test Observable exists in the DataPoint
 		Observable * testObservable = TestDataPoint->GetObservable( allNames[nameIndex] );
@@ -124,7 +124,7 @@ bool PhaseSpaceBoundary::IsPointInBoundary( DataPoint * TestDataPoint )
 //Returns true if the argument PhaseSpaceBoundary fits within this PhaseSpaceBoundary
 bool PhaseSpaceBoundary::CheckBoundary( PhaseSpaceBoundary * TestPhaseSpaceBoundary )
 {
-for ( int nameIndex = 0; nameIndex < allNames.size(); nameIndex++ )
+for ( int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 {
 //Check if the test SingleBound exists in both PhaseSpaceBoundaries
 IConstraint * testConstraint = TestPhaseSpaceBoundary->GetConstraint( allNames[nameIndex] );

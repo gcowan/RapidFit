@@ -478,6 +478,11 @@ TString EdStyle::GetParamLatexName( string Param_Name )
 	} else if (Param_Name == "f_sig_m1" ) {
 
 		Name.Append("f_{{\\sigma_m}^1}");
+
+	} else if (Param_Name == "timeOffset" ) {
+
+		Name.Append("\\tau_{Offset}");
+
 	} else if (Param_Name == "timeResolution1" ) {
 
 		Name.Append("\\tau_1");
@@ -530,6 +535,10 @@ TString EdStyle::GetParamLatexName( string Param_Name )
 
                 Name.Append("\\zeta_9");
 
+	} else if (Param_Name == "angAccI10" ) {
+
+                Name.Append("\\zeta_10");
+
 	} else if (Param_Name =="deltaM" ) {
 
                 Name.Append( "m_s" );
@@ -538,10 +547,70 @@ TString EdStyle::GetParamLatexName( string Param_Name )
 
                 Name.Append("\\delta_0");
 
+	} else if (Param_Name == "SignalFractionUBT") {
+	
+		Name.Append("{f_{UB}}^T");
+	
+	} else if (Param_Name == "SignalFractionUBU") {
+	
+		Name.Append("{f_{UB}}^{UT}");
+	
+	} else if (Param_Name == "SignalFractionBT") {
+	
+		Name.Append("{f_{B}}^T");
+	
+	} else if (Param_Name == "SignalFractionBU") {
+	
+		Name.Append("{f_{B}}^{UT}");
+	
+	} else if (Param_Name == "mistagOffset") {
+	
+		Name.Append("\\omega_{Offset}");
+	
+	} else if (Param_Name == "mistagScale") {
+	
+		Name.Append("\\omega_{Scale}");
+	
+	} else if (Param_Name == "timeResLL1Frac") {
+	
+		Name.Append("f_{\\tau_{LL1}}");
+	
+	} else if (Param_Name == "As_sq") {
+	
+		Name.Append("{A_s}^2");
+	
+	} else if (Param_Name == "sigma_LL1") {
+	
+		Name.Append("\\sigma_{LL1}");
+	
+	} else if (Param_Name == "sigma_LL2") {
+	
+		Name.Append("\\sigma_{LL2}");
+	
+	} else if (Param_Name == "tau_LL1") {
+	
+		Name.Append("\\tau_{LL1}");
+	
+	} else if (Param_Name == "tau_LL2") {
+	
+		Name.Append("\\tau_{LL2}");
+	
+	} else if (Param_Name == "alphaM_pr") {
+	
+		Name.Append("\\alpha M_{pr}");
+	
+	}  else if (Param_Name == "delta_s") {
+	
+		Name.Append("\\delta_s");
+	
+	}  else if (Param_Name == "f_LL1") {
+	
+		Name.Append("f_{LL1}");
+	
 	} else {
-		Name.Append("\\text{");
+		Name.Append("\\text(");
 		Name.Append(Param_Name);
-		Name.Append("}");
+		Name.Append(")");
 	}
 
 	Name.Append("$");

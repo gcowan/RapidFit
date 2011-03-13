@@ -65,7 +65,7 @@ PerEventAngularAcceptance::PerEventAngularAcceptance( string fileName, string tu
   TVector3 boosttoB(0,0,0), boostBackToLabFromB(0,0,0);
 
   vector<string>::iterator particleIterator;
-  for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+  for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
   {
     string name = *particleIterator;
     cosThetaMuHistos[name]         = new TH1F((name+"_cosMu").c_str(),      name.c_str(), cosbins, -1., 1);
@@ -181,7 +181,7 @@ void PerEventAngularAcceptance::fillEffHistos( int iteration )
   map<string, TH2F *> pptTmp;
 
   vector<string>::iterator particleIterator;
-  for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+  for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
   {
     string particle = *particleIterator;
     
@@ -230,7 +230,7 @@ void PerEventAngularAcceptance::fillEffHistos( int iteration )
 void PerEventAngularAcceptance::loopOnReconstructedBs()
 {
   vector<string>::iterator particleIterator;
-  for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+  for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
   {
     string particle = *particleIterator;
     cosThetaMuHistos[particle]->Reset();
@@ -243,7 +243,7 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
     pptHistosPredicted[particle]->Reset();
   }
 
-  for (int i = 0; i < nev; i++)
+  for (int i = 0; i < nev; ++i)
   {
     if (i % 10000 == 0) cout << "Processing event " << i << endl;
     decaytree->GetEntry(evtList->GetEntry(i));
@@ -292,7 +292,7 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
 	*/
   
     // Fill some histograms of the reconstructed quantities
-    for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+    for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
     {
       string particle = *particleIterator;
       pHistos[particle]->Fill(p[particle]->P());
@@ -305,7 +305,7 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
     double csth_k = cosk(*p["kaon"], *p["B"]);
 
     // Fill some histograms of these. Do it for each particle - this is redundant, but can't be bothered changing now
-    for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+    for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
     {
       string particle = *particleIterator;
       cosThetaMuHistos[particle]->Fill(csth_mu);
@@ -321,7 +321,7 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
     //cout << w_sum_gen << endl;
     // Now do the sum of the generated distributions
     vector<string>::iterator particleIterator;
-    for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+    for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
     {
       string particle = *particleIterator;
       cosThetaMuHistosPredicted[particle]->Add(cosThetaMuTmpHistos[particle], 1/w_sum_gen);
@@ -337,7 +337,7 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
     }
   }
   // Now divide the predicted distributions by the actual reconstructed distribution to get the efficiency
-  for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+  for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
   {
       string particle = *particleIterator;
       //pHistosPredicted[particle]->Divide(pHistosEffRatioPrev[particle]);//, 1., 1., "b");
@@ -357,7 +357,7 @@ void PerEventAngularAcceptance::generateEventsAndCalculateFgivenB()
   //p, weighted by the product of the individual particle efficiencies,
   //giving f(p|p_B). What about the normalisation of f?
   vector<string>::iterator particleIterator;
-  for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+  for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
   {
     string particle = *particleIterator;
     cosThetaMuTmpHistos[particle]->Reset();
@@ -457,7 +457,7 @@ void PerEventAngularAcceptance::generateEventsAndCalculateFgivenB()
     */
 
     vector<string>::iterator particleIterator;
-    for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+    for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
     {
       string particle = *particleIterator;
       cosThetaMuTmpHistos[particle]->Fill(cosThetaMu, w_ev);
@@ -482,7 +482,7 @@ void PerEventAngularAcceptance::boost()
 
   // Now do the boost
   vector<string>::iterator particleIterator;
-  for ( particleIterator = partsAndRes.begin(); particleIterator != partsAndRes.end(); particleIterator++ )
+  for ( particleIterator = partsAndRes.begin(); particleIterator != partsAndRes.end(); ++particleIterator )
   {
     string particle = *particleIterator;
     // Make copy of the vector, otherwise the p vector will be modified by the boost
@@ -495,7 +495,7 @@ void PerEventAngularAcceptance::boost()
   boostBackToLabFromB = p["B"]->BoostVector();
   
   // Now do the boost
-  for ( particleIterator = partsAndRes.begin(); particleIterator != partsAndRes.end(); particleIterator++ )
+  for ( particleIterator = partsAndRes.begin(); particleIterator != partsAndRes.end(); ++particleIterator )
   {
     string particle = *particleIterator;
     // Make copy of the vector, otherwise the p vector will be modified by the boost
@@ -511,7 +511,7 @@ void PerEventAngularAcceptance::writeHistos()
   TFile * outFile = new TFile( outFileName.c_str(), "RECREATE");
   outFile->SetCompressionLevel(9);
   vector<string>::iterator particleIterator;
-  for ( particleIterator = particles.begin(); particleIterator != particles.end(); particleIterator++ )
+  for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
   {
     string particle = *particleIterator;  
     cosThetaMuHistos[particle]->Write();

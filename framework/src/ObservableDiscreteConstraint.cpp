@@ -79,7 +79,7 @@ bool ObservableDiscreteConstraint::CheckObservable( Observable * TestObservable 
 
 	//Check if the observable value is one of those listed
 	vector<double>::iterator valueIterator;
-	for ( valueIterator = allValues.begin(); valueIterator != allValues.end(); valueIterator++ )
+	for ( valueIterator = allValues.begin(); valueIterator != allValues.end(); ++valueIterator )
 	{
 		if ( ( fabs( value - *valueIterator ) < DOUBLE_TOLERANCE ) )
 		{

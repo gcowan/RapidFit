@@ -66,7 +66,7 @@ ScanParam* OutputConfiguration::GetScanParam( string param_name )
 {
 
 	ScanParam* Returnable_Param=NULL;
-	for(unsigned short int i=0; i < Global_Scan_List.size(); i++)
+	for(unsigned short int i=0; i < Global_Scan_List.size(); ++i)
 	{
 		if( Global_Scan_List[i]->HasName() )
 		{
@@ -88,7 +88,7 @@ ScanParam* OutputConfiguration::GetScanParam( string param_name )
 pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_1, string param_2 )
 {
 	pair<ScanParam*, ScanParam* > Returnable_Pair;
-	for(unsigned short int i=0; i < Global_2DScan_List.size(); i++)
+	for(unsigned short int i=0; i < Global_2DScan_List.size(); ++i)
 	{
 		if( ( Global_2DScan_List[i].first->HasName() ) && ( Global_2DScan_List[i].second->HasName() ) )
 		{
@@ -117,7 +117,7 @@ pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_
 vector<string> OutputConfiguration::GetScanList( )
 {
 	vector<string> ScanReturnList;
-	for(unsigned short int i=0; i < Global_Scan_List.size(); i++)
+	for(unsigned short int i=0; i < Global_Scan_List.size(); ++i)
 	{
 		ScanReturnList.push_back( Global_Scan_List[i]->GetName() );
 	}
@@ -128,7 +128,7 @@ vector<string> OutputConfiguration::GetScanList( )
 vector<pair<string, string> > OutputConfiguration::Get2DScanList( )
 {
 	vector<pair<string, string> > ScanReturnList;
-	for(unsigned short int i=0; i < Global_2DScan_List.size(); i++)
+	for(unsigned short int i=0; i < Global_2DScan_List.size(); ++i)
 	{
 		string new_first = Global_2DScan_List[i].first->GetName();
 		string new_second = Global_2DScan_List[i].second->GetName();
@@ -220,8 +220,8 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 	ResultFormatter::PlotFitContours( TheResult, contourFileName );
 	
 	//Make any requested projections
-	//for ( int projectionIndex = 0; projectionIndex < projections.size(); projectionIndex++ )
-	for (unsigned int projectionIndex = 0; projectionIndex < 1; projectionIndex++ )
+	//for ( int projectionIndex = 0; projectionIndex < projections.size(); ++projectionIndex )
+	for (unsigned int projectionIndex = 0; projectionIndex < 1; ++projectionIndex )
 	{
 
 		PhysicsBottle * resultBottle = TheResult->GetPhysicsBottle();
@@ -229,7 +229,7 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 		//Loop over all PDFs, and plot
 		if ( makeAllPlots || projections.size() > 0 )
 		{
-			for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); resultIndex++ )
+			for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 			{
 				Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
 				if( weightedEventsWereUsed ) testPlotter->SetWeightsWereUsed( weightName ) ;
@@ -309,7 +309,7 @@ void OutputConfiguration::AddContour( string X_axis, string Y_axis )
 
 	if( Contour_X_Vals.size() != 4 ){
 		cerr << "Runtime Defined Contour Badly Defined:" << endl;
-		for(unsigned short int i=0; i < Contour_X_Vals.size(); i++ )
+		for(unsigned short int i=0; i < Contour_X_Vals.size(); ++i )
 		{
 			cerr << Contour_X_Vals[i] << "\t";
 		}
@@ -318,7 +318,7 @@ void OutputConfiguration::AddContour( string X_axis, string Y_axis )
 	}
 	if( Contour_Y_Vals.size() != 4 ){
 		cerr << "Runtime Defined Contour Badly Defined:" << endl;
-		for(unsigned short int i=0; i < Contour_Y_Vals.size(); i++ )
+		for(unsigned short int i=0; i < Contour_Y_Vals.size(); ++i )
 		{
 			cerr << Contour_Y_Vals[i] << "\t";
 		}
@@ -351,7 +351,7 @@ void OutputConfiguration::AddScan( string X_axis )
 
 	if( Contour_X_Vals.size() != 4 ){
 		cerr << "Runtime Defined Contour Badly Defined:" << endl;
-		for(unsigned short int i=0; i < Contour_X_Vals.size(); i++ )
+		for(unsigned short int i=0; i < Contour_X_Vals.size(); ++i )
 		{
 			cerr << Contour_X_Vals[i] << "\t";
 		}

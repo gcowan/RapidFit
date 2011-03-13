@@ -84,7 +84,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			{
 				//Trust the function's integration
 				cout << std::setprecision(3) ;
-				cout << "Integration  Test: numerical : analytical   " << numericalIntegral << " :  " << testIntegral <<  "           Using ANALYTICAL in all cases" << endl;
+				cout << "Integration  Test: numerical : analytical   " << numericalIntegral << " :  " << testIntegral <<  "\t\t\tUsing ANALYTICAL in all cases" << endl;
 				ratioOfIntegrals = 1.;
 				functionCanIntegrate = true;
 				return testIntegral;
@@ -195,7 +195,7 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 			//Make arrays of the observable ranges to integrate over
 			double* minima = new double[ doIntegrate.size() ];
 			double* maxima = new double[ doIntegrate.size() ];
-			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); observableIndex++ )
+			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 			{
 				IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[observableIndex] );
 				minima[observableIndex] = newConstraint->GetMinimum();
@@ -233,20 +233,20 @@ void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 	//Don't do it unless discrete combinations cached
 	if (cacheSetUp)
 	{
-		for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); combinationIndex++ )
+		for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
 		{
 			//Make a sample data point
 			DataPoint samplePoint( NewBoundary->GetAllNames() );
 
 			//Load the calculated discrete combinations
-			for (unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); discreteIndex++ )
+			for (unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); ++discreteIndex )
 			{
 				string unit = NewBoundary->GetConstraint( discreteNames[discreteIndex] )->GetUnit();
 				samplePoint.SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 1, unit );
 			}
 
 			//Just generate some random continuous values
-			for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); continuousIndex++ )
+			for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
 			{
 				samplePoint.SetObservable( continuousNames[continuousIndex], NewBoundary->GetConstraint( continuousNames[continuousIndex] )->CreateObservable() );
 			}
@@ -258,7 +258,7 @@ void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 			/*
 			//Debug
 			cout << "For combination: ";
-			for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+			for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; --discreteIndex )
 			{
 				cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
 			}
@@ -278,14 +278,14 @@ double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
 		int combinationIndex = 0;
 		int incrementValue = 1;
 		//cout << "Discrete values are: ";
-		for ( int discreteIndex = int(discreteNames.size()) - 1; discreteIndex >= 0; discreteIndex-- )
+		for ( int discreteIndex = int(discreteNames.size()) - 1; discreteIndex >= 0; --discreteIndex )
 		{
 			//Retrieve the discrete value
 			double currentValue = NewDataPoint->GetObservable( discreteNames[discreteIndex] )->GetValue();
 			//cout << currentValue << ", ";
 
 			//Calculate the index
-			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
+			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); ++valueIndex )
 			{
 				if ( fabs( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
@@ -298,7 +298,7 @@ double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
 
 		//Debug
 		//cout << "versus: ";
-		//for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; discreteIndex-- )
+		//for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; --discreteIndex )
 		//{
 		//	cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
 		//}

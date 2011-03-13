@@ -78,7 +78,7 @@ public:
 		
 		double previous = 0 ;
 		
-		for( int is=0; is < nslices ; is++)
+		for( int is=0; is < nslices ; ++is)
 		{
 			sliceTimeStart.push_back( ts[is] ) ;
 			sliceAcceptance.push_back( ac[is] ) ;
@@ -100,7 +100,7 @@ public:
 		
 		// Find the slice which corresponds to the lower chosen limit of integration.
 		else {
-			for( int is = 0; is < nslices-1; is++ ) { 
+			for( int is = 0; is < nslices-1; ++is ) { 
 				if( (sliceTimeStart[is] <= tstart ) && ( tstart < sliceTimeStart[is+1] )  )  
 				{
 					startSlice = is ;
@@ -127,7 +127,7 @@ public:
 		
 		// Find slice in range
 		else {
-			for( int is = 0; is < nslices-1; is++ ) { 
+			for( int is = 0; is < nslices-1; ++is ) { 
 				if( (sliceTimeStart[is] <= time ) && ( time < sliceTimeStart[is+1] )  ) return sliceAcceptance[is];  
 			}
 		}
@@ -177,7 +177,7 @@ public:
 		
 		cout << endl ;
 		cout  << "Time Acceptane Histogram " << endl ;
-		for( int is=this->firstSlice() ; is <= this->lastSlice() ; is++ ) {
+		for( int is=this->firstSlice() ; is <= this->lastSlice() ; ++is ) {
 			cout << "    Time slice : "  << this->sliceStart(is) << "  Fraction : " << this->fraction(is) << endl ;
 		}
 		return ;
