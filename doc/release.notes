@@ -1,5 +1,14 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/15 Rob Currie
+   - 'Optimised' a LOT of Mathematics to remove un-needed repeat calculations and similarly with the BaseClass pdf, this should improve fitting as these functions were called O(100k) during my profile run of RapidFit
+   - Added Controlled output from scans to give some level of debugging ability
+   - Reverted to old FC plotting code, although new implementation is on it's way (...slowly) to provide more plots per fit output
+   - Trying to help the compiler be slightly more intelligent by moving common return functions to be inline
+   - Applied some quick fixes to try and reduce overheads in commonly used functions (things such as removing constructors from within for loops)
+     Overall fit improvements seem to range between 25-33% from some quick and dirty tests
+   - Corrected the PhaseSpace problem with sWeighted scans and FC
+
 2011/03/13 Rob Currie
    - Significantly Reduced Output from Scans, work still required to have this controled from XML or runtime but this is a finishing touch
    - Moved a substancial amount of code to pre-incremental changes rather than post-incrementing variables as this is quicker and a relativley minor alteration

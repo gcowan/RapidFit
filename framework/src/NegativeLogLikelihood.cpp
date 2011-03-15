@@ -8,10 +8,11 @@
 */
 
 
-#include "NegativeLogLikelihood.h"
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
+
+#include "NegativeLogLikelihood.h"
 
 //Default constructor
 NegativeLogLikelihood::NegativeLogLikelihood()
@@ -31,10 +32,14 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 
 	//Loop over all data points
 	double total = 0.0;
-	for (int dataIndex = 0; dataIndex < TestDataSet->GetDataNumber(); dataIndex++)
+	double integral = 0.0;
+	double weight = 1.0;
+	double value = 0.0;
+	DataPoint* temporaryDataPoint=NULL;
+	for (int dataIndex = 0; dataIndex < TestDataSet->GetDataNumber(); ++dataIndex)
 	{
-		DataPoint * temporaryDataPoint = TestDataSet->GetDataPoint(dataIndex);
-		double value = TestPDF->Evaluate(temporaryDataPoint);
+		temporaryDataPoint = TestDataSet->GetDataPoint(dataIndex);
+		value = TestPDF->Evaluate(temporaryDataPoint);
 
 		//Idiot check
 		if ( value < 0 || isnan(value) )
@@ -43,10 +48,10 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		}
 		
 		//Find out the integral
-		double integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary(), true );
+		integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary(), true );
 		
 		//Get the weight for this DataPoint (event)
-		double weight = 1.0;	
+		weight = 1.0;
 		if (useWeights)
 		{
 			weight = temporaryDataPoint->GetObservable(weightObservableName)->GetValue();
@@ -55,7 +60,7 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 	}
 	
 	//Return negative log likelihood
-	return -1.0 * total;
+	return -/*1.0 **/ total;
 }
 
 //Return the up value for error calculations

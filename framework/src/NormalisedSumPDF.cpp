@@ -51,16 +51,17 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 
 	//Make the correctionss to the integrals for observables unused by only one PDF
 	vector<string>::iterator observableIterator;
-	IConstraint * inputConstraint;
+	IConstraint * inputConstraint=NULL;
 	firstIntegralCorrection = 1.0;
 	secondIntegralCorrection = 1.0;
+	bool doIntegrate=false;
 	for ( observableIterator = firstObservables.begin(); observableIterator != firstObservables.end(); ++observableIterator )
 	{
 		if ( StringProcessing::VectorContains( &secondObservables, &(*observableIterator) ) == -1 )
 		{
 			//The first PDF uses this observable, the second doesn't
 			inputConstraint = InputBoundary->GetConstraint( *observableIterator );
-			bool doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrateList, &(*observableIterator) ) == -1 );
+			doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrateList, &(*observableIterator) ) == -1 );
 			
 			//Update this integral correction
 			if ( !inputConstraint->IsDiscrete() && doIntegrate )
@@ -75,7 +76,7 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 		{
 			//The second PDF uses this observable, the first doesn't
 			inputConstraint = InputBoundary->GetConstraint( *observableIterator );
-                        bool doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrateList, &(*observableIterator) ) == -1 );
+                        doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrateList, &(*observableIterator) ) == -1 );
 
 			//Update this integral correction
 			if ( !inputConstraint->IsDiscrete() && doIntegrate )

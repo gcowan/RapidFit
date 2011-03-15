@@ -362,8 +362,8 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm1(  ) const
 { 
 	preCalculateTimeIntegrals() ;
 
-	double norm = 
-	
+	return
+
 	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1   +  
 	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2   +  
 	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3   +  
@@ -394,8 +394,6 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm1(  ) const
 		cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
 	}
 	 */
-	
-	return norm ;
 }
 
 
@@ -406,8 +404,7 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm2(  ) const
 {          
 	preCalculateTimeIntegrals() ;
 
-	double norm = 
-	
+	return 
 	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1 +
 	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2 +
 	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3 +
@@ -421,8 +418,6 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm2(  ) const
 	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +
 	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +
 	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
-		
-	return norm ;
 }
 
 

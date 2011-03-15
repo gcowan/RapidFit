@@ -633,6 +633,7 @@ int main( int argc, char * argv[] )
 				//Output results
 				makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
 				makeOutput->OutputFitResult( GlobalResult );
+				ResultFormatter::ReviewOutput( GlobalResult );
 
 
 				//Do LL scan

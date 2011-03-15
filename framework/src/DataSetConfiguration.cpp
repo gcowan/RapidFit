@@ -197,6 +197,8 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 	//  Container for all of the data read in from a root file
 	vector<vector<Double_t> > real_data_array;
+	real_data_array.reserve( numberOfObservables );
+
 
 	//time_t timeNow1;
 	//time(&timeNow1);
@@ -212,13 +214,15 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	//  This now simply reads all the data in a few fast requests which removes the slowest part of startup
 	//  This could probably be done with branches and loops but this is gauranteed to be quick as it's used behind the scenes by TBrowser
 	//  (why this has to be so hard with root I will never know...)
-	for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex=obsIndex+3 )
-	{
-		//  Hold the Data in a temp object
-		vector<Double_t *> data_array;
 
+	//  Hold the Data in a temp object
+	vector<Double_t *> data_array;
+	TString PlotString("");
+	for ( int obsIndex = 0; obsIndex < numberOfObservables; obsIndex+=3 )
+	{
+		data_array.reserve(3);
 		//  Construct a Plot String to use the TTree->Draw Method
-		TString PlotString = observableNames[obsIndex];
+		PlotString = observableNames[obsIndex];
 		for( short int i=1; ((obsIndex+i)<numberOfObservables)&&((i<3)); ++i )
 		{
 			PlotString.Append(":");
@@ -242,12 +246,15 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		for(unsigned short int i=0; i < data_array.size(); ++i )
 		{
 			vector<Double_t> temp_vector;
+			temp_vector.reserve( numberOfEventsAfterCut );
 			for(int j=0; j < numberOfEventsAfterCut; ++j )
 			{
 				temp_vector.push_back( data_array[i][j] );
 			}
 			real_data_array.push_back( temp_vector );
 		}
+		//	Cleanup
+		while( !data_array.empty() ) { data_array.pop_back(); }
 	}
         //time_t timeNow2;
 	//time(&timeNow2);
@@ -259,6 +266,8 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
         int numberOfDataPointsRead = 0;
 	//  Now we have all of the data stored in memory in real_data_array which has a 1<->1 with observableName
 	//  Create and store data points for each event as before and throw away events outside of the PhaseSpace 
+	if ( int(numberEventsToRead) < int(numberOfEventsAfterCut*0.75) )	data->ReserveDataSpace( int(numberEventsToRead) );
+	else	data->ReserveDataSpace( int(numberOfEventsAfterCut*0.75) );
 	for( ; (numberOfDataPointsRead < numberOfEventsAfterCut) && (numberOfDataPointsAdded < numberEventsToRead) ; ++numberOfDataPointsRead )
 	{
 		DataPoint point( observableNames );
@@ -266,7 +275,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		{
 			string name = observableNames[obsIndex];
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
-			point.SetObservable( name, real_data_array[obsIndex][numberOfDataPointsRead], 0.0, unit);
+			point.SetObservable( name, real_data_array[obsIndex][numberOfDataPointsRead], 0.0, unit, true, obsIndex);
 		}
 		bool dataPointAdded = data->AddDataPoint( &point );
 		if (dataPointAdded) ++numberOfDataPointsAdded;

@@ -371,6 +371,16 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;	
 
+}
+
+
+//Display the results of a fit in a LaTeX table using cout
+void ResultFormatter::ReviewOutput( FitResult * OutputData )
+{
+	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
+	vector<string> allNames = outputParameters->GetAllNames();
+	vector<string>::iterator nameIterator;
+
 	cout << endl << endl;
 	cout << "--------------------------------------------------" <<endl;
 	cout << "\nFit Review:\t\tStatus:\t" <<OutputData->GetFitStatus()<<endl<<endl;
@@ -390,9 +400,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 	cout << endl;
 	cout << "--------------------------------------------------" <<endl;
 	cout << endl <<endl;
-
 }
-
 /*string ResultFormatter::FindAndReplaceString( string name )
   {
 // This isn't very general, and probably won't work for names
@@ -462,8 +470,8 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 	vector<string> allNames = ToyResult->GetAllNames();
 	Float_t valueErrorPull[3];
 	vector<double> parameterValues, parameterErrors, parameterPulls;
-	TH1F * pullHistogram;
-	TNtuple * parameterNTuple;
+	TH1F * pullHistogram=NULL;
+	TNtuple * parameterNTuple=NULL;
 
 	//Plots for each observable
 	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)

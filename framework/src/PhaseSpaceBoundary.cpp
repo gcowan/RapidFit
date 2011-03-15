@@ -22,6 +22,7 @@ PhaseSpaceBoundary::PhaseSpaceBoundary()
 //Constructor with correct arguments
 PhaseSpaceBoundary::PhaseSpaceBoundary( vector<string> NewNames )
 {
+	allConstraints.reserve(NewNames.size());
 	//Populate the map
 	for (unsigned int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex)
 	{

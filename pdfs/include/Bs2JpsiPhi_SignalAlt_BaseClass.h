@@ -12,12 +12,14 @@
 #define Bs2JpsiPhi_SignalAlt_BaseClass_H
 
 #include "BasePDF.h"
+#include "Mathematics.h"
 #include "RooComplex.h"
 
 #include <iostream>
 #include <cstdlib>
 
 #define DOUBLE_TOLERANCE 1E-6
+#define DEBUGFLAG true
 
 // Some hard code switches - 
 #define USE_LOWER_TIME_ACCEPTANCE true   // If true then lower time acceptance is used **IF* the event is ALSO marked as time biased 
@@ -291,9 +293,9 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 	
 		// lower and upper time acceptance things
 		TimeAcceptanceFunction timeAcceptance ;
-		bool useLowerTimeAcceptance() const ;
-		bool useUpperTimeAcceptance() const ;
-		double upperTimeAcceptanceBeta() const ;
+//		bool useLowerTimeAcceptance() const ;
+//		bool useUpperTimeAcceptance() const ;
+//		double upperTimeAcceptanceBeta() const ;
 
 		// stored time primitives
 		mutable double expL_stored ;
@@ -306,109 +308,502 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		mutable double intExpCos_stored ;
 		void preCalculateTimeFactors() const ;
 		void preCalculateTimeIntegrals() const ;
-			    	
+
+		
+		//	It has been suggested that inlining as much of the code as possible will force the compiler
+		//	to generate better code.
+		//	This is going to be tested with a profile run.
+		
 		//Amplitudes Used in three angle PDF
-		double AT() const ;
-		double AP() const ;
-		double A0() const ;
-		double AS() const ;
+//		inline double AT() const ;
+//		inline double AP() const ;
+//		inline double A0() const ;
+//		inline double AS() const ;
 	
-		double ctrsq() const ;
-		double strsq() const ;
-		double ct1sq() const ;
-		double st1sq() const ;
-		double cphsq() const ;
-		double sphsq() const ;
+//		inline double ctrsq() const ;
+//		inline double strsq() const ;
+//		inline double ct1sq() const ;
+//		inline double st1sq() const ;
+//		inline double cphsq() const ;
+//		inline double sphsq() const ;
 	
 		// Widths
-		double gamma_l() const ;
-		double gamma_h() const ;
-		double gamma() const ;
+//		inline double gamma_l() const ;
+//		inline double gamma_h() const ;
+//		inline double gamma() const ;
+		
+		//....................................
+//Internal helper functions
+
+		inline double AT() const { 
+			if( Aperp_sq <= 0. ) return 0. ;
+			else return sqrt(Aperp_sq) ; 
+		}
+		inline double AP() const { 
+			if( Apara_sq <= 0. ) return 0. ;
+			else return sqrt(Apara_sq) ; 
+		}
+		inline double A0() const { 
+			if( Azero_sq <= 0. ) return 0. ;
+			else return sqrt(Azero_sq) ; 
+		}
+		inline double AS() const { 
+			if( As_sq <= 0. ) return 0. ;
+			else return sqrt(As_sq) ; 
+		}
+
+		inline double ctrsq() const { return (ctheta_tr*ctheta_tr) ; }
+		inline double strsq() const { return (1.0 - ctrsq()) ; }
+		inline double ct1sq() const { return (ctheta_1*ctheta_1) ; }
+		inline double st1sq() const { return (1.0 - ct1sq()) ; }
+		inline double cphsq() const { return (cos(phi_tr)*cos(phi_tr)) ; }
+		inline double sphsq() const { return (1.0 - cphsq()) ; }
+
+		inline double gamma_l() const { 
+			const double gl = gamma() + ( dgam *0.5 ) ;
+			if( gl < 0. ) {
+				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
+				return 0.0000001 ;
+			}
+			else
+				return gl ; 
+		}
+
+		inline double gamma_h() const { 
+			const double gh = gamma() - ( dgam *0.5 ) ;
+			if( gh < 0. ) {
+				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
+				return 0.0000001 ;
+			}
+			else
+				return gh ;   
+		}
+
+		inline double gamma() const { return gamma_in ; }
+
+		inline double q() const { return tag ;}
+
+		inline bool useLowerTimeAcceptance() const { return (USE_LOWER_TIME_ACCEPTANCE && (timeAcceptanceCategory > 0)) ; }
+
+		inline bool useUpperTimeAcceptance() const { return (USE_UPPER_TIME_ACCEPTANCE && ( fabs(UPPER_TIME_ACCEPTANCE_FACTOR - 0) < DOUBLE_TOLERANCE) ) ; }
+
+		inline double upperTimeAcceptanceBeta() const { return UPPER_TIME_ACCEPTANCE_FACTOR ; }
+
+		
 	
 		// Time primitives
-		double expL() const ;
-		double expH() const ;
-		double expCos() const ;
-		double expSin() const ;
-		double intExpL() const ;
-		double intExpH() const ;
-		double intExpSin() const ;
-		double intExpCos() const ;
-	
+//		inline double expL() const ;
+//		inline double expH() const ;
+//		inline double expCos() const ;
+//		inline double expSin() const ;
+//		inline double intExpL() const ;
+//		inline double intExpH() const ;
+//		inline double intExpSin() const ;
+//		inline double intExpCos() const ;
+
+		inline double expL() const 
+		{
+			return expL_stored ; //Mathematics::Exp( t, gamma_l(), resolution ) ;
+		}
+
+		inline double expH() const 
+		{
+			return expH_stored ; //Mathematics::Exp( t, gamma_h(), resolution ) ;
+		}
+
+		inline double intExpL( ) const {
+			return intExpL_stored ;
+			//if( useUpperTimeAcceptance() ) return Mathematics::ExpInt_betaAcceptance( tlo, thi, gamma_l(), resolution, upperTimeAcceptanceBeta() )  ;
+			//else return Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
+		}
+
+		inline double intExpH( ) const {
+			return intExpH_stored ;
+			//if( useUpperTimeAcceptance() )return Mathematics::ExpInt_betaAcceptance( tlo, thi, gamma_h(), resolution, upperTimeAcceptanceBeta() )  ;
+			//else return Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
+		}
+
+		//......................................................
+		// Exponential x sine  and cosine
+
+		inline double expSin() const  
+		{
+			return expSin_stored ; // Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
+		}
+
+		inline double expCos() const 
+		{
+			return expCos_stored ; // Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
+		}
+
+		inline double intExpSin( ) const 
+		{
+			return intExpSin_stored ;   // Mathematics::ExpSinInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
+		}
+
+		// Integral of exp( - G * t ) * cos( dm * t )  
+		inline double intExpCos( ) const 
+		{
+			return intExpCos_stored ;   // Mathematics::ExpCosInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
+		}
+
+
+
 	
 		//--------------------
 		// Tag category, i.e B, Bbar or untagged.
-		double q() const ;
+//		double q() const ;
 	
 	
 		//----------------------------------------------------------
 		// These are the time factors and their analytic integrals 
 	
-		//..................................
-		double timeFactorEven(  )  const ;
-		double timeFactorEvenInt(  )  const ;
+//		//..................................
+//		inline double timeFactorEven(  )  const ;
+//		inline double timeFactorEvenInt(  )  const ;
 	
 		//..................................
-		double timeFactorOdd(  )   const ;
-		double timeFactorOddInt(  )  const ;
+//		inline double timeFactorOdd(  )   const ;
+//		inline double timeFactorOddInt(  )  const ;
 	
 		//.......... P Wave .........
 		//...........................
-		double timeFactorA0A0( ) const ;      
-		double timeFactorA0A0Int( ) const ;
+//		inline double timeFactorA0A0( ) const ;      
+//		inline double timeFactorA0A0Int( ) const ;
 	
 		//...........................
-		double timeFactorAPAP( ) const ;
-		double timeFactorAPAPInt( ) const ;
+//		inline double timeFactorAPAP( ) const ;
+//		inline double timeFactorAPAPInt( ) const ;
 	
 		//...........................
-		double timeFactorATAT( ) const ;
-		double timeFactorATATInt( ) const ;
+//		inline double timeFactorATAT( ) const ;
+//		inline double timeFactorATATInt( ) const ;
 
 		//...........................
-		double timeFactorImAPAT( ) const ; 
-		double timeFactorImAPATInt( ) const ;
+//		inline double timeFactorImAPAT( ) const ; 
+//		inline double timeFactorImAPATInt( ) const ;
 	
 		//...........................	
-		double timeFactorReA0AP( )  const ;		
-		double timeFactorReA0APInt( ) const ;
+//		inline double timeFactorReA0AP( )  const ;		
+//		inline double timeFactorReA0APInt( ) const ;
 	
 		//...........................
-		double timeFactorImA0AT(  ) const ;
-		double timeFactorImA0ATInt( ) const ;
+//		inline double timeFactorImA0AT(  ) const ;
+//		inline double timeFactorImA0ATInt( ) const ;
     
 		//.....  S Wave..............
 		//...........................
-		double timeFactorASAS( ) const ;
-		double timeFactorASASInt( ) const ;
+//		inline double timeFactorASAS( ) const ;
+//		inline double timeFactorASASInt( ) const ;
 	
 		//............................
-		double timeFactorReASAP( ) const ;
-		double timeFactorReASAPInt( ) const ;
+//		inline double timeFactorReASAP( ) const ;
+//		inline double timeFactorReASAPInt( ) const ;
 
 		//............................
-		double timeFactorImASAT( ) const ;
-		double timeFactorImASATInt( ) const ;
+//		inline double timeFactorImASAT( ) const ;
+//		inline double timeFactorImASATInt( ) const ;
 
 		//............................
-		double timeFactorReASA0( ) const ;
-		double timeFactorReASA0Int( ) const ;
+//		inline double timeFactorReASA0( ) const ;
+//		inline double timeFactorReASA0Int( ) const ;
+		
+		
+		//------------------------------------------------------------------------------
+// These are the time factors and their analytic integrals for the one angle PDF
+
+		//..................................
+		inline double timeFactorEven(  )  const
+		{
+			//if( t < 0.0 ) return 0.0 ;
+			const double result = 
+			( 1.0 + cos(phi_s) ) * expL( ) 
+			+ ( 1.0 - cos(phi_s) ) * expH( ) 
+			+ q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
+		  
+			//DEBUG
+			if( DEBUGFLAG && (result < 0) ) {
+				cout << " Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorEven() : result < 0 " << endl ;
+				cout << " ->term1 " << ( 1.0 + cos(phi_s) ) * expL( ) << endl ;
+				cout << " ->term2 " << ( 1.0 - cos(phi_s) ) * expH( ) << endl ;
+				cout << " ->term3 " << q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) << endl ;
+				cout << "   -->sin(phis) "  << sin(phi_s) << endl ;
+				cout << "   -->expSin    "  << expSin() << endl ;
+				cout << "   -->tagFrac   "  << tagFraction << endl ;
+				cout << "   -->delta_ms  "  << delta_ms << endl ;
+			}
+			return result ;
+		}
+
+		inline double timeFactorEvenInt(  )  const
+		{
+			return
+			( 1.0 + cos(phi_s) )  * intExpL()     
+			+ ( 1.0 - cos(phi_s) )  * intExpH()          
+			+ q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
+		}
+
+
+		//..................................
+		inline double timeFactorOdd(  )   const
+		{
+			//if( t < 0.0 ) return 0.0 ;
+			return
+			( 1.0 - cos(phi_s) ) * expL( ) 
+			+ ( 1.0 + cos(phi_s) ) * expH( ) 
+			- q() * ( 2.0 * sin(phi_s)   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
+		}
+
+		inline double timeFactorOddInt(  )  const
+		{
+			return
+			( 1.0 - cos(phi_s) ) * intExpL()
+			+ ( 1.0 + cos(phi_s) ) * intExpH() 
+			- q() * ( 2.0 * sin(phi_s)   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
+		}
+
+
+		//----------------------------------------------------------
+		// These are the time factors and their analytic integrals for the three angle PDF
+
+		//...........................
+		inline double timeFactorA0A0( )    const { return timeFactorEven( ) ; }     
+		inline double timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; }
+
+		//...........................
+		inline double timeFactorAPAP( )    const { return timeFactorEven( ) ; }
+		inline double timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; }
+
+		//...........................
+		inline double timeFactorATAT( )    const { return timeFactorOdd( ) ; }
+		inline double timeFactorATATInt( ) const { return timeFactorOddInt( ) ; }
+
+		//...........................
+		inline double timeFactorImAPAT( ) const
+		{
+			//if( t < 0.0 ) return 0.0 ;
+			return
+			q() * 2.0  * ( sin(delta1)*expCos( ) - cos(delta1)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)
+			- /*1.0 **/ ( expH( ) - expL( ) ) * cos(delta1) * sin(phi_s)  ;
+		}
+		
+		inline double timeFactorImAPATInt( ) const
+		{
+			double _tlo = tlo ;
+			if(_tlo < 0.) _tlo = 0. ;
+			
+			return
+			q() * 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cos(phi_s)*intExpSin() ) * (1.0 - 		2.0*tagFraction)
+			- /*1.0 **/ ( intExpH() - intExpL() ) * cos(delta1) * sin(phi_s) ;	    
+		}
+
+
+		//...........................
+		inline double timeFactorReA0AP( )  const
+		{
+			//if( t < 0.0 ) return 0.0 ;
+			return cos(delta2-delta1) * this->timeFactorEven(  ) ;
+		}
+
+		inline double timeFactorReA0APInt( ) const
+		{
+			return cos(delta2-delta1) * this->timeFactorEvenInt( ) ;
+		}
+
+
+		//...........................
+		inline double timeFactorImA0AT(  ) const
+		{
+			//if( t < 0.0 ) return 0.0 ;
+			return 
+			q() * 2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)	
+			-/*1.0 **/ ( expH( ) - expL( ) ) * cos(delta2) * sin(phi_s) ;
+		}
+
+		inline double timeFactorImA0ATInt( ) const
+		{
+			double _tlo = tlo ;
+			if(_tlo < 0.) _tlo = 0. ;
+	
+			return 
+			q() * 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cos(phi_s)*intExpSin()  ) * (1.0 - 2.0*tagFraction)
+			-/*1.0 **/ ( intExpH() - intExpL()  ) * cos(delta2) * sin(phi_s) ;
+		}
+
+		//.... S wave additions.......
+
+		//...........................
+		inline double timeFactorASAS( )    const { return timeFactorOdd( ) ; }
+		inline double timeFactorASASInt( ) const { return timeFactorOddInt( ) ; }
+
+
+		//...........................
+		inline double timeFactorReASAP( ) const
+		{
+			//if( t < 0.0 ) return 0.0 ;
+			
+			double delta = delta_para - delta_s ;
+			return
+			q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)
+			- /*1.0 **/ ( expH( ) - expL( ) ) * sin(delta) * sin(phi_s)  ;
+		}
+
+		inline double timeFactorReASAPInt( ) const
+		{
+			double _tlo = tlo ;
+			if(_tlo < 0.) _tlo = 0. ;
+
+			double delta = delta_para - delta_s ;
+
+			return
+			q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
+			- /*1.0 **/ ( intExpH() - intExpL() ) * sin(delta) * sin(phi_s) ;	    
+		}
+
+
+		//...........................
+		inline double timeFactorImASAT( )  const
+		{
+			//if( t < 0.0 ) return 0.0 ;
+			return sin(delta_perp-delta_s) * this->timeFactorOdd(  ) ;
+		}
+
+		inline double timeFactorImASATInt( ) const
+		{
+			return sin(delta_perp-delta_s) * this->timeFactorOddInt( ) ;
+		}
+
+
+		//...........................
+		inline double timeFactorReASA0( ) const
+		{
+			//if( t < 0.0 ) return 0.0 ;
+			
+			double delta = delta_zero - delta_s ;
+			return
+			q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cos(phi_s)*expSin( ) ) * (1.0 - 2.0*tagFraction)
+			- /*1.0 **/ ( expH( ) - expL( ) ) * sin(delta) * sin(phi_s)  ;
+		}
+
+		inline double timeFactorReASA0Int( ) const
+		{
+			double _tlo = tlo ;
+			if(_tlo < 0.) _tlo = 0. ;
+			
+			double delta = delta_zero - delta_s ;
+			
+			return
+			q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cos(phi_s)*intExpSin() ) * (1.0 - 2.0*tagFraction)
+			- /*1.0 **/ ( intExpH() - intExpL() ) * sin(delta) * sin(phi_s) ;	    
+		}
+
+
+		
+		
+		
+		
+		
 	
 		//-----------------------------------------------------------------
 		// Angle factors 
 	
-		double angleFactorA0A0(  ) const ;
-		double angleFactorAPAP(  ) const ;
-		double angleFactorATAT(  ) const ;
-		double angleFactorImAPAT(  ) const ;
-		double angleFactorReA0AP( ) const ;
-		double angleFactorImA0AT(  ) const ;
+//		double angleFactorA0A0(  ) const ;
+//		double angleFactorAPAP(  ) const ;
+//		double angleFactorATAT(  ) const ;
+//		double angleFactorImAPAT(  ) const ;
+//		double angleFactorReA0AP( ) const ;
+//		double angleFactorImA0AT(  ) const ;
 
-		double angleFactorASAS(  ) const ;
-		double angleFactorReASAP( ) const ;
-		double angleFactorImASAT(  ) const ;
-		double angleFactorReASA0( ) const ;
-	
+//		double angleFactorASAS(  ) const ;
+//		double angleFactorReASAP( ) const ;
+//		double angleFactorImASAT(  ) const ;
+//		double angleFactorReASA0( ) const ;
+
+
+		//------------------------------------------------------
+		// Angle factors for three angle PDFs
+
+		//........ P Wave ..........
+
+		//...........................
+		inline double angleFactorA0A0(  ) const
+		{
+			// Normalised to  1	
+			return 2.0 * ct1sq() * (1.0 - strsq()*cphsq() ) * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
+		}
+
+		//...........................
+		inline double angleFactorAPAP(  ) const
+		{
+			// Normalised to  1
+			return  st1sq() * (1.0 - strsq()*sphsq() ) * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
+		}
+
+		//...........................
+		inline double angleFactorATAT(  ) const
+		{
+			// Normalised to  1
+			return st1sq() * strsq() * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
+		}
+
+		//...........................
+		inline double angleFactorImAPAT(  ) const
+		{
+			// Normalised to  0
+			double theta_tr = acos(ctheta_tr) ;		
+			return   -/*1.0 **/  st1sq() * sin(2.0*theta_tr) * sin(phi_tr) * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
+		}
+
+		//...........................
+		inline double angleFactorReA0AP( ) const
+		{
+			// Normalised to  0
+			double theta_1 = acos(ctheta_1) ;	
+			return    sin(2.0*theta_1) * strsq() * sin(2.0*phi_tr) *Mathematics::_Over_SQRT_2()/*/ sqrt(2.0)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
+		}
+
+		//...........................
+		inline double angleFactorImA0AT(  ) const
+		{
+			// Normalised to  0
+			double theta_tr = acos(ctheta_tr) ;		
+			double theta_1 = acos(ctheta_1) ;		
+			return  +/*1.0**/   sin(2.0*theta_1) * sin(2.0*theta_tr) * cos(phi_tr) *Mathematics::_Over_SQRT_2()/*/ sqrt(2.0)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
+		}
+
+		//......  S wave additions ....
+
+		//.............................
+		inline double angleFactorASAS(  ) const
+		{
+			return  (1.0 - strsq()*cphsq() ) * 2*Mathematics::Third()/*(2./3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
+		}
+
+		//...........................
+		inline double angleFactorReASAP(  ) const
+		{
+			double stheta_1 =  sqrt(st1sq());		
+			return   strsq() * stheta_1 * sin(2.0*phi_tr) * Mathematics::Root_6()*Mathematics::Third()/*(sqrt(6.)/3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
+		}
+
+		//...........................
+		inline double angleFactorImASAT(  ) const
+		{
+			double theta_tr = acos(ctheta_tr) ;		
+			double stheta_1 =  sqrt(st1sq());		
+			return -/*1.0**/  sin(2.0*theta_tr) * stheta_1 * cos(phi_tr) * Mathematics::Root_6()*Mathematics::Third()/*(sqrt(6.)/3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
+		}
+
+
+		//...........................
+		inline double angleFactorReASA0(  ) const
+		{
+			return -/*1.0 **/  ( 1.0 -  strsq()* cphsq() ) * ctheta_1 *  4*Mathematics::Third()/*(4.0*sqrt(3.)/3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
+		}
+
+
+
+
 };
 
 #endif

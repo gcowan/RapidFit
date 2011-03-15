@@ -21,6 +21,7 @@ DataPoint::DataPoint()
 //Constructor with correct arguments
 DataPoint::DataPoint( vector<string> NewNames )
 {
+	allObservables.reserve( NewNames.size() );
 	//Populate the map
 	for (unsigned short int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
 	{
@@ -77,10 +78,17 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 }
 
 //Initialise observable
-bool DataPoint::SetObservable( string Name, double Value, double Error, string Unit )
+bool DataPoint::SetObservable( string Name, double Value, double Error, string Unit, bool trusted, int nameIndex )
 {
 	Observable * temporaryObservable = new Observable( Name, Value, Error, Unit );
-	bool returnValue = SetObservable( Name, temporaryObservable );
+	bool returnValue=false;
+	if( trusted )
+	{
+		returnValue=true;
+		allObservables[nameIndex] = *temporaryObservable;
+	} else {
+		returnValue = SetObservable( Name, temporaryObservable );
+	}
 	delete temporaryObservable;
 	return returnValue;
 }

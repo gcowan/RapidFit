@@ -27,6 +27,7 @@ class ResultFormatter
 		static void MakeRootDataFile( string, IDataSet* );
 		static void DebugOutputFitResult( FitResult* );
 		static void LatexOutputFitResult( FitResult* );
+		static void ReviewOutput( FitResult * OutputData );
 		static void LatexOutputCovarianceMatrix( FitResult* );
 		static void PlotFitContours( FitResult*, string );
 		static double GetElementFromCovarianceMatrix( vector<double>, int, int);		

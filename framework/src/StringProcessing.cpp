@@ -9,6 +9,7 @@
 
 #include "StringProcessing.h"
 #include <iostream>
+#include <algorithm>
 
 //Split a string every time you find a given character
 vector<string> StringProcessing::SplitString( string Input, char SplitCharacter )
@@ -218,14 +219,9 @@ vector<string> StringProcessing::CombineUniques( vector<string> VectorOne, vecto
 //Return the position of a search string within a vector of strings, or -1 if not found
 int StringProcessing::VectorContains( vector<string> * InputVector, string * SearchString )
 {
-	for (unsigned int searchIndex = 0; searchIndex < InputVector->size(); ++searchIndex )
-	{
-		if ( (*InputVector)[searchIndex] == (*SearchString) )
-		{
-			//Found the search string
-			return searchIndex;
-		}
-	}
+	vector<string>::iterator result=find( InputVector->begin(), InputVector->end(), *SearchString);
+	int position=int( result - InputVector->begin() );
+	if( position >= 0 && position < int(InputVector->size()) ) return position;
 
 	//If you've got this far, it wasn't found
 	return -1;

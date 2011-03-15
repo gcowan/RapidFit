@@ -27,6 +27,11 @@ MemoryDataSet::~MemoryDataSet()
 	//delete dataBoundary;
 }
 
+void MemoryDataSet::ReserveDataSpace( int numberOfPoints )
+{
+	allData.reserve( numberOfPoints );
+}
+
 //Add a data point to the set
 bool MemoryDataSet::AddDataPoint( DataPoint * NewDataPoint )
 {

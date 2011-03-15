@@ -13,6 +13,8 @@
 #include "ClassLookUp.h"
 #include "ScanParam.h"
 #include "ToyStudyResult.h"
+#include "ResultFormatter.h"
+#include "StringProcessing.h"
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
@@ -435,12 +437,15 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			string sWeightObs="Nsig_sw";
 			bool sWeighted=false;
 			vector<string> phase_names = PhaseSpaceForToys[pdf_num]->GetAllNames();
-			for( unsigned short int phase_param=0; phase_param < phase_names.size(); ++phase_param )
-			{
-				if( phase_names[phase_param] == sWeightObs ) sWeighted = true;
-			}
+			int sweight_num = StringProcessing::VectorContains( &phase_names, &sWeightObs );
+			if( sweight_num != -1 ) sWeighted=true;
 			if( sWeighted )
 			{
+				for(unsigned short int i=0; i< PhaseSpaceForToys.size(); ++i )
+				{
+					vector<double> new_constraint(1,1.0);
+					PhaseSpaceForToys[i]->SetConstraint( "Nsig_sw", new_constraint, " " );
+				}
 				IDataSet* file_input = pdfsAndData[pdf_num]->GetDataSet();
 				int point_number = file_input->GetDataNumber();
 				double data_num=0; double data_err=0;
@@ -621,6 +626,8 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			{
 				if( FC_Debug_Flag )	cout << "\n\nYou are aware your requesting all output?\n"<<endl;
 
+				ResultFormatter::ReviewOutput( fit1Result );
+
 				//  Fit secondGlobalResult with control parameters Fixed
 				for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); ++pdf_num )
 				{
@@ -656,9 +663,13 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 				cout << "\tFit Finished!\n" <<endl;
 
 				//	If either Fit Failed we want to 'dump the results' and run an extra Fit.
-				if( (fit2Result->GetFitStatus() != 3) || (fit2Result->GetFitStatus() != 3) ) toy_failed = true;
+				if( (fit1Result->GetFitStatus() != 3) || (fit2Result->GetFitStatus() != 3) ) toy_failed = true;
 			}
 			else	toy_failed = false;
+			
+			if( !toy_failed || FC_Debug_Flag )
+				ResultFormatter::ReviewOutput( fit2Result );
+
 
 			//	Do we want to store the Data OR run another toy to get a better Fit
 			if( toy_failed )
@@ -729,6 +740,6 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		AllResults.push_back( study2Results );
 	}
 
-	cout << "\n\nNumercial par of FeldMan-Cousins Scan Complete,\n\n Now process data through the plotting tool :D\n\n";
+	cout << "\n\nNumerical part of FeldMan-Cousins Scan Complete,\n\n Now process the data through the plotting tool :D\n\n";
 	return new ToyStudyResult( AllResults );
 }

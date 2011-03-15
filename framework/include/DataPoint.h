@@ -27,7 +27,7 @@ class DataPoint
 		vector<string> GetAllNames();
 		Observable * GetObservable(string);
 		bool SetObservable( string, Observable* );
-		bool SetObservable( string, double, double, string );
+		bool SetObservable( string, double, double, string, bool=false, int=-1);
 
 	private:
 		vector<Observable> allObservables;

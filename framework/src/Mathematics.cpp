@@ -17,17 +17,21 @@
 
 namespace Mathematics
 {
+
 	// Mathematica integral of the exp * erf
 	//Integrate[(1*Exp[-(x/t) + s^2/(2*t^2)]* Erfc[-((x - s^2/t)/(Sqrt[2]*s))])/2, x] ==
 	//(t*(Erf[x/(Sqrt[2]*s)] - E^((s^2 - 2*t*x)/(2*t^2))* Erfc[(s^2 - t*x)/(Sqrt[2]*s*t)]))/2
-	double expErfInt( double tlimit, double tau, double sigma)
+	double expErfInt( const double tlimit, const double tau, const double sigma)
 	{
-		double val = 0.5 * (tau * ( RooMath::erf( tlimit/(sqrt(2.)*sigma) )
-					- exp( (sigma*sigma - 2*tau*tlimit)/(2.*tau*tau) )
-					* RooMath::erfc( (sigma*sigma - tau*tlimit)/(sqrt(2.)*sigma*tau) )
+		const double sigma_2=sigma*sigma;
+		const double inv_r2_sigma = 1./(sqrt_2*sigma);
+		const double inv_r2_sigma_tau = inv_r2_sigma/tau;
+		const double tau_tlimit = tau*tlimit;
+		return 0.5 * (tau * ( RooMath::erf( tlimit*inv_r2_sigma )
+					- exp( (sigma_2*0.5 - tau_tlimit)/(tau*tau) )
+					* RooMath::erfc( (sigma_2 - tau_tlimit)*inv_r2_sigma_tau )
 					)
-				);
-		return val;
+					);
 	}
 
 	//--------------------------- exp and exp*sin and exp*cos time functions -------------------------
@@ -44,11 +48,11 @@ namespace Mathematics
 
 	// use the approximation: erf(z) = exp(-z*z)/(sqrt(pi)*z) to explicitly cancel the divergent exp(y*y) behaviour of
 	// CWERF for z = x + i y with large negative y
-	RooComplex evalCerfApprox(double swt, double u, double c)
+	RooComplex evalCerfApprox(const double swt, const double u, const double c)
 	{
-		static double rootpi= sqrt(atan2(0.,-1.));
-		RooComplex z(swt*c,u+c);
-		RooComplex zc(u+c,-swt*c);
+		const double swt_c=swt*c;
+		RooComplex z(swt_c,u+c);
+		RooComplex zc(u+c,-swt_c);
 		RooComplex zsq= z*z;
 		RooComplex v= -zsq - u*u;
 		return v.exp()*(-zsq.exp()/(zc*rootpi) + 1)*2 ; //why shoule be a 2 here?
@@ -56,37 +60,39 @@ namespace Mathematics
 	}
 
 	// Calculate Re(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-	double evalCerfRe(double swt, double u, double c)  {
+	double evalCerfRe(const double swt, const double u, const double c)  {
 		RooComplex z(swt*c,u+c);
-		return (z.im()>-4.0) ? RooMath::FastComplexErrFuncRe(z)*TMath::Exp(-u*u) : evalCerfApprox(swt,u,c).re() ;
+		return (z.im()>-4.0) ? RooMath::FastComplexErrFuncRe(z)*exp(-u*u) : evalCerfApprox(swt,u,c).re() ;
 	}
 
 	// Calculate Im(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-	double evalCerfIm(double swt, double u, double c)  {
+	double evalCerfIm(const double swt, const double u, const double c)  {
 		RooComplex z(swt*c,u+c);
-		return (z.im()>-4.0) ? RooMath::FastComplexErrFuncIm(z)*TMath::Exp(-u*u) : evalCerfApprox(swt,u,c).im() ;
+		return (z.im()>-4.0) ? RooMath::FastComplexErrFuncIm(z)*exp(-u*u) : evalCerfApprox(swt,u,c).im() ;
 	}
 
 	//----------------------------------------------------------------------------------------------
 	//........................................
 	//evaluate a simple exponential with single gaussian time resolution
-	double Exp( double t, double gamma, double resolution )
+	double Exp( const double t, const double gamma, const double resolution )
 	{
 
+		const double resolution_2_gamma=resolution*resolution*gamma;
+		const double t_gamma=t*gamma;
 		if(resolution > 0.) {
 
-			double theExp = TMath::Exp( -t*gamma + resolution*resolution * gamma*gamma / 2. ) ;
-			double theErfc = RooMath::erfc(  -( t - resolution*resolution*gamma ) /sqrt(2.)/resolution )  ;
-			return theExp * theErfc  / 2.0 ;
+			const double theExp = exp( -t_gamma + resolution_2_gamma*gamma *0.5 ) ;
+			const double theErfc = RooMath::erfc(  -( t - resolution_2_gamma ) *_over_sqrt_2 /resolution )  ;
+			return theExp * theErfc  *0.5 ;
 
 			// Yue hongs code
-			//double c = gamma * resolution /sqrt(2.);
-			//double u = t / resolution / sqrt(2.);
+			//double c = gamma * resolution *_over_sqrt_2;
+			//double u = t / resolution *_over_sqrt_2;
 			//return exp( c*c - gamma*t ) * RooMath::erfc(c-u) / 2.;
 		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
-			return TMath::Exp( -gamma * t ) ;
+			return exp( -t_gamma ) ;
 		}
 
 	}
@@ -94,17 +100,17 @@ namespace Mathematics
 	//.......................................
 	// Evaluate integral of a simple exponential with single gaussian time resolution
 	/* From Mathematica we have:
-	   R2[t_] := 1/2 * Exp[-t*gamma + timeRes*timeRes*gamma*gamma/2] * Erfc[-(t - timeRes*timeRes*gamma)/(Sqrt[2]*timeRes)]
+	   R2[t_] := 0.5 * Exp[-t*gamma + timeRes*timeRes*gamma*gamma*0.5] * Erfc[-(t - timeRes*timeRes*gamma)/(Sqrt[2]*timeRes)]
 	   CForm[FullSimplify[Simplify[Integrate[R2[t], {t, tlow, thigh}]]]]
 	   (
-	   -2*exp((gamma*gamma*timeRes*timeRes)/2.) -
+	   -2*exp((gamma*gamma*timeRes*timeRes)*0.5.) -
 	   exp( gamma*thigh)*Erfc(thigh/(sqrt(2)*timeRes)) +
-	   exp((gamma*gamma*timeRes*timeRes)/2.) 		      * Erfc((thigh - gamma*timeRes*timeRes)/(sqrt(2)*timeRes)) +
-	   exp((gamma*(2*thigh + gamma*timeRes*timeRes - 2*tlow))/2.) * Erfc((gamma*timeRes*timeRes - tlow )/(sqrt(2)*timeRes)) +
+	   exp((gamma*gamma*timeRes*timeRes)*0.5) 		      * Erfc((thigh - gamma*timeRes*timeRes)/(sqrt(2)*timeRes)) +
+	   exp((gamma*(2*thigh + gamma*timeRes*timeRes - 2*tlow))*0.5) * Erfc((gamma*timeRes*timeRes - tlow )/(sqrt(2)*timeRes)) +
 	   exp( gamma*thigh)*Erfc(tlow/(sqrt(2)*timeRes))
 	   )/(2.*exp(gamma*thigh)*gamma)
 	 */
-	double ExpInt( double tlow, double thigh, double gamma, double resolution  )
+	double ExpInt( const double tlow, const double thigh, const double gamma, const double resolution  )
 	{
 		if( thigh < tlow )
 		{
@@ -112,21 +118,23 @@ namespace Mathematics
 			return -1.0 ;
 		}
 
+		const double invgamma=1./gamma;
+		const double exp_gamma_thigh=exp(-gamma*thigh);
 		if( resolution > 0. )
 		{
-			return expErfInt(thigh, 1./gamma, resolution) - expErfInt(tlow, 1./gamma, resolution);
+			return expErfInt(thigh, invgamma, resolution) - expErfInt(tlow, invgamma, resolution);
 		}
 		else
 		{
-			if( tlow < 0. ) return (1/gamma) * ( 1.0 - TMath::Exp(-gamma*thigh) ) ;
-			else return (1/gamma) * ( TMath::Exp(-gamma*tlow) - TMath::Exp(-gamma*thigh) ) ;
+			if( tlow < 0. ) return invgamma * ( 1.0 - exp_gamma_thigh ) ;
+			else return invgamma * ( exp(-gamma*tlow) - exp_gamma_thigh ) ;
 		}
 	}
 
 	//------------------------------------------------------------------------------------------
 	//........................................
 	//evaluate a simple exponential with single gaussian time resolution, allowing for an acceptance (1.0 - b*t) - formula from wolfram
-	double Exp_betaAcceptance( double t, double gamma, double resolution, double acceptanceParameter  )
+	double Exp_betaAcceptance( const double t, const double gamma, const double resolution, const double acceptanceParameter  )
 	{		
 		if(resolution > 0.) 
 		{
@@ -136,7 +144,7 @@ namespace Mathematics
 		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
-			return TMath::Exp( -gamma * t ) * (1. - acceptanceParameter * t ) ;
+			return exp( -gamma * t ) * (1. - acceptanceParameter * t ) ;
 		}		
 	}
 	
@@ -144,7 +152,7 @@ namespace Mathematics
 	//.....................................................
 	// Evaluate integral of a simple exponential with single gaussian time resolution, allowing for an acceptance (1.0 - b*t) - formula from wolfram
 	// I = -1/G * exp (-tG) (1 - b(1/G +t ))  instead of I = -1/G * exp (-tG)
-	double ExpInt_betaAcceptance( double tlow, double thigh, double gamma, double resolution, double acceptanceParameter  )
+	double ExpInt_betaAcceptance( const double tlow, const double thigh, const double gamma, const double resolution, const double acceptanceParameter  )
 	{
 		if( thigh < tlow )
 		{
@@ -162,13 +170,14 @@ namespace Mathematics
 		{
 			double LoFactor=0, UpFactor=0 ;
 
+			const double invgamma = 1./gamma;
 			if( tlow < 0. ) {
-				LoFactor = (1. - acceptanceParameter*(1./gamma)) * (-1./gamma) ;
+				LoFactor = (1. - acceptanceParameter*invgamma) * (-invgamma) ;
 			}
 			else {
-				LoFactor = (1. - acceptanceParameter*((1./gamma)+tlow)) * (-1./gamma) * TMath::Exp(-gamma*tlow) ;
+				LoFactor = (1. - acceptanceParameter*(invgamma+tlow)) * (-invgamma) * exp(-gamma*tlow) ;
 			}
-			UpFactor = (1. - acceptanceParameter*((1./gamma)+thigh)) * (-1./gamma) * TMath::Exp(-gamma*thigh) ;
+			UpFactor = (1. - acceptanceParameter*(invgamma+thigh)) * (-invgamma) * exp(-gamma*thigh) ;
 
 			return UpFactor - LoFactor ;
 
@@ -180,40 +189,44 @@ namespace Mathematics
 	//evaluate a simple exponential X cosh with single gaussian time resolution
 	//When you express the cosh as a sum of exp and then multiply out, you are
 	//left with just a sum of exponentials.
-	double ExpCosh( double t, double gamma, double deltaGamma, double resolution )
+	double ExpCosh( const double t, const double gamma, const double deltaGamma, const double resolution )
 	{
-		double gammaL = gamma + deltaGamma/2.;
-		double gammaH = gamma - deltaGamma/2.;
-		return ( Exp( t, gammaH, resolution ) + Exp( t, gammaL, resolution ) ) / 2.;
+		const double dg_2 = deltaGamma*0.5;
+		const double gammaL = gamma + dg_2;
+		const double gammaH = gamma - dg_2;
+		return ( Exp( t, gammaH, resolution ) + Exp( t, gammaL, resolution ) ) *0.5;
 	}
 
 	//.......................................
 	// Evaluate integral of a simple exponential X cosh with single gaussian time resolution
-	double ExpCoshInt( double tlow, double thigh, double gamma, double deltaGamma, double resolution  )
+	double ExpCoshInt( const double tlow, const double thigh, const double gamma, const double deltaGamma, const double resolution  )
 	{
-		double gammaL = gamma + deltaGamma/2.;
-		double gammaH = gamma - deltaGamma/2.;
-		return ( ExpInt( tlow, thigh, gammaH, resolution ) + ExpInt( tlow, thigh, gammaL, resolution ) )/2.;
+		const double dg_2 = deltaGamma*0.5;
+		const double gammaL = gamma + dg_2;
+		const double gammaH = gamma - dg_2;
+		return ( ExpInt( tlow, thigh, gammaH, resolution ) + ExpInt( tlow, thigh, gammaL, resolution ) )*0.5;
 	}
 
 	//........................................
 	//evaluate a simple exponential with single gaussian time resolution
 	//When you express the sinh as a sum of exp and then multiply out, you are
 	//left with just a sum of exponentials.
-	double ExpSinh( double t, double gamma, double deltaGamma, double resolution )
+	double ExpSinh( const double t, const double gamma, const double deltaGamma, const double resolution )
 	{
-		double gammaL = gamma + deltaGamma/2.;
-		double gammaH = gamma - deltaGamma/2.;
-		return ( Exp( t, gammaH, resolution ) - Exp( t, gammaL, resolution ) )/2.;
+		const double dg_2 = deltaGamma*0.5;
+		const double gammaL = gamma + dg_2;
+		const double gammaH = gamma - dg_2;
+		return ( Exp( t, gammaH, resolution ) - Exp( t, gammaL, resolution ) )*0.5;
 	}
 
 	//.......................................
 	// Evaluate integral of a simple exponential X sinh with single gaussian time resolution
-	double ExpSinhInt( double tlow, double thigh, double gamma, double deltaGamma, double resolution  )
+	double ExpSinhInt( const double tlow, const double thigh, const double gamma, const double deltaGamma, const double resolution  )
 	{
-		double gammaL = gamma + deltaGamma/2.;
-		double gammaH = gamma - deltaGamma/2.;
-		return ( ExpInt( tlow, thigh, gammaH, resolution ) - ExpInt( tlow, thigh, gammaL, resolution ))/2.;
+		const double dg_2 = deltaGamma*0.5;
+		const double gammaL = gamma + dg_2;
+		const double gammaH = gamma - dg_2;
+		return ( ExpInt( tlow, thigh, gammaH, resolution ) - ExpInt( tlow, thigh, gammaL, resolution ))*0.5;
 	}
 
 	// Mathematica integral of the exp * cos * erf
@@ -221,22 +234,22 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate exponential X cosine with single time resolution
-	double ExpCos( double t, double gamma, double deltaM, double resolution )
+	double ExpCos( const double t, const double gamma, const double deltaM, const double resolution )
 	{
 
 		if(resolution > 0.) {
 
 			//Yue Hongs code
-			double c = gamma * resolution/sqrt(2.);
-			double u = t / resolution / sqrt(2.) ;
-			double wt = deltaM / gamma ;
-			return ( evalCerfRe(wt,-u,c) + evalCerfRe(-wt,-u,c) ) / 4. ;
+			const double c = gamma * resolution*_over_sqrt_2;
+			const double u = (t / resolution) *_over_sqrt_2 ;	//BODMAS
+			const double wt = deltaM / gamma ;
+			return ( evalCerfRe(wt,-u,c) + evalCerfRe(-wt,-u,c) ) *0.25 ;
 
 			// My code which didnt work due to numerical instability
 			//double theExp = exp( -t*gamma + timeRes*timeRes * ( gamma*gamma - deltaM*deltaM ) / 2. ) ;
 			//double theCos = cos( deltaM * ( t - timeRes*timeRes*gamma ) ) ;
 			//double theSin = sin( deltaM * ( t - timeRes*timeRes*gamma ) ) ;
-			//RooComplex z( -( t - timeRes*timeRes*gamma )/sqrt(2.)/timeRes,  - timeRes*deltaM/sqrt(2.) ) ;
+			//RooComplex z( -( t - timeRes*timeRes*gamma )*_over_sqrt_2/timeRes,  - timeRes*deltaM*_over_sqrt_2 ) ;
 			//double theReErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncRe(z) ) : ( 1.0 - RooMath::FastComplexErrFuncRe(z) );
 			//double theImErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncIm(z) ) : ( 1.0 - RooMath::FastComplexErrFuncIm(z) );
 			//return theExp * ( theCos*theReErfc - theSin*theImErfc ) / 2.0 ;
@@ -244,14 +257,14 @@ namespace Mathematics
 		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
-			return TMath::Exp( -gamma *t ) * cos( deltaM * t )  ;
+			return exp( -gamma *t ) * cos( deltaM * t )  ;
 		}
 
 	}
 
 	//.................................................................
 	// Evaluate integral of exponential X cosine with single time resolution
-	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )
+	double ExpCosInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution  )
 	{
 		if( thigh < tlow ) {
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
@@ -267,33 +280,36 @@ namespace Mathematics
 			}
 		}
 
-		if( tlow < 0. ) tlow = 0. ;
+		double real_tlow=tlow;
+		if( tlow < 0. ) real_tlow = 0. ;
 
-		return (1/(gamma*gamma + deltaM*deltaM)) * (
-				( TMath::Exp(-gamma*tlow)* (gamma*cos(deltaM*tlow) - deltaM*sin(deltaM*tlow)))
-				-( TMath::Exp(-gamma*thigh)* (gamma*cos(deltaM*thigh) - deltaM*sin(deltaM*thigh)))
-				);
+		const double deltaM_tlow=deltaM*real_tlow;
+		const double deltaM_thigh=deltaM*thigh;
+		return (
+				( exp(-gamma*real_tlow)* (gamma*cos(deltaM_tlow) - deltaM*sin(deltaM_tlow)))
+				-( exp(-gamma*thigh)* (gamma*cos(deltaM_thigh) - deltaM*sin(deltaM_thigh)))
+				)/(gamma*gamma + deltaM*deltaM);
 
 	}
 
 
 	//.................................................................
 	// Evaluate exponential X sine with single time resolution
-	double ExpSin( double t, double gamma, double deltaM, double resolution )
+	double ExpSin( const double t, const double gamma, const double deltaM, const double resolution )
 	{
 		if(resolution > 0.) {
 
 			//Yue Hongs code
-			double c = gamma * resolution/sqrt(2.);
-			double u = t / resolution / sqrt(2.) ;
-			double wt = deltaM / gamma ;
-			return ( evalCerfIm(wt,-u,c) - evalCerfIm(-wt,-u,c) ) /4. ;
+			const double c = gamma * resolution*_over_sqrt_2;
+			const double u = (t / resolution) *_over_sqrt_2 ;
+			const double wt = deltaM / gamma ;
+			return ( evalCerfIm(wt,-u,c) - evalCerfIm(-wt,-u,c) ) *0.25 ;
 
 			// My code which didnt work due to numerical instability
 			//double theExp = exp( -t*gamma() + resolution*resolution * ( gamma()*gamma() - delta_ms*delta_ms ) / 2. ) ;
 			//double theCos = cos( delta_ms * ( t - resolution*resolution*gamma() ) ) ;
 			//double theSin = sin( delta_ms * ( t - resolution*resolution*gamma() ) ) ;
-			//RooComplex z( -( t - resolution*resolution*gamma() )/sqrt(2.)/resolution,  - resolution*delta_ms/sqrt(2.) ) ;
+			//RooComplex z( -( t - resolution*resolution*gamma() )*_over_sqrt_2/resolution,  - resolution*delta_ms*_over_sqrt_2) ;
 			//double theReErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncRe(z) ) : ( 1.0 - RooMath::FastComplexErrFuncRe(z) );
 			//double theImErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncIm(z) ) : ( 1.0 - RooMath::FastComplexErrFuncIm(z) );
 			//return theExp * ( theCos*theImErfc + theSin*theReErfc ) / 2.0 ;
@@ -302,14 +318,14 @@ namespace Mathematics
 		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
-			return TMath::Exp( -gamma *t ) * sin( deltaM * t )  ;
+			return exp( -gamma *t ) * sin( deltaM * t )  ;
 		}
 
 	}
 
 	//.................................................................
 	// Evaluate integral of exponential X cosine with single time resolution
-	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )
+	double ExpSinInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution  )
 	{
 		if( thigh < tlow ) {
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
@@ -325,12 +341,15 @@ namespace Mathematics
 			}
 		}
 
-		if( tlow < 0. ) tlow = 0. ;
+		double real_tlow=tlow;
+		if( tlow < 0. ) real_tlow = 0. ;
 
-		return (1/(gamma*gamma + deltaM*deltaM)) * (
-				( TMath::Exp(-gamma*tlow)* (gamma*sin(deltaM*tlow) + deltaM*cos(deltaM*tlow)))
-				-( TMath::Exp(-gamma*thigh)* (gamma*sin(deltaM*thigh) + deltaM*cos(deltaM*thigh)))
-				);
+		double deltaM_tlow=deltaM*real_tlow;
+		double deltaM_thigh=deltaM*thigh;
+		return (
+				( exp(-gamma*real_tlow)* (gamma*sin(deltaM_tlow) + deltaM*cos(deltaM_tlow)))
+				-( exp(-gamma*thigh)* (gamma*sin(deltaM_thigh) + deltaM*cos(deltaM_thigh)))
+				)/(gamma*gamma + deltaM*deltaM);
 	}
 
 //......................................................................
@@ -340,32 +359,35 @@ namespace Mathematics
 			, double & f4
 			, double & f5
 			, double & f6
-			, double cosTheta
-			, double phi
-			, double cosPsi)
+			, const double cosTheta
+			, const double phi
+			, const double cosPsi)
 	{
-		double sinTheta  = sqrt(1. - cosTheta*cosTheta);
-		double sinPsi    = sqrt(1. - cosPsi*cosPsi);
+		const double sinTheta  = sqrt(1. - cosTheta*cosTheta);
+		const double sinPsi    = sqrt(1. - cosPsi*cosPsi);
 
-		double cosPhi    = cos(phi);
-		double sinPhi    = sin(phi);
+		const double cosPhi    = cos(phi);
+		const double sinPhi    = sin(phi);
 
-		double sin2Theta = 2.*sinTheta*cosTheta;
-		double sin2Psi   = 2.*sinPsi*cosPsi;
-		double sin2Phi   = 2.*sinPhi*cosPhi;
+		const double sin2Theta = 2.*sinTheta*cosTheta;
+		const double sin2Psi   = 2.*sinPsi*cosPsi;
+		const double sin2Phi   = 2.*sinPhi*cosPhi;
 
-		double norm = 9./32./TMath::Pi();
+		const double norm = global_frac;//9./32./TMath::Pi();
+		const double sinTheta_sinTheta=sinTheta*sinTheta;
+		const double sinPsi_sinPsi=sinPsi*sinPsi;
+
 		// This is the factor that drops out when you integrate over the angles
 		// Multiply by it here to get overall normalisation of 1.
 		// i.e., int(2*cospsi*cospsi*(1-(1-costh*costh)*cos(phi)*cos(phi)),cospsi=-1..1, costh=-1..1,phi=-Pi..Pi);
 		// same factor for f1, f2, f3. The remaining terms f4, f5, f6 give 0
 		// int(-(1-cospsi*cospsi)*2*sqrt(1-costh*costh)*costh*sin(phi),cospsi=-1..1, costh=-1..1,phi=-Pi..Pi);
-		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi ) * norm;
-		f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi ) * norm;
-		f3 =      sinPsi*sinPsi * sinTheta*sinTheta * norm;
-		f4 = -1.* sinPsi*sinPsi * sin2Theta * sinPhi * norm;
-		f5 = sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.) * norm;
-		f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.) * norm;
+		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta_sinTheta * cosPhi*cosPhi ) * norm;
+		f2 =      sinPsi_sinPsi * ( 1. - sinTheta_sinTheta * sinPhi*sinPhi ) * norm;
+		f3 =      sinPsi_sinPsi * sinTheta_sinTheta * norm;
+		f4 = -1.* sinPsi_sinPsi * sin2Theta * sinPhi * norm;
+		f5 = sin2Psi * sinTheta_sinTheta * sin2Phi*_over_sqrt_2 * norm;
+		f6 = sin2Psi * sin2Theta * cosPhi*_over_sqrt_2 * norm;
 		return;
 	}
 
@@ -379,33 +401,36 @@ namespace Mathematics
                         , double & f8
                         , double & f9
                         , double & f10
-                        , double cosTheta
-                        , double phi
-                        , double cosPsi)
+                        , const double cosTheta
+                        , const double phi
+                        , const double cosPsi)
         {
-                double sinTheta  = sqrt(1. - cosTheta*cosTheta);
-                double sinPsi    = sqrt(1. - cosPsi*cosPsi);
+                const double sinTheta  = sqrt(1. - cosTheta*cosTheta);
+                const double sinPsi    = sqrt(1. - cosPsi*cosPsi);
 
-                double cosPhi    = cos(phi);
-                double sinPhi    = sin(phi);
+                const double cosPhi    = cos(phi);
+                const double sinPhi    = sin(phi);
 
-                double sin2Theta = 2.*sinTheta*cosTheta;
-                double sin2Psi   = 2.*sinPsi*cosPsi;
-                double sin2Phi   = 2.*sinPhi*cosPhi;
+                const double sin2Theta = 2.*sinTheta*cosTheta;
+                const double sin2Psi   = 2.*sinPsi*cosPsi;
+                const double sin2Phi   = 2.*sinPhi*cosPhi;
 
-		double norm = 9./32./TMath::Pi();
+		const double norm = global_frac;//9./32./TMath::Pi();
+		const double sinTheta_sinTheta=sinTheta*sinTheta;
+		const double sinPsi_sinPsi=sinPsi*sinPsi;
+		const double cosPhi_cosPhi=cosPhi*cosPhi;
 
-		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta*sinTheta * cosPhi*cosPhi ) * norm;
-                f2 =      sinPsi*sinPsi * ( 1. - sinTheta*sinTheta * sinPhi*sinPhi ) * norm;
-                f3 =      sinPsi*sinPsi * sinTheta*sinTheta * norm;
-                f4 = -1.* sinPsi*sinPsi * sin2Theta * sinPhi * norm;
-                f5 = sin2Psi * sinTheta*sinTheta * sin2Phi/sqrt(2.) * norm;
-                f6 = sin2Psi * sin2Theta * cosPhi/sqrt(2.) * norm;
+		f1 =  2.* cosPsi*cosPsi * ( 1. - sinTheta_sinTheta * cosPhi_cosPhi ) * norm;
+                f2 =      sinPsi_sinPsi * ( 1. - sinTheta_sinTheta * sinPhi*sinPhi ) * norm;
+                f3 =      sinPsi_sinPsi * sinTheta_sinTheta * norm;
+                f4 = -1.* sinPsi_sinPsi * sin2Theta * sinPhi * norm;
+                f5 = sin2Psi * sinTheta_sinTheta * sin2Phi*_over_sqrt_2 * norm;
+                f6 = sin2Psi * sin2Theta * cosPhi*_over_sqrt_2 * norm;
 		// Need to make sure that we deal with the normalisation of the following terms properly in the code that uses them
-        	f7 =  (2./3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * norm ;			//Check: norm = (9./64./TMath::Pi())
-        	f8 =  (1./3.) * sqrt(6.) * sinTheta*sinTheta * sin2Phi * sinPsi * norm;        		//Check: norm = 0
-        	f9 = -(1./3.) * sqrt(6.) * sin2Theta * cosPhi * sinPsi * norm;         			//Check: norm = 0
-        	f10= -(4./3.) * sqrt(3.) * (1. - sinTheta*sinTheta * cosPhi*cosPhi) * cosPsi * norm;   	//Check: norm = 0
+        	f7 =  2*third * (1. - sinTheta_sinTheta * cosPhi_cosPhi) * norm ;			//Check: norm = (9./64./TMath::Pi())
+        	f8 =  third * root_6 * sinTheta_sinTheta * sin2Phi * sinPsi * norm;        		//Check: norm = 0
+        	f9 = -third * root_6 * sin2Theta * cosPhi * sinPsi * norm;         			//Check: norm = 0
+        	f10= -(1+third) * root_3 * (1. - sinTheta_sinTheta * cosPhi_cosPhi) * cosPsi * norm;   	//Check: norm = 0
                 return;
         }
 
