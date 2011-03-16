@@ -138,8 +138,8 @@ TARGET_LINK_LIBRARIES( fitting fits pdfs ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES}
 ADD_EXECUTABLE( rapidfit_fcscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_fcscanresults.cc )
 TARGET_LINK_LIBRARIES( rapidfit_fcscanresults ${ROOT_LIBRARIES} )
 
-#ADD_EXECUTABLE( rapidfit_fcscanresults_2 ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_fcscanresults_2.cc )
-#TARGET_LINK_LIBRARIES( rapidfit_fcscanresults_2 ${ROOT_LIBRARIES} )
+ADD_EXECUTABLE( rapidfit_fcscanresults_2 ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_fcscanresults_2.cc )
+TARGET_LINK_LIBRARIES( rapidfit_fcscanresults_2 ${ROOT_LIBRARIES} )
 
 ADD_EXECUTABLE( rapidfit_toyresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_toyresults.cc )
 TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )

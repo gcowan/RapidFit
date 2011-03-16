@@ -257,6 +257,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 			}
 		}
 
+		ResultFormatter::ReviewOutput( scanStepResult );
 
 		output_interface->AddFitResult( scanStepResult );
 	}
