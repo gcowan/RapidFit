@@ -15,12 +15,12 @@
 //Constructor
 Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal() :
 	// Physics parameters
-	  f_sig_m1Name	( "f_sig_m1" )
-	, sigma_m1Name	( "sigma_m1" )
-	, sigma_m2Name	( "sigma_m2" )
-	, m_BsName	( "m_Bs" )
+	  f_sig_m1Name	( make_pair("f_sig_m1",-1) )
+	, sigma_m1Name	( make_pair("sigma_m1",-1) )
+	, sigma_m2Name	( make_pair("sigma_m2",-1) )
+	, m_BsName	( make_pair("m_Bs",-1) )
 	// Observables
-	, recoMassName	( "mass")
+	, recoMassName	( make_pair("mass",-1) )
 {
 	MakePrototypes();
 }
@@ -29,14 +29,14 @@ Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal() :
 void Bs2JpsiPhiMassSignal::MakePrototypes()
 {
 	// Observables
-	allObservables.push_back( recoMassName );
+	allObservables.push_back( recoMassName.first );
 
         //Make the parameter set
         vector<string> parameterNames;
-        parameterNames.push_back( f_sig_m1Name );
-        parameterNames.push_back( sigma_m1Name );
-        parameterNames.push_back( sigma_m2Name );
-        parameterNames.push_back( m_BsName );
+        parameterNames.push_back( f_sig_m1Name.first );
+        parameterNames.push_back( sigma_m1Name.first );
+        parameterNames.push_back( sigma_m2Name.first );
+        parameterNames.push_back( m_BsName.first );
         allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -52,13 +52,13 @@ Bs2JpsiPhiMassSignal::~Bs2JpsiPhiMassSignal()
 double Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
 {
 	// Get the physics parameters
-  	double f_sig_m1  = allParameters.GetPhysicsParameter( f_sig_m1Name )->GetValue();
-  	double sigma_m1 = allParameters.GetPhysicsParameter( sigma_m1Name )->GetValue();
-  	double sigma_m2 = allParameters.GetPhysicsParameter( sigma_m2Name )->GetValue();
-  	double m_Bs = allParameters.GetPhysicsParameter( m_BsName )->GetValue();
+  	double f_sig_m1  = allParameters.GetPhysicsParameter( &f_sig_m1Name )->GetValue();
+  	double sigma_m1 = allParameters.GetPhysicsParameter( &sigma_m1Name )->GetValue();
+  	double sigma_m2 = allParameters.GetPhysicsParameter( &sigma_m2Name )->GetValue();
+  	double m_Bs = allParameters.GetPhysicsParameter( &m_BsName )->GetValue();
 
 	// Get the observable
-        double mass = measurement->GetObservable( recoMassName )->GetValue();
+        double mass = measurement->GetObservable( &recoMassName )->GetValue();
 
 	double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi()));
 	double factor2 = 1./(sigma_m2*sqrt(2.*TMath::Pi()));

@@ -43,6 +43,7 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		DataPoint * currentPoint;
 		vector<string> doIntegrate, dontIntegrate;
 		vector<double> minima, ranges;
+		vector<int> cache_positions;
 };
 
 #endif

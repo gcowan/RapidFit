@@ -42,7 +42,24 @@ vector<string> DataPoint::GetAllNames()
 	return allNames;
 }
 
+//Retrieve an observable it's cached index, or find it and save it's index for reference
+Observable * DataPoint::GetObservable( pair<string,int>* wanted_param )
+{
+	if( wanted_param->second != -1 )
+	{
+		return &allObservables[wanted_param->second];
+	} else {
+		wanted_param->second = StringProcessing::VectorContains( &allNames, &(wanted_param->first) );
+	}
+	if( wanted_param->second == -1 ){
+		cerr << "Observable name " << wanted_param->first << " not found" <<endl;
+	}else{
+		return &allObservables[wanted_param->second];}
+	exit(-1);
+}
+
 //Retrieve an observable by its name
+//	!!!THIS IS VERY, VERY, VERY WASTEFUL FOR LARGE DATASETS!!!
 Observable * DataPoint::GetObservable(string Name)
 {
 	//Check if the name is stored in the map

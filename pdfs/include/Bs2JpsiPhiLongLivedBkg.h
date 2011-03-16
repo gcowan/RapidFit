@@ -29,14 +29,15 @@ class Bs2JpsiPhiLongLivedBkg : public BasePDF
 		void MakePrototypes();
 
 		// Physics parameters
-		string tau1Name;		// decay constant 1
-		string tau2Name;		// decay constant 2
-		string f_LL1Name;		// fraction
+		pair<string,int> tau1Name;		// decay constant 1
+		pair<string,int> tau2Name;		// decay constant 2
+		pair<string,int> f_LL1Name;		// fraction
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF. 
-		string timeName;	// proper time
+		pair<string,int> timeName;	// proper time
+		pair<string,int> constraint_timeName;
 };
 
 #endif

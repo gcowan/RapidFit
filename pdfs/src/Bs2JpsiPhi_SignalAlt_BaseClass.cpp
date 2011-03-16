@@ -18,41 +18,41 @@
 
 Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() : 
 	// Physics parameters
-	  gammaName     ( "gamma" )
-	, deltaGammaName( "deltaGamma" )
-	, deltaMName    ( "deltaM")
-	, Phi_sName     ( "Phi_s")
-	, Azero_sqName  ( "Azero_sq" )
-	, Aperp_sqName  ( "Aperp_sq" )
-	, As_sqName	( "As_sq" )
-	, delta_zeroName( "delta_zero" )
-	, delta_paraName( "delta_para" )
-	, delta_perpName( "delta_perp" )
-	, delta_sName( "delta_s" )
+	  gammaName     ( make_pair("gamma",-1) )
+	, deltaGammaName( make_pair("deltaGamma",-1) )
+	, deltaMName    ( make_pair("deltaM",-1))
+	, Phi_sName     ( make_pair("Phi_s",-1))
+	, Azero_sqName  ( make_pair("Azero_sq",-1) )
+	, Aperp_sqName  ( make_pair("Aperp_sq",-1) )
+	, As_sqName	( make_pair("As_sq",-1) )
+	, delta_zeroName( make_pair("delta_zero",-1) )
+	, delta_paraName( make_pair("delta_para",-1) )
+	, delta_perpName( make_pair("delta_perp",-1) )
+	, delta_sName( make_pair("delta_s",-1) )
 	// Detector parameters
-	, mistagName	( "mistag" )
-	, res1Name	( "timeResolution1" )
-	, res2Name	( "timeResolution2" )
-	, res1FractionName	( "timeResolution1Fraction" )
-	, timeOffsetName	( "timeOffset" )
+	, mistagName	( make_pair("mistag",-1) )
+	, res1Name	( make_pair("timeResolution1",-1) )
+	, res2Name	( make_pair("timeResolution2",-1) )
+	, res1FractionName	( make_pair("timeResolution1Fraction",-1) )
+	, timeOffsetName	( make_pair("timeOffset",-1) )
 	// Angular acceptance factors
-	, angAccI1Name ( "angAccI1" )
-	, angAccI2Name ( "angAccI2" )
-	, angAccI3Name ( "angAccI3" )
-	, angAccI4Name ( "angAccI4" )
-	, angAccI5Name ( "angAccI5" )
-	, angAccI6Name ( "angAccI6" )
-	, angAccI7Name ( "angAccI7" )
-	, angAccI8Name ( "angAccI8" )
-	, angAccI9Name ( "angAccI9" )
-	, angAccI10Name ( "angAccI10" )
+	, angAccI1Name ( make_pair("angAccI1",-1) )
+	, angAccI2Name ( make_pair("angAccI2",-1) )
+	, angAccI3Name ( make_pair("angAccI3",-1) )
+	, angAccI4Name ( make_pair("angAccI4",-1) )
+	, angAccI5Name ( make_pair("angAccI5",-1) )
+	, angAccI6Name ( make_pair("angAccI6",-1) )
+	, angAccI7Name ( make_pair("angAccI7",-1) )
+	, angAccI8Name ( make_pair("angAccI8",-1) )
+	, angAccI9Name ( make_pair("angAccI9",-1) )
+	, angAccI10Name ( make_pair("angAccI10",-1) )
 	// Observables
-	, timeName	    ( "time" )
-	, cosThetaName	( "cosTheta" )
-	, phiName	    ( "phi" )
-	, cosPsiName	( "cosPsi" )
-	, tagName	    ( "tag" )
-	, timeAcceptanceCategoryName ( "timeAcceptanceCategory" )
+	, timeName	    ( make_pair("time",-1) )
+	, cosThetaName	( make_pair("cosTheta",-1) )
+	, phiName	    ( make_pair("phi",-1) )
+	, cosPsiName	( make_pair("cosPsi",-1) )
+	, tagName	    ( make_pair("tag",-1) )
+	, timeAcceptanceCategoryName ( make_pair("timeAcceptanceCategory",-1) )
 	// Other things
 {
 	if( ! USE_LOWER_TIME_ACCEPTANCE ) {
@@ -95,7 +95,7 @@ void Bs2JpsiPhi_SignalAlt_BaseClass::preCalculateTimeFactors() const
 	else expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
 	expSin_stored = Mathematics::ExpSin( t, gamma(), delta_ms, resolution ) ;
 	expCos_stored = Mathematics::ExpCos( t, gamma(), delta_ms, resolution ) ;
-	return ;	
+	return ;
 }
 
 

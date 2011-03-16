@@ -76,11 +76,10 @@ namespace Mathematics
 	//evaluate a simple exponential with single gaussian time resolution
 	double Exp( const double t, const double gamma, const double resolution )
 	{
-
-		const double resolution_2_gamma=resolution*resolution*gamma;
-		const double t_gamma=t*gamma;
 		if(resolution > 0.) {
 
+			const double t_gamma=t*gamma;
+			const double resolution_2_gamma=resolution*resolution*gamma;
 			const double theExp = exp( -t_gamma + resolution_2_gamma*gamma *0.5 ) ;
 			const double theErfc = RooMath::erfc(  -( t - resolution_2_gamma ) *_over_sqrt_2 /resolution )  ;
 			return theExp * theErfc  *0.5 ;
@@ -92,7 +91,7 @@ namespace Mathematics
 		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
-			return exp( -t_gamma ) ;
+			return exp( -t*gamma ) ;
 		}
 
 	}
@@ -119,13 +118,13 @@ namespace Mathematics
 		}
 
 		const double invgamma=1./gamma;
-		const double exp_gamma_thigh=exp(-gamma*thigh);
 		if( resolution > 0. )
 		{
 			return expErfInt(thigh, invgamma, resolution) - expErfInt(tlow, invgamma, resolution);
 		}
 		else
 		{
+			const double exp_gamma_thigh=exp(-gamma*thigh);
 			if( tlow < 0. ) return invgamma * ( 1.0 - exp_gamma_thigh ) ;
 			else return invgamma * ( exp(-gamma*tlow) - exp_gamma_thigh ) ;
 		}
@@ -140,7 +139,7 @@ namespace Mathematics
 		{
 			// At present we dont know how to do this with resolution included
 			cout <<" Mathematics::Exp_betaAcceptance - with (1-bt) acceptance : This doesnt work when resolution .ne. 0 yet " << endl ;
-			exit(1) ;		
+			exit(1) ;
 		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
@@ -346,8 +345,7 @@ namespace Mathematics
 
 		double deltaM_tlow=deltaM*real_tlow;
 		double deltaM_thigh=deltaM*thigh;
-		return (
-				( exp(-gamma*real_tlow)* (gamma*sin(deltaM_tlow) + deltaM*cos(deltaM_tlow)))
+		return (	( exp(-gamma*real_tlow)* (gamma*sin(deltaM_tlow) + deltaM*cos(deltaM_tlow)))
 				-( exp(-gamma*thigh)* (gamma*sin(deltaM_thigh) + deltaM*cos(deltaM_thigh)))
 				)/(gamma*gamma + deltaM*deltaM);
 	}

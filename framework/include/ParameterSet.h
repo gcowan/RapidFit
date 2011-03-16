@@ -26,7 +26,8 @@ class ParameterSet
 		vector<string> GetAllNames();
 		vector<string> GetAllFloatNames();
 		vector<string> GetAllFixedNames();
-		PhysicsParameter * GetPhysicsParameter(string);
+		PhysicsParameter * GetPhysicsParameter( pair<string,int>* );
+		PhysicsParameter * GetPhysicsParameter( string );
 		bool SetPhysicsParameter( string, PhysicsParameter* );
 		bool SetPhysicsParameter( string, double, double, double, string, string );
 		bool SetPhysicsParameters( ParameterSet* );

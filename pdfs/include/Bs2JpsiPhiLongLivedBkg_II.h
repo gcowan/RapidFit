@@ -32,12 +32,12 @@ class Bs2JpsiPhiLongLivedBkg_II : public BasePDF
 		double buildPDFdenominator();		
 
 		// Physics parameters
-		string tauLL1Name;		// decay constant 1
-		string tauLL2Name;		// decay constant 2
-		string f_LL1Name;		// fraction
-		string sigmaLL1Name;		// time res sigma 1
-		string sigmaLL2Name;		// time res sigma 2
-		string timeResLL1FracName;
+		pair<string,int> tauLL1Name;		// decay constant 1
+		pair<string,int> tauLL2Name;		// decay constant 2
+		pair<string,int> f_LL1Name;		// fraction
+		pair<string,int> sigmaLL1Name;		// time res sigma 1
+		pair<string,int> sigmaLL2Name;		// time res sigma 2
+		pair<string,int> timeResLL1FracName;
 
 		double tauLL1;
 		double tauLL2;
@@ -52,7 +52,8 @@ class Bs2JpsiPhiLongLivedBkg_II : public BasePDF
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF. 
-		string timeName;	// proper time
+		pair<string,int> timeName;	// proper time
+		pair<string,int> constraint_timeName;	// proper time
 		double time;
 };
 

@@ -34,7 +34,7 @@ class Bs2JpsiPhi_SignalAlt_MO_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
-	
+
 		void MakePrototypes();
 
 		bool normalisationCacheValid ;
@@ -49,8 +49,8 @@ class Bs2JpsiPhi_SignalAlt_MO_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_
 		double diffXsecNorm2(  ) const ;
 	
 		// Additional parameters specific to this PDF
-		string mistagScaleName ;
-		string mistagOffsetName ;
+		pair<string,int> mistagScaleName ;
+		pair<string,int> mistagOffsetName ;
 		double mistagScale ;
 		double mistagOffset ;
 };

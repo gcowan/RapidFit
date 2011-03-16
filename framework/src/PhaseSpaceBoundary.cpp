@@ -44,6 +44,22 @@ vector<string> PhaseSpaceBoundary::GetAllNames()
 }
 
 //Retrieve a constraint by its name
+IConstraint * PhaseSpaceBoundary::GetConstraint( pair<string,int>* wanted_constraint )
+{
+	if( wanted_constraint->second != -1 )
+	{
+		return allConstraints[wanted_constraint->second];
+	} else {
+		wanted_constraint->second = StringProcessing::VectorContains( &allNames, &(wanted_constraint->first) );
+	}
+	if( wanted_constraint->second == -1 ){
+		cerr << "PhysicsParameter " << wanted_constraint->first << " not found" <<endl;
+	}else{
+		return allConstraints[wanted_constraint->second];}
+	exit(-1);
+}
+
+//Retrieve a constraint by its name
 IConstraint * PhaseSpaceBoundary::GetConstraint(string Name)
 {
 	//Check if the name is stored in the map

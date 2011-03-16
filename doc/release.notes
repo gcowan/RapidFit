@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/16 Rob Currie
+   - A new framework allows for the pdfs to chache information about the address of objects within MemoryDataSets.
+     Profiling revealed this to be an issue and the (very wasteful) sub-routine to find the address of objects was called in excess of 1E10 times during FC scans with only 2 datasets
+     This is not overly apparent when running on one machine with one fit but for something such as FC we need to be able to scale better
+          The result of optimisations so far stand between 30-40% speed improvements on single fits and due to the nature of the fit, teh effect of these improvements should scale strongly with total event number
+   - This requires some relativley cosmetic changes for a pdf to make use of this new framework, the old interfaces are still in place and work, however they aren't very efficient
+
 2011/03/15 Rob Currie
    - 'Optimised' a LOT of Mathematics to remove un-needed repeat calculations and similarly with the BaseClass pdf, this should improve fitting as these functions were called O(100k) during my profile run of RapidFit
    - Added Controlled output from scans to give some level of debugging ability

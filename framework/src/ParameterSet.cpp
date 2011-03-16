@@ -62,6 +62,22 @@ vector<string> ParameterSet::GetAllFloatNames()
 	return Not_Fixed_List;
 }
 
+//Retrieve a physics parameter it's cached index, or find it and save it's index for reference
+PhysicsParameter * ParameterSet::GetPhysicsParameter( pair<string,int>* wanted_param )
+{
+	if( wanted_param->second != -1 )
+	{
+		return &allParameters[wanted_param->second];
+	} else {
+		wanted_param->second = StringProcessing::VectorContains( &allNames, &(wanted_param->first) );
+	}
+	if( wanted_param->second == -1 ){
+		cerr << "PhysicsParameter " << wanted_param->first << " not found" <<endl;
+	}else{
+		return &allParameters[wanted_param->second];}
+	exit(-1);
+}
+
 
 //Retrieve a physics parameter by its name
 PhysicsParameter * ParameterSet::GetPhysicsParameter(string Name)

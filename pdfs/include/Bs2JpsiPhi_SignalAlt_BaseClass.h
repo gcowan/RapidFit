@@ -200,46 +200,46 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 
 	protected:
 	
-		// These contain the strings that correspond to the physics parameter names.
-		string gammaName;		// gamma
-		string deltaGammaName;	// delta gamma
-		string deltaMName;		// delta mass
-		string Phi_sName;		// what we want to measure!
-		string Azero_sqName;	// amplitude
-		string Apara_sqName;	// amplitude
-		string Aperp_sqName;	// amplitude
-		string As_sqName;		// amplitude
-		string delta_zeroName;	// strong phase, set to 0
-		string delta_paraName;	// strong phase
-		string delta_perpName;	// strong phase
-		string delta_sName;		// strong phase for S-wave
+		// These contain the pair<string,int>s that correspond to the physics parameter names and references
+		pair<string,int> gammaName;		// gamma
+		pair<string,int> deltaGammaName;	// delta gamma
+		pair<string,int> deltaMName;		// delta mass
+		pair<string,int> Phi_sName;		// what we want to measure!
+		pair<string,int> Azero_sqName;	// amplitude
+		pair<string,int> Apara_sqName;	// amplitude
+		pair<string,int> Aperp_sqName;	// amplitude
+		pair<string,int> As_sqName;		// amplitude
+		pair<string,int> delta_zeroName;	// strong phase, set to 0
+		pair<string,int> delta_paraName;	// strong phase
+		pair<string,int> delta_perpName;	// strong phase
+		pair<string,int> delta_sName;		// strong phase for S-wave
 
 	    // These are detector parameters
-	    string mistagName;		// mistag fraction
-		string res1Name;		  // time resolution core
-		string res2Name;		  // time resolution tail
-		string res1FractionName;  // fraction of core
-		string timeOffsetName;    // time offset
+	    pair<string,int> mistagName;		// mistag fraction
+		pair<string,int> res1Name;		  // time resolution core
+		pair<string,int> res2Name;		  // time resolution tail
+		pair<string,int> res1FractionName;  // fraction of core
+		pair<string,int> timeOffsetName;    // time offset
 	
 	    // These are the angular accceptance factors. The first 6 are P-wave, the second 4 are S-wave
-	    string angAccI1Name ;  
-		string angAccI2Name ;
-		string angAccI3Name ;
-		string angAccI4Name ;
-		string angAccI5Name ;
-		string angAccI6Name ;
-		string angAccI7Name ;
-		string angAccI8Name ;
-		string angAccI9Name ;
-		string angAccI10Name ;
+	    pair<string,int> angAccI1Name ;  
+		pair<string,int> angAccI2Name ;
+		pair<string,int> angAccI3Name ;
+		pair<string,int> angAccI4Name ;
+		pair<string,int> angAccI5Name ;
+		pair<string,int> angAccI6Name ;
+		pair<string,int> angAccI7Name ;
+		pair<string,int> angAccI8Name ;
+		pair<string,int> angAccI9Name ;
+		pair<string,int> angAccI10Name ;
 	
-		// These contain the strings that correspond to the observable names
-		string timeName;		// proper time
-		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		string phiName;			// azimuthal angle of the mu+ in Jpsi frame
-		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-		string tagName;			// B tag
-		string timeAcceptanceCategoryName ;  //Originally included for using unbiased and biased events.
+		// These contain the pair<string,int>s that correspond to the observable names
+		pair<string,int> timeName;		// proper time
+		pair<string,int> cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		pair<string,int> phiName;			// azimuthal angle of the mu+ in Jpsi frame
+		pair<string,int> cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		pair<string,int> tagName;			// B tag
+		pair<string,int> timeAcceptanceCategoryName ;  //Originally included for using unbiased and biased events.
 
 		// Measured Event Observables
 		double t ;

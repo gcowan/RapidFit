@@ -25,7 +25,8 @@ class DataPoint
 		~DataPoint();
 
 		vector<string> GetAllNames();
-		Observable * GetObservable(string);
+		Observable * GetObservable( pair<string,int>* );	//  Return wanted parameter & cache lookup ref
+		Observable * GetObservable( string );
 		bool SetObservable( string, Observable* );
 		bool SetObservable( string, double, double, string, bool=false, int=-1);
 
