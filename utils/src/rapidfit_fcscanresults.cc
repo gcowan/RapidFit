@@ -149,6 +149,8 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 			}else{
 				gc->SetLineColor(i+2);
 			}
+
+			gc->SetLineWidth(2);
 			gc->Draw("L");
 		}
 		leg->AddEntry(gc,confname, "L");
@@ -271,6 +273,7 @@ int main(int argc, char *argv[]){
 	}
 
 	TFile * output = new TFile(outputdir+"/llscanresults.root","RECREATE");
+	output->cd();
 
 	Long64_t entries = allresults->GetEntries();
 	cout << "INPUT NTUPLE CONTAINS: " << entries << " ENTRIES" << endl;
@@ -325,7 +328,7 @@ int main(int argc, char *argv[]){
 	datafixed->SetBranchAddress(param1valstr,&param1val);
 	datafixed->SetBranchAddress(param2valstr,&param2val);
 	datafixed->SetBranchAddress(NLLstr,&nll);
-	for(Long64_t i = 1; i < datafixed->GetEntries(); i++){
+	for(Long64_t i = 0; i < datafixed->GetEntries(); i++){
 		datafixed->GetEntry(i);
 		// We've found a new gridpoint
 		// But is it unique?

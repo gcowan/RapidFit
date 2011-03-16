@@ -125,7 +125,7 @@ TPaveText* addLHCbLabel(TString footer){
 	TPaveText * label = new TPaveText(0.14, 0.73, 0.14, 0.88,"BRNDC");
 	//TPaveText * label = new TPaveText(0.12, 0.58, 0.12, 0.43,"BRNDC");
 	label->SetFillStyle(0);		//Transparent i.e. Opacity of 0 :D
-//	label->SetFillColor(0);
+	//	label->SetFillColor(0);
 	label->SetBorderSize(0);
 	label->SetTextAlign(11);
 	label->SetTextSize(Float_t(0.04));
@@ -237,15 +237,15 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 		contLevel = (TList*)llcontObjArr->At(i);
 		for(int j =0; j<contLevel->GetSize(); ++j){
 			curv = (TGraph*)contLevel->At(j);
-				TGraph *gc = (TGraph*)curv->Clone();
-				gc->SetLineStyle(Style_t(i+1));
-				gcarr.push_back(gc);
+			TGraph *gc = (TGraph*)curv->Clone();
+			gc->SetLineStyle(Style_t(i+1));
+			gcarr.push_back(gc);
 
-		if(j==0){leg->AddEntry(gc,confname, "L");}
+			if(j==0){leg->AddEntry(gc,confname, "L");}
 		}
 
 	}
-	
+
 	histfc->SetContour(nconts,fcconts);
 	histfc->Draw("cont LIST");
 	confCanvas->Update();
@@ -260,15 +260,15 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 		contLevel = (TList*)fccontObjArr->At(i);
 		for(int j =0; j<contLevel->GetSize(); ++j){
 			curv = (TGraph*)contLevel->At(j);
-				TGraph *gc = (TGraph*)curv->Clone();
-				gc->SetLineColor(Color_t(i+2));
-				gcarr.push_back(gc);
-		if(j==0){leg->AddEntry(gc,confname, "L");}
+			TGraph *gc = (TGraph*)curv->Clone();
+			gc->SetLineColor(Color_t(i+2));
+			gcarr.push_back(gc);
+			if(j==0){leg->AddEntry(gc,confname, "L");}
 		}
 	}
 	histll->Draw("AXIS");
 	for(UInt_t i =0; i<gcarr.size(); ++i){
-	gcarr[i]->Draw("L SAME");
+		gcarr[i]->Draw("L SAME");
 	}
 	addLHCbLabel(labelname)->Draw();
 	leg->Draw();
@@ -391,7 +391,7 @@ int main(int argc, char *argv[]){
 
 	// Find the positions of the gridpoints we scanned, and find the profileLL at each point for data:
 	TString datafixedstr = param1genstr + "==" + notgen + "&&" + param2genstr + "==" + notgen + "&&"+ param1errstr + "==0.0&&" +param2errstr +"==0.0&&" + FRstr + "==3.0";
-//	TTree* datafixed = allresults->CopyTree(datafixedstr);
+	//	TTree* datafixed = allresults->CopyTree(datafixedstr);
 
 
 	//	40 x 40 x 200toys translates into 320000 seperate read statements...
@@ -404,9 +404,9 @@ int main(int argc, char *argv[]){
 	Double_t* param1val_pointer = allresults->GetV1();	//	array of size	datafixed->GetEntries() **
 	Double_t* param2val_pointer = allresults->GetV2();	//	array of size	datafixed->GetEntries()
 	Double_t* nllval_pointer    = allresults->GetV3();	//	array of size	datafixed->GetEntries()
-//	param1gridpoints.reserve( numberOfEventsAfterCut );
-//	param2gridpoints.reserve( numberOfEventsAfterCut );
-//	dataRatiogridpoints.reserve( numberOfEventsAfterCut );
+	//	param1gridpoints.reserve( numberOfEventsAfterCut );
+	//	param2gridpoints.reserve( numberOfEventsAfterCut );
+	//	dataRatiogridpoints.reserve( numberOfEventsAfterCut );
 	//	Temp store all data in vectors
 	for( short int i=0; i<numberOfEventsAfterCut; ++i )
 	{
@@ -421,7 +421,7 @@ int main(int argc, char *argv[]){
 	vector<vector<double> > Floated_values;
 	//	Read in the CV of all floated parameters
 	vector<vector<double> > all_CV_values;
-//	all_CV_values.reserve( all_parameter_values.size() );
+	//	all_CV_values.reserve( all_parameter_values.size() );
 	if( plot_CV )
 	{
 		//  Hold the Data in a temp object
@@ -429,7 +429,7 @@ int main(int argc, char *argv[]){
 
 		for ( unsigned int obsIndex = 0; obsIndex < all_parameter_values.size(); obsIndex+=3 )
 		{
-//			data_array.reserve(3);
+			//			data_array.reserve(3);
 			vector<Double_t *> data_array;
 			//  Construct a Plot String to use the TTree->Draw Method
 			PlotString="(";
@@ -455,27 +455,27 @@ int main(int argc, char *argv[]){
 			TString Unique("");
 			Unique+=obsIndex;
 			temp_hist->SetName(Unique);
-//			temp_hist->SetTitle(Unique);
+			//			temp_hist->SetTitle(Unique);
 
 			bool flag1=true, flag2=true, flag3=true;
-			
 
-//			double X_min_range = temp_hist->GetXaxis()->GetXmin();
-//			double X_max_range = temp_hist->GetXaxis()->GetXmax();
-//			double Y_min_range = temp_hist->GetYaxis()->GetXmin();
-//			double Y_max_range = temp_hist->GetYaxis()->GetXmax();
-//			double Z_min_range = temp_hist->GetZaxis()->GetXmin();
-//			double Z_max_range = temp_hist->GetZaxis()->GetXmax();
-//			double bin_width_X = temp_hist->GetXaxis()->GetBinWidth(0);
-//			double bin_width_Y = temp_hist->GetYaxis()->GetBinWidth(0);
-//			double bin_width_Z = temp_hist->GetZaxis()->GetBinWidth(0);
-//			if( fabs(fabs((X_min_range + X_max_range) - X_max_range*2.)/X_max_range-2) > 1E-3 ) flag1=true;
-//			if( fabs(fabs((Y_min_range + Y_max_range) - Y_max_range*2.)/Y_max_range-2) > 1E-3 ) flag2=true;
-//			if( fabs(fabs((Z_min_range + Z_max_range) - Z_max_range*2.)/Z_max_range-2) > 1E-3 ) flag3=true;
-//			flag1=flag2=flag3=true;
-//			if( (num1==num1) && num1>1E-9 )	flag1=true;
-//			if( (num2==num2) && num2>1E-9 )	flag2=true;
-//			if( (num3==num3) && num3>1E-9 )	flag3=true;
+
+			//			double X_min_range = temp_hist->GetXaxis()->GetXmin();
+			//			double X_max_range = temp_hist->GetXaxis()->GetXmax();
+			//			double Y_min_range = temp_hist->GetYaxis()->GetXmin();
+			//			double Y_max_range = temp_hist->GetYaxis()->GetXmax();
+			//			double Z_min_range = temp_hist->GetZaxis()->GetXmin();
+			//			double Z_max_range = temp_hist->GetZaxis()->GetXmax();
+			//			double bin_width_X = temp_hist->GetXaxis()->GetBinWidth(0);
+			//			double bin_width_Y = temp_hist->GetYaxis()->GetBinWidth(0);
+			//			double bin_width_Z = temp_hist->GetZaxis()->GetBinWidth(0);
+			//			if( fabs(fabs((X_min_range + X_max_range) - X_max_range*2.)/X_max_range-2) > 1E-3 ) flag1=true;
+			//			if( fabs(fabs((Y_min_range + Y_max_range) - Y_max_range*2.)/Y_max_range-2) > 1E-3 ) flag2=true;
+			//			if( fabs(fabs((Z_min_range + Z_max_range) - Z_max_range*2.)/Z_max_range-2) > 1E-3 ) flag3=true;
+			//			flag1=flag2=flag3=true;
+			//			if( (num1==num1) && num1>1E-9 )	flag1=true;
+			//			if( (num2==num2) && num2>1E-9 )	flag2=true;
+			//			if( (num3==num3) && num3>1E-9 )	flag3=true;
 
 
 			if( flag1 ){	data_array.push_back( allresults->GetV1() ); ++numberOfFloatedPhysicsParams; Floated_Parameters.push_back(all_parameter_values[obsIndex]);}
@@ -562,10 +562,10 @@ int main(int argc, char *argv[]){
 	TString p1isatoy = "(abs("+param1genstr+"-"+notgen+")>"+shiftstr+")";
 	TString p2isatoy = "(abs("+param2genstr+"-"+notgen+")>"+shiftstr+")";
 	TString isatoy = p1isatoy + "&&" + p2isatoy;
-	
+
 	TString all_toys_cut = datafixedstr+"&&"+isatoy;
 
-//	TTree* toys = datafixed->CopyTree(isatoy);
+	//	TTree* toys = datafixed->CopyTree(isatoy);
 	int numberOfToyEventsAfterCut = int(allresults->Draw(Plot_Str,all_toys_cut,"goff"));//	Draw without plotting
 	cout << "FOUND " << numberOfToyEventsAfterCut << " TOYS" << endl;
 
@@ -640,8 +640,8 @@ int main(int argc, char *argv[]){
 				clgridpoints.push_back(-9999.0);
 			}
 
-//			delete floatedtoys;
-//			delete fixedtoys;
+			//			delete floatedtoys;
+			//			delete fixedtoys;
 		}
 	}
 	//delete toys;
@@ -657,7 +657,7 @@ int main(int argc, char *argv[]){
 	copy( dataRatiogridpoints.begin(), dataRatiogridpoints.end(),pllpoints);
 
 	int np = (int)sqrt((double)npoints);
-	
+
 	//We get the data profile likelihood free, so let's plot it: 
 	TGraph2D *pllgraph = new TGraph2D(npoints, p2points, p1points, pllpoints);
 	pllgraph->SetName("pllgraph");
@@ -671,7 +671,6 @@ int main(int argc, char *argv[]){
 	pllhist->GetYaxis()->SetTitle(param1string);
 	pllhist->Write();
 
-	vector<TH2D*> CV_Graphs;
 	if( plot_CV )
 	{
 		cout << "CONSTRUCTING CV PLOTS, NB For a large number of events, this is CPU intensive!\n"<<endl;
@@ -680,15 +679,25 @@ int main(int argc, char *argv[]){
 			cout << "Constructing CV Plot " << i+1 << " of " << Floated_Parameters.size() <<endl;
 			Double_t* CV_values = new Double_t [npoints];
 			copy( Floated_values[i].begin(), Floated_values[i].end(), CV_values );
+			cerr << "HERE1" << endl;
+			cerr << Floated_Parameters.size() << " " << Floated_values[i].size() << " " << npoints << endl;
 			TGraph2D* Local_Graph = new TGraph2D(npoints, p2points, p1points, CV_values);
+			cerr << "HERE2" << endl;
 			Local_Graph->SetName(Floated_Parameters[i]);
+			cerr << "HERE3" << endl;
 			Local_Graph->SetNpx(np);
+			cerr << "HERE4" << endl;
 			Local_Graph->SetNpy(np);
+			cerr << "HERE5" << endl;
 			TH2D* Local_Hist = Local_Graph->GetHistogram();
-//			Local_Hist->SetTitle(Floated_Parameters[i]);
+			cerr << "HERE6" << endl;
+			Local_Hist->SetTitle("");
+			cerr << "HERE7" << endl;
 			Local_Hist->GetXaxis()->SetTitle(param2string);
 			Local_Hist->GetYaxis()->SetTitle(param1string);
-			CV_Graphs.push_back(Local_Hist);
+			TCanvas *Local_Canvas = makeTempCanvas(Local_Hist,Floated_Parameters[i]);
+			Local_Canvas->Print(outputdir+"/"+param1string+"_"+param2string+"_"+Floated_Parameters[i]+".png");
+			Local_Canvas->Print(outputdir+"/"+param1string+"_"+param2string+"_"+Floated_Parameters[i]+".pdf");
 			cout << "Finished Constructing This CV Plot" <<endl;
 		}
 	}
@@ -697,7 +706,7 @@ int main(int argc, char *argv[]){
 	double pllconts[4] = {1.15,2.36,3.0,4.61};
 	double fcconts[4] = {0.68,0.9,0.95,0.99};
 	double confs[4] = {68.0,90.0,95.0,99.0};
-	
+
 	TMarker* global_minima = new TMarker( x_point, y_point, 20 );
 	global_minima->SetMarkerSize(1);
 	global_minima->SetMarkerColor(1);
@@ -709,16 +718,7 @@ int main(int argc, char *argv[]){
 	}
 	plltemp->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_temp.pdf");
 	plltemp->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_temp.png");
-	vector<TCanvas*> CV_temps;
-	if( plot_CV )
-	{
-		for( unsigned short int i=0; i<Floated_Parameters.size(); i++ )
-		{
-			TCanvas *Local_Canvas = makeTempCanvas(CV_Graphs[i],Floated_Parameters[i]);
-			Local_Canvas->Print(outputdir+"/"+param1string+"_"+param2string+"_"+Floated_Parameters[i]+".png");
-			CV_temps.push_back(Local_Canvas);
-		}
-	}
+
 	TCanvas *pllcont = makeContCanvas(pllhist,"Profile Likelihood");
 	if( plot_point )  {
 		global_minima->Draw("SAME");
@@ -789,7 +789,7 @@ int main(int argc, char *argv[]){
 		TCanvas *toytemp = makeTempCanvas(toyhist,"Toys per gridpoint");
 		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.pdf");
 		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.png");
-	
+
 
 		output->Write();
 		output->Close();

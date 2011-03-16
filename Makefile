@@ -20,7 +20,7 @@ AR           = ar cru
 
 ##Flags
 #CXXFLAGS     += -D_DEBUG
-CXXFLAGS     = -O3 -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+CXXFLAGS     = -O3 -ffast-math -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 
 SRCEXT   = cpp
 SRCDIR   = framework/src
@@ -89,7 +89,7 @@ cleanall:
 	$(RM) $(GARBAGE)
 
 $(EXEDIR)/rapidfit_toyresults: $(OBJDIR)/rapidfit_toyresults.o
-	$(CXX) -o $@ $< $(ROOTLIBS)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(ROOTLIBS)
 
 $(OBJDIR)/rapidfit_toyresults.o: $(UTILSSRC)/rapidfit_toyresults.cc
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
