@@ -739,8 +739,8 @@ int main( int argc, char * argv[] )
 						for(unsigned int ii=0; ii < _2DLLscanList.size(); ++ii )
 						{
 							//	STOP RELYING ON THIS OUTPUT, IT'S BADLY WRITTEN, AND IT WILL BE DISABLED SOONER RATHER THAN LATER
-					//		makeOutput->SetLLcontourFileName( LLcontourFileNamez[ii].Data() );
-					//		makeOutput->OutputLLcontourResult( contourResults ) ;
+						//	makeOutput->SetLLcontourFileName( LLcontourFileNamez[ii].Data() );
+						//	makeOutput->OutputLLcontourResult( contourResults ) ;
 
 							//	This output is A LOT safer as it intended to be fed to a sperate plotting program.
 							//	Formatting SHOULD be seperate to generation!

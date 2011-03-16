@@ -367,18 +367,19 @@ int main(int argc, char *argv[]){
 	TString notgen = "-9999.";
 	Float_t nll, nlldatabest, x_point, y_point, global_x,global_y;
 	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints, toysgridpoints;
-	allresults->SetBranchAddress(NLLstr,&nll);
-	allresults->SetBranchAddress(param2valstr,&global_x);
-	allresults->SetBranchAddress(param1valstr,&global_y);
+	TTree* first_entry = allresults->CopyTree("","",1,0);
+	first_entry->SetBranchAddress(NLLstr,&nll);
+	first_entry->SetBranchAddress(param2valstr,&global_x);
+	first_entry->SetBranchAddress(param1valstr,&global_y);
 	Float_t best_fit_temp_values[all_parameter_values.size()];
 	for( unsigned short int i=0; i < all_parameter_values.size(); ++i )
 	{
-		allresults->SetBranchAddress(all_parameter_values[i],&best_fit_temp_values[i]);
+		first_entry->SetBranchAddress(all_parameter_values[i],&best_fit_temp_values[i]);
 	}
 	// Find the global minimum from the first entry:
 
 	//	THIS SHOULD BE THE ONLY USE OF GetEntry it's slow and doesn't emply something 'intelligent'
-	allresults->GetEntry(0);
+	first_entry->GetEntry(0);
 	nlldatabest = nll;
 	Float_t best_fit_values[all_parameter_values.size()];
 	for( unsigned short int i=0; i < all_parameter_values.size(); ++i )
@@ -429,6 +430,11 @@ int main(int argc, char *argv[]){
 
 		for ( unsigned int obsIndex = 0; obsIndex < all_parameter_values.size(); obsIndex+=3 )
 		{
+			//	Un-comment the next 3 lines for Absolute Central Values in the plots
+			//best_fit_values[obsIndex] = 0.0;
+			//if((obsIndex+1)<=all_parameter_values.size())best_fit_values[obsIndex+1] = 0.0;
+			//if((obsIndex+2)<=all_parameter_values.size())best_fit_values[obsIndex+2] = 0.0;
+
 			//			data_array.reserve(3);
 			vector<Double_t *> data_array;
 			//  Construct a Plot String to use the TTree->Draw Method
@@ -448,8 +454,9 @@ int main(int argc, char *argv[]){
 			//  Draw 3 observables at a time in some large plot
 			//  use the 'goff' option to turn graphical output (and annoying text output from con/de-structors) off
 			//  (it doesn't matter what this looks like and we can throw it away from here :)
-			allresults->Draw( PlotString , datafixedstr, "goff" );
+			int num2 = allresults->Draw( PlotString , datafixedstr, "goff" );
 
+			cout << numberOfEventsAfterCut << "\t\t" << num2 <<endl;
 			//  Store pointers to the objects for ease of access
 			TH1* temp_hist = (TH1*)allresults->GetHistogram()->Clone();
 			TString Unique("");
@@ -488,25 +495,22 @@ int main(int argc, char *argv[]){
 			for(unsigned short int i=0; i < data_array.size(); ++i )
 			{
 				vector<double> temp_vector;
-				temp_vector.reserve( numberOfEventsAfterCut );
-				for(int j=0; j < numberOfEventsAfterCut; ++j )
+				temp_vector.reserve( num2 );
+				for(int j=0; j < num2; ++j )
 				{
 					temp_vector.push_back( Double_t(data_array[i][j]) );	//	ith array and jth event in
 				}
 				all_CV_values.push_back( temp_vector );
 			}
 		}
-		Floated_values.resize( numberOfFloatedPhysicsParams );
-		for( unsigned short int i=0; i<numberOfFloatedPhysicsParams; ++i )
-		{
-			Floated_values[i].resize( numberOfEventsAfterCut );
-		}
+//		Floated_values.resize( numberOfFloatedPhysicsParams );
 		cout << "Number of Additional Floated Physics Parameters: " << numberOfFloatedPhysicsParams <<endl;
 	}
 
 	list<pair<pair<double, double>, vector<double> > >  Coordinates_NLL_CV;
 	//Coordinates_NLL_CV.reserve(numberOfEventsAfterCut);		//	Doesn't apply to lists
 
+	cout << param1gridpoints.size() <<endl;
 	for(unsigned short int i = 0; i < param1gridpoints.size(); ++i)
 	{
 		//	Store the coordinate we are at
@@ -533,6 +537,8 @@ int main(int argc, char *argv[]){
 	cout << "FINDING UNIQUE COORDINATES ONLY" <<endl;
 	//	Using the STL syntax for finding unique objects in a list seems nicer
 	Coordinates_NLL_CV.unique( unique_xy_coord );
+	int numberOfUniqueEventsAfterCut = Coordinates_NLL_CV.size();
+	cout << "FOUND " << numberOfUniqueEventsAfterCut << " UNIQUE GRIDPOINTS" << endl;
 
 	//	Some cleanup so we can continue
 	while( !param1gridpoints.empty() )
@@ -544,18 +550,20 @@ int main(int argc, char *argv[]){
 
 	//	Store all values corresponding to unique data points in X and Y
 	list<pair<pair<double,double>,vector<double> > >::iterator coord_iter=Coordinates_NLL_CV.begin();
+	Floated_values.resize( all_CV_values.size() );
+	for( unsigned short int i=0; i<Floated_values.size(); ++i ){
+		Floated_values[i].resize( numberOfUniqueEventsAfterCut ); }
+
 	for( short int i=0; coord_iter != Coordinates_NLL_CV.end(); ++coord_iter, ++i )
 	{
 		param1gridpoints.push_back( float(coord_iter->first.first) );
 		param2gridpoints.push_back( float(coord_iter->first.second) );
 		dataRatiogridpoints.push_back( float(coord_iter->second[0] - nlldatabest) );
-		for( unsigned short int j=1; j<coord_iter->second.size(); ++j )
+		for( unsigned short int j=0; j<Floated_values.size(); ++j )
 		{
-			Floated_values[j-1][i] = coord_iter->second[j];
+			Floated_values[j][i] = coord_iter->second[j+1];
 		}
 	}
-
-	cout << "FOUND " << numberOfEventsAfterCut << " UNIQUE GRIDPOINTS" << endl;
 
 	bool hastoys = false;
 
@@ -677,11 +685,11 @@ int main(int argc, char *argv[]){
 		for( unsigned short int i=0; i<Floated_Parameters.size(); ++i )
 		{
 			cout << "Constructing CV Plot " << i+1 << " of " << Floated_Parameters.size() <<endl;
-			Double_t* CV_values = new Double_t [npoints];
+			Double_t* CV_values = new Double_t [Floated_values[i].size()];
 			copy( Floated_values[i].begin(), Floated_values[i].end(), CV_values );
 			cerr << "HERE1" << endl;
 			cerr << Floated_Parameters.size() << " " << Floated_values[i].size() << " " << npoints << endl;
-			TGraph2D* Local_Graph = new TGraph2D(npoints, p2points, p1points, CV_values);
+			TGraph2D* Local_Graph = new TGraph2D(Floated_values[i].size(), p2points, p1points, CV_values);
 			cerr << "HERE2" << endl;
 			Local_Graph->SetName(Floated_Parameters[i]);
 			cerr << "HERE3" << endl;
