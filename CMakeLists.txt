@@ -132,8 +132,8 @@ TARGET_LINK_LIBRARIES( fitting fits pdfs ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES}
 #ADD_EXECUTABLE( rapidresults ${PROJECT_SOURCE_DIR}/utils/src/rapidresults.cc )
 #TARGET_LINK_LIBRARIES( rapidresults ${ROOT_LIBRARIES} )
 
-#ADD_EXECUTABLE( rapidfit_llscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_llscanresults.cc )
-#TARGET_LINK_LIBRARIES( rapidfit_llscanresults ${ROOT_LIBRARIES} )
+ADD_EXECUTABLE( rapidfit_llscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_llscanresults.cc )
+TARGET_LINK_LIBRARIES( rapidfit_llscanresults ${ROOT_LIBRARIES} )
 
 ADD_EXECUTABLE( rapidfit_fcscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_fcscanresults.cc )
 TARGET_LINK_LIBRARIES( rapidfit_fcscanresults ${ROOT_LIBRARIES} )
@@ -147,9 +147,11 @@ TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter-static.C )
 TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 
-#ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
-#TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
+ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
+TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
 
+ADD_EXECUTABLE( plot_try ${PROJECT_SOURCE_DIR}/utils/src/plot_try.C )
+TARGET_LINK_LIBRARIES( plot_try ${ROOT_LIBRARIES} )
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone
 

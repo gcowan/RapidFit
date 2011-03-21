@@ -20,7 +20,7 @@ AR           = ar cru
 
 ##Flags
 #CXXFLAGS     += -D_DEBUG
-CXXFLAGS     = -O3 -ffast-math -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+CXXFLAGS     = -O3 -ffast-math -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 
 SRCEXT   = cpp
 SRCDIR   = framework/src
@@ -87,6 +87,13 @@ clean   :
 
 cleanall:
 	$(RM) $(GARBAGE)
+
+rapidfit_dict.cpp: $(SRCDIR)/RapidRun.h
+	@echo "Making the rootdict"
+	@$(ROOTSYS)/bin/rootcint -f rapidfit_dict.cpp -c $(SRCDIR)/RapidRun.h
+
+RapidFitLib.so: $(OBJS) $(PDFOBJS) rapidfit_dict.o
+	$(CXX)  -o RapidFitLib.so -shared $(OBJS) $(PDFOBJS) rapidfit_dict.o $(LINKFLAGS) $(LIBS)
 
 $(EXEDIR)/rapidfit_toyresults: $(OBJDIR)/rapidfit_toyresults.o
 	$(CXX) -o $@ $< $(CXXFLAGS) $(ROOTLIBS)

@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/27 Rob Currie
+   - Added Simplex to Minimisation Stratagy
+   - Added small amount of code relating to building RapidFit for use in CINT
+
 2011/03/16 Rob Currie
    - A new framework allows for the pdfs to chache information about the address of objects within MemoryDataSets.
      Profiling revealed this to be an issue and the (very wasteful) sub-routine to find the address of objects was called in excess of 1E10 times during FC scans with only 2 datasets

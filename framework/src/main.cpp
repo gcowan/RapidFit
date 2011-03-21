@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef __CINT__
 //  RapidFit Headers
 #include "Mathematics.h"
 #include "FitAssembler.h"
@@ -38,7 +39,15 @@
 
 using namespace std;
 
+int RapidFit( int argc, char * argv[] );
+
 int main( int argc, char * argv[] )
+{
+	return RapidFit( argc, argv );
+}
+#endif
+
+int RapidFit( int argc, char * argv[] )
 {
 
 	//TProof * proof = TProof::Open( "" ); // idea of using PROOF for paralellisation

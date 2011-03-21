@@ -15,9 +15,9 @@
 #include "FunctionContour.h"
 #include <ctime>
 
-const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.01;//0.001;
-const double STEP_SIZE = 0.01;
+const double MAXIMUM_MINIMISATION_STEPS = 10000000.0;//800.0;
+const double FINAL_GRADIENT_TOLERANCE = 0.0001;//0.001;
+const double STEP_SIZE = 0.001;
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
@@ -98,16 +98,28 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	arguments[0] = NewFunction->UpErrorValue(1);
 	minuit->mnexcm("SET ERR", arguments, 1, errorFlag);
 
-	
+	arguments[0] = 1;
+	minuit->mnexcm("SET STR", arguments, 1, errorFlag);
+
+	arguments[0] = 10000000;
+	arguments[1] = 0.0001;
+	minuit->mnexcm("SIMplex",arguments, 1, errorFlag);
+	//minuit->mnsimp();
+
+	arguments[0] = 10000000;
+	minuit->mnexcm("IMProve", arguments, 1, errorFlag);
+
 	arguments[0] = MAXIMUM_MINIMISATION_STEPS;
 	arguments[1] = FINAL_GRADIENT_TOLERANCE;
-        
+
 	//Now call HESSE to get a rough starting estimate for the error matrix
         //minuit->mnexcm("HESSE", arguments, 1, errorFlag);
-	
+
 	//Do the minimisation
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
 
+	arguments[0] = 10000000;
+	minuit->mnexcm("IMProve", arguments, 1, errorFlag);
 	//Now call HESSE to properly calculate the error matrix
 	minuit->mnexcm("HESSE", arguments, 1, errorFlag);
 
