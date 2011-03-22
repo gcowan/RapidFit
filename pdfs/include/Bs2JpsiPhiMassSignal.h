@@ -10,7 +10,12 @@
 #ifndef Bs2JpsiPhiMassSignal_H
 #define Bs2JpsiPhiMassSignal_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
 
 class Bs2JpsiPhiMassSignal : public BasePDF
 {

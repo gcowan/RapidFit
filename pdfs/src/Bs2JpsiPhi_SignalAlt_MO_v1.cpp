@@ -15,6 +15,7 @@
 #include "Mathematics.h"
 
 #define DEBUGFLAG true
+#define ETABAR 0.339
 
 //......................................
 //Constructor
@@ -178,12 +179,16 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate(DataPoint * measurement)
 	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();
 	tag = (int)measurement->GetObservable( &tagName )->GetValue();
-	
-	//tagFraction = measurement->GetObservable( &mistagName )->GetValue();
-	tagFraction = mistagOffset + mistagScale*measurement->GetObservable( &mistagName )->GetValue();
-	if( tagFraction < 0 )   cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate() : tagFraction < 0 so set to 0 " << endl ;
-	if( tagFraction > 0.5 ) cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate() : tagFraction > 0.5 so set to 0.5 " << endl ;
-	
+	tagFraction = measurement->GetObservable( &mistagName )->GetValue();
+	if( tagFraction < 0 ) {  cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate() : tagFraction < 0 so set to 0 " << endl ; tagFraction = 0 ; }
+	if( tagFraction > 0.5 ) { cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate() : tagFraction > 0.5 so set to 0.5 " << endl ; tagFraction = 0.5 ; }
+
+        if( (fabs(tag-0)<DOUBLE_TOLERANCE) && (fabs(tagFraction- 0.5)<DOUBLE_TOLERANCE) ) {
+                tagFraction = mistagOffset + mistagScale * ( tagFraction - ETABAR ) ;
+                if( tagFraction < 0 )   {  tagFraction = 0 ; }
+                if( tagFraction > 0.5 ) {  tagFraction = 0.5 ; }
+        }
+
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
 	
 	double val1, val2 ;
@@ -246,11 +251,19 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
 	ctheta_tr = measurement->GetObservable( &cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();	
+        tag = (int)measurement->GetObservable( &tagName )->GetValue();
+        tagFraction = measurement->GetObservable( &mistagName )->GetValue() ;
 
 	//tagFraction = measurement->GetObservable( mistagName )->GetValue();
-	tagFraction = mistagOffset + mistagScale*measurement->GetObservable( &mistagName )->GetValue();
-	if( tagFraction < 0 )   cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Normalise() : tagFraction < 0 so set to 0 " << endl ;
-	if( tagFraction > 0.5 ) cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Normalise() : tagFraction > 0.5 so set to 0.5 " << endl ;
+	//tagFraction = mistagOffset + mistagScale*measurement->GetObservable( &mistagName )->GetValue();
+	if( tagFraction < 0 ) {  cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Normalise() : tagFraction < 0 so set to 0 " << endl ; tagFraction = 0 ; }
+	if( tagFraction > 0.5 ) { cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Normalise() : tagFraction > 0.5 so set to 0.5 " << endl ; tagFraction = 0.5 ; }
+
+        if( (fabs(tag-0)<DOUBLE_TOLERANCE) && (fabs(tagFraction-0.5)<DOUBLE_TOLERANCE) ) {
+                tagFraction = mistagOffset + mistagScale * (tagFraction - ETABAR) ;
+                if( tagFraction < 0 )   {  tagFraction = 0 ; }
+                if( tagFraction > 0.5 ) {  tagFraction = 0.5 ; }
+        }
 
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
 	
@@ -264,10 +277,10 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
 		tlo = timeBound->GetMinimum();
 		thi = timeBound->GetMaximum();
 	}
-	
+/*
 	// Recalculate cached values if Physics parameters have changed
 	// Must do this for each of the two resolutions.
-	if( true /*! normalisationCacheValid*/ )  {
+	if( true *! normalisationCacheValid* )  {
 		for( tag = -1; tag <= 1; ++tag ) {
 			if(resolution1Fraction >= 0.9999 ){
 				resolution =  resolution1 ;
@@ -281,19 +294,27 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
 			}
 		}
 		normalisationCacheValid = true ;
-	}	
+	}
+*/
 	
 	// calculate return value according to tag 
 
-	tag = (int)measurement->GetObservable( &tagName )->GetValue();
+	//tag = (int)measurement->GetObservable( &tagName )->GetValue();
 	double returnValue  ;
 	if(resolution1Fraction >= 0.9999 )
 	{
-		returnValue = normalisationCacheValueRes1[tag+1] ;
+		resolution =  resolution1 ;
+		returnValue = this->diffXsecCompositeNorm1( );
+		//returnValue = normalisationCacheValueRes1[tag+1] ;
 	}
 	else
 	{
-		returnValue = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
+		resolution =  resolution1 ;
+                double val1 = this->diffXsecCompositeNorm1( );
+                resolution =  resolution2 ;
+                double val2 = this->diffXsecCompositeNorm1( );
+                returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;
+		//returnValue = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
 	}
 	
 	if( (returnValue <= 0.) || isnan(returnValue) ) {

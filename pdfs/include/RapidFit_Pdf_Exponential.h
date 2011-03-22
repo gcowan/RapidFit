@@ -4,11 +4,17 @@
 
 // Include files
 
+#ifndef __CINT__
 #include "IPDF.h"
-#include "DataPoint.h"
-#include "PhaseSpaceBoundary.h"
-#include "PhysicsParameter.h"
-#include "ParameterSet.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/IPDF.h"
+#endif
+
+//#include "DataPoint.h"
+//#include "PhaseSpaceBoundary.h"
+//#include "PhysicsParameter.h"
+//#include "ParameterSet.h"
 
 
 /** @class RapidFitPdfExponential RapidFitPdfExponential.h

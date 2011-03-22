@@ -10,7 +10,12 @@
 #ifndef Bs2DsPiBkg_withTimeRes_H
 #define Bs2DsPiBkg_withTimeRes_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
 
 class Bs2DsPiBkg_withTimeRes : public BasePDF
 {

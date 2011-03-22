@@ -10,7 +10,13 @@
 #ifndef Bs2DsPi_acc_H
 #define Bs2DsPi_acc_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
+
 #include "RooComplex.h"
 #include "RooMath.h"
 

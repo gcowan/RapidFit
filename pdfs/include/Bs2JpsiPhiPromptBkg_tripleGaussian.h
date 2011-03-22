@@ -9,7 +9,12 @@
 #ifndef Bs2JpsiPhiPromptBkg_tripleGaussian_H
 #define Bs2JpsiPhiPromptBkg_tripleGaussian_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
 
 class Bs2JpsiPhiPromptBkg_tripleGaussian : public BasePDF
 {

@@ -10,7 +10,12 @@
 #ifndef Bs2JpsiPhiLongLivedBkg_II_H
 #define Bs2JpsiPhiLongLivedBkg_II_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
 
 class Bs2JpsiPhiLongLivedBkg_II : public BasePDF
 {

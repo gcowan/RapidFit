@@ -10,7 +10,12 @@
 #ifndef Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms_H
 #define Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
 
 class Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms : public BasePDF
 {

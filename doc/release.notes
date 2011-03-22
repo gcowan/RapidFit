@@ -1,6 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
-2011/03/27 Rob Currie
+2011/03/22 Rob Currie
+   - Added the ability to built a CINT  library version of RapidFit with the goal of torturing Tier2
+   - Added Pete's new implementation of mistag parameter handling
+
+2011/03/21 Rob Currie
    - Added Simplex to Minimisation Stratagy
    - Added small amount of code relating to building RapidFit for use in CINT
 

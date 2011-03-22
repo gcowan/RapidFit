@@ -9,7 +9,12 @@
 #ifndef Bs2DsPiMassSignal_H
 #define Bs2DsPiMassSignal_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
 
 class Bs2DsPiMassSignal : public BasePDF
 {

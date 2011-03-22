@@ -10,7 +10,13 @@
 #ifndef Bs2JpsiPhi_mistagParameter_alt_H
 #define Bs2JpsiPhi_mistagParameter_alt_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
+
 #include "RooComplex.h"
 
 class Bs2JpsiPhi_mistagParameter_alt : public BasePDF

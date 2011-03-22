@@ -20,9 +20,11 @@ AR           = ar cru
 
 ##Flags
 #CXXFLAGS     += -D_DEBUG
-CXXFLAGS     = -O3 -ffast-math -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+CXXFLAGS     = -O3 -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+#CXXFLAGS    = -Os -ansi -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -fPIC
 
 SRCEXT   = cpp
+HDREXT   = h
 SRCDIR   = framework/src
 SRCPDFDIR= pdfs/src
 INCDIR   = framework/include
@@ -30,12 +32,19 @@ INCPDFDIR= pdfs/include
 OBJDIR   = framework/build
 OBJPDFDIR= pdfs/build
 EXEDIR   = bin
+LIBDIR   = lib
 UTILSSRC = utils/src
-SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)' -not -name 'Roo*.cpp')
-PDFSRCS := $(shell find $(SRCPDFDIR) -name '*.$(SRCEXT)' -not -name 'Roo*.cpp')
+SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)' -not -name 'Roo*.cpp' | grep -v 'RapidRun' )
+PDFSRCS := $(shell find $(SRCPDFDIR) -name '*.$(SRCEXT)' -not -name 'Roo*.cpp' )
+HEADERS := $(shell find $(PWD)/$(INCDIR) -name '*.$(HDREXT)' | grep -v 'LinkDef' )
+PDFHEAD := $(shell find $(PWD)/$(INCPDFDIR) -name '*.$(HDREXT)' )
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst $(SRCDIR)/%.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 PDFOBJS := $(patsubst $(SRCPDFDIR)/%.$(SRCEXT),$(OBJPDFDIR)/%.o,$(PDFSRCS))
+
+#ALL_HEADERS = ""
+ALL_HEADERS += $(HEADERS)
+ALL_HEADERS += $(PDFHEAD)
 
 GARBAGE  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting pdfDict.h pdfDict.cpp *.so *.rootmap
 
@@ -59,7 +68,7 @@ endif
 #LIBS       += $(ROOTLIBS) -lHtml -lThread -lMinuit -lRooFit -lRooFitCore -lMathCore -lMinuit2 -lFoam #-lboost_thread-xgcc40-mt #-lMathMore
 LIBS       += $(ROOTLIBS) -lHtml -lThread -lMinuit -lMathCore -lMinuit2 -lRooFit -lRooFitCore -lFoam #-lProof #-lboost_thread #-lMathMore
 
-HEADERS    =  $(INCDIR)/RooBs2PhiPhiFullPdf.h $(INCDIR)/RooPdf_Bs2JPsiPhi.h $(INCDIR)/LinkDef.h
+#HEADERS    =  $(INCDIR)/RooBs2PhiPhiFullPdf.h $(INCDIR)/RooPdf_Bs2JPsiPhi.h $(INCDIR)/LinkDef.h
 
 all : $(EXEDIR)/fitting utils
 
@@ -88,13 +97,6 @@ clean   :
 cleanall:
 	$(RM) $(GARBAGE)
 
-rapidfit_dict.cpp: $(SRCDIR)/RapidRun.h
-	@echo "Making the rootdict"
-	@$(ROOTSYS)/bin/rootcint -f rapidfit_dict.cpp -c $(SRCDIR)/RapidRun.h
-
-RapidFitLib.so: $(OBJS) $(PDFOBJS) rapidfit_dict.o
-	$(CXX)  -o RapidFitLib.so -shared $(OBJS) $(PDFOBJS) rapidfit_dict.o $(LINKFLAGS) $(LIBS)
-
 $(EXEDIR)/rapidfit_toyresults: $(OBJDIR)/rapidfit_toyresults.o
 	$(CXX) -o $@ $< $(CXXFLAGS) $(ROOTLIBS)
 
@@ -120,4 +122,24 @@ $(OBJDIR)/rapidfit_fcscanresults_2.o: $(UTILSSRC)/rapidfit_fcscanresults_2.cc
 #	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
-utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2	
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2
+
+
+#	This command will generate a C++ file which interfaces the rest of humanity with root...
+#	It requires the explicit paths of all files, or that you remain in the same working directory at all times during the build process
+$(OBJDIR)/rapidfit_dict.cpp:
+	@echo "Building Root Dictionary:"
+	@echo "rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c $(ALL_HEADERS) framework/include/LinkDef.h"
+	@rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c $(ALL_HEADERS) framework/include/LinkDef.h
+
+#	Compile the class that root has generated for us which is the linker interface to root	(i.e. dictionaries & such)
+$(OBJDIR)/rapidfit_dict.o: $(OBJDIR)/rapidfit_dict.cpp
+	$(CXX) $(LIBS) $(CXXFLAGS) -o $@ -c $<
+
+$(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp
+	$(CXX) $(LIBS) $(CXXFLAGS) -o $@ -c $<
+
+#	Compile RapidFit as a library making use of the existing binaries for other classes
+$(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS) $(PDFOBJS)
+	$(CXX) $(LIBS) -shared -fPIC $(CXXFLAGS) $(OBJS) $(PDFOBJS) $(OBJDIR)/rapidfit_dict.o $(OBJDIR)/RapidRun.o -o $@
+

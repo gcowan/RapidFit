@@ -24,7 +24,7 @@ ENDIF( INSOURCE )
 
 SET( CMAKE_CXX_FLAGS_RELEASE "" )
 
-SET( CMAKE_CXX_FLAGS "-O3 -mtune=native -ffast-math -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+SET( CMAKE_CXX_FLAGS "-Os -Bdynamic -mtune=native -shared -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
 
 #  Get back the old style verbosity :) by setting this to 1
 #SET( CMAKE_VERBOSE_MAKEFILE 1 )
@@ -76,6 +76,7 @@ AUX_SOURCE_DIRECTORY( ${PROJECT_SOURCE_DIR}/framework/src FITTER_SRCS )
 #  This is here due to 'broken' sources called Roo* I have to remove these from the list of source files in framework/srcs
 #  If these files weren't here I could remove this code which is less than 
 
+SET( ALL_HEADERS )
 LIST(LENGTH FITTER_SRCS SRC_LEN )
 MATH(EXPR SRC_LEN ${SRC_LEN}-1 )
 # This forms the equivalent of a for loop in cmake and removes all list elements containing the string "Roo"
@@ -105,9 +106,23 @@ WHILE( ${I} LESS ${SRC_LEN} )
                 	MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
         	ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/main+")
         ENDIF("${THIS_FILE}" MATCHES "main+")
+        IF("${THIS_FILE}" MATCHES "RapidRun+")
+                LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
+                MATH( EXPR I ${I}-1 )
+                MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
+        ELSEIF(NOT "${THIS_FILE}" MATCHES "RapidRun+" )
+                IF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/RapidRun+")
+                        LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
+                        MATH( EXPR I ${I}-1 )
+                        MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
+                ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/RapidRun+")
+        ENDIF("${THIS_FILE}" MATCHES "RapidRun+")
+	SET(HEADER_IN "${THIS_FILE}")
+	STRING(REGEX REPLACE ".cpp" ".h" HEADER_OUT "${HEADER_IN}" )
+	STRING(REGEX REPLACE "framework/src/" "framework/include/" FINAL_HEADER "${HEADER_OUT}")
+	LIST( APPEND ALL_HEADERS ${FINAL_HEADER} )
 	SET( I ${PRESENT_FILENUM}  )
 ENDWHILE( ${I} LESS ${SRC_LEN} )
-
 
 
 #  OUTPUT OPTIONS
@@ -157,3 +172,14 @@ TARGET_LINK_LIBRARIES( plot_try ${ROOT_LIBRARIES} )
 
 add_custom_target (doc doxygen RapidFit_doxygen.cfg && tar cvfz ./RapidFit_html.tgz ./html/ && scp ./RapidFit_html.tgz ph-ppe.ph.ed.ac.uk:~/WWW/RapidFit/doc/  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc COMMENT "Generating documentation" OUTPUT docs/RapidFit_html.tgz docs/html)
 SET_DIRECTORY_PROPERTIES( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES"${PROJECT_SOURCE_DIR}/doc/RapidFit_html.tgz;${PROJECT_SOURCE_DIR}/doc/html" )
+
+
+SET( HEADERS "${PROJECT_SOURCE_DIR}/framework/include/RapidRun.h" )
+SET( LINKDEF "${PROJECT_SOURCE_DIR}/framework/include/LinkDef.h" )
+
+ADD_CUSTOM_COMMAND ( OUTPUT  ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp
+		    COMMAND rootcint -f ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp -c ${HEADERS} ${ALL_HEADERS} ${LINKDEF} )
+
+ADD_LIBRARY ( RapidRun SHARED ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp ${PROJECT_SOURCE_DIR}/framework/src/RapidRun.cpp ${FITTER_SRCS} ${PDF_SRCS} )
+TARGET_LINK_LIBRARIES( RapidRun ${ROOT_LIBRARIES} )
+

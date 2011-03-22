@@ -10,7 +10,12 @@
 #ifndef Bs2JpsiPhiPromptBkg_withTimeRes_H
 #define Bs2JpsiPhiPromptBkg_withTimeRes_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
 
 class Bs2JpsiPhiPromptBkg_withTimeRes : public BasePDF
 {

@@ -107,7 +107,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	//minuit->mnsimp();
 
 	arguments[0] = 10000000;
-	minuit->mnexcm("IMProve", arguments, 1, errorFlag);
+	//minuit->mnexcm("IMProve", arguments, 1, errorFlag);
 
 	arguments[0] = MAXIMUM_MINIMISATION_STEPS;
 	arguments[1] = FINAL_GRADIENT_TOLERANCE;
@@ -119,7 +119,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
 
 	arguments[0] = 10000000;
-	minuit->mnexcm("IMProve", arguments, 1, errorFlag);
+	//minuit->mnexcm("IMProve", arguments, 1, errorFlag);
 	//Now call HESSE to properly calculate the error matrix
 	minuit->mnexcm("HESSE", arguments, 1, errorFlag);
 

@@ -10,7 +10,12 @@
 #ifndef Bs2JpsiPhi_sWave_H
 #define Bs2JpsiPhi_sWave_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#endif
+#ifdef __CINT__
+#include "framework/include/BasePDF.h"
+#endif
 
 class Bs2JpsiPhi_sWave : public BasePDF
 {

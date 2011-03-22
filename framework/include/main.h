@@ -1,0 +1,1 @@
+int RapidFit( int, char** );
