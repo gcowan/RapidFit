@@ -56,8 +56,8 @@ typedef vector<TString> array1s;
 
 bool unique_xy_coord( pair< pair<double,double>, vector<double> > first, pair< pair<double,double>, vector<double> > second )
 {
-	bool x_unique = ((first.first.first - second.first.first) < 1E-9 );
-	bool y_unique = ((first.first.second - second.first.second) < 1E-9 );
+	bool x_unique = (fabs(first.first.first - second.first.first) > 1E-9 );
+	bool y_unique = (fabs(first.first.second - second.first.second) > 1E-9 );
 	return !(x_unique || y_unique);
 }
 
@@ -149,7 +149,14 @@ TCanvas *makeTempCanvas(TH2* hist, TString labelname){
 	addLHCbLabel(labelname)->Draw();
 	return tempCanvas;
 }
-
+TCanvas *makePointCanvas(TGraph2D* graph, TString labelname){
+	TCanvas *pointCanvas = new TCanvas(labelname+" points",labelname+" points",1024,768);
+	pointCanvas->SetPhi(0.0);
+	pointCanvas->SetTheta(90.0);
+	graph->Draw("PCOL");
+	addLHCbLabel(labelname)->Draw();
+	return pointCanvas;
+}
 TCanvas *makeContCanvas(TGraph2D* graph, TString labelname){
 	TCanvas *contourCanvas = new TCanvas(labelname+" contour",labelname+" contour",1024,768);
 	graph->Draw("cont1z");
@@ -160,6 +167,7 @@ TCanvas *makeContCanvas(TGraph2D* graph, TString labelname){
 TCanvas *makeContCanvas(TH2* hist, TString labelname){
 	TCanvas *contourCanvas = new TCanvas(labelname+" contour",labelname+" contour",1024,768);
 	hist->Draw("cont1z");
+
 	addLHCbLabel(labelname)->Draw();
 	return contourCanvas;
 }
@@ -360,7 +368,7 @@ int main(int argc, char *argv[]){
 	//Par values will be floated
 	//Par errors !=0
 
-	Float_t shift = Float_t(0.000000001);
+	Float_t shift = Float_t(0.000001);
 	TString shiftstr = "";
 	shiftstr += shift;
 
@@ -664,8 +672,8 @@ int main(int argc, char *argv[]){
 	Double_t* pllpoints = new Double_t [npoints];
 	copy( dataRatiogridpoints.begin(), dataRatiogridpoints.end(),pllpoints);
 
-	int np = (int)sqrt((double)npoints);
-
+	//int np = (int)sqrt((double)npoints);
+	int np = 40;
 	//We get the data profile likelihood free, so let's plot it: 
 	TGraph2D *pllgraph = new TGraph2D(npoints, p2points, p1points, pllpoints);
 	pllgraph->SetName("pllgraph");
@@ -687,20 +695,13 @@ int main(int argc, char *argv[]){
 			cout << "Constructing CV Plot " << i+1 << " of " << Floated_Parameters.size() <<endl;
 			Double_t* CV_values = new Double_t [Floated_values[i].size()];
 			copy( Floated_values[i].begin(), Floated_values[i].end(), CV_values );
-			cerr << "HERE1" << endl;
 			cerr << Floated_Parameters.size() << " " << Floated_values[i].size() << " " << npoints << endl;
 			TGraph2D* Local_Graph = new TGraph2D(Floated_values[i].size(), p2points, p1points, CV_values);
-			cerr << "HERE2" << endl;
 			Local_Graph->SetName(Floated_Parameters[i]);
-			cerr << "HERE3" << endl;
 			Local_Graph->SetNpx(np);
-			cerr << "HERE4" << endl;
 			Local_Graph->SetNpy(np);
-			cerr << "HERE5" << endl;
 			TH2D* Local_Hist = Local_Graph->GetHistogram();
-			cerr << "HERE6" << endl;
 			Local_Hist->SetTitle("");
-			cerr << "HERE7" << endl;
 			Local_Hist->GetXaxis()->SetTitle(param2string);
 			Local_Hist->GetYaxis()->SetTitle(param1string);
 			TCanvas *Local_Canvas = makeTempCanvas(Local_Hist,Floated_Parameters[i]);
@@ -718,6 +719,11 @@ int main(int argc, char *argv[]){
 	TMarker* global_minima = new TMarker( x_point, y_point, 20 );
 	global_minima->SetMarkerSize(1);
 	global_minima->SetMarkerColor(1);
+
+
+	TCanvas *pllPoints = makePointCanvas(pllgraph, "PLL Gridpoints");
+	pllPoints->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_points.pdf");
+	pllPoints->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_points.png");
 
 	TCanvas *plltemp = makeTempCanvas(pllhist,"Profile Likelihood");
 	if( plot_point )  {
@@ -784,15 +790,19 @@ int main(int argc, char *argv[]){
 		both->Print(outputdir+"/"+param1string+"_"+param2string+"_both.png");
 
 		TGraph2D *toygraph = new TGraph2D(npoints, p2points, p1points, toyspoints);
-		fcgraph->SetName("ntoysgraph");
-		fcgraph->SetNpx(np);
-		fcgraph->SetNpy(np);
+		toygraph->SetName("ntoysgraph");
+		toygraph->SetNpx(np);
+		toygraph->SetNpy(np);
 		TH2D* toyhist = toygraph->GetHistogram();
 		toyhist->SetName("ntoyshist");
 		toyhist->SetTitle("");
 		toyhist->GetXaxis()->SetTitle(param2string);
 		toyhist->GetYaxis()->SetTitle(param1string);
 		toyhist->Write();
+
+		TCanvas *toyPoints = makePointCanvas(toygraph, "FC Gridpoints");
+		toyPoints->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_points.pdf");
+		toyPoints->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_points.png");
 
 		TCanvas *toytemp = makeTempCanvas(toyhist,"Toys per gridpoint");
 		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.pdf");
