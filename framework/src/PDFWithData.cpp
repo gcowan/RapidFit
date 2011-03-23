@@ -94,7 +94,7 @@ IDataSet * PDFWithData::GetDataSet()
 		delete oldDataSet;
 	}
 
-	cout << "DataSet contains " << newDataSet->GetDataNumber() << " events" << endl;
+	cout << "DataSet contains " << newDataSet->GetDataNumber() << " events\n" << endl;
 	return newDataSet;
 }
 

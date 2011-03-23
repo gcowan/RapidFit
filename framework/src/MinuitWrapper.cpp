@@ -17,7 +17,7 @@
 
 const double MAXIMUM_MINIMISATION_STEPS = 100000000.0;//800.0;
 const double FINAL_GRADIENT_TOLERANCE = 0.1;//0.001;
-const double STEP_SIZE = 0.001;
+//const double STEP_SIZE = 0.001;
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
@@ -72,6 +72,18 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	{
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
+		double STEP_SIZE=0.;
+		if( allNames[nameIndex] == "gamma" )		STEP_SIZE = 0.01;
+		else if( allNames[nameIndex] == "deltaGamma" )	STEP_SIZE = 0.01;
+		else if( allNames[nameIndex] == "Aperp_sq" )	STEP_SIZE = 0.01;
+		else if( allNames[nameIndex] == "Azero_sq" )	STEP_SIZE = 0.01;
+		else if( allNames[nameIndex] == "delta_para" )	STEP_SIZE = 0.1;
+		else if( allNames[nameIndex] == "delta_perp" )	STEP_SIZE = 0.1;
+		else if( allNames[nameIndex] == "alphaM_pr" )	STEP_SIZE = 0.0001;
+		else STEP_SIZE = 0.001;
+		cout << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
+
+		
 		//Make bounded or unbounded parameters
 		if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
 		{

@@ -101,7 +101,7 @@ $(OBJPDFDIR)/%.o : $(SRCPDFDIR)/%.$(SRCEXT) $(INCPDFDIR)/%.$(HDREXT)
 
 #	Main Build of RapidFit Binary
 $(EXEDIR)/fitting : $(OBJS) $(PDFOBJS) $(OBJDIR)/ClassLookUp.o $(OBJDIR)/RootFileDataSet.o
-	$(CXX) -o $@ $(OBJS) $(PDFOBJS) $(OBJDIR)/ClassLookUp.o $(OBJDIR)/RootFileDataSet.o $(LINKFLAGS) $(LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(LIBS)
 
 
 
@@ -171,20 +171,20 @@ lib:    $(LIBDIR)/libRapidRun.so
 #	This command will generate a C++ file which interfaces the rest of humanity with root...
 #	It requires the explicit paths of all files, or that you remain in the same working directory at all times during the build process
 #	We want to place the output dictionary in the Build directory as this is CODE that is NOT to be editted by the $USER!
-$(OBJDIR)/rapidfit_dict.cpp:
+$(OBJDIR)/rapidfit_dict.cpp: $(ALL_HEADERS) $(PWD)/framework/include/LinkDef.h
 	@echo "Building Root Dictionary:"
-	@echo "rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c $(ALL_HEADERS) framework/include/LinkDef.h"
-	@rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c $(ALL_HEADERS) framework/include/LinkDef.h
+	@echo "rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c $^"
+	@rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c $^
 
 #	Compile the class that root has generated for us which is the linker interface to root	(i.e. dictionaries & such)
 $(OBJDIR)/rapidfit_dict.o: $(OBJDIR)/rapidfit_dict.cpp
-	$(CXX) $(LIBS) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #	Class which has a dictionary generated for it, think of this as the equivalent to int main() in a CINT-y Universe
 $(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp
-	$(CXX) $(LIBS) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #	Finally, Compile RapidFit as a library making use of the existing binaries for other classes
-$(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS) $(PDFOBJS)
-	$(CXX) $(LIBS) -shared -fPIC $(CXXFLAGS) $< -o $@
+$(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS) $(PDFOBJS) $(OBJDIR)/ClassLookUp.o
+	$(CXX) $(LIBS) -shared -fPIC $(CXXFLAGS) $^ -o $@
 

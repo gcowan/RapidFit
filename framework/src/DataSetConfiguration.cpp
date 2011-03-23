@@ -286,7 +286,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << " which are consistent with the PhaseSpaceBoundary" << endl;
 	time_t timeNow;
         time(&timeNow);
-        cout << "Time: " << ctime( &timeNow ) << endl;
+        cout << "Time: " << ctime( &timeNow );
 	return data;
 }
 
