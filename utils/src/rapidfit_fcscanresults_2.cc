@@ -43,6 +43,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <string>
 #include <stdio.h>
@@ -311,8 +312,10 @@ int main(int argc, char *argv[]){
 	gStyle->SetLineWidth(2);
 	bool plot_point=false;
 	bool plot_CV=false;
+	bool AbsCV=false;
 	if( (argc>5) && ( string(argv[5])=="Points" ) ) { plot_point=true; }
 	if( (argc>5) && ( string(argv[5])=="CV" ) ) { plot_CV=true; }
+	if( (argc>5) && ( string(argv[5])=="AbsCV" ) ) { plot_CV=true; AbsCV=true; }
 	if( (argc>5) && ( string(argv[5])=="CVPoints" ) ) { plot_point=true; plot_CV=true; }
 
 
@@ -387,6 +390,9 @@ int main(int argc, char *argv[]){
 	// Find the global minimum from the first entry:
 
 	//	THIS SHOULD BE THE ONLY USE OF GetEntry it's slow and doesn't emply something 'intelligent'
+//	nlldatabest = allresults->CopyTree("","",0)->GetMinimum("NLL");
+//	param1databest = allresults->CopyTree("","",0)->GetMinimum(param1valstr);
+//	param2databest = allresults->CopyTree("","",0)->GetMinimum(param2valstr);
 	first_entry->GetEntry(0);
 	nlldatabest = nll;
 	Float_t best_fit_values[all_parameter_values.size()];
@@ -394,9 +400,14 @@ int main(int argc, char *argv[]){
 	{
 		best_fit_values[i] = best_fit_temp_values[i];
 	}
-	x_point = global_x;
-	y_point = global_y;
-	cout << "GLOBAL DATA MINIMUM NLL: " << nlldatabest << "\t\tAT: " << x_point << ":" << y_point << endl;
+	TString Best_Catch("NLL==");
+	Best_Catch+=nlldatabest;
+	TTree* local_best = allresults->CopyTree( Best_Catch );
+	x_point = local_best->GetMinimum(param1valstr);
+	y_point = local_best->GetMinimum(param2valstr);
+//	x_point = global_x;
+//	y_point = global_y;
+	cout << "GLOBAL DATA MINIMUM NLL:\t" << setprecision(10)<< nlldatabest << "\tAT:\tX:" << x_point << "\tY:\t" << y_point << endl;
 
 	// Find the positions of the gridpoints we scanned, and find the profileLL at each point for data:
 	TString datafixedstr = param1genstr + "==" + notgen + "&&" + param2genstr + "==" + notgen + "&&"+ param1errstr + "==0.0&&" +param2errstr +"==0.0&&" + FRstr + "==3.0";
@@ -418,25 +429,63 @@ int main(int argc, char *argv[]){
 	//	dataRatiogridpoints.reserve( numberOfEventsAfterCut );
 	//	Temp store all data in vectors
 
+	list<pair<pair<double,double>,double> > searchable_list_data;
 
-	
 	for( short int i=0; i<numberOfEventsAfterCut; ++i )
 	{
 		param1gridpoints.push_back( float(param1val_pointer[i]) );
 		param2gridpoints.push_back( float(param2val_pointer[i]) );
 		dataRatiogridpoints.push_back( float(nllval_pointer[i]) );
+		pair<pair<double,double>,double> new_coordinate_value;
+		new_coordinate_value.first = make_pair( param1val_pointer[i], param2val_pointer[i] );
+		new_coordinate_value.second = nllval_pointer[i];
+		searchable_list_data.push_back( new_coordinate_value );
 	}
+
+	//------------------------------------------------------------------------------------------------------
+	//	This section deals with fit minima and the duality in deltaGamma Phi_s
+
 	double true_Z = allresults->CopyTree("NLL>0")->GetMinimum("NLL");
 	//	Move values into vectors
 	if( (true_Z-nlldatabest) < 0 )
 	{
+		//	I know this is comparing doubles exactly, however this is also doing maths in Loki... you be the judge
+		TString Catch("NLL==");
+		Catch+=true_Z;
+		TTree* local_best = allresults->CopyTree( Catch );
+		double true_X = local_best->GetMinimum(param1valstr);
+		double true_Y = local_best->GetMinimum(param2valstr);
 		cout << "\n\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
-		cout << "\t\tTRUE MINIMUM NLL = " << true_Z <<endl<<endl;
+		cout << "\t\tTRUE MINIMUM NLL = " << true_Z << "\t\tAt:\t\tX:" << true_X << "\tY:\t" << true_Y <<endl<<endl;
 //		cout << "\tNEW MINIMA FOUND AT :\tX:\t" << X_true_min << "\tY:\t" << Y_true_min << endl<<endl;
 		cout << "\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
 		nlldatabest=true_Z;
 	}
 
+	TString Condition("NLL==");	Condition+=nlldatabest;
+	TTree* new_best = allresults->CopyTree( Condition );
+	if( ( ( allresults->GetEntries() /2 ) - new_best->GetEntries()) == 0 )
+	{
+		TString Condition_Orig="(NLL>0)&&(NLL!=";
+		Condition_Orig+=true_Z;	Condition_Orig.Append(")");
+		new_best = allresults->CopyTree( Condition_Orig );
+		double new_Z = new_best->GetMinimum( "NLL" );
+		TString Condition("NLL==");
+		Condition+=new_Z;
+		new_best = allresults->CopyTree(Condition);
+		double new_X = new_best->GetMinimum(param1valstr);
+		double new_Y = new_best->GetMinimum(param2valstr);
+		cout << "SECOND MINIMA:\t\t" << setprecision(10) << new_Z << "\tFOUND AT:\tX:"<< new_X << "\tY:\t" <<new_Y<<endl;
+		//	fabs doubles based on difference between them and best_X (deltaGamma)
+		//	sort based on difference
+	} else {
+		cout << new_best->GetEntries() << "\tPOINTS FOUND WHICH CORRESPOND TO MINIMA"<<endl;
+	}
+
+
+
+	//------------------------------------------------------------------------------------------------------
+	
 	int numberOfFloatedPhysicsParams=0;
 	vector<TString> Floated_Parameters;
 	vector<vector<double> > Floated_values;
@@ -451,9 +500,12 @@ int main(int argc, char *argv[]){
 		for ( unsigned int obsIndex = 0; obsIndex < all_parameter_values.size(); obsIndex+=3 )
 		{
 			//	Un-comment the next 3 lines for Absolute Central Values in the plots
-			//best_fit_values[obsIndex] = 0.0;
-			//if((obsIndex+1)<=all_parameter_values.size())best_fit_values[obsIndex+1] = 0.0;
-			//if((obsIndex+2)<=all_parameter_values.size())best_fit_values[obsIndex+2] = 0.0;
+			if( AbsCV )
+			{
+				best_fit_values[obsIndex] = 0.0;
+				if((obsIndex+1)<=all_parameter_values.size())best_fit_values[obsIndex+1] = 0.0;
+				if((obsIndex+2)<=all_parameter_values.size())best_fit_values[obsIndex+2] = 0.0;
+			}
 
 			//			data_array.reserve(3);
 			vector<Double_t *> data_array;

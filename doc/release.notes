@@ -2,6 +2,7 @@
 
 2011/03/24 Rob Currie
    - Added warning to fcscanresults_2 for incorrect global minima
+   - Re-Added AbsCV plotting to fcplotter v2
 
 2011/03/23 Rob Currie
    - Re-Written Makefile to use better linking between files
