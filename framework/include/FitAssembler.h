@@ -42,7 +42,7 @@ class FitAssembler
 		static ToyStudyResult* SingleScan(  MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, OutputConfiguration*, string, int=-999 );
 
 		//  Std Feldman-Cousins Code, relying on many already defined objects even though it pulls in the XMLConfigReader object
-		static ToyStudyResult* FeldmanCousins( ToyStudyResult*, ToyStudyResult*, vector<unsigned short int>, unsigned short int, bool, OutputConfiguration*, MinimiserConfiguration*, FitFunctionConfiguration*, XMLConfigReader*, vector< PDFWithData* >, int=-999);
+		static ToyStudyResult* FeldmanCousins( ToyStudyResult*, ToyStudyResult*, vector<unsigned int>, unsigned int, bool, OutputConfiguration*, MinimiserConfiguration*, FitFunctionConfiguration*, XMLConfigReader*, vector< PDFWithData* >, int=-999);
 
 	private:
 		static FitResult * DoFit( IMinimiser*, FitFunction* );

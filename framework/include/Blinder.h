@@ -11,8 +11,7 @@
 #ifndef BLINDER_RESULT_H
 #define BLINDER_RESULT_H
 
-#include <string> 
-#include <vector> 
+#include <string>
 #include "RooRealVar.h"
 #include "RooAbsReal.h"
 #include "RooUnblindUniform.h"

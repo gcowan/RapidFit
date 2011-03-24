@@ -17,6 +17,7 @@
 #include "IDataGenerator.h"
 #include "IPrecalculator.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 

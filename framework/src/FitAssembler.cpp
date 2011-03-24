@@ -361,7 +361,7 @@ ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConf
 //			At the time of writing the nuisence parameters are still under investigation
 //	Step4:		Repeat Step 3 as many times as requested, or do 100 toys as default
 //	Step5:		Format output into standard block format. This gives us 2 things.
-ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned short int> numberRepeats, unsigned short int NuisenceModel, bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData, int OutputLevel )
+ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned int> numberRepeats, unsigned int NuisenceModel, bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData, int OutputLevel )
 {
 
 	double Random_Seed = pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm();
@@ -470,8 +470,8 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 
 
 		//		Number of datasets wanted i.e. Number of Toys
-		unsigned short int wanted_number_of_toys = 100;
-		if( !numberRepeats.empty() ) wanted_number_of_toys = numberRepeats[0];
+		unsigned int wanted_number_of_toys = 100;
+		if( !numberRepeats.empty() ) wanted_number_of_toys = unsigned(numberRepeats[0]);
 
 
 

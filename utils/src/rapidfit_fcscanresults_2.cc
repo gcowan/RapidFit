@@ -450,7 +450,8 @@ int main(int argc, char *argv[]){
 	if( (true_Z-nlldatabest) < 0 )
 	{
 		//	I know this is comparing doubles exactly, however this is also doing maths in Loki... you be the judge
-		TString Catch("NLL==");
+		TString Catch("(param1valstr>");
+		Catch.Append(")&&NLL==");
 		Catch+=true_Z;
 		TTree* local_best = allresults->CopyTree( Catch );
 		double true_X = local_best->GetMinimum(param1valstr);

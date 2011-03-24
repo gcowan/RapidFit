@@ -773,11 +773,11 @@ int RapidFit( int argc, char * argv[] )
 				//	Do the main work of the FC scan
 				if( doFC_Flag )
 				{
-					vector<unsigned short int> numberRepeatsVec;
-					if( numberRepeatsFlag ) numberRepeatsVec.push_back( unsigned(short(numberRepeats)) );
+					vector<unsigned int> numberRepeatsVec;
+					if( numberRepeatsFlag ) numberRepeatsVec.push_back( unsigned(numberRepeats) );
 					
 					//	Do FC scan
-					ToyStudyResult* AllFCResults = FitAssembler::FeldmanCousins( GlobalFitResult, _2DResultForFC, numberRepeatsVec, Nuisencemodel, FC_Debug_Flag, makeOutput, theMinimiser, theFunction,  xmlFile, pdfsAndData );
+					ToyStudyResult* AllFCResults = FitAssembler::FeldmanCousins( GlobalFitResult, _2DResultForFC, numberRepeatsVec, unsigned(int(Nuisencemodel)), FC_Debug_Flag, makeOutput, theMinimiser, theFunction,  xmlFile, pdfsAndData );
 
 					//		STORE THE OUTPUT OF THE TOY STUDIES
 					ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );

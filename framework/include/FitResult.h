@@ -14,6 +14,7 @@
 #include "ResultParameterSet.h"
 #include "PhysicsBottle.h"
 #include "FunctionContour.h"
+#include <vector>
 
 class FitResult
 {

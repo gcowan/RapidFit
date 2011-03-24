@@ -27,7 +27,7 @@ MinuitWrapper::MinuitWrapper(): print_verbosity( 0 )
 }
 
 //Constructor with correct argument
-MinuitWrapper::MinuitWrapper( int NumberParameters, short int output_level ): print_verbosity( output_level )
+MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): print_verbosity( output_level )
 {
 	minuit = new TMinuit( NumberParameters );
 }
@@ -38,7 +38,7 @@ MinuitWrapper::~MinuitWrapper()
 	delete minuit;
 }
 
-void MinuitWrapper::SetOutputLevel( short int output_level )
+void MinuitWrapper::SetOutputLevel( int output_level )
 {
 	print_verbosity = output_level;
 	Double_t arg=output_level;

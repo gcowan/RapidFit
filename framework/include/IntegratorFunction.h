@@ -13,6 +13,7 @@
 #include "Math/IFunction.h"
 #include "TFoamIntegrand.h"
 #include "IPDF.h"
+#include <vector>
 
 using namespace ROOT::Math;
 

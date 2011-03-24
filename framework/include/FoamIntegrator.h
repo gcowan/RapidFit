@@ -4,6 +4,7 @@
 #include "IPDF.h"
 #include "IDataSet.h"
 #include "MakeFoam.h"
+#include <vector>
 
 class FoamIntegrator
 {

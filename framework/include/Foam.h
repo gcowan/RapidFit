@@ -17,6 +17,7 @@
 #include "TRandom3.h"
 #include "IntegratorFunction.h"
 #include "TFoam.h"
+#include <vector>
 
 class Foam : public IDataGenerator
 {

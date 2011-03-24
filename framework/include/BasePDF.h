@@ -13,6 +13,7 @@
 #define BASE_PDF_H
 
 #include "IPDF.h"
+#include <vector>
 
 class BasePDF : public IPDF
 {

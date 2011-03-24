@@ -30,6 +30,7 @@
 #include "Minuit2/MnMigrad.h"
 #include "FumiliFunction.h"
 #include "FitResult.h"
+#include <vector>
 
 using namespace ROOT::Minuit2;
 
@@ -40,7 +41,7 @@ class FumiliWrapper : public IMinimiser
 		~FumiliWrapper();
 
 		//Interface functions
-		virtual void SetOutputLevel( short int ){};
+		virtual void SetOutputLevel( int ){};
 		virtual void Minimise( FitFunction* );
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );
