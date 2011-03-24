@@ -325,7 +325,7 @@
 <PhysicsParameter>
 <Name>alphaM_pr</Name>      // exponent 
 <Value>0.00135</Value>
-<Type>Fixed</Type>
+<Type>Free</Type>
 <Unit>Unitless</Unit>
 </PhysicsParameter>
 
