@@ -417,13 +417,25 @@ int main(int argc, char *argv[]){
 	//	param2gridpoints.reserve( numberOfEventsAfterCut );
 	//	dataRatiogridpoints.reserve( numberOfEventsAfterCut );
 	//	Temp store all data in vectors
+
+
+	
 	for( short int i=0; i<numberOfEventsAfterCut; ++i )
 	{
 		param1gridpoints.push_back( float(param1val_pointer[i]) );
 		param2gridpoints.push_back( float(param2val_pointer[i]) );
 		dataRatiogridpoints.push_back( float(nllval_pointer[i]) );
 	}
+	double true_Z = allresults->CopyTree("NLL>0")->GetMinimum("NLL");
 	//	Move values into vectors
+	if( (true_Z-nlldatabest) < 0 )
+	{
+		cout << "\n\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
+		cout << "\t\tTRUE MINIMUM NLL = " << true_Z <<endl<<endl;
+//		cout << "\tNEW MINIMA FOUND AT :\tX:\t" << X_true_min << "\tY:\t" << Y_true_min << endl<<endl;
+		cout << "\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
+		nlldatabest=true_Z;
+	}
 
 	int numberOfFloatedPhysicsParams=0;
 	vector<TString> Floated_Parameters;
@@ -464,7 +476,6 @@ int main(int argc, char *argv[]){
 			//  (it doesn't matter what this looks like and we can throw it away from here :)
 			int num2 = allresults->Draw( PlotString , datafixedstr, "goff" );
 
-			cout << numberOfEventsAfterCut << "\t\t" << num2 <<endl;
 			//  Store pointers to the objects for ease of access
 			TH1* temp_hist = (TH1*)allresults->GetHistogram()->Clone();
 			TString Unique("");

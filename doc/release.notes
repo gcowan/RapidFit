@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/24 Rob Currie
+   - Added warning to fcscanresults_2 for incorrect global minima
+
 2011/03/23 Rob Currie
    - Re-Written Makefile to use better linking between files
    - Changed Fitting Strategy to that used by Heidelberg
