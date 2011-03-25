@@ -345,6 +345,10 @@ TString EdStyle::GetParamRootName( string Param_Name )
 
 		return TString("{A_#perp}^2");
 
+        } else if ( Param_Name == "Apara_sq" ) {
+
+                return TString("{A_#parallel}^2");
+
 	} else if ( Param_Name == "delta_para" ) {
 
 		return TString("#delta_#parallel");
@@ -450,6 +454,10 @@ TString EdStyle::GetParamLatexName( string Param_Name )
         } else if ( Param_Name == "Aperp_sq" ) {
 
                 Name.Append("{A_\\perp}^2");
+
+        } else if ( Param_Name == "Apara_sq" ) {
+
+                Name.Append("{A_\\parallel}^2");
 
         } else if ( Param_Name == "delta_para" ) {
 
