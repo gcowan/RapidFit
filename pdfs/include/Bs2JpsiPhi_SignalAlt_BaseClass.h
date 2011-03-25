@@ -810,7 +810,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		//...........................
 		inline double angleFactorReASA0(  ) const
 		{
-			return -/*1.0 **/  ( 1.0 -  strsq()* cphsq() ) * ctheta_1 *  4*Mathematics::Third()/*(4.0*sqrt(3.)/3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
+			return -/*1.0 **/  ( 1.0 -  strsq()* cphsq() ) * ctheta_1 *  4*Mathematics::Root_3()*Mathematics::Third()/*(4.0*sqrt(3.)/3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
 		}
 
 

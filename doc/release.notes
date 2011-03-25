@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/03/25 Rob Currie
+   - Updated FC plotting tool
+
 2011/03/24 Rob Currie
    - Added warning to fcscanresults_2 for incorrect global minima
    - Re-Added AbsCV plotting to fcplotter v2

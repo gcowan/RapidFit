@@ -445,12 +445,13 @@ int main(int argc, char *argv[]){
 	//------------------------------------------------------------------------------------------------------
 	//	This section deals with fit minima and the duality in deltaGamma Phi_s
 
-	double true_Z = allresults->CopyTree("NLL>0")->GetMinimum("NLL");
+	double true_Z = allresults->CopyTree(datafixedstr)->GetMinimum("NLL");
 	//	Move values into vectors
 	if( (true_Z-nlldatabest) < 0 )
 	{
 		//	I know this is comparing doubles exactly, however this is also doing maths in Loki... you be the judge
-		TString Catch("(param1valstr>");
+		TString Catch(datafixedstr);
+		Catch.Append("&&(param1valstr>");
 		Catch.Append(")&&NLL==");
 		Catch+=true_Z;
 		TTree* local_best = allresults->CopyTree( Catch );
@@ -463,17 +464,19 @@ int main(int argc, char *argv[]){
 		nlldatabest=true_Z;
 	}
 
-	TString Condition("NLL==");	Condition+=nlldatabest;
+	TString Condition(datafixedstr); Condition.Append("&&NLL==");	Condition+=nlldatabest;
 	TTree* new_best = allresults->CopyTree( Condition );
 	if( ( ( allresults->GetEntries() /2 ) - new_best->GetEntries()) == 0 )
 	{
-		TString Condition_Orig="(NLL>0)&&(NLL!=";
+		TString Condition_Orig(datafixedstr);
+		Condition_Orig.Append("&&(NLL!=");
 		Condition_Orig+=true_Z;	Condition_Orig.Append(")");
 		new_best = allresults->CopyTree( Condition_Orig );
 		double new_Z = new_best->GetMinimum( "NLL" );
-		TString Condition("NLL==");
-		Condition+=new_Z;
-		new_best = allresults->CopyTree(Condition);
+		TString Condition2(datafixedstr);
+		Condition2.Append("NLL==");
+		Condition2+=new_Z;
+		new_best = allresults->CopyTree(Condition2);
 		double new_X = new_best->GetMinimum(param1valstr);
 		double new_Y = new_best->GetMinimum(param2valstr);
 		cout << "SECOND MINIMA:\t\t" << setprecision(10) << new_Z << "\tFOUND AT:\tX:"<< new_X << "\tY:\t" <<new_Y<<endl;
@@ -720,11 +723,8 @@ int main(int argc, char *argv[]){
 				clgridpoints.push_back(-9999.0);
 			}
 
-			//			delete floatedtoys;
-			//			delete fixedtoys;
 		}
 	}
-	//delete toys;
 	//We now have 4 vectors: The gridpoints in x,y and the conf. limits in z or the profile LL in z. We need to make TGraphs from these bad boys. 
 
 	//Copy vectors to arrays: 
@@ -736,8 +736,7 @@ int main(int argc, char *argv[]){
 	Double_t* pllpoints = new Double_t [npoints];
 	copy( dataRatiogridpoints.begin(), dataRatiogridpoints.end(),pllpoints);
 
-	//int np = (int)sqrt((double)npoints);
-	int np = 40;
+	int np = (int)sqrt((double)npoints);
 	//We get the data profile likelihood free, so let's plot it: 
 	TGraph2D *pllgraph = new TGraph2D(npoints, p2points, p1points, pllpoints);
 	pllgraph->SetName("pllgraph");
