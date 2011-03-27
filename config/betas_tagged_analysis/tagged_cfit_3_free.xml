@@ -476,7 +476,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>/phys/linux/s0127440/scratch/Data2010_NTuples/goldstandard_unbiased_timecut.root</FileName>  
+<FileName>goldstandard_unbiased_timecut.root</FileName>  
 <NTuplePath>merged</NTuplePath>
 
 <NumberEvents>2000000</NumberEvents>
@@ -569,7 +569,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>/phys/linux/s0127440/scratch/Data2010_NTuples/goldstandard_unbiased_timecut.root</FileName>  
+<FileName>goldstandard_unbiased_timecut.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 
 <NumberEvents>2000000</NumberEvents>
@@ -659,7 +659,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>/phys/linux/s0127440/scratch/Data2010_NTuples/goldstandard_biased_timecut3_PELC.root</FileName>  
+<FileName>goldstandard_biased_timecut3_PELC.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 <NumberEvents>200000000</NumberEvents>   
 
@@ -751,7 +751,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>/phys/linux/s0127440/scratch/Data2010_NTuples/goldstandard_biased_timecut3_PELC.root</FileName>  
+<FileName>goldstandard_biased_timecut3_PELC.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 
 <NumberEvents>20000000</NumberEvents>

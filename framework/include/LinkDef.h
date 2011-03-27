@@ -13,9 +13,9 @@
 
 
 //	Are these required
-//#pragma link C++ nestedclasses;
-//#pragma link C++ nestedtypedefs;
-//#pragma link C++ global gROOT;
-//#pragma link C++ global gEnv;
+#pragma link C++ nestedclasses;
+#pragma link C++ nestedtypedefs;
+#pragma link C++ global gROOT;
+#pragma link C++ global gEnv;
 
 #endif

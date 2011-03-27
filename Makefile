@@ -16,8 +16,7 @@ RM           = rm -f
 
 
 #		Compiler Flags
-CXXFLAGS     = -O3 -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
-#CXXFLAGS    = -Os -ansi -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -fPIC  #  Try to use these on the Grid to produce a small library which can just be passed in sandbox
+CXXFLAGS     = -Os -shared -msse -msse2 -m3dnow -g1 -ansi -fPIC -shared -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 
 
 #		Some Useful global variables, makes this file MUCH easier to maintain

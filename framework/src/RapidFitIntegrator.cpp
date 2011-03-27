@@ -149,6 +149,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			return numericalIntegral;
 		}
 	}
+	return -1;
 }
 
 double RapidFitIntegrator::GetRatioOfIntegrals()

@@ -20,7 +20,6 @@ RapidRun::RapidRun( TList* _args ):
 }
 
 int RapidRun::run(){
-  cout << TString("HELLO") <<endl;
   //convert the TList args into a main compatible list
   const Int_t argc = args->GetSize();
   //memory is dynamically allocated
@@ -35,16 +34,9 @@ int RapidRun::run(){
     lnk = lnk->Next();
     count++;
   }
-  cout << count << "\t" << argv[0] << "\t" << argv[1] << "\t" << argv[2] <<endl;
- //                XMLConfigReader* xmlFile=NULL;
- //                       xmlFile = new XMLConfigReader("/home/robert/PHYS/Tagged-Pass9-UB-XML1/Tagged-Pass9-UB-XML1/DataFile_Tagged_cFit_Working-forMainFit-mistagObservable-Unbiased-XML1.xml"); 
+  cout << "RapidRun Launching RapidFit!" <<endl;
 
   Int_t result = RapidFit(count, argv);
-  //clean up
-  //for(int i = 0; i < argc; i++){
-  //  delete argv[i];
-  //}
-  //delete argv;
 
   return result;
 }
