@@ -437,7 +437,7 @@ int main(int argc, char *argv[]){
 	pllhist->Write();
 
 
-	double pllconts[4] = {1.15,2.36,3.0,4.61};
+	double pllconts[4] = {1.15,2.31,3.0,4.61};
 	double fcconts[4] = {0.68,0.9,0.95,0.99};
 	double confs[4] = {68.0,90.0,95.0,99.0};
 

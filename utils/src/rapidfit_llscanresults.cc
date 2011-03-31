@@ -183,7 +183,7 @@ int main(int argc, char *argv[]){
 	contCanvas->Print(outputdir+"/"+param1string+"_"+param2string+"_cont.png");
 	contCanvas->Write();
 
-	double conts[4] = {1.15,2.36,3.0,4.61};
+	double conts[4] = {1.15,2.31,3.0,4.61};
 	double confs[4] = {68.0,90.0,95.0,99.0};
 	nllhist->SetContour(4,conts);
 

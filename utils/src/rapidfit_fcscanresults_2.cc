@@ -774,9 +774,9 @@ int main(int argc, char *argv[]){
 	}
 
 
-	double pllconts[4] = {1.15,2.36,3.0,4.61};
-	double fcconts[4] = {0.68,0.9,0.95,0.99};
-	double confs[4] = {68.0,90.0,95.0,99.0};
+	double pllconts[3] = {1.15,2.31,3.0};
+	double fcconts[3] = {0.68,0.9,0.95};
+	double confs[3] = {68.0,90.0,95.0};
 
 	TMarker* global_minima = new TMarker( x_point, y_point, 20 );
 	global_minima->SetMarkerSize(1);
@@ -802,14 +802,14 @@ int main(int argc, char *argv[]){
 	}
 	pllcont->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_cont.pdf");
 	pllcont->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_cont.png");
-	TCanvas *pllconf = makeConfCanvas(pllhist,"Profile Likelihood",4,pllconts,confs,false);
+	TCanvas *pllconf = makeConfCanvas(pllhist,"Profile Likelihood",3,pllconts,confs,false);
 	if( plot_point )  {
 		global_minima->Draw("SAME");
 		pllconf->Update();
 	}
 	pllconf->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_conf.pdf");
 	pllconf->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_conf.png");
-	TCanvas *pllpub = makeConfCanvas(pllhist,"Profile Likelihood",4,pllconts,confs,true);
+	TCanvas *pllpub = makeConfCanvas(pllhist,"Profile Likelihood",3,pllconts,confs,true);
 	if( plot_point )  {
 		global_minima->Draw("SAME");
 		pllcont->Update();
@@ -841,13 +841,13 @@ int main(int argc, char *argv[]){
 		TCanvas *fccont = makeContCanvas(fchist,"Feldman Cousins");
 		fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.pdf");
 		fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.png");
-		TCanvas *fcconf = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,false);
+		TCanvas *fcconf = makeConfCanvas(fchist,"Feldman Cousins",3,fcconts,confs,false);
 		fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.pdf");
 		fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.png");
-		TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,true);
+		TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",3,fcconts,confs,true);
 		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.pdf");
 		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.png");
-		TCanvas *both = makeBothCanvas(fchist,pllhist,"FC and PLL",4,fcconts,pllconts,confs);
+		TCanvas *both = makeBothCanvas(fchist,pllhist,"FC and PLL",3,fcconts,pllconts,confs);
 		both->Print(outputdir+"/"+param1string+"_"+param2string+"_both.pdf");
 		both->Print(outputdir+"/"+param1string+"_"+param2string+"_both.png");
 

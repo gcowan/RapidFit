@@ -14,6 +14,7 @@
 #include "StringProcessing.h"
 #include "FunctionContour.h"
 #include <ctime>
+#include <cmath>
 
 const double MAXIMUM_MINIMISATION_STEPS = 100000000.0;//800.0;
 const double FINAL_GRADIENT_TOLERANCE = 0.1;//0.001;
@@ -72,7 +73,9 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	{
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
-		double STEP_SIZE=0.;
+		double STEP_SIZE= fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/1000.0;
+	/*
+
 		if( allNames[nameIndex] == "gamma" )		STEP_SIZE = 0.01;
 		else if( allNames[nameIndex] == "deltaGamma" )	STEP_SIZE = 0.01;
 		else if( allNames[nameIndex] == "Aperp_sq" )	STEP_SIZE = 0.01;
@@ -81,6 +84,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		else if( allNames[nameIndex] == "delta_perp" )	STEP_SIZE = 0.1;
 		else if( allNames[nameIndex] == "alphaM_pr" )	STEP_SIZE = 0.0001;
 		else STEP_SIZE = 0.001;
+	*/
 		cout << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
 
 		
