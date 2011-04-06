@@ -53,6 +53,8 @@
 #include "Bs2JpsiPhiMassBkg.h"
 #include "Bs2JpsiPhiMassBkgLL.h"
 
+#include "Exponential.h"
+
 #include "MinuitWrapper.h"
 #include "Minuit2Wrapper.h"
 #include "FumiliWrapper.h"
@@ -207,7 +209,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
                 //Default JPsiPhi prompt bkg mass signal
                 return new Bs2JpsiPhiMassBkg();
-		}
+	}
+        else if ( Name == "Exponential" )
+        {
+            	//Default JPsiPhi prompt bkg mass signal
+                return new Exponential();
+	}
         else if ( Name == "Bs2JpsiPhiMassBkgLL" )
         {
 			//Default JPsiPhi prompt bkg mass signal

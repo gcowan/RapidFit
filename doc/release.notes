@@ -1,5 +1,20 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/04/06 Greig Cowan
+  - Added GoodnessOfFit namespace. This implements two methods which are
+    summarised in this paper: arXiv:1006.3019v2 [hep-ex]
+
+    1. Point to point dissimalarity method (section 3.3)
+    2. Distance to nearest neighbour method (section 3.4)
+
+    The second method is not as powerful as the first, but provides a nice
+    way to present the agreement (or not) between a PDF and data in a 
+    multidimensional problem.
+ 
+    There is no guarantee that this code is free from bugs!
+
+  - Added PDF for exponential.
+
 2011/03/25 Rob Currie
    - Updated FC plotting tool
 

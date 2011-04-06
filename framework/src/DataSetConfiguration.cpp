@@ -66,6 +66,12 @@ bool DataSetConfiguration::SetPhysicsParameters( ParameterSet * InputParameters 
 	}
 }
 
+bool DataSetConfiguration::SetSource( string NewSource )
+{
+	source = NewSource;
+	return true;
+}
+
 //Create the DataSet
 IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary, IPDF * FitPDF, int real_numberEvents)
 {
