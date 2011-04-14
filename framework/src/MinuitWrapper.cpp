@@ -16,8 +16,8 @@
 #include <ctime>
 #include <cmath>
 
-const double MAXIMUM_MINIMISATION_STEPS = 100000000.0;//800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.1;//0.001;
+const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
+const double FINAL_GRADIENT_TOLERANCE = 0.001;//0.001;
 //const double STEP_SIZE = 0.001;
 FitFunction * MinuitWrapper::function = 0;
 
@@ -73,7 +73,10 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	{
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
-		double STEP_SIZE= fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/1000.0;
+		double STEP_SIZE= 0.01;
+//		if(!(newParameter->GetMaximum() == newParameter->GetMinimum())){
+//			fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
+//		}
 	/*
 
 		if( allNames[nameIndex] == "gamma" )		STEP_SIZE = 0.01;
@@ -124,7 +127,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
         arguments[1] = FINAL_GRADIENT_TOLERANCE;
 
 	//	First do Simplex
-	minuit->mnexcm("SIMplex",arguments, 2, errorFlag);
+	//minuit->mnexcm("SIMplex",arguments, 2, errorFlag);
 
 	//	Now Do the minimisation
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);

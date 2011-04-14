@@ -145,6 +145,11 @@ $(EXEDIR)/rapidfit_fcscanresults_2: $(OBJDIR)/rapidfit_fcscanresults_2.o
 $(OBJDIR)/rapidfit_fcscanresults_2.o: $(UTILSSRC)/rapidfit_fcscanresults_2.cc
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
+#	Tool that sWeights the betas ntuple
+$(EXEDIR)/betas_sweightfitter: $(OBJDIR)/betas_sweightfitter.o
+	$(CXX) -o $@ $< $(ROOTLIBS) -lRooFit -lRooStats -lRooFitCore -lFoam -lMinuit
+$(OBJDIR)/betas_sweightfitter.o: $(UTILSSRC)/betas_sweightfitter.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #	Trying to move people off this tool
 #$(EXEDIR)/rapidfit_llscanresults: $(OBJDIR)/rapidfit_llscanresults.o
@@ -154,7 +159,7 @@ $(OBJDIR)/rapidfit_fcscanresults_2.o: $(UTILSSRC)/rapidfit_fcscanresults_2.cc
 
 
 #utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
-utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter
 
 
 
