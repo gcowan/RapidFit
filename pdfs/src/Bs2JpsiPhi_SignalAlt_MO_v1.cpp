@@ -56,9 +56,9 @@ void Bs2JpsiPhi_SignalAlt_MO_v1::MakePrototypes()
 	parameterNames.push_back( delta_sName.first );
 	parameterNames.push_back( deltaMName.first );
 	parameterNames.push_back( Phi_sName.first );
+	parameterNames.push_back( res1FractionName.first );
 	parameterNames.push_back( res1Name.first );
 	parameterNames.push_back( res2Name.first );
-	parameterNames.push_back( res1FractionName.first );
 	parameterNames.push_back( timeOffsetName.first );
 	parameterNames.push_back( mistagScaleName.first );
 	parameterNames.push_back( mistagOffsetName.first );
@@ -86,21 +86,16 @@ Bs2JpsiPhi_SignalAlt_MO_v1::~Bs2JpsiPhi_SignalAlt_MO_v1()
 
 //........................................................
 //Set the physics parameters into member variables
-//Indicate that the cache is no longer valid
 
 bool Bs2JpsiPhi_SignalAlt_MO_v1::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-	normalisationCacheValid = false;
+	normalisationCacheValid = false;  //This is left in, but is no longer used in this PDF as you cannot cache with event-by-event mistag
 	
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
 	
-	/// Some gymnastics here to match xml parameters to my original pdf parameters 
-
 	// Physics parameters. 
-	gamma_in  = allParameters.GetPhysicsParameter( &gammaName )->GetValue();
+	_gamma  = allParameters.GetPhysicsParameter( &gammaName )->GetValue();
 	dgam      = allParameters.GetPhysicsParameter( &deltaGammaName )->GetValue();
-	delta_ms  = allParameters.GetPhysicsParameter( &deltaMName )->GetValue();
-	phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
 
 	Azero_sq = allParameters.GetPhysicsParameter( &Azero_sqName )->GetValue();
 	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_v1::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}	
@@ -122,15 +117,20 @@ bool Bs2JpsiPhi_SignalAlt_MO_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
 	
+	delta_ms		= allParameters.GetPhysicsParameter( &deltaMName )->GetValue();	
+	mistagScale     = allParameters.GetPhysicsParameter( &mistagScaleName )->GetValue();
+	mistagOffset    = allParameters.GetPhysicsParameter( &mistagOffsetName )->GetValue();
+	phi_s			= allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
+	_cosphis = cos(phi_s) ;
+	_sinphis = sin(phi_s) ;
+		
+
 	// Detector parameters
+	resolution1Fraction = allParameters.GetPhysicsParameter( &res1FractionName )->GetValue();
 	resolution1         = allParameters.GetPhysicsParameter( &res1Name )->GetValue();
 	resolution2         = allParameters.GetPhysicsParameter( &res2Name )->GetValue();
-	resolution1Fraction = allParameters.GetPhysicsParameter( &res1FractionName )->GetValue();
 	timeOffset          = allParameters.GetPhysicsParameter( &timeOffsetName )->GetValue();
-	
-	// Mistag calibration parameters
-	mistagScale         = allParameters.GetPhysicsParameter( &mistagScaleName )->GetValue();
-	mistagOffset        = allParameters.GetPhysicsParameter( &mistagOffsetName )->GetValue();
+
 	
 	// Angular acceptance factors
 	angAccI1 = allParameters.GetPhysicsParameter( &angAccI1Name )->GetValue();
@@ -178,17 +178,26 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate(DataPoint * measurement)
 	ctheta_tr = measurement->GetObservable( &cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();
+
 	tag = (int)measurement->GetObservable( &tagName )->GetValue();
 	tagFraction = measurement->GetObservable( &mistagName )->GetValue();
+
+	//PELCX 
+	//double tagFractionOld = tagFraction ;
+	
 	if( tagFraction < 0 ) {  cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate() : tagFraction < 0 so set to 0 " << endl ; tagFraction = 0 ; }
 	if( tagFraction > 0.5 ) { cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate() : tagFraction > 0.5 so set to 0.5 " << endl ; tagFraction = 0.5 ; }
 
-        if( (fabs(tag-0)<DOUBLE_TOLERANCE) && (fabs(tagFraction- 0.5)<DOUBLE_TOLERANCE) ) {
-                tagFraction = mistagOffset + mistagScale * ( tagFraction - ETABAR ) ;
-                if( tagFraction < 0 )   {  tagFraction = 0 ; }
-                if( tagFraction > 0.5 ) {  tagFraction = 0.5 ; }
-        }
+	if( (fabs(tag-0) > DOUBLE_TOLERANCE) && (fabs(tagFraction- 0.5)> DOUBLE_TOLERANCE) ) {
+		tagFraction = mistagOffset + mistagScale * ( tagFraction - ETABAR ) ;
+		if( tagFraction < 0 )   {  tagFraction = 0 ; }
+		if( tagFraction > 0.5 ) {  tagFraction = 0.5 ; }
+	}
 
+	//PELCX 
+	//cout << " TAGGING:  tag = " << tag << "   mistagold = " <<tagFractionOld << "   mistagnew  = " <<tagFraction << endl ;
+	
+	
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
 	
 	double val1, val2 ;
@@ -251,19 +260,18 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
 	ctheta_tr = measurement->GetObservable( &cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();	
-        tag = (int)measurement->GetObservable( &tagName )->GetValue();
-        tagFraction = measurement->GetObservable( &mistagName )->GetValue() ;
 
-	//tagFraction = measurement->GetObservable( mistagName )->GetValue();
-	//tagFraction = mistagOffset + mistagScale*measurement->GetObservable( &mistagName )->GetValue();
+	tag = (int)measurement->GetObservable( &tagName )->GetValue();
+	tagFraction = measurement->GetObservable( &mistagName )->GetValue() ;
+
 	if( tagFraction < 0 ) {  cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Normalise() : tagFraction < 0 so set to 0 " << endl ; tagFraction = 0 ; }
 	if( tagFraction > 0.5 ) { cout << "Bs2JpsiPhi_SignalAlt_MO_v1::Normalise() : tagFraction > 0.5 so set to 0.5 " << endl ; tagFraction = 0.5 ; }
 
-        if( (fabs(tag-0)<DOUBLE_TOLERANCE) && (fabs(tagFraction-0.5)<DOUBLE_TOLERANCE) ) {
-                tagFraction = mistagOffset + mistagScale * (tagFraction - ETABAR) ;
-                if( tagFraction < 0 )   {  tagFraction = 0 ; }
-                if( tagFraction > 0.5 ) {  tagFraction = 0.5 ; }
-        }
+	if( (fabs(tag-0) > DOUBLE_TOLERANCE) && (fabs(tagFraction- 0.5)> DOUBLE_TOLERANCE) ) {
+		tagFraction = mistagOffset + mistagScale * (tagFraction - ETABAR) ;
+		if( tagFraction < 0 )   {  tagFraction = 0 ; }
+		if( tagFraction > 0.5 ) {  tagFraction = 0.5 ; }
+	}
 
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
 	
@@ -277,35 +285,12 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
 		tlo = timeBound->GetMinimum();
 		thi = timeBound->GetMaximum();
 	}
-/*
-	// Recalculate cached values if Physics parameters have changed
-	// Must do this for each of the two resolutions.
-	if( true *! normalisationCacheValid* )  {
-		for( tag = -1; tag <= 1; ++tag ) {
-			if(resolution1Fraction >= 0.9999 ){
-				resolution =  resolution1 ;
-				normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
-			}
-			else {
-				resolution =  resolution1 ;
-				normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
-				resolution =  resolution2 ;
-				normalisationCacheValueRes2[tag+1] = this->diffXsecCompositeNorm1( );
-			}
-		}
-		normalisationCacheValid = true ;
-	}
-*/
 	
-	// calculate return value according to tag 
-
-	//tag = (int)measurement->GetObservable( &tagName )->GetValue();
 	double returnValue  ;
 	if(resolution1Fraction >= 0.9999 )
 	{
 		resolution =  resolution1 ;
 		returnValue = this->diffXsecCompositeNorm1( );
-		//returnValue = normalisationCacheValueRes1[tag+1] ;
 	}
 	else
 	{
@@ -314,7 +299,6 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
                 resolution =  resolution2 ;
                 double val2 = this->diffXsecCompositeNorm1( );
                 returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;
-		//returnValue = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
 	}
 	
 	if( (returnValue <= 0.) || isnan(returnValue) ) {
@@ -332,145 +316,4 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Normalisation(DataPoint * measurement, PhaseS
 	return returnValue ;
 }
 
-
-//...................................
-// Diff cross section
-
-double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec(  )  const
-{   
-	preCalculateTimeFactors() ;
-
-	double xsec = 
-	
-	0.5 * A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
-	0.5 * AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
-	0.5 * AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
-	
-	0.5 * AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
-	0.5 * A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
-	0.5 * A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
-
-	0.5 * AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
-	
-	0.5 * AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
-	0.5 * AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
-	0.5 * AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
-
-	//PELC DEBUG 
-	 if( DEBUGFLAG && (xsec < 0) ) {
-		 cout << " Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec( ) : return value < 0 " << endl ;
-		 cout << "  -> " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
-		 cout << "  -> " << "  time " << timeFactorA0A0(  ) << endl ;
-		 cout << "  -> " << "  angle " << angleFactorA0A0( ) << endl ;
-		 cout <<  "  -> " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
-		 cout <<  "  -> " <<AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) << endl << endl ;
-		 cout <<  "  -> " <<AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( )<< endl ;
-		 cout <<  "  -> " <<A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( )<< endl ;
-		 cout <<  "  -> " <<A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( )<< endl << endl;
-		 cout <<  "  -> " <<AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) << endl ;
-		 cout <<  "  -> " <<AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( )<< endl ;
-		 cout <<  "  -> " <<AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( )<< endl ;
-		 cout <<  "  -> " <<AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( )<< endl ;
-	 }
-	
-	return xsec ;
-}
-
-//...................................
-// Integral over all variables: t + angles
-
-double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm1(  ) const
-{ 
-	preCalculateTimeIntegrals() ;
-
-	return
-
-	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1   +  
-	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2   +  
-	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3   +  
-
-	0.5 * AP()*AT() * timeFactorImAPATInt(  ) * angAccI4 +  
-	0.5 * A0()*AP() * timeFactorReA0APInt(  ) * angAccI5 +  
-	0.5 * A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 +  
-	
-	0.5 * AS()*AS() * timeFactorASASInt(  ) * angAccI7   +  
-	
-	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +  
-	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
-	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
-	
-	//PELC DEBUG 
-	/*
-	if( norm < 0 ) {
-		cout << endl ;
-		cout <<  A0()*A0() * timeFactorA0A0Int(  )* angAccI1  << endl ;
-		cout <<  AP()*AP() * timeFactorAPAPInt(  )* angAccI2 << endl ;
-		cout <<  AT()*AT() * timeFactorATATInt(  )* angAccI3 << endl << endl ;
-		cout <<  AP()*AT() * timeFactorImAPATInt(  ) * angAccI4<< endl ;
-		cout <<  A0()*AP() * timeFactorReA0APInt(  ) * angAccI5<< endl ;
-		cout <<  A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6<< endl << endl;
-		cout <<  AS()*AS() * timeFactorASASInt(  ) * angAccI7 << endl ;
-		cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl ;
-		cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
-		cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
-	}
-	 */
-}
-
-
-//...................................
-// Integral over angles only 3 
-
-double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecNorm2(  ) const
-{          
-	preCalculateTimeIntegrals() ;
-
-	return 
-	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1 +
-	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2 +
-	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3 +
-	
-	0.5 * AP()*AT() * timeFactorImAPATInt(  ) * angAccI4 +
-	0.5 * A0()*AP() * timeFactorReA0APInt(  ) * angAccI5 +
-	0.5 * A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 +
-	
-	0.5 * AS()*AS() * timeFactorASASInt(  ) * angAccI7 +
-	
-	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +
-	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +
-	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
-}
-
-
-//....................................................
-// New method to calculate normalisation using a histogrammed "low-end" time acceptance function
-// The acceptance function information is all containe din the timeAcceptance member object,
-
-double Bs2JpsiPhi_SignalAlt_MO_v1::diffXsecCompositeNorm1(  )  
-{   
-	if( useLowerTimeAcceptance() ) 
-	{
-		double norm = 0 ;
-		double tlo_remember = tlo ;
-	
-		timeAcceptance.configure( tlo ) ;
-	
-		bool firstBin = true ;
-		for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); ++islice ) 
-		{
-			if( firstBin )firstBin = false ;
-			else tlo = timeAcceptance.sliceStart( islice ) ;
-			norm += this->diffXsecNorm1(  ) * timeAcceptance.fraction( islice ) ;
-		}
-
-		tlo =  tlo_remember ;
-		return norm ;	
-	}
-
-	else 
-	{
-		return this->diffXsecNorm1() ;
-	}
-	
-}
 

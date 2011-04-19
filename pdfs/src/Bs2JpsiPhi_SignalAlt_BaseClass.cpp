@@ -29,6 +29,9 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() :
 	, delta_paraName( make_pair("delta_para",-1) )
 	, delta_perpName( make_pair("delta_perp",-1) )
 	, delta_sName( make_pair("delta_s",-1) )
+	// PELC NEW additions for v2
+	, cosphisName( make_pair("cosphis",-1) )
+	, sinphisName( make_pair("sinphis",-1) )
 	// Detector parameters
 	, mistagName	( make_pair("mistag",-1) )
 	, res1Name	( make_pair("timeResolution1",-1) )
@@ -111,4 +114,156 @@ void Bs2JpsiPhi_SignalAlt_BaseClass::preCalculateTimeIntegrals() const
 	intExpCos_stored = Mathematics::ExpCosInt( tlo, thi, gamma(), delta_ms, resolution ) ; 
 	return ;
 }
+
+
+//-------------------------------------------------------------------------
+// Differential crtoss sections and normalisations
+//
+
+//...................................
+// Main Diff cross section
+
+double Bs2JpsiPhi_SignalAlt_BaseClass::diffXsec(  )  const
+{   
+	preCalculateTimeFactors() ;
+	
+	double xsec = 
+	
+	0.5 * A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
+	0.5 * AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
+	0.5 * AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
+	
+	0.5 * AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
+	0.5 * A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
+	0.5 * A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
+	
+	0.5 * AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
+	
+	0.5 * AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
+	0.5 * AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
+	0.5 * AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
+	
+	//PELC DEBUG 
+	if( DEBUGFLAG && (xsec < 0) ) {
+		cout << " Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec( ) : return value < 0 " << endl ;
+		cout << "  -> " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
+		cout << "  -> " << "  time " << timeFactorA0A0(  ) << endl ;
+		cout << "  -> " << "  angle " << angleFactorA0A0( ) << endl ;
+		cout <<  "  -> " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
+		cout <<  "  -> " <<AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) << endl << endl ;
+		cout <<  "  -> " <<AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( )<< endl ;
+		cout <<  "  -> " <<A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( )<< endl ;
+		cout <<  "  -> " <<A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( )<< endl << endl;
+		cout <<  "  -> " <<AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) << endl ;
+		cout <<  "  -> " <<AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( )<< endl ;
+		cout <<  "  -> " <<AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( )<< endl ;
+		cout <<  "  -> " <<AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( )<< endl ;
+	}
+	
+	return xsec ;
+}
+
+//...................................
+// Integral over all variables: t + angles
+
+double Bs2JpsiPhi_SignalAlt_BaseClass::diffXsecNorm1(  ) const
+{ 
+	preCalculateTimeIntegrals() ;
+	
+	double norm =
+	
+	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1   +  
+	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2   +  
+	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3   +  
+	
+	0.5 * AP()*AT() * timeFactorImAPATInt(  ) * angAccI4 +  
+	0.5 * A0()*AP() * timeFactorReA0APInt(  ) * angAccI5 +  
+	0.5 * A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 +  
+	
+	0.5 * AS()*AS() * timeFactorASASInt(  ) * angAccI7   +  
+	
+	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +  
+	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
+	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
+	
+	//PELC DEBUG 	
+	 if( DEBUGFLAG && (norm < 0) ) {
+	 cout << endl ;
+	 cout <<  A0()*A0() * timeFactorA0A0Int(  )* angAccI1  << endl ;
+	 cout <<  AP()*AP() * timeFactorAPAPInt(  )* angAccI2 << endl ;
+	 cout <<  AT()*AT() * timeFactorATATInt(  )* angAccI3 << endl << endl ;
+	 cout <<  AP()*AT() * timeFactorImAPATInt(  ) * angAccI4<< endl ;
+	 cout <<  A0()*AP() * timeFactorReA0APInt(  ) * angAccI5<< endl ;
+	 cout <<  A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6<< endl << endl;
+	 cout <<  AS()*AS() * timeFactorASASInt(  ) * angAccI7 << endl ;
+	 cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl ;
+	 cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
+	 cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
+	 }
+	 
+	return norm ;
+}
+
+
+
+//...................................
+// Integral over angles only for a fixed time.
+
+double Bs2JpsiPhi_SignalAlt_BaseClass::diffXsecNorm2(  ) const
+{          
+	preCalculateTimeFactors() ;
+	
+	double norm = 
+	
+	0.5 * A0()*A0() * timeFactorA0A0(  ) * angAccI1 +
+	0.5 * AP()*AP() * timeFactorAPAP(  ) * angAccI2 +
+	0.5 * AT()*AT() * timeFactorATAT(  ) * angAccI3 +
+	
+	0.5 * AP()*AT() * timeFactorImAPAT(  ) * angAccI4 +
+	0.5 * A0()*AP() * timeFactorReA0AP(  ) * angAccI5 +
+	0.5 * A0()*AT() * timeFactorImA0AT(  ) * angAccI6 +
+	
+	0.5 * AS()*AS() * timeFactorASAS(  ) * angAccI7 +
+	
+	0.5 * AS()*AP() * timeFactorReASAP(  ) * angAccI8 +
+	0.5 * AS()*AT() * timeFactorImASAT(  ) * angAccI9 +
+	0.5 * AS()*A0() * timeFactorReASA0(  ) * angAccI10 ;
+	
+	return norm ;
+}
+
+
+//....................................................
+// New method to calculate normalisation using a histogrammed "low-end" time acceptance function
+// The acceptance function information is all contained in the timeAcceptance member object,
+
+double Bs2JpsiPhi_SignalAlt_BaseClass::diffXsecCompositeNorm1(  )  
+{   
+	if( useLowerTimeAcceptance() ) 
+	{
+		double norm = 0 ;
+		double tlo_remember = tlo ;
+		
+		timeAcceptance.configure( tlo ) ;
+		
+		bool firstBin = true ;
+		for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); ++islice ) 
+		{
+			if( firstBin )firstBin = false ;
+			else tlo = timeAcceptance.sliceStart( islice ) ;
+			norm += this->diffXsecNorm1(  ) * timeAcceptance.fraction( islice ) ;
+		}
+		
+		tlo =  tlo_remember ;
+		return norm ;	
+	}
+	
+	else 
+	{
+		return this->diffXsecNorm1() ;
+	}
+	
+}
+
+
 

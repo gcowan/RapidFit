@@ -35,7 +35,7 @@ class Bs2JpsiPhi_SignalAlt_MP_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_
 		//Mandatory method to evaluate the PDF value:
 		virtual double Evaluate(DataPoint*) ;
 
-		//Other opeating methods
+		//Other operating methods
 		virtual bool SetPhysicsParameters(ParameterSet*);
 		virtual vector<string> GetDoNotIntegrateList();
 
@@ -51,12 +51,6 @@ class Bs2JpsiPhi_SignalAlt_MP_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_
 		double normalisationCacheValueRes1[3] ;
 		double normalisationCacheValueRes2[3] ;
 
-		double diffXsec(  )  const ;   
-		
-		double diffXsecNorm1(  ) const ;
-		double diffXsecCompositeNorm1(  )  ;
-	
-		double diffXsecNorm2(  ) const ;
 };
 
 #endif

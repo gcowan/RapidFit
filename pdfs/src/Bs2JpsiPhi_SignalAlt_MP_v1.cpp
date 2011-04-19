@@ -30,6 +30,8 @@ Bs2JpsiPhi_SignalAlt_MP_v1::Bs2JpsiPhi_SignalAlt_MP_v1() :
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_v1 " << std::endl ;
 }
 
+
+//.......................................
 //Make the data point and parameter set
 void Bs2JpsiPhi_SignalAlt_MP_v1::MakePrototypes()
 {
@@ -55,9 +57,9 @@ void Bs2JpsiPhi_SignalAlt_MP_v1::MakePrototypes()
 	parameterNames.push_back( deltaMName.first );
 	parameterNames.push_back( Phi_sName.first );
 	parameterNames.push_back( mistagName.first );
+	parameterNames.push_back( res1FractionName.first );
 	parameterNames.push_back( res1Name.first );
 	parameterNames.push_back( res2Name.first );
-	parameterNames.push_back( res1FractionName.first );
 	parameterNames.push_back( timeOffsetName.first );
 	parameterNames.push_back( angAccI1Name.first );
 	parameterNames.push_back( angAccI2Name.first );
@@ -91,14 +93,10 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
 	
-	/// Some gymnastics here to match xml parameters to my original pdf parameters 
-	
 	// Physics parameters. 
-	gamma_in  = allParameters.GetPhysicsParameter( &gammaName )->GetValue();
+	_gamma  = allParameters.GetPhysicsParameter( &gammaName )->GetValue();
     dgam      = allParameters.GetPhysicsParameter( &deltaGammaName )->GetValue();
-	delta_ms  = allParameters.GetPhysicsParameter( &deltaMName )->GetValue();
-	phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
-
+	
 	Azero_sq = allParameters.GetPhysicsParameter( &Azero_sqName )->GetValue();
 	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}	
 	Aperp_sq = allParameters.GetPhysicsParameter( &Aperp_sqName )->GetValue();
@@ -118,12 +116,17 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	delta_s	   = allParameters.GetPhysicsParameter( &delta_sName )->GetValue();
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
-	
-	// Detector parameters
+
 	tagFraction         = allParameters.GetPhysicsParameter( &mistagName )->GetValue();
+	delta_ms  = allParameters.GetPhysicsParameter( &deltaMName )->GetValue();
+	phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
+	_cosphis = cos(phi_s) ;
+	_sinphis = sin(phi_s) ;
+	
+	// Resolution parameters
+	resolution1Fraction = allParameters.GetPhysicsParameter( &res1FractionName )->GetValue();
 	resolution1         = allParameters.GetPhysicsParameter( &res1Name )->GetValue();
 	resolution2         = allParameters.GetPhysicsParameter( &res2Name )->GetValue();
-	resolution1Fraction = allParameters.GetPhysicsParameter( &res1FractionName )->GetValue();
 	timeOffset          = allParameters.GetPhysicsParameter( &timeOffsetName )->GetValue();
 	
 	// Angular acceptance factors
@@ -173,7 +176,6 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement)
 	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( &tagName )->GetValue();
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
-	//timeAcceptanceCategory	= 0. ;  //PELC
 	
 	double val1, val2 ;
 	double returnValue ;
@@ -233,7 +235,6 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseS
 	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();	
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
-	//timeAcceptanceCategory	= 0. ;  //PELC
 	
 	// Get time boundaries into member variables
 	IConstraint * timeBound = boundary->GetConstraint("time");
@@ -265,7 +266,6 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseS
 	}	
 	
 	// calculate return value according to tag 
-
 	tag = (int)measurement->GetObservable( &tagName )->GetValue();
 	double returnValue  ;
 	if(resolution1Fraction >= 0.9999 )
@@ -290,118 +290,5 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseS
 	}
 	
 	return returnValue ;
-}
-
-
-//...................................
-// Diff cross section
-
-double Bs2JpsiPhi_SignalAlt_MP_v1::diffXsec(  )  const
-{   
-	preCalculateTimeFactors() ;						
-
-	double xsec = 
-	
-	0.5 * A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
-	0.5 * AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
-	0.5 * AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
-	
-	0.5 * AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
-	0.5 * A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
-	0.5 * A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
-
-	0.5 * AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
-	
-	0.5 * AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
-	0.5 * AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
-	0.5 * AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
-	
-	return xsec ;
-}
-
-//...................................
-// Integral over all variables: t + angles
-
-double Bs2JpsiPhi_SignalAlt_MP_v1::diffXsecNorm1(  ) const
-{ 
-	preCalculateTimeIntegrals() ;
-
-	double norm = 
-	
-	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1   +  
-	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2   +  
-	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3   +  
-
-	0.5 * AP()*AT() * timeFactorImAPATInt(  ) * angAccI4 +  
-	0.5 * A0()*AP() * timeFactorReA0APInt(  ) * angAccI5 +  
-	0.5 * A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 +  
-	
-	0.5 * AS()*AS() * timeFactorASASInt(  ) * angAccI7   +  
-	
-	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +  
-	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
-	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
-	
-	return norm ;
-}
-
-
-//...................................
-// Integral over angles only 3 
-
-double Bs2JpsiPhi_SignalAlt_MP_v1::diffXsecNorm2(  ) const
-{          
-	preCalculateTimeIntegrals() ;
-
-	double norm = 
-	
-	0.5 * A0()*A0() * timeFactorA0A0Int(  ) * angAccI1 +
-	0.5 * AP()*AP() * timeFactorAPAPInt(  ) * angAccI2 +
-	0.5 * AT()*AT() * timeFactorATATInt(  ) * angAccI3 +
-	
-	0.5 * AP()*AT() * timeFactorImAPATInt(  ) * angAccI4 +
-	0.5 * A0()*AP() * timeFactorReA0APInt(  ) * angAccI5 +
-	0.5 * A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 +
-	
-	0.5 * AS()*AS() * timeFactorASASInt(  ) * angAccI7 +
-	
-	0.5 * AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +
-	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +
-	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
-		
-	return norm ;
-}
-
-
-//....................................................
-// New method to calculate normalisation using a histogrammed "low-end" time acceptance function
-// The acceptance function information is all containe din the timeAcceptance member object,
-
-double Bs2JpsiPhi_SignalAlt_MP_v1::diffXsecCompositeNorm1(  )  
-{   
-	if( useLowerTimeAcceptance() ) 
-	{
-		double norm = 0 ;
-		double tlo_remember = tlo ;
-	
-		timeAcceptance.configure( tlo ) ;
-	
-		bool firstBin = true ;
-		for( int islice = timeAcceptance.firstSlice( ); islice <= timeAcceptance.lastSlice( ); ++islice ) 
-		{
-			if( firstBin )firstBin = false ;
-			else tlo = timeAcceptance.sliceStart( islice ) ;
-			norm += this->diffXsecNorm1(  ) * timeAcceptance.fraction( islice ) ;
-		}
-
-		tlo =  tlo_remember ;
-		return norm ;	
-	}
-
-	else 
-	{
-		return this->diffXsecNorm1() ;
-	}
-	
 }
 
