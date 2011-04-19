@@ -507,7 +507,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>../../myDataFiles/goldstandard_unbiased_timecut3.root</FileName>  
+<FileName>../Xdata/goldstandard_unbiased_timecut3.root</FileName>  
 <NTuplePath>merged</NTuplePath>
 
 <NumberEvents>2000000</NumberEvents>
@@ -600,7 +600,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>../../myDataFiles/goldstandard_unbiased_timecut3.root</FileName>  
+<FileName>../Xdata/goldstandard_unbiased_timecut3.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 
 <NumberEvents>2000000</NumberEvents>
@@ -690,7 +690,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>../../myDataFiles/goldstandard_biased_timecut3PELC.root</FileName>  
+<FileName>../Xdata/goldstandard_biased_timecut3PELC.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 <NumberEvents>200000000</NumberEvents>   
 
@@ -782,7 +782,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>../../myDataFiles/goldstandard_biased_timecut3PELC.root</FileName>  
+<FileName>../Xdata/goldstandard_biased_timecut3PELC.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 
 <NumberEvents>20000000</NumberEvents>
