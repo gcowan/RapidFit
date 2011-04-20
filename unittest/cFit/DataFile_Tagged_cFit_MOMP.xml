@@ -106,7 +106,7 @@
 
 <PhysicsParameter>
 <Name>delta_perp</Name>
-<Value>1.7</Value> 
+<Value>-0.17</Value> 
 <Minimum>-3.3</Minimum>
 <Maximum>3.3</Maximum>
 <Type>Free</Type>
@@ -507,7 +507,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>../Xdata/goldstandard_unbiased_timecut3.root</FileName>  
+<FileName>/phys/linux/s0127440/rapidfit/trunk/unittest/Xdata/goldstandard_unbiased_timecut3.root</FileName>  
 <NTuplePath>merged</NTuplePath>
 
 <NumberEvents>2000000</NumberEvents>
@@ -600,7 +600,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>../Xdata/goldstandard_unbiased_timecut3.root</FileName>  
+<FileName>/phys/linux/s0127440/rapidfit/trunk/unittest/Xdata/goldstandard_unbiased_timecut3.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 
 <NumberEvents>2000000</NumberEvents>
@@ -690,7 +690,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>../Xdata/goldstandard_biased_timecut3PELC.root</FileName>  
+<FileName>/phys/linux/s0127440/rapidfit/trunk/unittest/Xdata/goldstandard_biased_timecut3PELC.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 <NumberEvents>200000000</NumberEvents>   
 
@@ -782,7 +782,7 @@
 
 <DataSet>
 <Source>File</Source>
-<FileName>../Xdata/goldstandard_biased_timecut3PELC.root</FileName>  
+<FileName>/phys/linux/s0127440/rapidfit/trunk/unittest/Xdata/goldstandard_biased_timecut3PELC.root</FileName>  
 <NTuplePath>merged</NTuplePath>  
 
 <NumberEvents>20000000</NumberEvents>
