@@ -99,7 +99,9 @@ namespace GoodnessOfFit
 	double pValueFromPoint2PointDissimilarity(IDataSet * data, IDataSet * mcData)
 	{
 		double T = calculateTstatistic( data, mcData );
-		cout << "T = " << T << endl;
+		char buffer[20];
+		sprintf( buffer, "T = %f", T );
+		cout << buffer << endl;
 
 		int nPerm = 20;
 		vector<double> Tvalues = permutation( data, mcData, nPerm );
@@ -116,7 +118,7 @@ namespace GoodnessOfFit
 
 	double calculateTstatistic( IDataSet * data, IDataSet * mcData )
 	{
-		return sumEvents( data ) + sumEvents( mcData ) - sumDataMCEvents( data, mcData );
+		return sumEvents( data ) /*+ sumEvents( mcData )*/ - sumDataMCEvents( data, mcData );
 	}
 
 	vector<double> permutation( IDataSet * data, IDataSet * mc, int nPerm )
@@ -125,7 +127,9 @@ namespace GoodnessOfFit
 		for ( int i = 0; i < nPerm; i++ ) {
 			double T = permutationCore( data, mc, i );
 			bootstrappedTvalues.push_back(T);
-			cout << "finished permutation " << i << " Tperm value " << T << endl;
+			char buffer[20];
+			sprintf( buffer, "Tperm%i = %f", i, T );
+			cout << buffer << endl;
 		}
 		return bootstrappedTvalues;
 	}
@@ -180,11 +184,13 @@ namespace GoodnessOfFit
 			for ( int j = i+1; j < n; j++){
 				DataPoint * event_j = data->GetDataPoint(j);
 				distance = getDistance( event_i, event_j );
-				//T += exp( -distance * distance / (2.*0.001) );
-				T += 1./distance;
+				//if ( distance == 0. ) cout << "sumEvents " << distance << " " << i << " " << j << endl;
+				//T += 1./distance;  // This is an alternative function which could be used
+				T += exp( -distance * distance / (2.*0.0001) ); // sigma = 0.1 is a nuisance parameter. 0.1 is chosen arbitrarily.
 			}
 		}
-		T *= 1./(n * (n - 1.));
+		//T *= 1./(n * (n - 1.));
+		T *= 1./(n * n); // This is better behaved for low statistics
 		return T;
 	}
 
@@ -199,8 +205,9 @@ namespace GoodnessOfFit
 			for ( int j = 0; j < nMC; j++){
 				DataPoint * event_j = mcData->GetDataPoint(j);
 				distance = getDistance( event_i, event_j );
-				//T += exp( -distance * distance / (2.*0.001) );
-				T += 1./distance;
+				//if ( distance == 0. ) cout << "sumDataMCEvents " << distance << " " << i << " " << j << endl;
+				//T += 1./distance;
+				T += exp( -distance * distance / (2.*0.0001) );
 			}
 		}
 		T *= 1./(nD * nMC);
@@ -216,11 +223,11 @@ namespace GoodnessOfFit
                 vector<string>::iterator yIter = yListOfNames.begin();
                 Observable * xVar = 0;
                 Observable * yVar = 0;
-                char buffer[100];
+                //char buffer[100];
                 while ( (xVar = x->GetObservable( *xIter ) ) && (yVar = y->GetObservable( *yIter ) ) ) {
                         distance += (xVar->GetValue() - yVar->GetValue())*(xVar->GetValue() - yVar->GetValue());
-                        sprintf(buffer, "%f %f %f", xVar->GetValue(), yVar->GetValue(), sqrt(distance));
-                        //cout << buffer << endl;
+                        //sprintf(buffer, "%f %f %f", xVar->GetValue(), yVar->GetValue(), sqrt(distance));
+			//if ( distance == 0. ) cout << buffer << endl;
                         ++xIter, ++yIter;
                         if ( xIter == xListOfNames.end() || yIter == yListOfNames.end() ) break;
                 }

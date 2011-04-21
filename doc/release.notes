@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/04/21 Greig Cowan
+ - Some changes to GOF code.
+
 2011/04/19 Pete Clarke
   - Updated .h and .cpp files for
     	   o Bs2JpsiPhi_SignalAlt_BaseClass
