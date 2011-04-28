@@ -88,13 +88,13 @@ ScanParam* OutputConfiguration::GetScanParam( string param_name )
 pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_1, string param_2 )
 {
 	pair<ScanParam*, ScanParam* > Returnable_Pair;
-	for(unsigned short int i=0; i < Global_2DScan_List.size(); ++i)
+	for( int i=(Global_2DScan_List.size()-1); i >= 0 ; --i )
 	{
-		if( ( Global_2DScan_List[i].first->HasName() ) && ( Global_2DScan_List[i].second->HasName() ) )
+		if( ( Global_2DScan_List[unsigned(i)].first->HasName() ) && ( Global_2DScan_List[unsigned(i)].second->HasName() ) )
 		{
-			if( ( Global_2DScan_List[i].first->GetName() == param_1 ) && ( Global_2DScan_List[i].second->GetName() == param_2 ) )
+			if( ( Global_2DScan_List[unsigned(i)].first->GetName() == param_1 ) && ( Global_2DScan_List[unsigned(i)].second->GetName() == param_2 ) )
 			{
-				Returnable_Pair = Global_2DScan_List[i];
+				Returnable_Pair = Global_2DScan_List[unsigned(i)];
 			}
 		}
 	}
@@ -122,6 +122,13 @@ vector<string> OutputConfiguration::GetScanList( )
 		ScanReturnList.push_back( Global_Scan_List[i]->GetName() );
 	}
 	return ScanReturnList;
+}
+
+void OutputConfiguration::Clear2DScanList( )
+{
+	while( !Global_2DScan_List.empty() )
+		Global_2DScan_List.pop_back();
+	return;
 }
 
 //Return the requested Scans

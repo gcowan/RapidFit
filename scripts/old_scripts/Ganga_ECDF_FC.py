@@ -46,24 +46,17 @@ j.name = 'RapidFit FC Edinburgh'
 j.application.script = File( name='./RapidFit_FC.C' )
 
 #	Input Required by jobs
-j.inputsandbox = ['./RapidFit_FC.C','../config/betas_tagged_analysis/tagged_cfit_3_free.xml','../lib/libRapidRun.so']
+j.inputsandbox = ['./RapidFit_FC.C','../config/betas_tagged_analysis/tagged_cfit_3_free_ECDF.xml','../lib/libRapidRun.so']
 #	Output given from FC Scan
 j.outputsandbox = ['FCOutput.root']
-
-#	INPUT LFNs on Grid
-j.inputdata = ['LFN:/lhcb/user/r/rcurrie/goldstandard_unbiased_timecut.root','LFN:/lhcb/user/r/rcurrie/goldstandard_biased_timecut3_PELC.root']
 
 #	ROOT MERGE OUTPUT broken for large number of files but leave in anyway incase root fixes it
 j.merger = RootMerger( files=['FCOutput.root'] )
 
-#	Dirac BACKEND	RUN ON THE GRID :D
-j.backend = Dirac()
-
-#	MAKE DIRAC DOWNLOAD THE LFNs TO THE SPACE THE JOB RUNS IN
-j.backend.inputSandboxLFNs = ['LFN:/lhcb/user/r/rcurrie/goldstandard_unbiased_timecut.root','LFN:/lhcb/user/r/rcurrie/goldstandard_biased_timecut3_PELC.root']
-
 #	INTERACTIVE FOR TESTING
 #j.backend=Interactive()
+
+j.backend=SGE()
 
 #	THE CONFIGURATION OF ALL JOBS WITHIN THE SCAN
 j.splitter=ArgSplitter( args = fcsplitter('tagged_cfit_3_free.xml',10,10,'Phi_s',0,2*pi,39,'deltaGamma',-0.7,0.7,39,67890) )

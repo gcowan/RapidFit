@@ -569,6 +569,7 @@ int RapidFit( int argc, char * argv[] )
 			{
 				for( unsigned short int i=0; i < Contour_X.size(); ++i)
 				{
+					makeOutput->Clear2DScanList();
 					makeOutput->AddContour( Contour_X[i], Contour_Y[i] );
 				}
 			}
@@ -687,10 +688,10 @@ int RapidFit( int argc, char * argv[] )
 					vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
 
 					unsigned int initial_scan=0;
-					if( ( _2DLLscanList.size() > 1 ) && doFC_Flag )
+					if( ( ( _2DLLscanList.size() > 1 ) && doFC_Flag ) || defineContourFlag )
 					{
 						cerr << "\n\nPERFORMING ONLY ONE 2D SCAN, CHECK THIS IS EXPECTED!" <<endl;
-						initial_scan = int(_2DLLscanList.size()-2);
+						initial_scan = int(_2DLLscanList.size()-1);
 					}
 
 					if( ( _2DLLscanList.size() == 0 ) && ( doFC_Flag) )

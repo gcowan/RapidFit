@@ -22,7 +22,7 @@ def fcsplitter(commonargs='-f XML_File.xml --doFCscan',toys=10,toyspersj=5,par1=
 
 j = Job (
 name = 'Feldman_Cousins_test' ,
- outputsandbox = ['pullPlots.root','fit.log'] ,
+ outputsandbox = ['FCOutput.root'] ,
  info = JobInfo (
     ) ,
  inputdata = None ,
@@ -34,14 +34,14 @@ name = 'Feldman_Cousins_test' ,
     ) ,
  inputsandbox = [ ] ,
  application = Executable (
-    exe = '/phys/linux/s0127440/sWave_scripts/runrapidfit.sh',
+    exe = '/exports/home/s0957039/runrapidfit.sh',
     env = {} ,
     args = [] 
     ) ,
  outputdata = None ,
  splitter = ArgSplitter (
- args = fcsplitter('-f /phys/linux/s0127440/sWave_scripts/pete-unbiased-upper.xml --doFCscan',20,100,'Phi_s',0.0,2.0*pi,24,'deltaGamma',-0.9,0.9,24,2)
+ args = fcsplitter('-f /exports/home/s0957039/trunk/config/betas_tagged_analysis/tagged_cfit_3_free.xml --doFCscan',20,10,'Phi_s',0.0,2.0*pi,39,'deltaGamma',-0.7,0.7,39,169234)
     ) ,
- backend = Condor ( ) 
+ backend = SGE( ) 
     ) 
 j.submit()

@@ -21,16 +21,13 @@ def fcsplitter(XML='XML.xml',par1='x',par1min=0.,par1max=0.,par1res=1,par2='y',p
 	print args
 	return args
 
-j = Job( application = Root( version = '5.26.00b' ) )
+j = Job( application = Root() )
 j.name = 'rootrun'
 j.application.script = File( name='./RapidFit.C' )
-j.inputsandbox = ['./RapidFit.C','../config/betas_tagged_analysis/tagged_cfit_3_free.xml','../lib/libRapidRun.so']
+j.inputsandbox = ['./RapidFit.C','../config/betas_tagged_analysis/tagged_cfit_3_free_ECDF.xml','../lib/libRapidRun.so']
 j.outputsandbox = ['LLcontourScanData.root']
-#j.inputdata = ['LFN:/lhcb/user/r/rcurrie/oldstandard_unbiased_timecut.root','LFN:/lhcb/user/r/rcurrie/goldstandard_biased_timecut3_PELC.root']
 j.merger = RootMerger( files=['LLcontourScanData.root'] )
-#j.backend = Dirac()
-#j.backend.inputSandboxLFNs = ['LFN:/lhcb/user/r/rcurrie/oldstandard_unbiased_timecut.root','LFN:/lhcb/user/r/rcurrie/goldstandard_biased_timecut3_PELC.root']
-j.backend=Interactive()
-j.splitter=ArgSplitter( args = fcsplitter('tagged_cfit_3_free.xml','Phi_s',0,2*pi,1,'deltaGamma',-0.7,0.7,1) )
+j.backend=SGE()
+j.splitter=ArgSplitter( args = fcsplitter('tagged_cfit_3_free_ECDF.xml','Phi_s',0,2*pi,39,'deltaGamma',-0.7,0.7,39) )
 j.submit()
 

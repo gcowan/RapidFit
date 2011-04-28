@@ -1,5 +1,21 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/04/28 Rob Currie
+  - Fixed a subtle bug that *should* never present itself in the 2DLL code to do with combining XML and command line contour definitions
+      command line now takes complete precedent and overwrites the values stored in OutputConfiguration
+  - Added some UnitTest scripts which allow for the results of any commit to be rigorously checked against known good code
+      ONLY changes to the UnitTest XML are to have the source files in the local working directory of the fit
+
+      TO PERFORM a Unit test:
+
+	cd Path/to/RapidFit
+	cd scripts
+
+	./run_UnitTests.py			#	Run on your local machine over-night
+	./run_UnitTests_ECDF.py			#	Use when running on ECDF
+	./run_UnitTests_GRID.py			#	Use when running on lxplus and submitting to the GRID
+	./run_UnitTests_CONDOR.py		#	Use when running on CONDOR in Edinburgh  ***UNTESTED***
+
 2011/04/21 Greig Cowan
  - Some changes to GOF code.
 

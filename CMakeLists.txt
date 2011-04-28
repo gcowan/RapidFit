@@ -2,7 +2,9 @@
 
 #  Some Defaults to allow people to just use the file
 
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+#	Would REALLY like to make this 2.8 but 2.6.x is provided in SC_Linux 5.x
+#	2.8 handles system includes in a MUCH better way
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
 MARK_AS_ADVANCED( CMAKE_BACKWARDS_COMPATABILITY )
 SET( CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE )
 
@@ -24,7 +26,7 @@ ENDIF( INSOURCE )
 
 SET( CMAKE_CXX_FLAGS_RELEASE "" )
 
-SET( CMAKE_CXX_FLAGS "-Os -Bdynamic -mtune=native -shared -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+SET( CMAKE_CXX_FLAGS "-Os -msse -msse2 -msse3 -m3dnow -shared -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
 
 #  Get back the old style verbosity :) by setting this to 1
 #SET( CMAKE_VERBOSE_MAKEFILE 1 )
@@ -89,11 +91,11 @@ WHILE( ${I} LESS ${SRC_LEN} )
 		MATH( EXPR I ${I}-1 )
 		MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
 	ELSEIF(NOT "${THIS_FILE}" MATCHES "Roo+" )
-		IF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/Roo+")
+		IF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/unused+")
                 	LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
                 	MATH( EXPR I ${I}-1 )
                 	MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
-        	ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/Roo+")
+        	ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/unused+")
 	ENDIF("${THIS_FILE}" MATCHES "Roo+")
         IF("${THIS_FILE}" MATCHES "main+")
                 LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
@@ -147,39 +149,52 @@ TARGET_LINK_LIBRARIES( fitting fits pdfs ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES}
 #ADD_EXECUTABLE( rapidresults ${PROJECT_SOURCE_DIR}/utils/src/rapidresults.cc )
 #TARGET_LINK_LIBRARIES( rapidresults ${ROOT_LIBRARIES} )
 
-ADD_EXECUTABLE( rapidfit_llscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_llscanresults.cc )
-TARGET_LINK_LIBRARIES( rapidfit_llscanresults ${ROOT_LIBRARIES} )
+#	Depreciated tool
+#ADD_EXECUTABLE( rapidfit_llscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_llscanresults.cc )
+#TARGET_LINK_LIBRARIES( rapidfit_llscanresults ${ROOT_LIBRARIES} )
 
+#	Old tool for producing FC plots
 ADD_EXECUTABLE( rapidfit_fcscanresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_fcscanresults.cc )
 TARGET_LINK_LIBRARIES( rapidfit_fcscanresults ${ROOT_LIBRARIES} )
 
+#	Newest tool, currently broken for FC plots
 ADD_EXECUTABLE( rapidfit_fcscanresults_2 ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_fcscanresults_2.cc )
 TARGET_LINK_LIBRARIES( rapidfit_fcscanresults_2 ${ROOT_LIBRARIES} )
 
+#	Conors tool for analysing toy studies
+#	main difference it plots the actual fit results
 ADD_EXECUTABLE( rapidfit_toyresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_toyresults.cc )
 TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
 
+#	My tool for analysing toy studies
+#	main difference is it performs a binned analysis
 ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter-static.C )
 TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 
+#	Tool for comparing results of 2DLL within Edinburgh
 ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
 TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
 
-ADD_EXECUTABLE( plot_try ${PROJECT_SOURCE_DIR}/utils/src/plot_try.C )
-TARGET_LINK_LIBRARIES( plot_try ${ROOT_LIBRARIES} )
+
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone
-
 add_custom_target (doc doxygen RapidFit_doxygen.cfg && tar cvfz ./RapidFit_html.tgz ./html/ && scp ./RapidFit_html.tgz ph-ppe.ph.ed.ac.uk:~/WWW/RapidFit/doc/  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc COMMENT "Generating documentation" OUTPUT docs/RapidFit_html.tgz docs/html)
 SET_DIRECTORY_PROPERTIES( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES"${PROJECT_SOURCE_DIR}/doc/RapidFit_html.tgz;${PROJECT_SOURCE_DIR}/doc/html" )
 
 
+#	Add the new files to the Headers that are required for building
+#	RapidFit as a library extention to ROOT
 SET( HEADERS "${PROJECT_SOURCE_DIR}/framework/include/RapidRun.h" )
 SET( LINKDEF "${PROJECT_SOURCE_DIR}/framework/include/LinkDef.h" )
 
+#	This is a custom command in cmake required to produce the psuedo-code
+#	that RapidFit requires to build the fitter as a library extension to
+#	ROOT to run on the grid
 ADD_CUSTOM_COMMAND ( OUTPUT  ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp
-		    COMMAND rootcint -f ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp -c ${HEADERS} ${ALL_HEADERS} ${LINKDEF} )
+		    COMMAND rootcint -f ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp -c ${ALL_HEADERS} ${LINKDEF} )
 
+#	This is what is required to build the object libRapidRun.so
+#	It requires the custom command above
 ADD_LIBRARY ( RapidRun SHARED ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp ${PROJECT_SOURCE_DIR}/framework/src/RapidRun.cpp ${FITTER_SRCS} ${PDF_SRCS} )
 TARGET_LINK_LIBRARIES( RapidRun ${ROOT_LIBRARIES} )
 

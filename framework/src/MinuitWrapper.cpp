@@ -77,7 +77,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		if(!(newParameter->GetMaximum() == newParameter->GetMinimum())){
 		STEP_SIZE = fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
 		}
-	/*
+	
 
 		if( allNames[nameIndex] == "gamma" )		STEP_SIZE = 0.01;
 		else if( allNames[nameIndex] == "deltaGamma" )	STEP_SIZE = 0.01;
@@ -87,7 +87,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		else if( allNames[nameIndex] == "delta_perp" )	STEP_SIZE = 0.1;
 		else if( allNames[nameIndex] == "alphaM_pr" )	STEP_SIZE = 0.0001;
 		else STEP_SIZE = 0.001;
-	*/
+	
 		cout << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
 
 		

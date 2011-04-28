@@ -16,8 +16,9 @@ RM           = rm -f
 
 
 #		Compiler Flags
-CXXFLAGS     = -O3 -shared -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
-
+CXXFLAGS     = -O3 -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+#		When running on the GRID & other batch systems the sandbox is limited in size hence the library HAS to be as small as possible
+#CXXFLAGS     = -Os -msse -msse2 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 
 #		Some Useful global variables, makes this file MUCH easier to maintain
 SRCEXT   = cpp
@@ -62,6 +63,7 @@ OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJD
 ifeq "$(UNAME)" "Linux"
 	RANLIB       = ranlib
 	CXXFLAGS    += -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS) #-I$(GSLINC)
+	CXXFLAGS_LIB+= -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS)
 	LINKFLAGS    =
 endif
 
@@ -69,6 +71,7 @@ endif
 ifeq "$(UNAME)" "Darwin"
 	RANLIB       = ranlib
 	CXXFLAGS    += -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS) #-I$(GSLINC)
+	CXXFLAGS_LIB+= -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS)
 	LINKFLAGS    =
 endif
 
@@ -157,9 +160,14 @@ $(OBJDIR)/betas_sweightfitter.o: $(UTILSSRC)/betas_sweightfitter.cc
 #$(OBJDIR)/rapidfit_llscanresults.o: $(UTILSSRC)/rapidfit_llscanresults.cc
 #	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
+#       A VERY stupid tool designed to overlay the results of 2 LL scans from within Edinburgh
+$(EXEDIR)/merge_plot: $(OBJDIR)/merge_plot.o
+	$(CXX) -o $@ $< $(ROOTLIBS)
+$(OBJDIR)/merge_plot.o: $(UTILSSRC)/merge_plot.C
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
-utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/merge_plot
 
 
 
@@ -190,5 +198,5 @@ $(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp
 
 #	Finally, Compile RapidFit as a library making use of the existing binaries for other classes
 $(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS) $(PDFOBJS) $(OBJDIR)/ClassLookUp.o
-	$(CXX) $(LIBS) -shared -fPIC $(CXXFLAGS) $^ -o $@
+	$(CXX) $(LIBS) -shared -fPIC $(CXXFLAG) $^ -o $@
 

@@ -35,6 +35,8 @@ class OutputConfiguration
 		ScanParam* GetScanParam( string param_name );
 		pair<ScanParam*, ScanParam*> Get2DScanParams( string , string );
 
+		void Clear2DScanList( );
+
 		bool DoPullPlots();
 
 		//Make output requested

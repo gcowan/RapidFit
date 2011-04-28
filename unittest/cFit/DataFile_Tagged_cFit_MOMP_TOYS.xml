@@ -66,7 +66,7 @@
 
 <PhysicsParameter>
 <Name>delta_perp</Name>
-<Value>1.7</Value> 
+<Value>-0.17</Value> 
 <Minimum>-3.3</Minimum>
 <Maximum>3.3</Maximum>
 <Type>Free</Type>
@@ -104,6 +104,43 @@
 <Type>Free</Type>
 <Unit>Unitless</Unit>
 </PhysicsParameter>
+
+
+// Signal Mass parameters for double Gaussian mass model
+<PhysicsParameter>
+<Name>f_sig_m1</Name>      // Fraction of first Gaussian
+<Value>1.0</Value>
+<Minimum>0.0</Minimum>
+<Maximum>1.00001</Maximum>
+<Type>Fixed</Type>
+<Unit>Unitless</Unit>
+</PhysicsParameter>
+
+<PhysicsParameter>
+<Name>sigma_m1</Name>      // Gaussian width in MeV
+<Value>7.47</Value>
+<Minimum>0.0</Minimum>
+<Maximum>20.0</Maximum>
+<Type>Fixed</Type>
+<Unit>MeV/c^{2}</Unit>
+</PhysicsParameter>
+
+<PhysicsParameter>
+<Name>sigma_m2</Name>
+<Value>20.0</Value>
+<Minimum>10.0</Minimum>
+<Maximum>100.0</Maximum>
+<Type>Fixed</Type>
+<Unit>MeV/c^{2}</Unit>
+</PhysicsParameter>
+
+<PhysicsParameter>
+<Name>m_Bs</Name>
+<Value>5366.4</Value>
+<Type>Fixed</Type>
+<Unit>MeV/c^{2}</Unit>
+</PhysicsParameter>
+
 
 //..................................
 // Detector Parameters
@@ -241,15 +278,17 @@
 // Specify which minimiser to use.
 
 <Minimiser>Minuit</Minimiser>
-<FitFunction>
-<WeightName>Nsig_sw</WeightName>
-<FunctionName>NegativeLogLikelihood</FunctionName>
-</FitFunction>
+<FitFunction>NegativeLogLikelihood</FitFunction>
+
 <NumberRepeats>1</NumberRepeats>
+
+
 
 //==========================================
 // Specify the fit
 
+//...................................
+// This applies a constraint on deltaM
 //...................................
 // This applies a constraint on deltaM
 <ToFit>
@@ -311,16 +350,19 @@
 // UN-BIASED TAGGED events
 
 <ToFit>
+
+<ProdPDF>
 <PDF>
 <Name>Bs2JpsiPhi_SignalAlt_MO_v1</Name>
 </PDF>
+<PDF>
+<Name>Bs2JpsiPhiMassSignal</Name>
+</PDF>
+</ProdPDF>
 
 <DataSet>
-<Source>File</Source>
-<FileName>goldstandard_unbiased_timecut3.root</FileName>  
-<NTuplePath>merged</NTuplePath>
-
-<NumberEvents>2000000</NumberEvents>
+<Source>Foam</Source>
+<NumberEvents>140</NumberEvents>
 
 <PhaseSpaceBoundary>
 <Observable>
@@ -376,13 +418,6 @@
 <Minimum>5200.0</Minimum>
 <Maximum>5550.0</Maximum>
 <Unit>MeV/c^{2}</Unit>
-</Observable>
-
-<Observable>
-<Name>Nsig_sw</Name>
-<Minimum>-50.0</Minimum>
-<Maximum>50.0</Maximum>
-<Unit> </Unit>
 </Observable>
 
 </PhaseSpaceBoundary>
@@ -394,16 +429,19 @@
 // UN-BIASED UN-TAGGED events
 
 <ToFit>
+
+<ProdPDF>
 <PDF>
 <Name>Bs2JpsiPhi_SignalAlt_MP_v1</Name>
 </PDF>
+<PDF>
+<Name>Bs2JpsiPhiMassSignal</Name>
+</PDF>
+</ProdPDF>
 
 <DataSet>
-<Source>File</Source>
-<FileName>goldstandard_unbiased_timecut3.root</FileName>  
-<NTuplePath>merged</NTuplePath>  
-
-<NumberEvents>2000000</NumberEvents>
+<Source>Foam</Source>
+<NumberEvents>410</NumberEvents>
 
 <PhaseSpaceBoundary>
 <Observable>
@@ -460,14 +498,6 @@
 <Unit>MeV/c^{2}</Unit>
 </Observable>
 
-
-<Observable>
-<Name>Nsig_sw</Name>
-<Minimum>-50.0</Minimum>
-<Maximum>50.0</Maximum>
-<Unit> </Unit>
-</Observable>
-
 </PhaseSpaceBoundary>
 </DataSet>
 </ToFit>
@@ -476,15 +506,18 @@
 // BIASED TAGGED events
 
 <ToFit>
+<ProdPDF>
 <PDF>
 <Name>Bs2JpsiPhi_SignalAlt_MO_v1</Name>
 </PDF>
+<PDF>
+<Name>Bs2JpsiPhiMassSignal</Name>
+</PDF>
+</ProdPDF>
 
 <DataSet>
-<Source>File</Source>
-<FileName>goldstandard_biased_timecut3PELC.root</FileName>  
-<NTuplePath>merged</NTuplePath>  
-<NumberEvents>200000000</NumberEvents>   
+<Source>Foam</Source>
+<NumberEvents>50</NumberEvents>   
 
 <PhaseSpaceBoundary>
 <Observable>
@@ -542,13 +575,6 @@
 <Unit>MeV/c^{2}</Unit>
 </Observable>
 
-<Observable>
-<Name>Nsig_sw</Name>
-<Minimum>-50.0</Minimum>
-<Maximum>50.0</Maximum>
-<Unit> </Unit>
-</Observable>
-
 </PhaseSpaceBoundary>
 </DataSet>
 </ToFit>
@@ -558,16 +584,19 @@
 // BIASED UN-TAGGED events
 
 <ToFit>
+
+<ProdPDF>
 <PDF>
 <Name>Bs2JpsiPhi_SignalAlt_MP_v1</Name>
 </PDF>
+<PDF>
+<Name>Bs2JpsiPhiMassSignal</Name>
+</PDF>
+</ProdPDF>
 
 <DataSet>
-<Source>File</Source>
-<FileName>goldstandard_biased_timecut3PELC.root</FileName>  
-<NTuplePath>merged</NTuplePath>  
-
-<NumberEvents>20000000</NumberEvents>
+<Source>Foam</Source>
+<NumberEvents>150</NumberEvents>
 
 <PhaseSpaceBoundary>
 <Observable>
@@ -624,57 +653,8 @@
 <Unit>MeV/c^{2}</Unit>
 </Observable>
 
-<Observable>
-<Name>Nsig_sw</Name>
-<Minimum>-50.0</Minimum>
-<Maximum>50.0</Maximum>
-<Unit> </Unit>
-</Observable>
-
 </PhaseSpaceBoundary>
 </DataSet>
 </ToFit>
-
-<Output>                                                                                                                                                              
-  
-        <Scan>                                                                                                                                                        
-                <Name>gamma</Name>                                                                                                                               
-                <Minimum>0.55</Minimum>                                                                                                                              
-                <Maximum>0.95</Maximum>                                                                                                                               
-                <Points>20</Points>                                                                                                                                    
-        </Scan>                                                                                                                                                       
-        <Scan>                                                                                                                                                        
-                <Name>delta_para</Name>                                                                                                                               
-                <Minimum>2.0</Minimum>                                                                                                                              
-                <Maximum>3.5</Maximum>                                                                                                                               
-                <Points>20</Points>                                                                                                                                    
-        </Scan>                                                                                                                                                       
-        <Scan>                                                                                                                                                        
-                <Name>delta_perp</Name>                                                                                                                               
-                <Minimum>-2.0</Minimum>                                                                                                                              
-                <Maximum>2.0</Maximum>                                                                                                                               
-                <Points>20</Points>                                                                                                                                    
-        </Scan>                                                                                                                                                       
-                                                                                                                                                                      
-        <2DScan>                                                                                                                                                      
-                                                                                                                                                                      
-            <X_Param>                                                                                                                                             
-                <Name>Phi_s</Name>                                                                                                                            
-                <Minimum>-3.2</Minimum>                                                                                                                                
-                <Maximum>3.2</Maximum>                                                                                                                               
-                <Points>40</Points>                                                                                                                            
-            </X_Param>                                                                                                                                            
-                                                                                                                                                                      
-            <Y_Param>                                                                                                                                             
-                <Name>deltaGamma</Name>                                                                                                                       
-                <Minimum>-0.7</Minimum>                                                                                                                                
-                <Maximum>0.7</Maximum>                                                                                                                                
-                <Points>40</Points>                                                                                                                            
-            </Y_Param>                                                                                                                                            
-                                                                                                                                                                      
-        </2DScan>                                                                                                                                                     
-                                                                                                                                                                      
-</Output>
-
 
 </RapidFit>
