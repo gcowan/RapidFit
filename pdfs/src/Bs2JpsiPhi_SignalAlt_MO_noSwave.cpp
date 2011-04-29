@@ -1,13 +1,13 @@
-// $Id: Bs2JpsiPhi_SignalAlt_MP_v1.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
-/** @class Bs2JpsiPhi_SignalAlt_MP_v1 Bs2JpsiPhi_SignalAlt_MP_v1.cpp
+// $Id: Bs2JpsiPhi_SignalAlt_MO_noSwave.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
+/** @class Bs2JpsiPhi_SignalAlt_MO_noSwave Bs2JpsiPhi_SignalAlt_MO_noSwave.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
  *  @author Peter Clarke peter.clarke@ed.ac.uk
- *  @date 2011-01-28
+ *  @date 2011-02-13
  */
 
-#include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
+#include "Bs2JpsiPhi_SignalAlt_MO_noSwave.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
@@ -15,25 +15,24 @@
 #include "Mathematics.h"
 
 #define DEBUGFLAG true
-
-#define DOUBLE_TOLERANCE 1E-6
+#define ETABAR 0.339
 
 //......................................
 //Constructor
 
-Bs2JpsiPhi_SignalAlt_MP_v1::Bs2JpsiPhi_SignalAlt_MP_v1() : 
+Bs2JpsiPhi_SignalAlt_MO_noSwave::Bs2JpsiPhi_SignalAlt_MO_noSwave() : 
 	  Bs2JpsiPhi_SignalAlt_BaseClass()
 	, normalisationCacheValid(false)
+	, mistagScaleName	( make_pair(string("mistagScale"),-1) )
+	, mistagOffsetName	( make_pair(string("mistagOffset"),-1) )
 {
 	MakePrototypes();
 	
-	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_v1 " << std::endl ;
+	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MO_noSwave " << std::endl ;
 }
 
-
-//.......................................
 //Make the data point and parameter set
-void Bs2JpsiPhi_SignalAlt_MP_v1::MakePrototypes()
+void Bs2JpsiPhi_SignalAlt_MO_noSwave::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName.first );
@@ -41,6 +40,7 @@ void Bs2JpsiPhi_SignalAlt_MP_v1::MakePrototypes()
 	allObservables.push_back( phiName.first );
 	allObservables.push_back( cosPsiName.first );
 	allObservables.push_back( tagName.first );
+	allObservables.push_back( mistagName.first );
 	allObservables.push_back( timeAcceptanceCategoryName.first );
 
 	//Make the parameter set
@@ -56,11 +56,12 @@ void Bs2JpsiPhi_SignalAlt_MP_v1::MakePrototypes()
 	parameterNames.push_back( delta_sName.first );
 	parameterNames.push_back( deltaMName.first );
 	parameterNames.push_back( Phi_sName.first );
-	parameterNames.push_back( mistagName.first );
 	parameterNames.push_back( res1FractionName.first );
 	parameterNames.push_back( res1Name.first );
 	parameterNames.push_back( res2Name.first );
 	parameterNames.push_back( timeOffsetName.first );
+	parameterNames.push_back( mistagScaleName.first );
+	parameterNames.push_back( mistagOffsetName.first );
 	parameterNames.push_back( angAccI1Name.first );
 	parameterNames.push_back( angAccI2Name.first );
 	parameterNames.push_back( angAccI3Name.first );
@@ -79,34 +80,37 @@ void Bs2JpsiPhi_SignalAlt_MP_v1::MakePrototypes()
 
 //........................................................
 //Destructor
-Bs2JpsiPhi_SignalAlt_MP_v1::~Bs2JpsiPhi_SignalAlt_MP_v1()
+Bs2JpsiPhi_SignalAlt_MO_noSwave::~Bs2JpsiPhi_SignalAlt_MO_noSwave()
 {
 }
 
 //........................................................
 //Set the physics parameters into member variables
-//Indicate that the cache is no longer valid
 
-bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2JpsiPhi_SignalAlt_MO_noSwave::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-	normalisationCacheValid = false;
+	normalisationCacheValid = false;  //This is left in, but is no longer used in this PDF as you cannot cache with event-by-event mistag
 	
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
 	
 	// Physics parameters. 
 	_gamma  = allParameters.GetPhysicsParameter( &gammaName )->GetValue();
-    dgam      = allParameters.GetPhysicsParameter( &deltaGammaName )->GetValue();
-	
-	Azero_sq = allParameters.GetPhysicsParameter( &Azero_sqName )->GetValue();
-	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}	
-	Aperp_sq = allParameters.GetPhysicsParameter( &Aperp_sqName )->GetValue();
-	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}	
-	As_sq = allParameters.GetPhysicsParameter( &As_sqName )->GetValue();
-	if( (As_sq < 0.) || (As_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
+	dgam      = allParameters.GetPhysicsParameter( &deltaGammaName )->GetValue();
 
+	Azero_sq = allParameters.GetPhysicsParameter( &Azero_sqName )->GetValue();
+	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_noSwave::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}	
+	Aperp_sq = allParameters.GetPhysicsParameter( &Aperp_sqName )->GetValue();
+	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_noSwave::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}	
+	As_sq = allParameters.GetPhysicsParameter( &As_sqName )->GetValue();
+	if( (As_sq < 0.) || (As_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_noSwave::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
+	//****************
+	//As WILL BE IGNORED
+	As_sq = 0 ;
+	//****************
+	
 	Apara_sq = (1. - Azero_sq - Aperp_sq  - As_sq) ;
 	if( Apara_sq < 0. ) {
-		cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: derived parameter Apara_sq <0  and so set to zero" <<  endl ;
+		cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_noSwave::SetPhysicsParameters: derived parameter Apara_sq <0  and so set to zero" <<  endl ;
 		Apara_sq = 0. ;
 	}	
 		
@@ -116,18 +120,21 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	delta_s	   = allParameters.GetPhysicsParameter( &delta_sName )->GetValue();
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
-
-	tagFraction         = allParameters.GetPhysicsParameter( &mistagName )->GetValue();
-	delta_ms  = allParameters.GetPhysicsParameter( &deltaMName )->GetValue();
-	phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
+	
+	delta_ms		= allParameters.GetPhysicsParameter( &deltaMName )->GetValue();	
+	mistagScale     = allParameters.GetPhysicsParameter( &mistagScaleName )->GetValue();
+	mistagOffset    = allParameters.GetPhysicsParameter( &mistagOffsetName )->GetValue();
+	phi_s			= allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
 	_cosphis = cos(phi_s) ;
 	_sinphis = sin(phi_s) ;
-	
-	// Resolution parameters
+		
+
+	// Detector parameters
 	resolution1Fraction = allParameters.GetPhysicsParameter( &res1FractionName )->GetValue();
 	resolution1         = allParameters.GetPhysicsParameter( &res1Name )->GetValue();
 	resolution2         = allParameters.GetPhysicsParameter( &res2Name )->GetValue();
 	timeOffset          = allParameters.GetPhysicsParameter( &timeOffsetName )->GetValue();
+
 	
 	// Angular acceptance factors
 	angAccI1 = allParameters.GetPhysicsParameter( &angAccI1Name )->GetValue();
@@ -142,7 +149,7 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	angAccI10 = allParameters.GetPhysicsParameter( &angAccI10Name )->GetValue();
 	
 	// Do a test to ensure user is not using upper time acceptance wrongly
-	if( ((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE) || (fabs(tagFraction-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
+	if( (((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE)) || (fabs(tagFraction-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
 	{
 		cout << " You appear to be trying to use the upper time acceptance but are using either resolution or are doing a tagged fit" << endl ;
 		cout << " This is not possible at present" << endl ;
@@ -150,7 +157,7 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 		cout << " Resolution2 : " << resolution2 << endl ;
 		cout << " Mistag : " << tagFraction << endl ;
 		cout << " Phi_s : " << phi_s <<  endl ;
-		throw(10);
+		throw(10) ;
 	}
 	
 	return result;
@@ -158,23 +165,43 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 
 //.........................................................
 //Return a list of observables not to be integrated
-vector<string> Bs2JpsiPhi_SignalAlt_MP_v1::GetDoNotIntegrateList()
+vector<string> Bs2JpsiPhi_SignalAlt_MO_noSwave::GetDoNotIntegrateList()
 {
 	vector<string> list;
+	list.push_back(mistagName.first) ;
 	return list;
 }
 
 //.............................................................
 //Calculate the PDF value for a given set of observables
 
-double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement) 
+double Bs2JpsiPhi_SignalAlt_MO_noSwave::Evaluate(DataPoint * measurement)
 {
 	// Get observables into member variables
 	t = measurement->GetObservable( &timeName )->GetValue() - timeOffset ;
 	ctheta_tr = measurement->GetObservable( &cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
-	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();	
+	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();
+
 	tag = (int)measurement->GetObservable( &tagName )->GetValue();
+	tagFraction = measurement->GetObservable( &mistagName )->GetValue();
+
+	//PELCX 
+	//double tagFractionOld = tagFraction ;
+	
+	if( tagFraction < 0 ) {  cout << "Bs2JpsiPhi_SignalAlt_MO_noSwave::Evaluate() : tagFraction < 0 so set to 0 " << endl ; tagFraction = 0 ; }
+	if( tagFraction > 0.5 ) { cout << "Bs2JpsiPhi_SignalAlt_MO_noSwave::Evaluate() : tagFraction > 0.5 so set to 0.5 " << endl ; tagFraction = 0.5 ; }
+
+	if( (fabs(tag-0) > DOUBLE_TOLERANCE) && (fabs(tagFraction- 0.5)> DOUBLE_TOLERANCE) ) {
+		tagFraction = mistagOffset + mistagScale * ( tagFraction - ETABAR ) ;
+		if( tagFraction < 0 )   {  tagFraction = 0 ; }
+		if( tagFraction > 0.5 ) {  tagFraction = 0.5 ; }
+	}
+
+	//PELCX 
+	//cout << " TAGGING:  tag = " << tag << "   mistagold = " <<tagFractionOld << "   mistagnew  = " <<tagFraction << endl ;
+	
+	
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
 	
 	double val1, val2 ;
@@ -199,33 +226,29 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement)
 	//conditions to throw exception
 	bool c1 = isnan(returnValue) ;
 	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
-	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&((fabs(resolution2-0.)<DOUBLE_TOLERANCE))) && (returnValue <= 0.) && (t>0.) ;
-
+	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&(fabs(resolution2-0.)<DOUBLE_TOLERANCE)) && (returnValue <= 0.) && (t>0.) ;
+	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
-		cout << " Bs2JpsiPhi_SignalAlt_MP_v1::evaluate() returns <=0 or nan :" << returnValue << endl ;
-		cout << "   gamma " << gamma() << endl ;
-		cout << "   gl    " << gamma_l() << endl ;
-		cout << "   gh    " << gamma_h()  << endl;
-		cout << "   AT^2    " << AT()*AT() << endl;
-		cout << "   AP^2    " << AP()*AP() << endl;
-		cout << "   A0^2    " << A0()*A0() << endl ;
-		cout << "   AS^2    " << AS()*AS() << endl ;
-		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
+		cout << " Bs2JpsiPhi_SignalAlt_MO_noSwave::evaluate() returns <=0 or nan :" << returnValue << endl ;
+		cout << "   gamma " << gamma() ;
+		cout << "   gl    " << gamma_l() ;
+		cout << "   gh    " << gamma_h() ;
+		cout << "   AT    " << AT() ;
+		cout << "   AP    " << AP() ;
+		cout << "   A0    " << A0() << endl ;
+		cout << "   AS    " << AS() << endl ;
 		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag    " << tagFraction << endl ;
+		cout << "   mistagScale    " << mistagScale << endl ;
+		cout << "   mistagOffset   " << mistagOffset << endl ;
 		cout << " For event with:  " << endl ;
-		cout << "   time      " << t << endl ;
-		cout << "   ctheta_tr " << ctheta_tr << endl ;
-		cout << "   ctheta_1 " << ctheta_1 << endl ;
-		cout << "   phi_tr " << phi_tr << endl ;
+		cout << "   time " << t << endl ;
 		if( isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
 	
 	if( useLowerTimeAcceptance() ) return returnValue * timeAcceptance.acceptance(t);
 	else return returnValue ;
-
 	
 }
 
@@ -233,7 +256,7 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement)
 //...............................................................
 //Calculate the normalisation for a given set of physics parameters and boundary
 
-double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary) 
+double Bs2JpsiPhi_SignalAlt_MO_noSwave::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 		
 	// Get observables into member variables
@@ -241,6 +264,19 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseS
 	ctheta_tr = measurement->GetObservable( &cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();	
+
+	tag = (int)measurement->GetObservable( &tagName )->GetValue();
+	tagFraction = measurement->GetObservable( &mistagName )->GetValue() ;
+
+	if( tagFraction < 0 ) {  cout << "Bs2JpsiPhi_SignalAlt_MO_noSwave::Normalise() : tagFraction < 0 so set to 0 " << endl ; tagFraction = 0 ; }
+	if( tagFraction > 0.5 ) { cout << "Bs2JpsiPhi_SignalAlt_MO_noSwave::Normalise() : tagFraction > 0.5 so set to 0.5 " << endl ; tagFraction = 0.5 ; }
+
+	if( (fabs(tag-0) > DOUBLE_TOLERANCE) && (fabs(tagFraction- 0.5)> DOUBLE_TOLERANCE) ) {
+		tagFraction = mistagOffset + mistagScale * (tagFraction - ETABAR) ;
+		if( tagFraction < 0 )   {  tagFraction = 0 ; }
+		if( tagFraction > 0.5 ) {  tagFraction = 0.5 ; }
+	}
+
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
 	
 	// Get time boundaries into member variables
@@ -254,38 +290,23 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseS
 		thi = timeBound->GetMaximum();
 	}
 	
-	// Recalculate cached values if Physics parameters have changed
-	// Must do this for each of the two resolutions.
-	if( ! normalisationCacheValid )  {
-		for( tag = -1; tag <= 1; ++tag ) {
-			if(resolution1Fraction >= 0.9999 ){
-				resolution =  resolution1 ;
-				normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
-			}
-			else {
-				resolution =  resolution1 ;
-				normalisationCacheValueRes1[tag+1] = this->diffXsecCompositeNorm1( );
-				resolution =  resolution2 ;
-				normalisationCacheValueRes2[tag+1] = this->diffXsecCompositeNorm1( );
-			}
-		}
-		normalisationCacheValid = true ;
-	}	
-	
-	// calculate return value according to tag 
-	tag = (int)measurement->GetObservable( &tagName )->GetValue();
 	double returnValue  ;
 	if(resolution1Fraction >= 0.9999 )
 	{
-		returnValue = normalisationCacheValueRes1[tag+1] ;
+		resolution =  resolution1 ;
+		returnValue = this->diffXsecCompositeNorm1( );
 	}
 	else
 	{
-		returnValue = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
+		resolution =  resolution1 ;
+                double val1 = this->diffXsecCompositeNorm1( );
+                resolution =  resolution2 ;
+                double val2 = this->diffXsecCompositeNorm1( );
+                returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;
 	}
 	
 	if( (returnValue <= 0.) || isnan(returnValue) ) {
-		cout << " Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation() returns <=0 or nan " << returnValue << endl ;
+		cout << " Bs2JpsiPhi_SignalAlt_MO_noSwave::Normalisation() returns <=0 or nan " << returnValue << endl ;
 		cout << " gamma " << gamma() ;
 		cout << " gl    " << gamma_l() ;
 		cout << " gh    " << gamma_h() ;
@@ -298,4 +319,5 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseS
 	
 	return returnValue ;
 }
+
 

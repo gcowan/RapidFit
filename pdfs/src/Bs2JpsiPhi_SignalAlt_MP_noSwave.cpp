@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhi_SignalAlt_MP_v1.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
-/** @class Bs2JpsiPhi_SignalAlt_MP_v1 Bs2JpsiPhi_SignalAlt_MP_v1.cpp
+// $Id: Bs2JpsiPhi_SignalAlt_MP_noSwave.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
+/** @class Bs2JpsiPhi_SignalAlt_MP_noSwave Bs2JpsiPhi_SignalAlt_MP_noSwave.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi
  *
@@ -7,7 +7,7 @@
  *  @date 2011-01-28
  */
 
-#include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
+#include "Bs2JpsiPhi_SignalAlt_MP_noSwave.h"
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
@@ -21,19 +21,19 @@
 //......................................
 //Constructor
 
-Bs2JpsiPhi_SignalAlt_MP_v1::Bs2JpsiPhi_SignalAlt_MP_v1() : 
+Bs2JpsiPhi_SignalAlt_MP_noSwave::Bs2JpsiPhi_SignalAlt_MP_noSwave() : 
 	  Bs2JpsiPhi_SignalAlt_BaseClass()
 	, normalisationCacheValid(false)
 {
 	MakePrototypes();
 	
-	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_v1 " << std::endl ;
+	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_noSwave " << std::endl ;
 }
 
 
 //.......................................
 //Make the data point and parameter set
-void Bs2JpsiPhi_SignalAlt_MP_v1::MakePrototypes()
+void Bs2JpsiPhi_SignalAlt_MP_noSwave::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName.first );
@@ -79,7 +79,7 @@ void Bs2JpsiPhi_SignalAlt_MP_v1::MakePrototypes()
 
 //........................................................
 //Destructor
-Bs2JpsiPhi_SignalAlt_MP_v1::~Bs2JpsiPhi_SignalAlt_MP_v1()
+Bs2JpsiPhi_SignalAlt_MP_noSwave::~Bs2JpsiPhi_SignalAlt_MP_noSwave()
 {
 }
 
@@ -87,7 +87,7 @@ Bs2JpsiPhi_SignalAlt_MP_v1::~Bs2JpsiPhi_SignalAlt_MP_v1()
 //Set the physics parameters into member variables
 //Indicate that the cache is no longer valid
 
-bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2JpsiPhi_SignalAlt_MP_noSwave::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	normalisationCacheValid = false;
 	
@@ -98,15 +98,19 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
     dgam      = allParameters.GetPhysicsParameter( &deltaGammaName )->GetValue();
 	
 	Azero_sq = allParameters.GetPhysicsParameter( &Azero_sqName )->GetValue();
-	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}	
+	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_noSwave::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}	
 	Aperp_sq = allParameters.GetPhysicsParameter( &Aperp_sqName )->GetValue();
-	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}	
+	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_noSwave::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}	
 	As_sq = allParameters.GetPhysicsParameter( &As_sqName )->GetValue();
-	if( (As_sq < 0.) || (As_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
-
+	if( (As_sq < 0.) || (As_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_noSwave::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
+	//****************
+	//As WILL BE IGNORED
+	As_sq = 0 ;
+	//****************
+	
 	Apara_sq = (1. - Azero_sq - Aperp_sq  - As_sq) ;
 	if( Apara_sq < 0. ) {
-		cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters: derived parameter Apara_sq <0  and so set to zero" <<  endl ;
+		cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_noSwave::SetPhysicsParameters: derived parameter Apara_sq <0  and so set to zero" <<  endl ;
 		Apara_sq = 0. ;
 	}	
 		
@@ -158,7 +162,7 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 
 //.........................................................
 //Return a list of observables not to be integrated
-vector<string> Bs2JpsiPhi_SignalAlt_MP_v1::GetDoNotIntegrateList()
+vector<string> Bs2JpsiPhi_SignalAlt_MP_noSwave::GetDoNotIntegrateList()
 {
 	vector<string> list;
 	return list;
@@ -167,7 +171,7 @@ vector<string> Bs2JpsiPhi_SignalAlt_MP_v1::GetDoNotIntegrateList()
 //.............................................................
 //Calculate the PDF value for a given set of observables
 
-double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement) 
+double Bs2JpsiPhi_SignalAlt_MP_noSwave::Evaluate(DataPoint * measurement) 
 {
 	// Get observables into member variables
 	t = measurement->GetObservable( &timeName )->GetValue() - timeOffset ;
@@ -203,29 +207,22 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement)
 
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
-		cout << " Bs2JpsiPhi_SignalAlt_MP_v1::evaluate() returns <=0 or nan :" << returnValue << endl ;
-		cout << "   gamma " << gamma() << endl ;
-		cout << "   gl    " << gamma_l() << endl ;
-		cout << "   gh    " << gamma_h()  << endl;
-		cout << "   AT^2    " << AT()*AT() << endl;
-		cout << "   AP^2    " << AP()*AP() << endl;
-		cout << "   A0^2    " << A0()*A0() << endl ;
-		cout << "   AS^2    " << AS()*AS() << endl ;
-		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
-		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag    " << tagFraction << endl ;
-		cout << " For event with:  " << endl ;
-		cout << "   time      " << t << endl ;
-		cout << "   ctheta_tr " << ctheta_tr << endl ;
-		cout << "   ctheta_1 " << ctheta_1 << endl ;
-		cout << "   phi_tr " << phi_tr << endl ;
+		cout << " Bs2JpsiPhi_SignalAlt_MP_noSwave::evaluate() returns <=0 or nan :" << returnValue << endl ;
+		cout << "   gamma " << gamma() << endl;
+		cout << "   gl    " << gamma_l() << endl;
+		cout << "   gh    " << gamma_h() << endl ;
+		cout << "   AT    " << AT() << endl;
+		cout << "   AP    " << AP() << endl;
+		cout << "   A0    " << A0() << endl ;
+		cout << "   AS    " << AS() << endl ;
+		cout << " For event with: " << endl ;
+		cout << "   time " << t << endl ;
 		if( isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
 	
 	if( useLowerTimeAcceptance() ) return returnValue * timeAcceptance.acceptance(t);
 	else return returnValue ;
-
 	
 }
 
@@ -233,7 +230,7 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement)
 //...............................................................
 //Calculate the normalisation for a given set of physics parameters and boundary
 
-double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary) 
+double Bs2JpsiPhi_SignalAlt_MP_noSwave::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary) 
 {
 		
 	// Get observables into member variables
@@ -285,7 +282,7 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation(DataPoint * measurement, PhaseS
 	}
 	
 	if( (returnValue <= 0.) || isnan(returnValue) ) {
-		cout << " Bs2JpsiPhi_SignalAlt_MP_v1::Normalisation() returns <=0 or nan " << returnValue << endl ;
+		cout << " Bs2JpsiPhi_SignalAlt_MP_noSwave::Normalisation() returns <=0 or nan " << returnValue << endl ;
 		cout << " gamma " << gamma() ;
 		cout << " gl    " << gamma_l() ;
 		cout << " gh    " << gamma_h() ;

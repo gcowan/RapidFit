@@ -26,6 +26,8 @@
 #include "Bs2JpsiPhi_mistagParameter_Swave_alt.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
 #include "Bs2JpsiPhi_SignalAlt_MO_v1.h"
+#include "Bs2JpsiPhi_SignalAlt_MP_noSwave.h"
+#include "Bs2JpsiPhi_SignalAlt_MO_noSwave.h"
 
 
 #include "Bs2JpsiPhiMassSignal.h"
@@ -130,10 +132,20 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //JPsiPhi from Pete with sWave 
 	        return new Bs2JpsiPhi_SignalAlt_MP_v1();
         }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_noSwave" )
+        {
+	        //JPsiPhi from Pete with sWave 
+	        return new Bs2JpsiPhi_SignalAlt_MP_noSwave();
+        }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v1" )
         {
 	        //JPsiPhi from Pete with sWave 
 	        return new Bs2JpsiPhi_SignalAlt_MO_v1();
+        }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_noSwave" )
+        {
+	        //JPsiPhi from Pete with sWave 
+	        return new Bs2JpsiPhi_SignalAlt_MO_noSwave();
         }
         else if ( Name == "Bs2PhiPhi" )
         {

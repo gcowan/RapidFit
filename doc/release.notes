@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/04/29 Pete Clarke
+  - some tidying of .h and .cpp files for
+    	   o Bs2JpsiPhi_SignalAlt_BaseClass
+	   o Bs2JpsiPhi_SignalAlt_MO_v1.h
+	   o Bs2JpsiPhi_SignalAlt_MP_v1.h
+  - Fixed signs in S wave terms in BaseClass according to the note form Jeroen & co
+  - Added Bs2JpsiPhi_SignalAlt_MO_noSwave.h,  Bs2JpsiPhi_SignalAlt_MP_noSwave.h
+
 2011/04/28 Rob Currie
   - Fixed a subtle bug that *should* never present itself in the 2DLL code to do with combining XML and command line contour definitions
       command line now takes complete precedent and overwrites the values stored in OutputConfiguration

@@ -30,6 +30,11 @@
 #include <iostream>
 #include <cstdlib>
 
+//PELC
+#include <TH1D.h>
+#include <TCanvas.h>
+//~PELC
+
 #define DOUBLE_TOLERANCE 1E-6
 #define DEBUGFLAG true
 
@@ -212,6 +217,13 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 
 	protected:
 	
+		//PELC For debugging purposes
+		//TH1D * histOfPdfValues ;
+		//TCanvas * c0 ; 
+		//mutable int histCounter ;
+		//~PELC
+
+	
 		// These contain the pair<string,int>s that correspond to the physics parameter names and references
 		pair<string,int> gammaName;		// gamma
 		pair<string,int> deltaGammaName;	// delta gamma
@@ -347,11 +359,26 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 
 		inline double ctrsq() const { return (ctheta_tr*ctheta_tr) ; }
 		inline double strsq() const { return (1.0 - ctrsq()) ; }
+		inline double theta_tr() const { return acos(ctheta_tr) ; }	
+		inline double ctr() const { return ctheta_tr ; }
+		inline double str() const { return sin(theta_tr()) ; }
+		inline double s2tr() const { return sin(2.0*theta_tr()) ; }
+		
 		inline double ct1sq() const { return (ctheta_1*ctheta_1) ; }
 		inline double st1sq() const { return (1.0 - ct1sq()) ; }
+		inline double theta_1() const { return acos(ctheta_1) ; }	
+		inline double ct1() const { return ctheta_1 ; }
+		inline double st1() const { return sin(theta_1()) ; }
+		inline double s2t1() const { return sin(2.0*theta_1()) ; }
+	
+		inline double cph() const {  return cos(phi_tr) ; }
+		inline double sph() const {  return sin(phi_tr) ; }
 		inline double cphsq() const { return (cos(phi_tr)*cos(phi_tr)) ; }
-		inline double sphsq() const { return (1.0 - cphsq()) ; }
+		inline double sphsq() const { return (sin(phi_tr)*sin(phi_tr)) ; }
+		inline double s2ph() const { return sin(2.0*phi_tr) ; }
 
+	
+	
 		inline double gamma_l() const { 
 			const double gl = gamma() + ( dgam *0.5 ) ;
 			if( gl < 0. ) {
@@ -608,83 +635,49 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 
 		//........ P Wave ..........
 
-		//...........................
-		inline double angleFactorA0A0(  ) const
-		{
-			// Normalised to  1	
-			return 2.0 * ct1sq() * (1.0 - strsq()*cphsq() ) * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
-		}
+	    //...........................
+		inline double angleFactorA0A0(  )   const { return 2.0 * ct1sq() * (1.0 - strsq()*cphsq() ) * Mathematics::Global_Frac(); }
 
 		//...........................
-		inline double angleFactorAPAP(  ) const
-		{
-			// Normalised to  1
-			return  st1sq() * (1.0 - strsq()*sphsq() ) * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
-		}
+		inline double angleFactorAPAP( )    const { return  st1sq() * (1.0 - strsq()*sphsq() ) * Mathematics::Global_Frac(); }
 
 		//...........................
-		inline double angleFactorATAT(  ) const
-		{
-			// Normalised to  1
-			return st1sq() * strsq() * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
-		}
+		inline double angleFactorATAT(  )   const { return st1sq() * strsq() * Mathematics::Global_Frac(); }
+
+	
+		//...........................
+		inline double angleFactorImAPAT(  ) const { return  -1. * st1sq() * s2tr() * sph() * Mathematics::Global_Frac(); }
 
 		//...........................
-		inline double angleFactorImAPAT(  ) const
-		{
-			// Normalised to  0
-			double theta_tr = acos(ctheta_tr) ;		
-			return   -/*1.0 **/  st1sq() * sin(2.0*theta_tr) * sin(phi_tr) * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
-		}
+		inline double angleFactorReA0AP( )  const { return   Mathematics::_Over_SQRT_2() * s2t1() * strsq() * s2ph() * Mathematics::Global_Frac(); }
 
 		//...........................
-		inline double angleFactorReA0AP( ) const
-		{
-			// Normalised to  0
-			double theta_1 = acos(ctheta_1) ;	
-			return    sin(2.0*theta_1) * strsq() * sin(2.0*phi_tr) *Mathematics::_Over_SQRT_2()/*/ sqrt(2.0)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
-		}
-
-		//...........................
-		inline double angleFactorImA0AT(  ) const
-		{
-			// Normalised to  0
-			double theta_tr = acos(ctheta_tr) ;		
-			double theta_1 = acos(ctheta_1) ;		
-			return  +/*1.0**/   sin(2.0*theta_1) * sin(2.0*theta_tr) * cos(phi_tr) *Mathematics::_Over_SQRT_2()/*/ sqrt(2.0)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
-		}
+		inline double angleFactorImA0AT(  ) const { return   Mathematics::_Over_SQRT_2() * s2t1() * s2tr() * cph() * Mathematics::Global_Frac(); }
 
 		//......  S wave additions ....
 
 		//.............................
-		inline double angleFactorASAS(  ) const
-		{
-			return  (1.0 - strsq()*cphsq() ) * 2*Mathematics::Third()/*(2./3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi());
-		}
+		inline double angleFactorASAS(  ) const   { return  2.0*Mathematics::Third() * (1.0 - strsq()*cphsq() ) * Mathematics::Global_Frac(); }
 
 		//...........................
-		inline double angleFactorReASAP(  ) const
-		{
-			double stheta_1 =  sqrt(st1sq());		
-			return   strsq() * stheta_1 * sin(2.0*phi_tr) * Mathematics::Root_6()*Mathematics::Third()/*(sqrt(6.)/3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
-		}
+		inline double angleFactorReASAP(  ) const {return Mathematics::Root_6()*Mathematics::Third() * st1() * strsq() * s2ph() *  Mathematics::Global_Frac(); }
 
 		//...........................
-		inline double angleFactorImASAT(  ) const
-		{
-			double theta_tr = acos(ctheta_tr) ;		
-			double stheta_1 =  sqrt(st1sq());		
-			return -/*1.0**/  sin(2.0*theta_tr) * stheta_1 * cos(phi_tr) * Mathematics::Root_6()*Mathematics::Third()/*(sqrt(6.)/3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
-		}
+		// This appreas to be ifferent to the LHCB note, but on inspection it is not. It is the difference in sign of ImASAT <=> ImATAS
+		inline double angleFactorImASAT(  ) const { return  Mathematics::Root_6()*Mathematics::Third() *  st1() * s2tr() *  cph() *  Mathematics::Global_Frac(); }
 
 
 		//...........................
 		inline double angleFactorReASA0(  ) const
 		{
-			return -/*1.0 **/  ( 1.0 -  strsq()* cphsq() ) * ctheta_1 *  4*Mathematics::Root_3()*Mathematics::Third()/*(4.0*sqrt(3.)/3.)*/ * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
+			//There was a -1.0 here
+			//Then I looked in the LHCb note being drafted and found this disagreed with it
+			//For now i have made it +1.0 to agree with draft LHCb note.
+			// Since then ive proved that this set of signs is consistent by my "pdfvalue < 0 test"
+			return  4.0*Mathematics::Root_3()*Mathematics::Third() * ct1() *  ( 1.0 - strsq()* cphsq() ) * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
 		}
 
-
+//(-1.)*
 
 };
 

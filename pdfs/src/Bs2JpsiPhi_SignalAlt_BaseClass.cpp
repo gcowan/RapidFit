@@ -71,6 +71,11 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() :
 		cout << "       - It doesnt work with resolution as we dont know how to do the integral for normalisation " << endl << endl ;
 	}
 		
+	//PELC  - debug to plot the distribution of PDF values for each event 
+	//histOfPdfValues = new TH1D( "HistOfPdfValue" ,  "HistOfPdfValue" , 110, -0.00001, 0.00001 ) ;
+	//c0  = new TCanvas;
+	//histCounter = 0;
+	//~PELC
 }
 
 
@@ -145,20 +150,59 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::diffXsec(  )  const
 	
 	//PELC DEBUG 
 	if( DEBUGFLAG && (xsec < 0) ) {
-		cout << " Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec( ) : return value < 0 " << endl ;
-		cout << "  -> " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
-		cout << "  -> " << "  time " << timeFactorA0A0(  ) << endl ;
-		cout << "  -> " << "  angle " << angleFactorA0A0( ) << endl ;
-		cout <<  "  -> " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
-		cout <<  "  -> " <<AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) << endl << endl ;
-		cout <<  "  -> " <<AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( )<< endl ;
-		cout <<  "  -> " <<A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( )<< endl ;
-		cout <<  "  -> " <<A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( )<< endl << endl;
-		cout <<  "  -> " <<AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) << endl ;
-		cout <<  "  -> " <<AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( )<< endl ;
-		cout <<  "  -> " <<AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( )<< endl ;
-		cout <<  "  -> " <<AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( )<< endl ;
+		cout << " Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec( ) : return value < 0 = " << xsec << endl ;
+		cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
+		cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
+		cout << "   AT()*AT() term: " <<AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) << endl << endl ;
+		
+		cout << "   AP()*AT() term: " <<AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( )<< endl ;
+		cout << "                 : " <<AP()*AT() <<" / "<<  timeFactorImAPAT( )  <<" / "<<  angleFactorImAPAT( )<< endl ;
+		cout << "   A0()*AP() term: " <<A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( )<< endl ;
+		cout << "                 : " <<A0()*AP() <<" / "<<  timeFactorReA0AP(  ) <<" / "<<  angleFactorReA0AP( )<< endl ;
+		cout << "   A0()*AT() term: " <<A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( )<< endl << endl;
+		cout << "                 : " <<A0()*AT() <<" / "<<  timeFactorImA0AT(  ) <<" / "<<  angleFactorImA0AT( )<< endl << endl;
+		
+		cout << "   AS()*AS() term: " <<AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) << endl << endl ;
+
+		cout << "   AS()*AP() term: " <<AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( )<< endl ;
+		cout << "                 : " <<AS()*AP() <<" / "<<   timeFactorReASAP(  ) <<" / "<<  angleFactorReASAP( )<< endl ;
+		cout << "   AS()*AT() term: " <<AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( )<< endl ;
+		cout << "                 : " <<AS()*AT() <<" / "<<   timeFactorImASAT(  ) <<" / "<<   angleFactorImASAT( )<< endl ;
+		cout << "   AS()*A0() term: " <<AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( )<< endl ;
+		cout << "                 : " <<AS()*A0() <<" / "<<   timeFactorReASA0(  ) <<" / "<<  angleFactorReASA0( )<< endl << endl ;
+
+		double PwaveTot =
+		0.5 * A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
+		0.5 * AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
+		0.5 * AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +		
+		0.5 * AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
+		0.5 * A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
+		0.5 * A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) ;
+		
+		double SwaveAdditions =
+		0.5 * AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
+		0.5 * AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
+		0.5 * AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
+		0.5 * AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
+
+		cout << "   Pwave Only : " << PwaveTot << endl ;
+		cout << "   Swave add : " <<  SwaveAdditions << endl ;
+
 	}
+	
+	//PELC - This turned out to be an important debugging tool 
+	//switch it on to see the values of PDF being returend.  If ANY go negative, it means there is a sign wrong in one or more of the terms
+	//You need to enable in the .h file as well
+	//histOfPdfValues->Fill(xsec) ;	
+	//histCounter++ ;
+	//if( histCounter > 10000 ) {
+	//	histOfPdfValues->Draw() ;
+	//	c0->Update() ;	
+	//	c0->SaveAs( "histOfPdfValues-from-Evaluate.eps" ) ;
+	//	histCounter = 0 ;
+	//}
+	 
+		
 	
 	return xsec ;
 }

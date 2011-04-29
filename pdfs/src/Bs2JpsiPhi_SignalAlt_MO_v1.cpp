@@ -82,6 +82,8 @@ void Bs2JpsiPhi_SignalAlt_MO_v1::MakePrototypes()
 //Destructor
 Bs2JpsiPhi_SignalAlt_MO_v1::~Bs2JpsiPhi_SignalAlt_MO_v1()
 {
+	
+	cout << " DESTRUCTOR CALLED =======================================================" << endl ;
 }
 
 //........................................................
@@ -227,18 +229,24 @@ double Bs2JpsiPhi_SignalAlt_MO_v1::Evaluate(DataPoint * measurement)
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
 		cout << " Bs2JpsiPhi_SignalAlt_MO_v1::evaluate() returns <=0 or nan :" << returnValue << endl ;
-		cout << "   gamma " << gamma() ;
-		cout << "   gl    " << gamma_l() ;
-		cout << "   gh    " << gamma_h() ;
-		cout << "   AT    " << AT() ;
-		cout << "   AP    " << AP() ;
-		cout << "   A0    " << A0() << endl ;
-		cout << "   AS    " << AS() << endl ;
+		cout << "   gamma " << gamma() << endl ;
+		cout << "   gl    " << gamma_l() << endl ;
+		cout << "   gh    " << gamma_h()  << endl;
+		cout << "   AT^2    " << AT()*AT() << endl;
+		cout << "   AP^2    " << AP()*AP() << endl;
+		cout << "   A0^2    " << A0()*A0() << endl ;
+		cout << "   AS^2    " << AS()*AS() << endl ;
+		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
 		cout << "   delta_ms       " << delta_ms << endl ;
+		cout << "   mistag    " << tagFraction << endl ;
 		cout << "   mistagScale    " << mistagScale << endl ;
 		cout << "   mistagOffset   " << mistagOffset << endl ;
 		cout << " For event with:  " << endl ;
-		cout << "   time " << t << endl ;
+		cout << "   time      " << t << endl ;
+		cout << "   ctheta_tr " << ctheta_tr << endl ;
+		cout << "   ctheta_1 " << ctheta_1 << endl ;
+		cout << "   phi_tr " << phi_tr << endl ;
+		
 		if( isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
