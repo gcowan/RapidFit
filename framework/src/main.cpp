@@ -108,6 +108,7 @@ int RapidFit( int argc, char * argv[] )
 		bool doFC_Flag = false;
 		bool UUID_Flag = false;
 		bool FC_Debug_Flag = false;
+		bool BurnToROOTFlag = false;
 
 		//Parse command line arguments
 		string currentArgument;
@@ -415,6 +416,10 @@ int RapidFit( int argc, char * argv[] )
 					return 1;
 				}
 			}
+			else if ( currentArgument == "--BurnToROOT" )
+			{
+				BurnToROOTFlag = true;
+			}
 			else
 			{
 				cerr << "Unrecognised argument: " << currentArgument << endl;
@@ -644,7 +649,10 @@ int RapidFit( int argc, char * argv[] )
 				makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
 				makeOutput->OutputFitResult( GlobalResult );
 				ResultFormatter::ReviewOutput( GlobalResult );
-
+				if( BurnToROOTFlag )
+				{
+					ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result.root" ), GlobalFitResult );
+				}
 
 				//Do LL scan
 				if( doLLscanFlag ) {
@@ -669,7 +677,8 @@ int RapidFit( int argc, char * argv[] )
 						TString output_scan_dat("LLScanData");
 						output_scan_dat.Append(LLscanList[ii]);
 						output_scan_dat.Append(".root" );
-						ResultFormatter::FlatNTuplePullPlots( string( output_scan_dat ), scanSoloResult[ii] );
+						//ResultFormatter::FlatNTuplePullPlots( string( output_scan_dat ), scanSoloResult[ii] );
+						ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), scanSoloResult[ii] );
 					}
 				}
 

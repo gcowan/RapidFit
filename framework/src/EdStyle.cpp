@@ -10,16 +10,17 @@
 
 // Include files
 
-
-
-// local
-#include "EdStyle.h"
+//	ROOT Headers
 #include "TLatex.h"
 #include "TText.h"
 #include "TPaveText.h"
 #include "TROOT.h"
+//	RapidFit Headers
+#include "EdStyle.h"
+//	System Headers
 #include <iostream>
 #include <string.h>
+
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -32,8 +33,10 @@ using namespace std;
 // Standard constructor, initializes variables
 //=============================================================================
 
-EdStyle::EdStyle( )
+EdStyle::EdStyle( ) : edStyle(), icol(), font(), tsize()
 {}
+
+EdStyle::~EdStyle(){}
 
 void EdStyle::SetStyle()
 {
@@ -282,17 +285,10 @@ gStyle->SetPadTickY(1);
    }
  */
 
-//=============================================================================
-// Destructor
-//=============================================================================
-EdStyle::~EdStyle() {}
-
-//=============================================================================
-
-
 
 //  These functions are not guaranteed correct but will people please add to them
 //  it can save time in editing tables out of RapidFit if we can at least call one standard function for things like this
+//	This could be cleaner but given where this occurs in the program I officially cba
 
 TString EdStyle::GetParamRootUnit( string Param_Unit )
 {
@@ -339,27 +335,27 @@ TString EdStyle::GetParamRootName( string Param_Name )
 
 	} else if ( Param_Name == "Azero_sq" ) {
 
-		return TString("{A_0}^2");
+		return TString("A_{0}^{2}");
 
 	} else if ( Param_Name == "Aperp_sq" ) {
 
-		return TString("{A_#perp}^2");
+		return TString("A_{#perp}^{2}");
 
         } else if ( Param_Name == "Apara_sq" ) {
 
-                return TString("{A_#parallel}^2");
+                return TString("A_{#parallel}^{2}");
 
 	} else if ( Param_Name == "delta_para" ) {
 
-		return TString("#delta_#parallel");
+		return TString("#delta_{#parallel}");
 
 	} else if ( Param_Name == "delta_perp" ) {
 
-		return TString("#delta_#perp");
+		return TString("#delta_{#perp}");
 
 	} else if ( Param_Name == "Phi_s" ) {
 
-		return TString("#phi_s");
+		return TString("#phi_{s}");
 
         } else if ( Param_Name == "m_Bs" ) {
 
@@ -367,15 +363,15 @@ TString EdStyle::GetParamRootName( string Param_Name )
 
         } else if (Param_Name == "sigma_m1" ) {
 
-                return TString("{#sigma_m}^1");
+                return TString("{#sigma_{m}}^1");
 
         } else if (Param_Name == "sigma_m2" ) {
 
-                return TString("{#sigma_m}^2");
+                return TString("{#sigma_{m}}^2");
 
         } else if (Param_Name == "f_sig_m1" ) {
 
-                return TString("f_{{#sigma_m}^1}");
+                return TString("f_{{#sigma_{m}}^1}");
 
 	} else if (Param_Name == "mistag" ) {
 
@@ -383,47 +379,47 @@ TString EdStyle::GetParamRootName( string Param_Name )
 
         } else if (Param_Name == "angAccI1" ) {
 
-                return TString("#zeta_1");
+                return TString("#zeta_{1}");
 
         } else if (Param_Name == "angAccI2" ) {
 
-                return TString("#zeta_2");
+                return TString("#zeta_{2}");
         
         } else if (Param_Name == "angAccI3" ) {
 
-                return TString("#zeta_3");
+                return TString("#zeta_{3}");
         
         } else if (Param_Name == "angAccI4" ) {
 
-                return TString("#zeta_4");
+                return TString("#zeta_{4}");
         
         } else if (Param_Name == "angAccI5" ) {
 
-                return TString("#zeta_5");
+                return TString("#zeta_{5}");
         
         } else if (Param_Name == "angAccI6" ) {
 
-                return TString("#zeta_6");
+                return TString("#zeta_{6}");
         
         } else if (Param_Name == "angAccI7" ) {
 
-                return TString("#zeta_7");
+                return TString("#zeta_{7}");
         
         } else if (Param_Name == "angAccI8" ) {
 
-                return TString("#zeta_8");
+                return TString("#zeta_{8}");
         
         } else if (Param_Name == "angAccI9" ) {
 
-                return TString("#zeta_9");
+                return TString("#zeta_{9}");
 
 	} else if (Param_Name =="deltaM" ) {
 
-		return TString( "m_s" );
+		return TString( "#Delta{m_{s}}" );
 
 	} else if (Param_Name =="delta_zero") {
 
-		return TString("#delta_0");
+		return TString("#delta_{0}");
 
         } else {
 
@@ -549,7 +545,7 @@ TString EdStyle::GetParamLatexName( string Param_Name )
 
 	} else if (Param_Name =="deltaM" ) {
 
-                Name.Append( "m_s" );
+                Name.Append( "\\Delta{M_s}" );
 
         } else if (Param_Name =="delta_zero") {
 
@@ -623,4 +619,23 @@ TString EdStyle::GetParamLatexName( string Param_Name )
 
 	Name.Append("$");
 	return Name;
+}
+
+
+//	Wrapper functions
+TString EdStyle::GetParamLatexUnit( TString arg )
+{
+	return GetParamLatexUnit( string( arg.Data() ) );
+}
+TString EdStyle::GetParamRootUnit( TString arg )
+{
+	return GetParamRootUnit( string( arg.Data() ) );
+}
+TString EdStyle::GetParamLatexName( TString arg )
+{
+	return GetParamLatexName( string( arg.Data() ) );
+} 
+TString EdStyle::GetParamRootName( TString arg )
+{
+	return GetParamRootName( string( arg.Data() ) );
 }

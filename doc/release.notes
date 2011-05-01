@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/01 Rob Currie
+  - Added a new plotting tool RapidLL for doingd 1D LL plots, in a HEAVY state of flux and currently crashes after producing the plots, this is being developed in tangent with work I'm currently persuing
+  - Added a new plotting tool RapidPlot, this is another incarnation of the rapidfit_fcscanresults_2 code which *should* be easier to understand
+      I plan to fix rapidfit_fcscanresults_2 at some point for FC plots as this should be a simple addittion of a further search for only unique data points when performing a cut
+  - Added a few minor modifications to main.cpp and EdStyle.cpp which are mainly cosmetic and deal with the output of data and wrapper interfaces respectivley
+  - Altered the svn repository such that it will now correctly ignore binary and psuedo-code files which are built by the user
+      this makes the 'svn stat'/'svn diff' output cleaner _and_ removes the possibility of someone accidently adding one of these files into the repo
+
 2011/04/29 Pete Clarke
   - some tidying of .h and .cpp files for
     	   o Bs2JpsiPhi_SignalAlt_BaseClass

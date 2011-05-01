@@ -9,11 +9,14 @@
 */
 
 #ifndef EDSTYLE_H 
-#define EDSTYLE_H 1
+#define EDSTYLE_H
 
 // Include files
 
+//	ROOT Headers
 #include "TStyle.h"
+#include "TString.h"
+//	System Headers
 #include <string.h>
 
 using namespace::std;
@@ -25,25 +28,32 @@ using namespace::std;
  *  @date   2007-12-07
  */
 class EdStyle {
-public: 
-   /// Standard constructor
-   EdStyle( ); 
+	public: 
+		/// Standard constructor
+		EdStyle( ); 
    
-   static void SetStyle();
+		static void SetStyle();
 
-   static TString GetParamLatexUnit( string );
-   static TString GetParamRootUnit( string );
-   static TString GetParamLatexName( string );
-   static TString GetParamRootName( string );
+		static TString GetParamLatexUnit( string );
+		static TString GetParamRootUnit( string );
+		static TString GetParamLatexName( string );
+		static TString GetParamRootName( string );
+
+                static TString GetParamLatexUnit( TString );
+                static TString GetParamRootUnit( TString );
+                static TString GetParamLatexName( TString );
+                static TString GetParamRootName( TString );
    
-   virtual ~EdStyle( ); ///< Destructor
+		~EdStyle( ); ///< Destructor
 
-private:
-
-   TStyle* edStyle;
-   Int_t icol;
-   Int_t font;
-   Double_t tsize;
+	private:
+		//	Uncopyable!
+		EdStyle ( const EdStyle& );
+		EdStyle& operator = ( const EdStyle& );
+		TStyle* edStyle;
+		Int_t icol;
+		Int_t font;
+		Double_t tsize;
    
 
 };

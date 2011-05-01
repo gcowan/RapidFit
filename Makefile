@@ -52,7 +52,7 @@ ALL_HEADERS += $(PDFHEAD)
 
 
 #	BUILD OUTPUT
-OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJDIR)/rapidfit_dict.* *.so *.rootmap
+OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJDIR)/rapidfit_dict.* *.so *.rootmap $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot 
 
 
 
@@ -166,8 +166,20 @@ $(EXEDIR)/merge_plot: $(OBJDIR)/merge_plot.o
 $(OBJDIR)/merge_plot.o: $(UTILSSRC)/merge_plot.C
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
+#       New tool for plotting 2DLL and FC
+$(EXEDIR)/RapidPlot: $(OBJDIR)/RapidPlot.o $(OBJDIR)/EdStyle.o
+	$(CXX) -o $@ $^ $(ROOTLIBS)
+$(OBJDIR)/RapidPlot.o: $(UTILSSRC)/RapidPlot.C
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+#       New tool for plotting 1D LL and overlaying multiple copies of the same
+$(EXEDIR)/RapidLL: $(OBJDIR)/RapidLL.o $(OBJDIR)/EdStyle.o
+	$(CXX) -o $@ $^ $(ROOTLIBS)
+$(OBJDIR)/RapidLL.o: $(UTILSSRC)/RapidLL.C
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
 #utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
-utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/merge_plot
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot
 
 
 
