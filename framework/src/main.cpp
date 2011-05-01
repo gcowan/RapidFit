@@ -24,6 +24,7 @@
 #include "ToyStudyResult.h"
 #include "LLscanResult.h"
 #include "LLscanResult2D.h"
+#include "main.h"
 //  System Headers
 #include <string>
 #include <vector>
@@ -52,8 +53,17 @@ int RapidFit( int argc, char * argv[] )
 	//Welcome blurb
 	time_t timeNow;
 	time(&timeNow);
+
 	cout << endl << "RapidFit" << endl;
-	cout << "Starting time: " << ctime( &timeNow ) << endl;
+	cout << "SVN Rev:\t" << STR(SVN_REV) << endl;
+	string mod="M";
+	size_t found = string( STR(SVN_REV) ).find( mod );
+
+	if( found != string::npos )
+	{
+		cout << "!!YOU HAVE LOCAL CODE MODIFICATIONS!!" << endl;
+	}
+	cout << "Starting time: " << ctime( &timeNow ) << endl << endl;
 
 	if ( argc == 1 )
 	{

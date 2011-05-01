@@ -1,5 +1,7 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/01 Rob Currie
+  - Added the knowledge of build revisions into RapidFit build using Makefile, not looked into doing this with the CMakeLists.txt file yet.
 
 2011/05/01 Rob Currie
   - *Fixed* memory 'leak' problem with toys	(This appears to be a TFoam 'feature')

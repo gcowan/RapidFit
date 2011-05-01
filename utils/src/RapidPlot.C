@@ -1041,7 +1041,7 @@ int main( int argc, char* argv[] )
 		cout << "FOUND TOYS IN FILE, PLOTTING FC" <<endl;
 		FC_Plot = FC_TOYS( allresults, Fit_Cut_String, param1string, param2string, NLL, Fit_Cut, Global_Best_NLL, FC_Output, Double_Tolerance, rand_gen );
 
-		LL2D_Grid( FC_Output, Fit_Cut, param1_val, param2_val, rand_gen, "FC" );
+		//LL2D_Grid( FC_Output, Fit_Cut, param1_val, param2_val, rand_gen, "FC" );
 	}
 
 	//	Contours to be used in plotting
