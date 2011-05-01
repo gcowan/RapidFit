@@ -12,9 +12,11 @@
 #ifndef RAPIDFIT_INTEGRATOR_H
 #define RAPIDFIT_INTEGRATOR_H
 
-#include "IntegratorFunction.h"
+//	ROOT Headers
 #include "Math/AdaptiveIntegratorMultiDim.h"
 #include "Math/Integrator.h"
+//	RapidFit Headers
+#include "IntegratorFunction.h"
 #include "FoamIntegrator.h"
 #include "IDataSet.h"
 
@@ -35,6 +37,10 @@ class RapidFitIntegrator
 		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string> );
 	
 	private:
+		//	Uncopyable!
+		RapidFitIntegrator ( const RapidFitIntegrator& );
+		RapidFitIntegrator& operator = ( const RapidFitIntegrator& );
+
 		double GetCachedIntegral( DataPoint* );
 		void SetUpIntegralCache( PhaseSpaceBoundary* );
 

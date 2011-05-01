@@ -7,19 +7,20 @@
   @date 2009-10-02
   */
 
-
+//	RapidFit Headers
 #include "DataPoint.h"
 #include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 #include <stdlib.h>
 
 //Default constructor
-DataPoint::DataPoint()
+DataPoint::DataPoint() : allObservables(), allNames()
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames )
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(NewNames)
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -27,8 +28,6 @@ DataPoint::DataPoint( vector<string> NewNames )
 	{
 		allObservables.push_back( Observable() );
 	}
-
-	allNames = NewNames;
 }
 
 //Destructor
@@ -47,14 +46,14 @@ Observable * DataPoint::GetObservable( pair<string,int>* wanted_param )
 {
 	if( wanted_param->second != -1 )
 	{
-		return &allObservables[wanted_param->second];
+		return &allObservables[unsigned(wanted_param->second)];
 	} else {
 		wanted_param->second = StringProcessing::VectorContains( &allNames, &(wanted_param->first) );
 	}
 	if( wanted_param->second == -1 ){
 		cerr << "Observable name " << wanted_param->first << " not found" <<endl;
 	}else{
-		return &allObservables[wanted_param->second];}
+		return &allObservables[unsigned(wanted_param->second)];}
 	exit(-1);
 }
 
@@ -72,7 +71,7 @@ Observable * DataPoint::GetObservable(string Name)
 	}
 	else
 	{
-		return &allObservables[nameIndex];
+		return &allObservables[unsigned(nameIndex)];
 	}
 }
 
@@ -89,20 +88,20 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 	}
 	else
 	{
-		allObservables[nameIndex] = *NewObservable;
+		allObservables[unsigned(nameIndex)] = *NewObservable;
 		return true;
 	}
 }
 
 //Initialise observable
-bool DataPoint::SetObservable( string Name, double Value, double Error, string Unit, bool trusted, int nameIndex )
+bool DataPoint::SetObservable( const string Name, const double Value, const double Error, const string Unit, const bool trusted, const int nameIndex )
 {
 	Observable * temporaryObservable = new Observable( Name, Value, Error, Unit );
 	bool returnValue=false;
 	if( trusted )
 	{
 		returnValue=true;
-		allObservables[nameIndex] = *temporaryObservable;
+		allObservables[unsigned(nameIndex)] = *temporaryObservable;
 	} else {
 		returnValue = SetObservable( Name, temporaryObservable );
 	}

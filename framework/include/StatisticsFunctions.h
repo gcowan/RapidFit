@@ -10,11 +10,13 @@
 #ifndef STATISTICS_FUNCTIONS_H
 #define STATISTICS_FUNCTIONS_H
 
-#include <string>
-#include <vector>
+//	RapidFit Headers
 #include "PhaseSpaceBoundary.h"
 #include "IPDF.h"
 #include "IDataSet.h"
+//	System Headers
+#include <string>
+#include <vector>
 
 using namespace std;
 

@@ -10,9 +10,11 @@
 #ifndef MINUIT_2_WRAPPER_H
 #define MINUIT_2_WRAPPER_H
 
-#include "IMinimiser.h"
+//	ROOT Headers
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2Function.h"
+//	RapidFit Headers
+#include "IMinimiser.h"
 #include "FitResult.h"
 
 using namespace ROOT::Minuit2;
@@ -30,6 +32,10 @@ class Minuit2Wrapper : public IMinimiser
 		virtual void ContourPlots( vector< pair< string, string > > );
 
 	private:
+		//	Uncopyable!
+		Minuit2Wrapper ( const Minuit2Wrapper& );
+		Minuit2Wrapper& operator = ( const Minuit2Wrapper& );
+
 		//MnMigrad minuit;
 		Minuit2Function * function;
 		FitResult * fitResult;

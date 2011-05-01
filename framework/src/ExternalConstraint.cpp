@@ -7,10 +7,11 @@
   @date 21-01-10
   */
 
+//	RapidFit Headers
 #include "ExternalConstraint.h"
 
 //Default constructor
-ExternalConstraint::ExternalConstraint()
+ExternalConstraint::ExternalConstraint(): name(), value(), error()
 {
 }
 

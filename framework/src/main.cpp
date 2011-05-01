@@ -5,22 +5,10 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+ **/
 
 //  Root Headers
-#include <TString.h>
-
-//  System Headers
-#include <string>
-#include <vector>
-#include <iostream>
-#include <ctime>
-#include <sstream>
-#include <iomanip>
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifndef __CINT__
+#include "TString.h"
 //  RapidFit Headers
 #include "Mathematics.h"
 #include "FitAssembler.h"
@@ -36,9 +24,19 @@
 #include "ToyStudyResult.h"
 #include "LLscanResult.h"
 #include "LLscanResult2D.h"
+//  System Headers
+#include <string>
+#include <vector>
+#include <iostream>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
+#ifndef __CINT__
 int RapidFit( int argc, char * argv[] );
 
 int main( int argc, char * argv[] )
@@ -49,7 +47,7 @@ int main( int argc, char * argv[] )
 
 int RapidFit( int argc, char * argv[] )
 {
-
+	//ProfilerStart("profile.out");
 	//TProof * proof = TProof::Open( "" ); // idea of using PROOF for paralellisation
 	//Welcome blurb
 	time_t timeNow;
@@ -61,15 +59,16 @@ int RapidFit( int argc, char * argv[] )
 	{
 		//Default behaviour if no command line arguments
 		ToyStudy * testStudy = new ToyStudy("../config/MC09Toy_noBkg.xml");
-		ToyStudyResult * fitResults = testStudy->DoWholeStudy();
+		ToyStudyResult * fitResults = testStudy->DoWholeStudy( true );
 		ResultFormatter::MakePullPlots( "SeparateParameter", "pullPlots.root", fitResults );
 		ResultFormatter::LatexOutputFitResult( fitResults->GetFitResult(0) );
+		delete testStudy;
 	}
 	else
 	{
 		//Variables to store command line arguments
 		int numberRepeats = 0;
-		unsigned short int Nuisencemodel=2;
+		int Nuisencemodel=2;
 		string configFileName = "";
 		vector<string> parameterTemplates;
 		MinimiserConfiguration * theMinimiser=NULL;
@@ -155,7 +154,7 @@ int RapidFit( int argc, char * argv[] )
 				cout << "				<Name>parameterName</Name> " << endl ;
 				cout << "				<Maximum>Maxima of x axis</Maximum> " << endl ;
 				cout << "				<Minimum>Minima of x axis</Minimum> " << endl ;
-				cout << "				<Points>number of points in y axis</Points> " << endl ;
+				cout << "				<Points>number of points in x axis</Points> " << endl ;
 				cout << "			</Y_Param>" <<endl;
 				cout << "				<Name>parameterName</Name> " << endl ;
 				cout << "				<Sigma>number of sigma from fit minima</Sigma> " << endl ;
@@ -399,7 +398,7 @@ int RapidFit( int argc, char * argv[] )
 				if ( argumentIndex + 1 < argc )
 				{
 					++argumentIndex;
-					Nuisencemodel = unsigned (short(atoi( argv[argumentIndex] )));
+					Nuisencemodel = atoi( argv[argumentIndex] );
 				} else {
 					cerr << "Not correctly Formatted Nuisence Input" <<endl;
 					return 1;
@@ -445,7 +444,7 @@ int RapidFit( int argc, char * argv[] )
 		if( ( !RuntimeSeed.empty() && xmlFile->IsLoaded() ) && !UUID_Flag )
 		{
 			cout << "Setting Seed At Runtime to be: " << RuntimeSeed[0] << endl;
-			xmlFile->SetSeed( RuntimeSeed[0] );
+			xmlFile->SetSeed( unsigned(RuntimeSeed[0]) );
 		} else if ( !RuntimeSeed.empty() && UUID_Flag && xmlFile->IsLoaded() )
 		{
 			//  I have used the TRandom3 code as inspiration for 'Salting the Seed' of the UUID at runtime
@@ -454,14 +453,14 @@ int RapidFit( int argc, char * argv[] )
 			UChar_t uuid[16];
 			uid.GetUUID(uuid);
 			RuntimeSeed[0] = RuntimeSeed[0] * ( uuid[ 2*(RuntimeSeed[0]%8) ]*256 +uuid[ 2*(RuntimeSeed[0]%8) ] );
-			xmlFile->SetSeed( RuntimeSeed[0] );
+			xmlFile->SetSeed( unsigned(RuntimeSeed[0]) );
 		}
 
 		//Create a parameter set
-		ParameterSet * argumentParameterSet=NULL;
+		vector<ParameterSet*> argumentParameterSet;
 		if (parameterTemplateFlag)
 		{
-			argumentParameterSet = InputParsing::MakeParameterSet(parameterTemplates);
+			argumentParameterSet.push_back( InputParsing::MakeParameterSet(parameterTemplates) );
 		}
 
 		//Choose what action to take, now that you've configured everything
@@ -473,6 +472,7 @@ int RapidFit( int argc, char * argv[] )
 				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
 				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 				ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickData->GetDataSet() );
+				delete quickData;
 			}
 			else
 			{
@@ -490,6 +490,8 @@ int RapidFit( int argc, char * argv[] )
 				IDataSet * quickDataSet = quickData->GetDataSet();
 				RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( quickData->GetPDF() );
 				testIntegrator->Integral( quickDataSet->GetDataPoint(0), quickDataSet->GetBoundary() );
+				delete testIntegrator;
+				delete quickData;
 			}
 			else
 			{
@@ -507,6 +509,7 @@ int RapidFit( int argc, char * argv[] )
         IDataSet * dataSet = pdfAndData->GetDataSet();
         IPDF * pdf = pdfAndData->GetPDF();
         Mathematics::calculateAcceptanceWeights(dataSet, pdf);
+	delete pdfAndData;
       }
       else
       {
@@ -524,6 +527,7 @@ int RapidFit( int argc, char * argv[] )
         IDataSet * dataSet = pdfAndData->GetDataSet();
         IPDF * pdf = pdfAndData->GetPDF();
         Mathematics::calculateAcceptanceWeightsWithSwave(dataSet, pdf);
+	delete pdfAndData;
       }
       else
       {
@@ -535,13 +539,14 @@ int RapidFit( int argc, char * argv[] )
 
 	  else if (calculatePerEventAcceptance)
     {
-      PerEventAngularAcceptance a = PerEventAngularAcceptance("jpsikmc09_loose.root","Bu2JpsiKTuple/DecayTree", "out2.root");
+      PerEventAngularAcceptance* a = new PerEventAngularAcceptance("jpsikmc09_loose.root","Bu2JpsiKTuple/DecayTree", "out2.root");
       for (int iter = 1; iter <= 3; ++iter)
       {
-        a.fillEffHistos( iter );
-        a.loopOnReconstructedBs();
+        a->fillEffHistos( iter );
+        a->loopOnReconstructedBs();
       }
-      a.writeHistos();
+      a->writeHistos();
+      delete a;
     }
 		else if (testPlotFlag)
 		{
@@ -553,6 +558,8 @@ int RapidFit( int argc, char * argv[] )
 				IDataSet * quickDataSet = quickData->GetDataSet();
 				Plotter * testPlotter = new Plotter( quickData->GetPDF(), quickDataSet );
 				testPlotter->PlotAllObservables(plotFileName);
+				delete testPlotter;
+				delete quickData;
 			}
 			else
 			{
@@ -623,26 +630,36 @@ int RapidFit( int argc, char * argv[] )
 			//Pick a toy study if there are repeats, or if pull plots are wanted
 			if ( ( ( numberRepeats > 1 ) && ((!doFC_Flag) && (!doLLcontourFlag) && (!doLLscanFlag) ) ) || doPullsFlag )
 			{
+				vector< ConstraintFunction* > XMLConstraints = xmlFile->GetConstraints();
 				//Do the toy study
-				ToyStudy newStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), numberRepeats );
-				ToyStudyResult * fitResults = newStudy.DoWholeStudy();
+				ToyStudy newStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, XMLConstraints, numberRepeats );
+				ToyStudyResult * fitResults = newStudy.DoWholeStudy( true );
 
 				//Output results
 				makeOutput->OutputToyResult(fitResults);
 				makeOutput->OutputFitResult( fitResults->GetFitResult(0) );
 
+				while( !XMLConstraints.empty() )
+				{
+					delete XMLConstraints.back();
+					XMLConstraints.pop_back();
+				}
 			}
 			else
 			{
 				//		This is re-used for FC scans and forms FC Step 1
 				cout << "\n\n\t\tStarting Fit to Find Global Minima!\n"<<endl;
 				//Do the fit to find GLOBAL MINIMA
-				ToyStudyResult* GlobalFitResult = new ToyStudyResult( argumentParameterSet->GetAllNames() );
+				ToyStudyResult* GlobalFitResult = new ToyStudyResult( argumentParameterSet.back()->GetAllNames() );
 				GlobalFitResult->StartStopwatch();
 
-				FitResult * GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints() );
+				vector< ConstraintFunction* > XMLConstraints = xmlFile->GetConstraints();
+
+				FitResult * GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, XMLConstraints );
 
 				GlobalFitResult->AddFitResult( GlobalResult );
+
+				ResultFormatter::FlatNTuplePullPlots( string("Global_Fit.root"), GlobalFitResult );
 
 				cout << "\n\n\t\tFit Output:" <<endl;
 				//Output results
@@ -758,8 +775,8 @@ int RapidFit( int argc, char * argv[] )
 						for(unsigned int ii=0; ii < _2DLLscanList.size(); ++ii )
 						{
 							//	STOP RELYING ON THIS OUTPUT, IT'S BADLY WRITTEN, AND IT WILL BE DISABLED SOONER RATHER THAN LATER
-						//	makeOutput->SetLLcontourFileName( LLcontourFileNamez[ii].Data() );
-						//	makeOutput->OutputLLcontourResult( contourResults ) ;
+							makeOutput->SetLLcontourFileName( LLcontourFileNamez[ii].Data() );
+							makeOutput->OutputLLcontourResult( contourResults ) ;
 
 							//	This output is A LOT safer as it intended to be fed to a sperate plotting program.
 							//	Formatting SHOULD be seperate to generation!
@@ -779,6 +796,12 @@ int RapidFit( int argc, char * argv[] )
 							ResultFormatter::WriteFlatNtuple( output_scan_dat , TempContourResults2 );
 						}
 					}
+
+					while( !SoloContourResults.empty() )
+					{
+						delete SoloContourResults.back();
+						SoloContourResults.pop_back();
+					}
 				}
 				//	Do the main work of the FC scan
 				if( doFC_Flag )
@@ -792,7 +815,14 @@ int RapidFit( int argc, char * argv[] )
 					//		STORE THE OUTPUT OF THE TOY STUDIES
 					ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );
 				}
-
+			
+				while( !XMLConstraints.empty() )
+				{
+					delete XMLConstraints.back();
+					XMLConstraints.pop_back();
+				}
+				delete GlobalResult;
+				delete GlobalFitResult;
 			}
 		}
 		else
@@ -801,11 +831,22 @@ int RapidFit( int argc, char * argv[] )
 			cerr << "No action performed" << endl;
 			return 1;
 		}
+
+	//	Clean UP!
+	while ( !pdfsAndData.empty() )
+	{
+		delete pdfsAndData.back();
+		pdfsAndData.pop_back();
+	}
+	delete xmlFile;
+
 	}
 
 	//Exit blurb
 	time(&timeNow);
 	cout << endl << "RapidFit" << endl;
 	cout << "Ending time: " << ctime( &timeNow ) << endl;
+	//ProfilerStop();
+
 	return 0;
 }

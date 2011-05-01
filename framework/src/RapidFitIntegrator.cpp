@@ -9,13 +9,16 @@
   @date 2009-10-8
  */
 
+//	RapidFit Headers
 #include "RapidFitIntegrator.h"
 #include "StringProcessing.h"
 #include "StatisticsFunctions.h"
+//	System Headers
 #include <iostream>
 #include <iomanip>
 #include <cmath>
 #include <stdlib.h>
+
 #define DOUBLE_TOLERANCE 1E-6
 
 using namespace std;
@@ -24,12 +27,12 @@ using namespace std;
 const double INTEGRAL_PRECISION_THRESHOLD = 0.01;
 
 //Default constructor
-RapidFitIntegrator::RapidFitIntegrator()
+RapidFitIntegrator::RapidFitIntegrator() : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(), fastIntegrator(), functionToWrap(), multiDimensionIntegrator(), oneDimensionIntegrator(), functionCanIntegrate(), functionCanProject(), haveTestedIntegral(), forceNumerical(), cacheSetUp(), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals()
 {
 }
 
 //Constructor with correct argument
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : functionToWrap(InputFunction), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), forceNumerical(ForceNumerical), cacheSetUp(false)
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(), fastIntegrator(), functionToWrap(InputFunction), multiDimensionIntegrator(), oneDimensionIntegrator(), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), forceNumerical(ForceNumerical), cacheSetUp(false), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals()
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
@@ -282,16 +285,16 @@ double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
 		for ( int discreteIndex = int(discreteNames.size()) - 1; discreteIndex >= 0; --discreteIndex )
 		{
 			//Retrieve the discrete value
-			double currentValue = NewDataPoint->GetObservable( discreteNames[discreteIndex] )->GetValue();
+			double currentValue = NewDataPoint->GetObservable( discreteNames[unsigned(discreteIndex)] )->GetValue();
 			//cout << currentValue << ", ";
 
 			//Calculate the index
-			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); ++valueIndex )
+			for (unsigned int valueIndex = 0; valueIndex < discreteValues[unsigned(discreteIndex)].size(); ++valueIndex )
 			{
-				if ( fabs( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
+				if ( fabs( discreteValues[unsigned(discreteIndex)][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
-					combinationIndex += ( incrementValue * valueIndex );
-					incrementValue *= int(discreteValues[discreteIndex].size());
+					combinationIndex += ( incrementValue * int(valueIndex) );
+					incrementValue *= int(discreteValues[unsigned(discreteIndex)].size());
 					break;
 				}
 			}
@@ -306,7 +309,7 @@ double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
 		//cout << endl;
 
 		//Return the cached integral value for this index
-		return cachedIntegrals[combinationIndex];
+		return cachedIntegrals[unsigned(combinationIndex)];
 	}
 	else
 	{

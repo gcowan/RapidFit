@@ -11,9 +11,11 @@
 #ifndef DATA_POINT_H
 #define DATA_POINT_H
 
+//	RapidFit Headers
+#include "Observable.h"
+//	System Headers
 #include <vector>
 #include <string>
-#include "Observable.h"
 
 using namespace std;
 
@@ -28,7 +30,7 @@ class DataPoint
 		Observable * GetObservable( pair<string,int>* );	//  Return wanted parameter & cache lookup ref
 		Observable * GetObservable( string );
 		bool SetObservable( string, Observable* );
-		bool SetObservable( string, double, double, string, bool=false, int=-1);
+		bool SetObservable( const string, const double, const double, const string, const bool=false, const int=-1);
 
 	private:
 		vector<Observable> allObservables;

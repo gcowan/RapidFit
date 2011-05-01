@@ -7,18 +7,19 @@
 	@date 2009-10-02
 */
 
-
+//	RapidFit Headers
 #include "LinearPDF.h"
+//	System Headers
 #include <iostream>
 
 //Constructor
-LinearPDF::LinearPDF() : gradientName( "mGradient" ), interceptName( "cIntercept" )
+LinearPDF::LinearPDF() : gradientName( "mGradient" ), interceptName( "cIntercept" ), observableName( "Observable" )
 {
 	MakePrototypes();
 }
 
 //Constructor allowing you to specify the parameter names
-LinearPDF::LinearPDF(string CInterceptName, string MGradientName) : gradientName( MGradientName ), interceptName( CInterceptName )
+LinearPDF::LinearPDF(string CInterceptName, string MGradientName) : gradientName( MGradientName ), interceptName( CInterceptName ), observableName( "Observable" )
 {
 	MakePrototypes();
 }

@@ -10,9 +10,11 @@
 #ifndef MINUIT2_FUNCTION_H
 #define MINUIT2_FUNCTION_H
 
+//	ROOT Headers
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnUserParameters.h"
 #include "Minuit2/ParametricFunction.h"
+//	RapidFit Headers
 #include "FitFunction.h"
 
 using namespace ROOT::Minuit2;
@@ -34,6 +36,10 @@ class Minuit2Function : public FCNBase
 		virtual double ErrorDef() const;
 	
 	private:
+		//	Uncopyable!
+		Minuit2Function ( const Minuit2Function& );
+		Minuit2Function& operator = ( const Minuit2Function& );
+
 		FitFunction * function;
 		MnUserParameters * parameters;
 		double up;

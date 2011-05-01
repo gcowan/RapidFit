@@ -6,10 +6,13 @@
  */
 #ifndef RAPIDFIT_GOODNESSOFFIT
 #define RAPIDFIT_GOODNESSOFFIT
+
+//	ROOT Headers
+#include "TH1D.h"
+//	RapidFit Headers
 #include "IDataSet.h"
 #include "IPDF.h"
 #include "PhaseSpaceBoundary.h"
-#include "TH1D.h"
 
 namespace GoodnessOfFit 
 {

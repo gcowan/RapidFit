@@ -10,10 +10,12 @@
 #ifndef RESULT_PARAMETER_SET_H
 #define RESULT_PARAMETER_SET_H
 
-#include <vector>
-#include <string>
+//	RapidFit Headers
 #include "ResultParameter.h"
 #include "ParameterSet.h"
+//	System Headers
+#include <vector>
+#include <string>
 
 using namespace std;
 

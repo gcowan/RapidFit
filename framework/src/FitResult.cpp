@@ -7,21 +7,21 @@
 	@date 2009-10-02
 */
 
-
+//	RapidFit Headers
 #include "FitResult.h"
 
 //Default constructor
-FitResult::FitResult()
+FitResult::FitResult() : minimumValue(), fittedParameters(), covarianceMatrix(), contours(), fitStatus(), fittedBottle()
 {
 }
 
 //Constructor with correct arguments
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix(), contours(), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 {
 }
 
 //Constructor with correct arguments, including covariance Matrix
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), contours(), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 {
 }
 
@@ -66,7 +66,7 @@ void FitResult::ForceFitStatus( int input_status )
 	fitStatus = input_status;
 }
 
-PhysicsBottle * FitResult::GetPhysicsBottle()
+PhysicsBottle* FitResult::GetPhysicsBottle()
 {
 	return &fittedBottle;
 }

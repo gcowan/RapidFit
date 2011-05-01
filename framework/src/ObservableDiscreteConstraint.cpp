@@ -7,14 +7,16 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "ObservableDiscreteConstraint.h"
+//	System Headers
 #include <iostream>
 #include <math.h>
 
 #define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
-ObservableDiscreteConstraint::ObservableDiscreteConstraint() :  unit("Uninitialised")
+ObservableDiscreteConstraint::ObservableDiscreteConstraint() : allValues(), unit("Uninitialised")
 {
 }
 
@@ -104,7 +106,7 @@ Observable * ObservableDiscreteConstraint::CreateObservable()
 Observable * ObservableDiscreteConstraint::CreateObservable( TRandom3 * RandomNumberGenerator )
 {
 	int randomIndex = (int)floor( int(allValues.size()) * RandomNumberGenerator->Rndm() );
-	return new Observable( "Unknown", allValues[randomIndex], 0.0, unit );
+	return new Observable( "Unknown", allValues[unsigned(randomIndex)], 0.0, unit );
 }
 
 bool ObservableDiscreteConstraint::IsDiscrete()

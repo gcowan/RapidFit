@@ -7,20 +7,22 @@
   @date 2009-10-5
  */
 
+//	RapidFit Headers
 #include "PDFWithData.h"
 #include "ClassLookUp.h"
+//	System Headers
 #include <stdlib.h>
 #include <iostream>
 
 using namespace std;
 
 //Default constructor
-PDFWithData::PDFWithData() : parametersAreSet(false)
+PDFWithData::PDFWithData() : fitPDF(), inputBoundary(), parametersAreSet(false), dataProcessors(), dataSetMakers(), cached_data()
 {
 }
 
 //Constructor with correct aruments
-PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(InputPDF), inputBoundary(InputBoundary),  parametersAreSet(false), dataProcessors(InputPrecalculators), dataSetMakers(DataConfig)
+PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(InputPDF), inputBoundary(InputBoundary),  parametersAreSet(false), dataProcessors(InputPrecalculators), dataSetMakers(DataConfig), cached_data()
 {
 	if ( DataConfig.size() < 1 )
 	{
@@ -32,6 +34,13 @@ PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, v
 //Destructor
 PDFWithData::~PDFWithData()
 {
+	delete fitPDF;
+	while( !dataSetMakers.empty() )
+	{
+		delete dataSetMakers.back();
+		dataSetMakers.pop_back();
+	}
+	cout << "Hello from PDFWithData destructor" << endl;
 }
 
 //Return the PDF
@@ -39,7 +48,7 @@ IPDF * PDFWithData::GetPDF()
 {
 	if (!parametersAreSet)
 	{
-		cout << "Warning: PDF parameters have not yet been set" << endl;
+		cerr << "Warning: PDF parameters have not yet been set" << endl;
 	}
 	return fitPDF;
 }
@@ -99,10 +108,14 @@ IDataSet * PDFWithData::GetDataSet()
 }
 
 //Set the physics parameters of the PDF
-bool PDFWithData::SetPhysicsParameters( ParameterSet * NewParameters )
+bool PDFWithData::SetPhysicsParameters( vector<ParameterSet*> NewParameters )
 {
+	//	I am in the process of adding more flexibility to the RapidFit structure
+	//	As such this requires that the Paramaters from the XML be passed in vectors
+	//	I will update this function in time to stop refering to just the first element it sees
+	
 	//Set the parameters for the stored PDF and all data set makers
-	bool success = fitPDF->SetPhysicsParameters(NewParameters);
+	bool success = fitPDF->SetPhysicsParameters(NewParameters.back());
 	for (unsigned int dataIndex = 0; dataIndex < dataSetMakers.size(); ++dataIndex )
 	{
 		success &= dataSetMakers[dataIndex]->SetPhysicsParameters(NewParameters);

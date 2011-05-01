@@ -8,28 +8,30 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "MemoryDataSet.h"
+//	System Headers
 #include <iostream>
 
 //Default constructor
-MemoryDataSet::MemoryDataSet()
+MemoryDataSet::MemoryDataSet() : allData(), dataBoundary()
 {
 }
 
 //Constructor with correct argument
-MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) : dataBoundary(NewBoundary)
+MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) : allData(), dataBoundary(NewBoundary)
 {
 }
 
 //Destructor
 MemoryDataSet::~MemoryDataSet()
 {
-	//delete dataBoundary;
+	delete dataBoundary;
 }
 
 void MemoryDataSet::ReserveDataSpace( int numberOfPoints )
 {
-	allData.reserve( numberOfPoints );
+	allData.reserve( unsigned(numberOfPoints) );
 }
 
 //Add a data point to the set
@@ -52,7 +54,7 @@ DataPoint * MemoryDataSet::GetDataPoint(  int Index )
 {
 	if ( Index < int(allData.size()) )
 	{
-		return &allData[Index];
+		return &allData[unsigned(Index)];
 	}
 	else
 	{

@@ -7,16 +7,18 @@
   @date 2009-11-27
  */
 
+//	RapidFit Headers
 #include "FunctionContour.h"
+//	System Headers
 #include <iostream>
 
 //Default constructor
-FunctionContour::FunctionContour()
+FunctionContour::FunctionContour() : xName(), yName(), allContours()
 {
 }
 
 //Constructor with correct arguments
-FunctionContour::FunctionContour( string XName, string YName, int ContourNumber ) : xName(XName), yName(YName)
+FunctionContour::FunctionContour( string XName, string YName, int ContourNumber ) : xName(XName), yName(YName), allContours()
 {
 	//Initialise the contour storage
 	for ( int contourIndex = 0; contourIndex < ContourNumber; ++contourIndex )
@@ -66,7 +68,7 @@ void FunctionContour::SetPlot( int Sigma, int NumberPoints, double * XValues, do
 			newContourPlot.push_back( make_pair( XValues[pointIndex], YValues[pointIndex] ) );
 		}
 
-		allContours[ Sigma - 1 ] = newContourPlot;
+		allContours[ unsigned(Sigma - 1) ] = newContourPlot;
 	}
 }
 void FunctionContour::SetPlot( int Sigma, vector< pair< double, double > > Contour )
@@ -77,7 +79,7 @@ void FunctionContour::SetPlot( int Sigma, vector< pair< double, double > > Conto
 	}       
 	else
 	{
-		allContours[ Sigma - 1 ] = Contour;
+		allContours[ unsigned(Sigma - 1) ] = Contour;
 	}
 }
 
@@ -90,7 +92,7 @@ vector< pair< double, double > > FunctionContour::GetPlot( int Sigma )
 	}
 	else
 	{
-		return allContours[ Sigma - 1 ];
+		return allContours[ unsigned(Sigma - 1) ];
 	}
 	return *(new vector<pair<double, double> >);
 }

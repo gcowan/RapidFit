@@ -7,25 +7,27 @@
   @date 2009-10-02
  */
 
+//	RapidFit Headers
 #include "SumPDF.h"
 #include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 
 using namespace std;
 
 //Default constructor
-SumPDF::SumPDF()
+SumPDF::SumPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(), secondPDF(), firstFraction(), firstIntegralCorrection(), secondIntegralCorrection(), fractionName()
 {
 }
 
 //Constructor not specifying fraction parameter name
-SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : firstPDF(FirstPDF), secondPDF(SecondPDF), firstFraction(0.5), fractionName("FirstPDFFraction")
+SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName("FirstPDFFraction")
 {
 	MakePrototypes(InputBoundary);
 }
 
 //Constructor specifying fraction parameter name
-SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : firstPDF(FirstPDF), secondPDF(SecondPDF), firstFraction(0.5), fractionName(FractionName)
+SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName)
 {
 	MakePrototypes(InputBoundary);
 }

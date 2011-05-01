@@ -10,8 +10,10 @@
 #ifndef S_WEIGHT_PRECALCULATOR_H
 #define S_WEIGHT_PRECALCULATOR_H
 
+//	RapidFit Headers
 #include "IPrecalculator.h"
 #include "IPDF.h"
+//	System Headers
 #include <vector>
 #include <string>
 
@@ -26,6 +28,9 @@ class SWeightPrecalculator : public IPrecalculator
 		pair< double, double > CalculateMatrixElements( long, long, IDataSet*, vector<double>&, vector<double>& );
 
 	private:
+		//	Uncopyable!
+		SWeightPrecalculator ( const SWeightPrecalculator& );
+		SWeightPrecalculator& operator = ( const SWeightPrecalculator& );
 		IPDF * signalPDF;
 		IPDF * backgroundPDF;
 		ParameterSet * fitParameters;

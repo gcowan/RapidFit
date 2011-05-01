@@ -8,12 +8,13 @@
 	@date 2009-10-02
 */
 
-
+//	RapidFit Headers
 #include "BasePDF.h"
+//	System Headers
 #include <iostream>
 
 //Constructor
-BasePDF::BasePDF() : cachedIntegral(-1.0), cacheValid(false), valid(false)
+BasePDF::BasePDF() : cachedIntegral(-1.0), cacheValid(false), allParameters(), allObservables(), valid(false)
 {
 }
 
@@ -82,19 +83,19 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 //Do the integration
 double BasePDF::Normalisation(PhaseSpaceBoundary * NewBoundary)
 {
+	//	Stupid gcc
+	(void)NewBoundary;
 	//Just a default value
-	PhaseSpaceBoundary* null_p = NewBoundary;
-	null_p=NULL;
 	return -1.0;
 }
 
 //Do the integration
 double BasePDF::Normalisation(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary)
 {
+	//	Stupid gcc
+	(void)NewDataPoint;
+	(void)NewBoundary;
 	//Just a default value
-	DataPoint* null_p = NewDataPoint;
-	PhaseSpaceBoundary* null_p2 = NewBoundary;
-	null_p=NULL; null_p2=NULL;
 	return -1.0;
 }
 
@@ -116,9 +117,9 @@ double BasePDF::Evaluate(DataPoint * NewDataPoint)
 //Calculate the function value
 double BasePDF::Evaluate(DataPoint * NewDataPoint)
 {
+	//	Stupid gcc
+	(void)NewDataPoint;
 	//Just a default value
-	DataPoint* null_p = NewDataPoint;
-	null_p=NULL;
 	return  -1.0;
 }
 
@@ -154,4 +155,3 @@ vector<string> BasePDF::GetDoNotIntegrateList()
 void BasePDF::UpdateIntegralCache()
 {
 }
-

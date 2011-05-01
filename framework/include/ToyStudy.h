@@ -10,11 +10,13 @@
 #ifndef TOY_STUDY_H
 #define TOY_STUDY_H
 
+//	RapidFit Headers
 #include "PDFWithData.h"
 #include "ParameterSet.h"
 #include "ToyStudyResult.h"
 #include "FitFunctionConfiguration.h"
 #include "MinimiserConfiguration.h"
+//	System Headers
 #include <string>
 #include <vector>
 
@@ -25,17 +27,21 @@ class ToyStudy
 	public:
 		ToyStudy();
 		ToyStudy( string );
-		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
+		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, vector<ParameterSet*>, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
 		~ToyStudy();
 
 		ToyStudyResult * DoWholeStudy( bool=false );
 		ToyStudyResult * GetToyStudyResult();
 
 	private:
+		//	Uncopyable!
+		ToyStudy ( const ToyStudy& );
+		ToyStudy& operator = ( const ToyStudy& );
+
 		FitResult * GenerateAndMinimise();
 
 		vector< PDFWithData* > pdfsAndData;
-		ParameterSet * studyParameters;
+		vector< ParameterSet* > studyParameters;
 		MinimiserConfiguration * theMinimiser;
 		FitFunctionConfiguration * theFunction;
 		ToyStudyResult * allResults;

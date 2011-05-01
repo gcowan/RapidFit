@@ -8,21 +8,23 @@
         @date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "AcceptReject.h"
 #include "PhaseSpaceBoundary.h"
+//	System Headers
 #include <iostream>
 #include <math.h>
 
 #define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
-AcceptReject::AcceptReject()
+AcceptReject::AcceptReject() : generationFunction(), generationBoundary(), dataNumber(), newDataSet(), rootRandom(), moreThanMaximum(), numberAttempts()
 {
 }
 
 //Constructor with correct argument
 AcceptReject::AcceptReject( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationFunction(NewPDF),
-	generationBoundary(NewBoundary), dataNumber(0), moreThanMaximum(0.01), numberAttempts(0)
+	generationBoundary(NewBoundary), dataNumber(0), newDataSet(), rootRandom(), moreThanMaximum(0.01), numberAttempts(0)
 {
 	newDataSet = new MemoryDataSet(generationBoundary);
 	rootRandom = NewPDF->GetRandomFunction();
@@ -123,8 +125,7 @@ IDataSet * AcceptReject::GetDataSet()
 //Overload in child functions to speed data generation for complex functions
 bool AcceptReject::Preselection( DataPoint * TestDataPoint, double TestValue )
 {
-	DataPoint* null_p = TestDataPoint;
-	double null_d = TestValue;
-	null_p=NULL; null_d=0;
+	(void)TestDataPoint;
+	(void)TestValue;
 	return true;
 }

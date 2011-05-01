@@ -10,7 +10,9 @@
 #ifndef OBSERVABLE_CONTINUOUS_CONSTRAINT_H
 #define OBSERVABLE_CONTINUOUS_CONSTRAINT_H
 
+//	RapidFit Headers
 #include "IConstraint.h"
+//	System Headers
 #include <string>
 
 using namespace std;

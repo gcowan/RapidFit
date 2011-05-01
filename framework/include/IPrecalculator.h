@@ -10,6 +10,7 @@
 #ifndef I_PRECALCULATOR_H
 #define I_PRECALCULATOR_H
 
+//	RapidFit Headers
 #include "IDataSet.h"
 
 class IPrecalculator

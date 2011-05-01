@@ -7,14 +7,16 @@
   @date 21-01-10
   */
 
+//	RapidFit Headers
 #include "ConstraintFunction.h"
 #include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 
 using namespace std;
 
 //Default constructor
-ConstraintFunction::ConstraintFunction()
+ConstraintFunction::ConstraintFunction() : allConstraints()
 {
 }
 
@@ -84,7 +86,7 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			double dgam =  NewParameters->GetPhysicsParameter("deltaGamma")->GetValue();
 			double G1 = gamma-dgam/2.0 ;
 			double G2 = gamma+dgam/2.0 ;
-			double val = allConstraints[constraintIndex]->GetValue();
+//			double val = allConstraints[constraintIndex]->GetValue();
 			double constraint = allConstraints[constraintIndex]->GetError();
 			double penalty = 0 ;
 			if( G1 < 0. ) penalty += (G1*G1)/(constraint*constraint) ;

@@ -10,9 +10,13 @@
 #ifndef PARAMETER_SET_H
 #define PARAMETER_SET_H
 
+//	ROOT Headers
+#include "TString.h"
+//	RapidFit Headers
+#include "PhysicsParameter.h"
+//	System Headers
 #include <vector>
 #include <string>
-#include "PhysicsParameter.h"
 
 using namespace std;
 
@@ -23,6 +27,9 @@ class ParameterSet
 		ParameterSet( vector<string> );
 		~ParameterSet();
 
+		void SET_ID( TString );
+		void SET_ID( string );
+		string GET_ID();
 		vector<string> GetAllNames();
 		vector<string> GetAllFloatNames();
 		vector<string> GetAllFixedNames();
@@ -39,6 +46,7 @@ class ParameterSet
 		void print() ;
 
 	private:
+		string stored_id;
 		vector<PhysicsParameter> allParameters;
 		vector<string> allNames;
 };

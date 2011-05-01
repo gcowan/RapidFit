@@ -7,9 +7,10 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "ResultParameter.h"
-//  This probably breaks OO but it's nicer to have it in this class for F-C plots
 #include "PhysicsParameter.h"
+//	System Headers
 #include <iostream>
 
 //Default constructor

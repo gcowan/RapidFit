@@ -8,29 +8,32 @@
   @data 2009-12-16
  */
 
-#include "StringProcessing.h"
-#include "MemoryDataSet.h"
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <map>
+//	ROOT Headers
 #include "TFile.h"
 #include "TBranch.h"
 #include "TLeaf.h"
 #include "TEventList.h"
-#include "DataSetConfiguration.h"
-#include "ClassLookUp.h"
-#include <stdlib.h>
 #include "TCanvas.h"
 #include "TString.h"
+//	RapidFit Headers
+#include "StringProcessing.h"
+#include "MemoryDataSet.h"
+#include "DataSetConfiguration.h"
+#include "ClassLookUp.h"
+//	System Headers
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <map>
+#include <stdlib.h>
 
 //Default constructor
-DataSetConfiguration::DataSetConfiguration()
+DataSetConfiguration::DataSetConfiguration() : source(), cutString(), numberEvents(), arguments(), argumentNames(), generatePDF(), separateGeneratePDF(), parametersAreSet()
 {
 }
 
 //Constructor with correct argument
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), separateGeneratePDF(false), parametersAreSet(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false)
 {
 }
 
@@ -44,12 +47,17 @@ DataSetConfiguration::~DataSetConfiguration()
 {
 }
 
+IPDF* DataSetConfiguration::GetGenerationPDF()
+{
+	return generatePDF;
+}
+
 //Set the parameters of the generation PDF
-bool DataSetConfiguration::SetPhysicsParameters( ParameterSet * InputParameters )
+bool DataSetConfiguration::SetPhysicsParameters( vector<ParameterSet*> InputParameters )
 {
 	if (separateGeneratePDF)
 	{
-		if ( generatePDF->SetPhysicsParameters(InputParameters) )
+		if ( generatePDF->SetPhysicsParameters(InputParameters.back()) )
 		{
 			parametersAreSet = true;
 			return true;
@@ -122,7 +130,7 @@ IDataSet * DataSetConfiguration::LoadDataFile( vector<string> Arguments, vector<
 	string fileName = "NotFound";
 	if ( fileNameIndex >= 0 )
 	{
-		fileName = Arguments[fileNameIndex];
+		fileName = Arguments[unsigned(fileNameIndex)];
 	}
 	else
 	{
@@ -136,7 +144,7 @@ IDataSet * DataSetConfiguration::LoadDataFile( vector<string> Arguments, vector<
 	string nTuplePath = "NotFound";
 	if ( nTuplePathIndex >= 0 )
 	{
-		nTuplePath = Arguments[nTuplePathIndex];
+		nTuplePath = Arguments[unsigned(nTuplePathIndex)];
 	}
 
 	//Find the file type, and treat appropriately
@@ -203,7 +211,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 	//  Container for all of the data read in from a root file
 	vector<vector<Double_t> > real_data_array;
-	real_data_array.reserve( numberOfObservables );
+	real_data_array.reserve( unsigned(numberOfObservables) );
 
 
 	//time_t timeNow1;
@@ -228,11 +236,11 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	{
 		data_array.reserve(3);
 		//  Construct a Plot String to use the TTree->Draw Method
-		PlotString = observableNames[obsIndex];
+		PlotString = observableNames[unsigned(obsIndex)];
 		for( short int i=1; ((obsIndex+i)<numberOfObservables)&&((i<3)); ++i )
 		{
 			PlotString.Append(":");
-			PlotString.Append(observableNames[obsIndex+i]);
+			PlotString.Append(observableNames[unsigned(obsIndex+i)]);
 		}
 		//cout << "PlotString: " << PlotString << endl;
 
@@ -252,7 +260,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		for(unsigned short int i=0; i < data_array.size(); ++i )
 		{
 			vector<Double_t> temp_vector;
-			temp_vector.reserve( numberOfEventsAfterCut );
+			temp_vector.reserve( unsigned(numberOfEventsAfterCut) );
 			for(int j=0; j < numberOfEventsAfterCut; ++j )
 			{
 				temp_vector.push_back( data_array[i][j] );
@@ -279,9 +287,9 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		DataPoint point( observableNames );
 		for(int obsIndex = 0; obsIndex < numberOfObservables; ++obsIndex )
 		{
-			string name = observableNames[obsIndex];
+			string name = observableNames[unsigned(obsIndex)];
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
-			point.SetObservable( name, real_data_array[obsIndex][numberOfDataPointsRead], 0.0, unit, true, obsIndex);
+			point.SetObservable( name, real_data_array[unsigned(obsIndex)][unsigned(numberOfDataPointsRead)], 0.0, unit, true, obsIndex);
 		}
 		bool dataPointAdded = data->AddDataPoint( &point );
 		if (dataPointAdded) ++numberOfDataPointsAdded;

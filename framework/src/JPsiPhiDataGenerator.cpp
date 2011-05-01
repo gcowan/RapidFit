@@ -7,7 +7,7 @@
 	@date 2009-10-02
 */
 
-
+//	RapidFit Headers
 #include "JPsiPhiDataGenerator.h"
 
 //Default constructor

@@ -19,6 +19,8 @@ RM           = rm -f
 CXXFLAGS     = -O3 -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 #		When running on the GRID & other batch systems the sandbox is limited in size hence the library HAS to be as small as possible
 #CXXFLAGS     = -Os -msse -msse2 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+#		For extra debugging info:
+#CXXFLAGS    = -Weffc++ -pedantic -O3 -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 
 #		Some Useful global variables, makes this file MUCH easier to maintain
 SRCEXT   = cpp
@@ -34,11 +36,11 @@ LIBDIR   = lib
 UTILSSRC = utils/src
 
 #	Source Files to be Built
-SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)' -not -name 'Roo*.cpp' | grep -v 'RapidRun' | grep -v 'ClassLookUp' )
-PDFSRCS := $(shell find $(SRCPDFDIR) -name '*.$(SRCEXT)' -not -name 'Roo*.cpp' )
+SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)' | grep -v 'unused' | grep -v 'RapidRun' | grep -v 'ClassLookUp' )
+PDFSRCS := $(shell find $(SRCPDFDIR) -name '*.$(SRCEXT)' | grep -v 'unused' )
 
 #	Absolute Paths of headers
-HEADERS := $(shell find $(PWD)/$(INCDIR) -name '*.$(HDREXT)' | grep -v 'LinkDef' )
+HEADERS := $(shell find $(PWD)/$(INCDIR) -name '*.$(HDREXT)' | grep -v 'unused' | grep -v 'LinkDef' )
 PDFHEAD := $(shell find $(PWD)/$(INCPDFDIR) -name '*.$(HDREXT)' )
 
 #	Binary Objects to make in the build
@@ -102,7 +104,7 @@ $(OBJPDFDIR)/%.o : $(SRCPDFDIR)/%.$(SRCEXT) $(INCPDFDIR)/%.$(HDREXT)
 
 
 #	Main Build of RapidFit Binary
-$(EXEDIR)/fitting : $(OBJS) $(PDFOBJS) $(OBJDIR)/ClassLookUp.o $(OBJDIR)/RootFileDataSet.o
+$(EXEDIR)/fitting : $(OBJS) $(PDFOBJS) $(OBJDIR)/ClassLookUp.o
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(LIBS)
 
 

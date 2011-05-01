@@ -12,8 +12,10 @@
 #ifndef FUMILI_FUNCTION_H
 #define FUMILI_FUNCTION_H
 
+//	ROOT Headers
 #include "Minuit2/ParametricFunction.h"
 #include "Minuit2/MnUserParameters.h"
+//	RapidFit Headers
 #include "FitFunction.h"
 
 using namespace ROOT::Minuit2;
@@ -35,6 +37,10 @@ class FumiliFunction : public ParametricFunction
 		virtual double Up() const;		
 
 	protected:
+		//	Uncopyable!
+		FumiliFunction ( const FumiliFunction& );
+		FumiliFunction& operator = ( const FumiliFunction& );
+
 		FitFunction * function;
 		MnUserParameters * parameters;
 };

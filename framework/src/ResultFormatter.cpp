@@ -8,6 +8,7 @@
   @date 2009-10-02
  */
 
+//	ROOT Headers
 #include "TFile.h"
 #include "TNtuple.h"
 #include "Rtypes.h"
@@ -19,12 +20,12 @@
 #include "TCanvas.h"
 #include "TFrame.h"
 #include "TAxis.h"
-
+//	RapidFit Headers
 #include "ResultFormatter.h"
 #include "StatisticsFunctions.h"
 #include "EdStyle.h"
 #include "StringProcessing.h"
-
+//	System Headers
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -57,7 +58,7 @@ void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
 	for ( int dataIndex = 0; dataIndex < OutputData->GetDataNumber(); ++dataIndex)
 	{
 		//Retrieve the values of all observables
-		Float_t observables[ allNames.size() ];
+		Float_t* observables = new Float_t[ allNames.size() ];
 		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 		{
 			DataPoint * temporaryDataPoint = OutputData->GetDataPoint(dataIndex);
@@ -122,7 +123,8 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 			vector< pair< double, double > > sigmaContour = plotContour->GetPlot(sigma);
 
 			//Retrieve each point
-			double xCoordinates[ sigmaContour.size() ], yCoordinates[ sigmaContour.size() ];
+			double* xCoordinates = new double[ sigmaContour.size() ];
+			double* yCoordinates = new double[ sigmaContour.size() ];
 			for (unsigned short int pointIndex = 0; pointIndex < sigmaContour.size(); ++pointIndex )
 			{
 				xCoordinates[pointIndex] = sigmaContour[pointIndex].first;
@@ -249,8 +251,8 @@ bool ResultFormatter::IsParameterFree( FitResult * OutputData, string ParameterN
 
 double ResultFormatter::GetElementFromCovarianceMatrix( vector<double> matrix, int row, int col)
 {
-	if(row > col) return matrix[col+row*(row+1)/2];
-	else return matrix[row+col*(col+1)/2];
+	if(row > col) return matrix[unsigned(col+row*(row+1)/2)];
+	else return matrix[unsigned(row+col*(col+1)/2)];
 }
 
 
@@ -383,7 +385,7 @@ void ResultFormatter::ReviewOutput( FitResult * OutputData )
 
 	cout << endl << endl;
 	cout << "--------------------------------------------------" <<endl;
-	cout << "\nFit Review:\t\tStatus:\t" <<OutputData->GetFitStatus()<<endl<<endl;
+	cout << "\nFit Review:\t\tStatus:\t" <<OutputData->GetFitStatus()<<"\t\tNLL:\t"<<setprecision(10)<<OutputData->GetMinimumValue()<<endl<<endl;
 
 	//Ouput each parameter
 	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
@@ -441,6 +443,7 @@ void ResultFormatter::MakePullPlots( string Type, string FileName, ToyStudyResul
 void ResultFormatter::WriteFlatNtuple( string Filename, ToyStudyResult* ToyResult )
 {
 	ResultFormatter::FlatNTuplePullPlots( Filename, ToyResult );
+
 }
 
 //Make pull plots from the output of a toy study
@@ -460,6 +463,72 @@ void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * Toy
 	}
 	rootFile->Write();
 	rootFile->Close();
+	//delete parameterNTuple;
+	delete rootFile;
+}
+
+//	HEAVILY WIP!!! I INTEND THIS TO BE ABLE TO COPE WITH VARIOUS 2D MATRIX SIZES DUE TO THE NATURE OF MOST OF THE SCANS
+//
+//	The whole matrix has been compressed down to a single vector, we will write it out as n columns where n is the number of stored correlations
+//	
+//	1 row = 1 fit
+//	1 column = 1 correlation
+//	
+//	number of columns = max number of columns in all ToyResult FitResults
+//	if a particular fit column num < max column number trailing elements filled with -9999.
+//
+void ResultFormatter::CorrMatrixOutput( string FileName, ToyStudyResult * ToyResult )
+{
+	TFile* output_File = new TFile( FileName.c_str(), "RECREATE" );
+	//	Because TNtuples are the devils work on top of the pile of crap that is ROOT!
+	TTree* matrix_tree = new TTree( "matrix", "matrix" );
+
+	int numresults = ToyResult->NumberResults();
+
+	int max_elements=0;
+
+	//	Loop over all fits to find the one with the biggest correlation matrix and save knowledge of this
+	int temp_elements=0;
+	for( int i=0; i< numresults; ++i )
+	{
+		temp_elements = int(ToyResult->GetFitResult( i )->GetCovarianceMatrix().size());
+		if( temp_elements > max_elements )	max_elements = temp_elements;
+	}
+
+	Double_t* matrix_contents = new Double_t[max_elements];
+
+	//	Create the required number of columns within the TTree
+	for( int i=0; i< max_elements; ++i )
+	{
+		TString name="cell_";
+		name+=i;
+		matrix_tree->Branch( name, &matrix_contents[i] );
+	}
+
+	//	loop over all fits
+	for( int i=0; i< numresults; ++i )
+	{
+		int j=0;
+		//	Fill columns with data from matrix
+		//	loop over all defiend columns
+		for( j=0; j< int(ToyResult->GetFitResult( i )->GetCovarianceMatrix().size()); ++j )
+		{
+			matrix_contents[j]  = ToyResult->GetFitResult( i )->GetCovarianceMatrix()[j];
+		}
+		//	Fill any trailing columns with -9999. (typical number for undefined)
+		for( ; j< max_elements; ++j )
+		{
+			matrix_contents[j] = -9999.;
+		}
+		//	Store the data in the TTree
+		matrix_tree->Fill();
+	}
+
+	//	Write out the file and exit
+	output_File->Write();
+	output_File->Close();
+	delete matrix_tree;
+	delete output_File;
 }
 
 //Make pull plots from the output of a toy study
@@ -497,15 +566,15 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 		//Plot the results
 		for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
 		{
-			valueErrorPull[0] = Float_t(parameterValues[resultIndex]);
-			valueErrorPull[1] = Float_t(parameterErrors[resultIndex]);
-			valueErrorPull[2] = Float_t(parameterPulls[resultIndex]);
+			valueErrorPull[0] = Float_t(parameterValues[unsigned(resultIndex)]);
+			valueErrorPull[1] = Float_t(parameterErrors[unsigned(resultIndex)]);
+			valueErrorPull[2] = Float_t(parameterPulls[unsigned(resultIndex)]);
 
 			parameterNTuple->Fill(valueErrorPull);
 
 			if (makeHistogram)
 			{
-				pullHistogram->Fill( parameterPulls[resultIndex] );
+				pullHistogram->Fill( parameterPulls[unsigned(resultIndex)] );
 			}
 		}
 
@@ -563,7 +632,7 @@ void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string
 		cv.GetFrame()->SetBorderSize(12);
 
 		cv.cd(ii+1) ;
-		TGraph * grnew = scanResults[ii]->GetGraph() ;
+		TGraph * grnew = scanResults[unsigned(ii)]->GetGraph() ;
 		grnew->Draw("ALP") ;
 		grnew->Draw() ;
 		//grnew->Write();
@@ -591,7 +660,7 @@ void ResultFormatter::MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, s
 
 	for( int ii=0; ii<nscans; ++ii )
 	{
-		TH2D * hist = scanResults[ii]->GetTH2D() ;
+		TH2D * hist = scanResults[unsigned(ii)]->GetTH2D() ;
 		hist->Draw("cont1") ;
 		hist->Write();		
 	}

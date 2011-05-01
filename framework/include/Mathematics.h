@@ -10,11 +10,14 @@
  */
 #ifndef RAPIDFIT_MATHEMATICS
 #define RAPIDFIT_MATHEMATICS
+
+//	ROOT Headers
+#include "TMath.h"
+//	RapidFit Headers
 #include "IDataSet.h"
 #include "IPDF.h"
 #include "RapidFitIntegrator.h"
 #include "PhaseSpaceBoundary.h"
-#include "TMath.h"
 
 namespace Mathematics
 {

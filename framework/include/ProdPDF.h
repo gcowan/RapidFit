@@ -10,6 +10,7 @@
 #ifndef PROD_PDF_H
 #define PROD_PDF_H
 
+//	RapidFit Headers
 #include "IPDF.h"
 
 class ProdPDF : public IPDF
@@ -17,7 +18,7 @@ class ProdPDF : public IPDF
 	public:
 		ProdPDF();
 		ProdPDF( IPDF*, IPDF* );
-		~ProdPDF();
+		virtual ~ProdPDF();
 
 		void MakePrototypes();
 
@@ -49,6 +50,11 @@ class ProdPDF : public IPDF
                 virtual void UpdateIntegralCache();
 	
 	private:
+		//	Uncopyable!
+		ProdPDF ( const ProdPDF& );
+		ProdPDF& operator = ( const ProdPDF& );
+
+		void MakePrototypes( PhaseSpaceBoundary* );
 		vector<string> prototypeDataPoint;
 		vector<string> prototypeParameterSet;
 		vector<string> doNotIntegrateList;

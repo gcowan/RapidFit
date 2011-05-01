@@ -8,6 +8,7 @@
   @date 2009-10-02
  */
 
+//	RapidFit Headers
 #include "FitAssembler.h"
 #include "FitResult.h"
 #include "ClassLookUp.h"
@@ -15,6 +16,7 @@
 #include "ToyStudyResult.h"
 #include "ResultFormatter.h"
 #include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
@@ -44,9 +46,9 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Create the physics bottle
-FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
+FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector<ParameterSet*> BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints )
 {
-	PhysicsBottle * bottle = new PhysicsBottle( BottleParameters );
+	PhysicsBottle * bottle = new PhysicsBottle( BottleParameters.back() );
 
 	//Fill the bottle - data generation occurs in this step
 	for ( unsigned int resultIndex = 0; resultIndex < BottleData.size(); ++resultIndex )
@@ -72,16 +74,16 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Create the physics bottle with pre-made data
-FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< IPDF* > AllPDFs, vector< IDataSet* > AllData, vector< ConstraintFunction* > BottleConstraints )
+FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< IPDF* > AllPDFs, const vector< IDataSet* > AllData, const vector< ConstraintFunction* > BottleConstraints )
 {
 	if ( AllPDFs.size() == AllData.size() )
 	{
-		PhysicsBottle * bottle = new PhysicsBottle(BottleParameters);
+		PhysicsBottle * bottle = new PhysicsBottle(BottleParameters.back());
 
 		//Fill the bottle - data already generated
 		for ( unsigned int resultIndex = 0; resultIndex < AllData.size(); ++resultIndex )
 		{
-			AllPDFs[resultIndex]->SetPhysicsParameters(BottleParameters);
+			AllPDFs[resultIndex]->SetPhysicsParameters(BottleParameters.back());
 			bottle->AddResult( AllPDFs[resultIndex], AllData[resultIndex] );
 		}
 
@@ -89,7 +91,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		for ( unsigned int constraintIndex = 0; constraintIndex < BottleConstraints.size(); ++constraintIndex )
 		{
 			bottle->AddConstraint( BottleConstraints[constraintIndex] );
-		}  
+		}
 
 		bottle->Finalise();
 		FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );
@@ -109,14 +111,14 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 //	// To be written in a 'safe' way
 //}
 //  Perform a safer fit which is gauranteed to return something which you can use :D
-FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters,vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, int OutputLevel )
+FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
 {
 	MinimiserConfig->SetOutputLevel( OutputLevel );
-	vector<string> other_params = BottleParameters->GetAllFloatNames();
+	vector<string> other_params = BottleParameters.back()->GetAllFloatNames();
 	vector<double> truth;
 	for( unsigned short int j=0; j < other_params.size(); ++j )
 	{
-		truth.push_back( BottleParameters->GetPhysicsParameter(other_params[j])->GetTrueValue() );
+		truth.push_back( BottleParameters.back()->GetPhysicsParameter(other_params[j])->GetTrueValue() );
 	}
 
 
@@ -160,20 +162,21 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 
 		for( unsigned short int j=0; j < other_params.size(); ++j )
 		{
-			BottleParameters->GetPhysicsParameter( other_params[j] )->SetTrueValue( truth[j] );
+			BottleParameters.back()->GetPhysicsParameter( other_params[j] )->SetTrueValue( truth[j] );
 		}
 		int status = -1;
-		vector<string> NewNamesList = BottleParameters->GetAllNames();
+		vector<string> NewNamesList = BottleParameters.back()->GetAllNames();
 		ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
-		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, BottleParameters );
+		PhysicsBottle* Bad_Bottle = new PhysicsBottle( BottleParameters.back() );
+		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, *Bad_Bottle );
 	}
-	
+
 	return ReturnableFitResult;
 }
 
 
 //  Interface for internal calls
-void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, ToyStudyResult* output_interface, int OutputLevel )
+void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, ToyStudyResult* output_interface, const int OutputLevel )
 {
 
 	double uplim = Wanted_Param->GetMax();
@@ -185,7 +188,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 	
 	// Get a pointer to the physics parameter to be scanned and fix it	
 	// CAREFUL:  this must be reset as it was at the end.
-	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName);
+	PhysicsParameter * scanParameter = BottleParameters.back()->GetPhysicsParameter(scanName);
 	double originalValue = scanParameter->GetBlindedValue( ) ;
 	string originalType = scanParameter->GetType( ) ;
 	scanParameter->SetType( "Fixed" ) ;
@@ -232,11 +235,11 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
 
 		string name = Wanted_Param->GetName();
-		string type = BottleParameters->GetPhysicsParameter( name )->GetType();
-		string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
+		string type = BottleParameters.back()->GetPhysicsParameter( name )->GetType();
+		string unit = BottleParameters.back()->GetPhysicsParameter( name )->GetUnit();
 		scanStepResult->GetResultParameterSet()->SetResultParameter( name, scanVal, 0, 0., scanVal, scanVal, type, unit );
 
-		vector<string> Fixed_List = BottleParameters->GetAllFixedNames();
+		vector<string> Fixed_List = BottleParameters.back()->GetAllFixedNames();
 		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
 		for( unsigned short int i=0; i < Fixed_List.size() ; ++i )
 		{
@@ -250,9 +253,9 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 			}
 			if( !found )
 			{
-				string fixed_type = BottleParameters->GetPhysicsParameter( Fixed_List[i] )->GetType();
-				string fixed_unit = BottleParameters->GetPhysicsParameter( Fixed_List[i] )->GetUnit();
-				double fixed_value = BottleParameters->GetPhysicsParameter( Fixed_List[i] )->GetValue();
+				string fixed_type = BottleParameters.back()->GetPhysicsParameter( Fixed_List[i] )->GetType();
+				string fixed_unit = BottleParameters.back()->GetPhysicsParameter( Fixed_List[i] )->GetUnit();
+				double fixed_value = BottleParameters.back()->GetPhysicsParameter( Fixed_List[i] )->GetValue();
 				scanStepResult->GetResultParameterSet()->ForceNewResultParameter( Fixed_List[i], fixed_value, fixed_value, 0, fixed_value, fixed_value, fixed_type, fixed_unit );
 			}
 		}
@@ -269,11 +272,11 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 }
 
 //  Interface for internal calls
-void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, pair<ScanParam*, ScanParam*> Param_Set, vector<ToyStudyResult*>* output_interface, int OutputLevel )
+void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const pair<ScanParam*, ScanParam*> Param_Set, vector<ToyStudyResult*>* output_interface, const int OutputLevel )
 {
 
-//	vector<string> namez = BottleParameters->GetAllNames();
-	vector<string> result_names = BottleParameters->GetAllNames();
+//	vector<string> namez = BottleParameters.back()->GetAllNames();
+	vector<string> result_names = BottleParameters.back()->GetAllNames();
 	double uplim = Param_Set.first->GetMax();
 	double lolim = Param_Set.first->GetMin();
 	double npoints = Param_Set.first->GetPoints();
@@ -284,7 +287,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 
 	// Get a pointer to the physics parameter to be scanned and fix it
 	// CAREFUL:  this must be reset as it was at the end.
-	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName);
+	PhysicsParameter * scanParameter = BottleParameters.back()->GetPhysicsParameter(scanName);
 	double originalValue = scanParameter->GetBlindedValue( );
 	string originalType = scanParameter->GetType( );
 	scanParameter->SetType( "Fixed" );
@@ -309,8 +312,8 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
                 string name = Param_Set.first->GetName();
-                string type = BottleParameters->GetPhysicsParameter( name )->GetType();
-                string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
+                string type = BottleParameters.back()->GetPhysicsParameter( name )->GetType();
+                string unit = BottleParameters.back()->GetPhysicsParameter( name )->GetUnit();
 
 		for( short int i=0; i < Returnable_Result->NumberResults(); ++i )
 		{
@@ -327,7 +330,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 }
 
 // Interface for external calls
-vector<ToyStudyResult*> FitAssembler::ContourScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName, string scanName2, int OutputLevel )
+vector<ToyStudyResult*> FitAssembler::ContourScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, const string scanName, const string scanName2, const int OutputLevel )
 {
 	vector<ToyStudyResult*>* Returnable_Result = new vector<ToyStudyResult*>;
 
@@ -339,9 +342,9 @@ vector<ToyStudyResult*> FitAssembler::ContourScan( MinimiserConfiguration * Mini
 }
 
 //  Interface for external calls
-ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet * BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName, int OutputLevel )
+ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet*> BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, const string scanName, const int OutputLevel )
 {
-	ToyStudyResult* Returnable_Result = new ToyStudyResult( BottleParameters->GetAllNames() );
+	ToyStudyResult* Returnable_Result = new ToyStudyResult( BottleParameters.back()->GetAllNames() );
 
 	ScanParam* local_param = OutputConfig->GetScanParam( scanName );
 
@@ -361,7 +364,7 @@ ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConf
 //			At the time of writing the nuisence parameters are still under investigation
 //	Step4:		Repeat Step 3 as many times as requested, or do 100 toys as default
 //	Step5:		Format output into standard block format. This gives us 2 things.
-ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned int> numberRepeats, unsigned int NuisenceModel, bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData, int OutputLevel )
+ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned int> numberRepeats, const unsigned int NuisenceModel, const bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData, const int OutputLevel )
 {
 
 	double Random_Seed = pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm();
@@ -379,9 +382,9 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		string name1 = _2DLLscanList[0].first;
 		string name2 = _2DLLscanList[0].second;
 
-		ParameterSet* InputParamSet = NULL;
-		ParameterSet* InputFreeSet = NULL;
-		ParameterSet* ControlParamSet = NULL;
+		vector<ParameterSet*> InputParamSet;
+		vector<ParameterSet*> InputFreeSet;
+		vector<ParameterSet*> ControlParamSet;
 
 		//	True by definition:
 		double lim1 = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetResultParameter( name1 )->GetValue();
@@ -390,33 +393,33 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		if( NuisenceModel == 1 )
 		{
 			//		Use the inputs from Step 1
-			InputParamSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
-			InputFreeSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
-			ControlParamSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+			InputParamSet.push_back( GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet() );
+			InputFreeSet.push_back( GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet() );
+			ControlParamSet.push_back( GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet() );
 		} else if( NuisenceModel == 2 ){
 			//		Use the inputs from Step 2
-			InputParamSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
-			InputFreeSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
-			ControlParamSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+			InputParamSet.push_back( _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet() );
+			InputFreeSet.push_back( _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet() );
+			ControlParamSet.push_back( _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet() );
 		}
 
 
 		//		Just for clarity
 		//		also when using values from Step1 these are not set correctly for the study
-		ControlParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-		ControlParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-		InputParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-		InputParamSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
-		InputParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-		InputParamSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
-		InputParamSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
-		InputParamSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
-		InputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-		InputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
-		InputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-		InputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
-		InputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
-		InputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
+		ControlParamSet.back()->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+		ControlParamSet.back()->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+		InputParamSet.back()->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+		InputParamSet.back()->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+		InputParamSet.back()->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+		InputParamSet.back()->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+		InputParamSet.back()->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+		InputParamSet.back()->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+		InputFreeSet.back()->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+		InputFreeSet.back()->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+		InputFreeSet.back()->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+		InputFreeSet.back()->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+		InputFreeSet.back()->GetPhysicsParameter( name1 )->SetType( "Free" );
+		InputFreeSet.back()->GetPhysicsParameter( name2 )->SetType( "Free" );
 
 
 
@@ -462,7 +465,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 				EventsPerPDF.push_back( unsigned(int(data_num)) );
 			}
 			else	{
-				EventsPerPDF.push_back( pdfsAndData[pdf_num]->GetDataSet()->GetDataNumber() );
+				EventsPerPDF.push_back( unsigned(pdfsAndData[pdf_num]->GetDataSet()->GetDataNumber()) );
 				sweight_error.push_back( 0. );
 			}
 		}
@@ -549,40 +552,40 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			FitResult* fit1Result = NULL;
 			FitResult* fit2Result = NULL;
 
-			ParameterSet* LocalInputFreeSet=NULL;
-			ParameterSet* LocalInputFixedSet=NULL;
+			vector<ParameterSet*> LocalInputFreeSet;
+			vector<ParameterSet*> LocalInputFixedSet;
 
 			if( NuisenceModel == 1 )	{
 				//	Assuming Nuisence Parameters set to Global Minima
 				//	We need to set this for EVERY FIT in order to have correct generation/pull values
-				LocalInputFreeSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
-				LocalInputFixedSet = GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet();
+				LocalInputFreeSet.push_back( GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet() );
+				LocalInputFixedSet.push_back( GlobalFitResult->GetResultParameterSet()->GetDummyParameterSet() );
 			} else if( NuisenceModel == 2 )	{
 				//	Assuming Nuisence Parameters set to Local Minima
 				//
-				LocalInputFreeSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
-				LocalInputFixedSet = _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet();
+				LocalInputFreeSet.push_back( _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet() );
+				LocalInputFixedSet.push_back( _2DResultForFC->GetFitResult( iFC )->GetResultParameterSet()->GetDummyParameterSet() );
 			} else if( NuisenceModel == 3 )	{
 				//	Generate a ParameterSet with random numbers based on
 				//	Fit Results and assign it to the ControlParamSet which is used for generation
 				//	Also need to Setup Local ParameterSets as with standard case
 			}
 
-			ControlParamSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-			ControlParamSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-			LocalInputFreeSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-			LocalInputFreeSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
-			LocalInputFreeSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-			LocalInputFreeSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
-			LocalInputFreeSet->GetPhysicsParameter( name1 )->SetType( "Free" );
-			LocalInputFreeSet->GetPhysicsParameter( name2 )->SetType( "Free" );
+			ControlParamSet.back()->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+			ControlParamSet.back()->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+			LocalInputFreeSet.back()->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+			LocalInputFreeSet.back()->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+			LocalInputFreeSet.back()->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+			LocalInputFreeSet.back()->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+			LocalInputFreeSet.back()->GetPhysicsParameter( name1 )->SetType( "Free" );
+			LocalInputFreeSet.back()->GetPhysicsParameter( name2 )->SetType( "Free" );
 
-			LocalInputFixedSet->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
-			LocalInputFixedSet->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
-			LocalInputFixedSet->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
-			LocalInputFixedSet->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
-			LocalInputFixedSet->GetPhysicsParameter( name1 )->SetType( "Fixed" );
-			LocalInputFixedSet->GetPhysicsParameter( name2 )->SetType( "Fixed" );
+			LocalInputFixedSet.back()->GetPhysicsParameter( name1 )->SetBlindedValue( lim1 );
+			LocalInputFixedSet.back()->GetPhysicsParameter( name1 )->ForceOriginalValue( lim1 );
+			LocalInputFixedSet.back()->GetPhysicsParameter( name2 )->SetBlindedValue( lim2 );
+			LocalInputFixedSet.back()->GetPhysicsParameter( name2 )->ForceOriginalValue( lim2 );
+			LocalInputFixedSet.back()->GetPhysicsParameter( name1 )->SetType( "Fixed" );
+			LocalInputFixedSet.back()->GetPhysicsParameter( name2 )->SetType( "Fixed" );
 
 			//	We need to set some factors before we perform the fit
 			for( unsigned short int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); ++pdf_num )
@@ -672,7 +675,6 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			if( !toy_failed || FC_Debug_Flag )
 				ResultFormatter::ReviewOutput( fit2Result );
 
-
 			//	Do we want to store the Data OR run another toy to get a better Fit
 			if( toy_failed )
 			{
@@ -702,7 +704,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 					PDFsWithDataForToys[pdf_num]->SetPhysicsParameters( ControlParamSet );
 					unsigned int wanted_events = EventsPerPDF[pdf_num];
 					if( sweight_error[pdf_num] > 0. )  wanted_events *= unsigned(int(new_rand->Gaus()*sweight_error[pdf_num]));
-					IDataSet* new_dataset = PDFsWithDataForToys[pdf_num]->GetDataSetConfig()->MakeDataSet( PhaseSpaceForToys[pdf_num], PDFsWithDataForToys[pdf_num]->GetPDF(), wanted_events );
+					IDataSet* new_dataset = PDFsWithDataForToys[pdf_num]->GetDataSetConfig()->MakeDataSet( PhaseSpaceForToys[pdf_num], PDFsWithDataForToys[pdf_num]->GetPDF(), int(wanted_events) );
 					Memory_Data[pdf_num].push_back( new_dataset );
 				}
 			}
@@ -740,6 +742,8 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		AllResults.push_back( ThisStudy );
 		AllResults.push_back( study1Results );
 		AllResults.push_back( study2Results );
+
+		delete new_rand;
 	}
 
 	cout << "\n\nNumerical part of FeldMan-Cousins Scan Complete,\n\n Now process the data through the plotting tool :D\n\n";

@@ -7,18 +7,20 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "XMLTag.h"
 #include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 #include <stdlib.h>
 
 //Default constructor
-XMLTag::XMLTag()
+XMLTag::XMLTag(): children(), value(), name()
 {
 }
 
 //Constructor with correct arguments
-XMLTag::XMLTag( string TagName, vector<string> TagContent ) : name(TagName)
+XMLTag::XMLTag( string TagName, vector<string> TagContent ) : children(), value(), name(TagName)
 {
 	//Find the child tags
 	children = FindTagsInContent( TagContent, value );
@@ -115,7 +117,7 @@ string XMLTag::FindNextTagOpen( vector<string> Content, int & LineNumber, int & 
 			if ( closePosition > openPosition )
 			{
 				//Tag is complete
-				string name( Content[lineIndex], openPosition + 1, closePosition - openPosition - 1 );
+				string name( Content[lineIndex], unsigned(openPosition + 1), unsigned(closePosition - openPosition - 1) );
 
 				//Error check
 				if ( name.size() == 0 )
@@ -129,7 +131,7 @@ string XMLTag::FindNextTagOpen( vector<string> Content, int & LineNumber, int & 
 					exit(1);
 				}
 
-				LineNumber = lineIndex;
+				LineNumber = int(lineIndex);
 				LinePosition = openPosition;
 				return name;
 			}
@@ -161,7 +163,7 @@ void XMLTag::FindTagOpens( string TagName, vector<string> Content, vector<int> &
 		vector<int> positions = StringProcessing::StringPositions( Content[lineIndex], openTag );
 		for ( unsigned int positionIndex = 0; positionIndex < positions.size(); ++positionIndex )
 		{
-			LineNumbers.push_back(lineIndex);
+			LineNumbers.push_back(int(lineIndex));
 			LinePositions.push_back( positions[positionIndex] );
 		}
 	}
@@ -180,7 +182,7 @@ void XMLTag::FindTagCloses( string TagName, vector<string> Content, vector<int> 
 		vector<int> positions = StringProcessing::StringPositions( Content[lineIndex], closeTag );
 		for ( unsigned int positionIndex = 0; positionIndex < positions.size(); ++positionIndex )
 		{
-			LineNumbers.push_back(lineIndex);
+			LineNumbers.push_back(int(lineIndex));
 			LinePositions.push_back( positions[positionIndex] );
 		}
 	}
@@ -226,13 +228,13 @@ vector<string> XMLTag::FindTagContent( string TagName, vector<string> & Content 
 		if ( opens == closeIndex )
 		{
 			//Tag is complete
-			splitIndex = closeIndex;
+			splitIndex = int(closeIndex);
 			break;
 		}
 	}
 
 	//Split off the tag content
-	return SplitContent( Content, closeLines[splitIndex], closePositions[splitIndex], int(TagName.size() + 3) );
+	return SplitContent( Content, closeLines[unsigned(splitIndex)], closePositions[unsigned(splitIndex)], int(TagName.size() + 3) );
 }
 
 //Split a vector string about the specified place
@@ -245,24 +247,24 @@ vector<string> XMLTag::SplitContent( vector<string> & Content, int LineNumber, i
 		if ( lineIndex > LineNumber )
 		{
 			//All lines before the split line go in "head"
-			tail.push_back( Content[lineIndex] );
+			tail.push_back( Content[unsigned(lineIndex)] );
 		}
 		else if ( lineIndex < LineNumber )
 		{
 			//All lines after the split line go in "tail"
-			head.push_back( Content[lineIndex] );
+			head.push_back( Content[unsigned(lineIndex)] );
 		}
 		else
 		{
 			//The first part of the split line
-			string begin( Content[lineIndex], 0, LinePosition );
+			string begin( Content[unsigned(lineIndex)], 0, unsigned(LinePosition) );
 			if ( begin != "" )
 			{
 				head.push_back(begin);
 			}
 
 			//The second part of the split line
-			string end( Content[lineIndex], LinePosition + GapLength );
+			string end( Content[unsigned(lineIndex)], unsigned(LinePosition + GapLength) );
 			if ( end != "" )
 			{
 				tail.push_back(end);

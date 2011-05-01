@@ -10,6 +10,7 @@
 #ifndef FIT_FUNCTION_CONFIGURATION_H
 #define FIT_FUNCTION_CONFIGURATION_H
 
+//	RapidFit Headers
 #include "FitFunction.h"
 
 class FitFunctionConfiguration

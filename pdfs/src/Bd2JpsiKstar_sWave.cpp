@@ -219,8 +219,8 @@ double Bd2JpsiKstar_sWave::buildPDFnumerator()
 
 double Bd2JpsiKstar_sWave::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-	DataPoint* null_p = measurement;
-	null_p = NULL;
+	//	Stupid gcc
+	(void)measurement;
 
 	IConstraint * timeBound = boundary->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
@@ -304,7 +304,8 @@ void Bd2JpsiKstar_sWave::getTimeDependentAmplitudes(
 		, double & ReAzeroAs
 		)
 {
-	double null_d = AsAs; null_d = 0.0;
+	//	Stupid gcc
+	(void)AsAs;
 	// Quantities depending only on physics parameters can be cached
 	if ( !evaluationCacheValid )
 	{

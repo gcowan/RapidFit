@@ -7,25 +7,26 @@
 	@date 2009-11-27
 */
 
+//	RapidFit Headers
 #include "MinimiserConfiguration.h"
 #include "ClassLookUp.h"
 
 //Default constructor
-MinimiserConfiguration::MinimiserConfiguration()
+MinimiserConfiguration::MinimiserConfiguration() : theMinimiser(), OutputLevel(), minimiserName(), contours()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
 }
 
 //Constructor for a minimiser only specified by name
-MinimiserConfiguration::MinimiserConfiguration( string InputName ) : minimiserName(InputName)
+MinimiserConfiguration::MinimiserConfiguration( string InputName ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
 }
 
 //Constructor for a minimiser with requested contour plots
-MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) : minimiserName(InputName), contours( Formatting->GetContourPlots() )
+MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours( Formatting->GetContourPlots() )
 {
 	theMinimiser = NULL;
 	OutputLevel=0;

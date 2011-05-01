@@ -7,31 +7,46 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "StringProcessing.h"
 #include "ParameterSet.h"
+//	System Headers
 #include <iostream>
 #include <stdlib.h>
 
 //Default constructor
-ParameterSet::ParameterSet()
+ParameterSet::ParameterSet() : stored_id(), allParameters(), allNames()
 {
 }
 
 //Constructor with correct arguments
-ParameterSet::ParameterSet( vector<string> NewNames )
+ParameterSet::ParameterSet( vector<string> NewNames ) : stored_id(), allParameters(), allNames(NewNames)
 {
 	//Populate the map
 	for (unsigned int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
 	{
 		allParameters.push_back( PhysicsParameter() );
 	}
-
-	allNames = NewNames;
 }
 
 //Destructor
 ParameterSet::~ParameterSet()
 {
+}
+
+void ParameterSet::SET_ID( TString id_string )
+{
+	stored_id = id_string.Data();
+}
+
+void ParameterSet::SET_ID( string id_string )
+{
+	stored_id = id_string;
+}
+
+string ParameterSet::GET_ID()
+{
+	return stored_id;
 }
 
 //Retrieve names of all parameters stored
@@ -67,14 +82,14 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter( pair<string,int>* wanted_p
 {
 	if( wanted_param->second != -1 )
 	{
-		return &allParameters[wanted_param->second];
+		return &allParameters[unsigned(wanted_param->second)];
 	} else {
 		wanted_param->second = StringProcessing::VectorContains( &allNames, &(wanted_param->first) );
 	}
 	if( wanted_param->second == -1 ){
 		cerr << "PhysicsParameter " << wanted_param->first << " not found" <<endl;
 	}else{
-		return &allParameters[wanted_param->second];}
+		return &allParameters[unsigned(wanted_param->second)];}
 	exit(-1);
 }
 
@@ -92,7 +107,7 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter(string Name)
 	}
 	else
 	{
-		return &allParameters[nameIndex];
+		return &allParameters[unsigned(nameIndex)];
 	}
 }
 
@@ -109,7 +124,7 @@ bool ParameterSet::SetPhysicsParameter( string Name, PhysicsParameter * NewPhysi
 	}
 	else
 	{
-		allParameters[nameIndex] = *NewPhysicsParameter;
+		allParameters[unsigned(nameIndex)] = *NewPhysicsParameter;
                 return true;
 	}
 }

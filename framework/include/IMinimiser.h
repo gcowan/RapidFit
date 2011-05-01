@@ -10,12 +10,14 @@
 #ifndef I_MINIMISER_H
 #define I_MINIMISER_H
 
+//	RapidFit Headers
 #include "FitFunction.h"
 #include "FitResult.h"
 
 class IMinimiser
 {
 	public:
+		virtual ~IMinimiser(){};
 		virtual void Minimise( FitFunction* ) = 0;
 		virtual FitResult * GetFitResult() = 0;
 		virtual void ContourPlots( vector< pair< string, string > > ) = 0;

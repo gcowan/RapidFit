@@ -7,25 +7,25 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "ResultParameterSet.h"
 #include "ParameterSet.h"
+//	System Headers
 #include <iostream>
 
 //Default constructor
-ResultParameterSet::ResultParameterSet()
+ResultParameterSet::ResultParameterSet() : allParameters(), allNames()
 {
 }
 
 //Constructor with correct arguments
-ResultParameterSet::ResultParameterSet( vector<string> NewNames )
+ResultParameterSet::ResultParameterSet( vector<string> NewNames ) : allParameters(), allNames(NewNames)
 {
 	//Populate the map
 	for (unsigned short int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex)
 	{
-		allParameters.push_back( ResultParameter() );
+		allParameters.push_back( ResultParameter(NewNames[nameIndex],0,-9999.,0,0,0,"type","unit") );
 	}
-
-	allNames = NewNames;
 }
 
 //Destructor

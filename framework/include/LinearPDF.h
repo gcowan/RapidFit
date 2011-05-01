@@ -11,6 +11,7 @@
 #ifndef LINEAR_PDF_H
 #define LINEAR_PDF_H
 
+//	RapidFit Headers
 #include "BasePDF.h"
 
 class LinearPDF : public BasePDF
@@ -28,6 +29,9 @@ class LinearPDF : public BasePDF
 		virtual double Normalisation(PhaseSpaceBoundary*);
 
 	private:
+		//	Uncopyable!
+		LinearPDF ( const LinearPDF& );
+		LinearPDF& operator = ( const LinearPDF& );
 		void MakePrototypes();
 
 		string gradientName;

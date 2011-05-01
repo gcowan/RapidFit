@@ -10,8 +10,7 @@
 #ifndef XML_CONFIG_READER_H
 #define XML_CONFIG_READER_H
 
-#include <vector>
-#include <string>
+//	RapidFit Headers
 #include "XMLTag.h"
 #include "ParameterSet.h"
 #include "PDFWithData.h"
@@ -21,6 +20,9 @@
 #include "DataSetConfiguration.h"
 #include "ConstraintFunction.h"
 #include "ScanParam.h"
+//	System Headers
+#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -31,7 +33,8 @@ class XMLConfigReader
 		XMLConfigReader(string);
 		~XMLConfigReader();
 
-		ParameterSet * GetFitParameters();
+		//ParameterSet * GetFitParameters();
+		vector<ParameterSet*> GetFitParameters();
 		MinimiserConfiguration * GetMinimiserConfiguration();
 		FitFunctionConfiguration * GetFitFunctionConfiguration();
 		OutputConfiguration * GetOutputConfiguration();
@@ -71,6 +74,8 @@ class XMLConfigReader
 		bool isLoaded;
 
 		vector<int> seed;	//  Random Seed
+		int PDF_index;
+		int ParamSet_index;
 };
 
 #endif

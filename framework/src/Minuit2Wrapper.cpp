@@ -7,15 +7,18 @@
   @date 2009-10-02
  */
 
-#include "Minuit2Wrapper.h"
+//	ROOT Headers
 #include "Minuit2/FunctionMinimum.h"
 #include "Minuit2/MnContours.h"
 #include "Minuit2/MnHesse.h"
+//	RapidFit Headers
+#include "Minuit2Wrapper.h"
+#include "ResultParameterSet.h"
+#include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 #include <limits>
-#include "ResultParameterSet.h"
 #include <ctime>
-#include "StringProcessing.h"
 
 const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
 const double FINAL_GRADIENT_TOLERANCE = 0.01;//;0.001;
@@ -23,7 +26,7 @@ const double STEP_SIZE = 0.01;
 const int MINUIT_QUALITY = 2;
 
 //Default constructor
-Minuit2Wrapper::Minuit2Wrapper()
+Minuit2Wrapper::Minuit2Wrapper() : function(), fitResult(), contours()
 {
 }
 
@@ -123,7 +126,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 			int numberOfPoints = 40;
 //			int iErrf;
 //			double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
-			vector< pair< double, double> > oneContour = contoursFromMinuit( allIndices[plotIndex].first, allIndices[plotIndex].second, numberOfPoints );	
+			vector< pair< double, double> > oneContour = contoursFromMinuit( unsigned(allIndices[plotIndex].first), unsigned(allIndices[plotIndex].second), unsigned(numberOfPoints) );	
 			allContours[plotIndex]->SetPlot( sigma, oneContour );
 		}
 	}
@@ -147,7 +150,8 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 		fitStatus = 3;
 	}
 
-	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, *( NewFunction->GetPhysicsBottle() ), covData, allContours );
+	PhysicsBottle* newBottle = NewFunction->GetPhysicsBottle();
+	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, *newBottle, covData, allContours );
 }
 
 //Return the result of minimisation

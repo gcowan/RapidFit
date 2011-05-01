@@ -10,16 +10,18 @@
 	@date 2009-10-09
 */
 
+//	RapidFit Headers
 #include "FumiliFunction.h"
+//	System Headers
 #include <iostream>
 
 //Default constructor
-FumiliFunction::FumiliFunction() : ParametricFunction(1)
+FumiliFunction::FumiliFunction() : ParametricFunction(1), function(), parameters()
 {
 }
 
 //Constructor with correct argument
-FumiliFunction::FumiliFunction( FitFunction* NewFitFunction ) : ParametricFunction( int(NewFitFunction->GetParameterSet()->GetAllNames().size()) ), function(NewFitFunction)
+FumiliFunction::FumiliFunction( FitFunction* NewFitFunction ) : ParametricFunction( int(NewFitFunction->GetParameterSet()->GetAllNames().size()) ), function(NewFitFunction), parameters()
 {
 	// Need to change this constructor since we now pass the numParams and not the fit function
 	// Not entirely sure what to do here.

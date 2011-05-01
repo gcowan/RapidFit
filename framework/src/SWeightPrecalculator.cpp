@@ -7,17 +7,19 @@
   @date 2009-12-14
  */
 
+//	RapidFit Headers
 #include "SWeightPrecalculator.h"
 #include "NormalisedSumPDF.h"
 #include "FitAssembler.h"
 #include "MemoryDataSet.h"
 #include "RapidFitIntegrator.h"
+//	System Headers
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 
 //Default constructor
-SWeightPrecalculator::SWeightPrecalculator()
+SWeightPrecalculator::SWeightPrecalculator()  : signalPDF(NULL), backgroundPDF(NULL), fitParameters(NULL), weightName( "WeightName" )
 {
 }
 
@@ -46,19 +48,20 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	vector<string> allParameters = fitParameters->GetAllNames();
 	vector<string>::iterator parameterIterator;
 	allParameters.push_back(fractionName);
-	ParameterSet * fractionFitParameters = new ParameterSet(allParameters);
+	vector< ParameterSet* > fractionFitParameters;
+	fractionFitParameters.push_back( new ParameterSet(allParameters) );
 	for ( parameterIterator = allParameters.begin(); parameterIterator != allParameters.end(); ++parameterIterator )
 	{
 		if  ( *parameterIterator == fractionName )
 		{
 			//Add the new parameter
-			fractionFitParameters->SetPhysicsParameter( fractionName, 0.5, 0.0, 1.0, "Free", "Unitless" );
+			fractionFitParameters.back()->SetPhysicsParameter( fractionName, 0.5, 0.0, 1.0, "Free", "Unitless" );
 		}
 		else
 		{
 			//Copy the parameter set
 			PhysicsParameter temporaryParameter = *( fitParameters->GetPhysicsParameter( *parameterIterator ) );
-			fractionFitParameters->SetPhysicsParameter( *parameterIterator, &temporaryParameter );
+			fractionFitParameters.back()->SetPhysicsParameter( *parameterIterator, &temporaryParameter );
 		}
 	}
 
@@ -96,8 +99,8 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
 	{
 		//Calculate the sWeight
-		double numerator = double( ( matrixElements.first * signalValues[eventIndex] ) + ( matrixElements.second * backgroundValues[eventIndex] ) );
-		double denominator = double( ( double(numberSignalEvents) * signalValues[eventIndex] ) + ( double(numberBackgroundEvents) * backgroundValues[eventIndex] ) );
+		double numerator = double( ( matrixElements.first * signalValues[unsigned(eventIndex)] ) + ( matrixElements.second * backgroundValues[unsigned(eventIndex)] ) );
+		double denominator = double( ( double(numberSignalEvents) * signalValues[unsigned(eventIndex)] ) + ( double(numberBackgroundEvents) * backgroundValues[unsigned(eventIndex)] ) );
 		
 		//Make the new data point
 		DataPoint * currentEvent = InputData->GetDataPoint(eventIndex);

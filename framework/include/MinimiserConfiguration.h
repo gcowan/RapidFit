@@ -10,6 +10,7 @@
 #ifndef MINIMISER_CONFIGURATION_H
 #define MINIMISER_CONFIGURATION_H
 
+//	RapidFit Headers
 #include "IMinimiser.h"
 #include "OutputConfiguration.h"
 
@@ -26,6 +27,10 @@ class MinimiserConfiguration
 		void RemoveMinimiser();
 
 	private:
+		//	Uncopyable!
+		MinimiserConfiguration ( const MinimiserConfiguration& );
+		MinimiserConfiguration& operator = ( const MinimiserConfiguration& );
+
 		IMinimiser* theMinimiser;
 		int OutputLevel;
 		string minimiserName;

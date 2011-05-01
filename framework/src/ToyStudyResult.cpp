@@ -7,17 +7,19 @@
   @date 2009-10-02
  */
 
+//	RapidFit Headers
 #include "ToyStudyResult.h"
 #include "LLscanResult.h"
+//	System Headers
 #include <iostream>
 
 //Default constructor
-ToyStudyResult::ToyStudyResult()
+ToyStudyResult::ToyStudyResult() : allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
 {
 }
 
 //  Constructor to Return a single array from multiple arrays
-ToyStudyResult::ToyStudyResult( vector<ToyStudyResult*> Result_Array )
+ToyStudyResult::ToyStudyResult( vector<ToyStudyResult*> Result_Array ) : allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
 {
 	if( !Result_Array.empty() )
 	{
@@ -51,7 +53,7 @@ ToyStudyResult::ToyStudyResult( vector<ToyStudyResult*> Result_Array )
 }
 
 //Constructor with correct argument
-ToyStudyResult::ToyStudyResult( vector<string> AllParameterNames ) : allNames(AllParameterNames)
+ToyStudyResult::ToyStudyResult( vector<string> AllParameterNames ) : allResults(), allNames(AllParameterNames), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
 {
 	//Construct the result data structure
 	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
@@ -198,7 +200,7 @@ FitResult * ToyStudyResult::GetFitResult( int Index )
 {
 	if ( Index < int(allResults.size()) )
 	{
-		return allResults[Index];
+		return allResults[unsigned(Index)];
 	}
 	else
 	{
@@ -208,7 +210,7 @@ FitResult * ToyStudyResult::GetFitResult( int Index )
 }
 double ToyStudyResult::GetRealTime( int Index )
 {
-	if( Index < int(allRealTimes.size()) ) return allRealTimes[ Index ];
+	if( Index < int(allRealTimes.size()) ) return allRealTimes[ unsigned(Index) ];
 	else return -1;
 }
 void ToyStudyResult::AddRealTimes( vector<double> input_times )
@@ -224,12 +226,12 @@ void ToyStudyResult::AddRealTime( double input_time )
 }
 void ToyStudyResult::SetRealTime( int Index, double input_time )
 {
-	if( int(allRealTimes.size()) < Index ) allRealTimes.resize( Index );
-	allRealTimes[Index] = input_time;
+	if( int(allRealTimes.size()) < Index ) allRealTimes.resize( unsigned(Index) );
+	allRealTimes[unsigned(Index)] = input_time;
 }
 double ToyStudyResult::GetCPUTime( int Index )
 {
-	if( Index < int(allCPUTimes.size()) ) return allCPUTimes[ Index ];
+	if( Index < int(allCPUTimes.size()) ) return allCPUTimes[ unsigned(Index) ];
 	else return -1;
 }
 void ToyStudyResult::AddCPUTimes( vector<double> input_times )
@@ -245,8 +247,8 @@ void ToyStudyResult::AddCPUTime( double input_time )
 }
 void ToyStudyResult::SetCPUTime( int Index, double input_time )
 {
-	if( Index < int(allCPUTimes.size()) ) allCPUTimes.resize( Index );
-	allCPUTimes[Index] = input_time;  
+	if( Index < int(allCPUTimes.size()) ) allCPUTimes.resize( unsigned(Index) );
+	allCPUTimes[unsigned(Index)] = input_time;  
 }
 
 //Return names of all variables
@@ -271,17 +273,17 @@ vector<double> ToyStudyResult::GetFlatResult( int Index )
 	vector<double> Flatresult;
 	for(unsigned int i = 0; i<allNames.size(); ++i)
 	{
-		Flatresult.push_back( (allValues[i][Index]) );
-		Flatresult.push_back( (allErrors[i][Index]) );
-		Flatresult.push_back( (allPulls[i][Index]) );
-		Flatresult.push_back( (allGenValues[i][Index]) );
+		Flatresult.push_back( (allValues[i][unsigned(Index)]) );
+		Flatresult.push_back( (allErrors[i][unsigned(Index)]) );
+		Flatresult.push_back( (allPulls[i][unsigned(Index)]) );
+		Flatresult.push_back( (allGenValues[i][unsigned(Index)]) );
 
 	}
 
-	Flatresult.push_back(allRealTimes[Index]);
-	Flatresult.push_back(allCPUTimes[Index]);
-	Flatresult.push_back(allResults[Index]->GetFitStatus());
-	Flatresult.push_back(allResults[Index]->GetMinimumValue());
+	Flatresult.push_back(allRealTimes[unsigned(Index)]);
+	Flatresult.push_back(allCPUTimes[unsigned(Index)]);
+	Flatresult.push_back(allResults[unsigned(Index)]->GetFitStatus());
+	Flatresult.push_back(allResults[unsigned(Index)]->GetMinimumValue());
 	return Flatresult;
 }
 TString ToyStudyResult::GetFlatResultHeader()

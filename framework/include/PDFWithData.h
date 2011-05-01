@@ -10,10 +10,12 @@
 #ifndef PDF_WITH_DATA_H
 #define PDF_WITH_DATA_H
 
+//	RapidFit Headers
 #include "IPDF.h"
 #include "PhaseSpaceBoundary.h"
 #include "IPrecalculator.h"
 #include "DataSetConfiguration.h"
+//	System Headers
 #include <string>
 #include <vector>
 
@@ -25,18 +27,22 @@ class PDFWithData
 		~PDFWithData();
 
 		void AddCachedData( vector<IDataSet*> );
-		bool SetPhysicsParameters( ParameterSet* );
+		bool SetPhysicsParameters( vector<ParameterSet*> );
 		IPDF * GetPDF();
 		IDataSet * GetDataSet();
 		DataSetConfiguration* GetDataSetConfig();
 
 	private:
+		//	Uncopyable!
+		PDFWithData ( const PDFWithData& );
+		PDFWithData& operator = ( const PDFWithData& );
+
 		IPDF * fitPDF;
 		PhaseSpaceBoundary * inputBoundary;
 		bool parametersAreSet;
 		vector< IPrecalculator* > dataProcessors;
 		vector< DataSetConfiguration* > dataSetMakers;
-		vector<IDataSet*> cached_data;
+		vector< IDataSet* > cached_data;
 };
 
 #endif

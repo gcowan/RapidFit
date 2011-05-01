@@ -26,10 +26,13 @@
 #ifndef FUMILI_WRAPPER_H
 #define FUMILI_WRAPPER_H
 
-#include "IMinimiser.h"
+//	ROOT Headers
 #include "Minuit2/MnMigrad.h"
+//	RapidFit Headers
+#include "IMinimiser.h"
 #include "FumiliFunction.h"
 #include "FitResult.h"
+//	System Headers
 #include <vector>
 
 using namespace ROOT::Minuit2;
@@ -47,6 +50,10 @@ class FumiliWrapper : public IMinimiser
 		virtual void ContourPlots( vector< pair< string, string > > );
 
 	private:
+		//	Uncopyable!
+		FumiliWrapper ( const FumiliWrapper& );
+		FumiliWrapper& operator = ( const FumiliWrapper& );
+
 		//MnMigrad minuit;
 		FumiliFunction * function;
 		FitResult * fitResult;

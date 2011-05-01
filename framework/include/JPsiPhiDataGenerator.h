@@ -11,6 +11,7 @@
 #ifndef JPSIPHI_DATA_GENERATOR_H
 #define JPSIPHI_DATA_GENERATOR_H
 
+//	RapidFit Headers
 #include "AcceptReject.h"
 
 class JPsiPhiDataGenerator : public AcceptReject

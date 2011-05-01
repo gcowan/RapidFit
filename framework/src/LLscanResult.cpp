@@ -7,29 +7,30 @@
 	@date 2010-11-22
 */
 
+//	ROOT Headers
+#include "TGraph.h"
+#include "TFrame.h"
+#include "TAxis.h"
+//	RapidFit Headers
+#include "LLscanResult.h"
+//	System Headers
 #include <iostream>
 #include <iomanip>
-
 #include <cstdlib>
 #include <math.h>
-
-#include "LLscanResult.h"
-#include <TGraph.h>
-#include <TFrame.h>
-#include <TAxis.h>
 
 #define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
-LLscanResult::LLscanResult()
+LLscanResult::LLscanResult() : parameterName(), llmin(), parameterValues(), llvalues(), llvalues_offset()
 {
 }
 
 //Main constructor
 LLscanResult::LLscanResult( string _parameterName, vector<double> _parameterValues, vector<double> _llvalues  ):
-	parameterName(_parameterName) ,
+	parameterName(_parameterName) , llmin(),
 	parameterValues(_parameterValues),
-	llvalues(_llvalues)
+	llvalues(_llvalues), llvalues_offset()
 {
 	// Reality check
 	if( llvalues.size() != parameterValues.size() ) 

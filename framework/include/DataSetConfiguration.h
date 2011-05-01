@@ -10,9 +10,12 @@
 #ifndef DATA_SET_CONFIGURATION_H
 #define DATA_SET_CONFIGURATION_H
 
+//	ROOT Headers
 #include "TNtuple.h"
+//	RapidFit Headers
 #include "IPDF.h"
 #include "IDataSet.h"
+//	System Headers
 #include <string>
 #include <vector>
 
@@ -24,11 +27,15 @@ class DataSetConfiguration
 		DataSetConfiguration( string, long, string, vector<string>, vector<string>, IPDF* );
 		~DataSetConfiguration();
 
-		bool SetPhysicsParameters( ParameterSet* );
+		bool SetPhysicsParameters( vector<ParameterSet*> );
 		bool SetSource( string );
 		IDataSet * MakeDataSet( PhaseSpaceBoundary*, IPDF*, int=-1 );
+		IPDF* GetGenerationPDF();
 
 	private:
+		//	Uncopyable!
+		DataSetConfiguration ( const DataSetConfiguration& );
+		DataSetConfiguration& operator = ( const DataSetConfiguration& );
 		IDataSet * LoadDataFile( vector<string>, vector<string>, PhaseSpaceBoundary*, long );
 		IDataSet * LoadAsciiFileIntoMemory( string, long, PhaseSpaceBoundary* );
 		IDataSet * LoadRootFileIntoMemory( string, string, long, PhaseSpaceBoundary* );

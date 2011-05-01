@@ -8,17 +8,18 @@
 	@date 2009-10-02
 */
 
-
+//	RapidFit Headers
 #include "FitFunction.h"
 
 //Default constructor
-FitFunction::FitFunction() : useWeights(false)
+FitFunction::FitFunction() : allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName()
 {
 }
 
 //Destructor
 FitFunction::~FitFunction()
 {
+  	cout << "Hello from FitFunction destructor" << endl;
 }
 
 //Set the physics bottle to fit with
@@ -36,9 +37,9 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 }
 
 //Return the physics bottle
-PhysicsBottle * FitFunction::GetPhysicsBottle()
+PhysicsBottle* FitFunction::GetPhysicsBottle()
 {
-	return allData;
+	return new PhysicsBottle( allData->GetParameterSet() );
 }
 
 // Get and set the fit parameters
@@ -59,7 +60,7 @@ double FitFunction::Evaluate()
 	//Calculate the function value for each PDF-DataSet pair
 	for (int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex)
 	{
-		minimiseValue += EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[resultIndex] );
+		minimiseValue += EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)] );
 	}
 
 	//Calculate the value of each constraint
@@ -75,18 +76,19 @@ double FitFunction::Evaluate()
 //Return the value to minimise for a given PDF/DataSet pair
 double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
 {
-	IPDF* null_p = TestPDF;
-	IDataSet* null_p2 = TestDataSet;
-	RapidFitIntegrator* null_p3 = ResultIntegrator;
-	null_p = NULL; null_p2 = NULL; null_p3 = NULL;
+	//	Stupid gcc
+	(void)TestPDF;
+	(void)TestDataSet;
+	(void)ResultIntegrator;
+
 	return 1.0;
 }
 
 //Return the Up value for error calculation
 double FitFunction::UpErrorValue( int Sigma )
 {
-	int null_i = Sigma;
-	null_i = 0;
+	//	Stupid gcc
+	(void)Sigma;
 	return 1.0;
 }
 

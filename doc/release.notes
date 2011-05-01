@@ -1,5 +1,17 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+
+2011/05/01 Rob Currie
+  - *Fixed* memory 'leak' problem with toys	(This appears to be a TFoam 'feature')
+  - Made a lot of RapidFit more compliant with the -Weffc++ gcc flag which picks up on bad OO in the code
+  - Made RapidFit actually call a LOT more destructors cleanly and when appropriate as this was not being called before as Pete noted
+  - moved redundant code to framework/src/unused
+  - altered #include statements in a lot of framework files to make a clean distinction where objects come from in code
+  - Fixed a LOT of warnings when building RapidFit with clang++ (NB: you can compile RapidFit with clang++ and link against a g++ binary of ROOT)
+  - Added an internal name identifier for each PDF object in ROOT
+  - Moved a lot of code into IPDF.cpp THIS IS UP FOR DEBATE AND WILL LIKELY BE MOVED INTO A DEFAULT_PDF OBJECT AT A LATER DATE
+  - Changed a lot of internal function calls to pass vector<ParameterSet*> rather than ParameterSet* in preparation of future work to be done to enhance the XML
+
 2011/05/01 Pete Clarke
   - Added new feature to allow substituttion of a parameter name when declaring a PDF
   - This allows, e.g,  mistag  -> mistag2

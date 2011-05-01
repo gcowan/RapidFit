@@ -7,26 +7,28 @@
   @date 2009-10-8
   */
 
+//	RapidFit Headers
 #include "StringProcessing.h"
 #include "IntegratorFunction.h"
+//	System Headers
 #include <iostream>
 
 using namespace std;
 
 //Default constructor
-IntegratorFunction::IntegratorFunction()
+IntegratorFunction::IntegratorFunction() : wrappedFunction(), currentPoint(), doIntegrate(), dontIntegrate(), minima(), ranges(), cache_positions()
 {
 }
 
 //Constructor with correct argument
 IntegratorFunction::IntegratorFunction( IPDF * InputFunction, DataPoint * InputPoint, vector<string> IntegrateThese, vector<string> DontIntegrateThese )
-	: wrappedFunction(InputFunction), currentPoint(InputPoint), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese)
+	: wrappedFunction(InputFunction), currentPoint(InputPoint), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese), minima(), ranges(), cache_positions()
 {
 }
 
 //Constructor with additional information needed for the Foam coordinate transform
 IntegratorFunction::IntegratorFunction( IPDF * InputFunction, DataPoint * InputPoint, vector<string> IntegrateThese, vector<string> DontIntegrateThese, vector<double> InputMinima, vector<double> InputRanges )
-	: wrappedFunction(InputFunction), currentPoint(InputPoint), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese), minima(InputMinima), ranges(InputRanges)
+	: wrappedFunction(InputFunction), currentPoint(InputPoint), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese), minima(InputMinima), ranges(InputRanges), cache_positions()
 {
 }
 
@@ -47,10 +49,17 @@ IntegratorFunction * IntegratorFunction::Clone() const
 	return new IntegratorFunction( wrappedFunction, currentPoint, doIntegrate, dontIntegrate );
 }
 
+//Copy the wrapper
+IntegratorFunction * IntegratorFunction::Clone( const char *newname ) const
+{
+	(void) newname;
+	return new IntegratorFunction( wrappedFunction, currentPoint, doIntegrate, dontIntegrate );
+}
+
 //Return the number of dimensions
 unsigned int IntegratorFunction::NDim() const
 {
-	return int(doIntegrate.size());
+	return unsigned(int(doIntegrate.size()));
 }
 
 //Return the function value at x
@@ -64,10 +73,10 @@ double IntegratorFunction::operator()( double x ) const
 }
 
 //Assignment operator
-IBaseFunctionMultiDim & IntegratorFunction::operator=( const IntegratorFunction & NewFunction )
+IntegratorFunction& IntegratorFunction::operator=( const IntegratorFunction & NewFunction )
 {
 	wrappedFunction = NewFunction.wrappedFunction;
-	return *this;
+	return *(this);	//	?
 }
 
 //Return the function value at x
@@ -76,17 +85,18 @@ double IntegratorFunction::DoEval( const double * x ) const
 	//Make a new data point
 	DataPoint * newDataPoint = new DataPoint( currentPoint->GetAllNames() );//WrappedFunction->GetPrototypeDataPoint() );
 
+	Observable * currentObservable=NULL;
 	//Load the array into the data point
 	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 	{
-		Observable * currentObservable = currentPoint->GetObservable( doIntegrate[observableIndex] );
+		currentObservable = currentPoint->GetObservable( doIntegrate[observableIndex] );
 		newDataPoint->SetObservable( doIntegrate[observableIndex], x[observableIndex], currentObservable->GetError(), currentObservable->GetUnit() );
 	}
 
 	//Load values of other observables
 	for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 	{
-		Observable * currentObservable = currentPoint->GetObservable( dontIntegrate[observableIndex] );
+		currentObservable = currentPoint->GetObservable( dontIntegrate[observableIndex] );
 		newDataPoint->SetObservable( dontIntegrate[observableIndex], currentObservable->GetValue(), currentObservable->GetError(), currentObservable->GetUnit() );
 	}
 
@@ -114,10 +124,10 @@ Double_t IntegratorFunction::Density( Int_t ndim, Double_t * xArray )
 	if ( ndim == int(doIntegrate.size()) )
 	{
 		//Coordinate transform
-		double* transformedArray = new double[ndim];
+		double* transformedArray = new double[unsigned(ndim)];
 		for ( int observableIndex = 0; observableIndex < ndim; ++observableIndex )
 		{
-			transformedArray[observableIndex] = minima[observableIndex] + ( ranges[observableIndex] * xArray[observableIndex] );
+			transformedArray[unsigned(observableIndex)] = minima[unsigned(observableIndex)] + ( ranges[unsigned(observableIndex)] * xArray[unsigned(observableIndex)] );
 		}
 
 		return DoEval(transformedArray);

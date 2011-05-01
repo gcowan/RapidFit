@@ -5,23 +5,23 @@
 	@date 2010-11-22
 */
 
+//	ROOT Headers
+#include "TH2.h"
+#include "TFrame.h"
+#include "TAxis.h"
+#include "TCanvas.h"
+//	RapidFit Headers
+#include "LLscanResult2D.h"
+//	System Headers
 #include <iostream>
 #include <iomanip>
-
 #include <cstdlib>
 #include <math.h>
-
-#include "LLscanResult2D.h"
-#include <TFrame.h>
-#include <TAxis.h>
-#include <TCanvas.h>
-
-#include <TH2.h>
 
 #define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
-LLscanResult2D::LLscanResult2D()
+LLscanResult2D::LLscanResult2D() : parameterName (), parameterValues(), parameterName2 (), parameterValues2(), listOfLLscans()
 {
 }
 
@@ -112,9 +112,9 @@ TH2D * LLscanResult2D::GetTH2D()
 
 	int numberOfPoints = int(parameterValues.size())*int(parameterValues2.size());
 
-	double* pvx = new double[numberOfPoints];
-	double* pvy = new double[numberOfPoints];
-	double* pvz = new double[numberOfPoints];
+	double* pvx = new double[unsigned(numberOfPoints)];
+	double* pvy = new double[unsigned(numberOfPoints)];
+	double* pvz = new double[unsigned(numberOfPoints)];
 
 	//Extract lists of x,y, z (z is LL value)
 	int ind = 0 ;

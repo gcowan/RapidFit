@@ -7,12 +7,15 @@
 	@date 2009-10-02
 */
 
-#include "RootFileDataSet.h"
+//	ROOT Headers
 #include "TFile.h"
-#include <iostream>
 #include "TKey.h"
 #include "TLeaf.h"
 #include "Rtypes.h"
+//	RapidFit Headers
+#include "RootFileDataSet.h"
+//	System Headers
+#include <iostream>
 
 //Default constructor
 RootFileDataSet::RootFileDataSet()

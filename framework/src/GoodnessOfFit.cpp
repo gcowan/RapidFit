@@ -7,14 +7,17 @@
   @date 2011-04-06
  */
 
-#include <iostream>
-#include "math.h"
-#include "TMath.h"
-#include "GoodnessOfFit.h"
-#include "MemoryDataSet.h"
+//	ROOT Headers
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TStyle.h"
+#include "TMath.h"
+//	RapidFit Headers
+#include "GoodnessOfFit.h"
+#include "MemoryDataSet.h"
+//	System Headers
+#include <math.h>
+#include <iostream>
 #include <set>
 
 using namespace std;

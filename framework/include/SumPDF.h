@@ -10,6 +10,7 @@
 #ifndef SUM_PDF_H
 #define SUM_PDF_H
 
+//	RapidFit Headers
 #include "IPDF.h"
 
 class SumPDF : public IPDF
@@ -48,6 +49,9 @@ class SumPDF : public IPDF
                 virtual void UpdateIntegralCache();
 	
 	private:
+		//	Uncopyable!
+		SumPDF ( const SumPDF& );
+		SumPDF& operator = ( const SumPDF& );
 		void MakePrototypes( PhaseSpaceBoundary* );
 
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;

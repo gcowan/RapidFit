@@ -10,6 +10,7 @@
 #ifndef NEGATIVE_LOG_LIKELIHOOD_H
 #define NEGATIVE_LOG_LIKELIHOOD_H
 
+//	RapidFit Headers
 #include "FitFunction.h"
 
 class NegativeLogLikelihood : public FitFunction

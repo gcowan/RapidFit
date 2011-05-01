@@ -7,26 +7,28 @@
   @date 2009-11-12
  */
 
+//	RapidFit Headers
 #include "NormalisedSumPDF.h"
 #include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 #include <math.h>
 
 using namespace std;
 
 //Default constructor
-NormalisedSumPDF::NormalisedSumPDF()
+NormalisedSumPDF::NormalisedSumPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(), secondPDF(), firstIntegrator(), secondIntegrator(), firstFraction(), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary()
 {
 }
 
 //Constructor not specifying fraction parameter name
-NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : firstPDF(FirstPDF), secondPDF(SecondPDF), firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ), firstFraction(0.5), fractionName("FirstPDFFraction"), integrationBoundary(InputBoundary)
+NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF), firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName("FirstPDFFraction"), integrationBoundary(InputBoundary)
 {
 	MakePrototypes(InputBoundary);
 }
 
 //Constructor specifying fraction parameter name
-NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : firstPDF(FirstPDF), secondPDF(SecondPDF), firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ), firstFraction(0.5), fractionName(FractionName), integrationBoundary(InputBoundary)
+NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF), firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName), integrationBoundary(InputBoundary)
 {
 	MakePrototypes(InputBoundary);
 }
@@ -90,6 +92,9 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 //Destructor
 NormalisedSumPDF::~NormalisedSumPDF()
 {
+  	cout << "Hello from Normalised destructor" << endl;
+	delete firstPDF;
+	delete secondPDF;
 }
 
 //Indicate whether the function has been set up correctly
@@ -128,10 +133,10 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Return the integral of the function over the given boundary
 double NormalisedSumPDF::Integral( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
-	//The evaluate method alreeady returns a normalised value
-	DataPoint* null_p = NewDataPoint;
-	PhaseSpaceBoundary* null_p2 = NewBoundary;
-	null_p = NULL; null_p2 = NULL;
+	//	Stupid gcc
+	(void)NewDataPoint;
+	(void)NewBoundary;
+	//The evaluate method already returns a normalised value
 	return 1.0;
 }
 

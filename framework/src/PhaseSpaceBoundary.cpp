@@ -7,20 +7,22 @@
   @date 2009-10-02
   */
 
+//	RapidFit Headers
 #include "StringProcessing.h"
 #include "PhaseSpaceBoundary.h"
 #include "ObservableContinuousConstraint.h"
 #include "ObservableDiscreteConstraint.h"
+//	System Headers
 #include <iostream>
 #include <stdlib.h>
 
 //Default constructor
-PhaseSpaceBoundary::PhaseSpaceBoundary()
+PhaseSpaceBoundary::PhaseSpaceBoundary() : allConstraints(), allNames()
 {
 }
 
 //Constructor with correct arguments
-PhaseSpaceBoundary::PhaseSpaceBoundary( vector<string> NewNames )
+PhaseSpaceBoundary::PhaseSpaceBoundary( vector<string> NewNames ) : allConstraints(), allNames(NewNames)
 {
 	allConstraints.reserve(NewNames.size());
 	//Populate the map
@@ -28,8 +30,6 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( vector<string> NewNames )
 	{
 		allConstraints.push_back(NULL);
 	}
-
-	allNames = NewNames;
 }
 
 //Destructor
@@ -48,14 +48,14 @@ IConstraint * PhaseSpaceBoundary::GetConstraint( pair<string,int>* wanted_constr
 {
 	if( wanted_constraint->second != -1 )
 	{
-		return allConstraints[wanted_constraint->second];
+		return allConstraints[unsigned(wanted_constraint->second)];
 	} else {
 		wanted_constraint->second = StringProcessing::VectorContains( &allNames, &(wanted_constraint->first) );
 	}
 	if( wanted_constraint->second == -1 ){
 		cerr << "PhysicsParameter " << wanted_constraint->first << " not found" <<endl;
 	}else{
-		return allConstraints[wanted_constraint->second];}
+		return allConstraints[unsigned(wanted_constraint->second)];}
 	exit(-1);
 }
 
@@ -72,7 +72,7 @@ IConstraint * PhaseSpaceBoundary::GetConstraint(string Name)
 	}
 	else
 	{
-		return allConstraints[nameIndex];
+		return allConstraints[unsigned(nameIndex)];
 	}
 }
 
@@ -90,8 +90,8 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 	else
 	{
 		//Delete the old constraint before overwriting pointer
-		delete allConstraints[nameIndex];
-		allConstraints[nameIndex] = NewConstraint;
+		delete allConstraints[unsigned(nameIndex)];
+		allConstraints[unsigned(nameIndex)] = NewConstraint;
 		return true;
 	}
 }

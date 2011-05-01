@@ -7,31 +7,34 @@
   @date 2009-10-13
   */
 
-#include "Plotter.h"
-#include "StatisticsFunctions.h"
-#include "EdStyle.h"
-#include <iostream>
-#include <sstream>
-#include <math.h>
+//	ROOT Headers
 #include "TFile.h"
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"
 #include "TCanvas.h"
 #include "TPaveText.h"
 #include "TFolder.h"
+//	RapidFit Headers
+#include "Plotter.h"
+#include "StatisticsFunctions.h"
+#include "EdStyle.h"
 #include "StringProcessing.h"
+//	System Headers
+#include <iostream>
+#include <sstream>
+#include <math.h>
 
 #define DOUBLE_TOLERANCE 1E-6
 
 using namespace std;
 
 //Default constructor
-Plotter::Plotter()
+Plotter::Plotter(): weightName(), plotPDF(), plotData(), pdfIntegrator(), weightsWereUsed()
 {
 }
 
 //Constructor with correct arguments
-Plotter::Plotter( IPDF * NewPDF, IDataSet * NewDataSet ) : plotPDF(NewPDF), plotData(NewDataSet), pdfIntegrator( new RapidFitIntegrator(NewPDF) ), weightsWereUsed(false)
+Plotter::Plotter( IPDF * NewPDF, IDataSet * NewDataSet ) : weightName(), plotPDF(NewPDF), plotData(NewDataSet), pdfIntegrator( new RapidFitIntegrator(NewPDF) ), weightsWereUsed(false)
 {
 }
 
@@ -178,16 +181,16 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		ratioOfIntegrals = pdfIntegrator->GetRatioOfIntegrals();
 		
 		//Update the data average values, and make the projection graph arrays
-		double* projectionValueArray = new double[plotNumber];
-		double* observableValueArray = new double[plotNumber];
+		double* projectionValueArray = new double[unsigned(plotNumber)];
+		double* observableValueArray = new double[unsigned(plotNumber)];
 		for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 		{
 			//Projection graph
-			projectionValueArray[pointIndex] = ratioOfIntegrals * projectionValueVector[pointIndex] * binInterval * double(observableValues.size()) / projectionIntegral;
-			observableValueArray[pointIndex] = minimum + ( plotInterval * pointIndex );
+			projectionValueArray[unsigned(pointIndex)] = ratioOfIntegrals * projectionValueVector[unsigned(pointIndex)] * binInterval * double(observableValues.size()) / projectionIntegral;
+			observableValueArray[unsigned(pointIndex)] = minimum + ( plotInterval * pointIndex );
 
 			//Data average
-			dataAverageProjection[pointIndex] += projectionValueVector[pointIndex] * CombinationWeights[combinationIndex];
+			dataAverageProjection[unsigned(pointIndex)] += projectionValueVector[unsigned(pointIndex)] * CombinationWeights[combinationIndex];
 		}
 		averageIntegral += projectionIntegral * CombinationWeights[combinationIndex];
 
@@ -203,11 +206,11 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	combinationDirectory->GetMotherDir()->cd();
 
 	//Plot the data averaged projection
-	double* projectionValueArray = new double[plotNumber];
-	double* observableValueArray = new double[plotNumber];
+	double* projectionValueArray = new double[unsigned(plotNumber)];
+	double* observableValueArray = new double[unsigned(plotNumber)];
 	for (int pointIndex = 0; pointIndex < plotNumber; pointIndex++ )
 	{
-		projectionValueArray[pointIndex] = ratioOfIntegrals * dataAverageProjection[pointIndex] * binInterval * double(observableValues.size()) / averageIntegral;
+		projectionValueArray[pointIndex] = ratioOfIntegrals * dataAverageProjection[unsigned(pointIndex)] * binInterval * double(observableValues.size()) / averageIntegral;
 		observableValueArray[pointIndex] = minimum + ( plotInterval * pointIndex );
 	}
 	MakePlotCanvas( ObservableName, "", dataHistogram, observableValueArray, projectionValueArray, plotNumber );
@@ -369,19 +372,19 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 		int incrementValue = 1;
 		for (int discreteIndex = int(discreteNames.size() - 1); discreteIndex >= 0; discreteIndex-- )
 		{
-			double currentValue = readDataPoint->GetObservable( discreteNames[discreteIndex] )->GetValue();
+			double currentValue = readDataPoint->GetObservable( discreteNames[unsigned(discreteIndex)] )->GetValue();
 
-			for (unsigned int valueIndex = 0; valueIndex < discreteValues[discreteIndex].size(); valueIndex++ )
+			for (unsigned int valueIndex = 0; valueIndex < discreteValues[unsigned(discreteIndex)].size(); valueIndex++ )
 			{
-				if ( fabs( discreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
+				if ( fabs( discreteValues[unsigned(discreteIndex)][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
 				{
-					combinationIndex += ( incrementValue * valueIndex );
-					incrementValue *= int(discreteValues[discreteIndex].size());
+					combinationIndex += ( incrementValue * int(valueIndex) );
+					incrementValue *= int(discreteValues[unsigned(discreteIndex)].size());
 					break;
 				}
 			}
 		}
-		combinationCounts[combinationIndex]++;
+		++combinationCounts[unsigned(combinationIndex)];
 	}
 
 	//Calculate averages and weights

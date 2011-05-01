@@ -64,8 +64,8 @@ double Bs2JpsiPhiMassBkg::Evaluate(DataPoint * measurement)
 
 double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-	DataPoint* null_p = measurement;
-	null_p = NULL;
+	//	Stupid gcc
+	(void)measurement;
 	double mhigh, mlow ;
 
 	IConstraint * massBound = boundary->GetConstraint( &constraint_recoMassName );

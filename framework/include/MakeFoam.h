@@ -1,6 +1,7 @@
 #ifndef MAKE_FOAM_H
 #define MAKE_FOAM_H
 
+//	RapidFit Headers
 #include "IPDF.h"
 #include "PhaseSpaceBoundary.h"
 
@@ -15,6 +16,10 @@ class MakeFoam
 		double Integral();
 
 	private:
+		//	Uncopyable!
+		MakeFoam ( const MakeFoam& );
+		MakeFoam& operator = ( const MakeFoam& );
+
 		vector<PhaseSpaceBoundary> finishedCells;
 		vector<DataPoint> centerPoints;
 		vector<double> centerValues, cellIntegrals;

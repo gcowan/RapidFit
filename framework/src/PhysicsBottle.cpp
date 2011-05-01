@@ -7,24 +7,32 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "PhysicsBottle.h"
-#include <iostream>
 #include "StringProcessing.h"
+//	System Headers
+#include <iostream>
 #include <stdlib.h>
 
 //Default constructor
-PhysicsBottle::PhysicsBottle() : finalised(false)
+PhysicsBottle::PhysicsBottle() : allPDFs(), allDataSets(), allConstraints(), bottleParameters(), finalised(false)
 {
 }
 
 //Constructor with correct argument
-PhysicsBottle::PhysicsBottle(ParameterSet * NewParameters) : bottleParameters(NewParameters), finalised(false)
+PhysicsBottle::PhysicsBottle(ParameterSet * NewParameters) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(NewParameters), finalised(false)
 {
+}
+
+PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(), finalised()
+{
+	bottleParameters = newParameters.bottleParameters;
 }
 
 //Destructor
 PhysicsBottle::~PhysicsBottle()
 {
+  	cout << "Hello from PhysicsBottle destructor" << endl;
 }
 
 //Store a PDF/dataset pair
@@ -63,7 +71,7 @@ IPDF * PhysicsBottle::GetResultPDF(int Index)
 {
 	if ( Index < int(allPDFs.size()) )
 	{
-		return allPDFs[Index];
+		return allPDFs[unsigned(Index)];
 	}
 	else
 	{
@@ -77,7 +85,7 @@ IDataSet * PhysicsBottle::GetResultDataSet(int Index)
 {
 	if ( Index < int(allDataSets.size()) )
 	{
-		return allDataSets[ Index ];
+		return allDataSets[unsigned(Index)];
 	}
 	else
 	{

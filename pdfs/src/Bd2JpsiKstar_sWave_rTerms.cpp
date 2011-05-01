@@ -393,8 +393,9 @@ void Bd2JpsiKstar_sWave_rTerms::getTimeDependentAmplitudes(
 		, double & ReAzeroAs
 		)
 {
-	double null_d = AsAs;
-	null_d = 0;
+	//	Stupid gcc
+	(void)AsAs;
+
 	// Quantities depending only on physics parameters can be cached
 	if ( !evaluationCacheValid )
 	{

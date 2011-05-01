@@ -7,8 +7,8 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "ClassLookUp.h"
-
 // Signal PDFs set 1  (originally Greig and Conor mostly)
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h"
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.h"
@@ -60,6 +60,8 @@
 #include "AcceptReject.h"
 #include "JPsiPhiDataGenerator.h"
 #include "SWeightPrecalculator.h"
+
+//	System Headers
 #include <stdlib.h>
 
 //Look up the name of a PDF, return an appropriate instance of IPDF
@@ -304,11 +306,11 @@ IDataGenerator * ClassLookUp::LookUpDataGenerator( string Name, PhaseSpaceBounda
 }
 
 //Look up the name of a precalculator, and return an appropriate instance
-IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, IPDF * FirstPDF, IPDF * SecondPDF, ParameterSet * FitParameters, string WeightName )
+IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, IPDF * FirstPDF, IPDF * SecondPDF, vector<ParameterSet*> FitParameters, string WeightName )
 {
 	if ( Name == "SWeightPrecalculator" )
 	{
-		return new SWeightPrecalculator( FirstPDF, SecondPDF, FitParameters, WeightName );
+		return new SWeightPrecalculator( FirstPDF, SecondPDF, FitParameters.back(), WeightName );
 	}
 	else
 	{

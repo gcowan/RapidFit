@@ -10,6 +10,7 @@
 #ifndef NORMALISED_SUM_PDF_H
 #define NORMALISED_SUM_PDF_H
 
+//	RapidFit Headers
 #include "IPDF.h"
 #include "RapidFitIntegrator.h"
 
@@ -19,7 +20,7 @@ class NormalisedSumPDF : public IPDF
 		NormalisedSumPDF();
 		NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary* );
 		NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string );
-		~NormalisedSumPDF();
+		virtual ~NormalisedSumPDF();
 
 		//Indicate whether the function has been set up correctly
 		virtual bool IsValid();
@@ -49,6 +50,9 @@ class NormalisedSumPDF : public IPDF
 		virtual void UpdateIntegralCache();
 
 	private:
+		//	Uncopyable!
+		NormalisedSumPDF ( const NormalisedSumPDF& );
+		NormalisedSumPDF& operator = ( const NormalisedSumPDF& );
 		void MakePrototypes( PhaseSpaceBoundary* );
 
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;

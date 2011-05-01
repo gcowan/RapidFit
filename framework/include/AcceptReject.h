@@ -29,6 +29,10 @@ class AcceptReject : public IDataGenerator
 		virtual IDataSet * GetDataSet();
 
 	protected:
+		//	Uncopyable!
+		AcceptReject ( const AcceptReject& );
+		AcceptReject& operator = ( const AcceptReject& );
+
 		virtual bool Preselection( DataPoint*, double );
 
 		IPDF * generationFunction;

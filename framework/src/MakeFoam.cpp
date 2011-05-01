@@ -1,9 +1,11 @@
+//	RapidFit Headers
 #include "MakeFoam.h"
-#include <queue>
 #include "StatisticsFunctions.h"
+#include "RapidFitIntegrator.h"
+//	System Headers
+#include <queue>
 #include <iostream>
 #include <cmath>
-#include "RapidFitIntegrator.h"
 
 using namespace std;
 
@@ -13,12 +15,12 @@ const int MAXIMUM_CELLS = 100;
 const int HISTOGRAM_BINS = 8;
 
 //Default constructor
-MakeFoam::MakeFoam()
+MakeFoam::MakeFoam() : finishedCells(), centerPoints(), centerValues(), cellIntegrals(), integratePDF()
 {
 }
 
 //Constructor with correct argument
-MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoint * InputPoint ) : integratePDF(InputPDF)
+MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoint * InputPoint ) : finishedCells(), centerPoints(), centerValues(), cellIntegrals(), integratePDF(InputPDF)
 {
 	//Make the container to hold the possible cells
 	queue<PhaseSpaceBoundary> possibleCells;
@@ -89,9 +91,9 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 
 				for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; ++binIndex )
 				{
-					if ( observableValue < histogramBinMaxes[observableIndex][binIndex] )
+					if ( observableValue < histogramBinMaxes[observableIndex][unsigned(binIndex)] )
 					{
-						histogramBinHeights[observableIndex][binIndex] += sampleValue;
+						histogramBinHeights[observableIndex][unsigned(binIndex)] += sampleValue;
 						break;
 					}
 				}
@@ -103,7 +105,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		{
 			for ( int binIndex = 0; binIndex < HISTOGRAM_BINS; ++binIndex )
 			{
-				histogramBinHeights[observableIndex][binIndex] /= normalisation;
+				histogramBinHeights[observableIndex][unsigned(binIndex)] /= normalisation;
 			}
 		}
 
@@ -127,7 +129,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 
 			for ( int binIndex = 1; binIndex < HISTOGRAM_BINS; ++binIndex )
 			{
-				double gradient = abs( histogramBinHeights[observableIndex][ binIndex - 1 ] - histogramBinHeights[observableIndex][binIndex] );
+				double gradient = abs( histogramBinHeights[observableIndex][ unsigned(binIndex - 1) ] - histogramBinHeights[observableIndex][unsigned(binIndex)] );
 
 				//Update maximum
 				if ( ( observableIndex == 0 && binIndex == 1 ) || gradient > maximumGradient )
@@ -136,7 +138,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 					maximumGradientObservable = doIntegrate[observableIndex];
 					unit = temporaryConstraint->GetUnit();
 					highPoint = cellMaximum;
-					splitPoint = ( histogramBinMiddles[observableIndex][ binIndex - 1 ] + histogramBinMiddles[observableIndex][binIndex] ) / 2.0;
+					splitPoint = ( histogramBinMiddles[observableIndex][ unsigned(binIndex - 1) ] + histogramBinMiddles[observableIndex][unsigned(binIndex)] ) / 2.0;
 					lowPoint = cellMinimum;
 				}
 			}

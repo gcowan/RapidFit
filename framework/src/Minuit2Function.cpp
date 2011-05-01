@@ -7,19 +7,21 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "Minuit2Function.h"
+//	System Headers
 #include <iostream>
 
 //This is the parameter uncertainty - i.e. I think it's a limit on MiGrad convergence
 const double ERROR_THINGY = 0.1;
 
 //Default constructor
-Minuit2Function::Minuit2Function() : up(1.0)
+Minuit2Function::Minuit2Function() : function(), parameters(), up(1.0)
 {
 }
 
 //Constructor with correct argument
-Minuit2Function::Minuit2Function( FitFunction * NewFitFunction ) : function(NewFitFunction), up( NewFitFunction->UpErrorValue(1) )
+Minuit2Function::Minuit2Function( FitFunction * NewFitFunction ) : function(NewFitFunction), parameters(), up( NewFitFunction->UpErrorValue(1) )
 {
 	parameters = new MnUserParameters();
 

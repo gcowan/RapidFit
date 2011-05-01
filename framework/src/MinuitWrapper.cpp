@@ -7,14 +7,20 @@
   @date 2009-10-02
  */
 
-#include "MinuitWrapper.h"
-#include <iostream>
+//	ROOT Headers
 #include "Rtypes.h"
-#include <limits>
+//	RapidFit Headers
+#include "MinuitWrapper.h"
 #include "StringProcessing.h"
 #include "FunctionContour.h"
+//	System Headers
+#include <iostream>
+#include <limits>
 #include <ctime>
 #include <cmath>
+#include <cstdlib>
+
+#define DOUBLE_TOLERANCE 1E-6
 
 const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
 const double FINAL_GRADIENT_TOLERANCE = 0.001;//0.001;
@@ -22,13 +28,13 @@ const double FINAL_GRADIENT_TOLERANCE = 0.001;//0.001;
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
-MinuitWrapper::MinuitWrapper(): print_verbosity( 0 )
+MinuitWrapper::MinuitWrapper(): minuit(), fitResult(), contours(), print_verbosity( 0 )
 {
 	minuit = new TMinuit( 1 );
 }
 
 //Constructor with correct argument
-MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): print_verbosity( output_level )
+MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(), fitResult(), contours(), print_verbosity( output_level )
 {
 	minuit = new TMinuit( NumberParameters );
 }
@@ -36,6 +42,7 @@ MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): print_ve
 //Destructor
 MinuitWrapper::~MinuitWrapper()
 {
+	cout << "hello from MinuitWrapper destructor" << endl;
 	delete minuit;
 }
 
@@ -74,8 +81,11 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
 		double STEP_SIZE= 0.01;
-		if(!(newParameter->GetMaximum() == newParameter->GetMinimum())){
-		STEP_SIZE = fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
+		bool test1 = ( newParameter->GetMaximum() - 0 ) < DOUBLE_TOLERANCE;
+		bool test2 = ( newParameter->GetMinimum() - 0 ) < DOUBLE_TOLERANCE;
+		bool test3 = ( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE ;
+		if( !( (test1 && test2) && test3 ) ){
+			STEP_SIZE = fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
 		}
 	
 
@@ -180,19 +190,21 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	//	I'm taking the approach once used by Pete to solve annoying problems:
 	//
 	//	A beer to whoever can fix this!		rob.currie@ed.ac.uk
+
 	Double_t matrix[numParams][numParams];
 
 //	Double_t** matrix = new Double_t*[numParams];
 //	for( short int i=0; i < numParams; ++i )
 //		matrix[i] = new Double_t[numParams];
 	gMinuit->mnemat(&matrix[0][0],numParams);
-	vector<double> covarianceMatrix(numParams*(numParams+1)/2);
+	
+	vector<double> covarianceMatrix(unsigned(numParams*(numParams+1)/2));
 	for (int row = 0; row < numParams; ++row)
 	{
 		for (int col = 0; col < numParams; ++col)
 		{
-			if(row > col) {covarianceMatrix[col+row*(row+1)/2] = matrix[row][col];}
-			else {covarianceMatrix[row+col*(col+1)/2] = matrix[row][col];}
+			if(row > col) {covarianceMatrix[unsigned(col+row*(row+1)/2)] = matrix[row][col];}
+			else {covarianceMatrix[unsigned(row+col*(col+1)/2)] = matrix[row][col];}
 		}
 	}
 
@@ -228,10 +240,10 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 			//If the parameters have valid indices, ask minuit to plot them
 			int numberOfPoints = 40;
 			int iErrf;
-			double* xCoordinates1 = new double[numberOfPoints];
-			double* yCoordinates1 = new double[numberOfPoints];
-			double* xCoordinates2 = new double[numberOfPoints];
-			double* yCoordinates2 = new double[numberOfPoints];
+			double* xCoordinates1 = new double[unsigned(numberOfPoints)];
+			double* yCoordinates1 = new double[unsigned(numberOfPoints)];
+			double* xCoordinates2 = new double[unsigned(numberOfPoints)];
+			double* yCoordinates2 = new double[unsigned(numberOfPoints)];
 
 			//One sigma contour
 			minuit->SetErrorDef( NewFunction->UpErrorValue(1) );

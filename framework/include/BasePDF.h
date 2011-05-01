@@ -12,14 +12,16 @@
 #ifndef BASE_PDF_H
 #define BASE_PDF_H
 
+//	RapidFit Headers
 #include "IPDF.h"
+//	System Headers
 #include <vector>
 
 class BasePDF : public IPDF
 {
 	public:
 		BasePDF();
-		~BasePDF();
+		virtual ~BasePDF();
 
 		//Indicate whether the function has been set up correctly
 		virtual bool IsValid();
@@ -61,6 +63,7 @@ class BasePDF : public IPDF
 		ParameterSet allParameters;
 		vector<string> allObservables;
 		bool valid;
+
 };
 
 #endif

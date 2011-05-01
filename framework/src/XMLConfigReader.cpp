@@ -7,11 +7,9 @@
   @date 2009-10-02
  */
 
+//	RapidFit Headers
 #include "XMLConfigReader.h"
 #include "ClassLookUp.h"
-#include <fstream>
-#include <iostream>
-#include <stdlib.h>
 #include "SumPDF.h"
 #include "NormalisedSumPDF.h"
 #include "ProdPDF.h"
@@ -22,16 +20,20 @@
 #include "Blinder.h"
 #include "ScanParam.h"
 #include "PDFConfigurator.h"
+//	System Headers
+#include <fstream>
+#include <iostream>
+#include <stdlib.h>
 
 #define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
-XMLConfigReader::XMLConfigReader() : isLoaded(false)
+XMLConfigReader::XMLConfigReader() : children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
 {
 }
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName ) : isLoaded(false)
+XMLConfigReader::XMLConfigReader( string FileName ) : children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -81,6 +83,7 @@ XMLConfigReader::XMLConfigReader( string FileName ) : isLoaded(false)
 //Destructor
 XMLConfigReader::~XMLConfigReader()
 {
+	cout << "Hello from XMLConfigReader destructor" << endl;
 }
 
 //Return whether file is loaded
@@ -90,17 +93,35 @@ bool XMLConfigReader::IsLoaded()
 }
 
 //Return the parameter set
-ParameterSet * XMLConfigReader::GetFitParameters()
+//ParameterSet * XMLConfigReader::GetFitParameters()
+//{
+//	//Find the ParameterSet tag
+//	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
+//	{
+//		if ( children[childIndex]->GetName() == "ParameterSet" )
+//		{
+//			return GetParameterSet( children[childIndex] );
+//		}
+//	}
+
+//	//If no such tag is found, fail
+//	cerr << "ParameterSet tag not found in config file" << endl;
+//	exit(1);
+//}
+
+vector<ParameterSet*> XMLConfigReader::GetFitParameters()
 {
+	vector<ParameterSet*> All_Parameters;
 	//Find the ParameterSet tag
 	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ParameterSet" )
 		{
-			return GetParameterSet( children[childIndex] );
+			All_Parameters.push_back( GetParameterSet( children[childIndex] ) );
 		}
 	}
 
+	if( !All_Parameters.empty() )	return All_Parameters;
 	//If no such tag is found, fail
 	cerr << "ParameterSet tag not found in config file" << endl;
 	exit(1);
@@ -1061,7 +1082,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
 		string name;
 		vector<string> observableNames, parameterNames;
-		PDFConfigurator configurator ;
+		PDFConfigurator configurator;
 
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
@@ -1098,7 +1119,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		exit(1);
 	}
 
-	returnable_NamedPDF->SetRandomFunction( GetSeed() );
+//	returnable_NamedPDF->SetRandomFunction( GetSeed() );
 	return returnable_NamedPDF;
 }
 
@@ -1150,7 +1171,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		exit(1);
 	}
 
-	returnable_SUMPDF->SetRandomFunction( GetSeed() );
+//	returnable_SUMPDF->SetRandomFunction( GetSeed() );
 	return returnable_SUMPDF;
 }
 
@@ -1202,7 +1223,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		exit(1);
 	}
 
-	returnable_NormPDF->SetRandomFunction( GetSeed() );
+//	returnable_NormPDF->SetRandomFunction( GetSeed() );
 	return returnable_NormPDF;
 }
 
@@ -1239,7 +1260,7 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		exit(1);
 	}
 
-	returnable_ProdPDF->SetRandomFunction( GetSeed() );
+//	returnable_ProdPDF->SetRandomFunction( GetSeed() );
 	return returnable_ProdPDF;
 }
 
@@ -1269,7 +1290,14 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 		exit(1);
 	}
 
-	returnable_pdf->SetRandomFunction( GetSeed() );
+	//	Create a unique name for this PDF to use internally
+	TString PDF_ID("PDF_");
+	PDF_ID+=PDF_index;
+	//	Increment the number of discovered PDFs
+	++PDF_index;
+	returnable_pdf->SetRandomFunction( int(GetSeed()) );
+	returnable_pdf->SET_ID( PDF_ID );
+	returnable_pdf->SetMCCacheStatus( false );
 	return returnable_pdf;
 }
 
@@ -1386,13 +1414,13 @@ unsigned int XMLConfigReader::GetSeed()
 			{
 				seed.push_back ( abs( atoi( children[childIndex]->GetValue( )[0].c_str() ) ) );
 				cout << "Using seed: " << seed.back() << " from input file." << endl;
-				return seed.back();
+				return unsigned(seed.back());
 			}
 		}
 		seed.push_back( 0 );
 		//If no such tag is found, report
 		cout << "Seed tag not found in config file, defaulting to TRandom3(0)." << endl;
-	} else  return seed.back();
+	} else  return unsigned(seed.back());
 	return 0;
 }
 
@@ -1400,7 +1428,7 @@ unsigned int XMLConfigReader::GetSeed()
 void XMLConfigReader::SetSeed( unsigned int new_seed )
 {
 	while( !seed.empty() )  {  seed.pop_back();  }	//  Remove the old seed
-	seed.push_back(new_seed);			//  Set the new Random Seed
+	seed.push_back(int(new_seed));			//  Set the new Random Seed
 }
 
 pair<ScanParam*, ScanParam*> XMLConfigReader::Get2DScanParam( XMLTag * InputTag )

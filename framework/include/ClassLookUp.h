@@ -11,12 +11,14 @@
 #ifndef CLASS_LOOK_UP_H
 #define CLASS_LOOK_UP_H
 
+//	RapidFit Headers
 #include "IPDF.h"
 #include "PDFConfigurator.h"
 #include "FitFunction.h"
 #include "IMinimiser.h"
 #include "IDataGenerator.h"
 #include "IPrecalculator.h"
+//	System Headers
 #include <iostream>
 #include <vector>
 
@@ -29,7 +31,7 @@ class ClassLookUp
 		static FitFunction * LookUpFitFunctionName( string );
 		static IMinimiser * LookUpMinimiserName( string, int );
 		static IDataGenerator * LookUpDataGenerator( string, PhaseSpaceBoundary*, IPDF* );
-		static IPrecalculator * LookUpPrecalculator( string, IPDF*, IPDF*, ParameterSet*, string );
+		static IPrecalculator * LookUpPrecalculator( string, IPDF*, IPDF*, vector<ParameterSet*>, string );
 };
 
 #endif

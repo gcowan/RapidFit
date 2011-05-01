@@ -7,6 +7,7 @@
   @date 2010-11-25
  */
 
+//	RapidFit Headers
 #include "Blinder.h"
 
 using namespace std;

@@ -1,19 +1,36 @@
-#include <iostream>
+//	ROOT Headers
 #include "TRandom.h"
-#include <TMinuit.h>
-#include <TROOT.h>
+#include "TMinuit.h"
+#include "TROOT.h"
+#include "TMatrixD.h"
+//	RapidFit Headers
+#include "PerEventAngularAcceptance.h"
+//	System Headers
+#include <typeinfo>
+#include <iostream>
 #include <vector>
 #include <cmath>
-#include "TMatrixD.h"
-#include <typeinfo>
-#include "PerEventAngularAcceptance.h"
 
 #define DOUBLE_TOLERANCE 1E-6
 
 using namespace std;
 
 //Default constructor
-PerEventAngularAcceptance::PerEventAngularAcceptance()
+PerEventAngularAcceptance::PerEventAngularAcceptance() :
+//	Did the author intend for ALL of these to be persistant in the heap?
+tupleFile(), decaytree(), evtList(), nev(), particles(), resonances(), partsAndRes(),
+p(), pInB(), pInJpsi(), cosThetaMuHistos(), cosThetaMuHistosPredicted(), cosThetaMuTmpHistos(),
+cosThetaMuSumHistos(), cosThetaMuHistosEffRatio(), cosThetaKHistos(), cosThetaKHistosPredicted(),
+cosThetaKTmpHistos(), cosThetaKSumHistos(), cosThetaKHistosEffRatio(), pHistos(), pHistosPredicted(),
+pTmpHistos(), pSumHistos(), pHistosEffRatio(), pHistosEffRatioPrev(), ptHistos(), ptHistosPredicted(),
+ptTmpHistos(), ptSumHistos(), ptHistosEffRatio(), pptHistos(), pptHistosPredicted(), pptTmpHistos(),
+pptSumHistos(), pptHistosEffRatio(), boosttoJpsi(), boostBackToLabFromJpsi(), boosttoB(),
+boostBackToLabFromB(), GeV(), pmin(), pmax(), pbinWidth(), ptmin(), ptmax(), ptbinWidth(), amin(), amax(),
+aymax(), pmin_jpsi(), ptmin_jpsi(), cosbins(), pbins(), ptbins(), w_sum_gen(), muonplus_PX(), muonplus_PY(),
+muonplus_PZ(), muonplus_PE(), muonminus_PX(), muonminus_PY(), muonminus_PZ(), muonminus_PE(), kaon_PX(),
+kaon_PY(), kaon_PZ(), kaon_PE(), Bu_MM(), Bu_TAU(), Bu_BKGCAT(), b_Bu_BKGCAT(), b_Bu_MM(), b_Bu_TAU(),
+b_muonplus_PX(), b_muonplus_PY(), b_muonplus_PZ(), b_muonplus_PE(),b_muonminus_PX(), b_muonminus_PY(),
+b_muonminus_PZ(), b_muonminus_PE(), b_kaon_PX(), b_kaon_PY(), b_kaon_PZ(), b_kaon_PE()
 {
 }
 
@@ -23,13 +40,27 @@ PerEventAngularAcceptance::~PerEventAngularAcceptance()
 }
 
 //Constructor with correct argument
-PerEventAngularAcceptance::PerEventAngularAcceptance( string fileName, string tupleName, string outFileName )
+PerEventAngularAcceptance::PerEventAngularAcceptance( string fileName, string tupleName, string outFileName ) : 
+//	Did the author intend for ALL of these to be persistant in the heap?
+tupleFile(), decaytree(), evtList(), nev(), particles(), resonances(), partsAndRes(),
+p(), pInB(), pInJpsi(), cosThetaMuHistos(), cosThetaMuHistosPredicted(), cosThetaMuTmpHistos(),
+cosThetaMuSumHistos(), cosThetaMuHistosEffRatio(), cosThetaKHistos(), cosThetaKHistosPredicted(),
+cosThetaKTmpHistos(), cosThetaKSumHistos(), cosThetaKHistosEffRatio(), pHistos(), pHistosPredicted(),
+pTmpHistos(), pSumHistos(), pHistosEffRatio(), pHistosEffRatioPrev(), ptHistos(), ptHistosPredicted(),
+ptTmpHistos(), ptSumHistos(), ptHistosEffRatio(), pptHistos(), pptHistosPredicted(), pptTmpHistos(),
+pptSumHistos(), pptHistosEffRatio(), boosttoJpsi(), boostBackToLabFromJpsi(), boosttoB(),
+boostBackToLabFromB(), GeV(), pmin(), pmax(), pbinWidth(), ptmin(), ptmax(), ptbinWidth(), amin(), amax(),
+aymax(), pmin_jpsi(), ptmin_jpsi(), cosbins(), pbins(), ptbins(), w_sum_gen(), muonplus_PX(), muonplus_PY(),
+muonplus_PZ(), muonplus_PE(), muonminus_PX(), muonminus_PY(), muonminus_PZ(), muonminus_PE(), kaon_PX(),
+kaon_PY(), kaon_PZ(), kaon_PE(), Bu_MM(), Bu_TAU(), Bu_BKGCAT(), b_Bu_BKGCAT(), b_Bu_MM(), b_Bu_TAU(),
+b_muonplus_PX(), b_muonplus_PY(), b_muonplus_PZ(), b_muonplus_PE(),b_muonminus_PX(), b_muonminus_PY(),
+b_muonminus_PZ(), b_muonminus_PE(), b_kaon_PX(), b_kaon_PY(), b_kaon_PZ(), b_kaon_PE()
 {
   string null_s = outFileName; null_s = "";
   setupNtuple( fileName, tupleName );
-
+  
   gRandom->SetSeed(1);
-
+  
   GeV = 1000.;
   pbins = 40;
   pmin = 3.*GeV;
@@ -40,30 +71,30 @@ PerEventAngularAcceptance::PerEventAngularAcceptance( string fileName, string tu
   ptmax = 5.*GeV;
   ptbinWidth = (ptmax - ptmin)/ptbins;
   cosbins = 50;
-
+  
   pmin_jpsi = 0.*GeV;
   ptmin_jpsi = 1.*GeV;
-
+  
   amin = 0.02;
   amax = 0.28;
   aymax = 0.25;
-
+  
   particles.push_back("kaon");
   particles.push_back("muonplus");
   particles.push_back("muonminus");
-
+  
   resonances.push_back("Jpsi");
   resonances.push_back("B");
-
+  
   partsAndRes.push_back("kaon");
   partsAndRes.push_back("muonplus");
   partsAndRes.push_back("muonminus");
   partsAndRes.push_back("Jpsi");
   partsAndRes.push_back("B");
-
+  
   TVector3 boosttoJpsi(0,0,0), boostBackToLabFromJpsi(0,0,0);
   TVector3 boosttoB(0,0,0), boostBackToLabFromB(0,0,0);
-
+  
   vector<string>::iterator particleIterator;
   for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
   {
@@ -127,7 +158,7 @@ void PerEventAngularAcceptance::setupNtuple( string tupleFileName, string tupleN
     cerr << "Ntuple not found. Are you specifying the correct file and ntuple path?" << endl;
     exit(1);
   }
-
+  
   string cut = " Bu_M > 5200 && Bu_M < 5360";
   cut += " && Bu_TAU > -0.2 && Bu_TAU < 20";
   cut += " && muonplus_P > 3000. && muonplus_PT > 500.";
@@ -136,36 +167,36 @@ void PerEventAngularAcceptance::setupNtuple( string tupleFileName, string tupleN
   cut += " && Jpsi_P > 0. && Jpsi_PT > 1000.";
   cut += " && abs(Jpsi_M-3096.) < 50.";
   cut += " && Bu_BKGCAT==0";
-
+  
   string cut1 = "1==1";
-
+  
   decaytree->Draw(">>evtList", cut1.c_str());
   evtList = (TEventList*)gDirectory->Get("evtList");
   nev = evtList->GetN();
   nev = 10000;
   cout << "Number of events passing cut: " << nev << endl;
-
+  
   decaytree->SetMakeClass(1);
   decaytree->SetBranchStatus("*",1);
   //decaytree->SetBranchAddress("Bu_BKGCAT",   &B_BKGCAT, &b_B_BKGCAT);
   //decaytree->SetBranchAddress("Bu_MM",   &B_MM, &b_B_MM);
   //decaytree->SetBranchAddress("Bu_TAU",   &B_TAU, &b_B_TAU);
-
+  
   decaytree->SetBranchAddress("muonplus_PX",   &muonplus_PX, &b_muonplus_PX);
   decaytree->SetBranchAddress("muonplus_PY",   &muonplus_PY, &b_muonplus_PY);
   decaytree->SetBranchAddress("muonplus_PZ",   &muonplus_PZ, &b_muonplus_PZ);
   decaytree->SetBranchAddress("muonplus_PE",   &muonplus_PE, &b_muonplus_PE);
-
+  
   decaytree->SetBranchAddress("muonminus_PX",   &muonminus_PX, &b_muonminus_PX);
   decaytree->SetBranchAddress("muonminus_PY",   &muonminus_PY, &b_muonminus_PY);
   decaytree->SetBranchAddress("muonminus_PZ",   &muonminus_PZ, &b_muonminus_PZ);
   decaytree->SetBranchAddress("muonminus_PE",   &muonminus_PE, &b_muonminus_PE);
-
+  
   decaytree->SetBranchAddress("kaon_PX",   &kaon_PX, &b_kaon_PX);
   decaytree->SetBranchAddress("kaon_PY",   &kaon_PY, &b_kaon_PY);
   decaytree->SetBranchAddress("kaon_PZ",   &kaon_PZ, &b_kaon_PZ);
   decaytree->SetBranchAddress("kaon_PE",   &kaon_PE, &b_kaon_PE);
-
+  
   decaytree->SetBranchAddress("Bu_BKGCAT",   &Bu_BKGCAT, &b_Bu_BKGCAT);
   decaytree->SetBranchAddress("Bu_MM",   &Bu_MM, &b_Bu_MM);
   decaytree->SetBranchAddress("Bu_TAU",   &Bu_TAU, &b_Bu_TAU);

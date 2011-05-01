@@ -10,10 +10,13 @@
 #ifndef TOY_STUDY_RESULT_H
 #define TOY_STUDY_RESULT_H
 
+//	ROOT Headers
+#include "TStopwatch.h"
+//	RapidFit Headers
 #include "FitResult.h"
+//	System Headers
 #include <vector>
 #include <string>
-#include "TStopwatch.h"
 
 class ToyStudyResult
 {
@@ -48,6 +51,10 @@ class ToyStudyResult
 		void SetRealTime( int, double );
 
 	private:
+		//	Uncopyable!
+		ToyStudyResult ( const ToyStudyResult& );
+		ToyStudyResult& operator = ( const ToyStudyResult& );
+
 		vector< FitResult* > allResults;
 		vector<string> allNames;
 		vector< vector<double> > allValues, allErrors, allPulls, allGenValues;

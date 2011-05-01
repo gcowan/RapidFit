@@ -11,9 +11,11 @@
 #ifndef LLSCAN_RESULT_H
 #define LLSCAN_RESULT_H
 
-#include <string> 
-#include <vector> 
-#include "TGraph.h" 
+//	ROOT Headers
+#include "TGraph.h"
+//	System Headers
+#include <string>
+#include <vector>
 
 #define LLSCAN_FIT_FAILURE_VALUE -9999.
 

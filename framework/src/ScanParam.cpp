@@ -6,7 +6,9 @@
   @date 2011-02
   */
 
+//	RapidFit Headers
 #include "ScanParam.h"
+//	System Headers
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
@@ -15,7 +17,7 @@
 
 using namespace::std;
 
-ScanParam::ScanParam()
+ScanParam::ScanParam() : name(), minimum(), maximum(), sigma(), points()
 {
 }
 
@@ -94,7 +96,7 @@ void ScanParam::SetPoints(int new_val) {
 }
 
 
-ScanParam::ScanParam( string nName, double nMaximum, double nMinimum, int nPoints )
+ScanParam::ScanParam( string nName, double nMaximum, double nMinimum, int nPoints ) : name(), minimum(), maximum(), sigma(), points()
 {
 	name.push_back( nName );
 	points.push_back( nPoints );
@@ -109,20 +111,20 @@ ScanParam::ScanParam( string nName, double nMaximum, double nMinimum, int nPoint
 	}
 }
 
-ScanParam::ScanParam( string nName, int nSigma, int nPoints )
+ScanParam::ScanParam( string nName, int nSigma, int nPoints ) : name(), minimum(), maximum(), sigma(), points()
 {
 	name.push_back( nName );
 	points.push_back( nPoints );
 	sigma.push_back( nSigma );
 }
 
-ScanParam::ScanParam( string nName, int nPoints)
+ScanParam::ScanParam( string nName, int nPoints) : name(), minimum(), maximum(), sigma(), points()
 {
 	name.push_back( nName );
 	points.push_back( nPoints );
 }
 
-ScanParam::ScanParam( string nName )
+ScanParam::ScanParam( string nName ) : name(), minimum(), maximum(), sigma(), points()
 {
 	name.push_back( nName );
 }

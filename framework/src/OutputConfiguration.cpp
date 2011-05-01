@@ -6,42 +6,55 @@
   @author Benjamin Wynne bwynne@cern.ch
  */
 
+//	ROOT Headers
+#include "TTree.h"
+//	RapidFit Headers
 #include "OutputConfiguration.h"
 #include "ResultFormatter.h"
 #include "Plotter.h"
 #include "ScanParam.h"
-#include <time.h>
-#include "ScanParam.h"
-#include "TTree.h"
 #include "StringProcessing.h"
-#include "stdlib.h"
+//	System Headers
+#include <time.h>
+#include <stdlib.h>
 
 //Default constructor
-OutputConfiguration::OutputConfiguration() : 
-   pullType("None"), 
-   makeAllPlots(false), 
-   pullFileName("pullPlots.root"), 
-   projectionFileName("projectionPlots.root"),  
-   LLscanFileName("LLscans.root"),
-   contourFileName("contourPlots.root"),
-   weightedEventsWereUsed(false)
+OutputConfiguration::OutputConfiguration() :
+contours(),
+projections(),
+LLscanList(),
+pullType("None"),
+makeAllPlots(false),
+weightName(),
+pullFileName("pullPlots.root"),
+projectionFileName("projectionPlots.root"),
+LLscanFileName("LLscans.root"),
+LLcontourFileName(),
+contourFileName("contourPlots.root"),
+weightedEventsWereUsed(false),
+Global_Scan_List(),
+Global_2DScan_List(),
+Stored_Fit_Results()
 {
 }
 
 //Constructor with correct arguments
-OutputConfiguration::OutputConfiguration( vector< pair< string, string > > InputContours, vector<string> InputProjections, string PullPlotType, vector<ScanParam*> ScanParameters, vector<pair<ScanParam*, ScanParam*> > _2DScanParameters ) : 
-    contours(InputContours), 
-    projections(InputProjections),
-    pullType(PullPlotType),
-	makeAllPlots(false), 
-    pullFileName("pullPlots.root"), 
-    projectionFileName("projectionPlots.root"), 
-    LLscanFileName("LLscanPlots.root"),
-	LLcontourFileName("LLcontourPlots.root"),
-    contourFileName("contourPlots.root"),
-    weightedEventsWereUsed(false), 
-    Global_Scan_List( ScanParameters ),
-    Global_2DScan_List( _2DScanParameters )
+OutputConfiguration::OutputConfiguration( vector< pair< string, string > > InputContours, vector<string> InputProjections, string PullPlotType, vector<ScanParam*> ScanParameters, vector<pair<ScanParam*, ScanParam*> > _2DScanParameters ) :
+contours(InputContours),
+projections(InputProjections),
+LLscanList(),
+pullType(PullPlotType),
+makeAllPlots(false),
+weightName(),
+pullFileName("pullPlots.root"),
+projectionFileName("projectionPlots.root"),
+LLscanFileName("LLscanPlots.root"),
+LLcontourFileName("LLcontourPlots.root"),
+contourFileName("contourPlots.root"),
+weightedEventsWereUsed(false),
+Global_Scan_List( ScanParameters ),
+Global_2DScan_List( _2DScanParameters ),
+Stored_Fit_Results()
 {
 }
 
@@ -85,10 +98,10 @@ ScanParam* OutputConfiguration::GetScanParam( string param_name )
 	return Returnable_Param;
 }
 
-pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( string param_1, string param_2 )
+pair<ScanParam*, ScanParam*> OutputConfiguration::Get2DScanParams( const string param_1, const string param_2 )
 {
 	pair<ScanParam*, ScanParam* > Returnable_Pair;
-	for( int i=(Global_2DScan_List.size()-1); i >= 0 ; --i )
+	for( int i=int(Global_2DScan_List.size()-1); i >= 0 ; --i )
 	{
 		if( ( Global_2DScan_List[unsigned(i)].first->HasName() ) && ( Global_2DScan_List[unsigned(i)].second->HasName() ) )
 		{
@@ -148,7 +161,7 @@ vector<pair<string, string> > OutputConfiguration::Get2DScanList( )
 }
 
 	//  [0] Max, [1] Min, [2] nPoints
-vector<double> OutputConfiguration::GetRange( string wanted_param )
+vector<double> OutputConfiguration::GetRange( const string wanted_param )
 //  Return a vector containing [0]=Max, [1]=Min and [2]=Points
 {
 	ScanParam* Wanted_Param = GetScanParam( wanted_param );
@@ -195,7 +208,7 @@ vector<double> OutputConfiguration::GetRange( ScanParam* Wanted_Param )
 }
 
 //	Pair of:  [0] Max, [1] Min, [2] nPoints
-pair<vector<double>, vector<double> > OutputConfiguration::Get2DRange( string param_1, string param_2 )
+pair<vector<double>, vector<double> > OutputConfiguration::Get2DRange( const string param_1, const string param_2 )
 {
 	pair<vector<double>, vector<double> >  Returnable_Range;
 
@@ -309,7 +322,7 @@ void OutputConfiguration::SetLLcontourFileName( string FileName )
 	LLcontourFileName = FileName;
 }
 
-void OutputConfiguration::AddContour( string X_axis, string Y_axis )
+void OutputConfiguration::AddContour( const string X_axis, const string Y_axis )
 {
 	vector<string> Contour_X_Vals = StringProcessing::SplitString( X_axis, ',' );
 	vector<string> Contour_Y_Vals = StringProcessing::SplitString( Y_axis, ',' );
@@ -352,7 +365,7 @@ void OutputConfiguration::AddContour( string X_axis, string Y_axis )
 
 }
 
-void OutputConfiguration::AddScan( string X_axis )
+void OutputConfiguration::AddScan( const string X_axis )
 {
 	vector<string> Contour_X_Vals = StringProcessing::SplitString( X_axis, ',' );
 

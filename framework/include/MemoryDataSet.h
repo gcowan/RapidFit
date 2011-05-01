@@ -10,7 +10,9 @@
 #ifndef MEMORY_DATA_SET_H
 #define MEMORY_DATA_SET_H
 
+//	RapidFit Headers
 #include "IDataSet.h"
+//	System Headers
 #include <vector>
 
 using namespace std;
@@ -32,6 +34,9 @@ class MemoryDataSet : public IDataSet
 		void Clear();
 
 	private:
+		//	Uncopyable!
+		MemoryDataSet ( const MemoryDataSet& );
+		MemoryDataSet& operator = ( const MemoryDataSet& );
 		vector<DataPoint> allData;
 		PhaseSpaceBoundary * dataBoundary;
 };

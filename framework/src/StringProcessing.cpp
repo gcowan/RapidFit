@@ -7,7 +7,9 @@
   @date 2009-10-02
   */
 
+//	RapidFit Headers
 #include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 #include <algorithm>
 
@@ -35,8 +37,8 @@ vector<string> StringProcessing::SplitString( string Input, char SplitCharacter 
 		else
 		{
 			//Split the string at the character postion
-			string tempString( Input, 0, position );
-			string newInput( Input, position + 1 );
+			string tempString( Input, 0, unsigned(position) );
+			string newInput( Input, unsigned(position + 1) );
 
 			//Ignore empty strings
 			if ( tempString != "" )
@@ -58,7 +60,7 @@ int StringProcessing::CharacterPosition( string Input, char SearchCharacter )
 		//Look for the character
 		if ( Input[characterIndex] == SearchCharacter )
 		{
-			return characterIndex;
+			return int(characterIndex);
 		}
 
 		//If you get to the end, character not found
@@ -90,7 +92,7 @@ vector<int> StringProcessing::StringPositions( string Input, string SearchString
 			for (unsigned int characterIndex = 0; characterIndex < SearchString.size(); ++characterIndex )
 			{
 				//Compare each subsequent character
-				if ( Input[ characterIndex + firstCharacterPosition ] != SearchString[characterIndex] )
+				if ( Input[ characterIndex + unsigned(firstCharacterPosition) ] != SearchString[characterIndex] )
 				{
 					found = false;
 					break;
@@ -103,8 +105,8 @@ vector<int> StringProcessing::StringPositions( string Input, string SearchString
 			}
 
 			//Search the rest of the string
-			string tempString( Input, firstCharacterPosition + 1 );
-			numberDiscarded += firstCharacterPosition + 1;
+			string tempString( Input, unsigned(firstCharacterPosition + 1) );
+			numberDiscarded += unsigned(firstCharacterPosition + 1);
 			Input = tempString;
 		}
 	}
@@ -158,7 +160,7 @@ string StringProcessing::ReplaceString( string & Input, string FindString, strin
 				output.push_back( ReplaceString[replaceIndex] );
 			}
 
-			characterIndex += int(FindString.size()) - 1;
+			characterIndex += unsigned(FindString.size() - 1);
 		}
 		else
 		{

@@ -24,13 +24,15 @@ ENDIF( INSOURCE )
 #  -O2 optimizations and -g
 #SET( CMAKE_BUILD_TYPE Debug )
 
+#SET( CMAKE_CXX_COMPILER "clang++" )
+
 SET( CMAKE_CXX_FLAGS_RELEASE "" )
 
-SET( CMAKE_CXX_FLAGS "-Os -msse -msse2 -msse3 -m3dnow -shared -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+SET( CMAKE_CXX_FLAGS "-pedantic -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
 
 #  Get back the old style verbosity :) by setting this to 1
-#SET( CMAKE_VERBOSE_MAKEFILE 1 )
-SET( CMAKE_VERBOSE_MAKEFILE 0 )
+SET( CMAKE_VERBOSE_MAKEFILE 1 )
+#SET( CMAKE_VERBOSE_MAKEFILE 0 )
 
 
 
@@ -132,7 +134,7 @@ ENDWHILE( ${I} LESS ${SRC_LEN} )
 #  Add the pdfs to a Static Library to be accessed by the main program
 #  (also less of a pain and more clearly removes it as a dependence when rebuilding)
 ADD_LIBRARY( pdfs SHARED ${PDF_SRCS} )
-TARGET_LINK_LIBRARIES( pdfs ${ROOT_LIBRARIES})
+TARGET_LINK_LIBRARIES( pdfs ${ROOT_LIBRARIES} )
 
 #  Add the main RapidFit architecture to a simple new fits library to allow for dynamically linking into segments of RapidFit Code
 ADD_LIBRARY( fits SHARED ${FITTER_SRCS} )
@@ -175,6 +177,13 @@ TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
 TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
 
+#
+ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+TARGET_LINK_LIBRARIES( RapidLL ${ROOT_LIBRARIES} )
+
+#	New tool for plotting 2D scans
+ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+TARGET_LINK_LIBRARIES( RapidPlot ${ROOT_LIBRARIES} )
 
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone

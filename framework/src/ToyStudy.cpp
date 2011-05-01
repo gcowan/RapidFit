@@ -7,21 +7,23 @@
   @date 2009-10-02
   */
 
+//	RapidFit Headers
 #include "ToyStudy.h"
 #include "FitAssembler.h"
 #include "XMLConfigReader.h"
 #include "StringProcessing.h"
+//	System Headers
 #include <iostream>
 
 using namespace std;
 
 //Default constructor
-ToyStudy::ToyStudy()
+ToyStudy::ToyStudy() : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(), numberStudies(), allConstraints()
 {
 }
 
 //Constructor using an XML config file directly
-ToyStudy::ToyStudy( string FileName )
+ToyStudy::ToyStudy( string FileName ) : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(), numberStudies(), allConstraints()
 {
 	XMLConfigReader * xml = new XMLConfigReader(FileName);
 	if ( xml->IsLoaded() )
@@ -50,8 +52,8 @@ ToyStudy::ToyStudy( string FileName )
 }
 
 //Constructor with correct arguments
-ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, ParameterSet * StudyParameters, vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies )
-: pdfsAndData(PDFsAndData), studyParameters(StudyParameters), theMinimiser(TheMinimiser), theFunction(TheFunction), numberStudies(NumberStudies), allConstraints(InputConstraints)
+ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, vector<ParameterSet*> StudyParameters, vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies )
+: pdfsAndData(PDFsAndData), studyParameters(StudyParameters), theMinimiser(TheMinimiser), theFunction(TheFunction), allResults(), numberStudies(NumberStudies), allConstraints(InputConstraints)
 {
 	if ( numberStudies < 1 )
 	{
@@ -71,8 +73,9 @@ ToyStudy::~ToyStudy()
 }
 
 //Automate the toy study
-ToyStudyResult * ToyStudy::DoWholeStudy( bool force_n_studies )
+ToyStudyResult * ToyStudy::DoWholeStudy( bool some_flag )
 {
+	(void) some_flag;
 	//Make a vector of unique parameter names
 	vector<string> uniqueNames;
 	for (unsigned int pdfIndex = 0; pdfIndex < pdfsAndData.size(); ++pdfIndex )
@@ -89,11 +92,19 @@ ToyStudyResult * ToyStudy::DoWholeStudy( bool force_n_studies )
 	{
 		cout << "\n\n\t\tStarting ToyStudy\t\t" << studyIndex+1 << "\tof:\t" << numberStudies << endl;
 		allResults->StartStopwatch();
-		allResults->AddFitResult( FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints ) );
-		if( ( allResults->GetFitResult( studyIndex )->GetFitStatus() != 3 ) && force_n_studies )
+		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints, -999 );
+		if( new_result->GetFitStatus() != 3 )
 		{
-			cout << "Fit fell over!\t Requesting another fit but keeping this result." << endl;
+			cout << "Fit fell over!\t Requesting another fit." << endl;
+			for( unsigned int to_fit=0; to_fit<pdfsAndData.size(); ++to_fit )
+			{
+				pdfsAndData[to_fit]->GetDataSetConfig()->GetGenerationPDF()->SetMCCacheStatus( false );
+				//	Called internally from IPDF when setting false status
+				//	pdfsAndData[to_fit]->GetPDF()->Remove_Cache();
+			}
 			++numberStudies;
+		} else {
+			allResults->AddFitResult( new_result );
 		}
 	}
 

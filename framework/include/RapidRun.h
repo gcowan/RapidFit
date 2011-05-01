@@ -1,12 +1,14 @@
 #ifndef RAPIDRUN_H
 #define RAPIDRUN_H
 
-#include "main.h"
+//	ROOT Headers
 #include "TList.h"
 #include "TObject.h"
 #include "TObjString.h"
 #include "TString.h"
-
+//	RapidFit Headers
+#include "main.h"
+//	System Headers
 #include <memory>
 
 class RapidRun : public TObject {

@@ -7,9 +7,11 @@
   @date 2009-10-02
  */
 
+//	RapidFit Headers
 #include "StatisticsFunctions.h"
-#include "math.h"
 #include "StringProcessing.h"
+//	System Headers
+#include <math.h>
 #include <iostream>
 
 #define DOUBLE_TOLERANCE 1E-6
@@ -129,17 +131,17 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 			vector<double> oneCombination;
 			for (unsigned int observableIndex = 0; observableIndex < discreteValues.size(); ++observableIndex )
 			{
-				oneCombination.push_back( discreteValues[observableIndex][ indices[observableIndex] ] );
+				oneCombination.push_back( discreteValues[unsigned(observableIndex)][ unsigned(indices[unsigned(observableIndex)]) ] );
 			}
 			discreteCombinations.push_back(oneCombination);
 
 			//Increment the indices
 			for ( int observableIndex = int(discreteValues.size()) - 1; observableIndex >= 0; --observableIndex )
 			{
-				++indices[observableIndex];
+				++indices[unsigned(observableIndex)];
 
 				//Check if the index has reached its maximum
-				if ( indices[observableIndex] == int(discreteValues[observableIndex].size()) )
+				if ( indices[unsigned(observableIndex)] == int(discreteValues[unsigned(observableIndex)].size()) )
 				{
 					if ( observableIndex == 0 )
 					{
@@ -149,7 +151,7 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 					else
 					{
 						//Zero this index, and examine the next most significant
-						indices[observableIndex] = 0;
+						indices[unsigned(observableIndex)] = 0;
 					}
 				}
 				else
@@ -222,19 +224,19 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 		int incrementValue = 1;
 		for ( int discreteIndex = int(DiscreteNames.size()) - 1; discreteIndex >= 0; --discreteIndex )
 		{
-			double currentValue = readDataPoint->GetObservable( DiscreteNames[discreteIndex] )->GetValue();
+			double currentValue = readDataPoint->GetObservable( DiscreteNames[unsigned(discreteIndex)] )->GetValue();
 
-			for (unsigned int valueIndex = 0; valueIndex < DiscreteValues[discreteIndex].size(); ++valueIndex )
+			for (unsigned int valueIndex = 0; valueIndex < DiscreteValues[unsigned(discreteIndex)].size(); ++valueIndex )
 			{
-				if ( fabs( DiscreteValues[discreteIndex][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
+				if ( fabs( DiscreteValues[unsigned(discreteIndex)][unsigned(valueIndex)] - currentValue ) < DOUBLE_TOLERANCE )
 				{
-					combinationIndex += ( incrementValue * valueIndex );
-					incrementValue *= int(DiscreteValues[discreteIndex].size());
+					combinationIndex += ( incrementValue * int(valueIndex) );
+					incrementValue *= int(DiscreteValues[unsigned(discreteIndex)].size());
 					break;
 				}
 			}
 		}
-		++combinationCounts[combinationIndex];
+		++combinationCounts[unsigned(combinationIndex)];
 	}
 
 	//Calculate averages and weights

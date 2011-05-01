@@ -7,11 +7,13 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "StringProcessing.h"
 #include "InputParsing.h"
 #include "ObservableDiscreteConstraint.h"
 #include "ObservableContinuousConstraint.h"
 #include "ClassLookUp.h"
+//	System Headers
 #include <stdlib.h>
 #include <iostream>
 
@@ -32,12 +34,12 @@ ParameterSet * InputParsing::MakeParameterSet( string Input )
 		//Retrieve all parameter components
 		for ( int parameterIndex = 0; parameterIndex < numberParameters; ++parameterIndex )
 		{
-			names.push_back( splitInput[ parameterIndex ] );
-			values.push_back( strtod( splitInput[ parameterIndex + 1 ].c_str(), NULL ) );
-			minima.push_back( strtod( splitInput[ parameterIndex + 2 ].c_str(), NULL ) );
-			maxima.push_back( strtod( splitInput[ parameterIndex + 3 ].c_str(), NULL ) );
-			types.push_back( splitInput[ parameterIndex + 4 ] );
-			units.push_back( splitInput[ parameterIndex + 5 ] );
+			names.push_back( splitInput[ unsigned(parameterIndex) ] );
+			values.push_back( strtod( splitInput[ unsigned(parameterIndex + 1) ].c_str(), NULL ) );
+			minima.push_back( strtod( splitInput[ unsigned(parameterIndex + 2) ].c_str(), NULL ) );
+			maxima.push_back( strtod( splitInput[ unsigned(parameterIndex + 3) ].c_str(), NULL ) );
+			types.push_back( splitInput[ unsigned(parameterIndex + 4) ] );
+			units.push_back( splitInput[ unsigned(parameterIndex + 5) ] );
 		}
 
 		ParameterSet * newParameters = new ParameterSet( names );
@@ -45,8 +47,7 @@ ParameterSet * InputParsing::MakeParameterSet( string Input )
 		//Populate the parameter set
 		for ( int parameterIndex = 0; parameterIndex < numberParameters; ++parameterIndex )
 		{
-			newParameters->SetPhysicsParameter( names[parameterIndex], values[parameterIndex], minima[parameterIndex], 
-					maxima[parameterIndex], types[parameterIndex], units[parameterIndex] );
+			newParameters->SetPhysicsParameter( names[unsigned(parameterIndex)], values[unsigned(parameterIndex)], minima[unsigned(parameterIndex)], maxima[unsigned(parameterIndex)], types[unsigned(parameterIndex)], units[unsigned(parameterIndex)] );
 		}
 
 		return newParameters;

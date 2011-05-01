@@ -7,16 +7,17 @@
 	@date 2009-11-27
 */
 
+//	RapidFit Headers
 #include "FitFunctionConfiguration.h"
 #include "ClassLookUp.h"
 
 //Default constructor
-FitFunctionConfiguration::FitFunctionConfiguration()
+FitFunctionConfiguration::FitFunctionConfiguration() : functionName(), weightName(), hasWeight()
 {
 }
 
 //Constructor with only name of FitFunction
-FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) : functionName(InputName), hasWeight(false)
+FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) : functionName(InputName), weightName(), hasWeight(false)
 {
 }
 

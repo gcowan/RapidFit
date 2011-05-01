@@ -11,17 +11,27 @@
 #ifndef IPDF_H
 #define IPDF_H
 
+//	ROOT Headers
+#include "TString.h"
+#include "TRandom3.h"
+//	RapidFit Headers
 #include "DataPoint.h"
 #include "PhaseSpaceBoundary.h"
 #include "ParameterSet.h"
+//	System Headers
 #include <vector>
 #include <string>
+#include <stdio.h>
+#include <iostream>
 
 using namespace std;
 
 class IPDF
 {
 	public:
+		IPDF();
+		virtual ~IPDF(){};
+
 		//Indicate whether the function has been set up correctly
 		virtual bool IsValid() = 0;
 
@@ -49,47 +59,53 @@ class IPDF
 		//Update the integral cache
 		virtual void UpdateIntegralCache() = 0;
 
-		//  Get a pointer to the seed function
-		//  Using a pointer so we have one seed per normal study
-		TRandom3 * GetRandomFunction()
-		{
-			if( seed_function.empty() )
-			{
-//				cout << "Seed not found in PDF, generating TRandom3(0) random function." << endl;
-				seed_function.push_back( new TRandom3(0) );
-			}
-			return seed_function.back();
-		}
 
-		//  Set the Random Generator to be some externally defined instance
-		void SetRandomFunction( TRandom3 * new_function )
-		{
-			while( !seed_function.empty() ){  seed_function.pop_back();  }  //Get rid of old seed(s)
+		//	These should __NOT__ be virtual due to the inheritance structure
+		//	These can be virtual but then this requires re-implementing
+		//	the same code within Normalised, Sum, Product... PDFs
 
-			seed_function.push_back(  new_function  );       //Insert reference to new seed
-		}
+		//	Set the virtual ID
+		void SET_ID( string );
+		void SET_ID( TString );
 
-			//  Seed the Random Number Generator correctly
-		void SetRandomFunction( int new_seed )
-		{
-			while( !seed_function.empty() ){  seed_function.pop_back();  }    //Get rid of old seed(s)
+		//	Get the virtual ID
+		string GET_ID();
 
-			seed_function.push_back(  new TRandom3( new_seed ) ); //Insert reference to new seed
+		//	Set the virtual cache status
+		void SetMCCacheStatus( bool );
 
-			while( !seed_num.empty() ){  seed_num.pop_back();  }  //  Get rid of old seed(s)
+		//	Get the virtual cache status
+		bool GetMCCacheStatus();
 
-			seed_num.push_back( new_seed );             //  Store the seed for internal reference
-		}
+		//	Start a new TRandom3 instance with a given seed value
+		void SetRandomFunction( int );
 
-		//  Return the numerical seed
-		int GetSeedNum()
-		{
-			if( !seed_num.empty() )return seed_num.back();
-			else return 0;
-		}
+		//	Replace TRandom3 instance with a new function
+		void SetRandomFunction( TRandom3* );
 
-		private:
+		int GetSeedNum();
 
+		//	Remove the cached files
+		void Remove_Cache();
+
+		//	Add a virtual cache object
+		void AddCacheObject( string );
+		void AddCacheObject( TString );
+
+		//	Get the Random function stored in this PDF
+		TRandom3* GetRandomFunction();
+
+	private:
+		//	Uncopyable!
+		IPDF ( const IPDF& );
+		IPDF& operator = ( const IPDF& );
+  
+		//	Varibles required for caching MC
+		vector<string> cached_files;
+		string stored_ID;
+		bool hasCachedMCGenerator;
+
+		//	Variables required for storing the Seed
 		vector<TRandom3 *> seed_function;
 		vector<int> seed_num;
 

@@ -10,11 +10,13 @@
 #ifndef PLOTTER_H
 #define PLOTTER_H
 
-#include "IPDF.h"
+//	System Headers
 #include "TH1F.h"
+#include "TFile.h"
+//	RapidFit Headers
+#include "IPDF.h"
 #include "IDataSet.h"
 #include "RapidFitIntegrator.h"
-#include "TFile.h"
 
 class Plotter
 {
@@ -29,6 +31,9 @@ class Plotter
 		vector<double> ProjectObservable( DataPoint, string );
 
 	private:
+		//	Uncopyable!
+		Plotter ( const Plotter& );
+		Plotter& operator = ( const Plotter& );
 		vector<double> ProjectObservable( DataPoint, string, double, double, int, double& );
 		vector<DataPoint> GetDiscreteCombinations( vector<double>&, vector<string>& );
 		vector<double> GetStatistics( string, double&, double&, int& );

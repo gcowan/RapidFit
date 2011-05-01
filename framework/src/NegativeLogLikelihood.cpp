@@ -7,12 +7,12 @@
 	@date 2009-10-02
 */
 
-
+//	RapidFit Headers
+#include "NegativeLogLikelihood.h"
+//	System Headers
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
-
-#include "NegativeLogLikelihood.h"
 
 //Default constructor
 NegativeLogLikelihood::NegativeLogLikelihood()
@@ -36,16 +36,22 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 	double weight = 1.0;
 	double value = 0.0;
 	DataPoint* temporaryDataPoint=NULL;
+	bool flag = false;
+
 	for (int dataIndex = 0; dataIndex < TestDataSet->GetDataNumber(); ++dataIndex)
 	{
 		temporaryDataPoint = TestDataSet->GetDataPoint(dataIndex);
 		value = TestPDF->Evaluate(temporaryDataPoint);
 
 		//Idiot check
-		if ( value < 0 || isnan(value) )
-		{
-			cerr << "PDF evaluates to " << value << endl;
-		}
+		//if ( value < 0 || isnan(value) )
+		//{
+			//cerr << "PDF evaluates to " << value << endl;
+			//	Quickest way to train the fitter not to go wherever this was in phase-space
+			//if( TestPDF->GetMCCacheStatus() )	TestPDF->SetMCCacheStatus( false );
+			//total-=1;
+		//}
+		flag = ( (value < 0) || isnan(value) );
 		
 		//Find out the integral
 		integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary(), true );
@@ -58,7 +64,9 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		}
 		total += weight * log( value / integral );
 	}
-	
+
+	if( flag ) cerr << "PDF evaluates to " << value << endl;
+
 	//Return negative log likelihood
 	return -/*1.0 **/ total;
 }

@@ -11,16 +11,18 @@
 #ifndef FIT_RESULT_H
 #define FIT_RESULT_H
 
+//	RapidFit Headers
 #include "ResultParameterSet.h"
 #include "PhysicsBottle.h"
 #include "FunctionContour.h"
+//	System Headers
 #include <vector>
 
 class FitResult
 {
 	public:
 		FitResult();
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle );
+		FitResult( double, ResultParameterSet*, int, PhysicsBottle);
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double> );
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double>, vector< FunctionContour* >);
 		~FitResult();
@@ -28,12 +30,16 @@ class FitResult
 		double GetMinimumValue();
 		vector<double> GetCovarianceMatrix();
 		vector< FunctionContour* > GetContours();
-		ResultParameterSet * GetResultParameterSet();
+		ResultParameterSet* GetResultParameterSet();
 		int GetFitStatus();
 		void ForceFitStatus( int );
-		PhysicsBottle * GetPhysicsBottle();
+		PhysicsBottle* GetPhysicsBottle();
 
 	private:
+		//	Uncopyable!
+		FitResult ( const FitResult& );
+		FitResult& operator = ( const FitResult& );
+
 		double minimumValue;
 		ResultParameterSet * fittedParameters;
 		vector<double> covarianceMatrix;

@@ -10,10 +10,12 @@
 #ifndef PHASE_SPACE_BOUNDARY_H
 #define PHASE_SPACE_BOUNDARY_H
 
-#include <vector>
-#include <string>
+//	RapidFit Headers
 #include "IConstraint.h"
 #include "DataPoint.h"
+//	System Headers
+#include <vector>
+#include <string>
 
 using namespace std;
 

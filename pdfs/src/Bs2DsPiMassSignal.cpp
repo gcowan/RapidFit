@@ -73,8 +73,8 @@ double Bs2DsPiMassSignal::Evaluate(DataPoint * measurement)
 
 double Bs2DsPiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-	DataPoint* null_p = measurement;
-	PhaseSpaceBoundary* null_p2 = boundary;
-	null_p = NULL; null_p2 = NULL;
+	//	Stupid gcc
+	(void)measurement;
+	(void)boundary;
 	return 1.0;
 }

@@ -11,10 +11,12 @@
 #ifndef BLINDER_RESULT_H
 #define BLINDER_RESULT_H
 
-#include <string>
+//	ROOT Headers
 #include "RooRealVar.h"
 #include "RooAbsReal.h"
 #include "RooUnblindUniform.h"
+//	System Headers
+#include <string>
 
 using namespace std;
 

@@ -118,8 +118,8 @@ double Bs2JpsiPhiLongLivedBkg_II::buildPDFnumerator()
 
 double Bs2JpsiPhiLongLivedBkg_II::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-	DataPoint* null_p = measurement;
-	null_p=NULL;
+	//	Stupid gcc
+	(void)measurement;
 	IConstraint * timeBound = boundary->GetConstraint( &constraint_timeName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {

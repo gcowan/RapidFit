@@ -143,8 +143,8 @@ double RapidFitPdfExponential::Evaluate( DataPoint * dataPoint )
 
 double RapidFitPdfExponential::Integral( DataPoint* dataPoint, PhaseSpaceBoundary * bounds )
 {
-	DataPoint* null_p = dataPoint;
-	null_p = NULL;
+	//	Stupid gcc
+	(void)dataPoint;
 	IConstraint * timeBound = bounds->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{

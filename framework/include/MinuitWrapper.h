@@ -10,8 +10,10 @@
 #ifndef MINUIT_WRAPPER_H
 #define MINUIT_WRAPPER_H
 
-#include "IMinimiser.h"
+//	ROOT Headers
 #include "TMinuit.h"
+//	RapidFit Headers
+#include "IMinimiser.h"
 #include "FitFunction.h"
 #include "FitResult.h"
 
@@ -31,6 +33,10 @@ class MinuitWrapper : public IMinimiser
 		virtual void ContourPlots( vector< pair< string, string > > );
 
 	private:
+		//	Uncopyable!
+		MinuitWrapper ( const MinuitWrapper& );
+		MinuitWrapper& operator = ( const MinuitWrapper& );
+
 		friend void Function( int&, double*, double&, double*, int );
 
 		TMinuit * minuit;

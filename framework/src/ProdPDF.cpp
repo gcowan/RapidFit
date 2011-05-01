@@ -7,19 +7,21 @@
 	@date 2009-10-02
 */
 
+//	RapidFit Headers
 #include "ProdPDF.h"
-#include <iostream>
 #include "StringProcessing.h"
+//	System Headers
+#include <iostream>
 
 using namespace std;
 
 //Default constructor
-ProdPDF::ProdPDF()
+ProdPDF::ProdPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(), secondPDF()
 {
 }
 
 //Constructor not specifying fraction parameter name
-ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : firstPDF(FirstPDF), secondPDF(SecondPDF)
+ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF)
 {
 	MakePrototypes();
 }
@@ -35,6 +37,9 @@ void ProdPDF::MakePrototypes()
 //Destructor
 ProdPDF::~ProdPDF()
 {
+	cout << "Hello from Product destructor" << endl;
+	delete firstPDF;
+	delete secondPDF;
 }
 
 //Indicate whether the function has been set up correctly

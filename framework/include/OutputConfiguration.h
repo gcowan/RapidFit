@@ -9,13 +9,15 @@
 #ifndef OUTPUT_CONFIGURATION_H
 #define OUTPUT_CONFIGURATION_H
 
+//	RapidFit Headers
 #include "LLscanResult.h"
 #include "LLscanResult2D.h"
 #include "ToyStudyResult.h"
 #include "FitResult.h"
+#include "ScanParam.h"
+//	System Headers
 #include <vector>
 #include <string>
-#include "ScanParam.h"
 
 using namespace std;
 
@@ -46,21 +48,21 @@ class OutputConfiguration
 		void OutputToyResult( ToyStudyResult* );
 
 		//Change the configuration
-		void MakeAllPlots(string);
-		void SetPullFileName(string);
-		void SetContourFileName(string);
-		void SetLLscanFileName(string);
-		void SetLLcontourFileName(string);
+		void MakeAllPlots( string );
+		void SetPullFileName( string );
+		void SetContourFileName( string );
+		void SetLLscanFileName( string );
+		void SetLLcontourFileName( string );
 		void SetWeightsWereUsed( string ) ;
 		void SetInputResults( ResultParameterSet* );
 		
-		void AddContour( string, string );
-		void AddScan( string );
+		void AddContour( const string, const string );
+		void AddScan( const string );
 
 	private:
-		vector<double> GetRange( string );		//  Return Max, Min and Resolution
+		vector<double> GetRange( const string );		//  Return Max, Min and Resolution
 		vector<double> GetRange( ScanParam* );		//  Return Max, Min and Resolution
-		pair<vector<double>, vector<double> > Get2DRange( string, string );
+		pair<vector<double>, vector<double> > Get2DRange( const string, const string );
 
 		vector< pair< string, string > > contours;
 		vector<string> projections;

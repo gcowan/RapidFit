@@ -8,15 +8,18 @@
 	@date 2009-10-09
 */
 
-#include "FumiliWrapper.h"
+//	ROOT Headers
 #include "Minuit2/FunctionMinimum.h"
 #include "Minuit2/MnFumiliMinimize.h"
 #include "Minuit2/FumiliStandardMaximumLikelihoodFCN.h"
-#include <iostream>
-#include <limits>
+//	RapidFit Headers
+#include "FumiliWrapper.h"
 #include "ResultParameterSet.h"
 #include "PhysicsBottle.h"
 #include "PhaseSpaceBoundary.h"
+//	System Headers
+#include <iostream>
+#include <limits>
 
 const double MAXIMUM_MINIMISATION_STEPS = 800.0;
 const double FINAL_GRADIENT_TOLERANCE = 0.001;
@@ -24,7 +27,7 @@ const double STEP_SIZE = 0.01;
 const int MINUIT_QUALITY = 2;
 
 //Default constructor
-FumiliWrapper::FumiliWrapper()
+FumiliWrapper::FumiliWrapper() : function(), fitResult(), contours()
 {
 }
 
@@ -154,7 +157,8 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 		fitStatus = 3;
 	}
 
-	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, *( NewFunction->GetPhysicsBottle() ) );
+	PhysicsBottle* newBottle = NewFunction->GetPhysicsBottle();
+	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, *newBottle  );
 }
 
 //Return the result of minimisation

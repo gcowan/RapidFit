@@ -9,11 +9,14 @@
   @date 2009-12-22
  */
 
-#include <iostream>
-#include "math.h"
+//	ROOT Headers
 #include "TMath.h"
 #include "RooMath.h"
+//	RapidFit Headers
 #include "Mathematics.h"
+//	System Headers
+#include <iostream>
+#include <math.h>
 
 namespace Mathematics
 {
@@ -439,8 +442,8 @@ namespace Mathematics
     RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
     PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
     int numAngularTerms = 6;
-    double*  f = new double[numAngularTerms]; // the angular functions
-    double* xi = new double[numAngularTerms]; // the angular weights
+    double*  f = new double[unsigned(numAngularTerms)]; // the angular functions
+    double* xi = new double[unsigned(numAngularTerms)]; // the angular weights
     double cosTheta, phi, cosPsi;
     double evalPDFraw, evalPDFnorm, val;
     int numEvents = dataSet->GetDataNumber();
@@ -483,8 +486,8 @@ void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF )
     RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
     PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
     int numAngularTerms = 10;
-    double*  f = new double[numAngularTerms]; // the angular functions
-    double* xi = new double[numAngularTerms]; // the angular weights
+    double*  f = new double[unsigned(numAngularTerms)]; // the angular functions
+    double* xi = new double[unsigned(numAngularTerms)]; // the angular weights
     double cosTheta, phi, cosPsi;
     double evalPDFraw, evalPDFnorm, val;
     int numEvents = dataSet->GetDataNumber();

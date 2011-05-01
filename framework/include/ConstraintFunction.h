@@ -10,8 +10,10 @@
 #ifndef CONSTRAINT_FUNCTION_H
 #define CONSTRAINT_FUNCTION_H
 
+//	RapidFit Headers
 #include "ParameterSet.h"
 #include "ExternalConstraint.h"
+//	System Headers
 #include <vector>
 
 using namespace std;

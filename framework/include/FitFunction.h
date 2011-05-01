@@ -11,6 +11,7 @@
 #ifndef FIT_FUNCTION_H
 #define FIT_FUNCTION_H
 
+//	RapidFit Headers
 #include "PhysicsBottle.h"
 #include "RapidFitIntegrator.h"
 
@@ -32,6 +33,9 @@ class FitFunction
 		virtual double UpErrorValue(int);
 
 	protected:
+		//	Uncopyable!
+		FitFunction ( const FitFunction& );
+		FitFunction& operator = ( const FitFunction& );
 		//Overload these functions in child classes
 		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator* );
 

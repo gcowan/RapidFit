@@ -11,11 +11,14 @@
 #ifndef LLSCAN_RESULT2D_H
 #define LLSCAN_RESULT2D_H
 
+//	ROOT Headers
+#include "TGraph2D.h" 
+#include "TH2D.h"
+//	RapidFit Headers
+#include "LLscanResult.h" 
+//	System Headers
 #include <string> 
 #include <vector> 
-#include "TGraph2D.h" 
-#include "TH2D.h" 
-#include "LLscanResult.h" 
 
 using namespace std;
 
