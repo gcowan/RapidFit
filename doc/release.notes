@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/01 Pete Clarke
+  - Added new feature to allow substituttion of a parameter name when declaring a PDF
+  - This allows, e.g,  mistag  -> mistag2
+  - Added this ONLy in Bs2JpsiPhi_SignalAlt_MO_dev    and _MP_dev as new development PDFs
+  - Changes also necessary in Bs2JpsiPhi_SignalAlt_BaseClass and ClassLookup, InputParsing and XMLConfigReader
+
+
 2011/05/01 Rob Currie
   - Added a new plotting tool RapidLL for doingd 1D LL plots, in a HEAVY state of flux and currently crashes after producing the plots, this is being developed in tangent with work I'm currently persuing
   - Added a new plotting tool RapidPlot, this is another incarnation of the rapidfit_fcscanresults_2 code which *should* be easier to understand

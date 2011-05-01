@@ -21,6 +21,7 @@
 #include "ObservableDiscreteConstraint.h"
 #include "Blinder.h"
 #include "ScanParam.h"
+#include "PDFConfigurator.h"
 
 #define DOUBLE_TOLERANCE 1E-6
 
@@ -1060,6 +1061,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
 		string name;
 		vector<string> observableNames, parameterNames;
+		PDFConfigurator configurator ;
 
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
@@ -1076,6 +1078,10 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 			{
 				parameterNames.push_back( pdfConfig[configIndex]->GetValue()[0] );
 			}
+			else if ( pdfConfig[configIndex]->GetName() == "ParameterSubstitution" )
+			{
+				configurator.addParameterSubstitution( pdfConfig[configIndex]->GetValue()[0] );
+			}
 			else
 			{
 				cerr << "Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
@@ -1084,7 +1090,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		}
 
 		//Check if the name is recognised as a PDF
-		returnable_NamedPDF = ClassLookUp::LookUpPDFName( name, observableNames, parameterNames );
+		returnable_NamedPDF = ClassLookUp::LookUpPDFName( name, observableNames, parameterNames, configurator );
 	}
 	else
 	{

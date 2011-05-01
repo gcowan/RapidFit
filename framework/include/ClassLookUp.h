@@ -12,6 +12,7 @@
 #define CLASS_LOOK_UP_H
 
 #include "IPDF.h"
+#include "PDFConfigurator.h"
 #include "FitFunction.h"
 #include "IMinimiser.h"
 #include "IDataGenerator.h"
@@ -24,7 +25,7 @@ using namespace std;
 class ClassLookUp
 {
 	public:
-		static IPDF * LookUpPDFName( string, vector<string>, vector<string> );
+		static IPDF * LookUpPDFName( string, vector<string>, vector<string>, PDFConfigurator );
 		static FitFunction * LookUpFitFunctionName( string );
 		static IMinimiser * LookUpMinimiserName( string, int );
 		static IDataGenerator * LookUpDataGenerator( string, PhaseSpaceBoundary*, IPDF* );

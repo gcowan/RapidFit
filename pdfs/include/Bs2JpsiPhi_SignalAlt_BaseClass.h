@@ -13,9 +13,11 @@
 
 #ifndef __CINT__
 #include "BasePDF.h"
+#include "PDFConfigurator.h"
 #endif
 #ifdef __CINT__
 #include "framework/include/BasePDF.h"
+#include "framework/include/PDFConfigurator.h"
 #endif
 
 #ifndef __CINT__
@@ -213,6 +215,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 {
 	public:
 		Bs2JpsiPhi_SignalAlt_BaseClass();
+		Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator);
 		~Bs2JpsiPhi_SignalAlt_BaseClass();
 
 	protected:

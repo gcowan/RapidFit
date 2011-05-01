@@ -9,24 +9,19 @@
 
 #include "ClassLookUp.h"
 
-// Many of these will soon be depricated
-//#include "Bs2JpsiPhi_mistagObservable.h"
-//#include "Bs2JpsiPhi_mistagObservable_withTimeRes.h"
-//#include "Bs2JpsiPhi_mistagObservable_withAngAcc.h"
-//#include "Bs2JpsiPhi_mistagObservable_withAverageAngAcc.h"
-//#include "Bs2JpsiPhi_mistagObservable_alt.h"
-
 // Signal PDFs set 1  (originally Greig and Conor mostly)
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h"
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.h"
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms.h"
 
 //Signal  PDFs set 2 (originally Pete, Rob and Matt mostly)
-#include "Bs2JpsiPhi_mistagParameter_alt.h"
-#include "Bs2JpsiPhi_mistagParameter_Swave_alt.h"
+//DEPRICATED#include "Bs2JpsiPhi_mistagParameter_alt.h"
+//DEPRICATED#include "Bs2JpsiPhi_mistagParameter_Swave_alt.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
-#include "Bs2JpsiPhi_SignalAlt_MO_v1.h"
+#include "Bs2JpsiPhi_SignalAlt_MP_dev.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_noSwave.h"
+#include "Bs2JpsiPhi_SignalAlt_MO_v1.h"
+#include "Bs2JpsiPhi_SignalAlt_MO_dev.h"
 #include "Bs2JpsiPhi_SignalAlt_MO_noSwave.h"
 
 
@@ -68,39 +63,14 @@
 #include <stdlib.h>
 
 //Look up the name of a PDF, return an appropriate instance of IPDF
-IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters )
+IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters, PDFConfigurator configurator )
 {
 
 	vector<string> null_vec = PDFObservables;
 	vector<string> null_vec2 = PDFParameters;
-	while( !null_vec.empty() ) null_vec.pop_back();
+	while( !null_vec.empty() ) null_vec.pop_back();   // what are these lines for ???
 	while( !null_vec2.empty() ) null_vec2.pop_back();
-/*        if ( Name == "Bs2JpsiPhi_mistagObservable" )
-        {
-	        //Default JPsiPhi
-	        return new Bs2JpsiPhi_mistagObservable();
-        }
-		else if ( Name == "Bs2JpsiPhi_mistagObservable_withTimeRes" )
-        {
-                // Bs2JPsiPhi with analytic double gaussian time resolution
-                return new Bs2JpsiPhi_mistagObservable_withTimeRes();
-        }
-        else if ( Name == "Bs2JpsiPhi_mistagObservable_withAngAcc" )
-        {
-                //JpsiPhi with angular acceptance fed in as "observables"
-                return new Bs2JpsiPhi_mistagObservable_withAngAcc();
-        }
-        else if ( Name == "Bs2JpsiPhi_mistagObservable_withAverageAngAcc" )
-        {
-                //JpsiPhi with angular acceptance fed in as fixed physics parameters
-                return new Bs2JpsiPhi_mistagObservable_withAverageAngAcc();
-        }
-		else if ( Name == "Bs2JpsiPhi_mistagObservable_alt" )
-        {
-	        //JPsiPhi from Pete with mistag as a physics observable
-	        return new Bs2JpsiPhi_mistagObservable_alt();
-        }
-	*/
+
 		if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
         {
 	        //Default JPsiPhi
@@ -117,20 +87,25 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //Default JPsiPhi with s wave
 	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms();
         }
-		else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
-        {
-	        //JPsiPhi from Pete
-	        return new Bs2JpsiPhi_mistagParameter_alt();
-        }
-		else if ( Name == "Bs2JpsiPhi_mistagParameter_Swave_alt" )
-        {
-	        //JPsiPhi from Pete with sWave
-	        return new Bs2JpsiPhi_mistagParameter_Swave_alt();
-        }
+		//else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
+        //{
+	    //    //JPsiPhi from Pete
+	    //    return new Bs2JpsiPhi_mistagParameter_alt();
+        //}
+		//else if ( Name == "Bs2JpsiPhi_mistagParameter_Swave_alt" )
+        //{
+	    //    //JPsiPhi from Pete with sWave
+	    //    return new Bs2JpsiPhi_mistagParameter_Swave_alt();
+        //}
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v1" )
         {
 	        //JPsiPhi from Pete with sWave 
 	        return new Bs2JpsiPhi_SignalAlt_MP_v1();
+        }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev" )
+        {
+	        //JPsiPhi from Pete with sWave 
+	        return new Bs2JpsiPhi_SignalAlt_MP_dev(configurator);
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_noSwave" )
         {
@@ -141,6 +116,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 	        //JPsiPhi from Pete with sWave 
 	        return new Bs2JpsiPhi_SignalAlt_MO_v1();
+        }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_dev" )
+        {
+	        //JPsiPhi from Pete with sWave 
+	        return new Bs2JpsiPhi_SignalAlt_MO_dev(configurator);
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_noSwave" )
         {

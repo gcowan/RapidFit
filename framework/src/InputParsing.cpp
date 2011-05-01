@@ -191,7 +191,12 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 	IPDF * newPDF=NULL;
 	if ( pdfComponents.size() == 1 )
 	{
-		newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], vector<string>(), vector<string>() );
+		//PELC 
+		PDFConfigurator dummy ;
+		cout << " In InputParsing::MakePDFWithData : WARNING : Calling ClassLookUp::LookUpPDFName with dummy configurator " << endl ;
+		//~PELC
+		//PELC newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], vector<string>(), vector<string>() );
+		newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], vector<string>(), vector<string>(), dummy );
 	}
 	else if ( pdfComponents.size() == 3 )
 	{
@@ -202,7 +207,13 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 		StringProcessing::RemoveCharacter( parameters, '}' );
 		vector<string> parameterComponents = StringProcessing::SplitString( parameters, ':' );
 
-		newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], observableComponents, parameterComponents );
+		//PELC 
+		PDFConfigurator dummy ;
+		cout << " In InputParsing::MakePDFWithData : WARNING : Calling ClassLookUp::LookUpPDFName with dummy configurator " << endl ;
+		//~PELC
+		
+		//PELC newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], observableComponents, parameterComponents );
+		newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], observableComponents, parameterComponents, dummy );
 	}
 	else
 	{

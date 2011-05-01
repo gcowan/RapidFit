@@ -14,8 +14,10 @@
 #include "RooMath.h"
 
 //......................................
-//Constructor
+//Constructor(s)
 
+//...............................
+// Old default constructor
 Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() : 
 	// Physics parameters
 	  gammaName     ( make_pair("gamma",-1) )
@@ -71,6 +73,71 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() :
 		cout << "       - It doesnt work with resolution as we dont know how to do the integral for normalisation " << endl << endl ;
 	}
 		
+	//PELC  - debug to plot the distribution of PDF values for each event 
+	//histOfPdfValues = new TH1D( "HistOfPdfValue" ,  "HistOfPdfValue" , 110, -0.00001, 0.00001 ) ;
+	//c0  = new TCanvas;
+	//histCounter = 0;
+	//~PELC
+}
+
+
+//.....................................
+// New Constructor which takes configuration object
+Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator configurator ) : 
+// Physics parameters
+	  gammaName     ( make_pair(configurator.getName("gamma"),-1) )
+	, deltaGammaName( make_pair(configurator.getName("deltaGamma"),-1) )
+	, deltaMName    ( make_pair(configurator.getName("deltaM"),-1))
+	, Phi_sName     ( make_pair(configurator.getName("Phi_s"),-1))
+	, Azero_sqName  ( make_pair(configurator.getName("Azero_sq"),-1) )
+	, Aperp_sqName  ( make_pair(configurator.getName("Aperp_sq"),-1) )
+	, As_sqName		( make_pair(configurator.getName("As_sq"),-1) )
+	, delta_zeroName( make_pair(configurator.getName("delta_zero"),-1) )
+	, delta_paraName( make_pair(configurator.getName("delta_para"),-1) )
+	, delta_perpName( make_pair(configurator.getName("delta_perp"),-1) )
+	, delta_sName	( make_pair(configurator.getName("delta_s"),-1) )
+	// PELC NEW additions for v2
+	, cosphisName( make_pair(configurator.getName("cosphis"),-1) )
+	, sinphisName( make_pair(configurator.getName("sinphis"),-1) )
+	// Detector parameters
+	, mistagName		( make_pair(configurator.getName("mistag"),-1) )
+	, res1Name			( make_pair(configurator.getName("timeResolution1"),-1) )
+	, res2Name			( make_pair(configurator.getName("timeResolution2"),-1) )
+	, res1FractionName	( make_pair(configurator.getName("timeResolution1Fraction"),-1) )
+	, timeOffsetName	( make_pair(configurator.getName("timeOffset"),-1) )
+	// Angular acceptance factors
+	, angAccI1Name ( make_pair(configurator.getName("angAccI1"),-1) )
+	, angAccI2Name ( make_pair(configurator.getName("angAccI2"),-1) )
+	, angAccI3Name ( make_pair(configurator.getName("angAccI3"),-1) )
+	, angAccI4Name ( make_pair(configurator.getName("angAccI4"),-1) )
+	, angAccI5Name ( make_pair(configurator.getName("angAccI5"),-1) )
+	, angAccI6Name ( make_pair(configurator.getName("angAccI6"),-1) )
+	, angAccI7Name ( make_pair(configurator.getName("angAccI7"),-1) )
+	, angAccI8Name ( make_pair(configurator.getName("angAccI8"),-1) )
+	, angAccI9Name ( make_pair(configurator.getName("angAccI9"),-1) )
+	, angAccI10Name( make_pair(configurator.getName("angAccI10"),-1) )
+	// Observables
+	, timeName      ( make_pair(configurator.getName("time"),-1) )
+	, cosThetaName	( make_pair(configurator.getName("cosTheta"),-1) )
+	, phiName	    ( make_pair(configurator.getName("phi"),-1) )
+	, cosPsiName	( make_pair(configurator.getName("cosPsi"),-1) )
+	, tagName	    ( make_pair(configurator.getName("tag"),-1) )
+	, timeAcceptanceCategoryName ( make_pair(configurator.getName("timeAcceptanceCategory"),-1) )
+// Other things
+{
+	if( ! USE_LOWER_TIME_ACCEPTANCE ) {
+		cout << "=====>WARNING " << endl ;
+		cout << "=====>WARNING YOU APPEAR TO **NOT** BE USING THE LOWER TIME ACCEPTANCE" << endl ;
+		cout << "       - The define flag is turned off " << endl << endl ;
+	}
+	
+	if( USE_UPPER_TIME_ACCEPTANCE ) {
+		cout << "=====>WARNING " << endl ;
+		cout << "=====>WARNING YOU APPEAR TO BE USING THE UPPER TIME ACCEPTANCE. BE WARNED THAT: " << endl ;
+		cout << "       - It doesnt work for Tagged fits as we havnt looked up how to combine with Exp*Cos in the normalisation " << endl ;
+		cout << "       - It doesnt work with resolution as we dont know how to do the integral for normalisation " << endl << endl ;
+	}
+	
 	//PELC  - debug to plot the distribution of PDF values for each event 
 	//histOfPdfValues = new TH1D( "HistOfPdfValue" ,  "HistOfPdfValue" , 110, -0.00001, 0.00001 ) ;
 	//c0  = new TCanvas;
