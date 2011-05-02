@@ -1,3 +1,6 @@
+//	This program is intended to give you an overlay of 1D LL plots formatted in the RapidFit style
+//	It DOES work, however due to ROOT bugs it requires a later version to work correctly
+
 //	ROOT Headers
 #include "TFile.h"
 #include "TTree.h"
@@ -72,7 +75,7 @@ vector<TString> filter_names( vector<TString> all_names, string substring )
 
 int main( int argc, char* argv[] )
 {
-	cout << argv[0] << "\t" << "Param_to_plot" << "\t" << "File1.root" << "\t" << "File2.root" << "\t...\t" << "FileN.root" << endl;
+	cout << endl << argv[0] << "\t" << "Param_to_plot" << "\t" << "File1.root" << "\t" << "File2.root" << "\t...\t" << "FileN.root" << endl;
 
 	//	Do this before any Canvas is constructed
 	//	ROOT is a BITCH for not allowing you to easily change internal crap
@@ -84,14 +87,14 @@ int main( int argc, char* argv[] )
 
 	TString Param_Of_Choice( argv[1] );
 
-	TString* Input_File_Names = new TString[size_t(argc-2)];
+	vector<TString> Input_File_Names;
 	vector<TFile*> Input_Files;
 	vector<TTree*> Input_Tree_per_File;
 	for( int i=2; i < argc ; ++i )
 	{
-		Input_File_Names[i-2] = TString( argv[i] );
+		Input_File_Names.push_back( TString( argv[i] ) );
 
-		Input_Files.push_back( new TFile( Input_File_Names[i-2], "READ" ) );
+		Input_Files.push_back( new TFile( Input_File_Names.back(), "READ" ) );
 
 		Input_Tree_per_File.push_back( (TTree*) gDirectory->Get( TREE_NAME ) );
 
@@ -102,7 +105,7 @@ int main( int argc, char* argv[] )
 		Input_Tree_per_File.back()->SetName( new_name );
 	}
 
-	cout << "opened files..." << endl;
+	cout << endl <<"Opened files..." << endl<<endl;
 
 
 	TString value_suffix = "_value";
@@ -115,11 +118,11 @@ int main( int argc, char* argv[] )
 
 	//	Create a vector to hold the overlay graphs for all of the parameters in the fit
 	vector<TMultiGraph*> all_params_drift_multi;
-	all_params_drift_multi.resize( all_parameters.size() );
+	//all_params_drift_multi.resize( all_parameters.size() );
 
 	for( unsigned int i=0; i< all_parameters.size(); ++i )
 	{
-		all_params_drift_multi[i] = new TMultiGraph();
+		all_params_drift_multi.push_back( new TMultiGraph() );
 	}
 
 	TMultiGraph *mg = new TMultiGraph();
@@ -127,32 +130,35 @@ int main( int argc, char* argv[] )
 	TString NLL="NLL";
 
 
-	vector<double> minimum_NLL( Input_Files.size() );
-	vector<TString> ALL_Draw_Strings( Input_Files.size() );
+	vector<double> minimum_NLL;
+	vector<TString> ALL_Draw_Strings;
+	vector<TTree*> temp_trees;
 
-	cout << "Calculating DLL..." << endl;
+	cout << "Calculating DLL..." << endl<<endl;
 
-	TString _1D_Draw_String, NLL_Draw_String;
-	for( unsigned int i=0; i< Input_Files.size(); ++i )
+	for( unsigned int i=0; i< Input_Tree_per_File.size(); ++i )
 	{
+		TString _1D_Draw_String, NLL_Draw_String;
 		TTree* temp_tree = Input_Tree_per_File[i]->CopyTree( "NLL>0","fast",Input_Tree_per_File[i]->GetEntries(),0 );
-		minimum_NLL[i] = temp_tree->GetMinimum( NLL );
+		TString Name="TEMP_ROOT";
+		Name+=i;
+		temp_tree->SetName( Name );
+		temp_trees.push_back( temp_tree );
+		minimum_NLL.push_back( temp_tree->GetMinimum( NLL ) );
 
 		NLL_Draw_String = "(" + NLL + "-";
-		NLL_Draw_String+=minimum_NLL[i];
+		NLL_Draw_String+=minimum_NLL.back();
 		NLL_Draw_String.Append(")");
 
 		_1D_Draw_String = NLL_Draw_String + ":" + Param_Of_Choice + value_suffix;
 
-		ALL_Draw_Strings[i] = _1D_Draw_String;
+		ALL_Draw_Strings.push_back( _1D_Draw_String );
 	}
-
-	TFile* working_file = new TFile( "/tmp/work.root", "RECREATE" );
 
 	TCanvas* new_canvas = new TCanvas("Output", "Output", 1680, 1050 );
 
 	vector<TGraph*> temp_graphs;
-	cout << "Constructing Graphs..." << endl;
+	cout << "Constructing Graphs:" << endl;
 
 	TCanvas* bad_c = new TCanvas("new2", "new2", 1680, 1050);
 	for( unsigned int i=0; i< Input_Files.size(); ++i )
@@ -181,7 +187,7 @@ int main( int argc, char* argv[] )
 		cout << Drift_Param_Draw_String.back() << endl;
 	}
 
-	cout << "Constructing Nuisence Parameter Plots..." << endl;
+	cout << endl<<"Constructing Nuisence Parameter Plots..." << endl;
 
 	TCanvas* temp_c = new TCanvas( "tmp2", "tmp2", 1680, 1050 );
 	//	For all files
@@ -195,10 +201,10 @@ int main( int argc, char* argv[] )
 			all_params_drift_multi[j]->Add( temp_graph );
 		}
 	}
-//	delete temp_c;
+	delete temp_c;
 
 	new_canvas->cd();
-	cout << "Overlaying And Plotting..." << endl;
+	cout << endl <<"Overlaying And Plotting..." << endl;
 	mg->Draw("AC*");
 
 	//	Now that the axis exist we can worry about labeling them
@@ -210,7 +216,7 @@ int main( int argc, char* argv[] )
 	new_canvas->Print( Output_Graph_Name+".pdf" );
 
 
-	for( unsigned int i=0; i < all_params_drift_multi.size(); ++i )
+	for( unsigned int i=0; i < all_parameter_values.size(); ++i )
 	{
 		TString canvas_name="Canvas_";
 		canvas_name+=i;
@@ -240,5 +246,6 @@ int main( int argc, char* argv[] )
 //	}
 //	delete new_canvas;
 
+	cout << endl;
 	return 0;
 }

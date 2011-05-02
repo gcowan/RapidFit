@@ -29,6 +29,7 @@ class DataSetConfiguration
 
 		bool SetPhysicsParameters( vector<ParameterSet*> );
 		bool SetSource( string );
+		string GetSource();
 		IDataSet * MakeDataSet( PhaseSpaceBoundary*, IPDF*, int=-1 );
 		IPDF* GetGenerationPDF();
 

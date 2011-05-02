@@ -17,12 +17,12 @@
 using namespace std;
 
 //Default constructor
-PDFWithData::PDFWithData() : fitPDF(), inputBoundary(), parametersAreSet(false), dataProcessors(), dataSetMakers(), cached_data()
+PDFWithData::PDFWithData() : fitPDF(), inputBoundary(), parametersAreSet(false), dataProcessors(), dataSetMakers(), cached_data(), delete_data_decision(true)
 {
 }
 
 //Constructor with correct aruments
-PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(InputPDF), inputBoundary(InputBoundary),  parametersAreSet(false), dataProcessors(InputPrecalculators), dataSetMakers(DataConfig), cached_data()
+PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(InputPDF), inputBoundary(InputBoundary),  parametersAreSet(false), dataProcessors(InputPrecalculators), dataSetMakers(DataConfig), cached_data(), delete_data_decision(true)
 {
 	if ( DataConfig.size() < 1 )
 	{
@@ -66,6 +66,16 @@ DataSetConfiguration* PDFWithData::GetDataSetConfig()
 	return dataSetMakers[0];
 }
 
+vector<DataSetConfiguration*> PDFWithData::GetAllDataSetConfigs()
+{
+	return dataSetMakers;
+}
+
+void PDFWithData::SetDelete( bool new_decision )
+{
+	delete_data_decision = new_decision;
+}
+
 //Return the data set associated with the PDF
 IDataSet * PDFWithData::GetDataSet()
 {
@@ -92,7 +102,10 @@ IDataSet * PDFWithData::GetDataSet()
 		//	future attempts to fit to this DANGEROUS so I remove any reference to it once I've fitted
 		//	This is contrary to the intent I think for RapidFit, but I wish to use this for FC and so it's
 		//	MUCH easier to re-use existing objects as much as possible.
-		cached_data.pop_back();
+		if( delete_data_decision )
+		{
+			cached_data.pop_back();
+		}
 	}
 
 	//Precalculation, if required

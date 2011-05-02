@@ -25,6 +25,7 @@
 #include "LLscanResult.h"
 #include "LLscanResult2D.h"
 #include "main.h"
+#include "DataSetConfiguration.h"
 //  System Headers
 #include <string>
 #include <vector>
@@ -619,6 +620,27 @@ int RapidFit( int argc, char * argv[] )
 			if ( pdfsAndData.size() == 0 )
 			{
 				pdfsAndData = xmlFile->GetPDFsAndData();
+
+				//	If we are performing a scan we want to check for Data Generation instances and generate/store the data in a cache for future use
+				if( doLLscanFlag || ( doLLcontourFlag || doFC_Flag ) )
+				{
+					for( unsigned int pdf_num=0; pdf_num< pdfsAndData.size(); ++pdf_num )
+					{
+						vector<DataSetConfiguration*> DataConfigs = pdfsAndData[pdf_num]->GetAllDataSetConfigs();
+						for( unsigned int config_num=0; config_num < DataConfigs.size(); ++config_num )
+						{
+							if( DataConfigs[config_num]->GetSource() != "File" )
+							{
+								cout << "SCAN REQUESTED, GENERATING AND CACHING DATA" << endl;
+								pdfsAndData[pdf_num]->SetDelete( false );			//	Don't remove cache after one use
+								pdfsAndData[pdf_num]->SetPhysicsParameters( xmlFile->GetFitParameters() );
+								vector<IDataSet*> gen_data;
+								gen_data.push_back( pdfsAndData[pdf_num]->GetDataSet() );	//	Generate a Foam DataSet
+								pdfsAndData[pdf_num]->AddCachedData( gen_data );		//	Cache it for the lifetime of a scan
+							}
+						}
+					}
+				}
 			}
 
 			//Pulls
@@ -669,7 +691,7 @@ int RapidFit( int argc, char * argv[] )
 
 				GlobalFitResult->AddFitResult( GlobalResult );
 
-				ResultFormatter::FlatNTuplePullPlots( string("Global_Fit.root"), GlobalFitResult );
+				//ResultFormatter::FlatNTuplePullPlots( string("Global_Fit.root"), GlobalFitResult );
 
 				cout << "\n\n\t\tFit Output:" <<endl;
 				//Output results

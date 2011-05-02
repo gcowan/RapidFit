@@ -31,6 +31,9 @@ class PDFWithData
 		IPDF * GetPDF();
 		IDataSet * GetDataSet();
 		DataSetConfiguration* GetDataSetConfig();
+		vector<DataSetConfiguration*> GetAllDataSetConfigs();
+
+		void SetDelete( bool );
 
 	private:
 		//	Uncopyable!
@@ -43,6 +46,8 @@ class PDFWithData
 		vector< IPrecalculator* > dataProcessors;
 		vector< DataSetConfiguration* > dataSetMakers;
 		vector< IDataSet* > cached_data;
+
+		bool delete_data_decision;
 };
 
 #endif

@@ -80,6 +80,11 @@ bool DataSetConfiguration::SetSource( string NewSource )
 	return true;
 }
 
+string DataSetConfiguration::GetSource()
+{
+	return source;
+}
+
 //Create the DataSet
 IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary, IPDF * FitPDF, int real_numberEvents)
 {
