@@ -25,7 +25,7 @@
 #include "TColor.h"
 #include "TStyle.h"
 #include "TKey.h"
-//#include "TFormula.h"
+#include "TNtuple.h"
 //  System Headers
 #include <stdio.h>
 #include <math.h>
@@ -143,7 +143,7 @@ void get_number_events(int *number_o_events, TString current_path, TString top_d
     TString temp(obj_name);
 
     //  If this is a Tuple object we want to store some info about it
-    if ( obj->IsA()->InheritsFrom( TTree::Class()) )
+    if ( obj->IsA()->InheritsFrom( TNtuple::Class()) || obj->IsA()->InheritsFrom( TTree::Class()) )
     {
       //  Store the full name of the object and it's full path to determine if we've already found it
       string full_name(relative_path->Data());

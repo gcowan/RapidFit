@@ -20,7 +20,8 @@ RapidRun::RapidRun( TList* _args ) : args( _args )
 {
 }
 
-int RapidRun::run(){
+int RapidRun::run()
+{
 	//convert the TList args into a main compatible list
 	const Int_t argc = args->GetSize();
 	//memory is dynamically allocated

@@ -88,8 +88,11 @@ Else (${ROOT_CONFIG} MATCHES "ROOT_CONFIG-NOTFOUND")
   Set(ROOT_LIBRARIES ${ROOT_LIBRARIES} -lThread -lMinuit -lHtml -lVMC -lEG -lGeom -lTreePlayer -lXMLIO -lProof)
   Set(ROOT_LIBRARIES ${ROOT_LIBRARIES} -lProofPlayer -lMLP -lSpectrum -lEve -lRGL -lGed -lXMLParser -lPhysics)
   Set(ROOT_FIT_LIBRARIES -lHtml -lThread -lMinuit -lMathCore -lMinuit2 -lRooFit -lRooFitCore -lFoam) 
-  Set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib ${ROOTSYS}/lib/root )
-
+  IF(EXISTS ${ROOTSYS}/lib/root )
+    Set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib ${ROOTSYS}/lib/root )
+  ELSEIF(EXISTS ${ROOTSYS}/lib/root )
+    Set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib )
+  ENDIF(EXISTS ${ROOTSYS}/lib/root )
   SET( CXXFLAGS ${ROOT_LIBRRIES} )
 
   # Make variables changeble to the advanced user

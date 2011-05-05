@@ -10,6 +10,8 @@
 #ifndef STRING_PROCESSING_H
 #define STRING_PROCESSING_H
 
+//	ROOT Headers
+#include "TString.h"
 //	System Headers
 #include <string>
 #include <vector>
@@ -27,6 +29,7 @@ class StringProcessing
 		static void RemoveWhiteSpace( vector<string>& );
 		static vector<string> CombineUniques( vector<string>, vector<string> );
 		static int VectorContains( vector<string>*, string* );
+		static TString CondenseStrings( vector<string>, int, int );
 };
 
 #endif

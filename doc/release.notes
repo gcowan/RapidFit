@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/05 Rob Currie
+  - Extended the --saveOneDataSet flag for RapidFit such that it saves OneDataSet of what you want defined in your XML.
+    If you define multiple DataSets in your file you will now generate multiple ntuples out the end.
+    These are named as such:   for '--saveOneDataSet Badger.root' with 3 datasets in an xml you will get 'Badger_0.root Badger_1.root Badger_2.root'
+
 2011/05/02 Rob Currie
   - Fixed and added a bit of polish to the RapidLL tool (it requires ROOT>5.26 due to root being crap)
   - Using a data generator in the XML whilst performing a scan now gives the expected behaviour of performing the scan over the 1 dataset that was produced for the best fit

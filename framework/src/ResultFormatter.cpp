@@ -32,47 +32,70 @@
 #include <math.h>
 
 //Output data as a RootNTuple
-void ResultFormatter::MakeRootDataFile( string FileName, IDataSet * OutputData )
+void ResultFormatter::MakeRootDataFile( string FullFileName, vector<IDataSet*> OutputData )
 {
-	cout << "ResultFormatter writing to " << FileName << endl;
-	//Make a string naming all observables
-	string observableNames = "";
-	vector<string> allNames = OutputData->GetBoundary()->GetAllNames();
-	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
-	{
-		if (nameIndex == 0)
-		{
-			observableNames += allNames[0];
-		}
-		else
-		{
-			observableNames += ":" + allNames[nameIndex];
-		}
-	}
 
-	//Make the file and NTuple
-	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
-	TNtuple * dataNTuple = new TNtuple( "dataNTuple", "All data", observableNames.c_str() );
+	//	Remove the extention from the filename if it exists
+	string ext_dot=".";
+	vector<string> temp_strings = StringProcessing::SplitString( FullFileName, *(ext_dot.c_str()) );
+	TString FileName_Pre_Suffix = StringProcessing::CondenseStrings( temp_strings, 0, int(temp_strings.size() -1) );
 
-	//Loop over all data points and add them to the NTuple
-	for ( int dataIndex = 0; dataIndex < OutputData->GetDataNumber(); ++dataIndex)
+	int counter = 0;
+	for( vector<IDataSet*>::iterator data_iter = OutputData.begin(); data_iter!=OutputData.end(); ++data_iter, ++counter )
 	{
-		//Retrieve the values of all observables
-		Float_t* observables = new Float_t[ allNames.size() ];
+		TString TString_FileName = FileName_Pre_Suffix;
+		//	If we have multiple datasets write it to multuple files
+		if( OutputData.size() > 1 )
+		{
+			TString_FileName.Append("_");
+			TString_FileName+=counter;
+		}
+		TString_FileName.Append(".root");
+
+		string FileName = TString_FileName.Data();
+
+		cout << "ResultFormatter writing to " << FileName << endl;
+		//Make a string naming all observables
+		string observableNames = "";
+		vector<string> allNames = (*data_iter)->GetBoundary()->GetAllNames();
 		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 		{
-			DataPoint * temporaryDataPoint = OutputData->GetDataPoint(dataIndex);
-			observables[nameIndex] = Float_t(temporaryDataPoint->GetObservable( allNames[nameIndex] )->GetValue());
-			//delete temporaryDataPoint;
+			if (nameIndex == 0)
+			{
+				observableNames += allNames[0];
+			}
+			else
+			{
+				observableNames += ":" + allNames[nameIndex];
+			}
 		}
+	
+		//Make the file and NTuple
+		TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
+		TNtuple * dataNTuple = new TNtuple( "dataNTuple", "All data", observableNames.c_str() );
+	
+		//Loop over all data points and add them to the NTuple
+		for ( int dataIndex = 0; dataIndex < (*data_iter)->GetDataNumber(); ++dataIndex)
+		{
+		//Retrieve the values of all observables
+			Float_t* observables = new Float_t[ allNames.size() ];
+			for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
+			{
+				DataPoint * temporaryDataPoint = (*data_iter)->GetDataPoint(dataIndex);
+				observables[nameIndex] = Float_t(temporaryDataPoint->GetObservable( allNames[nameIndex] )->GetValue());
+				//delete temporaryDataPoint;
+			}
+	
+			//Populate the NTuple
+			dataNTuple->Fill(observables);
+		}
+	
+		//Write the file
+		rootFile->Write("dataNTuple");
+		rootFile->Close();
 
-		//Populate the NTuple
-		dataNTuple->Fill(observables);
 	}
-
-	//Write the file
-	rootFile->Write("dataNTuple");
-	rootFile->Close();
+	return;
 }
 
 //Display the results of a fit using cout

@@ -24,15 +24,26 @@ ENDIF( INSOURCE )
 #  -O2 optimizations and -g
 #SET( CMAKE_BUILD_TYPE Debug )
 
+#	If you system has this installed this is a very nice compiler and produces sweet erorr messages :D 
 #SET( CMAKE_CXX_COMPILER "clang++" )
 
-SET( CMAKE_CXX_FLAGS_RELEASE "" )
 
-SET( CMAKE_CXX_FLAGS "-pedantic -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	SET( CMAKE_CXX_FLAGS "-pedantic -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+ELSEIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	SET( CMAKE_CXX_FLAGS "-O3 -msse -msse2 -msse3 -m3dnow -ansi -Wextra -Wall -Wno-non-virtual-dtor" ) 
+ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+
+Execute_process(
+	COMMAND svnversion -n ..
+	OUTPUT_VARIABLE SVN_REV)
+MESSAGE( "SVN VERSION:  ${SVN_REV}" )
+
+SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -O3 -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
 
 #  Get back the old style verbosity :) by setting this to 1
-SET( CMAKE_VERBOSE_MAKEFILE 1 )
-#SET( CMAKE_VERBOSE_MAKEFILE 0 )
+#SET( CMAKE_VERBOSE_MAKEFILE 1 )
+SET( CMAKE_VERBOSE_MAKEFILE 0 )
 
 
 
@@ -60,7 +71,15 @@ FIND_PACKAGE( ROOT )
 
 INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/framework/include" )
 INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/pdfs/include" )
-INCLUDE_DIRECTORIES( SYSTEM ${ROOT_INCLUDE_DIR} )
+
+#	Apple is full of fomplete... WHAT THE HELL?
+IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	INCLUDE_DIRECTORIES( SYSTEM "${ROOT_INCLUDE_DIR}" )
+ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+
+IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem ${ROOT_INCLUDE_DIR}" )
+ENDIF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
 LINK_DIRECTORIES( ${ROOT_LIBRARY_DIR} )
 LINK_DIRECTORIES( ${LINK_DIRECTORIES} )
@@ -99,17 +118,6 @@ WHILE( ${I} LESS ${SRC_LEN} )
                 	MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
         	ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/unused+")
 	ENDIF("${THIS_FILE}" MATCHES "Roo+")
-        IF("${THIS_FILE}" MATCHES "main+")
-                LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
-                MATH( EXPR I ${I}-1 )
-                MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
-	ELSEIF(NOT "${THIS_FILE}" MATCHES "main+" )
-		IF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/main+")
-                	LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
-                	MATH( EXPR I ${I}-1 )
-                	MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
-        	ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/main+")
-        ENDIF("${THIS_FILE}" MATCHES "main+")
         IF("${THIS_FILE}" MATCHES "RapidRun+")
                 LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
                 MATH( EXPR I ${I}-1 )
@@ -141,8 +149,8 @@ ADD_LIBRARY( fits SHARED ${FITTER_SRCS} )
 TARGET_LINK_LIBRARIES( fits ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
 
 #  Add the main program which offers the standard way into RapidFit and the usecase where most users will want it
-ADD_EXECUTABLE( fitting ${PROJECT_SOURCE_DIR}/framework/src/main.cpp )
-TARGET_LINK_LIBRARIES( fitting fits pdfs ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
+ADD_EXECUTABLE( fitting fits pdfs )
+TARGET_LINK_LIBRARIES( fitting ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
 
 
 
@@ -178,12 +186,12 @@ ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
 TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
 
 #
-ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
-TARGET_LINK_LIBRARIES( RapidLL ${ROOT_LIBRARIES} )
+#ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+#TARGET_LINK_LIBRARIES( RapidLL ${ROOT_LIBRARIES} )
 
 #	New tool for plotting 2D scans
-ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
-TARGET_LINK_LIBRARIES( RapidPlot ${ROOT_LIBRARIES} )
+#ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+#TARGET_LINK_LIBRARIES( RapidPlot ${ROOT_LIBRARIES} )
 
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone
@@ -200,10 +208,10 @@ SET( LINKDEF "${PROJECT_SOURCE_DIR}/framework/include/LinkDef.h" )
 #	that RapidFit requires to build the fitter as a library extension to
 #	ROOT to run on the grid
 ADD_CUSTOM_COMMAND ( OUTPUT  ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp
-		    COMMAND rootcint -f ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp -c ${ALL_HEADERS} ${LINKDEF} )
+		    COMMAND rootcint -f ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp -c ${ALL_HEADERS} ${LINKDEF}
+		    DEPENDS ${ALL_HEADERS} )
 
 #	This is what is required to build the object libRapidRun.so
 #	It requires the custom command above
 ADD_LIBRARY ( RapidRun SHARED ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp ${PROJECT_SOURCE_DIR}/framework/src/RapidRun.cpp ${FITTER_SRCS} ${PDF_SRCS} )
-TARGET_LINK_LIBRARIES( RapidRun ${ROOT_LIBRARIES} )
-
+TARGET_LINK_LIBRARIES( RapidRun ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )

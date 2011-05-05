@@ -1,6 +1,7 @@
 #ifndef RAPIDRUN_H
 #define RAPIDRUN_H
 
+
 //	ROOT Headers
 #include "TList.h"
 #include "TObject.h"
@@ -11,17 +12,17 @@
 //	System Headers
 #include <memory>
 
-class RapidRun : public TObject {
 
-public:
-	RapidRun(){}//needed by Root IO
-	RapidRun( TList* );
-	int run();
+class RapidRun : public TObject
+{
+	public:
+		RapidRun(){}//needed by Root IO
+		RapidRun( TList* );
+		int run();
 
-private:
-
-	std::auto_ptr<TList> args;
-	ClassDef( RapidRun, 1 )//Needed for Cint
+	private:
+		std::auto_ptr<TList> args;
+		ClassDef( RapidRun, 1 )//Needed for Cint
 };
 
 #endif

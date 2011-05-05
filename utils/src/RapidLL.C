@@ -9,6 +9,9 @@
 #include "TGraph.h"
 #include "TMultiGraph.h"
 #include "TAxis.h"
+#include "TLine.h"
+#include "TColor.h"
+#include "TH2.h"
 //	RapidFit Headers
 #include "EdStyle.h"
 //	System Headers
@@ -210,11 +213,51 @@ int main( int argc, char* argv[] )
 	//	Now that the axis exist we can worry about labeling them
 	mg->GetXaxis()->SetTitle( EdStyle::GetParamRootName( Param_Of_Choice ) );
 	mg->GetYaxis()->SetTitle( "#Delta LL" );
+	new_canvas->Update();
 
 	TString Output_Graph_Name = "Output_"+Param_Of_Choice;
 	new_canvas->Print( Output_Graph_Name+".png" );
 	new_canvas->Print( Output_Graph_Name+".pdf" );
 
+	//	Now mark and draw the 1 sigma error
+	double xmax=0, xmin=0;
+	double error=0.5;
+	mg->GetYaxis()->SetRangeUser( 0., 5. );
+	new_canvas->Update();
+        xmax = mg->GetXaxis()->GetXmax();
+        xmin = mg->GetXaxis()->GetXmin();
+	TLine *error_line = new TLine( xmin, error, xmax, error);
+	error_line->SetLineColor( Color_t(3) );
+	TLine *param_error = NULL;
+	if( Param_Of_Choice == "gamma" )
+	{
+		param_error = new TLine( 0.6807-0.02, error, 0.6807+.02, error);
+	} else if( Param_Of_Choice == "deltaGamma" )
+	{
+		param_error = new TLine( 0.06-0.06, error, 0.06+0.06, error);
+	} else if( Param_Of_Choice == "Azero_sq" )
+        {
+		param_error = new TLine( 0.6-0.015, error, 0.6+0.015, error);
+        } else if( Param_Of_Choice == "Aperp_sq" )
+        {
+		param_error = new TLine( 0.16-0.02, error, 0.16+0.02, error);
+        } else if( Param_Of_Choice == "delta_para" )
+        {
+		param_error = new TLine( 2.5-0.24, error, 2.5+0.24, error);
+        } else if( Param_Of_Choice == "delta_perp" )
+        {
+		param_error = new TLine( -0.17-0.5, error, -0.17+0.5, error);
+        } else if( Param_Of_Choice == "Phi_s" )
+        {
+		param_error = new TLine( 0.-0.29, error, 0.+0.29, error);
+        }
+
+	param_error->SetLineColor( Color_t(2) );
+	error_line->Draw();
+	param_error->Draw();
+	new_canvas->Update();
+	new_canvas->Print( Output_Graph_Name+"_error.png" );
+	new_canvas->Print( Output_Graph_Name+"_error.pdf" );
 
 	for( unsigned int i=0; i < all_parameter_values.size(); ++i )
 	{

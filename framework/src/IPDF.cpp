@@ -76,6 +76,11 @@ void IPDF::SetMCCacheStatus( bool newStatus)
 	hasCachedMCGenerator = newStatus;
 }
 
+IPDF::~IPDF()
+{
+	IPDF::Remove_Cache();
+}
+
 void IPDF::Remove_Cache()
 {
 	while( !cached_files.empty() )

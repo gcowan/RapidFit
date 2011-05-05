@@ -26,6 +26,7 @@
 #include "LLscanResult2D.h"
 #include "main.h"
 #include "DataSetConfiguration.h"
+#include "IDataSet.h"
 //  System Headers
 #include <string>
 #include <vector>
@@ -480,10 +481,30 @@ int RapidFit( int argc, char * argv[] )
 			if (configFileNameFlag)
 			{
 				//Make a file containing toy data from the PDF
-				PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
-				quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
-				ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickData->GetDataSet() );
-				delete quickData;
+				vector<PDFWithData*> quickDataGen = xmlFile->GetPDFsAndData();
+				vector<IDataSet*> quickDataSet;
+				for( unsigned int i=0; i< quickDataGen.size(); ++i )
+				{
+					quickDataGen[i]->SetPhysicsParameters( xmlFile->GetFitParameters() );
+					IDataSet* temp_dataSet = quickDataGen[i]->GetDataSet();
+					quickDataSet.push_back( temp_dataSet );
+				}
+
+				if( quickDataGen.size() != quickDataSet.size() )
+				{	
+					cerr << "Unexpected, Unexplained, Error... Goodbye!" << endl;
+					exit(-53);
+				}
+
+				ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickDataSet );
+
+				while( !quickDataGen.empty() )
+				{
+					delete quickDataGen.back();
+					delete quickDataSet.back();
+					quickDataGen.pop_back();
+					quickDataSet.pop_back();
+				}
 			}
 			else
 			{

@@ -7,6 +7,8 @@
   @date 2009-10-02
   */
 
+//	ROOT Headers
+#include "TString.h"
 //	RapidFit Headers
 #include "StringProcessing.h"
 //	System Headers
@@ -228,3 +230,19 @@ int StringProcessing::VectorContains( vector<string> * InputVector, string * Sea
 	//If you've got this far, it wasn't found
 	return -1;
 }
+
+//Return the a TString object which is composed of the selected strings within the vector
+TString StringProcessing::CondenseStrings( vector<string> input_vec, int lolim=-1, int hilim=-1 )
+{
+	int temp_int = int( input_vec.size() );
+	if( ( hilim > temp_int ) || (hilim < 0) ) hilim = temp_int;
+	if( lolim < 0 ) lolim = 0;
+
+	TString Returnable_String( "" );
+	for( int iter = lolim; iter < hilim ; ++iter )
+	{
+		Returnable_String.Append( input_vec[iter] );
+	}
+	return Returnable_String;
+}
+

@@ -25,7 +25,7 @@ using namespace std;
 class ResultFormatter
 {
 	public:
-		static void MakeRootDataFile( string, IDataSet* );
+		static void MakeRootDataFile( string, vector<IDataSet*> );
 		static void DebugOutputFitResult( FitResult* );
 		static void LatexOutputFitResult( FitResult* );
 		static void ReviewOutput( FitResult * OutputData );

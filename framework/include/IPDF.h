@@ -30,7 +30,7 @@ class IPDF
 {
 	public:
 		IPDF();
-		virtual ~IPDF(){};
+		virtual ~IPDF();
 
 		//Indicate whether the function has been set up correctly
 		virtual bool IsValid() = 0;
