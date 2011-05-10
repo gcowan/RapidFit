@@ -22,28 +22,11 @@ ENDIF( INSOURCE )
 #  -O3 optimizations
 #SET( CMAKE_BUILD_TYPE Release )
 #  -O2 optimizations and -g
-#SET( CMAKE_BUILD_TYPE Debug )
-
-#	If you system has this installed this is a very nice compiler and produces sweet erorr messages :D 
-#SET( CMAKE_CXX_COMPILER "clang++" )
-
-
-IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-	SET( CMAKE_CXX_FLAGS "-pedantic -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
-ELSEIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-	SET( CMAKE_CXX_FLAGS "-O3 -msse -msse2 -msse3 -m3dnow -ansi -Wextra -Wall -Wno-non-virtual-dtor" ) 
-ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-
-Execute_process(
-	COMMAND svnversion -n ..
-	OUTPUT_VARIABLE SVN_REV)
-MESSAGE( "SVN VERSION:  ${SVN_REV}" )
-
-SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -O3 -msse -msse2 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+SET( CMAKE_BUILD_TYPE Debug )
 
 #  Get back the old style verbosity :) by setting this to 1
 #SET( CMAKE_VERBOSE_MAKEFILE 1 )
-SET( CMAKE_VERBOSE_MAKEFILE 0 )
+#SET( CMAKE_VERBOSE_MAKEFILE 0 )
 
 
 
@@ -59,13 +42,18 @@ SET( ${PROJECT_NAME}_PATCH_LEVEL 0 )
 
 
 
-#  ROOT OPTIONS
+EXECUTE_PROCESS(
+       		COMMAND	svnversion -n ..
+		OUTPUT_VARIABLE SVN_REV )
+MESSAGE( "SVN VERSION:  ${SVN_REV}" )
+
+EXECUTE_PROCESS(
+		COMMAND date +%Y_%m_%d
+		OUTPUT_VARIABLE BUILD_DATE )
 
 #  Grab the info on ROOT and store the global prarmaters
 SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts )
 FIND_PACKAGE( ROOT )
-
-
 
 #  INCLUDE & LINKING DIRS
 
@@ -77,7 +65,13 @@ IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 	INCLUDE_DIRECTORIES( SYSTEM "${ROOT_INCLUDE_DIR}" )
 ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
+
+IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -pedantic -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+
 IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -Wextra -Wall -Wno-non-virtual-dtor" )
 	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem ${ROOT_INCLUDE_DIR}" )
 ENDIF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
@@ -118,7 +112,11 @@ WHILE( ${I} LESS ${SRC_LEN} )
                 	MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
         	ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/unused+")
 	ENDIF("${THIS_FILE}" MATCHES "Roo+")
-        IF("${THIS_FILE}" MATCHES "RapidRun+")
+        SET(HEADER_IN "${THIS_FILE}")
+	STRING(REGEX REPLACE ".cpp" ".h" HEADER_OUT "${HEADER_IN}" )
+	STRING(REGEX REPLACE "framework/src/" "framework/include/" FINAL_HEADER "${HEADER_OUT}")
+	LIST( APPEND ALL_HEADERS ${FINAL_HEADER} )
+	IF("${THIS_FILE}" MATCHES "RapidRun+")
                 LIST( REMOVE_AT FITTER_SRCS ${PRESENT_FILENUM} )
                 MATH( EXPR I ${I}-1 )
                 MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
@@ -129,28 +127,18 @@ WHILE( ${I} LESS ${SRC_LEN} )
                         MATH( EXPR SRC_LEN ${SRC_LEN}-1 )
                 ENDIF("${THIS_FILE}" MATCHES "${PROJECT_SOURCE_DIR}/framework/src/RapidRun+")
         ENDIF("${THIS_FILE}" MATCHES "RapidRun+")
-	SET(HEADER_IN "${THIS_FILE}")
-	STRING(REGEX REPLACE ".cpp" ".h" HEADER_OUT "${HEADER_IN}" )
-	STRING(REGEX REPLACE "framework/src/" "framework/include/" FINAL_HEADER "${HEADER_OUT}")
-	LIST( APPEND ALL_HEADERS ${FINAL_HEADER} )
 	SET( I ${PRESENT_FILENUM}  )
 ENDWHILE( ${I} LESS ${SRC_LEN} )
 
 
 #  OUTPUT OPTIONS
 
-#  Add the pdfs to a Static Library to be accessed by the main program
-#  (also less of a pain and more clearly removes it as a dependence when rebuilding)
-ADD_LIBRARY( pdfs SHARED ${PDF_SRCS} )
-TARGET_LINK_LIBRARIES( pdfs ${ROOT_LIBRARIES} )
-
-#  Add the main RapidFit architecture to a simple new fits library to allow for dynamically linking into segments of RapidFit Code
-ADD_LIBRARY( fits SHARED ${FITTER_SRCS} )
-TARGET_LINK_LIBRARIES( fits ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
-
 #  Add the main program which offers the standard way into RapidFit and the usecase where most users will want it
-ADD_EXECUTABLE( fitting fits pdfs )
+ADD_EXECUTABLE( fitting ${PDF_SRCS} ${FITTER_SRCS} )
 TARGET_LINK_LIBRARIES( fitting ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
+
+
+
 
 
 
@@ -185,13 +173,22 @@ TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
 TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
 
-#
-#ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
-#TARGET_LINK_LIBRARIES( RapidLL ${ROOT_LIBRARIES} )
+#       Tool that sWeights the betas ntuple
+ADD_EXECUTABLE( betas_sweightfitter ${PROJECT_SOURCE_DIR}/utils/src/betas_sweightfitter.cc )
+TARGET_LINK_LIBRARIES( betas_sweightfitter ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
 
-#	New tool for plotting 2D scans
-#ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
-#TARGET_LINK_LIBRARIES( RapidPlot ${ROOT_LIBRARIES} )
+#       New tool for plotting 2DLL and FC
+ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot.C ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+TARGET_LINK_LIBRARIES( RapidPlot ${ROOT_LIBRARIES} )
+
+#       New tool for plotting 1D LL and overlaying multiple copies of the same
+ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+TARGET_LINK_LIBRARIES( RapidLL ${ROOT_LIBRARIES} )
+
+
+
+
+
 
 
 #  Add the custom command to 'make doc' incase this was/is still used by anyone

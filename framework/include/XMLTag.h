@@ -10,6 +10,8 @@
 #ifndef XML_TAG_H
 #define XML_TAG_H
 
+//	ROOT Headers
+#include "TString.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -20,24 +22,32 @@ class XMLTag
 {
 	public:
 		XMLTag();
-		XMLTag( string, vector<string> );
+		XMLTag( vector<pair<string,string> >* );
+		XMLTag( string, vector<string>, XMLTag* );
 		~XMLTag();
 
-		static vector< XMLTag* > FindTagsInContent( vector<string>, vector<string>& );
+		vector< XMLTag* > FindTagsInContent( vector<string>, vector<string>& );
+		string GetPath();
+		void AppendPath( string );
 		string GetName();
+		vector<pair<string,string> >* GetForbidden();
 		vector< XMLTag* > GetChildren();
 		vector<string> GetValue();
+		bool NotAppended();
 
 	private:
-		static string FindNextTagOpen( vector<string>, int&, int& );
-		static void FindTagOpens( string, vector<string>, vector<int>&, vector<int>& );
-		static void FindTagCloses( string, vector<string>, vector<int>&, vector<int>& );
-		static vector<string> FindTagContent( string, vector<string>& );
-		static vector<string> SplitContent( vector<string>&, int, int, int );
+		string FindNextTagOpen( vector<string>, int&, int& );
+		void FindTagOpens( string, vector<string>, vector<int>&, vector<int>& );
+		void FindTagCloses( string, vector<string>, vector<int>&, vector<int>& );
+		vector<string> FindTagContent( string, vector<string>& );
+		vector<string> SplitContent( vector<string>&, int, int, int );
 
 		vector< XMLTag* > children;
 		vector<string> value;
 		string name;
+		XMLTag* parent;
+		TString path;
+		vector<pair<string, string> >* forbidden;
 };
 
 #endif

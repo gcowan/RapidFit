@@ -30,7 +30,7 @@ class XMLConfigReader
 {
 	public:
 		XMLConfigReader();
-		XMLConfigReader(string);
+		XMLConfigReader(string, vector<pair<string,string> >*);
 		~XMLConfigReader();
 
 		//ParameterSet * GetFitParameters();
@@ -49,6 +49,7 @@ class XMLConfigReader
 		void SetSeed( unsigned int new_seed );	//  Set Seed returned by XMLFile
 
 	private:
+		XMLTag* All_XML_Tags;
 		ParameterSet * GetParameterSet( XMLTag* );
 		PhysicsParameter * GetPhysicsParameter( XMLTag*, string& );
 		PhaseSpaceBoundary * GetPhaseSpaceBoundary( XMLTag* );

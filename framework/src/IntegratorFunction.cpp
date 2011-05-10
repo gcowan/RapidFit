@@ -76,7 +76,7 @@ double IntegratorFunction::operator()( double x ) const
 IntegratorFunction& IntegratorFunction::operator=( const IntegratorFunction & NewFunction )
 {
 	wrappedFunction = NewFunction.wrappedFunction;
-	return *(this);	//	?
+	return *(this);
 }
 
 //Return the function value at x

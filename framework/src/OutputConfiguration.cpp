@@ -238,7 +238,7 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 
 	//Output any calculated contours
 	ResultFormatter::PlotFitContours( TheResult, contourFileName );
-	
+
 	//Make any requested projections
 	//for ( int projectionIndex = 0; projectionIndex < projections.size(); ++projectionIndex )
 	for (unsigned int projectionIndex = 0; projectionIndex < 1; ++projectionIndex )
@@ -247,7 +247,7 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 		PhysicsBottle * resultBottle = TheResult->GetPhysicsBottle();
 
 		//Loop over all PDFs, and plot
-		if ( makeAllPlots || projections.size() > 0 )
+		if ( makeAllPlots || ( projections.size() > 0 ) )
 		{
 			for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 			{

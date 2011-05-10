@@ -42,7 +42,7 @@ MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit()
 //Destructor
 MinuitWrapper::~MinuitWrapper()
 {
-	cout << "hello from MinuitWrapper destructor" << endl;
+	//cout << "hello from MinuitWrapper destructor" << endl;
 	delete minuit;
 }
 

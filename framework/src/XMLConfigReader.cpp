@@ -28,12 +28,12 @@
 #define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
-XMLConfigReader::XMLConfigReader() : children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
+XMLConfigReader::XMLConfigReader() : All_XML_Tags(new XMLTag()), children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
 {
 }
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName ) : children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverideXML ) : All_XML_Tags(new XMLTag(OverideXML)), children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -63,7 +63,7 @@ XMLConfigReader::XMLConfigReader( string FileName ) : children(), isLoaded(false
 			middleOfFile.push_back( wholeFile[lineIndex] );
 		}
 		vector<string> value;
-		children = XMLTag::FindTagsInContent( middleOfFile, value );
+		children = All_XML_Tags->FindTagsInContent( middleOfFile, value );
 
 		//Anything in "value" is considered debug data
 		for ( unsigned int valueIndex = 0; valueIndex < value.size(); ++valueIndex )
@@ -83,7 +83,8 @@ XMLConfigReader::XMLConfigReader( string FileName ) : children(), isLoaded(false
 //Destructor
 XMLConfigReader::~XMLConfigReader()
 {
-	cout << "Hello from XMLConfigReader destructor" << endl;
+	delete All_XML_Tags;
+	//cout << "Hello from XMLConfigReader destructor" << endl;
 }
 
 //Return whether file is loaded

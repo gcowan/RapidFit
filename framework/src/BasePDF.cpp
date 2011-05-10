@@ -46,7 +46,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 {
 	//Check the boundary is within the correct phase space
 	vector<string>::iterator nameIterator;
-	for(nameIterator = allObservables.begin(); nameIterator != allObservables.end(); nameIterator++)
+	for(nameIterator = allObservables.begin(); nameIterator != allObservables.end(); ++nameIterator)
 	{
 		IConstraint * testConstraint = NewBoundary->GetConstraint( *nameIterator );
 		if (testConstraint->GetUnit() == "NameNotFoundError")
@@ -78,6 +78,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 			return Normalisation(NewDataPoint, NewBoundary);
 		}
 	}
+	return -1.;
 }
 
 //Do the integration

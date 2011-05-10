@@ -92,7 +92,7 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 //Destructor
 NormalisedSumPDF::~NormalisedSumPDF()
 {
-  	cout << "Hello from Normalised destructor" << endl;
+	//cout << "Hello from Normalised destructor" << endl;
 	delete firstPDF;
 	delete secondPDF;
 }

@@ -1,5 +1,21 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/10 Rob Currie
+  - Properly added the ability to overide any tag within an XML from the command line for easier submittion of systematics after this was requested from multiple users...
+    This time I wrote it properly, I pass a vector of pairs containing parameter address and new value down to the XMLTag class which now implements non-static functions
+    The transform between user submitted changes and XML tags is handled entireley within the XMLTag class
+    (which now implements a child/parent path member variable)
+    hence no significant changes to the XMLConfigReader, other than passing runtime input down to the XMLTag class.
+  - Added speed improvement to Projection Plots (which appear to not be running by default atm?)
+    This is due to the integrator demanding 1E-6 on upper limit of errors for each plotted point, this is a rediculously high error given the resolution of the plots!
+    Also added more interactive user input just to let them know that the program hasn't stalled!
+
+        PROJECTION PLOTS ARE NOT BEING RUN AUTOMATICALLY AS OF SOME PRIOR RELEASE
+        the best way to perform projection plots is to run something similar to:
+               'fitting -f some.xml  --testPlot outputfile.root'
+
+  - A few bugfixes in my program for plotting the result of toy studies (This tool works with both toy study ntuple formats)
+
 2011/05/05 Rob Currie
   - Extended the --saveOneDataSet flag for RapidFit such that it saves OneDataSet of what you want defined in your XML.
     If you define multiple DataSets in your file you will now generate multiple ntuples out the end.

@@ -37,7 +37,7 @@ void ProdPDF::MakePrototypes()
 //Destructor
 ProdPDF::~ProdPDF()
 {
-	cout << "Hello from Product destructor" << endl;
+	//cout << "Hello from Product destructor" << endl;
 	delete firstPDF;
 	delete secondPDF;
 }

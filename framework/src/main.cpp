@@ -65,6 +65,7 @@ int RapidFit( int argc, char * argv[] )
 	{
 		cout << "!!YOU HAVE LOCAL CODE MODIFICATIONS!!" << endl;
 	}
+	cout << "Build Info:\t" << STR(BUILD_INFO) << endl;
 	cout << "Starting time: " << ctime( &timeNow ) << endl << endl;
 
 	if ( argc == 1 )
@@ -96,6 +97,7 @@ int RapidFit( int argc, char * argv[] )
 		vector<string> Scan_X;
 		vector<string> Contour_X;
 		vector<string> Contour_Y;
+		vector<pair<string, string> >* XMLOverideList = new vector<pair<string,string> >;
 
 		//Flags for which arguments have been received
 		bool numberRepeatsFlag = false;
@@ -294,6 +296,30 @@ int RapidFit( int argc, char * argv[] )
 					return 1;
 				}
 			}
+                        else if ( currentArgument == "--OverideXML" )
+			{
+				if ( argumentIndex + 2 < argc )
+				{
+					++argumentIndex;
+					string path = argv[argumentIndex];
+					++argumentIndex;
+					string value = argv[argumentIndex];
+					pair<string,string> temp_pair;
+					temp_pair.first = path;
+					temp_pair.second = value;
+					cout << endl;
+					cout << "WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING" << endl;
+					cout << "Overiding an XMLTag with:" << endl;
+					cout << "\t" << path << "\t" << value << endl;
+					cout << "WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING" << endl << endl;
+					XMLOverideList->push_back( temp_pair );
+				}
+				else
+				{
+					cerr << "XML Overide not correctly defined!" << endl;
+					return 1;
+				}
+			}
 			else if ( currentArgument == "--testIntegrator" )
 			{
 				testIntegratorFlag = true;
@@ -442,7 +468,7 @@ int RapidFit( int argc, char * argv[] )
 		XMLConfigReader* xmlFile=NULL;
 		if (configFileNameFlag)
 		{
-			xmlFile = new XMLConfigReader(configFileName);
+			xmlFile = new XMLConfigReader(configFileName, XMLOverideList);
 			if ( xmlFile->IsLoaded() )
 			{
 				cout << "XML config file " << configFileName << " loaded" << endl;

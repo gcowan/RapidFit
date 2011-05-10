@@ -25,7 +25,7 @@ ToyStudy::ToyStudy() : pdfsAndData(), studyParameters(), theMinimiser(), theFunc
 //Constructor using an XML config file directly
 ToyStudy::ToyStudy( string FileName ) : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(), numberStudies(), allConstraints()
 {
-	XMLConfigReader * xml = new XMLConfigReader(FileName);
+	XMLConfigReader * xml = new XMLConfigReader(FileName, new vector<pair<string,string> >);
 	if ( xml->IsLoaded() )
 	{
 		theMinimiser = xml->GetMinimiserConfiguration();

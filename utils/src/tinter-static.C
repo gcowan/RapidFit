@@ -81,14 +81,14 @@ unsigned int GetOptimalBins( TH1* input_hist, int axis=1 )
   if( ( axis == 1 ) && ( wanted_bins > input_hist->GetNbinsX() ) )  return 0;
   else if( ( axis == 2 ) && ( wanted_bins > input_hist->GetNbinsY() ) )  return 0;
   else if( ( axis == 3 ) && ( wanted_bins > input_hist->GetNbinsZ() ) )  return 0;
-  else return wanted_bins;
+  else return unsigned(int(wanted_bins) );
 }
 
 int tab_formatter(TString input, int tab_number)
 {
   string input_str(input.Data());
   //  Want tab_number of tabs after this string, i.e. how many to align words of long length
-  return tab_number - floor(input_str.size()/TAB_LENGTH);
+  return int( tab_number - floor(input_str.size()/TAB_LENGTH) );
 }
 
 //  Return False if the string new_name isn't in the vector of stings
@@ -214,6 +214,7 @@ void get_tuple_infos(TString File_Name, vector<int>* number_o_events, vector<TSt
     number_o_events->pop_back();
     relative_path->pop_back();
   }
+  first_source->Close();
 }
 
 void get_tuple_infos(TString File_Name, vector<TString>* relative_path)
@@ -255,6 +256,7 @@ void get_absolute_path( TString relative_path, TString file_name, TString *absol
   TFile* temp = new TFile( file_name, "READ" );
   absolute_path->Append( gDirectory->GetPath() );
   absolute_path->Append( relative_path );
+  temp->Close();
 }
 
 //  Get the names of branches within a given TTree object
@@ -266,9 +268,9 @@ void get_branch_names( TString absolute_path, vector<TString> *branch_names)
   //gDirectory->cd("root:/");
   TTree* local_tree = (TTree*) gDirectory->Get( (const char*) absolute_path );
   TObjArray* branch_obj_array = local_tree->GetListOfBranches();
-  for(unsigned int i=0; i<branch_obj_array->GetEntries();i++)
+  for(int i=0; i<branch_obj_array->GetEntries();i++)
   {
-    TObject* branch_object = (*branch_obj_array)[i];
+    TObject* branch_object = (*branch_obj_array)[size_t(i)];
     branch_names->push_back((const char*) branch_object->GetName());
   }
 
@@ -282,9 +284,9 @@ vector<TString> get_branch_names( TString absolute_path )
   //gDirectory->cd("root:/");
   TTree* local_tree = (TTree*) gDirectory->Get((const char*) absolute_path);
   TObjArray* branch_obj_array = local_tree->GetListOfBranches();
-  for(unsigned int i=0; i<branch_obj_array->GetEntries();i++)
+  for(int i=0; i<branch_obj_array->GetEntries();i++)
   {
-    TObject* branch_object = (*branch_obj_array)[i];
+    TObject* branch_object = (*branch_obj_array)[size_t(i)];
     temp_branch_names.push_back((const char*) branch_object->GetName());
   }
   return temp_branch_names;
@@ -307,7 +309,7 @@ bool is_empty( TString input )
 
 void tabs_TStr( TString input, int tab_number, TString* output)
 {
-  for(unsigned int tabs=0; tabs < tab_formatter(input, tab_number); tabs++)
+  for(int tabs=0; tabs < tab_formatter(input, tab_number); tabs++)
   {
     output->Append("\t");
   }
@@ -386,9 +388,9 @@ int OptimumBinNumber( TH1* input_hist, int axis=1 )
   if( axis == 1 ) existing_bins = input_hist->GetNbinsX();
   else if( axis == 2 )  existing_bins = input_hist->GetNbinsY();
   else if( axis == 3 )  existing_bins = input_hist->GetNbinsZ();
-  input_hist->Rebin( existing_bins / wanted_bins );
+  input_hist->Rebin( int(existing_bins / wanted_bins) );
 
-  return wanted_bins;
+  return int(wanted_bins);
 }
 
 
@@ -439,7 +441,8 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 
     if ( ( argc >= 3 )  && ( string ( argv[2] ).compare ( "*" ) != 0 ) )
     {
-        if ( check_found ( &string ( argv[2] ), &Param_tree_path ) )
+	string pass(argv[2]);
+        if ( check_found ( &pass, &Param_tree_path ) )
         {
             while ( !Param_tree_path.empty() )
             {
@@ -482,8 +485,9 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 
         if ( ( argc >= 4 ) && ( string ( argv[3] ).compare ( "*" ) != 0 ) )
         {
+	    string pass(argv[3]);
 	    //  We only want a the output_branch based on the user input
-            if ( check_found ( &string ( argv[3] ), &output_branch_names ) )
+            if ( check_found ( &pass, &output_branch_names ) )
             {
                 while ( !output_branch_names.empty() )
                 {
@@ -525,13 +529,13 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
             int most_probable_bin = local_histogram->GetMaximumBin();
             double most_probable_value = local_histogram->GetXaxis()->GetBinCenter ( most_probable_bin );
 
-            double param_rms = local_histogram->GetRMS ( 1 );
+            //double param_rms = local_histogram->GetRMS ( 1 );
 
 	    //  If the user requested to fir with the off function, don't fit to the data
             TString fit_type;
             if ( ( argc>4 ) && ( string ( argv[4] ).compare ( "off" ) !=0 ) )  fit_type.Append ( argv[4] );
 
-            double bin_scale = local_histogram->GetBinContent ( local_histogram->GetMaximumBin() );
+            //double bin_scale = local_histogram->GetBinContent ( local_histogram->GetMaximumBin() );
 
 
             //  Ignore unphysical RMS  it's the telltale sign of an empty TTree RapidFit spits out from fixed parameters in fit
@@ -546,7 +550,7 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 
                 cout << "Tree:\t" << tree_name << format_1 << "Branch_Name:\t" <<  output_branch_names[output_param_num] << format_2 << "most_probable_value:\t\t" << most_probable_value << " \\pm " << bin_width/2.0 << endl;
 
-		int newnum = OptimumBinNumber( local_histogram );
+		//int newnum = OptimumBinNumber( local_histogram );
 
                 TString Fit_Options ( "Q" );
 
@@ -572,7 +576,7 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 		//  This allows me to simply compare the dfferent fit functions to establish which provides the best fit solution based on chi_squared
 		//  I will only fit and plot the best fitting function and the rest of the code is unaware of the changes as the mean and sigma are in the same place for each
 
-                double mean,sigma,mean_err,sigma_err,error;
+                double mean=0,sigma=0,mean_err=0,sigma_err=0,error=0;
 
 		//  If the user has not selected a special function just fit a gaussian
 //		if( ( output_branch_names[output_param_num] != "error" ) )  {
@@ -679,7 +683,7 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
     Extensions.push_back( TString("C") );
     Extensions.push_back( TString("pdf") );
     TCanvas* temp_multi;
-    for( short int count1=0; count1<Param_FitResult_Plots.size(); count1++ )
+    for( unsigned int count1=0; count1<Param_FitResult_Plots.size(); count1++ )
     {
 	TString Param_Name = get_tuple_name ( Param_tree_path[count1] );
 	int sub_plots = Param_FitResult_Plots[count1].size();
@@ -687,11 +691,11 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 	temp_multi->Divide( sub_plots, 1 );
 	vector<TCanvas*> sub_canvas;
 
-	for( short int count2=0; count2<Param_FitResult_Plots[count1].size(); count2++ )
+	for( unsigned int count2=0; count2<Param_FitResult_Plots[count1].size(); count2++ )
 	{
 		TCanvas* local_canvas = new TCanvas( Param_FitResult_Names[count1][count2], Param_FitResult_Names[count1][count2], 1680, 1050);
-		double Hist_RMS = Param_FitResult_Plots[count1][count2]->GetRMS ( 1 );
-		double bin_scale = Param_FitResult_Plots[count1][count2]->GetBinContent ( Param_FitResult_Plots[count1][count2]->GetMaximumBin() );
+		//double Hist_RMS = Param_FitResult_Plots[count1][count2]->GetRMS ( 1 );
+		//double bin_scale = Param_FitResult_Plots[count1][count2]->GetBinContent ( Param_FitResult_Plots[count1][count2]->GetMaximumBin() );
 		Param_FitResult_Plots[count1][count2]->SetLineColor( line_colors[0] );
 		Param_FitResult_Plots[count1][count2]->SetLineWidth( mystyle_line_width() );
 		Param_FitResult_Plots[count1][count2]->GetYaxis()->SetTitle("Entries");
@@ -702,7 +706,7 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 		Param_FitResult_Plots[count1][count2]->SetTitle("");
 		if( GetOptimalBins( Param_FitResult_Plots[count1][count2] ) != 0 )
 		{
-			for( short int print_count=0; print_count < Extensions.size(); print_count++ )
+			for( unsigned int print_count=0; print_count < Extensions.size(); print_count++ )
 			{
 				if( left_handed_plot[count1][count2] )
 				{  gStyle->SetStatX(0.46);  gStyle->SetStatY(0.9);  gStyle->SetTitleX(0.8f);  }
@@ -721,7 +725,7 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 	}
 	if( GetOptimalBins( Param_FitResult_Plots[count1][0] ) != 0 )
 	{
-		for( short int print_count=0; print_count < Extensions.size(); print_count++ )
+		for( unsigned int print_count=0; print_count < Extensions.size(); print_count++ )
 		{
 		  temp_multi->Print(outputdir+"/"+Param_Name+"_all"+"."+Extensions[ print_count ]);
 		}

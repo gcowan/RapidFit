@@ -150,7 +150,7 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator c
 //Destructor
 Bs2JpsiPhi_SignalAlt_BaseClass::~Bs2JpsiPhi_SignalAlt_BaseClass()
 {
-	cout << "hello from BaseClass PDF" << endl;
+	//cout << "hello from BaseClass PDF" << endl;
 }
 
 

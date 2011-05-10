@@ -100,7 +100,7 @@ void Bs2JpsiPhi_SignalAlt_MO_dev::MakePrototypes()
 Bs2JpsiPhi_SignalAlt_MO_dev::~Bs2JpsiPhi_SignalAlt_MO_dev()
 {
 	
-	cout << " DESTRUCTOR CALLED =======================================================" << endl ;
+	//cout << " DESTRUCTOR CALLED =======================================================" << endl ;
 }
 
 //........................................................

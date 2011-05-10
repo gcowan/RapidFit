@@ -34,7 +34,8 @@ RapidFitIntegrator::RapidFitIntegrator() : ratioOfIntegrals(), cumulativeError()
 //Constructor with correct argument
 RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(), fastIntegrator(), functionToWrap(InputFunction), multiDimensionIntegrator(), oneDimensionIntegrator(), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), forceNumerical(ForceNumerical), cacheSetUp(false), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals()
 {
-	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
+	//						Want a high accuracy of final result, well 1E-2 or better... the error due to internal variables isn't too important
+	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim(1E-5, 1E-3, 100000000, 0);
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
 	oneDimensionIntegrator = new IntegratorOneDim(type);
 }
@@ -107,7 +108,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 
 					//Check validity of cache
 					double cachedIntegral = GetCachedIntegral(NewDataPoint);
-					if ( abs( cachedIntegral - numericalIntegral ) / numericalIntegral < INTEGRAL_PRECISION_THRESHOLD )
+					if ( fabs( cachedIntegral - numericalIntegral ) / numericalIntegral < INTEGRAL_PRECISION_THRESHOLD )
 					{
 						cout << "Integral caching assumptions seem to be valid: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
 					}
@@ -137,7 +138,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 
 				//Check validity of cache
 				double cachedIntegral = GetCachedIntegral(NewDataPoint);
-				if ( abs( cachedIntegral - numericalIntegral ) / numericalIntegral < INTEGRAL_PRECISION_THRESHOLD )
+				if ( fabs( cachedIntegral - numericalIntegral ) / numericalIntegral < INTEGRAL_PRECISION_THRESHOLD )
 				{
 					cout << "Integral caching assumptions seem to be valid: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
 				}
@@ -175,10 +176,12 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 	//If there are no observables left to integrate over, just evaluate the function
 	if ( doIntegrate.size() == 0 )
 	{
+		//cout << "size == 0" << endl;
 		return functionToWrap->Evaluate(NewDataPoint);
 	}
 	else
 	{
+		//cout << "size == " << doIntegrate.size() << endl;
 		//Make the function wrapper
 		IntegratorFunction quickFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate );
 
@@ -190,6 +193,7 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 			double minimum = newConstraint->GetMinimum();
 			double maximum = newConstraint->GetMaximum();
 
+			//cout << "1D Integration" << endl;
 			//Do a 1D integration
 			oneDimensionIntegrator->SetFunction(quickFunction);
 			return oneDimensionIntegrator->Integral( minimum, maximum );
@@ -206,6 +210,7 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 				maxima[observableIndex] = newConstraint->GetMaximum();
 			}
 
+			//cout << "MultiDim Integration" << endl;
 			//Do a 2-15D integration
 			multiDimensionIntegrator->SetFunction(quickFunction);
 			return multiDimensionIntegrator->Integral( minima, maxima );
@@ -219,7 +224,7 @@ double RapidFitIntegrator::ProjectObservable( DataPoint * NewDataPoint, PhaseSpa
 	//Make the list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 	dontIntegrate.push_back(ProjectThis);
-
+	//cout << "Projecting Observable : " << ProjectThis << endl;
 	return DoNumericalIntegral( NewDataPoint, NewBoundary, dontIntegrate );
 }
 

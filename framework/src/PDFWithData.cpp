@@ -40,7 +40,7 @@ PDFWithData::~PDFWithData()
 		delete dataSetMakers.back();
 		dataSetMakers.pop_back();
 	}
-	cout << "Hello from PDFWithData destructor" << endl;
+	//cout << "Hello from PDFWithData destructor" << endl;
 }
 
 //Return the PDF

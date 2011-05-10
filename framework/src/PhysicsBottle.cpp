@@ -32,7 +32,7 @@ PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) : allPDFs(), a
 //Destructor
 PhysicsBottle::~PhysicsBottle()
 {
-  	cout << "Hello from PhysicsBottle destructor" << endl;
+	//cout << "Hello from PhysicsBottle destructor" << endl;
 }
 
 //Store a PDF/dataset pair

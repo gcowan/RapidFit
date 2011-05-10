@@ -68,6 +68,8 @@
 IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters, PDFConfigurator configurator )
 {
 
+	IPDF* returnable_PDF = NULL;
+
 	vector<string> null_vec = PDFObservables;
 	vector<string> null_vec2 = PDFParameters;
 	while( !null_vec.empty() ) null_vec.pop_back();   // what are these lines for ???
@@ -76,18 +78,18 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 		if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
         {
 	        //Default JPsiPhi
-	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc();
+		returnable_PDF = new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc();
         }
 
 		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave" )
         {
 	        //Default JPsiPhi with s wave
-	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave();
+	        returnable_PDF = new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave();
         }
 		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms" )
         {
 	        //Default JPsiPhi with s wave
-	        return new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms();
+	        returnable_PDF = new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms();
         }
 		//else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
         //{
@@ -101,143 +103,143 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         //}
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v1" )
         {
-	        //JPsiPhi from Pete with sWave 
-	        return new Bs2JpsiPhi_SignalAlt_MP_v1();
+	        //JPsiPhi from Pete with sWave
+		returnable_PDF = new  Bs2JpsiPhi_SignalAlt_MP_v1();
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev" )
         {
 	        //JPsiPhi from Pete with sWave 
-	        return new Bs2JpsiPhi_SignalAlt_MP_dev(configurator);
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_dev(configurator);
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_noSwave" )
         {
 	        //JPsiPhi from Pete with sWave 
-	        return new Bs2JpsiPhi_SignalAlt_MP_noSwave();
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_noSwave();
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v1" )
         {
 	        //JPsiPhi from Pete with sWave 
-	        return new Bs2JpsiPhi_SignalAlt_MO_v1();
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v1();
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_dev" )
         {
 	        //JPsiPhi from Pete with sWave 
-	        return new Bs2JpsiPhi_SignalAlt_MO_dev(configurator);
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_dev(configurator);
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_noSwave" )
         {
 	        //JPsiPhi from Pete with sWave 
-	        return new Bs2JpsiPhi_SignalAlt_MO_noSwave();
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_noSwave();
         }
         else if ( Name == "Bs2PhiPhi" )
         {
 	        //Default PhiPhi
-                return new Bs2PhiPhi();
+                returnable_PDF = new Bs2PhiPhi();
         }
         else if ( Name == "Bs2DsPi" )
         {
                 // DsPi
-                return new Bs2DsPi();
+                returnable_PDF = new Bs2DsPi();
         }
         else if ( Name == "Bs2DsPi_mistagParameter" )
         {
 			// DsPi
-			return new Bs2DsPi_mistagParameter();
+			returnable_PDF = new Bs2DsPi_mistagParameter();
         }
         else if ( Name == "Bs2DsPi_acc" )
         {
 			// DsPi w. acceptance
-			return new Bs2DsPi_acc();
+			returnable_PDF = new Bs2DsPi_acc();
         }
         else if ( Name == "Bs2DsPiMassSignal" )
         {
                 //Default DsPi signal mass PDF
-                return new Bs2DsPiMassSignal();
+                returnable_PDF = new Bs2DsPiMassSignal();
         }
 		else if ( Name == "Bs2JpsiPhiMassSignal" )
         {
                 //Default JPsiPhi signal mass PDF
-                return new Bs2JpsiPhiMassSignal();
+                returnable_PDF = new Bs2JpsiPhiMassSignal();
         }
         else if ( Name == "Bs2DsPiBkg_withTimeRes" )
         {
 		// DsPi
-		return new Bs2DsPiBkg_withTimeRes();
+		returnable_PDF = new Bs2DsPiBkg_withTimeRes();
         }
 		else if ( Name == "Bs2JpsiPhiLongLivedBkg" )
         {
 	        //Long lived background for JPsiPhi
-                return new Bs2JpsiPhiLongLivedBkg();
+                returnable_PDF = new Bs2JpsiPhiLongLivedBkg();
         }
 		else if ( Name == "Bs2JpsiPhiLongLivedBkg_II" )
         {
 	        //Long lived background for JPsiPhi with different parameters
-			return new Bs2JpsiPhiLongLivedBkg_II();
+			returnable_PDF = new Bs2JpsiPhiLongLivedBkg_II();
         }
         else if ( Name == "Bs2JpsiPhiLongLivedBkg_withTimeRes" )
         {
                 //Long lived background for JPsiPhi with time resolution (convolved gaussian)
-                return new Bs2JpsiPhiLongLivedBkg_withTimeRes();
+                returnable_PDF = new Bs2JpsiPhiLongLivedBkg_withTimeRes();
         }
         else if ( Name == "Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist" )
         {
 			//Long lived background for JPsiPhi with time resolution (convolved gaussian)
-			return new Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist();
+			returnable_PDF = new Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist();
         }
         else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeRes" )
         {
 	        //Prompt background for JPsiPhi, with time resolution (convolved gaussian)
-		return new Bs2JpsiPhiPromptBkg_withTimeRes();
+		returnable_PDF = new Bs2JpsiPhiPromptBkg_withTimeRes();
         }
         else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeResDouble" )
         {
 	        //Prompt background for JPsiPhi, with time resolution (double convolved gaussian)
-			return new Bs2JpsiPhiPromptBkg_withTimeResDouble();
+			returnable_PDF = new Bs2JpsiPhiPromptBkg_withTimeResDouble();
         }
         else if ( Name == "Bs2JpsiPhiPromptBkg_tripleGaussian" )
         {
 	        //Prompt background for JPsiPhi, with time resolution (double convolved gaussian)
-			return new Bs2JpsiPhiPromptBkg_tripleGaussian();
+			returnable_PDF = new Bs2JpsiPhiPromptBkg_tripleGaussian();
         }
         else if ( Name == "Bs2JpsiPhiMassBkg" )
         {
                 //Default JPsiPhi prompt bkg mass signal
-                return new Bs2JpsiPhiMassBkg();
+                returnable_PDF = new Bs2JpsiPhiMassBkg();
 	}
         else if ( Name == "Exponential" )
         {
             	//Default JPsiPhi prompt bkg mass signal
-                return new Exponential();
+                returnable_PDF = new Exponential();
 	}
         else if ( Name == "Bs2JpsiPhiMassBkgLL" )
         {
 			//Default JPsiPhi prompt bkg mass signal
-			return new Bs2JpsiPhiMassBkgLL();
+			returnable_PDF = new Bs2JpsiPhiMassBkgLL();
 		}
 
 	else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc" )
         {
 			// Bd2JPsiKstar with analytic double gaussian time resolution
-			return new Bd2JpsiKstar_withTimeRes_withAverageAngAcc();
+			returnable_PDF = new Bd2JpsiKstar_withTimeRes_withAverageAngAcc();
         }
 
         else if ( Name == "Bd2JpsiKstar_sWave" )
         {
                          // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
-                         return new Bd2JpsiKstar_sWave();
+                         returnable_PDF = new Bd2JpsiKstar_sWave();
         }
 
 	else if ( Name == "Bd2JpsiKstar_sWave_rTerms" )
         {
                          // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
-                         return new Bd2JpsiKstar_sWave_rTerms();
+                         returnable_PDF = new Bd2JpsiKstar_sWave_rTerms();
         }
 
 
 	else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms" )
         {
                          // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
-                         return new Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms();
+                         returnable_PDF = new Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms();
         }
 
 	else
@@ -245,6 +247,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 		cerr << "Unrecognised PDF name: " << Name << endl;
 		exit(1);
 	}
+	return returnable_PDF;
 }
 
 //Look up the name of a fit function, and return an appropriate instance

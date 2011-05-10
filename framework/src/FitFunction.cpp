@@ -19,7 +19,7 @@ FitFunction::FitFunction() : allData(), allIntegrators(), testDouble(), useWeigh
 //Destructor
 FitFunction::~FitFunction()
 {
-  	cout << "Hello from FitFunction destructor" << endl;
+	//cout << "Hello from FitFunction destructor" << endl;
 }
 
 //Set the physics bottle to fit with

@@ -14,14 +14,20 @@
 #include <iostream>
 #include <stdlib.h>
 
-//Default constructor
-XMLTag::XMLTag(): children(), value(), name()
+//Default Constructor
+XMLTag::XMLTag() : children(), value(), name("RapidFit"), parent(NULL), path("RapidFit"), forbidden()
+{
+}
+
+//Default constructor w Overide tags
+XMLTag::XMLTag( vector<pair<string,string> >* Overide_Tags ): children(), value(), name("RapidFit"), parent(NULL), path("RapidFit"), forbidden(Overide_Tags)
 {
 }
 
 //Constructor with correct arguments
-XMLTag::XMLTag( string TagName, vector<string> TagContent ) : children(), value(), name(TagName)
+XMLTag::XMLTag( string TagName, vector<string> TagContent, XMLTag* Parent ) : children(), value(), name(TagName), parent(Parent), path(Parent->GetPath()), forbidden(Parent->GetForbidden())
 {
+	path.Append( "/" + name );
 	//Find the child tags
 	children = FindTagsInContent( TagContent, value );
 }
@@ -37,21 +43,69 @@ XMLTag::~XMLTag()
 	}
 }
 
+vector<pair<string,string> >* XMLTag::GetForbidden()
+{
+	return forbidden;
+}
+
+//Return the complete Path of the Object within the XML Structure
+string XMLTag::GetPath()
+{
+	return string( path.Data() );
+}
+
 //Return the tag name
 string XMLTag::GetName()
 {
-	return name;
+	string new_name = name;
+	return new_name;
 }
 
 //Return the children
 vector< XMLTag* > XMLTag::GetChildren()
 {
-	return children;
+	string NameStr="Name";
+	vector<string> children_names;
+	int NamePos=0;
+	for( vector<XMLTag*>::iterator child_i = children.begin(); child_i != children.end(); ++child_i )
+	{
+		children_names.push_back( (*child_i)->GetName() );
+	}
+	NamePos = StringProcessing::VectorContains( &children_names, &NameStr );
+	if( NamePos != -1  )
+	{
+		size_t found = string::npos;
+		found = string( path.Data() ).find( children[NamePos]->GetValue()[0] );
+		if( found == string::npos )
+		{
+			path.Append( "/" + children[NamePos]->GetValue()[0] );
+		}
+	}
+	vector<XMLTag*> new_children = children;
+	//cout << path << endl;
+	return new_children;
 }
 
 //Return the value
 vector<string> XMLTag::GetValue()
 {
+	vector<string> new_value = value;
+	path = parent->GetPath();
+	path.Append( "/" + name );
+	//cout << path << endl;
+	string pathStr = path.Data();
+	vector<string> forbidden_paths;
+	for( vector<pair<string,string> >::iterator fpath_i = forbidden->begin(); fpath_i != forbidden->end(); ++fpath_i )
+	{
+		forbidden_paths.push_back( fpath_i->first );
+	}
+	int TagPos = StringProcessing::VectorContains( &forbidden_paths, &pathStr );
+	if( TagPos != -1 )
+	{
+		value[0] = (*forbidden)[TagPos].second;
+		forbidden->erase(forbidden->begin()+TagPos);
+	}
+	//cout << path << "\t" << name << "\t" << "\t" << value[0] << endl;
 	if ( value.size() == 0 )
 	{
 		cerr << "Requested value of tag " << name << ", but the value is empty" << endl;
@@ -59,7 +113,7 @@ vector<string> XMLTag::GetValue()
 	}
 	else
 	{
-		return value;
+		return new_value;
 	}
 }
 
@@ -97,7 +151,7 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 
 			//Create the child tag
 			vector<string> childContent = FindTagContent( tagName, Content );
-			childTags.push_back( new XMLTag( tagName, childContent ) );
+			childTags.push_back( new XMLTag( tagName, childContent, this ) );
 		}
 	}
 
