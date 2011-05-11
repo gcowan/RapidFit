@@ -90,7 +90,7 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter( pair<string,int>* wanted_p
 		cerr << "PhysicsParameter " << wanted_param->first << " not found" <<endl;
 	}else{
 		return &allParameters[unsigned(wanted_param->second)];}
-	exit(-1);
+	throw(-20);
 }
 
 
@@ -102,7 +102,7 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter(string Name)
 	if ( nameIndex == -1 )
 	{
 		cerr << "PhysicsParameter " << Name << " not found" << endl;
-		exit(1);
+		throw(-20);
 		//return new PhysicsParameter( Name, 0.0, 0.0, 0.0, "Error", "NameNotFoundError");
 	}
 	else

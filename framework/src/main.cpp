@@ -97,7 +97,8 @@ int RapidFit( int argc, char * argv[] )
 		vector<string> Scan_X;
 		vector<string> Contour_X;
 		vector<string> Contour_Y;
-		vector<pair<string, string> >* XMLOverideList = new vector<pair<string,string> >;
+		vector<pair<string, string> >* XMLOverrideList = new vector<pair<string,string> >;
+		vector<string> CommandLineParam;
 
 		//Flags for which arguments have been received
 		bool numberRepeatsFlag = false;
@@ -296,7 +297,7 @@ int RapidFit( int argc, char * argv[] )
 					return 1;
 				}
 			}
-                        else if ( currentArgument == "--OverideXML" )
+                        else if ( currentArgument == "--OverrideXML" )
 			{
 				if ( argumentIndex + 2 < argc )
 				{
@@ -309,15 +310,30 @@ int RapidFit( int argc, char * argv[] )
 					temp_pair.second = value;
 					cout << endl;
 					cout << "WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING" << endl;
-					cout << "Overiding an XMLTag with:" << endl;
+					cout << "Overriding an XMLTag with:" << endl;
 					cout << "\t" << path << "\t" << value << endl;
+					cout << "NB:\t this is an expert option for complex situations which haven't been forseen in the design yet" << endl;
 					cout << "WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING" << endl << endl;
-					XMLOverideList->push_back( temp_pair );
+					XMLOverrideList->push_back( temp_pair );
 				}
 				else
 				{
-					cerr << "XML Overide not correctly defined!" << endl;
-					return 1;
+					cerr << "XML Override not correctly defined!" << endl;
+					return 32;
+				}
+			}
+			else if ( currentArgument == "--PhysParam" )
+			{
+				if ( argumentIndex +1 < argc )
+				{
+					++argumentIndex;
+					string PhysParam = argv[argumentIndex];
+					CommandLineParam.push_back( PhysParam );
+				}
+				else
+				{
+					cerr << "PhysParam not correctly defined at Runtime" << endl;
+					return 89;
 				}
 			}
 			else if ( currentArgument == "--testIntegrator" )
@@ -468,7 +484,7 @@ int RapidFit( int argc, char * argv[] )
 		XMLConfigReader* xmlFile=NULL;
 		if (configFileNameFlag)
 		{
-			xmlFile = new XMLConfigReader(configFileName, XMLOverideList);
+			xmlFile = new XMLConfigReader(configFileName, XMLOverrideList);
 			if ( xmlFile->IsLoaded() )
 			{
 				cout << "XML config file " << configFileName << " loaded" << endl;
@@ -658,7 +674,7 @@ int RapidFit( int argc, char * argv[] )
 			}
 			if (!parameterTemplateFlag)
 			{
-				argumentParameterSet = xmlFile->GetFitParameters();
+				argumentParameterSet = xmlFile->GetFitParameters( CommandLineParam );
 			}
 			if (!numberRepeatsFlag)
 			{

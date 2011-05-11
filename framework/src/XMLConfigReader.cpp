@@ -33,7 +33,7 @@ XMLConfigReader::XMLConfigReader() : All_XML_Tags(new XMLTag()), children(), isL
 }
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverideXML ) : All_XML_Tags(new XMLTag(OverideXML)), children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : All_XML_Tags(new XMLTag(OverrideXML)), children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -53,28 +53,38 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 	}
 	StringProcessing::RemoveWhiteSpace(wholeFile);
 
-	//Check the root tag is correct
-	if ( wholeFile[0] == "<RapidFit>" && wholeFile[ wholeFile.size() - 1 ] == "</RapidFit>" )
-	{
-		//Parse the first level tags
-		vector<string> middleOfFile;
-		for ( unsigned int lineIndex = 1; lineIndex < wholeFile.size() - 1; ++lineIndex )
-		{
-			middleOfFile.push_back( wholeFile[lineIndex] );
-		}
-		vector<string> value;
-		children = All_XML_Tags->FindTagsInContent( middleOfFile, value );
 
-		//Anything in "value" is considered debug data
-		for ( unsigned int valueIndex = 0; valueIndex < value.size(); ++valueIndex )
-		{
-			cout << value[valueIndex] << endl;
-		}
-	}
-	else
-	{
-		cerr << "Config file in wrong format: root tag is \"" << wholeFile[0] << "\" not \"<RapidFit>\"" << endl;
-		exit(1);
+//	THIS CAUSES MORE HEADACHES THAN IT FIXES WE WOULD LIKE TO MOVE TO USING A PROPER XML PARSER IN THE FUTURE ANYWAY!
+
+	//Check the root tag is correct
+//	if ( wholeFile[0] == "<RapidFit>" && wholeFile[ wholeFile.size() - 1 ] == "</RapidFit>" )
+//	{
+		//Parse the first level tags
+//		vector<string> middleOfFile;
+//	for ( unsigned int lineIndex = 1; lineIndex < wholeFile.size() -1; ++lineIndex )
+//	{
+//		middleOfFile.push_back( wholeFile[lineIndex] );
+//	}
+	vector<string> value;
+	vector<XMLTag*> File_Tags = All_XML_Tags->FindTagsInContent( wholeFile, value );
+	children = File_Tags[0]->GetChildren();
+
+//		//Anything in "value" is considered debug data
+//		for ( unsigned int valueIndex = 0; valueIndex < value.size(); ++valueIndex )
+//		{
+//			cout << value[valueIndex] << endl;
+//		}
+//	}
+//	else
+//	{
+//		cerr << "Config file in wrong format: root tag is \"" << wholeFile[0] << "\" not \"<RapidFit>\"" << endl;
+//		exit(1);
+//	}
+
+	if( ( File_Tags.size() != 1) || ( children.size() == 0 ) )
+	{	
+		cerr << "Error processing XMLFile" << endl;
+		exit( -234 );
 	}
 
 	isLoaded = true;
@@ -109,6 +119,53 @@ bool XMLConfigReader::IsLoaded()
 //	cerr << "ParameterSet tag not found in config file" << endl;
 //	exit(1);
 //}
+
+vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandLineParam )
+{
+	vector<ParameterSet*> RawParameters = XMLConfigReader::GetFitParameters();
+
+	for( unsigned int i=0; i < CommandLineParam.size() ; ++i )
+	{
+		vector<string> input_args = StringProcessing::SplitString( CommandLineParam[i], ',' );
+		if( input_args.size() != 5 )
+		{
+			cerr << "Cannot understand Physics Parameter info you passed at runtime" << endl;
+			exit(-598);
+		}
+		bool found_parameter=false;
+		for( unsigned int j=0; j < RawParameters.size(); ++j )
+		{
+			bool local_find = false;
+			PhysicsParameter* try_get_param=NULL;
+			try{
+				try_get_param = RawParameters[j]->GetPhysicsParameter( input_args[0] );
+				local_find = true;
+			}
+			catch( int e )
+			{
+				local_find = false;
+			}
+
+			if( local_find )
+			{
+				string Unit = try_get_param->GetUnit();
+				//					name			value
+				RawParameters[j]->SetPhysicsParameter( input_args[0], strtod(input_args[1].c_str(),NULL),
+									//			min			max			type
+									strtod(input_args[2].c_str(),NULL), strtod(input_args[3].c_str(),NULL), input_args[4], Unit );
+
+				found_parameter = local_find;
+			}
+		}
+		if( !found_parameter )
+		{
+			cerr << "Couldn't find parameter: " << input_args[0] << " exiting!" << endl;
+			exit(-345);
+		}
+	}
+
+	return RawParameters;
+}
 
 vector<ParameterSet*> XMLConfigReader::GetFitParameters()
 {
@@ -221,8 +278,14 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 				ScanParam* temp_SParam = GetScanParam( outputComponents[childIndex] );
 				ScanParameters.push_back( temp_SParam );
 			}
+			else if ( outputComponents[childIndex]->GetName() == "TwoDScan" )
+			{
+				pair<ScanParam*, ScanParam*> temp_2DScan = Get2DScanParam( outputComponents[childIndex] );
+				_2DScanParameters.push_back( temp_2DScan );
+			}
 			else if ( outputComponents[childIndex]->GetName() == "2DScan" )
 			{
+				cerr << "PLEASE MOVE YOUR XML TO THE NEW SYNTAX \'<TwoDScan>\' TO BE STANDARDS COMPLIANT!" << endl;
 				pair<ScanParam*, ScanParam*> temp_2DScan = Get2DScanParam( outputComponents[childIndex] );
 				_2DScanParameters.push_back( temp_2DScan );
 			}
@@ -1437,7 +1500,7 @@ pair<ScanParam*, ScanParam*> XMLConfigReader::Get2DScanParam( XMLTag * InputTag 
 	pair<ScanParam*, ScanParam*> Returnable_Pair;
 	ScanParam* Param_1=NULL;
 	ScanParam* Param_2=NULL;
-	if ( InputTag->GetName() == "2DScan" )
+	if ( ( InputTag->GetName() == "2DScan" ) || ( InputTag->GetName() == "TwoDScan" ) )
 	{
 		bool param1 = false;
 		bool param2 = false;

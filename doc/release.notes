@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/11 Rob Currie
+  - Removed the check for <RapidFit> </RapidFit> being the begining/end of a file (This causes more pain than it fixes when moving files between people)
+  - Added <TwoDScan> to replace <2DScan> Flags in XML for standards compliance old XML will still work... for now... consider the error messages a warning!
+  - Added command line option for editing a PhysicsParameter at runtime which can be accessed with '--PhysParam name,value,min,max,type'
+
 2011/05/10 Rob Currie
   - Properly added the ability to overide any tag within an XML from the command line for easier submittion of systematics after this was requested from multiple users...
     This time I wrote it properly, I pass a vector of pairs containing parameter address and new value down to the XMLTag class which now implements non-static functions

@@ -90,7 +90,8 @@ void PhysicsParameter::SetValue(double NewValue)
 //Get the blinded value
 double PhysicsParameter::GetBlindedValue()
 {
-	return value ;
+	double new_value = value;
+	return new_value ;
 }
 //Set the blinded value
 void PhysicsParameter::SetBlindedValue(double NewValue)
@@ -101,11 +102,13 @@ void PhysicsParameter::SetBlindedValue(double NewValue)
 //Get the true value
 double PhysicsParameter::GetTrueValue()
 {
+	double new_value=-9999;
 	if( toBeBlinded ) 
 	{
-		return value + blindOffset;   
+		new_value = value + blindOffset;   
 	}
-	else return value ;
+	else new_value = value ;
+	return new_value;
 }
 //Set the true value
 void PhysicsParameter::SetTrueValue(double NewValue)
@@ -128,7 +131,8 @@ double PhysicsParameter::GetMinimum()
 		cerr << "Minimum of unbounded parameter requested" << endl;
 	}
 
-	return minimum;
+	double new_minimum = minimum;
+	return new_minimum;
 }
 void PhysicsParameter::SetMinimum(double NewMinimum)
 {
@@ -156,8 +160,8 @@ double PhysicsParameter::GetMaximum()
 	{
 		cerr << "Maximum of unbounded parameter requested" << endl;
 	}
-
-	return maximum;
+	double new_maximum = maximum;
+	return new_maximum;
 }
 void PhysicsParameter::SetMaximum(double NewMaximum)
 {
@@ -216,7 +220,8 @@ void PhysicsParameter::SetLimits(double NewMaximum, double NewMinimum)
 //Get and set the type
 string PhysicsParameter::GetType()
 {
-	return type;
+	string new_type = type;
+	return new_type;
 }
 void PhysicsParameter::SetType(string NewType)
 {
@@ -226,7 +231,8 @@ void PhysicsParameter::SetType(string NewType)
 //Get the original value
 double PhysicsParameter::GetOriginalValue()
 {
-	return originalValue;
+	double new_originalValue= originalValue;
+	return new_originalValue;
 }
 
 void PhysicsParameter::ForceOriginalValue( double new_original_value )
@@ -237,7 +243,8 @@ void PhysicsParameter::ForceOriginalValue( double new_original_value )
 //Get the unit
 string PhysicsParameter::GetUnit()
 {
-	return unit;
+	string new_unit = unit;
+	return new_unit;
 }
 
 //Set blinding offset

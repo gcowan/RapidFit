@@ -19,8 +19,8 @@ XMLTag::XMLTag() : children(), value(), name("RapidFit"), parent(NULL), path("Ra
 {
 }
 
-//Default constructor w Overide tags
-XMLTag::XMLTag( vector<pair<string,string> >* Overide_Tags ): children(), value(), name("RapidFit"), parent(NULL), path("RapidFit"), forbidden(Overide_Tags)
+//Default constructor w Override tags
+XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path("RapidFit"), forbidden(Override_Tags)
 {
 }
 

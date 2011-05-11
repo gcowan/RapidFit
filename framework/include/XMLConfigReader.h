@@ -34,6 +34,7 @@ class XMLConfigReader
 		~XMLConfigReader();
 
 		//ParameterSet * GetFitParameters();
+		vector<ParameterSet*> GetFitParameters( vector<string> );
 		vector<ParameterSet*> GetFitParameters();
 		MinimiserConfiguration * GetMinimiserConfiguration();
 		FitFunctionConfiguration * GetFitFunctionConfiguration();
