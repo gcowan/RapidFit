@@ -241,8 +241,8 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::Evaluate(DataPoint * measurement)
 	//conditions to throw exception
 	bool c1 = isnan(returnValue) ;
 	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
-	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&(fabs(resolution2-0.)<DOUBLE_TOLERANCE)) && (returnValue <= 0.) && (t>0.) ;
-	
+	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&((fabs(resolution2-0.)<DOUBLE_TOLERANCE))) && (returnValue <= 0.) && (t>0.) ;
+
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
 		cout << " Bs2JpsiPhi_SignalAlt_MO_dev::evaluate() returns <=0 or nan :" << returnValue << endl ;
