@@ -149,11 +149,24 @@ vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandL
 			if( local_find )
 			{
 				string Unit = try_get_param->GetUnit();
-				//					name			value
-				RawParameters[j]->SetPhysicsParameter( input_args[0], strtod(input_args[1].c_str(),NULL),
-									//			min			max			type
-									strtod(input_args[2].c_str(),NULL), strtod(input_args[3].c_str(),NULL), input_args[4], Unit );
 
+				//		min			-		max			< 	1E-5
+
+				double max = strtod(input_args[3].c_str(),NULL);
+				double min = strtod(input_args[2].c_str(),NULL);
+				double val = strtod(input_args[1].c_str(),NULL);
+
+				if( ( fabs( min - max ) < 	1E-6 ) && ( max < 1E-6 ) )
+				{
+					//		Unbounded				name	value	type		unit
+					PhysicsParameter* new_param = new PhysicsParameter( input_args[0], val , input_args[4], Unit);
+					RawParameters[j]->SetPhysicsParameter( input_args[0], new_param );
+				}
+				else
+				{
+					//					name	val	min	max	type		unit
+					RawParameters[j]->SetPhysicsParameter( input_args[0], val, min, max, input_args[4], Unit );
+				}
 				found_parameter = local_find;
 			}
 		}

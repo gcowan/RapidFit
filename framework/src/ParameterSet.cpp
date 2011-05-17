@@ -124,8 +124,9 @@ bool ParameterSet::SetPhysicsParameter( string Name, PhysicsParameter * NewPhysi
 	}
 	else
 	{
+		//	Copy the new parameter into the old one so no need to delete anything
 		allParameters[unsigned(nameIndex)] = *NewPhysicsParameter;
-                return true;
+		return true;
 	}
 }
 
