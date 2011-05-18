@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/18 Rob Currie
+  - Fixed a bug in --OverrideXML flag
+
 2011/05/17 Rob Currie
   - Fixed a bug in the --PhysParam flag which caused parameters defined without a limit i.e. max==min=0.0 to have their value set to 0 as well, it now generates a free value with the given value
 

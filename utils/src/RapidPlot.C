@@ -873,7 +873,7 @@ int main( int argc, char* argv[] )
 
 	//	Switches for different plotting
 	bool CV_Drift = false;
-	bool Want_Physics_Params = true;
+	bool Want_Physics_Params = false;
 	bool want_FC = true;
 
 	if( argc == 6 )
