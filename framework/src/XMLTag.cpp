@@ -105,7 +105,7 @@ vector<string> XMLTag::GetValue()
 		new_value[0] = (*forbidden)[TagPos].second;
 		forbidden->erase(forbidden->begin()+TagPos);
 	}
-	cout << path << "\t" << name << "\t" << "\t" << new_value[0] << endl;
+	//cout << path << "\t" << name << "\t" << "\t" << new_value[0] << endl;
 	if ( value.size() == 0 )
 	{
 		cerr << "Requested value of tag " << name << ", but the value is empty" << endl;
