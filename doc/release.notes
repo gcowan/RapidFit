@@ -1,12 +1,18 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
 2011/05/23 Rob Currie
+  - Slightly altered --saveOneDataSet to use less memory when handling large datasets
+  - Altered the RapidFitIntegrator to have variable behaviour depending on how it is intended to be used (i.e. less accuracy more speed for pulls) whilst having default ROOT behaviour for other uses (MC generation)
+  - Added virtual destructors for all Interface classes not having such (this gets rid of a memory leak poentital our end in RapidFit)
+      TFoam still appears to be largely memory resident throughout toys, however spikes in memory usage at generation have been tracked to the use of ROOTs multiple dimentional integration tool which we make use of
+      We don't destroy data associated with toys during toy studies (This is not an issue right now, but will likely hurt anyone doing studies at 2fb^-1)
+
+2011/05/23 Rob Currie
   - Added the ability to sort a dataset accoring to a particlar Observable, this could allow caching of certain calculations, however this IS NOT enabled in the code, although it doesn't change the fit result
       This can easily be adapted to allow for a PDF to request the data to be sorted in a certain way for faster processing under certain conditions
       This was added partly because I was bored and partly because this could allow for you to speed up the MO pdf by sorting the events in time which reduces A the complexity of time acceptance and B speeds it up
   - Adding the ability to select where in the input file you start the fit from
-      This is a new XMLTag which is a child of <DataSet> and is used as:  <StartingEntry>10000</StartingEntry>   to start reading data from the 10000th entry in an ntuple
-      
+      This is a new XMLTag which is a child of <DataSet> and is used as:  <StartingEntry>10000</StartingEntry>   to start reading data from the 10000th entry in an ntuple  
 
 2011/05/18 Rob Currie
   - Fixed a bug in --OverrideXML flag

@@ -19,6 +19,7 @@ class IDataGenerator
 	public:
 		virtual int GenerateData(int) = 0;
 		virtual IDataSet * GetDataSet() = 0;
+		virtual ~IDataGenerator() {};
 };
 
 #endif

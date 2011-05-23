@@ -87,7 +87,7 @@ void Foam::Init()
 
 		TFile* MC_Cache = NULL;
 		TFoam * foamGenerator = NULL;
-		
+
 		if( !InputPDF->GetMCCacheStatus() )
 		{
 			cout << "FOAM NOT Cached, Generating Foam:\t" << Name << endl;
@@ -106,6 +106,9 @@ void Foam::Init()
 			foamGenerator->SetChat( 0 );		//	0	verbosity
 			foamGenerator->SetMaxWtRej( 1.1 );	//	1.1	Unknown what effect this has, something to do with weights
 			foamGenerator->Initialize();
+//			foamGenerator->ResetPseRan( rootRandom );
+//			foamGenerator->ResetRho( combinationFunction );	//	Can afford to Boot Foam's ability if we're using just one cached instance :D
+//			foamGenerator->Initialize();
 			//	As we haven't cached yet, write to file
 			foamGenerator->Write(Name);
 			cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
@@ -113,15 +116,15 @@ void Foam::Init()
 			MC_Cache->Write();
 		} else {
 			cout << "FOAM Cached, Re-Aquiring TFOAM TObject:\t" << Name << endl;
-			MC_Cache = new TFile( RootName, "READ" );
+			MC_Cache = new TFile( RootName, "UPDATE" );
 			//gDirectory->ls();
 			//Cached_Files.back()->Map();
 			//Cached_Files.back()->ShowStreamerInfo();
 			//Cached_Files.back()->GetListOfKeys()->Print();
 			foamGenerator = (TFoam*) MC_Cache->Get( Name );
 			cout << "Checking Consistancy, will crash if this fails... this is unavoidable" << endl;
-			foamGenerator->SetPseRan( rootRandom );
-			foamGenerator->SetRho( combinationFunction );
+			foamGenerator->ResetPseRan( rootRandom );
+			foamGenerator->ResetRho( combinationFunction );
 			foamGenerator->SetChat( 0 );
 			//	Make one event here to check everything was processed correctly
 			foamGenerator->MakeEvent();

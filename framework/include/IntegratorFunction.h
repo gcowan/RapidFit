@@ -41,7 +41,7 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		virtual IntegratorFunction & operator=( const IntegratorFunction& );
 
 	private:
-		//	Uncopyable!
+		//	Uncopyable This Way!
 		IntegratorFunction ( const IntegratorFunction& );
 //		IntegratorFunction& operator = ( const IntegratorFunction& );
 		//Interface function

@@ -37,6 +37,7 @@ Plotter::Plotter(): weightName(), plotPDF(), plotData(), pdfIntegrator(), weight
 //Constructor with correct arguments
 Plotter::Plotter( IPDF * NewPDF, IDataSet * NewDataSet ) : weightName(), plotPDF(NewPDF), plotData(NewDataSet), pdfIntegrator( new RapidFitIntegrator(NewPDF) ), weightsWereUsed(false)
 {
+	pdfIntegrator->ProjectionSettings();
 }
 
 //Destructor
@@ -99,7 +100,7 @@ void Plotter::PlotObservables( string FileName, vector<string> ObservableNames )
 			MakeObservablePlots( ObservableNames[observableIndex], allCombinations, combinationWeights, combinationDescriptions, rootFile );
 		}
 	}
-	
+
 	rootFile->Close();
 }
 
@@ -119,7 +120,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	vector<double> observableValues = GetStatistics( ObservableName, minimum, maximum, binNumber );
 	double binInterval = ( maximum - minimum ) / (double)binNumber;
 
-	
+
 	//New code to deal with weighted events
 	vector<double> observableWeights ;
 	double normalisationFactor=0. ;
@@ -130,7 +131,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		for( unsigned int iw=0;iw<observableWeights.size();iw++) sumWeights+=observableWeights[iw];
 		normalisationFactor = sumWeights/double(observableWeights.size()) ;
 	}
-	
+
 	//Make the histogram
 	string histogramName = ObservableName + "ProjectionPlot";
 	string histogramTitle = "";
@@ -141,8 +142,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	//Loop over all data points and add them to the histogram
 	for (unsigned int dataIndex = 0; dataIndex < observableValues.size(); dataIndex++)
 	{
-		if( weightsWereUsed ) dataHistogram->Fill( observableValues[dataIndex], observableWeights[dataIndex] / normalisationFactor ); 
-		else dataHistogram->Fill( observableValues[dataIndex] );   
+		if( weightsWereUsed ) dataHistogram->Fill( observableValues[dataIndex], observableWeights[dataIndex] / normalisationFactor );
+		else dataHistogram->Fill( observableValues[dataIndex] );
 	}
 
 	//Histogram complete
@@ -161,7 +162,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	double averageIntegral = 0.0;
 	double plotInterval;
 	double ratioOfIntegrals = 1.;
-		
+
 	int plotNumber;
 	if (ObservableName == "time") plotNumber = 256;
 	else plotNumber = 128;
@@ -180,7 +181,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		vector<double> projectionValueVector = ProjectObservable( AllCombinations[combinationIndex], ObservableName, minimum, maximum, plotNumber, plotInterval );
 		double projectionIntegral = pdfIntegrator->Integral( &( AllCombinations[combinationIndex] ), plotData->GetBoundary(), true );
 		ratioOfIntegrals = pdfIntegrator->GetRatioOfIntegrals();
-		
+
 		//Update the data average values, and make the projection graph arrays
 		double* projectionValueArray = new double[unsigned(plotNumber)];
 		double* observableValueArray = new double[unsigned(plotNumber)];
@@ -202,7 +203,7 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 		MakePlotCanvas( ObservableName, CombinationDescriptions[combinationIndex], dataHistogram, observableValueArray, projectionValueArray, plotNumber );
 		cout << "Finished combination " << combinationIndex+1 << " of " << AllCombinations.size() << endl;
 	}
-	
+
 
 	//Projecting complete
 	/////////////////////////////////////////////////////////////////////
@@ -234,14 +235,14 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 	TMultiGraph * graph = new TMultiGraph();
 	TGraphErrors * projectionGraph = new TGraphErrors( PlotNumber, ProjectionXValues, ProjectionYValues );
 	graph->Add(projectionGraph);
-	
+
 	//Formatting
 	projectionGraph->SetLineColor(2);
 	projectionGraph->SetLineWidth(4);
 	string xTitle = ObservableName + " (" + plotData->GetDataPoint(0)->GetObservable(ObservableName)->GetUnit() + ")";
 	Histogram->GetXaxis()->SetTitle( xTitle.c_str() );
 	Histogram->GetYaxis()->SetTitle( "Events" );
-	
+
 	string drawOptions = "C";
 	//Note "same" option is not required if graph is drawn second. "A" option - requesting axes - will overwrite whatever was there before
 
@@ -260,7 +261,7 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 
 //	double ymin = Histogram->GetBinContent(Histogram->GetMinimumBin());
 	double ymax = Histogram->GetBinContent(Histogram->GetMaximumBin());
-	
+
 	if (ObservableName == "time" || ObservableName == "B_s_TAU"){
 		// Attempted hack to get round the fact that ROOT is rubbish!
 		//TH1F * tmpHist = new TH1F("tmp", "tmp", 1, -2., -1.);
@@ -270,23 +271,23 @@ void Plotter::MakePlotCanvas( string ObservableName, string Description, TH1F * 
 		bothPlots->SetLogy();
 		Histogram->GetXaxis()->SetRangeUser(-2., 15.); // This does not work because of STUPID ROOT!!
 		Histogram->GetYaxis()->SetRangeUser(0.1, 2*ymax);
-		//projectionGraph->SetMinimum(-2.); // Don't think this works either	
+		//projectionGraph->SetMinimum(-2.); // Don't think this works either
 	}
 	else
 	{
 		Histogram->GetYaxis()->SetRangeUser(0., ymax + ymax/3.);
 	}
 
-	TPaveText *lhcb7TeVPrelimR = new TPaveText(0.65, 
-					   0.75, 
-					   0.90, 
-					   0.85, 
+	TPaveText *lhcb7TeVPrelimR = new TPaveText(0.65,
+					   0.75,
+					   0.90,
+					   0.85,
 					   "BRNDC");
 	lhcb7TeVPrelimR->SetFillColor(0);
 	lhcb7TeVPrelimR->SetTextAlign(12);
 	lhcb7TeVPrelimR->SetBorderSize(0);
 	lhcb7TeVPrelimR->AddText("#splitline{#splitline{LHCb}{Preliminary}}{#scale[0.7]{#sqrt{s} = 7 TeV}}");
-	
+
 	Histogram->Draw("E1");
 	graph->Draw( drawOptions.c_str() );
 	lhcb7TeVPrelimR->Draw();
@@ -461,7 +462,7 @@ vector<DataPoint> Plotter::GetDiscreteCombinations( vector<double> & DataPointWe
 
 
 //Setting knowledge that weights were uses
-void Plotter::SetWeightsWereUsed( string _weightName ) 
+void Plotter::SetWeightsWereUsed( string _weightName )
 {
 	weightsWereUsed = true ;
 	weightName = _weightName ;

@@ -28,7 +28,7 @@ class Foam : public IDataGenerator
 	public:
 		Foam();
 		Foam( PhaseSpaceBoundary*, IPDF* );
-		~Foam();
+		virtual ~Foam();
 
 		//Interface functions
 		virtual int GenerateData(int);

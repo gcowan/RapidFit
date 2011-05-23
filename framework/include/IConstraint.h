@@ -41,6 +41,8 @@ class IConstraint
 
 		//Return whether the observable is discrete
 		virtual bool IsDiscrete() = 0;
+
+		virtual ~IConstraint() {};
 };
 
 #endif

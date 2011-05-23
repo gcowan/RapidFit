@@ -550,7 +550,9 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 
                 cout << "Tree:\t" << tree_name << format_1 << "Branch_Name:\t" <<  output_branch_names[output_param_num] << format_2 << "most_probable_value:\t\t" << most_probable_value << " \\pm " << bin_width/2.0 << endl;
 
-		//int newnum = OptimumBinNumber( local_histogram );
+		int newnum = OptimumBinNumber( local_histogram );
+
+		(void) newnum;
 
                 TString Fit_Options ( "Q" );
 

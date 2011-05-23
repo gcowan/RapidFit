@@ -98,7 +98,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		else if( allNames[nameIndex] == "alphaM_pr" )	STEP_SIZE = 0.0001;
 		else STEP_SIZE = 0.001;
 */	
-		cout << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
+		//cout << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
 
 		
 		//Make bounded or unbounded parameters

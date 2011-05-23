@@ -35,20 +35,22 @@ RapidFitIntegrator::RapidFitIntegrator() : ratioOfIntegrals(), cumulativeError()
 //Constructor with correct argument
 RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(), fastIntegrator(), functionToWrap(InputFunction), multiDimensionIntegrator(), oneDimensionIntegrator(), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), forceNumerical(ForceNumerical), cacheSetUp(false), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals()
 {
-	//						Want a high accuracy of final result, well 1E-2 or better... the error due to internal variables isn't too important
-//	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim(1E-5, 1E-3, 100000000, 0);
-	//	Apparently Can't do that in ROOT pre 5.27 or 5.28... not pleased by this!
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
-	multiDimensionIntegrator->SetAbsTolerance( 1E-5 );	//	Absolute error for things such as plots
-
-//	Thse functions only exist with ROOT > 5.26 I think, at least they exist in 5.28/29
-#if ROOT_VERSION_CODE > ROOT_VERSION(5,26,0)
-	multiDimensionIntegrator->SetRelTolerance( 1E-3 );
-	multiDimensionIntegrator->SetMaxPts( 100000000 );
-#endif
+	multiDimensionIntegrator->SetAbsTolerance( 1E-9 );
 
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
 	oneDimensionIntegrator = new IntegratorOneDim(type);
+}
+
+//	Don't want the projections to be insanely accurate
+void RapidFitIntegrator::ProjectionSettings()
+{
+	//	These functions only exist with ROOT > 5.26 I think, at least they exist in 5.28/29
+	#if ROOT_VERSION_CODE > ROOT_VERSION(5,26,0)
+		multiDimensionIntegrator->SetAbsTolerance( 1E-5 );	//	Absolute error for things such as plots
+		multiDimensionIntegrator->SetRelTolerance( 1E-3 );
+		multiDimensionIntegrator->SetMaxPts( 100000000 );
+	#endif
 }
 
 //Destructor

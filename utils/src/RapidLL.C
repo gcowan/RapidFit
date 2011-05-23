@@ -243,16 +243,18 @@ int main( int argc, char* argv[] )
 		param_error = new TLine( 0.16-0.02, error, 0.16+0.02, error);
         } else if( Param_Of_Choice == "delta_para" )
         {
-		param_error = new TLine( 2.5-0.24, error, 2.5+0.24, error);
+		param_error = new TLine( 2.5-0.1, error, 2.5+0.1, error);
         } else if( Param_Of_Choice == "delta_perp" )
         {
 		param_error = new TLine( -0.17-0.5, error, -0.17+0.5, error);
         } else if( Param_Of_Choice == "Phi_s" )
         {
-		param_error = new TLine( 0.-0.29, error, 0.+0.29, error);
+		param_error = new TLine( 0.-0.25, error, 0.+0.25, error);
         }
 
 	param_error->SetLineColor( Color_t(2) );
+	param_error->SetLineWidth( 10 );
+	error_line->SetLineWidth( 10 );
 	error_line->Draw();
 	param_error->Draw();
 	new_canvas->Update();

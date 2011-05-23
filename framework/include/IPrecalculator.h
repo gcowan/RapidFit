@@ -17,6 +17,7 @@ class IPrecalculator
 {
 	public:
 		virtual IDataSet * ProcessDataSet( IDataSet* ) = 0;
+		virtual ~IPrecalculator() {};
 };
 
 #endif

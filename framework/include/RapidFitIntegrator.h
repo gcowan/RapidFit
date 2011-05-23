@@ -29,13 +29,15 @@ class RapidFitIntegrator
 		RapidFitIntegrator( IPDF*, bool ForceNumerical = false );
 		~RapidFitIntegrator();
 
+		void ProjectionSettings();
+
 		double Integral( DataPoint*, PhaseSpaceBoundary*, bool UseCache = false );
 		double ProjectObservable( DataPoint*, PhaseSpaceBoundary*, string );
 		double GetRatioOfIntegrals();
 		IPDF * GetPDF();
 		void UpdateIntegralCache( PhaseSpaceBoundary* );
 		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string> );
-	
+
 	private:
 		//	Uncopyable!
 		RapidFitIntegrator ( const RapidFitIntegrator& );
@@ -50,7 +52,7 @@ class RapidFitIntegrator
 		bool testFast;
 		FoamIntegrator * fastIntegrator;
 		//BenIntegrator * fastIntegrator;
-		
+
 		IPDF * functionToWrap;
 		AdaptiveIntegratorMultiDim * multiDimensionIntegrator;
 		IntegratorOneDim * oneDimensionIntegrator;

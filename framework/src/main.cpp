@@ -27,6 +27,7 @@
 #include "main.h"
 #include "DataSetConfiguration.h"
 #include "IDataSet.h"
+#include "StringProcessing.h"
 //  System Headers
 #include <string>
 #include <vector>
@@ -525,29 +526,35 @@ int RapidFit( int argc, char * argv[] )
 			{
 				//Make a file containing toy data from the PDF
 				vector<PDFWithData*> quickDataGen = xmlFile->GetPDFsAndData();
-				vector<IDataSet*> quickDataSet;
 				for( unsigned int i=0; i< quickDataGen.size(); ++i )
 				{
+					vector<IDataSet*> quickDataSet;
 					quickDataGen[i]->SetPhysicsParameters( xmlFile->GetFitParameters() );
 					IDataSet* temp_dataSet = quickDataGen[i]->GetDataSet();
 					quickDataSet.push_back( temp_dataSet );
+					string ext_dot=".";
+					vector<string> temp_strings = StringProcessing::SplitString( saveOneDataSetFileName, *(ext_dot.c_str()) );
+					TString FileName_Pre_Suffix = StringProcessing::CondenseStrings( temp_strings, 0, int(temp_strings.size() -1) );
+					TString number;
+					if( i > 0){ number.Append("_"); number+=i; }
+					TString real_saveOneDataSetFileName = TString( FileName_Pre_Suffix + number + ".root" );
+					ResultFormatter::MakeRootDataFile( string(real_saveOneDataSetFileName.Data()), quickDataSet );
+					delete temp_dataSet;
 				}
 
-				if( quickDataGen.size() != quickDataSet.size() )
-				{	
-					cerr << "Unexpected, Unexplained, Error... Goodbye!" << endl;
-					exit(-53);
-				}
+//				if( quickDataGen.size() != quickDataSet.size() )
+//				{
+//					cerr << "Unexpected, Unexplained, Error... Goodbye!" << endl;
+//					exit(-53);
+//				}
 
-				ResultFormatter::MakeRootDataFile( saveOneDataSetFileName, quickDataSet );
-
-				while( !quickDataGen.empty() )
-				{
-					delete quickDataGen.back();
-					delete quickDataSet.back();
-					quickDataGen.pop_back();
-					quickDataSet.pop_back();
-				}
+//				while( !quickDataGen.empty() )
+//				{
+//					delete quickDataGen.back();
+//					delete quickDataSet.back();
+//					quickDataGen.pop_back();
+//					quickDataSet.pop_back();
+//				}
 			}
 			else
 			{
@@ -904,14 +911,14 @@ int RapidFit( int argc, char * argv[] )
 				{
 					vector<unsigned int> numberRepeatsVec;
 					if( numberRepeatsFlag ) numberRepeatsVec.push_back( unsigned(numberRepeats) );
-					
+
 					//	Do FC scan
 					ToyStudyResult* AllFCResults = FitAssembler::FeldmanCousins( GlobalFitResult, _2DResultForFC, numberRepeatsVec, unsigned(int(Nuisencemodel)), FC_Debug_Flag, makeOutput, theMinimiser, theFunction,  xmlFile, pdfsAndData );
 
 					//		STORE THE OUTPUT OF THE TOY STUDIES
 					ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );
 				}
-			
+
 				while( !XMLConstraints.empty() )
 				{
 					delete XMLConstraints.back();
