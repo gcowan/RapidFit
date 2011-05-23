@@ -343,6 +343,7 @@ int RapidFit( int argc, char * argv[] )
 			else if ( currentArgument == "--testRapidIntegrator" )
 			{
 				testRapidIntegratorFlag = true;
+				(void) testRapidIntegratorFlag;
 			}
 			else if ( currentArgument == "--calculateAcceptanceWeights" )
 			{

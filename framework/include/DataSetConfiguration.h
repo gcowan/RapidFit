@@ -23,7 +23,7 @@ class DataSetConfiguration
 {
 	public:
 		DataSetConfiguration();
-		DataSetConfiguration( string, long, string, vector<string>, vector<string> );
+		DataSetConfiguration( string, long, string, vector<string>, vector<string>, int=0 );
 		DataSetConfiguration( string, long, string, vector<string>, vector<string>, IPDF* );
 		~DataSetConfiguration();
 
@@ -48,6 +48,7 @@ class DataSetConfiguration
 		vector<string> arguments, argumentNames;
 		IPDF * generatePDF;
 		bool separateGeneratePDF, parametersAreSet;
+		int Start_Entry;
 };
 
 #endif

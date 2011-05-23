@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/23 Rob Currie
+  - Added the ability to sort a dataset accoring to a particlar Observable, this could allow caching of certain calculations, however this IS NOT enabled in the code, although it doesn't change the fit result
+      This can easily be adapted to allow for a PDF to request the data to be sorted in a certain way for faster processing under certain conditions
+      This was added partly because I was bored and partly because this could allow for you to speed up the MO pdf by sorting the events in time which reduces A the complexity of time acceptance and B speeds it up
+  - Adding the ability to select where in the input file you start the fit from
+      This is a new XMLTag which is a child of <DataSet> and is used as:  <StartingEntry>10000</StartingEntry>   to start reading data from the 10000th entry in an ntuple
+      
+
 2011/05/18 Rob Currie
   - Fixed a bug in --OverrideXML flag
 

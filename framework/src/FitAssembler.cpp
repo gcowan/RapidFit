@@ -56,6 +56,9 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		BottleData[resultIndex]->SetPhysicsParameters(BottleParameters);
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
+
+//		Requested_DataSet->SortBy("time");
+
 		bottle->AddResult( Requested_PDF, Requested_DataSet );
 	}
 

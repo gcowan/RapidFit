@@ -28,9 +28,13 @@ class DataPoint
 
 		vector<string> GetAllNames();
 		Observable * GetObservable( pair<string,int>* );	//  Return wanted parameter & cache lookup ref
-		Observable * GetObservable( string );
+		Observable * GetObservable( string const );
+		Observable const* GetSafeObservable( string const ) const;
 		bool SetObservable( string, Observable* );
 		bool SetObservable( const string, const double, const double, const string, const bool=false, const int=-1);
+
+		//	Wanted for sorting datapoints
+		bool operator() ( pair<DataPoint , pair<string,int> >, pair<DataPoint , pair<string,int> > );
 
 	private:
 		vector<Observable> allObservables;

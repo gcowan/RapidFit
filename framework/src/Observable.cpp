@@ -33,7 +33,7 @@ Observable::~Observable()
 }
 
 //Get and set the value
-double Observable::GetValue()
+double Observable::GetValue() const
 {
 	return value;
 }

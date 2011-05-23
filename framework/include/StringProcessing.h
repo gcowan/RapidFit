@@ -28,7 +28,7 @@ class StringProcessing
 		static string ReplaceString( string&, string, string );
 		static void RemoveWhiteSpace( vector<string>& );
 		static vector<string> CombineUniques( vector<string>, vector<string> );
-		static int VectorContains( vector<string>*, string* );
+		static int VectorContains( vector<string> const*, string const* );
 		static TString CondenseStrings( vector<string>, int, int );
 };
 

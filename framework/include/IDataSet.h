@@ -21,6 +21,7 @@ class IDataSet
 		virtual bool AddDataPoint( DataPoint* ) = 0;
 		virtual int GetDataNumber() = 0;
 		virtual PhaseSpaceBoundary * GetBoundary() = 0;
+		virtual void SortBy( string ) = 0;
 };
 
 #endif

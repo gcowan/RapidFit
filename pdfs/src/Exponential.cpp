@@ -98,8 +98,7 @@ double Exponential::buildPDFnumerator()
 
 double Exponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-	DataPoint* null_p = measurement;
-	null_p = NULL;
+	(void) measurement;
 	IConstraint * timeBound = boundary->GetConstraint( timeName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{

@@ -267,9 +267,9 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 //The function to pass to Minuit
 void Function( int & npar, double * grad, double & fval, double * xval, int iflag )
 {
-	int null_i = npar; null_i = 0;
-	double null_d = *grad; null_d = 0;
-	int null_i2 = iflag; null_i2 = 0;
+	(void) npar;
+	(void) *grad;
+	(void) iflag;
 	ParameterSet * temporaryParameters = MinuitWrapper::function->GetParameterSet();
 	
 	if ( temporaryParameters->SetPhysicsParameters(xval) )

@@ -12,6 +12,7 @@
 
 //	RapidFit Headers
 #include "IDataSet.h"
+#include "DataPoint.h"
 //	System Headers
 #include <vector>
 
@@ -31,14 +32,19 @@ class MemoryDataSet : public IDataSet
 		virtual int GetDataNumber();
 		virtual PhaseSpaceBoundary * GetBoundary();
 
+		virtual void SortBy( string );
+
 		void Clear();
 
 	private:
 		//	Uncopyable!
-		MemoryDataSet ( const MemoryDataSet& );
-		MemoryDataSet& operator = ( const MemoryDataSet& );
+		//MemoryDataSet ( const MemoryDataSet& );
+		//MemoryDataSet& operator = ( const MemoryDataSet& );
 		vector<DataPoint> allData;
 		PhaseSpaceBoundary * dataBoundary;
+
 };
+
+bool compare_datapoints ( pair<DataPoint,pair<string,int> > first, pair<DataPoint,pair<string,int> > second );
 
 #endif

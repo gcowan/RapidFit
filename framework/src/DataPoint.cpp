@@ -46,7 +46,7 @@ Observable * DataPoint::GetObservable( pair<string,int>* wanted_param )
 {
 	if( wanted_param->second != -1 )
 	{
-		return &allObservables[unsigned(wanted_param->second)];
+		return &allObservables[(unsigned)wanted_param->second];
 	} else {
 		wanted_param->second = StringProcessing::VectorContains( &allNames, &(wanted_param->first) );
 	}
@@ -59,7 +59,7 @@ Observable * DataPoint::GetObservable( pair<string,int>* wanted_param )
 
 //Retrieve an observable by its name
 //	!!!THIS IS VERY, VERY, VERY WASTEFUL FOR LARGE DATASETS!!!
-Observable * DataPoint::GetObservable(string Name)
+Observable * DataPoint::GetObservable(string const Name)
 {
 	//Check if the name is stored in the map
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
@@ -73,6 +73,23 @@ Observable * DataPoint::GetObservable(string Name)
 	{
 		return &allObservables[unsigned(nameIndex)];
 	}
+}
+
+Observable const * DataPoint::GetSafeObservable( string const Name ) const
+{
+        //Check if the name is stored in the map
+        int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
+        if ( nameIndex == -1 )
+        {
+                cerr << "Observable name " << Name << " not found" << endl;
+                exit(1);
+                //return new Observable( Name, 0.0, 0.0, "NameNotFoundError");
+        }
+        else
+        {
+                return &allObservables[unsigned(nameIndex)];
+        }
+
 }
 
 //Set an observable by name
@@ -107,4 +124,12 @@ bool DataPoint::SetObservable( const string Name, const double Value, const doub
 	}
 	delete temporaryObservable;
 	return returnValue;
+}
+
+//	Used for Sorting DataPoints
+bool DataPoint::operator() ( pair<DataPoint,pair<string,int> > first, pair<DataPoint,pair<string,int> > second )
+{
+       double param_val_1 = first.first.GetObservable( &first.second )->GetValue();
+       double param_val_2 = second.first.GetObservable( &second.second )->GetValue();
+       return (param_val_1 < param_val_2 );
 }

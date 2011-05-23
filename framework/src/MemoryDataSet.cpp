@@ -12,6 +12,8 @@
 #include "MemoryDataSet.h"
 //	System Headers
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 //Default constructor
 MemoryDataSet::MemoryDataSet() : allData(), dataBoundary()
@@ -80,3 +82,33 @@ void MemoryDataSet::Clear()
 {
 	allData.clear();
 }
+
+void MemoryDataSet::SortBy( string parameter )
+{
+	cout << "Sorting" << endl;
+	if( allData.size() > 0 )
+	{
+		vector<pair<DataPoint,pair<string,int> > > allData_sort;
+
+		for( vector<DataPoint>::iterator data_i = allData.begin(); data_i != allData.end(); ++data_i )
+		{
+			allData_sort.push_back( make_pair( *data_i, make_pair( parameter, -1 ) ) );
+		}
+
+		cout << "hello" << endl;
+		sort( allData_sort.begin(), allData_sort.end(), DataPoint() );
+		cout << "sorted" << endl;
+		//	Sort the data in memory
+
+		while( !allData.empty() ) allData.pop_back();		
+
+		for( vector<pair<DataPoint,pair<string,int> > >::iterator sort_i = allData_sort.begin(); sort_i != allData_sort.end(); ++sort_i )
+		{
+			allData.push_back( sort_i->first );
+		}
+
+		cout << allData.size() << endl;
+	}
+	cout << "Sorted" << endl;
+}
+

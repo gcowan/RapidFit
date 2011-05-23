@@ -864,6 +864,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		vector< DataSetConfiguration* > dataSetMakers;
 		bool generatePDFFlag = false;
 		IPDF * generatePDF=NULL;
+		vector<int> Starting_Value;
 
 		//Retrieve the data set config
 		vector< XMLTag* > dataComponents = DataTag->GetChildren();
@@ -905,6 +906,10 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			{
 				dataProcessors.push_back( MakePrecalculator( dataComponents[dataIndex], dataBoundary ) );
 			}
+			else if ( name == "StartingEntry" )
+			{
+				Starting_Value.push_back( atoi( dataComponents[dataIndex]->GetValue()[0].c_str() ) );
+			}
 			else
 			{
 				cerr << "Unrecognised data set component: " << name << endl;
@@ -930,7 +935,14 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			}
 			else
 			{
-				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames );
+				if( Starting_Value.size() > 0 )
+				{
+					oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, Starting_Value[0] );
+				}
+				else
+				{
+					oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, 0 );
+				}
 			}
 
 			dataSetMakers.push_back(oldStyleConfig);

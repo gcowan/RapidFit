@@ -36,6 +36,10 @@ class XMLTag
 		bool NotAppended();
 
 	private:
+                //      Uncopyable!
+                XMLTag ( const XMLTag& );
+                XMLTag& operator = ( const XMLTag& );
+
 		string FindNextTagOpen( vector<string>, int&, int& );
 		void FindTagOpens( string, vector<string>, vector<int>&, vector<int>& );
 		void FindTagCloses( string, vector<string>, vector<int>&, vector<int>& );

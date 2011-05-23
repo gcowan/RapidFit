@@ -28,17 +28,17 @@
 #include <stdlib.h>
 
 //Default constructor
-DataSetConfiguration::DataSetConfiguration() : source(), cutString(), numberEvents(), arguments(), argumentNames(), generatePDF(), separateGeneratePDF(), parametersAreSet()
+DataSetConfiguration::DataSetConfiguration() : source(), cutString(), numberEvents(), arguments(), argumentNames(), generatePDF(), separateGeneratePDF(), parametersAreSet(), Start_Entry(0)
 {
 }
 
 //Constructor with correct argument
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, int starting_entry ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false), Start_Entry(starting_entry)
 {
 }
 
 //Constructor with separate data generation PDF
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(DataPDF), separateGeneratePDF(true), parametersAreSet(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(DataPDF), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0)
 {
 }
 
@@ -86,7 +86,7 @@ string DataSetConfiguration::GetSource()
 }
 
 //Create the DataSet
-IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary, IPDF * FitPDF, int real_numberEvents)
+IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary, IPDF * FitPDF, int real_numberEvents )
 {
 	//Some kind of decision about what kind of data set to use?
 	IDataSet * newDataSet;
@@ -192,9 +192,10 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		cerr << "Ntuple not found. Are you specifying the correct file and ntuple path?" << endl;
 		exit(1);
 	}
+	if( Start_Entry != 0 ) cout << "Starting From Entry: " << Start_Entry<< " in the ntuple." << endl;
 	int totalNumberOfEvents = int(ntuple->GetEntries());
 	ntuple->SetEstimate(ntuple->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this many)
-	int numberOfEventsAfterCut = int(ntuple->Draw(">>evtList", cutString.c_str())); // apply the cut which automatically creates the evtList object
+	int numberOfEventsAfterCut = int(ntuple->Draw(">>evtList", cutString.c_str(),"goff",ntuple->GetEntries(),Start_Entry)); // apply the cut which automatically creates the evtList object
 	if ( numberOfEventsAfterCut == -1 )
 	{
 		cerr << "Please check the cut string you are using!" << endl;
@@ -252,7 +253,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		//  Draw 3 observables at a time in some large plot
 		//  use the 'goff' option to turn graphical output (and annoying text output from default co/de-structors) off
 		//  (it doesn't matter what this looks like and we can throw it away from here)
-		ntuple->Draw( PlotString , cutString.c_str(), "goff" );
+		ntuple->Draw( PlotString , cutString.c_str(), "goff", numberOfEventsAfterCut, Start_Entry );
 		
 		//  Store pointers to the objects for ease of access
 		data_array.push_back( ntuple->GetV1() );

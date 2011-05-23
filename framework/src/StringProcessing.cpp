@@ -221,9 +221,11 @@ vector<string> StringProcessing::CombineUniques( vector<string> VectorOne, vecto
 }
 
 //Return the position of a search string within a vector of strings, or -1 if not found
-int StringProcessing::VectorContains( vector<string> * InputVector, string * SearchString )
+int StringProcessing::VectorContains( vector<string> const* InputVector, string const* SearchString )
 {
-	vector<string>::iterator result=find( InputVector->begin(), InputVector->end(), *SearchString);
+	vector<string>::const_iterator begin = InputVector->begin();
+	vector<string>::const_iterator ending = InputVector->end();
+	vector<string>::const_iterator result = find( begin, ending, *SearchString);
 	int position=int( result - InputVector->begin() );
 	if( position >= 0 && position < int(InputVector->size()) ) return position;
 

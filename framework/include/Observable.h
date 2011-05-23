@@ -22,7 +22,7 @@ class Observable
 		Observable( string, double, double, string );
 		~Observable();
 
-		double GetValue();
+		double GetValue() const;
 		void SetValue(double);
 
 		double GetError();
