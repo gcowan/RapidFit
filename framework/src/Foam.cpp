@@ -123,8 +123,8 @@ void Foam::Init()
 			//Cached_Files.back()->GetListOfKeys()->Print();
 			foamGenerator = (TFoam*) MC_Cache->Get( Name );
 			cout << "Checking Consistancy, will crash if this fails... this is unavoidable" << endl;
-			foamGenerator->ResetPseRan( rootRandom );
-			foamGenerator->ResetRho( combinationFunction );
+			foamGenerator->SetPseRan( rootRandom );
+			foamGenerator->SetRho( combinationFunction );
 			foamGenerator->SetChat( 0 );
 			//	Make one event here to check everything was processed correctly
 			foamGenerator->MakeEvent();

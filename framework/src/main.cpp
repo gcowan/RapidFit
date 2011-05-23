@@ -529,7 +529,7 @@ int RapidFit( int argc, char * argv[] )
 				for( unsigned int i=0; i< quickDataGen.size(); ++i )
 				{
 					vector<IDataSet*> quickDataSet;
-					quickDataGen[i]->SetPhysicsParameters( xmlFile->GetFitParameters() );
+					quickDataGen[i]->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
 					IDataSet* temp_dataSet = quickDataGen[i]->GetDataSet();
 					quickDataSet.push_back( temp_dataSet );
 					string ext_dot=".";
