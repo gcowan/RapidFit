@@ -49,11 +49,11 @@ typedef vector<Double_t> array1d;
 typedef vector<TString> array1s;
 
 inline TString prettyPrint(Double_t value){
-        char pretty[20];
-        TString prettyString;
-        sprintf (pretty, "%1.1g",value);
-        prettyString = pretty;
-        return prettyString;
+	char pretty[20];
+	TString prettyString;
+	sprintf (pretty, "%1.1g",value);
+	prettyString = pretty;
+	return prettyString;
 }
 
 
@@ -69,14 +69,14 @@ inline TString prettyPrint(Double_t val, Double_t err){
 	outstr+= "$";
 	return outstr;
 
-	
+
 }
 
 int main(int argc, char *argv[]){
 
 	if(argc !=3){
-		  cout << "Plots, fits and tabulates the mean, width, pull of RapidFit toyresults automagically. Usage:" << endl;
-		                    cout <<  argv[0] << " <flatntuple.root> <outputdir>"    << endl;
+		cout << "Plots, fits and tabulates the mean, width, pull of RapidFit toyresults automagically. Usage:" << endl;
+		cout <<  argv[0] << " <flatntuple.root> <outputdir>"    << endl;
 		exit(1);
 	}
 	gROOT->SetStyle("Plain");
@@ -102,10 +102,10 @@ int main(int argc, char *argv[]){
 	TNtuple* results;
 	input->GetObject("RapidFitResult", results);
 	if(!results){
-	input->GetObject("RapidFitResult/RapidFitResult",results);
-	if(!results){
-		cout << "Couldn't find ntuple RapidFitResult in TFile" << endl;
-		exit(1);
+		input->GetObject("RapidFitResult/RapidFitResult",results);
+		if(!results){
+			cout << "Couldn't find ntuple RapidFitResult in TFile" << endl;
+			exit(1);
 		}
 	}
 	TObjArray *vars = results->GetListOfLeaves();
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]){
 			var_pull += "_pull";
 			TString var_error = varname;
 			var_error += "_error";
-			
+
 			output->cd();
 			results->Draw(var_pull+">>pull","Fit_Status==3");
 			TH1F *pullhist = (TH1F*)gDirectory->Get("pull");
@@ -191,26 +191,60 @@ int main(int argc, char *argv[]){
 	cout << "\\begin{tabular}{lcccc}" << endl;
 	cout << "Parameter	&	Mean	&	Std. Dev 	&	Pull mean	&	Pull Std. Dev	\\\\" << endl;
 	for(UInt_t i =0; i< param.size(); i++){
+		TString parname = param[i];
+		parname.ReplaceAll("_","\\_");
 
-	TString alertstr = " { ";
-	TString strmean = prettyPrint(mean[i], emean[i]);
-	TString strsigma = prettyPrint(sigma[i], esigma[i]);
-		
-	bool warnpull = (fabs(pull[i])/epull[i] > 3.0);
-	TString strpull;
-	if(warnpull) strpull = alertstr;
-	strpull += prettyPrint(pull[i],epull[i]);
-	if(warnpull) strpull += " } ";
+		TString alertstr = " { ";
+		TString strmean = prettyPrint(mean[i], emean[i]);
+		TString strsigma = prettyPrint(sigma[i], esigma[i]);
 
-	bool warnpullw = (fabs(pullw[i] -1)/epullw[i] > 3.0);
-        TString strpullw;
-        if(warnpullw) strpullw = alertstr;
-	strpullw += prettyPrint(pullw[i],epullw[i]);
-        if(warnpullw) strpullw += " } ";
 
-		cout << param[i] << " 	& 	" << strmean << " 	& 	" << strsigma << "	 & 	" << strpull << "	 & 	" << strpullw << "	\\\\" << endl;
+		bool warnpull = (fabs(pull[i])/epull[i] > 3.0);
+		TString strpull;
+		if(warnpull){
+			UInt_t wpullcol	= 0;
+			strpull = "\\textcolor{";
+			if (pull[i]<0.0){ strpull+= "blue!";}else{strpull+="red!";}
+			wpullcol = (UInt_t)(fabs(200*pull[i]));
+			if(wpullcol>100){wpullcol=100;}
+			strpull+= wpullcol;
+			if(wpullcol!=100){
+				strpull+= "!black!";
+				strpull+= 100;
+			}
+				strpull+= "}{";
 
-//		cout << param[i] << " & 	$ " << prettyPrint(mean[i]) << " \\pm " << prettyPrint(emean[i]) << " $	&	$ " << prettyPrint(sigma[i]) << " \\pm " << prettyPrint(esigma[i]) << " $   &       $ " << prettyPrint(pull[i]) << " \\pm " << prettyPrint(epull[i]) <<  " $   &       $ " << prettyPrint(pullw[i]) << " \\pm " << prettyPrint(epullw[i]) << " $	\\\\" << endl;
+		}
+		strpull += prettyPrint(pull[i],epull[i]);
+		if(warnpull) strpull += " } ";
+
+		bool warnpullw = (fabs(pullw[i] -1)/epullw[i] > 3.0);
+		TString strpullw;
+
+		if(warnpullw){
+		UInt_t wpullcolw = 0;
+		strpullw = "\\textcolor{";
+		if (pullw[i]<1.0){ 
+			strpullw+= "blue!";
+			wpullcolw = (UInt_t)((1.0 - pullw[i])*200);
+		}else{
+			strpullw+="red!";
+			wpullcolw = (UInt_t)(fabs(1.0 - pullw[i])*200);
+		}
+		if(wpullcolw>100){wpullcolw=100;}
+			strpullw+= wpullcolw;
+			if(wpullcolw!=100){
+				strpullw+= "!black!";
+				strpullw+= 100;
+			}
+				strpullw+= "}{";
+		}
+		strpullw += prettyPrint(pullw[i],epullw[i]);
+		if(warnpullw) strpullw += " } ";
+
+		cout << parname << " 	& 	" << strmean << " 	& 	" << strsigma << "	 & 	" << strpull << "	 & 	" << strpullw << "	\\\\" << endl;
+
+		//		cout << param[i] << " & 	$ " << prettyPrint(mean[i]) << " \\pm " << prettyPrint(emean[i]) << " $	&	$ " << prettyPrint(sigma[i]) << " \\pm " << prettyPrint(esigma[i]) << " $   &       $ " << prettyPrint(pull[i]) << " \\pm " << prettyPrint(epull[i]) <<  " $   &       $ " << prettyPrint(pullw[i]) << " \\pm " << prettyPrint(epullw[i]) << " $	\\\\" << endl;
 	}
 	cout << "\\end{tabular}" << endl;
 	cout << "\\end{table}" << endl;
