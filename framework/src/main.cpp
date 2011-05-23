@@ -536,7 +536,7 @@ int RapidFit( int argc, char * argv[] )
 					vector<string> temp_strings = StringProcessing::SplitString( saveOneDataSetFileName, *(ext_dot.c_str()) );
 					TString FileName_Pre_Suffix = StringProcessing::CondenseStrings( temp_strings, 0, int(temp_strings.size() -1) );
 					TString number;
-					if( i > 0){ number.Append("_"); number+=i; }
+					if( quickDataGen.size() > 1){ number.Append("_"); number+=i; }
 					TString real_saveOneDataSetFileName = TString( FileName_Pre_Suffix + number + ".root" );
 					ResultFormatter::MakeRootDataFile( string(real_saveOneDataSetFileName.Data()), quickDataSet );
 					delete temp_dataSet;
