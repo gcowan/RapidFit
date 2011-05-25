@@ -11,6 +11,7 @@
 #define TOY_STUDY_H
 
 //	RapidFit Headers
+#include "IStudy.h"
 #include "PDFWithData.h"
 #include "ParameterSet.h"
 #include "ToyStudyResult.h"
@@ -22,7 +23,7 @@
 
 using namespace std;
 
-class ToyStudy
+class ToyStudy	:	public IStudy
 {
 	public:
 		ToyStudy();
@@ -30,8 +31,11 @@ class ToyStudy
 		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, vector<ParameterSet*>, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
 		~ToyStudy();
 
-		ToyStudyResult * DoWholeStudy( bool=false );
-		ToyStudyResult * GetToyStudyResult();
+		void DoWholeStudy();
+		ToyStudyResult * GetStudyResult();
+
+		void SetNumRepeats( int );			//	Set number of Repeats
+		void SetCommandLineParams( vector<string> );	//	Set Command Line Physics Parameters
 
 	private:
 		//	Uncopyable!

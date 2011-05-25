@@ -1,5 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/24 Rob Currie
+  - I've added a new class MCStudy which performs an MC style sequential study on a large ntuple(s)
+  - I've also added IStudy.h and plan to flesh this out into a simple framework which will allow for people to easily copy/implement a systematic study over some parameter within the RapidFit framework.
+       I will flesh out IStudy into a baseclass for a systematic fit and add functions which should allow sharing of a lot of code between Toy and MC style studies
+  - I've cleaned up main.cpp which now implements goto statements as opposed to having serveral lines of indentation in cumulative if statements
+
 2011/05/23 Rob Currie
   - Slightly altered --saveOneDataSet to use less memory when handling large datasets
   - Altered the RapidFitIntegrator to have variable behaviour depending on how it is intended to be used (i.e. less accuracy more speed for pulls) whilst having default ROOT behaviour for other uses (MC generation)

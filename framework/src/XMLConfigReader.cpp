@@ -82,7 +82,7 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 //	}
 
 	if( ( File_Tags.size() != 1) || ( children.size() == 0 ) )
-	{	
+	{
 		cerr << "Error processing XMLFile" << endl;
 		exit( -234 );
 	}
@@ -155,8 +155,9 @@ vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandL
 				double max = strtod(input_args[3].c_str(),NULL);
 				double min = strtod(input_args[2].c_str(),NULL);
 				double val = strtod(input_args[1].c_str(),NULL);
+				string type = input_args[4];
 
-				if( ( fabs( min - max ) < 	1E-6 ) && ( max < 1E-6 ) )
+				if( ( ( fabs( min - max ) < 	1E-6 ) && ( max < 1E-6 ) ) || (type=="Fixed") )
 				{
 					//		Unbounded				name	value	type		unit
 					PhysicsParameter* new_param = new PhysicsParameter( input_args[0], val , input_args[4], Unit);
@@ -420,7 +421,7 @@ FitFunctionConfiguration * XMLConfigReader::GetFitFunctionConfiguration()
 FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTag )
 {
 	if ( FunctionTag->GetName() == "FitFunction" )
-	{		
+	{
 		string functionName = "Uninitialised";
 		string weightName = "Uninitialised";
 		bool hasWeight = false;
@@ -455,7 +456,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		//Make the function
 		if (hasWeight)
 		{
-			cerr <<"Weighted events have been asked for in XML using" << weightName << endl ;  
+			cerr <<"Weighted events have been asked for in XML using" << weightName << endl ;
 			return new FitFunctionConfiguration( functionName, weightName );
 		}
 		else
@@ -471,7 +472,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 }
 
 //Organise all the PDFs and DataSets
-vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
+vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Value )
 {
 	//Collect all ToFit elements
 	vector< XMLTag* > toFits;
@@ -531,7 +532,13 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 			//Make the data set, and populate the physics bottle
 			if ( foundData && foundPDF )
 			{
-				pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag ) );
+				if( !Starting_Value.empty() )
+				{
+					int s_val_index = (int) pdfsAndData.size(); ++s_val_index;
+					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, Starting_Value[s_val_index] ) );
+				} else {
+					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, -1 ) );
+				}
 			}
 			else if ( !foundConstraint )
 			{
@@ -546,7 +553,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData()
 				}
 				else
 				{
-					cerr << " No configuration found"; 
+					cerr << " No configuration found";
 				}
 				cerr << endl;
 				exit(1);
@@ -593,7 +600,7 @@ vector< ConstraintFunction* > XMLConfigReader::GetConstraints()
 				{
 					constraintTag = fitComponents[componentIndex];
 					foundConstraint = true;
-				}       
+				}
 			}
 
 			if (foundConstraint)
@@ -677,8 +684,8 @@ ParameterSet * XMLConfigReader::GetParameterSet( XMLTag * InputTag )
 	{
 		vector< PhysicsParameter* > physicsParameters;
 		vector<string> names;
-		string name = "";		
-		
+		string name = "";
+
 		//Create each physics parameter
 		vector< XMLTag* > parameters = InputTag->GetChildren();
 		for ( unsigned int parameterIndex = 0; parameterIndex < parameters.size(); ++parameterIndex )
@@ -779,11 +786,11 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		}
 
 		//See of blinding has been specified, and if so construct the blinding offset
-		if( hasBlindString && hasBlindScale ) 
+		if( hasBlindString && hasBlindScale )
 		{
 			blindOffset = Blinder::getBlindOffset( blindString.c_str(), blindScale ) ;
 		}
-		else if( (hasBlindString && ! hasBlindScale) || (! hasBlindString && hasBlindScale) ) 
+		else if( (hasBlindString && ! hasBlindScale) || (! hasBlindString && hasBlindScale) )
 		{
 			cerr << "Blinding information incomplete for parameter: " << ParameterName << " Ignoring blinding for this parameter" << endl;
 		}
@@ -849,7 +856,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 }
 
 //Collect the information needed to make a data set
-PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDFTag )
+PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDFTag, int Starting_Value )
 {
 	//Check the tag actually is a data set
 	if ( DataTag->GetName() == "DataSet" )
@@ -864,7 +871,6 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		vector< DataSetConfiguration* > dataSetMakers;
 		bool generatePDFFlag = false;
 		IPDF * generatePDF=NULL;
-		vector<int> Starting_Value;
 
 		//Retrieve the data set config
 		vector< XMLTag* > dataComponents = DataTag->GetChildren();
@@ -908,7 +914,10 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			}
 			else if ( name == "StartingEntry" )
 			{
-				Starting_Value.push_back( atoi( dataComponents[dataIndex]->GetValue()[0].c_str() ) );
+				if( Starting_Value < 0 )
+				{
+					Starting_Value = atoi( dataComponents[dataIndex]->GetValue()[0].c_str() );
+				}
 			}
 			else
 			{
@@ -935,9 +944,9 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			}
 			else
 			{
-				if( Starting_Value.size() > 0 )
+				if( Starting_Value > 0 )
 				{
-					oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, Starting_Value[0] );
+					oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, Starting_Value );
 				}
 				else
 				{
@@ -1056,7 +1065,7 @@ vector<PhaseSpaceBoundary*> XMLConfigReader::GetPhaseSpaceBoundaries()
 					}
 				}
 			}
-			
+
 		}
 	}
 	return PhaseSpaceBoundary_vec;
@@ -1433,7 +1442,7 @@ vector<vector<IPrecalculator*> > XMLConfigReader::GetPrecalculators()
 				}
 				IPrecalculator_vec.push_back( IPrecalculator_local_vec );
 			}
-			
+
 		}
 	}
 	return IPrecalculator_vec;
@@ -1545,13 +1554,13 @@ pair<ScanParam*, ScanParam*> XMLConfigReader::Get2DScanParam( XMLTag * InputTag 
 				exit(-1);
 			}
 		}
-		
+
 		if( !param1 || !param2 )
 		{
 			cerr << "Sorry 2DScan not correctly defined" <<endl;
 			exit(-3);
 		}
-		
+
 		Returnable_Pair.first = Param_1;
 		Returnable_Pair.second = Param_2;
 		return Returnable_Pair;
@@ -1631,4 +1640,117 @@ ScanParam * XMLConfigReader::GetScanParam( XMLTag * InputTag )
 
 	} else	{ cerr << "Unreconised Scan Config: " << InputTag->GetName() << endl; exit(1); }
 
+}
+
+
+int XMLConfigReader::GetTotalDataSetSize()
+{
+	int DataSetSize=0;
+	//Find the ParameterSets
+	vector< XMLTag* > toFits;
+	//  Children Defined globally on initialization!
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
+	{
+		if ( children[childIndex]->GetName() == "ToFit" )
+		{
+			toFits.push_back( children[childIndex] );
+		}
+	}
+	//  Loop over all of the fits
+	for ( unsigned short int fitnum=0; fitnum < toFits.size(); ++fitnum )
+	{
+		vector<XMLTag*> allChildren = toFits[fitnum]->GetChildren();
+		for( unsigned short int Childnum=0; Childnum < allChildren.size(); ++Childnum )
+		{
+			if( allChildren[Childnum]->GetName() == "DataSet" )
+			{
+				vector< XMLTag* > dataComponents = allChildren[Childnum]->GetChildren();
+				for ( unsigned int dataIndex = 0; dataIndex < dataComponents.size(); ++dataIndex )
+				{
+					if ( dataComponents[dataIndex]->GetName() == "NumberEvents" )
+					{
+						DataSetSize += (int) atoi( dataComponents[dataIndex]->GetValue()[0].c_str() );
+					}
+				}
+			}
+		}
+	}
+
+	return DataSetSize;
+}
+
+vector<int> XMLConfigReader::GetAllDataSetSizes()
+{
+	vector<int> DataSetSizes;
+	//Find the ParameterSets
+	vector< XMLTag* > toFits;
+	//  Children Defined globally on initialization!
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
+	{
+		if ( children[childIndex]->GetName() == "ToFit" )
+		{
+			toFits.push_back( children[childIndex] );
+		}
+	}
+	//  Loop over all of the fits
+	for ( unsigned short int fitnum=0; fitnum < toFits.size(); ++fitnum )
+	{
+		vector<XMLTag*> allChildren = toFits[fitnum]->GetChildren();
+		for( unsigned short int Childnum=0; Childnum < allChildren.size(); ++Childnum )
+		{
+			if( allChildren[Childnum]->GetName() == "DataSet" )
+			{
+				vector< XMLTag* > dataComponents = allChildren[Childnum]->GetChildren();
+				for ( unsigned int dataIndex = 0; dataIndex < dataComponents.size(); ++dataIndex )
+				{
+					if ( dataComponents[dataIndex]->GetName() == "NumberEvents" )
+					{
+						DataSetSizes.push_back( (int) atoi( dataComponents[dataIndex]->GetValue()[0].c_str() ) );
+					}
+				}
+			}
+		}
+	}
+	return DataSetSizes;
+}
+
+vector<int> XMLConfigReader::GetAllStartEntries()
+{
+	vector<int> StartEntries;
+	//Find the ParameterSets
+	vector< XMLTag* > toFits;
+	//  Children Defined globally on initialization!
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
+	{
+		if ( children[childIndex]->GetName() == "ToFit" )
+		{
+			toFits.push_back( children[childIndex] );
+		}
+	}
+	//  Loop over all of the fits
+	for ( unsigned short int fitnum=0; fitnum < toFits.size(); ++fitnum )
+	{
+		vector<XMLTag*> allChildren = toFits[fitnum]->GetChildren();
+		for( unsigned short int Childnum=0; Childnum < allChildren.size(); ++Childnum )
+		{
+			if( allChildren[Childnum]->GetName() == "DataSet" )
+			{
+				vector< XMLTag* > dataComponents = allChildren[Childnum]->GetChildren();
+				bool found_one = false;
+				for ( unsigned int dataIndex = 0; dataIndex < dataComponents.size(); ++dataIndex )
+				{
+					if ( dataComponents[dataIndex]->GetName() == "NumberEvents" )
+					{
+						found_one = true;
+						StartEntries.push_back( (int) atoi( dataComponents[dataIndex]->GetValue()[0].c_str() ) );
+					}
+				}
+				if( !found_one )
+				{
+					StartEntries.push_back( 0 );
+				}
+			}
+		}
+	}
+	return StartEntries;
 }

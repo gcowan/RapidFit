@@ -18,12 +18,12 @@
 using namespace std;
 
 //Default constructor
-ToyStudy::ToyStudy() : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(), numberStudies(), allConstraints()
+ToyStudy::ToyStudy() : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(NULL), numberStudies(), allConstraints()
 {
 }
 
 //Constructor using an XML config file directly
-ToyStudy::ToyStudy( string FileName ) : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(), numberStudies(), allConstraints()
+ToyStudy::ToyStudy( string FileName ) : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(NULL), numberStudies(), allConstraints()
 {
 	XMLConfigReader * xml = new XMLConfigReader(FileName, new vector<pair<string,string> >);
 	if ( xml->IsLoaded() )
@@ -53,7 +53,7 @@ ToyStudy::ToyStudy( string FileName ) : pdfsAndData(), studyParameters(), theMin
 
 //Constructor with correct arguments
 ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, vector<ParameterSet*> StudyParameters, vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies )
-: pdfsAndData(PDFsAndData), studyParameters(StudyParameters), theMinimiser(TheMinimiser), theFunction(TheFunction), allResults(), numberStudies(NumberStudies), allConstraints(InputConstraints)
+: pdfsAndData(PDFsAndData), studyParameters(StudyParameters), theMinimiser(TheMinimiser), theFunction(TheFunction), allResults(NULL), numberStudies(NumberStudies), allConstraints(InputConstraints)
 {
 	if ( numberStudies < 1 )
 	{
@@ -69,13 +69,12 @@ ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfigurat
 //Destructor
 ToyStudy::~ToyStudy()
 {
-	delete allResults;
+	if( allResults!=NULL ) delete allResults;
 }
 
 //Automate the toy study
-ToyStudyResult * ToyStudy::DoWholeStudy( bool some_flag )
+void ToyStudy::DoWholeStudy( )
 {
-	(void) some_flag;
 	//Make a vector of unique parameter names
 	vector<string> uniqueNames;
 	for (unsigned int pdfIndex = 0; pdfIndex < pdfsAndData.size(); ++pdfIndex )
@@ -107,12 +106,24 @@ ToyStudyResult * ToyStudy::DoWholeStudy( bool some_flag )
 			allResults->AddFitResult( new_result );
 		}
 	}
-
-	return allResults;
 }
 
 //Get the result of the toy study
-ToyStudyResult * ToyStudy::GetToyStudyResult()
+ToyStudyResult * ToyStudy::GetStudyResult()
 {
 	return allResults;
+}
+
+
+//	Set the number of repeats
+void ToyStudy::SetNumRepeats( int new_num_repeats )
+{
+	numberStudies = new_num_repeats;
+}
+
+//	Set the command line physics parameters
+//	Not actually implemented in the ToyStudy class ATM
+void ToyStudy::SetCommandLineParams( vector<string> new_CommandLineParams )
+{
+	(void) new_CommandLineParams;
 }

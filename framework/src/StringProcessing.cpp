@@ -227,7 +227,7 @@ int StringProcessing::VectorContains( vector<string> const* InputVector, string 
 	vector<string>::const_iterator ending = InputVector->end();
 	vector<string>::const_iterator result = find( begin, ending, *SearchString);
 	int position=int( result - InputVector->begin() );
-	if( position >= 0 && position < int(InputVector->size()) ) return position;
+	if( position >= 0 && position < int( InputVector->size() ) ) return position;
 
 	//If you've got this far, it wasn't found
 	return -1;

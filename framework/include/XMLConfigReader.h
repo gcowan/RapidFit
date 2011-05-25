@@ -39,10 +39,13 @@ class XMLConfigReader
 		MinimiserConfiguration * GetMinimiserConfiguration();
 		FitFunctionConfiguration * GetFitFunctionConfiguration();
 		OutputConfiguration * GetOutputConfiguration();
-		vector< PDFWithData* > GetPDFsAndData();
+		vector< PDFWithData* > GetPDFsAndData( vector<int> = *(new vector<int>) );
 		vector< ConstraintFunction* > GetConstraints();
-		vector<PhaseSpaceBoundary*> GetPhaseSpaceBoundaries();
-		vector<vector<IPrecalculator*> > GetPrecalculators();
+		vector< PhaseSpaceBoundary* > GetPhaseSpaceBoundaries();
+		vector< vector< IPrecalculator* > > GetPrecalculators();
+		int GetTotalDataSetSize();
+		vector<int> GetAllDataSetSizes();
+		vector<int> GetAllStartEntries();
 		int GetNumberRepeats();
 		bool IsLoaded();
 
@@ -55,7 +58,7 @@ class XMLConfigReader
 		PhysicsParameter * GetPhysicsParameter( XMLTag*, string& );
 		PhaseSpaceBoundary * GetPhaseSpaceBoundary( XMLTag* );
 		IConstraint * GetConstraint( XMLTag*, string& );
-		PDFWithData * GetPDFWithData( XMLTag*, XMLTag* );
+		PDFWithData * GetPDFWithData( XMLTag*, XMLTag*, int );
 		IPDF * GetNamedPDF( XMLTag* );
 		IPDF * GetSumPDF( XMLTag*, PhaseSpaceBoundary* );
 		IPDF * GetNormalisedSumPDF( XMLTag*, PhaseSpaceBoundary* );
