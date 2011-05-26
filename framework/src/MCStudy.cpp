@@ -93,8 +93,8 @@ void MCStudy::DoWholeStudy()
 			cout << (*start_i) << "\t" <<(*entries_i) << "\t" << local_Start_entries.back() << endl;
 
 			//	We either have 1 step/start for the whole xml or we have a unique step/start for each PDFWithData from the XML
-			if( events_to_step_over.size() != 1 )	{	++entries_i;	}
-			if( StartingEntries.size() != 1 )	{	++start_i;	}
+			if( events_to_step_over.size() != 1 )	{	++entries_i;	} else { entries_i = events_to_step_over.end(); }
+			if( StartingEntries.size() != 1 )	{	++start_i;	} else { start_i = StartingEntries.end(); }
 		}
 
 		if( StartingEntries.size() == 1 )
