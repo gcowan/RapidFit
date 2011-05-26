@@ -88,7 +88,7 @@ void MCStudy::DoWholeStudy()
 		for( ; ( start_i!=StartingEntries.end() && entries_i != events_to_step_over.end() );  )
 		{
 			//	Written such that this always addresses the correct element
-			local_Start_entries.push_back( (*start_i) + (i+1)* (*entries_i) );
+			local_Start_entries.push_back( (*start_i) + (i)* (*entries_i) );
 
 			cout << (*start_i) << "\t" <<(*entries_i) << "\t" << local_Start_entries.back() << endl;
 
