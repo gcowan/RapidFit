@@ -47,10 +47,6 @@ class Bs2JpsiPhi_SignalAlt_MO_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_
 		double normalisationCacheValueRes1[3] ;
 		double normalisationCacheValueRes2[3] ;
 		
-		pair<string,int> mistagScaleName ;
-		pair<string,int> mistagOffsetName ;
-		double mistagScale ;
-		double mistagOffset ;
 };
 
 #endif

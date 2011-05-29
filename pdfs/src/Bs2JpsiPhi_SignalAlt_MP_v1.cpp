@@ -18,16 +18,19 @@
 
 #define DOUBLE_TOLERANCE 1E-6
 
+
 //......................................
 //Constructor
 
 Bs2JpsiPhi_SignalAlt_MP_v1::Bs2JpsiPhi_SignalAlt_MP_v1() : 
-	  Bs2JpsiPhi_SignalAlt_BaseClass()
+	Bs2JpsiPhi_SignalAlt_BaseClass()
 	, normalisationCacheValid(false)
 {
 	MakePrototypes();
-	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_v1 " << std::endl ;
+	_mistagP1=1.0 ;     // These three are for backwards compatibility
+	_mistagP0=0.0 ;      // These three are for backwards compatibility
+	_mistagSetPoint=0.0 ; // These three are for backwards compatibility
 }
 
 
@@ -117,7 +120,8 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
 
-	tagFraction         = allParameters.GetPhysicsParameter( &mistagName )->GetValue();
+	_mistag         = allParameters.GetPhysicsParameter( &mistagName )->GetValue();
+
 	delta_ms  = allParameters.GetPhysicsParameter( &deltaMName )->GetValue();
 	phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
 	_cosphis = cos(phi_s) ;
@@ -142,13 +146,13 @@ bool Bs2JpsiPhi_SignalAlt_MP_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	angAccI10 = allParameters.GetPhysicsParameter( &angAccI10Name )->GetValue();
 	
 	// Do a test to ensure user is not using upper time acceptance wrongly
-	if( ((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE) || (fabs(tagFraction-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
+	if( ((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE) || (fabs(_mistag-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
 	{
 		cout << " You appear to be trying to use the upper time acceptance but are using either resolution or are doing a tagged fit" << endl ;
 		cout << " This is not possible at present" << endl ;
 		cout << " Resolution1 : " << resolution1 << endl ;
 		cout << " Resolution2 : " << resolution2 << endl ;
-		cout << " Mistag : " << tagFraction << endl ;
+		cout << " Mistag : " << _mistag << endl ;
 		cout << " Phi_s : " << phi_s <<  endl ;
 		throw(10);
 	}
@@ -213,7 +217,7 @@ double Bs2JpsiPhi_SignalAlt_MP_v1::Evaluate(DataPoint * measurement)
 		cout << "   AS^2    " << AS()*AS() << endl ;
 		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
 		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag    " << tagFraction << endl ;
+		cout << "   mistag    " << _mistag << endl ;
 		cout << " For event with:  " << endl ;
 		cout << "   time      " << t << endl ;
 		cout << "   ctheta_tr " << ctheta_tr << endl ;

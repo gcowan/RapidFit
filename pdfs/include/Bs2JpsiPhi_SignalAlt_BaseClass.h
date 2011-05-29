@@ -47,6 +47,7 @@
 #define UPPER_TIME_ACCEPTANCE_FACTOR 0.025
 
 
+//================================================================================================
 //--------------------------------------------
 // This is included here to avoid checking it in as a separate file to SVN - as this may
 // not be the final solution
@@ -130,7 +131,7 @@ public:
 			}
 		}
 		
-		if( (startSlice + 1. ) < DOUBLE_TOLERANCE )  {cout << " InTimeAcceptance::configure : times in slices are screwed up " << endl ; exit(1) ;}	
+		if( fabs(startSlice + 1. ) < DOUBLE_TOLERANCE )  {cout << " InTimeAcceptance::configure : times in slices are screwed up " << endl ; exit(1) ;}	
 		
 		return ;
 	}
@@ -207,7 +208,8 @@ public:
 };
 
 
-//---------------------------------------------
+//========================================================================================================================
+//========================================================================================================================
 
 
 
@@ -241,12 +243,17 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		pair<string,int> delta_perpName;	// strong phase
 		pair<string,int> delta_sName;		// strong phase for S-wave
 	
-		//PELC NEW : These are new physics parameters which might be used instead of some of those above.
+		//PELC NEW : These are new physics parameters which might be used instead of some of those above later
 		pair<string,int> cosphisName;		// fitting cosphis and sinphis independently
 		pair<string,int> sinphisName;		// fitting cosphis and sinphis independently	
 
-	    // These are detector parameters
+	    // Mistag parameters
 	    pair<string,int> mistagName;		// mistag fraction
+		pair<string,int> mistagP1Name;		// mistag calib
+		pair<string,int> mistagP0Name;		// mistag calib
+		pair<string,int> mistagSetPointName;// mistag calib
+	
+		// Time resolution
 		pair<string,int> res1Name;		  // time resolution core
 		pair<string,int> res2Name;		  // time resolution tail
 		pair<string,int> res1FractionName;  // fraction of core
@@ -270,7 +277,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		pair<string,int> phiName;			// azimuthal angle of the mu+ in Jpsi frame
 		pair<string,int> cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 		pair<string,int> tagName;			// B tag
-		pair<string,int> timeAcceptanceCategoryName ;  //Originally included for using unbiased and biased events.
+		pair<string,int> timeAcceptanceCategoryName ; //Originally included for using unbiased and biased events.
 
 		// Measured Event Observables
 		double t ;
@@ -301,8 +308,13 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		double _cosphis ;
 		double _sinphis ;
 	
-		// Other experimental parameters
-		double tagFraction ;
+		// Mistag parameters
+		double _mistag ;
+		double _mistagP1 ;
+		double _mistagP0 ;
+		double _mistagSetPoint ;
+	
+		// Time resolution
 		double resolution ;
 		double resolution1 ;
 		double resolution2 ;
@@ -406,6 +418,33 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 
 		inline double q() const { return tag ;}
 	
+		inline double mistag() const { 
+			double returnValue = -1000.;
+			
+			if( fabs((q()-0.0)) < DOUBLE_TOLERANCE ) {
+				returnValue = 0.5 ;
+			}			
+			else if( (_mistag>=0.0) && (_mistag <= 0.5) ) {
+				//Normal case
+				returnValue =  _mistagP0 + _mistagP1*(_mistag - _mistagSetPoint ) ;
+				if( returnValue < 0 )  returnValue = 0 ;
+				if( returnValue > 0.5) returnValue = 0.5 ; 
+			}			
+			else if( _mistag < 0.0 ) {
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass::mistag() : _mistag < 0 so set to 0 " << endl ;
+				returnValue = 0 ;
+			}
+			else if( _mistag > 0.5 ) {
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass::mistag() : _mistag > 0.5 so set to 0.5 "  << endl ;
+				returnValue = 0.5 ;
+			}
+			else {
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass::mistag() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				exit(1);
+			}
+			return returnValue ;			
+		}
+	
 		inline double cosphis() const { return _cosphis ; }
 		inline double sinphis() const { return _sinphis ; }
 
@@ -452,17 +491,17 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 			const double result = 
 			( 1.0 + cosphis() ) * expL( ) 
 			+ ( 1.0 - cosphis() ) * expH( ) 
-			+ q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
+			+ q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) ;
 		  
 			//DEBUG
 			if( DEBUGFLAG && (result < 0) ) {
 				cout << " Bs2JpsiPhi_SignalAlt_BaseClass::timeFactorEven() : result < 0 " << endl ;
 				cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
 				cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
-				cout << " ->term3 " << q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*tagFraction) << endl ;
+				cout << " ->term3 " << q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) << endl ;
 				cout << "   -->sin(phis) "  << sinphis() << endl ;
 				cout << "   -->expSin    "  << expSin() << endl ;
-				cout << "   -->tagFrac   "  << tagFraction << endl ;
+				cout << "   -->tagFrac   "  << mistag() << endl ;
 				cout << "   -->delta_ms  "  << delta_ms << endl ;
 			}
 			return result ;
@@ -473,7 +512,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 			return
 			( 1.0 + cosphis() )  * intExpL()     
 			+ ( 1.0 - cosphis() )  * intExpH()          
-			+ q() * ( 2.0 * sinphis()   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
+			+ q() * ( 2.0 * sinphis()   ) * intExpSin( ) * (1.0 - 2.0*mistag()) ;
 		}
 
 
@@ -484,7 +523,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 			return
 			( 1.0 - cosphis() ) * expL( ) 
 			+ ( 1.0 + cosphis() ) * expH( ) 
-			- q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*tagFraction) ;
+			- q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) ;
 		}
 
 		inline double timeFactorOddInt(  )  const
@@ -492,7 +531,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 			return
 			( 1.0 - cosphis() ) * intExpL()
 			+ ( 1.0 + cosphis() ) * intExpH() 
-			- q() * ( 2.0 * sinphis()   ) * intExpSin( ) * (1.0 - 2.0*tagFraction) ;
+			- q() * ( 2.0 * sinphis()   ) * intExpSin( ) * (1.0 - 2.0*mistag()) ;
 		}
 
 
@@ -514,27 +553,25 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		//...........................
 		inline double timeFactorImAPAT( ) const
 		{
-			//if( t < 0.0 ) return 0.0 ;
 			return
-			q() * 2.0  * ( sin(delta1)*expCos( ) - cos(delta1)*cosphis()*expSin( ) ) * (1.0 - 2.0*tagFraction)
-			- /*1.0 **/ ( expH( ) - expL( ) ) * cos(delta1) * sinphis()  ;
+			q() * 2.0  * ( sin(delta1)*expCos( ) - cos(delta1)*cosphis()*expSin( ) ) * (1.0 - 2.0*mistag())
+			- ( expH( ) - expL( ) ) * cos(delta1) * sinphis()  ;
 		}
 		
 		inline double timeFactorImAPATInt( ) const
 		{
-			double _tlo = tlo ;
-			if(_tlo < 0.) _tlo = 0. ;
+			//double _tlo = tlo ;
+			//if(_tlo < 0.) _tlo = 0. ;
 			
 			return
-			q() * 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cosphis()*intExpSin() ) * (1.0 - 2.0*tagFraction)
-			- /*1.0 **/ ( intExpH() - intExpL() ) * cos(delta1) * sinphis() ;	
+			q() * 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cosphis()*intExpSin() ) * (1.0 - 2.0*mistag())
+			- ( intExpH() - intExpL() ) * cos(delta1) * sinphis() ;	
 		}
 
 
 		//...........................
 		inline double timeFactorReA0AP( )  const
 		{
-			//if( t < 0.0 ) return 0.0 ;
 			return cos(delta2-delta1) * this->timeFactorEven(  ) ;
 		}
 
@@ -547,20 +584,19 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		//...........................
 		inline double timeFactorImA0AT(  ) const
 		{
-			//if( t < 0.0 ) return 0.0 ;
 			return 
-			q() * 2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cosphis()*expSin( ) ) * (1.0 - 2.0*tagFraction)	
-			-/*1.0 **/ ( expH( ) - expL( ) ) * cos(delta2) * sinphis() ;
+			q() * 2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cosphis()*expSin( ) ) * (1.0 - 2.0*mistag())	
+			- ( expH( ) - expL( ) ) * cos(delta2) * sinphis() ;
 		}
 
 		inline double timeFactorImA0ATInt( ) const
 		{
-			double _tlo = tlo ;
-			if(_tlo < 0.) _tlo = 0. ;
+			//double _tlo = tlo ;
+			//if(_tlo < 0.) _tlo = 0. ;
 	
 			return 
-			q() * 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cosphis()*intExpSin()  ) * (1.0 - 2.0*tagFraction)
-			-/*1.0 **/ ( intExpH() - intExpL()  ) * cos(delta2) * sinphis() ;
+			q() * 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cosphis()*intExpSin()  ) * (1.0 - 2.0*mistag())
+			- ( intExpH() - intExpL()  ) * cos(delta2) * sinphis() ;
 		}
 
 		//.... S wave additions.......
@@ -573,31 +609,28 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		//...........................
 		inline double timeFactorReASAP( ) const
 		{
-			//if( t < 0.0 ) return 0.0 ;
-			
 			double delta = delta_para - delta_s ;
 			return
-			q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) ) * (1.0 - 2.0*tagFraction)
-			- /*1.0 **/ ( expH( ) - expL( ) ) * sin(delta) * sinphis()  ;
+			q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) ) * (1.0 - 2.0*mistag())
+			- ( expH( ) - expL( ) ) * sin(delta) * sinphis()  ;
 		}
 
 		inline double timeFactorReASAPInt( ) const
 		{
-			double _tlo = tlo ;
-			if(_tlo < 0.) _tlo = 0. ;
+			//double _tlo = tlo ;
+			//if(_tlo < 0.) _tlo = 0. ;
 
 			double delta = delta_para - delta_s ;
 
 			return
-			q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() ) * (1.0 - 2.0*tagFraction)
-			- /*1.0 **/ ( intExpH() - intExpL() ) * sin(delta) * sinphis() ;	    
+			q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() ) * (1.0 - 2.0*mistag())
+			- ( intExpH() - intExpL() ) * sin(delta) * sinphis() ;	    
 		}
 
 
 		//...........................
 		inline double timeFactorImASAT( )  const
 		{
-			//if( t < 0.0 ) return 0.0 ;
 			return sin(delta_perp-delta_s) * this->timeFactorOdd(  ) ;
 		}
 
@@ -609,25 +642,23 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 
 		//...........................
 		inline double timeFactorReASA0( ) const
-		{
-			//if( t < 0.0 ) return 0.0 ;
-			
+		{			
 			double delta = delta_zero - delta_s ;
 			return
-			q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) ) * (1.0 - 2.0*tagFraction)
-			- /*1.0 **/ ( expH( ) - expL( ) ) * sin(delta) * sinphis()  ;
+			q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) ) * (1.0 - 2.0*mistag())
+			- ( expH( ) - expL( ) ) * sin(delta) * sinphis()  ;
 		}
 
 		inline double timeFactorReASA0Int( ) const
 		{
-			double _tlo = tlo ;
-			if(_tlo < 0.) _tlo = 0. ;
+			//double _tlo = tlo ;
+			//if(_tlo < 0.) _tlo = 0. ;
 			
 			double delta = delta_zero - delta_s ;
 			
 			return
-			q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() ) * (1.0 - 2.0*tagFraction)
-			- /*1.0 **/ ( intExpH() - intExpL() ) * sin(delta) * sinphis() ;	    
+			q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() ) * (1.0 - 2.0*mistag())
+			- ( intExpH() - intExpL() ) * sin(delta) * sinphis() ;	    
 		}
 
 
@@ -679,8 +710,6 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 			// Since then ive proved that this set of signs is consistent by my "pdfvalue < 0 test"
 			return  4.0*Mathematics::Root_3()*Mathematics::Third() * ct1() *  ( 1.0 - strsq()* cphsq() ) * Mathematics::Global_Frac();//(9.0/32.0/TMath::Pi()) ;
 		}
-
-//(-1.)*
 
 };
 

@@ -14,15 +14,10 @@
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.h"
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms.h"
 
-//Signal  PDFs set 2 (originally Pete, Rob and Matt mostly)
-//DEPRICATED#include "Bs2JpsiPhi_mistagParameter_alt.h"
-//DEPRICATED#include "Bs2JpsiPhi_mistagParameter_Swave_alt.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_dev.h"
-#include "Bs2JpsiPhi_SignalAlt_MP_noSwave.h"
 #include "Bs2JpsiPhi_SignalAlt_MO_v1.h"
 #include "Bs2JpsiPhi_SignalAlt_MO_dev.h"
-#include "Bs2JpsiPhi_SignalAlt_MO_noSwave.h"
 
 
 #include "Bs2JpsiPhiMassSignal.h"
@@ -91,16 +86,6 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //Default JPsiPhi with s wave
 	        returnable_PDF = new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms();
         }
-		//else if ( Name == "Bs2JpsiPhi_mistagParameter_alt" )
-        //{
-	    //    //JPsiPhi from Pete
-	    //    return new Bs2JpsiPhi_mistagParameter_alt();
-        //}
-		//else if ( Name == "Bs2JpsiPhi_mistagParameter_Swave_alt" )
-        //{
-	    //    //JPsiPhi from Pete with sWave
-	    //    return new Bs2JpsiPhi_mistagParameter_Swave_alt();
-        //}
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v1" )
         {
 	        //JPsiPhi from Pete with sWave
@@ -111,11 +96,6 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //JPsiPhi from Pete with sWave 
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_dev(configurator);
         }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_noSwave" )
-        {
-	        //JPsiPhi from Pete with sWave 
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_noSwave();
-        }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v1" )
         {
 	        //JPsiPhi from Pete with sWave 
@@ -125,11 +105,6 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 	        //JPsiPhi from Pete with sWave 
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_dev(configurator);
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_noSwave" )
-        {
-	        //JPsiPhi from Pete with sWave 
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_noSwave();
         }
         else if ( Name == "Bs2PhiPhi" )
         {

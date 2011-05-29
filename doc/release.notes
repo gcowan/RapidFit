@@ -1,5 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/29 Pete Clarke
+   - Update of all B2sJPsiPhi_SignalAlt......  code   (i.e. BaseClass, MP, MO)
+   - Refactoring code into base class
+   - Introduction of mistagP1, mistagP0 and mistafSetPoint instead of scal eand offset
+   - ..MP.. pdfs now require mistagP1, mistagP0 and mistafSetPoint
+
 2011/05/24 Rob Currie
   - I've added a new class MCStudy which performs an MC style sequential study on a large ntuple(s)
   - I've also added IStudy.h and plan to flesh this out into a simple framework which will allow for people to easily copy/implement a systematic study over some parameter within the RapidFit framework.

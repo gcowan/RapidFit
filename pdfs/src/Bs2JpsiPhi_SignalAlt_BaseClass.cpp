@@ -34,8 +34,12 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() :
 	// PELC NEW additions for v2
 	, cosphisName( make_pair("cosphis",-1) )
 	, sinphisName( make_pair("sinphis",-1) )
-	// Detector parameters
-	, mistagName	( make_pair("mistag",-1) )
+	// Mistag parameters
+	, mistagName		( make_pair("mistag",-1) )
+	, mistagP1Name		( make_pair("mistagP1",-1) )
+	, mistagP0Name		( make_pair("mistagP0",-1) )
+	, mistagSetPointName( make_pair("mistagSetPoint",-1) )
+	// Detector Parameters
 	, res1Name	( make_pair("timeResolution1",-1) )
 	, res2Name	( make_pair("timeResolution2",-1) )
 	, res1FractionName	( make_pair("timeResolution1Fraction",-1) )
@@ -101,6 +105,10 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator c
 	, sinphisName( make_pair(configurator.getName("sinphis"),-1) )
 	// Detector parameters
 	, mistagName		( make_pair(configurator.getName("mistag"),-1) )
+	, mistagP1Name		( make_pair(configurator.getName("mistagP1"),-1) )
+	, mistagP0Name		( make_pair(configurator.getName("mistagP0"),-1) )
+	, mistagSetPointName( make_pair(configurator.getName("mistagSetPoint"),-1) )
+	// Detector parameters
 	, res1Name			( make_pair(configurator.getName("timeResolution1"),-1) )
 	, res2Name			( make_pair(configurator.getName("timeResolution2"),-1) )
 	, res1FractionName	( make_pair(configurator.getName("timeResolution1Fraction"),-1) )
@@ -218,7 +226,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass::diffXsec(  )  const
 	
 	//PELC DEBUG 
 	if( DEBUGFLAG && (xsec < 0) ) {
-		cout << " Bs2JpsiPhi_SignalAlt_MO_v1::diffXsec( ) : return value < 0 = " << xsec << endl ;
+		cout << " Bs2JpsiPhi_SignalAlt_BaseClass_v1::diffXsec( ) : return value < 0 = " << xsec << endl ;
 		cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
 		cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
 		cout << "   AT()*AT() term: " <<AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) << endl << endl ;

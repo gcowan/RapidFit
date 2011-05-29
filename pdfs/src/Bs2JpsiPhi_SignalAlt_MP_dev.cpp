@@ -27,8 +27,7 @@ Bs2JpsiPhi_SignalAlt_MP_dev::Bs2JpsiPhi_SignalAlt_MP_dev() :
 	  Bs2JpsiPhi_SignalAlt_BaseClass()
 	, normalisationCacheValid(false)
 {
-	MakePrototypes();
-	
+	MakePrototypes();	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_dev " << std::endl ;
 }
 
@@ -39,8 +38,7 @@ Bs2JpsiPhi_SignalAlt_MP_dev::Bs2JpsiPhi_SignalAlt_MP_dev( PDFConfigurator config
 Bs2JpsiPhi_SignalAlt_BaseClass(config)
 , normalisationCacheValid(false)
 {
-	MakePrototypes();
-	
+	MakePrototypes();	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_dev " << std::endl ;
 }
 
@@ -71,6 +69,9 @@ void Bs2JpsiPhi_SignalAlt_MP_dev::MakePrototypes()
 	parameterNames.push_back( deltaMName.first );
 	parameterNames.push_back( Phi_sName.first );
 	parameterNames.push_back( mistagName.first );
+	parameterNames.push_back( mistagP1Name.first );
+	parameterNames.push_back( mistagP0Name.first );
+	parameterNames.push_back( mistagSetPointName.first );
 	parameterNames.push_back( res1FractionName.first );
 	parameterNames.push_back( res1Name.first );
 	parameterNames.push_back( res2Name.first );
@@ -131,7 +132,11 @@ bool Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters( ParameterSet * NewParame
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
 
-	tagFraction         = allParameters.GetPhysicsParameter( &mistagName )->GetValue();
+	_mistag			= allParameters.GetPhysicsParameter( &mistagName )->GetValue();
+	_mistagP1		= allParameters.GetPhysicsParameter( &mistagP1Name )->GetValue();
+	_mistagP0		= allParameters.GetPhysicsParameter( &mistagP0Name )->GetValue();
+	_mistagSetPoint = allParameters.GetPhysicsParameter( &mistagSetPointName )->GetValue();
+
 	delta_ms  = allParameters.GetPhysicsParameter( &deltaMName )->GetValue();
 	phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
 	_cosphis = cos(phi_s) ;
@@ -156,13 +161,13 @@ bool Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters( ParameterSet * NewParame
 	angAccI10 = allParameters.GetPhysicsParameter( &angAccI10Name )->GetValue();
 	
 	// Do a test to ensure user is not using upper time acceptance wrongly
-	if( ((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE) || (fabs(tagFraction-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
+	if( ((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE) || (fabs(mistag()-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
 	{
 		cout << " You appear to be trying to use the upper time acceptance but are using either resolution or are doing a tagged fit" << endl ;
 		cout << " This is not possible at present" << endl ;
 		cout << " Resolution1 : " << resolution1 << endl ;
 		cout << " Resolution2 : " << resolution2 << endl ;
-		cout << " Mistag : " << tagFraction << endl ;
+		cout << " Mistag : " << mistag() << endl ;
 		cout << " Phi_s : " << phi_s <<  endl ;
 		throw(10);
 	}
@@ -191,8 +196,8 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Evaluate(DataPoint * measurement)
 	tag = (int)measurement->GetObservable( &tagName )->GetValue();
 	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
 	
-	double val1, val2 ;
-	double returnValue ;
+	double val1=0, val2=0 ;
+	double returnValue=0 ;
 	
 	if(resolution1Fraction >= 0.9999 ) {
 		// Set the member variable for time resolution to the first value and calculate
@@ -214,7 +219,6 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Evaluate(DataPoint * measurement)
 	bool c1 = isnan(returnValue) ;
 	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
 	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&((fabs(resolution2-0.)<DOUBLE_TOLERANCE))) && (returnValue <= 0.) && (t>0.) ;
-
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
 		cout << " Bs2JpsiPhi_SignalAlt_MP_dev::evaluate() returns <=0 or nan :" << returnValue << endl ;
@@ -227,7 +231,10 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Evaluate(DataPoint * measurement)
 		cout << "   AS^2    " << AS()*AS() << endl ;
 		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
 		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag    " << tagFraction << endl ;
+		cout << "   mistag         " << mistag() << endl ;
+		cout << "   mistagP1       " << _mistagP1 << endl ;
+		cout << "   mistagP0       " << _mistagP0 << endl ;
+		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
 		cout << " For event with:  " << endl ;
 		cout << "   time      " << t << endl ;
 		cout << "   ctheta_tr " << ctheta_tr << endl ;
@@ -239,7 +246,6 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Evaluate(DataPoint * measurement)
 	
 	if( useLowerTimeAcceptance() ) return returnValue * timeAcceptance.acceptance(t);
 	else return returnValue ;
-
 	
 }
 
@@ -261,7 +267,7 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Normalisation(DataPoint * measurement, Phase
 	IConstraint * timeBound = boundary->GetConstraint("time");
 	if ( timeBound->GetUnit() == "NameNotFoundError" ) {
 		cerr << "Bound on time not provided" << endl;
-		return 0;
+		exit(1);
 	}
 	else {
 		tlo = timeBound->GetMinimum();
@@ -298,18 +304,29 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Normalisation(DataPoint * measurement, Phase
 		returnValue = resolution1Fraction*normalisationCacheValueRes1[tag+1] + (1. - resolution1Fraction)*normalisationCacheValueRes2[tag+1] ;
 	}
 	
-	if( (returnValue <= 0.) || isnan(returnValue) ) {
-		cout << " Bs2JpsiPhi_SignalAlt_MP_dev::Normalisation() returns <=0 or nan " << returnValue << endl ;
-		cout << " gamma " << gamma() ;
-		cout << " gl    " << gamma_l() ;
-		cout << " gh    " << gamma_h() ;
-		cout << " AT    " << AT() ;
-		cout << " AP    " << AP() ;
-		cout << " A0    " << A0() ;
-		cout << " AS    " << A0() ;
-		throw 10 ;
+	//conditions to throw exception
+	bool c1 = isnan(returnValue)  ;
+	bool c2 = (returnValue <= 0.) ;	
+	if( DEBUGFLAG && (c1 || c2 ) ) {
+		cout << endl ;
+		cout << " Bs2JpsiPhi_SignalAlt_MP_dev::Normaisation() returns <=0 or nan :" << returnValue << endl ;
+		cout << "   gamma " << gamma() << endl ;
+		cout << "   gl    " << gamma_l() << endl ;
+		cout << "   gh    " << gamma_h()  << endl;
+		cout << "   AT^2    " << AT()*AT() << endl;
+		cout << "   AP^2    " << AP()*AP() << endl;
+		cout << "   A0^2    " << A0()*A0() << endl ;
+		cout << "   AS^2    " << AS()*AS() << endl ;
+		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
+		cout << "   delta_ms       " << delta_ms << endl ;
+		cout << "   mistag         " << mistag() << endl ;
+		cout << "   mistagP1       " << _mistagP1 << endl ;
+		cout << "   mistagP0       " << _mistagP0 << endl ;
+		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
+		if( isnan(returnValue) ) throw 10 ;
+		if( returnValue <= 0. ) throw 10 ;
 	}
-	
+		
 	return returnValue ;
 }
 
