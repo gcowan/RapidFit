@@ -39,7 +39,7 @@ class XMLConfigReader
 		MinimiserConfiguration * GetMinimiserConfiguration();
 		FitFunctionConfiguration * GetFitFunctionConfiguration();
 		OutputConfiguration * GetOutputConfiguration();
-		vector< PDFWithData* > GetPDFsAndData( vector<int> = *(new vector<int>) );
+		vector< PDFWithData* > GetPDFsAndData( vector<int> = vector<int>() );
 		vector< ConstraintFunction* > GetConstraints();
 		vector< PhaseSpaceBoundary* > GetPhaseSpaceBoundaries();
 		vector< vector< IPrecalculator* > > GetPrecalculators();

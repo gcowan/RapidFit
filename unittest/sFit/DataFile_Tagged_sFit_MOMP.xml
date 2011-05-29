@@ -234,6 +234,27 @@
 <Unit> </Unit>
 </PhysicsParameter>
 
+<PhysicsParameters>
+<Name>mistagP1</Name> 
+<Value>1.</Value>
+<Type>Fixed</Type>
+<Unit> </Unit>
+</PhysicsParameters>
+
+<PhysicsParameters>
+<Name>mistagP0</Name>
+<Value>0.</Value>
+<Type>Fixed</Type>
+<Unit> </Unit>
+</PhysicsParameters>
+
+<PhysicsParameters>
+<Name>mistagSetPoint</Name>
+<Value>0.</Value>
+<Type>Fixed</Type>
+<Unit> </Unit>
+</PhysicsParameters>
+
 </ParameterSet>
 
 

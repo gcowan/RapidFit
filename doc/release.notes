@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/29 Rob Currie
+  - Updated Unittests to run correctly
+
 2011/05/29 Pete Clarke
    - Update of all B2sJPsiPhi_SignalAlt......  code   (i.e. BaseClass, MP, MO)
    - Refactoring code into base class
