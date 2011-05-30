@@ -14,8 +14,8 @@
 #include "IDataSet.h"
 #include "FitResult.h"
 #include "ToyStudyResult.h"
-#include "LLscanResult.h"
-#include "LLscanResult2D.h"
+//#include "LLscanResult.h"
+//#include "LLscanResult2D.h"
 //	System Headers
 #include <string>
 #include <vector>
@@ -39,13 +39,13 @@ class ResultFormatter
 		static void FlatNTuplePullPlots( string, ToyStudyResult* );
 		static void WriteFlatNtuple( string , ToyStudyResult* );
 		static void SeparateParameterPullPlots( string, ToyStudyResult* );
-		static void MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename ); 
-		static void MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename );
+//		static void MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename ); 
+//		static void MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename );
 
 		static void CorrMatrixOutput( string FileName, ToyStudyResult * ToyResult );
 
-		static LLscanResult* LLScan( ToyStudyResult*, string );
-		static LLscanResult2D* LLScan2D( vector<ToyStudyResult*>, string, string );
+//		static LLscanResult* LLScan( ToyStudyResult*, string );
+//		static LLscanResult2D* LLScan2D( vector<ToyStudyResult*>, string, string );
 };
 
 #endif

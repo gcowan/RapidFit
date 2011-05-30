@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/05/25 Rob Currie
+  - Fixed main.cpp to now call FC properly now, (quick profile reveals flat memory usage to first order over study as expected)
+  - Removed old plotting code from 1D and 2D LL scans, it has a bug that we are not willing to track down and can cause data loss so the easiest solution has been to remove it.
+
 2011/05/29 Rob Currie
   - Updated Unittests to run correctly
 

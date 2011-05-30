@@ -10,6 +10,8 @@
 #ifndef TOY_STUDY_RESULT_H
 #define TOY_STUDY_RESULT_H
 
+#define LLSCAN_FIT_FAILURE_VALUE -9999
+
 //	ROOT Headers
 #include "TStopwatch.h"
 //	RapidFit Headers

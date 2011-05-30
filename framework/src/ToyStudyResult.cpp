@@ -9,7 +9,7 @@
 
 //	RapidFit Headers
 #include "ToyStudyResult.h"
-#include "LLscanResult.h"
+//#include "LLscanResult.h"
 //	System Headers
 #include <iostream>
 

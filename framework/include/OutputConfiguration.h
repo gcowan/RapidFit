@@ -10,8 +10,8 @@
 #define OUTPUT_CONFIGURATION_H
 
 //	RapidFit Headers
-#include "LLscanResult.h"
-#include "LLscanResult2D.h"
+//#include "LLscanResult.h"
+//#include "LLscanResult2D.h"
 #include "ToyStudyResult.h"
 #include "FitResult.h"
 #include "ScanParam.h"
@@ -43,8 +43,8 @@ class OutputConfiguration
 
 		//Make output requested
 		void OutputFitResult( FitResult* );
-		void OutputLLscanResult( vector<LLscanResult*>  );
-		void OutputLLcontourResult( vector<LLscanResult2D*>  );
+//		void OutputLLscanResult( vector<LLscanResult*>  );
+//		void OutputLLcontourResult( vector<LLscanResult2D*>  );
 		void OutputToyResult( ToyStudyResult* );
 
 		//Change the configuration

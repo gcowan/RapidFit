@@ -22,8 +22,6 @@
 #include "PerEventAngularAcceptance.h"
 #include "OutputConfiguration.h"
 #include "ToyStudyResult.h"
-#include "LLscanResult.h"
-#include "LLscanResult2D.h"
 #include "main.h"
 #include "DataSetConfiguration.h"
 #include "IDataSet.h"
@@ -133,6 +131,8 @@ int RapidFit( int argc, char * argv[] )
 	vector<ParameterSet*> argumentParameterSet;
 	XMLConfigReader* xmlFile=NULL;
 	MCStudy* newMCStudy = NULL;
+	vector<ToyStudyResult*> SoloContourResults;
+
 
 
 	int BAD_COMMAND_LINE_ARG = -39;
@@ -818,7 +818,7 @@ int RapidFit( int argc, char * argv[] )
 
 	//	7)	Toy Study
 	//Pick a toy study if there are repeats, or if pull plots are wanted
-	if ( ( ( ( numberRepeats > 1 ) && ((!doFC_Flag) && (!doLLcontourFlag) && (!doLLscanFlag) ) ) || doPullsFlag ) && !MCStudyFlag )
+	if ( ( ( numberRepeats > 0 ) || doPullsFlag ) && !( ( ( doLLcontourFlag || doFC_Flag ) || doLLscanFlag ) || MCStudyFlag ) )
 	{
 		vector< ConstraintFunction* > XMLConstraints = xmlFile->GetConstraints();
 		//Do the toy study
@@ -914,29 +914,23 @@ int RapidFit( int argc, char * argv[] )
 	//	Do LL scan
 	if( doLLscanFlag )
 	{
-		//  Temporary Holder for the scan outputs to plot
-		LLscanResult * llResult;
-		vector<ToyStudyResult*> scanSoloResult;
+		vector<ToyStudyResult*> scanSoloResults;
+
 		//  Store
-		vector<LLscanResult*> scanResults;
 		vector<string> LLscanList = makeOutput->GetScanList();
 
-		for(unsigned int ii=0; ii < LLscanList.size() ; ++ii)
+		for(unsigned int scan_num=0; scan_num < LLscanList.size() ; ++scan_num)
 		{
-			ToyStudyResult* scan_result = FitAssembler::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[ii] );
-			llResult = ResultFormatter::LLScan( scan_result, LLscanList[ii] );
-			scanResults.push_back( llResult );
-			scanSoloResult.push_back( scan_result );
+			ToyStudyResult* scan_result = FitAssembler::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[scan_num] );
+			scanSoloResults.push_back( scan_result );
 		}
-		makeOutput->SetLLscanFileName( LLscanFileName );
-		makeOutput->OutputLLscanResult( scanResults ) ;
-		for(unsigned int ii=0; ii < LLscanList.size(); ++ii )
+
+		for(unsigned int scan_num=0; scan_num < LLscanList.size(); ++scan_num )
 		{
-			TString output_scan_dat("LLScanData");
-			output_scan_dat.Append(LLscanList[ii]);
-			output_scan_dat.Append(".root" );
-			//ResultFormatter::FlatNTuplePullPlots( string( output_scan_dat ), scanSoloResult[ii] );
-			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), scanSoloResult[ii] );
+			TString output_scan_dat( "LLScanData" );
+			output_scan_dat.Append( LLscanList[scan_num] );
+			output_scan_dat.Append( ".root" );
+			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), scanSoloResults[scan_num] );
 		}
 	}
 
@@ -947,21 +941,13 @@ int RapidFit( int argc, char * argv[] )
 	//Do 2D LL scan for deltaGamma and phis
 	if( doLLcontourFlag || doFC_Flag )
 	{
-
-		//  Soon to be gladly deprecated!
-		LLscanResult2D * llContourResult ;
-		vector<LLscanResult2D*> contourResults ;
-
-		//  Array of individual Results
-		vector<ToyStudyResult*> SoloContourResults;
-
 		vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
 
 		unsigned int initial_scan=0;
 		if( ( ( _2DLLscanList.size() > 1 ) && doFC_Flag ) || defineContourFlag )
 		{
-			cerr << "\n\nPERFORMING ONLY ONE 2D SCAN, CHECK THIS IS EXPECTED!" <<endl;
-			initial_scan = int(_2DLLscanList.size()-1);
+			//cerr << "\n\nPERFORMING ONLY ONE 2D SCAN, CHECK THIS IS EXPECTED!" <<endl;
+			initial_scan = int( _2DLLscanList.size()-1 );
 		}
 
 		if( ( _2DLLscanList.size() == 0 ) && ( doFC_Flag) )
@@ -979,20 +965,14 @@ int RapidFit( int argc, char * argv[] )
 		//theMinimiser = xmlFile->GetMinimiserConfiguration();
 			vector<ToyStudyResult*> Temp_Results = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
 
-			if( !doFC_Flag )
-			{
-				llContourResult = ResultFormatter::LLScan2D( Temp_Results, name1, name2 );
-				contourResults.push_back( llContourResult );
-			}
-
 			GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
 			GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
 			GlobalResult->GetResultParameterSet()->GetResultParameter( name2 )->ForcePullValue( -9999 );
 			GlobalResult->GetResultParameterSet()->GetResultParameter( name2 )->ForceOriginalValue( -9999 );
 
-			TString ext_string("-");
+			TString ext_string( "-" );
 			ext_string.Append( name1 );
-			ext_string.Append("_");
+			ext_string.Append( "_" );
 			ext_string.Append( name2 );
 			ext_string.Append( ".root" );
 			TString TempName = LLcontourFileName;
@@ -1017,36 +997,29 @@ int RapidFit( int argc, char * argv[] )
 		if( doFC_Flag )  {
 			_2DResultForFC = SoloContourResults.back();
 		} else  {
-			for(unsigned int ii=0; ii < _2DLLscanList.size(); ++ii )
+			for(unsigned int scanNum=0; scanNum < _2DLLscanList.size(); ++scanNum )
 			{
-				//	STOP RELYING ON THIS OUTPUT IT WILL BE DISABLED SOONER RATHER THAN LATER
-				makeOutput->SetLLcontourFileName( LLcontourFileNamez[ii].Data() );
-				makeOutput->OutputLLcontourResult( contourResults ) ;
 
 				//	This output is A LOT safer as it intended to be fed to a sperate plotting program.
 				//	Formatting SHOULD be seperate to generation!
 				string output_scan_dat("LLcontourScanData.root");
-				if( ii > 0 )
+				if( scanNum > 0 )
 				{
 					TString _scan_dat("LLcontourScanData_");
-					_scan_dat+= ii+1;
+					_scan_dat+= scanNum+1;
 					_scan_dat.Append(".root");
 					output_scan_dat=_scan_dat;
 				}
-					//	Add the Global Results and 'Linearize' the output
-					vector<ToyStudyResult*> TempContourResults;
-					TempContourResults.push_back( GlobalFitResult );
-					TempContourResults.push_back( SoloContourResults[ii] );
-					ToyStudyResult* TempContourResults2 = new ToyStudyResult( TempContourResults );
-					ResultFormatter::WriteFlatNtuple( output_scan_dat , TempContourResults2 );
+
+				//	Add the Global Results and 'Linearize' the output
+				vector<ToyStudyResult*> TempContourResults;
+				TempContourResults.push_back( GlobalFitResult );
+				TempContourResults.push_back( SoloContourResults[scanNum] );
+				ToyStudyResult* TempContourResults2 = new ToyStudyResult( TempContourResults );
+				ResultFormatter::WriteFlatNtuple( output_scan_dat , TempContourResults2 );
 			}
 		}
 
-		while( !SoloContourResults.empty() )
-		{
-			delete SoloContourResults.back();
-			SoloContourResults.pop_back();
-		}
 	}
 
 	//	Do the main work of the FC scan
@@ -1055,11 +1028,11 @@ int RapidFit( int argc, char * argv[] )
 		vector<unsigned int> numberRepeatsVec;
 		if( numberRepeatsFlag ) numberRepeatsVec.push_back( unsigned(numberRepeats) );
 
-			//	Do FC scan
-			ToyStudyResult* AllFCResults = FitAssembler::FeldmanCousins( GlobalFitResult, _2DResultForFC, numberRepeatsVec, unsigned(int(Nuisencemodel)), FC_Debug_Flag, makeOutput, theMinimiser, theFunction,  xmlFile, pdfsAndData );
+		//	Do FC scan
+		ToyStudyResult* AllFCResults = FitAssembler::FeldmanCousins( GlobalFitResult, _2DResultForFC, numberRepeatsVec, unsigned(int(Nuisencemodel)), FC_Debug_Flag, makeOutput, theMinimiser, theFunction,  xmlFile, pdfsAndData );
 
-			//		STORE THE OUTPUT OF THE TOY STUDIES
-			ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );
+		//		STORE THE OUTPUT OF THE TOY STUDIES
+		ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );
 	}
 
 
@@ -1074,6 +1047,12 @@ int RapidFit( int argc, char * argv[] )
 	delete GlobalResult;
 	delete GlobalFitResult;
 
+	//	These have to be cleaned here such that they are still within scope during FC scans
+	while( !SoloContourResults.empty() )
+	{
+		delete SoloContourResults.back();
+		SoloContourResults.pop_back();
+	}
 
 	//Default action - presumably a fit or a toy study
 	cerr << "No action performed" << endl;

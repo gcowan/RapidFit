@@ -691,7 +691,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 			for( unsigned int pdf_num=0; pdf_num < PDFsWithDataForToys.size(); ++pdf_num )
 			{
 				cout << "deleting data for pdf: " << pdf_num << "\n";
-				delete Memory_Data[pdf_num].back();
+				//delete Memory_Data[pdf_num].back();
 				Memory_Data[pdf_num].back() = NULL;
 			}
 
