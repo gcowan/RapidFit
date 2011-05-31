@@ -228,6 +228,9 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		//mutable int histCounter ;
 		//~PELC
 
+		//Configurationparameters
+		bool useCosAndSin ;
+		bool allowNegativeAsSq ;
 	
 		// These contain the pair<string,int>s that correspond to the physics parameter names and references
 		pair<string,int> gammaName;		// gamma

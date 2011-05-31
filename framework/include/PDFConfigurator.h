@@ -26,10 +26,20 @@ class PDFConfigurator
 		// E.g. to substitute tau_LL  ->  tauLL2
 		void addParameterSubstitution( string substitution );
 		string getName( string defaultName ) ; 
+	
+	    // Set configuration parameter
+		void addConfigurationParameter( string configString ) ;
+		string getConfigurationValue( string configParam );
+		bool hasConfigurationValue( string configParam, string val );
+		bool isTrue( string configParam );
+	    
 
 	private:
 		vector<string> defaultNames;
 		vector<string> replacementNames;
+
+		vector<string> configParameters;
+		vector<string> configValues;
 };
 
 #endif

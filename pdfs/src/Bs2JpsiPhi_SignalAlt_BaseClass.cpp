@@ -64,6 +64,7 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() :
 	, timeAcceptanceCategoryName ( make_pair("timeAcceptanceCategory",-1) )
 	// Other things
 {
+	
 	if( ! USE_LOWER_TIME_ACCEPTANCE ) {
 		cout << "=====>WARNING " << endl ;
 		cout << "=====>WARNING YOU APPEAR TO **NOT** BE USING THE LOWER TIME ACCEPTANCE" << endl ;
@@ -133,6 +134,10 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator c
 	, timeAcceptanceCategoryName ( make_pair(configurator.getName("timeAcceptanceCategory"),-1) )
 // Other things
 {
+	
+	useCosAndSin = configurator.isTrue( "UseCosAndSin" ) ;
+	allowNegativeAsSq = configurator.isTrue( "AllowNegativeAsSq" ) ;
+		
 	if( ! USE_LOWER_TIME_ACCEPTANCE ) {
 		cout << "=====>WARNING " << endl ;
 		cout << "=====>WARNING YOU APPEAR TO **NOT** BE USING THE LOWER TIME ACCEPTANCE" << endl ;

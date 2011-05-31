@@ -1201,6 +1201,10 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 			{
 				configurator.addParameterSubstitution( pdfConfig[configIndex]->GetValue()[0] );
 			}
+			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
+			{
+				configurator.addConfigurationParameter( pdfConfig[configIndex]->GetValue()[0] );
+			}
 			else
 			{
 				cerr << "Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;

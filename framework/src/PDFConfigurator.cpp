@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <string>
+#include <string.h>
 #include "PDFConfigurator.h"
 
 ///..........................................
@@ -56,7 +58,72 @@ string PDFConfigurator::getName( string defaultName ) {
 		}
 	}
 	return defaultName ;
-};
+}
 
-		   
+
+//............................................
+// Configuration parameters
+
+// Method to store a configuration parmeter
+// The configuration parameter is of the form parameter:value
+void PDFConfigurator::addConfigurationParameter( string configString ) {
 	
+	
+	// Find position of ":" character
+	size_t pos = configString.find_first_of(":") ;
+	if( pos == string::npos ) {
+		cout << "  In PDFConfigurator::addConfigurationParameter : No separator found  in string : " << configString << endl ;
+		exit(1);
+	}
+	
+	// Break into 2 strings
+	string configParameter  =  configString.substr( 0, pos ) ;
+	string configValue		=  configString.substr( pos+1, string::npos ) ;
+	cout << " In PDFConfigurator::addConfigurationParameter : storing configParameter [" << configParameter << " : " << configValue << "]" << endl ;
+	configParameters.push_back( configParameter ) ;
+	configValues.push_back( configValue ) ;
+	
+	return ;
+}
+
+
+// Method to return a configuration parameter value
+// If not found then returns " "
+string PDFConfigurator::getConfigurationValue( string configParam ) {
+	for( unsigned int ii=0; ii<configParameters.size() ; ii++ ) {
+		//cout << " Testing " << configParam <<  "   against   " << configParameters[ii] << endl ;
+		if( configParam == configParameters[ii] ) {
+			cout << " PDFConfiguratorgetConfigurationValue setting [" << configParam << "--->" << configParameters[ii] << "]" << endl ;
+			return configParameters[ii] ;
+		}
+	}
+	return string("") ;
+}
+
+// Method to check for a configuration parameter value
+bool PDFConfigurator::hasConfigurationValue( string configParam, string paramValue ) {
+	for( unsigned int ii=0; ii<configParameters.size() ; ii++ ) {
+		//cout << " Testing " << configParam <<  "   against   " << configParameters[ii] << endl ;
+		if( configParam == configParameters[ii] ) {
+			cout << " PDFConfigurator::hasConfigurationValue found [" << configParam << " == " << configValues[ii] << "]" << endl ;
+			return ( configValues[ii] == paramValue ) ;
+		}
+	}
+	return false ;
+}
+
+// Method to check for a configuration parameter value boolean
+bool PDFConfigurator::isTrue( string configParam ) {
+	for( unsigned int ii=0; ii<configParameters.size() ; ii++ ) {
+		//cout << " Testing " << configParam <<  "   against   " << configParameters[ii] << endl ;
+		if( configParam == configParameters[ii] ) {
+			bool returnValue =  ( strcasecmp( configValues[ii].c_str() , "TRUE" ) == 0 )  ;
+			cout << " PDFConfigurator::isTrue found [" << configParam << " == " << returnValue << " ]" << endl ;
+			return returnValue ;
+		}
+	}
+	return false ;
+}
+
+
+

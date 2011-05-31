@@ -65,7 +65,15 @@ void Bs2JpsiPhi_SignalAlt_MO_dev::MakePrototypes()
 	parameterNames.push_back( delta_zeroName.first );
 	parameterNames.push_back( delta_sName.first );
 	parameterNames.push_back( deltaMName.first );
-	parameterNames.push_back( Phi_sName.first );
+
+	if( useCosAndSin ) {
+		parameterNames.push_back( cosphisName.first );
+		parameterNames.push_back( sinphisName.first );
+	}
+	else{
+		parameterNames.push_back( Phi_sName.first );
+	}
+	
 	parameterNames.push_back( res1FractionName.first );
 	parameterNames.push_back( res1Name.first );
 	parameterNames.push_back( res2Name.first );
@@ -112,7 +120,7 @@ bool Bs2JpsiPhi_SignalAlt_MO_dev::SetPhysicsParameters( ParameterSet * NewParame
 	Aperp_sq = allParameters.GetPhysicsParameter( &Aperp_sqName )->GetValue();
 	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_dev::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}	
 	As_sq = allParameters.GetPhysicsParameter( &As_sqName )->GetValue();
-	if( (As_sq < 0.) || (As_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_dev::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
+	if( (!allowNegativeAsSq&&(As_sq < 0.)) || (As_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_dev::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
 
 	Apara_sq = (1. - Azero_sq - Aperp_sq  - As_sq) ;
 	if( Apara_sq < 0. ) {
@@ -128,10 +136,17 @@ bool Bs2JpsiPhi_SignalAlt_MO_dev::SetPhysicsParameters( ParameterSet * NewParame
 	delta2 = delta_perp -  delta_zero ;
 	
 	delta_ms		= allParameters.GetPhysicsParameter( &deltaMName )->GetValue();	
-	phi_s			= allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
-	_cosphis = cos(phi_s) ;
-	_sinphis = sin(phi_s) ;
-		
+
+	if(useCosAndSin){
+		_cosphis = allParameters.GetPhysicsParameter( &cosphisName )->GetValue();
+		_sinphis = allParameters.GetPhysicsParameter( &sinphisName )->GetValue();
+	}
+	else{
+		phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
+		_cosphis = cos(phi_s) ;
+		_sinphis = sin(phi_s) ;
+	}
+	
 	// Mistag parameters
 	_mistagP1		= allParameters.GetPhysicsParameter( &mistagP1Name )->GetValue();
 	_mistagP0		= allParameters.GetPhysicsParameter( &mistagP0Name )->GetValue();

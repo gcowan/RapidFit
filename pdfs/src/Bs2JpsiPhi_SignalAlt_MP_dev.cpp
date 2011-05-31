@@ -67,7 +67,15 @@ void Bs2JpsiPhi_SignalAlt_MP_dev::MakePrototypes()
 	parameterNames.push_back( delta_zeroName.first );
 	parameterNames.push_back( delta_sName.first );
 	parameterNames.push_back( deltaMName.first );
-	parameterNames.push_back( Phi_sName.first );
+
+	if( useCosAndSin ) {
+		parameterNames.push_back( cosphisName.first );
+		parameterNames.push_back( sinphisName.first );
+	}
+	else{
+		parameterNames.push_back( Phi_sName.first );
+	}
+	
 	parameterNames.push_back( mistagName.first );
 	parameterNames.push_back( mistagP1Name.first );
 	parameterNames.push_back( mistagP0Name.first );
@@ -117,7 +125,7 @@ bool Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters( ParameterSet * NewParame
 	Aperp_sq = allParameters.GetPhysicsParameter( &Aperp_sqName )->GetValue();
 	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}	
 	As_sq = allParameters.GetPhysicsParameter( &As_sqName )->GetValue();
-	if( (As_sq < 0.) || (As_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
+	if( (!allowNegativeAsSq&&(As_sq < 0.)) || (As_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
 
 	Apara_sq = (1. - Azero_sq - Aperp_sq  - As_sq) ;
 	if( Apara_sq < 0. ) {
@@ -138,9 +146,16 @@ bool Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters( ParameterSet * NewParame
 	_mistagSetPoint = allParameters.GetPhysicsParameter( &mistagSetPointName )->GetValue();
 
 	delta_ms  = allParameters.GetPhysicsParameter( &deltaMName )->GetValue();
-	phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
-	_cosphis = cos(phi_s) ;
-	_sinphis = sin(phi_s) ;
+
+	if(useCosAndSin){
+		_cosphis = allParameters.GetPhysicsParameter( &cosphisName )->GetValue();
+		_sinphis = allParameters.GetPhysicsParameter( &sinphisName )->GetValue();
+	}
+	else{
+		phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
+		_cosphis = cos(phi_s) ;
+		_sinphis = sin(phi_s) ;
+	}
 	
 	// Resolution parameters
 	resolution1Fraction = allParameters.GetPhysicsParameter( &res1FractionName )->GetValue();
