@@ -296,21 +296,6 @@
 <Unit> </Unit>
 </PhysicsParameter>
 
-// Mistag calibration
-<PhysicsParameter>
-<Name>mistagScale</Name>
-<Value>1.0</Value>
-<Type>Free</Type>
-<Unit> </Unit>
-</PhysicsParameter>
-
-<PhysicsParameter>
-<Name>mistagOffset</Name>
-<Value>0.338</Value>
-<Type>Free</Type>
-<Unit> </Unit>
-</PhysicsParameter>
-
 //............................................
 // Background model
 
@@ -414,14 +399,14 @@
 
 <PhysicsParameter>
 <Name>mistagP0</Name>
-<Value>0.</Value>
+<Value>0.338</Value>
 <Type>Fixed</Type>
 <Unit> </Unit>
 </PhysicsParameter>
 
 <PhysicsParameter>
 <Name>mistagSetPoint</Name>
-<Value>0.</Value>
+<Value>0.338</Value>
 <Type>Fixed</Type>
 <Unit> </Unit>
 </PhysicsParameter>
@@ -452,27 +437,6 @@
 <Name>deltaM</Name>
 <Value>17.77</Value>
 <Error>0.12</Error>
-</ExternalConstraint>
-</ConstraintFunction>
-</ToFit>
-
-// This applies a constraint on mistag scale
-<ToFit>
-<ConstraintFunction>
-<ExternalConstraint>
-<Name>mistagScale</Name>
-<Value>1.01</Value>
-<Error>0.12</Error>
-</ExternalConstraint>
-</ConstraintFunction>
-</ToFit>
-
-<ToFit>
-<ConstraintFunction>
-<ExternalConstraint>
-<Name>mistagOffset</Name>
-<Value>0.338</Value>
-<Error>0.012</Error>
 </ExternalConstraint>
 </ConstraintFunction>
 </ToFit>
