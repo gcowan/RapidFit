@@ -50,6 +50,24 @@ using std::endl;
 typedef vector<Float_t> array1f;
 typedef vector<TGraph*> array1g;
 typedef vector<TString> array1s;
+typedef vector< vector < Float_t> > array2f;
+
+array1s get_branch_names( TTree* local_tree , TString notme1, TString notme2)
+{
+	vector<TString> temp_branch_names;
+	TObjArray* branch_obj_array = local_tree->GetListOfBranches();
+	for(unsigned short int i=0; i<branch_obj_array->GetEntries();++i)
+	{
+		TObject* branch_object = (*branch_obj_array)[i];
+		TString name = branch_object->GetName();
+		if(!name.Contains("_gen") && !name.Contains(notme1) && !name.Contains(notme2)){
+			temp_branch_names.push_back(name);
+		}
+	}
+	return temp_branch_names;
+}
+
+
 
 inline TString prettyPrint(Double_t value){
 	char pretty[20];
@@ -58,7 +76,6 @@ inline TString prettyPrint(Double_t value){
 	prettyString = pretty;
 	return prettyString;
 }
-
 
 inline TString prettyPrint(Double_t val, Double_t err){
 	TString outstr = "$";
@@ -191,15 +208,15 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 		contLevel = (TList*)llcontObjArr->At(i);
 		for(int j =0; j<contLevel->GetSize(); j++){
 			curv = (TGraph*)contLevel->At(j);
-				TGraph *gc = (TGraph*)curv->Clone();
-				gc->SetLineStyle(i+1);
-				gcarr.push_back(gc);
+			TGraph *gc = (TGraph*)curv->Clone();
+			gc->SetLineStyle(i+1);
+			gcarr.push_back(gc);
 
-		if(j==0){leg->AddEntry(gc,confname, "L");}
+			if(j==0){leg->AddEntry(gc,confname, "L");}
 		}
 
 	}
-	
+
 	histfc->SetContour(nconts,fcconts);
 	histfc->Draw("cont LIST");
 	confCanvas->Update();
@@ -214,15 +231,15 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 		contLevel = (TList*)fccontObjArr->At(i);
 		for(int j =0; j<contLevel->GetSize(); j++){
 			curv = (TGraph*)contLevel->At(j);
-				TGraph *gc = (TGraph*)curv->Clone();
-				gc->SetLineColor(i+2);
-				gcarr.push_back(gc);
-		if(j==0){leg->AddEntry(gc,confname, "L");}
+			TGraph *gc = (TGraph*)curv->Clone();
+			gc->SetLineColor(i+2);
+			gcarr.push_back(gc);
+			if(j==0){leg->AddEntry(gc,confname, "L");}
 		}
 	}
 	histll->Draw("AXIS");
 	for(UInt_t i =0; i<gcarr.size(); i++){
-	gcarr[i]->Draw("L SAME");
+		gcarr[i]->Draw("L SAME");
 	}
 	addLHCbLabel(labelname)->Draw();
 	leg->Draw();
@@ -323,9 +340,20 @@ int main(int argc, char *argv[]){
 	// Find the positions of the gridpoints we scanned, and find the profileLL at each point for data:
 	TString datafixedstr = param1genstr + "==" + notgen + "&&" + param2genstr + "==" + notgen + "&&"+ param1errstr + "==0.0&&" +param2errstr +"==0.0&&" + FRstr + "==3.0";
 	TTree* datafixed = allresults->CopyTree(datafixedstr);
+
 	datafixed->SetBranchAddress(param1valstr,&param1val);
 	datafixed->SetBranchAddress(param2valstr,&param2val);
 	datafixed->SetBranchAddress(NLLstr,&nll);
+
+	vector<TString> all_parameters = get_branch_names( allresults, param1string, param2string);
+
+	Float_t best_fit_temp_values[all_parameters.size()];
+	array2f paramvalues;
+	paramvalues.resize(all_parameters.size());
+	for(UInt_t i=0; i < all_parameters.size(); ++i )
+	{
+		datafixed->SetBranchAddress(all_parameters[i],&best_fit_temp_values[i]);
+	}
 	Double_t smallest = 9999.9;
 	for(Long64_t i = 0; i < datafixed->GetEntries(); i++){
 		datafixed->GetEntry(i);
@@ -336,6 +364,11 @@ int main(int argc, char *argv[]){
 			if((fabs(param1gridpoints[j] - param1val) < shift) && (fabs(param2gridpoints[j] - param2val) < shift)){unique = false;}
 		}
 		if(unique){
+			for( UInt_t i=0; i < all_parameters.size(); ++i )
+			{
+				Float_t thisval = best_fit_temp_values[i];
+				paramvalues[i].push_back(thisval);
+			}
 			param1gridpoints.push_back(param1val);
 			param2gridpoints.push_back(param2val);
 			dataRatiogridpoints.push_back(nll-nlldatabest);
@@ -344,13 +377,42 @@ int main(int argc, char *argv[]){
 		}
 	}
 	for(UInt_t i = 0; i<dataRatiogridpoints.size(); i++){
-	dataRatiogridpoints[i] = dataRatiogridpoints[i] - smallest;
+		dataRatiogridpoints[i] = dataRatiogridpoints[i] - smallest;
 	}
 	cout << "FOUND " << param1gridpoints.size() << " UNIQUE GRIDPOINTS" << endl;
 	cout << "DIFFERENCE BETWEEN CENTRAL NLL AND SMALLEST NLL = " << smallest << endl;
 	Float_t NLLtoyfixed, NLLtoyfloat;
-	delete datafixed;
+	int npoints = param1gridpoints.size();
+	int np = (int)sqrt((double)npoints);
+	Double_t* p2points = new Double_t [npoints];
+	copy( param2gridpoints.begin(), param2gridpoints.end(),p2points);
+	Double_t* p1points = new Double_t [npoints];
+	copy( param1gridpoints.begin(), param1gridpoints.end(),p1points);
 
+	for(UInt_t i=0; i < all_parameters.size(); ++i ){
+		Double_t* parpoints = new Double_t [npoints];
+		copy(paramvalues[i].begin(),paramvalues[i].end(),parpoints);
+		TGraph2D *paramgraph = new TGraph2D(npoints, p2points, p1points, parpoints);
+		paramgraph->SetName(all_parameters[i]+"_llvalgraph");
+
+		if(fabs(paramgraph->GetZmax()-paramgraph->GetZmin())>shift){
+		paramgraph->SetNpx(np);
+		paramgraph->SetNpy(np);
+
+		TH2D* paramhist = paramgraph->GetHistogram();
+		paramhist->SetName(all_parameters[i]+"_llvalhist");
+		paramhist->SetTitle("");
+		paramhist->GetXaxis()->SetTitle(param2string);
+		paramhist->GetYaxis()->SetTitle(param1string);
+		paramhist->Write();
+
+		TCanvas *paramtemp = makeTempCanvas(paramhist, all_parameters[i]+" value in LLscan");
+		paramtemp->Print(outputdir+"/"+param1string+"_"+param2string+"_"+all_parameters[i]+"_llvals.pdf");
+		paramtemp->Print(outputdir+"/"+param1string+"_"+param2string+"_"+all_parameters[i]+"_llvals.png");
+		}
+	}	
+
+	delete datafixed;
 	bool hastoys = false;
 
 	TString p1isatoy = "(abs("+param1genstr+"-"+notgen+")>"+shiftstr+")";
@@ -395,23 +457,23 @@ int main(int argc, char *argv[]){
 				exit(1);
 			}
 			if(goodfixedtoystot != 0){
-			//Loop over the toys, pulling out the NLL ratio
-			goodfloatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);	
-			goodfixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
-			UInt_t toyNLLsmaller = 0;
+				//Loop over the toys, pulling out the NLL ratio
+				goodfloatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);	
+				goodfixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
+				UInt_t toyNLLsmaller = 0;
 
-			goodtoysgridpoints.push_back((Float_t)goodfixedtoystot);
-			toysgridpoints.push_back((Float_t)fixedtoystot);
-			for(UInt_t j = 0; j<goodfixedtoystot; j++){
-				goodfloatedtoys->GetEntry(j);	
-				goodfixedtoys->GetEntry(j);	
-				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
-				//if the toyratio is smaller than the data ratio at this point, increment:
-				if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}
-			}
-			//The C.L. is the percentage of toys that were smaller
-			double cl = ((Double_t)toyNLLsmaller/(Double_t)goodfixedtoystot);
-			clgridpoints.push_back(cl);
+				goodtoysgridpoints.push_back((Float_t)goodfixedtoystot);
+				toysgridpoints.push_back((Float_t)fixedtoystot);
+				for(UInt_t j = 0; j<goodfixedtoystot; j++){
+					goodfloatedtoys->GetEntry(j);	
+					goodfixedtoys->GetEntry(j);	
+					//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
+					//if the toyratio is smaller than the data ratio at this point, increment:
+					if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}
+				}
+				//The C.L. is the percentage of toys that were smaller
+				double cl = ((Double_t)toyNLLsmaller/(Double_t)goodfixedtoystot);
+				clgridpoints.push_back(cl);
 			}else{ 
 				cout << param1gridpoints[i] << " " << param2gridpoints[i] << " WARNING: Found no toys here. " << endl;
 				clgridpoints.push_back(-9999.0);
@@ -427,16 +489,16 @@ int main(int argc, char *argv[]){
 	//We now have 4 vectors: The gridpoints in x,y and the conf. limits in z or the profile LL in z. We need to make TGraphs from these bad boys. 
 
 	//Copy vectors to arrays: 
-	int npoints = param1gridpoints.size();
-	Double_t* p2points = new Double_t [npoints];
-	copy( param2gridpoints.begin(), param2gridpoints.end(),p2points);
-	Double_t* p1points = new Double_t [npoints];
-	copy( param1gridpoints.begin(), param1gridpoints.end(),p1points);
+
+	//Double_t* p2points = new Double_t [npoints];
+	//copy( param2gridpoints.begin(), param2gridpoints.end(),p2points);
+	//Double_t* p1points = new Double_t [npoints];
+	//copy( param1gridpoints.begin(), param1gridpoints.end(),p1points);
 	Double_t* pllpoints = new Double_t [npoints];
 	copy( dataRatiogridpoints.begin(), dataRatiogridpoints.end(),pllpoints);
 
-	int np = (int)sqrt((double)npoints);
-	
+
+
 	//We get the data profile likelihood free, so let's plot it: 
 	TGraph2D *pllgraph = new TGraph2D(npoints, p2points, p1points, pllpoints);
 	pllgraph->SetName("pllgraph");
@@ -519,7 +581,7 @@ int main(int argc, char *argv[]){
 		TCanvas *toytemp = makeTempCanvas(toyhist,"Toys per gridpoint");
 		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.pdf");
 		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.png");
-		
+
 		TGraph2D *goodtoygraph = new TGraph2D(npoints, p2points, p1points, goodtoyspoints);
 		goodtoygraph->SetName("ngoodtoysgraph");
 		goodtoygraph->SetNpx(np);
