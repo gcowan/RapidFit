@@ -71,17 +71,16 @@ inline TString prettyPrint(Double_t val, Double_t err){
 	outstr += errstr;
 	outstr+= "$";
 	return outstr;
-
-
 }
 
 TPaveText* addLHCbLabel(TString footer){
-	TPaveText * label = new TPaveText(0.14, 0.88, 0.14, 0.73,"BRNDC");
+	TPaveText * label = new TPaveText(0.14, 0.73, 0.14, 0.88,"BRNDC");
 	//TPaveText * label = new TPaveText(0.12, 0.58, 0.12, 0.43,"BRNDC");
-	label->SetFillColor(0);
+	label->SetFillStyle(0);
 	label->SetBorderSize(0);     
 	label->SetTextAlign(11);          
 	label->SetTextSize(0.04);
+
 	TText * labeltext = 0;
 	labeltext = label->AddText("LHC#font[12]{b} 2010 Data");
 	labeltext = label->AddText("#sqrt{s} = 7TeV");
@@ -307,14 +306,13 @@ int main(int argc, char *argv[]){
 	//Par values will be floated
 	//Par errors !=0
 
-	Float_t shift = 0.000000001;
+	Float_t shift = 0.1E-09;
 	TString shiftstr = "";
 	shiftstr += shift;
 
 	TString notgen = "-9999.";
-	Float_t param1val, param2val;
-	Float_t nll, nlldatabest;
-	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints, toysgridpoints;
+	Float_t param1val, param2val, nll, nlldatabest;
+	array1f param1gridpoints, param2gridpoints, dataRatiogridpoints, clgridpoints, toysgridpoints, goodtoysgridpoints;
 	allresults->SetBranchAddress(NLLstr,&nll);
 	// Find the global minimum from the first entry:
 
@@ -368,43 +366,51 @@ int main(int argc, char *argv[]){
 		for(UInt_t i = 0; i<param1gridpoints.size(); i++){
 			//cout << "step " << i << " of " <<  param1gridpoints.size() << endl;
 			// Build up cutstrings for the toys
-			TString toyscutstr = FRstr + "==3.0&&(abs(" +param1genstr + "-";
+			TString toyscutstr = "(abs(" +param1genstr + "-";
 			toyscutstr += param1gridpoints[i];
 			toyscutstr += ")<"+shiftstr+")&&(abs(" + param2genstr + "-";
 			toyscutstr += param2gridpoints[i];
 			toyscutstr += ")<"+shiftstr+")&&";
 			//Reduce the ntuple to only toys generated at this gridpoint, and only toys that had floated params
 			TString floatedtoyscutstr = toyscutstr;
-
 			floatedtoyscutstr += "(abs("+param1errstr +")>"+shiftstr + ")&&(abs(" + +param1errstr +")>"+shiftstr + ")";
 			TTree *floatedtoys = toys->CopyTree(floatedtoyscutstr);
+			TTree *goodfloatedtoys = floatedtoys->CopyTree(FRstr + "==3.0");
+
 			UInt_t floatedtoystot = floatedtoys->GetEntries();
+			UInt_t goodfloatedtoystot = goodfloatedtoys->GetEntries();
 			//Do the same for toys that had fixed params
 			TString fixedtoyscutstr = toyscutstr;
 			fixedtoyscutstr += "(abs("+param1errstr +")<"+shiftstr + ")&&(abs(" + +param1errstr +")<"+shiftstr + ")";
 			TTree* fixedtoys = toys->CopyTree(fixedtoyscutstr);
+			TTree* goodfixedtoys = fixedtoys->CopyTree(FRstr + "==3.0");
 			UInt_t fixedtoystot = fixedtoys->GetEntries();
-			if(fixedtoystot != floatedtoystot){
+			UInt_t goodfixedtoystot = goodfixedtoys->GetEntries();
+
+
+			if(goodfixedtoystot != goodfloatedtoystot){
 				//We've got serious problems! 
 				cout << "Different number of toy fits found for gridpoint " << param1gridpoints[i] << "," << param2gridpoints[i] << " (" << fixedtoystot << "," << floatedtoystot << ") Can't continue!" << endl;
 
 				exit(1);
 			}
-			if(fixedtoystot != 0){
+			if(goodfixedtoystot != 0){
 			//Loop over the toys, pulling out the NLL ratio
-			floatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);	
-			fixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
+			goodfloatedtoys->SetBranchAddress(NLLstr,&NLLtoyfloat);	
+			goodfixedtoys->SetBranchAddress(NLLstr,&NLLtoyfixed);
 			UInt_t toyNLLsmaller = 0;
+
+			goodtoysgridpoints.push_back((Float_t)goodfixedtoystot);
 			toysgridpoints.push_back((Float_t)fixedtoystot);
-			for(UInt_t j = 0; j<fixedtoystot; j++){
-				floatedtoys->GetEntry(j);	
-				fixedtoys->GetEntry(j);	
+			for(UInt_t j = 0; j<goodfixedtoystot; j++){
+				goodfloatedtoys->GetEntry(j);	
+				goodfixedtoys->GetEntry(j);	
 				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
 				//if the toyratio is smaller than the data ratio at this point, increment:
 				if((NLLtoyfixed-NLLtoyfloat)<dataRatiogridpoints[i]){toyNLLsmaller++;}
 			}
 			//The C.L. is the percentage of toys that were smaller
-			double cl = ((Double_t)toyNLLsmaller/(Double_t)fixedtoystot);
+			double cl = ((Double_t)toyNLLsmaller/(Double_t)goodfixedtoystot);
 			clgridpoints.push_back(cl);
 			}else{ 
 				cout << param1gridpoints[i] << " " << param2gridpoints[i] << " WARNING: Found no toys here. " << endl;
@@ -412,7 +418,9 @@ int main(int argc, char *argv[]){
 			}
 
 			delete floatedtoys;
+			delete goodfloatedtoys;
 			delete fixedtoys;
+			delete goodfixedtoys;
 		}
 	}
 	delete toys;
@@ -443,9 +451,9 @@ int main(int argc, char *argv[]){
 	pllhist->Write();
 
 
-	double pllconts[4] = {1.15,2.31,3.0,4.61};
-	double fcconts[4] = {0.68,0.9,0.95,0.99};
-	double confs[4] = {68.0,90.0,95.0,99.0};
+	double pllconts[3] = {1.15,2.31,3.0};
+	double fcconts[3] = {0.68,0.9,0.95};
+	double confs[3] = {68.0,90.0,95.0};
 
 	TCanvas *plltemp = makeTempCanvas(pllhist,"Profile Likelihood");
 	plltemp->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_temp.pdf");
@@ -453,10 +461,10 @@ int main(int argc, char *argv[]){
 	TCanvas *pllcont = makeContCanvas(pllhist,"Profile Likelihood");
 	pllcont->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_cont.pdf");
 	pllcont->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_cont.png");
-	TCanvas *pllconf = makeConfCanvas(pllhist,"Profile Likelihood",4,pllconts,confs,false);
+	TCanvas *pllconf = makeConfCanvas(pllhist,"Profile Likelihood",3,pllconts,confs,false);
 	pllconf->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_conf.pdf");
 	pllconf->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_conf.png");
-	TCanvas *pllpub = makeConfCanvas(pllhist,"Profile Likelihood",4,pllconts,confs,true);
+	TCanvas *pllpub = makeConfCanvas(pllhist,"Profile Likelihood",3,pllconts,confs,true);
 	pllpub->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_pub.pdf");
 	pllpub->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_pub.png");
 
@@ -464,6 +472,9 @@ int main(int argc, char *argv[]){
 	if(hastoys){
 		Double_t* clpoints = new Double_t [npoints];
 		copy( clgridpoints.begin(), clgridpoints.end(),clpoints);
+
+		Double_t* goodtoyspoints = new Double_t [npoints];
+		copy( goodtoysgridpoints.begin(), goodtoysgridpoints.end(),goodtoyspoints);
 		Double_t* toyspoints = new Double_t [npoints];
 		copy( toysgridpoints.begin(), toysgridpoints.end(),toyspoints);
 
@@ -484,20 +495,20 @@ int main(int argc, char *argv[]){
 		TCanvas *fccont = makeContCanvas(fchist,"Feldman Cousins");
 		fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.pdf");
 		fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.png");
-		TCanvas *fcconf = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,false);
+		TCanvas *fcconf = makeConfCanvas(fchist,"Feldman Cousins",3,fcconts,confs,false);
 		fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.pdf");
 		fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.png");
-		TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",4,fcconts,confs,true);
+		TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",3,fcconts,confs,true);
 		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.pdf");
 		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.png");
-		TCanvas *both = makeBothCanvas(fchist,pllhist,"FC and PLL",4,fcconts,pllconts,confs);
+		TCanvas *both = makeBothCanvas(fchist,pllhist,"FC and PLL",3,fcconts,pllconts,confs);
 		both->Print(outputdir+"/"+param1string+"_"+param2string+"_both.pdf");
 		both->Print(outputdir+"/"+param1string+"_"+param2string+"_both.png");
 
 		TGraph2D *toygraph = new TGraph2D(npoints, p2points, p1points, toyspoints);
-		fcgraph->SetName("ntoysgraph");
-		fcgraph->SetNpx(np);
-		fcgraph->SetNpy(np);
+		toygraph->SetName("ntoysgraph");
+		toygraph->SetNpx(np);
+		toygraph->SetNpy(np);
 		TH2D* toyhist = toygraph->GetHistogram();
 		toyhist->SetName("ntoyshist");
 		toyhist->SetTitle("");
@@ -508,7 +519,22 @@ int main(int argc, char *argv[]){
 		TCanvas *toytemp = makeTempCanvas(toyhist,"Toys per gridpoint");
 		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.pdf");
 		toytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_ntoys_temp.png");
-	
+		
+		TGraph2D *goodtoygraph = new TGraph2D(npoints, p2points, p1points, goodtoyspoints);
+		goodtoygraph->SetName("ngoodtoysgraph");
+		goodtoygraph->SetNpx(np);
+		goodtoygraph->SetNpy(np);
+		TH2D* goodtoyhist = goodtoygraph->GetHistogram();
+		goodtoyhist->Divide(toyhist);
+		goodtoyhist->SetName("goodtoyhist");
+		goodtoyhist->SetTitle("");
+		goodtoyhist->GetXaxis()->SetTitle(param2string);
+		goodtoyhist->GetYaxis()->SetTitle(param1string);
+		goodtoyhist->Write();
+
+		TCanvas *goodtoytemp = makeTempCanvas(goodtoyhist,"Good Toys per gridpoint");
+		goodtoytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_goodtoys_temp.pdf");
+		goodtoytemp->Print(outputdir+"/"+param1string+"_"+param2string+"_goodtoys_temp.png");
 
 		output->Write();
 		output->Close();
