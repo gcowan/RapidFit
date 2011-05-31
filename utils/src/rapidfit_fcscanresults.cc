@@ -328,6 +328,7 @@ int main(int argc, char *argv[]){
 	datafixed->SetBranchAddress(param1valstr,&param1val);
 	datafixed->SetBranchAddress(param2valstr,&param2val);
 	datafixed->SetBranchAddress(NLLstr,&nll);
+	Double_t smallest = 9999.9;
 	for(Long64_t i = 0; i < datafixed->GetEntries(); i++){
 		datafixed->GetEntry(i);
 		// We've found a new gridpoint
@@ -340,10 +341,15 @@ int main(int argc, char *argv[]){
 			param1gridpoints.push_back(param1val);
 			param2gridpoints.push_back(param2val);
 			dataRatiogridpoints.push_back(nll-nlldatabest);
+			if(nll-nlldatabest<smallest){smallest = nll-nlldatabest;}
 			//cout << "GRIDPOINT FOUND: " << param1val << " " << param2val << " " << nll << endl;
 		}
 	}
+	for(UInt_t i = 0; i<dataRatiogridpoints.size(); i++){
+	dataRatiogridpoints[i] = dataRatiogridpoints[i] - smallest;
+	}
 	cout << "FOUND " << param1gridpoints.size() << " UNIQUE GRIDPOINTS" << endl;
+	cout << "DIFFERENCE BETWEEN CENTRAL NLL AND SMALLEST NLL = " << smallest << endl;
 	Float_t NLLtoyfixed, NLLtoyfloat;
 	delete datafixed;
 
