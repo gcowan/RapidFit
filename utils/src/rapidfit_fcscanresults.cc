@@ -60,7 +60,7 @@ array1s get_branch_names( TTree* local_tree , TString notme1, TString notme2)
 	{
 		TObject* branch_object = (*branch_obj_array)[i];
 		TString name = branch_object->GetName();
-		if(!name.Contains("_gen") && !name.Contains(notme1) && !name.Contains(notme2)){
+		if(!name.Contains("_gen") && !name.Contains(notme1) && !name.Contains(notme2) && !name.Contains("NLL") && !name.Contains("Fit_Status")){
 			temp_branch_names.push_back(name);
 		}
 	}
@@ -323,7 +323,7 @@ int main(int argc, char *argv[]){
 	//Par values will be floated
 	//Par errors !=0
 
-	Float_t shift = 0.1E-09;
+	Float_t shift = 0.1E-05;
 	TString shiftstr = "";
 	shiftstr += shift;
 
@@ -496,8 +496,6 @@ int main(int argc, char *argv[]){
 	//copy( param1gridpoints.begin(), param1gridpoints.end(),p1points);
 	Double_t* pllpoints = new Double_t [npoints];
 	copy( dataRatiogridpoints.begin(), dataRatiogridpoints.end(),pllpoints);
-
-
 
 	//We get the data profile likelihood free, so let's plot it: 
 	TGraph2D *pllgraph = new TGraph2D(npoints, p2points, p1points, pllpoints);
