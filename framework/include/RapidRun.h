@@ -16,7 +16,7 @@
 class RapidRun : public TObject
 {
 	public:
-		RapidRun(){}//needed by Root IO
+		RapidRun() : args(){}//needed by Root IO
 		RapidRun( TList* );
 		int run();
 

@@ -169,23 +169,35 @@ $(EXEDIR)/merge_plot: $(OBJDIR)/merge_plot.o
 $(OBJDIR)/merge_plot.o: $(UTILSSRC)/merge_plot.C
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-#       New tool for plotting 2DLL and FC
-$(EXEDIR)/RapidPlot: $(OBJDIR)/RapidPlot.o $(OBJDIR)/EdStyle.o
-	$(CXX) -o $@ $^ $(ROOTLIBS)
-$(OBJDIR)/RapidPlot.o: $(UTILSSRC)/RapidPlot.C
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+
+
+#	Binaries sharing LOTS of useful code for processing/outputting results
+
+$(OBJDIR)/NTuple_Processing.o: $(UTILSSRC)/NTuple_Processing.C
+	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
+$(OBJDIR)/TString_Processing.o: $(UTILSSRC)/TString_Processing.C
+	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
+$(OBJDIR)/Histo_Processing.o: $(UTILSSRC)/Histo_Processing.C
+	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
 
 #       New tool for plotting 1D LL and overlaying multiple copies of the same
-$(EXEDIR)/RapidLL: $(OBJDIR)/RapidLL.o $(OBJDIR)/EdStyle.o
+$(EXEDIR)/RapidLL: $(OBJDIR)/RapidLL.o $(OBJDIR)/EdStyle.o $(OBJDIR)/NTuple_Processing.o $(OBJDIR)/TString_Processing.o $(OBJDIR)/StringProcessing.o
 	$(CXX) -o $@ $^ $(ROOTLIBS)
 $(OBJDIR)/RapidLL.o: $(UTILSSRC)/RapidLL.C
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
+
+#       New tool for plotting 2DLL and FC
+$(EXEDIR)/RapidPlot: $(OBJDIR)/RapidPlot.o $(OBJDIR)/EdStyle.o $(OBJDIR)/NTuple_Processing.o $(OBJDIR)/Histo_Processing.o $(OBJDIR)/TString_Processing.o $(OBJDIR)/StringProcessing.o
+	$(CXX) -o $@ $^ $(ROOTLIBS)
+$(OBJDIR)/RapidPlot.o: $(UTILSSRC)/RapidPlot.C
+	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
 
 #	Tinter tool for analysing old format toy stuides
-#$(EXEDIR)/tinter: $(OBJDIR)/tinter.o
-#	$(CXX) -o $@ $^ $(ROOTLIBS)
-#$(OBJDIR)/tinter.o: $(UTILSSRC)/tinter-static.C
-#	$(CXX) $(CXXFLAGS) -o $@ -c $<
+$(EXEDIR)/tinter: $(OBJDIR)/tinter.o
+	$(CXX) -o $@ $^ $(ROOTLIBS)
+$(OBJDIR)/tinter.o: $(UTILSSRC)/tinter.C
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 #utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
 utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot

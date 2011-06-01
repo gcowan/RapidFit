@@ -26,7 +26,7 @@ SET( CMAKE_BUILD_TYPE Debug )
 
 #  Get back the old style verbosity :) by setting this to 1
 #SET( CMAKE_VERBOSE_MAKEFILE 1 )
-#SET( CMAKE_VERBOSE_MAKEFILE 0 )
+SET( CMAKE_VERBOSE_MAKEFILE 0 )
 
 
 
@@ -39,8 +39,6 @@ PROJECT( RapidFit )
 SET( ${PROJECT_NAME}_MAJOR_VERSION 0 )
 SET( ${PROJECT_NAME}_MINOR_VERSION 1 )
 SET( ${PROJECT_NAME}_PATCH_LEVEL 0 )
-
-
 
 EXECUTE_PROCESS(
        		COMMAND	svnversion -n ..
@@ -59,6 +57,7 @@ FIND_PACKAGE( ROOT )
 
 INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/framework/include" )
 INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/pdfs/include" )
+INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/utils/include" )
 
 #	Apple is full of fomplete... WHAT THE HELL?
 IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
@@ -67,7 +66,7 @@ ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
 
 IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -pedantic -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
 ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
 IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
@@ -166,7 +165,12 @@ TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
 
 #	My tool for analysing toy studies
 #	main difference is it performs a binned analysis
-ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter-static.C )
+ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter.C
+${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp
+${PROJECT_SOURCE_DIR}/framework/src/StringProcessing.cpp
+${PROJECT_SOURCE_DIR}/utils/src/NTuple_Processing.C
+${PROJECT_SOURCE_DIR}/utils/src/TString_Processing.C
+${PROJECT_SOURCE_DIR}/utils/src/Histo_Processing.C )
 TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
 
 #	Tool for comparing results of 2DLL within Edinburgh
@@ -178,11 +182,21 @@ ADD_EXECUTABLE( betas_sweightfitter ${PROJECT_SOURCE_DIR}/utils/src/betas_sweigh
 TARGET_LINK_LIBRARIES( betas_sweightfitter ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
 
 #       New tool for plotting 2DLL and FC
-ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot.C ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot.C
+${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp
+${PROJECT_SOURCE_DIR}/framework/src/StringProcessing.cpp
+${PROJECT_SOURCE_DIR}/utils/src/NTuple_Processing.C
+${PROJECT_SOURCE_DIR}/utils/src/TString_Processing.C
+${PROJECT_SOURCE_DIR}/utils/src/Histo_Processing.C )
 TARGET_LINK_LIBRARIES( RapidPlot ${ROOT_LIBRARIES} )
 
 #       New tool for plotting 1D LL and overlaying multiple copies of the same
-ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C
+${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp
+${PROJECT_SOURCE_DIR}/framework/src/StringProcessing.cpp
+${PROJECT_SOURCE_DIR}/utils/src/NTuple_Processing.C
+${PROJECT_SOURCE_DIR}/utils/src/TString_Processing.C
+${PROJECT_SOURCE_DIR}/utils/src/Histo_Processing.C )
 TARGET_LINK_LIBRARIES( RapidLL ${ROOT_LIBRARIES} )
 
 

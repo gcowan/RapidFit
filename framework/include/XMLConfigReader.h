@@ -53,6 +53,10 @@ class XMLConfigReader
 		void SetSeed( unsigned int new_seed );	//  Set Seed returned by XMLFile
 
 	private:
+                //      Uncopyable!
+                XMLConfigReader ( const XMLConfigReader& );
+                XMLConfigReader& operator = ( const XMLConfigReader& );
+
 		XMLTag* All_XML_Tags;
 		ParameterSet * GetParameterSet( XMLTag* );
 		PhysicsParameter * GetPhysicsParameter( XMLTag*, string& );

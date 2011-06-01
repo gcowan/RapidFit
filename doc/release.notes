@@ -1,11 +1,19 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/01 Rob Currie
+   - Added TString_Processing, Histo_Processing & NTuple_Processing classes into utils directory
+       These contain a LOT of common code used throughout my RapidLL, RapidPlot, print and tinter tools
+       RapidLL has been cleaned up (This is for plotting/overlaying LLscans)
+       RapidPlot has been cleaned up a LOT (This is for 2DLL/FC plotting and has a much more modular design than previous tools)
+       tinter has been cleaned up and make compatible with earlier versions of ROOT (in time this will be further cleaned up and extended)
+   - Added 'print' binary which simply lets you know whats in a .root file (example of a few functions in the above mentioned classes) I find it easier than constantly launching TBrowser to just check a file
+   - Fixed Some minor compiler warnings fixed and ToyStudy behaviour fixed such that you get the expected results. This WILL effect the results of some people's personal plotting tools! (Apply a cut of Status==3 for ALL jobs)
+
 2011/05/31 Pete Clarke
    - Update of BaseClass, MP_dev, MO_dev)
    - Included <ConfigurableParameter> for PDFs in XML
    - Included <ConfigurableParameter>UseCosAndSin</ConfigurableParameter> to fit for cosphis and sinphis
    - Included <ConfigurableParameter>AllowNegativeAsSq</ConfigurableParameter> to allow AsSq negative
-
 
 2011/05/25 Rob Currie
   - Fixed main.cpp to now call FC properly now, (quick profile reveals flat memory usage to first order over study as expected)

@@ -38,8 +38,8 @@ class MemoryDataSet : public IDataSet
 
 	private:
 		//	Uncopyable!
-		//MemoryDataSet ( const MemoryDataSet& );
-		//MemoryDataSet& operator = ( const MemoryDataSet& );
+		MemoryDataSet ( const MemoryDataSet& );
+		MemoryDataSet& operator = ( const MemoryDataSet& );
 		vector<DataPoint> allData;
 		PhaseSpaceBoundary * dataBoundary;
 

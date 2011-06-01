@@ -17,7 +17,8 @@
 #include "TH1.h"
 #include "TF1.h"
 #include "TTree.h"
-#include "TFitResultPtr.h"
+//	Easier with TFitResultPtr but that is 'too new' for some users...
+#include "TFitResult.h"
 #include "TCanvas.h"
 #include "TSystem.h"
 #include "TMath.h"
@@ -26,6 +27,10 @@
 #include "TStyle.h"
 #include "TKey.h"
 #include "TNtuple.h"
+//	RapidFit Utils Headers
+#include "TString_Processing.h"
+#include "Histo_Processing.h"
+#include "NTuple_Processing.h"
 //  System Headers
 #include <stdio.h>
 #include <math.h>
@@ -54,34 +59,6 @@ string True_Filename_str( string FilePath )
 TString True_Filename( string FilePath )
 {
   return TString( True_Filename_str( FilePath ) );
-}
-
-//  Return the optimal number of bins that should be used if this data is gaussianly distributed
-unsigned int GetOptimalBins( TH1* input_hist, int axis=1 )
-{
-  double varience = input_hist->GetRMS( axis );
-  varience = varience*varience;
-  double num_entries = input_hist->GetEntries();
-  double width = 3.49 * sqrt( varience ) * pow( num_entries, -(1.0/3.0) );
-  double min_range = 0.;
-  double max_range = 0.;
-  if( axis == 1 ){
-    min_range = input_hist->GetXaxis()->GetXmin();
-    max_range = input_hist->GetXaxis()->GetXmax();}
-  else if( axis == 2 ){
-    min_range = input_hist->GetYaxis()->GetXmin();
-    max_range = input_hist->GetYaxis()->GetXmax();}
-  else if( axis == 3 ){
-    min_range = input_hist->GetZaxis()->GetXmin();
-    max_range = input_hist->GetZaxis()->GetXmax();}
-  double range = max_range - min_range;
-  double wanted_bins = ceil( range / width );
-
-  //  Catch SERIOUS rounding errors and caes where the information has already been lost due to underbinning
-  if( ( axis == 1 ) && ( wanted_bins > input_hist->GetNbinsX() ) )  return 0;
-  else if( ( axis == 2 ) && ( wanted_bins > input_hist->GetNbinsY() ) )  return 0;
-  else if( ( axis == 3 ) && ( wanted_bins > input_hist->GetNbinsZ() ) )  return 0;
-  else return unsigned(int(wanted_bins) );
 }
 
 int tab_formatter(TString input, int tab_number)
@@ -134,7 +111,6 @@ void get_number_events(int *number_o_events, TString current_path, TString top_d
     //  Leave on the last key
     if (oldkey && !strcmp(oldkey->GetName(),key->GetName())) continue;
     //  Should already be here?
-    //gDirectory->cd( current_path );
     //  Read in the object
     TObject *obj = key->ReadObj();
 
@@ -259,52 +235,12 @@ void get_absolute_path( TString relative_path, TString file_name, TString *absol
   temp->Close();
 }
 
-//  Get the names of branches within a given TTree object
-void get_branch_names( TString absolute_path, vector<TString> *branch_names)
-{
-  //  Where was I originally
-  TString old_path = gDirectory->GetPath();
-
-  //gDirectory->cd("root:/");
-  TTree* local_tree = (TTree*) gDirectory->Get( (const char*) absolute_path );
-  TObjArray* branch_obj_array = local_tree->GetListOfBranches();
-  for(int i=0; i<branch_obj_array->GetEntries();i++)
-  {
-    TObject* branch_object = (*branch_obj_array)[size_t(i)];
-    branch_names->push_back((const char*) branch_object->GetName());
-  }
-
-  //  Return to original path to not disrupt user
-  gDirectory->cd(old_path);
-}
-
-vector<TString> get_branch_names( TString absolute_path )
-{
-  vector<TString> temp_branch_names;
-  //gDirectory->cd("root:/");
-  TTree* local_tree = (TTree*) gDirectory->Get((const char*) absolute_path);
-  TObjArray* branch_obj_array = local_tree->GetListOfBranches();
-  for(int i=0; i<branch_obj_array->GetEntries();i++)
-  {
-    TObject* branch_object = (*branch_obj_array)[size_t(i)];
-    temp_branch_names.push_back((const char*) branch_object->GetName());
-  }
-  return temp_branch_names;
-}
-
 TH1F* get_branch( TFile *Input_File, TString Relative_Tuple_Name, TString Branch_Name )
 {
   Input_File->cd();
   TTree* temp_tree = (TTree*) gDirectory->Get( Relative_Tuple_Name );
   temp_tree->Draw( Branch_Name );
   return (TH1F*) temp_tree->GetHistogram()->Clone();
-}
-
-bool is_empty( TString input )
-{
-  string temp("");
-  if ( temp.compare( string(input.Data()) ) == 0 ) return true;
-  return false;
 }
 
 void tabs_TStr( TString input, int tab_number, TString* output)
@@ -327,8 +263,8 @@ void set_style()
   mystyle->SetLineColor(1);
   mystyle->SetLineWidth( mystyle_line_width() );
   mystyle->SetFuncWidth( mystyle_line_width() );
-  mystyle->SetStatW(0.2);
-  mystyle->SetStatH(0.2);
+  mystyle->SetStatW(float(0.2));
+  mystyle->SetStatH(float(0.2));
   mystyle->SetLabelColor(1,"xy");
   //mystyle->SetOptStat(11);
   mystyle->SetOptStat(0);
@@ -336,18 +272,18 @@ void set_style()
   mystyle->SetOptFit(111);
   mystyle->SetFillColor(0);
   mystyle->SetPadColor(10);
-  mystyle->SetTitleOffset(1.3,"xyz");
+  mystyle->SetTitleOffset(float(1.3),"xyz");
   mystyle->SetEndErrorSize(8);
   mystyle->SetFrameFillColor(10);
   mystyle->SetTitleFillColor(10);
-  mystyle->SetTitleFontSize(0.07);
+  mystyle->SetTitleFontSize(float(0.07));
   mystyle->SetTitleBorderSize(1);
   mystyle->SetTitleX(0.2f);
   mystyle->cd();
   mystyle->SetTextSize(5);
   //mystyle->SetStatFontSize(22);
-  mystyle->SetStatX(0.9);
-  mystyle->SetStatY(0.9);
+  mystyle->SetStatX(float(0.9));
+  mystyle->SetStatY(float(0.9));
   gROOT->ForceStyle();
 
 }
@@ -375,24 +311,6 @@ vector<short int> get_line_styles( ){
   my_line_styles.push_back(10);
   return my_line_styles;
 }
-
-//  This has been adapted from the original code in RapidFits Statistics code
-//  It is intended to take a histogram and automatically rebin according to this function
-//  As such it uses as much inbuilt functionality in root as possible
-//Return the ideal number of bins for a histogram of a vector of doubles
-////Uses D. Scott's method, published 1979
-int OptimumBinNumber( TH1* input_hist, int axis=1 )
-{
-  double wanted_bins = GetOptimalBins( input_hist, axis );
-  double existing_bins = 0.;
-  if( axis == 1 ) existing_bins = input_hist->GetNbinsX();
-  else if( axis == 2 )  existing_bins = input_hist->GetNbinsY();
-  else if( axis == 3 )  existing_bins = input_hist->GetNbinsZ();
-  input_hist->Rebin( int(existing_bins / wanted_bins) );
-
-  return int(wanted_bins);
-}
-
 
 int main ( int argc, char* argv[] )
 {
@@ -550,8 +468,8 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 
                 cout << "Tree:\t" << tree_name << format_1 << "Branch_Name:\t" <<  output_branch_names[output_param_num] << format_2 << "most_probable_value:\t\t" << most_probable_value << " \\pm " << bin_width/2.0 << endl;
 
+		//	Rebin
 		int newnum = OptimumBinNumber( local_histogram );
-
 		(void) newnum;
 
                 TString Fit_Options ( "Q" );
@@ -615,14 +533,14 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 		}
 
 		//  Perform fit again (I know it's slightly taxing but what the hey)
-		TFitResultPtr result;
+		TFitResult* result;
 	        
 //		if ( fit_type == "gaus" )  {  result = local_histogram->Fit ( fit_type, Fit_Options );  }
 //		else  {  result = local_histogram->Fit ( fit_type, Fit_Options );  }
 
-		result = local_histogram->Fit ( fit_type, Fit_Options );
+		result = new TFitResult( local_histogram->Fit ( fit_type, Fit_Options ) );
 
-		Int_t fitresult = result;	//  Fit Status at end of Fit	i.e.	did it converge?
+		Int_t fitresult = result->Status();	//  Fit Status at end of Fit	i.e.	did it converge?
 
                 if ( string ( argv[4] ).compare ( "off" ) != 0 )
                 {
@@ -688,9 +606,9 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
     for( unsigned int count1=0; count1<Param_FitResult_Plots.size(); count1++ )
     {
 	TString Param_Name = get_tuple_name ( Param_tree_path[count1] );
-	int sub_plots = Param_FitResult_Plots[count1].size();
+	int sub_plots = (int) Param_FitResult_Plots[count1].size();
 	temp_multi = new TCanvas( Param_Name, Param_Name, 1680*3, 1050 );
-	temp_multi->Divide( sub_plots, 1 );
+	temp_multi->Divide( sub_plots, int(1),0,0,0 );
 	vector<TCanvas*> sub_canvas;
 
 	for( unsigned int count2=0; count2<Param_FitResult_Plots[count1].size(); count2++ )
@@ -711,12 +629,12 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 			for( unsigned int print_count=0; print_count < Extensions.size(); print_count++ )
 			{
 				if( left_handed_plot[count1][count2] )
-				{  gStyle->SetStatX(0.46);  gStyle->SetStatY(0.9);  gStyle->SetTitleX(0.8f);  }
+				{  gStyle->SetStatX(float(0.46));  gStyle->SetStatY(float(0.9));  gStyle->SetTitleX(0.8f);  }
 				gROOT->ForceStyle();
 				Param_FitResult_Plots[count1][count2]->Draw();
 				local_canvas->Print(outputdir+"/"+Param_FitResult_Names[count1][count2]+"."+Extensions[ print_count ]);
 				if( left_handed_plot[count1][count2] )
-				{  gStyle->SetStatX(0.9);  gStyle->SetStatY(0.9);  gStyle->SetTitleX(0.2f);  }
+				{  gStyle->SetStatX(float(0.9));  gStyle->SetStatY(float(0.9));  gStyle->SetTitleX(0.2f);  }
 				gROOT->ForceStyle();
 			}
 		}

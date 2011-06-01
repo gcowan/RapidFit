@@ -92,19 +92,9 @@ void ToyStudy::DoWholeStudy( )
 		cout << "\n\n\t\tStarting ToyStudy\t\t" << studyIndex+1 << "\tof:\t" << numberStudies << endl;
 		allResults->StartStopwatch();
 		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints, -999 );
-		if( new_result->GetFitStatus() != 3 )
-		{
-			cout << "Fit fell over!\t Requesting another fit." << endl;
-			for( unsigned int to_fit=0; to_fit<pdfsAndData.size(); ++to_fit )
-			{
-				pdfsAndData[to_fit]->GetDataSetConfig()->GetGenerationPDF()->SetMCCacheStatus( false );
-				//	Called internally from IPDF when setting false status
-				//	pdfsAndData[to_fit]->GetPDF()->Remove_Cache();
-			}
-			++numberStudies;
-		} else {
-			allResults->AddFitResult( new_result );
-		}
+		cout << "Fit fell over!\t Requesting another fit." << endl;
+		if( new_result->GetFitStatus() != 3 ) ++numberStudies;
+		allResults->AddFitResult( new_result );
 	}
 }
 

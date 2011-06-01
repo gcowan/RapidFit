@@ -362,7 +362,7 @@
 
 <DataSet>
 <Source>Foam</Source>
-<NumberEvents>140</NumberEvents>
+<NumberEvents>1400000</NumberEvents>
 
 <PhaseSpaceBoundary>
 <Observable>
@@ -441,7 +441,7 @@
 
 <DataSet>
 <Source>Foam</Source>
-<NumberEvents>410</NumberEvents>
+<NumberEvents>4100000</NumberEvents>
 
 <PhaseSpaceBoundary>
 <Observable>
@@ -517,7 +517,7 @@
 
 <DataSet>
 <Source>Foam</Source>
-<NumberEvents>50</NumberEvents>   
+<NumberEvents>50000</NumberEvents>   
 
 <PhaseSpaceBoundary>
 <Observable>
@@ -596,7 +596,7 @@
 
 <DataSet>
 <Source>Foam</Source>
-<NumberEvents>150</NumberEvents>
+<NumberEvents>1500000</NumberEvents>
 
 <PhaseSpaceBoundary>
 <Observable>
@@ -656,5 +656,51 @@
 </PhaseSpaceBoundary>
 </DataSet>
 </ToFit>
+
+<Output>
+
+        <Scan>
+                <Name>gamma</Name>
+                <Minimum>0.55</Minimum>
+                <Maximum>0.85</Maximum>
+                <Points>40</Points>
+        </Scan>
+        <Scan>
+                <Name>deltaGamma</Name>
+                <Minimum>0</Minimum>
+                <Maximum>0.35</Maximum>
+                <Points>40</Points>
+        </Scan>
+        <Scan>
+                <Name>Aperp_sq</Name>
+                <Minimum>0.05</Minimum>
+                <Maximum>0.3</Maximum>
+                <Points>40</Points>
+        </Scan>
+        <Scan>
+                <Name>Azero_sq</Name>
+                <Minimum>0.48</Minimum>
+                <Maximum>0.72</Maximum>
+                <Points>40</Points>
+        </Scan>
+        <Scan>
+                <Name>delta_para</Name>
+                <Minimum>2.0</Minimum>
+                <Maximum>4.0</Maximum>
+                <Points>40</Points>
+        </Scan>
+        <Scan>
+                <Name>delta_perp</Name>
+                <Minimum>-3.2</Minimum>
+                <Maximum>3.2</Maximum>
+                <Points>40</Points>
+        </Scan>
+        <Scan>
+                <Name>Phi_s</Name>
+                <Minimum>-3.2</Minimum>
+                <Maximum>3.2</Maximum>
+                <Points>40</Points>
+        </Scan>
+</Output>
 
 </RapidFit>
