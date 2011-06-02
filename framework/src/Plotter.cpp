@@ -164,8 +164,8 @@ void Plotter::MakeObservablePlots( string ObservableName, vector<DataPoint> AllC
 	double ratioOfIntegrals = 1.;
 
 	int plotNumber;
-	if (ObservableName == "time") plotNumber = 256;
-	else plotNumber = 128;
+	if (ObservableName == "time") plotNumber = 32; //256;
+	else plotNumber = 16; //128;
 
 	//Initialise the data averaged projection
 	for (int pointIndex = 0; pointIndex < plotNumber; ++pointIndex )

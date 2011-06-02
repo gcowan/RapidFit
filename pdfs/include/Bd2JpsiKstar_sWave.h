@@ -13,7 +13,6 @@
 #include "BasePDF.h"
 #endif
 #ifdef __CINT__
-#include "framework/include/BasePDF.h"
 #endif
 
 class Bd2JpsiKstar_sWave : public BasePDF
@@ -25,6 +24,7 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
 		virtual bool SetPhysicsParameters(ParameterSet*);
+		double NormAnglesOnlyForAcceptanceWeights(DataPoint*, PhaseSpaceBoundary*);
 		//Return a list of parameters not to be integrated
                 virtual vector<string> GetDoNotIntegrateList();
 
@@ -38,13 +38,15 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		//Cached values
 		double cachedAzeroAzeroIntB, cachedAparaAparaIntB, cachedAperpAperpIntB;
 		double cachedAparaAperpIntB, cachedAzeroAparaIntB, cachedAzeroAperpIntB;
-		double cachedAsAsIntB, cachedAparaAsIntB, cachedAperpAsIntB, cachedAzeroAsIntB;
+		double cachedAsAsIntB, cachedAparaAsIntB, cachedAperpAsIntB, cachedAzeroAsIntB ;
+		double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
+		double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
+	        double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
 
 		double cachedSinDeltaPerpPara, cachedCosDeltaPara, cachedSinDeltaPerp, cachedCosDeltaParaS, cachedSinDeltaPerpS, cachedCosDeltaS;
 
 
 		double cachedAzero, cachedApara, cachedAperp, cachedAs;
-		bool normalisationCacheValid, evaluationCacheValid;
 
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
@@ -105,15 +107,20 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		double angAccI8;
 		double angAccI9;
 		double angAccI10;
-
+		double Ap_sq, Ap;
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF.
+
+		bool normalisationCacheValid, evaluationCacheValid;
+
 		string timeName;		// proper time
 		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
 		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 		string KstarFlavourName;
+
+
 
 		// Member variables for the observables
 		double time;
@@ -127,6 +134,7 @@ class Bd2JpsiKstar_sWave : public BasePDF
 
 		double buildPDFnumerator();
 		double buildPDFdenominator();
+		double buildPDFdenominatorAngles();
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
 

@@ -44,6 +44,7 @@
 #include "Bs2JpsiPhiPromptBkg_tripleGaussian.h"
 #include "Bs2JpsiPhiMassBkg.h"
 #include "Bs2JpsiPhiMassBkgLL.h"
+#include "LongLivedBkg_3Dangular.h"
 
 #include "Exponential.h"
 
@@ -93,17 +94,17 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev" )
         {
-	        //JPsiPhi from Pete with sWave 
+	        //JPsiPhi from Pete with sWave
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_dev(configurator);
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v1" )
         {
-	        //JPsiPhi from Pete with sWave 
+	        //JPsiPhi from Pete with sWave
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v1();
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_dev" )
         {
-	        //JPsiPhi from Pete with sWave 
+	        //JPsiPhi from Pete with sWave
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_dev(configurator);
         }
         else if ( Name == "Bs2PhiPhi" )
@@ -215,6 +216,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
                          // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
                          returnable_PDF = new Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms();
+        }
+
+	else if ( Name == "LongLivedBkg_3Dangular" )
+        {
+                         returnable_PDF = new LongLivedBkg_3Dangular();
         }
 
 	else

@@ -45,7 +45,6 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		double cachedCosSqDeltaM;
 
 		double cachedAzero, cachedApara, cachedAperp;
-		bool normalisationCacheValid, evaluationCacheValid;
 //		double q;
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
@@ -74,12 +73,12 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
                 double Azero_sq;
                 double Apara_sq;
                 double Aperp_sq;
-                double AzeroApara;
-                double AzeroAperp;
-                double AparaAperp;
                 double delta_zero;
                 double delta_para;
                 double delta_perp;
+		double AzeroApara;
+                double AzeroAperp;
+                double AparaAperp;
                 double omega;
                 double timeRes;	 // This is the member variable used in the "builder" functions
                 double timeRes1; // These are the physics parameters varied in the fit and passed from the XML
@@ -95,6 +94,9 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF.
+
+		bool normalisationCacheValid, evaluationCacheValid;
+
 		string timeName;		// proper time
 		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		string phiName;		// azimuthal angle of the mu+ in Jpsi frame

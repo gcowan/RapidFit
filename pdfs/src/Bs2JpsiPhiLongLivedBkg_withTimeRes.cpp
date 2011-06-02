@@ -38,10 +38,10 @@ void Bs2JpsiPhiLongLivedBkg_withTimeRes::MakePrototypes()
 
         //Make the parameter set
         vector<string> parameterNames;
-		parameterNames.push_back( f_LL1Name );
+	parameterNames.push_back( f_LL1Name );
         parameterNames.push_back( tauLL1Name );
         parameterNames.push_back( tauLL2Name );
-		parameterNames.push_back( timeResLL1FracName );
+	parameterNames.push_back( timeResLL1FracName );
         parameterNames.push_back( sigmaLL1Name );
         parameterNames.push_back( sigmaLL2Name );
         allParameters = *( new ParameterSet(parameterNames) );

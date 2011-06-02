@@ -277,7 +277,6 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::angularFactor( )
 			+ (1-f_NoJpsi) * ((f_cpB * f_pB * f_ctB) /( f_cpB_norm * f_pB_norm * f_ctB_norm ));
 
 
-
 	// For testing
 	//double factor = ( 1. * 1. * 1. ) / ( 2. * 2*pi * 2. ) ;
 

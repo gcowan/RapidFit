@@ -204,33 +204,33 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::build
 	// First for the B
 	double AzeroAzeroB, AparaAparaB, AperpAperpB,  AsAsB;
 	double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB, ReAsAparaB, ImAsAperpB, ReAsAzeroB;
-	getTimeDependentAmplitudes( 
-			AzeroAzeroB, 
-			AparaAparaB, 
-			AperpAperpB, 
-			AsAsB, 
-			ImAparaAperpB, 
-			ReAzeroAparaB, 
-			ImAzeroAperpB, 
-			ReAsAparaB, 
-			ImAsAperpB, 
-			ReAsAzeroB, 
+	getTimeDependentAmplitudes(
+			AzeroAzeroB,
+			AparaAparaB,
+			AperpAperpB,
+			AsAsB,
+			ImAparaAperpB,
+			ReAzeroAparaB,
+			ImAzeroAperpB,
+			ReAsAparaB,
+			ImAsAperpB,
+			ReAsAzeroB,
 			1
 			);
 
 	// Now for the Bbar
 	double AzeroAzeroBbar, AparaAparaBbar, AperpAperpBbar, AsAsBbar;
 	double ImAparaAperpBbar, ReAzeroAparaBbar, ImAzeroAperpBbar, ReAsAparaBbar, ImAsAperpBbar, ReAsAzeroBbar;
-	getTimeDependentAmplitudes( 
-			AzeroAzeroBbar, 
-			AparaAparaBbar, 
-			AperpAperpBbar, 
-			AsAsBbar, 
-			ImAparaAperpBbar, 
-			ReAzeroAparaBbar, 
-			ImAzeroAperpBbar, 
-			ReAsAparaBbar, 
-			ImAsAperpBbar, 
+	getTimeDependentAmplitudes(
+			AzeroAzeroBbar,
+			AparaAparaBbar,
+			AperpAperpBbar,
+			AsAsBbar,
+			ImAparaAperpBbar,
+			ReAzeroAparaBbar,
+			ImAzeroAperpBbar,
+			ReAsAparaBbar,
+			ImAsAperpBbar,
 			ReAsAzeroBbar,
 			-1
 			);
@@ -379,7 +379,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::build
 	return (w1*v1 + w2*v2)/norm;
 }
 
-void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTimeDependentAmplitudes(  
+void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTimeDependentAmplitudes(
 		double & AzeroAzero
 		, double & AparaApara
 		, double & AperpAperp
@@ -427,7 +427,7 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 	return;
 }
 
-void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTimeAmplitudeIntegrals( 
+void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTimeAmplitudeIntegrals(
 		double & AzeroAzeroInt
 		, double & AparaAparaInt
 		, double & AperpAperpInt
@@ -459,7 +459,7 @@ void Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave::getTime
 	AparaAperpInt = AparaAperp * ( -cachedCosDeltaPerpPara * cachedSinPhisExpSinhInt + Btype * cachedSinDeltaPerpPara * expCosInt - Btype * cachedCosDeltaPerpPara * cachedCosPhisExpSinInt);
 	AzeroAparaInt = AzeroApara * cachedCosDeltaPara  * Int1;
 	AzeroAperpInt = AzeroAperp * ( -cachedCosDeltaPerp     * cachedSinPhisExpSinhInt + Btype * cachedSinDeltaPerp     * expCosInt - Btype * cachedCosDeltaPerp     * cachedCosPhisExpSinInt);
-	AsAsInt       = As_sq    * Int2;	
+	AsAsInt       = As_sq    * Int2;
 	AsAparaInt = AsApara       * ( -cachedSinDeltaParaS    * cachedSinPhisExpSinhInt + Btype * cachedCosDeltaParaS    * expCosInt - Btype * cachedSinDeltaParaS    * cachedCosPhisExpSinInt);
 	AsAperpInt = AsAperp       * cachedSinDeltaPerpS * Int2;
 	AsAzeroInt = AsAzero       * ( -cachedSinDeltaZeroS    * cachedSinPhisExpSinhInt + Btype * cachedCosDeltaZeroS    * expCosInt - Btype * cachedSinDeltaZeroS    * cachedCosPhisExpSinInt);

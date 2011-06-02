@@ -10,14 +10,11 @@
  */
 #ifndef RAPIDFIT_MATHEMATICS
 #define RAPIDFIT_MATHEMATICS
-
-//	ROOT Headers
-#include "TMath.h"
-//	RapidFit Headers
 #include "IDataSet.h"
 #include "IPDF.h"
 #include "RapidFitIntegrator.h"
 #include "PhaseSpaceBoundary.h"
+#include "TMath.h"
 
 namespace Mathematics
 {
@@ -45,30 +42,29 @@ namespace Mathematics
 
 	double Exp( const double t, const double gamma, const double resolution );
 	double ExpInt( const double tlow, const double thigh, const double gamma, const double resolution  );
-	
-	//Added thes to include an upper time acceptance of form ( 1 - beta*t) 
+
+	//Added thes to include an upper time acceptance of form ( 1 - beta*t)
 	double Exp_betaAcceptance( const double t, const double gamma, const double resolution, const double betaParameter );
-	double ExpInt_betaAcceptance( const double tlow, const double thigh, const double gamma, const double resolution, const double betaParameter  );  
-	
+	double ExpInt_betaAcceptance( const double tlow, const double thigh, const double gamma, const double resolution, const double betaParameter  );
+
 	double ExpCosh( const double t, const double gamma, const double deltaGamma, const double resolution );
 	double ExpCoshInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution );
-	
+
 	double ExpSinh( const double t, const double gamma, const double deltaGamma, const double resolution );
 	double ExpSinhInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution );
-	
+
 	double ExpCos( const double t, const double gamma, const double deltaM, const double resolution );
 	double ExpCosInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution );
-	
+
 	double ExpSin( const double t, const double gamma, const double deltaM, const double resolution );
 	double ExpSinInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution );
-	
+
 	double expErfInt(const double tlimit, const double tau, const double sigma);
 	void getBs2JpsiPhiAngularFunctions( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, const double cosTheta, const double phi, const double cosPsi);
 	void getBs2JpsiPhiAngularFunctionsWithSwave( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, double & f7, double & f8, double & f9, double & f10, const double cosTheta, const double phi, const double cosPsi);
-	
+
   	void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
 	void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF );
 }
 
 #endif
-
