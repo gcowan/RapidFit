@@ -14,12 +14,20 @@
 #include "TMath.h"
 
 //Constructor
-Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverageAngAcc() :
+Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverageAngAcc() : cachedAzeroAzeroIntB(),
+	cachedAparaAparaIntB(), cachedAperpAperpIntB(),
+	cachedAparaAperpIntB(), cachedAzeroAparaIntB(),
+	cachedAzeroAperpIntB(), cachedSinDeltaPerpPara(),
+	cachedCosDeltaPara(), cachedSinDeltaPerp(), cachedCosSqDeltaM(),
+	cachedAzero(), cachedApara(), cachedAperp(),
+
 	// Physics parameters
-	gammaName     ( "gamma" )
+	  gammaName     ( "gamma" )
 	, deltaMName    ( "deltaM")
+	, Azero_sqName  ( "Azero_sq" )
 	, Apara_sqName  ( "Apara_sq" )
 	, Aperp_sqName  ( "Aperp_sq" )
+	, delta_zeroName( "delta_zero" )
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
 	, angAccI1Name	( "angAccI1" )
@@ -41,6 +49,10 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverage
 	, phiName	( "phi" )
 	, cosPsiName	( "cosPsi" )
 	, KstarFlavourName  ( "KstarFlavour" )
+
+	, gamma(), deltaMs(), Azero_sq(), Apara_sq(), Aperp_sq(), delta_zero(), delta_para(), delta_perp(), AzeroApara(),
+	AzeroAperp(), AparaAperp(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(), angAccI3(), angAccI4(),
+	angAccI5(), angAccI6(), time(), cosTheta(), phi(), cosPsi(), KstarFlavour(), tlow(), thigh()
 {
 	MakePrototypes();
 }

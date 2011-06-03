@@ -21,6 +21,7 @@ Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg() :
 
         // Observables
         , timeName      ( make_pair("time",-1) )
+	, constraint_timeName()
 {
 	MakePrototypes();
 }

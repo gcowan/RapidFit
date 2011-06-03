@@ -15,12 +15,12 @@
 #include <stdlib.h>
 
 //Default Constructor
-XMLTag::XMLTag() : children(), value(), name("RapidFit"), parent(NULL), path("RapidFit"), forbidden()
+XMLTag::XMLTag() : children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden()
 {
 }
 
 //Default constructor w Override tags
-XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path("RapidFit"), forbidden(Override_Tags)
+XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden(Override_Tags)
 {
 }
 

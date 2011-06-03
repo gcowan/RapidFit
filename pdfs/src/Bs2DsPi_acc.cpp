@@ -27,13 +27,13 @@ Bs2DsPi_acc::Bs2DsPi_acc() :
     , accSlopeLowName	( "AcceptanceSlopeLow" )
     , accSlopeHighName	( "AcceptanceSlopeHigh" )
     , accPowerName	( "AcceptancePower" )
-            
-	// Observables
-	, timeName	( "time" )
-	, tagName	( "tag" )
 
-	//, normalisationCacheValid(false)
-	//, evaluationCacheValid(false)
+
+        // Observables
+	, timeName      ( "time" )
+	, tagName       ( "tag" )    
+	//objects    
+	,gamma(), deltaGamma(), deltaM(), mistag(), timeRes(), AcceptanceOffset(), AcceptanceSlopeLow(), AcceptanceSlopeHigh(), AcceptancePower(), time(), tag(), tlow(), thigh()
 {
 	MakePrototypes();
 }

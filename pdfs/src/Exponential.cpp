@@ -24,6 +24,8 @@ Exponential::Exponential() :
 	, timeResLL1FracName( "timeResolution1Fraction" )
 	// Observables
 	, timeName      ( "time" )
+	//objects used in XML
+	,tauLL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time()
 {
 	MakePrototypes();
 }

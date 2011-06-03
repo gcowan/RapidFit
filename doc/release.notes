@@ -1,5 +1,18 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/03 Rob Currie
+   - Added "--Weffc++" to Makefile, as a consequence I've updated the constructors of several objects to explicitly
+       instantiate member variables onto the heap
+   - Added a check into main.cpp to check for fits where the global fit is not well behaved and by default stop
+       further actions which depend on this.
+       Use  '--ForceScan'  to force RapidFit to continue with a scan regardless of the fit to data. 
+   - Changed CMakeLists.txt to build everything as dynamic libraries
+
+2011/06/01 Rob Currie
+   - Made the Bs2JpsiPhi_SignalAlt_Baseclass destructor virtual again!
+   - Changed the conditions for toy studies to have repeats>1 for older xml's with the repeats flag defined
+   - Added the condition the global fit be well behaved for scans to be performed
+
 2011/06/01 Rob Currie
    - Added TString_Processing, Histo_Processing & NTuple_Processing classes into utils directory
        These contain a LOT of common code used throughout my RapidLL, RapidPlot, print and tinter tools

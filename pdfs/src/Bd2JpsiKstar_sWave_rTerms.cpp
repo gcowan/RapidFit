@@ -13,7 +13,10 @@
 #include "TMath.h"
 
 //Constructor
-Bd2JpsiKstar_sWave_rTerms::Bd2JpsiKstar_sWave_rTerms() :
+Bd2JpsiKstar_sWave_rTerms::Bd2JpsiKstar_sWave_rTerms() : cachedAzeroAzeroIntB(), cachedAparaAparaIntB(), cachedAperpAperpIntB(), cachedAparaAperpIntB(),
+	cachedAzeroAparaIntB(), cachedAzeroAperpIntB(), cachedAsAsIntB(), cachedAparaAsIntB(), cachedAperpAsIntB(), cachedAzeroAsIntB(), cachedSinDeltaPerpPara(),
+	cachedCosDeltaPara(), cachedSinDeltaPerp(), cachedCosDeltaParaS(), cachedSinDeltaPerpS(), cachedCosDeltaS(), cachedAzero(), cachedApara(), cachedAperp(),
+	cachedAs(),
          normalisationCacheValid(false)
 	, evaluationCacheValid(false)
 	// Physics parameters
@@ -43,12 +46,17 @@ Bd2JpsiKstar_sWave_rTerms::Bd2JpsiKstar_sWave_rTerms() :
 	, timeRes2Name	( "timeResolution2" )
 	, timeRes1FractionName	( "timeResolution1Fraction" )
 
+	, gamma(), deltaMs(), Azero_sq(), Apara_sq(), Aperp_sq(), As_sq(), R_alpha(), R_beta(), R_gamma(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(),
+	AperpAs(), AzeroAs(), delta_zero(), delta_para(), delta_perp(), delta_s(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(),
+	angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10()
+
 	// Observables (What we want to gain from the pdf after inserting physics parameter values)
 	, timeName	( "time" )
 	, cosThetaName	( "cosTheta" )
 	, phiName	( "phi" )
 	, cosPsiName	( "cosPsi" )
 	, KstarFlavourName  ( "KstarFlavour" )
+	,time(), cosTheta(), phi(), cosPsi(), KstarFlavour(), tlow(), thigh()
 {
 	MakePrototypes();
 }

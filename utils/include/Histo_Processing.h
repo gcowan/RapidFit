@@ -46,8 +46,18 @@ TH1* LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TStri
 
 void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name );
 
+void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name );
+
 void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double *llconts, double* confs, TString outputdir );
 
 TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TString param2, TString NLL, TString Fit_Cut, double NLL_Global_Best, TTree* FC_Output, TString Double_Tolerance, TRandom3* random );
+
+
+
+vector<vector<Float_t> > Plotter_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random );
+
+TTree* vecvec2TTree( vector<vector<Float_t> > input_vec );
+
+TGraph2D* Plot_From_Cut_lo( TTree* wanted_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 );
 
 #endif

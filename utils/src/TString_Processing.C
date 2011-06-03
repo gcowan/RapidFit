@@ -98,6 +98,7 @@ TPaveText* addLHCbLabel(TString footer, bool DATA){
 	labeltext = label->AddText( labeltstring );
 	labeltext = label->AddText("#sqrt{s} = 7TeV");
 	labeltext = label->AddText(footer);
+	(void) labeltext;
 	return label;
 }
 

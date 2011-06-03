@@ -75,6 +75,18 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		string timeRes2Name;
 		string timeRes1FractionName;
 
+		// These contain the strings that correspond
+		// to the observable names that are used in the
+		// PDF.
+		
+		bool normalisationCacheValid, evaluationCacheValid;
+		
+		string timeName;		// proper time
+		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
+		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		string KstarFlavourName;
+
 		// Member variables that will contain the parameter values
                 double gamma;
                 double deltaMs;
@@ -108,18 +120,6 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		double angAccI9;
 		double angAccI10;
 		double Ap_sq, Ap;
-		// These contain the strings that correspond
-		// to the observable names that are used in the
-		// PDF.
-
-		bool normalisationCacheValid, evaluationCacheValid;
-
-		string timeName;		// proper time
-		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
-		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-		string KstarFlavourName;
-
 
 
 		// Member variables for the observables

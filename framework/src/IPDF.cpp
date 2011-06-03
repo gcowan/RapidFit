@@ -78,7 +78,7 @@ void IPDF::SetMCCacheStatus( bool newStatus)
 
 IPDF::~IPDF()
 {
-	IPDF::Remove_Cache();
+	Remove_Cache();
 }
 
 void IPDF::Remove_Cache()

@@ -44,6 +44,11 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes : public BasePDF
 		string sigmaLL2Name;		// time res sigma 2
                 string timeResLL1FracName;
 
+		// These contain the strings that correspond
+		// to the observable names that are used in the
+		// PDF.
+		string timeName;	// proper time
+
 		double tauLL1;
 		double tauLL2;
 		double f_LL1;
@@ -54,10 +59,6 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes : public BasePDF
 
 		double tlow, thigh; // integration limits
 
-		// These contain the strings that correspond
-		// to the observable names that are used in the
-		// PDF. 
-		string timeName;	// proper time
 		double time;
 };
 

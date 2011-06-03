@@ -18,13 +18,14 @@
 
 //...............................
 // Old default constructor
-Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() : 
+Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() : useCosAndSin(), allowNegativeAsSq(),
 	// Physics parameters
 	  gammaName     ( make_pair("gamma",-1) )
 	, deltaGammaName( make_pair("deltaGamma",-1) )
 	, deltaMName    ( make_pair("deltaM",-1))
 	, Phi_sName     ( make_pair("Phi_s",-1))
 	, Azero_sqName  ( make_pair("Azero_sq",-1) )
+	, Apara_sqName  ( make_pair("Apara_sq",-1) )
 	, Aperp_sqName  ( make_pair("Aperp_sq",-1) )
 	, As_sqName	( make_pair("As_sq",-1) )
 	, delta_zeroName( make_pair("delta_zero",-1) )
@@ -63,6 +64,12 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() :
 	, tagName	    ( make_pair("tag",-1) )
 	, timeAcceptanceCategoryName ( make_pair("timeAcceptanceCategory",-1) )
 	// Other things
+	//objects
+	,t(), ctheta_tr(), phi_tr(), ctheta_1(), tag(), timeAcceptanceCategory(), _gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
+	delta_perp(), delta_zero(), delta_s(), delta1(), delta2(), delta_ms(), phi_s(), _cosphis(), _sinphis(), _mistag(), _mistagP1(), _mistagP0(), _mistagSetPoint(),
+	resolution(), resolution1(), resolution2(), resolution1Fraction(), timeOffset(), angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(),
+	angAccI7(), angAccI8(), angAccI9(), angAccI10(), tlo(), thi(), timeAcceptance(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
+	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored()
 {
 	
 	if( ! USE_LOWER_TIME_ACCEPTANCE ) {
@@ -88,13 +95,14 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() :
 
 //.....................................
 // New Constructor which takes configuration object
-Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator configurator ) : 
+Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator configurator ) : useCosAndSin(), allowNegativeAsSq(),
 // Physics parameters
 	  gammaName     ( make_pair(configurator.getName("gamma"),-1) )
 	, deltaGammaName( make_pair(configurator.getName("deltaGamma"),-1) )
 	, deltaMName    ( make_pair(configurator.getName("deltaM"),-1))
 	, Phi_sName     ( make_pair(configurator.getName("Phi_s"),-1))
 	, Azero_sqName  ( make_pair(configurator.getName("Azero_sq"),-1) )
+	, Apara_sqName  ( make_pair(configurator.getName("Apara_sq"),-1) )
 	, Aperp_sqName  ( make_pair(configurator.getName("Aperp_sq"),-1) )
 	, As_sqName		( make_pair(configurator.getName("As_sq"),-1) )
 	, delta_zeroName( make_pair(configurator.getName("delta_zero"),-1) )
@@ -133,6 +141,12 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator c
 	, tagName	    ( make_pair(configurator.getName("tag"),-1) )
 	, timeAcceptanceCategoryName ( make_pair(configurator.getName("timeAcceptanceCategory"),-1) )
 // Other things
+	//objects
+	,t(), ctheta_tr(), phi_tr(), ctheta_1(), tag(), timeAcceptanceCategory(), _gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
+	delta_perp(), delta_zero(), delta_s(), delta1(), delta2(), delta_ms(), phi_s(), _cosphis(), _sinphis(), _mistag(), _mistagP1(), _mistagP0(), _mistagSetPoint(),
+	resolution(), resolution1(), resolution2(), resolution1Fraction(), timeOffset(), angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(),
+	angAccI7(), angAccI8(), angAccI9(), angAccI10(), tlo(), thi(), timeAcceptance(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
+	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored()
 {
 	
 	useCosAndSin = configurator.isTrue( "UseCosAndSin" ) ;

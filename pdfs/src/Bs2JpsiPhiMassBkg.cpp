@@ -20,6 +20,7 @@ Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg() :
 	  alphaM_prName	( make_pair("alphaM_pr",-1) )
         // Observables
         , recoMassName  ( make_pair("mass",-1) )
+	, constraint_recoMassName()
 {
 	MakePrototypes();
 }

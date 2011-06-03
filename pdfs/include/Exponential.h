@@ -41,6 +41,7 @@ class Exponential : public BasePDF
 		string sigmaLL1Name;		// time res sigma 1
 		string sigmaLL2Name;		// time res sigma 2
                 string timeResLL1FracName;
+		string timeName;		// proper time
 
 		double tauLL1;
 		double sigmaLL; // This is the member variable used in the "builder" functions 
@@ -53,7 +54,6 @@ class Exponential : public BasePDF
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF. 
-		string timeName;	// proper time
 		double time;
 };
 

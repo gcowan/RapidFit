@@ -27,8 +27,8 @@ Bs2DsPi_mistagParameter::Bs2DsPi_mistagParameter() :
 	, timeName	( "time" )
 	, tagName	( "tag" )
 
-	//, normalisationCacheValid(false)
-	//, evaluationCacheValid(false)
+	//objects
+	,gamma(), deltaGamma(), deltaM(), mistag(), timeRes(), time(), tag(), tlow(), thigh()
 {
 	MakePrototypes();
 }

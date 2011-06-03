@@ -25,6 +25,7 @@ Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Bs2JpsiPhiLongLivedBkg_withTimeR
         , sigmaLL1Name  ( "sigma_LL1" )
         , sigmaLL2Name  ( "sigma_LL2" )
         , timeResLL1FracName( "timeResLL1Frac" )
+	, f_JpsiName    ( "f_Jpsi" )
 	, f_NoJpsiName  ( "f_NoJpsi" )
 
 // Observables
@@ -32,6 +33,11 @@ Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Bs2JpsiPhiLongLivedBkg_withTimeR
         , cosThetaName  ( "cosTheta" )
         , phiName       ( "phi" )
         , cosPsiName    ( "cosPsi" )
+
+	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(),
+	sigmaLL2(), timeResLL1Frac(), f_Jpsi(), f_NoJpsi(),
+	tlow(), thigh(), time(), cosTheta(), phi(), cosPsi()
+
 {
 	MakePrototypes();
 }

@@ -41,11 +41,10 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave : publi
 		double cachedAzeroAzeroIntBbar, cachedAparaAparaIntBbar, cachedAperpAperpIntBbar, cachedAparaAperpIntBbar, cachedAzeroAparaIntBbar, cachedAzeroAperpIntBbar, cachedAsAsIntBbar, cachedAsAparaIntBbar, cachedAsAperpIntBbar, cachedAsAzeroIntBbar;
 
 		double cachedSinDeltaPerpPara, cachedCosDeltaPerpPara, cachedSinDeltaPerp, cachedCosDeltaPerp, cachedCosDeltaPara, cachedSinDeltaPerpS, cachedSinDeltaParaS, cachedCosDeltaParaS, cachedSinDeltaZeroS, cachedCosDeltaZeroS, cachedSinPhis, cachedCosPhis;
-		bool normalisationCacheValid, evaluationCacheValid;
 
 		double cachedExpCosh, cachedExpSinh, cachedExpCos, cachedExpSin;
 
-
+		bool normalisationCacheValid, evaluationCacheValid;
 
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
@@ -75,6 +74,17 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave : publi
 		string timeRes1Name;
 		string timeRes2Name;
 		string timeRes1FractionName;
+
+		// These contain the strings that correspond
+		// to the observable names that are used in the
+		// PDF.
+		string timeName;		// proper time
+		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
+		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		// in phi rest frame
+		string tagName;		// B tag
+
 
 		// Member variables that will contain the parameter values
                 double gamma;
@@ -111,16 +121,6 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave : publi
 		double angAccI9;
 		double angAccI10;
 
-
-		// These contain the strings that correspond
-		// to the observable names that are used in the
-		// PDF. 
-		string timeName;		// proper time
-		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
-		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-					// in phi rest frame
-		string tagName;		// B tag
 
 		// Member variables for the observables
 		double time;

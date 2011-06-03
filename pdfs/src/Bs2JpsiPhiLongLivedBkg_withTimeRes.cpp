@@ -26,6 +26,9 @@ Bs2JpsiPhiLongLivedBkg_withTimeRes::Bs2JpsiPhiLongLivedBkg_withTimeRes() :
         , timeResLL1FracName( "timeResLL1Frac" )
 	// Observables
         , timeName      ( "time" )
+
+	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(),
+	sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time()
 {
 	MakePrototypes();
 }

@@ -27,6 +27,9 @@ Bs2JpsiPhiLongLivedBkg_II::Bs2JpsiPhiLongLivedBkg_II() :
 
         // Observables
         , timeName      ( make_pair("time",-1) )
+	, constraint_timeName()
+
+	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time()
 {
 	MakePrototypes();
 }

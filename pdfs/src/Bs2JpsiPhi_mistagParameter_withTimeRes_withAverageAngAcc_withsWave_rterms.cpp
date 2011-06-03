@@ -14,7 +14,20 @@
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms() :
+Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms() : cachedAzeroAzeroIntB(),
+cachedAparaAparaIntB(), cachedAperpAperpIntB(), cachedAparaAperpIntB(),
+cachedAzeroAparaIntB(), cachedAzeroAperpIntB(), cachedAsAsIntB(), cachedAsAparaIntB(),
+cachedAsAperpIntB(), cachedAsAzeroIntB(), cachedAzeroAzeroIntBbar(),
+cachedAparaAparaIntBbar(), cachedAperpAperpIntBbar(), cachedAparaAperpIntBbar(),
+cachedAzeroAparaIntBbar(), cachedAzeroAperpIntBbar(), cachedAsAsIntBbar(),
+cachedAsAparaIntBbar(), cachedAsAperpIntBbar(), cachedAsAzeroIntBbar(),
+cachedSinDeltaPerpPara(), cachedCosDeltaPerpPara(), cachedSinDeltaPerp(),
+cachedCosDeltaPerp(), cachedCosDeltaPara(), cachedSinDeltaPerpS(), cachedSinDeltaParaS(),
+cachedCosDeltaParaS(), cachedSinDeltaZeroS(), cachedCosDeltaZeroS(), cachedSinPhis(),
+cachedCosPhis(), cachedExpCosh(), cachedExpSinh(), cachedExpCos(), cachedExpSin(),
+
+
+
 	//Cache flags
 	  normalisationCacheValid(false)
 	, evaluationCacheValid(false)
@@ -54,6 +67,17 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms::Bs2Jp
 	, cosPsiName	( "cosPsi" )
 	, tagName	( "tag" )
 
+	// Member variables that will contain the parameter values
+	, gamma(), deltaGamma(), deltaMs(), Phi_s(), R_alpha(),
+	R_beta(), R_gamma(), Azero_sq(), Apara_sq(), Aperp_sq(),
+	As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(),
+	AsApara(), AsAperp(), AsAzero(), delta_zero(),
+	delta_para(), delta_perp(), delta_s(), omega(),
+	timeRes(), timeRes1(), timeRes2(), timeRes1Frac(),
+	angAccI1(), angAccI2(), angAccI3(), angAccI4(),
+	angAccI5(), angAccI6(), angAccI7(), angAccI8(),
+	angAccI9(), angAccI10(), time(), cosTheta(), phi(),
+	cosPsi(), q(), tlow(), thigh()
 {
 	MakePrototypes();
 }

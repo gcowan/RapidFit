@@ -44,14 +44,13 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :  Open_Files(), I
 void Foam::Init()
 {
 //Retrieve the maxima and minima, to use in the coordinate transforms
-        for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
-                {
-                                double maximum = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetMaximum();
-                                                double minimum = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetMinimum();
-
-                                                                minima.push_back(minimum);
-                                                                                ranges.push_back( maximum - minimum );
-                                                                                        }
+	for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
+	{
+		double maximum = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetMaximum();
+		double minimum = generationBoundary->GetConstraint( continuousNames[continuousIndex] )->GetMinimum();
+		minima.push_back(minimum);
+		ranges.push_back( maximum - minimum );
+	}
 
 	//Make a Foam generator for each combination
 	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
@@ -122,7 +121,8 @@ void Foam::Init()
 			//Cached_Files.back()->ShowStreamerInfo();
 			//Cached_Files.back()->GetListOfKeys()->Print();
 			foamGenerator = (TFoam*) MC_Cache->Get( Name );
-			cout << "Checking Consistancy, will crash if this fails... this is unavoidable" << endl;
+			//	This code has been production testeted enough such that I think this is pointlessly scaring users
+			//cout << "Checking Consistancy, will crash if this fails... this is unavoidable" << endl;
 			foamGenerator->SetPseRan( rootRandom );
 			foamGenerator->SetRho( combinationFunction );
 			foamGenerator->SetChat( 0 );
@@ -233,7 +233,7 @@ int Foam::GenerateData( int DataAmount )
 		++dataNumber;
 	}
 
-	cout << "Destroying Generator(s)" << endl;
+	//cout << "Destroying Generator(s)" << endl;
 	Foam::RemoveGenerator();
 	return DataAmount;
 }

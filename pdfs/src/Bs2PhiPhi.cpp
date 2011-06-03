@@ -12,7 +12,7 @@
 #include "TMath.h"
 
 //Constructor
-Bs2PhiPhi::Bs2PhiPhi() : 
+Bs2PhiPhi::Bs2PhiPhi() : cach_v1(), cach_v2(), cach_Azero(), cach_Apara(), cach_Aperp(), cach_sinPhis(), cach_cosPhis(), cach_sinDelta_(), cach_cosDelta_(), cach_cosDeltaSubtr(),
       normalisationCacheValid(false)
     , evaluationCacheValid(false)
     // Physics parameters
@@ -22,8 +22,8 @@ Bs2PhiPhi::Bs2PhiPhi() :
     , deltaMName      ( "deltaM")
     , Phi_sName       ( "Phi_s")
     , Azero_sqName    ( "Azero_sq" )
+    , Apara_sqName    ( "Apara_sq" )
     , Aperp_sqName    ( "Aperp_sq" )
-    //, Apara_sqName    ( "Apara_sq" )
     , delta_1Name     ( "delta_1" )
     , delta_2Name     ( "delta_2" )
 

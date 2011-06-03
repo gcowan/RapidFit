@@ -481,7 +481,7 @@ void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * Toy
 		vector<double> result = ToyResult->GetFlatResult(resultIndex);
 		resultArr = new Float_t [result.size()];
 		copy( result.begin(), result.end(), resultArr);
-		parameterNTuple->Fill(resultArr);
+		parameterNTuple->Fill( resultArr );
 		delete [] resultArr;
 	}
 	rootFile->Write();

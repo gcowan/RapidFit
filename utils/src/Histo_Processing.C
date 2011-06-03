@@ -88,157 +88,251 @@ void OptimallyRebin( TH1* input_hist, int axis )
 //      NB this was written due to the fact that ROOT thows away the contents of {3/4}D TTree->Draw() objects... (God only knows why)
 vector<vector<Float_t> > Unique_Coords( TPolyMarker3D *pm )
 {
-        //      Tolerance of the DOUBLE
-        double DT = 1E-5;
+	//      Tolerance of the DOUBLE
+	double DT = 1E-5;
 
-        //      Get the number of coordinates in the TPolyMarker3D
-        int number_of_points = pm->GetN();
-        //      Get the data contained in the TPolyMarker3D
-        Float_t* Coord_Data_pointer = pm->GetP();
+	//      Get the number of coordinates in the TPolyMarker3D
+	int number_of_points = pm->GetN();
+	//      Get the data contained in the TPolyMarker3D
+	Float_t* Coord_Data_pointer = pm->GetP();
 
-        //      Will populate and return to the user
-        vector<vector<Float_t> > Returnable_Coord_Data;
+	//      Will populate and return to the user
+	vector<vector<Float_t> > Returnable_Coord_Data;
 
-        //      Used within a for loop in logic, externally created/destroyed
-        bool add_point = true;
-        bool temp_decision_1 = true;
-        bool temp_decision_2 = true;
-        bool temp_decision_3 = true;
+	//      Used within a for loop in logic, externally created/destroyed
+	bool add_point = true;
+	bool temp_decision_1 = true;
+	bool temp_decision_2 = true;
+	bool temp_decision_3 = true;
 
-        //      Run over all of the points contained within the TPolyMarker3D object
-        for( int i=0; i< number_of_points; ++i )
-        {
-                //      Assume we haven't seen this point yet
-                add_point = true;
-                //      Check the anzats
-                for( unsigned int j=0; j< Returnable_Coord_Data.size(); ++j )
-                {
-                        temp_decision_1 = true;
-                        temp_decision_2 = true;
-                        temp_decision_3 = true;
-                        if( fabs( Coord_Data_pointer[i*3] - Returnable_Coord_Data[j][0] ) < DT ) temp_decision_1 = false;
-                        if( fabs( Coord_Data_pointer[i*3+1] - Returnable_Coord_Data[j][1] ) < DT ) temp_decision_2 = false;
-                        if( fabs( Coord_Data_pointer[i*3+2] - Returnable_Coord_Data[j][2] ) < DT ) temp_decision_3 = false;
+	//      Run over all of the points contained within the TPolyMarker3D object
+	for( int i=0; i< number_of_points; ++i )
+	{
+		//      Assume we haven't seen this point yet
+		add_point = true;
+		//      Check the anzats
+		for( unsigned int j=0; j< Returnable_Coord_Data.size(); ++j )
+		{
+			temp_decision_1 = true;
+			temp_decision_2 = true;
+			temp_decision_3 = true;
+			if( fabs( Coord_Data_pointer[i*3] - Returnable_Coord_Data[j][0] ) < DT ) temp_decision_1 = false;
+			if( fabs( Coord_Data_pointer[i*3+1] - Returnable_Coord_Data[j][1] ) < DT ) temp_decision_2 = false;
+			if( fabs( Coord_Data_pointer[i*3+2] - Returnable_Coord_Data[j][2] ) < DT ) temp_decision_3 = false;
 
-                        //      If all of the information is the same do NOT add the point to the new vector of data
-                        if( ( ( temp_decision_1 == temp_decision_2 ) && ( temp_decision_2 == temp_decision_3 ) ) && ( temp_decision_1 == false ) )
-                                add_point = false;
-                }
-                //      If we haven't seen this point yet add it to the array of points
-                if( add_point )
-                {
-                        //cout << Coord_Data_pointer[i*3] << "\t" << Coord_Data_pointer[i*3+1] << "\t" << Coord_Data_pointer[i*3+2] << endl;
-                        vector<Float_t> temp_vector;
-                        temp_vector.push_back( Coord_Data_pointer[i*3] );
-                        temp_vector.push_back( Coord_Data_pointer[i*3+1] );
-                        temp_vector.push_back( Coord_Data_pointer[i*3+2] );
-                        Returnable_Coord_Data.push_back( temp_vector );
-                }
-        }
+			//      If all of the information is the same do NOT add the point to the new vector of data
+			if( ( ( temp_decision_1 == temp_decision_2 ) && ( temp_decision_2 == temp_decision_3 ) ) && ( temp_decision_1 == false ) )
+				add_point = false;
+		}
+		//      If we haven't seen this point yet add it to the array of points
+		if( add_point )
+		{
+			//cout << Coord_Data_pointer[i*3] << "\t" << Coord_Data_pointer[i*3+1] << "\t" << Coord_Data_pointer[i*3+2] << endl;
+			vector<Float_t> temp_vector;
+			temp_vector.push_back( Coord_Data_pointer[i*3] );
+			temp_vector.push_back( Coord_Data_pointer[i*3+1] );
+			temp_vector.push_back( Coord_Data_pointer[i*3+2] );
+			Returnable_Coord_Data.push_back( temp_vector );
+		}
+	}
 
-        //      Return a 2D vector of unique 3D corrdinates of size npoints*3
-        return Returnable_Coord_Data;
+	//      Return a 2D vector of unique 3D corrdinates of size npoints*3
+	return Returnable_Coord_Data;
+}
+
+vector<vector<Float_t> > Plotter_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random )
+{
+        //      Plot the graph using TTree->Draw()
+	//      The resulting graph (TH3) contains empty axis and a TPolyMarker3D object
+	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
+	input_tree->Draw( Draw_String, Cut_String );
+                                      
+	//      Get the Points that have been plotted (TPolyMarker3D object named "TPolyMarker3D", see ROOTtalk)
+	TPolyMarker3D *pm = (TPolyMarker3D*)gPad->FindObject("TPolyMarker3D");
+	double temp = random->Rndm();
+	TString Name = "TPoly3_";
+	Name+=temp;
+	pm->SetName(Name);
+
+	//      Get a list of ONLY unique coordinates due to the short comings of the interpolation within TGraph2D
+	vector<vector<Float_t> > returnable_data = Unique_Coords( pm );
+
+	return returnable_data;
 }
 
 TGraph2D* Plotter( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random )
 {
-        //      Plot the graph using TTree->Draw()
-        //      The resulting graph (TH3) contains empty axis and a TPolyMarker3D object
-        input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
-        input_tree->Draw( Draw_String, Cut_String );
+	//      Get a list of ONLY unique coordinates due to the short comings of the interpolation within TGraph2D
+	vector<vector<Float_t> > Coord_Data = Plotter_Data( input_tree, Draw_String, Cut_String, random );
 
-        //      Get the Points that have been plotted (TPolyMarker3D object named "TPolyMarker3D", see ROOTtalk)
-        TPolyMarker3D *pm = (TPolyMarker3D*)gPad->FindObject("TPolyMarker3D");
-        double temp = random->Rndm();
-        TString Name = "TPoly3_";
-        Name+=temp;
-        pm->SetName(Name);
+	//      Make a new EMPTY TGraph2D with a unique name
+	TGraph2D* new_plot = new TGraph2D();
+	TString Plot="Plot_";
+	double temp = random->Rndm();
+	Plot+=temp;
+	new_plot->SetName(Plot);
+	new_plot->SetTitle(Plot);
+	//      Set Binning of Plot
+	new_plot->SetNpx( int( ceil( sqrt( double(Coord_Data.size()) ) ) ) );
+	new_plot->SetNpy( int( ceil( sqrt( double(Coord_Data.size()) ) ) ) );
 
-        //      Get a list of ONLY unique coordinates due to the short comings of the interpolation within TGraph2D
-        vector<vector<Float_t> > Coord_Data = Unique_Coords( pm );
+	//      Add the data to the TGraph2D object as points
+	for( unsigned int i=0; i< Coord_Data.size(); ++i )
+	{
+		//cout << i << "\t" << Coord_Data[i][0] << "\t" << Coord_Data[i][1] << "\t" << Coord_Data[i][2] << endl;
+		new_plot->SetPoint( int(i), Coord_Data[i][0], Coord_Data[i][1], Coord_Data[i][2] );
+	}
 
-        //      Make a new EMPTY TGraph2D with a unique name
-        TGraph2D* new_plot = new TGraph2D();
-        TString Plot="Plot_";
-        temp = random->Rndm();
-        Plot+=temp;
-        new_plot->SetName(Plot);
-        new_plot->SetTitle(Plot);
-        //      Set Binning of Plot
-        new_plot->SetNpx( int( ceil( sqrt( double(Coord_Data.size()) ) ) ) );
-        new_plot->SetNpy( int( ceil( sqrt( double(Coord_Data.size()) ) ) ) );
-
-        //      Add the data to the TGraph2D object as points
-        for( unsigned int i=0; i< Coord_Data.size(); ++i )
-        {
-                //cout << i << "\t" << Coord_Data[i][0] << "\t" << Coord_Data[i][1] << "\t" << Coord_Data[i][2] << endl;
-                new_plot->SetPoint( int(i), Coord_Data[i][0], Coord_Data[i][1], Coord_Data[i][2] );
-        }
-
-        //      Return the TGraph2D object
-        return new_plot;
+	//      Return the TGraph2D object
+	return new_plot;
 }
 
 
 //      Produce Plotting Histograms from an input TTree
 TH2D* Plot_From_Cut( TTree* wanted_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 )
 {
-        //      Create a canvas
-        TString Canvas_Name("Canvas_");
-        double rand = random->Rndm();
-        Canvas_Name+=rand;
-        TCanvas* temp_canvas = new TCanvas( Canvas_Name, Canvas_Name );
-        //      Plot the Graph
-        TGraph2D* new_graph = Plotter( wanted_tree, Draw_String, Cut_String, random );
-        //      Update the Canvas to initialize anything that requires this step... this is very much a ROOT thing
-        temp_canvas->Update();
-        //      Return the Histogram from within this graph for plotting
-        TH2D* Returnable_Hist = new_graph->GetHistogram();
-        Returnable_Hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
-        Returnable_Hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
-        return Returnable_Hist;
+	//      Create a canvas
+	TString Canvas_Name("Canvas_");
+	double rand = random->Rndm();
+	Canvas_Name+=rand;
+	TCanvas* temp_canvas = new TCanvas( Canvas_Name, Canvas_Name );
+
+	//      Plot the Graph
+	TGraph2D* new_graph = Plotter( wanted_tree, Draw_String, Cut_String, random );
+
+	//      Update the Canvas to initialize anything that requires this step... this is very much a ROOT thing
+	temp_canvas->Update();
+
+	//      Return the Histogram from within this graph for plotting
+	TH2D* Returnable_Hist = new_graph->GetHistogram();
+	Returnable_Hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
+	Returnable_Hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
+
+	return Returnable_Hist;
 }
 
+//      Produce Plotting Histograms from an input TTree
+TGraph2D* Plot_From_Cut_lo( TTree* wanted_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 )
+{
+	//      Create a canvas
+	TString Canvas_Name("Canvas_");
+	double rand = random->Rndm();
+	Canvas_Name+=rand;
+	TCanvas* temp_canvas = new TCanvas( Canvas_Name, Canvas_Name );
+
+	//      Plot the Graph
+	TGraph2D* new_graph = Plotter( wanted_tree, Draw_String, Cut_String, random );
+
+	//      Update the Canvas to initialize anything that requires this step... this is very much a ROOT thing
+	temp_canvas->Update();
+
+	//      Return the Histogram from within this graph for plotting
+	new_graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
+	new_graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
+
+	return new_graph;
+}
+
+
+TTree* vecvec2TTree( vector<vector<Float_t> > input_vec )
+{
+
+	TTree* new_tree = new TTree( "tree2Draw", "tree2Drw" );
+		 
+	Float_t* Float_data = new Float_t[ input_vec[0].size() ];
+	for( unsigned int i=0; i<input_vec[0].size(); ++i )
+	{
+		TString br_name("Branch_");
+		br_name+=i;
+		TString br_title(br_name);
+		br_title.Append("/F");
+		new_tree->Branch( br_name, &Float_data[i], br_title );
+	}
+
+	for( unsigned int i=0; i<input_vec.size(); ++i)
+	{
+		for( unsigned int j=0; j<input_vec[i].size(); ++j )
+		{
+			Float_data[j] = input_vec[i][j];
+			new_tree->Fill();
+		}
+	}
+
+	return new_tree;
+}
+
+//pair<TH2*,TPolyMarker3D>* Plot_From_Cut_lo( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 )
+//{
+//	vector<vector<Float_t> > Coord_Data = Plotter_Data( input_tree, Draw_String, Cut_String, random );
+//
+//	TRandom3* rand = new TRandom(0);
+//
+//	TString name("namez");
+//	name+=rand->Rndm();
+//
+//	TCanvas* mc = new TCanvas( name, name, 1680, 1050 );
+//
+//	TTree* plotting_tree = vecvec2TTree( Coord_Data );
+//
+//	plotting_tree->Draw("Branch_0:Branch_1:Branch_2");
+//
+//	mc->Update();
+//	TPolyMarker3D *pm = (TPolyMarker3D*)gPad->FindObject("TPolyMarker3D");
+//	temp = rand->Rndm();
+//	TString Name = "TPoly3_";
+//	Name+=temp;
+//	pm->SetName(Name);
+//
+//	TH2* returnable_hist = (TH2*) plotting_tree->GetHistogram();
+//
+//	returnable_hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
+//	returnable_hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
+//	pair<TH2*,TPolyMarker3D> returnable_pair;
+//	returnable_pair.first = returnable_hist;
+//	returnable_pair.second = pm;
+//	return returnable_pair;
+//}
 
 //      Produce plots for all Physics Parameters stored within the given TTree
 //      In theory could also extract the parameters from the input TTree, but as the user likely knows what they want, ask-em
 void Physics_Plots( vector<TString> all_parameter_values, Float_t* best_fit_values, TTree* input_tree, TRandom3* rand_gen, TString Param1_Param2, bool CV_Drift, TH2** Physics_Param_Plots, TString Cut_String)
 {
-        //      Construct a plot string for the physics parameters and plot them
-        cout << endl << "STARTING PLOTS SHOWING THE VARIATION OF PHYSICS PARAMETERS THROUGHOUT THE SCANS" << endl;
+	//      Construct a plot string for the physics parameters and plot them
+	cout << endl << "STARTING PLOTS SHOWING THE VARIATION OF PHYSICS PARAMETERS THROUGHOUT THE SCANS" << endl;
 
-        //      Store all of the plotting strings
-        TString* Physics_Param_DrawString = new TString[unsigned(all_parameter_values.size())];
-        //      Loop over all of the wanted parameters that have been passed
-        for( unsigned int i=0; i<all_parameter_values.size(); ++i )
-        {
-                cout << endl << "PLOTTING: " << all_parameter_values[i] << "\t" << i+1 << " of: " << all_parameter_values.size() << endl;
+	//      Store all of the plotting strings
+	TString* Physics_Param_DrawString = new TString[unsigned(all_parameter_values.size())];
+	//      Loop over all of the wanted parameters that have been passed
+	for( unsigned int i=0; i<all_parameter_values.size(); ++i )
+	{
+		cout << endl << "PLOTTING: " << all_parameter_values[i] << "\t" << i+1 << " of: " << all_parameter_values.size() << endl;
 
-                //      Construct Plotting String based on input
-                Physics_Param_DrawString[i] = "(" + all_parameter_values[i];
-                if( CV_Drift ) {
-                        TString Best_Value;
-                        Best_Value+=best_fit_values[i];
-                        Physics_Param_DrawString[i] += "-" + Best_Value;
-                }
-                Physics_Param_DrawString[i] += ")";
-                Physics_Param_DrawString[i] += Param1_Param2;
+		//      Construct Plotting String based on input
+		Physics_Param_DrawString[i] = "(" + all_parameter_values[i];
+		if( CV_Drift )
+		{
+			TString Best_Value;
+			Best_Value+=best_fit_values[i];
+			Physics_Param_DrawString[i] += "-" + Best_Value;
+		}
+		Physics_Param_DrawString[i] += ")";
+		Physics_Param_DrawString[i] += Param1_Param2;
 
-                //      Actually perform the plots using the same tool as before
-                cout << Physics_Param_DrawString[i] << endl;
-                cout << Cut_String << endl;
-                Physics_Param_Plots[i] = Plot_From_Cut( input_tree, Physics_Param_DrawString[i], Cut_String, rand_gen );
+		//      Actually perform the plots using the same tool as before
+		cout << Physics_Param_DrawString[i] << endl;
+		cout << Cut_String << endl;
+		Physics_Param_Plots[i] = Plot_From_Cut( input_tree, Physics_Param_DrawString[i], Cut_String, rand_gen );
 
-                //      Plot the graph
-                TString Canvas_Name("Plot_Me_");
-                double rand_canv = rand_gen->Rndm();
-                Canvas_Name+=rand_canv;
-                TCanvas* plot_me = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
-                plot_me->SetTitle( "" );
-                plot_me->SetName( all_parameter_values[i] );
-                Physics_Param_Plots[i]->Draw("colz");
-                plot_me->Update();
-        }
+		//      Plot the graph
+		TString Canvas_Name("Plot_Me_");
+		double rand_canv = rand_gen->Rndm();
+		Canvas_Name+=rand_canv;
+		TCanvas* plot_me = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
+		plot_me->SetTitle( "" );
+		plot_me->SetName( all_parameter_values[i] );
+		Physics_Param_Plots[i]->Draw("colz");
+		plot_me->Update();
+	}
 }
 
 void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_parameter_values, TString param1string, TString param2string, TString outputdir, bool CV_Drift )
@@ -283,6 +377,111 @@ TH1* LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TStri
 	return input_tree->GetHistogram();
 }
 
+void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name )
+{
+	(void) input_conts; (void) cont_num; 
+	vector<TString> Plot_Type;
+	Plot_Type.push_back( "Temp" );
+	Plot_Type.push_back( "Cont" );
+	Plot_Type.push_back( "Conf" );
+	Plot_Type.push_back( "Pub" );
+
+	TString Draw_String;
+	TString Canvas_Name("Styled_Canvas_");
+
+	TString Base_Name = outputdir + "/" + Name + "_";
+
+	for( unsigned int i = 0; i < Plot_Type.size(); ++i )
+	{
+
+		if( i == 0 )	Draw_String = "colz";
+		if( i == 1 )	Draw_String = "cont1z";
+
+		if( i == 2 || i == 3 )
+		{
+			Draw_String = "cont LIST";
+			//input_graph->SetContour( cont_num, input_conts );
+		}
+
+		Canvas_Name+=i;
+		TCanvas* Styled_Output_Canvas = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
+
+		input_graph->Draw( Draw_String );
+		Styled_Output_Canvas->Update();
+
+		if( i == 0 )
+		{
+			input_graph->Draw( Draw_String );
+			Styled_Output_Canvas->Update();
+		}
+
+		if( i == 2 || i == 3 )
+		{
+			TObjArray *contObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
+
+			TList* contLevel = NULL;
+			TGraph* curv = NULL;
+			TGraph* gc = NULL;
+			double cl=0;
+			TString confname;
+
+			int TotalConts = contObjArr->GetSize();
+
+			TLegend *leg = new TLegend(0.80,0.89,0.95,0.7);
+			leg->SetHeader("Conf. Levels");
+			leg->SetBorderSize(0);
+			leg->SetFillStyle(0);
+
+			input_graph->Draw("AXIS");
+
+			for(int j = 0; j < TotalConts; ++j )
+			{
+				confname = "";
+				cl = confs[j];
+				confname +=cl;
+				confname += "% C.L.";
+				contLevel = input_graph->GetContourList(cl);
+				//contLevel = (TList*)contObjArr->At(j);
+				for(int k =0; k < contLevel->GetSize(); ++k)
+				{
+					curv = (TGraph*)contLevel->At(k);
+					gc = (TGraph*)curv->Clone();
+					if( Plot_Type[i] == "Pub"  )	gc->SetLineStyle( Style_t(j+1) );
+					if( Plot_Type[i] == "Conf" )	gc->SetLineColor( Color_t(j+2) );
+					gc->Draw("L");
+				}
+				leg->AddEntry( gc, confname, "L");
+			}
+
+			leg->Draw();
+		}
+
+		TString Output_Name = Base_Name + Plot_Type[i];
+
+		addLHCbLabel( Name )->Draw();
+		input_graph->SetTitle("");
+		Styled_Output_Canvas->Update();
+
+		Styled_Output_Canvas->Print( Output_Name + ".png" );
+		Styled_Output_Canvas->Print( Output_Name + ".pdf" );
+
+	}
+
+	//	Lets conserve the efforts of this plotting tool :D
+	cout << endl << "Writing TH2D object for comparisons with other scans" << endl << endl;
+
+	TString Hist_FileName = outputdir+"/"+Name+".root";
+
+	TFile * output = new TFile( Hist_FileName, "RECREATE" );
+
+	input_graph->Write();
+	output->Close();
+
+	// Return to default
+	//input_hist->SetContour(20);
+	return;
+}
+
 void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name )
 {
 	vector<TString> Plot_Type;
@@ -293,12 +492,12 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 
 	TString Draw_String;
 	TString Canvas_Name("Styled_Canvas_");
-	
+
 	TString Base_Name = outputdir + "/" + Name + "_";
 
 	for( unsigned int i = 0; i < Plot_Type.size(); ++i )
 	{
-	  
+
 		if( i == 0 )	Draw_String = "colz";
 		if( i == 1 )	Draw_String = "cont1z";
 
@@ -307,7 +506,7 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 			Draw_String = "cont LIST";
 			input_hist->SetContour( cont_num, input_conts );
 		}
-		
+
 		Canvas_Name+=i;
 		TCanvas* Styled_Output_Canvas = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
 
@@ -376,10 +575,10 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 
 	TString Hist_FileName = outputdir+"/"+Name+".root";
 
-        TFile * output = new TFile( Hist_FileName, "RECREATE" );
+	TFile * output = new TFile( Hist_FileName, "RECREATE" );
 
-        input_hist->Write();
-        output->Close();
+	input_hist->Write();
+	output->Close();
 
 	// Return to default
 	input_hist->SetContour(20);
@@ -463,7 +662,7 @@ void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double 
 		{
 			//	Current line
 			Line = (TGraph*) contLevel->At(j);
-		
+
 			//	Set the line Color
 			TGraph *gc = (TGraph*) Line->Clone();
 			gc->SetLineColor( Color_t(i+2) );
@@ -534,7 +733,7 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 
 	vector<vector<Float_t> > Used_Coordinate;
 
-	
+
 	bool Add_Point=true;
 	bool decision_1=true;
 	bool decision_2=true;
@@ -644,9 +843,9 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 			Double_t Ratio = NLL_Local_Best - NLL_Global_Best;
 			for(unsigned short int j = 0; j < Fixed_Toy_Num; ++j){
 
-			//	VERY MEMORY INTENSIVE!!!
-			//	Floated_Toys->GetEntry(j);
-			//	Fixed_Toys->GetEntry(j);
+				//	VERY MEMORY INTENSIVE!!!
+				//	Floated_Toys->GetEntry(j);
+				//	Fixed_Toys->GetEntry(j);
 
 				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
 				//if the toyratio is smaller than the data ratio at this point, increment:
@@ -664,9 +863,9 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 			cerr << "\t" << Param_1_Coord << ":" << Param_2_Coord << "\tWARNING: NO TOYS FOUND HERE! " << endl;
 			CL = +9999.;	//	This plots a spike here which shows on contours
 		}
-	cout << Processed_Toys << "\tTOYS PROCESSED AT:\t" << setprecision(4) << Param_1_Coord << "\t:\t" << Param_2_Coord << endl;
-	//	Store the relevent information for plotting in the FC_Output TTree
-	FC_Output->Fill();
+		cout << Processed_Toys << "\tTOYS PROCESSED AT:\t" << setprecision(4) << Param_1_Coord << "\t:\t" << Param_2_Coord << endl;
+		//	Store the relevent information for plotting in the FC_Output TTree
+		FC_Output->Fill();
 	}
 
 	TString FCName="FC_Plot_";
@@ -705,7 +904,7 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 	TH2D* Returnable_Hist = new_plot->GetHistogram();
 
 	Returnable_Hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
-        Returnable_Hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
+	Returnable_Hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
 
 	return Returnable_Hist;
 }

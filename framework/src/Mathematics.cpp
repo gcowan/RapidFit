@@ -482,13 +482,13 @@ namespace Mathematics
 	{
 		// This tries to implement the NIKHEF method for calculating the
 		// average acceptance weights for Bs2JpsiPhi.
-		RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
+		RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);	(void)	rapidInt;	//	shutup gcc for unused param
 		PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
 		int numAngularTerms = 10;
 		double*  f = new double[numAngularTerms]; // the angular functions
 		double* xi = new double[numAngularTerms]; // the angular weights
 		double cosTheta, phi, cosPsi;
-		double evalPDFraw, evalPDFnorm, evalPDFnorm2, val;
+		double evalPDFraw, evalPDFnorm, evalPDFnorm2, val;		(void) evalPDFnorm2;	//	shutup gcc for unused param!
 		int numEvents = dataSet->GetDataNumber();
 		for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
 
@@ -529,7 +529,7 @@ namespace Mathematics
 		}
 
 
-		float xi_scale = 3/ (xi[0] + xi[1] + xi[2])  ;
+		float xi_scale = float( 3./ (xi[0] + xi[1] + xi[2]) );
 		//cout << "[" << xi[0] << ", " << xi[1] << ", " << xi[2] <<  ", " << xi[3] << ", " << xi[4] << ", " << xi[5] <<  "," << xi[7] << "," << xi[8] << ","  << xi[9] <<"]" <<  endl;
 		cout << "[" << xi[0]*xi_scale << ", " << xi[1]*xi_scale << ", " << xi[2]*xi_scale <<  ", " << xi[3]*xi_scale << ", " << xi[4]*xi_scale << ", " << xi[5]*xi_scale <<  ", " << xi[6]*xi_scale << "," << xi[7]*xi_scale << "," << xi[8]*xi_scale << ","  << xi[9]*xi_scale <<"]" <<  endl;
 		//cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents  << "," <<  xi[6]/numEvents << "," << xi[7]/numEvents << "," << xi[8]/numEvents << ","  << xi[9]/numEvents << "]" <<  endl;

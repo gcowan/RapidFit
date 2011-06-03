@@ -14,13 +14,19 @@
 
 //Constructor
 Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave() :
+	cachedAzeroAzeroIntB(), cachedAparaAparaIntB(), cachedAperpAperpIntB(), cachedAparaAperpIntB(), cachedAzeroAparaIntB(), cachedAzeroAperpIntB(),
+	cachedAsAsIntB(), cachedAparaAsIntB(), cachedAperpAsIntB(), cachedAzeroAsIntB(), AzeroAzeroB(), AparaAparaB(), AperpAperpB(), AsAsB(), ImAparaAperpB(),
+	ReAzeroAparaB(), ImAzeroAperpB(), ReAparaAsB(), ImAperpAsB(), ReAzeroAsB(), cachedSinDeltaPerpPara(), cachedCosDeltaPara(), cachedSinDeltaPerp(),
+	cachedCosDeltaParaS(), cachedSinDeltaPerpS(), cachedCosDeltaS(), cachedAzero(), cachedApara(), cachedAperp(), cachedAs(),
+
 	// Physics parameters
-	gammaName     	( "gamma" )
+	  gammaName     	( "gamma" )
 	, deltaMName    ( "deltaM")
 	, Azero_sqName ( "Azero_sq")
 	, Apara_sqName  ( "Apara_sq" )
 	, Aperp_sqName  ( "Aperp_sq" )
 	, As_sqName	( "As_sq" )
+	, delta_zeroName( "delta_zero" )
 	, delta_paraName( "delta_para" )
 	, delta_perpName( "delta_perp" )
 	, delta_sName	( "delta_s" )
@@ -47,6 +53,11 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave() :
 	, cosPsiName	( "cosPsi" )
 	, KstarFlavourName  ( "KstarFlavour" )
 	//, timeres	( "resolution" )
+
+	, gamma(), deltaMs(), Azero_sq(), Apara_sq(), Aperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
+	delta_zero(), delta_para(), delta_perp(), delta_s(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(),
+	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), Ap_sq(), Ap(), time(), cosTheta(), phi(),
+	cosPsi(), KstarFlavour(), tlow(), thigh()
 {
 	MakePrototypes();
 }
@@ -324,6 +335,7 @@ return returnValue;
 
 double Bd2JpsiKstar_sWave::NormAnglesOnlyForAcceptanceWeights(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+	(void) boundary;
         double returnValue;
 	time = measurement->GetObservable( timeName )->GetValue();
         KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();

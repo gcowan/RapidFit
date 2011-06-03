@@ -116,7 +116,8 @@ int main( int argc, char* argv[] )
 		_1D_Draw_String = NLL_Draw_String + ":" + Param_Of_Choice + value_suffix;
 
 		ALL_Draw_Strings.push_back( _1D_Draw_String );
-	}
+                cout << ALL_Draw_Strings.back() << endl;
+        }
 
 	TCanvas* new_canvas = new TCanvas("Output", "Output", 1680, 1050 );
 

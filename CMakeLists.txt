@@ -66,11 +66,11 @@ ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
 
 IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -Weffc++ -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -funroll-all-loops -g -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
 ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
 IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -Wextra -Wall -Wno-non-virtual-dtor" )
+	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -fPIC -O3 -msse -msse2 -msse3 -funroll-all-loops -m3dnow -ansi -g -Wextra -Wall -Wno-non-virtual-dtor" )
 	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem ${ROOT_INCLUDE_DIR}" )
 ENDIF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
@@ -132,9 +132,15 @@ ENDWHILE( ${I} LESS ${SRC_LEN} )
 
 #  OUTPUT OPTIONS
 
+ADD_LIBRARY( fits SHARED ${FITTER_SRCS} )
+TARGET_LINK_LIBRARIES( fits ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
+
+ADD_LIBRARY( pdfs SHARED ${PDF_SRCS} )
+TARGET_LINK_LIBRARIES( pdfs ${ROOT_LIBRARIES} )
+
 #  Add the main program which offers the standard way into RapidFit and the usecase where most users will want it
-ADD_EXECUTABLE( fitting ${PDF_SRCS} ${FITTER_SRCS} )
-TARGET_LINK_LIBRARIES( fitting ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
+ADD_EXECUTABLE( fitting ${PROJECT_SOURCE_DIR}/framework/src/main.cpp )
+TARGET_LINK_LIBRARIES( fitting ${ROOT_LIBRARIES} fits pdfs )
 
 
 
@@ -163,16 +169,6 @@ TARGET_LINK_LIBRARIES( rapidfit_fcscanresults_2 ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( rapidfit_toyresults ${PROJECT_SOURCE_DIR}/utils/src/rapidfit_toyresults.cc )
 TARGET_LINK_LIBRARIES( rapidfit_toyresults ${ROOT_LIBRARIES} )
 
-#	My tool for analysing toy studies
-#	main difference is it performs a binned analysis
-ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter.C
-${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp
-${PROJECT_SOURCE_DIR}/framework/src/StringProcessing.cpp
-${PROJECT_SOURCE_DIR}/utils/src/NTuple_Processing.C
-${PROJECT_SOURCE_DIR}/utils/src/TString_Processing.C
-${PROJECT_SOURCE_DIR}/utils/src/Histo_Processing.C )
-TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} )
-
 #	Tool for comparing results of 2DLL within Edinburgh
 ADD_EXECUTABLE( merge_plot ${PROJECT_SOURCE_DIR}/utils/src/merge_plot.C )
 TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
@@ -181,25 +177,41 @@ TARGET_LINK_LIBRARIES( merge_plot ${ROOT_LIBRARIES} )
 ADD_EXECUTABLE( betas_sweightfitter ${PROJECT_SOURCE_DIR}/utils/src/betas_sweightfitter.cc )
 TARGET_LINK_LIBRARIES( betas_sweightfitter ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
 
+
+
+
+#	Libraries which share a LOT of code useful in the analysis of the results from RapidFit
+
+ADD_LIBRARY( NTuple_Processing SHARED ${PROJECT_SOURCE_DIR}/utils/src/NTuple_Processing.C )
+TARGET_LINK_LIBRARIES( NTuple_Processing ${ROOT_LIBRARIES} )
+
+ADD_LIBRARY( TString_Processing SHARED ${PROJECT_SOURCE_DIR}/utils/src/TString_Processing.C ${PROJECT_SOURCE_DIR}/framework/src/StringProcessing.cpp )
+TARGET_LINK_LIBRARIES( TString_Processing ${ROOT_LIBRARIES} )
+
+ADD_LIBRARY( Histo_Processing SHARED ${PROJECT_SOURCE_DIR}/utils/src/Histo_Processing.C )
+TARGET_LINK_LIBRARIES( Histo_Processing ${ROOT_LIBRARIES} )
+
+ADD_LIBRARY( RapidFit_Style SHARED ${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp )
+TARGET_LINK_LIBRARIES( RapidFit_Style ${ROOT_LIBRARIES} )
+
+
+
+#       My tool for analysing toy studies
+#       main difference is it performs a binned analysis
+ADD_EXECUTABLE( tinter ${PROJECT_SOURCE_DIR}/utils/src/tinter.C )
+TARGET_LINK_LIBRARIES( tinter ${ROOT_LIBRARIES} RapidFit_Style Histo_Processing TString_Processing NTuple_Processing )
+
 #       New tool for plotting 2DLL and FC
-ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot.C
-${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp
-${PROJECT_SOURCE_DIR}/framework/src/StringProcessing.cpp
-${PROJECT_SOURCE_DIR}/utils/src/NTuple_Processing.C
-${PROJECT_SOURCE_DIR}/utils/src/TString_Processing.C
-${PROJECT_SOURCE_DIR}/utils/src/Histo_Processing.C )
-TARGET_LINK_LIBRARIES( RapidPlot ${ROOT_LIBRARIES} )
+ADD_EXECUTABLE( RapidPlot ${PROJECT_SOURCE_DIR}/utils/src/RapidPlot.C )
+TARGET_LINK_LIBRARIES( RapidPlot ${ROOT_LIBRARIES} RapidFit_Style Histo_Processing TString_Processing NTuple_Processing )
 
 #       New tool for plotting 1D LL and overlaying multiple copies of the same
-ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C
-${PROJECT_SOURCE_DIR}/framework/src/EdStyle.cpp
-${PROJECT_SOURCE_DIR}/framework/src/StringProcessing.cpp
-${PROJECT_SOURCE_DIR}/utils/src/NTuple_Processing.C
-${PROJECT_SOURCE_DIR}/utils/src/TString_Processing.C
-${PROJECT_SOURCE_DIR}/utils/src/Histo_Processing.C )
-TARGET_LINK_LIBRARIES( RapidLL ${ROOT_LIBRARIES} )
+ADD_EXECUTABLE( RapidLL ${PROJECT_SOURCE_DIR}/utils/src/RapidLL.C )
+TARGET_LINK_LIBRARIES( RapidLL ${ROOT_LIBRARIES} RapidFit_Style Histo_Processing TString_Processing NTuple_Processing )
 
-
+#       New tool for plotting 1D LL and overlaying multiple copies of the same
+ADD_EXECUTABLE( print ${PROJECT_SOURCE_DIR}/utils/src/print.C )
+TARGET_LINK_LIBRARIES( print ${ROOT_LIBRARIES} RapidFit_Style Histo_Processing TString_Processing NTuple_Processing )
 
 
 
@@ -224,5 +236,5 @@ ADD_CUSTOM_COMMAND ( OUTPUT  ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp
 
 #	This is what is required to build the object libRapidRun.so
 #	It requires the custom command above
-ADD_LIBRARY ( RapidRun SHARED ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp ${PROJECT_SOURCE_DIR}/framework/src/RapidRun.cpp ${FITTER_SRCS} ${PDF_SRCS} )
-TARGET_LINK_LIBRARIES( RapidRun ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} )
+ADD_LIBRARY ( RapidRun SHARED ${PROJECT_BINARY_DIR}/rapidfit_dict.cpp ${PROJECT_SOURCE_DIR}/framework/src/RapidRun.cpp )
+TARGET_LINK_LIBRARIES( RapidRun ${ROOT_LIBRARIES} ${ROOT_FIT_LIBRARIES} pdfs fits )

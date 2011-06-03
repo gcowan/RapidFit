@@ -44,12 +44,12 @@ class Bs2DsPi_acc : public BasePDF
 		string gammaName;		// gamma
 		string deltaGammaName;	// delta gamma
 		string deltaMName;		// delta mass
-    	string mistagName;		// B mistag
-	    string timeresName;		// B timeres
-	    string accOffName;	// acc parameters
-	    string accSlopeLowName;		// acc parameters
-	    string accSlopeHighName;		// acc parameters	    
-	    string accPowerName;		// acc parameters
+		string mistagName;		// B mistag
+		string timeresName;		// B timeres
+		string accOffName;	// acc parameters
+		string accSlopeLowName;		// acc parameters
+		string accSlopeHighName;		// acc parameters	    
+		string accPowerName;		// acc parameters
 	    	    	    
 		// These contain the strings that correspond
 		// to the observable names that are used in the
@@ -59,7 +59,7 @@ class Bs2DsPi_acc : public BasePDF
 	   
 		// Physics parameters
 
-	    double gamma, deltaGamma, deltaM, mistag, timeRes, AcceptanceOffset, AcceptanceSlopeLow, AcceptanceSlopeHigh, AcceptancePower ;
+		double gamma, deltaGamma, deltaM, mistag, timeRes, AcceptanceOffset, AcceptanceSlopeLow, AcceptanceSlopeHigh, AcceptancePower ;
 
 	
 	    // Observables

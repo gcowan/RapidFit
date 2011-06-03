@@ -37,8 +37,9 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular() :
         , phiName       ( "phi" )
         , cosPsiName    ( "cosPsi" )
 
-	, f(TFile::Open("output.root"))
-
+	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cosTheta(),
+	phi(), cosPsi(), histo(), f(TFile::Open("output.root")), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
+	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries()
 {
 	MakePrototypes();
 

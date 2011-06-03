@@ -71,6 +71,7 @@ int main( int argc, char* argv[] )
 	bool CV_Drift = false;
 	bool Want_Physics_Params = false;
 	bool want_FC = true;
+	bool high_res = true;	//	False method may only call plot fully once... still in development
 
 	if( argc == 6 )
 	{
@@ -212,8 +213,14 @@ int main( int argc, char* argv[] )
 
 	cout << endl << "PLOTTING NLL VARIATION" << endl;
 	//	PLL plot
-	TH2* pllhist = Plot_From_Cut( allresults, NLL_DrawString, Fit_Cut_String, rand_gen, param1string, param2string );
+	TH2* pllhist=NULL;
+	TGraph2D* pllgraph=NULL;
 
+	if( high_res )	{
+		pllhist = Plot_From_Cut( allresults, NLL_DrawString, Fit_Cut_String, rand_gen, param1string, param2string );
+	} else {
+		pllgraph = Plot_From_Cut_lo( allresults, NLL_DrawString, Fit_Cut_String, rand_gen, param1string, param2string );
+	}
 
 	//	Array storing the addresses of all of the Physics Plots still in memory
 	TH2** All_Physics_Plots = new TH2*[all_parameter_values.size()];
@@ -257,7 +264,12 @@ int main( int argc, char* argv[] )
 
 	cout <<endl<< "SAVING GRAPHS" << endl;
 
-	Plot_Styled_Contour( pllhist, cont_num, pllconts, confs, outputdir, "Likelihood Profile" );
+	if( high_res )
+	{
+		Plot_Styled_Contour( pllhist, cont_num, pllconts, confs, outputdir, "Likelihood Profile" );
+	} else {
+		Plot_Styled_Contour2( pllgraph, cont_num, pllconts, confs, outputdir, "Likelihood Profile" );
+	}
 
 	if( Has_Toys && want_FC )	//	If FC was generated
 	{

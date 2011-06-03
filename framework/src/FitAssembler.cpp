@@ -117,11 +117,11 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
 {
 	MinimiserConfig->SetOutputLevel( OutputLevel );
-	vector<string> other_params = BottleParameters.back()->GetAllFloatNames();
+	vector<string> other_params = BottleParameters.back()->GetAllFloatNames();	//	This better at least contain all in prototypeparamset!!!
 	vector<double> truth;
 	for( unsigned short int j=0; j < other_params.size(); ++j )
 	{
-		truth.push_back( BottleParameters.back()->GetPhysicsParameter(other_params[j])->GetTrueValue() );
+		truth.push_back( BottleParameters.back()->GetPhysicsParameter( other_params[j] )->GetTrueValue() );
 	}
 
 

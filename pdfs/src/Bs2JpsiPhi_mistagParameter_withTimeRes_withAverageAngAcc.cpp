@@ -14,7 +14,15 @@
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc() :
+Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc() : cachedAzeroAzeroIntB(), cachedAparaAparaIntB(),
+cachedAperpAperpIntB(), cachedAparaAperpIntB(), cachedAzeroAparaIntB(),
+cachedAzeroAperpIntB(), cachedAzeroAzeroIntBbar(), cachedAparaAparaIntBbar(),
+cachedAperpAperpIntBbar(), cachedAparaAperpIntBbar(), cachedAzeroAparaIntBbar(),
+cachedAzeroAperpIntBbar(), cachedAzero(), cachedApara(), cachedAperp(), cachedExpCosh(),
+cachedExpSinh(), cachedExpCos(), cachedExpSin(), cachedSinDeltaPerpPara(),
+cachedSinDeltaPerp(), cachedSinDeltaPara(), cachedCosDeltaPerpPara(),
+cachedCosDeltaPerp(), cachedCosDeltaPara(), cachedSinPhis(), cachedCosPhis(),
+
 	normalisationCacheValid(false)
 	, evaluationCacheValid(false)
 
@@ -24,6 +32,7 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParam
 	, deltaMName    ( "deltaM")
 	, Phi_sName     ( "Phi_s")
 	, Azero_sqName  ( "Azero_sq" )
+	, Apara_sqName  ( "Apara_sq" )
 	, Aperp_sqName  ( "Aperp_sq" )
 	, delta_zeroName( "delta_zero" )
 	, delta_paraName( "delta_para" )
@@ -46,6 +55,12 @@ Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParam
 	, cosPsiName	( "cosPsi" )
 	//, timeres	( "resolution" )
 	, tagName	( "tag" )
+
+	, gamma(), deltaGamma(), deltaMs(), Phi_s(), Azero_sq(), Apara_sq(), Aperp_sq(),
+	AzeroApara(), AzeroAperp(), AparaAperp(), delta_zero(), delta_para(),
+	delta_perp(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(),
+	angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(), time(),
+	cosTheta(), phi(), cosPsi(), q(), tlow(), thigh()
 {
 	MakePrototypes();
 }

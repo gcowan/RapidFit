@@ -67,7 +67,7 @@ public:
 	
 	//.................................
 	// Constructor
-	TimeAcceptanceFunction() {
+	TimeAcceptanceFunction() :  sliceTimeStart(), sliceAcceptance(), sliceFraction(), nslices(), startSlice() {
 		
 		// The data ....
 		
@@ -85,7 +85,7 @@ public:
 //		double ac[31] = {0.000116891 , 0.00515391 , 0.0288208 , 0.0860796 , 0.181686 , 0.30586 , 0.425054 , 0.525121 , 
 //	                             0.613731 , 0.687362 , 0.747977 , 0.79574 , 0.834891 , 0.865584 , 0.888149 , 0.90725 , 0.924371 , 
 //	                             0.938193 , 0.95011 , 0.960408 , 0.966892 , 0.97265 , 0.975763 , 0.979905 , 0.98415 , 0.988728 , 
-//	                             0.990672 , 0.994114 , 0.996717 , 0.999169 , 1 };		
+//	                             0.990672 , 0.994114 , 0.996717 , 0.999169 , 1 };
 
 		//  DATA
 		double ac[31] = {0.000122069 , 0.00436829 , 0.022288 , 0.0633692 , 0.132094 , 0.225401 , 0.321979 , 0.409769 , 
@@ -140,7 +140,7 @@ public:
 	// Return the acceptance corresponding to this slice
 	double acceptance ( double time ) 
 	{
-		
+	        
 		// If less than first time slice then zero
 		if( time < sliceTimeStart[0] ) { return 0 ; }
 		
@@ -218,7 +218,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 	public:
 		Bs2JpsiPhi_SignalAlt_BaseClass();
 		Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator);
-		~Bs2JpsiPhi_SignalAlt_BaseClass();
+		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass();
 
 	protected:
 	
@@ -250,8 +250,8 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		pair<string,int> cosphisName;		// fitting cosphis and sinphis independently
 		pair<string,int> sinphisName;		// fitting cosphis and sinphis independently	
 
-	    // Mistag parameters
-	    pair<string,int> mistagName;		// mistag fraction
+                // Mistag parameters
+                pair<string,int> mistagName;		// mistag fraction
 		pair<string,int> mistagP1Name;		// mistag calib
 		pair<string,int> mistagP0Name;		// mistag calib
 		pair<string,int> mistagSetPointName;// mistag calib
@@ -261,9 +261,9 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		pair<string,int> res2Name;		  // time resolution tail
 		pair<string,int> res1FractionName;  // fraction of core
 		pair<string,int> timeOffsetName;    // time offset
-	
-	    // These are the angular accceptance factors. The first 6 are P-wave, the second 4 are S-wave
-	    pair<string,int> angAccI1Name ;  
+
+                // These are the angular accceptance factors. The first 6 are P-wave, the second 4 are S-wave
+                pair<string,int> angAccI1Name ;  
 		pair<string,int> angAccI2Name ;
 		pair<string,int> angAccI3Name ;
 		pair<string,int> angAccI4Name ;
@@ -323,8 +323,8 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		double resolution2 ;
 		double resolution1Fraction ;
 		double timeOffset ;
-	
-	    // Angular acceptance factors
+
+                // Angular acceptance factors
 		double angAccI1 ;
 		double angAccI2 ;
 		double angAccI3 ;
@@ -672,7 +672,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 
 		//........ P Wave ..........
 
-	    //...........................
+                //...........................
 		inline double angleFactorA0A0(  )   const { return 2.0 * ct1sq() * (1.0 - strsq()*cphsq() ) * Mathematics::Global_Frac(); }
 
 		//...........................
@@ -681,7 +681,6 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		//...........................
 		inline double angleFactorATAT(  )   const { return st1sq() * strsq() * Mathematics::Global_Frac(); }
 
-	
 		//...........................
 		inline double angleFactorImAPAT(  ) const { return  -1. * st1sq() * s2tr() * sph() * Mathematics::Global_Frac(); }
 

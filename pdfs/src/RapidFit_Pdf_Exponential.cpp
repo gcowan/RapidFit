@@ -24,15 +24,13 @@ using namespace std;
 
 //.................................
 // Default constructor
-RapidFitPdfExponential::RapidFitPdfExponential()
+RapidFitPdfExponential::RapidFitPdfExponential() : gamma(), resolution(0), valid(true)
 {
-  resolution = 0.0; 
-  valid = true ;
 }
 
 //.................................
 // Constructor with resolution
-RapidFitPdfExponential::RapidFitPdfExponential( double res )
+RapidFitPdfExponential::RapidFitPdfExponential( double res ) : gamma(), resolution(), valid()
 {
   if( res >= 0.0 ) {
     resolution = res ; 
@@ -48,10 +46,8 @@ RapidFitPdfExponential::RapidFitPdfExponential( double res )
 //....................................
 //Copy constructor  
 RapidFitPdfExponential::RapidFitPdfExponential( const RapidFitPdfExponential & other  ) :
-   IPDF(), gamma( other.gamma ) 
+   IPDF(), gamma( other.gamma ), resolution(other.resolution), valid(other.valid)
 {  
-  resolution = other.resolution ;
-  valid = other.valid ;
 }
  
 

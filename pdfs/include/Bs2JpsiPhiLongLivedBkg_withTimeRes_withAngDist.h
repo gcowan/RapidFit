@@ -47,6 +47,14 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist : public BasePDF
 		string f_JpsiName;
 		string f_NoJpsiName;
 
+		// These contain the strings that correspond
+		// to the observable names that are used in the
+		// PDF.
+		string timeName;	// proper time
+		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
+		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+
 		double tauLL1;
 		double tauLL2;
 		double f_LL1;
@@ -58,13 +66,6 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist : public BasePDF
 		double f_NoJpsi;
 		double tlow, thigh; // integration limits
 
-		// These contain the strings that correspond
-		// to the observable names that are used in the
-		// PDF.
-		string timeName;	// proper time
-		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
-		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 		double time;
 		double cosTheta;
 		double phi;

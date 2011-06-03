@@ -80,7 +80,7 @@ void get_object_list( TString current_path, vector<pair<string,string> > *found_
 				path_and_name.first = string( (*relative_path).Data() );
 				path_and_name.second = obj_name;
 				found_names->push_back( path_and_name );
-				break;
+				continue;
 			}
 		} else if ( obj->IsA()->InheritsFrom( TDirectory::Class() ) ) {
 
@@ -90,7 +90,6 @@ void get_object_list( TString current_path, vector<pair<string,string> > *found_
 			relative_path->Append( obj_name );
 			relative_path->Append( "/" );
 			get_object_list( current_path_str, found_names, inherit_type, relative_path );
-
 		}
 	}
 }

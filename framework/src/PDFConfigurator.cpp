@@ -17,7 +17,7 @@
 
 ///..........................................
 //Default constructor & destructor
-PDFConfigurator::PDFConfigurator() { }
+PDFConfigurator::PDFConfigurator() :defaultNames(),replacementNames(),configParameters(),configValues() { }
 PDFConfigurator::~PDFConfigurator() { }
 
 //...........................................

@@ -113,7 +113,10 @@ int RapidFit( int argc, char * argv[] )
 	bool FC_Debug_Flag = false;
 	bool BurnToROOTFlag = false;
 	bool MCStudyFlag=false;
+	bool Force_Scan_Flag=false;
 
+	//	This should do something, it doesn't anymore... what was it?	-	Rob Currie
+	(void) testRapidIntegratorFlag;
 
 
 	//	Some parameters with large scope
@@ -279,10 +282,12 @@ int RapidFit( int argc, char * argv[] )
 			cout << "\n	i.e.	--MCStartEntry	3000		to start an MC style Study at the 3000th entry in the file(s)" << endl;
 			cout << "		--MCStartEntry	30000,50000,222	to start an MC style Study at the 30000th,50000th & 222nd entries in the files" <<endl;
 
+			cout << endl;
+			cout << "--ForceScan" << endl;
+			cout << "	This forces a scan to be performed on a less than perfectly fit dataset" << endl;
 
 			cout << endl;
 			goto exit_RapidFit;
-
 		}
 		else if ( currentArgument == "-f" )
 		{
@@ -552,6 +557,7 @@ int RapidFit( int argc, char * argv[] )
 		else if ( currentArgument == "--debugFC" )				{	FC_Debug_Flag = true;				}
 		else if ( currentArgument == "--BurnToROOT" )				{	BurnToROOTFlag = true;				}
 		else if ( currentArgument == "--MCStudy" )				{	MCStudyFlag = true;				}
+		else if ( currentArgument == "--ForceScan" )				{	Force_Scan_Flag = true;				}
 
 		//	We didn't understand the argument to end up here
 		else
@@ -818,7 +824,7 @@ int RapidFit( int argc, char * argv[] )
 
 	//	7)	Toy Study
 	//Pick a toy study if there are repeats, or if pull plots are wanted
-	if ( ( ( numberRepeats > 0 ) || doPullsFlag ) && !( ( ( doLLcontourFlag || doFC_Flag ) || doLLscanFlag ) || MCStudyFlag ) )
+	if ( ( ( numberRepeats > 1 ) || doPullsFlag ) && !( ( ( doLLcontourFlag || doFC_Flag ) || doLLscanFlag ) || MCStudyFlag ) )
 	{
 		vector< ConstraintFunction* > XMLConstraints = xmlFile->GetConstraints();
 		//Do the toy study
@@ -880,7 +886,6 @@ int RapidFit( int argc, char * argv[] )
 
 	//	9)
 	{	//	This is for code collapsing and to clearly outline the 'Fit' step of this file
-
 		//		This is re-used for FC scans and forms FC Step 1
 
 		cout << "\n\n\t\tStarting Fit to Find Global Minima!\n"<<endl;
@@ -905,9 +910,29 @@ int RapidFit( int argc, char * argv[] )
 		//	If requested write the central value to a single file
 		if( BurnToROOTFlag )
 		{
+			cout << "If you get any errors here and/or an empty Global_Fit_Result.root file, check your xml ONLY contains parameters in the fit." << endl;
+			cout << "(There is a known bug which requires a bit of work to fix)" << endl;
 			ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result.root" ), GlobalFitResult );
 		}
+	}
 
+	if( GlobalResult->GetFitStatus() != 3 )
+	{
+		cerr << "--------------------------------------------------------------" << endl;
+		cerr << "---------------------FIT RESULT IS NOT 3----------------------" << endl;
+		cerr << "--------------------------------------------------------------" << endl;
+		cerr << "--------------------------------------------------------------" << endl;
+		cerr << "---------If this is a Foam study, change seed and re-run------" << endl;
+		cerr << "--------------------------------------------------------------" << endl;
+		cerr << "--------------------------------------------------------------" << endl;
+		cerr << "-If your sure you want to continue employ the following flag--" << endl;
+		cerr << "--------------------------------------------------------------" << endl;
+		cerr << "--------------      \'--ForceScan\'            -----------------" << endl;
+		cerr << "--------------------------------------------------------------" << endl;
+		if( !Force_Scan_Flag || ( GlobalResult->GetMinimumValue() < 0 )  )
+		{
+			goto exit_RapidFit;
+		}
 	}
 
 	//	10)
@@ -1019,9 +1044,9 @@ int RapidFit( int argc, char * argv[] )
 				ResultFormatter::WriteFlatNtuple( output_scan_dat , TempContourResults2 );
 			}
 		}
-
 	}
 
+	//	12b)
 	//	Do the main work of the FC scan
 	if( doFC_Flag )
 	{
@@ -1035,9 +1060,18 @@ int RapidFit( int argc, char * argv[] )
 		ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );
 	}
 
-
+	//	Should only happen under the condition that no CV fit was performed or anything else
+	if( GlobalFitResult == NULL )
+	{
+		//	Default action - presumably a fit or a toy study
+		cerr << "No action performed" << endl;
+		cerr << "Not sure how I got here, please email a maintainer!..." <<endl;
+	}
 
 	//	13)	Exit
+	//	This is executed once everything else has finished
+	exit_RapidFit:
+
 
 	while( !XMLConstraints.empty() )
 	{
@@ -1054,13 +1088,6 @@ int RapidFit( int argc, char * argv[] )
 		SoloContourResults.pop_back();
 	}
 
-	//Default action - presumably a fit or a toy study
-	cerr << "No action performed" << endl;
-
-
-	//	This is executed once everything else has finished
-	exit_RapidFit:
-
 	//	Clean UP!
 	while ( !pdfsAndData.empty() )
 	{
@@ -1075,5 +1102,6 @@ int RapidFit( int argc, char * argv[] )
 	cout << endl << "RapidFit" << endl;
 	cout << "Ending time: " << ctime( &timeNow ) << endl;
 
+	cout << "Goodbye :)" << endl;
 	return 0;
 }
