@@ -14,6 +14,7 @@
 
 //	RapidFit Headers
 #include "IPDF.h"
+#include "PDFConfigurator.h"
 //	System Headers
 #include <vector>
 

@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/03 Ailsa & Pete
+   - Added LongLivedBkg_3Dangular.cpp   PDF which takes in a histogram for angular distribution
+   - This also modifiedthe BasePDF.h to include the PDFConfigurator.h
+
 2011/06/03 Rob Currie
    - Added "--Weffc++" to Makefile, as a consequence I've updated the constructors of several objects to explicitly
        instantiate member variables onto the heap

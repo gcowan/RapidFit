@@ -220,7 +220,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 
 	else if ( Name == "LongLivedBkg_3Dangular" )
         {
-                         returnable_PDF = new LongLivedBkg_3Dangular();
+                         returnable_PDF = new LongLivedBkg_3Dangular(configurator);
         }
 
 	else

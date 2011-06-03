@@ -1,7 +1,7 @@
 // $Id: LongLivedBkg_3Dangular.h,v 1.2 2009/11/13 15:31:51 gcowan Exp $
 /** @class LongLivedBkg_3Dangular LongLivedBkg_3Dangular_withAngDist.h
  *
- *  PDF for Bs2JpsiPhi long lived background with time resolution + non-trivial angular distribution
+ *  PDF for Bs2JpsiPhi long lived background with time resolution + non-trivial angular distribution realised by a histogram
  *
  *  @author Ailsa Sparkes
  *  @date 2011-05-30
@@ -24,11 +24,11 @@
 class LongLivedBkg_3Dangular : public BasePDF
 {
 	public:
-		LongLivedBkg_3Dangular();
+		//LongLivedBkg_3Dangular();
+		LongLivedBkg_3Dangular(PDFConfigurator);
 		~LongLivedBkg_3Dangular();
 
 		//Calculate the PDF value
-
 		virtual double Evaluate(DataPoint*);
 
 	protected:
@@ -38,52 +38,50 @@ class LongLivedBkg_3Dangular : public BasePDF
 	private:
 		//	Can't be copied
 		LongLivedBkg_3Dangular ( const LongLivedBkg_3Dangular& );
-		LongLivedBkg_3Dangular& operator = ( const LongLivedBkg_3Dangular& );
-		
+		LongLivedBkg_3Dangular& operator = ( const LongLivedBkg_3Dangular& );		
 
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 		double buildPDFnumerator();
 		double buildPDFdenominator();
-		double angularFactor(double, double, double);
+		double angularFactor( );
 
 		// Physics parameters
-		string tauLL1Name;		// decay constant 1
-		string tauLL2Name;		// decay constant 2
-		string f_LL1Name;		// fraction
-		string sigmaLL1Name;		// time res sigma 1
-		string sigmaLL2Name;		// time res sigma 2
-                string timeResLL1FracName;
-//		string f_JpsiName;
-//		string f_NoJpsiName;
+		pair<string,int> tauLL1Name;		// decay constant 1
+		pair<string,int> tauLL2Name;		// decay constant 2
+		pair<string,int> f_LL1Name;		// fraction of decay const 1
+	
+	    //Detector parameters
+		pair<string,int> sigmaLL1Name;	// time res sigma 1
+		pair<string,int> sigmaLL2Name;	// time res sigma 2
+		pair<string,int> timeResLL1FracName; //fraction of timeres 1
+
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF.
-		string timeName;	// proper time
-		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
-		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-
+		pair<string,int> timeName;		// proper time
+		pair<string,int> cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		pair<string,int> phiName;			// azimuthal angle of the mu+ in Jpsi frame
+		pair<string,int> cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 
 		double tauLL1;
 		double tauLL2;
 		double f_LL1;
-		double sigmaLL; // This is the member variable used in the "builder" functions
-		double sigmaLL1; // These are the physics parameters varied in the fit and passed from the XML;
+		double sigmaLL; 
+		double sigmaLL1; 
 		double sigmaLL2;
-                double timeResLL1Frac;
-//		double f_Jpsi;
-//		double f_NoJpsi;
-		double tlow, thigh; // integration limits
+		double timeResLL1Frac;
+
+		double tlow, thigh; // time integration limits
 
 		double time;
 		double cosTheta;
 		double phi;
 		double cosPsi;
 
-
+        //Additions to deal with 3-D angular distribution via a histogram
+		bool useFlatAngularDistribution;
 		TH3D *histo;
-       		TFile* f;
 		TAxis *xaxis, *yaxis, *zaxis;
 		int nxbins, nybins, nzbins;
 		double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
