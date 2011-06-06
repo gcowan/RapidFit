@@ -39,32 +39,34 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 	, phiName	    ( make_pair(config.getName("phi"),-1) )
 	, cosPsiName	( make_pair(config.getName("cosPsi"),-1) )
 	//Other things to be initialised
+
+
 	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cosTheta(),
 	phi(), cosPsi(), histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
 	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true)
 {
 
 	cout << "Constructing PDF:LongLivedBkg_3Dangular" << endl ;
-	
+
 	MakePrototypes();
 
 	//Find name of histogram needed to define 3-D angular distribution
 	string fileName = config.getConfigurationValue( "AngularDistributionHistogram" ) ;
-	
+
 	//Initialise depending upon whether configuration parameter was found
 	if( fileName == "" ) {
 		cout << "   No AngularDistributionHistogram found: using flat background " << endl ;
-		useFlatAngularDistribution = true ;		
+		useFlatAngularDistribution = true ;
 	}
 	else {
 		cout << "   AngularDistributionHistogram found: " << fileName << endl ;
 		useFlatAngularDistribution = false ;
 
 		//Read in histo
-		TFile* f;
-		histo = new TH3D(*((TH3D*)f->Get(fileName.c_str())));
+		TFile* f =  TFile::Open(fileName.c_str());
+		histo = new TH3D(  *(    (TH3D*)f ->Get("histo")      )     ); //(fileName.c_str())));
 
-		xaxis = histo->GetXaxis();
+	xaxis = histo->GetXaxis();
         xmin = xaxis->GetXmin();
         xmax = xaxis->GetXmax();
         nxbins = histo->GetNbinsX();
@@ -84,10 +86,13 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 
 		total_num_entries = histo->GetEntries();
 
+
 		if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() ){
 			cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
 			exit(1);
 		}
+
+		cout << "Finishing processing histo" << endl;
 	}
 
 }
@@ -139,7 +144,7 @@ bool LongLivedBkg_3Dangular::SetPhysicsParameters( ParameterSet * NewParameterSe
 }
 
 //..............................................................
-//Main method to build the PDF return value 
+//Main method to build the PDF return value
 double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 {
 	// Observable
@@ -175,7 +180,7 @@ double LongLivedBkg_3Dangular::buildPDFnumerator()
 	// Sum of two exponentials, using the time resolution functions
 
 	double returnValue = 0;
-	
+
 	if( f_LL1 >= 0.9999 ) {
 		if( tauLL1 <= 0 ) {
 			cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
@@ -192,18 +197,18 @@ double LongLivedBkg_3Dangular::buildPDFnumerator()
 		double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
 		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
 	}
-	
+
 	return returnValue * angularFactor();
 }
 
 
 //..............................................................
-// Normlisation 
+// Normlisation
 double LongLivedBkg_3Dangular::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	//	Stupid gcc
 	(void)measurement;
-	
+
 	IConstraint * timeBound = boundary->GetConstraint( &timeName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
@@ -217,7 +222,7 @@ double LongLivedBkg_3Dangular::Normalisation(DataPoint * measurement, PhaseSpace
 	}
 
 	double returnValue = 0;
-	
+
 	if( timeResLL1Frac >= 0.9999 )
 	{
 		// Set the member variable for time resolution to the first value and calculate
@@ -279,7 +284,7 @@ double LongLivedBkg_3Dangular::angularFactor( )
 		return 1.0 / 8.0 / TMath::Pi() ;
 	}
 	else {
-		
+
 		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
 		int globalbin = histo->FindBin(cosTheta, cosPsi, phi);
 		double num_entries_bin = histo->GetBinContent(globalbin);

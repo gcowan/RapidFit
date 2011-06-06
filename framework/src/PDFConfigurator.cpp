@@ -4,7 +4,7 @@
  This is a class to contain configuration information for a PDF
  The information is taken from the XML  under the <PDF> tag
  Objects of this class are passed to PDF constructors to configure them
- 
+
  @author Pete Clarke
  @date 2011-05-01
  */
@@ -23,7 +23,7 @@ PDFConfigurator::~PDFConfigurator() { }
 //...........................................
 // Parameter substitution methods
 // These allow you to configure a PDF with a substituttion of a default parameter name for another name
-// Example :  substitute mass -> massBd 
+// Example :  substitute mass -> massBd
 
 // Method to store a substitution
 void PDFConfigurator::addParameterSubstitution( string substitution ) {
@@ -36,14 +36,14 @@ void PDFConfigurator::addParameterSubstitution( string substitution ) {
 		cout << "  In PDFConfigurator::addParameterSubstitution : No separator found  in string : " << substitution << endl ;
 		exit(1);
 	}
-	
+
 	// Break into 2 strings
 	string defaultName     =  substitution.substr( 0, pos ) ;
 	string replacementName =  substitution.substr( pos+1, string::npos ) ;
 	cout << " In PDFConfigurator::addParameterSubstitution : storing substitution [" << defaultName << "--->" << replacementName << "]" << endl ;
 	defaultNames.push_back( defaultName ) ;
 	replacementNames.push_back( replacementName ) ;
-	
+
 	return ;
 }
 
@@ -67,22 +67,22 @@ string PDFConfigurator::getName( string defaultName ) {
 // Method to store a configuration parmeter
 // The configuration parameter is of the form parameter:value
 void PDFConfigurator::addConfigurationParameter( string configString ) {
-	
-	
+
+
 	// Find position of ":" character
 	size_t pos = configString.find_first_of(":") ;
 	if( pos == string::npos ) {
 		cout << "  In PDFConfigurator::addConfigurationParameter : No separator found  in string : " << configString << endl ;
 		exit(1);
 	}
-	
+
 	// Break into 2 strings
 	string configParameter  =  configString.substr( 0, pos ) ;
 	string configValue		=  configString.substr( pos+1, string::npos ) ;
 	cout << " In PDFConfigurator::addConfigurationParameter : storing configParameter [" << configParameter << " : " << configValue << "]" << endl ;
 	configParameters.push_back( configParameter ) ;
 	configValues.push_back( configValue ) ;
-	
+
 	return ;
 }
 
@@ -93,8 +93,8 @@ string PDFConfigurator::getConfigurationValue( string configParam ) {
 	for( unsigned int ii=0; ii<configParameters.size() ; ii++ ) {
 		//cout << " Testing " << configParam <<  "   against   " << configParameters[ii] << endl ;
 		if( configParam == configParameters[ii] ) {
-			cout << " PDFConfiguratorgetConfigurationValue setting [" << configParam << "--->" << configParameters[ii] << "]" << endl ;
-			return configParameters[ii] ;
+			cout << " PDFConfiguratorgetConfigurationValue setting [" << configParam << "--->" << configValues[ii] << "]" << endl ;
+			return configValues[ii] ;
 		}
 	}
 	return string("") ;
