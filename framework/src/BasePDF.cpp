@@ -10,11 +10,12 @@
 
 //	RapidFit Headers
 #include "BasePDF.h"
+#include "ObservableRef.h"
 //	System Headers
 #include <iostream>
 
 //Constructor
-BasePDF::BasePDF() : cachedIntegral(-1.0), cacheValid(false), allParameters(), allObservables(), valid(false)
+BasePDF::BasePDF() : cachedIntegral(-1.0), cacheValid(false), allParameters(), allObservables(), valid(false), observables()
 {
 }
 
@@ -44,14 +45,17 @@ bool BasePDF::SetPhysicsParameters(ParameterSet * NewParameterSet)
 //Return the integral of the function over the given boundary
 double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary)
 {
-	//Check the boundary is within the correct phase space
-	vector<string>::iterator nameIterator;
-	for(nameIterator = allObservables.begin(); nameIterator != allObservables.end(); ++nameIterator)
+	if( observables.size() != this->GetPrototypeDataPoint().size() )
 	{
-		IConstraint * testConstraint = NewBoundary->GetConstraint( *nameIterator );
+		observables=ObservableRef( this->GetPrototypeDataPoint() );
+	}
+	//Check the boundary is within the correct phase space
+	for( unsigned int nameIndex=0; nameIndex < allObservables.size(); ++nameIndex )
+	{
+		IConstraint * testConstraint = NewBoundary->GetConstraint( observables[nameIndex] );
 		if (testConstraint->GetUnit() == "NameNotFoundError")
 		{
-			cerr << "PDF cannot integrate over phase space: observable \"" << *nameIterator << "\" not found" << endl;
+			cerr << "PDF cannot integrate over phase space: observable \"" << observables[nameIndex].Name().c_str() << "\" not found" << endl;
 			return -1.0;
 		}
 	}
@@ -156,3 +160,4 @@ vector<string> BasePDF::GetDoNotIntegrateList()
 void BasePDF::UpdateIntegralCache()
 {
 }
+

@@ -24,13 +24,13 @@ using namespace std;
 
 //.................................
 // Default constructor
-RapidFitPdfExponential::RapidFitPdfExponential() : gamma(), resolution(0), valid(true)
+RapidFitPdfExponential::RapidFitPdfExponential() : gamma(), resolution(0), valid(true), gammaName("gamma"), timeName("time")
 {
 }
 
 //.................................
 // Constructor with resolution
-RapidFitPdfExponential::RapidFitPdfExponential( double res ) : gamma(), resolution(), valid()
+RapidFitPdfExponential::RapidFitPdfExponential( double res ) : gamma(), resolution(), valid(), gammaName("gamma"), timeName("time")
 {
   if( res >= 0.0 ) {
     resolution = res ; 
@@ -46,7 +46,7 @@ RapidFitPdfExponential::RapidFitPdfExponential( double res ) : gamma(), resoluti
 //....................................
 //Copy constructor  
 RapidFitPdfExponential::RapidFitPdfExponential( const RapidFitPdfExponential & other  ) :
-   IPDF(), gamma( other.gamma ), resolution(other.resolution), valid(other.valid)
+   IPDF(), gamma( other.gamma ), resolution(other.resolution), valid(other.valid), gammaName("gamma"), timeName("time")
 {  
 }
  
@@ -67,7 +67,7 @@ bool RapidFitPdfExponential::IsValid()
 
 bool RapidFitPdfExponential::SetPhysicsParameters( ParameterSet * params )
 {
-	PhysicsParameter * newGamma = params->GetPhysicsParameter( "gamma" );
+	PhysicsParameter * newGamma = params->GetPhysicsParameter( gammaName );
 	if ( newGamma->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Parameter gamma not provided" << endl;
@@ -101,7 +101,7 @@ bool RapidFitPdfExponential::SetPhysicsParameters( ParameterSet * params )
 
 double RapidFitPdfExponential::Evaluate( DataPoint * dataPoint )
 {
-	Observable * newTime = dataPoint->GetObservable( "time" );
+	Observable * newTime = dataPoint->GetObservable( timeName );
 	if ( newTime->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Observable time not provided" << endl;
@@ -141,7 +141,7 @@ double RapidFitPdfExponential::Integral( DataPoint* dataPoint, PhaseSpaceBoundar
 {
 	//	Stupid gcc
 	(void)dataPoint;
-	IConstraint * timeBound = bounds->GetConstraint("time");
+	IConstraint * timeBound = bounds->GetConstraint(timeName);
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;

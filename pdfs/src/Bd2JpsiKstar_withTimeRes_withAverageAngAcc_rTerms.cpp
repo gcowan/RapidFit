@@ -53,6 +53,7 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Bd2JpsiKstar_withTimeRes_with
 	, cosPsiName	( "cosPsi" )
 	, KstarFlavourName  ( "KstarFlavour" )
 
+	, timeconstraintName( "time" )
 	, gamma(), deltaMs(), R_alpha(), R_beta(), Azero_sq(),
 	Apara_sq(), Aperp_sq(), AzeroApara(), AzeroAperp(),
 	AparaAperp(), delta_zero(), delta_para(), delta_perp(),
@@ -305,7 +306,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Normalisation(DataPoin
 {
 	double returnValue;
 	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint(timeconstraintName);
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;

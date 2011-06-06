@@ -36,17 +36,19 @@ class Bs2DsPi : public BasePDF
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
 		// used in the minimiser.
-		string gammaName;		// gamma
-		string deltaGammaName;	// delta gamma
-		string deltaMName;		// delta mass
+		ObservableRef gammaName;		// gamma
+		ObservableRef deltaGammaName;	// delta gamma
+		ObservableRef deltaMName;		// delta mass
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF. 
-		string timeName;		// proper time
-		string tagName;		// B tag
-		string mistagName;		// B mistag
-	
+		ObservableRef timeName;		// proper time
+		ObservableRef tagName;		// B tag
+		ObservableRef mistagName;		// B mistag
+
+		ObservableRef timeconstraintName;
+
 		void getPhysicsParameters( double&, double&, double&);
 		
 		void getTimeDependentFuncs( double&, double&, double&, DataPoint*);

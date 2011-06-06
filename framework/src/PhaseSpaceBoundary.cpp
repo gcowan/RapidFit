@@ -12,6 +12,7 @@
 #include "PhaseSpaceBoundary.h"
 #include "ObservableContinuousConstraint.h"
 #include "ObservableDiscreteConstraint.h"
+#include "ObservableRef.h"
 //	System Headers
 #include <iostream>
 #include <stdlib.h>
@@ -57,6 +58,18 @@ IConstraint * PhaseSpaceBoundary::GetConstraint( pair<string,int>* wanted_constr
 	}else{
 		return allConstraints[unsigned(wanted_constraint->second)];}
 	exit(-1);
+}
+
+IConstraint * PhaseSpaceBoundary::GetConstraint( ObservableRef& object )
+{
+        if( object.GetIndex() < 0 ) {
+		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef()) );
+		if( object.GetIndex() >= 0 ) return allConstraints[ (unsigned) object.GetIndex() ];
+	} else {
+		return allConstraints[ (unsigned) object.GetIndex() ];
+	}
+	cerr << "Observable name " << object.Name().c_str() << " not found" << endl;
+	throw(-20);
 }
 
 //Retrieve a constraint by its name

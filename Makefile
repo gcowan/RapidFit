@@ -17,7 +17,7 @@ RM           = rm -f
 SVN_REV = $(shell svnversion -n .)
 
 #		Compiler Flags
-CXXFLAGS     = -DSVN_REV=$(SVN_REV) -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fPIC -funroll-all-loops -D__ROOFIT_NOBANNER -Weffc++ -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+CXXFLAGS     = -DSVN_REV=$(SVN_REV) -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fPIC -floop-interchange -fmerge-all-constants -funroll-all-loops -D__ROOFIT_NOBANNER -Weffc++ -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 #		When running on the GRID & other batch systems the sandbox is limited in size hence the library HAS to be as small as possible
 #CXXFLAGS     = -Os -msse -msse2 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 #		For extra debugging info:
@@ -200,13 +200,13 @@ $(OBJDIR)/print.o: $(UTILSSRC)/print.C
 	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
 
 #	Tinter tool for analysing old format toy stuides
-$(EXEDIR)/tinter: $(OBJDIR)/tinter.o
+$(EXEDIR)/tinter: $(OBJDIR)/tinter.o $(OBJDIR)/EdStyle.o $(OBJDIR)/TString_Processing.o $(OBJDIR)/Histo_Processing.o $(OBJDIR)/NTuple_Processing.o $(OBJDIR)/StringProcessing.o
 	$(CXX) -o $@ $^ $(ROOTLIBS)
 $(OBJDIR)/tinter.o: $(UTILSSRC)/tinter.C
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
 
 #utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
-utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/print $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/print $(EXEDIR)/tinter $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot
 
 
 

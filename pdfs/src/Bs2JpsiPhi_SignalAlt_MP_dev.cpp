@@ -48,52 +48,52 @@ Bs2JpsiPhi_SignalAlt_BaseClass(config)
 void Bs2JpsiPhi_SignalAlt_MP_dev::MakePrototypes()
 {
 	//Make the DataPoint prototype
-	allObservables.push_back( timeName.first );
-	allObservables.push_back( cosThetaName.first );
-	allObservables.push_back( phiName.first );
-	allObservables.push_back( cosPsiName.first );
-	allObservables.push_back( tagName.first );
-	allObservables.push_back( timeAcceptanceCategoryName.first );
+	allObservables.push_back( timeName );
+	allObservables.push_back( cosThetaName );
+	allObservables.push_back( phiName );
+	allObservables.push_back( cosPsiName );
+	allObservables.push_back( tagName );
+	allObservables.push_back( timeAcceptanceCategoryName );
 
 	//Make the parameter set
 	vector<string> parameterNames;
-	parameterNames.push_back( gammaName.first );
-	parameterNames.push_back( deltaGammaName.first );
-	parameterNames.push_back( Aperp_sqName.first );
-	parameterNames.push_back( Azero_sqName.first );
-	parameterNames.push_back( As_sqName.first );
-	parameterNames.push_back( delta_paraName.first );
-	parameterNames.push_back( delta_perpName.first );
-	parameterNames.push_back( delta_zeroName.first );
-	parameterNames.push_back( delta_sName.first );
-	parameterNames.push_back( deltaMName.first );
+	parameterNames.push_back( gammaName );
+	parameterNames.push_back( deltaGammaName );
+	parameterNames.push_back( Aperp_sqName );
+	parameterNames.push_back( Azero_sqName );
+	parameterNames.push_back( As_sqName );
+	parameterNames.push_back( delta_paraName );
+	parameterNames.push_back( delta_perpName );
+	parameterNames.push_back( delta_zeroName );
+	parameterNames.push_back( delta_sName );
+	parameterNames.push_back( deltaMName );
 
 	if( useCosAndSin ) {
-		parameterNames.push_back( cosphisName.first );
-		parameterNames.push_back( sinphisName.first );
+		parameterNames.push_back( cosphisName );
+		parameterNames.push_back( sinphisName );
 	}
 	else{
-		parameterNames.push_back( Phi_sName.first );
+		parameterNames.push_back( Phi_sName );
 	}
 	
-	parameterNames.push_back( mistagName.first );
-	parameterNames.push_back( mistagP1Name.first );
-	parameterNames.push_back( mistagP0Name.first );
-	parameterNames.push_back( mistagSetPointName.first );
-	parameterNames.push_back( res1FractionName.first );
-	parameterNames.push_back( res1Name.first );
-	parameterNames.push_back( res2Name.first );
-	parameterNames.push_back( timeOffsetName.first );
-	parameterNames.push_back( angAccI1Name.first );
-	parameterNames.push_back( angAccI2Name.first );
-	parameterNames.push_back( angAccI3Name.first );
-	parameterNames.push_back( angAccI4Name.first );
-	parameterNames.push_back( angAccI5Name.first );
-	parameterNames.push_back( angAccI6Name.first );
-	parameterNames.push_back( angAccI7Name.first );
-	parameterNames.push_back( angAccI8Name.first );
-	parameterNames.push_back( angAccI9Name.first );
-	parameterNames.push_back( angAccI10Name.first );
+	parameterNames.push_back( mistagName );
+	parameterNames.push_back( mistagP1Name );
+	parameterNames.push_back( mistagP0Name );
+	parameterNames.push_back( mistagSetPointName );
+	parameterNames.push_back( res1FractionName );
+	parameterNames.push_back( res1Name );
+	parameterNames.push_back( res2Name );
+	parameterNames.push_back( timeOffsetName );
+	parameterNames.push_back( angAccI1Name );
+	parameterNames.push_back( angAccI2Name );
+	parameterNames.push_back( angAccI3Name );
+	parameterNames.push_back( angAccI4Name );
+	parameterNames.push_back( angAccI5Name );
+	parameterNames.push_back( angAccI6Name );
+	parameterNames.push_back( angAccI7Name );
+	parameterNames.push_back( angAccI8Name );
+	parameterNames.push_back( angAccI9Name );
+	parameterNames.push_back( angAccI10Name );
 	allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -117,14 +117,14 @@ bool Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters( ParameterSet * NewParame
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
 	
 	// Physics parameters. 
-	_gamma  = allParameters.GetPhysicsParameter( &gammaName )->GetValue();
-    dgam      = allParameters.GetPhysicsParameter( &deltaGammaName )->GetValue();
+	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+    dgam      = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 	
-	Azero_sq = allParameters.GetPhysicsParameter( &Azero_sqName )->GetValue();
+	Azero_sq = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
 	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}	
-	Aperp_sq = allParameters.GetPhysicsParameter( &Aperp_sqName )->GetValue();
+	Aperp_sq = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
 	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}	
-	As_sq = allParameters.GetPhysicsParameter( &As_sqName )->GetValue();
+	As_sq = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
 	
 	if( allowNegativeAsSq ) {
 		if( (As_sq > 1.) ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: As_sq >1 but left as is" <<  endl ;	}
@@ -140,47 +140,47 @@ bool Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters( ParameterSet * NewParame
 		Apara_sq = 0. ;
 	}
 				
-	delta_zero = allParameters.GetPhysicsParameter( &delta_zeroName )->GetValue();
-	delta_para = allParameters.GetPhysicsParameter( &delta_paraName )->GetValue();
-	delta_perp = allParameters.GetPhysicsParameter( &delta_perpName )->GetValue();
-	delta_s	   = allParameters.GetPhysicsParameter( &delta_sName )->GetValue();
+	delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
+	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
+	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
+	delta_s	   = allParameters.GetPhysicsParameter( delta_sName )->GetValue();
 	delta1 = delta_perp -  delta_para ;    
 	delta2 = delta_perp -  delta_zero ;
 
-	_mistag			= allParameters.GetPhysicsParameter( &mistagName )->GetValue();
-	_mistagP1		= allParameters.GetPhysicsParameter( &mistagP1Name )->GetValue();
-	_mistagP0		= allParameters.GetPhysicsParameter( &mistagP0Name )->GetValue();
-	_mistagSetPoint = allParameters.GetPhysicsParameter( &mistagSetPointName )->GetValue();
+	_mistag			= allParameters.GetPhysicsParameter( mistagName )->GetValue();
+	_mistagP1		= allParameters.GetPhysicsParameter( mistagP1Name )->GetValue();
+	_mistagP0		= allParameters.GetPhysicsParameter( mistagP0Name )->GetValue();
+	_mistagSetPoint = allParameters.GetPhysicsParameter( mistagSetPointName )->GetValue();
 
-	delta_ms  = allParameters.GetPhysicsParameter( &deltaMName )->GetValue();
+	delta_ms  = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 
 	if(useCosAndSin){
-		_cosphis = allParameters.GetPhysicsParameter( &cosphisName )->GetValue();
-		_sinphis = allParameters.GetPhysicsParameter( &sinphisName )->GetValue();
+		_cosphis = allParameters.GetPhysicsParameter( cosphisName )->GetValue();
+		_sinphis = allParameters.GetPhysicsParameter( sinphisName )->GetValue();
 	}
 	else{
-		phi_s     = allParameters.GetPhysicsParameter( &Phi_sName )->GetValue();
+		phi_s     = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
 		_cosphis = cos(phi_s) ;
 		_sinphis = sin(phi_s) ;
 	}
 	
 	// Resolution parameters
-	resolution1Fraction = allParameters.GetPhysicsParameter( &res1FractionName )->GetValue();
-	resolution1         = allParameters.GetPhysicsParameter( &res1Name )->GetValue();
-	resolution2         = allParameters.GetPhysicsParameter( &res2Name )->GetValue();
-	timeOffset          = allParameters.GetPhysicsParameter( &timeOffsetName )->GetValue();
+	resolution1Fraction = allParameters.GetPhysicsParameter( res1FractionName )->GetValue();
+	resolution1         = allParameters.GetPhysicsParameter( res1Name )->GetValue();
+	resolution2         = allParameters.GetPhysicsParameter( res2Name )->GetValue();
+	timeOffset          = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
 	
 	// Angular acceptance factors
-	angAccI1 = allParameters.GetPhysicsParameter( &angAccI1Name )->GetValue();
-	angAccI2 = allParameters.GetPhysicsParameter( &angAccI2Name )->GetValue();
-	angAccI3 = allParameters.GetPhysicsParameter( &angAccI3Name )->GetValue();
-	angAccI4 = allParameters.GetPhysicsParameter( &angAccI4Name )->GetValue();
-	angAccI5 = allParameters.GetPhysicsParameter( &angAccI5Name )->GetValue();
-	angAccI6 = allParameters.GetPhysicsParameter( &angAccI6Name )->GetValue();
-	angAccI7 = allParameters.GetPhysicsParameter( &angAccI7Name )->GetValue();
-	angAccI8 = allParameters.GetPhysicsParameter( &angAccI8Name )->GetValue();
-	angAccI9 = allParameters.GetPhysicsParameter( &angAccI9Name )->GetValue();
-	angAccI10 = allParameters.GetPhysicsParameter( &angAccI10Name )->GetValue();
+	angAccI1 = allParameters.GetPhysicsParameter( angAccI1Name )->GetValue();
+	angAccI2 = allParameters.GetPhysicsParameter( angAccI2Name )->GetValue();
+	angAccI3 = allParameters.GetPhysicsParameter( angAccI3Name )->GetValue();
+	angAccI4 = allParameters.GetPhysicsParameter( angAccI4Name )->GetValue();
+	angAccI5 = allParameters.GetPhysicsParameter( angAccI5Name )->GetValue();
+	angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();
+	angAccI7 = allParameters.GetPhysicsParameter( angAccI7Name )->GetValue();
+	angAccI8 = allParameters.GetPhysicsParameter( angAccI8Name )->GetValue();
+	angAccI9 = allParameters.GetPhysicsParameter( angAccI9Name )->GetValue();
+	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
 	
 	// Do a test to ensure user is not using upper time acceptance wrongly
 	if( ((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE) || (fabs(mistag()-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
@@ -211,12 +211,12 @@ vector<string> Bs2JpsiPhi_SignalAlt_MP_dev::GetDoNotIntegrateList()
 double Bs2JpsiPhi_SignalAlt_MP_dev::Evaluate(DataPoint * measurement) 
 {
 	// Get observables into member variables
-	t = measurement->GetObservable( &timeName )->GetValue() - timeOffset ;
-	ctheta_tr = measurement->GetObservable( &cosThetaName )->GetValue();
-	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
-	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();	
-	tag = (int)measurement->GetObservable( &tagName )->GetValue();
-	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
+	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
+	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
+	phi_tr      = measurement->GetObservable( phiName )->GetValue();
+	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
+	tag = (int)measurement->GetObservable( tagName )->GetValue();
+	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
 	double val1=0, val2=0 ;
 	double returnValue=0 ;
@@ -279,14 +279,14 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Normalisation(DataPoint * measurement, Phase
 {
 		
 	// Get observables into member variables
-	t = measurement->GetObservable( &timeName )->GetValue() - timeOffset;
-	ctheta_tr = measurement->GetObservable( &cosThetaName )->GetValue();
-	phi_tr      = measurement->GetObservable( &phiName )->GetValue();
-	ctheta_1   = measurement->GetObservable( &cosPsiName )->GetValue();	
-	timeAcceptanceCategory = (int)measurement->GetObservable( &timeAcceptanceCategoryName )->GetValue();
+	t = measurement->GetObservable( timeName )->GetValue() - timeOffset;
+	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
+	phi_tr      = measurement->GetObservable( phiName )->GetValue();
+	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
+	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
 	// Get time boundaries into member variables
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint( timeConstraintName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" ) {
 		cerr << "Bound on time not provided" << endl;
 		exit(1);
@@ -315,7 +315,7 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Normalisation(DataPoint * measurement, Phase
 	}	
 	
 	// calculate return value according to tag 
-	tag = (int)measurement->GetObservable( &tagName )->GetValue();
+	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	double returnValue  ;
 	if(resolution1Fraction >= 0.9999 )
 	{

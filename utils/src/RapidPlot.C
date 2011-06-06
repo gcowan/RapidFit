@@ -198,7 +198,13 @@ int main( int argc, char* argv[] )
 	//	Plot the distribution of successfully fitted grid points for the PLL scan
 	//	NB:	For FC this will likely saturate due to multiple layers of fits
 	cout << endl << "FOUND UNIQUE GRID POINTS, PLOTTING" << endl;
-	LL2D_Grid( allresults, Fit_Cut, param1_val, param2_val, rand_gen, "LL" );
+	TCanvas* grid_c = new TCanvas("Grid_C","Grid_C",1680,1050);
+	TH1* GRID_PLOT = LL2D_Grid( allresults, Fit_Cut, param1_val, param2_val, rand_gen, "LL" );
+	grid_c->cd();
+	GRID_PLOT->Draw();
+	grid_c->Update();
+	grid_c->Print( outputdir+"/Coordinates.png");
+	grid_c->Print( outputdir+"/Coordinates.pdf");
 
 	//	Construct a plot string for the NLL plot and plot it
 

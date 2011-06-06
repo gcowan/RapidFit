@@ -34,13 +34,13 @@ class Bs2JpsiPhiMassSignal : public BasePDF
 		void MakePrototypes();
 
 		// Physics parameters
-		pair<string,int> f_sig_m1Name;	// fraction
-		pair<string,int> sigma_m1Name;	// width 1
-		pair<string,int> sigma_m2Name;	// width 2 
-		pair<string,int> m_BsName;	// Bs mass
+		ObservableRef f_sig_m1Name;	// fraction
+		ObservableRef sigma_m1Name;	// width 1
+		ObservableRef sigma_m2Name;	// width 2 
+		ObservableRef m_BsName;	// Bs mass
 
 		// Observables
-		pair<string,int> recoMassName;	// reconstructed Bs mass
+		ObservableRef recoMassName;	// reconstructed Bs mass
 };
 
 #endif

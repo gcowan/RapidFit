@@ -15,12 +15,12 @@
 //Constructor
 Bs2JpsiPhiPromptBkg_withTimeResDouble::Bs2JpsiPhiPromptBkg_withTimeResDouble() : 
 	// Physics parameters
-	  frac_sigmaPrName      ( "frac_sigmaPr" )
-        , sigmaPrName   ( "sigmaPr" )
-        , sigmaPr2Name  ( "sigmaPr2" )
+	  frac_sigmaPrName	( "frac_sigmaPr" )
+        , sigmaPrName		( "sigmaPr" )
+        , sigmaPr2Name		( "sigmaPr2" )
         // Observables
-        ,  timeName      ( "time" )
-
+        ,  timeName		( "time" )
+	,  timeconstraintName	( "time" )
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with double time resolution" << endl;
@@ -75,7 +75,7 @@ double Bs2JpsiPhiPromptBkg_withTimeResDouble::Normalisation(PhaseSpaceBoundary *
 {
         double tmin = 0.;
         double tmax = 0.;
-        IConstraint * timeBound = boundary->GetConstraint("time");
+        IConstraint * timeBound = boundary->GetConstraint( timeconstraintName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {
                 cerr << "Bound on time not provided" << endl;

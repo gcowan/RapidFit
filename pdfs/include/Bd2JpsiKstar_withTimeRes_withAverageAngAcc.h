@@ -45,27 +45,27 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		double cachedCosSqDeltaM;
 
 		double cachedAzero, cachedApara, cachedAperp;
-//		double q;
+		//double q;
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
 		// used in the minimiser.
-		string gammaName;		// gamma
-		string deltaMName;		// delta mass
-		string Azero_sqName;	// amplitude
-		string Apara_sqName;	// amplitude
-		string Aperp_sqName;	// amplitude
-		string delta_zeroName;	// strong phase, set to 0
-		string delta_paraName;	// strong phase
-		string delta_perpName;	// strong phase
-		string angAccI1Name;		// Pre-calculated angular integrals including acceptance
-		string angAccI2Name;		//
-		string angAccI3Name;		//
-		string angAccI4Name;		//
-		string angAccI5Name;		//
-		string angAccI6Name;		//
-		string timeRes1Name;
-		string timeRes2Name;
-		string timeRes1FractionName;
+		ObservableRef gammaName;		// gamma
+		ObservableRef deltaMName;		// delta mass
+		ObservableRef Azero_sqName;	// amplitude
+		ObservableRef Apara_sqName;	// amplitude
+		ObservableRef Aperp_sqName;	// amplitude
+		ObservableRef delta_zeroName;	// strong phase, set to 0
+		ObservableRef delta_paraName;	// strong phase
+		ObservableRef delta_perpName;	// strong phase
+		ObservableRef angAccI1Name;		// Pre-calculated angular integrals including acceptance
+		ObservableRef angAccI2Name;		//
+		ObservableRef angAccI3Name;		//
+		ObservableRef angAccI4Name;		//
+		ObservableRef angAccI5Name;		//
+		ObservableRef angAccI6Name;		//
+		ObservableRef timeRes1Name;
+		ObservableRef timeRes2Name;
+		ObservableRef timeRes1FractionName;
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
@@ -73,13 +73,14 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 		
 		bool normalisationCacheValid, evaluationCacheValid;
 		
-		string timeName;		// proper time
-		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
-		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-		string KstarFlavourName;
+		ObservableRef timeName;		// proper time
+		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		ObservableRef phiName;		// azimuthal angle of the mu+ in Jpsi frame
+		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		ObservableRef KstarFlavourName;
 		//kaonIDName;				// in phi rest frame
 
+		ObservableRef timeconstraintName;
 
 		// Member variables that will contain the parameter values
                 double gamma;

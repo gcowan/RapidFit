@@ -21,6 +21,7 @@ Bs2DsPiBkg_withTimeRes::Bs2DsPiBkg_withTimeRes() :
 	, timeResName	( "timeRes_DsPi_background" )
         // Observables
         , timeName      ( "time" )
+	, timeconstraintName( "time" )
 {
 	MakePrototypes();
 }
@@ -72,7 +73,7 @@ double Bs2DsPiBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * boundary)
 {
 	double tmin = 0.;
 	double tmax = 0.;
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint(timeconstraintName);
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 			cerr << "Bound on time not provided" << endl;

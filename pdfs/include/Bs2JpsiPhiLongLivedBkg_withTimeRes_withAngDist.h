@@ -38,22 +38,22 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist : public BasePDF
 		double angularFactor();
 
 		// Physics parameters
-		string tauLL1Name;		// decay constant 1
-		string tauLL2Name;		// decay constant 2
-		string f_LL1Name;		// fraction
-		string sigmaLL1Name;		// time res sigma 1
-		string sigmaLL2Name;		// time res sigma 2
-                string timeResLL1FracName;
-		string f_JpsiName;
-		string f_NoJpsiName;
+		ObservableRef tauLL1Name;		// decay constant 1
+		ObservableRef tauLL2Name;		// decay constant 2
+		ObservableRef f_LL1Name;		// fraction
+		ObservableRef sigmaLL1Name;		// time res sigma 1
+		ObservableRef sigmaLL2Name;		// time res sigma 2
+                ObservableRef timeResLL1FracName;
+		ObservableRef f_JpsiName;
+		ObservableRef f_NoJpsiName;
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF.
-		string timeName;	// proper time
-		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
-		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		ObservableRef timeName;	// proper time
+		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		ObservableRef phiName;		// azimuthal angle of the mu+ in Jpsi frame
+		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 
 		double tauLL1;
 		double tauLL2;

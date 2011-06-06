@@ -32,6 +32,8 @@ Bs2DsPi_acc::Bs2DsPi_acc() :
         // Observables
 	, timeName      ( "time" )
 	, tagName       ( "tag" )    
+
+	, timeconstraintName( "time" )
 	//objects    
 	,gamma(), deltaGamma(), deltaM(), mistag(), timeRes(), AcceptanceOffset(), AcceptanceSlopeLow(), AcceptanceSlopeHigh(), AcceptancePower(), time(), tag(), tlow(), thigh()
 {
@@ -100,7 +102,7 @@ double Bs2DsPi_acc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 	getPhysicsParameters( );	
 	getObservables( measurement ) ;
 	// Get time integration boundaries
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint( timeconstraintName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;

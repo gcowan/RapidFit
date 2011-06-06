@@ -35,12 +35,12 @@ class Bs2DsPiBkg_withTimeRes : public BasePDF
 		void MakePrototypes();
 		
 		// Physics parameters
-		string lifetimeBdName;		// decay constant 1
-		string timeResName ;		// decay constant 2
+		ObservableRef lifetimeBdName;		// decay constant 1
+		ObservableRef timeResName ;		// decay constant 2
 
 		// Observables
-		string timeName;	// proper time
-	
+		ObservableRef timeName;	// proper time
+		ObservableRef timeconstraintName;
 };
 
 #endif

@@ -19,7 +19,7 @@ Bs2JpsiPhiPromptBkg_withTimeRes::Bs2JpsiPhiPromptBkg_withTimeRes() :
 	  sigmaPrName	( "sigmaPr" )
         // Observables
         , timeName      ( "time" )
-
+	, timeconstraintName( "time" )
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with time resolution" << endl;
@@ -67,7 +67,7 @@ double Bs2JpsiPhiPromptBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * bound
 {
         double tmin = 0.;
         double tmax = 0.;
-        IConstraint * timeBound = boundary->GetConstraint("time");
+        IConstraint * timeBound = boundary->GetConstraint( timeconstraintName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {
                 cerr << "Bound on time not provided" << endl;

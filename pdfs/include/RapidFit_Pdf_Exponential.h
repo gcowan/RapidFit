@@ -76,7 +76,8 @@ private:
    
    // Internal status
    bool valid ;
-   
+
+   ObservableRef gammaName,timeName;   
 };
 
 #endif // RAPIDFITPDFEXPONENTIAL_H

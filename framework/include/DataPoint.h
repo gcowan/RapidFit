@@ -13,6 +13,7 @@
 
 //	RapidFit Headers
 #include "Observable.h"
+#include "ObservableRef.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -29,6 +30,7 @@ class DataPoint
 		vector<string> GetAllNames();
 		Observable * GetObservable( pair<string,int>* );	//  Return wanted parameter & cache lookup ref
 		Observable * GetObservable( string const );
+		Observable * GetObservable( ObservableRef& );
 		Observable const* GetSafeObservable( string const ) const;
 		bool SetObservable( string, Observable* );
 		bool SetObservable( const string, const double, const double, const string, const bool=false, const int=-1);

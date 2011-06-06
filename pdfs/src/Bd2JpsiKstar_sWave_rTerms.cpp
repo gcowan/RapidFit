@@ -56,6 +56,8 @@ Bd2JpsiKstar_sWave_rTerms::Bd2JpsiKstar_sWave_rTerms() : cachedAzeroAzeroIntB(),
 	, phiName	( "phi" )
 	, cosPsiName	( "cosPsi" )
 	, KstarFlavourName  ( "KstarFlavour" )
+
+	, timeconstraintName( "time" )
 	,time(), cosTheta(), phi(), cosPsi(), KstarFlavour(), tlow(), thigh()
 {
 	MakePrototypes();
@@ -301,7 +303,7 @@ double Bd2JpsiKstar_sWave_rTerms::Normalisation(DataPoint * measurement, PhaseSp
 
         double returnValue;
         KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
-        IConstraint * timeBound = boundary->GetConstraint("time");
+        IConstraint * timeBound = boundary->GetConstraint( timeconstraintName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {
                 cerr << "Bound on time not provided" << endl;

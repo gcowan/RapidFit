@@ -33,14 +33,15 @@ class Bs2JpsiPhiPromptBkg_tripleGaussian : public BasePDF
 		void MakePrototypes();
 
 		// Physics parameters
-		string frac_sigmaPr1Name;    // Fraction of first Gaussian : second two Gaussians
-		string frac_sigmaPr23Name;   // Fraction of second : third Gaussian
-		string sigmaPr1Name;			 // Width of Gaussian 1
-		string sigmaPr2Name;		 // Width of Gaussian 2
-		string sigmaPr3Name;		 // Width of Gaussian 3
+		ObservableRef frac_sigmaPr1Name;    // Fraction of first Gaussian : second two Gaussians
+		ObservableRef frac_sigmaPr23Name;   // Fraction of second : third Gaussian
+		ObservableRef sigmaPr1Name;			 // Width of Gaussian 1
+		ObservableRef sigmaPr2Name;		 // Width of Gaussian 2
+		ObservableRef sigmaPr3Name;		 // Width of Gaussian 3
 
-		// These contain the strings that correspond to the observable names that are used in the PDF
-		string timeName;    // proper time
+		// These contain the ObservableRefs that correspond to the observable names that are used in the PDF
+		ObservableRef timeName;    // proper time
+		ObservableRef timeconstraintName;
 };
 
 #endif

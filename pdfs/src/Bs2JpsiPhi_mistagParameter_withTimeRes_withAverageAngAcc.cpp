@@ -56,6 +56,8 @@ cachedCosDeltaPerp(), cachedCosDeltaPara(), cachedSinPhis(), cachedCosPhis(),
 	//, timeres	( "resolution" )
 	, tagName	( "tag" )
 
+	, timeconstraintName( "time" )
+
 	, gamma(), deltaGamma(), deltaMs(), Phi_s(), Azero_sq(), Apara_sq(), Aperp_sq(),
 	AzeroApara(), AzeroAperp(), AparaAperp(), delta_zero(), delta_para(),
 	delta_perp(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(),
@@ -236,7 +238,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Normalisation(D
 	// Now need to know the tag and the mistag
 	q = (int)measurement->GetObservable( tagName )->GetValue();
 
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint( timeconstraintName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;

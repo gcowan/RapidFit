@@ -28,6 +28,7 @@ class ConstraintFunction
 		double Evaluate( ParameterSet* );
 
 	private:
+		vector< int > Found_Position;
 		vector< ExternalConstraint* > allConstraints;
 };
 

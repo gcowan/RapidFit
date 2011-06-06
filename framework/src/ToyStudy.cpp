@@ -92,8 +92,11 @@ void ToyStudy::DoWholeStudy( )
 		cout << "\n\n\t\tStarting ToyStudy\t\t" << studyIndex+1 << "\tof:\t" << numberStudies << endl;
 		allResults->StartStopwatch();
 		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints, -999 );
-		cout << "Fit fell over!\t Requesting another fit." << endl;
-		if( new_result->GetFitStatus() != 3 ) ++numberStudies;
+		if( new_result->GetFitStatus() != 3 )
+		{
+			cerr << "Fit fell over!\t Requesting another fit." << endl;
+			++numberStudies;
+		}
 		allResults->AddFitResult( new_result );
 	}
 }

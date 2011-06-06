@@ -15,12 +15,12 @@
 //Constructor
 Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg() :
 	// Physics parameters
-	tau1Name	( make_pair("tau_LL1",-1) )
-	, tau2Name	( make_pair("tau_LL2",-1) )
-	, f_LL1Name	( make_pair("f_LL1",-1) )
+	tau1Name	( "tau_LL1" )
+	, tau2Name	( "tau_LL2" )
+	, f_LL1Name	( "f_LL1" )
 
         // Observables
-        , timeName      ( make_pair("time",-1) )
+        , timeName      ( "time" )
 	, constraint_timeName()
 {
 	MakePrototypes();
@@ -30,15 +30,15 @@ Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg() :
 void Bs2JpsiPhiLongLivedBkg::MakePrototypes()
 {
 	//Make the DataPoint prototype
-	allObservables.push_back( timeName.first );
+	allObservables.push_back( timeName );
 	constraint_timeName=timeName;
 
 
         //Make the parameter set
         vector<string> parameterNames;
-        parameterNames.push_back( tau1Name.first );
-        parameterNames.push_back( tau2Name.first );
-        parameterNames.push_back( f_LL1Name.first );
+        parameterNames.push_back( tau1Name );
+        parameterNames.push_back( tau2Name );
+        parameterNames.push_back( f_LL1Name );
         allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -53,12 +53,12 @@ Bs2JpsiPhiLongLivedBkg::~Bs2JpsiPhiLongLivedBkg()
 double Bs2JpsiPhiLongLivedBkg::Evaluate(DataPoint * measurement)
 {
 	// Observable
-        double time = measurement->GetObservable( &timeName )->GetValue();
+        double time = measurement->GetObservable( timeName )->GetValue();
 
 	if ( time < 0.0 ) return 0.0;
-  	double tau1 = allParameters.GetPhysicsParameter( &tau1Name )->GetValue();
-  	double tau2 = allParameters.GetPhysicsParameter( &tau2Name )->GetValue();
-  	double f_LL1 = allParameters.GetPhysicsParameter( &f_LL1Name )->GetValue();
+  	double tau1 = allParameters.GetPhysicsParameter( tau1Name )->GetValue();
+  	double tau2 = allParameters.GetPhysicsParameter( tau2Name )->GetValue();
+  	double f_LL1 = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
   	double val = f_LL1 * exp( -time/tau1 ) + (1. - f_LL1)*exp( -time/tau2 );
 
   	return val;
@@ -73,7 +73,7 @@ double Bs2JpsiPhiLongLivedBkg::Normalisation(PhaseSpaceBoundary * boundary)
 {
         double tmin = 0.;
         double tmax = 0.;
-        IConstraint * timeBound = boundary->GetConstraint( &constraint_timeName );
+        IConstraint * timeBound = boundary->GetConstraint( constraint_timeName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {
                 cerr << "Bound on time not provided" << endl;
@@ -88,9 +88,9 @@ double Bs2JpsiPhiLongLivedBkg::Normalisation(PhaseSpaceBoundary * boundary)
 	if ( tmin < 0. ) tmin = 0.;
 	if ( tmax < 0. ) tmax = 0.;
 
-        double tau1 = allParameters.GetPhysicsParameter( &tau1Name )->GetValue();
-        double tau2 = allParameters.GetPhysicsParameter( &tau2Name )->GetValue();
-        double f_LL1 = allParameters.GetPhysicsParameter( &f_LL1Name )->GetValue();
+        double tau1 = allParameters.GetPhysicsParameter( tau1Name )->GetValue();
+        double tau2 = allParameters.GetPhysicsParameter( tau2Name )->GetValue();
+        double f_LL1 = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
 
   	double val = f_LL1 * tau1 * ( exp(-tmin/tau1) - exp(-tmax/tau1) )
 	      + (1.-f_LL1) * tau2 * ( exp(-tmin/tau2) - exp(-tmax/tau2) );

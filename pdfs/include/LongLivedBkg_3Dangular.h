@@ -47,22 +47,24 @@ class LongLivedBkg_3Dangular : public BasePDF
 		double angularFactor( );
 
 		// Physics parameters
-		pair<string,int> tauLL1Name;		// decay constant 1
-		pair<string,int> tauLL2Name;		// decay constant 2
-		pair<string,int> f_LL1Name;		// fraction of decay const 1
-	
-	    //Detector parameters
-		pair<string,int> sigmaLL1Name;	// time res sigma 1
-		pair<string,int> sigmaLL2Name;	// time res sigma 2
-		pair<string,int> timeResLL1FracName; //fraction of timeres 1
+		ObservableRef f_LL1Name;		// fraction of decay const 1
+                ObservableRef tauLL1Name;            // decay constant 1
+		ObservableRef tauLL2Name;            // decay constant 2
+
+		//Detector parameters
+		ObservableRef timeResLL1FracName; //fraction of timeres 1
+		ObservableRef sigmaLL1Name;	// time res sigma 1
+		ObservableRef sigmaLL2Name;	// time res sigma 2
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF.
-		pair<string,int> timeName;		// proper time
-		pair<string,int> cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		pair<string,int> phiName;			// azimuthal angle of the mu+ in Jpsi frame
-		pair<string,int> cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		ObservableRef timeName;		// proper time
+		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		ObservableRef phiName;			// azimuthal angle of the mu+ in Jpsi frame
+		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+
+		ObservableRef timeconstName;
 
 		double tauLL1;
 		double tauLL2;
@@ -79,13 +81,13 @@ class LongLivedBkg_3Dangular : public BasePDF
 		double phi;
 		double cosPsi;
 
-        //Additions to deal with 3-D angular distribution via a histogram
-		bool useFlatAngularDistribution;
+		//Additions to deal with 3-D angular distribution via a histogram
 		TH3D *histo;
 		TAxis *xaxis, *yaxis, *zaxis;
 		int nxbins, nybins, nzbins;
 		double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
 		double total_num_entries;
+		bool useFlatAngularDistribution;
 };
 
 #endif

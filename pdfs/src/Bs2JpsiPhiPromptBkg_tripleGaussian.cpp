@@ -22,6 +22,7 @@ Bs2JpsiPhiPromptBkg_tripleGaussian::Bs2JpsiPhiPromptBkg_tripleGaussian() :
 	, sigmaPr3Name	( "sigmaPr3" )
 	// Observables
 	, timeName	( "time" )	
+	, timeconstraintName( "time" )
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with triple Gaussian" << endl;
@@ -101,7 +102,7 @@ double Bs2JpsiPhiPromptBkg_tripleGaussian::Normalisation(PhaseSpaceBoundary * bo
 {
 	double tmin = 0.;
 	double tmax = 0.;
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint(timeconstraintName);
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;

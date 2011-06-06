@@ -13,6 +13,7 @@
 //	ROOT Headers
 #include "TString.h"
 //	RapidFit Headers
+#include "ObservableRef.h"
 #include "PhysicsParameter.h"
 //	System Headers
 #include <vector>
@@ -35,6 +36,7 @@ class ParameterSet
 		vector<string> GetAllFixedNames();
 		PhysicsParameter * GetPhysicsParameter( pair<string,int>* );
 		PhysicsParameter * GetPhysicsParameter( string );
+		PhysicsParameter * GetPhysicsParameter( ObservableRef& );
 		bool SetPhysicsParameter( string, PhysicsParameter* );
 		bool SetPhysicsParameter( string, double, double, double, string, string );
 		bool SetPhysicsParameters( ParameterSet* );
@@ -52,3 +54,4 @@ class ParameterSet
 };
 
 #endif
+

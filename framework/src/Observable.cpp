@@ -57,3 +57,4 @@ string Observable::GetUnit()
 {
 	return unit;
 }
+

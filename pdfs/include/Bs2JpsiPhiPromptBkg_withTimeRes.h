@@ -34,11 +34,13 @@ class Bs2JpsiPhiPromptBkg_withTimeRes : public BasePDF
 		void MakePrototypes();
 
                 // Physics parameters
-                string sigmaPrName; // sigma of the prompt dist
+                ObservableRef sigmaPrName; // sigma of the prompt dist
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the PDF
-		string timeName;    // proper time
+		ObservableRef timeName;    // proper time
+
+		ObservableRef timeconstraintName;
 };
 
 #endif

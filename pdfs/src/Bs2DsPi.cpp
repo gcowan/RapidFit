@@ -24,6 +24,7 @@ Bs2DsPi::Bs2DsPi() :
 	//, timeres	( "resolution" )
 	//, normalisationCacheValid(false)
 	//, evaluationCacheValid(false)
+	, timeconstraintName( "time" )
 {
 	MakePrototypes();
 }
@@ -136,7 +137,7 @@ void Bs2DsPi::getTimeDependentFuncsInt(  double & expLTInt, double & expHTInt, d
 {
 	double tmin = 0.;
 	double tmax = 0.;
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint( timeconstraintName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;

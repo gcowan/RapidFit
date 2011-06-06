@@ -14,6 +14,7 @@
 
 //	RapidFit Headers
 #include "IPDF.h"
+#include "ObservableRef.h"
 #include "PDFConfigurator.h"
 //	System Headers
 #include <vector>
@@ -64,7 +65,8 @@ class BasePDF : public IPDF
 		ParameterSet allParameters;
 		vector<string> allObservables;
 		bool valid;
-
+		ObservableRef observables;
 };
 
 #endif
+

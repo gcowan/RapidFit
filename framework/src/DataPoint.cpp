@@ -9,6 +9,7 @@
 
 //	RapidFit Headers
 #include "DataPoint.h"
+#include "ObservableRef.h"
 #include "StringProcessing.h"
 //	System Headers
 #include <iostream>
@@ -75,6 +76,18 @@ Observable * DataPoint::GetObservable(string const Name)
 	}
 }
 
+Observable * DataPoint::GetObservable( ObservableRef& object )
+{
+        if( object.GetIndex() < 0 ) {
+		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef()) );
+		if( object.GetIndex() >= 0 ) return &allObservables[ (unsigned) object.GetIndex() ];
+	} else {
+		return &allObservables[ (unsigned) object.GetIndex() ];
+	}
+	cerr << "Observable name " << object.Name().c_str() << " not found" << endl;
+	throw(-20);
+}
+
 Observable const * DataPoint::GetSafeObservable( string const Name ) const
 {
         //Check if the name is stored in the map
@@ -133,3 +146,4 @@ bool DataPoint::operator() ( pair<DataPoint,pair<string,int> > first, pair<DataP
        double param_val_2 = second.first.GetObservable( &second.second )->GetValue();
        return (param_val_1 < param_val_2 );
 }
+

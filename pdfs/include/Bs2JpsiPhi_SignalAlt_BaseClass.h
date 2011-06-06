@@ -232,55 +232,57 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 		bool useCosAndSin ;
 		bool allowNegativeAsSq ;
 	
-		// These contain the pair<string,int>s that correspond to the physics parameter names and references
-		pair<string,int> gammaName;		// gamma
-		pair<string,int> deltaGammaName;	// delta gamma
-		pair<string,int> deltaMName;		// delta mass
-		pair<string,int> Phi_sName;		// what we want to measure!
-		pair<string,int> Azero_sqName;	// amplitude
-		pair<string,int> Apara_sqName;	// amplitude
-		pair<string,int> Aperp_sqName;	// amplitude
-		pair<string,int> As_sqName;		// amplitude
-		pair<string,int> delta_zeroName;	// strong phase, set to 0
-		pair<string,int> delta_paraName;	// strong phase
-		pair<string,int> delta_perpName;	// strong phase
-		pair<string,int> delta_sName;		// strong phase for S-wave
-	
+		// These contain the ObservableRefs that correspond to the physics parameter names and references
+		ObservableRef gammaName;		// gamma
+		ObservableRef deltaGammaName;	// delta gamma
+		ObservableRef deltaMName;		// delta mass
+		ObservableRef Phi_sName;		// what we want to measure!
+		ObservableRef Azero_sqName;	// amplitude
+		ObservableRef Apara_sqName;	// amplitude
+		ObservableRef Aperp_sqName;	// amplitude
+		ObservableRef As_sqName;		// amplitude
+		ObservableRef delta_zeroName;	// strong phase, set to 0
+		ObservableRef delta_paraName;	// strong phase
+		ObservableRef delta_perpName;	// strong phase
+		ObservableRef delta_sName;		// strong phase for S-wave
+
 		//PELC NEW : These are new physics parameters which might be used instead of some of those above later
-		pair<string,int> cosphisName;		// fitting cosphis and sinphis independently
-		pair<string,int> sinphisName;		// fitting cosphis and sinphis independently	
+		ObservableRef cosphisName;		// fitting cosphis and sinphis independently
+		ObservableRef sinphisName;		// fitting cosphis and sinphis independently	
 
                 // Mistag parameters
-                pair<string,int> mistagName;		// mistag fraction
-		pair<string,int> mistagP1Name;		// mistag calib
-		pair<string,int> mistagP0Name;		// mistag calib
-		pair<string,int> mistagSetPointName;// mistag calib
-	
+                ObservableRef mistagName;		// mistag fraction
+		ObservableRef mistagP1Name;		// mistag calib
+		ObservableRef mistagP0Name;		// mistag calib
+		ObservableRef mistagSetPointName;// mistag calib
+
 		// Time resolution
-		pair<string,int> res1Name;		  // time resolution core
-		pair<string,int> res2Name;		  // time resolution tail
-		pair<string,int> res1FractionName;  // fraction of core
-		pair<string,int> timeOffsetName;    // time offset
+		ObservableRef res1Name;		  // time resolution core
+		ObservableRef res2Name;		  // time resolution tail
+		ObservableRef res1FractionName;  // fraction of core
+		ObservableRef timeOffsetName;    // time offset
 
                 // These are the angular accceptance factors. The first 6 are P-wave, the second 4 are S-wave
-                pair<string,int> angAccI1Name ;  
-		pair<string,int> angAccI2Name ;
-		pair<string,int> angAccI3Name ;
-		pair<string,int> angAccI4Name ;
-		pair<string,int> angAccI5Name ;
-		pair<string,int> angAccI6Name ;
-		pair<string,int> angAccI7Name ;
-		pair<string,int> angAccI8Name ;
-		pair<string,int> angAccI9Name ;
-		pair<string,int> angAccI10Name ;
-	
-		// These contain the pair<string,int>s that correspond to the observable names
-		pair<string,int> timeName;		// proper time
-		pair<string,int> cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		pair<string,int> phiName;			// azimuthal angle of the mu+ in Jpsi frame
-		pair<string,int> cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-		pair<string,int> tagName;			// B tag
-		pair<string,int> timeAcceptanceCategoryName ; //Originally included for using unbiased and biased events.
+                ObservableRef angAccI1Name ;  
+		ObservableRef angAccI2Name ;
+		ObservableRef angAccI3Name ;
+		ObservableRef angAccI4Name ;
+		ObservableRef angAccI5Name ;
+		ObservableRef angAccI6Name ;
+		ObservableRef angAccI7Name ;
+		ObservableRef angAccI8Name ;
+		ObservableRef angAccI9Name ;
+		ObservableRef angAccI10Name ;
+
+		ObservableRef timeName;		// proper time
+		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		ObservableRef phiName;			// azimuthal angle of the mu+ in Jpsi frame
+		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		ObservableRef tagName;			// B tag
+		ObservableRef timeAcceptanceCategoryName ; //Originally included for using unbiased and biased events.
+
+		//	Constraints
+		ObservableRef timeConstraintName;
 
 		// Measured Event Observables
 		double t ;

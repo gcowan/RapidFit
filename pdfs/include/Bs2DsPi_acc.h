@@ -41,22 +41,24 @@ class Bs2DsPi_acc : public BasePDF
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
 		// used in the minimiser.
-		string gammaName;		// gamma
-		string deltaGammaName;	// delta gamma
-		string deltaMName;		// delta mass
-		string mistagName;		// B mistag
-		string timeresName;		// B timeres
-		string accOffName;	// acc parameters
-		string accSlopeLowName;		// acc parameters
-		string accSlopeHighName;		// acc parameters	    
-		string accPowerName;		// acc parameters
+		ObservableRef gammaName;		// gamma
+		ObservableRef deltaGammaName;	// delta gamma
+		ObservableRef deltaMName;		// delta mass
+		ObservableRef mistagName;		// B mistag
+		ObservableRef timeresName;		// B timeres
+		ObservableRef accOffName;	// acc parameters
+		ObservableRef accSlopeLowName;		// acc parameters
+		ObservableRef accSlopeHighName;		// acc parameters	    
+		ObservableRef accPowerName;		// acc parameters
 	    	    	    
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF. 
-		string timeName;		// proper time
-		string tagName;		// B tag
-	   
+		ObservableRef timeName;		// proper time
+		ObservableRef tagName;		// B tag
+
+		ObservableRef timeconstraintName;
+
 		// Physics parameters
 
 		double gamma, deltaGamma, deltaM, mistag, timeRes, AcceptanceOffset, AcceptanceSlopeLow, AcceptanceSlopeHigh, AcceptancePower ;
@@ -70,7 +72,7 @@ class Bs2DsPi_acc : public BasePDF
 		double tlow, thigh ;
 	
 		void getPhysicsParameters(  );
-	    void getObservables( DataPoint* );
+		void getObservables( DataPoint* );
 		
 		void getTimeDependentFuncsInt(double&, double&, double&, PhaseSpaceBoundary*);
 	

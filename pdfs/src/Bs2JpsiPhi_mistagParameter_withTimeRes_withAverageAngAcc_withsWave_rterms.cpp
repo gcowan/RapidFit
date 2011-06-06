@@ -67,6 +67,7 @@ cachedCosPhis(), cachedExpCosh(), cachedExpSinh(), cachedExpCos(), cachedExpSin(
 	, cosPsiName	( "cosPsi" )
 	, tagName	( "tag" )
 
+	, timeconstraintName ("time")
 	// Member variables that will contain the parameter values
 	, gamma(), deltaGamma(), deltaMs(), Phi_s(), R_alpha(),
 	R_beta(), R_gamma(), Azero_sq(), Apara_sq(), Aperp_sq(),
@@ -309,7 +310,7 @@ double Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms
 	// Now need to know the tag and the mistag
 	q = (int)measurement->GetObservable( tagName )->GetValue();
 
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint(timeconstraintName);
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;

@@ -16,12 +16,12 @@
 using namespace std;
 
 //Default constructor
-ConstraintFunction::ConstraintFunction() : allConstraints()
+ConstraintFunction::ConstraintFunction() : Found_Position(), allConstraints()
 {
 }
 
 //Constructor with correct arguments
-ConstraintFunction::ConstraintFunction( vector< ExternalConstraint* > NewConstraints ) : allConstraints(NewConstraints)
+ConstraintFunction::ConstraintFunction( vector< ExternalConstraint* > NewConstraints ) : Found_Position(), allConstraints(NewConstraints)
 {
 }
 
@@ -36,8 +36,17 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 	vector<string> parameterNames = NewParameters->GetAllNames();
 	double constraintValue = 0.0;
 
+	if( Found_Position.size() != allConstraints.size() )
+	{
+		for( unsigned int constraintIndex = 0; constraintIndex < allConstraints.size(); ++constraintIndex )
+		{
+			string name = allConstraints[constraintIndex]->GetName();
+			Found_Position.push_back( StringProcessing::VectorContains( &parameterNames, &name ) );
+		}
+	}
+
 	//Loop over all ExternalConstraints
-	for (unsigned int constraintIndex = 0; constraintIndex < allConstraints.size(); constraintIndex++ )
+	for (unsigned int constraintIndex = 0; constraintIndex < allConstraints.size(); ++constraintIndex )
 	{
 		string name = allConstraints[constraintIndex]->GetName();
 		if ( name == "GammaL" )
@@ -50,7 +59,6 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			double gaml_con = allConstraints[constraintIndex]->GetValue();
 			double gaussSqrt = ( gaml_fit -  gaml_con ) / allConstraints[constraintIndex]->GetError();
 			constraintValue += gaussSqrt * gaussSqrt;
-			
 		}
 		else if ( name == "GammaObs" )
 		{
@@ -62,7 +70,6 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			double gamobs_con = allConstraints[constraintIndex]->GetValue();
 			double gaussSqrt = ( gamobs_fit -  gamobs_con ) / allConstraints[constraintIndex]->GetError();
 			constraintValue += gaussSqrt * gaussSqrt;
-			
 		}
 		else if ( name == "ATOTAL" )
 		{
@@ -77,7 +84,6 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			if( excess >= 0 ) penalty = 0 ;
 			else penalty = (excess*excess) / (Atot_constraint*Atot_constraint) ;
 			constraintValue += penalty;
-			
 		}
 		else if ( name == "GLandGH" )
 		{
@@ -86,14 +92,13 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			double dgam =  NewParameters->GetPhysicsParameter("deltaGamma")->GetValue();
 			double G1 = gamma-dgam/2.0 ;
 			double G2 = gamma+dgam/2.0 ;
-//			double val = allConstraints[constraintIndex]->GetValue();
+			//double val = allConstraints[constraintIndex]->GetValue();
 			double constraint = allConstraints[constraintIndex]->GetError();
 			double penalty = 0 ;
 			if( G1 < 0. ) penalty += (G1*G1)/(constraint*constraint) ;
 			if( G2 < 0. ) penalty += (G2*G2)/(constraint*constraint) ;
 			if( penalty > 0. ) cout << " GLandGH constraint being applied " << endl ;
 			constraintValue += penalty;
-			
 		}
 		else if ( name == "CosSqPlusSinSq" )
 		{
@@ -105,9 +110,8 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			double excess = (val - cosphis*cosphis - sinphis*sinphis ) ;
 			double penalty = (excess*excess) / (constraint*constraint) ;
 			constraintValue += penalty;
-			
 		}
-		else if ( StringProcessing::VectorContains( &parameterNames, &name ) >= 0 )
+		else if ( Found_Position[constraintIndex] >= 0 )
 		{
 			//Do standard gaussian constraint calculation
 			double parameterValue = NewParameters->GetPhysicsParameter(name)->GetValue();
@@ -118,3 +122,4 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 
 	return 0.5 * constraintValue;
 }
+

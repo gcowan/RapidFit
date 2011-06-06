@@ -44,30 +44,31 @@ class Bs2PhiPhi : public BasePDF
         double cach_cosDeltaSubtr;
         bool normalisationCacheValid, evaluationCacheValid;
 
-        // These contain the strings that correspond
+        // These contain the ObservableRefs that correspond
         // to the physics parameter names that will be
         // used in the minimiser.
-        string gamma_sName;       // gamma_s
-        string gamma_lName;       // gamma_L
-        string gamma_hName;       // gamma_H
-        string deltaMName;        // delta mass
-        string Phi_sName;         // what we want to measure!
-        string Azero_sqName;      // amplitude
-        string Apara_sqName;      // amplitude
-        string Aperp_sqName;      // amplitude
-        string delta_1Name;       // strong phase
-        string delta_2Name;       // strong phase
+        ObservableRef gamma_sName;       // gamma_s
+        ObservableRef gamma_lName;       // gamma_L
+        ObservableRef gamma_hName;       // gamma_H
+        ObservableRef deltaMName;        // delta mass
+        ObservableRef Phi_sName;         // what we want to measure!
+        ObservableRef Azero_sqName;      // amplitude
+        ObservableRef Apara_sqName;      // amplitude
+        ObservableRef Aperp_sqName;      // amplitude
+        ObservableRef delta_1Name;       // strong phase
+        ObservableRef delta_2Name;       // strong phase
 
-        // These contain the strings that correspond
+        // These contain the ObservableRefs that correspond
         // to the observable names that are used in the
         // PDF. 
-        string timeName;    // proper time
-        string theta_1Name;  // angle between Phi1 p vector and its K+ daughter's p vector
-        string theta_2Name;  // angle between Phi2 p vector and its K+ daughter's p vector
-        string phiName;     // angle between the decay planes of the 2 Phi resonances
-        string tagName;     // B tag
-        string mistagName;  // B mistag
-    
+        ObservableRef timeName;    // proper time
+        ObservableRef theta_1Name;  // angle between Phi1 p vector and its K+ daughter's p vector
+        ObservableRef theta_2Name;  // angle between Phi2 p vector and its K+ daughter's p vector
+        ObservableRef phiName;     // angle between the decay planes of the 2 Phi resonances
+        ObservableRef tagName;     // B tag
+        ObservableRef mistagName;  // B mistag
+
+	ObservableRef timeconstraintName;	
     
         void getPhysicsParameters( double&, double&, double&, double&, double&
                                  , double&, double&, double&, double&, double&);

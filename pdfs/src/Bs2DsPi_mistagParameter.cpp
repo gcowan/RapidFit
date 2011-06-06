@@ -27,6 +27,8 @@ Bs2DsPi_mistagParameter::Bs2DsPi_mistagParameter() :
 	, timeName	( "time" )
 	, tagName	( "tag" )
 
+	, timeconstraintName( "time" )
+
 	//objects
 	,gamma(), deltaGamma(), deltaM(), mistag(), timeRes(), time(), tag(), tlow(), thigh()
 {
@@ -90,7 +92,7 @@ double Bs2DsPi_mistagParameter::Normalisation(DataPoint * measurement, PhaseSpac
 	getObservables( measurement ) ;
 
 	// Get time integration boundaries
-	IConstraint * timeBound = boundary->GetConstraint("time");
+	IConstraint * timeBound = boundary->GetConstraint(timeconstraintName);
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;

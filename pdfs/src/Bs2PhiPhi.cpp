@@ -34,6 +34,7 @@ Bs2PhiPhi::Bs2PhiPhi() : cach_v1(), cach_v2(), cach_Azero(), cach_Apara(), cach_
     , phiName    ( "phi" )
     , tagName    ( "tag" )
     , mistagName ( "mistag" )
+    , timeconstraintName( "time" )
     //, timeres    ( "resolution" )
 {
     MakePrototypes();
@@ -321,7 +322,7 @@ void Bs2PhiPhi::getTimeAmplitudeIntegrals( double & AzeroAzeroInt
 {
     double tlow = 0.;
     double thigh = 0.;
-    IConstraint * timeBound = boundary->GetConstraint("time");
+    IConstraint * timeBound = boundary->GetConstraint( timeconstraintName );
     if ( timeBound->GetUnit() == "NameNotFoundError" )
     {
         cerr << "Bound on time not provided" << endl;

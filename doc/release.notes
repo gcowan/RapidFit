@@ -1,5 +1,18 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/06 Rob Currie
+   - Added ObservableRef class. This is a slightly more constructed way of caching lookup information when accessing objects such as PhysicsParameters, Observbles and Constraints
+       The construction of this object now means all classes have been transparently ported over to use this new object for communication
+       As a consequence all used pdfs/include/*.h files have been touched, and the Bs2JPsiPhi pdfs have been backported to transparently use this object asif it were a string.
+
+       This DOES NOT change the numberical output of the pdf but does clean up the codebase and speed up RapidFit member function calls.
+ 
+       This has been verified with the usual UnitTests
+   - Have ported all classes to use an ObjectRef object for time limit lookup, this is a more efficient use of resources
+   - Changed ConstraintFunction to use a cache for lookups to be more efficient
+
+     Again, this change is a structural change within RapidFit. It is designed to remove blind calls to the VectorContains function. This leads to a non negligable performance improvement in fits
+
 2011/06/03 Ailsa & Pete
    - Added LongLivedBkg_3Dangular.cpp   PDF which takes in a histogram for angular distribution
    - This also modifiedthe BasePDF.h to include the PDFConfigurator.h
@@ -42,8 +55,8 @@
 2011/05/29 Pete Clarke
    - Update of all B2sJPsiPhi_SignalAlt......  code   (i.e. BaseClass, MP, MO)
    - Refactoring code into base class
-   - Introduction of mistagP1, mistagP0 and mistafSetPoint instead of scal eand offset
-   - ..MP.. pdfs now require mistagP1, mistagP0 and mistafSetPoint
+   - Introduction of mistagP1, mistagP0 and mistagSetPoint instead of scal eand offset
+   - ..MP.. pdfs now require mistagP1, mistagP0 and mistagSetPoint
 
 2011/05/24 Rob Currie
   - I've added a new class MCStudy which performs an MC style sequential study on a large ntuple(s)

@@ -54,6 +54,7 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave() :
 	, KstarFlavourName  ( "KstarFlavour" )
 	//, timeres	( "resolution" )
 
+	, timeconstraintName( "time" )
 	, gamma(), deltaMs(), Azero_sq(), Apara_sq(), Aperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
 	delta_zero(), delta_para(), delta_perp(), delta_s(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(),
 	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), Ap_sq(), Ap(), time(), cosTheta(), phi(),
@@ -276,8 +277,7 @@ cout << "ReAzeroAsB " << ReAzeroAsB << endl;
 double Bd2JpsiKstar_sWave::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	double returnValue;
-	IConstraint * timeBound = boundary->GetConstraint("time");
-
+	IConstraint * timeBound = boundary->GetConstraint(timeconstraintName);
 
 	time = measurement->GetObservable( timeName )->GetValue();
         KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();

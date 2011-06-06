@@ -47,45 +47,46 @@ class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms 
 
 		bool normalisationCacheValid, evaluationCacheValid;
 
-		// These contain the strings that correspond
+		// These contain the ObservableRefs that correspond
 		// to the physics parameter names that will be
 		// used in the minimiser.
-		string gammaName;		// gamma
-		string deltaGammaName;	// delta gamma
-		string deltaMName;		// delta mass
-		string Phi_sName;		// what we want to measure!
-		string R_alphaName;	// amplitude
-		string R_betaName;	// amplitude
-		string R_gammaName;	// amplitude
-		string delta_zeroName;	// strong phase, set to 0
-		string delta_paraName;	// strong phase
-		string delta_perpName;	// strong phase
-		string delta_sName;	// strong phase
-		string angAccI1Name;		// Pre-calculated angular integrals including acceptance
-		string angAccI2Name;		// 
-		string angAccI3Name;		// 
-		string angAccI4Name;		// 
-		string angAccI5Name;		// 
-		string angAccI6Name;		// 
-		string angAccI7Name;		// 
-		string angAccI8Name;		// 
-		string angAccI9Name;		// 
-		string angAccI10Name;		// 
-		string mistagName;
-		string timeRes1Name;
-		string timeRes2Name;
-		string timeRes1FractionName;
+		ObservableRef gammaName;		// gamma
+		ObservableRef deltaGammaName;	// delta gamma
+		ObservableRef deltaMName;		// delta mass
+		ObservableRef Phi_sName;		// what we want to measure!
+		ObservableRef R_alphaName;	// amplitude
+		ObservableRef R_betaName;	// amplitude
+		ObservableRef R_gammaName;	// amplitude
+		ObservableRef delta_zeroName;	// strong phase, set to 0
+		ObservableRef delta_paraName;	// strong phase
+		ObservableRef delta_perpName;	// strong phase
+		ObservableRef delta_sName;	// strong phase
+		ObservableRef angAccI1Name;		// Pre-calculated angular integrals including acceptance
+		ObservableRef angAccI2Name;		// 
+		ObservableRef angAccI3Name;		// 
+		ObservableRef angAccI4Name;		// 
+		ObservableRef angAccI5Name;		// 
+		ObservableRef angAccI6Name;		// 
+		ObservableRef angAccI7Name;		// 
+		ObservableRef angAccI8Name;		// 
+		ObservableRef angAccI9Name;		// 
+		ObservableRef angAccI10Name;		// 
+		ObservableRef mistagName;
+		ObservableRef timeRes1Name;
+		ObservableRef timeRes2Name;
+		ObservableRef timeRes1FractionName;
 
-		// These contain the strings that correspond
+		// These contain the ObservableRefs that correspond
 		// to the observable names that are used in the
 		// PDF.
-		string timeName;		// proper time
-		string cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		string phiName;		// azimuthal angle of the mu+ in Jpsi frame
-		string cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+		ObservableRef timeName;		// proper time
+		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
+		ObservableRef phiName;		// azimuthal angle of the mu+ in Jpsi frame
+		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 		// in phi rest frame
-		string tagName;		// B tag
+		ObservableRef tagName;		// B tag
 
+		ObservableRef timeconstraintName;
 
 		// Member variables that will contain the parameter values
                 double gamma;

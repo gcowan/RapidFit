@@ -41,18 +41,20 @@ class Bs2DsPi_mistagParameter : public BasePDF
 		// These contain the strings that correspond
 		// to the physics parameter names that will be
 		// used in the minimiser.
-		string gammaName;		// gamma
-		string deltaGammaName;	// delta gamma
-		string deltaMName;		// delta mass
-    	string mistagName;		// B mistag
-	    string timeresName;		// B mistag
+		ObservableRef gammaName;		// gamma
+		ObservableRef deltaGammaName;	// delta gamma
+		ObservableRef deltaMName;		// delta mass
+		ObservableRef mistagName;		// B mistag
+	       	ObservableRef timeresName;		// B mistag
 
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF. 
-		string timeName;		// proper time
-		string tagName;		// B tag
-	   
+		ObservableRef timeName;		// proper time
+		ObservableRef tagName;		// B tag
+
+		ObservableRef timeconstraintName;
+
 		// Physics parameters
 	    double gamma, deltaGamma, deltaM, mistag, timeRes ;
 	

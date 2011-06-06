@@ -373,7 +373,9 @@ TH1* LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TStri
 	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
 	TString Draw_Str = param1_val + ":" + param2_val;
 	input_tree->Draw( Draw_Str, Cut_String );
-	GRID->Print("Coordinate_Grid"+Suffix+".png");
+	//GRID->Print("Coordinate_Grid"+Suffix+".png");
+	(void) GRID;
+	(void) Suffix;
 	return input_tree->GetHistogram();
 }
 

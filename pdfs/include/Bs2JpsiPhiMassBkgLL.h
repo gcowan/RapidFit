@@ -34,10 +34,10 @@ class Bs2JpsiPhiMassBkgLL : public BasePDF
 		void MakePrototypes();
 
 		// Physics parameters
-		pair<string,int> alphaM_llName;	// mass decay constant
+		ObservableRef alphaM_llName;	// mass decay constant
 		// Observables
-		pair<string,int> recoMassName;	// reconstructed Bs mass
-		pair<string,int> constraint_recoMassName;
+		ObservableRef recoMassName;	// reconstructed Bs mass
+		ObservableRef constraint_recoMassName;
 };
 
 #endif

@@ -17,9 +17,9 @@
 //Constructor
 Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg() :
 	// Physics parameters
-	  alphaM_prName	( make_pair("alphaM_pr",-1) )
+	  alphaM_prName	( "alphaM_pr" )
         // Observables
-        , recoMassName  ( make_pair("mass",-1) )
+        , recoMassName  ( "mass" )
 	, constraint_recoMassName()
 {
 	MakePrototypes();
@@ -28,12 +28,12 @@ Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg() :
 //Make the data point and parameter set
 void Bs2JpsiPhiMassBkg::MakePrototypes()
 {
-        allObservables.push_back( recoMassName.first );
+        allObservables.push_back( recoMassName );
 	constraint_recoMassName = recoMassName;
 
         //Make the parameter set
         vector<string> parameterNames;
-        parameterNames.push_back( alphaM_prName.first );
+        parameterNames.push_back( alphaM_prName );
         allParameters = *( new ParameterSet(parameterNames) );
 
 	valid = true;
@@ -48,10 +48,10 @@ Bs2JpsiPhiMassBkg::~Bs2JpsiPhiMassBkg()
 //Calculate the function value
 double Bs2JpsiPhiMassBkg::Evaluate(DataPoint * measurement)
 {
-  	double alphaM_pr = allParameters.GetPhysicsParameter( &alphaM_prName )->GetValue();
+  	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
 
 	// Get the observable
-        double mass = measurement->GetObservable( &recoMassName )->GetValue();
+        double mass = measurement->GetObservable( recoMassName )->GetValue();
 
 	double val = exp( -alphaM_pr * mass);
 	
@@ -69,7 +69,7 @@ double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBound
 	(void)measurement;
 	double mhigh, mlow ;
 
-	IConstraint * massBound = boundary->GetConstraint( &constraint_recoMassName );
+	IConstraint * massBound = boundary->GetConstraint( constraint_recoMassName );
 	if ( massBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on mass not provided in Bs2JpsiPhiMassBkg" << endl;
@@ -81,7 +81,7 @@ double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBound
 		mhigh = massBound->GetMaximum();
 	}
 
-	double alphaM_pr = allParameters.GetPhysicsParameter( &alphaM_prName )->GetValue();
+	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
 	double integral ;
 
 	if( fabs( alphaM_pr - 0. ) < DOUBLE_TOLERANCE ) {
@@ -93,7 +93,6 @@ double Bs2JpsiPhiMassBkg::Normalisation(DataPoint * measurement, PhaseSpaceBound
 		//Code prepared to take out a large scale variation - this is arbitrary provided it is same in Evaluate() and Normalisation()
 		double scaleFactor = exp( -alphaM_pr * 5366.0 );
 		integral /= scaleFactor ;
-		
 	}
 	return integral;
 

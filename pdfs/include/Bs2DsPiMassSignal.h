@@ -33,13 +33,13 @@ class Bs2DsPiMassSignal : public BasePDF
 		void MakePrototypes();
 
 		// Physics parameters
-		string f_sig_m1Name;	// fraction
-		string sigma_m1Name;	// width 1
-		string sigma_m2Name;	// width 2 
-		string m_BsName;	// Bs mass
+		ObservableRef f_sig_m1Name;	// fraction
+		ObservableRef sigma_m1Name;	// width 1
+		ObservableRef sigma_m2Name;	// width 2 
+		ObservableRef m_BsName;	// Bs mass
 
 		// Observables
-		string recoMassName;	// reconstructed Bs mass
+		ObservableRef recoMassName;	// reconstructed Bs mass
 };
 
 #endif

@@ -37,11 +37,11 @@ class Exponential : public BasePDF
 		double buildPDFdenominator();		
 
 		// Physics parameters
-		string tauLL1Name;		// decay constant 1
-		string sigmaLL1Name;		// time res sigma 1
-		string sigmaLL2Name;		// time res sigma 2
-                string timeResLL1FracName;
-		string timeName;		// proper time
+		ObservableRef tauLL1Name;		// decay constant 1
+		ObservableRef sigmaLL1Name;		// time res sigma 1
+		ObservableRef sigmaLL2Name;		// time res sigma 2
+                ObservableRef timeResLL1FracName;
+		ObservableRef timeName;		// proper time
 
 		double tauLL1;
 		double sigmaLL; // This is the member variable used in the "builder" functions 
@@ -51,7 +51,7 @@ class Exponential : public BasePDF
 
 		double tlow, thigh; // integration limits
 
-		// These contain the strings that correspond
+		// These contain the ObservableRefs that correspond
 		// to the observable names that are used in the
 		// PDF. 
 		double time;

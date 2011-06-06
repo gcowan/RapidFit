@@ -66,7 +66,7 @@ ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
 
 IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -Weffc++ -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -funroll-all-loops -g -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
+	SET( CMAKE_CXX_FLAGS "-DSVN_REV=${SVN_REV} -Weffc++ -Os -msse -msse2 -msse3 -m3dnow -ansi -fPIC -fmerge-all-constants -funroll-all-loops -g -D__ROOFIT_NOBANNER -Wconversion -Weffc++ -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor" )
 ENDIF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 
 IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )

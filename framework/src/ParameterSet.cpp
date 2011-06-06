@@ -9,6 +9,7 @@
 
 //	RapidFit Headers
 #include "StringProcessing.h"
+#include "ObservableRef.h"
 #include "ParameterSet.h"
 //	System Headers
 #include <iostream>
@@ -109,6 +110,18 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter(string Name)
 	{
 		return &allParameters[unsigned(nameIndex)];
 	}
+}
+
+PhysicsParameter* ParameterSet::GetPhysicsParameter( ObservableRef& object )
+{
+	if( object.GetIndex() < 0 ) {
+		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef() ) );
+		if( object.GetIndex() >= 0 ) return &allParameters[ (unsigned) object.GetIndex() ];
+	} else {
+		return &allParameters[ (unsigned) object.GetIndex() ];
+	}
+	cerr << "PhysicsParameter " << object.Name().c_str() << " not found" << endl;
+	throw(-20);
 }
 
 //Set a physics parameter by name
