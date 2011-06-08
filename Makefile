@@ -206,7 +206,7 @@ $(OBJDIR)/tinter.o: $(UTILSSRC)/tinter.C
 	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
 
 #utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_llscanresults  $(EXEDIR)/rapidfit_fcscanresults
-utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/print $(EXEDIR)/tinter $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot
+utils: $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/print $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot
 
 
 
