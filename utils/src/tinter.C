@@ -458,7 +458,7 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 
             //  Ignore unphysical RMS  it's the telltale sign of an empty TTree RapidFit spits out from fixed parameters in fit
 
-	    if( GetOptimalBins( local_histogram ) != 0 )
+	    if( true )//GetOptimalBins( local_histogram ) != 0 )
             {
 		//  
                 TString format_1;
@@ -624,7 +624,7 @@ cout<<"\t\t:::..:::::....::..::::..:::::..:::::........::..:::::..::"<<endl;
 			Param_FitResult_Plots[count1][count2]->GetXaxis()->SetTitle( TString( Param_FitResult_Plots[count1][count2]->GetXaxis()->GetTitle()) +" ps^{-1}") ;
 		}
 		Param_FitResult_Plots[count1][count2]->SetTitle("");
-		if( GetOptimalBins( Param_FitResult_Plots[count1][count2] ) != 0 )
+		if( true )//GetOptimalBins( Param_FitResult_Plots[count1][count2] ) != 0 )
 		{
 			for( unsigned int print_count=0; print_count < Extensions.size(); print_count++ )
 			{

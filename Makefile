@@ -17,7 +17,7 @@ RM           = rm -f
 SVN_REV = $(shell svnversion -n .)
 
 #		Compiler Flags
-CXXFLAGS     = -DSVN_REV=$(SVN_REV) -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fPIC -fmerge-all-constants -funroll-all-loops -D__ROOFIT_NOBANNER -Weffc++ -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
+CXXFLAGS     = -Wno-reorder -DSVN_REV=$(SVN_REV) -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fPIC -fmerge-all-constants -funroll-all-loops -D__ROOFIT_NOBANNER -Weffc++ -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 #		When running on the GRID & other batch systems the sandbox is limited in size hence the library HAS to be as small as possible
 #CXXFLAGS     = -Os -msse -msse2 -m3dnow -ansi -fPIC -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor
 #		For extra debugging info:
@@ -55,7 +55,7 @@ ALL_HEADERS += $(PDFHEAD)
 
 
 #	BUILD OUTPUT
-OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJDIR)/rapidfit_dict.* *.so *.rootmap $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot $(EXEIR)/print $(EXEDIR)/tinter
+OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJDIR)/rapidfit_dict.* *.so *.rootmap $(EXEDIR)/rapidfit_toyresults $(EXEDIR)/rapidfit_fcscanresults $(EXEDIR)/rapidfit_fcscanresults_2 $(EXEDIR)/betas_sweightfitter $(EXEDIR)/merge_plot $(EXEDIR)/RapidLL $(EXEDIR)/RapidPlot $(EXEIR)/print
 
 
 
