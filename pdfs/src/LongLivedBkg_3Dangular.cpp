@@ -84,8 +84,34 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
         nzbins = histo->GetNbinsZ();
         deltaz = (zmax-zmin)/nzbins;
 
-		total_num_entries = histo->GetEntries();
+	//method for Checking whether histogram is sensible
 
+	total_num_entries = histo->GetEntries();
+	int total_num_bins = nxbins * nybins * nzbins;
+	int sum = 0;
+
+	vector<int> zero_bins;
+
+	//loop over each bin in histogram and print out how many zero bins there are
+	for (int i=1; i < nxbins+1; i++){
+		for (int j=1; j < nxbins+1; j++){
+			for (int k=1; k < nxbins+1; k++){
+
+				double bin_content = histo->GetBinContent(i,j,k);
+				//cout << "Bin content: " << bin_content << endl;
+				if(bin_content<=0) { zero_bins.push_back(1);}
+				//cout << " Zero bins " << zero_bins.size() << endl;}
+				else if (bin_content>0){
+				sum += bin_content;}
+}}}
+
+
+	int average_bin_content = sum / total_num_bins;
+
+	cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
+	cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
+	cout << endl;
+	cout << endl;
 
 		if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() ){
 			cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
@@ -153,12 +179,13 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	phi      = measurement->GetObservable( phiName )->GetValue();
 	cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
 
+	double returnValue = 0;
 	//Deal with propertime resolution
 	if( timeResLL1Frac >= 0.9999 )
 	{
 		// Set the member variable for time resolution to the first value and calculate
 		sigmaLL = sigmaLL1;
-		return buildPDFnumerator() ;
+		returnValue =  buildPDFnumerator() ;
 	}
 	else
 	{
@@ -168,8 +195,13 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 		// Set the member variable for time resolution to the second value and calculate
 		sigmaLL = sigmaLL2;
 		double val2 = buildPDFnumerator();
-		return (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2) ;
+		returnValue = (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2) ;
 	}
+
+	if (returnValue <= 0) cout << "PDF returns zero!" << endl;
+
+	return returnValue;
+
 }
 
 
