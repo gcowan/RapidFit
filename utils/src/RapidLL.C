@@ -217,7 +217,7 @@ int main( int argc, char* argv[] )
 			param_error = new TLine( -0.17-0.5, error, -0.17+0.5, error);
         	} else if( Param_Of_Choice == "Phi_s" )
         	{
-			param_error = new TLine( 0.-0.25, error, 0.+0.25, error);
+			param_error = new TLine( -0.7-0.25, error, -0.7+0.25, error);
         	}
 	
 		param_error->SetLineColor( Color_t(2) );

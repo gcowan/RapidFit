@@ -48,7 +48,7 @@ void RapidFitIntegrator::ProjectionSettings()
 	//	These functions only exist with ROOT > 5.26 I think, at least they exist in 5.28/29
 	#if ROOT_VERSION_CODE > ROOT_VERSION(5,26,0)
 		multiDimensionIntegrator->SetAbsTolerance( 1E-5 );	//	Absolute error for things such as plots
-		multiDimensionIntegrator->SetRelTolerance( 1E-3 );
+		multiDimensionIntegrator->SetRelTolerance( 1E-4 );
 		multiDimensionIntegrator->SetMaxPts( 100000000 );
 	#endif
 }

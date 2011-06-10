@@ -240,11 +240,10 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 	ResultFormatter::PlotFitContours( TheResult, contourFileName );
 
 	//Make any requested projections
-	//for ( int projectionIndex = 0; projectionIndex < projections.size(); ++projectionIndex )
+	//for ( unsigned int projectionIndex = 0; projectionIndex < projections.size(); ++projectionIndex )
 	for (unsigned int projectionIndex = 0; projectionIndex < 1; ++projectionIndex )
 	{
-
-		PhysicsBottle * resultBottle = TheResult->GetPhysicsBottle();
+		PhysicsBottle* resultBottle = TheResult->GetPhysicsBottle();
 
 		//Loop over all PDFs, and plot
 		if ( makeAllPlots || ( projections.size() > 0 ) )

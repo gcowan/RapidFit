@@ -22,9 +22,9 @@ class FitResult
 {
 	public:
 		FitResult();
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle);
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double> );
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle, vector<double>, vector< FunctionContour* >);
+		FitResult( double, ResultParameterSet*, int, PhysicsBottle*);
+		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, vector<double> );
+		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, vector<double>, vector< FunctionContour* >);
 		~FitResult();
 
 		double GetMinimumValue();
@@ -45,7 +45,7 @@ class FitResult
 		vector<double> covarianceMatrix;
 		vector< FunctionContour* > contours;
 		int fitStatus;
-		PhysicsBottle fittedBottle;
+		PhysicsBottle* fittedBottle;
 };
 
 #endif

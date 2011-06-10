@@ -53,7 +53,11 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass_dev();
 
 	protected:
-	
+
+	        //      Uncopyable!
+		Bs2JpsiPhi_SignalAlt_BaseClass_dev ( const Bs2JpsiPhi_SignalAlt_BaseClass_dev& );
+		Bs2JpsiPhi_SignalAlt_BaseClass_dev& operator = ( const Bs2JpsiPhi_SignalAlt_BaseClass_dev& );
+
 		//PELC For debugging purposes
 		//TH1D * histOfPdfValues ;
 		//TCanvas * c0 ; 

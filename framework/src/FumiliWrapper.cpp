@@ -158,7 +158,7 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 	}
 
 	PhysicsBottle* newBottle = NewFunction->GetPhysicsBottle();
-	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, *newBottle  );
+	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, newBottle  );
 }
 
 //Return the result of minimisation

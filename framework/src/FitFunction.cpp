@@ -39,7 +39,7 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 //Return the physics bottle
 PhysicsBottle* FitFunction::GetPhysicsBottle()
 {
-	return new PhysicsBottle( allData->GetParameterSet() );
+	return allData;
 }
 
 // Get and set the fit parameters

@@ -144,7 +144,7 @@ int main( int argc, char* argv[] )
 	//	General Cuts to be applied for various plots
 
 	//	Fit_Status == 3
-	TString Fit_Cut = "(abs(" + Fit_Status + "-3.0)<"+Double_Tolerance+")";
+	TString Fit_Cut = "(abs(" + Fit_Status + "-3.0)<"+Double_Tolerance+")&&NLL>30400";
 
 
 	//	param1_gen == notgen	&&	param1_err == 0

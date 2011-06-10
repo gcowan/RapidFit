@@ -102,7 +102,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 				if(bin_content<=0) { zero_bins.push_back(1);}
 				//cout << " Zero bins " << zero_bins.size() << endl;}
 				else if (bin_content>0){
-				sum += bin_content;}
+				sum += (int) bin_content;}
 }}}
 
 

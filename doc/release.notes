@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/10 Rob Currie
+    - Redesigned the way we read in data to fall back to 1 column at a time (which allows for useful debugging). This is 'slower' but is still much faster than reading in via rows
+    - Re-enabled the projection plots, this was a complex issue to do with the scope of the PhysicsBottle within the object (this means several delete and new statments have been removed safely as it's destructor is now called from FitResult where it resides)
+    - Changed Release notes to hadle a pointer to an object and cleaned up by adding some more private copy constructors
+
 2011/06/10 Pete Clarke
     - Completely revamped development PDF
     - Bs2JPisPhi_SignalAlt_BaseClass_dev, Bs2JPisPhi_SignalAlt_MO_dev, Bs2JPisPhi_SignalAlt_MP_dev

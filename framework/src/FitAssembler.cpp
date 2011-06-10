@@ -38,7 +38,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	FitFunction * theFunction = FunctionConfig->GetFitFunction();
 	theFunction->SetPhysicsBottle(Bottle);
 
-	FitResult * result = DoFit( minimiser, theFunction );
+	FitResult* result = DoFit( minimiser, theFunction );
 
 	delete theFunction;
 	delete minimiser;
@@ -72,7 +72,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );
 
-	delete bottle;
+	//delete bottle;
 	return result;
 }
 
@@ -99,7 +99,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		bottle->Finalise();
 		FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );
 
-		delete bottle;
+		//delete bottle;
 		return result;
 	}
 	else
@@ -171,7 +171,7 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 		vector<string> NewNamesList = BottleParameters.back()->GetAllNames();
 		ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
 		PhysicsBottle* Bad_Bottle = new PhysicsBottle( BottleParameters.back() );
-		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, *Bad_Bottle );
+		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, Bad_Bottle );
 	}
 
 	return ReturnableFitResult;

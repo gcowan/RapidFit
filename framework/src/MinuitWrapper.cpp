@@ -13,6 +13,7 @@
 #include "MinuitWrapper.h"
 #include "StringProcessing.h"
 #include "FunctionContour.h"
+#include "PhysicsBottle.h"
 //	System Headers
 #include <iostream>
 #include <limits>
@@ -261,7 +262,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		}
 	}
 
-	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, *( function->GetPhysicsBottle() ), covarianceMatrix, allContours );
+	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, function->GetPhysicsBottle(), covarianceMatrix, allContours );
 }
 
 //The function to pass to Minuit

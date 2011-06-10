@@ -151,7 +151,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 	}
 
 	PhysicsBottle* newBottle = NewFunction->GetPhysicsBottle();
-	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, *newBottle, covData, allContours );
+	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, newBottle, covData, allContours );
 }
 
 //Return the result of minimisation

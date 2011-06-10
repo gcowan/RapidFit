@@ -11,22 +11,22 @@
 #include "FitResult.h"
 
 //Default constructor
-FitResult::FitResult() : minimumValue(), fittedParameters(), covarianceMatrix(), contours(), fitStatus(), fittedBottle()
+FitResult::FitResult() : minimumValue(-9999), fittedParameters(NULL), covarianceMatrix(), contours(), fitStatus(-9999), fittedBottle(NULL)
 {
 }
 
 //Constructor with correct arguments
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix(), contours(), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix(), contours(), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 {
 }
 
 //Constructor with correct arguments, including covariance Matrix
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), contours(), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle, vector<double> covMatrix ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), contours(), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 {
 }
 
 //Constructor with correct arguments, including covariance Matrix and contours
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle FittedBottle, vector<double> covMatrix, vector< FunctionContour* > ContourPlots ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle, vector<double> covMatrix, vector< FunctionContour* > ContourPlots ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
 {
 }
 
@@ -34,6 +34,10 @@ FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters
 //Destructor
 FitResult::~FitResult()
 {
+	if( fittedBottle != NULL )
+			delete fittedBottle;
+	if( fittedParameters != NULL )
+		delete fittedParameters;
 }
 
 vector< FunctionContour* > FitResult::GetContours()
@@ -68,5 +72,5 @@ void FitResult::ForceFitStatus( int input_status )
 
 PhysicsBottle* FitResult::GetPhysicsBottle()
 {
-	return &fittedBottle;
+	return fittedBottle;
 }

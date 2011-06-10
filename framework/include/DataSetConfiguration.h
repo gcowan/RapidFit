@@ -33,6 +33,7 @@ class DataSetConfiguration
 		IDataSet * MakeDataSet( PhaseSpaceBoundary*, IPDF*, int=-1 );
 		IPDF* GetGenerationPDF();
 
+		void SetDebug( bool );
 	private:
 		//	Uncopyable!
 		DataSetConfiguration ( const DataSetConfiguration& );
@@ -49,6 +50,8 @@ class DataSetConfiguration
 		IPDF * generatePDF;
 		bool separateGeneratePDF, parametersAreSet;
 		int Start_Entry;
+
+		bool DEBUG_DATA;
 };
 
 #endif

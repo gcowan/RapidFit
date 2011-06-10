@@ -24,9 +24,8 @@ PhysicsBottle::PhysicsBottle(ParameterSet * NewParameters) : allPDFs(), allDataS
 {
 }
 
-PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(), finalised()
+PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) : allPDFs(newParameters.allPDFs), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters(newParameters.bottleParameters), finalised(newParameters.finalised)
 {
-	bottleParameters = newParameters.bottleParameters;
 }
 
 //Destructor

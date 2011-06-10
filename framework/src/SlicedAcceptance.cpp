@@ -14,7 +14,7 @@
 //............................................
 // Constructor for flat acceptance
 SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
-  nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(0)
+  slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(0)
 {
 	
 	//Reality checks
@@ -31,7 +31,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
 //............................................
 // Constructor for simple upper time acceptance only
 SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
- nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b)
+ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b)
 {
 
 	//Reality checks
@@ -78,7 +78,7 @@ double SlicedAcceptance::getValue( double t ) const
 
 //............................................
 // Return the number of slices
-int SlicedAcceptance::numberOfSlices() const { return slices.size() ; }
+int SlicedAcceptance::numberOfSlices() const { return (int) slices.size() ; }
 
 //............................................
 // Return a slice

@@ -904,7 +904,7 @@ int RapidFit( int argc, char * argv[] )
 		cout << "\n\n\t\tFit Output:" <<endl;
 		//Output results
 		makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
-		makeOutput->OutputFitResult( GlobalResult );
+		makeOutput->OutputFitResult( GlobalFitResult->GetFitResult(0) );
 		ResultFormatter::ReviewOutput( GlobalResult );
 
 		//	If requested write the central value to a single file
