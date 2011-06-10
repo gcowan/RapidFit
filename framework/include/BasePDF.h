@@ -37,6 +37,9 @@ class BasePDF : public IPDF
 		//Return the function value at the given point
 		virtual double Evaluate( DataPoint* );
 
+		//Return the function value at the given point for use in numeric integral
+		virtual double EvaluateForNumericIntegral( DataPoint* );
+	
 		//Return the components of the function value at the given point
 		virtual vector<double> EvaluateComponents( DataPoint* );
 

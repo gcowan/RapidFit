@@ -11,10 +11,11 @@
 #define NORMALISED_SUM_PDF_H
 
 //	RapidFit Headers
-#include "IPDF.h"
+//#include "IPDF.h"
+#include "BasePDF.h"
 #include "RapidFitIntegrator.h"
 
-class NormalisedSumPDF : public IPDF
+class NormalisedSumPDF : public BasePDF
 {
 	public:
 		NormalisedSumPDF();

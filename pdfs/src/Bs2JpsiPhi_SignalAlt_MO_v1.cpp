@@ -148,7 +148,7 @@ bool Bs2JpsiPhi_SignalAlt_MO_v1::SetPhysicsParameters( ParameterSet * NewParamet
 	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
 	
 	// Do a test to ensure user is not using upper time acceptance wrongly
-	if( (((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE)) || (fabs(_mistag-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
+	if( (((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE)) || (fabs(mistag()-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
 	{
 		cout << " You appear to be trying to use the upper time acceptance but are using either resolution or are doing a tagged fit" << endl ;
 		cout << " This is not possible at present" << endl ;

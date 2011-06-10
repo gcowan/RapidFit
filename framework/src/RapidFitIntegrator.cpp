@@ -63,6 +63,7 @@ RapidFitIntegrator::~RapidFitIntegrator()
 //Return the integral over all observables
 double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, bool UseCache )
 {
+	
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 
@@ -92,6 +93,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 		haveTestedIntegral = true;
 		double testIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
 		double numericalIntegral = DoNumericalIntegral( NewDataPoint, NewBoundary, dontIntegrate );
+		cout << std::setprecision(5) ;
 
 		//Check if the function has an integrate method
 		if ( testIntegral > 0.0 )
@@ -100,7 +102,6 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			if ( true /*abs( numericalIntegral - testIntegral) / testIntegral < INTEGRAL_PRECISION_THRESHOLD*/ )
 			{
 				//Trust the function's integration
-				cout << std::setprecision(3) ;
 				cout << "Integration  Test: numerical : analytical   " << numericalIntegral << " :  " << testIntegral <<  "\t\t\tUsing ANALYTICAL in all cases" << endl;
 				ratioOfIntegrals = 1.;
 				functionCanIntegrate = true;

@@ -11,9 +11,10 @@
 #define SUM_PDF_H
 
 //	RapidFit Headers
-#include "IPDF.h"
+//#include "IPDF.h"
+#include "BasePDF.h"
 
-class SumPDF : public IPDF
+class SumPDF : public BasePDF
 {
 	public:
 		SumPDF();

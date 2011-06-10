@@ -17,20 +17,21 @@
 #include "framework/include/BasePDF.h"
 #endif
 
-#include "Bs2JpsiPhi_SignalAlt_BaseClass.h"
+#include "Bs2JpsiPhi_SignalAlt_BaseClass_dev.h"
 #include "RooComplex.h"
 
 #include <exception>
 
-class Bs2JpsiPhi_SignalAlt_MO_dev : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass
+class Bs2JpsiPhi_SignalAlt_MO_dev : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass_dev
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_MO_dev();
 		Bs2JpsiPhi_SignalAlt_MO_dev(PDFConfigurator);
 		~Bs2JpsiPhi_SignalAlt_MO_dev();
 
 		//Mandatory method to evaluate the PDF value:
+		virtual double EvaluateForNumericIntegral(DataPoint*) ;
 		virtual double Evaluate(DataPoint*);
+		virtual double EvaluateTimeOnly(DataPoint*) ;
 
 		//Other operating methods
 		virtual bool SetPhysicsParameters(ParameterSet*);
@@ -43,10 +44,6 @@ class Bs2JpsiPhi_SignalAlt_MO_dev : public BasePDF,  public Bs2JpsiPhi_SignalAlt
 	private:
 
 		void MakePrototypes();
-
-		bool normalisationCacheValid ;
-		double normalisationCacheValueRes1[3] ;
-		double normalisationCacheValueRes2[3] ;
 		
 };
 

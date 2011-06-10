@@ -18,22 +18,9 @@
 
 //......................................
 //Constructor(s)
-
-//Old one
-Bs2JpsiPhi_SignalAlt_MO_dev::Bs2JpsiPhi_SignalAlt_MO_dev() : 
-	  Bs2JpsiPhi_SignalAlt_BaseClass()
-	, normalisationCacheValid(false)
-{
-	MakePrototypes();	
-	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MO_dev " << std::endl ;
-}
-
-
 //New one with configurator
-
 Bs2JpsiPhi_SignalAlt_MO_dev::Bs2JpsiPhi_SignalAlt_MO_dev(PDFConfigurator configurator) : 
-Bs2JpsiPhi_SignalAlt_BaseClass(configurator)
-	, normalisationCacheValid(false)
+Bs2JpsiPhi_SignalAlt_BaseClass_dev(configurator)
 {
 	MakePrototypes();	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MO_dev " << std::endl ;
@@ -66,7 +53,7 @@ void Bs2JpsiPhi_SignalAlt_MO_dev::MakePrototypes()
 	parameterNames.push_back( delta_sName );
 	parameterNames.push_back( deltaMName );
 
-	if( useCosAndSin ) {
+	if( _useCosAndSin ) {
 		parameterNames.push_back( cosphisName );
 		parameterNames.push_back( sinphisName );
 	}
@@ -144,7 +131,7 @@ bool Bs2JpsiPhi_SignalAlt_MO_dev::SetPhysicsParameters( ParameterSet * NewParame
 	
 	delta_ms		= allParameters.GetPhysicsParameter( deltaMName )->GetValue();	
 
-	if(useCosAndSin){
+	if(_useCosAndSin){
 		_cosphis = allParameters.GetPhysicsParameter( cosphisName )->GetValue();
 		_sinphis = allParameters.GetPhysicsParameter( sinphisName )->GetValue();
 	}
@@ -177,18 +164,6 @@ bool Bs2JpsiPhi_SignalAlt_MO_dev::SetPhysicsParameters( ParameterSet * NewParame
 	angAccI9 = allParameters.GetPhysicsParameter( angAccI9Name )->GetValue();
 	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
 	
-	// Do a test to ensure user is not using upper time acceptance wrongly
-	if( (((fabs(resolution1-0.0)>DOUBLE_TOLERANCE) || (fabs(resolution2-0.0)>DOUBLE_TOLERANCE)) || (fabs(_mistag-0.5)>DOUBLE_TOLERANCE) || (fabs(phi_s-0.0)>DOUBLE_TOLERANCE)) && useUpperTimeAcceptance() )
-	{
-		cout << " You appear to be trying to use the upper time acceptance but are using either resolution or are doing a tagged fit" << endl ;
-		cout << " This is not possible at present" << endl ;
-		cout << " Resolution1 : " << resolution1 << endl ;
-		cout << " Resolution2 : " << resolution2 << endl ;
-		cout << " Mistag : " << mistag() << endl ;
-		cout << " Phi_s : " << phi_s <<  endl ;
-		throw(10) ;
-	}
-	
 	return result;
 }
 
@@ -198,8 +173,25 @@ vector<string> Bs2JpsiPhi_SignalAlt_MO_dev::GetDoNotIntegrateList()
 {
 	vector<string> list;
 	list.push_back(mistagName) ;
+	if( _numericIntegralTimeOnly ) {
+		list.push_back( cosThetaName );
+		list.push_back( cosPsiName ) ;
+		list.push_back( phiName ) ;
+	}	
 	return list;
 }
+
+
+//.............................................................
+//Calculate the PDF value for a given set of observables for use by numeric integral
+
+double Bs2JpsiPhi_SignalAlt_MO_dev::EvaluateForNumericIntegral(DataPoint * measurement) 
+{
+	if( _numericIntegralTimeOnly ) return this->EvaluateTimeOnly(measurement) ;
+	
+	else return this->Evaluate(measurement) ;
+}
+
 
 //.............................................................
 //Calculate the PDF value for a given set of observables
@@ -258,9 +250,71 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::Evaluate(DataPoint * measurement)
 		if( isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
+			
+	return returnValue ;	
+}
+
+
+//.............................................................
+//Calculate the PDF value for a given set of observables
+
+double Bs2JpsiPhi_SignalAlt_MO_dev::EvaluateTimeOnly(DataPoint * measurement)
+{
+	// Get observables into member variables
+	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
+	//ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
+	//phi_tr      = measurement->GetObservable( phiName )->GetValue();
+	//ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();
+	tag = (int)measurement->GetObservable( tagName )->GetValue();
+	_mistag = measurement->GetObservable( mistagName )->GetValue();
+	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
-	if( useLowerTimeAcceptance() ) return returnValue * timeAcceptance.acceptance(t);
-	else return returnValue ;
+	double val1, val2 ;
+	double returnValue ;
+	
+	if(resolution1Fraction >= 0.9999 ) {
+		resolution = resolution1 ;
+		returnValue = this->diffXsecTimeOnly( );
+	}
+	else {
+		resolution = resolution1 ;
+		val1 = this->diffXsecTimeOnly( );
+		resolution = resolution2 ;
+		val2 = this->diffXsecTimeOnly( );		
+		returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;				
+	}
+	
+	//conditions to throw exception
+	bool c1 = isnan(returnValue) ;
+	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
+	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&(fabs(resolution2-0.)<DOUBLE_TOLERANCE)) && (returnValue <= 0.) && (t>0.) ;	
+	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
+		cout << endl ;
+		cout << " Bs2JpsiPhi_SignalAlt_MO_dev::evaluate() returns <=0 or nan :" << returnValue << endl ;
+		cout << "   gamma " << gamma() << endl ;
+		cout << "   gl    " << gamma_l() << endl ;
+		cout << "   gh    " << gamma_h()  << endl;
+		cout << "   AT^2    " << AT()*AT() << endl;
+		cout << "   AP^2    " << AP()*AP() << endl;
+		cout << "   A0^2    " << A0()*A0() << endl ;
+		cout << "   AS^2    " << AS()*AS() << endl ;
+		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
+		cout << "   delta_ms       " << delta_ms << endl ;
+		cout << "   mistag         " << mistag() << endl ;
+		cout << "   mistagP1       " << _mistagP1 << endl ;
+		cout << "   mistagP0       " << _mistagP0 << endl ;
+		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
+		cout << " For event with:  " << endl ;
+		cout << "   time      " << t << endl ;
+		cout << "   ctheta_tr " << ctheta_tr << endl ;
+		cout << "   ctheta_1 " << ctheta_1 << endl ;
+		cout << "   phi_tr " << phi_tr << endl ;		
+		if( isnan(returnValue) ) throw 10 ;
+		if( returnValue <= 0. ) throw 10 ;
+	}
+	
+	
+	return returnValue ;
 	
 }
 
@@ -270,7 +324,9 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::Evaluate(DataPoint * measurement)
 
 double Bs2JpsiPhi_SignalAlt_MO_dev::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
-		
+
+	if( _numericIntegralForce ) return -1. ;
+
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset;
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();

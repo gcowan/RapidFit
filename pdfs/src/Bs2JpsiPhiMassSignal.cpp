@@ -58,20 +58,30 @@ double Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
   	double m_Bs = allParameters.GetPhysicsParameter( m_BsName )->GetValue();
 
 	// Get the observable
-        double mass = measurement->GetObservable( recoMassName )->GetValue();
+	double mass = measurement->GetObservable( recoMassName )->GetValue();
 
-	double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi()));
-	double factor2 = 1./(sigma_m2*sqrt(2.*TMath::Pi()));
-	double deltaMsq = ( mass - m_Bs )*( mass - m_Bs );
+	double returnValue = 0;
+	
+	if( f_sig_m1 > 0.9999 ) {
+		double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi()));
+		double deltaMsq = ( mass - m_Bs )*( mass - m_Bs );		
+		double exp1 = exp( -deltaMsq / ( 2. * sigma_m1 * sigma_m1 ) );
+		returnValue = factor1 * exp1 ;		
+	}
+	else {
+		double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi()));
+		double factor2 = 1./(sigma_m2*sqrt(2.*TMath::Pi()));
+		double deltaMsq = ( mass - m_Bs )*( mass - m_Bs );
+		double exp1 = exp( -deltaMsq / ( 2. * sigma_m1 * sigma_m1 ) );
+		double exp2 = exp( -deltaMsq / ( 2. * sigma_m2 * sigma_m2 ) );
+		returnValue = f_sig_m1 * factor1 * exp1 + (1. - f_sig_m1) * factor2 * exp2;
+	}
 
-	double exp1 = exp( -deltaMsq / ( 2. * sigma_m1 * sigma_m1 ) );
-	double exp2 = exp( -deltaMsq / ( 2. * sigma_m2 * sigma_m2 ) );
-
-	double val = f_sig_m1 * factor1 * exp1 + (1. - f_sig_m1) * factor2 * exp2;
-
-  	return val;
+  	return returnValue ;
 }
 
+
+// Normalisation
 double Bs2JpsiPhiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	//	Stupid gcc

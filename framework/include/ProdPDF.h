@@ -11,9 +11,10 @@
 #define PROD_PDF_H
 
 //	RapidFit Headers
-#include "IPDF.h"
+//#include "IPDF.h"
+#include "BasePDF.h"
 
-class ProdPDF : public IPDF
+class ProdPDF : public BasePDF
 {
 	public:
 		ProdPDF();

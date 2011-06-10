@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/10 Pete Clarke
+    - Completely revamped development PDF
+    - Bs2JPisPhi_SignalAlt_BaseClass_dev, Bs2JPisPhi_SignalAlt_MO_dev, Bs2JPisPhi_SignalAlt_MP_dev
+    - Added time acceptance by slices or numerical
+    - Changed mass signal pdf to be protected.
+    - Changed all PDF classes to inherit BasePDF instead of IPDF
+
 2011/06/06 Rob Currie
    - Added ObservableRef class. This is a slightly more constructed way of caching lookup information when accessing objects such as PhysicsParameters, Observbles and Constraints
        The construction of this object now means all classes have been transparently ported over to use this new object for communication

@@ -101,7 +101,9 @@ double IntegratorFunction::DoEval( const double * x ) const
 	}
 
 	//Evaluate
-	double result = wrappedFunction->Evaluate(newDataPoint);
+    //PELC   This change was made as part of the modificationt to allow integration over time only
+	//double result = wrappedFunction->Evaluate(newDataPoint);
+	double result = wrappedFunction->EvaluateForNumericIntegral(newDataPoint);
 	delete newDataPoint;
 	return result;
 }

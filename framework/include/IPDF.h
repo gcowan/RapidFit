@@ -44,6 +44,9 @@ class IPDF
 		//Return the function value at the given point
 		virtual double Evaluate( DataPoint* ) = 0;
 
+		//Return the function value at the given point for use by numeric integral
+		virtual double EvaluateForNumericIntegral( DataPoint* ) = 0;
+	
 		//Return the components of the function value at the given point
 		virtual vector<double> EvaluateComponents( DataPoint* ) = 0;
 

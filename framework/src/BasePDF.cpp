@@ -68,7 +68,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	else
 	{
 		//If the PDF normalisation does not depend on the DataPoint, cache the value to save time
-                cachedIntegral = Normalisation(NewBoundary);
+		cachedIntegral = Normalisation(NewBoundary);
 
 		//Check the cache is valid
 		if ( cachedIntegral > 0.0 )
@@ -126,6 +126,12 @@ double BasePDF::Evaluate(DataPoint * NewDataPoint)
 	(void)NewDataPoint;
 	//Just a default value
 	return  -1.0;
+}
+
+//Calculate the function value for numerical integration
+double BasePDF::EvaluateForNumericIntegral(DataPoint * NewDataPoint)
+{
+	return this->Evaluate( NewDataPoint ) ;
 }
 
 //Calculate the function value
