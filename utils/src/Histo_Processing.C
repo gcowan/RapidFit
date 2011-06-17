@@ -235,7 +235,7 @@ TGraph2D* Plot_From_Cut_lo( TTree* wanted_tree, TString Draw_String, TString Cut
 	return new_graph;
 }
 
-
+//	Return a TTree object composed from a vector of vector of data objects, I provide a stupid branch naming scheme
 TTree* vecvec2TTree( vector<vector<Float_t> > input_vec )
 {
 
@@ -263,6 +263,7 @@ TTree* vecvec2TTree( vector<vector<Float_t> > input_vec )
 	return new_tree;
 }
 
+//	This will be removed in future versions
 //pair<TH2*,TPolyMarker3D>* Plot_From_Cut_lo( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 )
 //{
 //	vector<vector<Float_t> > Coord_Data = Plotter_Data( input_tree, Draw_String, Cut_String, random );
@@ -337,6 +338,7 @@ void Physics_Plots( vector<TString> all_parameter_values, Float_t* best_fit_valu
 	}
 }
 
+//	Actually plot the Physics Parameter plots properly
 void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_parameter_values, TString param1string, TString param2string, TString outputdir, bool CV_Drift )
 {
 	for( unsigned short int i=0; i < all_parameter_values.size(); ++i )
@@ -346,6 +348,7 @@ void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_param
 
 		TCanvas* final_physics_canvas = new TCanvas( Name, Name, 1680, 1050 );
 
+		//	Use the RapidFit naming scheme to translate the parameter name back into latex characters
 		All_Physics_Plots[i]->SetTitle("");
 		All_Physics_Plots[i]->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2string ) );
 		All_Physics_Plots[i]->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1string ) );
@@ -357,11 +360,11 @@ void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_param
 
 		final_physics_canvas->Update();
 
+		//	See the object for FC Stats as to why this is here
 		TPaletteAxis *palette = (TPaletteAxis*)All_Physics_Plots[i]->GetListOfFunctions()->FindObject("palette");
-
 		palette->SetX1NDC(0.957);
 		palette->SetX2NDC(0.962);
-		palette->SetLabelSize(0.02);
+		palette->SetLabelSize((Float_t)0.02);
 		palette->GetAxis()->SetTickSize(0);
 		final_physics_canvas->Update();
 
@@ -374,6 +377,8 @@ void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_param
 	return;
 }
 
+//	Plot a 2D grid of points that contain data on a TGraph2D
+//	This allows for failing grid points and misssing grid jobs to be visualised and compared on a similar scale to explain any anomolies in other plots
 void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TString param2_val, TRandom3* random, TString Suffix, TString outputdir )
 {
 	TString Name("Canvas");
@@ -383,9 +388,10 @@ void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TStri
 	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
 	TString Draw_Str = param1_val + "_value:" + param2_val + "_value";
 	input_tree->Draw( Draw_Str, Cut_String );
-	TGraph* GRID_Graph = new TGraph( input_tree->GetSelectedRows(), input_tree->GetV2(), input_tree->GetV1() );
+	TGraph* GRID_Graph = new TGraph( (int)input_tree->GetSelectedRows(), input_tree->GetV2(), input_tree->GetV1() );
 	rand = random->Rndm();
 	TString GName= "Coord";GName+=rand;
+	//	Use Black squares to indicate if data was here or not, nothing more intelligent, nothing less
 	GRID_Graph->SetName( GName );
 	GRID_Graph->SetMarkerStyle(21);
 	GRID_Graph->SetMarkerSize(3);
@@ -394,11 +400,16 @@ void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TStri
 	GRID_Graph->SetName( Name );
 	GRID_Graph->Draw("P");
 	GRID->Update();
+	//	use the RapidFit nameing scheme
 	GRID_Graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2_val ) );
 	GRID_Graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1_val ) );
 	GRID->Print( outputdir + "/Coordinate_Grid"+Suffix+".png");
 }
 
+//	This Is HEAVILY WIP and attempts to use some more internal functions within the TGraph{,2D} objects to produce the Contours
+//	This could reduce the overheads introduced in this very intensive plotting algorithm
+//
+//	THIS SHOULD NOT BE CONSIDERED STABLE CODE AND MAY COMPILE BUT WILL PROBABLY TURN YOUR MACHINE INTO A MOLTEN WRECK
 void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name )
 {
 	(void) input_conts; (void) cont_num; 
@@ -438,7 +449,7 @@ void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_co
 			TPaletteAxis *palette = (TPaletteAxis*)input_graph->GetListOfFunctions()->FindObject("palette");
 			palette->SetX1NDC(0.957);
 			palette->SetX2NDC(0.962);
-			palette->SetLabelSize(0.02);
+			palette->SetLabelSize((Float_t)0.02);
 			palette->GetAxis()->SetTickSize(0);
 			Styled_Output_Canvas->Update();
 		}
@@ -510,6 +521,12 @@ void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_co
 	return;
 }
 
+//	Take a contour and plot on a given set of contours and provide, 4 plots:
+//	Tempterature plot,
+//	Contour Plot with 40 levels
+//	Contour Plot with the reuqested contours
+//	Black and White version of the above
+//	in .png & .pdf
 void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name )
 {
 	vector<TString> Plot_Type;
@@ -525,7 +542,7 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 
 	for( unsigned int i = 0; i < Plot_Type.size(); ++i )
 	{
-
+		//	Define Plot Type for the DrawString
 		if( i == 0 )	Draw_String = "colz";
 		if( i == 1 )	Draw_String = "cont1z";
 
@@ -538,9 +555,12 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 		Canvas_Name+=i;
 		TCanvas* Styled_Output_Canvas = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
 
+		//	Actually call plot function to create EVERYTHING on the convas
+		//	THIS SHOULD BE 1 COMMAND BUT ISN'T IN ROOT...
 		input_hist->Draw( Draw_String );
 		Styled_Output_Canvas->Update();
 
+		//	Temperature Plot
 		if( i == 0 )
 		{
 			input_hist->Draw( Draw_String );
@@ -548,16 +568,19 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
                         TPaletteAxis *palette = (TPaletteAxis*)input_hist->GetListOfFunctions()->FindObject("palette");
 			palette->SetX1NDC(0.957);
 			palette->SetX2NDC(0.962);
-			palette->SetLabelSize(0.02);
+			palette->SetLabelSize((Float_t)0.02);
 			palette->GetAxis()->SetTickSize(0);
 			Styled_Output_Canvas->Update();
 		}
 
+		//	Lots of Contours
 		if( i == 1 )
 		{
 			input_hist->SetContour(40);	
 		}
 
+
+		//	User requested Contours
 		if( i == 2 || i == 3 )
 		{
 			TObjArray *contObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
@@ -600,6 +623,7 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 
 		TString Output_Name = Base_Name + Plot_Type[i];
 
+		//	Actually Output the graphs to disk
 		addLHCbLabel( Name )->Draw();
 		input_hist->SetTitle("");
 		Styled_Output_Canvas->Update();
@@ -608,6 +632,8 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 		Styled_Output_Canvas->Print( Output_Name + ".pdf" );
 
 	}
+
+	//	Save the LL Contour that was user requested as a TGraph2D Object in a ROOT file
 
 	//	Lets conserve the efforts of this plotting tool :D
 	cout << endl << "Writing TH2D object for comparisons with other scans" << endl << endl;
@@ -625,6 +651,13 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 }
 
 
+//	Plot 2 canvased on top of each other
+//	This allows for 2 sets of contours (of equal number) to be chosen for each dataset
+//	
+//	TODO:	Allow for the Legend to be customised, easy step just takes time to code up
+//
+//	This adopts the namescheme to plot a FC scan atop a 2DLL plot but is generically written enough to allow 2 group TH2 objects to be placed atop each other
+//
 void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double *llconts, double* confs, TString outputdir )
 {
 	TCanvas* Temp_1 = new TCanvas("Temp","Temp",1680,1050);  
@@ -634,7 +667,7 @@ void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double 
 	vector<TGraph*> Contour_Lines;
 
 	//	Construct the Legend
-	TLegend *leg = new TLegend(0.75,0.89,0.95,0.7);
+	TLegend *leg = new TLegend(0.75,0.89,0.95,0.99);
 	leg->SetHeader("Conf. Levels");
 	leg->SetBorderSize(0);
 	leg->SetFillStyle(0);
@@ -738,6 +771,12 @@ void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double 
 	FC_Plot->SetContour(20);
 }
 
+//	Actually Perform an FC analysis on a RapidFit dataset containing the data
+//
+//	The data is extraced from the input_tree using various cutstrings built up from data in the 2DLL data contained within the dataset
+//
+//	the FC_Output object has output data placed in as the analysis is performed which allows for the FC_Stat object to simply review the output
+//	this stored things such as job efficiency/stability
 TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TString param2, TString NLL, TString Fit_Cut, double NLL_Global_Best, TTree* FC_Output, TString Double_Tolerance, TRandom3* random )
 {
 
@@ -781,10 +820,13 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 
 	vector<vector<Float_t> > Used_Coordinate;
 
-
+	//	Move the object definitions outside of the loop
 	bool Add_Point=true;
 	bool decision_1=true;
 	bool decision_2=true;
+	int j=0;
+	int Floated_Toy_Num=0;
+	int Fixed_Toy_Num=0;
 
 	//double rand=0;
 
@@ -798,7 +840,7 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 		Grid->GetEntry( i );
 
 		Add_Point = true;
-		for( unsigned int j=0; j < Used_Coordinate.size(); ++j )
+		for( j=0; j < (int)Used_Coordinate.size(); ++j )
 		{
 			decision_1 = true;
 			decision_2 = true;
@@ -824,12 +866,12 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 		TString Toys_At_Grid_Point = Param_1_Grid + "&&" + Param_2_Grid;
 
 		Floated_Toys_NLL = Get_Data( input_tree, Toys_At_Grid_Point, NLL );
-		Toy_Num = Floated_Toys_NLL.size();
+		Toy_Num = (int)Floated_Toys_NLL.size();
 
 		Toys_At_Grid_Point += "&&" + Fit_Cut;
 
 		Floated_Toys_NLL = Get_Data( input_tree, Toys_At_Grid_Point, NLL );
-		Successful_Toys = Floated_Toys_NLL.size();
+		Successful_Toys = (int)Floated_Toys_NLL.size();
 
 		TString float_param_1 = "(abs(" + param1_err + ")>" + Double_Tolerance + ")";
 		TString float_param_2 = "(abs(" + param2_err + ")>" + Double_Tolerance + ")";
@@ -845,22 +887,12 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 		//	Get all toys at this grid point that are Floated
 
 		Floated_Toys_NLL = Get_Data( input_tree, Floated_Toys_At_Grid_Point, NLL );
-		//TTree* Floated_Toys = input_tree->CopyTree( Floated_Toys_At_Grid_Point, "fast", input_tree->GetEntries() );
-		//TString Floated_Name("Floated_");
-		//rand = random->Rndm();
-		//Floated_Name+=rand;
-		//Floated_Toys->SetName(Floated_Name);
 
 		//	Get all toys at this grid point that are Fixed
 		Fixed_Toys_NLL = Get_Data( input_tree, Fixed_Toys_At_Grid_Point, NLL );
-		//TTree* Fixed_Toys = input_tree->CopyTree( Fixed_Toys_At_Grid_Point, "fast", input_tree->GetEntries() );
-		//TString Fixed_Name("Fixed_");
-		//rand = random->Rndm();
-		//Fixed_Name+=rand;
-		//Fixed_Toys->SetName(Fixed_Name);
 
-		int Floated_Toy_Num = int( Floated_Toys_NLL.size() );
-		int Fixed_Toy_Num = int( Fixed_Toys_NLL.size() );
+		Floated_Toy_Num = int( Floated_Toys_NLL.size() );
+		Fixed_Toy_Num = int( Fixed_Toys_NLL.size() );
 
 		if( Floated_Toy_Num != Fixed_Toy_Num )
 		{
@@ -873,27 +905,13 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 		//	By definition here!
 		Processed_Toys = Floated_Toy_Num;
 
-		//	Remember coordinates stored in param1gridpoints and param2gridpoints
-		//	With NLL values stored in NLL_Local_Best
-		//	This again would be nicer&easier if associated data was stored in the one object
-
-
-		//	Using GetEntry to look at each toy at each point so tell it where to store the value we get
-		//Float_t Floated_NLL=0, Fixed_NLL=0;
-		//Floated_Toys->SetBranchAddress( NLL, &Floated_NLL );
-		//Fixed_Toys->SetBranchAddress( NLL, &Fixed_NLL );
-
 		if( Fixed_Toy_Num != 0 ){
 
 			//Loop over the toys, pulling out the NLL ratio
 			UInt_t smaller_Toys = 0;
 
 			Double_t Ratio = NLL_Local_Best - NLL_Global_Best;
-			for(unsigned short int j = 0; j < Fixed_Toy_Num; ++j){
-
-				//	VERY MEMORY INTENSIVE!!!
-				//	Floated_Toys->GetEntry(j);
-				//	Fixed_Toys->GetEntry(j);
+			for( j = 0; j < Fixed_Toy_Num; ++j){
 
 				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
 				//if the toyratio is smaller than the data ratio at this point, increment:
@@ -957,6 +975,7 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 	return Returnable_Hist;
 }
 
+//	Plot some stats from the FC_Output ttree which stores some data from the full FC calculations
 void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand, TString outputdir )
 {
 	TString Name("FC_STAT_");
@@ -973,12 +992,16 @@ void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand,
 	Map_Names.push_back( "FC_Total_Toys.pdf" );
 	Map_Names.push_back( "FC_Toy_Efficiency.pdf" );
 
+	//	Working canvas, intended to be internal and never plotted
+	TCanvas* FC_Throw = new TCanvas( "throw", "throw", 1680, 1050);
+	TPaletteAxis* palette = NULL;
+
 	for( unsigned int i=0; i< all_plot_str.size(); ++i )
 	{
-		TCanvas* FC_throw = new TCanvas( "throw", "throw", 1680, 1050);
+		FC_Throw->cd();
 		FC_Output->Draw( all_plot_str[i] );
-		TGraph2D* FC_Stat_Graph = new TGraph2D( FC_Output->GetSelectedRows(), FC_Output->GetV2(), FC_Output->GetV1(), FC_Output->GetV3() );
-		FC_Stat_Graph->Draw(); FC_throw->Update();
+		TGraph2D* FC_Stat_Graph = new TGraph2D( (int)FC_Output->GetSelectedRows(), FC_Output->GetV2(), FC_Output->GetV1(), FC_Output->GetV3() );
+		FC_Stat_Graph->Draw(); FC_Throw->Update();
 		FC_Stat_Graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
 		FC_Stat_Graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
 		FC_Stat_Graph->Draw("P");
@@ -988,16 +1011,28 @@ void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand,
 		FC_Stat_Canvas->cd();
 		FC_Stat_Hist->Draw("colz");
 		FC_Stat_Canvas->Update();
-                TPaletteAxis *palette = (TPaletteAxis*)FC_Stat_Hist->GetListOfFunctions()->FindObject("palette");
+
+		//	Due to some part of the construction the labels for the temp key (right of the plot) are plotted off canvas
+		//	This is likely some net effect of doing something 'not quite ROOT'
+		//
+		//	Hence you can either resize the TFrame object containing the actual area where the plot is made,
+		//	OR:
+		//	Move and reisze the axis (which is something that is much easier and will likely always be less painful
+
+		//	Get the PaletteAxis for temperature graphs which is created as part of the Update axis
+                palette = (TPaletteAxis*)FC_Stat_Hist->GetListOfFunctions()->FindObject("palette");
+		//	Move it to a slightly better position
 		palette->SetX1NDC(0.957);
 		palette->SetX2NDC(0.962);
-		palette->SetLabelSize(0.02);
+		//	Reduce the text size of the axis to allow the numbers to be shown on part of the plot
+		palette->SetLabelSize((Float_t)0.02);
+		//	Remove the pointless axis markings...
 		palette->GetAxis()->SetTickSize(0);
+		//	Store the output
 		FC_Stat_Canvas->Update();
 		FC_Stat_Canvas->Print( outputdir + "/" + Map_Names[i] );
 	}
 
 	return;
 }
-
 
