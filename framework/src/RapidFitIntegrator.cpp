@@ -45,8 +45,8 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerica
 //	Don't want the projections to be insanely accurate
 void RapidFitIntegrator::ProjectionSettings()
 {
-	//	These functions only exist with ROOT > 5.26 I think, at least they exist in 5.28/29
-	#if ROOT_VERSION_CODE > ROOT_VERSION(5,26,0)
+	//	These functions only exist with ROOT > 5.28 I think, at least they exist in 5.28/29
+	#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
 		multiDimensionIntegrator->SetAbsTolerance( 1E-5 );	//	Absolute error for things such as plots
 		multiDimensionIntegrator->SetRelTolerance( 1E-4 );
 		multiDimensionIntegrator->SetMaxPts( 100000000 );

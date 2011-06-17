@@ -164,36 +164,41 @@ string XMLTag::FindNextTagOpen( vector<string> Content, int & LineNumber, int & 
 	//Loop over all lines
 	for ( unsigned int lineIndex = 0; lineIndex < Content.size(); ++lineIndex )
 	{
-		int openPosition = StringProcessing::CharacterPosition( Content[lineIndex], '<' );
-		if ( openPosition > -1 )
+		//	Ignore lines starting with '#'
+		if( Content[lineIndex].find('#')!=0 )
 		{
-			int closePosition = StringProcessing::CharacterPosition( Content[lineIndex], '>' );
-			if ( closePosition > openPosition )
+			int openPosition = StringProcessing::CharacterPosition( Content[lineIndex], '<' );
+			if ( openPosition > -1 )
 			{
-				//Tag is complete
-				string name( Content[lineIndex], unsigned(openPosition + 1), unsigned(closePosition - openPosition - 1) );
-
-				//Error check
-				if ( name.size() == 0 )
+				int closePosition = StringProcessing::CharacterPosition( Content[lineIndex], '>' );
+				if ( closePosition > openPosition )
 				{
-					cerr << "Found tag with no name in line: \"" << Content[lineIndex] << "\"" << endl;
+					//Tag is complete
+					string name( Content[lineIndex], unsigned(openPosition + 1), unsigned(closePosition - openPosition - 1) );
+	
+					//Error check
+						if ( name.size() == 0 )
+					{
+						cerr << "Found tag with no name in line: \"" << Content[lineIndex] << "\"" << endl;
+						exit(1);
+					}
+		
+					if ( name[0] == '/' )
+					{
+						cerr << "Found a closing tag <" << name << "> when opening tag expected" << endl;
+						exit(1);
+					}
+
+					LineNumber = int(lineIndex);
+					LinePosition = openPosition;
+					return name;
+				}
+				else
+				{
+					//Incomplete tag
+					cerr << "Incomplete XML tag in line: \"" << Content[lineIndex] << "\"" << endl;
 					exit(1);
 				}
-				if ( name[0] == '/' )
-				{
-					cerr << "Found a closing tag <" << name << "> when opening tag expected" << endl;
-					exit(1);
-				}
-
-				LineNumber = int(lineIndex);
-				LinePosition = openPosition;
-				return name;
-			}
-			else
-			{
-				//Incomplete tag
-				cerr << "Incomplete XML tag in line: \"" << Content[lineIndex] << "\"" << endl;
-				exit(1);
 			}
 		}
 	}

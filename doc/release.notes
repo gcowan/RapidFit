@@ -1,6 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
 2011/06/17 Rob Currie
+    - Added a simplistic functionality to comment out XML,                                        ANY line starting with a # character is ignored in the XML processor.
+        It's not perfect and cannot be used to half way through a line, however it is better than not having it
+    - Ammended the Macro code in RapidFitIntegrator to compile correctly against ROOT 5.27
+
+2011/06/17 Rob Currie
     - Some ammendments to the RapidPlot tool, made the Corrdinate plotting work in a better way, added a statisical review of FC data
     - Fixed the palette object in temp plots
       Again, this is very modular design which just works when built using the Makefile... still looking into wether I should compile static libraries or not when compiling with cmake
