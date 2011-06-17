@@ -75,9 +75,9 @@ void EdStyle::SetStyle()
 	gStyle->SetLabelSize(Float_t(0.05),"y");
 	gStyle->SetLabelSize(Float_t(0.05),"z");
 	gStyle->SetTitleFont(Style_t(lhcbFont));
-	gStyle->SetTitleSize(Float_t(0.06),"x");
-	gStyle->SetTitleSize(Float_t(0.06),"y");
-	gStyle->SetTitleSize(Float_t(0.06),"z");
+	gStyle->SetTitleSize(Float_t(0.05),"x");
+	gStyle->SetTitleSize(Float_t(0.05),"y");
+	gStyle->SetTitleSize(Float_t(0.05),"z");
 
 	// use bold lines and markers
 	gStyle->SetLineWidth(lhcbWidth);

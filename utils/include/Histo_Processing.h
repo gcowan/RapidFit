@@ -42,7 +42,7 @@ void Physics_Plots( vector<TString> all_parameter_values, Float_t* best_fit_valu
 
 void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_parameter_values, TString param1string, TString param2string, TString outputdir, bool CV_Drift );
 
-TH1* LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TString param2_val, TRandom3* random, TString Suffix );
+void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TString param2_val, TRandom3* random, TString Suffix, TString outputdir );
 
 void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name );
 
@@ -52,7 +52,7 @@ void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double 
 
 TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TString param2, TString NLL, TString Fit_Cut, double NLL_Global_Best, TTree* FC_Output, TString Double_Tolerance, TRandom3* random );
 
-
+void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand, TString outputdir );
 
 vector<vector<Float_t> > Plotter_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random );
 

@@ -3,6 +3,7 @@
 #include "TH1.h"
 #include "TAxis.h"
 #include "TString.h"
+#include "TPolyMarker.h"
 #include "TPolyMarker3D.h"
 #include "TCanvas.h"
 #include "TH1.h"
@@ -15,6 +16,7 @@
 #include "TList.h"
 #include "TRandom3.h"
 #include "TROOT.h"
+#include "TPaletteAxis.h"
 //	RapidFit Header
 #include "EdStyle.h"
 //	RapidFit Utils Headers
@@ -355,6 +357,14 @@ void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_param
 
 		final_physics_canvas->Update();
 
+		TPaletteAxis *palette = (TPaletteAxis*)All_Physics_Plots[i]->GetListOfFunctions()->FindObject("palette");
+
+		palette->SetX1NDC(0.95);
+		palette->SetX2NDC(0.955);
+		palette->SetTitleSize(0.05);
+		palette->SetTitleOffset(-1);
+		final_physics_canvas->Update();
+
 		//	Output Filename for the Plot
 		TString Output_File( outputdir );
 		Output_File+= "/" + all_parameter_values[i] + ".png";
@@ -364,7 +374,7 @@ void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_param
 	return;
 }
 
-TH1* LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TString param2_val, TRandom3* random, TString Suffix )
+void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TString param2_val, TRandom3* random, TString Suffix, TString outputdir )
 {
 	TString Name("Canvas");
 	double rand = random->Rndm();
@@ -373,10 +383,15 @@ TH1* LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TStri
 	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
 	TString Draw_Str = param1_val + ":" + param2_val;
 	input_tree->Draw( Draw_Str, Cut_String );
-	//GRID->Print("Coordinate_Grid"+Suffix+".png");
-	(void) GRID;
-	(void) Suffix;
-	return input_tree->GetHistogram();
+	TGraph* GRID_Graph = new TGraph( input_tree->GetSelectedRows(), input_tree->GetV2(), input_tree->GetV1() );
+	rand = random->Rndm();
+	TString GName= "Coord";GName+=rand;
+	GRID_Graph->SetName( GName );
+	GRID_Graph->SetMarkerStyle(21);
+	GRID_Graph->SetMarkerSize(3);
+	GRID_Graph->Draw("P");
+	GRID->Update();
+	GRID->Print( outputdir + "/Coordinate_Grid"+Suffix+".png");
 }
 
 void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name )
@@ -414,6 +429,12 @@ void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_co
 		if( i == 0 )
 		{
 			input_graph->Draw( Draw_String );
+			Styled_Output_Canvas->Update();
+			TPaletteAxis *palette = (TPaletteAxis*)input_graph->GetListOfFunctions()->FindObject("palette");
+			palette->SetX1NDC(0.95);
+			palette->SetX2NDC(0.955);
+			palette->SetTitleSize(0.05);
+			palette->SetTitleOffset(-1);
 			Styled_Output_Canvas->Update();
 		}
 
@@ -519,6 +540,17 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 		{
 			input_hist->Draw( Draw_String );
 			Styled_Output_Canvas->Update();
+                        TPaletteAxis *palette = (TPaletteAxis*)input_hist->GetListOfFunctions()->FindObject("palette");
+			palette->SetX1NDC(0.95);
+			palette->SetX2NDC(0.955);
+			palette->SetTitleSize(0.05);
+			palette->SetTitleOffset(-1);
+			Styled_Output_Canvas->Update();
+		}
+
+		if( i == 1 )
+		{
+			input_hist->SetContour(40);	
 		}
 
 		if( i == 2 || i == 3 )
@@ -720,18 +752,27 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 
 	//	Easiest to store the output in a new TTree
 	//	Want to store the CL calculated at every point and the efficiency of Toys at this coordinate
-	Float_t CL=0., Toy_Num=0., Successful_Toys=0., Processed_Toys=0., Fit_Status=3.;
+	Float_t CL=0.;
+	Int_t Toy_Num=0, Successful_Toys=0, Processed_Toys=0, Fit_Status=3;
 	TString CL_Branch = "CL";
+	TString CL_Branch_Type = "CL/F";
 	TString Success_Branch = "Success";
+	TString Success_Branch_Type = "Success/I";
 	TString Total_Branch = "Total";
+	TString Total_Branch_Type = "Total/I";
 	TString Processed_Toys_Branch = "Processed_Toys";
-	FC_Output->Branch( CL_Branch, &CL );
-	FC_Output->Branch( Success_Branch, &Successful_Toys );
-	FC_Output->Branch( Total_Branch, &Toy_Num );
-	FC_Output->Branch( param1_val, &Param_1_Coord );
-	FC_Output->Branch( param2_val, &Param_2_Coord );
-	FC_Output->Branch( Processed_Toys_Branch, &Processed_Toys );
-	FC_Output->Branch( "Fit_Status", &Fit_Status );
+	TString Processed_Toys_Branch_Type = "Processed_Toys/I";
+	TString param1_val_type = param1_val + "/F";
+	TString param2_val_type = param2_val + "/F";
+	TString Fit_Status_Str = "Fit_Status";
+	TString Fit_Status_Type = Fit_Status_Str + "/I";
+	FC_Output->Branch( CL_Branch, &CL, CL_Branch_Type );
+	FC_Output->Branch( Success_Branch, &Successful_Toys, Success_Branch_Type );
+	FC_Output->Branch( Total_Branch, &Toy_Num, Total_Branch_Type );
+	FC_Output->Branch( param1_val, &Param_1_Coord, param1_val_type );
+	FC_Output->Branch( param2_val, &Param_2_Coord, param2_val_type );
+	FC_Output->Branch( Processed_Toys_Branch, &Processed_Toys, Processed_Toys_Branch_Type );
+	FC_Output->Branch( Fit_Status_Str, &Fit_Status, Fit_Status_Type );
 
 	vector<vector<Float_t> > Used_Coordinate;
 
@@ -778,12 +819,12 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 		TString Toys_At_Grid_Point = Param_1_Grid + "&&" + Param_2_Grid;
 
 		Floated_Toys_NLL = Get_Data( input_tree, Toys_At_Grid_Point, NLL );
-		Toy_Num = Float_t( Floated_Toys_NLL.size() );
+		Toy_Num = Floated_Toys_NLL.size();
 
 		Toys_At_Grid_Point += "&&" + Fit_Cut;
 
 		Floated_Toys_NLL = Get_Data( input_tree, Toys_At_Grid_Point, NLL );
-		Successful_Toys = Float_t( Floated_Toys_NLL.size() );
+		Successful_Toys = Floated_Toys_NLL.size();
 
 		TString float_param_1 = "(abs(" + param1_err + ")>" + Double_Tolerance + ")";
 		TString float_param_2 = "(abs(" + param2_err + ")>" + Double_Tolerance + ")";
@@ -825,7 +866,7 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 		}
 
 		//	By definition here!
-		Processed_Toys = Float_t(Floated_Toy_Num);
+		Processed_Toys = Floated_Toy_Num;
 
 		//	Remember coordinates stored in param1gridpoints and param2gridpoints
 		//	With NLL values stored in NLL_Local_Best
@@ -910,3 +951,47 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 
 	return Returnable_Hist;
 }
+
+void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand, TString outputdir )
+{
+	TString Name("FC_STAT_");
+	Name+= rand->Rndm();
+	TCanvas* FC_Stat_Canvas = new TCanvas( Name, Name, 1680, 1050 );
+
+	TString Total_Toy_Map = param1 + "_value:" + param2 + "_value:" + "Processed_Toys";
+	TString Toy_Efficiency_Map = param1 + "_value:" + param2 + "_value:" + "(Processed_Toys/(Total/2))";
+
+	vector<TString> all_plot_str;
+	all_plot_str.push_back( Total_Toy_Map );
+	all_plot_str.push_back( Toy_Efficiency_Map );
+	vector<TString> Map_Names;
+	Map_Names.push_back( "FC_Total_Toys.pdf" );
+	Map_Names.push_back( "FC_Toy_Efficiency.pdf" );
+
+	for( unsigned int i=0; i< all_plot_str.size(); ++i )
+	{
+		TCanvas* FC_throw = new TCanvas( "throw", "throw", 1680, 1050);
+		FC_Output->Draw( all_plot_str[i] );
+		TGraph2D* FC_Stat_Graph = new TGraph2D( FC_Output->GetSelectedRows(), FC_Output->GetV2(), FC_Output->GetV1(), FC_Output->GetV3() );
+		FC_Stat_Graph->Draw(); FC_throw->Update();
+		FC_Stat_Graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
+		FC_Stat_Graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
+		FC_Stat_Graph->Draw("P");
+		FC_Stat_Canvas->Update();
+		TH1* FC_Stat_Hist = FC_Stat_Graph->GetHistogram();
+		FC_Stat_Canvas->cd();
+		FC_Stat_Hist->Draw("colz");
+		FC_Stat_Canvas->Update();
+                TPaletteAxis *palette = (TPaletteAxis*)FC_Stat_Hist->GetListOfFunctions()->FindObject("palette");
+		palette->SetX1NDC(0.95);
+		palette->SetX2NDC(0.955);
+		palette->SetTitleSize(0.05);
+		palette->SetTitleOffset(-1);
+		FC_Stat_Canvas->Update();
+		FC_Stat_Canvas->Print( outputdir + "/" + Map_Names[i] );
+	}
+
+	return;
+}
+
+

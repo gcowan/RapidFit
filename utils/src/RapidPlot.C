@@ -69,7 +69,7 @@ int main( int argc, char* argv[] )
 
 	//	Switches for different plotting
 	bool CV_Drift = false;
-	bool Want_Physics_Params = false;
+	bool Want_Physics_Params=true;
 	bool want_FC = true;
 	bool high_res = true;	//	False method may only call plot fully once... still in development
 
@@ -144,7 +144,7 @@ int main( int argc, char* argv[] )
 	//	General Cuts to be applied for various plots
 
 	//	Fit_Status == 3
-	TString Fit_Cut = "(abs(" + Fit_Status + "-3.0)<"+Double_Tolerance+")&&NLL>30400";
+	TString Fit_Cut = "(abs(" + Fit_Status + "-3.0)<"+Double_Tolerance+")";
 
 
 	//	param1_gen == notgen	&&	param1_err == 0
@@ -198,13 +198,8 @@ int main( int argc, char* argv[] )
 	//	Plot the distribution of successfully fitted grid points for the PLL scan
 	//	NB:	For FC this will likely saturate due to multiple layers of fits
 	cout << endl << "FOUND UNIQUE GRID POINTS, PLOTTING" << endl;
-	TCanvas* grid_c = new TCanvas("Grid_C","Grid_C",1680,1050);
-	TH1* GRID_PLOT = LL2D_Grid( allresults, Fit_Cut, param1_val, param2_val, rand_gen, "LL" );
-	grid_c->cd();
-	GRID_PLOT->Draw();
-	grid_c->Update();
-	grid_c->Print( outputdir+"/Coordinates.png");
-	grid_c->Print( outputdir+"/Coordinates.pdf");
+
+	LL2D_Grid( allresults, Fit_Cut_String, param1_val, param2_val, rand_gen, "LL", outputdir );
 
 	//	Construct a plot string for the NLL plot and plot it
 
@@ -250,6 +245,7 @@ int main( int argc, char* argv[] )
 		cout << "FOUND TOYS IN FILE, PLOTTING FC" <<endl;
 		FC_Plot = FC_TOYS( allresults, Fit_Cut_String, param1string, param2string, NLL, Fit_Cut, Global_Best_NLL, FC_Output, Double_Tolerance, rand_gen );
 
+		FC_Stats( FC_Output, param1string, param2string, rand_gen, outputdir );
 		//LL2D_Grid( FC_Output, Fit_Cut, param1_val, param2_val, rand_gen, "FC" );
 	}
 
