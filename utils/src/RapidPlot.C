@@ -199,7 +199,7 @@ int main( int argc, char* argv[] )
 	//	NB:	For FC this will likely saturate due to multiple layers of fits
 	cout << endl << "FOUND UNIQUE GRID POINTS, PLOTTING" << endl;
 
-	LL2D_Grid( allresults, Fit_Cut_String, param1_val, param2_val, rand_gen, "LL", outputdir );
+	LL2D_Grid( allresults, Fit_Cut_String, param1string, param2string, rand_gen, "LL", outputdir );
 
 	//	Construct a plot string for the NLL plot and plot it
 

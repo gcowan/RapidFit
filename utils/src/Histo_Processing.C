@@ -359,10 +359,10 @@ void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_param
 
 		TPaletteAxis *palette = (TPaletteAxis*)All_Physics_Plots[i]->GetListOfFunctions()->FindObject("palette");
 
-		palette->SetX1NDC(0.95);
-		palette->SetX2NDC(0.955);
-		palette->SetTitleSize(0.05);
-		palette->SetTitleOffset(-1);
+		palette->SetX1NDC(0.957);
+		palette->SetX2NDC(0.962);
+		palette->SetLabelSize(0.02);
+		palette->GetAxis()->SetTickSize(0);
 		final_physics_canvas->Update();
 
 		//	Output Filename for the Plot
@@ -381,7 +381,7 @@ void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TStri
 	Name+=rand;
 	TCanvas* GRID = new TCanvas(Name,Name,1680,1050);
 	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
-	TString Draw_Str = param1_val + ":" + param2_val;
+	TString Draw_Str = param1_val + "_value:" + param2_val + "_value";
 	input_tree->Draw( Draw_Str, Cut_String );
 	TGraph* GRID_Graph = new TGraph( input_tree->GetSelectedRows(), input_tree->GetV2(), input_tree->GetV1() );
 	rand = random->Rndm();
@@ -389,8 +389,13 @@ void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TStri
 	GRID_Graph->SetName( GName );
 	GRID_Graph->SetMarkerStyle(21);
 	GRID_Graph->SetMarkerSize(3);
+	GRID_Graph->SetTitle("");
+	Name+=random->Rndm();
+	GRID_Graph->SetName( Name );
 	GRID_Graph->Draw("P");
 	GRID->Update();
+	GRID_Graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2_val ) );
+	GRID_Graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1_val ) );
 	GRID->Print( outputdir + "/Coordinate_Grid"+Suffix+".png");
 }
 
@@ -431,10 +436,10 @@ void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_co
 			input_graph->Draw( Draw_String );
 			Styled_Output_Canvas->Update();
 			TPaletteAxis *palette = (TPaletteAxis*)input_graph->GetListOfFunctions()->FindObject("palette");
-			palette->SetX1NDC(0.95);
-			palette->SetX2NDC(0.955);
-			palette->SetTitleSize(0.05);
-			palette->SetTitleOffset(-1);
+			palette->SetX1NDC(0.957);
+			palette->SetX2NDC(0.962);
+			palette->SetLabelSize(0.02);
+			palette->GetAxis()->SetTickSize(0);
 			Styled_Output_Canvas->Update();
 		}
 
@@ -541,10 +546,10 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 			input_hist->Draw( Draw_String );
 			Styled_Output_Canvas->Update();
                         TPaletteAxis *palette = (TPaletteAxis*)input_hist->GetListOfFunctions()->FindObject("palette");
-			palette->SetX1NDC(0.95);
-			palette->SetX2NDC(0.955);
-			palette->SetTitleSize(0.05);
-			palette->SetTitleOffset(-1);
+			palette->SetX1NDC(0.957);
+			palette->SetX2NDC(0.962);
+			palette->SetLabelSize(0.02);
+			palette->GetAxis()->SetTickSize(0);
 			Styled_Output_Canvas->Update();
 		}
 
@@ -906,7 +911,7 @@ TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TStrin
 			cerr << "\t" << Param_1_Coord << ":" << Param_2_Coord << "\tWARNING: NO TOYS FOUND HERE! " << endl;
 			CL = +9999.;	//	This plots a spike here which shows on contours
 		}
-		cout << Processed_Toys << "\tTOYS PROCESSED AT:\t" << setprecision(4) << Param_1_Coord << "\t:\t" << Param_2_Coord << endl;
+		cout << Processed_Toys << "\tTOYS PROCESSED AT:\t" << setprecision(4) << setw(10) << Param_1_Coord << "   :" << setw(10) << Param_2_Coord << endl;
 		//	Store the relevent information for plotting in the FC_Output TTree
 		FC_Output->Fill();
 	}
@@ -979,14 +984,15 @@ void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand,
 		FC_Stat_Graph->Draw("P");
 		FC_Stat_Canvas->Update();
 		TH1* FC_Stat_Hist = FC_Stat_Graph->GetHistogram();
+		FC_Stat_Hist->SetTitle("");
 		FC_Stat_Canvas->cd();
 		FC_Stat_Hist->Draw("colz");
 		FC_Stat_Canvas->Update();
                 TPaletteAxis *palette = (TPaletteAxis*)FC_Stat_Hist->GetListOfFunctions()->FindObject("palette");
-		palette->SetX1NDC(0.95);
-		palette->SetX2NDC(0.955);
-		palette->SetTitleSize(0.05);
-		palette->SetTitleOffset(-1);
+		palette->SetX1NDC(0.957);
+		palette->SetX2NDC(0.962);
+		palette->SetLabelSize(0.02);
+		palette->GetAxis()->SetTickSize(0);
 		FC_Stat_Canvas->Update();
 		FC_Stat_Canvas->Print( outputdir + "/" + Map_Names[i] );
 	}
