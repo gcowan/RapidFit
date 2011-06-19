@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/19 Rob Currie
+    - Added some further improvements to the RapidPlot and RapidLL tools for plotting the output of various jobs
+         Expanded RapidPlot to optionally plot the variation in parameter error and pull across a 2D plane (not a bad feature for <10 lines of code)
+         Also added more clear usage instructions to the tools, but don't have the time to expand it as fully as for RapidFit itself but it's an improvement
+         Caught an usual bit of behaviour from ROOT in one of the algorithms in the Histo_Processing library
+         Improved the Plot_Both function to allow it to be easily expanded which should mean that in time the merge tool can be ported to it to simply process runtime arguments
+
 2011/06/17 Rob Currie
     - Added a simplistic functionality to comment out XML,                                        ANY line starting with a # character is ignored in the XML processor.
         It's not perfect and cannot be used to half way through a line, however it is better than not having it

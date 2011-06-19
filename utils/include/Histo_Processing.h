@@ -56,7 +56,7 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name );
 
 //	Plot 2 TH2 object contours on the same TCanvas
-void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double *llconts, double* confs, TString outputdir );
+void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double *llconts, double* confs, TString outputdir, TString Legend_Name_1="NLL", TString Legend_Name_2="FC" );
 
 //	Perform the full FC analysis on a RapidFit dataset
 TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TString param2, TString NLL, TString Fit_Cut, double NLL_Global_Best, TTree* FC_Output, TString Double_Tolerance, TRandom3* random );

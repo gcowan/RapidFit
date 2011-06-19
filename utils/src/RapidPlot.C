@@ -39,6 +39,30 @@ using namespace::std;
 
 int main( int argc, char* argv[] )
 {
+cout << endl;
+cout << "        8888888b.                 d8b     888   8888888b. 888        888"<<endl;
+cout << "        888   Y88b                Y8P     888   888   Y88b888        888"<<endl;
+cout << "        888    888                        888   888    888888        888"<<endl;
+cout << "        888   d88P 8888b. 88888b. 888 .d88888   888   d88P888 .d88b. 888888"<<endl;
+cout << "        8888888P\"     \"88b888 \"88b888d88\" 888   8888888P\" 888d88\"\"88b888"<<endl;
+cout << "        888 T88b  .d888888888  888888888  888   888       888888  888888"<<endl;
+cout << "        888  T88b 888  888888 d88P888Y88b 888   888       888Y88..88PY88b."<<endl;
+cout << "        888   T88b\"Y88888888888P\" 888 \"Y88888   888       888 \"Y88P\"  \"Y888"<<endl;
+cout << "                          888"<<endl;
+cout << "                          888"<<endl;
+cout << "                          888"<<endl;
+cout << endl;
+
+cout << "Usage:" << endl;
+cout << "\t" << argv[0] << "\tSomeFile.root\t" << "phys_param1\tphys_param2\toutput_directory" << endl;
+cout << endl << "\teg:\t" << argv[0] << "\tLLcontourData.root\tdeltaGamma\tPhi_s\toutputdir"<<endl;
+cout << endl;
+cout << "6th (Optional) Option:"<<endl;
+cout << "\t\t\tCV\t\t(Plot the CV of 'nuisence' Physics Parameters)"<<endl;
+cout << "\t\t\tRelCV\t\t(Plot the variation in the CV of the 'nuisence' Physics Parameters)"<<endl;
+cout << "\t\t\tExtraCV\t\t(Plot all of the CV, errors and pulls for each 'nuisence' Physics Parameter)"<<endl;
+cout << "\t\t\tNOFC\t\t(Don't process FC data in a file if any is there)"<<endl;
+cout << endl;
 	if( (argc != 5) && (argc != 6) ) exit(-1);
 	//	Use UUID based seed from ROOT, just used for unique identification of ROOT objects
 	TRandom3* rand_gen = new TRandom3(0);
@@ -69,13 +93,17 @@ int main( int argc, char* argv[] )
 
 	//	Switches for different plotting
 	bool CV_Drift = false;
-	bool Want_Physics_Params=true;
+	bool Want_Physics_Params=false;
+	bool Want_Extra_Physics_Param_Info=false;
 	bool want_FC = true;
 	bool high_res = true;	//	False method may only call plot fully once... still in development
 
 	if( argc == 6 )
 	{
-		Want_Physics_Params = ( TString(argv[5]) == "CVPlots" );
+		if( string(argv[5]) == "CV" )	   Want_Physics_Params = true;
+		if( string(argv[5]) == "RelCV" )   CV_Drift = true;
+		if( string(argv[5]) == "ExtraCV" ) Want_Extra_Physics_Param_Info = true;
+		if( string(argv[5]) == "NOFC" )    want_FC = false;
 	}
 
 	//	Strings that are universally defined
@@ -85,6 +113,7 @@ int main( int argc, char* argv[] )
 	TString notgen = "-9999.";
 	TString error_suffix = "_error";
 	TString value_suffix = "_value";
+	TString pull_suffix = "_pull";
 	TString gen_suffix = "_gen";
 	TString Copy_Option = "fast";
 
@@ -105,7 +134,8 @@ int main( int argc, char* argv[] )
 	vector<TString> all_parameters = get_branch_names( allresults );
 	//	Get a list of all branches in allresults with '_value' in their name
 	vector<TString> all_parameter_values = filter_names( all_parameters, value_suffix );
-
+	vector<TString> all_parameter_errors = filter_names( all_parameters, error_suffix );
+	vector<TString> all_parameter_pulls = filter_names( all_parameters, pull_suffix );
 
 
 	//	Now to read in the Global Minima
@@ -225,6 +255,8 @@ int main( int argc, char* argv[] )
 
 	//	Array storing the addresses of all of the Physics Plots still in memory
 	TH2** All_Physics_Plots = new TH2*[all_parameter_values.size()];
+	TH2** All_Physics_Errors = new TH2*[all_parameter_values.size()];
+	TH2** All_Physics_Pulls = new TH2*[all_parameter_values.size()];
 	//	Making use of switch
 	if( Want_Physics_Params )
 	{
@@ -232,6 +264,19 @@ int main( int argc, char* argv[] )
 		Physics_Plots( all_parameter_values, best_fit_values, allresults, rand_gen, Param1_Param2, CV_Drift, All_Physics_Plots, Fit_Cut_String);
 		cout << endl << "Finalising CV Plots" << endl << endl;
 		Finalize_Physics_Plots( All_Physics_Plots, all_parameter_values, param1string, param2string, outputdir, CV_Drift );
+		if( Want_Extra_Physics_Param_Info )
+		{
+                //      Physics Plots
+		//      
+		//      Passing false as Highly unlikely that I will 'ever' want to watch error/pull drift rather than the absolute value
+
+			Float_t* null_pointer=NULL;
+			Physics_Plots( all_parameter_errors, null_pointer, allresults, rand_gen, Param1_Param2, false, All_Physics_Errors, Fit_Cut_String);
+			Physics_Plots( all_parameter_pulls, null_pointer, allresults, rand_gen, Param1_Param2, false, All_Physics_Pulls, Fit_Cut_String);
+			cout << endl << "Finalising Extra CV Plots" << endl << endl;
+			Finalize_Physics_Plots( All_Physics_Errors, all_parameter_errors, param1string, param2string, outputdir, false );
+			Finalize_Physics_Plots( All_Physics_Pulls, all_parameter_pulls, param1string, param2string, outputdir, false );
+		}
 	}
 
 

@@ -25,8 +25,34 @@ using namespace::std;
 
 int main( int argc, char* argv[] )
 {
+	cout<<" .----------------.  .----------------.  .----------------.  .----------------.  .----------------."<<endl;
+	cout<<" | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |"<<endl;
+	cout<<" | |  _______     | || |      __      | || |   ______     | || |     _____    | || |  ________    | |"<<endl;
+	cout<<" | | |_   __ \\    | || |     /  \\     | || |  |_   __ \\   | || |    |_   _|   | || | |_   ___ `.  | |"<<endl;
+	cout<<" | |   | |__) |   | || |    / /\\ \\    | || |    | |__) |  | || |      | |     | || |   | |   `. \\ | |"<<endl;
+	cout<<" | |   |  __ /    | || |   / ____ \\   | || |    |  ___/   | || |      | |     | || |   | |    | | | |"<<endl;
+	cout<<" | |  _| |  \\ \\_  | || | _/ /    \\ \\_ | || |   _| |_      | || |     _| |_    | || |  _| |___.' / | |"<<endl;
+	cout<<" | | |____| |___| | || ||____|  |____|| || |  |_____|     | || |    |_____|   | || | |________.'  | |"<<endl;
+	cout<<" | |              | || |              | || |              | || |              | || |              | |"<<endl;
+	cout<<" | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |"<<endl;
+	cout<<"  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'"<<endl;
+	cout<<"  .----------------.  .----------------."<<endl;
+	cout<<" | .--------------. || .--------------. |"<<endl;
+	cout<<" | |   _____      | || |   _____      | |"<<endl;
+	cout<<" | |  |_   _|     | || |  |_   _|     | |"<<endl;
+	cout<<" | |    | |       | || |    | |       | |"<<endl;
+	cout<<" | |    | |   _   | || |    | |   _   | |"<<endl;
+	cout<<" | |   _| |__/ |  | || |   _| |__/ |  | |"<<endl;
+	cout<<" | |  |________|  | || |  |________|  | |"<<endl;
+	cout<<" | |              | || |              | |"<<endl;
+	cout<<" | '--------------' || '--------------' |"<<endl;
+	cout<<"  '----------------'  '----------------'"<<endl;
+	cout <<endl;
+	cout << "Usage:"<<endl;
 	cout << endl << argv[0] << "\t" << "Param_to_plot" << "\t" << "File1.root" << "\t" << "File2.root" << "\t...\t" << "FileN.root" << endl;
+	cout <<endl;
 
+	if( argc < 3 ) exit(-5);
 	//	Do this before any Canvas is constructed
 	//	ROOT is a BITCH for not allowing you to easily change internal crap
 	//      Setup the Canvas and such
@@ -116,8 +142,8 @@ int main( int argc, char* argv[] )
 		_1D_Draw_String = NLL_Draw_String + ":" + Param_Of_Choice + value_suffix;
 
 		ALL_Draw_Strings.push_back( _1D_Draw_String );
-                cout << ALL_Draw_Strings.back() << endl;
-        }
+		cout << ALL_Draw_Strings.back() << endl;
+	}
 
 	TCanvas* new_canvas = new TCanvas("Output", "Output", 1680, 1050 );
 
@@ -189,8 +215,8 @@ int main( int argc, char* argv[] )
 		mg->GetYaxis()->SetRangeUser( 0., 5. );
 		//	This was an attempt to get the range to auto adust
 		new_canvas->Update();
-        	xmax = mg->GetXaxis()->GetXmax();
-        	xmin = mg->GetXaxis()->GetXmin();
+		xmax = mg->GetXaxis()->GetXmax();
+		xmin = mg->GetXaxis()->GetXmin();
 		TLine *error_line = new TLine( xmin, error, xmax, error);
 		error_line->SetLineColor( Color_t(3) );
 		TLine *param_error = NULL;
@@ -204,22 +230,22 @@ int main( int argc, char* argv[] )
 		{
 			param_error = new TLine( 0.06-0.06, error, 0.06+0.06, error);
 		} else if( Param_Of_Choice == "Azero_sq" )
-        	{
+		{
 			param_error = new TLine( 0.6-0.015, error, 0.6+0.015, error);
-        	} else if( Param_Of_Choice == "Aperp_sq" )
-        	{
+		} else if( Param_Of_Choice == "Aperp_sq" )
+		{
 			param_error = new TLine( 0.16-0.02, error, 0.16+0.02, error);
-        	} else if( Param_Of_Choice == "delta_para" )
-        	{
+		} else if( Param_Of_Choice == "delta_para" )
+		{
 			param_error = new TLine( 2.5-0.1, error, 2.5+0.1, error);
-        	} else if( Param_Of_Choice == "delta_perp" )
-        	{
+		} else if( Param_Of_Choice == "delta_perp" )
+		{
 			param_error = new TLine( -0.17-0.5, error, -0.17+0.5, error);
-        	} else if( Param_Of_Choice == "Phi_s" )
-        	{
+		} else if( Param_Of_Choice == "Phi_s" )
+		{
 			param_error = new TLine( -0.7-0.25, error, -0.7+0.25, error);
-        	}
-	
+		}
+
 		param_error->SetLineColor( Color_t(2) );
 		param_error->SetLineWidth( 10 );
 		error_line->SetLineWidth( 10 );

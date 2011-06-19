@@ -362,12 +362,14 @@ void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_param
 
 		//	See the object for FC Stats as to why this is here
 		TPaletteAxis *palette = (TPaletteAxis*)All_Physics_Plots[i]->GetListOfFunctions()->FindObject("palette");
-		palette->SetX1NDC(0.957);
-		palette->SetX2NDC(0.962);
-		palette->SetLabelSize((Float_t)0.02);
-		palette->GetAxis()->SetTickSize(0);
-		final_physics_canvas->Update();
-
+		if( palette != NULL )
+		{
+			palette->SetX1NDC(0.957);
+			palette->SetX2NDC(0.962);
+			palette->SetLabelSize((Float_t)0.02);
+			palette->GetAxis()->SetTickSize(0);
+			final_physics_canvas->Update();
+		}
 		//	Output Filename for the Plot
 		TString Output_File( outputdir );
 		Output_File+= "/" + all_parameter_values[i] + ".png";
@@ -658,7 +660,7 @@ void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, do
 //
 //	This adopts the namescheme to plot a FC scan atop a 2DLL plot but is generically written enough to allow 2 group TH2 objects to be placed atop each other
 //
-void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double *llconts, double* confs, TString outputdir )
+void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double *llconts, double* confs, TString outputdir, TString Legend_Name_1, TString Legend_Name_2 )
 {
 	TCanvas* Temp_1 = new TCanvas("Temp","Temp",1680,1050);  
 
@@ -666,8 +668,12 @@ void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double 
 	TGraph* Line     = NULL;
 	vector<TGraph*> Contour_Lines;
 
+	//TString Legend_Name_1 = "NLL";
+	//TString Legend_Name_2 = "FC";
+
 	//	Construct the Legend
-	TLegend *leg = new TLegend(0.75,0.89,0.95,0.99);
+	//TLegend *leg = new TLegend(0.75,0.89,0.95,0.99);
+	TLegend *leg = new TLegend(0.80,0.89,0.95,0.7);
 	leg->SetHeader("Conf. Levels");
 	leg->SetBorderSize(0);
 	leg->SetFillStyle(0);
@@ -686,7 +692,7 @@ void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double 
 		//	Name that contour...
 		TString confname = "";
 		confname += confs[i];
-		confname += "% C.L. (PLL)";
+		confname.Append( "% C.L. " + Legend_Name_1 );
 
 		//	Get the List of lines making up this contour
 		contLevel = (TList*) LL_Contours->At(i);
@@ -724,7 +730,7 @@ void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double 
 		//	Name that contour...
 		TString confname = "";
 		confname += confs[i];
-		confname += "% C.L. (FC)";
+		confname.Append( "% C.L. " + Legend_Name_2 );
 
 		//	Get the List of lines making up this contour
 		contLevel = (TList*) FC_Contours->At(i);
@@ -757,7 +763,8 @@ void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double 
 		Contour_Lines[i]->Draw("L SAME");
 
 	//	Add the rest of the details to the plot
-	addLHCbLabel( "LL & FC Overlay" )->Draw();
+	TString Label_Str( Legend_Name_1 + " & " + Legend_Name_2 + " Overlay" );
+	addLHCbLabel( Label_Str )->Draw();
 	leg->Draw();
 	Overlay_Output->Update();
 
