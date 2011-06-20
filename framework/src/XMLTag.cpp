@@ -102,8 +102,9 @@ vector<string> XMLTag::GetValue()
 	int TagPos = StringProcessing::VectorContains( &forbidden_paths, &pathStr );
 	if( TagPos != -1 )
 	{
-		new_value[0] = (*forbidden)[TagPos].second;
+		value[0] = (*forbidden)[TagPos].second;
 		forbidden->erase(forbidden->begin()+TagPos);
+		new_value[0] = value[0];
 	}
 	//cout << path << "\t" << name << "\t" << "\t" << new_value[0] << endl;
 	if ( value.size() == 0 )

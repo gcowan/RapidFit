@@ -35,6 +35,8 @@
         HOWEVER, these scripts are 90%+ complete and represent a set of idiot proof scripts which allow the user to use ganga to submit to any added backend
           This will allow 'any' user to submit intensive jobs and I intend to write a short talk introducing these soon
 
+    - Fixed a bug in the OverrideXML argument. I am happy to suggest people use it now as it's quite powerful and I believe it has actually stabalized.
+
 2011/06/19 Rob Currie
     - Added some further improvements to the RapidPlot and RapidLL tools for plotting the output of various jobs
          Expanded RapidPlot to optionally plot the variation in parameter error and pull across a 2D plane (not a bad feature for <10 lines of code)
