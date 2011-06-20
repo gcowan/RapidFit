@@ -1,5 +1,40 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/20 Rob Currie
+    - Re-named the ToyStudyResult Class to FitResultVector class as this more accuratley reflects the nature of the class
+        (seeing segfaults in a ToyStudy class when your not performing a toy study can be VERY distracting)
+        It would be nice to re-write this class to return objects by reference rather than storing them internally as copies, this will be addressed soon but it's not urgent
+
+    - Added a further set of configuration steps intended to assist FC on the Grid.
+        One of the bottlenecks on doing FC on the grid is that you ended up having to run a fit to data and then using this data as a seed for what essentially is an MC based study
+        LHCb computing model is designed such that user jobs requiring external data run on Tier 1               This is the 2DLL scans
+                                                   user jobs requiring no external data run on Tier 2/elsewhere  This is MC production and such
+
+        I have added an interpretation layer to RapidFit to allow it to essentially take in the result from a 2DLL scan on the grid and run the FC 'toy' studies on Tier 2
+        This is possible as the job requires so little input it can be tarred up as part of the InputSandbox, this opens Tier 2 to running a root application
+        (This is probably more inline with the intent of the computing model s Tier1 is intended for data processing which FC is not strictly doing)
+
+        The way that this works is to construct ResultParameterSet and a full FitResult with a NULL Bottle/contour (etc.)
+        This contains all of the data that combined with the fit XML allows RapidFit to correctly initialize from the ground up the objects required for the FC scan.
+
+        - In doing this I noticed a potential shortcoming in the MinuitWrapper package which didn't construct ResultParameters with the limits as passed to Minuit
+        
+        - The main additition to the code has been in DataSetConfiguration.cpp which reads in a Result DataSet from a previous RapidFit run,
+           although, quite a few additional routines had to be coded up to support this use case
+
+        The code remains untested as this requires a new FC run to verify the result which is intensive so a code ceck before I run is required.
+	HOWEVER, I HAVE tested this code and the stadard Unit tests are OK so the code doesn't interfere with existing code (which was already known but is now proven)
+
+    - I also fixed several float/double ambiguities when compiling on lxplus due to the cmath template functions not being in focus (aka added the <cmake> header to some files)
+
+    - Fixed some compiler warinings in various utils which were annoying me which are basically to explicitly request parameter in the source where it is correct to do so
+
+    - Fixed the segfaults caused by paramater list mismatches between fit initialization and returning the output
+
+    - Added the initial implementation of pyRoot submittion scripts adequate for most reasons. These require a little work to verify and iron out remaining bugs on ECDF/CONDOR
+        HOWEVER, these scripts are 90%+ complete and represent a set of idiot proof scripts which allow the user to use ganga to submit to any added backend
+          This will allow 'any' user to submit intensive jobs and I intend to write a short talk introducing these soon
+
 2011/06/19 Rob Currie
     - Added some further improvements to the RapidPlot and RapidLL tools for plotting the output of various jobs
          Expanded RapidPlot to optionally plot the variation in parameter error and pull across a 2D plane (not a bad feature for <10 lines of code)

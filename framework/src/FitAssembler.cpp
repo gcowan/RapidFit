@@ -13,7 +13,7 @@
 #include "FitResult.h"
 #include "ClassLookUp.h"
 #include "ScanParam.h"
-#include "ToyStudyResult.h"
+#include "FitResultVector.h"
 #include "ResultFormatter.h"
 #include "StringProcessing.h"
 //	System Headers
@@ -124,9 +124,8 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 		truth.push_back( BottleParameters.back()->GetPhysicsParameter( other_params[j] )->GetTrueValue() );
 	}
 
-
 	bool fit_fail_status=false;
-	FitResult* ReturnableFitResult;
+	FitResult* ReturnableFitResult=NULL;
 	//  Try to fit 5 times and then abort
 	for( unsigned short int i=0; i<=0; ++i )
 	{
@@ -140,7 +139,7 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 			{
 				cerr << "\n\n\t\tFit Did NOT Converge Correctly, CHECK YOUR RESULTS!\n\n";
 			}
-			return ReturnableFitResult;
+			//return ReturnableFitResult;
 		}
 		//  If it didn't fit tell the user why!
 		catch( int e){
@@ -174,12 +173,36 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, Bad_Bottle );
 	}
 
+	vector<string> already_found = ReturnableFitResult->GetResultParameterSet()->GetAllNames();
+
+	for( unsigned int i=0; i< BottleParameters.back()->GetAllNames().size(); ++i )
+	{
+		int found = StringProcessing::VectorContains( &already_found, &(BottleParameters.back()->GetAllNames()[i]) );
+		//	There was something in the ParameterSet not in the FitResult, i.e. an unclaimed object which can't have changed during the fit
+		if( found == -1 )
+		{
+			double Value = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetValue();
+			double OriginalValue = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetValue();
+			double Error = 0;
+			double Minimum = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetMinimum();
+			double Maximum = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetMaximum();
+			string Type = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetType();
+			string Unit = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetUnit();
+			bool added = ReturnableFitResult->GetResultParameterSet()->ForceNewResultParameter( BottleParameters.back()->GetAllNames()[i],  Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
+			if( !added )
+			{
+				cerr << "Error finalizing FitResultVector Object" << endl << endl;
+				exit(-984);
+			}
+		}
+	}
+
 	return ReturnableFitResult;
 }
 
 
 //  Interface for internal calls
-void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, ToyStudyResult* output_interface, const int OutputLevel )
+void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, FitResultVector* output_interface, const int OutputLevel )
 {
 
 	double uplim = Wanted_Param->GetMax();
@@ -275,7 +298,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 }
 
 //  Interface for internal calls
-void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const pair<ScanParam*, ScanParam*> Param_Set, vector<ToyStudyResult*>* output_interface, const int OutputLevel )
+void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const pair<ScanParam*, ScanParam*> Param_Set, vector<FitResultVector*>* output_interface, const int OutputLevel )
 {
 
 //	vector<string> namez = BottleParameters.back()->GetAllNames();
@@ -304,7 +327,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 	for( int si=0; si < int(npoints); ++si) {
 	  
 		cout << "\n\n2DSCAN OUTER NUMBER\t\t" << si+1 << "\t\tOF\t\t" << int(npoints) <<endl<<endl;
-		ToyStudyResult* Returnable_Result = new ToyStudyResult( result_names );
+		FitResultVector* Returnable_Result = new FitResultVector( result_names );
 		
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan;
@@ -333,9 +356,9 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 }
 
 // Interface for external calls
-vector<ToyStudyResult*> FitAssembler::ContourScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, const string scanName, const string scanName2, const int OutputLevel )
+vector<FitResultVector*> FitAssembler::ContourScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, const string scanName, const string scanName2, const int OutputLevel )
 {
-	vector<ToyStudyResult*>* Returnable_Result = new vector<ToyStudyResult*>;
+	vector<FitResultVector*>* Returnable_Result = new vector<FitResultVector*>;
 
 	pair< ScanParam*, ScanParam* > Param_Set = OutputConfig->Get2DScanParams( scanName, scanName2 );
 
@@ -345,9 +368,9 @@ vector<ToyStudyResult*> FitAssembler::ContourScan( MinimiserConfiguration * Mini
 }
 
 //  Interface for external calls
-ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet*> BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, const string scanName, const int OutputLevel )
+FitResultVector* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet*> BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, const string scanName, const int OutputLevel )
 {
-	ToyStudyResult* Returnable_Result = new ToyStudyResult( BottleParameters.back()->GetAllNames() );
+	FitResultVector* Returnable_Result = new FitResultVector( BottleParameters.back()->GetAllNames() );
 
 	ScanParam* local_param = OutputConfig->GetScanParam( scanName );
 
@@ -367,16 +390,15 @@ ToyStudyResult* FitAssembler::SingleScan( MinimiserConfiguration * MinimiserConf
 //			At the time of writing the nuisence parameters are still under investigation
 //	Step4:		Repeat Step 3 as many times as requested, or do 100 toys as default
 //	Step5:		Format output into standard block format. This gives us 2 things.
-ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyStudyResult* _2DResultForFC, vector<unsigned int> numberRepeats, const unsigned int NuisenceModel, const bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData, const int OutputLevel )
+FitResultVector* FitAssembler::FeldmanCousins( FitResultVector* GlobalResult, FitResultVector* _2DResultForFC, vector<unsigned int> numberRepeats, const unsigned int NuisenceModel, const bool FC_Debug_Flag, OutputConfiguration* makeOutput, MinimiserConfiguration* theMinimiser, FitFunctionConfiguration* theFunction, XMLConfigReader* xmlFile, vector< PDFWithData* > pdfsAndData, const int OutputLevel )
 {
-
 	double Random_Seed = pdfsAndData[0]->GetPDF()->GetRandomFunction()->Rndm();
 	FitResult* GlobalFitResult = GlobalResult->GetFitResult( 0 );
-	vector<ToyStudyResult*> AllResults;
+	vector<FitResultVector*> AllResults;
+
 	//		Want to loop over all points on a 2D Plot that have been allocated to this instance
 	for( int iFC=0; iFC < _2DResultForFC->NumberResults(); ++iFC )
 	{
-
 		TRandom3* new_rand = new TRandom3(UInt_t(Random_Seed));
 		//		GET INPUT Data from fit Results
 		//
@@ -424,7 +446,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		InputFreeSet.back()->GetPhysicsParameter( name1 )->SetType( "Free" );
 		InputFreeSet.back()->GetPhysicsParameter( name2 )->SetType( "Free" );
 
-
+		cout << "Here" << endl;
 
 		//	Collect all of the relevent Data from the XML
 		//	Note: most of these had to be written for FCscans
@@ -539,8 +561,8 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		}
 
 		//		Result Vectors for the Fit for clarity and Output Formatting
-		ToyStudyResult* study1Results = new ToyStudyResult( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
-		ToyStudyResult* study2Results = new ToyStudyResult( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
+		FitResultVector* study1Results = new FitResultVector( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
+		FitResultVector* study2Results = new FitResultVector( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
 
 		//	This Forms the main sequence of the fit
 
@@ -728,7 +750,7 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 		//
 		//		Standard Output Format which makes the results the same running either
 		//		the whole scan on one machine or running the whole set on a batch system
-		ToyStudyResult* ThisStudy = new ToyStudyResult( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
+		FitResultVector* ThisStudy = new FitResultVector( GlobalFitResult->GetResultParameterSet()->GetAllNames() );
 		ThisStudy->AddFitResult( _2DResultForFC->GetFitResult( iFC ), false );
 		ThisStudy->AddCPUTimes( _2DResultForFC->GetAllCPUTimes() );
 		ThisStudy->AddRealTimes( _2DResultForFC->GetAllRealTimes() );
@@ -750,5 +772,5 @@ ToyStudyResult* FitAssembler::FeldmanCousins( ToyStudyResult* GlobalResult, ToyS
 	}
 
 	cout << "\n\nNumerical part of FeldMan-Cousins Scan Complete,\n\n Now process the data through the plotting tool :D\n\n";
-	return new ToyStudyResult( AllResults );
+	return new FitResultVector( AllResults );
 }

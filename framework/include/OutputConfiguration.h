@@ -12,7 +12,7 @@
 //	RapidFit Headers
 //#include "LLscanResult.h"
 //#include "LLscanResult2D.h"
-#include "ToyStudyResult.h"
+#include "FitResultVector.h"
 #include "FitResult.h"
 #include "ScanParam.h"
 //	System Headers
@@ -45,7 +45,7 @@ class OutputConfiguration
 		void OutputFitResult( FitResult* );
 //		void OutputLLscanResult( vector<LLscanResult*>  );
 //		void OutputLLcontourResult( vector<LLscanResult2D*>  );
-		void OutputToyResult( ToyStudyResult* );
+		void OutputToyResult( FitResultVector* );
 
 		//Change the configuration
 		void MakeAllPlots( string );

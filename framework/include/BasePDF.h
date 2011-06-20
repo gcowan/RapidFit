@@ -18,6 +18,7 @@
 #include "PDFConfigurator.h"
 //	System Headers
 #include <vector>
+#include <cmath>
 
 class BasePDF : public IPDF
 {

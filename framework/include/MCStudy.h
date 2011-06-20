@@ -6,7 +6,7 @@
 //	RapidFit Headers
 #include "IStudy.h"
 #include "XMLConfigReader.h"
-#include "ToyStudyResult.h"
+#include "FitResultVector.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -24,7 +24,7 @@ class MCStudy	:	public IStudy
 		~MCStudy();
 
 		void DoWholeStudy();				//	Perform the Study
-		ToyStudyResult* GetStudyResult();		//	Get the output of the study
+		FitResultVector* GetStudyResult();		//	Get the output of the study
 
 		void SetNumRepeats( int );			//	Set number of Repeats
 		void SetNumEvents( vector<int> );		//	Set number of events_to_step_over
@@ -48,7 +48,7 @@ class MCStudy	:	public IStudy
 		vector<string> CommandLineParams;
 		vector<int> StartingEntries;
 
-		ToyStudyResult* ALL_Fit_Results;
+		FitResultVector* ALL_Fit_Results;
 		vector<string> PhysParams;
 };
 

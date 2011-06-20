@@ -64,6 +64,6 @@ j.inputsandbox = ['../unittest/Xdata/goldstandard_unbiased_timecut3.root','../un
 j.outputsandbox = ['LLcontourScanData.root']
 j.merger = RootMerger( files=['LLcontourScanData.root'] )
 j.backend = Dirac()
-j.splitter=ArgSplitter( args = LL_Splitter('DataFile_Tagged_cFit_MOMP.xml','Phi_s',-pi,pi,40,'deltaGamma',-0.7,0.7,40,5) )
+j.splitter=ArgSplitter( args = LL_Splitter('DataFile_Tagged_cFit_MOMP.xml','Phi_s',-pi,pi,40,'deltaGamma',-0.7,0.7,40,8) )
 j.submit()
 

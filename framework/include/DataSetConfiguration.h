@@ -15,6 +15,7 @@
 //	RapidFit Headers
 #include "IPDF.h"
 #include "IDataSet.h"
+#include "FitResultVector.h"
 //	System Headers
 #include <string>
 #include <vector>
@@ -34,6 +35,9 @@ class DataSetConfiguration
 		IPDF* GetGenerationPDF();
 
 		void SetDebug( bool );
+
+		static FitResultVector* LoadFitResult( TString, ParameterSet* );
+
 	private:
 		//	Uncopyable!
 		DataSetConfiguration ( const DataSetConfiguration& );

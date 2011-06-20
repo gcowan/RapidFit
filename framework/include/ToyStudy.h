@@ -14,7 +14,7 @@
 #include "IStudy.h"
 #include "PDFWithData.h"
 #include "ParameterSet.h"
-#include "ToyStudyResult.h"
+#include "FitResultVector.h"
 #include "FitFunctionConfiguration.h"
 #include "MinimiserConfiguration.h"
 //	System Headers
@@ -32,7 +32,7 @@ class ToyStudy	:	public IStudy
 		~ToyStudy();
 
 		void DoWholeStudy();
-		ToyStudyResult * GetStudyResult();
+		FitResultVector* GetStudyResult();
 
 		void SetNumRepeats( int );			//	Set number of Repeats
 		void SetCommandLineParams( vector<string> );	//	Set Command Line Physics Parameters
@@ -48,7 +48,7 @@ class ToyStudy	:	public IStudy
 		vector< ParameterSet* > studyParameters;
 		MinimiserConfiguration * theMinimiser;
 		FitFunctionConfiguration * theFunction;
-		ToyStudyResult * allResults;
+		FitResultVector* allResults;
 		int numberStudies;
 		vector< ConstraintFunction* > allConstraints;
 };

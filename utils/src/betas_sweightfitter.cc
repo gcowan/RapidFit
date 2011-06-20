@@ -29,9 +29,9 @@ void addLHCbLabel(RooPlot * frame1, TString legend){
 	label->SetFillColor(0);
 	label->SetBorderSize(0);
 	label->SetTextAlign(11);
-	label->SetTextSize(0.04);
+	label->SetTextSize((Float_t)0.04);
 	TText * labeltext = 0;
-	labeltext = label->AddText("LHC#font[12]{b} 2010 Data");
+	labeltext = label->AddText("LHC#font[12]{b} 2011 Data");
 	labeltext = label->AddText("#sqrt{s} = 7TeV");
 	labeltext = label->AddText(legend);
 	frame1->addObject(label);
@@ -50,21 +50,21 @@ void paramOn(RooArgSet * params, RooPlot * frame1, char* label, int numEntries, 
 	while((var=(RooRealVar*)pIter->Next())) {
 		if(!var->isConstant()) ymin-= dy; 
 	}
-	if(label != "") ymin-= dy; 
+	if(string(label) != "") ymin-= dy; 
 	TPaveText * box = new TPaveText(xmin, ymax, xmax, ymin,"BRNDC");
 	box->SetFillColor(0);
 	box->SetBorderSize(0);
 	box->SetTextAlign(11);
-	box->SetTextSize(0.025);
+	box->SetTextSize((Float_t)0.025);
 	TText * text = 0;
-	if(label != "") text = box->AddText(label);
+	if(string(label) != "") text = box->AddText(label);
 	char formatter [50];
 	int sigfigs = 3;                
 	RooLinkedList cmdList;    
 	const RooCmdArg* formatCmd = static_cast<RooCmdArg*>(cmdList.FindObject("FormatArgs"));    
 	pIter->Reset();    
 	while((var=(RooRealVar*)pIter->Next())) {    
-		if ( var->GetName() == "#mu" ) sigfigs = 5;    
+		if ( string(var->GetName()) == "#mu" ) sigfigs = 5;    
 		TString *formatted = "NELU" ? var->format(sigfigs, "NELU") : var->format(*formatCmd) ;    
 		text = box->AddText(formatted->Data());    
 		delete formatted;    
@@ -103,7 +103,7 @@ RooPlot *MakePlot(RooAbsPdf * model, RooAbsData * data, RooAbsPdf * sig, RooAbsP
 	model->plotOn(varplot,Components(RooArgSet(*sig)),LineColor(kBlue),LineStyle(kDashed),LineWidth(lwidth));
 	model->plotOn(varplot,Components(RooArgSet(*bkg)),LineColor(kRed),LineStyle(kDashed),LineWidth(lwidth));
 	addLHCbLabel(varplot, name);
-	paramOn(params, varplot, "", data->numEntries(), chi);
+	paramOn(params, varplot, (char*)"", data->numEntries(), chi);
 	return varplot;
 }
 

@@ -3,7 +3,7 @@
 //	RapidFit Headers
 #include "MCStudy.h"
 #include "XMLConfigReader.h"
-#include "ToyStudyResult.h"
+#include "FitResultVector.h"
 #include "FitAssembler.h"
 #include "PDFWithData.h"
 //	System Headers
@@ -63,7 +63,7 @@ void MCStudy::SetCommandLineParams( vector<string> new_CommandLineParams )
 void MCStudy::DoWholeStudy()
 {
 	//		THIS WILL NEED TO BE CHANGED IF WE MOVE TO MULTIPLE PARAMETERSETS IN THE XML STRUCTURE
-	ALL_Fit_Results = new ToyStudyResult( input_xml->GetFitParameters( CommandLineParams )[0]->GetAllNames() );
+	ALL_Fit_Results = new FitResultVector( input_xml->GetFitParameters( CommandLineParams )[0]->GetAllNames() );
 
 	if( ( StartingEntries.size() != 1) && ( StartingEntries.size() != input_xml->GetAllStartEntries().size() ) )
 	{
@@ -118,7 +118,7 @@ void MCStudy::DoWholeStudy()
 }
 
 
-ToyStudyResult* MCStudy::GetStudyResult()
+FitResultVector* MCStudy::GetStudyResult()
 {
 	return ALL_Fit_Results;
 }

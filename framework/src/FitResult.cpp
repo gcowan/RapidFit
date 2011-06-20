@@ -30,12 +30,15 @@ FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters
 {
 }
 
+FitResult::FitResult( double MinimumValue, ResultParameterSet* FittedParameters, int FitStatus ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix(), contours(), fitStatus( FitStatus ), fittedBottle(NULL)
+{
+}
 
 //Destructor
 FitResult::~FitResult()
 {
 	if( fittedBottle != NULL )
-			delete fittedBottle;
+		delete fittedBottle;
 	if( fittedParameters != NULL )
 		delete fittedParameters;
 }

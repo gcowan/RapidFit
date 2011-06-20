@@ -1,5 +1,5 @@
 /**
-        @class ToyStudyResult
+        @class FitResultVector
 
         The result of a toy study.
 
@@ -20,13 +20,13 @@
 #include <vector>
 #include <string>
 
-class ToyStudyResult
+class FitResultVector
 {
 	public:
-		ToyStudyResult();
-		ToyStudyResult( vector<ToyStudyResult*> );
-		ToyStudyResult( vector<string> );
-		~ToyStudyResult();
+		FitResultVector();
+		FitResultVector( vector<FitResultVector*> );
+		FitResultVector( vector<string> );
+		~FitResultVector();
 
 		bool AddFitResult( FitResult*, bool=true );
 		int NumberResults();
@@ -54,12 +54,14 @@ class ToyStudyResult
 
 	private:
 		//	Uncopyable!
-		ToyStudyResult ( const ToyStudyResult& );
-		ToyStudyResult& operator = ( const ToyStudyResult& );
+		FitResultVector ( const FitResultVector& );
+		FitResultVector& operator = ( const FitResultVector& );
 
 		vector< FitResult* > allResults;
 		vector<string> allNames;
-		vector< vector<double> > allValues, allErrors, allPulls, allGenValues;
+
+		//	Was this wise storing a COPY of ALL of this data in the class?
+		vector<vector<double> > allValues, allErrors, allPulls, allGenValues;
 		vector<double> allRealTimes;
 		vector<double> allCPUTimes;
 		TStopwatch * clock;

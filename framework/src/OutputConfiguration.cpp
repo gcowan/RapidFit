@@ -286,7 +286,7 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 //
 
 //Make the requested output from a toy study
-void OutputConfiguration::OutputToyResult( ToyStudyResult * TheResult )
+void OutputConfiguration::OutputToyResult( FitResultVector* TheResult )
 {
 	ResultFormatter::MakePullPlots( pullType, pullFileName, TheResult );
 }

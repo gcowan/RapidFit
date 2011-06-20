@@ -13,7 +13,7 @@
 //	RapidFit Headers
 #include "IDataSet.h"
 #include "FitResult.h"
-#include "ToyStudyResult.h"
+#include "FitResultVector.h"
 //#include "LLscanResult.h"
 //#include "LLscanResult2D.h"
 //	System Headers
@@ -35,17 +35,16 @@ class ResultFormatter
 		static bool IsParameterFree( FitResult*, string );
 
 		//MakePullPlots chooses the appropriate method based on the first string argument
-		static void MakePullPlots( string, string, ToyStudyResult* );
-		static void FlatNTuplePullPlots( string, ToyStudyResult* );
-		static void WriteFlatNtuple( string , ToyStudyResult* );
-		static void SeparateParameterPullPlots( string, ToyStudyResult* );
+		static void MakePullPlots( string, string, FitResultVector* );
+		static void FlatNTuplePullPlots( string, FitResultVector* );
+		static void WriteFlatNtuple( string , FitResultVector* );
+		static void SeparateParameterPullPlots( string, FitResultVector* );
 //		static void MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename ); 
 //		static void MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename );
 
-		static void CorrMatrixOutput( string FileName, ToyStudyResult * ToyResult );
+		static void CorrMatrixOutput( string FileName, FitResultVector* ToyResult );
 
-//		static LLscanResult* LLScan( ToyStudyResult*, string );
-//		static LLscanResult2D* LLScan2D( vector<ToyStudyResult*>, string, string );
+		static vector<TString> get_branch_names( TTree* );
 };
 
 #endif

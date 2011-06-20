@@ -12,6 +12,9 @@
 #include "PhysicsParameter.h"
 //	System Headers
 #include <iostream>
+#include <math.h>
+
+#define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
 ResultParameter::ResultParameter() : name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), type("Uninitialised"), unit("Uninitialised")
@@ -28,12 +31,12 @@ ResultParameter::ResultParameter( string Name, double NewValue, double NewOrigin
 		maximum = NewMinimum;
 	}
 
-	if (value < minimum)
+	if ( (value < minimum) && ( fabs( minimum ) > DOUBLE_TOLERANCE ) ) 
 	{
 		cerr << "Result parameter \"" << Name << "\" has value less than minimum" << endl;
 	}
 
-	if (value > maximum)
+	if ( (value > maximum) && ( fabs( maximum ) > DOUBLE_TOLERANCE ) )
 	{
 		cerr << "Result parameter \"" << Name << "\" has value greater than maximum" << endl;
 	}
@@ -52,6 +55,11 @@ ResultParameter::~ResultParameter()
 PhysicsParameter* ResultParameter::GetDummyPhysicsParameter()
 {
 	return new PhysicsParameter( name, value, type, unit );
+}
+
+string ResultParameter::GetName()
+{
+	return name;
 }
 
 //Get the value

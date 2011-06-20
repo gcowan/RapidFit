@@ -180,7 +180,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 
 		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-				-numeric_limits<double>::max(), numeric_limits<double>::max(),
+				oldParameter->GetMinimum(), oldParameter->GetMaximum(),
 				oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 

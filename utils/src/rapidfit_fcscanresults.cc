@@ -96,10 +96,10 @@ TPaveText* addLHCbLabel(TString footer){
 	label->SetFillStyle(0);
 	label->SetBorderSize(0);     
 	label->SetTextAlign(11);          
-	label->SetTextSize(0.04);
+	label->SetTextSize((Float_t)0.04);
 
 	TText * labeltext = 0;
-	labeltext = label->AddText("LHC#font[12]{b} 2010 Data");
+	labeltext = label->AddText("LHC#font[12]{b} 2011 Data");
 	labeltext = label->AddText("#sqrt{s} = 7TeV");
 	labeltext = label->AddText(footer);
 	return label;
@@ -161,9 +161,9 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 			curv = (TGraph*)contLevel->At(j);
 			gc = (TGraph*)curv->Clone();
 			if(pub){	
-				gc->SetLineStyle(i+1);
+				gc->SetLineStyle((Style_t)(i+1));
 			}else{
-				gc->SetLineColor(i+2);
+				gc->SetLineColor((Color_t)(i+2));
 			}
 
 			gc->SetLineWidth(2);
@@ -209,7 +209,7 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 		for(int j =0; j<contLevel->GetSize(); j++){
 			curv = (TGraph*)contLevel->At(j);
 			TGraph *gc = (TGraph*)curv->Clone();
-			gc->SetLineStyle(i+1);
+			gc->SetLineStyle((Style_t)(i+1));
 			gcarr.push_back(gc);
 
 			if(j==0){leg->AddEntry(gc,confname, "L");}
@@ -232,7 +232,7 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 		for(int j =0; j<contLevel->GetSize(); j++){
 			curv = (TGraph*)contLevel->At(j);
 			TGraph *gc = (TGraph*)curv->Clone();
-			gc->SetLineColor(i+2);
+			gc->SetLineColor((Color_t)(i+2));
 			gcarr.push_back(gc);
 			if(j==0){leg->AddEntry(gc,confname, "L");}
 		}
@@ -323,7 +323,7 @@ int main(int argc, char *argv[]){
 	//Par values will be floated
 	//Par errors !=0
 
-	Float_t shift = 0.1E-05;
+	Float_t shift = (Float_t)0.1E-05;
 	TString shiftstr = "";
 	shiftstr += shift;
 
@@ -377,12 +377,12 @@ int main(int argc, char *argv[]){
 		}
 	}
 	for(UInt_t i = 0; i<dataRatiogridpoints.size(); i++){
-		dataRatiogridpoints[i] = dataRatiogridpoints[i] - smallest;
+		dataRatiogridpoints[i] = float( dataRatiogridpoints[i] - smallest );
 	}
 	cout << "FOUND " << param1gridpoints.size() << " UNIQUE GRIDPOINTS" << endl;
 	cout << "DIFFERENCE BETWEEN CENTRAL NLL AND SMALLEST NLL = " << smallest << endl;
 	Float_t NLLtoyfixed, NLLtoyfloat;
-	int npoints = param1gridpoints.size();
+	int npoints = (int)param1gridpoints.size();
 	int np = (int)sqrt((double)npoints);
 	Double_t* p2points = new Double_t [npoints];
 	copy( param2gridpoints.begin(), param2gridpoints.end(),p2points);
@@ -439,15 +439,15 @@ int main(int argc, char *argv[]){
 			TTree *floatedtoys = toys->CopyTree(floatedtoyscutstr);
 			TTree *goodfloatedtoys = floatedtoys->CopyTree(FRstr + "==3.0");
 
-			UInt_t floatedtoystot = floatedtoys->GetEntries();
-			UInt_t goodfloatedtoystot = goodfloatedtoys->GetEntries();
+			UInt_t floatedtoystot = (UInt_t)floatedtoys->GetEntries();
+			UInt_t goodfloatedtoystot = (UInt_t)goodfloatedtoys->GetEntries();
 			//Do the same for toys that had fixed params
 			TString fixedtoyscutstr = toyscutstr;
 			fixedtoyscutstr += "(abs("+param1errstr +")<"+shiftstr + ")&&(abs(" + +param1errstr +")<"+shiftstr + ")";
 			TTree* fixedtoys = toys->CopyTree(fixedtoyscutstr);
 			TTree* goodfixedtoys = fixedtoys->CopyTree(FRstr + "==3.0");
-			UInt_t fixedtoystot = fixedtoys->GetEntries();
-			UInt_t goodfixedtoystot = goodfixedtoys->GetEntries();
+			UInt_t fixedtoystot = (UInt_t)fixedtoys->GetEntries();
+			UInt_t goodfixedtoystot = (UInt_t)goodfixedtoys->GetEntries();
 
 
 			if(goodfixedtoystot != goodfloatedtoystot){
@@ -473,7 +473,7 @@ int main(int argc, char *argv[]){
 				}
 				//The C.L. is the percentage of toys that were smaller
 				double cl = ((Double_t)toyNLLsmaller/(Double_t)goodfixedtoystot);
-				clgridpoints.push_back(cl);
+				clgridpoints.push_back((float)cl);
 			}else{ 
 				cout << param1gridpoints[i] << " " << param2gridpoints[i] << " WARNING: Found no toys here. " << endl;
 				clgridpoints.push_back(-9999.0);

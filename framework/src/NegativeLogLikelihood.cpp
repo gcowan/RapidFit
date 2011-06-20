@@ -11,6 +11,7 @@
 #include "NegativeLogLikelihood.h"
 //	System Headers
 #include <stdlib.h>
+#include <cmath>
 #include <math.h>
 #include <iostream>
 

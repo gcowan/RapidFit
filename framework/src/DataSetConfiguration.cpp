@@ -15,11 +15,13 @@
 #include "TEventList.h"
 #include "TCanvas.h"
 #include "TString.h"
+#include "TTree.h"
 //	RapidFit Headers
 #include "StringProcessing.h"
 #include "MemoryDataSet.h"
 #include "DataSetConfiguration.h"
 #include "ClassLookUp.h"
+#include "ResultFormatter.h"
 //	System Headers
 #include <iostream>
 #include <fstream>
@@ -204,7 +206,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	if ( numberOfEventsAfterCut == -1 )
 	{
 		cerr << "Please check the cut string you are using!" << endl;
-		exit(1);
+		exit(978);
 	}
 //	TEventList * evtList = (TEventList*)gDirectory->Get("evtList"); // ROOT is weird
 
@@ -439,3 +441,134 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 		exit(1);
 	}
 }
+
+FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, ParameterSet* ParametersFromXML )
+{
+	TFile* input_LL = new TFile( input_file, "READ" );
+	//	FitResult file format is ALWAYS for now until the end of time defined as:
+	//	TTree Element 0, 2, 4, ....... 0+2n (int)n are ALWAYS IDENTICAL AND THE GLOBAL FIT RESULT!!!
+	//	FitResults 1, 3, 5, 7 ....... 0+n (int)n   ARE THE INPUT FITRESULTS
+
+	TTree* input_tree = (TTree*) gDirectory->Get( "RapidFitResult" );
+
+	vector<TString> all_branches = ResultFormatter::get_branch_names( input_tree );
+
+	vector<TString> all_parameter_values = StringProcessing::GetStringContaining( all_branches, TString("_value") );
+
+	vector<TString> all_parameters = StringProcessing::StripStrings( all_parameter_values, TString("_value") );
+
+	vector<Float_t> all_values; all_values.resize( all_parameters.size() );
+	vector<Float_t> all_generated; all_generated.resize( all_parameters.size() );
+	vector<Float_t> all_errors; all_errors.resize( all_parameters.size() );
+	vector<Float_t> all_min; all_min.resize( all_parameters.size() );
+	vector<Float_t> all_max; all_max.resize( all_parameters.size() );
+	Float_t Fit_Status=-1;
+	Float_t NLL=-9999;
+	Float_t CPUTime=-1;
+	Float_t RealTime=-1;
+
+	TString value, gen, error, min_str, max_str;
+
+	for( unsigned int i=0; i< all_parameter_values.size(); ++i )
+	{
+		//cout << all_parameters[i] << endl;
+
+		value = all_parameters[i] + "_value";
+		gen = all_parameters[i] + "_gen";
+		error = all_parameters[i] + "_error";
+		min_str = all_parameters[i] + "_min";
+		max_str = all_parameters[i] + "_max";
+
+		input_tree->SetBranchAddress( value, &all_values[i] );
+		input_tree->SetBranchAddress( gen, &all_generated[i] );
+		input_tree->SetBranchAddress( error, &all_errors[i] );
+		input_tree->SetBranchAddress( min_str, &all_min[i] );
+		input_tree->SetBranchAddress( max_str, &all_max[i] );
+		input_tree->SetBranchAddress( "NLL", &NLL );
+		input_tree->SetBranchAddress( "Fit_Status", &Fit_Status );
+	}
+
+	ResultParameterSet* global_result = new ResultParameterSet( StringProcessing::Convert( all_parameters ) );
+	FitResult* global_fitresult = NULL;
+	FitResultVector* global_fitresultvector = NULL;
+
+	for( unsigned int j=0; j< all_parameters.size(); ++j )
+	{
+		ResultParameter* new_param = new ResultParameter( all_parameters[j].Data(), (double)all_values[j], (double)all_generated[j], (double)all_errors[j],
+								(double)all_min[j], (double)all_max[j],
+							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
+							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() );
+		global_result->SetResultParameter( all_parameters[j].Data(), new_param );
+		//	Don't worry, the ResultParameter is actually copied into a memory persistant standard class
+		delete new_param;
+	}
+
+	global_fitresult = new FitResult( (double)NLL, global_result, (int)Fit_Status );
+	global_fitresultvector = new FitResultVector( StringProcessing::Convert( all_parameters ) );
+
+	global_fitresultvector->AddFitResult( global_fitresult, false );
+	global_fitresultvector->AddCPUTime( (double)CPUTime );
+	global_fitresultvector->AddRealTime( (double)RealTime );
+
+	int number_fits = (int)input_tree->GetEntries();
+	int number_grid_points = number_fits/2;
+
+	if( number_fits != 2*number_grid_points )
+	{
+		cerr << "Badly Defined RapidFit File!" << endl;
+		exit(-89);
+	}
+
+	vector<ResultParameterSet*> all_sets_in_file;
+	vector<FitResult*> all_sets_in_file_fitresult;
+	vector<FitResultVector*> all_sets_in_file_fitresultvector;
+
+	for( int i=0; i< number_grid_points; ++i )
+	{
+		input_tree->GetEntry( i*2+1 );
+
+		ResultParameterSet* new_set = new ResultParameterSet( StringProcessing::Convert( all_parameters ) );
+
+		for( unsigned int j=0; j< all_parameters.size(); ++j )
+		{
+			ResultParameter* new_param = new ResultParameter( all_parameters[j].Data(), (double)all_values[j], (double)all_generated[j], (double)all_errors[j],
+									 (double)all_min[j], (double)all_max[j], 
+							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
+							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() ); 
+			new_set->SetResultParameter( all_parameters[j].Data(), new_param );
+			delete new_param;
+		}
+		all_sets_in_file.push_back( new_set );
+
+		all_sets_in_file_fitresult.push_back( new FitResult( (double)NLL, all_sets_in_file.back(), (int)Fit_Status ) );
+		all_sets_in_file_fitresultvector.push_back( new FitResultVector( StringProcessing::Convert( all_parameters ) ) );
+
+		all_sets_in_file_fitresultvector.back()->AddFitResult( all_sets_in_file_fitresult.back(), false );
+		all_sets_in_file_fitresultvector.back()->AddCPUTime( (double)CPUTime );
+		all_sets_in_file_fitresultvector.back()->AddRealTime( (double)RealTime );
+	}
+
+	//for( unsigned int i=0; i< all_sets_in_file.size(); ++i )
+	//{
+	//	cout << "SET:\t" << i << endl;
+	//	vector<string> all_stored_params = all_sets_in_file[i]->GetAllNames();
+	//	for( unsigned j=0; j< all_stored_params.size(); ++j )
+	//	{
+	//		cout << "Name:\t" << all_stored_params[j].c_str() << "\tValue:\t" << (double)all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetValue() << "\tMax:\t" << (double)all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetMaximum() << "\tMin:\t" << (double)all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetMinimum() << "\tType:\t" << all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetType() << "\tUnit:\t" << all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetUnit() << endl;
+	//	}
+	//	cout << endl;
+	//}
+
+	vector<FitResultVector*> all_vectors;
+	all_vectors.push_back( global_fitresultvector );
+	for( unsigned int i=0; i< all_sets_in_file_fitresultvector.size(); ++i )
+	{
+		all_vectors.push_back( all_sets_in_file_fitresultvector[i] );
+	}
+
+	FitResultVector* all_Results = new FitResultVector( all_vectors );
+
+	input_LL->Close();	
+	return all_Results;
+}
+

@@ -131,7 +131,7 @@ TPaveText* addLHCbLabel(TString footer){
 	label->SetTextAlign(11);
 	label->SetTextSize(Float_t(0.04));
 	TText * labeltext = 0;
-	labeltext = label->AddText("LHC#font[12]{b} 2010 Data");
+	labeltext = label->AddText("LHC#font[12]{b} 2011 Data");
 	labeltext = label->AddText("#sqrt{s} = 7TeV");
 	labeltext = label->AddText(footer);
 	return label;
@@ -403,8 +403,8 @@ int main(int argc, char *argv[]){
 	TString Best_Catch("NLL==");
 	Best_Catch+=nlldatabest;
 	TTree* local_best = allresults->CopyTree( Best_Catch );
-	x_point = local_best->GetMinimum(param1valstr);
-	y_point = local_best->GetMinimum(param2valstr);
+	x_point = (Float_t)local_best->GetMinimum(param1valstr);
+	y_point = (Float_t)local_best->GetMinimum(param2valstr);
 //	x_point = global_x;
 //	y_point = global_y;
 	cout << "GLOBAL DATA MINIMUM NLL:\t" << setprecision(10)<< nlldatabest << "\tAT:\tX:" << x_point << "\tY:\t" << y_point << endl;
@@ -460,7 +460,7 @@ int main(int argc, char *argv[]){
 		cout << "\t\tTRUE MINIMUM NLL = " << true_Z << "\t\tAt:\t\tX:" << true_X << "\tY:\t" << true_Y <<endl<<endl;
 //		cout << "\tNEW MINIMA FOUND AT :\tX:\t" << X_true_min << "\tY:\t" << Y_true_min << endl<<endl;
 		cout << "\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
-		nlldatabest=true_Z;
+		nlldatabest=(Float_t)true_Z;
 	}
 
 	TString Condition(datafixedstr); Condition.Append("&&NLL==");	Condition+=nlldatabest;
@@ -529,7 +529,7 @@ int main(int argc, char *argv[]){
 			//  Draw 3 observables at a time in some large plot
 			//  use the 'goff' option to turn graphical output (and annoying text output from con/de-structors) off
 			//  (it doesn't matter what this looks like and we can throw it away from here :)
-			int num2 = allresults->Draw( PlotString , datafixedstr, "goff" );
+			int num2 = (int)allresults->Draw( PlotString , datafixedstr, "goff" );
 
 			//  Store pointers to the objects for ease of access
 			TH1* temp_hist = (TH1*)allresults->GetHistogram()->Clone();
@@ -611,7 +611,7 @@ int main(int argc, char *argv[]){
 	cout << "FINDING UNIQUE COORDINATES ONLY" <<endl;
 	//	Using the STL syntax for finding unique objects in a list seems nicer
 	Coordinates_NLL_CV.unique( unique_xy_coord );
-	int numberOfUniqueEventsAfterCut = Coordinates_NLL_CV.size();
+	int numberOfUniqueEventsAfterCut = (int)Coordinates_NLL_CV.size();
 	cout << "FOUND " << numberOfUniqueEventsAfterCut << " UNIQUE GRIDPOINTS" << endl;
 
 	//	Some cleanup so we can continue
@@ -758,7 +758,7 @@ int main(int argc, char *argv[]){
 			Double_t* CV_values = new Double_t [Floated_values[i].size()];
 			copy( Floated_values[i].begin(), Floated_values[i].end(), CV_values );
 			cerr << Floated_Parameters.size() << " " << Floated_values[i].size() << " " << npoints << endl;
-			TGraph2D* Local_Graph = new TGraph2D(Floated_values[i].size(), p2points, p1points, CV_values);
+			TGraph2D* Local_Graph = new TGraph2D((int)Floated_values[i].size(), p2points, p1points, CV_values);
 			Local_Graph->SetName(Floated_Parameters[i]);
 			Local_Graph->SetNpx(np);
 			Local_Graph->SetNpy(np);

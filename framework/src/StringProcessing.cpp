@@ -248,3 +248,50 @@ TString StringProcessing::CondenseStrings( vector<string> input_vec, int lolim=-
 	return Returnable_String;
 }
 
+vector<TString> StringProcessing::GetStringContaining( vector<TString> list, TString search_str )
+{
+	vector<TString> output_list;
+
+	for( unsigned int i=0; i< list.size(); ++i )
+	{
+		string input = list[i].Data();
+		size_t found = input.find( search_str.Data() );
+		if( found != string::npos )
+		{
+			output_list.push_back( list[i] );
+		}
+	}
+
+	return output_list;
+}
+
+vector<TString> StringProcessing::StripStrings( vector<TString> list, TString ext )
+{
+	vector<TString> output_list;
+	string remove = ext.Data();
+	for( unsigned int i=0; i< list.size(); ++i )
+	{
+		string object = list[i].Data();
+		size_t found = object.find( remove );
+		TString TObject_Str;
+		if( found != string::npos )
+		{
+			TObject_Str = object.substr( 0, object.length()-remove.length() ).c_str();
+		} else {
+			TObject_Str = object.c_str();
+		}
+		output_list.push_back( TObject_Str );
+	}
+	return output_list;
+}
+
+vector<string> StringProcessing::Convert( vector<TString> input )
+{
+	vector<string> output;
+	for( unsigned int i=0; i< input.size(); ++i )
+	{
+		output.push_back( input[i].Data() );
+	}
+	return output;
+}
+

@@ -25,6 +25,7 @@ class FitResult
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle*);
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, vector<double> );
 		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, vector<double>, vector< FunctionContour* >);
+		FitResult( double, ResultParameterSet*, int );
 		~FitResult();
 
 		double GetMinimumValue();

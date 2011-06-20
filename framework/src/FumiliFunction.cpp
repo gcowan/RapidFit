@@ -14,6 +14,7 @@
 #include "FumiliFunction.h"
 //	System Headers
 #include <iostream>
+#include <cmath>
 
 //Default constructor
 FumiliFunction::FumiliFunction() : ParametricFunction(1), function(), parameters()

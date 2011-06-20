@@ -82,7 +82,7 @@ TPaveText* addLHCbLabel(TString footer){
 	label->SetTextAlign(11);          
 	label->SetTextSize(Float_t(0.04));
 	TText * labeltext = 0;
-	labeltext = label->AddText("LHC#font[12]{b} 2010 Data");
+	labeltext = label->AddText("LHC#font[12]{b} 2011 Data");
 	labeltext = label->AddText("#sqrt{s} = 7TeV");
 	labeltext = label->AddText(footer);
 	return label;

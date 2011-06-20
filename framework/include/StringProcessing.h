@@ -30,6 +30,10 @@ class StringProcessing
 		static vector<string> CombineUniques( vector<string>, vector<string> );
 		static int VectorContains( vector<string> const*, string const* );
 		static TString CondenseStrings( vector<string>, int, int );
+
+		static vector<TString> GetStringContaining( vector<TString>, TString );
+		static vector<TString> StripStrings( vector<TString>, TString );
+		static vector<string> Convert( vector<TString> );
 };
 
 #endif

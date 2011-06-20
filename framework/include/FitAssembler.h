@@ -18,7 +18,7 @@
 #include "MinimiserConfiguration.h"
 #include "PDFWithData.h"
 #include "ScanParam.h"
-#include "ToyStudyResult.h"
+#include "FitResultVector.h"
 #include "XMLConfigReader.h"
 //	System Headers
 #include <vector>
@@ -32,27 +32,35 @@ class FitAssembler
 	public:
 		//	New Interface to Fits, for a well behaved PDF it will not crash, it will always return a FitResult which makes it more stable for scanning and such
 		//	Also provides way to control the output level during the fit (default = Everything)
-		static FitResult * DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >, const vector< ConstraintFunction* >, const int=1);
+		static FitResult * DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >,
+						const vector< ConstraintFunction* >, const int=1);
 
 		//	Provided for sWeightPrecalculator I would like to replace this with something closer to another DoSafeFit
-		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< IPDF* >, const vector< IDataSet* >, const vector< ConstraintFunction* > );
+		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< IPDF* >, const vector< IDataSet* >,
+						const vector< ConstraintFunction* > );
 
 
 		//	New Interface to Scanning Code
-		static vector<ToyStudyResult*> ContourScan( MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >, const vector< ConstraintFunction* >, OutputConfiguration*, const string, const string, const int=-999 );
-		static ToyStudyResult* SingleScan(  MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >, const vector< ConstraintFunction* >, OutputConfiguration*, const string, const int=-999 );
+		static vector<FitResultVector*> ContourScan( MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >,
+						const vector< ConstraintFunction* >, OutputConfiguration*, const string, const string, const int=-999 );
+		static FitResultVector* SingleScan(  MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >,
+						const vector< ConstraintFunction* >, OutputConfiguration*, const string, const int=-999 );
 
 		//  Std Feldman-Cousins Code, relying on many already defined objects even though it pulls in the XMLConfigReader object
-		static ToyStudyResult* FeldmanCousins( ToyStudyResult*, ToyStudyResult*, const vector<unsigned int>, const unsigned int, const bool, OutputConfiguration*, MinimiserConfiguration*, FitFunctionConfiguration*, XMLConfigReader*, const vector< PDFWithData* >, const int=-999);
+		static FitResultVector* FeldmanCousins( FitResultVector*, FitResultVector*, const vector<unsigned int>, const unsigned int, const bool, OutputConfiguration*,
+						MinimiserConfiguration*, FitFunctionConfiguration*, XMLConfigReader*, const vector< PDFWithData* >, const int=-999);
 
 	private:
 		static FitResult * DoFit( IMinimiser*, FitFunction* );
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle* );
-		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, vector<ParameterSet*>, const vector< PDFWithData* >, const vector< ConstraintFunction* > );
+		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, vector<ParameterSet*>, const vector< PDFWithData* >,
+				const vector< ConstraintFunction* > );
 
-		static void DoScan( MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >, const vector< ConstraintFunction* >, ScanParam*, ToyStudyResult*, const int );
+		static void DoScan( MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >,
+				const vector< ConstraintFunction* >, ScanParam*, FitResultVector*, const int );
 
-		static void DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >, const vector< ConstraintFunction* >, const pair<ScanParam*, ScanParam* >, vector<ToyStudyResult*>*, const int );
+		static void DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >,
+				const vector< ConstraintFunction* >, const pair<ScanParam*, ScanParam* >, vector<FitResultVector*>*, const int );
 
 //		static void ShakeBottle( ParameterSet*, vector< PDFWithData* >, unsigned int );
 };

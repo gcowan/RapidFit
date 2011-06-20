@@ -24,6 +24,7 @@ class ResultParameter
 		ResultParameter( string, double, double, double, double, double, string, string );
 		~ResultParameter();
 
+		string GetName();
 		double GetValue();
 		double GetOriginalValue();
 		double GetError();

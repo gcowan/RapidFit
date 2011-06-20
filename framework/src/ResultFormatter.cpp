@@ -30,6 +30,7 @@
 #include <sstream>
 #include <iomanip>
 #include <math.h>
+#include <cmath>
 
 //Output data as a RootNTuple
 void ResultFormatter::MakeRootDataFile( string FullFileName, vector<IDataSet*> OutputData )
@@ -446,7 +447,7 @@ return name;
 }*/
 
 //Chose which pull plot method to use
-void ResultFormatter::MakePullPlots( string Type, string FileName, ToyStudyResult * ToyResult )
+void ResultFormatter::MakePullPlots( string Type, string FileName, FitResultVector* ToyResult )
 {
 	if ( Type == "FlatNTuple" )
 	{
@@ -463,14 +464,14 @@ void ResultFormatter::MakePullPlots( string Type, string FileName, ToyStudyResul
 	}
 }
 
-void ResultFormatter::WriteFlatNtuple( string Filename, ToyStudyResult* ToyResult )
+void ResultFormatter::WriteFlatNtuple( string Filename, FitResultVector* ToyResult )
 {
 	ResultFormatter::FlatNTuplePullPlots( Filename, ToyResult );
 
 }
 
 //Make pull plots from the output of a toy study
-void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * ToyResult )
+void ResultFormatter::FlatNTuplePullPlots( string FileName, FitResultVector* ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	TNtuple * parameterNTuple;
@@ -500,7 +501,7 @@ void ResultFormatter::FlatNTuplePullPlots( string FileName, ToyStudyResult * Toy
 //	number of columns = max number of columns in all ToyResult FitResults
 //	if a particular fit column num < max column number trailing elements filled with -9999.
 //
-void ResultFormatter::CorrMatrixOutput( string FileName, ToyStudyResult * ToyResult )
+void ResultFormatter::CorrMatrixOutput( string FileName, FitResultVector* ToyResult )
 {
 	TFile* output_File = new TFile( FileName.c_str(), "RECREATE" );
 	//	Because TNtuples are the devils work on top of the pile of crap that is ROOT!
@@ -555,7 +556,7 @@ void ResultFormatter::CorrMatrixOutput( string FileName, ToyStudyResult * ToyRes
 }
 
 //Make pull plots from the output of a toy study
-void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResult * ToyResult )
+void ResultFormatter::SeparateParameterPullPlots( string FileName, FitResultVector* ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	string header = "value:error:pull";
@@ -630,111 +631,24 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, ToyStudyResul
 	rootFile->Close();
 }
 
-//	DEPRECATED CODE, SAFE TO REMOVE IN FUTURE,
-//
-//	Just plotting like this causes glyphs in the 2D plots (ROOT binning issue) as well as ugly formats of the graphs
-//
-//.........................................
-// New Method form PELC to plot LL scan results
-//
-//void ResultFormatter::MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename )
-//{
-//	// 1=BLACK    4=BLUE    3=GREEN     5=YELLOW
-//
-//	TFile * LLscanFile = new TFile( filename.c_str(), "RECREATE");
-//	LLscanFile->SetCompressionLevel(9);
-//
-//
-//	//Set some numbers
-//	int nscans = int(scanResults.size());
-//
-//	//Make a canvas for all the plots
-//	TCanvas cv ;
-//
-//	for( int ii=0; ii<nscans; ++ii )
-//	{
-//		cv.SetGrid();
-//		cv.GetFrame()->SetFillColor(21);
-//		cv.GetFrame()->SetBorderSize(12);
-//
-//		cv.cd(ii+1) ;
-//		TGraph * grnew = scanResults[unsigned(ii)]->GetGraph() ;
-//		grnew->Draw("ALP") ;
-//		grnew->Draw() ;
-//		//grnew->Write();
-//		cv.Update();
-//		cv.Write();
-//
-//	}
-//
-//	LLscanFile->Close();
-//
-//}
-//
-//.........................................
-// Send LL contour results to a file
-//
-//void ResultFormatter::MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename )
-//{	
-//	// 1=BLACK    4=BLUE    3=GREEN     5=YELLOW
-//
-//	TFile * LLcontourFile = new TFile( filename.c_str(), "RECREATE");
-//	LLcontourFile->SetCompressionLevel(9);
-//
-//	//Set some numbers
-//	int nscans = int(scanResults.size());
-//
-//	for( int ii=0; ii<nscans; ++ii )
-//	{
-//		TH2D * hist = scanResults[unsigned(ii)]->GetTH2D() ;
-//		hist->Draw("cont1") ;
-//		hist->Write();		
-//	}
-//
-//	LLcontourFile->Close();
-//
-//}
-//
-//
-//====================================================================================================
-//Do a likelihood scan
-//LLscanResult* ResultFormatter::LLScan( ToyStudyResult* new_results, string scanName )
-//{
-//
-//	cout << "Constructing LLscan for parameter " << scanName << endl ;
-//
-//	// Need to set up a loop , fixing the scan parameter at each point
-//	vector<double> scanParameterValues = new_results->GetParameterValues( scanName );
-//	vector<double> scanLLValues = new_results->GetAllMLL() ;
-//
-//	LLscanResult * result = new LLscanResult( scanName, scanParameterValues, scanLLValues ) ;
-//	result->print() ; //PELC
-//
-//	return result;
-//}
-//
-//LLscanResult2D* ResultFormatter::LLScan2D( vector<ToyStudyResult*> new_results, string scanName, string scanName2 )
-//{
-//
-//	// THIS CODE WILL NOT WORK WITH ANYTHING LESS THAN A PERFECT SQUARE OF FIT RESULTS
-//
-//	cout << "Constructing LLcontour for parameters " << scanName << "\t" << scanName2 << endl ;
-//
-//	vector<LLscanResult* > LLScanResults;
-//	vector<double> scanParameterValues;
-//	vector<double> scanParameterValues2 = new_results[0]->GetParameterValues( scanName2 );
-//
-//	for(unsigned int si=0; si < new_results.size(); ++si) {
-//		vector<double> scanLLValues = new_results[si]->GetAllMLL();
-//		LLscanResult * _1D_temp_result = new LLscanResult( scanName2, scanParameterValues2, scanLLValues ) ;
-//		LLScanResults.push_back( _1D_temp_result );
-//		vector<double> temp_values = new_results[si]->GetParameterValues( scanName );
-//		scanParameterValues.push_back( temp_values[0] );
-//	}
-//
-//	LLscanResult2D * result = new LLscanResult2D( scanName, scanParameterValues, scanName2, scanParameterValues2, LLScanResults );
-//
-//	return result;
-//}
-//
+//      Pass this the pointer to the ntuple you're handing and it will give you a list
+//      of branches that it contains in an easy to handle manner
+vector<TString> ResultFormatter::get_branch_names( TTree* local_tree )
+{
+        //      To be populated and returned to the user
+        vector<TString> temp_branch_names;
+
+        //      Get the list of branches within the TTree
+        TObjArray* branch_obj_array = local_tree->GetListOfBranches();
+
+        //      Loop over all found branch objects and request their names
+        for( unsigned short int i=0; i < branch_obj_array->GetEntries() ; ++i )
+        {
+                TObject* branch_object = (*branch_obj_array)[i];
+                temp_branch_names.push_back((const char*) branch_object->GetName());
+        }
+
+        //      Return the vector of names I have found
+        return temp_branch_names;
+}
 

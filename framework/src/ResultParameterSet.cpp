@@ -39,6 +39,17 @@ vector<string> ResultParameterSet::GetAllNames()
 	return allNames;
 }
 
+ResultParameter * ResultParameterSet::GetResultParameter( int number )
+{
+	if( number < (int)allNames.size() )
+	{
+		return &allParameters[ number ];
+	} else {
+		return new ResultParameter( "DummyResult", 0.0, 0.0, 0.0, 0.0, 0.0, "Error", "NameNotFoundError");
+	}
+	return NULL;
+}
+
 //Retrieve a physics parameter by its name
 ResultParameter * ResultParameterSet::GetResultParameter( string Name )
 {

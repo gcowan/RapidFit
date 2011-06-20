@@ -9,7 +9,7 @@
 
 //	RapidFit Headers
 #include "XMLConfigReader.h"
-#include "ToyStudyResult.h"
+#include "FitResultVector.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -24,7 +24,7 @@ class IStudy
 		virtual ~IStudy() {};
 
 		virtual void DoWholeStudy() = 0;				//	Perform the Study
-		virtual ToyStudyResult* GetStudyResult() = 0;			//	Get the output of the study
+		virtual FitResultVector* GetStudyResult() = 0;			//	Get the output of the study
 
 		virtual void SetNumRepeats( int ) = 0;				//	Set number of Repeats
 		virtual void SetCommandLineParams( vector<string> ) = 0;	//	Set Command Line Physics Parameters

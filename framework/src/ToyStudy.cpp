@@ -84,7 +84,7 @@ void ToyStudy::DoWholeStudy( )
 
 		uniqueNames = StringProcessing::CombineUniques( uniqueNames, pdfsAndData[pdfIndex]->GetPDF()->GetPrototypeParameterSet() );
 	}
-	allResults = new ToyStudyResult(uniqueNames);
+	allResults = new FitResultVector(uniqueNames);
 
 	//Loop over all studies
 	for ( int studyIndex = 0; studyIndex < numberStudies; ++studyIndex )
@@ -102,7 +102,7 @@ void ToyStudy::DoWholeStudy( )
 }
 
 //Get the result of the toy study
-ToyStudyResult * ToyStudy::GetStudyResult()
+FitResultVector* ToyStudy::GetStudyResult()
 {
 	return allResults;
 }
