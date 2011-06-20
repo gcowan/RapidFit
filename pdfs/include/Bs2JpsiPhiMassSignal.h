@@ -20,7 +20,7 @@
 class Bs2JpsiPhiMassSignal : public BasePDF
 {
 	public:
-		Bs2JpsiPhiMassSignal();
+		Bs2JpsiPhiMassSignal(PDFConfigurator);
 		~Bs2JpsiPhiMassSignal();
 
 		//Calculate the PDF value

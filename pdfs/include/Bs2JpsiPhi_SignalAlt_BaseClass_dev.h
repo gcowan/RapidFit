@@ -111,7 +111,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		ObservableRef phiName;			// azimuthal angle of the mu+ in Jpsi frame
 		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 		ObservableRef tagName;			// B tag
-		ObservableRef timeAcceptanceCategoryName ; //Originally included for using unbiased and biased events.
+		//X ObservableRef timeAcceptanceCategoryName ; //Originally included for using unbiased and biased events.
 
 		//	Constraints
 		ObservableRef timeConstraintName;
@@ -122,7 +122,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		double phi_tr ;
 		double ctheta_1 ;
 		int tag ;
-		int timeAcceptanceCategory ;
+		//X int timeAcceptanceCategory ;
 	
 		// Physics Fit Parameters 
 		double _gamma ;

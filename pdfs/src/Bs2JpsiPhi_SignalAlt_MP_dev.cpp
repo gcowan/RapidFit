@@ -40,7 +40,7 @@ void Bs2JpsiPhi_SignalAlt_MP_dev::MakePrototypes()
 	allObservables.push_back( phiName );
 	allObservables.push_back( cosPsiName );
 	allObservables.push_back( tagName );
-	allObservables.push_back( timeAcceptanceCategoryName );
+	//X allObservables.push_back( timeAcceptanceCategoryName );
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -206,7 +206,7 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Evaluate(DataPoint * measurement)
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
-	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
+	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
 	double val1=0, val2=0 ;
 	double returnValue=0 ;
@@ -271,7 +271,7 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::EvaluateTimeOnly(DataPoint * measurement)
 	//phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	//ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
-	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
+	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
 	double val1=0, val2=0 ;
 	double returnValue=0 ;
@@ -338,7 +338,7 @@ double Bs2JpsiPhi_SignalAlt_MP_dev::Normalisation(DataPoint * measurement, Phase
 	ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
 	phi_tr      = measurement->GetObservable( phiName )->GetValue();
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
-	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
+	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
 	// Get time boundaries into member variables
 	IConstraint * timeBound = boundary->GetConstraint( timeConstraintName );

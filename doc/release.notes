@@ -1,5 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/20 Pete Clarke
+    - Fixed LongLived  ....  to correct loop over nxbins*nxbins*nxbins
+    - Upgraded more PDFs to tak econfigurator 
+    - Installed 2010 lower time acceptance in SlicedAcceptance
+    - Removed timeAcceptanceCategory from _dev_
+ 
 2011/06/20 Rob Currie
     - Re-named the ToyStudyResult Class to FitResultVector class as this more accuratley reflects the nature of the class
         (seeing segfaults in a ToyStudy class when your not performing a toy study can be VERY distracting)

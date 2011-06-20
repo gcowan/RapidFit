@@ -38,7 +38,7 @@ void Bs2JpsiPhi_SignalAlt_MO_dev::MakePrototypes()
 	allObservables.push_back( cosPsiName );
 	allObservables.push_back( tagName );
 	allObservables.push_back( mistagName );
-	allObservables.push_back( timeAcceptanceCategoryName );
+	//X allObservables.push_back( timeAcceptanceCategoryName );
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -205,7 +205,7 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::Evaluate(DataPoint * measurement)
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
-	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
+	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
 	double val1, val2 ;
 	double returnValue ;
@@ -267,7 +267,7 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::EvaluateTimeOnly(DataPoint * measurement)
 	//ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
-	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
+	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
 	double val1, val2 ;
 	double returnValue ;
@@ -334,7 +334,7 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::Normalisation(DataPoint * measurement, Phase
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue() ;
-	timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
+	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
 	// Get time boundaries into member variables
 	IConstraint * timeBound = boundary->GetConstraint( timeConstraintName );

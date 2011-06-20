@@ -62,7 +62,7 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfig
 	, phiName				( configurator.getName("phi") )
 	, cosPsiName			( configurator.getName("cosPsi") )
 	, tagName				( configurator.getName("tag") )
-	, timeAcceptanceCategoryName	( configurator.getName("timeAcceptanceCategory") )
+	//X, timeAcceptanceCategoryName	( configurator.getName("timeAcceptanceCategory") )
 	, timeConstraintName	( configurator.getName("time") )
 	// Other things
 	, _useTimeAcceptance(false)
@@ -71,7 +71,7 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfig
 	, _useCosAndSin(false) 
 	, allowNegativeAsSq(false)
 	//objects
-	,t(), ctheta_tr(), phi_tr(), ctheta_1(), tag(), timeAcceptanceCategory(), _gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
+	,t(), ctheta_tr(), phi_tr(), ctheta_1(), tag(), /*timeAcceptanceCategory(),*/ _gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
 	delta_perp(), delta_zero(), delta_s(), delta1(), delta2(), delta_ms(), phi_s(), _cosphis(), _sinphis(), _mistag(), _mistagP1(), _mistagP0(), _mistagSetPoint(),
 	resolution(), resolution1(), resolution2(), resolution1Fraction(), timeOffset(), angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(),
 	angAccI7(), angAccI8(), angAccI9(), angAccI10(), tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
@@ -86,6 +86,10 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfig
 		if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.025 ) ;
 			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: Upper time acceptance beta=0.025 [0 < t < 14] " << endl ;
+		}
+		else if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Lower2010" ) ) {
+			timeAcc = new SlicedAcceptance( "Lower2010" ) ;
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: Lower time acceptance 2010  [0 < t < 14] " << endl ;
 		}
 	}
 	else {

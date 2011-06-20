@@ -135,7 +135,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 		else if ( Name == "Bs2JpsiPhiMassSignal" )
         {
                 //Default JPsiPhi signal mass PDF
-                returnable_PDF = new Bs2JpsiPhiMassSignal();
+                returnable_PDF = new Bs2JpsiPhiMassSignal(configurator);
         }
         else if ( Name == "Bs2DsPiBkg_withTimeRes" )
         {

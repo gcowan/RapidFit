@@ -13,14 +13,14 @@
 #include "TMath.h"
 
 //Constructor
-Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal() :
+Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal(PDFConfigurator configurator) :
 	// Physics parameters
-	  f_sig_m1Name	( "f_sig_m1" )
-	, sigma_m1Name	( "sigma_m1" )
-	, sigma_m2Name	( "sigma_m2" )
-	, m_BsName	( "m_Bs" )
+	  f_sig_m1Name	( configurator.getName("f_sig_m1") )
+	, sigma_m1Name	( configurator.getName("sigma_m1") )
+	, sigma_m2Name	( configurator.getName("sigma_m2") )
+	, m_BsName		( configurator.getName("m_Bs") )
 	// Observables
-	, recoMassName	( "mass" )
+	, recoMassName	( configurator.getName("mass") )
 {
 	MakePrototypes();
 }

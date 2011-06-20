@@ -66,7 +66,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 		TFile* f =  TFile::Open(fileName.c_str());
 		histo = new TH3D(  *(    (TH3D*)f ->Get("histo")      )     ); //(fileName.c_str())));
 
-	xaxis = histo->GetXaxis();
+		xaxis = histo->GetXaxis();
         xmin = xaxis->GetXmin();
         xmax = xaxis->GetXmax();
         nxbins = histo->GetNbinsX();
@@ -94,8 +94,8 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 
 	//loop over each bin in histogram and print out how many zero bins there are
 	for (int i=1; i < nxbins+1; i++){
-		for (int j=1; j < nxbins+1; j++){
-			for (int k=1; k < nxbins+1; k++){
+		for (int j=1; j < nybins+1; j++){
+			for (int k=1; k < nzbins+1; k++){
 
 				double bin_content = histo->GetBinContent(i,j,k);
 				//cout << "Bin content: " << bin_content << endl;
