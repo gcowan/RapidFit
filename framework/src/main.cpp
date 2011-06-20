@@ -1016,7 +1016,10 @@ int RapidFit( int argc, char * argv[] )
 		{
 			TString output_scan_dat( "LLScanData" );
 			output_scan_dat.Append( LLscanList[scan_num] );
+			TString new_output_scan_dat( output_scan_dat );
+			new_output_scan_dat.Append( "_newformat" );
 			output_scan_dat.Append( ".root" );
+			new_output_scan_dat.Append(".root");
 			vector<FitResultVector*> ammended_format;
 			for( int i=0; i< scanSoloResults[scan_num]->NumberResults(); ++i )
 			{
@@ -1029,7 +1032,8 @@ int RapidFit( int argc, char * argv[] )
 			}
 			FitResultVector* corrected_format = new FitResultVector( ammended_format );
 			cout << output_scan_dat << "\t\t" << corrected_format->NumberResults() << endl;
-			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), corrected_format );
+			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), scanSoloResults[scan_num] );
+			ResultFormatter::WriteFlatNtuple( string( new_output_scan_dat ), corrected_format );
 		}
 	}
 
