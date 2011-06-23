@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/23 Rob Currie
+    - Workaround for a Root bug
+        we now access the List of TBranch objects rather than casting them into TLeafs and they both inherit from the Name class
+
 2011/06/20 Pete Clarke
     - Fixed LongLived  ....  to correct loop over nxbins*nxbins*nxbins
     - Upgraded more PDFs to tak econfigurator 
