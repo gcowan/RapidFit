@@ -355,26 +355,33 @@ void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_param
 
 		if( CV_Drift ) 	all_parameter_values[i].Append("_var");
 
-		All_Physics_Plots[i]->Draw("colz");
-		addLHCbLabel( all_parameter_values[i] )->Draw();
+		vector<TString> Draw_Styles; Draw_Styles.push_back("colz"); Draw_Styles.push_back("cont1z");
 
-		final_physics_canvas->Update();
-
-		//	See the object for FC Stats as to why this is here
-		TPaletteAxis *palette = (TPaletteAxis*)All_Physics_Plots[i]->GetListOfFunctions()->FindObject("palette");
-		if( palette != NULL )
+		for( unsigned int j=0; j< Draw_Styles.size(); ++j )
 		{
-			palette->SetX1NDC(0.957);
-			palette->SetX2NDC(0.962);
-			palette->SetLabelSize((Float_t)0.02);
-			palette->GetAxis()->SetTickSize(0);
-			final_physics_canvas->Update();
-		}
-		//	Output Filename for the Plot
-		TString Output_File( outputdir );
-		Output_File+= "/" + all_parameter_values[i] + ".png";
+			if( j==1 ) All_Physics_Plots[i]->SetContour(80);
+			All_Physics_Plots[i]->Draw(Draw_Styles[j]);
+			addLHCbLabel( all_parameter_values[i] )->Draw();
 
-		final_physics_canvas->Print( Output_File );
+			final_physics_canvas->Update();
+
+			//	See the object for FC Stats as to why this is here
+			TPaletteAxis *palette = (TPaletteAxis*)All_Physics_Plots[i]->GetListOfFunctions()->FindObject("palette");
+			if( palette != NULL )
+			{
+				palette->SetX1NDC(0.957);
+				palette->SetX2NDC(0.962);
+				palette->SetLabelSize((Float_t)0.02);
+				palette->GetAxis()->SetTickSize(0);
+				final_physics_canvas->Update();
+			}
+			//	Output Filename for the Plot
+			TString Output_File( outputdir );
+			Output_File+= "/" + all_parameter_values[i]+"_"+Draw_Styles[j]+"_";
+
+			final_physics_canvas->Print( Output_File + ".png" );
+			final_physics_canvas->Print( Output_File + ".pdf" );
+		}
 	}
 	return;
 }

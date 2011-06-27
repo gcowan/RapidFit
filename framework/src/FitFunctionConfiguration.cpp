@@ -12,17 +12,17 @@
 #include "ClassLookUp.h"
 
 //Default constructor
-FitFunctionConfiguration::FitFunctionConfiguration() : functionName(), weightName(), hasWeight()
+FitFunctionConfiguration::FitFunctionConfiguration() : functionName(), weightName(), hasWeight(false), wantTrace(false), TraceFileName()
 {
 }
 
 //Constructor with only name of FitFunction
-FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) : functionName(InputName), weightName(), hasWeight(false)
+FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) : functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName()
 {
 }
 
 //Constructor for FitFunction with event weights
-FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) : functionName(InputName), weightName(InputWeight), hasWeight(true)
+FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) : functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName()
 {
 }
 
@@ -32,7 +32,7 @@ FitFunctionConfiguration::~FitFunctionConfiguration()
 }
 
 //Return appropriate instance of FitFunction
-FitFunction * FitFunctionConfiguration::GetFitFunction()
+FitFunction * FitFunctionConfiguration::GetFitFunction( PhysicsBottle* PhysBottle )
 {
 	FitFunction * theFunction = ClassLookUp::LookUpFitFunctionName(functionName);
 
@@ -40,6 +40,13 @@ FitFunction * FitFunctionConfiguration::GetFitFunction()
 	if (hasWeight)
 	{
 		theFunction->UseEventWeights(weightName);
+	}
+
+	theFunction->SetPhysicsBottle( PhysBottle );
+
+	if( wantTrace )
+	{
+		theFunction->SetupTrace( TraceFileName );
 	}
 
 	return theFunction;
@@ -57,3 +64,8 @@ string FitFunctionConfiguration::GetWeightName()
 	return weightName ;
 }
 
+void FitFunctionConfiguration::SetupTrace( TString FileName )
+{
+	wantTrace = true;
+	TraceFileName = FileName;
+}

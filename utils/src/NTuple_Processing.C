@@ -363,7 +363,7 @@ void Check_Minima( TTree* input_tree, TString Cut_String, Float_t* Global_Best_N
                 TString Global_Min_NLL_Str;
                 Global_Min_NLL_Str+=Global_Min_NLL;
                 TString Catch( "abs(" + NLL + "-" + Global_Min_NLL_Str + ")<" + Double_Tolerance);
-                TTree* local_best = wanted->CopyTree( Catch );
+                TTree* local_best = wanted->CopyTree( Catch, "fast", wanted->GetEntries() );
                 //      GetMinimum == GetMaximum == Get 0th event
                 double true_X = local_best->GetMinimum(param1_val);
                 double true_Y = local_best->GetMinimum(param2_val);

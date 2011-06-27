@@ -10,8 +10,11 @@
 #ifndef FIT_FUNCTION_CONFIGURATION_H
 #define FIT_FUNCTION_CONFIGURATION_H
 
+//	ROOT Headers
+#include "TString.h"
 //	RapidFit Headers
 #include "FitFunction.h"
+#include "PhysicsBottle.h"
 
 class FitFunctionConfiguration
 {
@@ -21,14 +24,17 @@ class FitFunctionConfiguration
 		FitFunctionConfiguration( string, string );
 		~FitFunctionConfiguration();
 
-		FitFunction * GetFitFunction();
+		FitFunction * GetFitFunction( PhysicsBottle* );
 	
 		bool GetWeightsWereUsed() ;
 		string GetWeightName() ;
-	
+
+		void SetupTrace( TString );
 	private:
 		string functionName, weightName;
 		bool hasWeight;
+		bool wantTrace;
+		TString TraceFileName;
 };
 
 #endif

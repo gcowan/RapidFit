@@ -337,11 +337,11 @@ bool DataSetConfiguration::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseS
 		bool found = false;
 		//Find the requested observable name in the ntuple
 		TIter observableIterator( TestTuple->GetListOfBranches() );
-		TBranch * observableLeaf;
-		while( ( observableLeaf = (TBranch*)observableIterator() ) )
+		TBranch * observableBranch;
+		while( ( observableBranch = (TBranch*)observableIterator() ) )
 		{
-			string leafName = observableLeaf->GetName();
-			if ( leafName == allNames[observableIndex] )
+			string BranchName = observableBranch->GetName();
+			if ( BranchName == allNames[observableIndex] )
 			{
 				found = true;
 				break;

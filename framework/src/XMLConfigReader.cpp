@@ -425,6 +425,8 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		string functionName = "Uninitialised";
 		string weightName = "Uninitialised";
 		bool hasWeight = false;
+		bool want_Trace = false;
+		string Trace_FileName;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		if ( functionInfo.size() == 0 )
 		{
@@ -445,6 +447,11 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 					hasWeight = true;
 					weightName = functionInfo[childIndex]->GetValue()[0];
 				}
+				else if ( functionInfo[childIndex]->GetName() == "Trace" )
+				{
+					want_Trace = true;
+					Trace_FileName = functionInfo[childIndex]->GetValue()[0];
+				}
 				else
 				{
 					cerr << "Unrecognised FitFunction component: \"" << functionInfo[childIndex]->GetName() << endl;
@@ -453,16 +460,25 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 			}
 		}
 
+		FitFunctionConfiguration* returnable_function = NULL;
+
 		//Make the function
 		if (hasWeight)
 		{
 			cerr <<"Weighted events have been asked for in XML using" << weightName << endl ;
-			return new FitFunctionConfiguration( functionName, weightName );
+			returnable_function = new FitFunctionConfiguration( functionName, weightName );
 		}
 		else
 		{
-			return new FitFunctionConfiguration( functionName );
+			returnable_function = new FitFunctionConfiguration( functionName );
 		}
+
+		if( want_Trace )
+		{
+			returnable_function->SetupTrace( Trace_FileName );
+		}
+
+		return returnable_function;
 	}
 	else
 	{

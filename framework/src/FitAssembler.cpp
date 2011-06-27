@@ -35,8 +35,8 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, PhysicsBottle * Bottle )
 {
 	IMinimiser * minimiser = MinimiserConfig->GetMinimiser( int(Bottle->GetParameterSet()->GetAllNames().size()) );
-	FitFunction * theFunction = FunctionConfig->GetFitFunction();
-	theFunction->SetPhysicsBottle(Bottle);
+	FitFunction * theFunction = FunctionConfig->GetFitFunction( Bottle );
+	//theFunction->SetPhysicsBottle(Bottle);
 
 	FitResult* result = DoFit( minimiser, theFunction );
 

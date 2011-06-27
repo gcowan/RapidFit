@@ -1,8 +1,33 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/06/27 Rob Currie
+    - Added the ability to Trace what the Minimiser is doing during the fit.
+         This data is pretty dificult to interperate correctly,
+              however it does provide some interesting insight to the behavour of Minuit
+         It is controlled by an optional XML tag which is constructed as such
+
+        <FitFunction>
+                <WeightName>Nsig_sw</WeightName>
+                <FunctionName>NegativeLogLikelihood</FunctionName>
+                <Trace>RapidFitFileName.root</Trace>
+        </FitFunction>
+
+	The output file 'RapidFitFileName.root' (as controlled by XML)
+        will contain an Ntuple with the value(s) of all of the parameters passed to the fitfunction object
+        (i.e. all parameters passed to and controlled by Minuit in the fit fixed&free)
+        It correctly uses blinded value during the calls
+
+        I am working on a tool to display the results from this (it's difficult)
+        I plan to write a short tool to plot multiple graphs on the one canvas with NLL vs param val & Request vs param
+        It would be nice to plot the evolution of the fit in multiple 2D parameter spaces but this is best done on request
+
+    - I corrected a small amount of code by renaming parameters to something more sane
+    - Some general fixes in the processing tools, no new 1DLL plotting tool... yet
+
 2011/06/23 Rob Currie
     - Workaround for a Root bug
-        we now access the List of TBranch objects rather than casting them into TLeafs and they both inherit from the Name class
+        we now access the List of TBranch objects rather than casting them into TLeafs
+        and they both inherit from the Name class
 
 2011/06/20 Pete Clarke
     - Fixed LongLived  ....  to correct loop over nxbins*nxbins*nxbins

@@ -25,28 +25,28 @@ using namespace::std;
 
 int main( int argc, char* argv[] )
 {
-	cout<<" .----------------.  .----------------.  .----------------.  .----------------.  .----------------."<<endl;
-	cout<<" | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |"<<endl;
-	cout<<" | |  _______     | || |      __      | || |   ______     | || |     _____    | || |  ________    | |"<<endl;
-	cout<<" | | |_   __ \\    | || |     /  \\     | || |  |_   __ \\   | || |    |_   _|   | || | |_   ___ `.  | |"<<endl;
-	cout<<" | |   | |__) |   | || |    / /\\ \\    | || |    | |__) |  | || |      | |     | || |   | |   `. \\ | |"<<endl;
-	cout<<" | |   |  __ /    | || |   / ____ \\   | || |    |  ___/   | || |      | |     | || |   | |    | | | |"<<endl;
-	cout<<" | |  _| |  \\ \\_  | || | _/ /    \\ \\_ | || |   _| |_      | || |     _| |_    | || |  _| |___.' / | |"<<endl;
-	cout<<" | | |____| |___| | || ||____|  |____|| || |  |_____|     | || |    |_____|   | || | |________.'  | |"<<endl;
-	cout<<" | |              | || |              | || |              | || |              | || |              | |"<<endl;
-	cout<<" | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |"<<endl;
-	cout<<"  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'"<<endl;
-	cout<<"  .----------------.  .----------------."<<endl;
-	cout<<" | .--------------. || .--------------. |"<<endl;
-	cout<<" | |   _____      | || |   _____      | |"<<endl;
-	cout<<" | |  |_   _|     | || |  |_   _|     | |"<<endl;
-	cout<<" | |    | |       | || |    | |       | |"<<endl;
-	cout<<" | |    | |   _   | || |    | |   _   | |"<<endl;
-	cout<<" | |   _| |__/ |  | || |   _| |__/ |  | |"<<endl;
-	cout<<" | |  |________|  | || |  |________|  | |"<<endl;
-	cout<<" | |              | || |              | |"<<endl;
-	cout<<" | '--------------' || '--------------' |"<<endl;
-	cout<<"  '----------------'  '----------------'"<<endl;
+	cout <<" .----------------.  .----------------.  .----------------.  .----------------.  .----------------."<<endl;
+	cout <<" | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |"<<endl;
+	cout <<" | |  _______     | || |      __      | || |   ______     | || |     _____    | || |  ________    | |"<<endl;
+	cout <<" | | |_   __ \\    | || |     /  \\     | || |  |_   __ \\   | || |    |_   _|   | || | |_   ___ `.  | |"<<endl;
+	cout <<" | |   | |__) |   | || |    / /\\ \\    | || |    | |__) |  | || |      | |     | || |   | |   `. \\ | |"<<endl;
+	cout <<" | |   |  __ /    | || |   / ____ \\   | || |    |  ___/   | || |      | |     | || |   | |    | | | |"<<endl;
+	cout <<" | |  _| |  \\ \\_  | || | _/ /    \\ \\_ | || |   _| |_      | || |     _| |_    | || |  _| |___.' / | |"<<endl;
+	cout <<" | | |____| |___| | || ||____|  |____|| || |  |_____|     | || |    |_____|   | || | |________.'  | |"<<endl;
+	cout <<" | |              | || |              | || |              | || |              | || |              | |"<<endl;
+	cout <<" | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |"<<endl;
+	cout <<"  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'"<<endl;
+	cout <<"  .----------------.  .----------------."<<endl;
+	cout <<" | .--------------. || .--------------. |"<<endl;
+	cout <<" | |   _____      | || |   _____      | |"<<endl;
+	cout <<" | |  |_   _|     | || |  |_   _|     | |"<<endl;
+	cout <<" | |    | |       | || |    | |       | |"<<endl;
+	cout <<" | |    | |   _   | || |    | |   _   | |"<<endl;
+	cout <<" | |   _| |__/ |  | || |   _| |__/ |  | |"<<endl;
+	cout <<" | |  |________|  | || |  |________|  | |"<<endl;
+	cout <<" | |              | || |              | |"<<endl;
+	cout <<" | '--------------' || '--------------' |"<<endl;
+	cout <<"  '----------------'  '----------------'"<<endl;
 	cout <<endl;
 	cout << "Usage:"<<endl;
 	cout << endl << argv[0] << "\t" << "Param_to_plot" << "\t" << "File1.root" << "\t" << "File2.root" << "\t...\t" << "FileN.root" << endl;
@@ -245,15 +245,17 @@ int main( int argc, char* argv[] )
 		{
 			param_error = new TLine( -0.7-0.25, error, -0.7+0.25, error);
 		}
-
-		param_error->SetLineColor( Color_t(2) );
-		param_error->SetLineWidth( 10 );
-		error_line->SetLineWidth( 10 );
-		error_line->Draw();
-		param_error->Draw();
-		new_canvas->Update();
-		new_canvas->Print( Output_Graph_Name+"_error.png" );
-		new_canvas->Print( Output_Graph_Name+"_error.pdf" );
+		if( param_error != NULL )
+		{
+			param_error->SetLineColor( Color_t(2) );
+			param_error->SetLineWidth( 10 );
+			error_line->SetLineWidth( 10 );
+			error_line->Draw();
+			param_error->Draw();
+			new_canvas->Update();
+			new_canvas->Print( Output_Graph_Name+"_error.png" );
+			new_canvas->Print( Output_Graph_Name+"_error.pdf" );
+		}
 	}
 
 	for( unsigned int i=0; i < all_parameter_values.size(); ++i )
@@ -262,6 +264,7 @@ int main( int argc, char* argv[] )
 		canvas_name+=i;
 		TCanvas* out_canvas = new TCanvas(canvas_name, canvas_name, 1680, 1050 );
 		all_params_drift_multi[i]->Draw("AC*");
+		out_canvas->Update();
 		all_params_drift_multi[i]->GetXaxis()->SetTitle( EdStyle::GetParamRootName( Param_Of_Choice ) );
 		all_params_drift_multi[i]->GetYaxis()->SetTitle( EdStyle::GetParamRootName( all_parameter_values[i] ) );
 		TString Output_Graph_Name = "Output_"+Param_Of_Choice+"_"+all_parameter_values[i];
