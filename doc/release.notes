@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/07 Rob Currie
+    - Modified Trace code to create a new tuple with a new name for each FitFunction object in RapidFit
+        This is really quite cool as it's the constructor/desctructor that creates the objects and writes the data and FitFunction strictly only exists for the lifetime of the Fit
+
 2011/06/27 Rob Currie
     - Added the ability to Trace what the Minimiser is doing during the fit.
          This data is pretty dificult to interperate correctly,
