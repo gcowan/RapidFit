@@ -26,7 +26,7 @@ class FitFunction
 		FitFunction();
 		~FitFunction();
 
-		void SetupTrace( TString FileName );
+		void SetupTrace( TString FileName, int traceNum );
 		void SetPhysicsBottle( PhysicsBottle* );
 		PhysicsBottle * GetPhysicsBottle();
 		bool SetParameterSet( ParameterSet* );

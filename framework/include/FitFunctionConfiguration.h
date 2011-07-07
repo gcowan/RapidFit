@@ -35,6 +35,7 @@ class FitFunctionConfiguration
 		bool hasWeight;
 		bool wantTrace;
 		TString TraceFileName;
+		int traceCount;
 };
 
 #endif

@@ -12,17 +12,17 @@
 #include "ClassLookUp.h"
 
 //Default constructor
-FitFunctionConfiguration::FitFunctionConfiguration() : functionName(), weightName(), hasWeight(false), wantTrace(false), TraceFileName()
+FitFunctionConfiguration::FitFunctionConfiguration() : functionName(), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0)
 {
 }
 
 //Constructor with only name of FitFunction
-FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) : functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName()
+FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) : functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0)
 {
 }
 
 //Constructor for FitFunction with event weights
-FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) : functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName()
+FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) : functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0)
 {
 }
 
@@ -46,7 +46,8 @@ FitFunction * FitFunctionConfiguration::GetFitFunction( PhysicsBottle* PhysBottl
 
 	if( wantTrace )
 	{
-		theFunction->SetupTrace( TraceFileName );
+		theFunction->SetupTrace( TraceFileName, traceCount );
+		++traceCount;
 	}
 
 	return theFunction;

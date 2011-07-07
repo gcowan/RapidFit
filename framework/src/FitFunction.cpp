@@ -14,8 +14,6 @@
 #include "TString.h"
 //	RapidFit Headers
 #include "FitFunction.h"
-//	System Headers
-#include "time.h"
 
 //Default constructor
 FitFunction::FitFunction() : allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0)
@@ -36,13 +34,12 @@ FitFunction::~FitFunction()
 	}
 }
 
-void FitFunction::SetupTrace( TString FileName )
+void FitFunction::SetupTrace( TString FileName, int traceNum )
 {
 	//	Create the output file
 	Fit_File = new TFile( FileName, "UPDATE" );
 	TString TraceName("Trace_");
-	time_t seconds = time(NULL );
-	TraceName+=seconds;
+	TraceName+=traceNum;
 	Fit_Tree = new TTree( TraceName, TraceName );
 
 	//	Yes I could point the FitFunction to the address of the objects in memory in RapidFit...
