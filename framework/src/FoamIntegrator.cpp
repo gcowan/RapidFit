@@ -4,8 +4,9 @@
 #include "StatisticsFunctions.h"
 //	System Headers
 #include <math.h>
+#include <float.h>
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 //Default constructor
 FoamIntegrator::FoamIntegrator() : allIntegrators(), discreteNames(), discreteValues()

@@ -11,8 +11,9 @@
 #include "ObservableContinuousConstraint.h"
 //	System Headers
 #include <iostream>
+#include <float.h>
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 //Default constructor
 ObservableContinuousConstraint::ObservableContinuousConstraint() : minimum(0.0), maximum(0.0), unit("")

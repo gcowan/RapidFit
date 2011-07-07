@@ -37,7 +37,9 @@
 #include <TCanvas.h>
 //~PELC
 
-#define DOUBLE_TOLERANCE 1E-6
+#include "float.h"
+
+#define DOUBLE_TOLERANCE DBL_MIN
 #define DEBUGFLAG true
 
 // Some hard code switches - 

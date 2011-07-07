@@ -24,8 +24,9 @@
 #include <iomanip>
 #include <sstream>
 #include <math.h>
+#include <float.h>
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 using namespace std;
 

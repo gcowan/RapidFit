@@ -20,8 +20,9 @@
 #include <ctime>
 #include <cmath>
 #include <cstdlib>
+#include <float.h>
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
 const double FINAL_GRADIENT_TOLERANCE = 0.001;//0.001;

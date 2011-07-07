@@ -33,13 +33,14 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <float.h>
 
 //PELC
-#include <TH1D.h>
-#include <TCanvas.h>
+#include "TH1.h"
+#include "TCanvas.h"
 //~PELC
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 #define DEBUGFLAG true
 
 //========================================================================================================================

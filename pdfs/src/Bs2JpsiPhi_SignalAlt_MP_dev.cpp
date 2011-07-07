@@ -14,9 +14,11 @@
 #include "RooMath.h"
 #include "Mathematics.h"
 
+#include <float.h>
+
 #define DEBUGFLAG true
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 //......................................
 //Constructor(s)

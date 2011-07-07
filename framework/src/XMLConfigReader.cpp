@@ -24,8 +24,9 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
+#include <float.h>
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 //Default constructor
 XMLConfigReader::XMLConfigReader() : All_XML_Tags(new XMLTag()), children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)

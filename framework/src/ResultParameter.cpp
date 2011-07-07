@@ -13,8 +13,9 @@
 //	System Headers
 #include <iostream>
 #include <math.h>
+#include <float.h>
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 //Default constructor
 ResultParameter::ResultParameter() : name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), type("Uninitialised"), unit("Uninitialised")

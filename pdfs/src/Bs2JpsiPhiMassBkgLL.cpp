@@ -12,7 +12,9 @@
 #include "math.h"
 #include "TMath.h"
 
-#define DOUBLE_TOLERANCE 1E-6
+#include <float.h>
+
+#define DOUBLE_TOLERANCE DBL_MIN
 
 //Constructor
 Bs2JpsiPhiMassBkgLL::Bs2JpsiPhiMassBkgLL() : 

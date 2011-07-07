@@ -12,8 +12,9 @@
 //	System Headers
 #include <iostream>
 #include <math.h>
+#include <float.h>
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 //Default constructor
 ObservableDiscreteConstraint::ObservableDiscreteConstraint() : allValues(), unit("Uninitialised")

@@ -11,8 +11,9 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
+#include <float.h>
 
-#define DOUBLE_TOLERANCE 1E-6
+#define DOUBLE_TOLERANCE DBL_MIN
 
 //Constructor
 Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg() :
