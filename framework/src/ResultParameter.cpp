@@ -18,12 +18,12 @@
 #define DOUBLE_TOLERANCE DBL_MIN
 
 //Default constructor
-ResultParameter::ResultParameter() : name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), type("Uninitialised"), unit("Uninitialised")
+ResultParameter::ResultParameter() : name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.), type("Uninitialised"), unit("Uninitialised")
 {
 }
 
 //Constructor with correct argument
-ResultParameter::ResultParameter( string Name, double NewValue, double NewOriginalValue, double NewError, double NewMinimum, double NewMaximum, string NewType, string NewUnit ) : name(Name), value(NewValue), originalValue(NewOriginalValue), error(NewError), minimum(NewMinimum), maximum(NewMaximum), type(NewType), unit(NewUnit)
+ResultParameter::ResultParameter( string Name, double NewValue, double NewOriginalValue, double NewError, double NewMinimum, double NewMaximum, double StepSize, string NewType, string NewUnit ) : name(Name), value(NewValue), originalValue(NewOriginalValue), error(NewError), minimum(NewMinimum), maximum(NewMaximum), stepSize(StepSize), type(NewType), unit(NewUnit)
 {
 	if (maximum < minimum)
 	{
@@ -55,7 +55,7 @@ ResultParameter::~ResultParameter()
 
 PhysicsParameter* ResultParameter::GetDummyPhysicsParameter()
 {
-	return new PhysicsParameter( name, value, type, unit );
+	return new PhysicsParameter( name, value, stepSize, type, unit );
 }
 
 string ResultParameter::GetName()
@@ -121,3 +121,9 @@ string ResultParameter::GetUnit()
 {
 	return unit;
 }
+
+double ResultParameter::GetStepSize()
+{
+	return double(stepSize);
+}
+

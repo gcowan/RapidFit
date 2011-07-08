@@ -128,9 +128,10 @@ vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandL
 	for( unsigned int i=0; i < CommandLineParam.size() ; ++i )
 	{
 		vector<string> input_args = StringProcessing::SplitString( CommandLineParam[i], ',' );
-		if( input_args.size() != 5 )
+		if( input_args.size() != 6 )
 		{
 			cerr << "Cannot understand Physics Parameter info you passed at runtime" << endl;
+			cerr << "They should be defined as:\t\tgamma,value,min,max,stepsize,type" << endl;
 			exit(-598);
 		}
 		bool found_parameter=false;
@@ -153,21 +154,22 @@ vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandL
 
 				//		min			-		max			< 	1E-5
 
+				double step = strtod(input_args[4].c_str(),NULL);
 				double max = strtod(input_args[3].c_str(),NULL);
 				double min = strtod(input_args[2].c_str(),NULL);
 				double val = strtod(input_args[1].c_str(),NULL);
-				string type = input_args[4];
+				string type = input_args[5];
 
 				if( ( ( fabs( min - max ) < 	1E-6 ) && ( max < 1E-6 ) ) || (type=="Fixed") )
 				{
-					//		Unbounded				name	value	type		unit
-					PhysicsParameter* new_param = new PhysicsParameter( input_args[0], val , input_args[4], Unit);
+					//		Unbounded				name	value	step	type	unit
+					PhysicsParameter* new_param = new PhysicsParameter( input_args[0], val , step, input_args[4], Unit);
 					RawParameters[j]->SetPhysicsParameter( input_args[0], new_param );
 				}
 				else
 				{
-					//					name	val	min	max	type		unit
-					RawParameters[j]->SetPhysicsParameter( input_args[0], val, min, max, input_args[4], Unit );
+					//					name	val	min	max	step	type	unit
+					RawParameters[j]->SetPhysicsParameter( input_args[0], val, min, max, step, input_args[4], Unit );
 				}
 				found_parameter = local_find;
 			}
@@ -225,17 +227,54 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		//Examine all minimiser components
 		string minimiserName = "Uninitialised";
 		vector< XMLTag* > minimiserComponents = MinimiserTag->GetChildren();
-		vector<string> valueLines = MinimiserTag->GetValue();
-		if ( valueLines.size() == 1 )
+		//vector<string> valueLines = MinimiserTag->GetValue();
+		int MAXIMUM_MINIMISATION_STEPS = 1000000.0;
+		double FINAL_GRADIENT_TOLERANCE = 0.001;
+		MinimiserConfiguration* returnableConfig = NULL;
+		vector<string> minimiserOptions;
+		int Quality = 2;
+		if ( minimiserComponents.size() == 0 )
 		{
 			minimiserName = MinimiserTag->GetValue()[0];
 		}
 		else
 		{
-			cerr << "Minimiser tag contains " << valueLines.size() << " lines, not 1" << endl;
-			exit(1);
+                        //New style - can have weights
+                        for ( unsigned int childIndex = 0; childIndex < minimiserComponents.size(); ++childIndex )
+                        {
+                                if ( minimiserComponents[childIndex]->GetName() == "MinimiserName" )
+                                {
+					minimiserName = minimiserComponents[childIndex]->GetValue()[0];
+				}
+				else if( minimiserComponents[childIndex]->GetName() == "MaxSteps" )
+				{
+					MAXIMUM_MINIMISATION_STEPS = atoi( minimiserComponents[childIndex]->GetValue()[0].c_str() );
+				}
+				else if( minimiserComponents[childIndex]->GetName() == "GradTolerance" )
+				{
+					FINAL_GRADIENT_TOLERANCE = strtod( minimiserComponents[childIndex]->GetValue()[0].c_str(), NULL );
+				}
+				else if( minimiserComponents[childIndex]->GetName() == "ConfigureMinimiser" )
+				{
+					minimiserOptions.push_back( minimiserComponents[childIndex]->GetValue()[0] );
+				}
+				else if( minimiserComponents[childIndex]->GetName() == "Quality" )
+				{
+					Quality = atoi(minimiserComponents[childIndex]->GetValue()[0].c_str() );
+				}
+				else
+				{
+					cerr << "Minimiser not properly configured" << endl;
+					exit(9234);
+				}
+			}
 		}
-		return new MinimiserConfiguration( minimiserName, GetOutputConfiguration() );
+		returnableConfig = new MinimiserConfiguration( minimiserName, GetOutputConfiguration() );
+		returnableConfig->SetSteps( MAXIMUM_MINIMISATION_STEPS );
+		returnableConfig->SetTolerance( FINAL_GRADIENT_TOLERANCE );
+		returnableConfig->SetOptions( minimiserOptions );
+		returnableConfig->SetQuality( Quality );
+		return returnableConfig;
 	}
 	else
 	{
@@ -747,6 +786,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		double maximum = 0.0;
 		double blindScale = 0.0 ;
 		double blindOffset = 0.0 ;
+		double stepSize = -1.;
 		bool hasValue = false;
 		bool hasMaximum = false;
 		bool hasMinimum = false;
@@ -795,6 +835,10 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 				hasBlindScale =  true ;
 				blindScale = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
 			}
+			else if ( name == "StepSize" )
+			{
+				stepSize = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+			}
 			else
 			{
 				cerr << "Unrecognised physics parameter configuration: " << name << endl;
@@ -820,14 +864,14 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 				if ( ( ( fabs(maximum - 0.0) < DOUBLE_TOLERANCE ) && ( ( fabs(minimum - 0.0) < DOUBLE_TOLERANCE ) ) ) || type == "Unbounded" )
 				{
 					//Unbounded parameter
-					PhysicsParameter * p = new PhysicsParameter( ParameterName, value, type, unit );
+					PhysicsParameter * p = new PhysicsParameter( ParameterName, value, stepSize, type, unit );
 					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
 					return p ;
 				}
 				else
 				{
 					//Bounded parameter
-					PhysicsParameter * p =  new PhysicsParameter( ParameterName, value, minimum, maximum, type, unit );
+					PhysicsParameter * p =  new PhysicsParameter( ParameterName, value, minimum, maximum, stepSize, type, unit );
 					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
 					return p ;
 				}
@@ -852,7 +896,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 				else
 				{
 					//Unbounded parameter
-					PhysicsParameter * p =  new PhysicsParameter( ParameterName, value, type, unit );
+					PhysicsParameter * p =  new PhysicsParameter( ParameterName, value, stepSize, type, unit );
 					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
 					return p ;
 				}

@@ -21,10 +21,10 @@
 #include <iostream>
 #include <limits>
 
-const double MAXIMUM_MINIMISATION_STEPS = 800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.001;
+//const double MAXIMUM_MINIMISATION_STEPS = 800.0;
+//const double FINAL_GRADIENT_TOLERANCE = 0.001;
 const double STEP_SIZE = 0.01;
-const int MINUIT_QUALITY = 2;
+//const int MINUIT_QUALITY = 2;
 
 //Default constructor
 FumiliWrapper::FumiliWrapper() : function(), fitResult(), contours()
@@ -35,6 +35,26 @@ FumiliWrapper::FumiliWrapper() : function(), fitResult(), contours()
 FumiliWrapper::~FumiliWrapper()
 {
 	//delete minuit;
+}
+
+void FumiliWrapper::SetSteps( int newSteps )
+{
+        maxSteps = newSteps;
+}
+
+void FumiliWrapper::SetTolerance( double newTolerance )
+{
+        bestTolerance = newTolerance;
+}
+
+void FumiliWrapper::SetOptions( vector<string> newOptions )
+{
+        Options = newOptions;
+}
+
+void FumiliWrapper::SetQuality( int newQuality )
+{
+        Quality = newQuality;
 }
 
 //Use Migrad to minimise the given function
@@ -118,10 +138,10 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 	FumiliStandardMaximumLikelihoodFCN fumFCN( *function, positions );
 	
 	// Setup the minimiser
-	MnFumiliMinimize fumili( fumFCN, *( function->GetMnUserParameters() ), MINUIT_QUALITY);
+	MnFumiliMinimize fumili( fumFCN, *( function->GetMnUserParameters() ), Quality);//MINUIT_QUALITY);
 
 	// Do the minimisation
-	FunctionMinimum minimum = fumili( (int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
+	FunctionMinimum minimum = fumili( maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
 
 	// Once we have the FunctionMinimum, code same as in other Wrappers
 	//Create the fit results
@@ -135,7 +155,7 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 		double parameterError = minimisedParameters->Error( parameterName.c_str() );
 
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-			       -numeric_limits<double>::max(), numeric_limits<double>::max(),
+			       -oldParameter->GetMinimum(), oldParameter->GetMaximum(), oldParameter->GetStepSize(),
 			       oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 

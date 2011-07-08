@@ -144,9 +144,9 @@ bool ParameterSet::SetPhysicsParameter( string Name, PhysicsParameter * NewPhysi
 }
 
 //Initialise a physics parameter
-bool ParameterSet::SetPhysicsParameter( string Name, double Value, double Minimum, double Maximum, string Type, string Unit )
+bool ParameterSet::SetPhysicsParameter( string Name, double Value, double Minimum, double Maximum, double Step, string Type, string Unit )
 {
-	PhysicsParameter * newParameter = new PhysicsParameter( Name, Value, Minimum, Maximum, Type, Unit );
+	PhysicsParameter * newParameter = new PhysicsParameter( Name, Value, Minimum, Maximum, Step, Type, Unit );
 	bool returnValue = SetPhysicsParameter( Name, newParameter );
 	delete newParameter;
 	return returnValue;

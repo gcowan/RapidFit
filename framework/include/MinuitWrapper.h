@@ -32,18 +32,27 @@ class MinuitWrapper : public IMinimiser
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );
 
+		virtual void SetSteps( int );
+		virtual void SetTolerance( double );
+		virtual void SetOptions( vector<string> );
+		virtual void SetQuality( int );
+
 	private:
 		//	Uncopyable!
 		MinuitWrapper ( const MinuitWrapper& );
 		MinuitWrapper& operator = ( const MinuitWrapper& );
 
-		friend void Function( int&, double*, double&, double*, int );
+		static void Function( int&, double*, double&, double*, int );
+		static FitFunction * function;
 
 		TMinuit * minuit;
-		static FitFunction * function;
 		FitResult * fitResult;
 		vector< pair< string, string > > contours;
 		int print_verbosity;
+		int maxSteps;
+		double bestTolerance;
+		vector<string> Options;
+		int Quality;
 };
 
 #endif

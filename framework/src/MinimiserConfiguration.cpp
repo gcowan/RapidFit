@@ -12,21 +12,21 @@
 #include "ClassLookUp.h"
 
 //Default constructor
-MinimiserConfiguration::MinimiserConfiguration() : theMinimiser(), OutputLevel(), minimiserName(), contours()
+MinimiserConfiguration::MinimiserConfiguration() : theMinimiser(), OutputLevel(), minimiserName(), contours(), maxSteps(), bestTolerance(), MinimiseOptions()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
 }
 
 //Constructor for a minimiser only specified by name
-MinimiserConfiguration::MinimiserConfiguration( string InputName ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours()
+MinimiserConfiguration::MinimiserConfiguration( string InputName ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
 }
 
 //Constructor for a minimiser with requested contour plots
-MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours( Formatting->GetContourPlots() )
+MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours( Formatting->GetContourPlots() ), maxSteps(), bestTolerance(), MinimiseOptions()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
@@ -54,7 +54,10 @@ IMinimiser * MinimiserConfiguration::GetMinimiser( int ParameterNumber )
 	{
 		theMinimiser->ContourPlots(contours);
 	}
-
+	theMinimiser->SetSteps( maxSteps );
+	theMinimiser->SetTolerance( bestTolerance );
+	theMinimiser->SetOptions( MinimiseOptions );
+	theMinimiser->SetQuality( Quality );
 	return theMinimiser;
 }
 
@@ -63,3 +66,24 @@ void MinimiserConfiguration::RemoveMinimiser()
 	delete theMinimiser;
 	theMinimiser=NULL;
 }
+
+void MinimiserConfiguration::SetSteps( int steps )
+{
+	maxSteps = steps;
+}
+
+void MinimiserConfiguration::SetTolerance( double newTolerance )
+{
+	bestTolerance = newTolerance;
+}
+
+void MinimiserConfiguration::SetOptions( vector<string> Options )
+{
+	MinimiseOptions = Options;
+}
+
+void MinimiserConfiguration::SetQuality( int newQuality )
+{
+	Quality = newQuality;
+}
+

@@ -21,7 +21,7 @@ class ResultParameter
 {
 	public:
 		ResultParameter();
-		ResultParameter( string, double, double, double, double, double, string, string );
+		ResultParameter( string, double, double, double, double, double, double, string, string );
 		~ResultParameter();
 
 		string GetName();
@@ -36,6 +36,7 @@ class ResultParameter
 		void ForceOriginalValue( double );
 		void ForcePullValue( double );
 		PhysicsParameter* GetDummyPhysicsParameter();
+		double GetStepSize();
 
 	private:
 		string name;
@@ -44,6 +45,7 @@ class ResultParameter
 		double error;
 		double minimum;
 		double maximum;
+		double stepSize;
 		string type;
 		string unit;
 };

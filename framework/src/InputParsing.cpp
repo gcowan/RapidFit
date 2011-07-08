@@ -23,11 +23,12 @@ ParameterSet * InputParsing::MakeParameterSet( string Input )
 	vector<string> splitInput = StringProcessing::SplitString( Input, ',' );
 	if ( splitInput.size() % 6 == 0 )
 	{
-		int numberParameters = (int)(splitInput.size() / 6);
+		int numberParameters = (int)(splitInput.size() / 7);
 		vector<string> names;
 		vector<double> values;
 		vector<double> minima;
 		vector<double> maxima;
+		vector<double> steps;
 		vector<string> types;
 		vector<string> units;
 
@@ -38,8 +39,9 @@ ParameterSet * InputParsing::MakeParameterSet( string Input )
 			values.push_back( strtod( splitInput[ unsigned(parameterIndex + 1) ].c_str(), NULL ) );
 			minima.push_back( strtod( splitInput[ unsigned(parameterIndex + 2) ].c_str(), NULL ) );
 			maxima.push_back( strtod( splitInput[ unsigned(parameterIndex + 3) ].c_str(), NULL ) );
-			types.push_back( splitInput[ unsigned(parameterIndex + 4) ] );
-			units.push_back( splitInput[ unsigned(parameterIndex + 5) ] );
+			steps.push_back( strtod( splitInput[ unsigned(parameterIndex + 4) ].c_str(), NULL ) );
+			types.push_back( splitInput[ unsigned(parameterIndex + 5) ] );
+			units.push_back( splitInput[ unsigned(parameterIndex + 6) ] );
 		}
 
 		ParameterSet * newParameters = new ParameterSet( names );
@@ -47,7 +49,7 @@ ParameterSet * InputParsing::MakeParameterSet( string Input )
 		//Populate the parameter set
 		for ( int parameterIndex = 0; parameterIndex < numberParameters; ++parameterIndex )
 		{
-			newParameters->SetPhysicsParameter( names[unsigned(parameterIndex)], values[unsigned(parameterIndex)], minima[unsigned(parameterIndex)], maxima[unsigned(parameterIndex)], types[unsigned(parameterIndex)], units[unsigned(parameterIndex)] );
+			newParameters->SetPhysicsParameter( names[unsigned(parameterIndex)], values[unsigned(parameterIndex)], minima[unsigned(parameterIndex)], maxima[unsigned(parameterIndex)], steps[unsigned(parameterIndex)], types[unsigned(parameterIndex)], units[unsigned(parameterIndex)] );
 		}
 
 		return newParameters;
@@ -65,36 +67,38 @@ ParameterSet * InputParsing::MakeParameterSet( vector<string> Input )
 	vector<string> parameterNames, splitInput;
 	vector<PhysicsParameter> physicsParameters;
 	string name, type, unit;
-	double value, minimum, maximum;
+	double value, minimum, maximum, steps;
 
 	//Parse the input
 	for (unsigned int parameterIndex = 0; parameterIndex < Input.size(); ++parameterIndex )
 	{
 		splitInput = StringProcessing::SplitString( Input[parameterIndex], ':' );
-		if ( splitInput.size() == 6 )
+		if ( splitInput.size() == 7 )
 		{
 			//Parse the parameter components
 			name = splitInput[0];
 			value = strtod( splitInput[1].c_str(), NULL );
 			minimum = strtod( splitInput[2].c_str(), NULL );
 			maximum = strtod( splitInput[3].c_str(), NULL );
-			type = splitInput[4];
-			unit = splitInput[5];
+			steps = strtod( splitInput[4].c_str(), NULL );
+			type = splitInput[5];
+			unit = splitInput[6];
 
 			//Make the parameter
-			physicsParameters.push_back( PhysicsParameter( name, value, minimum, maximum, type, unit ) );
+			physicsParameters.push_back( PhysicsParameter( name, value, minimum, maximum, steps, type, unit ) );
 			parameterNames.push_back(name);
 		}
-		else if ( splitInput.size() == 4 )
+		else if ( splitInput.size() == 5 )
 		{
 			//Parse components of an unbounded parameter
 			name = splitInput[0];
 			value = strtod( splitInput[1].c_str(), NULL );
-			type = splitInput[2];
-			unit = splitInput[3];
+			steps =  strtod( splitInput[2].c_str(), NULL );
+			type = splitInput[3];
+			unit = splitInput[4];
 
 			//Make the parameter
-			physicsParameters.push_back( PhysicsParameter( name, value, type, unit ) );
+			physicsParameters.push_back( PhysicsParameter( name, value, steps, type, unit ) );
 			parameterNames.push_back(name);
 		}
 		else

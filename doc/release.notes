@@ -1,5 +1,19 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/08 Rob Currie
+    - Added the ability to control the StepSize of a parameter through the commandline/xml with <StepSize> or in the argument of --PhysParam
+        This ha touched a LOT of files. This adds the param_step columns to the output ttree from RapidFit.
+          (I am moving to allow the whole fit result to be 'reconstructed' from an input .root)
+    - I reorganized some code in MinuitWrapper so as to make scope and intent of the 'Function' object clearer, also fixed the output of Fumili and Minuit2 to be as expected
+    - Expanded Miniser Tag in XML (still backwards compatable)
+        <Minimiser>
+            <MinimiserName>Minuit</MinimiserName>
+            <MaxSteps>100000</MaxSteps>
+            <GradTolerance>0.001</GradTolerance>
+            <Quality>1</Quality>
+        </Minimiser>
+      It is now trivial to expand this to control the individual fitters more closely now
+
 2011/07/07 Rob Currie
     - Modified every occurance of '#define DOUBLE_PRECISION' to use the smallest floating point number 'DBL_MIN' defined in <float.h>
         This removes a single event of 2011 data that was INCORRECTLY being added into the datset as it existed outside of the strict phasespace limits

@@ -462,12 +462,13 @@ FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, Parame
 	vector<Float_t> all_errors; all_errors.resize( all_parameters.size() );
 	vector<Float_t> all_min; all_min.resize( all_parameters.size() );
 	vector<Float_t> all_max; all_max.resize( all_parameters.size() );
+	vector<Float_t> all_steps; all_steps.resize( all_parameters.size() );
 	Float_t Fit_Status=-1;
 	Float_t NLL=-9999;
 	Float_t CPUTime=-1;
 	Float_t RealTime=-1;
 
-	TString value, gen, error, min_str, max_str;
+	TString value, gen, error, min_str, max_str, step_str;
 
 	for( unsigned int i=0; i< all_parameter_values.size(); ++i )
 	{
@@ -478,6 +479,7 @@ FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, Parame
 		error = all_parameters[i] + "_error";
 		min_str = all_parameters[i] + "_min";
 		max_str = all_parameters[i] + "_max";
+		step_str = all_parameters[i] + "_step";
 
 		input_tree->SetBranchAddress( value, &all_values[i] );
 		input_tree->SetBranchAddress( gen, &all_generated[i] );
@@ -495,7 +497,7 @@ FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, Parame
 	for( unsigned int j=0; j< all_parameters.size(); ++j )
 	{
 		ResultParameter* new_param = new ResultParameter( all_parameters[j].Data(), (double)all_values[j], (double)all_generated[j], (double)all_errors[j],
-								(double)all_min[j], (double)all_max[j],
+								(double)all_min[j], (double)all_max[j], (double)all_steps[j],
 							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
 							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() );
 		global_result->SetResultParameter( all_parameters[j].Data(), new_param );
@@ -532,7 +534,7 @@ FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, Parame
 		for( unsigned int j=0; j< all_parameters.size(); ++j )
 		{
 			ResultParameter* new_param = new ResultParameter( all_parameters[j].Data(), (double)all_values[j], (double)all_generated[j], (double)all_errors[j],
-									 (double)all_min[j], (double)all_max[j], 
+									 (double)all_min[j], (double)all_max[j], (double)all_steps[j],
 							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
 							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() ); 
 			new_set->SetResultParameter( all_parameters[j].Data(), new_param );

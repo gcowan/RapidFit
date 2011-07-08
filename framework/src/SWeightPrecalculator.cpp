@@ -55,7 +55,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 		if  ( *parameterIterator == fractionName )
 		{
 			//Add the new parameter
-			fractionFitParameters.back()->SetPhysicsParameter( fractionName, 0.5, 0.0, 1.0, "Free", "Unitless" );
+			fractionFitParameters.back()->SetPhysicsParameter( fractionName, 0.5, 0.0, 1.0, 0., "Free", "Unitless" );
 		}
 		else
 		{

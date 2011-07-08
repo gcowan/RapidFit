@@ -24,7 +24,7 @@ ResultParameterSet::ResultParameterSet( vector<string> NewNames ) : allParameter
 	//Populate the map
 	for (unsigned short int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex)
 	{
-		allParameters.push_back( ResultParameter(NewNames[nameIndex],0,-9999.,0,0,0,"type","unit") );
+		allParameters.push_back( ResultParameter(NewNames[nameIndex],0,-9999.,0.,0.,0.,0.,"type","unit") );
 	}
 }
 
@@ -45,7 +45,7 @@ ResultParameter * ResultParameterSet::GetResultParameter( int number )
 	{
 		return &allParameters[ number ];
 	} else {
-		return new ResultParameter( "DummyResult", 0.0, 0.0, 0.0, 0.0, 0.0, "Error", "NameNotFoundError");
+		return new ResultParameter( "DummyResult", 0.0, 0.0, 0.0, 0.0, 0.0, 0., "Error", "NameNotFoundError");
 	}
 	return NULL;
 }
@@ -63,7 +63,7 @@ ResultParameter * ResultParameterSet::GetResultParameter( string Name )
 	}
 
 	//If the parameter is not found, return an error
-	return new ResultParameter( Name, 0.0, 0.0, 0.0, 0.0, 0.0, "Error", "NameNotFoundError");
+	return new ResultParameter( Name, 0.0, 0.0, 0.0, 0.0, 0.0, 0., "Error", "NameNotFoundError");
 }
 
 //Set a physics parameter by name
@@ -86,18 +86,18 @@ bool ResultParameterSet::SetResultParameter( string Name, ResultParameter * NewR
 }
 
 //Initialise a physics parameter
-bool ResultParameterSet::SetResultParameter( string Name, double Value, double OriginalValue, double Error, double Minimum, double Maximum, string Type, string Unit )
+bool ResultParameterSet::SetResultParameter( string Name, double Value, double OriginalValue, double Error, double Minimum, double Maximum, double Step, string Type, string Unit )
 {
-	ResultParameter * newParameter = new ResultParameter( Name, Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
+	ResultParameter * newParameter = new ResultParameter( Name, Value, OriginalValue, Error, Minimum, Maximum, Step, Type, Unit );
 	bool returnValue = SetResultParameter( Name, newParameter );
 	delete newParameter;
 	return returnValue;
 }
 
 //Initialise a physics parameter
-bool ResultParameterSet::ForceNewResultParameter( string Name, double Value, double OriginalValue, double Error, double Minimum, double Maximum, string Type, string Unit )
+bool ResultParameterSet::ForceNewResultParameter( string Name, double Value, double OriginalValue, double Error, double Minimum, double Maximum, double Step, string Type, string Unit )
 {
-	ResultParameter * newParameter = new ResultParameter( Name, Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
+	ResultParameter * newParameter = new ResultParameter( Name, Value, OriginalValue, Error, Minimum, Maximum, Step, Type, Unit );
 	bool found=false;
 	for( unsigned short int i=0; i< allNames.size(); ++i )
 	{

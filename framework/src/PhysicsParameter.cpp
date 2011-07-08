@@ -14,13 +14,13 @@
 #include <iostream>
 
 //Default constructor
-PhysicsParameter::PhysicsParameter() : value(0.0), originalValue(0.0), minimum(0.0), maximum(0.0), type("Uninitialised"), unit("Uninitialised"), toBeBlinded(false), blindOffset(0.0)
+PhysicsParameter::PhysicsParameter() : value(0.0), originalValue(0.0), minimum(0.0), maximum(0.0), stepSize(0.), type("Uninitialised"), unit("Uninitialised"), toBeBlinded(false), blindOffset(0.0)
 {
 }
 
 //Constructor with correct argument
-PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMinimum, double NewMaximum, string NewType, string NewUnit )
-	: value(NewValue), originalValue(0.0), minimum(NewMinimum), maximum(NewMaximum), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0)
+PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMinimum, double NewMaximum, double StepSize, string NewType, string NewUnit )
+	: value(NewValue), originalValue(0.0), minimum(NewMinimum), maximum(NewMaximum), stepSize(StepSize), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0)
 {
 	if ( maximum < minimum )
 	{
@@ -51,7 +51,7 @@ PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMini
 }
 
 //Constructor for unbounded parameter
-PhysicsParameter::PhysicsParameter( string Name, double NewValue, string NewType, string NewUnit ) : value(NewValue), originalValue(), minimum(0.0), maximum(0.0), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0)
+PhysicsParameter::PhysicsParameter( string Name, double NewValue, double StepSize, string NewType, string NewUnit ) : value(NewValue), originalValue(), minimum(0.0), maximum(0.0), stepSize(StepSize), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0)
 {
 	//You could define a fixed parameter with no maximum or minimum, but it must be unbounded if not fixed.
 	if ( type != "Fixed" )
@@ -272,3 +272,14 @@ void PhysicsParameter::print()
 	cout << "   type        " << type << endl ;
 	cout << "   unit        " << unit << endl ;
 }
+
+double PhysicsParameter::GetStepSize()
+{
+	return double( stepSize );
+}
+
+void PhysicsParameter::SetStepSize( double newStep )
+{
+	stepSize = newStep;
+}
+

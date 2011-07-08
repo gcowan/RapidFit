@@ -19,8 +19,8 @@ class PhysicsParameter
 {
 	public:
 		PhysicsParameter();
-		PhysicsParameter( string, double, double, double, string, string );
-		PhysicsParameter( string, double, string, string );
+		PhysicsParameter( string, double, double, double, double, string, string );
+		PhysicsParameter( string, double, double, string, string );
 		~PhysicsParameter();
 
 		double GetValue();
@@ -47,7 +47,10 @@ class PhysicsParameter
 		double GetOriginalValue();
 		void ForceOriginalValue( double );
 		string GetUnit();
-	
+
+		double GetStepSize();
+		void SetStepSize( double );
+
 		void print() ;
 
 	private:
@@ -55,6 +58,7 @@ class PhysicsParameter
 		double originalValue;
 		double minimum;
 		double maximum;
+		double stepSize;
 		string type;
 		string unit;
 	

@@ -24,9 +24,11 @@
 
 #define DOUBLE_TOLERANCE DBL_MIN
 
-const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.001;//0.001;
+//const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
+//const double FINAL_GRADIENT_TOLERANCE = 0.001;//0.001;
 //const double STEP_SIZE = 0.001;
+
+//	Required to act as a 'global' pointer to the RapidFit fitfunction member of the MinuitWrapper Class
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
@@ -46,6 +48,26 @@ MinuitWrapper::~MinuitWrapper()
 {
 	//cout << "hello from MinuitWrapper destructor" << endl;
 	delete minuit;
+}
+
+void MinuitWrapper::SetSteps( int newSteps )
+{
+	maxSteps = newSteps;
+}
+
+void MinuitWrapper::SetTolerance( double newTolerance )
+{
+	bestTolerance = newTolerance;
+}
+
+void MinuitWrapper::SetOptions( vector<string> newOptions )
+{
+	Options = newOptions;
+}
+
+void MinuitWrapper::SetQuality( int newQuality )
+{
+	Quality = newQuality;
 }
 
 void MinuitWrapper::SetOutputLevel( int output_level )
@@ -73,7 +95,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	double arguments[2] = {0.0, 0.0};
 
 	//Set the function
-	minuit->SetFCN( Function );
+	minuit->SetFCN( &MinuitWrapper::Function );
 
 	//Store the parameters
 	ParameterSet * newParameters = NewFunction->GetParameterSet();
@@ -83,26 +105,14 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
 		double STEP_SIZE= 0.01;
-	//	bool test1 = fabs( newParameter->GetMaximum() - 0 ) < DOUBLE_TOLERANCE;
-	//	bool test2 = fabs( newParameter->GetMinimum() - 0 ) < DOUBLE_TOLERANCE;
-		bool test3 = fabs( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE ;
-		if( !( test3 ) ){
+		if( !( fabs( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE  ) ){
 			STEP_SIZE = fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
 		}
-	
-/*
-		if( allNames[nameIndex] == "gamma" )		STEP_SIZE = 0.01;
-		else if( allNames[nameIndex] == "deltaGamma" )	STEP_SIZE = 0.01;
-		else if( allNames[nameIndex] == "Aperp_sq" )	STEP_SIZE = 0.01;
-		else if( allNames[nameIndex] == "Azero_sq" )	STEP_SIZE = 0.01;
-		else if( allNames[nameIndex] == "delta_para" )	STEP_SIZE = 0.1;
-		else if( allNames[nameIndex] == "delta_perp" )	STEP_SIZE = 0.1;
-		else if( allNames[nameIndex] == "alphaM_pr" )	STEP_SIZE = 0.0001;
-		else STEP_SIZE = 0.001;
-*/	
-		//cout << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
 
-		
+		if( newParameter->GetStepSize() > 0 ) { STEP_SIZE = newParameter->GetStepSize(); };
+
+		//cout << "STEP SIZE:" << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
+
 		//Make bounded or unbounded parameters
 		if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
 		{
@@ -132,11 +142,11 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	minuit->mnexcm("SET ERR", arguments, 1, errorFlag);
 
 	//	Set Migrad Strategy 2
-	arguments[0] = 1;
+	arguments[0] = Quality;//1;
 	minuit->mnexcm("SET STR", arguments, 1, errorFlag);
 
-        arguments[0] = MAXIMUM_MINIMISATION_STEPS;
-        arguments[1] = FINAL_GRADIENT_TOLERANCE;
+        arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS;
+        arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
 
 	//	First do Simplex
 	//minuit->mnexcm("SIMplex",arguments, 2, errorFlag);
@@ -181,7 +191,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 
 		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-				oldParameter->GetMinimum(), oldParameter->GetMaximum(),
+				oldParameter->GetMinimum(), oldParameter->GetMaximum(), oldParameter->GetStepSize(),
 				oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 
@@ -267,17 +277,28 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 }
 
 //The function to pass to Minuit
-void Function( int & npar, double * grad, double & fval, double * xval, int iflag )
+void MinuitWrapper::Function( int & npar, double * grad, double & fval, double * xval, int iflag )
 {
 	(void) npar;
-	(void) *grad;
+	(void) grad;
+	(void) fval;
 	(void) iflag;
-	ParameterSet * temporaryParameters = MinuitWrapper::function->GetParameterSet();
+	//cout << npar << "\t" << iflag << endl;
+	//	CAUTION CAUTION CAUTION
+	//	IF YOU EVER USE THIS, IT IS 
+	//		!!!UNBLINDED!!!
+	//
+	//for( int i=0; i< npar; ++i )
+	//{
+	//	cout << grad[i] << "\t" << xval[i] << endl;
+	//}
+
+	ParameterSet * temporaryParameters = function->GetParameterSet();
 	
 	if ( temporaryParameters->SetPhysicsParameters(xval) )
 	{
-		MinuitWrapper::function->SetParameterSet(temporaryParameters);
-		fval = MinuitWrapper::function->Evaluate();
+		function->SetParameterSet(temporaryParameters);
+		fval = function->Evaluate();
 	}
 	else
 	{

@@ -22,6 +22,10 @@ class IMinimiser
 		virtual FitResult * GetFitResult() = 0;
 		virtual void ContourPlots( vector< pair< string, string > > ) = 0;
 		virtual void SetOutputLevel( int ) = 0;
+		virtual void SetSteps( int ) = 0;
+		virtual void SetTolerance( double ) = 0;
+		virtual void SetOptions( vector<string> ) = 0;
+		virtual void SetQuality( int ) = 0;
 };
 
 #endif

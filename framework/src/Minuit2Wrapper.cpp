@@ -20,19 +20,39 @@
 #include <limits>
 #include <ctime>
 
-const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
-const double FINAL_GRADIENT_TOLERANCE = 0.01;//;0.001;
+//const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
+//const double FINAL_GRADIENT_TOLERANCE = 0.01;//;0.001;
 const double STEP_SIZE = 0.01;
-const int MINUIT_QUALITY = 2;
+//const int MINUIT_QUALITY = 2;
 
 //Default constructor
-Minuit2Wrapper::Minuit2Wrapper() : function(), fitResult(), contours()
+Minuit2Wrapper::Minuit2Wrapper() : function(), fitResult(), contours(), maxSteps(), bestTolerance(), Options()
 {
 }
 
 //Destructor
 Minuit2Wrapper::~Minuit2Wrapper()
 {
+}
+
+void Minuit2Wrapper::SetSteps( int newSteps )
+{
+        maxSteps = newSteps;
+}
+
+void Minuit2Wrapper::SetTolerance( double newTolerance )
+{
+        bestTolerance = newTolerance;
+}
+
+void Minuit2Wrapper::SetOptions( vector<string> newOptions )
+{
+        Options = newOptions;
+}
+
+void Minuit2Wrapper::SetQuality( int newQuality )
+{
+        Quality = newQuality;
 }
 
 //Use Migrad to minimise the given function
@@ -42,10 +62,10 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 	function = new Minuit2Function( NewFunction );
 
 	//Minimise the wrapped function
-	MnMigrad mig( *function, *( function->GetMnUserParameters() ), MINUIT_QUALITY );
+	MnMigrad mig( *function, *( function->GetMnUserParameters() ), Quality );//MINUIT_QUALITY );
 
 	//Retrieve the result of the fit
-	FunctionMinimum minimum = mig( (int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
+	FunctionMinimum minimum = mig( maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
 	
 	// May also want to run Hesse before the minimisation to get better estimate
 	// of the error matrix.
@@ -72,7 +92,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 		double parameterError = minimisedParameters->Error( parameterName.c_str() );
 
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-				-numeric_limits<double>::max(), numeric_limits<double>::max(),
+				-oldParameter->GetMinimum(), oldParameter->GetMaximum(), oldParameter->GetStepSize(),
 				oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 

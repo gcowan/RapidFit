@@ -186,9 +186,10 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 			double Error = 0;
 			double Minimum = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetMinimum();
 			double Maximum = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetMaximum();
+			double StepSize = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetStepSize();
 			string Type = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetType();
 			string Unit = BottleParameters.back()->GetPhysicsParameter( BottleParameters.back()->GetAllNames()[i] )->GetUnit();
-			bool added = ReturnableFitResult->GetResultParameterSet()->ForceNewResultParameter( BottleParameters.back()->GetAllNames()[i],  Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
+			bool added = ReturnableFitResult->GetResultParameterSet()->ForceNewResultParameter( BottleParameters.back()->GetAllNames()[i],  Value, OriginalValue, Error, Minimum, Maximum, StepSize, Type, Unit );
 			if( !added )
 			{
 				cerr << "Error finalizing FitResultVector Object" << endl << endl;
@@ -261,9 +262,10 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
 
 		string name = Wanted_Param->GetName();
+		double StepSize = BottleParameters.back()->GetPhysicsParameter( name )->GetStepSize();
 		string type = BottleParameters.back()->GetPhysicsParameter( name )->GetType();
 		string unit = BottleParameters.back()->GetPhysicsParameter( name )->GetUnit();
-		scanStepResult->GetResultParameterSet()->SetResultParameter( name, scanVal, 0, 0., scanVal, scanVal, type, unit );
+		scanStepResult->GetResultParameterSet()->SetResultParameter( name, scanVal, 0, 0., scanVal, scanVal, StepSize, type, unit );
 
 		vector<string> Fixed_List = BottleParameters.back()->GetAllFixedNames();
 		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
@@ -279,10 +281,11 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 			}
 			if( !found )
 			{
+				double fixed_StepSize = BottleParameters.back()->GetPhysicsParameter( Fixed_List[i] )->GetStepSize();
 				string fixed_type = BottleParameters.back()->GetPhysicsParameter( Fixed_List[i] )->GetType();
 				string fixed_unit = BottleParameters.back()->GetPhysicsParameter( Fixed_List[i] )->GetUnit();
 				double fixed_value = BottleParameters.back()->GetPhysicsParameter( Fixed_List[i] )->GetValue();
-				scanStepResult->GetResultParameterSet()->ForceNewResultParameter( Fixed_List[i], fixed_value, fixed_value, 0, fixed_value, fixed_value, fixed_type, fixed_unit );
+				scanStepResult->GetResultParameterSet()->ForceNewResultParameter( Fixed_List[i], fixed_value, fixed_value, 0, fixed_value, fixed_value, fixed_StepSize, fixed_type, fixed_unit );
 			}
 		}
 
@@ -338,12 +341,13 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
                 string name = Param_Set.first->GetName();
+		double step = BottleParameters.back()->GetPhysicsParameter( name )->GetStepSize();
                 string type = BottleParameters.back()->GetPhysicsParameter( name )->GetType();
                 string unit = BottleParameters.back()->GetPhysicsParameter( name )->GetUnit();
 
 		for( short int i=0; i < Returnable_Result->NumberResults(); ++i )
 		{
-			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, scanVal, 0, 0.0, scanVal, scanVal, type, unit );
+			Returnable_Result->GetFitResult( i )->GetResultParameterSet()->SetResultParameter( name, scanVal, 0, 0.0, scanVal, scanVal, step, type, unit );
 		}
 
 		output_interface->push_back( Returnable_Result );

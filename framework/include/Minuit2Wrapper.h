@@ -31,6 +31,11 @@ class Minuit2Wrapper : public IMinimiser
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );
 
+		virtual void SetSteps( int );
+                virtual void SetTolerance( double );
+                virtual void SetOptions( vector<string> );
+		virtual void SetQuality( int );
+
 	private:
 		//	Uncopyable!
 		Minuit2Wrapper ( const Minuit2Wrapper& );
@@ -40,6 +45,10 @@ class Minuit2Wrapper : public IMinimiser
 		Minuit2Function * function;
 		FitResult * fitResult;
 		vector< pair< string, string > > contours;
+                int maxSteps;
+                double bestTolerance;
+                vector<string> Options;
+		int Quality;
 };
 
 #endif

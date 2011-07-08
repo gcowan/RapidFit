@@ -278,6 +278,7 @@ vector<double> FitResultVector::GetFlatResult( int Index )
 		Flatresult.push_back( (allPulls[i][unsigned(Index)]) );
 		Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetMinimum() ) );
 		Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetMaximum() ) );
+		Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetStepSize() ) );
 		Flatresult.push_back( (allGenValues[i][unsigned(Index)]) );
 	}
 
@@ -299,6 +300,7 @@ TString FitResultVector::GetFlatResultHeader()
 		header += name + "_min:";
 		header += name + "_max:";
 		header += name + "_gen:";
+		header += name + "_step:";
 	}
 	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:NLL";
 	return header;

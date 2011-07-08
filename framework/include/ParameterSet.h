@@ -38,7 +38,7 @@ class ParameterSet
 		PhysicsParameter * GetPhysicsParameter( string );
 		PhysicsParameter * GetPhysicsParameter( ObservableRef& );
 		bool SetPhysicsParameter( string, PhysicsParameter* );
-		bool SetPhysicsParameter( string, double, double, double, string, string );
+		bool SetPhysicsParameter( string, double, double, double, double, string, string );
 		bool SetPhysicsParameters( ParameterSet* );
 
 		//Not very nice in OO programming terms, and unsafe. Much faster though

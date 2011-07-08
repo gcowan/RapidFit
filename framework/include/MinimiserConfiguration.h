@@ -26,6 +26,11 @@ class MinimiserConfiguration
 		void SetOutputLevel(int);
 		void RemoveMinimiser();
 
+		void SetSteps(int);
+		void SetTolerance(double);
+		void SetOptions(vector<string>);
+		void SetQuality( int );
+
 	private:
 		//	Uncopyable!
 		MinimiserConfiguration ( const MinimiserConfiguration& );
@@ -35,6 +40,10 @@ class MinimiserConfiguration
 		int OutputLevel;
 		string minimiserName;
 		vector< pair< string, string > > contours;
+		int maxSteps;
+		double bestTolerance;
+		vector<string> MinimiseOptions;
+		int Quality;
 };
 
 #endif
