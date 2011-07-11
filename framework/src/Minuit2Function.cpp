@@ -98,3 +98,4 @@ MnUserParameters * Minuit2Function::GetMnUserParameters()
 {
 	return parameters;
 }
+

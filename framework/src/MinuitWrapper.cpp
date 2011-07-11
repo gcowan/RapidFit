@@ -135,6 +135,8 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		}
 	}
 
+	//	Syntax for Minuit Commands through the TMinuit Class:
+	//
 	//	minuit->mnexcm("SOMECOMMAND",&SOMEARGUMENTS,NUMBEROFARGUMENTS,ERRORFLAG);
 
 	//	Set the error analysis
@@ -148,8 +150,18 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
         arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS;
         arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
 
-	//	First do Simplex
-	//minuit->mnexcm("SIMplex",arguments, 2, errorFlag);
+	string SimplexOption("SimplexFirst");
+	if( StringProcessing::VectorContains( &Options, &SimplexOption ) != -1 )
+	{
+		//	First do Simplex
+		minuit->mnexcm("SIMplex",arguments, 2, errorFlag);
+	}
+
+	string HesseFirstOption("HesseFirst");
+	if( StringProcessing::VectorContains( &Options, &HesseFirstOption ) != -1 )
+	{
+		minuit->mnexcm("HESSE", arguments, 2, errorFlag);
+	}
 
 	//	Now Do the minimisation
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
@@ -157,10 +169,14 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	//	Finally Now call HESSE to properly calculate the error matrix
 	minuit->mnexcm("HESSE", arguments, 2, errorFlag);
 
-	//	Call MINOS to calculate the non-parabolic errors.
-	//	MINOS rather than assuming parabolic shape about the minimum, MINOS climbs
-	//	out of the minimum on either side up until the UP value.
-	//minuit->mnexcm("MINOS", arguments, 2, errorFlag);
+	string MinosOption("MinosErrors");
+	if( StringProcessing::VectorContains( &Options, &MinosOption ) != -1 )
+	{
+		//	Call MINOS to calculate the non-parabolic errors.
+		//	MINOS rather than assuming parabolic shape about the minimum, MINOS climbs
+		//	out of the minimum on either side up until the UP value.
+		minuit->mnexcm("MINOS", arguments, 2, errorFlag);
+	}
 
 	//Output time information
 	time_t timeNow;

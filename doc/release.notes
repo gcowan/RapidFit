@@ -1,5 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/10 Rob Currie
+    - Added some more XML options for the Minuit Minimiser, I trust they're fairly self-explanitory
+           <ConfigureMinimiser>SimplexFirst</ConfigureMinimiser>
+           <ConfigureMinimiser>HesseFirst</ConfigureMinimiser>
+           <ConfigureMinimiser>MinosErrors</ConfigureMinimiser>
+
 2011/07/08 Rob Currie
     - Added the ability to control the StepSize of a parameter through the commandline/xml with <StepSize> or in the argument of --PhysParam
         This ha touched a LOT of files. This adds the param_step columns to the output ttree from RapidFit.
