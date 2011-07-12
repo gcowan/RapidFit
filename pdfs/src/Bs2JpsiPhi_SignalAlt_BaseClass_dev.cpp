@@ -7,11 +7,15 @@
  *  @date 2011-02-12
  */
 
-#include "Bs2JpsiPhi_SignalAlt_BaseClass_dev.h"
-#include <iostream>
-#include "math.h"
+//	ROOT Headers
 #include "TMath.h"
 #include "RooMath.h"
+//	RapidFit Headers
+#include "Bs2JpsiPhi_SignalAlt_BaseClass_dev.h"
+#include "SlicedAcceptance.h"
+//	System Headers
+#include <iostream>
+#include <math.h>
 
 //......................................
 //Constructor(s)

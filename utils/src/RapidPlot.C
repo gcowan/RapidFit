@@ -207,7 +207,11 @@ int main( int argc, char* argv[] )
 
 	cout << endl << "NUMBER OF TOYS IN FILE:\t" << allresults->GetSelectedRows() << endl;
 
-
+	if( int(allresults->GetEntries() - allresults->GetSelectedRows()) == 0 )
+	{
+		cerr << "SERIOUS ERROR:\tSOMETHING HAS REALLY GOTTEN SCREWED UP!" << endl;
+		exit(-3498);
+	}
 
 
 	//	Fit values for the global fit are now stored in:

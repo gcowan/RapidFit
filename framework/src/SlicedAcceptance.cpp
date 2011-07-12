@@ -67,7 +67,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 SlicedAcceptance::SlicedAcceptance( string s ) :
 nullSlice(new AcceptanceSlice(0.,0.,0.))
 {
-	
+	(void)s;	
 	int N = 31;
 	
 	double ts[31] = {0, 0.05,  0.1, 0.15, 0.2, 0.25, 0.3, 0.34, 0.38, 0.42, 0.46, 0.5, 0.54, 0.58, 0.62, 0.66, 

@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/12 Rob Currie
+    - Fixed a dangerous mixup between the Step and Generated values in the 'FlatNtuple' format.    (Appologies this should not have happened and should have been caught)
+    - Added more control to the Minuit Minimiser:
+           <ConfigureMinimiser>Interactive</ConfigureMinimiser> Run in interactive mode
+           <ConfigureMinimiser>SeekFirst</ConfigureMinimiser>   Run Seek before Fit
+           <ConfigureMinimiser>NoHesse</ConfigureMinimiser>	Don't run Hesse after  the fit
+
 2011/07/10 Rob Currie
     - Added some more XML options for the Minuit Minimiser, I trust they're fairly self-explanitory
            <ConfigureMinimiser>SimplexFirst</ConfigureMinimiser>

@@ -299,8 +299,8 @@ TString FitResultVector::GetFlatResultHeader()
 		header += name + "_pull:";
 		header += name + "_min:";
 		header += name + "_max:";
-		header += name + "_gen:";
 		header += name + "_step:";
+		header += name + "_gen:";
 	}
 	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:NLL";
 	return header;

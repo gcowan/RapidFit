@@ -105,11 +105,13 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
 		double STEP_SIZE= 0.01;
-		if( !( fabs( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE  ) ){
+		if( !( fabs( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE  ) || (newParameter->GetStepSize()<0) ){
 			STEP_SIZE = fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
 		}
 
 		if( newParameter->GetStepSize() > 0 ) { STEP_SIZE = newParameter->GetStepSize(); };
+
+		newParameter->SetStepSize( STEP_SIZE );
 
 		//cout << "STEP SIZE:" << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
 
@@ -147,8 +149,21 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 	arguments[0] = Quality;//1;
 	minuit->mnexcm("SET STR", arguments, 1, errorFlag);
 
-        arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS;
-        arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
+	minuit->mnexcm("SET NOGradient", arguments, 0, errorFlag);
+
+	string IntOption("Interactive");
+	if( StringProcessing::VectorContains( &Options, &IntOption ) != -1 )
+	{
+		minuit->mnexcm("SET INT", arguments, 0, errorFlag);
+	}
+
+	string SeekOption("SeekFirst");
+	if( StringProcessing::VectorContains( &Options, &SeekOption ) != -1 )
+	{
+		arguments[0] = maxSteps;
+		arguments[1] = 3;
+		minuit->mnexcm("SEEk", arguments, 2, errorFlag);
+	}
 
 	string SimplexOption("SimplexFirst");
 	if( StringProcessing::VectorContains( &Options, &SimplexOption ) != -1 )
@@ -163,11 +178,18 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		minuit->mnexcm("HESSE", arguments, 2, errorFlag);
 	}
 
+	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
+	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
+
 	//	Now Do the minimisation
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
 
-	//	Finally Now call HESSE to properly calculate the error matrix
-	minuit->mnexcm("HESSE", arguments, 2, errorFlag);
+	string NoHesse("NoHesse");
+	if( StringProcessing::VectorContains( &Options, &NoHesse ) == -1 )
+	{
+		//	Finally Now call HESSE to properly calculate the error matrix
+		minuit->mnexcm("HESSE", arguments, 2, errorFlag);
+	}
 
 	string MinosOption("MinosErrors");
 	if( StringProcessing::VectorContains( &Options, &MinosOption ) != -1 )

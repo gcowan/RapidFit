@@ -154,12 +154,18 @@ vector<vector<Float_t> > Plotter_Data( TTree* input_tree, TString Draw_String, T
 	double temp = random->Rndm();
 	TString Name = "TPoly3_";
 	Name+=temp;
-	pm->SetName(Name);
 
-	//      Get a list of ONLY unique coordinates due to the short comings of the interpolation within TGraph2D
-	vector<vector<Float_t> > returnable_data = Unique_Coords( pm );
+	if( pm!= NULL )
+	{
+		pm->SetName(Name);
 
-	return returnable_data;
+		//      Get a list of ONLY unique coordinates due to the short comings of the interpolation within TGraph2D
+		vector<vector<Float_t> > returnable_data = Unique_Coords( pm );
+
+		return returnable_data;
+	}
+	vector<vector<Float_t> > dummy_return;
+	return dummy_return;
 }
 
 TGraph2D* Plotter( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random )
@@ -207,10 +213,13 @@ TH2D* Plot_From_Cut( TTree* wanted_tree, TString Draw_String, TString Cut_String
 
 	//      Return the Histogram from within this graph for plotting
 	TH2D* Returnable_Hist = new_graph->GetHistogram();
-	Returnable_Hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
-	Returnable_Hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
-
-	return Returnable_Hist;
+	if( Returnable_Hist != NULL )
+	{
+		Returnable_Hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
+		Returnable_Hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
+		return Returnable_Hist;
+	}
+	return NULL;
 }
 
 //      Produce Plotting Histograms from an input TTree

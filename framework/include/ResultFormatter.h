@@ -10,6 +10,8 @@
 #ifndef RESULT_FORMATTER_H
 #define RESULT_FORMATTER_H
 
+//	ROOT Headers
+#include "TTree.h"
 //	RapidFit Headers
 #include "IDataSet.h"
 #include "FitResult.h"
