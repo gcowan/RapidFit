@@ -105,7 +105,7 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
 		double STEP_SIZE= 0.01;
-		if( !( fabs( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE  ) || (newParameter->GetStepSize()<0) ){
+		if( !( fabs( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE  ) ){
 			STEP_SIZE = fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
 		}
 
