@@ -232,7 +232,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		double FINAL_GRADIENT_TOLERANCE = 0.001;
 		MinimiserConfiguration* returnableConfig = NULL;
 		vector<string> minimiserOptions;
-		int Quality = 2;
+		int Quality = 1;
 		if ( minimiserComponents.size() == 0 )
 		{
 			minimiserName = MinimiserTag->GetValue()[0];

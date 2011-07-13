@@ -189,7 +189,7 @@ IDataSet * DataSetConfiguration::LoadDataFile( vector<string> Arguments, vector<
 IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string ntuplePath, long numberEventsToRead, PhaseSpaceBoundary * DataBoundary )
 {
 	MemoryDataSet * data = new MemoryDataSet(DataBoundary);
-	std::vector<string> observableNames = DataBoundary->GetAllNames();
+	vector<string> observableNames = DataBoundary->GetAllNames();
 	int numberOfObservables = int(observableNames.size());
 
 	TFile * inputFile = new TFile( fileName.c_str(), "READ" );
@@ -197,7 +197,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	if ( ntuple == NULL )
 	{
 		cerr << "Ntuple not found. Are you specifying the correct file and ntuple path?" << endl;
-		exit(1);
+		exit(2374);
 	}
 	if( Start_Entry != 0 ) cout << "Starting From Entry: " << Start_Entry<< " in the ntuple." << endl;
 	int totalNumberOfEvents = int(ntuple->GetEntries());
@@ -206,7 +206,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	if ( numberOfEventsAfterCut == -1 )
 	{
 		cerr << "Please check the cut string you are using!" << endl;
-		exit(978);
+		exit(97823);
 	}
 //	TEventList * evtList = (TEventList*)gDirectory->Get("evtList"); // ROOT is weird
 
@@ -225,7 +225,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 	//  Container for all of the data read in from a root file
 	vector<vector<Double_t> > real_data_array;
-	real_data_array.reserve( unsigned(numberOfObservables) );
+	//real_data_array.reserve( unsigned(numberOfObservables) );
 
 
 	//time_t timeNow1;
@@ -324,6 +324,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	time_t timeNow;
         time(&timeNow);
         cout << "Time: " << ctime( &timeNow );
+	while( !real_data_array.empty() ){ while( !real_data_array.back().empty() ){real_data_array.back().pop_back(); }; real_data_array.pop_back(); }
 	return data;
 }
 
