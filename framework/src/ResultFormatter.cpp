@@ -19,6 +19,7 @@
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TFrame.h"
+#include "TLegend.h"
 #include "TAxis.h"
 //	RapidFit Headers
 #include "ResultFormatter.h"
@@ -128,22 +129,34 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 
 	string name = contourFileName;// + ".root";
 	TFile * contourFile = new TFile( name.c_str(), "RECREATE");
-	int colours[2] = {42,38};
+	int colours[3] = {2,3,4};
+	TString confs[3] = {"68.0","90.0","95.0"};
+
 
 	//Loop over all contour plots
 	for (unsigned short int plotIndex = 0; plotIndex < contours.size(); ++plotIndex )
 	{
+
+
 		TMultiGraph * graph = new TMultiGraph();
 		FunctionContour * plotContour = contours[plotIndex];
 
 		//Make the plot canvas
-		string canvasName = plotContour->GetXName() + "vs" + plotContour->GetYName() + "Contour";
-		string canvasTitle = plotContour->GetXName() + " vs " + plotContour->GetYName() + " Contour";
+		string canvasName = plotContour->GetXName() + "vs" + plotContour->GetYName() + "Profile LL";
+		string canvasTitle = plotContour->GetXName() + " vs " + plotContour->GetYName() + " Profile LL";
 		TCanvas * bothPlots = new TCanvas( canvasName.c_str(), canvasTitle.c_str() );
+		TLegend *leg = new TLegend(0.80,0.89,0.95,0.7);
+		   leg->SetHeader("Conf. Levels");
+		             leg->SetBorderSize(0);
+			               leg->SetFillStyle(0);
 
 		//Plot each contour, starting at highest sigma
 		for ( int sigma = plotContour->GetContourNumber(); sigma > 0; --sigma )
 		{
+		TString confname = "";
+		confname +=confs[sigma-1];
+		confname += "\% C.L.";
+
 			vector< pair< double, double > > sigmaContour = plotContour->GetPlot(sigma);
 
 			//Retrieve each point
@@ -157,13 +170,18 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 
 			//Make the graph
 			TGraphErrors * contourGraph = new TGraphErrors( int(sigmaContour.size()), xCoordinates, yCoordinates );
-			contourGraph->SetFillColor( Color_t(colours[sigma-1]) );
+
+			contourGraph->SetLineColor(colours[sigma-1]);
+			contourGraph->SetLineWidth(2);
+			leg->AddEntry(contourGraph,confname, "L");
 			graph->Add(contourGraph);
 		}
 
 		//Format the graph
-		graph->SetTitle("1 and 2 sigma contours");
-		graph->Draw( "ALF" ); //Smooth fill area drawn
+		graph->SetTitle("Profile LL Contours");
+		graph->Draw( "AL" ); //Smooth fill area drawn //FIXME
+		leg->Draw();
+		
 
 		//Titles in format: ParameterName (ParameterUnit)
 		string xTitle = plotContour->GetXName() + " (" + OutputData->GetResultParameterSet()->GetResultParameter( plotContour->GetXName() )->GetUnit() + ")";
@@ -175,7 +193,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 		bothPlots->Modified();
 		bothPlots->Update();
 		bothPlots->Write();
-		//bothPlots->SaveAs( (contourFileName + "." + plotContour->GetXName() + "." + plotContour->GetYName() + ".png").c_str() );
+		bothPlots->SaveAs( (contourFileName + "_" + plotContour->GetXName() + "_" + plotContour->GetYName() + ".pdf").c_str() );
 	}
 
 	contourFile->Close();

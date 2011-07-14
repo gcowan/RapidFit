@@ -83,6 +83,10 @@ double NegativeLogLikelihood::UpErrorValue( int Sigma )
 	{
 		return 2.0;
 	}
+	else if ( Sigma == 3 )
+	{
+		return 4.5;
+	}
 	else
 	{
 		cerr << "I don't know UP for NLL sigma > 2" << endl;

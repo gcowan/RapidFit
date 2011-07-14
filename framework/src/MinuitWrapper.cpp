@@ -289,25 +289,33 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 		else
 		{
 			//If the parameters have valid indices, ask minuit to plot them
-			int numberOfPoints = 40;
+			int numberOfPoints = 20;
 			int iErrf;
-			double* xCoordinates1 = new double[unsigned(numberOfPoints)];
-			double* yCoordinates1 = new double[unsigned(numberOfPoints)];
-			double* xCoordinates2 = new double[unsigned(numberOfPoints)];
-			double* yCoordinates2 = new double[unsigned(numberOfPoints)];
+			double* xCoordinates1 = new double[unsigned(numberOfPoints+1)];
+			double* yCoordinates1 = new double[unsigned(numberOfPoints+1)];
+			double* xCoordinates2 = new double[unsigned(numberOfPoints+1)];
+			double* yCoordinates2 = new double[unsigned(numberOfPoints+1)];
+			double* xCoordinates3 = new double[unsigned(numberOfPoints+1)];
+			double* yCoordinates3 = new double[unsigned(numberOfPoints+1)];
+
 
 			//One sigma contour
-			minuit->SetErrorDef( NewFunction->UpErrorValue(1) );
+			minuit->SetErrorDef( 0.5);
 			minuit->mncont( xParameterIndex, yParameterIndex, numberOfPoints, xCoordinates1, yCoordinates1, iErrf );
 
 			//Two sigma contour
-			minuit->SetErrorDef( NewFunction->UpErrorValue(2) );
+			minuit->SetErrorDef( 2.0);
 			minuit->mncont( xParameterIndex, yParameterIndex, numberOfPoints, xCoordinates2, yCoordinates2, iErrf );
 
+			//Three sigma contour
+			minuit->SetErrorDef( 4.5);
+			minuit->mncont( xParameterIndex, yParameterIndex, numberOfPoints, xCoordinates3, yCoordinates3, iErrf );
+
 			//Store the contours
-			FunctionContour * newContour = new FunctionContour( contours[plotIndex].first, contours[plotIndex].second, 2 );
+			FunctionContour * newContour = new FunctionContour( contours[plotIndex].first, contours[plotIndex].second, 3 );
 			newContour->SetPlot( 1, numberOfPoints, xCoordinates1, yCoordinates1 );
 			newContour->SetPlot( 2, numberOfPoints, xCoordinates2, yCoordinates2 );
+			newContour->SetPlot( 3, numberOfPoints, xCoordinates2, yCoordinates3 );
 			allContours.push_back(newContour);
 		}
 	}
