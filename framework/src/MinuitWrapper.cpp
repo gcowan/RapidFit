@@ -302,14 +302,21 @@ void MinuitWrapper::Minimise( FitFunction * NewFunction )
 			//One sigma contour
 			minuit->SetErrorDef( 0.5);
 			minuit->mncont( xParameterIndex, yParameterIndex, numberOfPoints, xCoordinates1, yCoordinates1, iErrf );
+			xCoordinates1[numberOfPoints] = xCoordinates1[0];
+			xCoordinates1[numberOfPoints] = yCoordinates1[0];
+
 
 			//Two sigma contour
 			minuit->SetErrorDef( 2.0);
 			minuit->mncont( xParameterIndex, yParameterIndex, numberOfPoints, xCoordinates2, yCoordinates2, iErrf );
+			xCoordinates2[numberOfPoints] = xCoordinates2[0];
+			xCoordinates2[numberOfPoints] = yCoordinates2[0];
 
 			//Three sigma contour
 			minuit->SetErrorDef( 4.5);
 			minuit->mncont( xParameterIndex, yParameterIndex, numberOfPoints, xCoordinates3, yCoordinates3, iErrf );
+			xCoordinates3[numberOfPoints] = xCoordinates3[0];
+			xCoordinates3[numberOfPoints] = yCoordinates3[0];
 
 			//Store the contours
 			FunctionContour * newContour = new FunctionContour( contours[plotIndex].first, contours[plotIndex].second, 3 );
