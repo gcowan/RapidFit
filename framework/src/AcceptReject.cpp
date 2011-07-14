@@ -16,7 +16,8 @@
 #include <math.h>
 #include <float.h>
 
-#define DOUBLE_TOLERANCE DBL_MIN
+//#define DOUBLE_TOLERANCE DBL_MIN
+#define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
 AcceptReject::AcceptReject() : generationFunction(), generationBoundary(), dataNumber(), newDataSet(), rootRandom(), moreThanMaximum(), numberAttempts()

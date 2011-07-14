@@ -15,7 +15,8 @@
 #include <iostream>
 #include <float.h>
 
-#define DOUBLE_TOLERANCE DBL_MIN
+//#define DOUBLE_TOLERANCE DBL_MIN
+#define DOUBLE_TOLERANCE 1E-6
 
 //Return the mean of a vector of doubles
 double StatisticsFunctions::Mean( vector<double> Numbers )

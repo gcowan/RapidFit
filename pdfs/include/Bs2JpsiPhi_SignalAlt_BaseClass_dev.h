@@ -40,7 +40,8 @@
 #include "TCanvas.h"
 //~PELC
 
-#define DOUBLE_TOLERANCE DBL_MIN
+//#define DOUBLE_TOLERANCE DBL_MIN
+#define DOUBLE_TOLERANCE 1E-6
 #define DEBUGFLAG true
 
 //========================================================================================================================

@@ -18,7 +18,8 @@
 
 #define DEBUGFLAG true
 
-#define DOUBLE_TOLERANCE DBL_MIN
+//#define DOUBLE_TOLERANCE DBL_MIN
+//#define DOUBLE_TOLERANCE 1E-6
 
 //......................................
 //Constructor(s)

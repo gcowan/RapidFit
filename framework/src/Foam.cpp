@@ -20,7 +20,8 @@
 #include <limits.h>
 #include <float.h>
 
-#define DOUBLE_TOLERANCE DBL_MIN
+//#define DOUBLE_TOLERANCE DBL_MIN
+#define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
 Foam::Foam() : Open_Files(), InputPDF(NULL), generationFunction(), generationBoundary(), newDataSet(), rootRandom(), foamGenerators(), storedIntegrator(), storedDatapoint(), dataNumber(0), discreteCombinations(), allNames(), discreteNames(), continuousNames(), discreteValues(), minima(), ranges()

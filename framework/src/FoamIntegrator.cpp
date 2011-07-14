@@ -6,7 +6,8 @@
 #include <math.h>
 #include <float.h>
 
-#define DOUBLE_TOLERANCE DBL_MIN
+//#define DOUBLE_TOLERANCE DBL_MIN
+#define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
 FoamIntegrator::FoamIntegrator() : allIntegrators(), discreteNames(), discreteValues()

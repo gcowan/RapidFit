@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/14 Rob Currie
+    - Reverted Double precision to more relaxed limits due to bug this introduces...
+           Testing revleals we're now binary compatible with the results to 2010 as far back as r600
+
 2011/07/12 Rob Currie
     - Fixed a dangerous mixup between the Step and Generated values in the 'FlatNtuple' format.    (Appologies this should not have happened and should have been caught)
     - Added more control to the Minuit Minimiser:

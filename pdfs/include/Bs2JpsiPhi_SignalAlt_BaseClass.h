@@ -39,7 +39,8 @@
 
 #include "float.h"
 
-#define DOUBLE_TOLERANCE DBL_MIN
+//#define DOUBLE_TOLERANCE DBL_MIN
+#define DOUBLE_TOLERANCE 1E-6
 #define DEBUGFLAG true
 
 // Some hard code switches - 
