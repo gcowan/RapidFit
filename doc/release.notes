@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/16 Pete Clarke
+    - Added functionality ot SlicedAcceptnce and to ...BaseClass...  to read in a file to configure time acceptance
+       The file must reside in pdfs/configdata/.....
+       The XML needs 
+           <ConfigurationParameter>UseTimeAcceptance:True</ConfigurationParamete> to switch on time acceptance
+           <ConfigurationParameter>TimeAcceptanceFile:filename</ConfigurationParamete> to declare file
+
+           
 2011/07/14 Rob Currie
     - Reverted Double precision to more relaxed limits due to bug this introduces...
            Testing revleals we're now binary compatible with the results to 2010 as far back as r600
