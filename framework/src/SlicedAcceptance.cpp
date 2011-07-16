@@ -10,7 +10,6 @@
 
 #include "SlicedAcceptance.h"
 
-
 //............................................
 // Constructor for flat acceptance
 SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
@@ -93,6 +92,48 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 
 
 //............................................
+// Constructor for accpetance from a file
+SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
+nullSlice(new AcceptanceSlice(0.,0.,0.))
+{
+	(void)type;	
+	
+	if( type != "File" ) { ;  }//do nothing for now  
+
+	string path( getenv("RAPIDFITROOT") ) ;
+	
+	string fullFileName = path+"/pdfs/configdata/"+fileName ;
+	
+	ifstream in;
+	in.open(fullFileName.c_str());
+	if( in.fail() ) { cout << "SlicedAcceptance::SlicedAcceptance : failed to open acceptance file  '  " << fullFileName  << "  '  " << endl ; exit(1) ; }
+
+	std::vector<double> lowEdge; std::vector<double> hiEdge; std::vector<double> binContent;
+	int ok = true;
+	while (ok) {  
+		lowEdge.push_back(stream(in));  hiEdge.push_back(stream(in)); binContent.push_back(stream(in) );
+		if (in.eof()  == true || in.good() == false) ok =false; 
+	}		
+	in.close();
+	
+	double last = 0 ;
+	for( int is=0; is < lowEdge.size() ; is++ ) 
+	{
+		double tlow = lowEdge[is];
+		double thigh = hiEdge[is] ;
+		double height = binContent[is] - last ;
+		last = binContent[is]  ;
+		cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
+		slices.push_back( new AcceptanceSlice( tlow, thigh, height ) ) ;
+	}
+	
+	//....done.....
+	
+}
+
+
+
+//............................................
 // Return numerator for evaluate
 double SlicedAcceptance::getValue( double t ) const
 {
@@ -114,3 +155,13 @@ AcceptanceSlice * SlicedAcceptance::getSlice( int s ) const
 	if( (s<0) || (s>=(int)slices.size()) ) return nullSlice ;
 	return slices[s] ;
 }
+
+
+//............................................
+//Helpers
+double SlicedAcceptance::stream(ifstream& stream) {
+	double tmpVal;
+	stream >> tmpVal;
+	return tmpVal;
+}
+

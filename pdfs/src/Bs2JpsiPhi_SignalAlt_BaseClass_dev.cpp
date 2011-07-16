@@ -95,6 +95,10 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfig
 			timeAcc = new SlicedAcceptance( "Lower2010" ) ;
 			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: Lower time acceptance 2010  [0 < t < 14] " << endl ;
 		}
+		else if( configurator.getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
+			timeAcc = new SlicedAcceptance( "File" , configurator.getConfigurationValue( "TimeAcceptanceFile" ) ) ;
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: using file: " << configurator.getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
+		}
 	}
 	else {
 			timeAcc = new SlicedAcceptance( 0., 14. ) ;

@@ -93,7 +93,7 @@ string PDFConfigurator::getConfigurationValue( string configParam ) {
 	for( unsigned int ii=0; ii<configParameters.size() ; ii++ ) {
 		//cout << " Testing " << configParam <<  "   against   " << configParameters[ii] << endl ;
 		if( configParam == configParameters[ii] ) {
-			cout << " PDFConfiguratorgetConfigurationValue setting [" << configParam << "--->" << configValues[ii] << "]" << endl ;
+			//cout << " PDFConfiguratorgetConfigurationValue setting [" << configParam << "--->" << configValues[ii] << "]" << endl ;
 			return configValues[ii] ;
 		}
 	}

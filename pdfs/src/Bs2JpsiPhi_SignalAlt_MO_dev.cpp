@@ -206,7 +206,7 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::Evaluate(DataPoint * measurement)
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
 	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
-	
+		
 	double val1, val2 ;
 	double returnValue ;
 	
