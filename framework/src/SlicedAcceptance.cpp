@@ -98,9 +98,20 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 {
 	(void)type;	
 	
-	if( type != "File" ) { ;  }//do nothing for now  
+	if( type != "File" ) {   }//do nothing for now  
 
+	if( !getenv("RAPIDFITROOT") )
+	{
+		cerr << "\n\n" << endl;
+		cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
+		cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		cerr << "\n\n" << endl;
+		exit(-987);
+	}
 	string path( getenv("RAPIDFITROOT") ) ;
+
+	cout << "RAPIDFITROOT defined as: " << path << endl;
 	
 	string fullFileName = path+"/pdfs/configdata/"+fileName ;
 	
