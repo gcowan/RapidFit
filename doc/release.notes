@@ -2,6 +2,9 @@
 
 2011/07/17 Rob Currie
     - Fixed some minor bugs, further testing reveals results from svn head are binary compatable with svn r575-r620
+    - Improved the ability to use the acceptance data with the Biased fit
+          This requires that the filename passed to the ConfigurationParameter in the XML be either an absolute path or just a filename in the directory defined by the $RAPIDFITROOT
+          i.e. this requires $RAPIDFITROOT be defined in the environment to be used
 
 2011/07/16 Pete Clarke
     - Added functionality ot SlicedAcceptnce and to ...BaseClass...  to read in a file to configure time acceptance
@@ -9,7 +12,6 @@
        The XML needs 
            <ConfigurationParameter>UseTimeAcceptance:True</ConfigurationParamete> to switch on time acceptance
            <ConfigurationParameter>TimeAcceptanceFile:filename</ConfigurationParamete> to declare file
-
            
 2011/07/14 Rob Currie
     - Reverted Double precision to more relaxed limits due to bug this introduces...

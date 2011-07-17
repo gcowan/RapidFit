@@ -100,7 +100,12 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 	
 	if( type != "File" ) {   }//do nothing for now  
 
-	if( !getenv("RAPIDFITROOT") )
+	ifstream input_file;
+
+	input_file.open( fileName.c_str(), ifstream::in );
+	input_file.close();
+
+	if( !getenv("RAPIDFITROOT") && input_file.fail() )
 	{
 		cerr << "\n\n" << endl;
 		cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
@@ -109,12 +114,24 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 		cerr << "\n\n" << endl;
 		exit(-987);
 	}
-	string path( getenv("RAPIDFITROOT") ) ;
 
-	cout << "RAPIDFITROOT defined as: " << path << endl;
+	string fullFileName;
+
+	if( getenv("RAPIDFITROOT") )
+	{
+		string path( getenv("RAPIDFITROOT") ) ;
+
+		cout << "RAPIDFITROOT defined as: " << path << endl;
 	
-	string fullFileName = path+"/pdfs/configdata/"+fileName ;
-	
+		fullFileName = path+"/pdfs/configdata/"+fileName ;
+	} else if( !input_file.fail() )
+	{
+		fullFileName = fileName;
+	} else {
+		cerr << "Shouldn't end up Here in the code!" << endl;
+		exit(-892);
+	}
+
 	ifstream in;
 	in.open(fullFileName.c_str());
 	if( in.fail() ) { cout << "SlicedAcceptance::SlicedAcceptance : failed to open acceptance file  '  " << fullFileName  << "  '  " << endl ; exit(1) ; }
