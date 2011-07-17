@@ -117,7 +117,7 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 	in.close();
 	
 	double last = 0 ;
-	for( int is=0; is < lowEdge.size() ; is++ ) 
+	for( unsigned int is=0; is < lowEdge.size() ; is++ ) 
 	{
 		double tlow = lowEdge[is];
 		double thigh = hiEdge[is] ;

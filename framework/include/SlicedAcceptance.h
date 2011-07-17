@@ -43,7 +43,7 @@ class SlicedAcceptance
 		SlicedAcceptance( double tlow, double thigh ) ;
 		SlicedAcceptance( double tlow, double thigh, double beta  ) ;
 		SlicedAcceptance( string s  ) ;
-		SlicedAcceptance( string s, string s  ) ;
+		SlicedAcceptance( string s1, string s2  ) ;
 
 		// Methods for numerator of PDF to return acceptance for event
 		double getValue( double time ) const ;

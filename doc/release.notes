@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/17 Rob Currie
+    - Fixed some minor bugs, further testing reveals results from svn head are binary compatable with svn r575-r620
+
 2011/07/16 Pete Clarke
     - Added functionality ot SlicedAcceptnce and to ...BaseClass...  to read in a file to configure time acceptance
        The file must reside in pdfs/configdata/.....

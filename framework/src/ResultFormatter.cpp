@@ -171,7 +171,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 			//Make the graph
 			TGraphErrors * contourGraph = new TGraphErrors( int(sigmaContour.size()), xCoordinates, yCoordinates );
 
-			contourGraph->SetLineColor(colours[sigma-1]);
+			contourGraph->SetLineColor(Color_t(colours[sigma-1]));
 			contourGraph->SetLineWidth(2);
 			leg->AddEntry(contourGraph,confname, "L");
 			graph->Add(contourGraph);
