@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/18 Greig Cowan
+    - Updated GOF code. Using phi = -log() potential. Unfortunately, with this updated version of RapidFit I have a problem
+      running on OSX.
+
 2011/07/17 Rob Currie
     - Fixed some minor bugs, further testing reveals results from svn head are binary compatable with svn r575-r620
     - Improved the ability to use the acceptance data with the Biased fit

@@ -23,8 +23,13 @@ namespace GoodnessOfFit
 	double sumEvents( IDataSet * data );
 	double sumDataMCEvents( IDataSet * data, IDataSet * mcData );
 	void plotUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, string plot );
-	void calculateUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, TH1D * distances );
+	void calculateUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, TH1D * distances);
+        void calculateUstatisticNum( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, TH1D * distances);
 	double getDistance( DataPoint * x, DataPoint * y );
+	vector<double> getDistances( DataPoint * x, DataPoint * y );
+        void copyPhaseSpaceBoundary( PhaseSpaceBoundary * newBoundary, PhaseSpaceBoundary * oldBoundary );
+	void updatePhaseSpaceBoundary( DataPoint * x, PhaseSpaceBoundary * newPhase, PhaseSpaceBoundary * oldPhase, vector<double> distances );
+        double diffmod2pi( double input );
 }
 
 #endif

@@ -27,6 +27,10 @@
 #include "IDataSet.h"
 #include "StringProcessing.h"
 #include "MCStudy.h"
+#include "GoodnessOfFit.h"
+#include "EdStyle.h"
+#include "MemoryDataSet.h"
+#include "PhaseSpaceBoundary.h"
 //  System Headers
 #include <string>
 #include <vector>
@@ -115,6 +119,7 @@ int RapidFit( int argc, char * argv[] )
 	bool MCStudyFlag=false;
 	bool Force_Scan_Flag=false;
 	bool FC_LL_PART_Flag=false;
+	bool GOF_Flag=false;
 
 	//	This should do something, it doesn't anymore... what was it?	-	Rob Currie
 	(void) testRapidIntegratorFlag;
@@ -565,6 +570,7 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
+		else if ( currentArgument == "--GOF" ) GOF_Flag = true;
 
 		//	The Parameters beyond here are for setting boolean flags
 		else if ( currentArgument == "--testIntegrator" )			{	testIntegratorFlag = true;			}
@@ -630,7 +636,6 @@ int RapidFit( int argc, char * argv[] )
 		RuntimeSeed[0] = RuntimeSeed[0] * ( uuid[ 2*(RuntimeSeed[0]%8) ]*256 +uuid[ 2*(RuntimeSeed[0]%8) ] );
 		xmlFile->SetSeed( unsigned(RuntimeSeed[0]) );
 	}
-
 
 	//	Command line arguments are passed and interpreted within the parser to override what is read from the XMLFile
 	if ( parameterTemplateFlag )	{	argumentParameterSet.push_back( InputParsing::MakeParameterSet( parameterTemplates ) );		}
@@ -978,6 +983,57 @@ int RapidFit( int argc, char * argv[] )
 			ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result.root" ), GlobalFitResult );
 		}
 
+		if ( GOF_Flag ) {	
+			PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
+			vector< ParameterSet * > parSet;
+			parSet.push_back(GlobalResult->GetResultParameterSet()->GetDummyParameterSet());
+			pdfAndData->SetPhysicsParameters( parSet ); 
+			IPDF * pdf = pdfAndData->GetPDF();
+			vector<IPDF*> vectorPDFs;
+			vectorPDFs.push_back(pdf);
+			IDataSet * data = pdfAndData->GetDataSet();
+			PhaseSpaceBoundary * phase = xmlFile->GetPhaseSpaceBoundaries()[0];
+			EdStyle * greigFormat = new EdStyle();
+			greigFormat->SetStyle();
+			//GoodnessOfFit::plotUstatistic( pdf, data, phase, "testStatistic.pdf");                               
+
+			// Set up to be able to generate some MC data
+			DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
+			dataConfig->SetSource( "Foam" );
+			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
+			double pvalue = 0.;
+			int nData = 100;
+			for ( int i = 1; i < 100; i++ ) {
+
+				cout << "Ensemble " << i << endl;
+				// Generate a large sample of MC toy data
+				pdf->SetRandomFunction( i );
+				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 1000 );
+
+				// Take a subset of the full dataset
+				MemoryDataSet * subset = new MemoryDataSet( data->GetBoundary() );
+				for ( int j = i*nData; j < (i+1)*nData; j++ ) {
+					subset->AddDataPoint( data->GetDataPoint(j) );
+				}
+				vector<IDataSet*> vectorData;
+				vectorData.push_back(subset);
+
+				// Fit the data and then calculate the p-value relative to the large MC sample
+				FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
+				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
+				pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
+				pvalueHist->Fill( pvalue );
+				cout << "pvalue = " << pvalue << endl;
+				delete subset;
+				cout << "pvalue = " << pvalue << endl;
+				delete mcData;
+			}
+			TFile * outputFile = new TFile("pvalues.root", "RECREATE");
+			pvalueHist->Write();
+			outputFile->Close();
+			delete outputFile;
+		}
+
 		if( GlobalResult->GetFitStatus() != 3 )
 		{
 			cerr << "--------------------------------------------------------------" << endl;
@@ -1065,7 +1121,7 @@ int RapidFit( int argc, char * argv[] )
 		{
 			string name1 = _2DLLscanList[ii].first;
 			string name2 = _2DLLscanList[ii].second;
-		//theMinimiser = xmlFile->GetMinimiserConfiguration();
+			//theMinimiser = xmlFile->GetMinimiserConfiguration();
 			vector<FitResultVector*> Temp_Results = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
 
 			GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
@@ -1148,7 +1204,7 @@ int RapidFit( int argc, char * argv[] )
 
 	//	13)	Exit
 	//	This is executed once everything else has finished
-	exit_RapidFit:
+exit_RapidFit:
 
 
 	while( !XMLConstraints.empty() )
