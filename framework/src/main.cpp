@@ -575,7 +575,7 @@ int RapidFit( int argc, char * argv[] )
 		else if ( currentArgument == "--GOF" ) 
 		{
 			GOF_Flag = true;
-			if ( argumentIndex + 1 < argc )
+			if ( argumentIndex + 2 < argc )
                         {
                                 ++argumentIndex;
                                 jobNum = atoi( argv[argumentIndex] );
@@ -979,7 +979,6 @@ int RapidFit( int argc, char * argv[] )
 		GlobalFitResult->StartStopwatch();
 
 		XMLConstraints = xmlFile->GetConstraints();
-		//********** Comment out to save time fitting to lots of events
 		GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, XMLConstraints );
 
 		GlobalFitResult->AddFitResult( GlobalResult );
@@ -991,7 +990,6 @@ int RapidFit( int argc, char * argv[] )
 		makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
 		makeOutput->OutputFitResult( GlobalFitResult->GetFitResult(0) );
 		ResultFormatter::ReviewOutput( GlobalResult );
-		//*******************/
 		//	If requested write the central value to a single file
 		if( BurnToROOTFlag )
 		{
@@ -1001,8 +999,9 @@ int RapidFit( int argc, char * argv[] )
 		}
 
 		if ( GOF_Flag ) {	
-			cout << "Staring GOF" << endl;
+			cout << "Starting GOF" << endl;
 			PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
+                        pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
 			IPDF * pdf = pdfAndData->GetPDF();
 			vector<IPDF*> vectorPDFs;
 			vectorPDFs.push_back(pdf);
@@ -1016,7 +1015,8 @@ int RapidFit( int argc, char * argv[] )
 			dataConfig->SetSource( "Foam" );
 			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
 			double pvalue = 0.;
-			for ( int i = jobNum; i < jobNum + 1; i++ ) {
+			bool model = false;
+			for ( int i = jobNum; i < jobNum + 100; i++ ) {
 
 				cout << "Ensemble " << i << endl;
 
@@ -1025,37 +1025,27 @@ int RapidFit( int argc, char * argv[] )
 				pdf->SetRandomFunction( i );
 				pdf->SetMCCacheStatus( false );
 				MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
-				/*
-				// Take a subset of the full dataset
-				MemoryDataSet * subset = new MemoryDataSet( data->GetBoundary() );
-				for ( int j = i*nData; j < (i+1)*nData; j++ ) {
-					subset->AddDataPoint( data->GetDataPoint(j) );
-				}
-				*/
 				vector<IDataSet*> vectorData;
 				vectorData.push_back(subset);
 				
-				// Fit the generated data (skip this step if you want to use the "Model" approach) 
-				FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
-				Plotter * testPlotter = new Plotter( pdf, subset );
-                		testPlotter->PlotAllObservables("test_plot.root");
-                		delete testPlotter;
-				
-				// Generate a large sample of MC toy data using the PDF which we just fit
-			        vector< ParameterSet * > parSet;
-                        	parSet.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
-                        	pdfAndData->SetPhysicsParameters( parSet );
-				
-				//pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
+				if ( model ) {
+					// Use the same PDF for the large MC dataset (the Model approach)
+					pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
+				}
+				else {
+					// Fit the generated data (the Fit I approach)
+					FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
+			        	vector< ParameterSet * > parSet;
+                        		parSet.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
+                        		pdfAndData->SetPhysicsParameters( parSet );
+				}
+				// Generate large sample of MC
 				pdf->SetRandomFunction( i*i + 1 );
 				pdf->SetMCCacheStatus( false );
 				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
-				Plotter * testPlotter2 = new Plotter( pdf, mcData );
-                		testPlotter2->PlotAllObservables("test_plot2.root");
-                		delete testPlotter2;
 
 				// Finally calculate the p-value relative to the large MC sample
-				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
+				pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
 				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
 				pvalueHist->Fill( pvalue );
 				cout << "p-value " << pvalue << endl;
