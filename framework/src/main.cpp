@@ -72,7 +72,9 @@ int RapidFit( int argc, char * argv[] )
 
 	//Variables to store command line arguments
 	int numberRepeats = 0;
-	int Nuisencemodel=2;
+	int Nuisencemodel = 2;
+	int jobNum = 0;
+	int nData = 0;
 	string configFileName = "";
 	vector<string> parameterTemplates;
 	MinimiserConfiguration * theMinimiser=NULL;
@@ -570,7 +572,22 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
-		else if ( currentArgument == "--GOF" ) GOF_Flag = true;
+		else if ( currentArgument == "--GOF" ) 
+		{
+			GOF_Flag = true;
+			if ( argumentIndex + 1 < argc )
+                        {
+                                ++argumentIndex;
+                                jobNum = atoi( argv[argumentIndex] );
+                                ++argumentIndex;
+                                nData  = atoi( argv[argumentIndex] );
+                        }
+                        else
+                        {
+                                cerr << "Job number for GOF not specified" << endl;
+                                return BAD_COMMAND_LINE_ARG;
+                        }
+		}
 
 		//	The Parameters beyond here are for setting boolean flags
 		else if ( currentArgument == "--testIntegrator" )			{	testIntegratorFlag = true;			}
@@ -962,7 +979,7 @@ int RapidFit( int argc, char * argv[] )
 		GlobalFitResult->StartStopwatch();
 
 		XMLConstraints = xmlFile->GetConstraints();
-
+		//********** Comment out to save time fitting to lots of events
 		GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, XMLConstraints );
 
 		GlobalFitResult->AddFitResult( GlobalResult );
@@ -974,7 +991,7 @@ int RapidFit( int argc, char * argv[] )
 		makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
 		makeOutput->OutputFitResult( GlobalFitResult->GetFitResult(0) );
 		ResultFormatter::ReviewOutput( GlobalResult );
-
+		//*******************/
 		//	If requested write the central value to a single file
 		if( BurnToROOTFlag )
 		{
@@ -984,10 +1001,8 @@ int RapidFit( int argc, char * argv[] )
 		}
 
 		if ( GOF_Flag ) {	
+			cout << "Staring GOF" << endl;
 			PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
-			vector< ParameterSet * > parSet;
-			parSet.push_back(GlobalResult->GetResultParameterSet()->GetDummyParameterSet());
-			pdfAndData->SetPhysicsParameters( parSet ); 
 			IPDF * pdf = pdfAndData->GetPDF();
 			vector<IPDF*> vectorPDFs;
 			vectorPDFs.push_back(pdf);
@@ -995,37 +1010,56 @@ int RapidFit( int argc, char * argv[] )
 			PhaseSpaceBoundary * phase = xmlFile->GetPhaseSpaceBoundaries()[0];
 			EdStyle * greigFormat = new EdStyle();
 			greigFormat->SetStyle();
-			//GoodnessOfFit::plotUstatistic( pdf, data, phase, "testStatistic.pdf");                               
 
 			// Set up to be able to generate some MC data
 			DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
 			dataConfig->SetSource( "Foam" );
 			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
 			double pvalue = 0.;
-			int nData = 100;
-			for ( int i = 1; i < 100; i++ ) {
+			for ( int i = jobNum; i < jobNum + 1; i++ ) {
 
 				cout << "Ensemble " << i << endl;
-				// Generate a large sample of MC toy data
-				pdf->SetRandomFunction( i );
-				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 1000 );
 
+				// First, generate some data
+                        	pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
+				pdf->SetRandomFunction( i );
+				pdf->SetMCCacheStatus( false );
+				MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
+				/*
 				// Take a subset of the full dataset
 				MemoryDataSet * subset = new MemoryDataSet( data->GetBoundary() );
 				for ( int j = i*nData; j < (i+1)*nData; j++ ) {
 					subset->AddDataPoint( data->GetDataPoint(j) );
 				}
+				*/
 				vector<IDataSet*> vectorData;
 				vectorData.push_back(subset);
+				
+				// Fit the generated data (skip this step if you want to use the "Model" approach) 
+				FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
+				Plotter * testPlotter = new Plotter( pdf, subset );
+                		testPlotter->PlotAllObservables("test_plot.root");
+                		delete testPlotter;
+				
+				// Generate a large sample of MC toy data using the PDF which we just fit
+			        vector< ParameterSet * > parSet;
+                        	parSet.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
+                        	pdfAndData->SetPhysicsParameters( parSet );
+				
+				//pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
+				pdf->SetRandomFunction( i*i + 1 );
+				pdf->SetMCCacheStatus( false );
+				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
+				Plotter * testPlotter2 = new Plotter( pdf, mcData );
+                		testPlotter2->PlotAllObservables("test_plot2.root");
+                		delete testPlotter2;
 
-				// Fit the data and then calculate the p-value relative to the large MC sample
-				FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
+				// Finally calculate the p-value relative to the large MC sample
 				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
-				pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
+				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
 				pvalueHist->Fill( pvalue );
-				cout << "pvalue = " << pvalue << endl;
+				cout << "p-value " << pvalue << endl;
 				delete subset;
-				cout << "pvalue = " << pvalue << endl;
 				delete mcData;
 			}
 			TFile * outputFile = new TFile("pvalues.root", "RECREATE");
@@ -1239,3 +1273,10 @@ exit_RapidFit:
 	cout << "Goodbye :)" << endl;
 	return 0;
 }
+
+			// Need following commented lines if wanting to use the U statistic
+			//vector< ParameterSet * > parSet;
+			//parSet.push_back(GlobalResult->GetResultParameterSet()->GetDummyParameterSet());
+			//pdfAndData->SetPhysicsParameters( parSet ); 
+			//GoodnessOfFit::plotUstatistic( pdf, data, phase, "testStatistic.pdf");                               
+

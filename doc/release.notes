@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/20 Greig Cowan
+    - Altered MemoryDataSet as it was deleting PhaseSpaceBoundary which was breaking GOF. This deletion should
+      move to the end of main.
+    - Correct method now being used for GOF.
+
 2011/07/18 Greig Cowan
     - Updated GOF code. Using phi = -log() potential. Unfortunately, with this updated version of RapidFit I have a problem
       running on OSX.

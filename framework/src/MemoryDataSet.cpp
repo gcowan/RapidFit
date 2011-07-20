@@ -28,7 +28,7 @@ MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) : allData(), da
 //Destructor
 MemoryDataSet::~MemoryDataSet()
 {
-	delete dataBoundary;
+//	delete dataBoundary;
 }
 
 void MemoryDataSet::ReserveDataSpace( int numberOfPoints )

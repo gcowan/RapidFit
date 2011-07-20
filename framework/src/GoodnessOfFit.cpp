@@ -262,9 +262,9 @@ namespace GoodnessOfFit
 		double pValueFromPoint2PointDissimilarity(IDataSet * data, IDataSet * mcData)
 		{
 			double T = calculateTstatistic( data, mcData );
-			char buffer[20];
-			sprintf( buffer, "T = %f", T );
-			cout << buffer << endl;
+			//char buffer[20];
+			//sprintf( buffer, "T = %f", T );
+			//cout << buffer << endl;
 
 			int nPerm = 25;
 			vector<double> Tvalues = permutation( data, mcData, nPerm );
@@ -318,15 +318,14 @@ namespace GoodnessOfFit
 			TRandom3 * rand = new TRandom3(iteration);
 
 			// Need to get some empty version of the dataset
-			MemoryDataSet * tempData = new MemoryDataSet( data->GetBoundary() );
 			MemoryDataSet * tempMC   = new MemoryDataSet( mc->GetBoundary() );
+			MemoryDataSet * tempData = new MemoryDataSet( data->GetBoundary() );
 
 			set<unsigned int> eventNotAccepted;
 			for ( unsigned int i = 0; i < nD + nMC; i++ ) eventNotAccepted.insert(i);
 
 			unsigned int count = 0;
 			set<unsigned int>::iterator iter;
-			cout << "nd " << nD << endl;
 			while ( count < nD ) {
 				unsigned int random = (unsigned int)rand->Uniform(0., nD + nMC);
 				iter = find(eventNotAccepted.begin(), eventNotAccepted.end(), random);
@@ -342,11 +341,9 @@ namespace GoodnessOfFit
 			}
 			double T = calculateTstatistic( tempData, tempMC );
 			delete rand;
-			delete dataClone;
 			delete tempMC;
-			cout << "in permutationCore tmpMC OK " << T << endl;
 			delete tempData;
-			cout << "in permutationCore tmpData OK" << T << endl;
+			delete dataClone;
 			return T;
 		}
 
