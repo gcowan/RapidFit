@@ -70,3 +70,13 @@ void FitFunctionConfiguration::SetupTrace( TString FileName )
 	wantTrace = true;
 	TraceFileName = FileName;
 }
+
+void FitFunctionConfiguration::SetStrategy( string newStrategy )
+{
+	Strategy = newStrategy;
+}
+
+string FitFunctionConfiguration::GetStrategy()
+{
+	return Strategy;
+}

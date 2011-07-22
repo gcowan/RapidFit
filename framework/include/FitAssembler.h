@@ -34,35 +34,61 @@ class FitAssembler
 		//	Also provides way to control the output level during the fit (default = Everything)
 		static FitResult * DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >,
 						const vector< ConstraintFunction* >, const int=1);
+		static FitResult * DoSafeFit_II( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >,
+								 const vector< ConstraintFunction* >, const int=1);
 
-		//	Provided for sWeightPrecalculator I would like to replace this with something closer to another DoSafeFit
+		//	This moves the 'safety' part of the DoFit into a dedicated function call which is much neater to work with
+		static void SafeMinimise( IMinimiser* );
+
+
+                static FitResult * Petes_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >,
+                                                const vector< ConstraintFunction* >, const int=1);
+
+                static FitResult * DoSingleSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >,
+                                                const vector< ConstraintFunction* >, const int=1 );
+
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< IPDF* >, const vector< IDataSet* >,
 						const vector< ConstraintFunction* > );
 
 
-		//	New Interface to Scanning Code
+		//	Interface to Classic Scanning Code
 		static vector<FitResultVector*> ContourScan( MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >,
 						const vector< ConstraintFunction* >, OutputConfiguration*, const string, const string, const int=-999 );
+
 		static FitResultVector* SingleScan(  MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >,
 						const vector< ConstraintFunction* >, OutputConfiguration*, const string, const int=-999 );
+
+
 
 		//  Std Feldman-Cousins Code, relying on many already defined objects even though it pulls in the XMLConfigReader object
 		static FitResultVector* FeldmanCousins( FitResultVector*, FitResultVector*, const vector<unsigned int>, const unsigned int, const bool, OutputConfiguration*,
 						MinimiserConfiguration*, FitFunctionConfiguration*, XMLConfigReader*, const vector< PDFWithData* >, const int=-999);
 
 	private:
+		//	Used for checking a ResultDataSet against the input Parameter to insert 'missing' parameters to avoid bugs downstream in further analysis in RapidFit
+		static void CheckParameterSet( FitResult*, vector< ParameterSet* > );
+
+
+		//	Last DoFit which initialises the minimiser and the FitFunction and does the first fit
 		static FitResult * DoFit( IMinimiser*, FitFunction* );
+
+		//	Second DoFit - Used for Constructing a FitFunction for passing to the 
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle* );
+
+		//	First DoFit - Used For Constructing a PhysicsBottle to contain all of te 'Physics' input
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, vector<ParameterSet*>, const vector< PDFWithData* >,
 				const vector< ConstraintFunction* > );
 
+		//	Classic DoScan engine
 		static void DoScan( MinimiserConfiguration *, FitFunctionConfiguration *, const vector<ParameterSet*>, const vector< PDFWithData* >,
 				const vector< ConstraintFunction* >, ScanParam*, FitResultVector*, const int );
 
+		//	Classic DoScan2D engine
 		static void DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, const vector<ParameterSet*>, const vector< PDFWithData* >,
 				const vector< ConstraintFunction* >, const pair<ScanParam*, ScanParam* >, vector<FitResultVector*>*, const int );
 
-//		static void ShakeBottle( ParameterSet*, vector< PDFWithData* >, unsigned int );
+		//	This has likely been abandonded (it was intended to shake the physics bottle at a failed point in order to recall Minuit
+		//	static void ShakeBottle( ParameterSet*, vector< PDFWithData* >, unsigned int );
 };
 
 #endif

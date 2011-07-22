@@ -234,6 +234,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		MinimiserConfiguration* returnableConfig = NULL;
 		vector<string> minimiserOptions;
 		int Quality = 1;
+		bool MultiMini=false;
 		if ( minimiserComponents.size() == 0 )
 		{
 			minimiserName = MinimiserTag->GetValue()[0];
@@ -261,7 +262,14 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 				}
 				else if( minimiserComponents[childIndex]->GetName() == "Quality" )
 				{
-					Quality = atoi(minimiserComponents[childIndex]->GetValue()[0].c_str() );
+					Quality = atoi( minimiserComponents[childIndex]->GetValue()[0].c_str() );
+				}
+				else if( minimiserComponents[childIndex]->GetName() == "MultiMini" )
+				{
+					if( minimiserComponents[childIndex]->GetValue()[0] == "true" )
+					{
+						MultiMini = true;
+					}
 				}
 				else
 				{
@@ -275,6 +283,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		returnableConfig->SetTolerance( FINAL_GRADIENT_TOLERANCE );
 		returnableConfig->SetOptions( minimiserOptions );
 		returnableConfig->SetQuality( Quality );
+		returnableConfig->SetMultiMini( MultiMini );
 		return returnableConfig;
 	}
 	else
@@ -467,7 +476,9 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		string weightName = "Uninitialised";
 		bool hasWeight = false;
 		bool want_Trace = false;
+		bool change_style = false;
 		string Trace_FileName;
+		string Strategy;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		if ( functionInfo.size() == 0 )
 		{
@@ -493,6 +504,11 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 					want_Trace = true;
 					Trace_FileName = functionInfo[childIndex]->GetValue()[0];
 				}
+				else if ( functionInfo[childIndex]->GetName() == "Strategy" )
+				{
+					change_style = true;
+					Strategy = functionInfo[childIndex]->GetValue()[0];
+				}
 				else
 				{
 					cerr << "Unrecognised FitFunction component: \"" << functionInfo[childIndex]->GetName() << endl;
@@ -517,6 +533,11 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		if( want_Trace )
 		{
 			returnable_function->SetupTrace( Trace_FileName );
+		}
+
+		if( change_style )
+		{
+			returnable_function->SetStrategy( Strategy );
 		}
 
 		return returnable_function;

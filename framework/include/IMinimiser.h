@@ -13,12 +13,15 @@
 //	RapidFit Headers
 #include "FitFunction.h"
 #include "FitResult.h"
+#include "PhysicsParameter.h"
 
 class IMinimiser
 {
 	public:
 		virtual ~IMinimiser(){};
-		virtual void Minimise( FitFunction* ) = 0;
+		virtual void SetupFit( FitFunction* ) = 0;
+		virtual void FixParameters( vector<double>, vector<string> ) = 0;
+		virtual void Minimise() = 0;
 		virtual FitResult * GetFitResult() = 0;
 		virtual void ContourPlots( vector< pair< string, string > > ) = 0;
 		virtual void SetOutputLevel( int ) = 0;
@@ -26,6 +29,7 @@ class IMinimiser
 		virtual void SetTolerance( double ) = 0;
 		virtual void SetOptions( vector<string> ) = 0;
 		virtual void SetQuality( int ) = 0;
+		virtual FitFunction* GetFitFunction() = 0;
 };
 
 #endif

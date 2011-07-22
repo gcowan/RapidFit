@@ -30,12 +30,17 @@ class FitFunctionConfiguration
 		string GetWeightName() ;
 
 		void SetupTrace( TString );
+
+		string GetStrategy();
+		void SetStrategy( string );
+
 	private:
 		string functionName, weightName;
 		bool hasWeight;
 		bool wantTrace;
 		TString TraceFileName;
 		int traceCount;
+		string Strategy;
 };
 
 #endif

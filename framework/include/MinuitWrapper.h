@@ -28,7 +28,9 @@ class MinuitWrapper : public IMinimiser
 
 		//Interface functions
 		void SetOutputLevel( int );
-		virtual void Minimise( FitFunction* );
+                virtual void SetupFit( FitFunction* );
+		virtual void FixParameters( vector<double>, vector<string> );
+		virtual void Minimise();
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );
 
@@ -36,6 +38,7 @@ class MinuitWrapper : public IMinimiser
 		virtual void SetTolerance( double );
 		virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
+		virtual FitFunction* GetFitFunction();
 
 	private:
 		//	Uncopyable!

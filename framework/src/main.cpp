@@ -31,6 +31,7 @@
 #include "EdStyle.h"
 #include "MemoryDataSet.h"
 #include "PhaseSpaceBoundary.h"
+#include "VectorScan.h"
 //  System Headers
 #include <string>
 #include <vector>
@@ -72,9 +73,7 @@ int RapidFit( int argc, char * argv[] )
 
 	//Variables to store command line arguments
 	int numberRepeats = 0;
-	int Nuisencemodel = 2;
-	int jobNum = 0;
-	int nData = 0;
+	int Nuisencemodel=2;
 	string configFileName = "";
 	vector<string> parameterTemplates;
 	MinimiserConfiguration * theMinimiser=NULL;
@@ -94,6 +93,8 @@ int RapidFit( int argc, char * argv[] )
 	vector<string> CommandLineParam;
 	string MCStepSize;
 	string MCStartEntry;
+	int OutputLevel=0;
+	int OutputLevel2=-1;
 
 	//Flags for which arguments have been received
 	bool numberRepeatsFlag = false;
@@ -108,6 +109,8 @@ int RapidFit( int argc, char * argv[] )
 	bool doPullsFlag = false;
 	bool doLLscanFlag = false;
 	bool doLLcontourFlag = false;
+        bool donewLLscanFlag = false;
+        bool donewLLcontourFlag = false;
 	bool testRapidIntegratorFlag = false;
 	bool calculateAcceptanceWeights = false;
 	bool calculateAcceptanceWeightsWithSwave = false;
@@ -122,6 +125,7 @@ int RapidFit( int argc, char * argv[] )
 	bool Force_Scan_Flag=false;
 	bool FC_LL_PART_Flag=false;
 	bool GOF_Flag=false;
+	bool StartAtCenterFlag=true;
 
 	//	This should do something, it doesn't anymore... what was it?	-	Rob Currie
 	(void) testRapidIntegratorFlag;
@@ -552,6 +556,28 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
+                else if ( currentArgument == "--OutputLevel" )
+                {
+                        if( argumentIndex + 1 < argc )
+                        {
+                                ++argumentIndex;
+                                OutputLevel = atoi( argv[argumentIndex] );
+                        } else {
+                                cerr << "Badly Defined Output Level" << endl;
+                                return BAD_COMMAND_LINE_ARG;
+                        }
+                }
+                else if ( currentArgument == "--OutputLevelScans" )
+                {
+                        if( argumentIndex + 1 < argc )
+                        {
+                                ++argumentIndex;
+                                OutputLevel2 = atoi( argv[argumentIndex] );
+                        } else {
+                                cerr << "Badly Defined Output Level" << endl;
+                                return BAD_COMMAND_LINE_ARG;
+                        }
+                }
 		else if ( currentArgument == "--FC_LL_PART" )
 		{
 			FC_LL_PART_Flag = true;
@@ -572,22 +598,6 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
-		else if ( currentArgument == "--GOF" ) 
-		{
-			GOF_Flag = true;
-			if ( argumentIndex + 2 < argc )
-                        {
-                                ++argumentIndex;
-                                jobNum = atoi( argv[argumentIndex] );
-                                ++argumentIndex;
-                                nData  = atoi( argv[argumentIndex] );
-                        }
-                        else
-                        {
-                                cerr << "Job number for GOF not specified" << endl;
-                                return BAD_COMMAND_LINE_ARG;
-                        }
-		}
 
 		//	The Parameters beyond here are for setting boolean flags
 		else if ( currentArgument == "--testIntegrator" )			{	testIntegratorFlag = true;			}
@@ -596,13 +606,17 @@ int RapidFit( int argc, char * argv[] )
 		else if ( currentArgument == "--calculateAcceptanceWeightsWithSwave" )	{	calculateAcceptanceWeightsWithSwave = true;	}
 		else if ( currentArgument == "--calculatePerEventAcceptance" )		{	calculatePerEventAcceptance = true;		}
 		else if ( currentArgument == "--doLLscan" )				{	doLLscanFlag = true;				}
+		else if ( currentArgument == "--donewLLscan" )                          {       donewLLscanFlag = true;                         }
 		else if ( currentArgument == "--doLLcontour" )				{	doLLcontourFlag = true;				}
+		else if ( currentArgument == "--donewLLcontour" )                       {       donewLLcontourFlag = true;                      }
 		else if ( currentArgument == "--doFCscan" )				{	doFC_Flag = true;				}
 		else if ( currentArgument == "--useUUID" )				{	UUID_Flag = true;				}
 		else if ( currentArgument == "--debugFC" )				{	FC_Debug_Flag = true;				}
 		else if ( currentArgument == "--BurnToROOT" )				{	BurnToROOTFlag = true;				}
 		else if ( currentArgument == "--MCStudy" )				{	MCStudyFlag = true;				}
 		else if ( currentArgument == "--ForceScan" )				{	Force_Scan_Flag = true;				}
+		else if ( currentArgument == "--DontStartAtCenter" )			{	StartAtCenterFlag = false;			}
+		else if ( currentArgument == "--GOF" ) 					{	GOF_Flag = true;				}
 
 		//	We didn't understand the argument to end up here
 		else
@@ -979,17 +993,23 @@ int RapidFit( int argc, char * argv[] )
 		GlobalFitResult->StartStopwatch();
 
 		XMLConstraints = xmlFile->GetConstraints();
-		GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, XMLConstraints );
+
+		GlobalResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, XMLConstraints, OutputLevel );
 
 		GlobalFitResult->AddFitResult( GlobalResult );
 
 		//ResultFormatter::FlatNTuplePullPlots( string("Global_Fit.root"), GlobalFitResult );
 
 		cout << "\n\n\t\tFit Output:" <<endl;
-		//Output results
-		makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
-		makeOutput->OutputFitResult( GlobalFitResult->GetFitResult(0) );
+
+		if( OutputLevel >= 0 )
+		{
+			//Output results
+			makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
+			makeOutput->OutputFitResult( GlobalFitResult->GetFitResult(0) );
+		}
 		ResultFormatter::ReviewOutput( GlobalResult );
+
 		//	If requested write the central value to a single file
 		if( BurnToROOTFlag )
 		{
@@ -998,10 +1018,11 @@ int RapidFit( int argc, char * argv[] )
 			ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result.root" ), GlobalFitResult );
 		}
 
-		if ( GOF_Flag ) {	
-			cout << "Starting GOF" << endl;
+		if ( GOF_Flag ) {
 			PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
-                        pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
+			vector< ParameterSet * > parSet;
+			parSet.push_back(GlobalResult->GetResultParameterSet()->GetDummyParameterSet());
+			pdfAndData->SetPhysicsParameters( parSet ); 
 			IPDF * pdf = pdfAndData->GetPDF();
 			vector<IPDF*> vectorPDFs;
 			vectorPDFs.push_back(pdf);
@@ -1009,47 +1030,37 @@ int RapidFit( int argc, char * argv[] )
 			PhaseSpaceBoundary * phase = xmlFile->GetPhaseSpaceBoundaries()[0];
 			EdStyle * greigFormat = new EdStyle();
 			greigFormat->SetStyle();
+			//GoodnessOfFit::plotUstatistic( pdf, data, phase, "testStatistic.pdf");                               
 
 			// Set up to be able to generate some MC data
 			DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
 			dataConfig->SetSource( "Foam" );
 			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
 			double pvalue = 0.;
-			bool model = false;
-			for ( int i = jobNum; i < jobNum + 100; i++ ) {
+			int nData = 100;
+			for ( int i = 1; i < 100; i++ ) {
 
 				cout << "Ensemble " << i << endl;
-
-				// First, generate some data
-                        	pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
+				// Generate a large sample of MC toy data
 				pdf->SetRandomFunction( i );
-				pdf->SetMCCacheStatus( false );
-				MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
+				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 1000 );
+
+				// Take a subset of the full dataset
+				MemoryDataSet * subset = new MemoryDataSet( data->GetBoundary() );
+				for ( int j = i*nData; j < (i+1)*nData; j++ ) {
+					subset->AddDataPoint( data->GetDataPoint(j) );
+				}
 				vector<IDataSet*> vectorData;
 				vectorData.push_back(subset);
-				
-				if ( model ) {
-					// Use the same PDF for the large MC dataset (the Model approach)
-					pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
-				}
-				else {
-					// Fit the generated data (the Fit I approach)
-					FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
-			        	vector< ParameterSet * > parSet;
-                        		parSet.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
-                        		pdfAndData->SetPhysicsParameters( parSet );
-				}
-				// Generate large sample of MC
-				pdf->SetRandomFunction( i*i + 1 );
-				pdf->SetMCCacheStatus( false );
-				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
 
-				// Finally calculate the p-value relative to the large MC sample
-				pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
-				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
+				// Fit the data and then calculate the p-value relative to the large MC sample
+				FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
+				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
+				pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
 				pvalueHist->Fill( pvalue );
-				cout << "p-value " << pvalue << endl;
+				cout << "pvalue = " << pvalue << endl;
 				delete subset;
+				cout << "pvalue = " << pvalue << endl;
 				delete mcData;
 			}
 			TFile * outputFile = new TFile("pvalues.root", "RECREATE");
@@ -1088,7 +1099,16 @@ int RapidFit( int argc, char * argv[] )
 
 		for(unsigned int scan_num=0; scan_num < LLscanList.size() ; ++scan_num)
 		{
-			FitResultVector* scan_result = FitAssembler::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[scan_num] );
+			if( StartAtCenterFlag )
+			{
+				vector<ParameterSet*>  param_set;
+				param_set.push_back( GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
+				for(unsigned int i=0; i< argumentParameterSet.back()->GetAllNames().size(); ++i )
+				{
+					argumentParameterSet.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->SetBlindedValue( param_set.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->GetValue() );
+				}
+			}
+			FitResultVector* scan_result = FitAssembler::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[scan_num], OutputLevel2 );
 			scanSoloResults.push_back( scan_result );
 		}
 
@@ -1117,6 +1137,85 @@ int RapidFit( int argc, char * argv[] )
 		}
 	}
 
+	//	New LL scan technology
+	if( donewLLscanFlag )
+	{
+		vector<FitResultVector*> scanSoloResults;
+
+		//  Store
+		vector<string> LLscanList = makeOutput->GetScanList();
+
+		for(unsigned int scan_num=0; scan_num < LLscanList.size() ; ++scan_num)
+		{
+
+			//	Start at the global values
+			vector<ParameterSet*>  param_set;
+			param_set.push_back( GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
+			for(unsigned int i=0; i< argumentParameterSet.back()->GetAllNames().size(); ++i )
+			{	argumentParameterSet.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->SetBlindedValue( param_set.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->GetValue() );	}
+
+			ScanParam* local_param = makeOutput->GetScanParam( LLscanList[scan_num] );
+
+			FitResultVector* scan_result = VectorScan::Scan1D( theMinimiser, makeOutput->GetScanParam( LLscanList[scan_num] ) );
+
+			scanSoloResults.push_back( scan_result );
+		}
+
+		for(unsigned int scan_num=0; scan_num < LLscanList.size(); ++scan_num )
+		{
+			TString output_scan_dat( "LLScanData" );
+			output_scan_dat.Append( LLscanList[scan_num] );
+			TString new_output_scan_dat( output_scan_dat );
+			new_output_scan_dat.Append( "_newformat" );
+			output_scan_dat.Append( ".root" );
+			new_output_scan_dat.Append(".root");
+			vector<FitResultVector*> ammended_format;
+			for( int i=0; i< scanSoloResults[scan_num]->NumberResults(); ++i )
+			{
+				ammended_format.push_back( GlobalFitResult );
+				FitResultVector* temp_vec = new FitResultVector( scanSoloResults[scan_num]->GetAllNames() );
+				temp_vec->AddFitResult( scanSoloResults[scan_num]->GetFitResult( i ), false );
+				temp_vec->AddRealTime( scanSoloResults[scan_num]->GetRealTime(i) );
+				temp_vec->AddCPUTime( scanSoloResults[scan_num]->GetCPUTime(i) );
+				ammended_format.push_back( temp_vec );
+			}
+			FitResultVector* corrected_format = new FitResultVector( ammended_format );
+			cout << output_scan_dat << "\t\t" << corrected_format->NumberResults() << endl;
+			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), scanSoloResults[scan_num] );
+			ResultFormatter::WriteFlatNtuple( string( new_output_scan_dat ), corrected_format );
+		}
+	}
+
+	if( donewLLcontourFlag )
+	{
+		vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
+		for(unsigned int i=0; i < _2DLLscanList.size() ; ++i )
+                {
+                        string name1 = _2DLLscanList[i].first;
+                        string name2 = _2DLLscanList[i].second;
+
+			pair< ScanParam*, ScanParam* > Param_Set = makeOutput->Get2DScanParams( name1, name2 );
+
+			FitResultVector* scan_result = VectorScan::Scan2D( theMinimiser, Param_Set );
+
+			string output_scan_dat("LLcontourScanData.root");
+			if( _2DLLscanList.size() > 0 )
+			{
+				TString _scan_dat("LLcontourScanData_");
+				_scan_dat+= _2DLLscanList.size()+1;
+				_scan_dat.Append(".root");
+				output_scan_dat=_scan_dat;
+			}
+
+			//      Add the Global Results and 'Linearize' the output
+			vector<FitResultVector*> TempContourResults;
+			TempContourResults.push_back( GlobalFitResult );
+			TempContourResults.push_back( scan_result );
+			FitResultVector* TempContourResults2 = new FitResultVector( TempContourResults );
+			ResultFormatter::WriteFlatNtuple( output_scan_dat , TempContourResults2 );
+
+		}
+	}
 
 	//		This is re-used for FC scans and forms FC Step 2
 
@@ -1146,7 +1245,17 @@ int RapidFit( int argc, char * argv[] )
 			string name1 = _2DLLscanList[ii].first;
 			string name2 = _2DLLscanList[ii].second;
 			//theMinimiser = xmlFile->GetMinimiserConfiguration();
-			vector<FitResultVector*> Temp_Results = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2 );
+			if( StartAtCenterFlag )
+			{
+				vector<ParameterSet*> param_set;
+				param_set.push_back( GlobalResult->GetResultParameterSet()->GetDummyParameterSet() ); 
+				for(unsigned int i=0; i< argumentParameterSet.back()->GetAllNames().size(); ++i )
+				{
+					argumentParameterSet.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->SetBlindedValue( param_set.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->GetValue() );
+				}
+			}
+
+			vector<FitResultVector*> Temp_Results = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2, OutputLevel2 );
 
 			GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
 			GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
@@ -1263,10 +1372,3 @@ exit_RapidFit:
 	cout << "Goodbye :)" << endl;
 	return 0;
 }
-
-			// Need following commented lines if wanting to use the U statistic
-			//vector< ParameterSet * > parSet;
-			//parSet.push_back(GlobalResult->GetResultParameterSet()->GetDummyParameterSet());
-			//pdfAndData->SetPhysicsParameters( parSet ); 
-			//GoodnessOfFit::plotUstatistic( pdf, data, phase, "testStatistic.pdf");                               
-

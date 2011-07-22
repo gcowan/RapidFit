@@ -55,11 +55,26 @@ void Minuit2Wrapper::SetQuality( int newQuality )
         Quality = newQuality;
 }
 
-//Use Migrad to minimise the given function
-void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
+void Minuit2Wrapper::SetupFit( FitFunction* NewFunction )
 {
 	//Make a wrapper for the function
 	function = new Minuit2Function( NewFunction );
+	RapidFunction = NewFunction;
+}
+
+FitFunction* Minuit2Wrapper::GetFitFunction()
+{
+	return RapidFunction;
+}
+
+void Minuit2Wrapper::FixParameters( vector<double> fix_values, vector<string> ParameterNames )
+{
+	
+}
+
+//Use Migrad to minimise the given function
+void Minuit2Wrapper::Minimise()
+{
 
 	//Minimise the wrapped function
 	MnMigrad mig( *function, *( function->GetMnUserParameters() ), Quality );//MINUIT_QUALITY );
@@ -81,7 +96,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 
 	//Make a set of the fitted parameters
 	const MnUserParameters * minimisedParameters = &minimum.UserParameters();
-	ParameterSet * newParameters = NewFunction->GetParameterSet();
+	ParameterSet * newParameters = RapidFunction->GetParameterSet();
 	vector<string> allNames = newParameters->GetAllNames();
 	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
 	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
@@ -92,7 +107,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 		double parameterError = minimisedParameters->Error( parameterName.c_str() );
 
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-				-oldParameter->GetMinimum(), oldParameter->GetMaximum(), oldParameter->GetStepSize(),
+				oldParameter->GetMinimum(), oldParameter->GetMaximum(), oldParameter->GetStepSize(),
 				oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 
@@ -170,7 +185,7 @@ void Minuit2Wrapper::Minimise( FitFunction * NewFunction )
 		fitStatus = 3;
 	}
 
-	PhysicsBottle* newBottle = NewFunction->GetPhysicsBottle();
+	PhysicsBottle* newBottle = RapidFunction->GetPhysicsBottle();
 	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, newBottle, covData, allContours );
 }
 

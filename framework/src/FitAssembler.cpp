@@ -18,16 +18,46 @@
 #include "StringProcessing.h"
 //	System Headers
 #include <iostream>
+#include <iomanip>
 #include <stdlib.h>
 #include <math.h>
 #include <fstream>
 
 using namespace std;
 
+
+void FitAssembler::SafeMinimise( IMinimiser* Minimiser )
+{
+	try
+	{
+		// Try a Fit, it it converges, continue to elsewhere in the program
+		Minimiser->Minimise();
+	}
+	//  If it didn't fit tell the user why!
+	catch( int e)
+	{
+		if ( e == 10 )
+		{
+			cerr << "\nCaught exception : fit failed for these parameters..." << endl; 
+		}
+		else if ( e == 13 )
+		{
+			cerr << "\nIntegration Error: Fit Failed..." << endl;
+		}
+	}
+	catch (...)
+	{
+		cerr << "\n\n\n\t\t\tCaught Unknown Exception, THIS IS SERIOUS!!!\n\n\n" << endl;
+	}
+}
+
 //The final stage - do the minimisation
 FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFunction )
 {
-	Minimiser->Minimise(TheFunction);
+	Minimiser->SetupFit( TheFunction );
+
+	SafeMinimise( Minimiser );
+
 	return Minimiser->GetFitResult();
 }
 
@@ -40,8 +70,6 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	FitResult* result = DoFit( minimiser, theFunction );
 
-	delete theFunction;
-	delete minimiser;
 	return result;
 }
 
@@ -57,7 +85,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
 
-//		Requested_DataSet->SortBy("time");
+		//		Requested_DataSet->SortBy("time");
 
 		bottle->AddResult( Requested_PDF, Requested_DataSet );
 	}
@@ -109,75 +137,14 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	}
 }
 
-//void FitAssembler::ShakeBottle( ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, unsigned int some_number )
-//{
-//	// To be written in a 'safe' way
-//}
-//  Perform a safer fit which is gauranteed to return something which you can use :D
-FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
+void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, vector< ParameterSet* > BottleParameters )
 {
-	MinimiserConfig->SetOutputLevel( OutputLevel );
-	vector<string> other_params = BottleParameters.back()->GetAllFloatNames();	//	This better at least contain all in prototypeparamset!!!
-	vector<double> truth;
-	for( unsigned short int j=0; j < other_params.size(); ++j )
-	{
-		truth.push_back( BottleParameters.back()->GetPhysicsParameter( other_params[j] )->GetTrueValue() );
-	}
-
-	bool fit_fail_status=false;
-	FitResult* ReturnableFitResult=NULL;
-	//  Try to fit 5 times and then abort
-	for( unsigned short int i=0; i<=0; ++i )
-	{
-		//  Left in for correctness
-		fit_fail_status = false;
-
-		try{
-			// Try a Fit, it it converges, continue to elsewhere in the program
-			ReturnableFitResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
-			if( ReturnableFitResult->GetFitStatus() != 3 )
-			{
-				cerr << "\n\n\t\tFit Did NOT Converge Correctly, CHECK YOUR RESULTS!\n\n";
-			}
-			//return ReturnableFitResult;
-		}
-		//  If it didn't fit tell the user why!
-		catch( int e){
-			if ( e == 10 ){
-				cerr << "\nCaught exception : fit failed for these parameters..." << endl;  }
-			else if ( e == 13 ){
-				cerr << "\nIntegration Error: Fit Failed..." << endl;  }
-			fit_fail_status = true;
-		} catch (...) {
-                        cerr << "\n\n\n\t\t\tCaught Unknown Exception, THIS IS SERIOUS!!!\n\n\n" << endl;
-			fit_fail_status = true;
-		}
-		//cerr << "Fit Did Not converge, shaking the bottle and starting again!" <<endl;
-		//cerr << "This is Retry " << i+1 << "of 4"<<endl;
-		//  Give the physics bottle a bit of a shake and see if it works this time
-		//ShakeBottle( BottleParameters, BottleData, (i+5) );
-	}
-
-	//  If the fit failed 5 times I will simply return a dummy fit result full of zerod objects. It is up to the user to watch for and remove these
-	if( fit_fail_status ){
-		cerr << "Nothing more I'm willing to do, considering a Fit here a lost cause..." <<endl;
-
-		for( unsigned short int j=0; j < other_params.size(); ++j )
-		{
-			BottleParameters.back()->GetPhysicsParameter( other_params[j] )->SetTrueValue( truth[j] );
-		}
-		int status = -1;
-		vector<string> NewNamesList = BottleParameters.back()->GetAllNames();
-		ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
-		PhysicsBottle* Bad_Bottle = new PhysicsBottle( BottleParameters.back() );
-		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, Bad_Bottle );
-	}
-
 	vector<string> already_found = ReturnableFitResult->GetResultParameterSet()->GetAllNames();
 
 	for( unsigned int i=0; i< BottleParameters.back()->GetAllNames().size(); ++i )
 	{
 		int found = StringProcessing::VectorContains( &already_found, &(BottleParameters.back()->GetAllNames()[i]) );
+
 		//	There was something in the ParameterSet not in the FitResult, i.e. an unclaimed object which can't have changed during the fit
 		if( found == -1 )
 		{
@@ -197,10 +164,140 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 			}
 		}
 	}
+}
+
+//  Perform a safer fit which is gauranteed to return something which you can use :D
+FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
+{
+	FitResult* ReturnableFitResult=NULL;
+
+	if( FunctionConfig->GetStrategy() == "Petes" )
+	{
+		ReturnableFitResult = Petes_DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
+	}
+	else
+	{
+		ReturnableFitResult = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
+	}
 
 	return ReturnableFitResult;
 }
 
+FitResult * FitAssembler::DoSingleSafeFit(MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
+{
+	streambuf *nullbuf=NULL, *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+	ofstream filestr;
+	filestr.open ("/dev/null");
+	//      If the user wanted silence we point the Std Output Streams to /dev/null
+	if( OutputLevel <= -1 )
+	{
+		cout_bak = cout.rdbuf();
+		cerr_bak = cerr.rdbuf();
+		clog_bak = clog.rdbuf();
+		nullbuf = filestr.rdbuf();
+		cout.rdbuf(nullbuf);
+		cerr.rdbuf(nullbuf);
+		clog.rdbuf(nullbuf);
+	}
+
+	FitResult* ReturnableFitResult=NULL;
+	MinimiserConfig->SetOutputLevel( OutputLevel );
+	vector<string> other_params = BottleParameters.back()->GetAllFloatNames();      //      This better at least contain all in prototypeparamset!!!
+	vector<double> truth;
+	for( unsigned short int j=0; j < other_params.size(); ++j )
+	{
+		truth.push_back( BottleParameters.back()->GetPhysicsParameter( other_params[j] )->GetValue() );
+	}
+
+	// Try a Fit, it it converges, continue to elsewhere in the program
+	ReturnableFitResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints );
+
+	//      Reset Std Output Streams
+	if( OutputLevel <= -1 )
+	{
+		cout.rdbuf(cout_bak);
+		cerr.rdbuf(cerr_bak);
+		clog.rdbuf(clog_bak);
+	}
+
+	if( ReturnableFitResult->GetFitStatus() != 3 )
+	{
+		cerr << "\n\n\t\tFit Did NOT Converge Correctly, CHECK YOUR RESULTS!\n\n";
+		for( unsigned short int j=0; j < other_params.size(); ++j )
+		{
+			BottleParameters.back()->GetPhysicsParameter( other_params[j] )->SetValue( truth[j] );
+		}
+		int status = -1;
+		vector<string> NewNamesList = BottleParameters.back()->GetAllNames();
+		ResultParameterSet* DummyFitResults = new ResultParameterSet( NewNamesList );
+		PhysicsBottle* Bad_Bottle = new PhysicsBottle( BottleParameters.back() );
+		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, Bad_Bottle );
+	}
+
+	CheckParameterSet( ReturnableFitResult, BottleParameters );
+
+	return ReturnableFitResult;
+}
+
+
+FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
+{
+	cout << endl << "******* Result of Petes Double fit strategy*********" << endl ;
+	cout << "Starting Fit1:" << endl;
+	// Normal fit
+	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
+	double LLmin0 = res0->GetMinimumValue() ;
+	bool good_result_0 = res0->GetFitStatus() == 3;
+	cout << "Finished Fit1." << endl;
+	if( !good_result_0  ) cout << "Fit-1 failed" << endl;
+
+	// Conjugate fit
+	double deltaPara = BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->GetBlindedValue() ;
+	double deltaPerp = BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->GetBlindedValue() ;
+	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
+	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ) ;
+	cout << endl << "Starting Fit2:" << endl;
+	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
+	double LLmin1 = res1->GetMinimumValue() ;
+	bool good_result_1 = res1->GetFitStatus() == 3;
+
+	// Apply strategy 
+	FitResult * res ;
+	bool swapped = false ;
+	if( !good_result_0 && !good_result_1 ){ 
+		res = res0;     //both fail so it doesnt matter 
+	}
+	else if( good_result_0 && !good_result_1 ){     
+		res = res0;     
+	}
+	else if( !good_result_0 && good_result_1 ){     
+		res = res1;     
+		swapped = true;
+	}
+	else if( LLmin0 < LLmin1+0.001 ){ 
+		res = res0 ;
+	}
+	else { 
+		res = res1 ;
+		swapped = true;
+	}
+
+	//MinimiserConfig->SetOutputLevel( 0 );
+	cout << setprecision(9) ;
+	if( !good_result_1  ) cout << "Fit-2 failed" << endl;
+	cout << "Finished Fit2." << endl;
+	cout << "The 2 LLs were "  << LLmin0 << "   <=>   "  << LLmin1 << endl ;
+	if( swapped  ) cout << "Swapped to conjugate fit result " << endl;
+	cout << "******* Result of Petes Double fit strategy*********" << endl ;
+	//MinimiserConfig->SetOutputLevel( OutputLevel );
+
+	// Set input parameters back to what they were 
+	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( deltaPara ) ;  
+	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( deltaPerp ) ;  
+
+	return res ;
+
+}
 
 //  Interface for internal calls
 void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, FitResultVector* output_interface, const int OutputLevel )
@@ -211,8 +308,8 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 	double npoints = Wanted_Param->GetPoints();
 	string scanName = Wanted_Param->GetName();
 
-//	cout << "Performing Scan for the parameter " << scanName << endl ;
-	
+	//	cout << "Performing Scan for the parameter " << scanName << endl ;
+
 	// Get a pointer to the physics parameter to be scanned and fix it	
 	// CAREFUL:  this must be reset as it was at the end.
 	PhysicsParameter * scanParameter = BottleParameters.back()->GetPhysicsParameter(scanName);
@@ -223,7 +320,8 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 	// Need to set up a loop , fixing the scan parameter at each point
 	double deltaScan;
 
-	for( int si=0; si<int(npoints); ++si) {
+	for( int si=0; si<int(npoints); ++si)
+	{
 		cout << "\n\nSINGLE SCAN NUMBER\t\t" << si+1 << "\t\tOF\t\t" <<int(npoints)<< endl<<endl;
 		// Set scan parameter value
 		if( int(npoints)!=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
@@ -233,31 +331,10 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 
 		output_interface->StartStopwatch();
 
-		streambuf *nullbuf=NULL, *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
-		ofstream filestr;
-		filestr.open ("/dev/null");
-		cout << "\nStarting Fit:" <<endl;
-		//	If the user wanted silence we point the Std Output Streams to /dev/null
-		if( OutputLevel <= -1 )
-		{
-			cout_bak = cout.rdbuf();
-			cerr_bak = cerr.rdbuf();
-			clog_bak = clog.rdbuf();
-			nullbuf = filestr.rdbuf();
-			cout.rdbuf(nullbuf);
-			cerr.rdbuf(nullbuf);
-			clog.rdbuf(nullbuf);
-		}
 		//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
 		//	Do a scan point fit
 		FitResult * scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
-		//	Reset Std Output Streams
-		if( OutputLevel <= -1 )
-		{
-			cout.rdbuf(cout_bak);
-			cerr.rdbuf(cerr_bak);
-			clog.rdbuf(clog_bak);
-		}
+
 		cout << "Fit Finished!\n" <<endl;
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
 
@@ -269,7 +346,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 
 		vector<string> Fixed_List = BottleParameters.back()->GetAllFixedNames();
 		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
-		for( unsigned short int i=0; i < Fixed_List.size() ; ++i )
+		for( unsigned short int i=-1; i < Fixed_List.size() ; ++i )
 		{
 			bool found=false;
 			for( unsigned short int j=0; j < Fit_List.size(); ++j )
@@ -293,7 +370,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 
 		output_interface->AddFitResult( scanStepResult );
 	}
-	
+
 	//Reset the parameter as it was
 	scanParameter->SetType( originalType ) ;
 	scanParameter->SetBlindedValue( originalValue ) ;
@@ -304,7 +381,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const pair<ScanParam*, ScanParam*> Param_Set, vector<FitResultVector*>* output_interface, const int OutputLevel )
 {
 
-//	vector<string> namez = BottleParameters.back()->GetAllNames();
+	//	vector<string> namez = BottleParameters.back()->GetAllNames();
 	vector<string> result_names = BottleParameters.back()->GetAllNames();
 	double uplim = Param_Set.first->GetMax();
 	double lolim = Param_Set.first->GetMin();
@@ -320,7 +397,7 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 	double originalValue = scanParameter->GetBlindedValue( );
 	string originalType = scanParameter->GetType( );
 	scanParameter->SetType( "Fixed" );
-	
+
 	// Need to set up a loop , fixing the scan parameter at each point
 
 	double deltaScan;
@@ -328,10 +405,10 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 	else deltaScan=0.;
 
 	for( int si=0; si < int(npoints); ++si) {
-	  
+
 		cout << "\n\n2DSCAN OUTER NUMBER\t\t" << si+1 << "\t\tOF\t\t" << int(npoints) <<endl<<endl;
 		FitResultVector* Returnable_Result = new FitResultVector( result_names );
-		
+
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan;
 		scanParameter->SetBlindedValue( scanVal ) ;
@@ -340,10 +417,10 @@ void FitAssembler::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFuncti
 		FitAssembler::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result, OutputLevel );
 
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
-                string name = Param_Set.first->GetName();
+		string name = Param_Set.first->GetName();
 		double step = BottleParameters.back()->GetPhysicsParameter( name )->GetStepSize();
-                string type = BottleParameters.back()->GetPhysicsParameter( name )->GetType();
-                string unit = BottleParameters.back()->GetPhysicsParameter( name )->GetUnit();
+		string type = BottleParameters.back()->GetPhysicsParameter( name )->GetType();
+		string unit = BottleParameters.back()->GetPhysicsParameter( name )->GetUnit();
 
 		for( short int i=0; i < Returnable_Result->NumberResults(); ++i )
 		{
@@ -626,7 +703,7 @@ FitResultVector* FitAssembler::FeldmanCousins( FitResultVector* GlobalResult, Fi
 			}
 
 			cout << "\n\n\t\tPerforming Fit To Toy: "<< (dataset_num+1) <<" of " << wanted_number_of_toys << endl<<endl;
-			
+
 			streambuf *nullbuf=NULL, *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
 			ofstream filestr;
 			filestr.open ("/dev/null");
@@ -700,7 +777,7 @@ FitResultVector* FitAssembler::FeldmanCousins( FitResultVector* GlobalResult, Fi
 				if( (fit1Result->GetFitStatus() != 3) || (fit2Result->GetFitStatus() != 3) ) toy_failed = true;
 			}
 			else	toy_failed = false;
-			
+
 			if( !toy_failed || FC_Debug_Flag )
 				ResultFormatter::ReviewOutput( fit2Result );
 

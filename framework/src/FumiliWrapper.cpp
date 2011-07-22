@@ -57,16 +57,29 @@ void FumiliWrapper::SetQuality( int newQuality )
         Quality = newQuality;
 }
 
-//Use Migrad to minimise the given function
-void FumiliWrapper::Minimise( FitFunction * NewFunction )
+void FumiliWrapper::SetupFit( FitFunction* NewFunction )
 {
-	ParameterSet * newParameters = NewFunction->GetParameterSet();
+	// Instantiate the FumiliFunction (which is just a parametric function)
+        // There is another constructor that takes a vector of parameters
+        function = new FumiliFunction( NewFunction );
+	RapidFunction = NewFunction;
+}
+
+FitFunction* FumiliWrapper::GetFitFunction()
+{
+	return RapidFunction;
+}
+
+void FumiliWrapper::FixParameters( vector<double> fix_values, vector<string> ParameterNames )
+{
+}
+
+//Use Migrad to minimise the given function
+void FumiliWrapper::Minimise()
+{
+	ParameterSet * newParameters = RapidFunction->GetParameterSet();
         vector<string> allNames = newParameters->GetAllNames();
 //	int numParams = allNames.size();
-
-	// Instantiate the FumiliFunction (which is just a parametric function)
-	// There is another constructor that takes a vector of parameters
-	function = new FumiliFunction( NewFunction );
 
 	/*
 	// Fill a vector of doubles for each set of physics parameters that you
@@ -104,7 +117,7 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 
 	// Fill a vector of doubles for each set of observables
         vector< vector<double> > positions;
-	PhysicsBottle* bottle = NewFunction->GetPhysicsBottle();
+	PhysicsBottle* bottle = RapidFunction->GetPhysicsBottle();
 	PhaseSpaceBoundary* boundary = bottle->GetResultDataSet(0)->GetBoundary();
         vector<string> names = boundary->GetAllNames();   
 
@@ -177,7 +190,7 @@ void FumiliWrapper::Minimise( FitFunction * NewFunction )
 		fitStatus = 3;
 	}
 
-	PhysicsBottle* newBottle = NewFunction->GetPhysicsBottle();
+	PhysicsBottle* newBottle = RapidFunction->GetPhysicsBottle();
 	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, newBottle  );
 }
 

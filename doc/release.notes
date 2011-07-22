@@ -1,4 +1,14 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+2011/07/22
+    - Pete Clarke
+     *****  STABLE RAPIDFIT DECLATED FOR LP CONFERENCE ****
+     *****  aim is to not change this apart from bug fixes until after LP ******
+
+2011/07/21 Rob Currie
+    - Added <Strategy> XML tag as a daughter of the FitFunction tag which allows us to control the style of fit i.e. use Pete's patch or not (not by default as per HEAD)
+    - Added --DontStartAtCenter command line option to decide wether to take CV for the starting value at each point 'default' or to take the XML input (when using the run time flag)
+    - Added --OutputLevel runtime flag which allows for the verbosity to be selected by the user at runtime, -1 will cause most all output to be killed
+    - Added <MultiMini> XML tag to control single or multiple instances of the minimiser object class
 
 2011/07/20 Greig Cowan
     - Altered MemoryDataSet as it was deleting PhaseSpaceBoundary which was breaking GOF. This deletion should

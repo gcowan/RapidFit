@@ -157,3 +157,4 @@ void FitFunction::UseEventWeights( string WeightName )
 	useWeights = true;
 	weightObservableName = WeightName;
 }
+

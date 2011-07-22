@@ -44,8 +44,10 @@ class FumiliWrapper : public IMinimiser
 		~FumiliWrapper();
 
 		//Interface functions
+                virtual void SetupFit( FitFunction* );
+		virtual void FixParameters( vector<double>, vector<string> );
+		virtual void Minimise();
 		virtual void SetOutputLevel( int ){};
-		virtual void Minimise( FitFunction* );
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );
 
@@ -53,6 +55,7 @@ class FumiliWrapper : public IMinimiser
                 virtual void SetTolerance( double );
                 virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
+		virtual FitFunction* GetFitFunction();
 
 	private:
 		//	Uncopyable!
@@ -61,6 +64,7 @@ class FumiliWrapper : public IMinimiser
 
 		//MnMigrad minuit;
 		FumiliFunction * function;
+		FitFunction* RapidFunction;
 		FitResult * fitResult;
 		vector< pair< string, string > > contours;
                 int maxSteps;

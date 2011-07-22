@@ -417,7 +417,10 @@
 //==========================================
 // Specify which minimiser to use.
 
-<Minimiser>Minuit</Minimiser>
+<Minimiser>
+<MinimiserName>Minuit</MinimiserName>
+<ConfigureMinimiser>HesseFirst</ConfigureMinimiser>
+</Minimiser>
 <FitFunction>NegativeLogLikelihood</FitFunction>
 
 <NumberRepeats>1</NumberRepeats>
@@ -844,15 +847,15 @@
                                                                                                                                                                       
             <X_Param>                                                                                                                                             
                 <Name>Phi_s</Name>                                                                                                                            
-                <Minimum>-3.2</Minimum>                                                                                                                                
-                <Maximum>3.2</Maximum>                                                                                                                               
+                <Minimum>-2.</Minimum>                                                                                                                                
+                <Maximum>2.</Maximum>                                                                                                                               
                 <Points>20</Points>                                                                                                                            
             </X_Param>                                                                                                                                            
                                                                                                                                                                       
             <Y_Param>                                                                                                                                             
                 <Name>deltaGamma</Name>                                                                                                                       
-                <Minimum>-0.7</Minimum>                                                                                                                                
-                <Maximum>0.7</Maximum>                                                                                                                                
+                <Minimum>-0.5</Minimum>                                                                                                                                
+                <Maximum>0.5</Maximum>                                                                                                                                
                 <Points>20</Points>                                                                                                                            
             </Y_Param>                                                                                                                                            
                                                                                                                                                                       

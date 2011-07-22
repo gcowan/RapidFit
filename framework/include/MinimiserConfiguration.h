@@ -22,6 +22,7 @@ class MinimiserConfiguration
 		MinimiserConfiguration( string, OutputConfiguration* );
 		~MinimiserConfiguration();
 
+		IMinimiser * GetMinimiser();
 		IMinimiser * GetMinimiser(int);
 		void SetOutputLevel(int);
 		void RemoveMinimiser();
@@ -30,6 +31,7 @@ class MinimiserConfiguration
 		void SetTolerance(double);
 		void SetOptions(vector<string>);
 		void SetQuality( int );
+		void SetMultiMini( bool );
 
 	private:
 		//	Uncopyable!
@@ -44,6 +46,7 @@ class MinimiserConfiguration
 		double bestTolerance;
 		vector<string> MinimiseOptions;
 		int Quality;
+		bool MultiMini;
 };
 
 #endif

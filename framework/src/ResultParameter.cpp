@@ -56,7 +56,12 @@ ResultParameter::~ResultParameter()
 
 PhysicsParameter* ResultParameter::GetDummyPhysicsParameter()
 {
-	return new PhysicsParameter( name, value, stepSize, type, unit );
+	if( (type == "Fixed") | ( (minimum - maximum) < 1E-6 ) )
+	{
+		return new PhysicsParameter( name, value, stepSize, type, unit );
+	} else {
+		return new PhysicsParameter( name, value, minimum, maximum, stepSize, type, unit );
+	}
 }
 
 string ResultParameter::GetName()
