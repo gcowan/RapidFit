@@ -26,7 +26,7 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-Minuit2Wrapper::Minuit2Wrapper() : function(), fitResult(), contours(), maxSteps(), bestTolerance(), Options()
+Minuit2Wrapper::Minuit2Wrapper() : function(), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options()
 {
 }
 

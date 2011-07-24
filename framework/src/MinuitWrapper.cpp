@@ -33,13 +33,13 @@
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
-MinuitWrapper::MinuitWrapper(): minuit(), fitResult(), contours(), print_verbosity( 0 )
+MinuitWrapper::MinuitWrapper(): minuit(), fitResult(NULL), contours(), print_verbosity( 0 )
 {
 	minuit = new TMinuit( 1 );
 }
 
 //Constructor with correct argument
-MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(), fitResult(), contours(), print_verbosity( output_level )
+MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(), fitResult(NULL), contours(), print_verbosity( output_level )
 {
 	minuit = new TMinuit( NumberParameters );
 }

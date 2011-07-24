@@ -220,7 +220,20 @@ FitResult * FitAssembler::DoSingleSafeFit(MinimiserConfiguration * MinimiserConf
 		clog.rdbuf(clog_bak);
 	}
 
-	if( ReturnableFitResult->GetFitStatus() != 3 )
+	bool bad_fit=false;
+
+	//	Have to protect against null objects being returned from the Wrappers
+	if( ReturnableFitResult != NULL )
+	{
+		if( ReturnableFitResult->GetFitStatus() != 3 )
+		{
+		bad_fit = true;
+		}
+	} else {
+		bad_fit = true;
+	}
+
+	if( bad_fit )
 	{
 		cerr << "\n\n\t\tFit Did NOT Converge Correctly, CHECK YOUR RESULTS!\n\n";
 		for( unsigned short int j=0; j < other_params.size(); ++j )

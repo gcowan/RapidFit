@@ -27,7 +27,7 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-FumiliWrapper::FumiliWrapper() : function(), fitResult(), contours()
+FumiliWrapper::FumiliWrapper() : function(), fitResult(NULL), contours()
 {
 }
 
