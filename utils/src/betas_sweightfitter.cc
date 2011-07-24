@@ -13,6 +13,8 @@
 #include "RooGaussian.h"
 #include "RooExponential.h"
 #include "RooMinuit.h"
+#include "RooCBShape.h"
+#include "RooProdPdf.h"
 using std::cout;
 using std::endl;
 using namespace RooFit;
@@ -107,9 +109,22 @@ RooPlot *MakePlot(RooAbsPdf * model, RooAbsData * data, RooAbsPdf * sig, RooAbsP
 	return varplot;
 }
 
+RooPlot *MakePlot(RooAbsPdf * model, RooAbsData * data, RooArgList* pdfs, RooRealVar *arg, RooArgSet *params, TString name){
+	RooPlot *varplot = arg->frame();
+	 varplot->SetTitle("");
+	 data->plotOn(varplot,LineWidth(lwidth),LineColor(kBlack),LineWidth(lwidth));
+	 model->plotOn(varplot,LineWidth(lwidth),LineColor(kBlack),LineWidth(lwidth));
+	 Double_t chi = varplot->chiSquare();
+	 for(int i = 0; i<pdfs->getSize();i++){
+	 model->plotOn(varplot,Components(RooArgList(*pdfs->at(i))),LineColor(i+2),LineStyle(kDashed),LineWidth(lwidth));
+	 }
+	 addLHCbLabel(varplot, name);
+	 paramOn(params, varplot, (char*)"", data->numEntries(), chi);
+	 return varplot;
+}
 
 int main(int argc, char *argv[]){
-	
+
 	// Cosmetics: Make RooFit look good:
 	gROOT->SetStyle("Plain");
 	gStyle->SetFrameBorderMode(0);
@@ -126,7 +141,7 @@ int main(int argc, char *argv[]){
 	gStyle->SetPadTickY(1);
 	gStyle->SetHistLineWidth(2);
 	gStyle->SetLineStyleString(2,"[12 12]");
-	
+
 	// Definitions of the mass parameter in the ntuple, ranges and binning to use:
 	TString bsmassString = "mass";
 	TString bsmassUnit = "MeV/c^{2}";
@@ -135,22 +150,45 @@ int main(int argc, char *argv[]){
 	Double_t bsmassMax = 5550.0;
 	Double_t bsmassMid = 5367.0;
 	UInt_t bsmassBins = 50;
+	
+	TString jpsimassString = "mdau1";
+	TString jpsimassUnit = "MeV/c^{2}";
+	TString jpsimassTitle = "M(#mu #mu)";
+	Double_t jpsimassMin = 3030.0;
+	Double_t jpsimassMax = 3160.0;
+	Double_t jpsimassMid = 3075.0;
+	UInt_t jpsimassBins = 50;
+
 
 	// Try to parse the input arguments
-	if(argc !=4){
-		cout << "Sytnax: " << argv[0] <<" <signal.root> <signal path> <output.root>" << endl;
+	if(argc !=5 && argc!=4){
+		cout << "Sytnax: " << argv[0] <<" <signal.root> <signal path> <output.root> <n Bs Gaus>" << endl;
 		return EXIT_FAILURE;
 	}
 
+	bool twogaus = false;
+	bool jpsi = false;
+	if(argc==5){
+		if(atoi(argv[4])>1){
+			twogaus=true;
+		}
+		if(atoi(argv[4])>2){
+			jpsi=true;
+		}
+	}
 	// Open input file and get ntuple
 	TFile *inFile = new TFile(argv[1]);
 	TTree * inTuple = (TTree*)inFile->Get(argv[2]);
 
 	// Declare mass variable to be extracted from ntuple to fit to
+
 	RooRealVar * obs_bs_mass = new RooRealVar(bsmassString,bsmassTitle,bsmassMid,bsmassMin,bsmassMax,bsmassUnit);
+	RooRealVar * obs_jpsi_mass = new RooRealVar(jpsimassString,jpsimassTitle,jpsimassMid,jpsimassMin,jpsimassMax,jpsimassUnit);
 	obs_bs_mass->setBins(bsmassBins);
+	obs_jpsi_mass->setBins(jpsimassBins);
+
 	// Load the ntuple into a RooDataset, taking only the mass column of the ntuple (as this is much faster to fit to)
-	RooArgList *fitArgs = new RooArgList(*obs_bs_mass);
+	RooArgList *fitArgs = new RooArgList(*obs_bs_mass,*obs_jpsi_mass);
 	RooDataSet * fitData = new RooDataSet("rawfitData","raw input fitDataset",inTuple,*fitArgs);
 	Double_t entries = fitData->numEntries();
 	cout << " SAMPLE CONTAINS: " << entries << " EVENTS" << endl;
@@ -162,7 +200,7 @@ int main(int argc, char *argv[]){
 	RooRealVar *aVar;
 	for(int i = 0; i < members->GetEntries(); i++){
 		TString var = members->At(i)->GetName();
-		if(!var.Contains("COV") && !var.Contains("ERR") && (!var.Contains(bsmassString))){
+		if(!var.Contains("COV") && !var.Contains("ERR") && (!var.Contains(bsmassString)) && (!var.Contains(jpsimassString))){
 			aVar = new RooRealVar(var,var,-1.0);
 			allArgs->add(*aVar,false);
 		}
@@ -170,20 +208,39 @@ int main(int argc, char *argv[]){
 	}
 	RooDataSet * allData = new RooDataSet("fitfitData","fit input fitDataset",inTuple,*allArgs);
 
-
-
 	//create an ouput file
 	TString outputdir = argv[3];
 	gSystem->mkdir( outputdir );
 	TFile * outputFile = new TFile(outputdir+"/result.root","RECREATE");
 
+	// Yields	
+	RooRealVar *Nsig = new RooRealVar("Nsig","Nsig",10.0,0.0,entries);
+	RooRealVar *Nbkg = new RooRealVar("Nbkg","Nbkg",10.0,0.0,entries);
+	RooRealVar *Nprompt = new RooRealVar("Nprompt","Nprompt",10.0,0.0,entries);
+	RooRealVar *Nnojpsi = new RooRealVar("Nnojpsi","Nnojpsi",10.0,0.0,entries);
+
+	RooArgList *yields = new RooArgList();
+
+	if(jpsi){
+
+		yields->add(RooArgList(*Nsig,*Nprompt,*Nnojpsi,*Nbkg));
+	}else{
+		yields->add(RooArgList(*Nsig,*Nbkg));
+
+	}
+
 	//Bs FIT PARAMS
 
 	// Signal
 	RooArgSet *bs_sig_vars = new RooArgSet();
-	RooRealVar *bs_sig_sigma1 = new RooRealVar("bs_sig_sigma","bs_sig_sigma",6.4016,1,20, "MeV/c^{2}");
+	RooRealVar *bs_sig_sigma1 = new RooRealVar("bs_sig_sigma1","bs_sig_sigma1",6.4016,1,10, "MeV/c^{2}");
 	RooRealVar *bs_sig_mean1 = new RooRealVar("bs_sig_mean","bs_sig_mean",5.3671e+03,5350,5400, "MeV/c^{2}");
+	RooRealVar *bs_sig_sigma2 = new RooRealVar("bs_sig_sigma2","bs_sig_sigma2",10,6,20, "MeV/c^{2}");
+	RooRealVar *bs_sig_f1 = new RooRealVar("bs_sig_f1","bs_sig_f1",0.9,0.0,1.0);
 	bs_sig_vars->add(RooArgList(*bs_sig_sigma1,*bs_sig_mean1));
+	if(twogaus){
+		bs_sig_vars->add(RooArgList(*bs_sig_sigma2,*bs_sig_f1));
+	}
 
 	// Background
 	RooArgSet *bs_bkg_vars = new RooArgSet();
@@ -193,53 +250,132 @@ int main(int argc, char *argv[]){
 	// Both
 	RooArgSet *bs_vars = new RooArgSet(*bs_sig_vars,*bs_bkg_vars);
 
-	// Yields	
-	RooRealVar *Nsig_bs = new RooRealVar("Nsig","Nsig",10.0,0.0,entries);
-	RooRealVar *Nbkg_bs = new RooRealVar("Nbkg","Nbkg",10.0,0.0,entries);
-	RooArgSet *bs_yields = new RooArgSet(*Nsig_bs,*Nbkg_bs);
-	bs_vars->add(*bs_yields);
 
-	// Bs FIT PDF
-	RooAbsPdf *bs_sig = new RooGaussian("bs_sig","bs_sig",*obs_bs_mass,*bs_sig_mean1,*bs_sig_sigma1);
+	// Jpsi FIT PARAMS
+
+	// Signal
+	RooArgSet *jpsi_sig_vars = new RooArgSet();
+	RooRealVar *jpsi_sig_mean = new RooRealVar("jpsi_sig_mean","jpsi_sig_mean",3.0945e+03,3017,3177, "MeV/c^{2}");
+	RooRealVar *jpsi_sig_sigma1 = new RooRealVar("jpsi_sig_sigma1","jpsi_sig_sigma1",1.2200e+01,0,20, "MeV/c^{2}");
+	RooRealVar *jpsi_sig_sigma2 = new RooRealVar("jpsi_sig_sigma2","jpsi_sig_sigma2",2.4133e+01,15,50, "MeV/c^{2}");
+	RooRealVar *jpsi_sig_aa = new RooRealVar("jpsi_sig_aa", "jpsi_sig_aa", 1.975);
+	RooRealVar *jpsi_sig_ab = new RooRealVar("jpsi_sig_ab", "jpsi_sig_ab", -0.0011);
+	RooRealVar *jpsi_sig_ac = new RooRealVar("jpsi_sig_ac", "jpsi_sig_ac", -0.00018);
+	RooRealVar *jpsi_sig_na = new RooRealVar("jpsi_sig_na", "jpsi_sig_na", 1.039);
+	RooRealVar *jpsi_sig_nb = new RooRealVar("jpsi_sig_nb", "jpsi_sig_nb", -0.041);
+	RooRealVar *jpsi_sig_nc = new RooRealVar("jpsi_sig_nc", "jpsi_sig_nc", 0.00227);
+	RooRealVar *jpsi_sig_sa = new RooRealVar("jpsi_sig_sa","jpsi_sig_sa",0.0546);
+	RooRealVar *jpsi_sig_sb = new RooRealVar("jpsi_sig_sb","jpsi_sig_sb",2.6e-1);
+	RooRealVar *jpsi_sig_n = new RooRealVar("jpsi_sig_n","jpsi_sig_n",1.0);
+
+	RooRealVar *jpsi_sig_f1 = new RooRealVar("jpsi_sig_f1","jpsi_sig_f1",0.6,0.0,1.0);
+	jpsi_sig_vars->add(RooArgList(*jpsi_sig_mean,*jpsi_sig_sigma1,*jpsi_sig_sigma2,*jpsi_sig_f1));
+	jpsi_sig_vars->add(RooArgList(*jpsi_sig_aa,*jpsi_sig_ab,*jpsi_sig_ac));
+	jpsi_sig_vars->add(RooArgList(*jpsi_sig_sa,*jpsi_sig_sb,*jpsi_sig_n));
+	jpsi_sig_vars->add(RooArgList( *jpsi_sig_na,*jpsi_sig_nb,*jpsi_sig_nc,*jpsi_sig_n));
+	// Background
+	RooArgSet *jpsi_bkg_vars = new RooArgSet();
+	RooRealVar *jpsi_bkg_coeff = new RooRealVar("jpsi_bkg_coeff","jpsi_bkg_coeff",-1.3931e-03,-0.1,0.1);
+	jpsi_bkg_vars->add(RooArgList(*jpsi_bkg_coeff));
+
+	//Both
+	RooArgSet *jpsi_vars = new RooArgSet(*jpsi_sig_vars,*jpsi_bkg_vars);
+
+
+	// Bs FIT PDFs
+
+	RooAbsPdf *bs_sig1 = new RooGaussian("bs_sig1","bs_sig1",*obs_bs_mass,*bs_sig_mean1,*bs_sig_sigma1);
+	RooAbsPdf *bs_sig2 = new RooGaussian("bs_sig2","bs_sig2",*obs_bs_mass,*bs_sig_mean1,*bs_sig_sigma2);
+	RooAbsPdf *bs_sig = bs_sig1;
+	if(twogaus){
+		bs_sig = new RooAddPdf("bs_sig","bs_sig",RooArgList(*bs_sig1,*bs_sig2),*bs_sig_f1);
+	}
+
 	RooAbsPdf *bs_bkg = new RooExponential("bs_bkg","bs_bkg",*obs_bs_mass,*bs_bkg_coeff);
-	RooAbsPdf *bs = new RooAddPdf("bs","bs",RooArgList(*bs_sig,*bs_bkg),RooArgList(*Nsig_bs,*Nbkg_bs));
+
+
+	//RooAbsPdf *bs = new RooAddPdf("bs","bs",RooArgList(*bs_sig,*bs_bkg),RooArgList(*Nsig,*Nbkg));
+
+
+	//Jpsi FIT PDFs
+	RooFormulaVar *jpsi_sig_a1 = new RooFormulaVar("jpsi_sig_a1", "jpsi_sig_a1",  "jpsi_sig_aa + jpsi_sig_ab*jpsi_sig_sigma1 + jpsi_sig_ac*jpsi_sig_sigma1*jpsi_sig_sigma1",  RooArgSet(*jpsi_sig_aa, *jpsi_sig_ab, *jpsi_sig_ac,*jpsi_sig_sigma1));
+//	RooFormulaVar *jpsi_sig_n1 = new RooFormulaVar("jpsi_sig_n1", "jpsi_sig_n1" , "jpsi_sig_na + jpsi_sig_nb*jpsi_sig_sigma1 + jpsi_sig_nc*jpsi_sig_sigma1*jpsi_sig_sigma1", RooArgSet(*jpsi_sig_na, *jpsi_sig_nb,*jpsi_sig_nc, *jpsi_sig_sigma1)); 
+
+
+	RooFormulaVar *jpsi_sig_a2 = new RooFormulaVar("jpsi_sig_a2", "jpsi_sig_a2",  "jpsi_sig_aa + jpsi_sig_ab*jpsi_sig_sigma2 + jpsi_sig_ac*jpsi_sig_sigma2*jpsi_sig_sigma2",  RooArgSet(*jpsi_sig_aa, *jpsi_sig_ab, *jpsi_sig_ac, *jpsi_sig_sigma2)); 
+//	RooFormulaVar *jpsi_sig_n2 = new RooFormulaVar("jpsi_sig_n2", "jpsi_sig_n2" , "jpsi_sig_na + jpsi_sig_nb*jpsi_sig_sigma2 + jpsi_sig_nc*jpsi_sig_sigma2*jpsi_sig_sigma2", RooArgSet(*jpsi_sig_na, *jpsi_sig_nb, *jpsi_sig_nc, *jpsi_sig_sigma2));  
+
+
+	RooFormulaVar *jpsi_sig_mean1 = new RooFormulaVar("jpsi_sig_mean1","jpsi_sig_mean1","jpsi_sig_mean+jpsi_sig_sigma1*jpsi_sig_sa+jpsi_sig_sigma1*jpsi_sig_sigma1*jpsi_sig_sb",RooArgSet(*jpsi_sig_mean,*jpsi_sig_sigma1,*jpsi_sig_sa,*jpsi_sig_sb));
+	RooFormulaVar *jpsi_sig_mean2 = new RooFormulaVar("jpsi_sig_mean2","jpsi_sig_mean2","jpsi_sig_mean+jpsi_sig_sigma2*jpsi_sig_sa+jpsi_sig_sigma2*jpsi_sig_sigma2*jpsi_sig_sb",RooArgSet(*jpsi_sig_mean,*jpsi_sig_sigma2,*jpsi_sig_sa,*jpsi_sig_sb));
+
+	RooAbsPdf *jpsi_sig_cb1 = new RooCBShape("jpsi_sig_cb1","jpsi_sig_cb1",*obs_jpsi_mass, *jpsi_sig_mean1,*jpsi_sig_sigma1,*jpsi_sig_a1,*jpsi_sig_n);
+	RooAbsPdf *jpsi_sig_cb2 = new RooCBShape("jpsi_sig_cb2","jpsi_sig_cb2",*obs_jpsi_mass, *jpsi_sig_mean2,*jpsi_sig_sigma2,*jpsi_sig_a2,*jpsi_sig_n);
+	
+	RooAbsPdf *jpsi_sig = new RooAddPdf("jpsi_sig","jpsi_sig",*jpsi_sig_cb1,*jpsi_sig_cb2,*jpsi_sig_f1);
+
+	RooAbsPdf *jpsi_bkg = new RooExponential("jpsi_bkg","jpsi_bkg",*obs_jpsi_mass,*jpsi_bkg_coeff);
+
+
+	//PRODPDFs
+	RooArgList* pdfs = new RooArgList();
+	RooAbsPdf *bs_sig_jpsi_sig = new RooProdPdf("bs_sig_jpsi_sig","bs_sig_jpsi_sig",RooArgSet(*bs_sig,*jpsi_sig));
+	RooAbsPdf *bs_sig_jpsi_bkg = new RooProdPdf("bs_sig_jpsi_bkg","bs_sig_jpsi_bkg",RooArgSet(*bs_sig,*jpsi_bkg));
+	RooAbsPdf *bs_bkg_jpsi_sig = new RooProdPdf("bs_bkg_jpsi_sig","bs_bkg_jpsi_sig",RooArgSet(*bs_bkg,*jpsi_sig));
+	RooAbsPdf *bs_bkg_jpsi_bkg = new RooProdPdf("bs_bkg_jpsi_bkg","bs_bkg_jpsi_bkg",RooArgSet(*bs_bkg,*jpsi_bkg));
+	if(jpsi){
+	pdfs->add(RooArgList(*bs_sig_jpsi_sig,*bs_bkg_jpsi_sig,*bs_sig_jpsi_bkg,*bs_bkg_jpsi_bkg));
+	}else{
+	pdfs->add(RooArgList(*bs_sig,*bs_bkg));
+	}
+
+	RooAbsPdf *pdf = new RooAddPdf("pdf","pdf",*pdfs,*yields);
 
 	//Here we perform the fit:
 	//Create the NLL var
-	RooAbsReal * bsnll = bs->createNLL(*fitData,NumCPU(ncpu),Extended(kTRUE));
+	RooAbsReal * nll = pdf->createNLL(*fitData,NumCPU(ncpu),Extended(kTRUE));
 	//Create the minuit instance
-	RooMinuit *bsm = new RooMinuit(*bsnll);
+	RooMinuit *m = new RooMinuit(*nll);
 	//Call migrad to minimise it
-	bsm->migrad();
+	m->migrad();
 	//Save the fit result
-	RooFitResult *bsresult = bsm->save();
-	bsresult->Print();
+	RooFitResult *result = m->save();
+	result->Print();
 
 	//Plot the fit
-	TCanvas* masscanv = new TCanvas("masscanv","masscanv",1024,768);
-	MakePlot(bs, fitData, bs_sig, bs_bkg, obs_bs_mass, bs_vars, "B_{s} Mass")->Draw();
-	masscanv->Write();
-	masscanv->Print(outputdir+"/mass.pdf");
-	masscanv->Close();
+	TCanvas* bsmasscanv = new TCanvas("bsmasscanv","bsmasscanv",1024,768);
+	MakePlot(pdf, fitData, pdfs, obs_bs_mass, bs_vars, "B_{s} Mass")->Draw();
+	bsmasscanv->Write();
+	bsmasscanv->Print(outputdir+"/bsmass.pdf");
+	bsmasscanv->Close();
+
+	if(jpsi){
+	TCanvas* jpsimasscanv = new TCanvas("jpsimasscanv","jpsimasscanv",1024,768);
+	MakePlot(pdf, fitData, pdfs, obs_jpsi_mass, jpsi_vars, "J/#psi Mass")->Draw();
+	jpsimasscanv->Write();
+	jpsimasscanv->Print(outputdir+"/jpsimass.pdf");
+	jpsimasscanv->Close();
+	}
 
 	//Perform likelihood scans of all floated params in the fit:
-	RooArgList scanparams = bsresult->floatParsFinal();
+	RooArgList scanparams = result->floatParsFinal();
 	scanparams.printLatex(Format("NEAU",AutoPrecision(1)));
 	RooRealVar *scanpar;
 	for(int i = 0; i< scanparams.getSize(); i++){
 		scanpar = (RooRealVar*)scanparams.at(i);
 		TCanvas * scanvas = new TCanvas(scanpar->getTitle()+"_scan",scanpar->getTitle()+"_scan",1024,768);
-		LikelihoodScan(bsnll, scanpar)->Draw();
+		LikelihoodScan(nll, scanpar)->Draw();
 		scanvas->Write();
 		scanvas->Print(outputdir+"/"+scanpar->getTitle()+"_scan.pdf");
 		scanvas->Close();
 	}
 
 	//Now the important bit: Make the sWeights and write them to the output file:
-	RooStats::SPlot *splot = new RooStats::SPlot("sData","An SPlot", *allData, bs, *bs_yields);
+	RooStats::SPlot *splot = new RooStats::SPlot("sData","An SPlot", *allData, pdf, *yields);
 	((RooTreeDataStore*)allData->store()->tree())->Write();
 	delete splot;
 	// Close the output file
 	outputFile->Write();
 	outputFile->Close();
+	
 }
