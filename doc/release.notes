@@ -1,8 +1,17 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+
+2011/07/26 Rob Currie
+    - Fixed PhysParam runtime flag... code was broken a long time ago with the introduction of the stepsize flags for each paramter
+    - Moved some code around in RapidPlot... code is _GOOD_ bug segfaults on exiting due to some ROOT(5.28.00b) bug with calling a TString destructor?...  code now writes out all data/plots safely before crashing
+    - Removed bad check on the FC_DATA_STEP code which trips on a less than perfect 2DLL 'seed'
+
 2011/07/22
     - Pete Clarke
      *****  STABLE RAPIDFIT DECLATED FOR LP CONFERENCE ****
      *****  aim is to not change this apart from bug fixes until after LP ******
+
+     CODE WILL BE TAGGED AFTER L/P 2011 REGARDLESS OF THE STATE IT IS IN
+     MAJOR DEVELOPMENT IS NOW TAKING PLACE IN BRANCHES WHICH WILL BE RE-SYNCED/MERGED TO HEAD ONCE L/P IS OVER TO REDUCE HEADACHES
 
 2011/07/21 Rob Currie
     - Added <Strategy> XML tag as a daughter of the FitFunction tag which allows us to control the style of fit i.e. use Pete's patch or not (not by default as per HEAD)

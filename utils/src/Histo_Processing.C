@@ -1003,6 +1003,13 @@ void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand,
 {
 	TString Name("FC_STAT_");
 	Name+= rand->Rndm();
+	vector<TString> unique;
+	TString Name2("FC_STAT_");
+	Name2+= rand->Rndm();
+	TString Name3("FC_STAT_");
+	Name3+= rand->Rndm();
+	unique.push_back( Name2 );
+	unique.push_back( Name3 );
 	TCanvas* FC_Stat_Canvas = new TCanvas( Name, Name, 1680, 1050 );
 
 	TString Total_Toy_Map = param1 + "_value:" + param2 + "_value:" + "Processed_Toys";
@@ -1015,22 +1022,22 @@ void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand,
 	Map_Names.push_back( "FC_Total_Toys.pdf" );
 	Map_Names.push_back( "FC_Toy_Efficiency.pdf" );
 
-	//	Working canvas, intended to be internal and never plotted
-	TCanvas* FC_Throw = new TCanvas( "throw", "throw", 1680, 1050);
-	TPaletteAxis* palette = NULL;
-
 	for( unsigned int i=0; i< all_plot_str.size(); ++i )
 	{
-		FC_Throw->cd();
-		FC_Output->Draw( all_plot_str[i] );
+		FC_Output->Draw( all_plot_str[i], "goff" );
 		TGraph2D* FC_Stat_Graph = new TGraph2D( (int)FC_Output->GetSelectedRows(), FC_Output->GetV2(), FC_Output->GetV1(), FC_Output->GetV3() );
-		FC_Stat_Graph->Draw(); FC_Throw->Update();
+		FC_Stat_Graph->SetName( unique[i] );
+		FC_Stat_Graph->SetTitle( unique[i] );
+		FC_Stat_Graph->Draw();
+		FC_Stat_Canvas->Update();
 		FC_Stat_Graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
 		FC_Stat_Graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
 		FC_Stat_Graph->Draw("P");
 		FC_Stat_Canvas->Update();
 		TH1* FC_Stat_Hist = FC_Stat_Graph->GetHistogram();
-		FC_Stat_Hist->SetTitle("");
+		unique[i]+=rand->Rndm();
+		FC_Stat_Hist->SetName( unique[i] );
+		FC_Stat_Hist->SetTitle( unique[i] );
 		FC_Stat_Canvas->cd();
 		FC_Stat_Hist->Draw("colz");
 		FC_Stat_Canvas->Update();
@@ -1042,20 +1049,33 @@ void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand,
 		//	OR:
 		//	Move and reisze the axis (which is something that is much easier and will likely always be less painful
 
+		TPaletteAxis* palette = NULL;
+
 		//	Get the PaletteAxis for temperature graphs which is created as part of the Update axis
                 palette = (TPaletteAxis*)FC_Stat_Hist->GetListOfFunctions()->FindObject("palette");
-		//	Move it to a slightly better position
-		palette->SetX1NDC(0.957);
-		palette->SetX2NDC(0.962);
-		//	Reduce the text size of the axis to allow the numbers to be shown on part of the plot
-		palette->SetLabelSize((Float_t)0.02);
-		//	Remove the pointless axis markings...
-		palette->GetAxis()->SetTickSize(0);
-		//	Store the output
+		if( palette != NULL )
+		{
+			TString pal_name("pal_");
+			pal_name+=rand->Rndm();
+			palette->SetName(pal_name);
+			//	Move it to a slightly better position
+			palette->SetX1NDC(0.957);
+			palette->SetX2NDC(0.962);
+			//	Reduce the text size of the axis to allow the numbers to be shown on part of the plot
+			palette->SetLabelSize((Float_t)0.02);
+			//	Remove the pointless axis markings...
+			palette->GetAxis()->SetTickSize(0);
+			//	Store the output
+		}
 		FC_Stat_Canvas->Update();
 		FC_Stat_Canvas->Print( outputdir + "/" + Map_Names[i] );
-	}
 
-	return;
+		//delete FC_Stat_Hist;
+		//delete FC_Stat_Graph;
+	}
+	//delete FC_Throw;
+	//delete FC_Stat_Canvas;
+	//if( palette != NULL ) delete palette;
+	//return;
 }
 

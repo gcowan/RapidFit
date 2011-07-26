@@ -164,13 +164,13 @@ vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandL
 				if( ( ( fabs( min - max ) < 	1E-6 ) && ( max < 1E-6 ) ) || (type=="Fixed") )
 				{
 					//		Unbounded				name	value	step	type	unit
-					PhysicsParameter* new_param = new PhysicsParameter( input_args[0], val , step, input_args[4], Unit);
+					PhysicsParameter* new_param = new PhysicsParameter( input_args[0], val , step, type, Unit);
 					RawParameters[j]->SetPhysicsParameter( input_args[0], new_param );
 				}
 				else
 				{
 					//					name	val	min	max	step	type	unit
-					RawParameters[j]->SetPhysicsParameter( input_args[0], val, min, max, step, input_args[4], Unit );
+					RawParameters[j]->SetPhysicsParameter( input_args[0], val, min, max, step, type, Unit );
 				}
 				found_parameter = local_find;
 			}

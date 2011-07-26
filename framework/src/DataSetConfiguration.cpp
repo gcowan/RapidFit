@@ -516,11 +516,12 @@ FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, Parame
 	int number_fits = (int)input_tree->GetEntries();
 	int number_grid_points = number_fits/2;
 
-	if( number_fits != 2*number_grid_points )
-	{
-		cerr << "Badly Defined RapidFit File!" << endl;
-		exit(-89);
-	}
+	//	This trips up on a contour with less than perfect coverage... should this happen?
+	//if( number_fits != 2*number_grid_points )
+	//{
+	//	cerr << "Badly Defined RapidFit File!" << endl;
+	//	exit(-89);
+	//}
 
 	vector<ResultParameterSet*> all_sets_in_file;
 	vector<FitResult*> all_sets_in_file_fitresult;

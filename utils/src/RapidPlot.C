@@ -284,7 +284,7 @@ int main( int argc, char* argv[] )
 	}
 
 
-
+	TFile* new_FC_Output = NULL;
 	TTree* FC_Output = new TTree( "FC_Output", "FC_Output" );;
 	TH2* FC_Plot = NULL;
 	//	Making use of switch
@@ -292,9 +292,12 @@ int main( int argc, char* argv[] )
 	{
 		//	FC Plot
 		cout << "FOUND TOYS IN FILE, PLOTTING FC" <<endl;
-		FC_Plot = FC_TOYS( allresults, Fit_Cut_String, param1string, param2string, NLL, Fit_Cut, Global_Best_NLL, FC_Output, Double_Tolerance, rand_gen );
+                TString FC_Tuple_File( outputdir+ "/FC_Tuple.root" );
+                new_FC_Output = new TFile( FC_Tuple_File, "RECREATE" );
 
-		FC_Stats( FC_Output, param1string, param2string, rand_gen, outputdir );
+		FC_Plot = FC_TOYS( allresults, Fit_Cut_String, param1string, param2string, NLL, Fit_Cut, Global_Best_NLL, FC_Output, Double_Tolerance, rand_gen );
+		FC_Output->Write();
+
 		//LL2D_Grid( FC_Output, Fit_Cut, param1_val, param2_val, rand_gen, "FC" );
 	}
 
@@ -324,15 +327,20 @@ int main( int argc, char* argv[] )
 
 	if( Has_Toys && want_FC )	//	If FC was generated
 	{
+		//	Thinking of implementing a PLL Plot for the FC as it's easier to plot that (and looks more impressive)
+		//TH2* FC_PLL = Invert_PLL( FC_Plot );
 		Plot_Styled_Contour( FC_Plot, cont_num, fcconts, confs, outputdir, "FeldmanCousins Profile" );
+		//Plot_Styled_Contour( FC_PLL, cont_num, fcconts, confs, outputdir, "FeldmanCousins Profile PLL" );
 
-		TString FC_Tuple_File( outputdir+ "FC_Tuple.root" );
-		TFile* new_FC_Output = new TFile( FC_Tuple_File, "RECREATE" );
-		FC_Output->Write();
-		new_FC_Output->Close();
+		//TString FC_Tuple_File( outputdir+ "FC_Tuple.root" );
+		//TFile* new_FC_Output = new TFile( FC_Tuple_File, "RECREATE" );
+		//FC_Output->Write();
 
 		Plot_Both( pllhist, FC_Plot, cont_num, fcconts, pllconts, confs, outputdir );
+		FC_Stats( FC_Output, param1string, param2string, rand_gen, outputdir );
+		if( new_FC_Output != NULL )	new_FC_Output->Close();
 	}
 
 	return 0;
 }
+
