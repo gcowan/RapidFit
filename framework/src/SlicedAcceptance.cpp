@@ -144,13 +144,11 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 	}		
 	in.close();
 	
-	double last = 0 ;
 	for( unsigned int is=0; is < lowEdge.size() ; is++ ) 
 	{
 		double tlow = lowEdge[is];
 		double thigh = hiEdge[is] ;
-		double height = binContent[is] - last ;
-		last = binContent[is]  ;
+		double height = binContent[is]  ;
 		cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
 		slices.push_back( new AcceptanceSlice( tlow, thigh, height ) ) ;
 	}
