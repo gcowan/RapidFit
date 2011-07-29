@@ -46,7 +46,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true)
 {
 
-	cout << "Constructing PDF:LongLivedBkg_3Dangular" << endl ;
+	cout << "LongLivedBkg_3Dangular::  " ;
 
 	MakePrototypes();
 
@@ -59,11 +59,44 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 		useFlatAngularDistribution = true ;
 	}
 	else {
-		cout << "   AngularDistributionHistogram found: " << fileName << endl ;
+		cout << "   AngularDistributionHistogram requested: " << fileName << endl ;
 		useFlatAngularDistribution = false ;
 
+		//File location
+		ifstream input_file;
+		input_file.open( fileName.c_str(), ifstream::in );
+		input_file.close();
+		
+		if( !getenv("RAPIDFITROOT") && input_file.fail() )
+		{
+			cerr << "\n\n" << endl;
+			cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+			cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
+			cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+			cerr << "\n\n" << endl;
+			exit(-987);
+		}
+		
+		string fullFileName;
+		
+		if( getenv("RAPIDFITROOT") )
+		{
+			string path( getenv("RAPIDFITROOT") ) ;
+			
+			cout << "RAPIDFITROOT defined as: " << path << endl;
+			
+			fullFileName = path+"/pdfs/configdata/"+fileName ;
+		} else if( !input_file.fail() )
+		{
+			fullFileName = fileName;
+		} else {
+			cerr << "Shouldn't end up Here in the code!" << endl;
+			exit(-892);
+		}
+		
+		
 		//Read in histo
-		TFile* f =  TFile::Open(fileName.c_str());
+		TFile* f =  TFile::Open(fullFileName.c_str());
 		histo = new TH3D(  *(    (TH3D*)f ->Get("histo")      )     ); //(fileName.c_str())));
 
 		xaxis = histo->GetXaxis();
