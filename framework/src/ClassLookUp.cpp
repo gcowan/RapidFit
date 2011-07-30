@@ -21,6 +21,7 @@
 
 
 #include "Bs2JpsiPhiMassSignal.h"
+#include "BsMass.h"
 
 #include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc.h"
 #include "Bd2JpsiKstar_sWave.h"
@@ -136,6 +137,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
                 //Default JPsiPhi signal mass PDF
                 returnable_PDF = new Bs2JpsiPhiMassSignal(configurator);
+        }
+		else if ( Name == "BsMass" )
+        {
+			//Default JPsiPhi signal mass PDF
+			returnable_PDF = new BsMass(configurator);
         }
         else if ( Name == "Bs2DsPiBkg_withTimeRes" )
         {

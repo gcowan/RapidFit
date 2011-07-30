@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/07/30 Pete Clarke
+    - Added new Bs mass model PDF called BsMass
+    - This implements the fraction and ratios of the second Gaussian to be fixed by MC
+    - This requires different parameters 
+
 2011/07/29 Pete Clarke
     - Added the J/PsiPhi angular distribution histogram for of background for J/PsiPhi
     - At smae time added the safe code to LongLived_Angular background PDf to look for file in $RAPIDFITROOT
