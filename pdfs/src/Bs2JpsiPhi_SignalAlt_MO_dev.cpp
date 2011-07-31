@@ -60,14 +60,19 @@ void Bs2JpsiPhi_SignalAlt_MO_dev::MakePrototypes()
 	else{
 		parameterNames.push_back( Phi_sName );
 	}
-	
-	parameterNames.push_back( res1FractionName );
-	parameterNames.push_back( res1Name );
-	parameterNames.push_back( res2Name );
-	parameterNames.push_back( timeOffsetName );
+
 	parameterNames.push_back( mistagP1Name );
 	parameterNames.push_back( mistagP0Name );
 	parameterNames.push_back( mistagSetPointName );
+	
+	parameterNames.push_back( resScaleName );
+	parameterNames.push_back( res1Name );
+	parameterNames.push_back( res2Name );
+	parameterNames.push_back( res3Name );
+	parameterNames.push_back( res2FractionName );
+	parameterNames.push_back( res3FractionName );
+	parameterNames.push_back( timeOffsetName );
+	
 	parameterNames.push_back( angAccI1Name );
 	parameterNames.push_back( angAccI2Name );
 	parameterNames.push_back( angAccI3Name );
@@ -147,9 +152,12 @@ bool Bs2JpsiPhi_SignalAlt_MO_dev::SetPhysicsParameters( ParameterSet * NewParame
 	_mistagSetPoint = allParameters.GetPhysicsParameter( mistagSetPointName )->GetValue();
 		
 	// Detector parameters
-	resolution1Fraction = allParameters.GetPhysicsParameter( res1FractionName )->GetValue();
+	resolutionScale		= allParameters.GetPhysicsParameter( resScaleName )->GetValue();
 	resolution1         = allParameters.GetPhysicsParameter( res1Name )->GetValue();
 	resolution2         = allParameters.GetPhysicsParameter( res2Name )->GetValue();
+	resolution3         = allParameters.GetPhysicsParameter( res3Name )->GetValue();
+	resolution2Fraction = allParameters.GetPhysicsParameter( res2FractionName )->GetValue();
+	resolution3Fraction = allParameters.GetPhysicsParameter( res3FractionName )->GetValue();
 	timeOffset          = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
 	
 	// Angular acceptance factors
@@ -205,27 +213,37 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::Evaluate(DataPoint * measurement)
 	ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
-	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 		
-	double val1, val2 ;
+	double val1=0. , val2=0., val3=0. ;
 	double returnValue ;
 	
-	if(resolution1Fraction >= 0.9999 ) {
-		resolution = resolution1 ;
+	double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
+	
+	if( resolutionScale <= 0. ) {
+		resolution = 0. ;
 		returnValue = this->diffXsec( );
 	}
-	else {
-		resolution = resolution1 ;
-		val1 = this->diffXsec( );
-		resolution = resolution2 ;
-		val2 = this->diffXsec( );		
-		returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;				
+	else {		
+		if(resolution1Fraction > 0 ) {
+			resolution = resolution1 * resolutionScale ;
+			val1 = this->diffXsec( );
+		}
+		if(resolution2Fraction > 0 ) {
+			resolution = resolution2 * resolutionScale ;
+			val2 = this->diffXsec( );
+		}
+		if(resolution3Fraction > 0 ) {
+			resolution = resolution3 * resolutionScale ;
+			val3 = this->diffXsec( );
+		}
+		returnValue = resolution1Fraction*val1 + resolution2Fraction*val2 + resolution3Fraction*val3 ;				
 	}
+	
 	
 	//conditions to throw exception
 	bool c1 = isnan(returnValue) ;
-	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
-	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&(fabs(resolution2-0.)<DOUBLE_TOLERANCE)) && (returnValue <= 0.) && (t>0.) ;	
+	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
+	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
 		cout << " Bs2JpsiPhi_SignalAlt_MO_dev::evaluate() returns <=0 or nan :" << returnValue << endl ;
@@ -267,27 +285,37 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::EvaluateTimeOnly(DataPoint * measurement)
 	//ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
-	//X timeAcceptanceCategory = (int)measurement->GetObservable( timeAcceptanceCategoryName )->GetValue();
 	
-	double val1, val2 ;
+	double val1=0. , val2=0., val3=0. ;
 	double returnValue ;
 	
-	if(resolution1Fraction >= 0.9999 ) {
-		resolution = resolution1 ;
+	double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
+
+	if( resolutionScale <= 0. ) {
+		resolution = 0. ;
 		returnValue = this->diffXsecTimeOnly( );
 	}
-	else {
-		resolution = resolution1 ;
-		val1 = this->diffXsecTimeOnly( );
-		resolution = resolution2 ;
-		val2 = this->diffXsecTimeOnly( );		
-		returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;				
+	else {				
+		if(resolution1Fraction > 0 ) {
+			resolution = resolution1 * resolutionScale ;
+			val1 = this->diffXsecTimeOnly( );
+		}
+		if(resolution2Fraction > 0 ) {
+			resolution = resolution2 * resolutionScale ;
+			val2 = this->diffXsecTimeOnly( );
+		}
+		if(resolution3Fraction > 0 ) {
+			resolution = resolution3 * resolutionScale ;
+			val3 = this->diffXsecTimeOnly( );
+		}
+		returnValue = resolution1Fraction*val1 + resolution2Fraction*val2 + resolution3Fraction*val3 ;	
 	}
+	
 	
 	//conditions to throw exception
 	bool c1 = isnan(returnValue) ;
-	bool c2 = ((resolution1>0.)||(resolution2>0.)) && (returnValue <= 0.) ;
-	bool c3 = ((fabs(resolution1-0.)<DOUBLE_TOLERANCE)&&(fabs(resolution2-0.)<DOUBLE_TOLERANCE)) && (returnValue <= 0.) && (t>0.) ;	
+	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
+	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		cout << endl ;
 		cout << " Bs2JpsiPhi_SignalAlt_MO_dev::evaluate() returns <=0 or nan :" << returnValue << endl ;
@@ -347,19 +375,30 @@ double Bs2JpsiPhi_SignalAlt_MO_dev::Normalisation(DataPoint * measurement, Phase
 		thi = timeBound->GetMaximum();
 	}
 	
-	double returnValue  ;
-	if(resolution1Fraction >= 0.9999 )
-	{
-		resolution =  resolution1 ;
+	
+	double val1=0. , val2=0., val3=0. ;
+	double returnValue ;
+	
+	double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
+
+	if( resolutionScale <= 0. ) {
+		resolution = 0. ;
 		returnValue = this->diffXsecCompositeNorm1( );
 	}
-	else
-	{
-		resolution =  resolution1 ;
-		double val1 = this->diffXsecCompositeNorm1( );
-		resolution =  resolution2 ;
-		double val2 = this->diffXsecCompositeNorm1( );
-		returnValue = resolution1Fraction*val1 + (1. - resolution1Fraction)*val2 ;
+	else {						
+		if(resolution1Fraction > 0 ) {
+			resolution = resolution1 * resolutionScale ;
+			val1 = this->diffXsecCompositeNorm1( );
+		}
+		if(resolution2Fraction > 0 ) {
+			resolution = resolution2 * resolutionScale ;
+			val2 = this->diffXsecCompositeNorm1( );
+		}
+		if(resolution3Fraction > 0 ) {
+			resolution = resolution3 * resolutionScale ;
+			val3 = this->diffXsecCompositeNorm1( );
+		}
+		returnValue = resolution1Fraction*val1 + resolution2Fraction*val2 + resolution3Fraction*val3 ;	
 	}
 	
 	// Conditions to throw exception

@@ -15,8 +15,10 @@
 #include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms.h"
 
 #include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
+#include "Bs2JpsiPhi_SignalAlt_MP_v2.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_dev.h"
 #include "Bs2JpsiPhi_SignalAlt_MO_v1.h"
+#include "Bs2JpsiPhi_SignalAlt_MO_v2.h"
 #include "Bs2JpsiPhi_SignalAlt_MO_dev.h"
 
 
@@ -93,6 +95,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //JPsiPhi from Pete with sWave
 		returnable_PDF = new  Bs2JpsiPhi_SignalAlt_MP_v1();
         }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v2" )
+        {
+	        //JPsiPhi from Pete with sWave
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_v2(configurator);
+        }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev" )
         {
 	        //JPsiPhi from Pete with sWave
@@ -102,6 +109,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 	        //JPsiPhi from Pete with sWave
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v1();
+        }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v2" )
+        {
+	        //JPsiPhi from Pete with sWave
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v2(configurator);
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_dev" )
         {

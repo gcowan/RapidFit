@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhi_SignalAlt_BaseClass_dev.h,v 1.1 2009/12/06  Pete Clarke Exp $
-/** @class Bs2JpsiPhi_SignalAlt_BaseClass_dev.h
+// $Id: Bs2JpsiPhi_SignalAlt_BaseClass_v2.h,v 1.1 2009/12/06  Pete Clarke Exp $
+/** @class Bs2JpsiPhi_SignalAlt_BaseClass_v2.h
  *
  *  Base Class for Bs2JpsiPhi_SignalAlt....  PDFs
  *
@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef Bs2JpsiPhi_SignalAlt_BaseClass_dev_H
-#define Bs2JpsiPhi_SignalAlt_BaseClass_dev_H
+#ifndef Bs2JpsiPhi_SignalAlt_BaseClass_v2_H
+#define Bs2JpsiPhi_SignalAlt_BaseClass_v2_H
 
 #ifndef __CINT__
 #include "BasePDF.h"
@@ -48,17 +48,17 @@
 
 
 
-class Bs2JpsiPhi_SignalAlt_BaseClass_dev
+class Bs2JpsiPhi_SignalAlt_BaseClass_v2
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfigurator);
-		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass_dev();
+		Bs2JpsiPhi_SignalAlt_BaseClass_v2(PDFConfigurator);
+		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass_v2();
 
 	protected:
 
 	        //      Uncopyable!
-		Bs2JpsiPhi_SignalAlt_BaseClass_dev ( const Bs2JpsiPhi_SignalAlt_BaseClass_dev& );
-		Bs2JpsiPhi_SignalAlt_BaseClass_dev& operator = ( const Bs2JpsiPhi_SignalAlt_BaseClass_dev& );
+		Bs2JpsiPhi_SignalAlt_BaseClass_v2 ( const Bs2JpsiPhi_SignalAlt_BaseClass_v2& );
+		Bs2JpsiPhi_SignalAlt_BaseClass_v2& operator = ( const Bs2JpsiPhi_SignalAlt_BaseClass_v2& );
 
 		//PELC For debugging purposes
 		//TH1D * histOfPdfValues ;
@@ -84,23 +84,20 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		ObservableRef cosphisName;		// fitting cosphis and sinphis independently
 		ObservableRef sinphisName;		// fitting cosphis and sinphis independently	
 
-		// Mistag parameters  
-		ObservableRef mistagName;		// mistag fraction  - may be used as observable also
+                // Mistag parameters
+                ObservableRef mistagName;		// mistag fraction
 		ObservableRef mistagP1Name;		// mistag calib
 		ObservableRef mistagP0Name;		// mistag calib
 		ObservableRef mistagSetPointName;// mistag calib
 
 		// Time resolution
-		ObservableRef resScaleName;			// Scale to multiply all Gaussians with 
-		ObservableRef res1Name;				// time resolution narrow
-		ObservableRef res2Name;				// time resolution wide
-		ObservableRef res3Name;				// time resolution tail
-		ObservableRef res2FractionName;		// fraction of wide
-		ObservableRef res3FractionName;		// fraction of tail
-		ObservableRef timeOffsetName;		// time offset
+		ObservableRef res1Name;		  // time resolution core
+		ObservableRef res2Name;		  // time resolution tail
+		ObservableRef res1FractionName;  // fraction of core
+		ObservableRef timeOffsetName;    // time offset
 
-		// These are the angular accceptance factors. The first 6 are P-wave, the second 4 are S-wave
-		ObservableRef angAccI1Name ;  
+                // These are the angular accceptance factors. The first 6 are P-wave, the second 4 are S-wave
+                ObservableRef angAccI1Name ;  
 		ObservableRef angAccI2Name ;
 		ObservableRef angAccI3Name ;
 		ObservableRef angAccI4Name ;
@@ -111,15 +108,15 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		ObservableRef angAccI9Name ;
 		ObservableRef angAccI10Name ;
 
-		// Observables 
 		ObservableRef timeName;		// proper time
 		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		ObservableRef phiName;			// azimuthal angle of the mu+ in Jpsi frame
 		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
 		ObservableRef tagName;			// B tag
+		//X ObservableRef timeAcceptanceCategoryName ; //Originally included for using unbiased and biased events.
 
 		//	Constraints
-		ObservableRef timeConstraintName;  // what is this ????????????
+		ObservableRef timeConstraintName;
 
 		// Measured Event Observables
 		double t ;
@@ -158,12 +155,9 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 	
 		// Time resolution
 		double resolution ;
-		double resolutionScale ;
 		double resolution1 ;
 		double resolution2 ;
-		double resolution3 ;
-		double resolution2Fraction ;
-		double resolution3Fraction ;
+		double resolution1Fraction ;
 		double timeOffset ;
 
                 // Angular acceptance factors
@@ -249,7 +243,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		inline double gamma_l() const { 
 			const double gl = gamma() + ( dgam *0.5 ) ;
 			if( gl < 0. ) {
-				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_dev : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
+				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_v2 : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
 				return 0.0000001 ;
 			}
 			else
@@ -259,7 +253,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		inline double gamma_h() const { 
 			const double gh = gamma() - ( dgam *0.5 ) ;
 			if( gh < 0. ) {
-				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_dev : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
+				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_v2 : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
 				return 0.0000001 ;
 			}
 			else
@@ -283,15 +277,15 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 				if( returnValue > 0.5) returnValue = 0.5 ; 
 			}			
 			else if( _mistag < 0.0 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev::mistag() : _mistag < 0 so set to 0 " << endl ;
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v2::mistag() : _mistag < 0 so set to 0 " << endl ;
 				returnValue = 0 ;
 			}
 			else if( _mistag > 0.5 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev::mistag() : _mistag > 0.5 so set to 0.5 "  << endl ;
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v2::mistag() : _mistag > 0.5 so set to 0.5 "  << endl ;
 				returnValue = 0.5 ;
 			}
 			else {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev::mistag() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v2::mistag() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
 				exit(1);
 			}
 			return returnValue ;			
@@ -327,8 +321,8 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		double diffXsecCompositeNorm1(  )  ;
 
 		bool normalisationCacheValid ;
-		double normalisationCacheValue[3] ;
-		//double normalisationCacheValueRes2[3] ;
+		double normalisationCacheValueRes1[3] ;
+		double normalisationCacheValueRes2[3] ;
 	
 		void DebugPrintXsec( string , double ) const ;
 		void DebugPrintNorm( string , double ) const ;
@@ -348,7 +342,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		  
 			//DEBUG
 			if( DEBUGFLAG && (result < 0) ) {
-				cout << " Bs2JpsiPhi_SignalAlt_BaseClass_dev::timeFactorEven() : result < 0 " << endl ;
+				cout << " Bs2JpsiPhi_SignalAlt_BaseClass_v2::timeFactorEven() : result < 0 " << endl ;
 				cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
 				cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
 				cout << " ->term3 " << q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) << endl ;
