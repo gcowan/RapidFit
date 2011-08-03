@@ -162,8 +162,8 @@ int main( int argc, char* argv[] )
 		TString Name( Param_Of_Choice );
 		Name.Append("_");Name+=i;
 		temp_graph->SetName( Name );
-		temp_graph->SetLineColor( i );
-		temp_graph->SetMarkerColor( i );
+		temp_graph->SetLineColor( i+1 );
+		temp_graph->SetMarkerColor( i+1 );
 		new_canvas->cd();
 		temp_graphs.push_back( temp_graph );
 		mg->Add(temp_graph);
@@ -192,8 +192,8 @@ int main( int argc, char* argv[] )
 		{
 			Input_Tree_per_File[i]->Draw( Drift_Param_Draw_String[j] , "NLL>0" );
 			TGraph* temp_graph = new TGraph( int( Input_Tree_per_File[i]->GetSelectedRows() ), Input_Tree_per_File[i]->GetV2(), Input_Tree_per_File[i]->GetV1() );
-			temp_graph->SetLineColor( i );
-			temp_graph->SetMarkerColor( i );
+			temp_graph->SetLineColor( i+1 );
+			temp_graph->SetMarkerColor( i+1 );
 			TString Name("File_");
 			Name+=j;Name.Append("_");Name+=i;
 			temp_graph->SetName( Name );
