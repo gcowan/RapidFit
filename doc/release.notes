@@ -1,4 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+
+2011/08/03 Rob Currie
+    - Auto_Color lines in RapidLL, why ROOT has to make this so difficult I will never know
+
 2011/07/31 Pete Clarke
     - Froze .....MO_dev  and ....MP_dev  ----->  M)_v2  and ....MP_v2
     - Added new time resolution model as decided for lepton-photon into _dev versions of PDFs
