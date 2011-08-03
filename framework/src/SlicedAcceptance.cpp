@@ -43,7 +43,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 	
 	
 	//Create N more, equispaced 
-	int N = 100 ;
+	int N = 15 ;
 	double dh = (accUp-accLow) / N ;
 	double dt = (thigh - tlow) / N ;
 
