@@ -4,6 +4,10 @@
     - Added new time resolution model as decided for lepton-photon into _dev versions of PDFs
 
 2011/07/30 Pete Clarke
+    -  change dupper time acceptance factor to -0.0158
+    -  added pdfs/configdata/  files
+
+2011/07/30 Pete Clarke
     - Added new Bs mass model PDF called BsMass
     - This implements the fraction and ratios of the second Gaussian to be fixed by MC
     - This requires different parameters 

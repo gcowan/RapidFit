@@ -187,6 +187,7 @@ int main( int argc, char* argv[] )
 		{
 			Input_Tree_per_File[i]->Draw( Drift_Param_Draw_String[j] , "NLL>0" );
 			TGraph* temp_graph = new TGraph( int( Input_Tree_per_File[i]->GetSelectedRows() ), Input_Tree_per_File[i]->GetV2(), Input_Tree_per_File[i]->GetV1() );
+			temp_graph->SetLineColor( i ) ;
 			all_params_drift_multi[j]->Add( temp_graph );
 		}
 	}
@@ -201,6 +202,8 @@ int main( int argc, char* argv[] )
 	mg->GetYaxis()->SetTitle( "#Delta LL" );
 	new_canvas->Update();
 
+	//Try to change colour
+ 
 	TString Output_Graph_Name = "Output_"+Param_Of_Choice;
 	new_canvas->Print( Output_Graph_Name+".png" );
 	new_canvas->Print( Output_Graph_Name+".pdf" );

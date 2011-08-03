@@ -92,8 +92,8 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfig
 	
 	if( useTimeAcceptance() ) {
 		if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
-			timeAcc = new SlicedAcceptance( 0., 14.0, 0.025 ) ;
-			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: Upper time acceptance beta=0.025 [0 < t < 14] " << endl ;
+			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0157 ) ;
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: Upper time acceptance beta=0.0157 [0 < t < 14] " << endl ;
 		}
 		else if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Lower2010" ) ) {
 			timeAcc = new SlicedAcceptance( "Lower2010" ) ;
