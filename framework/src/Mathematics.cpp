@@ -439,7 +439,7 @@ namespace Mathematics
 		// average acceptance weights for Bs2JpsiPhi.
 		RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
 		PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
-		int numAngularTerms = 6;
+		int numAngularTerms = 10;//6;
 		double*  f = new double[numAngularTerms]; // the angular functions
 		double* xi = new double[numAngularTerms]; // the angular weights
 		double cosTheta, phi, cosPsi;
@@ -450,12 +450,13 @@ namespace Mathematics
 		for (int e = 0; e < numEvents; e++)
 			//for (int e = 0; e < 10; e++)
 		{
-			if (e % 10000 == 0) cout << "Event # " << e << endl;
+			if (e % 1000 == 0) cout << "Event # " << e << endl;
 			DataPoint * event = dataSet->GetDataPoint(e);
 			cosTheta = event->GetObservable("cosTheta")->GetValue();
 			phi      = event->GetObservable("phi")->GetValue();
 			cosPsi   = event->GetObservable("cosPsi")->GetValue();
-			getBs2JpsiPhiAngularFunctions( f[0], f[1], f[2], f[3], f[4], f[5], cosTheta, phi, cosPsi);
+			//getBs2JpsiPhiAngularFunctions( f[0], f[1], f[2], f[3], f[4], f[5], cosTheta, phi, cosPsi);
+	                getBs2JpsiPhiAngularFunctionsWithSwave( f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], cosTheta, phi, cosPsi);
 			// The method sums the angular factor f_i divided by the sum_i(A_i*f_i)
 			// for each accepted event. I'm not sure if dividing by Evaluate is exactly the
 			// same here, particularly if you look at untagged events.
@@ -464,7 +465,7 @@ namespace Mathematics
 			vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
 			dontIntegrate.push_back("time");
 			dontIntegrate.push_back("tag");
-			dontIntegrate.push_back("KstarFlavour");
+			//dontIntegrate.push_back("KstarFlavour");
 			evalPDFnorm = rapidInt->DoNumericalIntegral( event, boundary, dontIntegrate );
 			val = evalPDFraw/evalPDFnorm;
 			for (int i = 0; i < numAngularTerms; i++)
@@ -474,7 +475,9 @@ namespace Mathematics
 			//cout << f[0]<<" " << cosTheta << " " << phi << " " << cosPsi << " " << evalPDF  << " " << xi[0] << endl;
 		}
 		//cout << "[" << xi[0]/xi[0] << ", " << xi[1]/xi[0] << ", " << xi[2]/xi[0] <<  ", " << xi[3]/xi[0] << ", " << xi[4]/xi[0] << ", " << xi[5]/xi[0] << "]" <<  endl;
-		cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents << "]" <<  endl;
+		//cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents << "]" <<  endl;
+		cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents << ", " << 
+		xi[6]/numEvents << ", " << xi[7]/numEvents << ", " << xi[8]/numEvents <<  ", " << xi[9]/numEvents << "]" <<  endl;
 		return;
 	}
 
@@ -499,7 +502,7 @@ namespace Mathematics
 			cosTheta = event->GetObservable("cosTheta")->GetValue();
 			phi      = event->GetObservable("phi")->GetValue();
 			cosPsi   = event->GetObservable("cosPsi")->GetValue();
-			double weight = event->GetObservable("NSig_sw")->GetValue();
+			double weight = 1.;//event->GetObservable("NSig_sw")->GetValue();
 
 			//cout << weight << endl;
 			getBs2JpsiPhiAngularFunctionsWithSwave( f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], cosTheta, phi, cosPsi);

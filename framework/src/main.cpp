@@ -74,6 +74,8 @@ int RapidFit( int argc, char * argv[] )
 	//Variables to store command line arguments
 	int numberRepeats = 0;
 	int Nuisencemodel=2;
+        int jobNum = 0;
+        int nData = 0;
 	string configFileName = "";
 	vector<string> parameterTemplates;
 	MinimiserConfiguration * theMinimiser=NULL;
@@ -109,8 +111,8 @@ int RapidFit( int argc, char * argv[] )
 	bool doPullsFlag = false;
 	bool doLLscanFlag = false;
 	bool doLLcontourFlag = false;
-        bool donewLLscanFlag = false;
-        bool donewLLcontourFlag = false;
+	bool donewLLscanFlag = false;
+	bool donewLLcontourFlag = false;
 	bool testRapidIntegratorFlag = false;
 	bool calculateAcceptanceWeights = false;
 	bool calculateAcceptanceWeightsWithSwave = false;
@@ -556,28 +558,28 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
-                else if ( currentArgument == "--OutputLevel" )
-                {
-                        if( argumentIndex + 1 < argc )
-                        {
-                                ++argumentIndex;
-                                OutputLevel = atoi( argv[argumentIndex] );
-                        } else {
-                                cerr << "Badly Defined Output Level" << endl;
-                                return BAD_COMMAND_LINE_ARG;
-                        }
-                }
-                else if ( currentArgument == "--OutputLevelScans" )
-                {
-                        if( argumentIndex + 1 < argc )
-                        {
-                                ++argumentIndex;
-                                OutputLevel2 = atoi( argv[argumentIndex] );
-                        } else {
-                                cerr << "Badly Defined Output Level" << endl;
-                                return BAD_COMMAND_LINE_ARG;
-                        }
-                }
+		else if ( currentArgument == "--OutputLevel" )
+		{
+			if( argumentIndex + 1 < argc )
+			{
+				++argumentIndex;
+				OutputLevel = atoi( argv[argumentIndex] );
+			} else {
+				cerr << "Badly Defined Output Level" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}
+		}
+		else if ( currentArgument == "--OutputLevelScans" )
+		{
+			if( argumentIndex + 1 < argc )
+			{
+				++argumentIndex;
+				OutputLevel2 = atoi( argv[argumentIndex] );
+			} else {
+				cerr << "Badly Defined Output Level" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}
+		}
 		else if ( currentArgument == "--FC_LL_PART" )
 		{
 			FC_LL_PART_Flag = true;
@@ -598,6 +600,22 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
+                else if ( currentArgument == "--GOF" )
+                {
+                        GOF_Flag = true;
+                        if ( argumentIndex + 2 < argc )
+                        {
+                                ++argumentIndex;
+                                jobNum = atoi( argv[argumentIndex] );
+                                ++argumentIndex;
+                                nData  = atoi( argv[argumentIndex] );
+                        }
+                        else
+                        {
+                                cerr << "Job number for GOF not specified" << endl;
+                                return BAD_COMMAND_LINE_ARG;
+                        }
+                }
 
 		//	The Parameters beyond here are for setting boolean flags
 		else if ( currentArgument == "--testIntegrator" )			{	testIntegratorFlag = true;			}
@@ -616,7 +634,6 @@ int RapidFit( int argc, char * argv[] )
 		else if ( currentArgument == "--MCStudy" )				{	MCStudyFlag = true;				}
 		else if ( currentArgument == "--ForceScan" )				{	Force_Scan_Flag = true;				}
 		else if ( currentArgument == "--DontStartAtCenter" )			{	StartAtCenterFlag = false;			}
-		else if ( currentArgument == "--GOF" ) 					{	GOF_Flag = true;				}
 
 		//	We didn't understand the argument to end up here
 		else
@@ -1019,10 +1036,9 @@ int RapidFit( int argc, char * argv[] )
 		}
 
 		if ( GOF_Flag ) {
+			cout << "Starting GOF" << endl;
 			PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
-			vector< ParameterSet * > parSet;
-			parSet.push_back(GlobalResult->GetResultParameterSet()->GetDummyParameterSet());
-			pdfAndData->SetPhysicsParameters( parSet ); 
+			pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
 			IPDF * pdf = pdfAndData->GetPDF();
 			vector<IPDF*> vectorPDFs;
 			vectorPDFs.push_back(pdf);
@@ -1030,37 +1046,47 @@ int RapidFit( int argc, char * argv[] )
 			PhaseSpaceBoundary * phase = xmlFile->GetPhaseSpaceBoundaries()[0];
 			EdStyle * greigFormat = new EdStyle();
 			greigFormat->SetStyle();
-			//GoodnessOfFit::plotUstatistic( pdf, data, phase, "testStatistic.pdf");                               
 
 			// Set up to be able to generate some MC data
 			DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
 			dataConfig->SetSource( "Foam" );
 			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
 			double pvalue = 0.;
-			int nData = 100;
-			for ( int i = 1; i < 100; i++ ) {
+			bool model = true;
+			for ( int i = jobNum; i < jobNum + 100; i++ ) {
 
 				cout << "Ensemble " << i << endl;
-				// Generate a large sample of MC toy data
-				pdf->SetRandomFunction( i );
-				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 1000 );
 
-				// Take a subset of the full dataset
-				MemoryDataSet * subset = new MemoryDataSet( data->GetBoundary() );
-				for ( int j = i*nData; j < (i+1)*nData; j++ ) {
-					subset->AddDataPoint( data->GetDataPoint(j) );
-				}
+				// First, generate some data
+				pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
+				pdf->SetRandomFunction( i );
+				pdf->SetMCCacheStatus( false );
+				MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
 				vector<IDataSet*> vectorData;
 				vectorData.push_back(subset);
 
-				// Fit the data and then calculate the p-value relative to the large MC sample
-				FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
-				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
-				pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
+				if ( model ) {
+					// Use the same PDF for the large MC dataset (the Model approach)
+					pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
+				}
+				else {
+					// Fit the generated data (the Fit I approach)
+					FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
+					vector< ParameterSet * > parSet;
+					parSet.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
+					pdfAndData->SetPhysicsParameters( parSet );
+				}
+				// Generate large sample of MC
+				pdf->SetRandomFunction( i*i + 1 );
+				pdf->SetMCCacheStatus( false );
+				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
+
+				// Finally calculate the p-value relative to the large MC sample
+				pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
+				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
 				pvalueHist->Fill( pvalue );
-				cout << "pvalue = " << pvalue << endl;
+				cout << "p-value " << pvalue << endl;
 				delete subset;
-				cout << "pvalue = " << pvalue << endl;
 				delete mcData;
 			}
 			TFile * outputFile = new TFile("pvalues.root", "RECREATE");
@@ -1190,9 +1216,9 @@ int RapidFit( int argc, char * argv[] )
 	{
 		vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
 		for(unsigned int i=0; i < _2DLLscanList.size() ; ++i )
-                {
-                        string name1 = _2DLLscanList[i].first;
-                        string name2 = _2DLLscanList[i].second;
+		{
+			string name1 = _2DLLscanList[i].first;
+			string name2 = _2DLLscanList[i].second;
 
 			pair< ScanParam*, ScanParam* > Param_Set = makeOutput->Get2DScanParams( name1, name2 );
 
