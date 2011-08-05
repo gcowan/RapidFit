@@ -1,0 +1,21 @@
+
+
+in ganga:
+                pfn=PhysicalFile("/tmp/rcurrie/Pass3-version2_Bs_310711_RapidFit.root")
+                pfn.upload('/lhcb/user/r/rcurrie/Pass3-version2_Bs_310711_RapidFit.root','CERN-USER')
+
+(You can upload to any GRID-SE but CERN is local so will be the quickest)
+
+
+
+to make the file available across the whole Tier1:
+
+
+from bash:
+		>  SetupProject LHCbDirac
+		>  lhcb-proxy-init
+		>  for i in GRIDKA-USER NIKHEF-USER IN2P3-USER RAL-USER CNAF-USER; do dirac-dms-replicate-lfn LFN:/lhcb/user/r/rcurrie/Pass3-version2_Bs_310711_RapidFit.root $i CERN-USER; done
+
+
+the grid will probably in time make the file available across all Tier1 but if you request the replication here you can run on all Tier1 sites so spend less time in Dirac waiting lists
+

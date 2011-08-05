@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/08/05 Rob Currie
+    - Added some scripts and instructions to scripts/next-gen-scripts for running on the Grid with RapidFit
+
 2011/08/05 Greig Cowan
     - Updated GOF method in main.
     - Updated angular acceptance weight calculation for sWave.
