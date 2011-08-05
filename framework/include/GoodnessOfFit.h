@@ -13,9 +13,15 @@
 #include "IDataSet.h"
 #include "IPDF.h"
 #include "PhaseSpaceBoundary.h"
+#include "XMLConfigReader.h"
+#include "MinimiserConfiguration.h"
+#include "FitFunctionConfiguration.h"
 
 namespace GoodnessOfFit 
 {
+	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, vector<string> CommandLineParam, int nData );
+        void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, vector<ParameterSet*> * parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, int nData, int repeats, vector<double> * pvalues);
+	double getPvalue( double datavalue, vector<double> distribution );
 	double pValueFromPoint2PointDissimilarity( IDataSet * data, IDataSet * mc );
 	double calculateTstatistic( IDataSet * data, IDataSet * mc);
 	vector<double> permutation( IDataSet * data, IDataSet * mc, int nPerm );

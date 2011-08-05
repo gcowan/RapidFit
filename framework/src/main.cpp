@@ -28,9 +28,6 @@
 #include "StringProcessing.h"
 #include "MCStudy.h"
 #include "GoodnessOfFit.h"
-#include "EdStyle.h"
-#include "MemoryDataSet.h"
-#include "PhaseSpaceBoundary.h"
 #include "VectorScan.h"
 //  System Headers
 #include <string>
@@ -74,8 +71,8 @@ int RapidFit( int argc, char * argv[] )
 	//Variables to store command line arguments
 	int numberRepeats = 0;
 	int Nuisencemodel=2;
-        int jobNum = 0;
-        int nData = 0;
+	int jobNum = 0;
+	int nData = 0;
 	string configFileName = "";
 	vector<string> parameterTemplates;
 	MinimiserConfiguration * theMinimiser=NULL;
@@ -600,22 +597,22 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
-                else if ( currentArgument == "--GOF" )
-                {
-                        GOF_Flag = true;
-                        if ( argumentIndex + 2 < argc )
-                        {
-                                ++argumentIndex;
-                                jobNum = atoi( argv[argumentIndex] );
-                                ++argumentIndex;
-                                nData  = atoi( argv[argumentIndex] );
-                        }
-                        else
-                        {
-                                cerr << "Job number for GOF not specified" << endl;
-                                return BAD_COMMAND_LINE_ARG;
-                        }
-                }
+		else if ( currentArgument == "--GOF" )
+		{
+			GOF_Flag = true;
+			if ( argumentIndex + 2 < argc )
+			{
+				++argumentIndex;
+				jobNum = atoi( argv[argumentIndex] );
+				++argumentIndex;
+				nData  = atoi( argv[argumentIndex] );
+			}
+			else
+			{
+				cerr << "Job number for GOF not specified" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}
+		}
 
 		//	The Parameters beyond here are for setting boolean flags
 		else if ( currentArgument == "--testIntegrator" )			{	testIntegratorFlag = true;			}
@@ -1036,62 +1033,14 @@ int RapidFit( int argc, char * argv[] )
 		}
 
 		if ( GOF_Flag ) {
-			cout << "Starting GOF" << endl;
-			PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
-			pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
-			IPDF * pdf = pdfAndData->GetPDF();
-			vector<IPDF*> vectorPDFs;
-			vectorPDFs.push_back(pdf);
-			IDataSet * data = pdfAndData->GetDataSet();
-			PhaseSpaceBoundary * phase = xmlFile->GetPhaseSpaceBoundaries()[0];
-			EdStyle * greigFormat = new EdStyle();
-			greigFormat->SetStyle();
-
-			// Set up to be able to generate some MC data
-			DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
-			dataConfig->SetSource( "Foam" );
 			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
-			double pvalue = 0.;
-			bool model = true;
-			for ( int i = jobNum; i < jobNum + 100; i++ ) {
-
-				cout << "Ensemble " << i << endl;
-
-				// First, generate some data
-				pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
-				pdf->SetRandomFunction( i );
-				pdf->SetMCCacheStatus( false );
-				MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
-				vector<IDataSet*> vectorData;
-				vectorData.push_back(subset);
-
-				if ( model ) {
-					// Use the same PDF for the large MC dataset (the Model approach)
-					pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters( CommandLineParam ) );
-				}
-				else {
-					// Fit the generated data (the Fit I approach)
-					FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
-					vector< ParameterSet * > parSet;
-					parSet.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
-					pdfAndData->SetPhysicsParameters( parSet );
-				}
-				// Generate large sample of MC
-				pdf->SetRandomFunction( i*i + 1 );
-				pdf->SetMCCacheStatus( false );
-				MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
-
-				// Finally calculate the p-value relative to the large MC sample
-				pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
-				//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
-				pvalueHist->Fill( pvalue );
-				cout << "p-value " << pvalue << endl;
-				delete subset;
-				delete mcData;
-			}
+			double pvalue = GoodnessOfFit::gofLoop( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, nData );
+			pvalueHist->Fill( pvalue );
 			TFile * outputFile = new TFile("pvalues.root", "RECREATE");
 			pvalueHist->Write();
+			outputFile->Write();
 			outputFile->Close();
+			delete pvalueHist;
 			delete outputFile;
 		}
 

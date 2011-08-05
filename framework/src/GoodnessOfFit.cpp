@@ -12,21 +12,127 @@
 #include "TF1.h"
 #include "TStyle.h"
 #include "TMath.h"
+#include "TH1D.h"
+#include "TFile.h"
 //	RapidFit Headers
 #include "GoodnessOfFit.h"
 #include "MemoryDataSet.h"
 #include "ObservableContinuousConstraint.h"
 #include "RapidFitIntegrator.h"
+#include "XMLConfigReader.h"
+#include "PDFWithData.h"
+#include "IPDF.h"
+#include "IDataSet.h"
+#include "PhaseSpaceBoundary.h"
+#include "EdStyle.h"
+#include "DataSetConfiguration.h"
+#include "FitResult.h"
+#include "FitAssembler.h"
 //	System Headers
 #include <math.h>
 #include <iostream>
 #include <set>
 #include <algorithm>
+#include <time.h>
 
 using namespace std;
 
 namespace GoodnessOfFit
 {
+
+	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, vector<string> CommandLineParam, int nData )
+	{
+		cout << "Starting GOF" << endl;
+
+		double pvalue = 0.;
+		for ( int i = 0; i < 1; i ++ )
+		{
+			cout << "Iteration " << i << endl;
+			// Set up the PDF parameters
+			vector< ParameterSet * > parSet = xmlFile->GetFitParameters( CommandLineParam );
+
+			// First, generate our toy data, fit to it, use PDF to generate large MC and then calculate corresponding p-value from permutation
+			vector<double> dataPvalue;
+			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, &parSet, theMinimiser, theFunction, argumentParameterSet, nData, 1, &dataPvalue );
+
+			// Now need to account for any potential fit bias so repeat above procedure N times to get distribution of p-values
+			vector<double> distOfPvalues;
+			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, &parSet, theMinimiser, theFunction, argumentParameterSet, nData, 100, &distOfPvalues );
+
+			// Finally, compare dataPvalue with distribution of pvalues to get the actual p-value of the fit, which correctly accounts for the bias
+			pvalue = GoodnessOfFit::getPvalue( dataPvalue[0], distOfPvalues );	
+		}
+		return pvalue;
+	}
+
+	double getPvalue( double datavalue, vector<double> distribution )
+	{
+		int count = 0;
+		vector<double>::iterator iter;
+		for ( iter = distribution.begin(); iter != distribution.end(); ++iter ){
+			//cout << datavalue << " " << *iter << endl;
+			if ( datavalue < *iter ) count++;
+		}
+		double pvalue = count/double(distribution.size());
+		return pvalue;
+	}
+
+	void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, vector<ParameterSet*> * parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, int nData, int repeats, vector<double> * pvalues)
+	{
+		PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
+		IPDF * pdf = pdfAndData->GetPDF();
+		vector<IPDF*> vectorPDFs;
+		vectorPDFs.push_back(pdf);
+		PhaseSpaceBoundary * phase = xmlFile->GetPhaseSpaceBoundaries()[0];
+		EdStyle * greigFormat = new EdStyle();
+		greigFormat->SetStyle();
+
+		vector< ParameterSet * > parSetFromFit;
+
+		// Set up to be able to generate some MC data
+		DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
+		dataConfig->SetSource( "Foam" );
+		bool model = false;
+		double pvalue = 0.;
+		unsigned int ulTime = static_cast<unsigned int>( time( NULL ));
+		for ( int i = 0; i < repeats; i++ ) {
+			cout << "Ensemble " << i << endl;
+
+			// First, generate some data from this PDF
+			pdfAndData->SetPhysicsParameters( *parSet );
+			pdf->SetRandomFunction( ulTime );
+			pdf->SetMCCacheStatus( false );
+			MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
+			vector<IDataSet*> vectorData;
+			vectorData.push_back(subset);
+
+			if ( model ) {
+				// Use the same PDF for the large MC dataset (the Model approach)
+				pdfAndData->SetPhysicsParameters( *parSet );
+			}
+			else {
+				// Fit the generated data (the Fit I approach)
+				FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
+				parSetFromFit.clear();
+				parSetFromFit.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
+				pdfAndData->SetPhysicsParameters( parSetFromFit );
+			}
+			// Generate large sample of MC
+			ulTime = static_cast<unsigned int>( time( NULL ));
+			pdf->SetRandomFunction( ulTime );
+			pdf->SetMCCacheStatus( false );
+			MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
+
+			// Finally calculate the p-value relative to the large MC sample
+			pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
+			//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
+			pvalues->push_back(pvalue);
+			delete subset;
+			delete mcData;
+		}
+		parSet = &parSetFromFit;  // Need this so that we have the correct parameters during the second call of this function
+	}
+
 	void plotUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, string plot )
 	{
 		unsigned int nD = data->GetDataNumber();
