@@ -114,7 +114,7 @@ namespace GoodnessOfFit
 			else {
 				// Fit the generated data (the Fit I approach)
 				FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
-				if { gofResult->GetFitStatus == 3 ) {
+				if ( gofResult->GetFitStatus() == 3 ) {
 					parSetFromFit.clear();
 					parSetFromFit.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
 					pdfAndData->SetPhysicsParameters( parSetFromFit );
