@@ -80,6 +80,7 @@ namespace GoodnessOfFit
 	void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, vector<ParameterSet*> * parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, int nData, int repeats, vector<double> * pvalues)
 	{
 		PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
+		pdfAndData->SetPhysicsParameters( *parSet );
 		IPDF * pdf = pdfAndData->GetPDF();
 		vector<IPDF*> vectorPDFs;
 		vectorPDFs.push_back(pdf);
@@ -95,7 +96,7 @@ namespace GoodnessOfFit
 		bool model = false;
 		double pvalue = 0.;
 		unsigned int ulTime = static_cast<unsigned int>( time( NULL ));
-		for ( int i = 0; i < repeats; i++ ) {
+		for ( int i = 0; i < repeats; ) {
 			cout << "Ensemble " << i << endl;
 
 			// First, generate some data from this PDF
@@ -113,9 +114,12 @@ namespace GoodnessOfFit
 			else {
 				// Fit the generated data (the Fit I approach)
 				FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
-				parSetFromFit.clear();
-				parSetFromFit.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
-				pdfAndData->SetPhysicsParameters( parSetFromFit );
+				if { gofResult->GetFitStatus == 3 ) {
+					parSetFromFit.clear();
+					parSetFromFit.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
+					pdfAndData->SetPhysicsParameters( parSetFromFit );
+					i++; // let us go to the next iteration of the loop so that we always get "repeats" good results
+				}
 			}
 			// Generate large sample of MC
 			ulTime = static_cast<unsigned int>( time( NULL ));

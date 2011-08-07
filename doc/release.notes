@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/08/07 Greig Cowan
+    - Bug fixes to GOF.
+
 2011/08/05 Rob Currie
     - Added some scripts and instructions to scripts/next-gen-scripts for running on the Grid with RapidFit
 
