@@ -60,7 +60,7 @@ namespace GoodnessOfFit
 
 			// Now need to account for any potential fit bias so repeat above procedure N times to get distribution of p-values
 			vector<double> distOfPvalues;
-			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, &parSet, theMinimiser, theFunction, argumentParameterSet, nData, 100, &distOfPvalues );
+			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, &parSet, theMinimiser, theFunction, argumentParameterSet, nData, 50, &distOfPvalues );
 
 			// Finally, compare dataPvalue with distribution of pvalues to get the actual p-value of the fit, which correctly accounts for the bias
 			pvalue = GoodnessOfFit::getPvalue( dataPvalue[0], distOfPvalues );	
@@ -421,9 +421,9 @@ namespace GoodnessOfFit
 		double pValueFromPoint2PointDissimilarity(IDataSet * data, IDataSet * mcData)
 		{
 			double T = calculateTstatistic( data, mcData );
-			//char buffer[20];
+			char buffer[20];
 			sprintf( buffer, "T = %f", T );
-			//cout << buffer << endl;
+			cout << buffer << endl;
 
 			int nPerm = 25;
 			vector<double> Tvalues = permutation( data, mcData, nPerm );
