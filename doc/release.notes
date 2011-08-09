@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/08/09 Greig Cowan
+    - Added some more helper code for GOF.
+
 2011/08/07 Greig Cowan
     - Bug fixes to GOF.
 
