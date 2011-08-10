@@ -45,8 +45,6 @@ namespace GoodnessOfFit
 		cout << "Starting GOF" << endl;
 
 		double pvalue = 0.;
-		pvalue = GoodnessOfFit::fitDataCalculatePvalue( xmlFile, theMinimiser, theFunction, argumentParameterSet );
-		return pvalue;
 
 		for ( int i = 0; i < 1; i ++ )
 		{
@@ -80,21 +78,14 @@ namespace GoodnessOfFit
 		return pvalue;
 	}
 
-	double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet)
+	double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, FitResult * result)
 	{
+		cout << "Starting GOF for data" << endl;
 		vector<PDFWithData *> pdfAndData = xmlFile->GetPDFsAndData();	
 		vector<PDFWithData *>::iterator iter;
-		vector<IPDF*> pdfs;
 		vector<IDataSet*> data;
 
-		// Get the list of PDFs and data to fit
-		for ( iter = pdfAndData.begin(); iter != pdfAndData.end(); ++iter ){
-			pdfs.push_back( (*iter)->GetPDF() );
-			data.push_back( (*iter)->GetDataSet() );
-		}
-
-		// Fit the data
-		FitResult * result = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, pdfs, data, xmlFile->GetConstraints() );
+		// Take the fitted parameters
 		vector< ParameterSet * > parSetFromFit;
 		parSetFromFit.push_back(result->GetResultParameterSet()->GetDummyParameterSet());
 
@@ -108,22 +99,26 @@ namespace GoodnessOfFit
 
 		// Generate large sample of MC using the fitted PDF parameters
 		for ( iter = pdfAndData.begin(); iter != pdfAndData.end(); ++iter ){
+			data.push_back( (*iter)->GetDataSet() );
+			nData = data.back()->GetDataNumber();
+			phase = data.back()->GetBoundary();
+			
 			(*iter)->SetPhysicsParameters( parSetFromFit );
 			ulTime = static_cast<unsigned int>( time( NULL ));
 			pdf = (*iter)->GetPDF();
 			pdf->SetRandomFunction( ulTime );
 			pdf->SetMCCacheStatus( false );
-			phase = (*iter)->GetDataSet()->GetBoundary();
+			
 			dataConfig = (*iter)->GetDataSetConfig();
 			dataConfig->SetSource( "Foam" );
 
-			nData = (*iter)->GetDataSet()->GetDataNumber();
 			mc = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
 			mcData.push_back( mc );
 		}
 
 		// Finally calculate the p-value relative to the large MC sample
-		double pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data[0], mcData[0] );
+		double pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data[1], mcData[1] );
+		cout << "p-value " << pvalue << endl;
 		return pvalue;
 	}
 
@@ -421,9 +416,9 @@ namespace GoodnessOfFit
 		double pValueFromPoint2PointDissimilarity(IDataSet * data, IDataSet * mcData)
 		{
 			double T = calculateTstatistic( data, mcData );
-			char buffer[20];
-			sprintf( buffer, "T = %f", T );
-			cout << buffer << endl;
+			//char buffer[20];
+			//sprintf( buffer, "T = %f", T );
+			//cout << buffer << endl;
 
 			int nPerm = 25;
 			vector<double> Tvalues = permutation( data, mcData, nPerm );
@@ -458,9 +453,9 @@ namespace GoodnessOfFit
 			for ( int i = 0; i < nPerm; i++ ) {
 				double T = permutationCore( data, mc, i );
 				bootstrappedTvalues.push_back(T);
-				//char buffer[20];
-				//sprintf( buffer, "Tperm%i = %f", i, T );
-				//cout << buffer << endl;
+				char buffer[20];
+				sprintf( buffer, "Tperm%i = %f", i, T );
+				cout << buffer << endl;
 			}
 			return bootstrappedTvalues;
 		}
@@ -576,6 +571,7 @@ namespace GoodnessOfFit
 			double yVal = 0.;
 			char buffer[100];
 			while ( (xVar = x->GetObservable( *xIter ) ) && (yVar = y->GetObservable( *yIter ) ) ) {
+				cout << *xIter << endl;
 				if ( (*xIter == "time") ) {
 					xVal = ( xVar->GetValue() - 1.6 )/1.2;
 					yVal = ( yVar->GetValue() - 1.6 )/1.2;

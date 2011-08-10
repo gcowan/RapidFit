@@ -1034,7 +1034,8 @@ int RapidFit( int argc, char * argv[] )
 
 		if ( GOF_Flag ) {
 			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
-			double pvalue = GoodnessOfFit::gofLoop( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, nData );
+			//double pvalue = GoodnessOfFit::gofLoop( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, nData );
+		        double pvalue = GoodnessOfFit::fitDataCalculatePvalue( xmlFile, theMinimiser, theFunction, argumentParameterSet, GlobalResult );
 			pvalueHist->Fill( pvalue );
 			TFile * outputFile = new TFile("pvalues.root", "RECREATE");
 			pvalueHist->Write();
