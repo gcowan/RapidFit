@@ -1,10 +1,11 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
 2011/08/15 Greig Cowan
-    - GOF bugfix
+    - GOF bugfix.
     - Added new Bs2JpsiPhi PDF to include the angular acceptance in the evaluate method. This is
       essential for toy generation/plotting and therefore for GOF calculation.
     - Fix to ClassLookUp. 
+    - Added ability to have lifetime acceptance in LongLivedBkg PDF for Jpsif0 fit.
 
 2011/08/10 Greig Cowan
     - Some minor GOF restructuring.

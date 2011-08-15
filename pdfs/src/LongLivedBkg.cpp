@@ -40,12 +40,13 @@ LongLivedBkg::LongLivedBkg(PDFConfigurator config ) :
 	//, cosPsiName		( config.getName("cosPsi") )
 	//Other things to be initialised
 	, timeconstName		( config.getName("time") )
+	, _useTimeAcceptance(false)
 
 	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(),
 	histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
 	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true)
+	, timeAcc(NULL)
 {
-
 	cout << "LongLivedBkg::  " ;
 
 	MakePrototypes();
@@ -55,6 +56,15 @@ LongLivedBkg::LongLivedBkg(PDFConfigurator config ) :
 
 	//Initialise depending upon whether configuration parameter was found
 	useFlatAngularDistribution = true ;
+
+	//...........................................
+        // Configure to use time acceptance machinery 
+        _useTimeAcceptance = config.isTrue( "UseTimeAcceptance" ) ;
+
+        if( _useTimeAcceptance ) {
+                        timeAcc = new SlicedAcceptance( "File" , config.getConfigurationValue( "TimeAcceptanceFile" ) ) ;
+                        cout << "LongLivedBkg:: Constructing timeAcc: using file: " << config.getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
+        }
 
 }
 
@@ -171,7 +181,7 @@ double LongLivedBkg::buildPDFnumerator()
 
 //..............................................................
 // Normlisation
-double LongLivedBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double LongLivedBkg::Norm(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	//	Stupid gcc
 	(void)measurement;
@@ -207,6 +217,46 @@ double LongLivedBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary *
 		returnValue =  timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2;
 	}
 
+	return returnValue;
+}
+
+double LongLivedBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+{
+	//	Stupid gcc
+	(void)measurement;
+	// Use this if you want to ignore the time acceptance calculation
+	//return Norm( measurement, boundary );
+
+	IConstraint * timeBound = boundary->GetConstraint( timeconstName );
+	if ( timeBound->GetUnit() == "NameNotFoundError" )
+	{
+		cerr << "Bound on time not provided" << endl;
+		return -1.;
+	}
+	else
+	{
+	    tlow = timeBound->GetMinimum();
+		thigh = timeBound->GetMaximum();
+	}
+
+	double returnValue = 0;
+
+	double tlo_boundary = tlow;
+	double thi_boundary = thigh;
+	
+        if( _useTimeAcceptance ) {
+                //This loops over each time slice, does the normalisation between the limits, and accumulates
+                for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
+                {
+			tlow = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
+                        thigh = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
+                        if( thigh > tlow ) returnValue += this->Norm( measurement, boundary ) * timeAcc->getSlice(islice)->height() ;
+                }
+        }
+
+	tlow  = tlo_boundary;
+	thigh = thi_boundary;
+
 	return returnValue ;
 }
 
@@ -238,7 +288,6 @@ double LongLivedBkg::buildPDFdenominator()
 
 	//This PDF only works for full angular phase space= 8pi factor included in the factors in the Evaluate() method - so no angular normalisation term.
 	return returnValue ;
-
 }
 
 

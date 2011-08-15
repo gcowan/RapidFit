@@ -16,9 +16,11 @@
 
 #ifndef __CINT__
 #include "BasePDF.h"
+#include "SlicedAcceptance.h"
 #endif
 #ifdef __CINT__
 #include "framework/include/BasePDF.h"
+#include "framework/include/SlicedAcceptance.h"
 #endif
 
 class LongLivedBkg : public BasePDF
@@ -34,6 +36,7 @@ class LongLivedBkg : public BasePDF
 	protected:
 		//Calculate the PDF normalisation
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
+		virtual double Norm(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
 		//	Can't be copied
@@ -88,6 +91,8 @@ class LongLivedBkg : public BasePDF
 		double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
 		double total_num_entries;
 		bool useFlatAngularDistribution;
+                bool _useTimeAcceptance;
+                SlicedAcceptance * timeAcc;
 };
 
 #endif
