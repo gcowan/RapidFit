@@ -17,11 +17,11 @@
 #define DOUBLE_TOLERANCE 1E-6
 
 //Constructor
-Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg() :
+Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg(PDFConfigurator configurator) :
 	// Physics parameters
-	  alphaM_prName	( "alphaM_pr" )
+	  alphaM_prName	( configurator.getName("alphaM_pr" ))
         // Observables
-        , recoMassName  ( "mass" )
+        , recoMassName  (configurator.getName( "mass" ))
 	, constraint_recoMassName()
 {
 	MakePrototypes();

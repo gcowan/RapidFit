@@ -165,7 +165,7 @@ double LongLivedBkg::buildPDFnumerator()
 		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
 	}
 
-	return returnValue * angularFactor();
+	return returnValue;
 }
 
 

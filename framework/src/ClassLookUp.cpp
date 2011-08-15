@@ -222,7 +222,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         else if ( Name == "Bs2JpsiPhiMassBkg" )
         {
                 //Default JPsiPhi prompt bkg mass signal
-                returnable_PDF = new Bs2JpsiPhiMassBkg();
+                returnable_PDF = new Bs2JpsiPhiMassBkg(configurator);
 	}
         else if ( Name == "Exponential" )
         {

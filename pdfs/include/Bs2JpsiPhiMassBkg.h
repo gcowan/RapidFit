@@ -20,7 +20,7 @@
 class Bs2JpsiPhiMassBkg : public BasePDF
 {
 	public:
-		Bs2JpsiPhiMassBkg();
+		Bs2JpsiPhiMassBkg(PDFConfigurator);
 		~Bs2JpsiPhiMassBkg();
 
 		//Calculate the PDF value
