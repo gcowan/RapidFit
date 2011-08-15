@@ -17,7 +17,7 @@
 #include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_v2.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_dev.h"
-
+#include "Bs2JpsiPhi_SignalAlt_MP_dev_v3.h"
 
 #include "Bs2JpsiPhi_SignalAlt_MO_v1.h"
 #include "Bs2JpsiPhi_SignalAlt_MO_v2.h"
@@ -99,6 +99,11 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         {
 	        //JPsiPhi from Pete with sWave
 		returnable_PDF = new  Bs2JpsiPhi_SignalAlt_MP_v1();
+        }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev_v3" )
+        {
+	        //JPsiPhi from Pete/Greig with sWave and angular acceptance in numerator from histogram
+		returnable_PDF = new  Bs2JpsiPhi_SignalAlt_MP_dev_v3(configurator);
         }
 		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v2" )
         {
