@@ -52,6 +52,8 @@
 #include "Bs2JpsiPhiPromptBkg_tripleGaussian.h"
 #include "Bs2JpsiPhiMassBkg.h"
 #include "Bs2JpsiPhiMassBkgLL.h"
+
+#include "LongLivedBkg.h"
 #include "LongLivedBkg_3Dangular.h"
 
 #include "Exponential.h"
@@ -257,6 +259,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
                          // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
                          returnable_PDF = new Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms();
         }
+
+	else if ( Name == "LongLivedBkg" )
+        {
+                         returnable_PDF = new LongLivedBkg(configurator);
+        }
+
 
 	else if ( Name == "LongLivedBkg_3Dangular" )
         {
