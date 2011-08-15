@@ -139,6 +139,7 @@ TPaveText* addLHCbLabel(TString footer){
 
 TCanvas *makeTempCanvas(TGraph2D* graph, TString labelname){
 	TCanvas *tempCanvas = new TCanvas(labelname+" temperature",labelname+" temperature",1024,768);
+	tempCanvas->SetRightMargin(0.15);
 	graph->Draw("colz");
 	addLHCbLabel(labelname)->Draw();
 	return tempCanvas;
@@ -146,12 +147,15 @@ TCanvas *makeTempCanvas(TGraph2D* graph, TString labelname){
 
 TCanvas *makeTempCanvas(TH2* hist, TString labelname){
 	TCanvas *tempCanvas = new TCanvas(labelname+" temperature",labelname+" temperature",1024,768);
+
+	tempCanvas->SetRightMargin(0.15);
 	hist->Draw("colz");
 	addLHCbLabel(labelname)->Draw();
 	return tempCanvas;
 }
 TCanvas *makePointCanvas(TGraph2D* graph, TString labelname){
 	TCanvas *pointCanvas = new TCanvas(labelname+" points",labelname+" points",1024,768);
+	pointCanvas->SetRightMargin(0.15);
 	pointCanvas->SetPhi(0.0);
 	pointCanvas->SetTheta(90.0);
 	graph->Draw("PCOL");
@@ -160,6 +164,7 @@ TCanvas *makePointCanvas(TGraph2D* graph, TString labelname){
 }
 TCanvas *makeContCanvas(TGraph2D* graph, TString labelname){
 	TCanvas *contourCanvas = new TCanvas(labelname+" contour",labelname+" contour",1024,768);
+	contourCanvas->SetRightMargin(0.15);
 	graph->Draw("cont1z");
 	addLHCbLabel(labelname)->Draw();
 	return contourCanvas;
@@ -167,8 +172,8 @@ TCanvas *makeContCanvas(TGraph2D* graph, TString labelname){
 
 TCanvas *makeContCanvas(TH2* hist, TString labelname){
 	TCanvas *contourCanvas = new TCanvas(labelname+" contour",labelname+" contour",1024,768);
+	contourCanvas->SetRightMargin(0.15);
 	hist->Draw("cont1z");
-
 	addLHCbLabel(labelname)->Draw();
 	return contourCanvas;
 }
@@ -178,6 +183,7 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 	TString pname = "color";
 	if(pub){pname = "pub";}
 	TCanvas *confCanvas = new TCanvas(pname + " " + labelname+" CL contours",pname + " " + labelname+" CL contours",1024,768);
+	confCanvas->SetRightMargin(0.15);
 	hist->SetContour(nconts,conts);
 	hist->Draw("cont LIST");
 	confCanvas->Update();
@@ -186,7 +192,7 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 	TGraph* curv     = NULL;
 	TGraph* gc    = NULL;
 	int TotalConts = contObjArr->GetSize();
-	TLegend *leg = new TLegend(0.80,0.89,0.95,0.7);
+	TLegend *leg = new TLegend(0.7,0.89,0.85,0.7);
 	leg->SetHeader("Conf. Levels");
 	leg->SetBorderSize(0);
 	leg->SetFillStyle(0);
@@ -224,6 +230,7 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 	//TH2* hist = (TH2*)_hist->Clone("confhist");
 	TString pname = "both";
 	TCanvas *confCanvas = new TCanvas(pname + " " + labelname+" CL contours",pname + " " + labelname+" CL contours",1024,768);
+	confCanvas->SetRightMargin(0.15);
 	histll->SetContour(nconts,llconts);
 	histll->Draw("cont LIST");
 	confCanvas->Update();
@@ -234,7 +241,7 @@ TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t ncon
 	int llTotalConts = llcontObjArr->GetSize();
 
 
-	TLegend *leg = new TLegend(0.75,0.89,0.95,0.7);
+	TLegend *leg = new TLegend(0.7,0.89,0.85,0.7);
 	leg->SetHeader("Conf. Levels");
 	leg->SetBorderSize(0);
 	leg->SetFillStyle(0);
@@ -335,7 +342,10 @@ int main(int argc, char *argv[]){
 		}
 	}
 	vector<TString> all_parameters = get_branch_names( allresults );
+
 	vector<TString> all_parameter_values = filter_names( all_parameters, "_value" );
+	vector<TString> all_parameter_errors = filter_names( all_parameters, "_error" );
+	all_parameter_values.insert(all_parameter_values.end(),all_parameter_errors.begin(),all_parameter_errors.end());
 
 	TFile * output = new TFile(outputdir+"/llscanresults.root","RECREATE");
 
@@ -784,6 +794,7 @@ int main(int argc, char *argv[]){
 
 
 	TCanvas *pllPoints = makePointCanvas(pllgraph, "PLL Gridpoints");
+
 	pllPoints->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_points.pdf");
 	pllPoints->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_points.png");
 
