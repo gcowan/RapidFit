@@ -117,7 +117,7 @@ namespace GoodnessOfFit
 		}
 
 		// Finally calculate the p-value relative to the large MC sample
-		double pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data[1], mcData[1] );
+		double pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data[0], mcData[0] );
 		cout << "p-value " << pvalue << endl;
 		return pvalue;
 	}
@@ -571,7 +571,7 @@ namespace GoodnessOfFit
 			double yVal = 0.;
 			char buffer[100];
 			while ( (xVar = x->GetObservable( *xIter ) ) && (yVar = y->GetObservable( *yIter ) ) ) {
-				cout << *xIter << endl;
+				//cout << *xIter << endl;
 				if ( (*xIter == "time") ) {
 					xVal = ( xVar->GetValue() - 1.6 )/1.2;
 					yVal = ( yVar->GetValue() - 1.6 )/1.2;
