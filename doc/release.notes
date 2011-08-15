@@ -4,6 +4,7 @@
     - GOF bugfix
     - Added new Bs2JpsiPhi PDF to include the angular acceptance in the evaluate method. This is
       essential for toy generation/plotting and therefore for GOF calculation.
+    - Fix to ClassLookUp. 
 
 2011/08/10 Greig Cowan
     - Some minor GOF restructuring.

@@ -111,12 +111,12 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_v2(configurator);
         }
 
-		else if ( Name == "Bs2Jpsifzero_SignalAlt_MP_dev" )
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev" )
         {
 	        //JPsiPhi from Pete with sWave
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_dev(configurator);
         }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev" )
+		else if ( Name == "Bs2Jpsifzero_SignalAlt_MP_dev" )
         {
 	        //JPsifzero
 	        returnable_PDF = new Bs2Jpsifzero_SignalAlt_MP_dev(configurator);
