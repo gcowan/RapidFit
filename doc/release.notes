@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/08/16 Greig Cowan
+    - Modified LongLivedBkg PDF to use a delta function in place of the second exponential.
+
 2011/08/15 Greig Cowan
     - GOF bugfix.
     - Added new Bs2JpsiPhi PDF to include the angular acceptance in the evaluate method. This is

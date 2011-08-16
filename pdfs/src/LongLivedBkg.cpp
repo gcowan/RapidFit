@@ -171,7 +171,7 @@ double LongLivedBkg::buildPDFnumerator()
 			exit(1) ;
 		}
 		double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
-		double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
+		double val2 = 1./(sqrt(2*TMath::Pi())*sigmaLL) * exp(-time*time/(2*sigmaLL*sigmaLL)); //Mathematics::Exp(time, 1./tauLL2, sigmaLL);
 		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
 	}
 
@@ -282,7 +282,7 @@ double LongLivedBkg::buildPDFdenominator()
 			exit(1) ;
 		}
 		double val1 = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
-		double val2 = Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
+		double val2 = 0.5*RooMath::erf( (thigh - tlow)/(sqrt(2.)*sigmaLL) );//Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
 		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
 	}
 
