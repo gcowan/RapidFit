@@ -31,7 +31,7 @@ MC_STEP_OFFSET = 0				#	Where to start in the file
 #output_file_list = [ 'FitTrace.root', 'Global_Fit_Result.root', 'LLcontourScanData.root' ]
 output_file_list = [ 'Global_Fit_Result.root', 'LLcontourScanData.root' ]
 
-RapidFit_Path = "/afs/cern.ch/user/r/rcurrie/trunk-vanilla/"
+RapidFit_Path = "/home/gcowan/lhcb/RapidFit/trunk/"
 RapidFit_Library=RapidFit_Path+"lib/libRapidRun.so"
 
 ROOT_VERSION='5.28.00b'
@@ -45,7 +45,7 @@ Y_min=-0.1
 Y_max=0.2
 
 resolution=40
-sqrt_jobs_per_core=4
+sqrt_jobs_per_core=2
 
 
 LFN_LIST=[]
@@ -203,6 +203,18 @@ if is_ganga:
 			choice = int( raw_input( "try again... " ) )
 		if choice == 1 :
 			j.backend = Condor()
+			j.inputdata = FILE_LIST
+		if choice == 2 :
+			j.backend = Interactive()
+			j.inputdata = FILE_LIST
+
+	elif ( string.find( host_name, "epfl" ) != -1 ):
+		choice = int( raw_input("Running on EPFL, submit to 1) PBS or 2) Interactive? ") )
+		while ( choice != 1 ) and ( choice != 2 ):
+			choice = int( raw_input( "try again... " ) )
+		if choice == 1 :
+			j.backend = PBS()
+			j.backend.queue = 'long'
 			j.inputdata = FILE_LIST
 		if choice == 2 :
 			j.backend = Interactive()
