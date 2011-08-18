@@ -212,7 +212,7 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
         else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeResDouble" )
         {
 	        //Prompt background for JPsiPhi, with time resolution (double convolved gaussian)
-			returnable_PDF = new Bs2JpsiPhiPromptBkg_withTimeResDouble();
+			returnable_PDF = new Bs2JpsiPhiPromptBkg_withTimeResDouble(configurator);
         }
         else if ( Name == "Bs2JpsiPhiPromptBkg_tripleGaussian" )
         {

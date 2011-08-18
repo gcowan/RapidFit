@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/08/18 Greig Cowan
+    - Modified Bs2JpsiPhi Prompt background PDF to be configurable.
+    - Fixed normalisation in LongLivedBkg PDF.
+
 2011/08/17 Greig Cowan
     - Modified Ganga script for running 2D LL scans to include PBS backend.
 

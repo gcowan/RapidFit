@@ -19,7 +19,7 @@
 class Bs2JpsiPhiPromptBkg_withTimeResDouble : public BasePDF
 {
 	public:
-		Bs2JpsiPhiPromptBkg_withTimeResDouble();
+		Bs2JpsiPhiPromptBkg_withTimeResDouble(PDFConfigurator);
 		~Bs2JpsiPhiPromptBkg_withTimeResDouble();
 
 		//Calculate the PDF value

@@ -13,14 +13,14 @@
 #include "RooMath.h"
 
 //Constructor
-Bs2JpsiPhiPromptBkg_withTimeResDouble::Bs2JpsiPhiPromptBkg_withTimeResDouble() : 
+Bs2JpsiPhiPromptBkg_withTimeResDouble::Bs2JpsiPhiPromptBkg_withTimeResDouble(PDFConfigurator config) : 
 	// Physics parameters
-	  frac_sigmaPrName	( "frac_sigmaPr" )
-        , sigmaPrName		( "sigmaPr" )
-        , sigmaPr2Name		( "sigmaPr2" )
+	  frac_sigmaPrName	( config.getName("frac_sigmaPr") )
+        , sigmaPrName		( config.getName("sigmaPr") )
+        , sigmaPr2Name		( config.getName("sigmaPr2") )
         // Observables
-        ,  timeName		( "time" )
-	,  timeconstraintName	( "time" )
+        ,  timeName		( config.getName("time") )
+	,  timeconstraintName	( config.getName("time") )
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with double time resolution" << endl;

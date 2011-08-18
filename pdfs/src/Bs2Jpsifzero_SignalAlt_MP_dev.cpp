@@ -200,6 +200,13 @@ double Bs2Jpsifzero_SignalAlt_MP_dev::Evaluate(DataPoint * measurement)
 		cout << "   mistagP1       " << _mistagP1 << endl ;
 		cout << "   mistagP0       " << _mistagP0 << endl ;
 		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
+		cout << "   resolutionScale " << resolutionScale << endl; 
+		cout << "   resolution1Fraction " << resolution1Fraction << endl; 
+		cout << "   resolution2Fraction " << resolution2Fraction << endl; 
+		cout << "   resolution3Fraction " << resolution3Fraction << endl; 
+		cout << "   val1 " << val1 << endl; 
+		cout << "   val2 " << val2 << endl; 
+		cout << "   val3 " << val3 << endl; 
 		cout << " For event with:  " << endl ;
 		cout << "   time      " << t << endl ;
 		cout << "   ctheta_tr " << ctheta_tr << endl ;
