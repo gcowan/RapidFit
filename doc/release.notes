@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/08/19 Greig Cowan
+    - Added new acceptance histogram for signal with offset of 0.127.
+    - Modified ExternalConstraint to allow for a correlation between parameters (Pete)
+
 2011/08/18 Greig Cowan
     - Modified Bs2JpsiPhi Prompt background PDF to be configurable.
     - Fixed normalisation in LongLivedBkg PDF.

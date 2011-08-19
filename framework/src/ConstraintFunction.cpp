@@ -71,6 +71,30 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			double gaussSqrt = ( gamobs_fit -  gamobs_con ) / allConstraints[constraintIndex]->GetError();
 			constraintValue += gaussSqrt * gaussSqrt;
 		}
+		else if ( name == "SpecialForGreig" )
+		{
+			//GammaObs^-1 = Gamma^-1 * ( 1 + (deltaGamma/2*Gamma)^2 ) / ( 1 - (deltaGamma/2*Gamma)^2 )
+			// Get gamma and delta gamma
+			double gamma = NewParameters->GetPhysicsParameter("gamma")->GetValue();
+			double dgam =  NewParameters->GetPhysicsParameter("deltaGamma")->GetValue();
+			double gamma_con = 0.656 ;
+			double dgam_con = 0.123 ;
+			double v[2] ;
+			v[0] = gamma-gamma_con ;
+			v[1] = dgam-dgam_con ;
+			double E[2][2] ;
+			E[0][0] = 17170.3 ;
+			E[1][1] = 1306.66 ;
+			E[1][0] = 1420.99 ;
+			E[0][1] = E[1][0] ;
+			double chisq = 0;
+			for( int ix=0; ix<2; ++ix ) {
+				for( int iy=0; iy<2; ++iy ) {
+					chisq += v[ix]*E[ix][iy]*v[iy] ;
+				}
+			}
+			constraintValue += chisq ;
+		}
 		else if ( name == "ATOTAL" )
 		{
 			// This is a special one to contrain the sum of the amplitudes to 1
