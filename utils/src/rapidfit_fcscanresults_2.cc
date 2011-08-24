@@ -178,12 +178,43 @@ TCanvas *makeContCanvas(TH2* hist, TString labelname){
 	return contourCanvas;
 }
 
-TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* conts, double* confs, bool pub){
+void scaleContours( TGraph * gc, double x_point, double y_point, double x_scale, double y_scale ) {
+	double x = 0., y = 0.;
+	double radius = 0.;
+	double sinTheta = 0.;
+	double cosTheta = 0.;
+	double scale = 1.;
+	// y_point is actually for the x-axis...
+	double x_min = y_point;
+	double y_min = x_point;
+	// check which quadrant the global minimum is in	
+	bool sm = false;
+	bool flipped = false;
+	if ( x_min > -1. && y_min > 0. ) sm = true;
+	for ( int p = 0; p < gc->GetN(); p++ ) {
+		gc->GetPoint( p, x, y );
+		// need to flip the minimum depending upon which contour
+		if ( !flipped && ( (sm && (x < -1. && y < 0.)) || (!sm && (x > -1 && y > 0.) )) ) {
+			flipped = true;
+			x_min = TMath::Pi() - x_min - 2*TMath::Pi(); // also move by 2pi
+			y_min = -y_min;
+		}
+		radius = sqrt((x_min - x)*(x_min - x) + (y_min - y)*(y_min - y));	
+		sinTheta = (y_min - y)/radius;
+		cosTheta = (x_min - x)/radius;
+		scale = sqrt( (x_scale * cosTheta)*(x_scale * cosTheta) + (y_scale * sinTheta)*(y_scale * sinTheta) );
+		// set the new coordinate after scaling the radius and doing a bit of trig
+		gc->SetPoint( p, -scale*radius*cosTheta + x_min, -scale*radius*sinTheta + y_min);
+	}
+}
+
+TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* conts, double* confs, bool pub, double x_point, double y_point){
 	//TH2* hist = (TH2*)_hist->Clone("confhist");
 	TString pname = "color";
 	if(pub){pname = "pub";}
 	TCanvas *confCanvas = new TCanvas(pname + " " + labelname+" CL contours",pname + " " + labelname+" CL contours",1024,768);
-	confCanvas->SetRightMargin(0.15);
+	confCanvas->SetGrid();
+	//confCanvas->SetRightMargin(0.15);
 	hist->SetContour(nconts,conts);
 	hist->Draw("cont LIST");
 	confCanvas->Update();
@@ -191,11 +222,21 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 	TList* contLevel = NULL;
 	TGraph* curv     = NULL;
 	TGraph* gc    = NULL;
+	double phi[1] = {-0.036};
+	double phiE[1] = {0.002};
+	double dg[1] = {0.087};
+	double dgE[1] = {0.021}; 
+	TGraphErrors* sm = new TGraphErrors( 1, phi, dg, phiE, dgE);
+	sm->SetMarkerStyle(21);
 	int TotalConts = contObjArr->GetSize();
-	TLegend *leg = new TLegend(0.7,0.89,0.85,0.7);
+	TLegend *leg = new TLegend(0.68,0.39,0.83,0.2);
 	leg->SetHeader("Conf. Levels");
 	leg->SetBorderSize(0);
 	leg->SetFillStyle(0);
+	hist->GetYaxis()->SetNdivisions(505);
+	hist->GetXaxis()->SetTitle("#phi_{s} [rad]");
+	hist->GetYaxis()->SetTitle("#Delta#Gamma_{s} [ps^{-1}]");
+	hist->GetYaxis()->SetTitleOffset(1.2);
 	hist->Draw("AXIS");
 	for(int i = 0; i < TotalConts; ++i){
 		TString confname = "";
@@ -203,13 +244,21 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 		confname +=cl;
 		confname += "\% C.L.";
 		contLevel = (TList*)contObjArr->At(i);
-		for(int j =0; j<contLevel->GetSize(); ++j){
+		for(int j = 0; j < contLevel->GetSize(); ++j){
 			curv = (TGraph*)contLevel->At(j);
 			gc = (TGraph*)curv->Clone();
+			scaleContours( gc, x_point, y_point, 1.08, 1.011 ); // If you want to scale the contours to include systematics 
 			if(pub){	
 				gc->SetLineStyle(Style_t(i+1));
 			}else{
-				gc->SetLineColor(Color_t(i+2));
+				int c = 0;
+				int s = 0;
+				if ( i == 0 ) { c = 2; s = 1;} 
+				if ( i == 1 ) { c = kViolet; s = 9;}
+				if ( i == 2 ) { c = 4; s = 2;}
+				gc->SetLineColor(Color_t(c));
+				gc->SetLineStyle(s);
+				gc->SetLineWidth(2.5);
 			}
 			gc->Draw("L");
 		}
@@ -217,6 +266,7 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 	}
 	addLHCbLabel(labelname)->Draw();
 	leg->Draw();
+	sm->Draw("PLSAME");
 	confCanvas->Update();
 	//hist->Delete();
 	hist->SetContour(20);
@@ -224,7 +274,6 @@ TCanvas *makeConfCanvas(TH2* hist, TString labelname,UInt_t nconts, double* cont
 
 
 }
-
 
 TCanvas *makeBothCanvas(TH2* histfc, TH2* histll, TString labelname, UInt_t nconts, double* fcconts, double *llconts, double* confs){
 	//TH2* hist = (TH2*)_hist->Clone("confhist");
@@ -400,9 +449,9 @@ int main(int argc, char *argv[]){
 	// Find the global minimum from the first entry:
 
 	//	THIS SHOULD BE THE ONLY USE OF GetEntry it's slow and doesn't emply something 'intelligent'
-//	nlldatabest = allresults->CopyTree("","",0)->GetMinimum("NLL");
-//	param1databest = allresults->CopyTree("","",0)->GetMinimum(param1valstr);
-//	param2databest = allresults->CopyTree("","",0)->GetMinimum(param2valstr);
+	//	nlldatabest = allresults->CopyTree("","",0)->GetMinimum("NLL");
+	//	param1databest = allresults->CopyTree("","",0)->GetMinimum(param1valstr);
+	//	param2databest = allresults->CopyTree("","",0)->GetMinimum(param2valstr);
 	first_entry->GetEntry(0);
 	nlldatabest = nll;
 	Float_t best_fit_values[all_parameter_values.size()];
@@ -415,8 +464,8 @@ int main(int argc, char *argv[]){
 	TTree* local_best = allresults->CopyTree( Best_Catch );
 	x_point = (Float_t)local_best->GetMinimum(param1valstr);
 	y_point = (Float_t)local_best->GetMinimum(param2valstr);
-//	x_point = global_x;
-//	y_point = global_y;
+	//	x_point = global_x;
+	//	y_point = global_y;
 	cout << "GLOBAL DATA MINIMUM NLL:\t" << setprecision(10)<< nlldatabest << "\tAT:\tX:" << x_point << "\tY:\t" << y_point << endl;
 
 	// Find the positions of the gridpoints we scanned, and find the profileLL at each point for data:
@@ -457,6 +506,7 @@ int main(int argc, char *argv[]){
 
 	double true_Z = allresults->CopyTree(datafixedstr)->GetMinimum("NLL");
 	//	Move values into vectors
+	
 	if( (true_Z-nlldatabest) < 0 )
 	{
 		//	I know this is comparing doubles exactly, however this is also doing maths in Loki... you be the judge
@@ -468,11 +518,11 @@ int main(int argc, char *argv[]){
 		double true_Y = local_best->GetMinimum(param2valstr);
 		cout << "\n\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
 		cout << "\t\tTRUE MINIMUM NLL = " << true_Z << "\t\tAt:\t\tX:" << true_X << "\tY:\t" << true_Y <<endl<<endl;
-//		cout << "\tNEW MINIMA FOUND AT :\tX:\t" << X_true_min << "\tY:\t" << Y_true_min << endl<<endl;
+		//		cout << "\tNEW MINIMA FOUND AT :\tX:\t" << X_true_min << "\tY:\t" << Y_true_min << endl<<endl;
 		cout << "\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
 		nlldatabest=(Float_t)true_Z;
 	}
-
+	
 	TString Condition(datafixedstr); Condition.Append("&&NLL==");	Condition+=nlldatabest;
 	TTree* new_best = allresults->CopyTree( Condition );
 	if( ( ( allresults->GetEntries() /2 ) - new_best->GetEntries()) == 0 )
@@ -498,7 +548,7 @@ int main(int argc, char *argv[]){
 
 
 	//------------------------------------------------------------------------------------------------------
-	
+
 	int numberOfFloatedPhysicsParams=0;
 	vector<TString> Floated_Parameters;
 	vector<vector<double> > Floated_values;
@@ -587,7 +637,7 @@ int main(int argc, char *argv[]){
 				all_CV_values.push_back( temp_vector );
 			}
 		}
-//		Floated_values.resize( numberOfFloatedPhysicsParams );
+		//		Floated_values.resize( numberOfFloatedPhysicsParams );
 		cout << "Number of Additional Floated Physics Parameters: " << numberOfFloatedPhysicsParams <<endl;
 	}
 
@@ -813,14 +863,14 @@ int main(int argc, char *argv[]){
 	}
 	pllcont->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_cont.pdf");
 	pllcont->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_cont.png");
-	TCanvas *pllconf = makeConfCanvas(pllhist,"Profile Likelihood",3,pllconts,confs,false);
+	TCanvas *pllconf = makeConfCanvas(pllhist,"Profile Likelihood",3,pllconts,confs,false, x_point, y_point);
 	if( plot_point )  {
 		global_minima->Draw("SAME");
 		pllconf->Update();
 	}
 	pllconf->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_conf.pdf");
 	pllconf->Print(outputdir+"/"+param1string+"_"+param2string+"_pll_conf.png");
-	TCanvas *pllpub = makeConfCanvas(pllhist,"Profile Likelihood",3,pllconts,confs,true);
+	TCanvas *pllpub = makeConfCanvas(pllhist,"Profile Likelihood",3,pllconts,confs,true, x_point, y_point);
 	if( plot_point )  {
 		global_minima->Draw("SAME");
 		pllcont->Update();
@@ -852,10 +902,10 @@ int main(int argc, char *argv[]){
 		TCanvas *fccont = makeContCanvas(fchist,"Feldman Cousins");
 		fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.pdf");
 		fccont->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_cont.png");
-		TCanvas *fcconf = makeConfCanvas(fchist,"Feldman Cousins",3,fcconts,confs,false);
+		TCanvas *fcconf = makeConfCanvas(fchist,"Feldman Cousins",3,fcconts,confs,false, x_point, y_point);
 		fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.pdf");
 		fcconf->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_conf.png");
-		TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",3,fcconts,confs,true);
+		TCanvas *fcpub = makeConfCanvas(fchist,"Feldman Cousins",3,fcconts,confs,true, x_point, y_point);
 		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.pdf");
 		fcpub->Print(outputdir+"/"+param1string+"_"+param2string+"_fc_pub.png");
 		TCanvas *both = makeBothCanvas(fchist,pllhist,"FC and PLL",3,fcconts,pllconts,confs);

@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/08/24 Greig Cowan
+    - Updated contour making plot to use our default style.
+    - Added ability to scale contours for the inclusion of systematic errors. 
+      It's all a bit hard-coded at the moment, but will do for now. 
+
 2011/08/19 Greig Cowan
     - Added new acceptance histogram for signal with offset of 0.127.
     - Modified ExternalConstraint to allow for a correlation between parameters (Pete)
