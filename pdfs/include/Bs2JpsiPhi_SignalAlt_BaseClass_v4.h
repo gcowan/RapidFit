@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhi_SignalAlt_BaseClass_dev.h,v 1.1 2009/12/06  Pete Clarke Exp $
-/** @class Bs2JpsiPhi_SignalAlt_BaseClass_dev.h
+// $Id: Bs2JpsiPhi_SignalAlt_BaseClass_v4.h,v 1.1 2009/12/06  Pete Clarke Exp $
+/** @class Bs2JpsiPhi_SignalAlt_BaseClass_v4.h
  *
  *  Base Class for Bs2JpsiPhi_SignalAlt....  PDFs
  *
@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef Bs2JpsiPhi_SignalAlt_BaseClass_dev_H
-#define Bs2JpsiPhi_SignalAlt_BaseClass_dev_H
+#ifndef Bs2JpsiPhi_SignalAlt_BaseClass_v4_H
+#define Bs2JpsiPhi_SignalAlt_BaseClass_v4_H
 
 #ifndef __CINT__
 #include "BasePDF.h"
@@ -34,6 +34,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <float.h>
+#include <vector>
 
 //PELC
 #include "TH1.h"
@@ -48,17 +49,18 @@
 
 
 
-class Bs2JpsiPhi_SignalAlt_BaseClass_dev
+class Bs2JpsiPhi_SignalAlt_BaseClass_v4  :  public BasePDF 
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfigurator);
-		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass_dev();
+		Bs2JpsiPhi_SignalAlt_BaseClass_v4(PDFConfigurator);
+		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass_v4();
+		virtual bool SetPhysicsParameters(ParameterSet*);
 
 	protected:
 
 	        //      Uncopyable!
-		Bs2JpsiPhi_SignalAlt_BaseClass_dev ( const Bs2JpsiPhi_SignalAlt_BaseClass_dev& );
-		Bs2JpsiPhi_SignalAlt_BaseClass_dev& operator = ( const Bs2JpsiPhi_SignalAlt_BaseClass_dev& );
+		Bs2JpsiPhi_SignalAlt_BaseClass_v4 ( const Bs2JpsiPhi_SignalAlt_BaseClass_v4& );
+		Bs2JpsiPhi_SignalAlt_BaseClass_v4& operator = ( const Bs2JpsiPhi_SignalAlt_BaseClass_v4& );
 
 		//PELC For debugging purposes
 		//TH1D * histOfPdfValues ;
@@ -127,7 +129,6 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		double phi_tr ;
 		double ctheta_1 ;
 		int tag ;
-		//X int timeAcceptanceCategory ;
 	
 		// Physics Fit Parameters 
 		double _gamma ;
@@ -137,6 +138,18 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		double Apara_sq ;
 		double Azero_sq ;
 		double As_sq ;
+	
+		double CachedA1 ;
+		double CachedA2 ;
+		double CachedA3 ;	
+		double CachedA4 ;
+		double CachedA5 ;
+		double CachedA6 ;
+		double CachedA7 ;
+		double CachedA8 ;
+		double CachedA9 ;
+		double CachedA10 ;
+		void CacheAmplitudesAndAngles() ;
 
 		double delta_para ;
 		double delta_perp ;
@@ -193,6 +206,17 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		void preCalculateTimeFactors() const ;
 		void preCalculateTimeIntegrals() const ;
 	
+	
+		bool timeIntegralCacheValid ;
+		vector< vector<double> > storeExpL;
+		vector< vector<double> > storeExpH;
+		vector< vector<double> > storeExpSin;
+		vector< vector<double> > storeExpCos;
+		void CacheTimeIntegrals() ;
+		void deCacheTimeIntegrals( int ires, int islice ) ;
+	
+	
+	
 		//Time acceptance 
 		SlicedAcceptance * timeAcc ;
 	
@@ -225,6 +249,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 			else return sqrt(As_sq) ; 
 		}
 
+	
 		inline double ctrsq() const { return (ctheta_tr*ctheta_tr) ; }
 		inline double strsq() const { return (1.0 - ctrsq()) ; }
 		inline double theta_tr() const { return acos(ctheta_tr) ; }	
@@ -249,7 +274,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		inline double gamma_l() const { 
 			const double gl = gamma() + ( dgam *0.5 ) ;
 			if( gl < 0. ) {
-				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_dev : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
+				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_v4 : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
 				return 0.0000001 ;
 			}
 			else
@@ -259,7 +284,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		inline double gamma_h() const { 
 			const double gh = gamma() - ( dgam *0.5 ) ;
 			if( gh < 0. ) {
-				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_dev : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
+				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_v4 : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
 				return 0.0000001 ;
 			}
 			else
@@ -283,15 +308,15 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 				if( returnValue > 0.5) returnValue = 0.5 ; 
 			}			
 			else if( _mistag < 0.0 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev::mistag() : _mistag < 0 so set to 0 " << endl ;
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistag() : _mistag < 0 so set to 0 " << endl ;
 				returnValue = 0 ;
 			}
 			else if( _mistag > 0.5 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev::mistag() : _mistag > 0.5 so set to 0.5 "  << endl ;
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistag() : _mistag > 0.5 so set to 0.5 "  << endl ;
 				returnValue = 0.5 ;
 			}
 			else {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev::mistag() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistag() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
 				exit(1);
 			}
 			return returnValue ;			
@@ -324,7 +349,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		double diffXsec(  )  const ;   	
 		double diffXsecTimeOnly(  ) const ;
 		double diffXsecNorm1(  ) const ;
-		double diffXsecCompositeNorm1(  )  ;
+		double diffXsecCompositeNorm1( int resolutionIndex )  ;
 
 		bool normalisationCacheValid ;
 		double normalisationCacheValue[3] ;
@@ -348,7 +373,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_dev
 		  
 			//DEBUG
 			if( DEBUGFLAG && (result < 0) ) {
-				cout << " Bs2JpsiPhi_SignalAlt_BaseClass_dev::timeFactorEven() : result < 0 " << endl ;
+				cout << " Bs2JpsiPhi_SignalAlt_BaseClass_v4::timeFactorEven() : result < 0 " << endl ;
 				cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
 				cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
 				cout << " ->term3 " << q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) << endl ;

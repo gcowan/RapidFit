@@ -18,7 +18,7 @@
 #include "framework/include/BasePDF.h"
 #endif
 
-#include "Bs2JpsiPhi_SignalAlt_BaseClass_dev.h"
+#include "Bs2JpsiPhi_SignalAlt_BaseClass_v3.h"
 #include "RooComplex.h"
 #include "TFile.h"
 #include "TH3D.h"
@@ -27,7 +27,7 @@
 #include <iostream>
 
 
-class Bs2JpsiPhi_SignalAlt_MP_dev_v3 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass_dev
+class Bs2JpsiPhi_SignalAlt_MP_dev_v3 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass_v3
 {
 	public:
 		Bs2JpsiPhi_SignalAlt_MP_dev_v3( PDFConfigurator);

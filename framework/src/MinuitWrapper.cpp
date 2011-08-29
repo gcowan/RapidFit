@@ -213,6 +213,11 @@ void MinuitWrapper::Minimise()
 	//	Now Do the minimisation
 	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
 
+	//Apply an improve step
+	//arguments[0] = maxSteps;
+	//minuit->mnexcm("IMPROVE", arguments, 2, errorFlag);
+	
+	
 	string NoHesse("NoHesse");
 	if( StringProcessing::VectorContains( &Options, &NoHesse ) == -1 )
 	{

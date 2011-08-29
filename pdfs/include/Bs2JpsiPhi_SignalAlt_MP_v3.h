@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhi_SignalAlt_MP_dev.h,v 1.1 2009/12/06  Pete Clarke Exp $
-/** @class Bs2JpsiPhi_SignalAlt_MP_dev.h
+// $Id: Bs2JpsiPhi_SignalAlt_MP_v3.h,v 1.1 2009/12/06  Pete Clarke Exp $
+/** @class Bs2JpsiPhi_SignalAlt_MP_v3.h
  *
  *  PDF for Bs2JpsiPhi Signal - development version
  *
@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef Bs2JpsiPhi_SignalAlt_MP_dev_H
-#define Bs2JpsiPhi_SignalAlt_MP_dev_H
+#ifndef Bs2JpsiPhi_SignalAlt_MP_v3_H
+#define Bs2JpsiPhi_SignalAlt_MP_v3_H
 
 #ifndef __CINT__
 #include "BasePDF.h"
@@ -18,18 +18,18 @@
 #include "framework/include/BasePDF.h"
 #endif
 
-#include "Bs2JpsiPhi_SignalAlt_BaseClass_dev.h"
+#include "Bs2JpsiPhi_SignalAlt_BaseClass_v3.h"
 #include "RooComplex.h"
 
 #include <exception>
 #include <iostream>
 
 
-class Bs2JpsiPhi_SignalAlt_MP_dev : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass_dev
+class Bs2JpsiPhi_SignalAlt_MP_v3 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass_v3
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_MP_dev( PDFConfigurator);
-		~Bs2JpsiPhi_SignalAlt_MP_dev();
+		Bs2JpsiPhi_SignalAlt_MP_v3( PDFConfigurator);
+		~Bs2JpsiPhi_SignalAlt_MP_v3();
 
 		//Mandatory method to evaluate the PDF value:
 		virtual double EvaluateForNumericIntegral(DataPoint*) ;

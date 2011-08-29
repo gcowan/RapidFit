@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhi_SignalAlt_BaseClass_dev.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
-/** @class Bs2JpsiPhi_SignalAlt_BaseClass_dev Bs2JpsiPhi_SignalAlt_BaseClass_dev.cpp
+// $Id: Bs2JpsiPhi_SignalAlt_BaseClass_v3.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
+/** @class Bs2JpsiPhi_SignalAlt_BaseClass_v3 Bs2JpsiPhi_SignalAlt_BaseClass_v3.cpp
  *
  *  Base class for Bs2JpsiPhi_SignalAlt..... PDFs
  *
@@ -11,7 +11,7 @@
 #include "TMath.h"
 #include "RooMath.h"
 //	RapidFit Headers
-#include "Bs2JpsiPhi_SignalAlt_BaseClass_dev.h"
+#include "Bs2JpsiPhi_SignalAlt_BaseClass_v3.h"
 #include "SlicedAcceptance.h"
 //	System Headers
 #include <iostream>
@@ -22,7 +22,7 @@
 
 //.....................................
 // New Constructor which takes configuration object
-Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfigurator configurator ) : 
+Bs2JpsiPhi_SignalAlt_BaseClass_v3::Bs2JpsiPhi_SignalAlt_BaseClass_v3(PDFConfigurator configurator ) : 
 // Physics parameters
 	  gammaName     		( configurator.getName("gamma") )
 	, deltaGammaName		( configurator.getName("deltaGamma") )
@@ -93,20 +93,20 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfig
 	if( useTimeAcceptance() ) {
 		if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0157 ) ;
-			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: Upper time acceptance beta=0.0157 [0 < t < 14] " << endl ;
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v3:: Constructing timeAcc: Upper time acceptance beta=0.0157 [0 < t < 14] " << endl ;
 		}
 		else if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Lower2010" ) ) {
 			timeAcc = new SlicedAcceptance( "Lower2010" ) ;
-			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: Lower time acceptance 2010  [0 < t < 14] " << endl ;
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v3:: Constructing timeAcc: Lower time acceptance 2010  [0 < t < 14] " << endl ;
 		}
 		else if( configurator.getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
 			timeAcc = new SlicedAcceptance( "File" , configurator.getConfigurationValue( "TimeAcceptanceFile" ) ) ;
-			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: using file: " << configurator.getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v3:: Constructing timeAcc: using file: " << configurator.getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
 		}
 	}
 	else {
 			timeAcc = new SlicedAcceptance( 0., 14. ) ;
-			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_dev:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v3:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
 	}
 	
 	
@@ -119,6 +119,7 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfig
 	// Configure fit parameter options 
 	_useCosAndSin = configurator.isTrue( "UseCosAndSin" ) ;
 	allowNegativeAsSq = configurator.isTrue( "AllowNegativeAsSq" ) ;
+	
 
 	
 	//PELC  - debug to plot the distribution of PDF values for each event 
@@ -131,7 +132,7 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::Bs2JpsiPhi_SignalAlt_BaseClass_dev(PDFConfig
 
 //........................................................
 //Destructor
-Bs2JpsiPhi_SignalAlt_BaseClass_dev::~Bs2JpsiPhi_SignalAlt_BaseClass_dev() {}
+Bs2JpsiPhi_SignalAlt_BaseClass_v3::~Bs2JpsiPhi_SignalAlt_BaseClass_v3() {}
 
 
 //--------------------------------------------------------------------------
@@ -139,7 +140,7 @@ Bs2JpsiPhi_SignalAlt_BaseClass_dev::~Bs2JpsiPhi_SignalAlt_BaseClass_dev() {}
 
 //.......................................................
 // Pre calculate the time integrals : this is becaue these functions are called many times for each event due to the 10 angular terms
-void Bs2JpsiPhi_SignalAlt_BaseClass_dev::preCalculateTimeFactors( ) const
+void Bs2JpsiPhi_SignalAlt_BaseClass_v3::preCalculateTimeFactors( ) const
 {
 	expL_stored = Mathematics::Exp( t, gamma_l(), resolution ) ;
 	expH_stored = Mathematics::Exp( t, gamma_h(), resolution ) ;
@@ -151,7 +152,7 @@ void Bs2JpsiPhi_SignalAlt_BaseClass_dev::preCalculateTimeFactors( ) const
 
 //.......................................................
 // Pre calculate the time integrals : this is becaue these functions are called many times for each event due to the 10 angular terms
-void Bs2JpsiPhi_SignalAlt_BaseClass_dev::preCalculateTimeIntegrals( ) const
+void Bs2JpsiPhi_SignalAlt_BaseClass_v3::preCalculateTimeIntegrals( ) const
 {
 	intExpL_stored = Mathematics::ExpInt( tlo, thi, gamma_l(), resolution )  ;
 	intExpH_stored = Mathematics::ExpInt( tlo, thi, gamma_h(), resolution )  ;
@@ -168,7 +169,7 @@ void Bs2JpsiPhi_SignalAlt_BaseClass_dev::preCalculateTimeIntegrals( ) const
 //...................................
 // Main Diff cross section
 
-double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsec(  )  const
+double Bs2JpsiPhi_SignalAlt_BaseClass_v3::diffXsec(  )  const
 {   
 	preCalculateTimeFactors() ;
 	
@@ -192,7 +193,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsec(  )  const
 	// object cannot exist.  Only option is to ignore it until it is created - but this should happen within one iteration
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue(t);
 				
-	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_SignalAlt_BaseClass_dev_v1::diffXsec( ) : return value < 0 = ", xsec ) ;
+	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_SignalAlt_BaseClass_v3_v1::diffXsec( ) : return value < 0 = ", xsec ) ;
 	
 	//PELC - This turned out to be an important debugging tool 
 	//switch it on to see the values of PDF being returend.  If ANY go negative, it means there is a sign wrong in one or more of the terms
@@ -213,7 +214,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsec(  )  const
 //...................................
 // Integral over angles only for a fixed time.
 
-double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsecTimeOnly(  ) const
+double Bs2JpsiPhi_SignalAlt_BaseClass_v3::diffXsecTimeOnly(  ) const
 {          
 	preCalculateTimeFactors() ;
 	
@@ -238,7 +239,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsecTimeOnly(  ) const
 	// object cannot exist.  Only option is to ignore it until it is created - but this should happen within one iteration
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue(t);
 	
-	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_SignalAlt_BaseClass_dev_v1::diffXsecTimeOnly( ) : return value < 0 = ", xsec ) ;
+	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_SignalAlt_BaseClass_v3_v1::diffXsecTimeOnly( ) : return value < 0 = ", xsec ) ;
 	
 	return xsec ;
 }
@@ -249,7 +250,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsecTimeOnly(  ) const
 //...................................
 // Integral over all variables: t + angles
 
-double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsecNorm1(  ) const
+double Bs2JpsiPhi_SignalAlt_BaseClass_v3::diffXsecNorm1(  ) const
 { 
 	preCalculateTimeIntegrals() ;
 	
@@ -269,7 +270,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsecNorm1(  ) const
 	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
 	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
 	
-	if( DEBUGFLAG && (norm < 0) ) this->DebugPrintNorm( " Bs2JpsiPhi_SignalAlt_BaseClass_dev_v1::diffXsecNorm1( ) : return value < 0 = ", norm ) ;
+	if( DEBUGFLAG && (norm < 0) ) this->DebugPrintNorm( " Bs2JpsiPhi_SignalAlt_BaseClass_v3_v1::diffXsecNorm1( ) : return value < 0 = ", norm ) ;
 	 
 	return norm ;
 }
@@ -280,7 +281,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsecNorm1(  ) const
 // New method to calculate normalisation using a histogrammed "low-end" time acceptance function
 // The acceptance function information is all contained in the timeAcceptance member object,
 
-double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsecCompositeNorm1(  )  
+double Bs2JpsiPhi_SignalAlt_BaseClass_v3::diffXsecCompositeNorm1(  )  
 {   
 	double tlo_boundary = tlo ;
 	double thi_boundary = thi ;
@@ -307,9 +308,9 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_dev::diffXsecCompositeNorm1(  )
 
 //...............................................................................
 // Debug printout
-void Bs2JpsiPhi_SignalAlt_BaseClass_dev::DebugPrintXsec( string message, double value )  const
+void Bs2JpsiPhi_SignalAlt_BaseClass_v3::DebugPrintXsec( string message, double value )  const
 {   
-    cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_BaseClass_dev::DebugPrintXsec ***************************" << endl ;
+    cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_BaseClass_v3::DebugPrintXsec ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 	cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
 	cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
@@ -352,9 +353,9 @@ void Bs2JpsiPhi_SignalAlt_BaseClass_dev::DebugPrintXsec( string message, double 
 	
 
 
-void Bs2JpsiPhi_SignalAlt_BaseClass_dev::DebugPrintNorm( string message, double value )  const
+void Bs2JpsiPhi_SignalAlt_BaseClass_v3::DebugPrintNorm( string message, double value )  const
 {   
-    cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_BaseClass_dev::DebugPrintNorm ***************************" << endl ;
+    cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_BaseClass_v3::DebugPrintNorm ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 
 	cout << endl ;

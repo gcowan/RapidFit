@@ -255,7 +255,7 @@ FitResult * FitAssembler::DoSingleSafeFit(MinimiserConfiguration * MinimiserConf
 
 FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
 {
-	cout << endl << "******* Result of Petes Double fit strategy*********" << endl ;
+	cout << endl << "******* Result of Petes Double fit strategy  (NOT flipping delta_s as well) *********" << endl ;
 	cout << "Starting Fit1:" << endl;
 	// Normal fit
 	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
@@ -267,8 +267,10 @@ FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserCon
 	// Conjugate fit
 	double deltaPara = BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->GetBlindedValue() ;
 	double deltaPerp = BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->GetBlindedValue() ;
+	//double deltaS = BottleParameters.back()->GetPhysicsParameter( string("delta_s") )->GetBlindedValue() ;   
 	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
 	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ) ;
+	//BottleParameters.back()->GetPhysicsParameter( string("delta_s") )->SetBlindedValue( -deltaS ) ;          
 	cout << endl << "Starting Fit2:" << endl;
 	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
 	double LLmin1 = res1->GetMinimumValue() ;

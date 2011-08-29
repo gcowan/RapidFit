@@ -16,12 +16,13 @@
 
 #include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_v2.h"
-#include "Bs2JpsiPhi_SignalAlt_MP_dev.h"
+#include "Bs2JpsiPhi_SignalAlt_MP_v3.h"
 #include "Bs2JpsiPhi_SignalAlt_MP_dev_v3.h"
 
 #include "Bs2JpsiPhi_SignalAlt_MO_v1.h"
 #include "Bs2JpsiPhi_SignalAlt_MO_v2.h"
-#include "Bs2JpsiPhi_SignalAlt_MO_dev.h"
+#include "Bs2JpsiPhi_SignalAlt_MO_v3.h"
+#include "Bs2JpsiPhi_SignalAlt_MO_v4.h"
 
 #include "Bs2Jpsifzero_SignalAlt_MP_dev.h"
 #include "Bs2Jpsifzero_SignalAlt_MO_dev.h"
@@ -112,11 +113,10 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        //JPsiPhi from Pete with sWave
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_v2(configurator);
         }
-
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev" )
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v3" )
         {
 	        //JPsiPhi from Pete with sWave
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_dev(configurator);
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_v3(configurator);
         }
 		else if ( Name == "Bs2Jpsifzero_SignalAlt_MP_dev" )
         {
@@ -134,15 +134,20 @@ IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, v
 	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v2(configurator);
         }
 
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v3" )
+        {
+	        //JPsiPhi from Pete with sWave
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v3(configurator);
+        }
+		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v4" )
+        {
+	        //JPsiPhi from Pete with sWave
+	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v4(configurator);
+        }
 		else if ( Name == "Bs2Jpsifzero_SignalAlt_MO_dev" )
         {
 	        //JPsifzero
 	        returnable_PDF = new Bs2Jpsifzero_SignalAlt_MO_dev(configurator);
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_dev" )
-        {
-	        //JPsiPhi from Pete with sWave
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_dev(configurator);
         }
         else if ( Name == "Bs2PhiPhi" )
         {

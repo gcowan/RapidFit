@@ -1,5 +1,5 @@
-// $Id: Bs2JpsiPhi_SignalAlt_MO_dev.h,v 1.1 2009/12/06  Pete Clarke Exp $
-/** @class Bs2JpsiPhi_SignalAlt_MO_dev 
+// $Id: Bs2JpsiPhi_SignalAlt_MO_v4.h,v 1.1 2009/12/06  Pete Clarke Exp $
+/** @class Bs2JpsiPhi_SignalAlt_MO_v4 
  *
  *  Bs2JpsiPhi_SignalAlt series with mistag as observable
  *
@@ -7,8 +7,8 @@
  *  @date 2011-02-13
  */
 
-#ifndef Bs2JpsiPhi_SignalAlt_MO_dev_H
-#define Bs2JpsiPhi_SignalAlt_MO_dev_H
+#ifndef Bs2JpsiPhi_SignalAlt_MO_v4_H
+#define Bs2JpsiPhi_SignalAlt_MO_v4_H
 
 #ifndef __CINT__
 #include "BasePDF.h"
@@ -17,16 +17,16 @@
 #include "framework/include/BasePDF.h"
 #endif
 
-#include "Bs2JpsiPhi_SignalAlt_BaseClass_dev.h"
+#include "Bs2JpsiPhi_SignalAlt_BaseClass_v4.h"
 #include "RooComplex.h"
 
 #include <exception>
 
-class Bs2JpsiPhi_SignalAlt_MO_dev : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass_dev
+class Bs2JpsiPhi_SignalAlt_MO_v4 : /*public BasePDF,*/  public Bs2JpsiPhi_SignalAlt_BaseClass_v4
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_MO_dev(PDFConfigurator);
-		~Bs2JpsiPhi_SignalAlt_MO_dev();
+		Bs2JpsiPhi_SignalAlt_MO_v4(PDFConfigurator);
+		~Bs2JpsiPhi_SignalAlt_MO_v4();
 
 		//Mandatory method to evaluate the PDF value:
 		virtual double EvaluateForNumericIntegral(DataPoint*) ;
@@ -44,6 +44,10 @@ class Bs2JpsiPhi_SignalAlt_MO_dev : public BasePDF,  public Bs2JpsiPhi_SignalAlt
 	private:
 
 		void MakePrototypes();
+	
+		double normalisationCacheUntagged ;
+	
+
 		
 };
 

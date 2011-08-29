@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/08/29 Pete Clarke
+    - Lepton Photon consolodation update
+    - fixed all the ...._dev  PDFS used for LP   to be called ....._v3
+    - added new ...._v4 which is the current development version
+    - Added a directory in unittest/Data2011-ProductionXML-LeptonPhoton/   
+      This contains al the production xmls used for the LP results and the subsequent adding of f0 and 2010 data
+
 2011/08/24 Greig Cowan
     - Updated contour making plot to use our default style.
     - Added ability to scale contours for the inclusion of systematic errors. 
