@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/09/01 Rob Currie
+    - Updated Background PDF to read the bins from a histogram in the correct order
+
 2011/08/29 Pete Clarke
     - Lepton Photon consolodation update
     - fixed all the ...._dev  PDFS used for LP   to be called ....._v3

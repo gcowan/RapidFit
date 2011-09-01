@@ -351,7 +351,7 @@ double LongLivedBkg_3Dangular::angularFactor( )
 	else {
 
 		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-		int globalbin = histo->FindBin(cosTheta, cosPsi, phi);
+		int globalbin = histo->FindBin(cosPsi, cosTheta, phi);
 		double num_entries_bin = histo->GetBinContent(globalbin);
 
 		//Angular factor normalized with phase space of histogram and total number of entries in the histogram
