@@ -1,5 +1,10 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/10/17 Rob Currie
+    - Converging on a final set of Results for J/phi Phi paper and so are commiting a 'final' xml configuration for UBandB fit
+    - Updated some of the more modern scans to use the RAPIDFITROOT variable to pick up the RapidFit library (this will be built by default quite soon)
+         Added a script for performing Toy Studies over a batch system using the new method of submitting jobs
+
 2011/09/01 Rob Currie
     - Updated Background PDF to read the bins from a histogram in the correct order
 

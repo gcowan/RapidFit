@@ -31,9 +31,6 @@ MC_STEP_OFFSET = 0				#	Where to start in the file
 #output_file_list = [ 'FitTrace.root', 'Global_Fit_Result.root', 'LLcontourScanData.root' ]
 output_file_list = [ 'Global_Fit_Result.root', 'LLcontourScanData.root' ]
 
-RapidFit_Path = "/home/gcowan/lhcb/RapidFit/trunk/"
-RapidFit_Library=RapidFit_Path+"lib/libRapidRun.so"
-
 ROOT_VERSION='5.28.00b'
 
 X_par="Phi_s"
@@ -51,18 +48,17 @@ sqrt_jobs_per_core=2
 LFN_LIST=[]
 FILE_LIST=[]
 
-
+xml = str()
 
 #	written up here for clarity, process all possible LFNs and PFNs that have to be processed
 if is_ganga:
-	i=0
 	for arg in sys.argv:
-		if i > 1:
-			if string.find( arg, "LFN:" ) != -1 :
-				LFN_LIST.append( str( arg ) )
-			else:
-				FILE_LIST.append( str( arg ) )
-		i=i+1
+		if string.find( arg, "LFN:" ) != -1 :
+			LFN_LIST.append( str( arg ) )
+		else string.find( arg, ".xml" ) != -1 :
+			xml = str( arg )
+		else:
+			FILE_LIST.append( str( arg ) )
 	print "LFNs:"
 	print LFN_LIST
 	print "FILEs:"
@@ -135,10 +131,25 @@ def LL_2DSplitter(XML='XML.xml',par1='x',par1min=0.,par1max=0.,par1res=1,par2='y
 #	This is the section of code which will be executed within ganga
 if is_ganga:
 
+        RapidFit_Path = os.environ.get("RAPIDFITROOT")
+        if not RapidFit_Path:
+                print ""
+                print "\t\tCouldn't find $RAPIDFITROOT, Please check this!!"
+                print ""
+                sys.exit(-3)
+
+        RapidFit_Library=RapidFit_Path+"/lib/libRapidRun.so"
+
+        if not os.path.isfile( RapidFit_Library ):
+                print "Please (re) compile RapidFit for submitting to a batch system"
+                print "              run:    'make lib'           not just:   'make'"
+                print ""
+                print "This could also mean you haven't defined '$RAPIDFITROOT, please check!!"
+                print ""
+                sys.exit(-42)
+
 	#	By definition of how this should be run!
 	script_name = str( sys.argv[0] )
-	xml = str( sys.argv[1] )
-
 	#	i.e.	> ganga script.py some.xml
 
         #       Input Parameters
@@ -160,8 +171,6 @@ if is_ganga:
 	j.application.script = File( name=script_name )
 	#	Tell the script where the RapidFit library is
 	j.inputsandbox = [ script_name, xml, RapidFit_Library ]
-	#	Outputs Wanted
-	j.outputdata = output_file_list
 
 
 	#	Backend to submit jobs to
@@ -169,9 +178,14 @@ if is_ganga:
 
 	host_name = os.popen('hostname').readline()
 
-	if ( host_name == "frontend01"  ) or ( host_name == "frontend02" ):
+	if ( string.find( host_name, "frontend" ) != -1 ):
 		print "Running on ECDF, submitting to SGE"
 		j.backend = SGE()
+		j.outputsandbox = output_file_list
+		sandbox_data = [ script_name, xml, RapidFit_Library ]
+		for k in FILE_LIST:
+			sandbox_data.append( k )
+		j.inputsandbox = sandbox_data
 
 	elif ( string.find( host_name, "lxplus" ) != -1 ):
 		choice = int( raw_input("Running on LXPLUS, submit to 1) GRID 2) lxplus Batch or 3) Interactive?\t") )
@@ -182,11 +196,12 @@ if is_ganga:
 			j.inputdata = LFN_LIST			#	Point the job to the data
 			j.backend.inputSandboxLFNs = LFN_LIST	#	Tell Dirac we need a local copy in order to process it
 			sandbox_data = [ script_name, xml, RapidFit_Library ]
-			print sandbox_data
+			#print sandbox_data
 			for k in FILE_LIST:
 				sandbox_data.append( k )
-			print sandbox_data
+			#print sandbox_data
 			j.inputsandbox = sandbox_data
+			j.outputdata = output_file_list
 		if choice == 2:
 			j.backend = LSF()
 			j.backend.queue = '8nh'		#	1nh, 8nh, 1nd, 2nd, 1nw, 2nw
@@ -247,6 +262,8 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 	#	Just to record the input for any debugging
 	for i in sys.argv:
 		print i
+
+	sys.path.append("/exports/work/ppe/sw/fitting-latest/root-5.29/lib")
 
 	#	We want ROOT
 	import ROOT

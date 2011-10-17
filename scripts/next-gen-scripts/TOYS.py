@@ -21,71 +21,48 @@ is_ganga = "Ganga.Core" in sys.modules
 
 #	Configurables
 
-job_name = "TOY-1D"
+job_name = "TOYZ"
 
-#	Semi-Frequently changed script veriables:
-MC_TOTAL_STEPS = 2					#	Total unique subsets in file
-MC_FILE_STEP = 10000				#	Size of Step to take in file
-MC_FIT_STEP = 5000				#	Step size between subset selection
+TOYS_PER_SUBJOB=10
+NUM_OF_SUBJOBS=100
 
 #	All the possible output files right now
 #
 #			THIS HAS TO BE CHANGED BASED ON THE OUTPUT FROM YOUR SCAN
 
-output_file_list = [ 'MC_Study.root' ]
+output_file_list = [ 'pullPlots.root' ]
 
-param_name="deltaGamma"
-X_min=-2.
-X_max=0.
-STEPS=10
-STEPS_PER_CORE=2
 
-ROOT_VERSION='5.26.00b'
+ROOT_VERSION='5.28.00b'
 
 LFN_LIST=[]
 FILE_LIST=[]
 
-xml = str()
+
 
 #	written up here for clarity, process all possible LFNs and PFNs that have to be processed
 if is_ganga:
+	i=0
 	for arg in sys.argv:
-		if string.find( arg, "LFN:" ) != -1 :
-			LFN_LIST.append( str( arg ) )
-		elif string.find( arg, ".xml" ) != -1 :
-			xml = str( arg )
-		else:
-			FILE_LIST.append( str( argv ) )
+		if i > 1:
+			if string.find( arg, "LFN:" ) != -1 :
+				LFN_LIST.append( str( arg ) )
+			else:
+				FILE_LIST.append( str( argv ) )
+		i=i+1
 	print "LFNs:"
 	print LFN_LIST
 	print "FILEs:"
 	print FILE_LIST
 
-#       Splitter for 1DLL studies
-def _1DLL_Splitter( XML='XML.xml', STEPS=10, STEPS_PER_CORE=2 ):
+#	Splitter for toy studies
+def TOYStudy_Splitter( XML='XML.xml', All_Jobs=NUM_OF_SUBJOBS ):
 	args = []
-	if int(STEPS) < 2:
-		STEPS = 2
-	step_size = (X_max - X_min)/(STEPS-1)
 
-	param_min=0.
-	param_val=0.
-	i = 0
-	for i in range( 0, int(STEPS/STEPS_PER_CORE) , 1 ):
+	for i in range( 0, All_Jobs, 1 ):
 		temp = []
 		temp.append( str( XML ) )
-		param_min = X_min + step_size * i * STEPS_PER_CORE
-		param_val = X_min + step_size * ((i+1) * STEPS_PER_CORE-1)
-		param_str = str(param_name) + "," + str( param_min ) + "," + str( param_val ) + "," + str( STEPS_PER_CORE )
-		temp.append( param_str )
-		args.append( temp )
-	if int(STEPS/STEPS_PER_CORE)*STEPS_PER_CORE != STEPS:
-		param_val = X_min + step_size * ((i+1) * STEPS_PER_CORE)
-		param_str = str(param_name) + "," + str( param_val ) +","+ str( X_max ) + "," + str( STEPS - int(STEPS/STEPS_PER_CORE)*STEPS_PER_CORE )
-		temp = []
-		temp.append( str( XML ) )
-		temp.append( param_str )
-		args.append( temp )
+                args.append( temp )
 	print args
 	return args
 
@@ -97,7 +74,7 @@ if is_ganga:
 	RapidFit_Path = os.environ.get("RAPIDFITROOT")
 	if not RapidFit_Path:
 		print ""
-		print "\t\tCouldn't find $RAPIDFITROOT, Please check this!!"
+		print "Couldn't find $RAPIDFITROOT, Please check this!!"
 		print ""
 		sys.exit(-3)
 
@@ -113,6 +90,7 @@ if is_ganga:
 
 	#	By definition of how this should be run!
 	script_name = str( sys.argv[0] )
+	xml = str( sys.argv[1] )
 
 	#	i.e.	> ganga script.py some.xml
 
@@ -186,6 +164,20 @@ if is_ganga:
 		if choice == 2 :
 			j.backend = Interactive()
 			j.inputdata = FILE_LIST
+		j.outputdata = output_file_list
+
+	elif ( string.find( host_name, "epfl" ) != -1 ):
+		choice = int( raw_input("Running on EPFL, submit to 1) PBS or 2) Interactive? ") )
+		while ( choice != 1 ) and ( choice != 2 ):
+			choice = int( raw_input( "try again... " ) )
+		if choice == 1 :
+			j.backend = PBS()
+			j.backend.queue = 'long'
+			j.inputdata = FILE_LIST
+		if choice == 2 :
+			j.backend = Interactive()
+			j.inputdata = FILE_LIST
+		j.outputdata = output_file_list
 
 	else:
 		print "Unknown system, just running the job, check this is what you want"
@@ -201,7 +193,7 @@ if is_ganga:
         FIT_XML = FIT_LIST[ int(len(FIT_LIST)-1) ]
 
 	#	Splitter to use for job
-	j.splitter=ArgSplitter( args = _1DLL_Splitter( FIT_XML, STEPS, STEPS_PER_CORE ) )
+	j.splitter=ArgSplitter( args = TOYStudy_Splitter( FIT_XML ) )
 	#	submit the job
 	j.submit()
 
@@ -214,13 +206,13 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 	for i in sys.argv:
 		print i
 
+	sys.path.append("/exports/work/ppe/sw/fitting-latest/root-5.29/lib")
+
 	#	We want ROOT
 	import ROOT
 
 	#	Input Parameters
 	FIT_XML = sys.argv[1]
-
-	SCAN_RANGE = sys.argv[2]
 
 	#	Load the RapidFit binary library
 	ROOT.gSystem.Load("libRapidRun")
@@ -232,10 +224,11 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 	args.Add( ROOT.TObjString( "RapidFit"     ) )
 	args.Add( ROOT.TObjString( "-f"           ) )
 	args.Add( ROOT.TObjString( str( FIT_XML ) ) )
-	args.Add( ROOT.TObjString( "--doLLscan"    ) )
-	args.Add( ROOT.TObjString( "--defineScan" ) )
-	args.Add( ROOT.TObjString( str( SCAN_RANGE )) )
-
+	args.Add( ROOT.TObjString( "-repeats"     ) )
+	args.Add( ROOT.TObjString( str( TOYS_PER_SUBJOB ) ) )
+	args.Add( ROOT.TObjString( "--useUUID"    ) )
+	args.Add( ROOT.TObjString( "--doPulls"    ) )
+	args.Add( ROOT.TObjString( "pullPlots.root" ) )
 	#	Print the command that is being run for reference
 	#print args
 
