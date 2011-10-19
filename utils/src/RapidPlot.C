@@ -223,7 +223,7 @@ int main( int argc, char* argv[] )
 
 	//	Check wether the minima as defined from the Global fit is the true minima within the phase-space
 
-	Check_Minima( allresults, Fit_Cut_String, &Global_Best_NLL, NLL, Double_Tolerance, param1_val, param2_val );
+	//Check_Minima( allresults, Fit_Cut_String, &Global_Best_NLL, NLL, Double_Tolerance, param1_val, param2_val );
 
 
 	TString NLL_Min;		//	Of course ROOT doesn't have USEFUL constructors!

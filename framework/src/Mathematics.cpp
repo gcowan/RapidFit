@@ -428,7 +428,7 @@ namespace Mathematics
 		// Need to make sure that we deal with the normalisation of the following terms properly in the code that uses them
 		f7 =  2*third * (1. - sinTheta_sinTheta * cosPhi_cosPhi) * norm ;			//Check: norm = (9./64./TMath::Pi())
 		f8 =  third * root_6 * sinTheta_sinTheta * sin2Phi * sinPsi * norm;        		//Check: norm = 0
-		f9 = -third * root_6 * sin2Theta * cosPhi * sinPsi * norm;         			//Check: norm = 0
+		f9 =  third * root_6 * sin2Theta * cosPhi * sinPsi * norm;         			//Check: norm = 0
 		f10= (1+third) * root_3 * (1. - sinTheta_sinTheta * cosPhi_cosPhi) * cosPsi * norm;   	//Check: norm = 0
 		return;
 	}
@@ -439,24 +439,36 @@ namespace Mathematics
 		// average acceptance weights for Bs2JpsiPhi.
 		RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
 		PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
-		int numAngularTerms = 10;//6;
+		const int numAngularTerms = 10;//6;
 		double*  f = new double[numAngularTerms]; // the angular functions
-		double* xi = new double[numAngularTerms]; // the angular weights
-		double cosTheta, phi, cosPsi;
+		double xi[numAngularTerms]; // the angular weights
+		double cosTheta, phi, cosPsi, time;
 		double evalPDFraw, evalPDFnorm, val;
 		int numEvents = dataSet->GetDataNumber();
 		for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
 
+		double Sum[numAngularTerms];
+		double Sum_sq[numAngularTerms][numAngularTerms];
+		double cov[numAngularTerms][numAngularTerms];
+		double cor[numAngularTerms][numAngularTerms];
+		for (int i = 0; i < numAngularTerms; i++) {
+			Sum[i] = 0.0;
+			for (int k = 0; k < numAngularTerms; k++) {
+				cov[i][k] = 0.0;
+				Sum_sq[i][k] = 0.0;
+			}
+		}
+	
 		for (int e = 0; e < numEvents; e++)
-			//for (int e = 0; e < 10; e++)
 		{
 			if (e % 1000 == 0) cout << "Event # " << e << endl;
 			DataPoint * event = dataSet->GetDataPoint(e);
 			cosTheta = event->GetObservable("cosTheta")->GetValue();
 			phi      = event->GetObservable("phi")->GetValue();
 			cosPsi   = event->GetObservable("cosPsi")->GetValue();
-			//getBs2JpsiPhiAngularFunctions( f[0], f[1], f[2], f[3], f[4], f[5], cosTheta, phi, cosPsi);
+			time     = event->GetObservable("time")->GetValue();
 	                getBs2JpsiPhiAngularFunctionsWithSwave( f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], cosTheta, phi, cosPsi);
+
 			// The method sums the angular factor f_i divided by the sum_i(A_i*f_i)
 			// for each accepted event. I'm not sure if dividing by Evaluate is exactly the
 			// same here, particularly if you look at untagged events.
@@ -465,19 +477,49 @@ namespace Mathematics
 			vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
 			dontIntegrate.push_back("time");
 			dontIntegrate.push_back("tag");
-			//dontIntegrate.push_back("KstarFlavour");
 			evalPDFnorm = rapidInt->DoNumericalIntegral( event, boundary, dontIntegrate );
 			val = evalPDFraw/evalPDFnorm;
+			//cout << f[0] << " " << f[1]<< " " <<  f[2]<< " " <<  f[3]<< " " <<  f[4]<< " " <<  f[5]<< " " << f[6]<< " " <<  f[7]<< " " <<  f[8]<< " " <<  f[9]<< endl;
+			//cout << time << " " << cosTheta  << " " << phi << " " << cosPsi << " " << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
 			for (int i = 0; i < numAngularTerms; i++)
 			{
-				xi[i] += f[i]/val; ///1501544.3013043751;
+				Sum[i] = Sum[i] + f[i]/val;
+				xi[i] += f[i]/val;
+
+				for (int k = 0; k < numAngularTerms; k++)
+				{
+					Sum_sq[i][k] += f[i]/val*f[k]/val;
+				}
 			}
-			//cout << f[0]<<" " << cosTheta << " " << phi << " " << cosPsi << " " << evalPDF  << " " << xi[0] << endl;
 		}
-		//cout << "[" << xi[0]/xi[0] << ", " << xi[1]/xi[0] << ", " << xi[2]/xi[0] <<  ", " << xi[3]/xi[0] << ", " << xi[4]/xi[0] << ", " << xi[5]/xi[0] << "]" <<  endl;
-		//cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents << "]" <<  endl;
-		cout << "[" << xi[0]/numEvents << ", " << xi[1]/numEvents << ", " << xi[2]/numEvents <<  ", " << xi[3]/numEvents << ", " << xi[4]/numEvents << ", " << xi[5]/numEvents << ", " << 
-		xi[6]/numEvents << ", " << xi[7]/numEvents << ", " << xi[8]/numEvents <<  ", " << xi[9]/numEvents << "]" <<  endl;
+		
+		cout << "Covariance matrix " << endl;
+		for (int i = 0; i < numAngularTerms; i++)
+		{
+			for (int k = 0; k < numAngularTerms; k++)
+			{
+				cov[i][k] = 1./numEvents/numEvents * ( Sum_sq[i][k] - Sum[i]*Sum[k]/numEvents);
+				cout << cov[i][k] << "\t";
+			}
+			cout << endl;
+		}
+		
+		cout << "Correlation matrix " << endl;
+		for (int i = 0; i < numAngularTerms; i++)
+		{
+			for (int k = 0; k < numAngularTerms; k++)
+			{
+				cor[i][k] = cov[i][k]/(sqrt(cov[i][i])*sqrt(cov[k][k]));
+				cout << cor[i][k] << "\t";
+			}
+			cout << endl;
+		}
+	
+		cout << "Weight +- error " << endl;
+		for (int i = 0; i < numAngularTerms; i++)
+		{
+			cout << xi[i]/numEvents << " \\pm " << sqrt(cov[i][i]) << endl;
+		}	
 		return;
 	}
 
@@ -490,7 +532,7 @@ namespace Mathematics
 		int numAngularTerms = 10;
 		double*  f = new double[numAngularTerms]; // the angular functions
 		double* xi = new double[numAngularTerms]; // the angular weights
-		double cosTheta, phi, cosPsi;
+		double cosTheta, phi, cosPsi, time;
 		double evalPDFraw, evalPDFnorm, evalPDFnorm2, val;		(void) evalPDFnorm2;	//	shutup gcc for unused param!
 		int numEvents = dataSet->GetDataNumber();
 		for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
@@ -502,6 +544,7 @@ namespace Mathematics
 			cosTheta = event->GetObservable("cosTheta")->GetValue();
 			phi      = event->GetObservable("phi")->GetValue();
 			cosPsi   = event->GetObservable("cosPsi")->GetValue();
+			time     = event->GetObservable("time")->GetValue();
 			double weight = 1.;//event->GetObservable("NSig_sw")->GetValue();
 
 			//cout << weight << endl;
