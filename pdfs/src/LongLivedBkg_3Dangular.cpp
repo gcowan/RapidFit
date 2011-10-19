@@ -1,7 +1,7 @@
 // $Id: LongLivedBkg_3Dangular.cpp,v 1.2 2009/11/13 15:31:51 gcowan Exp $
 /** @class LongLivedBkg_3Dangular LongLivedBkg_3Dangular.cpp
  *
- *  PDF for  long lived background with 3D histogram angular description
+ *  PDF for  long lived background with 3D histogram angular description. A 3D root Histogram required provided by user and input in the xml file. The transversity angles in the order (x,y,z) --> (cosPsi, cosTheta, phi)
  *
  *  @author Ailsa Sparkes
  *  @date 2011-05-30
@@ -66,7 +66,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 		ifstream input_file;
 		input_file.open( fileName.c_str(), ifstream::in );
 		input_file.close();
-		
+
 		if( !getenv("RAPIDFITROOT") && input_file.fail() )
 		{
 			cerr << "\n\n" << endl;
@@ -76,15 +76,15 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 			cerr << "\n\n" << endl;
 			exit(-987);
 		}
-		
+
 		string fullFileName;
-		
+
 		if( getenv("RAPIDFITROOT") )
 		{
 			string path( getenv("RAPIDFITROOT") ) ;
-			
+
 			cout << "RAPIDFITROOT defined as: " << path << endl;
-			
+
 			fullFileName = path+"/pdfs/configdata/"+fileName ;
 		} else if( !input_file.fail() )
 		{
@@ -93,13 +93,13 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 			cerr << "Shouldn't end up Here in the code!" << endl;
 			exit(-892);
 		}
-		
-		
+
+
 		//Read in histo
 		TFile* f =  TFile::Open(fullFileName.c_str());
 		histo = new TH3D(  *(    (TH3D*)f ->Get("histo")      )     ); //(fileName.c_str())));
 
-		xaxis = histo->GetXaxis();
+	xaxis = histo->GetXaxis();
         xmin = xaxis->GetXmin();
         xmax = xaxis->GetXmax();
         nxbins = histo->GetNbinsX();
