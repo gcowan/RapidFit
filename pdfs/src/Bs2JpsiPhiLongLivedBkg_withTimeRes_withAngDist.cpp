@@ -14,25 +14,27 @@
 #include "TMath.h"
 #include "RooMath.h"
 
+PDF_CREATOR( Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist );
+
 //Constructor
-Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist() :
+Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist( PDFConfigurator* configurator ) :
 
 	// Physics parameters
-	  tauLL1Name	( "tau_LL1" )
-	, tauLL2Name	( "tau_LL2" )
-//	, f_JpsiName	( "f_Jpsi"   )
-	, f_LL1Name      ( "f_LL1" )
-        , sigmaLL1Name  ( "sigma_LL1" )
-        , sigmaLL2Name  ( "sigma_LL2" )
-        , timeResLL1FracName( "timeResLL1Frac" )
-	, f_JpsiName    ( "f_Jpsi" )
-	, f_NoJpsiName  ( "f_NoJpsi" )
+	  tauLL1Name	( configurator->getName("tau_LL1") )
+	, tauLL2Name	( configurator->getName("tau_LL2") )
+//	, f_JpsiName	( configurator->getName("f_Jpsi") )
+	, f_LL1Name      ( configurator->getName("f_LL1") )
+        , sigmaLL1Name  ( configurator->getName("sigma_LL1") )
+        , sigmaLL2Name  ( configurator->getName("sigma_LL2") )
+        , timeResLL1FracName( configurator->getName("timeResLL1Frac") )
+	, f_JpsiName    ( configurator->getName("f_Jpsi") )
+	, f_NoJpsiName  ( configurator->getName("f_NoJpsi") )
 
 // Observables
-        , timeName      ( "time" )
-        , cosThetaName  ( "cosTheta" )
-        , phiName       ( "phi" )
-        , cosPsiName    ( "cosPsi" )
+        , timeName      ( configurator->getName("time") )
+        , cosThetaName  ( configurator->getName("cosTheta") )
+        , phiName       ( configurator->getName("phi") )
+        , cosPsiName    ( configurator->getName("cosPsi") )
 
 	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(),
 	sigmaLL2(), timeResLL1Frac(), f_Jpsi(), f_NoJpsi(),

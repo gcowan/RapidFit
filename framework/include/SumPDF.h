@@ -20,6 +20,7 @@ class SumPDF : public BasePDF
 		SumPDF();
 		SumPDF( IPDF*, IPDF*, PhaseSpaceBoundary* );
 		SumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string );
+		SumPDF( const SumPDF& );
 		~SumPDF();
 
 		//Indicate whether the function has been set up correctly
@@ -51,7 +52,7 @@ class SumPDF : public BasePDF
 	
 	private:
 		//	Uncopyable!
-		SumPDF ( const SumPDF& );
+		//SumPDF ( const SumPDF& );
 		SumPDF& operator = ( const SumPDF& );
 		void MakePrototypes( PhaseSpaceBoundary* );
 

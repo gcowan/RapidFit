@@ -243,7 +243,7 @@ TString StringProcessing::CondenseStrings( vector<string> input_vec, int lolim=-
 	TString Returnable_String( "" );
 	for( int iter = lolim; iter < hilim ; ++iter )
 	{
-		Returnable_String.Append( input_vec[iter] );
+		Returnable_String.Append( input_vec[(unsigned)iter] );
 	}
 	return Returnable_String;
 }

@@ -468,7 +468,7 @@
 </Minimiser>
 
 <FitFunction>
-<FunctionName>NegativeLogLikelihoodiThreaded</FunctionName>
+<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
 <Threads>2</Threads>
 #<Strategy>Petes</Strategy>
 </FitFunction>

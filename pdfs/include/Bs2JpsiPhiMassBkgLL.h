@@ -10,17 +10,12 @@
 #ifndef Bs2JpsiPhiMassBkgLL_H
 #define Bs2JpsiPhiMassBkgLL_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class Bs2JpsiPhiMassBkgLL : public BasePDF
 {
 	public:
-		Bs2JpsiPhiMassBkgLL();
+		Bs2JpsiPhiMassBkgLL( PDFConfigurator* );
 		~Bs2JpsiPhiMassBkgLL();
 
 		//Calculate the PDF value

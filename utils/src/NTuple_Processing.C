@@ -10,8 +10,6 @@
 #include "TH3.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
-//	RapidFit Headers
-#include "StringProcessing.h"
 //	RapidFit Utils Header
 #include "TString_Processing.h"
 #include "NTuple_Processing.h"
@@ -19,8 +17,89 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 using namespace::std;
+
+//	Open a .root file without barfing if it doesn't exist, really this should be handled by ROOT SILENTLY && INTERNALLY
+TFile* OpenFile( string filename )
+{
+
+	ifstream input_file;
+
+	input_file.open( filename.c_str(), ifstream::in );
+	input_file.close();
+
+	if( !input_file.fail() )
+	{
+		//      Open the File
+		return TFile::Open( filename.c_str() );
+	} else {
+		return NULL;
+	}
+
+	return NULL;
+}
+
+vector<TFile*> OpenMultipleFiles( vector<string> all_filenames )
+{
+	vector<TFile*> output;
+	for( vector<string>::iterator file_i=all_filenames.begin(); file_i != all_filenames.end(); ++file_i )
+	{
+		output.push_back( OpenFile( *file_i ) );
+	}
+	return output;
+}
+
+TTree* GetTree( string filename, string tuplename )
+{
+	TFile* input_file = OpenFile( filename );
+	TTree* input_tree = NULL;
+
+	vector<pair<string,string> > all_Trees;
+
+	get_TTree_list_here( &all_Trees );
+
+	vector<string> tree_names = return_second(all_Trees);
+
+	int tuple_index = VectorContains( &tree_names, &tuplename );
+
+	if( tuple_index == -1 ) return NULL;
+
+	string object_path = all_Trees[tuple_index].first;
+	object_path+="/"+tuplename;
+
+	input_file->GetObject( object_path.c_str(), input_tree );
+
+	return input_tree;
+}
+
+vector<TTree*> GetMultipleTrees( vector<string> all_filenames, vector<string> all_tuplenames )
+{
+	vector<TTree*> output;
+	if( all_filenames.size() != all_tuplenames.size() )
+	{
+		cerr << "ERROR:\tReuested number of files different to number of tuples wanted!!!" << endl;
+		return output;
+	}
+	vector<string>::iterator file_i=all_filenames.begin();
+	vector<string>::iterator tuple_i=all_tuplenames.begin();
+	for( ; file_i != all_filenames.end(); ++file_i, ++tuple_i )
+        {
+                output.push_back( GetTree( *file_i, *tuple_i ) );
+        }
+	return output;
+}
+
+vector<TTree*> GetMultipleTrees( vector<string> all_filenames, string tuplename )
+{
+	vector<TTree*> output;
+	for( vector<string>::iterator file_i = all_filenames.begin(); file_i != all_filenames.end(); ++file_i )
+	{
+		output.push_back( GetTree( *file_i, tuplename ) );
+	}
+	return output;
+}
 
 //  From the root current path look for all keys (objects in root file) and loop over them
 //  For each one that is actually an object of inherit_type store it's name and the number of events it has
@@ -71,7 +150,7 @@ void get_object_list( TString current_path, vector<pair<string,string> > *found_
 			}
 
 			//  If this is an object of the wanted type we foud ignore it
-			if( StringProcessing::VectorContains( &all_found_names, &full_name ) == -1 )
+			if( VectorContains( &all_found_names, &full_name ) == -1 )
 			{
 				//  If this is a new class object save it's name and event_number
 				//relative_path->Append( obj_name );
@@ -144,38 +223,38 @@ void get_TTree_list_here( vector<pair<string,string> > *found_names )
 
 void get_TH1_list_here( vector<pair<string,string> > *found_names )
 {
-        TString current_path = gDirectory->GetPath();
-        get_TH1_list( current_path, found_names );
+	TString current_path = gDirectory->GetPath();
+	get_TH1_list( current_path, found_names );
 }
 
 void get_TH2_list_here( vector<pair<string,string> > *found_names )
 {
-        TString current_path = gDirectory->GetPath();
-        get_TH2_list( current_path, found_names );
+	TString current_path = gDirectory->GetPath();
+	get_TH2_list( current_path, found_names );
 }
 
 void get_TH3_list_here( vector<pair<string,string> > *found_names )
 {
-        TString current_path = gDirectory->GetPath();
-        get_TH3_list( current_path, found_names );
+	TString current_path = gDirectory->GetPath();
+	get_TH3_list( current_path, found_names );
 }
 
 void get_TGraph_list_here( vector<pair<string,string> > *found_names )
 {
-        TString current_path = gDirectory->GetPath();
-        get_TGraph_list( current_path, found_names );
+	TString current_path = gDirectory->GetPath();
+	get_TGraph_list( current_path, found_names );
 }
 
 void get_TGraph2D_list_here( vector<pair<string,string> > *found_names )
 {
-        TString current_path = gDirectory->GetPath();
-        get_TGraph2D_list( current_path, found_names );
+	TString current_path = gDirectory->GetPath();
+	get_TGraph2D_list( current_path, found_names );
 }
 
 void get_TNtuple_list_here( vector<pair<string,string> > *found_names )
 {
-        TString current_path = gDirectory->GetPath();
-        get_TNtuple_list( current_path, found_names );
+	TString current_path = gDirectory->GetPath();
+	get_TNtuple_list( current_path, found_names );
 }
 
 vector<int> get_Event_Number( vector<pair<string,string> > *found_names )
@@ -198,31 +277,31 @@ vector<int> get_Event_Number( vector<pair<string,string> > *found_names )
 //      of branches that it contains in an easy to handle manner
 vector<TString> get_branch_names( TTree* local_tree )
 {
-        //      To be populated and returned to the user
-        vector<TString> temp_branch_names;
+	//      To be populated and returned to the user
+	vector<TString> temp_branch_names;
 
-        //      Get the list of branches within the TTree
-        TObjArray* branch_obj_array = local_tree->GetListOfBranches();
+	//      Get the list of branches within the TTree
+	TObjArray* branch_obj_array = local_tree->GetListOfBranches();
 
-        //      Loop over all found branch objects and request their names
-        for( unsigned short int i=0; i < branch_obj_array->GetEntries() ; ++i )
-        {
-                TObject* branch_object = (*branch_obj_array)[i];
-                temp_branch_names.push_back((const char*) branch_object->GetName());
-        }
+	//      Loop over all found branch objects and request their names
+	for( unsigned short int i=0; i < branch_obj_array->GetEntries() ; ++i )
+	{
+		TObject* branch_object = (*branch_obj_array)[i];
+		temp_branch_names.push_back((const char*) branch_object->GetName());
+	}
 
-        //      Return the vector of names I have found
-        return temp_branch_names;
+	//      Return the vector of names I have found
+	return temp_branch_names;
 }
 
 //      Pass this the name of the ntuple you're handing and it will give you a list
 //      of branches that it contains in an easy to handle manner
 vector<TString> get_branch_names( TString absolute_path )
 {
-        //      Get the tree that has been defined by the user
-        TTree* local_tree = (TTree*) gDirectory->Get((const char*) absolute_path);
-        //      Return a vector of Branch names as defined by the user
-        return get_branch_names( local_tree );
+	//      Get the tree that has been defined by the user
+	TTree* local_tree = (TTree*) gDirectory->Get((const char*) absolute_path);
+	//      Return a vector of Branch names as defined by the user
+	return get_branch_names( local_tree );
 }
 
 
@@ -243,22 +322,22 @@ TObject* open_object( pair<string,string> details )
 //      Perform a cut on a TTree object and return a new TTree with a unique name
 TTree* Cut( TTree* input_tree, TString Cut_String, TRandom3* random )
 {
-        //      Tree to be returned
-        TTree* wanted_tree = NULL;
-        //      Perform The Cut
-        wanted_tree = input_tree->CopyTree( Cut_String, "fast", input_tree->GetEntries() );
+	//      Tree to be returned
+	TTree* wanted_tree = NULL;
+	//      Perform The Cut
+	wanted_tree = input_tree->CopyTree( Cut_String, "fast", input_tree->GetEntries() );
 
-        //      Generate a Unique Name
-        TString Name="Tree_";
-        double rand = random->Rndm();
-        Name+=rand;
+	//      Generate a Unique Name
+	TString Name="Tree_";
+	double rand = random->Rndm();
+	Name+=rand;
 
-        //      Set Unique Name
-        wanted_tree->SetName(Name);
-        wanted_tree->SetTitle(Name);
+	//      Set Unique Name
+	wanted_tree->SetName(Name);
+	wanted_tree->SetTitle(Name);
 
-        //      Return the TTree
-        return wanted_tree;
+	//      Return the TTree
+	return wanted_tree;
 }
 
 
@@ -267,13 +346,13 @@ TTree* Cut( TTree* input_tree, TString Cut_String, TRandom3* random )
 vector<Double_t> Get_Data( TTree* input_tree, TString Cut_String, TString Data_String )
 {
 	input_tree->SetEstimate(input_tree->GetEntries());
-        input_tree->Draw( Data_String, Cut_String );
-        int Data_Num = int( input_tree->GetSelectedRows() );
-        Double_t* temp_pointer = input_tree->GetV1();
-        vector<Double_t> Returnable_Data;
-        for( int i=0; i < Data_Num; ++i )
-                Returnable_Data.push_back( double(temp_pointer[i]) );
-        return Returnable_Data;
+	input_tree->Draw( Data_String, Cut_String );
+	int Data_Num = int( input_tree->GetSelectedRows() );
+	Double_t* temp_pointer = input_tree->GetV1();
+	vector<Double_t> Returnable_Data;
+	for( int i=0; i < Data_Num; ++i )
+		Returnable_Data.push_back( double(temp_pointer[i]) );
+	return Returnable_Data;
 }
 
 //      A wrapper for the vector<double> Get_Data2D for instances where it's easier to write code to
@@ -295,19 +374,19 @@ vector<vector<Double_t> > Get_Datav( TTree* input_tree, TString Cut_String, TStr
 vector<pair<Double_t,Double_t> > Get_Data2D( TTree* input_tree, TString Cut_String, TString Data_String )
 {
 	input_tree->SetEstimate(input_tree->GetEntries());
-        input_tree->Draw( Data_String, Cut_String );
-        int Data_Num = int( input_tree->GetSelectedRows() );
-        Double_t* temp_pointer = input_tree->GetV1();
+	input_tree->Draw( Data_String, Cut_String );
+	int Data_Num = int( input_tree->GetSelectedRows() );
+	Double_t* temp_pointer = input_tree->GetV1();
 	Double_t* temp_pointer2 = input_tree->GetV2();
-        vector<pair<Double_t,Double_t> > Returnable_Data;
-        for( int i=0; i < Data_Num; ++i )
+	vector<pair<Double_t,Double_t> > Returnable_Data;
+	for( int i=0; i < Data_Num; ++i )
 	{
 		pair<Double_t,Double_t> new_pair;
 		new_pair.first = double( temp_pointer[i] );
 		new_pair.second = double( temp_pointer2[i] );
-                Returnable_Data.push_back( new_pair );
+		Returnable_Data.push_back( new_pair );
 	}
-        return Returnable_Data;
+	return Returnable_Data;
 }
 
 //	A wrapper for the vector<pair<double,double> > Get_Data2D for instances where it's easier to write code to
@@ -332,47 +411,47 @@ vector<vector<Double_t> > Get_Data2Dv( TTree* input_tree, TString Cut_String, TS
 vector<vector<Double_t> > Get_Data3D( TTree* input_tree, TString Cut_String, TString Data_String )
 {
 	input_tree->SetEstimate(input_tree->GetEntries());
-        input_tree->Draw( Data_String, Cut_String );
-        int Data_Num = int( input_tree->GetSelectedRows() );
-        Double_t* temp_pointer = input_tree->GetV1();
+	input_tree->Draw( Data_String, Cut_String );
+	int Data_Num = int( input_tree->GetSelectedRows() );
+	Double_t* temp_pointer = input_tree->GetV1();
 	Double_t* temp_pointer2 = input_tree->GetV2();
 	Double_t* temp_pointer3 = input_tree->GetV3();
-        vector<vector<Double_t> > Returnable_Data;
-        for( int i=0; i < Data_Num; ++i )
+	vector<vector<Double_t> > Returnable_Data;
+	for( int i=0; i < Data_Num; ++i )
 	{
 		vector<Double_t> new_vec;
 		new_vec.push_back( double(temp_pointer[i]) );
 		new_vec.push_back( double(temp_pointer2[i]) );
 		new_vec.push_back( double(temp_pointer3[i]) );
-                Returnable_Data.push_back( new_vec );
+		Returnable_Data.push_back( new_vec );
 	}
-        return Returnable_Data;
+	return Returnable_Data;
 }
 
 
 //      Check that the Global Minima as defined at entry 0 within the file is actually the best minima or not
 void Check_Minima( TTree* input_tree, TString Cut_String, Float_t* Global_Best_NLL, TString NLL, TString Double_Tolerance, TString param1_val, TString param2_val )
 {
-        TTree* wanted = input_tree->CopyTree( Cut_String, "fast", input_tree->GetEntries() );
+	TTree* wanted = input_tree->CopyTree( Cut_String, "fast", input_tree->GetEntries() );
 
-        Float_t Global_Min_NLL = Float_t( wanted->GetMinimum( NLL ) );
+	Float_t Global_Min_NLL = Float_t( wanted->GetMinimum( NLL ) );
 
-        //      Only if we have a better minima Minuit did NOT find
-        if( (Global_Min_NLL-*Global_Best_NLL) < 0 )
-        {
-                TString Global_Min_NLL_Str;
-                Global_Min_NLL_Str+=Global_Min_NLL;
-                TString Catch( "abs(" + NLL + "-" + Global_Min_NLL_Str + ")<" + Double_Tolerance);
-                TTree* local_best = wanted->CopyTree( Catch, "fast", wanted->GetEntries() );
-                //      GetMinimum == GetMaximum == Get 0th event
-                double true_X = local_best->GetMinimum(param1_val);
-                double true_Y = local_best->GetMinimum(param2_val);
-                cout << "\n\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
-                cout << "\t\tTRUE MINIMUM NLL = " << Global_Min_NLL << "\t\tAt:\t\tX:" << true_X << "\tY:\t" << true_Y <<endl<<endl;
-//              cout << "\tNEW MINIMA FOUND AT :\tX:\t" << X_true_min << "\tY:\t" << Y_true_min << endl<<endl;
-                cout << "\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
-                *Global_Best_NLL=Global_Min_NLL;
-        }
+	//      Only if we have a better minima Minuit did NOT find
+	if( (Global_Min_NLL-*Global_Best_NLL) < 0 )
+	{
+		TString Global_Min_NLL_Str;
+		Global_Min_NLL_Str+=Global_Min_NLL;
+		TString Catch( "abs(" + NLL + "-" + Global_Min_NLL_Str + ")<" + Double_Tolerance);
+		TTree* local_best = wanted->CopyTree( Catch, "fast", wanted->GetEntries() );
+		//      GetMinimum == GetMaximum == Get 0th event
+		double true_X = local_best->GetMinimum(param1_val);
+		double true_Y = local_best->GetMinimum(param2_val);
+		cout << "\n\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
+		cout << "\t\tTRUE MINIMUM NLL = " << Global_Min_NLL << "\t\tAt:\t\tX:" << true_X << "\tY:\t" << true_Y <<endl<<endl;
+		//              cout << "\tNEW MINIMA FOUND AT :\tX:\t" << X_true_min << "\tY:\t" << Y_true_min << endl<<endl;
+		cout << "\t\tWARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING!!!WARNING\n"<<endl;
+		*Global_Best_NLL=Global_Min_NLL;
+	}
 
 }
 

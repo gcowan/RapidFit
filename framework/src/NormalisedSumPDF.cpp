@@ -5,26 +5,47 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-11-12
- */
+  */
 
 //	RapidFit Headers
+#include "ClassLookUp.h"
 #include "NormalisedSumPDF.h"
 #include "StringProcessing.h"
 //	System Headers
 #include <iostream>
 #include <math.h>
+#include <cstdlib>
+
+pthread_mutex_t pdf_lock_1, pdf_lock_2;
 
 using namespace std;
 
 //Default constructor
-NormalisedSumPDF::NormalisedSumPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(), secondPDF(), firstIntegrator(), secondIntegrator(), firstFraction(), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary()
+NormalisedSumPDF::NormalisedSumPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL), firstIntegrator(NULL), secondIntegrator(NULL), firstFraction(), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL)
 {
 }
 
 //Constructor not specifying fraction parameter name
-NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF), firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName("FirstPDFFraction"), integrationBoundary(InputBoundary)
+NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) ), firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName("FirstPDFFraction"), integrationBoundary(InputBoundary)
 {
+	firstIntegrator->SetPDF( firstPDF );
+	secondIntegrator->SetPDF( secondPDF );
 	MakePrototypes(InputBoundary);
+}
+
+NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (BasePDF) input ),
+	prototypeDataPoint( input.prototypeDataPoint ), prototypeParameterSet( input.prototypeParameterSet ), firstPDF( ClassLookUp::CopyPDF( input.firstPDF ) ),
+	secondPDF( ClassLookUp::CopyPDF( input.secondPDF ) ), doNotIntegrateList( StringProcessing::CombineUniques( input.firstPDF->GetDoNotIntegrateList(), input.secondPDF->GetDoNotIntegrateList() ) ),
+	firstIntegrator( new RapidFitIntegrator( *(input.firstIntegrator) ) ), secondIntegrator( new RapidFitIntegrator( *(input.secondIntegrator) ) ),
+	firstFraction( input.firstFraction ), firstIntegralCorrection( input.firstIntegralCorrection ), secondIntegralCorrection( input.secondIntegralCorrection ),
+	fractionName( input.fractionName ), integrationBoundary( input.integrationBoundary )
+{
+	firstIntegrator->SetPDF( firstPDF );
+	secondIntegrator->SetPDF( secondPDF );
+
+	ParameterSet tempSet = input.allParameters;
+	if( ! firstPDF->GetActualParameterSet()->GetAllNames().empty() ) firstPDF->SetPhysicsParameters( &tempSet );
+	if( ! secondPDF->GetActualParameterSet()->GetAllNames().empty() ) secondPDF->SetPhysicsParameters( &tempSet );
 }
 
 //Constructor specifying fraction parameter name
@@ -64,7 +85,7 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 			//The first PDF uses this observable, the second doesn't
 			inputConstraint = InputBoundary->GetConstraint( *observableIterator );
 			doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrateList, &(*observableIterator) ) == -1 );
-			
+
 			//Update this integral correction
 			if ( !inputConstraint->IsDiscrete() && doIntegrate )
 			{
@@ -78,7 +99,7 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 		{
 			//The second PDF uses this observable, the first doesn't
 			inputConstraint = InputBoundary->GetConstraint( *observableIterator );
-                        doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrateList, &(*observableIterator) ) == -1 );
+			doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrateList, &(*observableIterator) ) == -1 );
 
 			//Update this integral correction
 			if ( !inputConstraint->IsDiscrete() && doIntegrate )
@@ -93,8 +114,10 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 NormalisedSumPDF::~NormalisedSumPDF()
 {
 	//cout << "Hello from Normalised destructor" << endl;
-	delete firstPDF;
-	delete secondPDF;
+	if( firstPDF != NULL ) delete firstPDF;
+	if( secondPDF != NULL ) delete secondPDF;
+	if( firstIntegrator != NULL ) delete firstIntegrator;
+	if( secondIntegrator != NULL ) delete secondIntegrator;
 }
 
 //Indicate whether the function has been set up correctly
@@ -125,7 +148,9 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 		else
 		{
 			firstFraction = newFractionValue;
-			return firstPDF->SetPhysicsParameters( NewParameterSet ) && secondPDF->SetPhysicsParameters( NewParameterSet );
+			bool output = ( firstPDF->SetPhysicsParameters( NewParameterSet ) && secondPDF->SetPhysicsParameters( NewParameterSet ) );
+			output = output && allParameters.AddPhysicsParameters( NewParameterSet );
+			return output;
 		}
 	}
 }
@@ -165,12 +190,12 @@ vector<double> NormalisedSumPDF::EvaluateComponents( DataPoint * NewDataPoint )
 	//Get the components of each term
 	vector<double> termOneComponents = firstPDF->EvaluateComponents( NewDataPoint ) ;
 	vector<double> termTwoComponents = secondPDF->EvaluateComponents( NewDataPoint );
-	
+
 	//Insert components in output vector with correct weights.	
 	vector<double> components ;
 	for(unsigned int ii=0; ii<termOneComponents.size(); ++ii ) components.push_back( termOneComponents[ii]*firstFraction/firstIntegral ) ;
 	for(unsigned int ii=0; ii<termTwoComponents.size(); ++ii ) components.push_back( termTwoComponents[ii]*(1.-firstFraction)/secondIntegral ) ;
-	
+
 	// Return the complete set of components
 	return components;
 }
@@ -197,6 +222,9 @@ vector<string> NormalisedSumPDF::GetDoNotIntegrateList()
 // Update the integral cache for the two RapidFitIntegrators
 void NormalisedSumPDF::UpdateIntegralCache()
 {
-	firstIntegrator->UpdateIntegralCache(integrationBoundary);
-	secondIntegrator->UpdateIntegralCache(integrationBoundary);
+	if( integrationBoundary !=NULL )
+	{
+		firstIntegrator->UpdateIntegralCache(integrationBoundary);
+		secondIntegrator->UpdateIntegralCache(integrationBoundary);
+	}
 }

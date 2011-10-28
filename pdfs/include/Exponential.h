@@ -10,17 +10,12 @@
 #ifndef Exponential_H
 #define Exponential_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class Exponential : public BasePDF
 {
 	public:
-		Exponential();
+		Exponential( PDFConfigurator* );
 		~Exponential();
 
 		//Calculate the PDF value

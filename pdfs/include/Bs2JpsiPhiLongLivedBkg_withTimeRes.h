@@ -10,17 +10,12 @@
 #ifndef Bs2JpsiPhiLongLivedBkg_withTimeRes_H
 #define Bs2JpsiPhiLongLivedBkg_withTimeRes_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class Bs2JpsiPhiLongLivedBkg_withTimeRes : public BasePDF
 {
 	public:
-		Bs2JpsiPhiLongLivedBkg_withTimeRes();
+		Bs2JpsiPhiLongLivedBkg_withTimeRes( PDFConfigurator* );
 		~Bs2JpsiPhiLongLivedBkg_withTimeRes();
 
 		//Calculate the PDF value

@@ -26,7 +26,7 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-Minuit2Wrapper::Minuit2Wrapper() : function(), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options()
+Minuit2Wrapper::Minuit2Wrapper() : function(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), RapidFunction(), Quality()
 {
 }
 
@@ -69,7 +69,8 @@ FitFunction* Minuit2Wrapper::GetFitFunction()
 
 void Minuit2Wrapper::FixParameters( vector<double> fix_values, vector<string> ParameterNames )
 {
-	
+	(void) fix_values;
+	(void) ParameterNames;
 }
 
 //Use Migrad to minimise the given function
@@ -77,10 +78,10 @@ void Minuit2Wrapper::Minimise()
 {
 
 	//Minimise the wrapped function
-	MnMigrad mig( *function, *( function->GetMnUserParameters() ), Quality );//MINUIT_QUALITY );
+	MnMigrad mig( *function, *( function->GetMnUserParameters() ), (unsigned)Quality );//MINUIT_QUALITY );
 
 	//Retrieve the result of the fit
-	FunctionMinimum minimum = mig( maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
+	FunctionMinimum minimum = mig( (unsigned)maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
 	
 	// May also want to run Hesse before the minimisation to get better estimate
 	// of the error matrix.

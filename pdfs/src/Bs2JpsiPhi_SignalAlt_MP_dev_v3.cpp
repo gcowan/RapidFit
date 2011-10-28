@@ -18,6 +18,8 @@
 
 #define DEBUGFLAG true
 
+PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MP_dev_v3 );
+
 //#define DOUBLE_TOLERANCE DBL_MIN
 //#define DOUBLE_TOLERANCE 1E-6
 
@@ -25,8 +27,8 @@
 //Constructor(s)
 //...........
 // New with configurator
-Bs2JpsiPhi_SignalAlt_MP_dev_v3::Bs2JpsiPhi_SignalAlt_MP_dev_v3( PDFConfigurator config) : 
-Bs2JpsiPhi_SignalAlt_BaseClass_v3(config)
+Bs2JpsiPhi_SignalAlt_MP_dev_v3::Bs2JpsiPhi_SignalAlt_MP_dev_v3( PDFConfigurator* config) : 
+Bs2JpsiPhi_SignalAlt_BaseClass_v3(config), histogramFile(), angularAcceptanceHistogram()
 {
 	MakePrototypes();	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_dev_v3 " << std::endl ;
@@ -96,6 +98,11 @@ void Bs2JpsiPhi_SignalAlt_MP_dev_v3::MakePrototypes()
 	valid = true;
 }
 
+Bs2JpsiPhi_SignalAlt_MP_dev_v3::Bs2JpsiPhi_SignalAlt_MP_dev_v3( const Bs2JpsiPhi_SignalAlt_MP_dev_v3& input ) : BasePDF( (BasePDF) input ),
+	Bs2JpsiPhi_SignalAlt_BaseClass_v3( (Bs2JpsiPhi_SignalAlt_BaseClass_v3) input ),
+	histogramFile(input.histogramFile), angularAcceptanceHistogram(input.angularAcceptanceHistogram)
+{
+}
 
 //........................................................
 //Destructor

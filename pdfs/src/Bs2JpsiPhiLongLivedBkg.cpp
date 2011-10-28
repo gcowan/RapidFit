@@ -12,15 +12,17 @@
 #include "math.h"
 #include "TMath.h"
 
+PDF_CREATOR( Bs2JpsiPhiLongLivedBkg );
+
 //Constructor
-Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg() :
+Bs2JpsiPhiLongLivedBkg::Bs2JpsiPhiLongLivedBkg( PDFConfigurator* configurator ) :
 	// Physics parameters
-	tau1Name	( "tau_LL1" )
-	, tau2Name	( "tau_LL2" )
-	, f_LL1Name	( "f_LL1" )
+	tau1Name	( configurator->getName("tau_LL1") )
+	, tau2Name	( configurator->getName("tau_LL2") )
+	, f_LL1Name	( configurator->getName("f_LL1") )
 
         // Observables
-        , timeName      ( "time" )
+        , timeName      ( configurator->getName("time") )
 	, constraint_timeName()
 {
 	MakePrototypes();

@@ -269,22 +269,6 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 	}
 }
 
-//	DEPRECATED CODE, SAFE TO REMOVE IN FUTURE
-//
-//Make the requested output from a single result
-//void OutputConfiguration::OutputLLcontourResult( vector<LLscanResult2D*> scanResults )
-//{
-//	ResultFormatter::MakeLLcontourPlots( scanResults, LLcontourFileName );
-//}
-//
-//
-//Make the requested output from a single result
-//void OutputConfiguration::OutputLLscanResult( vector<LLscanResult*> scanResults )
-//{
-//	ResultFormatter::MakeLLscanPlots( scanResults, LLscanFileName );
-//}
-//
-
 //Make the requested output from a toy study
 void OutputConfiguration::OutputToyResult( FitResultVector* TheResult )
 {

@@ -20,33 +20,38 @@
 #include <cmath>
 #include <iostream>
 
+PDF_CREATOR( RapidFitPdfExponential );
+
 using namespace std;
 
 //.................................
 // Default constructor
-RapidFitPdfExponential::RapidFitPdfExponential() : gamma(), resolution(0), valid(true), gammaName("gamma"), timeName("time")
+RapidFitPdfExponential::RapidFitPdfExponential( PDFConfigurator* configurator ) : gamma(), resolution(0), valid(true), gammaName("gamma"), timeName("time")
 {
+	(void) configurator;
 }
 
+//	NO LONGER ACCESSIBLE 2011-10
+//
 //.................................
 // Constructor with resolution
-RapidFitPdfExponential::RapidFitPdfExponential( double res ) : gamma(), resolution(), valid(), gammaName("gamma"), timeName("time")
-{
-  if( res >= 0.0 ) {
-    resolution = res ; 
-    valid = true ;
-  }
-  else {
-    resolution = 0.0; 
-    valid = false ;
-  }
-}
+//RapidFitPdfExponential::RapidFitPdfExponential( double res ) : gamma(), resolution(), valid(), gammaName("gamma"), timeName("time")
+//{
+//  if( res >= 0.0 ) {
+//    resolution = res ; 
+//    valid = true ;
+//  }
+//  else {
+//    resolution = 0.0; 
+//    valid = false ;
+//  }
+//}
 
 
 //....................................
 //Copy constructor  
 RapidFitPdfExponential::RapidFitPdfExponential( const RapidFitPdfExponential & other  ) :
-   IPDF(), gamma( other.gamma ), resolution(other.resolution), valid(other.valid), gammaName("gamma"), timeName("time")
+   BasePDF( (BasePDF) other ), gamma( other.gamma ), resolution(other.resolution), valid(other.valid), gammaName("gamma"), timeName("time")
 {  
 }
  

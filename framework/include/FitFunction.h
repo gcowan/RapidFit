@@ -35,6 +35,9 @@ class FitFunction
 		void Finalise();
 		void UseEventWeights(string);
 
+		void SetThreads( int );
+		int GetThreads();
+
 		//Overload this function in child classes
 		virtual double UpErrorValue(int);
 
@@ -58,6 +61,7 @@ class FitFunction
 		vector<Double_t> branch_objects;
 		vector<ObservableRef> branch_names;
 		Double_t fit_calls;
+		int Threads;
 };
 
 #endif

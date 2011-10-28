@@ -20,28 +20,29 @@
 #include "TAxis.h"
 #include "TH1.h"
 
+PDF_CREATOR( LongLivedBkg_3Dangular );
 
 //.....................................................
 //Constructor
-LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
+LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 
 	// Physics parameters
-	  f_LL1Name		( config.getName("f_LL1")  )
-	, tauLL1Name		( config.getName("tau_LL1") )
-	, tauLL2Name		( config.getName("tau_LL2") )
-    //Detector parameters
-	, timeResLL1FracName	( config.getName("timeResLL1Frac") )
-	, sigmaLL1Name		( config.getName("sigma_LL1") )
-	, sigmaLL2Name		( config.getName("sigma_LL2") )
+	f_LL1Name		( config->getName("f_LL1")  )
+	, tauLL1Name		( config->getName("tau_LL1") )
+	, tauLL2Name		( config->getName("tau_LL2") )
+	//Detector parameters
+	, timeResLL1FracName	( config->getName("timeResLL1Frac") )
+	, sigmaLL1Name		( config->getName("sigma_LL1") )
+	, sigmaLL2Name		( config->getName("sigma_LL2") )
 	// Observables
-	, timeName		( config.getName("time") )
-	, cosThetaName		( config.getName("cosTheta") )
-	, phiName		( config.getName("phi") )
-	, cosPsiName		( config.getName("cosPsi") )
+	, timeName		( config->getName("time") )
+	, cosThetaName		( config->getName("cosTheta") )
+	, phiName		( config->getName("phi") )
+	, cosPsiName		( config->getName("cosPsi") )
 	//Other things to be initialised
-	, timeconstName		( config.getName("time") )
+	, timeconstName		( config->getName("time") )
 
-	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cosTheta(),
+, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cosTheta(),
 	phi(), cosPsi(), histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
 	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true)
 {
@@ -51,7 +52,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 	MakePrototypes();
 
 	//Find name of histogram needed to define 3-D angular distribution
-	string fileName = config.getConfigurationValue( "AngularDistributionHistogram" ) ;
+	string fileName = config->getConfigurationValue( "AngularDistributionHistogram" ) ;
 
 	//Initialise depending upon whether configuration parameter was found
 	if( fileName == "" ) {
@@ -67,13 +68,15 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 		input_file.open( fileName.c_str(), ifstream::in );
 		input_file.close();
 
-		if( !getenv("RAPIDFITROOT") && input_file.fail() )
+		bool local_fail = input_file.fail();
+
+		if( !getenv("RAPIDFITROOT") && local_fail )
 		{
-			cerr << "\n\n" << endl;
-			cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+			cerr << "\n" << endl;
+			//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
-			cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-			cerr << "\n\n" << endl;
+			//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+			cerr << "\n" << endl;
 			exit(-987);
 		}
 
@@ -86,65 +89,70 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 			cout << "RAPIDFITROOT defined as: " << path << endl;
 
 			fullFileName = path+"/pdfs/configdata/"+fileName ;
-		} else if( !input_file.fail() )
-		{
-			fullFileName = fileName;
-		} else {
-			cerr << "Shouldn't end up Here in the code!" << endl;
-			exit(-892);
-		}
 
+			input_file.open( fullFileName.c_str(), ifstream::in );
+			input_file.close();
+		}
+		bool elsewhere_fail = input_file.fail();
+
+		if( elsewhere_fail && !local_fail ) fullFileName = fileName;
+
+		if( elsewhere_fail && local_fail )
+		{
+			cerr << "\n\tFileName:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
+			exit(-89);
+		}
 
 		//Read in histo
 		TFile* f =  TFile::Open(fullFileName.c_str());
 		histo = new TH3D(  *(    (TH3D*)f ->Get("histo")      )     ); //(fileName.c_str())));
 
-	xaxis = histo->GetXaxis();
-        xmin = xaxis->GetXmin();
-        xmax = xaxis->GetXmax();
-        nxbins = histo->GetNbinsX();
-        deltax = (xmax-xmin)/nxbins;
+		xaxis = histo->GetXaxis();
+		xmin = xaxis->GetXmin();
+		xmax = xaxis->GetXmax();
+		nxbins = histo->GetNbinsX();
+		deltax = (xmax-xmin)/nxbins;
 
-        yaxis = histo->GetYaxis();
-        ymin = yaxis->GetXmin();
-        ymax = yaxis->GetXmax();
-        nybins = histo->GetNbinsY();
-        deltay = (ymax-ymin)/nybins;
+		yaxis = histo->GetYaxis();
+		ymin = yaxis->GetXmin();
+		ymax = yaxis->GetXmax();
+		nybins = histo->GetNbinsY();
+		deltay = (ymax-ymin)/nybins;
 
-        zaxis = histo->GetZaxis();
-        zmin = zaxis->GetXmin();
-        zmax = zaxis->GetXmax();
-        nzbins = histo->GetNbinsZ();
-        deltaz = (zmax-zmin)/nzbins;
+		zaxis = histo->GetZaxis();
+		zmin = zaxis->GetXmin();
+		zmax = zaxis->GetXmax();
+		nzbins = histo->GetNbinsZ();
+		deltaz = (zmax-zmin)/nzbins;
 
-	//method for Checking whether histogram is sensible
+		//method for Checking whether histogram is sensible
 
-	total_num_entries = histo->GetEntries();
-	int total_num_bins = nxbins * nybins * nzbins;
-	int sum = 0;
+		total_num_entries = histo->GetEntries();
+		int total_num_bins = nxbins * nybins * nzbins;
+		int sum = 0;
 
-	vector<int> zero_bins;
+		vector<int> zero_bins;
 
-	//loop over each bin in histogram and print out how many zero bins there are
-	for (int i=1; i < nxbins+1; i++){
-		for (int j=1; j < nybins+1; j++){
-			for (int k=1; k < nzbins+1; k++){
+		//loop over each bin in histogram and print out how many zero bins there are
+		for (int i=1; i < nxbins+1; i++){
+			for (int j=1; j < nybins+1; j++){
+				for (int k=1; k < nzbins+1; k++){
 
-				double bin_content = histo->GetBinContent(i,j,k);
-				//cout << "Bin content: " << bin_content << endl;
-				if(bin_content<=0) { zero_bins.push_back(1);}
-				//cout << " Zero bins " << zero_bins.size() << endl;}
-				else if (bin_content>0){
-				sum += (int) bin_content;}
-}}}
+					double bin_content = histo->GetBinContent(i,j,k);
+					//cout << "Bin content: " << bin_content << endl;
+					if(bin_content<=0) { zero_bins.push_back(1);}
+					//cout << " Zero bins " << zero_bins.size() << endl;}
+					else if (bin_content>0){
+						sum += (int) bin_content;}
+			}}}
 
 
-	int average_bin_content = sum / total_num_bins;
+		int average_bin_content = sum / total_num_bins;
 
-	cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
-	cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
-	cout << endl;
-	cout << endl;
+		cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
+		cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
+		cout << endl;
+		cout << endl;
 
 		if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() ){
 			cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
@@ -152,7 +160,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular(PDFConfigurator config ) :
 		}
 
 		cout << "Finishing processing histo" << endl;
-	}
+}
 
 }
 
@@ -182,6 +190,16 @@ void LongLivedBkg_3Dangular::MakePrototypes()
 	valid = true;
 }
 
+LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( const LongLivedBkg_3Dangular& input ) : BasePDF( (BasePDF) input ),
+	f_LL1Name(input.f_LL1Name), tauLL1Name(input.tauLL1Name), tauLL2Name(input.tauLL2Name), timeResLL1FracName(input.timeResLL1FracName), sigmaLL1Name(input.sigmaLL1Name),
+	sigmaLL2Name(input.sigmaLL2Name), timeName(input.timeName), timeconstName(input.timeconstName), tauLL1(input.tauLL1), tauLL2(input.tauLL2), f_LL1(input.f_LL1),
+	sigmaLL(input.sigmaLL), sigmaLL1(input.sigmaLL1), sigmaLL2(input.sigmaLL2), timeResLL1Frac(input.timeResLL1Frac), tlow(input.tlow), thigh(input.thigh), time(input.time),
+	histo(input.histo), xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), xmin(input.xmin),
+	xmax(input.xmax), ymin(input.ymin), ymax(input.ymax), zmin(input.zmin), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz),
+	total_num_entries(input.total_num_entries), useFlatAngularDistribution(input.useFlatAngularDistribution),
+	cosThetaName(input.cosThetaName), phiName(input.phiName), cosPsiName(input.cosPsiName), cosTheta(input.cosTheta), phi(input.phi), cosPsi(input.cosPsi)
+{
+}
 
 //................................................................
 //Destructor
@@ -191,13 +209,13 @@ LongLivedBkg_3Dangular::~LongLivedBkg_3Dangular()
 
 bool LongLivedBkg_3Dangular::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-        bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
-		f_LL1       = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
-        tauLL1      = allParameters.GetPhysicsParameter( tauLL1Name )->GetValue();
-        tauLL2      = allParameters.GetPhysicsParameter( tauLL2Name )->GetValue();
-		timeResLL1Frac = allParameters.GetPhysicsParameter( timeResLL1FracName )->GetValue();
-        sigmaLL1    = allParameters.GetPhysicsParameter( sigmaLL1Name )->GetValue();
-        sigmaLL2    = allParameters.GetPhysicsParameter( sigmaLL2Name )->GetValue();
+	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
+	f_LL1       = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
+	tauLL1      = allParameters.GetPhysicsParameter( tauLL1Name )->GetValue();
+	tauLL2      = allParameters.GetPhysicsParameter( tauLL2Name )->GetValue();
+	timeResLL1Frac = allParameters.GetPhysicsParameter( timeResLL1FracName )->GetValue();
+	sigmaLL1    = allParameters.GetPhysicsParameter( sigmaLL1Name )->GetValue();
+	sigmaLL2    = allParameters.GetPhysicsParameter( sigmaLL2Name )->GetValue();
 
 	return isOK;
 }
@@ -282,7 +300,7 @@ double LongLivedBkg_3Dangular::Normalisation(DataPoint * measurement, PhaseSpace
 	}
 	else
 	{
-	    tlow = timeBound->GetMinimum();
+		tlow = timeBound->GetMinimum();
 		thigh = timeBound->GetMaximum();
 	}
 

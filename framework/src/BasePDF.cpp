@@ -15,13 +15,15 @@
 #include <iostream>
 
 //Constructor
-BasePDF::BasePDF() : cachedIntegral(-1.0), cacheValid(false), allParameters(), allObservables(), valid(false), observables()
+BasePDF::BasePDF() : cachedIntegral(-1.0), cacheValid(false), allParameters(), allObservables(), valid(false), observables(),
+	cached_files(), stored_ID(), hasCachedMCGenerator(false), seed_function(), seed_num(), PDFName("Base")
 {
 }
 
 //Destructor
 BasePDF::~BasePDF()
 {
+	Remove_Cache();
 }
 
 //Indicate whether the function has been set up correctly
@@ -68,7 +70,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	else
 	{
 		//If the PDF normalisation does not depend on the DataPoint, cache the value to save time
-		cachedIntegral = Normalisation(NewBoundary);
+		cachedIntegral = this->Normalisation(NewBoundary);
 
 		//Check the cache is valid
 		if ( cachedIntegral > 0.0 )
@@ -79,7 +81,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		else
 		{
 			//Integral must depend on the DataPoint
-			return Normalisation(NewDataPoint, NewBoundary);
+			return this->Normalisation(NewDataPoint, NewBoundary);
 		}
 	}
 	return -1.;
@@ -155,6 +157,11 @@ vector<string> BasePDF::GetPrototypeParameterSet()
 	return allParameters.GetAllNames();
 }
 
+ParameterSet* BasePDF::GetActualParameterSet()
+{
+	return &allParameters;
+}
+
 //Return a list of parameters not to be integrated
 vector<string> BasePDF::GetDoNotIntegrateList()
 {
@@ -165,5 +172,109 @@ vector<string> BasePDF::GetDoNotIntegrateList()
 // Update integral cache
 void BasePDF::UpdateIntegralCache()
 {
+}
+
+
+//  Get a pointer to the seed function
+//  Using a pointer so we have one seed per normal study
+TRandom3 * BasePDF::GetRandomFunction()
+{
+	if( seed_function.empty() )
+	{
+		//				cout << "Seed not found in PDF, generating TRandom3(0) random function." << endl;
+		seed_function.push_back( new TRandom3(0) );
+	}
+	return seed_function.back();
+}
+
+//  Set the Random Generator to be some externally defined instance
+void BasePDF::SetRandomFunction( TRandom3 * new_function )
+{
+	while( !seed_function.empty() ){  seed_function.pop_back();  }  //Get rid of old seed(s)
+	seed_function.push_back(  new_function  );       //Insert reference to new seed
+}
+
+//  Seed the Random Number Generator correctly
+void BasePDF::SetRandomFunction( int new_seed )
+{
+	while( !seed_function.empty() ){  seed_function.pop_back();  }    //Get rid of old seed(s)
+
+	seed_function.push_back(  new TRandom3( unsigned(new_seed) ) ); //Insert reference to new seed
+
+	while( !seed_num.empty() ){  seed_num.pop_back();  }  //  Get rid of old seed(s)
+
+	seed_num.push_back( new_seed );             //  Store the seed for internal reference
+}
+
+//  Return the numerical seed
+int BasePDF::GetSeedNum()
+{
+	if( !seed_num.empty() )return seed_num.back();
+	else return 0;
+}
+
+//	Set the ID of the PDF (Used internally as a way of identifiying this PDF
+void BasePDF::SET_ID( TString id_string )
+{
+	stored_ID = id_string.Data();
+}
+void BasePDF::SET_ID( string id_string )
+{
+	stored_ID = id_string;
+}
+
+//	Get the ID of this particular PDF
+string BasePDF::GET_ID()
+{
+	return stored_ID;
+}
+
+//	Set the Status of a cache for the MC generator associated with this PDF
+void BasePDF::SetMCCacheStatus( bool newStatus)	
+{
+	if( (newStatus == false) && hasCachedMCGenerator )
+	{
+		//cout << GET_Name() << ":\tRemoving Cache" << endl;
+		Remove_Cache();
+	}
+	hasCachedMCGenerator = newStatus;
+}
+
+void BasePDF::Remove_Cache( bool leave_on_disk )
+{
+	while( !cached_files.empty() )
+	{
+		if( !leave_on_disk ) remove ( cached_files.back().c_str() );
+		cached_files.pop_back();
+	}
+}
+
+//	Get the Status of the MC generator for this PDF
+bool BasePDF::GetMCCacheStatus()
+{
+	return hasCachedMCGenerator;
+}
+
+//	Add an on-disk object which exists for the lifetime of this PDF
+void BasePDF::AddCacheObject( TString obj_name )
+{
+	cached_files.push_back( obj_name.Data() );
+}
+void BasePDF::AddCacheObject( string obj_name )
+{
+	cached_files.push_back( obj_name );
+}
+
+string BasePDF::GetName()
+{
+	return PDFName;
+}
+
+void BasePDF::SetName( string input )
+{
+	PDFName = input;
+	TString Random;	Random+=this->GetRandomFunction()->Rndm()*1000;
+	string new_name = input+"_"+Random.Data();
+	this->SET_ID( new_name );
 }
 

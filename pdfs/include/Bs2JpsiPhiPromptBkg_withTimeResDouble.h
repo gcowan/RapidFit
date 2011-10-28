@@ -9,17 +9,12 @@
 #ifndef Bs2JpsiPhiPromptBkg_withTimeResDouble_H
 #define Bs2JpsiPhiPromptBkg_withTimeResDouble_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class Bs2JpsiPhiPromptBkg_withTimeResDouble : public BasePDF
 {
 	public:
-		Bs2JpsiPhiPromptBkg_withTimeResDouble(PDFConfigurator);
+		Bs2JpsiPhiPromptBkg_withTimeResDouble( PDFConfigurator* );
 		~Bs2JpsiPhiPromptBkg_withTimeResDouble();
 
 		//Calculate the PDF value

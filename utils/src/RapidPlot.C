@@ -40,19 +40,18 @@ using namespace::std;
 int main( int argc, char* argv[] )
 {
 	cout << endl;
-	cout << "        8888888b.                 d8b     888   8888888b. 888        888"<<endl;
-	cout << "        888   Y88b                Y8P     888   888   Y88b888        888"<<endl;
-	cout << "        888    888                        888   888    888888        888"<<endl;
-	cout << "        888   d88P 8888b. 88888b. 888 .d88888   888   d88P888 .d88b. 888888"<<endl;
-	cout << "        8888888P\"     \"88b888 \"88b888d88\" 888   8888888P\" 888d88\"\"88b888"<<endl;
-	cout << "        888 T88b  .d888888888  888888888  888   888       888888  888888"<<endl;
-	cout << "        888  T88b 888  888888 d88P888Y88b 888   888       888Y88..88PY88b."<<endl;
-	cout << "        888   T88b\"Y88888888888P\" 888 \"Y88888   888       888 \"Y88P\"  \"Y888"<<endl;
-	cout << "                          888"<<endl;
-	cout << "                          888"<<endl;
-	cout << "                          888"<<endl;
-	cout << endl;
-
+	cout << "\t8888888b.                    d8b      888      8888888b.  888          888    " << endl;
+	cout << "\t888   Y88b                   Y8P      888      888   Y88b 888          888    " << endl;
+	cout << "\t888    888                            888      888    888 888          888    " << endl;
+	cout << "\t888   d88P  8888b.  88888b.  888  .d88888      888   d88P 888  .d88b.  888888 " << endl;
+	cout << "\t8888888P\"      \"88b 888 \"88b 888 d88\" 888      8888888P\"  888 d88\"\"88b 888    " << endl;
+	cout << "\t888 T88b   .d888888 888  888 888 888  888      888        888 888  888 888    " << endl;
+	cout << "\t888  T88b  888  888 888 d88P 888 Y88b 888      888        888 Y88..88P Y88b.  " << endl;
+	cout << "\t888   T88b \"Y888888 88888P\"  888  \"Y88888      888        888  \"Y88P\"   \"Y888 " << endl;
+	cout << "\t                    888                                                       " << endl;
+	cout << "\t                    888                                                       " << endl;
+	cout << "\t                    888                                                       " << endl;
+	cout << endl << endl;
 	cout << "Usage:" << endl;
 	cout << "\t" << argv[0] << "\tSomeFile.root\t" << "phys_param1\tphys_param2\toutput_directory" << endl;
 	cout << endl << "\teg:\t" << argv[0] << "\tLLcontourData.root\tdeltaGamma\tPhi_s\toutputdir"<<endl;
@@ -292,8 +291,8 @@ int main( int argc, char* argv[] )
 	{
 		//	FC Plot
 		cout << "FOUND TOYS IN FILE, PLOTTING FC" <<endl;
-                TString FC_Tuple_File( outputdir+ "/FC_Tuple.root" );
-                new_FC_Output = new TFile( FC_Tuple_File, "RECREATE" );
+		TString FC_Tuple_File( outputdir+ "/FC_Tuple.root" );
+		new_FC_Output = new TFile( FC_Tuple_File, "RECREATE" );
 
 		FC_Plot = FC_TOYS( allresults, Fit_Cut_String, param1string, param2string, NLL, Fit_Cut, Global_Best_NLL, FC_Output, Double_Tolerance, rand_gen );
 		FC_Output->Write();

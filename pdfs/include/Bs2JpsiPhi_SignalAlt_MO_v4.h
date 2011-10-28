@@ -10,12 +10,7 @@
 #ifndef Bs2JpsiPhi_SignalAlt_MO_v4_H
 #define Bs2JpsiPhi_SignalAlt_MO_v4_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 #include "Bs2JpsiPhi_SignalAlt_BaseClass_v4.h"
 #include "RooComplex.h"
@@ -25,7 +20,7 @@
 class Bs2JpsiPhi_SignalAlt_MO_v4 : /*public BasePDF,*/  public Bs2JpsiPhi_SignalAlt_BaseClass_v4
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_MO_v4(PDFConfigurator);
+		Bs2JpsiPhi_SignalAlt_MO_v4( PDFConfigurator* );
 		~Bs2JpsiPhi_SignalAlt_MO_v4();
 
 		//Mandatory method to evaluate the PDF value:
@@ -46,9 +41,7 @@ class Bs2JpsiPhi_SignalAlt_MO_v4 : /*public BasePDF,*/  public Bs2JpsiPhi_Signal
 		void MakePrototypes();
 	
 		double normalisationCacheUntagged ;
-	
 
-		
 };
 
 #endif

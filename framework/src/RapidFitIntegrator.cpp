@@ -7,13 +7,15 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-8
- */
+  */
 
+//	ROOT Headers
+#include "RVersion.h"
 //	RapidFit Headers
 #include "RapidFitIntegrator.h"
 #include "StringProcessing.h"
 #include "StatisticsFunctions.h"
-#include "RVersion.h"
+#include "ClassLookUp.h"
 //	System Headers
 #include <iostream>
 #include <iomanip>
@@ -30,12 +32,12 @@ using namespace std;
 const double INTEGRAL_PRECISION_THRESHOLD = 0.01;
 
 //Default constructor
-RapidFitIntegrator::RapidFitIntegrator() : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(), fastIntegrator(), functionToWrap(), multiDimensionIntegrator(), oneDimensionIntegrator(), functionCanIntegrate(), functionCanProject(), haveTestedIntegral(), forceNumerical(), cacheSetUp(), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals()
+RapidFitIntegrator::RapidFitIntegrator() : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(false), fastIntegrator(NULL), functionToWrap(NULL), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(), forceNumerical(), cacheSetUp(), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals(), loud(true)
 {
 }
 
 //Constructor with correct argument
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(), fastIntegrator(), functionToWrap(InputFunction), multiDimensionIntegrator(), oneDimensionIntegrator(), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), forceNumerical(ForceNumerical), cacheSetUp(false), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals()
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), forceNumerical(ForceNumerical), cacheSetUp(false), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals(), loud(true)
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 	multiDimensionIntegrator->SetAbsTolerance( 1E-9 );
@@ -44,10 +46,33 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerica
 	oneDimensionIntegrator = new IntegratorOneDim(type);
 }
 
+RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : ratioOfIntegrals( input.ratioOfIntegrals ), cumulativeError( input.cumulativeError ), numberCalls( input.numberCalls ),
+	testFast( input.testFast ), fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
+	functionCanIntegrate( input.functionCanIntegrate ), functionCanProject( input.functionCanProject ), haveTestedIntegral( input.haveTestedIntegral ), forceNumerical( input.forceNumerical ),
+	cacheSetUp( input.cacheSetUp ), discreteNames( input.discreteNames ), continuousNames( input.continuousNames ), discreteValues( input.discreteValues ),
+	discreteCombinations( input.discreteCombinations ), cachedIntegrals( input.cachedIntegrals ), loud( false )
+{
+	//	We don't own the PDF so no need to duplicate it as we have to be told which one to use
+	//if( input.functionToWrap != NULL ) functionToWrap = ClassLookUp::CopyPDF( input.functionToWrap );
+
+	//	Only Construct the Integrators if they are required
+	if( input.fastIntegrator != NULL ) fastIntegrator = new FoamIntegrator( *(input.fastIntegrator) );
+	if( input.multiDimensionIntegrator != NULL ) 
+	{
+		multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
+		multiDimensionIntegrator->SetAbsTolerance( 1E-9 );
+	}
+	if( input.oneDimensionIntegrator != NULL )
+	{
+		ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
+		oneDimensionIntegrator = new IntegratorOneDim( type );
+	}
+}
+
 //	Don't want the projections to be insanely accurate
 void RapidFitIntegrator::ProjectionSettings()
 {
-	//	These functions only exist with ROOT > 5.28 I think, at least they exist in 5.28/29
+	//	These functions only exist with ROOT > 5.27 I think, at least they exist in 5.28/29
 	#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
 		multiDimensionIntegrator->SetAbsTolerance( 1E-5 );	//	Absolute error for things such as plots
 		multiDimensionIntegrator->SetRelTolerance( 1E-4 );
@@ -58,14 +83,20 @@ void RapidFitIntegrator::ProjectionSettings()
 //Destructor
 RapidFitIntegrator::~RapidFitIntegrator()
 {
-	delete multiDimensionIntegrator;
-	delete oneDimensionIntegrator;
+	if( multiDimensionIntegrator != NULL ) delete multiDimensionIntegrator;
+	if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
+	if( fastIntegrator != NULL ) delete fastIntegrator;
 }
 
 //Return the integral over all observables
 double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, bool UseCache )
 {
-	
+	if( functionToWrap == NULL )
+	{
+		  cerr << "WHAT ARE YOU DOING TO ME, YOUR TRYING TO INTEGRATE OVER A NULL OBJECT!!!" << endl;
+		  exit(-69);
+	}
+
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 
@@ -104,7 +135,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 			if ( true /*abs( numericalIntegral - testIntegral) / testIntegral < INTEGRAL_PRECISION_THRESHOLD*/ )
 			{
 				//Trust the function's integration
-				cout << "Integration  Test: numerical : analytical   " << numericalIntegral << " :  " << testIntegral <<  "\t\t\tUsing ANALYTICAL in all cases" << endl;
+				if( loud == true ) cout << "Integration  Test: numerical : analytical   " << numericalIntegral << " :  " << testIntegral <<  "\t\t\tUsing ANALYTICAL in all cases" << endl;
 				ratioOfIntegrals = 1.;
 				functionCanIntegrate = true;
 				return testIntegral;
@@ -132,7 +163,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 					{
 						cerr << "Integral caching error: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
 						throw( 13 );
-//						exit(1);
+						//						exit(1);
 					}
 				}
 
@@ -162,7 +193,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 				{
 					cerr << "Integral caching error: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
 					throw( 13 );
-//					exit(1);
+					//					exit(1);
 				}
 			}
 
@@ -180,6 +211,12 @@ double RapidFitIntegrator::GetRatioOfIntegrals()
 IPDF * RapidFitIntegrator::GetPDF()
 {
 	return functionToWrap;
+}
+
+void RapidFitIntegrator::SetPDF( IPDF* input )
+{
+	//if( functionToWrap != NULL ){ delete functionToWrap; }
+	functionToWrap = input;
 }
 
 //Actually perform the numerical integration
@@ -285,7 +322,7 @@ void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
 			cout << "For combination: ";
 			for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; --discreteIndex )
 			{
-				cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
+			cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
 			}
 			cout << "get integral: " << integralToCache << endl;
 			*/

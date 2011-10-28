@@ -101,6 +101,7 @@ bool RootFileDataSet::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceB
 	bool compatible = true;
 
 	vector<string> allNames = TestBoundary->GetAllNames();
+	string lastName;
 	for ( unsigned short int observableIndex = 0; observableIndex < allNames.size(); ++observableIndex )
 	{
 		bool found = false;
@@ -110,6 +111,7 @@ bool RootFileDataSet::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceB
 		while ( ( observableLeaf = (TLeaf*)observableIterator() ) )
 		{
 			string leafName = observableLeaf->GetName();
+			lastName = leafName;
 			if ( leafName == allNames[observableIndex] )
 			{
 				found = true;
@@ -121,11 +123,12 @@ bool RootFileDataSet::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceB
 		if ( !found )
 		{
 			compatible = false;
+			cerr << "\n" << allNames[observableIndex] << "\tNOT FOUND in Ntuple!!\n" << endl;
 			break;
 		}
 	}
 
-	return compatible;
+	return output;
 }
 
 //Return a data point from the NTuple

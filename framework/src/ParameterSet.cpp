@@ -89,6 +89,7 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter( pair<string,int>* wanted_p
 	}
 	if( wanted_param->second == -1 ){
 		cerr << "PhysicsParameter " << wanted_param->first << " not found" <<endl;
+		exit(-3);
 	}else{
 		return &allParameters[unsigned(wanted_param->second)];}
 	throw(-20);
@@ -102,7 +103,7 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter(string Name)
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		cerr << "PhysicsParameter " << Name << " not found" << endl;
+		cerr << "PhysicsParameter " << Name << " not found(1)" << endl;
 		throw(-20);
 		//return new PhysicsParameter( Name, 0.0, 0.0, 0.0, "Error", "NameNotFoundError");
 	}
@@ -120,7 +121,7 @@ PhysicsParameter* ParameterSet::GetPhysicsParameter( ObservableRef& object )
 	} else {
 		return &allParameters[ (unsigned) object.GetIndex() ];
 	}
-	cerr << "PhysicsParameter " << object.Name().c_str() << " not found" << endl;
+	cerr << "PhysicsParameter " << object.Name().c_str() << " not found(2)" << endl;
 	throw(-20);
 }
 
@@ -131,7 +132,7 @@ bool ParameterSet::SetPhysicsParameter( string Name, PhysicsParameter * NewPhysi
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
         if ( nameIndex == -1 )
 	{
-		cerr << "PhysicsParameter " << Name << " not found" << endl;
+		cerr << "PhysicsParameter " << Name << " not found(3)" << endl;
 		//exit(1);
 		return false;
 	}
@@ -167,6 +168,26 @@ bool ParameterSet::SetPhysicsParameters( ParameterSet * NewParameterSet )
 		else
 		{
 			allParameters[nameIndex] = *inputParameter;
+		}
+	}
+
+	return true;
+}
+
+//Set all physics parameters
+bool ParameterSet::AddPhysicsParameters( ParameterSet * NewParameterSet )
+{
+	for (unsigned short int nameIndex = 0; nameIndex < NewParameterSet->GetAllNames().size(); nameIndex++)
+	{
+		//PhysicsParameter * inputParameter = NewParameterSet->GetPhysicsParameter( NewParameterSet->GetAllNames()[nameIndex] );
+		int paramIndex = StringProcessing::VectorContains( &allNames, &(NewParameterSet->GetAllNames()[nameIndex]) );
+		if( paramIndex == -1 )
+		{
+			allNames.push_back( NewParameterSet->GetAllNames()[nameIndex] );
+			allParameters.push_back( *(NewParameterSet->GetPhysicsParameter( NewParameterSet->GetAllNames()[nameIndex] )) );
+		}
+		else {
+			allParameters[(unsigned)paramIndex] = *(NewParameterSet->GetPhysicsParameter( NewParameterSet->GetAllNames()[nameIndex] ));
 		}
 	}
 

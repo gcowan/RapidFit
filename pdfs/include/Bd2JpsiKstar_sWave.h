@@ -9,16 +9,12 @@
 #ifndef Bd2JpsiKstar_sWave_H
 #define Bd2JpsiKstar_sWave_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#endif
 
 class Bd2JpsiKstar_sWave : public BasePDF
 {
 	public:
-		Bd2JpsiKstar_sWave();
+		Bd2JpsiKstar_sWave( PDFConfigurator* );
 		~Bd2JpsiKstar_sWave();
 
 		//Calculate the PDF value

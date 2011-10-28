@@ -43,7 +43,7 @@ ResultParameter * ResultParameterSet::GetResultParameter( int number )
 {
 	if( number < (int)allNames.size() )
 	{
-		return &allParameters[ number ];
+		return &allParameters[ (unsigned)number ];
 	} else {
 		return new ResultParameter( "DummyResult", 0.0, 0.0, 0.0, 0.0, 0.0, 0., "Error", "NameNotFoundError");
 	}

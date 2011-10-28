@@ -14,20 +14,22 @@
 #include "TMath.h"
 #include "RooMath.h"
 
+PDF_CREATOR( Bs2JpsiPhiLongLivedBkg_II );
+
 //Constructor
-Bs2JpsiPhiLongLivedBkg_II::Bs2JpsiPhiLongLivedBkg_II() :
+Bs2JpsiPhiLongLivedBkg_II::Bs2JpsiPhiLongLivedBkg_II( PDFConfigurator* configurator ) :
 
 	// Physics parameters
-	  tauLL1Name	( "tau_LL1_II" )
-	, tauLL2Name	( "tau_LL2_II" )
-        , f_LL1Name     ( "f_LL1_II" )
-	, sigmaLL1Name	( "sigma_LL1" )
-	, sigmaLL2Name	( "sigma_LL2" )
-        , timeResLL1FracName( "timeResLL1Frac" )
+	  tauLL1Name	( configurator->getName("tau_LL1_II") )
+	, tauLL2Name	( configurator->getName("tau_LL2_II") )
+        , f_LL1Name     ( configurator->getName("f_LL1_II") )
+	, sigmaLL1Name	( configurator->getName("sigma_LL1") )
+	, sigmaLL2Name	( configurator->getName("sigma_LL2") )
+        , timeResLL1FracName( configurator->getName("timeResLL1Frac") )
 
         // Observables
-        , timeName      ( "time" )
-	, constraint_timeName( "time" )
+        , timeName      ( configurator->getName("time") )
+	, constraint_timeName( configurator->getName("time") )
 
 	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time()
 {

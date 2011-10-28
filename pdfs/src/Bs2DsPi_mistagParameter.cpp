@@ -13,24 +13,26 @@
 #include "math.h"
 #include "TMath.h"
 
-//Constructor
-Bs2DsPi_mistagParameter::Bs2DsPi_mistagParameter() : 
+PDF_CREATOR( Bs2DsPi_mistagParameter );
 
-// Physics parameters
-	  gammaName     ( "gamma" )
-	, deltaGammaName( "deltaGamma" )
-	, deltaMName    ( "deltaM")
-    , mistagName	( "mistag" )
-    , timeresName	( "timeresDsPi" )
+//Constructor
+Bs2DsPi_mistagParameter::Bs2DsPi_mistagParameter( PDFConfigurator* configurator ) : 
+
+	// Physics parameters
+	gammaName     ( configurator->getName("gamma") )
+	, deltaGammaName( configurator->getName("deltaGamma") )
+	, deltaMName    ( configurator->getName("deltaM") )
+	, mistagName	( configurator->getName("mistag") )
+	, timeresName	( configurator->getName("timeresDsPi") )
 
 	// Observables
-	, timeName	( "time" )
-	, tagName	( "tag" )
+	, timeName	( configurator->getName("time") )
+	, tagName	( configurator->getName("tag") )
 
-	, timeconstraintName( "time" )
+	, timeconstraintName( configurator->getName("time") )
 
 	//objects
-	,gamma(), deltaGamma(), deltaM(), mistag(), timeRes(), time(), tag(), tlow(), thigh()
+,gamma(), deltaGamma(), deltaM(), mistag(), timeRes(), time(), tag(), tlow(), thigh()
 {
 	MakePrototypes();
 }
@@ -41,7 +43,7 @@ void Bs2DsPi_mistagParameter::MakePrototypes()
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
 	allObservables.push_back( tagName );
-   
+
 	//Make the parameter set
 	vector<string> parameterNames;
 	parameterNames.push_back( gammaName );
@@ -75,9 +77,9 @@ double Bs2DsPi_mistagParameter::Evaluate(DataPoint * measurement)
 	// Get physics parameters and observables
 	getPhysicsParameters( );
 	getObservables( measurement ) ;
-				
+
 	double D  = 1.0 - 2.0 * mistag;
-  	
+
 	return (0.25 * ( expL() + expH() + tag * 2.0 * expCos() * D ) ); //Normalisation from dunietz
 }
 
@@ -104,7 +106,7 @@ double Bs2DsPi_mistagParameter::Normalisation(DataPoint * measurement, PhaseSpac
 		thigh = timeBound->GetMaximum();
 		if( thigh <  tlow ) return -999.0 ;
 	}
-	
+
 	double D  = 1.0 - 2.0 * mistag;
 	return (0.25 * ( expHint() + expLint() + tag * 2.0 * expCosInt() * D ) ); //Normalisation from dunietz
 }
@@ -125,11 +127,11 @@ void Bs2DsPi_mistagParameter::getPhysicsParameters( )
 {
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
-    deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
+	deltaGamma = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 	deltaM     = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 	mistag     = allParameters.GetPhysicsParameter( mistagName )->GetValue();
 	timeRes    = allParameters.GetPhysicsParameter( timeresName )->GetValue();
-	
+
 	return;
 }
 
@@ -141,7 +143,7 @@ void Bs2DsPi_mistagParameter::getObservables( DataPoint* measurement)
 	// Observables
 	time = measurement->GetObservable( timeName )->GetValue();
 	tag =  (int) measurement->GetObservable( tagName )->GetValue();
-	
+
 	return;
 }
 

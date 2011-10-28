@@ -10,6 +10,7 @@ class MakeFoam
 	public:
 		MakeFoam();
 		MakeFoam( IPDF*, PhaseSpaceBoundary*, DataPoint* );
+		MakeFoam( const MakeFoam& );
 		~MakeFoam();
 
 		void Debug();
@@ -17,7 +18,6 @@ class MakeFoam
 
 	private:
 		//	Uncopyable!
-		MakeFoam ( const MakeFoam& );
 		MakeFoam& operator = ( const MakeFoam& );
 
 		vector<PhaseSpaceBoundary> finishedCells;

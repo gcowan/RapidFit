@@ -11,7 +11,6 @@ now = datetime.datetime.now()
 #	This script is intended to be run as 'ganga script.py', it will submit itself and the relative configuration as a pyROOT job
 is_ganga = "Ganga.Core" in sys.modules
 
-
 #	USAGE:
 #
 #	ganga script_name.py xml_for_job.xml file1.root file2.root	to run on most backends
@@ -23,16 +22,11 @@ is_ganga = "Ganga.Core" in sys.modules
 
 job_name = "TOY-1D"
 
-#	Semi-Frequently changed script veriables:
-MC_TOTAL_STEPS = 2					#	Total unique subsets in file
-MC_FILE_STEP = 10000				#	Size of Step to take in file
-MC_FIT_STEP = 5000				#	Step size between subset selection
-
 #	All the possible output files right now
 #
 #			THIS HAS TO BE CHANGED BASED ON THE OUTPUT FROM YOUR SCAN
 
-output_file_list = [ 'MC_Study.root' ]
+output_file_list = [ 'LLScanData_newformat.root' ]
 
 param_name="deltaGamma"
 X_min=-2.

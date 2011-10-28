@@ -20,26 +20,27 @@
 #include "TAxis.h"
 #include "TH1.h"
 
+PDF_CREATOR( LongLivedBkg );
 
 //.....................................................
 //Constructor
-LongLivedBkg::LongLivedBkg(PDFConfigurator config ) :
+LongLivedBkg::LongLivedBkg(PDFConfigurator* configurator ) :
 
 	// Physics parameters
-	  f_LL1Name		( config.getName("f_LL1")  )
-	, tauLL1Name		( config.getName("tau_LL1") )
-	, tauLL2Name		( config.getName("tau_LL2") )
+	  f_LL1Name		( configurator->getName("f_LL1")  )
+	, tauLL1Name		( configurator->getName("tau_LL1") )
+	, tauLL2Name		( configurator->getName("tau_LL2") )
     //Detector parameters
-	, timeResLL1FracName	( config.getName("timeResLL1Frac") )
-	, sigmaLL1Name		( config.getName("sigma_LL1") )
-	, sigmaLL2Name		( config.getName("sigma_LL2") )
+	, timeResLL1FracName	( configurator->getName("timeResLL1Frac") )
+	, sigmaLL1Name		( configurator->getName("sigma_LL1") )
+	, sigmaLL2Name		( configurator->getName("sigma_LL2") )
 	// Observables
-	, timeName		( config.getName("time") )
-	//, cosThetaName		( config.getName("cosTheta") )
-	//, phiName		( config.getName("phi") )
-	//, cosPsiName		( config.getName("cosPsi") )
+	, timeName		( configurator->getName("time") )
+	//, cosThetaName		( configurator->getName("cosTheta") )
+	//, phiName		( configurator->getName("phi") )
+	//, cosPsiName		( configurator->getName("cosPsi") )
 	//Other things to be initialised
-	, timeconstName		( config.getName("time") )
+	, timeconstName		( configurator->getName("time") )
 	, _useTimeAcceptance(false)
 
 	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(),
@@ -52,18 +53,18 @@ LongLivedBkg::LongLivedBkg(PDFConfigurator config ) :
 	MakePrototypes();
 
 	//Find name of histogram needed to define 3-D angular distribution
-	string fileName = config.getConfigurationValue( "AngularDistributionHistogram" ) ;
+	string fileName = configurator->getConfigurationValue( "AngularDistributionHistogram" ) ;
 
 	//Initialise depending upon whether configuration parameter was found
 	useFlatAngularDistribution = true ;
 
 	//...........................................
         // Configure to use time acceptance machinery 
-        _useTimeAcceptance = config.isTrue( "UseTimeAcceptance" ) ;
+        _useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 
         if( _useTimeAcceptance ) {
-                        timeAcc = new SlicedAcceptance( "File" , config.getConfigurationValue( "TimeAcceptanceFile" ) ) ;
-                        cout << "LongLivedBkg:: Constructing timeAcc: using file: " << config.getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
+                        timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
+                        cout << "LongLivedBkg:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
         }
 
 }
@@ -94,6 +95,16 @@ void LongLivedBkg::MakePrototypes()
 	valid = true;
 }
 
+LongLivedBkg::LongLivedBkg( const LongLivedBkg& input ) : BasePDF( (BasePDF) input ),
+	f_LL1Name(input.f_LL1Name), tauLL1Name(input.tauLL1Name), tauLL2Name(input.tauLL2Name), timeResLL1FracName(input.timeResLL1FracName), sigmaLL1Name(input.sigmaLL1Name),
+	sigmaLL2Name(input.sigmaLL2Name), timeName(input.timeName), timeconstName(input.timeconstName), tauLL1(input.tauLL1), tauLL2(input.tauLL2), f_LL1(input.f_LL1),
+	sigmaLL(input.sigmaLL), sigmaLL1(input.sigmaLL1), sigmaLL2(input.sigmaLL2), timeResLL1Frac(input.timeResLL1Frac), tlow(input.tlow), thigh(input.thigh), time(input.time),
+	histo(input.histo), xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), xmin(input.xmin),
+	xmax(input.xmax), ymin(input.ymin), ymax(input.ymax), zmin(input.zmin), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz),
+	total_num_entries(input.total_num_entries), useFlatAngularDistribution(input.useFlatAngularDistribution), _useTimeAcceptance(input._useTimeAcceptance), timeAcc(NULL)
+{
+	timeAcc = new SlicedAcceptance( *(input.timeAcc) );
+}
 
 //................................................................
 //Destructor

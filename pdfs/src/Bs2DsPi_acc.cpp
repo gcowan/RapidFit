@@ -14,28 +14,30 @@
 #include "TMath.h"
 #include "RooMath.h"
 
+PDF_CREATOR( Bs2DsPi_acc );
+
 //Constructor
-Bs2DsPi_acc::Bs2DsPi_acc() : 
+Bs2DsPi_acc::Bs2DsPi_acc( PDFConfigurator* configurator ) : 
 
-// Physics parameters
-	  gammaName     ( "gamma" )
-	, deltaGammaName ( "deltaGamma" )
-	, deltaMName    ( "deltaM")
-    , mistagName	( "mistag" )
-    , timeresName	( "timeresDsPi" )
-    , accOffName	( "AcceptanceOffset" )
-    , accSlopeLowName	( "AcceptanceSlopeLow" )
-    , accSlopeHighName	( "AcceptanceSlopeHigh" )
-    , accPowerName	( "AcceptancePower" )
+	// Physics parameters
+	gammaName     ( configurator->getName("gamma") )
+	, deltaGammaName ( configurator->getName("deltaGamma") )
+	, deltaMName    ( configurator->getName("deltaM") )
+	, mistagName	( configurator->getName("mistag") )
+	, timeresName	( configurator->getName("timeresDsPi") )
+	, accOffName	( configurator->getName("AcceptanceOffset") )
+	, accSlopeLowName	( configurator->getName("AcceptanceSlopeLow") )
+	, accSlopeHighName	( configurator->getName("AcceptanceSlopeHigh") )
+	, accPowerName	( configurator->getName("AcceptancePower") )
 
 
-        // Observables
-	, timeName      ( "time" )
-	, tagName       ( "tag" )    
+	// Observables
+	, timeName      ( configurator->getName("time") )
+	, tagName       ( configurator->getName("tag") )
 
-	, timeconstraintName( "time" )
+	, timeconstraintName( configurator->getName("time") )
 	//objects    
-	,gamma(), deltaGamma(), deltaM(), mistag(), timeRes(), AcceptanceOffset(), AcceptanceSlopeLow(), AcceptanceSlopeHigh(), AcceptancePower(), time(), tag(), tlow(), thigh()
+,gamma(), deltaGamma(), deltaM(), mistag(), timeRes(), AcceptanceOffset(), AcceptanceSlopeLow(), AcceptanceSlopeHigh(), AcceptancePower(), time(), tag(), tlow(), thigh()
 {
 	MakePrototypes();
 }
@@ -46,7 +48,7 @@ void Bs2DsPi_acc::MakePrototypes()
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
 	allObservables.push_back( tagName );
-   
+
 	//Make the parameter set
 	vector<string> parameterNames;
 	parameterNames.push_back( gammaName );
@@ -85,8 +87,8 @@ double Bs2DsPi_acc::Evaluate(DataPoint * measurement)
 	// Get physics parameters and observables
 	getPhysicsParameters( );
 	getObservables( measurement ) ;
-				
-  	double D  = 1.0 - 2.0 * mistag;
+
+	double D  = 1.0 - 2.0 * mistag;
 	return (0.25 * acc() * ( expL() + expH() + tag * 2.0 * expCos() * D ) ); //Normalisation from dunietz
 }
 
@@ -114,10 +116,10 @@ double Bs2DsPi_acc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 		thigh = timeBound->GetMaximum();
 		if( thigh <  tlow ) return -999.0 ;
 	}
-	
-//	double D  = 1.0 - 2.0 * mistag;
 
- 	return -1; //can't deal with acceptance analytically yet
+	//	double D  = 1.0 - 2.0 * mistag;
+
+	return -1; //can't deal with acceptance analytically yet
 	//return (0.25 * ( expHint() + expLint() + tag * 2.0 * expCosInt() * D ) ); //Normalisation from dunietz
 }
 
@@ -137,7 +139,7 @@ void Bs2DsPi_acc::getPhysicsParameters( )
 {
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	gamma      			= allParameters.GetPhysicsParameter( gammaName )->GetValue();
-    deltaGamma 			= allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
+	deltaGamma 			= allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 	deltaM     			= allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 	mistag     			= allParameters.GetPhysicsParameter( mistagName )->GetValue();
 	timeRes    			= allParameters.GetPhysicsParameter( timeresName )->GetValue();
@@ -146,7 +148,7 @@ void Bs2DsPi_acc::getPhysicsParameters( )
 	AcceptanceSlopeHigh = allParameters.GetPhysicsParameter( accSlopeHighName )->GetValue();
 	AcceptanceSlopeHigh 	= allParameters.GetPhysicsParameter( accSlopeHighName )->GetValue();
 	AcceptancePower 	= allParameters.GetPhysicsParameter( accPowerName )->GetValue();
-	
+
 	return;
 }
 

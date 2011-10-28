@@ -16,11 +16,13 @@
 
 #define DEBUGFLAG true
 
+PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MO_v4 );
+
 //......................................
 //Constructor(s)
 //New one with configurator
-Bs2JpsiPhi_SignalAlt_MO_v4::Bs2JpsiPhi_SignalAlt_MO_v4(PDFConfigurator configurator) : 
-Bs2JpsiPhi_SignalAlt_BaseClass_v4(configurator)
+Bs2JpsiPhi_SignalAlt_MO_v4::Bs2JpsiPhi_SignalAlt_MO_v4(PDFConfigurator* configurator) : 
+Bs2JpsiPhi_SignalAlt_BaseClass_v4(configurator), normalisationCacheUntagged()
 {
 	MakePrototypes();	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MO_v4 " << std::endl ;

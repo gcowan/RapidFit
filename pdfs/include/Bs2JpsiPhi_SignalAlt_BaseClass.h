@@ -11,21 +11,10 @@
 #ifndef Bs2JpsiPhi_SignalAlt_BaseClass_H
 #define Bs2JpsiPhi_SignalAlt_BaseClass_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#include "framework/include/PDFConfigurator.h"
-#endif
 
-#ifndef __CINT__
 #include "Mathematics.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/Mathematics.h"
-#endif
 
 #include "RooComplex.h"
 
@@ -220,8 +209,12 @@ class Bs2JpsiPhi_SignalAlt_BaseClass
 {
 	public:
 		Bs2JpsiPhi_SignalAlt_BaseClass();
-		Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator);
+		Bs2JpsiPhi_SignalAlt_BaseClass( const Bs2JpsiPhi_SignalAlt_BaseClass& );
+		Bs2JpsiPhi_SignalAlt_BaseClass( PDFConfigurator* );
 		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass();
+
+	private:
+		Bs2JpsiPhi_SignalAlt_BaseClass& operator=( const Bs2JpsiPhi_SignalAlt_BaseClass& );
 
 	protected:
 	

@@ -10,12 +10,7 @@
 #ifndef Bs2DsPi_mistagParameter_H
 #define Bs2DsPi_mistagParameter_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 #include "RooComplex.h"
 #include "RooMath.h"
@@ -23,7 +18,7 @@
 class Bs2DsPi_mistagParameter : public BasePDF
 {
 	public:
-		Bs2DsPi_mistagParameter();
+		Bs2DsPi_mistagParameter( PDFConfigurator* );
 		~Bs2DsPi_mistagParameter();
 
 		//Calculate the PDF value

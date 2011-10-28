@@ -33,13 +33,13 @@
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
-MinuitWrapper::MinuitWrapper(): minuit(), fitResult(NULL), contours(), print_verbosity( 0 )
+MinuitWrapper::MinuitWrapper(): minuit(NULL), fitResult(NULL), contours(), print_verbosity( 0 ), maxSteps(), bestTolerance(), Options(), Quality()
 {
 	minuit = new TMinuit( 1 );
 }
 
 //Constructor with correct argument
-MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(), fitResult(NULL), contours(), print_verbosity( output_level )
+MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(NULL), fitResult(NULL), contours(), print_verbosity( output_level ), maxSteps(), bestTolerance(), Options(), Quality()
 {
 	minuit = new TMinuit( NumberParameters );
 }
@@ -133,8 +133,9 @@ void MinuitWrapper::SetupFit( FitFunction* NewFunction )
                         minuit->FixParameter( nameIndex );
                 }
                 else
-                {       
-                        minuit->Release( nameIndex );
+		{
+			//	Released on Construction
+			//minuit->Release( nameIndex );
                 }
         }
         
@@ -166,7 +167,7 @@ void MinuitWrapper::FixParameters( vector<double> fix_values, vector<string> Par
 	{
 		int errorFlag=0;
 		int nameIndex = StringProcessing::VectorContains( &allNames, &(ParameterNames[i]) );
-		minuit->mnparm(nameIndex, allNames[nameIndex], fix_values[i], 0.001, 0.0, 0.0, errorFlag);
+		minuit->mnparm(nameIndex, allNames[(unsigned)nameIndex], fix_values[i], 0.001, 0.0, 0.0, errorFlag);
 		minuit->FixParameter( nameIndex );
 	}
 }

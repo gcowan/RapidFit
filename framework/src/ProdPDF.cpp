@@ -1,29 +1,40 @@
 /**
-        @class ProdPDF
+  @class ProdPDF
 
-        An implementation of IPDF for multiplying the values of two other IPDFs
+  An implementation of IPDF for multiplying the values of two other IPDFs
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+  */
 
 //	RapidFit Headers
 #include "ProdPDF.h"
 #include "StringProcessing.h"
+#include "ClassLookUp.h"
 //	System Headers
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
 //Default constructor
-ProdPDF::ProdPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(), secondPDF()
+ProdPDF::ProdPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL)
 {
 }
 
 //Constructor not specifying fraction parameter name
-ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF)
+ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) )
 {
 	MakePrototypes();
+}
+
+ProdPDF::ProdPDF( const ProdPDF& input ) : BasePDF( (BasePDF) input ),
+	prototypeDataPoint( StringProcessing::CombineUniques( input.firstPDF->GetPrototypeDataPoint(), input.secondPDF->GetPrototypeDataPoint() ) ),
+	prototypeParameterSet( StringProcessing::CombineUniques( input.firstPDF->GetPrototypeParameterSet(), input.secondPDF->GetPrototypeParameterSet() ) ),
+	doNotIntegrateList( StringProcessing::CombineUniques( input.firstPDF->GetDoNotIntegrateList(), input.secondPDF->GetDoNotIntegrateList() ) ),
+	firstPDF( ClassLookUp::CopyPDF( input.firstPDF ) ),
+	secondPDF( ClassLookUp::CopyPDF( input.secondPDF ) )
+{
 }
 
 //Assemble the vectors of parameter/observable names needed
@@ -38,8 +49,8 @@ void ProdPDF::MakePrototypes()
 ProdPDF::~ProdPDF()
 {
 	//cout << "Hello from Product destructor" << endl;
-	delete firstPDF;
-	delete secondPDF;
+	if( firstPDF != NULL ) delete firstPDF;
+	if( secondPDF != NULL ) delete secondPDF;
 }
 
 //Indicate whether the function has been set up correctly
@@ -51,7 +62,9 @@ bool ProdPDF::IsValid()
 //Set the function parameters
 bool ProdPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-	return firstPDF->SetPhysicsParameters( NewParameterSet ) && secondPDF->SetPhysicsParameters( NewParameterSet );
+	bool output = firstPDF->SetPhysicsParameters( NewParameterSet ) && secondPDF->SetPhysicsParameters( NewParameterSet );
+	output = output && allParameters.AddPhysicsParameters( NewParameterSet );
+	return output;
 }
 
 //Return the integral of the function over the given boundary
@@ -79,7 +92,7 @@ vector<double> ProdPDF::EvaluateComponents( DataPoint * NewDataPoint )
 	//Get the components of each term
 	vector<double> termOneComponents = firstPDF->EvaluateComponents( NewDataPoint ) ;
 	vector<double> termTwoComponents = secondPDF->EvaluateComponents( NewDataPoint );
-	
+
 	//Insert components in output vector with correct weights.	
 	vector<double> components ;
 	for(unsigned int ii=0; ii<termOneComponents.size(); ++ii ) {
@@ -108,7 +121,7 @@ vector<string> ProdPDF::GetPrototypeParameterSet()
 //Return a list of parameters not to be integrated
 vector<string> ProdPDF::GetDoNotIntegrateList()
 {
-        return doNotIntegrateList;
+	return doNotIntegrateList;
 }
 
 // Update integral cache

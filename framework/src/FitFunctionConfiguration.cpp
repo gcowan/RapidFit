@@ -12,17 +12,17 @@
 #include "ClassLookUp.h"
 
 //Default constructor
-FitFunctionConfiguration::FitFunctionConfiguration() : functionName(), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0)
+FitFunctionConfiguration::FitFunctionConfiguration() : functionName(), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy()
 {
 }
 
 //Constructor with only name of FitFunction
-FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) : functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0)
+FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) : functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy()
 {
 }
 
 //Constructor for FitFunction with event weights
-FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) : functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0)
+FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) : functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy()
 {
 }
 
@@ -49,6 +49,8 @@ FitFunction * FitFunctionConfiguration::GetFitFunction( PhysicsBottle* PhysBottl
 		theFunction->SetupTrace( TraceFileName, traceCount );
 		++traceCount;
 	}
+
+	theFunction->SetThreads( Threads );
 
 	return theFunction;
 }
@@ -80,3 +82,9 @@ string FitFunctionConfiguration::GetStrategy()
 {
 	return Strategy;
 }
+
+void FitFunctionConfiguration::SetThreads( int input )
+{
+	Threads = input;
+}
+

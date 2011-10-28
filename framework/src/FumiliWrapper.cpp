@@ -27,7 +27,7 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-FumiliWrapper::FumiliWrapper() : function(), fitResult(NULL), contours()
+FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality()
 {
 }
 
@@ -72,6 +72,8 @@ FitFunction* FumiliWrapper::GetFitFunction()
 
 void FumiliWrapper::FixParameters( vector<double> fix_values, vector<string> ParameterNames )
 {
+	(void) fix_values;
+	(void) ParameterNames;
 }
 
 //Use Migrad to minimise the given function
@@ -151,10 +153,10 @@ void FumiliWrapper::Minimise()
 	FumiliStandardMaximumLikelihoodFCN fumFCN( *function, positions );
 	
 	// Setup the minimiser
-	MnFumiliMinimize fumili( fumFCN, *( function->GetMnUserParameters() ), Quality);//MINUIT_QUALITY);
+	MnFumiliMinimize fumili( fumFCN, *( function->GetMnUserParameters() ), (unsigned)Quality);//MINUIT_QUALITY);
 
 	// Do the minimisation
-	FunctionMinimum minimum = fumili( maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
+	FunctionMinimum minimum = fumili( (unsigned)maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
 
 	// Once we have the FunctionMinimum, code same as in other Wrappers
 	//Create the fit results

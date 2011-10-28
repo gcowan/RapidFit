@@ -13,15 +13,17 @@
 #include "math.h"
 #include "TMath.h"
 
+PDF_CREATOR( BsMass );
+
 //Constructor
-BsMass::BsMass(PDFConfigurator configurator) :
+BsMass::BsMass(PDFConfigurator* configurator) :
 	// Physics parameters
-	  f_sig_m1Name	( configurator.getName("f_sig_m1") )
-	, sigma_m1Name	( configurator.getName("sigma_m1") )
-	, ratio_21Name	( configurator.getName("ratio_21") )
-	, m_BsName		( configurator.getName("m_Bs") )
+	  f_sig_m1Name	( configurator->getName("f_sig_m1") )
+	, sigma_m1Name	( configurator->getName("sigma_m1") )
+	, ratio_21Name	( configurator->getName("ratio_21") )
+	, m_BsName		( configurator->getName("m_Bs") )
 	// Observables
-	, recoMassName	( configurator.getName("mass") )
+	, recoMassName	( configurator->getName("mass") )
 {
 	MakePrototypes();
 }

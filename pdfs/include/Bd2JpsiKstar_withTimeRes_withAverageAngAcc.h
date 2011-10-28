@@ -10,17 +10,12 @@
 #ifndef Bd2JpsiKstar_withTimeRes_withAverageAngAcc_H
 #define Bd2JpsiKstar_withTimeRes_withAverageAngAcc_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class Bd2JpsiKstar_withTimeRes_withAverageAngAcc : public BasePDF
 {
 	public:
-		Bd2JpsiKstar_withTimeRes_withAverageAngAcc();
+		Bd2JpsiKstar_withTimeRes_withAverageAngAcc( PDFConfigurator* );
 		~Bd2JpsiKstar_withTimeRes_withAverageAngAcc();
 
 		//Calculate the PDF value

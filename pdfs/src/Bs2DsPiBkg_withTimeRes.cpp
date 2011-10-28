@@ -14,14 +14,16 @@
 #include "RooMath.h"
 #include "Mathematics.h"
 
+PDF_CREATOR( Bs2DsPiBkg_withTimeRes );
+
 //Constructor
-Bs2DsPiBkg_withTimeRes::Bs2DsPiBkg_withTimeRes() : 
+Bs2DsPiBkg_withTimeRes::Bs2DsPiBkg_withTimeRes(PDFConfigurator* configurator) : 
 	// Physics parameters
-	  lifetimeBdName	( "lifetimeBd" )
-	, timeResName	( "timeRes_DsPi_background" )
+	  lifetimeBdName	( configurator->getName("lifetimeBd") )
+	, timeResName	( configurator->getName("timeRes_DsPi_background") )
         // Observables
-        , timeName      ( "time" )
-	, timeconstraintName( "time" )
+        , timeName      ( configurator->getName("time") )
+	, timeconstraintName( configurator->getName("time") )
 {
 	MakePrototypes();
 }

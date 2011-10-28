@@ -445,23 +445,24 @@ void ResultFormatter::ReviewOutput( FitResult * OutputData )
 	cout << "--------------------------------------------------" <<endl;
 	cout << endl <<endl;
 }
+
 /*string ResultFormatter::FindAndReplaceString( string name )
-  {
-// This isn't very general, and probably won't work for names
-// containing lots of "_".
-int pos = 0;
-int newPos = 0;
-int size = name.size();
-while ( pos < size )
 {
-newPos = name.find("_", pos);
-if( newPos != string::npos ) {
-name.replace(newPos, 1, "\\_");
-}
-else break;
-pos = newPos + 2;
-}
-return name;
+	// This isn't very general, and probably won't work for names
+	// containing lots of "_".
+	int pos = 0;
+	int newPos = 0;
+	int size = name.size();
+	while ( pos < size )
+	{
+		newPos = name.find("_", pos);
+		if( newPos != string::npos ) {
+			name.replace(newPos, 1, "\\_");
+		}
+		else break;
+		pos = newPos + 2;
+	}
+	return name;
 }*/
 
 //Chose which pull plot method to use
@@ -469,7 +470,7 @@ void ResultFormatter::MakePullPlots( string Type, string FileName, FitResultVect
 {
 	if ( Type == "FlatNTuple" )
 	{
-		return FlatNTuplePullPlots( FileName, ToyResult );
+		return WriteFlatNtuple( FileName, ToyResult );
 	}
 	else if ( Type == "SeparateParameter" )
 	{
@@ -477,25 +478,26 @@ void ResultFormatter::MakePullPlots( string Type, string FileName, FitResultVect
 	}
 	else
 	{
-		cout << "Unrecognised pull plot type \"" << Type << "\" - defaulting to SeparateParameter" << endl;
-		return SeparateParameterPullPlots( FileName, ToyResult );
+		//cout << "Unrecognised pull plot type \"" << Type << "\" - defaulting to SeparateParameter" << endl;
+		//return SeparateParameterPullPlots( FileName, ToyResult );
+		return WriteFlatNtuple( FileName, ToyResult );
 	}
 }
 
-void ResultFormatter::WriteFlatNtuple( string Filename, FitResultVector* ToyResult )
+void ResultFormatter::FlatNTuplePullPlots( string Filename, FitResultVector* ToyResult )
 {
-	ResultFormatter::FlatNTuplePullPlots( Filename, ToyResult );
-
+	ResultFormatter::WriteFlatNtuple( Filename, ToyResult );
 }
 
 //Make pull plots from the output of a toy study
-void ResultFormatter::FlatNTuplePullPlots( string FileName, FitResultVector* ToyResult )
+void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
+	//	Ntuples are 'stupid' objects in ROOT and the basic one can only handle float type objects
 	TNtuple * parameterNTuple;
 	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader());
 	Float_t * resultArr;
-	for ( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
+	for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
 	{
 		vector<double> result = ToyResult->GetFlatResult(resultIndex);
 		resultArr = new Float_t [result.size()];
@@ -505,6 +507,7 @@ void ResultFormatter::FlatNTuplePullPlots( string FileName, FitResultVector* Toy
 	}
 	rootFile->Write();
 	rootFile->Close();
+	//	THIS SHOULD BE SAFE... BUT THIS IS ROOT so 'of course' it isn't...
 	//delete parameterNTuple;
 	delete rootFile;
 }
@@ -555,7 +558,7 @@ void ResultFormatter::CorrMatrixOutput( string FileName, FitResultVector* ToyRes
 		//	loop over all defiend columns
 		for( j=0; j< int(ToyResult->GetFitResult( i )->GetCovarianceMatrix().size()); ++j )
 		{
-			matrix_contents[j]  = ToyResult->GetFitResult( i )->GetCovarianceMatrix()[j];
+			matrix_contents[j]  = ToyResult->GetFitResult( i )->GetCovarianceMatrix()[(unsigned)j];
 		}
 		//	Fill any trailing columns with -9999. (typical number for undefined)
 		for( ; j< max_elements; ++j )

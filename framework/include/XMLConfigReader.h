@@ -83,7 +83,7 @@ class XMLConfigReader
 		bool isLoaded;
 
 		vector<int> seed;	//  Random Seed
-		int PDF_index;
+		//int PDF_index;
 		int ParamSet_index;
 };
 

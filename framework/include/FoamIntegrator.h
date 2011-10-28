@@ -12,6 +12,7 @@ class FoamIntegrator
 {
 	public:
 		FoamIntegrator();
+		FoamIntegrator( const FoamIntegrator& );
 		FoamIntegrator( IPDF*, IDataSet* );
 		~FoamIntegrator();
 

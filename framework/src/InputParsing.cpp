@@ -197,7 +197,7 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 	if ( pdfComponents.size() == 1 )
 	{
 		//PELC 
-		PDFConfigurator dummy ;
+		PDFConfigurator* dummy = new PDFConfigurator;
 		cout << " In InputParsing::MakePDFWithData : WARNING : Calling ClassLookUp::LookUpPDFName with dummy configurator " << endl ;
 		//~PELC
 		//PELC newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], vector<string>(), vector<string>() );
@@ -213,7 +213,7 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 		vector<string> parameterComponents = StringProcessing::SplitString( parameters, ':' );
 
 		//PELC 
-		PDFConfigurator dummy ;
+		PDFConfigurator* dummy = new PDFConfigurator;
 		cout << " In InputParsing::MakePDFWithData : WARNING : Calling ClassLookUp::LookUpPDFName with dummy configurator " << endl ;
 		//~PELC
 		

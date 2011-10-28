@@ -30,7 +30,7 @@
 #include <stdlib.h>
 
 //Default constructor
-DataSetConfiguration::DataSetConfiguration() : source(), cutString(), numberEvents(), arguments(), argumentNames(), generatePDF(), separateGeneratePDF(), parametersAreSet(), Start_Entry(0), DEBUG_DATA(false)
+DataSetConfiguration::DataSetConfiguration() : source(), cutString(), numberEvents(), arguments(), argumentNames(), generatePDF(NULL), separateGeneratePDF(), parametersAreSet(), Start_Entry(0), DEBUG_DATA(false)
 {
 }
 
@@ -40,18 +40,19 @@ DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, 
 }
 
 //Constructor with separate data generation PDF
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(DataPDF), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF( ClassLookUp::CopyPDF(DataPDF) ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false)
 {
 }
 
 //Destructor
 DataSetConfiguration::~DataSetConfiguration()
 {
+	if( generatePDF != NULL ) delete generatePDF; 
 }
 
 IPDF* DataSetConfiguration::GetGenerationPDF()
 {
-	return generatePDF;
+	return ClassLookUp::CopyPDF(generatePDF);
 }
 
 //Set the parameters of the generation PDF
@@ -201,6 +202,11 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	}
 	if( Start_Entry != 0 ) cout << "Starting From Entry: " << Start_Entry<< " in the ntuple." << endl;
 	int totalNumberOfEvents = int(ntuple->GetEntries());
+	if( totalNumberOfEvents <= 0 )
+	{
+		cerr << "\t\tInvalid number of Events! exiting" << endl << endl;
+		exit(-2374);
+	}
 	ntuple->SetEstimate(ntuple->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this many)
 	int numberOfEventsAfterCut = int(ntuple->Draw(">>evtList", cutString.c_str(),"goff",ntuple->GetEntries(),Start_Entry)); // apply the cut which automatically creates the evtList object
 	if ( numberOfEventsAfterCut == -1 )
@@ -208,7 +214,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		cerr << "Please check the cut string you are using!" << endl;
 		exit(97823);
 	}
-//	TEventList * evtList = (TEventList*)gDirectory->Get("evtList"); // ROOT is weird
+	//	TEventList * evtList = (TEventList*)gDirectory->Get("evtList"); // ROOT is weird
 
 	cout << "Total number of events in file: " << totalNumberOfEvents << endl;
 	cout << "You have applied this cut to the data: '" << cutString << "'" << endl;
@@ -279,10 +285,10 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 			temp_vector.push_back( double(ntuple->GetV1()[j]) );
 		}
 
-                if( DEBUG_DATA )
+		if( DEBUG_DATA )
 		{
 			bob->Update();
-			bob->Print(TString("Observable_"+observableNames[obsIndex]+"_selected.png"));
+			bob->Print(TString("Observable_"+observableNames[(unsigned)obsIndex]+"_selected.png"));
 		}
 
 		//	Store the data
@@ -297,9 +303,9 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	//cout << "Time After Draw Read: " << ctime( &timeNow2 ) << endl;
 
 
-        // Now populate the dataset
-        int numberOfDataPointsAdded = 0;
-        int numberOfDataPointsRead = 0;
+	// Now populate the dataset
+	int numberOfDataPointsAdded = 0;
+	int numberOfDataPointsRead = 0;
 	//  Now we have all of the data stored in memory in real_data_array which has a 1<->1 with observableName
 	//  Create and store data points for each event as before and throw away events outside of the PhaseSpace 
 	if ( int(numberEventsToRead) < int(numberOfEventsAfterCut) )	data->ReserveDataSpace( int(numberEventsToRead) );
@@ -317,13 +323,13 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		bool dataPointAdded = data->AddDataPoint( &point );
 		if (dataPointAdded) ++numberOfDataPointsAdded;
 	}
-	
+
 	inputFile->Close();
 	delete inputFile;
 	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << " which are consistent with the PhaseSpaceBoundary" << endl;
 	time_t timeNow;
-        time(&timeNow);
-        cout << "Time: " << ctime( &timeNow );
+	time(&timeNow);
+	cout << "Time: " << ctime( &timeNow );
 	while( !real_data_array.empty() ){ while( !real_data_array.back().empty() ){real_data_array.back().pop_back(); }; real_data_array.pop_back(); }
 	return data;
 }
@@ -352,6 +358,7 @@ bool DataSetConfiguration::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseS
 		if ( !found )
 		{
 			compatible = false;
+			cerr << "\n\t\t" << allNames[observableIndex] << "\t NOT FOUND in the Ntuple you supplied!\n" << endl;
 			break;
 		}
 	}
@@ -498,9 +505,9 @@ FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, Parame
 	for( unsigned int j=0; j< all_parameters.size(); ++j )
 	{
 		ResultParameter* new_param = new ResultParameter( all_parameters[j].Data(), (double)all_values[j], (double)all_generated[j], (double)all_errors[j],
-								(double)all_min[j], (double)all_max[j], (double)all_steps[j],
-							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
-							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() );
+				(double)all_min[j], (double)all_max[j], (double)all_steps[j],
+				ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
+				ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() );
 		global_result->SetResultParameter( all_parameters[j].Data(), new_param );
 		//	Don't worry, the ResultParameter is actually copied into a memory persistant standard class
 		delete new_param;
@@ -536,9 +543,9 @@ FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, Parame
 		for( unsigned int j=0; j< all_parameters.size(); ++j )
 		{
 			ResultParameter* new_param = new ResultParameter( all_parameters[j].Data(), (double)all_values[j], (double)all_generated[j], (double)all_errors[j],
-									 (double)all_min[j], (double)all_max[j], (double)all_steps[j],
-							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
-							ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() ); 
+					(double)all_min[j], (double)all_max[j], (double)all_steps[j],
+					ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
+					ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() ); 
 			new_set->SetResultParameter( all_parameters[j].Data(), new_param );
 			delete new_param;
 		}

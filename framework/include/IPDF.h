@@ -16,6 +16,7 @@
 #include "TRandom3.h"
 //	RapidFit Headers
 #include "DataPoint.h"
+#include "PDFConfigurator.h"
 #include "PhaseSpaceBoundary.h"
 #include "ParameterSet.h"
 //	System Headers
@@ -29,8 +30,8 @@ using namespace std;
 class IPDF
 {
 	public:
-		IPDF();
-		virtual ~IPDF();
+		IPDF() {};
+		virtual ~IPDF() {};
 
 		//Indicate whether the function has been set up correctly
 		virtual bool IsValid() = 0;
@@ -56,62 +57,63 @@ class IPDF
 		//Return a prototype set of physics parameters
 		virtual vector<string> GetPrototypeParameterSet() = 0;
 
+		virtual ParameterSet* GetActualParameterSet() = 0;
+
 		//Return a list of parameters not to be integrated
 		virtual vector<string> GetDoNotIntegrateList() = 0;
 
 		//Update the integral cache
 		virtual void UpdateIntegralCache() = 0;
 
-
-		//	These should __NOT__ be virtual due to the inheritance structure
-		//	These can be virtual but then this requires re-implementing
-		//	the same code within Normalised, Sum, Product... PDFs
-
-		//	Set the virtual ID
-		void SET_ID( string );
-		void SET_ID( TString );
+		virtual void SET_ID( string ) = 0;
+		virtual void SET_ID( TString ) = 0;
 
 		//	Get the virtual ID
-		string GET_ID();
+		virtual string GET_ID() = 0;
 
 		//	Set the virtual cache status
-		void SetMCCacheStatus( bool );
+		virtual void SetMCCacheStatus( bool ) = 0;
 
 		//	Get the virtual cache status
-		bool GetMCCacheStatus();
+		virtual bool GetMCCacheStatus() = 0;
 
 		//	Start a new TRandom3 instance with a given seed value
-		void SetRandomFunction( int );
+		virtual void SetRandomFunction( int ) = 0;
 
 		//	Replace TRandom3 instance with a new function
-		void SetRandomFunction( TRandom3* );
+		virtual void SetRandomFunction( TRandom3* ) = 0;
 
-		int GetSeedNum();
+		virtual int GetSeedNum() = 0;
 
 		//	Remove the cached files
-		void Remove_Cache();
+		virtual void Remove_Cache( bool=false ) = 0;
 
 		//	Add a virtual cache object
-		void AddCacheObject( string );
-		void AddCacheObject( TString );
+		virtual void AddCacheObject( string ) = 0;
+		virtual void AddCacheObject( TString ) = 0;
 
 		//	Get the Random function stored in this PDF
-		TRandom3* GetRandomFunction();
+		virtual TRandom3* GetRandomFunction() = 0;
 
-	private:
-		//	Uncopyable!
-		IPDF ( const IPDF& );
-		IPDF& operator = ( const IPDF& );
-  
-		//	Varibles required for caching MC
-		vector<string> cached_files;
-		string stored_ID;
-		bool hasCachedMCGenerator;
-
-		//	Variables required for storing the Seed
-		vector<TRandom3 *> seed_function;
-		vector<int> seed_num;
-
+		virtual string GetName() = 0;
+		virtual void SetName( string ) = 0;
 };
+
+
+//	Macro for adding a class lookup and copy function instance to the main function index
+//
+//	This is VERY easy to maintain from a PDF developers point of view as it avoids
+//	having to re-write these 2 macros for each PDF by hand
+#define PDF_CREATOR( X ) \
+	extern "C" IPDF* CreatePDF_##X( PDFConfigurator* config ) { \
+		return (IPDF*) new X( config ); \
+	} \
+	extern "C" IPDF* CopyPDF_##X( IPDF& input ) { \
+		return (IPDF*) new X( (X&) input ); \
+	}
+
+//	typedef for the class-factory objects which actually create the new class instances in memory
+typedef IPDF* CreatePDF_t( PDFConfigurator* );
+typedef IPDF* CopyPDF_t( IPDF& );
 
 #endif

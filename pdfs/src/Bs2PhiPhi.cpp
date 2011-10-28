@@ -11,30 +11,32 @@
 #include "math.h"
 #include "TMath.h"
 
+PDF_CREATOR( Bs2PhiPhi );
+
 //Constructor
-Bs2PhiPhi::Bs2PhiPhi() : cach_v1(), cach_v2(), cach_Azero(), cach_Apara(), cach_Aperp(), cach_sinPhis(), cach_cosPhis(), cach_sinDelta_(), cach_cosDelta_(), cach_cosDeltaSubtr(),
+Bs2PhiPhi::Bs2PhiPhi( PDFConfigurator* configurator ) : cach_v1(), cach_v2(), cach_Azero(), cach_Apara(), cach_Aperp(), cach_sinPhis(), cach_cosPhis(), cach_sinDelta_(), cach_cosDelta_(), cach_cosDeltaSubtr(),
       normalisationCacheValid(false)
     , evaluationCacheValid(false)
     // Physics parameters
-    , gamma_sName     ( "gamma_s" )
-    , gamma_lName     ( "gamma_l" )
-    , gamma_hName     ( "gamma_h" )
-    , deltaMName      ( "deltaM")
-    , Phi_sName       ( "Phi_s")
-    , Azero_sqName    ( "Azero_sq" )
-    , Apara_sqName    ( "Apara_sq" )
-    , Aperp_sqName    ( "Aperp_sq" )
-    , delta_1Name     ( "delta_1" )
-    , delta_2Name     ( "delta_2" )
+    , gamma_sName     ( configurator->getName("gamma_s") )
+    , gamma_lName     ( configurator->getName("gamma_l") )
+    , gamma_hName     ( configurator->getName("gamma_h") )
+    , deltaMName      ( configurator->getName("deltaM") )
+    , Phi_sName       ( configurator->getName("Phi_s") )
+    , Azero_sqName    ( configurator->getName("Azero_sq") )
+    , Apara_sqName    ( configurator->getName("Apara_sq") )
+    , Aperp_sqName    ( configurator->getName("Aperp_sq") )
+    , delta_1Name     ( configurator->getName("delta_1") )
+    , delta_2Name     ( configurator->getName("delta_2") )
 
     // Observables
-    , timeName   ( "time" )
-    , theta_1Name( "theta_1" )
-    , theta_2Name( "theta_2" )
-    , phiName    ( "phi" )
-    , tagName    ( "tag" )
-    , mistagName ( "mistag" )
-    , timeconstraintName( "time" )
+    , timeName   ( configurator->getName("time") )
+    , theta_1Name( configurator->getName("theta_1") )
+    , theta_2Name( configurator->getName("theta_2") )
+    , phiName    ( configurator->getName("phi") )
+    , tagName    ( configurator->getName("tag") )
+    , mistagName ( configurator->getName("mistag") )
+    , timeconstraintName( configurator->getName("time") )
     //, timeres    ( "resolution" )
 {
     MakePrototypes();

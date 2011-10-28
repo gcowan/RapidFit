@@ -16,10 +16,12 @@
 
 #define DEBUGFLAG true
 
+PDF_CREATOR( Bs2Jpsifzero_SignalAlt_MO_dev );
+
 //......................................
 //Constructor(s)
 //New one with configurator
-Bs2Jpsifzero_SignalAlt_MO_dev::Bs2Jpsifzero_SignalAlt_MO_dev(PDFConfigurator configurator) : 
+Bs2Jpsifzero_SignalAlt_MO_dev::Bs2Jpsifzero_SignalAlt_MO_dev(PDFConfigurator* configurator) : 
 Bs2Jpsifzero_SignalAlt_BaseClass_dev(configurator)
 {
 	MakePrototypes();	

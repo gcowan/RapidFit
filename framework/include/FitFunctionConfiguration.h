@@ -34,6 +34,8 @@ class FitFunctionConfiguration
 		string GetStrategy();
 		void SetStrategy( string );
 
+		void SetThreads( int );
+
 	private:
 		string functionName, weightName;
 		bool hasWeight;
@@ -41,6 +43,7 @@ class FitFunctionConfiguration
 		TString TraceFileName;
 		int traceCount;
 		string Strategy;
+		int Threads;
 };
 
 #endif

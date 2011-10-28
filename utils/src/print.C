@@ -3,8 +3,6 @@
 #include "TTree.h"
 #include "TNtuple.h"
 #include "TFile.h"
-//	RapidFit Headers
-#include "StringProcessing.h"
 //	RapidFit Utils Headers
 #include "TString_Processing.h"
 #include "NTuple_Processing.h"

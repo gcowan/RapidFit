@@ -1130,7 +1130,7 @@ int RapidFit( int argc, char * argv[] )
 			for(unsigned int i=0; i< argumentParameterSet.back()->GetAllNames().size(); ++i )
 			{	argumentParameterSet.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->SetBlindedValue( param_set.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->GetValue() );	}
 
-			ScanParam* local_param = makeOutput->GetScanParam( LLscanList[scan_num] );
+			ScanParam* local_param = makeOutput->GetScanParam( LLscanList[scan_num] );	(void) local_param;//	Unused
 
 			FitResultVector* scan_result = VectorScan::Scan1D( theMinimiser, makeOutput->GetScanParam( LLscanList[scan_num] ) );
 
@@ -1140,11 +1140,10 @@ int RapidFit( int argc, char * argv[] )
 		for(unsigned int scan_num=0; scan_num < LLscanList.size(); ++scan_num )
 		{
 			TString output_scan_dat( "LLScanData" );
-			output_scan_dat.Append( LLscanList[scan_num] );
 			TString new_output_scan_dat( output_scan_dat );
-			new_output_scan_dat.Append( "_newformat" );
+			output_scan_dat.Append( LLscanList[scan_num] );
+			new_output_scan_dat.Append( "_newformat.root" );
 			output_scan_dat.Append( ".root" );
-			new_output_scan_dat.Append(".root");
 			vector<FitResultVector*> ammended_format;
 			for( int i=0; i< scanSoloResults[scan_num]->NumberResults(); ++i )
 			{

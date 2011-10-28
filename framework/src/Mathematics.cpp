@@ -20,8 +20,8 @@ namespace Mathematics
 {
 
 	// Mathematica integral of the exp * erf
-	//Integrate[(1*Exp[-(x/t) + s^2/(2*t^2)]* Erfc[-((x - s^2/t)/(Sqrt[2]*s))])/2, x] ==
-	//(t*(Erf[x/(Sqrt[2]*s)] - E^((s^2 - 2*t*x)/(2*t^2))* Erfc[(s^2 - t*x)/(Sqrt[2]*s*t)]))/2
+	//Integrate[(1*Exp[-(x/t) + s^2/(2*t^2)]* erfc[-((x - s^2/t)/(Sqrt[2]*s))])/2, x] ==
+	//(t*(erf[x/(Sqrt[2]*s)] - E^((s^2 - 2*t*x)/(2*t^2))* erfc[(s^2 - t*x)/(Sqrt[2]*s*t)]))/2
 	double expErfInt( const double tlimit, const double tau, const double sigma)
 	{
 		const double sigma_2=sigma*sigma;

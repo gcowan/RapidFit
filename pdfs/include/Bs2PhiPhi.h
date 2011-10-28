@@ -9,17 +9,12 @@
 #ifndef Bs2PhiPhi_H
 #define Bs2PhiPhi_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class Bs2PhiPhi : public BasePDF
 {
     public:
-        Bs2PhiPhi();
+        Bs2PhiPhi( PDFConfigurator* );
         ~Bs2PhiPhi();
 
         //Calculate the PDF value

@@ -12,16 +12,19 @@
 #include "math.h"
 #include "TMath.h"
 
+PDF_CREATOR( Bs2JpsiPhiMassSignal );
+
 //Constructor
-Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal(PDFConfigurator configurator) :
+Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal(PDFConfigurator* configurator) :
 	// Physics parameters
-	  f_sig_m1Name	( configurator.getName("f_sig_m1") )
-	, sigma_m1Name	( configurator.getName("sigma_m1") )
-	, sigma_m2Name	( configurator.getName("sigma_m2") )
-	, m_BsName		( configurator.getName("m_Bs") )
+	  f_sig_m1Name	( configurator->getName("f_sig_m1") )
+	, sigma_m1Name	( configurator->getName("sigma_m1") )
+	, sigma_m2Name	( configurator->getName("sigma_m2") )
+	, m_BsName		( configurator->getName("m_Bs") )
 	// Observables
-	, recoMassName	( configurator.getName("mass") )
+	, recoMassName	( configurator->getName("mass") )
 {
+	cout << "here" << endl;
 	MakePrototypes();
 }
 

@@ -18,6 +18,8 @@
 
 #define DEBUGFLAG true
 
+PDF_CREATOR( Bs2Jpsifzero_SignalAlt_MP_dev );
+
 //#define DOUBLE_TOLERANCE DBL_MIN
 //#define DOUBLE_TOLERANCE 1E-6
 
@@ -25,7 +27,7 @@
 //Constructor(s)
 //...........
 // New with configurator
-Bs2Jpsifzero_SignalAlt_MP_dev::Bs2Jpsifzero_SignalAlt_MP_dev( PDFConfigurator config) : 
+Bs2Jpsifzero_SignalAlt_MP_dev::Bs2Jpsifzero_SignalAlt_MP_dev( PDFConfigurator* config) : 
 Bs2Jpsifzero_SignalAlt_BaseClass_dev(config)
 {
 	MakePrototypes();	

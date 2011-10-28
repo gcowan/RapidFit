@@ -26,6 +26,13 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
 	
 }
 
+SlicedAcceptance::SlicedAcceptance( const SlicedAcceptance& input ) : slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta )
+{
+	for( unsigned int i=0; i< input.slices.size(); ++i )
+	{
+		slices.push_back( new AcceptanceSlice( *(input.slices[i]) ) );
+	}
+}
 
 //............................................
 // Constructor for simple upper time acceptance only
@@ -64,7 +71,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 //............................................
 // Constructor for simple 2010 version of lower time acceptance only
 SlicedAcceptance::SlicedAcceptance( string s ) :
-nullSlice(new AcceptanceSlice(0.,0.,0.))
+slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 {
 	(void)s;	
 	int N = 31;
@@ -94,7 +101,7 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 //............................................
 // Constructor for accpetance from a file
 SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
-nullSlice(new AcceptanceSlice(0.,0.,0.))
+slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 {
 	(void)type;	
 	
@@ -105,13 +112,15 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 	input_file.open( fileName.c_str(), ifstream::in );
 	input_file.close();
 
-	if( !getenv("RAPIDFITROOT") && input_file.fail() )
+	bool local_fail = input_file.fail();
+
+	if( !getenv("RAPIDFITROOT") && local_fail )
 	{
-		cerr << "\n\n" << endl;
-		cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		cerr << "\n" << endl;
+		//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 		cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
-		cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		cerr << "\n\n" << endl;
+		//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		cerr << "\n" << endl;
 		exit(-987);
 	}
 
@@ -124,12 +133,18 @@ nullSlice(new AcceptanceSlice(0.,0.,0.))
 		cout << "RAPIDFITROOT defined as: " << path << endl;
 	
 		fullFileName = path+"/pdfs/configdata/"+fileName ;
-	} else if( !input_file.fail() )
+
+		input_file.open( fullFileName.c_str(), ifstream::in );
+		input_file.close();
+	}
+	bool elsewhere_fail = input_file.fail();
+
+	if( elsewhere_fail && !local_fail ) fullFileName = fileName;
+
+	if( elsewhere_fail && local_fail )
 	{
-		fullFileName = fileName;
-	} else {
-		cerr << "Shouldn't end up Here in the code!" << endl;
-		exit(-892);
+		cerr << "\n\tFILE NAMED:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
+		exit(-89);
 	}
 
 	ifstream in;
@@ -179,7 +194,7 @@ int SlicedAcceptance::numberOfSlices() const { return (int) slices.size() ; }
 AcceptanceSlice * SlicedAcceptance::getSlice( int s ) const
 {
 	if( (s<0) || (s>=(int)slices.size()) ) return nullSlice ;
-	return slices[s] ;
+	return slices[(unsigned)s] ;
 }
 
 

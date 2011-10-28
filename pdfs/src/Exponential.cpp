@@ -14,16 +14,18 @@
 #include "TMath.h"
 #include "RooMath.h"
 
+PDF_CREATOR( Exponential );
+
 //Constructor
-Exponential::Exponential() :
+Exponential::Exponential( PDFConfigurator* configurator) :
 
 	// Physics parameters
-	tauLL1Name	( "tau1" )
-	, sigmaLL1Name	( "timeResolution1" )
-	, sigmaLL2Name	( "timeResolution2" )
-	, timeResLL1FracName( "timeResolution1Fraction" )
+	tauLL1Name	( configurator->getName("tau1") )
+	, sigmaLL1Name	( configurator->getName("timeResolution1") )
+	, sigmaLL2Name	( configurator->getName("timeResolution2") )
+	, timeResLL1FracName( configurator->getName("timeResolution1Fraction") )
 	// Observables
-	, timeName      ( "time" )
+	, timeName      ( configurator->getName("time") )
 	//objects used in XML
 	,tauLL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time()
 {

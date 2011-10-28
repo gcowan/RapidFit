@@ -52,13 +52,37 @@ template<class T> void print ( vector<T> output, bool new_line=true )
 //	Print a vector of pairs of variables which are compatible with cout with a single command
 template<class T, class U> void print ( vector<pair<T,U> > output, bool new_line=true )
 {
-        typename std::vector<std::pair<T,U> >::iterator output_i;
-        for( output_i = output.begin(); output_i != output.end(); ++output_i )
-        {
-                cout << output_i->first << "  ,  " << output_i->second ;
-                if( new_line ) { cout << endl; }
-                else { cout << " ::  " << endl; }
-        }
+	typename std::vector<std::pair<T,U> >::iterator output_i;
+	for( output_i = output.begin(); output_i != output.end(); ++output_i )
+	{
+		cout << output_i->first << "  ,  " << output_i->second ;
+		if( new_line ) { cout << endl; }
+		else { cout << " ::  " << endl; }
+	}
+}
+
+//	Return a vector of the first objects in a vector of pairs
+template<class T, class U > vector<T> return_first( vector<pair<T,U> > input )
+{
+	typename std::vector<std::pair<T,U> >::iterator input_i;
+	vector<T> output;
+	for( input_i = input.begin(); input_i != input.end(); ++input_i )
+	{
+		output.push_back( input_i->first );
+	}
+	return output;
+}
+
+//	return a vector of the second objects in a vector of pairs
+template<class T, class U > vector<U> return_second( vector<pair<T,U> > input )
+{
+	typename std::vector<std::pair<T,U> >::iterator input_i;
+	vector<U> output;
+	for( input_i = input.begin(); input_i != input.end(); ++input_i )
+	{
+		output.push_back( input_i->second );
+	}
+	return output;
 }
 
 //	empty a vector
@@ -81,5 +105,19 @@ void strip_strings( vector<string>* list, string ext );
 
 //	Create a new string composed of the 
 vector<string> strip_all_strings( vector<string>* list, string ext );
+
+vector<string> SplitString( string, char );
+int CharacterPosition( string, char );
+vector<int> StringPositions( string, string );
+void RemoveCharacter( string&, char );
+string ReplaceString( string&, string, string );
+void RemoveWhiteSpace( vector<string>& );
+vector<string> CombineUniques( vector<string>, vector<string> );
+int VectorContains( vector<string> const*, string const* );
+TString CondenseStrings( vector<string>, int, int );
+
+vector<TString> GetStringContaining( vector<TString>, TString );
+vector<TString> StripStrings( vector<TString>, TString );
+vector<string> Convert( vector<TString> );
 
 #endif

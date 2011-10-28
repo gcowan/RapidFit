@@ -10,17 +10,12 @@
 #ifndef BsMass_H
 #define BsMass_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class BsMass : public BasePDF
 {
 	public:
-		BsMass(PDFConfigurator);
+		BsMass( PDFConfigurator* );
 		~BsMass();
 
 		//Calculate the PDF value

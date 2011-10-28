@@ -13,8 +13,10 @@
 #include "math.h"
 #include "TMath.h"
 
+PDF_CREATOR( Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc );
+
 //Constructor
-Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc() : cachedAzeroAzeroIntB(), cachedAparaAparaIntB(),
+Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc::Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc( PDFConfigurator* configurator ) : cachedAzeroAzeroIntB(), cachedAparaAparaIntB(),
 cachedAperpAperpIntB(), cachedAparaAperpIntB(), cachedAzeroAparaIntB(),
 cachedAzeroAperpIntB(), cachedAzeroAzeroIntBbar(), cachedAparaAparaIntBbar(),
 cachedAperpAperpIntBbar(), cachedAparaAperpIntBbar(), cachedAzeroAparaIntBbar(),
@@ -27,36 +29,36 @@ cachedCosDeltaPerp(), cachedCosDeltaPara(), cachedSinPhis(), cachedCosPhis(),
 	, evaluationCacheValid(false)
 
 	// Physics parameters
-	, gammaName     ( "gamma" )
-	, deltaGammaName( "deltaGamma" )
-	, deltaMName    ( "deltaM")
-	, Phi_sName     ( "Phi_s")
-	, Azero_sqName  ( "Azero_sq" )
-	, Apara_sqName  ( "Apara_sq" )
-	, Aperp_sqName  ( "Aperp_sq" )
-	, delta_zeroName( "delta_zero" )
-	, delta_paraName( "delta_para" )
-	, delta_perpName( "delta_perp" )
-	, angAccI1Name	( "angAccI1" )
-	, angAccI2Name	( "angAccI2" )
-	, angAccI3Name	( "angAccI3" )
-	, angAccI4Name	( "angAccI4" )
-	, angAccI5Name	( "angAccI5" )
-	, angAccI6Name	( "angAccI6" )
-	, mistagName	( "mistag" )
-	, timeRes1Name	( "timeResolution1" )
-	, timeRes2Name	( "timeResolution2" )
-	, timeRes1FractionName	( "timeResolution1Fraction" )
+	, gammaName     ( configurator->getName("gamma") )
+	, deltaGammaName( configurator->getName("deltaGamma") )
+	, deltaMName    ( configurator->getName("deltaM") )
+	, Phi_sName     ( configurator->getName("Phi_s") )
+	, Azero_sqName  ( configurator->getName("Azero_sq") )
+	, Apara_sqName  ( configurator->getName("Apara_sq") )
+	, Aperp_sqName  ( configurator->getName("Aperp_sq") )
+	, delta_zeroName( configurator->getName("delta_zero") )
+	, delta_paraName( configurator->getName("delta_para") )
+	, delta_perpName( configurator->getName("delta_perp") )
+	, angAccI1Name	( configurator->getName("angAccI1") )
+	, angAccI2Name	( configurator->getName("angAccI2") )
+	, angAccI3Name	( configurator->getName("angAccI3") )
+	, angAccI4Name	( configurator->getName("angAccI4") )
+	, angAccI5Name	( configurator->getName("angAccI5") )
+	, angAccI6Name	( configurator->getName("angAccI6") )
+	, mistagName	( configurator->getName("mistag") )
+	, timeRes1Name	( configurator->getName("timeResolution1") )
+	, timeRes2Name	( configurator->getName("timeResolution2") )
+	, timeRes1FractionName	( configurator->getName("timeResolution1Fraction") )
 
 	// Observables
-	, timeName	( "time" )
-	, cosThetaName	( "cosTheta" )
-	, phiName	( "phi" )
-	, cosPsiName	( "cosPsi" )
-	//, timeres	( "resolution" )
-	, tagName	( "tag" )
+	, timeName	( configurator->getName("time") )
+	, cosThetaName	( configurator->getName("cosTheta") )
+	, phiName	( configurator->getName("phi") )
+	, cosPsiName	( configurator->getName("cosPsi") )
+	//, timeres	( configurator->getName("resolution") )
+	, tagName	( configurator->getName("tag") )
 
-	, timeconstraintName( "time" )
+	, timeconstraintName( configurator->getName("time") )
 
 	, gamma(), deltaGamma(), deltaMs(), Phi_s(), Azero_sq(), Apara_sq(), Aperp_sq(),
 	AzeroApara(), AzeroAperp(), AparaAperp(), delta_zero(), delta_para(),

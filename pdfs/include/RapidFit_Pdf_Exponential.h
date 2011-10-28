@@ -4,18 +4,15 @@
 
 // Include files
 
-#ifndef __CINT__
 #include "IPDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/IPDF.h"
-#endif
 
 //#include "DataPoint.h"
 //#include "PhaseSpaceBoundary.h"
 //#include "PhysicsParameter.h"
 //#include "ParameterSet.h"
 
+#include "BasePDF.h"
+#include "PDFConfigurator.h"
 
 /** @class RapidFitPdfExponential RapidFitPdfExponential.h
  *  
@@ -27,16 +24,19 @@
  *  @author Pete clarke
  *  @date   2009-05-01
  */
-class RapidFitPdfExponential : public IPDF  {
+class RapidFitPdfExponential : public BasePDF
+{
 
 public: 
    //......................................
    // Default Constructor  which sets resolution to zero
-   RapidFitPdfExponential( ) ;
-   
+   RapidFitPdfExponential( PDFConfigurator* configurator ) ;
+
+   //	NO LONGER ACCESSIBLE 2011-10
+   //   
    //......................................
    // Constructor with resolution
-   RapidFitPdfExponential( double res ) ;
+   //RapidFitPdfExponential( double res ) ;
    
    //......................................
    // Copy constructor  

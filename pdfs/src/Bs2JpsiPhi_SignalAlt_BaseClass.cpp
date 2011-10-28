@@ -93,55 +93,76 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass() : useCosAndSin(
 	//~PELC
 }
 
+//	Copy Constructor
+Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass( const Bs2JpsiPhi_SignalAlt_BaseClass& input ) :
+	useCosAndSin(input.useCosAndSin), allowNegativeAsSq(input.allowNegativeAsSq), gammaName(input.gammaName), deltaGammaName(input.deltaGammaName), deltaMName(input.deltaMName),
+	Phi_sName(input.Phi_sName), Azero_sqName(input.Azero_sqName), Apara_sqName(input.Apara_sqName), Aperp_sqName(input.Aperp_sqName), As_sqName(input.As_sqName),
+	delta_zeroName(input.delta_zeroName), delta_paraName(input.delta_paraName), delta_perpName(input.delta_perpName), delta_sName(input.delta_sName), cosphisName(input.cosphisName),
+	sinphisName(input.sinphisName), mistagName(input.mistagName), mistagP1Name(input.mistagP1Name), mistagP0Name(input.mistagP0Name), mistagSetPointName(input.mistagSetPointName),
+	res1Name(input.res1Name), res2Name(input.res2Name), res1FractionName(input.res1FractionName), timeOffsetName(input.timeOffsetName), angAccI1Name(input.angAccI1Name),
+	angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name), angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name),
+	angAccI7Name(input.angAccI7Name), angAccI8Name(input.angAccI8Name), angAccI9Name(input.angAccI9Name), angAccI10Name(input.angAccI10Name), timeName(input.timeName),
+	cosThetaName(input.cosThetaName), phiName(input.phiName), cosPsiName(input.cosPsiName), tagName(input.tagName), timeAcceptanceCategoryName(input.timeAcceptanceCategoryName),
+	timeConstraintName(input.timeConstraintName), t(input.t), ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr), ctheta_1(input.ctheta_1), tag(input.tag),
+	timeAcceptanceCategory(input.timeAcceptanceCategory), _gamma(input._gamma), dgam(input.dgam), Aperp_sq(input.Aperp_sq), Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq),
+	As_sq(input.As_sq), delta_para(input.delta_para), delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2),
+	delta_ms(input.delta_ms), phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag), _mistagP1(input._mistagP1), _mistagP0(input._mistagP0),
+	_mistagSetPoint(input._mistagSetPoint), resolution(input.resolution), resolution1(input.resolution1), resolution2(input.resolution2), resolution1Fraction(input.resolution1Fraction),
+	timeOffset(input.timeOffset), angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4), angAccI5(input.angAccI5), angAccI6(input.angAccI6),
+	angAccI7(input.angAccI7), angAccI8(input.angAccI8), angAccI9(input.angAccI9), angAccI10(input.angAccI10), tlo(input.tlo), thi(input.thi), timeAcceptance( *( new TimeAcceptanceFunction() )),
+	expL_stored(input.expL_stored), expH_stored(input.expH_stored), expSin_stored(input.expSin_stored), expCos_stored(input.expCos_stored), intExpL_stored(input.intExpL_stored),
+	intExpH_stored(input.intExpH_stored), intExpSin_stored(input.intExpSin_stored), intExpCos_stored(input.intExpCos_stored)
+{
+}
 
 //.....................................
 // New Constructor which takes configuration object
-Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator configurator ) : useCosAndSin(), allowNegativeAsSq(),
+Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator* configurator ) : useCosAndSin(), allowNegativeAsSq(),
 // Physics parameters
-	  gammaName     		( configurator.getName("gamma") )
-	, deltaGammaName		( configurator.getName("deltaGamma") )
-	, deltaMName			( configurator.getName("deltaM") )
-	, Phi_sName			( configurator.getName("Phi_s") )
-	, Azero_sqName			( configurator.getName("Azero_sq") )
-	, Apara_sqName			( configurator.getName("Apara_sq") )
-	, Aperp_sqName			( configurator.getName("Aperp_sq") )
-	, As_sqName			( configurator.getName("As_sq") )
-	, delta_zeroName		( configurator.getName("delta_zero") )
-	, delta_paraName		( configurator.getName("delta_para") )
-	, delta_perpName		( configurator.getName("delta_perp") )
-	, delta_sName			( configurator.getName("delta_s") )
+	  gammaName     		( configurator->getName("gamma") )
+	, deltaGammaName		( configurator->getName("deltaGamma") )
+	, deltaMName			( configurator->getName("deltaM") )
+	, Phi_sName			( configurator->getName("Phi_s") )
+	, Azero_sqName			( configurator->getName("Azero_sq") )
+	, Apara_sqName			( configurator->getName("Apara_sq") )
+	, Aperp_sqName			( configurator->getName("Aperp_sq") )
+	, As_sqName			( configurator->getName("As_sq") )
+	, delta_zeroName		( configurator->getName("delta_zero") )
+	, delta_paraName		( configurator->getName("delta_para") )
+	, delta_perpName		( configurator->getName("delta_perp") )
+	, delta_sName			( configurator->getName("delta_s") )
 	// PELC NEW additions for v2
-	, cosphisName			( configurator.getName("cosphis") )
-	, sinphisName			( configurator.getName("sinphis") )
+	, cosphisName			( configurator->getName("cosphis") )
+	, sinphisName			( configurator->getName("sinphis") )
 	// Detector parameters
-	, mistagName			( configurator.getName("mistag") )
-	, mistagP1Name			( configurator.getName("mistagP1") )
-	, mistagP0Name			( configurator.getName("mistagP0") )
-	, mistagSetPointName		( configurator.getName("mistagSetPoint") )
+	, mistagName			( configurator->getName("mistag") )
+	, mistagP1Name			( configurator->getName("mistagP1") )
+	, mistagP0Name			( configurator->getName("mistagP0") )
+	, mistagSetPointName		( configurator->getName("mistagSetPoint") )
 	// Detector parameters
-	, res1Name			( configurator.getName("timeResolution1") )
-	, res2Name			( configurator.getName("timeResolution2") )
-	, res1FractionName		( configurator.getName("timeResolution1Fraction") )
-	, timeOffsetName		( configurator.getName("timeOffset") )
+	, res1Name			( configurator->getName("timeResolution1") )
+	, res2Name			( configurator->getName("timeResolution2") )
+	, res1FractionName		( configurator->getName("timeResolution1Fraction") )
+	, timeOffsetName		( configurator->getName("timeOffset") )
 	// Angular acceptance factors
-	, angAccI1Name			( configurator.getName("angAccI1") )
-	, angAccI2Name			( configurator.getName("angAccI2") )
-	, angAccI3Name			( configurator.getName("angAccI3") )
-	, angAccI4Name			( configurator.getName("angAccI4") )
-	, angAccI5Name			( configurator.getName("angAccI5") )
-	, angAccI6Name			( configurator.getName("angAccI6") )
-	, angAccI7Name			( configurator.getName("angAccI7") )
-	, angAccI8Name			( configurator.getName("angAccI8") )
-	, angAccI9Name			( configurator.getName("angAccI9") )
-	, angAccI10Name			( configurator.getName("angAccI10") )
+	, angAccI1Name			( configurator->getName("angAccI1") )
+	, angAccI2Name			( configurator->getName("angAccI2") )
+	, angAccI3Name			( configurator->getName("angAccI3") )
+	, angAccI4Name			( configurator->getName("angAccI4") )
+	, angAccI5Name			( configurator->getName("angAccI5") )
+	, angAccI6Name			( configurator->getName("angAccI6") )
+	, angAccI7Name			( configurator->getName("angAccI7") )
+	, angAccI8Name			( configurator->getName("angAccI8") )
+	, angAccI9Name			( configurator->getName("angAccI9") )
+	, angAccI10Name			( configurator->getName("angAccI10") )
 	// Observables
-	, timeName			( configurator.getName("time") )
-	, cosThetaName			( configurator.getName("cosTheta") )
-	, phiName			( configurator.getName("phi") )
-	, cosPsiName			( configurator.getName("cosPsi") )
-	, tagName			( configurator.getName("tag") )
-	, timeAcceptanceCategoryName	( configurator.getName("timeAcceptanceCategory") )
-	, timeConstraintName		( configurator.getName("time") )
+	, timeName			( configurator->getName("time") )
+	, cosThetaName			( configurator->getName("cosTheta") )
+	, phiName			( configurator->getName("phi") )
+	, cosPsiName			( configurator->getName("cosPsi") )
+	, tagName			( configurator->getName("tag") )
+	, timeAcceptanceCategoryName	( configurator->getName("timeAcceptanceCategory") )
+	, timeConstraintName		( configurator->getName("time") )
 	// Other things
 	//objects
 	,t(), ctheta_tr(), phi_tr(), ctheta_1(), tag(), timeAcceptanceCategory(), _gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
@@ -151,8 +172,8 @@ Bs2JpsiPhi_SignalAlt_BaseClass::Bs2JpsiPhi_SignalAlt_BaseClass(PDFConfigurator c
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored()
 {
 
-	useCosAndSin = configurator.isTrue( "UseCosAndSin" ) ;
-	allowNegativeAsSq = configurator.isTrue( "AllowNegativeAsSq" ) ;
+	useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
+	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
 		
 	if( ! USE_LOWER_TIME_ACCEPTANCE ) {
 		cout << "=====>WARNING " << endl ;

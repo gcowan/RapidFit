@@ -21,6 +21,7 @@ class NormalisedSumPDF : public BasePDF
 		NormalisedSumPDF();
 		NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary* );
 		NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string );
+		NormalisedSumPDF( const NormalisedSumPDF& );
 		virtual ~NormalisedSumPDF();
 
 		//Indicate whether the function has been set up correctly
@@ -52,8 +53,7 @@ class NormalisedSumPDF : public BasePDF
 
 	private:
 		//	Uncopyable!
-		NormalisedSumPDF ( const NormalisedSumPDF& );
-		NormalisedSumPDF& operator = ( const NormalisedSumPDF& );
+		NormalisedSumPDF& operator=(const NormalisedSumPDF&);
 		void MakePrototypes( PhaseSpaceBoundary* );
 
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;

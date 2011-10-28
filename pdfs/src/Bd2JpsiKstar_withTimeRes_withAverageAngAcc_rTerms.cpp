@@ -13,8 +13,10 @@
 #include "math.h"
 #include "TMath.h"
 
+PDF_CREATOR( Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms );
+
 //Constructor
-Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms() :
+Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms( PDFConfigurator* configurator ) :
 	cachedAzeroAzeroIntB(), cachedAparaAparaIntB(),
 	cachedAperpAperpIntB(), cachedAparaAperpIntB(),
 	cachedAzeroAparaIntB(), cachedAzeroAperpIntB(),
@@ -27,33 +29,33 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Bd2JpsiKstar_withTimeRes_with
 	, evaluationCacheValid(false)
 
 	// Physics parameters
-	,  gammaName     ( "gamma" )
-	, deltaMName    ( "deltaM")
-	, R_alphaName  ( "R_alpha" )
-        , R_betaName  ( "R_beta" )
-	, delta_zeroName( "delta_zero" )
-	, delta_paraName( "delta_para" )
-	, delta_perpName( "delta_perp" )
-//	, Aperp_sqName  ( "Aperp_sq" )
-//	, Apara_sqName  ( "Apara_sq" )
-	, angAccI1Name	( "angAccI1" )
-	, angAccI2Name	( "angAccI2" )
-	, angAccI3Name	( "angAccI3" )
-	, angAccI4Name	( "angAccI4" )
-	, angAccI5Name	( "angAccI5" )
-	, angAccI6Name	( "angAccI6" )
-	, timeRes1Name	( "timeResolution1" )
-	, timeRes2Name	( "timeResolution2" )
-	, timeRes1FractionName	( "timeResolution1Fraction" )
+	,  gammaName     ( configurator->getName("gamma") )
+	, deltaMName    ( configurator->getName("deltaM") )
+	, R_alphaName  ( configurator->getName("R_alpha") )
+        , R_betaName  ( configurator->getName("R_beta") )
+	, delta_zeroName( configurator->getName("delta_zero") )
+	, delta_paraName( configurator->getName("delta_para") )
+	, delta_perpName( configurator->getName("delta_perp") )
+//	, Aperp_sqName  ( configurator->getName("Aperp_sq") )
+//	, Apara_sqName  ( configurator->getName("Apara_sq") )
+	, angAccI1Name	( configurator->getName("angAccI1") )
+	, angAccI2Name	( configurator->getName("angAccI2") )
+	, angAccI3Name	( configurator->getName("angAccI3") )
+	, angAccI4Name	( configurator->getName("angAccI4") )
+	, angAccI5Name	( configurator->getName("angAccI5") )
+	, angAccI6Name	( configurator->getName("angAccI6") )
+	, timeRes1Name	( configurator->getName("timeResolution1") )
+	, timeRes2Name	( configurator->getName("timeResolution2") )
+	, timeRes1FractionName	( configurator->getName("timeResolution1Fraction") )
 
 	// Observables (What we want to gain from the pdf after inserting physics parameter values)
-	, timeName	( "time" )
-	, cosThetaName	( "cosTheta" )
-	, phiName	( "phi" )
-	, cosPsiName	( "cosPsi" )
-	, KstarFlavourName  ( "KstarFlavour" )
+	, timeName	( configurator->getName("time") )
+	, cosThetaName	( configurator->getName("cosTheta") )
+	, phiName	( configurator->getName("phi") )
+	, cosPsiName	( configurator->getName("cosPsi") )
+	, KstarFlavourName  ( configurator->getName("KstarFlavour") )
 
-	, timeconstraintName( "time" )
+	, timeconstraintName( configurator->getName("time") )
 	, gamma(), deltaMs(), R_alpha(), R_beta(), Azero_sq(),
 	Apara_sq(), Aperp_sq(), AzeroApara(), AzeroAperp(),
 	AparaAperp(), delta_zero(), delta_para(), delta_perp(),

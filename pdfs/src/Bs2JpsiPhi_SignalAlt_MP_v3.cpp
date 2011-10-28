@@ -21,11 +21,13 @@
 //#define DOUBLE_TOLERANCE DBL_MIN
 //#define DOUBLE_TOLERANCE 1E-6
 
+PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MP_v3 );
+
 //......................................
 //Constructor(s)
 //...........
 // New with configurator
-Bs2JpsiPhi_SignalAlt_MP_v3::Bs2JpsiPhi_SignalAlt_MP_v3( PDFConfigurator config) : 
+Bs2JpsiPhi_SignalAlt_MP_v3::Bs2JpsiPhi_SignalAlt_MP_v3( PDFConfigurator* config) : 
 Bs2JpsiPhi_SignalAlt_BaseClass_v3(config)
 {
 	MakePrototypes();	
@@ -94,6 +96,10 @@ void Bs2JpsiPhi_SignalAlt_MP_v3::MakePrototypes()
 	valid = true;
 }
 
+Bs2JpsiPhi_SignalAlt_MP_v3::Bs2JpsiPhi_SignalAlt_MP_v3( const Bs2JpsiPhi_SignalAlt_MP_v3& input )
+:	BasePDF( input ), Bs2JpsiPhi_SignalAlt_BaseClass_v3( input )
+{
+}
 
 //........................................................
 //Destructor

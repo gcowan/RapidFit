@@ -27,6 +27,7 @@ class RapidFitIntegrator
 	public:
 		RapidFitIntegrator();
 		RapidFitIntegrator( IPDF*, bool ForceNumerical = false );
+		RapidFitIntegrator ( const RapidFitIntegrator& );
 		~RapidFitIntegrator();
 
 		void ProjectionSettings();
@@ -35,12 +36,12 @@ class RapidFitIntegrator
 		double ProjectObservable( DataPoint*, PhaseSpaceBoundary*, string );
 		double GetRatioOfIntegrals();
 		IPDF * GetPDF();
+		void SetPDF( IPDF* );
 		void UpdateIntegralCache( PhaseSpaceBoundary* );
 		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string> );
 
 	private:
 		//	Uncopyable!
-		RapidFitIntegrator ( const RapidFitIntegrator& );
 		RapidFitIntegrator& operator = ( const RapidFitIntegrator& );
 
 		double GetCachedIntegral( DataPoint* );
@@ -61,6 +62,7 @@ class RapidFitIntegrator
 		vector<string> discreteNames, continuousNames;
 		vector< vector<double> > discreteValues, discreteCombinations;
 		vector<double> cachedIntegrals;
+		bool loud;
 };
 
 #endif

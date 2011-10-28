@@ -80,6 +80,8 @@ namespace GoodnessOfFit
 
 	double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, FitResult * result)
 	{
+		//	Unused parameters, keep gcc happy
+		(void) theMinimiser; (void) theFunction; (void) argumentParameterSet;
 		cout << "Starting GOF for data" << endl;
 		vector<PDFWithData *> pdfAndData = xmlFile->GetPDFsAndData();	
 		vector<PDFWithData *>::iterator iter;
@@ -254,6 +256,7 @@ namespace GoodnessOfFit
 			//double distToCosPsiBoundary = 1. - fabs(event_i->GetObservable( "cosPsi" )->GetValue()) ;
 			double distToTimeBoundary = event_i->GetObservable( "time" )->GetValue() - 0.3;
 			double distToMassBoundary = min(fabs(event_i->GetObservable( "mass" )->GetValue() - 5200.),fabs(event_i->GetObservable( "mass" )->GetValue() - 5550.)) ;
+			(void) distToTimeBoundary; (void) distToMassBoundary;	//Unused
 			double f1 = 1.;
 			double f2 = 1.;
 			//if( sd > distToCosThetaBoundary ) f1 = 1. - acos(distToCosThetaBoundary/sd)/TMath::Pi() ;
@@ -397,7 +400,7 @@ namespace GoodnessOfFit
 		Observable * xVar = 0;
 		double min = 0., max = 0.;
 		int i = 0;
-		char buffer[100];
+		char buffer[100];	(void) buffer;//	Unused
 
 		while ( ( xVar = x->GetObservable( *xIter ) ) ) {
 			if ( *xIter == "time" || *xIter == "cosTheta" || *xIter == "mass"){//|| *xIter == "cosPsi" || *xIter == "phi") {
@@ -560,7 +563,7 @@ namespace GoodnessOfFit
 		double getDistance(DataPoint * x, DataPoint * y)
 		{
 			double distance = 0.;
-			double diff = 0.;
+			double diff = 0.;	(void) diff;	//	Unused
 			vector<string> xListOfNames = x->GetAllNames();
 			vector<string> yListOfNames = y->GetAllNames();
 			vector<string>::iterator xIter = xListOfNames.begin();
@@ -569,7 +572,7 @@ namespace GoodnessOfFit
 			Observable * yVar = 0;
 			double xVal = 0.;
 			double yVal = 0.;
-			char buffer[100];
+			char buffer[100];	(void) buffer;	//	Unused
 			while ( (xVar = x->GetObservable( *xIter ) ) && (yVar = y->GetObservable( *yIter ) ) ) {
 				//cout << *xIter << endl;
 				if ( (*xIter == "time") ) {

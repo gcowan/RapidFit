@@ -2,6 +2,7 @@
 #define _NTUPLE_PROCESS
 
 //	ROOT Headers
+#include "TFile.h"
 #include "TString.h"
 #include "TClass.h"
 #include "TRandom3.h"
@@ -9,6 +10,21 @@
 #include <vector>
 
 using namespace::std;
+
+//	Open a .root file safely i.e. don't crash on failure
+TFile* OpenFile( string );
+
+//	Open Multiple .root files safely
+vector<TFile*> OpenMultipleFiles( vector<string> );
+
+//	Open a file ane get the requested TTree from the file
+TTree* GetTree( string filename, string tuplename );
+
+//	Open Multiple files and get the requested TTrees from the files
+vector<TTree*> GetMultipleTrees( vector<string> all_filenames, vector<string> all_tuplenames );
+
+//	Open Multiple files and get the same TTree from each file
+vector<TTree*> GetMultipleTrees( vector<string> all_filenames, vector<string> all_tuplenames );
 
 //  From the root current path look for all keys (objects in root file) and loop over them
 //  For each one that is actually an object of inherit_type store it's name and the number of events it has

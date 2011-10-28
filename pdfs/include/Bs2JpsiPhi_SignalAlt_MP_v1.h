@@ -11,12 +11,7 @@
 #ifndef Bs2JpsiPhi_SignalAlt_MP_v1_H
 #define Bs2JpsiPhi_SignalAlt_MP_v1_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 #include "Bs2JpsiPhi_SignalAlt_BaseClass.h"
 #include "RooComplex.h"
@@ -29,7 +24,7 @@
 class Bs2JpsiPhi_SignalAlt_MP_v1 : public BasePDF,  public Bs2JpsiPhi_SignalAlt_BaseClass
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_MP_v1();
+		Bs2JpsiPhi_SignalAlt_MP_v1( PDFConfigurator* );
 		~Bs2JpsiPhi_SignalAlt_MP_v1();
 
 		//Mandatory method to evaluate the PDF value:

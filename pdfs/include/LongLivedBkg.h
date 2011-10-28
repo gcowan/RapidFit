@@ -14,20 +14,15 @@
 #include "TFile.h"
 #include "TH3D.h"
 
-#ifndef __CINT__
 #include "BasePDF.h"
 #include "SlicedAcceptance.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#include "framework/include/SlicedAcceptance.h"
-#endif
 
 class LongLivedBkg : public BasePDF
 {
 	public:
 		//LongLivedBkg();
-		LongLivedBkg(PDFConfigurator);
+		LongLivedBkg( PDFConfigurator* );
+		LongLivedBkg( const LongLivedBkg& );
 		~LongLivedBkg();
 
 		//Calculate the PDF value
@@ -39,10 +34,7 @@ class LongLivedBkg : public BasePDF
 		virtual double Norm(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
-		//	Can't be copied
-		LongLivedBkg ( const LongLivedBkg& );
-		LongLivedBkg& operator = ( const LongLivedBkg& );		
-
+		LongLivedBkg& operator=( const LongLivedBkg& );
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 		double buildPDFnumerator();

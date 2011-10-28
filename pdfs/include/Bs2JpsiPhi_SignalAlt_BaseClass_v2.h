@@ -11,23 +11,11 @@
 #ifndef Bs2JpsiPhi_SignalAlt_BaseClass_v2_H
 #define Bs2JpsiPhi_SignalAlt_BaseClass_v2_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
 #include "SlicedAcceptance.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#include "framework/include/PDFConfigurator.h"
-#include "framework/include/SlicedAcceptance.h"
-#endif
 
-#ifndef __CINT__
 #include "Mathematics.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/Mathematics.h"
-#endif
 
 #include "RooComplex.h"
 
@@ -51,15 +39,14 @@
 class Bs2JpsiPhi_SignalAlt_BaseClass_v2
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_BaseClass_v2(PDFConfigurator);
+		Bs2JpsiPhi_SignalAlt_BaseClass_v2( PDFConfigurator* );
+		Bs2JpsiPhi_SignalAlt_BaseClass_v2( const Bs2JpsiPhi_SignalAlt_BaseClass_v2& );
 		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass_v2();
 
+	private:
+		Bs2JpsiPhi_SignalAlt_BaseClass_v2& operator=( const Bs2JpsiPhi_SignalAlt_BaseClass_v2& );
+
 	protected:
-
-	        //      Uncopyable!
-		Bs2JpsiPhi_SignalAlt_BaseClass_v2 ( const Bs2JpsiPhi_SignalAlt_BaseClass_v2& );
-		Bs2JpsiPhi_SignalAlt_BaseClass_v2& operator = ( const Bs2JpsiPhi_SignalAlt_BaseClass_v2& );
-
 		//PELC For debugging purposes
 		//TH1D * histOfPdfValues ;
 		//TCanvas * c0 ; 

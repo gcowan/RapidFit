@@ -12,21 +12,21 @@
 #include "ClassLookUp.h"
 
 //Default constructor
-MinimiserConfiguration::MinimiserConfiguration() : theMinimiser(), OutputLevel(), minimiserName(), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false)
+MinimiserConfiguration::MinimiserConfiguration() : theMinimiser(), OutputLevel(), minimiserName(), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
 }
 
 //Constructor for a minimiser only specified by name
-MinimiserConfiguration::MinimiserConfiguration( string InputName ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false)
+MinimiserConfiguration::MinimiserConfiguration( string InputName ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
 }
 
 //Constructor for a minimiser with requested contour plots
-MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours( Formatting->GetContourPlots() ), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false)
+MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours( Formatting->GetContourPlots() ), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;

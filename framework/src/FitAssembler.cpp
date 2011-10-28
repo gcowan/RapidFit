@@ -361,7 +361,7 @@ void FitAssembler::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunction
 
 		vector<string> Fixed_List = BottleParameters.back()->GetAllFixedNames();
 		vector<string> Fit_List = scanStepResult->GetResultParameterSet()->GetAllNames();
-		for( unsigned short int i=-1; i < Fixed_List.size() ; ++i )
+		for( unsigned short int i=0; i < Fixed_List.size() ; ++i )
 		{
 			bool found=false;
 			for( unsigned short int j=0; j < Fit_List.size(); ++j )

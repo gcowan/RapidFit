@@ -19,6 +19,7 @@ class ProdPDF : public BasePDF
 	public:
 		ProdPDF();
 		ProdPDF( IPDF*, IPDF* );
+		ProdPDF( const ProdPDF& );
 		virtual ~ProdPDF();
 
 		void MakePrototypes();
@@ -52,7 +53,7 @@ class ProdPDF : public BasePDF
 	
 	private:
 		//	Uncopyable!
-		ProdPDF ( const ProdPDF& );
+		//ProdPDF ( const ProdPDF& );
 		ProdPDF& operator = ( const ProdPDF& );
 
 		void MakePrototypes( PhaseSpaceBoundary* );

@@ -1,286 +1,159 @@
 /**
-        @class ClassLookUp
+  @class ClassLookUp
 
-        Central place to hold the methods for returning an instance of a class with a given name.
+  Central place to hold the methods for returning an instance of a class with a given name.
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+  */
+
+//	ROOT Headers
+#include "TSystem.h"
 
 //	RapidFit Headers
 #include "ClassLookUp.h"
-// Signal PDFs set 1  (originally Greig and Conor mostly)
-#include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc.h"
-#include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave.h"
-#include "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms.h"
-
-#include "Bs2JpsiPhi_SignalAlt_MP_v1.h"
-#include "Bs2JpsiPhi_SignalAlt_MP_v2.h"
-#include "Bs2JpsiPhi_SignalAlt_MP_v3.h"
-#include "Bs2JpsiPhi_SignalAlt_MP_dev_v3.h"
-
-#include "Bs2JpsiPhi_SignalAlt_MO_v1.h"
-#include "Bs2JpsiPhi_SignalAlt_MO_v2.h"
-#include "Bs2JpsiPhi_SignalAlt_MO_v3.h"
-#include "Bs2JpsiPhi_SignalAlt_MO_v4.h"
-
-#include "Bs2Jpsifzero_SignalAlt_MP_dev.h"
-#include "Bs2Jpsifzero_SignalAlt_MO_dev.h"
-
-
-#include "Bs2JpsiPhiMassSignal.h"
-#include "BsMass.h"
-
-#include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc.h"
-#include "Bd2JpsiKstar_sWave.h"
-#include "Bd2JpsiKstar_sWave_rTerms.h"
-#include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms.h"
-
-#include "Bs2DsPi.h"
-#include "Bs2DsPi_mistagParameter.h"
-#include "Bs2DsPi_acc.h"
-#include "Bs2PhiPhi.h"
-#include "Bs2DsPiMassSignal.h"
-#include "Bs2DsPiBkg_withTimeRes.h"
-
-#include "Bs2JpsiPhiLongLivedBkg.h"
-#include "Bs2JpsiPhiLongLivedBkg_II.h"
-#include "Bs2JpsiPhiLongLivedBkg_withTimeRes.h"
-#include "Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist.h"
-
-#include "Bs2JpsiPhiPromptBkg_withTimeRes.h"
-#include "Bs2JpsiPhiPromptBkg_withTimeResDouble.h"
-#include "Bs2JpsiPhiPromptBkg_tripleGaussian.h"
-#include "Bs2JpsiPhiMassBkg.h"
-#include "Bs2JpsiPhiMassBkgLL.h"
-
-#include "LongLivedBkg.h"
-#include "LongLivedBkg_3Dangular.h"
-
-#include "Exponential.h"
-
+#include "BasePDF.h"
+#include "NormalisedSumPDF.h"
+#include "ProdPDF.h"
+#include "SumPDF.h"
 #include "MinuitWrapper.h"
 #include "Minuit2Wrapper.h"
 #include "FumiliWrapper.h"
 #include "NegativeLogLikelihood.h"
+#include "NegativeLogLikelihoodThreaded.h"
 #include "Foam.h"
 #include "AcceptReject.h"
 #include "JPsiPhiDataGenerator.h"
 #include "SWeightPrecalculator.h"
+#include "RapidRun.h"
 
 //	System Headers
 #include <stdlib.h>
+#include <dlfcn.h>
+#include <fstream>
+#include <iostream>
+#ifdef _WIN32
+	//#include "dummy.h"	//	This needs correcting
+#elif __APPLE__
+	#include <mach-o/dyld.h>
+#else
+	#include <linux/limits.h>
+	#include <unistd.h>
+	#include <stdint.h>
+#endif
 
-//Look up the name of a PDF, return an appropriate instance of IPDF
-IPDF * ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters, PDFConfigurator configurator )
+//	Get the path of the running executable on this system
+//	Arch independent, and an example of the windows code has not been dreamt up
+//	(and I don't care to unles someone throws their toys out of the pram!)
+char* ClassLookUp::getSelfPath()
 {
+	//void* handle = NULL;
+	static char filename[PATH_MAX];
+	uint32_t pathsize = PATH_MAX;
+	(void) pathsize;
 
-	IPDF* returnable_PDF = NULL;
-
-	vector<string> null_vec = PDFObservables;
-	vector<string> null_vec2 = PDFParameters;
-	while( !null_vec.empty() ) null_vec.pop_back();   // what are these lines for ???
-	while( !null_vec2.empty() ) null_vec2.pop_back();
-
-		if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc" )
-        {
-	        //Default JPsiPhi
-		returnable_PDF = new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc();
-        }
-
-		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave" )
-        {
-	        //Default JPsiPhi with s wave
-	        returnable_PDF = new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave();
-        }
-		else if ( Name == "Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms" )
-        {
-	        //Default JPsiPhi with s wave
-	        returnable_PDF = new Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms();
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v1" )
-        {
-	        //JPsiPhi from Pete with sWave
-		returnable_PDF = new  Bs2JpsiPhi_SignalAlt_MP_v1();
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_dev_v3" )
-        {
-	        //JPsiPhi from Pete/Greig with sWave and angular acceptance in numerator from histogram
-		returnable_PDF = new  Bs2JpsiPhi_SignalAlt_MP_dev_v3(configurator);
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v2" )
-        {
-	        //JPsiPhi from Pete with sWave
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_v2(configurator);
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MP_v3" )
-        {
-	        //JPsiPhi from Pete with sWave
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MP_v3(configurator);
-        }
-		else if ( Name == "Bs2Jpsifzero_SignalAlt_MP_dev" )
-        {
-	        //JPsifzero
-	        returnable_PDF = new Bs2Jpsifzero_SignalAlt_MP_dev(configurator);
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v1" )
-        {
-	        //JPsiPhi from Pete with sWave
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v1();
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v2" )
-        {
-	        //JPsiPhi from Pete with sWave
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v2(configurator);
-        }
-
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v3" )
-        {
-	        //JPsiPhi from Pete with sWave
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v3(configurator);
-        }
-		else if ( Name == "Bs2JpsiPhi_SignalAlt_MO_v4" )
-        {
-	        //JPsiPhi from Pete with sWave
-	        returnable_PDF = new Bs2JpsiPhi_SignalAlt_MO_v4(configurator);
-        }
-		else if ( Name == "Bs2Jpsifzero_SignalAlt_MO_dev" )
-        {
-	        //JPsifzero
-	        returnable_PDF = new Bs2Jpsifzero_SignalAlt_MO_dev(configurator);
-        }
-        else if ( Name == "Bs2PhiPhi" )
-        {
-	        //Default PhiPhi
-                returnable_PDF = new Bs2PhiPhi();
-        }
-        else if ( Name == "Bs2DsPi" )
-        {
-                // DsPi
-                returnable_PDF = new Bs2DsPi();
-        }
-        else if ( Name == "Bs2DsPi_mistagParameter" )
-        {
-			// DsPi
-			returnable_PDF = new Bs2DsPi_mistagParameter();
-        }
-        else if ( Name == "Bs2DsPi_acc" )
-        {
-			// DsPi w. acceptance
-			returnable_PDF = new Bs2DsPi_acc();
-        }
-        else if ( Name == "Bs2DsPiMassSignal" )
-        {
-                //Default DsPi signal mass PDF
-                returnable_PDF = new Bs2DsPiMassSignal();
-        }
-		else if ( Name == "Bs2JpsiPhiMassSignal" )
-        {
-                //Default JPsiPhi signal mass PDF
-                returnable_PDF = new Bs2JpsiPhiMassSignal(configurator);
-        }
-		else if ( Name == "BsMass" )
-        {
-			//Default JPsiPhi signal mass PDF
-			returnable_PDF = new BsMass(configurator);
-        }
-        else if ( Name == "Bs2DsPiBkg_withTimeRes" )
-        {
-		// DsPi
-		returnable_PDF = new Bs2DsPiBkg_withTimeRes();
-        }
-		else if ( Name == "Bs2JpsiPhiLongLivedBkg" )
-        {
-	        //Long lived background for JPsiPhi
-                returnable_PDF = new Bs2JpsiPhiLongLivedBkg();
-        }
-		else if ( Name == "Bs2JpsiPhiLongLivedBkg_II" )
-        {
-	        //Long lived background for JPsiPhi with different parameters
-			returnable_PDF = new Bs2JpsiPhiLongLivedBkg_II();
-        }
-        else if ( Name == "Bs2JpsiPhiLongLivedBkg_withTimeRes" )
-        {
-                //Long lived background for JPsiPhi with time resolution (convolved gaussian)
-                returnable_PDF = new Bs2JpsiPhiLongLivedBkg_withTimeRes();
-        }
-        else if ( Name == "Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist" )
-        {
-			//Long lived background for JPsiPhi with time resolution (convolved gaussian)
-			returnable_PDF = new Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist();
-        }
-        else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeRes" )
-        {
-	        //Prompt background for JPsiPhi, with time resolution (convolved gaussian)
-		returnable_PDF = new Bs2JpsiPhiPromptBkg_withTimeRes();
-        }
-        else if ( Name == "Bs2JpsiPhiPromptBkg_withTimeResDouble" )
-        {
-	        //Prompt background for JPsiPhi, with time resolution (double convolved gaussian)
-			returnable_PDF = new Bs2JpsiPhiPromptBkg_withTimeResDouble(configurator);
-        }
-        else if ( Name == "Bs2JpsiPhiPromptBkg_tripleGaussian" )
-        {
-	        //Prompt background for JPsiPhi, with time resolution (double convolved gaussian)
-			returnable_PDF = new Bs2JpsiPhiPromptBkg_tripleGaussian();
-        }
-        else if ( Name == "Bs2JpsiPhiMassBkg" )
-        {
-                //Default JPsiPhi prompt bkg mass signal
-                returnable_PDF = new Bs2JpsiPhiMassBkg(configurator);
-	}
-        else if ( Name == "Exponential" )
-        {
-            	//Default JPsiPhi prompt bkg mass signal
-                returnable_PDF = new Exponential();
-	}
-        else if ( Name == "Bs2JpsiPhiMassBkgLL" )
-        {
-			//Default JPsiPhi prompt bkg mass signal
-			returnable_PDF = new Bs2JpsiPhiMassBkgLL();
+	#ifdef _WIN32
+		cout << "Windows hasn't been implemented yet... any takers?" << endl;
+		exit(-42);
+	#elif __APPLE__
+		_NSGetExecutablePath(filename, &pathsize);
+	#else
+		ssize_t len = readlink("/proc/self/exe", filename, sizeof(filename)-1);
+		if (len != -1) {
+			filename[len] = '\0';
+		} else {
+			filename[0] = 'F' ;
+			filename[1] = 'A' ;
+			filename[2] = 'I' ;
+			filename[3] = 'L' ;
+			filename[4] = '\0';
 		}
+	#endif
+	
+	return filename;
+}
 
-	else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc" )
-        {
-			// Bd2JPsiKstar with analytic double gaussian time resolution
-			returnable_PDF = new Bd2JpsiKstar_withTimeRes_withAverageAngAcc();
-        }
+//	Resolve the object 'Name' within the binary object containing RapidFit
+void* ClassLookUp::getObject( string Name )
+{
+	void* returnable_object;
 
-        else if ( Name == "Bd2JpsiKstar_sWave" )
-        {
-                         // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
-                         returnable_PDF = new Bd2JpsiKstar_sWave();
-        }
-
-	else if ( Name == "Bd2JpsiKstar_sWave_rTerms" )
-        {
-                         // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
-                         returnable_PDF = new Bd2JpsiKstar_sWave_rTerms();
-        }
+	string pathName = ClassLookUp::getSelfPath();
+	string root_exe = "root.exe";
+	string failed_str = "FAIL";
 
 
-	else if ( Name == "Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms" )
-        {
-                         // Bd2JPsiKstar with analytic double gaussian time resolution and sWave
-                         returnable_PDF = new Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms();
-        }
+	//	If RapidFit is compiled/run as a CINT library
+	//	DO NOT INTEROGATE THE OUTSIDE WORLD (you probably won't like what you find on the grid...)
+	//	This needs to be protected with a macro due to ROOT needlessley SCREAMING at you with unwanted errors
+	if( pathName.find( root_exe ) != string::npos )
+	{
+		returnable_object = (void*) gSystem->DynFindSymbol( RAPIDFIT_LIBRARY_NAME, Name.c_str() );
+	} else {
+		void *handle = dlopen( ClassLookUp::getSelfPath(), RTLD_LAZY | RTLD_GLOBAL );
+		returnable_object = dlsym( handle, Name.c_str() );
+	}
 
-	else if ( Name == "LongLivedBkg" )
-        {
-                         returnable_PDF = new LongLivedBkg(configurator);
-        }
+	if( returnable_object == NULL )
+	{
+		cerr << "Error:\t\tCan't find symbol List or Object:\t" << Name << endl << endl;
+		exit(-45);
+	}
 
+	return returnable_object;
+}
 
-	else if ( Name == "LongLivedBkg_3Dangular" )
-        {
-                         returnable_PDF = new LongLivedBkg_3Dangular(configurator);
-        }
+IPDF* ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters, PDFConfigurator* configurator )
+{
+	(void) PDFObservables;
+	(void) PDFParameters;
 
+	string pdf_creator_Name = "CreatePDF_"+Name;
+
+	CreatePDF_t* pdf_creator = (CreatePDF_t*) ClassLookUp::getObject( pdf_creator_Name );
+
+	IPDF* returnable_PDF = pdf_creator( configurator );
+
+	returnable_PDF->SetName( Name ); 
+
+	return returnable_PDF;
+}
+
+IPDF* ClassLookUp::CopyPDF( IPDF* inputPDF )
+{
+	IPDF* returnable_PDF=NULL;
+	string Name = inputPDF->GetName();
+
+	if( Name == "NormalisedSum" )
+	{
+		returnable_PDF = (IPDF*) new NormalisedSumPDF( *(const NormalisedSumPDF*) inputPDF );
+	}
+	else if( Name == "Prod" )
+	{
+		returnable_PDF = (IPDF*) new ProdPDF( *(const ProdPDF*) inputPDF );
+	}
+	else if( Name == "Sum" )
+	{
+		returnable_PDF = (IPDF*) new SumPDF( *(const SumPDF*) inputPDF );
+	}
 	else
 	{
-		cerr << "Unrecognised PDF name: " << Name << endl;
-		exit(1);
+		string pdf_copy_Name = "CopyPDF_"+Name;
+
+		CopyPDF_t* pdf_copy = (CopyPDF_t*) ClassLookUp::getObject( pdf_copy_Name );
+
+		returnable_PDF = pdf_copy( *inputPDF );
 	}
+
+	returnable_PDF->SetName( Name );
+	returnable_PDF->Remove_Cache( true );
+
+	if( !inputPDF->GetActualParameterSet()->GetAllNames().empty() )
+	{
+		returnable_PDF->SetPhysicsParameters( inputPDF->GetActualParameterSet() );
+		returnable_PDF->UpdateIntegralCache();
+	}
+
 	return returnable_PDF;
 }
 
@@ -290,6 +163,10 @@ FitFunction * ClassLookUp::LookUpFitFunctionName( string Name )
 	if ( Name == "NegativeLogLikelihood" )
 	{
 		return new NegativeLogLikelihood();
+	}
+	if ( Name == "NegativeLogLikelihoodThreaded" )
+	{
+		return new NegativeLogLikelihoodThreaded();
 	}
 	else
 	{
@@ -310,9 +187,9 @@ IMinimiser * ClassLookUp::LookUpMinimiserName( string Name, int NumberParameters
 		return new Minuit2Wrapper();
 	}
 	else if ( Name == "Fumili" )
-        {
-                return new FumiliWrapper();
-        }
+	{
+		return new FumiliWrapper();
+	}
 	else
 	{
 		cerr << "Unrecognised minimiser name: " << Name << endl;

@@ -14,18 +14,14 @@
 #include "TFile.h"
 #include "TH3D.h"
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class LongLivedBkg_3Dangular : public BasePDF
 {
 	public:
 		//LongLivedBkg_3Dangular();
-		LongLivedBkg_3Dangular(PDFConfigurator);
+		LongLivedBkg_3Dangular( PDFConfigurator* );
+		LongLivedBkg_3Dangular( const LongLivedBkg_3Dangular& );
 		~LongLivedBkg_3Dangular();
 
 		//Calculate the PDF value
@@ -36,10 +32,7 @@ class LongLivedBkg_3Dangular : public BasePDF
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
-		//	Can't be copied
-		LongLivedBkg_3Dangular ( const LongLivedBkg_3Dangular& );
-		LongLivedBkg_3Dangular& operator = ( const LongLivedBkg_3Dangular& );		
-
+		LongLivedBkg_3Dangular& operator=( const LongLivedBkg_3Dangular& );
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 		double buildPDFnumerator();

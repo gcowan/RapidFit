@@ -17,60 +17,62 @@
 #include <iostream>
 #include <math.h>
 
+PDF_CREATOR( Bs2Jpsifzero_SignalAlt_BaseClass_dev );
+
 //......................................
 //Constructor(s)
 
 //.....................................
 // New Constructor which takes configuration object
-Bs2Jpsifzero_SignalAlt_BaseClass_dev::Bs2Jpsifzero_SignalAlt_BaseClass_dev(PDFConfigurator configurator ) : 
+Bs2Jpsifzero_SignalAlt_BaseClass_dev::Bs2Jpsifzero_SignalAlt_BaseClass_dev(PDFConfigurator* configurator ) : 
 // Physics parameters
-	  gammaName     		( configurator.getName("gamma") )
-	, deltaGammaName		( configurator.getName("deltaGamma") )
-	, deltaMName			( configurator.getName("deltaM") )
-	, Phi_sName				( configurator.getName("Phi_s") )
-	, Azero_sqName			( configurator.getName("Azero_sq") )
-	, Apara_sqName			( configurator.getName("Apara_sq") )
-	, Aperp_sqName			( configurator.getName("Aperp_sq") )
-	, As_sqName				( configurator.getName("As_sq") )
-	, delta_zeroName		( configurator.getName("delta_zero") )
-	, delta_paraName		( configurator.getName("delta_para") )
-	, delta_perpName		( configurator.getName("delta_perp") )
-	, delta_sName			( configurator.getName("delta_s") )
+	  gammaName     		( configurator->getName("gamma") )
+	, deltaGammaName		( configurator->getName("deltaGamma") )
+	, deltaMName			( configurator->getName("deltaM") )
+	, Phi_sName				( configurator->getName("Phi_s") )
+	, Azero_sqName			( configurator->getName("Azero_sq") )
+	, Apara_sqName			( configurator->getName("Apara_sq") )
+	, Aperp_sqName			( configurator->getName("Aperp_sq") )
+	, As_sqName				( configurator->getName("As_sq") )
+	, delta_zeroName		( configurator->getName("delta_zero") )
+	, delta_paraName		( configurator->getName("delta_para") )
+	, delta_perpName		( configurator->getName("delta_perp") )
+	, delta_sName			( configurator->getName("delta_s") )
 	// PELC NEW additions for v2
-	, cosphisName			( configurator.getName("cosphis") )
-	, sinphisName			( configurator.getName("sinphis") )
+	, cosphisName			( configurator->getName("cosphis") )
+	, sinphisName			( configurator->getName("sinphis") )
 	// Detector parameters
-	, mistagName			( configurator.getName("mistag") )
-	, mistagP1Name			( configurator.getName("mistagP1") )
-	, mistagP0Name			( configurator.getName("mistagP0") )
-	, mistagSetPointName	( configurator.getName("mistagSetPoint") )
+	, mistagName			( configurator->getName("mistag") )
+	, mistagP1Name			( configurator->getName("mistagP1") )
+	, mistagP0Name			( configurator->getName("mistagP0") )
+	, mistagSetPointName	( configurator->getName("mistagSetPoint") )
 	// Detector parameters
-	, resScaleName			( configurator.getName("timeResolutionScale") )
-	, res1Name				( configurator.getName("timeResolution1") )
-	, res2Name				( configurator.getName("timeResolution2") )
-	, res3Name				( configurator.getName("timeResolution3") )
-	, res2FractionName		( configurator.getName("timeResolution2Fraction") )
-	, res3FractionName		( configurator.getName("timeResolution3Fraction") )
-	, timeOffsetName		( configurator.getName("timeOffset") )
+	, resScaleName			( configurator->getName("timeResolutionScale") )
+	, res1Name				( configurator->getName("timeResolution1") )
+	, res2Name				( configurator->getName("timeResolution2") )
+	, res3Name				( configurator->getName("timeResolution3") )
+	, res2FractionName		( configurator->getName("timeResolution2Fraction") )
+	, res3FractionName		( configurator->getName("timeResolution3Fraction") )
+	, timeOffsetName		( configurator->getName("timeOffset") )
 	// Angular acceptance factors
-	, angAccI1Name			( configurator.getName("angAccI1") )
-	, angAccI2Name			( configurator.getName("angAccI2") )
-	, angAccI3Name			( configurator.getName("angAccI3") )
-	, angAccI4Name			( configurator.getName("angAccI4") )
-	, angAccI5Name			( configurator.getName("angAccI5") )
-	, angAccI6Name			( configurator.getName("angAccI6") )
-	, angAccI7Name			( configurator.getName("angAccI7") )
-	, angAccI8Name			( configurator.getName("angAccI8") )
-	, angAccI9Name			( configurator.getName("angAccI9") )
-	, angAccI10Name			( configurator.getName("angAccI10") )
+	, angAccI1Name			( configurator->getName("angAccI1") )
+	, angAccI2Name			( configurator->getName("angAccI2") )
+	, angAccI3Name			( configurator->getName("angAccI3") )
+	, angAccI4Name			( configurator->getName("angAccI4") )
+	, angAccI5Name			( configurator->getName("angAccI5") )
+	, angAccI6Name			( configurator->getName("angAccI6") )
+	, angAccI7Name			( configurator->getName("angAccI7") )
+	, angAccI8Name			( configurator->getName("angAccI8") )
+	, angAccI9Name			( configurator->getName("angAccI9") )
+	, angAccI10Name			( configurator->getName("angAccI10") )
 	// Observables
-	, timeName				( configurator.getName("time") )
-	, cosThetaName			( configurator.getName("cosTheta") )
-	, phiName				( configurator.getName("phi") )
-	, cosPsiName			( configurator.getName("cosPsi") )
-	, tagName				( configurator.getName("tag") )
-	//X, timeAcceptanceCategoryName	( configurator.getName("timeAcceptanceCategory") )
-	, timeConstraintName	( configurator.getName("time") )
+	, timeName				( configurator->getName("time") )
+	, cosThetaName			( configurator->getName("cosTheta") )
+	, phiName				( configurator->getName("phi") )
+	, cosPsiName			( configurator->getName("cosPsi") )
+	, tagName				( configurator->getName("tag") )
+	//X, timeAcceptanceCategoryName	( configurator->getName("timeAcceptanceCategory") )
+	, timeConstraintName	( configurator->getName("time") )
 	// Other things
 	, _useTimeAcceptance(false)
 	, _numericIntegralForce(false)
@@ -83,25 +85,25 @@ Bs2Jpsifzero_SignalAlt_BaseClass_dev::Bs2Jpsifzero_SignalAlt_BaseClass_dev(PDFCo
 	resolutionScale(), resolution1(), resolution2(), resolution3(), resolution2Fraction(), resolution3Fraction(), timeOffset(), 
 	angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), 
 	tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
-	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL), normalisationCacheValid(false)
+	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL), normalisationCacheValid(false), resolution()
 {
 
 	//...........................................
 	// Configure to use time acceptance machinery 
-	_useTimeAcceptance = configurator.isTrue( "UseTimeAcceptance" ) ;
+	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 	
 	if( useTimeAcceptance() ) {
-		if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
+		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0157 ) ;
 			cout << "Bs2Jpsifzero_SignalAlt_BaseClass_dev:: Constructing timeAcc: Upper time acceptance beta=0.0157 [0 < t < 14] " << endl ;
 		}
-		else if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Lower2010" ) ) {
+		else if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Lower2010" ) ) {
 			timeAcc = new SlicedAcceptance( "Lower2010" ) ;
 			cout << "Bs2Jpsifzero_SignalAlt_BaseClass_dev:: Constructing timeAcc: Lower time acceptance 2010  [0 < t < 14] " << endl ;
 		}
-		else if( configurator.getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
-			timeAcc = new SlicedAcceptance( "File" , configurator.getConfigurationValue( "TimeAcceptanceFile" ) ) ;
-			cout << "Bs2Jpsifzero_SignalAlt_BaseClass_dev:: Constructing timeAcc: using file: " << configurator.getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
+		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
+			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
+			cout << "Bs2Jpsifzero_SignalAlt_BaseClass_dev:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
 		}
 	}
 	else {
@@ -112,13 +114,13 @@ Bs2Jpsifzero_SignalAlt_BaseClass_dev::Bs2Jpsifzero_SignalAlt_BaseClass_dev(PDFCo
 	
 	//...........................................
 	// Configure numerical integration options 
-	_numericIntegralForce    = configurator.isTrue( "NumericIntegralForce") ;
-	_numericIntegralTimeOnly = configurator.isTrue( "NumericIntegralTimeOnly" ) ;
+	_numericIntegralForce    = configurator->isTrue( "NumericIntegralForce") ;
+	_numericIntegralTimeOnly = configurator->isTrue( "NumericIntegralTimeOnly" ) ;
 	
 	//...........................................
 	// Configure fit parameter options 
-	_useCosAndSin = configurator.isTrue( "UseCosAndSin" ) ;
-	allowNegativeAsSq = configurator.isTrue( "AllowNegativeAsSq" ) ;
+	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
+	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
 	
 
 	
@@ -129,6 +131,37 @@ Bs2Jpsifzero_SignalAlt_BaseClass_dev::Bs2Jpsifzero_SignalAlt_BaseClass_dev(PDFCo
 	//~PELC
 }
 
+
+Bs2Jpsifzero_SignalAlt_BaseClass_dev::Bs2Jpsifzero_SignalAlt_BaseClass_dev( const Bs2Jpsifzero_SignalAlt_BaseClass_dev& input )	:
+	gammaName(input.gammaName), deltaGammaName(input.deltaGammaName), deltaMName(input.deltaMName), Phi_sName( input.Phi_sName ),
+	Azero_sqName(input.Azero_sqName), Apara_sqName(input.Apara_sqName), Aperp_sqName(input.Aperp_sqName), As_sqName(input.As_sqName),
+	delta_zeroName(input.delta_zeroName), delta_paraName(input.delta_paraName), delta_perpName(input.delta_perpName),
+	delta_sName(input.delta_sName), cosphisName(input.cosphisName), sinphisName(input.sinphisName), mistagName(input.mistagName),
+	mistagP1Name(input.mistagP1Name), mistagP0Name(input.mistagP0Name), mistagSetPointName(input.mistagSetPointName),
+	resScaleName(input.resScaleName), res1Name(input.res1Name), res2Name(input.res2Name), res3Name(input.res3Name),
+	res2FractionName(input.res2FractionName), res3FractionName(input.res3FractionName), timeOffsetName(input.timeOffsetName),
+	angAccI1Name(input.angAccI1Name), angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name),
+	angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name), angAccI7Name(input.angAccI7Name), angAccI8Name(input.angAccI8Name),
+	angAccI9Name(input.angAccI9Name), angAccI10Name(input.angAccI10Name), timeName(input.timeName), cosThetaName(input.cosThetaName),
+	phiName(input.phiName), cosPsiName(input.cosPsiName), tagName(input.tagName), timeConstraintName(input.timeConstraintName), t(input.t),
+	ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr), ctheta_1(input.ctheta_1), tag(input.tag), _gamma(input._gamma), dgam(input.dgam),
+	Aperp_sq(input.Aperp_sq), Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq), As_sq(input.As_sq), delta_para(input.delta_para),
+	delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2),
+	delta_ms(input.delta_ms), phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag),
+	_mistagP1(input._mistagP1), _mistagP0(input._mistagP0), _mistagSetPoint(input._mistagSetPoint), resolution(input.resolution),
+	resolutionScale(input.resolutionScale), resolution1(input.resolution1), resolution2(input.resolution2), resolution3(input.resolution3),
+	resolution2Fraction(input.resolution2Fraction), resolution3Fraction(input.resolution3Fraction), timeOffset(input.timeOffset),
+	angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4), angAccI5(input.angAccI5),
+	angAccI6(input.angAccI6), angAccI7(input.angAccI7), angAccI8(input.angAccI8), angAccI9(input.angAccI9), angAccI10(input.angAccI10),
+	tlo(input.tlo), thi(input.thi), expL_stored(input.expL_stored), expH_stored(input.expH_stored), expSin_stored(input.expSin_stored),
+	expCos_stored(input.expCos_stored), intExpL_stored(input.intExpL_stored), intExpH_stored(input.intExpH_stored),
+	intExpSin_stored(input.intExpSin_stored), intExpCos_stored(input.intExpCos_stored), _useTimeAcceptance(input._useTimeAcceptance),
+	_numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly), 
+	_useCosAndSin(input._useCosAndSin), allowNegativeAsSq(input.allowNegativeAsSq), timeAcc(input.timeAcc),
+	normalisationCacheValid(input.normalisationCacheValid)
+{
+	timeAcc = new SlicedAcceptance( *(input.timeAcc) );
+}
 
 //........................................................
 //Destructor

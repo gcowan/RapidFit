@@ -12,7 +12,7 @@
 
 //	System Headers
 #include <iostream>
-#include<fstream>
+#include <fstream>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -44,6 +44,8 @@ class SlicedAcceptance
 		SlicedAcceptance( double tlow, double thigh, double beta  ) ;
 		SlicedAcceptance( string s  ) ;
 		SlicedAcceptance( string s1, string s2  ) ;
+		//	Copy Constructor
+		SlicedAcceptance( const SlicedAcceptance& input );
 
 		// Methods for numerator of PDF to return acceptance for event
 		double getValue( double time ) const ;
@@ -54,7 +56,6 @@ class SlicedAcceptance
 
 	private:	
 		//      Uncopyable!
-		SlicedAcceptance ( const SlicedAcceptance& );
 		SlicedAcceptance& operator = ( const SlicedAcceptance& );
 
 		double stream(ifstream& stream) ;

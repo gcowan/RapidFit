@@ -75,10 +75,10 @@ vector< XMLTag* > XMLTag::GetChildren()
 	if( NamePos != -1  )
 	{
 		size_t found = string::npos;
-		found = string( path.Data() ).find( children[NamePos]->GetValue()[0] );
+		found = string( path.Data() ).find( children[(unsigned)NamePos]->GetValue()[0] );
 		if( found == string::npos )
 		{
-			path.Append( "/" + children[NamePos]->GetValue()[0] );
+			path.Append( "/" + children[(unsigned)NamePos]->GetValue()[0] );
 		}
 	}
 	vector<XMLTag*> new_children = children;
@@ -102,7 +102,7 @@ vector<string> XMLTag::GetValue()
 	int TagPos = StringProcessing::VectorContains( &forbidden_paths, &pathStr );
 	if( TagPos != -1 )
 	{
-		value[0] = (*forbidden)[TagPos].second;
+		value[0] = (*forbidden)[(unsigned)TagPos].second;
 		forbidden->erase(forbidden->begin()+TagPos);
 		new_value[0] = value[0];
 	}

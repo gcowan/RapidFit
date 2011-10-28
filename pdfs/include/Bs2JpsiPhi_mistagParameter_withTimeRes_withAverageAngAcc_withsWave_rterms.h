@@ -10,17 +10,12 @@
 #ifndef Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms_H
 #define Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms : public BasePDF
 {
 	public:
-		Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms();
+		Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms( PDFConfigurator* );
 		~Bs2JpsiPhi_mistagParameter_withTimeRes_withAverageAngAcc_withsWave_rterms();
 
 		//Calculate the PDF value

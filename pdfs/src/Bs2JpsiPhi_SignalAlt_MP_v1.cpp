@@ -21,13 +21,16 @@
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
+PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MP_v1 );
+
 //......................................
 //Constructor
 
-Bs2JpsiPhi_SignalAlt_MP_v1::Bs2JpsiPhi_SignalAlt_MP_v1() : 
+Bs2JpsiPhi_SignalAlt_MP_v1::Bs2JpsiPhi_SignalAlt_MP_v1(PDFConfigurator* configuration) : 
 	Bs2JpsiPhi_SignalAlt_BaseClass()
 	, normalisationCacheValid(false)
 {
+	(void) configuration;
 	MakePrototypes();
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MP_v1 " << std::endl ;
 	_mistagP1=1.0 ;     // These three are for backwards compatibility

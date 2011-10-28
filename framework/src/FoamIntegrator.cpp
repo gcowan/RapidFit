@@ -14,6 +14,14 @@ FoamIntegrator::FoamIntegrator() : allIntegrators(), discreteNames(), discreteVa
 {
 }
 
+FoamIntegrator::FoamIntegrator( const FoamIntegrator& input ) : allIntegrators(), discreteNames( input.discreteNames ), discreteValues( input.discreteValues )
+{
+	for( unsigned int i=0; i< input.allIntegrators.size(); ++i )
+	{
+		allIntegrators.push_back( new MakeFoam( *(input.allIntegrators[i]) ) );
+	}
+}
+
 //Constructor with correct arguments
 FoamIntegrator::FoamIntegrator( IPDF * InputPDF, IDataSet * InputData ) : allIntegrators(), discreteNames(), discreteValues()
 {

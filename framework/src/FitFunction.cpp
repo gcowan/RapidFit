@@ -14,9 +14,12 @@
 #include "TString.h"
 //	RapidFit Headers
 #include "FitFunction.h"
+//	System Headers
+#include <iostream>
+#include <iomanip>
 
 //Default constructor
-FitFunction::FitFunction() : allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0)
+FitFunction::FitFunction() : allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0), Threads(0)
 {
 }
 
@@ -123,6 +126,7 @@ double FitFunction::Evaluate()
 		//cout << endl;
 		Fit_Tree->Fill();
 	}
+	cout << "NLL: " << setprecision(20) << minimiseValue << "\r\r\r" << flush;
 	return minimiseValue;
 }
 
@@ -158,3 +162,12 @@ void FitFunction::UseEventWeights( string WeightName )
 	weightObservableName = WeightName;
 }
 
+void FitFunction::SetThreads( int input )
+{
+	Threads = input;
+}
+
+int FitFunction::GetThreads()
+{
+	return Threads;
+}

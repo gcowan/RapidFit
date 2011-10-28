@@ -8,11 +8,12 @@
 */
 
 //	RapidFit Headers
+#include "ClassLookUp.h"
 #include "PhysicsBottle.h"
 #include "StringProcessing.h"
 //	System Headers
 #include <iostream>
-#include <stdlib.h>
+#include 	<stdlib.h>
 
 //Default constructor
 PhysicsBottle::PhysicsBottle() : allPDFs(), allDataSets(), allConstraints(), bottleParameters(), finalised(false)
@@ -24,13 +25,22 @@ PhysicsBottle::PhysicsBottle(ParameterSet * NewParameters) : allPDFs(), allDataS
 {
 }
 
-PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) : allPDFs(newParameters.allPDFs), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters(newParameters.bottleParameters), finalised(newParameters.finalised)
+PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) : allPDFs(), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters(newParameters.bottleParameters), finalised(newParameters.finalised)
 {
+	for( unsigned int i=0; i< newParameters.allPDFs.size(); ++i )
+	{
+		allPDFs.push_back( ClassLookUp::CopyPDF(newParameters.allPDFs[i]) );
+	}
 }
 
 //Destructor
 PhysicsBottle::~PhysicsBottle()
 {
+	while( !allPDFs.empty() )
+	{
+		if( allPDFs.back() != NULL ) delete allPDFs.back();
+		allPDFs.pop_back();
+	}
 	//cout << "Hello from PhysicsBottle destructor" << endl;
 }
 
@@ -44,7 +54,7 @@ void PhysicsBottle::AddResult( IPDF * NewPDF, IDataSet * NewDataSet )
 	}
 	else
 	{
-		allPDFs.push_back( NewPDF );
+		allPDFs.push_back( ClassLookUp::CopyPDF(NewPDF) );
 		allDataSets.push_back( NewDataSet );
 	}
 }

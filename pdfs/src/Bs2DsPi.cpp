@@ -10,21 +10,23 @@
 #include "math.h"
 #include "TMath.h"
 
+PDF_CREATOR( Bs2DsPi );
+
 //Constructor
-Bs2DsPi::Bs2DsPi() : 
+Bs2DsPi::Bs2DsPi( PDFConfigurator* configurator ) : 
 	// Physics parameters
-	  gammaName     ( "gamma" )
-	, deltaGammaName( "deltaGamma" )
-	, deltaMName    ( "deltaM")
+	  gammaName     ( configurator->getName("gamma") )
+	, deltaGammaName( configurator->getName("deltaGamma") )
+	, deltaMName    ( configurator->getName("deltaM") )
 
 	// Observables
-	, timeName	( "time" )
-	, tagName	( "tag" )
-	, mistagName	( "mistag" )
-	//, timeres	( "resolution" )
+	, timeName	( configurator->getName("time") )
+	, tagName	( configurator->getName("tag") )
+	, mistagName	( configurator->getName("mistag") )
+	//, timeres	( configurator->getName("resolution") )
 	//, normalisationCacheValid(false)
 	//, evaluationCacheValid(false)
-	, timeconstraintName( "time" )
+	, timeconstraintName( configurator->getName("time") )
 {
 	MakePrototypes();
 }

@@ -17,12 +17,14 @@
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
+PDF_CREATOR( Bs2JpsiPhiMassBkgLL );
+
 //Constructor
-Bs2JpsiPhiMassBkgLL::Bs2JpsiPhiMassBkgLL() : 
+Bs2JpsiPhiMassBkgLL::Bs2JpsiPhiMassBkgLL( PDFConfigurator* configurator ) : 
 	// Physics parameters
-	  alphaM_llName	( "alphaM_ll" )
+	  alphaM_llName	( configurator->getName("alphaM_ll") )
         // Observables
-        , recoMassName  ( "mass" )
+        , recoMassName  ( configurator->getName("mass") )
 	, constraint_recoMassName()
 {
 	MakePrototypes();

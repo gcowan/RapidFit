@@ -13,13 +13,15 @@
 #include "TMath.h"
 #include "RooMath.h"
 
+PDF_CREATOR( Bs2JpsiPhiPromptBkg_withTimeRes );
+
 //Constructor
-Bs2JpsiPhiPromptBkg_withTimeRes::Bs2JpsiPhiPromptBkg_withTimeRes() : 
+Bs2JpsiPhiPromptBkg_withTimeRes::Bs2JpsiPhiPromptBkg_withTimeRes( PDFConfigurator* configurator ) : 
 	// Physics parameters
-	  sigmaPrName	( "sigmaPr" )
+	  sigmaPrName	( configurator->getName("sigmaPr") )
         // Observables
-        , timeName      ( "time" )
-	, timeconstraintName( "time" )
+        , timeName      ( configurator->getName("time") )
+	, timeconstraintName( configurator->getName("time") )
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with time resolution" << endl;

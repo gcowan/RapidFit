@@ -11,23 +11,11 @@
 #ifndef Bs2Jpsifzero_SignalAlt_BaseClass_dev_H
 #define Bs2Jpsifzero_SignalAlt_BaseClass_dev_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
 #include "SlicedAcceptance.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#include "framework/include/PDFConfigurator.h"
-#include "framework/include/SlicedAcceptance.h"
-#endif
 
-#ifndef __CINT__
 #include "Mathematics.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/Mathematics.h"
-#endif
 
 #include "RooComplex.h"
 
@@ -51,14 +39,14 @@
 class Bs2Jpsifzero_SignalAlt_BaseClass_dev
 {
 	public:
-		Bs2Jpsifzero_SignalAlt_BaseClass_dev(PDFConfigurator);
+		Bs2Jpsifzero_SignalAlt_BaseClass_dev ( PDFConfigurator* );
+		Bs2Jpsifzero_SignalAlt_BaseClass_dev ( const Bs2Jpsifzero_SignalAlt_BaseClass_dev& );
 		virtual ~Bs2Jpsifzero_SignalAlt_BaseClass_dev();
 
-	protected:
+	private:
+		Bs2Jpsifzero_SignalAlt_BaseClass_dev& operator=( const Bs2Jpsifzero_SignalAlt_BaseClass_dev& );
 
-	        //      Uncopyable!
-		Bs2Jpsifzero_SignalAlt_BaseClass_dev ( const Bs2Jpsifzero_SignalAlt_BaseClass_dev& );
-		Bs2Jpsifzero_SignalAlt_BaseClass_dev& operator = ( const Bs2Jpsifzero_SignalAlt_BaseClass_dev& );
+	protected:
 
 		//PELC For debugging purposes
 		//TH1D * histOfPdfValues ;

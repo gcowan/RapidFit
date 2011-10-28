@@ -2,6 +2,7 @@
 #include "MakeFoam.h"
 #include "StatisticsFunctions.h"
 #include "RapidFitIntegrator.h"
+#include "ClassLookUp.h"
 //	System Headers
 #include <queue>
 #include <iostream>
@@ -16,6 +17,12 @@ const int HISTOGRAM_BINS = 8;
 
 //Default constructor
 MakeFoam::MakeFoam() : finishedCells(), centerPoints(), centerValues(), cellIntegrals(), integratePDF()
+{
+}
+
+MakeFoam::MakeFoam( const MakeFoam& input ) :
+	finishedCells( input.finishedCells ), centerPoints( input.centerPoints ), centerValues( input.centerValues ), cellIntegrals( input.cellIntegrals ),
+	integratePDF( ClassLookUp::CopyPDF( input.integratePDF ) )
 {
 }
 

@@ -8,17 +8,12 @@
 #ifndef Bs2DsPi_H
 #define Bs2DsPi_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
 
 class Bs2DsPi : public BasePDF
 {
 	public:
-		Bs2DsPi();
+		Bs2DsPi( PDFConfigurator* );
 		~Bs2DsPi();
 
 		//Calculate the PDF value

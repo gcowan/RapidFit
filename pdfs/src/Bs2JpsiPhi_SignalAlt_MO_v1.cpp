@@ -16,15 +16,18 @@
 
 #define DEBUGFLAG true
 
+PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MO_v1 );
+
 //......................................
 //Constructor
 
-Bs2JpsiPhi_SignalAlt_MO_v1::Bs2JpsiPhi_SignalAlt_MO_v1() : 
+Bs2JpsiPhi_SignalAlt_MO_v1::Bs2JpsiPhi_SignalAlt_MO_v1( PDFConfigurator* configurator ) : 
 	  Bs2JpsiPhi_SignalAlt_BaseClass()
 	, normalisationCacheValid(false)
 	//, mistagScaleName	( make_pair(string("mistagScale"),-1) )
 	//, mistagOffsetName	( make_pair(string("mistagOffset"),-1) )
 {
+	(void) configurator;
 	MakePrototypes();
 	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MO_v1 " << std::endl ;

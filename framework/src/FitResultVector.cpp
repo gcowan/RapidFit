@@ -288,6 +288,7 @@ vector<double> FitResultVector::GetFlatResult( int Index )
 	Flatresult.push_back(allResults[unsigned(Index)]->GetMinimumValue());
 	return Flatresult;
 }
+
 TString FitResultVector::GetFlatResultHeader()
 {
 	TString header = "";

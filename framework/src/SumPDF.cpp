@@ -10,24 +10,31 @@
 //	RapidFit Headers
 #include "SumPDF.h"
 #include "StringProcessing.h"
+#include "ClassLookUp.h"
 //	System Headers
 #include <iostream>
 
 using namespace std;
 
 //Default constructor
-SumPDF::SumPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(), secondPDF(), firstFraction(), firstIntegralCorrection(), secondIntegralCorrection(), fractionName()
+SumPDF::SumPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL), firstFraction(), firstIntegralCorrection(), secondIntegralCorrection(), fractionName()
 {
 }
 
 //Constructor not specifying fraction parameter name
-SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName("FirstPDFFraction")
+SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName("FirstPDFFraction")
 {
 	MakePrototypes(InputBoundary);
 }
 
+SumPDF::SumPDF( const SumPDF& input ) : BasePDF( (BasePDF) input ), prototypeDataPoint(input.prototypeDataPoint), prototypeParameterSet(input.prototypeParameterSet), doNotIntegrateList(input.doNotIntegrateList),
+	firstPDF(ClassLookUp::CopyPDF(input.firstPDF) ), secondPDF( ClassLookUp::CopyPDF(input.secondPDF) ), firstFraction(input.firstFraction), firstIntegralCorrection(input.firstIntegralCorrection),
+	secondIntegralCorrection(input.secondIntegralCorrection), fractionName(input.fractionName)
+{
+}
+
 //Constructor specifying fraction parameter name
-SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(FirstPDF), secondPDF(SecondPDF), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName)
+SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName)
 {
 	MakePrototypes(InputBoundary);
 }
@@ -91,6 +98,8 @@ void SumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 //Destructor
 SumPDF::~SumPDF()
 {
+	if( firstPDF != NULL ) delete firstPDF;
+	if( secondPDF != NULL ) delete secondPDF;
 }
 
 //Indicate whether the function has been set up correctly

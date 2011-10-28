@@ -17,27 +17,27 @@
 using namespace std;
 
 //Default constructor
-PDFWithData::PDFWithData() : fitPDF(), inputBoundary(), parametersAreSet(false), dataProcessors(), dataSetMakers(), cached_data(), delete_data_decision(true)
+PDFWithData::PDFWithData() : fitPDF(NULL), inputBoundary(), parametersAreSet(false), dataProcessors(), dataSetMakers(), cached_data(), delete_data_decision(true)
 {
 }
 
 //Constructor with correct aruments
-PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(InputPDF), inputBoundary(InputBoundary),  parametersAreSet(false), dataProcessors(InputPrecalculators), dataSetMakers(DataConfig), cached_data(), delete_data_decision(true)
+PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(ClassLookUp::CopyPDF(InputPDF)), inputBoundary(InputBoundary),  parametersAreSet(false), dataProcessors(InputPrecalculators), dataSetMakers(DataConfig), cached_data(), delete_data_decision(true)
 {
 	if ( DataConfig.size() < 1 )
 	{
 		cerr << "No data sets configured" << endl;
 		exit(1);
-	}       
+	}
 }
 
 //Destructor
 PDFWithData::~PDFWithData()
 {
-	delete fitPDF;
+	if( fitPDF != NULL ) delete fitPDF;
 	while( !dataSetMakers.empty() )
 	{
-		delete dataSetMakers.back();
+		if( dataSetMakers.back() != NULL ) delete dataSetMakers.back();
 		dataSetMakers.pop_back();
 	}
 	//cout << "Hello from PDFWithData destructor" << endl;
@@ -50,6 +50,7 @@ IPDF * PDFWithData::GetPDF()
 	{
 		cerr << "Warning: PDF parameters have not yet been set" << endl;
 	}
+	//return ClassLookUp::CopyPDF(fitPDF);
 	return fitPDF;
 }
 

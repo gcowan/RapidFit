@@ -12,17 +12,19 @@
 #include "TMath.h"
 #include "RooMath.h"
 
+PDF_CREATOR( Bs2JpsiPhiPromptBkg_tripleGaussian );
+
 //Constructor
-Bs2JpsiPhiPromptBkg_tripleGaussian::Bs2JpsiPhiPromptBkg_tripleGaussian() : 
+Bs2JpsiPhiPromptBkg_tripleGaussian::Bs2JpsiPhiPromptBkg_tripleGaussian( PDFConfigurator* configurator ) : 
 	// Physics parameters
-	  frac_sigmaPr1Name	( "frac_sigmaPr1" )
-	, frac_sigmaPr23Name	( "frac_sigmaPr23" )
-	, sigmaPr1Name	( "sigmaPr1" )
-	, sigmaPr2Name	( "sigmaPr2" )
-	, sigmaPr3Name	( "sigmaPr3" )
+	  frac_sigmaPr1Name	( configurator->getName("frac_sigmaPr1") )
+	, frac_sigmaPr23Name	( configurator->getName("frac_sigmaPr23" ))
+	, sigmaPr1Name	( configurator->getName("sigmaPr1") )
+	, sigmaPr2Name	( configurator->getName("sigmaPr2") )
+	, sigmaPr3Name	( configurator->getName("sigmaPr3") )
 	// Observables
-	, timeName	( "time" )	
-	, timeconstraintName( "time" )
+	, timeName	( configurator->getName("time") )	
+	, timeconstraintName( configurator->getName("time") )
 {
 	MakePrototypes();
 	cout << "Constructing Bs2JpsiPhi prompt background with triple Gaussian" << endl;

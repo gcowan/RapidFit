@@ -1,5 +1,49 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/10/28 Rob Currie
+
+    -     How do I use/get multithreading when I'm working?
+
+          Change:      <FunctionName>NegativeLogLikelihood</FunctionName>
+              to:      <FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+
+          (optional):  add  <Threads>2</Threads>  within the FitFunction XML tags, replacing 2 with the number of threads you wish to spawn in the fit
+                                                  (default = number of cores reported inc non-physical cores)
+
+          or see:       unittest/Data2011-ProductionXML-LeptonPhoton/Production_Pass3_UandB_v3_newAF_multithreaded.xml
+
+
+          Unfortunatley ONLY functions which call the evaluatedataset method gain from this, but this includes 1D/2D/CV fits
+
+          angularacceptance functions can be multithreaded, but do we run them enough that this is of interest?
+
+    - This has turned into a MUCH larger commit than I originally hoped for...
+
+    Main new features:
+         1)   ClassLookUp has been improved to look for PDF objects
+         2)   RapidFit can now implement multithreaded fitting
+         3)   Scope of PDF objects in code now MUCH more clearly defined
+
+      More extensivley this equates to:
+    - Added PDF configuration parameter to each PDF allowing _ALL_ PDFs to make use of parameter substitution and accept options at runtime from XML
+    - Added Threading class containing static objects used for multithreading the fit
+    - Added NegativeLogLikeyhoodThreaded Class which multithreads the fit, I don't want to remove the NLL class 
+    - Added explicit Copy Constructor to Bs2JPsiPhi _v3 and _v4 classes and other PDFs
+    - Added numerous Copy Constructors to many classes within framework
+    - Modified MakeFile to build a position independent executable (-pie) which allows the binary to be read by the dload method at runtime as well as execute safely
+    - Changed ClassLookUp::NamedPDF to automatically search for constructor objects which exist within the namespace within the 'fitting' binary
+    - Added ClassLookUp::CopyPDF which allows you to copy a PDF from an IPDF* pointer (PDF now stores it's symbolic name in order to know what it is)
+    - Added NegativeLogLikelihoodThreaded FitFunction which is a threaded version of the old NLL code
+         (very simple tests shows that the overhead of this code is minimal <20% on really small datasets
+          and does actually provide speed improvements for much larger datasets and more complex PDFs)
+    - Added <Threads> tag to FitFunctionConfiguration part of XML to control the number of threads that should be used at runtime
+    - Changed a lot of constructors to call ClassLookUp::CopyPDF rather than keep the PDF by construction
+         This is more memory intensive, however it allows for a much clearer scope to the objects
+         Because of this I have moved PDF destructors to sensible locations within RapidFit
+         Most functions taking PDF(s) have functions to set/get the address of the internal PDF object
+         these should suffice for most cases where the object needs to be modified out of class
+    - Added unusual fix in DataSetConfguration for bug which crashes RapidFit when compiled and run as a root library before the number of events in a file is reported
+
 2011/10/19 Greig Cowan
     - Updated code for calculating angular acceptance weights to also calculate
       the covariance matrix of the 10 terms, from which we get the statistical

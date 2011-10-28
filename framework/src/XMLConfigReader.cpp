@@ -30,12 +30,12 @@
 #define DOUBLE_TOLERANCE 1E-6
 
 //Default constructor
-XMLConfigReader::XMLConfigReader() : All_XML_Tags(new XMLTag()), children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
+XMLConfigReader::XMLConfigReader() : All_XML_Tags(new XMLTag()), children(), isLoaded(false), seed(0), ParamSet_index(0)
 {
 }
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : All_XML_Tags(new XMLTag(OverrideXML)), children(), isLoaded(false), seed(0), PDF_index(0), ParamSet_index(0)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : All_XML_Tags(new XMLTag(OverrideXML)), children(), isLoaded(false), seed(0), ParamSet_index(0)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -229,7 +229,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		string minimiserName = "Uninitialised";
 		vector< XMLTag* > minimiserComponents = MinimiserTag->GetChildren();
 		//vector<string> valueLines = MinimiserTag->GetValue();
-		int MAXIMUM_MINIMISATION_STEPS = 1000000.0;
+		int MAXIMUM_MINIMISATION_STEPS = 1000000;
 		double FINAL_GRADIENT_TOLERANCE = 0.001;
 		MinimiserConfiguration* returnableConfig = NULL;
 		vector<string> minimiserOptions;
@@ -479,6 +479,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		bool change_style = false;
 		string Trace_FileName;
 		string Strategy;
+		int Threads = -1;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		if ( functionInfo.size() == 0 )
 		{
@@ -509,9 +510,13 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 					change_style = true;
 					Strategy = functionInfo[childIndex]->GetValue()[0];
 				}
+				else if ( functionInfo[childIndex]->GetName() == "Threads" )
+				{
+					Threads = atoi( functionInfo[childIndex]->GetValue()[0].c_str() );
+				}
 				else
 				{
-					cerr << "Unrecognised FitFunction component: \"" << functionInfo[childIndex]->GetName() << endl;
+					cerr << "Unrecognised FitFunction component: " << functionInfo[childIndex]->GetName() << endl;
 					exit(1);
 				}
 			}
@@ -522,7 +527,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		//Make the function
 		if (hasWeight)
 		{
-			cerr <<"Weighted events have been asked for in XML using" << weightName << endl ;
+			cerr <<"Weighted events have been asked for in XML using:\t\t" << weightName << endl ;
 			returnable_function = new FitFunctionConfiguration( functionName, weightName );
 		}
 		else
@@ -539,6 +544,8 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		{
 			returnable_function->SetStrategy( Strategy );
 		}
+
+		returnable_function->SetThreads( Threads );
 
 		return returnable_function;
 	}
@@ -613,7 +620,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 				if( !Starting_Value.empty() )
 				{
 					int s_val_index = (int) pdfsAndData.size(); ++s_val_index;
-					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, Starting_Value[s_val_index] ) );
+					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, Starting_Value[(unsigned)s_val_index] ) );
 				} else {
 					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, -1 ) );
 				}
@@ -1263,7 +1270,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
 		string name;
 		vector<string> observableNames, parameterNames;
-		PDFConfigurator configurator;
+		PDFConfigurator* configurator = new PDFConfigurator;
 
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
@@ -1282,11 +1289,11 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ParameterSubstitution" )
 			{
-				configurator.addParameterSubstitution( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->addParameterSubstitution( pdfConfig[configIndex]->GetValue()[0] );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{
-				configurator.addConfigurationParameter( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->addConfigurationParameter( pdfConfig[configIndex]->GetValue()[0] );
 			}
 			else
 			{
@@ -1408,6 +1415,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		exit(1);
 	}
 
+	returnable_NormPDF->SetName( "NormalisedSum" );
 //	returnable_NormPDF->SetRandomFunction( GetSeed() );
 	return returnable_NormPDF;
 }
@@ -1445,6 +1453,7 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		exit(1);
 	}
 
+	returnable_ProdPDF->SetName( "Prod" );
 //	returnable_ProdPDF->SetRandomFunction( GetSeed() );
 	return returnable_ProdPDF;
 }
@@ -1475,13 +1484,7 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 		exit(1);
 	}
 
-	//	Create a unique name for this PDF to use internally
-	TString PDF_ID("PDF_");
-	PDF_ID+=PDF_index;
-	//	Increment the number of discovered PDFs
-	++PDF_index;
 	returnable_pdf->SetRandomFunction( int(GetSeed()) );
-	returnable_pdf->SET_ID( PDF_ID );
 	returnable_pdf->SetMCCacheStatus( false );
 	return returnable_pdf;
 }

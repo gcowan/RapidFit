@@ -12,6 +12,7 @@
 //	System Headers
 #include <memory>
 
+#define RAPIDFIT_LIBRARY_NAME "libRapidRun"
 
 class RapidRun : public TObject
 {
