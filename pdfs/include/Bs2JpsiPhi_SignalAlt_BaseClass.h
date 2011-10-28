@@ -110,14 +110,14 @@ public:
 		if( tstart < sliceTimeStart[0] ) {cout << " InTimeAcceptance::configure : start time less than bins specified " << endl ; exit(1) ;}	
 		
 		// If in last time slice, or later, then slice = nslices-1
-		if ( sliceTimeStart[nslices-1] <= tstart ) { startSlice = nslices-1 ; }
+		if ( sliceTimeStart[(unsigned)nslices-1] <= tstart ) { startSlice = nslices-1 ; }
 		
 		// Find the slice which corresponds to the lower chosen limit of integration.
 		else {
-			for( int is = 0; is < nslices-1; ++is ) { 
+			for( unsigned int is = 0; is < (unsigned)nslices-1; ++is ) { 
 				if( (sliceTimeStart[is] <= tstart ) && ( tstart < sliceTimeStart[is+1] )  )  
 				{
-					startSlice = is ;
+					startSlice = (int)is ;
 					break ;
 				}
 			}
@@ -137,11 +137,11 @@ public:
 		if( time < sliceTimeStart[0] ) { return 0 ; }
 		
 		// If in last time slice, or later, then slice = last slice = nslices-1
-		else if ( sliceTimeStart[nslices-1] <= time ) { return sliceAcceptance[nslices-1] ; }
+		else if ( sliceTimeStart[(unsigned)nslices-1] <= time ) { return sliceAcceptance[(unsigned)nslices-1] ; }
 		
 		// Find slice in range
 		else {
-			for( int is = 0; is < nslices-1; ++is ) { 
+			for( unsigned int is = 0; is < (unsigned)nslices-1; ++is ) { 
 				if( (sliceTimeStart[is] <= time ) && ( time < sliceTimeStart[is+1] )  ) return sliceAcceptance[is];  
 			}
 		}
@@ -162,7 +162,7 @@ public:
 	// Return time of beginning of selected slice -  must be between startSlice and nslices-1
 	double sliceStart( int islice ) {
 		if( (islice < startSlice) || (islice >= nslices ) ) {cout << " InTimeAcceptance::sliceFraction : islice is crazy: " << islice << endl ; exit(1) ;} 
-		return sliceTimeStart[islice] ;
+		return sliceTimeStart[(unsigned)islice] ;
 	}
 	
 	
@@ -174,10 +174,10 @@ public:
 		
 		// If this is first slice, then you need to do something differently - yuo need cumulative fraction (i.e. acceptance)
 		if( islice == startSlice ) {
-			return sliceAcceptance[islice] ;
+			return sliceAcceptance[(unsigned)islice] ;
 		}
 		else{
-			return sliceFraction[islice] ; 
+			return sliceFraction[(unsigned)islice] ;
 		}
 	}
 	

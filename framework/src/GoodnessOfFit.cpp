@@ -102,19 +102,19 @@ namespace GoodnessOfFit
 		// Generate large sample of MC using the fitted PDF parameters
 		for ( iter = pdfAndData.begin(); iter != pdfAndData.end(); ++iter ){
 			data.push_back( (*iter)->GetDataSet() );
-			nData = data.back()->GetDataNumber();
+			nData = (unsigned)data.back()->GetDataNumber();
 			phase = data.back()->GetBoundary();
 			
 			(*iter)->SetPhysicsParameters( parSetFromFit );
 			ulTime = static_cast<unsigned int>( time( NULL ));
 			pdf = (*iter)->GetPDF();
-			pdf->SetRandomFunction( ulTime );
+			pdf->SetRandomFunction( (int)ulTime );
 			pdf->SetMCCacheStatus( false );
 			
 			dataConfig = (*iter)->GetDataSetConfig();
 			dataConfig->SetSource( "Foam" );
 
-			mc = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
+			mc = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*(int)nData );
 			mcData.push_back( mc );
 		}
 
@@ -148,7 +148,7 @@ namespace GoodnessOfFit
 
 			// First, generate some data from this PDF
 			pdfAndData->SetPhysicsParameters( *parSet );
-			pdf->SetRandomFunction( ulTime );
+			pdf->SetRandomFunction( (int)ulTime );
 			pdf->SetMCCacheStatus( false );
 			MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
 			vector<IDataSet*> vectorData;
@@ -170,7 +170,7 @@ namespace GoodnessOfFit
 			}
 			// Generate large sample of MC
 			ulTime = static_cast<unsigned int>( time( NULL ));
-			pdf->SetRandomFunction( ulTime );
+			pdf->SetRandomFunction( (int)ulTime );
 			pdf->SetMCCacheStatus( false );
 			MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
 
@@ -186,9 +186,9 @@ namespace GoodnessOfFit
 
 	void plotUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, string plot )
 	{
-		unsigned int nD = data->GetDataNumber();
+		unsigned int nD = (unsigned) data->GetDataNumber();
 		int bins = 30;
-		double level = nD/bins;
+		double level = (double)nD/(double)bins;
 		TH1D * distances = new TH1D( "distances", "U", bins, 0., 1.);
 		distances->Sumw2();
 		calculateUstatistic(pdf, data, phase, distances);
@@ -225,16 +225,16 @@ namespace GoodnessOfFit
 		if ( dimension == 7 ) dimension = 4;
 		dimension = 2;
 		cout << "number of dimensions: " << dimension << endl;
-		unsigned int nD = data->GetDataNumber();
+		unsigned int nD = (unsigned)data->GetDataNumber();
 		int count = 0;
 		for (unsigned int i = 0; i < nD; i++) {
 			if ( !(i % 100) ) cout << i << endl;
-			event_i = data->GetDataPoint( i );
+			event_i = data->GetDataPoint( (int)i );
 			pdfValue = pdf->Evaluate( event_i )/pdf->Integral( event_i, phase );
 			firstEvent = true;
 			for (unsigned int j = 0; j < nD; j++) {
 				if ( j == i ) continue;
-				event_j = data->GetDataPoint( j );
+				event_j = data->GetDataPoint( (int)j );
 				distance = getDistance( event_i, event_j );
 				if ( firstEvent ) {
 					smallest_distance = distance;
@@ -296,15 +296,15 @@ namespace GoodnessOfFit
 		size_t dimension = (pdf->GetPrototypeDataPoint()).size();
 		if ( dimension == 7 ) dimension = 5;
 		cout << "number of dimensions: " << dimension << endl;
-		unsigned int nD = data->GetDataNumber();
+		unsigned int nD = (unsigned) data->GetDataNumber();
 		int count = 0;
 		for (unsigned int i = 0; i < nD; i++) {
 			if ( !(i % 100) ) cout << "Event " << i << endl;
-			event_i = data->GetDataPoint( i );
+			event_i = data->GetDataPoint( (int)i );
 			firstEvent = true;
 			for (unsigned int j = 0; j < nD; j++) {
 				if ( j == i ) continue;
-				event_j = data->GetDataPoint( j );
+				event_j = data->GetDataPoint( (int)j );
 				distance = getDistance( event_i, event_j );
 				if ( firstEvent ) {
 					smallest_distance = distance;
@@ -404,8 +404,8 @@ namespace GoodnessOfFit
 
 		while ( ( xVar = x->GetObservable( *xIter ) ) ) {
 			if ( *xIter == "time" || *xIter == "cosTheta" || *xIter == "mass"){//|| *xIter == "cosPsi" || *xIter == "phi") {
-				min = xVar->GetValue() - distances[ i ];
-				max = xVar->GetValue() + distances[ i ];
+				min = xVar->GetValue() - distances[ (unsigned)i ];
+				max = xVar->GetValue() + distances[ (unsigned)i ];
 				if ( min > oldPhase->GetConstraint( *xIter )->GetMinimum() ) ((ObservableContinuousConstraint *)newPhase->GetConstraint( *xIter ))->SetMinimum( min );
 				if ( max < oldPhase->GetConstraint( *xIter )->GetMaximum() ) ((ObservableContinuousConstraint *)newPhase->GetConstraint( *xIter ))->SetMaximum( max );
 				//cout << *xIter << " " << buffer << endl;
@@ -465,14 +465,14 @@ namespace GoodnessOfFit
 
 		double permutationCore( IDataSet * data, IDataSet * mc, int iteration )
 		{
-			unsigned int nD = data->GetDataNumber();
-			unsigned int nMC = mc->GetDataNumber();
+			unsigned int nD = (unsigned) data->GetDataNumber();
+			unsigned int nMC = (unsigned) mc->GetDataNumber();
 			// Append the two datasets
 			MemoryDataSet * dataClone = new MemoryDataSet( data->GetBoundary() );
-			for ( unsigned int i = 0; i < nD;  i++ ) dataClone->AddDataPoint( data->GetDataPoint(i) );
-			for ( unsigned int j = 0; j < nMC; j++ ) dataClone->AddDataPoint( mc  ->GetDataPoint(j) );
+			for ( unsigned int i = 0; i < nD;  i++ ) dataClone->AddDataPoint( data->GetDataPoint((int)i) );
+			for ( unsigned int j = 0; j < nMC; j++ ) dataClone->AddDataPoint( mc  ->GetDataPoint((int)j) );
 
-			TRandom3 * rand = new TRandom3(iteration);
+			TRandom3 * rand = new TRandom3((unsigned)iteration);
 
 			// Need to get some empty version of the dataset
 			MemoryDataSet * tempMC   = new MemoryDataSet( mc->GetBoundary() );
@@ -487,14 +487,14 @@ namespace GoodnessOfFit
 				unsigned int random = (unsigned int)rand->Uniform(0., nD + nMC);
 				iter = find(eventNotAccepted.begin(), eventNotAccepted.end(), random);
 				if ( iter != eventNotAccepted.end() ) {
-					tempData->AddDataPoint( dataClone->GetDataPoint(random) );
+					tempData->AddDataPoint( dataClone->GetDataPoint((int)random) );
 					eventNotAccepted.erase(random);
 					count++;
 				}
 			}
 
 			for ( iter = eventNotAccepted.begin(); iter != eventNotAccepted.end(); ++iter) {
-				tempMC->AddDataPoint( dataClone->GetDataPoint(*iter) );
+				tempMC->AddDataPoint( dataClone->GetDataPoint((int)*iter) );
 			}
 			double T = calculateTstatistic( tempData, tempMC );
 			delete rand;

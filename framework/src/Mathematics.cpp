@@ -28,9 +28,9 @@ namespace Mathematics
 		const double inv_r2_sigma = 1./(sqrt_2*sigma);
 		const double inv_r2_sigma_tau = inv_r2_sigma/tau;
 		const double tau_tlimit = tau*tlimit;
-		return 0.5 * (tau * ( RooMath::erf( tlimit*inv_r2_sigma )
+		return 0.5 * (tau * ( erf( tlimit*inv_r2_sigma )
 					- exp( (sigma_2*0.5 - tau_tlimit)/(tau*tau) )
-					* RooMath::erfc( (sigma_2 - tau_tlimit)*inv_r2_sigma_tau )
+					* erfc( (sigma_2 - tau_tlimit)*inv_r2_sigma_tau )
 				    )
 			     );
 	}
@@ -82,13 +82,13 @@ namespace Mathematics
 			const double t_gamma=t*gamma;
 			const double resolution_2_gamma=resolution*resolution*gamma;
 			const double theExp = exp( -t_gamma + resolution_2_gamma*gamma *0.5 ) ;
-			const double theErfc = RooMath::erfc(  -( t - resolution_2_gamma ) *_over_sqrt_2 /resolution )  ;
+			const double theErfc = erfc(  -( t - resolution_2_gamma ) *_over_sqrt_2 /resolution )  ;
 			return theExp * theErfc  *0.5 ;
 
 			// Yue hongs code
 			//double c = gamma * resolution *_over_sqrt_2;
 			//double u = t / resolution *_over_sqrt_2;
-			//return exp( c*c - gamma*t ) * RooMath::erfc(c-u) / 2.;
+			//return exp( c*c - gamma*t ) * erfc(c-u) / 2.;
 		}
 		else {
 			if( t < 0.0 ) return 0.0 ;
@@ -530,8 +530,8 @@ namespace Mathematics
 		RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);	(void)	rapidInt;	//	shutup gcc for unused param
 		PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
 		int numAngularTerms = 10;
-		double*  f = new double[numAngularTerms]; // the angular functions
-		double* xi = new double[numAngularTerms]; // the angular weights
+		double*  f = new double[(unsigned)numAngularTerms]; // the angular functions
+		double* xi = new double[(unsigned)numAngularTerms]; // the angular weights
 		double cosTheta, phi, cosPsi, time;
 		double evalPDFraw, evalPDFnorm, evalPDFnorm2, val;		(void) evalPDFnorm2;	//	shutup gcc for unused param!
 		int numEvents = dataSet->GetDataNumber();

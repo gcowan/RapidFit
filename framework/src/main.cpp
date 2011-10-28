@@ -1204,7 +1204,7 @@ int RapidFit( int argc, char * argv[] )
 		if( ( ( _2DLLscanList.size() > 1 ) && doFC_Flag ) || defineContourFlag )
 		{
 			//cerr << "\n\nPERFORMING ONLY ONE 2D SCAN, CHECK THIS IS EXPECTED!" <<endl;
-			initial_scan = int( _2DLLscanList.size()-1 );
+			initial_scan = unsigned( _2DLLscanList.size()-1 );
 		}
 
 		if( ( _2DLLscanList.size() == 0 ) && ( doFC_Flag) )

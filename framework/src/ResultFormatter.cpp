@@ -540,7 +540,7 @@ void ResultFormatter::CorrMatrixOutput( string FileName, FitResultVector* ToyRes
 		if( temp_elements > max_elements )	max_elements = temp_elements;
 	}
 
-	Double_t* matrix_contents = new Double_t[max_elements];
+	Double_t* matrix_contents = new Double_t[(unsigned)max_elements];
 
 	//	Create the required number of columns within the TTree
 	for( int i=0; i< max_elements; ++i )

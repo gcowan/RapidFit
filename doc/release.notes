@@ -2,6 +2,11 @@
 
 2011/10/28 Rob Currie
 
+    - Fixed all warning when compiling against the latest clang on lxplus
+    - verified that the CV from a fit with the v3 and v4 PDFs have extremely negligible effect on fit values (last digit on phi_s and rounding of the errors in jpsiphi)
+
+2011/10/28 Rob Currie
+
     -     How do I use/get multithreading when I'm working?
 
           Change:      <FunctionName>NegativeLogLikelihood</FunctionName>

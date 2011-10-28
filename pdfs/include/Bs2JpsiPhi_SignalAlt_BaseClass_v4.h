@@ -200,7 +200,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_v4  :  public BasePDF
 		vector< vector<double> > storeExpSin;
 		vector< vector<double> > storeExpCos;
 		void CacheTimeIntegrals() ;
-		void deCacheTimeIntegrals( int ires, int islice ) ;
+		void deCacheTimeIntegrals( unsigned int ires, unsigned int islice ) ;
 	
 	
 	

@@ -134,7 +134,7 @@ Observable* DataPoint::GetPseudoObservable( ObservableRef& final_observable, str
 {
 	if( ( final_observable.GetIndex() >=0 ) && ( ( (int)allPseudoObservables.size() -1 ) >= final_observable.GetIndex() ) )
 	{
-		return &( allPseudoObservables[ final_observable.GetIndex() ] );
+		return &( allPseudoObservables[ (unsigned)final_observable.GetIndex() ] );
 	}
 	else
 	{
@@ -175,7 +175,7 @@ Observable* DataPoint::GetPseudoObservable( ObservableRef& final_observable, str
 {
 	if( ( final_observable.GetIndex() >=0 ) && ( ( (int)allPseudoObservables.size() -1 ) >= final_observable.GetIndex() ) )
 	{
-		return &( allPseudoObservables[ final_observable.GetIndex() ] );
+		return &( allPseudoObservables[ (unsigned)final_observable.GetIndex() ] );
 	}
 	else
 	{
