@@ -79,12 +79,13 @@ CXXFLAGS_LIB += -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS)
 # Linux
 ifeq "$(UNAME)" "Linux"
 	CXXFLAGS     += -fPIE
-	LINKFLAGS    += -Wl,--export-dynamic -pie
+	LINKFLAGS    += -Wl,--export-dynamic -pie -m64
 endif
 
 # OS X
 ifeq "$(UNAME)" "Darwin"
-	
+	CXXFLAGS     += -fPIE
+	LINKFLAGS    += -m64
 endif
 
 

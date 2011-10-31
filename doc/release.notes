@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/10/31 Greig Cowan
+    - Fixed header in ClassLookup.cpp for OS X.
+    - Added OS X section to Makefile.
+
 2011/10/31 Rob Currie
     - Some bugfixes to get the Makefile to work with $PWD paths containing spaces and a preprocessor error in NegativeLogLikelihoodThreaded.h
     - Fixed warnings against gcc 4.6 on lxplus
