@@ -33,7 +33,7 @@ class NegativeLogLikelihoodThreaded : public FitFunction
 			//	let's keep em happy
 			//	
 			static void* ThreadWork( void* ) __attribute__ ((noreturn));
-		#elif
+		#else
 			static void* ThreadWork( void* );
 		#endif
 };

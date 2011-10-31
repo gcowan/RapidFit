@@ -10,10 +10,12 @@ TEMPCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags)
 ROOTCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags | awk -F "-I" '{print $$1" -isystem"$$2}' )
 ROOTLIBS     = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --libs)
 ROOTGLIBS    = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --glibs)
-EXTRA_ROOTLIBS=-lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam -lMathMore
+
+#               On some Systems with Mathmore compiled, sometimes things need to be resolved against it... I don't know why
+EXTRA_ROOTLIBS=-lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam $(shell if [ "$(shell root-config --features | grep mathmore)" = "" ]; then echo "" ; else echo "-lMathMore" ; fi)
 
 #		Command Line Tools
-CXX          = g++
+CXX          = g++$(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo ""; else echo " --arch=i386"; fi)
 RM           = rm -f
 
 SVN_REV = $(shell svnversion -n .)
@@ -43,8 +45,8 @@ PDFSRCS := $(shell find $(SRCPDFDIR) -name '*.$(SRCEXT)' | grep -v 'unused' )
 
 
 #	Absolute Paths of headers	ignoring the LinkDef written for ROOT and ignoring unused code
-HEADERS := $(shell find $(PWD)/$(INCDIR) -name '*.$(HDREXT)' | grep -v 'unused' | grep -v 'LinkDef' )
-PDFHEAD := $(shell find $(PWD)/$(INCPDFDIR) -name '*.$(HDREXT)' )
+HEADERS := $(shell find $(INCDIR) -name '*.$(HDREXT)' | grep -v 'unused' | grep -v 'LinkDef' )
+PDFHEAD := $(shell find $(INCPDFDIR) -name '*.$(HDREXT)' )
 
 
 #	Binary Objects to make in the build
@@ -227,14 +229,14 @@ lib:    $(LIBDIR)/libRapidRun.so
 #	This command will generate a C++ file which interfaces the rest of humanity with root...
 #	It requires the explicit paths of all files, or that you remain in the same working directory at all times during the build process
 #	We want to place the output dictionary in the Build directory as this is CODE that is NOT to be editted by the $USER!
-$(OBJDIR)/rapidfit_dict.cpp: $(ALL_HEADERS) $(PWD)/framework/include/LinkDef.h
+$(OBJDIR)/rapidfit_dict.cpp: $(ALL_HEADERS) framework/include/LinkDef.h
 	@echo "Building Root Dictionary:"
-	#@echo "rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c -I$(PWD)/framework/include $^"
-	@rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c -I$(PWD)/framework/include $^
+	@echo "rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c -I\"$(PWD)/framework/include\" $^"
+	@rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c -I"$(PWD)/framework/include" $^
 
 #	Compile the class that root has generated for us which is the linker interface to root	(i.e. dictionaries & such)
 $(OBJDIR)/rapidfit_dict.o: $(OBJDIR)/rapidfit_dict.cpp
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) -o $@ -I"$(PWD)" -c $<
 
 #	Class which has a dictionary generated for it, think of this as the equivalent to int main() in a CINT-y Universe
 $(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp

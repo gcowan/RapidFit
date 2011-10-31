@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/10/31 Rob Currie
+    - Some bugfixes to get the Makefile to work with $PWD paths containing spaces and a preprocessor error in NegativeLogLikelihoodThreaded.h
+
 2011/10/28 Rob Currie
 
     - Fixed all warning when compiling against the latest clang on lxplus
