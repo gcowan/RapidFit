@@ -2,6 +2,7 @@
 
 2011/10/31 Rob Currie
     - Some bugfixes to get the Makefile to work with $PWD paths containing spaces and a preprocessor error in NegativeLogLikelihoodThreaded.h
+    - Fixed warnings against gcc 4.6 on lxplus
 
 2011/10/28 Rob Currie
 

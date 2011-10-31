@@ -71,8 +71,8 @@ int RapidFit( int argc, char * argv[] )
 	//Variables to store command line arguments
 	int numberRepeats = 0;
 	int Nuisencemodel=2;
-	int jobNum = 0;
-	int nData = 0;
+	int jobNum = 0; (void) jobNum;
+	int nData = 0; (void) nData;
 	string configFileName = "";
 	vector<string> parameterTemplates;
 	MinimiserConfiguration * theMinimiser=NULL;

@@ -442,7 +442,7 @@ namespace Mathematics
 		const int numAngularTerms = 10;//6;
 		double*  f = new double[numAngularTerms]; // the angular functions
 		double xi[numAngularTerms]; // the angular weights
-		double cosTheta, phi, cosPsi, time;
+		double cosTheta, phi, cosPsi, time; (void) time;
 		double evalPDFraw, evalPDFnorm, val;
 		int numEvents = dataSet->GetDataNumber();
 		for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
@@ -532,7 +532,7 @@ namespace Mathematics
 		int numAngularTerms = 10;
 		double*  f = new double[(unsigned)numAngularTerms]; // the angular functions
 		double* xi = new double[(unsigned)numAngularTerms]; // the angular weights
-		double cosTheta, phi, cosPsi, time;
+		double cosTheta, phi, cosPsi, time; (void) time;
 		double evalPDFraw, evalPDFnorm, evalPDFnorm2, val;		(void) evalPDFnorm2;	//	shutup gcc for unused param!
 		int numEvents = dataSet->GetDataNumber();
 		for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
