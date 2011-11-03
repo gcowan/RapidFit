@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/11/03 Pete Clarke
+   - Added one angle fit PDFS
+
 2011/10/31 Greig Cowan
     - Fixed header in ClassLookup.cpp for OS X.
     - Added OS X section to Makefile.
@@ -64,8 +67,11 @@
 
 2011/10/17 Rob Currie
     - Converging on a final set of Results for J/phi Phi paper and so are commiting a 'final' xml configuration for UBandB fit
-    - Updated some of the more modern scans to use the RAPIDFITROOT variable to pick up the RapidFit library (this will be built by default quite soon)
-         Added a script for performing Toy Studies over a batch system using the new method of submitting jobs
+    - Updated some of the more modern scans to use the RAPIDFITROOT variable to pick up the RapidFit library (this will be built by default quite soon)        Added a script for performing Toy Studies over a batch system using the new method of submitting jobs
+
+2011/10/10 Pete Clarke
+    - Added many background angle histograms in pdfs/configdata/2011-JPsiPhi-backgroundangles-tight...XXX.....root
+
 
 2011/09/01 Rob Currie
     - Updated Background PDF to read the bins from a histogram in the correct order

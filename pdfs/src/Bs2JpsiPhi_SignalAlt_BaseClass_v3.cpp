@@ -301,7 +301,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_v3::diffXsecNorm1(  ) const
 	0.5 * AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
 	0.5 * AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
 	
-	if( DEBUGFLAG && (norm < 0) ) this->DebugPrintNorm( " Bs2JpsiPhi_SignalAlt_BaseClass_v3_v1::diffXsecNorm1( ) : return value < 0 = ", norm ) ;
+	if( DEBUGFLAG && (norm < 0) ) this->DebugPrintNorm( " Bs2JpsiPhi_SignalAlt_BaseClass_v3::diffXsecNorm1( ) : return value < 0 = ", norm ) ;
 	 
 	return norm ;
 }
