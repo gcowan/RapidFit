@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/11/04 Rob Currie
+   -  Added Bs2DsPi_lowmassbkg PDFs for Gemma
+
 2011/11/03 Pete Clarke
    - Added one angle fit PDFS
 
