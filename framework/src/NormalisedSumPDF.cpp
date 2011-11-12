@@ -181,6 +181,21 @@ double NormalisedSumPDF::Evaluate( DataPoint * NewDataPoint )
 }
 
 //Return the function value at the given point
+double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
+{
+	//Calculate the integrals of the PDFs
+	double firstIntegral = firstIntegrator->Integral( NewDataPoint, integrationBoundary, true ) * firstIntegralCorrection;
+	double secondIntegral = secondIntegrator->Integral( NewDataPoint, integrationBoundary, true ) * secondIntegralCorrection;
+	
+	//Get the PDFs' values, normalised and weighted by firstFrsction
+	double termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / firstIntegral;
+	double termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+	
+	//Return the sum
+	return termOne + termTwo;
+}
+
+//Return the function value at the given point
 vector<double> NormalisedSumPDF::EvaluateComponents( DataPoint * NewDataPoint )
 {
 	//Calculate the integrals of the PDFs

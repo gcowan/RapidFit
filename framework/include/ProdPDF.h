@@ -35,7 +35,8 @@ class ProdPDF : public BasePDF
 
 		//Return the function value at the given point
 		virtual double Evaluate(DataPoint*);
-
+		virtual double EvaluateForNumericIntegral(DataPoint*);
+	
 		//Return the components of the function value at the given point
 		virtual vector<double> EvaluateComponents(DataPoint*);
 	

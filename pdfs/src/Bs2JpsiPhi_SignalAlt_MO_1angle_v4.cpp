@@ -16,6 +16,9 @@
 
 #define DEBUGFLAG true
 
+//PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MO_1angle_v4 );
+
+
 //......................................
 //Constructor(s)
 //New one with configurator

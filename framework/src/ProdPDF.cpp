@@ -85,6 +85,15 @@ double ProdPDF::Evaluate( DataPoint * NewDataPoint )
 	return termOne * termTwo;
 }
 
+//Return the function value at the given point for numericl integration
+double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
+{
+	double termOne = firstPDF->EvaluateForNumericIntegral( NewDataPoint );
+	double termTwo = secondPDF->EvaluateForNumericIntegral( NewDataPoint );
+	return termOne * termTwo;
+}
+
+
 //Return the function value at the given point
 vector<double> ProdPDF::EvaluateComponents( DataPoint * NewDataPoint )
 {

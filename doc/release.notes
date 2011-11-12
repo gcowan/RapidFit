@@ -1,5 +1,12 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/11/12/ Peter Clarke
+    - Significant change to the latest J/PsiPhi PDF  :  Bs2JpsiPhi_SignalAlt_MO_v4.cpp and .h
+    - Removed ÉBaseClass_v4.h and .cpp as all have now been moved back into the main PDF
+    - Helicity angle capability added, but you will need to ask Pete how to use this as we don't have it in the background PDFS yet.
+            <ConfigurationParameter>useHelicityBasis:True</ConfigurationParameter> 
+    - Made a technical transparent change in ProdPDF and NormailisedSumPDG to do with EvaluateForNumericIntagral()
+    
 2011/11/04 Rob Currie
    -  Added Bs2DsPi_lowmassbkg PDFs for Gemma
 
