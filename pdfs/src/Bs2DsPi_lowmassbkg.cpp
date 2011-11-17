@@ -1,4 +1,5 @@
 // $Id: Bs2JpsiPhiMassBkgLL.cpp,v 1.1 2009/11/10 10:35:49 gcowan Exp $
+
 /** @class Bs2JpsiPhiMassBkgLL Bs2JpsiPhiMassBkgLL.cpp
  *
  *  RapidFit PDF for Bs2JpsiPhi mass background
@@ -21,34 +22,41 @@
 #include "TH1.h"
 
 #define DOUBLE_TOLERANCE 1E-6
+
+PDF_CREATOR( Bs2DsPi_lowmassbkg );
+
 //.....................................................
 //Constructor
-Bs2DsPi_lowmassbkg::Bs2DsPi_lowmassbkg(PDFConfigurator* config ) :
+Bs2DsPi_lowmassbkg::Bs2DsPi_lowmassbkg(PDFConfigurator* configurator ) :
 
 	// Physics parameters
 	//alphaM_llName	( "alphaM_ll" )
 	// Observables
 	//, recoMassName  ( "mass" )
 
-	massName  ( config->getName("mass") )
-,constraint_massName()
-
+	massName  ( configurator->getName("mass") )
+	,constraint_massName()
 , histo(), xaxis(), nxbins(), xmin(), xmax(), deltax(), total_num_entries()
 {
 
 	cout << "Constructing PDF:Bs2DsPi_lowmassbkg" << endl ;
 
-	MakePrototypes();
+
+	{
+		MakePrototypes();
+	}
 
 	//Find name of histogram needed to define 1-D mass distribution
-	string fileName = config->getConfigurationValue( "MassDistributionHistogram" ) ;
+	string fileName = configurator->getConfigurationValue( "MassDistributionHistogram" ) ;
 
 	//Initialise depending upon whether configuration parameter was found
-	if( fileName == "" ) {
+	if( fileName == "" )
+	{
 		cout << "   No MassDistributionHistogram found" << endl;
 		exit(1);
 	}
-	else {
+	else
+	{
 		cout << "   MassDistributionHistogram found: " << fileName << endl ;
 
 		//Read in histo
@@ -86,7 +94,6 @@ Bs2DsPi_lowmassbkg::Bs2DsPi_lowmassbkg(PDFConfigurator* config ) :
 			}
 		}
 
-
 		int average_bin_content = sum / total_num_bins;
 
 		cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
@@ -102,7 +109,6 @@ Bs2DsPi_lowmassbkg::Bs2DsPi_lowmassbkg(PDFConfigurator* config ) :
 
 		cout << "Finishing processing histo" << endl;
 	}
-
 }
 
 

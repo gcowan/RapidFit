@@ -14,46 +14,46 @@
 #include "TFile.h"
 #include "TH1D.h"
 
-#ifndef __CINT__
+
 #include "BasePDF.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#endif
+
 
 class Bs2DsPi_lowmassbkg : public BasePDF
 {
-public:
-	Bs2DsPi_lowmassbkg(PDFConfigurator*);
-	~Bs2DsPi_lowmassbkg();
-	//Calculate the PDF value
-	virtual double Evaluate(DataPoint*);
-	
-protected:
-	//Calculate the PDF normalisation
-	virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
-	
-private:
-	
-	void MakePrototypes();
-	
-	// Physics parameters
+	public:
+		Bs2DsPi_lowmassbkg(PDFConfigurator*);
+		~Bs2DsPi_lowmassbkg();
+		//Calculate the PDF value
+		virtual double Evaluate(DataPoint*);
+		//virtual bool SetPhysicsParameters(ParameterSet*);
 
-	// Observables
-	ObservableRef massName;
-	ObservableRef constraint_massName;
+	protected:
+		//Calculate the PDF normalisation
+		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
-	double mass;
-	
-	//Additions to deal with 1-D mass distribution via a histogram
-	TH1D *histo;
-	TAxis *xaxis;
-	int nxbins;
-	double xmin, xmax, deltax;
-	double total_num_entries;
-	
-	
-	
+
+
+	private:	
+
+		void MakePrototypes();
+
+		// Physics parameters
+
+		// Observables
+		ObservableRef massName;
+		ObservableRef constraint_massName;
+
+		double mass;
+
+		//Additions to deal with 1-D mass distribution via a histogram
+		TH1D *histo;
+		TAxis *xaxis;
+		int nxbins;
+		double xmin, xmax, deltax;
+		double total_num_entries;
+
+
+
 };
 
 #endif

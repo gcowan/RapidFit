@@ -71,14 +71,14 @@ def main():
 	valueList.append( pyl.B_s_TAGDECISION.GetValue() )
 	valueList.append( pyl.B_s_TAGOMEGA.GetValue() )
 	'''
-  	valueList.append( pyl.B_s0_TAU.GetValue() )
-	valueList.append( pyl.B_s0_TAGDECISION.GetValue() )
-	valueList.append( pyl.B_s0_TAGOMEGA.GetValue() )
-	valueList.append( pyl.B_s0_MM.GetValue() )
-	valueList.append( pyl.B_s0_TRUETAU.GetValue() )
-	valueList.append( pyl.B_s0_TAU.GetValue() - pyl.B_s0_TRUETAU.GetValue() )
+  	valueList.append( pyl.B_s_TAU.GetValue()*1000 )
+	valueList.append( pyl.B_s_TAGDECISION.GetValue() )
+	valueList.append( pyl.B_s_TAGOMEGA.GetValue() )
+	valueList.append( pyl.B_s_MM.GetValue() )
+	valueList.append( pyl.B_s_TRUETAU.GetValue()*1000 )
+	valueList.append( pyl.B_s_TAU.GetValue()*1000 - pyl.B_s_TRUETAU.GetValue()*1000 )
   
-  	if pyl.B_s0_TRUETAU.GetValue() < -0.2: continue
+  	if pyl.B_s_TRUETAU.GetValue() < -0.2: continue
 	data = array("f", valueList)
 	outputNtuple.Fill(data)	
 
