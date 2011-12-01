@@ -9,12 +9,17 @@
 #ifndef Bd2JpsiKstar_sWave_H
 #define Bd2JpsiKstar_sWave_H
 
+#ifndef __CINT__
 #include "BasePDF.h"
+#include "SlicedAcceptance.h"
+#endif
+#ifdef __CINT__
+#endif
 
 class Bd2JpsiKstar_sWave : public BasePDF
 {
 	public:
-		Bd2JpsiKstar_sWave( PDFConfigurator* );
+		Bd2JpsiKstar_sWave(PDFConfigurator);
 		~Bd2JpsiKstar_sWave();
 
 		//Calculate the PDF value
@@ -48,12 +53,11 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		// to the physics parameter names that will be
 		// used in the minimiser.
 		ObservableRef gammaName;		// gamma
-		ObservableRef deltaMName;		// delta mass
+		ObservableRef As_sqName;
+		ObservableRef delta_zeroName;	// strong phase, set to 0
 		ObservableRef Azero_sqName;	// amplitude
 		ObservableRef Apara_sqName;	// amplitude
 		ObservableRef Aperp_sqName;	// amplitude
-		ObservableRef As_sqName;
-		ObservableRef delta_zeroName;	// strong phase, set to 0
 		ObservableRef delta_paraName;	// strong phase
 		ObservableRef delta_perpName;
 		ObservableRef delta_sName;
@@ -74,9 +78,9 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF.
-		
+
 		bool normalisationCacheValid, evaluationCacheValid;
-		
+
 		ObservableRef timeName;		// proper time
 		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		ObservableRef phiName;		// azimuthal angle of the mu+ in Jpsi frame
@@ -86,7 +90,6 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		ObservableRef timeconstraintName;
 		// Member variables that will contain the parameter values
                 double gamma;
-                double deltaMs;
                 double Azero_sq;
                 double Apara_sq;
                 double Aperp_sq;
@@ -118,7 +121,11 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		double angAccI10;
 		double Ap_sq, Ap;
 
+		bool _useTimeAcceptance ;
+		inline bool useTimeAcceptance() const { return _useTimeAcceptance ; }
+		SlicedAcceptance * timeAcc ;
 
+		 double tlo, thi ;
 		// Member variables for the observables
 		double time;
 		double cosTheta;
@@ -127,10 +134,11 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		double KstarFlavour;
 		double q() const ;
 
-		double tlow, thigh; // Integration limits
+		//double tlow, thigh; // Integration limits
 
 		double buildPDFnumerator();
 		double buildPDFdenominator();
+		double buildCompositePDFdenominator();
 		double buildPDFdenominatorAngles();
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
