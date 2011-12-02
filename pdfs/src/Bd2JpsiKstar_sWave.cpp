@@ -13,8 +13,9 @@
 #include "math.h"
 #include "TMath.h"
 
+PDF_CREATOR( Bd2JpsiKstar_sWave );
 //Constructor
-Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator configurator ) :
+Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator* configurator ) :
 	cachedAzeroAzeroIntB(), cachedAparaAparaIntB(), cachedAperpAperpIntB(), cachedAparaAperpIntB(), cachedAzeroAparaIntB(), cachedAzeroAperpIntB(),
 	cachedAsAsIntB(), cachedAparaAsIntB(), cachedAperpAsIntB(), cachedAzeroAsIntB(), AzeroAzeroB(), AparaAparaB(), AperpAperpB(), AsAsB(), ImAparaAperpB(),
 	ReAzeroAparaB(), ImAzeroAperpB(), ReAparaAsB(), ImAperpAsB(), ReAzeroAsB(), cachedSinDeltaPerpPara(), cachedCosDeltaPara(), cachedSinDeltaPerp(),
@@ -61,7 +62,7 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator configurator ) :
 	cosPsi(), KstarFlavour(), tlo(), thi()
 {
 	MakePrototypes();
-	_useTimeAcceptance = configurator.isTrue( "UseTimeAcceptance" ) ;
+	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 
        if( useTimeAcceptance() ) {
                         timeAcc = new SlicedAcceptance( 0., 14.0, 0.0171 ) ;

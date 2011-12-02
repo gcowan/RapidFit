@@ -19,7 +19,7 @@
 class Bd2JpsiKstar_sWave : public BasePDF
 {
 	public:
-		Bd2JpsiKstar_sWave(PDFConfigurator);
+		Bd2JpsiKstar_sWave(PDFConfigurator*);
 		~Bd2JpsiKstar_sWave();
 
 		//Calculate the PDF value
