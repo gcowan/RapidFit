@@ -15,13 +15,13 @@ ROOTGLIBS    = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --glibs)
 EXTRA_ROOTLIBS=-lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam $(shell if [ "$(shell root-config --features | grep mathmore)" = "" ]; then echo "" ; else echo "-lMathMore" ; fi)
 
 #		Command Line Tools
-CXX          = g++$(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo ""; else echo " --arch=i386"; fi)
+CXX          = g++ $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo ""; else echo "--arch=i386"; fi)
 RM           = rm -f
 
 SVN_REV = $(shell svnversion -n .)
 
 #		Compiler Flags
-CXXFLAGS     = -DSVN_REV=$(SVN_REV) -fPIC -Wabi -Weffc++ -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
+CXXFLAGS     = -DSVN_REV=$(SVN_REV) -fPIC -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -funroll-all-loops -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
 
 #		Some Useful global variables, makes this file MUCH easier to maintain
 SRCEXT   = cpp
@@ -79,13 +79,13 @@ CXXFLAGS_LIB += -I$(INCDIR) -I$(INCPDFDIR) $(ROOTCFLAGS)
 # Linux
 ifeq "$(UNAME)" "Linux"
 	CXXFLAGS     += -fPIE
-	LINKFLAGS    += -Wl,--export-dynamic -pie -m64
+	LINKFLAGS    += -pie -m64
 endif
 
 # OS X
 ifeq "$(UNAME)" "Darwin"
 	CXXFLAGS     += -fPIE
-	LINKFLAGS    += -m64
+	LINKFLAGS    += $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo " -m64"; else echo ""; fi)
 endif
 
 
@@ -128,9 +128,14 @@ distclean:
 
 clang: override CXX=clang++
 clang: all
+clang-utils: override CXX=clang++
+clang-utils: utils
 
-
-
+#	Have a build option that SCREAMS at the user for potential mistakes!!!
+debug: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++
+debug: all
+debug-utils: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++
+debug-utils: utils
 
 
 #	RapidFit Utils:
@@ -189,12 +194,6 @@ $(EXEDIR)/RapidLL: $(OBJDIR)/RapidLL.o $(OBJDIR)/EdStyle.o $(OBJDIR)/NTuple_Proc
 $(OBJDIR)/RapidLL.o: $(UTILSSRC)/RapidLL.C
 	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
 
-#       New tool for plotting 1D LL and overlaying multiple copies of the same
-$(EXEDIR)/RapidLL2: $(OBJDIR)/RapidLL2.o $(OBJDIR)/EdStyle.o $(OBJDIR)/NTuple_Processing.o $(OBJDIR)/TString_Processing.o $(OBJDIR)/StringProcessing.o
-	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
-$(OBJDIR)/RapidLL2.o: $(UTILSSRC)/RapidLL2.C
-	$(CXX) $(CXXFLAGS) -Iutils/include -o $@ -c $<
-
 #       New tool for plotting 2DLL and FC
 $(EXEDIR)/RapidPlot: $(OBJDIR)/RapidPlot.o $(OBJDIR)/EdStyle.o $(OBJDIR)/NTuple_Processing.o $(OBJDIR)/Histo_Processing.o $(OBJDIR)/TString_Processing.o $(OBJDIR)/StringProcessing.o
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
@@ -245,5 +244,4 @@ $(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp
 
 #	Finally, Compile RapidFit as a library making use of the existing binaries for other classes
 $(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS) $(PDFOBJS) $(OBJDIR)/ClassLookUp.o
-	$(CXX) -shared $(LIBS) $(LINKFLAGS) $(ROOTLIBS) $(EXTRA_ROOTLIBS) $(CXXFLAG) $^ -o $@
-
+	$(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS) $(ROOTLIBS) $(EXTRA_ROOTLIBS)

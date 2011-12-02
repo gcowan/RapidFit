@@ -10,9 +10,9 @@
 #include "LongLivedBkg_3Dangular.h"
 #include "Mathematics.h"
 #include <iostream>
+#include <fstream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 #include "TROOT.h"
 #include "TMath.h"
 #include "TFile.h"
@@ -95,17 +95,18 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 		}
 		bool elsewhere_fail = input_file.fail();
 
-		if( elsewhere_fail && !local_fail ) fullFileName = fileName;
-
 		if( elsewhere_fail && local_fail )
 		{
 			cerr << "\n\tFileName:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
+			cerr << "\t\tAlternativley make sure your XML points to the correct file, or that the file is in the current working directory\n" << endl;
 			exit(-89);
 		}
 
+		if( fullFileName.empty() ) fullFileName = fileName;
+
 		//Read in histo
 		TFile* f =  TFile::Open(fullFileName.c_str());
-		histo = new TH3D(  *(    (TH3D*)f ->Get("histo")      )     ); //(fileName.c_str())));
+		histo =  (TH3D*)f ->Get("histo"); //(fileName.c_str())));
 
 		xaxis = histo->GetXaxis();
 		xmin = xaxis->GetXmin();
@@ -134,17 +135,27 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 		vector<int> zero_bins;
 
 		//loop over each bin in histogram and print out how many zero bins there are
-		for (int i=1; i < nxbins+1; i++){
-			for (int j=1; j < nybins+1; j++){
-				for (int k=1; k < nzbins+1; k++){
+		for (int i=1; i < nxbins+1; ++i)
+		{
+			for (int j=1; j < nybins+1; ++j)
+			{
+				for (int k=1; k < nzbins+1; ++k)
+				{
 
 					double bin_content = histo->GetBinContent(i,j,k);
 					//cout << "Bin content: " << bin_content << endl;
-					if(bin_content<=0) { zero_bins.push_back(1);}
+					if(bin_content<=0)
+					{
+						zero_bins.push_back(1);
+					}
 					//cout << " Zero bins " << zero_bins.size() << endl;}
-					else if (bin_content>0){
-						sum += (int) bin_content;}
-			}}}
+					else if (bin_content>0)
+					{
+						sum += (int) bin_content;
+					}
+				}
+			}
+		}
 
 
 		int average_bin_content = sum / total_num_bins;
@@ -189,6 +200,7 @@ void LongLivedBkg_3Dangular::MakePrototypes()
 
 	valid = true;
 }
+
 
 LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( const LongLivedBkg_3Dangular& input ) : BasePDF( (BasePDF) input ),
 	f_LL1Name(input.f_LL1Name), tauLL1Name(input.tauLL1Name), tauLL2Name(input.tauLL2Name), timeResLL1FracName(input.timeResLL1FracName), sigmaLL1Name(input.sigmaLL1Name),
@@ -252,7 +264,6 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	if (returnValue <= 0) cout << "PDF returns zero!" << endl;
 
 	return returnValue;
-
 }
 
 
