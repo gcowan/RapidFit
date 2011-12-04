@@ -55,11 +55,13 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 	string fileName = config->getConfigurationValue( "AngularDistributionHistogram" ) ;
 
 	//Initialise depending upon whether configuration parameter was found
-	if( fileName == "" ) {
+	if( fileName == "" )
+	{
 		cout << "   No AngularDistributionHistogram found: using flat background " << endl ;
 		useFlatAngularDistribution = true ;
 	}
-	else {
+	else
+	{
 		cout << "   AngularDistributionHistogram requested: " << fileName << endl ;
 		useFlatAngularDistribution = false ;
 
@@ -102,28 +104,37 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 			exit(-89);
 		}
 
-		if( fullFileName.empty() ) fullFileName = fileName;
+		if( fullFileName.empty() || !local_fail )
+		{
+			fullFileName = fileName;
+		}
 
 		//Read in histo
 		TFile* f =  TFile::Open(fullFileName.c_str());
-		histo =  (TH3D*)f ->Get("histo"); //(fileName.c_str())));
+		histo = (TH3D*) f->Get("histo"); //(fileName.c_str())));
 
 		xaxis = histo->GetXaxis();
+		cout << "X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << endl;
 		xmin = xaxis->GetXmin();
 		xmax = xaxis->GetXmax();
 		nxbins = histo->GetNbinsX();
+		cout << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
 		deltax = (xmax-xmin)/nxbins;
 
 		yaxis = histo->GetYaxis();
+		cout << "Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << endl;
 		ymin = yaxis->GetXmin();
 		ymax = yaxis->GetXmax();
 		nybins = histo->GetNbinsY();
+		cout << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
 		deltay = (ymax-ymin)/nybins;
 
 		zaxis = histo->GetZaxis();
+		cout << "Z axis Name: " << zaxis->GetName() << "\tTitle: " << zaxis->GetTitle() << endl;
 		zmin = zaxis->GetXmin();
 		zmax = zaxis->GetXmax();
 		nzbins = histo->GetNbinsZ();
+		cout << "Z axis Min: " << zmin << "\tMax: " << zmax << "\tBins: " << nzbins << endl;
 		deltaz = (zmax-zmin)/nzbins;
 
 		//method for Checking whether histogram is sensible
@@ -157,7 +168,6 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 			}
 		}
 
-
 		int average_bin_content = sum / total_num_bins;
 
 		cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
@@ -165,14 +175,14 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 		cout << endl;
 		cout << endl;
 
-		if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() ){
+		if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() )
+		{
 			cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
 			exit(1);
 		}
 
 		cout << "Finishing processing histo" << endl;
-}
-
+	}
 }
 
 
@@ -243,25 +253,29 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
 
 	double returnValue = 0;
+	double val1=-1., val2=-1.;
 	//Deal with propertime resolution
 	if( timeResLL1Frac >= 0.9999 )
 	{
 		// Set the member variable for time resolution to the first value and calculate
 		sigmaLL = sigmaLL1;
-		returnValue =  buildPDFnumerator() ;
+		returnValue =  this->buildPDFnumerator() ;
 	}
 	else
 	{
 		// Set the member variable for time resolution to the first value and calculate
 		sigmaLL = sigmaLL1;
-		double val1 = buildPDFnumerator();
+		val1 = this->buildPDFnumerator();
 		// Set the member variable for time resolution to the second value and calculate
 		sigmaLL = sigmaLL2;
-		double val2 = buildPDFnumerator();
+		val2 = this->buildPDFnumerator();
 		returnValue = (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2) ;
 	}
 
-	if (returnValue <= 0) cout << "PDF returns zero!" << endl;
+	if (returnValue <= 0)
+	{
+		cout << "PDF returns zero!" << endl;
+	}
 
 	return returnValue;
 }
@@ -273,8 +287,9 @@ double LongLivedBkg_3Dangular::buildPDFnumerator()
 {
 	// Sum of two exponentials, using the time resolution functions
 
-	double returnValue = 0;
+	double returnValue = 0.;
 
+	double val1=-1., val2=-1.;
 	if( f_LL1 >= 0.9999 ) {
 		if( tauLL1 <= 0 ) {
 			cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
@@ -287,12 +302,14 @@ double LongLivedBkg_3Dangular::buildPDFnumerator()
 			cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
 			exit(1) ;
 		}
-		double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
-		double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
+		val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
+		val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
 		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
 	}
 
-	return returnValue * angularFactor();
+	returnValue *= angularFactor();
+
+	return returnValue;
 }
 
 
@@ -373,20 +390,29 @@ double LongLivedBkg_3Dangular::buildPDFdenominator()
 //Angular distribution function
 double LongLivedBkg_3Dangular::angularFactor( )
 {
+	double returnValue=0.;
+
+	int globalbin=-1;
+	int xbin=-1, ybin=-1, zbin=-1;
+	double num_entries_bin=-1.;
 
 	if( useFlatAngularDistribution ) {
-		return 1.0 / 8.0 / TMath::Pi() ;
+		returnValue = 1.0 / 8.0 / TMath::Pi() ;
 	}
 	else {
 
 		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-		int globalbin = histo->FindBin(cosPsi, cosTheta, phi);
-		double num_entries_bin = histo->GetBinContent(globalbin);
+		xbin = xaxis->FindFixBin( cosPsi ); if( xbin > nxbins ) xbin = nxbins;
+		ybin = yaxis->FindFixBin( cosTheta ); if( ybin > nybins ) ybin = nybins;
+		zbin = zaxis->FindFixBin( phi ); if( zbin > nzbins ) zbin = nzbins;
+
+		globalbin = histo->GetBin( xbin, ybin, zbin );
+		num_entries_bin = histo->GetBinContent(globalbin);
 
 		//Angular factor normalized with phase space of histogram and total number of entries in the histogram
-		double factor = num_entries_bin / (deltax * deltay * deltaz) / total_num_entries ;
-
-		return factor;
+		returnValue = num_entries_bin / (deltax * deltay * deltaz) / total_num_entries ;
 	}
 
+	return returnValue;
 }
+

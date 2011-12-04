@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/12/04 Rob Currie
+    - Fixed a rather irritating bug within RapidFit which caused problems with the background 3D histogram PDF
+
 2011/12/02 Rob Currie
     - Bugfix for loading files with the LL_3D histogram PDF
     - Improved Makefile, loud compiler warnings are moved to 'make debug', the default build still warns of most serious problems in code, 'make clang' allows the llvm compiler to be used
