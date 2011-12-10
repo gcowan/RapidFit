@@ -23,7 +23,7 @@ PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MO_v4 );
 //New one with configurator
 Bs2JpsiPhi_SignalAlt_MO_v4::Bs2JpsiPhi_SignalAlt_MO_v4(PDFConfigurator* configurator) : 
 // Physics parameters
-gammaName     		( configurator->getName("gamma") )
+gammaName				( configurator->getName("gamma") )
 , deltaGammaName		( configurator->getName("deltaGamma") )
 , deltaMName			( configurator->getName("deltaM") )
 , Phi_sName				( configurator->getName("Phi_s") )
@@ -45,6 +45,7 @@ gammaName     		( configurator->getName("gamma") )
 , mistagSetPointName	( configurator->getName("mistagSetPoint") )
 // Detector parameters
 , resScaleName			( configurator->getName("timeResolutionScale") )
+, eventResolutionName	( configurator->getName("eventResolution") )
 , res1Name				( configurator->getName("timeResolution1") )
 , res2Name				( configurator->getName("timeResolution2") )
 , res3Name				( configurator->getName("timeResolution3") )
@@ -71,8 +72,8 @@ gammaName     		( configurator->getName("gamma") )
 , cthetalName			( configurator->getName("helcosthetaL") )
 , phihName				( configurator->getName("helphi") )
 , tagName				( configurator->getName("tag") )
-//, timeConstraintName	( configurator->getName("time") )
 // Other things
+, _useEventResolution(false)
 , _useTimeAcceptance(false)
 , _useHelicityBasis(false)
 , _numericIntegralForce(false)
@@ -88,7 +89,7 @@ angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7
 tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
 intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL), normalisationCacheValid(false),
 CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
-resolution(), timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(), storeExpCos(), normalisationCacheUntagged()
+resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(), storeExpCos(), normalisationCacheUntagged()
 {
 	
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MO_v4 " << std::endl ;
@@ -96,15 +97,10 @@ resolution(), timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(),
 	//...........................................
 	// Configure to use time acceptance machinery 
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
-	
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0157 ) ;
 			cout << "Bs2JpsiPhi_SignalAlt_MO_v4:: Constructing timeAcc: Upper time acceptance beta=0.0157 [0 < t < 14] " << endl ;
-		}
-		else if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Lower2010" ) ) {
-			timeAcc = new SlicedAcceptance( "Lower2010" ) ;
-			cout << "Bs2JpsiPhi_SignalAlt_MO_v4:: Constructing timeAcc: Lower time acceptance 2010  [0 < t < 14] " << endl ;
 		}
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
 			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
@@ -133,6 +129,7 @@ resolution(), timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(),
 	
 	//...........................................
 	// Configure other options 
+	_useEventResolution = configurator->isTrue( "UseEventResolution" ) ;
 	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
 	_useHelicityBasis = configurator->isTrue( "UseHelicityBasis" ) ;
 	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
@@ -151,6 +148,7 @@ resolution(), timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(),
 	
 }
 
+/*
 //................................................
 //	Copy Constructor
 Bs2JpsiPhi_SignalAlt_MO_v4::Bs2JpsiPhi_SignalAlt_MO_v4( const Bs2JpsiPhi_SignalAlt_MO_v4& input )	: BasePDF( (BasePDF) input ),
@@ -159,21 +157,21 @@ Azero_sqName(input.Azero_sqName), Apara_sqName(input.Apara_sqName), Aperp_sqName
 delta_zeroName(input.delta_zeroName), delta_paraName(input.delta_paraName), delta_perpName(input.delta_perpName),
 delta_sName(input.delta_sName), cosphisName(input.cosphisName), sinphisName(input.sinphisName), mistagName(input.mistagName),
 mistagP1Name(input.mistagP1Name), mistagP0Name(input.mistagP0Name), mistagSetPointName(input.mistagSetPointName),
-resScaleName(input.resScaleName), res1Name(input.res1Name), res2Name(input.res2Name), res3Name(input.res3Name),
+resScaleName(input.resScaleName), res1Name(input.res1Name), res2Name(input.res2Name), res3Name(input.res3Name),eventResolutionName(input.eventResolutionName),
 res2FractionName(input.res2FractionName), res3FractionName(input.res3FractionName), timeOffsetName(input.timeOffsetName),
 angAccI1Name(input.angAccI1Name), angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name),
 angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name), angAccI7Name(input.angAccI7Name), angAccI8Name(input.angAccI8Name),
 angAccI9Name(input.angAccI9Name), angAccI10Name(input.angAccI10Name), timeName(input.timeName), 
 cosThetaName(input.cosThetaName), phiName(input.phiName), cosPsiName(input.cosPsiName), 
 cthetakName(input.cthetakName), phihName(input.phihName), cthetalName(input.cthetalName), 
-tagName(input.tagName), /*timeConstraintName(input.timeConstraintName),*/ t(input.t),
+tagName(input.tagName), t(input.t),
 ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr), ctheta_1(input.ctheta_1), 
 ctheta_k(input.ctheta_k), phi_h(input.phi_h), ctheta_l(input.ctheta_l), 
 tag(input.tag), _gamma(input._gamma), dgam(input.dgam),
 Aperp_sq(input.Aperp_sq), Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq), As_sq(input.As_sq), delta_para(input.delta_para),
 delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2),
 delta_ms(input.delta_ms), phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag),
-_mistagP1(input._mistagP1), _mistagP0(input._mistagP0), _mistagSetPoint(input._mistagSetPoint), resolution(input.resolution),
+_mistagP1(input._mistagP1), _mistagP0(input._mistagP0), _mistagSetPoint(input._mistagSetPoint), resolution(input.resolution), eventResolution(input.eventResolution),
 resolutionScale(input.resolutionScale), resolution1(input.resolution1), resolution2(input.resolution2), resolution3(input.resolution3),
 resolution2Fraction(input.resolution2Fraction), resolution3Fraction(input.resolution3Fraction), timeOffset(input.timeOffset),
 angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4), angAccI5(input.angAccI5),
@@ -184,6 +182,7 @@ intExpSin_stored(input.intExpSin_stored), intExpCos_stored(input.intExpCos_store
 _numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly), 
 _useCosAndSin(input._useCosAndSin), allowNegativeAsSq(input.allowNegativeAsSq), timeAcc(input.timeAcc),
 _useHelicityBasis(input._useHelicityBasis),
+_useEventResolution(input._useEventResolution),
 normalisationCacheValid(input.normalisationCacheValid),
 CachedA1(input.CachedA1), CachedA2(input.CachedA2), CachedA3(input.CachedA3), CachedA4(input.CachedA4), CachedA5(input.CachedA5),
 CachedA6(input.CachedA6), CachedA7(input.CachedA7), CachedA8(input.CachedA8), CachedA9(input.CachedA9), CachedA10(input.CachedA10),
@@ -192,6 +191,7 @@ storeExpSin(input.storeExpSin), storeExpCos(input.storeExpCos), normalisationCac
 {
 	timeAcc = new SlicedAcceptance( *(input.timeAcc) );
 }
+*/
 
 //........................................................
 //Destructor
@@ -218,6 +218,8 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::MakePrototypes()
 
 	allObservables.push_back( tagName );
 	allObservables.push_back( mistagName );
+	
+	if(useEventResolution()) allObservables.push_back( eventResolutionName );
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -245,11 +247,13 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::MakePrototypes()
 	parameterNames.push_back( mistagSetPointName );
 	
 	parameterNames.push_back( resScaleName );
-	parameterNames.push_back( res1Name );
-	parameterNames.push_back( res2Name );
-	parameterNames.push_back( res3Name );
-	parameterNames.push_back( res2FractionName );
-	parameterNames.push_back( res3FractionName );
+	if( ! useEventResolution() ) {
+		parameterNames.push_back( res1Name );
+		parameterNames.push_back( res2Name );
+		parameterNames.push_back( res3Name );
+		parameterNames.push_back( res2FractionName );
+		parameterNames.push_back( res3FractionName );
+	}
 	parameterNames.push_back( timeOffsetName );
 	
 	parameterNames.push_back( angAccI1Name );
@@ -273,7 +277,11 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::MakePrototypes()
 vector<string> Bs2JpsiPhi_SignalAlt_MO_v4::GetDoNotIntegrateList()
 {
 	vector<string> list;
+	
 	list.push_back(mistagName) ;
+	
+	if( useEventResolution() ) list.push_back(eventResolutionName) ;
+		
 	if( _numericIntegralTimeOnly ) {
 		if( _useHelicityBasis ) {
 			list.push_back( cthetakName );
@@ -295,8 +303,9 @@ vector<string> Bs2JpsiPhi_SignalAlt_MO_v4::GetDoNotIntegrateList()
 
 bool Bs2JpsiPhi_SignalAlt_MO_v4::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-	normalisationCacheValid = false;  //This is only used for the untagged events.
-	timeIntegralCacheValid = false;  
+
+	normalisationCacheValid = false;  //This is only used for the untagged events and only if not useing event resolution
+	timeIntegralCacheValid = false;   //This cannot be used if event resolution is used
 	
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
 	
@@ -331,7 +340,7 @@ bool Bs2JpsiPhi_SignalAlt_MO_v4::SetPhysicsParameters( ParameterSet * NewParamet
 	delta1 = delta_perp -  delta_para ;
 	delta2 = delta_perp -  delta_zero ;
 	
-	delta_ms		= allParameters.GetPhysicsParameter( deltaMName )->GetValue();	
+	delta_ms = allParameters.GetPhysicsParameter( deltaMName )->GetValue();	
 	
 	if(_useCosAndSin){
 		_cosphis = allParameters.GetPhysicsParameter( cosphisName )->GetValue();
@@ -350,11 +359,13 @@ bool Bs2JpsiPhi_SignalAlt_MO_v4::SetPhysicsParameters( ParameterSet * NewParamet
 	
 	// Detector parameters
 	resolutionScale		= allParameters.GetPhysicsParameter( resScaleName )->GetValue();
-	resolution1         = allParameters.GetPhysicsParameter( res1Name )->GetValue();
-	resolution2         = allParameters.GetPhysicsParameter( res2Name )->GetValue();
-	resolution3         = allParameters.GetPhysicsParameter( res3Name )->GetValue();
-	resolution2Fraction = allParameters.GetPhysicsParameter( res2FractionName )->GetValue();
-	resolution3Fraction = allParameters.GetPhysicsParameter( res3FractionName )->GetValue();
+	if( ! useEventResolution() ) {
+		resolution1         = allParameters.GetPhysicsParameter( res1Name )->GetValue();
+		resolution2         = allParameters.GetPhysicsParameter( res2Name )->GetValue();
+		resolution3         = allParameters.GetPhysicsParameter( res3Name )->GetValue();
+		resolution2Fraction = allParameters.GetPhysicsParameter( res2FractionName )->GetValue();
+		resolution3Fraction = allParameters.GetPhysicsParameter( res3FractionName )->GetValue();
+	}
 	timeOffset          = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
 	
 	// Angular acceptance factors
@@ -388,6 +399,7 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateForNumericIntegral(DataPoint * measur
 
 double Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate(DataPoint * measurement)
 {
+	
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
 
@@ -404,20 +416,31 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate(DataPoint * measurement)
 	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
+	
+	if( useEventResolution() ) eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
 
 	//Cache amplitues and angles terms used in cross section
 	this->CacheAmplitudesAndAngles() ;
 	
-	double val1=0. , val2=0., val3=0. ;
-	double returnValue ;
+	//***** This will be returned*****
+	//It gets constructed according to what you want to do with resolution
+	double returnValue ;	
 	
-	double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
 	
 	if( resolutionScale <= 0. ) {
+		//This is the "code" to run with resolution=0
 		resolution = 0. ;
 		returnValue = this->diffXsec( );
 	}
-	else {		
+	else if( useEventResolution() ) {
+		// Event-by-event resolution has been selected
+		resolution = eventResolution * resolutionScale ;
+		returnValue = this->diffXsec( );
+	}
+	else {	
+		//Good old fashioned triple Gaussian resolution is selected
+		double val1=0. , val2=0., val3=0. ;
+		double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
 		if(resolution1Fraction > 0 ) {
 			resolution = resolution1 * resolutionScale ;
 			val1 = this->diffXsec( );
@@ -438,31 +461,12 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate(DataPoint * measurement)
 	bool c1 = isnan(returnValue) ;
 	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
-	if( DEBUGFLAG && (c1 || c2 || c3)  ) 
-	{
-		cout << endl ;
-		cout << " Bs2JpsiPhi_SignalAlt_MO_v4::evaluate() returns <=0 or nan :" << returnValue << endl ;
-		cout << "   gamma " << gamma() << endl ;
-		cout << "   gl    " << gamma_l() << endl ;
-		cout << "   gh    " << gamma_h()  << endl;
-		cout << "   AT^2    " << AT()*AT() << endl;
-		cout << "   AP^2    " << AP()*AP() << endl;
-		cout << "   A0^2    " << A0()*A0() << endl ;
-		cout << "   AS^2    " << AS()*AS() << endl ;
-		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
-		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag         " << mistag() << endl ;
-		cout << "   mistagP1       " << _mistagP1 << endl ;
-		cout << "   mistagP0       " << _mistagP0 << endl ;
-		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
-		cout << " For event with:  " << endl ;
-		cout << "   time      " << t << endl ;
-		cout << "   ctheta_tr " << ctheta_tr << endl ;
-		cout << "   ctheta_1 " << ctheta_1 << endl ;
-		cout << "   phi_tr " << phi_tr << endl ;		
+	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
+		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate() returns <=0 or nan :" , returnValue ) ;
 		if( isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
+	
 			
 	return returnValue ;	
 }
@@ -477,17 +481,22 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateTimeOnly(DataPoint * measurement)
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
-	
-	double val1=0. , val2=0., val3=0. ;
+	if( useEventResolution() ) eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
+
 	double returnValue ;
 	
-	double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
 
 	if( resolutionScale <= 0. ) {
 		resolution = 0. ;
 		returnValue = this->diffXsecTimeOnly( );
 	}
+	else if( useEventResolution() ) {
+		resolution = eventResolution * resolutionScale ;
+		returnValue = this->diffXsecTimeOnly( );
+	}
 	else {				
+		double val1=0. , val2=0., val3=0. ;
+		double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
 		if(resolution1Fraction > 0 ) {
 			resolution = resolution1 * resolutionScale ;
 			val1 = this->diffXsecTimeOnly( );
@@ -509,30 +518,11 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateTimeOnly(DataPoint * measurement)
 	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
-		cout << endl ;
-		cout << " Bs2JpsiPhi_SignalAlt_MO_v4::evaluate() returns <=0 or nan :" << returnValue << endl ;
-		cout << "   gamma " << gamma() << endl ;
-		cout << "   gl    " << gamma_l() << endl ;
-		cout << "   gh    " << gamma_h()  << endl;
-		cout << "   AT^2    " << AT()*AT() << endl;
-		cout << "   AP^2    " << AP()*AP() << endl;
-		cout << "   A0^2    " << A0()*A0() << endl ;
-		cout << "   AS^2    " << AS()*AS() << endl ;
-		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
-		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag         " << mistag() << endl ;
-		cout << "   mistagP1       " << _mistagP1 << endl ;
-		cout << "   mistagP0       " << _mistagP0 << endl ;
-		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
-		cout << " For event with:  " << endl ;
-		cout << "   time      " << t << endl ;
-		cout << "   ctheta_tr " << ctheta_tr << endl ;
-		cout << "   ctheta_1 " << ctheta_1 << endl ;
-		cout << "   phi_tr " << phi_tr << endl ;		
+		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateTimeOnly() returns <=0 or nan :" , returnValue ) ;
 		if( isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
-	
+		
 	
 	return returnValue ;
 	
@@ -548,15 +538,11 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Normalisation(DataPoint * measurement, PhaseS
 	if( _numericIntegralForce ) return -1. ;
 
 	// Get observables into member variables
-	//t = measurement->GetObservable( timeName )->GetValue() - timeOffset;
-	//ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
-	//phi_tr      = measurement->GetObservable( phiName )->GetValue();
-	//ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue() ;
+	if( useEventResolution() ) eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
 	
 	// Get time boundaries into member variables
-//	IConstraint * timeBound = boundary->GetConstraint( timeConstraintName );
 	IConstraint * timeBound = boundary->GetConstraint( timeName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" ) {
 		cerr << "Bound on time not provided" << endl;
@@ -566,77 +552,83 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Normalisation(DataPoint * measurement, PhaseS
 		tlo = timeBound->GetMinimum();
 		thi = timeBound->GetMaximum();
 	}
-	
-	//First job for any new set of parameters is to Cache the time integrals
-	if( ! timeIntegralCacheValid ) {
-		CacheTimeIntegrals() ;
-		timeIntegralCacheValid = true ;
-	}
-	
-	
-	//If this is an untagged event and the result has been cached, then it can be used
-	// Otherwise must calculate the normalisation
 
-	double returnValue ;
+
+	//*** This is what will be returned.***
+	//How it is calcualted depends upon how resolution is treated
+	double returnValue=0 ;
+
 	
-	if( (tag==0) && normalisationCacheValid ) {
-		returnValue = normalisationCacheUntagged ;
+	// If we are going to use event-by-event resolution, then all the caching is irrelevant and will be bypassed.
+	// You cant cache either untagged or tagged since the resolution will change from event to event and affect the normalisation.
+	if( useEventResolution() )  {
+		if( resolutionScale <=0. ) resolution = 0. ;
+		else resolution = eventResolution * resolutionScale ;
+		returnValue = this->diffXsecCompositeNorm1( 0 );
 	}
+		
 	
+	//We are not going to use event by event resolution so we can use all the caching machinery
 	else {
-			
-		double val1=0. , val2=0., val3=0. ;		
-		double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
-
-		if( resolutionScale <= 0. ) {
-			resolution = 0. ;
-			returnValue = this->diffXsecCompositeNorm1( 0 );
+		
+		//First job for any new set of parameters is to Cache the time integrals
+		if( ! timeIntegralCacheValid ) {
+			CacheTimeIntegrals() ;
+			timeIntegralCacheValid = true ;
+			// if( ! useEventResolution() ) timeIntegralCacheValid = true ;
 		}
-		else {						
-			if(resolution1Fraction > 0 ) {
-				resolution = resolution1 * resolutionScale ;
-				val1 = this->diffXsecCompositeNorm1( 1 );
-			}
-			if(resolution2Fraction > 0 ) {
-				resolution = resolution2 * resolutionScale ;
-				val2 = this->diffXsecCompositeNorm1( 2 );
-			}
-			if(resolution3Fraction > 0 ) {
-				resolution = resolution3 * resolutionScale ;
-				val3 = this->diffXsecCompositeNorm1( 3 );
-			}
-			returnValue = resolution1Fraction*val1 + resolution2Fraction*val2 + resolution3Fraction*val3 ;	
-		}
-	}
 	
-	// If this is an untagged event then the normaisation is invariant and so can be cached
-	if( (tag==0) && !normalisationCacheValid )  {
-		normalisationCacheUntagged = returnValue ;
-		normalisationCacheValid = true ;
+	
+		//If this is an untagged event and the result has been cached, then it can be used
+		// Otherwise must calculate the normalisation	
+		if( (tag==0) && normalisationCacheValid ) {
+			returnValue = normalisationCacheUntagged ;
+		}
+	
+		
+		//So we need to calculate the normalisation 
+		else {
+			if( resolutionScale <= 0. ) {
+				resolution = 0. ;
+				returnValue = this->diffXsecCompositeNorm1( 0 );
+			}
+			else {						
+				double val1=0. , val2=0., val3=0. ;		
+				double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
+				if(resolution1Fraction > 0 ) {
+					resolution = resolution1 * resolutionScale ;
+					val1 = this->diffXsecCompositeNorm1( 1 );
+				}
+				if(resolution2Fraction > 0 ) {
+					resolution = resolution2 * resolutionScale ;
+					val2 = this->diffXsecCompositeNorm1( 2 );
+				}
+				if(resolution3Fraction > 0 ) {
+					resolution = resolution3 * resolutionScale ;
+					val3 = this->diffXsecCompositeNorm1( 3 );
+				}
+				returnValue = resolution1Fraction*val1 + resolution2Fraction*val2 + resolution3Fraction*val3 ;	
+			}
+		}
+	
+		// If this is an untagged event then the normaisation is invariant and so can be cached
+		//if( (tag==0) && !normalisationCacheValid && !useEventResolution() )  {
+		if( (tag==0) && !normalisationCacheValid )  {
+			normalisationCacheUntagged = returnValue ;
+			normalisationCacheValid = true ;
+		}
+		
 	}
 	
 	// Conditions to throw exception
 	bool c1 = isnan(returnValue)  ;
 	bool c2 = (returnValue <= 0.) ;	
 	if( DEBUGFLAG && (c1 || c2 ) ) {
-		cout << endl ;
-		cout << " Bs2JpsiPhi_SignalAlt_MO_v4::normalisation() returns <=0 or nan :" << returnValue << endl ;
-		cout << "   gamma " << gamma() << endl ;
-		cout << "   gl    " << gamma_l() << endl ;
-		cout << "   gh    " << gamma_h()  << endl;
-		cout << "   AT^2    " << AT()*AT() << endl;
-		cout << "   AP^2    " << AP()*AP() << endl;
-		cout << "   A0^2    " << A0()*A0() << endl ;
-		cout << "   AS^2    " << AS()*AS() << endl ;
-		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
-		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag         " << mistag() << endl ;
-		cout << "   mistagP1       " << _mistagP1 << endl ;
-		cout << "   mistagP0       " << _mistagP0 << endl ;
-		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;		
+		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::Normalisation() returns <=0 or nan :" , returnValue ) ;
 		if( isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
+		
 	
 	return returnValue ;
 }
@@ -765,7 +757,8 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::diffXsecTimeOnly(  ) const
 
 double Bs2JpsiPhi_SignalAlt_MO_v4::diffXsecNorm1(  ) const
 { 
-	//preCalculateTimeIntegrals() ;  Replaced by new Caching mechanism  
+	//preCalculateTimeIntegrals() ;  Replaced by new Caching mechanism , but this cant be used when event resolution is selected 
+	if( useEventResolution() ) preCalculateTimeIntegrals() ;   
 	
 	double norm =
 	
@@ -800,22 +793,15 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::diffXsecCompositeNorm1( int resolutionIndex )
 	double thi_boundary = thi ;
 	double returnValue = 0;
 	
-	
-	if( true /*useTimeAcceptance()*/ ) {		    // Set to true because seleting false makes a single slice for 0 --> 14. 
-		//This loops over each time slice, does the normalisation between the limits, and accumulates
-		for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
-		{
-			//Set the time integrals
-			this->deCacheTimeIntegrals( (unsigned)resolutionIndex, islice ) ;
+	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
+	{
+		//De cache the time integrals  (unles using event Resolution
+		if( ! useEventResolution() ) this->deCacheTimeIntegrals( (unsigned)resolutionIndex, islice ) ;
 			
-			tlo = tlo_boundary > timeAcc->getSlice((int)islice)->tlow() ? tlo_boundary : timeAcc->getSlice((int)islice)->tlow() ;
-			thi = thi_boundary < timeAcc->getSlice((int)islice)->thigh() ? thi_boundary : timeAcc->getSlice((int)islice)->thigh() ;			
-			if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * timeAcc->getSlice((int)islice)->height() ;
-		}
-	}	
-	else {
-		returnValue = this->diffXsecNorm1() ;
-	}
+		tlo = tlo_boundary > timeAcc->getSlice((int)islice)->tlow() ? tlo_boundary : timeAcc->getSlice((int)islice)->tlow() ;
+		thi = thi_boundary < timeAcc->getSlice((int)islice)->thigh() ? thi_boundary : timeAcc->getSlice((int)islice)->thigh() ;			
+		if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * timeAcc->getSlice((int)islice)->height() ;
+	}		
 	
 	tlo = tlo_boundary;
 	thi = thi_boundary ;
@@ -855,14 +841,10 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::CacheTimeIntegrals() {
 	
 	double tlo_boundary = tlo ;
 	double thi_boundary = thi ;
-	
-	for( unsigned int ires=0; ires < 4 ; ++ires ) {
-		
-		if( ires==0 ) resolution = 0.0 ;
-		if( ires==1 ) resolution = resolution1 * resolutionScale ;
-		if( ires==2 ) resolution = resolution2 * resolutionScale ;
-		if( ires==3 ) resolution = resolution3 * resolutionScale ;
-		
+
+	if( useEventResolution() ) {
+	    int ires = 0 ;
+		resolution = eventResolution * resolutionScale ;
 		for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice ) {
 			tlo = tlo_boundary > timeAcc->getSlice((int)islice)->tlow() ? tlo_boundary : timeAcc->getSlice((int)islice)->tlow() ;
 			thi = thi_boundary < timeAcc->getSlice((int)islice)->thigh() ? thi_boundary : timeAcc->getSlice((int)islice)->thigh() ;
@@ -882,6 +864,37 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::CacheTimeIntegrals() {
 				storeExpCos[ires][islice] = 0 ;
 			}
 			
+		}
+	}
+	
+	else {
+		for( unsigned int ires=0; ires < 4 ; ++ires ) {
+		
+			if( ires==0 ) resolution = 0.0 ;
+			if( ires==1 ) resolution = resolution1 * resolutionScale ;
+			if( ires==2 ) resolution = resolution2 * resolutionScale ;
+			if( ires==3 ) resolution = resolution3 * resolutionScale ;
+		
+			for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice ) {
+				tlo = tlo_boundary > timeAcc->getSlice((int)islice)->tlow() ? tlo_boundary : timeAcc->getSlice((int)islice)->tlow() ;
+				thi = thi_boundary < timeAcc->getSlice((int)islice)->thigh() ? thi_boundary : timeAcc->getSlice((int)islice)->thigh() ;
+				if( thi > tlo ) {
+					this->preCalculateTimeIntegrals() ;
+					//cout << " >>>>> caching time integrals / " << intExpL_stored << "  /  "<< intExpH_stored << "  /  "<< intExpSin_stored << "  /  "<< intExpCos_stored << "  /  " << endl ;
+				
+					storeExpL[ires][islice] = intExpL_stored ;
+					storeExpH[ires][islice] = intExpH_stored ;
+					storeExpSin[ires][islice] = intExpSin_stored ;
+					storeExpCos[ires][islice] = intExpCos_stored ;
+				}
+				else {
+					storeExpL[ires][islice] = 0 ;
+					storeExpH[ires][islice] = 0 ;
+					storeExpSin[ires][islice] = 0 ;
+					storeExpCos[ires][islice] = 0 ;
+				}
+			
+			}
 		}
 	}
 	
@@ -911,8 +924,39 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::deCacheTimeIntegrals( unsigned int ires, unsign
 
 
 
-//...............................................................................
+//===========================================================================================
 // Debug printout
+//===========================================================================================
+
+
+void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrint( string message, double value )  const
+{
+	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrint ***************************" << endl ;
+	cout << message << value << endl <<endl ;
+	
+	cout << endl ;
+	cout << "   gamma " << gamma() << endl ;
+	cout << "   gl    " << gamma_l() << endl ;
+	cout << "   gh    " << gamma_h()  << endl;
+	cout << "   AT^2    " << AT()*AT() << endl;
+	cout << "   AP^2    " << AP()*AP() << endl;
+	cout << "   A0^2    " << A0()*A0() << endl ;
+	cout << "   AS^2    " << AS()*AS() << endl ;
+	cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
+	cout << "   delta_ms       " << delta_ms << endl ;
+	cout << "   mistag         " << mistag() << endl ;
+	cout << "   mistagP1       " << _mistagP1 << endl ;
+	cout << "   mistagP0       " << _mistagP0 << endl ;
+	cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
+	cout << "   resolution " << resolution << endl ;
+	cout << " For event with:  " << endl ;
+	cout << "   time      " << t << endl ;
+	cout << "   ctheta_tr " << ctheta_tr << endl ;
+	cout << "   ctheta_1 " << ctheta_1 << endl ;
+	cout << "   phi_tr " << phi_tr << endl ;		
+}
+
+
 void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintXsec( string message, double value )  const
 {   
     cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintXsec ***************************" << endl ;
@@ -978,6 +1022,7 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintNorm( string message, double value ) 
 
 
 
+	
 
 
 

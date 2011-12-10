@@ -34,7 +34,7 @@ class Bs2JpsiPhi_SignalAlt_MO_v4 : public BasePDF
 {
 public:
 	Bs2JpsiPhi_SignalAlt_MO_v4( PDFConfigurator* ); 
-	Bs2JpsiPhi_SignalAlt_MO_v4( const Bs2JpsiPhi_SignalAlt_MO_v4& );
+	//Bs2JpsiPhi_SignalAlt_MO_v4( const Bs2JpsiPhi_SignalAlt_MO_v4& );
 	~Bs2JpsiPhi_SignalAlt_MO_v4();
 
 	//Mandatory RapidFit Methods
@@ -84,6 +84,7 @@ protected:
 	ObservableRef mistagP0Name;		// mistag calib
 	ObservableRef mistagSetPointName;// mistag calib
 	
+	ObservableRef eventResolutionName;			// Scale to multiply all Gaussians with 
 	ObservableRef resScaleName;			// Scale to multiply all Gaussians with 
 	ObservableRef res1Name;				// time resolution narrow
 	ObservableRef res2Name;				// time resolution wide
@@ -165,6 +166,7 @@ protected:
 	double _mistagSetPoint ;
 
 	double resolution ;
+	double eventResolution ;
 	double resolutionScale ;
 	double resolution1 ;
 	double resolution2 ;
@@ -172,6 +174,8 @@ protected:
 	double resolution2Fraction ;
 	double resolution3Fraction ;
 	double timeOffset ;
+	bool _useEventResolution ;
+	bool useEventResolution() const {return _useEventResolution ; }
 
 	double angAccI1 ;
 	double angAccI2 ;
@@ -362,6 +366,7 @@ protected:
 	double normalisationCacheValue[3] ;
 	//double normalisationCacheValueRes2[3] ;
 	
+	void DebugPrint( string , double ) const ;
 	void DebugPrintXsec( string , double ) const ;
 	void DebugPrintNorm( string , double ) const ;
 	
