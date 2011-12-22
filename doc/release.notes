@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2011/12/22/ Pete Clarke
+    - Added new pdf/configdata files for background angles and time acceptance  
+    - all labelled as É_v1É
+
 2011/12/10  Pete Clarke
     - New version of  Bs2JpsiPhi_SignalAlt_MO_v4 which allows to use event by event time resolution
     - It is switched on by <ConfiguraitonParameter>useEventResolution:True</ConfiguraitonParameter>
