@@ -164,7 +164,7 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 		double tlow = lowEdge[is];
 		double thigh = hiEdge[is] ;
 		double height = binContent[is]  ;
-		cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
+		//cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
 		slices.push_back( new AcceptanceSlice( tlow, thigh, height ) ) ;
 	}
 	

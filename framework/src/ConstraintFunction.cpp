@@ -100,10 +100,11 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			// This is a special one to contrain the sum of the amplitudes to 1
 			double Aperpsq = NewParameters->GetPhysicsParameter("Aperp_sq")->GetValue();
 			double Azerosq =  NewParameters->GetPhysicsParameter("Azero_sq")->GetValue();
-			double Assq =  NewParameters->GetPhysicsParameter("As_sq")->GetValue();
+			//double Assq =  NewParameters->GetPhysicsParameter("As_sq")->GetValue();
 			double Atot_val = allConstraints[constraintIndex]->GetValue();
 			double Atot_constraint = allConstraints[constraintIndex]->GetError();
-			double excess = (Atot_val-Aperpsq-Azerosq-Assq) ;
+			//double excess = (Atot_val-Aperpsq-Azerosq-Assq) ;
+			double excess = (Atot_val-Aperpsq-Azerosq) ;
 			double penalty ;
 			if( excess >= 0 ) penalty = 0 ;
 			else penalty = (excess*excess) / (Atot_constraint*Atot_constraint) ;

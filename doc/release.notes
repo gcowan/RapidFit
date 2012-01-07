@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2012/01/07/ Peter Clarke
+    - Changed _v4_ PDF to implement new definitions of Amplitudes ready for fitting in bins of mKK
+    - Removed some cout statements from configuration.
+
 2011/12/22/ Pete Clarke
     - Added new pdf/configdata files for background angles and time acceptance  
     - all labelled as É_v1É

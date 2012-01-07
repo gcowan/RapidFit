@@ -317,21 +317,17 @@ bool Bs2JpsiPhi_SignalAlt_MO_v4::SetPhysicsParameters( ParameterSet * NewParamet
 	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_v4::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}	
 	Aperp_sq = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
 	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_v4::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}	
-	As_sq = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
-	
-	if( allowNegativeAsSq ) {
-		if( (As_sq > 1.) ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: As_sq >1 but left as is" <<  endl ;	}
-		Apara_sq = (1. - Azero_sq - Aperp_sq ) ;
-	}
-	else {
-		if( (As_sq < 0.) || (As_sq > 1.) ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: As_sq <0 or >1 but left as is" <<  endl ;	}	
-		Apara_sq = (1. - Azero_sq - Aperp_sq  - As_sq) ;
-	}
-	
+
+	Apara_sq = (1. - Azero_sq - Aperp_sq ) ;
 	if( Apara_sq < 0. ) {
 		cout << "Warning in Bs2JpsiPhi_SignalAlt_MO_v4::SetPhysicsParameters: derived parameter Apara_sq <0  and so set to zero" <<  endl ;
 		Apara_sq = 0. ;
 	}	
+	
+	double fs = allParameters.GetPhysicsParameter( As_sqName )->GetValue();	
+	if( (fs < 0.) || (fs >= 1.) ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: As_sq <0 or >=1 but left as is" <<  endl ;	}	
+	As_sq = fs / (1. - fs ) ;
+				   
 	
 	delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
 	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();

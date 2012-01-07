@@ -40,7 +40,7 @@ void PDFConfigurator::addParameterSubstitution( string substitution ) {
 	// Break into 2 strings
 	string defaultName     =  substitution.substr( 0, pos ) ;
 	string replacementName =  substitution.substr( pos+1, string::npos ) ;
-	cout << " In PDFConfigurator::addParameterSubstitution : storing substitution [" << defaultName << "--->" << replacementName << "]" << endl ;
+	//cout << " In PDFConfigurator::addParameterSubstitution : storing substitution [" << defaultName << "--->" << replacementName << "]" << endl ;
 	defaultNames.push_back( defaultName ) ;
 	replacementNames.push_back( replacementName ) ;
 
@@ -79,7 +79,7 @@ void PDFConfigurator::addConfigurationParameter( string configString ) {
 	// Break into 2 strings
 	string configParameter  =  configString.substr( 0, pos ) ;
 	string configValue		=  configString.substr( pos+1, string::npos ) ;
-	cout << " In PDFConfigurator::addConfigurationParameter : storing configParameter [" << configParameter << " : " << configValue << "]" << endl ;
+	//cout << " In PDFConfigurator::addConfigurationParameter : storing configParameter [" << configParameter << " : " << configValue << "]" << endl ;
 	configParameters.push_back( configParameter ) ;
 	configValues.push_back( configValue ) ;
 
