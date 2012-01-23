@@ -91,6 +91,9 @@ RapidFitIntegrator::~RapidFitIntegrator()
 //Return the integral over all observables
 double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, bool UseCache )
 {
+	
+	UseCache = false ;
+	
 	if( functionToWrap == NULL )
 	{
 		  cerr << "WHAT ARE YOU DOING TO ME, YOUR TRYING TO INTEGRATE OVER A NULL OBJECT!!!" << endl;

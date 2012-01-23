@@ -262,11 +262,11 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 					std::stringstream ResultStream;
 					ResultStream << std::setprecision(2) << correlation;
 					TString formatted("\\bf{"); formatted.Append( ResultStream.str() ); formatted.Append("}") ;
-					cout << " & " << setw(12) << std::setprecision(2) << formatted;
+					cout << " & " << setw(12) << std::setprecision(2) << fixed << formatted;
 				}
 				else
 				{
-					cout << " & " << setw(12) << std::setprecision(2) << correlation;
+					cout << " & " << setw(12) << std::setprecision(2) << fixed << correlation;
 				}
 			}
 			else
@@ -281,6 +281,8 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 
 	cout << "\\hline \n\\end{tabular}" << endl;
 	cout << "\\end{center}\n" << endl;
+	
+	cout.unsetf( ios_base::fixed );
 }
 
 bool ResultFormatter::IsParameterFree( FitResult * OutputData, string ParameterName )

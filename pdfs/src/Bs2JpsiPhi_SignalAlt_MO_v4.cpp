@@ -11,6 +11,7 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
+#include "TF1.h"
 #include "RooMath.h"
 #include "Mathematics.h"
 
@@ -99,8 +100,8 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
-			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0157 ) ;
-			cout << "Bs2JpsiPhi_SignalAlt_MO_v4:: Constructing timeAcc: Upper time acceptance beta=0.0157 [0 < t < 14] " << endl ;
+			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0112 ) ;
+			cout << "Bs2JpsiPhi_SignalAlt_MO_v4:: Constructing timeAcc: Upper time acceptance beta=0.0112 [0 < t < 14] " << endl ;
 		}
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
 			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
@@ -279,7 +280,6 @@ vector<string> Bs2JpsiPhi_SignalAlt_MO_v4::GetDoNotIntegrateList()
 	vector<string> list;
 	
 	list.push_back(mistagName) ;
-	
 	if( useEventResolution() ) list.push_back(eventResolutionName) ;
 		
 	if( _numericIntegralTimeOnly ) {
@@ -917,7 +917,6 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::deCacheTimeIntegrals( unsigned int ires, unsign
 	//cout << " <<<<< de-caching time integrals / " << intExpL_stored << "  /  "<< intExpH_stored << "  /  "<< intExpSin_stored << "  /  "<< intExpCos_stored << "  /  " << endl ;
 	
 }		
-
 
 
 //===========================================================================================

@@ -31,26 +31,32 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 	, tauLL1Name		( config->getName("tau_LL1") )
 	, tauLL2Name		( config->getName("tau_LL2") )
 	//Detector parameters
-	, timeResLL1FracName	( config->getName("timeResLL1Frac") )
+	, timeResLL1FracName( config->getName("timeResLL1Frac") )
 	, sigmaLL1Name		( config->getName("sigma_LL1") )
 	, sigmaLL2Name		( config->getName("sigma_LL2") )
 	// Observables
-	, timeName		( config->getName("time") )
+	, timeName			( config->getName("time") )
 	, cosThetaName		( config->getName("cosTheta") )
-	, phiName		( config->getName("phi") )
+	, phiName			( config->getName("phi") )
 	, cosPsiName		( config->getName("cosPsi") )
-	//Other things to be initialised
+	, cthetakName 		( config->getName("helcosthetaK") )
+	, cthetalName		( config->getName("helcosthetaL") )
+	, phihName			( config->getName("helphi") )
 	, timeconstName		( config->getName("time") )
-
-, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cosTheta(),
-	phi(), cosPsi(), histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
-	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true)
+	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cos1(),
+	cos2(), phi(), histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
+	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true),
+	_useHelicityBasis(false)
 {
 
-	cout << "LongLivedBkg_3Dangular::  " ;
+	cout << "Constructing PDF: LongLivedBkg_3Dangular  " << endl ;
 
+	//Configure 
+	_useHelicityBasis = config->isTrue( "UseHelicityBasis" ) ;
+
+	//Make prototypes
 	MakePrototypes();
-
+	
 	//Find name of histogram needed to define 3-D angular distribution
 	string fileName = config->getConfigurationValue( "AngularDistributionHistogram" ) ;
 
@@ -175,6 +181,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 		cout << endl;
 		cout << endl;
 
+		// Check.  This order works for both bases since phi is always the third one.
 		if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() )
 		{
 			cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
@@ -186,16 +193,49 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 }
 
 
+// ................................
+// Copy
+LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( const LongLivedBkg_3Dangular& input ) : BasePDF( (BasePDF) input ),
+f_LL1Name(input.f_LL1Name), tauLL1Name(input.tauLL1Name), tauLL2Name(input.tauLL2Name), timeResLL1FracName(input.timeResLL1FracName), sigmaLL1Name(input.sigmaLL1Name),
+sigmaLL2Name(input.sigmaLL2Name), timeName(input.timeName), timeconstName(input.timeconstName), tauLL1(input.tauLL1), tauLL2(input.tauLL2), f_LL1(input.f_LL1),
+sigmaLL(input.sigmaLL), sigmaLL1(input.sigmaLL1), sigmaLL2(input.sigmaLL2), timeResLL1Frac(input.timeResLL1Frac), tlow(input.tlow), thigh(input.thigh), time(input.time),
+histo(input.histo), xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), xmin(input.xmin),
+xmax(input.xmax), ymin(input.ymin), ymax(input.ymax), zmin(input.zmin), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz),
+total_num_entries(input.total_num_entries), useFlatAngularDistribution(input.useFlatAngularDistribution),
+cosThetaName(input.cosThetaName), phiName(input.phiName), cosPsiName(input.cosPsiName), 
+cthetakName(input.cthetakName), cthetalName(input.cthetalName), phihName(input.phihName), 
+cos1(input.cos1), cos2(input.cos2), phi(input.phi), _useHelicityBasis(input._useHelicityBasis)
+
+{
+}
+
+//................................................................
+//Destructor
+LongLivedBkg_3Dangular::~LongLivedBkg_3Dangular()
+{
+}
+
+
+
 //..................................................................
 //Make the data point and parameter set
 void LongLivedBkg_3Dangular::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
-	allObservables.push_back( cosThetaName );
-	allObservables.push_back( phiName );
-	allObservables.push_back( cosPsiName );
-
+	//allObservables.push_back( cosThetaName );
+	//allObservables.push_back( phiName );
+	//allObservables.push_back( cosPsiName );
+	if( _useHelicityBasis ) {
+		allObservables.push_back( cthetakName );
+		allObservables.push_back( cthetalName );
+		allObservables.push_back( phihName );
+	}
+	else {
+		allObservables.push_back( cosThetaName );
+		allObservables.push_back( phiName );
+		allObservables.push_back( cosPsiName );
+	}	
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -212,23 +252,7 @@ void LongLivedBkg_3Dangular::MakePrototypes()
 }
 
 
-LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( const LongLivedBkg_3Dangular& input ) : BasePDF( (BasePDF) input ),
-	f_LL1Name(input.f_LL1Name), tauLL1Name(input.tauLL1Name), tauLL2Name(input.tauLL2Name), timeResLL1FracName(input.timeResLL1FracName), sigmaLL1Name(input.sigmaLL1Name),
-	sigmaLL2Name(input.sigmaLL2Name), timeName(input.timeName), timeconstName(input.timeconstName), tauLL1(input.tauLL1), tauLL2(input.tauLL2), f_LL1(input.f_LL1),
-	sigmaLL(input.sigmaLL), sigmaLL1(input.sigmaLL1), sigmaLL2(input.sigmaLL2), timeResLL1Frac(input.timeResLL1Frac), tlow(input.tlow), thigh(input.thigh), time(input.time),
-	histo(input.histo), xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), xmin(input.xmin),
-	xmax(input.xmax), ymin(input.ymin), ymax(input.ymax), zmin(input.zmin), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz),
-	total_num_entries(input.total_num_entries), useFlatAngularDistribution(input.useFlatAngularDistribution),
-	cosThetaName(input.cosThetaName), phiName(input.phiName), cosPsiName(input.cosPsiName), cosTheta(input.cosTheta), phi(input.phi), cosPsi(input.cosPsi)
-{
-}
-
-//................................................................
-//Destructor
-LongLivedBkg_3Dangular::~LongLivedBkg_3Dangular()
-{
-}
-
+//.................................................................
 bool LongLivedBkg_3Dangular::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
@@ -248,10 +272,20 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 {
 	// Observable
 	time = measurement->GetObservable( timeName )->GetValue();
-	cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
-	phi      = measurement->GetObservable( phiName )->GetValue();
-	cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
-
+	//cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
+	//phi      = measurement->GetObservable( phiName )->GetValue();
+	//cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
+	if( _useHelicityBasis ) {
+		cos1   = measurement->GetObservable( cthetakName )->GetValue();
+		cos2   = measurement->GetObservable( cthetalName )->GetValue();
+		phi    = TMath::Pi() + measurement->GetObservable( phihName )->GetValue();  // Pi offset is difference between angle calculator and "Our Paper"
+	}
+	else {
+		cos1   = measurement->GetObservable( cosPsiName )->GetValue();
+		cos2   = measurement->GetObservable( cosThetaName )->GetValue();
+		phi    = measurement->GetObservable( phiName )->GetValue();
+	}
+	
 	double returnValue = 0;
 	double val1=-1., val2=-1.;
 	//Deal with propertime resolution
@@ -400,12 +434,14 @@ double LongLivedBkg_3Dangular::angularFactor( )
 		returnValue = 1.0 / 8.0 / TMath::Pi() ;
 	}
 	else {
-
 		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-		xbin = xaxis->FindFixBin( cosPsi ); if( xbin > nxbins ) xbin = nxbins;
-		ybin = yaxis->FindFixBin( cosTheta ); if( ybin > nybins ) ybin = nybins;
+		//xbin = xaxis->FindFixBin( cosPsi ); if( xbin > nxbins ) xbin = nxbins;
+		//ybin = yaxis->FindFixBin( cosTheta ); if( ybin > nybins ) ybin = nybins;
+		//zbin = zaxis->FindFixBin( phi ); if( zbin > nzbins ) zbin = nzbins;
+		xbin = xaxis->FindFixBin( cos1 ); if( xbin > nxbins ) xbin = nxbins;
+		ybin = yaxis->FindFixBin( cos2 ); if( ybin > nybins ) ybin = nybins;
 		zbin = zaxis->FindFixBin( phi ); if( zbin > nzbins ) zbin = nzbins;
-
+		
 		globalbin = histo->GetBin( xbin, ybin, zbin );
 		num_entries_bin = histo->GetBinContent(globalbin);
 

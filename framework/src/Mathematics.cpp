@@ -241,7 +241,7 @@ namespace Mathematics
 
 			//Yue Hongs code
 			const double c = gamma * resolution*_over_sqrt_2;
-			const double u = (t / resolution) *_over_sqrt_2 ;	//BODMAS
+			const double u = (t / resolution) *_over_sqrt_2 ;
 			const double wt = deltaM / gamma ;
 			return ( evalCerfRe(wt,-u,c) + evalCerfRe(-wt,-u,c) ) *0.25 ;
 
@@ -271,13 +271,15 @@ namespace Mathematics
 			return -1.0 ;
 		}
 
-		if( resolution > 0. ) {
-			// This is a placeholder as I havnt put the correct code in yet as i dont know it.
-			// So it only works if time limits are large and start from < 0
-			if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
-				//	std::cerr << " Mathematics::ExpCosInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
-				//	return -1. ;
-			}
+		if( resolution > 0.) {
+			//Added by Pete after getting code from Yuehong 120118
+			const double c = gamma * resolution * _over_sqrt_2;
+			const double umax = (thigh / resolution) *_over_sqrt_2 ;	
+			const double umin = (tlow / resolution) *_over_sqrt_2 ;	
+			const double wt = deltaM / gamma ;
+			RooComplex evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;			
+			double deltaCos = -0.5/gamma/(1+wt*wt) * ( evalDif.re() + wt*evalDif.im() + RooMath::erf(-umax) - RooMath::erf(-umin) ) ;
+			return deltaCos ;
 		}
 
 		double real_tlow=tlow;
@@ -333,12 +335,14 @@ namespace Mathematics
 		}
 
 		if( resolution > 0. ) {
-			// This is a placeholder as I havnt put the correct code in yet as i dont know it.
-			// So it only works if time limits are large and start from < 0
-			if( ( tlow > -5.0*resolution ) || ( thigh < 5. ) ) {
-				//	std::cerr << " Mathematics::ExpSinInt: cannot handle tlow > -"<<5.0*resolution<<" or thigh < 5  with resolution on" << std::endl ;
-				//	return -1.0 ;
-			}
+			//Added by Pete after getting code from Yuehong 120118
+			const double c = gamma * resolution * _over_sqrt_2;
+			const double umax = (thigh / resolution) *_over_sqrt_2 ;	
+			const double umin = (tlow / resolution) *_over_sqrt_2 ;	
+			const double wt = deltaM / gamma ;
+			RooComplex evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;			
+			double deltaSin = -0.5/gamma/(1.+wt*wt) * ( -evalDif.im() +   wt*evalDif.re() -   -wt*(RooMath::erf(-umax) - RooMath::erf(-umin)) ) ;
+			return deltaSin ;
 		}
 
 		double real_tlow=tlow;

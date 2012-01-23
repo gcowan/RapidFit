@@ -52,11 +52,16 @@ class LongLivedBkg_3Dangular : public BasePDF
 		// These contain the strings that correspond
 		// to the observable names that are used in the
 		// PDF.
-		ObservableRef timeName;		// proper time
-		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-		ObservableRef phiName;			// azimuthal angle of the mu+ in Jpsi frame
-		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-
+		ObservableRef timeName;		
+	    // For transversity angles
+		ObservableRef cosThetaName;	
+		ObservableRef phiName;			
+		ObservableRef cosPsiName;	
+		// For helicity angles
+		ObservableRef cthetakName;	
+		ObservableRef cthetalName;		
+		ObservableRef phihName;			
+	
 		ObservableRef timeconstName;
 
 		double tauLL1;
@@ -70,9 +75,18 @@ class LongLivedBkg_3Dangular : public BasePDF
 		double tlow, thigh; // time integration limits
 
 		double time;
-		double cosTheta;
+		//double cosTheta;
+		//double phi;
+		//double cosPsi;
+		//double ctheta_k;
+		//double ctheta_l;
+		//double phi_h;
+		double cos1;
+		double cos2;
 		double phi;
-		double cosPsi;
+		bool _useHelicityBasis ;
+		double useHelicityBasis() { return _useHelicityBasis; }
+
 
 		//Additions to deal with 3-D angular distribution via a histogram
 		TH3D *histo;

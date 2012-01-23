@@ -49,8 +49,7 @@ private:
 	Bs2JpsiPhi_SignalAlt_MO_v4& operator=( const Bs2JpsiPhi_SignalAlt_MO_v4& );
 	void MakePrototypes();
 	double normalisationCacheUntagged ;
-	
-	
+		
 protected:
 	//Calculate the PDF normalisation
 	virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);

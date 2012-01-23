@@ -1,5 +1,9 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2012/01/23 Pete Clarke
+    - Change to LonglivedBkg_3DAngular to implement helicity angles as an option
+    - Minor changes to ..MO_v4...
+
 2012/01/23 Rob Currie
     - Minimal set of changes which are required to get 1DLL in svn HEAD working as they're only small fixes for bugs still in HEAD
 
