@@ -6,6 +6,7 @@
 
 2012/01/23 Rob Currie
     - Minimal set of changes which are required to get 1DLL in svn HEAD working as they're only small fixes for bugs still in HEAD
+    - Added Robs Strategy which performs 4 fits slipping the strong phases and deltaGamma seperatley to find the absolute minima in scans
 
 2012/01/07/ Peter Clarke
     - Changed _v4_ PDF to implement new definitions of Amplitudes ready for fitting in bins of mKK

@@ -175,6 +175,10 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 	{
 		ReturnableFitResult = Petes_DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
 	}
+	if( FunctionConfig->GetStrategy() == "Robs" )
+	{
+		ReturnableFitResult = Robs_DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
+	}
 	else
 	{
 		ReturnableFitResult = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
@@ -227,7 +231,7 @@ FitResult * FitAssembler::DoSingleSafeFit(MinimiserConfiguration * MinimiserConf
 	{
 		if( ReturnableFitResult->GetFitStatus() != 3 )
 		{
-		bad_fit = true;
+			bad_fit = true;
 		}
 	} else {
 		bad_fit = true;
@@ -252,6 +256,82 @@ FitResult * FitAssembler::DoSingleSafeFit(MinimiserConfiguration * MinimiserConf
 	return ReturnableFitResult;
 }
 
+FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
+{
+	cout << "Starting Fit1:" << endl;
+	double deltaPara = BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->GetBlindedValue() ;
+	double deltaPerp = BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->GetBlindedValue() ;
+	double deltaGamma = BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->GetBlindedValue() ;
+	// Normal fit
+	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
+	double LLmin0 = res0->GetMinimumValue() ;
+	bool good_result_0 = res0->GetFitStatus() == 3;
+	cout << "Finished Fit1." << endl;
+	if( !good_result_0  ) cout << "Fit-1 failed" << endl;
+
+	// Conjugate fit
+	//double deltaS = BottleParameters.back()->GetPhysicsParameter( string("delta_s") )->GetBlindedValue() ;   
+	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
+	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ) ;
+	//BottleParameters.back()->GetPhysicsParameter( string("delta_s") )->SetBlindedValue( -deltaS );
+	cout << endl << "Starting Fit2:" << endl;
+	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
+	cout << "Finished Fit2." << endl;
+	double LLmin1 = res1->GetMinimumValue();
+	bool good_result_1 = res1->GetFitStatus() == 3;
+
+	bool good_result_2 = false;
+	FitResult* res2 = NULL, res3 = NULL;
+	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( deltaPara ) ;
+	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( deltaPerp ) 
+		BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
+	cout << endl << "Starting Fit3:" << endl;
+	res2 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
+	cout << "Finished Fit3." << endl;
+	good_result_2 = res2->GetFitStatus() == 3;
+
+	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
+	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ) 
+		BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
+	cout << endl << "Starting Fit4:" << endl;
+	res3 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
+	cout << "Finished Fit4." << endl;
+	good_result_3 = res3->GetFitStatus() == 3;
+
+
+	// Apply strategy 
+	FitResult * res ;
+	bool swapped = false ;
+
+	vector<FitResult*> results;
+	if( good_result_0 ) results.push_back( res0 );
+	if( good_result_1 ) results.push_back( res1 );
+	if( good_result_2 ) results.push_back( res2 );
+	if( good_result_3 ) results.push_back( res3 );
+
+	res = res0;
+	for( unsigned int i=0; i< results.size(); ++i )
+	{
+		if( results[i]->GetMinimum() < res->GetMinimum() )
+		{
+			res = results[i];
+		}
+	}
+
+	swapped = res != res0;
+
+	cout << endl << "Fit Finished!" << endl;
+
+	//MinimiserConfig->SetOutputLevel( 0 );
+	if( swapped  ) cout << "Swapped to some conjugate fit result " << endl;
+
+	// Set input parameters back to what they were 
+	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( deltaPara );
+	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( deltaPerp );
+	BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( deltaGamma );
+	return res ;
+
+}
 
 FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, vector< ParameterSet* > BottleParameters, const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel )
 {
