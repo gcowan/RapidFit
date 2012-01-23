@@ -280,23 +280,21 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	double LLmin1 = res1->GetMinimumValue();
 	bool good_result_1 = res1->GetFitStatus() == 3;
 
-	bool good_result_2 = false;
-	FitResult* res2 = NULL, res3 = NULL;
 	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( deltaPara ) ;
-	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( deltaPerp ) 
-		BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
+	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( deltaPerp ) ;
+	BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
 	cout << endl << "Starting Fit3:" << endl;
-	res2 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
+	FitResult* res2 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
 	cout << "Finished Fit3." << endl;
-	good_result_2 = res2->GetFitStatus() == 3;
+	bool good_result_2 = res2->GetFitStatus() == 3;
 
 	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
-	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ) 
-		BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
+	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ); 
+	BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
 	cout << endl << "Starting Fit4:" << endl;
-	res3 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
+	FitResult* res3 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
 	cout << "Finished Fit4." << endl;
-	good_result_3 = res3->GetFitStatus() == 3;
+	bool good_result_3 = res3->GetFitStatus() == 3;
 
 
 	// Apply strategy 
@@ -312,7 +310,7 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	res = res0;
 	for( unsigned int i=0; i< results.size(); ++i )
 	{
-		if( results[i]->GetMinimum() < res->GetMinimum() )
+		if( results[i]->GetMinimumValue() < res->GetMinimumValue() )
 		{
 			res = results[i];
 		}
