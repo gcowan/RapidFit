@@ -139,13 +139,13 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 	}
 	bool elsewhere_fail = input_file.fail();
 
-	if( elsewhere_fail && !local_fail ) fullFileName = fileName;
-
 	if( elsewhere_fail && local_fail )
 	{
 		cerr << "\n\tFILE NAMED:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
 		exit(-89);
 	}
+
+	if( fullFileName.empty() ) fullFileName = fileName; 
 
 	ifstream in;
 	in.open(fullFileName.c_str());
@@ -164,7 +164,7 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 		double tlow = lowEdge[is];
 		double thigh = hiEdge[is] ;
 		double height = binContent[is]  ;
-		//cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
+		cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
 		slices.push_back( new AcceptanceSlice( tlow, thigh, height ) ) ;
 	}
 	
@@ -178,8 +178,8 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 // Return numerator for evaluate
 double SlicedAcceptance::getValue( double t ) const
 {
-	double returnValue = 0 ;	
-	for( unsigned int is = 0; is < slices.size() ; is++ ){
+	double returnValue = 0 ;
+	for( unsigned int is = 0; is < slices.size() ; ++is ){
 		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height() ;
 	}	
 	return returnValue ;

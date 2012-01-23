@@ -490,6 +490,7 @@ int RapidFit( int argc, char * argv[] )
 		{
 			if ( argumentIndex + 1 < argc )
 			{
+				++argumentIndex;
 				defineScanFlag = true;
 				Scan_X.push_back( argv[argumentIndex] );
 			} else {

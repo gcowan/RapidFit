@@ -11,6 +11,13 @@ now = datetime.datetime.now()
 #	This script is intended to be run as 'ganga script.py', it will submit itself and the relative configuration as a pyROOT job
 is_ganga = "Ganga.Core" in sys.modules
 
+#	Want a Random Seed unique to WHOLE scan for ALL toys, therefore must use this runtime to generate and set SEED which overwites XML
+import ROOT
+import random
+rand_gen = ROOT.TRandom3( int(random.random()*10000) )
+rand_seed = rand_gen.Rndm()*100000
+stored_seed = int(rand_seed)
+
 #	USAGE:
 #
 #	ganga script_name.py xml_for_job.xml file1.root file2.root	to run on most backends
@@ -20,26 +27,25 @@ is_ganga = "Ganga.Core" in sys.modules
 
 #	Configurables
 
-job_name = "TOY-1D"
+job_name = "RapidFit-1D"
 
 #	All the possible output files right now
 #
 #			THIS HAS TO BE CHANGED BASED ON THE OUTPUT FROM YOUR SCAN
 
-output_file_list = [ 'LLScanData_newformat.root' ]
+output_file_list = [ 'LLScanDataPhi_s_newformat.root', 'LLScanDataPhi_s.root' ]
 
-param_name="deltaGamma"
-X_min=-2.
-X_max=0.
-STEPS=10
-STEPS_PER_CORE=2
-
-ROOT_VERSION='5.26.00b'
+param_name="Phi_s"
+X_min=-0.3
+X_max=0.7
+STEPS=20
+STEPS_PER_CORE=1
 
 LFN_LIST=[]
 FILE_LIST=[]
 
 xml = str()
+script_name = str()
 
 #	written up here for clarity, process all possible LFNs and PFNs that have to be processed
 if is_ganga:
@@ -48,10 +54,17 @@ if is_ganga:
 			LFN_LIST.append( str( arg ) )
 		elif string.find( arg, ".xml" ) != -1 :
 			xml = str( arg )
+		elif string.find( arg, ".py" ) != -1 :
+			script_name = str(arg)
 		else:
-			FILE_LIST.append( str( argv ) )
-	print "LFNs:"
-	print LFN_LIST
+			FILE_LIST.append( str( arg ) )
+	print "running:"
+	print script_name
+	print "using XML:"
+	print xml
+	if LFN_LIST:
+		print "LFNs:"
+		print LFN_LIST
 	print "FILEs:"
 	print FILE_LIST
 
@@ -72,6 +85,7 @@ def _1DLL_Splitter( XML='XML.xml', STEPS=10, STEPS_PER_CORE=2 ):
 		param_val = X_min + step_size * ((i+1) * STEPS_PER_CORE-1)
 		param_str = str(param_name) + "," + str( param_min ) + "," + str( param_val ) + "," + str( STEPS_PER_CORE )
 		temp.append( param_str )
+		temp.append( str(stored_seed) )
 		args.append( temp )
 	if int(STEPS/STEPS_PER_CORE)*STEPS_PER_CORE != STEPS:
 		param_val = X_min + step_size * ((i+1) * STEPS_PER_CORE)
@@ -79,8 +93,9 @@ def _1DLL_Splitter( XML='XML.xml', STEPS=10, STEPS_PER_CORE=2 ):
 		temp = []
 		temp.append( str( XML ) )
 		temp.append( param_str )
+		temp.append( str(stored_seed) )
 		args.append( temp )
-	print args
+	#print args
 	return args
 
 #	GANGA JOB
@@ -88,6 +103,7 @@ def _1DLL_Splitter( XML='XML.xml', STEPS=10, STEPS_PER_CORE=2 ):
 #	This is the section of code which will be executed within ganga
 if is_ganga:
 
+	ROOT_VERSION = str( os.popen("root-config --version | sed -e \'s/\\//\./g' ").readline() )[:-1]
 	RapidFit_Path = os.environ.get("RAPIDFITROOT")
 	if not RapidFit_Path:
 		print ""
@@ -105,11 +121,6 @@ if is_ganga:
 		print ""
 		sys.exit(-42)
 
-	#	By definition of how this should be run!
-	script_name = str( sys.argv[0] )
-
-	#	i.e.	> ganga script.py some.xml
-
         #       Input Parameters
         script_onlyname = script_name
         script_list = string.split( script_name, "/" )
@@ -123,7 +134,7 @@ if is_ganga:
 
 	datetimeinfo = str( "_" + str( now.strftime("%Y-%m-%d_%H.%M") ) )
 	#       Change the name of your job for records
-	j.name = str(job_name + "_" + str(script_onlyname) + datetimeinfo)
+	j.name = str(job_name + "_" + param_name + "_" + datetimeinfo)
 
 	#
 	j.application.script = File( name=script_name )
@@ -146,26 +157,47 @@ if is_ganga:
 		j.inputsandbox = sandbox_data
 
 	elif ( string.find( host_name, "lxplus" ) != -1 ):
-		choice = int( raw_input("Running on LXPLUS, submit to 1) GRID 2) lxplus Batch or 3) Interactive?\t") )
-		while ( choice != 1 ) and ( choice != 2 ):
-			choice = int( raw_input( "try again...  " ) )
+		choice = int()
+		if not LFN_LIST:
+			choice = int( raw_input("Running on LXPLUS, submit to 1) GRID 2) lxplus Batch or 3) Interactive?\t") )
+			while ( choice != 1 ) and ( ( choice != 2 ) and ( choice != 3 ) ):
+				choice = int( raw_input( "try again...  " ) )
+		else:
+			print "LFNs in job, Submitting to grid in 3s!"
+			import time
+			time.sleep(3)
+			choice = 1
 		if choice == 1:
 			j.backend = Dirac()
+			print "Input Data:"
+			print LFN_LIST
 			j.inputdata = LFN_LIST                  #       Point the job to the data
 			j.backend.inputSandboxLFNs = LFN_LIST   #       Tell Dirac we need a local copy in order to process it
 			sandbox_data = [ script_name, xml, RapidFit_Library ]
 			#print sandbox_data
 			for k in FILE_LIST:
 				sandbox_data.append( k )
-			#print sandbox_data
+			print "Input Sandbox:"
+			print sandbox_data
 			j.inputsandbox = sandbox_data
-			j.outputdata = output_file_list
+			j.outputsandbox = output_file_list
+			#j.outputdata = output_file_list
 		if choice == 2:
 			j.backend = LSF()
-			j.backend.queue = '8nh'         #       1nh, 8nh, 1nd, 2nd, 1nw, 2nw
-			j.inputdata = FILE_LIST
-			j.outputsandbox = j.outputdata.files
-			j.outputdata=[]
+			j.backend.queue = '1nh'         #       1nh, 8nh, 1nd, 2nd, 1nw, 2nw
+			new_list = []
+			PWD = os.getcwd()
+			for i in FILE_LIST:
+				pfn_name = str()
+				if string.find( i, "PFN:") == -1 :	#	file not in PFN format
+					pfn_name = "PFN:" +str( PWD ) + str(i)
+				else:
+					pfn_name = str( i )
+				new_list.append( pfn_name )
+			new_list.append( "PFN:" + str( PWD ) + str( xml ) )
+			new_list.append( "PFN:" + str( PWD ) + str( script_name ) )
+			new_list.append( "PFN:" + str( RapidFit_Library ) )
+			j.inputdata = new_list
 		if choice == 3:
 			j.backend = Interactive()
 			j.inputdata = FILE_LIST
@@ -216,9 +248,10 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 
 	SCAN_RANGE = sys.argv[2]
 
+	SEED = sys.argv[3]
+
 	#	Load the RapidFit binary library
 	ROOT.gSystem.Load("libRapidRun")
-
 
 	#	RapidFit arguments
 	args = ROOT.TList()
@@ -226,9 +259,11 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 	args.Add( ROOT.TObjString( "RapidFit"     ) )
 	args.Add( ROOT.TObjString( "-f"           ) )
 	args.Add( ROOT.TObjString( str( FIT_XML ) ) )
-	args.Add( ROOT.TObjString( "--doLLscan"    ) )
 	args.Add( ROOT.TObjString( "--defineScan" ) )
-	args.Add( ROOT.TObjString( str( SCAN_RANGE )) )
+	args.Add( ROOT.TObjString(str(SCAN_RANGE )) )
+	args.Add( ROOT.TObjString( "--doLLscan"   ) )
+	args.Add( ROOT.TObjString( "--SetSeed"    ) )
+	args.Add( ROOT.TObjString( str(SEED)      ) )
 
 	#	Print the command that is being run for reference
 	#print args

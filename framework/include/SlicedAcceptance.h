@@ -10,6 +10,8 @@
 #ifndef SLICED_ACCEPTANCE_H
 #define SLICED_ACCEPTANCE_H
 
+//	RapidFir Headers
+#include "Observable.h"
 //	System Headers
 #include <iostream>
 #include <fstream>
@@ -49,6 +51,8 @@ class SlicedAcceptance
 
 		// Methods for numerator of PDF to return acceptance for event
 		double getValue( double time ) const ;
+
+		double getValue( Observable* time ) const ;
 
 		// Methods for the normalisation integral in slices
 		int numberOfSlices() const ;
