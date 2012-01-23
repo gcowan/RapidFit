@@ -43,9 +43,9 @@ NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (
 	firstIntegrator->SetPDF( firstPDF );
 	secondIntegrator->SetPDF( secondPDF );
 
-	ParameterSet tempSet = input.allParameters;
-	if( ! firstPDF->GetActualParameterSet()->GetAllNames().empty() ) firstPDF->SetPhysicsParameters( &tempSet );
-	if( ! secondPDF->GetActualParameterSet()->GetAllNames().empty() ) secondPDF->SetPhysicsParameters( &tempSet );
+	//ParameterSet tempSet = input.allParameters;
+	//if( ! firstPDF->GetActualParameterSet()->GetAllNames().empty() ) firstPDF->SetPhysicsParameters( &tempSet );
+	//if( ! secondPDF->GetActualParameterSet()->GetAllNames().empty() ) secondPDF->SetPhysicsParameters( &tempSet );
 }
 
 //Constructor specifying fraction parameter name
