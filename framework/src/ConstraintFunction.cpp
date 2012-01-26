@@ -77,15 +77,15 @@ double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
 			// Get gamma and delta gamma
 			double gamma = NewParameters->GetPhysicsParameter("gamma")->GetValue();
 			double dgam =  NewParameters->GetPhysicsParameter("deltaGamma")->GetValue();
-			double gamma_con = 0.7 ;
-			double dgam_con = 0.07 ;
+			double gamma_con = 0.657 ;
+			double dgam_con = 0.123 ;
 			double v[2] ;
 			v[0] = gamma-gamma_con ;
 			v[1] = dgam-dgam_con ;
 			double E[2][2] ;
-			E[0][0] = 1 ;
-			E[1][1] = 2 ;
-			E[1][0] = 3 ;
+			E[0][0] = 7213.6;//7213.6;  //13566.7
+			E[1][1] = 1087.3;//1087.3;  //1221.
+			E[1][0] = 587.1;//587.1;   //1221.
 			E[0][1] = E[1][0] ;
 			double chisq = 0;
 			for( int ix=0; ix<2; ++ix ) {

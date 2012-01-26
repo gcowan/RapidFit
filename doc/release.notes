@@ -1,5 +1,8 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2012/01/26
+    - Fixed LongLivedBkg.cpp used for f0 fits
+
 2012/01/26 Rob Currie
     - Backported EdStyle from my branch to make plotting nicer/easier
     - Backported StringProcessing for extra required functionality

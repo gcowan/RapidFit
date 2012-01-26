@@ -25,48 +25,36 @@ PDF_CREATOR( LongLivedBkg );
 //.....................................................
 //Constructor
 LongLivedBkg::LongLivedBkg(PDFConfigurator* configurator ) :
-
 	// Physics parameters
-	  f_LL1Name		( configurator->getName("f_LL1")  )
-	, tauLL1Name		( configurator->getName("tau_LL1") )
-	, tauLL2Name		( configurator->getName("tau_LL2") )
+	  f_LL1Name				( configurator->getName("f_LL1")  )
+	, tauLL1Name			( configurator->getName("tau_LL1") )
+	, tauLL2Name			( configurator->getName("tau_LL2") )
     //Detector parameters
 	, timeResLL1FracName	( configurator->getName("timeResLL1Frac") )
-	, sigmaLL1Name		( configurator->getName("sigma_LL1") )
-	, sigmaLL2Name		( configurator->getName("sigma_LL2") )
+	, sigmaLL1Name			( configurator->getName("sigma_LL1") )
+	, sigmaLL2Name			( configurator->getName("sigma_LL2") )
 	// Observables
-	, timeName		( configurator->getName("time") )
-	//, cosThetaName		( configurator->getName("cosTheta") )
-	//, phiName		( configurator->getName("phi") )
-	//, cosPsiName		( configurator->getName("cosPsi") )
+	, timeName				( configurator->getName("time") )
 	//Other things to be initialised
-	, timeconstName		( configurator->getName("time") )
 	, _useTimeAcceptance(false)
-
-	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(),
-	histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
-	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true)
+	, tauLL1(), tauLL2(), f_LL1() 
+	, sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac()
+	, tlow(), thigh(), time()
 	, timeAcc(NULL)
 {
-	cout << "LongLivedBkg::  " ;
-
-	MakePrototypes();
-
-	//Find name of histogram needed to define 3-D angular distribution
-	string fileName = configurator->getConfigurationValue( "AngularDistributionHistogram" ) ;
-
-	//Initialise depending upon whether configuration parameter was found
-	useFlatAngularDistribution = true ;
+	cout << "Constructing LongLivedBkg::  " << endl ;
 
 	//...........................................
         // Configure to use time acceptance machinery 
         _useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
-
         if( _useTimeAcceptance ) {
                         timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
                         cout << "LongLivedBkg:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
         }
 
+	//...............
+	MakePrototypes();
+	
 }
 
 
@@ -76,10 +64,6 @@ void LongLivedBkg::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
-//	allObservables.push_back( cosThetaName );
-//	allObservables.push_back( phiName );
-//	allObservables.push_back( cosPsiName );
-
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -95,16 +79,16 @@ void LongLivedBkg::MakePrototypes()
 	valid = true;
 }
 
-LongLivedBkg::LongLivedBkg( const LongLivedBkg& input ) : BasePDF( (BasePDF) input ),
-	f_LL1Name(input.f_LL1Name), tauLL1Name(input.tauLL1Name), tauLL2Name(input.tauLL2Name), timeResLL1FracName(input.timeResLL1FracName), sigmaLL1Name(input.sigmaLL1Name),
-	sigmaLL2Name(input.sigmaLL2Name), timeName(input.timeName), timeconstName(input.timeconstName), tauLL1(input.tauLL1), tauLL2(input.tauLL2), f_LL1(input.f_LL1),
-	sigmaLL(input.sigmaLL), sigmaLL1(input.sigmaLL1), sigmaLL2(input.sigmaLL2), timeResLL1Frac(input.timeResLL1Frac), tlow(input.tlow), thigh(input.thigh), time(input.time),
-	histo(input.histo), xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), xmin(input.xmin),
-	xmax(input.xmax), ymin(input.ymin), ymax(input.ymax), zmin(input.zmin), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz),
-	total_num_entries(input.total_num_entries), useFlatAngularDistribution(input.useFlatAngularDistribution), _useTimeAcceptance(input._useTimeAcceptance), timeAcc(NULL)
-{
-	timeAcc = new SlicedAcceptance( *(input.timeAcc) );
-}
+//LongLivedBkg::LongLivedBkg( const LongLivedBkg& input ) : BasePDF( (BasePDF) input ),
+//	f_LL1Name(input.f_LL1Name), tauLL1Name(input.tauLL1Name), tauLL2Name(input.tauLL2Name), timeResLL1FracName(input.timeResLL1FracName), sigmaLL1Name(input.sigmaLL1Name),
+//	sigmaLL2Name(input.sigmaLL2Name), timeName(input.timeName), timeconstName(input.timeconstName), tauLL1(input.tauLL1), tauLL2(input.tauLL2), f_LL1(input.f_LL1),
+//	sigmaLL(input.sigmaLL), sigmaLL1(input.sigmaLL1), sigmaLL2(input.sigmaLL2), timeResLL1Frac(input.timeResLL1Frac), tlow(input.tlow), thigh(input.thigh), time(input.time),
+//	histo(input.histo), xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), xmin(input.xmin),
+//	xmax(input.xmax), ymin(input.ymin), ymax(input.ymax), zmin(input.zmin), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz),
+//	total_num_entries(input.total_num_entries), useFlatAngularDistribution(input.useFlatAngularDistribution), _useTimeAcceptance(input._useTimeAcceptance), timeAcc(NULL)
+//{
+//	timeAcc = new SlicedAcceptance( *(input.timeAcc) );
+//}
 
 //................................................................
 //Destructor
@@ -131,11 +115,9 @@ double LongLivedBkg::Evaluate(DataPoint * measurement)
 {
 	// Observable
 	time = measurement->GetObservable( timeName )->GetValue();
-//	cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
-//	phi      = measurement->GetObservable( phiName )->GetValue();
-//	cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
 
 	double returnValue = 0;
+
 	//Deal with propertime resolution
 	if( timeResLL1Frac >= 0.9999 )
 	{
@@ -155,7 +137,19 @@ double LongLivedBkg::Evaluate(DataPoint * measurement)
 	}
 
 	if (returnValue <= 0) cout << "PDF returns zero!" << endl;
+	if(isnan(returnValue)) {
+		cout << "PDF returns nan!  " << returnValue << endl;
+		cout << "   f_LL1    "  << f_LL1 << endl;
+		cout << "   tauLL1   "  << tauLL1 << endl;
+		cout << "   tauLL2   "  << tauLL2 << endl;
+		cout << "   sigmaLL  " << sigmaLL << endl;
+		cout << "   time     "  << time << endl;
+		exit(1);
+	}
 
+	
+	if( _useTimeAcceptance ) returnValue = returnValue * timeAcc->getValue(time);
+	
 	return returnValue;
 
 }
@@ -182,7 +176,7 @@ double LongLivedBkg::buildPDFnumerator()
 			exit(1) ;
 		}
 		double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
-		double val2 = 1./(sqrt(2*TMath::Pi())*sigmaLL) * exp(-time*time/(2*sigmaLL*sigmaLL)); //Mathematics::Exp(time, 1./tauLL2, sigmaLL);
+		double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
 		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
 	}
 
@@ -196,18 +190,6 @@ double LongLivedBkg::Norm(DataPoint * measurement, PhaseSpaceBoundary * boundary
 {
 	//	Stupid gcc
 	(void)measurement;
-
-	IConstraint * timeBound = boundary->GetConstraint( timeconstName );
-	if ( timeBound->GetUnit() == "NameNotFoundError" )
-	{
-		cerr << "Bound on time not provided" << endl;
-		return -1.;
-	}
-	else
-	{
-	    tlow = timeBound->GetMinimum();
-		thigh = timeBound->GetMaximum();
-	}
 
 	double returnValue = 0;
 
@@ -238,7 +220,7 @@ double LongLivedBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary *
 	// Use this if you want to ignore the time acceptance calculation
 	//return Norm( measurement, boundary );
 
-	IConstraint * timeBound = boundary->GetConstraint( timeconstName );
+	IConstraint * timeBound = boundary->GetConstraint( timeName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
 		cerr << "Bound on time not provided" << endl;
@@ -255,15 +237,18 @@ double LongLivedBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary *
 	double tlo_boundary = tlow;
 	double thi_boundary = thigh;
 	
-        if( _useTimeAcceptance ) {
-                //This loops over each time slice, does the normalisation between the limits, and accumulates
-                for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
-                {
+	if( _useTimeAcceptance ) {
+		//This loops over each time slice, does the normalisation between the limits, and accumulates
+		for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
+		{
 			tlow = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
-                        thigh = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
-                        if( thigh > tlow ) returnValue += this->Norm( measurement, boundary ) * timeAcc->getSlice(islice)->height() ;
-                }
-        }
+			thigh = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
+			if( thigh > tlow ) returnValue += this->Norm( measurement, boundary ) * timeAcc->getSlice(islice)->height() ;
+		}
+	}
+	else {
+		returnValue = this->Norm( measurement, boundary ) ;
+	}
 
 	tlow  = tlo_boundary;
 	thigh = thi_boundary;
@@ -293,7 +278,7 @@ double LongLivedBkg::buildPDFdenominator()
 			exit(1) ;
 		}
 		double val1 = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
-		double val2 = 0.5*RooMath::erf( thigh/(sqrt(2.)*sigmaLL) ) - 0.5*RooMath::erf( tlow/(sqrt(2.)*sigmaLL) );//Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
+		double val2 = Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
 		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
 	}
 
@@ -302,10 +287,3 @@ double LongLivedBkg::buildPDFdenominator()
 }
 
 
-//................................................................
-//Angular distribution function
-double LongLivedBkg::angularFactor( )
-{
-
-		return 1.0 / 8.0 / TMath::Pi() ;
-}

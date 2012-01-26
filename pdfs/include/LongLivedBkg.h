@@ -22,7 +22,7 @@ class LongLivedBkg : public BasePDF
 	public:
 		//LongLivedBkg();
 		LongLivedBkg( PDFConfigurator* );
-		LongLivedBkg( const LongLivedBkg& );
+		//LongLivedBkg( const LongLivedBkg& );
 		~LongLivedBkg();
 
 		//Calculate the PDF value
@@ -39,11 +39,10 @@ class LongLivedBkg : public BasePDF
 		bool SetPhysicsParameters(ParameterSet*);
 		double buildPDFnumerator();
 		double buildPDFdenominator();
-		double angularFactor( );
 
 		// Physics parameters
 		ObservableRef f_LL1Name;		// fraction of decay const 1
-                ObservableRef tauLL1Name;            // decay constant 1
+		ObservableRef tauLL1Name;            // decay constant 1
 		ObservableRef tauLL2Name;            // decay constant 2
 
 		//Detector parameters
@@ -52,14 +51,7 @@ class LongLivedBkg : public BasePDF
 		ObservableRef sigmaLL2Name;	// time res sigma 2
 
 		// These contain the strings that correspond
-		// to the observable names that are used in the
-		// PDF.
 		ObservableRef timeName;		// proper time
-//		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
-//		ObservableRef phiName;			// azimuthal angle of the mu+ in Jpsi frame
-//		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-
-		ObservableRef timeconstName;
 
 		double tauLL1;
 		double tauLL2;
@@ -72,19 +64,10 @@ class LongLivedBkg : public BasePDF
 		double tlow, thigh; // time integration limits
 
 		double time;
-	//	double cosTheta;
-	//	double phi;
-	//	double cosPsi;
 
 		//Additions to deal with 3-D angular distribution via a histogram
-		TH3D *histo;
-		TAxis *xaxis, *yaxis, *zaxis;
-		int nxbins, nybins, nzbins;
-		double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
-		double total_num_entries;
-		bool useFlatAngularDistribution;
-                bool _useTimeAcceptance;
-                SlicedAcceptance * timeAcc;
+		bool _useTimeAcceptance;
+		SlicedAcceptance * timeAcc;
 };
 
 #endif
