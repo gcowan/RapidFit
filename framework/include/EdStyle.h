@@ -19,7 +19,7 @@
 //	System Headers
 #include <string.h>
 
-using namespace::std;
+using namespace std;
 
 /** @class style EdStyle.h
  *  
@@ -43,7 +43,15 @@ class EdStyle {
                 static TString GetParamRootUnit( TString );
                 static TString GetParamLatexName( TString );
                 static TString GetParamRootName( TString );
-   
+
+		static int Test_Suffix( string );
+		static int Test_Suffix( TString );  
+		static string Get_Suffix( string );
+		static TString Get_Suffix( TString ); 
+		static TString Remove_Suffix( TString );
+
+		static string Remove_Suffix( string );
+
 		~EdStyle( ); ///< Destructor
 
 	private:
@@ -54,7 +62,5 @@ class EdStyle {
 		Int_t icol;
 		Int_t font;
 		Double_t tsize;
-   
-
 };
 #endif // EDSTYLE_H

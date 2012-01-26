@@ -33,12 +33,68 @@ job_name = "RapidFit-1D"
 #
 #			THIS HAS TO BE CHANGED BASED ON THE OUTPUT FROM YOUR SCAN
 
-output_file_list = [ 'LLScanDataPhi_s_newformat.root', 'LLScanDataPhi_s.root' ]
+output_file_list = [ ]
+
+#param_name="gamma"
+#X_min=0.64
+#X_max=0.7
 
 param_name="Phi_s"
 X_min=-0.3
 X_max=0.7
+
+#param_name="Aperp_sq"
+#X_min=0.2
+#X_max=0.3
+
+#param_name="As_sq"
+#X_min=0.
+#X_max=0.08
+
+#param_name="Azero_sq"
+#X_min=0.48
+#X_max=0.56
+
+#param_name="deltaGamma"
+#X_min=0.
+#X_max=0.25
+
+#param_name="delta_perp"
+#X_min=2.5
+#X_max=3.5
+
+#param_name="delta_para"
+#X_min=2.8
+#X_max=3.8
+
+#param_name="delta_s"
+#X_min=2.
+#X_max=3.5
+
 STEPS=20
+
+#param_name="Phi_s"
+#X_min=-3.2
+#X_max=3.2
+
+#param_name="delta_para"
+#X_min=-3.2
+#X_max=3.2
+
+#param_name="delta_perp"
+#X_min=-3.2
+#X_max=3.2
+
+#param_name="delta_s"
+#X_min=-3.2
+#X_max=3.2
+
+#STEPS=40
+
+Output_File = 'LLScanData'+str(param_name)+'.root'
+
+output_file_list.append( Output_File )
+
 STEPS_PER_CORE=1
 
 LFN_LIST=[]

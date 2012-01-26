@@ -175,7 +175,7 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 	{
 		ReturnableFitResult = Petes_DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
 	}
-	if( FunctionConfig->GetStrategy() == "Robs" )
+	else if( FunctionConfig->GetStrategy() == "Robs" )
 	{
 		ReturnableFitResult = Robs_DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
 	}
@@ -271,8 +271,8 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 
 	// Conjugate fit
 	//double deltaS = BottleParameters.back()->GetPhysicsParameter( string("delta_s") )->GetBlindedValue() ;   
-	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
-	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ) ;
+	if( BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->GetType() != "Fixed" ) BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
+	if( BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->GetType() != "Fixed" ) BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ) ;
 	//BottleParameters.back()->GetPhysicsParameter( string("delta_s") )->SetBlindedValue( -deltaS );
 	cout << endl << "Starting Fit2:" << endl;
 	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
@@ -280,17 +280,17 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	double LLmin1 = res1->GetMinimumValue();
 	bool good_result_1 = res1->GetFitStatus() == 3;
 
-	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( deltaPara ) ;
-	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( deltaPerp ) ;
-	BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
+	if( BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->GetType() != "Fixed" ) BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( deltaPara ) ;
+	if( BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->GetType() != "Fixed" ) BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( deltaPerp ) ;
+	if( BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->GetType() != "Fixed" ) BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
 	cout << endl << "Starting Fit3:" << endl;
 	FitResult* res2 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
 	cout << "Finished Fit3." << endl;
 	bool good_result_2 = res2->GetFitStatus() == 3;
 
-	BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
-	BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ); 
-	BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
+	if( BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->GetType() != "Fixed" ) BottleParameters.back()->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
+	if( BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->GetType() != "Fixed" ) BottleParameters.back()->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ); 
+	if( BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->GetType() != "Fixed" ) BottleParameters.back()->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
 	cout << endl << "Starting Fit4:" << endl;
 	FitResult* res3 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
 	cout << "Finished Fit4." << endl;

@@ -1,5 +1,13 @@
 // $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
 
+2012/01/26 Rob Currie
+    - Backported EdStyle from my branch to make plotting nicer/easier
+    - Backported StringProcessing for extra required functionality
+    - Fixed Robs Strategy for fixed parameters
+
+2012/01/26 Sean
+    - Added AccCore stuff to HEAD and latest phiphi PDF
+
 2012/01/23 Pete Clarke
     - Change to LonglivedBkg_3DAngular to implement helicity angles as an option
     - Minor changes to ..MO_v4...

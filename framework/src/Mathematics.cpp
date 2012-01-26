@@ -437,6 +437,25 @@ namespace Mathematics
 		return;
 	}
 
+        void getBs2PhiPhiAngularFunctions( double & f1
+                        , double & f2
+                        , double & f3
+                        , double & f4
+                        , double & f5
+                        , double & f6
+                        , const double ct1
+                        , const double ct2
+                        , const double phi)
+        {
+                f1=4.*ct1*ct1*ct2*ct2;
+                f2=sin(acos(ct1))*sin(acos(ct1))*sin(acos(ct2))*sin(acos(ct2))*(1+cos(2.*phi));
+                f3=sin(acos(ct1))*sin(acos(ct1))*sin(acos(ct2))*sin(acos(ct2))*(1-cos(2.*phi));
+                f4=-1.*2.*sin(acos(ct1))*sin(acos(ct1))*sin(acos(ct2))*sin(acos(ct2))*sin(2.*phi);
+                f5=sqrt_2*sin(2.*acos(ct1))*sin(2.*acos(ct2))*cos(phi);
+                f6=-1.*sqrt_2*sin(2.*acos(ct1))*sin(2.*acos(ct2))*sin(phi);
+                return;
+        }
+
 	void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF )
 	{
 		// This tries to implement the NIKHEF method for calculating the

@@ -21,6 +21,7 @@ using namespace std;
 class StringProcessing
 {
 	public:
+		static string TimeString();
 		static vector<string> SplitString( string, char );
 		static int CharacterPosition( string, char );
 		static vector<int> StringPositions( string, string );
@@ -34,6 +35,14 @@ class StringProcessing
 		static vector<TString> GetStringContaining( vector<TString>, TString );
 		static vector<TString> StripStrings( vector<TString>, TString );
 		static vector<string> Convert( vector<TString> );
+
+                static int GetNumberOnLeft( string );
+                static string AddNumberToLeft( string, int );
+                static string RemoveFirstNumber( string );
+                static vector<string> FillList( int, int=0 );
+
+                static string AddNames( string, string );
+                static string MultNames( string, string );
 };
 
 #endif

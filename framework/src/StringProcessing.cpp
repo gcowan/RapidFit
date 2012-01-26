@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	ROOT Headers
 #include "TString.h"
@@ -13,7 +13,40 @@
 #include "StringProcessing.h"
 //	System Headers
 #include <iostream>
+#include <sstream>
 #include <algorithm>
+#include <time.h>
+
+using namespace std;
+
+string StringProcessing::TimeString()
+{
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+	int min = timeinfo->tm_min;
+	int hr = timeinfo->tm_hour;
+	int day = timeinfo->tm_mday;
+	int month = 1+timeinfo->tm_mon;
+	int year = 1900+timeinfo->tm_year;
+
+	stringstream time_stream;
+	time_stream << year;
+	if( month < 10 ) time_stream << "0";
+	time_stream << month;
+	if( day < 10 ) time_stream << "0";
+	time_stream << day << "_";
+	if( hr < 10 ) time_stream << "0";	
+	time_stream << hr;
+	if( min < 10 ) time_stream << "0";
+	time_stream << min ;
+
+	string returnable_time = time_stream.str();
+
+	return returnable_time;
+}
 
 //Split a string every time you find a given character
 vector<string> StringProcessing::SplitString( string Input, char SplitCharacter )
@@ -293,5 +326,88 @@ vector<string> StringProcessing::Convert( vector<TString> input )
 		output.push_back( input[i].Data() );
 	}
 	return output;
+}
+//      Chosen to use sprintf as itoa is not supported everywhere...
+
+string StringProcessing::AddNumberToLeft( string input_str, int num2add )
+{
+	stringstream temp_stream;
+	temp_stream << num2add ;
+	string numberstr;
+	numberstr.append( temp_stream.str() );
+	numberstr.append(input_str);
+	return numberstr;
+}
+
+string StringProcessing::RemoveFirstNumber( string input_str )
+{
+	string returnable_str;
+	for( unsigned int i=1; i< input_str.size(); ++i )
+	{
+		returnable_str+=input_str[i];
+	}
+	return returnable_str;
+}
+
+vector<string> StringProcessing::FillList( int max, int min )
+{
+	vector<string> returnable_list;
+	for( int i=min; i<= max; ++i )
+	{
+		char numberchar[1];
+		sprintf( numberchar, "%d", i );
+		string temp( numberchar );
+		returnable_list.push_back( temp );
+	}
+	return returnable_list;
+}
+
+int StringProcessing::GetNumberOnLeft( string input_str )
+{
+	string input_num;
+	input_num += input_str[0];
+	return atoi( input_num.c_str() );
+}
+
+string StringProcessing::AddNames( string input1, string input2)
+{
+	if( !input1.empty() && !input2.empty() )
+	{
+		return input1+"+"+input2;
+	}
+	if( input1.empty() && input2.empty() )
+	{
+		return "unknown+unknown";
+	}
+	if( input1.empty() )
+	{
+		return "unknown+"+input2;
+	}
+	if( input2.empty() )
+	{
+		return input1+"+unknown";
+	}
+	return "";
+}
+
+string StringProcessing::MultNames( string input1, string input2 )
+{
+	if( !input1.empty() && !input2.empty() )
+	{
+		return input1+":"+input2;
+	}
+	if( input1.empty() && input2.empty() )
+	{
+		return "unknown:unknown";
+	}
+	if( input1.empty() )
+	{
+		return "unknown:"+input2;
+	}
+	if( input2.empty() )
+	{
+		return input1+":unknown";
+	}
+	return "";
 }
 

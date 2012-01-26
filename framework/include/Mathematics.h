@@ -62,6 +62,7 @@ namespace Mathematics
 	double expErfInt(const double tlimit, const double tau, const double sigma);
 	void getBs2JpsiPhiAngularFunctions( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, const double cosTheta, const double phi, const double cosPsi);
 	void getBs2JpsiPhiAngularFunctionsWithSwave( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, double & f7, double & f8, double & f9, double & f10, const double cosTheta, const double phi, const double cosPsi);
+	void getBs2PhiPhiAngularFunctions( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, const double ct1, const double ct2, const double phi);
 
   	void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
 	void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF );
