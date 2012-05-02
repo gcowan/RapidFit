@@ -13,25 +13,50 @@
 #include "FitAssembler.h"
 #include "MemoryDataSet.h"
 #include "RapidFitIntegrator.h"
+#include "ClassLookUp.h"
+#include "StatisticsFunctions.h"
+#include "ObservableContinuousConstraint.h"
 //	System Headers
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 
-//Default constructor
-SWeightPrecalculator::SWeightPrecalculator()  : signalPDF(NULL), backgroundPDF(NULL), fitParameters(NULL), weightName( "WeightName" )
+SWeightPrecalculator::SWeightPrecalculator( FitResult* InputResult, string WeightName, unsigned int config ) : inputResult(InputResult), signalPDF(NULL), backgroundPDF(NULL), weightName(WeightName), fractionName()
 {
-}
+	if( inputResult->GetPhysicsBottle()->GetResultPDF( 0 )->GetName() == "NormalisedSum" )
+	{
+		NormalisedSumPDF* inputNorm = (NormalisedSumPDF*)inputResult->GetPhysicsBottle()->GetResultPDF( 0 );
+		if( config == 1 )
+		{
+			signalPDF = ClassLookUp::CopyPDF( inputNorm->GetFirstPDF() );
+			backgroundPDF = ClassLookUp::CopyPDF( inputNorm->GetSecondPDF() );
+		}
+		else if ( config == 2 )
+		{
+			signalPDF = ClassLookUp::CopyPDF( inputNorm->GetSecondPDF() );
+			backgroundPDF = ClassLookUp::CopyPDF( inputNorm->GetFirstPDF() );
+		}
+		else
+		{
+			cerr << "Unknown Option, Please Select configuration 1 or 2" << endl;
+			exit(-9823);
+		}
+		fractionName = inputNorm->GetFractionName();
+	}
+	else
+	{
+		cerr << "Provided PDF, NOT a NormalisedSumPDF, cannot Proceed with S-Weighting" << endl;
+		exit(-3);
+	}
 
-//Constructor with correct arguments
-SWeightPrecalculator::SWeightPrecalculator( IPDF * InputSignal, IPDF * InputBackground, ParameterSet * InputParameters, string WeightName ) : signalPDF(InputSignal),
-	backgroundPDF(InputBackground), fitParameters(InputParameters), weightName(WeightName)
-{
 }
 
 //Destructor
 SWeightPrecalculator::~SWeightPrecalculator()
 {
+	if( signalPDF != NULL ) delete signalPDF;
+	if( backgroundPDF != NULL ) delete backgroundPDF;
+	// Can't copy FitResult, so no need to attempt to destroy it here!!!
 }
 
 //Calculate the sWeights
@@ -39,49 +64,10 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 {
 	cout << endl << "Calculating sWeights" << endl;
 
-	//First fit to find number of signal events v number background
-	//Make a sum PDF, with a new physics parameter for the ratio
-	const string fractionName = "sWeightSignalFraction";
-	NormalisedSumPDF * signalAndBackground = new NormalisedSumPDF( signalPDF, backgroundPDF, InputData->GetBoundary(), fractionName );
-
-	//Make a new parameter set with this parameter in
-	vector<string> allParameters = fitParameters->GetAllNames();
-	vector<string>::iterator parameterIterator;
-	allParameters.push_back(fractionName);
-	vector< ParameterSet* > fractionFitParameters;
-	fractionFitParameters.push_back( new ParameterSet(allParameters) );
-	for ( parameterIterator = allParameters.begin(); parameterIterator != allParameters.end(); ++parameterIterator )
-	{
-		if  ( *parameterIterator == fractionName )
-		{
-			//Add the new parameter
-			fractionFitParameters.back()->SetPhysicsParameter( fractionName, 0.5, 0.0, 1.0, 0., "Free", "Unitless" );
-		}
-		else
-		{
-			//Copy the parameter set
-			PhysicsParameter temporaryParameter = *( fitParameters->GetPhysicsParameter( *parameterIterator ) );
-			fractionFitParameters.back()->SetPhysicsParameter( *parameterIterator, &temporaryParameter );
-		}
-	}
-
-	//Fit
-	vector< IPDF* > fitPDF;
-	fitPDF.push_back(signalAndBackground);
-	vector< IDataSet* > fitData;
-	fitData.push_back(InputData);
-	MinimiserConfiguration * minimiser = new MinimiserConfiguration("Minuit2");
-	FitFunctionConfiguration * function = new FitFunctionConfiguration("NegativeLogLikelihood");
-	FitResult * findFractionResult = FitAssembler::DoFit( minimiser, function, fractionFitParameters, fitPDF, fitData, vector< ConstraintFunction* >() );
-
 	//Retrieve the correct fraction
-	double signalFraction = findFractionResult->GetResultParameterSet()->GetResultParameter(fractionName)->GetValue();
+	double signalFraction = inputResult->GetResultParameterSet()->GetResultParameter( fractionName )->GetValue();
 	long numberSignalEvents = (long)floor( InputData->GetDataNumber() * signalFraction );
 	long numberBackgroundEvents = (long)ceil( InputData->GetDataNumber() * ( 1 - signalFraction ) );
-
-	//Reset the PDF parameters (just in case)
-	signalPDF->SetPhysicsParameters(fitParameters);
-	backgroundPDF->SetPhysicsParameters(fitParameters);
 
 	//Debug
 	cout << "Signal events: " << numberSignalEvents << endl;
@@ -95,40 +81,47 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	vector<string> allObservables = InputData->GetBoundary()->GetAllNames();
 	vector<string>::iterator observableIterator;
 	allObservables.push_back(weightName);
-	MemoryDataSet * newDataSet = new MemoryDataSet( InputData->GetBoundary() );
+
+	vector<DataPoint*> allPoints;
+	vector<double> allValues;
+
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
 	{
 		//Calculate the sWeight
 		double numerator = double( ( matrixElements.first * signalValues[unsigned(eventIndex)] ) + ( matrixElements.second * backgroundValues[unsigned(eventIndex)] ) );
 		double denominator = double( ( double(numberSignalEvents) * signalValues[unsigned(eventIndex)] ) + ( double(numberBackgroundEvents) * backgroundValues[unsigned(eventIndex)] ) );
-		
+
 		//Make the new data point
 		DataPoint * currentEvent = InputData->GetDataPoint(eventIndex);
-		DataPoint * newEvent = new DataPoint(allObservables);
-		for ( observableIterator = allObservables.begin(); observableIterator != allObservables.end(); ++observableIterator )
-		{
-			if ( *observableIterator == weightName )
-			{
-				//Add the sWeight as an Observable
-				newEvent->SetObservable( weightName, numerator / denominator, 0.0, "Unitless" );
-				newDataSet->AddDataPoint(newEvent);
-			}
-			else
-			{
-				//Copy data point contents
-				Observable * copyObservable = currentEvent->GetObservable( *observableIterator );
-				newEvent->SetObservable( *observableIterator, copyObservable );
-			}
-		}
+		DataPoint * newEvent = new DataPoint( *currentEvent );
+
+		//Add the sWeight as an Observable
+		newEvent->AddObservable( weightName, numerator / denominator, 0.0, "Unitless" );
+
+		allValues.push_back( numerator / denominator );
+		allPoints.push_back( newEvent );
+	}
+
+        PhaseSpaceBoundary* dataSetBoundary = new PhaseSpaceBoundary( *(InputData->GetBoundary()) );
+	double min=0, max=0;
+	min = StatisticsFunctions::Minimum( allValues );
+	max = StatisticsFunctions::Maximum( allValues );
+	ObservableContinuousConstraint* weightConstraint = new ObservableContinuousConstraint( weightName, min, max, "Unitless" );
+	dataSetBoundary->AddConstraint( weightName, weightConstraint );
+        MemoryDataSet * newDataSet = new MemoryDataSet( dataSetBoundary );
+
+	for( unsigned int i=0; i< allPoints.size(); ++i )
+	{
+		newDataSet->AddDataPoint( allPoints[i] );
 	}
 
 	//Output time information
 	time_t timeNow;
-        time(&timeNow);
+	time(&timeNow);
 	cout << "Finished calculating sWeights: " << ctime( &timeNow ) << endl;
 	//exit(0);
 
-	return newDataSet;
+	return (IDataSet*) newDataSet;
 }
 
 //A separate method for calculating the martix elements for the weight
@@ -143,8 +136,8 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long Numbe
 	vector<double> saveSignalValues, saveBackgroundValues;
 
 	//Make the PDF integrators
-	RapidFitIntegrator * signalIntegrator = new RapidFitIntegrator(signalPDF);
-	RapidFitIntegrator * backgroundIntegrator = new RapidFitIntegrator(backgroundPDF);
+	RapidFitIntegrator * signalIntegrator = (RapidFitIntegrator*) ( signalPDF->RequestIntegrator() );
+	RapidFitIntegrator * backgroundIntegrator = (RapidFitIntegrator*) ( backgroundPDF->RequestIntegrator() );
 
 	//The matrix is a sum over all events
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
@@ -179,3 +172,4 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long Numbe
 	BackgroundValues = saveBackgroundValues;
 	return make_pair( returnSignalSignal, returnSignalBackground );
 }
+

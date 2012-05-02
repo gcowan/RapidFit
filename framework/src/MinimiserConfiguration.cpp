@@ -1,32 +1,33 @@
-/**
-  @class MinimiserConfiguration
-
-  Container that stores all information related to minimiser configuration, and returns an appropriate instance of a minimiser
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @date 2009-11-27
+/*!
+ * @class MinimiserConfiguration
+ *
+ * Container that stores all information related to minimiser configuration, and returns an appropriate instance of a minimiser
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
  */
 
-//	RapidFit Headers
+///	RapidFit Headers
 #include "MinimiserConfiguration.h"
 #include "ClassLookUp.h"
+///	System Headers
+#include <string>
+#include <sstream>
 
-//Default constructor
-MinimiserConfiguration::MinimiserConfiguration() : theMinimiser(), OutputLevel(), minimiserName(), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
-{
-	theMinimiser = NULL;
-	OutputLevel=0;
-}
+using namespace::std;
 
 //Constructor for a minimiser only specified by name
-MinimiserConfiguration::MinimiserConfiguration( string InputName ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
+MinimiserConfiguration::MinimiserConfiguration( string InputName ) :
+	theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
 }
 
 //Constructor for a minimiser with requested contour plots
-MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) : theMinimiser(), OutputLevel(), minimiserName(InputName), contours( Formatting->GetContourPlots() ), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
+MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) :
+	theMinimiser(), OutputLevel(), minimiserName(InputName),
+	contours( Formatting != NULL ? Formatting->GetContourPlots() : vector< pair< string, string > >() ), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
@@ -106,3 +107,24 @@ void MinimiserConfiguration::SetMultiMini( bool decision )
 {
 	MultiMini = decision;
 }
+
+void MinimiserConfiguration::Print() const
+{
+	cout << "MinimiserConfiguration:" << endl;
+	cout << "This is to be coded up when needed" << endl;
+}
+
+string MinimiserConfiguration::XML() const
+{
+	stringstream xml;
+
+	xml << "<Minimiser>" << endl;
+	xml << "\t" << "<MinimiserName>" << minimiserName << "</MinimiserConfiguration>" << endl;
+	xml << "\t" << "<MaxSteps>" << maxSteps << "</MaxSteps>" << endl;
+	xml << "\t" << "<GradTolerance>" << bestTolerance << "</GradTolerance>" << endl;
+	xml << "\t" << "<Quality>" << Quality << "</Quality>" << endl;
+	xml << "</Minimiser>" << endl;
+
+	return xml.str();
+}
+

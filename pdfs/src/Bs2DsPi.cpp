@@ -49,9 +49,7 @@ void Bs2DsPi::MakePrototypes()
 	parameterNames.push_back( gammaName );
 	parameterNames.push_back( deltaGammaName );
 	parameterNames.push_back( deltaMName );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor

@@ -39,9 +39,7 @@ void Bs2JpsiPhiMassBkgLL::MakePrototypes()
         //Make the parameter set
         vector<string> parameterNames;
         parameterNames.push_back( alphaM_llName );
-        allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+        allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -68,10 +66,8 @@ double Bs2JpsiPhiMassBkgLL::Evaluate(DataPoint * measurement)
 }
 
 
-double Bs2JpsiPhiMassBkgLL::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhiMassBkgLL::Normalisation(PhaseSpaceBoundary * boundary)
 {
-	//	Stupid gcc
-	(void)measurement;
 	double mhigh, mlow ;
 	
 	IConstraint * massBound = boundary->GetConstraint( constraint_recoMassName );

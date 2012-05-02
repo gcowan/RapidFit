@@ -455,8 +455,8 @@
 
 <Minimiser>
 <MinimiserName>Minuit</MinimiserName>
-<MaxSteps>100000</MaxSteps>
-<GradTolerance>0.0001</GradTolerance>
+<MaxSteps>1000000</MaxSteps>
+<GradTolerance>0.000001</GradTolerance>
 <Quality>1</Quality>
 </Minimiser>
 
@@ -617,8 +617,7 @@
 
 <Observable>
 <Name>mistag_os</Name>
-<Minimum>0.4999999</Minimum>
-<Maximum>0.5000001</Maximum>
+<Value>0.5</Value>
 <Unit> </Unit>
 </Observable>
 
@@ -716,7 +715,7 @@
 <Observable>
 <Name>mistag_os</Name>
 <Minimum>0.0</Minimum>
-<Maximum>0.499999</Maximum>
+<Maximum>0.5</Maximum>
 <Unit> </Unit>
 </Observable>
 
@@ -816,8 +815,7 @@
 
 <Observable>
 <Name>mistag_os</Name>
-<Minimum>0.499999</Minimum>
-<Maximum>0.500001</Maximum>
+<Value>0.5</Value>
 <Unit> </Unit>
 </Observable>
 
@@ -918,7 +916,7 @@
 <Observable>
 <Name>mistag_os</Name>
 <Minimum>0.0</Minimum>
-<Maximum>0.499999</Maximum>
+<Maximum>0.5</Maximum>
 <Unit> </Unit>
 </Observable>
 
@@ -942,35 +940,13 @@
 
 
 <Output>
-
-#<Projection>mass</Projection>
+<ComponentProjection>cosPsi</ComponentProjection>
        <Scan>                                                                                                                                                        
                 <Name>Phi_s</Name>                                                                                                                               
                 <Minimum>-2.0</Minimum>                                                                                                                              
                 <Maximum>0.</Maximum>                                                                                                                               
                 <Points>20</Points>                                                                                                                                    
         </Scan>   
-       <Scan>                                                                                                                                                        
-                <Name>deltaGamma</Name>                                                                                                                       
-                <Minimum>-0.1</Minimum>                                                                                                                                
-                <Maximum>0.2</Maximum>                                                                                                                                
-                <Points>20</Points>                                                                                                                            
-        </Scan>   
-        <TwoDScan>                                                                                                                                                      
-            <X_Param>                                                                                                                                             
-                <Name>Phi_s</Name>                                                                                                                            
-                <Minimum>-2.0</Minimum>                                                                                                                                
-                <Maximum>0.0</Maximum>                                                                                                                               
-                <Points>10</Points>                                                                                                                            
-            </X_Param>                                                                                                                                            
-                                                                                                                                                                      
-            <Y_Param>                                                                                                                                             
-                <Name>deltaGamma</Name>                                                                                                                       
-                <Minimum>-0.1</Minimum>                                                                                                                                
-                <Maximum>0.2</Maximum>                                                                                                                                
-                <Points>10</Points>                                                                                                                            
-            </Y_Param>                                                                                                                                            
-        </TwoDScan>                                                                                                                                                     
 </Output>
 
 

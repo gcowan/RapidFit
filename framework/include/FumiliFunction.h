@@ -1,21 +1,21 @@
 // $Id: FumiliFunction.h,v 1.2 2009/11/13 09:57:05 gcowan Exp $
-/**
-        @class FumiliFunction
+/*!
+ * @class FumiliFunction
+ *
+ * @brief A wrapper making IPDFs work with the Minuit2 API
+ *        using the Fumili minimisation method.
+ *
+ * @author Greig A Cowan greig.cowan@cern.ch
+ */
 
-        A wrapper making IPDFs work with the Minuit2 API
-	using the Fumili minimisation method.
-
-        @author Greig A Cowan greig.cowan@cern.ch
-	@date 2009-10-09
-*/
-
+#pragma once
 #ifndef FUMILI_FUNCTION_H
 #define FUMILI_FUNCTION_H
 
-//	ROOT Headers
+///	ROOT Headers
 #include "Minuit2/ParametricFunction.h"
 #include "Minuit2/MnUserParameters.h"
-//	RapidFit Headers
+///	RapidFit Headers
 #include "FitFunction.h"
 
 using namespace ROOT::Minuit2;
@@ -46,3 +46,4 @@ class FumiliFunction : public ParametricFunction
 };
 
 #endif
+

@@ -1,3 +1,5 @@
+
+#pragma once
 #ifndef ObservableRef_H
 #define ObservableRef_H
 
@@ -6,8 +8,8 @@
 
 using namespace::std;
 
-class ObservableRef{
-
+class ObservableRef
+{
 	public:
 		ObservableRef();
 		ObservableRef( string );
@@ -16,13 +18,11 @@ class ObservableRef{
 
 		operator string() const
 		{
-		        string new_name = Observable_Name;
-		        return new_name;
+		        return Observable_Name;
 		}
 		operator vector<string>() const
 		{
-			vector<string> new_names = Observable_Names;
-			return new_names;
+			return Observable_Names;
 		}
 		//operator const char *() const
 		//{
@@ -37,16 +37,16 @@ class ObservableRef{
 			return ObservableRef("unknown");
 		}
 
-		void SetIndex( int );
-		int GetIndex();
+		void SetIndex( const int ) const;
+		int GetIndex() const;
 		string Name() const;
-		string* NameRef();
+		string* NameRef() const;
 		size_t size() const;
 		void push_back( string );
 
 	private:
-		string Observable_Name;
-		int Observable_Index;
+		mutable string Observable_Name;
+		mutable int Observable_Index;
 		vector<string> Observable_Names;
 		vector<ObservableRef> Observable_Refs;
 };

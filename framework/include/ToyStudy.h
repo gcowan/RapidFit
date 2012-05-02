@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef TOY_STUDY_H
 #define TOY_STUDY_H
 
@@ -21,17 +22,16 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using namespace::std;
 
 class ToyStudy	:	public IStudy
 {
 	public:
-		ToyStudy();
 		ToyStudy( string );
-		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, vector<ParameterSet*>, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
+		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
 		~ToyStudy();
 
-		void DoWholeStudy();
+		void DoWholeStudy( int = -999 );
 		FitResultVector* GetStudyResult();
 
 		void SetNumRepeats( int );			//	Set number of Repeats
@@ -43,14 +43,7 @@ class ToyStudy	:	public IStudy
 		ToyStudy& operator = ( const ToyStudy& );
 
 		FitResult * GenerateAndMinimise();
-
-		vector< PDFWithData* > pdfsAndData;
-		vector< ParameterSet* > studyParameters;
-		MinimiserConfiguration * theMinimiser;
-		FitFunctionConfiguration * theFunction;
-		FitResultVector* allResults;
-		int numberStudies;
-		vector< ConstraintFunction* > allConstraints;
 };
 
 #endif
+

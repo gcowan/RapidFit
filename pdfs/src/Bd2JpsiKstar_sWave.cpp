@@ -10,8 +10,12 @@
 #include "Mathematics.h"
 #include "SlicedAcceptance.h"
 #include <iostream>
+#include <fstream>
 #include "math.h"
 #include "TMath.h"
+#include "TFile.h"
+#include "TH3D.h"
+#include "TROOT.h"
 
 PDF_CREATOR( Bd2JpsiKstar_sWave );
 //Constructor
@@ -59,7 +63,7 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator* configurator ) :
 	, gamma(), Azero_sq(), Apara_sq(), Aperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
 	delta_zero(), delta_para(), delta_perp(), delta_s(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(),
 	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), Ap_sq(), Ap(), time(), cosTheta(), phi(),
-	cosPsi(), KstarFlavour(), tlo(), thi()
+	cosPsi(), KstarFlavour(), tlo(), thi(), useFlatAngularDistribution(true)
 {
 	MakePrototypes();
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
@@ -73,7 +77,147 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator* configurator ) :
                         cout << "Bd2JpsiKstar_sWave:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
         }
 
+
+//AILSA
+	//Find name of histogram needed to define 3-D angular distribution
+        string fileName = configurator->getConfigurationValue( "AngularDistributionHistogram" ) ;
+
+        //Initialise depending upon whether configuration parameter was found
+        if( fileName == "" )
+        {
+                cout << "   No AngularAcceptanceHisto found" << endl ;
+                useFlatAngularDistribution = true ;
+        }
+        else
+        {
+                cout << "   AngularAcceptanceHisto requested: " << fileName << endl ;
+                useFlatAngularDistribution = false ;
+
+
+
+                ifstream input_file2;
+                input_file2.open( fileName.c_str(), ifstream::in );
+                input_file2.close();
+                bool local_fail2 = input_file2.fail();
+                if( !getenv("RAPIDFITROOT") && local_fail2 )
+                {
+                        cerr << "\n" << endl;
+                        //cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
+                        //cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        cerr << "\n" << endl;
+                        exit(-987);
+                }
+		
+
+		string fullFileName;
+
+                //File location
+                //ifstream input_file2;
+                //input_file2.open( fileName.c_str(), ifstream::in );
+                //input_file2.close();
+                //bool local_fail2 = input_file2.fail();
+  
+              if( getenv("RAPIDFITROOT") )
+                {
+                        string path( getenv("RAPIDFITROOT") ) ;
+
+                        cout << "RAPIDFITROOT defined as: " << path << endl;
+                        fullFileName = path+"/pdfs/configdata/"+fileName ;
+
+                        input_file2.open( fullFileName.c_str(), ifstream::in );
+                        input_file2.close();
+                }
+                bool elsewhere_fail = input_file2.fail();
+
+                if( elsewhere_fail && local_fail2 )
+                {
+                        cerr << "\n\tFileName:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
+                        cerr << "\t\tAlternativley make sure your XML points to the correct file, or that the file is in the current working directory\n" <<
+ endl;
+                        exit(-89);
+                }
+
+                if( fullFileName.empty() || !local_fail2 )
+                {
+                        fullFileName = fileName;
+                }
+	
+		TFile* f =  TFile::Open(fullFileName.c_str());
+                histo = (TH3D*) f->Get("histo"); //(fileName.c_str())));
+
+                xaxis = histo->GetXaxis();
+                cout << "X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << endl;
+                xmin = xaxis->GetXmin();
+                xmax = xaxis->GetXmax();
+                nxbins = histo->GetNbinsX();
+                cout << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
+                deltax = (xmax-xmin)/nxbins;
+
+                yaxis = histo->GetYaxis();
+                cout << "Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << endl;
+                ymin = yaxis->GetXmin();
+                ymax = yaxis->GetXmax();
+                nybins = histo->GetNbinsY();
+                cout << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
+                deltay = (ymax-ymin)/nybins;
+
+                zaxis = histo->GetZaxis();
+                cout << "Z axis Name: " << zaxis->GetName() << "\tTitle: " << zaxis->GetTitle() << endl;
+                zmin = zaxis->GetXmin();
+                zmax = zaxis->GetXmax();
+                nzbins = histo->GetNbinsZ();
+                cout << "Z axis Min: " << zmin << "\tMax: " << zmax << "\tBins: " << nzbins << endl;
+                deltaz = (zmax-zmin)/nzbins;
+
+                //method for Checking whether histogram is sensible
+
+                total_num_entries = histo->GetEntries();
+                int total_num_bins = nxbins * nybins * nzbins;
+                int sum = 0;
+
+                vector<int> zero_bins;
+		//loop over each bin in histogram and print out how many zero bins there are
+                for (int i=1; i < nxbins+1; ++i)
+                {
+                        for (int j=1; j < nybins+1; ++j)
+                        {
+                                for (int k=1; k < nzbins+1; ++k)
+                                {
+                                        double bin_content = histo->GetBinContent(i,j,k);
+                                        //cout << "Bin content: " << bin_content << endl;
+                                        if(bin_content<=0)
+                                        {
+                                                zero_bins.push_back(1);
+                                        }
+                                        //cout << " Zero bins " << zero_bins.size() << endl;}
+                                        else if (bin_content>0)                                        {
+                                                sum += (int) bin_content;
+                                        }
+                                }
+                        }
+                }
+
+                int average_bin_content = sum / total_num_bins;
+
+                cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
+                cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
+                cout << endl;
+                cout << endl;
+
+                // Check.  This order works for both bases since phi is always the third one.
+                if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() )
+                {
+                        cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
+                        exit(1);
+                }
+
+                cout << "Finishing processing histo" << endl;
+        }
+
 }
+// END AILSA
+
 
 //Make the data point and parameter set
 void Bd2JpsiKstar_sWave::MakePrototypes()
@@ -111,9 +255,7 @@ void Bd2JpsiKstar_sWave::MakePrototypes()
 	parameterNames.push_back( angAccI8Name );
 	parameterNames.push_back( angAccI9Name );
 	parameterNames.push_back( angAccI10Name );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -250,6 +392,8 @@ double Bd2JpsiKstar_sWave::buildPDFnumerator()
 		+ f10 * ReAzeroAsB
 		;
 	if( useTimeAcceptance() ) v1  = v1 * timeAcc->getValue(time);
+	
+	v1  *=  angularFactor();
 	return v1;
 }
 
@@ -329,7 +473,7 @@ double Bd2JpsiKstar_sWave::buildCompositePDFdenominator( )
 
         if( true /*useTimeAcceptance()*/ ) {                // Set to true because seleting false makes a single slice for 0 --> 14.
                 //This loops over each time slice, does the normalisation between the limits, and accumulates
-              for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
+              for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
                 {
                         //Set the time integrals
                         tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
@@ -570,3 +714,32 @@ if ( !evaluationCacheValid )
 
 return;
 }
+
+//Angular distribution function
+double Bd2JpsiKstar_sWave::angularFactor( )
+{
+        double returnValue=0.;
+
+        int globalbin=-1;
+        int xbin=-1, ybin=-1, zbin=-1;
+        double num_entries_bin=-1.;
+
+        if( useFlatAngularDistribution ) {
+                returnValue = 1.0; /// 8.0 / TMath::Pi() ;
+        }
+        else {
+                //Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
+                xbin = xaxis->FindFixBin( cosPsi ); if( xbin > nxbins ) xbin = nxbins;
+                ybin = yaxis->FindFixBin( cosTheta ); if( ybin > nybins ) ybin = nybins;
+                zbin = zaxis->FindFixBin( phi ); if( zbin > nzbins ) zbin = nzbins;
+
+                globalbin = histo->GetBin( xbin, ybin, zbin );
+                num_entries_bin = histo->GetBinContent(globalbin);
+
+                //Angular factor normalized with phase space of histogram and total number of entries in the histogram
+                returnValue = num_entries_bin; /// (deltax * deltay * deltaz) / total_num_entries ;
+        }
+
+        return returnValue;
+}
+

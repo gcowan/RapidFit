@@ -21,7 +21,7 @@
 #include <iostream>
 #include <string.h>
 
-using namespace std;
+using namespace::std;
 
 //-----------------------------------------------------------------------------
 // Implementation file for class : EdStyle
@@ -37,290 +37,234 @@ EdStyle::EdStyle( ) : edStyle(), icol(), font(), tsize()
 {
 }
 
-EdStyle::~EdStyle(){}
+EdStyle::~EdStyle()
+{
+}
 
 void EdStyle::SetStyle()
+/*!
+ * Compared to: Erasmus/trunk/RootTools/LHCbStyle/src/lhcbStyle.C -r 139227
+ *
+ * From: svn co svn+ssh://svn.cern.ch/reps/lhcb/Erasmus/trunk/RootTools/LHCbStyle/src
+ */
 {
 
-	// use helvetica-bold-r-normal, precision 2 (rotatable)
-	Int_t lhcbFont = 62;
-	// line thickness
-	Width_t lhcbWidth = 2; //Width_t is a SHORT INT, not a double
-	//Double_t lhcbWidth = 1.75;
+	//Start of LHCb Style choices
 
-	// use plain black on white colors
+	// use helvetica-bold-r-normal, precision 2 (rotatable)
+	Font_t lhcbFont = 132;
+
+	// line thickness
+	Width_t lhcbWidth = 2.; //Width_t is a SHORT INT, NOT a double
+
+	// text size
+	Double_t lhcbTSize = 0.06;
+
 	gStyle->SetFrameBorderMode(0);
 	gStyle->SetCanvasBorderMode(0);
 	gStyle->SetPadBorderMode(0);
 	gStyle->SetPadColor(0);
 	gStyle->SetCanvasColor(0);
 	gStyle->SetStatColor(0);
+	gStyle->SetFrameFillColor(0);
+	gStyle->SetLegendBorderSize(0);
 	gStyle->SetPalette(1);
-	gStyle->SetFillColor(0);
-	gStyle->SetTitleFillColor(0);
-	gStyle->SetStatBorderSize(1);
-	//gStyle->SetTitleColor(0);
-	//gStyle->SetFillColor(0);
+	gStyle->SetFillStyle(1001);
+	gStyle->SetFillColor(1);
+	gStyle->SetPalette(1);
 
-	// set the paper & margin sizes
-	gStyle->SetPaperSize(Float_t(20),Float_t(26));
-	gStyle->SetPadTopMargin(Float_t(0.05));
-	gStyle->SetPadRightMargin(Float_t(0.05)); // increase for colz plots!!
-	gStyle->SetPadBottomMargin(Float_t(0.16));
-	gStyle->SetPadLeftMargin(Float_t(0.14));
+	int colors[8] = {0,5,7,3,6,2,4,1};
+	gStyle->SetPalette(8,colors);
 
-	// use large fonts
-	gStyle->SetTextFont(Font_t(lhcbFont));
-	gStyle->SetTextSize(Float_t(0.08));
-	gStyle->SetLabelFont(Style_t(lhcbFont),"x");
-	gStyle->SetLabelFont(Style_t(lhcbFont),"y");
-	gStyle->SetLabelFont(Style_t(lhcbFont),"z");
-	gStyle->SetLabelSize(Float_t(0.05),"x");
-	gStyle->SetLabelSize(Float_t(0.05),"y");
-	gStyle->SetLabelSize(Float_t(0.05),"z");
-	gStyle->SetTitleFont(Style_t(lhcbFont));
-	gStyle->SetTitleSize(Float_t(0.05),"x");
-	gStyle->SetTitleSize(Float_t(0.05),"y");
-	gStyle->SetTitleSize(Float_t(0.05),"z");
+
+	gStyle->SetPaperSize(20,26);
+        gStyle->SetPadLeftMargin( (Float_t) 0.14 );
+        gStyle->SetPadBottomMargin( (Float_t) 0.16 );
+        gStyle->SetPadRightMargin( (Float_t)0.05 ); // increase for colz plots!!
+        gStyle->SetPadTopMargin( (Float_t)0.05 );
+
+
+	//      Set default fonts for axis and titles on all plots
+        gStyle->SetTextFont( lhcbFont );
+	gStyle->SetTextSize( (Float_t) lhcbTSize );
+	gStyle->SetLabelFont( lhcbFont, "xyz" );
+	gStyle->SetLabelSize( (Float_t)lhcbTSize, "xyz" );
+	gStyle->SetTitleFont( lhcbFont, "xyz" );
+	gStyle->SetTitleSize( (Float_t)1.2*(Float_t)lhcbTSize, "xyz" );
+	gStyle->SetStatFont( lhcbFont );
 
 	// use bold lines and markers
-	gStyle->SetLineWidth(lhcbWidth);
-	gStyle->SetFrameLineWidth(3);
-	gStyle->SetHistLineWidth(lhcbWidth);
-	gStyle->SetFuncWidth(lhcbWidth);
-	gStyle->SetGridWidth(lhcbWidth);
-	gStyle->SetLineStyleString(2,"[12 12]"); // postscript dashes
-	//gStyle->SetMarkerStyle(15;
-	gStyle->SetMarkerStyle(20);
-	gStyle->SetMarkerSize(1.5);
+        gStyle->SetLineWidth( lhcbWidth );
+        gStyle->SetFrameLineWidth( lhcbWidth );
+        gStyle->SetHistLineWidth( lhcbWidth );
+        gStyle->SetFuncWidth( lhcbWidth );
+        gStyle->SetGridWidth( lhcbWidth );
+        gStyle->SetLineStyleString( 2, "[12 12]"); // postscript dashes
+        gStyle->SetMarkerStyle( 20 );
+        gStyle->SetMarkerSize( (Float_t)1.0 );
+
 
 	// label offsets
-	gStyle->SetLabelOffset(Float_t(0.015));
+        gStyle->SetLabelOffset( (Float_t)0.010, "X" );
+	gStyle->SetLabelOffset( (Float_t)0.010, "Y" );
+
 
 	// by default, do not display histogram decorations:
-	gStyle->SetOptStat(0);
-	gStyle->SetOptStat(1110);  // show only nent, mean, rms
-	//gStyle->SetOptTitle(0;
-	gStyle->SetOptFit(0);
-	//gStyle->SetOptFit(1011; // show probability, parameters and errors
+        gStyle->SetOptStat(0);  // show only nent, mean, rms
+        gStyle->SetOptStat("emr");
+        gStyle->SetStatFormat("6.3g");
+        gStyle->SetOptTitle(0);
+        gStyle->SetOptFit(0);
+
+
+	//titles
+	gStyle->SetTitleOffset((Float_t)0.95,"X");
+	gStyle->SetTitleOffset((Float_t)0.95,"Y");
+	gStyle->SetTitleOffset((Float_t)1.2,"Z");
+	gStyle->SetTitleFillColor(0);
+	gStyle->SetTitleStyle(0);
+	gStyle->SetTitleBorderSize(0);
+	gStyle->SetTitleFont(lhcbFont,"title");
+	gStyle->SetTitleX(0.0);
+	gStyle->SetTitleY(1.0); 
+	gStyle->SetTitleW(1.0);
+	gStyle->SetTitleH((Float_t)0.05);
 
 	// look of the statistics box:
-	gStyle->SetStatBorderSize(1);
-	gStyle->SetStatFont(Style_t(lhcbFont));
-	gStyle->SetStatFontSize(Float_t(0.05));
-	gStyle->SetStatX(Float_t(0.9));
-	gStyle->SetStatY(Float_t(0.9));
-	gStyle->SetStatW(Float_t(0.25));
-	gStyle->SetStatH(Float_t(0.15));
+        gStyle->SetStatBorderSize( 0 );
+        gStyle->SetStatFont( lhcbFont );
+        gStyle->SetStatFontSize( (Float_t)0.05 );
+        gStyle->SetStatX( (Float_t)0.9 );
+        gStyle->SetStatY( (Float_t)0.9 );
+        gStyle->SetStatW( (Float_t)0.25 );
+        gStyle->SetStatH( (Float_t)0.15 );
 
 	// put tick marks on top and RHS of plots
-	gStyle->SetPadTickX(1);
-	gStyle->SetPadTickY(1);
+        gStyle->SetPadTickX( 1 );
+        gStyle->SetPadTickY( 1 );
 
 	// histogram divisions: only 5 in x to avoid label overlaps
-	gStyle->SetNdivisions(505,"x");
-	gStyle->SetNdivisions(510,"y");
+        gStyle->SetNdivisions( 505, "x" );
+        gStyle->SetNdivisions( 510, "y" );
 
-	TPaveText *lhcbName = new TPaveText(0.65,0.8,0.9,0.9,"BRNDC");
-	lhcbName->SetFillColor(0);
-	lhcbName->SetTextAlign(12);
-	lhcbName->SetBorderSize(0);
-	lhcbName->AddText("LHCb");
 
-	TPaveText *lhcbPrelimR = new TPaveText(0.70 - gStyle->GetPadRightMargin(),
-			0.80 - gStyle->GetPadTopMargin(),
-			0.95 - gStyle->GetPadRightMargin(),
-			0.85 - gStyle->GetPadTopMargin(),
-			"BRNDC");
-	lhcbPrelimR->SetFillColor(0);
-	lhcbPrelimR->SetTextAlign(12);
-	lhcbPrelimR->SetBorderSize(0);
-	lhcbPrelimR->AddText("#splitline{LHCb}{#scale[1.0]{Preliminary}}");
 
-	TPaveText *lhcbPrelimL = new TPaveText(gStyle->GetPadLeftMargin() + 0.05,
-			0.87 - gStyle->GetPadTopMargin(),
-			gStyle->GetPadLeftMargin() + 0.30,
-			0.95 - gStyle->GetPadTopMargin(),
-			"BRNDC");
-	lhcbPrelimL->SetFillColor(0);
-	lhcbPrelimL->SetTextAlign(12);
-	lhcbPrelimL->SetBorderSize(0);
-	lhcbPrelimL->AddText("#splitline{LHCb}{#scale[1.0]{Preliminary}}");
+	//End of LHCb Style choices
 
-	/*
-	   TPaveText *lhcb7TeVPrelimR = new TPaveText(0.70 - gStyle->GetPadRightMargin(),
-	   0.75 - gStyle->SetPadTopMargin(0.05),
-	   0.95 - gStyle->GetPadRightMargin(),
-	   0.85 - gStyle->SetPadTopMargin(0.05),
-	   "BRNDC";
-	   lhcb7TeVPrelimR->SetFillColor(0;
-	   lhcb7TeVPrelimR->SetTextAlign(12;
-	   lhcb7TeVPrelimR->SetBorderSize(0;
-	   lhcb7TeVPrelimR->AddText("#splitline{#splitline{LHCb}{Preliminary}}{#scale[0.7]{#sqrt{s} = 7 TeV Data}}";
 
-	   TPaveText *lhcb7TeVPrelimL = new TPaveText(gStyle->GetPadLeftMargin() + 0.05,
-	   0.78 - gStyle->SetPadTopMargin(0.05),
-	   gStyle->GetPadLeftMargin() + 0.30,
-	   0.88 - gStyle->SetPadTopMargin(0.05),
-	   "BRNDC";
-	   lhcb7TeVPrelimL->SetFillColor(0;
-	   lhcb7TeVPrelimL->SetTextAlign(12;
-	   lhcb7TeVPrelimL->SetBorderSize(0;
-	   lhcb7TeVPrelimL->SetTextSize(0.06;
-	   lhcb7TeVPrelimL->AddText("#splitline{#splitline{LHCb}{Preliminary}}{#scale[0.7]{#sqrt{s} = 7 TeV Data}}";
 
-	   TPaveText *lhcb0_9TeVPrelimR = new TPaveText(0.70 - gStyle->GetPadRightMargin(),
-	   0.75 - gStyle->SetPadTopMargin(0.05),
-	   0.95 - gStyle->GetPadRightMargin(),
-	   0.85 - gStyle->SetPadTopMargin(0.05),
-	   "BRNDC";
-	   lhcb7TeVPrelimR->SetFillColor(0;
-	   lhcb7TeVPrelimR->SetTextAlign(12;
-	   lhcb7TeVPrelimR->SetBorderSize(0;
-	   lhcb7TeVPrelimR->AddText("#splitline{#splitline{LHCb}{Preliminary}}{#scale[0.7]{#sqrt{s} = 900 eV Data}}";
 
-	   TPaveText *lhcb0_9TeVPrelimL = new TPaveText(gStyle->GetPadLeftMargin() + 0.05,
-	   0.78 - gStyle->SetPadTopMargin(0.05),
-	   gStyle->GetPadLeftMargin() + 0.30,
-	   0.88 - gStyle->SetPadTopMargin(0.05),
-	   "BRNDC";
-	   lhcb0_9TeVPrelimL->SetFillColor(0;
-	   lhcb0_9TeVPrelimL->SetTextAlign(12;
-	   lhcb0_9TeVPrelimL->SetBorderSize(0;
-	   lhcb0_9TeVPrelimL->SetTextSize(0.06;
-	   lhcb0_9TeVPrelimL->AddText("#splitline{#splitline{LHCb}{Preliminary}}{#scale[0.7]{#sqrt{s} = 900 GeV Data}}";
-	 */
+	//	Custom choice by Edinburgh
+	gStyle->SetTitleFillColor(0);
+	gStyle->SetStatBorderSize(1);
 
+
+	// label offsets
+
+	//gStyle->SetTitleOffset( (Float_t)1.25, "xyz" );	//	Stop ALL titles overlapping the numbers on the axis
+
+	//	0 to use RGB, 1 to use CKYM... CKYM does make more sence
+	gStyle->SetColorModelPS( 1 );
+
+	//define style for text
 	TText *lhcbLabel = new TText();
-	lhcbLabel->SetTextFont(Font_t(lhcbFont));
+	lhcbLabel->SetTextFont(lhcbFont);
 	lhcbLabel->SetTextColor(1);
-	lhcbLabel->SetTextSize(Float_t(0.04));
+	lhcbLabel->SetTextSize( (Float_t)0.04 );
 	lhcbLabel->SetTextAlign(12);
 
+	// define style of latex text
 	TLatex *lhcbLatex = new TLatex();
-	lhcbLatex->SetTextFont(Font_t(lhcbFont));
+	lhcbLatex->SetTextFont(lhcbFont);
 	lhcbLatex->SetTextColor(1);
-	lhcbLatex->SetTextSize(Float_t(0.04));
+	lhcbLatex->SetTextSize((Float_t)0.04);
 	lhcbLatex->SetTextAlign(12);
 
-	//gROOT->SetStyle("gStyle";
-	//gROOT->ForceStyle(;
-
+	gROOT->UseCurrentStyle();
+	gROOT->ForceStyle( true );
 }
 
 
-/*
-   EdStyle::EdStyle(  ) {
-//
-// based on a style file from BaBar
-//
+void EdStyle::FormatTText( TText* input )
+{
+	Font_t lhcbFont=62;
+	input->SetTextFont(lhcbFont);
+	input->SetTextColor(1);
+	input->SetTextSize((Float_t)0.04);
+	input->SetTextAlign(12);
+}
 
-//..BABAR style from RooLogon.C in workdir
-
-// use plain black on white colors
-Int_t icol=0;
-gStyle->SetFrameBorderMode(icol;
-gStyle->SetCanvasBorderMode(icol;
-gStyle->SetPadBorderMode(icol;
-gStyle->SetPadColor(icol;
-gStyle->SetCanvasColor(icol;
-gStyle->SetStatColor(icol;
-//gStyle->SetFillColor(icol;
-
-// set the paper & margin sizes
-//   gStyle->SetPaperSize(20,26;
-//   gStyle->SetPadTopMargin(0.05;
-//   gStyle->SetPadRightMargin(0.05;
-//   gStyle->SetPadBottomMargin(0.16;
-//   gStyle->SetPadLeftMargin(0.12;
-
-// use large fonts
-//Int_t font=72;
-Int_t font=42;
-Double_t tsize=0.045;
-gStyle->SetTextFont(font;
-gStyle->SetTextSize(tsize;
-gStyle->SetLabelFont(font,"x";
-gStyle->SetTitleFont(font,"x";
-gStyle->SetLabelFont(font,"y";
-gStyle->SetTitleFont(font,"y";
-gStyle->SetLabelFont(font,"z";
-gStyle->SetTitleFont(font,"z";
-
-gStyle->SetLabelSize(tsize,"x";
-gStyle->SetTitleSize(tsize,"x";
-gStyle->SetLabelSize(tsize,"y";
-gStyle->SetTitleSize(tsize,"y";
-gStyle->SetLabelSize(tsize,"z";
-gStyle->SetTitleSize(tsize,"z";
-gStyle->SetTitleSize(0.05;
-
-
-//use bold lines and markers
-gStyle->SetMarkerStyle(20;
-gStyle->SetMarkerSize(1.2;
-gStyle->SetHistLineWidth(2.0;
-gStyle->SetLineStyleString(2,"[12 12]"; // postscript dashes
-
-//get rid of X error bars and y error bar caps
-//gStyle->SetErrorX(0.001;
-
-//do not display any of the standard histogram decorations
-gStyle->SetOptTitle(0;
-
-gStyle->SetOptStat(0;
-
-gStyle->SetOptFit(0;
-
-// put tick marks on top and RHS of plots
-gStyle->SetPadTickX(1;
-gStyle->SetPadTickY(1;
-
-//   gROOT->SetStyle("GREIG";
-
-//gStyle->SetPadTickX(1;
-//gStyle->SetPadTickY(1;
-*/
-//gStyle->SetOptStat(1111;
-/* 
-   gStyle->SetOptFit(1111;
-   gStyle->SetMarkerStyle(20;
-   gStyle->SetMarkerSize(1.;
-   }
- */
-
+void EdStyle::FormatTLatex( TLatex* input )
+{
+	Font_t lhcbFont=62;
+	input->SetTextFont(lhcbFont);
+	input->SetTextColor(1);
+	input->SetTextSize((Float_t)0.04);
+	input->SetTextAlign(12);
+}
 
 //  These functions are not guaranteed correct but will people please add to them
 //  it can save time in editing tables out of RapidFit if we can at least call one standard function for things like this
 //	This could be cleaner but given where this occurs in the program I officially cba
 
-TString EdStyle::GetParamRootUnit( string Param_Unit )
+TString EdStyle::GetParamRootUnit( string Param_Name )
 {
 	TString returnable_string;
-	if( Param_Unit == "ps^{-1}" ){
-		returnable_string =  Param_Unit ;
-	} else if ( Param_Unit == "MeV/c^{2}" ) {
-		returnable_string =  "MeV{c}^{-2}" ;
-	} else if ( Param_Unit == "ps" ) {
-		returnable_string =  Param_Unit ;
-	} else {
-		returnable_string =  "" ;
+
+	if( Param_Name == "gamma" )
+	{
+		returnable_string = "[ps^{-1}]";
+
+	} else if( Param_Name == "deltaGamma" ) { 
+
+		returnable_string = "[ps^{-1}]";
+
+	} else if( Param_Name == "Phi_s" ) {
+
+		returnable_string = "[rad]";
+
+	} else if ( Param_Name == "Azero_sq" ) {
+
+		returnable_string = "[unitless]";
+
+	} else if ( Param_Name == "Aperp_sq" ) {
+
+		returnable_string = "[unitless]";
+
+	} else if ( Param_Name == "Apara_sq" ) {
+
+		returnable_string = "[unitless]";
+
+	} else if ( Param_Name == "As_sq" ) {
+
+		returnable_string = "[unitless]";
+
+	} else if ( Param_Name == "delta_para" ) {
+
+		returnable_string = "[rad]";
+
+	} else if ( Param_Name == "delta_perp" ) {
+
+		returnable_string = "[rad]";
+
+	} else if ( Param_Name == "delta_s" ) {
+
+		returnable_string = "[rad]";
+
+	} else if ( Param_Name == "deltaM" ) {
+
+		//returnable_string = "MeV/c^{2}";
+		returnable_string = "[ps^{-1}]";
 	}
+
 	return returnable_string;
 }
 
-TString EdStyle::GetParamLatexUnit( string Param_Unit )
+TString EdStyle::GetParamLatexUnit( string Param_Name )
 {
+	(void) Param_Name;
+	//	I will write this when I can be bothered...
 	TString Unit("$");
-	if( Param_Unit == "ps^{-1}" ){
-		Unit.Append( Param_Unit );
-	} else if ( Param_Unit == "MeV/c^{2}" ) {
-		Unit.Append( "MeV{c}^{-2}" );
-	} else if ( Param_Unit == "ps" ) {
-		Unit.Append( Param_Unit );
-	} else {
-		Unit.Append( "" );
-	}
 	Unit.Append("$");
 	return Unit;
 }
@@ -333,19 +277,18 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 	{
 		Param_Name = Remove_Suffix( Param_Name_orig );
 	}
-	cout << Param_Name_orig << Param_Name << endl;
 	TString returnable_string;
 	if( Param_Name == "LLscan" ) {
 
-		returnable_string = "#Delta LL";
-	}
-	if( Param_Name == "gamma" ) {
+		returnable_string = "-#Delta Log Likelihood";
+
+	} else if( Param_Name == "gamma" ) {
 
 		returnable_string = "#Gamma";
 
 	} else if ( Param_Name == "deltaGamma" ) {
 
-		returnable_string = "#Delta#Gamma";
+		returnable_string = "#Delta#Gamma_{s}";
 
 	} else if ( Param_Name == "Azero_sq" ) {
 
@@ -771,5 +714,10 @@ TString EdStyle::Get_Suffix( TString arg )
 TString EdStyle::Remove_Suffix( TString arg )
 {
 	return Remove_Suffix( string( arg.Data() ) );
+}
+
+TLegend* EdStyle::LHCbLegend()
+{
+	return new TLegend( 0.75, 0.65, 0.9, 0.9 );
 }
 

@@ -1,10 +1,10 @@
-/**
-  @class PDFWithData
-
-  A class for creating/storing a PDF and its associated data set
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @date 2009-10-5
+/*!
+ * @class PDFWithData
+ *
+ * A class for creating/storing a PDF and its associated data set
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
  */
 
 //	RapidFit Headers
@@ -13,16 +13,14 @@
 //	System Headers
 #include <stdlib.h>
 #include <iostream>
+#include <sstream>
 
-using namespace std;
+using namespace::std;
 
-//Default constructor
-PDFWithData::PDFWithData() : fitPDF(NULL), inputBoundary(), parametersAreSet(false), dataProcessors(), dataSetMakers(), cached_data(), delete_data_decision(true)
-{
-}
-
-//Constructor with correct aruments
-PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig, vector< IPrecalculator* > InputPrecalculators ) : fitPDF(ClassLookUp::CopyPDF(InputPDF)), inputBoundary(InputBoundary),  parametersAreSet(false), dataProcessors(InputPrecalculators), dataSetMakers(DataConfig), cached_data(), delete_data_decision(true)
+//Constructor with correct arguments
+PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig ) :
+	fitPDF(ClassLookUp::CopyPDF(InputPDF)), inputBoundary(new PhaseSpaceBoundary(*InputBoundary)),  parametersAreSet(false),
+	dataSetMakers(DataConfig), cached_data(), useCache(false)
 {
 	if ( DataConfig.size() < 1 )
 	{
@@ -34,23 +32,20 @@ PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, v
 //Destructor
 PDFWithData::~PDFWithData()
 {
+	fitPDF->Can_Remove_Cache( true );
 	if( fitPDF != NULL ) delete fitPDF;
+	if( inputBoundary != NULL ) delete inputBoundary;
 	while( !dataSetMakers.empty() )
 	{
 		if( dataSetMakers.back() != NULL ) delete dataSetMakers.back();
 		dataSetMakers.pop_back();
 	}
-	//cout << "Hello from PDFWithData destructor" << endl;
+	this->ClearCache();
 }
 
 //Return the PDF
 IPDF * PDFWithData::GetPDF()
 {
-	if (!parametersAreSet)
-	{
-		cerr << "Warning: PDF parameters have not yet been set" << endl;
-	}
-	//return ClassLookUp::CopyPDF(fitPDF);
 	return fitPDF;
 }
 
@@ -62,9 +57,15 @@ void PDFWithData::AddCachedData( vector<IDataSet*> input_cache )
 	}
 }
 
-DataSetConfiguration* PDFWithData::GetDataSetConfig()
+void PDFWithData::AddCachedData( IDataSet* input_cache )
 {
-	return dataSetMakers[0];
+	cached_data.push_back( input_cache );
+}
+
+
+DataSetConfiguration* PDFWithData::GetDataSetConfig( int i )
+{
+	return dataSetMakers[(unsigned)i];
 }
 
 vector<DataSetConfiguration*> PDFWithData::GetAllDataSetConfigs()
@@ -72,9 +73,51 @@ vector<DataSetConfiguration*> PDFWithData::GetAllDataSetConfigs()
 	return dataSetMakers;
 }
 
-void PDFWithData::SetDelete( bool new_decision )
+void PDFWithData::ClearCache()
 {
-	delete_data_decision = new_decision;
+	while( !cached_data.empty() )
+	{
+		//cout << "Removing DataSet At: " << cached_data.back() << endl;
+		if( cached_data.back() != NULL ) delete cached_data.back();
+		cached_data.pop_back();
+	}
+}
+
+void PDFWithData::SetUseCache( bool input )
+{
+	useCache = input;
+}
+
+bool PDFWithData::GetUseCache() const
+{
+	return useCache;
+}
+
+vector<IDataSet*> PDFWithData::GetCacheList()
+{
+	return cached_data;
+}
+
+IDataSet* PDFWithData::GetFromCache( int request )
+{
+	if( (unsigned)request >= cached_data.size() ) return NULL;
+	else if( request < 0 ) return NULL;
+	else return cached_data[(unsigned)request];
+}
+
+void PDFWithData::RemoveFromCache( int request )
+{
+	if( request > 0 && (unsigned)request < cached_data.size() )
+	{
+		int i=0;
+		vector<IDataSet*>::iterator table_iter = cached_data.begin();
+		while( i != request )
+		{
+			++table_iter;
+			++i;
+		}
+		cached_data.erase( table_iter );
+	}
 }
 
 //Return the data set associated with the PDF
@@ -82,67 +125,85 @@ IDataSet * PDFWithData::GetDataSet()
 {
 	//Combine all data sources
 	IDataSet * newDataSet=NULL;
-	
-	if( cached_data.empty() )
+
+	//Right, the behaviour of this class has changed vastly from what  used to happen, but the external use if still the same.
+
+	//For any dataset NOT a File, calling this class generates a new dataset and passes a pointer
+
+	//For a FILE based dataset the dataset is loaded once, and then kept in memory until it's removed
+
+	/*!
+	 * This makes the Implcit assumption you don't mix File and Toy dataTypes!
+	 *
+	 * This may not be strictly true!
+	 */
+	if( dataSetMakers[0]->GetSource() == "File" ) useCache = true;
+
+	if( cached_data.empty() || !useCache )
 	{
 		newDataSet = dataSetMakers[0]->MakeDataSet( inputBoundary, fitPDF );
-		for (unsigned int sourceIndex = 1; sourceIndex < dataSetMakers.size(); ++sourceIndex )
+		for( unsigned int sourceIndex = 1; sourceIndex < dataSetMakers.size(); ++sourceIndex )
 		{
 			IDataSet * extraData = dataSetMakers[sourceIndex]->MakeDataSet( inputBoundary, fitPDF );
-			for (int dataIndex = 0; dataIndex < extraData->GetDataNumber(); ++dataIndex )
+			for( int dataIndex = 0; dataIndex < extraData->GetDataNumber(); ++dataIndex )
 			{
 				newDataSet->AddDataPoint( extraData->GetDataPoint(dataIndex) );
 			}
 			delete extraData;
 		}
-	} else {
-		newDataSet = cached_data.back();
-		//	Pop back?	Yes?	No?
-		//	I can't decide what the correct behaviour should be for 'cached data' I suppose it should still be kept
-		//	However, I am passing by pointer and cached data can be deleted by the calling function which makes any
-		//	future attempts to fit to this DANGEROUS so I remove any reference to it once I've fitted
-		//	This is contrary to the intent I think for RapidFit, but I wish to use this for FC and so it's
-		//	MUCH easier to re-use existing objects as much as possible.
-		if( delete_data_decision )
-		{
-			cached_data.pop_back();
-		}
-	}
 
-	//Precalculation, if required
-	for (unsigned int precalculatorIndex = 0; precalculatorIndex < dataProcessors.size(); ++precalculatorIndex )
+		cached_data.push_back( newDataSet );
+	}
+	else
 	{
-		IDataSet * oldDataSet = newDataSet;
-		newDataSet = dataProcessors[precalculatorIndex]->ProcessDataSet(oldDataSet);
-		delete oldDataSet;
+		newDataSet = cached_data.back();
 	}
 
-	cout << "DataSet contains " << newDataSet->GetDataNumber() << " events\n" << endl;
+	cout << "DataSet contains " << newDataSet->GetDataNumber() << " events" << endl;
+	//cout << "Providing DataSet At: " << newDataSet << endl;
+
 	return newDataSet;
 }
 
 //Set the physics parameters of the PDF
-bool PDFWithData::SetPhysicsParameters( vector<ParameterSet*> NewParameters )
+bool PDFWithData::SetPhysicsParameters( ParameterSet* NewParameters )
 {
 	//	I am in the process of adding more flexibility to the RapidFit structure
 	//	As such this requires that the Paramaters from the XML be passed in vectors
 	//	I will update this function in time to stop refering to just the first element it sees
-	
+
 	//Set the parameters for the stored PDF and all data set makers
-	bool success = fitPDF->SetPhysicsParameters(NewParameters.back());
+	fitPDF->UpdatePhysicsParameters( NewParameters );
 	for (unsigned int dataIndex = 0; dataIndex < dataSetMakers.size(); ++dataIndex )
 	{
-		success &= dataSetMakers[dataIndex]->SetPhysicsParameters(NewParameters);
+		dataSetMakers[dataIndex]->SetPhysicsParameters( NewParameters );
+	}
+	return true;
+}
+
+void PDFWithData::Print() const
+{
+	cout << "PDFWithData information:" << endl;
+	cout << "This is to be coded up when needed" << endl;
+}
+
+string PDFWithData::XML() const
+{
+	stringstream xml;
+
+	xml << "<ToFit>" << endl;
+
+	xml << fitPDF->XML() << endl;
+
+	for( vector<DataSetConfiguration*>::const_iterator set_i = dataSetMakers.begin(); set_i != dataSetMakers.end(); ++set_i )
+	{
+		xml << endl;
+		xml << (*set_i)->XML() << endl;
+		xml << endl;
 	}
 
-	if (success)
-	{
-		parametersAreSet = true;
-		return true;
-	}
-	else
-	{
-		cerr << "Failed to set PDF parameters in initialisation" << endl;
-		exit(1);
-	}
+	xml << "</ToFit>" << endl;
+
+	return xml.str();
 }
+

@@ -85,73 +85,73 @@ void MinuitWrapper::SetOutputLevel( int output_level )
 	} else {
 		minuit->mnexcm("SET PRINT", &arg, 1, err);
 	}
-//	minuit->SetPrintLevel( print_verbosity );
+	//	minuit->SetPrintLevel( print_verbosity );
 }
 
 void MinuitWrapper::SetupFit( FitFunction* NewFunction )
 {
-        function = NewFunction;
-        int errorFlag = 0;
-        double arguments[2] = {0.0, 0.0};
-        
-        //Set the function
-        minuit->SetFCN( &MinuitWrapper::Function );
-                
-        //Store the parameters
-        ParameterSet * newParameters = NewFunction->GetParameterSet();
-        vector<string> allNames = newParameters->GetAllNames();
+	function = NewFunction;
+	int errorFlag = 0;
+	double arguments[2] = {0.0, 0.0};
 
-        for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
-        {
-                PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
+	//Set the function
+	minuit->SetFCN( &MinuitWrapper::Function );
 
-                double STEP_SIZE= 0.01;
-                if( !( fabs( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE  ) ){
-                        STEP_SIZE = fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
-                }
+	//Store the parameters
+	ParameterSet * newParameters = NewFunction->GetParameterSet();
+	vector<string> allNames = newParameters->GetAllNames();
 
-                if( newParameter->GetStepSize() > 0 ) { STEP_SIZE = newParameter->GetStepSize(); };
+	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
+	{
+		PhysicsParameter * newParameter = newParameters->GetPhysicsParameter( allNames[nameIndex] );
 
-                newParameter->SetStepSize( STEP_SIZE );
-        
-                //cout << "STEP SIZE:" << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
-        
-                //Make bounded or unbounded parameters
-                if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
-                {
-                        minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE, 0.0, 0.0, errorFlag);
-                }
-                else 
-                {
-                        minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE,
-                                        newParameter->GetMinimum(), newParameter->GetMaximum(), errorFlag);
-                }
-                
-                //Fix the parameter if required 
-                if ( newParameter->GetType() == "Fixed" )
-                {       
-                        minuit->FixParameter( nameIndex );
-                }
-                else
+		double STEP_SIZE= 0.01;
+		if( !( fabs( newParameter->GetMaximum() - newParameter->GetMinimum() ) < DOUBLE_TOLERANCE  ) ){
+			STEP_SIZE = fabs((newParameter->GetMaximum() - newParameter->GetMinimum()))/10000.0;
+		}
+
+		if( newParameter->GetStepSize() > 0 ) { STEP_SIZE = newParameter->GetStepSize(); };
+
+		newParameter->SetStepSize( STEP_SIZE );
+
+		//cout << "STEP SIZE:" << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
+
+		//Make bounded or unbounded parameters
+		if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
+		{
+			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE, 0.0, 0.0, errorFlag);
+		}
+		else 
+		{
+			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE,
+					newParameter->GetMinimum(), newParameter->GetMaximum(), errorFlag);
+		}
+
+		//Fix the parameter if required 
+		if ( newParameter->GetType() == "Fixed" )
+		{       
+			minuit->FixParameter( nameIndex );
+		}
+		else
 		{
 			//	Released on Construction
 			//minuit->Release( nameIndex );
-                }
-        }
-        
-        //      Syntax for Minuit Commands through the TMinuit Class:
-        //
-        //      minuit->mnexcm("SOMECOMMAND",&SOMEARGUMENTS,NUMBEROFARGUMENTS,ERRORFLAG);
-        
-        //      Set the error analysis
-        arguments[0] = NewFunction->UpErrorValue(1);
-        minuit->mnexcm("SET ERR", arguments, 1, errorFlag);
+		}
+	}
 
-        //      Set Migrad Strategy 2
-        arguments[0] = Quality;//1;
-        minuit->mnexcm("SET STR", arguments, 1, errorFlag);
+	//      Syntax for Minuit Commands through the TMinuit Class:
+	//
+	//      minuit->mnexcm("SOMECOMMAND",&SOMEARGUMENTS,NUMBEROFARGUMENTS,ERRORFLAG);
 
-        minuit->mnexcm("SET NOGradient", arguments, 0, errorFlag);
+	//      Set the error analysis
+	arguments[0] = NewFunction->UpErrorValue(1);
+	minuit->mnexcm("SET ERR", arguments, 1, errorFlag);
+
+	//      Set Migrad Strategy 2
+	arguments[0] = Quality;//1;
+	minuit->mnexcm("SET STR", arguments, 1, errorFlag);
+
+	minuit->mnexcm("SET NOGradient", arguments, 0, errorFlag);
 }
 
 FitFunction* MinuitWrapper::GetFitFunction()
@@ -175,8 +175,8 @@ void MinuitWrapper::FixParameters( vector<double> fix_values, vector<string> Par
 //Use Migrad to minimise the given function
 void MinuitWrapper::Minimise()
 {
-        int errorFlag = 0;
-        double arguments[2] = {0.0, 0.0};
+	int errorFlag = 0;
+	double arguments[2] = {0.0, 0.0};
 	vector<string> allNames = function->GetParameterSet()->GetAllNames();
 	ParameterSet * newParameters = function->GetParameterSet();
 
@@ -208,6 +208,13 @@ void MinuitWrapper::Minimise()
 		//minuit->mnexcm("HESSE", arguments, 2, errorFlag);
 	}
 
+	string SetEPS("EPS3");
+	if( StringProcessing::VectorContains( &Options, &SetEPS ) != -1 )
+	{
+		arguments[0] = 1E-5;
+		minuit->mnexcm("SET EPS", arguments, 1, errorFlag);
+	}
+
 	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
 	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
 
@@ -217,8 +224,8 @@ void MinuitWrapper::Minimise()
 	//Apply an improve step
 	//arguments[0] = maxSteps;
 	//minuit->mnexcm("IMPROVE", arguments, 2, errorFlag);
-	
-	
+
+
 	string NoHesse("NoHesse");
 	if( StringProcessing::VectorContains( &Options, &NoHesse ) == -1 )
 	{
@@ -264,8 +271,7 @@ void MinuitWrapper::Minimise()
 
 		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-				oldParameter->GetMinimum(), oldParameter->GetMaximum(), oldParameter->GetStepSize(),
-				oldParameter->GetType(), oldParameter->GetUnit() );
+				xlolim, xuplim, oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 
 	// Get the error matrix and construct a vector containing the correlation coefficients
@@ -275,14 +281,14 @@ void MinuitWrapper::Minimise()
 	//	I'm taking the approach once used by Pete to solve annoying problems:
 	//
 	//	A beer to whoever can fix this!		rob.currie@ed.ac.uk
-
+	
 	Double_t matrix[numParams][numParams];
 
-//	Double_t** matrix = new Double_t*[numParams];
-//	for( short int i=0; i < numParams; ++i )
-//		matrix[i] = new Double_t[numParams];
+	//	Double_t** matrix = new Double_t*[numParams];
+	//	for( short int i=0; i < numParams; ++i )
+	//		matrix[i] = new Double_t[numParams];
 	gMinuit->mnemat(&matrix[0][0],numParams);
-	
+
 	vector<double> covarianceMatrix(unsigned(numParams*(numParams+1)/2));
 	for (int row = 0; row < numParams; ++row)
 	{
@@ -293,9 +299,9 @@ void MinuitWrapper::Minimise()
 		}
 	}
 
-//	for( short int i=0; i< numParams; ++i )
-//		delete[] matrix[i];
-//	delete[] matrix;
+	//	for( short int i=0; i< numParams; ++i )
+	//		delete[] matrix[i];
+	//	delete[] matrix;
 
 	//Make the contour plots
 	vector< FunctionContour* > allContours;
@@ -365,11 +371,15 @@ void MinuitWrapper::Minimise()
 }
 
 //The function to pass to Minuit
-void MinuitWrapper::Function( int & npar, double * grad, double & fval, double * xval, int iflag )
+void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Double_t * xval, Int_t iflag )
 {
 	(void) npar;		//	Number of Free Parameters
 	(void) grad;		//	Gradient in each Parameter
-	(void) iflag;		//	flag for stuff... check this for using derrivatives
+	(void) iflag;		//	flag for stuff... check this for using derivatives
+
+	
+	//	Very useful code for vry indepth debugging, I advise this be left in to help diagnose FitFunction behaviour!
+	//
 	//cout << npar << "\t" << iflag << endl;
 	//
 	//for( int i=0; i< npar; ++i )
@@ -377,17 +387,23 @@ void MinuitWrapper::Function( int & npar, double * grad, double & fval, double *
 	//	cout << grad[i] << "\t" << xval[i] << endl;
 	//}
 
-	ParameterSet * temporaryParameters = function->GetParameterSet();
-	
-	if ( temporaryParameters->SetPhysicsParameters(xval) )
+	//for( int i=0; i< npar; ++i )
+	//{
+	//	cout << xval[i] << "  " << ((double*)xval)[i] << endl;
+	//}
+
+	ParameterSet* test = new ParameterSet( *( function->GetParameterSet() ) );
+	test->SetTrusted( true );
+	if ( test->SetPhysicsParameters( (double*)xval ) == true )
 	{
-		function->SetParameterSet(temporaryParameters);
+		function->SetParameterSet( test );
 		fval = function->Evaluate();
 	}
 	else
 	{
 		cerr << "Failed to set physics parameters" << endl;
 	}
+	delete test;
 }
 
 //Return the result of minimisation
@@ -401,3 +417,4 @@ void MinuitWrapper::ContourPlots( vector< pair< string, string > > ContourParame
 {
 	contours = ContourParameters;
 }
+

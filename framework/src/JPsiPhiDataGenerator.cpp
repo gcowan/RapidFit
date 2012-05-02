@@ -10,12 +10,6 @@
 //	RapidFit Headers
 #include "JPsiPhiDataGenerator.h"
 
-//Default constructor
-JPsiPhiDataGenerator::JPsiPhiDataGenerator()
-{
-	moreThanMaximum = 0.11;
-}
-
 //Constructor with correct argument
 JPsiPhiDataGenerator::JPsiPhiDataGenerator( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : AcceptReject( NewBoundary, NewPDF )
 {

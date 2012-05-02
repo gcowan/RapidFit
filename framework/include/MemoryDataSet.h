@@ -1,12 +1,13 @@
 /**
-        @class MemoryDataSet
+  @class MemoryDataSet
 
-        A data set which simply stores a vector of pointers to datapoint objects
+  A data set which simply stores a vector of pointers to datapoint objects
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+  */
 
+#pragma once
 #ifndef MEMORY_DATA_SET_H
 #define MEMORY_DATA_SET_H
 
@@ -16,31 +17,39 @@
 //	System Headers
 #include <vector>
 
-using namespace std;
+using namespace::std;
 
 class MemoryDataSet : public IDataSet
 {
 	public:
-		MemoryDataSet();
 		MemoryDataSet( PhaseSpaceBoundary* );
 		~MemoryDataSet();
 
 		//Interface functions
-		virtual DataPoint * GetDataPoint(int);
+		virtual DataPoint * GetDataPoint(int) const;
 		virtual void ReserveDataSpace( int numberOfPoints );
 		virtual bool AddDataPoint( DataPoint* );
-		virtual int GetDataNumber();
-		virtual PhaseSpaceBoundary * GetBoundary();
+		virtual int GetDataNumber() const;
+		virtual PhaseSpaceBoundary * GetBoundary() const;
 
 		virtual void SortBy( string );
 
+		virtual vector<DataPoint*> GetDiscreteSubSet( vector<string> discreteParam, vector<double> discreteVal );
+
 		void Clear();
+
+		virtual void Print();
+
+		/*!                      
+		 * @brief Returns an estimate of the total Yield
+		 */                      
+		virtual int Yield();
 
 	private:
 		//	Uncopyable!
 		MemoryDataSet ( const MemoryDataSet& );
 		MemoryDataSet& operator = ( const MemoryDataSet& );
-		vector<DataPoint> allData;
+		vector<DataPoint*> allData;
 		PhaseSpaceBoundary * dataBoundary;
 
 };
@@ -48,3 +57,4 @@ class MemoryDataSet : public IDataSet
 bool compare_datapoints ( pair<DataPoint,pair<string,int> > first, pair<DataPoint,pair<string,int> > second );
 
 #endif
+

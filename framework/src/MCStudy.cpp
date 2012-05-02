@@ -12,28 +12,41 @@
 
 using namespace::std;
 
-//	Default
-MCStudy::MCStudy() : input_xml(NULL), events_to_step_over(), num_repeats(), CommandLineParams(), StartingEntries(), ALL_Fit_Results(NULL), PhysParams()
-{}
-
 //	Destructor
 MCStudy::~MCStudy()
 {
-	if( ALL_Fit_Results != NULL ) delete ALL_Fit_Results;
 }
 
 //	XML Constructor
-MCStudy::MCStudy( XMLConfigReader* new_input_xml ) : input_xml( new_input_xml ), events_to_step_over( new_input_xml->GetAllDataSetSizes() ), num_repeats( new_input_xml->GetNumberRepeats() ), CommandLineParams(), StartingEntries( new_input_xml->GetAllStartEntries() ), ALL_Fit_Results(NULL), PhysParams()
-{}
+MCStudy::MCStudy( XMLConfigReader* new_xmlConfig ) :
+IStudy(), events_to_step_over( new_xmlConfig->GetAllDataSetSizes() ), CommandLineParams(), StartingEntries( new_xmlConfig->GetAllStartEntries() ), PhysParams()
+{
+	xmlConfig = new_xmlConfig;
+	numberStudies = xmlConfig->GetNumberRepeats();
+	theMinimiser = xmlConfig->GetMinimiserConfiguration();
+	theFunction = xmlConfig->GetFitFunctionConfiguration();
+	studyParameters = xmlConfig->GetFitParameters( CommandLineParams );
+	allConstraints = xmlConfig->GetConstraints();
+	delete_objects = true;
+}
 
 //	XML Constructor with events_to_step_over, num_repeats & starting_entry defined
-MCStudy::MCStudy( XMLConfigReader* new_input_xml, vector<int> new_events_to_step_over, int new_num_repeats, vector<int> starting_entries ) : input_xml( new_input_xml ), events_to_step_over( new_events_to_step_over ), num_repeats( new_num_repeats ), CommandLineParams(), StartingEntries( starting_entries ), ALL_Fit_Results(NULL), PhysParams()
-{}
+MCStudy::MCStudy( XMLConfigReader* new_xmlConfig, vector<int> new_events_to_step_over, int new_num_repeats, vector<int> starting_entries ) :
+IStudy(), events_to_step_over( new_events_to_step_over ), CommandLineParams(), StartingEntries( starting_entries ), PhysParams()
+{
+	xmlConfig = new_xmlConfig;
+	numberStudies = new_num_repeats;
+	theMinimiser = xmlConfig->GetMinimiserConfiguration();
+	theFunction = xmlConfig->GetFitFunctionConfiguration();
+	studyParameters = xmlConfig->GetFitParameters( CommandLineParams );
+	allConstraints = xmlConfig->GetConstraints();
+	delete_objects = true;
+}
 
 //	Set the number of repeats
 void MCStudy::SetNumRepeats( int new_num_repeats )
 {
-	num_repeats = new_num_repeats;
+	numberStudies = new_num_repeats;
 }
 
 //	Set the number of repeats
@@ -60,17 +73,17 @@ void MCStudy::SetCommandLineParams( vector<string> new_CommandLineParams )
 }
 
 //	Perform the Study
-void MCStudy::DoWholeStudy()
+void MCStudy::DoWholeStudy( int OutputLevel )
 {
 	//		THIS WILL NEED TO BE CHANGED IF WE MOVE TO MULTIPLE PARAMETERSETS IN THE XML STRUCTURE
-	ALL_Fit_Results = new FitResultVector( input_xml->GetFitParameters( CommandLineParams )[0]->GetAllNames() );
+	allResults = new FitResultVector( xmlConfig->GetFitParameters( CommandLineParams )->GetAllNames() );
 
-	if( ( StartingEntries.size() != 1) && ( StartingEntries.size() != input_xml->GetAllStartEntries().size() ) )
+	if( ( StartingEntries.size() != 1) && ( StartingEntries.size() != xmlConfig->GetAllStartEntries().size() ) )
 	{
 		cerr << "The number of Starting Entries passed is neither 1 nor same as the number present in the XML" << endl;
 		cerr << "I dont' know what to do!" << endl;	return;
 	}
-	if( ( events_to_step_over.size() != 1) && ( events_to_step_over.size() != input_xml->GetAllDataSetSizes().size()))
+	if( ( events_to_step_over.size() != 1) && ( events_to_step_over.size() != xmlConfig->GetAllDataSetSizes().size()))
 	{
 		cerr << "The number of Step_Sizes passed is neither 1 nor the same as the number present in the XML" <<endl;
 		cerr << "I don't know what to do!" << endl;	return;
@@ -80,7 +93,7 @@ void MCStudy::DoWholeStudy()
 		cerr << "Sorry don't quite know how this happened!" << endl; return;
 	}
 
-	for( int i=0; i < num_repeats; ++i )
+	for( int i=0; i < numberStudies; ++i )
 	{
 		vector<int> local_Start_entries;
 		vector<int>::iterator start_i=StartingEntries.begin();
@@ -99,28 +112,26 @@ void MCStudy::DoWholeStudy()
 
 		if( StartingEntries.size() == 1 )
 		{
-			for( unsigned int i=0; i < input_xml->GetAllDataSetSizes().size(); ++i )
+			for( unsigned int i=0; i < xmlConfig->GetAllDataSetSizes().size(); ++i )
 			{
 				local_Start_entries.push_back( local_Start_entries[0] );
 			}
 		}
 
-		vector<PDFWithData*> local_PDF_w_Data = input_xml->GetPDFsAndData( local_Start_entries );
+		vector<PDFWithData*> local_PDF_w_Data = xmlConfig->GetPDFsAndData( local_Start_entries );
 
-		ALL_Fit_Results->StartStopwatch();
+		allResults->StartStopwatch();
 
-		FitResult * newResult = FitAssembler::DoSafeFit( input_xml->GetMinimiserConfiguration(), input_xml->GetFitFunctionConfiguration(), input_xml->GetFitParameters( CommandLineParams ), local_PDF_w_Data, input_xml->GetConstraints() );
+		FitResult * newResult = FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, local_PDF_w_Data, allConstraints, OutputLevel );
 
-		ALL_Fit_Results->AddFitResult( newResult );
+		allResults->AddFitResult( newResult );
 
 	}
 
 }
 
-
 FitResultVector* MCStudy::GetStudyResult()
 {
-	return ALL_Fit_Results;
+	return allResults;
 }
-
 

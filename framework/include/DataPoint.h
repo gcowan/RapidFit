@@ -1,55 +1,299 @@
-/**
-        @class DataPoint
+/*!
+ * @class DataPoint
+ *
+ * @brief Holds all observables for a given event
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ */
 
-        Holds all observables for a given event
-
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
-
-
+#pragma once
 #ifndef DATA_POINT_H
 #define DATA_POINT_H
 
-//	RapidFit Headers
+///	RapidFit Headers
 #include "Observable.h"
 #include "ObservableRef.h"
-//	System Headers
+#include "PseudoObservable.h"
+///	System Headers
 #include <vector>
 #include <string>
 
-using namespace std;
+using namespace::std;
+
+class PhaseSpaceBoundary;
 
 class DataPoint
 {
 	public:
+		/*!
+		 * @brief Default Constructor Required for Sorting
+		 */
 		DataPoint();
-		DataPoint( vector<string> );
+
+		/*!
+		 * @brief Correct Copy Constructor for DataPoints
+		 */
+		DataPoint( const DataPoint& );
+
+		/*!
+		 * @brief Correct Constructor which contains the name of all of the observables the class knows about
+		 *
+		 * @param Names   These are the names of the Observables that should exist within this DataPoint
+		 */
+		DataPoint( vector<string> Names);
+
+		/*!
+		 * @brief Destructor for the DataPoint
+		 */
 		~DataPoint();
 
-		vector<string> GetAllNames();
-		Observable * GetObservable( pair<string,int>* );	//  Return wanted parameter & cache lookup ref
-		Observable * GetObservable( string const );
-		Observable * GetObservable( ObservableRef& );
+		/*!
+		 * @brief Get the list names of all of the Observables contained in this DataPoint
+		 *
+		 * @return Returns a list of the names of all of the Observables in this DataPoint
+		 */
+		vector<string> GetAllNames() const;
 
-		//	Pseudo-Observable functions which return an Observable or create one using the given dependency and relation
-		//	Useful as once th observable is created it's permenantly stored in the DataPoint and the result is cached
-		//	This is intended to reduce the number of angular calculations by effectivley pre-processing the dataset
-		Observable* GetPseudoObservable( ObservableRef&, string, double (*pseudoRelation)(vector<double>) );
-		Observable* GetPseudoObservable( ObservableRef&, string, pair<double,double> (*pseudoRelation)(vector<double>) );
 
-		bool SetObservable( string, Observable* );
-		bool SetObservable( const string, const double, const double, const string, const bool=false, const int=-1);
+		/*!
+		 * @brief This returns the Observable Requested by location
+		 *
+		 * @param Input   This is the location of the Observable in the list of Obseravbles in this DataPoint
+		 *
+		 * @return returns the Observable at the requested DataPoint, NULL if out of range
+		 */
+		Observable* GetObservable( unsigned int Input ) const;
 
-		//	Wanted for sorting datapoints
-		bool operator() ( pair<DataPoint , pair<string,int> >, pair<DataPoint , pair<string,int> > );
+		/*!
+		 * @brief This returns the Observable Requested by the Name and stores the location
+		 *
+		 * @param Input    This contains the Name of the Requested Observable and will store the position of the Observable once it's been found for future reference
+		 *
+		 * @return returns the Observable with the requested Name, or at the given location if it's already been found once before and it's location stored
+		 */
+		Observable* GetObservable( pair<string,int>* Input ) const;
+
+		/*!
+		 * @brief This returns the Observable Requested by the Name
+		 *
+		 * This used to cause the most CPU to be spent in RapidFit before intelligent Caching was coded up
+		 *
+		 * @param Name   This contains the Name of the Observable being Requested
+		 *
+		 * @return returns the Observable with the requested Name
+		 */
+		Observable* GetObservable( const string Name ) const;
+
+		/*!
+		 * @brief This returns the Observable Requested by the Name and stores the location
+		 *
+		 * @param NameRef  This object stored the Name of the object and returns it when requested or the object is cast to a string
+		 *                 ObservableRef wraps the caching into a transparent object better than using the pair or string methods
+		 *
+		 * @return returns the Observable with the requested Name, or at the given location if it's already been found once before and it's location stored
+		 */
+		Observable* GetObservable( const ObservableRef& NameRef ) const;
+
+		/*!
+		 * @brief Remove the requested Observable
+		 *
+		 * @param Name   Name of the Observable to remove
+		 *
+		 * @return Void
+		 */
+		void RemoveObservable( const string Name );
+
+		/*!
+		 *	Pseudo-Observable function which returns an Observable or creates one using the given dependency and relation
+		 *	Useful as once th observable is created it's permanently stored in the DataPoint and the result is cached
+		 *	This is intended to reduce the number of angular calculations by effectively pre-processing the dataset
+		 */
+
+		/*!
+		 * @brief This allows you to add a new Psuedo-Observable to this DataPoint, useful when you have a per-event complex object which you don't want to calculate multiple times
+		 *
+		 * @param Input    This is the new PseudoObservable class which allows for all of the information required to be wrapped up in a convenient wrapper
+		 *
+		 * @return returns a pointer to an observable which can be interrogated in exactly the same way as a normal Observable object
+		 */
+		Observable* GetPseudoObservable( PseudoObservable& Input );
+
+		/*!
+		 * @brief Remove all stored Pseudo-Observable Objects
+		 *
+		 * Removes all Pseudo-Observables Stored in this DataPoint
+		 *
+		 * @return Void
+		 */
+		void ClearPsuedoObservable();
+
+		/*!
+		 * @brief Adds an Observable to This DataPoint
+		 *
+		 * This will Add or Alter an internal DataPoint according to the given Input
+		 *
+		 * @param Name    This is the Name of the Observable you want to add
+		 *
+		 * @param Input   This is a pointer to the Observable you want to add
+		 *
+		 * @return Void
+		 */
+		void AddObservable( string Name, Observable* Input );
+
+		/*!
+		 * @brief Adds an Observable to This DataPoint
+		 *
+		 * This will Add or Alter an internal DataPoint according to the given values
+		 *
+		 * @param Name     Name of the New observable we want to add
+		 *
+		 * @param Value    The Value we want it to take
+		 *
+		 * @param Error    The Error we want it to have
+		 *
+		 * @param Unit     The corresponding Unit
+		 *
+		 * @param trusted  Is this trusted? i.e. Do we know the parameter to already exist in the DataPoint (possibly as a NULL parameter in a default DataPoint)
+		 *
+		 * @param position If this is trusted use this position to save performing a lookup of known DataPoints
+		 *
+		 * @return Void
+		 */
+		void AddObservable( string Name, double Value, double Error, string Unit, bool trusted = false, int position = -1 );
+	
+		/*!
+		 * @brief Set an internal Observable of the given name to be equal to this Observable
+		 *
+		 * This WILL NOT add an observable to the DataPoint if one does not exist with the given name
+		 *
+		 * @param Name     This is the Name of the Observable we want to set
+		 *
+		 * @oaram Input    This is the Observable we want to replace the internal Observable for
+		 *
+		 * @return boolean, true is successful, false if not
+		 */
+		bool SetObservable( string Name, Observable* Input );
+
+		/*!
+		 * @brief Set the internal Observable using the given values
+		 *
+		 * This WILL NOT add an observable to the DataPoint if one does not exist with the given name
+		 *
+		 * @param Name     Name of the New observable we want to add                                                
+                 *                                                 
+                 * @param Value    The Value we want it to take    
+                 *                                                 
+                 * @param Error    The Error we want it to have    
+                 *                                                 
+                 * @param Unit     The corresponding Unit          
+                 *                                                 
+                 * @param trusted  Is this trusted? i.e. Do we know the parameter to already exist in the DataPoint (possibly as a NULL parameter in a default DataPoint)
+                 *                                                 
+                 * @param position If this is trusted use this position to save performing a lookup of known DataPoints
+		 *
+		 * @return boolean, true is sucessful, false if not
+		 */
+		bool SetObservable( string Name, double Value, double Error, string Unit, bool trusted =false, int position =-1 );
+
+		/*!
+		 * @brief Wanted for sorting DataPoints
+		 *
+		 * This allows you to sort the DataSet in one Observable if you need to
+		 *
+		 * @return true/false result of a comparison
+		 */
+		bool operator() ( pair<DataPoint* , pair<string,int> >, pair<DataPoint* , pair<string,int> > );
+
+		/*!
+		 * @brief Output some debugging info
+		 *
+		 * @return Void
+		 */
+		void Print() const;
+
+		/*!
+		 * @brief Get a Pointer to the PhaseSpaceBoundary that the DataPoint exists in
+		 *
+		 * @return Returns a Pointer to the PhaseSpace this DataPoint exists within
+		 */
+		PhaseSpaceBoundary* GetPhaseSpaceBoundary() const;
+
+		/*!
+		 * @brief Set the Pointer to the PhaseSpaceBoundary
+		 *
+		 * This allows you to change the PhaseSpace associated with this DataPoint
+		 *
+		 * @param Input   New PhaseSpace to be associate with this DataPoint
+		 *
+		 * @return Void
+		 */
+		void SetPhaseSpaceBoundary( PhaseSpaceBoundary* Input );
+
+		/*!
+		 *
+		 */
+		int GetDiscreteIndex() const;
+
+		/*!
+		 *
+		 */
+		void SetDiscreteIndex( int );
 
 	private:
-		vector<Observable> allObservables;
+		/*!
+		 * Don't Copy the class this way!
+		 */
+		DataPoint& operator= ( const DataPoint& );
+
+
+
+		/*!
+		 *	This is REAL Data i.e. it was read in from a file
+		 */
+
+		/*!
+		 * A list of pointers to all of the Observables in this DataPoint
+		 */
+		vector<Observable*> allObservables;
+
+		/*!
+		 * A list of the names of all of the Observables in this DataPoint
+		 */
 		vector<string> allNames;
 
+
+
+		/*!
+		 *	This is Pseudo-Data i.e. it only varies event to event but it has been calculated at runtime
+		 */
+
+		/*!
+		 * A list of the names of the pseudo-Observables that exist in this DataPoint
+		 */
 		vector<string> allPseudoNames;
-		vector<Observable> allPseudoObservables; 
+
+
+		/*!
+		 * A list of pointers to the pseudo-Observables that exist in the DataPoint
+		 */
+		vector<PseudoObservable*> allPseudoObservables; 
+
+
+
+
+
+		/*!
+		 * This is a pointer to the PhaseSpaceBoundary that this datapoint has been defined in
+		 * DataPoints do NOT have control over this class and don't check that ths pointer is valid
+		 */
+		PhaseSpaceBoundary* myPhaseSpaceBoundary;
+
+		/*!
+		 *
+		 */
+		int thisDiscreteIndex;
 };
 
 #endif
+

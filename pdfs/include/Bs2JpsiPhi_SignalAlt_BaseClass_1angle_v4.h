@@ -11,25 +11,11 @@
 #ifndef Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4_H
 #define Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4_H
 
-#ifndef __CINT__
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
 #include "SlicedAcceptance.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/BasePDF.h"
-#include "framework/include/PDFConfigurator.h"
-#include "framework/include/SlicedAcceptance.h"
-#endif
 
-#ifndef __CINT__
 #include "Mathematics.h"
-#endif
-#ifdef __CINT__
-#include "framework/include/Mathematics.h"
-#endif
-
-#include "RooComplex.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -52,15 +38,15 @@
 class Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4  :  public BasePDF 
 {
 	public:
-		Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4(PDFConfigurator);
+		Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4(PDFConfigurator* );
 		virtual ~Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4();
 		virtual bool SetPhysicsParameters(ParameterSet*);
 
 	protected:
 
 	        //      Uncopyable!
-		Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4 ( const Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4& );
-		Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4& operator = ( const Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4& );
+		//Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4 ( const Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4& );
+		//Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4& operator = ( const Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4& );
 
 		//PELC For debugging purposes
 		//TH1D * histOfPdfValues ;
@@ -173,7 +159,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4  :  public BasePDF
 		vector< vector<double> > storeExpSin;
 		vector< vector<double> > storeExpCos;
 		void CacheTimeIntegrals() ;
-		void deCacheTimeIntegrals( int ires, int islice ) ;
+		void deCacheTimeIntegrals( unsigned int ires, unsigned int islice ) ;
 	
 	
 	
@@ -274,7 +260,7 @@ class Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4  :  public BasePDF
 		double diffXsec(  )  const ;   	
 		double diffXsecTimeOnly(  ) const ;
 		double diffXsecNorm1(  ) const ;
-		double diffXsecCompositeNorm1( int resolutionIndex )  ;
+		double diffXsecCompositeNorm1( unsigned int resolutionIndex )  ;
 
 		bool normalisationCacheValid ;
 		double normalisationCacheValue[3] ;

@@ -23,7 +23,7 @@ class Bs2JpsiPhiMassSignal : public BasePDF
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
+		virtual double Normalisation(PhaseSpaceBoundary*);
 
 	private:
 		void MakePrototypes();
@@ -39,3 +39,4 @@ class Bs2JpsiPhiMassSignal : public BasePDF
 };
 
 #endif
+

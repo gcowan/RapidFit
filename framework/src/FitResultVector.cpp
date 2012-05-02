@@ -13,11 +13,6 @@
 //	System Headers
 #include <iostream>
 
-//Default constructor
-FitResultVector::FitResultVector() : allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
-{
-}
-
 //  Constructor to Return a single array from multiple arrays
 FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
 {
@@ -196,6 +191,12 @@ int FitResultVector::NumberResults()
 {
 	return int(allResults.size());
 }
+
+unsigned int FitResultVector::size()
+{
+	return (unsigned)allResults.size();
+}
+
 FitResult * FitResultVector::GetFitResult( int Index )
 {
 	if ( Index < int(allResults.size()) )
@@ -205,7 +206,7 @@ FitResult * FitResultVector::GetFitResult( int Index )
 	else
 	{
 		cerr << "Index (" << Index << ") out of range" << endl;
-		return new FitResult();
+		return NULL;
 	}
 }
 double FitResultVector::GetRealTime( int Index )
@@ -274,12 +275,16 @@ vector<double> FitResultVector::GetFlatResult( int Index )
 	for(unsigned int i = 0; i<allNames.size(); ++i)
 	{
 		Flatresult.push_back( (allValues[i][unsigned(Index)]) );
-		Flatresult.push_back( (allErrors[i][unsigned(Index)]) );
-		Flatresult.push_back( (allPulls[i][unsigned(Index)]) );
-		Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetMinimum() ) );
-		Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetMaximum() ) );
-		Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetStepSize() ) );
-		Flatresult.push_back( (allGenValues[i][unsigned(Index)]) );
+		if( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetType() != "Fixed") || allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetScanStatus() )
+		{
+			Flatresult.push_back( (allErrors[i][unsigned(Index)]) );
+			Flatresult.push_back( (allPulls[i][unsigned(Index)]) );
+			Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetMinimum() ) );
+			Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetMaximum() ) );
+			Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetStepSize() ) );
+			Flatresult.push_back( (allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetOriginalValue() ) );
+		}
+		Flatresult.push_back( ( allResults[(unsigned)Index]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetScanStatus() ? 1.0 : 0.0 ) );
 	}
 
 	Flatresult.push_back(allRealTimes[unsigned(Index)]);
@@ -296,14 +301,27 @@ TString FitResultVector::GetFlatResultHeader()
 	{
 		TString name = allNames[i];
 		header += name + "_value:";
-		header += name + "_error:";
-		header += name + "_pull:";
-		header += name + "_min:";
-		header += name + "_max:";
-		header += name + "_step:";
-		header += name + "_gen:";
+		if( (allResults[ 0 ]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetType() != "Fixed" ) || allResults[ 0 ]->GetResultParameterSet()->GetResultParameter(allNames[i])->GetScanStatus() )
+		{
+			header += name + "_error:";
+			header += name + "_pull:";
+			header += name + "_min:";
+			header += name + "_max:";
+			header += name + "_step:";
+			header += name + "_gen:";
+		}
+		header += name + "_scan:";
 	}
 	header += "Fit_RealTime:Fit_CPUTime:Fit_Status:NLL";
 	return header;
+}
+
+void FitResultVector::Print() const
+{
+	cout << "FitResultVector:" << endl;
+	for( vector<FitResult*>::const_iterator result_i = allResults.begin(); result_i != allResults.end(); ++result_i )
+	{
+		(*result_i)->Print();
+	}
 }
 

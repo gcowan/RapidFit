@@ -1,11 +1,11 @@
-/**
-  @class DataSetConfiguration
-
-  A class for holding the data to create a data set, and creating that data set when requested
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @author Greig A Cowan greig.cowan@cern.ch
-  @data 2009-12-16
+/*!
+ * @class DataSetConfiguration
+ *
+ * A class for holding the data to create a data set, and creating that data set when requested
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Greig A Cowan greig.cowan@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
  */
 
 //	ROOT Headers
@@ -16,6 +16,9 @@
 #include "TCanvas.h"
 #include "TString.h"
 #include "TTree.h"
+#include "TDirectory.h"
+#include "TKey.h"
+#include "TTreeFormula.h"
 //	RapidFit Headers
 #include "StringProcessing.h"
 #include "MemoryDataSet.h"
@@ -28,47 +31,46 @@
 #include <vector>
 #include <map>
 #include <stdlib.h>
+#include <sstream>
 
-//Default constructor
-DataSetConfiguration::DataSetConfiguration() : source(), cutString(), numberEvents(), arguments(), argumentNames(), generatePDF(NULL), separateGeneratePDF(), parametersAreSet(), Start_Entry(0), DEBUG_DATA(false)
-{
-}
+using namespace::std;
 
 //Constructor with correct argument
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, int starting_entry ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false), Start_Entry(starting_entry), DEBUG_DATA(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, int starting_entry, PhaseSpaceBoundary* Boundary ) :
+	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
+	generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false), Start_Entry(starting_entry), DEBUG_DATA(false), internalBoundary( (Boundary!=NULL)?(new PhaseSpaceBoundary(*Boundary)):NULL ),
+	internalRef(NULL)
 {
 }
 
 //Constructor with separate data generation PDF
-DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF ) : source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames), generatePDF( ClassLookUp::CopyPDF(DataPDF) ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false)
+DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF, PhaseSpaceBoundary* Boundary ) :
+	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
+	generatePDF( DataPDF ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false), internalBoundary( (Boundary!=NULL)?(new PhaseSpaceBoundary(*Boundary)):NULL ),
+	internalRef(NULL)
 {
 }
 
 //Destructor
 DataSetConfiguration::~DataSetConfiguration()
 {
-	if( generatePDF != NULL ) delete generatePDF; 
+	if( generatePDF != NULL ) delete generatePDF;
+	if( internalBoundary != NULL ) delete internalBoundary;
 }
 
 IPDF* DataSetConfiguration::GetGenerationPDF()
 {
-	return ClassLookUp::CopyPDF(generatePDF);
+	return generatePDF;
 }
 
 //Set the parameters of the generation PDF
-bool DataSetConfiguration::SetPhysicsParameters( vector<ParameterSet*> InputParameters )
+bool DataSetConfiguration::SetPhysicsParameters( ParameterSet* InputParameters )
 {
-	if (separateGeneratePDF)
+	if( separateGeneratePDF )
 	{
-		if ( generatePDF->SetPhysicsParameters(InputParameters.back()) )
-		{
-			parametersAreSet = true;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		generatePDF->UpdatePhysicsParameters( InputParameters );
+		parametersAreSet = true;
+		return true;
 	}
 	else
 	{
@@ -96,6 +98,12 @@ string DataSetConfiguration::GetSource()
 //Create the DataSet
 IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary, IPDF * FitPDF, int real_numberEvents )
 {
+	if(DataBoundary != NULL )
+	{
+		if( internalBoundary != NULL ) delete internalBoundary;
+		internalBoundary = new PhaseSpaceBoundary( *DataBoundary );
+	}
+
 	//Some kind of decision about what kind of data set to use?
 	IDataSet * newDataSet;
 	if( real_numberEvents!=-1 ) numberEvents = real_numberEvents;
@@ -103,7 +111,7 @@ IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary,
 	if ( source == "File" )
 	{
 		//Load data from file
-		newDataSet = LoadDataFile( arguments, argumentNames, DataBoundary, numberEvents );
+		newDataSet = LoadDataFile( arguments, argumentNames, internalBoundary, numberEvents );
 	}
 	else
 	{
@@ -114,11 +122,11 @@ IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary,
 			IDataGenerator * dataGenerator;
 			if (separateGeneratePDF)
 			{
-				dataGenerator = ClassLookUp::LookUpDataGenerator( source, DataBoundary, generatePDF );
+				dataGenerator = ClassLookUp::LookUpDataGenerator( source, internalBoundary, generatePDF );
 			}
 			else
 			{
-				dataGenerator = ClassLookUp::LookUpDataGenerator( source, DataBoundary, FitPDF );
+				dataGenerator = ClassLookUp::LookUpDataGenerator( source, internalBoundary, FitPDF );
 			}
 			dataGenerator->GenerateData( int(numberEvents) );
 			newDataSet = dataGenerator->GetDataSet();
@@ -131,8 +139,107 @@ IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary,
 		}
 	}
 
+	internalRef = newDataSet;
 	return newDataSet;
 }
+
+string DataSetConfiguration::getNtuplePath( string fileName )
+{
+	TFile* temp_file = TFile::Open( fileName.c_str(), "READ" );
+
+	if( temp_file == NULL )
+	{
+		cerr << "Can't open File: " << fileName << endl << endl;
+		exit(8547);
+	}
+
+	TString current_path = gDirectory->GetPath();
+
+	string tuple_path;
+
+	vector<pair<string, string> > found_names;
+
+	get_object_list( current_path, &found_names, TTree::Class(), new TString(current_path) );
+
+	tuple_path = found_names[0].first + "/" + found_names[0].second;
+
+	temp_file->Close();
+
+	return tuple_path;
+}
+
+//  From the root current path look for all keys (objects in root file) and loop over them
+//  For each one that is actually an object of inherit_type store it's name and the number of events it has
+//  Slightly stupid and ineffient as it always has to decend into the file stuture
+//  This shouldn't be a huge problem as I never anticipate finding files with hundereds of files
+void DataSetConfiguration::get_object_list( TString current_path, vector<pair<string,string> > *found_names, TClass* inherit_type, TString *relative_path )
+{
+	//  goto current search path
+	gDirectory->cd( current_path );
+	TDirectory *current_path_directory = gDirectory;
+	TString current_path_str( current_path );
+
+	//  get all keys present in current path
+	TIter nextkey( current_path_directory->GetListOfKeys() );
+	TKey *key, *oldkey=0;
+
+	//cout << current_path << endl;
+	while ( ( key = (TKey*) nextkey() ) )
+	{
+		//  Loop over all keys (objects) in the current path
+		//  Leave on the last key
+
+		if ( oldkey && !strcmp( oldkey->GetName(), key->GetName() ) ) continue;
+		//  Should already be here?
+		//gDirectory->cd( current_path );
+		//  Read in the object
+		TObject *obj = key->ReadObj();
+
+		//  Get the name of the object in current directory
+		string obj_name( (char*) obj->GetName() );
+		TString temp( obj_name );
+
+		//  If this is a Tuple object we want to store some info about it
+		if ( obj->IsA()->InheritsFrom( inherit_type ) )
+		{
+			//  Store the full name of the object and it's full path to determine if we've already found it
+			string full_name( relative_path->Data() );
+			full_name.append( obj_name );
+
+			vector<string> all_found_names;
+
+			for( vector<pair<string,string> >::iterator found_i=found_names->begin(); found_i!=found_names->end(); ++found_i )
+			{
+				string full_name = found_i->first;
+				full_name.append( string("/") );
+				full_name.append( found_i->second );
+				all_found_names.push_back( full_name );
+			}
+
+			//  If this is an object of the wanted type we foud ignore it
+			if( StringProcessing::VectorContains( &all_found_names, &full_name ) == -1 )
+			{
+				//  If this is a new class object save it's name and event_number
+				//relative_path->Append( obj_name );
+				//found_names->push_back( (*relative_path).Data() );
+				pair<string,string> path_and_name;
+				path_and_name.first = string( (*relative_path).Data() );
+				path_and_name.second = obj_name;
+				found_names->push_back( path_and_name );
+				continue;
+			}
+		} else if ( obj->IsA()->InheritsFrom( TDirectory::Class() ) ) {
+
+			//  If this is a directory we want to decend down into it
+			current_path_str.Append( obj_name );
+			current_path_str.Append( "/" );
+			relative_path->Append( obj_name );
+			relative_path->Append( "/" );
+			get_object_list( current_path_str, found_names, inherit_type, relative_path );
+		}
+	}
+}
+
 
 //Constructor with correct arguments
 IDataSet * DataSetConfiguration::LoadDataFile( vector<string> Arguments, vector<string> ArgumentNames, PhaseSpaceBoundary * DataBoundary, long NumberEventsToRead )
@@ -158,6 +265,10 @@ IDataSet * DataSetConfiguration::LoadDataFile( vector<string> Arguments, vector<
 	if ( nTuplePathIndex >= 0 )
 	{
 		nTuplePath = Arguments[unsigned(nTuplePathIndex)];
+	}
+	else
+	{
+		nTuplePath = this->getNtuplePath( fileName );
 	}
 
 	//Find the file type, and treat appropriately
@@ -220,15 +331,6 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	cout << "You have applied this cut to the data: '" << cutString << "'" << endl;
 	cout << "Total number of events after cut: " << numberOfEventsAfterCut << endl;
 
-	// Check that ntuple is compatible with the PhaseSpaceBoundary that is defined
-	// in the XML file.
-	if ( !CheckTNtupleWithBoundary( ntuple, data->GetBoundary() ) )
-	{
-		cerr << "NTuple is incompatible with boundary" << endl;
-		cerr << "Does this file contain all of the Parameters in your PhaseSpace?" << endl;
-		exit(1);
-	}
-
 	//  Container for all of the data read in from a root file
 	vector<vector<Double_t> > real_data_array;
 	//real_data_array.reserve( unsigned(numberOfObservables) );
@@ -263,13 +365,32 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 	TCanvas* bob = new TCanvas( Name, Name, 1680, 1050 );
 
-	for ( int obsIndex = 0; obsIndex < numberOfObservables; ++obsIndex )
+	TString FormulaName="Fomula_";
+	for( int obsIndex = 0; obsIndex < numberOfObservables; ++obsIndex )
 	{
 		//	If we want to debug the selection construct a canvas
 		Name="Canvas_Name_"; Name+=obsIndex;
 
 		//  Construct a Plot String to use the TTree->Draw Method
-		PlotString = observableNames[unsigned(obsIndex)];
+
+		IConstraint* this_const = DataBoundary->GetConstraint( observableNames[unsigned(obsIndex)] );
+		PlotString = "("+this_const->GetTF1()+")";
+
+		TString thisFormulaName = FormulaName; thisFormulaName+=obsIndex;
+		TTreeFormula* tempFormula = new TTreeFormula( thisFormulaName, PlotString, ntuple );
+
+		//	We may one day come across a situation where we need to evaluate a 0-dim Observable (but your likely being a lazy developer)
+		//	I have had to make the choice here to check for 0-dim as the Init code is too difficult/under-documented for me to parse
+		//	If you have 0-dim it is LIKELY your formula is invalid
+		//	If you have a NULL internal pointer to a Tree your forumla IS invalid!
+		//	ROOT did NOT code up a perfect way of checking for these things
+		if( (tempFormula->GetTree() == NULL) || (tempFormula->GetNdim() == 0 ) )
+		{
+			cerr << "Error evaluating: " << PlotString << " within your NTuple " << ntuple->GetName() << " titled: " << ntuple->GetTitle() << endl;
+			cerr << "This was for file: " << fileName << endl;
+			cerr << "Cannot process DataSet. exiting!" << endl << endl;
+			exit(-765);
+		}
 
 		//  Draw upto 3 observables at a time in some large plot
 		//  use the 'goff' option to turn graphical output (and annoying text output from default co/de-structors) off
@@ -278,12 +399,11 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		ntuple->Draw( PlotString , cutString.c_str(), Plot_Options, Long64_t(ntuple->GetEntries()), Long64_t(Start_Entry) );
 
 		//  Save the actual data to somewhere protected in our memory
+		Double_t* values = ntuple->GetV1();
 
 		//	Use object recasting to make a copy of the data
-		for(int j=0; j < numberOfEventsAfterCut; ++j )
-		{
-			temp_vector.push_back( double(ntuple->GetV1()[j]) );
-		}
+		for(int j=0; j < numberOfEventsAfterCut; ++j )	temp_vector.push_back( double(values[j]) );
+
 
 		if( DEBUG_DATA )
 		{
@@ -307,21 +427,26 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	int numberOfDataPointsAdded = 0;
 	int numberOfDataPointsRead = 0;
 	//  Now we have all of the data stored in memory in real_data_array which has a 1<->1 with observableName
-	//  Create and store data points for each event as before and throw away events outside of the PhaseSpace 
+	//  Create and store data points for each event as before and throw away events outside of the PhaseSpace
 	if ( int(numberEventsToRead) < int(numberOfEventsAfterCut) )	data->ReserveDataSpace( int(numberEventsToRead) );
 	else	data->ReserveDataSpace( int(numberOfEventsAfterCut) );
 	for( ; (numberOfDataPointsRead < numberOfEventsAfterCut) && (numberOfDataPointsAdded < numberEventsToRead) ; ++numberOfDataPointsRead )
 	{
-		DataPoint point( observableNames );
+		DataPoint* point = new DataPoint( observableNames );
 		for(int obsIndex = 0; obsIndex < numberOfObservables; ++obsIndex )
 		{
 			string name = observableNames[unsigned(obsIndex)];
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
-			point.SetObservable( name, real_data_array[unsigned(obsIndex)][unsigned(numberOfDataPointsRead)], 0.0, unit, true, obsIndex);
+			point->SetObservable( name, real_data_array[unsigned(obsIndex)][unsigned(numberOfDataPointsRead)], 0.0, unit, true, obsIndex);
 			//cout << real_data_array[unsigned(obsIndex)][unsigned(numberOfDataPointsRead)] << endl;
 		}
-		bool dataPointAdded = data->AddDataPoint( &point );
+		bool dataPointAdded = data->AddDataPoint( point );
 		if (dataPointAdded) ++numberOfDataPointsAdded;
+	}
+
+	if( DEBUG_DATA )
+	{
+		data->Print();
 	}
 
 	inputFile->Close();
@@ -332,37 +457,6 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	cout << "Time: " << ctime( &timeNow );
 	while( !real_data_array.empty() ){ while( !real_data_array.back().empty() ){real_data_array.back().pop_back(); }; real_data_array.pop_back(); }
 	return data;
-}
-
-bool DataSetConfiguration::CheckTNtupleWithBoundary( TNtuple * TestTuple, PhaseSpaceBoundary * TestBoundary )
-{
-	bool compatible = true;
-
-	vector<string> allNames = TestBoundary->GetAllNames();
-	for (unsigned int observableIndex = 0; observableIndex < allNames.size(); ++observableIndex )
-	{
-		bool found = false;
-		//Find the requested observable name in the ntuple
-		TIter observableIterator( TestTuple->GetListOfBranches() );
-		TBranch * observableBranch;
-		while( ( observableBranch = (TBranch*)observableIterator() ) )
-		{
-			string BranchName = observableBranch->GetName();
-			if ( BranchName == allNames[observableIndex] )
-			{
-				found = true;
-				break;
-			}
-		}
-		//If the name isn't present, the ntuple is incompatible
-		if ( !found )
-		{
-			compatible = false;
-			cerr << "\n\t\t" << allNames[observableIndex] << "\t NOT FOUND in the Ntuple you supplied!\n" << endl;
-			break;
-		}
-	}
-	return compatible;
 }
 
 IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long numberEventsToRead, PhaseSpaceBoundary * DataBoundary )
@@ -450,136 +544,19 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 	}
 }
 
-FitResultVector* DataSetConfiguration::LoadFitResult( TString input_file, ParameterSet* ParametersFromXML )
+string DataSetConfiguration::XML() const
 {
-	TFile* input_LL = new TFile( input_file, "READ" );
-	//	FitResult file format is ALWAYS for now until the end of time defined as:
-	//	TTree Element 0, 2, 4, ....... 0+2n (int)n are ALWAYS IDENTICAL AND THE GLOBAL FIT RESULT!!!
-	//	FitResults 1, 3, 5, 7 ....... 0+n (int)n   ARE THE INPUT FITRESULTS
+	stringstream xml;
 
-	TTree* input_tree = (TTree*) gDirectory->Get( "RapidFitResult" );
+	xml << "<DataSet>" << endl;
+	xml << "\t" << "<Source>" << source << "</Source>" << endl;
+	xml << "\t<NumberEvents>";
+	if( internalRef != NULL ) xml << internalRef->Yield() << "</NumberEvents>" << endl;
+	else xml << 10000 << "</NumberEvents>" << endl;
+	if( source != "File" && generatePDF != NULL ) xml << generatePDF->XML() << endl;
+	if( internalBoundary != NULL ) xml << internalBoundary->XML() << endl;
+	xml << "</DataSet>" << endl;
 
-	vector<TString> all_branches = ResultFormatter::get_branch_names( input_tree );
-
-	vector<TString> all_parameter_values = StringProcessing::GetStringContaining( all_branches, TString("_value") );
-
-	vector<TString> all_parameters = StringProcessing::StripStrings( all_parameter_values, TString("_value") );
-
-	vector<Float_t> all_values; all_values.resize( all_parameters.size() );
-	vector<Float_t> all_generated; all_generated.resize( all_parameters.size() );
-	vector<Float_t> all_errors; all_errors.resize( all_parameters.size() );
-	vector<Float_t> all_min; all_min.resize( all_parameters.size() );
-	vector<Float_t> all_max; all_max.resize( all_parameters.size() );
-	vector<Float_t> all_steps; all_steps.resize( all_parameters.size() );
-	Float_t Fit_Status=-1;
-	Float_t NLL=-9999;
-	Float_t CPUTime=-1;
-	Float_t RealTime=-1;
-
-	TString value, gen, error, min_str, max_str, step_str;
-
-	for( unsigned int i=0; i< all_parameter_values.size(); ++i )
-	{
-		//cout << all_parameters[i] << endl;
-
-		value = all_parameters[i] + "_value";
-		gen = all_parameters[i] + "_gen";
-		error = all_parameters[i] + "_error";
-		min_str = all_parameters[i] + "_min";
-		max_str = all_parameters[i] + "_max";
-		step_str = all_parameters[i] + "_step";
-
-		input_tree->SetBranchAddress( value, &all_values[i] );
-		input_tree->SetBranchAddress( gen, &all_generated[i] );
-		input_tree->SetBranchAddress( error, &all_errors[i] );
-		input_tree->SetBranchAddress( min_str, &all_min[i] );
-		input_tree->SetBranchAddress( max_str, &all_max[i] );
-		input_tree->SetBranchAddress( "NLL", &NLL );
-		input_tree->SetBranchAddress( "Fit_Status", &Fit_Status );
-	}
-
-	ResultParameterSet* global_result = new ResultParameterSet( StringProcessing::Convert( all_parameters ) );
-	FitResult* global_fitresult = NULL;
-	FitResultVector* global_fitresultvector = NULL;
-
-	for( unsigned int j=0; j< all_parameters.size(); ++j )
-	{
-		ResultParameter* new_param = new ResultParameter( all_parameters[j].Data(), (double)all_values[j], (double)all_generated[j], (double)all_errors[j],
-				(double)all_min[j], (double)all_max[j], (double)all_steps[j],
-				ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
-				ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() );
-		global_result->SetResultParameter( all_parameters[j].Data(), new_param );
-		//	Don't worry, the ResultParameter is actually copied into a memory persistant standard class
-		delete new_param;
-	}
-
-	global_fitresult = new FitResult( (double)NLL, global_result, (int)Fit_Status );
-	global_fitresultvector = new FitResultVector( StringProcessing::Convert( all_parameters ) );
-
-	global_fitresultvector->AddFitResult( global_fitresult, false );
-	global_fitresultvector->AddCPUTime( (double)CPUTime );
-	global_fitresultvector->AddRealTime( (double)RealTime );
-
-	int number_fits = (int)input_tree->GetEntries();
-	int number_grid_points = number_fits/2;
-
-	//	This trips up on a contour with less than perfect coverage... should this happen?
-	//if( number_fits != 2*number_grid_points )
-	//{
-	//	cerr << "Badly Defined RapidFit File!" << endl;
-	//	exit(-89);
-	//}
-
-	vector<ResultParameterSet*> all_sets_in_file;
-	vector<FitResult*> all_sets_in_file_fitresult;
-	vector<FitResultVector*> all_sets_in_file_fitresultvector;
-
-	for( int i=0; i< number_grid_points; ++i )
-	{
-		input_tree->GetEntry( i*2+1 );
-
-		ResultParameterSet* new_set = new ResultParameterSet( StringProcessing::Convert( all_parameters ) );
-
-		for( unsigned int j=0; j< all_parameters.size(); ++j )
-		{
-			ResultParameter* new_param = new ResultParameter( all_parameters[j].Data(), (double)all_values[j], (double)all_generated[j], (double)all_errors[j],
-					(double)all_min[j], (double)all_max[j], (double)all_steps[j],
-					ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetType(),
-					ParametersFromXML->GetPhysicsParameter( all_parameters[j].Data() )->GetUnit() ); 
-			new_set->SetResultParameter( all_parameters[j].Data(), new_param );
-			delete new_param;
-		}
-		all_sets_in_file.push_back( new_set );
-
-		all_sets_in_file_fitresult.push_back( new FitResult( (double)NLL, all_sets_in_file.back(), (int)Fit_Status ) );
-		all_sets_in_file_fitresultvector.push_back( new FitResultVector( StringProcessing::Convert( all_parameters ) ) );
-
-		all_sets_in_file_fitresultvector.back()->AddFitResult( all_sets_in_file_fitresult.back(), false );
-		all_sets_in_file_fitresultvector.back()->AddCPUTime( (double)CPUTime );
-		all_sets_in_file_fitresultvector.back()->AddRealTime( (double)RealTime );
-	}
-
-	//for( unsigned int i=0; i< all_sets_in_file.size(); ++i )
-	//{
-	//	cout << "SET:\t" << i << endl;
-	//	vector<string> all_stored_params = all_sets_in_file[i]->GetAllNames();
-	//	for( unsigned j=0; j< all_stored_params.size(); ++j )
-	//	{
-	//		cout << "Name:\t" << all_stored_params[j].c_str() << "\tValue:\t" << (double)all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetValue() << "\tMax:\t" << (double)all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetMaximum() << "\tMin:\t" << (double)all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetMinimum() << "\tType:\t" << all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetType() << "\tUnit:\t" << all_sets_in_file[i]->GetResultParameter( all_stored_params[j] )->GetUnit() << endl;
-	//	}
-	//	cout << endl;
-	//}
-
-	vector<FitResultVector*> all_vectors;
-	all_vectors.push_back( global_fitresultvector );
-	for( unsigned int i=0; i< all_sets_in_file_fitresultvector.size(); ++i )
-	{
-		all_vectors.push_back( all_sets_in_file_fitresultvector[i] );
-	}
-
-	FitResultVector* all_Results = new FitResultVector( all_vectors );
-
-	input_LL->Close();	
-	return all_Results;
+	return xml.str();
 }
 

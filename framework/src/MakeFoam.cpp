@@ -8,30 +8,29 @@
 #include <iostream>
 #include <cmath>
 
-using namespace std;
+using namespace::std;
 
 const int MAXIMUM_SAMPLES = 10000;
 const double MAXIMUM_GRADIENT_TOLERANCE = 0.05;
 const int MAXIMUM_CELLS = 100;
 const int HISTOGRAM_BINS = 8;
 
-//Default constructor
-MakeFoam::MakeFoam() : finishedCells(), centerPoints(), centerValues(), cellIntegrals(), integratePDF()
-{
-}
-
 MakeFoam::MakeFoam( const MakeFoam& input ) :
-	finishedCells( input.finishedCells ), centerPoints( input.centerPoints ), centerValues( input.centerValues ), cellIntegrals( input.cellIntegrals ),
+	finishedCells(), centerPoints( input.centerPoints ), centerValues( input.centerValues ), cellIntegrals( input.cellIntegrals ),
 	integratePDF( ClassLookUp::CopyPDF( input.integratePDF ) )
 {
+	for( unsigned int i=0; i< input.finishedCells.size(); ++i )
+	{
+		finishedCells.push_back( new PhaseSpaceBoundary( *(input.finishedCells[i]) ) );
+	}
 }
 
 //Constructor with correct argument
 MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoint * InputPoint ) : finishedCells(), centerPoints(), centerValues(), cellIntegrals(), integratePDF(InputPDF)
 {
 	//Make the container to hold the possible cells
-	queue<PhaseSpaceBoundary> possibleCells;
-	PhaseSpaceBoundary firstCell = *InputBoundary;
+	queue<PhaseSpaceBoundary*> possibleCells;
+	PhaseSpaceBoundary* firstCell = InputBoundary;
 	possibleCells.push(firstCell);
 
 	//Make a list of observables to integrate over
@@ -43,7 +42,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 	while ( !possibleCells.empty() )
 	{
 		//Remove the next possible cell
-		PhaseSpaceBoundary currentCell = possibleCells.front();
+		PhaseSpaceBoundary* currentCell = possibleCells.front();
 		possibleCells.pop();
 
 		//Set up the histogram storage
@@ -52,7 +51,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 		{
 			vector<double> binHeights, binMiddles, binMaxes;
-			IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
+			IConstraint * temporaryConstraint = currentCell->GetConstraint( doIntegrate[observableIndex] );
 			double minimum = temporaryConstraint->GetMinimum();
 			double delta = ( temporaryConstraint->GetMaximum() - minimum ) / (double)HISTOGRAM_BINS;
 
@@ -77,14 +76,15 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 			{
 				//Generate random values to explore integrable observables
-				IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
+				IConstraint * temporaryConstraint = currentCell->GetConstraint( doIntegrate[observableIndex] );
 				samplePoint.SetObservable( doIntegrate[observableIndex], temporaryConstraint->CreateObservable() );
 			}
 			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 			{
 				//Use given values for unintegrable observables
-				Observable * temporaryObservable = InputPoint->GetObservable( dontIntegrate[observableIndex] );
+				Observable * temporaryObservable = new Observable( *(InputPoint->GetObservable( dontIntegrate[observableIndex] )) );
 				samplePoint.SetObservable( dontIntegrate[observableIndex], temporaryObservable );
+				delete temporaryObservable;
 			}
 
 			//Evaluate the function at this point
@@ -126,7 +126,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 		{
 			//Find the size of the cell in this observable
-			IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
+			IConstraint * temporaryConstraint = currentCell->GetConstraint( doIntegrate[observableIndex] );
 			double cellMaximum = temporaryConstraint->GetMaximum();
 			double cellMinimum = temporaryConstraint->GetMinimum();
 
@@ -158,19 +158,21 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			finishedCells.push_back(currentCell);
 
 			//Create a data point at the center of the current cell
-			DataPoint cellCenter( InputPoint->GetAllNames() );
+			DataPoint* cellCenter = new DataPoint( InputPoint->GetAllNames() );
 			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 			{
 				//Use the mid points for the integrable values
-				Observable * temporaryObservable = cellCenter.GetObservable( doIntegrate[observableIndex] );
-				temporaryObservable->SetValue( midPoints[observableIndex] );
-				cellCenter.SetObservable( doIntegrate[observableIndex], temporaryObservable );
+				Observable * temporaryObservable = cellCenter->GetObservable( doIntegrate[observableIndex] );
+				Observable* temporaryObservable2 = new Observable( temporaryObservable->GetName(), midPoints[observableIndex], 0, temporaryObservable->GetUnit() );
+				cellCenter->SetObservable( doIntegrate[observableIndex], temporaryObservable2 );
+				delete temporaryObservable2;
 			}
 			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 			{
 				//Use given values for unintegrable observables
-				Observable * temporaryObservable = InputPoint->GetObservable( dontIntegrate[observableIndex] );
-				cellCenter.SetObservable( dontIntegrate[observableIndex], temporaryObservable );
+				Observable * temporaryObservable = new Observable( *(InputPoint->GetObservable( dontIntegrate[observableIndex] )) );
+				cellCenter->SetObservable( dontIntegrate[observableIndex], temporaryObservable );
+				delete temporaryObservable;
 			}
 
 			//Store the center point
@@ -179,39 +181,39 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 		else
 		{
 			//Create two cells to replace the current cell
-			PhaseSpaceBoundary daughterCell1( currentCell.GetAllNames() );
-			PhaseSpaceBoundary daughterCell2( currentCell.GetAllNames() );
+			PhaseSpaceBoundary* daughterCell1 = new PhaseSpaceBoundary( currentCell->GetAllNames() );
+			PhaseSpaceBoundary* daughterCell2 = new PhaseSpaceBoundary( currentCell->GetAllNames() );
 
 			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 			{
-				IConstraint * temporaryConstraint = currentCell.GetConstraint( doIntegrate[observableIndex] );
+				IConstraint * temporaryConstraint = currentCell->GetConstraint( doIntegrate[observableIndex] );
 				if ( doIntegrate[observableIndex] == maximumGradientObservable )
 				{
 					//Split the cells on the observable with the greatest gradient
-					daughterCell1.SetConstraint( doIntegrate[observableIndex], lowPoint, splitPoint, unit );
-					daughterCell2.SetConstraint( doIntegrate[observableIndex], splitPoint, highPoint, unit );
+					daughterCell1->SetConstraint( doIntegrate[observableIndex], lowPoint, splitPoint, unit );
+					daughterCell2->SetConstraint( doIntegrate[observableIndex], splitPoint, highPoint, unit );
 				}
 				else
 				{
 					//Copy the continuous constraint (if it can be integrated, it must be continuous)
-					daughterCell1.SetConstraint( doIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
-					daughterCell2.SetConstraint( doIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
+					daughterCell1->SetConstraint( doIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
+					daughterCell2->SetConstraint( doIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
 				}
 			}
 			for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 			{
-				IConstraint * temporaryConstraint = currentCell.GetConstraint( dontIntegrate[observableIndex] );
+				IConstraint * temporaryConstraint = currentCell->GetConstraint( dontIntegrate[observableIndex] );
 				if ( temporaryConstraint->IsDiscrete() )
 				{
 					//Copy the discrete constraint
-					daughterCell1.SetConstraint( dontIntegrate[observableIndex], temporaryConstraint->GetValues(), temporaryConstraint->GetUnit() );
-					daughterCell2.SetConstraint( dontIntegrate[observableIndex], temporaryConstraint->GetValues(), temporaryConstraint->GetUnit() );
+					daughterCell1->SetConstraint( dontIntegrate[observableIndex], temporaryConstraint->GetValues(), temporaryConstraint->GetUnit() );
+					daughterCell2->SetConstraint( dontIntegrate[observableIndex], temporaryConstraint->GetValues(), temporaryConstraint->GetUnit() );
 				}
 				else
 				{
 					//Copy the continuous constraint
-					daughterCell1.SetConstraint( dontIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
-					daughterCell2.SetConstraint( dontIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
+					daughterCell1->SetConstraint( dontIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
+					daughterCell2->SetConstraint( dontIntegrate[observableIndex], temporaryConstraint->GetMinimum(), temporaryConstraint->GetMaximum(), temporaryConstraint->GetUnit() );
 				}
 			}
 
@@ -229,28 +231,30 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			while ( !possibleCells.empty() )
 			{
 				//Move the cell from "possible" to "finished"
-				PhaseSpaceBoundary temporaryCell = possibleCells.front();
+				PhaseSpaceBoundary* temporaryCell = possibleCells.front();
 				possibleCells.pop();
 				finishedCells.push_back(temporaryCell);
 
 				//Create a data point at the center of the current cell
-				DataPoint cellCenter( InputPoint->GetAllNames() );
+				DataPoint* cellCenter = new DataPoint( InputPoint->GetAllNames() );
 				for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 				{
 					//Calculate the cell mid point
-					IConstraint * temporaryConstraint = temporaryCell.GetConstraint( doIntegrate[observableIndex] );
+					IConstraint * temporaryConstraint = temporaryCell->GetConstraint( doIntegrate[observableIndex] );
 					double midPoint = temporaryConstraint->GetMinimum() + ( ( temporaryConstraint->GetMaximum() - temporaryConstraint->GetMinimum() ) / 2  );
 
 					//Use the mid points for the integrable values
-					Observable * temporaryObservable = cellCenter.GetObservable( doIntegrate[observableIndex] );
-					temporaryObservable->SetValue(midPoint);
-					cellCenter.SetObservable( doIntegrate[observableIndex], temporaryObservable );
+					Observable * temporaryObservable = cellCenter->GetObservable( doIntegrate[observableIndex] );
+					Observable* temporaryObservable2 = new Observable( temporaryObservable->GetName(), midPoint, 0, temporaryObservable->GetUnit() );
+					cellCenter->SetObservable( doIntegrate[observableIndex], temporaryObservable2 );
+					delete temporaryObservable2;
 				}
 				for (unsigned int observableIndex = 0; observableIndex < dontIntegrate.size(); ++observableIndex )
 				{
 					//Use given values for unintegrable observables
-					Observable * temporaryObservable = InputPoint->GetObservable( dontIntegrate[observableIndex] );
-					cellCenter.SetObservable( dontIntegrate[observableIndex], temporaryObservable );
+					Observable * temporaryObservable = new Observable( *(InputPoint->GetObservable( dontIntegrate[observableIndex] )) );
+					cellCenter->SetObservable( dontIntegrate[observableIndex], temporaryObservable );
+					delete temporaryObservable;
 				}
 
 				//Store the center point
@@ -270,11 +274,11 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 	for (unsigned int cellIndex = 0; cellIndex < finishedCells.size(); ++cellIndex )
 	{
 		//Integrate the cell
-		double integral = cellIntegrator.Integral( InputPoint, &( finishedCells[cellIndex] ) );
+		double integral = cellIntegrator.Integral( InputPoint, finishedCells[cellIndex] );
 		cellIntegrals.push_back(integral);
 
 		//Evaluate the function at the center of the cell
-		double value = InputPDF->Evaluate( &( centerPoints[cellIndex] ) );
+		double value = InputPDF->Evaluate( centerPoints[cellIndex] );
 		centerValues.push_back(value);
 	}
 }
@@ -282,13 +286,24 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 //Destructor
 MakeFoam::~MakeFoam()
 {
+	while( !centerPoints.empty() )
+	{
+		if( centerPoints.back() != NULL ) delete centerPoints.back();
+		centerPoints.pop_back();
+	}
+	while( !finishedCells.empty() )
+	{
+		if( finishedCells.back() != NULL ) delete finishedCells.back();
+		finishedCells.pop_back();
+	}
+	if( integratePDF != NULL ) delete integratePDF;
 }
 
 //Output all cells to console
 void MakeFoam::Debug()
 {
 	cout << centerPoints.size() << " cells generated" << endl << endl;
-	vector<string> allNames = centerPoints[0].GetAllNames();
+	vector<string> allNames = centerPoints[0]->GetAllNames();
 	vector<string>::iterator observableIterator;
 	for ( observableIterator = allNames.begin(); observableIterator != allNames.end(); ++observableIterator )
 	{
@@ -299,7 +314,7 @@ void MakeFoam::Debug()
 	{
 		for ( observableIterator = allNames.begin(); observableIterator != allNames.end(); ++observableIterator )
 		{
-			cout << centerPoints[pointIndex].GetObservable( *observableIterator )->GetValue() << ", ";
+			cout << centerPoints[pointIndex]->GetObservable( *observableIterator )->GetValue() << ", ";
 		}
 		cout << endl;
 	}
@@ -321,7 +336,7 @@ double MakeFoam::Integral()
 	for (unsigned int cellIndex = 0; cellIndex < centerPoints.size(); ++cellIndex )
 	{
 		//Evaluate the function at the center of the cell
-		double newCenterValue = integratePDF->Evaluate( &( centerPoints[cellIndex] ) );
+		double newCenterValue = integratePDF->Evaluate( centerPoints[cellIndex] );
 
 		//Return the precalculated integral of the cell, scaled to the new function value
 		double newIntegral = cellIntegrals[cellIndex] * newCenterValue / centerValues[cellIndex];

@@ -10,7 +10,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 
 PDF_CREATOR( Bs2DsPiMassSignal );
 
@@ -50,9 +49,7 @@ void Bs2DsPiMassSignal::MakePrototypes()
 		parameterNames.push_back( alpha_m2Name );
 		parameterNames.push_back( eta_m2Name );	
         parameterNames.push_back( m_BsName );
-        allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+        allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -118,10 +115,8 @@ double Bs2DsPiMassSignal::Evaluate(DataPoint * measurement)
 	
  }
 
-double Bs2DsPiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2DsPiMassSignal::Normalisation(PhaseSpaceBoundary * boundary)
 {
-	//	Stupid gcc
-	(void)measurement;
 	(void)boundary;
 /*
 	double mhigh, mlow ;
@@ -165,7 +160,7 @@ double Bs2DsPiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBound
 	 
 	   if( mlow > c1 ) {
 	     // Integral from Gaussian part
-		   integral1 = 0.5 * ( RooMath::erf( mhigh/(sqrt(2.)*sigma_m1) ) - RooMath::erf( mlow/(sqrt(2.)*sigma_m1 )) );
+		   integral1 = 0.5 * ( erf( mhigh/(sqrt(2.)*sigma_m1) ) - erf( mlow/(sqrt(2.)*sigma_m1 )) );
 	   } else if( mhigh < c1 ) {
 	     // Integral from powerlaw part
 	     double k = eta_m1*sigma_m1*exp(-0.5*alpha_m1*alpha_m1)/m1*alpha_m1;
@@ -180,7 +175,7 @@ double Bs2DsPiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBound
 	 
 	     // Integral from both parts
 	     double k = eta_m1*sigma_m1*exp(-0.5*alpha_m1*alpha_m1)/m1*alpha_m1;
-	     integral1 = sigma_m1*sqrt(M_PI/2.)*( RooMath::erf(alpha_m1/sqrt(2)) - RooMath::erf((m_Bs-mhigh)/sqrt(2)*sigma_m1) );
+	     integral1 = sigma_m1*sqrt(M_PI/2.)*( erf(alpha_m1/sqrt(2)) - erf((m_Bs-mhigh)/sqrt(2)*sigma_m1) );
 	     if( eta_m1 == 1. ) {
 	       double B = eta_m1/alpha_m1 - alpha_m1;
 	       integral1 += k/pow(1-alpha_m1*alpha_m1/eta_m1,m1)*log( (B+(m_Bs-mlow)/sigma_m1)/(B+alpha_m1) );
@@ -193,8 +188,8 @@ double Bs2DsPiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBound
 	/*
 	if( mlow > c2 ) {
 		// Integral from Gaussian part
-		integral1 = 0.5 * ( RooMath::erf( mhigh/(sqrt(2.)*sigma_m1) ) - RooMath::erf( mlow/(sqrt(2.)*sigma_m1 )) );
-		//integral2 = sigma_m2*sqrt(M_PI/2.)*( RooMath::erf((m_Bs-mlow)/sqrt(2)*sigma_m2) - RooMath::erf((m_Bs-mhigh)/sqrt(2)*sigma_m2) );
+		integral1 = 0.5 * ( erf( mhigh/(sqrt(2.)*sigma_m1) ) - erf( mlow/(sqrt(2.)*sigma_m1 )) );
+		//integral2 = sigma_m2*sqrt(M_PI/2.)*( erf((m_Bs-mlow)/sqrt(2)*sigma_m2) - erf((m_Bs-mhigh)/sqrt(2)*sigma_m2) );
 	} else if( mhigh < c2 ) {
 		// Integral from powerlaw part
 		double k = eta_m2*sigma_m2*exp(-0.5*alpha_m2*alpha_m2)/m2*alpha_m2;

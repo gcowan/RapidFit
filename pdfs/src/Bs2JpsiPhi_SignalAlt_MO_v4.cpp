@@ -36,6 +36,7 @@ gammaName				( configurator->getName("gamma") )
 , delta_paraName		( configurator->getName("delta_para") )
 , delta_perpName		( configurator->getName("delta_perp") )
 , delta_sName			( configurator->getName("delta_s") )
+, cosdparName			( configurator->getName("cosdpar") ) //PELC-COSDPAR Special for fitting cosdpar separately
 // PELC NEW additions for v2
 , cosphisName			( configurator->getName("cosphis") )
 , sinphisName			( configurator->getName("sinphis") )
@@ -80,6 +81,7 @@ gammaName				( configurator->getName("gamma") )
 , _numericIntegralForce(false)
 , _numericIntegralTimeOnly(false)
 , _useCosAndSin(false) 
+, _useCosDpar(false)
 , allowNegativeAsSq(false)
 //objects
 ,t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(), tag(), 
@@ -92,15 +94,39 @@ intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), time
 CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(), storeExpCos(), normalisationCacheUntagged()
 {
-	
+	componentIndex = 0;
+
 	std::cout << "Constructing PDF: Bs2JpsiPhi_SignalAlt_MO_v4 " << std::endl ;
+	
+	/*
+	// PUT IN BUT DISABLED AS I WANTED _V4 TO BE FROZEN AS THE PDF USED AT MORIOND
+	// THIS IS ALL ENABLED IN _V5
+	//...............................................
+	// Configure to use angular acceptance machinery
+	string angAccFile = configurator->getConfigurationValue( "AngularAcceptanceFile" ) ;
+	_angAccIgnoreNumerator = configurator->isTrue( "AngularAcceptanceIgnoreNumerator" ) ;
+	if( angAccFile == "" ) cout << "Bs2JpsiPhi_SignalAlt_MO_v4:: Using flat angular acceptance " << endl ;
+	else cout << "Bs2JpsiPhi_SignalAlt_MO_v4:: Constructing angAcc using file: " << angAccFile << endl ;
+	angAcc = new AngularAcceptance( angAccFile ) ;
+	angAccI1 = angAcc->af1() ;  cout << "  af1 = " << angAccI1 << endl ;
+	angAccI2 = angAcc->af2() ;	cout << "  af2 = " << angAccI2 << endl ;
+	angAccI3 = angAcc->af3() ;	cout << "  af3 = " << angAccI3 << endl ;
+	angAccI4 = angAcc->af4() ;	cout << "  af4 = " << angAccI4 << endl ;
+	angAccI5 = angAcc->af5() ;	cout << "  af5 = " << angAccI5 << endl ;
+	angAccI6 = angAcc->af6() ;	cout << "  af6 = " << angAccI6 << endl ;
+	angAccI7 = angAcc->af7() ;	cout << "  af7 = " << angAccI7 << endl ;
+	angAccI8 = angAcc->af8() ;	cout << "  af8 = " << angAccI8 << endl ;
+	angAccI9 = angAcc->af9() ;	cout << "  af9 = " << angAccI9 << endl ;
+	angAccI10 = angAcc->af10();	cout << "  af10 = " << angAccI10 << endl ;
+	if( _angAccIgnoreNumerator ) cout << "Bs2JpsiPhi_SignalAlt_MO_v4:: Ignoring angular acceptance numerator " << endl ;
+	*/
 	
 	//...........................................
 	// Configure to use time acceptance machinery 
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
-			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0112 ) ;
+			timeAcc = new SlicedAcceptance( 0., 14.0, /*0.0157*/ 0.0112) ;
 			cout << "Bs2JpsiPhi_SignalAlt_MO_v4:: Constructing timeAcc: Upper time acceptance beta=0.0112 [0 < t < 14] " << endl ;
 		}
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
@@ -132,8 +158,13 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 	// Configure other options 
 	_useEventResolution = configurator->isTrue( "UseEventResolution" ) ;
 	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
+	_useCosDpar = configurator->isTrue( "UseCosDpar" ) ;
 	_useHelicityBasis = configurator->isTrue( "UseHelicityBasis" ) ;
 	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
+
+	this->TurnCachingOff();
+
+	this->SetNumericalNormalisation( false );
 	
 	//........................
 	// Now do some actual work
@@ -233,6 +264,7 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::MakePrototypes()
 	parameterNames.push_back( delta_perpName );
 	parameterNames.push_back( delta_zeroName );
 	parameterNames.push_back( delta_sName );
+	if( _useCosDpar ) parameterNames.push_back( cosdparName ); //PELC-COSDPAR Special for fitting cosdpar separately
 	parameterNames.push_back( deltaMName );
 
 	if( _useCosAndSin ) {
@@ -257,6 +289,7 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::MakePrototypes()
 	}
 	parameterNames.push_back( timeOffsetName );
 	
+	
 	parameterNames.push_back( angAccI1Name );
 	parameterNames.push_back( angAccI2Name );
 	parameterNames.push_back( angAccI3Name );
@@ -267,9 +300,9 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::MakePrototypes()
 	parameterNames.push_back( angAccI8Name );
 	parameterNames.push_back( angAccI9Name );
 	parameterNames.push_back( angAccI10Name );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	
+	 
+	allParameters = ParameterSet(parameterNames);
 }
 
 
@@ -336,6 +369,8 @@ bool Bs2JpsiPhi_SignalAlt_MO_v4::SetPhysicsParameters( ParameterSet * NewParamet
 	delta1 = delta_perp -  delta_para ;
 	delta2 = delta_perp -  delta_zero ;
 	
+	if( _useCosDpar ) cosdpar = allParameters.GetPhysicsParameter( cosdparName )->GetValue(); //PELC-COSDPAR Special for fitting cosdpar separately
+	
 	delta_ms = allParameters.GetPhysicsParameter( deltaMName )->GetValue();	
 	
 	if(_useCosAndSin){
@@ -395,6 +430,8 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateForNumericIntegral(DataPoint * measur
 
 double Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate(DataPoint * measurement)
 {
+
+	double angAcceptanceFactor = 0 ;
 	
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
@@ -403,11 +440,13 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate(DataPoint * measurement)
 		ctheta_k   = measurement->GetObservable( cthetakName )->GetValue();
 		phi_h      = TMath::Pi() + measurement->GetObservable( phihName )->GetValue();  // Pi offset is difference between angle calculator and "Our Paper"
 		ctheta_l   = measurement->GetObservable( cthetalName )->GetValue();
+		//angAcceptanceFactor = angAcc->getValue( ctheta_l, ctheta_k, phi_h );
 	}
 	else {
 		ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
 		phi_tr      = measurement->GetObservable( phiName )->GetValue();
 		ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();
+		//angAcceptanceFactor = angAcc->getValue( ctheta_1, ctheta_tr, phi_tr );
 	}
 	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
@@ -464,7 +503,9 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate(DataPoint * measurement)
 	}
 	
 			
-	return returnValue ;	
+	//if( _angAccIgnoreNumerator ) return returnValue ;
+	//else return returnValue  * angAcceptanceFactor ;	
+	return returnValue ;
 }
 
 
@@ -654,64 +695,122 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::preCalculateTimeIntegrals( ) const
 	return ;
 }
 
+vector<string> Bs2JpsiPhi_SignalAlt_MO_v4::PDFComponents()
+{
+	vector<string> component_list;
+	component_list.push_back( "CP-Even" );
+	component_list.push_back( "CP-Odd" );
+	component_list.push_back( "As" );
+	component_list.push_back( "0" );
+	return component_list;
+}
+
+double Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateComponent( DataPoint* input, ComponentRef* Component )
+{
+	componentIndex = Component->getComponentNumber();
+	if( componentIndex == -1 )
+	{
+		string ComponentName = Component->getComponentName();
+		if( ComponentName.compare( "CP-Even" ) == 0 )
+		{
+			Component->setComponentNumber( 1 );
+			componentIndex = 1;
+		}
+		else if( ComponentName.compare( "CP-Odd" ) == 0 )
+		{
+			Component->setComponentNumber( 2 );
+			componentIndex = 2;
+		}
+		else if( ComponentName.compare( "As" ) == 0 )
+		{
+			Component->setComponentNumber( 3 );
+			componentIndex = 3;
+		}
+		else
+		{
+			Component->setComponentNumber( 0 );
+			componentIndex = 0;
+		}
+	}
+
+	double return_value = this->Evaluate( input );
+	componentIndex = 0;
+
+	return return_value;
+}
 
 //...................................
 // Main Diff cross section
 
 double Bs2JpsiPhi_SignalAlt_MO_v4::diffXsec(  )  const
 {   
-	preCalculateTimeFactors() ;
-	
-	double xsec = 
-	
-	/*
-	 A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
-	 AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
-	 AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
-	 
-	 AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
-	 A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
-	 A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
-	 
-	 AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
-	 
-	 AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
-	 AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
-	 AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;	
-	 */
-	
-	CachedA1 * timeFactorA0A0(  )  +
-	CachedA2 * timeFactorAPAP(  )  +
-	CachedA3 * timeFactorATAT(  )  +
-	
-	CachedA4 * timeFactorImAPAT(  )  +
-	CachedA5 * timeFactorReA0AP(  )  +
-	CachedA6 * timeFactorImA0AT(  )  +
-	
-	CachedA7 * timeFactorASAS(  )  +
-	
-	CachedA8 * timeFactorReASAP(  )  +
-	CachedA9 * timeFactorImASAT(  )  +
-	CachedA10 * timeFactorReASA0(  )  ;	
-	
-	
-	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue(t);
-	
-	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_SignalAlt_MO_v4_v1::diffXsec( ) : return value < 0 = ", xsec ) ;
-	
-	//PELC - This turned out to be an important debugging tool 
-	//switch it on to see the values of PDF being returend.  If ANY go negative, it means there is a sign wrong in one or more of the terms
-	//You need to enable in the .h file as well
-	//histOfPdfValues->Fill(xsec) ;	
-	//histCounter++ ;
-	//if( histCounter > 10000 ) {
-	//	histOfPdfValues->Draw() ;
-	//	c0->Update() ;	
-	//	c0->SaveAs( "histOfPdfValues-from-Evaluate.eps" ) ;
-	//	histCounter = 0 ;
-	//}
-	
-	return xsec ;
+	preCalculateTimeFactors();
+
+	double xsec=-1.;
+	switch( componentIndex )
+	{
+		case 1:		//	CP-Even		CP-Odd=0 && S-Wave=0
+			xsec = CachedA1 * timeFactorA0A0(  );
+			xsec += CachedA2 * timeFactorAPAP(  );
+			xsec += CachedA5 * timeFactorReA0AP(  );
+			break;
+		case 2:		//	CP-Odd		CP-Even=0 && S-Wave=0
+			xsec = CachedA3 * timeFactorATAT(  );
+			break;
+		case 3:		//	S-Wave		CP-Even=0 && CP-Odd=0
+			xsec = CachedA7 * timeFactorASAS(  );
+			break;
+		default:	//	Everything
+			xsec =
+
+			/*
+			 A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
+			 AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
+			 AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
+
+			 AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
+			 A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
+			 A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
+
+			 AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
+
+			 AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
+			 AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
+			 AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;	
+		 	*/
+
+			CachedA1 * timeFactorA0A0(  ) +
+			CachedA2 * timeFactorAPAP(  ) +
+			CachedA3 * timeFactorATAT(  ) +
+		
+			CachedA4 * timeFactorImAPAT(  ) +
+			CachedA5 * timeFactorReA0AP(  ) +
+			CachedA6 * timeFactorImA0AT(  ) +
+
+			CachedA7 * timeFactorASAS(  ) +
+
+			CachedA8 * timeFactorReASAP(  ) +
+			CachedA9 * timeFactorImASAT(  ) +
+			CachedA10 * timeFactorReASA0(  );
+
+			if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue(t);
+			if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_SignalAlt_MO_v4_v1::diffXsec( ) : return value < 0 = ", xsec ) ;
+
+			//PELC - This turned out to be an important debugging tool 
+			//switch it on to see the values of PDF being returend.  If ANY go negative, it means there is a sign wrong in one or more of the terms
+			//You need to enable in the .h file as well
+			//histOfPdfValues->Fill(xsec) ;	
+			//histCounter++ ;
+			//if( histCounter > 10000 ) {
+			//	histOfPdfValues->Draw() ;
+			//	c0->Update() ;	
+			//	c0->SaveAs( "histOfPdfValues-from-Evaluate.eps" ) ;
+			//	histCounter = 0 ;
+			//}
+			break;
+	}
+
+	return xsec;
 }
 
 
@@ -926,7 +1025,8 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::deCacheTimeIntegrals( unsigned int ires, unsign
 
 void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrint( string message, double value )  const
 {
-	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrint ***************************" << endl ;
+	(void) message; (void) value;
+/*	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrint ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 	
 	cout << endl ;
@@ -949,12 +1049,14 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrint( string message, double value )  con
 	cout << "   ctheta_tr " << ctheta_tr << endl ;
 	cout << "   ctheta_1 " << ctheta_1 << endl ;
 	cout << "   phi_tr " << phi_tr << endl ;		
+*/
 }
 
 
 void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintXsec( string message, double value )  const
-{   
-    cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintXsec ***************************" << endl ;
+{
+	(void) message; (void) value;
+/*	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintXsec ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 	cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
 	cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
@@ -992,14 +1094,13 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintXsec( string message, double value ) 
 	
 	cout << "   Pwave Only : " << PwaveTot << endl ;
 	cout << "   Swave add : " <<  SwaveAdditions << endl ;
-	
+*/
 }
 
-
-
 void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintNorm( string message, double value )  const
-{   
-    cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintNorm ***************************" << endl ;
+{
+	(void) message; (void) value;
+/*	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintNorm ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 	
 	cout << endl ;
@@ -1013,13 +1114,6 @@ void Bs2JpsiPhi_SignalAlt_MO_v4::DebugPrintNorm( string message, double value ) 
 	cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl ;
 	cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
 	cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
+*/
 }
-
-
-
-	
-
-
-
-
 

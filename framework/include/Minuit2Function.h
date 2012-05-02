@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef MINUIT2_FUNCTION_H
 #define MINUIT2_FUNCTION_H
 
@@ -46,3 +47,4 @@ class Minuit2Function : public FCNBase
 };
 
 #endif
+

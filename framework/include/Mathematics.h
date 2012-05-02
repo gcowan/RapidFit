@@ -1,20 +1,32 @@
-/**
-  @namespace Mathematics
-
-  Namespace holding some common mathematical functions that are used
-  by many PDFs. For example, gaussian's convolved with trigonometric
-  functions.
-
-  @author Greig A Cowan, Pete Clalrke greig.cowan@cern.ch
-  @date 2009-12-22
+/*!
+ * @namespace Mathematics
+ *
+ * Namespace holding some common mathematical functions that are used
+ * by many PDFs. For example, gaussian's convolved with trigonometric
+ * functions.
+ *
+ * @author Greig A Cowan, Pete Clalrke greig.cowan@cern.ch
  */
+
+#pragma once
 #ifndef RAPIDFIT_MATHEMATICS
 #define RAPIDFIT_MATHEMATICS
+
+///	ROOT Headers
+#include "RooMath.h"
+#include "TMath.h"
+#include "RooSentinel.h"
+///	RapidFit Headers
 #include "IDataSet.h"
 #include "IPDF.h"
 #include "RapidFitIntegrator.h"
 #include "PhaseSpaceBoundary.h"
-#include "TMath.h"
+///	System Headers
+#include <vector>
+
+using namespace::std;
+
+extern RooMath* math_object;
 
 namespace Mathematics
 {
@@ -24,9 +36,13 @@ namespace Mathematics
 	static const double invpi=TMath::InvPi();
 	static const double global_frac = 0.28125 * invpi;
 	static const double third= 1./3.;
+	static const double twothird = 2.*third;
+	static const double fourthird = 1.+third;
+	static const double eightthird = 2.*fourthird;
 	static const double root_6 = sqrt(6.);
 	static const double root_3 = sqrt(3.);
-	static double rootpi= sqrt(atan2(0.,-1.));
+	static const double rootpi= sqrt(TMath::Pi()) ; //sqrt(atan2(0.,-1.));
+	static const double _pi = TMath::Pi();
 
 	inline double SQRT_2(){ return sqrt_2; }//=sqrt(2.);
 	inline double _Over_SQRT_2(){ return _over_sqrt_2; }// = 1./SQRT_2;
@@ -35,37 +51,42 @@ namespace Mathematics
 	inline double Root_6(){ return root_6; }
 	inline double Root_3(){ return root_3; }
 	inline double Third(){ return third; }
+	inline double TwoThird(){ return twothird; }
+	inline double FourThird(){ return fourthird; }
+	inline double EightThird(){ return eightthird; }
 	inline double Rootpi(){ return rootpi; }
+	inline double Pi(){ return _pi; }
 
 	//--------------------------- exp and exp*sin and exp*cos time functions -------------------------
 	// time functions for use in PDFs with resolution
 
-	double Exp( const double t, const double gamma, const double resolution );
-	double ExpInt( const double tlow, const double thigh, const double gamma, const double resolution  );
+	double Exp( double t, double gamma, double resolution );
+	double ExpInt( double tlow, double thigh, double gamma, double resolution  );
 
 	//Added thes to include an upper time acceptance of form ( 1 - beta*t)
-	double Exp_betaAcceptance( const double t, const double gamma, const double resolution, const double betaParameter );
-	double ExpInt_betaAcceptance( const double tlow, const double thigh, const double gamma, const double resolution, const double betaParameter  );
+	double Exp_betaAcceptance( double t, double gamma, double resolution, double betaParameter );
+	double ExpInt_betaAcceptance( double tlow, double thigh, double gamma, double resolution, double betaParameter  );
 
-	double ExpCosh( const double t, const double gamma, const double deltaGamma, const double resolution );
-	double ExpCoshInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution );
+	double ExpCosh( double t, double gamma, double deltaGamma, double resolution );
+	double ExpCoshInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 
-	double ExpSinh( const double t, const double gamma, const double deltaGamma, const double resolution );
-	double ExpSinhInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution );
+	double ExpSinh( double t, double gamma, double deltaGamma, double resolution );
+	double ExpSinhInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 
-	double ExpCos( const double t, const double gamma, const double deltaM, const double resolution );
-	double ExpCosInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution );
+	double ExpCos( double t, double gamma, double deltaM, double resolution );
+	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 
-	double ExpSin( const double t, const double gamma, const double deltaM, const double resolution );
-	double ExpSinInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution );
+	double ExpSin( double t, double gamma, double deltaM, double resolution );
+	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 
-	double expErfInt(const double tlimit, const double tau, const double sigma);
+	double expErfInt( double tlimit, double tau, double sigma);
+
 	void getBs2JpsiPhiAngularFunctions( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, const double cosTheta, const double phi, const double cosPsi);
 	void getBs2JpsiPhiAngularFunctionsWithSwave( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, double & f7, double & f8, double & f9, double & f10, const double cosTheta, const double phi, const double cosPsi);
-	void getBs2PhiPhiAngularFunctions( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, const double ct1, const double ct2, const double phi);
 
-  	void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
+	vector<double> calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
 	void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF );
 }
 
 #endif
+

@@ -1,0 +1,93 @@
+
+This howto is broken up into smaller sections:
+
+
+1) Setting Up RapidFit
+2) Running RapidFit
+3) Making your fits run faster
+4) Information about the given Dataset
+
+
+This barely scratches the surface of how to configure and run a script, as always if help is needed in that, contact the authors
+
+
+
+Setting Up RapidFit:
+=====================
+
+I'm assuming by this point that you've extracted your tarball to some location.
+
+Define the environmental parameter RAPIDFITROOT to be the directory that the source has been extracted to.
+
+e.g.:
+
+export RAPIDFITROOT=$HOME/RapidFit
+
+
+Now that you have defined this build the source:
+
+cd $RAPIDFITROOT
+
+(if on lxplus run 'SetupProject ganga v506r11' to provide you with a tested root version)
+
+make clean && make -j5
+
+(-j5 will speed this up a lot as there are many files which can be built in parallel)
+
+
+
+
+
+
+Running RapidFit:
+==================
+
+now, to perform the analyses for JpsiPhi Moriond 2012 go to the directory:
+
+cd scripts/2D-Scans-Moriond2012
+
+
+To perform a single fit run:
+
+
+(cFit)
+../../bin/fitting -f FinalProduction_1fb_U_v4_0p3.xm
+
+(sFit)
+../../bin/fitting -f FinalProduction_1fb_U_v4_0p3_sFit.xml
+
+
+This will give you the CV best fit for each analysis.
+
+
+
+
+
+Making the fits run faster:
+============================
+
+If you have a more powerful machine (say an lxplus node to yourself) you can increase the number of parallel threads exploited by the fit when running through Minuit
+
+To do this edit the XML tag <Threads> in the .xml that configures the fit.
+
+(Be sure to set this to 1 before you submit to the grid, or you will get some angry emails)
+
+
+
+
+
+Info about the DataSet:
+========================
+
+The data file is:
+Bs2JpsiPhi_ntupleB_for_fitting_20120203_sWeighted_0p3.root
+
+This is the standard NtupleB dataset produced for Moriond, only we have sWeighted the data and thrown away all information not relevant to the fit.
+This makes our lives easier although you can run over the full NtupleB and get exactly the same results!
+
+This particular DataSet was made with the following cut:
+(sel==1)&&(triggerDecision==1)&&(12.>abs(mdau2-1020))
+
+I mention this here as there is no (easy) way to determine this is you compare the dataset here the to the full NtupleB and find some data missing
+
+

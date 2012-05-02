@@ -51,9 +51,7 @@ void Bs2DsPi_mistagParameter::MakePrototypes()
 	parameterNames.push_back( deltaMName );
 	parameterNames.push_back( mistagName );
 	parameterNames.push_back( timeresName );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor

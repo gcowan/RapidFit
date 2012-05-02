@@ -1,9 +1,12 @@
-/**
-  @namespace GoodnessOfFit
-
-  @author Greig A Cowan greig.cowan@cern.ch
-  @date 2011-04-06
+/*!
+ * @namespace GoodnessOfFit
+ *
+ * @brief Where all of teh Code relating to GoodNess of Fit is
+ *
+ * @author Greig A Cowan greig.cowan@cern.ch
  */
+
+#pragma once
 #ifndef RAPIDFIT_GOODNESSOFFIT
 #define RAPIDFIT_GOODNESSOFFIT
 
@@ -19,9 +22,9 @@
 
 namespace GoodnessOfFit 
 {
-	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, vector<string> CommandLineParam, int nData );
-        double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, FitResult * result);
-        void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, vector<ParameterSet*> * parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, int nData, int repeats, vector<double> * pvalues);
+	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int nData );
+        double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, FitResult * result);
+        void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, ParameterSet* parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, int nData, int repeats, vector<double> * pvalues);
 	double getPvalue( double datavalue, vector<double> distribution );
 	double pValueFromPoint2PointDissimilarity( IDataSet * data, IDataSet * mc );
 	double calculateTstatistic( IDataSet * data, IDataSet * mc);
@@ -40,3 +43,4 @@ namespace GoodnessOfFit
 }
 
 #endif
+

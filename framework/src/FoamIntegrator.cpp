@@ -9,11 +9,6 @@
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
-//Default constructor
-FoamIntegrator::FoamIntegrator() : allIntegrators(), discreteNames(), discreteValues()
-{
-}
-
 FoamIntegrator::FoamIntegrator( const FoamIntegrator& input ) : allIntegrators(), discreteNames( input.discreteNames ), discreteValues( input.discreteValues )
 {
 	for( unsigned int i=0; i< input.allIntegrators.size(); ++i )
@@ -33,12 +28,12 @@ FoamIntegrator::FoamIntegrator( IPDF * InputPDF, IDataSet * InputData ) : allInt
 	//Create data points for each combination (using data averaged values for continuous, non-integrable functions)
 	vector<string> dataPointDescriptions;
 	vector<double> dataPointWeights;
-	vector<DataPoint> combinationPoints =  StatisticsFunctions::DataAverage( InputData, discreteCombinations, discreteValues, discreteNames, continuousNames, dataPointDescriptions, dataPointWeights );
+	vector<DataPoint*> combinationPoints =  StatisticsFunctions::DataAverage( InputData, discreteCombinations, discreteValues, discreteNames, continuousNames, dataPointDescriptions, dataPointWeights );
 
 	//Make a foam for each discrete combination
 	for (unsigned int combinationIndex = 0; combinationIndex < combinationPoints.size(); ++combinationIndex )
 	{
-		MakeFoam* combinationFoam = new MakeFoam( InputPDF, InputData->GetBoundary(), &( combinationPoints[combinationIndex] ) );
+		MakeFoam* combinationFoam = new MakeFoam( InputPDF, InputData->GetBoundary(), combinationPoints[combinationIndex] );
 		allIntegrators.push_back(combinationFoam);
 	}
 }
@@ -51,7 +46,6 @@ FoamIntegrator::~FoamIntegrator()
 //Select and run the correct integrator
 double FoamIntegrator::Integral( DataPoint * InputPoint, PhaseSpaceBoundary * InputBoundary )
 {
-	//	Stupid gcc
 	(void)InputBoundary;
 	//The integral won't work if the boundary has changed, but you might want a check that it's the same
 

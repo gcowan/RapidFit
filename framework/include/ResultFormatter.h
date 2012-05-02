@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef RESULT_FORMATTER_H
 #define RESULT_FORMATTER_H
 
@@ -22,7 +23,7 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using namespace::std;
 
 class ResultFormatter
 {
@@ -50,3 +51,4 @@ class ResultFormatter
 };
 
 #endif
+

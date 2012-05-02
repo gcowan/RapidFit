@@ -5,86 +5,146 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
 #include "DataPoint.h"
 #include "ObservableRef.h"
 #include "StringProcessing.h"
+#include "PseudoObservable.h"
 //	System Headers
 #include <iostream>
 #include <stdlib.h>
+#include <iomanip>
 
-//Default constructor
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables()
+using namespace::std;
+
+//	Required for Sorting
+DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1)
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(NewNames), allPseudoNames(), allPseudoObservables()
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(NewNames), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1)
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
 	for (unsigned short int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
 	{
-		allObservables.push_back( Observable() );
+		allObservables.push_back( new Observable(NewNames[nameIndex]) );
+	}
+}
+
+DataPoint::DataPoint( const DataPoint& input ) : allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
+						 thisDiscreteIndex(input.thisDiscreteIndex)
+{
+	for( unsigned int i=0; i< input.allObservables.size(); ++i )
+	{
+		allObservables.push_back( new Observable(*(input.allObservables[i])) );
+	}
+	for( unsigned int i=0; i< input.allPseudoObservables.size(); ++i )
+	{
+		allPseudoObservables.push_back( new PseudoObservable(*(input.allPseudoObservables[i])) );
 	}
 }
 
 //Destructor
 DataPoint::~DataPoint()
 {
+	while( !allObservables.empty() )
+	{
+		if( allObservables.back() != NULL ) { delete allObservables.back(); }
+		allObservables.pop_back();
+	}
+	while( !allPseudoObservables.empty() )
+	{
+		if( allPseudoObservables.back() != NULL ) { delete allPseudoObservables.back(); }
+		allPseudoObservables.pop_back();
+	}
 }
 
 //Retrieve names of all observables stored
-vector<string> DataPoint::GetAllNames()
+vector<string> DataPoint::GetAllNames() const
 {
 	return allNames;
 }
 
+void DataPoint::RemoveObservable( const string input )
+{
+	vector<string>::iterator name_i = allNames.begin();
+	vector<Observable*>::iterator obs_i = allObservables.begin();
+
+	vector<string>::iterator name_to_remove;
+	vector<Observable*>::iterator observable_to_remove;
+
+	for( ; name_i != allNames.end(); ++name_i, ++obs_i )
+	{
+		if( (*name_i) == input )
+		{
+			name_to_remove = name_i;
+			observable_to_remove = obs_i;
+			break;
+		}
+	}
+
+	if( *observable_to_remove != NULL ) delete *observable_to_remove;
+
+	allNames.erase( name_to_remove );
+	allObservables.erase( observable_to_remove );
+}
+
+Observable* DataPoint::GetObservable( unsigned int wanted ) const
+{
+	return allObservables[ wanted ];
+}
+
 //Retrieve an observable it's cached index, or find it and save it's index for reference
-Observable * DataPoint::GetObservable( pair<string,int>* wanted_param )
+Observable* DataPoint::GetObservable( pair<string,int>* wanted_param ) const
 {
 	if( wanted_param->second != -1 )
 	{
-		return &allObservables[(unsigned)wanted_param->second];
+		return allObservables[(unsigned)wanted_param->second];
 	} else {
 		wanted_param->second = StringProcessing::VectorContains( &allNames, &(wanted_param->first) );
 	}
 	if( wanted_param->second == -1 ){
-		cerr << "Observable name " << wanted_param->first << " not found" <<endl;
+		cerr << "Observable name " << wanted_param->first << " not found (1)" << endl;
 	}else{
-		return &allObservables[unsigned(wanted_param->second)];}
+		return allObservables[unsigned(wanted_param->second)];
+	}
 	exit(-1);
 }
 
 //Retrieve an observable by its name
 //	!!!THIS IS VERY, VERY, VERY WASTEFUL FOR LARGE DATASETS!!!
-Observable * DataPoint::GetObservable(string const Name)
+Observable* DataPoint::GetObservable(string const Name) const
 {
 	//Check if the name is stored in the map
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		cerr << "Observable name " << Name << " not found" << endl;
+		cerr << "Observable name " << Name << " not found (2)" << endl;
 		exit(1);
 		//return new Observable( Name, 0.0, 0.0, "NameNotFoundError");
 	}
 	else
 	{
-		return &allObservables[unsigned(nameIndex)];
+		return allObservables[unsigned(nameIndex)];
 	}
 }
 
-Observable * DataPoint::GetObservable( ObservableRef& object )
+Observable* DataPoint::GetObservable( const ObservableRef& object ) const
 {
-	if( object.GetIndex() < 0 ) {
+	if( object.GetIndex() < 0 )
+	{
 		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef()) );
-		if( object.GetIndex() >= 0 ) return &allObservables[ (unsigned) object.GetIndex() ];
-	} else {
-		return &allObservables[ (unsigned) object.GetIndex() ];
+		if( object.GetIndex() >= 0 ) return allObservables[ (unsigned) object.GetIndex() ];
 	}
-	cerr << "Observable name " << object.Name().c_str() << " not found" << endl;
+	else
+	{
+		return allObservables[ (unsigned) object.GetIndex() ];
+	}
+	cerr << "Observable name " << object.Name().c_str() << " not found (3)" << endl;
 	throw(-20);
 }
 
@@ -95,27 +155,55 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		cerr << "Observable name " << Name << " not found" << endl;
+		cerr << "Observable name " << Name << " not found (4)" << endl;
 		exit(1);
 		//return false;
 	}
 	else
 	{
-		allObservables[unsigned(nameIndex)] = *NewObservable;
+		allObservables[unsigned(nameIndex)]->SetObservable(NewObservable);
 		return true;
 	}
 }
 
+void DataPoint::AddObservable( string Name, Observable* NewObservable )
+{
+	if( StringProcessing::VectorContains( &allNames, &Name ) == -1 )
+	{
+		allNames.push_back( Name );
+		allObservables.push_back( new Observable(*NewObservable) );
+	}
+	else
+	{
+		this->SetObservable( Name, new Observable(*NewObservable) );
+	}
+}
+
+void DataPoint::AddObservable( string Name, double Value, double Error, string Unit, bool trusted, int nameIndex )
+{
+	Observable *tempObservable = new Observable( Name, Value, Error, Unit );
+	if( trusted )
+	{
+		allObservables[unsigned(nameIndex)]->SetObservable( tempObservable );
+	}
+	else
+	{
+		this->AddObservable( Name, tempObservable );
+	}
+}
+
 //Initialise observable
-bool DataPoint::SetObservable( const string Name, const double Value, const double Error, const string Unit, const bool trusted, const int nameIndex )
+bool DataPoint::SetObservable( string Name, double Value, double Error, string Unit, bool trusted, int nameIndex )
 {
 	Observable * temporaryObservable = new Observable( Name, Value, Error, Unit );
 	bool returnValue=false;
 	if( trusted )
 	{
 		returnValue=true;
-		allObservables[unsigned(nameIndex)] = *temporaryObservable;
-	} else {
+		allObservables[unsigned(nameIndex)]->SetObservable( temporaryObservable );
+	}
+	else
+	{
 		returnValue = SetObservable( Name, temporaryObservable );
 	}
 	delete temporaryObservable;
@@ -123,93 +211,95 @@ bool DataPoint::SetObservable( const string Name, const double Value, const doub
 }
 
 //	Used for Sorting DataPoints
-bool DataPoint::operator() ( pair<DataPoint,pair<string,int> > first, pair<DataPoint,pair<string,int> > second )
+bool DataPoint::operator() ( pair<DataPoint*,pair<string,int> > first, pair<DataPoint*,pair<string,int> > second )
 {
-	double param_val_1 = first.first.GetObservable( &first.second )->GetValue();
-	double param_val_2 = second.first.GetObservable( &second.second )->GetValue();
+	double param_val_1 = first.first->GetObservable( &first.second )->GetValue();
+	double param_val_2 = second.first->GetObservable( &second.second )->GetValue();
 	return (param_val_1 < param_val_2 );
 }
 
-Observable* DataPoint::GetPseudoObservable( ObservableRef& final_observable, string dependencies, double (*pseudoRelation)(vector<double>) )
+Observable* DataPoint::GetPseudoObservable( PseudoObservable& Input )
 {
-	if( ( final_observable.GetIndex() >=0 ) && ( ( (int)allPseudoObservables.size() -1 ) >= final_observable.GetIndex() ) )
+	//	If the DataPoint already has this Observable then continue,
+	//	else, Add it to the internal list and continue
+	if( Input.GetIndex() < 0 || ( Input.GetIndex()>(int)(allPseudoObservables.size()-1) || allPseudoObservables.empty() ))
 	{
-		return &( allPseudoObservables[ (unsigned)final_observable.GetIndex() ] );
+		allPseudoObservables.push_back( new PseudoObservable( Input ) );
+		Input.SetIndex( (int)allPseudoObservables.size()-1 );
 	}
-	else
+
+	PseudoObservable* thisObservable = allPseudoObservables[ Input.GetIndex() ];
+
+	Observable* outputObservable = NULL;
+
+	if( thisObservable->GetValid() )
 	{
-		//	Test if all observables before this one have been created
-		//	They should have been, if they haven't then this _will_ lead to logic errors
-		if( ( (int) allPseudoObservables.size() -2 ) != ( final_observable.GetIndex() - 1 ) )
-		{
-			cerr << endl << "\tWarning: Internal Logic Error in the handling of PsuedoObservables, resorting to look-up method" << endl << endl;
-			final_observable.SetIndex( -1 );
-		}
-
-		vector<string> split_deps = StringProcessing::SplitString( dependencies, ':' );
-
-		vector<double> input_from_deps;
-		for( unsigned int i=0; i< split_deps.size(); ++i )
-		{
-			input_from_deps.push_back( this->GetObservable( split_deps[i] )->GetValue() );
-		}
-						//		Name		Value			     Error   Unit
-		Observable* new_pseudo = new Observable( final_observable, pseudoRelation( input_from_deps ), 0, "none" );
-
-		allPseudoObservables.push_back( *new_pseudo );
-		allPseudoNames.push_back( final_observable );
-
-		if( final_observable.GetIndex() == -1 )
-		{
-			final_observable.SetIndex( (int)allPseudoObservables.size() -1 );
-		}
-
-		return &( allPseudoObservables.back() );
+		outputObservable = thisObservable->GetPseudoObservable();
 	}
-	return NULL;
+
+	if( !thisObservable->GetValid() || outputObservable == NULL )
+	{
+		vector<ObservableRef>* deps = thisObservable->GetDependencies();
+		vector<double> input;
+		for( vector<ObservableRef>::iterator dep_i = deps->begin(); dep_i != deps->end(); ++dep_i )
+		{
+			input.push_back( this->GetObservable( *(dep_i) )->GetValue() );
+		}
+		thisObservable->SetInput( input );
+
+		outputObservable = thisObservable->GetPseudoObservable();
+	}
+
+	thisObservable->SetValid( Input.GetValid() );
+
+	return outputObservable;
 }
 
-//	Same function but for pair<double,double> (*pseudoRelation)(vector<double>)  which provides Value and error
-//	This is unlikely to be a generic function for more than 1 pdf but is here for extensibility
-Observable* DataPoint::GetPseudoObservable( ObservableRef& final_observable, string dependencies, pair<double,double> (*pseudoRelation)(vector<double>) )
+void DataPoint::Print() const
 {
-	if( ( final_observable.GetIndex() >=0 ) && ( ( (int)allPseudoObservables.size() -1 ) >= final_observable.GetIndex() ) )
+	cout << "DataPoint:" << endl;
+	for( unsigned int i=0; i< allObservables.size(); ++i )
 	{
-		return &( allPseudoObservables[ (unsigned)final_observable.GetIndex() ] );
+		allObservables[i]->Print();
 	}
-	else
+
+	if( !allPseudoObservables.empty() )
 	{
-		//      Test if all observables before this one have been created
-		//      They should have been, if they haven't then this _will_ lead to logic errors
-		if( ( (int) allPseudoObservables.size() -2 ) != ( final_observable.GetIndex() - 1 ) )
+		for( unsigned int i=0; i< allPseudoObservables.size(); ++i )
 		{
-			cerr << endl << "\tWarning: Internal Logic Error in the handling of PsuedoObservables, resorting to look-up method" << endl << endl;
-			final_observable.SetIndex( -1 );
+			allPseudoObservables[i]->Print();
 		}
-
-		vector<string> split_deps = StringProcessing::SplitString( dependencies, ':' );
-
-		vector<double> input_from_deps;
-		for( unsigned int i=0; i< split_deps.size(); ++i )
-		{
-			input_from_deps.push_back( this->GetObservable( split_deps[i] )->GetValue() );
-		}
-
-		pair<double,double> relation_result = pseudoRelation( input_from_deps );
-
-						//              Name            Value                Error                Unit
-		Observable* new_pseudo = new Observable( final_observable, relation_result.first, relation_result.second, "none" );
-
-		allPseudoObservables.push_back( *new_pseudo );
-		allPseudoNames.push_back( final_observable );
-
-		if( final_observable.GetIndex() == -1 )
-		{
-			final_observable.SetIndex( (int)allPseudoObservables.size() -1 );
-		}
-
-		return &( allPseudoObservables.back() );
 	}
-	return NULL;
+	cout << endl;
+}
+
+void DataPoint::ClearPsuedoObservable()
+{
+	while( !allPseudoObservables.empty() )
+	{
+		if( allPseudoObservables.back() != NULL ) delete allPseudoObservables.back();
+		allPseudoObservables.pop_back();
+		allPseudoNames.pop_back();
+	}
+}
+
+PhaseSpaceBoundary* DataPoint::GetPhaseSpaceBoundary() const
+{
+	return myPhaseSpaceBoundary;
+}
+
+void DataPoint::SetPhaseSpaceBoundary( PhaseSpaceBoundary* input )
+{
+	myPhaseSpaceBoundary = input;
+}
+
+int DataPoint::GetDiscreteIndex() const
+{
+	return thisDiscreteIndex;
+}
+
+void DataPoint::SetDiscreteIndex( int Input )
+{
+	thisDiscreteIndex = Input;
 }
 

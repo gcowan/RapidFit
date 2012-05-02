@@ -7,33 +7,38 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef PHYSICS_PARAMETER_H
 #define PHYSICS_PARAMETER_H
 
 //	System Headers
 #include <string>
 
-using namespace std;
+using namespace::std;
 
 class PhysicsParameter
 {
 	public:
-		PhysicsParameter();
+		PhysicsParameter( string );
 		PhysicsParameter( string, double, double, double, double, string, string );
 		PhysicsParameter( string, double, double, string, string );
 		~PhysicsParameter();
 
-		double GetValue();
+		string GetName() const;
+
+		double GetValue() const;
 		void SetValue(double);
-		double GetBlindedValue();
+
+		double GetBlindedValue() const;
 		void SetBlindedValue(double);
-		double GetTrueValue();
+
+		double GetTrueValue() const;
 		void SetTrueValue(double);
 
-		double GetMinimum();
+		double GetMinimum() const;
 		void SetMinimum(double);
 
-		double GetMaximum();
+		double GetMaximum() const;
 		void SetMaximum(double);
 
 		void SetLimits(double, double);
@@ -41,19 +46,25 @@ class PhysicsParameter
 		void SetBlindOffset( double ) ;
 		void SetBlinding( bool ) ;
 
-		string GetType();
+		string GetType() const;
 		void SetType(string);
 
-		double GetOriginalValue();
+		double GetOriginalValue() const;
 		void ForceOriginalValue( double );
-		string GetUnit();
 
-		double GetStepSize();
+		string GetUnit() const;
+
+		double GetStepSize() const;
 		void SetStepSize( double );
 
-		void print() ;
+		void Print() const;
+
+		string XML() const;
+
+		void SetBlindingInfo( string, double );
 
 	private:
+		string name;
 		double value;
 		double originalValue;
 		double minimum;
@@ -62,8 +73,12 @@ class PhysicsParameter
 		string type;
 		string unit;
 	
-		bool toBeBlinded ;
-		double blindOffset ;
+		bool toBeBlinded;
+		double blindOffset;
+
+		string blindString;
+		double blindScale;
 };
 
 #endif
+

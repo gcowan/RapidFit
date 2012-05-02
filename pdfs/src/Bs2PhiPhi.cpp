@@ -71,9 +71,7 @@ void Bs2PhiPhi::MakePrototypes()
     parameterNames.push_back( delta_2Name );
     parameterNames.push_back( deltaMName );
     parameterNames.push_back( Phi_sName );
-    allParameters = *( new ParameterSet(parameterNames) );
-
-    valid = true;
+    allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor

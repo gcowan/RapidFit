@@ -65,7 +65,7 @@ public:
 private:
 
    // Physics Parameters - set by setPhysicsParameters() 
-   PhysicsParameter gamma ;
+   PhysicsParameter* gamma ;
    
    //Detector parameters
    double resolution ;

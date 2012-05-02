@@ -10,27 +10,27 @@
 //	RapidFit Headers
 #include "FitResult.h"
 
-//Default constructor
-FitResult::FitResult() : minimumValue(-9999), fittedParameters(NULL), covarianceMatrix(), contours(), fitStatus(-9999), fittedBottle(NULL)
-{
-}
-
 //Constructor with correct arguments
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix(), contours(), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle ) : minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix(), contours(), fitStatus( FitStatus ), fittedBottle( new PhysicsBottle(*FittedBottle) )
 {
 }
 
 //Constructor with correct arguments, including covariance Matrix
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle, vector<double> covMatrix ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), contours(), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle, vector<double> covMatrix ) : minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( covMatrix ), contours(), fitStatus( FitStatus ), fittedBottle( new PhysicsBottle(*FittedBottle) )
 {
 }
 
 //Constructor with correct arguments, including covariance Matrix and contours
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle, vector<double> covMatrix, vector< FunctionContour* > ContourPlots ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix( covMatrix ), contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( FittedBottle )
+FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle, vector<double> covMatrix, vector< FunctionContour* > ContourPlots ) : minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( covMatrix ), contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( new PhysicsBottle(*FittedBottle) )
 {
 }
 
-FitResult::FitResult( double MinimumValue, ResultParameterSet* FittedParameters, int FitStatus ) : minimumValue( MinimumValue ), fittedParameters( FittedParameters ), covarianceMatrix(), contours(), fitStatus( FitStatus ), fittedBottle(NULL)
+//FitResult::FitResult( double MinimumValue, ResultParameterSet* FittedParameters, int FitStatus ) : minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix(), contours(), fitStatus( FitStatus ), fittedBottle(NULL)
+//{
+//}
+
+FitResult::FitResult( const FitResult& input ) :
+minimumValue(input.minimumValue), fittedParameters( new ResultParameterSet(*input.fittedParameters) ), covarianceMatrix(input.covarianceMatrix), contours(input.contours), fitStatus(input.fitStatus), fittedBottle(new PhysicsBottle(*input.fittedBottle))
 {
 }
 
@@ -77,3 +77,9 @@ PhysicsBottle* FitResult::GetPhysicsBottle()
 {
 	return fittedBottle;
 }
+
+void FitResult::Print() const
+{
+	fittedParameters->Print();
+}
+

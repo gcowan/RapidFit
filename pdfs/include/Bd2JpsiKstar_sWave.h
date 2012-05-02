@@ -9,12 +9,17 @@
 #ifndef Bd2JpsiKstar_sWave_H
 #define Bd2JpsiKstar_sWave_H
 
-#ifndef __CINT__
+//#ifndef __CINT__
 #include "BasePDF.h"
 #include "SlicedAcceptance.h"
-#endif
-#ifdef __CINT__
-#endif
+#include "TFile.h"
+#include <iostream>
+#include <fstream>
+#include "TAxis.h"
+#include "TH3D.h"
+//#endif
+//#ifdef __CINT__
+//#endif
 
 class Bd2JpsiKstar_sWave : public BasePDF
 {
@@ -28,6 +33,7 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		double NormAnglesOnlyForAcceptanceWeights(DataPoint*, PhaseSpaceBoundary*);
 		//Return a list of parameters not to be integrated
                 virtual vector<string> GetDoNotIntegrateList();
+		double angularFactor();
 
 	protected:
 		//Calculate the PDF normalisation
@@ -136,13 +142,20 @@ class Bd2JpsiKstar_sWave : public BasePDF
 
 		//double tlow, thigh; // Integration limits
 
+		TH3D *histo;
+                TAxis *xaxis, *yaxis, *zaxis;
+                int nxbins, nybins, nzbins;
+                double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
+                double total_num_entries;
+
+
 		double buildPDFnumerator();
 		double buildPDFdenominator();
 		double buildCompositePDFdenominator();
 		double buildPDFdenominatorAngles();
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
-
+		bool useFlatAngularDistribution;
 };
 
 #endif

@@ -164,7 +164,7 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 		double tlow = lowEdge[is];
 		double thigh = hiEdge[is] ;
 		double height = binContent[is]  ;
-		cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
+		//cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
 		slices.push_back( new AcceptanceSlice( tlow, thigh, height ) ) ;
 	}
 	
@@ -179,28 +179,53 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 double SlicedAcceptance::getValue( double t ) const
 {
 	double returnValue = 0 ;
-	for( unsigned int is = 0; is < slices.size() ; ++is ){
+	for( unsigned int is = 0; is < slices.size() ; ++is )
+	{
 		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height() ;
-	}	
-	return returnValue ;
+	}
+	return returnValue;
+}
+
+double SlicedAcceptance::getValue( Observable* time ) const
+{
+	if( time->GetBinNumber() != -1 )
+	{
+		return time->GetAcceptance();
+	}
+	else
+	{
+		double t= time->GetValue();
+		double returnValue = 0 ;
+		unsigned int is = 0;
+        	for( ; is < slices.size() ; ++is )
+		{
+			if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
+        	}
+		time->SetBinNumber( (int)is );
+		time->SetAcceptance( returnValue );
+		return returnValue;
+	}
 }
 
 //............................................
 // Return the number of slices
-int SlicedAcceptance::numberOfSlices() const { return (int) slices.size() ; }
+unsigned int SlicedAcceptance::numberOfSlices() const
+{
+	return (unsigned)slices.size();
+}
 
 //............................................
 // Return a slice
-AcceptanceSlice * SlicedAcceptance::getSlice( int s ) const
+AcceptanceSlice * SlicedAcceptance::getSlice( unsigned int s ) const
 {
-	if( (s<0) || (s>=(int)slices.size()) ) return nullSlice ;
-	return slices[(unsigned)s] ;
+	if( s>=(unsigned)slices.size() ) return nullSlice;
+	return slices[s];
 }
-
 
 //............................................
 //Helpers
-double SlicedAcceptance::stream(ifstream& stream) {
+double SlicedAcceptance::stream(ifstream& stream)
+{
 	double tmpVal;
 	stream >> tmpVal;
 	return tmpVal;

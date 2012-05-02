@@ -29,7 +29,7 @@ class Bs2DsPi_lowmassbkg_updated : public BasePDF
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
+		virtual double Normalisation(PhaseSpaceBoundary*);
 
 
 

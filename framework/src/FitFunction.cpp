@@ -1,12 +1,12 @@
 /**
-        @class FitFunction
+  @class FitFunction
 
-        Parent class for the function to minimise
-	Overload the evaluate methods and UP value for Chi2, NLL, etc.
+  Parent class for the function to minimise
+  Overload the evaluate methods and UP value for Chi2, NLL, etc.
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+ */
 //	ROOT Headers
 #include "TFile.h"
 #include "TTree.h"
@@ -14,12 +14,21 @@
 #include "TString.h"
 //	RapidFit Headers
 #include "FitFunction.h"
+#include "Threading.h"
+#include "ClassLookUp.h"
+#include "RapidFitIntegrator.h"
 //	System Headers
 #include <iostream>
 #include <iomanip>
+#include <float.h>
+#include <cstdlib>
+
+using namespace::std;
 
 //Default constructor
-FitFunction::FitFunction() : allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0), Threads(0)
+FitFunction::FitFunction() :
+	allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
+	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true )
 {
 }
 
@@ -35,6 +44,30 @@ FitFunction::~FitFunction()
 		Fit_Tree->Write();
 		Fit_File->Close();
 	}
+	if( fit_thread_data != NULL ) delete [] fit_thread_data;
+	//if( allData != NULL ) delete allData;
+	while( !StoredBoundary.empty() )
+	{
+		if( StoredBoundary.back() != NULL ) delete StoredBoundary.back();
+		StoredBoundary.pop_back();
+	}
+	while( !stored_pdfs.empty() )
+	{
+		if( stored_pdfs.back() != NULL ) delete stored_pdfs.back();
+		stored_pdfs.pop_back();
+	}
+	while( !StoredIntegrals.empty() )
+	{
+		if( StoredIntegrals.back() != NULL ) delete StoredIntegrals.back();
+		StoredIntegrals.pop_back();
+	}
+	while( !allIntegrators.empty() )
+	{
+		if( allIntegrators.back() != NULL ) delete allIntegrators.back();
+		allIntegrators.pop_back();
+	}
+
+	if( fit_thread_data != NULL ) delete [] fit_thread_data;
 }
 
 void FitFunction::SetupTrace( TString FileName, int traceNum )
@@ -57,6 +90,7 @@ void FitFunction::SetupTrace( TString FileName, int traceNum )
 		TString Branch_Name_2( string( branch_names.back() ).c_str()); Branch_Name_2.Append("/D");
 		Fit_Tree->Branch( Branch_Name, &(branch_objects.back()), Branch_Name_2 );
 	}
+
 	branch_objects.push_back( 0 );
 	Fit_Tree->Branch( "NLL", &(branch_objects.back()), "NLL/D" );
 	Fit_Tree->Branch( "Call", &(fit_calls), "Call/D" );
@@ -65,14 +99,48 @@ void FitFunction::SetupTrace( TString FileName, int traceNum )
 //Set the physics bottle to fit with
 void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 {
-	NewBottle->Finalise();
 	allData = NewBottle;
+
 
 	//Initialise the integrators
 	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); ++resultIndex )
 	{
-		RapidFitIntegrator * resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
+		RapidFitIntegrator * resultIntegrator = NULL;
+		if( NewBottle->GetResultPDF(resultIndex)->RequestIntegrator() == NULL )
+		{
+			resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
+			NewBottle->GetResultPDF(resultIndex)->AssociateIntegrator( resultIntegrator );
+			//resultIntegrator->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
+			if( testIntegrator == false ) resultIntegrator->ForceTestStatus( true );
+		}
+		else
+		{
+			resultIntegrator = new RapidFitIntegrator( *(NewBottle->GetResultPDF(resultIndex)->RequestIntegrator()) );
+			if( testIntegrator == false ) resultIntegrator->ForceTestStatus( true );
+		}
+
 		allIntegrators.push_back( resultIntegrator );
+		// Give the Caching code a Sharp Kick!!!
+		allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
+		if( Threads > 0 )
+		{
+			//      Create simple data subsets. We no longer care about the handles that IDataSet takes care of
+			StoredDataSubSet.push_back( Threading::divideData( NewBottle->GetResultDataSet(resultIndex), Threads ) );
+			for( int i=0; i< Threads; ++i )
+			{
+				StoredBoundary.push_back( new PhaseSpaceBoundary( *(NewBottle->GetResultDataSet(resultIndex)->GetBoundary()) ) );
+				stored_pdfs.push_back( ClassLookUp::CopyPDF( NewBottle->GetResultPDF( resultIndex ) ) );
+				StoredIntegrals.push_back( new RapidFitIntegrator( stored_pdfs.back() ) );
+
+				// Give the Integral Testing code a Sharp Kick!!!
+				StoredIntegrals.back()->ForceTestStatus( true );
+			}
+		}
+	}
+
+	if( Threads > 0 )
+	{
+		fit_thread_data = new Fitting_Thread[ (unsigned) Threads ];
 	}
 }
 
@@ -85,8 +153,28 @@ PhysicsBottle* FitFunction::GetPhysicsBottle()
 // Get and set the fit parameters
 bool FitFunction::SetParameterSet( ParameterSet * NewParameters )
 {
-	return allData->SetParameterSet(NewParameters);
+	bool result = allData->SetParameterSet(NewParameters);
+
+	if( result )
+	{
+		//Initialise the integrators
+        	for ( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
+        	{
+			allData->SetParameterSet( NewParameters );
+
+			allData->GetResultPDF( resultIndex )->UpdatePhysicsParameters( NewParameters );
+
+			for( int i=0; i< Threads; ++i )
+			{
+				stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UpdatePhysicsParameters( NewParameters );
+				stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UnsetCache();
+			}
+		}
+	}
+
+	return result;
 }
+
 ParameterSet * FitFunction::GetParameterSet()
 {
 	return allData->GetParameterSet();
@@ -96,18 +184,30 @@ ParameterSet * FitFunction::GetParameterSet()
 double FitFunction::Evaluate()
 {
 	double minimiseValue = 0.0;
-
+	double temp=0.;
 	//Calculate the function value for each PDF-DataSet pair
 	for (int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex)
 	{
-		minimiseValue += EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)] );
+		temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)], resultIndex );
+		if( temp >= DBL_MAX )
+		{
+			minimiseValue=DBL_MAX;
+			break;
+		}
+		else
+		{
+			minimiseValue+=temp;
+		}
 	}
 
 	//Calculate the value of each constraint
 	vector< ConstraintFunction* > constraints = allData->GetConstraints();
 	for (unsigned int constraintIndex = 0; constraintIndex < constraints.size(); ++constraintIndex )
 	{
-		minimiseValue += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
+		if( minimiseValue < DBL_MAX )
+		{
+			minimiseValue += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
+		}
 	}
 
 	++fit_calls;
@@ -126,17 +226,22 @@ double FitFunction::Evaluate()
 		//cout << endl;
 		Fit_Tree->Fill();
 	}
-	cout << "NLL: " << setprecision(20) << minimiseValue << "\r\r\r" << flush;
+	cout << "NLL: " << setprecision(10) << minimiseValue << "\r\r\r" << flush;
+	if( isnan(minimiseValue) )
+	{
+		minimiseValue = DBL_MAX;
+	}
+
 	return minimiseValue;
 }
 
 //Return the value to minimise for a given PDF/DataSet pair
-double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
+double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator, int number )
 {
-	//	Stupid gcc
 	(void)TestPDF;
 	(void)TestDataSet;
 	(void)ResultIntegrator;
+	(void)number;
 
 	return 1.0;
 }
@@ -144,15 +249,8 @@ double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, Rap
 //Return the Up value for error calculation
 double FitFunction::UpErrorValue( int Sigma )
 {
-	//	Stupid gcc
 	(void)Sigma;
 	return 1.0;
-}
-
-//Finalise the PhysicsBottle
-void FitFunction::Finalise()
-{
-	allData->Finalise();
 }
 
 //Set the FitFunction to use per-event weights
@@ -165,9 +263,22 @@ void FitFunction::UseEventWeights( string WeightName )
 void FitFunction::SetThreads( int input )
 {
 	Threads = input;
+	//      Get the number of cores on the compile machine
+	unsigned int num_cores = (unsigned)Threading::numCores();
+
+	if( input < 0 )
+	{
+		Threads = (int)num_cores;
+	}
 }
 
 int FitFunction::GetThreads()
 {
 	return Threads;
 }
+
+void FitFunction::SetIntegratorTest( bool input )
+{
+	testIntegrator = input;
+}
+

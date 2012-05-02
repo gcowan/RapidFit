@@ -14,7 +14,6 @@
 #include "BasePDF.h"
 
 #include "Bs2Jpsifzero_SignalAlt_BaseClass_dev.h"
-#include "RooComplex.h"
 
 #include <exception>
 #include <iostream>

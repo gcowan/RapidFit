@@ -24,7 +24,6 @@ Bs2JpsiPhiMassSignal::Bs2JpsiPhiMassSignal(PDFConfigurator* configurator) :
 	// Observables
 	, recoMassName	( configurator->getName("mass") )
 {
-	cout << "here" << endl;
 	MakePrototypes();
 }
 
@@ -40,9 +39,7 @@ void Bs2JpsiPhiMassSignal::MakePrototypes()
         parameterNames.push_back( sigma_m1Name );
         parameterNames.push_back( sigma_m2Name );
         parameterNames.push_back( m_BsName );
-        allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+        allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -85,10 +82,8 @@ double Bs2JpsiPhiMassSignal::Evaluate(DataPoint * measurement)
 
 
 // Normalisation
-double Bs2JpsiPhiMassSignal::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhiMassSignal::Normalisation(PhaseSpaceBoundary * boundary)
 {
-	//	Stupid gcc
-	(void)measurement;
 	(void)boundary;
 	// Assumes that the mass integration limits are +/- Infinity
 	// So take sufficiently large mass window.

@@ -1,0 +1,61 @@
+
+Step 1)
+
+Make your data file(s) > 10M available on the GRID		See:		Upload_Files_to_GRID_README
+
+Step 2)
+
+edit the XML to request for files only by the filename, let everything else worry about putting everything in the same place when your running
+
+
+Step 3)
+
+Customise the parameters in 2DLL_Scan_From_XML.py
+
+X_par="Phi_s"
+Y_par="deltaGamma"
+
+X_min=-2.
+X_max=0.
+Y_min=-0.1
+Y_max=0.2
+
+resolution=40
+sqrt_jobs_per_core=4			//	sqrt( number of grid points per CPU ) so this runs 16 points per CPU
+
+
+Step 4)
+
+Run the script as:
+
+	SetupProject Ganga
+
+	ganga 2DLL_Scan_From_XML.py Your_XML_FILE.xml  LFN:/lhcb/user/r/rcurrie/Pass3-version2_Bs_310711_RapidFit.root optional_background.root optional_acceptance.txt
+
+
+
+The XML you want to run over has to be the second argument to ganga (and the first argument passed to the script)
+
+Any and ALL LFNs in the argument list are added to the jobs inputsandbox and are set to be downloaded into the working directory for when the job starts running
+
+Any further arguments are treated as input files that should be added to the inputsandbox (this must be < 10M but you shouldn't have to worry for background and acceptance input files)
+
+
+
+
+
+
+
+
+
+
+(If you run your job requesting an LFN then the backend defaults to the GRID as I think even if it's possible to use LFN on other systems it's not worth the pain)
+
+
+
+The script polls te environment for RAPIDFITROOT which has been used in the larger analyses requiring batch jobs for long enough I feel it's a standard part of RapidFit's install. 
+
+The script also polls root-config to determine the running version of ROOT at submittion (this is very likely the one that you built RapidFit against)
+
+
+

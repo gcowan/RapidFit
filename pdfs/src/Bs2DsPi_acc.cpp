@@ -12,7 +12,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 
 PDF_CREATOR( Bs2DsPi_acc );
 
@@ -61,9 +60,7 @@ void Bs2DsPi_acc::MakePrototypes()
 	parameterNames.push_back( accSlopeHighName );
 	parameterNames.push_back( accSlopeHighName );
 	parameterNames.push_back( accPowerName );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor

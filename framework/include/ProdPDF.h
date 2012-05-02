@@ -1,57 +1,95 @@
-/**
-        @class ProdPDF
+/*!
+ * @class ProdPDF
+ *
+ * @brief An implementation of IPDF for multiplying the values of two other IPDFs
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie
+ */
 
-        An implementation of IPDF for adding the values of two other IPDFs
-
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
-
+#pragma once
 #ifndef PROD_PDF_H
 #define PROD_PDF_H
 
 //	RapidFit Headers
-//#include "IPDF.h"
+#include "IPDF.h"
 #include "BasePDF.h"
+#include "ComponentRef.h"
+//	System Headers
+#include <string>
+#include <vector>
+
+using namespace::std;
 
 class ProdPDF : public BasePDF
 {
 	public:
-		ProdPDF();
-		ProdPDF( IPDF*, IPDF* );
-		ProdPDF( const ProdPDF& );
-		virtual ~ProdPDF();
+		/*!
+		 * @brief Correct Constructor which takes in 2 arguemnt PDF objects
+		 *
+		 * @param First   First fully constructed PDF object
+		 *
+		 * @patam Second  Second fully constructed PDF object
+		 */
+		ProdPDF( IPDF* First, IPDF* Second );
 
+		/*!
+		 * @brief Copy Constructor
+		 */
+		ProdPDF( const ProdPDF& );
+
+		/*!
+		 * @brief Destructor
+		 */
+		~ProdPDF();
+
+		/*!
+		 * @brief Called by the Constructor to deal with initializing objects now that the PDF has been initalized
+		 */
 		void MakePrototypes();
 
-		//Indicate whether the function has been set up correctly
-		virtual bool IsValid();
+		/*!
+		 * @brief Set the function parameters
+		 *
+		 * @param Input 
+		 */
+		bool SetPhysicsParameters( ParameterSet* Input );
 
-		//Set the function parameters
-		virtual bool SetPhysicsParameters(ParameterSet*);
-
-		//Return the integral of the function over the given boundary
-		virtual double Integral(DataPoint*, PhaseSpaceBoundary*);
+		/*!
+		 * @brief Return the integral of the function over the given boundary
+		 */
+		double Normalisation( DataPoint*, PhaseSpaceBoundary* );
 
 		//Return the function value at the given point
-		virtual double Evaluate(DataPoint*);
-		virtual double EvaluateForNumericIntegral(DataPoint*);
-	
-		//Return the components of the function value at the given point
-		virtual vector<double> EvaluateComponents(DataPoint*);
-	
+		double Evaluate( DataPoint* );
+		double EvaluateForNumericIntegral( DataPoint* );
+
 		//Return a prototype data point
-		virtual vector<string> GetPrototypeDataPoint();
+		vector<string> GetPrototypeDataPoint();
 
 		//Return a prototype set of physics parameters
-		virtual vector<string> GetPrototypeParameterSet();
+		vector<string> GetPrototypeParameterSet();
 
 		//Return a list of parameters not to be integrated
-                virtual vector<string> GetDoNotIntegrateList();
-	
-		//Update cache
-                virtual void UpdateIntegralCache();
-	
+		vector<string> GetDoNotIntegrateList();
+
+		bool GetNumericalNormalisation() const;
+
+		//      Return components, component 0 by default
+		double EvaluateComponent( DataPoint*, ComponentRef* );
+
+		IPDF* GetFirstPDF() const;
+
+		IPDF* GetSecondPDF() const;
+
+		bool GetCachingEnabled() const;
+
+		void SetCachingEnabled( bool );
+
+		/*!
+		 * @brief Provide the XML which is capable of constructing this PDF in it's current state
+		 */
+		string XML() const;
 	private:
 		//	Uncopyable!
 		//ProdPDF ( const ProdPDF& );
@@ -66,3 +104,4 @@ class ProdPDF : public BasePDF
 };
 
 #endif
+

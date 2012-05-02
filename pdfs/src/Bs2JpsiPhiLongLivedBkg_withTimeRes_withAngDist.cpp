@@ -12,7 +12,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 
 PDF_CREATOR( Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist );
 
@@ -64,9 +63,7 @@ void Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::MakePrototypes()
 //	parameterNames.push_back( f_JpsiName );
 	parameterNames.push_back( f_NoJpsiName );
 
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -140,10 +137,8 @@ double Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::buildPDFnumerator()
 	}
 }
 
-double Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Normalisation(PhaseSpaceBoundary * boundary)
 {
-	//	Stupid gcc
-	(void)measurement;
         IConstraint * timeBound = boundary->GetConstraint( timeName );
         if ( timeBound->GetUnit() == "NameNotFoundError" )
         {

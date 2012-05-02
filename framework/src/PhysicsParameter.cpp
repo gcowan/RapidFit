@@ -1,26 +1,35 @@
-/**
-  @class PhysicsParameter
-
-  A parameter to be adjusted by the fitter, with a starting value and limits
-  Modified by Pete Clarke december 2010 to add blinding 
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @date 2009-10-02
-  */
+/*!
+ *
+ * @class PhysicsParameter
+ *
+ * A parameter to be adjusted by the fitter, with a starting value and limits
+ * Modified by Pete Clarke december 2010 to add blinding 
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ */
 
 //	RapidFit Headers
 #include "PhysicsParameter.h"
 //	System Headers
 #include <iostream>
+#include <sstream>
+
+using namespace::std;
+
+const double default_val = -9999.;
 
 //Default constructor
-PhysicsParameter::PhysicsParameter() : value(0.0), originalValue(0.0), minimum(0.0), maximum(0.0), stepSize(0.), type("Uninitialised"), unit("Uninitialised"), toBeBlinded(false), blindOffset(0.0)
+PhysicsParameter::PhysicsParameter( string Name ) :
+	name(Name), value(default_val), originalValue(default_val), minimum(default_val), maximum(default_val), stepSize(default_val),
+	type("Uninitialised"), unit("Uninitialised"), toBeBlinded(false), blindOffset(default_val), blindString("uninitialized"), blindScale(-999.)
 {
 }
 
 //Constructor with correct argument
 PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMinimum, double NewMaximum, double StepSize, string NewType, string NewUnit )
-	: value(NewValue), originalValue(0.0), minimum(NewMinimum), maximum(NewMaximum), stepSize(StepSize), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0)
+	: name(Name), value(NewValue), originalValue(NewValue), minimum(NewMinimum), maximum(NewMaximum), stepSize(StepSize),
+	type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0), blindString("uninitialized"), blindScale(-999.)
 {
 	if ( maximum < minimum )
 	{
@@ -51,7 +60,7 @@ PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMini
 }
 
 //Constructor for unbounded parameter
-PhysicsParameter::PhysicsParameter( string Name, double NewValue, double StepSize, string NewType, string NewUnit ) : value(NewValue), originalValue(), minimum(0.0), maximum(0.0), stepSize(StepSize), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0)
+PhysicsParameter::PhysicsParameter( string Name, double NewValue, double StepSize, string NewType, string NewUnit ) : value(NewValue), originalValue(NewValue), minimum(0.0), maximum(0.0), stepSize(StepSize), type(NewType), unit(NewUnit), toBeBlinded(false), blindOffset(0.0), blindString("uninitialized"), blindScale(-999.)
 {
 	//You could define a fixed parameter with no maximum or minimum, but it must be unbounded if not fixed.
 	if ( type != "Fixed" )
@@ -72,10 +81,15 @@ PhysicsParameter::~PhysicsParameter()
 {
 }
 
+string PhysicsParameter::GetName() const
+{
+	return name;
+}
+
 //............ Get ans Set methods became complex since adding blinding  .......
 
 //Get the unblinded value. 
-double PhysicsParameter::GetValue()
+double PhysicsParameter::GetValue() const
 {
 	return this->GetTrueValue() ;
 }
@@ -84,14 +98,13 @@ double PhysicsParameter::GetValue()
 // {This sets a different thing to what GetValue gets for historic reasons.}
 void PhysicsParameter::SetValue(double NewValue)
 {
-	this->SetBlindedValue( NewValue) ;
+	this->SetBlindedValue( NewValue );
 }
 
 //Get the blinded value
-double PhysicsParameter::GetBlindedValue()
+double PhysicsParameter::GetBlindedValue() const
 {
-	double new_value = value;
-	return new_value ;
+	return value;
 }
 //Set the blinded value
 void PhysicsParameter::SetBlindedValue(double NewValue)
@@ -100,7 +113,7 @@ void PhysicsParameter::SetBlindedValue(double NewValue)
 }
 
 //Get the true value
-double PhysicsParameter::GetTrueValue()
+double PhysicsParameter::GetTrueValue() const
 {
 	double new_value=-9999;
 	if( toBeBlinded ) 
@@ -110,6 +123,7 @@ double PhysicsParameter::GetTrueValue()
 	else new_value = value ;
 	return new_value;
 }
+
 //Set the true value
 void PhysicsParameter::SetTrueValue(double NewValue)
 {
@@ -117,23 +131,21 @@ void PhysicsParameter::SetTrueValue(double NewValue)
 	{
 		value = NewValue - blindOffset;   
 	}
-	else value = NewValue ;	
+	else value = NewValue;	
 }
-
-
 
 //.....................
 //Get and set the minimum
-double PhysicsParameter::GetMinimum()
+double PhysicsParameter::GetMinimum() const
 {
-	if ( type == "Unbounded" )
-	{
-		cerr << "Minimum of unbounded parameter requested" << endl;
-	}
+	//if ( type == "Unbounded" )	//	We have defined sensible behaviour in this instance, this is not an error
+	//{
+	//	cerr << "Minimum of unbounded parameter requested" << endl;
+	//}
 
-	double new_minimum = minimum;
-	return new_minimum;
+	return minimum;
 }
+
 void PhysicsParameter::SetMinimum(double NewMinimum)
 {
 	if ( type == "Unbounded" )
@@ -154,15 +166,16 @@ void PhysicsParameter::SetMinimum(double NewMinimum)
 }
 
 //Get and set the maximum
-double PhysicsParameter::GetMaximum()
+double PhysicsParameter::GetMaximum() const
 {
-	if ( type == "Unbounded" )
-	{
-		cerr << "Maximum of unbounded parameter requested" << endl;
-	}
-	double new_maximum = maximum;
-	return new_maximum;
+	//if ( type == "Unbounded" )	//	We have defined sensible behviour in this instance, this is not an error
+	//{
+	//	cerr << "Maximum of unbounded parameter requested" << endl;
+	//}
+
+	return maximum;
 }
+
 void PhysicsParameter::SetMaximum(double NewMaximum)
 {
 	if ( type == "Unbounded" )
@@ -218,21 +231,21 @@ void PhysicsParameter::SetLimits(double NewMaximum, double NewMinimum)
 }
 
 //Get and set the type
-string PhysicsParameter::GetType()
+string PhysicsParameter::GetType() const
 {
-	string new_type = type;
-	return new_type;
+	return type;
 }
+
 void PhysicsParameter::SetType(string NewType)
 {
+	if( NewType == "Fixed" ) originalValue = this->GetBlindedValue();
 	type = NewType;
 }
 
 //Get the original value
-double PhysicsParameter::GetOriginalValue()
+double PhysicsParameter::GetOriginalValue() const
 {
-	double new_originalValue= originalValue;
-	return new_originalValue;
+	return originalValue;
 }
 
 void PhysicsParameter::ForceOriginalValue( double new_original_value )
@@ -241,45 +254,79 @@ void PhysicsParameter::ForceOriginalValue( double new_original_value )
 }
 
 //Get the unit
-string PhysicsParameter::GetUnit()
+string PhysicsParameter::GetUnit() const
 {
-	string new_unit = unit;
-	return new_unit;
+	return unit;
 }
 
 //Set blinding offset
 void PhysicsParameter::SetBlindOffset( double offset )
 {
-	blindOffset = offset ;
-	toBeBlinded = true ;
-	return ;
+	blindOffset = offset;
+	toBeBlinded = true;
+	return;
 }
 
 //Set blinding on or off
 void PhysicsParameter::SetBlinding( bool state )
 {
-	toBeBlinded = state ;
-	return ;
+	toBeBlinded = state;
+	return;
 }
 
 //General print
-void PhysicsParameter::print()
+void PhysicsParameter::Print() const
 {
-	cout << "   value       " << value << endl ;
-	cout << "   blindOffset " << blindOffset << endl ;
-	cout << "   minimum     " << minimum << endl ;
-	cout << "   maximum     " << maximum << endl ;
-	cout << "   type        " << type << endl ;
-	cout << "   unit        " << unit << endl ;
+        cout << "   value       " << value << endl;
+        //cout << "   blindOffset " << blindOffset << endl;
+        cout << "   blinded?    " << string( toBeBlinded ? "Yes" : "No" ) << endl;
+        cout << "   originalVal " << originalValue << endl;
+        cout << "   minimum     " << minimum << endl;
+        cout << "   maximum     " << maximum << endl;
+        cout << "   stepsize    " << stepSize << endl;
+        cout << "   type        " << type << endl;
+        cout << "   unit        " << unit << endl;
 }
 
-double PhysicsParameter::GetStepSize()
+double PhysicsParameter::GetStepSize() const
 {
-	return double( stepSize );
+	return stepSize;
 }
 
 void PhysicsParameter::SetStepSize( double newStep )
 {
 	stepSize = newStep;
+}
+
+string PhysicsParameter::XML() const
+{
+	stringstream xml;
+	xml << "\t<PhysicsParameter>" << endl;
+	xml << "\t\t<Name>" << name << "</Name>" << endl;
+	xml << "\t\t<Value>" << value << "</Value>" << endl;
+	if( toBeBlinded )
+	{
+		xml << "\t\t<BlindString>" << blindString << "</BlindString>" << endl;
+		xml << "\t\t<BlindScale>" << blindScale << "</BlindScale>" << endl;
+	}
+	if( type != "Fixed" )
+	{
+		xml << "\t\t<Minimum>" << minimum << "</Minimum>" << endl;
+		xml << "\t\t<Maximum>" << maximum << "</Maximum>" << endl;
+	}
+	xml << "\t\t<Type>";
+	if( type != "Uninitialised" ) xml << type << "</Type>" << endl;
+	else xml << "Free" << "</Type>" << endl;
+	xml << "\t\t<Unit>";
+	if( unit != "Uninitialised" ) xml << unit << "</Unit>" << endl;
+	else xml << "someUnit" << "</Unit>" << endl;
+	xml << "\t</PhysicsParameter>" << endl;
+	return xml.str();
+}
+
+void PhysicsParameter::SetBlindingInfo( string input_str, double input_val )
+{
+	blindString = input_str;
+	blindScale = input_val;
 }
 

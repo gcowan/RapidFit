@@ -1,43 +1,41 @@
 /**
-        @class SumPDF
+  @class SumPDF
 
-        An implementation of IPDF for adding the values of two other IPDFs
+  An implementation of IPDF for adding the values of two other IPDFs
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+ */
 
+#pragma once
 #ifndef SUM_PDF_H
 #define SUM_PDF_H
 
 //	RapidFit Headers
-//#include "IPDF.h"
+#include "IPDF.h"
 #include "BasePDF.h"
+//	System Headers
+#include <string>
+#include <vector>
+
+using namespace::std;
 
 class SumPDF : public BasePDF
 {
 	public:
-		SumPDF();
-		SumPDF( IPDF*, IPDF*, PhaseSpaceBoundary* );
 		SumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string );
 		SumPDF( const SumPDF& );
 		~SumPDF();
 
-		//Indicate whether the function has been set up correctly
-		virtual bool IsValid();
-
 		//Set the function parameters
-		virtual bool SetPhysicsParameters(ParameterSet*);
+		bool SetPhysicsParameters( ParameterSet* );
 
 		//Return the integral of the function over the given boundary
-		virtual double Integral(DataPoint*, PhaseSpaceBoundary*);
+		double Normalisation( DataPoint*, PhaseSpaceBoundary* );
 
 		//Return the function value at the given point
-		virtual double Evaluate(DataPoint*);
+		double Evaluate( DataPoint* );
 
-		//Return the components of the function value at the given point
-		virtual vector<double> EvaluateComponents(DataPoint*);
-	
 		//Return a prototype data point
 		virtual vector<string> GetPrototypeDataPoint();
 
@@ -45,11 +43,22 @@ class SumPDF : public BasePDF
 		virtual vector<string> GetPrototypeParameterSet();
 
 		//Return a list of parameters not to be integrated
-                virtual vector<string> GetDoNotIntegrateList();
+		virtual vector<string> GetDoNotIntegrateList();
 
-		//Update cache
-                virtual void UpdateIntegralCache();
-	
+		//      Return components, component 0 by default
+		double EvaluateComponent( DataPoint*, ComponentRef* );
+
+		bool GetNumericalNormalisation() const;
+
+		IPDF* GetFirstPDF() const;
+
+		IPDF* GetSecondPDF() const;
+
+		void SetCachingEnabled( bool );
+
+		bool GetCachingEnabled() const;
+
+		string XML() const;
 	private:
 		//	Uncopyable!
 		//SumPDF ( const SumPDF& );
@@ -58,9 +67,10 @@ class SumPDF : public BasePDF
 
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;
 		IPDF * firstPDF;
-	       	IPDF * secondPDF;
+		IPDF * secondPDF;
 		double firstFraction, firstIntegralCorrection, secondIntegralCorrection;
 		string fractionName;
 };
 
 #endif
+

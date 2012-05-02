@@ -11,7 +11,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 
 PDF_CREATOR( Bs2JpsiPhiPromptBkg_withTimeRes );
 
@@ -36,9 +35,7 @@ void Bs2JpsiPhiPromptBkg_withTimeRes::MakePrototypes()
         //Make the parameter set
         vector<string> parameterNames;
         parameterNames.push_back( sigmaPrName );
-        allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+        allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -81,7 +78,7 @@ double Bs2JpsiPhiPromptBkg_withTimeRes::Normalisation(PhaseSpaceBoundary * bound
                 tmax = timeBound->GetMaximum();
         }
         double sigmaPr = allParameters.GetPhysicsParameter( sigmaPrName )->GetValue();
-	double val = 0.5 * ( RooMath::erf( tmax/(sqrt(2.)*sigmaPr) ) - RooMath::erf( tmin/(sqrt(2.)*sigmaPr )) );
+	double val = 0.5 * ( erf( tmax/(sqrt(2.)*sigmaPr) ) - erf( tmin/(sqrt(2.)*sigmaPr )) );
 
 	return val;
 }

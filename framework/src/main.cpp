@@ -1,15 +1,17 @@
 /**
-  @file main.cpp
+ * @file main.cpp
+ *
+ * Entry point for RapidFit
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ */
 
-  Entry point for RapidFit
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @date 2009-10-02
- **/
-
-//  Root Headers
+///  Root Headers
 #include "TString.h"
-//  RapidFit Headers
+#include "TH3D.h"
+#include "RooMath.h"
+///  RapidFit Headers
 #include "Mathematics.h"
 #include "FitAssembler.h"
 #include "ToyStudy.h"
@@ -17,29 +19,37 @@
 #include "ResultFormatter.h"
 #include "InputParsing.h"
 #include "RapidFitIntegrator.h"
-#include "Plotter.h"
 #include "MakeFoam.h"
 #include "PerEventAngularAcceptance.h"
 #include "OutputConfiguration.h"
 #include "FitResultVector.h"
 #include "main.h"
 #include "DataSetConfiguration.h"
+#include "IPDF.h"
 #include "IDataSet.h"
+#include "MemoryDataSet.h"
 #include "StringProcessing.h"
 #include "MCStudy.h"
 #include "GoodnessOfFit.h"
-#include "VectorScan.h"
-//  System Headers
+#include "ComponentPlotter.h"
+#include "ParameterSet.h"
+#include "IConstraint.h"
+#include "ClassLookUp.h"
+#include "ScanStudies.h"
+#include "VectoredFeldmanCousins.h"
+#include "PDFConfigurator.h"
+///  System Headers
 #include <string>
 #include <vector>
 #include <iostream>
 #include <ctime>
+#include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
 
-using namespace std;
+using namespace::std;
 
 //	Standard opening into RapidFit when not in CINT/pyROOT
 #ifndef __CINT__
@@ -52,6 +62,11 @@ int main( int argc, char * argv[] )
 //	The 'meat' of the Code
 int RapidFit( int argc, char * argv[] )
 {
+	//	An attempt to make sure that the caching is enabled for the complex calculations
+	RooMath* math_object = new RooMath();
+	math_object->cacheCERF( true );
+	RooSentinel::activate();
+
 	//Welcome blurb
 	time_t timeNow;
 	time(&timeNow);
@@ -70,14 +85,17 @@ int RapidFit( int argc, char * argv[] )
 
 	//Variables to store command line arguments
 	int numberRepeats = 0;
-	int Nuisencemodel=2;
+	unsigned int Nuisencemodel=2;
 	int jobNum = 0; (void) jobNum;
 	int nData = 0; (void) nData;
 	string configFileName = "";
 	vector<string> parameterTemplates;
 	MinimiserConfiguration * theMinimiser=NULL;
 	FitFunctionConfiguration * theFunction=NULL;
+	PrecalculatorConfig* calcConfig = NULL;
+	IPrecalculator* calculator = NULL;
 	string saveOneDataSetFileName = "";
+	string observableName = "time";
 	string plotFileName = "FitPlots.root";
 	string pullFileName = "PullPlots.root";
 	string LLscanFileName = "LLscanPlots.root";
@@ -102,14 +120,14 @@ int RapidFit( int argc, char * argv[] )
 	bool theMinimiserFlag = false;
 	bool theFunctionFlag = false;
 	bool saveOneDataSetFlag = false;
+	bool saveOneFoamDataSetFlag = false;
 	bool testIntegratorFlag = false;
-	bool testPlotFlag = false;
+	bool testComponentPlotFlag = false;
+	bool observableNameFlag = false;
 	bool doPlottingFlag = false;
 	bool doPullsFlag = false;
 	bool doLLscanFlag = false;
 	bool doLLcontourFlag = false;
-	bool donewLLscanFlag = false;
-	bool donewLLcontourFlag = false;
 	bool testRapidIntegratorFlag = false;
 	bool calculateAcceptanceWeights = false;
 	bool calculateAcceptanceWeightsWithSwave = false;
@@ -118,13 +136,19 @@ int RapidFit( int argc, char * argv[] )
 	bool defineScanFlag = false;
 	bool doFC_Flag = false;
 	bool UUID_Flag = false;
-	bool FC_Debug_Flag = false;
 	bool BurnToROOTFlag = false;
 	bool MCStudyFlag=false;
 	bool Force_Scan_Flag=false;
 	bool FC_LL_PART_Flag=false;
 	bool GOF_Flag=false;
 	bool StartAtCenterFlag=true;
+	bool WeightDataSet=false;
+	bool OutputLevelSet=false;
+	bool saveFitXML=false;
+	bool generateToyXML=false;
+	bool makeTemplateXML=false;
+
+	vector<string> templatePDFs;
 
 	//	This should do something, it doesn't anymore... what was it?	-	Rob Currie
 	(void) testRapidIntegratorFlag;
@@ -137,25 +161,18 @@ int RapidFit( int argc, char * argv[] )
 	//	the FC code was over 7th level indented and hard to read/maintain
 
 	string currentArgument;
-	FitResultVector* _2DResultForFC=NULL;
-	FitResultVector* GlobalFitResult=NULL;
+	FitResultVector* _2DResultForFC = NULL;
+	FitResultVector* GlobalFitResult = NULL;
 	FitResult * GlobalResult = NULL;
-	FitResultVector* FC_Input=NULL;
 	vector< ConstraintFunction* > XMLConstraints;
 	OutputConfiguration * makeOutput = NULL;
-	vector<ParameterSet*> argumentParameterSet;
-	XMLConfigReader* xmlFile=NULL;
+	ParameterSet* argumentParameterSet = NULL;
+	XMLConfigReader* xmlFile = NULL;
 	MCStudy* newMCStudy = NULL;
 	vector<FitResultVector*> SoloContourResults;
-	TString FC_Input_File;
-	int FC_INPUT_MIN=0, FC_INPUT_MAX=0;
-	TString FC_INPUT_PARAM1, FC_INPUT_PARAM2;
 
 	int BAD_COMMAND_LINE_ARG = -39;
-	int BAD_XML = -40;
 	int NO_XML = -41;
-
-
 
 	if ( argc == 1 )
 	{
@@ -237,7 +254,7 @@ int RapidFit( int argc, char * argv[] )
 			cout << "	Causes a set of LL scans to be performed around the fit minimum" << endl ;
 			cout << "	The parameters which will be scanned must be specified in the xml file as " << endl ;
 			cout << "\n	<Output> " << endl ;
-			cout << "		<2DScan>" << endl;
+			cout << "		<TwoDScan>" << endl;
 			cout << "			<X_Param>" << endl;
 			cout << "				<Name>parameterName</Name> " << endl ;
 			cout << "				<Maximum>Maxima of x axis</Maximum> " << endl ;
@@ -248,7 +265,7 @@ int RapidFit( int argc, char * argv[] )
 			cout << "				<Sigma>number of sigma from fit minima</Sigma> " << endl ;
 			cout << "				<Points>number of points in y axis</Points> " << endl ;
 			cout << "			</Y_Param>" <<endl;
-			cout << "		</2DScan>" << endl;
+			cout << "		</TwoDScan>" << endl;
 			cout << "	</Output> " << endl ;
 
 			cout << endl ;
@@ -372,6 +389,20 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
+		else if ( currentArgument == "--saveOneFoamDataSet" )
+		{
+			if ( argumentIndex + 1 < argc )
+			{
+				++argumentIndex;
+				saveOneDataSetFileName = argv[argumentIndex];
+				saveOneFoamDataSetFlag = true;
+			}
+			else
+			{
+				cerr << "Data file name not specified" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}
+		}
 		else if ( currentArgument == "-PDF" )
 		{
 			if ( argumentIndex + 3 < argc )
@@ -444,13 +475,27 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
-		else if ( currentArgument == "--testPlot" )
+		else if ( currentArgument == "--testComponentPlot" )
 		{
-			testPlotFlag = true;
+			testComponentPlotFlag = true;
 			if ( argumentIndex + 1 < argc )
 			{
 				++argumentIndex;
 				plotFileName = argv[argumentIndex];
+			}
+			else
+			{
+				cerr << "Path to store plot file not specified" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}
+		}
+		else if ( currentArgument == "--observableName" )
+		{
+			observableNameFlag = true;
+			if ( argumentIndex + 1 < argc )
+			{
+				++argumentIndex;
+				observableName = argv[argumentIndex];
 			}
 			else
 			{
@@ -517,7 +562,7 @@ int RapidFit( int argc, char * argv[] )
 			if ( argumentIndex + 1 < argc )
 			{
 				++argumentIndex;
-				Nuisencemodel = atoi( argv[argumentIndex] );
+				Nuisencemodel = (unsigned)atoi( argv[argumentIndex] );
 			} else {
 				cerr << "Not correctly Formatted Nuisence Input" <<endl;
 				return BAD_COMMAND_LINE_ARG;
@@ -562,6 +607,7 @@ int RapidFit( int argc, char * argv[] )
 			{
 				++argumentIndex;
 				OutputLevel = atoi( argv[argumentIndex] );
+				OutputLevelSet=true;
 			} else {
 				cerr << "Badly Defined Output Level" << endl;
 				return BAD_COMMAND_LINE_ARG;
@@ -573,28 +619,9 @@ int RapidFit( int argc, char * argv[] )
 			{
 				++argumentIndex;
 				OutputLevel2 = atoi( argv[argumentIndex] );
+				OutputLevelSet=true;
 			} else {
 				cerr << "Badly Defined Output Level" << endl;
-				return BAD_COMMAND_LINE_ARG;
-			}
-		}
-		else if ( currentArgument == "--FC_LL_PART" )
-		{
-			FC_LL_PART_Flag = true;
-			if( argumentIndex + 5 < argc )
-			{
-				++argumentIndex;
-				FC_Input_File = ( argv[argumentIndex] );
-				++argumentIndex;
-				FC_INPUT_MIN = atoi( argv[argumentIndex] );
-				++argumentIndex;
-				FC_INPUT_MAX = atoi( argv[argumentIndex] );
-				++argumentIndex;
-				FC_INPUT_PARAM1 = argv[argumentIndex];
-				++argumentIndex;
-				FC_INPUT_PARAM2 = argv[argumentIndex];
-			} else {
-				cerr << "Please Provide a result file with the result of a 2DLL Scan." << endl;
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
@@ -614,6 +641,23 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
+		else if ( currentArgument == "--MakeTemplate" )
+		{
+			makeTemplateXML = true;
+			if( argumentIndex + 1 < argc )
+			{
+				++argumentIndex;
+				for( ; argumentIndex < argc; ++argumentIndex )
+				{
+					templatePDFs.push_back( argv[argumentIndex] );
+				}
+			}
+			else
+			{
+				cerr << "Required to give at least 1 PDF as input fot an XML template" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}
+		}
 
 		//	The Parameters beyond here are for setting boolean flags
 		else if ( currentArgument == "--testIntegrator" )			{	testIntegratorFlag = true;			}
@@ -622,16 +666,16 @@ int RapidFit( int argc, char * argv[] )
 		else if ( currentArgument == "--calculateAcceptanceWeightsWithSwave" )	{	calculateAcceptanceWeightsWithSwave = true;	}
 		else if ( currentArgument == "--calculatePerEventAcceptance" )		{	calculatePerEventAcceptance = true;		}
 		else if ( currentArgument == "--doLLscan" )				{	doLLscanFlag = true;				}
-		else if ( currentArgument == "--donewLLscan" )                          {       donewLLscanFlag = true;                         }
 		else if ( currentArgument == "--doLLcontour" )				{	doLLcontourFlag = true;				}
-		else if ( currentArgument == "--donewLLcontour" )                       {       donewLLcontourFlag = true;                      }
 		else if ( currentArgument == "--doFCscan" )				{	doFC_Flag = true;				}
 		else if ( currentArgument == "--useUUID" )				{	UUID_Flag = true;				}
-		else if ( currentArgument == "--debugFC" )				{	FC_Debug_Flag = true;				}
 		else if ( currentArgument == "--BurnToROOT" )				{	BurnToROOTFlag = true;				}
 		else if ( currentArgument == "--MCStudy" )				{	MCStudyFlag = true;				}
 		else if ( currentArgument == "--ForceScan" )				{	Force_Scan_Flag = true;				}
 		else if ( currentArgument == "--DontStartAtCenter" )			{	StartAtCenterFlag = false;			}
+		else if ( currentArgument == "--WeightDataSet" ) 			{       WeightDataSet=true;				}
+		else if ( currentArgument == "--saveFitXML" )				{	saveFitXML = true;				}
+		else if ( currentArgument == "--generateToyXML" )			{	generateToyXML = true;				}
 
 		//	We didn't understand the argument to end up here
 		else
@@ -641,22 +685,116 @@ int RapidFit( int argc, char * argv[] )
 		}
 	}
 
-
-	//Load a config file
-	if ( configFileNameFlag )
+	if( makeTemplateXML )
 	{
-		xmlFile = new XMLConfigReader(configFileName, XMLOverrideList);
-		if ( xmlFile->IsLoaded() )
+
+		cout << "Building Template XML for:\t";
+
+		for( vector<string>::iterator template_i = templatePDFs.begin(); template_i != templatePDFs.end(); ++template_i )
 		{
-			cout << "XML config file " << configFileName << " loaded" << endl;
+			cout << (*template_i) << "\t";
 		}
-		else
+
+		cout << endl;
+		cout << "This is ONLY a template XML and as such I can't give you parameter configurations, his needs to be configured BY YOU" << endl;
+
+		cout << endl;
+
+		PDFConfigurator* empty = new PDFConfigurator();
+		vector<IPDF*> requestedPDFs;
+		for( vector<string>::iterator template_i = templatePDFs.begin(); template_i != templatePDFs.end(); ++template_i )
 		{
-			cerr << "XML config file " << configFileName << " not found" << endl;
-			return BAD_XML;
+			requestedPDFs.push_back( ClassLookUp::LookUpPDFName( (*template_i), empty ) );
 		}
+
+		vector<string> WantedParameters;
+		vector<PhaseSpaceBoundary*> RequiredObservables;
+
+		for( vector<IPDF*>::iterator PDF_i = requestedPDFs.begin(); PDF_i != requestedPDFs.end(); ++PDF_i )
+		{
+			vector<string> this_datapoint = (*PDF_i)->GetPrototypeDataPoint();
+			vector<string> this_parameterset = (*PDF_i)->GetPrototypeParameterSet();
+
+			RequiredObservables.push_back( new PhaseSpaceBoundary(this_datapoint) );
+
+			WantedParameters = StringProcessing::CombineUniques( WantedParameters, this_parameterset );
+		}
+
+		ParameterSet* templateParameterSet = new ParameterSet( WantedParameters );
+
+		MinimiserConfiguration* Minuit = new MinimiserConfiguration( "Minuit" );
+		Minuit->SetSteps( 1000000 );
+		Minuit->SetTolerance( 0.001 );
+		Minuit->SetQuality( 1 );
+
+		FitFunctionConfiguration* Function = new FitFunctionConfiguration( "NegativeLogLikelihoodThreaded" );
+		Function->SetThreads( 4 );
+
+		stringstream xml;
+		xml << setprecision(10) << endl;
+		xml << "<RapidFit>" << endl << endl;
+		xml << templateParameterSet->XML() << endl;
+		xml << endl;
+		xml << Minuit->XML() << endl;
+		xml << endl;
+		xml << Function->XML() << endl;
+		xml << endl;
+
+
+		vector<PhaseSpaceBoundary*>::iterator obs_i = RequiredObservables.begin();
+		vector<IPDF*>::iterator PDF_i = requestedPDFs.begin();
+		for( ; PDF_i != requestedPDFs.end(); ++PDF_i, ++obs_i )
+		{
+			DataSetConfiguration* set_i = new DataSetConfiguration( "Foam", 10000, string(), vector<string>(), vector<string>(), ClassLookUp::CopyPDF( *PDF_i ), *obs_i );
+			vector<DataSetConfiguration*> input_vec_set( 1, set_i );
+			PDFWithData* toFit = new PDFWithData( ClassLookUp::CopyPDF( *PDF_i ), *obs_i, input_vec_set );
+
+			xml << endl;
+			xml << toFit->XML() << endl;
+			xml << endl;
+
+			delete toFit;
+		}
+		delete empty;
+		while( !RequiredObservables.empty() )
+		{
+			if( RequiredObservables.back() != NULL ) delete RequiredObservables.back();
+			RequiredObservables.pop_back();
+		}
+		while( !requestedPDFs.empty() )
+		{
+			if( requestedPDFs.back() != NULL ) delete requestedPDFs.back();
+			requestedPDFs.pop_back();
+		}
+		delete templateParameterSet;
+		delete Minuit;
+		delete Function;
+
+		xml << "</RapidFit>" << endl;
+
+		string xml_filename = "Template_";
+		xml_filename.append( StringProcessing::TimeString() );
+		xml_filename.append(".xml");
+
+		ofstream output_xmlFile;
+		output_xmlFile.open( xml_filename.c_str() );
+		output_xmlFile << xml.str();
+
+		output_xmlFile.close();
+
+		cout << endl << "Template file stored at:\t" << xml_filename << endl << endl;
+
+		return 0;
 	}
 
+	//Load a config file
+	if( configFileNameFlag )
+	{
+		xmlFile = new XMLConfigReader(configFileName, XMLOverrideList);
+		cout << "XML config file " << configFileName << " loaded" << endl;
+	}
+
+	if( WeightDataSet == true )	{	calcConfig = xmlFile->GetPrecalculatorConfig();		}
 
 	//	CONFIGURE RAPIDFIT PARAMETERS
 
@@ -669,11 +807,11 @@ int RapidFit( int argc, char * argv[] )
 	}
 
 	//	This Section of Code deals with the seed value that is to be used to start whatever your studying
-	if( ( !RuntimeSeed.empty() && xmlFile->IsLoaded() ) && !UUID_Flag )
+	if( !RuntimeSeed.empty() && !UUID_Flag )
 	{
 		cout << "Setting Seed At Runtime to be: " << RuntimeSeed[0] << endl;
 		xmlFile->SetSeed( unsigned(RuntimeSeed[0]) );
-	} else if ( !RuntimeSeed.empty() && UUID_Flag && xmlFile->IsLoaded() )	{
+	} else if ( !RuntimeSeed.empty() && UUID_Flag )	{
 		//  I have used the TRandom3 code as inspiration for 'Salting the Seed' of the UUID at runtime
 		cout << "Using a Random seed of UUID x RuntimeSeed to be 'unique' for all machines"<<endl;
 		TUUID uid;
@@ -684,7 +822,10 @@ int RapidFit( int argc, char * argv[] )
 	}
 
 	//	Command line arguments are passed and interpreted within the parser to override what is read from the XMLFile
-	if ( parameterTemplateFlag )	{	argumentParameterSet.push_back( InputParsing::MakeParameterSet( parameterTemplates ) );		}
+	if( parameterTemplateFlag )
+	{
+		argumentParameterSet = InputParsing::MakeParameterSet( parameterTemplates );
+	}
 
 	//Actually configure a fit: first configure the output
 	makeOutput = xmlFile->GetOutputConfiguration();
@@ -697,10 +838,11 @@ int RapidFit( int argc, char * argv[] )
 		theMinimiser = xmlFile->GetMinimiserConfiguration();
 	}
 	//	If the range for a Contour Scan was provided at runtime
-	if ( defineContourFlag )
+	if( defineContourFlag )
 	{
 		for( unsigned short int i=0; i < Contour_X.size(); ++i)
 		{
+			makeOutput->ClearScanList();
 			makeOutput->Clear2DScanList();
 			makeOutput->AddContour( Contour_X[i], Contour_Y[i] );
 		}
@@ -710,6 +852,8 @@ int RapidFit( int argc, char * argv[] )
 	{
 		for( unsigned short int i=0; i < Scan_X.size(); ++i )
 		{
+			makeOutput->ClearScanList();
+			makeOutput->Clear2DScanList();
 			makeOutput->AddScan( Scan_X[i] );
 		}
 	}
@@ -720,16 +864,18 @@ int RapidFit( int argc, char * argv[] )
 		// If weights were specified then we need to let the output plotting know
 		if( theFunction->GetWeightsWereUsed() ) makeOutput->SetWeightsWereUsed( theFunction->GetWeightName() ) ;
 	}
-	//	No Parameter Template had been provided, look in the XML
-	if ( !parameterTemplateFlag )
-	{
-		argumentParameterSet = xmlFile->GetFitParameters( CommandLineParam );
-	}
 	//	The number of repeats hasn't been defined at runtime, look in the XML
 	if ( !numberRepeatsFlag )
 	{
 		numberRepeats = xmlFile->GetNumberRepeats();
 	}
+
+	//      No Parameter Template had been provided, look in the XML
+	if ( !parameterTemplateFlag )
+	{
+		argumentParameterSet = xmlFile->GetFitParameters( CommandLineParam );
+	}
+
 	//	PDFs used in fits and the dataset to be fit to hasn't been defined at the command line
 	if ( pdfsAndData.size() == 0 )
 	{
@@ -750,11 +896,11 @@ int RapidFit( int argc, char * argv[] )
 					if( DataConfigs[config_num]->GetSource() != "File" )
 					{
 						cout << "SCAN REQUESTED, GENERATING AND CACHING DATA" << endl;
-						pdfsAndData[pdf_num]->SetDelete( false );			//	Don't remove cache after one use
 						pdfsAndData[pdf_num]->SetPhysicsParameters( xmlFile->GetFitParameters() );
 						vector<IDataSet*> gen_data;
 						gen_data.push_back( pdfsAndData[pdf_num]->GetDataSet() );	//	Generate a Foam DataSet
 						pdfsAndData[pdf_num]->AddCachedData( gen_data );		//	Cache it for the lifetime of a scan
+						pdfsAndData[pdf_num]->SetUseCache( true );
 					}
 				}
 			}
@@ -774,46 +920,6 @@ int RapidFit( int argc, char * argv[] )
 		makeOutput->MakeAllPlots(plotFileName);
 	}
 
-	//	Seperate MC portion and fitting portion of a FC study
-	if ( FC_LL_PART_Flag )
-	{
-		if( xmlFile == NULL )
-		{
-			cerr << "I'm not that good, please provide me with an XML" <<endl;
-			exit(-3546);
-		}
-		FC_Input = DataSetConfiguration::LoadFitResult( FC_Input_File, argumentParameterSet.back() );
-		GlobalResult = FC_Input->GetFitResult( 0 );
-		GlobalFitResult = new FitResultVector( FC_Input->GetAllNames() );
-		GlobalFitResult->AddFitResult( GlobalResult, false );
-		GlobalFitResult->AddCPUTime( FC_Input->GetCPUTime(0) );
-		GlobalFitResult->AddRealTime( FC_Input->GetRealTime(0) );
-
-		vector<FitResultVector*> FC_Inputz;
-		for( int i= FC_INPUT_MIN; i<= FC_INPUT_MAX; ++i )
-		{
-			FitResultVector* temp_vec = new FitResultVector( FC_Input->GetAllNames() );
-			temp_vec->AddFitResult( FC_Input->GetFitResult( i ), false );
-			temp_vec->AddCPUTime( FC_Input->GetCPUTime( i ) );
-			temp_vec->AddRealTime( FC_Input->GetRealTime( i ) );
-			FC_Inputz.push_back( temp_vec );
-		}
-		_2DResultForFC = new FitResultVector( FC_Inputz );
-		pdfsAndData = xmlFile->GetPDFsAndData();
-		for( unsigned int i=0; i< pdfsAndData.size(); ++i )
-		{
-			pdfsAndData[i]->SetPhysicsParameters( xmlFile->GetFitParameters() );
-		}
-
-		//	All Information about where to perform scans is stored in the _2DResultForFC object
-		//
-		//	Apart from the names of the controls which the user has to provide
-		makeOutput->Clear2DScanList();
-		FC_INPUT_PARAM1.Append(",0,0,0");
-		FC_INPUT_PARAM2.Append(",0,0,0");
-		makeOutput->AddContour( FC_INPUT_PARAM1.Data(), FC_INPUT_PARAM2.Data() );
-	}
-
 	//	FINISHED CONFIGURING RAPIDFIT PARAMETERS
 
 
@@ -831,6 +937,7 @@ int RapidFit( int argc, char * argv[] )
 	//	8)	perform an MC Study and exit
 
 	//	9)	Actually perform a fit according to the XML
+	//	9b)	Weight the dataset if requested to do so and save the output(s)
 
 	//	10)	If requested perform 1D LL Scans
 	//	12)	If requested perform 2D LL Scans
@@ -859,8 +966,14 @@ int RapidFit( int argc, char * argv[] )
 			if( quickDataGen.size() > 1){ number.Append("_"); number+=i; }
 
 			TString real_saveOneDataSetFileName = TString( FileName_Pre_Suffix + number + ".root" );
+			//quickDataSet.back()->Print();
 			ResultFormatter::MakeRootDataFile( string(real_saveOneDataSetFileName.Data()), quickDataSet );
 			delete temp_dataSet;
+		}
+		while( !quickDataGen.empty() )
+		{
+			delete quickDataGen.back();
+			quickDataGen.pop_back();
 		}
 		goto exit_RapidFit;
 
@@ -887,8 +1000,53 @@ int RapidFit( int argc, char * argv[] )
 		PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
 		pdfAndData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 		IDataSet * dataSet = pdfAndData->GetDataSet();
+		int nMCEvents = dataSet->GetDataNumber();
 		IPDF * pdf = pdfAndData->GetPDF();
-		Mathematics::calculateAcceptanceWeights(dataSet, pdf);
+		vector<double> weights = Mathematics::calculateAcceptanceWeights(dataSet, pdf);
+		TFile * file = TFile::Open("acceptance_weights_and_histos.root", "RECREATE");
+		TTree * tree = new TTree("tree", "tree containing acceptance weights and histo");
+		tree->Branch("weights", "std::vector<double>", &weights);
+		tree->Fill();
+
+		// Now calculate the acceptance histograms from the data PDF/xml and MC sample
+		DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
+		dataConfig->SetSource( "Foam" );
+		PhaseSpaceBoundary * phase = dataSet->GetBoundary();
+		int nToyEvents = 1000000;
+		MemoryDataSet * toy = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nToyEvents );
+		file->cd();
+		double pi = TMath::Pi();
+		TH3D * num = new TH3D("num", "num", 7, -1., 1., 5, -1., 1., 9, -pi, pi);
+		TH3D * den = new TH3D("den", "den", 7, -1., 1., 5, -1., 1., 9, -pi, pi);
+		TH3D * acc = new TH3D("acc", "acc", 7, -1., 1., 5, -1., 1., 9, -pi, pi);
+		num->Sumw2();
+		den->Sumw2();
+		acc->Sumw2();
+		double cosTheta, phi, cosPsi;
+		for ( int i = 0; i < nToyEvents; i++ ) {
+			if (i % 10000 == 0) cout << "Toy event # " << i << endl;
+			DataPoint * event = toy->GetDataPoint(i);
+			cosTheta = event->GetObservable("trcostheta")->GetValue();
+			phi      = event->GetObservable("trphi")->GetValue();
+			cosPsi   = event->GetObservable("trcospsi")->GetValue();
+			den->Fill(cosTheta, cosPsi, phi);
+			//delete event;
+		}
+		delete toy;
+		for ( int i = 0; i < nMCEvents; i++ ) {
+			if (i % 10000 == 0) cout << "MC event # " << i << endl;
+			DataPoint * event = dataSet->GetDataPoint(i);
+			cosTheta = event->GetObservable("trcostheta")->GetValue();
+			phi      = event->GetObservable("trphi")->GetValue();
+			cosPsi   = event->GetObservable("trcospsi")->GetValue();
+			num->Fill(cosTheta, cosPsi, phi);
+			//delete event;
+		}
+		acc->Divide(num, den);
+		file->Write();
+		file->Close();
+		//delete tree;
+		//delete file;
 		delete pdfAndData;
 		goto exit_RapidFit;
 	}
@@ -921,14 +1079,15 @@ int RapidFit( int argc, char * argv[] )
 	}
 
 	//	6)
-	if ( testPlotFlag && configFileNameFlag )
+	if ( testComponentPlotFlag && configFileNameFlag && observableNameFlag )
 	{
 		//Project the PDF onto the data
 		PDFWithData * quickData = xmlFile->GetPDFsAndData()[0];
 		quickData->SetPhysicsParameters( xmlFile->GetFitParameters() );
 		IDataSet * quickDataSet = quickData->GetDataSet();
-		Plotter * testPlotter = new Plotter( quickData->GetPDF(), quickDataSet );
-		testPlotter->PlotAllObservables(plotFileName);
+		TFile* testFile = new TFile( "testFile.root", "UPDATE" );
+		ComponentPlotter * testPlotter = new ComponentPlotter( quickData->GetPDF(), quickDataSet, "testPDF", testFile, observableName );
+		testPlotter->ProjectObservable( );
 		delete testPlotter;
 		delete quickData;
 		goto exit_RapidFit;
@@ -939,14 +1098,19 @@ int RapidFit( int argc, char * argv[] )
 	if ( ( ( numberRepeats > 1 ) || doPullsFlag ) && !( ( ( doLLcontourFlag || doFC_Flag ) || doLLscanFlag ) || MCStudyFlag ) )
 	{
 		vector< ConstraintFunction* > XMLConstraints = xmlFile->GetConstraints();
+
 		//Do the toy study
 		ToyStudy* newStudy = new ToyStudy( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, XMLConstraints, numberRepeats );
-		newStudy->DoWholeStudy();
+
+		if( OutputLevelSet == false ) OutputLevel = -999;
+
+		newStudy->DoWholeStudy( OutputLevel );
+
 		FitResultVector* fitResults = newStudy->GetStudyResult();
 
 		//Output results
 		makeOutput->OutputToyResult( fitResults );
-		makeOutput->OutputFitResult( fitResults->GetFitResult(0) );
+		//makeOutput->OutputFitResult( fitResults->GetFitResult(0) );
 
 		while( !XMLConstraints.empty() )
 		{
@@ -1004,7 +1168,7 @@ int RapidFit( int argc, char * argv[] )
 		cout << "\n\n\t\tStarting Fit to Find Global Minima!\n"<<endl;
 
 		//Do the fit to find GLOBAL MINIMA
-		GlobalFitResult = new FitResultVector( argumentParameterSet.back()->GetAllNames() );
+		GlobalFitResult = new FitResultVector( argumentParameterSet->GetAllNames() );
 		GlobalFitResult->StartStopwatch();
 
 		XMLConstraints = xmlFile->GetConstraints();
@@ -1013,37 +1177,57 @@ int RapidFit( int argc, char * argv[] )
 
 		GlobalFitResult->AddFitResult( GlobalResult );
 
-		//ResultFormatter::FlatNTuplePullPlots( string("Global_Fit.root"), GlobalFitResult );
-
-		cout << "\n\n\t\tFit Output:" <<endl;
-
-		if( OutputLevel >= 0 )
+		if( saveFitXML == true || generateToyXML == true )
 		{
-			//Output results
-			makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
-			makeOutput->OutputFitResult( GlobalFitResult->GetFitResult(0) );
-		}
-		ResultFormatter::ReviewOutput( GlobalResult );
+			stringstream full_xml;
 
-		//	If requested write the central value to a single file
-		if( BurnToROOTFlag )
-		{
-			cout << "If you get any errors here and/or an empty Global_Fit_Result.root file, check your xml ONLY contains parameters in the fit." << endl;
-			cout << "(There is a known bug which requires a bit of work to fix)" << endl;
-			ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result.root" ), GlobalFitResult );
-		}
+			full_xml << "<RapidFit>" << endl;
+			full_xml << endl;
+			if( generateToyXML == true )
+			{
+				full_xml << GlobalResult->GetResultParameterSet()->ToyXML();
+				for( vector<PDFWithData*>::iterator toFit_i = pdfsAndData.begin(); toFit_i != pdfsAndData.end(); ++toFit_i )
+				{
+					vector<DataSetConfiguration*> gen_list = (*toFit_i)->GetAllDataSetConfigs();
+					for( vector<DataSetConfiguration*>::iterator gen_i = gen_list.begin(); gen_i != gen_list.end(); ++gen_i )
+					{
+						(*gen_i)->SetSource("Foam");
+					}
+				}
+			}
+			else
+			{
+				full_xml << GlobalResult->GetResultParameterSet()->FitXML();
+			}
+			full_xml << endl;
+			full_xml << theMinimiser->XML() << endl;
+			full_xml << endl;
+			full_xml << theFunction->XML() << endl;
+			full_xml << endl;
+			for( vector<ConstraintFunction*>::iterator const_i = XMLConstraints.begin(); const_i != XMLConstraints.end(); ++const_i )
+			{
+				full_xml << (*const_i)->XML() << endl;
+				full_xml << endl;
+			}
+			full_xml << endl;
+			for( vector<PDFWithData*>::iterator toFit_i = pdfsAndData.begin(); toFit_i != pdfsAndData.end(); ++toFit_i )
+			{
+				full_xml << (*toFit_i)->XML() << endl;
+				full_xml << endl;
+			}
+			full_xml << "</RapidFit>" << endl;
 
-		if ( GOF_Flag ) {
-			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
-			//double pvalue = GoodnessOfFit::gofLoop( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, nData );
-		        double pvalue = GoodnessOfFit::fitDataCalculatePvalue( xmlFile, theMinimiser, theFunction, argumentParameterSet, GlobalResult );
-			pvalueHist->Fill( pvalue );
-			TFile * outputFile = new TFile("pvalues.root", "RECREATE");
-			pvalueHist->Write();
-			outputFile->Write();
-			outputFile->Close();
-			delete pvalueHist;
-			delete outputFile;
+			string xml_filename = "outputXMLFile";
+			xml_filename.append( StringProcessing::TimeString() );
+			xml_filename.append( ".xml" );
+			ofstream output_xmlFile;
+			output_xmlFile.open( xml_filename.c_str() );
+
+			output_xmlFile << full_xml.str() ;
+
+			output_xmlFile.close();
+
+			cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
 		}
 
 		if( GlobalResult->GetFitStatus() != 3 )
@@ -1064,7 +1248,123 @@ int RapidFit( int argc, char * argv[] )
 				goto exit_RapidFit;
 			}
 		}
+
+		if( saveOneFoamDataSetFlag )
+		{
+			//For each dataset in the fit
+			for( unsigned int i=0; i< pdfsAndData.size(); ++i )
+			{
+				//Get the phasespace from the fit
+				PhaseSpaceBoundary* temp_boundary = pdfsAndData[i]->GetDataSet()->GetBoundary();
+
+				//Get the PDF from the fit with the CV from the fit still passed
+				IPDF* temp_pdf = pdfsAndData[i]->GetPDF();
+
+				//Tell the PDF you want to copy the form of all continuous objects on the don't integrate list
+				for( unsigned int j=0; j< temp_pdf->GetDoNotIntegrateList().size(); ++j )
+				{
+					string observableName = temp_pdf->GetDoNotIntegrateList()[j];
+					IConstraint* temp_constr = temp_boundary->GetConstraint( observableName );
+					if( temp_constr != NULL )
+					{
+						if( temp_constr->IsDiscrete() == false )
+						{
+							PDFConfigurator* pdf_config = new PDFConfigurator();
+							pdf_config->addObservableToModel( observableName, pdfsAndData[i]->GetDataSet() );
+							//pdf_config->setFitFunc( "pol9" );
+							IPDF* observable_modeller = ClassLookUp::LookUpPDFName( "Observable_1D_distribution", pdf_config );
+							temp_pdf->SetObservableDistribution( observableName, observable_modeller );
+						}
+					}
+				}
+
+				//Construct the configuration to give a Foam generator
+				DataSetConfiguration* temp_config = new DataSetConfiguration( "Foam", pdfsAndData[i]->GetDataSet()->GetDataNumber(), "", vector<string>(), vector<string>(), temp_pdf );
+				vector<DataSetConfiguration*> data_config; data_config.push_back( temp_config );
+				PDFWithData* pdf_data_to_fit = new PDFWithData( temp_pdf, temp_boundary, data_config );
+
+				ParameterSet* result_set = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+				pdf_data_to_fit->SetPhysicsParameters( result_set );
+
+				vector<IDataSet*> quickDataSet;
+				IDataSet* temp_dataSet = pdf_data_to_fit->GetDataSet();
+				quickDataSet.push_back( temp_dataSet );
+				string ext_dot=".";
+				vector<string> temp_strings = StringProcessing::SplitString( saveOneDataSetFileName, *(ext_dot.c_str()) );
+				TString FileName_Pre_Suffix = StringProcessing::CondenseStrings( temp_strings, 0, int(temp_strings.size() -1) );
+
+				TString number; number+=i;
+
+				TString real_saveOneDataSetFileName = TString( FileName_Pre_Suffix + "-" + number + ".root" );
+
+				ResultFormatter::MakeRootDataFile( string(real_saveOneDataSetFileName.Data()), quickDataSet );
+				delete temp_dataSet;
+			}
+		}
+
+		if( WeightDataSet == true )
+		{
+			cout << "Weighting DataSet(s) with: " << endl;
+			if( calcConfig == NULL )
+			{
+				cerr << "No PreCalculator Defined in the XML" << endl;
+			}
+			else
+			{
+				for( unsigned int i=0; i< pdfsAndData.size(); ++i )
+				{
+					cout << endl << "Weighting DataSet " << i << endl;
+					calculator = calcConfig->GetPreCalculator( GlobalResult );
+					IDataSet* weightedDataSet = calculator->ProcessDataSet( pdfsAndData[i]->GetDataSet() );
+					vector<IDataSet*> weightedDataSet_v; weightedDataSet_v.push_back( weightedDataSet );
+					TString filename = calcConfig->GetFileName();
+					filename.Append("_"); filename+=i; filename.Append(".root");
+					cout << "Saving Weighted DataSet " << i << " as: " << filename << endl;
+					ResultFormatter::MakeRootDataFile( filename.Data(), weightedDataSet_v );
+					delete weightedDataSet;
+					delete calculator;
+				}
+			}
+		}
+
+		//ResultFormatter::FlatNTuplePullPlots( string("Global_Fit.root"), GlobalFitResult );
+
+		cout << "\n\n\t\tFit Output:" <<endl;
+
+		if( OutputLevel >= 0 )
+		{
+			//Output results
+			makeOutput->SetInputResults( GlobalResult->GetResultParameterSet() );
+			if( !doLLcontourFlag && ( !doFC_Flag && !doLLscanFlag  ) )
+			{
+				makeOutput->OutputFitResult( GlobalFitResult->GetFitResult(0) );
+			}
+			ResultFormatter::ReviewOutput( GlobalResult );
+		}
+
+		//	If requested write the central value to a single file
+		if( BurnToROOTFlag )
+		{
+			cout << "If you get any errors here and/or an empty Global_Fit_Result.root file, check your xml ONLY contains parameters in the fit." << endl;
+			cout << "(There is a known bug which requires a bit of work to fix)" << endl;
+			ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result.root" ), GlobalFitResult );
+		}
+
+		if ( GOF_Flag ) {
+			TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
+			//double pvalue = GoodnessOfFit::gofLoop( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, nData );
+			double pvalue = GoodnessOfFit::fitDataCalculatePvalue( xmlFile, theMinimiser, theFunction, argumentParameterSet, GlobalResult );
+			pvalueHist->Fill( pvalue );
+			TFile * outputFile = new TFile("pvalues.root", "RECREATE");
+			pvalueHist->Write();
+			outputFile->Write();
+			outputFile->Close();
+			delete pvalueHist;
+			delete outputFile;
+		}
+
 	}
+
 	//	10)
 	//	Do LL scan
 	if( doLLscanFlag )
@@ -1078,133 +1378,71 @@ int RapidFit( int argc, char * argv[] )
 		{
 			if( StartAtCenterFlag )
 			{
-				vector<ParameterSet*>  param_set;
-				param_set.push_back( GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
-				for(unsigned int i=0; i< argumentParameterSet.back()->GetAllNames().size(); ++i )
+				ParameterSet*  param_set = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+				for(unsigned int i=0; i< argumentParameterSet->GetAllNames().size(); ++i )
 				{
-					argumentParameterSet.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->SetBlindedValue( param_set.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->GetValue() );
+					argumentParameterSet->GetPhysicsParameter( argumentParameterSet->GetAllNames()[i] )->SetBlindedValue( param_set->GetPhysicsParameter( argumentParameterSet->GetAllNames()[i] )->GetValue() );
 				}
 			}
-			FitResultVector* scan_result = FitAssembler::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[scan_num], OutputLevel2 );
+			FitResultVector* scan_result = ScanStudies::SingleScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, LLscanList[scan_num], OutputLevel2 );
 			scanSoloResults.push_back( scan_result );
-		}
 
-		for(unsigned int scan_num=0; scan_num < LLscanList.size(); ++scan_num )
-		{
-			TString output_scan_dat( "LLScanData" );
-			output_scan_dat.Append( LLscanList[scan_num] );
-			TString new_output_scan_dat( output_scan_dat );
-			new_output_scan_dat.Append( "_newformat" );
-			output_scan_dat.Append( ".root" );
-			new_output_scan_dat.Append(".root");
-			vector<FitResultVector*> ammended_format;
-			for( int i=0; i< scanSoloResults[scan_num]->NumberResults(); ++i )
+
+			if( doFC_Flag )
 			{
-				ammended_format.push_back( GlobalFitResult );
-				FitResultVector* temp_vec = new FitResultVector( scanSoloResults[scan_num]->GetAllNames() );
-				temp_vec->AddFitResult( scanSoloResults[scan_num]->GetFitResult( i ), false );
-				temp_vec->AddRealTime( scanSoloResults[scan_num]->GetRealTime(i) );
-				temp_vec->AddCPUTime( scanSoloResults[scan_num]->GetCPUTime(i) );
-				ammended_format.push_back( temp_vec );
-			}
-			FitResultVector* corrected_format = new FitResultVector( ammended_format );
-			cout << output_scan_dat << "\t\t" << corrected_format->NumberResults() << endl;
-			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), scanSoloResults[scan_num] );
-			ResultFormatter::WriteFlatNtuple( string( new_output_scan_dat ), corrected_format );
-		}
-	}
-
-	//	New LL scan technology
-	if( donewLLscanFlag )
-	{
-		vector<FitResultVector*> scanSoloResults;
-
-		//  Store
-		vector<string> LLscanList = makeOutput->GetScanList();
-
-		for(unsigned int scan_num=0; scan_num < LLscanList.size() ; ++scan_num)
-		{
-
-			//	Start at the global values
-			vector<ParameterSet*>  param_set;
-			param_set.push_back( GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
-			for(unsigned int i=0; i< argumentParameterSet.back()->GetAllNames().size(); ++i )
-			{	argumentParameterSet.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->SetBlindedValue( param_set.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->GetValue() );	}
-
-			ScanParam* local_param = makeOutput->GetScanParam( LLscanList[scan_num] );	(void) local_param;//	Unused
-
-			FitResultVector* scan_result = VectorScan::Scan1D( theMinimiser, makeOutput->GetScanParam( LLscanList[scan_num] ) );
-
-			scanSoloResults.push_back( scan_result );
-		}
-
-		for(unsigned int scan_num=0; scan_num < LLscanList.size(); ++scan_num )
-		{
-			TString output_scan_dat( "LLScanData" );
-			TString new_output_scan_dat( output_scan_dat );
-			output_scan_dat.Append( LLscanList[scan_num] );
-			new_output_scan_dat.Append( "_newformat.root" );
-			output_scan_dat.Append( ".root" );
-			vector<FitResultVector*> ammended_format;
-			for( int i=0; i< scanSoloResults[scan_num]->NumberResults(); ++i )
-			{
-				ammended_format.push_back( GlobalFitResult );
-				FitResultVector* temp_vec = new FitResultVector( scanSoloResults[scan_num]->GetAllNames() );
-				temp_vec->AddFitResult( scanSoloResults[scan_num]->GetFitResult( i ), false );
-				temp_vec->AddRealTime( scanSoloResults[scan_num]->GetRealTime(i) );
-				temp_vec->AddCPUTime( scanSoloResults[scan_num]->GetCPUTime(i) );
-				ammended_format.push_back( temp_vec );
-			}
-			FitResultVector* corrected_format = new FitResultVector( ammended_format );
-			cout << output_scan_dat << "\t\t" << corrected_format->NumberResults() << endl;
-			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), scanSoloResults[scan_num] );
-			ResultFormatter::WriteFlatNtuple( string( new_output_scan_dat ), corrected_format );
-		}
-	}
-
-	if( donewLLcontourFlag )
-	{
-		vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
-		for(unsigned int i=0; i < _2DLLscanList.size() ; ++i )
-		{
-			string name1 = _2DLLscanList[i].first;
-			string name2 = _2DLLscanList[i].second;
-
-			pair< ScanParam*, ScanParam* > Param_Set = makeOutput->Get2DScanParams( name1, name2 );
-
-			FitResultVector* scan_result = VectorScan::Scan2D( theMinimiser, Param_Set );
-
-			string output_scan_dat("LLcontourScanData.root");
-			if( _2DLLscanList.size() > 0 )
-			{
-				TString _scan_dat("LLcontourScanData_");
-				_scan_dat+= _2DLLscanList.size()+1;
-				_scan_dat.Append(".root");
-				output_scan_dat=_scan_dat;
+				FitResultVector* new_1D = new FitResultVector( scanSoloResults );
+				GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( true );
+				VectoredFeldmanCousins* new_study = new VectoredFeldmanCousins( GlobalFitResult, new_1D, Nuisencemodel, makeOutput, theMinimiser, theFunction, xmlFile, pdfsAndData );
+				new_study->SetNumRepeats( numberRepeats );
+				new_study->DoWholeStudy( OutputLevel2 );
+				//	Doesn't hurt to be sure we obay the file format standard
+				vector<FitResultVector*> file_output;
+				file_output.push_back( GlobalFitResult );
+				FitResultVector* study_output = new_study->GetStudyResult();
+				file_output.push_back( study_output );
+				FitResultVector* for_file = new FitResultVector( file_output );
+				//	Making the assumption the user isn't running more than one of these at a time and isn't an idiot
+				ResultFormatter::WriteFlatNtuple( "1DLL_FCScan.root", for_file );
+				ResultFormatter::WriteFlatNtuple( "FCScan.root", for_file );
+				GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( false );
 			}
 
-			//      Add the Global Results and 'Linearize' the output
-			vector<FitResultVector*> TempContourResults;
-			TempContourResults.push_back( GlobalFitResult );
-			TempContourResults.push_back( scan_result );
-			FitResultVector* TempContourResults2 = new FitResultVector( TempContourResults );
-			ResultFormatter::WriteFlatNtuple( output_scan_dat , TempContourResults2 );
+			for(unsigned int scan_num=0; scan_num < LLscanList.size(); ++scan_num )
+			{
+				TString new_output_scan_dat( "LLScanData" );
+				TString time_stamped_name( new_output_scan_dat ); time_stamped_name.Append( "_" ); time_stamped_name.Append( StringProcessing::TimeString() );
+				new_output_scan_dat.Append(".root"); time_stamped_name.Append(".root");
+				vector<FitResultVector*> ammended_format;
+				GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( true );
 
+				//	The output file format is [0] = Global_CV, [1] = Scan_CV_1, [2] = Global_CV, [3] = Scan_CV_2 ...
+				for( int i=0; i< scanSoloResults[scan_num]->NumberResults(); ++i )
+				{
+					ammended_format.push_back( GlobalFitResult );
+					FitResultVector* temp_vec = new FitResultVector( scanSoloResults[scan_num]->GetAllNames() );
+					temp_vec->AddFitResult( scanSoloResults[scan_num]->GetFitResult( i ), false );
+					temp_vec->AddRealTime( scanSoloResults[scan_num]->GetRealTime(i) );
+					temp_vec->AddCPUTime( scanSoloResults[scan_num]->GetCPUTime(i) );
+					ammended_format.push_back( temp_vec );
+				}
+				FitResultVector* corrected_format = new FitResultVector( ammended_format );
+				ResultFormatter::WriteFlatNtuple( string( new_output_scan_dat ), corrected_format );
+				ResultFormatter::WriteFlatNtuple( string( time_stamped_name ), corrected_format );
+				GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( false );
+			}
 		}
 	}
 
 	//		This is re-used for FC scans and forms FC Step 2
-
 	//	11)
-	//Do 2D LL scan for deltaGamma and phis
-	if( ( doLLcontourFlag || doFC_Flag ) && ( !FC_LL_PART_Flag ) )
+	//Do 2D LL scan
+	if( ( ( doLLcontourFlag || doFC_Flag ) && ( !FC_LL_PART_Flag ) ) && !doLLscanFlag )
 	{
 		vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
 
 		unsigned int initial_scan=0;
 		if( ( ( _2DLLscanList.size() > 1 ) && doFC_Flag ) || defineContourFlag )
 		{
-			//cerr << "\n\nPERFORMING ONLY ONE 2D SCAN, CHECK THIS IS EXPECTED!" <<endl;
 			initial_scan = unsigned( _2DLLscanList.size()-1 );
 		}
 
@@ -1214,94 +1452,89 @@ int RapidFit( int argc, char * argv[] )
 			exit(-54);
 		}
 
-		vector<TString> LLcontourFileNamez;
-
 		for(unsigned int ii=initial_scan; ii < _2DLLscanList.size() ; ++ii )
 		{
 			string name1 = _2DLLscanList[ii].first;
 			string name2 = _2DLLscanList[ii].second;
-			//theMinimiser = xmlFile->GetMinimiserConfiguration();
 			if( StartAtCenterFlag )
 			{
-				vector<ParameterSet*> param_set;
-				param_set.push_back( GlobalResult->GetResultParameterSet()->GetDummyParameterSet() ); 
-				for(unsigned int i=0; i< argumentParameterSet.back()->GetAllNames().size(); ++i )
+				ParameterSet* param_set = GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+				for(unsigned int i=0; i< argumentParameterSet->GetAllNames().size(); ++i )
 				{
-					argumentParameterSet.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->SetBlindedValue( param_set.back()->GetPhysicsParameter( argumentParameterSet.back()->GetAllNames()[i] )->GetValue() );
+					argumentParameterSet->GetPhysicsParameter( argumentParameterSet->GetAllNames()[i] )->SetBlindedValue( param_set->GetPhysicsParameter( argumentParameterSet->GetAllNames()[i] )->GetValue() );
 				}
 			}
 
-			vector<FitResultVector*> Temp_Results = FitAssembler::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2, OutputLevel2 );
+			vector<FitResultVector*> Temp_Results = ScanStudies::ContourScan( theMinimiser, theFunction, argumentParameterSet, pdfsAndData, xmlFile->GetConstraints(), makeOutput, name1, name2, OutputLevel2 );
 
-			GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
-			GlobalResult->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
-			GlobalResult->GetResultParameterSet()->GetResultParameter( name2 )->ForcePullValue( -9999 );
-			GlobalResult->GetResultParameterSet()->GetResultParameter( name2 )->ForceOriginalValue( -9999 );
+			vector<FitResultVector*> Ordered_Results;
 
-			TString ext_string( "-" );
-			ext_string.Append( name1 );
-			ext_string.Append( "_" );
-			ext_string.Append( name2 );
-			ext_string.Append( ".root" );
-			TString TempName = LLcontourFileName;
-			TempName.Append( ext_string );
-			LLcontourFileNamez.push_back( TempName );
-
-			//	Linearize the data and then Set the generate values to a default
-			SoloContourResults.push_back( new FitResultVector( Temp_Results ) );
-			//	This should probably be in the main as I don't want to pollute the FitResult with
-			//	'hard coded defaults that seem sensible now'
-			for( unsigned short int point_num=0; point_num < SoloContourResults.back()->NumberResults(); ++point_num )
+			for( vector<FitResultVector*>::iterator result_i = Temp_Results.begin(); result_i != Temp_Results.end(); ++result_i )
 			{
-				SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name1 )->ForcePullValue( -9999 );
-				SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name1 )->ForceOriginalValue( -9999 );
-				SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name2 )->ForcePullValue( -9999 );
-				SoloContourResults.back()->GetFitResult(point_num)->GetResultParameterSet()->GetResultParameter( name2 )->ForceOriginalValue( -9999 );
+				Ordered_Results.push_back( GlobalFitResult );
+				Ordered_Results.push_back( *result_i );
 			}
+
+			SoloContourResults.push_back( new FitResultVector( Ordered_Results ) );
 		}
 
-		//	12)
+		//	12a)
 		//  Don't output the scan files when doing a FC scan
-		if( doFC_Flag )  {
+		if( doFC_Flag )
+		{
 			_2DResultForFC = SoloContourResults.back();
-		} else  {
+		}
+		else
+		{
 			for(unsigned int scanNum=0; scanNum < _2DLLscanList.size(); ++scanNum )
 			{
-
-				//	This output is A LOT safer as it intended to be fed to a sperate plotting program.
-				//	Formatting SHOULD be seperate to generation!
-				string output_scan_dat("LLcontourScanData.root");
-				if( scanNum > 0 )
-				{
-					TString _scan_dat("LLcontourScanData_");
-					_scan_dat+= scanNum+1;
-					_scan_dat.Append(".root");
-					output_scan_dat=_scan_dat;
-				}
-
+				TString output_scan_dat("LLScanData");
+				TString time_stamped_name( output_scan_dat ); time_stamped_name.Append( "_" ); time_stamped_name.Append( StringProcessing::TimeString() );
+				output_scan_dat.Append(".root"); time_stamped_name.Append(".root");
 				//	Add the Global Results and 'Linearize' the output
 				vector<FitResultVector*> TempContourResults;
-				TempContourResults.push_back( GlobalFitResult );
-				TempContourResults.push_back( SoloContourResults[scanNum] );
-				FitResultVector* TempContourResults2 = new FitResultVector( TempContourResults );
-				ResultFormatter::WriteFlatNtuple( output_scan_dat , TempContourResults2 );
+				GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList[scanNum].first )->SetScanStatus( true );
+				GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList[scanNum].second )->SetScanStatus( true );
+				ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), SoloContourResults[scanNum] );
+				ResultFormatter::WriteFlatNtuple( string( time_stamped_name ), SoloContourResults[scanNum] );
+				GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList[scanNum].first )->SetScanStatus( false );
+				GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList[scanNum].second )->SetScanStatus( false );
 			}
 		}
 	}
 
+
 	//	12b)
 	//	Do the main work of the FC scan
-	if( doFC_Flag )
+	if( doFC_Flag && !doLLscanFlag )
 	{
 		vector<unsigned int> numberRepeatsVec;
 		if( numberRepeatsFlag ) numberRepeatsVec.push_back( unsigned(numberRepeats) );
 
 		//	Do FC scan
-		FitResultVector* AllFCResults = FitAssembler::FeldmanCousins( GlobalFitResult, _2DResultForFC, numberRepeatsVec, unsigned(int(Nuisencemodel)), FC_Debug_Flag, makeOutput, theMinimiser, theFunction,  xmlFile, pdfsAndData );
+		vector<pair<string, string> > _2DLLscanList = makeOutput->Get2DScanList();
+		VectoredFeldmanCousins* new_study = new VectoredFeldmanCousins( GlobalFitResult, _2DResultForFC, Nuisencemodel, makeOutput, theMinimiser, theFunction, xmlFile, pdfsAndData );
+		if( numberRepeatsFlag ) new_study->SetNumRepeats( numberRepeats );
+		new_study->DoWholeStudy( OutputLevel2 );
+		FitResultVector* study_output = new_study->GetStudyResult();
+
+		GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList.back().first )->SetScanStatus( true );
+		GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList.back().second )->SetScanStatus( true );
+		//      Making the assumption the user isn't running more than one of these at a time and isn't an idiot
+		ResultFormatter::WriteFlatNtuple( "2DLL_FCScan.root", study_output );
+		ResultFormatter::WriteFlatNtuple( "FCScan.root", study_output );
+		GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList.back().first )->SetScanStatus( false );
+		GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList.back().second )->SetScanStatus( false );
+
 
 		//		STORE THE OUTPUT OF THE TOY STUDIES
-		ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );
+		//ResultFormatter::WriteFlatNtuple( "FCOutput.root", AllFCResults );
 	}
+
+
+
+
+
 
 	//	Should only happen under the condition that no CV fit was performed or anything else
 	if( GlobalFitResult == NULL )
@@ -1310,6 +1543,7 @@ int RapidFit( int argc, char * argv[] )
 		cerr << "No action performed" << endl;
 		cerr << "Not sure how I got here, please email a maintainer!..." <<endl;
 	}
+
 
 	//	13)	Exit
 	//	This is executed once everything else has finished
@@ -1346,5 +1580,7 @@ exit_RapidFit:
 	cout << "Ending time: " << ctime( &timeNow ) << endl;
 
 	cout << "Goodbye :)" << endl;
+
 	return 0;
 }
+

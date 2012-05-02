@@ -80,7 +80,7 @@ bool RapidFitPdfExponential::SetPhysicsParameters( ParameterSet * params )
 	}
 	else
 	{
-		gamma = *newGamma;
+		gamma = newGamma;
 		return true;
 	}
   /*
@@ -144,7 +144,6 @@ double RapidFitPdfExponential::Evaluate( DataPoint * dataPoint )
 
 double RapidFitPdfExponential::Integral( DataPoint* dataPoint, PhaseSpaceBoundary * bounds )
 {
-	//	Stupid gcc
 	(void)dataPoint;
 	IConstraint * timeBound = bounds->GetConstraint(timeName);
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
@@ -179,7 +178,7 @@ double RapidFitPdfExponential::Integral( DataPoint* dataPoint, PhaseSpaceBoundar
 
 double  RapidFitPdfExponential::evaluateNumerator( double t ) const
 { 
-   double gam  =  (const_cast<PhysicsParameter &>(gamma)).GetValue() ;
+   double gam = gamma->GetValue() ;
 
    if(resolution > 0.0 ) {     
       double theExp = exp( -gam*t + resolution*resolution * gam*gam / 2. ) ;
@@ -202,7 +201,7 @@ double  RapidFitPdfExponential::evaluateNumerator( double t ) const
 
 double RapidFitPdfExponential::evaluateIntegral( double tlow, double thigh) const 
 { 
-   double gam  =  (const_cast<PhysicsParameter &>(gamma)).GetValue() ;
+   double gam = gamma->GetValue() ;
 
    if( resolution > 0.0 ) {
      // Cant do integral with resolution with finite limits
@@ -230,3 +229,4 @@ vector<string> RapidFitPdfExponential::GetPrototypeParameterSet()
 	parameterSet.push_back( "gamma" );
 	return parameterSet;
 }
+

@@ -1,287 +1,277 @@
-//	This program is intended to give you an overlay of 1D LL plots formatted in the RapidFit style
-//	It DOES work, however due to ROOT bugs it requires a later version to work correctly
+//	This is the 3rd complete re-write of the plotting code used in the analysis of 2DLL and FC plots from the Edinburgh RapidFit Fitter
+//	The reasoning behind this re-write is complex but the complexity is driven by shortcomings in the root framework,
+//	Whilst the speed and actual plots are a credit to the things that root does well
 
 //	ROOT Headers
 #include "TFile.h"
-#include "TTree.h"
-#include "TCanvas.h"
-#include "TString.h"
-#include "TGraph.h"
-#include "TMultiGraph.h"
-#include "TAxis.h"
-#include "TLine.h"
-#include "TColor.h"
 #include "TH2.h"
+#include "TTree.h"
+#include "TNtuple.h"
+#include "TString.h"
+#include "TCanvas.h"
+#include "TObject.h"
+#include "TSystem.h"
+#include "TROOT.h"
+#include "TGraph2D.h"
+#include "TPolyMarker3D.h"
+#include "TList.h"
+#include "TRandom3.h"
+#include "TPaveText.h"
+#include "TStyle.h"
+#include "TGraph.h"
+#include "TLegend.h"
+#include "TString.h"
+#include "TLeaf.h"
+#include "TTree.h"
+#include "TMultiGraph.h"
 //	RapidFit Headers
 #include "EdStyle.h"
-#include "NTuple_Processing.h"
-#include "TString_Processing.h"
+//	RapidFit Utils Headers
+#include "RapidLL.h"
+#include "TTree_Processing.h"
+#include "Histo_Processing.h"
+#include "DoFCAnalysis.h"
+#include "StringOperations.h"
+#include "RapidFit_Output_File.h"
+#include "Mathematics.h"
 //	System Headers
 #include <vector>
-#include <iostream>
+#include <string>
 #include <cstdlib>
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <algorithm>
 
 using namespace::std;
 
-int main( int argc, char* argv[] )
+/*int RapidLL::PlotRapidFitLL( TTree* input_tree, TString controlled_parameter, TRandom3* rand, vector<string> other_params )
 {
-	cout <<" .----------------.  .----------------.  .----------------.  .----------------.  .----------------."<<endl;
-	cout <<" | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |"<<endl;
-	cout <<" | |  _______     | || |      __      | || |   ______     | || |     _____    | || |  ________    | |"<<endl;
-	cout <<" | | |_   __ \\    | || |     /  \\     | || |  |_   __ \\   | || |    |_   _|   | || | |_   ___ `.  | |"<<endl;
-	cout <<" | |   | |__) |   | || |    / /\\ \\    | || |    | |__) |  | || |      | |     | || |   | |   `. \\ | |"<<endl;
-	cout <<" | |   |  __ /    | || |   / ____ \\   | || |    |  ___/   | || |      | |     | || |   | |    | | | |"<<endl;
-	cout <<" | |  _| |  \\ \\_  | || | _/ /    \\ \\_ | || |   _| |_      | || |     _| |_    | || |  _| |___.' / | |"<<endl;
-	cout <<" | | |____| |___| | || ||____|  |____|| || |  |_____|     | || |    |_____|   | || | |________.'  | |"<<endl;
-	cout <<" | |              | || |              | || |              | || |              | || |              | |"<<endl;
-	cout <<" | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |"<<endl;
-	cout <<"  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'"<<endl;
-	cout <<"  .----------------.  .----------------."<<endl;
-	cout <<" | .--------------. || .--------------. |"<<endl;
-	cout <<" | |   _____      | || |   _____      | |"<<endl;
-	cout <<" | |  |_   _|     | || |  |_   _|     | |"<<endl;
-	cout <<" | |    | |       | || |    | |       | |"<<endl;
-	cout <<" | |    | |   _   | || |    | |   _   | |"<<endl;
-	cout <<" | |   _| |__/ |  | || |   _| |__/ |  | |"<<endl;
-	cout <<" | |  |________|  | || |  |________|  | |"<<endl;
-	cout <<" | |              | || |              | |"<<endl;
-	cout <<" | '--------------' || '--------------' |"<<endl;
-	cout <<"  '----------------'  '----------------'"<<endl;
-	cout <<endl;
-	cout << "Usage:"<<endl;
-	cout << endl << argv[0] << "\t" << "Param_to_plot" << "\t" << "File1.root" << "\t" << "File2.root" << "\t...\t" << "FileN.root" << endl;
-	cout <<endl;
+	(void) other_params;
 
-	if( argc < 3 ) exit(-5);
-	//	Do this before any Canvas is constructed
-	//	ROOT is a BITCH for not allowing you to easily change internal crap
-	//      Setup the Canvas and such
-	EdStyle* RapidFit_Style = new EdStyle();
-	RapidFit_Style->SetStyle();
+	vector<string> controlled_parameters( 1, controlled_parameter.Data() );
 
-	//	The name of output tree's from RapidFit assuming Flat NTuple format
-	TString TREE_NAME( "RapidFitResult" );
+	vector<TString> free_parameters = 
 
-	//	Parameter Passed from the command line
-	TString Param_Of_Choice( argv[1] );
+	TString Draw_String = controlled_parameter+value_suffix + ":NLL";
 
-	//	switch for plotting the _error plots for each parameter of interest
-	bool want_ROADMAP_ERROR=true;
+	TString Cut_String = "Fit_Status==3";
+
+	vector<vector<double> > plotting_data = TTree_Processing::Plotter_Data( input_tree, Draw_String, Cut_String, rand );
+
+	return 0;
+}*/
+
+int RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, TRandom3* rand_gen, vector<string> other_params )
+{
+	(void) other_params;
+
+	TString param_string = controlled_parameter;
+	TString param_val = param_string+value_suffix;
+
+	input_tree->Draw( param_val,"","goff",1,0 );
+	double notgenvalue = input_tree->GetV1()[0];
+	TString notgen; notgen+=notgenvalue;
+
+	TString output_path("RapidFit_LLScan_");
+	output_path.Append( controlled_parameter );
+	output_path.Append( "_" + StringOperations::TimeString() );
+
+	//      Make OutputDir
+	TDirectory* output_dir=NULL;
+	gSystem->mkdir( output_path );
+	gSystem->cd( output_path );
+	output_dir=gDirectory;
 
 
-	//	Input Object Holders
-	vector<TString> Input_File_Names;
-	vector<TFile*> Input_Files;
-	vector<TTree*> Input_Tree_per_File;
-	//	All args>=3 are assumed to be files due to design
-	for( int i=2; i < argc ; ++i )
-	{
-		Input_File_Names.push_back( TString( argv[i] ) );
+	//	Setup Objects for Plotting
 
-		Input_Files.push_back( new TFile( Input_File_Names.back(), "READ" ) );
+	//	Quick(ish) way to establish the smallest NLL from a good fit (by definition this is the global result)
+	TTree* temp_tree = input_tree->CopyTree( "NLL>=0","fast", input_tree->GetEntries(),0 );
+	double true_min_NLL = temp_tree->GetMinimum("NLL");
 
-		Input_Tree_per_File.push_back( (TTree*) gDirectory->Get( TREE_NAME ) );
+	//	General Cuts to be applied for various plots
 
-		TString new_name = TREE_NAME;
-		new_name+=i;
+	//	Fit_Status == 3
+	TString Fit_Cut = "(abs(" + Fit_Status + "-3.0)<"+double_tolerance+")";
 
-		//	ROOT does NOT like objects having the same name, keep it from throwing a hissy fit!
-		Input_Tree_per_File.back()->SetName( new_name );
-	}
+	//	Combine the individual Cuts
+	TString Fit_Cut_String = Fit_Cut;
 
-	cout << endl <<"Opened files..." << endl<<endl;
+	TString NLL_Min;		//	Of course ROOT doesn't have USEFUL constructors!
+	NLL_Min+=true_min_NLL;
 
 
-	TString value_suffix = "_value";
+	//	Do the NLL plotting
 
-	//      Get a list of all branches in allresults
-	vector<TString> all_parameters = get_branch_names( Input_Tree_per_File[0] );
-	//      Get a list of all branches in allresults with '_value' in their name
-	vector<TString> all_parameter_values = filter_names( all_parameters, string(value_suffix.Data()) );
+	cout << "Plotting NLL variation\n\n";
 
+	//	This function is amazing, it even returns TGraphs with unique names so as to not cause problems in ROOT namespace :D
+	TGraph* drawn_histo = LL_Plot( input_tree, Fit_Cut_String, true_min_NLL, NLL, param_val, rand_gen );
 
-	//	Create a vector to hold the overlay graphs for all of the parameters in the fit
-	vector<TMultiGraph*> all_params_drift_multi;
-	//all_params_drift_multi.resize( all_parameters.size() );
-
-	for( unsigned int i=0; i< all_parameters.size(); ++i )
-	{
-		all_params_drift_multi.push_back( new TMultiGraph() );
-	}
-
-	TMultiGraph *mg = new TMultiGraph();
-
-	TString NLL="NLL";
+	TGraph* color_graph = LL_Plot( input_tree, Fit_Cut_String, true_min_NLL, NLL, param_val, rand_gen );
 
 
-	vector<double> minimum_NLL;
-	vector<TString> ALL_Draw_Strings;
-	vector<TTree*> temp_trees;
+	TString Name_Base="RapidLL_"+param_string;
+	TString Name=Name_Base; Name.Append("_"); Name+=rand_gen->Rndm();
 
-	cout << "Calculating DLL..." << endl<<endl;
+	gSystem->cd( output_path );
 
-	//	For all Input Files, derrive the string that will allow the DeltaLL to start at minima
-	for( unsigned int i=0; i< Input_Tree_per_File.size(); ++i )
-	{
+	TCanvas* new_canvas = new TCanvas( Name, Name, 1680, 1050 );
 
-		TString _1D_Draw_String, NLL_Draw_String;
+	drawn_histo->Draw( "AC*" );
+	new_canvas->Update();
+	TPaveText* text_1 = Histogram_Processing::addLHCbLabel("",true);
+	text_1->SetFillStyle(0);
+	text_1->Draw("SAME");
 
-		TTree* temp_tree = Input_Tree_per_File[i]->CopyTree( "NLL>0","fast",Input_Tree_per_File[i]->GetEntries(),0 );
-
-		TString Name="TEMP_ROOT";
-		Name+=i;
-		temp_tree->SetName( Name );
-
-		temp_trees.push_back( temp_tree );
-		minimum_NLL.push_back( temp_tree->GetMinimum( NLL ) );
-
-		NLL_Draw_String = "(" + NLL + "-";
-		NLL_Draw_String+=minimum_NLL.back();
-		NLL_Draw_String.Append(")");
-
-		_1D_Draw_String = NLL_Draw_String + ":" + Param_Of_Choice + value_suffix;
-
-		ALL_Draw_Strings.push_back( _1D_Draw_String );
-		cout << ALL_Draw_Strings.back() << endl;
-	}
-
-	TCanvas* new_canvas = new TCanvas("Output", "Output", 1680, 1050 );
-
-	vector<TGraph*> temp_graphs;
-	cout << "Constructing Graphs:" << endl;
-
-
-	//	For thowing away, but certain objects only exist after Canvas creation
-	TCanvas* bad_c = new TCanvas("new2", "new2", 1680, 1050);
-
-	for( unsigned int i=0; i< Input_Files.size(); ++i )
-	{
-		bad_c->cd();
-		Input_Tree_per_File[i]->Draw( ALL_Draw_Strings[i], "NLL>0" );
-		TGraph* temp_graph = new TGraph( int(Input_Tree_per_File[i]->GetSelectedRows()), Input_Tree_per_File[i]->GetV2(), Input_Tree_per_File[i]->GetV1() );
-		TString Name( Param_Of_Choice );
-		Name.Append("_");Name+=i;
-		temp_graph->SetName( Name );
-		temp_graph->SetLineColor( i+1 );
-		temp_graph->SetMarkerColor( i+1 );
-		new_canvas->cd();
-		temp_graphs.push_back( temp_graph );
-		mg->Add(temp_graph);
-	}
-
-	vector<TString> Drift_Param_Draw_String;
-
-	for( unsigned int i=0; i< all_parameter_values.size(); ++i )
-	{
-		TString temp_str = all_parameter_values[i];
-		temp_str.Append( ":" );
-		temp_str.Append( Param_Of_Choice );
-		temp_str.Append( value_suffix );
-		Drift_Param_Draw_String.push_back( temp_str );
-		cout << Drift_Param_Draw_String.back() << endl;
-	}
-
-	cout << endl<<"Constructing Nuisence Parameter Plots..." << endl;
-
-	TCanvas* temp_c = new TCanvas( "tmp2", "tmp2", 1680, 1050 );
-	//	For all files
-	for( unsigned int i=0; i< Input_Files.size(); ++i )
-	{
-		//	For all fit parameters
-		for( unsigned int j=0; j< Drift_Param_Draw_String.size(); ++j )
-		{
-			Input_Tree_per_File[i]->Draw( Drift_Param_Draw_String[j] , "NLL>0" );
-			TGraph* temp_graph = new TGraph( int( Input_Tree_per_File[i]->GetSelectedRows() ), Input_Tree_per_File[i]->GetV2(), Input_Tree_per_File[i]->GetV1() );
-			temp_graph->SetLineColor( i+1 );
-			temp_graph->SetMarkerColor( i+1 );
-			TString Name("File_");
-			Name+=j;Name.Append("_");Name+=i;
-			temp_graph->SetName( Name );
-			all_params_drift_multi[j]->Add( temp_graph );
-		}
-	}
-	delete temp_c;
-
-	new_canvas->cd();
-	cout << endl <<"Overlaying And Plotting..." << endl;
-	mg->Draw("AC*");
-
-	//	Now that the axis exist we can worry about labeling them
-	mg->GetXaxis()->SetTitle( EdStyle::GetParamRootName( Param_Of_Choice ) );
-	mg->GetYaxis()->SetTitle( "#Delta LL" );
+	//      Now that the axis exist we can worry about labeling them
+	drawn_histo->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param_string ) + " " + EdStyle::GetParamRootUnit( param_string ) );
+	drawn_histo->GetYaxis()->SetTitle( EdStyle::GetParamRootName( TString("LLscan") ) );
 	new_canvas->Update();
 
-	TString Output_Graph_Name = "Output_"+Param_Of_Choice;
-	new_canvas->Print( Output_Graph_Name+".png" );
-	new_canvas->Print( Output_Graph_Name+".pdf" );
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub.png");
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub.pdf");
+
+	drawn_histo->Draw( "AC" );
+	new_canvas->SetTitle("");
+	text_1->Draw("SAME");
+	new_canvas->Update();
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub_nopoints.png");
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub_nopoints.pdf");
 
 
-	if(	want_ROADMAP_ERROR	)
+	color_graph->Draw("AC*");
+	new_canvas->Update();
+	text_1->Draw("SAME");
+
+	//      Now that the axis exist we can worry about labeling them
+	color_graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param_string ) + " " + EdStyle::GetParamRootUnit( param_string ) );
+	color_graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( TString("LLscan") ) );
+	new_canvas->Update();
+
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf.png");
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf.pdf");
+
+	color_graph->Draw("AC");
+	new_canvas->SetTitle("");
+	text_1->Draw("SAME");
+	new_canvas->Update();
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf_nopoints.png");
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf_nopoints.pdf");
+
+	TString nuisance_dir = "nuisance_params_"; nuisance_dir.Append( StringOperations::TimeString() );
+
+	gSystem->mkdir( nuisance_dir );
+	gSystem->cd( nuisance_dir );
+
+	vector<string> temp_vec( 1, controlled_parameter.Data() );
+
+	vector<TString> nuisance_parameters = RapidFit_Output_File::get_free_non_scanned_parameters( input_tree, temp_vec );
+
+	cout << "Plotting Variation in:" << endl;
+
+	for( vector<TString>::iterator param_i = nuisance_parameters.begin(); param_i != nuisance_parameters.end(); ++param_i )
 	{
-		//	Now mark and draw the 1 sigma error
-		double xmax=0, xmin=0;
-		double error=0.5;
-		//	Zoom in so you can see it
-		mg->GetYaxis()->SetRangeUser( 0., 5. );
-		//	This was an attempt to get the range to auto adust
-		new_canvas->Update();
-		xmax = mg->GetXaxis()->GetXmax();
-		xmin = mg->GetXaxis()->GetXmin();
-		TLine *error_line = new TLine( xmin, error, xmax, error);
-		error_line->SetLineColor( Color_t(3) );
-		TLine *param_error = NULL;
+		TCanvas* param_c = new TCanvas("param_canv_"+*param_i,"param_canv_"+*param_i,1680,1050);
 
-		//	Definition of errors around CV
-		//	Would be nice to be able to read this from somewhere...
-		if( Param_Of_Choice == "gamma" )
-		{
-			param_error = new TLine( 0.6807-0.02, error, 0.6807+.02, error);
-		} else if( Param_Of_Choice == "deltaGamma" )
-		{
-			param_error = new TLine( 0.06-0.06, error, 0.06+0.06, error);
-		} else if( Param_Of_Choice == "Azero_sq" )
-		{
-			param_error = new TLine( 0.6-0.015, error, 0.6+0.015, error);
-		} else if( Param_Of_Choice == "Aperp_sq" )
-		{
-			param_error = new TLine( 0.16-0.02, error, 0.16+0.02, error);
-		} else if( Param_Of_Choice == "delta_para" )
-		{
-			param_error = new TLine( 2.5-0.1, error, 2.5+0.1, error);
-		} else if( Param_Of_Choice == "delta_perp" )
-		{
-			param_error = new TLine( -0.17-0.5, error, -0.17+0.5, error);
-		} else if( Param_Of_Choice == "Phi_s" )
-		{
-			param_error = new TLine( -0.7-0.25, error, -0.7+0.25, error);
-		}
-		if( param_error != NULL )
-		{
-			param_error->SetLineColor( Color_t(2) );
-			param_error->SetLineWidth( 10 );
-			error_line->SetLineWidth( 10 );
-			error_line->Draw();
-			param_error->Draw();
-			new_canvas->Update();
-			new_canvas->Print( Output_Graph_Name+"_error.png" );
-			new_canvas->Print( Output_Graph_Name+"_error.pdf" );
-		}
+		cout << *param_i << endl;
+
+		TGraph* param_graph = LL_Plot( input_tree, Fit_Cut_String, 0., *param_i+value_suffix, param_val, rand_gen );
+		TGraph* err_graph = LL_Plot( input_tree, Fit_Cut_String, 0., *param_i+error_suffix, param_val, rand_gen );
+
+		param_graph->Draw("AC*");
+
+		param_c->SetTitle("");
+
+		param_c->Update();
+		text_1->Draw("SAME");
+
+
+		//      Now that the axis exist we can worry about labeling them
+		param_graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param_string + value_suffix ) + " " + EdStyle::GetParamRootUnit( param_string ) );
+		param_graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( *param_i + value_suffix ) + " " + EdStyle::GetParamRootUnit( *param_i ) );
+
+		TString param_file = *param_i;
+
+		Histogram_Processing::Silent_Print( param_c, param_file+".pdf" );
+		Histogram_Processing::Silent_Print( param_c, param_file+".png" );
+
+
+		err_graph->Draw("AC*");
+
+		param_c->SetTitle("");
+
+		param_c->Update();
+		text_1->Draw("SAME");
+
+		err_graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param_string + value_suffix ) + " " + EdStyle::GetParamRootUnit( param_string ) );
+		err_graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( *param_i + error_suffix ) + " " + EdStyle::GetParamRootUnit( *param_i ) );
+
+		Histogram_Processing::Silent_Print( param_c, param_file+"_"+error_suffix+".pdf" );
+		Histogram_Processing::Silent_Print( param_c, param_file+"_"+error_suffix+".png" );
 	}
 
-	for( unsigned int i=0; i < all_parameter_values.size(); ++i )
-	{
-		TString canvas_name="Canvas_";
-		canvas_name+=i;
-		TCanvas* out_canvas = new TCanvas(canvas_name, canvas_name, 1680, 1050 );
-		all_params_drift_multi[i]->Draw("AC*");
-		out_canvas->Update();
-		all_params_drift_multi[i]->GetXaxis()->SetTitle( EdStyle::GetParamRootName( Param_Of_Choice ) );
-		all_params_drift_multi[i]->GetYaxis()->SetTitle( EdStyle::GetParamRootName( all_parameter_values[i] ) );
-		TString Output_Graph_Name = "Output_"+Param_Of_Choice+"_"+all_parameter_values[i];
-		out_canvas->Print( Output_Graph_Name+".png");
-		out_canvas->Print( Output_Graph_Name+".pdf");
-	}
-
-	cout << endl;
 	return 0;
+}
+
+pair<vector<double>,vector<double> > RapidLL::LL_Plot_Histo( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString NLL, TString param )
+{
+	TString cut_val; cut_val+=Global_Best_NLL;
+	TString Draw_String = "("+NLL+"-"+cut_val+"):"+param;
+
+	input_TTree->SetEstimate(input_TTree->GetEntries() );
+	input_TTree->Draw( Draw_String, Cut_String, "goff" );
+
+	//      Return the Histogram from within this graph for plotting
+	TH1* Returnable_Hist = (TH1*) input_TTree->GetHistogram();
+	pair<vector<double>,vector<double> > output;
+	if( Returnable_Hist != NULL )
+	{
+		int selected = (int)input_TTree->GetSelectedRows();
+		double* param_plot = input_TTree->GetV1();
+		double* NLL_plot = input_TTree->GetV2();
+		vector<double> temp1, temp2;
+		for( int i=0; i< selected; ++i )
+		{
+			temp1.push_back( param_plot[i] );
+			temp2.push_back( NLL_plot[i] );
+		}
+		output.first = temp1;
+		output.second = temp2;
+	}
+	return output;
+}
+
+
+
+TGraph* RapidLL::LL_Plot( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString NLL, TString param, TRandom3* rand )
+{
+	TGraph* new_graph = NULL;
+	pair<vector<double>,vector<double> > data = LL_Plot_Histo( input_TTree, Cut_String, Global_Best_NLL, NLL, param );
+
+	vector<pair<double,double> > filter = reparam( data );
+	sort( filter.begin(), filter.end(), Mathematics::Sort_first_Double );
+	sort( filter.begin(), filter.end(), Mathematics::Sort_second_Double );
+
+	vector<pair<double,double> >::iterator it;
+	it = unique( filter.begin(), filter.end(), Mathematics::Unique_2D_Double );
+
+	filter.resize( unsigned(it - filter.begin()) );
+	pair<vector<double>,vector<double> > plottable = reparam( filter );
+
+	unsigned int size = (unsigned) plottable.first.size();
+	double* temp1 = new double[size]; double* temp2 = new double[size];
+	for( unsigned int i=0; i< size; ++i )
+	{
+		temp1[i] = plottable.first[i];
+		temp2[i] = plottable.second[i];
+	}
+	new_graph = new TGraph( (Int_t)size, temp2, temp1 );
+	TString Name="Graph";
+	Name+=rand->Rndm();
+	new_graph->SetName( Name );
+	new_graph->SetTitle("");
+
+	return new_graph;
 }

@@ -1,28 +1,28 @@
 // $Id: FumiliWrapper.h,v 1.1 2009/11/10 10:35:44 gcowan Exp $
-/**
-        @class FumiliWrapper
-
-        A wrapper for Fumili, implementing IMinimiser
-
-	I think this has defeated me, there is no easy way to get
-	this to work. With Fumili you need to calculate the
-	derivatives (there is a Gradient() method that needs to be
-	defined in FumiliFCNBase()) which is in general difficult.
-	Here is an example of how this minimisation technique can 
-	be used:
-
-	http://seal.web.cern.ch/seal/snapshot/work-packages/mathlibs/minuit/
-
-	This is using it without ROOT, just as we are using Minuit2.
-	There are some advanced ways to use fitters in ROOT (see 
-	TVirtualFitter and related classes).
-
-	http://seal.web.cern.ch/seal/MathLibs/Minuit2/html/annotated.html
-	
-        @author Greig A Cowan greig.cowan@cern.ch
-	@date 2009-10-09
+/*!
+ * @class FumiliWrapper
+ *
+ * @brief A wrapper for Fumili, implementing IMinimiser
+ *
+ * I think this has defeated me, there is no easy way to get
+ * this to work. With Fumili you need to calculate the
+ * derivatives (there is a Gradient() method that needs to be
+ * defined in FumiliFCNBase()) which is in general difficult.
+ * Here is an example of how this minimisation technique can 
+ * be used:
+ *
+ *http://seal.web.cern.ch/seal/snapshot/work-packages/mathlibs/minuit/
+ *
+ * This is using it without ROOT, just as we are using Minuit2.
+ * There are some advanced ways to use fitters in ROOT (see 
+ * TVirtualFitter and related classes).
+ * 
+ * http://seal.web.cern.ch/seal/MathLibs/Minuit2/html/annotated.html
+ * 
+ * @author Greig A Cowan greig.cowan@cern.ch
 */
 
+#pragma once
 #ifndef FUMILI_WRAPPER_H
 #define FUMILI_WRAPPER_H
 
@@ -44,16 +44,16 @@ class FumiliWrapper : public IMinimiser
 		~FumiliWrapper();
 
 		//Interface functions
-                virtual void SetupFit( FitFunction* );
+		virtual void SetupFit( FitFunction* );
 		virtual void FixParameters( vector<double>, vector<string> );
 		virtual void Minimise();
 		virtual void SetOutputLevel( int ){};
 		virtual FitResult * GetFitResult();
 		virtual void ContourPlots( vector< pair< string, string > > );
 
-                virtual void SetSteps( int );
-                virtual void SetTolerance( double );
-                virtual void SetOptions( vector<string> );
+		virtual void SetSteps( int );
+		virtual void SetTolerance( double );
+		virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
 		virtual FitFunction* GetFitFunction();
 
@@ -67,9 +67,9 @@ class FumiliWrapper : public IMinimiser
 		FitFunction* RapidFunction;
 		FitResult * fitResult;
 		vector< pair< string, string > > contours;
-                int maxSteps;
-                double bestTolerance;
-                vector<string> Options;
+		int maxSteps;
+		double bestTolerance;
+		vector<string> Options;
 		int Quality;
 };
 

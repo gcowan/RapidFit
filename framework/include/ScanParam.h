@@ -12,6 +12,7 @@
 	@date 2011-02
 */
 
+#pragma once
 #ifndef SCANPARAM_H
 #define SCANPARAM_H
 
@@ -19,7 +20,7 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using namespace::std;
 
 class ScanParam
 {
@@ -66,3 +67,4 @@ class ScanParam
 };
 
 #endif
+

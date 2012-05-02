@@ -30,8 +30,8 @@ class LongLivedBkg : public BasePDF
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
-		virtual double Norm(DataPoint*, PhaseSpaceBoundary*);
+		virtual double Normalisation(PhaseSpaceBoundary*);
+		virtual double Norm(PhaseSpaceBoundary*);
 
 	private:
 		LongLivedBkg& operator=( const LongLivedBkg& );

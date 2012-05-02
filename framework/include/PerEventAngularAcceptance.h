@@ -5,6 +5,7 @@
 	      @date 2010-05-03
 */
 
+#pragma once
 #ifndef PEREVENTANGULARACCEPTANCE_H
 #define PEREVENTANGULARACCEPTANCE_H
 
@@ -21,7 +22,7 @@
 #include <vector>
 #include <map>
 
-using namespace std;
+using namespace::std;
 
 class PerEventAngularAcceptance
 {

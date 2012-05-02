@@ -30,21 +30,20 @@ ObservableRef::~ObservableRef()
 
 string ObservableRef::Name() const
 {
-	string new_name = Observable_Name;
-	return new_name;
+	return Observable_Name;
 }
 
-string* ObservableRef::NameRef()
+string* ObservableRef::NameRef() const
 {
 	return &Observable_Name;
 }
 
-void ObservableRef::SetIndex( int Index )
+void ObservableRef::SetIndex( const int Index ) const
 {
 	Observable_Index = Index;
 }
 
-int ObservableRef::GetIndex()
+int ObservableRef::GetIndex() const
 {
 	return Observable_Index;
 }

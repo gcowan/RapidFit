@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef RESULT_PARAMETER_H
 #define RESULT_PARAMETER_H
 
@@ -15,28 +16,36 @@
 //	System Headers
 #include <string>
 
-using namespace std;
+using namespace::std;
 
 class ResultParameter
 {
 	public:
 		ResultParameter();
-		ResultParameter( string, double, double, double, double, double, double, string, string );
+		ResultParameter( string, double, double, double, double, double, string, string );
 		~ResultParameter();
 
-		string GetName();
-		double GetValue();
-		double GetOriginalValue();
-		double GetError();
-		double GetPull();
-		double GetMinimum();
-		double GetMaximum();
-		string GetType();
-		string GetUnit();
+		string GetName() const;
+		double GetValue() const;
+		double GetOriginalValue() const;
+		double GetError() const;
+		double GetPull() const;
+		double GetMinimum() const;
+		double GetMaximum() const;
+		string GetType() const;
+		void ForceType( string );
+		string GetUnit() const;
 		void ForceOriginalValue( double );
 		void ForcePullValue( double );
-		PhysicsParameter* GetDummyPhysicsParameter();
-		double GetStepSize();
+		PhysicsParameter* GetDummyPhysicsParameter() const;
+		double GetStepSize() const;
+		void SetScanStatus( bool );
+		bool GetScanStatus() const;
+
+		void Print() const;
+
+		string FitXML() const;
+		string ToyXML() const;
 
 	private:
 		string name;
@@ -48,6 +57,10 @@ class ResultParameter
 		double stepSize;
 		string type;
 		string unit;
+		bool ScanStatus;
+
+		string XML( const bool=true ) const;
 };
 
 #endif
+

@@ -10,7 +10,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 
 PDF_CREATOR( Bs2JpsiPhiPromptBkg_tripleGaussian );
 
@@ -43,9 +42,7 @@ void Bs2JpsiPhiPromptBkg_tripleGaussian::MakePrototypes()
 	parameterNames.push_back( sigmaPr1Name );
 	parameterNames.push_back( sigmaPr2Name );
 	parameterNames.push_back( sigmaPr3Name );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -128,9 +125,9 @@ double Bs2JpsiPhiPromptBkg_tripleGaussian::Normalisation(PhaseSpaceBoundary * bo
 	if( sigmaPr2 <= 0. ) {cout << "Bs2JpsiPhiPromptBkg_tripleGaussian::Normalisation() : sigmaPr2 < 0 : " << sigmaPr2 << endl ; exit(1); }
 	if( sigmaPr3 <= 0. ) {cout << "Bs2JpsiPhiPromptBkg_tripleGaussian::Normalisation() : sigmaPr3 < 0 : " << sigmaPr3 << endl ; exit(1); }
 	
-	double val1 = 0.5 * ( RooMath::erf( tmax/(sqrt(2.)*sigmaPr1) ) - RooMath::erf( tmin/(sqrt(2.)*sigmaPr1 )) );
-	double val2 = 0.5 * ( RooMath::erf( tmax/(sqrt(2.)*sigmaPr2) ) - RooMath::erf( tmin/(sqrt(2.)*sigmaPr2 )) );
-	double val3 = 0.5 * ( RooMath::erf( tmax/(sqrt(2.)*sigmaPr3) ) - RooMath::erf( tmin/(sqrt(2.)*sigmaPr3 )) );
+	double val1 = 0.5 * ( erf( tmax/(sqrt(2.)*sigmaPr1) ) - erf( tmin/(sqrt(2.)*sigmaPr1 )) );
+	double val2 = 0.5 * ( erf( tmax/(sqrt(2.)*sigmaPr2) ) - erf( tmin/(sqrt(2.)*sigmaPr2 )) );
+	double val3 = 0.5 * ( erf( tmax/(sqrt(2.)*sigmaPr3) ) - erf( tmin/(sqrt(2.)*sigmaPr3 )) );
 	
 	return frac1*val1 + (1.-frac1)*(frac23*val2 + (1.-frac23)*val3) ;
 }

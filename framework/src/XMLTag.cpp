@@ -14,11 +14,6 @@
 #include <iostream>
 #include <stdlib.h>
 
-//Default Constructor
-XMLTag::XMLTag() : children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden()
-{
-}
-
 //Default constructor w Override tags
 XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden(Override_Tags)
 {
@@ -95,16 +90,19 @@ vector<string> XMLTag::GetValue()
 	//cout << path << endl;
 	string pathStr = path.Data();
 	vector<string> forbidden_paths;
-	for( vector<pair<string,string> >::iterator fpath_i = forbidden->begin(); fpath_i != forbidden->end(); ++fpath_i )
+	if( forbidden != NULL )
 	{
-		forbidden_paths.push_back( fpath_i->first );
-	}
-	int TagPos = StringProcessing::VectorContains( &forbidden_paths, &pathStr );
-	if( TagPos != -1 )
-	{
-		value[0] = (*forbidden)[(unsigned)TagPos].second;
-		forbidden->erase(forbidden->begin()+TagPos);
-		new_value[0] = value[0];
+		for( vector<pair<string,string> >::iterator fpath_i = forbidden->begin(); fpath_i != forbidden->end(); ++fpath_i )
+		{
+			forbidden_paths.push_back( fpath_i->first );
+		}
+		int TagPos = StringProcessing::VectorContains( &forbidden_paths, &pathStr );
+		if( TagPos != -1 )
+		{
+			value[0] = (*forbidden)[(unsigned)TagPos].second;
+			forbidden->erase(forbidden->begin()+TagPos);
+			new_value[0] = value[0];
+		}
 	}
 	//cout << path << "\t" << name << "\t" << "\t" << new_value[0] << endl;
 	if ( value.size() == 0 )
@@ -143,7 +141,7 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 		else
 		{
 			//Everything before the tag goes into value
-			vector<string> newValue = SplitContent( Content, lineNumber, linePosition, int(tagName.size() + 2) );
+			vector<string> newValue = this->SplitContent( Content, lineNumber, linePosition, int(tagName.size() + 2) );
 			StringProcessing::RemoveWhiteSpace(newValue);
 			for ( unsigned int contentIndex = 0; contentIndex < newValue.size(); ++contentIndex )
 			{
@@ -151,7 +149,7 @@ vector< XMLTag* > XMLTag::FindTagsInContent( vector<string> Content, vector<stri
 			}
 
 			//Create the child tag
-			vector<string> childContent = FindTagContent( tagName, Content );
+			vector<string> childContent = this->FindTagContent( tagName, Content );
 			childTags.push_back( new XMLTag( tagName, childContent, this ) );
 		}
 	}
@@ -294,7 +292,7 @@ vector<string> XMLTag::FindTagContent( string TagName, vector<string> & Content 
 	}
 
 	//Split off the tag content
-	return SplitContent( Content, closeLines[unsigned(splitIndex)], closePositions[unsigned(splitIndex)], int(TagName.size() + 3) );
+	return this->SplitContent( Content, closeLines[unsigned(splitIndex)], closePositions[unsigned(splitIndex)], int(TagName.size() + 3) );
 }
 
 //Split a vector string about the specified place

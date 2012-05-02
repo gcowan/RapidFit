@@ -17,8 +17,6 @@
 
 #include "Mathematics.h"
 
-#include "RooComplex.h"
-
 #include <iostream>
 #include <cstdlib>
 #include <float.h>

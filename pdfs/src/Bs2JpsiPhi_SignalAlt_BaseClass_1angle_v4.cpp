@@ -9,7 +9,6 @@
 
 //	ROOT Headers
 #include "TMath.h"
-#include "RooMath.h"
 //	RapidFit Headers
 #include "Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4.h"
 #include "SlicedAcceptance.h"
@@ -22,40 +21,40 @@
 
 //.....................................
 // New Constructor which takes configuration object
-Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4(PDFConfigurator configurator ) : 
+Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4( PDFConfigurator* configurator ) : 
 // Physics parameters
-	  gammaName     		( configurator.getName("gamma") )
-	, deltaGammaName		( configurator.getName("deltaGamma") )
-	, deltaMName			( configurator.getName("deltaM") )
-	, Phi_sName				( configurator.getName("Phi_s") )
-	, Aeven_sqName			( configurator.getName("Aeven_sq") )
-	, Aodd_sqName			( configurator.getName("Aodd_sq") )
-	, As_sqName				( configurator.getName("As_sq") )
+	  gammaName     		( configurator->getName("gamma") )
+	, deltaGammaName		( configurator->getName("deltaGamma") )
+	, deltaMName			( configurator->getName("deltaM") )
+	, Phi_sName				( configurator->getName("Phi_s") )
+	, Aeven_sqName			( configurator->getName("Aeven_sq") )
+	, Aodd_sqName			( configurator->getName("Aodd_sq") )
+	, As_sqName				( configurator->getName("As_sq") )
 	// PELC NEW additions for v2
-	, cosphisName			( configurator.getName("cosphis") )
-	, sinphisName			( configurator.getName("sinphis") )
+	, cosphisName			( configurator->getName("cosphis") )
+	, sinphisName			( configurator->getName("sinphis") )
 	// Detector parameters
-	, mistagName			( configurator.getName("mistag") )
-	, mistagP1Name			( configurator.getName("mistagP1") )
-	, mistagP0Name			( configurator.getName("mistagP0") )
-	, mistagSetPointName	( configurator.getName("mistagSetPoint") )
+	, mistagName			( configurator->getName("mistag") )
+	, mistagP1Name			( configurator->getName("mistagP1") )
+	, mistagP0Name			( configurator->getName("mistagP0") )
+	, mistagSetPointName	( configurator->getName("mistagSetPoint") )
 	// Detector parameters
-	, resScaleName			( configurator.getName("timeResolutionScale") )
-	, res1Name				( configurator.getName("timeResolution1") )
-	, res2Name				( configurator.getName("timeResolution2") )
-	, res3Name				( configurator.getName("timeResolution3") )
-	, res2FractionName		( configurator.getName("timeResolution2Fraction") )
-	, res3FractionName		( configurator.getName("timeResolution3Fraction") )
-	, timeOffsetName		( configurator.getName("timeOffset") )
+	, resScaleName			( configurator->getName("timeResolutionScale") )
+	, res1Name				( configurator->getName("timeResolution1") )
+	, res2Name				( configurator->getName("timeResolution2") )
+	, res3Name				( configurator->getName("timeResolution3") )
+	, res2FractionName		( configurator->getName("timeResolution2Fraction") )
+	, res3FractionName		( configurator->getName("timeResolution3Fraction") )
+	, timeOffsetName		( configurator->getName("timeOffset") )
 	// Angular acceptance factors
-	, angAccEvenName		( configurator.getName("angAccEven") )
-	, angAccOddName			( configurator.getName("angAccOdd") )
+	, angAccEvenName		( configurator->getName("angAccEven") )
+	, angAccOddName			( configurator->getName("angAccOdd") )
 	// Observables
-	, timeName				( configurator.getName("time") )
-	, cosThetaName			( configurator.getName("cosTheta") )
-	, tagName				( configurator.getName("tag") )
-	//X, timeAcceptanceCategoryName	( configurator.getName("timeAcceptanceCategory") )
-	, timeConstraintName	( configurator.getName("time") )
+	, timeName				( configurator->getName("time") )
+	, cosThetaName			( configurator->getName("cosTheta") )
+	, tagName				( configurator->getName("tag") )
+	//X, timeAcceptanceCategoryName	( configurator->getName("timeAcceptanceCategory") )
+	, timeConstraintName	( configurator->getName("time") )
 	// Other things
 	, _useTimeAcceptance(false)
 	, _numericIntegralForce(false)
@@ -73,20 +72,20 @@ Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::Bs2JpsiPhi_SignalAlt_BaseClass_1angle_
 
 	//...........................................
 	// Configure to use time acceptance machinery 
-	_useTimeAcceptance = configurator.isTrue( "UseTimeAcceptance" ) ;
+	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 	
 	if( useTimeAcceptance() ) {
-		if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
+		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0157 ) ;
 			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4:: Constructing timeAcc: Upper time acceptance beta=0.0157 [0 < t < 14] " << endl ;
 		}
-		else if( configurator.hasConfigurationValue( "TimeAcceptanceType", "Lower2010" ) ) {
+		else if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Lower2010" ) ) {
 			timeAcc = new SlicedAcceptance( "Lower2010" ) ;
 			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4:: Constructing timeAcc: Lower time acceptance 2010  [0 < t < 14] " << endl ;
 		}
-		else if( configurator.getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
-			timeAcc = new SlicedAcceptance( "File" , configurator.getConfigurationValue( "TimeAcceptanceFile" ) ) ;
-			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4:: Constructing timeAcc: using file: " << configurator.getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
+		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
+			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
 		}
 	}
 	else {
@@ -97,8 +96,8 @@ Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::Bs2JpsiPhi_SignalAlt_BaseClass_1angle_
 	
 	//Make empty Cache for the time integrals. This has to be done now after the SlicedAcceptance is created
 	vector<double> empty ;
-	for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice ) empty.push_back(0.0) ;
-	for( int ires=0; ires < 4 ; ++ires ) {			
+	for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice ) empty.push_back(0.0) ;
+	for( unsigned int ires=0; ires < 4 ; ++ires ) {			
 		storeExpL.push_back( empty ) ;
 		storeExpH.push_back( empty ) ;
 		storeExpSin.push_back( empty ) ;
@@ -110,13 +109,13 @@ Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::Bs2JpsiPhi_SignalAlt_BaseClass_1angle_
 	
 	//...........................................
 	// Configure numerical integration options 
-	_numericIntegralForce    = configurator.isTrue( "NumericIntegralForce") ;
-	_numericIntegralTimeOnly = configurator.isTrue( "NumericIntegralTimeOnly" ) ;
+	_numericIntegralForce    = configurator->isTrue( "NumericIntegralForce") ;
+	_numericIntegralTimeOnly = configurator->isTrue( "NumericIntegralTimeOnly" ) ;
 	
 	//...........................................
 	// Configure fit parameter options 
-	_useCosAndSin = configurator.isTrue( "UseCosAndSin" ) ;
-	allowNegativeAsSq = configurator.isTrue( "AllowNegativeAsSq" ) ;
+	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
+	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
 	
 
 	//PELC  - debug to plot the distribution of PDF values for each event 
@@ -324,7 +323,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::diffXsecNorm1(  ) const
 // New method to calculate normalisation using a histogrammed "low-end" time acceptance function
 // The acceptance function information is all contained in the timeAcceptance member object,
 
-double Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::diffXsecCompositeNorm1( int resolutionIndex )  
+double Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::diffXsecCompositeNorm1( unsigned int resolutionIndex )  
 {   
 	double tlo_boundary = tlo ;
 	double thi_boundary = thi ;
@@ -333,7 +332,7 @@ double Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::diffXsecCompositeNorm1( int res
 	
 	if( true /*useTimeAcceptance()*/ ) {		    // Set to true because seleting false makes a single slice for 0 --> 14. 
 		//This loops over each time slice, does the normalisation between the limits, and accumulates
-		for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
+		for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
 		{
 			//Set the time integrals
 			this->deCacheTimeIntegrals( resolutionIndex, islice ) ;
@@ -376,14 +375,14 @@ void Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::CacheTimeIntegrals() {
 	double tlo_boundary = tlo ;
 	double thi_boundary = thi ;
 	
-	for( int ires=0; ires < 4 ; ++ires ) {
+	for( unsigned int ires=0; ires < 4 ; ++ires ) {
 		
 		if( ires==0 ) resolution = 0.0 ;
 		if( ires==1 ) resolution = resolution1 * resolutionScale ;
 		if( ires==2 ) resolution = resolution2 * resolutionScale ;
 		if( ires==3 ) resolution = resolution3 * resolutionScale ;
 		
-		for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice ) {
+		for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice ) {
 			tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
 			thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
 			if( thi > tlo ) {
@@ -414,7 +413,7 @@ void Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::CacheTimeIntegrals() {
 
 //.......................................................
 // New speed up method to Cache time integrals
-void Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::deCacheTimeIntegrals( int ires, int islice ) {
+void Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4::deCacheTimeIntegrals( unsigned int ires, unsigned int islice ) {
 	
 	//Time integrals are stored under 
 	// ires =  resolution integral

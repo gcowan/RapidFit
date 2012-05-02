@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef MINUIT_WRAPPER_H
 #define MINUIT_WRAPPER_H
 
@@ -17,7 +18,7 @@
 #include "FitFunction.h"
 #include "FitResult.h"
 
-void Function( int&, double*, double&, double*, int );
+void Function( Int_t&, Double_t*, Double_t&, Double_t*, Int_t);
 
 class MinuitWrapper : public IMinimiser
 {
@@ -45,7 +46,7 @@ class MinuitWrapper : public IMinimiser
 		MinuitWrapper ( const MinuitWrapper& );
 		MinuitWrapper& operator = ( const MinuitWrapper& );
 
-		static void Function( int&, double*, double&, double*, int );
+		static void Function( Int_t&, Double_t*, Double_t&, Double_t*, Int_t );
 		static FitFunction * function;
 
 		TMinuit * minuit;
@@ -56,6 +57,8 @@ class MinuitWrapper : public IMinimiser
 		double bestTolerance;
 		vector<string> Options;
 		int Quality;
+		ParameterSet* test;
 };
 
 #endif
+

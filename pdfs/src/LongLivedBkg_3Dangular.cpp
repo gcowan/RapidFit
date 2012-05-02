@@ -246,9 +246,7 @@ void LongLivedBkg_3Dangular::MakePrototypes()
 	parameterNames.push_back( sigmaLL1Name );
 	parameterNames.push_back( sigmaLL2Name );
 
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 
@@ -349,11 +347,8 @@ double LongLivedBkg_3Dangular::buildPDFnumerator()
 
 //..............................................................
 // Normlisation
-double LongLivedBkg_3Dangular::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double LongLivedBkg_3Dangular::Normalisation(PhaseSpaceBoundary * boundary)
 {
-	//	Stupid gcc
-	(void)measurement;
-
 	IConstraint * timeBound = boundary->GetConstraint( timeconstName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{

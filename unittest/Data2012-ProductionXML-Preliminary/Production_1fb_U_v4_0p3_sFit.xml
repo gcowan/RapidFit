@@ -293,8 +293,8 @@
 
 <FitFunction>
 <WeightName>sWeight</WeightName>
-<FunctionName>NegativeLogLikelihood</FunctionName>
-#<Threads>3</Threads>
+<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+<Threads>3</Threads>
 #<Strategy>Petes</Strategy>
 </FitFunction>
 

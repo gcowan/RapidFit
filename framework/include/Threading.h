@@ -1,5 +1,6 @@
 //	Class designed to contain common structs/functions required for multi-threading the fits in RapidFit
 
+#pragma once
 #ifndef RAPIDFIT_THREADING_H
 #define RAPIDFIT_THREADING_H
 
@@ -15,13 +16,20 @@
 //	This object is useful as multiple bits of information need to be provided to the running thread
 struct Fitting_Thread{
 	explicit Fitting_Thread() : dataSubSet(), fittingPDF(NULL), useWeights(false), weightName(), dataPoint_Result(), FitBoundary(NULL), ResultIntegrator(NULL) {}
+	//~Fitting_Thread()
+	//{
+	//	if( FitBoundary != NULL ) delete FitBoundary;
+	//	if( ResultIntegrator != NULL ) delete ResultIntegrator;
+	//	if( fittingPDF != NULL ) delete fittingPDF;
+	//}
 	vector<DataPoint*> dataSubSet;
 	IPDF* fittingPDF;
 	bool useWeights;
-	string weightName;
+	ObservableRef weightName;
 	vector<double> dataPoint_Result;
 	PhaseSpaceBoundary* FitBoundary;
 	RapidFitIntegrator* ResultIntegrator;
+	double stored_integral;
 	private:
 		Fitting_Thread(const Fitting_Thread&);
 		Fitting_Thread& operator=(const Fitting_Thread&);
@@ -40,3 +48,4 @@ class Threading
 };
 
 #endif
+

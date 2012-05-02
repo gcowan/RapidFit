@@ -11,7 +11,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 #include "Mathematics.h"
 
 PDF_CREATOR( Bs2DsPiBkg_withTimeRes );
@@ -38,9 +37,7 @@ void Bs2DsPiBkg_withTimeRes::MakePrototypes()
 	vector<string> parameterNames;
 	parameterNames.push_back( lifetimeBdName );
 	parameterNames.push_back( timeResName );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor

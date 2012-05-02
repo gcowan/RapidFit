@@ -5,14 +5,14 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	ROOT Headers
 #include "TSystem.h"
-
 //	RapidFit Headers
 #include "ClassLookUp.h"
 #include "BasePDF.h"
+#include "IPDF.h"
 #include "NormalisedSumPDF.h"
 #include "ProdPDF.h"
 #include "SumPDF.h"
@@ -21,6 +21,7 @@
 #include "FumiliWrapper.h"
 #include "NegativeLogLikelihood.h"
 #include "NegativeLogLikelihoodThreaded.h"
+#include "NegativeLogLikelihoodNumerical.h"
 #include "Foam.h"
 #include "AcceptReject.h"
 #include "JPsiPhiDataGenerator.h"
@@ -33,7 +34,7 @@
 #include <fstream>
 #include <iostream>
 #ifdef _WIN32
-	//#include "dummy.h"	//	This needs correcting
+	//#include "dummy.h"		//	This needs correcting
 #elif __APPLE__
 	#include <mach-o/dyld.h>
 	#include <syslimits.h>
@@ -53,24 +54,24 @@ char* ClassLookUp::getSelfPath()
 	uint32_t pathsize = PATH_MAX;
 	(void) pathsize;
 
-	#ifdef _WIN32
-		cout << "Windows hasn't been implemented yet... any takers?" << endl;
-		exit(-42);
-	#elif __APPLE__
-		_NSGetExecutablePath(filename, &pathsize);
-	#else
-		ssize_t len = readlink("/proc/self/exe", filename, sizeof(filename)-1);
-		if (len != -1) {
-			filename[len] = '\0';
-		} else {
-			filename[0] = 'F' ;
-			filename[1] = 'A' ;
-			filename[2] = 'I' ;
-			filename[3] = 'L' ;
-			filename[4] = '\0';
-		}
-	#endif
-	
+#ifdef _WIN32
+	cout << "Windows hasn't been implemented yet... any takers?" << endl;
+	exit(-42);
+#elif __APPLE__
+	_NSGetExecutablePath(filename, &pathsize);
+#else
+	ssize_t len = readlink("/proc/self/exe", filename, sizeof(filename)-1);
+	if (len != -1) {
+		filename[len] = '\0';
+	} else {
+		filename[0] = 'F' ;
+		filename[1] = 'A' ;
+		filename[2] = 'I' ;
+		filename[3] = 'L' ;
+		filename[4] = '\0';
+	}
+#endif
+
 	return filename;
 }
 
@@ -89,9 +90,14 @@ void* ClassLookUp::getObject( string Name )
 	//	This needs to be protected with a macro due to ROOT needlessley SCREAMING at you with unwanted errors
 	if( pathName.find( root_exe ) != string::npos )
 	{
+		//	ROOT equivalent to dlopen
 		returnable_object = (void*) gSystem->DynFindSymbol( RAPIDFIT_LIBRARY_NAME, Name.c_str() );
-	} else {
-		void *handle = dlopen( ClassLookUp::getSelfPath(), RTLD_LAZY | RTLD_GLOBAL );
+	}
+	else
+	{
+		//	POSIX for *nix based systems
+		//	There should probably be a wrapper here for windows based builds but we don't anticipate this
+		void *handle = dlopen( ClassLookUp::getSelfPath(), RTLD_LAZY | RTLD_NODELETE );
 		returnable_object = dlsym( handle, Name.c_str() );
 	}
 
@@ -104,18 +110,17 @@ void* ClassLookUp::getObject( string Name )
 	return returnable_object;
 }
 
-IPDF* ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, vector<string> PDFParameters, PDFConfigurator* configurator )
+//	Given a PDF object name we know that the PDF constructor is wrapped in an object with a derrived name
+IPDF* ClassLookUp::LookUpPDFName( string Name, PDFConfigurator* configurator )
 {
-	(void) PDFObservables;
-	(void) PDFParameters;
-
 	string pdf_creator_Name = "CreatePDF_"+Name;
 
 	CreatePDF_t* pdf_creator = (CreatePDF_t*) ClassLookUp::getObject( pdf_creator_Name );
 
-	IPDF* returnable_PDF = pdf_creator( configurator );
+	IPDF* returnable_PDF = (IPDF*) pdf_creator( configurator );
 
 	returnable_PDF->SetName( Name ); 
+	returnable_PDF->SetLabel( Name );
 
 	return returnable_PDF;
 }
@@ -123,37 +128,46 @@ IPDF* ClassLookUp::LookUpPDFName( string Name, vector<string> PDFObservables, ve
 IPDF* ClassLookUp::CopyPDF( IPDF* inputPDF )
 {
 	IPDF* returnable_PDF=NULL;
+
 	string Name = inputPDF->GetName();
 
-	if( Name == "NormalisedSum" )
+	//	The PDF already knows where it's template is, no need to look for it again
+	if( inputPDF->GetCopyConstructor() != NULL )
 	{
-		returnable_PDF = (IPDF*) new NormalisedSumPDF( *(const NormalisedSumPDF*) inputPDF );
-	}
-	else if( Name == "Prod" )
-	{
-		returnable_PDF = (IPDF*) new ProdPDF( *(const ProdPDF*) inputPDF );
-	}
-	else if( Name == "Sum" )
-	{
-		returnable_PDF = (IPDF*) new SumPDF( *(const SumPDF*) inputPDF );
+		CopyPDF_t* pdf_copy = inputPDF->GetCopyConstructor();
+		returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
 	}
 	else
 	{
-		string pdf_copy_Name = "CopyPDF_"+Name;
+		//	These special case PDFs explicitly need to be declared here as they're special case objects heavily integrated into the framework
+		if( Name == "NormalisedSum" )
+		{
+			returnable_PDF = (IPDF*) new NormalisedSumPDF( *(const NormalisedSumPDF*) inputPDF );
+		}
+		else if( Name == "Prod" )
+		{
+			returnable_PDF = (IPDF*) new ProdPDF( *(const ProdPDF*) inputPDF );
+		}
+		else if( Name == "Sum" )
+		{
+			returnable_PDF = (IPDF*) new SumPDF( *(const SumPDF*) inputPDF );
+		}
+		else
+		{
+			//	Each PDF has a C wrapper function with an unmangled name of CopyPDF_SomePDF
+			string pdf_copy_Name = "CopyPDF_"+Name;
 
-		CopyPDF_t* pdf_copy = (CopyPDF_t*) ClassLookUp::getObject( pdf_copy_Name );
+			//	Find this object in the object which has been loaded as a library
+			CopyPDF_t* pdf_copy = (CopyPDF_t*) ClassLookUp::getObject( pdf_copy_Name );
 
-		returnable_PDF = pdf_copy( *inputPDF );
+			//	Give the PDF object explicit knowledge of the path of it's constructor template
+			returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
+			inputPDF->SetCopyConstructor( pdf_copy );
+		}
 	}
 
 	returnable_PDF->SetName( Name );
-	returnable_PDF->Remove_Cache( true );
-
-	if( !inputPDF->GetActualParameterSet()->GetAllNames().empty() )
-	{
-		returnable_PDF->SetPhysicsParameters( inputPDF->GetActualParameterSet() );
-		returnable_PDF->UpdateIntegralCache();
-	}
+	returnable_PDF->Can_Remove_Cache( false );
 
 	return returnable_PDF;
 }
@@ -163,11 +177,21 @@ FitFunction * ClassLookUp::LookUpFitFunctionName( string Name )
 {
 	if ( Name == "NegativeLogLikelihood" )
 	{
-		return new NegativeLogLikelihood();
+		FitFunction* returnable = new NegativeLogLikelihood();
+		returnable->SetThreads(0);
+		return returnable;
 	}
 	if ( Name == "NegativeLogLikelihoodThreaded" )
 	{
-		return new NegativeLogLikelihoodThreaded();
+		FitFunction* returnable = new NegativeLogLikelihoodThreaded();
+		returnable->SetThreads(-1);
+		return returnable;
+	}
+	if ( Name == "NegativeLogLikelihoodNumerical" )
+	{
+		FitFunction* returnable = new NegativeLogLikelihoodNumerical();
+		returnable->SetThreads(-1);
+		return returnable;
 	}
 	else
 	{
@@ -221,11 +245,11 @@ IDataGenerator * ClassLookUp::LookUpDataGenerator( string Name, PhaseSpaceBounda
 }
 
 //Look up the name of a precalculator, and return an appropriate instance
-IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, IPDF * FirstPDF, IPDF * SecondPDF, vector<ParameterSet*> FitParameters, string WeightName )
+IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, string WeightName, FitResult* inputResult, unsigned int config )
 {
 	if ( Name == "SWeightPrecalculator" )
 	{
-		return new SWeightPrecalculator( FirstPDF, SecondPDF, FitParameters.back(), WeightName );
+		return new SWeightPrecalculator( inputResult, WeightName, config );
 	}
 	else
 	{
@@ -233,3 +257,4 @@ IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, IPDF * FirstPDF,
 		exit(1);
 	}
 }
+

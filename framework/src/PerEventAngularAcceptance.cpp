@@ -3,6 +3,8 @@
 #include "TMinuit.h"
 #include "TROOT.h"
 #include "TMatrixD.h"
+#include "TDirectory.h"
+#include "TSystem.h"
 //	RapidFit Headers
 #include "PerEventAngularAcceptance.h"
 //	System Headers
@@ -15,7 +17,7 @@
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
-using namespace std;
+using namespace::std;
 
 //Default constructor
 PerEventAngularAcceptance::PerEventAngularAcceptance() :

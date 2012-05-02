@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef MINUIT_2_WRAPPER_H
 #define MINUIT_2_WRAPPER_H
 
@@ -56,3 +57,4 @@ class Minuit2Wrapper : public IMinimiser
 };
 
 #endif
+

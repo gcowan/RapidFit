@@ -7,54 +7,40 @@
  */
 
 //	ROOT Headers
+#include "TSystem.h"
 #include "TTree.h"
+#include "TGraph.h"
+#include "TGraphErrors.h"
 //	RapidFit Headers
 #include "OutputConfiguration.h"
 #include "ResultFormatter.h"
-#include "Plotter.h"
+#include "ComponentPlotter.h"
 #include "ScanParam.h"
 #include "StringProcessing.h"
 //	System Headers
 #include <time.h>
 #include <stdlib.h>
+#include <iomanip>
 
-//Default constructor
-OutputConfiguration::OutputConfiguration() :
-contours(),
-projections(),
-LLscanList(),
-pullType("None"),
-makeAllPlots(false),
-weightName(),
-pullFileName("pullPlots.root"),
-projectionFileName("projectionPlots.root"),
-LLscanFileName("LLscans.root"),
-LLcontourFileName(),
-contourFileName("contourPlots.root"),
-weightedEventsWereUsed(false),
-Global_Scan_List(),
-Global_2DScan_List(),
-Stored_Fit_Results()
-{
-}
+using namespace::std;
 
 //Constructor with correct arguments
-OutputConfiguration::OutputConfiguration( vector< pair< string, string > > InputContours, vector<string> InputProjections, string PullPlotType, vector<ScanParam*> ScanParameters, vector<pair<ScanParam*, ScanParam*> > _2DScanParameters ) :
-contours(InputContours),
-projections(InputProjections),
-LLscanList(),
-pullType(PullPlotType),
-makeAllPlots(false),
-weightName(),
-pullFileName("pullPlots.root"),
-projectionFileName("projectionPlots.root"),
-LLscanFileName("LLscanPlots.root"),
-LLcontourFileName("LLcontourPlots.root"),
-contourFileName("contourPlots.root"),
-weightedEventsWereUsed(false),
-Global_Scan_List( ScanParameters ),
-Global_2DScan_List( _2DScanParameters ),
-Stored_Fit_Results()
+OutputConfiguration::OutputConfiguration( vector< pair< string, string > > InputContours, string PullPlotType, vector<ScanParam*> ScanParameters, vector<pair<ScanParam*, ScanParam*> > _2DScanParameters, vector<CompPlotter_config*> Components ) :
+	contours(InputContours),
+	LLscanList(),
+	pullType(PullPlotType),
+	makeAllPlots(false),
+	weightName(),
+	pullFileName("pullPlots.root"),
+	projectionFileName("projectionPlots.root"),
+	LLscanFileName("LLscanPlots.root"),
+	LLcontourFileName("LLcontourPlots.root"),
+	contourFileName("contourPlots.root"),
+	weightedEventsWereUsed(false),
+	Global_Scan_List( ScanParameters ),
+	Global_2DScan_List( _2DScanParameters ),
+	Stored_Fit_Results(),
+	proj_components( Components )
 {
 }
 
@@ -72,6 +58,11 @@ vector< pair< string, string > > OutputConfiguration::GetContourPlots()
 //Return the requested projections
 vector<string> OutputConfiguration::GetProjections()
 {
+	vector<string> projections;
+	for( unsigned int i=0; i< proj_components.size(); ++i )
+	{
+		projections.push_back( proj_components[i]->observableName );
+	}
 	return projections;
 }
 
@@ -137,10 +128,24 @@ vector<string> OutputConfiguration::GetScanList( )
 	return ScanReturnList;
 }
 
-void OutputConfiguration::Clear2DScanList( )
+void OutputConfiguration::ClearScanList()
+{
+	while( !Global_Scan_List.empty() )
+	{
+		if( Global_Scan_List.back() != NULL ) delete Global_Scan_List.back();
+		Global_Scan_List.pop_back();
+	}
+	return;
+}
+
+void OutputConfiguration::Clear2DScanList()
 {
 	while( !Global_2DScan_List.empty() )
+	{
+		if( Global_2DScan_List.back().first != NULL ) delete Global_2DScan_List.back().first;
+		if( Global_2DScan_List.back().second != NULL ) delete Global_2DScan_List.back().second;
 		Global_2DScan_List.pop_back();
+	}
 	return;
 }
 
@@ -160,18 +165,18 @@ vector<pair<string, string> > OutputConfiguration::Get2DScanList( )
 	return ScanReturnList;
 }
 
-	//  [0] Max, [1] Min, [2] nPoints
+//  [0] Max, [1] Min, [2] nPoints
 vector<double> OutputConfiguration::GetRange( const string wanted_param )
-//  Return a vector containing [0]=Max, [1]=Min and [2]=Points
+	//  Return a vector containing [0]=Max, [1]=Min and [2]=Points
 {
 	ScanParam* Wanted_Param = GetScanParam( wanted_param );
 	return GetRange( Wanted_Param );
 }
 
-	//  [0] Max, [1] Min, [2] nPoints
+//  [0] Max, [1] Min, [2] nPoints
 vector<double> OutputConfiguration::GetRange( ScanParam* Wanted_Param )
 {
-  	//  [0] Max, [1] Min, [2] nPoints
+	//  [0] Max, [1] Min, [2] nPoints
 	vector<double> ReturnRange;
 	string wanted_param = Wanted_Param->GetName();
 
@@ -186,7 +191,7 @@ vector<double> OutputConfiguration::GetRange( ScanParam* Wanted_Param )
 		ReturnRange.push_back( minimum );
 
 		if( Wanted_Param->HasPoints() )  {
-				ReturnRange.push_back( Wanted_Param->GetPoints() );
+			ReturnRange.push_back( Wanted_Param->GetPoints() );
 		} else {	ReturnRange.push_back( 5 ); }
 
 		return ReturnRange;
@@ -239,34 +244,127 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 	//Output any calculated contours
 	ResultFormatter::PlotFitContours( TheResult, contourFileName );
 
-	//Make any requested projections
-	//for ( unsigned int projectionIndex = 0; projectionIndex < projections.size(); ++projectionIndex )
-	for (unsigned int projectionIndex = 0; projectionIndex < 1; ++projectionIndex )
+
+	//	I spent long enough writing componentprojections that these will take priority over the old projection code
+
+	if( !proj_components.empty() ) this->OutputCompProjections( TheResult );
+
+	return;
+}
+
+void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
+{
+	PhysicsBottle* resultBottle = TheResult->GetPhysicsBottle();
+
+	for( vector<CompPlotter_config*>::iterator projection_i = proj_components.begin(); projection_i != proj_components.end(); ++projection_i )
 	{
-		PhysicsBottle* resultBottle = TheResult->GetPhysicsBottle();
+		vector<vector<TGraph*> > all_components_for_all_results;
 
-		//Loop over all PDFs, and plot
-		if ( makeAllPlots || ( projections.size() > 0 ) )
+		vector<TGraphErrors*> all_datasets_for_all_results;
+
+		vector<ComponentPlotter*> allComponentPlotters;
+
+		TString folderName( "RapidFit_Component_Projection_" ); folderName.Append( (*projection_i)->observableName ); folderName.Append( "_" );
+		folderName.Append( StringProcessing::TimeString() );
+
+		gSystem->mkdir( folderName );
+		gSystem->cd( folderName );
+
+		TString filename( "RapidFit_Component_Projections_" ); filename.Append( (*projection_i)->observableName ); filename.Append( "_" );
+		filename.Append( StringProcessing::TimeString() );
+		filename.Append( ".root" );
+		TFile* output_file = new TFile( filename, "UPDATE" );
+
+		vector< pair<double,double> > chi2_results;
+
+		for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 		{
-			for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
+			vector<string> claimedObservables = resultBottle->GetResultPDF(resultIndex)->GetPrototypeDataPoint();
+			string thisObservable = (*projection_i)->observableName;
+			if( StringProcessing::VectorContains( &claimedObservables, &thisObservable ) == -1 )
 			{
-				Plotter * testPlotter = new Plotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex) );
-				if( weightedEventsWereUsed ) testPlotter->SetWeightsWereUsed( weightName ) ;
-				
-				char fileNumber[100];
-				sprintf( fileNumber, "fit%d.", resultIndex );
-
-				if (makeAllPlots)
-				{
-					testPlotter->PlotAllObservables( fileNumber + projectionFileName );
-				}
-				else
-				{
-					testPlotter->PlotObservables( fileNumber + projectionFileName, projections );
-				}
+				cerr << endl << "This PDF " << resultBottle->GetResultPDF(resultIndex)->GetName() << " knows nothing about observable: " << thisObservable << endl;
+				cerr << "I will skip this PDF and continue!" << endl << endl;
+				continue;
 			}
+			TString PDFStr = "PDF_";PDFStr+=resultIndex;
+
+			//	ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
+			ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex),
+
+										PDFStr, output_file, thisObservable, (*projection_i) );
+
+			if( weightedEventsWereUsed ) thisPlotter->SetWeightsWereUsed( weightName );
+
+			allComponentPlotters.push_back( thisPlotter );
+
+			//	In ComponentPlotter this still does all of the work, but each ComponentPlotter object is created for each observable to allow you to do more easily
+			thisPlotter->ProjectObservable();
+
+			chi2_results.push_back( thisPlotter->GetChi2Numbers() );
+
+			all_datasets_for_all_results.push_back( thisPlotter->GetBinnedData()[0] );
+			all_components_for_all_results.push_back( thisPlotter->GetComponents()[0] );
 		}
+
+		if( !chi2_results.empty() )
+		{
+			double total_chi2 = 0.;
+			double total_N = 0.;
+			for( unsigned int i=0; i< chi2_results.size(); ++i )
+			{
+				total_chi2 += chi2_results[i].first;
+				total_N += chi2_results[i].second;
+			}
+			double final_corrected_chi2 = total_chi2 / ( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. ) ;
+			(*projection_i)->Chi2Value = final_corrected_chi2;
+
+			cout << endl << "\tFinal chi2/ndof = " << setprecision(10) << final_corrected_chi2 << endl << endl;
+		}
+
+		int num=(int) all_components_for_all_results[0].size();
+		bool compatible=true;
+
+		for( unsigned int i=0; i< all_components_for_all_results.size(); ++i )
+		{
+			if( (int)all_components_for_all_results[i].size() != num ) compatible = false;
+		}
+
+
+		//	We only want to overlay the output when all of the PDFs have the same number of components
+		//	Eg it is difficult to justify trying to overlay data from JpsiPhi and Jpsif0 in one component plot, although I'm sure it's possible
+		if( compatible )
+		{
+
+			//	These static functions will take the global Random function from ROOT if need be, but lets not force that issue and give it an already initialized generator
+			//	This, alas is a ROOT solution to a ROOT problem, and it creates a MESS that often is left to some code outside of ROOT to cleanup!
+			TGraphErrors* Total_BinnedData = ComponentPlotter::MergeBinnedData( all_datasets_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
+
+			vector<TGraph*> Total_Components = ComponentPlotter::MergeComponents( all_components_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
+
+			output_file->cd();
+			output_file->mkdir( "Total" );
+			output_file->cd( "Total" );
+
+			ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data",
+
+									resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
+		}
+
+
+		//	it is now safe to remove the instances of ComponentPlotter
+		for( vector<ComponentPlotter*>::iterator compP_i = allComponentPlotters.begin(); compP_i != allComponentPlotters.end(); ++compP_i )
+		{
+			if( (*compP_i) != NULL ) delete (*compP_i);
+		}
+
+		//	From experience I tend not to call delete on ROT objects as it causes segfaults when ROOT starts to clean up after itself
+		output_file->Close();
+
+		gSystem->cd( ".." );
+
 	}
+
 }
 
 //Make the requested output from a toy study
@@ -340,11 +438,11 @@ void OutputConfiguration::AddContour( const string X_axis, const string Y_axis )
 	double y_min = strtod( Contour_Y_Vals[2].c_str(), NULL );
 	int y_points = atoi( Contour_Y_Vals[3].c_str() );
 	ScanParam* new_Y = new ScanParam( y_name, y_max, y_min, y_points );
-	
+
 	pair<ScanParam*, ScanParam*> new_Contour;
 	new_Contour.first = new_X;
 	new_Contour.second = new_Y;
-	
+
 	Global_2DScan_List.push_back( new_Contour );
 
 }
@@ -384,3 +482,4 @@ void OutputConfiguration::SetInputResults( ResultParameterSet* oneResult )
 {
 	Stored_Fit_Results.push_back( oneResult );
 }
+

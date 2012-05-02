@@ -1,13 +1,12 @@
-/**
-        @class JPsiPhiDataGenerator
-
-        A data generator implementing preselection for JPsiPhi compatible events
-
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
+/*!
+ * @class JPsiPhiDataGenerator
+ *
+ * A data generator implementing preselection for JPsiPhi compatible events
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
 */
 
-
+#pragma once
 #ifndef JPSIPHI_DATA_GENERATOR_H
 #define JPSIPHI_DATA_GENERATOR_H
 
@@ -17,7 +16,6 @@
 class JPsiPhiDataGenerator : public AcceptReject
 {
 	public:
-		JPsiPhiDataGenerator();
 		JPsiPhiDataGenerator( PhaseSpaceBoundary*, IPDF* );
 		~JPsiPhiDataGenerator();
 
@@ -26,3 +24,4 @@ class JPsiPhiDataGenerator : public AcceptReject
 };
 
 #endif
+

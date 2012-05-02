@@ -11,10 +11,7 @@
 #include "Mathematics.h"
 #include <iostream>
 #include "math.h"
-#include "TMath.h"
-#include "RooMath.h"
 #include "TROOT.h"
-#include "TMath.h"
 #include "TFile.h"
 #include "TH3D.h"
 #include "TAxis.h"
@@ -74,9 +71,7 @@ void LongLivedBkg::MakePrototypes()
 	parameterNames.push_back( sigmaLL1Name );
 	parameterNames.push_back( sigmaLL2Name );
 
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //LongLivedBkg::LongLivedBkg( const LongLivedBkg& input ) : BasePDF( (BasePDF) input ),
@@ -186,10 +181,9 @@ double LongLivedBkg::buildPDFnumerator()
 
 //..............................................................
 // Normlisation
-double LongLivedBkg::Norm(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double LongLivedBkg::Norm(PhaseSpaceBoundary * boundary)
 {
-	//	Stupid gcc
-	(void)measurement;
+	(void)boundary;
 
 	double returnValue = 0;
 
@@ -213,10 +207,8 @@ double LongLivedBkg::Norm(DataPoint * measurement, PhaseSpaceBoundary * boundary
 	return returnValue;
 }
 
-double LongLivedBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double LongLivedBkg::Normalisation(PhaseSpaceBoundary * boundary)
 {
-	//	Stupid gcc
-	(void)measurement;
 	// Use this if you want to ignore the time acceptance calculation
 	//return Norm( measurement, boundary );
 
@@ -239,15 +231,15 @@ double LongLivedBkg::Normalisation(DataPoint * measurement, PhaseSpaceBoundary *
 	
 	if( _useTimeAcceptance ) {
 		//This loops over each time slice, does the normalisation between the limits, and accumulates
-		for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
+		for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
 		{
 			tlow = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
 			thigh = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
-			if( thigh > tlow ) returnValue += this->Norm( measurement, boundary ) * timeAcc->getSlice(islice)->height() ;
+			if( thigh > tlow ) returnValue += this->Norm( boundary ) * timeAcc->getSlice(islice)->height() ;
 		}
 	}
 	else {
-		returnValue = this->Norm( measurement, boundary ) ;
+		returnValue = this->Norm( boundary );
 	}
 
 	tlow  = tlo_boundary;

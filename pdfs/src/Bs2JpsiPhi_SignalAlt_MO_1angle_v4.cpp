@@ -11,18 +11,16 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 #include "Mathematics.h"
 
 #define DEBUGFLAG true
 
-//PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MO_1angle_v4 );
-
+PDF_CREATOR( Bs2JpsiPhi_SignalAlt_MO_1angle_v4 );
 
 //......................................
 //Constructor(s)
 //New one with configurator
-Bs2JpsiPhi_SignalAlt_MO_1angle_v4::Bs2JpsiPhi_SignalAlt_MO_1angle_v4(PDFConfigurator configurator) : 
+Bs2JpsiPhi_SignalAlt_MO_1angle_v4::Bs2JpsiPhi_SignalAlt_MO_1angle_v4(PDFConfigurator* configurator) : 
 Bs2JpsiPhi_SignalAlt_BaseClass_1angle_v4(configurator)
 {
 	MakePrototypes();	
@@ -71,9 +69,7 @@ void Bs2JpsiPhi_SignalAlt_MO_1angle_v4::MakePrototypes()
 	
 	parameterNames.push_back( angAccEvenName );
 	parameterNames.push_back( angAccOddName );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 

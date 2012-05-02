@@ -11,14 +11,50 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 #include <string>
 #include <string.h>
 #include "PDFConfigurator.h"
 
+
+using namespace::std;
+
 ///..........................................
 //Default constructor & destructor
-PDFConfigurator::PDFConfigurator() :defaultNames(),replacementNames(),configParameters(),configValues() { }
-PDFConfigurator::~PDFConfigurator() { }
+PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), input_observable(), input_DataSet(NULL), fitFunction("[0]")
+{
+}
+
+PDFConfigurator::PDFConfigurator( const PDFConfigurator& input ) :
+	defaultNames( input.defaultNames ), replacementNames( input.replacementNames ), configParameters( input.configParameters ), configValues( input.configValues ),
+	input_DataSet( input.input_DataSet ), fitFunction( input.fitFunction )
+{
+}
+
+PDFConfigurator::~PDFConfigurator()
+{
+}
+
+void PDFConfigurator::addObservableToModel( string inputObservable, IDataSet* inputDataSet )
+{
+	input_observable = inputObservable;
+	input_DataSet = inputDataSet;
+}
+
+pair<string, IDataSet*> PDFConfigurator::getObservableToModel()
+{
+	return make_pair( input_observable, input_DataSet );
+}
+
+void PDFConfigurator::setFitFunc( string input )
+{
+	fitFunction = input;
+}
+
+string PDFConfigurator::getFitFunc()
+{
+	return fitFunction;
+}
 
 //...........................................
 // Parameter substitution methods
@@ -79,7 +115,7 @@ void PDFConfigurator::addConfigurationParameter( string configString ) {
 	// Break into 2 strings
 	string configParameter  =  configString.substr( 0, pos ) ;
 	string configValue		=  configString.substr( pos+1, string::npos ) ;
-	//cout << " In PDFConfigurator::addConfigurationParameter : storing configParameter [" << configParameter << " : " << configValue << "]" << endl ;
+	cout << " In PDFConfigurator::addConfigurationParameter : storing configParameter [" << configParameter << " : " << configValue << "]" << endl ;
 	configParameters.push_back( configParameter ) ;
 	configValues.push_back( configValue ) ;
 
@@ -124,6 +160,4 @@ bool PDFConfigurator::isTrue( string configParam ) {
 	}
 	return false ;
 }
-
-
 

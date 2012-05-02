@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	ROOT Headers
 #include "TString.h"
@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <time.h>
 
-using namespace std;
+using namespace::std;
 
 string StringProcessing::TimeString()
 {
@@ -49,21 +49,23 @@ string StringProcessing::TimeString()
 }
 
 //Split a string every time you find a given character
-vector<string> StringProcessing::SplitString( string Input, char SplitCharacter )
+vector<string> StringProcessing::SplitString( const string Input, const char SplitCharacter )
 {
 	vector<string> splitParts;
+
+	string Loop_Str = Input;
 
 	while(true)
 	{
 		//Search for the character
-		int position = CharacterPosition( Input, SplitCharacter );
+		int position = CharacterPosition( Loop_Str, SplitCharacter );
 
 		if ( position == -1 )
 		{
 			//Ignore empty strings
 			if ( Input != "" )
 			{
-				splitParts.push_back( Input );
+				splitParts.push_back( Loop_Str );
 			}
 
 			//If it's not found, you've reached the end
@@ -72,15 +74,15 @@ vector<string> StringProcessing::SplitString( string Input, char SplitCharacter 
 		else
 		{
 			//Split the string at the character postion
-			string tempString( Input, 0, unsigned(position) );
-			string newInput( Input, unsigned(position + 1) );
+			string tempString( Loop_Str, 0, unsigned(position) );
+			string newInput( Loop_Str, unsigned(position + 1) );
 
 			//Ignore empty strings
 			if ( tempString != "" )
 			{
 				splitParts.push_back( tempString );
 			}
-			Input = newInput;
+			Loop_Str = newInput;
 		}
 	}
 
@@ -88,7 +90,7 @@ vector<string> StringProcessing::SplitString( string Input, char SplitCharacter 
 }
 
 //Return the position of the first instance of a character in a string
-int StringProcessing::CharacterPosition( string Input, char SearchCharacter )
+int StringProcessing::CharacterPosition( const string Input, const char SearchCharacter )
 {
 	for (unsigned int characterIndex = 0; characterIndex < Input.size(); ++characterIndex)
 	{
@@ -108,14 +110,16 @@ int StringProcessing::CharacterPosition( string Input, char SearchCharacter )
 }
 
 //Return the position of all instances of a string in another string
-vector<int> StringProcessing::StringPositions( string Input, string SearchString )
+vector<int> StringProcessing::StringPositions( const string Input, const string SearchString )
 {
 	vector<int> positions;
 	int numberDiscarded = 0;
 
+	string Loop_Str = Input;
+
 	while (true)
 	{
-		int firstCharacterPosition = CharacterPosition( Input, SearchString[0] );
+		int firstCharacterPosition = CharacterPosition( Loop_Str, SearchString[0] );
 		if ( firstCharacterPosition == -1 )
 		{
 			//If you can't find the first character of the string, you won't find the string!
@@ -140,9 +144,9 @@ vector<int> StringProcessing::StringPositions( string Input, string SearchString
 			}
 
 			//Search the rest of the string
-			string tempString( Input, unsigned(firstCharacterPosition + 1) );
+			string tempString( Loop_Str, unsigned(firstCharacterPosition + 1) );
 			numberDiscarded += unsigned(firstCharacterPosition + 1);
-			Input = tempString;
+			Loop_Str = tempString;
 		}
 	}
 
@@ -150,7 +154,7 @@ vector<int> StringProcessing::StringPositions( string Input, string SearchString
 }
 
 //Remove any instances of a particular character in a string
-void StringProcessing::RemoveCharacter( string & Input, char SearchCharacter )
+void StringProcessing::RemoveCharacter( string & Input, const char SearchCharacter )
 {
 	char* passedCharacters = new char[ Input.size() + 1 ];
 	int addedCharacters = 0;
@@ -169,7 +173,7 @@ void StringProcessing::RemoveCharacter( string & Input, char SearchCharacter )
 }
 
 //Replace any instances of a particular character in a string
-string StringProcessing::ReplaceString( string & Input, string FindString, string ReplaceString )
+string StringProcessing::ReplaceString( const string & Input, const string FindString, const string ReplaceString )
 {
 	string output;
 
@@ -227,10 +231,10 @@ void StringProcessing::RemoveWhiteSpace( vector<string> & newContent )
 }
 
 //Return a vector containing all the unique strings from the two input vectors
-vector<string> StringProcessing::CombineUniques( vector<string> VectorOne, vector<string> VectorTwo )
+vector<string> StringProcessing::CombineUniques( const vector<string> VectorOne, const vector<string> VectorTwo )
 {
 	vector<string> result;
-	vector<string>::iterator stringIterator;
+	vector<string>::const_iterator stringIterator;
 
 	//Don't assume VectorOne is unique
 	for ( stringIterator = VectorOne.begin(); stringIterator != VectorOne.end(); ++stringIterator )
@@ -253,35 +257,108 @@ vector<string> StringProcessing::CombineUniques( vector<string> VectorOne, vecto
 	return result;
 }
 
+vector<string> StringProcessing::RemoveCommon( const vector<string> VectorOne, const vector<string> VectorTwo )
+{
+	vector<string> result;
+	vector<string> erasable;
+	vector<string>::const_iterator stringIterator;
+
+	vector<vector<string>::const_iterator> remove_list;
+
+	//Don't assume VectorOne is unique
+	for ( stringIterator = VectorOne.begin(); stringIterator != VectorOne.end(); ++stringIterator )
+	{
+		if ( VectorContains( &result, &(*stringIterator) ) == -1 )
+		{
+			result.push_back( *stringIterator );
+		}
+		else
+		{
+			erasable.push_back( *stringIterator );
+		}
+	}
+
+	//Now add in VectorTwo
+	for ( stringIterator = VectorTwo.begin(); stringIterator != VectorTwo.end(); ++stringIterator )
+	{
+		if ( VectorContains( &result, &(*stringIterator) ) == -1 )
+		{
+			result.push_back( *stringIterator );
+		}
+	}
+
+	for( vector<string>::iterator e_i = erasable.begin(); e_i != erasable.end(); ++e_i )
+	{
+		StringProcessing::RemoveElement( result, *e_i );
+	}
+
+	return result;
+}
+
+void StringProcessing::RemoveElement( vector<string>& Input, string Element )
+{
+	vector<string>::iterator obj_i = Input.begin();
+	vector<vector<string>::iterator> element_i;
+	vector<string>::iterator end_i = Input.end();
+
+	for( ; obj_i != end_i; ++obj_i )
+	{
+		if( *obj_i == Element ) element_i.push_back( obj_i );
+	}
+
+	for( vector<vector<string>::iterator>::iterator remov_i = element_i.begin(); remov_i != element_i.end(); ++remov_i )
+	{
+		Input.erase( *remov_i );
+	}
+}
+
 //Return the position of a search string within a vector of strings, or -1 if not found
 int StringProcessing::VectorContains( vector<string> const* InputVector, string const* SearchString )
 {
+	if( InputVector->empty() ) return -1;
 	vector<string>::const_iterator begin = InputVector->begin();
 	vector<string>::const_iterator ending = InputVector->end();
 	vector<string>::const_iterator result = find( begin, ending, *SearchString);
 	int position=int( result - InputVector->begin() );
-	if( position >= 0 && position < int( InputVector->size() ) ) return position;
+	if( position < (int) InputVector->size() ) return position;
+
+	//If you've got this far, it wasn't found
+	return -1;
+}
+
+//Return the position of a search string within a vector of strings, or -1 if not found
+int StringProcessing::VectorContains( const vector<string>& InputVector, const string& SearchString )
+{
+	if( InputVector.empty() ) return -1;
+	vector<string>::const_iterator begin = InputVector.begin();
+	vector<string>::const_iterator ending = InputVector.end();
+	vector<string>::const_iterator result = find( begin, ending, SearchString);
+	int position=int( result - InputVector.begin() );
+	if( position < (int) InputVector.size() ) return position;
 
 	//If you've got this far, it wasn't found
 	return -1;
 }
 
 //Return the a TString object which is composed of the selected strings within the vector
-TString StringProcessing::CondenseStrings( vector<string> input_vec, int lolim=-1, int hilim=-1 )
+TString StringProcessing::CondenseStrings( const vector<string>& input_vec, const int lolim=-1, const int hilim=-1 )
 {
 	int temp_int = int( input_vec.size() );
-	if( ( hilim > temp_int ) || (hilim < 0) ) hilim = temp_int;
-	if( lolim < 0 ) lolim = 0;
+	int temp_hilim = hilim;
+	int temp_lolim = lolim;
+
+	if( ( temp_hilim > temp_int ) || (temp_hilim < 0) ) temp_hilim = temp_int;
+	if( temp_lolim < 0 ) temp_lolim = 0;
 
 	TString Returnable_String( "" );
-	for( int iter = lolim; iter < hilim ; ++iter )
+	for( int iter = temp_lolim; iter < temp_hilim ; ++iter )
 	{
 		Returnable_String.Append( input_vec[(unsigned)iter] );
 	}
 	return Returnable_String;
 }
 
-vector<TString> StringProcessing::GetStringContaining( vector<TString> list, TString search_str )
+vector<TString> StringProcessing::GetStringContaining( const vector<TString> list, const TString search_str )
 {
 	vector<TString> output_list;
 
@@ -298,7 +375,7 @@ vector<TString> StringProcessing::GetStringContaining( vector<TString> list, TSt
 	return output_list;
 }
 
-vector<TString> StringProcessing::StripStrings( vector<TString> list, TString ext )
+vector<TString> StringProcessing::StripStrings( const vector<TString> list, const TString ext )
 {
 	vector<TString> output_list;
 	string remove = ext.Data();
@@ -318,7 +395,7 @@ vector<TString> StringProcessing::StripStrings( vector<TString> list, TString ex
 	return output_list;
 }
 
-vector<string> StringProcessing::Convert( vector<TString> input )
+vector<string> StringProcessing::Convert( const vector<TString> input )
 {
 	vector<string> output;
 	for( unsigned int i=0; i< input.size(); ++i )
@@ -329,7 +406,7 @@ vector<string> StringProcessing::Convert( vector<TString> input )
 }
 //      Chosen to use sprintf as itoa is not supported everywhere...
 
-string StringProcessing::AddNumberToLeft( string input_str, int num2add )
+string StringProcessing::AddNumberToLeft( const string& input_str, const int& num2add )
 {
 	stringstream temp_stream;
 	temp_stream << num2add ;
@@ -339,17 +416,20 @@ string StringProcessing::AddNumberToLeft( string input_str, int num2add )
 	return numberstr;
 }
 
-string StringProcessing::RemoveFirstNumber( string input_str )
+string StringProcessing::RemoveFirstNumber( const string& input_str )
 {
 	string returnable_str;
-	for( unsigned int i=1; i< input_str.size(); ++i )
+	if( !returnable_str.empty() )
 	{
-		returnable_str+=input_str[i];
+		for( string::const_iterator str_i = (input_str.begin()+1); str_i != input_str.end(); ++str_i )
+		{
+			returnable_str+=*str_i;
+		}
 	}
 	return returnable_str;
 }
 
-vector<string> StringProcessing::FillList( int max, int min )
+vector<string> StringProcessing::FillList( const int max, const int min )
 {
 	vector<string> returnable_list;
 	for( int i=min; i<= max; ++i )
@@ -362,14 +442,13 @@ vector<string> StringProcessing::FillList( int max, int min )
 	return returnable_list;
 }
 
-int StringProcessing::GetNumberOnLeft( string input_str )
+int StringProcessing::GetNumberOnLeft( const string& input_str )
 {
-	string input_num;
-	input_num += input_str[0];
-	return atoi( input_num.c_str() );
+	string input_num; input_num+=input_str[0];
+	return atoi( &(input_num[0]) );	//Just take first character not whole string
 }
 
-string StringProcessing::AddNames( string input1, string input2)
+string StringProcessing::AddNames( const string& input1, const string& input2)
 {
 	if( !input1.empty() && !input2.empty() )
 	{
@@ -390,7 +469,7 @@ string StringProcessing::AddNames( string input1, string input2)
 	return "";
 }
 
-string StringProcessing::MultNames( string input1, string input2 )
+string StringProcessing::MultNames( const string& input1, const string& input2 )
 {
 	if( !input1.empty() && !input2.empty() )
 	{
@@ -409,5 +488,46 @@ string StringProcessing::MultNames( string input1, string input2 )
 		return input1+":unknown";
 	}
 	return "";
+}
+
+TString StringProcessing::Clean( const TString input )
+{
+	string temp(input.Data());
+
+	replace(temp.begin(), temp.end(), '.', '_');
+	replace(temp.begin(), temp.end(), '/', '_');
+	replace(temp.begin(), temp.end(), '\\', '_' );
+	replace(temp.begin(), temp.end(), ' ', '_' );
+	replace(temp.begin(), temp.end(), '(', '_' );
+	replace(temp.begin(), temp.end(), ')', '_' );
+
+	vector<string::iterator> remove_list;
+	string::iterator ch=temp.begin();
+	for( unsigned int i=0; i< temp.size(); ++i, ++ch )
+	{
+		if( i+1 != temp.size() )
+		{
+			if( temp[i] == temp[i+1] )
+			{
+				if( temp[i] == '_' )    remove_list.push_back( ch );
+			}
+		}
+	}
+	if( temp[0] == '_' ) remove_list.push_back( temp.begin() );
+
+	for( unsigned int i=0; i< remove_list.size(); ++i )
+	{
+		temp.erase( remove_list[i] );
+	}
+
+	return TString( temp.c_str() );
+}
+
+//      Is a TString empty ?
+bool StringProcessing::is_empty( const TString input )
+{
+	string temp("");
+	if ( temp.compare( string(input.Data()) ) == 0 ) return true;
+	return false;
 }
 

@@ -1,3 +1,5 @@
+
+#pragma once
 #ifndef RAPIDRUN_H
 #define RAPIDRUN_H
 
@@ -9,6 +11,7 @@
 #include "TString.h"
 //	RapidFit Headers
 #include "main.h"
+#include "Mathematics.h"
 //	System Headers
 #include <memory>
 
@@ -27,3 +30,4 @@ class RapidRun : public TObject
 };
 
 #endif
+

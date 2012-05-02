@@ -1,0 +1,97 @@
+
+I am assuming that you have followed the instructions in README, if not that is the best place to start if your new to RapidFit
+
+Again, there are multiple parts to this howto which don't cover all eventualities:
+
+1) Running the Scan
+2) ROOT/Ganga issues
+3) Configuring the script
+4) Post Processing
+
+
+This procedure has been mostly automated, but is still slightly involved and requires you knowing exactly what you want.
+
+
+In the case of JpsiPhi a single threaded fit takes about 30-50min to converge. This code has been heavily optimized and without some form of intelligent caching is entirely bound by mathematical calculations.
+
+On the grid you can exploit thousands of CPUs in parallel, but your code must be run in a single thread on each node.
+
+
+
+Running the Scan:
+=================
+
+The equivalent command you need to run to start the scan is:
+
+(Be sure you set <Threads>1</Threads> in the XML or you WILL get some angry emails from the grid asking why your circumventing their load balancing!)
+
+
+SetupProject ganga v506r11
+ganga 2DLL_Scan_From_XML.py FinalProduction_1fb_U_v4_0p3.xml Bs2JpsiPhi_ntupleB_for_fitting_20120203_sWeighted_0p3.root 2011-1fb-timeAcceptance-v5-Bs-40b.txt 2011-1fb-backgroundangles-0p3-v1.root
+
+
+run this in the scripts/2D-Scans-Moriond2012 directory.
+
+
+
+
+
+ROOT/Ganga Issues:
+==================
+
+ROOT is a complex beast. In order to build something which can submit run and converge on the grid you need to be consistent in your ROOT version.
+
+I suggest using:
+
+SetupProject ganga v506r11
+
+To provide you with ROOT 5.28 that you will get at runtime on the grid.
+
+I won't go into the details but there are problems with later ganga and ROOT versions. These are the recommended/supported versions I won't go bug hunting on any others!
+
+
+
+
+Configuring the Scan:
+======================
+
+The majority of the work in submitting the scan is automated by the script 2DLL_Scan_From_XML.py
+
+It requires some extra configuration to run, but it effectively acts as our executable program within the ganga environment.
+
+Below is a configuration for the JpsiPhi analysis
+
+X_par="Phi_s"
+Y_par="deltaGamma"
+ 
+X_min=-1.
+X_max=1.
+Y_min=0.
+Y_max=0.25
+  
+resolution=100
+sqrt_jobs_per_core=2
+
+
+The limits on phis and DGs are clear to see, and the resolution means you will get a 100x100 binning of the 2D plane.
+
+The 'sqrt_jobs_per_core=2' means you will have 2x2=4 points calculated per grid job.
+This equates to 2,500 grid jobs!
+This taxes ganga on a good day, it will require patience
+
+
+
+
+
+Post-Processing:
+================
+
+I am assuming by this point you have run your scan on the grid or elsewhere and have merged your results into somefile.root
+
+In order to process this output you need to use the tool:
+
+$RAPIDFITROOT/bin/RapidPlot somefile.root
+
+
+It should automatically determine what is in your output file and perform the appropriate analysis on the data.
+

@@ -13,7 +13,6 @@
 #include "math.h"
 #include "TMath.h"
 #include "Mathematics.h"
-#include "RooMath.h"
 #include "TROOT.h"
 #include "TMath.h"
 #include "TFile.h"
@@ -118,8 +117,6 @@ void Bs2DsPi_lowmassbkg_updated::MakePrototypes()
 {
 	allObservables.push_back( massName );
 	constraint_massName = massName;
-
-	valid = true;
 }
 
 //Destructor
@@ -146,11 +143,8 @@ double Bs2DsPi_lowmassbkg_updated::Evaluate(DataPoint * measurement)
 }
 
 
-double Bs2DsPi_lowmassbkg_updated::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bs2DsPi_lowmassbkg_updated::Normalisation(PhaseSpaceBoundary * boundary)
 {
-
-	//	Stupid gcc
-	(void)measurement;
 	double mhigh, mlow, sum ;
 
 	IConstraint * massBound = boundary->GetConstraint( constraint_massName );

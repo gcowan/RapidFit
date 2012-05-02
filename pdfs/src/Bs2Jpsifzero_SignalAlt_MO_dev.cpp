@@ -11,7 +11,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 #include "Mathematics.h"
 
 #define DEBUGFLAG true
@@ -65,9 +64,7 @@ void Bs2Jpsifzero_SignalAlt_MO_dev::MakePrototypes()
 	parameterNames.push_back( res3FractionName );
 	parameterNames.push_back( timeOffsetName );
 	
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 

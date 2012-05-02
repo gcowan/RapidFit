@@ -108,9 +108,7 @@ void Bd2JpsiKstar_sWave_rTerms::MakePrototypes()
 	parameterNames.push_back( angAccI8Name );
 	parameterNames.push_back( angAccI9Name );
 	parameterNames.push_back( angAccI10Name );
-allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -405,7 +403,6 @@ void Bd2JpsiKstar_sWave_rTerms::getTimeDependentAmplitudes(
 		, double & ReAzeroAs
 		)
 {
-	//	Stupid gcc
 	(void)AsAs;
 
 	// Quantities depending only on physics parameters can be cached

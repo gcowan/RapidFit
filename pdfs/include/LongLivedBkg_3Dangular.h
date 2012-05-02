@@ -29,7 +29,7 @@ class LongLivedBkg_3Dangular : public BasePDF
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
+		virtual double Normalisation(PhaseSpaceBoundary*);
 
 	private:
 		LongLivedBkg_3Dangular& operator=( const LongLivedBkg_3Dangular& );

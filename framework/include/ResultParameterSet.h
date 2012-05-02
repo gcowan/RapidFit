@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef RESULT_PARAMETER_SET_H
 #define RESULT_PARAMETER_SET_H
 
@@ -17,26 +18,48 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+using namespace::std;
 
 class ResultParameterSet
 {
 	public:
-		ResultParameterSet();
+		//Constructor
 		ResultParameterSet( vector<string> );
+		ResultParameterSet( const ResultParameterSet& );
+
+		//Destructor
 		~ResultParameterSet();
 
-		vector<string> GetAllNames();
-		ResultParameter * GetResultParameter( int );
-		ResultParameter * GetResultParameter(string);
+		//Get the list of parameters within
+		vector<string> GetAllNames() const;
+
+		//Get the result parameter according to this index, or this name
+		ResultParameter * GetResultParameter( int ) const;
+		ResultParameter * GetResultParameter( string ) const;
+
+		//Set the result parameter to be equal to:
 		bool SetResultParameter( string, ResultParameter* );
-		bool SetResultParameter( string, double, double, double, double, double, double, string, string );
-		bool ForceNewResultParameter( string, double, double, double, double, double, double, string, string );
-		ParameterSet* GetDummyParameterSet();
+		bool SetResultParameter( string, double, double, double, double, double, string, string );
+
+		//Forcibly change or add a new parameter to this object
+		bool ForceNewResultParameter( string, double, double, double, double, double, string, string );
+
+		//Get a ParameterSet constructed from the values of the parameters in this class
+		ParameterSet* GetDummyParameterSet() const;
+
+		void Print() const;
+
+		string FitXML() const;
+		string ToyXML() const;
 
 	private:
-		vector<ResultParameter> allParameters;
+		ResultParameterSet operator=( const ResultParameterSet& input );
+
+		vector<ResultParameter*> allParameters;
 		vector<string> allNames;
+
+		string XML( const bool=true ) const;
 };
 
 #endif
+

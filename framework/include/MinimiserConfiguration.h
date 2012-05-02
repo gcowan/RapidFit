@@ -1,12 +1,13 @@
 /**
-	@class MinimiserConfiguration
+ * @ingroup Generators  This Generator is capable of Constructing the Minimiser which minimises the FitFunction
+ * @class MinimiserConfiguration
+ *
+ *Container that stores all information related to minimiser configuration, and returns an appropriate instance of a minimiser
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ */
 
-	Container that stores all information related to minimiser configuration, and returns an appropriate instance of a minimiser
-
-	@author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-11-27
-*/
-
+#pragma once
 #ifndef MINIMISER_CONFIGURATION_H
 #define MINIMISER_CONFIGURATION_H
 
@@ -17,8 +18,7 @@
 class MinimiserConfiguration
 {
 	public:
-		MinimiserConfiguration();
-		MinimiserConfiguration(string);
+		MinimiserConfiguration( string );
 		MinimiserConfiguration( string, OutputConfiguration* );
 		~MinimiserConfiguration();
 
@@ -33,6 +33,11 @@ class MinimiserConfiguration
 		void SetQuality( int );
 		void SetMultiMini( bool );
 
+		//Output some debugging info
+		void Print() const;
+
+		string XML() const;
+
 	private:
 		//	Uncopyable!
 		MinimiserConfiguration ( const MinimiserConfiguration& );
@@ -45,8 +50,9 @@ class MinimiserConfiguration
 		int maxSteps;
 		double bestTolerance;
 		vector<string> MinimiseOptions;
-		int Quality;
 		bool MultiMini;
+		int Quality;
 };
 
 #endif
+

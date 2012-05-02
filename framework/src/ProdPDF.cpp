@@ -1,39 +1,98 @@
-/**
-  @class ProdPDF
 
-  An implementation of IPDF for multiplying the values of two other IPDFs
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @date 2009-10-02
-  */
-
-//	RapidFit Headers
+///	RapidFit Headers
+#include "BasePDF.h"
 #include "ProdPDF.h"
 #include "StringProcessing.h"
 #include "ClassLookUp.h"
-//	System Headers
+///	System Headers
 #include <iostream>
 #include <cstdlib>
+#include <sstream>
 
-using namespace std;
-
-//Default constructor
-ProdPDF::ProdPDF() : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL)
-{
-}
+using namespace::std;
 
 //Constructor not specifying fraction parameter name
-ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) )
+ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) )
 {
 	MakePrototypes();
+
+	//      Only one PDF has components beyond here
+	//      Add an index to allow for the ProdPDF to return the correct component in future
+
+	//      By definition the observable you project over is only in 1 of the pdfs
+
+	vector<string> first_components;
+	for( unsigned int i=0; i< firstPDF->PDFComponents().size(); ++i )
+	{
+		first_components.push_back( firstPDF->PDFComponents()[i] );
+	}
+	vector<string> second_components;
+	for( unsigned int j=0; j< secondPDF->PDFComponents().size(); ++j )
+	{
+		second_components.push_back( secondPDF->PDFComponents()[j] );
+	}
+
+	string zero="0";
+
+	if( first_components.empty() || (StringProcessing::VectorContains( &first_components, &zero ) == -1 ) ) first_components.push_back("0");
+	if( second_components.empty() || (StringProcessing::VectorContains( &second_components, &zero ) == -1 ) ) second_components.push_back("0");
+
+	component_list = vector<string>();
+
+	if( (first_components.size() != 1) && (second_components.size() == 1) )
+	{
+		//component_list.pop_back();
+		for( unsigned int i=0; i< first_components.size(); ++i )
+		{
+			component_list.push_back( StringProcessing::AddNumberToLeft( first_components[i], 1 ) );
+		}
+		string total="10";
+		if( StringProcessing::VectorContains( &component_list, &total ) == -1 )
+		{
+			component_list.push_back( "0" );
+		}
+		else
+		{
+			component_list[ (unsigned)StringProcessing::VectorContains( &component_list, &total ) ] = "0";
+		}
+		
+	}
+	else if( (second_components.size() != 1) && (first_components.size() == 1) )
+	{
+		//component_list.pop_back();
+		for( unsigned int j=0; j< second_components.size(); ++j )
+		{
+			component_list.push_back( StringProcessing::AddNumberToLeft( second_components[j], 2 ) );
+		}
+		string total="20";
+		if( StringProcessing::VectorContains( &component_list, &total ) == -1 )
+		{
+			component_list.push_back( "0" );
+		}
+		else
+		{
+			component_list[ (unsigned)StringProcessing::VectorContains( &component_list ,&total ) ] = "0";
+		}
+	}
+	else
+	{
+		if( (first_components.size() != 1) && (second_components.size() != 1) )
+		{
+			cerr << "CANNOT UNDERSTAND MULTIPLE PDFS WITH MULTIPLE COMPONENTS INSIDE THE SAME PDF, HENCE I WILL ONLY CLAIM 1 COMPONENT" << endl;
+		}
+		component_list.push_back( "0" );
+	}
+
+	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
+	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );
+	allParameters.AddPhysicsParameters( secondPDF->GetPhysicsParameters(), false );
 }
 
 ProdPDF::ProdPDF( const ProdPDF& input ) : BasePDF( (BasePDF) input ),
-	prototypeDataPoint( StringProcessing::CombineUniques( input.firstPDF->GetPrototypeDataPoint(), input.secondPDF->GetPrototypeDataPoint() ) ),
-	prototypeParameterSet( StringProcessing::CombineUniques( input.firstPDF->GetPrototypeParameterSet(), input.secondPDF->GetPrototypeParameterSet() ) ),
-	doNotIntegrateList( StringProcessing::CombineUniques( input.firstPDF->GetDoNotIntegrateList(), input.secondPDF->GetDoNotIntegrateList() ) ),
-	firstPDF( ClassLookUp::CopyPDF( input.firstPDF ) ),
-	secondPDF( ClassLookUp::CopyPDF( input.secondPDF ) )
+	prototypeDataPoint( input.prototypeDataPoint ),
+	prototypeParameterSet( input.prototypeParameterSet ),
+	doNotIntegrateList( input.doNotIntegrateList ),
+	firstPDF( ClassLookUp::CopyPDF( input.firstPDF ) ), secondPDF( ClassLookUp::CopyPDF( input.secondPDF ) )
 {
 }
 
@@ -53,22 +112,17 @@ ProdPDF::~ProdPDF()
 	if( secondPDF != NULL ) delete secondPDF;
 }
 
-//Indicate whether the function has been set up correctly
-bool ProdPDF::IsValid()
-{
-	return firstPDF->IsValid() && secondPDF->IsValid();
-}
-
 //Set the function parameters
 bool ProdPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-	bool output = firstPDF->SetPhysicsParameters( NewParameterSet ) && secondPDF->SetPhysicsParameters( NewParameterSet );
-	output = output && allParameters.AddPhysicsParameters( NewParameterSet );
+	firstPDF->UpdatePhysicsParameters( NewParameterSet );
+	secondPDF->UpdatePhysicsParameters( NewParameterSet );
+	bool output = allParameters.SetPhysicsParameters( NewParameterSet );
 	return output;
 }
 
 //Return the integral of the function over the given boundary
-double ProdPDF::Integral( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary )
+double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
 	//Note that this is almost certainly wrong. However, I don't know a good analytical solution.
 	//In cases that the formula is incorrect, it will be caught by the numerical integration check.
@@ -93,28 +147,6 @@ double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	return termOne * termTwo;
 }
 
-
-//Return the function value at the given point
-vector<double> ProdPDF::EvaluateComponents( DataPoint * NewDataPoint )
-{
-
-	//Get the components of each term
-	vector<double> termOneComponents = firstPDF->EvaluateComponents( NewDataPoint ) ;
-	vector<double> termTwoComponents = secondPDF->EvaluateComponents( NewDataPoint );
-
-	//Insert components in output vector with correct weights.	
-	vector<double> components ;
-	for(unsigned int ii=0; ii<termOneComponents.size(); ++ii ) {
-		for(unsigned int jj=0; jj<termTwoComponents.size(); ++jj ) {
-			components.push_back( termOneComponents[ii]*termTwoComponents[jj] ) ;
-		}
-	}
-
-	// Return the complete set of components
-	return components;
-}
-
-
 //Return a prototype data point
 vector<string> ProdPDF::GetPrototypeDataPoint()
 {
@@ -133,7 +165,93 @@ vector<string> ProdPDF::GetDoNotIntegrateList()
 	return doNotIntegrateList;
 }
 
-// Update integral cache
-void ProdPDF::UpdateIntegralCache()
+bool ProdPDF::GetNumericalNormalisation() const
 {
+	return firstPDF->GetNumericalNormalisation() || secondPDF->GetNumericalNormalisation();
 }
+
+//Return the function value at the given point
+double ProdPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRef* componentIndexObj )
+{
+	string componentIndex = componentIndexObj->getComponentName();
+	int component_num = componentIndexObj->getComponentNumber();
+	if( component_num == -1 )
+	{
+		if( componentIndex=="" || componentIndex=="0" ) component_num = 0;
+		else if( componentIndex=="10" || componentIndex=="20" ) component_num = 0;
+		else component_num = StringProcessing::GetNumberOnLeft( componentIndex );
+
+		componentIndexObj->setComponentNumber( component_num );
+		componentIndexObj->addSubComponent( StringProcessing::RemoveFirstNumber( componentIndex ) );
+	}
+
+	//cout << "Called:" << component_num << "\t" << StringProcessing::RemoveFirstNumber( componentIndex ) << endl;
+
+	double returnable_value = -1;
+
+	double termOne = -1;
+	double termTwo = -1;
+
+	//      By definition only 1 of the PDFs should have components to plot
+	switch( component_num )
+	{
+		case 0:
+			termOne = firstPDF->EvaluateForNumericIntegral( NewDataPoint );
+			termTwo = secondPDF->EvaluateForNumericIntegral( NewDataPoint );
+			break;
+
+		case 1:
+			termOne = firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() );
+			termTwo = secondPDF->EvaluateForNumericIntegral( NewDataPoint );
+			break;
+
+		case 2:
+			termOne = firstPDF->EvaluateForNumericIntegral( NewDataPoint );
+			termTwo = secondPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() );
+			break;
+		default:
+			return 0;
+	}
+
+	//cout << "ProdPDF: " << termOne * termTwo << "\t\t" << termOne << " , " << termTwo << "\t" << this->GetLabel() << endl;
+	returnable_value = termOne * termTwo;
+
+	//if( returnable_value < 1E-10 ) NewDataPoint->Print();
+
+	return returnable_value;
+}
+
+IPDF* ProdPDF::GetFirstPDF() const
+{
+	return firstPDF;
+}
+
+IPDF* ProdPDF::GetSecondPDF() const
+{
+	return secondPDF;
+}
+
+bool ProdPDF::GetCachingEnabled() const
+{
+	return firstPDF->GetCachingEnabled() && secondPDF->GetCachingEnabled();
+}
+
+void ProdPDF::SetCachingEnabled( bool input )
+{
+	firstPDF->SetCachingEnabled( input );
+	secondPDF->SetCachingEnabled( input );
+}
+
+string ProdPDF::XML() const
+{
+	stringstream xml;
+
+	xml << "<ProdPDF>" << endl;
+	xml << firstPDF->XML();
+	xml << secondPDF->XML();
+	xml << "</ProdPDF>" << endl;
+
+	return xml.str();
+}
+
+

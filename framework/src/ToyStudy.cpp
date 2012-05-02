@@ -15,46 +15,43 @@
 //	System Headers
 #include <iostream>
 
-using namespace std;
-
-//Default constructor
-ToyStudy::ToyStudy() : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(NULL), numberStudies(), allConstraints()
-{
-}
+using namespace::std;
 
 //Constructor using an XML config file directly
-ToyStudy::ToyStudy( string FileName ) : pdfsAndData(), studyParameters(), theMinimiser(), theFunction(), allResults(NULL), numberStudies(), allConstraints()
+ToyStudy::ToyStudy( string FileName ) : IStudy()
 {
-	XMLConfigReader * xml = new XMLConfigReader(FileName, new vector<pair<string,string> >);
-	if ( xml->IsLoaded() )
-	{
-		theMinimiser = xml->GetMinimiserConfiguration();
-		theFunction = xml->GetFitFunctionConfiguration();
-		studyParameters = xml->GetFitParameters();
-		pdfsAndData = xml->GetPDFsAndData();
-		numberStudies = xml->GetNumberRepeats();
-		allConstraints = xml->GetConstraints();
+	XMLConfigReader * xml = new XMLConfigReader( FileName );
 
-		if ( numberStudies < 1 )
-		{
-			cerr << "Erroneous number of studies: defaulting to 1" << endl;
-			numberStudies = 1;
-		}
-		else if ( numberStudies == 1 )
-		{
-			cout << "Doing a single toy study. Check this is what you expect." << endl;
-		}
-	}
-	else
+	theMinimiser = xml->GetMinimiserConfiguration();
+	theFunction = xml->GetFitFunctionConfiguration();
+	studyParameters = xml->GetFitParameters();
+	pdfsAndData = xml->GetPDFsAndData();
+	numberStudies = xml->GetNumberRepeats();
+	allConstraints = xml->GetConstraints();
+	delete_objects = true;
+
+	if ( numberStudies < 1 )
 	{
-		cerr << "XML file (" << FileName << ") not found" << endl;
+		cerr << "Erroneous number of studies: defaulting to 1" << endl;
+		numberStudies = 1;
+	}
+	else if ( numberStudies == 1 )
+	{
+		cout << "Doing a single toy study. Check this is what you expect." << endl;
 	}
 }
 
 //Constructor with correct arguments
-ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, vector<ParameterSet*> StudyParameters, vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies )
-: pdfsAndData(PDFsAndData), studyParameters(StudyParameters), theMinimiser(TheMinimiser), theFunction(TheFunction), allResults(NULL), numberStudies(NumberStudies), allConstraints(InputConstraints)
+ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, ParameterSet* StudyParameters, vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies ) : IStudy()
 {
+	pdfsAndData = PDFsAndData;
+	studyParameters = StudyParameters;
+	theMinimiser = TheMinimiser;
+	theFunction = TheFunction;
+	allResults = NULL;
+	numberStudies = NumberStudies;
+	allConstraints = InputConstraints;
+
 	if ( numberStudies < 1 )
 	{
 		cerr << "Erroneous number of studies: defaulting to 1" << endl;
@@ -73,7 +70,7 @@ ToyStudy::~ToyStudy()
 }
 
 //Automate the toy study
-void ToyStudy::DoWholeStudy( )
+void ToyStudy::DoWholeStudy( int OutputLevel )
 {
 	//Make a vector of unique parameter names
 	vector<string> uniqueNames;
@@ -86,17 +83,35 @@ void ToyStudy::DoWholeStudy( )
 	}
 	allResults = new FitResultVector(uniqueNames);
 
+	//	Do NOT want PDFWithData to cache the dataset as this will just keep running over the same data
+	for( unsigned int i=0; i< pdfsAndData.size(); ++i )
+	{
+		pdfsAndData[i]->SetUseCache( false );
+	}
+
 	//Loop over all studies
 	for ( int studyIndex = 0; studyIndex < numberStudies; ++studyIndex )
 	{
 		cout << "\n\n\t\tStarting ToyStudy\t\t" << studyIndex+1 << "\tof:\t" << numberStudies << endl;
 		allResults->StartStopwatch();
-		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints, -999 );
+
+		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints, OutputLevel );
+
+		//cout << "\n\nFinished Study" << endl;
+
+		//	Have to explicitly call this to request the data be deleted between runs, not normally an issue but causes problems with large (pb) datasets
+		for( unsigned int i=0; i< pdfsAndData.size(); ++i )
+		{
+			//cout << "Removing DataSet Number: " << i << endl;
+			pdfsAndData[i]->ClearCache();
+		}
+
 		if( new_result->GetFitStatus() != 3 )
 		{
 			cerr << "Fit fell over!\t Requesting another fit." << endl;
 			++numberStudies;
 		}
+
 		allResults->AddFitResult( new_result );
 	}
 }
@@ -120,3 +135,4 @@ void ToyStudy::SetCommandLineParams( vector<string> new_CommandLineParams )
 {
 	(void) new_CommandLineParams;
 }
+

@@ -15,6 +15,7 @@
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
 #include "SlicedAcceptance.h"
+#include "AngularAcceptance.h"
 #include "Mathematics.h"
 #include "RooComplex.h"
 #include <iostream>
@@ -44,16 +45,21 @@ public:
 	virtual bool SetPhysicsParameters(ParameterSet*);
 	virtual vector<string> GetDoNotIntegrateList();
 
+	vector<string> PDFComponents();
+
+	double EvaluateComponent( DataPoint* input, ComponentRef* );
 	
 private:
 	Bs2JpsiPhi_SignalAlt_MO_v4& operator=( const Bs2JpsiPhi_SignalAlt_MO_v4& );
 	void MakePrototypes();
 	double normalisationCacheUntagged ;
-		
+	
+	
 protected:
 	//Calculate the PDF normalisation
 	virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
-	
+
+	int componentIndex;	
 	
 	//PELC For debugging purposes
 	//TH1D * histOfPdfValues ;
@@ -73,6 +79,8 @@ protected:
 	ObservableRef delta_paraName;	// strong phase
 	ObservableRef delta_perpName;	// strong phase
 	ObservableRef delta_sName;		// strong phase for S-wave
+	ObservableRef cosdparName;		//PELC-COSDPAR Special for fitting cosdpar separately
+	
 	
 	ObservableRef Phi_sName;		// what we want to measure!
 	ObservableRef cosphisName;		// fitting cosphis and sinphis independently
@@ -153,6 +161,7 @@ protected:
 	double delta_s ;
 	double delta1 ;
 	double delta2 ;
+	double cosdpar ; //PELC-COSDPAR Special for fitting cosdpar separately
 	
 	double delta_ms ;
 	double phi_s ;
@@ -186,6 +195,8 @@ protected:
 	double angAccI8 ;
 	double angAccI9 ;
 	double angAccI10 ;
+	AngularAcceptance * angAcc ;
+	bool _angAccIgnoreNumerator ;
 	
 	// Othere things calculated later on the fly
 	double tlo, thi ;
@@ -218,6 +229,7 @@ protected:
 	bool _numericIntegralForce ;
 	bool _numericIntegralTimeOnly ;
 	bool _useCosAndSin ;
+	bool _useCosDpar ;
 	bool allowNegativeAsSq ;
 	
 	//....................................
@@ -461,12 +473,14 @@ protected:
 	//...........................
 	inline double timeFactorReA0AP( )  const
 	{
-		return cos(delta2-delta1) * this->timeFactorEven(  ) ;
+		if( _useCosDpar ) return cosdpar * this->timeFactorEven(  ) ;//PELC-COSDPAR Special for fitting cosdpar separately
+		else return cos(delta2-delta1) * this->timeFactorEven(  ) ;
 	}
 	
 	inline double timeFactorReA0APInt( ) const
 	{
-		return cos(delta2-delta1) * this->timeFactorEvenInt( ) ;
+		if( _useCosDpar ) return cosdpar * this->timeFactorEvenInt( ) ;//PELC-COSDPAR Special for fitting cosdpar separately
+		else return cos(delta2-delta1) * this->timeFactorEvenInt( ) ;
 	}
 	
 	

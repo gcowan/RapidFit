@@ -26,7 +26,7 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-Minuit2Wrapper::Minuit2Wrapper() : function(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), RapidFunction(), Quality()
+Minuit2Wrapper::Minuit2Wrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality()
 {
 }
 
@@ -108,7 +108,7 @@ void Minuit2Wrapper::Minimise()
 		double parameterError = minimisedParameters->Error( parameterName.c_str() );
 
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-				oldParameter->GetMinimum(), oldParameter->GetMaximum(), oldParameter->GetStepSize(),
+				oldParameter->GetMinimum(), oldParameter->GetMaximum(),
 				oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 

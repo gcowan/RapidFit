@@ -10,7 +10,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 
 PDF_CREATOR( Bs2JpsiPhiPromptBkg_withTimeResDouble );
 
@@ -39,9 +38,7 @@ void Bs2JpsiPhiPromptBkg_withTimeResDouble::MakePrototypes()
 	parameterNames.push_back( frac_sigmaPrName );
 	parameterNames.push_back( sigmaPrName );
 	parameterNames.push_back( sigmaPr2Name );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -90,10 +87,10 @@ double Bs2JpsiPhiPromptBkg_withTimeResDouble::Normalisation(PhaseSpaceBoundary *
         }
 
 		double sigmaPr = allParameters.GetPhysicsParameter( sigmaPrName )->GetValue();
-		double val = 0.5 * ( RooMath::erf( tmax/(sqrt(2.)*sigmaPr) ) - RooMath::erf( tmin/(sqrt(2.)*sigmaPr )) );
+		double val = 0.5 * ( erf( tmax/(sqrt(2.)*sigmaPr) ) - erf( tmin/(sqrt(2.)*sigmaPr )) );
 
 		double sigmaPr2 = allParameters.GetPhysicsParameter( sigmaPr2Name )->GetValue();
-		double val2 = 0.5 * ( RooMath::erf( tmax/(sqrt(2.)*sigmaPr2) ) - RooMath::erf( tmin/(sqrt(2.)*sigmaPr2 )) );
+		double val2 = 0.5 * ( erf( tmax/(sqrt(2.)*sigmaPr2) ) - erf( tmin/(sqrt(2.)*sigmaPr2 )) );
 
 		double frac = allParameters.GetPhysicsParameter( frac_sigmaPrName )->GetValue();
 

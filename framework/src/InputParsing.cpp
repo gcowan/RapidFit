@@ -57,7 +57,7 @@ ParameterSet * InputParsing::MakeParameterSet( string Input )
 	else
 	{
 		cerr << "String describing parameters is incorrectly formed: number of components ( " << splitInput.size() << " ) is not a multiple of 6" << endl;
-		return new ParameterSet();
+		return new ParameterSet( vector<string>() );
 	}
 }
 
@@ -201,7 +201,7 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 		cout << " In InputParsing::MakePDFWithData : WARNING : Calling ClassLookUp::LookUpPDFName with dummy configurator " << endl ;
 		//~PELC
 		//PELC newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], vector<string>(), vector<string>() );
-		newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], vector<string>(), vector<string>(), dummy );
+		newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], dummy );
 	}
 	else if ( pdfComponents.size() == 3 )
 	{
@@ -218,7 +218,7 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 		//~PELC
 		
 		//PELC newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], observableComponents, parameterComponents );
-		newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], observableComponents, parameterComponents, dummy );
+		newPDF = ClassLookUp::LookUpPDFName( pdfComponents[0], dummy );
 	}
 	else
 	{
@@ -253,14 +253,13 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 
 		//Make the configuration objects
 		string cutString = ""; // For now, just apply no cut
-		vector< IPrecalculator* > emptyPrecalculator;
 		vector< DataSetConfiguration* > singleDataSet;
 		singleDataSet.push_back( new DataSetConfiguration( dataSourceName, dataAmount, cutString, dataArguments, argumentNames ) );
-		return new PDFWithData( newPDF, newBoundary, singleDataSet, emptyPrecalculator );
+		return new PDFWithData( newPDF, newBoundary, singleDataSet );
 	}
 	else
 	{
 		cerr << "Incorrectly formed data source description: must be at least 2 terms" << endl;
-		return new PDFWithData();
+		return NULL;
 	}
 }

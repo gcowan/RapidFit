@@ -1,12 +1,12 @@
-/**
-  @class FunctionContour
-
-  A class holding a contour plot retrieved from minuit
-
-  @author Benjamin Wynne bwynne@cern.ch
-  @date 2009-11-27
+/*!
+ * @class FunctionContour
+ *
+ * @brief A class holding a contour plot retrieved from Minuit
+ *
+ * @author Benjamin Wynne bwynne@cern.ch
   */
 
+#pragma once
 #ifndef FUNCTION_CONTOUR_H
 #define FUNCTION_CONTOUR_H
 
@@ -14,7 +14,7 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+using namespace::std;
 
 class FunctionContour
 {
@@ -36,3 +36,4 @@ class FunctionContour
 };
 
 #endif
+

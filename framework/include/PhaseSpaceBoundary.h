@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef PHASE_SPACE_BOUNDARY_H
 #define PHASE_SPACE_BOUNDARY_H
 
@@ -18,28 +19,49 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+using namespace::std;
 
 class PhaseSpaceBoundary
 {
 	public:
-		PhaseSpaceBoundary();
+		PhaseSpaceBoundary( const PhaseSpaceBoundary& );
 		PhaseSpaceBoundary( vector<string> );
-		~PhaseSpaceBoundary();
+		virtual ~PhaseSpaceBoundary();
 
-		vector<string> GetAllNames();
+		vector<string> GetAllNames() const;
+		vector<string> GetDiscreteNames() const;
+		vector<string> GetContinuousNames() const;
+
 		bool SetConstraint( string, IConstraint* );
 		bool SetConstraint( string, double, double, string );
 		bool SetConstraint( string, vector<double>, string );
+		void AddConstraint( string, IConstraint* );
 		IConstraint * GetConstraint( pair<string,int>* );
-		IConstraint * GetConstraint( ObservableRef& );
-		IConstraint * GetConstraint( string );
+		IConstraint * GetConstraint( ObservableRef& ) const;
+		IConstraint * GetConstraint( string ) const;
 		bool IsPointInBoundary( DataPoint* );
 		//bool CheckBoundary( PhaseSpaceBoundary* );
 
+		virtual void Print() const;
+
+		virtual string DiscreteDescription( const DataPoint* ) const;
+
+		virtual DataPoint* GetMidPoint() const;
+
+		virtual vector<DataPoint*> GetDiscreteCombinations() const;
+
+		virtual int GetNumberCombinations() const;
+
+		virtual unsigned int GetDiscreteIndex( DataPoint* Input ) const;
+
+		string XML() const;
+
 	private:
+		PhaseSpaceBoundary& operator=(const PhaseSpaceBoundary&);
 		vector< IConstraint* > allConstraints;
 		vector<string> allNames;
+		mutable int DiscreteCombinationNumber;
 };
 
 #endif
+

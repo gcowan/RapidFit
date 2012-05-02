@@ -38,28 +38,47 @@ int Threading::numCores()
 		string pathName = ClassLookUp::getSelfPath();
 		if( pathName.find( root_exe ) == string::npos )		//	NOT running the root executable root.exe
 		{
-			#ifdef WIN32		//	Not tested
-				SYSTEM_INFO sysinfo;
-				GetSystemInfo(&sysinfo);
-				num_cores = sysinfo.dwNumberOfProcessors;
-			#elif __APPLE__		//	OS X (tested in 10.6)
-				int nm[2];
-				size_t len = 4;
-				uint32_t count;
+			string root_exe2 = "/root";
+			if( pathName.find( root_exe2 ) == string::npos )
+			{
+				string python_name = "python";
+				if( pathName.find( python_name ) == string::npos )
+				{
+					#ifdef WIN32		//	Not tested
+						SYSTEM_INFO sysinfo;
+						GetSystemInfo(&sysinfo);
+						num_cores = sysinfo.dwNumberOfProcessors;
+					#elif __APPLE__		//	OS X (tested in 10.6)
+						int nm[2];
+						size_t len = 4;
+						uint32_t count;
 
-				nm[0] = CTL_HW; nm[1] = HW_AVAILCPU;
-				sysctl(nm, 2, &count, &len, NULL, 0);
+						nm[0] = CTL_HW; nm[1] = HW_AVAILCPU;
+						sysctl(nm, 2, &count, &len, NULL, 0);
 
-				if(count < 1) {
-					nm[1] = HW_NCPU;
-					sysctl(nm, 2, &count, &len, NULL, 0);
-					if(count < 1) { count = 1; }
+						if(count < 1)
+						{
+							nm[1] = HW_NCPU;
+							sysctl(nm, 2, &count, &len, NULL, 0);
+							if(count < 1) { count = 1; }
+						}
+						num_cores = count;
+					#else			//	Linux
+						num_cores = (int) sysconf(_SC_NPROCESSORS_ONLN);
+					#endif
 				}
-				num_cores = count;
-			#else			//	Linux
-				num_cores = (int) sysconf(_SC_NPROCESSORS_ONLN);
-			#endif
-		} else {						//	running the ROOT executable root.exe
+				else
+				{
+					num_cores = 1;
+				}
+			}
+			else
+			{
+				num_cores = 1;
+			}
+		}
+		else
+		{						//	running the ROOT executable root.exe
 			num_cores = 1;
 		}
 	#else
@@ -73,6 +92,7 @@ int Threading::numCores()
 vector<vector<DataPoint*> > Threading::divideData( IDataSet* input, int subsets )
 {
 	vector<vector<DataPoint*> > output_datasets;
+	if( subsets <= 0 ) subsets = 1;
 	int subset_size = ( input->GetDataNumber() / subsets );
 
 	for( int setnum = 0; setnum < subsets; ++setnum )

@@ -1,12 +1,12 @@
-/**
-        @class PhysicsBottle
+/*!
+ * @class PhysicsBottle
+ *
+ *  A collection of PDF-DataSet pairs to be fitted simultaneously with a given parameter set.
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ */
 
-        A collection of PDF-DataSet pairs to be fitted simultaneously with a given parameter set.
-
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
-
+#pragma once
 #ifndef PHYSICS_BOTTLE_H
 #define PHYSICS_BOTTLE_H
 
@@ -21,23 +21,44 @@
 class PhysicsBottle
 {
 	public:
-		PhysicsBottle();
+		/*!
+		 * @brief Constructor to construct the PhysicsBottle
+		 *
+		 * @param InputSet    This is the ParameterSet which is used by the PhysicsBottle
+		 */
 		PhysicsBottle( ParameterSet* );
+
+		/*!
+		 * @brief Destructor
+		 */
 		~PhysicsBottle();
+
+		/*!
+		 * @brief Copy Constructor
+		 */
 		PhysicsBottle(const PhysicsBottle&);
 
+
 		void AddResult( IPDF*, IDataSet* );
+
 		void AddConstraint( ConstraintFunction* );
+
 		int NumberResults();
+
 		IPDF* GetResultPDF(int);
+
 		IDataSet* GetResultDataSet(int);
+
 		vector< ConstraintFunction* > GetConstraints();
+
 		ParameterSet * GetParameterSet();
+
 		bool SetParameterSet( ParameterSet* );
-		void Finalise();
 
 	private:
-		//	Uncopyable!
+		/*!
+		 * Don't Copy the class this way!
+		 */
 		PhysicsBottle& operator = ( const PhysicsBottle& );
 
 		vector< IPDF* > allPDFs;

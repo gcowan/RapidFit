@@ -12,9 +12,6 @@
 
 #include "BasePDF.h"
 
-#include "RooComplex.h"
-#include "RooMath.h"
-
 class Bs2DsPi_mistagParameter : public BasePDF
 {
 	public:

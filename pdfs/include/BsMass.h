@@ -23,7 +23,7 @@ class BsMass : public BasePDF
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
+		virtual double Normalisation(PhaseSpaceBoundary*);
 
 	private:
 		void MakePrototypes();
@@ -36,6 +36,9 @@ class BsMass : public BasePDF
 
 		// Observables
 		ObservableRef recoMassName;	// reconstructed Bs mass
+	
+		//Limits
+		double mlow, mhigh ;
 };
 
 #endif

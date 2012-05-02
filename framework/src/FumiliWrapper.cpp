@@ -170,7 +170,7 @@ void FumiliWrapper::Minimise()
 		double parameterError = minimisedParameters->Error( parameterName.c_str() );
 
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-			       -oldParameter->GetMinimum(), oldParameter->GetMaximum(), oldParameter->GetStepSize(),
+			       -oldParameter->GetMinimum(), oldParameter->GetMaximum(),
 			       oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 

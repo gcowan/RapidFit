@@ -41,9 +41,7 @@ void Bs2JpsiPhiLongLivedBkg::MakePrototypes()
         parameterNames.push_back( tau1Name );
         parameterNames.push_back( tau2Name );
         parameterNames.push_back( f_LL1Name );
-        allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+        allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor

@@ -9,7 +9,6 @@
 
 //	ROOT Headers
 #include "TMath.h"
-#include "RooMath.h"
 //	RapidFit Headers
 #include "Bs2Jpsifzero_SignalAlt_BaseClass_dev.h"
 #include "SlicedAcceptance.h"
@@ -295,7 +294,7 @@ double Bs2Jpsifzero_SignalAlt_BaseClass_dev::diffXsecCompositeNorm1(  )
 	
 	if( useTimeAcceptance() ) {		 
 		//This loops over each time slice, does the normalisation between the limits, and accumulates
-		for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
+		for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
 		{
 			tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
 			thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;

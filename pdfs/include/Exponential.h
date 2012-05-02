@@ -11,6 +11,7 @@
 #define Exponential_H
 
 #include "BasePDF.h"
+#include "SlicedAcceptance.h"
 
 class Exponential : public BasePDF
 {
@@ -20,9 +21,11 @@ class Exponential : public BasePDF
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
+		virtual vector<string> GetDoNotIntegrateList();
 
 	protected:
 		//Calculate the PDF normalisation
+		virtual double Normalisation( PhaseSpaceBoundary* );
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
@@ -32,17 +35,33 @@ class Exponential : public BasePDF
 		double buildPDFdenominator();		
 
 		// Physics parameters
-		ObservableRef tauLL1Name;		// decay constant 1
-		ObservableRef sigmaLL1Name;		// time res sigma 1
-		ObservableRef sigmaLL2Name;		// time res sigma 2
-                ObservableRef timeResLL1FracName;
+		ObservableRef tauName;		// decay constant 1
+		// Detector parameters
+		ObservableRef eventResolutionName;                      // Scale to multiply all Gaussians with 
+		ObservableRef resScale1Name;                     // Scale to multiply all Gaussians with 
+		ObservableRef resScale2Name;                     // Scale to multiply all Gaussians with 
+		ObservableRef resScale3Name;                     // Scale to multiply all Gaussians with 
+		ObservableRef sigma1Name;		// time res sigma 1
+		ObservableRef sigma2Name;		// time res sigma 2
+		ObservableRef timeRes1FracName;
+		ObservableRef timeRes2FracName;
+		// Observable
 		ObservableRef timeName;		// proper time
 
-		double tauLL1;
-		double sigmaLL; // This is the member variable used in the "builder" functions 
-		double sigmaLL1; // These are the physics parameters varied in the fit and passed from the XML;
-		double sigmaLL2;
-                double timeResLL1Frac;
+		double tau;
+		
+		// This stuff is all to do with resolution
+		double sigma; 
+		double sigma1; 
+		double sigma2;
+		double timeRes1Frac;
+		double timeRes2Frac;
+		double eventResolution;
+		double resolutionScale1;
+		double resolutionScale2;
+		double resolutionScale3;
+		bool _useEventResolution;
+		inline bool useEventResolution() const {return _useEventResolution;}
 
 		double tlow, thigh; // integration limits
 
@@ -50,6 +69,15 @@ class Exponential : public BasePDF
 		// to the observable names that are used in the
 		// PDF. 
 		double time;
+
+		//Time acceptance 
+		SlicedAcceptance * timeAcc;
+
+		//Configurationparameters
+		bool _useTimeAcceptance;
+		bool _numericIntegralForce;
+        	inline bool useTimeAcceptance() const { return _useTimeAcceptance;}
+
 };
 
 #endif

@@ -1,29 +1,27 @@
-/**
-        @class ObservableContinuousConstraint
-
-        A constraint defining an observable that can take any value between a given maximum and minimum.
-
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+/*!
+ * @class ObservableContinuousConstraint
+ *
+ * A constraint defining an observable that can take any value between a given maximum and minimum.
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ */
 
 //	RapidFit Headers
 #include "ObservableContinuousConstraint.h"
 //	System Headers
 #include <iostream>
 #include <float.h>
+#include <sstream>
+
+using namespace::std;
 
 //#define CONTINUOUS_TOLERANCE DBL_MIN
 #define CONTINUOUS_TOLERANCE 1E-9
 
-//Default constructor
-ObservableContinuousConstraint::ObservableContinuousConstraint() : minimum(0.0), maximum(0.0), unit("")
-{
-}
-
 //Constructor with correct argument
-ObservableContinuousConstraint::ObservableContinuousConstraint( string Name, double NewMinimum, double NewMaximum, string NewUnit ) : minimum(NewMinimum),
-	maximum(NewMaximum), unit(NewUnit)
+ObservableContinuousConstraint::ObservableContinuousConstraint( string Name, double NewMinimum, double NewMaximum, string NewUnit, string TF1 ) : 
+	name(Name), minimum(NewMinimum), maximum(NewMaximum), unit(NewUnit), tf1( TF1 )
 {
 	if (maximum < minimum)
 	{
@@ -36,6 +34,8 @@ ObservableContinuousConstraint::ObservableContinuousConstraint( string Name, dou
 	{
 		cerr << "Single bound \"" << Name << "\" has no unit! What kind of physicist are you?" << endl;
 	}
+
+	if( tf1 == "" || tf1.empty() ) tf1 = name;
 }
 
 //Destructor
@@ -43,8 +43,13 @@ ObservableContinuousConstraint::~ObservableContinuousConstraint()
 {
 }
 
+string ObservableContinuousConstraint::GetName() const
+{
+	return name;
+}
+
 //Get and set the minimum
-double ObservableContinuousConstraint::GetMinimum()
+double ObservableContinuousConstraint::GetMinimum() const
 {       
 	return minimum;
 }
@@ -61,7 +66,7 @@ void ObservableContinuousConstraint::SetMinimum(double NewMinimum)
 }
 
 //Get and set the maximum
-double ObservableContinuousConstraint::GetMaximum()
+double ObservableContinuousConstraint::GetMaximum() const
 {       
 	return maximum;
 }
@@ -78,7 +83,7 @@ void ObservableContinuousConstraint::SetMaximum(double NewMaximum)
 }
 
 //Return an error
-vector<double> ObservableContinuousConstraint::GetValues()
+vector<double> ObservableContinuousConstraint::GetValues() const
 {
 	cerr << "Values of constraint requested, but constraint is continuous" << endl;
 	vector<double> emptyVector;
@@ -102,13 +107,13 @@ void ObservableContinuousConstraint::SetLimits(double NewMaximum, double NewMini
 }
 
 //Get the unit
-string ObservableContinuousConstraint::GetUnit()
+string ObservableContinuousConstraint::GetUnit() const
 {
 	return unit;
 }
 
 //Check whether an observable fits with this constraint
-bool ObservableContinuousConstraint::CheckObservable( Observable * TestObservable )
+bool ObservableContinuousConstraint::CheckObservable( Observable * TestObservable ) const
 {
 	//Check the units are the same
 	if ( TestObservable->GetUnit() != unit )
@@ -121,22 +126,59 @@ bool ObservableContinuousConstraint::CheckObservable( Observable * TestObservabl
 }
 
 //Create an observable within this constraint, without specifying a random number generator
-Observable * ObservableContinuousConstraint::CreateObservable()
+Observable * ObservableContinuousConstraint::CreateObservable() const
 {
 	TRandom3 * random = new TRandom3(0);
-	Observable * returnObservable = CreateObservable(random);
+	Observable * returnObservable = this->CreateObservable(random);
 	delete random;
 	return returnObservable;
 }
 
 //Create an observable within this constraint, using the specified random number generator
-Observable * ObservableContinuousConstraint::CreateObservable( TRandom3 * RandomNumberGenerator )
+Observable * ObservableContinuousConstraint::CreateObservable( TRandom3 * RandomNumberGenerator ) const
 {
 	double value = minimum + ( ( maximum - minimum ) * RandomNumberGenerator->Rndm() );
-	return new Observable( "Unknown", value, 0.0, unit );
+	return new Observable( name, value, 0.0, unit );
 }
 
-bool ObservableContinuousConstraint::IsDiscrete()
+bool ObservableContinuousConstraint::IsDiscrete() const
 {
 	return false;
 }
+
+void ObservableContinuousConstraint::Print() const
+{
+	cout << "Maximum: " << maximum << "\tMinimum: " << minimum << "\tUnit: " << unit << endl;
+}
+
+Observable* ObservableContinuousConstraint::GetMidRangeValue() const
+{
+	double err=(maximum-minimum)/2.;
+	return new Observable( name, minimum+err, err, unit ); 
+}
+
+string ObservableContinuousConstraint::GetTF1() const
+{
+	return tf1;
+}
+
+void ObservableContinuousConstraint::SetTF1( const string input )
+{
+	tf1 = input;
+}
+
+string ObservableContinuousConstraint::XML() const
+{
+	stringstream xml;
+
+	xml << "\t<Observable>" << endl;
+	xml << "\t\t<Name>" << name << "</Name>" << endl;
+	xml << "\t\t<Minimum>" << minimum << "</Minimum>" << endl;
+	xml << "\t\t<Maximum>" << maximum << "</Maximum>" << endl;
+	xml << "\t\t<Unit>" << unit << "</Unit>" << endl;
+	if( !tf1.empty() ) xml << "\t\t<TF1>" << tf1 << "</TF1>" << endl;
+	xml << "\t</Observable>" << endl;
+
+	return xml.str();
+}
+

@@ -13,24 +13,22 @@
 #include "StringProcessing.h"
 //	System Headers
 #include <iostream>
-#include 	<stdlib.h>
-
-//Default constructor
-PhysicsBottle::PhysicsBottle() : allPDFs(), allDataSets(), allConstraints(), bottleParameters(), finalised(false)
-{
-}
+#include <stdlib.h>
 
 //Constructor with correct argument
-PhysicsBottle::PhysicsBottle(ParameterSet * NewParameters) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(NewParameters), finalised(false)
+PhysicsBottle::PhysicsBottle( ParameterSet * NewParameters ) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(new ParameterSet( *NewParameters) ), finalised(false)
 {
 }
 
-PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) : allPDFs(), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters(newParameters.bottleParameters), finalised(newParameters.finalised)
+PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) :
+	allPDFs(), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters(), finalised(newParameters.finalised)
 {
 	for( unsigned int i=0; i< newParameters.allPDFs.size(); ++i )
 	{
-		allPDFs.push_back( ClassLookUp::CopyPDF(newParameters.allPDFs[i]) );
+		allPDFs.push_back( ClassLookUp::CopyPDF( newParameters.allPDFs[i] ) );
 	}
+	if( newParameters.bottleParameters == NULL ) bottleParameters = NULL;
+	else bottleParameters = new ParameterSet( *newParameters.bottleParameters );
 }
 
 //Destructor
@@ -41,7 +39,7 @@ PhysicsBottle::~PhysicsBottle()
 		if( allPDFs.back() != NULL ) delete allPDFs.back();
 		allPDFs.pop_back();
 	}
-	//cout << "Hello from PhysicsBottle destructor" << endl;
+	if( bottleParameters != NULL ) delete bottleParameters;
 }
 
 //Store a PDF/dataset pair
@@ -64,6 +62,7 @@ void PhysicsBottle::AddConstraint( ConstraintFunction * NewConstraint )
 {
 	allConstraints.push_back(NewConstraint);
 }
+
 vector< ConstraintFunction* > PhysicsBottle::GetConstraints()
 {
 	return allConstraints;
@@ -112,12 +111,13 @@ ParameterSet * PhysicsBottle::GetParameterSet()
 //Change the parameter values
 bool PhysicsBottle::SetParameterSet(ParameterSet * NewParameters)
 {
-	if ( bottleParameters->SetPhysicsParameters( NewParameters ) )
+	if( bottleParameters->SetPhysicsParameters( NewParameters ) )
 	{
 		//Propagate the change to all stored PDFs
 		for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); ++pdfIndex)
 		{
-			allPDFs[pdfIndex]->SetPhysicsParameters( bottleParameters );
+			allPDFs[pdfIndex]->UpdatePhysicsParameters( bottleParameters );
+			allPDFs[pdfIndex]->UnsetCache();
 		}
 
 		return true;
@@ -129,33 +129,4 @@ bool PhysicsBottle::SetParameterSet(ParameterSet * NewParameters)
 	}
 }
 
-//Make the bottle read only, and cull unused parameters: "Seal the bottle"
-void PhysicsBottle::Finalise()
-{
-	if (finalised)
-	{
-		cout << "Bottle already finalised" << endl;
-	}
-	else
-	{
-		//Create a unique vector of parameters that are used
-		vector<string> usedParameters;
-		for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); ++pdfIndex )
-		{
-			usedParameters = StringProcessing::CombineUniques( usedParameters, allPDFs[pdfIndex]->GetPrototypeParameterSet() );
-		}
 
-		//Create a new parameter set, containing only those that are used
-		ParameterSet * culledParameters = new ParameterSet(usedParameters);
-		for (unsigned int usedIndex = 0; usedIndex < usedParameters.size(); ++usedIndex )
-		{
-			PhysicsParameter * usedParameter = bottleParameters->GetPhysicsParameter( usedParameters[usedIndex] );
-			culledParameters->SetPhysicsParameter( usedParameters[usedIndex], usedParameter );
-		}
-
-		//Replace the bottle's parameter set pointer
-		bottleParameters = culledParameters;
-
-		finalised = true;
-	}
-}

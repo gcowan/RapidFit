@@ -15,6 +15,7 @@
 #include "ProdPDF.h"
 #include "StringProcessing.h"
 #include "AcceptReject.h"
+#include "IConstraint.h"
 #include "ObservableContinuousConstraint.h"
 #include "ObservableDiscreteConstraint.h"
 #include "Blinder.h"
@@ -29,13 +30,8 @@
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
-//Default constructor
-XMLConfigReader::XMLConfigReader() : All_XML_Tags(new XMLTag()), children(), isLoaded(false), seed(0), ParamSet_index(0)
-{
-}
-
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : All_XML_Tags(new XMLTag(OverrideXML)), children(), isLoaded(false), seed(0), ParamSet_index(0)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -46,7 +42,6 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 	}
 
 	//Read the whole file into a vector
-	vector<string> wholeFile;
 	while ( configFile.good() )
 	{
 		string newLine;
@@ -56,40 +51,17 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 	StringProcessing::RemoveWhiteSpace(wholeFile);
 
 
-//	THIS CAUSES MORE HEADACHES THAN IT FIXES WE WOULD LIKE TO MOVE TO USING A PROPER XML PARSER IN THE FUTURE ANYWAY!
+	//	THIS CAUSES MORE HEADACHES THAN IT FIXES WE WOULD LIKE TO MOVE TO USING A PROPER XML PARSER IN THE FUTURE ANYWAY!
 
-	//Check the root tag is correct
-//	if ( wholeFile[0] == "<RapidFit>" && wholeFile[ wholeFile.size() - 1 ] == "</RapidFit>" )
-//	{
-		//Parse the first level tags
-//		vector<string> middleOfFile;
-//	for ( unsigned int lineIndex = 1; lineIndex < wholeFile.size() -1; ++lineIndex )
-//	{
-//		middleOfFile.push_back( wholeFile[lineIndex] );
-//	}
 	vector<string> value;
 	vector<XMLTag*> File_Tags = All_XML_Tags->FindTagsInContent( wholeFile, value );
 	children = File_Tags[0]->GetChildren();
-
-//		//Anything in "value" is considered debug data
-//		for ( unsigned int valueIndex = 0; valueIndex < value.size(); ++valueIndex )
-//		{
-//			cout << value[valueIndex] << endl;
-//		}
-//	}
-//	else
-//	{
-//		cerr << "Config file in wrong format: root tag is \"" << wholeFile[0] << "\" not \"<RapidFit>\"" << endl;
-//		exit(1);
-//	}
 
 	if( ( File_Tags.size() != 1) || ( children.size() == 0 ) )
 	{
 		cerr << "Error processing XMLFile" << endl;
 		exit( -234 );
 	}
-
-	isLoaded = true;
 }
 
 //Destructor
@@ -99,32 +71,16 @@ XMLConfigReader::~XMLConfigReader()
 	//cout << "Hello from XMLConfigReader destructor" << endl;
 }
 
-//Return whether file is loaded
-bool XMLConfigReader::IsLoaded()
+vector<string> XMLConfigReader::GetXML() const
 {
-	return isLoaded;
+	return wholeFile;
 }
 
-//Return the parameter set
-//ParameterSet * XMLConfigReader::GetFitParameters()
-//{
-//	//Find the ParameterSet tag
-//	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
-//	{
-//		if ( children[childIndex]->GetName() == "ParameterSet" )
-//		{
-//			return GetParameterSet( children[childIndex] );
-//		}
-//	}
-
-//	//If no such tag is found, fail
-//	cerr << "ParameterSet tag not found in config file" << endl;
-//	exit(1);
-//}
-
-vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandLineParam )
+ParameterSet* XMLConfigReader::GetFitParameters( vector<string> CommandLineParam )
 {
-	vector<ParameterSet*> RawParameters = XMLConfigReader::GetFitParameters();
+	ParameterSet* RawParameters = this->GetRawFitParameters();
+
+	if( CommandLineParam.empty() ) return RawParameters;
 
 	for( unsigned int i=0; i < CommandLineParam.size() ; ++i )
 	{
@@ -136,45 +92,44 @@ vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandL
 			exit(-598);
 		}
 		bool found_parameter=false;
-		for( unsigned int j=0; j < RawParameters.size(); ++j )
-		{
-			bool local_find = false;
-			PhysicsParameter* try_get_param=NULL;
-			try{
-				try_get_param = RawParameters[j]->GetPhysicsParameter( input_args[0] );
-				local_find = true;
-			}
-			catch( int e )
-			{
-				local_find = false;
-			}
 
-			if( local_find )
-			{
-				string Unit = try_get_param->GetUnit();
-
-				//		min			-		max			< 	1E-5
-
-				double step = strtod(input_args[4].c_str(),NULL);
-				double max = strtod(input_args[3].c_str(),NULL);
-				double min = strtod(input_args[2].c_str(),NULL);
-				double val = strtod(input_args[1].c_str(),NULL);
-				string type = input_args[5];
-
-				if( ( ( fabs( min - max ) < 	1E-6 ) && ( max < 1E-6 ) ) || (type=="Fixed") )
-				{
-					//		Unbounded				name	value	step	type	unit
-					PhysicsParameter* new_param = new PhysicsParameter( input_args[0], val , step, type, Unit);
-					RawParameters[j]->SetPhysicsParameter( input_args[0], new_param );
-				}
-				else
-				{
-					//					name	val	min	max	step	type	unit
-					RawParameters[j]->SetPhysicsParameter( input_args[0], val, min, max, step, type, Unit );
-				}
-				found_parameter = local_find;
-			}
+		bool local_find = false;
+		PhysicsParameter* try_get_param=NULL;
+		try{
+			try_get_param = RawParameters->GetPhysicsParameter( input_args[0] );
+			local_find = true;
 		}
+		catch( int e )
+		{
+			local_find = false;
+		}
+
+		if( local_find )
+		{
+			string Unit = try_get_param->GetUnit();
+
+			//		min			-		max			< 	1E-5
+
+			double step = strtod(input_args[4].c_str(),NULL);
+			double max = strtod(input_args[3].c_str(),NULL);
+			double min = strtod(input_args[2].c_str(),NULL);
+			double val = strtod(input_args[1].c_str(),NULL);
+			string type = input_args[5];
+
+			if( ( ( fabs( min - max ) < 	1E-6 ) && ( max < 1E-6 ) ) || (type=="Fixed") )
+			{
+				//		Unbounded				name	value	step	type	unit
+				PhysicsParameter* new_param = new PhysicsParameter( input_args[0], val , step, type, Unit);
+				RawParameters->SetPhysicsParameter( input_args[0], new_param );
+			}
+			else
+			{
+				//					name	val	min	max	step	type	unit
+				RawParameters->SetPhysicsParameter( input_args[0], val, min, max, step, type, Unit );
+			}
+			found_parameter = local_find;
+		}
+
 		if( !found_parameter )
 		{
 			cerr << "Couldn't find parameter: " << input_args[0] << " exiting!" << endl;
@@ -182,25 +137,29 @@ vector<ParameterSet*> XMLConfigReader::GetFitParameters( vector<string> CommandL
 		}
 	}
 
+
 	return RawParameters;
 }
 
-vector<ParameterSet*> XMLConfigReader::GetFitParameters()
+ParameterSet* XMLConfigReader::GetRawFitParameters()
 {
 	vector<ParameterSet*> All_Parameters;
 	//Find the ParameterSet tag
-	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
+	for( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ParameterSet" )
 		{
 			All_Parameters.push_back( GetParameterSet( children[childIndex] ) );
 		}
 	}
+	if( All_Parameters.empty() ) All_Parameters.push_back( new ParameterSet( vector<string>()) );
 
-	if( !All_Parameters.empty() )	return All_Parameters;
-	//If no such tag is found, fail
-	cerr << "ParameterSet tag not found in config file" << endl;
-	exit(1);
+	ParameterSet* output = new ParameterSet( All_Parameters );
+	for( vector<ParameterSet*>::iterator param_i = All_Parameters.begin(); param_i != All_Parameters.end(); ++param_i )
+	{
+		delete *param_i;
+	}
+	return output;
 }
 
 //Return the minimiser for the fit
@@ -241,11 +200,11 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		}
 		else
 		{
-                        //New style - can have weights
-                        for ( unsigned int childIndex = 0; childIndex < minimiserComponents.size(); ++childIndex )
-                        {
-                                if ( minimiserComponents[childIndex]->GetName() == "MinimiserName" )
-                                {
+			//New style - can have weights
+			for ( unsigned int childIndex = 0; childIndex < minimiserComponents.size(); ++childIndex )
+			{
+				if ( minimiserComponents[childIndex]->GetName() == "MinimiserName" )
+				{
 					minimiserName = minimiserComponents[childIndex]->GetValue()[0];
 				}
 				else if( minimiserComponents[childIndex]->GetName() == "MaxSteps" )
@@ -306,8 +265,8 @@ OutputConfiguration * XMLConfigReader::GetOutputConfiguration()
 	}
 
 	//If no such tag is found, make default
-	cout << "Output tag not found in config file - using default" << endl;
-	return new OutputConfiguration();
+	//cout << "Output tag not found in config file - using default" << endl;
+	return new OutputConfiguration( vector<pair<string,string> >(), string("undefined"), vector<ScanParam*>(), vector<pair<ScanParam*,ScanParam*> >(), vector<CompPlotter_config*>()  );
 }
 
 //Make an output configuration object
@@ -316,11 +275,12 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 	if ( OutputTag->GetName() == "Output" )
 	{
 		vector< pair< string, string > > contourPlots;
-		vector<string> projections;
-//		vector<string> LLscanList;
+		vector<string> componentprojections;
 		string pullType = "None";
 		vector<ScanParam*> ScanParameters;
 		vector<pair<ScanParam*, ScanParam*> > _2DScanParameters;
+
+		vector<CompPlotter_config*> compPlotter_vec;
 
 		vector< XMLTag* > outputComponents = OutputTag->GetChildren();
 		for ( unsigned int childIndex = 0; childIndex < outputComponents.size(); ++childIndex )
@@ -331,7 +291,11 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 			else if ( outputComponents[childIndex]->GetName() == "Projection" )
 			{
-				projections.push_back( outputComponents[childIndex]->GetValue()[0] );
+				compPlotter_vec.push_back( getCompPlotterConfigs( outputComponents[childIndex] ) );
+			}
+			else if ( outputComponents[childIndex]->GetName() == "ComponentProjection" )
+			{
+				compPlotter_vec.push_back( getCompPlotterConfigs( outputComponents[childIndex] ) );
 			}
 			else if ( outputComponents[childIndex]->GetName() == "DoPullPlots" )
 			{
@@ -360,13 +324,128 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 		}
 
-		return new OutputConfiguration( contourPlots, projections, pullType, ScanParameters, _2DScanParameters );
+		return new OutputConfiguration( contourPlots, pullType, ScanParameters, _2DScanParameters, compPlotter_vec );
 	}
 	else
 	{
 		cerr << "Incorrect xml tag provided: \"" << OutputTag->GetName() << "\" not \"Output\"" << endl;
 		exit(1);
 	}
+}
+
+CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
+{
+	vector< XMLTag* > projComps = CompTag->GetChildren();
+
+	CompPlotter_config* returnable_config = new CompPlotter_config();
+
+	returnable_config->observableName = "Undefined";
+	returnable_config->data_bins = 100;
+	returnable_config->PDF_points = 128;
+	returnable_config->logY = false;
+
+	returnable_config->xmin = -999;
+	returnable_config->xmax = -999;
+	returnable_config->ymin = -999;
+	returnable_config->ymax = -999;
+
+	returnable_config->CalcChi2 = false;
+	returnable_config->Chi2Value = -999;
+
+	returnable_config->OnlyZero = false;
+
+	//	If we have no extra config just take the name and use defaults
+	if( projComps.size() == 0 )
+	{
+		returnable_config->observableName = CompTag->GetValue()[0];
+		if( CompTag->GetName() == "Projection" ) returnable_config->OnlyZero = true;
+		else returnable_config->OnlyZero = false; 
+	}
+	else
+	{
+		for( unsigned int childIndex = 0; childIndex < projComps.size(); ++childIndex )
+		{
+			if( projComps[childIndex]->GetName() == "DataBins" )
+			{
+				returnable_config->data_bins = atoi( projComps[childIndex]->GetValue()[0].c_str() );
+			}
+			else if( projComps[childIndex]->GetName() == "PDFpoints" )
+			{
+				returnable_config->PDF_points = atoi( projComps[childIndex]->GetValue()[0].c_str() );
+			}
+			else if( projComps[childIndex]->GetName() == "LogY" )
+			{
+				string value =  projComps[childIndex]->GetValue()[0];
+				if( value == "True" )
+				{
+					returnable_config->logY = true;
+				}
+			}
+			else if( projComps[childIndex]->GetName() == "Name" )
+			{
+				returnable_config->observableName = projComps[childIndex]->GetValue()[0];
+			}
+			else if( projComps[childIndex]->GetName() == "ColorKey" )
+			{
+				vector<string> colors = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
+				if( colors.empty() ) returnable_config->style_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
+				for( vector<string>::iterator color_i = colors.begin(); color_i != colors.end(); ++color_i ) returnable_config->color_key.push_back( atoi( color_i->c_str() ) );
+			}
+			else if( projComps[childIndex]->GetName() == "StyleKey" )
+			{
+				vector<string> styles = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
+				if( styles.empty() ) returnable_config->style_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
+				for( vector<string>::iterator style_i = styles.begin(); style_i != styles.end(); ++style_i ) returnable_config->style_key.push_back( atoi( style_i->c_str() ) );
+			}
+			else if( projComps[childIndex]->GetName() == "Title" )
+			{
+				returnable_config->PlotTitle = projComps[childIndex]->GetValue()[0];
+			}
+			else if( projComps[childIndex]->GetName() == "CompNames" )
+			{
+				returnable_config->component_names = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
+				if( returnable_config->component_names.empty() ) returnable_config->component_names.push_back( projComps[childIndex]->GetValue()[0] );
+			}
+			else if( projComps[childIndex]->GetName() == "Xmax" )
+			{
+				returnable_config->xmax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+			}
+			else if( projComps[childIndex]->GetName() == "Xmin" )
+			{	
+				returnable_config->xmin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+			}
+			else if( projComps[childIndex]->GetName() == "Ymax" )
+			{
+				returnable_config->ymax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+			}
+			else if( projComps[childIndex]->GetName() == "Ymin" )
+			{
+				returnable_config->ymin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+			}
+			else if( projComps[childIndex]->GetName() == "XTitle" )
+			{
+				returnable_config->xtitle = TString(projComps[childIndex]->GetValue()[0]);
+			}
+			else if( projComps[childIndex]->GetName() == "YTitle" )
+			{
+				returnable_config->ytitle = TString(projComps[childIndex]->GetValue()[0]);
+			}
+			else if( projComps[childIndex]->GetName() == "CalcChi2" )
+			{
+				string value =  projComps[childIndex]->GetValue()[0];
+				if( value == "True" )
+				{
+					returnable_config->CalcChi2 = true;
+				}
+			}
+			else
+			{
+				cerr << "Sorry Don't understand: " << projComps[childIndex]->GetName() << " ignoring!" << endl;
+			}
+		}
+	}
+
+	return returnable_config;
 }
 
 //Return the pair of observables to plot the function contours for
@@ -480,6 +559,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		string Trace_FileName;
 		string Strategy;
 		int Threads = -1;
+		bool integratorTest = true;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		if ( functionInfo.size() == 0 )
 		{
@@ -514,6 +594,17 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 				{
 					Threads = atoi( functionInfo[childIndex]->GetValue()[0].c_str() );
 				}
+				else if ( functionInfo[childIndex]->GetName() == "SetIntegratorTest" )
+				{
+					if( functionInfo[childIndex]->GetValue()[0] == "True" )
+					{
+						integratorTest = true;
+					}
+					else
+					{
+						integratorTest = false;
+					}
+				}
 				else
 				{
 					cerr << "Unrecognised FitFunction component: " << functionInfo[childIndex]->GetName() << endl;
@@ -546,6 +637,8 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		}
 
 		returnable_function->SetThreads( Threads );
+
+		returnable_function->SetIntegratorTest( integratorTest );
 
 		return returnable_function;
 	}
@@ -894,15 +987,23 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 				{
 					//Unbounded parameter
 					PhysicsParameter * p = new PhysicsParameter( ParameterName, value, stepSize, type, unit );
-					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
-					return p ;
+					if( hasBlindString && hasBlindScale )
+					{
+						p->SetBlindOffset( blindOffset );
+						p->SetBlindingInfo( blindString.c_str(), blindScale );
+					}
+					return p;
 				}
 				else
 				{
 					//Bounded parameter
 					PhysicsParameter * p =  new PhysicsParameter( ParameterName, value, minimum, maximum, stepSize, type, unit );
-					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
-					return p ;
+					if( hasBlindString && hasBlindScale )
+					{
+						p->SetBlindOffset( blindOffset ) ;
+						p->SetBlindingInfo( blindString.c_str(), blindScale );
+					}
+					return p;
 				}
 			}
 			else
@@ -926,7 +1027,11 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 				{
 					//Unbounded parameter
 					PhysicsParameter * p =  new PhysicsParameter( ParameterName, value, stepSize, type, unit );
-					if( hasBlindString && hasBlindScale ) p->SetBlindOffset( blindOffset ) ;
+					if( hasBlindString && hasBlindScale )
+					{
+						p->SetBlindOffset( blindOffset );
+						p->SetBlindingInfo( blindString.c_str(), blindScale );
+					}
 					return p ;
 				}
 			}
@@ -957,7 +1062,6 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		PhaseSpaceBoundary * dataBoundary=NULL;
 		vector<string> dataArguments, argumentNames;
 		bool boundaryFound = false;
-		vector< IPrecalculator* > dataProcessors;
 		vector< DataSetConfiguration* > dataSetMakers;
 		bool generatePDFFlag = false;
 		IPDF * generatePDF=NULL;
@@ -998,10 +1102,6 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 				generatePDF = GetPDF( dataComponents[dataIndex], dataBoundary );
 				generatePDFFlag = true;
 			}
-			else if ( name == "Precalculator" )
-			{
-				dataProcessors.push_back( MakePrecalculator( dataComponents[dataIndex], dataBoundary ) );
-			}
 			else if ( name == "StartingEntry" )
 			{
 				if( Starting_Value < 0 )
@@ -1030,17 +1130,17 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 
 			if (generatePDFFlag)
 			{
-				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, generatePDF );
+				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, generatePDF, dataBoundary );
 			}
 			else
 			{
 				if( Starting_Value > 0 )
 				{
-					oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, Starting_Value );
+					oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, Starting_Value, dataBoundary );
 				}
 				else
 				{
-					oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, 0 );
+					oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, 0 , dataBoundary );
 				}
 			}
 
@@ -1049,7 +1149,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 
 		//Make the objects
 		IPDF * fitPDF = GetPDF( FitPDFTag, dataBoundary );
-		return new PDFWithData( fitPDF, dataBoundary, dataSetMakers, dataProcessors);
+		return new PDFWithData( fitPDF, dataBoundary, dataSetMakers );
 	}
 	else
 	{
@@ -1208,8 +1308,9 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 		//Create some default values;
 		Name = "Uninitialised";
 		string unit = "Uninitialised";
-		double minimum = 0.0;
-		double maximum = 0.0;
+		string tf1;
+		double minimum = -9999.0;
+		double maximum = -9999.0;
 		vector<double> allValues;
 
 		//Loop over the tag children, which correspond to the parameter elements
@@ -1236,6 +1337,10 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 			{
 				unit = elements[elementIndex]->GetValue()[0];
 			}
+			else if ( elements[elementIndex]->GetName() == "TF1" )
+			{
+				tf1 = elements[elementIndex]->GetValue()[0];
+			}
 			else
 			{
 				cerr << "Unrecognised constraint configuration: " <<  elements[elementIndex]->GetName() << endl;
@@ -1243,20 +1348,26 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 			}
 		}
 
+		if( tf1.empty() ) tf1 = Name;
+
+		IConstraint* returnable_const=NULL;
+
 		//If there are discrete values, make a discrete constraint
 		if ( allValues.size() > 0 )
 		{
-			return new ObservableDiscreteConstraint( Name, allValues, unit );
+			returnable_const = new ObservableDiscreteConstraint( Name, allValues, unit, tf1 );
 		}
 		else
 		{
-			return new ObservableContinuousConstraint( Name, minimum, maximum, unit );
+			returnable_const = new ObservableContinuousConstraint( Name, minimum, maximum, unit, tf1 );
 		}
+
+		return returnable_const;
 	}
 	else
 	{
 		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"Observable\"" << endl;
-		exit(1);
+		exit(18);
 	}
 }
 
@@ -1303,7 +1414,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		}
 
 		//Check if the name is recognised as a PDF
-		returnable_NamedPDF = ClassLookUp::LookUpPDFName( name, observableNames, parameterNames, configurator );
+		returnable_NamedPDF = ClassLookUp::LookUpPDFName( name, configurator );
 	}
 	else
 	{
@@ -1311,7 +1422,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 		exit(1);
 	}
 
-//	returnable_NamedPDF->SetRandomFunction( GetSeed() );
+	//	returnable_NamedPDF->SetRandomFunction( GetSeed() );
 	return returnable_NamedPDF;
 }
 
@@ -1319,12 +1430,12 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
 {
 	IPDF* returnable_SUMPDF;
+	vector< IPDF* > componentPDFs;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "SumPDF" )
 	{
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
 		string fractionName = "unspecified";
-		vector< IPDF* > componentPDFs;
 
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
@@ -1344,7 +1455,8 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		{
 			if ( fractionName == "unspecified" )
 			{
-				returnable_SUMPDF = new SumPDF( componentPDFs[0], componentPDFs[1], InputBoundary );
+				cerr << "Please provide fractionName" << endl;
+				exit(-87632);
 			}
 			else
 			{
@@ -1363,7 +1475,9 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		exit(1);
 	}
 
-//	returnable_SUMPDF->SetRandomFunction( GetSeed() );
+	returnable_SUMPDF->SetName( "Sum" );
+	returnable_SUMPDF->SetLabel( "Sum_("+componentPDFs[0]->GetLabel()+")v("+componentPDFs[1]->GetLabel()+")" );
+	//	returnable_SUMPDF->SetRandomFunction( GetSeed() );
 	return returnable_SUMPDF;
 }
 
@@ -1371,12 +1485,12 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
 {
 	IPDF* returnable_NormPDF;
+	vector< IPDF* > componentPDFs;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "NormalisedSumPDF" )
 	{
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
 		string fractionName = "unspecified";
-		vector< IPDF* > componentPDFs;
 
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
@@ -1416,7 +1530,8 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 	}
 
 	returnable_NormPDF->SetName( "NormalisedSum" );
-//	returnable_NormPDF->SetRandomFunction( GetSeed() );
+	returnable_NormPDF->SetLabel( "NormalisedSum_("+componentPDFs[0]->GetLabel()+")v("+componentPDFs[1]->GetLabel()+")" );
+	//	returnable_NormPDF->SetRandomFunction( GetSeed() );
 	return returnable_NormPDF;
 }
 
@@ -1424,11 +1539,11 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
 {
 	IPDF* returnable_ProdPDF;
+	vector< IPDF* > componentPDFs;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "ProdPDF" )
 	{
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
-		vector< IPDF* > componentPDFs;
 
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
@@ -1454,7 +1569,8 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 	}
 
 	returnable_ProdPDF->SetName( "Prod" );
-//	returnable_ProdPDF->SetRandomFunction( GetSeed() );
+	returnable_ProdPDF->SetLabel( "Prod["+componentPDFs[0]->GetLabel()+"]x["+componentPDFs[1]->GetLabel()+"]" );
+	//	returnable_ProdPDF->SetRandomFunction( GetSeed() );
 	return returnable_ProdPDF;
 }
 
@@ -1489,134 +1605,86 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	return returnable_pdf;
 }
 
-//  Return the Precalculators defined in the XML
-//  I don't want to add bloat and store the Precalculators as the file is loaded,
-//  this just leads to storing lots of not wanted data within this class
-//  I try to make use of the structure correctly
-vector<vector<IPrecalculator*> > XMLConfigReader::GetPrecalculators()
-{
-  	vector<vector<IPrecalculator*> > IPrecalculator_vec;
-	//Find the ParameterSets
-	vector< XMLTag* > toFits;
-	//  Children Defined globally on initialization!
-	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
-	{
-		if ( children[childIndex]->GetName() == "ToFit" )
-		{
-			toFits.push_back( children[childIndex] );
-		}
-	}
-	//  Loop over all of the fits
-	for ( unsigned short int fitnum=0; fitnum < toFits.size(); ++fitnum )
-	{
-		vector<XMLTag*> allChildren = toFits[fitnum]->GetChildren();
-		for( unsigned short int Childnum=0; Childnum < allChildren.size(); ++Childnum )
-		{
-			if( allChildren[Childnum]->GetName() == "DataSet" )
-			{
-				vector<IPrecalculator*> IPrecalculator_local_vec;
-				vector<XMLTag*> allFitDataSets = allChildren[Childnum]->GetChildren();
-				PhaseSpaceBoundary * dataBoundary=NULL;
-				bool boundaryFound=false;
-				for( unsigned short int DataSetNum=0; DataSetNum < allFitDataSets.size(); ++DataSetNum )
-				{
-					if( allFitDataSets[DataSetNum]->GetName() == "PhaseSpaceBoundary" )
-					{
-						boundaryFound = true;
-						dataBoundary = GetPhaseSpaceBoundary( allFitDataSets[DataSetNum] );
-					}
-					else if( ( allFitDataSets[DataSetNum]->GetName() == "Precalculator" ) && boundaryFound )
-					{
-						IPrecalculator_local_vec.push_back( MakePrecalculator( allFitDataSets[DataSetNum], dataBoundary ) );
-					}
-				}
-				IPrecalculator_vec.push_back( IPrecalculator_local_vec );
-			}
-
-		}
-	}
-	return IPrecalculator_vec;
-}
-
 //Make a precalculator for a data set
-IPrecalculator * XMLConfigReader::MakePrecalculator( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
+PrecalculatorConfig* XMLConfigReader::GetPrecalculatorConfig( )
 {
-	//Check the correct tag has been provided
-	if ( InputTag->GetName() == "Precalculator" )
-	{
-		//Parse the tag components
-		vector< IPDF* > componentPDFs;
-		string precalculatorName = "Unspecified";
-		string weightName = "Unspecified";
-		vector< XMLTag* > children = InputTag->GetChildren();
-		for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
-		{
-			string name = children[childIndex]->GetName();
-			if ( name == "Name" )
-			{
-				precalculatorName = children[childIndex]->GetValue()[0];
-			}
-			else if ( name == "WeightName" )
-			{
-				weightName = children[childIndex]->GetValue()[0];
-			}
-			else if ( name == "PDF" || name == "SumPDF" || name == "NormalisedSumPDF" || name == "ProdPDF" )
-			{
-				componentPDFs.push_back( GetPDF( children[childIndex], InputBoundary ) );
-			}
-			else
-			{
-				cerr << "Unrecognised Precalculator component: " << name << endl;
-				exit(1);
-			}
-		}
+	PrecalculatorConfig* preconfig = NULL;
 
-		//Check a signal and background PDF have been provided
-		if ( componentPDFs.size() == 2 )
-		{
-			return ClassLookUp::LookUpPrecalculator( precalculatorName, componentPDFs[0], componentPDFs[1], GetFitParameters(), weightName );
-		}
-		else
-		{
-			cerr << "Precalculator expecting 2 PDFs, not " << componentPDFs.size() << endl;
-			exit(1);
-		}
-	}
-	else
+	for( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
-		cerr << "Incorrect tag provided: \"" << InputTag->GetName() << "\" not \"Precalculator\"" << endl;
-		exit(1);
+		//Check the correct tag has been provided
+		if ( children[childIndex]->GetName() == "Precalculator" )
+		{
+			preconfig = new PrecalculatorConfig();
+			//Parse the tag components
+			string precalculatorName = "Unspecified";
+			string weightName = "Unspecified";
+			string filename = "WeightedFile";
+			int config=1;
+			vector< XMLTag* > newchildren = children[childIndex]->GetChildren();
+			for ( unsigned int newchildIndex = 0; newchildIndex < newchildren.size(); ++newchildIndex )
+			{
+				string name = newchildren[newchildIndex]->GetName();
+				if ( name == "Name" )
+				{
+					precalculatorName = newchildren[newchildIndex]->GetValue()[0];
+				}
+				else if ( name == "WeightName" )
+				{
+					weightName = newchildren[newchildIndex]->GetValue()[0];
+				}
+				else if ( name == "Config" )
+				{
+					config = atoi( newchildren[newchildIndex]->GetValue()[0].c_str() );
+				}
+				else if ( name == "OutputFile" )
+				{
+					filename = newchildren[newchildIndex]->GetValue()[0];
+				}
+				else
+				{
+					cerr << "Unrecognised Precalculator component: " << name << endl;
+					exit(1);
+				}
+			}
+			preconfig->SetCalculatorName( precalculatorName );
+			preconfig->SetWeightName( weightName );
+			preconfig->SetConfig( (unsigned)config );
+			preconfig->SetFileName( filename );
+			return preconfig;
+		}
 	}
+
+	return NULL;
 }
 
 
 //	Return the Integer Seed used in RapidFit XML tag <Seed>SomeInt</Seed>
 unsigned int XMLConfigReader::GetSeed()
 {
-	if( seed.empty() )
+	if( seed < 0 )
 	{
 		//Find the NumberRepeats tag
 		for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 		{
 			if ( children[childIndex]->GetName() == "Seed" )
 			{
-				seed.push_back ( abs( atoi( children[childIndex]->GetValue( )[0].c_str() ) ) );
-				cout << "Using seed: " << seed.back() << " from input file." << endl;
-				return unsigned(seed.back());
+				seed = abs( atoi( children[childIndex]->GetValue( )[0].c_str() ) );
+				cout << "Using seed: " << seed << " from input file." << endl;
+				return unsigned(seed);
 			}
 		}
-		seed.push_back( 0 );
+		seed = 0 ;
 		//If no such tag is found, report
 		cout << "Seed tag not found in config file, defaulting to TRandom3(0)." << endl;
-	} else  return unsigned(seed.back());
+	} else  return unsigned(seed);
 	return 0;
 }
 
 //	Set a new TRandom seed that is returned by the XMLFile
 void XMLConfigReader::SetSeed( unsigned int new_seed )
 {
-	while( !seed.empty() )  {  seed.pop_back();  }	//  Remove the old seed
-	seed.push_back(int(new_seed));			//  Set the new Random Seed
+	seed = (int)new_seed;
 }
 
 pair<ScanParam*, ScanParam*> XMLConfigReader::Get2DScanParam( XMLTag * InputTag )

@@ -41,11 +41,11 @@ int RapidRun::run()
 	Int_t result = RapidFit(count, argv);
 
 	//	Cleanup
-	for( int i=0; i<argc; ++i )
-	{
-		delete argv[i];
-	}
-	delete argv;
+	//for( int i=0; i<argc; ++i )
+	//{
+	//	delete argv[i];
+	//}
+	//delete argv;
 
 	return result;
 }

@@ -16,41 +16,48 @@
 #include "StringProcessing.h"
 #include "StatisticsFunctions.h"
 #include "ClassLookUp.h"
+#include "NormalisedSumPDF.h"
 //	System Headers
 #include <iostream>
 #include <iomanip>
 #include <cmath>
 #include <stdlib.h>
 #include <float.h>
+#include <pthread.h>
+
+pthread_mutex_t multi_mutex;
+pthread_mutex_t multi_mutex2;
+pthread_mutex_t multi_mutex3;
 
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
-using namespace std;
+using namespace::std;
 
 //1% tolerance on integral value
-const double INTEGRAL_PRECISION_THRESHOLD = 0.01;
-
-//Default constructor
-RapidFitIntegrator::RapidFitIntegrator() : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(false), fastIntegrator(NULL), functionToWrap(NULL), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(), forceNumerical(), cacheSetUp(), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals(), loud(true)
-{
-}
+//const double INTEGRAL_PRECISION_THRESHOLD = 0.01;
 
 //Constructor with correct argument
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) : ratioOfIntegrals(), cumulativeError(), numberCalls(), testFast(), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL), functionCanIntegrate(false), functionCanProject(false), haveTestedIntegral(false), forceNumerical(ForceNumerical), cacheSetUp(false), discreteNames(), continuousNames(), discreteValues(), discreteCombinations(), cachedIntegrals(), loud(true)
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) :
+	ratioOfIntegrals(-1.), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL),
+	functionCanIntegrate(false), haveTestedIntegral(false),
+	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list()
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
-	multiDimensionIntegrator->SetAbsTolerance( 1E-9 );
+#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
+	multiDimensionIntegrator->SetAbsTolerance( 1E-9 );      //      Absolute error for things such as plots
+	multiDimensionIntegrator->SetRelTolerance( 1E-6 );
+	multiDimensionIntegrator->SetMaxPts( 1000000 );		//	These are the defaults, and it's unlikely you will be able to realistically push the integral without using "double double"'s
+#endif
 
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
 	oneDimensionIntegrator = new IntegratorOneDim(type);
 }
 
-RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : ratioOfIntegrals( input.ratioOfIntegrals ), cumulativeError( input.cumulativeError ), numberCalls( input.numberCalls ),
-	testFast( input.testFast ), fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
-	functionCanIntegrate( input.functionCanIntegrate ), functionCanProject( input.functionCanProject ), haveTestedIntegral( input.haveTestedIntegral ), forceNumerical( input.forceNumerical ),
-	cacheSetUp( input.cacheSetUp ), discreteNames( input.discreteNames ), continuousNames( input.continuousNames ), discreteValues( input.discreteValues ),
-	discreteCombinations( input.discreteCombinations ), cachedIntegrals( input.cachedIntegrals ), loud( false )
+RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : ratioOfIntegrals( input.ratioOfIntegrals ),
+	fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
+	functionCanIntegrate( input.functionCanIntegrate ), haveTestedIntegral( input.haveTestedIntegral ),
+	RapidFitIntegratorNumerical( input.RapidFitIntegratorNumerical ), obs_check( input.obs_check ), checked_list( input.checked_list )
 {
 	//	We don't own the PDF so no need to duplicate it as we have to be told which one to use
 	//if( input.functionToWrap != NULL ) functionToWrap = ClassLookUp::CopyPDF( input.functionToWrap );
@@ -59,13 +66,19 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 	if( input.fastIntegrator != NULL ) fastIntegrator = new FoamIntegrator( *(input.fastIntegrator) );
 	if( input.multiDimensionIntegrator != NULL ) 
 	{
-		multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
-		multiDimensionIntegrator->SetAbsTolerance( 1E-9 );
+		multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();// *(input.multiDimensionIntegrator) );//new AdaptiveIntegratorMultiDim();
+		//      These functions only exist with ROOT > 5.27 I think, at least they exist in 5.28/29
+#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
+		multiDimensionIntegrator->SetAbsTolerance( 1E-9 );      //      Absolute error for things such as plots
+		multiDimensionIntegrator->SetRelTolerance( 1E-6 );
+		multiDimensionIntegrator->SetMaxPts( 1000000 );
+#endif
 	}
 	if( input.oneDimensionIntegrator != NULL )
 	{
 		ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
-		oneDimensionIntegrator = new IntegratorOneDim( type );
+		(void) type;	//	For the global state of ROOT
+		oneDimensionIntegrator = new IntegratorOneDim( );//*(input.oneDimensionIntegrator) );
 	}
 }
 
@@ -73,14 +86,13 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 void RapidFitIntegrator::ProjectionSettings()
 {
 	//	These functions only exist with ROOT > 5.27 I think, at least they exist in 5.28/29
-	#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
-		multiDimensionIntegrator->SetAbsTolerance( 1E-5 );	//	Absolute error for things such as plots
-		multiDimensionIntegrator->SetRelTolerance( 1E-4 );
-		multiDimensionIntegrator->SetMaxPts( 100000000 );
-	#endif
+#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
+	multiDimensionIntegrator->SetAbsTolerance( 1E-4 );	//	Absolute error for things such as plots
+	multiDimensionIntegrator->SetRelTolerance( 1E-4 );
+	multiDimensionIntegrator->SetMaxPts( 10000 );
+#endif
 }
 
-//Destructor
 RapidFitIntegrator::~RapidFitIntegrator()
 {
 	if( multiDimensionIntegrator != NULL ) delete multiDimensionIntegrator;
@@ -89,121 +101,117 @@ RapidFitIntegrator::~RapidFitIntegrator()
 }
 
 //Return the integral over all observables
-double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, bool UseCache )
+double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
-	
-	UseCache = false ;
-	
 	if( functionToWrap == NULL )
 	{
-		  cerr << "WHAT ARE YOU DOING TO ME, YOUR TRYING TO INTEGRATE OVER A NULL OBJECT!!!" << endl;
-		  exit(-69);
+		cerr << "WHAT ARE YOU DOING TO ME, YOUR TRYING TO INTEGRATE OVER A NULL OBJECT!!!" << endl;
+		exit(-69);
 	}
 
-	//Make a list of observables not to integrate
-	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
+	double PDF_test_result = functionToWrap->Integral( NewDataPoint, NewBoundary );
+
+	functionCanIntegrate = (PDF_test_result >= 0.);
+
+	if( functionCanIntegrate == false )
+	{
+		//	PDF doesn't know how to Normalise no need to check PDF!
+		haveTestedIntegral = true;
+	}
+
+	bool cacheEnabled = functionToWrap->GetCachingEnabled();
 
 	//Test the integration method the function has provided
-	if ( haveTestedIntegral || forceNumerical )
+	if( haveTestedIntegral )
 	{
 		//If the function has been tested already, use the result
-		if ( functionCanIntegrate && !forceNumerical )
+		if( functionCanIntegrate && !RapidFitIntegratorNumerical )
 		{
-			return functionToWrap->Integral( NewDataPoint, NewBoundary );
+			return PDF_test_result;
 		}
 		else
 		{
-			//Check whether to use precalculated numerical integral, or to recalculate
-			if (UseCache)
+			double return_value = -5.;
+			if( functionToWrap->CacheValid( NewDataPoint, NewBoundary ) && cacheEnabled )
 			{
-				return GetCachedIntegral(NewDataPoint);
+				return_value = PDF_test_result;
 			}
 			else
 			{
-				return DoNumericalIntegral( NewDataPoint, NewBoundary, dontIntegrate );
+				//Make a list of observables not to integrate
+				vector<string> dontIntegrate = this->DontNumericallyIntegrateList( NewDataPoint );
+
+				return_value = this->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, dontIntegrate );
+
+				if( cacheEnabled )
+				{
+					functionToWrap->SetCache( return_value, NewDataPoint, NewBoundary );
+				}
 			}
+			return return_value;
 		}
 	}
 	else
 	{
-		haveTestedIntegral = true;
-		double testIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
-		double numericalIntegral = DoNumericalIntegral( NewDataPoint, NewBoundary, dontIntegrate );
-		cout << std::setprecision(5) ;
-
-		//Check if the function has an integrate method
-		if ( testIntegral > 0.0 )
-		{
-			//Check if the function's integrate method agrees with the numerical integral
-			if ( true /*abs( numericalIntegral - testIntegral) / testIntegral < INTEGRAL_PRECISION_THRESHOLD*/ )
-			{
-				//Trust the function's integration
-				if( loud == true ) cout << "Integration  Test: numerical : analytical   " << numericalIntegral << " :  " << testIntegral <<  "\t\t\tUsing ANALYTICAL in all cases" << endl;
-				ratioOfIntegrals = 1.;
-				functionCanIntegrate = true;
-				return testIntegral;
-			}
-			else
-			{
-				//Use numerical integration
-				cerr << "Function provides poor integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
-				ratioOfIntegrals = testIntegral/numericalIntegral;
-				//functionCanIntegrate = false;
-				//return numericalIntegral;
-
-				if (UseCache)
-				{
-					//Calculate the discrete combinations
-					SetUpIntegralCache(NewBoundary);
-
-					//Check validity of cache
-					double cachedIntegral = GetCachedIntegral(NewDataPoint);
-					if ( fabs( cachedIntegral - numericalIntegral ) / numericalIntegral < INTEGRAL_PRECISION_THRESHOLD )
-					{
-						cout << "Integral caching assumptions seem to be valid: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
-					}
-					else
-					{
-						cerr << "Integral caching error: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
-						throw( 13 );
-						//						exit(1);
-					}
-				}
-
-				functionCanIntegrate = true;
-				return testIntegral;
-			}
-		}
-		else
-		{
-			//Use numerical integration
-			cout << "Function provides no integration method: numerical " << numericalIntegral << " vs analytical " << testIntegral << endl;
-			functionCanIntegrate = false;
-			ratioOfIntegrals = 1.;
-
-			if (UseCache)
-			{
-				//Calculate the discrete combinations
-				SetUpIntegralCache(NewBoundary);
-
-				//Check validity of cache
-				double cachedIntegral = GetCachedIntegral(NewDataPoint);
-				if ( fabs( cachedIntegral - numericalIntegral ) / numericalIntegral < INTEGRAL_PRECISION_THRESHOLD )
-				{
-					cout << "Integral caching assumptions seem to be valid: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
-				}
-				else
-				{
-					cerr << "Integral caching error: numerical " << numericalIntegral << " vs cache " << cachedIntegral << endl;
-					throw( 13 );
-					//					exit(1);
-				}
-			}
-
-			return numericalIntegral;
-		}
+		return TestIntegral( NewDataPoint, NewBoundary );
 	}
 	return -1;
+}
+
+vector<string> RapidFitIntegrator::DontNumericallyIntegrateList( DataPoint* NewDataPoint, vector<string> input )
+{
+	//Make a list of observables not to integrate
+	vector<string> dontIntegrate;
+
+	//	If the Observables haven't been checked, check them.
+	if( !obs_check )
+	{    
+		vector<string> PDF_params = functionToWrap->GetPrototypeDataPoint();
+		vector<string> DataPoint_params;
+		if( NewDataPoint != NULL ) DataPoint_params = NewDataPoint->GetAllNames();
+		vector<string>::iterator data_i = DataPoint_params.begin();
+
+		vector<string> not_found_list;
+		vector<string> not_integrable = functionToWrap->GetDoNotIntegrateList();
+		for( ; data_i != DataPoint_params.end(); ++data_i )
+		{
+			if( StringProcessing::VectorContains( &PDF_params, &(*data_i) ) == -1 )
+			{
+				not_found_list.push_back( *data_i );
+			}
+		}
+		checked_list = StringProcessing::CombineUniques( not_found_list, not_integrable );
+		obs_check = true;
+	}
+
+	//	Observables have been checked, set the dontIntegrate list to be the same as the checked list
+	dontIntegrate = StringProcessing::CombineUniques( checked_list, input );
+
+	return dontIntegrate;
+}
+
+double RapidFitIntegrator::TestIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary )
+{
+	//Make a list of observables not to integrate
+	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
+
+	double testIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
+	double numericalIntegral = this->NumericallyIntegratePhaseSpace( NewBoundary, dontIntegrate );
+
+	//Check if the function has an integrate method
+	if( testIntegral > 0.0 )
+	{
+		//Check if the function's integrate method agrees with the numerical integral
+		//Trust the function's integration
+		ratioOfIntegrals = numericalIntegral/testIntegral;
+		functionCanIntegrate = true;
+		functionToWrap->SetCache( testIntegral, NewDataPoint, NewBoundary );
+
+		haveTestedIntegral = true;
+		return testIntegral;
+	}
+	haveTestedIntegral = true;
+	return -1.;
 }
 
 double RapidFitIntegrator::GetRatioOfIntegrals()
@@ -211,181 +219,179 @@ double RapidFitIntegrator::GetRatioOfIntegrals()
 	return ratioOfIntegrals;
 }
 
-IPDF * RapidFitIntegrator::GetPDF()
+IPDF * RapidFitIntegrator::GetPDF() const
 {
 	return functionToWrap;
 }
 
 void RapidFitIntegrator::SetPDF( IPDF* input )
 {
-	//if( functionToWrap != NULL ){ delete functionToWrap; }
 	functionToWrap = input;
 }
 
+double RapidFitIntegrator::OneDimentionIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
+{
+	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
+	//Find the observable range to integrate over
+	IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
+	double minimum = newConstraint->GetMinimum();
+	double maximum = newConstraint->GetMaximum();
+
+	//cout << "1D Integration" << endl;
+	//Do a 1D integration
+	oneDimensionIntegrator->SetFunction(*quickFunction);
+
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+	cout_bak = cout.rdbuf();
+	cerr_bak = cerr.rdbuf();
+	clog_bak = clog.rdbuf();
+	cout.rdbuf(0);
+	cerr.rdbuf(0);
+	clog.rdbuf(0);
+
+	double output = oneDimensionIntegrator->Integral( minimum, maximum );
+
+	cout.rdbuf( cout_bak );
+	cerr.rdbuf( cerr_bak );
+	clog.rdbuf( clog_bak );
+
+	delete quickFunction;
+
+	return output;
+}
+
+double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary,
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
+{
+	//Make arrays of the observable ranges to integrate over
+	double* minima = new double[ doIntegrate.size() ];
+	double* maxima = new double[ doIntegrate.size() ];
+
+	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
+	{
+		IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[observableIndex] );
+		minima[observableIndex] = (double)newConstraint->GetMinimum();
+		maxima[observableIndex] = (double)newConstraint->GetMaximum();
+	}
+
+	//Do a 2-15D integration
+
+	vector<double> minima_v, maxima_v;
+	for( unsigned int i=0; i< doIntegrate.size(); ++i )
+	{
+		minima_v.push_back( minima[i] );
+		maxima_v.push_back( maxima[i] );
+	}
+
+	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
+
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+	cout_bak = cout.rdbuf();
+	cerr_bak = cerr.rdbuf();
+	clog_bak = clog.rdbuf();
+	cout.rdbuf(0);
+	cerr.rdbuf(0);
+	clog.rdbuf(0);
+
+	multiDimensionIntegrator->SetFunction( *quickFunction );
+	double output =  multiDimensionIntegrator->Integral( minima, maxima );
+
+	delete minima; delete maxima;
+	delete quickFunction;
+
+	cout.rdbuf( cout_bak );
+	cerr.rdbuf( cerr_bak );
+	clog.rdbuf( clog_bak );
+
+	return output;
+}
+
+//	Integrate over all possible discrete combinations within the phase-space
+double RapidFitIntegrator::NumericallyIntegratePhaseSpace( PhaseSpaceBoundary* NewBoundary, vector<string> DontIntegrateThese, ComponentRef* componentIndex )
+{
+	return this->DoNumericalIntegral( NULL, NewBoundary, DontIntegrateThese, componentIndex, false );
+}
+
+//	Integrate over the given phase space using this given DataPoint. i.e. ONLY 1 UNIQUE discrete combination
+double RapidFitIntegrator::NumericallyIntegrateDataPoint( DataPoint* NewDataPoint, PhaseSpaceBoundary* NewBoundary, vector<string> DontIntegrateThese, ComponentRef* componentIndex )
+{
+	return this->DoNumericalIntegral( NewDataPoint, NewBoundary, DontIntegrateThese, componentIndex, true );
+}
+
 //Actually perform the numerical integration
-double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, vector<string> DontIntegrateThese )
+double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, vector<string> DontIntegrateThese, ComponentRef* componentIndex, bool IntegrateDataPoint )
 {
 	//Make lists of observables to integrate and not to integrate
 	vector<string> doIntegrate, dontIntegrate;
 	StatisticsFunctions::DoDontIntegrateLists( functionToWrap, NewBoundary, &DontIntegrateThese, doIntegrate, dontIntegrate );
 
-	//If there are no observables left to integrate over, just evaluate the function
-	if ( doIntegrate.size() == 0 )
+	dontIntegrate = StringProcessing::CombineUniques( dontIntegrate, DontIntegrateThese );
+	dontIntegrate = this->DontNumericallyIntegrateList( NewDataPoint, dontIntegrate );
+
+	vector<DataPoint*> DiscreteIntegrals;
+
+	if( IntegrateDataPoint )
 	{
-		//cout << "size == 0" << endl;
-		return functionToWrap->Evaluate(NewDataPoint);
+		DiscreteIntegrals.push_back( NewDataPoint );
 	}
 	else
 	{
-		//cout << "size == " << doIntegrate.size() << endl;
-		//Make the function wrapper
-		IntegratorFunction quickFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate );
+		DiscreteIntegrals = NewBoundary->GetDiscreteCombinations();
+	}
 
-		//Chose the one dimensional or multi-dimensional method
-		if ( doIntegrate.size() == 1 )
+	double output_val = 0.;
+
+	//If there are no observables left to integrate over, just evaluate the function
+	if( doIntegrate.size() == 0 )
+	{
+		for( vector<DataPoint*>::iterator dataPoint_i = DiscreteIntegrals.begin(); dataPoint_i != DiscreteIntegrals.end(); ++dataPoint_i )
 		{
-			//Find the observable range to integrate over
-			IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
-			double minimum = newConstraint->GetMinimum();
-			double maximum = newConstraint->GetMaximum();
-
-			//cout << "1D Integration" << endl;
-			//Do a 1D integration
-			oneDimensionIntegrator->SetFunction(quickFunction);
-			return oneDimensionIntegrator->Integral( minimum, maximum );
-		}
-		else
-		{
-			//Make arrays of the observable ranges to integrate over
-			double* minima = new double[ doIntegrate.size() ];
-			double* maxima = new double[ doIntegrate.size() ];
-			for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
-			{
-				IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[observableIndex] );
-				minima[observableIndex] = newConstraint->GetMinimum();
-				maxima[observableIndex] = newConstraint->GetMaximum();
-			}
-
-			//cout << "MultiDim Integration" << endl;
-			//Do a 2-15D integration
-			multiDimensionIntegrator->SetFunction(quickFunction);
-			return multiDimensionIntegrator->Integral( minima, maxima );
+			output_val += functionToWrap->Integral( *dataPoint_i, NewBoundary );
 		}
 	}
+	else
+	{
+		for( vector<DataPoint*>::iterator dataPoint_i = DiscreteIntegrals.begin(); dataPoint_i != DiscreteIntegrals.end(); ++dataPoint_i )
+		{
+			double numericalIntegral = 0.;
+			//Chose the one dimensional or multi-dimensional method
+			if( doIntegrate.size() == 1 )
+			{
+				numericalIntegral += this->OneDimentionIntegral( *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
+			}
+			else
+			{
+				numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
+			}
+			if( !haveTestedIntegral )
+			{
+				double testIntegral = functionToWrap->Integral( *dataPoint_i, NewBoundary );
+				cout << "Integration  Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
+				cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
+			}
+
+			output_val += numericalIntegral;
+		}
+	}
+
+	return output_val;
 }
 
 //Return the integral over all observables except one
-double RapidFitIntegrator::ProjectObservable( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, string ProjectThis)
+double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary, string ProjectThis, ComponentRef* Component )
 {
 	//Make the list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 	dontIntegrate.push_back(ProjectThis);
-	//cout << "Projecting Observable : " << ProjectThis << endl;
-	return DoNumericalIntegral( NewDataPoint, NewBoundary, dontIntegrate );
+	double value = -1.;
+
+	value = this->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, dontIntegrate, Component );
+	return value;
 }
 
-//Cache a numerical integral value for each discrete observable combination
-void RapidFitIntegrator::UpdateIntegralCache( PhaseSpaceBoundary * NewBoundary )
+void RapidFitIntegrator::ForceTestStatus( bool input )
 {
-	//First update any internal RapdidFitIntegrator caches that the PDF is using
-	functionToWrap->UpdateIntegralCache();
-
-	//Make a list of observables not to integrate
-	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
-
-	if ( cachedIntegrals.size() > 0 ) cachedIntegrals.clear();
-
-	//Don't do it unless discrete combinations cached
-	if (cacheSetUp)
-	{
-		for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
-		{
-			//Make a sample data point
-			DataPoint samplePoint( NewBoundary->GetAllNames() );
-
-			//Load the calculated discrete combinations
-			for (unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); ++discreteIndex )
-			{
-				string unit = NewBoundary->GetConstraint( discreteNames[discreteIndex] )->GetUnit();
-				samplePoint.SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 1, unit );
-			}
-
-			//Just generate some random continuous values
-			for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
-			{
-				samplePoint.SetObservable( continuousNames[continuousIndex], NewBoundary->GetConstraint( continuousNames[continuousIndex] )->CreateObservable() );
-			}
-
-			//Integrate and store the result
-			double integralToCache = DoNumericalIntegral( &samplePoint, NewBoundary, dontIntegrate );
-			cachedIntegrals.push_back(integralToCache);
-
-			/*
-			//Debug
-			cout << "For combination: ";
-			for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; --discreteIndex )
-			{
-			cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
-			}
-			cout << "get integral: " << integralToCache << endl;
-			*/
-		}
-	}
+	haveTestedIntegral = input;
 }
 
-//Return the correct cached integral value
-double RapidFitIntegrator::GetCachedIntegral( DataPoint * NewDataPoint )
-{
-	//Don't do it unless cache done
-	if (cacheSetUp)
-	{
-		//Generate the discrete observables, and select the correct Foam generator to use
-		int combinationIndex = 0;
-		int incrementValue = 1;
-		//cout << "Discrete values are: ";
-		for ( int discreteIndex = int(discreteNames.size()) - 1; discreteIndex >= 0; --discreteIndex )
-		{
-			//Retrieve the discrete value
-			double currentValue = NewDataPoint->GetObservable( discreteNames[unsigned(discreteIndex)] )->GetValue();
-			//cout << currentValue << ", ";
 
-			//Calculate the index
-			for (unsigned int valueIndex = 0; valueIndex < discreteValues[unsigned(discreteIndex)].size(); ++valueIndex )
-			{
-				if ( fabs( discreteValues[unsigned(discreteIndex)][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
-				{
-					combinationIndex += ( incrementValue * int(valueIndex) );
-					incrementValue *= int(discreteValues[unsigned(discreteIndex)].size());
-					break;
-				}
-			}
-		}
-
-		//Debug
-		//cout << "versus: ";
-		//for ( int discreteIndex = discreteNames.size() - 1; discreteIndex >= 0; --discreteIndex )
-		//{
-		//	cout << discreteCombinations[combinationIndex][discreteIndex] << ", ";
-		//}
-		//cout << endl;
-
-		//Return the cached integral value for this index
-		return cachedIntegrals[unsigned(combinationIndex)];
-	}
-	else
-	{
-		return -1.0;
-	}
-}
-
-//Calculate the discrete combinations
-void RapidFitIntegrator::SetUpIntegralCache( PhaseSpaceBoundary * NewBoundary )
-{
-	//Retrieve all combinations of discrete variables
-	vector<string> allNames = NewBoundary->GetAllNames();
-	discreteCombinations = StatisticsFunctions::DiscreteCombinations( &allNames, NewBoundary, discreteNames, continuousNames, discreteValues );
-
-	//Now calculate the integral values to cache
-	cacheSetUp = true;
-	UpdateIntegralCache(NewBoundary);
-}

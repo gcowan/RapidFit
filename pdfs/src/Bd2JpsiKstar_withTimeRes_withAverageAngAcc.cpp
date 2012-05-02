@@ -92,9 +92,7 @@ void Bd2JpsiKstar_withTimeRes_withAverageAngAcc::MakePrototypes()
 	parameterNames.push_back( angAccI4Name );
 	parameterNames.push_back( angAccI5Name );
 	parameterNames.push_back( angAccI6Name );
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor

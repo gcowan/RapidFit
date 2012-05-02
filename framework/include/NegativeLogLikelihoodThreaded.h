@@ -7,6 +7,7 @@
 	@date 2011-10
 */
 
+#pragma once
 #ifndef NEGATIVE_LOG_LIKELIHOOD_THREADED_H
 #define NEGATIVE_LOG_LIKELIHOOD_THREADED_H
 
@@ -23,7 +24,7 @@ class NegativeLogLikelihoodThreaded : public FitFunction
 		virtual double UpErrorValue(int);
 
 	protected:
-		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator* );
+		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator*, int );
 
 	private:
 		#ifndef __CINT__

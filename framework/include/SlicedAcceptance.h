@@ -7,6 +7,7 @@
   @data 2011-06-07
   */
 
+#pragma once
 #ifndef SLICED_ACCEPTANCE_H
 #define SLICED_ACCEPTANCE_H
 
@@ -18,7 +19,8 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
-using namespace std;
+
+using namespace::std;
 
 //=======================================
 
@@ -55,8 +57,8 @@ class SlicedAcceptance
 		double getValue( Observable* time ) const ;
 
 		// Methods for the normalisation integral in slices
-		int numberOfSlices() const ;
-		AcceptanceSlice * getSlice( int slice ) const ;
+		unsigned int numberOfSlices() const ;
+		AcceptanceSlice * getSlice( unsigned int slice ) const ;
 
 	private:	
 		//      Uncopyable!

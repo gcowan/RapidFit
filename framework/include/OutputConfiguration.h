@@ -1,11 +1,13 @@
-/**
-  @class OutputConfiguration
-
-  A container for all information configuring RapidFit output
-
-  @author Benjamin Wynne bwynne@cern.ch
+/*!
+ * @ingroup Generators
+ * @class OutputConfiguration
+ *
+ * A container for all information configuring RapidFit output
+ *
+ * @author Benjamin Wynne bwynne@cern.ch
   */
 
+#pragma once
 #ifndef OUTPUT_CONFIGURATION_H
 #define OUTPUT_CONFIGURATION_H
 
@@ -15,17 +17,18 @@
 #include "FitResultVector.h"
 #include "FitResult.h"
 #include "ScanParam.h"
+#include "ComponentPlotter.h"
 //	System Headers
 #include <vector>
 #include <string>
+#include <utility>
 
-using namespace std;
+using namespace::std;
 
 class OutputConfiguration
 {
 	public:
-		OutputConfiguration();
-		OutputConfiguration( vector< pair< string, string > >, vector<string>, string, vector<ScanParam*>, vector<pair<ScanParam*, ScanParam*> > );
+		OutputConfiguration( vector<pair<string, string> > contour, string, vector<ScanParam*>, vector<pair<ScanParam*, ScanParam*> >, vector<CompPlotter_config*> );
 		~OutputConfiguration();
 
 		//Return configuration data
@@ -37,15 +40,17 @@ class OutputConfiguration
 		ScanParam* GetScanParam( string param_name );
 		pair<ScanParam*, ScanParam*> Get2DScanParams( string , string );
 
-		void Clear2DScanList( );
+		void ClearScanList();
+		void Clear2DScanList();
 
 		bool DoPullPlots();
 
 		//Make output requested
 		void OutputFitResult( FitResult* );
-//		void OutputLLscanResult( vector<LLscanResult*>  );
-//		void OutputLLcontourResult( vector<LLscanResult2D*>  );
 		void OutputToyResult( FitResultVector* );
+
+		void OutputCompProjections( FitResult* );
+
 
 		//Change the configuration
 		void MakeAllPlots( string );
@@ -55,17 +60,18 @@ class OutputConfiguration
 		void SetLLcontourFileName( string );
 		void SetWeightsWereUsed( string ) ;
 		void SetInputResults( ResultParameterSet* );
-		
+
 		void AddContour( const string, const string );
 		void AddScan( const string );
 
 	private:
+		OutputConfiguration ( const OutputConfiguration& );
+		OutputConfiguration& operator= ( const OutputConfiguration& );
 		vector<double> GetRange( const string );		//  Return Max, Min and Resolution
 		vector<double> GetRange( ScanParam* );		//  Return Max, Min and Resolution
 		pair<vector<double>, vector<double> > Get2DRange( const string, const string );
 
 		vector< pair< string, string > > contours;
-		vector<string> projections;
 		vector<string> LLscanList;
 		string pullType;
 		bool makeAllPlots;
@@ -76,6 +82,9 @@ class OutputConfiguration
 		vector<pair<ScanParam*, ScanParam*> > Global_2DScan_List;
 
 		vector<ResultParameterSet* > Stored_Fit_Results;
+
+		vector<CompPlotter_config*> proj_components;
 };
 
 #endif
+

@@ -1,12 +1,13 @@
 /**
-        @class ObservableDiscreteConstraint
+ * @class ObservableDiscreteConstraint
+ *
+ * A constraint defining an observable that can take any of a list of discrete values.
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ */
 
-        A constraint defining an observable that can take any of a list of discrete values.
-
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
-
+#pragma once
 #ifndef OBSERVABLE_DISCRETE_CONSTRAINT_H
 #define OBSERVABLE_DISCRETE_CONSTRAINT_H
 
@@ -16,31 +17,42 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using namespace::std;
 
 class ObservableDiscreteConstraint : public IConstraint
 {
 	public:
-		ObservableDiscreteConstraint();
-		ObservableDiscreteConstraint( string, vector<double>, string );
+		ObservableDiscreteConstraint( string, vector<double>, string, string="" );
 		~ObservableDiscreteConstraint();
 
 		void AddValue(double);
 		void SetValues( vector<double> );
 
 		//Interface functions
-		virtual bool CheckObservable( Observable* );
-		virtual Observable* CreateObservable();
-		virtual Observable* CreateObservable( TRandom3* );
-		virtual string GetUnit();
-		virtual double GetMaximum();
-		virtual double GetMinimum();
-		virtual vector<double> GetValues();
-		virtual bool IsDiscrete();
+		virtual bool CheckObservable( Observable* ) const;
+		virtual Observable* CreateObservable() const;
+		virtual Observable* CreateObservable( TRandom3* ) const;
+		virtual string GetName() const;
+		virtual string GetUnit() const;
+		virtual double GetMaximum() const;
+		virtual double GetMinimum() const;
+		virtual vector<double> GetValues() const;
+		virtual bool IsDiscrete() const;
 
+		virtual void Print() const;
+
+		virtual Observable* GetMidRangeValue() const;
+
+		virtual string GetTF1() const;
+		virtual void SetTF1( const string );
+
+		string XML() const;
 	private:
+		string name;
 		vector<double> allValues;
 		string unit;
+		string tf1;
 };
 
 #endif
+

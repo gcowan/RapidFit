@@ -9,12 +9,22 @@
   @date 2009-12-22
  */
 
-#include <iostream>
-#include "math.h"
+///	ROOT Headers
 #include "TMath.h"
 #include "RooMath.h"
+///	RapidFit Headers
+#include "main.h"
 #include "Mathematics.h"
 #include "Bd2JpsiKstar_sWave.h"
+///	System Headers
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include <pthread.h>
+
+pthread_mutex_t ROOT_Lock;
+
+using namespace::std;
 
 namespace Mathematics
 {
@@ -22,7 +32,7 @@ namespace Mathematics
 	// Mathematica integral of the exp * erf
 	//Integrate[(1*Exp[-(x/t) + s^2/(2*t^2)]* erfc[-((x - s^2/t)/(Sqrt[2]*s))])/2, x] ==
 	//(t*(erf[x/(Sqrt[2]*s)] - E^((s^2 - 2*t*x)/(2*t^2))* erfc[(s^2 - t*x)/(Sqrt[2]*s*t)]))/2
-	double expErfInt( const double tlimit, const double tau, const double sigma)
+	double expErfInt( double tlimit, double tau, double sigma)
 	{
 		const double sigma_2=sigma*sigma;
 		const double inv_r2_sigma = 1./(sqrt_2*sigma);
@@ -49,7 +59,7 @@ namespace Mathematics
 
 	// use the approximation: erf(z) = exp(-z*z)/(sqrt(pi)*z) to explicitly cancel the divergent exp(y*y) behaviour of
 	// CWERF for z = x + i y with large negative y
-	RooComplex evalCerfApprox(const double swt, const double u, const double c)
+	RooComplex evalCerfApprox( double swt, double u, double c)
 	{
 		const double swt_c=swt*c;
 		RooComplex z(swt_c,u+c);
@@ -61,21 +71,46 @@ namespace Mathematics
 	}
 
 	// Calculate Re(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-	double evalCerfRe(const double swt, const double u, const double c)  {
-		RooComplex z(swt*c,u+c);
-		return (z.im()>-4.0) ? RooMath::FastComplexErrFuncRe(z)*exp(-u*u) : evalCerfApprox(swt,u,c).re() ;
+	double evalCerfRe( double swt, double u, double c)  {
+		RooComplex* z = new RooComplex( swt*c, u+c );
+		double returnable = 0.;
+		if( z->im() > -4.0 )
+		{
+			pthread_mutex_lock( &ROOT_Lock );
+			returnable = math_object->ITPComplexErrFuncRe( *z, 10 )*exp( -u*u );
+			pthread_mutex_unlock( &ROOT_Lock );
+		}
+		else
+		{
+			returnable = evalCerfApprox( swt, u, c ).re();
+		}
+		delete z;
+		return returnable;
 	}
 
 	// Calculate Im(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-	double evalCerfIm(const double swt, const double u, const double c)  {
-		RooComplex z(swt*c,u+c);
-		return (z.im()>-4.0) ? RooMath::FastComplexErrFuncIm(z)*exp(-u*u) : evalCerfApprox(swt,u,c).im() ;
+	double evalCerfIm( double swt, double u, double c)  {
+		RooComplex* z = new RooComplex( swt*c, u+c );
+		double returnable = 0.;
+		if( z->im() > -4.0 )
+		{
+			pthread_mutex_lock( &ROOT_Lock );
+			returnable = math_object->ITPComplexErrFuncIm( *z, 10 )*exp( -u*u );
+			
+			pthread_mutex_unlock( &ROOT_Lock );
+		}
+		else
+		{
+			returnable = evalCerfApprox( swt, u, c ).im();
+		}
+		delete z;
+		return returnable;
 	}
 
 	//----------------------------------------------------------------------------------------------
 	//........................................
 	//evaluate a simple exponential with single gaussian time resolution
-	double Exp( const double t, const double gamma, const double resolution )
+	double Exp( double t, double gamma, double resolution )
 	{
 		if(resolution > 0.) {
 
@@ -110,7 +145,7 @@ namespace Mathematics
 	   exp( gamma*thigh)*Erfc(tlow/(sqrt(2)*timeRes))
 	   )/(2.*exp(gamma*thigh)*gamma)
 	 */
-	double ExpInt( const double tlow, const double thigh, const double gamma, const double resolution  )
+	double ExpInt( double tlow, double thigh, double gamma, double resolution  )
 	{
 		if( thigh < tlow )
 		{
@@ -134,7 +169,7 @@ namespace Mathematics
 	//------------------------------------------------------------------------------------------
 	//........................................
 	//evaluate a simple exponential with single gaussian time resolution, allowing for an acceptance (1.0 - b*t) - formula from wolfram
-	double Exp_betaAcceptance( const double t, const double gamma, const double resolution, const double acceptanceParameter  )
+	double Exp_betaAcceptance( double t, double gamma, double resolution, double acceptanceParameter  )
 	{
 		if(resolution > 0.)
 		{
@@ -152,7 +187,7 @@ namespace Mathematics
 	//.....................................................
 	// Evaluate integral of a simple exponential with single gaussian time resolution, allowing for an acceptance (1.0 - b*t) - formula from wolfram
 	// I = -1/G * exp (-tG) (1 - b(1/G +t ))  instead of I = -1/G * exp (-tG)
-	double ExpInt_betaAcceptance( const double tlow, const double thigh, const double gamma, const double resolution, const double acceptanceParameter  )
+	double ExpInt_betaAcceptance( double tlow, double thigh, double gamma, double resolution, double acceptanceParameter  )
 	{
 		if( thigh < tlow )
 		{
@@ -189,7 +224,7 @@ namespace Mathematics
 	//evaluate a simple exponential X cosh with single gaussian time resolution
 	//When you express the cosh as a sum of exp and then multiply out, you are
 	//left with just a sum of exponentials.
-	double ExpCosh( const double t, const double gamma, const double deltaGamma, const double resolution )
+	double ExpCosh( double t, double gamma, double deltaGamma, double resolution )
 	{
 		const double dg_2 = deltaGamma*0.5;
 		const double gammaL = gamma + dg_2;
@@ -199,7 +234,7 @@ namespace Mathematics
 
 	//.......................................
 	// Evaluate integral of a simple exponential X cosh with single gaussian time resolution
-	double ExpCoshInt( const double tlow, const double thigh, const double gamma, const double deltaGamma, const double resolution  )
+	double ExpCoshInt( double tlow, double thigh, double gamma, double deltaGamma, double resolution  )
 	{
 		const double dg_2 = deltaGamma*0.5;
 		const double gammaL = gamma + dg_2;
@@ -211,7 +246,7 @@ namespace Mathematics
 	//evaluate a simple exponential with single gaussian time resolution
 	//When you express the sinh as a sum of exp and then multiply out, you are
 	//left with just a sum of exponentials.
-	double ExpSinh( const double t, const double gamma, const double deltaGamma, const double resolution )
+	double ExpSinh( double t, double gamma, double deltaGamma, double resolution )
 	{
 		const double dg_2 = deltaGamma*0.5;
 		const double gammaL = gamma + dg_2;
@@ -221,7 +256,7 @@ namespace Mathematics
 
 	//.......................................
 	// Evaluate integral of a simple exponential X sinh with single gaussian time resolution
-	double ExpSinhInt( const double tlow, const double thigh, const double gamma, const double deltaGamma, const double resolution  )
+	double ExpSinhInt( double tlow, double thigh, double gamma, double deltaGamma, double resolution  )
 	{
 		const double dg_2 = deltaGamma*0.5;
 		const double gammaL = gamma + dg_2;
@@ -234,7 +269,7 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate exponential X cosine with single time resolution
-	double ExpCos( const double t, const double gamma, const double deltaM, const double resolution )
+	double ExpCos( double t, double gamma, double deltaM, double resolution )
 	{
 
 		if(resolution > 0.) {
@@ -264,7 +299,7 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate integral of exponential X cosine with single time resolution
-	double ExpCosInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution  )
+	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )
 	{
 		if( thigh < tlow ) {
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
@@ -297,7 +332,7 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate exponential X sine with single time resolution
-	double ExpSin( const double t, const double gamma, const double deltaM, const double resolution )
+	double ExpSin( double t, double gamma, double deltaM, double resolution )
 	{
 		if(resolution > 0.) {
 
@@ -305,7 +340,9 @@ namespace Mathematics
 			const double c = gamma * resolution*_over_sqrt_2;
 			const double u = (t / resolution) *_over_sqrt_2 ;
 			const double wt = deltaM / gamma ;
-			return ( evalCerfIm(wt,-u,c) - evalCerfIm(-wt,-u,c) ) *0.25 ;
+			const double val1 = evalCerfIm(wt,-u,c);
+			const double val2 = evalCerfIm(-wt,-u,c);
+			return ( val1 - val2 ) * 0.25 ;
 
 			// My code which didnt work due to numerical instability
 			//double theExp = exp( -t*gamma() + resolution*resolution * ( gamma()*gamma() - delta_ms*delta_ms ) / 2. ) ;
@@ -327,7 +364,7 @@ namespace Mathematics
 
 	//.................................................................
 	// Evaluate integral of exponential X cosine with single time resolution
-	double ExpSinInt( const double tlow, const double thigh, const double gamma, const double deltaM, const double resolution  )
+	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )
 	{
 		if( thigh < tlow ) {
 			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
@@ -437,27 +474,9 @@ namespace Mathematics
 		return;
 	}
 
-        void getBs2PhiPhiAngularFunctions( double & f1
-                        , double & f2
-                        , double & f3
-                        , double & f4
-                        , double & f5
-                        , double & f6
-                        , const double ct1
-                        , const double ct2
-                        , const double phi)
-        {
-                f1=4.*ct1*ct1*ct2*ct2;
-                f2=sin(acos(ct1))*sin(acos(ct1))*sin(acos(ct2))*sin(acos(ct2))*(1+cos(2.*phi));
-                f3=sin(acos(ct1))*sin(acos(ct1))*sin(acos(ct2))*sin(acos(ct2))*(1-cos(2.*phi));
-                f4=-1.*2.*sin(acos(ct1))*sin(acos(ct1))*sin(acos(ct2))*sin(acos(ct2))*sin(2.*phi);
-                f5=sqrt_2*sin(2.*acos(ct1))*sin(2.*acos(ct2))*cos(phi);
-                f6=-1.*sqrt_2*sin(2.*acos(ct1))*sin(2.*acos(ct2))*sin(phi);
-                return;
-        }
-
-	void calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF )
+	vector<double> calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF )
 	{
+		vector<double> weights;
 		// This tries to implement the NIKHEF method for calculating the
 		// average acceptance weights for Bs2JpsiPhi.
 		RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
@@ -481,16 +500,19 @@ namespace Mathematics
 				Sum_sq[i][k] = 0.0;
 			}
 		}
-	
+		
 		for (int e = 0; e < numEvents; e++)
 		{
 			if (e % 1000 == 0) cout << "Event # " << e << endl;
 			DataPoint * event = dataSet->GetDataPoint(e);
-			cosTheta = event->GetObservable("cosTheta")->GetValue();
-			phi      = event->GetObservable("phi")->GetValue();
-			cosPsi   = event->GetObservable("cosPsi")->GetValue();
+			//cosTheta = event->GetObservable("cosTheta")->GetValue();
+			//phi      = event->GetObservable("phi")->GetValue();
+			//cosPsi   = event->GetObservable("cosPsi")->GetValue();
+			cosTheta = event->GetObservable("trcostheta")->GetValue();
+			phi      = event->GetObservable("trphi")->GetValue();
+			cosPsi   = event->GetObservable("trcospsi")->GetValue();
 			time     = event->GetObservable("time")->GetValue();
-	                getBs2JpsiPhiAngularFunctionsWithSwave( f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], cosTheta, phi, cosPsi);
+			getBs2JpsiPhiAngularFunctionsWithSwave( f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], cosTheta, phi, cosPsi);
 
 			// The method sums the angular factor f_i divided by the sum_i(A_i*f_i)
 			// for each accepted event. I'm not sure if dividing by Evaluate is exactly the
@@ -499,8 +521,10 @@ namespace Mathematics
 			// Now need to calculate the normalisation when integrated over the 3 angles
 			vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
 			dontIntegrate.push_back("time");
-			dontIntegrate.push_back("tag");
-			evalPDFnorm = rapidInt->DoNumericalIntegral( event, boundary, dontIntegrate );
+			//dontIntegrate.push_back("tag");
+			dontIntegrate.push_back("tagdecision_os");
+			//evalPDFnorm = rapidInt->DoNumericalIntegral( event, boundary, dontIntegrate );
+			evalPDFnorm = rapidInt->NumericallyIntegrateDataPoint( event, boundary, dontIntegrate );
 			val = evalPDFraw/evalPDFnorm;
 			//cout << f[0] << " " << f[1]<< " " <<  f[2]<< " " <<  f[3]<< " " <<  f[4]<< " " <<  f[5]<< " " << f[6]<< " " <<  f[7]<< " " <<  f[8]<< " " <<  f[9]<< endl;
 			//cout << time << " " << cosTheta  << " " << phi << " " << cosPsi << " " << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
@@ -515,7 +539,7 @@ namespace Mathematics
 				}
 			}
 		}
-		
+
 		cout << "Covariance matrix " << endl;
 		for (int i = 0; i < numAngularTerms; i++)
 		{
@@ -526,7 +550,7 @@ namespace Mathematics
 			}
 			cout << endl;
 		}
-		
+
 		cout << "Correlation matrix " << endl;
 		for (int i = 0; i < numAngularTerms; i++)
 		{
@@ -537,13 +561,14 @@ namespace Mathematics
 			}
 			cout << endl;
 		}
-	
+
 		cout << "Weight +- error " << endl;
 		for (int i = 0; i < numAngularTerms; i++)
 		{
 			cout << xi[i]/numEvents << " \\pm " << sqrt(cov[i][i]) << endl;
+			weights.push_back(xi[i]/numEvents);
 		}	
-		return;
+		return weights;
 	}
 
 	void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF )

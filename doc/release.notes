@@ -1,46 +1,196 @@
-// $Id: release.notes,v 1.37 2009/11/19 12:53:51 cofitzpa Exp $
+// $Id: release.notes $
 
-2012/01/26
-    - Fixed LongLivedBkg.cpp used for f0 fits
+2012/05/02 Rob Currie                                    Migrated the Component Plotting Code into SVN HEAD
 
-2012/01/26 Rob Currie
-    - Backported EdStyle from my branch to make plotting nicer/easier
-    - Backported StringProcessing for extra required functionality
-    - Fixed Robs Strategy for fixed parameters
+2012/05/02 Rob Currie
+   - Fixed a VERY BAD typo in the code.
+   - Changed the way that all PDFs are evaluated such that any external call calls IPDF::Integrate to get the PDF analytical Integral (or -1 if none provided)
 
-2012/01/26 Sean
-    - Added AccCore stuff to HEAD and latest phiphi PDF
+2012/05/02 Greig Cowan
+   - Added LASS component to the Dalitz PDF.
+   - Expanded the Component Plot testing in main so that it is simpler to quickly produce a test plot without doing a fit first.
+     You can now specify the name of the observable that you want to plot, rather than having it hard-coded.
 
-2012/01/23 Pete Clarke
-    - Change to LonglivedBkg_3DAngular to implement helicity angles as an option
-    - Minor changes to ..MO_v4...
+2012/05/01 Rob Currie
+   - Removed old caching code
+   - Added new Caching Code which caches a value once per Discrete Combination in each PhaseSpace per ToFit
+   - Moved a lot of applicable PDFs to use the correct Normalise function where applicable. Implemented both on some PDFs
+   - Added some more documentation to the utils objects
 
-2012/01/23 Rob Currie
-    - Minimal set of changes which are required to get 1DLL in svn HEAD working as they're only small fixes for bugs still in HEAD
-    - Added Robs Strategy which performs 4 fits slipping the strong phases and deltaGamma seperatley to find the absolute minima in scans
+2012/05/01 Rob Currie
+   - Fixed a small memory leak in Foam.
+   - Added some new helper functions to PhaseSpace and DataPoint
+   - Fixed the TF1 code in SVN but we still cannot evaluate 0-dim equations and I am now convinced you will Never want to
 
-2012/01/07/ Peter Clarke
-    - Changed _v4_ PDF to implement new definitions of Amplitudes ready for fitting in bins of mKK
-    - Removed some cout statements from configuration.
+2012/05/01 Greig Cowan
+   - Added ability to have an acceptance histogram in DPTotalAmplitude PDF.
 
-2011/12/22/ Pete Clarke
-    - Added new pdf/configdata files for background angles and time acceptance  
-    - all labelled as É_v1É
+2012/04/29 Rob Currie
+   - Updated EdStyle to conform to latest lhcbStyle.
+        This may become an annoying game of cat and mouse because I would rather not include a 'processLine' command in the EdStyle class to launch the raw lhcb script
+   - Fixed a bug in toy studies where datasets are not removed from memory between fits (caused a 2Gb memory leak on the GRID...)
+   - Modified ComponentPlotter to pick up Component Projections but only plot the 0th component
+        Now both <Plotter>time</Plotter> <ComponentPlotter>time</ComponentPlotter> call the same code, however the former will only evaluate Component 0
+   - Moved the Plotter class into the unused folder and removed the hooks for it from framework to try and consolidate what code should/shouldn't be used
+   - Fixed some compiler warnings
 
-2011/12/10  Pete Clarke
-    - New version of  Bs2JpsiPhi_SignalAlt_MO_v4 which allows to use event by event time resolution
-    - It is switched on by <ConfiguraitonParameter>useEventResolution:True</ConfiguraitonParameter>
+2012/04/26 Rob Currie
+   - Fixed bugs which caused Memory Leaks in PhysicsBottle, ParameterSet and FitAssembler.
+   - Added const notation to applicable Observable functions. The first time I ever did this I couldn't finish compiling main due to the errors, not everything works as expected.
+   - Fixed Foam to gracefully handle a missing on-disk cache and simply proceed to regenerate it. This is something that only bugs people like me who find ways to bring the whole program down.
+   - Fixed a bug in BasePDF for clearing the Foam objects it knows about.
+   - Removed the 'Finalise' methods from the FitFunction and PhysicsBottle. These were simply not called and are no longer needed.
+   - Added the #pragma one line to headers which potentially speeds up compilation according to some articles.
+   - Added some more doxygen documentation. Some of the dot graphs are now getting quite complex showing the interplay between the classes.
+   - Updated the code which produces Toy Studies to provide plots which show the whole distribution, also updated the Makefile.
+   - Moved the old Feldman Cousins code out of the main build as it's no longer callable and the more upto date code is much more reasonable, although still complex.
 
-2011/12/04 Rob Currie
-    - Fixed a rather irritating bug within RapidFit which caused problems with the background 3D histogram PDF
+2012/04/26 Greig Cowan
+   - Fixed bug in DPTotalAmplitude PDF in the parameter transformation.
 
-2011/12/02 Rob Currie
-    - Bugfix for loading files with the LL_3D histogram PDF
-    - Improved Makefile, loud compiler warnings are moved to 'make debug', the default build still warns of most serious problems in code, 'make clang' allows the llvm compiler to be used
+2012/04/24 Greig Cowan
+   - Fixed DalitzPlot PDF so that numerical integration works with it.
+   - Changed flat upper decay time acceptance in Exponential PDF to extend to 20ps.
+
+2012/04/23 Rob Currie
+   - Added PseudoObservable class which cleans up what is involved in Creating PseudoObservables in the future Significantly
+   - Added Bs2JpsiPhi_Signal_v5_Robs and Bs2JpsiPhi_Angular_Terms to show how PseudoObservables can be used by a PDF this technology may/may-not make it's way back into head
+        This allowed me to move the angular terms elsewhere (which makes life easier/clearer) and has reduced the amount of actual code in the header considerably
+        I advide that anyone interested look at this as I'm close to having a method for caching complex objects for when they don't change between Minuit calls. More about this soon
+   
+   - Added a LOT of doxygen style documentation, although this will likely be an ongoing effort over a few weeks to finish this as there's a lot to document
+        Some of this has highlighted obscure behaviour, but mainly it is good to see the amount of deprecated code we have around and have actual documentation about what on earth some routines do
+
+        I have focused my efforts so far in BasePDF, RapidFitIntegrator and ComponentPlotter as these are the classes which I have been working on recently,
+        I aim to bring the documentation of all important classes up to this level over the next month or 2
+
+
+   - PDF DEVELOPERS:
+   
+        I have Removed the 'valid' boolean variable from BasePDF
+        This IS NOT USED anywhere in RapidFit and was associated with a few functions further up the chain such as NormalisedSum/Prod/...
+        I am hunting down and removing dead member functions which are just not required (so far not too many)
+
+
+   - Added --MakeTemplate to runtime
+        This is a nice new feature that takes in the name of the PDF you want and writes most of the XML for you
+        You need to configure ranges and values and fix some parameters to run a working fit, but this is a massive improvement
+
+   - I have done a lot of work with the flags: --saveFitXML and --generateToyXML
+        
+        saveFitXML will save the results of the fit you just ran in the XML with all physics parameters fixed.
+           I have the hope that this can be used to then run projections from in the near future and can be passed around internally as 'this is what I got'
+           Also, as it spits out all of the XML required to generate the objects in the first place you have (almost) all the information required to reconstruct the fit given
+
+        generateToyXML will save the final status of the Fit in an XML file which allows you to construct toy studies (for whatever purpose) 
+
+
+2012/04/18 Rob Currie
+   - Added a lot of const declarations throughout framework to make some of the code easier to parse and to highlight some potential mistakes
+        This doesn't effect pdf code and pdfs shouldn't worry about declaring functions const
+
+   - Added new XML tag to Observable's <TF1>
+        This allows for a parameter to be created based on a simple transform. Eg if the Ntuple contains time*0.3 then you can create an observable for time with <TF1>time/0.3</TF1> to renormalise the variable
+        It currently doesn't handle 0-dimentional functions aka. constant values but this is a corner case with no easy solution
+        This allows for parameter substitution to be reserved for physics parameters and observables to have a fixed name, although you can safely combine the 2
+
+   - Added a new XML tag to FitFunctionConfiguration <SetIntegratorTest> which allows you to stop checking the Normalisation at the start of a fit
+        By default this is 'True' but any other value (preferably 'False') will deactivate this test
+        Scans and FeldmanCousins have set this to be false to save CPU time and in an effort to combat some unknown numerical issue on the grid
+        NormalisedSumPDF now also constructs RapidFitIntegrator objects so as to not check the integrals of the subPDFs
+
+   - RapidFitIntegrator now contains new member functions NumericallyIntegratePhaseSpace and NumericallyIntegrateDataPoint
+        The behaviour of these should be easy to understand, they both call DoNumericalIntegration behind the scenes but this function is now private!
+
+   - framework has been tested and is able to produce the results from Moriond2012 using JpsiPhi v4 (at least to the accuracy of the results quoted when comparing between the different groups)
+        This has been done for both cFit and sFit.
+
+   - Started work on a lot of needed documentation for the code in the form doxygen comments, as I'm doing it, I've decided to go with the QT style, but this can be changed with a 'simple' sed command
+
+   - Will branch this commit for HFAG as the code used to reproduce the 1fb result. I will place the new branch in branches/HFAG-1fb-2012-04-18
+        This branch _WILL_ include an ugly one line patch that should _NOT_ make it's way into HEAD, EVER!.
+        It return 1. from calls to numerically integrate as there remains an (as of yet) unresolved issue with the Numerical Integrator. The fix has not been fully tested (yet)
+
+2012/04/06 Pete Clarke
+   - Cleared out many old Bs2JPsiPhi PDFs (all <= _v3)
+   - Added new class AngularAcceptance which deals with BOTH acceptnce factors and the acceptance numerator
+     using file creted now by Greigs code.  This means the angular acceptance factors areno longer needed in the XML
+   - Added a new PDF for the future  :  Bs2JPsiPhi_Signal_v5    (note name shortened)
+     This means the old Bs2JpsiPhi_SignalAlt_MO_v4.h is now a FROZEN version matching the Moriond analysis
+     All new work is in v5 - includeing the AngularAcceptance implementation.
+
+2012/04/04 Greig Cowan
+   - Fixed normalisation of 4D background histogram.
+   - Fixed seg fault and binning in acceptance histogram code.
+
+2012/04/03 Greig Cowan
+   - Added PDF for Dalitz 4D background histogram.
+   - Added histogrm for the 4D background.
+
+2012/04/02 Greig Cowan
+   - Added ability to write out angular acceptance weights to a ROOT
+     file and also stored 3D histogram of the acceptance along with it.
+
+2011/2012 Rob Currie
+   - Altered JpsiPhi PDF to handle components correctly for projections
+
+   Main dev work for Component Projections has completed and these are the main changes before this branch is moved back to HEAD
+
+   In no particular order the major changes to be aware of are:
+
+   1)  Changed the architecture to pass ParameterSet objects as a single element as the way that it is now used assumes one insance exists at a time and it passed throughout the code with objects accessing what they need from it.
+
+   2)  More Objects are held in memory as pointers and cleaned up with class destructors, this has removed (or reduced) several memory leaks in trunk-stable, even though the leak was never tracked down/removed
+
+   3)  FeldmanCousins has been rewritten to work in n-Dimentions with a new class VectoredFeldmanCousins
+
+   4)  PDFWithData has more access to datasets in memory
+
+   5)  Toy/MC studies and Vectored FeldmanCousins have been altered to inherit from IStudy.h this helps keep a common coding convention for common objects and is just less of a headache for maintenance
+
+   6)  Scans have been moved out of FitAssembler to make life easier
+
+   7)  Robs Strategy has been added to flip strong phases/dG/phi_s in jpsi/phi
+
+   8)  ComponentPlotter has now been written to evaluate components of a pdf for projections new XML has been added for this
+            New ComponentRef class has been created which is capable of reducing the total number of string comparisons when requesting a single component to be evaluated
+
+   9)  Multiple new hooks have been added to the IPDF/BasePDF, NumericalGeneration and NumericalIntegral have seperate Evaluate statements which in the BasePDF point back to the normal Evaluate
+
+   10) RapidFitIntegrator has effectivley been re-written.
+            BasePDF performs it's own test on the Normalise statements when Integrate is first called, this establishes some information about the PDF.
+            New functions have been added for BasePDF to allow the RapidFitIntegrator to interface with this:
+                          {,Set}ForceNumerical contains the decision about wether the PDF is numerically normalised
+                          ForceCache allows the RapidFitIntegrator to change the internal cache of the normalisation when it's appropriate
+
+   11) IntegralFunction has been effectivley re-written as well it now catches throw statements from the PDF as it is allowed in the context of normalising the whole pdf phase-space for the pdf to evaluate 0 (and for components)
+
+       The RapidFitIntegrator/IntegralFunction combination is now fully thread-safe with numerical normalisation being valid for multiple threads
+
+   12) NegativeLogLikelihoodThreaded now works correctly and all of the required objects are set up in FitFunction correctly.
+
+   13) NegativeLogLikelihoodNumerical has been added which performs the same as NegativeLogLikelihoodThreaded however it saves burning too much CPU in simply re-derriving the same value multiple times
+
+   14) The output from Toy, LL, 2DLL and FC studies has been tested and are all in agreement
+
+   15) New analysis tool RapidPlot has been written which handles all of the output files automatically, contains much more modular code which has been through several rounds of testing and retesting
+
+   16) Various minor improvements have reduced a few more expensive operation calls and few minor memory leaks
+
+   + possibly a few more changes that I have forgotten about
+
+2012/03/14 Greig Cowan
+   - Added Dalitz PDF for Bd2JpsiKpi studies.
+   - Corresponding change to Makefile to pick up code for Dalitz.
+   - Added ExponentialWithDeltaGamma PDF for DeltaGamma_d measurement.
+
+2012/02/22 Greig Cowan
+   - Modified Exponential PDF to use per-event resolution and time acceptance.
+   - Added CrystalBall PDF for masses. Code taken from RooFit.
 
 2011/11/12/ Peter Clarke
     - Significant change to the latest J/PsiPhi PDF  :  Bs2JpsiPhi_SignalAlt_MO_v4.cpp and .h
-    - Removed BaseClass_v4.h and .cpp as all have now been moved back into the main PDF
+    - Removed ÉBaseClass_v4.h and .cpp as all have now been moved back into the main PDF
     - Helicity angle capability added, but you will need to ask Pete how to use this as we don't have it in the background PDFS yet.
             <ConfigurationParameter>useHelicityBasis:True</ConfigurationParameter> 
     - Made a technical transparent change in ProdPDF and NormailisedSumPDG to do with EvaluateForNumericIntagral()

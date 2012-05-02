@@ -19,11 +19,6 @@
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
-//Default constructor
-AcceptReject::AcceptReject() : generationFunction(), generationBoundary(), dataNumber(), newDataSet(), rootRandom(), moreThanMaximum(), numberAttempts()
-{
-}
-
 //Constructor with correct argument
 AcceptReject::AcceptReject( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : generationFunction(NewPDF),
 	generationBoundary(NewBoundary), dataNumber(0), newDataSet(), rootRandom(), moreThanMaximum(0.01), numberAttempts(0)

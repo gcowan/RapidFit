@@ -12,6 +12,7 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
+#include "RooMath.h"
 
 PDF_CREATOR( BsMass );
 
@@ -24,6 +25,7 @@ BsMass::BsMass(PDFConfigurator* configurator) :
 	, m_BsName		( configurator->getName("m_Bs") )
 	// Observables
 	, recoMassName	( configurator->getName("mass") )
+	, mlow(-1.), mhigh(-1.)
 {
 	MakePrototypes();
 }
@@ -40,9 +42,7 @@ void BsMass::MakePrototypes()
         parameterNames.push_back( sigma_m1Name );
         parameterNames.push_back( ratio_21Name );
         parameterNames.push_back( m_BsName );
-        allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+        allParameters = ParameterSet(parameterNames);
 }
 
 //Destructor
@@ -66,17 +66,26 @@ double BsMass::Evaluate(DataPoint * measurement)
 	//Construct second width from ratio
 	double sigma_m2 = sigma_m1 * ratio_21 ;
 
-	double returnValue = 0;
+	//Temp way to initialise these - this means the first event of the first iteratino is wrong
+	//This also means it can mever work for Toys
+	if( (mlow < 0.) || (mhigh <0.)) {
+		mlow = 5346.3 ;
+		mhigh = 5386.3 ;
+	}
 	
+	double s1_erf_factor = 0.5*( RooMath::erf((mhigh-m_Bs)/(sigma_m1*sqrt(2.))) - RooMath::erf((mlow-m_Bs)/(sigma_m1*sqrt(2.)) ) );
+	double s2_erf_factor = 0.5*( RooMath::erf((mhigh-m_Bs)/(sigma_m2*sqrt(2.))) - RooMath::erf((mlow-m_Bs)/(sigma_m2*sqrt(2.)) ) );
+	double returnValue = 0;
+
 	if( f_sig_m1 > 0.9999 ) {
-		double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi()));
+		double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi())) / s1_erf_factor ;
 		double deltaMsq = ( mass - m_Bs )*( mass - m_Bs );		
 		double exp1 = exp( -deltaMsq / ( 2. * sigma_m1 * sigma_m1 ) );
 		returnValue = factor1 * exp1 ;		
 	}
 	else {
-		double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi()));
-		double factor2 = 1./(sigma_m2*sqrt(2.*TMath::Pi()));
+		double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi()))  / s1_erf_factor ;
+		double factor2 = 1./(sigma_m2*sqrt(2.*TMath::Pi()))  / s2_erf_factor;
 		double deltaMsq = ( mass - m_Bs )*( mass - m_Bs );
 		double exp1 = exp( -deltaMsq / ( 2. * sigma_m1 * sigma_m1 ) );
 		double exp2 = exp( -deltaMsq / ( 2. * sigma_m2 * sigma_m2 ) );
@@ -88,13 +97,21 @@ double BsMass::Evaluate(DataPoint * measurement)
 
 
 // Normalisation
-double BsMass::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double BsMass::Normalisation(PhaseSpaceBoundary * boundary)
 {
-	//	Stupid gcc
-	(void)measurement;
-	(void)boundary;
 	// Assumes that the mass integration limits are +/- Infinity
 	// So take sufficiently large mass window.
-	return 1.0;
+	
+	//These need to be put into the member variables in order to have then available in the evaluate method
+	IConstraint * massBound = boundary->GetConstraint( recoMassName );
+	if ( massBound->GetUnit() == "NameNotFoundError" ) {cerr << "Bound on mass not provided" << endl;return -1.;}
+	else{
+	    mlow = massBound->GetMinimum();
+		mhigh = massBound->GetMaximum();
+	}
+	
+	//double returnValue = RooMath::erf( mhigh) - RooMath::erf(mlow ) ;
+	
+	return 1.0 ; //returnValue;
 }
 

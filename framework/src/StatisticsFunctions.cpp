@@ -95,7 +95,7 @@ double StatisticsFunctions::Minimum( vector<double> Numbers )
 }
 
 //Returns all possible combinations of discrete observable values from a PhaseSpaceBoundary
-vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<string> * AllNames, PhaseSpaceBoundary * InputBoundary, vector<string> & DiscreteNames,
+vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<string> * AllNames, const PhaseSpaceBoundary * InputBoundary, vector<string> & DiscreteNames,
 		vector<string> & ContinuousNames, vector< vector<double> > & discreteValues )
 {
 	//Construct a vector<vector> containing all discrete values. List the names of discrete and continuous observables.
@@ -195,7 +195,7 @@ void StatisticsFunctions::DoDontIntegrateLists( IPDF * InputPDF, PhaseSpaceBound
 }
 
 //Perform data averaging
-vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector< vector<double> > DiscreteCombinations, vector< vector<double> > DiscreteValues, vector<string> DiscreteNames, vector<string> ContinuousNames,
+vector<DataPoint*> StatisticsFunctions::DataAverage( IDataSet * InputData, vector< vector<double> > DiscreteCombinations, vector< vector<double> > DiscreteValues, vector<string> DiscreteNames, vector<string> ContinuousNames,
 	       vector<string> & DataPointDescriptions, vector<double> & DataPointWeights )
 {
 	//Initialise the data averaging
@@ -255,14 +255,15 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 	}
 
 	//Create the data points to return
-	vector<DataPoint> newDataPoints;
+	vector<DataPoint*> newDataPoints;
 	vector<string> allDescriptions;
-	DataPoint templateDataPoint = *( InputData->GetDataPoint(0) );
+	DataPoint* templateDataPoint =  new DataPoint( *InputData->GetDataPoint(0) );
 	for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); ++continuousIndex )
 	{
-		Observable * newValue = templateDataPoint.GetObservable( ContinuousNames[continuousIndex] );
-		newValue->SetValue( continuousSums[continuousIndex] );
-		templateDataPoint.SetObservable( ContinuousNames[continuousIndex], newValue );
+		Observable * newValue = templateDataPoint->GetObservable( ContinuousNames[continuousIndex] );
+		Observable* newValue2 = new Observable( newValue->GetName(), continuousSums[continuousIndex], newValue->GetError(), newValue->GetUnit() );
+		templateDataPoint->SetObservable( ContinuousNames[continuousIndex], newValue2 );
+		delete newValue2;
 	}
 	for (unsigned int combinationIndex = 0; combinationIndex < DiscreteCombinations.size(); ++combinationIndex )
 	{
@@ -272,9 +273,10 @@ vector<DataPoint> StatisticsFunctions::DataAverage( IDataSet * InputData, vector
 		for (unsigned int discreteIndex = 0; discreteIndex < DiscreteNames.size(); ++discreteIndex )
 		{
 			//Set the data point
-			Observable * newValue = templateDataPoint.GetObservable( DiscreteNames[discreteIndex] );
-			newValue->SetValue( DiscreteCombinations[combinationIndex][discreteIndex] );
-			templateDataPoint.SetObservable( DiscreteNames[discreteIndex], newValue );
+			Observable * newValue = templateDataPoint->GetObservable( DiscreteNames[discreteIndex] );
+			Observable* newValue2 = new Observable( newValue->GetName(), DiscreteCombinations[combinationIndex][discreteIndex], newValue->GetError(), newValue->GetUnit() );
+			templateDataPoint->SetObservable( DiscreteNames[discreteIndex], newValue2 );
+			delete newValue2;
 
 			//Make the description
 			char value[100];

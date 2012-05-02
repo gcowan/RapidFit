@@ -9,6 +9,12 @@
 
 //	RapidFit Headers
 #include "ExternalConstraint.h"
+///	System Headers
+#include <string>
+#include <sstream>
+#include <iostream>
+
+using namespace::std;
 
 //Default constructor
 ExternalConstraint::ExternalConstraint(): name(), value(), error()
@@ -34,7 +40,29 @@ double ExternalConstraint::GetValue()
 {
 	return value;
 }
+
 double ExternalConstraint::GetError()
 {
 	return error;
 }
+
+void ExternalConstraint::Print() const
+{
+	cout << "External Constrint: " << name << "\tValue: " << value << "\tError: " << error << endl;
+}
+
+string ExternalConstraint::XML() const
+{
+	stringstream xml;
+
+	xml << "<ToFit>" << endl;
+	xml << "\t<ExternalConstraint>" << endl;
+	xml << "\t\t<Name>" << name << "</Name>" << endl;
+	xml << "\t\t<Value>" << value << "</Value>" << endl;
+	xml << "\t\t<Error>" << error << "</Error>" << endl;
+	xml << "\t</ExternalConstraint>" << endl;
+	xml << "</ToFit>" << endl;
+
+	return xml.str();
+}
+

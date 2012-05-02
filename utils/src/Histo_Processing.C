@@ -14,19 +14,30 @@
 #include "TGraph2D.h"
 #include "TLegend.h"
 #include "TList.h"
-#include "TRandom3.h"
+#include "TRandom.h"
 #include "TROOT.h"
 #include "TPaletteAxis.h"
+#include "TF1.h"
+#include "TFitResult.h"
+#include "TGraphErrors.h"
+#include "TPaveText.h"
+#include "TMultiGraph.h"
 //	RapidFit Header
 #include "EdStyle.h"
 //	RapidFit Utils Headers
 #include "Histo_Processing.h"
-#include "TString_Processing.h"
-#include "NTuple_Processing.h"
+#include "StringOperations.h"
+#include "TTree_Processing.h"
+#include "Mathematics.h"
 //	System Headers
 #include <math.h>
 #include <iomanip>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <limits.h>
+#include <float.h>
 
 using namespace::std;
 
@@ -35,20 +46,22 @@ using namespace::std;
 //  As such it uses as much inbuilt functionality in root as possible
 //Return the ideal number of bins for a histogram of a vector of doubles
 ////Uses D. Scott's method, published 1979
-int OptimumBinNumber( TH1* input_hist, int axis )
+int Histogram_Processing::OptimumBinNumber( TH1* input_hist, int axis )
 {
 	double wanted_bins = GetOptimalBins( input_hist, axis );
 	double existing_bins = 0.;
 	if( axis == 1 ) existing_bins = input_hist->GetNbinsX();
 	else if( axis == 2 )  existing_bins = input_hist->GetNbinsY();
 	else if( axis == 3 )  existing_bins = input_hist->GetNbinsZ();
-	input_hist->Rebin( int( ( (double) existing_bins ) / (( double)wanted_bins ) ) );
+	int rebin_factor = int( ( (double) existing_bins ) / (( double)wanted_bins ) );
+	if( rebin_factor <= 0 ) rebin_factor = 1;
+	input_hist->Rebin( rebin_factor );
 
 	return (int) wanted_bins;
 }
 
 //  Return the optimal number of bins that should be used if this data is gaussianly distributed
-unsigned int GetOptimalBins( TH1* input_hist, int axis )
+unsigned int Histogram_Processing::GetOptimalBins( TH1* input_hist, int axis )
 {
 	double varience = input_hist->GetRMS( axis );
 	varience = varience*varience;
@@ -56,1026 +69,477 @@ unsigned int GetOptimalBins( TH1* input_hist, int axis )
 	double width = 3.49 * sqrt( varience ) * pow( num_entries, -(1.0/3.0) );
 	double min_range = 0.;
 	double max_range = 0.;
-	if( axis == 1 ){
+	if( axis == 1 )
+	{
 		min_range = input_hist->GetXaxis()->GetXmin();
-		max_range = input_hist->GetXaxis()->GetXmax();	}
-	else if( axis == 2 ){
+		max_range = input_hist->GetXaxis()->GetXmax();
+	}
+	else if( axis == 2 )
+	{
 		min_range = input_hist->GetYaxis()->GetXmin();
-		max_range = input_hist->GetYaxis()->GetXmax();	}
-	else if( axis == 3 ){
+		max_range = input_hist->GetYaxis()->GetXmax();
+	}
+	else if( axis == 3 )
+	{
 		min_range = input_hist->GetZaxis()->GetXmin();
-		max_range = input_hist->GetZaxis()->GetXmax();	}
+		max_range = input_hist->GetZaxis()->GetXmax();
+	}
 
-		double range = max_range - min_range;
-		double wanted_bins = ceil( range / width );
+	double range = max_range - min_range;
+	double wanted_bins = ceil( range / width );
 
-		//  Catch SERIOUS rounding errors and caes where the information has already been lost due to underbinning
-		if( ( axis == 1 ) && ( wanted_bins > input_hist->GetNbinsX() ) )  return 0;
-		else if( ( axis == 2 ) && ( wanted_bins > input_hist->GetNbinsY() ) )  return 0;
-		else if( ( axis == 3 ) && ( wanted_bins > input_hist->GetNbinsZ() ) )  return 0;
-		else return (int) wanted_bins;
+	//  Catch SERIOUS rounding errors and caes where the information has already been lost due to underbinning
+	if( ( axis == 1 ) && ( wanted_bins > input_hist->GetNbinsX() ) )  return 0;
+	else if( ( axis == 2 ) && ( wanted_bins > input_hist->GetNbinsY() ) )  return 0;
+	else if( ( axis == 3 ) && ( wanted_bins > input_hist->GetNbinsZ() ) )  return 0;
+	else return (unsigned) wanted_bins;
 
-		return 0;
+	return 0;
 }
 
 //  This function simply rebins a histogram to an optimal number of bins for a gaussian like distribution
-void OptimallyRebin( TH1* input_hist, int axis )
+void Histogram_Processing::OptimallyRebin( TH1* input_hist, int axis )
 {
 	int temp = OptimumBinNumber( input_hist, axis );
 	(void) temp;	return;
 }
 
 
-//      This will find all of the unique corrdinates stored in a TPolyMarker3D object
-//      NB this was written due to the fact that ROOT thows away the contents of {3/4}D TTree->Draw() objects... (God only knows why)
-vector<vector<Float_t> > Unique_Coords( TPolyMarker3D *pm )
+TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int OutputLevel )
 {
-	//      Tolerance of the DOUBLE
-	double DT = 1E-5;
+	//	the gamma function in ROOT has issues with verbosity, let's silence it and then return the verbosity back at the end
 
-	//      Get the number of coordinates in the TPolyMarker3D
-	int number_of_points = pm->GetN();
-	//      Get the data contained in the TPolyMarker3D
-	Float_t* Coord_Data_pointer = pm->GetP();
-
-	//      Will populate and return to the user
-	vector<vector<Float_t> > Returnable_Coord_Data;
-
-	//      Used within a for loop in logic, externally created/destroyed
-	bool add_point = true;
-	bool temp_decision_1 = true;
-	bool temp_decision_2 = true;
-	bool temp_decision_3 = true;
-
-	//      Run over all of the points contained within the TPolyMarker3D object
-	for( int i=0; i< number_of_points; ++i )
+	streambuf *nullbuf=NULL, *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+	ofstream filestr;
+	filestr.open ("/dev/null");
+	//      If the user wanted silence we point the Std Output Streams to /dev/null
+	if( OutputLevel <= -1 )
 	{
-		//      Assume we haven't seen this point yet
-		add_point = true;
-		//      Check the anzats
-		for( unsigned int j=0; j< Returnable_Coord_Data.size(); ++j )
-		{
-			temp_decision_1 = true;
-			temp_decision_2 = true;
-			temp_decision_3 = true;
-			if( fabs( Coord_Data_pointer[i*3] - Returnable_Coord_Data[j][0] ) < DT ) temp_decision_1 = false;
-			if( fabs( Coord_Data_pointer[i*3+1] - Returnable_Coord_Data[j][1] ) < DT ) temp_decision_2 = false;
-			if( fabs( Coord_Data_pointer[i*3+2] - Returnable_Coord_Data[j][2] ) < DT ) temp_decision_3 = false;
-
-			//      If all of the information is the same do NOT add the point to the new vector of data
-			if( ( ( temp_decision_1 == temp_decision_2 ) && ( temp_decision_2 == temp_decision_3 ) ) && ( temp_decision_1 == false ) )
-				add_point = false;
-		}
-		//      If we haven't seen this point yet add it to the array of points
-		if( add_point )
-		{
-			//cout << Coord_Data_pointer[i*3] << "\t" << Coord_Data_pointer[i*3+1] << "\t" << Coord_Data_pointer[i*3+2] << endl;
-			vector<Float_t> temp_vector;
-			temp_vector.push_back( Coord_Data_pointer[i*3] );
-			temp_vector.push_back( Coord_Data_pointer[i*3+1] );
-			temp_vector.push_back( Coord_Data_pointer[i*3+2] );
-			Returnable_Coord_Data.push_back( temp_vector );
-		}
+		cout_bak = cout.rdbuf();
+		cerr_bak = cerr.rdbuf();
+		clog_bak = clog.rdbuf();
+		//	I have to use a non NULL destination for the output because the ROOT output mechanism is a incidious evil piece of code that checks if your directing ALL output to NULL and decides you don't want that
+		//	WTF gives this piece of code to change my mind for me?!?
+		nullbuf = filestr.rdbuf();
+		cout.rdbuf(nullbuf);
+		cerr.rdbuf(nullbuf);
+		clog.rdbuf(nullbuf);
 	}
 
-	//      Return a 2D vector of unique 3D corrdinates of size npoints*3
-	return Returnable_Coord_Data;
-}
 
-vector<vector<Float_t> > Plotter_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random )
-{
-        //      Plot the graph using TTree->Draw()
-	//      The resulting graph (TH3) contains empty axis and a TPolyMarker3D object
-	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
-	input_tree->Draw( Draw_String, Cut_String );
-                                      
-	//      Get the Points that have been plotted (TPolyMarker3D object named "TPolyMarker3D", see ROOTtalk)
-	TPolyMarker3D *pm = (TPolyMarker3D*)gPad->FindObject("TPolyMarker3D");
-	double temp = random->Rndm();
-	TString Name = "TPoly3_";
-	Name+=temp;
+	TString Fit_Options( "Q" );			// Reduce the verbosity slamming the user during this internal procedure
+	TF1* my_landau = Mathematics::landau_func(); (void) my_landau;
+	TF1* my_gamma = Mathematics::gamma_func(); (void) my_gamma; // this is used from the global state not here... this displeases me...
 
-	if( pm!= NULL )
+	TFitResult* result = NULL;
+
+	//  Try Gaussian function
+	result = new TFitResult( local_histogram->Fit ( "gaus", Fit_Options ) );
+	Double_t chi_2_gaus ( local_histogram->GetFunction ( "gaus" )->GetChisquare() );
+	if( result->Status() != 0 )	chi_2_gaus = DBL_MAX;
+
+	//  The GammaDist function originally complained of invalid results (A LOT) and giving it sensible starting points was a way around this
+	my_gamma->SetParameters( local_histogram->GetFunction( "gaus" )->GetParameter( 0 ), local_histogram->GetFunction( "gaus" )->GetParameter( 1 ), local_histogram->GetFunction( "gaus" )->GetParameter( 2 ) );
+
+	//  Try Landau function
+	result = new TFitResult( local_histogram->Fit ( "mylandau", Fit_Options ) );
+	Double_t chi_2_landau ( local_histogram->GetFunction ( "mylandau" )->GetChisquare() );
+	if( result->Status() != 0 )	chi_2_landau = DBL_MAX;
+
+	result = new TFitResult( local_histogram->Fit ( "gammaf", Fit_Options ) );
+	Double_t chi_2_gamma_f ( local_histogram->GetFunction( "gammaf" )->GetChisquare() );
+	if( result->Status() != 0 )	chi_2_gamma_f = DBL_MAX;
+
+	TString fit_type;
+
+	//  Determine which function gives the lowest fit chi squared
+	if( fabs(chi_2_landau) < fabs(chi_2_gaus) )  fit_type.Append( "mylandau" );
+	else  if( fabs(chi_2_gamma_f) < fabs(chi_2_gaus) )  fit_type.Append( "gammaf" );
+	else  fit_type.Append( "gaus" );
+
+	//      Reset Std Output Streams
+	if( OutputLevel <= -1 )
 	{
-		pm->SetName(Name);
-
-		//      Get a list of ONLY unique coordinates due to the short comings of the interpolation within TGraph2D
-		vector<vector<Float_t> > returnable_data = Unique_Coords( pm );
-
-		return returnable_data;
-	}
-	vector<vector<Float_t> > dummy_return;
-	return dummy_return;
-}
-
-TGraph2D* Plotter( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random )
-{
-	//      Get a list of ONLY unique coordinates due to the short comings of the interpolation within TGraph2D
-	vector<vector<Float_t> > Coord_Data = Plotter_Data( input_tree, Draw_String, Cut_String, random );
-
-	//      Make a new EMPTY TGraph2D with a unique name
-	TGraph2D* new_plot = new TGraph2D();
-	TString Plot="Plot_";
-	double temp = random->Rndm();
-	Plot+=temp;
-	new_plot->SetName(Plot);
-	new_plot->SetTitle(Plot);
-	//      Set Binning of Plot
-	new_plot->SetNpx( int( ceil( sqrt( double(Coord_Data.size()) ) ) ) );
-	new_plot->SetNpy( int( ceil( sqrt( double(Coord_Data.size()) ) ) ) );
-
-	//      Add the data to the TGraph2D object as points
-	for( unsigned int i=0; i< Coord_Data.size(); ++i )
-	{
-		//cout << i << "\t" << Coord_Data[i][0] << "\t" << Coord_Data[i][1] << "\t" << Coord_Data[i][2] << endl;
-		new_plot->SetPoint( int(i), Coord_Data[i][0], Coord_Data[i][1], Coord_Data[i][2] );
+		cout.rdbuf(cout_bak);
+		cerr.rdbuf(cerr_bak);
+		clog.rdbuf(clog_bak);
 	}
 
-	//      Return the TGraph2D object
-	return new_plot;
+	return fit_type;
 }
 
-
-//      Produce Plotting Histograms from an input TTree
-TH2D* Plot_From_Cut( TTree* wanted_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 )
+void Histogram_Processing::Silent_Fit( TH1* input_histo, TString fit_type, int OutputLevel )
 {
-	//      Create a canvas
-	TString Canvas_Name("Canvas_");
-	double rand = random->Rndm();
-	Canvas_Name+=rand;
-	TCanvas* temp_canvas = new TCanvas( Canvas_Name, Canvas_Name );
+	//      the gamma function in ROOT has issues with verbosity, let's silence it and then return the verbosity back at the end
 
-	//      Plot the Graph
-	TGraph2D* new_graph = Plotter( wanted_tree, Draw_String, Cut_String, random );
-
-	//      Update the Canvas to initialize anything that requires this step... this is very much a ROOT thing
-	temp_canvas->Update();
-
-	//      Return the Histogram from within this graph for plotting
-	TH2D* Returnable_Hist = new_graph->GetHistogram();
-	if( Returnable_Hist != NULL )
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+	//      If the user wanted silence we point the Std Output Streams to /dev/null
+	if( OutputLevel <= -1 )
 	{
-		Returnable_Hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
-		Returnable_Hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
-		return Returnable_Hist;
+		cout_bak = cout.rdbuf();
+		cerr_bak = cerr.rdbuf();
+		clog_bak = clog.rdbuf();
+		//  Redirect the errors to the empty void of nullness
+		freopen("/dev/null", "w", stderr);
 	}
-	return NULL;
+	//  Redirect the errors to the empty void of nullness
+	freopen("/dev/null", "w", stderr);
+	input_histo->Fit( fit_type, "Q" );
+	//      Reset Std Output Streams
+	if( OutputLevel <= -1 )
+	{
+		cout.rdbuf(cout_bak);
+		cerr.rdbuf(cerr_bak);
+		clog.rdbuf(clog_bak);
+	}
 }
 
-//      Produce Plotting Histograms from an input TTree
-TGraph2D* Plot_From_Cut_lo( TTree* wanted_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 )
+void Histogram_Processing::Silent_Draw( TCanvas* c1, TH1* input_histo, TString options, int OutputLevel )
 {
-	//      Create a canvas
-	TString Canvas_Name("Canvas_");
-	double rand = random->Rndm();
-	Canvas_Name+=rand;
-	TCanvas* temp_canvas = new TCanvas( Canvas_Name, Canvas_Name );
+	//      the gamma function in ROOT has issues with verbosity, let's silence it and then return the verbosity back at the end
 
-	//      Plot the Graph
-	TGraph2D* new_graph = Plotter( wanted_tree, Draw_String, Cut_String, random );
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+	//      If the user wanted silence we point the Std Output Streams to /dev/null
+	if( OutputLevel <= -1 )
+	{
+		cout_bak = cout.rdbuf();
+		cerr_bak = cerr.rdbuf();
+		clog_bak = clog.rdbuf();
+		//  Redirect the errors to the empty void of nullness
+		freopen("/dev/null", "w", stderr);
+	}
+	input_histo->Draw(options);
+	c1->Update();
+	//      Reset Std Output Streams
+	if( OutputLevel <= -1 )
+	{
+		cout.rdbuf(cout_bak);
+		cerr.rdbuf(cerr_bak);
+		clog.rdbuf(clog_bak);
+	}
+}
 
-	//      Update the Canvas to initialize anything that requires this step... this is very much a ROOT thing
-	temp_canvas->Update();
+void Histogram_Processing::Silent_Print( TCanvas* c1, TString Print_String, int OutputLevel )
+{
+	//      the gamma function in ROOT has issues with verbosity, let's silence it and then return the verbosity back at the end
 
-	//      Return the Histogram from within this graph for plotting
-	new_graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
-	new_graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+	//      If the user wanted silence we point the Std Output Streams to /dev/null
+	if( OutputLevel <= -1 )
+	{
+		cout_bak = cout.rdbuf();
+		cerr_bak = cerr.rdbuf();
+		clog_bak = clog.rdbuf();
+		//  Redirect the errors to the empty void of nullness
+		freopen("/dev/null", "w", stderr);
+	}
+	c1->Update();
+	c1->Print( Print_String );
+	//      Reset Std Output Streams
+	if( OutputLevel <= -1 )
+	{
+		cout.rdbuf(cout_bak);
+		cerr.rdbuf(cerr_bak);
+		clog.rdbuf(clog_bak);
+	}
+}
 
+TH1* Histogram_Processing::Get_Histo( TTree* input_tree, TString draw_str, TString weight_str, TRandom* rand )
+{
+	if( rand == NULL ) rand = gRandom;
+	TString rand_str; rand_str+=rand->Rndm();
+	input_tree->Draw( draw_str, weight_str, "goff" );
+	TH1* output_histo = (TH1*) input_tree->GetHistogram();
+	output_histo->SetName(output_histo->GetName()+rand_str);
+	return output_histo;
+}
+
+TGraph* Histogram_Processing::Get_Graph( TTree* input_tree, TString draw_str, TString weight_str, TRandom* rand )
+{
+	if( rand == NULL ) rand = gRandom;
+	TString rand_str; rand_str+=rand->Rndm();
+	TGraph* new_graph = new TGraph( Get_Histo( input_tree, draw_str, weight_str, rand ) );
+	new_graph->SetName("Graph_"+rand_str);
 	return new_graph;
 }
 
-//	Return a TTree object composed from a vector of vector of data objects, I provide a stupid branch naming scheme
-TTree* vecvec2TTree( vector<vector<Float_t> > input_vec )
+TH1* Histogram_Processing::Get_TH1( const vector<Double_t>& input, TRandom* rand, int bins, double X_MIN, double X_MAX )
 {
-
-	TTree* new_tree = new TTree( "tree2Draw", "tree2Drw" );
-		 
-	Float_t* Float_data = new Float_t[ input_vec[0].size() ];
-	for( unsigned int i=0; i<input_vec[0].size(); ++i )
+	if( rand == NULL ) rand = gRandom;
+	if( input.empty() )
 	{
-		TString br_name("Branch_");
-		br_name+=i;
-		TString br_title(br_name);
-		br_title.Append("/F");
-		new_tree->Branch( br_name, &Float_data[i], br_title );
+		cout << "NO 1D INPUT DATA TO PLOT" << endl;
+		return NULL;
 	}
-
-	for( unsigned int i=0; i<input_vec.size(); ++i)
+	double input_min = get_minimum( input );
+	double input_max = get_maximum( input );
+	if( X_MIN != -DBL_MAX ) input_min = X_MIN;
+	if( X_MAX != DBL_MAX ) input_max = X_MAX;
+	TString rand_num; rand_num += rand->Rndm();
+	TH1* returnable_hist = new TH1D( "TH1_"+rand_num, "TH1_"+rand_num, bins, input_min, input_max );
+	vector<Double_t>::const_iterator index_i = input.begin();
+	vector<Double_t>::const_iterator index_e = input.end();
+	for( ; index_i != index_e; ++index_i )
 	{
-		for( unsigned int j=0; j<input_vec[i].size(); ++j )
-		{
-			Float_data[j] = input_vec[i][j];
-			new_tree->Fill();
-		}
+		returnable_hist->Fill( *index_i );
 	}
-
-	return new_tree;
+	return returnable_hist;
 }
 
-//	This will be removed in future versions
-//pair<TH2*,TPolyMarker3D>* Plot_From_Cut_lo( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 )
-//{
-//	vector<vector<Float_t> > Coord_Data = Plotter_Data( input_tree, Draw_String, Cut_String, random );
-//
-//	TRandom3* rand = new TRandom(0);
-//
-//	TString name("namez");
-//	name+=rand->Rndm();
-//
-//	TCanvas* mc = new TCanvas( name, name, 1680, 1050 );
-//
-//	TTree* plotting_tree = vecvec2TTree( Coord_Data );
-//
-//	plotting_tree->Draw("Branch_0:Branch_1:Branch_2");
-//
-//	mc->Update();
-//	TPolyMarker3D *pm = (TPolyMarker3D*)gPad->FindObject("TPolyMarker3D");
-//	temp = rand->Rndm();
-//	TString Name = "TPoly3_";
-//	Name+=temp;
-//	pm->SetName(Name);
-//
-//	TH2* returnable_hist = (TH2*) plotting_tree->GetHistogram();
-//
-//	returnable_hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
-//	returnable_hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
-//	pair<TH2*,TPolyMarker3D> returnable_pair;
-//	returnable_pair.first = returnable_hist;
-//	returnable_pair.second = pm;
-//	return returnable_pair;
-//}
-
-//      Produce plots for all Physics Parameters stored within the given TTree
-//      In theory could also extract the parameters from the input TTree, but as the user likely knows what they want, ask-em
-void Physics_Plots( vector<TString> all_parameter_values, Float_t* best_fit_values, TTree* input_tree, TRandom3* rand_gen, TString Param1_Param2, bool CV_Drift, TH2** Physics_Param_Plots, TString Cut_String)
+TH1* Histogram_Processing::Plot_1D( const vector<double>& input, TString Filename, TString Options, TRandom* rand )
 {
-	//      Construct a plot string for the physics parameters and plot them
-	cout << endl << "STARTING PLOTS SHOWING THE VARIATION OF PHYSICS PARAMETERS THROUGHOUT THE SCANS" << endl;
+	if( rand == NULL ) rand = gRandom;
+	if( input.empty() ) return NULL;
 
-	//      Store all of the plotting strings
-	TString* Physics_Param_DrawString = new TString[unsigned(all_parameter_values.size())];
-	//      Loop over all of the wanted parameters that have been passed
-	for( unsigned int i=0; i<all_parameter_values.size(); ++i )
-	{
-		cout << endl << "PLOTTING: " << all_parameter_values[i] << "\t" << i+1 << " of: " << all_parameter_values.size() << endl;
+	TH1* temp_histo = Histogram_Processing::Get_TH1( input, rand );
 
-		//      Construct Plotting String based on input
-		Physics_Param_DrawString[i] = "(" + all_parameter_values[i];
-		if( CV_Drift )
-		{
-			TString Best_Value;
-			Best_Value+=best_fit_values[i];
-			Physics_Param_DrawString[i] += "-" + Best_Value;
-		}
-		Physics_Param_DrawString[i] += ")";
-		Physics_Param_DrawString[i] += Param1_Param2;
+	TString canv_name("canv_"); canv_name+=rand->Rndm();
 
-		//      Actually perform the plots using the same tool as before
-		cout << Physics_Param_DrawString[i] << endl;
-		cout << Cut_String << endl;
-		Physics_Param_Plots[i] = Plot_From_Cut( input_tree, Physics_Param_DrawString[i], Cut_String, rand_gen );
+	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
 
-		//      Plot the graph
-		TString Canvas_Name("Plot_Me_");
-		double rand_canv = rand_gen->Rndm();
-		Canvas_Name+=rand_canv;
-		TCanvas* plot_me = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
-		plot_me->SetTitle( "" );
-		plot_me->SetName( all_parameter_values[i] );
-		Physics_Param_Plots[i]->Draw("colz");
-		plot_me->Update();
-	}
+	temp_histo->Draw( Options );
+
+	c1->Update();
+	c1->Print(Filename);
+	c1->Close();
+	delete c1;
+
+	return temp_histo;
 }
 
-//	Actually plot the Physics Parameter plots properly
-void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_parameter_values, TString param1string, TString param2string, TString outputdir, bool CV_Drift )
+TGraph* Histogram_Processing::Get_TGraph( const vector<vector<Double_t> >& input, TRandom* rand )
 {
-	for( unsigned short int i=0; i < all_parameter_values.size(); ++i )
-	{
-		TString Name("Physics_Param_");
-		Name+=i;
+	if( rand == NULL ) rand = gRandom;
+	if( input.empty() ) return NULL;
 
-		TCanvas* final_physics_canvas = new TCanvas( Name, Name, 1680, 1050 );
+	TGraph* returnable_graph = new TGraph( input[0].size(), &(input[0][0]), &(input[1][0]) );
 
-		//	Use the RapidFit naming scheme to translate the parameter name back into latex characters
-		All_Physics_Plots[i]->SetTitle("");
-		All_Physics_Plots[i]->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2string ) );
-		All_Physics_Plots[i]->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1string ) );
+	TString TGraph_Name("TGraph_"); TGraph_Name+=rand->Rndm();
 
-		if( CV_Drift ) 	all_parameter_values[i].Append("_var");
+	returnable_graph->SetTitle( TGraph_Name );
+	returnable_graph->SetName( TGraph_Name );
 
-		vector<TString> Draw_Styles; Draw_Styles.push_back("colz"); Draw_Styles.push_back("cont1z");
-
-		for( unsigned int j=0; j< Draw_Styles.size(); ++j )
-		{
-			if( j==1 ) All_Physics_Plots[i]->SetContour(80);
-			All_Physics_Plots[i]->Draw(Draw_Styles[j]);
-			addLHCbLabel( all_parameter_values[i] )->Draw();
-
-			final_physics_canvas->Update();
-
-			//	See the object for FC Stats as to why this is here
-			TPaletteAxis *palette = (TPaletteAxis*)All_Physics_Plots[i]->GetListOfFunctions()->FindObject("palette");
-			if( palette != NULL )
-			{
-				palette->SetX1NDC(0.957);
-				palette->SetX2NDC(0.962);
-				palette->SetLabelSize((Float_t)0.02);
-				palette->GetAxis()->SetTickSize(0);
-				final_physics_canvas->Update();
-			}
-			//	Output Filename for the Plot
-			TString Output_File( outputdir );
-			Output_File+= "/" + all_parameter_values[i]+"_"+Draw_Styles[j]+"_";
-
-			final_physics_canvas->Print( Output_File + ".png" );
-			final_physics_canvas->Print( Output_File + ".pdf" );
-		}
-	}
-	return;
+	return returnable_graph;
 }
 
-//	Plot a 2D grid of points that contain data on a TGraph2D
-//	This allows for failing grid points and misssing grid jobs to be visualised and compared on a similar scale to explain any anomolies in other plots
-void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TString param2_val, TRandom3* random, TString Suffix, TString outputdir )
+TGraph2D* Histogram_Processing::Get_TGraph2D( const vector<vector<Double_t> >& input, TRandom* rand )
 {
-	TString Name("Canvas");
-	double rand = random->Rndm();
-	Name+=rand;
-	TCanvas* GRID = new TCanvas(Name,Name,1680,1050);
-	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
-	TString Draw_Str = param1_val + "_value:" + param2_val + "_value";
-	input_tree->Draw( Draw_Str, Cut_String );
-	TGraph* GRID_Graph = new TGraph( (int)input_tree->GetSelectedRows(), input_tree->GetV2(), input_tree->GetV1() );
-	rand = random->Rndm();
-	TString GName= "Coord";GName+=rand;
-	//	Use Black squares to indicate if data was here or not, nothing more intelligent, nothing less
-	GRID_Graph->SetName( GName );
-	GRID_Graph->SetMarkerStyle(21);
-	GRID_Graph->SetMarkerSize(3);
-	GRID_Graph->SetTitle("");
-	Name+=random->Rndm();
-	GRID_Graph->SetName( Name );
-	GRID_Graph->Draw("P");
-	GRID->Update();
-	//	use the RapidFit nameing scheme
-	GRID_Graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2_val ) );
-	GRID_Graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1_val ) );
-	GRID->Print( outputdir + "/Coordinate_Grid"+Suffix+".png");
+	if( rand == NULL ) rand = gRandom;
+	if( input.empty() ) return NULL;
+	if( input.size() != 3 ) return NULL;
+
+	TGraph2D* returnable_TGraph2D = new TGraph2D( input[0].size(), const_cast<Double_t*>(&(input[0][0])), const_cast<Double_t*>(&(input[1][0])), const_cast<Double_t*>(&(input[2][0])) );
+
+	TString TGraph2D_Name("TGraph2D_"); TGraph2D_Name+=rand->Rndm();
+
+	returnable_TGraph2D->SetName( TGraph2D_Name );
+	returnable_TGraph2D->SetTitle( TGraph2D_Name );
+
+	return returnable_TGraph2D;
+
 }
 
-//	This Is HEAVILY WIP and attempts to use some more internal functions within the TGraph{,2D} objects to produce the Contours
-//	This could reduce the overheads introduced in this very intensive plotting algorithm
-//
-//	THIS SHOULD NOT BE CONSIDERED STABLE CODE AND MAY COMPILE BUT WILL PROBABLY TURN YOUR MACHINE INTO A MOLTEN WRECK
-void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name )
+TH2* Histogram_Processing::Get_TH2( const vector<vector<Double_t> >& input, TRandom* rand, int bins1, int bins2 )
 {
-	(void) input_conts; (void) cont_num; 
-	vector<TString> Plot_Type;
-	Plot_Type.push_back( "Temp" );
-	Plot_Type.push_back( "Cont" );
-	Plot_Type.push_back( "Conf" );
-	Plot_Type.push_back( "Pub" );
-
-	TString Draw_String;
-	TString Canvas_Name("Styled_Canvas_");
-
-	TString Base_Name = outputdir + "/" + Name + "_";
-
-	for( unsigned int i = 0; i < Plot_Type.size(); ++i )
+	if( rand == NULL ) rand = gRandom;
+	if( input.empty() )
 	{
-
-		if( i == 0 )	Draw_String = "colz";
-		if( i == 1 )	Draw_String = "cont1z";
-
-		if( i == 2 || i == 3 )
-		{
-			Draw_String = "cont LIST";
-			//input_graph->SetContour( cont_num, input_conts );
-		}
-
-		Canvas_Name+=i;
-		TCanvas* Styled_Output_Canvas = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
-
-		input_graph->Draw( Draw_String );
-		Styled_Output_Canvas->Update();
-
-		if( i == 0 )
-		{
-			input_graph->Draw( Draw_String );
-			Styled_Output_Canvas->Update();
-			TPaletteAxis *palette = (TPaletteAxis*)input_graph->GetListOfFunctions()->FindObject("palette");
-			palette->SetX1NDC(0.957);
-			palette->SetX2NDC(0.962);
-			palette->SetLabelSize((Float_t)0.02);
-			palette->GetAxis()->SetTickSize(0);
-			Styled_Output_Canvas->Update();
-		}
-
-		if( i == 2 || i == 3 )
-		{
-			TObjArray *contObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
-
-			TList* contLevel = NULL;
-			TGraph* curv = NULL;
-			TGraph* gc = NULL;
-			double cl=0;
-			TString confname;
-
-			int TotalConts = contObjArr->GetSize();
-
-			TLegend *leg = new TLegend(0.80,0.89,0.95,0.7);
-			leg->SetHeader("Conf. Levels");
-			leg->SetBorderSize(0);
-			leg->SetFillStyle(0);
-
-			input_graph->Draw("AXIS");
-
-			for(int j = 0; j < TotalConts; ++j )
-			{
-				confname = "";
-				cl = confs[j];
-				confname +=cl;
-				confname += "% C.L.";
-				contLevel = input_graph->GetContourList(cl);
-				//contLevel = (TList*)contObjArr->At(j);
-				for(int k =0; k < contLevel->GetSize(); ++k)
-				{
-					curv = (TGraph*)contLevel->At(k);
-					gc = (TGraph*)curv->Clone();
-					if( Plot_Type[i] == "Pub"  )	gc->SetLineStyle( Style_t(j+1) );
-					if( Plot_Type[i] == "Conf" )	gc->SetLineColor( Color_t(j+2) );
-					gc->Draw("L");
-				}
-				leg->AddEntry( gc, confname, "L");
-			}
-
-			leg->Draw();
-		}
-
-		TString Output_Name = Base_Name + Plot_Type[i];
-
-		addLHCbLabel( Name )->Draw();
-		input_graph->SetTitle("");
-		Styled_Output_Canvas->Update();
-
-		Styled_Output_Canvas->Print( Output_Name + ".png" );
-		Styled_Output_Canvas->Print( Output_Name + ".pdf" );
-
+		cout << "NO 2D INPUT DATA TO PLOT" << endl;
+		return NULL;
 	}
-
-	//	Lets conserve the efforts of this plotting tool :D
-	cout << endl << "Writing TH2D object for comparisons with other scans" << endl << endl;
-
-	TString Hist_FileName = outputdir+"/"+Name+".root";
-
-	TFile * output = new TFile( Hist_FileName, "RECREATE" );
-
-	input_graph->Write();
-	output->Close();
-
-	// Return to default
-	//input_hist->SetContour(20);
-	return;
+	TString rand_num; rand_num += rand->Rndm();
+	vector<Double_t> X_data = input[0];
+	vector<Double_t> Y_data = input[1];
+	vector<Double_t> weight;
+	if( input.size() == 3 )
+	{
+		weight = input[2];
+	}
+	else
+	{
+		weight = vector<double>( input[0].size(), 1. );
+	}
+	TH2* returnable_hist = new TH2D( "TH2_"+rand_num, "TH2_"+rand_num, bins1, get_minimum(X_data), get_maximum(X_data), bins2, get_minimum(Y_data), get_maximum(Y_data) );
+	vector<Double_t>::const_iterator index_x = X_data.begin();
+	vector<Double_t>::const_iterator index_y = Y_data.begin();
+	vector<Double_t>::const_iterator index_e = X_data.end();
+	vector<Double_t>::const_iterator index_w = weight.begin();
+	for( ; index_x != index_e; ++index_x, ++index_y, ++index_w )
+	{
+		returnable_hist->Fill( *index_x, *index_y, *index_w );
+	}
+	return returnable_hist;
 }
 
-//	Take a contour and plot on a given set of contours and provide, 4 plots:
-//	Tempterature plot,
-//	Contour Plot with 40 levels
-//	Contour Plot with the reuqested contours
-//	Black and White version of the above
-//	in .png & .pdf
-void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name )
+TH2* Histogram_Processing::Plot_2D( const vector<double>& X, const vector<double>& Y, TString Filename, TString Option, TRandom* rand )
 {
-	vector<TString> Plot_Type;
-	Plot_Type.push_back( "Temp" );
-	Plot_Type.push_back( "Cont" );
-	Plot_Type.push_back( "Conf" );
-	Plot_Type.push_back( "Pub" );
+	if( rand == NULL ) rand = gRandom;
+	if( X.empty() || Y.empty() ) return NULL;
+	if( X.size() != Y.size() ) return NULL;
 
-	TString Draw_String;
-	TString Canvas_Name("Styled_Canvas_");
+	vector<vector<double> > data; data.push_back( X ); data.push_back( Y );
 
-	TString Base_Name = outputdir + "/" + Name + "_";
+	TH2* temp_plot = Histogram_Processing::Get_TH2( data, rand );
 
-	for( unsigned int i = 0; i < Plot_Type.size(); ++i )
-	{
-		//	Define Plot Type for the DrawString
-		if( i == 0 )	Draw_String = "colz";
-		if( i == 1 )	Draw_String = "cont1z";
+	TString canv_name("Canv_"); canv_name += rand->Rndm();
 
-		if( i == 2 || i == 3 )
-		{
-			Draw_String = "cont LIST";
-			input_hist->SetContour( cont_num, input_conts );
-		}
+	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
 
-		Canvas_Name+=i;
-		TCanvas* Styled_Output_Canvas = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
+	temp_plot->Draw( Option );
 
-		//	Actually call plot function to create EVERYTHING on the convas
-		//	THIS SHOULD BE 1 COMMAND BUT ISN'T IN ROOT...
-		input_hist->Draw( Draw_String );
-		Styled_Output_Canvas->Update();
+	c1->Update();
+	c1->Print( Filename );
 
-		//	Temperature Plot
-		if( i == 0 )
-		{
-			input_hist->Draw( Draw_String );
-			Styled_Output_Canvas->Update();
-                        TPaletteAxis *palette = (TPaletteAxis*)input_hist->GetListOfFunctions()->FindObject("palette");
-			palette->SetX1NDC(0.957);
-			palette->SetX2NDC(0.962);
-			palette->SetLabelSize((Float_t)0.02);
-			palette->GetAxis()->SetTickSize(0);
-			Styled_Output_Canvas->Update();
-		}
+	c1->Close();
 
-		//	Lots of Contours
-		if( i == 1 )
-		{
-			input_hist->SetContour(40);	
-		}
-
-
-		//	User requested Contours
-		if( i == 2 || i == 3 )
-		{
-			TObjArray *contObjArr = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
-
-			TList* contLevel = NULL;
-			TGraph* curv = NULL;
-			TGraph* gc = NULL;
-			double cl=0;
-			TString confname;
-
-			int TotalConts = contObjArr->GetSize();
-
-			TLegend *leg = new TLegend(0.80,0.89,0.95,0.7);
-			leg->SetHeader("Conf. Levels");
-			leg->SetBorderSize(0);
-			leg->SetFillStyle(0);
-
-			input_hist->Draw("AXIS");
-
-			for(int j = 0; j < TotalConts; ++j )
-			{
-				confname = "";
-				cl = confs[j];
-				confname +=cl;
-				confname += "% C.L.";
-				contLevel = (TList*)contObjArr->At(j);
-				for(int k =0; k < contLevel->GetSize(); ++k)
-				{
-					curv = (TGraph*)contLevel->At(k);
-					gc = (TGraph*)curv->Clone();
-					if( Plot_Type[i] == "Pub"  )	gc->SetLineStyle( Style_t(j+1) );
-					if( Plot_Type[i] == "Conf" )	gc->SetLineColor( Color_t(j+2) );
-					gc->Draw("L");
-				}
-				leg->AddEntry( gc, confname, "L");
-			}
-
-			leg->Draw();
-		}
-
-		TString Output_Name = Base_Name + Plot_Type[i];
-
-		//	Actually Output the graphs to disk
-		addLHCbLabel( Name )->Draw();
-		input_hist->SetTitle("");
-		Styled_Output_Canvas->Update();
-
-		Styled_Output_Canvas->Print( Output_Name + ".png" );
-		Styled_Output_Canvas->Print( Output_Name + ".pdf" );
-
-	}
-
-	//	Save the LL Contour that was user requested as a TGraph2D Object in a ROOT file
-
-	//	Lets conserve the efforts of this plotting tool :D
-	cout << endl << "Writing TH2D object for comparisons with other scans" << endl << endl;
-
-	TString Hist_FileName = outputdir+"/"+Name+".root";
-
-	TFile * output = new TFile( Hist_FileName, "RECREATE" );
-
-	input_hist->Write();
-	output->Close();
-
-	// Return to default
-	input_hist->SetContour(20);
-	return;
+	return temp_plot;
 }
 
-
-//	Plot 2 canvased on top of each other
-//	This allows for 2 sets of contours (of equal number) to be chosen for each dataset
-//	
-//	TODO:	Allow for the Legend to be customised, easy step just takes time to code up
-//
-//	This adopts the namescheme to plot a FC scan atop a 2DLL plot but is generically written enough to allow 2 group TH2 objects to be placed atop each other
-//
-void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double *llconts, double* confs, TString outputdir, TString Legend_Name_1, TString Legend_Name_2 )
+TH3* Histogram_Processing::Get_TH3( const vector<vector<Double_t> >& input, TRandom* rand, int bins1, int bins2, int bins3 )
 {
-	TCanvas* Temp_1 = new TCanvas("Temp","Temp",1680,1050);  
-
-	TList* contLevel = NULL;
-	TGraph* Line     = NULL;
-	vector<TGraph*> Contour_Lines;
-
-	//TString Legend_Name_1 = "NLL";
-	//TString Legend_Name_2 = "FC";
-
-	//	Construct the Legend
-	//TLegend *leg = new TLegend(0.75,0.89,0.95,0.99);
-	TLegend *leg = new TLegend(0.80,0.89,0.95,0.7);
-	leg->SetHeader("Conf. Levels");
-	leg->SetBorderSize(0);
-	leg->SetFillStyle(0);
-
-	//	Construct the Contours in the LL plot
-	pllhist->SetContour( nconts, llconts );
-	pllhist->Draw("cont LIST");
-	Temp_1->Update();
-
-	//	Get the Contours in the LL Plot
-	TObjArray *LL_Contours = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
-
-	//	Loop over all contours
-	for( int i = 0; i < LL_Contours->GetSize(); ++i )
+	if( rand == NULL ) rand = gRandom;
+	if( input.empty() )
 	{
-		//	Name that contour...
-		TString confname = "";
-		confname += confs[i];
-		confname.Append( "% C.L. " + Legend_Name_1 );
-
-		//	Get the List of lines making up this contour
-		contLevel = (TList*) LL_Contours->At(i);
-
-		//	Loop over all lines constructing this contour (max 4)
-		for(int j =0; j < contLevel->GetSize(); ++j)
-		{
-			//	Current line
-			Line = (TGraph*) contLevel->At(j);
-
-			//	Change the contour line Style
-			TGraph *gc = (TGraph*) Line->Clone();
-			gc->SetLineStyle( Style_t(i+1) );
-
-			//	Store this line
-			Contour_Lines.push_back(gc);
-
-			//	Add an entry in the Legend for it
-			if( j==0 )  leg->AddEntry( gc, confname, "L");
-		}
+		cout << "NO 3D INPUT DATA TO PLOT" << endl;
+		return NULL;
 	}
-
-	//	Construct the Legend
-	FC_Plot->SetContour(nconts,fcconts);
-	FC_Plot->Draw("cont LIST");
-	Temp_1->Update();
-
-	//	Get the Contours in the FC Plot
-	TObjArray *FC_Contours = (TObjArray*)gROOT->GetListOfSpecials()->FindObject("contours");
-	Temp_1->Update();
-
-	//	Loop over all contours
-	for(int i = 0; i < FC_Contours->GetSize(); ++i)
+	TString rand_num; rand_num += rand->Rndm();
+	vector<Double_t> X_data = input[0];
+	vector<Double_t> Y_data = input[1];
+	vector<Double_t> Z_data = input[2];
+	TH3* returnable_hist = new TH3D( "TH3_"+rand_num, "TH3_"+rand_num, bins1, get_minimum(X_data), get_maximum(X_data), bins2, get_minimum(Y_data), get_maximum(Y_data), bins3, get_minimum(Z_data), get_maximum(Z_data) );
+	vector<Double_t>::const_iterator index_x = X_data.begin();
+	vector<Double_t>::const_iterator index_y = Y_data.begin();
+	vector<Double_t>::const_iterator index_z = Z_data.begin();
+	vector<Double_t>::const_iterator index_e = X_data.end();
+	for( ; index_x != index_e; ++index_x, ++index_y, ++index_z )
 	{
-		//	Name that contour...
-		TString confname = "";
-		confname += confs[i];
-		confname.Append( "% C.L. " + Legend_Name_2 );
-
-		//	Get the List of lines making up this contour
-		contLevel = (TList*) FC_Contours->At(i);
-
-		//	Loop over all lines constructing this contour (max 4)
-		for(int j =0; j<contLevel->GetSize(); ++j)
-		{
-			//	Current line
-			Line = (TGraph*) contLevel->At(j);
-
-			//	Set the line Color
-			TGraph *gc = (TGraph*) Line->Clone();
-			gc->SetLineColor( Color_t(i+2) );
-
-			//	Store this line
-			Contour_Lines.push_back(gc);
-
-			//	Add an entry in the Legend for it
-			if(j==0)  leg->AddEntry( gc, confname, "L");
-		}
+		returnable_hist->Fill( *index_x, *index_y, *index_z );
 	}
-
-	TCanvas* Overlay_Output = new TCanvas( "Output_Overlay", "Output_Overlay", 1680, 1050);
-
-	//	First construct the Axis
-	pllhist->Draw("AXIS");
-
-	//	Now plot all of the lines from all of the contours
-	for( unsigned int i = 0; i < Contour_Lines.size(); ++i )
-		Contour_Lines[i]->Draw("L SAME");
-
-	//	Add the rest of the details to the plot
-	TString Label_Str( Legend_Name_1 + " & " + Legend_Name_2 + " Overlay" );
-	addLHCbLabel( Label_Str )->Draw();
-	leg->Draw();
-	Overlay_Output->Update();
-
-	TString Overlay_FileName( outputdir + "/LL_FC_Overlay");
-
-	Overlay_Output->Print( Overlay_FileName + ".png" );
-	Overlay_Output->Print( Overlay_FileName + ".pdf" );
-
-	//      Return the plots back to their input state
-	pllhist->SetContour(20);
-	FC_Plot->SetContour(20);
+	return returnable_hist;
 }
 
-//	Actually Perform an FC analysis on a RapidFit dataset containing the data
-//
-//	The data is extraced from the input_tree using various cutstrings built up from data in the 2DLL data contained within the dataset
-//
-//	the FC_Output object has output data placed in as the analysis is performed which allows for the FC_Stat object to simply review the output
-//	this stored things such as job efficiency/stability
-TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TString param2, TString NLL, TString Fit_Cut, double NLL_Global_Best, TTree* FC_Output, TString Double_Tolerance, TRandom3* random )
+TH1* Histogram_Processing::Get_Histo( const vector<vector<Double_t> >& input, TRandom* rand, int bins1, int bins2, int bins3 )
 {
-
-	TString param1_gen = param1 + "_gen";
-	TString param2_gen = param2 + "_gen";
-	TString param1_val = param1 + "_value";
-	TString param2_val = param2 + "_value";
-	TString param1_err = param1 + "_error";
-	TString param2_err = param2 + "_error";
-
-	TTree* Grid = Cut( input_tree, Fit_Cut_String, random );
-	//	The TTree object from the PLL fit contains information on the corrdinates of the fit
-	Float_t Param_1_Coord=0, Param_2_Coord=0, NLL_Local_Best=0;
-	Grid->SetBranchAddress( param1_val, &Param_1_Coord );
-	Grid->SetBranchAddress( param2_val, &Param_2_Coord );
-	Grid->SetBranchAddress( NLL, &NLL_Local_Best );
-
-	//	Easiest to store the output in a new TTree
-	//	Want to store the CL calculated at every point and the efficiency of Toys at this coordinate
-	Float_t CL=0.;
-	Int_t Toy_Num=0, Successful_Toys=0, Processed_Toys=0, Fit_Status=3;
-	TString CL_Branch = "CL";
-	TString CL_Branch_Type = "CL/F";
-	TString Success_Branch = "Success";
-	TString Success_Branch_Type = "Success/I";
-	TString Total_Branch = "Total";
-	TString Total_Branch_Type = "Total/I";
-	TString Processed_Toys_Branch = "Processed_Toys";
-	TString Processed_Toys_Branch_Type = "Processed_Toys/I";
-	TString param1_val_type = param1_val + "/F";
-	TString param2_val_type = param2_val + "/F";
-	TString Fit_Status_Str = "Fit_Status";
-	TString Fit_Status_Type = Fit_Status_Str + "/I";
-	FC_Output->Branch( CL_Branch, &CL, CL_Branch_Type );
-	FC_Output->Branch( Success_Branch, &Successful_Toys, Success_Branch_Type );
-	FC_Output->Branch( Total_Branch, &Toy_Num, Total_Branch_Type );
-	FC_Output->Branch( param1_val, &Param_1_Coord, param1_val_type );
-	FC_Output->Branch( param2_val, &Param_2_Coord, param2_val_type );
-	FC_Output->Branch( Processed_Toys_Branch, &Processed_Toys, Processed_Toys_Branch_Type );
-	FC_Output->Branch( Fit_Status_Str, &Fit_Status, Fit_Status_Type );
-
-	vector<vector<Float_t> > Used_Coordinate;
-
-	//	Move the object definitions outside of the loop
-	bool Add_Point=true;
-	bool decision_1=true;
-	bool decision_2=true;
-	int j=0;
-	int Floated_Toy_Num=0;
-	int Fixed_Toy_Num=0;
-
-	//double rand=0;
-
-	//Find the toys generated at the previously discovered gridpoints
-	for( int i = 0; i < Grid->GetEntries(); ++i )
-	{
-		vector<Double_t> Floated_Toys_NLL;
-		vector<Double_t> Fixed_Toys_NLL;
-
-		//	Read in information about this Grid_Coordinate, coordinate and the NLL from the local best fit
-		Grid->GetEntry( i );
-
-		Add_Point = true;
-		for( j=0; j < (int)Used_Coordinate.size(); ++j )
-		{
-			decision_1 = true;
-			decision_2 = true;
-			if( fabs( Param_1_Coord  - Used_Coordinate[j][0] ) < 1E-5 ) { decision_1 = false; }
-			if( fabs( Param_2_Coord  - Used_Coordinate[j][1] ) < 1E-5 ) { decision_2 = false; }
-			if( ( decision_1 == false ) && ( decision_2 == false ) ) { Add_Point = false; }
-		}
-		if( Add_Point ){
-			vector<Float_t> temp_Coord;
-			temp_Coord.push_back( Param_1_Coord );
-			temp_Coord.push_back( Param_2_Coord );
-			Used_Coordinate.push_back( temp_Coord );
-		} else { continue; }
-
-		//	Cut on only toys at this Grid coord
-		TString Param_1_Coord_Str;
-		Param_1_Coord_Str+=Param_1_Coord;
-		TString Param_2_Coord_Str;
-		Param_2_Coord_Str+=Param_2_Coord;
-		TString Param_1_Grid = "(abs(" + param1_gen + "-" + Param_1_Coord_Str + ")<" + Double_Tolerance + ")";
-		TString Param_2_Grid = "(abs(" + param2_gen + "-" + Param_2_Coord_Str + ")<" + Double_Tolerance + ")";
-
-		TString Toys_At_Grid_Point = Param_1_Grid + "&&" + Param_2_Grid;
-
-		Floated_Toys_NLL = Get_Data( input_tree, Toys_At_Grid_Point, NLL );
-		Toy_Num = (int)Floated_Toys_NLL.size();
-
-		Toys_At_Grid_Point += "&&" + Fit_Cut;
-
-		Floated_Toys_NLL = Get_Data( input_tree, Toys_At_Grid_Point, NLL );
-		Successful_Toys = (int)Floated_Toys_NLL.size();
-
-		TString float_param_1 = "(abs(" + param1_err + ")>" + Double_Tolerance + ")";
-		TString float_param_2 = "(abs(" + param2_err + ")>" + Double_Tolerance + ")";
-
-		TString Floated_Toys_At_Grid_Point = Toys_At_Grid_Point + "&&" + float_param_1 + "&&" + float_param_2;
-
-
-		TString fixed_param_1 = "(abs(" + param1_err + ")<" + Double_Tolerance + ")";
-		TString fixed_param_2 = "(abs(" + param2_err + ")<" + Double_Tolerance + ")";
-
-		TString Fixed_Toys_At_Grid_Point = Toys_At_Grid_Point + "&&" + fixed_param_1 + "&&" + fixed_param_2;
-
-		//	Get all toys at this grid point that are Floated
-
-		Floated_Toys_NLL = Get_Data( input_tree, Floated_Toys_At_Grid_Point, NLL );
-
-		//	Get all toys at this grid point that are Fixed
-		Fixed_Toys_NLL = Get_Data( input_tree, Fixed_Toys_At_Grid_Point, NLL );
-
-		Floated_Toy_Num = int( Floated_Toys_NLL.size() );
-		Fixed_Toy_Num = int( Fixed_Toys_NLL.size() );
-
-		if( Floated_Toy_Num != Fixed_Toy_Num )
-		{
-			cerr << endl << "NUMBER OF FIXED AND FLOATED TOYS AT COORDINATE:\t" << Param_1_Coord << ":" << Param_2_Coord <<endl;
-			cerr << "ARE DIFFERENT, USING THE SAME SAMBLE SIZE OF EACH WHICH REDUCES THE ACCURACY" << endl << endl;
-			if( Floated_Toy_Num < Fixed_Toy_Num ) Fixed_Toy_Num = Floated_Toy_Num;
-			else Floated_Toy_Num = Fixed_Toy_Num;
-		}
-
-		//	By definition here!
-		Processed_Toys = Floated_Toy_Num;
-
-		if( Fixed_Toy_Num != 0 ){
-
-			//Loop over the toys, pulling out the NLL ratio
-			UInt_t smaller_Toys = 0;
-
-			Double_t Ratio = NLL_Local_Best - NLL_Global_Best;
-			for( j = 0; j < Fixed_Toy_Num; ++j){
-
-				//THE LINE BELOW IS THE FELDMAN-COUSINS ORDERING METHOD USED BY CDF/HEIDELBERG: 
-				//if the toyratio is smaller than the data ratio at this point, increment:
-				if ( (Fixed_Toys_NLL[j]-Floated_Toys_NLL[j]) < Ratio )
-				{
-					++smaller_Toys;
-				}
-			}
-
-			//The C.L. is the percentage of toys that were smaller
-			CL = Float_t(smaller_Toys)/Float_t(Fixed_Toy_Num);
-
-		} else {
-			//	THIS IS SERIOUS, tell the user about it!
-			cerr << "\t" << Param_1_Coord << ":" << Param_2_Coord << "\tWARNING: NO TOYS FOUND HERE! " << endl;
-			CL = +9999.;	//	This plots a spike here which shows on contours
-		}
-		cout << Processed_Toys << "\tTOYS PROCESSED AT:\t" << setprecision(4) << setw(10) << Param_1_Coord << "   :" << setw(10) << Param_2_Coord << endl;
-		//	Store the relevent information for plotting in the FC_Output TTree
-		FC_Output->Fill();
-	}
-
-	TString FCName="FC_Plot_";
-	double temp = random->Rndm();
-	FCName+=temp;
-
-	TCanvas* FC_Plot = new TCanvas( FCName, FCName, 1680, 1050 );
-	TString Param1_Param2 = ":" + param1_val + ":" + param2_val;
-
-	FC_Output->Draw( "CL" + Param1_Param2 );
-	FC_Plot->Update();
-	TPolyMarker3D *pm = (TPolyMarker3D*)gPad->FindObject("TPolyMarker3D");
-	temp = random->Rndm();
-	TString Name = "TPoly3_";
-	Name+=temp;
-	pm->SetName(Name);
-
-	vector<vector<Float_t> > Coord_Data = Unique_Coords( pm );
-
-	TGraph2D* new_plot = new TGraph2D();
-	TString Plot="FC_Plot_";
-	temp = random->Rndm();
-	Plot+=temp;
-	new_plot->SetName(Plot);
-	new_plot->SetTitle(Plot);
-	//	Set Binning of Plot
-	new_plot->SetNpx( int( ceil( sqrt( double(Coord_Data.size()) ) ) ) );
-	new_plot->SetNpy( int( ceil( sqrt( double(Coord_Data.size()) ) ) ) );
-
-	for( unsigned int i=0; i< Coord_Data.size(); ++i )
-	{
-		//cout << i << "\t" << Coord_Data[i][0] << "\t" << Coord_Data[i][1] << "\t" << Coord_Data[i][2] << endl;
-		new_plot->SetPoint( int(i), Coord_Data[i][0], Coord_Data[i][1], Coord_Data[i][2] );
-	}
-
-	TH2D* Returnable_Hist = new_plot->GetHistogram();
-
-	Returnable_Hist->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
-	Returnable_Hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
-
-	return Returnable_Hist;
+	if( rand == NULL ) rand = gRandom;
+	if( input.empty() ) return NULL;
+	if( input.size() == 1 ) return Histogram_Processing::Get_TH1( input[0], rand, bins1 );
+	if( input.size() == 2 ) return (TH1*)Histogram_Processing::Get_TH2( input, rand, bins1, bins2 );
+	if( input.size() == 3 ) return (TH1*)Histogram_Processing::Get_TH3( input, rand, bins1, bins2, bins3 );
+	return NULL;
 }
 
-//	Plot some stats from the FC_Output ttree which stores some data from the full FC calculations
-void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand, TString outputdir )
+TH3* Histogram_Processing::Plot_3D( const vector<double>& X, const vector<double>& Y, const vector<double>& Z, TString Filename, TString Option, TRandom* rand )
 {
-	TString Name("FC_STAT_");
-	Name+= rand->Rndm();
-	vector<TString> unique;
-	TString Name2("FC_STAT_");
-	Name2+= rand->Rndm();
-	TString Name3("FC_STAT_");
-	Name3+= rand->Rndm();
-	unique.push_back( Name2 );
-	unique.push_back( Name3 );
-	TCanvas* FC_Stat_Canvas = new TCanvas( Name, Name, 1680, 1050 );
+	if( rand == NULL ) rand = gRandom;
+	if( X.empty() || (Y.empty() || Z.empty() ) )	return NULL;
+	if( (X.size() != Y.size()) || (Y.size() != Z.size()) || (X.size() != Z.size()) ) return NULL;
 
-	TString Total_Toy_Map = param1 + "_value:" + param2 + "_value:" + "Processed_Toys";
-	TString Toy_Efficiency_Map = param1 + "_value:" + param2 + "_value:" + "(Processed_Toys/(Total/2))";
+	vector<vector<double> > data; data.push_back( X ); data.push_back( Y ); data.push_back( Z );
 
-	vector<TString> all_plot_str;
-	all_plot_str.push_back( Total_Toy_Map );
-	all_plot_str.push_back( Toy_Efficiency_Map );
-	vector<TString> Map_Names;
-	Map_Names.push_back( "FC_Total_Toys.pdf" );
-	Map_Names.push_back( "FC_Toy_Efficiency.pdf" );
+	TH3* temp_plot = Histogram_Processing::Get_TH3( data, rand );
 
-	for( unsigned int i=0; i< all_plot_str.size(); ++i )
-	{
-		FC_Output->Draw( all_plot_str[i], "goff" );
-		TGraph2D* FC_Stat_Graph = new TGraph2D( (int)FC_Output->GetSelectedRows(), FC_Output->GetV2(), FC_Output->GetV1(), FC_Output->GetV3() );
-		FC_Stat_Graph->SetName( unique[i] );
-		FC_Stat_Graph->SetTitle( unique[i] );
-		FC_Stat_Graph->Draw();
-		FC_Stat_Canvas->Update();
-		FC_Stat_Graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param2 ) );
-		FC_Stat_Graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( param1 ) );
-		FC_Stat_Graph->Draw("P");
-		FC_Stat_Canvas->Update();
-		TH1* FC_Stat_Hist = FC_Stat_Graph->GetHistogram();
-		unique[i]+=rand->Rndm();
-		FC_Stat_Hist->SetName( unique[i] );
-		FC_Stat_Hist->SetTitle( unique[i] );
-		FC_Stat_Canvas->cd();
-		FC_Stat_Hist->Draw("colz");
-		FC_Stat_Canvas->Update();
+	TString canv_name("Canv_"); canv_name+=rand->Rndm();
 
-		//	Due to some part of the construction the labels for the temp key (right of the plot) are plotted off canvas
-		//	This is likely some net effect of doing something 'not quite ROOT'
-		//
-		//	Hence you can either resize the TFrame object containing the actual area where the plot is made,
-		//	OR:
-		//	Move and reisze the axis (which is something that is much easier and will likely always be less painful
+	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
 
-		TPaletteAxis* palette = NULL;
+	temp_plot->Draw( Option );
 
-		//	Get the PaletteAxis for temperature graphs which is created as part of the Update axis
-                palette = (TPaletteAxis*)FC_Stat_Hist->GetListOfFunctions()->FindObject("palette");
-		if( palette != NULL )
-		{
-			TString pal_name("pal_");
-			pal_name+=rand->Rndm();
-			palette->SetName(pal_name);
-			//	Move it to a slightly better position
-			palette->SetX1NDC(0.957);
-			palette->SetX2NDC(0.962);
-			//	Reduce the text size of the axis to allow the numbers to be shown on part of the plot
-			palette->SetLabelSize((Float_t)0.02);
-			//	Remove the pointless axis markings...
-			palette->GetAxis()->SetTickSize(0);
-			//	Store the output
-		}
-		FC_Stat_Canvas->Update();
-		FC_Stat_Canvas->Print( outputdir + "/" + Map_Names[i] );
+	c1->Update();
+	c1->Print(Filename);
+	c1->Close();
 
-		//delete FC_Stat_Hist;
-		//delete FC_Stat_Graph;
-	}
-	//delete FC_Throw;
-	//delete FC_Stat_Canvas;
-	//if( palette != NULL ) delete palette;
-	//return;
+	delete c1;
+
+	return temp_plot;
+}
+
+TH1* Histogram_Processing::Plot( const vector<vector<double> >& input, TString Filename, TString Option, TRandom* rand )
+{
+	if( rand = NULL ) rand = gRandom;
+	if( input.empty() ) return NULL;
+	if( input.size() == 1 ) return Histogram_Processing::Plot_1D( input[0], Filename, Option, rand );
+	if( input.size() == 2 ) return (TH1*) Histogram_Processing::Plot_2D( input[0], input[1], Filename, Option, rand );
+	if( input.size() == 3 ) return (TH1*) Histogram_Processing::Plot_3D( input[0], input[1], input[2], Filename, Option, rand );
+	return NULL;
+}
+
+//	Originally Written by Conor Fitzpatrick
+TPaveText* Histogram_Processing::addLHCbLabel(TString footer, bool DATA)
+{
+	//TPaveText * label = new TPaveText(0.18, 0.77, 0.18, 0.88,"BRNDC");
+	TPaveText* label = new TPaveText( gStyle->GetPadLeftMargin() + 0.05, 
+						0.87 - gStyle->GetPadTopMargin(),
+						gStyle->GetPadLeftMargin() + 0.30,
+						0.95 - gStyle->GetPadTopMargin(),
+
+	//TPaveText* label = new TPaveText(0.7 - gStyle->GetPadRightMargin(),
+        //                        0.87 - gStyle->GetPadTopMargin(),
+        //                        1. - gStyle->GetPadRightMargin(),
+        //                        0.95 - gStyle->GetPadTopMargin(),
+                                "BRNDC");
+					
+	label->SetFillStyle(0);         //Transparent i.e. Opacity of 0 :D
+	label->SetBorderSize(0);
+	label->SetTextAlign(11);
+	label->SetTextSize(Float_t(0.04));
+	//TString labelstring( "LHC#font[12]{b} 2011" );
+	//TString labelstring( "LHCb 2011 " );
+	TString labelstring( "LHCb" );//"#splitline{LHCb}{#scale[1.0]{Preliminary}}" );
+	//if( DATA ) labeltstring.Append( " Data" );
+	//if( !DATA ) labeltstring.Append( " Simulation" );
+	label->AddText( labelstring );
+	label->AddText( "#scale[1.0]{Preliminary}" );
+	//label->AddText("#sqrt{s} = 7TeV " + footer );
+	return label;
+}
+
+vector<TMultiGraph*> Histogram_Processing::GetContoursFromTH2( TH2* input_th2, const vector<double>& contour_list, TRandom* rand )
+{
+        if( rand == NULL ) rand = gRandom;
+        vector<TMultiGraph*> returnable_Contours;
+
+        TString TCanvas_Name("TCanvas_");TCanvas_Name+=rand->Rndm();
+        TCanvas* c1 = new TCanvas( TCanvas_Name, TCanvas_Name, 1680, 1050 );
+
+        input_th2->SetContour( contour_list.size(), &(contour_list[0]) );
+
+        input_th2->Draw("cont LIST");
+        c1->Update();
+
+        TObjArray* generated_contours = (TObjArray *)gROOT->GetListOfSpecials()->FindObject("contours");
+
+        if( generated_contours == NULL ) return returnable_Contours;
+
+        TString rand_str; rand_str+=rand->Rndm();
+
+        for( unsigned int i=0; i< generated_contours->GetSize(); ++i )
+        {
+                TString Contour_Name( "Contour_"+rand_str+"_" ); Contour_Name+=i;
+
+                TMultiGraph* this_contour = new TMultiGraph( Contour_Name, Contour_Name );
+
+                TList* contour_parts = (TList*) generated_contours->At(i);
+
+                for( unsigned int j=0; j< contour_parts->GetSize(); ++j )
+                {
+			TString Part_Name( "Contour_"+rand_str+"_" ); Part_Name+=i;
+			Part_Name.Append("_"); Part_Name+=j;
+                        TGraph* this_part = (TGraph*) contour_parts->At(j);
+
+                        TGraph* copy_this_part = new TGraph( *this_part );
+
+			copy_this_part->SetName(Part_Name);
+			copy_this_part->SetTitle(Part_Name);
+
+                        this_contour->Add( copy_this_part );
+                }
+
+                returnable_Contours.push_back( this_contour );
+        }
+
+        c1->Close();
+        
+        return returnable_Contours;
 }
 

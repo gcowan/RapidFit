@@ -7,33 +7,54 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef OBSERVABLE_H
 #define OBSERVABLE_H
 
 //	System Headers
 #include <string>
 
-using namespace std;
+using namespace::std;
 
 class Observable
 {
 	public:
-		Observable();
+
+		Observable( string );
+
 		Observable( string, double, double, string );
+
+		/*!
+		 * @brief Destruction
+		 */
 		~Observable();
 
 		double GetValue() const;
-		void SetValue(double);
 
-		double GetError();
-		void SetError(double);
+		double GetError() const;
 
-		string GetUnit();
+		string GetUnit() const;
+
+		void SetBinNumber( int );
+		int GetBinNumber() const;
+
+		double GetAcceptance() const;
+		void SetAcceptance( double );
+
+		string GetName() const;
+
+		void Print() const;
+
+		void SetObservable( Observable* );
 
 	private:
+		string name;
 		double value;
 		double error;
 		string unit;
+		int bin_num;
+		double acceptance;
 };
 
 #endif
+

@@ -35,12 +35,12 @@
 #include <algorithm>
 #include <time.h>
 
-using namespace std;
+using namespace::std;
 
 namespace GoodnessOfFit
 {
 
-	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, vector<string> CommandLineParam, int nData )
+	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int nData )
 	{
 		cout << "Starting GOF" << endl;
 
@@ -50,15 +50,15 @@ namespace GoodnessOfFit
 		{
 			cout << "Iteration " << i << endl;
 			// Set up the PDF parameters
-			vector< ParameterSet * > parSet = xmlFile->GetFitParameters( CommandLineParam );
+			ParameterSet* parSet = xmlFile->GetFitParameters( CommandLineParam );
 
 			// First, generate our toy data, fit to it, use PDF to generate large MC and then calculate corresponding p-value from permutation
 			vector<double> dataPvalue;
-			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, &parSet, theMinimiser, theFunction, argumentParameterSet, nData, 1, &dataPvalue );
+			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, parSet, theMinimiser, theFunction, argumentParameterSet, nData, 1, &dataPvalue );
 
 			// Now need to account for any potential fit bias so repeat above procedure N times to get distribution of p-values
 			vector<double> distOfPvalues;
-			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, &parSet, theMinimiser, theFunction, argumentParameterSet, nData, 50, &distOfPvalues );
+			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, parSet, theMinimiser, theFunction, argumentParameterSet, nData, 50, &distOfPvalues );
 
 			// Finally, compare dataPvalue with distribution of pvalues to get the actual p-value of the fit, which correctly accounts for the bias
 			pvalue = GoodnessOfFit::getPvalue( dataPvalue[0], distOfPvalues );	
@@ -78,18 +78,18 @@ namespace GoodnessOfFit
 		return pvalue;
 	}
 
-	double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, FitResult * result)
+	double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, FitResult * result)
 	{
 		//	Unused parameters, keep gcc happy
 		(void) theMinimiser; (void) theFunction; (void) argumentParameterSet;
 		cout << "Starting GOF for data" << endl;
-		vector<PDFWithData *> pdfAndData = xmlFile->GetPDFsAndData();	
+		vector<PDFWithData *> pdfAndData = xmlFile->GetPDFsAndData();
 		vector<PDFWithData *>::iterator iter;
 		vector<IDataSet*> data;
 
 		// Take the fitted parameters
-		vector< ParameterSet * > parSetFromFit;
-		parSetFromFit.push_back(result->GetResultParameterSet()->GetDummyParameterSet());
+		ParameterSet* parSetFromFit;
+		parSetFromFit = result->GetResultParameterSet()->GetDummyParameterSet();
 
 		IPDF * pdf = NULL;
 		PhaseSpaceBoundary * phase = NULL;
@@ -100,7 +100,8 @@ namespace GoodnessOfFit
 		vector<IDataSet*> mcData;
 
 		// Generate large sample of MC using the fitted PDF parameters
-		for ( iter = pdfAndData.begin(); iter != pdfAndData.end(); ++iter ){
+		for ( iter = pdfAndData.begin(); iter != pdfAndData.end(); ++iter )
+		{
 			data.push_back( (*iter)->GetDataSet() );
 			nData = (unsigned)data.back()->GetDataNumber();
 			phase = data.back()->GetBoundary();
@@ -124,10 +125,10 @@ namespace GoodnessOfFit
 		return pvalue;
 	}
 
-	void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, vector<ParameterSet*> * parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, vector<ParameterSet*> argumentParameterSet, int nData, int repeats, vector<double> * pvalues)
+	void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, ParameterSet* parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, int nData, int repeats, vector<double> * pvalues)
 	{
 		PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
-		pdfAndData->SetPhysicsParameters( *parSet );
+		pdfAndData->SetPhysicsParameters( parSet );
 		IPDF * pdf = pdfAndData->GetPDF();
 		vector<IPDF*> vectorPDFs;
 		vectorPDFs.push_back(pdf);
@@ -135,7 +136,7 @@ namespace GoodnessOfFit
 		EdStyle * greigFormat = new EdStyle();
 		greigFormat->SetStyle();
 
-		vector< ParameterSet * > parSetFromFit;
+		ParameterSet* parSetFromFit = NULL;
 
 		// Set up to be able to generate some MC data
 		DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
@@ -143,11 +144,12 @@ namespace GoodnessOfFit
 		bool model = false;
 		double pvalue = 0.;
 		unsigned int ulTime = static_cast<unsigned int>( time( NULL ));
-		for ( int i = 0; i < repeats; ) {
+		for ( int i = 0; i < repeats; )
+		{
 			cout << "Ensemble " << i << endl;
 
 			// First, generate some data from this PDF
-			pdfAndData->SetPhysicsParameters( *parSet );
+			pdfAndData->SetPhysicsParameters( parSet );
 			pdf->SetRandomFunction( (int)ulTime );
 			pdf->SetMCCacheStatus( false );
 			MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
@@ -156,14 +158,14 @@ namespace GoodnessOfFit
 
 			if ( model ) {
 				// Use the same PDF for the large MC dataset (the Model approach)
-				pdfAndData->SetPhysicsParameters( *parSet );
+				pdfAndData->SetPhysicsParameters( parSet );
 			}
 			else {
 				// Fit the generated data (the Fit I approach)
 				FitResult * gofResult = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
 				if ( gofResult->GetFitStatus() == 3 ) {
-					parSetFromFit.clear();
-					parSetFromFit.push_back(gofResult->GetResultParameterSet()->GetDummyParameterSet());
+					delete parSetFromFit;
+					parSetFromFit = gofResult->GetResultParameterSet()->GetDummyParameterSet();
 					pdfAndData->SetPhysicsParameters( parSetFromFit );
 					i++; // let us go to the next iteration of the loop so that we always get "repeats" good results
 				}
@@ -178,10 +180,10 @@ namespace GoodnessOfFit
 			pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( subset, mcData );
 			//pvalue = GoodnessOfFit::pValueFromPoint2PointDissimilarity( data, mcData );
 			pvalues->push_back(pvalue);
-			delete subset;
-			delete mcData;
+			//delete subset;
+			//delete mcData;
 		}
-		parSet = &parSetFromFit;  // Need this so that we have the correct parameters during the second call of this function
+		parSet = parSetFromFit;  // Need this so that we have the correct parameters during the second call of this function
 	}
 
 	void plotUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, string plot )
@@ -207,8 +209,8 @@ namespace GoodnessOfFit
 		line->Draw("same");
 		ca->Update();
 		ca->SaveAs(plot.c_str());
-		delete distances;
-		delete ca;
+		//delete distances;
+		//delete ca;
 	}
 
 	void calculateUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, TH1D * distances)
@@ -322,9 +324,9 @@ namespace GoodnessOfFit
 			copyPhaseSpaceBoundary( tempPhase, phase );
 			updatePhaseSpaceBoundary( event_i, tempPhase, phase, vectorOfDistances ); 
 			RapidFitIntegrator * integrator = new RapidFitIntegrator( pdf, true );
-			volume = integrator->Integral( event_i, tempPhase, false );
-			delete tempPhase;
-			delete integrator;
+			volume = integrator->Integral( event_i, tempPhase );
+			//delete tempPhase;
+			//delete integrator;
 			U = exp( -1. * nD * volume );
 			double anaVolume = TMath::Pi() * pow(smallest_distance, 2);
 			double anaU = exp(-1.*nD         *     TMath::Pi()     * pow(smallest_distance, 2) *   pdf->Evaluate( event_i ) );
@@ -497,10 +499,10 @@ namespace GoodnessOfFit
 				tempMC->AddDataPoint( dataClone->GetDataPoint((int)*iter) );
 			}
 			double T = calculateTstatistic( tempData, tempMC );
-			delete rand;
-			delete tempMC;
-			delete tempData;
-			delete dataClone;
+			//delete rand;
+			//delete tempMC;
+			//delete tempData;
+			//delete dataClone;
 			return T;
 		}
 

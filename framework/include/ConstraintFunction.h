@@ -1,35 +1,75 @@
-/**
-  @class ConstraintFunction
+/*!
+ *  @class ConstraintFunction
+ *
+ *  @brief Where external, experimental constraints on PhysicsParameters are calculated
+ * 
+ *  @author Benjamin M Wynne bwynne@cern.ch
+ */
 
-  Where external, experimental constraints on PhysicsParameters are calculated
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @date 21-01-10
-  */
-
+#pragma once
 #ifndef CONSTRAINT_FUNCTION_H
 #define CONSTRAINT_FUNCTION_H
 
-//	RapidFit Headers
+///	RapidFit Headers
 #include "ParameterSet.h"
 #include "ExternalConstraint.h"
-//	System Headers
+///	System Headers
 #include <vector>
 
-using namespace std;
+using namespace::std;
 
 class ConstraintFunction
 {
 	public:
-		ConstraintFunction();
-		ConstraintFunction( vector< ExternalConstraint* > );
+		/*!
+		 * @brief Constructor which loops over all ExternalConstraints in the XML
+		 *
+		 * @param Input   This is a list of the ExternalConstraints of parameters in the ParameterSet around their minima
+		 */
+		ConstraintFunction( vector< ExternalConstraint* > Input );
+
+		/*!
+		 * @brief Detructor
+		 */
 		~ConstraintFunction();
 
-		double Evaluate( ParameterSet* );
+		/*!
+		 * @brief Evaluate this Constraint Function(s) for this ParameterSet
+		 *
+		 * @oaram Input   This is a pointer to the ParameterSet being tested
+		 *
+		 * @return This returns a correction number which is +ve and is the effect of where parameters fall in these constraints
+		 */
+		double Evaluate( ParameterSet* Input );
 
+		/*!
+		 * @brief Output some debugging info
+		 *
+		 * @return Void
+		 */
+		void Print() const;
+
+		/*!
+		 * @brief Generate the XML required to generate this object
+		 *
+		 * @return Return the XML for this in string Format
+		 */
+		string XML() const;
 	private:
-		vector< int > Found_Position;
-		vector< ExternalConstraint* > allConstraints;
+		/*!
+		 * Don't Copy the class this way!
+		 */
+		ConstraintFunction ( const ConstraintFunction& );
+
+		/*!
+		 * Don't Copy the class this way!
+		 */
+		ConstraintFunction& operator= ( const ConstraintFunction& );
+
+
+		vector< int > Found_Position;				/*	! Undocumented!	*/
+		vector< ExternalConstraint* > allConstraints;		/*	Internal list of all the External Constraints requested	*/
 };
 
 #endif
+

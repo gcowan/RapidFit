@@ -1,67 +1,172 @@
-/**
-        @class FitFunction
-
-        Parent class for the function to minimise
-        Overload the evaluate methods and UP value for Chi2, NLL, etc.
-
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
+/*!
+ * @class FitFunction
+ *
+ * @brief Parent class for the function to minimise
+ * 
+ * Overload the evaluate methods and UP value for Chi2, NLL, etc.
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
 */
 
+#pragma once
 #ifndef FIT_FUNCTION_H
 #define FIT_FUNCTION_H
 
-//	ROOT Headers
+///	ROOT Headers
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
-//	RapidFit Headers
+///	RapidFit Headers
 #include "PhysicsBottle.h"
 #include "RapidFitIntegrator.h"
 #include "ObservableRef.h"
 
+using namespace::std;
+
 class FitFunction
 {
 	public:
+		/*!
+		 * @breif Default Constructor
+		 */
 		FitFunction();
-		~FitFunction();
 
+		/*!
+		 * @brief Default Detructor
+		 */
+		virtual ~FitFunction();
+
+		/*!
+		 * @brief Setup the Trace to record all of the output from the Minimiser
+		 */
 		void SetupTrace( TString FileName, int traceNum );
-		void SetPhysicsBottle( PhysicsBottle* );
-		PhysicsBottle * GetPhysicsBottle();
-		bool SetParameterSet( ParameterSet* );
-		ParameterSet * GetParameterSet();
-		double Evaluate();
-		void Finalise();
-		void UseEventWeights(string);
 
-		void SetThreads( int );
+		/*!
+		 * @brief Set the Physics Bottle to be used
+		 *
+		 * @param Input This is the PhysicsBottle that the FitFunction will use to calculate the result in Evalute
+		 *
+		 * @return Void
+		 */
+		void SetPhysicsBottle( PhysicsBottle* Input );
+
+		/*!
+		 * @brief Get the Pointer to the Internal Physics Bottle
+		 *
+		 * @return Returns a pointer to the PhysicsBottle the FitFunction is using to Evaluate
+		 */
+		PhysicsBottle * GetPhysicsBottle();
+
+		/*!
+		 * @brief Change/Update the ParameterSet
+		 *
+		 * @param Input  This is the ParameterSet that the internal ParameterSet(s) should be chaned to
+		 *
+		 * @return true Changed the ParameterSet with no problems, false there was an error (I don't think this can be trusted and this should be made void)
+		 */
+		bool SetParameterSet( ParameterSet* );
+
+		/*!
+		 * @brief Get a Pointer to the Internal Parameter Set
+		 *
+		 * @return Returns a pointer to the Internal ParameterSet
+		 */
+		ParameterSet * GetParameterSet();
+
+		/*!
+		 * @brief Evaluate the FitFunction
+		 *
+		 * @return Returns a final value of the whole ParameterSet as a single double
+		 */
+		virtual double Evaluate();
+
+		/*!
+		 * @brief Set the Name of the Weights to use and the fact that Weights were used in the fit
+		 *
+		 * @param Name    This sets the name of the Weights to be used when Evaluating the DataSet
+		 *
+		 * @return Void
+		 */
+		void UseEventWeights( string Name );
+
+		/*!
+		 * @brief Set the Number of threads to be used by the FitFunction
+		 *
+		 * @param Input   This sets the number of threads that should be used by this FitFunction during Evaluate
+		 *
+		 * @return Void
+		 */
+		void SetThreads( int Input );
+
+		/*!
+		 * @brief Get the Number of threads this FitFunction is using
+		 *
+		 * @return Returns the number of Threads this FitFunction is attempting to use
+		 */
 		int GetThreads();
 
-		//Overload this function in child classes
-		virtual double UpErrorValue(int);
+		/*!
+		 * @brief Set whether any RapidFitIntegrator Objects created internally should check the PDF/Numerical Integral
+		 *
+		 * @param Input  Should The Integrals be tested?  true = yes  false = no
+		 *
+		 * @return Void
+		 */
+		void SetIntegratorTest( bool Input );
+
+		/*!
+		 * @brief What size of step in the function defines the error, 0.5 for NLL, 1 for chi2... etc.
+		 *
+		 * @input n  This is the nsigma Error you wish to calculate
+		 *
+		 * @return Returns the equivalent rise in the Function value that should be used to calculate the Error Value
+		 */
+		virtual double UpErrorValue( int n );
 
 	protected:
-		//	Uncopyable!
+		/*!
+		 * Don't Copy the class this way!
+		 */
 		FitFunction ( const FitFunction& );
+
+		/*!
+		 * Don't Copy the class this way!
+		 */
 		FitFunction& operator = ( const FitFunction& );
-		//Overload these functions in child classes
-		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator* );
 
-		PhysicsBottle * allData;
-		vector< RapidFitIntegrator* > allIntegrators;
-		double testDouble;
-		bool useWeights;
-		string weightObservableName;
 
-		//	This is fr traing Minuit
-		//	(this could give some VERY oool graphs in ResultSpace :D )
-		TFile* Fit_File;
-		TTree* Fit_Tree;
-		vector<Double_t> branch_objects;
-		vector<ObservableRef> branch_names;
-		Double_t fit_calls;
-		int Threads;
+		/*!
+		 * Overload these functions in child classes
+		 */
+		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator*, int );
+
+		PhysicsBottle * allData;			/*!	Undocumented	*/
+		vector< RapidFitIntegrator* > allIntegrators;	/*!	Undocumented	*/
+		double testDouble;			/*!	Undocumented	*/
+		bool useWeights;			/*!	Undocmuented	*/
+		string weightObservableName;		/*!	Undocumented	*/
+
+		//	This is for traing Minuit
+		//	(this could give some VERY cool graphs in ResultSpace :D )
+
+		TFile* Fit_File;			/*!	Undocumented	*/
+		TTree* Fit_Tree;			/*!	Undocumented	*/
+		vector<Double_t> branch_objects;	/*!	Undocumented	*/
+		vector<ObservableRef> branch_names;	/*!	Undocumented	*/
+		Double_t fit_calls;			/*!	Undocumented	*/
+
+
+		int Threads;				/*!	Undocumented	*/
+		vector<IPDF*> stored_pdfs;		/*!	Undocumented	*/
+		vector<PhaseSpaceBoundary*> StoredBoundary;			/*!	Undocumented	*/
+		vector< vector<vector<DataPoint*> > > StoredDataSubSet;		/*!	Undocumented	*/
+		vector<RapidFitIntegrator*> StoredIntegrals;			/*	Undocumented	*/
+		bool finalised;				/*!	Undocumented	*/
+		struct Fitting_Thread* fit_thread_data;	/*!	Undocumented	*/
+
+		bool testIntegrator;			/*!	Undocumented	*/
 };
 
 #endif
+

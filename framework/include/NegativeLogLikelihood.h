@@ -7,6 +7,7 @@
 	@date 2009-10-02
 */
 
+#pragma once
 #ifndef NEGATIVE_LOG_LIKELIHOOD_H
 #define NEGATIVE_LOG_LIKELIHOOD_H
 
@@ -22,6 +23,7 @@ class NegativeLogLikelihood : public FitFunction
 		virtual double UpErrorValue(int);
 
 	protected:
-		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator* );
+		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator*, int );
 };
 #endif
+

@@ -10,7 +10,7 @@
 //	RapidFit Headers
 #include "Blinder.h"
 
-using namespace std;
+using namespace::std;
 
 //Unblinds a given value -probably not used.
 double Blinder::unBlindParameter( double blindValue, const char * blindString, double scale )

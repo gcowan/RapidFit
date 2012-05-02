@@ -1,6 +1,7 @@
 //	Voodoo required for compiling RapidFit as a CINT library
 //	It should now again work :D
 
+#pragma once
 #ifdef __CINT__
 
 //	Can be defined globally or just for CINT, no harm either way
@@ -19,3 +20,4 @@
 #pragma link C++ global gEnv;
 
 #endif
+

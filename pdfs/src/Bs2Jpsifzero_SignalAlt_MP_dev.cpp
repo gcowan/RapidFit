@@ -11,7 +11,6 @@
 #include <iostream>
 #include "math.h"
 #include "TMath.h"
-#include "RooMath.h"
 #include "Mathematics.h"
 
 #include <float.h>
@@ -71,9 +70,7 @@ void Bs2Jpsifzero_SignalAlt_MP_dev::MakePrototypes()
 	parameterNames.push_back( res3FractionName );
 	parameterNames.push_back( timeOffsetName );
 	
-	allParameters = *( new ParameterSet(parameterNames) );
-
-	valid = true;
+	allParameters = ParameterSet(parameterNames);
 }
 
 

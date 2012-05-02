@@ -1,69 +1,85 @@
 /**
-        @class NormalisedSumPDF
+  @class NormalisedSumPDF
 
-        An implementation of IPDF for adding the values of two other IPDFs, normalising them relative to each other.
+  An implementation of IPDF for adding the values of two other IPDFs, normalising them relative to each other.
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-11-12
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-11-12
+ */
 
+#pragma once
 #ifndef NORMALISED_SUM_PDF_H
 #define NORMALISED_SUM_PDF_H
 
 //	RapidFit Headers
-//#include "IPDF.h"
+#include "IPDF.h"
 #include "BasePDF.h"
 #include "RapidFitIntegrator.h"
+#include "ComponentRef.h"
+//	System Headers
+#include <vector>
+#include <string>
+
+using namespace::std;
 
 class NormalisedSumPDF : public BasePDF
 {
 	public:
-		NormalisedSumPDF();
-		NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary* );
-		NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string );
+		NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string="fractionName" );
 		NormalisedSumPDF( const NormalisedSumPDF& );
-		virtual ~NormalisedSumPDF();
-
-		//Indicate whether the function has been set up correctly
-		virtual bool IsValid();
-
-		//Set the function parameters
-		virtual bool SetPhysicsParameters(ParameterSet*);
+		~NormalisedSumPDF();
 
 		//Return the integral of the function over the given boundary
-		virtual double Integral(DataPoint*, PhaseSpaceBoundary*);
+		double Normalisation( DataPoint*, PhaseSpaceBoundary* );
 
 		//Return the function value at the given point
-		virtual double Evaluate(DataPoint*);
-		virtual double EvaluateForNumericIntegral(DataPoint*);
+		double Evaluate( DataPoint* );
+		double EvaluateForNumericIntegral( DataPoint* );
 
-		//Return the components of the function value at the given point
-		virtual vector<double> EvaluateComponents(DataPoint*);
+		//Set the function parameters
+		bool SetPhysicsParameters( ParameterSet* );
 
 		//Return a prototype data point
-		virtual vector<string> GetPrototypeDataPoint();
+		vector<string> GetPrototypeDataPoint();
 
 		//Return a prototype set of physics parameters
-		virtual vector<string> GetPrototypeParameterSet();
+		vector<string> GetPrototypeParameterSet();
 
 		//Return a list of parameters not to be integrated
-		virtual vector<string> GetDoNotIntegrateList();
+		vector<string> GetDoNotIntegrateList();
 
-		// Update the two RapidFitIntegrator caches
-		virtual void UpdateIntegralCache();
+		bool CacheValid() const;
+		bool GetNumericalNormalisation() const;
 
+		//      Return components, component 0 by default
+		double EvaluateComponent( DataPoint*, ComponentRef* = NULL );
+
+		IPDF* GetFirstPDF() const;
+
+		IPDF* GetSecondPDF() const;
+
+		string GetFractionName() const;
+
+		bool GetCachingEnabled() const;
+
+		void SetCachingEnabled( bool Input );
+
+		string XML() const;
 	private:
 		//	Uncopyable!
 		NormalisedSumPDF& operator=(const NormalisedSumPDF&);
 		void MakePrototypes( PhaseSpaceBoundary* );
 
+		double GetFirstIntegral( DataPoint* );
+		double GetSecondIntegral( DataPoint* );
+
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;
 		IPDF * firstPDF;
-	       	IPDF * secondPDF;
+		IPDF * secondPDF;
 		RapidFitIntegrator * firstIntegrator;
 		RapidFitIntegrator * secondIntegrator;
 		double firstFraction, firstIntegralCorrection, secondIntegralCorrection;
-		string fractionName;
+		ObservableRef fractionName;
 		PhaseSpaceBoundary * integrationBoundary;
 };
 

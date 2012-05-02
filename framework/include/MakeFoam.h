@@ -1,3 +1,5 @@
+
+#pragma once
 #ifndef MAKE_FOAM_H
 #define MAKE_FOAM_H
 
@@ -8,7 +10,6 @@
 class MakeFoam
 {
 	public:
-		MakeFoam();
 		MakeFoam( IPDF*, PhaseSpaceBoundary*, DataPoint* );
 		MakeFoam( const MakeFoam& );
 		~MakeFoam();
@@ -20,10 +21,11 @@ class MakeFoam
 		//	Uncopyable!
 		MakeFoam& operator = ( const MakeFoam& );
 
-		vector<PhaseSpaceBoundary> finishedCells;
-		vector<DataPoint> centerPoints;
+		vector<PhaseSpaceBoundary*> finishedCells;
+		vector<DataPoint*> centerPoints;
 		vector<double> centerValues, cellIntegrals;
 		IPDF * integratePDF;
 };
 
 #endif
+

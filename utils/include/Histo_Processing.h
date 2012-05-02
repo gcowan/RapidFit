@@ -1,76 +1,214 @@
 #ifndef _HISTO_PROCESS
 #define _HISTO_PROCESS
 
-//	ROOT Headers
+///	ROOT Headers
 #include "TH1.h"
 #include "TH2.h"
 #include "TH3.h"
 #include "TPolyMarker3D.h"
-#include "TRandom3.h"
+#include "TRandom.h"
 #include "TString.h"
 #include "TTree.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
-//	System Headers
-
+#include "TCanvas.h"
+#include "TPaveText.h"
+#include "TMultiGraph.h"
+///	Utils Headers
+#include "Template_Functions.h"
+///	System Headers
 #include <vector>
+#include <limits>
 
 using namespace::std;
 
-//  This has been adapted from the original code in RapidFits Statistics code
-//  It is intended to take a histogram and automatically rebin according to this function
-//  As such it uses as much inbuilt functionality in root as possible
-//Return the ideal number of bins for a histogram of a vector of doubles
-////Uses D. Scott's method, published 1979
-int OptimumBinNumber( TH1* input_hist, int axis=1 );
+class Histogram_Processing
+{
+	public:
 
-//	Return the optimal number of bins for a given axis
-//	1) X	2) Y	3) Z
-unsigned int GetOptimalBins( TH1* input_hist, int axis=1 );
+		/*! 
+		 * @brief This has been adapted from the original code in RapidFit's Statistics code
+		 *        It is intended to take a histogram and automatically rebin according to this function
+		 *        As such it uses as much inbuilt functionality in root as possible
+		 *        Return the ideal number of bins for a histogram of a vector of doubles
+		 *        Uses D. Scott's method, published 1979
+		 *
+		 * This WILL rebin the input histogram according to the result from this method
+		 *
+		 * @param input_hist    This is the Histogram you wish to rebin in a given axis
+		 *
+		 * @param axis          This the axis you wish to look at (x=1, y=2, z=3) default is x
+		 *
+		 * @return Returns the Optimal Number of Bins as a signed integer
+		 */
+		static int OptimumBinNumber( TH1* input_hist, int axis=1 );
 
-//	Function which returns the Unique corrdinates contained within a TPolyMarker3D* set of 3d points
-vector<vector<Float_t> > Unique_Coords( TPolyMarker3D *pm );
+		/*!
+		 * @brief Return the optimal number of bins for a given axis
+		 *        Return the ideal number of bins for a histogram of a vector of doubles
+		 *        Uses D. Scott's method, published 1979
+		 *
+		 * @param input_hist    This is the Histogram you wish to calculate the number of bins for.
+		 *
+		 * @return Returns the Optimal Number of bins as an unsigned integer
+		 */
+		static unsigned int GetOptimalBins( TH1* input_hist, int axis=1 );
 
-//	Main plotting algorithm for plotting a TGraph2D from the input_tree based on the other parameters passed to it
-//	This removes degenerate datapoints as ROOT throws it's toys out of the pram if you don't...
-TGraph2D* Plotter( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random = new TRandom3() );
+		/*!
+		 * @brief Optimally rebins the histogram you provide
+		 *         By default this operates on the X axis assuming that you have a 1D histo but can rebin each axis independently upto 3D plots
+		 *
+		 *
+		 * Behind the scenes this is a wrapper to the OptimumBinNumber method which stops the compiler complaining about any unused output
+		 *
+		 * @param input_hist    This is the Histogram you wish to rebin
+		 *
+		 * @param axis          This is the axis you wish to rebin
+		 *
+		 * @return Void
+		 */
+		static void OptimallyRebin( TH1* input_hist, int axis=1 );
 
-//      Produce Plotting Histograms from an input TTree
-TH2D* Plot_From_Cut( TTree* wanted_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1="", TString param2="" );
+		/*!
+		 * @brief Get a TH1 from a vector of Doubles (could even write this to be type agnostric but I have the recast function in the template header
+		 *
+		 * @param input      This is the vector of values you wish to put into a Histogram
+		 *
+		 * @param rand       This is an optional pointer to a Random number generator to make sure the output TH1 has a unique name
+		 *                   Slightly horrible solution to the HORRIBLE ROOT NAMESPACE
+		 *                   You can safely pass NULL to this in doubt
+		 *
+		 * @param bins       This is the number of bins to use for this Histogram
+		 *
+		 * @param X_min      This is optional minimum of the histogram X axis
+		 *
+		 * @param X_max      This is the optiomal maximum of the histogram X axis
+		 *
+		 * @return Returns a pointer to a new TH1D that has been created
+		 */
+		static TH1* Get_TH1( const vector<Double_t>& input, TRandom* rand=NULL, int bins=100, double X_min=-DBL_MIN, double X_max=DBL_MAX );
 
+		/*!
+		 * @brief Get a TH2 from a vector of vectors which should be of outer dimension 2
+		 *
+		 * If you have a vector of vector which is of inner dimension 2 you can use the rotate() template method to change your object to be used here
+		 *
+		 * @warning If your input has an outer dimention > 2 only the first 2 are used. There is no warning about this!
+		 *
+		 * @param rand       This is an optional pointer to a Random number generator to make sure the output TH1 has a unique name                   
+		 *                   Slightly horrible solution to the HORRIBLE ROOT NAMESPACE                                                                
+		 *                   You can safely pass NULL to this in doubt
+		 *
+		 * @param bins1      This is the number of bins in X you wish to use
+		 *
+		 * @param bins2      This is the number of bins in Y you wish to use
+		 *
+		 * @return Returns a pointer to a new TH2D that has been created
+		 */
+		static TH2* Get_TH2( const vector<vector<Double_t> >& input, TRandom* rand=NULL, int bins1=100, int bins2=100 );
 
-//      Produce plots for all Physics Parameters stored within the given TTree
-//      In theory could also extract the parameters from the input TTree, but as the user likely knows what they want, ask-em
-void Physics_Plots( vector<TString> all_parameter_values, Float_t* best_fit_values, TTree* input_tree, TRandom3* rand_gen, TString Param1_Param2, bool CV_Drift, TH2** Physics_Param_Plots, TString Cut_String);
+		/*!
+		 * @brief Get a TH3 from a vector of vectors
+		 *
+		 * @param input 
+		 *
+		 *
+		 * @param rand
+		 *
+		 * @param bins1
+		 *
+		 * @param bins2
+		 *
+		 * @param bins3
+		 *
+		 * @return Returns a pointer to a new TH3D that has been created.
+		 */
+		static TH3* Get_TH3( const vector<vector<Double_t> >& input, TRandom* rand=NULL, int bins1=100, int bins2=100, int bins3=100 );
 
-//	Output the Nuisence parameters to GRaphs
-void Finalize_Physics_Plots( TH2* All_Physics_Plots[], vector<TString> all_parameter_values, TString param1string, TString param2string, TString outputdir, bool CV_Drift );
+		/*!
+		 * @brief get a TGraph2D object from the provided vector vectors
+		 *
+		 * This uses the Get_TH2 method behind the senes to get a Histogram to create a TGraph2D from
+		 *
+		 * @return Returns a pointer to the new TGraph2D object which has been created
+		 */
+		static TGraph2D* Get_TGraph2D( const vector<vector<Double_t> >& input, TRandom* rand=NULL );
 
-//	Plot a the unique coordinates on a grid to see where there is data to be analysed
-void LL2D_Grid( TTree* input_tree, TString Cut_String, TString param1_val, TString param2_val, TRandom3* random, TString Suffix, TString outputdir );
+		/*!
+		 * @brief Common interface to Get_{TH1,TH2,TH3}
+		 *
+		 * This allows you to be lazy (or generic) and just use a common interface for getting the correctly sized THx object from your input
+		 *
+		 * @return Returns a pointer to the THxD object that has just been created
+		 */
+		static TH1* Get_Histo( const vector<vector<Double_t> >& input, TRandom* rand=NULL, int bins1=100, int bins2=100, int bins3=100 );
 
-//	Plot a TH2 object with various contours and styles
-void Plot_Styled_Contour( TH2* input_hist, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name );
+		/*!
+		 * @brief Get a histogram from your draw string, after weighting from the input_tree
+		 *
+		 * @return Returns a pointer to the new THxD object which has beeen creted
+		 */
+		static TH1* Get_Histo( TTree* input_tree, TString draw_str, TString weight_str, TRandom* rand=NULL );
 
-//	DANGEROUS
-void Plot_Styled_Contour2( TGraph2D* input_graph, int cont_num, double* input_conts, double* confs, TString outputdir, TString Name );
+		/*!
+		 * @brief 
+		 *
+		 * @return Returns a pointer to the new TGraph object which has just been created
+		 */
+		static TGraph* Get_TGraph( const vector<vector<Double_t> >& input, TRandom* rand=NULL );
 
-//	Plot 2 TH2 object contours on the same TCanvas
-void Plot_Both( TH2* pllhist, TH2* FC_Plot, int nconts, double* fcconts, double *llconts, double* confs, TString outputdir, TString Legend_Name_1="NLL", TString Legend_Name_2="FC" );
+		//	Get a graph from your input draw string, after weighting from the input_tree
+		static TGraph* Get_Graph( TTree* input_tree, TString draw_str, TString weight_str, TRandom* rand=NULL );
 
-//	Perform the full FC analysis on a RapidFit dataset
-TH2D* FC_TOYS( TTree* input_tree, TString Fit_Cut_String, TString param1, TString param2, TString NLL, TString Fit_Cut, double NLL_Global_Best, TTree* FC_Output, TString Double_Tolerance, TRandom3* random );
+		//	Return the string which corresponds to the best fit function for the dataset by the best chi2
+		//	Evaluates and compares the gaus, gamma & landau functions from ROOT
+		static TString Best_Fit_Function( TH1* input, int OutputLevel=-1 );
 
-//	Analyse the output TTree from the FC analysis in FC_TOYS
-void FC_Stats( TTree* FC_Output, TString param1, TString param2, TRandom3* rand, TString outputdir );
+		//	Fit the TH1 whilst catching a lot of unwanted output
+		static void Silent_Fit( TH1* input_histo, TString fit_type, int OutputLevel=-1 );
 
-//	return the *UNIQUE* corrdinates contained in the input_tree from the Draw_String after applying the Cut_String
-vector<vector<Float_t> > Plotter_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom3* random );
+		//	Draw something whilst catching all of the root output to the standard streams
+		static void Silent_Draw( TCanvas* c1, TH1* input_histo, TString options="", int OutputLevel=-1 );
 
-//	Create a ttree from a vector of vectors
-TTree* vecvec2TTree( vector<vector<Float_t> > input_vec );
+		//	Print whilst catching all of the root output to the standard streams
+		static void Silent_Print( TCanvas* c1, TString Print_String, int OutputLevel=-1 );
 
-//	
-TGraph2D* Plot_From_Cut_lo( TTree* wanted_tree, TString Draw_String, TString Cut_String, TRandom3* random, TString param1, TString param2 );
+		//	Addds the LHCb text to a plot
+		static TPaveText* addLHCbLabel(TString footer, bool DATA=true);
+
+		//	Plot a vector to a 1D file and return a pointer to the histogram created when this was done
+		static TH1* Plot_1D( const vector<double>& input, TString Filename, TString Options, TRandom* rand=NULL );
+
+		//	Plot 2 vectors to a 2D file and return a pointer to the histogram created when this was done
+		static TH2* Plot_2D( const vector<double>& X, const vector<double>& Y, TString Filename, TString Option, TRandom* rand=NULL );
+
+		//	Plot 3 vectors to a 3D file and return a pointer to the histogram created when this was done
+		static TH3* Plot_3D( const vector<double>& X, const vector<double>& Y, const vector<double>& Z, TString Filename, TString Option, TRandom* rand=NULL );
+
+		/*!
+		 * @brief Plot the data in the vector of vectors and return the histogram created when this was done
+		 *
+		 * @return Returns a pointer to the new Histogram which has been created
+		 */
+		static TH1* Plot( const vector<vector<double> >& input, TString Filename, TString Option, TRandom* rand=NULL );
+
+		/*!
+		 * @brief Get MultiGraph objects which contain the contours wanted from a TH2 histogram :D
+		 *        Another short algorithm I'm overly proud of. It makes coding at a higher level SO MUCH EASIER :D :D :D
+		 *
+		 * This method takes the provided TH2 object and constructs the contours requested by the static levels defined in the contour list
+		 * This collects the parts of each contour and constructs 1 TMultiGraph object for each contour requested.
+		 *
+		 * @param input_th2
+		 *
+		 * @param contour_list
+		 *
+		 * @param rand
+		 *
+		 * @return Returns a vector of pointer to new TMultiGraph objects which you can use normal
+		 */
+		static vector<TMultiGraph*> GetContoursFromTH2( TH2* input_th2, const vector<double>& contour_list, TRandom* rand );
+};
 
 #endif
+

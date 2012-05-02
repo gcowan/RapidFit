@@ -26,10 +26,11 @@ NegativeLogLikelihood::~NegativeLogLikelihood()
 }
 
 //Return the negative log likelihood for a PDF/DataSet result
-double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator )
+double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator, int number )
 {
+	(void)number;
 	//Initialise the integral caching
-	ResultIntegrator->UpdateIntegralCache( TestDataSet->GetBoundary() );
+	//ResultIntegrator->UpdateIntegralCache( TestDataSet->GetBoundary() );
 
 	//Loop over all data points
 	double total = 0.0;
@@ -55,7 +56,7 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		flag = ( (value < 0) || isnan(value) );
 		
 		//Find out the integral
-		integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary(), true );
+		integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );
 		
 		//Get the weight for this DataPoint (event)
 		weight = 1.0;
@@ -89,7 +90,7 @@ double NegativeLogLikelihood::UpErrorValue( int Sigma )
 	}
 	else
 	{
-		cerr << "I don't know UP for NLL sigma > 2" << endl;
+		cerr << "I don't know UP for NLL sigma > 3" << endl;
 		exit(1);
 	}
 }
