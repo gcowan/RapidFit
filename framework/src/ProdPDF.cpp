@@ -143,6 +143,8 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 	double termOne = firstPDF->Integral( NewDataPoint, NewBoundary );
 	double termTwo = secondPDF->Integral( NewDataPoint, NewBoundary );
 
+	//cout << termOne << "\tx\t" << termTwo << endl;
+
 	return termOne * termTwo;
 }
 

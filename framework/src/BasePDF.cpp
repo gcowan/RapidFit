@@ -24,7 +24,7 @@ using namespace::std;
 //Constructor
 BasePDF::BasePDF() : numericalCaching(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ),
-	do_i_control_the_cache(false), integrator_object(NULL), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches()
+	do_i_control_the_cache(false), integrator_object(NULL), cachingEnabled( false ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches()
 {
 	component_list.push_back( "0" );
 }

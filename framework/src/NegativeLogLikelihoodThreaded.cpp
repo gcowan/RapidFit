@@ -164,6 +164,8 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 			integral = DBL_MAX;
 		}
 
+		//if(num==5) exit(0);
+
 		if( isnan(value) == true )
 		{
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
