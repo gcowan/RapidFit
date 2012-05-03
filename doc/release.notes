@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/05/03 Greig Cowan 
+   - Added LASS component plotting code.
+
 2012/05/02 Rob Currie                                    Migrated the Component Plotting Code into SVN HEAD
 
 2012/05/02 Rob Currie

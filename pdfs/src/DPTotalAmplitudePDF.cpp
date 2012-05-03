@@ -528,6 +528,7 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         //component_list.push_back( "1680" );
         //component_list.push_back( "1430" );
         //component_list.push_back( "1430_2" );
+        component_list.push_back( "LASS" );
         component_list.push_back( "0" );
         return component_list;
 }
@@ -563,6 +564,11 @@ double DPTotalAmplitudePDF::EvaluateComponent(DataPoint * measurement, Component
                 {
                         Component->setComponentNumber( 5 );
                         componentIndex = 5;
+                }
+                else if( ComponentName.compare( "LASS" ) == 0 )
+                {
+                        Component->setComponentNumber( 6 );
+                        componentIndex = 6;
                 }
                 else
                 {
