@@ -60,7 +60,12 @@ CopyPDF_t* BasePDF::GetCopyConstructor() const
 
 void BasePDF::TurnCachingOff()
 {
-	cachingEnabled = false;
+	this->ReallyTurnCachingOff();
+}
+
+void BasePDF::ReallyTurnCachingOff()
+{
+	cachingEnabled=false;
 }
 
 bool BasePDF::CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary ) const
@@ -92,7 +97,7 @@ bool BasePDF::GetNumericalNormalisation() const
 	return numericalCaching;
 }
 
-//Externally Set wether the PDF wants to use Numerical Normalisation
+//Externally Set whether the PDF wants to use Numerical Normalisation
 void BasePDF::SetNumericalNormalisation( bool input )
 {
 	numericalCaching = input;
@@ -195,6 +200,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		if( this->CacheValid( NewDataPoint, NewBoundary ) && cachingEnabled )
 		{
 			//cout << "This Cache: " << thisCache << endl;
+			//cout << this->GetLabel() << endl;
 			return thisCache;
 		}
 		else
@@ -229,7 +235,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		discrete_Normalisation = false;
 		this->SetCache( Norm, NewDataPoint, NewBoundary );
 		//cout << "This Val1: " << Norm << endl;
-		cout << "Using Analytical Integration1 For: " << this->GetName() << endl;
+		//cout << "Using Analytical Integration1 For: " << this->GetName() << endl;
 		return Norm;
 	}
 
@@ -241,7 +247,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		discrete_Normalisation = true;
 		this->SetCache( Norm, NewDataPoint, NewBoundary );
 		//cout << "This Val2: " << Norm << endl;
-		cout << "Using Analytical Integration2 For: " << this->GetName() << endl;
+		//cout << "Using Analytical Integration2 For: " << this->GetName() << endl;
 		return Norm;
 	}
 
@@ -249,7 +255,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	numericalCaching = true;
 	discrete_Normalisation = true;
 
-	cout << "Using Numerical Integration For:" << this->GetName() << endl;
+	//cout << "Using Numerical Integration For:" << this->GetName() << endl;
 	//	We can't produce a valid PDF Normalisation
 	return -1.;
 }
@@ -401,12 +407,6 @@ bool BasePDF::GetMCCacheStatus() const
 vector<string> BasePDF::GetMCCacheNames() const
 {
 	return cached_files;
-}
-
-//	Add an on-disk object which exists for the lifetime of this PDF
-void BasePDF::AddCacheObject( TString obj_name )
-{
-	cached_files.push_back( obj_name.Data() );
 }
 
 void BasePDF::AddCacheObject( string obj_name )

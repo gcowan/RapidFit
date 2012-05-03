@@ -266,7 +266,7 @@ OutputConfiguration * XMLConfigReader::GetOutputConfiguration()
 
 	//If no such tag is found, make default
 	//cout << "Output tag not found in config file - using default" << endl;
-	return new OutputConfiguration( vector<pair<string,string> >(), string("undefined"), vector<ScanParam*>(), vector<pair<ScanParam*,ScanParam*> >(), vector<CompPlotter_config*>()  );
+	return new OutputConfiguration( vector<pair<string,string> >(), string("None"), vector<ScanParam*>(), vector<pair<ScanParam*,ScanParam*> >(), vector<CompPlotter_config*>()  );
 }
 
 //Make an output configuration object
@@ -526,7 +526,7 @@ int XMLConfigReader::GetNumberRepeats()
 
 	//If no such tag is found, fail
 	cerr << "NumberRepeats tag not found in config file" << endl;
-	exit(1);
+	return 1;
 }
 
 //Return the function to minimise

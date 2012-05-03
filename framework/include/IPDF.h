@@ -237,12 +237,6 @@ class IPDF
 
 		/*!
 		 * Interface Function:
-		 * Add a virtual cache object
-		 */
-		virtual void AddCacheObject( TString ) = 0;
-
-		/*!
-		 * Interface Function:
 		 * Get the Random function stored in this PDF
 		 */
 		virtual TRandom3* GetRandomFunction() const = 0;

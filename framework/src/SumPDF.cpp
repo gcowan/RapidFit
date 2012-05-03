@@ -62,6 +62,18 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 
 }
 
+void SumPDF::TurnThisCachingOff()
+{
+	this->ReallyTurnCachingOff();
+}
+
+void SumPDF::TurnCachingOff()
+{
+	this->TurnThisCachingOff();
+	firstPDF->TurnCachingOff();
+	secondPDF->TurnCachingOff();
+}
+
 //Assemble the vectors of parameter/observable names needed
 void SumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 {

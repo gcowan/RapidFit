@@ -55,7 +55,7 @@
  *
  *          GetDoNotIntegrateList()
  *             (Overloading this allows you to mix/match which observables you can't model based on the PDFConfigurator conditions)
- *          
+ *
  *
  * EXPERT/DEVELOPER:
  *
@@ -133,12 +133,12 @@
 		 */
 		virtual void TurnCachingOff();
 
-		/*!          
+		/*!
 		 * @brief   Interface Function: Is the Normalisation Cache Valid?
-		 *           
+		 *
 		 * The derived PDF MUST, either:   1) Set the internal object 'cacheValid' with Normalisation cache validity
 		 *                                 2) Overload this function to return the Validity of the cache
-		 * 
+		 *
 		 * @param InputPoint     Input DataPoint corresponding to the Discete Combination being checked
 		 *
 		 * @param InputBoundary  Input PhaseSpaceBoundary containing all the Discrete Combinations
@@ -240,7 +240,7 @@
 
 		/*!
 		 * @brief Return the function value at the given point for generation
-		 * 
+		 *
 		 * In BasePDF this internally wraps around to Evaluate
 		 *
 		 * This can be, but isn't required to be overloaded by derived PDF
@@ -253,14 +253,14 @@
 
 		/*!
 		 * @brief Return the function value at the given point for use in numeric integral
-		 * 
+		 *
 		 * In BasePDF this internally wraps around to Evaluate
 		 *
 		 * This can be, but isn't required to be overloaded by derived PDF
 		 *
 		 * @param Input   DataPoint to be evaluated for the Integration tools in RapidFit
 		 *
-		 * @return        Result of Evaluating the Input DataPoint 
+		 * @return        Result of Evaluating the Input DataPoint
 		 */
 		virtual double EvaluateForNumericIntegral( DataPoint* Input );
 
@@ -323,7 +323,7 @@
 		 * The derived PDF MUST, either:   1)   Do nothing and not expect to provide components
 		 *                                 2)   Use the internal object component_list to provide a list of the components that the PDF can provide an Evaluate Statement for
 		 *                                 3)   Provide a list of the Names of all of the Components it Hopes to plot
-		 * 
+		 *
 		 * Strings are used as they're much more adaptable to identify all of the components in a PDF even if it is nested within Sum/Product PDF objects
 		 * Strings will be taken from the most base class and prepended until the final call to the whole derived object will give the full list of appended objects and names
 		 *
@@ -333,7 +333,7 @@
 
 		/*!
 		 * @brief Interface Function: Return the value of the component given by ComponentRef, component 0 by default
-		 * 
+		 *
 		 * When no ComponentRef is provided this wraps around to the Evaluate method
 		 *
 		 * When the Name of the ComponentRef the PDF should return the same value as the Evaluate Method.
@@ -341,7 +341,7 @@
 		 *
 		 * The derived PDF MUST, either:   1)   Do nothing and not expect to provide components
 		 *                                 2)   Provide some method to evaluate the PDF for the given DataPoint(Unique Discrete Combination) for the requested CompoentRef
-		 * 
+		 *
 		 * @param InputDataPoint   This is the DataPoint (a single Unique Discrete Combination from the PhaseSpaceBoundary) being evaluated
 		 * @param InputRef         This is the ComponentRef object being interrogated  (Optional)
 		 *                         I make use of this and not a simple string as at a higher level I want to avoid a compound PDF performing many lookups per single call (of potentially hundreds)
@@ -425,7 +425,7 @@
 
 		/*!
 		 * @brief Remove the cached files
-		 * 
+		 *
 		 * This also Sets the cache validity as false
 		 *
 		 * @return Void
@@ -445,19 +445,10 @@
 		 * @brief Add a virtual cache object
 		 *
 		 * @pram Name   Add a new ROOT file name (minus the .root) which is a cache of the TFoam generator
-		 * 
+		 *
 		 * @return Void
 		 */
 		void AddCacheObject( string Name );
-
-		/*!
-		 * @brief Add a virtual cache object
-		 *
-		 * @param Name  Add a new ROOT file name (minus the .root) which is a cache of the TFoam generator
-		 *
-		 * @return Void
-		 */
-		void AddCacheObject( TString );
 
 		/*!
 		 * @brief Get the Random function stored in this PDF
@@ -475,7 +466,7 @@
 
 		/*!
 		 * @brief Set the Name of the PDF
-		 * 
+		 *
 		 * @warning Use With CAUTION!
 		 *
 		 * @return Name   This is the new Name we want to give to this PDF
@@ -519,8 +510,8 @@
 		CopyPDF_t* GetCopyConstructor() const;
 
 		/*!
-		 * @brief Associate an Integrator object with this PDF 
-		 * 
+		 * @brief Associate an Integrator object with this PDF
+		 *
 		 * @warning the PDF does NOT take ownership of the object and it doesn't clean up after it!
 		 *
 		 * @return Void
@@ -529,7 +520,7 @@
 
 		/*!
 		 * @brief Get the pointer to the associated Integrator
-		 * 
+		 *
 		 * @warning the PDF doesn NOT check wether this object exists, only use it when you know what you're doing!
 		 *
 		 * @return Returns a pointer to a RapidFitIntegrator assoicated with this class
@@ -567,20 +558,20 @@
 	protected:
 
 		/*!
-                 * @brief   Interface Function:  This function is called ONCE per call from Minuit
-                 *
-                 *
-                 * Using this, complex variables from the ParameterSet can be calculated/cached.
-                 * 
-                 * The derived PDF MUST, either:   1) Use the Internal ParameterSet allParameters
-                 *                                 2) Overload this function but set the internal ParameterSet as appropriate
-                 *
-                 * @param Input    ParameterSet Normally as defined by the IMinimiser
-                 *
-                 * @return        true = success , false = fail... (this can probably be replaced with a Void return)
-                 *
-                 */
-                virtual bool SetPhysicsParameters( ParameterSet* Input );
+		 * @brief   Interface Function:  This function is called ONCE per call from Minuit
+		 *
+		 *
+		 * Using this, complex variables from the ParameterSet can be calculated/cached.
+		 *
+		 * The derived PDF MUST, either:   1) Use the Internal ParameterSet allParameters
+		 *                                 2) Overload this function but set the internal ParameterSet as appropriate
+		 *
+		 * @param Input    ParameterSet Normally as defined by the IMinimiser
+		 *
+		 * @return        true = success , false = fail... (this can probably be replaced with a Void return)
+		 *
+		 */
+		virtual bool SetPhysicsParameters( ParameterSet* Input );
 
 
 		/*!
@@ -591,6 +582,11 @@
 		double GetCache( DataPoint*, PhaseSpaceBoundary* );
 
 		void CheckCaches( PhaseSpaceBoundary* InputBoundary ) const;
+
+		/*!
+		 * @brief This is what actually turns the caching off becasue 'TurnCachingOff' has to be overloaded for Specialist PDFs
+		 */
+		void ReallyTurnCachingOff();
 
 		/*!
 		 * @brief Protected Function for each PDF which provides a method for the PDF to analytically integrate over the whole phase space

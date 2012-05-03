@@ -126,7 +126,7 @@ void Foam::Init()
 			//	As we haven't cached yet, write to file
 			foamGenerator->Write(Name);
 			cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
-			InputPDF->AddCacheObject( Name );
+			InputPDF->AddCacheObject( Name.Data() );
 			MC_Cache->Write();
 			InputPDF->Can_Remove_Cache( false );
 			//MC_Cache->Close();
@@ -182,7 +182,7 @@ void Foam::Init()
 				//      As we haven't cached yet, write to file
 				foamGenerator->Write(Name);
 				cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
-				InputPDF->AddCacheObject( Name );
+				InputPDF->AddCacheObject( Name.Data() );
 				MC_Cache->Write();
 				InputPDF->Can_Remove_Cache( false );
 			}

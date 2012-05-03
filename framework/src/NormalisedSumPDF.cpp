@@ -84,6 +84,12 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 	allParameters.AddPhysicsParameter( frac_param, false );
 }
 
+void NormalisedSumPDF::TurnCachingOff()
+{
+	firstPDF->TurnCachingOff();
+	secondPDF->TurnCachingOff();
+}
+
 //Assemble the vectors of parameter/observable names needed
 void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 {
@@ -195,7 +201,7 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 	double firstIntegral = this->GetFirstIntegral( NewDataPoint );
 	double secondIntegral = this->GetSecondIntegral( NewDataPoint );
 
-	//Get the PDFs' values, normalised and weighted by firstFrsction
+	//Get the PDFs' values, normalised and weighted by firstFraction
 	double termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / firstIntegral;
 	double termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
 
@@ -220,7 +226,7 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	double firstIntegral = this->GetFirstIntegral( NewDataPoint );
 	double secondIntegral = this->GetSecondIntegral( NewDataPoint );
 
-	//Get the PDFs' values, normalised and weighted by firstFrsction
+	//Get the PDFs' values, normalised and weighted by firstFraction
 	double termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / firstIntegral;
 	double termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
 

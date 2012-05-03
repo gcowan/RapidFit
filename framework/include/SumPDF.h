@@ -27,6 +27,8 @@ class SumPDF : public BasePDF
 		SumPDF( const SumPDF& );
 		~SumPDF();
 
+		void TurnCachingOff();
+
 		//Set the function parameters
 		bool SetPhysicsParameters( ParameterSet* );
 
@@ -64,6 +66,8 @@ class SumPDF : public BasePDF
 		//SumPDF ( const SumPDF& );
 		SumPDF& operator = ( const SumPDF& );
 		void MakePrototypes( PhaseSpaceBoundary* );
+
+		void TurnThisCachingOff();
 
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;
 		IPDF * firstPDF;

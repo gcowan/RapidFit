@@ -43,15 +43,12 @@ class ProdPDF : public BasePDF
 		 */
 		~ProdPDF();
 
-		/*!
-		 * @brief Called by the Constructor to deal with initializing objects now that the PDF has been initalized
-		 */
-		void MakePrototypes();
+		void TurnCachingOff();
 
 		/*!
 		 * @brief Set the function parameters
 		 *
-		 * @param Input 
+		 * @param Input
 		 */
 		bool SetPhysicsParameters( ParameterSet* Input );
 
@@ -94,6 +91,13 @@ class ProdPDF : public BasePDF
 		//	Uncopyable!
 		//ProdPDF ( const ProdPDF& );
 		ProdPDF& operator = ( const ProdPDF& );
+
+		/*!
+		 * @brief Called by the Constructor to deal with initializing objects now that the PDF has been initalized
+		 */
+		void MakePrototypes();
+
+		void TurnThisCachingOff();
 
 		void MakePrototypes( PhaseSpaceBoundary* );
 		vector<string> prototypeDataPoint;

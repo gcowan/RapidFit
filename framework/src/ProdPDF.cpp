@@ -21,6 +21,8 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 
 	//      By definition the observable you project over is only in 1 of the pdfs
 
+	this->TurnThisCachingOff();
+
 	vector<string> first_components;
 	for( unsigned int i=0; i< firstPDF->PDFComponents().size(); ++i )
 	{
@@ -55,7 +57,7 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 		{
 			component_list[ (unsigned)StringProcessing::VectorContains( &component_list, &total ) ] = "0";
 		}
-		
+
 	}
 	else if( (second_components.size() != 1) && (first_components.size() == 1) )
 	{
@@ -96,6 +98,18 @@ ProdPDF::ProdPDF( const ProdPDF& input ) : BasePDF( (BasePDF) input ),
 {
 }
 
+void ProdPDF::TurnThisCachingOff()
+{
+	this->ReallyTurnCachingOff();
+}
+
+void ProdPDF::TurnCachingOff()
+{
+	this->TurnThisCachingOff();
+	firstPDF->TurnCachingOff();
+	secondPDF->TurnCachingOff();
+}
+
 //Assemble the vectors of parameter/observable names needed
 void ProdPDF::MakePrototypes()
 {
@@ -128,6 +142,7 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 	//In cases that the formula is incorrect, it will be caught by the numerical integration check.
 	double termOne = firstPDF->Integral( NewDataPoint, NewBoundary );
 	double termTwo = secondPDF->Integral( NewDataPoint, NewBoundary );
+
 	return termOne * termTwo;
 }
 
@@ -139,7 +154,7 @@ double ProdPDF::Evaluate( DataPoint * NewDataPoint )
 	return termOne * termTwo;
 }
 
-//Return the function value at the given point for numericl integration
+//Return the function value at the given point for numerical integration
 double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 {
 	double termOne = firstPDF->EvaluateForNumericIntegral( NewDataPoint );

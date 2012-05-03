@@ -1095,7 +1095,7 @@ int RapidFit( int argc, char * argv[] )
 
 	//	7)	Toy Study
 	//Pick a toy study if there are repeats, or if pull plots are wanted
-	if ( ( ( numberRepeats > 1 ) || doPullsFlag ) && !( ( ( doLLcontourFlag || doFC_Flag ) || doLLscanFlag ) || MCStudyFlag ) )
+	if( ( numberRepeats > 1 ) || ( doPullsFlag  && !( ( ( doLLcontourFlag || doFC_Flag ) || doLLscanFlag ) || MCStudyFlag ) ) )
 	{
 		vector< ConstraintFunction* > XMLConstraints = xmlFile->GetConstraints();
 

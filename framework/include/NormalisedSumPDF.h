@@ -29,6 +29,8 @@ class NormalisedSumPDF : public BasePDF
 		NormalisedSumPDF( const NormalisedSumPDF& );
 		~NormalisedSumPDF();
 
+		void TurnCachingOff();
+
 		//Return the integral of the function over the given boundary
 		double Normalisation( DataPoint*, PhaseSpaceBoundary* );
 
