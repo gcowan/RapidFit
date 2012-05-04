@@ -620,7 +620,7 @@
 
 	private:
 
-		bool numericalCaching;                  /*!     Does this PDF require Numerical Integration, or has Numerical Integration been requested?       */
+		bool numericalNormalisation;                  /*!     Does this PDF require Numerical Integration, or has Numerical Integration been requested?       */
 
 		bool cachingEnabled;	/*!	Does this PDF require event by event normalisation	*/
 

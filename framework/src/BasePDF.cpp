@@ -22,7 +22,7 @@
 using namespace::std;
 
 //Constructor
-BasePDF::BasePDF() : numericalCaching(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
+BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ),
 	do_i_control_the_cache(false), integrator_object(NULL), cachingEnabled( false ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches()
 {
@@ -30,7 +30,7 @@ BasePDF::BasePDF() : numericalCaching(false), allParameters( vector<string>() ),
 }
 
 BasePDF::BasePDF( const BasePDF& input ) :
-	numericalCaching( input.numericalCaching ), allParameters( input.allParameters ),
+	numericalNormalisation( input.numericalNormalisation ), allParameters( input.allParameters ),
 	allObservables( input.allObservables ), doNotIntegrateList( input.doNotIntegrateList ), observableDistNames( input.observableDistNames ), observableDistributions( input.observableDistributions ),
 	component_list( input.component_list ), cached_files( input.cached_files ), hasCachedMCGenerator( input.hasCachedMCGenerator ),
 	seed_function( input.seed_function ), seed_num( input.seed_num ), PDFName( input.PDFName ), PDFLabel( input.PDFLabel ), copy_object( input.copy_object ),
@@ -96,13 +96,13 @@ void BasePDF::SetCachingEnabled( bool input )
 
 bool BasePDF::GetNumericalNormalisation() const
 {
-	return numericalCaching;
+	return numericalNormalisation;
 }
 
 //Externally Set whether the PDF wants to use Numerical Normalisation
 void BasePDF::SetNumericalNormalisation( bool input )
 {
-	numericalCaching = input;
+	numericalNormalisation = input;
 }
 
 void BasePDF::SetCache( double input, DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary )
@@ -189,7 +189,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 
 	// If the PDF has been configured to rely on Numerical Normalisation we can't calculate the Normalisation here at all
 	// Just return what has been cached so far
-	if( numericalCaching )
+	if( numericalNormalisation && cachingEnabled )
 	{
 		return thisCache;
 	}
@@ -229,7 +229,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	if( Norm >= 0. )		//	Valid
 	{
 		haveTestedIntegral = true;
-		numericalCaching = false;
+		numericalNormalisation = false;
 		discrete_Normalisation = false;
 		this->SetCache( Norm, NewDataPoint, NewBoundary );
 		//cout << "This Val1: " << Norm << endl;
@@ -241,7 +241,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	if( Norm >= 0. )		//	Valid
 	{
 		haveTestedIntegral = true;
-		numericalCaching = false;
+		numericalNormalisation = false;
 		discrete_Normalisation = true;
 		this->SetCache( Norm, NewDataPoint, NewBoundary );
 		//cout << "This Val2: " << Norm << endl;
@@ -250,7 +250,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	}
 
 	//	PDF does NOT know how to Normalise!!
-	numericalCaching = true;
+	numericalNormalisation = true;
 	discrete_Normalisation = true;
 
 	//cout << "Using Numerical Integration For:" << this->GetName() << endl;
