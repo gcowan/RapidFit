@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/05/04 Rob Currie
+   - After more exhaustive testing the caching code now appears to be working and correctly caches what it possibly can so even if one PDF in a sum can't cache it's
+     normalisation the other will correctly cache it's value for multiple discrete combinations in the dataset. i.e. tag =1 always gets the tag1 cache and all the same for all other combinations
+
 2012/05/03 Rob Currie
    - Turned Off caching by default while bugs are hunted down and squashed
 

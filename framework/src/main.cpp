@@ -968,7 +968,7 @@ int RapidFit( int argc, char * argv[] )
 			TString real_saveOneDataSetFileName = TString( FileName_Pre_Suffix + number + ".root" );
 			//quickDataSet.back()->Print();
 			ResultFormatter::MakeRootDataFile( string(real_saveOneDataSetFileName.Data()), quickDataSet );
-			delete temp_dataSet;
+			//delete temp_dataSet;
 		}
 		while( !quickDataGen.empty() )
 		{
@@ -1298,7 +1298,8 @@ int RapidFit( int argc, char * argv[] )
 				TString real_saveOneDataSetFileName = TString( FileName_Pre_Suffix + "-" + number + ".root" );
 
 				ResultFormatter::MakeRootDataFile( string(real_saveOneDataSetFileName.Data()), quickDataSet );
-				delete temp_dataSet;
+				delete temp_config;
+				delete pdf_data_to_fit;
 			}
 		}
 

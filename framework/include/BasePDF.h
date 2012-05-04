@@ -14,7 +14,7 @@
  *          Evaluate( DataPoint* )
  *             (Required or there is not point!)
  *
- *          Normalise( DataPoint*, PhaseSpaceBoundary* ) and/or Normalise( PhaseSpaceBoundary* ) or set 'forceNumerical=true;'
+ *          Normalisation( DataPoint*, PhaseSpaceBoundary* ) and/or Normalisation( PhaseSpaceBoundary* ) or set 'forceNumerical=true;'
  *             (Required some way of Normalising the Evaluate Function, return 1 if it already is)
  *
  *
@@ -145,7 +145,7 @@
 		 *
 		 * @return        true = cache is valid , false = cache is not valid
 		 */
-		virtual bool CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary ) const;
+		virtual bool CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary );
 
 		/*!
 		 * @brief   Interface Function: Is it valid to Cache the Numerical Integral
@@ -581,7 +581,7 @@
 		 */
 		double GetCache( DataPoint*, PhaseSpaceBoundary* );
 
-		void CheckCaches( PhaseSpaceBoundary* InputBoundary ) const;
+		void CheckCaches( PhaseSpaceBoundary* InputBoundary );
 
 		/*!
 		 * @brief This is what actually turns the caching off becasue 'TurnCachingOff' has to be overloaded for Specialist PDFs
@@ -626,7 +626,7 @@
 
 		bool discrete_Normalisation;	/*!	Does this PDF require a unique normalisation to be calculated/applied depending on each unique discrete combination	*/
 
-		mutable vector<double> DiscreteCaches;	/*!	Normalisation Caches, each one corresponding to a unique Discrete Combination in the PhaseSpace		*/
+		mutable vector<double>* DiscreteCaches;	/*!	Normalisation Caches, each one corresponding to a unique Discrete Combination in the PhaseSpace		*/
 
 		/*!
 		 * Don't Copy the PDF this way!

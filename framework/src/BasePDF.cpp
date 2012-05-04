@@ -24,7 +24,7 @@ using namespace::std;
 //Constructor
 BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ),
-	do_i_control_the_cache(false), integrator_object(NULL), cachingEnabled( false ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches()
+	do_i_control_the_cache(false), integrator_object(NULL), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>())
 {
 	component_list.push_back( "0" );
 }
@@ -35,8 +35,13 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	component_list( input.component_list ), cached_files( input.cached_files ), hasCachedMCGenerator( input.hasCachedMCGenerator ),
 	seed_function( input.seed_function ), seed_num( input.seed_num ), PDFName( input.PDFName ), PDFLabel( input.PDFLabel ), copy_object( input.copy_object ),
 	do_i_control_the_cache( input.do_i_control_the_cache ), integrator_object( input.integrator_object ), cachingEnabled( input.cachingEnabled ), haveTestedIntegral( input.haveTestedIntegral ),
-	thisConfig(NULL), discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches( input.DiscreteCaches )
+	thisConfig(NULL), discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL)
 {
+	DiscreteCaches = new vector<double>( input.DiscreteCaches->size() );
+	for( vector<double>::iterator cache_i = DiscreteCaches->begin(); cache_i != DiscreteCaches->end(); ++cache_i )
+	{
+		(*cache_i) = -1;
+	}
 }
 
 //Destructor
@@ -46,6 +51,7 @@ BasePDF::~BasePDF()
 	if( thisConfig != NULL ) delete thisConfig;
 	//	If we weren't using ROOT this would a) be safe and b) be advisible, but ROOT segfaults...
 	//if( seed_function != NULL ) delete seed_function;
+	if( DiscreteCaches != NULL ) delete DiscreteCaches;
 }
 
 void BasePDF::SetCopyConstructor( CopyPDF_t* input )
@@ -68,7 +74,7 @@ void BasePDF::ReallyTurnCachingOff()
 	cachingEnabled=false;
 }
 
-bool BasePDF::CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary ) const
+bool BasePDF::CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary )
 {
 	//	Force the cache to be not valid when caching is NOT enabled
 	if( !cachingEnabled ) return false;
@@ -78,7 +84,7 @@ bool BasePDF::CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBounda
 
 	unsigned int cacheIndex = InputBoundary->GetDiscreteIndex( InputPoint );
 
-	double norm = DiscreteCaches[cacheIndex];
+	double norm = DiscreteCaches->at(cacheIndex);
 
 	if( norm > 0 ) return true;
 	else return false;
@@ -107,30 +113,36 @@ void BasePDF::SetNumericalNormalisation( bool input )
 
 void BasePDF::SetCache( double input, DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary )
 {
+	this->CheckCaches( InputBoundary );
 	/*!
 	 * Get the Number Corresponding to the Unique Combination that this DataPoint is in
 	 */
 	unsigned int thisIndex = InputBoundary->GetDiscreteIndex( InputPoint );
 
-	DiscreteCaches[thisIndex] = input;
+	DiscreteCaches->at(thisIndex) = input;
 
 }
 
-void BasePDF::CheckCaches( PhaseSpaceBoundary* InputBoundary ) const
+void BasePDF::CheckCaches( PhaseSpaceBoundary* InputBoundary )
 {
 	/*!                                                   
 	 * If the internal Caches don't match re-allocate the whole array to be -1
 	 */                                                   
-	unsigned int totalCombinations = InputBoundary->GetNumberCombinations();  
-	if( DiscreteCaches.size() != totalCombinations )  
+	unsigned int totalCombinations = InputBoundary->GetNumberCombinations();
+	//cout << "I have: " << DiscreteCaches->size() << " I want : " << totalCombinations << endl;
+	if( DiscreteCaches->size() != totalCombinations )  
 	{                                                     
-		DiscreteCaches = vector<double>( totalCombinations, -1. );
+		//cout << "Resizing!" << endl;
+		DiscreteCaches->resize( totalCombinations );
+		//cout << "Unsetting!" << endl;
+		this->UnsetCache();
+		//cout << "Zeroth element: " << DiscreteCaches->at(0) << endl;
 	}
 }
 
 void BasePDF::UnsetCache()
 {
-	for(vector<double>::iterator this_i = DiscreteCaches.begin(); this_i != DiscreteCaches.end(); ++this_i )
+	for(vector<double>::iterator this_i = DiscreteCaches->begin(); this_i != DiscreteCaches->end(); ++this_i )
 	{
 		*this_i = -1.;
 	}
@@ -139,38 +151,42 @@ void BasePDF::UnsetCache()
 
 void BasePDF::UpdatePhysicsParameters( ParameterSet* Input )
 {
-	BasePDF* thisPDF = (BasePDF*) this;
-	thisPDF->SetPhysicsParameters( Input );
+	if( allParameters.GetAllNames().size() != 0 )
+	{                                 
+		allParameters.SetPhysicsParameters( Input );                                                                                                                                                               
+	}                                 
+	else                              
+	{                                 
+		allParameters.AddPhysicsParameters( Input );
+	}                                 
+
+	//Invalidate the cache            
+	this->UnsetCache();
+
 	this->SetPhysicsParameters( Input );
 }
 
 //Set the function parameters
 bool BasePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-	bool success = false;
-	if( allParameters.GetAllNames().size() != 0 )
-	{
-		success = allParameters.SetPhysicsParameters(NewParameterSet);
-	}
-	else
-	{
-		allParameters.AddPhysicsParameters( NewParameterSet );
-		success = true;
-	}
-
-	//Invalidate the cache
-	this->UnsetCache();
-
-	return success;
+	(void) NewParameterSet;
+	return true;
 }
 
 double BasePDF::GetCache( DataPoint* InputPoint, PhaseSpaceBoundary* NewBoundary )
 {
+	//cout << "I have : " << DiscreteCaches->size() << " caches." << endl;
 	this->CheckCaches( NewBoundary );
+
+	//cout << "I now have: " << DiscreteCaches->size() << " caches." << endl;
 
 	unsigned int thisIndex = NewBoundary->GetDiscreteIndex( InputPoint );
 
-	double thisVal = DiscreteCaches[thisIndex];
+	//cout << "I want this: " << thisIndex << " Index" << endl;
+
+	double thisVal = DiscreteCaches->at(thisIndex);
+
+	//cout << "I get this: " << thisVal << endl;
 
 	if( thisVal > 0 )
 	{
@@ -187,6 +203,8 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 {
 	double thisCache = this->GetCache( NewDataPoint, NewBoundary );
 
+	//cout << "thisCache: " << thisCache << endl;
+
 	// If the PDF has been configured to rely on Numerical Normalisation we can't calculate the Normalisation here at all
 	// Just return what has been cached so far
 	if( numericalNormalisation && cachingEnabled )
@@ -201,6 +219,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		//cout << "Have Tested" << endl;
 		if( this->CacheValid( NewDataPoint, NewBoundary ) )
 		{
+			//cout << this->GetLabel() << "\t:\t" << thisCache << endl;
 			return thisCache;
 		}
 		else
@@ -231,6 +250,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		haveTestedIntegral = true;
 		numericalNormalisation = false;
 		discrete_Normalisation = false;
+		cachingEnabled = true;
 		this->SetCache( Norm, NewDataPoint, NewBoundary );
 		//cout << "This Val1: " << Norm << endl;
 		//cout << "Using Analytical Integration1 For: " << this->GetName() << endl;

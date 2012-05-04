@@ -345,7 +345,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input ) const
 	int thisIndex = Input->GetDiscreteIndex();
 	if( thisIndex != -1 ) return (unsigned)thisIndex;
 
-	if( this->GetDiscreteNames().empty() ) return 1;
+	if( this->GetDiscreteNames().empty() ) return 0;
 
 	vector<DataPoint*> allCombinations = this->GetDiscreteCombinations();
 
@@ -398,7 +398,7 @@ int PhaseSpaceBoundary::GetNumberCombinations() const
 
 	vector<DataPoint*> thisMany = this->GetDiscreteCombinations();
 
-	if( thisMany.empty() )
+	if( thisMany.empty() || (thisMany.size() == 0) )
 	{
 		DiscreteCombinationNumber = 1;
 	}

@@ -111,6 +111,8 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 
 	double PDF_test_result = functionToWrap->Integral( NewDataPoint, NewBoundary );
 
+	//cout << "PDF: " << PDF_test_result << endl;
+
 	functionCanIntegrate = ! functionToWrap->GetNumericalNormalisation();
 
 	if( functionCanIntegrate == false )

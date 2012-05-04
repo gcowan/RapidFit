@@ -65,7 +65,7 @@ class IPDF
 		 * Interface Function:
 		 * Is the Normalisation Cache Valid for this Discrete Combination?
 		 */
-		virtual bool CacheValid( DataPoint*, PhaseSpaceBoundary* ) const = 0;
+		virtual bool CacheValid( DataPoint*, PhaseSpaceBoundary* ) = 0;
 
 		/*!
 		 * Interface Function:
@@ -114,18 +114,6 @@ class IPDF
 		 * Return the integral of the function over the given boundary
 		 */
 		virtual double Integral( DataPoint*, PhaseSpaceBoundary* ) = 0;
-
-		/*!
-		 * Interface Function:
-		 * Return the Integral over the whole PhaseSpace
-		 */
-		virtual double Normalisation( PhaseSpaceBoundary* ) = 0;
-
-		/*!
-		 * Interface Function:
-		 * Return the Integral of this DataPoint in this PhaseSpace
-		 */
-		virtual double Normalisation( DataPoint*, PhaseSpaceBoundary* ) = 0;
 
 		/*!
 		 * Interface Function:
@@ -248,9 +236,9 @@ class IPDF
 		virtual string GetName() const = 0;
 
 		/*!
-                 * Interface Function:
-                 * Get the Name of the PDF
-                 */
+		 * Interface Function:
+		 * Get the Name of the PDF
+		 */
 		virtual void SetName( string ) = 0;
 
 		/*!
@@ -272,9 +260,9 @@ class IPDF
 		virtual string GetLabel() const = 0;
 
 		/*!
-                 * Interface Function:
-                 * Set the user defined label for this PDF
-                 */
+		 * Interface Function:
+		 * Set the user defined label for this PDF
+		 */
 		virtual void SetLabel( string ) = 0;
 
 		/*!
@@ -291,7 +279,7 @@ class IPDF
 
 		/*!
 		 * Interface Function:
-		 * Associate an Integrator object with this PDF (the PDF does NOT take ownership of the object and it doesn't clean up after it!) 
+		 * Associate an Integrator object with this PDF (the PDF does NOT take ownership of the object and it doesn't clean up after it!)
 		 */
 		virtual void AssociateIntegrator( RapidFitIntegrator* ) = 0;
 
@@ -318,6 +306,20 @@ class IPDF
 		 * Returns a pointer to the internal Object which contains the PDF configuration
 		 */
 		virtual PDFConfigurator* GetConfigurator() const = 0;
+
+	protected:
+
+		/*!
+		 * Interface Function:
+		 * Return the Integral over the whole PhaseSpace
+		 */
+		virtual double Normalisation( PhaseSpaceBoundary* ) = 0;
+
+		/*!
+		 * Interface Function:
+		 * Return the Integral of this DataPoint in this PhaseSpace
+		 */
+		virtual double Normalisation( DataPoint*, PhaseSpaceBoundary* ) = 0;
 };
 
 /*!
