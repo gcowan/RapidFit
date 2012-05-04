@@ -111,7 +111,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 
 	double PDF_test_result = functionToWrap->Integral( NewDataPoint, NewBoundary );
 
-	functionCanIntegrate = (PDF_test_result >= 0.);
+	functionCanIntegrate = ! functionToWrap->GetNumericalNormalisation();
 
 	if( functionCanIntegrate == false )
 	{
@@ -132,7 +132,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 		else
 		{
 			double return_value = -5.;
-			if( functionToWrap->CacheValid( NewDataPoint, NewBoundary ) && cacheEnabled )
+			if( functionToWrap->CacheValid( NewDataPoint, NewBoundary ) )
 			{
 				return_value = PDF_test_result;
 			}

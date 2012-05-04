@@ -70,8 +70,10 @@ void BasePDF::ReallyTurnCachingOff()
 
 bool BasePDF::CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary ) const
 {
-	//	Care about the input
+	//	Force the cache to be not valid when caching is NOT enabled
+	if( !cachingEnabled ) return false;
 
+	//	Care about the input
 	this->CheckCaches( InputBoundary );
 
 	unsigned int cacheIndex = InputBoundary->GetDiscreteIndex( InputPoint );
@@ -197,10 +199,8 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	if( haveTestedIntegral )
 	{
 		//cout << "Have Tested" << endl;
-		if( this->CacheValid( NewDataPoint, NewBoundary ) && cachingEnabled )
+		if( this->CacheValid( NewDataPoint, NewBoundary ) )
 		{
-			//cout << "This Cache: " << thisCache << endl;
-			//cout << this->GetLabel() << endl;
 			return thisCache;
 		}
 		else
@@ -209,14 +209,12 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 			{
 				double norm = this->Normalisation(NewDataPoint, NewBoundary);
 				this->SetCache( norm, NewDataPoint, NewBoundary );
-				//cout << "This Calc1: " << norm << endl;
 				return norm;
 			}
 			else
 			{
 				double norm = this->Normalisation(NewBoundary);
 				this->SetCache( norm, NewDataPoint, NewBoundary );
-				//cout << "This Calc2: " << norm << endl;
 				return norm;
 			}
 		}
