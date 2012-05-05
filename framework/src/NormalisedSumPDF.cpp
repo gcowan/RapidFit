@@ -60,13 +60,21 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 
 	string zero="0";
 
-	if( StringProcessing::VectorContains( &firstpdf_components, &zero ) == -1 ) firstpdf_components.push_back( "0" );
-	if( StringProcessing::VectorContains( &secondpdf_components, &zero ) == -1 ) secondpdf_components.push_back( "0" );
+	if( firstPDF->GetName() != "NormalisedSum" )
+	{
+		if( StringProcessing::VectorContains( &firstpdf_components, &zero ) == -1 ) firstpdf_components.push_back( "0" );
+	}
+	if( secondPDF->GetName() != "NormalisedSum" )
+	{
+		if( StringProcessing::VectorContains( &secondpdf_components, &zero ) == -1 ) secondpdf_components.push_back( "0" );
+	}
 
 	//      All components are:
 	//                              0       :       total of the whole NormalisedSumPDF
 	//                              1xx     :       all of the components in the first PDF
 	//                              2yy     :       all of the components in the second PDF
+
+	component_list.clear();
 
 	for( unsigned int i=0; i< firstpdf_components.size(); ++i )
 	{
@@ -270,14 +278,15 @@ double NormalisedSumPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRe
 	string componentIndex = componentIndexObj->getComponentName();
 	int component_num = componentIndexObj->getComponentNumber();
 
+	//cout << endl << componentIndexObj->getComponentName() << endl;
+
 	if( component_num == -1 )
 	{
 		component_num = StringProcessing::GetNumberOnLeft( componentIndex );
 		componentIndexObj->setComponentNumber( component_num );
 		componentIndexObj->addSubComponent( StringProcessing::RemoveFirstNumber( componentIndex ) );
 	}
-	//cout << "Eval Component: " << component_num << "\tAsking for " << StringProcessing::RemoveFirstNumber( componentIndex ) << endl;
-
+	//cout << "Eval Component: " << component_num << "\tAsking for " << StringProcessing::RemoveFirstNumber( componentIndex ) << endl << endl;
 
 	double returnable_value = -1.;
 
@@ -296,7 +305,6 @@ double NormalisedSumPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRe
 			//      We want a component from the first PDF, integrate over the second PDF
 			termOne = firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / this->GetFirstIntegral( NewDataPoint );
 			termTwo = 0.;
-			//cout << termOne << "\t" << termTwo << "\t\t\t" << firstFraction << "\t" << (1-firstFraction) << "\t\t\t" << firstIntegral << "\t" << secondIntegral << endl;
 			break;
 
 		case 2:

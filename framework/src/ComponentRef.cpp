@@ -15,7 +15,8 @@ ComponentRef::~ComponentRef()
 	if( thisSubComponent != NULL ) delete thisSubComponent;
 }
 
-ComponentRef::ComponentRef( const ComponentRef& input ) : thisSubComponent( (input.thisSubComponent)==NULL?NULL:(new ComponentRef( *(input.thisSubComponent) )) ), thisIndex( input.thisIndex ), thisName( input.thisName )
+ComponentRef::ComponentRef( const ComponentRef& input ) :
+	thisSubComponent( (input.thisSubComponent)==NULL?NULL:(new ComponentRef( *(input.thisSubComponent) )) ), thisIndex( input.thisIndex ), thisName( input.thisName )
 {
 }
 

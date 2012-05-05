@@ -387,7 +387,19 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 	dontIntegrate.push_back(ProjectThis);
 	double value = -1.;
 
-	value = this->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, dontIntegrate, Component );
+	vector<string> allIntegrable = NewDataPoint->GetAllNames();
+
+	if( allIntegrable.size() == 1 )
+	{
+		if( allIntegrable[0] == ProjectThis )
+		{
+			value = functionToWrap->EvaluateComponent( NewDataPoint, Component );
+		}
+	}
+	else
+	{
+		value = this->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, dontIntegrate, Component );
+	}
 	return value;
 }
 

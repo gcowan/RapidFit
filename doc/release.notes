@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2012/05/05 Rob Currie
+   - Fixed a bug to do with handling Nested NormalisedSum PDFs in a Component Projection
+   - Fixed a bug which stopped RapidFit from handling projections over a single observable (i.e. a mass plot)
+   - Added a new feature to the ComponentPlotter to handle line widths as an XML configurable quantity. If a line is defined as width 0 it is not drawn by design of our tool. Useful for when one line swamps out components
+
 2012/05/04 Rob Currie
    - After more exhaustive testing the caching code now appears to be working and correctly caches what it possibly can so even if one PDF in a sum can't cache it's
      normalisation the other will correctly cache it's value for multiple discrete combinations in the dataset. i.e. tag =1 always gets the tag1 cache and all the same for all other combinations

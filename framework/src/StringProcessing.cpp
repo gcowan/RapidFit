@@ -418,15 +418,12 @@ string StringProcessing::AddNumberToLeft( const string& input_str, const int& nu
 
 string StringProcessing::RemoveFirstNumber( const string& input_str )
 {
-	string returnable_str;
-	if( !returnable_str.empty() )
+	stringstream output_stream;
+	for( unsigned int i=1; i<input_str.size(); ++i )
 	{
-		for( string::const_iterator str_i = (input_str.begin()+1); str_i != input_str.end(); ++str_i )
-		{
-			returnable_str+=*str_i;
-		}
+		output_stream << input_str.at(i);
 	}
-	return returnable_str;
+	return output_stream.str();
 }
 
 vector<string> StringProcessing::FillList( const int max, const int min )

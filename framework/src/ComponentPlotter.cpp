@@ -509,7 +509,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			TCanvas* c1 = new TCanvas( Canvas_Name, "", 1680, 1050 );
 
 			data_plot->Draw();
-			data_graph->Draw("PL SAME");
+			data_graph->Draw("PL9 SAME");
 			c1->Update();
 			data_graph->GetYaxis()->SetRangeUser( 0., data_graph->GetYaxis()->GetXmax() );
 			c1->Update();
@@ -759,7 +759,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	TString plotTitle;
 
-	vector<int> Style_Key, Color_Key;
+	vector<int> Style_Key, Color_Key, Width_Key;
 
 	vector<string> component_names;
 
@@ -783,6 +783,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		plotTitle = conf->PlotTitle;
 		Style_Key = conf->style_key;
 		Color_Key = conf->color_key;
+		Width_Key = conf->width_key;
 		component_names = conf->component_names;
 		X_min = conf->xmin;
 		X_max = conf->xmax;
@@ -794,7 +795,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	}
 
 	input_data->SetTitle( plotTitle );
-	input_data->Draw("AP");
+	input_data->Draw("AP9");
 	c1->Update();
 
 	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
@@ -828,13 +829,24 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		}
 		if( !Color_Key.empty() )
 		{
+			cout << "Color: " << num << " : " << Color_Key.size() << "\t: " << Color_Key[num] << endl;
 			if( num < Color_Key.size() )
 			{
 				(*comp_i)->SetLineColor( (Color_t)Color_Key[num] );
 			}
 		}
+		if( !Width_Key.empty() )
+		{
+			if( num < Width_Key.size() )
+			{
+				(*comp_i)->SetLineWidth( (Width_t)Width_Key[num] );
+			}
+		}
 
-		(*comp_i)->Draw("L");
+		if( (*comp_i)->GetLineWidth() != 0 )
+		{
+			(*comp_i)->Draw("L9");
+		}
 
 		if( !component_names.empty() )
 		{

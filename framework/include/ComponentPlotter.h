@@ -110,6 +110,7 @@ class CompPlotter_config
 		bool logY;			/*!	This is the a boolean governing if the Y axis should be on a log scale							*/
 		vector<int> color_key;		/*!	This is a vector of numbers, each number corresponding to the Color_t which is given to the corresponding component	*/
 		vector<int> style_key;		/*!	This is a vector of numbers, each number corresponding to the Style_t which is given to the corresponding component	*/
+		vector<int> width_key;		/*!	This is a vector of numbers, each number corresponding to the Width_t which is given to the corresponding component	*/
 		vector<string> component_names;	/*!	This ia s vectot of strings which are names passed to the TLegend for all of the Components				*/
 		string PlotTitle;		/*!	This is the Name of the Plot												*/
 		double xmin, xmax, ymin, ymax;	/*!	These are the ranges that should be plotted on the X and Y axis								*/

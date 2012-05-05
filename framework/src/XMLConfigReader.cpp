@@ -385,6 +385,12 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 			{
 				returnable_config->observableName = projComps[childIndex]->GetValue()[0];
 			}
+			else if( projComps[childIndex]->GetName() == "WidthKey" )
+			{
+				vector<string> widths = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
+                                if( widths.empty() ) returnable_config->width_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
+                                for( vector<string>::iterator width_i = widths.begin(); width_i != widths.end(); ++width_i ) returnable_config->width_key.push_back( atoi( width_i->c_str() ) );
+			}
 			else if( projComps[childIndex]->GetName() == "ColorKey" )
 			{
 				vector<string> colors = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
