@@ -1,13 +1,12 @@
-/**
-  @class ComponentPlotter
-
-  A class for plotting PDF projections onto histograms
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @date 2009-10-13
+/*!
+ * @class ComponentPlotter
+ *
+ * A class for plotting PDF projections onto histograms
+ *
+ * @author Robert Currie rcurrie@cern.ch
  */
 
-//	ROOT Headers
+///	ROOT Headers
 #include "TFile.h"
 #include "TCanvas.h"
 #include "TPaveText.h"
@@ -22,7 +21,7 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TF1.h"
-//	RapidFit Headers
+///	RapidFit Headers
 #include "ComponentPlotter.h"
 #include "StatisticsFunctions.h"
 #include "EdStyle.h"
@@ -30,14 +29,14 @@
 #include "PhaseSpaceBoundary.h"
 #include "ClassLookUp.h"
 #include "ComponentRef.h"
-//	System Headers
+///	System Headers
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
 #include <math.h>
 #include <float.h>
 #include <cstdlib>
-//#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
 using namespace::std;
@@ -49,6 +48,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ), logY( (config!=NULL)?config->logY:false ),
 	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false )
 {
+	plotPDF->TurnCachingOff();
+
 	pdfIntegrator->SetPDF( plotPDF );
 	pdfIntegrator->ProjectionSettings();
 	//////////////////////////////////////////////////////////////////
@@ -120,7 +121,7 @@ void ComponentPlotter::ProjectObservable()
 	}
 }
 
-//	
+//
 //	Returns a vector of arrays of dimention		AllCombinations (+ 0 combination) * total_points
 //	This data corresponds to the X axis of the projected functions from the PDF
 //
@@ -141,9 +142,9 @@ vector<vector<double>* >* ComponentPlotter::MakeXProjectionData( unsigned int nu
 		for(int pointIndex = 0; pointIndex < total_points; ++pointIndex )
 		{
 			//	Start at minimum of observable in phase-space
-			//	
+			//
 			//	move a step equal to the size of the interval that you should take for this subset of data
-			//	
+			//
 			//	due to the fact that the stepsize corresponding to the tag=-1 (combinationIndex=0)
 			//	may be different ot the stepsize corresponding to the tag=1 (combinationIndex=1)
 			//
@@ -297,7 +298,7 @@ vector<PhaseSpaceBoundary*> ComponentPlotter::GeneratePhaseSpaceBoundary( vector
 //	When this function starts it collects statistical information and infromation on the boundary of the observable
 //
 //	From here it loops over all components and combinations for this PDFWithData object
-//	
+//
 //	For configurations with more than 1 combination I create combination 0 at the end to contain the total sum of all of the unique combination datasets and projections
 //
 void ComponentPlotter::GenerateProjectionData()
@@ -342,7 +343,12 @@ void ComponentPlotter::GenerateProjectionData()
 	vector<string> PDF_Components = plotPDF->PDFComponents();
 	if( StringProcessing::VectorContains( PDF_Components, string("0") ) == -1 )
 	{
-		PDF_Components.push_back( "0" );
+		vector<string> temp_PDF_Components( 1, "0" );
+		for(vector<string>::iterator comb_i = PDF_Components.begin(); comb_i != PDF_Components.end(); ++comb_i )
+		{
+			temp_PDF_Components.push_back( *comb_i );
+		}
+		PDF_Components = temp_PDF_Components;
 	}
 
 	if( onlyZero == true ) PDF_Components = vector<string>(1,"0");
@@ -421,11 +427,11 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 	PlotFile->cd();
 
 	//	Seperate directories per PDF in the XML
-	gDirectory->mkdir( pdfStr );
+	if( gDirectory->GetDirectory( pdfStr ) == 0 )	gDirectory->mkdir( pdfStr );
 	gDirectory->cd( pdfStr );
 
 	//	Seperate directories per observable in the XML
-	gDirectory->mkdir( observableName.c_str() );
+	if( gDirectory->GetDirectory( observableName.c_str() ) == 0 )	gDirectory->mkdir( observableName.c_str() );
 	gDirectory->cd( observableName.c_str() );
 
 	//	Pointer to here
@@ -435,7 +441,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 	for( unsigned int componentIndex=0; componentIndex < X_values->size(); ++componentIndex )
 	{
 		TString componentName("Combination_");componentName+=componentIndex;
-		gDirectory->mkdir( componentName );
+		if( gDirectory->GetDirectory( componentName ) == 0 )	gDirectory->mkdir( componentName );
 		gDirectory->cd( componentName );
 		TDirectory* componentDir = gDirectory;
 
@@ -443,7 +449,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		for( unsigned int combinationIndex=0; combinationIndex < (*X_values)[componentIndex]->size(); ++combinationIndex )
 		{
 			TString combinationName("Component_");combinationName+=combinationIndex;
-			gDirectory->mkdir( combinationName );
+			if( gDirectory->GetDirectory( combinationName ) == 0 )	gDirectory->mkdir( combinationName );
 			gDirectory->cd( combinationName );
 
 			//	Save all of the X and Y data in the TTree
@@ -526,7 +532,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 	gDirectory->cd( pdfStr );
 
-	gDirectory->mkdir( "overlay_graphs" );
+	if( gDirectory->GetDirectory( "overlay_graphs" ) == 0 )	gDirectory->mkdir( "overlay_graphs" );
 	gDirectory->cd( "overlay_graphs" );
 
 	//	Overlay all components for each combination
@@ -578,7 +584,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		temp->logY = logY;
 
 		//	Static function so has to be told everything about what you want to plot!
-		this->OutputPlot( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), plotPDF->GetRandomFunction(), temp ); 
+		this->OutputPlot( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), plotPDF->GetRandomFunction(), temp );
 
 		if( this_config != NULL )
 		{
@@ -596,21 +602,21 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				cout << endl << "Chi^2/ndof :\t" << setprecision(10) << chi2 / denominator << endl;
 
 				/*
-				TString graphName("Chi2Graph");
-				TString graphTitle(graphName);
-				graphName+=plotPDF->GetRandomFunction()->Rndm();
-				TGraph* tf1_graph = new TGraph( fitting_function );
-				tf1_graph->SetTitle( graphTitle );
-				tf1_graph->SetName( graphName );
+				   TString graphName("Chi2Graph");
+				   TString graphTitle(graphName);
+				   graphName+=plotPDF->GetRandomFunction()->Rndm();
+				   TGraph* tf1_graph = new TGraph( fitting_function );
+				   tf1_graph->SetTitle( graphTitle );
+				   tf1_graph->SetName( graphName );
 
-				TString Chi2Title("Chi2Title");
-				TString Chi2Name(Chi2Title); Chi2Name+=plotPDF->GetRandomFunction()->Rndm();
-				TCanvas* Chi2test = new TCanvas( Chi2Name, Chi2Title, 1680, 1050 );
-				binned_data.back()->Draw("AP");
-				tf1_graph->Draw("C");
-				Chi2test->Print(Chi2Name+".pdf");
-				Chi2test->Write("",TObject::kOverwrite);
-				*/
+				   TString Chi2Title("Chi2Title");
+				   TString Chi2Name(Chi2Title); Chi2Name+=plotPDF->GetRandomFunction()->Rndm();
+				   TCanvas* Chi2test = new TCanvas( Chi2Name, Chi2Title, 1680, 1050 );
+				   binned_data.back()->Draw("AP");
+				   tf1_graph->Draw("C");
+				   Chi2test->Print(Chi2Name+".pdf");
+				   Chi2test->Write("",TObject::kOverwrite);
+				   */
 			}
 		}
 
@@ -813,7 +819,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	c1->Update();
 
-	TLegend* leg = EdStyle::LHCbLegend(); 
+	TLegend* leg = EdStyle::LHCbLegend();
 
 	leg->AddEntry( input_data, "Data", "pl" );
 
@@ -829,7 +835,6 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		}
 		if( !Color_Key.empty() )
 		{
-			cout << "Color: " << num << " : " << Color_Key.size() << "\t: " << Color_Key[num] << endl;
 			if( num < Color_Key.size() )
 			{
 				(*comp_i)->SetLineColor( (Color_t)Color_Key[num] );
@@ -879,9 +884,26 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	TString Clean_Description = StringProcessing::Clean( CombinationDescription.c_str() );
 
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
+	ofstream filestr;
+	filestr.open ("/dev/null");
+	//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
+	cout_bak = cout.rdbuf();
+	cerr_bak = cerr.rdbuf();
+	clog_bak = clog.rdbuf();
+	nullbuf = filestr.rdbuf();
+	freopen("/dev/null", "w", stderr);
+	cout.rdbuf(nullbuf);
+	cerr.rdbuf(nullbuf);
+	clog.rdbuf(nullbuf);
+
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
+
+	cout.rdbuf( cout_bak );
+	cerr.rdbuf( cerr_bak );
+	clog.rdbuf( clog_bak );
 }
 
 //      This is a slimmed down version of the AddBranch function I have written elsewhere
