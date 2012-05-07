@@ -280,7 +280,7 @@ double NormalisedSumPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRe
 
 	//cout << endl << componentIndexObj->getComponentName() << endl;
 
-	if( component_num == -1 )
+	if( component_num == -1 || componentIndexObj->getSubComponent() == NULL )
 	{
 		component_num = StringProcessing::GetNumberOnLeft( componentIndex );
 		componentIndexObj->setComponentNumber( component_num );

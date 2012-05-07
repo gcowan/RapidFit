@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/05/07 Rob Currie
+   - Improved the BsMass PDF to correctly call the limits from the PhaseSpace that the DataPoint inhabits
+   - Added components to the BsMass PDF
+   - Added new unittest/framework_tests The idea being that the XML in here should always run without error as long as the feature they are testing is stable
+   - Cleaned up some naming of objects in the ComponentPlotter .root output. I still recommend this should only be used for diagnostics or if you know what you're doing, but it is useful
+
 2012/05/05 Rob Currie
    - Fixed a bug to do with handling Nested NormalisedSum PDFs in a Component Projection
    - Fixed a bug which stopped RapidFit from handling projections over a single observable (i.e. a mass plot)

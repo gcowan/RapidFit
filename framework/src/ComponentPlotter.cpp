@@ -358,7 +358,7 @@ void ComponentPlotter::GenerateProjectionData()
 
 
 	//	Yes I know these are pointers to templates, but this is faster and was quicker than coding up a struct to contain the information easily
-	//	I appologise for any difficult you may have reading it, but this is easier to debug (imo)
+	//	I apologise for any difficult you may have reading it, but this is easier to debug (imo)
 	vector<vector<vector<double>* >* >* X_values = new vector<vector<vector<double>* >* >();
 	vector<vector<vector<double>* >* >* Y_values = new vector<vector<vector<double>* >* >();
 
@@ -379,7 +379,6 @@ void ComponentPlotter::GenerateProjectionData()
 		//	Store the Projection Data for this Component
 		X_values->push_back( X_values_local );	Y_values->push_back( Y_values_local );
 	}
-
 
 	//	Write the output to the output file
 	TDirectory* here = gDirectory;
@@ -440,7 +439,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 	//	Loop over all components
 	for( unsigned int componentIndex=0; componentIndex < X_values->size(); ++componentIndex )
 	{
-		TString componentName("Combination_");componentName+=componentIndex;
+		TString componentName("Component_");componentName+=componentIndex;
 		if( gDirectory->GetDirectory( componentName ) == 0 )	gDirectory->mkdir( componentName );
 		gDirectory->cd( componentName );
 		TDirectory* componentDir = gDirectory;
@@ -448,7 +447,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		//	Loop over all combinations for this component
 		for( unsigned int combinationIndex=0; combinationIndex < (*X_values)[componentIndex]->size(); ++combinationIndex )
 		{
-			TString combinationName("Component_");combinationName+=combinationIndex;
+			TString combinationName("Combination_");combinationName+=combinationIndex;
 			if( gDirectory->GetDirectory( combinationName ) == 0 )	gDirectory->mkdir( combinationName );
 			gDirectory->cd( combinationName );
 

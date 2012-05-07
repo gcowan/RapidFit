@@ -21,6 +21,9 @@ class BsMass : public BasePDF
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
 
+		double EvaluateComponent( DataPoint*, ComponentRef* );
+
+		vector<string> PDFComponents();
 	protected:
 		//Calculate the PDF normalisation
 		virtual double Normalisation(PhaseSpaceBoundary*);
@@ -38,7 +41,12 @@ class BsMass : public BasePDF
 		ObservableRef recoMassName;	// reconstructed Bs mass
 	
 		//Limits
-		double mlow, mhigh ;
+		double mlow, mhigh;
+
+		int componentIndex;
+
+		bool plotComponents;
 };
 
 #endif
+

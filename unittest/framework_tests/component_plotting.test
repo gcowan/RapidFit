@@ -1,0 +1,6 @@
+
+Running this XML should produce a Projection plot where the components read from left to right in decending order with only the 1st and 3rd peaks expressing their components
+
+All components should have a unique color with line width of 3 with the 0th component not being plotted on the overall plot
+
+There should be no Foam files left if the destructors are all called correctly
