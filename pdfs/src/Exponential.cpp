@@ -42,7 +42,6 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 	_useEventResolution = configurator->isTrue( "UseEventResolution" );
 	_useTimeAcceptance  = configurator->isTrue( "UseTimeAcceptance" );
 	_numericIntegralForce = configurator->isTrue( "UseNumericalIntegration" );
-	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" );
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0033 );

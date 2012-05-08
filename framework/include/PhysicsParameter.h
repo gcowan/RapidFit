@@ -24,6 +24,7 @@ class PhysicsParameter
 		PhysicsParameter( string, double, double, string, string );
 		~PhysicsParameter();
 
+		void SetName( string );
 		string GetName() const;
 
 		double GetValue() const;

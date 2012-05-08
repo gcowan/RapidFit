@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
 #include "StringProcessing.h"
@@ -156,6 +156,11 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter( const string Name ) const
 	}
 	else
 	{
+		//	This has to be here to ensure that badly constructed parameters don't cause headaches!
+		if( allParameters[unsigned(nameIndex)]->GetName().empty() || allParameters[unsigned(nameIndex)]->GetName() == "" )
+		{
+			allParameters[unsigned(nameIndex)]->SetName( Name );
+		}
 		return allParameters[unsigned(nameIndex)];
 	}
 }
@@ -165,10 +170,23 @@ PhysicsParameter* ParameterSet::GetPhysicsParameter( const ObservableRef& object
 	if( object.GetIndex() < 0 )
 	{
 		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef() ) );
-		if( object.GetIndex() >= 0 ) return allParameters[ (unsigned) object.GetIndex() ];
+		if( object.GetIndex() >= 0 )
+		{
+			//      This has to be here to ensure that badly constructed parameters don't cause headaches!
+			if( allParameters[ (unsigned) object.GetIndex() ]->GetName().empty() || allParameters[ (unsigned) object.GetIndex() ]->GetName() == "" )
+			{
+				allParameters[ (unsigned) object.GetIndex() ]->SetName( allNames[(unsigned) object.GetIndex()] );
+			}
+			return allParameters[ (unsigned) object.GetIndex() ];
+		}
 	}
 	else
 	{
+		//      This has to be here to ensure that badly constructed parameters don't cause headaches!
+		if( allParameters[ (unsigned) object.GetIndex() ]->GetName().empty() || allParameters[ (unsigned) object.GetIndex() ]->GetName() == "" )
+		{
+			allParameters[ (unsigned) object.GetIndex() ]->SetName( allNames[(unsigned) object.GetIndex()]  );
+		}
 		return allParameters[ (unsigned) object.GetIndex() ];
 	}
 	cerr << "PhysicsParameter " << object.Name().c_str() << " not found(2)" << endl;

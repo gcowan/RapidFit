@@ -81,6 +81,11 @@ PhysicsParameter::~PhysicsParameter()
 {
 }
 
+void PhysicsParameter::SetName( string Input )
+{
+	name = Input;
+}
+
 string PhysicsParameter::GetName() const
 {
 	return name;

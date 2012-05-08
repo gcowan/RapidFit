@@ -94,12 +94,15 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	ParameterSet* checkedBottleParameters = CheckInputParams( BottleParameters, allPDFs );
 
+	ParameterSet* checkedGenerationParameters = GenerationParameters( checkedBottleParameters, BottleParameters );
+
 	PhysicsBottle * bottle = new PhysicsBottle( checkedBottleParameters );
 
 	//Fill the bottle - data generation occurs in this step
 	for ( unsigned int resultIndex = 0; resultIndex < BottleData.size(); ++resultIndex )
 	{
-		BottleData[resultIndex]->SetPhysicsParameters( checkedBottleParameters );
+		//	Use the Raw input as the Gemeration PDF may require Parameters not involved in the main fit
+		BottleData[resultIndex]->SetPhysicsParameters( checkedGenerationParameters );
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
 
@@ -120,7 +123,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Check that the provided ParameterSet only Contains the Parameters claimed by the PDFs to protect the Minimiser from runtime mistakes
-ParameterSet* FitAssembler::CheckInputParams( ParameterSet* givenParams, vector<IPDF*> allPDFs )
+ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs )
 {
 	vector<string> param_names;
 	for( unsigned int i=0; i< allPDFs.size(); ++i )
@@ -149,6 +152,21 @@ ParameterSet* FitAssembler::CheckInputParams( ParameterSet* givenParams, vector<
 	}
 
 	return wantedParameterSet;
+}
+
+ParameterSet* FitAssembler::GenerationParameters( const ParameterSet* checkedBottleParameters, const ParameterSet* BottleParameters )
+{
+	vector<string> allForGeneration = BottleParameters->GetAllNames();
+
+	ParameterSet* GenerationParameterSet = new ParameterSet( *checkedBottleParameters );
+
+	for( vector<string>::iterator param_i = allForGeneration.begin(); param_i != allForGeneration.end(); ++param_i )
+	{
+		PhysicsParameter* thisParam = BottleParameters->GetPhysicsParameter( *param_i );
+		GenerationParameterSet->AddPhysicsParameter( thisParam );
+	}
+
+	return GenerationParameterSet;
 }
 
 //Create the physics bottle with pre-made data

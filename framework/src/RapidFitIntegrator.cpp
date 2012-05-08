@@ -387,13 +387,18 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 	dontIntegrate.push_back(ProjectThis);
 	double value = -1.;
 
-	vector<string> allIntegrable = NewDataPoint->GetAllNames();
+	vector<string> allIntegrable = functionToWrap->GetPrototypeDataPoint();
 
 	if( allIntegrable.size() == 1 )
 	{
 		if( allIntegrable[0] == ProjectThis )
 		{
 			value = functionToWrap->EvaluateComponent( NewDataPoint, Component );
+		}
+		else
+		{
+			cerr << "This PDF only knows about: " << allIntegrable[0] << " CAN NOT INTEGRATE: " << ProjectThis << endl << endl;
+			exit(-342);
 		}
 	}
 	else

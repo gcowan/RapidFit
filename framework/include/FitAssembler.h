@@ -114,8 +114,13 @@ class FitAssembler
 		 *
 		 * @return Returns a ParamaterSet containing ONLY the parameters wanted by the PDFs during the fit
 		 */
-		static ParameterSet* CheckInputParams( ParameterSet* givenParams, vector<IPDF*> allPDFs );
+		static ParameterSet* CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs );
 
+
+		/*!
+		 *
+		 */
+		static ParameterSet* GenerationParameters( const ParameterSet* checkedBottleParameters, const ParameterSet* BottleParameters );
 
 	private:
 

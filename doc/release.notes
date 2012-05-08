@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2012/05/08 Rob Currie
+   - Added work around to badly constructed PhysicsParameters in ParameterSet which should protect code higher up from badly constructed objects.
+   - Modified the FitAssembler to include a new method for constructing a ParameterSet which contains all of the PhysicsBottle Parameters
+     This set is constructed such that only the Parameters requested by Minuit are at the top of the Set in the same order as the one passed to Minuit.
+     This allows for the full XML ParameterSet to be passed to the PDFs used in Generating whilst keeping badly constructed XML from breaking Minuit.
+   - Corrected RapidFitIntegrator to correctly call Evaluate and not Integrate for 1 observable fit/projection even when weights are in the fit
+
 2012/05/07 Rob Currie
    - Fixed a bug to do with discrete combinations (tagging) in Component Projections.
      This was an erroneous (effective) factor 2 which has been missing for a long time in the normalisation of the data.
