@@ -1,15 +1,13 @@
-//	ROOT Headers
+///	ROOT Headers
 #include "TString.h"
 #include "TTree.h"
 #include "TNtuple.h"
 #include "TFile.h"
-//	RapidFit Utils Headers
-#include "StringOperations.h"
+///	RapidFit Utils Headers
 #include "TTree_Processing.h"
 #include "ROOT_File_Processing.h"
 #include "Template_Functions.h"
-#include "RapidFit_Output_File.h"
-//	System Headers
+///	System Headers
 #include <vector>
 #include <string>
 #include <iostream>

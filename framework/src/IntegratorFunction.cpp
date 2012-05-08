@@ -42,6 +42,8 @@ IntegratorFunction::IntegratorFunction( IPDF * InputFunction, DataPoint * InputP
 		cache_lookup.push_back( obs_i->GetIndex() );
 	}
 	newDataPoint = new DataPoint( currentPoint->GetAllNames() );
+	newDataPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
+	currentPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
 }
 
 //	Constructor with additional information needed for the Foam coordinate transform
@@ -67,6 +69,8 @@ IntegratorFunction::IntegratorFunction( IPDF * InputFunction, DataPoint * InputP
 		cache_lookup.push_back( obs_i->GetIndex() );
 	}
 	newDataPoint = new DataPoint( *InputPoint );
+	newDataPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
+	currentPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
 	vector<double>::iterator num_i=lower_limit.begin();
 	vector<double>::iterator num_j=ranges.begin();
 	for( ; num_i != lower_limit.end(); ++num_i, ++num_j )
@@ -168,7 +172,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		{
 			if( (double)x[observableIndex] < lower_limit[observableIndex] )
 			{
-				cout << x[observableIndex] << " :\t" << lower_limit[observableIndex] << endl;
+				//cout << x[observableIndex] << " :\t" << lower_limit[observableIndex] << endl;
 				return 0.;
 			}
 		}
@@ -176,7 +180,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		{
 			if( (double)x[observableIndex] > upper_limit[observableIndex] )
 			{
-				cout << x[observableIndex] << " :\t" << upper_limit[observableIndex] << endl;
+				//cout << x[observableIndex] << " :\t" << upper_limit[observableIndex] << endl;
 				return 0.;
 			}
 		}

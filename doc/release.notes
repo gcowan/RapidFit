@@ -1,6 +1,15 @@
 // $Id: release.notes $
 
 2012/05/07 Rob Currie
+   - Fixed a bug to do with discrete combinations (tagging) in Component Projections.
+     This was an erroneous (effective) factor 2 which has been missing for a long time in the normalisation of the data.
+     However there was another factor 2 which was introduced in the Component Plotting branch which hasn't been fully explained but is believed to be related to confusions around Discrete Combination.
+   - Added new FoamFile DataSource which does the 'simple' task of generating a Foam DataSet and then passes it through the ROOT file interface in order to correctly evaluate TF1 objects The resulting dataset is also saved.
+   - Added components to Bs2JpsiPhiMassSignal
+   - Commented out redundant code in BsMass
+   - Modified the interface to IDataSet to request the total amount of events in a single Discrete Combination within a given DataSet as given by a template DataPoint
+
+2012/05/07 Rob Currie
    - Improved the BsMass PDF to correctly call the limits from the PhaseSpace that the DataPoint inhabits
    - Added components to the BsMass PDF
    - Added new unittest/framework_tests The idea being that the XML in here should always run without error as long as the feature they are testing is stable

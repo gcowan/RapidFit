@@ -141,6 +141,17 @@ class DataSetConfiguration
 		DataSetConfiguration& operator = ( const DataSetConfiguration& );
 
 		/*!
+		 *
+		 */
+		IDataSet* FoamFile( vector<string> arguments, vector<string> ArgumentNames, PhaseSpaceBoundary* internalBoundary, int numberEvents, IPDF* FitPDF );
+
+
+		/*!
+		 *
+		 */
+		IDataSet* LoadGeneratorDataset( string source, PhaseSpaceBoundary* internalBoundary, int numberEvents, IPDF* FitPDF );
+
+		/*!
 		 * Private functions for reading objects and assembling DataSet
 		 */
 

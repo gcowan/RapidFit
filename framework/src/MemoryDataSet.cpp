@@ -6,10 +6,12 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
 #include "MemoryDataSet.h"
+#include "IConstraint.h"
+#include "ObservableDiscreteConstraint.h"
 //	System Headers
 #include <iostream>
 #include <vector>
@@ -21,8 +23,12 @@
 using namespace::std;
 
 //Constructor with correct argument
-MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) : allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) )
+MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) : allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets()
 {
+	for( unsigned int i=0; i< (unsigned)dataBoundary->GetNumberCombinations(); ++i )
+	{
+		allSubSets.push_back( -1 );
+	}
 }
 
 //Destructor
@@ -72,9 +78,39 @@ DataPoint * MemoryDataSet::GetDataPoint( int Index ) const
 }
 
 //Get the number of data points in the set
-int MemoryDataSet::GetDataNumber() const
+int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint ) const
 {
-	return int(allData.size());
+	if( templateDataPoint == NULL )	return int(allData.size());
+	else
+	{
+		int number = allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint ) ];
+
+		if( number != -1 ) return number;
+		else
+		{
+
+			int counter = 0;
+			vector<string> allDiscrete = dataBoundary->GetDiscreteNames();
+
+			PhaseSpaceBoundary* temp_Boundary = new PhaseSpaceBoundary( *dataBoundary );
+
+			for( vector<string>::iterator disc_i = allDiscrete.begin(); disc_i != allDiscrete.end(); ++disc_i )
+			{
+				double val = templateDataPoint->GetObservable( *disc_i )->GetValue();
+				ObservableDiscreteConstraint* thisConstraint = (ObservableDiscreteConstraint*) temp_Boundary->GetConstraint( *disc_i );
+				vector<double> vec_val( 1, val );
+				thisConstraint->SetValues( vec_val );
+			}
+
+			for( vector<DataPoint*>::const_iterator point_i = allData.begin(); point_i != allData.end(); ++point_i )
+			{
+				if( temp_Boundary->IsPointInBoundary( *point_i ) )	++counter;
+			}
+
+			allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint ) ] = counter;
+			return counter;
+		}
+	}
 }
 
 //Get the data bound

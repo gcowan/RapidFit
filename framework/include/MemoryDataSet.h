@@ -29,7 +29,7 @@ class MemoryDataSet : public IDataSet
 		virtual DataPoint * GetDataPoint(int) const;
 		virtual void ReserveDataSpace( int numberOfPoints );
 		virtual bool AddDataPoint( DataPoint* );
-		virtual int GetDataNumber() const;
+		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL ) const;
 		virtual PhaseSpaceBoundary * GetBoundary() const;
 
 		virtual void SortBy( string );
@@ -51,7 +51,7 @@ class MemoryDataSet : public IDataSet
 		MemoryDataSet& operator = ( const MemoryDataSet& );
 		vector<DataPoint*> allData;
 		PhaseSpaceBoundary * dataBoundary;
-
+		mutable vector<int> allSubSets;
 };
 
 bool compare_datapoints ( pair<DataPoint,pair<string,int> > first, pair<DataPoint,pair<string,int> > second );

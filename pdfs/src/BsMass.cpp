@@ -168,16 +168,22 @@ double BsMass::Normalisation(PhaseSpaceBoundary * boundary)
 	// Assumes that the mass integration limits are +/- Infinity
 	// So take sufficiently large mass window.
 
+	/*
 	//These need to be put into the member variables in order to have then available in the evaluate method
 	IConstraint * massBound = boundary->GetConstraint( recoMassName );
-	if ( massBound->GetUnit() == "NameNotFoundError" ) {cerr << "Bound on mass not provided" << endl;return -1.;}
-	else{
+	if( massBound->GetUnit() == "NameNotFoundError" )
+	{
+		cerr << "Bound on mass not provided" << endl;
+		return -1.;
+	}
+	else
+	{
 		mlow = massBound->GetMinimum();
 		mhigh = massBound->GetMaximum();
 	}
+	*/
+	double returnValue = 1;//RooMath::erf(mhigh) - RooMath::erf(mlow);
 
-	//double returnValue = RooMath::erf( mhigh) - RooMath::erf(mlow ) ;
-
-	return 1.0 ; //returnValue;
+	return returnValue;
 }
 

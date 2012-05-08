@@ -19,7 +19,10 @@ class Bs2JpsiPhiMassSignal : public BasePDF
 		~Bs2JpsiPhiMassSignal();
 
 		//Calculate the PDF value
-		virtual double Evaluate(DataPoint*);
+		double Evaluate(DataPoint*);
+
+		vector<string> PDFComponents();
+		double EvaluateComponent( DataPoint*, ComponentRef* );
 
 	protected:
 		//Calculate the PDF normalisation
@@ -36,6 +39,9 @@ class Bs2JpsiPhiMassSignal : public BasePDF
 
 		// Observables
 		ObservableRef recoMassName;	// reconstructed Bs mass
+
+		int componentIndex;
+		bool plotComponents;
 };
 
 #endif

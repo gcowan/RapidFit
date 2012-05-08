@@ -1,14 +1,14 @@
 /*!
  * @class DataSetConfiguration
  *
- * A class for holding the data to create a data set, and creating that data set when requested
+ * @brief A class for holding the data to create a data set, and creating that data set when requested
  *
  * @author Benjamin M Wynne bwynne@cern.ch
  * @author Greig A Cowan greig.cowan@cern.ch
  * @author Robert Currie rcurrie@cern.ch
  */
 
-//	ROOT Headers
+///	ROOT Headers
 #include "TFile.h"
 #include "TBranch.h"
 #include "TLeaf.h"
@@ -19,13 +19,13 @@
 #include "TDirectory.h"
 #include "TKey.h"
 #include "TTreeFormula.h"
-//	RapidFit Headers
+///	RapidFit Headers
 #include "StringProcessing.h"
 #include "MemoryDataSet.h"
 #include "DataSetConfiguration.h"
 #include "ClassLookUp.h"
 #include "ResultFormatter.h"
-//	System Headers
+///	System Headers
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -105,42 +105,84 @@ IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary,
 	}
 
 	//Some kind of decision about what kind of data set to use?
-	IDataSet * newDataSet;
+	IDataSet * newDataSet = NULL;
 	if( real_numberEvents!=-1 ) numberEvents = real_numberEvents;
 
-	if ( source == "File" )
+	if( source == "File" )
 	{
 		//Load data from file
-		newDataSet = LoadDataFile( arguments, argumentNames, internalBoundary, numberEvents );
+		newDataSet = this->LoadDataFile( arguments, argumentNames, internalBoundary, numberEvents );
+	}
+	else if( source == "FoamFile" )
+	{
+		newDataSet = this->FoamFile( arguments, argumentNames, internalBoundary, (int)numberEvents, FitPDF );
 	}
 	else
 	{
-		//PDF parameters must be set before data can be generated
-		if (parametersAreSet)
-		{
-			//Assume it's an accept/reject generator, or some child of it
-			IDataGenerator * dataGenerator;
-			if (separateGeneratePDF)
-			{
-				dataGenerator = ClassLookUp::LookUpDataGenerator( source, internalBoundary, generatePDF );
-			}
-			else
-			{
-				dataGenerator = ClassLookUp::LookUpDataGenerator( source, internalBoundary, FitPDF );
-			}
-			dataGenerator->GenerateData( int(numberEvents) );
-			newDataSet = dataGenerator->GetDataSet();
-			delete dataGenerator;
-		}
-		else
-		{
-			cerr << "PDF parameters must be set before data can be generated" << endl;
-			exit(1);
-		}
+		newDataSet = this->LoadGeneratorDataset( source, internalBoundary, (int)numberEvents, FitPDF );
 	}
 
 	internalRef = newDataSet;
 	return newDataSet;
+}
+
+IDataSet* DataSetConfiguration::LoadGeneratorDataset( string source, PhaseSpaceBoundary* internalBoundary, int numberEvents, IPDF* FitPDF )
+{
+	//Assume it's an accept/reject generator, or some child of it
+	IDataGenerator * dataGenerator = NULL;
+	if (separateGeneratePDF)
+	{
+		dataGenerator = ClassLookUp::LookUpDataGenerator( source, internalBoundary, generatePDF );
+	}
+	else
+	{
+		dataGenerator = ClassLookUp::LookUpDataGenerator( source, internalBoundary, FitPDF );
+	}
+	if( dataGenerator == NULL )
+	{
+		cerr << "Generator NOT found!" << endl;
+		exit(-9864);
+	}
+	dataGenerator->GenerateData( int(numberEvents) );
+	IDataSet* newDataSet = dataGenerator->GetDataSet();
+	delete dataGenerator;
+
+	return newDataSet;
+}
+
+IDataSet* DataSetConfiguration::FoamFile( vector<string> arguments, vector<string> ArgumentNames, PhaseSpaceBoundary* internalBoundary, int numberEvents, IPDF* FitPDF )
+{
+	string searchName = "FileName";
+	int fileNameIndex = StringProcessing::VectorContains( &ArgumentNames, &searchName );
+	if( fileNameIndex == -1 )
+	{
+		cerr << "We require a FileName to push the dataset to to process with the Interporator" << endl;
+		exit(56562);
+	}
+
+	string fileName = arguments[fileNameIndex];
+
+	string source="Foam";
+
+	IDataSet* FoamDataSet = this->LoadGeneratorDataset( source, internalBoundary, numberEvents, FitPDF );
+
+	vector<IDataSet*> TotalFoamDataSet(1, FoamDataSet);
+
+	remove( fileName.c_str() );
+
+	ResultFormatter::MakeRootDataFile( fileName, TotalFoamDataSet );
+
+	delete FoamDataSet;
+
+	IDataSet* FileDataSet = this->LoadDataFile( arguments, ArgumentNames, internalBoundary, numberEvents );
+
+	remove( fileName.c_str() );
+
+	TotalFoamDataSet[0] = FileDataSet;
+
+	ResultFormatter::MakeRootDataFile( fileName, TotalFoamDataSet );
+
+	return FileDataSet;
 }
 
 string DataSetConfiguration::getNtuplePath( string fileName )

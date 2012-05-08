@@ -204,7 +204,7 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 			//
 			(*projectionValueArray)[(unsigned)pointIndex] =
 				//						ratio Numerical/Analytical		n-points		Observable range	full Integral
-				(*projectionValueVector)[(unsigned)pointIndex] * ratioOfIntegrals[combinationIndex] * (double)plotData->GetDataNumber() * range / combination_integral[combinationIndex];
+				(*projectionValueVector)[(unsigned)pointIndex] * ratioOfIntegrals[combinationIndex] * (double)plotData->GetDataNumber( allCombinations[combinationIndex] ) * range / combination_integral[combinationIndex];
 
 			//	'Fraction of this Combination in Combination 0'
 			(*projectionValueArray)[(unsigned)pointIndex] *= combinationWeights[combinationIndex];
@@ -285,7 +285,6 @@ vector<PhaseSpaceBoundary*> ComponentPlotter::GeneratePhaseSpaceBoundary( vector
 			new_boundary->SetConstraint( discreteNames[discreteIndex], constraint_val,
 					AllCombinations[combinationIndex]->GetObservable( discreteNames[discreteIndex] )->GetUnit() );
 		}
-
 		//      Store the boundary
 		discrete_boundaries.push_back( new_boundary );
 	}

@@ -205,7 +205,8 @@
 		</NormalisedSumPDF>
 
 		<DataSet>
-			<Source>Foam</Source>
+			<Source>FoamFile</Source>
+			<FileName>output.root</FileName>
 			<NumberEvents>100000</NumberEvents>
 
 			<PhaseSpaceBoundary>
