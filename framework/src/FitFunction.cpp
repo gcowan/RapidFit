@@ -28,7 +28,7 @@ using namespace::std;
 //Default constructor
 FitFunction::FitFunction() :
 	allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
-	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true )
+	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false )
 {
 }
 
@@ -272,7 +272,7 @@ void FitFunction::SetThreads( int input )
 	}
 }
 
-int FitFunction::GetThreads()
+int FitFunction::GetThreads() const
 {
 	return Threads;
 }
@@ -280,5 +280,15 @@ int FitFunction::GetThreads()
 void FitFunction::SetIntegratorTest( bool input )
 {
 	testIntegrator = input;
+}
+
+void FitFunction::SetUseWeightsSquared( bool Input )
+{
+	weightsSquared = Input;
+}
+
+bool FitFunction::GetWeightsWereUsed() const
+{
+	return useWeights;
 }
 

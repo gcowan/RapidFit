@@ -10,6 +10,8 @@
 #ifndef I_MINIMISER_H
 #define I_MINIMISER_H
 
+///	ROOT Headers
+#include "TMatrixDSym.h"
 ///	RapidFit Headers
 #include "FitFunction.h"
 #include "FitResult.h"
@@ -137,6 +139,34 @@ class IMinimiser
 		 * @return Returns a pointer to the FitFunction that was Minimised in it's Minimised State
 		 */
 		virtual FitFunction* GetFitFunction() = 0;
+
+		/*!
+		 * @brief Interface Function:
+		 *        Calls the internal Hesse function for this Minimiser
+		 *
+		 * @return Void
+		 */
+		virtual void CallHesse() = 0;
+
+		/*!
+		 * @breif Interface Function:
+		 *        Request the Correlation Matrix from the Minimiser
+		 *
+		 * @param numParams  This is the number of Parameters in the fit, also the dimention of the matrix which is defined as square
+		 *
+		 * @return Returns a pointer to the correct Correlation Matrix that has been corrected for the effect of Weights being used in the Fit
+		 */
+		virtual TMatrixDSym* GetCovarianceMatrix() = 0;
+
+		/*!
+		 * @brief Interface Function
+		 *        Corrects the Errors stored in the FitResult based on this Covariance Matrix
+		 *
+		 * @param Input This is the covariance Matrix which is used to modify the internal FitResult Errors
+		 *
+		 * @return Void
+		 */
+		virtual void ApplyCovarianceMatrix( TMatrixDSym* Input ) = 0;
 };
 
 #endif

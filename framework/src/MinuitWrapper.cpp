@@ -1,19 +1,23 @@
-/**
-  @class MinuitWrapper
-
-  A wrapper to integrate Minuit with RapidFit
-
-  @author Benjamin M Wynne bwynne@cern.ch
-  @date 2009-10-02
+/*!
+ * @class MinuitWrapper
+ *
+ * A wrapper to integrate Minuit with RapidFit
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
  */
 
 //	ROOT Headers
 #include "Rtypes.h"
+#include "TVector.h"
+#include "TMatrixDSym.h"
+#include "TMinuit.h"
+#include "TMatrixTUtils.h"
 //	RapidFit Headers
 #include "MinuitWrapper.h"
 #include "StringProcessing.h"
 #include "FunctionContour.h"
 #include "PhysicsBottle.h"
+#include "CorrectedCovariance.h"
 //	System Headers
 #include <iostream>
 #include <limits>
@@ -21,6 +25,9 @@
 #include <cmath>
 #include <cstdlib>
 #include <float.h>
+#include <iomanip>
+
+using namespace::std;
 
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
@@ -121,15 +128,15 @@ void MinuitWrapper::SetupFit( FitFunction* NewFunction )
 		{
 			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE, 0.0, 0.0, errorFlag);
 		}
-		else 
+		else
 		{
 			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE,
 					newParameter->GetMinimum(), newParameter->GetMaximum(), errorFlag);
 		}
 
-		//Fix the parameter if required 
+		//Fix the parameter if required
 		if ( newParameter->GetType() == "Fixed" )
-		{       
+		{
 			minuit->FixParameter( nameIndex );
 		}
 		else
@@ -170,6 +177,15 @@ void MinuitWrapper::FixParameters( vector<double> fix_values, vector<string> Par
 		minuit->mnparm(nameIndex, allNames[(unsigned)nameIndex], fix_values[i], 0.001, 0.0, 0.0, errorFlag);
 		minuit->FixParameter( nameIndex );
 	}
+}
+
+void MinuitWrapper::CallHesse()
+{
+	double arguments[2];
+	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
+        arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE
+        int errorFlag=0;
+	minuit->mnexcm("HESSE", arguments, 2, errorFlag);
 }
 
 //Use Migrad to minimise the given function
@@ -230,7 +246,7 @@ void MinuitWrapper::Minimise()
 	if( StringProcessing::VectorContains( &Options, &NoHesse ) == -1 )
 	{
 		//	Finally Now call HESSE to properly calculate the error matrix
-		minuit->mnexcm("HESSE", arguments, 2, errorFlag);
+		this->CallHesse();
 	}
 
 	string MinosOption("MinosErrors");
@@ -241,6 +257,7 @@ void MinuitWrapper::Minimise()
 		//	out of the minimum on either side up until the UP value.
 		minuit->mnexcm("MINOS", arguments, 2, errorFlag);
 	}
+
 
 	//Output time information
 	time_t timeNow;
@@ -256,38 +273,79 @@ void MinuitWrapper::Minimise()
 	int fitStatus = 0;
 	minuit->mnstat( minimumValue, fedm, errdef, variableParameters, parameterNumber, fitStatus );
 
-	//Get the fitted parameters
-	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
-	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
-	{
-		string parameterName = allNames[nameIndex];
-		double parameterValue = 0.0;
-		double parameterError = 0.0;
-		double xlolim = 0.0;
-		double xuplim = 0.0;
-		int iuint = 0;
-		TString temporaryString;
-		minuit->mnpout( nameIndex, temporaryString, parameterValue, parameterError, xlolim, xuplim, iuint );
+	ResultParameterSet * fittedParameters = this->GetResultParameters( allNames, newParameters );
 
-		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
-		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-				xlolim, xuplim, oldParameter->GetType(), oldParameter->GetUnit() );
+	TMatrixDSym* covarianceMatrix = this->GetCovarianceMatrix();
+
+	vector<FunctionContour*> allContours = this->ConstructContours( allNames, newParameters );
+
+	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, function->GetPhysicsBottle(), covarianceMatrix, allContours );
+
+	string TestNewErrors("TestNewErrors");
+	if( StringProcessing::VectorContains( &Options, &TestNewErrors ) != -1 )
+	{
+		//	This will also call ApplyCovarianceMatrix which will change the fitResult
+		TMatrixDSym* newMatrix = CorrectedCovariance::GetCorrectedCovarianceMatrix( this );
+		(void) newMatrix;
 	}
 
-	// Get the error matrix and construct a vector containing the correlation coefficients
-	int numParams = int(allNames.size());
+}
 
-	//	This Causes an outstanding compiler warning due to non standards compliance
-	//	I'm taking the approach once used by Pete to solve annoying problems:
-	//
-	//	A beer to whoever can fix this!		rob.currie@ed.ac.uk
-	
+ResultParameterSet* MinuitWrapper::GetResultParameters( vector<string> allNames, ParameterSet* newParameters )
+{
+	//Get the fitted parameters
+        ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
+        for( unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
+        {
+                string parameterName = allNames[nameIndex];
+                double parameterValue = 0.0;
+                double parameterError = 0.0;
+                double xlolim = 0.0;
+                double xuplim = 0.0;
+                int iuint = 0;
+                TString temporaryString;
+                minuit->mnpout( nameIndex, temporaryString, parameterValue, parameterError, xlolim, xuplim, iuint );
+         
+                PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
+                fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
+                                xlolim, xuplim, oldParameter->GetType(), oldParameter->GetUnit() );
+        }
+	return fittedParameters;
+}
+
+TMatrixDSym* MinuitWrapper::GetCovarianceMatrix()
+{
+	unsigned int numParams = (unsigned)function->GetParameterSet()->GetAllNames().size();
+	/*!
+	 * This section of code causes some minor warnings against old c++ standards, but the behaviour here, explicitly requires the matrix to be allocated this way
+	 *
+	 * It's probably possible to mimic the same behaviour with malloc and address allocation, but it's easier to let the compiler 'do it's thing'
+	 */
 	Double_t matrix[numParams][numParams];
+	minuit->mnemat(&matrix[0][0],numParams);
 
-	//	Double_t** matrix = new Double_t*[numParams];
-	//	for( short int i=0; i < numParams; ++i )
-	//		matrix[i] = new Double_t[numParams];
-	gMinuit->mnemat(&matrix[0][0],numParams);
+	TMatrixDSym* covMatrix = new TMatrixDSym( numParams );
+
+	for( unsigned int i=0; i< (unsigned)numParams; ++i )
+	{
+		for( unsigned int j=0; j< (unsigned)numParams; ++j )
+		{
+			(*covMatrix)(i,j)=matrix[i][j];
+		}
+	}
+
+	return covMatrix;
+}
+
+vector<double> MinuitWrapper::oldGetCovarianceMatrix( int numParams )
+{
+	/*!
+	 * This section of code causes some minor warnings against old c++ standards, but the behaviour here, explicitly requires the matrix to be allocated this way
+	 *
+	 * It's probably possible to mimic the same behaviour with malloc and address allocation, but it's easier to let the compiler 'do it's thing'
+	 */
+	Double_t matrix[numParams][numParams];
+	minuit->mnemat(&matrix[0][0],numParams);
 
 	vector<double> covarianceMatrix(unsigned(numParams*(numParams+1)/2));
 	for (int row = 0; row < numParams; ++row)
@@ -299,12 +357,14 @@ void MinuitWrapper::Minimise()
 		}
 	}
 
-	//	for( short int i=0; i< numParams; ++i )
-	//		delete[] matrix[i];
-	//	delete[] matrix;
+	return covarianceMatrix;
+}
 
+
+vector<FunctionContour*> MinuitWrapper::ConstructContours( vector<string> allNames, ParameterSet* newParameters )
+{
 	//Make the contour plots
-	vector< FunctionContour* > allContours;
+	vector<FunctionContour*> allContours;
 	for (unsigned int plotIndex = 0; plotIndex < contours.size(); ++plotIndex )
 	{
 		//Find the index (in Minuit) of the parameter names requested for the plot
@@ -366,8 +426,7 @@ void MinuitWrapper::Minimise()
 			allContours.push_back(newContour);
 		}
 	}
-
-	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, function->GetPhysicsBottle(), covarianceMatrix, allContours );
+	return allContours;
 }
 
 //The function to pass to Minuit
@@ -377,7 +436,7 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	(void) grad;		//	Gradient in each Parameter
 	(void) iflag;		//	flag for stuff... check this for using derivatives
 
-	
+
 	//	Very useful code for vry indepth debugging, I advise this be left in to help diagnose FitFunction behaviour!
 	//
 	//cout << npar << "\t" << iflag << endl;
@@ -416,5 +475,10 @@ FitResult * MinuitWrapper::GetFitResult()
 void MinuitWrapper::ContourPlots( vector< pair< string, string > > ContourParameters )
 {
 	contours = ContourParameters;
+}
+
+void MinuitWrapper::ApplyCovarianceMatrix( TMatrixDSym* Input )
+{
+	fitResult->ApplyCovarianceMatrix( Input );
 }
 

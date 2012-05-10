@@ -34,7 +34,6 @@ class ResultFormatter
 		static void ReviewOutput( FitResult * OutputData );
 		static void LatexOutputCovarianceMatrix( FitResult* );
 		static void PlotFitContours( FitResult*, string );
-		static double GetElementFromCovarianceMatrix( vector<double>, int, int);		
 		static bool IsParameterFree( FitResult*, string );
 
 		//MakePullPlots chooses the appropriate method based on the first string argument
@@ -42,10 +41,6 @@ class ResultFormatter
 		static void FlatNTuplePullPlots( string, FitResultVector* );
 		static void WriteFlatNtuple( string , FitResultVector* );
 		static void SeparateParameterPullPlots( string, FitResultVector* );
-//		static void MakeLLscanPlots( vector<LLscanResult*> scanResults, string filename ); 
-//		static void MakeLLcontourPlots( vector<LLscanResult2D*> scanResults, string filename );
-
-		static void CorrMatrixOutput( string FileName, FitResultVector* ToyResult );
 
 		static vector<TString> get_branch_names( TTree* );
 };

@@ -15,7 +15,10 @@
 //      Threading Struct which contains all of the objects required for running multiple concurrent fits to data subsets
 //	This object is useful as multiple bits of information need to be provided to the running thread
 struct Fitting_Thread{
-	explicit Fitting_Thread() : dataSubSet(), fittingPDF(NULL), useWeights(false), weightName(), dataPoint_Result(), FitBoundary(NULL), ResultIntegrator(NULL) {}
+	explicit Fitting_Thread() :
+		dataSubSet(), fittingPDF(NULL), useWeights(false), weightName(), dataPoint_Result(), FitBoundary(NULL), ResultIntegrator(NULL),
+		stored_integral(0.), weightsSquared(false)
+	{}
 	//~Fitting_Thread()
 	//{
 	//	if( FitBoundary != NULL ) delete FitBoundary;
@@ -30,6 +33,7 @@ struct Fitting_Thread{
 	PhaseSpaceBoundary* FitBoundary;
 	RapidFitIntegrator* ResultIntegrator;
 	double stored_integral;
+	bool weightsSquared;
 	private:
 		Fitting_Thread(const Fitting_Thread&);
 		Fitting_Thread& operator=(const Fitting_Thread&);

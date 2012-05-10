@@ -29,6 +29,7 @@ class ResultParameter
 		double GetValue() const;
 		double GetOriginalValue() const;
 		double GetError() const;
+		void SetError( double );
 		double GetPull() const;
 		double GetMinimum() const;
 		double GetMaximum() const;

@@ -11,6 +11,8 @@
 #ifndef RESULT_PARAMETER_SET_H
 #define RESULT_PARAMETER_SET_H
 
+///	ROOT Headers
+#include "TMatrixDSym.h"
 //	RapidFit Headers
 #include "ResultParameter.h"
 #include "ParameterSet.h"
@@ -52,6 +54,7 @@ class ResultParameterSet
 		string FitXML() const;
 		string ToyXML() const;
 
+		void ApplyCovarianceMatrix( TMatrixDSym* Input );
 	private:
 		ResultParameterSet operator=( const ResultParameterSet& input );
 

@@ -8,25 +8,22 @@
   @date 2009-10-02
  */
 
-//	ROOT Headers
+///	ROOT Headers
 #include "TFile.h"
 #include "TNtuple.h"
 #include "Rtypes.h"
-#include "TH1F.h"
-#include "TH2D.h"
+#include "TMatrixDSym.h"
+//	Used for Minimiser Contours
 #include "TMultiGraph.h"
-#include "TGraphErrors.h"
-#include "TGraph.h"
 #include "TCanvas.h"
-#include "TFrame.h"
-#include "TLegend.h"
-#include "TAxis.h"
-//	RapidFit Headers
+#include "TH1F.h"
+#include "TGraphErrors.h"
+///	RapidFit Headers
 #include "ResultFormatter.h"
 #include "StatisticsFunctions.h"
 #include "EdStyle.h"
 #include "StringProcessing.h"
-//	System Headers
+///	System Headers
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -202,7 +199,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 //Display the covariance matrix of a fit in a LaTeX table using cout
 void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 {
-	vector<double> covarianceMatrix = OutputData->GetCovarianceMatrix();
+	TMatrixDSym* covarianceMatrix = OutputData->GetCovarianceMatrix();
 	vector<string> allNames = OutputData->GetResultParameterSet()->GetAllNames();
 	vector<string>::iterator nameIterator;
 	int numberOfFreeParameters = 0;
@@ -242,19 +239,23 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 		//string name = StringProcessing::ReplaceString( *nameIterator, "_", "\\_" );
 		string name = *nameIterator;
 		cout << setw(20) << EdStyle::GetParamLatexName( name );
-		if ( covarianceMatrix.size() == 0 )
+		if( covarianceMatrix == NULL )
 		{
 			cerr << "No correlation matrix returned from fit!" << endl;
 			break;
 		}
 
-		double drow = GetElementFromCovarianceMatrix( covarianceMatrix, row, row );
+		double drow = (*covarianceMatrix)( row, row );
 
 		for ( int col = 0; col < numberOfFreeParameters; ++col)
 		{
-			double dcol = GetElementFromCovarianceMatrix( covarianceMatrix, col, col );
-			double covariance = GetElementFromCovarianceMatrix( covarianceMatrix, row, col );
-			double correlation = covariance/sqrt(fabs(drow * dcol));
+			double dcol = (*covarianceMatrix)( col, col );
+			double covariance = (*covarianceMatrix)( row, col );
+			double correlation=0;
+			if( isFree )
+			{
+				correlation = covariance/sqrt(fabs(drow * dcol));
+			}
 			if (col >= row)
 			{
 				if ( fabs(correlation) > 0.5 && ( col != row ) )
@@ -289,16 +290,9 @@ bool ResultFormatter::IsParameterFree( FitResult * OutputData, string ParameterN
 {
 	bool decision = true;
 	string type = OutputData->GetResultParameterSet()->GetResultParameter( ParameterName )->GetType();
-	if ( type == "Fixed") decision = false;
+	if( type == "Fixed") decision = false;
 	return decision;
 }
-
-double ResultFormatter::GetElementFromCovarianceMatrix( vector<double> matrix, int row, int col)
-{
-	if(row > col) return matrix[unsigned(col+row*(row+1)/2)];
-	else return matrix[unsigned(row+col*(col+1)/2)];
-}
-
 
 //Display the results of a fit in a LaTeX table using cout
 void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
@@ -448,25 +442,6 @@ void ResultFormatter::ReviewOutput( FitResult * OutputData )
 	cout << endl <<endl;
 }
 
-/*string ResultFormatter::FindAndReplaceString( string name )
-{
-	// This isn't very general, and probably won't work for names
-	// containing lots of "_".
-	int pos = 0;
-	int newPos = 0;
-	int size = name.size();
-	while ( pos < size )
-	{
-		newPos = name.find("_", pos);
-		if( newPos != string::npos ) {
-			name.replace(newPos, 1, "\\_");
-		}
-		else break;
-		pos = newPos + 2;
-	}
-	return name;
-}*/
-
 //Chose which pull plot method to use
 void ResultFormatter::MakePullPlots( string Type, string FileName, FitResultVector* ToyResult )
 {
@@ -512,70 +487,6 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 	//	THIS SHOULD BE SAFE... BUT THIS IS ROOT so 'of course' it isn't...
 	//delete parameterNTuple;
 	delete rootFile;
-}
-
-//	HEAVILY WIP!!! I INTEND THIS TO BE ABLE TO COPE WITH VARIOUS 2D MATRIX SIZES DUE TO THE NATURE OF MOST OF THE SCANS
-//
-//	The whole matrix has been compressed down to a single vector, we will write it out as n columns where n is the number of stored correlations
-//	
-//	1 row = 1 fit
-//	1 column = 1 correlation
-//	
-//	number of columns = max number of columns in all ToyResult FitResults
-//	if a particular fit column num < max column number trailing elements filled with -9999.
-//
-void ResultFormatter::CorrMatrixOutput( string FileName, FitResultVector* ToyResult )
-{
-	TFile* output_File = new TFile( FileName.c_str(), "RECREATE" );
-	//	Because TNtuples are the devils work on top of the pile of crap that is ROOT!
-	TTree* matrix_tree = new TTree( "matrix", "matrix" );
-
-	int numresults = ToyResult->NumberResults();
-
-	int max_elements=0;
-
-	//	Loop over all fits to find the one with the biggest correlation matrix and save knowledge of this
-	int temp_elements=0;
-	for( int i=0; i< numresults; ++i )
-	{
-		temp_elements = int(ToyResult->GetFitResult( i )->GetCovarianceMatrix().size());
-		if( temp_elements > max_elements )	max_elements = temp_elements;
-	}
-
-	Double_t* matrix_contents = new Double_t[(unsigned)max_elements];
-
-	//	Create the required number of columns within the TTree
-	for( int i=0; i< max_elements; ++i )
-	{
-		TString name="cell_";
-		name+=i;
-		matrix_tree->Branch( name, &matrix_contents[i] );
-	}
-
-	//	loop over all fits
-	for( int i=0; i< numresults; ++i )
-	{
-		int j=0;
-		//	Fill columns with data from matrix
-		//	loop over all defiend columns
-		for( j=0; j< int(ToyResult->GetFitResult( i )->GetCovarianceMatrix().size()); ++j )
-		{
-			matrix_contents[j]  = ToyResult->GetFitResult( i )->GetCovarianceMatrix()[(unsigned)j];
-		}
-		//	Fill any trailing columns with -9999. (typical number for undefined)
-		for( ; j< max_elements; ++j )
-		{
-			matrix_contents[j] = -9999.;
-		}
-		//	Store the data in the TTree
-		matrix_tree->Fill();
-	}
-
-	//	Write out the file and exit
-	output_File->Write();
-	output_File->Close();
-	delete matrix_tree;
-	delete output_File;
 }
 
 //Make pull plots from the output of a toy study

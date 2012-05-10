@@ -83,6 +83,7 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 		fit_thread_data[threadnum].FitBoundary = StoredBoundary[(unsigned)Threads*((unsigned)number)+threadnum];
 		fit_thread_data[threadnum].ResultIntegrator = StoredIntegrals[(unsigned)Threads*((unsigned)number)+threadnum];
 		fit_thread_data[threadnum].dataPoint_Result = vector<double>();
+		fit_thread_data[threadnum].weightsSquared = weightsSquared;
 	}
 
 	//cout << "Create Threads" << endl;
@@ -212,6 +213,7 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 			weight = (*data_i)->GetObservable( thread_input->weightName )->GetValue();
 			pthread_mutex_lock( &eval_lock );
 			result *= weight;
+			if( thread_input->weightsSquared ) result *= weight;
 			pthread_mutex_unlock( &eval_lock );
 		}
 

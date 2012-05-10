@@ -1,17 +1,18 @@
 // $Id: FumiliWrapper.cpp,v 1.2 2009/11/13 09:57:06 gcowan Exp $
 /**
-        @class FumiliWrapper
+  @class FumiliWrapper
 
-        A wrapper for Minuit2, implementing IMinimiser
+  A wrapper for Minuit2, implementing IMinimiser
 
-        @author Greig A Cowan greig.cowan@cern.ch
-	@date 2009-10-09
-*/
+  @author Greig A Cowan greig.cowan@cern.ch
+  @date 2009-10-09
+  */
 
 //	ROOT Headers
 #include "Minuit2/FunctionMinimum.h"
 #include "Minuit2/MnFumiliMinimize.h"
 #include "Minuit2/FumiliStandardMaximumLikelihoodFCN.h"
+#include "TMatrixDSym.h"
 //	RapidFit Headers
 #include "FumiliWrapper.h"
 #include "ResultParameterSet.h"
@@ -39,29 +40,29 @@ FumiliWrapper::~FumiliWrapper()
 
 void FumiliWrapper::SetSteps( int newSteps )
 {
-        maxSteps = newSteps;
+	maxSteps = newSteps;
 }
 
 void FumiliWrapper::SetTolerance( double newTolerance )
 {
-        bestTolerance = newTolerance;
+	bestTolerance = newTolerance;
 }
 
 void FumiliWrapper::SetOptions( vector<string> newOptions )
 {
-        Options = newOptions;
+	Options = newOptions;
 }
 
 void FumiliWrapper::SetQuality( int newQuality )
 {
-        Quality = newQuality;
+	Quality = newQuality;
 }
 
 void FumiliWrapper::SetupFit( FitFunction* NewFunction )
 {
 	// Instantiate the FumiliFunction (which is just a parametric function)
-        // There is another constructor that takes a vector of parameters
-        function = new FumiliFunction( NewFunction );
+	// There is another constructor that takes a vector of parameters
+	function = new FumiliFunction( NewFunction );
 	RapidFunction = NewFunction;
 }
 
@@ -80,58 +81,58 @@ void FumiliWrapper::FixParameters( vector<double> fix_values, vector<string> Par
 void FumiliWrapper::Minimise()
 {
 	ParameterSet * newParameters = RapidFunction->GetParameterSet();
-        vector<string> allNames = newParameters->GetAllNames();
-//	int numParams = allNames.size();
+	vector<string> allNames = newParameters->GetAllNames();
+	//	int numParams = allNames.size();
 
 	/*
 	// Fill a vector of doubles for each set of physics parameters that you
-	// want to sample. What about case where Apara_sq + Aperp_sq > 1? 
+	// want to sample. What about case where Apara_sq + Aperp_sq > 1?
 	vector< vector<double> > positions;
 	PhysicsBottle* bottle = NewFunction->GetPhysicsBottle();
-	ParameterSet* parameters = bottle->GetParameterSet();	
+	ParameterSet* parameters = bottle->GetParameterSet();
 	vector<string> names = parameters->GetAllNames();
 	double nsteps = 1;
 	for( int k = 0; k < names.size(); ++k)
 	{
-		for( int j = 0; j < nsteps; ++j)
-		{
-			vector<double> tempPos;
-			for( int i = 0; i < names.size(); ++i )
-			{
-				double value;
-				if ( i != k )
-				{
-	                                value = parameters->GetPhysicsParameter(names[i])->GetValue();
-				}
-				else
-				{
-					double min = parameters->GetPhysicsParameter(names[i])->GetMinimum();
-					double max = parameters->GetPhysicsParameter(names[i])->GetMaximum();
-					double step = (max - min)/nsteps;
-					value = min + j * step;
-				}	
-				tempPos.push_back(value);
-			}
-			positions.push_back(tempPos);
-		}
+	for( int j = 0; j < nsteps; ++j)
+	{
+	vector<double> tempPos;
+	for( int i = 0; i < names.size(); ++i )
+	{
+	double value;
+	if ( i != k )
+	{
+	value = parameters->GetPhysicsParameter(names[i])->GetValue();
+	}
+	else
+	{
+	double min = parameters->GetPhysicsParameter(names[i])->GetMinimum();
+	double max = parameters->GetPhysicsParameter(names[i])->GetMaximum();
+	double step = (max - min)/nsteps;
+	value = min + j * step;
+	}
+	tempPos.push_back(value);
+	}
+	positions.push_back(tempPos);
+	}
 	}
 	*/
 
 	// Fill a vector of doubles for each set of observables
-        vector< vector<double> > positions;
+	vector< vector<double> > positions;
 	PhysicsBottle* bottle = RapidFunction->GetPhysicsBottle();
 	PhaseSpaceBoundary* boundary = bottle->GetResultDataSet(0)->GetBoundary();
-        vector<string> names = boundary->GetAllNames();   
+	vector<string> names = boundary->GetAllNames();
 
 	vector<double> observableSteps;
 	int nsteps = 10;
-	
+
 	// Could make this faster...
 	for ( int step = 0; step < nsteps; ++step)
 	{
 		vector<double> tempPos;
 		for( unsigned int observable = 0; observable < names.size(); ++observable )
-       		{
+		{
 			if ( !boundary->GetConstraint(names[observable])->IsDiscrete() )
 			{
 				double min = boundary->GetConstraint(names[observable])->GetMinimum();
@@ -145,13 +146,13 @@ void FumiliWrapper::Minimise()
 				double value = boundary->GetConstraint(names[observable])->CreateObservable()->GetValue();
 				tempPos.push_back( value );
 			}
-		}	
+		}
 		positions.push_back(tempPos);
-	}	
+	}
 
 	// Now, get the FumiliFCNBase function which will be passed to the Fumili minimiser
 	FumiliStandardMaximumLikelihoodFCN fumFCN( *function, positions );
-	
+
 	// Setup the minimiser
 	MnFumiliMinimize fumili( fumFCN, *( function->GetMnUserParameters() ), (unsigned)Quality);//MINUIT_QUALITY);
 
@@ -170,8 +171,8 @@ void FumiliWrapper::Minimise()
 		double parameterError = minimisedParameters->Error( parameterName.c_str() );
 
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-			       -oldParameter->GetMinimum(), oldParameter->GetMaximum(),
-			       oldParameter->GetType(), oldParameter->GetUnit() );
+				-oldParameter->GetMinimum(), oldParameter->GetMaximum(),
+				oldParameter->GetType(), oldParameter->GetUnit() );
 	}
 
 	int fitStatus;
@@ -206,4 +207,21 @@ FitResult * FumiliWrapper::GetFitResult()
 void FumiliWrapper::ContourPlots( vector< pair< string, string > > ContourParameters )
 {
 	contours = ContourParameters;
+}
+
+//      The following 3 functions are simply coded up to still have the class compile correctly, but these should be implemented in the future
+void FumiliWrapper::CallHesse()
+{
+	return;
+}
+
+TMatrixDSym* FumiliWrapper::GetCovarianceMatrix()
+{
+	return NULL;
+}
+
+void FumiliWrapper::ApplyCovarianceMatrix( TMatrixDSym* Input )
+{
+	(void)Input;
+	return;
 }

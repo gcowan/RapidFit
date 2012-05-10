@@ -11,12 +11,20 @@
 #ifndef MINUIT_WRAPPER_H
 #define MINUIT_WRAPPER_H
 
-//	ROOT Headers
+///	ROOT Headers
 #include "TMinuit.h"
-//	RapidFit Headers
+#include "TMatrixDSym.h"
+///	RapidFit Headers
 #include "IMinimiser.h"
 #include "FitFunction.h"
 #include "FitResult.h"
+#include "FunctionContour.h"
+#include "ParameterSet.h"
+///	System Headers
+#include <vector>
+#include <string>
+
+using namespace::std;
 
 void Function( Int_t&, Double_t*, Double_t&, Double_t*, Int_t);
 
@@ -40,6 +48,15 @@ class MinuitWrapper : public IMinimiser
 		virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
 		virtual FitFunction* GetFitFunction();
+
+		ResultParameterSet* GetResultParameters( vector<string> allNames, ParameterSet* );
+		TMatrixDSym* GetCovarianceMatrix();
+		vector<double> oldGetCovarianceMatrix( int numParams );
+		virtual vector<FunctionContour*> ConstructContours( vector<string>, ParameterSet* );
+
+		void CallHesse();
+
+		void ApplyCovarianceMatrix( TMatrixDSym* Input );
 
 	private:
 		//	Uncopyable!

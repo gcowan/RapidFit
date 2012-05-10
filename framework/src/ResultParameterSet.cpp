@@ -7,12 +7,16 @@
 	@date 2009-10-02
 */
 
+///	ROOT Headers
+#include "TMatrixDSym.h"
 //	RapidFit Headers
 #include "ResultParameterSet.h"
 #include "ParameterSet.h"
 //	System Headers
 #include <iostream>
 #include <sstream>
+#include <cmath>
+
 using namespace::std;
 
 //Constructor with correct arguments
@@ -169,4 +173,15 @@ string ResultParameterSet::ToyXML() const
 {
 	return this->XML( false );
 }
+
+void ResultParameterSet::ApplyCovarianceMatrix( TMatrixDSym* Input )
+{
+	//	This corrects the error on each parameter
+	for( unsigned int i=0; i< allNames.size(); ++i )
+	{
+		if( allParameters[i]->GetType() == "Fixed" ) continue;
+		else allParameters[i]->SetError( sqrt( (*Input)(i,i) ) );
+	}
+}
+
 

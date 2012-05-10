@@ -28,6 +28,7 @@
 
 //	ROOT Headers
 #include "Minuit2/MnMigrad.h"
+#include "TMatrixDSym.h"
 //	RapidFit Headers
 #include "IMinimiser.h"
 #include "FumiliFunction.h"
@@ -57,6 +58,10 @@ class FumiliWrapper : public IMinimiser
 		virtual void SetQuality( int );
 		virtual FitFunction* GetFitFunction();
 
+		void CallHesse();
+		TMatrixDSym* GetCovarianceMatrix();
+		void ApplyCovarianceMatrix( TMatrixDSym* Input );
+
 	private:
 		//	Uncopyable!
 		FumiliWrapper ( const FumiliWrapper& );
@@ -74,3 +79,4 @@ class FumiliWrapper : public IMinimiser
 };
 
 #endif
+

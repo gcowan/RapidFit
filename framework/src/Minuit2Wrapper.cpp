@@ -11,6 +11,7 @@
 #include "Minuit2/FunctionMinimum.h"
 #include "Minuit2/MnContours.h"
 #include "Minuit2/MnHesse.h"
+#include "TMatrixDSym.h"
 //	RapidFit Headers
 #include "Minuit2Wrapper.h"
 #include "ResultParameterSet.h"
@@ -187,7 +188,7 @@ void Minuit2Wrapper::Minimise()
 	}
 
 	PhysicsBottle* newBottle = RapidFunction->GetPhysicsBottle();
-	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, newBottle, covData, allContours );
+	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, newBottle, NULL, allContours );
 }
 
 //Return the result of minimisation
@@ -201,3 +202,22 @@ void Minuit2Wrapper::ContourPlots( vector< pair< string, string > > ContourParam
 {
 	contours = ContourParameters;
 }
+
+
+//	The following 3 functions are simply coded up to still have the class compile correctly, but these should be implemented in the future
+void Minuit2Wrapper::CallHesse()
+{
+	return;
+}
+
+TMatrixDSym* Minuit2Wrapper::GetCovarianceMatrix()
+{
+	return NULL;
+}
+
+void Minuit2Wrapper::ApplyCovarianceMatrix( TMatrixDSym* Input )
+{
+	(void)Input;
+	return;
+}
+

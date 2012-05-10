@@ -104,7 +104,6 @@ void* ClassLookUp::getObject( string Name )
 	if( returnable_object == NULL )
 	{
 		cerr << "Error:\t\tCan't find symbol List or Object:\t" << Name << endl << endl;
-		exit(-45);
 	}
 
 	return returnable_object;
@@ -116,6 +115,12 @@ IPDF* ClassLookUp::LookUpPDFName( string Name, PDFConfigurator* configurator )
 	string pdf_creator_Name = "CreatePDF_"+Name;
 
 	CreatePDF_t* pdf_creator = (CreatePDF_t*) ClassLookUp::getObject( pdf_creator_Name );
+
+	if( pdf_creator == NULL )
+	{
+		cerr << "Cannot Find PDF Named: " << Name << " You probably provided the wrong name in your XML." << endl << endl;
+		exit(-15513);
+	}
 
 	IPDF* returnable_PDF = (IPDF*) pdf_creator( configurator );
 
@@ -160,6 +165,13 @@ IPDF* ClassLookUp::CopyPDF( IPDF* inputPDF )
 			//	Find this object in the object which has been loaded as a library
 			CopyPDF_t* pdf_copy = (CopyPDF_t*) ClassLookUp::getObject( pdf_copy_Name );
 
+			if( pdf_copy == NULL )
+			{
+				cerr << "Cannot Find Copy Constructor for: " << Name << " This is highly unsual and was thought to be impossible... I cannot continue" << endl;
+				cerr << "You may have used SetName and incorrectly named the PDF, Use SetLabel if this is the case." << endl << endl;
+				exit(21841);
+			}
+
 			//	Give the PDF object explicit knowledge of the path of it's constructor template
 			returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
 			inputPDF->SetCopyConstructor( pdf_copy );
@@ -195,8 +207,8 @@ FitFunction * ClassLookUp::LookUpFitFunctionName( string Name )
 	}
 	else
 	{
-		cerr << "Unrecognised function to minimise: " << Name << endl;
-		exit(1);
+		cerr << "Unrecognised function to minimise: " << Name << endl << endl;
+		exit(-2355);
 	}
 }
 
@@ -217,8 +229,8 @@ IMinimiser * ClassLookUp::LookUpMinimiserName( string Name, int NumberParameters
 	}
 	else
 	{
-		cerr << "Unrecognised minimiser name: " << Name << endl;
-		exit(1);
+		cerr << "Unrecognised minimiser name: " << Name << endl << endl;
+		exit(23478);
 	}
 }
 
@@ -239,8 +251,8 @@ IDataGenerator * ClassLookUp::LookUpDataGenerator( string Name, PhaseSpaceBounda
 	}
 	else
 	{
-		cerr << "Unrecognised data generator name: " << Name << endl;
-		exit(1);
+		cerr << "Unrecognised data generator name: " << Name << endl << endl;
+		exit(366);
 	}
 }
 
@@ -253,8 +265,8 @@ IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, string WeightNam
 	}
 	else
 	{
-		cerr << "Unrecognised precalculator name: " << Name << endl;
-		exit(1);
+		cerr << "Unrecognised precalculator name: " << Name << endl << endl;
+		exit(-2138);
 	}
 }
 

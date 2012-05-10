@@ -91,6 +91,22 @@ class FitFunction
 		void UseEventWeights( string Name );
 
 		/*!
+		 * @brief Return if Weights were used as part of the analysis
+		 *
+		 * @return bool  true = Weights were used, false = Weights were NOT used
+		 */
+		bool GetWeightsWereUsed() const;
+
+		/*!
+		 * @brief Set the FitFunction to use Weights squared
+		 *
+		 * @param Input   true this causes Weights squared to be used in the fit, false don't use Weights squared
+		 *
+		 * @return Void
+		 */
+		void SetUseWeightsSquared( bool Input );
+
+		/*!
 		 * @brief Set the Number of threads to be used by the FitFunction
 		 *
 		 * @param Input   This sets the number of threads that should be used by this FitFunction during Evaluate
@@ -104,7 +120,7 @@ class FitFunction
 		 *
 		 * @return Returns the number of Threads this FitFunction is attempting to use
 		 */
-		int GetThreads();
+		int GetThreads() const;
 
 		/*!
 		 * @brief Set whether any RapidFitIntegrator Objects created internally should check the PDF/Numerical Integral
@@ -144,10 +160,10 @@ class FitFunction
 		PhysicsBottle * allData;			/*!	Undocumented	*/
 		vector< RapidFitIntegrator* > allIntegrators;	/*!	Undocumented	*/
 		double testDouble;			/*!	Undocumented	*/
-		bool useWeights;			/*!	Undocmuented	*/
+		bool useWeights;			/*!	Undocumented	*/
 		string weightObservableName;		/*!	Undocumented	*/
 
-		//	This is for traing Minuit
+		//	This is for training Minuit
 		//	(this could give some VERY cool graphs in ResultSpace :D )
 
 		TFile* Fit_File;			/*!	Undocumented	*/
@@ -166,6 +182,8 @@ class FitFunction
 		struct Fitting_Thread* fit_thread_data;	/*!	Undocumented	*/
 
 		bool testIntegrator;			/*!	Undocumented	*/
+
+		bool weightsSquared;			/*!	Should Weights squared be used in evaluating the function	*/
 };
 
 #endif

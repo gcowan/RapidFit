@@ -10,11 +10,13 @@
 #ifndef FIT_RESULT_H
 #define FIT_RESULT_H
 
-//	RapidFit Headers
+///	ROOT Headers
+#include "TMatrixDSym.h"
+///	RapidFit Headers
 #include "ResultParameterSet.h"
 #include "PhysicsBottle.h"
 #include "FunctionContour.h"
-//	System Headers
+///	System Headers
 #include <vector>
 
 using namespace::std;
@@ -23,19 +25,9 @@ class FitResult
 {
 	public:
 		/*!
-		 * Constructor containing the ResultParameterSet and the PhysicsBottle after Convergence
-		 */
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle*);
-
-		/*!
-		 * Constructor containing the ResultParameterSet and the PhysicsBottle as well as the Covarience Matrix
-		 */
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, vector<double> );
-
-		/*!
 		 * Constructor containing the ResultParameterSet and the PhysicsBottle as well as the Covarience Matrix and Contours
 		 */
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, vector<double>, vector< FunctionContour* >);
+		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, TMatrixDSym* =NULL, vector<FunctionContour*> =vector<FunctionContour*>());
 
 		/*!
 		 * Correct Copy Constructor
@@ -55,12 +47,14 @@ class FitResult
 		/*!
 		 * Return a copy of the Covarience Matrix as provided by the Minimiser
 		 */
-		vector<double> GetCovarianceMatrix();
+		TMatrixDSym* GetCovarianceMatrix();
+
+		void ApplyCovarianceMatrix( TMatrixDSym* Input );
 
 		/*!
 		 * Get the Contours extracted using Minuit's internal Functions
 		 */
-		vector< FunctionContour* > GetContours();
+		vector<FunctionContour*> GetContours();
 
 		/*!
 		 * Get the Result Parameter Set from this FitReult
@@ -95,7 +89,7 @@ class FitResult
 
 		double minimumValue;			/*!	The Final value from the Function After Minimisation		*/
 		ResultParameterSet * fittedParameters;	/*!	Pointer to the Result ParameterSet provided at Construction	*/
-		vector<double> covarianceMatrix;	/*!	The Covariance Matrix as constructed from the Minimiser		*/
+		TMatrixDSym* covarianceMatrix;		/*!	The Covariance Matrix as constructed from the Minimiser		*/
 		vector< FunctionContour* > contours;	/*!	Contours Provided directly from the Minimiser			*/
 		int fitStatus;				/*!	Final Minimiser Status value					*/
 		PhysicsBottle* fittedBottle;		/*!	Pointer to the Physics Bottle defined at Construction		*/

@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/05/10 Rob Currie
+   - Added initial changes required to correctly handle covariance Matrix in weighted fits
+   - Handling of covariant Matrix is now done using TMatrixDSym pointers which an object which can be written to a ROOT file
+   - New error changing code only working for Minuit with Minuit2 and Fumili implementations available on request only!
+   - New error code activated by using the XML tag: <ConfigureMinimiser>TestNewErrors</ConfigureMinimiser> within the Minimiser tags
+
 2012/05/08 Rob Currie
    - Added work around to badly constructed PhysicsParameters in ParameterSet which should protect code higher up from badly constructed objects.
    - Modified the FitAssembler to include a new method for constructing a ParameterSet which contains all of the PhysicsBottle Parameters

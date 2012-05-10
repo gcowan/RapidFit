@@ -100,6 +100,11 @@ double ResultParameter::GetError() const
 	return error;
 }
 
+void ResultParameter::SetError( double input )
+{
+	error = input;
+}
+
 //Get the pull
 double ResultParameter::GetPull() const
 {
