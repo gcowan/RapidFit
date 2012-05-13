@@ -55,6 +55,8 @@ class ConstraintFunction
 		 * @return Return the XML for this in string Format
 		 */
 		string XML() const;
+
+		vector<string> ConstrainedParameter() const;
 	private:
 		/*!
 		 * Don't Copy the class this way!

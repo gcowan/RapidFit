@@ -1,11 +1,11 @@
 /**
-        @class PhysicsBottle
+  @class PhysicsBottle
 
-        A collection of PDF-DataSet pairs to be fitted simultaneously with a given parameter set.
+  A collection of PDF-DataSet pairs to be fitted simultaneously with a given parameter set.
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+  */
 
 //	RapidFit Headers
 #include "ClassLookUp.h"
@@ -16,19 +16,19 @@
 #include <stdlib.h>
 
 //Constructor with correct argument
-PhysicsBottle::PhysicsBottle( ParameterSet * NewParameters ) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(new ParameterSet( *NewParameters) ), finalised(false)
+PhysicsBottle::PhysicsBottle( ParameterSet * NewParameters ) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(new ParameterSet( *NewParameters) )
 {
 }
 
 PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) :
-	allPDFs(), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters(), finalised(newParameters.finalised)
+	allPDFs(), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters()
 {
 	for( unsigned int i=0; i< newParameters.allPDFs.size(); ++i )
 	{
 		allPDFs.push_back( ClassLookUp::CopyPDF( newParameters.allPDFs[i] ) );
 	}
 	if( newParameters.bottleParameters == NULL ) bottleParameters = NULL;
-	else bottleParameters = new ParameterSet( *newParameters.bottleParameters );
+	else bottleParameters = new ParameterSet( *(newParameters.bottleParameters) );
 }
 
 //Destructor
@@ -45,16 +45,8 @@ PhysicsBottle::~PhysicsBottle()
 //Store a PDF/dataset pair
 void PhysicsBottle::AddResult( IPDF * NewPDF, IDataSet * NewDataSet )
 {
-	if ( finalised )
-	{
-		cerr << "Bottle finalised - cannot add result" << endl;
-		exit(1);
-	}
-	else
-	{
-		allPDFs.push_back( ClassLookUp::CopyPDF(NewPDF) );
-		allDataSets.push_back( NewDataSet );
-	}
+	allPDFs.push_back( ClassLookUp::CopyPDF(NewPDF) );
+	allDataSets.push_back( NewDataSet );
 }
 
 //Store a ConstraintFunction
@@ -111,22 +103,16 @@ ParameterSet * PhysicsBottle::GetParameterSet()
 //Change the parameter values
 bool PhysicsBottle::SetParameterSet(ParameterSet * NewParameters)
 {
-	if( bottleParameters->SetPhysicsParameters( NewParameters ) )
-	{
-		//Propagate the change to all stored PDFs
-		for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); ++pdfIndex)
-		{
-			allPDFs[pdfIndex]->UpdatePhysicsParameters( bottleParameters );
-			allPDFs[pdfIndex]->UnsetCache();
-		}
+	bottleParameters->SetPhysicsParameters( NewParameters );
 
-		return true;
-	}
-	else
+	//Propagate the change to all stored PDFs
+	for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); ++pdfIndex)
 	{
-		cerr << "Bottle parameters not successfully updated" << endl;
-		exit(1);
+		allPDFs[pdfIndex]->UpdatePhysicsParameters( bottleParameters );
+		allPDFs[pdfIndex]->UnsetCache();
 	}
+
+	return true;
 }
 
 

@@ -24,7 +24,7 @@ Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg(PDFConfigurator* configurator) :
 	  alphaM_prName	( configurator->getName("alphaM_pr" ))
         // Observables
         , recoMassName  (configurator->getName( "mass" ))
-	, constraint_recoMassName()
+	, constraint_recoMassName( "mass" )
 {
 	MakePrototypes();
 }

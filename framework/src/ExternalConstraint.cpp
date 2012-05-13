@@ -32,16 +32,16 @@ ExternalConstraint::~ExternalConstraint()
 }
 
 //Return the information held
-string ExternalConstraint::GetName()
+string ExternalConstraint::GetName() const
 {
 	return name;
 }
-double ExternalConstraint::GetValue()
+double ExternalConstraint::GetValue() const
 {
 	return value;
 }
 
-double ExternalConstraint::GetError()
+double ExternalConstraint::GetError() const
 {
 	return error;
 }

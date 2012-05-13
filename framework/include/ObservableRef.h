@@ -11,9 +11,10 @@ using namespace::std;
 class ObservableRef
 {
 	public:
-		ObservableRef();
-		ObservableRef( string );
+		ObservableRef( string="UnNamed" );
 		ObservableRef( vector<string> );
+		ObservableRef( const ObservableRef& );
+		ObservableRef& operator = ( const ObservableRef& );
 		~ObservableRef();
 
 		operator string() const
@@ -40,12 +41,12 @@ class ObservableRef
 		void SetIndex( const int ) const;
 		int GetIndex() const;
 		string Name() const;
-		string* NameRef() const;
+		const string* NameRef() const;
 		size_t size() const;
 		void push_back( string );
 
 	private:
-		mutable string Observable_Name;
+		string Observable_Name;
 		mutable int Observable_Index;
 		vector<string> Observable_Names;
 		vector<ObservableRef> Observable_Refs;

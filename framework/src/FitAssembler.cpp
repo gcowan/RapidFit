@@ -39,7 +39,7 @@ void FitAssembler::SafeMinimise( IMinimiser* Minimiser )
 	{
 		if ( e == 10 )
 		{
-			cerr << "\nCaught exception : fit failed for these parameters..." << endl; 
+			cerr << "\nCaught exception : fit failed for these parameters..." << endl;
 		}
 		else if ( e == 13 )
 		{
@@ -79,6 +79,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	FitResult* result = DoFit( minimiser, theFunction );
 
+	delete theFunction;
+
 	return result;
 }
 
@@ -101,7 +103,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	//Fill the bottle - data generation occurs in this step
 	for ( unsigned int resultIndex = 0; resultIndex < BottleData.size(); ++resultIndex )
 	{
-		//	Use the Raw input as the Gemeration PDF may require Parameters not involved in the main fit
+		//	Use the Raw input as the Generation PDF may require Parameters not involved in the main fit
 		BottleData[resultIndex]->SetPhysicsParameters( checkedGenerationParameters );
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
@@ -289,7 +291,7 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	ParameterSet* set2 = new ParameterSet( *BottleParameters );
 
 	// Conjugate fit
-	//double deltaS = BottleParameters->GetPhysicsParameter( string("delta_s") )->GetBlindedValue() ;   
+	//double deltaS = BottleParameters->GetPhysicsParameter( string("delta_s") )->GetBlindedValue() ;
 	if( set2->GetPhysicsParameter( string("delta_para") )->GetType() != "Fixed" ) set2->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
 	if( set2->GetPhysicsParameter( string("delta_perp") )->GetType() != "Fixed" ) set2->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ) ;
 	//BottleParameters->GetPhysicsParameter( string("delta_s") )->SetBlindedValue( -deltaS );
@@ -312,7 +314,7 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	ParameterSet* set4 = new ParameterSet( *BottleParameters );
 
 	if( set4->GetPhysicsParameter( string("delta_para") )->GetType() != "Fixed" ) set4->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( -deltaPara ) ;
-	if( set4->GetPhysicsParameter( string("delta_perp") )->GetType() != "Fixed" ) set4->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp ); 
+	if( set4->GetPhysicsParameter( string("delta_perp") )->GetType() != "Fixed" ) set4->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp );
 	if( set4->GetPhysicsParameter( string("deltaGamma") )->GetType() != "Fixed" ) set4->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
 	if( set4->GetPhysicsParameter( string("Phi_s") )->GetType() != "Fixed" ) set4->GetPhysicsParameter( string("Phi_s") )->SetBlindedValue( 3.14159-phi_s ) ;
 	cout << endl << "Starting Fit4:" << endl;
@@ -321,7 +323,7 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	bool good_result_3 = res3->GetFitStatus() == 3;
 
 
-	// Apply strategy 
+	// Apply strategy
 	FitResult * res = res0;
 	bool swapped = false ;
 
@@ -459,15 +461,15 @@ FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserCon
 	double LLmin1 = res1->GetMinimumValue();
 	bool good_result_1 = res1->GetFitStatus() == 3;
 
-	// Apply strategy 
+	// Apply strategy
 	FitResult * res=NULL;
 	bool swapped = false;
 	if( !good_result_0 && !good_result_1 )
 	{
-		res = res0;     //both fail so it doesnt matter 
+		res = res0;     //both fail so it doesnt matter
 	}
 	else if( good_result_0 && !good_result_1 )
-	{  
+	{
 		res = res0;
 	}
 	else if( !good_result_0 && good_result_1 )
@@ -494,7 +496,7 @@ FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserCon
 	cout << "******* Result of Petes Double fit strategy*********" << endl ;
 	//MinimiserConfig->SetOutputLevel( OutputLevel );
 
-	// Set input parameters back to what they were 
+	// Set input parameters back to what they were
 	BottleParameters->GetPhysicsParameter( string("delta_para") )->SetBlindedValue( deltaPara );
 	BottleParameters->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( deltaPerp );
 
@@ -512,7 +514,7 @@ FitResult * FitAssembler::PetesGamma_DoSafeFit( MinimiserConfiguration * Minimis
 	bool good_result_0 = res0->GetFitStatus() == 3;
 	cout << "Finished Fit1." << endl;
 	if( !good_result_0  ) cout << "Fit-1 failed" << endl;
-	
+
 	// Conjugate fit
 	double deltaGamma = BottleParameters->GetPhysicsParameter( string("deltaGamma") )->GetBlindedValue() ;
 	BottleParameters->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
@@ -520,28 +522,28 @@ FitResult * FitAssembler::PetesGamma_DoSafeFit( MinimiserConfiguration * Minimis
 	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel ) ;
 	double LLmin1 = res1->GetMinimumValue() ;
 	bool good_result_1 = res1->GetFitStatus() == 3;
-	
-	// Apply strategy 
+
+	// Apply strategy
 	FitResult * res ;
 	bool swapped = false ;
-	if( !good_result_0 && !good_result_1 ){ 
-		res = res0;     //both fail so it doesnt matter 
+	if( !good_result_0 && !good_result_1 ){
+		res = res0;     //both fail so it doesnt matter
 	}
-	else if( good_result_0 && !good_result_1 ){     
-		res = res0;     
+	else if( good_result_0 && !good_result_1 ){
+		res = res0;
 	}
-	else if( !good_result_0 && good_result_1 ){     
-		res = res1;     
+	else if( !good_result_0 && good_result_1 ){
+		res = res1;
 		swapped = true;
 	}
-	else if( LLmin0 < LLmin1+0.001 ){ 
+	else if( LLmin0 < LLmin1+0.001 ){
 		res = res0 ;
 	}
-	else { 
+	else {
 		res = res1 ;
 		swapped = true;
 	}
-	
+
 	//MinimiserConfig->SetOutputLevel( 0 );
 	cout << setprecision(9) ;
 	if( !good_result_1  ) cout << "Fit-2 failed" << endl;
@@ -550,11 +552,11 @@ FitResult * FitAssembler::PetesGamma_DoSafeFit( MinimiserConfiguration * Minimis
 	if( swapped  ) cout << "Swapped to conjugate fit result " << endl;
 	cout << "******* Result of Petes flipping deltaGamma strategy*********" << endl ;
 	//MinimiserConfig->SetOutputLevel( OutputLevel );
-	
-	// Set input parameters back to what they were 
-	BottleParameters->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( deltaGamma ) ;  
-	
+
+	// Set input parameters back to what they were
+	BottleParameters->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( deltaGamma ) ;
+
 	return res ;
-	
+
 }
 

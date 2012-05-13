@@ -46,7 +46,9 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ), pdfIntegrator( new RapidFitIntegrator(NewPDF) ), weightsWereUsed(false), weight_norm(1.),
 	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ), logY( (config!=NULL)?config->logY:false ),
-	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false )
+	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false ),
+	combination_integral(0.), ratioOfIntegrals(0.), wanted_weights(), format(), data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(),
+	total_components(), chi2(), N()
 {
 	plotPDF->TurnCachingOff();
 
@@ -849,17 +851,17 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		if( (*comp_i)->GetLineWidth() != 0 )
 		{
 			(*comp_i)->Draw("L9");
-		}
-
-		if( !component_names.empty() )
-		{
-			if( num < component_names.size() )
+		
+			if( !component_names.empty() )
 			{
-				leg->AddEntry( (*comp_i), TString(component_names[num]), "l" );
-			}
-			else
-			{
-				leg->AddEntry( (*comp_i), "Unnamed", "l" );
+				if( num < component_names.size() )
+				{
+					leg->AddEntry( (*comp_i), TString(component_names[num]), "l" );
+				}
+				else
+				{
+					leg->AddEntry( (*comp_i), "Unnamed", "l" );
+				}
 			}
 		}
 	}

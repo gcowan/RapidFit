@@ -7,11 +7,10 @@
  * @author Robert Currie rcurrie@cern.ch
  */
 
-///	ROOT Headers
-#include "TMatrixDSym.h"
 ///	RapidFit Headers
 #include "FitResult.h"
 #include "ResultParameterSet.h"
+#include "RapidFitMatrix.h"
 ///	System Headers
 #include <vector>
 
@@ -21,7 +20,7 @@ using namespace::std;
  * Constructor with correct arguments, including covariance Matrix and contours
  */
 FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle,
-		TMatrixDSym* covarianceMatrix, vector< FunctionContour* > ContourPlots ) :
+		RapidFitMatrix* covarianceMatrix, vector< FunctionContour* > ContourPlots ) :
 	minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( covarianceMatrix ),
 	contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( new PhysicsBottle(*FittedBottle) )
 {
@@ -29,7 +28,7 @@ FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters
 
 FitResult::FitResult( const FitResult& input ) :
 	minimumValue(input.minimumValue), fittedParameters( new ResultParameterSet(*input.fittedParameters) ),
-	covarianceMatrix(input.covarianceMatrix==NULL?NULL:new TMatrixDSym(*input.covarianceMatrix)), contours(input.contours),
+	covarianceMatrix(input.covarianceMatrix==NULL?NULL:new RapidFitMatrix(*input.covarianceMatrix)), contours(input.contours),
 	fitStatus(input.fitStatus), fittedBottle(new PhysicsBottle(*input.fittedBottle))
 {
 }
@@ -48,13 +47,16 @@ vector< FunctionContour* > FitResult::GetContours()
 	return contours;
 }
 
-TMatrixDSym* FitResult::GetCovarianceMatrix()
+RapidFitMatrix* FitResult::GetCovarianceMatrix()
 {
 	return covarianceMatrix;
 }
 
-void FitResult::ApplyCovarianceMatrix( TMatrixDSym* Input )
+void FitResult::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
+	cout << "Applying FitResult:  ";
+	for( unsigned int i=0; i< (unsigned)Input->theseParameters.size(); ++i ) cout << Input->theseParameters[i] << "\t";
+	cout << endl;
 	if( covarianceMatrix != NULL ) delete covarianceMatrix;
 	covarianceMatrix = Input;
 	fittedParameters->ApplyCovarianceMatrix( Input );

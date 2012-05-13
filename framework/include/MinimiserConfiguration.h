@@ -1,5 +1,5 @@
 /**
- * @ingroup Generators  This Generator is capable of Constructing the Minimiser which minimises the FitFunction
+ * @ingroup Configurators  This Generator is capable of Constructing the Minimiser which minimises the FitFunction
  * @class MinimiserConfiguration
  *
  *Container that stores all information related to minimiser configuration, and returns an appropriate instance of a minimiser

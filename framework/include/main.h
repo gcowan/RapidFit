@@ -65,6 +65,8 @@ int RapidFit( int, char** );
 /*!
  * @defgroup Generators  Generator Classes
  *
+ * @defgroup Configurators Configuration Classes
+ *
  * @defgroup Minimisers  Minimiser Objects
  *
  * @defgroup FitFunctions  FitFunction Objects
@@ -72,8 +74,6 @@ int RapidFit( int, char** );
  * @defgroup SpecialPDFs  Special PDFs
  *
  * @defgroup Study  RapidFit Studies
- *
- * @defgroup DataSource  DataSet Constructor
  *
  * @defgroup FitObjects  Normal Fit Objects
  *

@@ -13,13 +13,13 @@
 
 ///	ROOT Headers
 #include "TMinuit.h"
-#include "TMatrixDSym.h"
 ///	RapidFit Headers
 #include "IMinimiser.h"
 #include "FitFunction.h"
 #include "FitResult.h"
 #include "FunctionContour.h"
 #include "ParameterSet.h"
+#include "RapidFitMatrix.h"
 ///	System Headers
 #include <vector>
 #include <string>
@@ -50,13 +50,13 @@ class MinuitWrapper : public IMinimiser
 		virtual FitFunction* GetFitFunction();
 
 		ResultParameterSet* GetResultParameters( vector<string> allNames, ParameterSet* );
-		TMatrixDSym* GetCovarianceMatrix();
+		RapidFitMatrix* GetCovarianceMatrix();
 		vector<double> oldGetCovarianceMatrix( int numParams );
 		virtual vector<FunctionContour*> ConstructContours( vector<string>, ParameterSet* );
 
 		void CallHesse();
 
-		void ApplyCovarianceMatrix( TMatrixDSym* Input );
+		void ApplyCovarianceMatrix( RapidFitMatrix* Input );
 
 	private:
 		//	Uncopyable!
@@ -74,7 +74,7 @@ class MinuitWrapper : public IMinimiser
 		double bestTolerance;
 		vector<string> Options;
 		int Quality;
-		ParameterSet* test;
+		//ParameterSet* test;
 };
 
 #endif

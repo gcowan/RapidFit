@@ -156,7 +156,7 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 	if ( nameIndex == -1 )
 	{
 		cerr << "Observable name " << Name << " not found (4)" << endl;
-		exit(1);
+		throw(438);
 		//return false;
 	}
 	else
@@ -175,7 +175,7 @@ void DataPoint::AddObservable( string Name, Observable* NewObservable )
 	}
 	else
 	{
-		this->SetObservable( Name, new Observable(*NewObservable) );
+		this->SetObservable( Name, NewObservable );
 	}
 }
 

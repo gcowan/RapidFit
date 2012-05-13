@@ -46,9 +46,10 @@ ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), all
 	}
 }
 
-ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames)
+ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames), trusted_set(), trusted( input.trusted )
 {
-	for( vector<PhysicsParameter*>::const_iterator param_i = input.allParameters.begin(); param_i != input.allParameters.end(); ++param_i )
+	vector<PhysicsParameter*>::const_iterator param_i = input.allParameters.begin();
+	for( ; param_i != input.allParameters.end(); ++param_i )
 	{
 		allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
 	}
@@ -58,16 +59,18 @@ ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 {
 	if( this != &input )
 	{
-		while( !allParameters.empty() )
+		while( !this->allParameters.empty() )
 		{
-			if( allParameters.back() != NULL ) delete allParameters.back();
-			allParameters.pop_back();
+			if( this->allParameters.back() != NULL ) delete this->allParameters.back();
+			this->allParameters.pop_back();
 		}
 		for(vector<PhysicsParameter*>::const_iterator param_i = input.allParameters.begin(); param_i != input.allParameters.end(); ++param_i )
 		{
 			this->allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
 		}
 		this->allNames = input.allNames;
+		this->trusted = false;
+		this->trusted_set = vector<ObservableRef*>();
 	}
 	return *this;
 }

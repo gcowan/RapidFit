@@ -17,6 +17,7 @@
 #include "Threading.h"
 #include "ClassLookUp.h"
 #include "RapidFitIntegrator.h"
+#include "StringProcessing.h"
 //	System Headers
 #include <iostream>
 #include <iomanip>
@@ -66,8 +67,6 @@ FitFunction::~FitFunction()
 		if( allIntegrators.back() != NULL ) delete allIntegrators.back();
 		allIntegrators.pop_back();
 	}
-
-	if( fit_thread_data != NULL ) delete [] fit_thread_data;
 }
 
 void FitFunction::SetupTrace( TString FileName, int traceNum )
@@ -290,5 +289,16 @@ void FitFunction::SetUseWeightsSquared( bool Input )
 bool FitFunction::GetWeightsWereUsed() const
 {
 	return useWeights;
+}
+
+vector<string> FitFunction::ConstrainedParameter() const
+{
+	vector<string> allparams;
+	vector<ConstraintFunction*> allconstraints = allData->GetConstraints();
+	for( unsigned int i=0; i< allconstraints.size(); ++i )
+	{
+		allparams = StringProcessing::CombineUniques( allparams, allconstraints[i]->ConstrainedParameter() );
+	}
+	return allparams;
 }
 

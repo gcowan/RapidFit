@@ -26,7 +26,7 @@ Bs2DsPiMassSignal::Bs2DsPiMassSignal( PDFConfigurator* configurator ) :
 	, m_BsName	( configurator->getName("m_Bs") )
 	// Observables
 	, recoMassName	( configurator->getName("mass") )
-	, constraint_recoMassName()
+	, constraint_recoMassName( configurator->getName("mass") )
 
 {
 	MakePrototypes();

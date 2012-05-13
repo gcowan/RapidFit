@@ -44,21 +44,21 @@ class ExternalConstraint
 		 *
 		 * @return Returns the name of the PhysicsParameter Being Constrained
 		 */
-		string GetName();
+		string GetName() const;
 
 		/*!
 		 * @brief Get the Value of the ExternalConstraint
 		 *
 		 * @return the Central Value of the Constraint
 		 */
-		double GetValue();
+		double GetValue() const;
 
 		/*!
 		 * @brief Get the Error of the ExternalConstraint
 		 *
 		 * @return returns the Error on the Constraint
 		 */
-		double GetError();
+		double GetError() const;
 
 		void Print() const;
 

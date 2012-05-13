@@ -128,7 +128,7 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 			}
 			total+= fit_thread_data[threadnum].dataPoint_Result[ point_num ];
 		}
-		while( !fit_thread_data[threadnum].dataPoint_Result.empty() ) fit_thread_data[threadnum].dataPoint_Result.pop_back();
+		fit_thread_data[threadnum].dataPoint_Result.clear();
 	}
 
 	//delete [] fit_thread_data;

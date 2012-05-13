@@ -1,5 +1,5 @@
 /*!
- * @ingroup Generators This Generator is capable of Constructing the FitFunction objects which are to be Minimised
+ * @ingroup Configurators This Generator is capable of Constructing the FitFunction objects which are to be Minimised
  * @class FitFunctionConfiguration
  *
  * @brief Container that stores all information related to FitFunction configuration, and returns an appropriate instance of a FitFunction

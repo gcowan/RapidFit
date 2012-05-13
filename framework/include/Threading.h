@@ -16,7 +16,7 @@
 //	This object is useful as multiple bits of information need to be provided to the running thread
 struct Fitting_Thread{
 	explicit Fitting_Thread() :
-		dataSubSet(), fittingPDF(NULL), useWeights(false), weightName(), dataPoint_Result(), FitBoundary(NULL), ResultIntegrator(NULL),
+		dataSubSet(), fittingPDF(NULL), useWeights(false), weightName("no-weight"), dataPoint_Result(), FitBoundary(NULL), ResultIntegrator(NULL),
 		stored_integral(0.), weightsSquared(false)
 	{}
 	//~Fitting_Thread()

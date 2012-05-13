@@ -10,12 +10,11 @@
 #ifndef FIT_RESULT_H
 #define FIT_RESULT_H
 
-///	ROOT Headers
-#include "TMatrixDSym.h"
 ///	RapidFit Headers
 #include "ResultParameterSet.h"
 #include "PhysicsBottle.h"
 #include "FunctionContour.h"
+#include "RapidFitMatrix.h"
 ///	System Headers
 #include <vector>
 
@@ -27,7 +26,7 @@ class FitResult
 		/*!
 		 * Constructor containing the ResultParameterSet and the PhysicsBottle as well as the Covarience Matrix and Contours
 		 */
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, TMatrixDSym* =NULL, vector<FunctionContour*> =vector<FunctionContour*>());
+		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, RapidFitMatrix* =NULL, vector<FunctionContour*> =vector<FunctionContour*>());
 
 		/*!
 		 * Correct Copy Constructor
@@ -47,9 +46,9 @@ class FitResult
 		/*!
 		 * Return a copy of the Covarience Matrix as provided by the Minimiser
 		 */
-		TMatrixDSym* GetCovarianceMatrix();
+		struct RapidFitMatrix* GetCovarianceMatrix();
 
-		void ApplyCovarianceMatrix( TMatrixDSym* Input );
+		void ApplyCovarianceMatrix( struct RapidFitMatrix* Input );
 
 		/*!
 		 * Get the Contours extracted using Minuit's internal Functions
@@ -89,7 +88,7 @@ class FitResult
 
 		double minimumValue;			/*!	The Final value from the Function After Minimisation		*/
 		ResultParameterSet * fittedParameters;	/*!	Pointer to the Result ParameterSet provided at Construction	*/
-		TMatrixDSym* covarianceMatrix;		/*!	The Covariance Matrix as constructed from the Minimiser		*/
+		RapidFitMatrix* covarianceMatrix;	/*!	The Covariance Matrix as constructed from the Minimiser		*/
 		vector< FunctionContour* > contours;	/*!	Contours Provided directly from the Minimiser			*/
 		int fitStatus;				/*!	Final Minimiser Status value					*/
 		PhysicsBottle* fittedBottle;		/*!	Pointer to the Physics Bottle defined at Construction		*/

@@ -33,7 +33,7 @@ class IStudy
 		 *
 		 * again shouldn't be in an interface, but less work than a BaseStudy simply for (con/de)structors
 		 */
-		IStudy() : pdfsAndData(), studyParameters(), theMinimiser(NULL), theFunction(NULL), allResults(NULL), allConstraints(), numberStudies(-1), delete_objects(false)
+		IStudy() : pdfsAndData(), studyParameters(), theMinimiser(NULL), theFunction(NULL), allResults(NULL), allConstraints(), numberStudies(-1), delete_objects(false), xmlConfig(NULL)
 		{};
 
 		/*!

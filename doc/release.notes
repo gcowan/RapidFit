@@ -1,5 +1,14 @@
 // $Id: release.notes $
 
+2012/05/11 Rob Currie
+   - Ended up creating RapidFitMatrix class to wrap both TMatrixDSym and Parameter names which are required for understanding the output of a covariant matrix
+   - Moved ComponentPlotter config class to separate header to make code clearer to understand.
+   - Changed API to use RapidFitMatrix to pass matrix objects around
+   - Cleaned a lot of compiler warnings issued by make clean
+   - Fixed severe memory leak in new caching code
+   - FitFunction now deleted after fit has been run in FitAssembler
+   - Progress has been made on new Error Corrections for Weighted fits, however this is still experimental and NOT enabled by default
+
 2012/05/10 Rob Currie
    - Added initial changes required to correctly handle covariance Matrix in weighted fits
    - Handling of covariant Matrix is now done using TMatrixDSym pointers which an object which can be written to a ROOT file

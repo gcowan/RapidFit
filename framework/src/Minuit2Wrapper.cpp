@@ -210,12 +210,12 @@ void Minuit2Wrapper::CallHesse()
 	return;
 }
 
-TMatrixDSym* Minuit2Wrapper::GetCovarianceMatrix()
+RapidFitMatrix* Minuit2Wrapper::GetCovarianceMatrix()
 {
 	return NULL;
 }
 
-void Minuit2Wrapper::ApplyCovarianceMatrix( TMatrixDSym* Input )
+void Minuit2Wrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
 	(void)Input;
 	return;

@@ -19,7 +19,7 @@ MCStudy::~MCStudy()
 
 //	XML Constructor
 MCStudy::MCStudy( XMLConfigReader* new_xmlConfig ) :
-IStudy(), events_to_step_over( new_xmlConfig->GetAllDataSetSizes() ), CommandLineParams(), StartingEntries( new_xmlConfig->GetAllStartEntries() ), PhysParams()
+IStudy(), events_to_step_over( new_xmlConfig->GetAllDataSetSizes() ), CommandLineParams(), StartingEntries( new_xmlConfig->GetAllStartEntries() ), PhysParams(), input_xml(new_xmlConfig)
 {
 	xmlConfig = new_xmlConfig;
 	numberStudies = xmlConfig->GetNumberRepeats();
@@ -32,7 +32,7 @@ IStudy(), events_to_step_over( new_xmlConfig->GetAllDataSetSizes() ), CommandLin
 
 //	XML Constructor with events_to_step_over, num_repeats & starting_entry defined
 MCStudy::MCStudy( XMLConfigReader* new_xmlConfig, vector<int> new_events_to_step_over, int new_num_repeats, vector<int> starting_entries ) :
-IStudy(), events_to_step_over( new_events_to_step_over ), CommandLineParams(), StartingEntries( starting_entries ), PhysParams()
+IStudy(), events_to_step_over( new_events_to_step_over ), CommandLineParams(), StartingEntries( starting_entries ), PhysParams(), input_xml(new_xmlConfig)
 {
 	xmlConfig = new_xmlConfig;
 	numberStudies = new_num_repeats;

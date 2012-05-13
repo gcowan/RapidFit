@@ -11,11 +11,10 @@
 #ifndef RESULT_PARAMETER_SET_H
 #define RESULT_PARAMETER_SET_H
 
-///	ROOT Headers
-#include "TMatrixDSym.h"
 //	RapidFit Headers
 #include "ResultParameter.h"
 #include "ParameterSet.h"
+#include "RapidFitMatrix.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -35,9 +34,14 @@ class ResultParameterSet
 		//Get the list of parameters within
 		vector<string> GetAllNames() const;
 
+		vector<string> GetAllFloatNames() const;
+
+		vector<string> GetAllFixedNames() const;
+
 		//Get the result parameter according to this index, or this name
 		ResultParameter * GetResultParameter( int ) const;
 		ResultParameter * GetResultParameter( string ) const;
+		ResultParameter * GetResultParameter( const ObservableRef& ) const;
 
 		//Set the result parameter to be equal to:
 		bool SetResultParameter( string, ResultParameter* );
@@ -54,7 +58,7 @@ class ResultParameterSet
 		string FitXML() const;
 		string ToyXML() const;
 
-		void ApplyCovarianceMatrix( TMatrixDSym* Input );
+		void ApplyCovarianceMatrix( RapidFitMatrix* Input );
 	private:
 		ResultParameterSet operator=( const ResultParameterSet& input );
 

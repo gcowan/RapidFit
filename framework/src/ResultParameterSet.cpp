@@ -1,18 +1,18 @@
 /**
-        @class ResultParameterSet
+  @class ResultParameterSet
 
-        A set of physics parameters after fitting
+  A set of physics parameters after fitting
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+  */
 
-///	ROOT Headers
-#include "TMatrixDSym.h"
-//	RapidFit Headers
+///	RapidFit Headers
 #include "ResultParameterSet.h"
 #include "ParameterSet.h"
-//	System Headers
+#include "StringProcessing.h"
+#include "RapidFitMatrix.h"
+///	System Headers
 #include <iostream>
 #include <sstream>
 #include <cmath>
@@ -53,6 +53,28 @@ vector<string> ResultParameterSet::GetAllNames() const
 	return allNames;
 }
 
+//Retrieve names of all parameters stored that are fixed in the PDF
+vector<string> ResultParameterSet::GetAllFixedNames() const
+{
+	vector<string> Fixed_List;
+	for(unsigned short int i=0; i<allNames.size(); ++i )
+	{
+		if( this->GetResultParameter( allNames[i] )->GetType() == "Fixed" )  Fixed_List.push_back( allNames[i] );
+	}
+	return Fixed_List;
+}
+
+//Retrieve names of all parameters stored that are floated in the pdf
+vector<string> ResultParameterSet::GetAllFloatNames() const
+{
+	vector<string> Not_Fixed_List;
+	for(unsigned short int i=0; i<allNames.size(); ++i )
+	{
+		if( this->GetResultParameter( allNames[i] )->GetType() != "Fixed" )  Not_Fixed_List.push_back( allNames[i] );
+	}
+	return Not_Fixed_List;
+}
+
 ResultParameter * ResultParameterSet::GetResultParameter( int number ) const
 {
 	if( number < (int)allNames.size() )
@@ -78,6 +100,25 @@ ResultParameter * ResultParameterSet::GetResultParameter( string Name ) const
 
 	//If the parameter is not found, return an error
 	return new ResultParameter( Name, 0.0, 0.0, 0.0, 0.0, 0.0, "Error", "NameNotFoundError");
+}
+
+ResultParameter* ResultParameterSet::GetResultParameter( const ObservableRef& object ) const
+{
+	if( object.GetIndex() < 0 )
+	{
+		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef() ) );
+		if( object.GetIndex() >= 0 )
+		{
+			return allParameters[ (unsigned) object.GetIndex() ];
+		}
+	}
+	else
+	{
+		//      This has to be here to ensure that badly constructed parameters don't cause headaches!
+		return allParameters[ (unsigned) object.GetIndex() ];
+	}
+	cerr << "ResultParameter " << object.Name().c_str() << " not found(2)" << endl;
+	return NULL;
 }
 
 //Set a physics parameter by name
@@ -174,14 +215,21 @@ string ResultParameterSet::ToyXML() const
 	return this->XML( false );
 }
 
-void ResultParameterSet::ApplyCovarianceMatrix( TMatrixDSym* Input )
+void ResultParameterSet::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
-	//	This corrects the error on each parameter
-	for( unsigned int i=0; i< allNames.size(); ++i )
+	vector<string> appliedParmaters = Input->theseParameters;
+	cout << "Applying ResultParameterSet:  ";
+	int i=0;
+	for( vector<string>::iterator name_i = appliedParmaters.begin(); name_i != appliedParmaters.end(); ++name_i, ++i )
 	{
-		if( allParameters[i]->GetType() == "Fixed" ) continue;
-		else allParameters[i]->SetError( sqrt( (*Input)(i,i) ) );
+		cout << *name_i << "\t";
+		ResultParameter* thisParam = this->GetResultParameter( *name_i );
+		double thisErrorSq = (*(Input->thisMatrix))(i,i);
+		cout << i << "\t" << thisErrorSq << "\tsqrt=" << sqrt(thisErrorSq) << endl;
+		thisParam->SetError( sqrt( thisErrorSq ) );
 	}
+	cout << endl;
+	return;
 }
 
 

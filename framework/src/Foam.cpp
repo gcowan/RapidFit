@@ -318,7 +318,7 @@ int Foam::GenerateData( int DataAmount )
 }
 
 //Return data set
-IDataSet * Foam::GetDataSet()
+IDataSet * Foam::GetDataSet() const
 {
 	return newDataSet;
 }

@@ -376,6 +376,12 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 		}
 	}
 
+	while( !DiscreteIntegrals.empty() )
+	{
+		if( DiscreteIntegrals.back() != NULL ) delete DiscreteIntegrals.back();
+		DiscreteIntegrals.pop_back();
+	}
+
 	return output_val;
 }
 

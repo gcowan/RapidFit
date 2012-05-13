@@ -21,6 +21,8 @@ class PseudoObservable
 
 		PseudoObservable( const PseudoObservable& );
 
+		//PseudoObservable& operator= ( const PseudoObservable& );
+
 		~PseudoObservable();
 
 		void AddFunction( double (*pseudoRelation)(vector<double>) );

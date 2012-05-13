@@ -10,12 +10,11 @@
 #ifndef I_MINIMISER_H
 #define I_MINIMISER_H
 
-///	ROOT Headers
-#include "TMatrixDSym.h"
 ///	RapidFit Headers
 #include "FitFunction.h"
 #include "FitResult.h"
 #include "PhysicsParameter.h"
+#include "RapidFitMatrix.h"
 ///	System Headers
 #include <string>
 #include <vector>
@@ -156,7 +155,7 @@ class IMinimiser
 		 *
 		 * @return Returns a pointer to the correct Correlation Matrix that has been corrected for the effect of Weights being used in the Fit
 		 */
-		virtual TMatrixDSym* GetCovarianceMatrix() = 0;
+		virtual RapidFitMatrix* GetCovarianceMatrix() = 0;
 
 		/*!
 		 * @brief Interface Function
@@ -166,7 +165,7 @@ class IMinimiser
 		 *
 		 * @return Void
 		 */
-		virtual void ApplyCovarianceMatrix( TMatrixDSym* Input ) = 0;
+		virtual void ApplyCovarianceMatrix( RapidFitMatrix* Input ) = 0;
 };
 
 #endif

@@ -215,12 +215,12 @@ void FumiliWrapper::CallHesse()
 	return;
 }
 
-TMatrixDSym* FumiliWrapper::GetCovarianceMatrix()
+RapidFitMatrix* FumiliWrapper::GetCovarianceMatrix()
 {
 	return NULL;
 }
 
-void FumiliWrapper::ApplyCovarianceMatrix( TMatrixDSym* Input )
+void FumiliWrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
 	(void)Input;
 	return;

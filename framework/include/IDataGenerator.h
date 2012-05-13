@@ -1,4 +1,5 @@
 /*!
+ * @ingroup Generators
  * @interface IDataGenerator
  *
  * @brief Interface for any class used for generating toy data from a PDF
@@ -28,7 +29,7 @@ class IDataGenerator
 		 * Interface Function:
 		 * Request a Pointer to the newly created DataSet
 		 */
-		virtual IDataSet * GetDataSet() = 0;
+		virtual IDataSet * GetDataSet() const = 0;
 
 		/*!
 		 * Virtual Destructor

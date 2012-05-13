@@ -114,7 +114,7 @@ int AcceptReject::GenerateData( int DataAmount )
 }
 
 //Return data set
-IDataSet * AcceptReject::GetDataSet()
+IDataSet * AcceptReject::GetDataSet() const
 {
 	return newDataSet;
 }

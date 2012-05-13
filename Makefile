@@ -158,7 +158,7 @@ gcc48: override CC=g++-4.8
 gcc48: all
 
 #	Have a build option that SCREAMS at the user for potential mistakes!!!
-debug: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++ -ggdb
+debug: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++ -ggdb -Wno-reorder
 debug: all
 debug-utils: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++
 debug-utils: utils

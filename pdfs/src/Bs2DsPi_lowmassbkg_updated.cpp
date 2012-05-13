@@ -34,7 +34,7 @@ Bs2DsPi_lowmassbkg_updated::Bs2DsPi_lowmassbkg_updated(PDFConfigurator* configur
 	//, recoMassName  ( "mass" )
 
 	massName  ( configurator->getName("mass") )
-	,constraint_massName()
+	,constraint_massName( configurator->getName("mass") )
 , histo(), xaxis(), nxbins(), xmin(), xmax(), deltax(), total_num_entries()
 {
 

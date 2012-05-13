@@ -11,19 +11,21 @@
 using namespace::std;
 
 PseudoObservable::PseudoObservable() :
-	internal_function(NULL), internal_error_function(NULL), Dependencies(), Value(0.), Error(0.), valid(false), Name("undefinded"), Unit("unitless"), Index(-1), internal_Input(), internalObservable(NULL)
+	internal_function(NULL), internal_error_function(NULL), Dependencies(), Value(0.), Error(0.), valid(false), Name("undefinded"), Unit("unitless"),
+	Index(-1), internal_Input(), internalObservable(NULL), internal_function_extra(NULL)
 {
 }
 
 PseudoObservable::PseudoObservable( string InputName ) : 
-	internal_function(NULL), internal_error_function(NULL), Dependencies(), Value(0.), Error(0.), valid(false), Name(InputName), Unit("unitless"), Index(-1), internal_Input(), internalObservable(NULL)
+	internal_function(NULL), internal_error_function(NULL), Dependencies(), Value(0.), Error(0.), valid(false), Name(InputName), Unit("unitless"),
+	Index(-1), internal_Input(), internalObservable(NULL), internal_function_extra(NULL)
 {
 }
 
 PseudoObservable::PseudoObservable( const PseudoObservable& Input ) :
 	internal_function( Input.internal_function ), internal_error_function( Input.internal_error_function ), Dependencies(Input.Dependencies),
 	Value( Input.Value), Error( Input.Error ), valid( Input.valid ), Name( Input.Name ), Unit( Input.Unit ), Index( Input.Index ),
-	internal_Input( Input.internal_Input ), internalObservable(NULL)
+	internal_Input( Input.internal_Input ), internalObservable(NULL), internal_function_extra(NULL)
 {
 	if( Input.internalObservable != NULL ) internalObservable = new Observable( *(Input.internalObservable) );
 }

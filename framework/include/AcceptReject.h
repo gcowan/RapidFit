@@ -1,4 +1,5 @@
 /*!
+ * @ingroup Generators
  * @class AcceptReject
  *
  * @brief Class for generating toy data from a PDF.
@@ -53,7 +54,7 @@ class AcceptReject : public IDataGenerator
 		 * 
 		 * @return This passes the IDataSet to some external function, gives all control
 		 */
-		virtual IDataSet * GetDataSet();
+		virtual IDataSet * GetDataSet() const;
 
 	protected:
 		/*!

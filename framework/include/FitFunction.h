@@ -140,6 +140,8 @@ class FitFunction
 		 */
 		virtual double UpErrorValue( int n );
 
+		virtual vector<string> ConstrainedParameter() const;
+
 	protected:
 		/*!
 		 * Don't Copy the class this way!

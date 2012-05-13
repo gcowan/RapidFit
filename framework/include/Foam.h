@@ -1,4 +1,5 @@
 /*!
+ * @ingroup Generators
  * @class Foam
  *
  * @breif Class for generating toy data from a PDF.
@@ -30,24 +31,35 @@ class Foam : public IDataGenerator
 {
 	public:
 		/*!
-		 * Constructor which will initialize TFoam to generate DataPoints over the PhaseSpace using the given PDF
+		 * @brief Constructor which will initialize TFoam to generate DataPoints over the PhaseSpace using the given PDF
+		 *
+		 * @param InputBoundary This is the PhaseSpaceBoundary which is used to be populated by the PDF. A copy is taken by this constructor
+		 *
+		 * @param InputPDF      This is the PDF which is used to create DataPoints which populate the PhaseSpace.
+		 *                      This does NOT use an intenal PDF, it uses the PDF passed in this constructor.
 		 */
-		Foam( PhaseSpaceBoundary*, IPDF* );
+		Foam( PhaseSpaceBoundary* InputBoundary, IPDF* InputPDF );
 
 		/*!
-		 * Destruction
+		 * @brief Destruction
 		 */
 		virtual ~Foam();
 
 		/*!
-		 * Interface Function to Generate a DataSet of requested size
+		 * @brief Interface Function to Generate a DataSet of requested size
+		 *
+		 * @param Input   This is the total number of DataPoints which should be Generated within this DataSet
+		 *
+		 * @return Returns the number of DataPoints actually constructed
 		 */
-		virtual int GenerateData(int);
+		virtual int GenerateData( int Input );
 
 		/*!
-		 * Interface Function to Return a pointer to the new DataSet
+		 * @brief Interface Function to Return a pointer to the new DataSet
+		 *
+		 * @return Returns a pointer to the last DataSet constructed by this class (does NOT remember or alter previous DataSets
 		 */
-		virtual IDataSet * GetDataSet();
+		virtual IDataSet * GetDataSet() const;
 
 	protected:
 		/*!

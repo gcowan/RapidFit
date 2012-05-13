@@ -65,7 +65,7 @@ class PhysicsBottle
 		vector< IDataSet* > allDataSets;
 		vector< ConstraintFunction* > allConstraints;
 		ParameterSet * bottleParameters;
-		bool finalised;
 };
 
 #endif
+

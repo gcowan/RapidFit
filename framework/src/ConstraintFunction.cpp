@@ -260,3 +260,13 @@ string ConstraintFunction::XML() const
 	return xml.str();
 }
 
+vector<string> ConstraintFunction::ConstrainedParameter() const
+{
+	vector<string> constnames;
+	for( unsigned int i=0; i< allConstraints.size(); ++i )
+	{
+		constnames = StringProcessing::CombineUniques( constnames, vector<string>(1,allConstraints[i]->GetName()) );
+	}
+	return constnames;
+}
+

@@ -275,20 +275,20 @@ void MinuitWrapper::Minimise()
 
 	ResultParameterSet * fittedParameters = this->GetResultParameters( allNames, newParameters );
 
-	TMatrixDSym* covarianceMatrix = this->GetCovarianceMatrix();
+	RapidFitMatrix* covarianceMatrix = this->GetCovarianceMatrix();
 
 	vector<FunctionContour*> allContours = this->ConstructContours( allNames, newParameters );
 
+	function->GetPhysicsBottle()->GetParameterSet()->SetTrusted( false );
 	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, function->GetPhysicsBottle(), covarianceMatrix, allContours );
 
-	string TestNewErrors("TestNewErrors");
-	if( StringProcessing::VectorContains( &Options, &TestNewErrors ) != -1 )
+	string testnewError="TestNewErrors";
+	if( StringProcessing::VectorContains( &Options, &testnewError) != -1 )
 	{
 		//	This will also call ApplyCovarianceMatrix which will change the fitResult
-		TMatrixDSym* newMatrix = CorrectedCovariance::GetCorrectedCovarianceMatrix( this );
+		RapidFitMatrix* newMatrix = CorrectedCovariance::GetCorrectedCovarianceMatrix( this );
 		(void) newMatrix;
 	}
-
 }
 
 ResultParameterSet* MinuitWrapper::GetResultParameters( vector<string> allNames, ParameterSet* newParameters )
@@ -313,7 +313,7 @@ ResultParameterSet* MinuitWrapper::GetResultParameters( vector<string> allNames,
 	return fittedParameters;
 }
 
-TMatrixDSym* MinuitWrapper::GetCovarianceMatrix()
+RapidFitMatrix* MinuitWrapper::GetCovarianceMatrix()
 {
 	unsigned int numParams = (unsigned)function->GetParameterSet()->GetAllNames().size();
 	/*!
@@ -324,17 +324,28 @@ TMatrixDSym* MinuitWrapper::GetCovarianceMatrix()
 	Double_t matrix[numParams][numParams];
 	minuit->mnemat(&matrix[0][0],numParams);
 
+	//cout << "Matrix:" << endl;
+	//cout << setprecision(3) << endl;
 	TMatrixDSym* covMatrix = new TMatrixDSym( numParams );
 
 	for( unsigned int i=0; i< (unsigned)numParams; ++i )
 	{
 		for( unsigned int j=0; j< (unsigned)numParams; ++j )
 		{
+			//cout << "  " << matrix[i][j];
 			(*covMatrix)(i,j)=matrix[i][j];
 		}
+		//cout << endl;
 	}
+	//cout << endl;
 
-	return covMatrix;
+	RapidFitMatrix* thisCovMatrix = new RapidFitMatrix();
+
+	thisCovMatrix->thisMatrix = covMatrix;
+
+	thisCovMatrix->theseParameters = function->GetParameterSet()->GetAllNames();
+
+	return thisCovMatrix;
 }
 
 vector<double> MinuitWrapper::oldGetCovarianceMatrix( int numParams )
@@ -451,9 +462,9 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	//	cout << xval[i] << "  " << ((double*)xval)[i] << endl;
 	//}
 
-	ParameterSet* test = new ParameterSet( *( function->GetParameterSet() ) );
+	ParameterSet* test = new ParameterSet( function->GetParameterSet()->GetAllNames() );
 	test->SetTrusted( true );
-	if ( test->SetPhysicsParameters( (double*)xval ) == true )
+	if( test->SetPhysicsParameters( (double*)xval ) == true )
 	{
 		function->SetParameterSet( test );
 		fval = function->Evaluate();
@@ -477,8 +488,14 @@ void MinuitWrapper::ContourPlots( vector< pair< string, string > > ContourParame
 	contours = ContourParameters;
 }
 
-void MinuitWrapper::ApplyCovarianceMatrix( TMatrixDSym* Input )
+void MinuitWrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
+	cout << "Applying from Minuit:  ";
+	for( unsigned int i=0; i< (unsigned)Input->theseParameters.size(); ++i )
+	{
+		cout << Input->theseParameters[i] << "\t";
+	}
+	cout << endl;
 	fitResult->ApplyCovarianceMatrix( Input );
 }
 

@@ -243,7 +243,9 @@ DataPoint* PhaseSpaceBoundary::GetMidPoint() const
 	vector<string>::const_iterator name_i = allNames.begin();
 	for( vector<IConstraint*>::const_iterator const_i = allConstraints.begin(); const_i != allConstraints.end(); ++const_i, ++name_i )
 	{
-		returnable_point->AddObservable( *name_i, (*const_i)->GetMidRangeValue() );
+		Observable* thisMiddleObservable = (*const_i)->GetMidRangeValue();
+		returnable_point->AddObservable( *name_i, thisMiddleObservable );
+		delete thisMiddleObservable;
 	}
 	return returnable_point;
 }
@@ -282,7 +284,7 @@ vector<DataPoint*> PhaseSpaceBoundary::GetDiscreteCombinations() const
 	//Create the data points to return
 	vector<DataPoint*> newDataPoints;
 
-	DataPoint* tempPoint = new DataPoint( *(this->GetMidPoint()) );
+	DataPoint* tempPoint = this->GetMidPoint();
 
 	for( unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
 	{

@@ -1,5 +1,5 @@
 /*!
- * @ingroup Generators  This Generator class constricts DataSets which can be cast as IDataSets
+ * @ingroup Configurators  This Generator class constricts DataSets which can be cast as IDataSets
  * @class DataSetConfiguration
  *
  * @brief A class for holding the data to create a data set
@@ -127,6 +127,11 @@ class DataSetConfiguration
 		 */
 		void SetDebug( bool Input );
 
+		/*!
+		 * @brief Return the XML required to reconstruct this class
+		 *
+		 * @return Returns the XML in a 'flat' string
+		 */
 		string XML() const;
 
 	private:
@@ -141,13 +146,36 @@ class DataSetConfiguration
 		DataSetConfiguration& operator = ( const DataSetConfiguration& );
 
 		/*!
+		 * @brief This is the Function which Constructs a Toy DataSet (generally Foam) then stores the output in a .root file
+		 *        Then passes it through the File Interpretor to make use of more advanced ROOT features
 		 *
+		 * @param arguments     These are the arguments passed to the DataSetGenerator from the XML
+		 *
+		 * @param ArgumentNames These are the names of the arguments passed to the DataSetGenerator
+		 *
+		 * @param internalBoundary  This is the PhaseSpaceBoundary which should be occupied with the required Boundary
+		 *
+		 * @param numberEvents  This is the number of events requested to be constructed within the PhaseSpaceBoundary
+		 *
+		 * @param FitPDF        This is the PDF that should be used to construct the DataPoints within the PhaseSpaceBoundary
+		 *
+		 * @return Pointer to the new DataSet which has just been constructed. The Generator does not handle destroying of the DataSet
 		 */
 		IDataSet* FoamFile( vector<string> arguments, vector<string> ArgumentNames, PhaseSpaceBoundary* internalBoundary, int numberEvents, IPDF* FitPDF );
 
 
 		/*!
+		 * @brief This is the Function which Loads a Everything required to construct a Toy DataSet and returns the Constructed DataSet
 		 *
+		 * @param source           This is the Name of the DataSetGenerator that should be loaded
+		 *
+		 * @param internalBoundary 
+		 *
+		 * @param numberEvents     This is the number of events requested to be constructed within the PhaseSpaceBoundary
+		 *
+		 * @param FitPDF           This is the PDF that should be used to construct the DataPoints within the PhaseSpaceBoundary
+		 *
+		 * @return Returns the DataSet which has just been constructed
 		 */
 		IDataSet* LoadGeneratorDataset( string source, PhaseSpaceBoundary* internalBoundary, int numberEvents, IPDF* FitPDF );
 
