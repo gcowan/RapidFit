@@ -35,8 +35,9 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(New
 	}
 }
 
-DataPoint::DataPoint( const DataPoint& input ) : allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
-						 thisDiscreteIndex(input.thisDiscreteIndex)
+DataPoint::DataPoint( const DataPoint& input ) :
+	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
+	thisDiscreteIndex(input.thisDiscreteIndex)
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
@@ -121,9 +122,10 @@ Observable* DataPoint::GetObservable(string const Name) const
 {
 	//Check if the name is stored in the map
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
-	if ( nameIndex == -1 )
+	if( nameIndex == -1 )
 	{
 		cerr << "Observable name " << Name << " not found (2)" << endl;
+		this->Print();
 		exit(1);
 		//return new Observable( Name, 0.0, 0.0, "NameNotFoundError");
 	}

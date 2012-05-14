@@ -30,7 +30,7 @@ class StatisticsFunctions
 		static double Maximum( vector<double> );
 		static double Minimum( vector<double> );
 		static vector< vector<double> > DiscreteCombinations( vector<string>*, const PhaseSpaceBoundary*, vector<string>&, vector<string>&, vector< vector<double> >& );
-		static void DoDontIntegrateLists( IPDF*, PhaseSpaceBoundary*, vector<string>*, vector<string>&, vector<string>& );
+		static void DoDontIntegrateLists( IPDF*, const PhaseSpaceBoundary*, const vector<string>*, vector<string>&, vector<string>& );
 		static vector<DataPoint*> DataAverage( IDataSet*, vector< vector<double> >, vector< vector<double> >, vector<string>, vector<string>, vector<string>&, vector<double>& );
 };
 

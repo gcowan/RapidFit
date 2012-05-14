@@ -20,8 +20,8 @@
 using namespace::std;
 
 //	Constructor for Integrator Objects
-IntegratorFunction::IntegratorFunction( IPDF * InputFunction, DataPoint * InputPoint, vector<string> IntegrateThese, vector<string> DontIntegrateThese,
-		PhaseSpaceBoundary* inputPhaseSpaceBoundary, ComponentRef* Index, vector<double> new_lower_limit, vector<double> new_upper_limit ) :
+IntegratorFunction::IntegratorFunction( IPDF * InputFunction, const DataPoint * InputPoint, vector<string> IntegrateThese, vector<string> DontIntegrateThese,
+		const PhaseSpaceBoundary* inputPhaseSpaceBoundary, ComponentRef* Index, vector<double> new_lower_limit, vector<double> new_upper_limit ) :
 	wrappedFunction(InputFunction), currentPoint(new DataPoint(*InputPoint) ), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese),
 	minima(), ranges(), cache_positions(), componentIndex( Index==NULL?NULL:(new ComponentRef(*Index)) ), newDataPoint(NULL), cache_lookup(),
 	lower_limit(new_lower_limit), upper_limit(new_upper_limit), generateFunc(false), integrateFunc(true), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *inputPhaseSpaceBoundary ) )
@@ -47,8 +47,8 @@ IntegratorFunction::IntegratorFunction( IPDF * InputFunction, DataPoint * InputP
 }
 
 //	Constructor with additional information needed for the Foam coordinate transform
-IntegratorFunction::IntegratorFunction( IPDF * InputFunction, DataPoint * InputPoint, vector<string> IntegrateThese, vector<string> DontIntegrateThese,
-		vector<double> InputMinima, vector<double> InputRanges, PhaseSpaceBoundary* inputPhaseSpaceBoundary ) :
+IntegratorFunction::IntegratorFunction( IPDF * InputFunction, const DataPoint * InputPoint, vector<string> IntegrateThese, vector<string> DontIntegrateThese,
+		vector<double> InputMinima, vector<double> InputRanges, const PhaseSpaceBoundary* inputPhaseSpaceBoundary ) :
 	wrappedFunction(InputFunction), currentPoint(new DataPoint(*InputPoint) ), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese),
 	minima(InputMinima), ranges(InputRanges), cache_positions(), componentIndex(NULL), newDataPoint(NULL), cache_lookup(), lower_limit(InputMinima),
 	upper_limit(), generateFunc(true), integrateFunc(false), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *inputPhaseSpaceBoundary) )

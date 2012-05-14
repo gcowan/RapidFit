@@ -51,7 +51,7 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		 *
 		 * @param max           This is the list of maximum values extracted from the PhaseSpace (This should probably be integrally generated, but it's redily available in the programs which call this constructor
 		 */
-		IntegratorFunction( IPDF* InputPDF, DataPoint* InputPoint, vector<string> doIntegrate, vector<string> dontIntegrate, PhaseSpaceBoundary* InputBoundary, ComponentRef* WantedComponent= NULL,
+		IntegratorFunction( IPDF* InputPDF, const DataPoint* InputPoint, vector<string> doIntegrate, vector<string> dontIntegrate, const PhaseSpaceBoundary* InputBoundary, ComponentRef* WantedComponent= NULL,
 				vector<double> min=vector<double>(), vector<double> max =vector<double>() );
 
 		/*!
@@ -73,7 +73,7 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		 *
 		 * @param InputBoundary This is the PhaseSpace which is being integrated over. If a DataPoint is generated outside of the Range (shouldn't be but I simply don't trust ROOT) this forces Eval to return 0.0;
 		 */
-		IntegratorFunction( IPDF* InputPDF, DataPoint* InputPoint, vector<string> doIntegrate, vector<string> dontIntegrate, vector<double> min, vector<double> range, PhaseSpaceBoundary* InputBoundary );
+		IntegratorFunction( IPDF* InputPDF, const DataPoint* InputPoint, vector<string> doIntegrate, vector<string> dontIntegrate, vector<double> min, vector<double> range, const PhaseSpaceBoundary* InputBoundary );
 
 		/*!
 		 * @brief Return a pointer to the PDF being wrapped

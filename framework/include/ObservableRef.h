@@ -45,6 +45,8 @@ class ObservableRef
 		size_t size() const;
 		void push_back( string );
 
+		void Print() const;
+
 	private:
 		string Observable_Name;
 		mutable int Observable_Index;

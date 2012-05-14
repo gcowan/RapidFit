@@ -174,7 +174,8 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 }
 
 //Return names of observables to integrate or not
-void StatisticsFunctions::DoDontIntegrateLists( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector<string> * DontIntegrateThese, vector<string> & DoIntegrateList, vector<string> & DontIntegrateList )
+void StatisticsFunctions::DoDontIntegrateLists( IPDF * InputPDF, const PhaseSpaceBoundary * InputBoundary, const vector<string> * DontIntegrateThese,
+		vector<string> & DoIntegrateList, vector<string> & DontIntegrateList )
 {
 	//Make lists of observables to integrate and not to integrate
 	vector<string> observableNames = InputPDF->GetPrototypeDataPoint();

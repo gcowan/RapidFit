@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <float.h>
 #include <pthread.h>
+#include <exception>
 
 pthread_mutex_t multi_mutex;
 pthread_mutex_t multi_mutex2;
@@ -160,7 +161,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 	return -1;
 }
 
-vector<string> RapidFitIntegrator::DontNumericallyIntegrateList( DataPoint* NewDataPoint, vector<string> input )
+vector<string> RapidFitIntegrator::DontNumericallyIntegrateList( const DataPoint* NewDataPoint, vector<string> input )
 {
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate;
@@ -231,7 +232,7 @@ void RapidFitIntegrator::SetPDF( IPDF* input )
 	functionToWrap = input;
 }
 
-double RapidFitIntegrator::OneDimentionIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
+double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
 {
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
 	//Find the observable range to integrate over
@@ -262,7 +263,7 @@ double RapidFitIntegrator::OneDimentionIntegral( DataPoint * NewDataPoint, Phase
 	return output;
 }
 
-double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary,
+double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
 		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
 {
 	//Make arrays of the observable ranges to integrate over
@@ -321,7 +322,7 @@ double RapidFitIntegrator::NumericallyIntegrateDataPoint( DataPoint* NewDataPoin
 }
 
 //Actually perform the numerical integration
-double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, vector<string> DontIntegrateThese, ComponentRef* componentIndex, bool IntegrateDataPoint )
+double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, const vector<string> DontIntegrateThese, ComponentRef* componentIndex, const bool IntegrateDataPoint )
 {
 	//Make lists of observables to integrate and not to integrate
 	vector<string> doIntegrate, dontIntegrate;
@@ -334,7 +335,7 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 
 	if( IntegrateDataPoint )
 	{
-		DiscreteIntegrals.push_back( NewDataPoint );
+		DiscreteIntegrals.push_back( new DataPoint(*NewDataPoint) );
 	}
 	else
 	{
@@ -348,7 +349,7 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 	{
 		for( vector<DataPoint*>::iterator dataPoint_i = DiscreteIntegrals.begin(); dataPoint_i != DiscreteIntegrals.end(); ++dataPoint_i )
 		{
-			output_val += functionToWrap->Integral( *dataPoint_i, NewBoundary );
+			output_val += functionToWrap->Integral( *dataPoint_i, const_cast<PhaseSpaceBoundary*>(NewBoundary) );
 		}
 	}
 	else
@@ -367,7 +368,7 @@ double RapidFitIntegrator::DoNumericalIntegral( DataPoint * NewDataPoint, PhaseS
 			}
 			if( !haveTestedIntegral )
 			{
-				double testIntegral = functionToWrap->Integral( *dataPoint_i, NewBoundary );
+				double testIntegral = functionToWrap->Integral( *dataPoint_i, const_cast<PhaseSpaceBoundary*>(NewBoundary) );
 				cout << "Integration  Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
 				cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
 			}

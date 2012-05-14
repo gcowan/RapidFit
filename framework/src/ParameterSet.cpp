@@ -53,6 +53,11 @@ ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNa
 	{
 		allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
 	}
+	vector<string>::const_iterator name_i = allNames.begin();
+	for( ; name_i != allNames.end(); ++name_i )
+	{
+		trusted_set.push_back( new ObservableRef( *name_i ) );
+	}
 }
 
 ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
@@ -71,6 +76,10 @@ ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 		this->allNames = input.allNames;
 		this->trusted = false;
 		this->trusted_set = vector<ObservableRef*>();
+		for( vector<string>::const_iterator name_i = allNames.begin(); name_i != allNames.end(); ++name_i )
+		{
+			this->trusted_set.push_back( new ObservableRef( *name_i ) );
+		}
 	}
 	return *this;
 }
@@ -192,6 +201,7 @@ PhysicsParameter* ParameterSet::GetPhysicsParameter( const ObservableRef& object
 		}
 		return allParameters[ (unsigned) object.GetIndex() ];
 	}
+	object.Print();
 	cerr << "PhysicsParameter " << object.Name().c_str() << " not found(2)" << endl;
 	throw(-20);
 }

@@ -81,3 +81,11 @@ void ObservableRef::push_back( string input_name )
 	Observable_Names.push_back( input_name );
 }
 
+void ObservableRef::Print() const
+{
+	cout << "ObservableRef:" << endl;
+	cout << "Name:\t" << Observable_Name << endl;
+	cout << "Index:\t" << Observable_Index << endl;
+	return;
+}
+

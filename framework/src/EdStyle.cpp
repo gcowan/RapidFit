@@ -600,9 +600,9 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 		Name.Append("f_{LL1}");
 
 	} else {
-		Name.Append("\\text(");
+		Name.Append("\\text{");
 		Name.Append(Param_Name);
-		Name.Append(")");
+		Name.Append("}");
 	}
 
 	Name.Append("$");

@@ -239,7 +239,7 @@ class RapidFitIntegrator
 		 *
 		 * @return a vector of all non-Integrable Observables found in this DataPoint.
 		 */
-		vector<string> DontNumericallyIntegrateList( DataPoint*, vector<string> = vector<string>() );
+		vector<string> DontNumericallyIntegrateList( const DataPoint*, vector<string> = vector<string>() );
 
 	private:
 		/*!
@@ -266,7 +266,7 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-		double DoNumericalIntegral( DataPoint*, PhaseSpaceBoundary*, vector<string>, ComponentRef* = NULL, bool decision = false );
+		double DoNumericalIntegral( const DataPoint* InputDataPoint, const PhaseSpaceBoundary* InputPhaseSpace, const vector<string> DoNotIntegrate, ComponentRef* InputRef = NULL, const bool decision = false );
 
 
 		/*!
@@ -276,7 +276,7 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-		static double MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* thisIntegrator, DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary,
+		static double MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* thisIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
 				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate );
 
 		/*!
@@ -286,7 +286,7 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-		double OneDimentionIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate );
+		double OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate );
 
 		/*!
 		 * This stores the Ratio of the Integrals after the Comparison between Analytical and Numerical
