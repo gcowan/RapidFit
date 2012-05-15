@@ -463,7 +463,7 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	//}
 
 	ParameterSet* test = new ParameterSet( function->GetParameterSet()->GetAllNames() );
-	test->SetTrusted( true );
+	test->SetTrusted( false );
 	if( test->SetPhysicsParameters( (double*)xval ) == true )
 	{
 		function->SetParameterSet( test );

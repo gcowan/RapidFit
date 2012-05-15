@@ -151,6 +151,8 @@ class ParameterSet
 		 */
 		bool SetPhysicsParameters( ParameterSet* Input );
 
+		bool SetPhysicsParameters( const ParameterSet* Input );
+
 		/*!
 		 * @brief This is used from the various FitFunctions to translate new input values into PhysicsParameter Values
 		 *

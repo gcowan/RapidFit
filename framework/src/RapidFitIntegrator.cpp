@@ -156,7 +156,8 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 	}
 	else
 	{
-		return TestIntegral( NewDataPoint, NewBoundary );
+		double returnVal = TestIntegral( NewDataPoint, NewBoundary );
+		return returnVal;
 	}
 	return -1;
 }
@@ -214,7 +215,7 @@ double RapidFitIntegrator::TestIntegral( DataPoint * NewDataPoint, PhaseSpaceBou
 		return testIntegral;
 	}
 	haveTestedIntegral = true;
-	return -1.;
+	return this->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, dontIntegrate );
 }
 
 double RapidFitIntegrator::GetRatioOfIntegrals()
@@ -292,10 +293,9 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 	cout_bak = cout.rdbuf();
 	cerr_bak = cerr.rdbuf();
 	clog_bak = clog.rdbuf();
-	cout.rdbuf(0);
-	cerr.rdbuf(0);
-	clog.rdbuf(0);
-
+	//cout.rdbuf(0);
+	//cerr.rdbuf(0);
+	//clog.rdbuf(0);
 	multiDimensionIntegrator->SetFunction( *quickFunction );
 	double output =  multiDimensionIntegrator->Integral( minima, maxima );
 
@@ -369,7 +369,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			if( !haveTestedIntegral )
 			{
 				double testIntegral = functionToWrap->Integral( *dataPoint_i, const_cast<PhaseSpaceBoundary*>(NewBoundary) );
-				cout << "Integration  Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
+				cout << "Integration Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
 				cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
 			}
 

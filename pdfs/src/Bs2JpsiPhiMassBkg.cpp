@@ -82,7 +82,7 @@ double Bs2JpsiPhiMassBkg::Normalisation(PhaseSpaceBoundary * boundary)
 	}
 
 	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
-	double integral ;
+	double integral =0;
 
 	if( fabs( alphaM_pr - 0. ) < DOUBLE_TOLERANCE ) {
 		integral = mhigh-mlow ;   // this was added by PELC to catch a divide by zero Nov-2010
@@ -94,6 +94,16 @@ double Bs2JpsiPhiMassBkg::Normalisation(PhaseSpaceBoundary * boundary)
 		double scaleFactor = exp( -alphaM_pr * 5366.0 );
 		integral /= scaleFactor ;
 	}
-	return integral;
 
+	if( isnan(integral) )
+	{
+		cout << "scale factor: " << exp( -alphaM_pr * 5366.0 ) << endl;
+		cout << "alphaM_pr: " << alphaM_pr << endl;
+		cout << integral << endl;
+		boundary->Print();
+		allParameters.Print();
+	}
+
+	return integral;
 }
+

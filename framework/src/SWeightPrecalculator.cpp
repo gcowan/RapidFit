@@ -136,8 +136,8 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long Numbe
 	vector<double> saveSignalValues, saveBackgroundValues;
 
 	//Make the PDF integrators
-	RapidFitIntegrator * signalIntegrator = (RapidFitIntegrator*) ( signalPDF->RequestIntegrator() );
-	RapidFitIntegrator * backgroundIntegrator = (RapidFitIntegrator*) ( backgroundPDF->RequestIntegrator() );
+	RapidFitIntegrator * signalIntegrator = new RapidFitIntegrator( signalPDF );
+	RapidFitIntegrator * backgroundIntegrator = new RapidFitIntegrator( backgroundPDF );
 
 	//The matrix is a sum over all events
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
@@ -170,6 +170,8 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long Numbe
 	//Return results
 	SignalValues = saveSignalValues;
 	BackgroundValues = saveBackgroundValues;
+	delete signalIntegrator;
+	delete backgroundIntegrator;
 	return make_pair( returnSignalSignal, returnSignalBackground );
 }
 

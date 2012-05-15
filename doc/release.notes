@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/05/15 Rob Currie
+   - Fixed some 'not-fully-understood but kinda' bug in the way that ParameterSets are changed and associated with PDFs in RapidFit
+   - Removed some of the functions from IPDF and BasePDF which are not useful in further attempt to make it easier to see what goes on in the BasePDF
+   - PDFs now explicitly have the ParameterSet allocated within the PhysicsBottle and are managed internally within the PhysicsBottle
+   - new code to better handle ObservableRef objects being in/out of sync with the structure of the ParameterSet is being developed but has not been committed yet
+
 2012/05/11 Rob Currie
    - Fixed a bug in RapidFitIntegrator which caused Component-Projections to fail.
    - Added a few more const statements to functions throughout the codebase to make a few things easier to understand

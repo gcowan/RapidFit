@@ -279,18 +279,6 @@ class IPDF
 
 		/*!
 		 * Interface Function:
-		 * Associate an Integrator object with this PDF (the PDF does NOT take ownership of the object and it doesn't clean up after it!)
-		 */
-		virtual void AssociateIntegrator( RapidFitIntegrator* ) = 0;
-
-		/*!
-		 * Interface Function:
-		 * Get the pointer to the associated Integrator, the PDF does NOT check whether this object exists, only use it when you know what you're doing!
-		 */
-		virtual RapidFitIntegrator* RequestIntegrator() const = 0;
-
-		/*!
-		 * Interface Function:
 		 * Return the required XML for this PDF
 		 */
 		virtual string XML() const = 0;

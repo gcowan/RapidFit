@@ -46,7 +46,7 @@ ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), all
 	}
 }
 
-ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames), trusted_set(), trusted( input.trusted )
+ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames), trusted_set(), trusted( false )
 {
 	vector<PhysicsParameter*>::const_iterator param_i = input.allParameters.begin();
 	for( ; param_i != input.allParameters.end(); ++param_i )
@@ -54,10 +54,6 @@ ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNa
 		allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
 	}
 	vector<string>::const_iterator name_i = allNames.begin();
-	for( ; name_i != allNames.end(); ++name_i )
-	{
-		trusted_set.push_back( new ObservableRef( *name_i ) );
-	}
 }
 
 ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
@@ -236,6 +232,50 @@ bool ParameterSet::SetPhysicsParameter( string Name, double Value, double Minimu
 
 //Set all physics parameters
 bool ParameterSet::SetPhysicsParameters( ParameterSet * NewParameterSet )
+{
+	if( NewParameterSet->GetTrusted() )
+	{
+		if( trusted_set.empty() )
+		{
+			for( unsigned int i=0; i < allNames.size(); ++i )
+			{
+				ObservableRef* new_ref = new ObservableRef( allNames[i] );
+				allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *new_ref )->GetValue() );
+				trusted_set.push_back( new_ref );
+			}
+		}
+		else
+		{
+			for( unsigned int i=0; i< trusted_set.size(); ++i )
+			{
+				allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *(trusted_set[i]) )->GetValue() );
+			}
+		}
+	}
+	else
+	{
+		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+		{
+			PhysicsParameter* inputParameter = new PhysicsParameter( *(NewParameterSet->GetPhysicsParameter( allNames[nameIndex] )) );
+			if ( inputParameter->GetUnit() == "NameNotFoundError" )
+			{
+				//Fail if a required parameter is missing
+				cerr << "Parameter \"" << allNames[nameIndex] << "\" expected but not found" << endl;
+				return false;
+			}
+			else
+			{
+				if( allParameters[nameIndex] != NULL ) delete allParameters[nameIndex];
+				allParameters[nameIndex] = inputParameter;
+			}
+		}
+	}
+
+	return true;
+}
+
+//Set all physics parameters
+bool ParameterSet::SetPhysicsParameters( const ParameterSet * NewParameterSet )
 {
 	if( NewParameterSet->GetTrusted() )
 	{

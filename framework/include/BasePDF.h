@@ -510,24 +510,6 @@
 		CopyPDF_t* GetCopyConstructor() const;
 
 		/*!
-		 * @brief Associate an Integrator object with this PDF
-		 *
-		 * @warning the PDF does NOT take ownership of the object and it doesn't clean up after it!
-		 *
-		 * @return Void
-		 */
-		void AssociateIntegrator( RapidFitIntegrator* );
-
-		/*!
-		 * @brief Get the pointer to the associated Integrator
-		 *
-		 * @warning the PDF doesn NOT check wether this object exists, only use it when you know what you're doing!
-		 *
-		 * @return Returns a pointer to a RapidFitIntegrator assoicated with this class
-		 */
-		RapidFitIntegrator* RequestIntegrator() const;
-
-		/*!
 		 * @brief Return the required XML for this PDF
 		 *
 		 * @return Returns the name of the PDF in PDF tags
@@ -677,12 +659,6 @@
 		 * This allows the on disk cach to removed after RapidFit exists cleanly and only removed once
 		 */
 		bool do_i_control_the_cache;
-
-		/*!
-		 * Pointer to a RapidFitIntegrator associated with this class
-		 * NB: The PDF does NOT take responsibility for this object
-		 */
-		RapidFitIntegrator* integrator_object;
 
 		bool haveTestedIntegral;	/*!	Has the Integral Been tested?	*/
 		bool requiresBoundary;		/*!	Does the PDF require the PhaseSpaceBoundary to calculate the normalisation?	*/

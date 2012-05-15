@@ -100,27 +100,17 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 {
 	allData = NewBottle;
 
-
 	//Initialise the integrators
 	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); ++resultIndex )
 	{
-		RapidFitIntegrator * resultIntegrator = NULL;
-		if( NewBottle->GetResultPDF(resultIndex)->RequestIntegrator() == NULL )
-		{
-			resultIntegrator = new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
-			NewBottle->GetResultPDF(resultIndex)->AssociateIntegrator( resultIntegrator );
-			//resultIntegrator->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
-			if( testIntegrator == false ) resultIntegrator->ForceTestStatus( true );
-		}
-		else
-		{
-			resultIntegrator = new RapidFitIntegrator( *(NewBottle->GetResultPDF(resultIndex)->RequestIntegrator()) );
-			if( testIntegrator == false ) resultIntegrator->ForceTestStatus( true );
-		}
-
+		NewBottle->GetResultPDF(resultIndex)->UpdatePhysicsParameters( allData->GetParameterSet() );
+		RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
 		allIntegrators.push_back( resultIntegrator );
-		// Give the Caching code a Sharp Kick!!!
-		allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
+
+		allIntegrators.back()->ForceTestStatus( false );
+		double someval = allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
+		(void) someval;
+
 		if( Threads > 0 )
 		{
 			//      Create simple data subsets. We no longer care about the handles that IDataSet takes care of

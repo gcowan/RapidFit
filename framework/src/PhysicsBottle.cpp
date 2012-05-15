@@ -15,6 +15,8 @@
 #include <iostream>
 #include <stdlib.h>
 
+using namespace::std;
+
 //Constructor with correct argument
 PhysicsBottle::PhysicsBottle( ParameterSet * NewParameters ) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(new ParameterSet( *NewParameters) )
 {
@@ -71,6 +73,7 @@ IPDF * PhysicsBottle::GetResultPDF(int Index)
 {
 	if ( Index < int(allPDFs.size()) )
 	{
+		allPDFs[unsigned(Index)]->UpdatePhysicsParameters( bottleParameters );
 		return allPDFs[unsigned(Index)];
 	}
 	else

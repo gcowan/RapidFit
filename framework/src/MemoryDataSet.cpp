@@ -50,9 +50,10 @@ void MemoryDataSet::ReserveDataSpace( int numberOfPoints )
 //Add a data point to the set
 bool MemoryDataSet::AddDataPoint( DataPoint* NewDataPoint )
 {
-	if ( dataBoundary->IsPointInBoundary(NewDataPoint) )
+	if( dataBoundary->IsPointInBoundary(NewDataPoint) )
 	{
 		allData.push_back( NewDataPoint );
+		allData.back()->SetPhaseSpaceBoundary( dataBoundary );
 		return true;
 	}
 	else
@@ -68,6 +69,7 @@ DataPoint * MemoryDataSet::GetDataPoint( int Index ) const
 {
 	if ( Index < int(allData.size()) )
 	{
+		allData[unsigned(Index)]->SetPhaseSpaceBoundary( dataBoundary );
 		return allData[unsigned(Index)];
 	}
 	else
@@ -127,6 +129,7 @@ void MemoryDataSet::Clear()
 
 void MemoryDataSet::SortBy( string parameter )
 {
+
 	cout << "Sorting" << endl;
 	if( allData.size() > 0 )
 	{

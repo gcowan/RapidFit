@@ -14,6 +14,12 @@
 #include "TMath.h"
 #include "RooMath.h"
 
+#include "Mathematics.h"
+
+#include <iostream>
+
+using namespace::std;
+
 PDF_CREATOR( BsMass );
 
 //Constructor
@@ -122,7 +128,7 @@ double BsMass::Evaluate(DataPoint * measurement)
 	double s2_erf_factor = 0.5*( RooMath::erf((mhigh-m_Bs)/(sigma_m2*sqrt(2.))) - RooMath::erf((mlow-m_Bs)/(sigma_m2*sqrt(2.)) ) );
 	double returnValue = 0;
 
-	if( f_sig_m1 > 0.99999 )
+	if( f_sig_m1 >= 0.99999 || ratio_21 < 1E-5 )
 	{
 		double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi())) / s1_erf_factor;
 		double deltaMsq = ( mass - m_Bs )*( mass - m_Bs );
@@ -139,8 +145,8 @@ double BsMass::Evaluate(DataPoint * measurement)
 	}
 	else
 	{
-		double factor1 = 1./(sigma_m1*sqrt(2.*TMath::Pi()))  / s1_erf_factor;
-		double factor2 = 1./(sigma_m2*sqrt(2.*TMath::Pi()))  / s2_erf_factor;
+		double factor1 = 1./(sigma_m1*sqrt(2.*Mathematics::Pi()))  / s1_erf_factor;
+		double factor2 = 1./(sigma_m2*sqrt(2.*Mathematics::Pi()))  / s2_erf_factor;
 		double deltaMsq = ( mass - m_Bs )*( mass - m_Bs );
 		double exp1 = exp( -deltaMsq / ( 2. * sigma_m1 * sigma_m1 ) );
 		double exp2 = exp( -deltaMsq / ( 2. * sigma_m2 * sigma_m2 ) );
@@ -156,6 +162,19 @@ double BsMass::Evaluate(DataPoint * measurement)
 				returnValue = f_sig_m1 * factor1 * exp1 + (1. - f_sig_m1) * factor2 * exp2;
 				break;
 		}
+	}
+
+	if( isnan(fabs(returnValue)) )
+	{
+		measurement->Print();
+		measurement->GetPhaseSpaceBoundary()->Print();
+		allParameters.Print();
+		cout << "mlow: " << mlow << "  mhigh: " << mhigh << endl;
+		cout << "sigma_m1: " << sigma_m1 << endl;
+		cout << "PhaseSpace: " << measurement->GetPhaseSpaceBoundary() << endl;
+		cout << "s1_erf_factor: " << RooMath::erf((mhigh-m_Bs)/(sigma_m1*sqrt(2.))) << "-" << RooMath::erf((mlow-m_Bs)/(sigma_m1*sqrt(2.))) << "   s2_erf_factor: " << s2_erf_factor << endl;
+		cout << "factor1: " <<  "1./(" << sigma_m1 << " * " << sqrt(2.*Mathematics::Pi()) << ")" << endl;
+		cout << "factor2: " << 1./(sigma_m2*sqrt(2.*Mathematics::Pi())) << endl;
 	}
 
 	return returnValue;

@@ -16,6 +16,8 @@
 #include "ComponentRef.h"
 //	System Headers
 #include <iostream>
+#include <cstdlib>
+#include <float.h>
 
 using namespace::std;
 
@@ -214,10 +216,24 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		if( componentIndex != NULL )
 		{
 			result = wrappedFunction->EvaluateComponent( newDataPoint, componentIndex );
+			if( isnan(result) || fabs(result)>=DBL_MAX )
+			{
+				newDataPoint->Print();
+				myPhaseSpaceBoundary->Print();
+				exit(0);
+			}
+			//cout << result << endl;
 		}
 		else if( integrateFunc == true )
 		{
 			result = wrappedFunction->EvaluateForNumericIntegral( newDataPoint );
+			//cout << result << endl;
+			if( isnan(result) || fabs(result)>=DBL_MAX )
+			{
+				newDataPoint->Print();
+				myPhaseSpaceBoundary->Print();
+				//exit(0);
+			}
 		}
 		else if( generateFunc == true )
 		{
@@ -238,6 +254,10 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 	}
 
 	if( result < 0 ) result = 0.;
+
+	if( fabs(result) >= DBL_MAX ) result = 0.;
+	if( isnan(result) ) result = 0.;
+
 	newDataPoint->ClearPsuedoObservable();
 	return result;
 }

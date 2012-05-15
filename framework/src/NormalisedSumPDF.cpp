@@ -40,8 +40,8 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 {
 	firstIntegrator->SetPDF( firstPDF );
 	secondIntegrator->SetPDF( secondPDF );
-	firstPDF->AssociateIntegrator( firstIntegrator );
-	secondPDF->AssociateIntegrator( secondIntegrator );
+	//firstPDF->AssociateIntegrator( firstIntegrator );
+	//secondPDF->AssociateIntegrator( secondIntegrator );
 	firstIntegrator->ForceTestStatus( true );
 	secondIntegrator->ForceTestStatus( true );
 
@@ -213,10 +213,14 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 	double termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / firstIntegral;
 	double termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
 
-	//cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+	if( isnan(termOne) || isnan(termTwo) )
+	{
+		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 
-	//cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
+		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
+		exit(0);
+	}
 	//Return the sum
 	return termOne + termTwo;
 }
@@ -241,6 +245,13 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	//Get the PDFs' values, normalised and weighted by firstFraction
 	double termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / firstIntegral;
 	double termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+
+	if( isnan(termOne) || isnan(termTwo) )
+	{
+		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+
+		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
+	}
 
 	//Return the sum
 	return termOne + termTwo;

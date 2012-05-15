@@ -71,11 +71,12 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 //Create the minimiser and fit function
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, PhysicsBottle * Bottle )
 {
-
 	IMinimiser * minimiser = MinimiserConfig->GetMinimiser( int(Bottle->GetParameterSet()->GetAllNames().size()) );
+	cout << endl;
 
 	FitFunction * theFunction = FunctionConfig->GetFitFunction();
 	theFunction->SetPhysicsBottle(Bottle);
+	cout << endl;
 
 	FitResult* result = DoFit( minimiser, theFunction );
 
