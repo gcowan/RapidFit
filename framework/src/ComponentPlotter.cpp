@@ -174,6 +174,8 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 	{
 		cout << "Constructing PDF Integral of: " << observableName << " Combination: " << combinationIndex+1 << " of " << allCombinations.size() << ". For component: " << component_str <<" .\t";
 
+		allCombinations[combinationIndex]->SetPhaseSpaceBoundary( full_boundary );
+
 		//cout << "Combination: " << combinationIndex+1 << " is defined as:" << endl; allCombinations[combinationIndex]->Print();
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

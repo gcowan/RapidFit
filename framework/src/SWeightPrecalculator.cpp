@@ -88,8 +88,11 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
 	{
 		//Calculate the sWeight
-		double numerator = double( ( matrixElements.first * signalValues[unsigned(eventIndex)] ) + ( matrixElements.second * backgroundValues[unsigned(eventIndex)] ) );
-		double denominator = double( ( double(numberSignalEvents) * signalValues[unsigned(eventIndex)] ) + ( double(numberBackgroundEvents) * backgroundValues[unsigned(eventIndex)] ) );
+		double numerator = double( ( matrixElements.first * signalValues[unsigned(eventIndex)] )
+				+ ( matrixElements.second * backgroundValues[unsigned(eventIndex)] ) );
+
+		double denominator = double( ( double(numberSignalEvents) * signalValues[unsigned(eventIndex)] )
+				+ ( double(numberBackgroundEvents) * backgroundValues[unsigned(eventIndex)] ) );
 
 		//Make the new data point
 		DataPoint * currentEvent = InputData->GetDataPoint(eventIndex);

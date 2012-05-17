@@ -1473,7 +1473,6 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 			else
 			{
 				returnable_SUMPDF = new SumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
-				delete componentPDFs[0]; delete componentPDFs[1];
 			}
 		}
 		else
@@ -1490,6 +1489,8 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 
 	returnable_SUMPDF->SetName( "Sum" );
 	returnable_SUMPDF->SetLabel( "Sum_("+componentPDFs[0]->GetLabel()+")v("+componentPDFs[1]->GetLabel()+")" );
+
+	delete componentPDFs[0]; delete componentPDFs[1];
 	//	returnable_SUMPDF->SetRandomFunction( GetSeed() );
 	return returnable_SUMPDF;
 }
@@ -1528,7 +1529,6 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 			else
 			{
 				returnable_NormPDF =  new NormalisedSumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
-				delete componentPDFs[0]; delete componentPDFs[1];
 			}
 		}
 		else
@@ -1545,6 +1545,8 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 
 	returnable_NormPDF->SetName( "NormalisedSum" );
 	returnable_NormPDF->SetLabel( "NormalisedSum_("+componentPDFs[0]->GetLabel()+")v("+componentPDFs[1]->GetLabel()+")" );
+
+	delete componentPDFs[0]; delete componentPDFs[1];
 	//	returnable_NormPDF->SetRandomFunction( GetSeed() );
 	return returnable_NormPDF;
 }
@@ -1569,7 +1571,6 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		if ( componentPDFs.size() == 2 )
 		{
 			returnable_ProdPDF = new ProdPDF( componentPDFs[0], componentPDFs[1] );
-			delete componentPDFs[0]; delete componentPDFs[1];
 		}
 		else
 		{
@@ -1585,6 +1586,8 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 
 	returnable_ProdPDF->SetName( "Prod" );
 	returnable_ProdPDF->SetLabel( "Prod["+componentPDFs[0]->GetLabel()+"]x["+componentPDFs[1]->GetLabel()+"]" );
+
+	delete componentPDFs[0]; delete componentPDFs[1];
 	//	returnable_ProdPDF->SetRandomFunction( GetSeed() );
 	return returnable_ProdPDF;
 }
