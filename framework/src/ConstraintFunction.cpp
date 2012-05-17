@@ -18,17 +18,35 @@
 using namespace::std;
 
 //Constructor with correct arguments
-ConstraintFunction::ConstraintFunction( vector< ExternalConstraint* > NewConstraints ) : Found_Position(), allConstraints(NewConstraints)
+ConstraintFunction::ConstraintFunction( const vector< ExternalConstraint* > NewConstraints ) : Found_Position(), allConstraints()
 {
+	for( vector<ExternalConstraint*>::const_iterator const_i = NewConstraints.begin(); const_i != NewConstraints.end(); ++const_i )
+	{
+		allConstraints.push_back( new ExternalConstraint( *(*const_i) ) );
+	}
 }
+
+ConstraintFunction::ConstraintFunction( const ConstraintFunction& input ) : Found_Position( input.Found_Position ), allConstraints()
+{
+	for( vector<ExternalConstraint*>::const_iterator const_i = input.allConstraints.begin(); const_i != input.allConstraints.end(); ++const_i )
+	{
+		allConstraints.push_back( new ExternalConstraint( *(*const_i) ) );
+	}
+}
+
 
 //Destructor
 ConstraintFunction::~ConstraintFunction()
 {
+	while( !allConstraints.empty() )
+	{
+		if( allConstraints.back() != NULL ) delete allConstraints.back();
+		allConstraints.pop_back();
+	}
 }
 
 //Perform the constraint calculation
-double ConstraintFunction::Evaluate( ParameterSet * NewParameters )
+double ConstraintFunction::Evaluate( const ParameterSet * NewParameters )
 {
 	vector<string> parameterNames = NewParameters->GetAllNames();
 	double constraintValue = 0.0;

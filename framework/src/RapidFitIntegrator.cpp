@@ -200,7 +200,18 @@ double RapidFitIntegrator::TestIntegral( DataPoint * NewDataPoint, PhaseSpaceBou
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 
 	double testIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
-	double numericalIntegral = this->NumericallyIntegratePhaseSpace( NewBoundary, dontIntegrate );
+	double numericalIntegral = 0.;
+
+	int NumberCombinations = NewBoundary->GetNumberCombinations();
+
+	if( NumberCombinations == 1 || NumberCombinations == 0 )
+	{
+		numericalIntegral = this->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, dontIntegrate );
+	}
+	else
+	{
+		numericalIntegral = this->NumericallyIntegratePhaseSpace( NewBoundary, dontIntegrate );
+	}
 
 	//Check if the function has an integrate method
 	if( testIntegral > 0.0 )
@@ -366,6 +377,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			{
 				numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
 			}
+
 			if( !haveTestedIntegral )
 			{
 				double testIntegral = functionToWrap->Integral( *dataPoint_i, const_cast<PhaseSpaceBoundary*>(NewBoundary) );

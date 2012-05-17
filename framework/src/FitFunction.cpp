@@ -69,7 +69,7 @@ FitFunction::~FitFunction()
 	}
 }
 
-void FitFunction::SetupTrace( TString FileName, int traceNum )
+void FitFunction::SetupTrace( const TString FileName, const int traceNum )
 {
 	//	Create the output file
 	Fit_File = new TFile( FileName, "UPDATE" );
@@ -96,9 +96,9 @@ void FitFunction::SetupTrace( TString FileName, int traceNum )
 }
 
 //Set the physics bottle to fit with
-void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
+void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 {
-	allData = NewBottle;
+	allData = new PhysicsBottle( *NewBottle );
 
 	//Initialise the integrators
 	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); ++resultIndex )
@@ -108,6 +108,7 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 		allIntegrators.push_back( resultIntegrator );
 
 		allIntegrators.back()->ForceTestStatus( false );
+		if( testIntegrator == false ) allIntegrators.back()->ForceTestStatus( true );
 		double someval = allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
 		(void) someval;
 
@@ -134,13 +135,13 @@ void FitFunction::SetPhysicsBottle( PhysicsBottle * NewBottle )
 }
 
 //Return the physics bottle
-PhysicsBottle* FitFunction::GetPhysicsBottle()
+PhysicsBottle* FitFunction::GetPhysicsBottle() const
 {
 	return allData;
 }
 
 // Get and set the fit parameters
-bool FitFunction::SetParameterSet( ParameterSet * NewParameters )
+bool FitFunction::SetParameterSet( const ParameterSet * NewParameters )
 {
 	bool result = allData->SetParameterSet(NewParameters);
 
@@ -151,11 +152,11 @@ bool FitFunction::SetParameterSet( ParameterSet * NewParameters )
         	{
 			allData->SetParameterSet( NewParameters );
 
-			allData->GetResultPDF( resultIndex )->UpdatePhysicsParameters( NewParameters );
+			allData->GetResultPDF( resultIndex )->UpdatePhysicsParameters( allData->GetParameterSet() );
 
 			for( int i=0; i< Threads; ++i )
 			{
-				stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UpdatePhysicsParameters( NewParameters );
+				stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UpdatePhysicsParameters( allData->GetParameterSet() );
 				stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UnsetCache();
 			}
 		}
@@ -164,7 +165,7 @@ bool FitFunction::SetParameterSet( ParameterSet * NewParameters )
 	return result;
 }
 
-ParameterSet * FitFunction::GetParameterSet()
+ParameterSet * FitFunction::GetParameterSet() const
 {
 	return allData->GetParameterSet();
 }
@@ -236,20 +237,20 @@ double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, Rap
 }
 
 //Return the Up value for error calculation
-double FitFunction::UpErrorValue( int Sigma )
+double FitFunction::UpErrorValue( const int Sigma )
 {
 	(void)Sigma;
 	return 1.0;
 }
 
 //Set the FitFunction to use per-event weights
-void FitFunction::UseEventWeights( string WeightName )
+void FitFunction::UseEventWeights( const string WeightName )
 {
 	useWeights = true;
 	weightObservableName = WeightName;
 }
 
-void FitFunction::SetThreads( int input )
+void FitFunction::SetThreads( const int input )
 {
 	Threads = input;
 	//      Get the number of cores on the compile machine
@@ -266,12 +267,12 @@ int FitFunction::GetThreads() const
 	return Threads;
 }
 
-void FitFunction::SetIntegratorTest( bool input )
+void FitFunction::SetIntegratorTest( const bool input )
 {
 	testIntegrator = input;
 }
 
-void FitFunction::SetUseWeightsSquared( bool Input )
+void FitFunction::SetUseWeightsSquared( const bool Input )
 {
 	weightsSquared = Input;
 }

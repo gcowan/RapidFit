@@ -55,7 +55,7 @@ BasePDF::~BasePDF()
 	if( DiscreteCaches != NULL ) delete DiscreteCaches;
 }
 
-void BasePDF::SetCopyConstructor( CopyPDF_t* input )
+void BasePDF::SetCopyConstructor( const CopyPDF_t* input ) const
 {
 	copy_object = input;
 }
@@ -126,13 +126,13 @@ void BasePDF::SetCache( double input, DataPoint* InputPoint, PhaseSpaceBoundary*
 
 void BasePDF::CheckCaches( PhaseSpaceBoundary* InputBoundary )
 {
-	/*!                                                   
+	/*!
 	 * If the internal Caches don't match re-allocate the whole array to be -1
-	 */                                                   
+	 */
 	unsigned int totalCombinations = InputBoundary->GetNumberCombinations();
 	//cout << "I have: " << DiscreteCaches->size() << " I want : " << totalCombinations << endl;
-	if( DiscreteCaches->size() != totalCombinations )  
-	{                                                     
+	if( DiscreteCaches->size() != totalCombinations )
+	{
 		//cout << "Resizing!" << endl;
 		DiscreteCaches->resize( totalCombinations );
 		//cout << "Unsetting!" << endl;
@@ -153,15 +153,15 @@ void BasePDF::UnsetCache()
 void BasePDF::UpdatePhysicsParameters( ParameterSet* Input )
 {
 	if( allParameters.GetAllNames().size() != 0 )
-	{                                 
-		allParameters.SetPhysicsParameters( Input );                                                                                                                                                               
-	}                                 
-	else                              
-	{                                 
+	{
+		allParameters.SetPhysicsParameters( Input );
+	}
+	else
+	{
 		allParameters.AddPhysicsParameters( Input );
-	}                                 
+	}
 
-	//Invalidate the cache            
+	//Invalidate the cache
 	this->UnsetCache();
 
 	this->SetPhysicsParameters( Input );
@@ -387,7 +387,7 @@ int BasePDF::GetSeedNum() const
 }
 
 //	Set the Status of a cache for the MC generator associated with this PDF
-void BasePDF::SetMCCacheStatus( bool newStatus)	
+void BasePDF::SetMCCacheStatus( bool newStatus)
 {
 	if( (newStatus == false) && hasCachedMCGenerator )
 	{

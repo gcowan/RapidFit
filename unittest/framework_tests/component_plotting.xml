@@ -161,7 +161,7 @@
 		<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
 		<Threads>10</Threads>
 		#<Strategy>Petes</Strategy>
-		<SetIntegratorTest>False</SetIntegratorTest>
+		#<SetIntegratorTest>False</SetIntegratorTest>
 	</FitFunction>
 
 

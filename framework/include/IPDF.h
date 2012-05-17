@@ -40,7 +40,7 @@ typedef IPDF* CreatePDF_t( PDFConfigurator* );
 /*!
  * @brief typedef for the class-factory objects which actually copy a new class instances into memory
  */
-typedef IPDF* CopyPDF_t( IPDF& );
+typedef IPDF* CopyPDF_t( const IPDF& );
 
 class IPDF
 {
@@ -269,7 +269,7 @@ class IPDF
 		 * Interface Function:
 		 * Give the PDF a pointer to the template of it's copy constructor object
 		 */
-		virtual void SetCopyConstructor( CopyPDF_t* ) = 0;
+		virtual void SetCopyConstructor( const CopyPDF_t* ) const = 0;
 
 		/*!
 		 * Interface Function:
@@ -321,7 +321,7 @@ class IPDF
 	extern "C" IPDF* CreatePDF_##X() {\
 		return (IPDF*) new X();\
 	}\
-extern "C" IPDF* CopyPDF_##X( IPDF& input ) { \
+extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
 	return (IPDF*) new X( (X&) input ); \
 }
 
@@ -340,7 +340,7 @@ extern "C" IPDF* CopyPDF_##X( IPDF& input ) { \
 		thisObject->SetConfigurator( config );\
 		return thisObject;\
 	} \
-extern "C" IPDF* CopyPDF_##X( IPDF& input ) { \
+extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
 	return (IPDF*) new X( (X&) input ); \
 }
 

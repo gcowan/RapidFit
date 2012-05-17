@@ -123,27 +123,30 @@ void MinuitWrapper::SetupFit( FitFunction* NewFunction )
 
 		//cout << "STEP SIZE:" << allNames[nameIndex] << "\t"<<nameIndex << "\t"<<STEP_SIZE <<endl;
 
-		//Make bounded or unbounded parameters
-		if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
+		if( newParameter->GetType() != "Fixed" )
 		{
-			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE, 0.0, 0.0, errorFlag);
-		}
-		else
-		{
-			minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE,
-					newParameter->GetMinimum(), newParameter->GetMaximum(), errorFlag);
+			//Make bounded or unbounded parameters
+			if ( newParameter->GetType() == "Unbounded" || newParameter->GetType() == "GaussianConstrained" )
+			{
+				minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE, 0.0, 0.0, errorFlag);
+			}
+			else
+			{
+				minuit->mnparm(nameIndex, allNames[nameIndex], newParameter->GetBlindedValue(), STEP_SIZE,
+						newParameter->GetMinimum(), newParameter->GetMaximum(), errorFlag);
+			}
 		}
 
 		//Fix the parameter if required
-		if ( newParameter->GetType() == "Fixed" )
-		{
-			minuit->FixParameter( nameIndex );
-		}
-		else
-		{
-			//	Released on Construction
-			//minuit->Release( nameIndex );
-		}
+		//if ( newParameter->GetType() == "Fixed" )
+		//{
+		//	minuit->FixParameter( nameIndex );
+		//}
+		//else
+		//{
+		//	Released on Construction
+		//minuit->Release( nameIndex );
+		//}
 	}
 
 	//      Syntax for Minuit Commands through the TMinuit Class:
@@ -182,9 +185,16 @@ void MinuitWrapper::FixParameters( vector<double> fix_values, vector<string> Par
 void MinuitWrapper::CallHesse()
 {
 	double arguments[2];
+	int errorFlag=0;
 	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
-        arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE
-        int errorFlag=0;
+	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
+	//      Now Do the minimisation
+	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
+
+	//      Now Do the minimisation
+	//              minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
+	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
+	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE
 	minuit->mnexcm("HESSE", arguments, 2, errorFlag);
 }
 
@@ -294,28 +304,28 @@ void MinuitWrapper::Minimise()
 ResultParameterSet* MinuitWrapper::GetResultParameters( vector<string> allNames, ParameterSet* newParameters )
 {
 	//Get the fitted parameters
-        ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
-        for( unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
-        {
-                string parameterName = allNames[nameIndex];
-                double parameterValue = 0.0;
-                double parameterError = 0.0;
-                double xlolim = 0.0;
-                double xuplim = 0.0;
-                int iuint = 0;
-                TString temporaryString;
-                minuit->mnpout( nameIndex, temporaryString, parameterValue, parameterError, xlolim, xuplim, iuint );
-         
-                PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
-                fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
-                                xlolim, xuplim, oldParameter->GetType(), oldParameter->GetUnit() );
-        }
+	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
+	for( unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
+	{
+		string parameterName = allNames[nameIndex];
+		double parameterValue = 0.0;
+		double parameterError = 0.0;
+		double xlolim = 0.0;
+		double xuplim = 0.0;
+		int iuint = 0;
+		TString temporaryString;
+		minuit->mnpout( nameIndex, temporaryString, parameterValue, parameterError, xlolim, xuplim, iuint );
+
+		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
+		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
+				xlolim, xuplim, oldParameter->GetType(), oldParameter->GetUnit() );
+	}
 	return fittedParameters;
 }
 
 RapidFitMatrix* MinuitWrapper::GetCovarianceMatrix()
 {
-	unsigned int numParams = (unsigned)function->GetParameterSet()->GetAllNames().size();
+	unsigned int numParams = (unsigned)function->GetParameterSet()->GetAllFloatNames().size();
 	/*!
 	 * This section of code causes some minor warnings against old c++ standards, but the behaviour here, explicitly requires the matrix to be allocated this way
 	 *
@@ -343,7 +353,7 @@ RapidFitMatrix* MinuitWrapper::GetCovarianceMatrix()
 
 	thisCovMatrix->thisMatrix = covMatrix;
 
-	thisCovMatrix->theseParameters = function->GetParameterSet()->GetAllNames();
+	thisCovMatrix->theseParameters = function->GetParameterSet()->GetAllFloatNames();
 
 	return thisCovMatrix;
 }
@@ -462,9 +472,8 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	//	cout << xval[i] << "  " << ((double*)xval)[i] << endl;
 	//}
 
-	ParameterSet* test = new ParameterSet( function->GetParameterSet()->GetAllNames() );
-	test->SetTrusted( false );
-	if( test->SetPhysicsParameters( (double*)xval ) == true )
+	ParameterSet* test = function->GetParameterSet();
+	if( test->SetPhysicsParameters( (double*)xval, npar ) == true )
 	{
 		function->SetParameterSet( test );
 		fval = function->Evaluate();
@@ -472,8 +481,8 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	else
 	{
 		cerr << "Failed to set physics parameters" << endl;
+		throw(-99999);
 	}
-	delete test;
 }
 
 //Return the result of minimisation

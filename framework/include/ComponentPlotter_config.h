@@ -1,6 +1,11 @@
+/*!
+ *
+ * @brief This Class Contains all of the information to configure the plots and Projections which should be performed
+ *
+ * @author Robert Currie rcurrie@cern.ch
+ */
 
 #pragma once
-
 #ifndef COMP_PLOTTER_CONFIG_H
 #define COMP_PLOTTER_CONFIG_H
 

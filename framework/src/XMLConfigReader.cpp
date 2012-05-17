@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
 #include "XMLConfigReader.h"
@@ -359,7 +359,7 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 	{
 		returnable_config->observableName = CompTag->GetValue()[0];
 		if( CompTag->GetName() == "Projection" ) returnable_config->OnlyZero = true;
-		else returnable_config->OnlyZero = false; 
+		else returnable_config->OnlyZero = false;
 	}
 	else
 	{
@@ -388,8 +388,8 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 			else if( projComps[childIndex]->GetName() == "WidthKey" )
 			{
 				vector<string> widths = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-                                if( widths.empty() ) returnable_config->width_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
-                                for( vector<string>::iterator width_i = widths.begin(); width_i != widths.end(); ++width_i ) returnable_config->width_key.push_back( atoi( width_i->c_str() ) );
+				if( widths.empty() ) returnable_config->width_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
+				for( vector<string>::iterator width_i = widths.begin(); width_i != widths.end(); ++width_i ) returnable_config->width_key.push_back( atoi( width_i->c_str() ) );
 			}
 			else if( projComps[childIndex]->GetName() == "ColorKey" )
 			{
@@ -417,7 +417,7 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 				returnable_config->xmax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
 			}
 			else if( projComps[childIndex]->GetName() == "Xmin" )
-			{	
+			{
 				returnable_config->xmin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
 			}
 			else if( projComps[childIndex]->GetName() == "Ymax" )
@@ -812,7 +812,13 @@ ConstraintFunction * XMLConfigReader::GetConstraintFunction( XMLTag * InputTag )
 			}
 		}
 
-		return new ConstraintFunction(constraints);
+		ConstraintFunction* returnable = new ConstraintFunction(constraints);
+		while( !constraints.empty() )
+		{
+			if( constraints.back() != NULL ) delete constraints.back();
+			constraints.pop_back();
+		}
+		return returnable;
 	}
 	else
 	{
@@ -1457,7 +1463,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		}
 
 		//Check there are two component PDFs to sum
-		if ( componentPDFs.size() == 2 )
+		if( componentPDFs.size() == 2 )
 		{
 			if ( fractionName == "unspecified" )
 			{

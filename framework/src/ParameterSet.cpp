@@ -13,12 +13,12 @@
 #include "ParameterSet.h"
 //	System Headers
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <sstream>
 
 using namespace::std;
 
-ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), allNames(), trusted_set(), trusted( false )
+ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), allNames(), trusted_set(), trusted( false ), uniqueID(0)
 {
 	for( vector<ParameterSet*>::iterator set_i = input.begin(); set_i != input.end(); ++set_i )
 	{
@@ -44,9 +44,10 @@ ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), all
 			}
 		}
 	}
+	uniqueID = reinterpret_cast<size_t>(this);
 }
 
-ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames), trusted_set(), trusted( false )
+ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames), trusted_set(), trusted( false ), uniqueID(0)
 {
 	vector<PhysicsParameter*>::const_iterator param_i = input.allParameters.begin();
 	for( ; param_i != input.allParameters.end(); ++param_i )
@@ -54,6 +55,7 @@ ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNa
 		allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
 	}
 	vector<string>::const_iterator name_i = allNames.begin();
+	uniqueID = reinterpret_cast<size_t>(this);
 }
 
 ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
@@ -175,9 +177,12 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter( const string Name ) const
 
 PhysicsParameter* ParameterSet::GetPhysicsParameter( const ObservableRef& object ) const
 {
+	if( object.GetExternalID() != uniqueID ) object.SetIndex(-1);
+
 	if( object.GetIndex() < 0 )
 	{
 		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef() ) );
+		object.SetExternalID( uniqueID );
 		if( object.GetIndex() >= 0 )
 		{
 			//      This has to be here to ensure that badly constructed parameters don't cause headaches!
@@ -336,6 +341,7 @@ bool ParameterSet::AddPhysicsParameter( PhysicsParameter* NewParameter, bool rep
 
 		}
 	}
+	++uniqueID;
 	return true;
 }
 
@@ -360,16 +366,28 @@ bool ParameterSet::AddPhysicsParameters( ParameterSet * NewParameterSet, bool re
 			}
 		}
 	}
+	++uniqueID;
 	return true;
 }
 
 //Not very pleasant in OO terms, and unsafe. Quick however.
-bool ParameterSet::SetPhysicsParameters( double * NewValues )
+bool ParameterSet::SetPhysicsParameters( double* NewValues, int npar )
 {
-	unsigned int temp=0;
-	for( vector<PhysicsParameter*>::iterator parameterIndex = allParameters.begin(); parameterIndex != allParameters.end(); ++parameterIndex, ++temp )
+	if( npar <= -1 )
 	{
-		(*parameterIndex)->SetValue( NewValues[temp] );
+		unsigned int temp=0;
+		for( vector<PhysicsParameter*>::iterator parameterIndex = allParameters.begin(); parameterIndex != allParameters.end(); ++parameterIndex, ++temp )
+		{
+			(*parameterIndex)->SetValue( NewValues[temp] );
+		}
+	}
+	else
+	{
+		vector<PhysicsParameter*>::iterator parameterIndex = allParameters.begin();
+		for( unsigned int i=0; i< (unsigned) npar; ++i, ++parameterIndex )
+		{
+			(*parameterIndex)->SetValue( NewValues[i] );
+		}
 	}
 	return true;
 }
@@ -438,4 +456,36 @@ string ParameterSet::XML() const
 	return xml.str();
 }
 
+size_t ParameterSet::GetUniqueID() const
+{
+	return uniqueID;
+}
+
+void ParameterSet::SetUniqueID( size_t input )
+{
+	uniqueID = input;	
+}
+
+void ParameterSet::FloatedFirst()
+{
+	++uniqueID;
+	vector<string> floated = this->GetAllFloatNames();
+	vector<string> fixed = this->GetAllFixedNames();
+
+	vector<PhysicsParameter*> sorted_parameters;
+	vector<string> sorted_names;
+	for( vector<string>::iterator name_i = floated.begin(); name_i != floated.end(); ++name_i )
+	{
+		sorted_parameters.push_back( this->GetPhysicsParameter( *name_i ) );
+		sorted_names.push_back( *name_i );
+	}
+	for( vector<string>::iterator name_i = fixed.begin(); name_i != fixed.end(); ++name_i )
+	{
+		sorted_parameters.push_back( this->GetPhysicsParameter( *name_i ) );
+		sorted_names.push_back( *name_i );
+	}
+
+	allParameters = sorted_parameters;
+	allNames = sorted_names;
+}
 

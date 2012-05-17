@@ -40,7 +40,7 @@ class FitFunction
 		/*!
 		 * @brief Setup the Trace to record all of the output from the Minimiser
 		 */
-		void SetupTrace( TString FileName, int traceNum );
+		void SetupTrace( const TString FileName, const int traceNum );
 
 		/*!
 		 * @brief Set the Physics Bottle to be used
@@ -49,14 +49,14 @@ class FitFunction
 		 *
 		 * @return Void
 		 */
-		void SetPhysicsBottle( PhysicsBottle* Input );
+		void SetPhysicsBottle( const PhysicsBottle* Input );
 
 		/*!
 		 * @brief Get the Pointer to the Internal Physics Bottle
 		 *
 		 * @return Returns a pointer to the PhysicsBottle the FitFunction is using to Evaluate
 		 */
-		PhysicsBottle * GetPhysicsBottle();
+		PhysicsBottle * GetPhysicsBottle() const;
 
 		/*!
 		 * @brief Change/Update the ParameterSet
@@ -65,14 +65,14 @@ class FitFunction
 		 *
 		 * @return true Changed the ParameterSet with no problems, false there was an error (I don't think this can be trusted and this should be made void)
 		 */
-		bool SetParameterSet( ParameterSet* );
+		bool SetParameterSet( const ParameterSet* );
 
 		/*!
 		 * @brief Get a Pointer to the Internal Parameter Set
 		 *
 		 * @return Returns a pointer to the Internal ParameterSet
 		 */
-		ParameterSet * GetParameterSet();
+		ParameterSet * GetParameterSet() const;
 
 		/*!
 		 * @brief Evaluate the FitFunction
@@ -88,7 +88,7 @@ class FitFunction
 		 *
 		 * @return Void
 		 */
-		void UseEventWeights( string Name );
+		void UseEventWeights( const string Name );
 
 		/*!
 		 * @brief Return if Weights were used as part of the analysis
@@ -104,7 +104,7 @@ class FitFunction
 		 *
 		 * @return Void
 		 */
-		void SetUseWeightsSquared( bool Input );
+		void SetUseWeightsSquared( const bool Input );
 
 		/*!
 		 * @brief Set the Number of threads to be used by the FitFunction
@@ -113,7 +113,7 @@ class FitFunction
 		 *
 		 * @return Void
 		 */
-		void SetThreads( int Input );
+		void SetThreads( const int Input );
 
 		/*!
 		 * @brief Get the Number of threads this FitFunction is using
@@ -129,7 +129,7 @@ class FitFunction
 		 *
 		 * @return Void
 		 */
-		void SetIntegratorTest( bool Input );
+		void SetIntegratorTest( const bool Input );
 
 		/*!
 		 * @brief What size of step in the function defines the error, 0.5 for NLL, 1 for chi2... etc.
@@ -138,7 +138,7 @@ class FitFunction
 		 *
 		 * @return Returns the equivalent rise in the Function value that should be used to calculate the Error Value
 		 */
-		virtual double UpErrorValue( int n );
+		virtual double UpErrorValue( const int n );
 
 		virtual vector<string> ConstrainedParameter() const;
 

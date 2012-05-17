@@ -8,7 +8,7 @@
 
 using namespace::std;
 
-ObservableRef::ObservableRef( string ObsName ) : Observable_Name( ObsName ), Observable_Index(-1), Observable_Names(), Observable_Refs()
+ObservableRef::ObservableRef( string ObsName ) : Observable_Name( ObsName ), Observable_Index(-1), Observable_Names(), Observable_Refs(), externID(0)
 {
 }
 
@@ -24,13 +24,14 @@ ObservableRef& ObservableRef::operator= ( const ObservableRef& input )
 		{
 			this->Observable_Refs.push_back( ObservableRef( *obs_i ) );
 		}
+		this->externID = 0;
 	}
 
 	return *this;
 }
 
 ObservableRef::ObservableRef( const ObservableRef& input ) :
-	Observable_Name( input.Observable_Name ), Observable_Index( input.Observable_Index ), Observable_Names( input.Observable_Names ), Observable_Refs()
+	Observable_Name( input.Observable_Name ), Observable_Index( input.Observable_Index ), Observable_Names( input.Observable_Names ), Observable_Refs(), externID(0)
 {
 	for( vector<ObservableRef>::const_iterator obs_i = input.Observable_Refs.begin(); obs_i != input.Observable_Refs.end(); ++obs_i )
 	{
@@ -38,7 +39,7 @@ ObservableRef::ObservableRef( const ObservableRef& input ) :
 	}
 }
 
-ObservableRef::ObservableRef( vector<string> ObsList ) : Observable_Name(), Observable_Index(-2), Observable_Names(ObsList), Observable_Refs()
+ObservableRef::ObservableRef( vector<string> ObsList ) : Observable_Name(), Observable_Index(-2), Observable_Names(ObsList), Observable_Refs(), externID(0)
 {
 	for( vector<string>::iterator name_i=ObsList.begin(); name_i!=ObsList.end(); ++name_i )
 	{
@@ -87,5 +88,15 @@ void ObservableRef::Print() const
 	cout << "Name:\t" << Observable_Name << endl;
 	cout << "Index:\t" << Observable_Index << endl;
 	return;
+}
+
+void ObservableRef::SetExternalID( size_t input ) const
+{
+	externID = input;
+}
+
+size_t ObservableRef::GetExternalID() const
+{
+	return externID;
 }
 

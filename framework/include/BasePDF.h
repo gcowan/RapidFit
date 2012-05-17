@@ -69,24 +69,24 @@
  *             (This interfaces with the NumericalIntegrator class)
  *
  *          EvaluateForNumericGeneration( DataPoint* )
-*             (This interfaces with the Toy DataSet Generators like Foam)
-	*
-	*
-	*
-	*
-	* @author Benjamin M Wynne bwynne@cern.ch
-	* @author Robert Currie rcurrie@cern.ch
-	*
-	*/
+ *             (This interfaces with the Toy DataSet Generators like Foam)
+ *
+ *
+ *
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ *
+ */
 
 #pragma once
 #ifndef BASE_PDF_H
 #define BASE_PDF_H
 
-	///	ROOT Headers
+///	ROOT Headers
 #include "TRandom.h"
 #include "TRandom3.h"
-	///	RapidFit Headers
+///	RapidFit Headers
 #include "IPDF.h"
 #include "ObservableRef.h"
 #include "PDFConfigurator.h"
@@ -97,11 +97,9 @@
 #include <vector>
 #include <cmath>
 
-	using namespace::std;
+using namespace::std;
 
-	class RapidFitIntegrator;
-
-	class BasePDF : public IPDF
+class BasePDF : public IPDF
 {
 	public:
 		/*!
@@ -500,7 +498,7 @@
 		 *
 		 * @return Void
 		 */
-		void SetCopyConstructor( CopyPDF_t* Input );
+		void SetCopyConstructor( const CopyPDF_t* Input ) const;
 
 		/*!
 		 * @breif Get the pointer to the PDF copy constructor
@@ -563,6 +561,15 @@
 		 */
 		double GetCache( DataPoint*, PhaseSpaceBoundary* );
 
+		/*!
+		 * @brief This Checks the contents of the vector of caches.
+		 *
+		 * If it finds that this PhaseSpace requires a different number of caches it invalidates the current cache and resizes it
+		 *
+		 * @param InputBoundary This is the PhaseSpaceBoundary which contains all possible Data Combinations we want to cache a Normalisation for
+		 *
+		 * @return Void
+		 */
 		void CheckCaches( PhaseSpaceBoundary* InputBoundary );
 
 		/*!
@@ -652,7 +659,7 @@
 		 * Pointer to the 'on disk' copy constructor for this class
 		 * This means that the PDF only needs to look up it's own 'on disk' elements once
 		 */
-		CopyPDF_t* copy_object;
+		mutable CopyPDF_t* copy_object;
 
 		/*!
 		 * Does this PDF control the on disk TFoam cache

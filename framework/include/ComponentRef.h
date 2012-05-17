@@ -25,7 +25,7 @@ class ComponentRef
 		 *
 		 * @param Name   This is the full name of the Component
 		 */
-		ComponentRef( string Name );
+		ComponentRef( const string Name );
 
 		/*!
 		 * @brief Destructor
@@ -45,11 +45,13 @@ class ComponentRef
 		 *
 		 * @return Void
 		 */
-		void addSubComponent( string );
+		void addSubComponent( const string );
 
 		/*!
 		 * @brief Get the subComponentRef for this instance
 		 *        i.e. get the next link in the chain
+		 *
+		 * @warning This class will remove the object refrenced by this pointer on Destruction
 		 *
 		 * @return Returns the pointer to the CompoentRef internally stored by this object
 		 */
@@ -62,7 +64,7 @@ class ComponentRef
 		 *
 		 * @return Void
 		 */
-		void setComponentNumber( int Input );
+		void setComponentNumber( const int Input );
 
 		/*!
 		 * @brief get the component number in this ComponentRef

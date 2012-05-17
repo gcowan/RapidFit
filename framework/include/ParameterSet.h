@@ -162,7 +162,7 @@ class ParameterSet
 		 *
 		 * @return true = everything went as expected , false an error occurred (This is 'never' tested should this just be a void routine?)
 		 */
-		bool SetPhysicsParameters( double* Input );
+		bool SetPhysicsParameters( double* Input, int npar =-1 );
 
 		/*!
 		 * @brief This returns the Values of all of the Physics Parameters in a flat 1D double array
@@ -234,11 +234,18 @@ class ParameterSet
 		 */
 		string XML() const;
 
+		size_t GetUniqueID() const;
+
+		void FloatedFirst();
+
 	private:
+		void SetUniqueID( size_t );
+
 		vector<PhysicsParameter*> allParameters;	/*!	vector of pointers to all of the Physics Parameters managed by this ParameterSet			*/
 		vector<string> allNames;			/*!	vector of strings of the names of all of the Physics Parameters						*/
 		vector<ObservableRef*> trusted_set;		/*!	A vector of pointers to ObservableRef objects. If trusted==true then this is used			*/
 		bool trusted;					/*!	Is the ParameterSet trusted, i.e. from a section of code where ParameterSet has a fixed structure	*/
+		size_t uniqueID;
 };
 
 #endif

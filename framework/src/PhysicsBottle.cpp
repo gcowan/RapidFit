@@ -18,7 +18,7 @@
 using namespace::std;
 
 //Constructor with correct argument
-PhysicsBottle::PhysicsBottle( ParameterSet * NewParameters ) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(new ParameterSet( *NewParameters) )
+PhysicsBottle::PhysicsBottle( const ParameterSet * NewParameters ) : allPDFs(), allDataSets(), allConstraints(), bottleParameters(new ParameterSet( *NewParameters) )
 {
 }
 
@@ -45,31 +45,31 @@ PhysicsBottle::~PhysicsBottle()
 }
 
 //Store a PDF/dataset pair
-void PhysicsBottle::AddResult( IPDF * NewPDF, IDataSet * NewDataSet )
+void PhysicsBottle::AddResult( const IPDF * NewPDF, IDataSet * NewDataSet )
 {
 	allPDFs.push_back( ClassLookUp::CopyPDF(NewPDF) );
 	allDataSets.push_back( NewDataSet );
 }
 
 //Store a ConstraintFunction
-void PhysicsBottle::AddConstraint( ConstraintFunction * NewConstraint )
+void PhysicsBottle::AddConstraint( const ConstraintFunction * NewConstraint )
 {
-	allConstraints.push_back(NewConstraint);
+	allConstraints.push_back( new ConstraintFunction(*NewConstraint) );
 }
 
-vector< ConstraintFunction* > PhysicsBottle::GetConstraints()
+vector< ConstraintFunction* > PhysicsBottle::GetConstraints() const
 {
 	return allConstraints;
 }
 
 //Retrieve the number of results stored
-int PhysicsBottle::NumberResults()
+int PhysicsBottle::NumberResults() const
 {
 	return int(allPDFs.size());
 }
 
 //Retrieve the PDF corresponding to a particular result number
-IPDF * PhysicsBottle::GetResultPDF(int Index)
+IPDF * PhysicsBottle::GetResultPDF( const int Index ) const
 {
 	if ( Index < int(allPDFs.size()) )
 	{
@@ -84,7 +84,7 @@ IPDF * PhysicsBottle::GetResultPDF(int Index)
 }
 
 //Retrieve the data set corresponding to a particular result number
-IDataSet * PhysicsBottle::GetResultDataSet(int Index)
+IDataSet * PhysicsBottle::GetResultDataSet( const int Index ) const
 {
 	if ( Index < int(allDataSets.size()) )
 	{
@@ -98,13 +98,13 @@ IDataSet * PhysicsBottle::GetResultDataSet(int Index)
 }
 
 //Retrieve the parameter set
-ParameterSet * PhysicsBottle::GetParameterSet()
+ParameterSet * PhysicsBottle::GetParameterSet() const
 {
 	return bottleParameters;
 }
 
 //Change the parameter values
-bool PhysicsBottle::SetParameterSet(ParameterSet * NewParameters)
+bool PhysicsBottle::SetParameterSet( const ParameterSet * NewParameters )
 {
 	bottleParameters->SetPhysicsParameters( NewParameters );
 

@@ -106,6 +106,8 @@ class ComponentPlotter
 		 * @param Name          This is the Name of the Observable being Projected
 		 *
 		 * @param config        This is the object which carries configuration information from the XML to this class for projecting the data
+		 *
+		 * @warning This class will make copies of the PDF and config, however it will NOT make copies of the DataSet and file pointer which should always remain valid
 		 */
 		ComponentPlotter( IPDF* InputPDF, IDataSet* InputDataSet, TString PDFStr, TFile* filename, string Name, CompPlotter_config* config=NULL );
 
@@ -139,12 +141,16 @@ class ComponentPlotter
 		 *
 		 * Each Discrete Data SubSet has a Discretely different Set of Projections, hence the nested vector structure
 		 *
+		 * @warning This class will remove the objects when it is destroyed!
+		 *
 		 * @return This returns the pointers to the components plotted and stored in TGraphs
 		 */
 		vector<vector<TGraph*> > GetComponents();
 
 		/*!
 		 * @brief Get a vector of the different Data SubSets which correspond to unique Discrete Combinations, with the 0th component being all Data
+		 *
+		 * @warning This class will remove the objects when it is destoryed!
 		 *
 		 * @return This returns the Binned Data Subsets corresponding to the different configurations
 		 */

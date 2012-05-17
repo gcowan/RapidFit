@@ -1,5 +1,14 @@
 // $Id: release.notes $
 
+2012/05/17 Rob Currie
+   - Have Updated ObservableRef class to have a more dynamic cache
+   - The ObservableRef object now stores a size_t object which is unique for the class using it to store the result of lookup operations
+     For ParameterSet this unique size_t object is initialized to be extracted from the 'this' pointer at construction and is modified when the internal contents of the class change such as to cause the cache to be re-calculated
+   - This means that we now perform 2 integer comparisons instead of a string lookup operation in the best case, but we now correctly reference objects in the worst case too which is important
+   - Changed the MinuitWrapper class to only pass free or floated parameters (anything not 'Fixed') to Minuit. This appears to have removed warnings from within Hesse about a bad error matrix
+     This code still has to be called by using: <ConfigureMinimiser>TestNewErrors</ConfigureMinimiser> but should be much closer to the final version of the code to correct the errors/correlation matrix in weighted fits
+   - Added many more const definitions to the codebase which forces the scope/behaviour of several objects to be much clearer in the framework
+
 2012/05/15 Rob Currie
    - Fixed some 'not-fully-understood but kinda' bug in the way that ParameterSets are changed and associated with PDFs in RapidFit
    - Removed some of the functions from IPDF and BasePDF which are not useful in further attempt to make it easier to see what goes on in the BasePDF

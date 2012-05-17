@@ -95,7 +95,7 @@ void Foam::Init()
 		{
 			//      Generate unique name for this foam instance
 			TString Name("Foam-");
-			Name.Append(InputPDF->GetName());
+			Name.Append(InputPDF->GetLabel());
 			Name.Append("-");
 			Name+=combinationIndex;
 			Name.Append("_");Name+=rand;
@@ -151,7 +151,7 @@ void Foam::Init()
 
 				//      Generate unique name for this foam instance
 				TString Name("Foam-");
-				Name.Append(InputPDF->GetName());
+				Name.Append(InputPDF->GetLabel());
 				Name.Append("-");
 				Name+=combinationIndex;
 				Name.Append("_");Name+=rand;

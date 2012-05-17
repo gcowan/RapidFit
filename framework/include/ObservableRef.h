@@ -47,11 +47,16 @@ class ObservableRef
 
 		void Print() const;
 
+		void SetExternalID( size_t ) const;
+
+		size_t GetExternalID() const;
+
 	private:
 		string Observable_Name;
 		mutable int Observable_Index;
 		vector<string> Observable_Names;
 		vector<ObservableRef> Observable_Refs;
+		mutable size_t externID;
 };
 
 #endif

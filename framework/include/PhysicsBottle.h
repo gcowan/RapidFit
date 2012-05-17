@@ -26,7 +26,7 @@ class PhysicsBottle
 		 *
 		 * @param InputSet    This is the ParameterSet which is used by the PhysicsBottle
 		 */
-		PhysicsBottle( ParameterSet* );
+		PhysicsBottle( const ParameterSet* );
 
 		/*!
 		 * @brief Destructor
@@ -36,24 +36,24 @@ class PhysicsBottle
 		/*!
 		 * @brief Copy Constructor
 		 */
-		PhysicsBottle(const PhysicsBottle&);
+		PhysicsBottle( const PhysicsBottle& );
 
 
-		void AddResult( IPDF*, IDataSet* );
+		void AddResult( const IPDF*, IDataSet* );
 
-		void AddConstraint( ConstraintFunction* );
+		void AddConstraint( const ConstraintFunction* );
 
-		int NumberResults();
+		int NumberResults() const;
 
-		IPDF* GetResultPDF(int);
+		IPDF* GetResultPDF( const int ) const;
 
-		IDataSet* GetResultDataSet(int);
+		IDataSet* GetResultDataSet( const int ) const;
 
-		vector< ConstraintFunction* > GetConstraints();
+		vector< ConstraintFunction* > GetConstraints() const;
 
-		ParameterSet * GetParameterSet();
+		ParameterSet * GetParameterSet() const;
 
-		bool SetParameterSet( ParameterSet* );
+		bool SetParameterSet( const ParameterSet* );
 
 	private:
 		/*!

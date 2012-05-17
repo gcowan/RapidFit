@@ -32,6 +32,8 @@ class AcceptReject : public IDataGenerator
 		 * @param InputPhaseSpace This is the PhaseSpace that is to be filled
 		 *
 		 * @param InputPDF This is the PDF to be evaluated in the PhaseSpace
+		 * 
+		 * @warning Neither of the Objects are copied by the class and it only ever refrences them!
 		 */
 		AcceptReject( PhaseSpaceBoundary* InputPhaseSpace, IPDF* InputPDF );
 
@@ -52,6 +54,8 @@ class AcceptReject : public IDataGenerator
 		/*!
 		 * @brief Interface Function to get a pointer to this dataset that has been generated
 		 * 
+		 * @warning This class does not delete the object refrenced by this pointer
+		 *
 		 * @return This passes the IDataSet to some external function, gives all control
 		 */
 		virtual IDataSet * GetDataSet() const;

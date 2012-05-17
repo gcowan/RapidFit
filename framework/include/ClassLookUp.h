@@ -48,7 +48,7 @@ class ClassLookUp
 		 *
 		 * @return a pointer to a new IPDF instance which is a copy of the input PDF to the highest derived instance
 		 */
-		static IPDF* CopyPDF( IPDF* InputPDF );
+		static IPDF* CopyPDF( const IPDF* InputPDF );
 
 		/*!
 		 * @brief Function to return a named FitFunction by using a standard string comparison

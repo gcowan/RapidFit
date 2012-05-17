@@ -97,6 +97,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	ParameterSet* checkedBottleParameters = CheckInputParams( BottleParameters, allPDFs );
 
+	checkedBottleParameters->FloatedFirst();
+
 	ParameterSet* checkedGenerationParameters = GenerationParameters( checkedBottleParameters, BottleParameters );
 
 	PhysicsBottle * bottle = new PhysicsBottle( checkedBottleParameters );
@@ -121,6 +123,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	delete checkedBottleParameters;
 
 	FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );
+
+	delete bottle;
 
 	return result;
 }
@@ -432,6 +436,7 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 
 		PhysicsBottle* Bad_Bottle = new PhysicsBottle( BottleParameters );
 		ReturnableFitResult = new FitResult( LLSCAN_FIT_FAILURE_VALUE, DummyFitResults, status, Bad_Bottle );
+		delete Bad_Bottle;
 	}
 
 	return ReturnableFitResult;

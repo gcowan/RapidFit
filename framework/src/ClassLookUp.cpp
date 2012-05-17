@@ -130,7 +130,7 @@ IPDF* ClassLookUp::LookUpPDFName( string Name, PDFConfigurator* configurator )
 	return returnable_PDF;
 }
 
-IPDF* ClassLookUp::CopyPDF( IPDF* inputPDF )
+IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 {
 	IPDF* returnable_PDF=NULL;
 

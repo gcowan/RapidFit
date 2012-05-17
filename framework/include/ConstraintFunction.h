@@ -26,7 +26,9 @@ class ConstraintFunction
 		 *
 		 * @param Input   This is a list of the ExternalConstraints of parameters in the ParameterSet around their minima
 		 */
-		ConstraintFunction( vector< ExternalConstraint* > Input );
+		ConstraintFunction( const vector<ExternalConstraint*> Input );
+
+		ConstraintFunction( const ConstraintFunction& );
 
 		/*!
 		 * @brief Detructor
@@ -40,7 +42,7 @@ class ConstraintFunction
 		 *
 		 * @return This returns a correction number which is +ve and is the effect of where parameters fall in these constraints
 		 */
-		double Evaluate( ParameterSet* Input );
+		double Evaluate( const ParameterSet* Input );
 
 		/*!
 		 * @brief Output some debugging info
@@ -58,11 +60,6 @@ class ConstraintFunction
 
 		vector<string> ConstrainedParameter() const;
 	private:
-		/*!
-		 * Don't Copy the class this way!
-		 */
-		ConstraintFunction ( const ConstraintFunction& );
-
 		/*!
 		 * Don't Copy the class this way!
 		 */

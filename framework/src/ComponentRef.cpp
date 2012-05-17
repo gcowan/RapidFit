@@ -5,7 +5,7 @@
 
 using namespace::std;
 
-ComponentRef::ComponentRef( string input ) : thisSubComponent(NULL), thisIndex(-1), thisName( input )
+ComponentRef::ComponentRef( const string input ) : thisSubComponent(NULL), thisIndex(-1), thisName( input )
 {
 }
 
@@ -20,7 +20,7 @@ ComponentRef::ComponentRef( const ComponentRef& input ) :
 {
 }
 
-void ComponentRef::addSubComponent( string input )
+void ComponentRef::addSubComponent( const string input )
 {
 	if( thisSubComponent != NULL ) delete thisSubComponent;
 	thisSubComponent = new ComponentRef( input );
@@ -31,7 +31,7 @@ ComponentRef* ComponentRef::getSubComponent()
 	return thisSubComponent;
 }
 
-void ComponentRef::setComponentNumber( int input )
+void ComponentRef::setComponentNumber( const int input )
 {
 	thisIndex = input;
 }

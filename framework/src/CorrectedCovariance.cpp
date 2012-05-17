@@ -58,7 +58,7 @@ RapidFitMatrix* CorrectedCovariance::GetReducedMatrix( IMinimiser* thisMinimiser
 
 	//      Required Input
 	vector<string> RawFloatedParameterNames = fitResult->GetResultParameterSet()->GetAllFloatNames();
-	vector<string> ConstrainedParameters = thisMinimiser->GetFitFunction()->ConstrainedParameter();
+	vector<string> ConstrainedParameters = vector<string>();//thisMinimiser->GetFitFunction()->ConstrainedParameter();
 	vector<string> FloatedParameterNames;
 
 	for( unsigned int i=0; i< RawFloatedParameterNames.size(); ++i )
@@ -150,8 +150,8 @@ RapidFitMatrix* CorrectedCovariance::GetCorrectedCovarianceMatrix( IMinimiser* t
 	 * I take the matrix maths from the section starting at line 1128
 	 */
 
-	TMatrixDSym* V = Free_Covariance_Matrix_Weights_Squared->thisMatrix;
-	TMatrixDSym* C = Free_Covariance_Matrix->thisMatrix;
+	TMatrixDSym* C = Free_Covariance_Matrix_Weights_Squared->thisMatrix;
+	TMatrixDSym* V = Free_Covariance_Matrix->thisMatrix;
 
 	DumpMatrix( V );
 	cout << endl;
