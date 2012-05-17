@@ -1473,6 +1473,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 			else
 			{
 				returnable_SUMPDF = new SumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
+				delete componentPDFs[0]; delete componentPDFs[1];
 			}
 		}
 		else
@@ -1522,11 +1523,12 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		{
 			if ( fractionName == "unspecified" )
 			{
-				returnable_NormPDF = new NormalisedSumPDF( componentPDFs[0], componentPDFs[1], InputBoundary );
+				cerr << "Error Must Provide a FractionName for this PDF!\tNormalisedSum_(" << componentPDFs[0]->GetLabel()<<")v("<<componentPDFs[1]->GetLabel()<< ")" << endl;
 			}
 			else
 			{
 				returnable_NormPDF =  new NormalisedSumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
+				delete componentPDFs[0]; delete componentPDFs[1];
 			}
 		}
 		else
@@ -1567,6 +1569,7 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		if ( componentPDFs.size() == 2 )
 		{
 			returnable_ProdPDF = new ProdPDF( componentPDFs[0], componentPDFs[1] );
+			delete componentPDFs[0]; delete componentPDFs[1];
 		}
 		else
 		{

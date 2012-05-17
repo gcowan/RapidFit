@@ -45,6 +45,7 @@ class PDFConfigurator
 		bool hasConfigurationValue( string configParam, string val );
 		bool isTrue( string configParam );
 
+		string XML() const;
 
 	private:
 		//      Uncopyable This Way!

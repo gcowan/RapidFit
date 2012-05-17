@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2011/05/17 Rob Currie
+   - Updated Code to do with Error Corrections
+
 2012/05/17 Rob Currie
    - Have Updated ObservableRef class to have a more dynamic cache
    - The ObservableRef object now stores a size_t object which is unique for the class using it to store the result of lookup operations

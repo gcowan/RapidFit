@@ -154,13 +154,17 @@ IDataSet* DataSetConfiguration::FoamFile( vector<string> arguments, vector<strin
 {
 	string searchName = "FileName";
 	int fileNameIndex = StringProcessing::VectorContains( &ArgumentNames, &searchName );
+	string fileName;
 	if( fileNameIndex == -1 )
 	{
-		cerr << "We require a FileName to push the dataset to to process with the Interporator" << endl;
-		exit(56562);
+		fileName = "tempFile.root";
+		ArgumentNames.push_back( "FileName" );
+		arguments.push_back( fileName );
 	}
-
-	string fileName = arguments[fileNameIndex];
+	else
+	{
+		fileName = arguments[fileNameIndex];
+	}
 
 	string source="Foam";
 
@@ -180,7 +184,10 @@ IDataSet* DataSetConfiguration::FoamFile( vector<string> arguments, vector<strin
 
 	TotalFoamDataSet[0] = FileDataSet;
 
-	ResultFormatter::MakeRootDataFile( fileName, TotalFoamDataSet );
+	if( fileNameIndex != -1 )
+	{
+		ResultFormatter::MakeRootDataFile( fileName, TotalFoamDataSet );
+	}
 
 	return FileDataSet;
 }

@@ -213,7 +213,11 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 			weight = (*data_i)->GetObservable( thread_input->weightName )->GetValue();
 			pthread_mutex_lock( &eval_lock );
 			result *= weight;
-			if( thread_input->weightsSquared ) result *= weight;
+			if( thread_input->weightsSquared )
+			{
+				result *= weight;
+				//if( weight < 0 ) result *= -1.;
+			}
 			pthread_mutex_unlock( &eval_lock );
 		}
 

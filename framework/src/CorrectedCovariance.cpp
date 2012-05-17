@@ -150,8 +150,8 @@ RapidFitMatrix* CorrectedCovariance::GetCorrectedCovarianceMatrix( IMinimiser* t
 	 * I take the matrix maths from the section starting at line 1128
 	 */
 
-	TMatrixDSym* C = Free_Covariance_Matrix_Weights_Squared->thisMatrix;
-	TMatrixDSym* V = Free_Covariance_Matrix->thisMatrix;
+	TMatrixDSym* V = Free_Covariance_Matrix_Weights_Squared->thisMatrix;
+	TMatrixDSym* C = Free_Covariance_Matrix->thisMatrix;
 
 	DumpMatrix( V );
 	cout << endl;

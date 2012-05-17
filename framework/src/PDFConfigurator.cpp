@@ -9,13 +9,13 @@
  @date 2011-05-01
  */
 
+#include "PDFConfigurator.h"
+
 #include <iostream>
 #include <cstdlib>
 #include <vector>
 #include <string>
-#include <string.h>
-#include "PDFConfigurator.h"
-
+#include <sstream>
 
 using namespace::std;
 
@@ -160,4 +160,12 @@ bool PDFConfigurator::isTrue( string configParam ) {
 	}
 	return false ;
 }
+
+string PDFConfigurator::XML() const
+{
+	stringstream xml;
+
+	return xml.str();
+}
+
 
