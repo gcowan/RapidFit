@@ -308,6 +308,7 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 	//cerr.rdbuf(0);
 	//clog.rdbuf(0);
 	multiDimensionIntegrator->SetFunction( *quickFunction );
+
 	double output =  multiDimensionIntegrator->Integral( minima, maxima );
 
 	delete minima; delete maxima;
@@ -333,7 +334,7 @@ double RapidFitIntegrator::NumericallyIntegrateDataPoint( DataPoint* NewDataPoin
 }
 
 //Actually perform the numerical integration
-double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, const vector<string> DontIntegrateThese, ComponentRef* componentIndex, const bool IntegrateDataPoint )
+double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, const vector<string> DontIntegrateThese, ComponentRef* componentIndex, const bool IntegrateDataPoint )
 {
 	//Make lists of observables to integrate and not to integrate
 	vector<string> doIntegrate, dontIntegrate;
@@ -360,7 +361,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 	{
 		for( vector<DataPoint*>::iterator dataPoint_i = DiscreteIntegrals.begin(); dataPoint_i != DiscreteIntegrals.end(); ++dataPoint_i )
 		{
-			output_val += functionToWrap->Integral( *dataPoint_i, const_cast<PhaseSpaceBoundary*>(NewBoundary) );
+			output_val += functionToWrap->Integral( *dataPoint_i, NewBoundary );
 		}
 	}
 	else
@@ -380,7 +381,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 
 			if( !haveTestedIntegral )
 			{
-				double testIntegral = functionToWrap->Integral( *dataPoint_i, const_cast<PhaseSpaceBoundary*>(NewBoundary) );
+				double testIntegral = functionToWrap->Integral( *dataPoint_i, NewBoundary );
 				cout << "Integration Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
 				cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
 			}

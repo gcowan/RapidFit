@@ -31,8 +31,10 @@ extern RooMath* math_object;
 namespace Mathematics
 {
 	//	This comes up A LOT, save some CPU cycles and cache it!
+	static const double _pi = atan(1.0)*4.;;
 	static const double sqrt_2 = sqrt(2.);
 	static const double _over_sqrt_2 = 1./sqrt_2;
+	static const double _over_sqrt_2pi = 1./sqrt(2.*_pi);
 	static const double invpi=TMath::InvPi();
 	static const double global_frac = 0.28125 * invpi;
 	static const double third= 1./3.;
@@ -41,15 +43,17 @@ namespace Mathematics
 	static const double eightthird = 2.*fourthird;
 	static const double root_6 = sqrt(6.);
 	static const double root_3 = sqrt(3.);
-	static const double rootpi= sqrt(TMath::Pi()) ; //sqrt(atan2(0.,-1.));
-	static const double _pi = TMath::Pi();
+	static const double root_2 = sqrt(2.);
+	static const double rootpi= sqrt(_pi) ; //sqrt(atan2(0.,-1.));
 
 	inline double SQRT_2(){ return sqrt_2; }//=sqrt(2.);
 	inline double _Over_SQRT_2(){ return _over_sqrt_2; }// = 1./SQRT_2;
+	inline double _Over_SQRT_2PI(){ return _over_sqrt_2pi; }
 	inline double _Over_PI(){ return invpi; }// = TMath::InvPi();//1./TMath::Pi();
 	inline double Global_Frac(){ return global_frac; }// = 0.28125 * _Over_PI;
 	inline double Root_6(){ return root_6; }
 	inline double Root_3(){ return root_3; }
+	inline double Root_2(){ return root_2; }
 	inline double Third(){ return third; }
 	inline double TwoThird(){ return twothird; }
 	inline double FourThird(){ return fourthird; }

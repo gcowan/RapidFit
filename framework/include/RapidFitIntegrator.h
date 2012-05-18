@@ -266,7 +266,7 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-		double DoNumericalIntegral( const DataPoint* InputDataPoint, const PhaseSpaceBoundary* InputPhaseSpace, const vector<string> DoNotIntegrate, ComponentRef* InputRef = NULL, const bool decision = false );
+		double DoNumericalIntegral( const DataPoint* InputDataPoint, PhaseSpaceBoundary* InputPhaseSpace, const vector<string> DoNotIntegrate, ComponentRef* InputRef = NULL, const bool decision = false );
 
 
 		/*!
