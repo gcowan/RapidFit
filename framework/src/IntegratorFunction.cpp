@@ -43,7 +43,7 @@ IntegratorFunction::IntegratorFunction( IPDF * InputFunction, const DataPoint * 
 		currentPoint->GetObservable( *obs_i );
 		cache_lookup.push_back( obs_i->GetIndex() );
 	}
-	newDataPoint = new DataPoint( currentPoint->GetAllNames() );
+	newDataPoint = new DataPoint( *InputPoint );
 	newDataPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
 	currentPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
 }

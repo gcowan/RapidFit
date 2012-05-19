@@ -279,6 +279,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 		for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 		{
+			cout << "Projecting ToFit: " << resultIndex+1 << endl << endl;
 			vector<string> claimedObservables = resultBottle->GetResultPDF(resultIndex)->GetPrototypeDataPoint();
 			string thisObservable = (*projection_i)->observableName;
 			if( StringProcessing::VectorContains( &claimedObservables, &thisObservable ) == -1 )

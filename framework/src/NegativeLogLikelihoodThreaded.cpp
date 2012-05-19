@@ -23,6 +23,7 @@
 //	RapidFit Headers
 #include "NegativeLogLikelihoodThreaded.h"
 #include "ClassLookUp.h"
+#include "IPDF.h"
 //	System Headers
 #include <stdlib.h>
 #include <cmath>
@@ -34,7 +35,6 @@
 using namespace::std;
 
 pthread_mutex_t eval_lock;
-pthread_mutex_t int_lock;
 
 //Default constructor
 NegativeLogLikelihoodThreaded::NegativeLogLikelihoodThreaded()
@@ -147,6 +147,8 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 	//bool isnorm = thread_input->fittingPDF->GetName()=="NormalisedSum";
 	for( vector<DataPoint*>::iterator data_i=thread_input->dataSubSet.begin(); data_i != thread_input->dataSubSet.end(); ++data_i, ++num )
 	{
+
+		pthread_mutex_t* debug_lock = thread_input->fittingPDF->DebugMutex();
 		try
 		{
 			value = thread_input->fittingPDF->Evaluate( *data_i );
@@ -169,38 +171,48 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 
 		if( isnan(value) == true )
 		{
+			pthread_mutex_lock( debug_lock );
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
 			cout << endl << "PDF is nan" << endl;
 			(*data_i)->Print();
+			pthread_mutex_unlock( debug_lock );
 			break;
 		}
 		if( isnan(integral) == true )
 		{
+			pthread_mutex_lock( debug_lock );
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
 			cout << endl << "Integral is nan" << endl;
 			(*data_i)->Print();
+			pthread_mutex_unlock( debug_lock );
 			break;
 		}
 		if( value <= 0 )
 		{
+			pthread_mutex_lock( debug_lock );
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
 			cout << endl << "Value is <=0 " << value << endl;
 			(*data_i)->Print();
+			pthread_mutex_unlock( debug_lock );
 			break;
 		}
 		if( integral <= 0 )
 		{
+			pthread_mutex_lock( debug_lock );
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
 			cout << endl << "Integral is <= 0 " << integral << endl;
 			(*data_i)->Print();
+			pthread_mutex_unlock( debug_lock );
 			break;
 		}
 
 		if( value >= DBL_MAX || integral >= DBL_MAX )
 		{
+			pthread_mutex_lock( debug_lock );
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
 			cerr << endl << "Caught invalid value from PDF" << endl;
 			(*data_i)->Print();
+			pthread_mutex_unlock( debug_lock );
 			break;
 		}
 
@@ -216,7 +228,7 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 			if( thread_input->weightsSquared )
 			{
 				result *= weight;
-				//if( weight < 0 ) result *= -1.;
+				if( weight < 0 ) result *= -1.;
 			}
 			pthread_mutex_unlock( &eval_lock );
 		}

@@ -202,7 +202,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		//bottle->Finalise();
 		FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );
 
-
+		delete bottle;
 		delete internalBottleParameters;
 
 		return result;

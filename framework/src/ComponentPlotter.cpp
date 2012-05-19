@@ -64,18 +64,27 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	boundary_min = full_boundary->GetConstraint( observableName )->GetMinimum();
 	boundary_max = full_boundary->GetConstraint( observableName )->GetMaximum();
 
+	cout << "Here2" << endl;
 	step_size = ( boundary_max - boundary_min ) / (double)( total_points - 1 );
 
 	//Work out what to plot
 	allCombinations = this->GetDiscreteCombinations( combinationWeights, combinationDescriptions );
 
+	cout << "Here3" << endl;
+
 	for( unsigned int i=0; i< allCombinations.size(); ++i )
 	{
 		pdfIntegrator->ForceTestStatus( false );
-		combination_integral.push_back( pdfIntegrator->Integral( allCombinations[i], plotData->GetBoundary() ) );
+		cout << "Here5" << endl;
+		double thisIntegral = pdfIntegrator->Integral( allCombinations[i], full_boundary );
+		combination_integral.push_back( thisIntegral );
+		cout << "Here4: " << i << endl;
+
 		if( plotPDF->GetNumericalNormalisation() == true ) ratioOfIntegrals.push_back( 1. );
 		else ratioOfIntegrals.push_back( pdfIntegrator->GetRatioOfIntegrals() );
 	}
+
+	cout << "Here" << endl;
 
 	vector<double> minimum, maximum;
 	vector<int> binNumber;

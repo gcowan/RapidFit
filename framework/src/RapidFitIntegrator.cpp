@@ -304,9 +304,10 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 	cout_bak = cout.rdbuf();
 	cerr_bak = cerr.rdbuf();
 	clog_bak = clog.rdbuf();
-	//cout.rdbuf(0);
-	//cerr.rdbuf(0);
-	//clog.rdbuf(0);
+	cout.rdbuf(0);
+	cerr.rdbuf(0);
+	clog.rdbuf(0);
+
 	multiDimensionIntegrator->SetFunction( *quickFunction );
 
 	double output =  multiDimensionIntegrator->Integral( minima, maxima );
@@ -357,7 +358,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 	double output_val = 0.;
 
 	//If there are no observables left to integrate over, just evaluate the function
-	if( doIntegrate.size() == 0 )
+	if( doIntegrate.empty() || doIntegrate.size() == 0 )
 	{
 		for( vector<DataPoint*>::iterator dataPoint_i = DiscreteIntegrals.begin(); dataPoint_i != DiscreteIntegrals.end(); ++dataPoint_i )
 		{

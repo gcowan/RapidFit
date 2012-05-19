@@ -386,6 +386,8 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input ) const
 	{
 		cerr << "This DataPoint does not Lie within this PhaseSpace." << endl;
 		cerr << "This is a SERIOUS MISCONFIGURATION!!! Exiting :(" << endl;
+		Input->Print();
+		this->Print();
 		exit(-99865);
 	}
 

@@ -16,6 +16,9 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 {
 	MakePrototypes();
 
+	firstPDF->SetDebugMutex( this->DebugMutex(), false );
+	secondPDF->SetDebugMutex( this->DebugMutex(), false );
+
 	//      Only one PDF has components beyond here
 	//      Add an index to allow for the ProdPDF to return the correct component in future
 
@@ -96,6 +99,8 @@ ProdPDF::ProdPDF( const ProdPDF& input ) : BasePDF( (BasePDF) input ),
 	doNotIntegrateList( input.doNotIntegrateList ),
 	firstPDF( ClassLookUp::CopyPDF( input.firstPDF ) ), secondPDF( ClassLookUp::CopyPDF( input.secondPDF ) )
 {
+	firstPDF->SetDebugMutex( this->DebugMutex(), false );
+	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 }
 
 void ProdPDF::TurnThisCachingOff()

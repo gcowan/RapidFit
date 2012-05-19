@@ -27,10 +27,20 @@
 #include <string>
 #include <stdio.h>
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
+#include <pthread.h>
+
+#ifdef __CINT__ 
+#undef __GNUC__ 
+#define _SYS__SELECT_H_
+	struct pthread_mutex_t;
+#undef __SYS__SELECT_H_
+#define __GNUC__
+#endif
 
 using namespace::std;
 
-class RapidFitIntegrator;
 class IPDF;
 
 /*!
@@ -53,7 +63,9 @@ class IPDF
 		/*!
 		 * Virtual Destructor
 		 */
-		virtual ~IPDF() {};
+		virtual ~IPDF()
+		{
+		};
 
 		/*!
 		 * Interface Function:
@@ -295,7 +307,13 @@ class IPDF
 		 */
 		virtual PDFConfigurator* GetConfigurator() const = 0;
 
+		virtual pthread_mutex_t* DebugMutex() const = 0;
+
+		virtual void SetDebugMutex( pthread_mutex_t* Input, bool =true ) = 0;
+
 	protected:
+
+		virtual bool SetPhysicsParameters( ParameterSet* Input ) = 0;
 
 		/*!
 		 * Interface Function:

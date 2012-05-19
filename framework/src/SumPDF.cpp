@@ -21,12 +21,17 @@ SumPDF::SumPDF( const SumPDF& input ) : BasePDF( (BasePDF) input ), prototypeDat
 	firstPDF(ClassLookUp::CopyPDF(input.firstPDF) ), secondPDF( ClassLookUp::CopyPDF(input.secondPDF) ), firstFraction(input.firstFraction), firstIntegralCorrection(input.firstIntegralCorrection),
 	secondIntegralCorrection(input.secondIntegralCorrection), fractionName(input.fractionName)
 {
+	firstPDF->SetDebugMutex( this->DebugMutex(), false );
+	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 }
 
 //Constructor specifying fraction parameter name
 SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName)
 {
 	MakePrototypes(InputBoundary);
+
+	firstPDF->SetDebugMutex( this->DebugMutex(), false );
+	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 
 	//      All components are:
 	//                              0       :       total of the whole NormalisedSumPDF

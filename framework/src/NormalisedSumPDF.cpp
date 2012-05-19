@@ -30,6 +30,9 @@ NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (
 	secondIntegrator->SetPDF( secondPDF );
 	firstIntegrator->ForceTestStatus( true );
 	secondIntegrator->ForceTestStatus( true );
+
+	firstPDF->SetDebugMutex( this->DebugMutex(), false );
+	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 }
 
 //Constructor specifying fraction parameter name
@@ -44,6 +47,9 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 	//secondPDF->AssociateIntegrator( secondIntegrator );
 	firstIntegrator->ForceTestStatus( true );
 	secondIntegrator->ForceTestStatus( true );
+
+	firstPDF->SetDebugMutex( this->DebugMutex(), false );
+	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 
 	MakePrototypes(InputBoundary);
 

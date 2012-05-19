@@ -18,15 +18,17 @@
 #include <iostream>
 #include <cmath>
 #include <sstream>
+#include <pthread.h>
 
 using namespace::std;
 
 //Constructor
 BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ), requiresBoundary(false),
-	do_i_control_the_cache(false), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>())
+	do_i_control_the_cache(false), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()), debug_mutex(NULL), can_remove_mutex(true)
 {
 	component_list.push_back( "0" );
+	debug_mutex = new pthread_mutex_t();
 }
 
 BasePDF::BasePDF( const BasePDF& input ) :
@@ -35,7 +37,7 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	component_list( input.component_list ), cached_files( input.cached_files ), hasCachedMCGenerator( input.hasCachedMCGenerator ), requiresBoundary( input.requiresBoundary ),
 	seed_function( input.seed_function ), seed_num( input.seed_num ), PDFName( input.PDFName ), PDFLabel( input.PDFLabel ), copy_object( input.copy_object ),
 	do_i_control_the_cache( input.do_i_control_the_cache ), cachingEnabled( input.cachingEnabled ), haveTestedIntegral( input.haveTestedIntegral ),
-	thisConfig(NULL), discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL)
+	thisConfig(NULL), discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL), debug_mutex(input.debug_mutex), can_remove_mutex(false)
 {
 	allParameters.SetPhysicsParameters( &(input.allParameters) );
 	DiscreteCaches = new vector<double>( input.DiscreteCaches->size() );
@@ -53,6 +55,7 @@ BasePDF::~BasePDF()
 	//	If we weren't using ROOT this would a) be safe and b) be advisible, but ROOT segfaults...
 	//if( seed_function != NULL ) delete seed_function;
 	if( DiscreteCaches != NULL ) delete DiscreteCaches;
+	if( debug_mutex != NULL && can_remove_mutex == true ) delete debug_mutex;
 }
 
 void BasePDF::SetCopyConstructor( const CopyPDF_t* input ) const
@@ -485,5 +488,17 @@ void BasePDF::SetConfigurator( PDFConfigurator* config )
 PDFConfigurator* BasePDF::GetConfigurator() const
 {
 	return thisConfig;
+}
+
+pthread_mutex_t* BasePDF::DebugMutex() const
+{
+	return debug_mutex;
+}
+
+void BasePDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
+{
+	can_remove_mutex = can_remove;
+	if( debug_mutex != NULL && can_remove_mutex ) delete debug_mutex;
+	debug_mutex = Input;
 }
 

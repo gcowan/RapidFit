@@ -1498,7 +1498,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 //Create a NormalisedSumPDF from an appropriate xml tag
 IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
 {
-	IPDF* returnable_NormPDF;
+	IPDF* returnable_NormPDF = NULL;
 	vector< IPDF* > componentPDFs;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "NormalisedSumPDF" )
@@ -1525,6 +1525,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 			if ( fractionName == "unspecified" )
 			{
 				cerr << "Error Must Provide a FractionName for this PDF!\tNormalisedSum_(" << componentPDFs[0]->GetLabel()<<")v("<<componentPDFs[1]->GetLabel()<< ")" << endl;
+				exit(1);
 			}
 			else
 			{

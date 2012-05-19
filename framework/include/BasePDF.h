@@ -69,24 +69,24 @@
  *             (This interfaces with the NumericalIntegrator class)
  *
  *          EvaluateForNumericGeneration( DataPoint* )
- *             (This interfaces with the Toy DataSet Generators like Foam)
- *
- *
- *
- *
- * @author Benjamin M Wynne bwynne@cern.ch
- * @author Robert Currie rcurrie@cern.ch
- *
- */
+*             (This interfaces with the Toy DataSet Generators like Foam)
+	*
+	*
+	*
+	*
+	* @author Benjamin M Wynne bwynne@cern.ch
+	* @author Robert Currie rcurrie@cern.ch
+	*
+	*/
 
 #pragma once
 #ifndef BASE_PDF_H
 #define BASE_PDF_H
 
-///	ROOT Headers
+	///	ROOT Headers
 #include "TRandom.h"
 #include "TRandom3.h"
-///	RapidFit Headers
+	///	RapidFit Headers
 #include "IPDF.h"
 #include "ObservableRef.h"
 #include "PDFConfigurator.h"
@@ -96,6 +96,7 @@
 	///	System Headers
 #include <vector>
 #include <cmath>
+#include <pthread.h>
 
 using namespace::std;
 
@@ -535,6 +536,10 @@ class BasePDF : public IPDF
 		 */
 		PDFConfigurator* GetConfigurator() const;
 
+		pthread_mutex_t* DebugMutex() const;
+
+		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
+
 	protected:
 
 		/*!
@@ -607,6 +612,7 @@ class BasePDF : public IPDF
 
 		vector<string> component_list;	/*!	This is the list of components that this PDF can provide	*/
 
+
 	private:
 
 		bool numericalNormalisation;                  /*!     Does this PDF require Numerical Integration, or has Numerical Integration been requested?       */
@@ -671,6 +677,9 @@ class BasePDF : public IPDF
 		bool requiresBoundary;		/*!	Does the PDF require the PhaseSpaceBoundary to calculate the normalisation?	*/
 
 		PDFConfigurator* thisConfig;	/*!	PDFConfigurator containing the Configurator which knowsn how this PDF was configured	*/
+
+		pthread_mutex_t* debug_mutex;
+		bool can_remove_mutex;
 };
 
 #endif

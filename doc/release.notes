@@ -1,6 +1,11 @@
 // $Id: release.notes $
 
-2011/05/17 Rob Currie
+1012/05/19 Rob Currie
+   - A debug_mutex is now exposed to all pdfs which can allow for sensible output of warnings/errors when running multiple threads
+     This potentially has issues on unchecked platforms.
+   - -ve Weights keep sign when performing corrections to the errors of weighted fits
+
+2012/05/17 Rob Currie
    - Updated Code to do with Error Corrections
 
 2012/05/17 Rob Currie
