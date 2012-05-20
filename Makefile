@@ -22,9 +22,9 @@ RM           = rm -f
 SVN_REV = $(shell svnversion -n .)
 
 #		Compiler Flags
-CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -fPIC -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
+CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
 
-CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -fPIC -Os -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
+CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -Os -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
 
 #		Some Useful global variables, makes this file MUCH easier to maintain
 SRCEXT    = cpp

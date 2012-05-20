@@ -142,13 +142,13 @@ ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, c
 	if( param_names.size() != givenParams->GetAllNames().size() )
 	{
 		vector<string> temp = givenParams->GetAllNames();
-		for( unsigned int i=0; i< temp.size(); ++i )
-		{
-			if( StringProcessing::VectorContains( &param_names, &(temp[i]) ) == -1 )
-			{
-				cout << "Physics Parameter: " << temp[i] << " Provided, but not requested by a PDF, Ignoring" << endl;
-			}
-		}
+		//for( unsigned int i=0; i< temp.size(); ++i )
+		//{
+		//	if( StringProcessing::VectorContains( &param_names, &(temp[i]) ) == -1 )
+		//	{
+		//		cout << "Physics Parameter: " << temp[i] << " Provided, but not requested by a PDF, Ignoring" << endl;
+		//	}
+		//}
 	}
 
 	ParameterSet* wantedParameterSet = ( new ParameterSet( param_names ) );
@@ -226,7 +226,7 @@ void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, ParameterS
 		//	There was something in the ParameterSet not in the FitResult, i.e. an unclaimed object which can't have changed during the fit
 		if( found == -1 )
 		{
-			cout << "ALERT:\t" << "Parameter " << BottleParameters->GetAllNames()[i] << " was not claimed by any PDF in the fit and was NOT passed to the Minimiser!!!" << endl;
+			//cout << "ALERT:\t" << "Parameter " << BottleParameters->GetAllNames()[i] << " was not claimed by any PDF in the fit and was NOT passed to the Minimiser!!!" << endl;
 			double Value = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetValue();
 			double OriginalValue = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetValue();
 			double Minimum = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetMinimum();

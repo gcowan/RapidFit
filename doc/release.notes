@@ -1,6 +1,12 @@
 // $Id: release.notes $
 
-1012/05/19 Rob Currie
+2012/05/20 Rob Currie
+   - Removed some vebose output
+   - Changed toy studies and FC studies to not test the numerical integrator.
+     The information has been piped to NULL for a long time and nobody has requested it, so now the test is simply not performed to save CPU
+   - Removed dependencies on RooMath and alike from BsMass as the stl implementations in Mathematics are favoured
+
+2012/05/19 Rob Currie
    - A debug_mutex is now exposed to all pdfs which can allow for sensible output of warnings/errors when running multiple threads
      This potentially has issues on unchecked platforms.
    - -ve Weights keep sign when performing corrections to the errors of weighted fits

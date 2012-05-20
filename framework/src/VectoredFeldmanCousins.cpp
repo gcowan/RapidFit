@@ -27,6 +27,7 @@ VectoredFeldmanCousins::VectoredFeldmanCousins( FitResultVector* input_GlobalRes
 	numberStudies = xmlConfig->GetNumberRepeats();
 	theMinimiser = newMinimiser;
 	theFunction = newFunction;
+	theFunction->SetIntegratorTest( false );
 	allConstraints = xmlConfig->GetConstraints();
 	delete_objects = false;
 

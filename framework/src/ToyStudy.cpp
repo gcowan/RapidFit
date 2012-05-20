@@ -24,6 +24,7 @@ ToyStudy::ToyStudy( string FileName ) : IStudy()
 
 	theMinimiser = xml->GetMinimiserConfiguration();
 	theFunction = xml->GetFitFunctionConfiguration();
+	theFunction->SetIntegratorTest( false );
 	studyParameters = xml->GetFitParameters();
 	pdfsAndData = xml->GetPDFsAndData();
 	numberStudies = xml->GetNumberRepeats();
@@ -48,6 +49,7 @@ ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfigurat
 	studyParameters = StudyParameters;
 	theMinimiser = TheMinimiser;
 	theFunction = TheFunction;
+	theFunction->SetIntegratorTest( false );
 	allResults = NULL;
 	numberStudies = NumberStudies;
 	allConstraints = InputConstraints;
