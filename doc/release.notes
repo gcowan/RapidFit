@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/05/21 Rob Currie
+   - Constrained pull plots from Toy studies to be constrained to abs(pull)<10 to protect from numerical instability of small or zero error values
+
 2012/05/20 Rob Currie
    - Removed some vebose output
    - Changed toy studies and FC studies to not test the numerical integrator.

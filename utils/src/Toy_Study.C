@@ -70,7 +70,16 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 
 	for( unsigned int j=0; j< all_parameter_plots.size(); ++j )
 	{
-		input_tree->Draw( all_parameter_plots[j], "(Fit_Status==3)", "goff" );
+
+		TString cut_str("(Fit_Status==3)");
+
+		string this_suffix = string(EdStyle::Get_Suffix( all_parameter_plots[j] )); this_suffix[0] = '_';
+                if( this_suffix == string(pull_suffix.Data()) )
+		{
+			cut_str.Append("&&(abs("+all_parameter_plots[j]+")<10.)");
+		}
+
+		input_tree->Draw( all_parameter_plots[j], cut_str, "goff" );
 
 		TH1* input_histo = (TH1*) input_tree->GetHistogram();
 		TString Histo_Name( all_parameter_plots[j] );
