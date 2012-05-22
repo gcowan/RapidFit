@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/05/22 Greig Cowan
+   - Fixed bug in ordering of matrices in CorrectedCovariance. Errors returned from weighted fits now look OK.
+
 2012/05/21 Rob Currie
    - Constrained pull plots from Toy studies to be constrained to abs(pull)<10 to protect from numerical instability of small or zero error values
 

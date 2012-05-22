@@ -189,7 +189,7 @@ void MinuitWrapper::CallHesse()
 	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
 	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
 	//      Now Do the minimisation
-	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
+	//minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
 
 	//      Now Do the minimisation
 	//              minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
