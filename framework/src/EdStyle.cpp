@@ -78,9 +78,9 @@ void EdStyle::SetStyle()
 
 
 	gStyle->SetPaperSize(20,26);
-        gStyle->SetPadLeftMargin( (Float_t) 0.14 );
+        gStyle->SetPadLeftMargin( (Float_t) 0.11 );
         gStyle->SetPadBottomMargin( (Float_t) 0.16 );
-        gStyle->SetPadRightMargin( (Float_t)0.05 ); // increase for colz plots!!
+        gStyle->SetPadRightMargin( (Float_t)0.08 ); // increase for colz plots!!
         gStyle->SetPadTopMargin( (Float_t)0.05 );
 
 

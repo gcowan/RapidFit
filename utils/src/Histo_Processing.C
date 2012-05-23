@@ -121,6 +121,7 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 		//	I have to use a non NULL destination for the output because the ROOT output mechanism is a incidious evil piece of code that checks if your directing ALL output to NULL and decides you don't want that
 		//	WTF gives this piece of code to change my mind for me?!?
 		nullbuf = filestr.rdbuf();
+		freopen("/dev/null", "w", stderr);
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
@@ -207,6 +208,9 @@ void Histogram_Processing::Silent_Draw( TCanvas* c1, TH1* input_histo, TString o
 		clog_bak = clog.rdbuf();
 		//  Redirect the errors to the empty void of nullness
 		freopen("/dev/null", "w", stderr);
+		cout.rdbuf(0);
+		cerr.rdbuf(0);
+		clog.rdbuf(0);
 	}
 	input_histo->Draw(options);
 	c1->Update();
