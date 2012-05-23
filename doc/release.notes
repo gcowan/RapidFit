@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/05/23 Greig Cowan
+   - Small changes in plot style.
+
 2012/05/22 Greig Cowan
    - Fixed bug in ordering of matrices in CorrectedCovariance. Errors returned from weighted fits now look OK.
 

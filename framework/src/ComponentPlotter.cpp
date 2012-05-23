@@ -21,6 +21,7 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TF1.h"
+#include "TLatex.h"
 ///	RapidFit Headers
 #include "ComponentPlotter.h"
 #include "StatisticsFunctions.h"
@@ -814,7 +815,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
 
 	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
-	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Events";
+	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Candidates";
 
 	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
 	input_data->GetYaxis()->SetTitle( Y_Title );
@@ -822,6 +823,11 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	input_data->GetXaxis()->SetTitle( X_Title );
 
 	c1->Update();
+
+        TLatex *myLatex = new TLatex(0.5,0.5,"");
+        myLatex->SetTextAlign(11);
+        myLatex->SetNDC(kTRUE);
+        myLatex->DrawLatex(0.59, 0.75,"LHCb");
 
 	TLegend* leg = EdStyle::LHCbLegend();
 

@@ -55,7 +55,7 @@ void EdStyle::SetStyle()
 	Font_t lhcbFont = 132;
 
 	// line thickness
-	Width_t lhcbWidth = 2.; //Width_t is a SHORT INT, NOT a double
+	Width_t lhcbWidth = 1.; //Width_t is a SHORT INT, NOT a double
 
 	// text size
 	Double_t lhcbTSize = 0.06;
@@ -101,7 +101,7 @@ void EdStyle::SetStyle()
         gStyle->SetGridWidth( lhcbWidth );
         gStyle->SetLineStyleString( 2, "[12 12]"); // postscript dashes
         gStyle->SetMarkerStyle( 20 );
-        gStyle->SetMarkerSize( (Float_t)1.0 );
+        gStyle->SetMarkerSize( (Float_t)2.1 );
 
 
 	// label offsets
