@@ -1,6 +1,9 @@
 // $Id: release.notes $
 
-2012/05/23 Greig Cowan
+2012/05/25 Greig Cowan
+   - Explicitly turned off caching in the DPTotalAmplitudePDF. Would be good to know why this doesn't work.
+
+2012/05/23 Rob Currie 
    - Small changes in plot style.
    - Centred the Plots on the canvas to not cut off scale factors on the x axis
 

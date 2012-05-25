@@ -123,10 +123,10 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	KpiComponents.push_back(tmp);
   
 	// Kpi s-wave using LASS
-  	tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
-                     0.13957018, 5.0, 1.5, 3.096916,0,
-                     "LASS", 0.00415, 0.00136);
-   	KpiComponents.push_back(tmp);
+  	//tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
+        //             0.13957018, 5.0, 1.5, 3.096916,0,
+        //             "LASS", 0.00415, 0.00136);
+   	//KpiComponents.push_back(tmp);
 
 	// B0 --> Z+ K-
 	tmp=new DPZplusK(0,0,5.279,4.430,0.100,0.493677,
@@ -134,7 +134,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	//ZComponents.push_back(tmp);
 
 	this->SetNumericalNormalisation( true );
-
+	this->TurnCachingOff();
 	useAngularAcceptance = false;
 	if ( configurator->isTrue( "UseAngularAcceptance" ) )
 	{
@@ -264,6 +264,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,angularAccHistMassCosTheta2(copy.angularAccHistMassCosTheta2)
 {
 	this->SetNumericalNormalisation(true);
+	this->TurnCachingOff();
 	componentIndex = 0;
 	vector<DPComponent*>::const_iterator component_i = copy.KpiComponents.begin();
 	for( ; component_i != copy.KpiComponents.end(); ++component_i )
@@ -528,7 +529,7 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         //component_list.push_back( "1680" );
         //component_list.push_back( "1430" );
         //component_list.push_back( "1430_2" );
-        component_list.push_back( "LASS" );
+        //component_list.push_back( "LASS" );
         component_list.push_back( "0" );
         return component_list;
 }
