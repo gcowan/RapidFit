@@ -31,6 +31,7 @@
 #include "StringProcessing.h"
 #include "MCStudy.h"
 #include "GoodnessOfFit.h"
+#include "JackKnife.h"
 #include "ComponentPlotter.h"
 #include "ParameterSet.h"
 #include "IConstraint.h"
@@ -88,6 +89,8 @@ int RapidFit( int argc, char * argv[] )
 	unsigned int Nuisencemodel=2;
 	int jobNum = 0; (void) jobNum;
 	int nData = 0; (void) nData;
+	int jackStartNum = 0; (void) jackStartNum;
+	int jackStopNum = 0; (void) jackStopNum;
 	string configFileName = "";
 	vector<string> parameterTemplates;
 	MinimiserConfiguration * theMinimiser=NULL;
@@ -141,6 +144,7 @@ int RapidFit( int argc, char * argv[] )
 	bool Force_Scan_Flag=false;
 	bool FC_LL_PART_Flag=false;
 	bool GOF_Flag=false;
+	bool JackKnife_Flag=false;
 	bool StartAtCenterFlag=true;
 	bool WeightDataSet=false;
 	bool OutputLevelSet=false;
@@ -641,6 +645,22 @@ int RapidFit( int argc, char * argv[] )
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
+                else if ( currentArgument == "--JackKnife" )
+                {
+                        JackKnife_Flag = true;
+			if ( argumentIndex + 2 < argc )
+			{
+				++argumentIndex;
+				jackStartNum = atoi( argv[argumentIndex] );
+				++argumentIndex;
+				jackStopNum  = atoi( argv[argumentIndex] );
+			}
+			else
+			{
+				cerr << "Start and stop event numbers for JackKnife not specified" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}
+                }
 		else if ( currentArgument == "--MakeTemplate" )
 		{
 			makeTemplateXML = true;
@@ -1364,6 +1384,9 @@ int RapidFit( int argc, char * argv[] )
 			delete outputFile;
 		}
 
+		if ( JackKnife_Flag ) {
+			JackKnife::jackknife( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, jackStartNum, jackStopNum );	
+		}
 	}
 
 	//	10)

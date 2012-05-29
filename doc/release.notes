@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/05/29 Greig Cowan
+   - Added class which implements JackKnifing of a dataset. It is not general at the moment but tailored 
+     for particular use case of fitting for a lifetime.
+
 2012/05/25 Greig Cowan
    - Explicitly turned off caching in the DPTotalAmplitudePDF. Would be good to know why this doesn't work.
 
