@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/05/31 Rob Currie
+   - Thread-Safed GammaDistribution PDF
+
 2012/05/29 Greig Cowan
    - Added class which implements JackKnifing of a dataset. It is not general at the moment but tailored 
      for particular use case of fitting for a lifetime.

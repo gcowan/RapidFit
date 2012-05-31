@@ -11,7 +11,9 @@
 #define GammaDistribution_H
 
 #include "BasePDF.h"
-#include "TF1.h"
+#include "ObservableRef.h"
+
+using namespace::std;
 
 class GammaDistribution : public BasePDF
 {
@@ -30,7 +32,7 @@ class GammaDistribution : public BasePDF
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 	
-		TF1 * PDF ;
+		//TF1 * PDF ;
 	
 		// Physics parameters
 		double gamma ;

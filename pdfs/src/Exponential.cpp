@@ -10,15 +10,14 @@
 #include "Exponential.h"
 #include "Mathematics.h"
 #include <iostream>
-#include "math.h"
-#include "TMath.h"
-#include "RooMath.h"
+#include <cmath>
+
+using namespace::std;
 
 PDF_CREATOR( Exponential );
 
 //Constructor
 Exponential::Exponential( PDFConfigurator* configurator) :
-
 	// Physics parameters
 	tauName	( configurator->getName("tau") )
 	, resScale1Name          ( configurator->getName("timeResolutionScale1") )
