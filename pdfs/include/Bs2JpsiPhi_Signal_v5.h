@@ -53,7 +53,7 @@ private:
 	Bs2JpsiPhi_Signal_v5& operator=( const Bs2JpsiPhi_Signal_v5& );
 	void MakePrototypes();
 	double normalisationCacheUntagged ;
-	
+	void prepareCDS() ;
 	
 protected:
 	//Calculate the PDF normalisation
@@ -85,11 +85,15 @@ protected:
 	ObservableRef Phi_sName;		// what we want to measure!
 	ObservableRef cosphisName;		// fitting cosphis and sinphis independently
 	ObservableRef sinphisName;		// fitting cosphis and sinphis independently	
+	ObservableRef lambdaName;		// magnitude of lambda	
 	
 	ObservableRef mistagName;		// mistag fraction  - may be used as observable also
 	ObservableRef mistagP1Name;		// mistag calib
 	ObservableRef mistagP0Name;		// mistag calib
 	ObservableRef mistagSetPointName;// mistag calib
+	ObservableRef mistagDeltaP1Name;		// mistag calib
+	ObservableRef mistagDeltaP0Name;		// mistag calib
+	ObservableRef mistagDeltaSetPointName;// mistag calib
 	
 	ObservableRef eventResolutionName;			// Scale to multiply all Gaussians with 
 	ObservableRef resScaleName;			// Scale to multiply all Gaussians with 
@@ -167,12 +171,17 @@ protected:
 	double phi_s ;
 	double _cosphis ;
 	double _sinphis ;
+	double lambda ;
+	double _CC, _DD, _SS;
 
 	double _mistag ;
 	double _mistagP1 ;
 	double _mistagP0 ;
 	double _mistagSetPoint ;
-
+	double _mistagDeltaP1 ;
+	double _mistagDeltaP0 ;
+	double _mistagDeltaSetPoint ;
+	;
 	double resolution ;
 	double eventResolution ;
 	double resolutionScale ;
@@ -183,7 +192,9 @@ protected:
 	double resolution3Fraction ;
 	double timeOffset ;
 	bool _useEventResolution ;
-	bool useEventResolution() const {return _useEventResolution ; }
+	inline bool useEventResolution() const {return _useEventResolution ; }
+	inline bool useTimeAcceptance() const { return _useTimeAcceptance ; }		
+	
 
 	double angAccI1 ;
 	double angAccI2 ;
@@ -230,6 +241,8 @@ protected:
 	bool _numericIntegralTimeOnly ;
 	bool _useCosAndSin ;
 	bool _useCosDpar ;
+	bool _usePunziSigmat ;
+	bool _usePunziMistag ;
 	bool allowNegativeAsSq ;
 	
 	//....................................
@@ -292,7 +305,8 @@ protected:
 	inline double c2Hphi() const { return (cos(2.*phi_h)); }
 	inline double s2Hphi() const { return (sin(2.*phi_h)); }
 	
-	
+	//....................
+	// Safety for gammas
 	inline double gamma_l() const { 
 		const double gl = gamma() + ( dgam *0.5 ) ;
 		if( gl < 0. ) {
@@ -314,6 +328,10 @@ protected:
 	}
 	
 	inline double gamma() const { return _gamma ; }
+	
+	//...............
+	//tagging
+	
 	
 	inline double q() const { return tag ;}
 	
@@ -343,12 +361,76 @@ protected:
 		}
 		return returnValue ;			
 	}
+
+	inline double mistagB() const { 
+		double returnValue = -1000.;
+		
+		if( fabs(q()) < 0.5 ) {
+			returnValue = 0.5 ;
+		}			
+		else if( (_mistag>=0.0) && (_mistag <= 0.5) ) {
+			//Normal case
+			returnValue =  _mistagP0+(_mistagDeltaP0/2.0) + (_mistagP1+(_mistagDeltaP1/2.0))*(_mistag - (_mistagSetPoint+(_mistagDeltaSetPoint/2.0)) ) ;
+			//if( true ) returnValue =  _mistagP0 + (_mistagP1)*(_mistag - (_mistagSetPoint) ) ;  // to mock up independent P1/P0 for each tag
+			if( returnValue < 0 )  returnValue = 0 ;
+			if( returnValue > 0.5) returnValue = 0.5 ; 
+		}			
+		else if( _mistag < 0.0 ) {
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagB() : _mistag < 0 so deltaMistag set to 0 also " << endl ;
+			returnValue = 0 ;
+		}
+		else if( _mistag > 0.5 ) {
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagB() : _mistag > 0.5 so so deltaMistag set to 0.5 also "  << endl ;
+			returnValue = 0.5 ;
+		}
+		else {
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagB() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+			exit(1);
+		}
+		return returnValue ;			
+	}
 	
-	inline double cosphis() const { return _cosphis ; }
-	inline double sinphis() const { return _sinphis ; }
+	inline double mistagBbar() const { 
+		double returnValue = -1000.;
+		
+		if( fabs(q()) < 0.5 ) {
+			returnValue = 0.5 ;
+		}			
+		else if( (_mistag>=0.0) && (_mistag <= 0.5) ) {
+			//Normal case
+			returnValue =  _mistagP0-(_mistagDeltaP0/2.0) + (_mistagP1-(_mistagDeltaP1/2.0))*(_mistag - (_mistagSetPoint-(_mistagDeltaSetPoint/2.0)) ) ;
+			//if( true ) returnValue =   _mistagDeltaP0 + (_mistagDeltaP1)*(_mistag - (_mistagDeltaSetPoint) ) ;// to mock up independent P1/P0 for each tag
+			if( returnValue < 0 )  returnValue = 0 ;
+			if( returnValue > 0.5) returnValue = 0.5 ; 
+		}			
+		else if( _mistag < 0.0 ) {
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagBbar() : _mistag < 0 so deltaMistag set to 0 also " << endl ;
+			returnValue = 0 ;
+		}
+		else if( _mistag > 0.5 ) {
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagBbar() : _mistag > 0.5 so so deltaMistag set to 0.5 also "  << endl ;
+			returnValue = 0.5 ;
+		}
+		else {
+			cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagBbar() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+			exit(1);
+		}
+		return returnValue ;			
+	}
 	
-	inline bool useTimeAcceptance() const { return _useTimeAcceptance ; }		
+	inline double D1() const {  return 1.0 - q()*(mistagB()-mistagBbar()) ; }  
+	inline double D2() const {  return q()*( 1.0 - mistagB() -mistagBbar() ) ; }
+	//inline double D1() const {  return 1.0 ; }  
+	//inline double D2() const {  return  ( q()*( 1.0 - mistagB() -mistagBbar() ) ) / ( 1.0 - q()*(mistagB()-mistagBbar())  )  ; }
 	
+	
+	//.....................
+	// C, D, S
+	inline double cosphis() const { return _DD ; } //  _cosphis ; }
+	inline double sinphis() const { return _SS ; } //  _sinphis ; }
+	inline double CC() const { return _CC ; } //  _sinphis ; }
+	
+		
 	//......................................................
 	// Time primitives
 	
@@ -390,9 +472,14 @@ protected:
 	{
 		//if( t < 0.0 ) return 0.0 ;
 		const double result = 
-		( 1.0 + cosphis() ) * expL( ) 
-		+ ( 1.0 - cosphis() ) * expH( ) 
-		+ q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) ;
+		D1() * (
+			   ( 1.0 + cosphis() ) * expL( ) 
+			 + ( 1.0 - cosphis() ) * expH( ) 
+		) +
+		D2() * ( 
+				( 2.0 * sinphis() ) * expSin( )  
+			  + ( 2.0 * CC()      ) * expCos( ) 
+		);
 		
 		//DEBUG
 		if( DEBUGFLAG && (result < 0) ) {
@@ -411,9 +498,14 @@ protected:
 	inline double timeFactorEvenInt(  )  const
 	{
 		return
-		( 1.0 + cosphis() )  * intExpL()     
-		+ ( 1.0 - cosphis() )  * intExpH()          
-		+ q() * ( 2.0 * sinphis()   ) * intExpSin( ) * (1.0 - 2.0*mistag()) ;
+		D1() * (
+				( 1.0 + cosphis() )  * intExpL()     
+			  + ( 1.0 - cosphis() )  * intExpH()
+		) +
+		D2() * (
+				 ( 2.0 * sinphis() ) * intExpSin( ) 
+			  +  ( 2.0 * CC()      ) * intExpCos( ) 
+		) ;
 	}
 	
 	
@@ -422,17 +514,27 @@ protected:
 	{
 		//if( t < 0.0 ) return 0.0 ;
 		return
-		( 1.0 - cosphis() ) * expL( ) 
-		+ ( 1.0 + cosphis() ) * expH( ) 
-		- q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) ;
+		D1() * (
+				( 1.0 - cosphis() ) * expL( ) 
+			  + ( 1.0 + cosphis() ) * expH( ) 
+		) +
+		D2() * (
+				-  ( 2.0 * sinphis() ) * expSin( ) 
+				-  ( 2.0 * CC()      ) * expCos( )  
+		) ;
 	}
 	
 	inline double timeFactorOddInt(  )  const
 	{
 		return
-		( 1.0 - cosphis() ) * intExpL()
-		+ ( 1.0 + cosphis() ) * intExpH() 
-		- q() * ( 2.0 * sinphis()   ) * intExpSin( ) * (1.0 - 2.0*mistag()) ;
+		D1() * (
+				( 1.0 - cosphis() ) * intExpL()
+			  + ( 1.0 + cosphis() ) * intExpH() 
+		) +
+		D2() * (
+				-  ( 2.0 * sinphis() ) * intExpSin( ) 
+				-  ( 2.0 * CC()      ) * intExpCos( ) 
+		) ;
 	}
 	
 	
@@ -455,18 +557,26 @@ protected:
 	inline double timeFactorImAPAT( ) const
 	{
 		return
-		q() * 2.0  * ( sin(delta1)*expCos( ) - cos(delta1)*cosphis()*expSin( ) ) * (1.0 - 2.0*mistag())
-		- ( expH( ) - expL( ) ) * cos(delta1) * sinphis()  ;
+		D1() * (
+				  ( expL( ) - expH( ) ) * cos(delta1) * sinphis()  
+				+ ( expL( ) + expH( ) ) * sin(delta1) * CC()  
+		) +
+		D2() * (
+				 2.0  * ( sin(delta1)*expCos( ) - cos(delta1)*cosphis()*expSin( ) ) 
+		) ;
 	}
 	
 	inline double timeFactorImAPATInt( ) const
 	{
-		//double _tlo = tlo ;
-		//if(_tlo < 0.) _tlo = 0. ;
 		
 		return
-		q() * 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cosphis()*intExpSin() ) * (1.0 - 2.0*mistag())
-		- ( intExpH() - intExpL() ) * cos(delta1) * sinphis() ;	
+		D1() * (
+				  ( intExpL() - intExpH() ) * cos(delta1) * sinphis() 	
+				+ ( intExpL() + intExpH() ) * sin(delta1) * CC() 
+		) +
+		D2() * (
+				 2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cosphis()*intExpSin() )
+		) ;
 	}
 	
 	
@@ -488,18 +598,26 @@ protected:
 	inline double timeFactorImA0AT(  ) const
 	{
 		return 
-		q() * 2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cosphis()*expSin( ) ) * (1.0 - 2.0*mistag())	
-		- ( expH( ) - expL( ) ) * cos(delta2) * sinphis() ;
+		D1() * (
+				  ( expL( ) - expH( ) ) * cos(delta2) * sinphis() 
+				+ ( expL( ) + expH( ) ) * sin(delta2) * CC() 
+		) +
+		D2() * (
+				 2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cosphis()*expSin( ) ) 
+		) ;
 	}
 	
 	inline double timeFactorImA0ATInt( ) const
 	{
-		//double _tlo = tlo ;
-		//if(_tlo < 0.) _tlo = 0. ;
 		
-		return 
-		q() * 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cosphis()*intExpSin()  ) * (1.0 - 2.0*mistag())
-		- ( intExpH() - intExpL()  ) * cos(delta2) * sinphis() ;
+		return
+		D1() * (
+				  ( intExpL() - intExpH()  ) * cos(delta2) * sinphis() 
+				+ ( intExpL() + intExpH()  ) * sin(delta2) * CC() 
+		) +
+		D2() * (
+				 2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cosphis()*intExpSin()  ) 
+		) ;
 	}
 	
 	//.... S wave additions.......
@@ -514,20 +632,28 @@ protected:
 	{
 		double delta = delta_para - delta_s ;
 		return
-		q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) ) * (1.0 - 2.0*mistag())
-		- ( expH( ) - expL( ) ) * sin(delta) * sinphis()  ;
+		D1() * (
+				  ( expL( ) - expH( ) ) * sin(delta) * sinphis()  
+				+ ( expL( ) + expH( ) ) * cos(delta) * CC()  
+		) +
+		D2() * (
+				 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) ) 
+		) ;
 	}
 	
 	inline double timeFactorReASAPInt( ) const
 	{
-		//double _tlo = tlo ;
-		//if(_tlo < 0.) _tlo = 0. ;
 		
 		double delta = delta_para - delta_s ;
 		
 		return
-		q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() ) * (1.0 - 2.0*mistag())
-		- ( intExpH() - intExpL() ) * sin(delta) * sinphis() ;	    
+		D1() * (	
+				  ( intExpL() - intExpH() ) * sin(delta) * sinphis() 	    
+				+ ( intExpL() + intExpH() ) * cos(delta) * CC() 
+		) +
+		D2() * (
+				 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() ) 
+		) ;
 	}
 	
 	
@@ -548,20 +674,28 @@ protected:
 	{			
 		double delta = delta_zero - delta_s ;
 		return
-		q() * 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) ) * (1.0 - 2.0*mistag())
-		- ( expH( ) - expL( ) ) * sin(delta) * sinphis()  ;
+		D1() * (
+				  ( expL( ) - expH( ) ) * sin(delta) * sinphis()  
+				+ ( expL( ) + expH( ) ) * cos(delta) * CC()  
+		) +
+		D2() * (
+				 2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) ) 
+		) ;
 	}
 	
 	inline double timeFactorReASA0Int( ) const
 	{
-		//double _tlo = tlo ;
-		//if(_tlo < 0.) _tlo = 0. ;
 		
 		double delta = delta_zero - delta_s ;
 		
 		return
-		q() * 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() ) * (1.0 - 2.0*mistag())
-		- ( intExpH() - intExpL() ) * sin(delta) * sinphis() ;	    
+		D1() * (
+				  ( intExpL() - intExpH() ) * sin(delta) * sinphis() 	    
+				+ ( intExpL() + intExpH() ) * cos(delta) * CC() 
+		) +
+		D2() * (
+				 2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() ) 
+		) ;
 	}
 	
 	

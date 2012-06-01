@@ -37,14 +37,17 @@ gammaName				( configurator->getName("gamma") )
 , delta_perpName		( configurator->getName("delta_perp") )
 , delta_sName			( configurator->getName("delta_s") )
 , cosdparName			( configurator->getName("cosdpar") ) //PELC-COSDPAR Special for fitting cosdpar separately
-// PELC NEW additions for v2
 , cosphisName			( configurator->getName("cosphis") )
 , sinphisName			( configurator->getName("sinphis") )
-// Detector parameters
+, lambdaName			( configurator->getName("lambda") )
+// tagging parameters
 , mistagName			( configurator->getName("mistag") )
 , mistagP1Name			( configurator->getName("mistagP1") )
 , mistagP0Name			( configurator->getName("mistagP0") )
 , mistagSetPointName	( configurator->getName("mistagSetPoint") )
+, mistagDeltaP1Name		( configurator->getName("mistagDeltaP1") )
+, mistagDeltaP0Name		( configurator->getName("mistagDeltaP0") )
+, mistagDeltaSetPointName ( configurator->getName("mistagDeltaSetPoint") )
 // Detector parameters
 , resScaleName			( configurator->getName("timeResolutionScale") )
 , eventResolutionName	( configurator->getName("eventResolution") )
@@ -82,6 +85,8 @@ gammaName				( configurator->getName("gamma") )
 , _numericIntegralTimeOnly(false)
 , _useCosAndSin(false) 
 , _useCosDpar(false)
+, _usePunziMistag(false)
+, _usePunziSigmat(false)
 , allowNegativeAsSq(false)
 //objects
 ,t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(), tag(), 
@@ -156,6 +161,8 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
 	_useCosDpar = configurator->isTrue( "UseCosDpar" ) ;
 	_useHelicityBasis = configurator->isTrue( "UseHelicityBasis" ) ;
+	_usePunziSigmat = configurator->isTrue( "UsePunziSigmat" ) ;
+	_usePunziMistag = configurator->isTrue( "UsePunziMistag" ) ;
 	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
 
 	this->TurnCachingOff();
@@ -176,50 +183,6 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 	
 }
 
-/*
-//................................................
-//	Copy Constructor
-Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input )	: BasePDF( (BasePDF) input ),
-gammaName(input.gammaName), deltaGammaName(input.deltaGammaName), deltaMName(input.deltaMName), Phi_sName( input.Phi_sName ),
-Azero_sqName(input.Azero_sqName), Apara_sqName(input.Apara_sqName), Aperp_sqName(input.Aperp_sqName), As_sqName(input.As_sqName),
-delta_zeroName(input.delta_zeroName), delta_paraName(input.delta_paraName), delta_perpName(input.delta_perpName),
-delta_sName(input.delta_sName), cosphisName(input.cosphisName), sinphisName(input.sinphisName), mistagName(input.mistagName),
-mistagP1Name(input.mistagP1Name), mistagP0Name(input.mistagP0Name), mistagSetPointName(input.mistagSetPointName),
-resScaleName(input.resScaleName), res1Name(input.res1Name), res2Name(input.res2Name), res3Name(input.res3Name),eventResolutionName(input.eventResolutionName),
-res2FractionName(input.res2FractionName), res3FractionName(input.res3FractionName), timeOffsetName(input.timeOffsetName),
-angAccI1Name(input.angAccI1Name), angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name),
-angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name), angAccI7Name(input.angAccI7Name), angAccI8Name(input.angAccI8Name),
-angAccI9Name(input.angAccI9Name), angAccI10Name(input.angAccI10Name), timeName(input.timeName), 
-cosThetaName(input.cosThetaName), phiName(input.phiName), cosPsiName(input.cosPsiName), 
-cthetakName(input.cthetakName), phihName(input.phihName), cthetalName(input.cthetalName), 
-tagName(input.tagName), t(input.t),
-ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr), ctheta_1(input.ctheta_1), 
-ctheta_k(input.ctheta_k), phi_h(input.phi_h), ctheta_l(input.ctheta_l), 
-tag(input.tag), _gamma(input._gamma), dgam(input.dgam),
-Aperp_sq(input.Aperp_sq), Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq), As_sq(input.As_sq), delta_para(input.delta_para),
-delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2),
-delta_ms(input.delta_ms), phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag),
-_mistagP1(input._mistagP1), _mistagP0(input._mistagP0), _mistagSetPoint(input._mistagSetPoint), resolution(input.resolution), eventResolution(input.eventResolution),
-resolutionScale(input.resolutionScale), resolution1(input.resolution1), resolution2(input.resolution2), resolution3(input.resolution3),
-resolution2Fraction(input.resolution2Fraction), resolution3Fraction(input.resolution3Fraction), timeOffset(input.timeOffset),
-angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4), angAccI5(input.angAccI5),
-angAccI6(input.angAccI6), angAccI7(input.angAccI7), angAccI8(input.angAccI8), angAccI9(input.angAccI9), angAccI10(input.angAccI10),
-tlo(input.tlo), thi(input.thi), expL_stored(input.expL_stored), expH_stored(input.expH_stored), expSin_stored(input.expSin_stored),
-expCos_stored(input.expCos_stored), intExpL_stored(input.intExpL_stored), intExpH_stored(input.intExpH_stored),
-intExpSin_stored(input.intExpSin_stored), intExpCos_stored(input.intExpCos_stored), _useTimeAcceptance(input._useTimeAcceptance),
-_numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly), 
-_useCosAndSin(input._useCosAndSin), allowNegativeAsSq(input.allowNegativeAsSq), timeAcc(input.timeAcc),
-_useHelicityBasis(input._useHelicityBasis),
-_useEventResolution(input._useEventResolution),
-normalisationCacheValid(input.normalisationCacheValid),
-CachedA1(input.CachedA1), CachedA2(input.CachedA2), CachedA3(input.CachedA3), CachedA4(input.CachedA4), CachedA5(input.CachedA5),
-CachedA6(input.CachedA6), CachedA7(input.CachedA7), CachedA8(input.CachedA8), CachedA9(input.CachedA9), CachedA10(input.CachedA10),
-timeIntegralCacheValid(input.timeIntegralCacheValid), storeExpL(input.storeExpL), storeExpH(input.storeExpH),
-storeExpSin(input.storeExpSin), storeExpCos(input.storeExpCos), normalisationCacheUntagged(input.normalisationCacheUntagged)
-{
-	timeAcc = new SlicedAcceptance( *(input.timeAcc) );
-}
-*/
 
 //........................................................
 //Destructor
@@ -270,10 +233,14 @@ void Bs2JpsiPhi_Signal_v5::MakePrototypes()
 	else{
 		parameterNames.push_back( Phi_sName );
 	}
+	parameterNames.push_back( lambdaName );
 
 	parameterNames.push_back( mistagP1Name );
 	parameterNames.push_back( mistagP0Name );
 	parameterNames.push_back( mistagSetPointName );
+	parameterNames.push_back( mistagDeltaP1Name );
+	parameterNames.push_back( mistagDeltaP0Name );
+	parameterNames.push_back( mistagDeltaSetPointName );
 	
 	parameterNames.push_back( resScaleName );
 	if( ! useEventResolution() ) {
@@ -284,20 +251,7 @@ void Bs2JpsiPhi_Signal_v5::MakePrototypes()
 		parameterNames.push_back( res3FractionName );
 	}
 	parameterNames.push_back( timeOffsetName );
-	
-	/*
-	parameterNames.push_back( angAccI1Name );
-	parameterNames.push_back( angAccI2Name );
-	parameterNames.push_back( angAccI3Name );
-	parameterNames.push_back( angAccI4Name );
-	parameterNames.push_back( angAccI5Name );
-	parameterNames.push_back( angAccI6Name );
-	parameterNames.push_back( angAccI7Name );
-	parameterNames.push_back( angAccI8Name );
-	parameterNames.push_back( angAccI9Name );
-	parameterNames.push_back( angAccI10Name );
-	*/ 
-	 
+		 
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -308,8 +262,9 @@ vector<string> Bs2JpsiPhi_Signal_v5::GetDoNotIntegrateList()
 {
 	vector<string> list;
 	
-	list.push_back(mistagName) ;
-	if( useEventResolution() ) list.push_back(eventResolutionName) ;
+	//list.push_back(mistagName) ;
+	if( ! _usePunziMistag) list.push_back(mistagName) ;
+	if( useEventResolution() && ! _usePunziSigmat) list.push_back(eventResolutionName) ;
 		
 	if( _numericIntegralTimeOnly ) {
 		if( _useHelicityBasis ) {
@@ -378,11 +333,15 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet * NewParameterSet 
 		_cosphis = cos(phi_s) ;
 		_sinphis = sin(phi_s) ;
 	}
+	lambda = allParameters.GetPhysicsParameter( lambdaName )->GetValue();
 	
 	// Mistag parameters
 	_mistagP1		= allParameters.GetPhysicsParameter( mistagP1Name )->GetValue();
 	_mistagP0		= allParameters.GetPhysicsParameter( mistagP0Name )->GetValue();
 	_mistagSetPoint = allParameters.GetPhysicsParameter( mistagSetPointName )->GetValue();
+	_mistagDeltaP1		= allParameters.GetPhysicsParameter( mistagDeltaP1Name )->GetValue();
+	_mistagDeltaP0		= allParameters.GetPhysicsParameter( mistagDeltaP0Name )->GetValue();
+	_mistagDeltaSetPoint = allParameters.GetPhysicsParameter( mistagDeltaSetPointName )->GetValue();
 	
 	// Detector parameters
 	resolutionScale		= allParameters.GetPhysicsParameter( resScaleName )->GetValue();
@@ -395,19 +354,9 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet * NewParameterSet 
 	}
 	timeOffset          = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
 	
-	/* Superseeded by the new mechanism which reads it all from a root file
-	// Angular acceptance factors
-	angAccI1 = allParameters.GetPhysicsParameter( angAccI1Name )->GetValue();
-	angAccI2 = allParameters.GetPhysicsParameter( angAccI2Name )->GetValue();
-	angAccI3 = allParameters.GetPhysicsParameter( angAccI3Name )->GetValue();
-	angAccI4 = allParameters.GetPhysicsParameter( angAccI4Name )->GetValue();
-	angAccI5 = allParameters.GetPhysicsParameter( angAccI5Name )->GetValue();
-	angAccI6 = allParameters.GetPhysicsParameter( angAccI6Name )->GetValue();
-	angAccI7 = allParameters.GetPhysicsParameter( angAccI7Name )->GetValue();
-	angAccI8 = allParameters.GetPhysicsParameter( angAccI8Name )->GetValue();
-	angAccI9 = allParameters.GetPhysicsParameter( angAccI9Name )->GetValue();
-	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
-	*/
+	
+	// New: Prepare the coefficients of all of the time dependent terms (C,D,S etc)
+	this->prepareCDS() ;
 	
 	return result;
 }
@@ -1015,6 +964,23 @@ void Bs2JpsiPhi_Signal_v5::deCacheTimeIntegrals( unsigned int ires, unsigned int
 }		
 
 
+
+//....................................................
+// New to prepare all of the coeefficients needed in the time dependen terms
+void Bs2JpsiPhi_Signal_v5::prepareCDS()
+{
+
+	double F1 = 2.0*lambda / (1.0 + lambda*lambda);
+	double F2 = (1.0 - lambda*lambda) / (1.0 + lambda*lambda);
+	
+	_SS = _sinphis * F1;
+	_DD = _cosphis * F1;
+	_CC = F2;
+
+}
+
+
+
 //===========================================================================================
 // Debug printout
 //===========================================================================================
@@ -1023,7 +989,7 @@ void Bs2JpsiPhi_Signal_v5::deCacheTimeIntegrals( unsigned int ires, unsigned int
 void Bs2JpsiPhi_Signal_v5::DebugPrint( string message, double value )  const
 {
 	(void) message; (void) value;
-/*	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrint ***************************" << endl ;
+	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrint ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 	
 	cout << endl ;
@@ -1046,14 +1012,14 @@ void Bs2JpsiPhi_Signal_v5::DebugPrint( string message, double value )  const
 	cout << "   ctheta_tr " << ctheta_tr << endl ;
 	cout << "   ctheta_1 " << ctheta_1 << endl ;
 	cout << "   phi_tr " << phi_tr << endl ;		
-*/
+
 }
 
 
 void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 {
 	(void) message; (void) value;
-/*	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintXsec ***************************" << endl ;
+	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintXsec ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 	cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) << endl ;
 	cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) << endl ;
@@ -1091,13 +1057,13 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 	
 	cout << "   Pwave Only : " << PwaveTot << endl ;
 	cout << "   Swave add : " <<  SwaveAdditions << endl ;
-*/
+
 }
 
 void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 {
 	(void) message; (void) value;
-/*	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
+	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 	
 	cout << endl ;
@@ -1111,6 +1077,6 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 	cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl ;
 	cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
 	cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
-*/
+
 }
 

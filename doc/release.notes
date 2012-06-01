@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+
+2012/06/01 Pete Clarke
+   - Updated MistagDistribution (i) to use TMath and (ii) to add the small shoulder term (new parameter)
+
 2012/05/31 Rob Currie
    - Thread-Safed GammaDistribution PDF
 
@@ -149,6 +153,7 @@
    - Added some more doxygen documentation. Some of the dot graphs are now getting quite complex showing the interplay between the classes.
    - Updated the code which produces Toy Studies to provide plots which show the whole distribution, also updated the Makefile.
    - Moved the old Feldman Cousins code out of the main build as it's no longer callable and the more upto date code is much more reasonable, although still complex.
+
 
 2012/04/26 Greig Cowan
    - Fixed bug in DPTotalAmplitude PDF in the parameter transformation.

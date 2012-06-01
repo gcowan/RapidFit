@@ -34,9 +34,11 @@ class MistagDistribution : public BasePDF
 		double gamma ;
 		double mu ;
 		double beta ;
+		double shoulder ;
 		ObservableRef GFgammaName;
 		ObservableRef GFmuName;
 		ObservableRef GFbetaName;
+		ObservableRef GFshoulderName;
 
 		// Observables
 		double x ;
