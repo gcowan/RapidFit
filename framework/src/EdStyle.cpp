@@ -20,6 +20,8 @@
 //	System Headers
 #include <iostream>
 #include <string.h>
+#include <sstream>
+#include <cstdlib>
 
 using namespace::std;
 
@@ -624,12 +626,13 @@ int EdStyle::Test_Suffix( string arg )
 	sufficies.push_back( "_pull" );
 	sufficies.push_back( "_scan" );
 	int suffix_index = -1;
+
 	for( unsigned int i=0; i< sufficies.size(); ++i )
 	{
 		size_t found = arg.find( sufficies[i] );
 		if( found != string::npos )
 		{
-			suffix_index=(int)i;
+			suffix_index= i;
 			break;
 		}
 	}
@@ -657,12 +660,12 @@ string EdStyle::Remove_Suffix( string arg )
 	}
 	if( suffix_index >= 0 )
 	{
-		string output;
+		stringstream output;
 		for( unsigned int i=0; i< found; ++i )
 		{
-			output.push_back( arg[i] );
+			output << arg[i];
 		}
-		return output;
+		return output.str();
 	}
 
 	return arg;
@@ -671,8 +674,8 @@ string EdStyle::Remove_Suffix( string arg )
 string EdStyle::Get_Suffix( string arg )
 {
 	vector<string> sufficies_output;
-	sufficies_output.push_back( "" );
-	sufficies_output.push_back( " err" );
+	sufficies_output.push_back( " value" );
+	sufficies_output.push_back( " error" );
 	sufficies_output.push_back( " gen" );
 	sufficies_output.push_back( " pull" );
 	sufficies_output.push_back( " scan" );

@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/06/04 Rob Currie
+   - Change the way that toy studies are performed to ignore all results that have a pull of > 5 sigma when calculating the average value/error/pull.
+     This cut checks ALL floated parameters within the fit to remove badly behaved results
+     If you wish to turn off this cut for diagnostics/known biases then pass the option --allData as a command line option
 
 2012/06/01 Pete Clarke
    - Updated MistagDistribution (i) to use TMath and (ii) to add the small shoulder term (new parameter)

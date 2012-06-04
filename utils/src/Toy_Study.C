@@ -21,12 +21,23 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace::std;
 
 int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<string> OtherOptions )
 {
-	(void) OtherOptions;
+	bool noPullCuts=false;
+
+	for( unsigned int i=0; i< OtherOptions.size(); ++i )
+	{
+		string thisOption = OtherOptions[i];
+
+		if( thisOption == "--allData" )
+		{
+			noPullCuts = true;
+		}
+	}
 
 	gStyle->SetOptStat(0);
 	gStyle->SetOptFit(111);
@@ -68,16 +79,24 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 
 	cout << all_parameter_plots.size() << " Plots to Draw" << endl;
 
+	TString all_pulls_lt5;
+	if( !noPullCuts )
+	{
+		for( unsigned int j=0; j< all_parameter_plots.size(); ++j )
+		{
+			string param_name = EdStyle::Remove_Suffix( all_parameter_plots[j] ).Data();
+			//      Results at 5 sigma are heavily biased
+			all_pulls_lt5.Append( "&&(abs("+TString(param_name.c_str())+"_pull)<5.)" );
+		}
+	}
+
 	for( unsigned int j=0; j< all_parameter_plots.size(); ++j )
 	{
 
 		TString cut_str("(Fit_Status==3)");
 
-		string this_suffix = string(EdStyle::Get_Suffix( all_parameter_plots[j] )); this_suffix[0] = '_';
-                if( this_suffix == string(pull_suffix.Data()) )
-		{
-			cut_str.Append("&&(abs("+all_parameter_plots[j]+")<10.)");
-		}
+		//	Results at >5 sigma are heavily biased, fit is by definition badly behaved
+		cut_str.Append( all_pulls_lt5 );
 
 		input_tree->Draw( all_parameter_plots[j], cut_str, "goff" );
 
