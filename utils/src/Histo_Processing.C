@@ -173,7 +173,9 @@ void Histogram_Processing::Silent_Fit( TH1* input_histo, TString fit_type, int O
 {
 	//      the gamma function in ROOT has issues with verbosity, let's silence it and then return the verbosity back at the end
 
-	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
+	ofstream filestr;
+	filestr.open ("/dev/null");
 	//      If the user wanted silence we point the Std Output Streams to /dev/null
 	if( OutputLevel <= -1 )
 	{
@@ -181,7 +183,11 @@ void Histogram_Processing::Silent_Fit( TH1* input_histo, TString fit_type, int O
 		cerr_bak = cerr.rdbuf();
 		clog_bak = clog.rdbuf();
 		//  Redirect the errors to the empty void of nullness
+		nullbuf = filestr.rdbuf();
 		freopen("/dev/null", "w", stderr);
+		cout.rdbuf(nullbuf);
+		cerr.rdbuf(nullbuf);
+		clog.rdbuf(nullbuf);
 	}
 	//  Redirect the errors to the empty void of nullness
 	freopen("/dev/null", "w", stderr);
@@ -473,77 +479,77 @@ TPaveText* Histogram_Processing::addLHCbLabel(TString footer, bool DATA)
 {
 	//TPaveText * label = new TPaveText(0.18, 0.77, 0.18, 0.88,"BRNDC");
 	TPaveText* label = new TPaveText( gStyle->GetPadLeftMargin() + 0.05, 
-						0.87 - gStyle->GetPadTopMargin(),
-						gStyle->GetPadLeftMargin() + 0.30,
-						0.95 - gStyle->GetPadTopMargin(),
+			0.87 - gStyle->GetPadTopMargin(),
+			gStyle->GetPadLeftMargin() + 0.30,
+			0.95 - gStyle->GetPadTopMargin(),
 
-	//TPaveText* label = new TPaveText(0.7 - gStyle->GetPadRightMargin(),
-        //                        0.87 - gStyle->GetPadTopMargin(),
-        //                        1. - gStyle->GetPadRightMargin(),
-        //                        0.95 - gStyle->GetPadTopMargin(),
-                                "BRNDC");
-					
-	label->SetFillStyle(0);         //Transparent i.e. Opacity of 0 :D
-	label->SetBorderSize(0);
-	label->SetTextAlign(11);
-	label->SetTextSize(Float_t(0.04));
-	//TString labelstring( "LHC#font[12]{b} 2011" );
-	//TString labelstring( "LHCb 2011 " );
-	TString labelstring( "LHCb" );//"#splitline{LHCb}{#scale[1.0]{Preliminary}}" );
-	//if( DATA ) labeltstring.Append( " Data" );
-	//if( !DATA ) labeltstring.Append( " Simulation" );
-	label->AddText( labelstring );
-	label->AddText( "#scale[1.0]{Preliminary}" );
-	//label->AddText("#sqrt{s} = 7TeV " + footer );
-	return label;
+			//TPaveText* label = new TPaveText(0.7 - gStyle->GetPadRightMargin(),
+			//                        0.87 - gStyle->GetPadTopMargin(),
+			//                        1. - gStyle->GetPadRightMargin(),
+			//                        0.95 - gStyle->GetPadTopMargin(),
+		"BRNDC");
+
+			label->SetFillStyle(0);         //Transparent i.e. Opacity of 0 :D
+			label->SetBorderSize(0);
+			label->SetTextAlign(11);
+			label->SetTextSize(Float_t(0.04));
+			//TString labelstring( "LHC#font[12]{b} 2011" );
+			//TString labelstring( "LHCb 2011 " );
+			TString labelstring( "LHCb" );//"#splitline{LHCb}{#scale[1.0]{Preliminary}}" );
+			//if( DATA ) labeltstring.Append( " Data" );
+			//if( !DATA ) labeltstring.Append( " Simulation" );
+			label->AddText( labelstring );
+			label->AddText( "#scale[1.0]{Preliminary}" );
+			//label->AddText("#sqrt{s} = 7TeV " + footer );
+			return label;
 }
 
 vector<TMultiGraph*> Histogram_Processing::GetContoursFromTH2( TH2* input_th2, const vector<double>& contour_list, TRandom* rand )
 {
-        if( rand == NULL ) rand = gRandom;
-        vector<TMultiGraph*> returnable_Contours;
+	if( rand == NULL ) rand = gRandom;
+	vector<TMultiGraph*> returnable_Contours;
 
-        TString TCanvas_Name("TCanvas_");TCanvas_Name+=rand->Rndm();
-        TCanvas* c1 = new TCanvas( TCanvas_Name, TCanvas_Name, 1680, 1050 );
+	TString TCanvas_Name("TCanvas_");TCanvas_Name+=rand->Rndm();
+	TCanvas* c1 = new TCanvas( TCanvas_Name, TCanvas_Name, 1680, 1050 );
 
-        input_th2->SetContour( contour_list.size(), &(contour_list[0]) );
+	input_th2->SetContour( contour_list.size(), &(contour_list[0]) );
 
-        input_th2->Draw("cont LIST");
-        c1->Update();
+	input_th2->Draw("cont LIST");
+	c1->Update();
 
-        TObjArray* generated_contours = (TObjArray *)gROOT->GetListOfSpecials()->FindObject("contours");
+	TObjArray* generated_contours = (TObjArray *)gROOT->GetListOfSpecials()->FindObject("contours");
 
-        if( generated_contours == NULL ) return returnable_Contours;
+	if( generated_contours == NULL ) return returnable_Contours;
 
-        TString rand_str; rand_str+=rand->Rndm();
+	TString rand_str; rand_str+=rand->Rndm();
 
-        for( unsigned int i=0; i< generated_contours->GetSize(); ++i )
-        {
-                TString Contour_Name( "Contour_"+rand_str+"_" ); Contour_Name+=i;
+	for( unsigned int i=0; i< generated_contours->GetSize(); ++i )
+	{
+		TString Contour_Name( "Contour_"+rand_str+"_" ); Contour_Name+=i;
 
-                TMultiGraph* this_contour = new TMultiGraph( Contour_Name, Contour_Name );
+		TMultiGraph* this_contour = new TMultiGraph( Contour_Name, Contour_Name );
 
-                TList* contour_parts = (TList*) generated_contours->At(i);
+		TList* contour_parts = (TList*) generated_contours->At(i);
 
-                for( unsigned int j=0; j< contour_parts->GetSize(); ++j )
-                {
+		for( unsigned int j=0; j< contour_parts->GetSize(); ++j )
+		{
 			TString Part_Name( "Contour_"+rand_str+"_" ); Part_Name+=i;
 			Part_Name.Append("_"); Part_Name+=j;
-                        TGraph* this_part = (TGraph*) contour_parts->At(j);
+			TGraph* this_part = (TGraph*) contour_parts->At(j);
 
-                        TGraph* copy_this_part = new TGraph( *this_part );
+			TGraph* copy_this_part = new TGraph( *this_part );
 
 			copy_this_part->SetName(Part_Name);
 			copy_this_part->SetTitle(Part_Name);
 
-                        this_contour->Add( copy_this_part );
-                }
+			this_contour->Add( copy_this_part );
+		}
 
-                returnable_Contours.push_back( this_contour );
-        }
+		returnable_Contours.push_back( this_contour );
+	}
 
-        c1->Close();
-        
-        return returnable_Contours;
+	c1->Close();
+
+	return returnable_Contours;
 }
 

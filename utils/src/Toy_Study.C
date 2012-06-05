@@ -22,8 +22,129 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iomanip>
+#include <fstream>
 
 using namespace::std;
+
+void LatexDocHeader( stringstream& latex )
+{
+	latex << "\\documentclass[a4paper,10pt]{article}" << endl;
+	latex << "\\usepackage[utf8]{inputenc}" << endl;
+	latex << "\\title{}" << endl;
+	latex << "\\author{}" << endl;
+	latex << "\\date{}" << endl;
+	latex << endl;
+	latex << "\\pdfinfo{" << endl;
+	latex << "/Title    ()" << endl;
+	latex << "/Author   ()" << endl;
+	latex << "/Creator  ()" << endl;
+	latex << "/Producer ()" << endl;
+	latex << "/Subject  ()" << endl;
+	latex << "/Keywords ()" << endl;
+	latex << "}" << endl;
+	latex << endl;
+	latex << "\\usepackage{amsmath}" << endl;
+	latex << "\\usepackage{caption}" << endl;
+	latex << "\\usepackage{subcaption}" << endl;
+	latex << "\\usepackage{graphicx}" << endl;
+	latex << endl;
+	latex << "\\begin{document}" << endl;
+	latex << endl;
+}
+
+void LatexDocFooter( stringstream& latex )
+{
+	latex << endl;
+	latex << "\\end{document}" << endl;
+	latex << endl;
+}
+
+void TableHeader( stringstream& latex )
+{
+	latex << endl;
+	latex << "\\let\\oldpm\\pm" << endl;
+	latex << "\\renewcommand{\\pm}{\\ensuremath{\\oldpm}}" << endl;
+	latex << "\\begin{table}[h]" << endl;
+	latex << "\\begin{center}" << endl;
+	latex << "\\begin{tabular}{@{}|l|r|r|@{}}" << endl;
+	latex << "\\hline" << endl;
+	latex << "Paramater & Sensitivity & Pull Bias \\\\" << endl;
+	latex << "\\hline" << endl;
+}
+
+
+void TableFooter( stringstream& latex )
+{
+	latex << "\\hline" << endl;
+	latex << "\\end{tabular}" << endl;
+	latex << "\\caption{Some Caption}" << endl;
+	latex << "\\label{thisTable}" << endl;
+	latex << "\\end{center}" << endl;
+	latex << "\\end{table}" << endl;
+	latex << "\\renewcommand{\\pm}{\\oldpm}" << endl;
+	latex << endl;
+}
+
+void ImageSplit( stringstream& latex )
+{
+	latex << "\\caption{Some Caption for The Image}" << endl;
+	latex << "\\label{fig:Some_Label}" << endl;
+	latex << "\\end{figure}" << endl;
+	latex << "\\clearpage" << endl;
+	latex << endl;
+	latex << "\\begin{figure}" << endl;
+	latex << "\\ContinuedFloat" << endl;
+}
+
+void ProcessImageContent( stringstream& latex, vector<TString> all_parameter_plots )
+{
+	//      3 x each parameter, value, error, pull
+	int num_params = (int)all_parameter_plots.size()/3;
+
+	latex << "\\begin{figure}" << endl;
+
+	for( int i=0; i< num_params; ++i )
+	{
+		if( (i%5 == 0) && (i != 0) )
+		{
+			ImageSplit( latex );
+		}
+		string param_name = EdStyle::Remove_Suffix( all_parameter_plots[i] ).Data();
+		string latex_name = string(EdStyle::GetParamLatexName( param_name ) );
+		latex << "\\begin{subfigure}[" << latex_name << "]{\\textwidth}" << endl;
+		latex << "{\\includegraphics[width=0.3\\textwidth]{" << param_name << "_error_c_thru.png} }" << endl;
+		latex << "{\\includegraphics[width=0.3\\textwidth]{" << param_name << "_value_c_thru.png} }" << endl;
+		latex << "{\\includegraphics[width=0.3\\textwidth]{" << param_name << "_pull_c_thru.png} }" << endl;
+		latex << "\\caption{some sub-caption " << latex_name << "}" << endl;
+		latex << "\\label{fig:" << param_name << "}" << endl;
+		latex << "\\end{subfigure}" << endl;
+		latex << "\\newline" << endl;
+	}
+
+	latex << "\\caption{Some Caption for The Image}" << endl;
+	latex << "\\label{fig:Some_Label}" << endl;
+	latex << "\\end{figure}" << endl;
+	latex << endl;
+}
+
+void ProcessTableContent( stringstream& latex, vector<TString> all_parameter_plots, vector<pair<pair<double,double>,pair<double,double> > > table_content )
+{
+	//	3 x each parameter, value, error, pull
+	int num_params = (int)all_parameter_plots.size()/3;
+
+	latex << setprecision(3);
+
+	for( int i=0; i<num_params; ++i  )
+	{
+		string param_name = EdStyle::Remove_Suffix( all_parameter_plots[i] ).Data();
+
+		latex << string(EdStyle::GetParamLatexName( param_name ) ) << " & ";
+		latex << table_content[i+num_params].first.first << " & ";
+		latex << table_content[i+num_params+num_params].first.first << " \\pm ";
+		latex << table_content[i+num_params+num_params].first.second << "\\\\" << endl;
+	}
+}
 
 int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<string> OtherOptions )
 {
@@ -90,6 +211,16 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		}
 	}
 
+	stringstream latex;
+
+	LatexDocHeader( latex );
+
+	stringstream latexTable;
+
+	TableHeader( latexTable );
+
+	vector<pair<pair<double,double>,pair<double,double> > > table_content;
+
 	for( unsigned int j=0; j< all_parameter_plots.size(); ++j )
 	{
 
@@ -130,8 +261,47 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 
 		c1->Update();
 
+		TF1* fitted = input_histo->GetFunction( fit_type );
+
+		table_content.push_back( make_pair(
+					make_pair( fitted->GetParameter(1), fitted->GetParError(1) ),
+					make_pair( fitted->GetParameter(2), fitted->GetParError(2) )
+					) );
+
 		Histogram_Processing::Silent_Print( c1, Output_Dir+"/"+all_parameter_plots[j]+"_c_thru.png" );
 	}
+
+	ProcessTableContent( latexTable, all_parameter_plots, table_content );
+
+	TableFooter( latexTable );
+
+	ofstream outFileTable;
+	outFileTable.open( Output_Dir+"/ToyStudy_Table.tex");
+	outFileTable << latexTable.str();
+	outFileTable.close();
+
+	latex << "\\input{ToyStudy_Table}" << endl;
+	latex << endl;
+	latex << "\\clearpage" << endl;
+
+	stringstream latexImage;
+
+	ProcessImageContent( latexImage, all_parameter_plots );
+
+	ofstream outFileImage;
+	outFileImage.open( Output_Dir+"/ToyStudy_Image.tex");
+	outFileImage << latexImage.str();
+	outFileImage.close();
+
+	latex << "\\input{ToyStudy_Image}" << endl;
+	latex << endl;
+
+	LatexDocFooter( latex );
+
+	ofstream outFile;
+	outFile.open( Output_Dir+"/ToyStudy_LaTeX.tex" );
+	outFile << latex.str();
+	outFile.close();
 
 	return 0;
 }
