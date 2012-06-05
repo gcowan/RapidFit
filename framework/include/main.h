@@ -1,5 +1,6 @@
 
 #pragma once
+
 #ifndef _main_RapidFit_H
 #define _main_RapidFit_H
 

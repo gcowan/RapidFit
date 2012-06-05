@@ -124,6 +124,25 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle );
 
+	BottleParameters->AddPhysicsParameters( bottle->GetParameterSet(), true );
+
+	vector<string> fixed_names = checkedGenerationParameters->GetAllFixedNames();
+
+	for( vector<string>::iterator name_i = fixed_names.begin(); name_i != fixed_names.end(); ++name_i )
+	{
+		PhysicsParameter* thisParam = checkedGenerationParameters->GetPhysicsParameter( *name_i );
+
+		ResultParameter* thisResult = new ResultParameter( thisParam );
+
+		bool wasAdded = result->GetResultParameterSet()->ForceNewResultParameter( thisResult );
+
+		if( !wasAdded ) result->GetResultParameterSet()->SetResultParameter( *name_i, thisResult );
+
+		delete thisResult;
+	}
+
+	delete checkedGenerationParameters;
+
 	delete bottle;
 
 	return result;
@@ -205,6 +224,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		delete bottle;
 		delete internalBottleParameters;
 
+		BottleParameters->AddPhysicsParameters( bottle->GetParameterSet(), true );
+
 		return result;
 	}
 	else
@@ -272,6 +293,10 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 
 	/*!	Check that the ParameterSet in the output contains the provided ParameterSet regardless of what was passed to the Minimiser	*/
 	CheckParameterSet( ReturnableFitResult, internalBottleParameters );
+
+	BottleParameters->AddPhysicsParameters( internalBottleParameters, true );
+
+	delete internalBottleParameters;
 
 	return ReturnableFitResult;
 }

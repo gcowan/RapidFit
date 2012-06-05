@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 using namespace::std;
 
@@ -75,6 +76,12 @@ vector<DataSetConfiguration*> PDFWithData::GetAllDataSetConfigs()
 
 void PDFWithData::ClearCache()
 {
+	//cout << "CacheSize: " << cached_data.size() << endl;
+
+	//	Problems Happen so protect against it
+	sort( cached_data.begin(), cached_data.end() );
+	cached_data.erase( unique( cached_data.begin(), cached_data.end() ), cached_data.end() );
+
 	while( !cached_data.empty() )
 	{
 		//cout << "Removing DataSet At: " << cached_data.back() << endl;

@@ -54,10 +54,23 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 
 		output_interface->StartStopwatch();
 
-		//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
-		//	Do a scan point fit
-		FitResult * scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
+		FitResult* scanStepResult=NULL;
 
+		try{
+			//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
+			//	Do a scan point fit
+			scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
+		}
+		catch( int e )
+		{
+			cerr << "Caught Scan Error: " << e << endl;
+			exit(-987);
+		}
+		catch( ... )
+		{
+			cerr << "Caught Unknown Scan Error" << endl;
+			exit(-986);
+		}
 
 		int retries = 0;
 		int left_right = 1;

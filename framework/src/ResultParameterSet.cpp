@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 ///	RapidFit Headers
 #include "ResultParameterSet.h"
@@ -131,7 +131,7 @@ bool ResultParameterSet::SetResultParameter( string Name, ResultParameter * NewR
 		{
 			//Delete old parameter before overwriting the pointer
 			if( allParameters[nameIndex] != NULL ) delete allParameters[nameIndex];
-			allParameters[nameIndex] = NewResultParameter;
+			allParameters[nameIndex] = new ResultParameter( *NewResultParameter );
 			return true;
 		}
 	}
@@ -145,8 +145,25 @@ bool ResultParameterSet::SetResultParameter( string Name, double Value, double O
 {
 	ResultParameter * newParameter = new ResultParameter( Name, Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
 	bool returnValue = SetResultParameter( Name, newParameter );
-	//delete newParameter;
+	delete newParameter;
 	return returnValue;
+}
+
+//Initialise a physics parameter
+bool ResultParameterSet::ForceNewResultParameter( ResultParameter* Input )
+{
+	string Name = Input->GetName();
+	bool found=false;
+	for( unsigned short int i=0; i< allNames.size(); ++i )
+	{
+		if( allNames[i] == Name )  found = true;
+	}
+	if( !found )
+	{
+		allNames.push_back( Name );
+		allParameters.push_back( new ResultParameter( *Input ) );
+	}
+	return !found;
 }
 
 //Initialise a physics parameter

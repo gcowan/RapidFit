@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	RapidFit Headers
 #include "ResultParameter.h"
@@ -22,6 +22,43 @@
 //Default constructor
 ResultParameter::ResultParameter() : name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false)
 {
+}
+
+ResultParameter::ResultParameter( const PhysicsParameter* Input )
+	: name("Undefined"), value(0.0), originalValue(-9999.), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.0), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false)
+{
+	name = Input->GetName();
+	value = Input->GetValue();
+	originalValue = Input->GetOriginalValue();
+	error = Input->GetStepSize();
+	if( error < 0 ) error = 0.;
+	minimum = Input->GetMinimum();
+	maximum = Input->GetMaximum();
+	stepSize = Input->GetStepSize();
+	type = Input->GetType();
+	unit = Input->GetUnit();
+	if (maximum < minimum)
+	{
+		cerr << "Result parameter \"" << name << "\" has maximum less than minimum: values swapped" << endl;
+		double temp = minimum;
+		minimum = maximum;
+		maximum = temp;
+	}
+
+	if ( (value < minimum) && ( fabs( minimum ) > DOUBLE_TOLERANCE ) )
+	{
+		cerr << "Result parameter \"" << name << "\" has value less than minimum" << endl;
+	}
+
+	if ( (value > maximum) && ( fabs( maximum ) > DOUBLE_TOLERANCE ) )
+	{
+		cerr << "Result parameter \"" << name << "\" has value greater than maximum" << endl;
+	}
+
+	if (unit == "")
+	{
+		cerr << "Result parameter \"" << name << "\" has no unit! What kind of physicist are you?" << endl;
+	}
 }
 
 //Constructor with correct argument

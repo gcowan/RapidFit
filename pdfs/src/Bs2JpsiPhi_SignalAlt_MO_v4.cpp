@@ -498,8 +498,8 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate(DataPoint * measurement)
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw 10 ;
-		if( returnValue <= 0. ) throw 10 ;
+		if( isnan(returnValue) ) throw( 47 );
+		if( returnValue <= 0. ) throw( 238 );
 	}
 	
 			
@@ -556,8 +556,8 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateTimeOnly(DataPoint * measurement)
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateTimeOnly() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw 10 ;
-		if( returnValue <= 0. ) throw 10 ;
+		if( isnan(returnValue) ) throw( 78 );
+		if( returnValue <= 0. ) throw( 476 );
 	}
 		
 	
@@ -662,8 +662,8 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Normalisation(DataPoint * measurement, PhaseS
 	bool c2 = (returnValue <= 0.) ;	
 	if( DEBUGFLAG && (c1 || c2 ) ) {
 		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::Normalisation() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw 10 ;
-		if( returnValue <= 0. ) throw 10 ;
+		if( isnan(returnValue) ) throw( 23 );
+		if( returnValue <= 0. ) throw( 823 );
 	}
 		
 	

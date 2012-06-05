@@ -22,6 +22,7 @@ class ResultParameter
 {
 	public:
 		ResultParameter();
+		ResultParameter( const PhysicsParameter* );
 		ResultParameter( string, double, double, double, double, double, string, string );
 		~ResultParameter();
 

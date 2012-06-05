@@ -48,6 +48,7 @@ class ResultParameterSet
 		bool SetResultParameter( string, double, double, double, double, double, string, string );
 
 		//Forcibly change or add a new parameter to this object
+		bool ForceNewResultParameter( ResultParameter* );
 		bool ForceNewResultParameter( string, double, double, double, double, double, string, string );
 
 		//Get a ParameterSet constructed from the values of the parameters in this class
