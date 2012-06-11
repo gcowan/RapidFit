@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2012/06/11 Greig Cowan/Joel Bressieux
+   - Updated LASS PDF to allow for floating parameters.
+   - Bug fix in DPHistoBackground PDF.
+   - Changes to Exponential due to bugs.
+
 2012/06/05 Rob Currie
    - Replaced main.cpp now much more modular
    - Added new classes ParseCommandLine and RapidFitConfiguration in order to do this

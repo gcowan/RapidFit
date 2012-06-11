@@ -9,7 +9,7 @@
 #define DOUBLE_TOLERANCE 1E-6
 
 DPLassShape::DPLassShape(double mR, double gammaR, int L,
-                    double m1, double m2, double R, double a, double r):
+                         double m1, double m2, double R, double a, double r):
    mR(mR)
   ,gammaR(gammaR)
   ,LR(L)
@@ -103,9 +103,9 @@ double DPLassShape::daughterMomentum(double m)
   return momentum;
 }
 
-void DPLassShape::setResonanceParameters(double a, double r)
+void DPLassShape::setResonanceParameters(double a_lass, double r_lass)
 {
-	a = 0;
-	r = 0;
+	a = a_lass;
+	r = r_lass;
 	return;
 }

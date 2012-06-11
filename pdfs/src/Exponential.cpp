@@ -20,18 +20,19 @@ PDF_CREATOR( Exponential );
 Exponential::Exponential( PDFConfigurator* configurator) :
 	// Physics parameters
 	tauName	( configurator->getName("tau") )
+	, eventResolutionName   ( configurator->getName("eventResolution") )
 	, resScale1Name          ( configurator->getName("timeResolutionScale1") )
 	, resScale2Name          ( configurator->getName("timeResolutionScale2") )
 	, resScale3Name          ( configurator->getName("timeResolutionScale3") )
-	, eventResolutionName   ( configurator->getName("eventResolution") )
 	, sigma1Name	( configurator->getName("timeResolution1") )
 	, sigma2Name	( configurator->getName("timeResolution2") )
-	, timeRes1FracName( configurator->getName("timeResolution1Fraction") )
+	, sigma3Name	( configurator->getName("timeResolution3") )
 	, timeRes2FracName( configurator->getName("timeResolution2Fraction") )
+	, timeRes3FracName( configurator->getName("timeResolution3Fraction") )
 	// Observables
 	, timeName      ( configurator->getName("time") )
 	//objects used in XML
-	, tau(), sigma(), sigma1(), sigma2(), timeRes1Frac(), timeRes2Frac()
+	, tau(), sigma(), sigma1(), sigma2(), sigma3(), timeRes2Frac(), timeRes3Frac()
 	, resolutionScale1(), resolutionScale2(), resolutionScale3()
 	, tlow(), thigh(), time()
 	, _useEventResolution(false)
@@ -52,11 +53,39 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 		}
 	}
 	else {
-		timeAcc = new SlicedAcceptance( -1.5, 20. );
-		cout << "Exponential:: Constructing timeAcc: DEFAULT FLAT [-1.5 < t < 20]  " << endl;
+		timeAcc = new SlicedAcceptance( -25., 25. );
+		cout << "Exponential:: Constructing timeAcc: DEFAULT FLAT [-25 < t < 25]  " << endl;
 	}
 	MakePrototypes();
 }
+
+
+Exponential::Exponential( const Exponential &copy ) :
+        BasePDF( (BasePDF)copy )
+        , tauName ( copy.tauName )
+	, eventResolutionName   ( copy.eventResolutionName )
+	, resScale1Name          ( copy.resScale1Name )
+	, resScale2Name          ( copy.resScale2Name )
+	, resScale3Name          ( copy.resScale3Name )
+	, sigma1Name	( copy.sigma1Name )
+	, sigma2Name	( copy.sigma2Name )
+	, sigma3Name	( copy.sigma3Name )
+	, timeRes2FracName( copy.timeRes2FracName )
+	, timeRes3FracName( copy.timeRes3FracName )
+	, timeName      ( copy.timeName )
+	, tau( copy.tau )
+	, sigma( copy.sigma ), sigma1( copy.sigma1 ), sigma2( copy.sigma2 ), sigma3( copy.sigma3 )
+	, timeRes2Frac( copy.timeRes2Frac), timeRes3Frac( copy.timeRes3Frac )
+        , resolutionScale1( copy.resolutionScale1 ), resolutionScale2( copy.resolutionScale2 ), resolutionScale3( copy.resolutionScale3 )
+        , tlow( copy.tlow ), thigh( copy.thigh ), time( copy.time )
+	, _useEventResolution( copy._useEventResolution )
+        , _useTimeAcceptance( copy._useTimeAcceptance )
+	, _numericIntegralForce( copy._numericIntegralForce )
+{
+        timeAcc = new SlicedAcceptance( *(copy.timeAcc) );
+	cout << "making copy " << tau << endl;
+}
+
 
 //Make the data point and parameter set
 void Exponential::MakePrototypes()
@@ -72,15 +101,16 @@ void Exponential::MakePrototypes()
 	//Make the parameter set
 	vector<string> parameterNames;
 	parameterNames.push_back( tauName );
-	parameterNames.push_back( resScale1Name );
-	parameterNames.push_back( resScale2Name );
-	parameterNames.push_back( resScale3Name );
-	parameterNames.push_back( timeRes1FracName );
 	parameterNames.push_back( timeRes2FracName );
+	parameterNames.push_back( timeRes3FracName );
 	if( ! useEventResolution() ) {
 		parameterNames.push_back( sigma1Name );
 		parameterNames.push_back( sigma2Name );
+		parameterNames.push_back( sigma3Name );
 	}
+	parameterNames.push_back( resScale1Name );
+	parameterNames.push_back( resScale2Name );
+	parameterNames.push_back( resScale3Name );
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -100,16 +130,17 @@ Exponential::~Exponential()
 bool Exponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
-	resolutionScale1 = allParameters.GetPhysicsParameter( resScale1Name )->GetValue();
-	resolutionScale2 = allParameters.GetPhysicsParameter( resScale2Name )->GetValue();
-	resolutionScale3 = allParameters.GetPhysicsParameter( resScale3Name )->GetValue();
-	timeRes1Frac = allParameters.GetPhysicsParameter( timeRes1FracName )->GetValue();
 	timeRes2Frac = allParameters.GetPhysicsParameter( timeRes2FracName )->GetValue();
+	timeRes3Frac = allParameters.GetPhysicsParameter( timeRes3FracName )->GetValue();
 	tau = allParameters.GetPhysicsParameter( tauName )->GetValue();
 	if( ! useEventResolution() ) {
 		sigma1    = allParameters.GetPhysicsParameter( sigma1Name )->GetValue();
 		sigma2    = allParameters.GetPhysicsParameter( sigma2Name )->GetValue();
-	}
+		sigma3    = allParameters.GetPhysicsParameter( sigma3Name )->GetValue();
+	} 
+	resolutionScale1 = allParameters.GetPhysicsParameter( resScale1Name )->GetValue();
+	resolutionScale2 = allParameters.GetPhysicsParameter( resScale2Name )->GetValue();
+	resolutionScale3 = allParameters.GetPhysicsParameter( resScale3Name )->GetValue();
 
 	return isOK;
 }
@@ -130,7 +161,7 @@ double Exponential::Evaluate(DataPoint * measurement)
 	}
 	else if( useEventResolution() ) {
 		// Event-by-event resolution has been selected
-		if( timeRes1Frac >= 0.9999 )
+		if( (1. - timeRes2Frac - timeRes3Frac ) >= 0.9999 )
 		{
 			// Set the member variable for time resolution to the first value and calculate
 			sigma = eventResolution * resolutionScale1;
@@ -147,11 +178,11 @@ double Exponential::Evaluate(DataPoint * measurement)
 			// Set the member variable for time resolution to the second value and calculate
 			sigma = eventResolution * resolutionScale3;
 			double val3 = buildPDFnumerator();
-			num = timeRes1Frac*val1 + timeRes2Frac*val2 + (1. - timeRes1Frac - timeRes2Frac)*val3;
+			num = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
 		}
 	}
 	else {
-		if( timeRes1Frac >= 0.9999 )
+		if(  (1. - timeRes2Frac - timeRes3Frac ) >= 0.9999 )
 		{
 			// Set the member variable for time resolution to the first value and calculate
 			sigma = sigma1;
@@ -165,7 +196,10 @@ double Exponential::Evaluate(DataPoint * measurement)
 			// Set the member variable for time resolution to the second value and calculate
 			sigma = sigma2;
 			double val2 = buildPDFnumerator();
-			num = timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+			// Set the member variable for time resolution to the second value and calculate
+			sigma = sigma3;
+			double val3 = buildPDFnumerator();
+			num = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
 		}
 	}
 	if( useTimeAcceptance() ) num = num * timeAcc->getValue(time);
@@ -204,7 +238,7 @@ double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
 			tlow = timeBound->GetMinimum();
 			thigh = timeBound->GetMaximum();
 		}
-		if( timeRes1Frac >= 0.9999 )
+		if(  (1. - timeRes2Frac - timeRes3Frac ) >= 0.9999 )
 		{
 			// Set the member variable for time resolution to the first value and calculate
 			sigma = sigma1;
@@ -218,7 +252,9 @@ double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
 			// Set the member variable for time resolution to the second value and calculate
 			sigma = sigma2;
 			double val2 = buildPDFdenominator();
-			norm = timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
+                        sigma = sigma3;
+                        double val3 = buildPDFdenominator();
+                        norm = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
 		}
 	}
 	return norm;
@@ -244,7 +280,7 @@ double Exponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 
 	if( useEventResolution() )  {
 		eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
-		if( timeRes1Frac >= 0.9999 )
+		if(  (1. - timeRes2Frac - timeRes3Frac ) >= 0.9999 )
 		{
 			// Set the member variable for time resolution to the first value and calculate
 			sigma = eventResolution * resolutionScale1;
@@ -261,11 +297,28 @@ double Exponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 			// Set the member variable for time resolution to the second value and calculate
 			sigma = eventResolution * resolutionScale3;
 			double val3 = buildPDFdenominator();
-			norm = timeRes1Frac*val1 + timeRes2Frac*val2 + (1. - timeRes1Frac - timeRes2Frac)*val3;
+			norm =  (1. - timeRes2Frac - timeRes3Frac )*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
 		}
 	}
 	else {
-		norm = -1.;
+		if(  (1. - timeRes2Frac - timeRes3Frac ) >= 0.9999 )
+		{
+			// Set the member variable for time resolution to the first value and calculate
+			sigma = sigma1;
+			norm = buildPDFdenominator();
+		}       
+		else
+		{
+			// Set the member variable for time resolution to the first value and calculate
+			sigma = sigma1;
+			double val1 = buildPDFdenominator();
+			// Set the member variable for time resolution to the second value and calculate
+			sigma = sigma2;
+			double val2 = buildPDFdenominator();
+                        sigma = sigma3;
+                        double val3 = buildPDFdenominator();
+                        norm = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
+		}
 	}
 	return norm;
 }

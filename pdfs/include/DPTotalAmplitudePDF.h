@@ -99,6 +99,10 @@ class DPTotalAmplitudePDF : public BasePDF
 		ObservableRef widthK01430Name;
 		ObservableRef massK21430Name;
 		ObservableRef widthK21430Name;
+
+		ObservableRef a_LASSName;
+		ObservableRef r_LASSName;
+
 		double fracA0sqZplus;
 		double fracApsqZplus;
 		double fracZplus;
@@ -144,6 +148,12 @@ class DPTotalAmplitudePDF : public BasePDF
 		double widthK01430;
 		double massK21430;
 		double widthK21430;
+
+
+		//LASS
+		double a_LASS;
+		double r_LASS;
+		  
 
 		// These values are cached since they are calculated for each event
 		TLorentzVector pMuPlus;

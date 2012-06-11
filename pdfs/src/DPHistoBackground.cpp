@@ -147,7 +147,7 @@ DPHistoBackground::DPHistoBackground( PDFConfigurator* config ) :
 		//method for Checking whether histogram is sensible
 
 		total_num_entries = histo->GetEntries();
-		int total_num_bins = nxbins * nybins * nzbins;
+		int total_num_bins = nxbins * nybins * nzbins * nmbins;
 		int sum = 0;
 
 		vector<int> zero_bins;

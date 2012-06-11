@@ -17,6 +17,7 @@ class Exponential : public BasePDF
 {
 	public:
 		Exponential( PDFConfigurator* );
+		Exponential( const Exponential & );
 		~Exponential();
 
 		//Calculate the PDF value
@@ -43,8 +44,9 @@ class Exponential : public BasePDF
 		ObservableRef resScale3Name;                     // Scale to multiply all Gaussians with 
 		ObservableRef sigma1Name;		// time res sigma 1
 		ObservableRef sigma2Name;		// time res sigma 2
-		ObservableRef timeRes1FracName;
+		ObservableRef sigma3Name;		// time res sigma 2
 		ObservableRef timeRes2FracName;
+		ObservableRef timeRes3FracName;
 		// Observable
 		ObservableRef timeName;		// proper time
 
@@ -54,8 +56,9 @@ class Exponential : public BasePDF
 		double sigma; 
 		double sigma1; 
 		double sigma2;
-		double timeRes1Frac;
+		double sigma3;
 		double timeRes2Frac;
+		double timeRes3Frac;
 		double eventResolution;
 		double resolutionScale1;
 		double resolutionScale2;

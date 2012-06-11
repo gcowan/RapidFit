@@ -76,6 +76,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, cosTheta1Name	( configurator->getName("cosTheta1") )
 	, cosTheta2Name	( configurator->getName("cosTheta2") )
 	, phiName	( configurator->getName("phi") )
+
+	, a_LASSName	( configurator->getName("a_LASS") )
+	, r_LASSName	( configurator->getName("r_LASS") )
 	// The actual values of the parameters and observables
 	, fracA0sqZplus(),  fracApsqZplus(),  fracZplus(),  phaseA0Zplus(),  phaseApZplus(),  phaseAmZplus()
 	, fracA0sqKst892(),  fracApsqKst892(),  fracKst892(),  phaseA0Kst892(),  phaseApKst892(),  phaseAmKst892()
@@ -90,6 +93,10 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, massK01430(), widthK01430()
 	, massK21430(), widthK21430()
 	, m23(), cosTheta1(), cosTheta2(), phi()
+
+	//LASS parameters
+	, a_LASS(), r_LASS() 
+
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
 , histogramFile(), angularAccHistCosTheta1(), angularAccHistPhi(), angularAccHistMassCosTheta2()
@@ -123,10 +130,13 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	KpiComponents.push_back(tmp);
   
 	// Kpi s-wave using LASS
-  	//tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
-        //             0.13957018, 5.0, 1.5, 3.096916,0,
-        //             "LASS", 0.00415, 0.00136);
-   	//KpiComponents.push_back(tmp);
+
+  	tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
+                     0.13957018, 5.0, 1.5, 3.096916,0,
+                     "LASS", 0.00415, 0.00136);
+
+   	KpiComponents.push_back(tmp);
+
 
 	// B0 --> Z+ K-
 	tmp=new DPZplusK(0,0,5.279,4.430,0.100,0.493677,
@@ -201,6 +211,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,widthK01430Name(copy.widthK01430Name)
 	,massK21430Name(copy.massK21430Name)
 	,widthK21430Name(copy.widthK21430Name)
+
+	,a_LASSName(copy.a_LASSName)
+	,r_LASSName(copy.r_LASSName)
 	
 	,fracA0sqZplus(copy.fracA0sqZplus)
 	,fracApsqZplus(copy.fracApsqZplus)
@@ -262,6 +275,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,angularAccHistCosTheta1(copy.angularAccHistCosTheta1)
 	,angularAccHistPhi(copy.angularAccHistPhi)
 	,angularAccHistMassCosTheta2(copy.angularAccHistMassCosTheta2)
+
+        ,a_LASS(copy.a_LASS)
+        ,r_LASS(copy.r_LASS)
 {
 	this->SetNumericalNormalisation(true);
 	this->TurnCachingOff();
@@ -335,6 +351,11 @@ void DPTotalAmplitudePDF::MakePrototypes()
 	parameterNames.push_back( widthK01430Name );
 	parameterNames.push_back( massK21430Name );
 	parameterNames.push_back( widthK21430Name );
+
+	parameterNames.push_back( a_LASSName );
+	parameterNames.push_back( r_LASSName );
+
+
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -424,6 +445,10 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	massK21430  = allParameters.GetPhysicsParameter( massK21430Name )->GetValue();
 	widthK21430 = allParameters.GetPhysicsParameter( widthK21430Name )->GetValue();
 
+	a_LASS = allParameters.GetPhysicsParameter( a_LASSName )->GetValue();
+	r_LASS = allParameters.GetPhysicsParameter( r_LASSName )->GetValue();
+
+
 	// No checks performed here to ensure that parameters are set correctly		
 	//ZComponents[0]  ->setResonanceParameters( massZplus, widthZplus );
 	KpiComponents[0]->setResonanceParameters( massKst892, widthKst892 );
@@ -431,6 +456,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[2]->setResonanceParameters( massKst1680, widthKst1680 );
 	KpiComponents[3]->setResonanceParameters( massK01430, widthK01430 );
 	KpiComponents[4]->setResonanceParameters( massK21430, widthK21430 );
+	KpiComponents[5]->setResonanceParameters( a_LASS, r_LASS );
 	//ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
@@ -529,7 +555,7 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         //component_list.push_back( "1680" );
         //component_list.push_back( "1430" );
         //component_list.push_back( "1430_2" );
-        //component_list.push_back( "LASS" );
+        component_list.push_back( "LASS" );
         component_list.push_back( "0" );
         return component_list;
 }
