@@ -135,7 +135,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                      0.13957018, 5.0, 1.5, 3.096916,0,
                      "LASS", 0.00415, 0.00136);
 
-   	KpiComponents.push_back(tmp);
+   	//KpiComponents.push_back(tmp);
 
 
 	// B0 --> Z+ K-
@@ -146,10 +146,54 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	this->SetNumericalNormalisation( true );
 	this->TurnCachingOff();
 	useAngularAcceptance = false;
+	string fileName = configurator->getConfigurationValue( "AngularAcceptanceHistogram" ) ;
 	if ( configurator->isTrue( "UseAngularAcceptance" ) )
 	{
 		useAngularAcceptance = true;
-		histogramFile = TFile::Open("~gcowan/public/RapidFit/pdfs/configdata/Bd2JpsiKpi_TotalEff.root");
+                //File location
+                ifstream input_file;
+                input_file.open( fileName.c_str(), ifstream::in );
+                input_file.close();
+
+                bool local_fail = input_file.fail();
+
+                if( !getenv("RAPIDFITROOT") && local_fail )
+                {
+                        cerr << "\n" << endl;
+                        //cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
+                        //cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        cerr << "\n" << endl;
+                        exit(-987);
+                }
+
+                string fullFileName;
+
+                if( getenv("RAPIDFITROOT") )
+                {
+                        string path( getenv("RAPIDFITROOT") ) ;
+
+                        cout << "RAPIDFITROOT defined as: " << path << endl;
+
+                        fullFileName = path+"/pdfs/configdata/"+fileName ;
+                        input_file.open( fullFileName.c_str(), ifstream::in );
+                        input_file.close();
+                }
+                bool elsewhere_fail = input_file.fail();
+
+                if( elsewhere_fail && local_fail )
+                {
+                        cerr << "\n\tFileName:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
+                        cerr << "\t\tAlternativley make sure your XML points to the correct file, or that the file is in the current working directory\n" << endl;
+                        exit(-89);
+                }
+
+                if( fullFileName.empty() || !local_fail )
+                {
+                        fullFileName = fileName;
+                }
+
+		histogramFile = TFile::Open(fullFileName.c_str());
 		angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
 		angularAccHistPhi 	= (TH1D*)histogramFile->Get("delta_phi_effTot");
 		angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
@@ -456,7 +500,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[2]->setResonanceParameters( massKst1680, widthKst1680 );
 	KpiComponents[3]->setResonanceParameters( massK01430, widthK01430 );
 	KpiComponents[4]->setResonanceParameters( massK21430, widthK21430 );
-	KpiComponents[5]->setResonanceParameters( a_LASS, r_LASS );
+	//KpiComponents[5]->setResonanceParameters( a_LASS, r_LASS );
 	//ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
@@ -555,7 +599,7 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         //component_list.push_back( "1680" );
         //component_list.push_back( "1430" );
         //component_list.push_back( "1430_2" );
-        component_list.push_back( "LASS" );
+        //component_list.push_back( "LASS" );
         component_list.push_back( "0" );
         return component_list;
 }

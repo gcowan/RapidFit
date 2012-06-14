@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/06/14 Greig Cowan
+   - Enabled AngularAcceptanceHistogram for DP PDF as a configuration parameter
+
 2012/06/11 Greig Cowan/Joel Bressieux
    - Updated LASS PDF to allow for floating parameters.
    - Bug fix in DPHistoBackground PDF.
