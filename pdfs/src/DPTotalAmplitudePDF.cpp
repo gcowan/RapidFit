@@ -135,7 +135,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                      0.13957018, 5.0, 1.5, 3.096916,0,
                      "LASS", 0.00415, 0.00136);
 
-   	//KpiComponents.push_back(tmp);
+
 
 
 	// B0 --> Z+ K-
@@ -500,7 +500,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[2]->setResonanceParameters( massKst1680, widthKst1680 );
 	KpiComponents[3]->setResonanceParameters( massK01430, widthK01430 );
 	KpiComponents[4]->setResonanceParameters( massK21430, widthK21430 );
-	//KpiComponents[5]->setResonanceParameters( a_LASS, r_LASS );
+// 	//KpiComponents[5]->setResonanceParameters( a_LASS, r_LASS );
 	//ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
@@ -539,7 +539,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	double cosThetaZ;
 	double cosThetaPsi;
 	double dphi;
-	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
+DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	&cosThetaZ, &cosThetaPsi, &dphi);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
 
@@ -588,7 +588,24 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 		result += tmp.Rho2();
 	}
 	//cout << angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2 << endl;
-	return result * angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2;
+
+	//momenta are defined on eq 39.20a/b of the 2010 PDG
+	const double m1 = 0.493677;    // kaon mass
+	const double m2 = 0.13957018; // pion mass
+	const double m3 = 3.096916;   // psi mass
+	const double MB0= 5.2795; // B0 mass
+
+	double t1 = m23*m23-(m1+m2)*(m1+m2);
+	double t2 = m23*m23-(m1-m2)*(m1-m2);
+	
+	double t31 = MB0*MB0 - (m23 + m3)*(m23 + m3);
+	double t32 = MB0*MB0 - (m23 - m3)*(m23 - m3);
+
+
+	double p1_st = sqrt(t1*t2)/m23/2 ;
+	double p3    = sqrt(t31*t32)/MB0/2;
+
+	return result * angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2* p1_st * p3;
 }
 
 vector<string> DPTotalAmplitudePDF::PDFComponents()
@@ -599,7 +616,9 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         //component_list.push_back( "1680" );
         //component_list.push_back( "1430" );
         //component_list.push_back( "1430_2" );
-        //component_list.push_back( "LASS" );
+// //         component_list.push_back( "LASS" );   HACK
+// =======
+//         //component_list.push_back( "LASS" );
         component_list.push_back( "0" );
         return component_list;
 }
