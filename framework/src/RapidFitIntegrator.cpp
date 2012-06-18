@@ -48,7 +48,7 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerica
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
 	multiDimensionIntegrator->SetAbsTolerance( 1E-9 );      //      Absolute error for things such as plots
 	multiDimensionIntegrator->SetRelTolerance( 1E-6 );
-	multiDimensionIntegrator->SetMaxPts( 1000000 );		//	These are the defaults, and it's unlikely you will be able to realistically push the integral without using "double double"'s
+	multiDimensionIntegrator->SetMaxPts( 100000 );		//	These are the defaults, and it's unlikely you will be able to realistically push the integral without using "double double"'s
 #endif
 
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
@@ -72,7 +72,7 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
 		multiDimensionIntegrator->SetAbsTolerance( 1E-9 );      //      Absolute error for things such as plots
 		multiDimensionIntegrator->SetRelTolerance( 1E-6 );
-		multiDimensionIntegrator->SetMaxPts( 1000000 );
+		multiDimensionIntegrator->SetMaxPts( 100000 );
 #endif
 	}
 	if( input.oneDimensionIntegrator != NULL )

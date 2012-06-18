@@ -172,6 +172,7 @@ class DPTotalAmplitudePDF : public BasePDF
 		double mJpsi;
 
 		bool useAngularAcceptance;
+		string fullFileName;
 		TFile * histogramFile;
 		TH1D * angularAccHistCosTheta1;
 		TH1D * angularAccHistPhi;

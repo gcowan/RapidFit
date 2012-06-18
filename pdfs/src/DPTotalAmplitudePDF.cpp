@@ -99,7 +99,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
-, histogramFile(), angularAccHistCosTheta1(), angularAccHistPhi(), angularAccHistMassCosTheta2()
+	, fullFileName(), histogramFile(), angularAccHistCosTheta1(), angularAccHistPhi(), angularAccHistMassCosTheta2()
 {
 	MakePrototypes();
 
@@ -166,8 +166,6 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                         cerr << "\n" << endl;
                         exit(-987);
                 }
-
-                string fullFileName;
 
                 if( getenv("RAPIDFITROOT") )
                 {
@@ -315,10 +313,11 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,useAngularAcceptance(copy.useAngularAcceptance)
 	,pB(copy.pB)
 	,cosARefs(copy.cosARefs)
-	,histogramFile(copy.histogramFile)
-	,angularAccHistCosTheta1(copy.angularAccHistCosTheta1)
-	,angularAccHistPhi(copy.angularAccHistPhi)
-	,angularAccHistMassCosTheta2(copy.angularAccHistMassCosTheta2)
+	,fullFileName(copy.fullFileName)
+	,histogramFile()//copy.histogramFile)
+	,angularAccHistCosTheta1()//copy.angularAccHistCosTheta1)
+	,angularAccHistPhi()//copy.angularAccHistPhi)
+	,angularAccHistMassCosTheta2()//copy.angularAccHistMassCosTheta2)
 
         ,a_LASS(copy.a_LASS)
         ,r_LASS(copy.r_LASS)
@@ -335,6 +334,14 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	for( ; component_j != copy.ZComponents.end(); ++component_j )
 	{
 		ZComponents.push_back( new DPZplusK( *( dynamic_cast<DPZplusK*>( *(component_j) ) ) ) );
+	}
+        
+	if ( useAngularAcceptance )
+        {
+                histogramFile = TFile::Open(fullFileName.c_str());
+                angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
+                angularAccHistPhi       = (TH1D*)histogramFile->Get("delta_phi_effTot");
+                angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
 	}
 }
 
