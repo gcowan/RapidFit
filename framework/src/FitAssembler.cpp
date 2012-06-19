@@ -89,10 +89,17 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
 		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
 {
+	double someVal;
 	vector<IPDF*> allPDFs;
 	for( unsigned int i=0; i< BottleData.size(); ++i )
 	{
 		allPDFs.push_back( BottleData[i]->GetPDF() );
+		//	This is here to force the Random Number generators out of sync for a fixed Seed!
+		for( unsigned int j=0; j<i; ++j )
+		{
+			someVal = allPDFs.back()->GetRandomFunction()->Rndm();
+			(void) someVal;
+		}
 	}
 
 	ParameterSet* checkedBottleParameters = CheckInputParams( BottleParameters, allPDFs );
@@ -104,11 +111,26 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	PhysicsBottle * bottle = new PhysicsBottle( checkedBottleParameters );
 
 	//Fill the bottle - data generation occurs in this step
-	for ( unsigned int resultIndex = 0; resultIndex < BottleData.size(); ++resultIndex )
+	for( unsigned int resultIndex = 0; resultIndex < BottleData.size(); ++resultIndex )
 	{
 		//	Use the Raw input as the Generation PDF may require Parameters not involved in the main fit
 		BottleData[resultIndex]->SetPhysicsParameters( checkedGenerationParameters );
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
+		for( unsigned int i=0; i<resultIndex; ++i )
+		{
+			DataSetConfiguration* thisConfig = BottleData[resultIndex]->GetDataSetConfig();
+			if( thisConfig!= NULL )
+			{
+				IPDF* thisGen = thisConfig->GetGenerationPDF();
+				if( thisGen != NULL )
+				{
+					someVal = thisGen->GetRandomFunction()->Rndm();
+				}
+			}
+			someVal = BottleData[resultIndex]->GetPDF()->GetRandomFunction()->Rndm();
+			(void) someVal;
+		}
+		cout << "Generate Here:" << endl;
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
 
 		bottle->AddResult( Requested_PDF, Requested_DataSet );

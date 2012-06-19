@@ -46,7 +46,15 @@ DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, 
 //Constructor with separate data generation PDF
 DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF, PhaseSpaceBoundary* Boundary ) :
 	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
-	generatePDF( DataPDF ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false), internalBoundary( (Boundary!=NULL)?(new PhaseSpaceBoundary(*Boundary)):NULL ),
+	generatePDF( ClassLookUp::CopyPDF(DataPDF) ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false), internalBoundary( (Boundary!=NULL)?(new PhaseSpaceBoundary(*Boundary)):NULL ),
+	internalRef(NULL)
+{
+}
+
+DataSetConfiguration::DataSetConfiguration ( const DataSetConfiguration& input ) :
+	source(input.source), cutString(input.cutString), numberEvents(input.numberEvents), arguments(input.arguments), argumentNames(input.argumentNames),
+	generatePDF( (input.generatePDF==NULL)?NULL:ClassLookUp::CopyPDF(input.generatePDF) ), separateGeneratePDF(input.separateGeneratePDF), parametersAreSet(input.parametersAreSet),
+	Start_Entry(input.Start_Entry), DEBUG_DATA(input.DEBUG_DATA), internalBoundary( (input.internalBoundary!=NULL)?(new PhaseSpaceBoundary(*input.internalBoundary)):NULL ),
 	internalRef(NULL)
 {
 }

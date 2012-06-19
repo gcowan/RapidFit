@@ -167,35 +167,34 @@ int RapidFit( int argc, char * argv[] )
 	if( thisConfig->saveOneDataSetFlag ) saveOneDataSet( thisConfig );
 
 	//	2)
-	if( thisConfig->testIntegratorFlag && thisConfig->configFileNameFlag) testIntegrator( thisConfig );
+	else if( thisConfig->testIntegratorFlag && thisConfig->configFileNameFlag) testIntegrator( thisConfig );
 
 	//	3)
-	if( thisConfig->calculateAcceptanceWeights && thisConfig->configFileNameFlag ) calculateAcceptanceWeights( thisConfig );
+	else if( thisConfig->calculateAcceptanceWeights && thisConfig->configFileNameFlag ) calculateAcceptanceWeights( thisConfig );
 
 	//	4)
-	if( thisConfig->calculateAcceptanceWeightsWithSwave && thisConfig->configFileNameFlag ) calculateAcceptanceWeightsWithSwave( thisConfig );
+	else if( thisConfig->calculateAcceptanceWeightsWithSwave && thisConfig->configFileNameFlag ) calculateAcceptanceWeightsWithSwave( thisConfig );
 
 	//	5)
-	if( thisConfig->calculatePerEventAcceptance) calculatePerEventAcceptance( thisConfig );
+	else if( thisConfig->calculatePerEventAcceptance) calculatePerEventAcceptance( thisConfig );
 
 	//	6)
-	if( thisConfig->testComponentPlotFlag && thisConfig->configFileNameFlag && thisConfig->observableNameFlag ) testComponentPlot( thisConfig );
+	else if( thisConfig->testComponentPlotFlag && thisConfig->configFileNameFlag && thisConfig->observableNameFlag ) testComponentPlot( thisConfig );
 
-	if( thisConfig->JackKnife_Flag ) PerformJackKnife( thisConfig );
+	else if( thisConfig->JackKnife_Flag ) PerformJackKnife( thisConfig );
 
 	//	7)	Toy Study
 	//Pick a toy study if there are repeats, or if pull plots are wanted
-	if( ( thisConfig->numberRepeats > 1 ) || ( thisConfig->doPullsFlag 
-				&& !( ( ( thisConfig->doLLcontourFlag || thisConfig->doFC_Flag ) || thisConfig->doLLscanFlag ) || thisConfig->MCStudyFlag ) ) )
+	else if( ( thisConfig->numberRepeats > 1 ) || thisConfig->doPullsFlag )
 	{
 		PerformToyStudy( thisConfig );
 	}
 
 	//	8)	MC Study
-	if( thisConfig->MCStudyFlag ) PerformMCStudy( thisConfig );
+	else if( thisConfig->MCStudyFlag ) PerformMCStudy( thisConfig );
 
 	//	9)
-	if( !thisConfig->FC_LL_PART_Flag ) PerformMainFit( thisConfig );
+	else if( !thisConfig->FC_LL_PART_Flag ) PerformMainFit( thisConfig );
 
 	//	10)
 	//	Do LL scan
@@ -213,12 +212,12 @@ int RapidFit( int argc, char * argv[] )
 
 
 	//	Should only happen under the condition that no CV fit was performed or anything else
-	if( thisConfig->GlobalFitResult == NULL )
-	{
-		//	Default action - presumably a fit or a toy study
-		cerr << "No action performed" << endl;
-		cerr << "Not sure how I got here, please email a maintainer!..." <<endl;
-	}
+	//if( thisConfig->GlobalFitResult == NULL )
+	//{
+	//	//	Default action - presumably a fit or a toy study
+	//	cerr << "No action performed" << endl;
+	//	cerr << "Not sure how I got here, please email a maintainer!..." <<endl;
+	//}
 
 
 	delete thisConfig;

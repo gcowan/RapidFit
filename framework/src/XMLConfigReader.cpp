@@ -1161,7 +1161,14 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 
 		//Make the objects
 		IPDF * fitPDF = GetPDF( FitPDFTag, dataBoundary );
-		return new PDFWithData( fitPDF, dataBoundary, dataSetMakers );
+		if( generatePDF != NULL ) delete generatePDF;
+		PDFWithData* returnable = new PDFWithData( fitPDF, dataBoundary, dataSetMakers );
+		while( !dataSetMakers.empty() )
+		{
+			if( dataSetMakers.back() != NULL ) delete dataSetMakers.back();
+			dataSetMakers.pop_back();
+		}
+		return returnable;
 	}
 	else
 	{

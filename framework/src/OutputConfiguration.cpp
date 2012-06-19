@@ -279,15 +279,26 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 		for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 		{
-			cout << "Projecting ToFit: " << resultIndex+1 << endl << endl;
-			vector<string> claimedObservables = resultBottle->GetResultPDF(resultIndex)->GetPrototypeDataPoint();
 			string thisObservable = (*projection_i)->observableName;
-			if( StringProcessing::VectorContains( &claimedObservables, &thisObservable ) == -1 )
+
+			vector<string> known_observables = resultBottle->GetResultPDF(resultIndex)->GetPrototypeDataPoint();
+			int num = StringProcessing::VectorContains( &known_observables, &thisObservable );
+
+			vector<string> bad_observables = resultBottle->GetResultPDF(resultIndex)->GetDoNotIntegrateList();
+			int num2 = StringProcessing::VectorContains( &bad_observables, &thisObservable );
+
+			if( num2 != -1 )
 			{
-				cerr << endl << "This PDF " << resultBottle->GetResultPDF(resultIndex)->GetName() << " knows nothing about observable: " << thisObservable << endl;
-				cerr << "I will skip this PDF and continue!" << endl << endl;
+				cerr << "Observable: " << thisObservable << " is on Do Not Integrate List, cannot perform projection!" << endl;
 				continue;
 			}
+			if( num == -1 )
+			{
+				cerr << "Observable: " << thisObservable << " is not constrained by this PDF!" << endl;
+				continue;
+			}
+
+			cout << "Projecting ToFit: " << resultIndex+1 << endl << endl;
 			TString PDFStr = "PDF_";PDFStr+=resultIndex;
 
 			//	ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
@@ -323,6 +334,14 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			cout << endl << "\tFinal chi2/ndof = " << setprecision(10) << final_corrected_chi2 << endl << endl;
 		}
 
+		if( all_components_for_all_results.empty() )
+		{
+			output_file->Close();
+			remove( filename.Data() );
+			gSystem->cd( ".." );
+			rmdir( folderName.Data() );
+			continue;
+		}
 		int num=(int) all_components_for_all_results[0].size();
 		bool compatible=true;
 

@@ -1,5 +1,19 @@
 // $Id: release.notes $
 
+2012/06/19 Rob Currie
+   - Fixed bug in Projections. Code now correctly skips projections over Observables it cannot constrain or it knows nothing about, instead of segfaulting
+   - Fixed way that stderr is redirected in ComponentPlotter. This requires use of posix functions which may not be on non-posix platforms.
+   - Fixed behaviour in main to use if/else structure rather than simply testing single booleans this means we can more clearly document what order arguments are processed in
+   - Added Copy Constructor to DataSetConfiguration to make the scope of objects within PDFWithData easier to follow
+   - Fixed bug in generation of Foam datasets by de-syncing the Random number generators from fixed seeds by extra calls to the Random Number Generator
+        The effect of this is to fix studies performed with fixed seeds and explicit generation PDFs
+        The results effect a study with a fixed seed but effect is < 1 sigma which is consistent with the no effect hypothesis
+   - Updated RapidPlot for Toy Studies
+        We now get more plots in multiple formats from the tool
+        It first tries applying a cut of all pulls on all parameters < 5
+           if <10% of data is left then this is not applied and a warning is given
+           if <50% of data is left a warning is given
+
 2012/06/19 Greig Cowan
    - Added decay time acceptance histograms for unbiased and exclusively biased Bs2JpsiPhi samples.
 

@@ -66,6 +66,8 @@ class DataSetConfiguration
 		 */
 		DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF, PhaseSpaceBoundary* InputBoundary = NULL );
 
+		DataSetConfiguration ( const DataSetConfiguration& );
+
 		/*!
 		 * @brief Destructor
 		 */
@@ -135,11 +137,6 @@ class DataSetConfiguration
 		string XML() const;
 
 	private:
-		/*!
-		 * @brief Don't Copy the class this way!
-		 */
-		DataSetConfiguration ( const DataSetConfiguration& );
-
 		/*!
 		 * @brief Don't Copy the class this way!
 		 */

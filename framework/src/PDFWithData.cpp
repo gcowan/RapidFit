@@ -21,12 +21,16 @@ using namespace::std;
 //Constructor with correct arguments
 PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig ) :
 	fitPDF(ClassLookUp::CopyPDF(InputPDF)), inputBoundary(new PhaseSpaceBoundary(*InputBoundary)),  parametersAreSet(false),
-	dataSetMakers(DataConfig), cached_data(), useCache(false)
+	dataSetMakers(), cached_data(), useCache(false)
 {
-	if ( DataConfig.size() < 1 )
+	if( DataConfig.size() < 1 || DataConfig.empty() )
 	{
 		cerr << "No data sets configured" << endl;
 		exit(1);
+	}
+	for( vector<DataSetConfiguration*>::iterator config_i = DataConfig.begin(); config_i != DataConfig.end(); ++config_i )
+	{
+		dataSetMakers.push_back( new DataSetConfiguration( *(*config_i) ) );
 	}
 }
 

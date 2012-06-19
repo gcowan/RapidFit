@@ -123,3 +123,4 @@ RapidFitConfiguration::~RapidFitConfiguration()
 		}
 
 }
+

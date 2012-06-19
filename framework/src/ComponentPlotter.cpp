@@ -902,7 +902,14 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	cerr_bak = cerr.rdbuf();
 	clog_bak = clog.rdbuf();
 	nullbuf = filestr.rdbuf();
+
+	int    fd;
+	fpos_t pos;
+	fflush(stderr);
+	fgetpos(stderr, &pos);
+	fd = dup(fileno(stdout));
 	freopen("/dev/null", "w", stderr);
+	
 	cout.rdbuf(nullbuf);
 	cerr.rdbuf(nullbuf);
 	clog.rdbuf(nullbuf);
@@ -910,6 +917,11 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
+	fflush(stderr);
+	dup2(fd,fileno(stderr));
+	close(fd);
+	clearerr(stderr);
+	fsetpos(stderr, &pos);
 
 	cout.rdbuf( cout_bak );
 	cerr.rdbuf( cerr_bak );
