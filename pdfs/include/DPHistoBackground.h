@@ -53,7 +53,9 @@ class DPHistoBackground : public BasePDF
 		double phi;
 
 		//Additions to deal with 3-D angular distribution via a histogram
-		THnSparse *histo;
+                string fullFileName;
+		TFile * histogramFile;
+		THnSparse * histo;
 		TAxis *xaxis, *yaxis, *zaxis, *maxis;
 		int nxbins, nybins, nzbins, nmbins;
 		double xmin, xmax, ymin, ymax, zmin, zmax, mmin, mmax, deltax, deltay, deltaz, deltam;

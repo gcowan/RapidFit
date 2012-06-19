@@ -39,6 +39,7 @@ DPHistoBackground::DPHistoBackground( PDFConfigurator* config ) :
 	, mmin(), mmax()
 	, deltax(), deltay(), deltaz(), deltam()
 	, total_num_entries(), useFlatAngularDistribution(true)
+	, histogramFile()
 {
 
 	cout << "Constructing PDF: DPHistoBackground  " << endl ;
@@ -77,8 +78,6 @@ DPHistoBackground::DPHistoBackground( PDFConfigurator* config ) :
 			exit(-987);
 		}
 
-		string fullFileName;
-
 		if( getenv("RAPIDFITROOT") )
 		{
 			string path( getenv("RAPIDFITROOT") ) ;
@@ -105,8 +104,8 @@ DPHistoBackground::DPHistoBackground( PDFConfigurator* config ) :
 		}
 
 		//Read in histo
-		TFile* f =  TFile::Open(fullFileName.c_str());
-		histo = (THnSparse*) f->Get("histo_4var_SB"); //(fileName.c_str())));
+		histogramFile = TFile::Open(fullFileName.c_str());
+		histo = (THnSparse*)histogramFile->Get("histo_4var_SB"); //(fileName.c_str())));
 
 		// cos k
 		xaxis = histo->GetAxis(0);
@@ -199,7 +198,7 @@ DPHistoBackground::DPHistoBackground( PDFConfigurator* config ) :
 
 // Copy
 DPHistoBackground::DPHistoBackground( const DPHistoBackground& input ) : BasePDF( (BasePDF) input ),
-histo(input.histo), xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), maxis(input.maxis),
+xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), maxis(input.maxis),
 nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), nmbins(input.nmbins),
 xmin(input.xmin), xmax(input.xmax), 
 ymin(input.ymin), ymax(input.ymax), 
@@ -208,13 +207,22 @@ mmin(input.zmin), mmax(input.zmax),
 deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz), deltam(input.deltam),
 total_num_entries(input.total_num_entries), useFlatAngularDistribution(input.useFlatAngularDistribution),
 massName(input.massName), cosTheta1Name(input.cosTheta1Name), phiName(input.phiName), cosTheta2Name(input.cosTheta2Name), 
-mass(input.mass), cos1(input.cos1), cos2(input.cos2), phi(input.phi)
+mass(input.mass), cos1(input.cos1), cos2(input.cos2), phi(input.phi),
+histogramFile(), histo()
 {
+	if ( !useFlatAngularDistribution ) {
+                histogramFile = TFile::Open(fullFileName.c_str());
+                histo = (THnSparse*)histogramFile->Get("histo_4var_SB");
+	}
 }
 
 //Destructor
 DPHistoBackground::~DPHistoBackground()
 {
+        if( !useFlatAngularDistribution ) {
+		delete histogramFile;
+		delete histo;
+	}
 }
 
 //Make the data point and parameter set

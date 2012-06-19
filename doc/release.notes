@@ -1,7 +1,11 @@
 // $Id: release.notes $
 
+2012/06/19 Greig Cowan
+   - Added decay time acceptance histograms for unbiased and exclusively biased Bs2JpsiPhi samples.
+
 2012/06/18 Greig Cowan
    - Fixed DP copy constructor which was causing problems when plotting PDF with acceptance included.
+   - Fixed DP histo background copy constructor as above.
    - Lowered the maxPts in the RapidFitIntegrator.
 
 2012/06/18 Greig Cowan for Joel Bressieux
