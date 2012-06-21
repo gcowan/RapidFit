@@ -205,8 +205,12 @@ $(EXEDIR)/print: $(OBJUTILDIR)/print.o $(OBJDIR)/EdStyle.o $(OBJUTILDIR)/TTree_P
 $(OBJUTILDIR)/print.o: $(UTILSSRC)/print.C
 	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
 
+$(EXEDIR)/weighted: $(OBJUTILDIR)/weighted.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o              $(OBJUTILDIR)/Template_Functions.o
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+$(OBJUTILDIR)/weighted.o: $(UTILSSRC)/weighted.C
+	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
-utils: $(EXEDIR)/print $(EXEDIR)/RapidPlot
+utils: $(EXEDIR)/weighted $(EXEDIR)/print $(EXEDIR)/RapidPlot
 
 
 

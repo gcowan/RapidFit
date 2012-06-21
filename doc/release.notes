@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/06/21 Rob Currie
+   - Added tool for processing weighted studies to calculate deltaGamma
+
 2012/06/19 Rob Currie
    - Fixed bug in Projections. Code now correctly skips projections over Observables it cannot constrain or it knows nothing about, instead of segfaulting
    - Fixed way that stderr is redirected in ComponentPlotter. This requires use of posix functions which may not be on non-posix platforms.
