@@ -19,6 +19,7 @@
 #include <string>
 #include <iostream>
 #include <cmath>
+#include <cstdlib>
 
 using namespace::std;
 
@@ -82,11 +83,11 @@ int main( int argc, char* argv[] )
 		if( fabs( (*tau_l_fit_status)[i] - 3. ) > 1E-3 ) continue;
 		if( fabs( (*tau_h_fit_status)[i] - 3. ) > 1E-3 ) continue;
 
-		double this_dG = fabs( (1./((*tau_l)[i]) ) - (1./((*tau_h)[i]) ) );
+		double this_dG = (1./((*tau_l)[i]) ) - (1./((*tau_h)[i]) );
 		weighted_dG->push_back( this_dG );
 
 		double this_err = this_dG * sqrt( ((*tau_l_err)[i]/(*tau_l)[i])*((*tau_l_err)[i]/(*tau_l)[i]) + ((*tau_h_err)[i]/(*tau_h)[i])*((*tau_h_err)[i]/(*tau_h)[i]) );
-		weighted_dG_error->push_back( this_err );
+		weighted_dG_error->push_back( fabs(this_err) );
 	}
 
 	for( unsigned int i=0; i< weighted_dG->size(); ++i )
@@ -99,11 +100,13 @@ int main( int argc, char* argv[] )
 		diff_val->push_back( (*full_dG)[i] - (*weighted_dG)[i] );
 	}
 
-	TH1D* diff_th = new TH1D( "diff_th", "diff_th", 30, 0., 0.3 );
+	//exit(0);
+
+	TH1D* diff_th = new TH1D( "diff_th", "diff_th", 60, -0.15, 0.15 );
 
 	for( unsigned int i=0; i< diff_val->size(); ++i )
 	{
-		diff_th->Fill( fabs((*diff_val)[i]) );
+		diff_th->Fill( (*diff_val)[i] );
 	}
 
 	TCanvas* c1 = new TCanvas( "canv", "canv", 1680, 1050 );

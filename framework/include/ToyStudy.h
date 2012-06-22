@@ -37,6 +37,7 @@ class ToyStudy	:	public IStudy
 		void SetCommandLineParams( vector<string> );	//	Set Command Line Physics Parameters
 
 		void SetFixedNumberToys();
+		void setSaveAllToys();
 	private:
 		//	Uncopyable!
 		ToyStudy ( const ToyStudy& );
@@ -45,6 +46,7 @@ class ToyStudy	:	public IStudy
 		FitResult * GenerateAndMinimise();
 
 		bool fixedNumToys;
+		bool saveAllToys;
 };
 
 #endif

@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/06/22 Rob Currie
+   - Added otpion to save all of the individual datasets from within a toy study... this appears to work on the surface but doesn't give the expected results.
+     This likely requires work to change the underlying code to write a TTree os double branches rather than keep the TNtuple format
+
 2012/06/21 Rob Currie
    - Added tool for processing weighted studies to calculate deltaGamma
    - Added option to fix the total number of toys in Toy Studies to allow more complex studies

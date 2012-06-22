@@ -95,6 +95,7 @@ class RapidFitConfiguration
 		bool makeTemplateXML;
 		bool JackKnife_Flag;
 		bool fixedTotalToys;
+		bool saveAllToys;
 
 		string currentArgument;
 		FitResultVector* _2DResultForFC;

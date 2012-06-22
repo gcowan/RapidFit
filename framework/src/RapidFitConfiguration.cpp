@@ -77,6 +77,7 @@ RapidFitConfiguration::RapidFitConfiguration()
 		makeTemplateXML=false;
 		JackKnife_Flag=false;
 		fixedTotalToys = false;
+		saveAllToys = false;
 
 		_2DResultForFC = NULL;
 		GlobalFitResult = NULL;

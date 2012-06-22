@@ -650,6 +650,7 @@ int PerformToyStudy( RapidFitConfiguration* config )
 	ToyStudy* newStudy = new ToyStudy( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData, XMLConstraints, config->numberRepeats );
 
 	if( config->fixedTotalToys ) newStudy->SetFixedNumberToys();
+	if( config->saveAllToys ) newStudy->setSaveAllToys();
 
 	if( config->OutputLevelSet == false ) config->OutputLevel = -999;
 
