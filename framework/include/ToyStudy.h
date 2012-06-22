@@ -27,7 +27,6 @@ using namespace::std;
 class ToyStudy	:	public IStudy
 {
 	public:
-		ToyStudy( string );
 		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
 		~ToyStudy();
 
@@ -37,12 +36,15 @@ class ToyStudy	:	public IStudy
 		void SetNumRepeats( int );			//	Set number of Repeats
 		void SetCommandLineParams( vector<string> );	//	Set Command Line Physics Parameters
 
+		void SetFixedNumberToys();
 	private:
 		//	Uncopyable!
 		ToyStudy ( const ToyStudy& );
 		ToyStudy& operator = ( const ToyStudy& );
 
 		FitResult * GenerateAndMinimise();
+
+		bool fixedNumToys;
 };
 
 #endif

@@ -17,33 +17,8 @@
 
 using namespace::std;
 
-//Constructor using an XML config file directly
-ToyStudy::ToyStudy( string FileName ) : IStudy()
-{
-	XMLConfigReader * xml = new XMLConfigReader( FileName );
-
-	theMinimiser = xml->GetMinimiserConfiguration();
-	theFunction = xml->GetFitFunctionConfiguration();
-	theFunction->SetIntegratorTest( false );
-	studyParameters = xml->GetFitParameters();
-	pdfsAndData = xml->GetPDFsAndData();
-	numberStudies = xml->GetNumberRepeats();
-	allConstraints = xml->GetConstraints();
-	delete_objects = true;
-
-	if ( numberStudies < 1 )
-	{
-		cerr << "Erroneous number of studies: defaulting to 1" << endl;
-		numberStudies = 1;
-	}
-	else if ( numberStudies == 1 )
-	{
-		cout << "Doing a single toy study. Check this is what you expect." << endl;
-	}
-}
-
 //Constructor with correct arguments
-ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, ParameterSet* StudyParameters, vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies ) : IStudy()
+ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, ParameterSet* StudyParameters, vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies ) : IStudy(), fixedNumToys(false)
 {
 	pdfsAndData = PDFsAndData;
 	studyParameters = StudyParameters;
@@ -69,6 +44,11 @@ ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfigurat
 ToyStudy::~ToyStudy()
 {
 	if( allResults!=NULL ) delete allResults;
+}
+
+void ToyStudy::SetFixedNumberToys()
+{
+	fixedNumToys = true;
 }
 
 //Automate the toy study
@@ -111,7 +91,7 @@ void ToyStudy::DoWholeStudy( int OutputLevel )
 		if( new_result->GetFitStatus() != 3 )
 		{
 			cerr << "Fit fell over!\t Requesting another fit." << endl;
-			++numberStudies;
+			if( !fixedNumToys ) ++numberStudies;
 		}
 
 		allResults->AddFitResult( new_result );

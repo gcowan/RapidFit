@@ -649,6 +649,8 @@ int PerformToyStudy( RapidFitConfiguration* config )
 	//Do the toy study
 	ToyStudy* newStudy = new ToyStudy( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData, XMLConstraints, config->numberRepeats );
 
+	if( config->fixedTotalToys ) newStudy->SetFixedNumberToys();
+
 	if( config->OutputLevelSet == false ) config->OutputLevel = -999;
 
 	newStudy->DoWholeStudy( config->OutputLevel );

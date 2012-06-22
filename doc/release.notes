@@ -2,6 +2,7 @@
 
 2012/06/21 Rob Currie
    - Added tool for processing weighted studies to calculate deltaGamma
+   - Added option to fix the total number of toys in Toy Studies to allow more complex studies
 
 2012/06/19 Rob Currie
    - Fixed bug in Projections. Code now correctly skips projections over Observables it cannot constrain or it knows nothing about, instead of segfaulting

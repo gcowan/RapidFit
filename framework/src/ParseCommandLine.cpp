@@ -553,6 +553,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--WeightDataSet" ) 			{       config.WeightDataSet=true;				}
 		else if( currentArgument == "--saveFitXML" )				{	config.saveFitXML = true;				}
 		else if( currentArgument == "--generateToyXML" )			{	config.generateToyXML = true;				}
+		else if( currentArgument == "--fixedTotalToys" )			{	config.fixedTotalToys = true;				}
 
 		//	We didn't understand the argument to end up here
 		else
