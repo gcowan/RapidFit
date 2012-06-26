@@ -100,6 +100,7 @@ class DPTotalAmplitudePDF : public BasePDF
 		ObservableRef massK21430Name;
 		ObservableRef widthK21430Name;
 
+		ObservableRef frac_LASSName;
 		ObservableRef a_LASSName;
 		ObservableRef r_LASSName;
 
@@ -151,6 +152,7 @@ class DPTotalAmplitudePDF : public BasePDF
 
 
 		//LASS
+		double frac_LASS;
 		double a_LASS;
 		double r_LASS;
 		  
