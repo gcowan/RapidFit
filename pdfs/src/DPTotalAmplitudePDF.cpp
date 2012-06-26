@@ -77,6 +77,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, cosTheta2Name	( configurator->getName("cosTheta2") )
 	, phiName	( configurator->getName("phi") )
 
+  	, frac_LASSName	( configurator->getName("frac_LASS") )
 	, a_LASSName	( configurator->getName("a_LASS") )
 	, r_LASSName	( configurator->getName("r_LASS") )
 	// The actual values of the parameters and observables
@@ -95,7 +96,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, m23(), cosTheta1(), cosTheta2(), phi()
 
 	//LASS parameters
-	, a_LASS(), r_LASS() 
+	  , a_LASS(), r_LASS(), frac_LASS() 
 
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
@@ -135,6 +136,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                      0.13957018, 5.0, 1.5, 3.096916,0,
                      "LASS", 0.00415, 0.00136);
 
+	KpiComponents.push_back(tmp);
 
 
 
@@ -254,6 +256,8 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,massK21430Name(copy.massK21430Name)
 	,widthK21430Name(copy.widthK21430Name)
 
+
+  	,frac_LASSName(copy.frac_LASSName)
 	,a_LASSName(copy.a_LASSName)
 	,r_LASSName(copy.r_LASSName)
 	
@@ -319,6 +323,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,angularAccHistPhi()//copy.angularAccHistPhi)
 	,angularAccHistMassCosTheta2()//copy.angularAccHistMassCosTheta2)
 
+	,frac_LASS(copy.frac_LASS)
         ,a_LASS(copy.a_LASS)
         ,r_LASS(copy.r_LASS)
 {
@@ -403,6 +408,7 @@ void DPTotalAmplitudePDF::MakePrototypes()
 	parameterNames.push_back( massK21430Name );
 	parameterNames.push_back( widthK21430Name );
 
+	parameterNames.push_back( frac_LASSName );
 	parameterNames.push_back( a_LASSName );
 	parameterNames.push_back( r_LASSName );
 
@@ -463,8 +469,11 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	fracK21430    = allParameters.GetPhysicsParameter( fracK21430Name )->GetValue();
 	phaseA0K21430  = allParameters.GetPhysicsParameter( phaseA0K21430Name )->GetValue();
 
+	frac_LASS    = allParameters.GetPhysicsParameter( frac_LASSName )->GetValue();
+
+
 	// Sum of all amplitudes must equal 1
-	fracKst892 = ((1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430) < 0.) ? 0. : (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430);
+	fracKst892 = ((1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS) < 0.) ? 0. : (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
 
 	//cout << fracKst892 << " " << fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << endl;
 	
@@ -508,14 +517,15 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[2]->setResonanceParameters( massKst1680, widthKst1680 );
 	KpiComponents[3]->setResonanceParameters( massK01430, widthK01430 );
 	KpiComponents[4]->setResonanceParameters( massK21430, widthK21430 );
-// 	//KpiComponents[5]->setResonanceParameters( a_LASS, r_LASS );
+	KpiComponents[5]->setResonanceParameters( a_LASS, r_LASS );
 	//ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
 	KpiComponents[2]->setHelicityAmplitudes(magA0Kst1680, magApKst1680, magAmKst1680, phaseA0Kst1680, phaseApKst1680, phaseAmKst1680);
 	KpiComponents[3]->setHelicityAmplitudes(sqrt(fracK01430), 0., 0., phaseA0K01430, 0., 0.);
 	KpiComponents[4]->setHelicityAmplitudes(sqrt(fracK21430), 0., 0., phaseA0K21430, 0., 0.);
-	
+	KpiComponents[5]->setHelicityAmplitudes(sqrt(frac_LASS), 0., 0., 0., 0., 0.);
+
 	return isOK;
 }
 
@@ -624,7 +634,7 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         //component_list.push_back( "1680" );
         //component_list.push_back( "1430" );
         //component_list.push_back( "1430_2" );
-// //         component_list.push_back( "LASS" );   HACK
+        component_list.push_back( "LASS" );   //HACK
 // =======
 //         //component_list.push_back( "LASS" );
         component_list.push_back( "0" );
