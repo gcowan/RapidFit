@@ -46,9 +46,9 @@ class FitResult
 		/*!
 		 * Return a copy of the Covarience Matrix as provided by the Minimiser
 		 */
-		struct RapidFitMatrix* GetCovarianceMatrix();
+		RapidFitMatrix* GetCovarianceMatrix();
 
-		void ApplyCovarianceMatrix( struct RapidFitMatrix* Input );
+		void ApplyCovarianceMatrix( RapidFitMatrix* Input );
 
 		/*!
 		 * Get the Contours extracted using Minuit's internal Functions

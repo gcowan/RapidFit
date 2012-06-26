@@ -171,7 +171,7 @@ IDataSet* DataSetConfiguration::FoamFile( vector<string> arguments, vector<strin
 	}
 	else
 	{
-		fileName = arguments[fileNameIndex];
+		fileName = arguments[(unsigned)fileNameIndex];
 	}
 
 	string source="Foam";

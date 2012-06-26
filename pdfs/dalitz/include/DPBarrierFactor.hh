@@ -7,7 +7,7 @@ class DPBarrierFactor
   public:
 
     DPBarrierFactor(double radius);
-    ~DPBarrierFactor() {};
+    virtual ~DPBarrierFactor() {};
 
     virtual double barrier(double p0, double p) = 0;
 

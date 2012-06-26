@@ -499,7 +499,7 @@ class BasePDF : public IPDF
 		 *
 		 * @return Void
 		 */
-		void SetCopyConstructor( const CopyPDF_t* Input ) const;
+		void SetCopyConstructor( const IPDF* Input ) const;
 
 		/*!
 		 * @breif Get the pointer to the PDF copy constructor

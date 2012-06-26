@@ -174,7 +174,7 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 
 			//	Give the PDF object explicit knowledge of the path of it's constructor template
 			returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
-			inputPDF->SetCopyConstructor( pdf_copy );
+			inputPDF->SetCopyConstructor( (IPDF*)pdf_copy );
 		}
 	}
 

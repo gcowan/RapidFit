@@ -80,7 +80,7 @@ void EdStyle::SetStyle()
 
 
 	gStyle->SetPaperSize(20,26);
-        gStyle->SetPadLeftMargin( (Float_t) 0.11 );
+        gStyle->SetPadLeftMargin( (Float_t) 0.13 );
         gStyle->SetPadBottomMargin( (Float_t) 0.16 );
         gStyle->SetPadRightMargin( (Float_t)0.08 ); // increase for colz plots!!
         gStyle->SetPadTopMargin( (Float_t)0.05 );
@@ -632,7 +632,7 @@ int EdStyle::Test_Suffix( string arg )
 		size_t found = arg.find( sufficies[i] );
 		if( found != string::npos )
 		{
-			suffix_index= i;
+			suffix_index=(int)i;
 			break;
 		}
 	}

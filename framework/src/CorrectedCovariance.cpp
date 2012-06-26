@@ -93,7 +93,7 @@ RapidFitMatrix* CorrectedCovariance::GetReducedMatrix( IMinimiser* thisMinimiser
 		{
 			unsigned int index_j = (unsigned)FreeObservableReferences[j]->GetIndex();
 
-			(*Free_Covariance_Matrix)(i,j) = (*Raw_Covariance_Matrix)( index_i, index_j );
+			(*Free_Covariance_Matrix)((int)i,(int)j) = (*Raw_Covariance_Matrix)( (int)index_i, (int)index_j );
 		}
 	}
 

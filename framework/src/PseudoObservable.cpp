@@ -30,6 +30,26 @@ PseudoObservable::PseudoObservable( const PseudoObservable& Input ) :
 	if( Input.internalObservable != NULL ) internalObservable = new Observable( *(Input.internalObservable) );
 }
 
+PseudoObservable& PseudoObservable::operator= ( const PseudoObservable& input )
+{
+	if( this != &input )
+	{
+		this->internal_function = input.internal_function;
+		this->internal_error_function = input.internal_error_function;
+		this->Dependencies = input.Dependencies;
+		this->Value = input.Value;
+		this->Error = input.Error;
+		this->valid = input.valid;
+		this->Name = input.Name;
+		this->Unit = input.Unit;
+		this->Index = input.Index;
+		this->internal_Input = input.internal_Input;
+		this->internalObservable = (input.internalObservable==NULL)?NULL:new Observable( *(input.internalObservable) );
+		this->internal_function_extra = input.internal_function_extra;
+	}
+	return *this;
+}
+
 PseudoObservable::~PseudoObservable()
 {
 	if( internalObservable != NULL ) delete internalObservable;

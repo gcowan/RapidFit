@@ -182,6 +182,7 @@ double BsMass::Evaluate(DataPoint * measurement)
 // Normalisation
 double BsMass::Normalisation(PhaseSpaceBoundary * boundary)
 {
+	(void) boundary;
 	// Assumes that the mass integration limits are +/- Infinity
 	// So take sufficiently large mass window.
 

@@ -471,6 +471,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	double magA0Zplus   = sqrt(fracA0sqZplus*fracZplus);
 	double magApZplus   = sqrt(fracApsqZplus*fracZplus);
 	double magAmZplus   = ( (fracZplus - magA0Zplus*magA0Zplus - magApZplus*magApZplus) < 0.) ? 0. : sqrt(fracZplus - magA0Zplus*magA0Zplus - magApZplus*magApZplus);
+	(void) magAmZplus;
 	double magA0Kst892  = sqrt(fracA0sqKst892*fracKst892);
 	double magApKst892  = sqrt(fracApsqKst892*fracKst892);
 	double magAmKst892  = ( (fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892) < 0.) ? 0. : sqrt(fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892);
@@ -555,14 +556,14 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	double result = 0.;
 	TComplex tmp(0,0);
 
-	unsigned int lower = componentIndex - 1;
-	unsigned int upper = componentIndex;
+	unsigned int lower = (unsigned)(componentIndex - 1);
+	unsigned int upper = (unsigned)componentIndex;
 
 	//cout << "componentIndex " << componentIndex << endl;
 
 	if ( componentIndex == 0 ) {
 		lower = 0;
-		upper = KpiComponents.size();
+		upper = (unsigned)KpiComponents.size();
 	}
 	// Now sum over final state helicities (this is not general code, but
 	// knows about internals of components

@@ -281,7 +281,7 @@ class IPDF
 		 * Interface Function:
 		 * Give the PDF a pointer to the template of it's copy constructor object
 		 */
-		virtual void SetCopyConstructor( const CopyPDF_t* ) const = 0;
+		virtual void SetCopyConstructor( const IPDF* ) const = 0;
 
 		/*!
 		 * Interface Function:

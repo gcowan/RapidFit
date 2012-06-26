@@ -230,7 +230,7 @@ Observable* DataPoint::GetPseudoObservable( PseudoObservable& Input )
 		Input.SetIndex( (int)allPseudoObservables.size()-1 );
 	}
 
-	PseudoObservable* thisObservable = allPseudoObservables[ Input.GetIndex() ];
+	PseudoObservable* thisObservable = allPseudoObservables[ (unsigned)Input.GetIndex() ];
 
 	Observable* outputObservable = NULL;
 

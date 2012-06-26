@@ -332,18 +332,18 @@ RapidFitMatrix* MinuitWrapper::GetCovarianceMatrix()
 	 * It's probably possible to mimic the same behaviour with malloc and address allocation, but it's easier to let the compiler 'do it's thing'
 	 */
 	Double_t matrix[numParams][numParams];
-	minuit->mnemat(&matrix[0][0],numParams);
+	minuit->mnemat(&matrix[0][0],(int)numParams);
 
 	//cout << "Matrix:" << endl;
 	//cout << setprecision(3) << endl;
-	TMatrixDSym* covMatrix = new TMatrixDSym( numParams );
+	TMatrixDSym* covMatrix = new TMatrixDSym( (int)numParams );
 
 	for( unsigned int i=0; i< (unsigned)numParams; ++i )
 	{
 		for( unsigned int j=0; j< (unsigned)numParams; ++j )
 		{
 			//cout << "  " << matrix[i][j];
-			(*covMatrix)(i,j)=matrix[i][j];
+			(*covMatrix)((int)i,(int)j)=matrix[i][j];
 		}
 		//cout << endl;
 	}

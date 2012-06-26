@@ -50,7 +50,6 @@ class NormalisedSumPDF : public BasePDF
 		//Return a list of parameters not to be integrated
 		vector<string> GetDoNotIntegrateList();
 
-		bool CacheValid() const;
 		bool GetNumericalNormalisation() const;
 
 		//      Return components, component 0 by default

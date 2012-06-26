@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/06/26 Rob Currie
+   - Fixed some general compiler warnings and recast a few objects to make clang happier when that compiler is used (which may become default on OSX soon)
+
+2012/06/24 Rob Currie
+   - Added compiler option -flto to cxx variables, this allows gcc to perform inline optimisations for functions within derived classes
+
 2012/06/22 Rob Currie
    - Added otpion to save all of the individual datasets from within a toy study... this appears to work on the surface but doesn't give the expected results.
      This likely requires work to change the underlying code to write a TTree os double branches rather than keep the TNtuple format

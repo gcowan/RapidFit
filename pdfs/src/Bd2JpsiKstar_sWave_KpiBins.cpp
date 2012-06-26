@@ -332,7 +332,7 @@ double Bd2JpsiKstar_sWave_KpiBins::buildCompositePDFdenominator( )
 
 	if( true /*useTimeAcceptance()*/ ) {                // Set to true because seleting false makes a single slice for 0 --> 14.
 		//This loops over each time slice, does the normalisation between the limits, and accumulates
-		for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
+		for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
 		{
 			//Set the time integrals
 			tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
@@ -354,6 +354,7 @@ double Bd2JpsiKstar_sWave_KpiBins::buildCompositePDFdenominator( )
 
 double Bd2JpsiKstar_sWave_KpiBins::NormAnglesOnlyForAcceptanceWeights(DataPoint* measurement, PhaseSpaceBoundary * boundary)
 {
+	(void) boundary;
 	double returnValue;
 	time = measurement->GetObservable( timeName )->GetValue();
 	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();

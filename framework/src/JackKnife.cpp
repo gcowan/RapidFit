@@ -88,7 +88,7 @@ namespace JackKnife
 			FitResult * result = FitAssembler::DoFit( theMinimiser, theFunction, argumentParameterSet, vectorPDFs, vectorData, xmlFile->GetConstraints() );
 			if ( result->GetFitStatus() == 3 ) {
 				jackknifed_value = result->GetResultParameterSet()->GetResultParameter("tau")->GetValue();
-				jack->Fill( jackknifed_value - nominal_value, reco_time, true_time);
+				jack->Fill( (Float_t)(jackknifed_value - nominal_value), (Float_t)reco_time, (Float_t)true_time);
 			}
 			subset->Clear();
 			delete result;
@@ -99,6 +99,7 @@ namespace JackKnife
 
 	void plotUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, string plot )
 	{
+		(void) pdf; (void) phase;
 		unsigned int nD = (unsigned) data->GetDataNumber();
 		int bins = 30;
 		double level = (double)nD/(double)bins;

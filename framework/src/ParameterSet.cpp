@@ -54,11 +54,11 @@ ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNa
 	{
 		allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
 	}
-	vector<string>::const_iterator name_i = allNames.begin();
-	uniqueID = reinterpret_cast<size_t>(this);
+
+	uniqueID = reinterpret_cast<size_t>(this)+1;
 }
 
-ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
+ParameterSet& ParameterSet::operator= ( const ParameterSet& input ) 
 {
 	if( this != &input )
 	{
@@ -78,18 +78,20 @@ ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 		{
 			this->trusted_set.push_back( new ObservableRef( *name_i ) );
 		}
+		this->uniqueID = reinterpret_cast<size_t>(this)+1;
 	}
 	return *this;
 }
 
 //Constructor with correct arguments
-ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(NewNames)
+ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(NewNames), trusted_set(false), trusted( false ), uniqueID(0)
 {
 	//Populate the map
 	for( unsigned int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex )
 	{
 		allParameters.push_back( new PhysicsParameter( NewNames[nameIndex] ) );
 	}
+	uniqueID = reinterpret_cast<size_t>(this)+1;
 }
 
 //Destructor

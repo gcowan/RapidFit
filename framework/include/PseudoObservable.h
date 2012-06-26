@@ -21,7 +21,7 @@ class PseudoObservable
 
 		PseudoObservable( const PseudoObservable& );
 
-		//PseudoObservable& operator= ( const PseudoObservable& );
+		PseudoObservable& operator= ( const PseudoObservable& );
 
 		~PseudoObservable();
 

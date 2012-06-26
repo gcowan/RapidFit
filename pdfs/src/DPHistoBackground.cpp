@@ -291,7 +291,7 @@ double DPHistoBackground::angleMassFactor( )
 		mbin = maxis->FindFixBin( mass ); if( mbin > nmbins ) mbin = nmbins;
 		
 		int idx[4] = { xbin, ybin, zbin, mbin};
-		globalbin = histo->GetBin( idx );
+		globalbin = (int)histo->GetBin( idx );
 		num_entries_bin = histo->GetBinContent(globalbin);
 
 		//Angular factor normalized with phase space of histogram and total number of entries in the histogram

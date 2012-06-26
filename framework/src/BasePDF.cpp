@@ -58,9 +58,9 @@ BasePDF::~BasePDF()
 	if( debug_mutex != NULL && can_remove_mutex == true ) delete debug_mutex;
 }
 
-void BasePDF::SetCopyConstructor( const CopyPDF_t* input ) const
+void BasePDF::SetCopyConstructor( const IPDF* input ) const
 {
-	copy_object = input;
+	copy_object = (CopyPDF_t*) input;
 }
 
 CopyPDF_t* BasePDF::GetCopyConstructor() const
@@ -132,7 +132,7 @@ void BasePDF::CheckCaches( PhaseSpaceBoundary* InputBoundary )
 	/*!
 	 * If the internal Caches don't match re-allocate the whole array to be -1
 	 */
-	unsigned int totalCombinations = InputBoundary->GetNumberCombinations();
+	unsigned int totalCombinations = (unsigned)InputBoundary->GetNumberCombinations();
 	//cout << "I have: " << DiscreteCaches->size() << " I want : " << totalCombinations << endl;
 	if( DiscreteCaches->size() != totalCombinations )
 	{
@@ -380,7 +380,7 @@ void BasePDF::SetRandomFunction( int new_seed )
 {
 	seed_num = new_seed;
 	if( seed_function != NULL ) delete seed_function;
-	seed_function = new TRandom3( new_seed );
+	seed_function = new TRandom3( (unsigned)new_seed );
 }
 
 //  Return the numerical seed

@@ -142,7 +142,7 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 	
 	//Make empty Cache for the time integrals. This has to be done now after the SlicedAcceptance is created
 	vector<double> empty ;
-	for( int islice = 0; islice < timeAcc->numberOfSlices(); ++islice ) empty.push_back(0.0) ;
+	for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice ) empty.push_back(0.0) ;
 	for( int ires=0; ires < 4 ; ++ires ) {			
 		storeExpL.push_back( empty ) ;
 		storeExpH.push_back( empty ) ;
@@ -839,9 +839,9 @@ double Bs2JpsiPhi_Signal_v5::diffXsecCompositeNorm1( int resolutionIndex )
 		//De cache the time integrals  (unles using event Resolution
 		if( ! useEventResolution() ) this->deCacheTimeIntegrals( (unsigned)resolutionIndex, islice ) ;
 			
-		tlo = tlo_boundary > timeAcc->getSlice((int)islice)->tlow() ? tlo_boundary : timeAcc->getSlice((int)islice)->tlow() ;
-		thi = thi_boundary < timeAcc->getSlice((int)islice)->thigh() ? thi_boundary : timeAcc->getSlice((int)islice)->thigh() ;			
-		if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * timeAcc->getSlice((int)islice)->height() ;
+		tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
+		thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;			
+		if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * timeAcc->getSlice(islice)->height() ;
 	}		
 	
 	tlo = tlo_boundary;
@@ -884,11 +884,11 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals() {
 	double thi_boundary = thi ;
 
 	if( useEventResolution() ) {
-	    int ires = 0 ;
+	    unsigned int ires = 0 ;
 		resolution = eventResolution * resolutionScale ;
 		for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice ) {
-			tlo = tlo_boundary > timeAcc->getSlice((int)islice)->tlow() ? tlo_boundary : timeAcc->getSlice((int)islice)->tlow() ;
-			thi = thi_boundary < timeAcc->getSlice((int)islice)->thigh() ? thi_boundary : timeAcc->getSlice((int)islice)->thigh() ;
+			tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
+			thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
 			if( thi > tlo ) {
 				this->preCalculateTimeIntegrals() ;
 				//cout << " >>>>> caching time integrals / " << intExpL_stored << "  /  "<< intExpH_stored << "  /  "<< intExpSin_stored << "  /  "<< intExpCos_stored << "  /  " << endl ;
@@ -917,8 +917,8 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals() {
 			if( ires==3 ) resolution = resolution3 * resolutionScale ;
 		
 			for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice ) {
-				tlo = tlo_boundary > timeAcc->getSlice((int)islice)->tlow() ? tlo_boundary : timeAcc->getSlice((int)islice)->tlow() ;
-				thi = thi_boundary < timeAcc->getSlice((int)islice)->thigh() ? thi_boundary : timeAcc->getSlice((int)islice)->thigh() ;
+				tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
+				thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
 				if( thi > tlo ) {
 					this->preCalculateTimeIntegrals() ;
 					//cout << " >>>>> caching time integrals / " << intExpL_stored << "  /  "<< intExpH_stored << "  /  "<< intExpSin_stored << "  /  "<< intExpCos_stored << "  /  " << endl ;
