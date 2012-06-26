@@ -94,7 +94,8 @@ CXXFLAGS_LIB = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) $(R
 
 # Linux
 ifeq "$(UNAME)" "Linux"
-	CXXFLAGS+= -flto -fPIE
+	CXX_LTO=$(shell if [ $(gcc -v 2>&1 | tail -1 | awk '{print $3}' | awk -F "." '{print $2}') -gt 6 ]; then echo '-ftlo'; else echo ''; fi)
+	CXXFLAGS+= ${CXX_LTO} -fPIE
 	LINKFLAG+= -flto -pie -m64
 endif
 
