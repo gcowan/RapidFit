@@ -5,6 +5,8 @@
 
 2012/06/26 Rob Currie
    - Fixed some general compiler warnings and recast a few objects to make clang happier when that compiler is used (which may become default on OSX soon)
+   - moved -flto to just be used on Linux
+   - Made objects within dalitz folder not have a virtual destructor, the code contains some shared objects which may not be correctly duplicated/destroyed
 
 2012/06/24 Rob Currie
    - Added compiler option -flto to cxx variables, this allows gcc to perform inline optimisations for functions within derived classes

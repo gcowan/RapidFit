@@ -22,7 +22,7 @@ RM           = rm -f
 SVN_REV = $(shell svnversion -n .)
 
 #		Compiler Flags
-CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -flto -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
+CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
 
 CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -Os -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread
 
@@ -94,14 +94,14 @@ CXXFLAGS_LIB = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) $(R
 
 # Linux
 ifeq "$(UNAME)" "Linux"
-	CXXFLAGS     += -fPIE
-	LINKFLAGS    += -pie -m64
+	CXXFLAGS+= -flto -fPIE
+	LINKFLAG+= -flto -pie -m64
 endif
 
 # OS X
 ifeq "$(UNAME)" "Darwin"
-	CXXFLAGS     += -fPIE
-	LINKFLAGS    += $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo " -m64"; else echo ""; fi)
+	CXXFLAGS+= -fPIE
+	LINKFLAGS+= $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo " -m64"; else echo ""; fi)
 endif
 
 

@@ -9,7 +9,7 @@ class DPMassShape
   public:
 
     DPMassShape() {};
-    virtual ~DPMassShape() {};
+    ~DPMassShape() {};
 
     virtual TComplex massShape(double m) = 0;
 
