@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/06/26 Joel Bressieux
+   - Added a fraction to lass parametrization in pdfs/src/DPTotalAmplitudePDF.cpp
+
 2012/06/26 Rob Currie
    - Fixed some general compiler warnings and recast a few objects to make clang happier when that compiler is used (which may become default on OSX soon)
 
