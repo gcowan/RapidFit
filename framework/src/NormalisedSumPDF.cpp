@@ -391,3 +391,39 @@ string NormalisedSumPDF::XML() const
 	return xml.str();
 }
 
+void NormalisedSumPDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
+{
+	can_remove_mutex = can_remove;
+	if( debug_mutex != NULL && can_remove_mutex ) delete debug_mutex;
+	firstPDF->SetDebugMutex( Input, false );
+	secondPDF->SetDebugMutex( Input, false );
+	debug_mutex = Input;
+}
+
+void NormalisedSumPDF::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		firstPDF->SetDebug( input_debug );
+		secondPDF->SetDebug( input_debug );
+
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(*input_debug);
+
+		if( debug->DebugThisClass("NormalisedSumPDF") )
+		{
+			debug->SetStatus(true);
+			cout << "NormalisedSumPDF: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( false );
+	}
+}
+

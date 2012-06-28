@@ -68,18 +68,25 @@ spinZplus(spin)
 
 DPZplusK::~DPZplusK()
 {
-  if ( massShape ) 
-  {
-    delete massShape;
-  }
-  if ( barrierR )
-  {
-    delete barrierR;
-  }
-  if ( barrierB )
-  {
-    delete barrierB;
-  }
+  if( wigner != NULL ) delete wigner;
+}
+
+DPZplusK::DPZplusK( const DPZplusK& input ) :
+        mJpsi(input.mJpsi), m1(input.m1), m2(input.m2), pR0(input.pR0), A0(input.A0), Aplus(input.Aplus),
+        Aminus(input.Aminus), spinZplus(input.spinZplus), wigner(NULL), wignerPsi(input.wignerPsi)
+{  
+        if( input.wigner != NULL )
+        {
+                switch(spinZplus)
+                {
+                        case 0: wigner=new DPWignerFunctionJ0();
+                                break;
+                        case 1: wigner=new DPWignerFunctionJ1();
+                                break;
+                        case 2: wigner=new DPWignerFunctionJ2();
+                                break;
+                }
+        }
 }
 
 /*

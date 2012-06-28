@@ -4,7 +4,7 @@
   A container for all information configuring RapidFit output
 
   @author Benjamin Wynne bwynne@cern.ch
- */
+  */
 
 //	ROOT Headers
 #include "TSystem.h"
@@ -40,7 +40,8 @@ OutputConfiguration::OutputConfiguration( vector< pair< string, string > > Input
 	Global_Scan_List( ScanParameters ),
 	Global_2DScan_List( _2DScanParameters ),
 	Stored_Fit_Results(),
-	proj_components( Components )
+	proj_components( Components ),
+	debug(new DebugClass(false) )
 {
 }
 
@@ -304,7 +305,9 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			//	ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
 			ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex),
 
-										PDFStr, output_file, thisObservable, (*projection_i) );
+					PDFStr, output_file, thisObservable, (*projection_i) );
+
+			thisPlotter->SetDebug( debug );
 
 			if( weightedEventsWereUsed ) thisPlotter->SetWeightsWereUsed( weightName );
 
@@ -368,7 +371,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 			ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data",
 
-									resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
+					resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
 		}
 
 
@@ -501,5 +504,28 @@ void OutputConfiguration::SetWeightsWereUsed( string _weightName )
 void OutputConfiguration::SetInputResults( ResultParameterSet* oneResult )
 {
 	Stored_Fit_Results.push_back( oneResult );
+}
+
+void OutputConfiguration::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( *input_debug );
+		if( debug->DebugThisClass("OutputConfiguration") )
+		{
+			debug->SetStatus(true);
+			cout << "OutputConfiguration: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }
 

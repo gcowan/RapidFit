@@ -151,7 +151,7 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 	if( isnan(termOne) || isnan(termTwo) )
 	{
 		cout << this->GetLabel() << endl;
-	cout << termOne << "\tx\t" << termTwo << endl;
+		cout << termOne << "\tx\t" << termTwo << endl;
 	}
 	return termOne * termTwo;
 }
@@ -285,4 +285,37 @@ string ProdPDF::XML() const
 	return xml.str();
 }
 
+void ProdPDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
+{
+	can_remove_mutex = can_remove;
+	if( debug_mutex != NULL && can_remove_mutex ) delete debug_mutex;
+	firstPDF->SetDebugMutex( Input, false );
+	secondPDF->SetDebugMutex( Input, false );
+	debug_mutex = Input;
+}
+
+void ProdPDF::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		firstPDF->SetDebug( input_debug );
+		secondPDF->SetDebug( input_debug );
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(*input_debug);
+		if( debug->DebugThisClass("ProdPDF") )
+		{
+			debug->SetStatus(true);
+			cout << "ProdPDF: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( false );
+	}
+}
 

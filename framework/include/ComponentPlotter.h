@@ -208,7 +208,7 @@ class ComponentPlotter
 		 */
 		static void OutputPlot( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary,
 
-				TRandom* rand=NULL, CompPlotter_config* config=NULL );
+				TRandom* rand=NULL, CompPlotter_config* config=NULL, DebugClass* =NULL );
 
 
 		/*!
@@ -222,6 +222,7 @@ class ComponentPlotter
 		 */
 		double operator() (double *x, double *p);
 
+		void SetDebug( DebugClass* debug );
 	private:
 
 		/*!
@@ -525,6 +526,8 @@ class ComponentPlotter
 		CompPlotter_config* this_config;
 
 		bool onlyZero;				/*!	Should this class mimic the old Plotter behaviour?	*/
+
+		DebugClass* debug;
 };
 
 #endif

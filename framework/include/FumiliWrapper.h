@@ -63,6 +63,7 @@ class FumiliWrapper : public IMinimiser
 		RapidFitMatrix* GetCovarianceMatrix();
 		void ApplyCovarianceMatrix( RapidFitMatrix* Input );
 
+		void SetDebug( DebugClass* debug );
 	private:
 		//	Uncopyable!
 		FumiliWrapper ( const FumiliWrapper& );
@@ -77,6 +78,8 @@ class FumiliWrapper : public IMinimiser
 		double bestTolerance;
 		vector<string> Options;
 		int Quality;
+
+		DebugClass* debug;
 };
 
 #endif

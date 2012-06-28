@@ -388,7 +388,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	config->XMLConstraints = config->xmlFile->GetConstraints();
 
-	config->GlobalResult = FitAssembler::DoSafeFit( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData, config->XMLConstraints, config->OutputLevel );
+	config->GlobalResult = FitAssembler::DoSafeFit( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData, config->XMLConstraints, config->OutputLevel, config->debug );
 
 	config->GlobalFitResult->AddFitResult( config->GlobalResult );
 
@@ -855,6 +855,7 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 
 	//Actually configure a fit: first configure the output
 	config->makeOutput = config->xmlFile->GetOutputConfiguration();
+	config->makeOutput->SetDebug( config->debug );
 
 	//	Command line arguments override the config file
 

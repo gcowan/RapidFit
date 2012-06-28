@@ -21,6 +21,10 @@
 #include "PhysicsBottle.h"
 #include "RapidFitIntegrator.h"
 #include "ObservableRef.h"
+#include "DebugClass.h"
+
+#include <vector>
+#include <string>
 
 using namespace::std;
 
@@ -142,6 +146,7 @@ class FitFunction
 
 		virtual vector<string> ConstrainedParameter() const;
 
+		void SetDebug( DebugClass* debug );
 	protected:
 		/*!
 		 * Don't Copy the class this way!
@@ -186,6 +191,8 @@ class FitFunction
 		bool testIntegrator;			/*!	Undocumented	*/
 
 		bool weightsSquared;			/*!	Should Weights squared be used in evaluating the function	*/
+
+		DebugClass* debug;				/*!	Flag controlling the turning on/off of extra debug information	*/
 };
 
 #endif

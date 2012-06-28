@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-11-12
- */
+  */
 
 #pragma once
 #ifndef NORMALISED_SUM_PDF_H
@@ -66,6 +66,11 @@ class NormalisedSumPDF : public BasePDF
 		void SetCachingEnabled( bool Input );
 
 		string XML() const;
+
+		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
+
+		void SetDebug( DebugClass* input_debug );
+
 	private:
 		//	Uncopyable!
 		NormalisedSumPDF& operator=(const NormalisedSumPDF&);

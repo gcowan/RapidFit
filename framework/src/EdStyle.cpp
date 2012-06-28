@@ -431,7 +431,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "Aperp_sq" ) {
 
-		Name.Append("{A_{\\hspace{-1pt}\\perp}}^{\\hspace{-2pt}2}");
+		Name.Append("A_{\\hspace{-1pt}\\perp}^{2}");
 
 	} else if ( Param_Name == "Apara_sq" ) {
 

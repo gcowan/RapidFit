@@ -77,18 +77,25 @@ spinKaon(spin)
 
 DPJpsiKaon::~DPJpsiKaon()
 {
-  if ( massShape ) 
-  {
-    delete massShape;
-  }
-  if ( barrierR )
-  {
-    delete barrierR;
-  }
-  if ( barrierB )
-  {
-    delete barrierB;
-  }
+  if( wigner != NULL ) delete wigner;
+}
+
+DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
+        mJpsi(input.mJpsi), m1(input.m1), m2(input.m2), pR0(input.pR0), A0(input.A0), Aplus(input.Aplus),
+        Aminus(input.Aminus), spinKaon(input.spinKaon), wigner(NULL), wignerPsi(input.wignerPsi)
+{    
+        if( input.wigner != NULL )
+        {
+                switch(spinKaon)
+                {
+                        case 0: wigner=new DPWignerFunctionJ0();
+                        break;
+                        case 1: wigner=new DPWignerFunctionJ1();
+                        break;
+                        case 2: wigner=new DPWignerFunctionJ2();
+                        break;
+                }
+        }
 }
 
 TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1, 

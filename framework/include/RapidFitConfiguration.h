@@ -14,6 +14,7 @@
 #include "ParameterSet.h"
 #include "XMLConfigReader.h"
 #include "MCStudy.h"
+#include "DebugClass.h"
 
 #include <string>
 #include <vector>
@@ -109,9 +110,14 @@ class RapidFitConfiguration
 		
 		vector<string> templatePDFs;
 
+		DebugClass* debug;
 	private:
+		/*!
+		 * @brief DO NOT COPY THE CONFIGURATION OBJECT!!!!!
+		 */
 		RapidFitConfiguration& operator = ( const RapidFitConfiguration& );
 		RapidFitConfiguration( const RapidFitConfiguration& );
 };
 
 #endif
+

@@ -87,6 +87,10 @@ class ProdPDF : public BasePDF
 		 * @brief Provide the XML which is capable of constructing this PDF in it's current state
 		 */
 		string XML() const;
+
+		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
+
+		void SetDebug( DebugClass* input_debug );
 	private:
 		//	Uncopyable!
 		//ProdPDF ( const ProdPDF& );

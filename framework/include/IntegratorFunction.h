@@ -20,6 +20,7 @@
 #include "DataPoint.h"
 #include "PhaseSpaceBoundary.h"
 #include "ComponentRef.h"
+#include "DebugClass.h"
 ///	System Headers
 #include <vector>
 
@@ -182,6 +183,7 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		 */
 		IntegratorFunction& operator = ( const IntegratorFunction& );
 
+		void SetDebug( DebugClass* debug );
 	private:
 
 		IPDF * wrappedFunction;					/*!	Pointer to the PDF being interfaced with ROOT objects		*/
@@ -204,6 +206,8 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		bool generateFunc, integrateFunc;
 
 		PhaseSpaceBoundary* myPhaseSpaceBoundary;		/*!	Pointer to internally explorable PhaseSpace */
+
+		DebugClass* debug;
 };
 
 #endif

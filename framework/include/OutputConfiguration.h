@@ -64,6 +64,7 @@ class OutputConfiguration
 		void AddContour( const string, const string );
 		void AddScan( const string );
 
+		void SetDebug( DebugClass* debug );
 	private:
 		OutputConfiguration ( const OutputConfiguration& );
 		OutputConfiguration& operator= ( const OutputConfiguration& );
@@ -84,6 +85,8 @@ class OutputConfiguration
 		vector<ResultParameterSet* > Stored_Fit_Results;
 
 		vector<CompPlotter_config*> proj_components;
+
+		DebugClass* debug;
 };
 
 #endif

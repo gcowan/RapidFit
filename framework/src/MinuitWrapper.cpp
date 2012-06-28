@@ -40,13 +40,13 @@ using namespace::std;
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
-MinuitWrapper::MinuitWrapper(): minuit(NULL), fitResult(NULL), contours(), print_verbosity( 0 ), maxSteps(), bestTolerance(), Options(), Quality()
+MinuitWrapper::MinuitWrapper(): minuit(NULL), fitResult(NULL), contours(), print_verbosity( 0 ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
 {
 	minuit = new TMinuit( 1 );
 }
 
 //Constructor with correct argument
-MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(NULL), fitResult(NULL), contours(), print_verbosity( output_level ), maxSteps(), bestTolerance(), Options(), Quality()
+MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(NULL), fitResult(NULL), contours(), print_verbosity( output_level ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
 {
 	minuit = new TMinuit( NumberParameters );
 }
@@ -56,6 +56,7 @@ MinuitWrapper::~MinuitWrapper()
 {
 	//cout << "hello from MinuitWrapper destructor" << endl;
 	delete minuit;
+	if( debug != NULL ) delete debug;
 }
 
 void MinuitWrapper::SetSteps( int newSteps )
@@ -506,5 +507,28 @@ void MinuitWrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 	}
 	cout << endl;
 	fitResult->ApplyCovarianceMatrix( Input );
+}
+
+void MinuitWrapper::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( *input_debug );
+		if( debug->DebugThisClass("MinuitWrapper") )
+		{
+			debug->SetStatus(true);
+			cout << "MinuitWrapper: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }
 

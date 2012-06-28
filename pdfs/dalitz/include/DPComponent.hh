@@ -7,11 +7,10 @@
 
 class DPComponent
 {
-
   public:
 
-    DPComponent();
-    ~DPComponent();
+    DPComponent(){};
+    virtual ~DPComponent(){};
 
     virtual TComplex amplitude(double m23, double cosTheta1, double cosTheta2, 
                                double phi, int twoLambda, int twoLambdaPsi=0) = 0;

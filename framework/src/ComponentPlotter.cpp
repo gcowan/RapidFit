@@ -49,7 +49,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ), logY( (config!=NULL)?config->logY:false ),
 	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false ),
 	combination_integral(0.), ratioOfIntegrals(0.), wanted_weights(), format(), data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(),
-	total_components(), chi2(), N()
+	total_components(), chi2(), N(), debug( new DebugClass(false) )
 {
 	plotPDF->TurnCachingOff();
 
@@ -100,6 +100,7 @@ ComponentPlotter::~ComponentPlotter()
 		allCombinations.pop_back();
 	}
 	delete format;
+	if( debug != NULL ) delete debug;
 }
 
 //Create a root file containing a projection plot over one observable
@@ -761,7 +762,8 @@ TGraphErrors* ComponentPlotter::MergeBinnedData( vector<TGraphErrors*> input, TR
 }
 
 //	Plot all components on this combinations and print and save the canvas
-void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary, TRandom* rand, CompPlotter_config* conf )
+void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary, TRandom* rand,
+		CompPlotter_config* conf, DebugClass* debug )
 {
 	if( rand == NULL ) rand = gRandom;
 	TString TCanvas_Name("Overlay_"+observableName+"_"+CombinationDescription+"_");TCanvas_Name+=rand->Rndm();
@@ -824,10 +826,10 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	c1->Update();
 
-        TLatex *myLatex = new TLatex(0.5,0.5,"");
-        myLatex->SetTextAlign(11);
-        myLatex->SetNDC(kTRUE);
-        myLatex->DrawLatex(0.59, 0.75,"LHCb");
+	TLatex *myLatex = new TLatex(0.5,0.5,"");
+	myLatex->SetTextAlign(11);
+	myLatex->SetNDC(kTRUE);
+	myLatex->DrawLatex(0.59, 0.75,"LHCb");
 
 	TLegend* leg = EdStyle::LHCbLegend();
 
@@ -861,7 +863,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		if( (*comp_i)->GetLineWidth() != 0 )
 		{
 			(*comp_i)->Draw("L9");
-		
+
 			if( !component_names.empty() )
 			{
 				if( num < component_names.size() )
@@ -896,36 +898,49 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
 	ofstream filestr;
-	filestr.open ("/dev/null");
-	//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
-	cout_bak = cout.rdbuf();
-	cerr_bak = cerr.rdbuf();
-	clog_bak = clog.rdbuf();
-	nullbuf = filestr.rdbuf();
 
-	int    fd;
+	int fd=0;
 	fpos_t pos;
-	fflush(stderr);
-	fgetpos(stderr, &pos);
-	fd = dup(fileno(stdout));
-	freopen("/dev/null", "w", stderr);
-	
-	cout.rdbuf(nullbuf);
-	cerr.rdbuf(nullbuf);
-	clog.rdbuf(nullbuf);
+
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			filestr.open ("/dev/null");
+			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
+			cout_bak = cout.rdbuf();
+			cerr_bak = cerr.rdbuf();
+			clog_bak = clog.rdbuf();
+			nullbuf = filestr.rdbuf();
+			fflush(stderr);
+			fgetpos(stderr, &pos);
+			fd = dup(fileno(stdout));
+			freopen("/dev/null", "w", stderr);
+			cout.rdbuf(nullbuf);
+			cerr.rdbuf(nullbuf);
+			clog.rdbuf(nullbuf);
+		}
+	}
 
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
-	fflush(stderr);
-	dup2(fd,fileno(stderr));
-	close(fd);
-	clearerr(stderr);
-	fsetpos(stderr, &pos);
 
-	cout.rdbuf( cout_bak );
-	cerr.rdbuf( cerr_bak );
-	clog.rdbuf( clog_bak );
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			fflush(stderr);
+			dup2(fd,fileno(stderr));
+			close(fd);
+			clearerr(stderr);
+			fsetpos(stderr, &pos);
+			cout.rdbuf( cout_bak );
+			cerr.rdbuf( cerr_bak );
+			clog.rdbuf( clog_bak );
+		}
+	}
+
 }
 
 //      This is a slimmed down version of the AddBranch function I have written elsewhere
@@ -1005,12 +1020,24 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		InputPoint->SetObservable( ObservableName, newObs );
 		delete newObs; newObs = NULL;
 
+		if( debug->GetStatus() )
+		{
+			cout << "Debug: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << observableValue << "\t";
+			pdfIntegrator->SetDebug( debug );
+		}
 		//	perform actual evaluation of the PDF with the configuration in the InputPoint, in the whole boundary with the given name and for selected component
 		integralvalue = pdfIntegrator->ProjectObservable( InputPoint, full_boundary, ObservableName, comp_obj );
+
+		cout << "\tI got: " << integralvalue << endl;
 
 		pointValues->push_back( integralvalue );
 	}
 	delete comp_obj;
+
+	if( debug->GetStatus() )
+	{
+		cout << "Debug: Performing Sanity Check" << endl;
+	}
 
 	this->Sanity_Check( pointValues, component );
 
@@ -1330,5 +1357,33 @@ double ComponentPlotter::operator() (double *x, double *p)
 pair<double,double> ComponentPlotter::GetChi2Numbers()
 {
 	return make_pair( chi2, N );
+}
+
+void ComponentPlotter::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( *input_debug );
+		if( debug->DebugThisClass("ComponentPlotter") )
+		{
+			debug->SetStatus(true);
+			vector<string> names = debug->GetClassNames();
+			names.push_back( "RapidFitIntegrator" );
+			names.push_back( "IntegrationFunction" );
+			pdfIntegrator->SetDebug( debug );
+			debug->SetClassNames( names );
+			cout << "ComponentPlotter: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }
 

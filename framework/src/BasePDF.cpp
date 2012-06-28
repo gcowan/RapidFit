@@ -25,7 +25,8 @@ using namespace::std;
 //Constructor
 BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ), requiresBoundary(false),
-	do_i_control_the_cache(false), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()), debug_mutex(NULL), can_remove_mutex(true)
+	do_i_control_the_cache(false), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()),
+	debug_mutex(NULL), can_remove_mutex(true), debug(new DebugClass(false) )
 {
 	component_list.push_back( "0" );
 	debug_mutex = new pthread_mutex_t();
@@ -37,7 +38,8 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	component_list( input.component_list ), cached_files( input.cached_files ), hasCachedMCGenerator( input.hasCachedMCGenerator ), requiresBoundary( input.requiresBoundary ),
 	seed_function( input.seed_function ), seed_num( input.seed_num ), PDFName( input.PDFName ), PDFLabel( input.PDFLabel ), copy_object( input.copy_object ),
 	do_i_control_the_cache( input.do_i_control_the_cache ), cachingEnabled( input.cachingEnabled ), haveTestedIntegral( input.haveTestedIntegral ),
-	thisConfig(NULL), discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL), debug_mutex(input.debug_mutex), can_remove_mutex(false)
+	thisConfig(NULL), discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL),
+	debug_mutex(input.debug_mutex), can_remove_mutex(false), debug((input.debug==NULL)?NULL:new DebugClass(*input.debug))
 {
 	allParameters.SetPhysicsParameters( &(input.allParameters) );
 	DiscreteCaches = new vector<double>( input.DiscreteCaches->size() );
@@ -45,6 +47,7 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	{
 		(*cache_i) = -1;
 	}
+	if( !input.debug->GetStatus() ) debug->SetStatus(false);
 }
 
 //Destructor
@@ -56,6 +59,8 @@ BasePDF::~BasePDF()
 	//if( seed_function != NULL ) delete seed_function;
 	if( DiscreteCaches != NULL ) delete DiscreteCaches;
 	if( debug_mutex != NULL && can_remove_mutex == true ) delete debug_mutex;
+
+	if( debug != NULL ) delete debug;
 }
 
 void BasePDF::SetCopyConstructor( const IPDF* input ) const
@@ -500,5 +505,33 @@ void BasePDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
 	can_remove_mutex = can_remove;
 	if( debug_mutex != NULL && can_remove_mutex ) delete debug_mutex;
 	debug_mutex = Input;
+}
+
+void BasePDF::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL  ) delete debug;
+		debug = new DebugClass(*input_debug);
+
+		if( debug->DebugThisClass("BasePDF") )
+		{
+			debug->SetStatus(true);
+			cout << "BasePDF: Debugging Enabled!" << endl;
+		}
+		else if( debug->DebugThisClass("PDF") )
+		{
+			debug->SetStatus(true);
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }
 

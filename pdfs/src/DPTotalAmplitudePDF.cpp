@@ -330,15 +330,15 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	this->SetNumericalNormalisation(true);
 	this->TurnCachingOff();
 	componentIndex = 0;
-	vector<DPComponent*>::const_iterator component_i = copy.KpiComponents.begin();
-	for( ; component_i != copy.KpiComponents.end(); ++component_i )
+
+	for( unsigned int i=0; i < copy.KpiComponents.size(); ++i )
 	{
-		KpiComponents.push_back( new DPJpsiKaon( *( dynamic_cast<DPJpsiKaon*>( *(component_i) ) ) ) );
+		KpiComponents.push_back( new DPJpsiKaon( *((DPJpsiKaon*)copy.KpiComponents[i]) ) );
 	}
-	vector<DPComponent*>::const_iterator component_j = copy.ZComponents.begin();
-	for( ; component_j != copy.ZComponents.end(); ++component_j )
+
+	for( unsigned int i=0; i < copy.ZComponents.size(); ++i )
 	{
-		ZComponents.push_back( new DPZplusK( *( dynamic_cast<DPZplusK*>( *(component_j) ) ) ) );
+		ZComponents.push_back( new DPZplusK( *((DPZplusK*)copy.ZComponents[i]) ) );
 	}
         
 	if ( useAngularAcceptance )
@@ -623,7 +623,10 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	double p1_st = sqrt(t1*t2)/m23/2 ;
 	double p3    = sqrt(t31*t32)/MB0/2;
 
-	return result * angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2* p1_st * p3;
+	double returnable_value = result * angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2* p1_st * p3;
+
+	if( isnan(returnable_value) || returnable_value < 0 ) return 0.;
+	else return returnable_value;
 }
 
 vector<string> DPTotalAmplitudePDF::PDFComponents()

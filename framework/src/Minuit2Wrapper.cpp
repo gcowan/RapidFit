@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	ROOT Headers
 #include "Minuit2/FunctionMinimum.h"
@@ -27,33 +27,34 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-Minuit2Wrapper::Minuit2Wrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality()
+Minuit2Wrapper::Minuit2Wrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug( new DebugClass(false) )
 {
 }
 
 //Destructor
 Minuit2Wrapper::~Minuit2Wrapper()
 {
+	if( debug != NULL ) delete debug;
 }
 
 void Minuit2Wrapper::SetSteps( int newSteps )
 {
-        maxSteps = newSteps;
+	maxSteps = newSteps;
 }
 
 void Minuit2Wrapper::SetTolerance( double newTolerance )
 {
-        bestTolerance = newTolerance;
+	bestTolerance = newTolerance;
 }
 
 void Minuit2Wrapper::SetOptions( vector<string> newOptions )
 {
-        Options = newOptions;
+	Options = newOptions;
 }
 
 void Minuit2Wrapper::SetQuality( int newQuality )
 {
-        Quality = newQuality;
+	Quality = newQuality;
 }
 
 void Minuit2Wrapper::SetupFit( FitFunction* NewFunction )
@@ -83,11 +84,11 @@ void Minuit2Wrapper::Minimise()
 
 	//Retrieve the result of the fit
 	FunctionMinimum minimum = mig( (unsigned)maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
-	
+
 	// May also want to run Hesse before the minimisation to get better estimate
 	// of the error matrix.
 	//MnHesse hesse(2);
-	//hesse( *function, minimum, 1000); 
+	//hesse( *function, minimum, 1000);
 
 	// Need to add in the running of Hesse and Minos here. Should be configurable.
 
@@ -115,7 +116,7 @@ void Minuit2Wrapper::Minimise()
 
 	// Get the covariance matrix. Stored as an n*(n+1)/2 vector
 	const MnUserCovariance * covMatrix = &minimum.UserCovariance();
-	vector<double> covData = covMatrix->Data();	
+	vector<double> covData = covMatrix->Data();
 
 	//Make a location to store the contour plots
 	vector< FunctionContour* > allContours;
@@ -161,9 +162,9 @@ void Minuit2Wrapper::Minimise()
 		{
 			//If the parameters have valid indices, ask minuit to plot them
 			int numberOfPoints = 40;
-//			int iErrf;
-//			double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
-			vector< pair< double, double> > oneContour = contoursFromMinuit( unsigned(allIndices[plotIndex].first), unsigned(allIndices[plotIndex].second), unsigned(numberOfPoints) );	
+			//			int iErrf;
+			//			double xCoordinates[numberOfPoints], yCoordinates[numberOfPoints];
+			vector< pair< double, double> > oneContour = contoursFromMinuit( unsigned(allIndices[plotIndex].first), unsigned(allIndices[plotIndex].second), unsigned(numberOfPoints) );
 			allContours[plotIndex]->SetPlot( sigma, oneContour );
 		}
 	}
@@ -219,5 +220,28 @@ void Minuit2Wrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
 	(void)Input;
 	return;
+}
+
+void Minuit2Wrapper::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( *input_debug );
+		if( debug->DebugThisClass("Minuit2Wrapper") )
+		{
+			debug->SetStatus(true);
+			cout << "Minuit2Wrapper: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }
 

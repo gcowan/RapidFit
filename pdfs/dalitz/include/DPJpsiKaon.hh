@@ -16,7 +16,8 @@ class DPJpsiKaon: public DPComponent
                    double m1, double m2, double RB, double RR, 
                    double mJpsi, int spin, std::string massShape="BW",
                    double a=1, double r=0); 
-    ~DPJpsiKaon();
+    DPJpsiKaon( const DPJpsiKaon& input );
+    virtual ~DPJpsiKaon();
 
     TComplex amplitude(double m23, double cosTheta1, double cosTheta2, 
                        double phi, int twoLambda, int twoLambdaPsi);

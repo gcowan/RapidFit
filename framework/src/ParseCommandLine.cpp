@@ -2,6 +2,7 @@
 #include "RapidFitConfiguration.h"
 #include "ParseCommandLine.h"
 #include "InputParsing.h"
+#include "StringProcessing.h"
 
 #include <vector>
 #include <string>
@@ -535,6 +536,19 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
+		else if( currentArgument == "--DebugClass" )
+		{
+			if( argumentIndex + 1 < argc )
+			{
+				++argumentIndex;
+				vector<string> class_names = StringProcessing::SplitString( argv[argumentIndex], ':' );
+				DebugClass* thisDebug = new DebugClass( true );
+				thisDebug->SetClassNames( class_names );
+
+				if( config.debug != NULL ) delete config.debug;
+				config.debug = thisDebug;
+			}
+		}
 
 		//	The Parameters beyond here are for setting boolean flags
 		else if( currentArgument == "--testIntegrator" )			{	config.testIntegratorFlag = true;			}
@@ -555,6 +569,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--generateToyXML" )			{	config.generateToyXML = true;				}
 		else if( currentArgument == "--fixedTotalToys" )			{	config.fixedTotalToys = true;				}
 		else if( currentArgument == "--saveAllToys" )				{	config.saveAllToys = true;				}
+		else if( currentArgument == "--Debug" )	{  if( config.debug != NULL ){ delete config.debug;}	config.debug = new DebugClass(true);	}
 
 		//	We didn't understand the argument to end up here
 		else

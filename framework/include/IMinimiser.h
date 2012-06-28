@@ -166,6 +166,8 @@ class IMinimiser
 		 * @return Void
 		 */
 		virtual void ApplyCovarianceMatrix( RapidFitMatrix* Input ) = 0;
+
+		virtual void SetDebug( DebugClass* debug ) = 0;
 };
 
 #endif

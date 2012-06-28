@@ -17,6 +17,7 @@
 #include "StatisticsFunctions.h"
 #include "ClassLookUp.h"
 #include "NormalisedSumPDF.h"
+#include "DebugClass.h"
 //	System Headers
 #include <iostream>
 #include <iomanip>
@@ -42,7 +43,7 @@ using namespace::std;
 RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) :
 	ratioOfIntegrals(-1.), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL),
 	functionCanIntegrate(false), haveTestedIntegral(false),
-	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list()
+	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(NULL)
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
@@ -58,14 +59,14 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerica
 RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : ratioOfIntegrals( input.ratioOfIntegrals ),
 	fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
 	functionCanIntegrate( input.functionCanIntegrate ), haveTestedIntegral( input.haveTestedIntegral ),
-	RapidFitIntegratorNumerical( input.RapidFitIntegratorNumerical ), obs_check( input.obs_check ), checked_list( input.checked_list )
+	RapidFitIntegratorNumerical( input.RapidFitIntegratorNumerical ), obs_check( input.obs_check ), checked_list( input.checked_list ), debug((input.debug==NULL)?NULL:new DebugClass(*input.debug))
 {
 	//	We don't own the PDF so no need to duplicate it as we have to be told which one to use
 	//if( input.functionToWrap != NULL ) functionToWrap = ClassLookUp::CopyPDF( input.functionToWrap );
 
 	//	Only Construct the Integrators if they are required
 	if( input.fastIntegrator != NULL ) fastIntegrator = new FoamIntegrator( *(input.fastIntegrator) );
-	if( input.multiDimensionIntegrator != NULL ) 
+	if( input.multiDimensionIntegrator != NULL )
 	{
 		multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();// *(input.multiDimensionIntegrator) );//new AdaptiveIntegratorMultiDim();
 		//      These functions only exist with ROOT > 5.27 I think, at least they exist in 5.28/29
@@ -81,6 +82,8 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 		(void) type;	//	For the global state of ROOT
 		oneDimensionIntegrator = new IntegratorOneDim( );//*(input.oneDimensionIntegrator) );
 	}
+
+	if(input.debug!=NULL) if( !(input.debug->GetStatus()) ) debug->SetStatus(false);
 }
 
 //	Don't want the projections to be insanely accurate
@@ -99,6 +102,7 @@ RapidFitIntegrator::~RapidFitIntegrator()
 	if( multiDimensionIntegrator != NULL ) delete multiDimensionIntegrator;
 	if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
 	if( fastIntegrator != NULL ) delete fastIntegrator;
+	if( debug != NULL ) delete debug;
 }
 
 //Return the integral over all observables
@@ -169,7 +173,7 @@ vector<string> RapidFitIntegrator::DontNumericallyIntegrateList( const DataPoint
 
 	//	If the Observables haven't been checked, check them.
 	if( !obs_check )
-	{    
+	{
 		vector<string> PDF_params = functionToWrap->GetPrototypeDataPoint();
 		vector<string> DataPoint_params;
 		if( NewDataPoint != NULL ) DataPoint_params = NewDataPoint->GetAllNames();
@@ -244,9 +248,11 @@ void RapidFitIntegrator::SetPDF( IPDF* input )
 	functionToWrap = input;
 }
 
-double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
+double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate,
+		DebugClass* debug )
 {
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
+	quickFunction->SetDebug( debug );
 	//Find the observable range to integrate over
 	IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
 	double minimum = newConstraint->GetMinimum();
@@ -257,18 +263,31 @@ double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint,
 	oneDimensionIntegrator->SetFunction(*quickFunction);
 
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
-	cout_bak = cout.rdbuf();
-	cerr_bak = cerr.rdbuf();
-	clog_bak = clog.rdbuf();
-	cout.rdbuf(0);
-	cerr.rdbuf(0);
-	clog.rdbuf(0);
+
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			cout_bak = cout.rdbuf();
+			cerr_bak = cerr.rdbuf();
+			clog_bak = clog.rdbuf();
+			cout.rdbuf(0);
+			cerr.rdbuf(0);
+			clog.rdbuf(0);
+		}
+	}
 
 	double output = oneDimensionIntegrator->Integral( minimum, maximum );
 
-	cout.rdbuf( cout_bak );
-	cerr.rdbuf( cerr_bak );
-	clog.rdbuf( clog_bak );
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			cout.rdbuf( cout_bak );
+			cerr.rdbuf( cerr_bak );
+			clog.rdbuf( clog_bak );
+		}
+	}
 
 	delete quickFunction;
 
@@ -276,7 +295,7 @@ double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint,
 }
 
 double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug )
 {
 	//Make arrays of the observable ranges to integrate over
 	double* minima = new double[ doIntegrate.size() ];
@@ -299,14 +318,21 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 	}
 
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
-
+	quickFunction->SetDebug( debug );
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
-	cout_bak = cout.rdbuf();
-	cerr_bak = cerr.rdbuf();
-	clog_bak = clog.rdbuf();
-	cout.rdbuf(0);
-	cerr.rdbuf(0);
-	clog.rdbuf(0);
+
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			cout_bak = cout.rdbuf();
+			cerr_bak = cerr.rdbuf();
+			clog_bak = clog.rdbuf();
+			cout.rdbuf(0);
+			cerr.rdbuf(0);
+			clog.rdbuf(0);
+		}
+	}
 
 	multiDimensionIntegrator->SetFunction( *quickFunction );
 
@@ -315,9 +341,15 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 	delete minima; delete maxima;
 	delete quickFunction;
 
-	cout.rdbuf( cout_bak );
-	cerr.rdbuf( cerr_bak );
-	clog.rdbuf( clog_bak );
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			cout.rdbuf( cout_bak );
+			cerr.rdbuf( cerr_bak );
+			clog.rdbuf( clog_bak );
+		}
+	}
 
 	return output;
 }
@@ -373,11 +405,11 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			//Chose the one dimensional or multi-dimensional method
 			if( doIntegrate.size() == 1 )
 			{
-				numericalIntegral += this->OneDimentionIntegral( *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
+				numericalIntegral += this->OneDimentionIntegral( *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
 			}
 			else
 			{
-				numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
+				numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
 			}
 
 			if( !haveTestedIntegral )
@@ -434,4 +466,28 @@ void RapidFitIntegrator::ForceTestStatus( bool input )
 	haveTestedIntegral = input;
 }
 
+void RapidFitIntegrator::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(*input_debug);
+
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
+			debug->SetStatus(true);
+			cout << "RapidFitIntegrator: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
+	if( functionToWrap != NULL ) functionToWrap->SetDebug( input_debug );
+}
 

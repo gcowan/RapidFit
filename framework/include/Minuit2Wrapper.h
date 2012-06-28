@@ -48,6 +48,7 @@ class Minuit2Wrapper : public IMinimiser
 		RapidFitMatrix* GetCovarianceMatrix();
 		void ApplyCovarianceMatrix( RapidFitMatrix* Input );
 
+		void SetDebug( DebugClass* debug );
 	private:
 		//	Uncopyable!
 		Minuit2Wrapper ( const Minuit2Wrapper& );
@@ -62,6 +63,8 @@ class Minuit2Wrapper : public IMinimiser
                 double bestTolerance;
                 vector<string> Options;
 		int Quality;
+
+		DebugClass* debug;
 };
 
 #endif

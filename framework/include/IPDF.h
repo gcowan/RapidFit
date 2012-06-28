@@ -22,6 +22,7 @@
 #include "PhaseSpaceBoundary.h"
 #include "ParameterSet.h"
 #include "ComponentRef.h"
+#include "DebugClass.h"
 ///	System Headers
 #include <vector>
 #include <string>
@@ -311,6 +312,7 @@ class IPDF
 
 		virtual void SetDebugMutex( pthread_mutex_t* Input, bool =true ) = 0;
 
+		virtual void SetDebug( DebugClass* input_debug ) = 0;
 	protected:
 
 		virtual bool SetPhysicsParameters( ParameterSet* Input ) = 0;

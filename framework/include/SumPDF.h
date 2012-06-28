@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 #pragma once
 #ifndef SUM_PDF_H
@@ -61,6 +61,10 @@ class SumPDF : public BasePDF
 		bool GetCachingEnabled() const;
 
 		string XML() const;
+
+		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
+
+		void SetDebug( DebugClass* input_debug );
 	private:
 		//	Uncopyable!
 		//SumPDF ( const SumPDF& );

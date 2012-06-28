@@ -45,6 +45,7 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		temporaryDataPoint = TestDataSet->GetDataPoint(dataIndex);
 		value = TestPDF->Evaluate(temporaryDataPoint);
 
+		if( debug ) cout << "V: " << value << endl;
 		//Idiot check
 		//if ( value < 0 || isnan(value) )
 		//{
@@ -58,6 +59,8 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		//Find out the integral
 		integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );
 		
+		if( debug  ) cout << "I: " << integral << endl;
+
 		//Get the weight for this DataPoint (event)
 		weight = 1.0;
 		if (useWeights)

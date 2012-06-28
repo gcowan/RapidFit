@@ -6,7 +6,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 //	ROOT Headers
 #include "TFile.h"
 #include "TTree.h"
@@ -29,7 +29,8 @@ using namespace::std;
 //Default constructor
 FitFunction::FitFunction() :
 	allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
-	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false )
+	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
+	debug(new DebugClass(false) )
 {
 }
 
@@ -67,6 +68,8 @@ FitFunction::~FitFunction()
 		if( allIntegrators.back() != NULL ) delete allIntegrators.back();
 		allIntegrators.pop_back();
 	}
+
+	if( debug != NULL ) delete debug;
 }
 
 void FitFunction::SetupTrace( const TString FileName, const int traceNum )
@@ -105,12 +108,13 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 	{
 		NewBottle->GetResultPDF(resultIndex)->UpdatePhysicsParameters( allData->GetParameterSet() );
 		RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
+		resultIntegrator->SetDebug( debug );
 		allIntegrators.push_back( resultIntegrator );
 
 		allIntegrators.back()->ForceTestStatus( false );
 		if( testIntegrator == false ) allIntegrators.back()->ForceTestStatus( true );
-		double someval = allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
-		(void) someval;
+		//double someval = allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
+		//(void) someval;
 
 		if( Threads > 0 )
 		{
@@ -120,7 +124,9 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 			{
 				StoredBoundary.push_back( new PhaseSpaceBoundary( *(NewBottle->GetResultDataSet(resultIndex)->GetBoundary()) ) );
 				stored_pdfs.push_back( ClassLookUp::CopyPDF( NewBottle->GetResultPDF( resultIndex ) ) );
+				stored_pdfs.back()->SetDebug( debug );
 				StoredIntegrals.push_back( new RapidFitIntegrator( stored_pdfs.back() ) );
+				StoredIntegrals.back()->SetDebug( debug );
 
 				// Give the Integral Testing code a Sharp Kick!!!
 				StoredIntegrals.back()->ForceTestStatus( true );
@@ -148,8 +154,8 @@ bool FitFunction::SetParameterSet( const ParameterSet * NewParameters )
 	if( result )
 	{
 		//Initialise the integrators
-        	for ( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
-        	{
+		for ( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
+		{
 			allData->SetParameterSet( NewParameters );
 
 			allData->GetResultPDF( resultIndex )->UpdatePhysicsParameters( allData->GetParameterSet() );
@@ -291,5 +297,29 @@ vector<string> FitFunction::ConstrainedParameter() const
 		allparams = StringProcessing::CombineUniques( allparams, allconstraints[i]->ConstrainedParameter() );
 	}
 	return allparams;
+}
+
+void FitFunction::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( *input_debug );
+
+		if( debug->DebugThisClass("FitFunction") )
+		{
+			debug->SetStatus(true);
+			cout << "FitFunction: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }
 

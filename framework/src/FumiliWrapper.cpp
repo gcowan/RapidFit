@@ -28,7 +28,7 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality()
+FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
 {
 }
 
@@ -36,6 +36,7 @@ FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(
 FumiliWrapper::~FumiliWrapper()
 {
 	//delete minuit;
+	if( debug != NULL ) delete debug;
 }
 
 void FumiliWrapper::SetSteps( int newSteps )
@@ -224,4 +225,27 @@ void FumiliWrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
 	(void)Input;
 	return;
+}
+
+void FumiliWrapper::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( *input_debug );
+		if( debug->DebugThisClass("FumiliWrapper") )
+		{
+			debug->SetStatus(true);
+			cout << "FumiliWrapper: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }

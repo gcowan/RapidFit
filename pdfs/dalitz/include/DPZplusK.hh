@@ -15,7 +15,8 @@ class DPZplusK: public DPComponent
     DPZplusK(int LB, int LR, double mB, double mR, double gammaR,
                    double m1, double m2, double RB, double RR, 
                    double mJpsi, int spin); 
-    ~DPZplusK();
+    DPZplusK( const DPZplusK& input );
+    virtual ~DPZplusK();
 
     TComplex amplitude(double m23, double cosTheta1, double cosTheta2, 
                        double phi, int twoLambda, int twoLambdaPsi);

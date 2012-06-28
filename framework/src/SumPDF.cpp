@@ -50,7 +50,7 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 	//if( firstPDF->GetName() == "Prod" )//&& firstpdf_components.size() != 1 )
 	//{
 	//	start_1 = 1;
-	//}       
+	//}
 	//if( secondPDF->GetName() == "Prod" )//&& secondpdf_components.size() != 1 )
 	//{
 	//	start_2 = 1;
@@ -295,5 +295,41 @@ string SumPDF::XML() const
 	xml << "</SumPDF>" << endl;
 
 	return xml.str();
+}
+
+void SumPDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
+{
+	can_remove_mutex = can_remove;
+	if( debug_mutex != NULL && can_remove_mutex ) delete debug_mutex;
+	firstPDF->SetDebugMutex( Input, false );
+	secondPDF->SetDebugMutex( Input, false );
+	debug_mutex = Input;
+}
+
+void SumPDF::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		firstPDF->SetDebug( input_debug );
+		secondPDF->SetDebug( input_debug );
+
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(*input_debug);
+
+		if( debug->DebugThisClass("SumPDF") )
+		{
+			debug->SetStatus(true);
+			cout << "SumPDF: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( false );
+	}
 }
 

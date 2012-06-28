@@ -1,5 +1,18 @@
 // $Id: release.notes $
 
+2012/06/28 Rob Currie
+   - Removed pdfs/dalitz/src/DPComponent.cc in favour of keeping the header file for just an interface to derived types
+   - Added some copy constructors and cleaned up some destructors and inheritance in the dalitz codebase, although I have largely no idea what the code 
+   - Added --Debug run time option, this increases verbosity to maximum if you have a problem in an analysis.
+   - Added --DebugClass and DebugClass class source objects.
+        This allows the user to request for the debugging in a chosen class to be enabled at runtime.
+        eg:  --DebugClass ComponentPlotter
+        This will enable all of the debugging code within ComponentPlotter and dumps extra info to the screen as it's doing what it does which may be helpful
+        This is done without enabling all of the standard verbosity of sub-classes before here which may have stupid errors.
+        This has been enabled for many but not all classes in framework
+   - Changed expected behaviour of ComponentPlotter. Instead of exiting with an error it will now just plot 0 and continue
+        This is a change in the InterfaceFunction class, but only effects the ComponentPlotter and people should be aware of the change in expected behaviour
+
 2012/06/26 Joel Bressieux
    - Added a fraction to lass parametrization in pdfs/src/DPTotalAmplitudePDF.cpp
 

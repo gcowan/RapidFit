@@ -98,9 +98,9 @@
 #include <cmath>
 #include <pthread.h>
 
-using namespace::std;
+	using namespace::std;
 
-class BasePDF : public IPDF
+	class BasePDF : public IPDF
 {
 	public:
 		/*!
@@ -538,7 +538,9 @@ class BasePDF : public IPDF
 
 		pthread_mutex_t* DebugMutex() const;
 
-		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
+		virtual void SetDebugMutex( pthread_mutex_t* Input, bool =true );
+
+		virtual void SetDebug( DebugClass* input_debug );
 
 	protected:
 
@@ -612,7 +614,10 @@ class BasePDF : public IPDF
 
 		vector<string> component_list;	/*!	This is the list of components that this PDF can provide	*/
 
+		pthread_mutex_t* debug_mutex;
+		bool can_remove_mutex;
 
+		DebugClass* debug;
 	private:
 
 		bool numericalNormalisation;                  /*!     Does this PDF require Numerical Integration, or has Numerical Integration been requested?       */
@@ -678,8 +683,6 @@ class BasePDF : public IPDF
 
 		PDFConfigurator* thisConfig;	/*!	PDFConfigurator containing the Configurator which knowsn how this PDF was configured	*/
 
-		pthread_mutex_t* debug_mutex;
-		bool can_remove_mutex;
 };
 
 #endif

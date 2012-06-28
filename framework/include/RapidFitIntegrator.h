@@ -21,6 +21,7 @@
 #include "IPDF.h"
 #include "FoamIntegrator.h"
 #include "IDataSet.h"
+#include "DebugClass.h"
 
 using namespace ROOT::Math;
 
@@ -241,6 +242,7 @@ class RapidFitIntegrator
 		 */
 		vector<string> DontNumericallyIntegrateList( const DataPoint*, vector<string> = vector<string>() );
 
+		void SetDebug( DebugClass* debug );
 	private:
 		/*!
 		 * Don't Copy the class this way!
@@ -277,7 +279,7 @@ class RapidFitIntegrator
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
 		static double MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* thisIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate );
+				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug=false );
 
 		/*!
 		 * @brief This is the Interface to the 1D Integrator class within ROOT
@@ -286,7 +288,7 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-		double OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate );
+		double OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug=false );
 
 		/*!
 		 * This stores the Ratio of the Integrals after the Comparison between Analytical and Numerical
@@ -343,6 +345,8 @@ class RapidFitIntegrator
 		 * @brief A boolean to make sure that the Observables DataSet is only checked to be Integrable only once
 		 */
 		bool obs_check;
+
+		DebugClass* debug;
 };
 
 #endif

@@ -26,7 +26,8 @@ IntegratorFunction::IntegratorFunction( IPDF * InputFunction, const DataPoint * 
 		const PhaseSpaceBoundary* inputPhaseSpaceBoundary, ComponentRef* Index, vector<double> new_lower_limit, vector<double> new_upper_limit ) :
 	wrappedFunction(InputFunction), currentPoint(new DataPoint(*InputPoint) ), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese),
 	minima(), ranges(), cache_positions(), componentIndex( Index==NULL?NULL:(new ComponentRef(*Index)) ), newDataPoint(NULL), cache_lookup(),
-	lower_limit(new_lower_limit), upper_limit(new_upper_limit), generateFunc(false), integrateFunc(true), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *inputPhaseSpaceBoundary ) )
+	lower_limit(new_lower_limit), upper_limit(new_upper_limit), generateFunc(false), integrateFunc(true), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *inputPhaseSpaceBoundary ) ),
+	debug(new DebugClass(false))
 {
 	//	Chose to use perform the lookups in the constructor to keep the Eval statement as const as possible
 	vector<ObservableRef> lookups;
@@ -53,7 +54,8 @@ IntegratorFunction::IntegratorFunction( IPDF * InputFunction, const DataPoint * 
 		vector<double> InputMinima, vector<double> InputRanges, const PhaseSpaceBoundary* inputPhaseSpaceBoundary ) :
 	wrappedFunction(InputFunction), currentPoint(new DataPoint(*InputPoint) ), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese),
 	minima(InputMinima), ranges(InputRanges), cache_positions(), componentIndex(NULL), newDataPoint(NULL), cache_lookup(), lower_limit(InputMinima),
-	upper_limit(), generateFunc(true), integrateFunc(false), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *inputPhaseSpaceBoundary) )
+	upper_limit(), generateFunc(true), integrateFunc(false), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *inputPhaseSpaceBoundary) ),
+	debug(new DebugClass(false))
 {
 	//      Chose to use perform the lookups in the constructor to keep the Eval statement as const as possible
 	vector<ObservableRef> lookups;
@@ -88,6 +90,7 @@ IntegratorFunction::~IntegratorFunction()
 	if( newDataPoint != NULL ) delete newDataPoint;
 	if( myPhaseSpaceBoundary != NULL ) delete myPhaseSpaceBoundary;
 	if( componentIndex != NULL ) delete componentIndex;
+	if( debug != NULL ) delete debug;
 }
 
 IntegratorFunction::IntegratorFunction ( const IntegratorFunction& input ) :
@@ -95,8 +98,9 @@ IntegratorFunction::IntegratorFunction ( const IntegratorFunction& input ) :
 	wrappedFunction( ClassLookUp::CopyPDF( input.wrappedFunction ) ), currentPoint( new DataPoint(*input.currentPoint) ), doIntegrate( input.doIntegrate ), dontIntegrate( input.dontIntegrate ),
 	minima( input.minima ), ranges( input.ranges ), cache_positions( input.cache_positions ), componentIndex( input.componentIndex==NULL?NULL:(new ComponentRef(*input.componentIndex)) ),
 	newDataPoint( new DataPoint(*input.newDataPoint) ), cache_lookup( input.cache_lookup ), lower_limit( input.lower_limit ), upper_limit( input.upper_limit ), generateFunc( input.generateFunc ),
-	integrateFunc( input.integrateFunc ), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *input.myPhaseSpaceBoundary ) )
+	integrateFunc( input.integrateFunc ), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *input.myPhaseSpaceBoundary ) ), debug( (input.debug==NULL)?NULL:new DebugClass(*input.debug) )
 {
+	if(input.debug!=NULL) if( !(input.debug->GetStatus()) ) debug->SetStatus(false);
 }
 
 //Return the IPDF inside the wrapper
@@ -218,18 +222,18 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 			result = wrappedFunction->EvaluateComponent( newDataPoint, componentIndex );
 			if( isnan(result) || fabs(result)>=DBL_MAX )
 			{
+				cout << "Component Value:" << result << endl;
 				newDataPoint->Print();
 				myPhaseSpaceBoundary->Print();
-				exit(0);
+				//exit(0);
 			}
-			//cout << result << endl;
 		}
 		else if( integrateFunc == true )
 		{
 			result = wrappedFunction->EvaluateForNumericIntegral( newDataPoint );
-			//cout << result << endl;
 			if( isnan(result) || fabs(result)>=DBL_MAX )
 			{
+				if( debug->GetStatus() ) cout << "Evaluate for Numerical Integral Value:" << result << endl;
 				newDataPoint->Print();
 				myPhaseSpaceBoundary->Print();
 				//exit(0);
@@ -297,6 +301,29 @@ Double_t IntegratorFunction::Density( Int_t ndim, Double_t * xArray )
 	{
 		cerr << "TFoamIntegrand problem - dimension number mismatch" << endl;
 		return 0.0;
+	}
+}
+
+void IntegratorFunction::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(*input_debug);
+		if( debug->DebugThisClass( "IntegratorFunction" ) )
+		{
+			debug->SetStatus(true);
+			cout << "IntegratorFunction: Debugging Enabled" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
 	}
 }
 
