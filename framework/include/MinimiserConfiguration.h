@@ -14,6 +14,12 @@
 //	RapidFit Headers
 #include "IMinimiser.h"
 #include "OutputConfiguration.h"
+#include "DebugClass.h"
+
+#include <string>
+#include <vector>
+
+using namespace::std;
 
 class MinimiserConfiguration
 {
@@ -38,6 +44,7 @@ class MinimiserConfiguration
 
 		string XML() const;
 
+		void SetDebug( DebugClass* debug );
 	private:
 		//	Uncopyable!
 		MinimiserConfiguration ( const MinimiserConfiguration& );
@@ -52,6 +59,7 @@ class MinimiserConfiguration
 		vector<string> MinimiseOptions;
 		bool MultiMini;
 		int Quality;
+		DebugClass* debug;
 };
 
 #endif

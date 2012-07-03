@@ -27,11 +27,13 @@
 #include <stdlib.h>
 #include <float.h>
 
+using namespace::std;
+
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(new DebugClass(false) )
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -42,16 +44,14 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 	}
 
 	//Read the whole file into a vector
-	while ( configFile.good() )
+	while( configFile.good() )
 	{
 		string newLine;
 		getline( configFile, newLine );
 		wholeFile.push_back( newLine );
 	}
+
 	StringProcessing::RemoveWhiteSpace(wholeFile);
-
-
-	//	THIS CAUSES MORE HEADACHES THAN IT FIXES WE WOULD LIKE TO MOVE TO USING A PROPER XML PARSER IN THE FUTURE ANYWAY!
 
 	vector<string> value;
 	vector<XMLTag*> File_Tags = All_XML_Tags->FindTagsInContent( wholeFile, value );
@@ -69,6 +69,7 @@ XMLConfigReader::~XMLConfigReader()
 {
 	delete All_XML_Tags;
 	//cout << "Hello from XMLConfigReader destructor" << endl;
+	if( debug != NULL ) delete debug;
 }
 
 vector<string> XMLConfigReader::GetXML() const
@@ -237,12 +238,26 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 				}
 			}
 		}
+		if( debug->GetStatus() ) cout << "XMLConfigReader:\tMinimiser: " << minimiserName << " requested in XML, creating" << endl;
 		returnableConfig = new MinimiserConfiguration( minimiserName, GetOutputConfiguration() );
 		returnableConfig->SetSteps( MAXIMUM_MINIMISATION_STEPS );
 		returnableConfig->SetTolerance( FINAL_GRADIENT_TOLERANCE );
 		returnableConfig->SetOptions( minimiserOptions );
 		returnableConfig->SetQuality( Quality );
 		returnableConfig->SetMultiMini( MultiMini );
+		if( debug->GetStatus() )
+		{
+			cout << "XMLConfigReader:\tMinimiser Configured With:\t" << endl;
+			cout << "XMLConfigReader:\tSteps:\t" << MAXIMUM_MINIMISATION_STEPS << endl;
+			cout << "XMLConfigReader:\tTolerance:\t" << FINAL_GRADIENT_TOLERANCE << endl;
+			cout << "XMLConfigReader:\tOptions:" << endl;
+			for( unsigned int i=0; i< minimiserOptions.size(); ++i )
+			{
+				cout << "\t\t\t" << minimiserOptions[i] << endl;
+			}
+			cout << "XMLConfigReader:\tQuality:\t" << Quality << endl;
+			cout << "XMLConfigReader:\tMultiMini:\t" << string((MultiMini==true)?"True":"False") << endl;
+		}
 		return returnableConfig;
 	}
 	else
@@ -322,6 +337,11 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 				cerr << "Unrecognised output component: " << outputComponents[childIndex]->GetName() << endl;
 				exit(1);
 			}
+		}
+
+		if( debug->GetStatus() )
+		{
+			cout << "XMLConfigReader:\tOutput Configuration Requested, Contructing." << endl;
 		}
 
 		return new OutputConfiguration( contourPlots, pullType, ScanParameters, _2DScanParameters, compPlotter_vec );
@@ -1421,6 +1441,10 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 			{
 				configurator->addParameterSubstitution( pdfConfig[configIndex]->GetValue()[0] );
 			}
+			else if ( pdfConfig[configIndex]->GetName() == "AppendParameterNames" )
+			{
+				configurator->appendParameterNames( pdfConfig[configIndex]->GetValue()[0] );
+			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{
 				configurator->addConfigurationParameter( pdfConfig[configIndex]->GetValue()[0] );
@@ -1937,5 +1961,29 @@ vector<int> XMLConfigReader::GetAllStartEntries()
 		}
 	}
 	return StartEntries;
+}
+
+void XMLConfigReader::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( *input_debug );
+
+		if( debug->DebugThisClass("XMLConfigReader") )
+		{
+			debug->SetStatus(true);
+			cout << "XMLConfigReader: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }
 

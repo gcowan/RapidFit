@@ -18,7 +18,7 @@ using namespace::std;
 
 //Constructor for a minimiser only specified by name
 MinimiserConfiguration::MinimiserConfiguration( string InputName ) :
-	theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
+	theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality(), debug(new DebugClass(false) )
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
@@ -27,7 +27,7 @@ MinimiserConfiguration::MinimiserConfiguration( string InputName ) :
 //Constructor for a minimiser with requested contour plots
 MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) :
 	theMinimiser(), OutputLevel(), minimiserName(InputName),
-	contours( Formatting != NULL ? Formatting->GetContourPlots() : vector< pair< string, string > >() ), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality()
+	contours( Formatting != NULL ? Formatting->GetContourPlots() : vector< pair< string, string > >() ), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality(), debug(new DebugClass(false) )
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
@@ -37,6 +37,7 @@ MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfigur
 MinimiserConfiguration::~MinimiserConfiguration()
 {
 	delete theMinimiser;
+	if( debug != NULL ) delete debug;
 }
 
 void MinimiserConfiguration::SetOutputLevel( int output_Level )
@@ -126,5 +127,29 @@ string MinimiserConfiguration::XML() const
 	xml << "</Minimiser>" << endl;
 
 	return xml.str();
+}
+
+void MinimiserConfiguration::SetDebug( DebugClass* input_debug )
+{
+	if( input_debug != NULL )
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass( *input_debug );
+
+		if( debug->DebugThisClass("MinimiserConfiguration") )
+		{
+			debug->SetStatus(true);
+			cout << "MinimiserConfiguration: Debugging Enabled!" << endl;
+		}
+		else
+		{
+			debug->SetStatus(false);
+		}
+	}
+	else
+	{
+		if( debug != NULL ) delete debug;
+		debug = new DebugClass(false);
+	}
 }
 

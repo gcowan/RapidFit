@@ -30,6 +30,9 @@ class StringProcessing
 		static string ReplaceString( const string&, const string, const string );
 		static void RemoveWhiteSpace( vector<string>& );
 
+		static string LatexSafe( const string input );
+		static string LatexSafe( const TString input );
+
 		/*!
 		 * @brief combine 2 vectors of strings into one unique one
 		 *

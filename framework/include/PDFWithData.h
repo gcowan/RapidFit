@@ -16,9 +16,12 @@
 #include "PhaseSpaceBoundary.h"
 #include "IPrecalculator.h"
 #include "DataSetConfiguration.h"
+#include "DebugClass.h"
 //	System Headers
 #include <string>
 #include <vector>
+
+using namespace::std;
 
 class PDFWithData
 {
@@ -156,6 +159,8 @@ class PDFWithData
 		bool GetUseCache() const;
 
 		void SetUseCache( bool );
+
+		void SetDebug( DebugClass* debug );
 	private:
 		/*!
                  * Don't Copy the class this way!
@@ -173,6 +178,8 @@ class PDFWithData
 		vector< IDataSet* > cached_data;		/*!	This is the internal Cache of DataSets that this instance 'looks after'			*/
 
 		bool useCache;					/*!	Should PDFWithData return the last cached DataSet that it has (default false)		*/
+
+		DebugClass* debug;
 };
 
 #endif

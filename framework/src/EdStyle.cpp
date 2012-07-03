@@ -17,6 +17,7 @@
 #include "TROOT.h"
 //	RapidFit Headers
 #include "EdStyle.h"
+#include "StringProcessing.h"
 //	System Headers
 #include <iostream>
 #include <string.h>
@@ -241,6 +242,10 @@ TString EdStyle::GetParamRootUnit( string Param_Name )
 
 		returnable_string = "[unitless]";
 
+	} else if ( Param_Name == "F_s" ) {
+
+		returnable_string = "[unitless]";
+
 	} else if ( Param_Name == "delta_para" ) {
 
 		returnable_string = "[rad]";
@@ -266,8 +271,10 @@ TString EdStyle::GetParamLatexUnit( string Param_Name )
 {
 	(void) Param_Name;
 	//	I will write this when I can be bothered...
-	TString Unit("$");
-	Unit.Append("$");
+	//TString Unit("$");
+	//Unit.Append("$");
+
+	TString Unit;
 	return Unit;
 }
 
@@ -307,6 +314,10 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 	} else if ( Param_Name == "As_sq" ) {
 
 		returnable_string = "A_{s}^{2}";
+
+	} else if ( Param_Name == "F_s" ) {
+
+		returnable_string = "F_S";
 
 	} else if ( Param_Name == "delta_para" ) {
 
@@ -441,6 +452,10 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 		Name.Append("{A_s}^2");
 
+	} else if ( Param_Name == "F_s" ) {
+
+		Name.Append("F_S");
+
 	} else if ( Param_Name == "delta_para" ) {
 
 		Name.Append("\\delta_\\parallel");
@@ -573,6 +588,10 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 		Name.Append("{A_s}^2");
 
+	} else if (Param_Name == "F_s" ) {
+
+		Name.Append("F_S");
+
 	} else if (Param_Name == "sigma_LL1") {
 
 		Name.Append("\\sigma_{LL1}");
@@ -603,7 +622,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else {
 		Name.Append("\\text{");
-		Name.Append(Param_Name);
+		Name.Append(StringProcessing::LatexSafe( Param_Name.Data() ));
 		Name.Append("}");
 	}
 

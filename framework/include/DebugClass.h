@@ -14,7 +14,7 @@ class DebugClass
 		DebugClass( bool=true );
 		DebugClass( const DebugClass& );
 		~DebugClass(){};
-		
+
 		bool GetStatus();
 		void SetStatus( bool input ); 
 

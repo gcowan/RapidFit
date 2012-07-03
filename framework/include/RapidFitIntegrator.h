@@ -279,7 +279,7 @@ class RapidFitIntegrator
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
 		static double MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* thisIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug=false );
+				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug=new DebugClass(false) );
 
 		/*!
 		 * @brief This is the Interface to the 1D Integrator class within ROOT
@@ -288,7 +288,8 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-		double OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug=false );
+		double OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate,
+				DebugClass* debug=new DebugClass(false) );
 
 		/*!
 		 * This stores the Ratio of the Integrals after the Comparison between Analytical and Numerical

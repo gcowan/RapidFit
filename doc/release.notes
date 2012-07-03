@@ -1,11 +1,24 @@
 // $Id: release.notes $
 
+2012/07/03 Rob Currie
+   - Added the debug option to more classes and some examples of use in XMLConfigReader
+   - Fixed a minor bug in ComponentPlotter
+   - Replaced the standard calls to ResultFormatter to output a folder containing latex files.
+       This has several advantages:
+           The latex is pre-compiled for you and is mostly bug free
+           Individual tables are in separate latex files which allows for them to be included with input commands in latex which makes editing documents MUCH easier
+           There's less indecipherable garbage thrown at the screen after a fit.
+       The normal fit-review and Minuit output are still displayed only the latex has gone away and has been diverted directly to a file
+   - Added AppendParameterNames as an XML tag which is a member of PDFConfigurator it allows for multiple physics parameters to be renamed quickly to save xml
+   - Added StringProcessing.o as a requirement of objects linking against EdStyle in utils.
+       Avoid cross-changing the codebases this is here to allow for some EdStyle functions which must rely on complex string manipulation.
+       I don't intend to write code for the linker to pick up and correctly resolve or put more stuff in EdStyle that doesn't belong there.
+
 2012/07/03 Pete Clarke
    - Updated Bs2JpsiPhi_Signal_v5 to include (i) Lambda  (ii) Csp   (iii) additional asymmetric tagging calibration parameters 
    - Added new Angular acceptance historgrams for th 1fb paper analysis
    - small change to MoistagDistribution
    - Added a new mode to BsMass   so tht it can (with a flag) fit for 2 Gaussians directly.
-
 
 2012/06/28 Rob Currie
    - Removed pdfs/dalitz/src/DPComponent.cc in favour of keeping the header file for just an interface to derived types

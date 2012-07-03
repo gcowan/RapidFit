@@ -17,6 +17,8 @@
 #include "TCanvas.h"
 #include "TH1F.h"
 #include "TGraphErrors.h"
+#include "TString.h"
+#include "TSystem.h"
 ///	RapidFit Headers
 #include "ResultFormatter.h"
 #include "StatisticsFunctions.h"
@@ -29,6 +31,10 @@
 #include <iomanip>
 #include <math.h>
 #include <cmath>
+#include <sstream>
+#include <fstream>
+
+using namespace::std;
 
 //Output data as a RootNTuple
 void ResultFormatter::MakeRootDataFile( string FullFileName, vector<IDataSet*> OutputData )
@@ -255,7 +261,7 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 						std::stringstream ResultStream;
 						ResultStream << std::setprecision(2) << correlation;
 						TString formatted("\\bf{"); formatted.Append( ResultStream.str() ); formatted.Append("}") ;
-						cout << " & " << setw(12) << std::setprecision(2) << fixed << formatted;
+						cout << " & " << std::setprecision(2) << fixed << formatted;
 					}
 					else // else just print the number
 					{
@@ -286,6 +292,304 @@ bool ResultFormatter::IsParameterFree( FitResult * OutputData, string ParameterN
 	return decision;
 }
 
+void ResultFormatter::WriteOutputLatex( FitResult* OutputData )
+{
+	TString output_folder("OutputLatex_");
+	output_folder.Append( StringProcessing::TimeString() );
+
+	gSystem->mkdir( output_folder );
+
+	stringstream latex;
+
+	ResultFormatter::LatexDocHeader( latex );
+
+	latex << "\n\\input{ ./FullTable }" << endl;
+
+	latex << "\n\\clearpage" << endl;
+
+	latex << "\n\\input{ ./SimpleTable }" << endl;
+
+	latex << "\n\\clearpage" << endl;
+
+	latex << "\n\\input{ ./MinimalTable }" << endl;
+
+	latex << "\n\\clearpage" << endl;
+
+	latex << "\n\\input{ covMatrix }" << endl;
+
+	latex << "\n\\clearpage\n" << endl;
+
+	ResultFormatter::LatexDocFooter( latex );
+
+	ofstream outFile;
+	outFile.open( output_folder+"/main.tex" );
+	outFile << latex.str();
+	outFile.close();
+
+	outFile.open( output_folder+"/FullTable.tex" );
+	stringstream full;
+	ResultFormatter::LatexFullFitResultTable( OutputData, full );
+	outFile << full.str();
+	outFile.close();
+
+	outFile.open( output_folder+"/SimpleTable.tex" );
+	stringstream simple;
+	ResultFormatter::LatexSimpleFitResultTable( OutputData, simple );
+	outFile << simple.str();
+	outFile.close();
+
+	outFile.open( output_folder+"/MinimalTable.tex" );
+	stringstream minimal;
+	ResultFormatter::LatexMinimumFitResultTable( OutputData, minimal );
+	outFile << minimal.str();
+	outFile.close();
+
+	outFile.open( output_folder+"/covMatrix.tex" );
+	stringstream matrix;
+	ResultFormatter::LatexCovMatrix( OutputData, matrix );
+	outFile << matrix.str();
+	outFile.close();
+
+	gSystem->cd( output_folder );
+
+	system("pdflatex main.tex >/dev/null");
+
+	gSystem->cd( ".." );
+}
+
+void ResultFormatter::LatexDocHeader( stringstream& latex )
+{
+	latex << "\\documentclass[a4paper,10pt]{article}" << endl;
+	latex << "\\nonstopmode" << endl;
+	latex << "\\usepackage[utf8]{inputenc}" << endl;
+	latex << "\\title{}" << endl;
+	latex << "\\author{}" << endl;
+	latex << "\\date{}" << endl;
+	latex << endl;
+	latex << "\\pdfinfo{" << endl;
+	latex << "/Title    ()" << endl;
+	latex << "/Author   ()" << endl;
+	latex << "/Creator  ()" << endl;
+	latex << "/Producer ()" << endl;
+	latex << "/Subject  ()" << endl;
+	latex << "/Keywords ()" << endl;
+	latex << "}" << endl;
+	latex << endl;
+	latex << "\\usepackage{amsmath}" << endl;
+	latex << "\\usepackage{caption}" << endl;
+	latex << "\\usepackage{rotating}" << endl;
+	latex << "\\usepackage{subcaption}" << endl;
+	latex << "\\usepackage{graphicx}" << endl;
+	latex << endl;
+	latex << "\\let\\oldpm\\pm" << endl;
+	latex << endl;
+	latex << "\\renewcommand*{\\arraystretch}{1.25}" << endl;
+	latex << endl;
+	latex << "\\begin{document}" << endl;
+	latex << endl;
+}
+
+void ResultFormatter::LatexDocFooter( stringstream& latex )
+{
+	latex << endl;
+	latex << "\\end{document}" << endl;
+	latex << endl;
+}
+
+void ResultFormatter::TableHeader( stringstream& latex, unsigned int colnum )
+{
+	latex << endl;
+	latex << "\\renewcommand{\\pm}{\\ensuremath{\\oldpm} }" << endl;
+	latex << "\\begin{table}[h]" << endl;
+	latex << "\\begin{center}" << endl;
+	latex << "\\begin{tabular}{@{}|l";
+	for( unsigned int i=1; i< colnum; ++i )
+	{
+		latex << "|r";
+	}
+	latex << "|@{}}" << endl;
+	latex << "\\hline" << endl;
+}
+
+void ResultFormatter::TableHeaderLandscape( stringstream& latex, unsigned int colnum )
+{
+	latex << endl;
+	latex << "\\renewcommand{\\pm}{\\ensuremath{\\oldpm} }" << endl;
+	latex << "\\begin{sidewaystable}[h]" << endl;
+	latex << "\\begin{center}" << endl;
+	latex << "\\begin{tabular}{@{}|l";
+	for( unsigned int i=1; i< colnum; ++i )
+	{
+		latex << "|r";
+	}
+	latex << "|@{}}" << endl;
+	latex << "\\hline" << endl;
+}
+
+void ResultFormatter::TableFooter( stringstream& latex )
+{
+	latex << "\\hline" << endl;
+	latex << "\\end{tabular}" << endl;
+	latex << "\\caption{Some Caption}" << endl;
+	latex << "\\label{thisTable}" << endl;
+	latex << "\\end{center}" << endl;
+	latex << "\\end{table}" << endl;
+	latex << "\\renewcommand{\\pm}{\\oldpm}" << endl;
+	latex << endl;
+}
+
+void ResultFormatter::TableFooterLandscape( stringstream& latex )
+{
+	latex << "\\hline" << endl;
+	latex << "\\end{tabular}" << endl;
+	latex << "\\caption{Some Caption}" << endl;
+	latex << "\\label{thisTable}" << endl;
+	latex << "\\end{center}" << endl;
+	latex << "\\end{sidewaystable}" << endl;
+	latex << "\\renewcommand{\\pm}{\\oldpm}" << endl;
+	latex << endl;
+}
+
+void ResultFormatter::LatexSimpleFitResultTable( FitResult * OutputData, stringstream& latex )
+{
+	ResultFormatter::TableHeader( latex, 3 );
+	latex << "Parameter & Fit result and error & $\\sigma$ from input \\\\ \t\t\\hline \\hline\n" << endl;
+
+	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
+	vector<string> allNames = outputParameters->GetAllNames();
+	for( vector<string>::iterator nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
+	{
+		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
+		double fitValue = outputParameter->GetValue();
+		double fitError = outputParameter->GetError();
+		double sigmaFromInputValue = outputParameter->GetPull();
+		string unit = outputParameter->GetUnit();
+		string name = *nameIterator;
+
+		latex << setw(20) << EdStyle::GetParamLatexName(name) << " & "
+			<< setw(12) << setprecision(5) << fitValue << " \\pm "
+			<< setw(10) <<                    fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
+			<< setw(20) << setprecision(2) << sigmaFromInputValue << "\\\\" << endl;
+	}
+
+	ResultFormatter::TableFooter( latex );
+}
+
+void ResultFormatter::LatexFullFitResultTable( FitResult * OutputData, stringstream& latex )
+{
+	ResultFormatter::TableHeader( latex, 4 );
+	latex << "Parameter & Fit result and error & $\\sigma$ from input & Abs from input \\\\ \t\t\\hline \\hline\n" << endl;
+
+	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
+	vector<string> allNames = outputParameters->GetAllNames();
+	for( vector<string>::iterator nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
+	{
+		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
+
+		double fitValue = outputParameter->GetValue();
+		double inputValue = outputParameter->GetOriginalValue();
+		double fitError = outputParameter->GetError();
+		double sigmaFromInputValue = outputParameter->GetPull();
+		string unit = outputParameter->GetUnit();
+		string name = *nameIterator;
+		latex << setw(20) << EdStyle::GetParamLatexName(name) << " & "
+			<< setw(12) << setprecision(5) << fitValue << " \\pm "
+			<< setw(10) <<  		  fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
+			<< setw(20) << setprecision(2) << sigmaFromInputValue << " & "
+			<< setw(15) << setprecision(5) << fitValue-inputValue << "\\\\" << endl;
+	}
+
+	ResultFormatter::TableFooter( latex );
+}
+
+void ResultFormatter::LatexMinimumFitResultTable( FitResult * OutputData, stringstream& latex )
+{
+	ResultFormatter::TableHeader( latex, 2 );
+	latex << "Parameter & Fit result and error  \\\\ \\hline \\hline\n" << endl;
+
+	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
+	vector<string> allNames = outputParameters->GetAllNames();
+	for( vector<string>::iterator nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
+	{
+		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
+
+		double fitValue = outputParameter->GetValue();
+		double fitError = outputParameter->GetError();
+		string unit = outputParameter->GetUnit();
+		string name = *nameIterator;
+
+		latex << setw(20) << EdStyle::GetParamLatexName(name) << " & "
+			<< setw(12) << setprecision(3) << fitValue << " \\pm "
+			<< setw(10) <<  		  fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit)  << "\\\\" << endl;
+	}
+
+	ResultFormatter::TableFooter( latex );
+}
+
+//Display the covariance matrix of a fit in a LaTeX table using cout
+void ResultFormatter::LatexCovMatrix( FitResult * OutputData, stringstream& latex )
+{
+	TMatrixDSym* covarianceMatrix = OutputData->GetCovarianceMatrix()->thisMatrix;
+	if( covarianceMatrix == NULL )
+	{
+		cerr << "No correlation matrix returned from fit!" << endl;
+	}
+	else
+	{
+		vector<string> freeNames = OutputData->GetCovarianceMatrix()->theseParameters;
+
+		ResultFormatter::TableHeaderLandscape( latex, (unsigned)(freeNames.size()+1) );
+
+		string parameterNames = "";
+		for( vector<string>::iterator nameIterator = freeNames.begin(); nameIterator != freeNames.end(); ++nameIterator )
+		{
+			parameterNames += " & " + EdStyle::GetParamLatexName( *nameIterator );
+		}
+
+		parameterNames += "\\\\ \\hline \\hline\n";
+
+		latex << parameterNames;
+
+		int row = 0;
+		for ( vector<string>::iterator nameIterator = freeNames.begin(); nameIterator != freeNames.end(); ++nameIterator )
+		{
+			string name = *nameIterator;
+			latex << EdStyle::GetParamLatexName( name );
+			double drow = (*covarianceMatrix)( row, row );
+			for ( int col = 0; col < (int)freeNames.size(); ++col)
+			{
+				double dcol = (*covarianceMatrix)( col, col );
+				double covariance = (*covarianceMatrix)( row, col );
+				double correlation = covariance/sqrt(fabs(drow * dcol));
+				if( col >= row )
+				{
+					//	If there is a strong Correlation Make the Number Bold
+					if( fabs(correlation) > 0.5 && ( col != row ) )
+					{
+						std::stringstream ResultStream;
+						ResultStream << std::setprecision(2) << correlation;
+						TString formatted("\\bf{"); formatted.Append( ResultStream.str() ); formatted.Append("}") ;
+						latex << " & " << std::setprecision(2) << fixed << formatted;
+					}
+					else // else just print the number
+					{
+						latex << " & " << std::setprecision(2) << fixed << correlation;
+					}
+				}
+				else
+				{
+					latex << " & ";
+				}
+
+			}
+			latex << " \\\\" << endl;
+			row += 1;
+		}
+
+		ResultFormatter::TableFooterLandscape( latex );
+	}
+}
+
 //Display the results of a fit in a LaTeX table using cout
 void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 {
@@ -311,7 +615,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 		//		double inputValue = outputParameter->GetOriginalValue();
 		double fitError = outputParameter->GetError();
 		double sigmaFromInputValue = outputParameter->GetPull();
-		string unit = outputParameter->GetUnit(); 
+		string unit = outputParameter->GetUnit();
 		//if (fitError > 0.0) sigmaFromInputValue = (fitValue - inputValue)/fitError;
 
 		//boost::regex pattern ("_",boost::regex_constants::icase|boost::regex_constants::perl);
@@ -401,7 +705,7 @@ void ResultFormatter::LatexOutputFitResult( FitResult * OutputData )
 			<< setw(10) <<  		  fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit)  << "\\\\" << endl;
 	}
 	cout << "\\hline \n\\end{tabular}" << endl;
-	cout << "\\end{center}\n" << endl;	
+	cout << "\\end{center}\n" << endl;
 
 }
 

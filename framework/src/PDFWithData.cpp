@@ -21,7 +21,7 @@ using namespace::std;
 //Constructor with correct arguments
 PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig ) :
 	fitPDF(ClassLookUp::CopyPDF(InputPDF)), inputBoundary(new PhaseSpaceBoundary(*InputBoundary)),  parametersAreSet(false),
-	dataSetMakers(), cached_data(), useCache(false)
+	dataSetMakers(), cached_data(), useCache(false), debug( new DebugClass(false) )
 {
 	if( DataConfig.size() < 1 || DataConfig.empty() )
 	{
@@ -46,6 +46,7 @@ PDFWithData::~PDFWithData()
 		dataSetMakers.pop_back();
 	}
 	this->ClearCache();
+	if( debug != NULL ) delete debug;
 }
 
 //Return the PDF
@@ -216,5 +217,29 @@ string PDFWithData::XML() const
 	xml << "</ToFit>" << endl;
 
 	return xml.str();
+}
+
+void PDFWithData::SetDebug( DebugClass* input_debug )
+{
+        if( input_debug != NULL )
+        {
+                if( debug != NULL ) delete debug;
+                debug = new DebugClass( *input_debug );
+
+                if( debug->DebugThisClass("PDFWithData") )
+                {
+                        debug->SetStatus(true);
+                        cout << "PDFWithData: Debugging Enabled!" << endl;
+                }
+                else
+                {
+                        debug->SetStatus(false);
+                }
+        }
+        else
+        {
+                if( debug != NULL ) delete debug;
+                debug = new DebugClass(false);
+        }
 }
 

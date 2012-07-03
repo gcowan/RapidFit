@@ -39,6 +39,7 @@
 #include "ConstraintFunction.h"
 #include "ScanParam.h"
 #include "PrecalculatorConfig.h"
+#include "DebugClass.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -163,6 +164,8 @@ class XMLConfigReader
 		 * @brief Set the Random Number Generator Seed externally to override any number in the XML
 		 */
 		void SetSeed( unsigned int new_seed );
+
+		void SetDebug( DebugClass* input_debug );
 
 	private:
 		/*!
@@ -293,6 +296,8 @@ class XMLConfigReader
 		vector< XMLTag* > children;		/*!	All of the Children of the tag wholeFile	*/
 
 		int seed;				/*!	Random Seed	*/
+
+		DebugClass* debug;
 };
 
 #endif

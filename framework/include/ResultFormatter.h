@@ -17,11 +17,10 @@
 #include "IDataSet.h"
 #include "FitResult.h"
 #include "FitResultVector.h"
-//#include "LLscanResult.h"
-//#include "LLscanResult2D.h"
 //	System Headers
 #include <string>
 #include <vector>
+#include <sstream>
 
 using namespace::std;
 
@@ -30,6 +29,22 @@ class ResultFormatter
 	public:
 		static void MakeRootDataFile( string, vector<IDataSet*> );
 		static void DebugOutputFitResult( FitResult* );
+
+		static void LatexDocHeader( stringstream& latex );
+		static void LatexDocFooter( stringstream& latex );
+
+		static void TableFooter( stringstream& latex );
+		static void TableFooterLandscape( stringstream& latex );
+		static void TableHeader( stringstream& latex, unsigned int colnum );
+		static void TableHeaderLandscape( stringstream& latex, unsigned int colnum );
+
+		static void WriteOutputLatex( FitResult* OutputData );
+
+		static void LatexSimpleFitResultTable( FitResult * OutputData, stringstream& latex );
+		static void LatexFullFitResultTable( FitResult * OutputData, stringstream& latex );
+		static void LatexMinimumFitResultTable( FitResult * OutputData, stringstream& latex );
+		static void LatexCovMatrix( FitResult * OutputData, stringstream& latex );
+
 		static void LatexOutputFitResult( FitResult* );
 		static void ReviewOutput( FitResult * OutputData );
 		static void LatexOutputCovarianceMatrix( FitResult* );

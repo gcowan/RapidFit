@@ -1028,7 +1028,10 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		//	perform actual evaluation of the PDF with the configuration in the InputPoint, in the whole boundary with the given name and for selected component
 		integralvalue = pdfIntegrator->ProjectObservable( InputPoint, full_boundary, ObservableName, comp_obj );
 
-		cout << "\tI got: " << integralvalue << endl;
+		if( debug->GetStatus() )
+		{
+			cout << "\tI got: " << integralvalue << endl;
+		}
 
 		pointValues->push_back( integralvalue );
 	}

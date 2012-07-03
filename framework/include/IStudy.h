@@ -33,8 +33,8 @@ class IStudy
 		 *
 		 * again shouldn't be in an interface, but less work than a BaseStudy simply for (con/de)structors
 		 */
-		IStudy() : pdfsAndData(), studyParameters(), theMinimiser(NULL), theFunction(NULL), allResults(NULL), allConstraints(), numberStudies(-1), delete_objects(false), xmlConfig(NULL)
-		{};
+		IStudy() : pdfsAndData(), studyParameters(), theMinimiser(NULL), theFunction(NULL), allResults(NULL), allConstraints(), numberStudies(-1), delete_objects(false), xmlConfig(NULL), debug(new DebugClass(false) )
+	{};
 
 		/*!
 		 * @brief Can't have virtual public Constructors, and it doesn't make sense to either
@@ -50,6 +50,7 @@ class IStudy
 				if( allResults != NULL ) delete allResults;	//Potentially causes SERIOUS PROBLEMS with unchecked code in RapidFit!!!
 				while( !allConstraints.empty() ) { if( allConstraints.back() != NULL ) { delete allConstraints.back(); } allConstraints.pop_back(); }
 			}
+			if( debug != NULL ) delete debug;
 		};
 
 		/*!
@@ -103,14 +104,38 @@ class IStudy
 			cout << numberStudies << " numberStudies " << endl;
 		};
 
+		virtual void SetDebug( DebugClass* input_debug )
+		{
+			if( input_debug != NULL )
+			{
+				if( debug != NULL ) delete debug;
+				debug = new DebugClass( *input_debug );
+
+				if( debug->DebugThisClass("IStudy") )
+				{
+					debug->SetStatus(true);
+					cout << "IStudy: Debugging Enabled!" << endl;
+				}
+				else
+				{
+					debug->SetStatus(false);
+				}
+			}
+			else
+			{
+				if( debug != NULL ) delete debug;
+				debug = new DebugClass(false);
+			}
+		}
+
 	private:
 		/*!
-                 * Don't Copy the class this way!
-                 */
+		 * Don't Copy the class this way!
+		 */
 		IStudy ( const IStudy& );
 		/*!
-                 * Don't Copy the class this way!
-                 */
+		 * Don't Copy the class this way!
+		 */
 		IStudy& operator= ( const IStudy& );
 
 	protected:
@@ -166,6 +191,8 @@ class IStudy
 		 * Default of true makes the IStudy destructor cleanup all of the internally looked after objects, false means you wish to write your own proper destructor
 		 */
 		bool delete_objects;
+
+		DebugClass* debug;
 };
 
 #endif

@@ -182,7 +182,7 @@ $(OBJUTILDIR)/Mathematics.o: $(UTILSSRC)/Mathematics.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
 #       New mostly automated plotting tool taking the pain out of plotting RapidFit output
-$(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/Mathematics.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/RapidLL.o $(OBJUTILDIR)/Rapid2DLL.o $(OBJUTILDIR)/Toy_Study.o $(OBJDIR)/EdStyle.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Component_Projections.o $(OBJUTILDIR)/RapidFit_Output_File.o $(OBJUTILDIR)/Template_Functions.o
+$(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/Mathematics.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/RapidLL.o $(OBJUTILDIR)/Rapid2DLL.o $(OBJUTILDIR)/Toy_Study.o $(OBJDIR)/EdStyle.o $(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Component_Projections.o $(OBJUTILDIR)/RapidFit_Output_File.o $(OBJUTILDIR)/Template_Functions.o
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/RapidPlot.o: $(UTILSSRC)/RapidPlot.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
@@ -202,12 +202,12 @@ $(OBJUTILDIR)/Template_Functions.o: $(UTILSSRC)/Template_Functions.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
 #       Tool for printing information about a ROOT file and it's contents
-$(EXEDIR)/print: $(OBJUTILDIR)/print.o $(OBJDIR)/EdStyle.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o
+$(EXEDIR)/print: $(OBJUTILDIR)/print.o $(OBJDIR)/EdStyle.o $(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/print.o: $(UTILSSRC)/print.C
 	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
 
-$(EXEDIR)/weighted: $(OBJUTILDIR)/weighted.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o              $(OBJUTILDIR)/Template_Functions.o
+$(EXEDIR)/weighted: $(OBJUTILDIR)/weighted.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/weighted.o: $(UTILSSRC)/weighted.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<

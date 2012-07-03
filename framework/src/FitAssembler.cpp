@@ -134,7 +134,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			BottleData[resultIndex]->GetPDF()->SetDebug( debug );
 			(void) someVal;
 		}
-		cout << "Generate Here:" << endl;
+		//cout << "Generate Here:" << endl;
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
 
 		bottle->AddResult( Requested_PDF, Requested_DataSet );

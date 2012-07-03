@@ -239,8 +239,11 @@ bool OutputConfiguration::DoPullPlots()
 void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 {
 	//Output information aboout the fit
-	ResultFormatter::LatexOutputFitResult(TheResult);
-	ResultFormatter::LatexOutputCovarianceMatrix(TheResult);
+	//ResultFormatter::LatexOutputFitResult(TheResult);
+	//ResultFormatter::WriteOutputLatex(TheResult);
+	//ResultFormatter::LatexOutputCovarianceMatrix(TheResult);
+
+	ResultFormatter::WriteOutputLatex(TheResult);
 
 	//Output any calculated contours
 	ResultFormatter::PlotFitContours( TheResult, contourFileName );

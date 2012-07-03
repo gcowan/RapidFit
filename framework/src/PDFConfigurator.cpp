@@ -10,6 +10,7 @@
  */
 
 #include "PDFConfigurator.h"
+#include "StringProcessing.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -54,6 +55,30 @@ void PDFConfigurator::setFitFunc( string input )
 string PDFConfigurator::getFitFunc()
 {
 	return fitFunction;
+}
+
+void PDFConfigurator::appendParameterNames( string names_list )
+{
+	vector<string> all_params = StringProcessing::SplitString( names_list, ':' );
+
+	if( all_params.size() < 2 )
+	{
+		cerr << "Cannot Understand AppendParameterNames:\t" << names_list << endl;
+		exit(-5434);
+	}
+
+	string suffix = all_params.back();
+
+	for( unsigned int i=0; i< (all_params.size()-1); ++i )
+	{
+		string old_name = all_params[i];
+		string new_name = old_name;
+		new_name.append( suffix );
+		string substitution = old_name;
+		substitution.append(":");
+		substitution.append( new_name );
+		this->addParameterSubstitution( substitution );
+	}
 }
 
 //...........................................

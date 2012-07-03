@@ -222,10 +222,12 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 			result = wrappedFunction->EvaluateComponent( newDataPoint, componentIndex );
 			if( isnan(result) || fabs(result)>=DBL_MAX )
 			{
-				cout << "Component Value:" << result << endl;
-				newDataPoint->Print();
-				myPhaseSpaceBoundary->Print();
-				//exit(0);
+				if( debug->GetStatus() )
+				{
+					cout << "Component Value:" << result << endl;
+					newDataPoint->Print();
+					myPhaseSpaceBoundary->Print();
+				}
 			}
 		}
 		else if( integrateFunc == true )
@@ -233,10 +235,12 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 			result = wrappedFunction->EvaluateForNumericIntegral( newDataPoint );
 			if( isnan(result) || fabs(result)>=DBL_MAX )
 			{
-				if( debug->GetStatus() ) cout << "Evaluate for Numerical Integral Value:" << result << endl;
-				newDataPoint->Print();
-				myPhaseSpaceBoundary->Print();
-				//exit(0);
+				if( debug->GetStatus() )
+				{
+					cout << "Evaluate for Numerical Integral Value:" << result << endl;
+					newDataPoint->Print();
+					myPhaseSpaceBoundary->Print();
+				}
 			}
 		}
 		else if( generateFunc == true )

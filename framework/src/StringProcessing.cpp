@@ -528,3 +528,32 @@ bool StringProcessing::is_empty( const TString input )
 	return false;
 }
 
+string StringProcessing::LatexSafe( const string input )
+{               
+	string temp(input);
+	size_t found=0;
+
+	bool modified=false;
+	while( found != string::npos )
+	{
+		size_t start_found=found;
+		if( start_found == 0 ) found=temp.find("_");
+		else found=temp.find("_",start_found+2);
+
+		if( found != string::npos )
+		{
+			modified=true;
+			temp.insert(found,"\\");
+		}
+	}
+
+	if( !modified ) return input;
+	else return temp;
+}
+
+string StringProcessing::LatexSafe( const TString input )
+{                   
+	string temp(input.Data());
+	return LatexSafe(temp);
+}
+
