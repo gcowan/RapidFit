@@ -622,7 +622,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else {
 		Name.Append("\\text{");
-		Name.Append(StringProcessing::LatexSafe( Param_Name.Data() ));
+		Name.Append(StringProcessing::LatexSafe( Param_Name ));
 		Name.Append("}");
 	}
 
