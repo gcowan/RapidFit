@@ -23,13 +23,18 @@ BsMass::BsMass(PDFConfigurator* configurator) :
 	// Physics parameters
 	f_sig_m1Name	( configurator->getName("f_sig_m1") )
 	, sigma_m1Name	( configurator->getName("sigma_m1") )
+	, sigma_m2Name	( configurator->getName("sigma_m2") )
 	, ratio_21Name	( configurator->getName("ratio_21") )
 	, m_BsName		( configurator->getName("m_Bs") )
 	// Observables
 	, recoMassName	( configurator->getName("mass") )
 	, mlow(-1.), mhigh(-1.)
 	, componentIndex(0)
+	, _useSig1Sig2(false)
 {
+
+	if( configurator->isTrue("UseSig1Sig2") )   { _useSig1Sig2 = true ; }
+	   	
 	MakePrototypes();
 
 	plotComponents = configurator->isTrue( "PlotComponents" );
@@ -45,7 +50,10 @@ void BsMass::MakePrototypes()
 	vector<string> parameterNames;
 	parameterNames.push_back( f_sig_m1Name );
 	parameterNames.push_back( sigma_m1Name );
-	parameterNames.push_back( ratio_21Name );
+
+	if( _useSig1Sig2 ) parameterNames.push_back( sigma_m2Name );
+	else			   parameterNames.push_back( ratio_21Name );
+	
 	parameterNames.push_back( m_BsName );
 	allParameters = ParameterSet(parameterNames);
 }
@@ -103,14 +111,20 @@ double BsMass::Evaluate(DataPoint * measurement)
 	// Get the physics parameters
 	double f_sig_m1  = allParameters.GetPhysicsParameter( f_sig_m1Name )->GetValue();
 	double sigma_m1 = allParameters.GetPhysicsParameter( sigma_m1Name )->GetValue();
-	double ratio_21 = allParameters.GetPhysicsParameter( ratio_21Name )->GetValue();
+
+	double sigma_m2 = 0.0 ;
+	if( _useSig1Sig2 ) {
+		sigma_m2 = allParameters.GetPhysicsParameter( sigma_m2Name )->GetValue();
+	}
+	else {
+		double ratio_21 = allParameters.GetPhysicsParameter( ratio_21Name )->GetValue();
+		sigma_m2 = sigma_m1 * ratio_21 ;
+	}
+
 	double m_Bs = allParameters.GetPhysicsParameter( m_BsName )->GetValue();
 
 	// Get the observable
 	double mass = measurement->GetObservable( recoMassName )->GetValue();
-
-	//Construct second width from ratio
-	double sigma_m2 = sigma_m1 * ratio_21 ;
 
 	//Temp way to initialise these - this means the first event of the first iteration is wrong
 	//This also means it can never work for Toys
@@ -124,7 +138,7 @@ double BsMass::Evaluate(DataPoint * measurement)
 	double s2_erf_factor = 0.5*( erf((mhigh-m_Bs)/(sigma_m2*Mathematics::SQRT_2())) - erf((mlow-m_Bs)/(sigma_m2*Mathematics::SQRT_2()) ) );
 	double returnValue = 0;
 
-	if( f_sig_m1 >= 0.99999 || ratio_21 < 1E-5 )
+	if( f_sig_m1 >= 0.99999 ) // || ratio_21 < 1E-5 )
 	{
 		double factor1 = 1./(sigma_m1*sqrt(2.*Mathematics::Pi())) / s1_erf_factor;
 		double deltaM = mass - m_Bs;

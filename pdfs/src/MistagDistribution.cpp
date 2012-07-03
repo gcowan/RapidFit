@@ -87,6 +87,6 @@ double MistagDistribution::Evaluate(DataPoint * measurement)
 double MistagDistribution::Normalisation(PhaseSpaceBoundary * boundary)
 {
 	(void)boundary;
-	return 1.023  +  shoulder*mu;
+	return 1.0  +  shoulder*mu;
 }
 

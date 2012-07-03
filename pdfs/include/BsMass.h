@@ -34,6 +34,7 @@ class BsMass : public BasePDF
 		// Physics parameters
 		ObservableRef f_sig_m1Name;	// fraction
 		ObservableRef sigma_m1Name;	// width 1
+		ObservableRef sigma_m2Name;	// width 1
 		ObservableRef ratio_21Name;	// width 2 
 		ObservableRef m_BsName;	// Bs mass
 
@@ -46,6 +47,8 @@ class BsMass : public BasePDF
 		int componentIndex;
 
 		bool plotComponents;
+	
+		bool _useSig1Sig2 ;
 };
 
 #endif

@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2012/07/03 Pete Clarke
+   - Updated Bs2JpsiPhi_Signal_v5 to include (i) Lambda  (ii) Csp   (iii) additional asymmetric tagging calibration parameters 
+   - Added new Angular acceptance historgrams for th 1fb paper analysis
+   - small change to MoistagDistribution
+   - Added a new mode to BsMass   so tht it can (with a flag) fit for 2 Gaussians directly.
+
+
 2012/06/28 Rob Currie
    - Removed pdfs/dalitz/src/DPComponent.cc in favour of keeping the header file for just an interface to derived types
    - Added some copy constructors and cleaned up some destructors and inheritance in the dalitz codebase, although I have largely no idea what the code 

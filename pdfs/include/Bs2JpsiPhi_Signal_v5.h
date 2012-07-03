@@ -75,6 +75,7 @@ protected:
 	ObservableRef Apara_sqName;	// amplitude
 	ObservableRef Aperp_sqName;	// amplitude
 	ObservableRef As_sqName;		// amplitude
+	ObservableRef CspName;		// amplitude
 	ObservableRef delta_zeroName;	// strong phase, set to 0
 	ObservableRef delta_paraName;	// strong phase
 	ObservableRef delta_perpName;	// strong phase
@@ -147,6 +148,7 @@ protected:
 	double Apara_sq ;
 	double Azero_sq ;
 	double As_sq ;
+	double Csp ;
 	double CachedA1 ;
 	double CachedA2 ;
 	double CachedA3 ;	
@@ -263,6 +265,10 @@ protected:
 	inline double AS() const { 
 		if( As_sq <= 0. ) return 0. ;
 		else return sqrt(As_sq) ; 
+	}
+	inline double ASint() const { 
+		if( As_sq <= 0. ) return 0. ;
+		else return sqrt(As_sq) * Csp ; 
 	}
 	
 	

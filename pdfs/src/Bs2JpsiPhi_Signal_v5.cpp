@@ -31,11 +31,12 @@ gammaName				( configurator->getName("gamma") )
 , Azero_sqName			( configurator->getName("Azero_sq") )
 , Apara_sqName			( configurator->getName("Apara_sq") )
 , Aperp_sqName			( configurator->getName("Aperp_sq") )
-, As_sqName				( configurator->getName("As_sq") )
 , delta_zeroName		( configurator->getName("delta_zero") )
 , delta_paraName		( configurator->getName("delta_para") )
 , delta_perpName		( configurator->getName("delta_perp") )
+, As_sqName				( configurator->getName("F_s") )
 , delta_sName			( configurator->getName("delta_s") )
+, CspName				( configurator->getName("Csp") )
 , cosdparName			( configurator->getName("cosdpar") ) //PELC-COSDPAR Special for fitting cosdpar separately
 , cosphisName			( configurator->getName("cosphis") )
 , sinphisName			( configurator->getName("sinphis") )
@@ -219,6 +220,7 @@ void Bs2JpsiPhi_Signal_v5::MakePrototypes()
 	parameterNames.push_back( Aperp_sqName );
 	parameterNames.push_back( Azero_sqName );
 	parameterNames.push_back( As_sqName );
+	parameterNames.push_back( CspName );
 	parameterNames.push_back( delta_paraName );
 	parameterNames.push_back( delta_perpName );
 	parameterNames.push_back( delta_zeroName );
@@ -312,11 +314,13 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet * NewParameterSet 
 	if( (fs < 0.) || (fs >= 1.) ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: As_sq <0 or >=1 but left as is" <<  endl ;	}	
 	As_sq = fs / (1. - fs ) ;
 				   
+	Csp = allParameters.GetPhysicsParameter( CspName )->GetValue();
 	
 	delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
 	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
 	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
-	delta_s	   = allParameters.GetPhysicsParameter( delta_sName )->GetValue();
+//	delta_s	   = allParameters.GetPhysicsParameter( delta_sName )->GetValue();  /// This is the original
+	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue() +delta_perp ;   // This is the ambiguity inspired one with less corrn to delta_perp
 	delta1 = delta_perp -  delta_para ;
 	delta2 = delta_perp -  delta_zero ;
 	
@@ -779,9 +783,12 @@ double Bs2JpsiPhi_Signal_v5::diffXsecTimeOnly(  ) const
 	
 	AS()*AS() * timeFactorASAS(  ) * angAccI7 +
 	
-	AS()*AP() * timeFactorReASAP(  ) * angAccI8 +
-	AS()*AT() * timeFactorImASAT(  ) * angAccI9 +
-	AS()*A0() * timeFactorReASA0(  ) * angAccI10 ;
+	//AS()*AP() * timeFactorReASAP(  ) * angAccI8 +
+	//AS()*AT() * timeFactorImASAT(  ) * angAccI9 +
+	//AS()*A0() * timeFactorReASA0(  ) * angAccI10 ;
+	ASint()*AP() * timeFactorReASAP(  ) * angAccI8 +
+	ASint()*AT() * timeFactorImASAT(  ) * angAccI9 +
+	ASint()*A0() * timeFactorReASA0(  ) * angAccI10 ;
 	
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue(t);
 	
@@ -813,9 +820,12 @@ double Bs2JpsiPhi_Signal_v5::diffXsecNorm1(  ) const
 	
 	AS()*AS() * timeFactorASASInt(  ) * angAccI7   +  
 	
-	AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +  
-	AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
-	AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
+	//AS()*AP() * timeFactorReASAPInt(  ) * angAccI8 +  
+	//AS()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
+	//AS()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
+	ASint()*AP() * timeFactorReASAPInt(  ) * angAccI8 +  
+	ASint()*AT() * timeFactorImASATInt(  ) * angAccI9 +  
+	ASint()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;  
 	
 	if( DEBUGFLAG && (norm < 0) ) this->DebugPrintNorm( " Bs2JpsiPhi_Signal_v5_v1::diffXsecNorm1( ) : return value < 0 = ", norm ) ;
 	
@@ -865,9 +875,12 @@ void Bs2JpsiPhi_Signal_v5::CacheAmplitudesAndAngles() {
 	
 	CachedA7 = AS()*AS() * angleFactorASAS( ) ;
 	
-	CachedA8 = AS()*AP() * angleFactorReASAP( ) ;
-	CachedA9 = AS()*AT() * angleFactorImASAT( ) ;
-	CachedA10= AS()*A0() * angleFactorReASA0( ) ;	
+	//CachedA8 = AS()*AP() * angleFactorReASAP( ) ;
+	//CachedA9 = AS()*AT() * angleFactorImASAT( ) ;
+	//CachedA10= AS()*A0() * angleFactorReASA0( ) ;	
+	CachedA8 = ASint()*AP() * angleFactorReASAP( ) ;
+	CachedA9 = ASint()*AT() * angleFactorImASAT( ) ;
+	CachedA10= ASint()*A0() * angleFactorReASA0( ) ;	
 	
 }
 
