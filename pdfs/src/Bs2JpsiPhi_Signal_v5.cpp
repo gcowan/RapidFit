@@ -103,6 +103,19 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 	componentIndex = 0;
 
 	std::cout << "Constructing PDF: Bs2JpsiPhi_Signal_v5 " << std::endl ;
+
+	//...........................................
+	// Configure  options 
+	_numericIntegralForce    = configurator->isTrue( "NumericIntegralForce") ;
+	_numericIntegralTimeOnly = configurator->isTrue( "NumericIntegralTimeOnly" ) ;
+	_useEventResolution = configurator->isTrue( "UseEventResolution" ) ;
+	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
+	_useCosDpar = configurator->isTrue( "UseCosDpar" ) ;
+	_useHelicityBasis = configurator->isTrue( "UseHelicityBasis" ) ;
+	_usePunziSigmat = configurator->isTrue( "UsePunziSigmat" ) ;
+	_usePunziMistag = configurator->isTrue( "UsePunziMistag" ) ;
+	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
+	
 	
 	//...............................................
 	// Configure to use angular acceptance machinery
@@ -110,7 +123,7 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 	_angAccIgnoreNumerator = configurator->isTrue( "AngularAcceptanceIgnoreNumerator" ) ;
 	if( angAccFile == "" ) cout << "Bs2JpsiPhi_Signal_v5:: Using flat angular acceptance " << endl ;
 	else cout << "Bs2JpsiPhi_Signal_v5:: Constructing angAcc using file: " << angAccFile << endl ;
-	angAcc = new AngularAcceptance( angAccFile ) ;
+	angAcc = new AngularAcceptance( angAccFile, _useHelicityBasis ) ;
 	angAccI1 = angAcc->af1() ;  cout << "  af1 = " << angAccI1 << endl ;
 	angAccI2 = angAcc->af2() ;	cout << "  af2 = " << angAccI2 << endl ;
 	angAccI3 = angAcc->af3() ;	cout << "  af3 = " << angAccI3 << endl ;
@@ -151,20 +164,6 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 		storeExpCos.push_back( empty ) ;
 	}
 	
-	//...........................................
-	// Configure numerical integration options 
-	_numericIntegralForce    = configurator->isTrue( "NumericIntegralForce") ;
-	_numericIntegralTimeOnly = configurator->isTrue( "NumericIntegralTimeOnly" ) ;
-	
-	//...........................................
-	// Configure other options 
-	_useEventResolution = configurator->isTrue( "UseEventResolution" ) ;
-	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
-	_useCosDpar = configurator->isTrue( "UseCosDpar" ) ;
-	_useHelicityBasis = configurator->isTrue( "UseHelicityBasis" ) ;
-	_usePunziSigmat = configurator->isTrue( "UsePunziSigmat" ) ;
-	_usePunziMistag = configurator->isTrue( "UsePunziMistag" ) ;
-	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
 
 	this->TurnCachingOff();
 

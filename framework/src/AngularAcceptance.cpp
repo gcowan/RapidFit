@@ -15,7 +15,7 @@
 
 //............................................
 // Constructor for accpetance from a file
-AngularAcceptance::AngularAcceptance( string fileName ) :
+AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
  _af1(1), _af2(1), _af3(1), _af4(0), _af5(0), _af6(0), _af7(1), _af8(0), _af9(0), _af10(0) 
 {
 	
@@ -33,7 +33,15 @@ AngularAcceptance::AngularAcceptance( string fileName ) :
 		string fullFileName = this->openFile( fileName ) ;
 		
 		TFile* f =  TFile::Open(fullFileName.c_str());
-		histo = (TH3D*) f->Get("acc"); //(fileName.c_str())));
+		
+		if( useHelicityBasis ) {
+			histo = (TH3D*) f->Get("helacc"); //(fileName.c_str())));
+			cout << "AngularAcceptance::  Using heleicity basis" << endl ;
+		}
+		else {
+			histo = (TH3D*) f->Get("tracc"); //(fileName.c_str())));
+			cout << "AngularAcceptance::  Using transversity basis" << endl ;
+		}
 		
 		this->processHistogram() ;
 		
@@ -210,13 +218,4 @@ void AngularAcceptance::processHistogram() {
 
 }
 
-
-//............................................
-//Helpers
-//double AngularAcceptance::stream(ifstream& stream)
-//{
-//	double tmpVal;
-//	stream >> tmpVal;
-//	return tmpVal;
-//}
 

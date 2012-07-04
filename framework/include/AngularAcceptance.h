@@ -32,7 +32,7 @@ class AngularAcceptance
 	public:
 
 	// Constructors
-	AngularAcceptance( string fileName ) ;
+	AngularAcceptance( string fileName, bool useHelicityBasis ) ;
 
 	// Methods for numerator of PDF to return acceptance factor
 	inline double af1() const { return _af1 ; } 
