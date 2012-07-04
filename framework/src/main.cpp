@@ -259,12 +259,12 @@ int Perform2DLLScan( RapidFitConfiguration* config )
 			for(unsigned int i=0; i< config->argumentParameterSet->GetAllNames().size(); ++i )
 			{
 				config->argumentParameterSet->GetPhysicsParameter( config->argumentParameterSet->GetAllNames()[i] )
-									->SetBlindedValue( param_set->GetPhysicsParameter( config->argumentParameterSet->GetAllNames()[i] )->GetValue() );
+					->SetBlindedValue( param_set->GetPhysicsParameter( config->argumentParameterSet->GetAllNames()[i] )->GetValue() );
 			}
 		}
 
 		vector<FitResultVector*> Temp_Results = ScanStudies::ContourScan( config->theMinimiser, config->theFunction, config->argumentParameterSet,
-										config->pdfsAndData, config->xmlFile->GetConstraints(), config->makeOutput, name1, name2, config->OutputLevel2 );
+				config->pdfsAndData, config->xmlFile->GetConstraints(), config->makeOutput, name1, name2, config->OutputLevel2 );
 
 		vector<FitResultVector*> Ordered_Results;
 
@@ -318,12 +318,12 @@ int PerformLLScan( RapidFitConfiguration* config )
 			for(unsigned int i=0; i< config->argumentParameterSet->GetAllNames().size(); ++i )
 			{
 				config->argumentParameterSet->GetPhysicsParameter( config->argumentParameterSet->GetAllNames()[i] )->SetBlindedValue(
-											param_set->GetPhysicsParameter( config->argumentParameterSet->GetAllNames()[i] )->GetValue() );
+						param_set->GetPhysicsParameter( config->argumentParameterSet->GetAllNames()[i] )->GetValue() );
 			}
 		}
 
 		FitResultVector* scan_result = ScanStudies::SingleScan( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData,
-									config->xmlFile->GetConstraints(), config->makeOutput, LLscanList[scan_num], config->OutputLevel2 );
+				config->xmlFile->GetConstraints(), config->makeOutput, LLscanList[scan_num], config->OutputLevel2 );
 		scanSoloResults.push_back( scan_result );
 
 		cout << "Scan Finished" << endl;
@@ -333,7 +333,7 @@ int PerformLLScan( RapidFitConfiguration* config )
 			FitResultVector* new_1D = new FitResultVector( scanSoloResults );
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( true );
 			VectoredFeldmanCousins* new_study = new VectoredFeldmanCousins( config->GlobalFitResult, new_1D, config->Nuisencemodel, config->makeOutput, config->theMinimiser,
-											config->theFunction, config->xmlFile, config->pdfsAndData );
+					config->theFunction, config->xmlFile, config->pdfsAndData );
 			new_study->SetNumRepeats( config->numberRepeats );
 			new_study->DoWholeStudy( config->OutputLevel2 );
 			//	Doesn't hurt to be sure we obay the file format standard
@@ -730,38 +730,86 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
 	dataConfig->SetSource( "Foam" );
 	PhaseSpaceBoundary * phase = dataSet->GetBoundary();
-	int nToyEvents = 1000000;
+	int nToyEvents = 10*nMCEvents;
 	MemoryDataSet * toy = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nToyEvents );
 	file->cd();
 	double pi = TMath::Pi();
-	TH3D * num = new TH3D("num", "num", 7, -1., 1., 5, -1., 1., 9, -pi, pi);
-	TH3D * den = new TH3D("den", "den", 7, -1., 1., 5, -1., 1., 9, -pi, pi);
-	TH3D * acc = new TH3D("acc", "acc", 7, -1., 1., 5, -1., 1., 9, -pi, pi);
-	num->Sumw2();
-	den->Sumw2();
-	acc->Sumw2();
+	TH3D * num = new TH3D("trnum", "trnum", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
+	TH3D * den = new TH3D("trden", "trden", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
+	TH3D * acc = new TH3D("tracc", "tracc", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
+	TH3D * numh = new TH3D("helnum", "helnum", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
+	TH3D * denh = new TH3D("helden", "helden", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
+	TH3D * acch = new TH3D("helacc", "helacc", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
+	num->Sumw2(), numh->Sumw2();
+	den->Sumw2(), denh->Sumw2();
+	acc->Sumw2(), acch->Sumw2();
 	double cosTheta, phi, cosPsi;
+	double helcosk, helcosl, helphi;
 	for ( int i = 0; i < nToyEvents; i++ ) {
-		if (i % 10000 == 0) cout << "Toy event # " << i << endl;
+		if (i % 10000 == 0) cout << "Toy event # " << i << "\r\r\r\r\r\r\r\r\r\r";
 		DataPoint * event = toy->GetDataPoint(i);
-		cosTheta = event->GetObservable("trcostheta")->GetValue();
-		phi      = event->GetObservable("trphi")->GetValue();
-		cosPsi   = event->GetObservable("trcospsi")->GetValue();
-		den->Fill(cosTheta, cosPsi, phi);
+		cosPsi   = event->GetObservable("cosPsi")->GetValue();
+		cosTheta = event->GetObservable("cosTheta")->GetValue();
+		phi      = event->GetObservable("phi")->GetValue();
+		den->Fill(cosPsi, cosTheta, phi);
+		helcosk  = event->GetObservable("helcosthetaK")->GetValue();
+		helcosl  = event->GetObservable("helcosthetaL")->GetValue();
+		helphi   = event->GetObservable("helphi")->GetValue();
+		denh->Fill(helcosk, helcosl, helphi);
 		//delete event;
 	}
 	delete toy;
 	for ( int i = 0; i < nMCEvents; i++ ) {
-		if (i % 10000 == 0) cout << "MC event # " << i << endl;
+		if (i % 10000 == 0) cout << "MC event # " << i << "\r\r\r\r\r\r\r\r\r\r";
 		DataPoint * event = dataSet->GetDataPoint(i);
-		cosTheta = event->GetObservable("trcostheta")->GetValue();
-		phi      = event->GetObservable("trphi")->GetValue();
-		cosPsi   = event->GetObservable("trcospsi")->GetValue();
-		num->Fill(cosTheta, cosPsi, phi);
+		cosPsi   = event->GetObservable("cosPsi")->GetValue();
+		cosTheta = event->GetObservable("cosTheta")->GetValue();
+		phi      = event->GetObservable("phi")->GetValue();
+		num->Fill(cosPsi, cosTheta, phi);
+		helcosk  = event->GetObservable("helcosthetaK")->GetValue();
+		helcosl  = event->GetObservable("helcosthetaL")->GetValue();
+		helphi   = event->GetObservable("helphi")->GetValue();
+		numh->Fill(helcosk, helcosl, helphi);
 		//delete event;
 	}
 	acc->Divide(num, den);
-	file->Write();
+	acch->Divide(numh, denh);
+
+	den->Write("",TObject::kOverwrite);
+	num->Write("",TObject::kOverwrite);
+	acc->Write("",TObject::kOverwrite);
+
+	TH1D* x_axis = (TH1D*)acc->Project3D("x");
+	x_axis->SetName("cosPsi");
+	x_axis->SetTitle("cosPsi");
+	x_axis->Write("",TObject::kOverwrite);
+	TH1D* y_axis = (TH1D*)acc->Project3D("y");
+	y_axis->SetName("cosTheta");
+	y_axis->SetTitle("cosTheta");
+	y_axis->Write("",TObject::kOverwrite);
+	TH1D* z_axis = (TH1D*)acc->Project3D("z");
+	z_axis->SetName("phi");
+	z_axis->SetTitle("phi");
+	z_axis->Write("",TObject::kOverwrite);
+
+	den->Write("",TObject::kOverwrite);
+	num->Write("",TObject::kOverwrite);
+	acc->Write("",TObject::kOverwrite);
+
+	TH1D* x_axis_h = (TH1D*)acch->Project3D("x");
+	x_axis_h->SetName("helcosthetaK");
+	x_axis_h->SetTitle("helcosthetaK");
+	x_axis_h->Write("",TObject::kOverwrite);
+	TH1D* y_axis_h = (TH1D*)acch->Project3D("y");
+	y_axis_h->SetName("helcosthetaL");
+	y_axis_h->SetTitle("helcosthetaL");
+	y_axis_h->Write("",TObject::kOverwrite);
+	TH1D* z_axis_h = (TH1D*)acch->Project3D("z");
+	z_axis_h->SetName("helphi");
+	z_axis_h->SetTitle("helphi");
+	z_axis_h->Write("",TObject::kOverwrite);
+
+	file->Write("",TObject::kOverwrite);
 	file->Close();
 	//delete tree;
 	//delete file;

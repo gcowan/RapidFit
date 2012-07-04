@@ -263,6 +263,8 @@
 		 */
 		virtual double EvaluateForNumericIntegral( DataPoint* Input );
 
+		virtual double EvaluateTimeOnly( DataPoint* Input );
+
 		/*!
 		 * @brief Interface Function: Return a prototype data point
 		 *

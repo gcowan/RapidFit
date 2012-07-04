@@ -43,7 +43,7 @@ using namespace::std;
 RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) :
 	ratioOfIntegrals(-1.), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL),
 	functionCanIntegrate(false), haveTestedIntegral(false),
-	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(NULL)
+	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(new DebugClass(false))
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
@@ -252,7 +252,7 @@ double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint,
 		DebugClass* debug )
 {
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
-	quickFunction->SetDebug( debug );
+	if( debug != NULL ) quickFunction->SetDebug( debug );
 	//Find the observable range to integrate over
 	IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
 	double minimum = newConstraint->GetMinimum();
@@ -318,7 +318,7 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 	}
 
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
-	quickFunction->SetDebug( debug );
+	if( debug != NULL ) quickFunction->SetDebug( debug );
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
 
 	if( debug != NULL )
@@ -415,8 +415,11 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			if( !haveTestedIntegral )
 			{
 				double testIntegral = functionToWrap->Integral( *dataPoint_i, NewBoundary );
-				cout << "Integration Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
-				cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
+				if( debug->GetStatus() )
+				{
+					cout << "Integration Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
+					cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
+				}
 			}
 
 			output_val += numericalIntegral;

@@ -9,6 +9,7 @@ using namespace::std;
 
 DebugClass::DebugClass( bool input ) : perform_debugging( input ), classes_to_debug()
 {
+	if( !input ) classes_to_debug.push_back( "default" );
 }
 
 DebugClass::DebugClass( const DebugClass& input ) : perform_debugging( true ), classes_to_debug( input.classes_to_debug )

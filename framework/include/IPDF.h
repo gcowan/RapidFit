@@ -146,6 +146,8 @@ class IPDF
 		 */
 		virtual double EvaluateForNumericIntegral( DataPoint* ) = 0;
 
+		virtual double EvaluateTimeOnly( DataPoint* ) = 0;
+
 		/*!
 		 * Interface Function:
 		 * Get the function parameters

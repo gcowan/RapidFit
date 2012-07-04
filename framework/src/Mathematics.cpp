@@ -21,6 +21,7 @@
 #include <cmath>
 #include <iostream>
 #include <pthread.h>
+#include <iomanip>
 
 pthread_mutex_t ROOT_Lock;
 
@@ -500,17 +501,19 @@ namespace Mathematics
 				Sum_sq[i][k] = 0.0;
 			}
 		}
-		
+
+		cout << endl;
+
+		double testEval = PDF->EvaluateTimeOnly( dataSet->GetDataPoint(0) );
+		bool usePDF = testEval>=0. && !(isnan(testEval));
+
 		for (int e = 0; e < numEvents; e++)
 		{
-			if (e % 1000 == 0) cout << "Event # " << e << endl;
+			if (e % 1000 == 0) cout << "Event # " << e << "\t\t" << setprecision(4) << 100.*(double)e/(double)numEvents << "\% Complete\r\r\r\r\r\r\r\r\r\r\r";
 			DataPoint * event = dataSet->GetDataPoint(e);
-			//cosTheta = event->GetObservable("cosTheta")->GetValue();
-			//phi      = event->GetObservable("phi")->GetValue();
-			//cosPsi   = event->GetObservable("cosPsi")->GetValue();
-			cosTheta = event->GetObservable("trcostheta")->GetValue();
-			phi      = event->GetObservable("trphi")->GetValue();
-			cosPsi   = event->GetObservable("trcospsi")->GetValue();
+			cosTheta = event->GetObservable("cosTheta")->GetValue();
+			phi      = event->GetObservable("phi")->GetValue();
+			cosPsi   = event->GetObservable("cosPsi")->GetValue();
 			time     = event->GetObservable("time")->GetValue();
 			getBs2JpsiPhiAngularFunctionsWithSwave( f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], cosTheta, phi, cosPsi);
 
@@ -522,9 +525,16 @@ namespace Mathematics
 			vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
 			dontIntegrate.push_back("time");
 			//dontIntegrate.push_back("tag");
-			dontIntegrate.push_back("tagdecision_os");
+			dontIntegrate.push_back("tag");
 			//evalPDFnorm = rapidInt->DoNumericalIntegral( event, boundary, dontIntegrate );
-			evalPDFnorm = rapidInt->NumericallyIntegrateDataPoint( event, boundary, dontIntegrate );
+			if( usePDF )
+			{
+				evalPDFnorm = PDF->EvaluateTimeOnly( event );
+			}
+			else
+			{
+				evalPDFnorm = rapidInt->NumericallyIntegrateDataPoint( event, boundary, dontIntegrate );
+			}
 			val = evalPDFraw/evalPDFnorm;
 			//cout << f[0] << " " << f[1]<< " " <<  f[2]<< " " <<  f[3]<< " " <<  f[4]<< " " <<  f[5]<< " " << f[6]<< " " <<  f[7]<< " " <<  f[8]<< " " <<  f[9]<< endl;
 			//cout << time << " " << cosTheta  << " " << phi << " " << cosPsi << " " << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
@@ -539,6 +549,8 @@ namespace Mathematics
 				}
 			}
 		}
+
+		cout << endl;
 
 		cout << "Covariance matrix " << endl;
 		for (int i = 0; i < numAngularTerms; i++)
@@ -565,7 +577,7 @@ namespace Mathematics
 		cout << "Weight +- error " << endl;
 		for (int i = 0; i < numAngularTerms; i++)
 		{
-			cout << xi[i]/numEvents << " \\pm " << sqrt(cov[i][i]) << endl;
+			cout << fixed << setprecision(4) << xi[i]/numEvents << " \\pm " << sqrt(cov[i][i]) << endl;
 			weights.push_back(xi[i]/numEvents);
 		}	
 		return weights;

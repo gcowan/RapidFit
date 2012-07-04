@@ -324,6 +324,11 @@ double BasePDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	return this->Evaluate( NewDataPoint );
 }
 
+double BasePDF::EvaluateTimeOnly( DataPoint* )
+{
+	return -1.;
+}
+
 ParameterSet* BasePDF::GetPhysicsParameters()
 {
 	return &allParameters;
