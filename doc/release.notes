@@ -6,6 +6,7 @@
    - Modified Mathematics to check for the explicit definition of this Eval method in calculateAcceptanceWeights
    - Modified code in main.cpp to calculate both transverse and helicity angular acceptances whenever calculateAcceptanceWeights is called
    - Minor bugfixes in DebugClass and RapidFitIntegrator
+   - Updated Acceptance Histograms
 
 2012/07/03 Rob Currie
    - Added the debug option to more classes and some examples of use in XMLConfigReader

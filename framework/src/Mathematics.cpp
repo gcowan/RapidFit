@@ -97,7 +97,6 @@ namespace Mathematics
 		{
 			pthread_mutex_lock( &ROOT_Lock );
 			returnable = math_object->ITPComplexErrFuncIm( *z, 10 )*exp( -u*u );
-			
 			pthread_mutex_unlock( &ROOT_Lock );
 		}
 		else
