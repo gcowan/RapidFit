@@ -400,7 +400,7 @@ double Bs2JpsiPhi_Signal_v5::Evaluate(DataPoint * measurement)
 		ctheta_k   = measurement->GetObservable( cthetakName )->GetValue();
 		phi_h      = TMath::Pi() + measurement->GetObservable( phihName )->GetValue();  // Pi offset is difference between angle calculator and "Our Paper"
 		ctheta_l   = measurement->GetObservable( cthetalName )->GetValue();
-		angAcceptanceFactor = angAcc->getValue( ctheta_l, ctheta_k, phi_h );
+		angAcceptanceFactor = angAcc->getValue( ctheta_k, ctheta_l, phi_h );
 	}
 	else {
 		ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
