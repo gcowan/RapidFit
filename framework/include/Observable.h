@@ -35,11 +35,14 @@ class Observable
 
 		string GetUnit() const;
 
-		void SetBinNumber( int );
+		/*!
+		 * @brief An ugly lie, but it keeps the compiler happy for more abstract functions which should be treated as const!
+		 */
+		void SetBinNumber( int ) const;
 		int GetBinNumber() const;
 
 		double GetAcceptance() const;
-		void SetAcceptance( double );
+		void SetAcceptance( double ) const;
 
 		string GetName() const;
 
@@ -52,8 +55,8 @@ class Observable
 		double value;
 		double error;
 		string unit;
-		int bin_num;
-		double acceptance;
+		mutable int bin_num;
+		mutable double acceptance;
 };
 
 #endif

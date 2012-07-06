@@ -6,6 +6,9 @@
    - Updated Latex output files from standard fits
    - Added a more graceful exit to AngularAcceptance object when histogram is not found
    - Increased number of events to be reconstructed for angular acceptance histos to be 10x the input MC. This can be very memory intensive, will look to loop this in the future to reduce the memory requirements.
+   - Removed pi transform from main and v5 for Helicity-Phi. These transforms caused more problems than they solved.
+   - Updated 30MeV window Histogram UanB
+   - Added basic lookup caching for AngularAcceptance object which should take some time off fits
 
 2012/07/04 Rob Currie
    - Today there was an announcement of a 5.0 sigma measurement of a SM Higgs like boson at the LHC

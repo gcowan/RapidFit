@@ -53,7 +53,7 @@ string Observable::GetUnit() const
 	return unit;
 }
 
-void Observable::SetBinNumber( int input )
+void Observable::SetBinNumber( int input ) const
 {
 	bin_num = input;
 }
@@ -63,7 +63,7 @@ int Observable::GetBinNumber() const
 	return bin_num;
 }
 
-void Observable::SetAcceptance( double input )
+void Observable::SetAcceptance( double input ) const
 {
 	acceptance = input;
 }

@@ -9,9 +9,11 @@
 
 
 #include "AngularAcceptance.h"
+#include "Mathematics.h"
 
 #include "TChain.h"
 
+using namespace::std;
 
 //............................................
 // Constructor for accpetance from a file
@@ -102,6 +104,48 @@ double AngularAcceptance::getValue( double cosPsi, double cosTheta, double phi )
 	return returnValue / average_bin_content ;
 }
 
+double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Observable* phi ) const
+{
+	if( useFlatAngularAcceptance ) return 1.;
+
+	int psi_num = cosPsi->GetBinNumber();
+	int theta_num = cosTheta->GetBinNumber();
+	int phi_num = phi->GetBinNumber();
+
+	if( psi_num > -1  ) //	&& theta_num > -1) && phi_num > -1 )	These are implicitly +ve if psi is when using this class
+	{
+		//	By definition doesn't matter which Observable we interrogate here,
+		//	The user can be intentionally stupid and break this, but we trust that they won't
+		return cosPsi->GetAcceptance();
+	}
+	else
+	{
+		//	This has to be here to protect ROOT from breaking everything
+		//	GetBinContent is NOT a const function!!!
+		//	It will break the copy of the histogram in memory if you request an object out of scope
+		int xbin=-1, ybin=-1, zbin=-1;
+		xbin = xaxis->FindFixBin( cosPsi->GetValue() ); if( xbin > nxbins ) xbin = nxbins;
+		ybin = yaxis->FindFixBin( cosTheta->GetValue() ); if( ybin > nybins ) ybin = nybins;
+		zbin = zaxis->FindFixBin( phi->GetValue() ); if( zbin > nzbins ) zbin = nzbins;
+
+		cosPsi->SetBinNumber( xbin );
+		cosTheta->SetBinNumber( ybin );
+		phi->SetBinNumber( zbin );
+
+		int globalbin = histo->GetBin( xbin, ybin, zbin );
+		double num_entries_bin = histo->GetBinContent(globalbin);
+
+		double acc = (double)num_entries_bin / average_bin_content;
+
+		cosPsi->SetAcceptance( acc );
+		cosTheta->SetAcceptance( acc );
+		phi->SetAcceptance( acc );
+
+		return acc;
+	}
+
+	return -1.;
+}
 
 //............................................
 // Open the input file containing the acceptance

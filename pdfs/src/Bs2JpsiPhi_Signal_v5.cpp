@@ -398,15 +398,19 @@ double Bs2JpsiPhi_Signal_v5::Evaluate(DataPoint * measurement)
 
 	if( _useHelicityBasis ) {
 		ctheta_k   = measurement->GetObservable( cthetakName )->GetValue();
-		phi_h      = TMath::Pi() + measurement->GetObservable( phihName )->GetValue();  // Pi offset is difference between angle calculator and "Our Paper"
+		phi_h      = measurement->GetObservable( phihName )->GetValue();
 		ctheta_l   = measurement->GetObservable( cthetalName )->GetValue();
-		angAcceptanceFactor = angAcc->getValue( ctheta_k, ctheta_l, phi_h );
+		angAcceptanceFactor = angAcc->getValue( measurement->GetObservable( cthetakName ),
+							measurement->GetObservable( cthetalName ),
+							measurement->GetObservable( phihName ) );  // Histogram is generated in PDF basis!
 	}
 	else {
 		ctheta_tr = measurement->GetObservable( cosThetaName )->GetValue();
 		phi_tr      = measurement->GetObservable( phiName )->GetValue();
 		ctheta_1   = measurement->GetObservable( cosPsiName )->GetValue();
-		angAcceptanceFactor = angAcc->getValue( ctheta_1, ctheta_tr, phi_tr );
+		angAcceptanceFactor = angAcc->getValue( measurement->GetObservable( cosPsiName ),
+							measurement->GetObservable( cosThetaName ),
+							measurement->GetObservable( phiName ) );
 	}
 	
 	tag = (int)measurement->GetObservable( tagName )->GetValue();

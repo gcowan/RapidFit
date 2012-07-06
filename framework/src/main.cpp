@@ -808,7 +808,7 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 		num->Fill(cosPsi, cosTheta, phi);
 		helcosk  = event->GetObservable("helcosthetaK")->GetValue();
 		helcosl  = event->GetObservable("helcosthetaL")->GetValue();
-		helphi   = pi + event->GetObservable("helphi")->GetValue();
+		helphi   = event->GetObservable("helphi")->GetValue();
 		if( helphi > pi ) helphi-=2*pi;
 		numh->Fill(helcosk, helcosl, helphi);
 		//delete event;
