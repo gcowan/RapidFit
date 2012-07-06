@@ -110,6 +110,10 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "--ForceScan" << endl;
 	cout << "	This forces a scan to be performed on a less than perfectly fit dataset" << endl;
 
+	cout << endl;
+	cout << "--calculateAcceptanceWeights" << endl;
+	cout << "       Calculate the Angular Acceptance Weights and Histograms for both Helicity and Transverse Basis and store the results in a .root file" << endl;
+
 	cout << endl;  
 }
 

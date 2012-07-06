@@ -278,7 +278,17 @@ vector<string> Bs2JpsiPhi_Signal_v5::GetDoNotIntegrateList()
 			list.push_back( cosPsiName ) ;
 			list.push_back( phiName ) ;
 		}			
-	}	
+	}
+        if( !_useHelicityBasis ) {
+		list.push_back( cthetakName );
+		list.push_back( cthetalName );
+		list.push_back( phihName );
+	}
+	else {
+		list.push_back( cosThetaName );
+		list.push_back( phiName );
+		list.push_back( cosPsiName );
+	}
 	return list;
 }
 

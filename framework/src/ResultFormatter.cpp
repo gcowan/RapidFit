@@ -383,7 +383,7 @@ void ResultFormatter::LatexDocHeader( stringstream& latex )
 	latex << endl;
 	latex << "\\let\\oldpm\\pm" << endl;
 	latex << endl;
-	latex << "\\renewcommand*{\\arraystretch}{1.25}" << endl;
+	latex << "\\renewcommand*{\\arraystretch}{1.}" << endl;
 	latex << endl;
 	latex << "\\begin{document}" << endl;
 	latex << endl;
@@ -537,6 +537,24 @@ void ResultFormatter::LatexCovMatrix( FitResult * OutputData, stringstream& late
 	else
 	{
 		vector<string> freeNames = OutputData->GetCovarianceMatrix()->theseParameters;
+
+		if( freeNames.size() > 10 && freeNames.size() < 15 )
+		{
+			latex << "\\small" << endl;
+			latex << "\\renewcommand*{\\arraystretch}{1.}" << endl;
+		}
+		if( freeNames.size() > 15 && freeNames.size() < 20 )
+		{
+			latex << "\\footnotesize" << endl;
+			latex << "\\renewcommand*{\\arraystretch}{0.95}" << endl;
+			latex << "\\renewcommand{\\tabcolsep}{2.pt}" << endl;
+		}
+		if( freeNames.size() > 20 )
+		{
+			latex << "\\sriptsize" << endl;
+			latex << "\\renewcommand*{\\arraystretch}{0.9}" << endl;
+			latex << "\\renewcommand{\\tabcolsep}{1.pt}" << endl;
+		}
 
 		ResultFormatter::TableHeaderLandscape( latex, (unsigned)(freeNames.size()+1) );
 

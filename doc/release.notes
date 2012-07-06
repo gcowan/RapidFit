@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2012/07/06 Rob Currie
+   - Added correct return for commandline configuration which require exiting without any further action
+   - Updated Latex Param names in latex
+   - Updated Latex output files from standard fits
+   - Added a more graceful exit to AngularAcceptance object when histogram is not found
+   - Increased number of events to be reconstructed for angular acceptance histos to be 10x the input MC. This can be very memory intensive, will look to loop this in the future to reduce the memory requirements.
+
 2012/07/04 Rob Currie
    - Today there was an announcement of a 5.0 sigma measurement of a SM Higgs like boson at the LHC
    - Added EvaluateTimeOnly to IPDF with a BasePDF implementation that is -ve

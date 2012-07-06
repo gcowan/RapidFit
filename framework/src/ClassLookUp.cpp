@@ -126,6 +126,7 @@ IPDF* ClassLookUp::LookUpPDFName( string Name, PDFConfigurator* configurator )
 
 	returnable_PDF->SetName( Name ); 
 	returnable_PDF->SetLabel( Name );
+	returnable_PDF->SetConfigurator( configurator );
 
 	return returnable_PDF;
 }

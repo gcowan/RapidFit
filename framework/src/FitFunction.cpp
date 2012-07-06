@@ -182,8 +182,13 @@ double FitFunction::Evaluate()
 	double minimiseValue = 0.0;
 	double temp=0.;
 	//Calculate the function value for each PDF-DataSet pair
-	for (int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex)
+	for( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
 	{
+		if( allData->GetResultDataSet( resultIndex )->GetBoundary() == 0 )
+		{
+			cerr << "Are you aware DataSet: " << resultIndex+1 << " has zero size?" << endl;
+			continue;
+		}
 		temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)], resultIndex );
 		if( temp >= DBL_MAX )
 		{
@@ -222,7 +227,7 @@ double FitFunction::Evaluate()
 		//cout << endl;
 		Fit_Tree->Fill();
 	}
-	cout << "NLL: " << setprecision(10) << minimiseValue << "\r\r\r" << flush;
+	cout << "NLL: " << setprecision(10) << minimiseValue << "\b\b\b\b\r\r\r\r" << flush;
 	if( isnan(minimiseValue) )
 	{
 		minimiseValue = DBL_MAX;

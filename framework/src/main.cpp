@@ -134,7 +134,12 @@ int RapidFit( int argc, char * argv[] )
 
 	RapidFitConfiguration* thisConfig = new RapidFitConfiguration();
 
-	ParseCommandLine::ParseThisCommandLine( *thisConfig, argc, argv );
+	int command_check = ParseCommandLine::ParseThisCommandLine( *thisConfig, argc, argv );
+
+	if( command_check != 0 )
+	{
+		return command_check;
+	}
 
 	if( thisConfig->makeTemplateXML ) BuildTemplateXML( thisConfig );
 
@@ -712,6 +717,15 @@ int calculateAcceptanceWeightsWithSwave( RapidFitConfiguration* config )
 	return 0;
 }
 
+TH1D* ProjectAxis( TH3* input_histo, TString axis, TString name )
+{       
+	TH1D* X_proj = (TH1D*)input_histo->Project3D( axis );
+	X_proj->SetName( name );
+	X_proj->SetTitle( name );
+	X_proj->Write("",TObject::kOverwrite);
+	return X_proj;
+}
+
 int calculateAcceptanceWeights( RapidFitConfiguration* config )
 {
 	// Calculate the acceptance weights from MC
@@ -720,8 +734,18 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	IDataSet * dataSet = pdfAndData->GetDataSet();
 	int nMCEvents = dataSet->GetDataNumber();
 	IPDF * pdf = pdfAndData->GetPDF();
-	vector<double> weights = Mathematics::calculateAcceptanceWeights(dataSet, pdf);
+
+	string pdf_name = pdf->GetName();
+	string Helicity_Switch("UseHelicityBasis:True");
+	PDFConfigurator* tr_config = (pdf->GetConfigurator()==NULL)?new PDFConfigurator():pdf->GetConfigurator();
+	PDFConfigurator* helicity_config = new PDFConfigurator( *tr_config );
+	helicity_config->addConfigurationParameter( Helicity_Switch );
+	IPDF* helpdf = ClassLookUp::LookUpPDFName( pdf_name, helicity_config ); 
+	helpdf->UpdatePhysicsParameters( pdf->GetPhysicsParameters() ); 
+
+	vector<double> weights ;//= Mathematics::calculateAcceptanceWeights(dataSet, pdf);
 	TFile * file = TFile::Open("acceptance_weights_and_histos.root", "RECREATE");
+	TDirectory* output_file = gDirectory;
 	TTree * tree = new TTree("tree", "tree containing acceptance weights and histo");
 	tree->Branch("weights", "std::vector<double>", &weights);
 	tree->Fill();
@@ -729,11 +753,13 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	// Now calculate the acceptance histograms from the data PDF/xml and MC sample
 	DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
 	dataConfig->SetSource( "Foam" );
-	PhaseSpaceBoundary * phase = dataSet->GetBoundary();
+	PhaseSpaceBoundary* phase = new PhaseSpaceBoundary(*dataSet->GetBoundary());
+	PhaseSpaceBoundary* helphase = new PhaseSpaceBoundary(*dataSet->GetBoundary());
 	int nToyEvents = 10*nMCEvents;
 	MemoryDataSet * toy = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nToyEvents );
 	file->cd();
 	double pi = TMath::Pi();
+	output_file->cd();
 	TH3D * num = new TH3D("trnum", "trnum", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
 	TH3D * den = new TH3D("trden", "trden", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
 	TH3D * acc = new TH3D("tracc", "tracc", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
@@ -745,13 +771,23 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	acc->Sumw2(), acch->Sumw2();
 	double cosTheta, phi, cosPsi;
 	double helcosk, helcosl, helphi;
+	output_file->cd();
 	for ( int i = 0; i < nToyEvents; i++ ) {
-		if (i % 10000 == 0) cout << "Toy event # " << i << "\r\r\r\r\r\r\r\r\r\r";
+		if (i % 10000 == 0) cout << "Toy event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
 		DataPoint * event = toy->GetDataPoint(i);
 		cosPsi   = event->GetObservable("cosPsi")->GetValue();
 		cosTheta = event->GetObservable("cosTheta")->GetValue();
 		phi      = event->GetObservable("phi")->GetValue();
 		den->Fill(cosPsi, cosTheta, phi);
+		//delete event;
+	}
+	delete toy;
+	output_file->cd();
+	toy = (MemoryDataSet*)dataConfig->MakeDataSet( helphase, helpdf, nToyEvents );
+	output_file->cd();
+	for ( int i = 0; i < nToyEvents; i++ ) {
+		if (i % 10000 == 0) cout << "Toy event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
+		DataPoint * event = toy->GetDataPoint(i);
 		helcosk  = event->GetObservable("helcosthetaK")->GetValue();
 		helcosl  = event->GetObservable("helcosthetaL")->GetValue();
 		helphi   = event->GetObservable("helphi")->GetValue();
@@ -759,8 +795,9 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 		//delete event;
 	}
 	delete toy;
+	output_file->cd();
 	for ( int i = 0; i < nMCEvents; i++ ) {
-		if (i % 10000 == 0) cout << "MC event # " << i << "\r\r\r\r\r\r\r\r\r\r";
+		if (i % 10000 == 0) cout << "MC event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
 		DataPoint * event = dataSet->GetDataPoint(i);
 		cosPsi   = event->GetObservable("cosPsi")->GetValue();
 		cosTheta = event->GetObservable("cosTheta")->GetValue();
@@ -768,48 +805,62 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 		num->Fill(cosPsi, cosTheta, phi);
 		helcosk  = event->GetObservable("helcosthetaK")->GetValue();
 		helcosl  = event->GetObservable("helcosthetaL")->GetValue();
-		helphi   = event->GetObservable("helphi")->GetValue();
+		helphi   = pi + event->GetObservable("helphi")->GetValue();
+		if( helphi > pi ) helphi-=2*pi;
 		numh->Fill(helcosk, helcosl, helphi);
 		//delete event;
 	}
 	acc->Divide(num, den);
 	acch->Divide(numh, denh);
 
-	den->Write("",TObject::kOverwrite);
+	TH1D* num_x = ProjectAxis( num, "x", "num_cosPsi" );
+	TH1D* num_y = ProjectAxis( num, "y", "num_cosTheta" );
+	TH1D* num_z = ProjectAxis( num, "z", "num_phi" );
+	TH1D* den_x = ProjectAxis( den, "x", "den_cosPsi" );
+	TH1D* den_y = ProjectAxis( den, "y", "den_cosTheta" );
+	TH1D* den_z = ProjectAxis( den, "z", "den_phi" );
+	TH1D* acc_x = new TH1D( "acc_cosPsi", "acc_cosPsi", 7, -1., 1 );
+	acc_x->Divide( num_x, den_x );
+	acc_x->Write("",TObject::kOverwrite);
+	TH1D* acc_y = new TH1D( "acc_cosTheta", "acc_cosTheta", 7, -1, 1 );
+	acc_y->Divide( num_y, den_y );
+	acc_y->Write("",TObject::kOverwrite);
+	TH1D* acc_z = new TH1D( "acc_phi", "acc_cosphi", 9, -pi, pi );
+	acc_z->Divide( num_z, den_z );
+	acc_z->Write("",TObject::kOverwrite);
+
+	//ProjectAxis( acc, "x", "acc_cosPsi" );
+	//ProjectAxis( acc, "y", "acc_cosTheta" );
+	//ProjectAxis( acc, "z", "acc_phi" );
+
+	TH1D* numh_x = ProjectAxis( numh, "x", "numh_helcosthetaK" );
+	TH1D* numh_y = ProjectAxis( numh, "y", "numh_helcosthetaL" );
+	TH1D* numh_z = ProjectAxis( numh, "z", "numh_helphi" );
+	TH1D* denh_x = ProjectAxis( denh, "x", "denh_helcosthetaK" );
+	TH1D* denh_y = ProjectAxis( denh, "y", "denh_helcosthetaL" );
+	TH1D* denh_z = ProjectAxis( denh, "z", "denh_helphi" );
+	TH1D* acch_x = new TH1D( "acch_helcosthetaK", "acch_helcosthetaK", 7, -1., 1 );
+	acch_x->Divide( numh_x, denh_x );
+	acch_x->Write("",TObject::kOverwrite);
+	TH1D* acch_y = new TH1D( "acch_helcosthetaL", "acch_helcosthetaL", 7, -1., 1 );
+	acch_y->Divide( numh_y, denh_y );
+	acch_y->Write("",TObject::kOverwrite);
+	TH1D* acch_z = new TH1D( "acc_helphi", "acc_helphi", 9, -pi, pi );
+	acch_z->Divide( numh_z, denh_z );
+	acch_z->Write("",TObject::kOverwrite);
+
+	//ProjectAxis( acch, "x", "acch_helcosthetaK" );
+	//ProjectAxis( acch, "y", "acch_helcosthetaL" );
+	//ProjectAxis( acch, "z", "acch_helphi" );
+
 	num->Write("",TObject::kOverwrite);
-	acc->Write("",TObject::kOverwrite);
-
-	TH1D* x_axis = (TH1D*)acc->Project3D("x");
-	x_axis->SetName("cosPsi");
-	x_axis->SetTitle("cosPsi");
-	x_axis->Write("",TObject::kOverwrite);
-	TH1D* y_axis = (TH1D*)acc->Project3D("y");
-	y_axis->SetName("cosTheta");
-	y_axis->SetTitle("cosTheta");
-	y_axis->Write("",TObject::kOverwrite);
-	TH1D* z_axis = (TH1D*)acc->Project3D("z");
-	z_axis->SetName("phi");
-	z_axis->SetTitle("phi");
-	z_axis->Write("",TObject::kOverwrite);
-
 	den->Write("",TObject::kOverwrite);
-	num->Write("",TObject::kOverwrite);
 	acc->Write("",TObject::kOverwrite);
+	numh->Write("",TObject::kOverwrite);
+	denh->Write("",TObject::kOverwrite);
+	acch->Write("",TObject::kOverwrite);
 
-	TH1D* x_axis_h = (TH1D*)acch->Project3D("x");
-	x_axis_h->SetName("helcosthetaK");
-	x_axis_h->SetTitle("helcosthetaK");
-	x_axis_h->Write("",TObject::kOverwrite);
-	TH1D* y_axis_h = (TH1D*)acch->Project3D("y");
-	y_axis_h->SetName("helcosthetaL");
-	y_axis_h->SetTitle("helcosthetaL");
-	y_axis_h->Write("",TObject::kOverwrite);
-	TH1D* z_axis_h = (TH1D*)acch->Project3D("z");
-	z_axis_h->SetName("helphi");
-	z_axis_h->SetTitle("helphi");
-	z_axis_h->Write("",TObject::kOverwrite);
-
-	file->Write("",TObject::kOverwrite);
+	//file->Write("",TObject::kOverwrite);
 	file->Close();
 	//delete tree;
 	//delete file;

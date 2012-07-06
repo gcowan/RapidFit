@@ -508,7 +508,7 @@ namespace Mathematics
 
 		for (int e = 0; e < numEvents; e++)
 		{
-			if (e % 1000 == 0) cout << "Event # " << e << "\t\t" << setprecision(4) << 100.*(double)e/(double)numEvents << "\% Complete\r\r\r\r\r\r\r\r\r\r\r";
+			if (e % 1000 == 0) cout << "Event # " << e << "\t\t" << setprecision(4) << 100.*(double)e/(double)numEvents << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
 			DataPoint * event = dataSet->GetDataPoint(e);
 			cosTheta = event->GetObservable("cosTheta")->GetValue();
 			phi      = event->GetObservable("phi")->GetValue();

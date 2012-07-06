@@ -612,13 +612,109 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 		Name.Append("\\alpha M_{pr}");
 
-	}  else if (Param_Name == "delta_s") {
+	} else if (Param_Name == "delta_s") {
 
 		Name.Append("\\delta_s");
 
-	}  else if (Param_Name == "f_LL1") {
+	} else if (Param_Name == "f_LL1") {
 
 		Name.Append("f_{LL1}");
+
+	} else if ( Param_Name == "lambda" ) {
+
+		Name.Append("\\left|\\lambda\\right|^2");
+
+	} else if ( Param_Name == "SignalFractionUBU" ) {
+
+		Name.Append("f_{UB}^U");
+
+	} else if ( Param_Name == "SignalFractionUBOS" ) {
+
+		Name.Append("f_{UB}^{OS}");
+
+	} else if ( Param_Name == "SignalFractionUBSS" ) {
+
+		Name.Append("f_{UB}^{SS}");
+
+	} else if ( Param_Name == "SignalFractionUBOSSS" ) {
+
+		Name.Append("f_{UB}&{OS+SS}");
+
+	} else if ( Param_Name == "mistagP1_OS" ) {
+
+		Name.Append("\\omega_{P1}^{OS}");
+
+	} else if ( Param_Name == "mistagDeltaP1_OS" ) {
+
+		Name.Append("\\delta_{P1}^{OS}");
+
+	} else if ( Param_Name == "mistagP0_OS" ) {
+
+		Name.Append("\\omega_{P0}^{OS}");
+
+	} else if ( Param_Name == "mistagDeltaP0_OS" ) {
+
+		Name.Append("\\delta_{P0}^{OS}");
+
+	} else if ( Param_Name == "mistagSetPoint_OS" ) {
+
+		Name.Append("\\bar{\\omega}_\\omega^{OS}");
+
+	} else if ( Param_Name == "mistagDeltaSetPoint_OS" ) {
+
+		Name.Append("\\delta_{\\bar{\\omega}}^{OS}");
+
+	} else if ( Param_Name == "mistagP1_SS" ) {
+
+		Name.Append("\\omega_{P1}^{SS}");
+
+	} else if ( Param_Name == "mistagDeltaP1_SS" ) {
+
+		Name.Append("\\delta_{P1}^{SS}");
+
+	} else if ( Param_Name == "mistagP0_SS" ) {
+
+		Name.Append("\\omega_{P0}^{SS}");
+
+	} else if ( Param_Name == "mistagDeltaP0_SS" ) {
+
+		Name.Append("\\delta_{P0}^{SS}");
+
+	} else if ( Param_Name == "mistagSetPoint_SS" ) {
+
+		Name.Append("\\bar{\\omega}_\\omega^{SS}");
+
+	} else if ( Param_Name == "mistagDeltaSetPoint_SS" ) {
+
+		Name.Append("\\delta_{\\bar{\\omega}}^{SS}");
+
+	} else if ( Param_Name == "mistagP1_OSSS" ) {
+
+		Name.Append("\\omega_{P1}^{OS+SS}");
+
+	} else if ( Param_Name == "mistagDeltaP1_OSSS" ) {
+
+		Name.Append("\\delta_{P1}^{OS+SS}");
+
+	} else if ( Param_Name == "mistagP0_SS" ) {
+
+		Name.Append("\\omega_{P0}^{OS+SS}");
+
+	} else if ( Param_Name == "mistagDeltaP0_OSSS" ) {
+
+		Name.Append("\\delta_{P0}^{OS+SS}");
+
+	} else if ( Param_Name == "mistagSetPoint_OSSS" ) {
+
+		Name.Append("\\\\bar{\\omega}^{OS+SS}");
+
+	} else if ( Param_Name == "mistagDeltaSetPoint_OSSS" ) {
+
+		Name.Append("\\delta_{\\bar{\\omega}}^{OS+SS}");
+
+	} else if ( Param_Name == "Csp" ) {
+
+		Name.Append("C_{S-P}");
 
 	} else {
 		Name.Append("\\text{");

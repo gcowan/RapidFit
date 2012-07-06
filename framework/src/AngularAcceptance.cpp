@@ -43,6 +43,14 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
 			cout << "AngularAcceptance::  Using transversity basis" << endl ;
 		}
 		
+		if( histo == NULL ) histo = (TH3D*) f->Get("acc");
+
+		if( histo == NULL )
+		{
+			cerr << "Cannot Open a Valid NTuple" << endl;
+			exit(0);
+		}
+
 		this->processHistogram() ;
 		
 			
