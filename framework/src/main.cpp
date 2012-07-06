@@ -744,7 +744,9 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	helpdf->UpdatePhysicsParameters( pdf->GetPhysicsParameters() ); 
 
 	vector<double> weights = Mathematics::calculateAcceptanceWeights(dataSet, pdf);
-	TFile * file = TFile::Open("acceptance_weights_and_histos.root", "RECREATE");
+	TString FileName("acceptance_weights_and_histos_"); FileName.Append( StringProcessing::TimeString() );
+	FileName.Append(".root");
+	TFile * file = TFile::Open(FileName, "RECREATE");
 	TDirectory* output_file = gDirectory;
 	TTree * tree = new TTree("tree", "tree containing acceptance weights and histo");
 	tree->Branch("weights", "std::vector<double>", &weights);
