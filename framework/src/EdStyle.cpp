@@ -490,15 +490,15 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if (Param_Name == "timeOffset" ) {
 
-		Name.Append("\\tau_{Offset}");
+		Name.Append("\\tau_{\\text{Offset}}");
 
 	} else if (Param_Name == "timeResolution1" ) {
 
-		Name.Append("\\tau_1");
+		Name.Append("\\delta\\tau_1");
 
 	} else if (Param_Name == "timeResolution2" ) {
 
-		Name.Append("\\tau_2");
+		Name.Append("\\delta\\tau_2");
 
 	} else if (Param_Name == "timeResolution1Fraction" ) {
 
@@ -715,6 +715,46 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 	} else if ( Param_Name == "Csp" ) {
 
 		Name.Append("C_{S-P}");
+
+	} else if ( Param_Name == "mistagP0" ) {
+
+		Name.Append("\\omega_{P0}");
+	
+	} else if ( Param_Name == "mistagP1" ) {
+
+		Name.Append("\\omega_{P1}");
+
+	} else if ( Param_Name == "timeResolutionScale" ) {
+
+		Name.Append("\\delta\\tau_{\\text{res}}^{\\text{scale}");
+
+	} else if ( Param_Name == "mistagSetPoint" ) {
+
+		Name.Append("\\bar{\\omega}");
+
+	} else if ( Param_Name == "mistagDeltaP1" ) {
+
+		Name.Append("\\delta_{P1}" );
+
+	} else if ( Param_Name == "mistagDeltaP0" ) {
+
+		Name.Append("\\delta_{P0}" );
+
+	} else if ( Param_Name == "mistagDeltaSetPoint" ) {
+
+		Name.Append("\\delta_{\\bar{\\omega}}");
+
+	} else if ( Param_Name == "timeResolution3" ) {
+
+		Name.Append("\\delta\\tau_3");
+
+	} else if ( Param_Name == "timeResolution2Fraction" ) {
+
+		Name.Append("f_{\\delta\\tau_2}");
+
+	} else if ( Param_Name == "timeResolution3Fraction" ) {
+
+		Name.Append("f_{\\delta\\tau_3}");
 
 	} else {
 		Name.Append("\\text{");
