@@ -743,7 +743,7 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	IPDF* helpdf = ClassLookUp::LookUpPDFName( pdf_name, helicity_config ); 
 	helpdf->UpdatePhysicsParameters( pdf->GetPhysicsParameters() ); 
 
-	vector<double> weights ;//= Mathematics::calculateAcceptanceWeights(dataSet, pdf);
+	vector<double> weights = Mathematics::calculateAcceptanceWeights(dataSet, pdf);
 	TFile * file = TFile::Open("acceptance_weights_and_histos.root", "RECREATE");
 	TDirectory* output_file = gDirectory;
 	TTree * tree = new TTree("tree", "tree containing acceptance weights and histo");
@@ -755,7 +755,8 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	dataConfig->SetSource( "Foam" );
 	PhaseSpaceBoundary* phase = new PhaseSpaceBoundary(*dataSet->GetBoundary());
 	PhaseSpaceBoundary* helphase = new PhaseSpaceBoundary(*dataSet->GetBoundary());
-	int nToyEvents = 10*nMCEvents;
+	int factor = 10;
+	int nToyEvents = factor*nMCEvents;
 	MemoryDataSet * toy = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nToyEvents );
 	file->cd();
 	double pi = TMath::Pi();
@@ -820,14 +821,17 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	TH1D* den_y = ProjectAxis( den, "y", "den_cosTheta" );
 	TH1D* den_z = ProjectAxis( den, "z", "den_phi" );
 	TH1D* acc_x = new TH1D( "acc_cosPsi", "acc_cosPsi", 7, -1., 1 );
-	acc_x->Divide( num_x, den_x );
+	acc_x->Divide( num_x, den_x, factor, 1 );
 	acc_x->Write("",TObject::kOverwrite);
+	acc_x->GetYaxis()->SetRangeUser( 0., acc_x->GetYaxis()->GetXmax() );
 	TH1D* acc_y = new TH1D( "acc_cosTheta", "acc_cosTheta", 7, -1, 1 );
-	acc_y->Divide( num_y, den_y );
+	acc_y->Divide( num_y, den_y, factor, 1 );
 	acc_y->Write("",TObject::kOverwrite);
+	acc_y->GetYaxis()->SetRangeUser( 0., acc_y->GetYaxis()->GetXmax() );
 	TH1D* acc_z = new TH1D( "acc_phi", "acc_cosphi", 9, -pi, pi );
-	acc_z->Divide( num_z, den_z );
+	acc_z->Divide( num_z, den_z, factor, 1 );
 	acc_z->Write("",TObject::kOverwrite);
+	acc_z->GetYaxis()->SetRangeUser( 0., acc_z->GetYaxis()->GetXmax() );
 
 	//ProjectAxis( acc, "x", "acc_cosPsi" );
 	//ProjectAxis( acc, "y", "acc_cosTheta" );
@@ -840,14 +844,17 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	TH1D* denh_y = ProjectAxis( denh, "y", "denh_helcosthetaL" );
 	TH1D* denh_z = ProjectAxis( denh, "z", "denh_helphi" );
 	TH1D* acch_x = new TH1D( "acch_helcosthetaK", "acch_helcosthetaK", 7, -1., 1 );
-	acch_x->Divide( numh_x, denh_x );
+	acch_x->Divide( numh_x, denh_x, factor, 1 );
 	acch_x->Write("",TObject::kOverwrite);
+	acch_x->GetYaxis()->SetRangeUser( 0., acch_x->GetYaxis()->GetXmax() );
 	TH1D* acch_y = new TH1D( "acch_helcosthetaL", "acch_helcosthetaL", 7, -1., 1 );
-	acch_y->Divide( numh_y, denh_y );
+	acch_y->Divide( numh_y, denh_y, factor, 1 );
 	acch_y->Write("",TObject::kOverwrite);
+	acch_y->GetYaxis()->SetRangeUser( 0., acch_y->GetYaxis()->GetXmax() );
 	TH1D* acch_z = new TH1D( "acc_helphi", "acc_helphi", 9, -pi, pi );
-	acch_z->Divide( numh_z, denh_z );
+	acch_z->Divide( numh_z, denh_z, factor, 1 );
 	acch_z->Write("",TObject::kOverwrite);
+	acch_z->GetYaxis()->SetRangeUser( 0., acch_z->GetYaxis()->GetXmax() );
 
 	//ProjectAxis( acch, "x", "acch_helcosthetaK" );
 	//ProjectAxis( acch, "y", "acch_helcosthetaL" );
@@ -859,6 +866,7 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	numh->Write("",TObject::kOverwrite);
 	denh->Write("",TObject::kOverwrite);
 	acch->Write("",TObject::kOverwrite);
+	tree->Write("",TObject::kOverwrite);
 
 	//file->Write("",TObject::kOverwrite);
 	file->Close();

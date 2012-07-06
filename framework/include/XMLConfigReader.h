@@ -293,6 +293,8 @@ class XMLConfigReader
 		 */
 		CompPlotter_config* getCompPlotterConfigs( XMLTag* CompTag );
 
+		PhaseSpaceBoundary * FindCommonPhaseSpace( XMLTag* InputTag );
+
 		vector< XMLTag* > children;		/*!	All of the Children of the tag wholeFile	*/
 
 		int seed;				/*!	Random Seed	*/

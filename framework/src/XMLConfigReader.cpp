@@ -1300,6 +1300,20 @@ vector<PhaseSpaceBoundary*> XMLConfigReader::GetPhaseSpaceBoundaries()
 	return PhaseSpaceBoundary_vec;
 }
 
+PhaseSpaceBoundary* XMLConfigReader::FindCommonPhaseSpace( XMLTag* InputTag )
+{
+	string commonPhaseSpaceName = InputTag->GetValue()[0];
+
+	for( unsigned int i=0; i< children.size(); ++i )
+	{
+		if( children[i]->GetName() == "CommonPhaseSpace" )
+		{
+			//children[i]->Get
+		}
+	}
+	return new PhaseSpaceBoundary(vector<string>());
+}
+
 //Make a PhaseSpaceBoundary from the appropriate xml tag
 PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag * InputTag )
 {
@@ -1309,6 +1323,14 @@ PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag * InputTag )
 		vector< IConstraint* > constraints;
 		vector<string> names;
 		string name;
+
+		if( InputTag->GetChildren().size() == 1 )
+		{
+			if( InputTag->GetChildren()[0]->GetName() == "Name" )
+			{
+				return FindCommonPhaseSpace( InputTag->GetChildren()[0] );
+			}
+		}
 
 		//Create each single bound
 		vector< XMLTag* > constraintTags = InputTag->GetChildren();
