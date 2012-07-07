@@ -638,7 +638,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "SignalFractionUBOSSS" ) {
 
-		Name.Append("f_{UB}&{OS+SS}");
+		Name.Append("f_{UB}^{OS+SS}");
 
 	} else if ( Param_Name == "mistagP1_OS" ) {
 
@@ -696,7 +696,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 		Name.Append("\\delta_{P1}^{OS+SS}");
 
-	} else if ( Param_Name == "mistagP0_SS" ) {
+	} else if ( Param_Name == "mistagP0_OSSS" ) {
 
 		Name.Append("\\omega_{P0}^{OS+SS}");
 
@@ -706,7 +706,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "mistagSetPoint_OSSS" ) {
 
-		Name.Append("\\\\bar{\\omega}^{OS+SS}");
+		Name.Append("\\bar{\\omega}^{OS+SS}");
 
 	} else if ( Param_Name == "mistagDeltaSetPoint_OSSS" ) {
 
