@@ -218,12 +218,12 @@ void Bs2JpsiPhi_Signal_v5::MakePrototypes()
 	parameterNames.push_back( deltaGammaName );
 	parameterNames.push_back( Aperp_sqName );
 	parameterNames.push_back( Azero_sqName );
-	parameterNames.push_back( As_sqName );
-	parameterNames.push_back( CspName );
 	parameterNames.push_back( delta_paraName );
 	parameterNames.push_back( delta_perpName );
 	parameterNames.push_back( delta_zeroName );
+	parameterNames.push_back( As_sqName );
 	parameterNames.push_back( delta_sName );
+	parameterNames.push_back( CspName );
 	if( _useCosDpar ) parameterNames.push_back( cosdparName ); //PELC-COSDPAR Special for fitting cosdpar separately
 	parameterNames.push_back( deltaMName );
 
