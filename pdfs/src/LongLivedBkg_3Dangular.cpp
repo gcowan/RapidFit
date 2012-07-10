@@ -117,7 +117,12 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 
 		//Read in histo
 		TFile* f =  TFile::Open(fullFileName.c_str());
-		histo = (TH3D*) f->Get("histo"); //(fileName.c_str())));
+		if( _useHelicityBasis ) {
+			histo = (TH3D*) f->Get("histoHel"); //(fileName.c_str())));
+		}
+		else {
+			histo = (TH3D*) f->Get("histo"); //(fileName.c_str())));
+		}
 
 		xaxis = histo->GetXaxis();
 		cout << "X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << endl;
@@ -291,16 +296,16 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	{
 		// Set the member variable for time resolution to the first value and calculate
 		sigmaLL = sigmaLL1;
-		returnValue =  this->buildPDFnumerator() ;
+		returnValue =  this->buildPDFnumerator(measurement) ;
 	}
 	else
 	{
 		// Set the member variable for time resolution to the first value and calculate
 		sigmaLL = sigmaLL1;
-		val1 = this->buildPDFnumerator();
+		val1 = this->buildPDFnumerator(measurement);
 		// Set the member variable for time resolution to the second value and calculate
 		sigmaLL = sigmaLL2;
-		val2 = this->buildPDFnumerator();
+		val2 = this->buildPDFnumerator(measurement);
 		returnValue = (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2) ;
 	}
 
@@ -315,19 +320,24 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 
 //.............................................................
 // Core calculation of PDF value
-double LongLivedBkg_3Dangular::buildPDFnumerator()
+double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
 {
 	// Sum of two exponentials, using the time resolution functions
 
 	double returnValue = 0.;
 
-	double val1=-1., val2=-1.;
+	tlow = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMinimum();
+	thigh = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMaximum();
+	
+	double val1=-1., val2=-1., norm1=-1., norm2=-1.;
 	if( f_LL1 >= 0.9999 ) {
 		if( tauLL1 <= 0 ) {
 			cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
 			exit(1) ;
 		}
-		returnValue = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
+		val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
+		norm1= Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
+		returnValue = val1 /norm1 ;
 	}
 	else {
 		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
@@ -335,8 +345,10 @@ double LongLivedBkg_3Dangular::buildPDFnumerator()
 			exit(1) ;
 		}
 		val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
+		norm1= Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
 		val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
-		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
+		norm2= Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
+		returnValue = f_LL1 * val1/norm1 + (1. - f_LL1) * val2/norm2;
 	}
 
 	returnValue *= angularFactor();
@@ -349,6 +361,10 @@ double LongLivedBkg_3Dangular::buildPDFnumerator()
 // Normlisation
 double LongLivedBkg_3Dangular::Normalisation(PhaseSpaceBoundary * boundary)
 {
+	
+	return 1. ;
+	
+	/*
 	IConstraint * timeBound = boundary->GetConstraint( timeconstName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
@@ -381,12 +397,15 @@ double LongLivedBkg_3Dangular::Normalisation(PhaseSpaceBoundary * boundary)
 	}
 
 	return returnValue ;
+	 */
 }
 
 //.............................................................
 //
 double LongLivedBkg_3Dangular::buildPDFdenominator()
 {
+	return 1. ;
+	/*
 	// Sum of two exponentials, using the time resolution functions
 
 	double returnValue = 0;
@@ -411,6 +430,7 @@ double LongLivedBkg_3Dangular::buildPDFdenominator()
 
 	//This PDF only works for full angular phase space= 8pi factor included in the factors in the Evaluate() method - so no angular normalisation term.
 	return returnValue ;
+	 */
 
 }
 

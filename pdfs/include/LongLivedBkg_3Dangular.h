@@ -35,7 +35,7 @@ class LongLivedBkg_3Dangular : public BasePDF
 		LongLivedBkg_3Dangular& operator=( const LongLivedBkg_3Dangular& );
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
-		double buildPDFnumerator();
+		double buildPDFnumerator(DataPoint*);
 		double buildPDFdenominator();
 		double angularFactor( );
 

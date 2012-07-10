@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/07/10 Pete Clarke
+   - Mod LongLivedAngularBkg_3Dangular to deal with both transversity anf helicity histogram
+
 2012/07/10 Rob Currie
    - Adding Background Angles Histogram for 1fb 2011 jpsiphi
 
