@@ -281,7 +281,7 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	if( _useHelicityBasis ) {
 		cos1   = measurement->GetObservable( cthetakName )->GetValue();
 		cos2   = measurement->GetObservable( cthetalName )->GetValue();
-		phi    = TMath::Pi() + measurement->GetObservable( phihName )->GetValue();  // Pi offset is difference between angle calculator and "Our Paper"
+		phi    = measurement->GetObservable( phihName )->GetValue();  // Pi offset is difference between angle calculator and "Our Paper"
 	}
 	else {
 		cos1   = measurement->GetObservable( cosPsiName )->GetValue();
