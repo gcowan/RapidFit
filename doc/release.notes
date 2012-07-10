@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/07/10 Rob Currie
+   - Adding Background Angles Histogram for 1fb 2011 jpsiphi
+
 2012/07/06 Rob Currie
    - Added correct return for commandline configuration which require exiting without any further action
    - Updated Latex Param names in latex
