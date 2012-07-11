@@ -12,6 +12,8 @@
 
 #pragma link C++ class DPMassShape;
 #pragma link C++ class DPBWResonanceShape;
+#pragma link C++ class DPLassShape;
+#pragma link C++ class DPGLassShape;
 
 #pragma link C++ class DPComponent;
 #pragma link C++ class DPJpsiKSpinZero;

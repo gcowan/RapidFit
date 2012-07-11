@@ -2,6 +2,7 @@
 #include "DPJpsiKaon.hh"
 #include "DPBWResonanceShape.hh"
 #include "DPLassShape.hh"
+#include "DPGLassShape.hh"
 #include "DPBarrierFactor.hh"
 #include "DPBarrierL0.hh"
 #include "DPBarrierL1.hh"
@@ -30,7 +31,13 @@ spinKaon(spin)
   mJpsi=fmJpsi;
   if ( mShape == "LASS" )
   {
+    std::cout<<"Using Lass parametrization\n";
     massShape = new DPLassShape(mR, gammaR, LR, m1, m2, RR, a, r);
+  }
+  else if ( mShape == "gLASS" )
+  {
+    std::cout<<"Using generalize Lass parametrization\n";
+    massShape = new DPGLassShape(mR, gammaR, LR, m1, m2, RR, a, r);
   }
   else
   {

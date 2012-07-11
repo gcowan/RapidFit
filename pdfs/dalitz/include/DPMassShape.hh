@@ -15,6 +15,7 @@ class DPMassShape
 
     virtual void setResonanceParameters(double mass, double sigma) = 0;
 
+    virtual void setParameters(double* pars) = 0;
 };
 
 #endif

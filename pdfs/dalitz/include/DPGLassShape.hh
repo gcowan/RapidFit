@@ -1,24 +1,24 @@
-#ifndef DP_LASS_SHAPE
-#define DP_LASS_SHAPE
+#ifndef DP_GLASS_SHAPE
+#define DP_GLASS_SHAPE
 
 #include "DPMassShape.hh"
 #include "DPBarrierFactor.hh"
 
 #include "TComplex.h"
 
-class DPLassShape: public virtual DPMassShape
+class DPGLassShape: public virtual DPMassShape
 {
 
   public:
 
-    DPLassShape(double mR, double gammaR, int L, double m1, 
+    DPGLassShape(double mR, double gammaR, int L, double m1, 
                        double m2, double R, double a, double r);
-    ~DPLassShape();
+    ~DPGLassShape();
 
     TComplex massShape(double m);
 
     void setResonanceParameters(double a, double r);
-    void setParameters(double* pars){};
+    void setParameters(double* pars);
 
   private:
 
@@ -31,6 +31,10 @@ class DPLassShape: public virtual DPMassShape
     double r;
     DPBarrierFactor* barrier;
     double pR0;  // Momentum of daughters at mR
+
+    double fraction;
+    double phaseR;
+    double phaseB;
 
     double gamma(double m);
     double daughterMomentum(double m);

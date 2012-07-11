@@ -1,6 +1,8 @@
 #ifndef DP_JPSIKAON
 #define DP_JPSIKAON
 
+#include <string>
+
 #include "TComplex.h"
 #include "DPComponent.hh"
 #include "DPWignerFunctionJ0.hh"
