@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/07/10 Rob Currie
+   - Adding Bkg Histograms for JpsiPhi 1fb Paper
+
 2012/07/10 Pete Clarke
    - Mod LongLivedAngularBkg_3Dangular to deal with both transversity anf helicity histogram
    - Moving LL background PDF to PDF-basis for Helicity
