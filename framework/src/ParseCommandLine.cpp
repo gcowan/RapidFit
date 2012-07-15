@@ -114,6 +114,10 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "--calculateAcceptanceWeights" << endl;
 	cout << "       Calculate the Angular Acceptance Weights and Histograms for both Helicity and Transverse Basis and store the results in a .root file" << endl;
 
+	cout << endl;
+	cout << "--WeightDataSet" << endl;
+	cout << "       If a Preprocessor section is present in the XML the input data is weighted and the results are stored in the relevant file" << endl;
+
 	cout << endl;  
 }
 

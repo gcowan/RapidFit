@@ -46,6 +46,7 @@ class StringProcessing
 		 */
 		static vector<string> CombineUniques( const vector<string> List1, const vector<string> List2 );
 
+		static vector<string> RemoveDuplicates( const vector<string>, vector<string>& duplicated );
 		static vector<string> RemoveCommon( const vector<string>, const vector<string> );
 		static void RemoveElement( vector<string>& Input, string Element );
 

@@ -186,25 +186,25 @@ double SlicedAcceptance::getValue( double t ) const
 	return returnValue;
 }
 
-double SlicedAcceptance::getValue( Observable* time ) const
+double SlicedAcceptance::getValue( Observable* time, double timeOffset ) const
 {
 	if( time->GetBinNumber() != -1 )
 	{
-		return time->GetAcceptance();
+		if( time->GetOffSet() == timeOffset ) return time->GetAcceptance();
 	}
-	else
+
+	double t= time->GetValue() - timeOffset;
+	double returnValue = 0;
+	unsigned int is = 0;
+       	for( ; is < slices.size() ; ++is )
 	{
-		double t= time->GetValue();
-		double returnValue = 0 ;
-		unsigned int is = 0;
-        	for( ; is < slices.size() ; ++is )
-		{
-			if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
-        	}
-		time->SetBinNumber( (int)is );
-		time->SetAcceptance( returnValue );
-		return returnValue;
-	}
+		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
+       	}
+	time->SetBinNumber( (int)is );
+	time->SetAcceptance( returnValue );
+	time->SetOffSet( timeOffset );
+	return returnValue;
+
 }
 
 //............................................

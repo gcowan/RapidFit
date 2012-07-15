@@ -25,7 +25,7 @@ DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseu
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(NewNames), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1)
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1)
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -33,10 +33,20 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(New
 	{
 		allObservables.push_back( new Observable(NewNames[nameIndex]) );
 	}
+	vector<string> duplicates;
+	allNames = StringProcessing::RemoveDuplicates( NewNames, duplicates );
+	if( allNames.size() != NewNames.size() )
+	{
+		cerr << "WARNING: Cannot Generate a DataPoint with 2 Occurances of the same Observable" << endl;
+		for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
+		{
+			cout << *str_i << endl;
+		}
+	}
 }
 
 DataPoint::DataPoint( const DataPoint& input ) :
-	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
+	allObservables(NULL), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(NULL), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
 	thisDiscreteIndex(input.thisDiscreteIndex)
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
@@ -220,26 +230,57 @@ bool DataPoint::operator() ( pair<DataPoint*,pair<string,int> > first, pair<Data
 	return (param_val_1 < param_val_2 );
 }
 
-Observable* DataPoint::GetPseudoObservable( PseudoObservable& Input )
+double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 {
-	//	If the DataPoint already has this Observable then continue,
-	//	else, Add it to the internal list and continue
-	if( Input.GetIndex() < 0 || ( Input.GetIndex()>(int)(allPseudoObservables.size()-1) || allPseudoObservables.empty() ))
+	if(Input.GetIndex()<0)
 	{
-		allPseudoObservables.push_back( new PseudoObservable( Input ) );
-		Input.SetIndex( (int)allPseudoObservables.size()-1 );
+		string name = Input.GetName();
+		int lookup = StringProcessing::VectorContains( &allPseudoNames, &name );
+		if( lookup == -1 )
+		{
+			allPseudoObservables.push_back( new PseudoObservable( Input ) );
+			allPseudoNames.push_back( name );
+			allPseudoObservables.back()->SetIndex( (int)allPseudoObservables.size()-1 );
+			Input.SetIndex( (int)allPseudoObservables.size()-1 );
+			//cout << "<0 " << "creating" << " at " << allPseudoObservables.size()-1 << endl;
+		}
+		else
+		{
+			Input.SetIndex( lookup );
+			//cout << "found at " << lookup << endl;
+		}
+	}
+	else
+	{
+		if( Input.GetIndex()>(int)(allPseudoObservables.size()-1) )
+		{
+			//int var = allPseudoObservables.size();
+			allPseudoObservables.resize( Input.GetIndex()+1, NULL );
+			if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
+			allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
+			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
+		}
+		else
+		{
+			if( allPseudoObservables[(unsigned)Input.GetIndex()] == NULL )
+			{
+				if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
+				allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
+				//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
+			}
+		}
 	}
 
 	PseudoObservable* thisObservable = allPseudoObservables[ (unsigned)Input.GetIndex() ];
 
-	Observable* outputObservable = NULL;
+	double outputObservable = 0.;
 
 	if( thisObservable->GetValid() )
 	{
 		outputObservable = thisObservable->GetPseudoObservable();
 	}
 
-	if( !thisObservable->GetValid() || outputObservable == NULL )
+	if( !thisObservable->GetValid() || outputObservable == 0. )
 	{
 		vector<ObservableRef>* deps = thisObservable->GetDependencies();
 		vector<double> input;
@@ -253,6 +294,66 @@ Observable* DataPoint::GetPseudoObservable( PseudoObservable& Input )
 	}
 
 	thisObservable->SetValid( Input.GetValid() );
+
+	return outputObservable;
+}
+
+double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> Values )
+{
+	if(Input.GetIndex()<0)
+	{
+		string name = Input.GetName();
+		int lookup = StringProcessing::VectorContains( &allPseudoNames, &name );
+		if( lookup == -1 )
+		{
+			allPseudoObservables.push_back( new PseudoObservable( Input ) );
+			allPseudoNames.push_back( name );
+			allPseudoObservables.back()->SetIndex( (int)allPseudoObservables.size()-1 );
+			Input.SetIndex( (int)allPseudoObservables.size()-1 );
+			//cout << "<0 " << "creating" << " at " << allPseudoObservables.size()-1 << endl;
+		}
+		else
+		{
+			Input.SetIndex( lookup );
+			//cout << "found at " << lookup << endl;
+		}
+	}
+	else
+	{
+		if( Input.GetIndex()>(int)(allPseudoObservables.size()-1) )
+		{
+			//int var = allPseudoObservables.size();
+			allPseudoObservables.resize( Input.GetIndex()+1, NULL );
+			if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
+			allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
+			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
+		}
+		else
+		{
+			if( allPseudoObservables[(unsigned)Input.GetIndex()] == NULL )
+			{
+				if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
+				allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
+				//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
+			}
+		}
+	}
+
+	PseudoObservable* thisObservable = allPseudoObservables[ (unsigned)Input.GetIndex() ];
+
+	double outputObservable = 0.;
+
+	if( thisObservable->GetValid( Values ) )
+	{
+		//cout << "Cached" << endl;
+		outputObservable = thisObservable->GetPseudoObservable();
+	}
+	else
+	{
+		thisObservable->SetInput( Values );
+
+		outputObservable = thisObservable->GetPseudoObservable();
+	}
 
 	return outputObservable;
 }
@@ -277,12 +378,12 @@ void DataPoint::Print() const
 
 void DataPoint::ClearPsuedoObservable()
 {
-	while( !allPseudoObservables.empty() )
-	{
-		if( allPseudoObservables.back() != NULL ) delete allPseudoObservables.back();
-		allPseudoObservables.pop_back();
-		allPseudoNames.pop_back();
-	}
+	//while( !allPseudoObservables.empty() )
+	//{
+	//	if( allPseudoObservables.back() != NULL ) delete allPseudoObservables.back();
+	//	allPseudoObservables.pop_back();
+	//	allPseudoNames.pop_back();
+	//}
 }
 
 PhaseSpaceBoundary* DataPoint::GetPhaseSpaceBoundary() const

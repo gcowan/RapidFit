@@ -35,12 +35,10 @@ class PhaseSpaceBoundary
 		bool SetConstraint( string, IConstraint* );
 		bool SetConstraint( string, double, double, string );
 		bool SetConstraint( string, vector<double>, string );
-		void AddConstraint( string, IConstraint* );
-		IConstraint * GetConstraint( pair<string,int>* );
+		void AddConstraint( string, IConstraint*, bool overwrite=false );
 		IConstraint * GetConstraint( ObservableRef& ) const;
 		IConstraint * GetConstraint( string ) const;
 		bool IsPointInBoundary( DataPoint* );
-		//bool CheckBoundary( PhaseSpaceBoundary* );
 
 		virtual void Print() const;
 

@@ -168,11 +168,11 @@ double ConstraintFunction::Evaluate( const ParameterSet * NewParameters )
 			// This is a special one to contrain the sum of the amplitudes to 1
 			string AperpName("Aperp_sq");
 			string AzeroName("Azero_sq");
-			string AsName("As_sq");
+			//string AsName("As_sq");
 			int Aperp_i = StringProcessing::VectorContains(&parameterNames,&AperpName);
 			int Azero_i = StringProcessing::VectorContains(&parameterNames,&AzeroName);
-			int As_i = StringProcessing::VectorContains(&parameterNames,&AsName);
-			if( ((Aperp_i == -1) || (Azero_i == -1)) || (As_i == -1) )
+			//int As_i = StringProcessing::VectorContains(&parameterNames,&AsName);
+			if( ((Aperp_i == -1) || (Azero_i == -1)) )//|| (As_i == -1) )
 			{
 				cerr << "Cannot Apply " << name << " constraint" << endl;
 				to_be_removed.push_back(constraintIndex);
@@ -180,12 +180,12 @@ double ConstraintFunction::Evaluate( const ParameterSet * NewParameters )
 			}
 			double Aperpsq = NewParameters->GetPhysicsParameter(AperpName)->GetValue();
 			double Azerosq =  NewParameters->GetPhysicsParameter(AzeroName)->GetValue();
-			double Assq =  NewParameters->GetPhysicsParameter(AsName)->GetValue();
+			//double Assq =  NewParameters->GetPhysicsParameter(AsName)->GetValue();
 			double Atot_val = (*constraintIndex)->GetValue();
 			double Atot_constraint = (*constraintIndex)->GetError();
-			double excess = (Atot_val-Aperpsq-Azerosq-Assq) ;
+			double excess = (Atot_val-Aperpsq-Azerosq);//-Assq) ;
 			double penalty ;
-			if( excess >= 0 ) penalty = 0 ;
+			if( excess >= 0 ) penalty = 0;
 			else penalty = (excess*excess) / (Atot_constraint*Atot_constraint) ;
 			constraintValue += penalty;
 		}

@@ -14,6 +14,7 @@
 #include <math.h>
 #include <float.h>
 #include <sstream>
+#include <cstdlib>
 
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
@@ -21,7 +22,7 @@
 using namespace::std;
 
 //Constructor with correct argument
-	ObservableDiscreteConstraint::ObservableDiscreteConstraint( string Name, vector<double> NewValues, string NewUnit, string TF1 )
+ObservableDiscreteConstraint::ObservableDiscreteConstraint( string Name, vector<double> NewValues, string NewUnit, string TF1 )
 : name(Name), allValues(NewValues), unit(NewUnit), tf1(TF1)
 {
 	if (unit == "")
@@ -32,8 +33,24 @@ using namespace::std;
 	if( tf1 == "" || tf1.empty() ) tf1 = name;
 }
 
+ObservableDiscreteConstraint::ObservableDiscreteConstraint( const IConstraint* input )
+{
+	if( input->IsDiscrete() )
+	{
+		name=input->GetName();
+		allValues=input->GetValues();
+		unit=input->GetUnit();
+		tf1=input->GetTF1();
+	}
+	else
+	{
+		cerr << "Trying to Construct a Discrete Constraint from a Continuouse one" << endl;
+		exit(-962);
+	}
+}
+
 //Destructor
-ObservableDiscreteConstraint::~ObservableDiscreteConstraint()
+ObservableDiscreteConstraint::~ObservableDiscreteConstraint() 
 {
 }
 

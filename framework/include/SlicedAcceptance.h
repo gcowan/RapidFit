@@ -54,7 +54,7 @@ class SlicedAcceptance
 		// Methods for numerator of PDF to return acceptance for event
 		double getValue( double time ) const ;
 
-		double getValue( Observable* time ) const ;
+		double getValue( Observable* time, double timeOffset=0. ) const ;
 
 		// Methods for the normalisation integral in slices
 		unsigned int numberOfSlices() const ;

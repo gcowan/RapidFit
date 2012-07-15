@@ -28,7 +28,7 @@ PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, v
 		cerr << "No data sets configured" << endl;
 		exit(1);
 	}
-	for( vector<DataSetConfiguration*>::iterator config_i = DataConfig.begin(); config_i != DataConfig.end(); ++config_i )
+	for( vector<DataSetConfiguration*>::const_iterator config_i = DataConfig.begin(); config_i != DataConfig.end(); ++config_i )
 	{
 		dataSetMakers.push_back( new DataSetConfiguration( *(*config_i) ) );
 	}

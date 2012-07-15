@@ -546,7 +546,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if (Param_Name == "angAccI10" ) {
 
-		Name.Append("\\zeta_10");
+		Name.Append("\\zeta_{10}");
 
 	} else if (Param_Name =="deltaM" ) {
 
@@ -558,11 +558,11 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if (Param_Name == "SignalFractionUBT") {
 
-		Name.Append("{f_{UB}}^T");
+		Name.Append("f_{UB}^{T}");
 
 	} else if (Param_Name == "SignalFractionUBU") {
 
-		Name.Append("{f_{UB}}^{UT}");
+		Name.Append("f_{UB}^{UT}");
 
 	} else if (Param_Name == "SignalFractionBT") {
 
@@ -726,7 +726,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "timeResolutionScale" ) {
 
-		Name.Append("\\delta\\tau_{\\text{res}}^{\\text{scale}");
+		Name.Append("\\delta\\tau_{\\text{res}}^{\\text{scale}}");
 
 	} else if ( Param_Name == "mistagSetPoint" ) {
 
@@ -755,6 +755,10 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 	} else if ( Param_Name == "timeResolution3Fraction" ) {
 
 		Name.Append("f_{\\delta\\tau_3}");
+
+	} else if ( Param_Name == "ratio_21" ) {
+
+		Name.Append("r_{21}");
 
 	} else {
 		Name.Append("\\text{");

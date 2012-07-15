@@ -24,7 +24,7 @@ NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (
 	firstPDF( ClassLookUp::CopyPDF( input.firstPDF ) ), secondPDF( ClassLookUp::CopyPDF( input.secondPDF ) ),
 	firstIntegrator( new RapidFitIntegrator( *(input.firstIntegrator) ) ), secondIntegrator( new RapidFitIntegrator( *(input.secondIntegrator) ) ),
 	firstFraction( input.firstFraction ), firstIntegralCorrection( input.firstIntegralCorrection ), secondIntegralCorrection( input.secondIntegralCorrection ),
-	fractionName( input.fractionName ), integrationBoundary( input.integrationBoundary )
+	fractionName( input.fractionName ), integrationBoundary(NULL)
 {
 	firstIntegrator->SetPDF( firstPDF );
 	secondIntegrator->SetPDF( secondPDF );
@@ -33,14 +33,20 @@ NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
+
+	if( input.integrationBoundary != NULL ) integrationBoundary = new PhaseSpaceBoundary(*input.integrationBoundary);
 }
 
 //Constructor specifying fraction parameter name
 NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : BasePDF(),
 	prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF( FirstPDF ) ), secondPDF( ClassLookUp::CopyPDF( SecondPDF ) ),
 	firstIntegrator( new RapidFitIntegrator(FirstPDF) ), secondIntegrator( new RapidFitIntegrator(SecondPDF) ),
-	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName), integrationBoundary(InputBoundary)
+	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName), integrationBoundary(new PhaseSpaceBoundary(*InputBoundary) )
 {
+	this->SetName("NormalisedSum");
+	cout << "Constructing NormalisedSum"<< endl;
+	cout << "FractionName:\t" << FractionName << endl;
+	this->SetLabel( "NormalisedSum_("+firstPDF->GetLabel()+")v("+secondPDF->GetLabel()+")" );
 	firstIntegrator->SetPDF( firstPDF );
 	secondIntegrator->SetPDF( secondPDF );
 	//firstPDF->AssociateIntegrator( firstIntegrator );
@@ -96,6 +102,9 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 	allParameters.AddPhysicsParameters( secondPDF->GetPhysicsParameters(), false );
 	PhysicsParameter* frac_param = new PhysicsParameter( fractionName );
 	allParameters.AddPhysicsParameter( frac_param, false );
+
+	firstIntegrator->ForceTestStatus( true );
+	secondIntegrator->ForceTestStatus( true );
 }
 
 void NormalisedSumPDF::TurnCachingOff()
@@ -167,6 +176,7 @@ NormalisedSumPDF::~NormalisedSumPDF()
 	if( secondPDF != NULL ) delete secondPDF;
 	if( firstIntegrator != NULL ) delete firstIntegrator;
 	if( secondIntegrator != NULL ) delete secondIntegrator;
+	if( integrationBoundary != NULL ) delete integrationBoundary;
 }
 
 //Set the function parameters

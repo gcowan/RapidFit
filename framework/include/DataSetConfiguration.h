@@ -96,7 +96,7 @@ class DataSetConfiguration
 		 *
 		 * This is the name of the source of the DataSet i.e, Foam/File/...
 		 */
-		string GetSource();
+		string GetSource() const;
 
 		/*!
 		 * @brief External Interface to get a DataSet, either File or Toy Based
@@ -118,7 +118,7 @@ class DataSetConfiguration
 		 *
 		 * @return This simply returns a pointer to the PDF used in the Generation of the DataSet
 		 */
-		IPDF* GetGenerationPDF();
+		IPDF* GetGenerationPDF() const;
 
 		/*!
 		 * @brief Method for turning the debugging output on/off
@@ -137,6 +137,9 @@ class DataSetConfiguration
 		string XML() const;
 
 		void SetDebug( DebugClass* input_debug );
+
+		PhaseSpaceBoundary* GetPhaseSpace() const;
+
 	private:
 		/*!
 		 * @brief Don't Copy the class this way!

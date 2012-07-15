@@ -14,6 +14,9 @@ using namespace::std;
 //Constructor not specifying fraction parameter name
 ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) )
 {
+	this->SetName( "Prod" );
+        this->SetLabel( "Prod["+FirstPDF->GetLabel()+"]x["+SecondPDF->GetLabel()+"]" );
+
 	MakePrototypes();
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );

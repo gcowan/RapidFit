@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 ///	RapidFit Headers
 #include "ResultParameterSet.h"
@@ -20,12 +20,23 @@
 using namespace::std;
 
 //Constructor with correct arguments
-ResultParameterSet::ResultParameterSet( vector<string> NewNames ) : allParameters(), allNames(NewNames)
+ResultParameterSet::ResultParameterSet( vector<string> NewNames ) : allParameters(), allNames()
 {
 	//Populate the map
 	for (unsigned short int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex)
 	{
 		allParameters.push_back( new ResultParameter( NewNames[nameIndex], 0., -9999., 0., 0., 0., "type", "unit" ) );
+	}
+
+	vector<string> duplicates;
+	allNames = StringProcessing::RemoveDuplicates( NewNames, duplicates );
+	if( allNames.size() != NewNames.size() )
+	{
+		cerr << "WARNING: Cannot Generate a ResultParameterSet with 2 Occurances of the same name" << endl;
+		for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
+		{
+			cout << *str_i << endl;
+		}
 	}
 }
 

@@ -13,6 +13,7 @@
 #include <iostream>
 #include <float.h>
 #include <sstream>
+#include <cstdlib>
 
 using namespace::std;
 
@@ -23,19 +24,36 @@ using namespace::std;
 ObservableContinuousConstraint::ObservableContinuousConstraint( string Name, double NewMinimum, double NewMaximum, string NewUnit, string TF1 ) : 
 	name(Name), minimum(NewMinimum), maximum(NewMaximum), unit(NewUnit), tf1( TF1 )
 {
-	if (maximum < minimum)
+	if(maximum < minimum)
 	{
 		cerr << "Single bound \"" << Name << "\" has maximum less than minimum: values swapped" << endl;
 		minimum = NewMaximum;
 		maximum = NewMinimum;
 	}
 
-	if (unit == "")
+	if(unit == "")
 	{
 		cerr << "Single bound \"" << Name << "\" has no unit! What kind of physicist are you?" << endl;
 	}
 
 	if( tf1 == "" || tf1.empty() ) tf1 = name;
+}
+
+ObservableContinuousConstraint::ObservableContinuousConstraint( const IConstraint* input )
+{
+	if( !input->IsDiscrete() )
+	{
+		name = input->GetName();
+		minimum = input->GetMinimum();
+		maximum = input->GetMaximum();
+		unit = input->GetUnit();
+		tf1 = input->GetTF1();
+	}
+	else
+	{
+		cerr << "Trying to Construct a Discrete Constraint from a Continuouse one" << endl;
+		exit(-962);
+	}
 }
 
 //Destructor

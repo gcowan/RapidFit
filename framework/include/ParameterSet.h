@@ -82,15 +82,6 @@ class ParameterSet
 		vector<string> GetAllFixedNames() const;
 
 		/*!
-		 * @brief This returns the Parameter Requested by the Name and stores the location
-		 *
-		 * @param Input    This contains the Name of the Requested Parameter and will store the position of the Parameter once it's been found for future reference
-		 *
-		 * @return returns the Parameter with the requested Name, or at the given location if it's already been found once before and it's location stored
-		 */
-		PhysicsParameter * GetPhysicsParameter( pair<string,int>* ) const;
-
-		/*!
 		 * @brief This returns the Parameter Requested by the Name
 		 *
 		 * @param Name   This contains the Name of the Parameter being Requested

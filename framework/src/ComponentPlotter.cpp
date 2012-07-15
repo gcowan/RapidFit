@@ -77,7 +77,11 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		combination_integral.push_back( thisIntegral );
 
 		if( plotPDF->GetNumericalNormalisation() == true ) ratioOfIntegrals.push_back( 1. );
-		else ratioOfIntegrals.push_back( pdfIntegrator->GetRatioOfIntegrals() );
+		else
+		{
+			if( config->ScaleNumerical ) ratioOfIntegrals.push_back( pdfIntegrator->GetRatioOfIntegrals() );
+			else ratioOfIntegrals.push_back( 1./pdfIntegrator->GetRatioOfIntegrals() );
+		}
 	}
 
 	vector<double> minimum, maximum;

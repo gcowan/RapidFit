@@ -73,9 +73,11 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	cout << "Signal events: " << numberSignalEvents << endl;
 	cout << "Background events: " << numberBackgroundEvents << endl;
 
+	double denom_2=0.; vector<double> numer_2;
+
 	//Calculate the matrix elements to use in the sWeight
 	vector<double> signalValues, backgroundValues;
-	pair< double, double > matrixElements = CalculateMatrixElements( numberSignalEvents, numberBackgroundEvents, InputData, signalValues, backgroundValues );
+	pair< double, double > matrixElements = CalculateMatrixElements( numberSignalEvents, numberBackgroundEvents, InputData, signalValues, backgroundValues, denom_2, numer_2 );
 
 	//Now loop through input data, calculate sWeights and make a new DataSet
 	vector<string> allObservables = InputData->GetBoundary()->GetAllNames();
@@ -83,7 +85,9 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 	allObservables.push_back(weightName);
 
 	vector<DataPoint*> allPoints;
-	vector<double> allValues;
+	vector<double> allValues, allValues2;
+
+	string weightName2 = weightName+"2";
 
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
 	{
@@ -91,8 +95,23 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 		double numerator = double( ( matrixElements.first * signalValues[unsigned(eventIndex)] )
 				+ ( matrixElements.second * backgroundValues[unsigned(eventIndex)] ) );
 
+		double numerator2 =
+		(numer_2[0]*signalValues[unsigned(eventIndex)])*(numer_2[0]*signalValues[unsigned(eventIndex)]) +
+		(numer_2[1]*backgroundValues[unsigned(eventIndex)])*(numer_2[1]*backgroundValues[unsigned(eventIndex)])
+		+ 2.*(numer_2[0]*signalValues[unsigned(eventIndex)])
+		    *(numer_2[1]*backgroundValues[unsigned(eventIndex)]);
+		numerator2/=denom_2;
+
 		double denominator = double( ( double(numberSignalEvents) * signalValues[unsigned(eventIndex)] )
 				+ ( double(numberBackgroundEvents) * backgroundValues[unsigned(eventIndex)] ) );
+
+		double denominator2 =
+		(double(numberSignalEvents)*signalValues[unsigned(eventIndex)])
+		*(double(numberSignalEvents)*signalValues[unsigned(eventIndex)]) +
+		(double(numberBackgroundEvents)*backgroundValues[unsigned(eventIndex)])
+		*(double(numberBackgroundEvents)*backgroundValues[unsigned(eventIndex)])
+		+ 2.*(double(numberSignalEvents)*signalValues[unsigned(eventIndex)])
+		    *(double(numberBackgroundEvents)*backgroundValues[unsigned(eventIndex)]);
 
 		//Make the new data point
 		DataPoint * currentEvent = InputData->GetDataPoint(eventIndex);
@@ -100,17 +119,23 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 
 		//Add the sWeight as an Observable
 		newEvent->AddObservable( weightName, numerator / denominator, 0.0, "Unitless" );
+		newEvent->AddObservable( weightName2, numerator2 / denominator2, 0.0, "Unitless" );
 
 		allValues.push_back( numerator / denominator );
+		allValues2.push_back( numerator2 / denominator2 );
 		allPoints.push_back( newEvent );
 	}
 
         PhaseSpaceBoundary* dataSetBoundary = new PhaseSpaceBoundary( *(InputData->GetBoundary()) );
-	double min=0, max=0;
+	double min=0., max=0., min2=0., max2=0.;
 	min = StatisticsFunctions::Minimum( allValues );
 	max = StatisticsFunctions::Maximum( allValues );
+	min2 = StatisticsFunctions::Minimum( allValues2 );
+	max2 = StatisticsFunctions::Maximum( allValues2 );
 	ObservableContinuousConstraint* weightConstraint = new ObservableContinuousConstraint( weightName, min, max, "Unitless" );
+	ObservableContinuousConstraint* weightConstraint2 = new ObservableContinuousConstraint( weightName2, min2, max2, "Unitless" );
 	dataSetBoundary->AddConstraint( weightName, weightConstraint );
+	dataSetBoundary->AddConstraint( weightName2, weightConstraint2 );
         MemoryDataSet * newDataSet = new MemoryDataSet( dataSetBoundary );
 
 	for( unsigned int i=0; i< allPoints.size(); ++i )
@@ -128,7 +153,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 }
 
 //A separate method for calculating the martix elements for the weight
-pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long NumberSignal, long NumberBackground, IDataSet * InputData, vector<double> & SignalValues, vector<double> & BackgroundValues )
+pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long NumberSignal, long NumberBackground, IDataSet * InputData, vector<double> & SignalValues, vector<double> & BackgroundValues, double& denom_2, vector<double>& numer_2 )
 {
 	//The three unique components of the matrix (one is used twice)
 	double signalSignal = 0.0;
@@ -169,6 +194,12 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long Numbe
 	double discriminant = ( signalSignal * backgroundBackground ) - ( signalBackground * signalBackground );
 	double returnSignalSignal = backgroundBackground / discriminant;
 	double returnSignalBackground = -signalBackground / discriminant;
+
+	double den_2 = (signalSignal*backgroundBackground)*(signalSignal*backgroundBackground) + (signalBackground*signalBackground)*(signalBackground*signalBackground) - 2.*(signalSignal*backgroundBackground)*(signalBackground*signalBackground);
+	denom_2 = den_2;
+
+	vector<double> num_2; num_2.push_back( backgroundBackground ); num_2.push_back( -signalBackground );
+	numer_2 = num_2;
 
 	//Return results
 	SignalValues = saveSignalValues;

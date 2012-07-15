@@ -100,18 +100,22 @@ vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<strin
 {
 	//Construct a vector<vector> containing all discrete values. List the names of discrete and continuous observables.
 	vector<string>::iterator nameIterator;
-	for ( nameIterator = AllNames->begin(); nameIterator != AllNames->end(); ++nameIterator )
+	for( nameIterator = AllNames->begin(); nameIterator != AllNames->end(); ++nameIterator )
 	{
 		IConstraint * observableConstraint = InputBoundary->GetConstraint( *nameIterator );
-		if ( observableConstraint->IsDiscrete() )
+		if( observableConstraint != NULL )
 		{
-			discreteValues.push_back( observableConstraint->GetValues() );
-			DiscreteNames.push_back( *nameIterator );
+			if ( observableConstraint->IsDiscrete() )
+			{
+				discreteValues.push_back( observableConstraint->GetValues() );
+				DiscreteNames.push_back( *nameIterator );
+			}
+			else
+			{
+				ContinuousNames.push_back( *nameIterator );
+			}
 		}
-		else
-		{
-			ContinuousNames.push_back( *nameIterator );
-		}
+		else return vector<vector<double> >();
 	}
 
 	//Make a vector of combinations of discrete values

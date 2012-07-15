@@ -23,6 +23,7 @@ class ObservableDiscreteConstraint : public IConstraint
 {
 	public:
 		ObservableDiscreteConstraint( string, vector<double>, string, string="" );
+		ObservableDiscreteConstraint( const IConstraint* input );
 		~ObservableDiscreteConstraint();
 
 		void AddValue(double);

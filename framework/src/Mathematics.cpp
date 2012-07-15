@@ -641,5 +641,71 @@ namespace Mathematics
 		return;
 	}
 
+	double Exp_Wrapper( vector<double> input )
+	{
+		return Exp( input[0], input[1], input[2] );
+	}
+
+	double ExpInt_Wrapper( vector<double> input )
+	{
+		return ExpInt( input[0], input[1], input[2], input[3] );
+	}
+
+	double Exp_betaAcceptance_Wrapper( vector<double> input )
+	{
+		return Exp_betaAcceptance( input[0], input[1], input[2], input[3] );
+	}
+
+	double ExpInt_betaAcceptance_Wrapper( vector<double> input )
+	{
+		return ExpInt_betaAcceptance( input[0], input[1], input[2], input[3], input[4] );
+	}
+
+	double ExpCosh_Wrapper( vector<double> input )
+	{
+		return ExpCosh( input[0], input[1], input[2], input[3] );
+	}
+
+	double ExpCoshInt_Wrapper( vector<double> input )
+	{
+		return ExpCoshInt( input[0], input[1], input[2], input[3], input[4] );
+	}
+
+	double ExpSinh_Wrapper( vector<double> input )
+	{
+		return ExpSinh( input[0], input[1], input[2], input[3] );
+	}
+
+	double ExpSinhInt_Wrapper( vector<double> input )
+	{
+		return ExpSinhInt( input[0], input[1], input[2], input[3], input[4] );
+	}
+
+	double ExpCos_Wrapper( vector<double> input )
+	{
+		return ExpCos( input[0], input[1], input[2], input[3] );
+	}
+
+	double ExpCosInt_Wrapper( vector<double> input )
+	{
+		return ExpCosInt( input[0], input[1], input[2], input[3], input[4] );
+	}
+
+	double ExpSin_Wrapper( vector<double> input )
+	{
+		return ExpSin( input[0], input[1], input[2], input[3] );
+	}
+
+	double ExpSinInt_Wrapper( vector<double> input )
+	{
+		return ExpSinInt( input[0], input[1], input[2], input[3], input[4] );
+	}
+
+	double expErfInt_Wrapper( vector<double> input )
+	{
+		return expErfInt( input[0], input[1], input[2] );
+	}
+
 }
+
 

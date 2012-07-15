@@ -26,7 +26,7 @@ class SWeightPrecalculator : public IPrecalculator
 		~SWeightPrecalculator();
 
 		virtual IDataSet * ProcessDataSet( IDataSet* );
-		pair< double, double > CalculateMatrixElements( long, long, IDataSet*, vector<double>&, vector<double>& );
+		pair< double, double > CalculateMatrixElements( long, long, IDataSet*, vector<double>&, vector<double>&, double&, vector<double>& );
 
 	private:
 

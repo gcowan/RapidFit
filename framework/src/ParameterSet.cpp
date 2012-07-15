@@ -58,7 +58,7 @@ ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNa
 	uniqueID = reinterpret_cast<size_t>(this)+1;
 }
 
-ParameterSet& ParameterSet::operator= ( const ParameterSet& input ) 
+ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 {
 	if( this != &input )
 	{
@@ -84,8 +84,18 @@ ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 }
 
 //Constructor with correct arguments
-ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(NewNames), trusted_set(false), trusted( false ), uniqueID(0)
+ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(), trusted_set(false), trusted( false ), uniqueID(0)
 {
+	vector<string> duplicates;
+	allNames = StringProcessing::RemoveDuplicates( NewNames, duplicates );
+	if( allNames.size() != NewNames.size() )
+	{
+		cerr << "WARNING: Cannot Generate a ParameterSet with 2 Occurances of the same name" << endl;
+                for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
+                {
+                        cout << *str_i << endl;
+                }
+	}
 	//Populate the map
 	for( unsigned int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex )
 	{
@@ -136,24 +146,6 @@ vector<string> ParameterSet::GetAllFloatNames() const
 	}
 	return Not_Fixed_List;
 }
-
-//Retrieve a physics parameter it's cached index, or find it and save it's index for reference
-PhysicsParameter * ParameterSet::GetPhysicsParameter( pair<string,int>* wanted_param ) const
-{
-	if( wanted_param->second != -1 )
-	{
-		return allParameters[unsigned(wanted_param->second)];
-	} else {
-		wanted_param->second = StringProcessing::VectorContains( &allNames, &(wanted_param->first) );
-	}
-	if( wanted_param->second == -1 ){
-		cerr << "PhysicsParameter " << wanted_param->first << " not found" <<endl;
-		exit(-3);
-	}else{
-		return allParameters[unsigned(wanted_param->second)];}
-	throw(-20);
-}
-
 
 //Retrieve a physics parameter by its name
 PhysicsParameter * ParameterSet::GetPhysicsParameter( const string Name ) const
@@ -465,7 +457,7 @@ size_t ParameterSet::GetUniqueID() const
 
 void ParameterSet::SetUniqueID( size_t input )
 {
-	uniqueID = input;	
+	uniqueID = input;
 }
 
 void ParameterSet::FloatedFirst()

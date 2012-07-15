@@ -24,8 +24,8 @@
 
 
 //Constructor with correct arguments
-PhaseSpaceBoundary::PhaseSpaceBoundary( vector<string> NewNames ) :
-	allConstraints(), allNames(NewNames), DiscreteCombinationNumber(-1)
+PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
+	allConstraints(), allNames(), DiscreteCombinationNumber(-1)
 {
 	allConstraints.reserve(NewNames.size());
 	//Populate the map
@@ -33,25 +33,37 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( vector<string> NewNames ) :
 	{
 		allConstraints.push_back(NULL);
 	}
+	vector<string> duplicates;
+	allNames = StringProcessing::RemoveDuplicates( NewNames, duplicates );
+	if( allNames.size() != NewNames.size() )
+	{
+		cerr << "WARNING: PhaseSpace Cannot be created with multiple occurances of the same Observable!" << endl;
+		for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
+		{
+			cout << *str_i << endl;
+		}
+	}
 }
 
 PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) :
 	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber)
 {
-	allConstraints.reserve( NewBoundary.allConstraints.size() );
-	for( unsigned int i=0; i< NewBoundary.allConstraints.size(); ++i )
+	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
-		if( NewBoundary.allConstraints[i]->IsDiscrete() )
+		if( NewBoundary.allConstraints[i] != NULL )
 		{
-			allConstraints.push_back( new ObservableDiscreteConstraint( string(NewBoundary.allNames[i]),
-						vector<double>(NewBoundary.allConstraints[i]->GetValues()), string(NewBoundary.allConstraints[i]->GetUnit()),
-						string(NewBoundary.allConstraints[i]->GetTF1()) ) );
+			if( NewBoundary.allConstraints[i]->IsDiscrete() )
+			{
+				allConstraints.push_back( new ObservableDiscreteConstraint( NewBoundary.allConstraints[i] ));
+			}
+			else
+			{
+				allConstraints.push_back( new ObservableContinuousConstraint( NewBoundary.allConstraints[i] ));
+			}
 		}
 		else
 		{
-			allConstraints.push_back( new ObservableContinuousConstraint( string(NewBoundary.allNames[i]),
-						double(NewBoundary.allConstraints[i]->GetMinimum()), double(NewBoundary.allConstraints[i]->GetMaximum()),
-						string(NewBoundary.allConstraints[i]->GetUnit()), string(NewBoundary.allConstraints[i]->GetTF1()) ) );
+			allConstraints.push_back(NULL);
 		}
 	}
 }
@@ -91,22 +103,6 @@ vector<string> PhaseSpaceBoundary::GetContinuousNames() const
 		if( (*constr_i)->IsDiscrete() == false ) cont_names.push_back( (*name_i) );
 	}
 	return cont_names;
-}
-
-//Retrieve a constraint by its name
-IConstraint * PhaseSpaceBoundary::GetConstraint( pair<string,int>* wanted_constraint )
-{
-	if( wanted_constraint->second != -1 )
-	{
-		return allConstraints[unsigned(wanted_constraint->second)];
-	} else {
-		wanted_constraint->second = StringProcessing::VectorContains( &allNames, &(wanted_constraint->first) );
-	}
-	if( wanted_constraint->second == -1 ){
-		cerr << "PhysicsParameter " << wanted_constraint->first << " not found" <<endl;
-	}else{
-		return allConstraints[unsigned(wanted_constraint->second)];}
-	exit(-1);
 }
 
 IConstraint * PhaseSpaceBoundary::GetConstraint( ObservableRef& object ) const
@@ -153,7 +149,14 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 	{
 		//Delete the old constraint before overwriting pointer
 		if( allConstraints[unsigned(nameIndex)] != NULL ) delete allConstraints[unsigned(nameIndex)];
-		allConstraints[unsigned(nameIndex)] = NewConstraint;
+		if( NewConstraint->IsDiscrete() )
+		{
+			allConstraints[unsigned(nameIndex)] = new ObservableDiscreteConstraint( *((ObservableDiscreteConstraint*)NewConstraint) );
+		}
+		else
+		{
+			allConstraints[unsigned(nameIndex)] = new ObservableContinuousConstraint( *((ObservableContinuousConstraint*)NewConstraint) );
+		}
 		return true;
 	}
 }
@@ -162,27 +165,35 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 bool PhaseSpaceBoundary::SetConstraint( string Name, double Minimum, double Maximum, string Unit )
 {
 	ObservableContinuousConstraint * newConstraint = new ObservableContinuousConstraint( Name, Minimum, Maximum, Unit );
-	bool returnValue = SetConstraint( Name, newConstraint );
+	bool returnValue = this->SetConstraint( Name, newConstraint );
+	delete newConstraint;
 	return returnValue;
 }
 
 bool PhaseSpaceBoundary::SetConstraint( string Name, vector<double> Values, string Unit )
 {
 	ObservableDiscreteConstraint * newConstraint = new ObservableDiscreteConstraint( Name, Values, Unit );
-	bool returnValue = SetConstraint( Name, newConstraint );
+	bool returnValue = this->SetConstraint( Name, newConstraint );
+	delete newConstraint;
 	return returnValue;
 }
 
-void PhaseSpaceBoundary::AddConstraint( string Name, IConstraint* NewConstraint )
+void PhaseSpaceBoundary::AddConstraint( string Name, IConstraint* NewConstraint, bool overwrite )
 {
-	if( StringProcessing::VectorContains( &allNames, &Name ) == -1 )
+	int lookup = StringProcessing::VectorContains( &allNames, &Name );
+	if( lookup == -1 )
 	{
 		allNames.push_back( Name );
-		allConstraints.push_back( NewConstraint );
+		allConstraints.push_back( NULL );
+		this->SetConstraint( Name, NewConstraint );
+	}
+	else if( allConstraints[lookup] == NULL )
+	{
+		this->SetConstraint( Name, NewConstraint );
 	}
 	else
 	{
-		SetConstraint( Name, NewConstraint );
+		if( overwrite ) this->SetConstraint( Name, NewConstraint );
 	}
 }
 
@@ -228,10 +239,11 @@ bool PhaseSpaceBoundary::IsPointInBoundary( DataPoint * TestDataPoint )
 void PhaseSpaceBoundary::Print() const
 {
 	cout << "PhaseSpaceBoundary:" << endl;
-	for( unsigned int i=0; i< allConstraints.size(); ++i )
+	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
 		cout << "Name: " << allNames[i] << "\t";
-		allConstraints[i]->Print();
+		if( allConstraints[i] != NULL ) allConstraints[i]->Print();
+		else cout << "NULL" << endl;
 	}
 	cout << endl;
 }
@@ -243,7 +255,16 @@ DataPoint* PhaseSpaceBoundary::GetMidPoint() const
 	vector<string>::const_iterator name_i = allNames.begin();
 	for( vector<IConstraint*>::const_iterator const_i = allConstraints.begin(); const_i != allConstraints.end(); ++const_i, ++name_i )
 	{
-		Observable* thisMiddleObservable = (*const_i)->GetMidRangeValue();
+		Observable* thisMiddleObservable=NULL;
+		if( (*const_i) !=NULL )
+		{
+			thisMiddleObservable = (*const_i)->GetMidRangeValue();
+		}
+		else
+		{
+			delete returnable_point;
+			return NULL;
+		}
 		returnable_point->AddObservable( *name_i, thisMiddleObservable );
 		delete thisMiddleObservable;
 	}
@@ -285,6 +306,7 @@ vector<DataPoint*> PhaseSpaceBoundary::GetDiscreteCombinations() const
 	vector<DataPoint*> newDataPoints;
 
 	DataPoint* tempPoint = this->GetMidPoint();
+	if( tempPoint == NULL ) newDataPoints;
 
 	for( unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
 	{

@@ -26,10 +26,6 @@ class PseudoObservable
 		~PseudoObservable();
 
 		void AddFunction( double (*pseudoRelation)(vector<double>) );
-		void AddFunction( double (*pseudoRelation)(vector<double>,vector<double>) );
-
-		void AddErrorFunction( double (*pseudoRelation)(vector<double>) );
-		void AddErrorFunction( double (*pseudoRelation)(vector<double>,vector<double>) );
 
 		void AddDependency( ObservableRef Input );
 
@@ -41,29 +37,25 @@ class PseudoObservable
 		 * @param Input      true: yes PseudoObservable will be recalculated
 		 *                   false: no PseudoObservable will NOT be recalculated
 		 */
-		void SetValid( bool Input );
+		void SetValid( bool Input ) const;
 
-		bool GetValid();
+		bool GetValid() const;
+
+		bool GetValid( const vector<double> input ) const;
 
 		vector<ObservableRef>* GetDependencies();
 
-		void SetInput( vector<double> );
+		void SetInput( const vector<double> );
 
 		double GetValue() const;
 
-		double GetError() const;
-
 		string GetName() const;
 
-		void SetUnit( string );
-
-		string GetUnit() const;
-
-		Observable* GetPseudoObservable();
+		double GetPseudoObservable();
 
 		int GetIndex() const;
 
-		void SetIndex( int );
+		void SetIndex( const int ) const;
 
 		void Print() const;
 
@@ -71,25 +63,16 @@ class PseudoObservable
 
 	private:
 		double (*internal_function)(vector<double>);
-		double (*internal_function_extra)(vector<double>,vector<double>);
-		double (*internal_error_function)(vector<double>);
-		double (*internal_error_function_extra)(vector<double>,vector<double>);
 
 		vector<ObservableRef> Dependencies;
 
 		mutable double Value;
-		mutable double Error;
-
 		mutable bool valid;
 
 		string Name;
-		string Unit;
-
-		int Index;
+		mutable int Index;
 
 		vector<double> internal_Input;
-
-		Observable* internalObservable;
 };
 
 #endif

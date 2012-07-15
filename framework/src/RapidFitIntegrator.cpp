@@ -58,7 +58,7 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerica
 
 RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : ratioOfIntegrals( input.ratioOfIntegrals ),
 	fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
-	functionCanIntegrate( input.functionCanIntegrate ), haveTestedIntegral( input.haveTestedIntegral ),
+	functionCanIntegrate( input.functionCanIntegrate ), haveTestedIntegral( true ),//input.haveTestedIntegral ),
 	RapidFitIntegratorNumerical( input.RapidFitIntegratorNumerical ), obs_check( input.obs_check ), checked_list( input.checked_list ), debug((input.debug==NULL)?NULL:new DebugClass(*input.debug))
 {
 	//	We don't own the PDF so no need to duplicate it as we have to be told which one to use
@@ -249,7 +249,7 @@ void RapidFitIntegrator::SetPDF( IPDF* input )
 }
 
 double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate,
-		DebugClass* debug )
+		bool haveTestedIntegral, DebugClass* debug )
 {
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
 	if( debug != NULL ) quickFunction->SetDebug( debug );
@@ -295,7 +295,7 @@ double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint,
 }
 
 double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, bool haveTestedIntegral, DebugClass* debug )
 {
 	//Make arrays of the observable ranges to integrate over
 	double* minima = new double[ doIntegrate.size() ];
@@ -415,11 +415,8 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			if( !haveTestedIntegral )
 			{
 				double testIntegral = functionToWrap->Integral( *dataPoint_i, NewBoundary );
-				if( debug->GetStatus() )
-				{
-					cout << "Integration Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
-					cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
-				}
+				cout << "Integration Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
+				cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
 			}
 
 			output_val += numericalIntegral;

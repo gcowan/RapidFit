@@ -21,7 +21,7 @@ class LongLivedBkg_3Dangular : public BasePDF
 	public:
 		//LongLivedBkg_3Dangular();
 		LongLivedBkg_3Dangular( PDFConfigurator* );
-		LongLivedBkg_3Dangular( const LongLivedBkg_3Dangular& );
+		//LongLivedBkg_3Dangular( const LongLivedBkg_3Dangular& );
 		~LongLivedBkg_3Dangular();
 
 		//Calculate the PDF value
@@ -95,6 +95,8 @@ class LongLivedBkg_3Dangular : public BasePDF
 		double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
 		double total_num_entries;
 		bool useFlatAngularDistribution;
+
+		DataPoint* _datapoint;
 };
 
 #endif

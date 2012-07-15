@@ -86,7 +86,7 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 		fit_thread_data[threadnum].weightsSquared = weightsSquared;
 	}
 
-	//cout << "Create Threads" << endl;
+	//cout << "Creating Threads" << endl;
 
 	//	Create the Threads and set them to be joinable
 	for( unsigned int threadnum=0; threadnum< (unsigned)Threads ; ++threadnum )

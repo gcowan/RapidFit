@@ -18,7 +18,7 @@ using namespace::std;
 
 //Constructor with correct argument
 Observable::Observable( string Name, double NewValue, double NewError, string NewUnit )
-	: name(Name), value(NewValue), error(NewError), unit(NewUnit), bin_num(-1), acceptance(-1.)
+	: name(Name), value(NewValue), error(NewError), unit(NewUnit), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.)
 {
 	if (unit == "")
 	{
@@ -26,7 +26,7 @@ Observable::Observable( string Name, double NewValue, double NewError, string Ne
 	}
 }
 
-Observable::Observable( string Name ) : name(Name), value(0.), error(0.), unit("Uninitialised"), bin_num(-1), acceptance(-1.)
+Observable::Observable( string Name ) : name(Name), value(0.), error(0.), unit("Uninitialised"), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.)
 {
 }
 
@@ -58,9 +58,19 @@ void Observable::SetBinNumber( int input ) const
 	bin_num = input;
 }
 
+void Observable::SetBkgBinNumber( int input ) const
+{
+	bkg_bin_num = input;
+}
+
 int Observable::GetBinNumber() const
 {
 	return bin_num;
+}
+
+int Observable::GetBkgBinNumber() const
+{
+	return bkg_bin_num;
 }
 
 void Observable::SetAcceptance( double input ) const
@@ -68,9 +78,19 @@ void Observable::SetAcceptance( double input ) const
 	acceptance = input;
 }
 
+void Observable::SetBkgAcceptance( double input ) const
+{
+	bkg_acceptance = input;
+}
+
 double Observable::GetAcceptance() const
 {
 	return acceptance;
+}
+
+double Observable::GetBkgAcceptance() const
+{
+	return bkg_acceptance;
 }
 
 string Observable::GetName() const
@@ -96,5 +116,22 @@ void Observable::SetObservable( Observable* input )
 	unit = input->GetUnit();
 }
 
+void Observable::ExternallySetValue( double input )
+{
+	value = input;
+}
 
+void Observable::ExternallySetError( double input )
+{
+	error = input;
+}
 
+void Observable::SetOffSet( double input ) const
+{
+	offset = input;
+}
+
+double Observable::GetOffSet() const
+{
+	return offset;
+}

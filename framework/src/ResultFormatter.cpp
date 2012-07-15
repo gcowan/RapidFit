@@ -378,8 +378,9 @@ void ResultFormatter::LatexDocHeader( stringstream& latex )
 	latex << "\\usepackage{amsmath}" << endl;
 	latex << "\\usepackage{caption}" << endl;
 	latex << "\\usepackage{rotating}" << endl;
-	latex << "\\usepackage{subcaption}" << endl;
+	//latex << "\\usepackage{subcaption}" << endl;
 	latex << "\\usepackage{graphicx}" << endl;
+	latex << "\\usepackage[a4paper]{geometry}" << endl;
 	latex << endl;
 	latex << "\\let\\oldpm\\pm" << endl;
 	latex << endl;
@@ -413,7 +414,7 @@ void ResultFormatter::TableHeader( stringstream& latex, unsigned int colnum )
 
 void ResultFormatter::TableHeaderLandscape( stringstream& latex, unsigned int colnum )
 {
-	latex << endl;
+	latex << "\\newgeometry{left=3cm,bottom=2cm}" << endl;
 	latex << "\\renewcommand{\\pm}{\\ensuremath{\\oldpm} }" << endl;
 	latex << "\\begin{sidewaystable}[h]" << endl;
 	latex << "\\begin{center}" << endl;
@@ -447,6 +448,7 @@ void ResultFormatter::TableFooterLandscape( stringstream& latex )
 	latex << "\\end{center}" << endl;
 	latex << "\\end{sidewaystable}" << endl;
 	latex << "\\renewcommand{\\pm}{\\oldpm}" << endl;
+	latex << "\\restoregeometry" << endl;
 	latex << endl;
 }
 
@@ -551,7 +553,7 @@ void ResultFormatter::LatexCovMatrix( FitResult * OutputData, stringstream& late
 		}
 		if( freeNames.size() > 20 )
 		{
-			latex << "\\sriptsize" << endl;
+			latex << "\\scriptsize" << endl;
 			latex << "\\renewcommand*{\\arraystretch}{0.9}" << endl;
 			latex << "\\renewcommand{\\tabcolsep}{1.pt}" << endl;
 		}

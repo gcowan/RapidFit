@@ -38,26 +38,40 @@ using namespace::std;
 //Constructor with correct argument
 DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, int starting_entry, PhaseSpaceBoundary* Boundary ) :
 	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
-	generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false), Start_Entry(starting_entry), DEBUG_DATA(false), internalBoundary( (Boundary!=NULL)?(new PhaseSpaceBoundary(*Boundary)):NULL ),
+	generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false), Start_Entry(starting_entry), DEBUG_DATA(false), internalBoundary(NULL),
 	internalRef(NULL), debug( new DebugClass(false) )
 {
+	if( Boundary != NULL )
+	{
+		internalBoundary = new PhaseSpaceBoundary(*Boundary);
+		//internalBoundary->Print();
+	}
 }
 
 //Constructor with separate data generation PDF
 DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF, PhaseSpaceBoundary* Boundary ) :
 	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
-	generatePDF( ClassLookUp::CopyPDF(DataPDF) ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false), internalBoundary( (Boundary!=NULL)?(new PhaseSpaceBoundary(*Boundary)):NULL ),
+	generatePDF( ClassLookUp::CopyPDF(DataPDF) ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false), internalBoundary(NULL),
 	internalRef(NULL), debug( new DebugClass(false) )
 {
+	if( Boundary != NULL )
+	{
+		internalBoundary = new PhaseSpaceBoundary(*Boundary);
+		//internalBoundary->Print();
+	}
 }
 
 DataSetConfiguration::DataSetConfiguration ( const DataSetConfiguration& input ) :
 	source(input.source), cutString(input.cutString), numberEvents(input.numberEvents), arguments(input.arguments), argumentNames(input.argumentNames),
 	generatePDF( (input.generatePDF==NULL)?NULL:ClassLookUp::CopyPDF(input.generatePDF) ), separateGeneratePDF(input.separateGeneratePDF), parametersAreSet(input.parametersAreSet),
-	Start_Entry(input.Start_Entry), DEBUG_DATA(input.DEBUG_DATA), internalBoundary( (input.internalBoundary!=NULL)?(new PhaseSpaceBoundary(*input.internalBoundary)):NULL ),
-	internalRef(NULL), debug( new DebugClass(*input.debug))
+	Start_Entry(input.Start_Entry), DEBUG_DATA(input.DEBUG_DATA), internalBoundary(NULL), internalRef(NULL), debug( new DebugClass(*input.debug))
 {
 	if( !(input.debug->GetStatus()) ) debug->SetStatus(false);
+	if( input.internalBoundary != NULL )
+	{
+		internalBoundary = new PhaseSpaceBoundary( *input.internalBoundary );
+		//internalBoundary->Print();
+	}
 }
 
 //Destructor
@@ -68,7 +82,7 @@ DataSetConfiguration::~DataSetConfiguration()
 	if( debug != NULL ) delete debug;
 }
 
-IPDF* DataSetConfiguration::GetGenerationPDF()
+IPDF* DataSetConfiguration::GetGenerationPDF() const
 {
 	return generatePDF;
 }
@@ -100,7 +114,7 @@ bool DataSetConfiguration::SetSource( string NewSource )
 	return true;
 }
 
-string DataSetConfiguration::GetSource()
+string DataSetConfiguration::GetSource() const
 {
 	return source;
 }
@@ -422,6 +436,8 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		Plot_Options = "goff";
 	}
 
+	//DataBoundary->Print();
+
 	TCanvas* bob = new TCanvas( Name, Name, 1680, 1050 );
 
 	TString FormulaName="Fomula_";
@@ -432,8 +448,18 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 		//  Construct a Plot String to use the TTree->Draw Method
 
-		IConstraint* this_const = DataBoundary->GetConstraint( observableNames[unsigned(obsIndex)] );
-		PlotString = "("+this_const->GetTF1()+")";
+		ObservableRef refName = ObservableRef( observableNames[unsigned(obsIndex)] );
+
+		IConstraint* this_const = DataBoundary->GetConstraint( refName );
+		if( this_const != NULL )
+		{
+			PlotString = "("+this_const->GetTF1()+")";
+		}
+		else
+		{
+			cerr << "CANNOT FIND CONSTRAINT: " << string(refName) << endl;
+			exit(-8734);
+		}
 
 		TString thisFormulaName = FormulaName; thisFormulaName+=obsIndex;
 		TTreeFormula* tempFormula = new TTreeFormula( thisFormulaName, PlotString, ntuple );
@@ -641,6 +667,11 @@ void DataSetConfiguration::SetDebug( DebugClass* input_debug )
 		if( debug != NULL ) delete debug;
 		debug = new DebugClass(false);
 	}
+}
+
+PhaseSpaceBoundary* DataSetConfiguration::GetPhaseSpace() const
+{
+	return internalBoundary;
 }
 
 

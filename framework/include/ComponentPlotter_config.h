@@ -30,14 +30,15 @@ class CompPlotter_config
                  */                                                                                                                      
                 CompPlotter_config() :                                                                                                   
                         data_bins(100), PDF_points(128), observableName("undefined"), logY(false), color_key(), style_key(), width_key(), component_names(), PlotTitle(""),
-                        xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false)
+                        xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false), ScaleNumerical(true)
+
                 {}                                                                                                                       
                                                                                                                                          
                                                                                                                                          
                 int data_bins;                  /*!     This is the total number of bins which should be used when binning the dataset                                          */
                 int PDF_points;                 /*!     This is the number of points which the PDF should be interrogated for across the whole Observable range                 */
                 string observableName;          /*!     This is the Name of the Observable that is being Projected                                                              */
-                bool logY;                      /*!     This is the boolean governing if the Y axis should be on a log scale                                                  */
+                bool logY;                      /*!     This is the boolean governing if the Y axis should be on a log scale                                                    */
                 vector<int> color_key;          /*!     This is a vector of numbers, each number corresponding to the Color_t which is given to the corresponding component     */
                 vector<int> style_key;          /*!     This is a vector of numbers, each number corresponding to the Style_t which is given to the corresponding component     */
                 vector<int> width_key;          /*!     This is a vector of numbers, each number corresponding to the Width_t which is given to the corresponding component     */
@@ -48,6 +49,7 @@ class CompPlotter_config
                 bool CalcChi2;                  /*!     This boolean lets the class know you want the Chi2 value calculated between this DataSet and PDF                        */
                 double Chi2Value;               /*!     This is where the Chi2 final value is stored after it's calculated                                                      */
                 bool OnlyZero;                  /*!     If true this class will mimic the correct behaviour of the old Plotter class                                            */
+		bool ScaleNumerical;		/*!	Do you scale the Numerical or Analytical Integral                                                                       */
 };
 
 #endif

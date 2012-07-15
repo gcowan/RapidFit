@@ -105,19 +105,15 @@ class DataPoint
 		void RemoveObservable( const string Name );
 
 		/*!
-		 *	Pseudo-Observable function which returns an Observable or creates one using the given dependency and relation
-		 *	Useful as once th observable is created it's permanently stored in the DataPoint and the result is cached
-		 *	This is intended to reduce the number of angular calculations by effectively pre-processing the dataset
-		 */
-
-		/*!
 		 * @brief This allows you to add a new Psuedo-Observable to this DataPoint, useful when you have a per-event complex object which you don't want to calculate multiple times
 		 *
 		 * @param Input    This is the new PseudoObservable class which allows for all of the information required to be wrapped up in a convenient wrapper
 		 *
 		 * @return returns a pointer to an observable which can be interrogated in exactly the same way as a normal Observable object
 		 */
-		Observable* GetPseudoObservable( PseudoObservable& Input );
+		double GetPseudoObservable( PseudoObservable& Input );
+
+		double GetPseudoObservable( PseudoObservable& Input, vector<double> );
 
 		/*!
 		 * @brief Remove all stored Pseudo-Observable Objects
@@ -246,8 +242,6 @@ class DataPoint
 		 */
 		DataPoint& operator= ( const DataPoint& );
 
-
-
 		/*!
 		 *	This is REAL Data i.e. it was read in from a file
 		 */
@@ -262,8 +256,6 @@ class DataPoint
 		 */
 		vector<string> allNames;
 
-
-
 		/*!
 		 *	This is Pseudo-Data i.e. it only varies event to event but it has been calculated at runtime
 		 */
@@ -271,17 +263,12 @@ class DataPoint
 		/*!
 		 * A list of the names of the pseudo-Observables that exist in this DataPoint
 		 */
-		vector<string> allPseudoNames;
-
+		mutable vector<string> allPseudoNames;
 
 		/*!
 		 * A list of pointers to the pseudo-Observables that exist in the DataPoint
 		 */
-		vector<PseudoObservable*> allPseudoObservables; 
-
-
-
-
+		mutable vector<PseudoObservable*> allPseudoObservables; 
 
 		/*!
 		 * This is a pointer to the PhaseSpaceBoundary that this datapoint has been defined in
@@ -293,6 +280,7 @@ class DataPoint
 		 *
 		 */
 		int thisDiscreteIndex;
+
 };
 
 #endif

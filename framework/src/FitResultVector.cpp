@@ -5,13 +5,17 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
 #include "FitResultVector.h"
-//#include "LLscanResult.h"
+#include "StringProcessing.h"
 //	System Headers
 #include <iostream>
+#include <string>
+#include <vector>
+
+using namespace::std;
 
 //  Constructor to Return a single array from multiple arrays
 FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
@@ -50,6 +54,18 @@ FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allR
 //Constructor with correct argument
 FitResultVector::FitResultVector( vector<string> AllParameterNames ) : allResults(), allNames(AllParameterNames), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
 {
+	vector<string> duplicates;
+	allNames = StringProcessing::RemoveDuplicates( AllParameterNames, duplicates );
+	if( allNames.size() != AllParameterNames.size() )
+	{
+		cerr << "WARNING: Cannot Generate a FitResultVector with 2 Occurances of the same name" << endl;
+		for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
+		{
+			cout << *str_i << endl;
+		}
+	}
+
+
 	//Construct the result data structure
 	for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
@@ -128,7 +144,7 @@ vector<double> FitResultVector::GetAllMLL()
 	vector<double> output_MLL;
 	for (unsigned short int i=0; i < allResults.size(); ++i )
 	{
-		if( allResults[i]->GetFitStatus() >0 ) 
+		if( allResults[i]->GetFitStatus() >0 )
 		{
 			output_MLL.push_back( allResults[i]->GetMinimumValue() );
 		}
@@ -249,7 +265,7 @@ void FitResultVector::AddCPUTime( double input_time )
 void FitResultVector::SetCPUTime( int Index, double input_time )
 {
 	if( Index < int(allCPUTimes.size()) ) allCPUTimes.resize( unsigned(Index) );
-	allCPUTimes[unsigned(Index)] = input_time;  
+	allCPUTimes[unsigned(Index)] = input_time;
 }
 
 //Return names of all variables

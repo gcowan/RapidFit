@@ -153,6 +153,26 @@ vector<int> StringProcessing::StringPositions( const string Input, const string 
 	return positions;
 }
 
+vector<string> StringProcessing::RemoveDuplicates( const vector<string> input, vector<string>& duplicated )
+{
+	vector<string> output, temp;
+	for( vector<string>::const_iterator string_i = input.begin(); string_i != input.end(); ++string_i )
+	{
+		bool add=true;
+		for( vector<string>::iterator out_i = output.begin(); out_i != output.end(); ++out_i )
+		{
+			if( *out_i == *string_i )
+			{
+				duplicated.push_back( *string_i );
+				add = false;
+			}
+		}
+		if( add ) output.push_back( *string_i );
+	}
+	if( !duplicated.empty() ) duplicated = RemoveDuplicates( duplicated, temp );
+	return output;
+}
+
 //Remove any instances of a particular character in a string
 void StringProcessing::RemoveCharacter( string & Input, const char SearchCharacter )
 {

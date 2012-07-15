@@ -216,32 +216,32 @@ class XMLConfigReader
 		/*!
 		 * @brief Construct a PDFWithData based on the input XML Tags with a Starting value given by the integer StartVal
 		 */
-		PDFWithData * GetPDFWithData( XMLTag*, XMLTag*, int StartVal );
+		PDFWithData * GetPDFWithData( XMLTag*, XMLTag*, int StartVal, XMLTag* overloadConfigurator=NULL );
 
 		/*!
 		 * @brief Use the LookUpNamedPDF in ClassLookUp to request and configure a PDF based on the given XML Tag
 		 */
-		IPDF * GetNamedPDF( XMLTag* );
+		IPDF * GetNamedPDF( XMLTag*, XMLTag* );
 
 		/*!
 		 * @brief Construct a Sum of 2 PDFs based on the XMLTag with the given PhaseSpaceBoundary
 		 */
-		IPDF * GetSumPDF( XMLTag*, PhaseSpaceBoundary* );
+		IPDF * GetSumPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag* );
 
 		/*!
 		 * @brief Construct a NormalisedSum PDF based on the XMLTag with the given PhaseSpaceBoundary
 		 */
-		IPDF * GetNormalisedSumPDF( XMLTag*, PhaseSpaceBoundary* );
+		IPDF * GetNormalisedSumPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag* );
 
 		/*!
 		 * @brief Construct a ProdPDF based on the XMLTag with the given PhaseSpaceBoundary
 		 */
-		IPDF * GetProdPDF( XMLTag*, PhaseSpaceBoundary* );
+		IPDF * GetProdPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag* );
 
 		/*!
 		 * @brief Construct a PDF based on the XMLTag with the given PhaseSpaceBoundary
 		 */
-		IPDF * GetPDF( XMLTag*, PhaseSpaceBoundary* );
+		IPDF * GetPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag* overloadConfigurator );
 
 		/*!
 		 * @brief Construct a FitFunctionConfiguration based on the XMLTag
@@ -293,7 +293,13 @@ class XMLConfigReader
 		 */
 		CompPlotter_config* getCompPlotterConfigs( XMLTag* CompTag );
 
-		PhaseSpaceBoundary * FindCommonPhaseSpace( XMLTag* InputTag );
+		PhaseSpaceBoundary* FindCommonPhaseSpace( XMLTag* PhaseTag = NULL );
+
+		IPDF* FindCommonPDF( PhaseSpaceBoundary* override );
+
+		XMLTag* FindCommonPDFXML();
+
+		XMLTag* FindCommonPDFConfiguratorXML();
 
 		vector< XMLTag* > children;		/*!	All of the Children of the tag wholeFile	*/
 
@@ -303,4 +309,5 @@ class XMLConfigReader
 };
 
 #endif
+
 

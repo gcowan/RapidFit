@@ -23,6 +23,7 @@ class ObservableContinuousConstraint : public IConstraint
 {
 	public:
 		ObservableContinuousConstraint( string, double, double, string, string="" );
+		ObservableContinuousConstraint( const IConstraint* input );
 		~ObservableContinuousConstraint();
 
 		void SetMinimum(double);

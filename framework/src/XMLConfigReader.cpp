@@ -456,6 +456,14 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 			{
 				returnable_config->ytitle = TString(projComps[childIndex]->GetValue()[0]);
 			}
+			else if( projComps[childIndex]->GetName() == "TrustNumerical" )
+			{
+				string value =  projComps[childIndex]->GetValue()[0];
+				if( value == "True" )
+				{
+					returnable_config->ScaleNumerical = false;
+				}
+			}
 			else if( projComps[childIndex]->GetName() == "CalcChi2" )
 			{
 				string value =  projComps[childIndex]->GetValue()[0];
@@ -702,6 +710,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 		{
 			XMLTag * pdfTag=NULL;
 			XMLTag * dataTag=NULL;
+			XMLTag* overloadConfigurator=NULL;
 			bool foundPDF = false;
 			bool foundData = false;
 			bool foundConstraint = false;
@@ -726,6 +735,20 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 					//Just so can check for  bad ToFit tags
 					foundConstraint = true;
 				}
+				else if ( name == "CommonPDF" )
+				{
+					string value = fitComponents[componentIndex]->GetValue()[0];
+					if( value == "True" )
+					{
+						pdfTag = this->FindCommonPDFXML();
+						if( pdfTag == NULL ) foundPDF=false;
+						else foundPDF=true;
+					}
+				}
+				else if( name == "PDFConfigurator" )
+				{
+					overloadConfigurator = fitComponents[componentIndex];
+				}
 				else
 				{
 					cerr << "Unrecognised fit component: " << name << endl;
@@ -734,17 +757,17 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 			}
 
 			//Make the data set, and populate the physics bottle
-			if ( foundData && foundPDF )
+			if( foundData && foundPDF )
 			{
 				if( !Starting_Value.empty() )
 				{
 					int s_val_index = (int) pdfsAndData.size(); ++s_val_index;
-					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, Starting_Value[(unsigned)s_val_index] ) );
+					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, Starting_Value[(unsigned)s_val_index], overloadConfigurator ) );
 				} else {
-					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, -1 ) );
+					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, -1, overloadConfigurator ) );
 				}
 			}
-			else if ( !foundConstraint )
+			else if( !foundConstraint )
 			{
 				cerr << "A ToFit xml tag is incomplete:";
 				if ( !foundData && foundPDF )
@@ -1083,7 +1106,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 }
 
 //Collect the information needed to make a data set
-PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDFTag, int Starting_Value )
+PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDFTag, int Starting_Value, XMLTag* overloadConfigurator )
 {
 	//Check the tag actually is a data set
 	if ( DataTag->GetName() == "DataSet" )
@@ -1097,6 +1120,8 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		vector< DataSetConfiguration* > dataSetMakers;
 		bool generatePDFFlag = false;
 		IPDF * generatePDF=NULL;
+		XMLTag* generatePDFXML=NULL;
+		XMLTag* pdfOptionXML=NULL;
 
 		//Retrieve the data set config
 		vector< XMLTag* > dataComponents = DataTag->GetChildren();
@@ -1127,11 +1152,30 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			else if ( name == "PhaseSpaceBoundary" )
 			{
 				boundaryFound = true;
-				dataBoundary = GetPhaseSpaceBoundary( dataComponents[dataIndex] );
+				if( dataBoundary == NULL ) dataBoundary = GetPhaseSpaceBoundary( dataComponents[dataIndex] );
+				else
+				{
+					cerr << "CANNOT DO MULTIPLE PHASESPACES YET" << endl;
+					exit(8972);
+				}
+			}
+			else if ( name == "CommonPhaseSpace" )
+			{
+				boundaryFound = true;
+				if( dataBoundary == NULL ) dataBoundary = this->FindCommonPhaseSpace( dataComponents[dataIndex] );
+				else
+				{
+					cerr << "CANNOT DO MULTIPLE PHASESPACES YET" << endl;
+					exit(8972);
+				}
+			}
+			else if ( name == "PDFConfiguration" )
+			{
+				pdfOptionXML = dataComponents[dataIndex];
 			}
 			else if ( name == "PDF" || name == "SumPDF" || name == "NormalisedSumPDF" || name == "ProdPDF" )
 			{
-				generatePDF = GetPDF( dataComponents[dataIndex], dataBoundary );
+				generatePDFXML = dataComponents[dataIndex];
 				generatePDFFlag = true;
 			}
 			else if ( name == "StartingEntry" )
@@ -1148,19 +1192,26 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			}
 		}
 
+		//dataBoundary->Print();
+
+		if( generatePDFFlag == true )
+		{
+			generatePDF = GetPDF( generatePDFXML, dataBoundary, pdfOptionXML );
+		}
+
 		//Return the collection of configuration information - data generation will happen later
-		if (!boundaryFound)
+		if(!boundaryFound)
 		{
 			cerr << "DataSet defined without PhaseSpaceBoundary" << endl;
 			exit(1);
 		}
 
 		//If there are no separate data sources, go for backwards compatibility
-		if ( dataSetMakers.size() < 1 )
+		if( dataSetMakers.size() < 1 )
 		{
 			DataSetConfiguration * oldStyleConfig;
 
-			if (generatePDFFlag)
+			if(generatePDFFlag)
 			{
 				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, generatePDF, dataBoundary );
 			}
@@ -1180,14 +1231,16 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		}
 
 		//Make the objects
-		IPDF * fitPDF = GetPDF( FitPDFTag, dataBoundary );
+		IPDF * fitPDF = GetPDF( FitPDFTag, dataBoundary, overloadConfigurator );
 		if( generatePDF != NULL ) delete generatePDF;
 		PDFWithData* returnable = new PDFWithData( fitPDF, dataBoundary, dataSetMakers );
+		if( fitPDF != NULL ) delete fitPDF;
 		while( !dataSetMakers.empty() )
 		{
 			if( dataSetMakers.back() != NULL ) delete dataSetMakers.back();
 			dataSetMakers.pop_back();
 		}
+		if( dataBoundary != NULL ) delete dataBoundary;
 		return returnable;
 	}
 	else
@@ -1209,6 +1262,8 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 		vector<string> dataArguments, argumentNames;
 		bool generatePDFFlag = false;
 		IPDF * generatePDF=NULL;
+		XMLTag* PDFXML=NULL;
+		XMLTag* pdfOptions=NULL;
 
 		//Retrieve the data set config
 		vector< XMLTag* > dataComponents = DataTag->GetChildren();
@@ -1234,8 +1289,17 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 			}
 			else if ( name == "PDF" || name == "SumPDF" || name == "NormalisedSumPDF" || name == "ProdPDF" )
 			{
-				generatePDF = GetPDF( dataComponents[dataIndex], DataBoundary );
+				PDFXML = dataComponents[dataIndex];
 				generatePDFFlag = true;
+			}
+			else if( name == "CommonPDF" )
+			{
+				PDFXML = this->FindCommonPDFXML();
+				generatePDFFlag = true;
+			}
+			else if( name == "PDFConfiguration" )
+			{
+				pdfOptions = dataComponents[dataIndex];
 			}
 			else
 			{
@@ -1243,6 +1307,8 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 				exit(1);
 			}
 		}
+
+		if( generatePDFFlag )	generatePDF = GetPDF( PDFXML, DataBoundary, pdfOptions );
 
 		if (generatePDFFlag)
 		{
@@ -1266,7 +1332,7 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 //  I try to make use of the structure correctly
 vector<PhaseSpaceBoundary*> XMLConfigReader::GetPhaseSpaceBoundaries()
 {
-	vector< PhaseSpaceBoundary* > PhaseSpaceBoundary_vec;
+	vector<PhaseSpaceBoundary*> PhaseSpaceBoundary_vec;
 	//Find the ParameterSets
 	vector< XMLTag* > toFits;
 	//  Children Defined globally on initialization!
@@ -1300,22 +1366,84 @@ vector<PhaseSpaceBoundary*> XMLConfigReader::GetPhaseSpaceBoundaries()
 	return PhaseSpaceBoundary_vec;
 }
 
-PhaseSpaceBoundary* XMLConfigReader::FindCommonPhaseSpace( XMLTag* InputTag )
+PhaseSpaceBoundary* XMLConfigReader::FindCommonPhaseSpace( XMLTag* PhaseTag )
 {
-	string commonPhaseSpaceName = InputTag->GetValue()[0];
+	vector<XMLTag*> phaseChildren;
+	if( PhaseTag != NULL ) phaseChildren = PhaseTag->GetChildren();
 
-	for( unsigned int i=0; i< children.size(); ++i )
+	PhaseSpaceBoundary* returnablePhaseSpace = NULL;
+
+	for( unsigned int childIndex=0; childIndex< children.size(); ++childIndex )
 	{
-		if( children[i]->GetName() == "CommonPhaseSpace" )
+		if( children[childIndex]->GetName() == "CommonPhaseSpace" )
 		{
-			//children[i]->Get
+			returnablePhaseSpace = this->GetPhaseSpaceBoundary( children[childIndex]->GetChildren()[0] );
 		}
 	}
-	return new PhaseSpaceBoundary(vector<string>());
+
+	if( returnablePhaseSpace == NULL ) returnablePhaseSpace = new PhaseSpaceBoundary( vector<string>() );
+
+	for( unsigned int phaseChild=0; phaseChild< phaseChildren.size(); ++phaseChild )
+	{
+		if( phaseChildren[phaseChild]->GetName() == "Observable" )
+		{
+			string temp; (void) temp;
+			IConstraint* new_observable = this->GetConstraint( phaseChildren[phaseChild], temp );
+			//new_observable->Print();
+			//	Add Constraint if non exists and Overwrite if it already exists
+			returnablePhaseSpace->AddConstraint( new_observable->GetName(), new_observable, true );
+			delete new_observable;
+		}
+	}
+
+	return returnablePhaseSpace;
+}
+
+IPDF* XMLConfigReader::FindCommonPDF( PhaseSpaceBoundary* override )
+{
+	for( unsigned int childIndex=0; childIndex< children.size(); ++childIndex )
+	{
+		if( children[childIndex]->GetName() == "CommonPDF" )
+		{
+			if( override == NULL )
+			{
+				return this->GetPDF( children[childIndex]->GetChildren()[0], this->FindCommonPhaseSpace(), NULL );
+			}
+			else
+			{
+				return this->GetPDF( children[childIndex]->GetChildren()[0], override, NULL );
+			}
+		}
+	}
+	return NULL;
+}
+
+XMLTag* XMLConfigReader::FindCommonPDFXML()
+{
+	for( unsigned int childIndex=0; childIndex< children.size(); ++childIndex )
+	{
+		if( children[childIndex]->GetName() == "CommonPDF" )
+		{
+			return children[childIndex]->GetChildren()[0];
+		}
+	}
+	return NULL;
+}
+
+XMLTag* XMLConfigReader::FindCommonPDFConfiguratorXML()
+{
+	for( unsigned int childIndex=0; childIndex< children.size(); ++childIndex )
+	{
+		if( children[childIndex]->GetName() == "CommonPDFConfigurator" )
+		{
+			return children[childIndex]->GetChildren()[0];
+		}
+	}
+	return NULL;
 }
 
 //Make a PhaseSpaceBoundary from the appropriate xml tag
-PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag * InputTag )
+PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag* InputTag )
 {
 	//Check the tag is actually a PhaseSpaceBoundary
 	if ( InputTag->GetName() == "PhaseSpaceBoundary" )
@@ -1323,14 +1451,6 @@ PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag * InputTag )
 		vector< IConstraint* > constraints;
 		vector<string> names;
 		string name;
-
-		if( InputTag->GetChildren().size() == 1 )
-		{
-			if( InputTag->GetChildren()[0]->GetName() == "Name" )
-			{
-				return FindCommonPhaseSpace( InputTag->GetChildren()[0] );
-			}
-		}
 
 		//Create each single bound
 		vector< XMLTag* > constraintTags = InputTag->GetChildren();
@@ -1346,10 +1466,14 @@ PhaseSpaceBoundary * XMLConfigReader::GetPhaseSpaceBoundary( XMLTag * InputTag )
 
 		//Create the parameter set
 		PhaseSpaceBoundary * newBoundary = new PhaseSpaceBoundary(names);
-		for ( unsigned int nameIndex = 0; nameIndex < names.size(); ++nameIndex )
+		for( unsigned int nameIndex = 0; nameIndex < names.size(); ++nameIndex )
 		{
-			newBoundary->SetConstraint( names[nameIndex], constraints[nameIndex] );
-
+			newBoundary->AddConstraint( names[nameIndex], constraints[nameIndex] );
+		}
+		while(!constraints.empty())
+		{
+			if( constraints.back() != NULL ) delete constraints.back();
+			constraints.pop_back();
 		}
 		return newBoundary;
 	}
@@ -1433,13 +1557,30 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 }
 
 //Create a PDF from an appropriate xml tag
-IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
+IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigurator )
 {
 	IPDF* returnable_NamedPDF;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "PDF" )
 	{
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
+		XMLTag* common = this->FindCommonPDFConfiguratorXML();
+		if( common != NULL )
+		{
+			vector<XMLTag*> optional = common->GetChildren();
+			for( unsigned int i=0; i< optional.size(); ++i )
+			{
+				pdfConfig.push_back( optional[i] );
+			}
+		}
+		if( overloadConfigurator != NULL )
+		{
+			vector<XMLTag*> optional = overloadConfigurator->GetChildren();
+			for( unsigned int i=0; i< optional.size(); ++i )
+			{
+				pdfConfig.push_back( optional[i] );
+			}
+		}
 		string name;
 		vector<string> observableNames, parameterNames;
 		PDFConfigurator* configurator = new PDFConfigurator;
@@ -1471,9 +1612,13 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 			{
 				configurator->addConfigurationParameter( pdfConfig[configIndex]->GetValue()[0] );
 			}
+			else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
+			{
+				//	Silently ignore this option
+			}
 			else
 			{
-				cerr << "Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
+				cerr << "(1)Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
 				exit(1);
 			}
 		}
@@ -1492,7 +1637,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag )
 }
 
 //Create a SumPDF from an appropriate xml tag
-IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
+IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator )
 {
 	IPDF* returnable_SUMPDF;
 	vector< IPDF* > componentPDFs;
@@ -1511,7 +1656,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 			}
 			else
 			{
-				componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary ) );
+				componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator ) );
 			}
 		}
 
@@ -1549,7 +1694,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 }
 
 //Create a NormalisedSumPDF from an appropriate xml tag
-IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
+IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator )
 {
 	IPDF* returnable_NormPDF = NULL;
 	vector< IPDF* > componentPDFs;
@@ -1559,16 +1704,29 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
 		string fractionName = "unspecified";
 
+		if( overloadConfigurator != NULL )
+		{
+			vector<XMLTag*> optional = overloadConfigurator->GetChildren();
+			vector<string> names;
+			string fracstr="FractionName";
+			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
+			int lookup = StringProcessing::VectorContains( &names, &fracstr );
+			if( lookup != -1 )
+			{
+				fractionName = optional[lookup]->GetValue()[0];
+			}
+		}
+
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
-			if ( pdfConfig[configIndex]->GetName() == "FractionName" )
+			if( pdfConfig[configIndex]->GetName() == "FractionName" && fractionName == "unspecified" )
 			{
 				fractionName = pdfConfig[configIndex]->GetValue()[0];
 			}
 			else
 			{
-				componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary ) );
+				componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator ) );
 			}
 		}
 
@@ -1597,8 +1755,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		exit(1);
 	}
 
-	returnable_NormPDF->SetName( "NormalisedSum" );
-	returnable_NormPDF->SetLabel( "NormalisedSum_("+componentPDFs[0]->GetLabel()+")v("+componentPDFs[1]->GetLabel()+")" );
+	cout << returnable_NormPDF->GetName() << "\t\t" << returnable_NormPDF->GetLabel() << endl;
 
 	delete componentPDFs[0]; delete componentPDFs[1];
 	//	returnable_NormPDF->SetRandomFunction( GetSeed() );
@@ -1606,7 +1763,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 }
 
 //Create a ProdPDF from an appropriate xml tag
-IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
+IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator )
 {
 	IPDF* returnable_ProdPDF;
 	vector< IPDF* > componentPDFs;
@@ -1614,11 +1771,10 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 	if ( InputTag->GetName() == "ProdPDF" )
 	{
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
-
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
-			componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary ) );
+			componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator ) );
 		}
 
 		//Check there are two component PDFs to sum
@@ -1638,37 +1794,34 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		exit(1);
 	}
 
-	returnable_ProdPDF->SetName( "Prod" );
-	returnable_ProdPDF->SetLabel( "Prod["+componentPDFs[0]->GetLabel()+"]x["+componentPDFs[1]->GetLabel()+"]" );
-
 	delete componentPDFs[0]; delete componentPDFs[1];
 	//	returnable_ProdPDF->SetRandomFunction( GetSeed() );
 	return returnable_ProdPDF;
 }
 
 //Choose one of the PDF instantiation methods
-IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary )
+IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator )
 {
 	IPDF* returnable_pdf;
 	if ( InputTag->GetName() == "PDF" )
 	{
-		returnable_pdf = GetNamedPDF(InputTag);
+		returnable_pdf = GetNamedPDF(InputTag, overloadConfigurator);
 	}
 	else if ( InputTag->GetName() == "SumPDF" )
 	{
-		returnable_pdf = GetSumPDF( InputTag, InputBoundary );
+		returnable_pdf = GetSumPDF( InputTag, InputBoundary, overloadConfigurator );
 	}
 	else if ( InputTag->GetName() == "NormalisedSumPDF" )
 	{
-		returnable_pdf = GetNormalisedSumPDF( InputTag, InputBoundary );
+		returnable_pdf = GetNormalisedSumPDF( InputTag, InputBoundary, overloadConfigurator );
 	}
 	else if ( InputTag->GetName() == "ProdPDF" )
 	{
-		returnable_pdf = GetProdPDF( InputTag, InputBoundary );
+		returnable_pdf = GetProdPDF( InputTag, InputBoundary, overloadConfigurator );
 	}
 	else
 	{
-		cerr << "Unrecognised PDF configuration: " << InputTag->GetName() << endl;
+		cerr << "(2)Unrecognised PDF configuration: " << InputTag->GetName() << endl;
 		exit(1);
 	}
 

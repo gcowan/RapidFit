@@ -109,8 +109,8 @@ double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Ob
 	if( useFlatAngularAcceptance ) return 1.;
 
 	int psi_num = cosPsi->GetBinNumber();
-	int theta_num = cosTheta->GetBinNumber();
-	int phi_num = phi->GetBinNumber();
+	//int theta_num = cosTheta->GetBinNumber();
+	//int phi_num = phi->GetBinNumber();
 
 	if( psi_num > -1  ) //	&& theta_num > -1) && phi_num > -1 )	These are implicitly +ve if psi is when using this class
 	{

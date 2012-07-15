@@ -65,25 +65,38 @@ namespace Mathematics
 	// time functions for use in PDFs with resolution
 
 	double Exp( double t, double gamma, double resolution );
+	double Exp_Wrapper( vector<double> input );
 	double ExpInt( double tlow, double thigh, double gamma, double resolution  );
+	double ExpInt_Wrapper( vector<double> input );
 
 	//Added thes to include an upper time acceptance of form ( 1 - beta*t)
 	double Exp_betaAcceptance( double t, double gamma, double resolution, double betaParameter );
-	double ExpInt_betaAcceptance( double tlow, double thigh, double gamma, double resolution, double betaParameter  );
+	double Exp_betaAcceptance_Wrapper( vector<double> input );
+	double ExpInt_betaAcceptance( double tlow, double thigh, double gamma, double resolution, double betaParameter );
+	double ExpInt_betaAcceptance_Wrapper( vector<double> input );
 
 	double ExpCosh( double t, double gamma, double deltaGamma, double resolution );
+	double ExpCosh_Wrapper( vector<double> input );
 	double ExpCoshInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
+	double ExpCoshInt_Wrapper( vector<double> input );
 
 	double ExpSinh( double t, double gamma, double deltaGamma, double resolution );
+	double ExpSinh_Wrapper( vector<double> input );
 	double ExpSinhInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
+	double ExpSinhInt_Wrapper( vector<double> input );
 
 	double ExpCos( double t, double gamma, double deltaM, double resolution );
+	double ExpCos_Wrapper( vector<double> input );
 	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
+	double ExpCosInt_Wrapper( vector<double> input );
 
 	double ExpSin( double t, double gamma, double deltaM, double resolution );
+	double ExpSin_Wrapper( vector<double> input );
 	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
+	double ExpSinInt_Wrapper( vector<double> input );
 
 	double expErfInt( double tlimit, double tau, double sigma);
+	double expErfInt_Wrapper( vector<double> input );
 
 	void getBs2JpsiPhiAngularFunctions( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, const double cosTheta, const double phi, const double cosPsi);
 	void getBs2JpsiPhiAngularFunctionsWithSwave( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, double & f7, double & f8, double & f9, double & f10, const double cosTheta, const double phi, const double cosPsi);

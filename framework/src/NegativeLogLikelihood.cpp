@@ -38,14 +38,14 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 	double weight = 1.0;
 	double value = 0.0;
 	DataPoint* temporaryDataPoint=NULL;
-	bool flag = false;
+	//bool flag = false;
 
 	for (int dataIndex = 0; dataIndex < TestDataSet->GetDataNumber(); ++dataIndex)
 	{
 		temporaryDataPoint = TestDataSet->GetDataPoint(dataIndex);
 		value = TestPDF->Evaluate(temporaryDataPoint);
 
-		if( debug ) cout << "V: " << value << endl;
+		if( debug->GetStatus() ) cout << "V: " << value << endl;
 		//Idiot check
 		//if ( value < 0 || isnan(value) )
 		//{
@@ -54,12 +54,12 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 			//if( TestPDF->GetMCCacheStatus() )	TestPDF->SetMCCacheStatus( false );
 			//total-=1;
 		//}
-		flag = ( (value < 0) || isnan(value) );
+		//flag = ( (value < 0) || isnan(value) );
 		
 		//Find out the integral
 		integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );
 		
-		if( debug  ) cout << "I: " << integral << endl;
+		if( debug->GetStatus() ) cout << "I: " << integral << endl;
 
 		//Get the weight for this DataPoint (event)
 		weight = 1.0;
@@ -69,10 +69,12 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		}
 
 		if( weightsSquared ) weight*=weight;
-		total += weight * log( value / integral );
+		double pointValue= log( value / integral );
+		if( useWeights ) pointValue *=weight;
+		total+=pointValue;
 	}
 
-	if( flag ) cerr << "PDF evaluates to " << value << endl;
+	if( false ) cerr << "PDF evaluates to " << value << endl;
 
 	//Return negative log likelihood
 	return -/*1.0 **/ total;
