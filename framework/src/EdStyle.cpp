@@ -122,7 +122,7 @@ void EdStyle::SetStyle()
 
 	//titles
 	gStyle->SetTitleOffset((Float_t)0.95,"X");
-	gStyle->SetTitleOffset((Float_t)0.95,"Y");
+	gStyle->SetTitleOffset((Float_t)0.9,"Y");
 	gStyle->SetTitleOffset((Float_t)1.2,"Z");
 	gStyle->SetTitleFillColor(0);
 	gStyle->SetTitleStyle(0);

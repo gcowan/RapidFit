@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/07/15 Greig Cowan
+   - Added acceptance histograms for Bu lifetime measurements.
+   - Added PDF which combines two exponentials for background.
+
 2012/07/10 Rob Currie
    - Adding Bkg Histograms for JpsiPhi 1fb Paper
 

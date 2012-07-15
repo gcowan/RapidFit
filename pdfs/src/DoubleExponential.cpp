@@ -1,5 +1,5 @@
-// $Id: Exponential.cpp,v 1.2 2009/11/13 15:31:51 gcowan Exp $
-/** @class Exponential Exponential.cpp
+// $Id: DoubleExponential.cpp,v 1.2 2009/11/13 15:31:51 gcowan Exp $
+/** @class DoubleExponential DoubleExponential.cpp
  *
  *  PDF for Bs2JpsiPhi long lived background with time resolution
  *
@@ -7,19 +7,21 @@
  *  @date 2009-11-13
  */
 
-#include "Exponential.h"
+#include "DoubleExponential.h"
 #include "Mathematics.h"
 #include <iostream>
 #include <cmath>
 
 using namespace::std;
 
-PDF_CREATOR( Exponential );
+PDF_CREATOR( DoubleExponential );
 
 //Constructor
-Exponential::Exponential( PDFConfigurator* configurator) :
+DoubleExponential::DoubleExponential( PDFConfigurator* configurator) :
 	// Physics parameters
-	tauName	( configurator->getName("tau") )
+	tau1Name	( configurator->getName("tauLL1") )
+	, tau2Name	( configurator->getName("tauLL2") )
+	, fraction1Name	( configurator->getName("fractionLL1") )
 	, eventResolutionName   ( configurator->getName("eventResolution") )
 	, resScale1Name          ( configurator->getName("timeResolutionScale1") )
 	, resScale2Name          ( configurator->getName("timeResolutionScale2") )
@@ -32,7 +34,8 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 	// Observables
 	, timeName      ( configurator->getName("time") )
 	//objects used in XML
-	, tau(), sigma(), sigma1(), sigma2(), sigma3(), timeRes2Frac(), timeRes3Frac()
+	, tau1(), tau2(), fraction1()
+	, sigma(), sigma1(), sigma2(), sigma3(), timeRes2Frac(), timeRes3Frac()
 	, resolutionScale1(), resolutionScale2(), resolutionScale3()
 	, tlow(), thigh(), time()
 	, _useEventResolution(false)
@@ -45,24 +48,26 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0033 );
-			cout << "Exponential:: Constructing timeAcc: Upper time acceptance beta=0.0033 [0 < t < 14] " << endl;
+			cout << "DoubleExponential:: Constructing timeAcc: Upper time acceptance beta=0.0033 [0 < t < 14] " << endl;
 		}
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
 			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) );
-			cout << "Exponential:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl;
+			cout << "DoubleExponential:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl;
 		}
 	}
 	else {
 		timeAcc = new SlicedAcceptance( -25., 25. );
-		cout << "Exponential:: Constructing timeAcc: DEFAULT FLAT [-25 < t < 25]  " << endl;
+		cout << "DoubleExponential:: Constructing timeAcc: DEFAULT FLAT [-25 < t < 25]  " << endl;
 	}
 	MakePrototypes();
 }
 
 
-Exponential::Exponential( const Exponential &copy ) :
+DoubleExponential::DoubleExponential( const DoubleExponential &copy ) :
         BasePDF( (BasePDF)copy )
-        , tauName ( copy.tauName )
+        , tau1Name ( copy.tau1Name )
+        , tau2Name ( copy.tau2Name )
+        , fraction1Name ( copy.fraction1Name )
 	, eventResolutionName   ( copy.eventResolutionName )
 	, resScale1Name          ( copy.resScale1Name )
 	, resScale2Name          ( copy.resScale2Name )
@@ -73,7 +78,9 @@ Exponential::Exponential( const Exponential &copy ) :
 	, timeRes2FracName( copy.timeRes2FracName )
 	, timeRes3FracName( copy.timeRes3FracName )
 	, timeName      ( copy.timeName )
-	, tau( copy.tau )
+	, tau1( copy.tau1 )
+	, tau2( copy.tau2 )
+	, fraction1( copy.fraction1 )
 	, sigma( copy.sigma ), sigma1( copy.sigma1 ), sigma2( copy.sigma2 ), sigma3( copy.sigma3 )
 	, timeRes2Frac( copy.timeRes2Frac), timeRes3Frac( copy.timeRes3Frac )
         , resolutionScale1( copy.resolutionScale1 ), resolutionScale2( copy.resolutionScale2 ), resolutionScale3( copy.resolutionScale3 )
@@ -83,12 +90,11 @@ Exponential::Exponential( const Exponential &copy ) :
 	, _numericIntegralForce( copy._numericIntegralForce )
 {
         timeAcc = new SlicedAcceptance( *(copy.timeAcc) );
-	cout << "making copy " << tau << endl;
 }
 
 
 //Make the data point and parameter set
-void Exponential::MakePrototypes()
+void DoubleExponential::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -100,7 +106,9 @@ void Exponential::MakePrototypes()
 
 	//Make the parameter set
 	vector<string> parameterNames;
-	parameterNames.push_back( tauName );
+	parameterNames.push_back( tau1Name );
+	parameterNames.push_back( tau2Name );
+	parameterNames.push_back( fraction1Name );
 	parameterNames.push_back( timeRes2FracName );
 	parameterNames.push_back( timeRes3FracName );
 	if( ! useEventResolution() ) {
@@ -115,7 +123,7 @@ void Exponential::MakePrototypes()
 }
 
 //Return a list of observables not to be integrated
-vector<string> Exponential::GetDoNotIntegrateList()
+vector<string> DoubleExponential::GetDoNotIntegrateList()
 {
 	vector<string> list;
 	if( useEventResolution() ) list.push_back(eventResolutionName);
@@ -123,16 +131,18 @@ vector<string> Exponential::GetDoNotIntegrateList()
 }
 
 //Destructor
-Exponential::~Exponential()
+DoubleExponential::~DoubleExponential()
 {
 }
 
-bool Exponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool DoubleExponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
 	timeRes2Frac = allParameters.GetPhysicsParameter( timeRes2FracName )->GetValue();
 	timeRes3Frac = allParameters.GetPhysicsParameter( timeRes3FracName )->GetValue();
-	tau = allParameters.GetPhysicsParameter( tauName )->GetValue();
+	tau1 = allParameters.GetPhysicsParameter( tau1Name )->GetValue();
+	tau2 = allParameters.GetPhysicsParameter( tau2Name )->GetValue();
+	fraction1 = allParameters.GetPhysicsParameter( fraction1Name )->GetValue();
 	if( ! useEventResolution() ) {
 		sigma1    = allParameters.GetPhysicsParameter( sigma1Name )->GetValue();
 		sigma2    = allParameters.GetPhysicsParameter( sigma2Name )->GetValue();
@@ -146,7 +156,7 @@ bool Exponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 }
 
 //Calculate the function value
-double Exponential::Evaluate(DataPoint * measurement)
+double DoubleExponential::Evaluate(DataPoint * measurement)
 {
 	// Observable
 	time = measurement->GetObservable( timeName )->GetValue();
@@ -207,19 +217,20 @@ double Exponential::Evaluate(DataPoint * measurement)
 	return num;
 }
 
-double Exponential::buildPDFnumerator()
+double DoubleExponential::buildPDFnumerator()
 {
 	// Sum of two exponentials, using the time resolution functions
 
-	if( tau <= 0 ) {
-		cout << " In Exponential() you gave a negative or zero lifetime for tau " << endl ;
+	if( tau1 <= 0 || tau2 <= 0 ) {
+		cout << " In DoubleExponential() you gave a negative or zero lifetime for tau " << endl ;
 		throw(10) ;
 	}
-	double val = Mathematics::Exp(time, 1./tau, sigma);
+	double val = fraction1*Mathematics::Exp(time, 1./tau1, sigma);
+	val += (1.-fraction1)*Mathematics::Exp(time, 1./tau2, sigma);
 	return val;
 }
 
-double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
+double DoubleExponential::Normalisation( PhaseSpaceBoundary* boundary )
 {
 	double norm = 0.;
 	if( useEventResolution() )
@@ -261,7 +272,7 @@ double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
 	return norm;
 }
 
-double Exponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double DoubleExponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	if( _numericIntegralForce ) return -1.;
 
@@ -324,12 +335,12 @@ double Exponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 	return norm;
 }
 
-double Exponential::buildPDFdenominator()
+double DoubleExponential::buildPDFdenominator()
 {
 	// Sum of two exponentials, using the time resolution functions
 
-	if( tau <= 0 ) {
-		cout << " In Exponential() you gave a negative or zero lifetime for tau " << endl ;
+	if( tau1 <= 0 || tau2 <= 0 ) {
+		cout << " In DoubleExponential() you gave a negative or zero lifetime for tau " << endl ;
 		throw(10) ;
 	}
 
@@ -341,7 +352,10 @@ double Exponential::buildPDFdenominator()
 	{
 		tlow  = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
 		thigh = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh();
-		if( thigh > tlow ) val += Mathematics::ExpInt(tlow, thigh, 1./tau, sigma) * timeAcc->getSlice(islice)->height();
+		if( thigh > tlow ) {
+			val += fraction1*Mathematics::ExpInt(tlow, thigh, 1./tau1, sigma) * timeAcc->getSlice(islice)->height();
+			val += (1.-fraction1)*Mathematics::ExpInt(tlow, thigh, 1./tau2, sigma) * timeAcc->getSlice(islice)->height();
+		}
 	}
 
 	tlow  = tlo_boundary;
