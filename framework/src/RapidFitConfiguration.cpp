@@ -83,7 +83,8 @@ numberRepeats(),
 	xmlFile(),
 	SoloContourResults(),
 	templatePDFs(),
-	debug()
+	debug(),
+	BuildConstraints()
 {
 		//Variables to store command line arguments
 		numberRepeats = 0;
@@ -168,6 +169,8 @@ numberRepeats(),
 		templatePDFs = vector<string>();
 		debug = new DebugClass(false);
 		debug->SetClassNames(vector<string>(1,"default"));
+
+		BuildConstraints = false;
 }
 
 RapidFitConfiguration::~RapidFitConfiguration()

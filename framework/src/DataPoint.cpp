@@ -378,12 +378,11 @@ void DataPoint::Print() const
 
 void DataPoint::ClearPsuedoObservable()
 {
-	//while( !allPseudoObservables.empty() )
-	//{
-	//	if( allPseudoObservables.back() != NULL ) delete allPseudoObservables.back();
-	//	allPseudoObservables.pop_back();
-	//	allPseudoNames.pop_back();
-	//}
+	for( unsigned int i=0; i< allPseudoObservables.size(); ++i )
+	{
+		if( allPseudoObservables[i] != NULL ) delete allPseudoObservables[i];
+		allPseudoObservables[i]=NULL;
+	}
 }
 
 PhaseSpaceBoundary* DataPoint::GetPhaseSpaceBoundary() const

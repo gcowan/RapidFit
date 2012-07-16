@@ -166,7 +166,7 @@ IntegratorFunction& IntegratorFunction::operator=( const IntegratorFunction & Ne
 double IntegratorFunction::DoEval( const Double_t * x ) const
 {
 	if( currentPoint->GetPhaseSpaceBoundary() == NULL ) currentPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
-	//currentPoint->ClearPsuedoObservable();
+	currentPoint->ClearPsuedoObservable();
 	unsigned int true_index=100;
 	//Load the array into the data point
 	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )

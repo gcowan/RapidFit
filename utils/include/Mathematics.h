@@ -57,6 +57,10 @@ class Mathematics
 		 */
 		static TF1* gamma_func( int OutputLevel=-1 );
 
+		static TF1* raw_gamma_func( int OutputLevel=-1 );
+
+		static TF1* gammaDist_func( int OutputLevel=-1 );
+
 		/*!
 		 * @brief More correct to fit to the landau dist for some other dists from toys
 		 *

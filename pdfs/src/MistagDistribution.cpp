@@ -23,7 +23,8 @@ MistagDistribution::MistagDistribution(PDFConfigurator* configurator) : BasePDF(
 	GFbetaName	( configurator->getName("MistagBeta" ) ),
 	GFshoulderName	( configurator->getName("MistagShoulder" ) ),
 	// Observables
-	GFxName( configurator->getName("mistag") )
+	GFxName( configurator->getName("mistag") ),
+	tagName( configurator->getName("tag") )
 	, gamma(0.), mu(0.), beta(0.)
 {
 	std::cout << "Constructing PDF: MistagDistribution " << std::endl ;
@@ -37,6 +38,7 @@ void MistagDistribution::MakePrototypes()
 {
 	// Observables
 	allObservables.push_back( GFxName );
+	allObservables.push_back( tagName );
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -70,16 +72,17 @@ bool MistagDistribution::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Calculate the function value
 double MistagDistribution::Evaluate(DataPoint * measurement)
 {
+	if( measurement->GetObservable( tagName )->GetValue() == 0 ) return 1.;
 	// Get the observable
 	double x = 0.5 - measurement->GetObservable( GFxName )->GetValue();
-	
+	if( x < 1E-6 ) return 1.;	
 	double returnValue ;
 	
 	if( x > mu ) returnValue = TMath::GammaDist( x, gamma, mu, beta );
 	else if( shoulder > 0.0) returnValue = shoulder ;
 	else returnValue = 0.0000001 ;
 
-  	return returnValue ;
+  	return returnValue;
 }
 
 

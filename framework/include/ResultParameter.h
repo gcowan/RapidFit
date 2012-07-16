@@ -48,6 +48,7 @@ class ResultParameter
 
 		string FitXML() const;
 		string ToyXML() const;
+		string ConstraintXML() const;
 
 	private:
 		string name;

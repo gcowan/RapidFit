@@ -10,6 +10,7 @@
 //	RapidFit Headers
 #include "ResultParameter.h"
 #include "PhysicsParameter.h"
+#include "ExternalConstraint.h"
 //	System Headers
 #include <iostream>
 #include <math.h>
@@ -18,6 +19,8 @@
 
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
+
+using namespace::std;
 
 //Default constructor
 ResultParameter::ResultParameter() : name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false)
@@ -240,5 +243,13 @@ string ResultParameter::FitXML() const
 string ResultParameter::ToyXML() const
 {
 	return this->XML( false );
+}
+
+string ResultParameter::ConstraintXML() const
+{
+	ExternalConstraint* newConstraint = new ExternalConstraint( this->GetName(), this->GetValue(), this->GetError() );
+	string output = newConstraint->XML();
+	delete newConstraint;
+	return output;
 }
 

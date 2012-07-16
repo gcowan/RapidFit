@@ -97,6 +97,7 @@ class RapidFitConfiguration
 		bool JackKnife_Flag;
 		bool fixedTotalToys;
 		bool saveAllToys;
+		bool BuildConstraints;
 
 		string currentArgument;
 		FitResultVector* _2DResultForFC;

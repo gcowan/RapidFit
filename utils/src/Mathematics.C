@@ -186,9 +186,9 @@ vector<vector<Double_t> > Mathematics::Unique_Coords( TPolyMarker3D *pm )
 }
 
 //  The gamma distribution coded up in root is the more general form of that found on wikipedia (there's a surprise)
-//  
+//
 //  Using the root definition:                                  wiki:
-//                              gamma = mean^2 / sigma^2                k     = mu^2 / sigma^2  
+//                              gamma = mean^2 / sigma^2                k     = mu^2 / sigma^2
 //                              beta  = sigma^2 / mean                  theta = sigma^2 / mu
 //
 //              For:            mu == 0                         The 2 conditions above are ONLY valid for this condition
@@ -226,6 +226,19 @@ TF1* Mathematics::gamma_func( int OutputLevel )
 		cerr.rdbuf(cerr_bak);
 		clog.rdbuf(clog_bak);
 	}
+
+	return output;
+}
+
+TF1* Mathematics::raw_gamma_func( int OutputLevel )
+{
+	(void) OutputLevel;
+	TF1* output = new TF1( "gammaf", "[0]*TMath::GammaDist( x, [1], [2], [3] )" );
+
+	output->SetParName( 0, "Const" );
+	output->SetParName( 1, "#gamma" );
+	output->SetParName( 2, "#mu" );
+	output->SetParName( 3, "#beta" );
 
 	return output;
 }

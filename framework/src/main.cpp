@@ -450,6 +450,52 @@ int PerformMainFit( RapidFitConfiguration* config )
 		cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
 	}
 
+	if( config->BuildConstraints )
+	{
+		stringstream full_xml;
+
+		ResultParameterSet* resultParameters = config->GlobalResult->GetResultParameterSet();
+
+		vector<string> tobeConstrained = resultParameters->GetAllFloatNames();
+
+		full_xml << endl;
+
+		vector<ResultParameter*> ConstrainedParams;
+
+		for( unsigned int i=0; i< tobeConstrained.size(); ++i )
+		{
+			ResultParameter* thisParam = resultParameters->GetResultParameter( tobeConstrained[i] );
+
+			full_xml << thisParam->ToyXML();
+			full_xml << endl;
+
+			ConstrainedParams.push_back( thisParam );
+		}
+
+		full_xml << endl;
+
+		for( unsigned int i=0; i< ConstrainedParams.size(); ++i )
+		{
+			full_xml << ConstrainedParams[i]->ConstraintXML();
+			full_xml << endl;
+		}
+
+		full_xml << endl;
+
+
+		string xml_filename = "constraintXMLFile";
+		xml_filename.append( StringProcessing::TimeString() );
+		xml_filename.append( ".xml" );
+		ofstream output_xmlFile;
+		output_xmlFile.open( xml_filename.c_str() );
+
+		output_xmlFile << full_xml.str() ;
+
+		output_xmlFile.close();
+
+		cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
+	}
+
 	if( config->GlobalResult->GetFitStatus() != 3 )
 	{
 		cerr << "--------------------------------------------------------------" << endl;

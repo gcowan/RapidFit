@@ -42,7 +42,7 @@ using namespace::std;
 //Constructor with correct argument
 RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) :
 	ratioOfIntegrals(-1.), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL),
-	functionCanIntegrate(false), haveTestedIntegral(false),
+	functionCanIntegrate(false), haveTestedIntegral(true),
 	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(new DebugClass(false))
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();

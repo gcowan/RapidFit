@@ -43,6 +43,7 @@ class MistagDistribution : public BasePDF
 		// Observables
 		double x ;
 		ObservableRef GFxName;	
+		ObservableRef tagName;
 };
 
 #endif

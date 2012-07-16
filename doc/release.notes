@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2012/07/16 Rob Currie
+   - Added Constraint XML output from a set of fit results
+   - Temporarily disabled Numerical Integral tests at the start of RapidFit
+   - Added some minor documentation to --help runtime flag
+
 2012/07/15 Rob Currie
    - Significantly cleaned up PseudoObservable code-base and simplified logic, the compiler warning of an exact double comparison IS SAFE!
        An exact double comparison is performed to know if a calculation needs to be repeated,

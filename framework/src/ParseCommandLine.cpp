@@ -118,6 +118,23 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "--WeightDataSet" << endl;
 	cout << "       If a Preprocessor section is present in the XML the input data is weighted and the results are stored in the relevant file" << endl;
 
+	cout << endl;
+	cout << "--saveFitXML" << endl;
+	cout << "       Generates an XML roughly equivalent to the one you just input with final fit parameters and errors stored as fixed in the ParameterSet, good for projections" << endl;
+
+	cout << endl;
+	cout << "--generateToyXML" << endl;
+	cout << "       Generates an XML roughly equivalent to the one you just input with final fit parameters stored in a format compatible with Toy Studies" << endl;
+
+	cout << endl;
+	cout << "--BuildConstraints" << endl;
+	cout << "       Generate an XML which stores the parameters in a free XML result with constraints stored as an external Constraint XML segment" << endl;
+
+	cout << endl;
+	cout << "--saveAllToys" << endl;
+	cout << "       When used in conjunction with a toy/MC/FC study this will cause all toys generated to be saved." << endl;
+	cout << "       This creates a LOT of extra .root files from the toy study, but is a useful way to generate multiple toy datasets from one XML." << endl;
+
 	cout << endl;  
 }
 
@@ -578,6 +595,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--fixedTotalToys" )			{	config.fixedTotalToys = true;				}
 		else if( currentArgument == "--saveAllToys" )				{	config.saveAllToys = true;				}
 		else if( currentArgument == "--Debug" )	{  if( config.debug != NULL ){ delete config.debug;}	config.debug = new DebugClass(true);	}
+		else if( currentArgument == "--BuildConstraints" )			{	config.BuildConstraints = true;				}
 
 		//	We didn't understand the argument to end up here
 		else
