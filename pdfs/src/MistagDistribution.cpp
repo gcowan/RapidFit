@@ -38,7 +38,7 @@ void MistagDistribution::MakePrototypes()
 {
 	// Observables
 	allObservables.push_back( GFxName );
-	allObservables.push_back( tagName );
+	//allObservables.push_back( tagName );
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -72,10 +72,10 @@ bool MistagDistribution::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Calculate the function value
 double MistagDistribution::Evaluate(DataPoint * measurement)
 {
-	if( measurement->GetObservable( tagName )->GetValue() == 0 ) return 1.;
+	//if( measurement->GetObservable( tagName )->GetValue() == 0 ) return 1.;
 	// Get the observable
 	double x = 0.5 - measurement->GetObservable( GFxName )->GetValue();
-	if( x < 1E-6 ) return 1.;	
+	
 	double returnValue ;
 	
 	if( x > mu ) returnValue = TMath::GammaDist( x, gamma, mu, beta );
