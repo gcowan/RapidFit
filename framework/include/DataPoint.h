@@ -264,11 +264,13 @@ class DataPoint
 		 * A list of the names of the pseudo-Observables that exist in this DataPoint
 		 */
 		mutable vector<string> allPseudoNames;
+		mutable vector<string> allPseudoNames2;
 
 		/*!
 		 * A list of pointers to the pseudo-Observables that exist in the DataPoint
 		 */
 		mutable vector<PseudoObservable*> allPseudoObservables; 
+		mutable vector<PseudoObservable*> allPseudoObservables2;
 
 		/*!
 		 * This is a pointer to the PhaseSpaceBoundary that this datapoint has been defined in

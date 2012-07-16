@@ -25,7 +25,7 @@ PseudoObservable::PseudoObservable( string InputName ) :
 
 PseudoObservable::PseudoObservable( const PseudoObservable& Input ) :
 	internal_function( Input.internal_function ), Dependencies(Input.Dependencies),
-	Value( Input.Value), valid( Input.valid ), Name( Input.Name ), Index( Input.Index ),
+	Value( Input.Value), valid( false ), Name( Input.Name ), Index( Input.Index ),
 	internal_Input( Input.internal_Input )
 {
 }
@@ -164,5 +164,10 @@ bool PseudoObservable::GetValid( const vector<double> Input ) const
 		valid = check_ok;
 		return check_ok;
 	}
+}
+
+vector<double> PseudoObservable::GetCacheInput() const
+{
+	return internal_Input;
 }
 

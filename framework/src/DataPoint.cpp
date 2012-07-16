@@ -46,8 +46,9 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 }
 
 DataPoint::DataPoint( const DataPoint& input ) :
-	allObservables(NULL), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(NULL), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
+	allObservables(NULL), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
 	thisDiscreteIndex(input.thisDiscreteIndex)
+	, allPseudoNames2(input.allPseudoNames2), allPseudoObservables2()
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
@@ -56,6 +57,10 @@ DataPoint::DataPoint( const DataPoint& input ) :
 	for( unsigned int i=0; i< input.allPseudoObservables.size(); ++i )
 	{
 		allPseudoObservables.push_back( new PseudoObservable(*(input.allPseudoObservables[i])) );
+	}
+	for( unsigned int i=0; i< input.allPseudoObservables2.size(); ++i )
+	{
+		allPseudoObservables2.push_back( new PseudoObservable(*(input.allPseudoObservables2[i])) );
 	}
 }
 
@@ -71,6 +76,11 @@ DataPoint::~DataPoint()
 	{
 		if( allPseudoObservables.back() != NULL ) { delete allPseudoObservables.back(); }
 		allPseudoObservables.pop_back();
+	}
+	while( !allPseudoObservables2.empty() )
+	{
+		if( allPseudoObservables2.back() != NULL ) { delete allPseudoObservables2.back(); }
+		allPseudoObservables2.pop_back();
 	}
 }
 
@@ -247,6 +257,10 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 		else
 		{
 			Input.SetIndex( lookup );
+			if( allPseudoObservables[ (unsigned)Input.GetIndex() ] == NULL )
+			{
+				allPseudoObservables[ (unsigned)Input.GetIndex() ] = new PseudoObservable( Input );
+			}
 			//cout << "found at " << lookup << endl;
 		}
 	}
@@ -254,7 +268,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 	{
 		if( Input.GetIndex()>(int)(allPseudoObservables.size()-1) )
 		{
-			//int var = allPseudoObservables.size();
+			int var = allPseudoObservables.size();
 			allPseudoObservables.resize( Input.GetIndex()+1, NULL );
 			if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
 			allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
@@ -264,10 +278,10 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 		{
 			if( allPseudoObservables[(unsigned)Input.GetIndex()] == NULL )
 			{
-				if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
 				allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
 				//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
 			}
+			//cout << "requested at (2) " << (unsigned)Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
 		}
 	}
 
@@ -303,49 +317,51 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> V
 	if(Input.GetIndex()<0)
 	{
 		string name = Input.GetName();
-		int lookup = StringProcessing::VectorContains( &allPseudoNames, &name );
+		int lookup = StringProcessing::VectorContains( &allPseudoNames2, &name );
 		if( lookup == -1 )
 		{
-			allPseudoObservables.push_back( new PseudoObservable( Input ) );
-			allPseudoNames.push_back( name );
-			allPseudoObservables.back()->SetIndex( (int)allPseudoObservables.size()-1 );
-			Input.SetIndex( (int)allPseudoObservables.size()-1 );
-			//cout << "<0 " << "creating" << " at " << allPseudoObservables.size()-1 << endl;
+			allPseudoObservables2.push_back( new PseudoObservable( Input ) );
+			allPseudoNames2.push_back( name );
+			allPseudoObservables2.back()->SetIndex( (int)allPseudoObservables2.size()-1 );
+			Input.SetIndex( (int)allPseudoObservables2.size()-1 );
+			//cout << "<0 " << "creating" << " at " << allPseudoObservables2.size()-1 << endl;
 		}
 		else
 		{
 			Input.SetIndex( lookup );
+			if( allPseudoObservables2[ (unsigned)Input.GetIndex() ] == NULL )
+			{
+				allPseudoObservables2[ (unsigned)Input.GetIndex() ] = new PseudoObservable( Input );
+			}
 			//cout << "found at " << lookup << endl;
 		}
 	}
 	else
 	{
-		if( Input.GetIndex()>(int)(allPseudoObservables.size()-1) )
+		if( Input.GetIndex()>(int)(allPseudoObservables2.size()-1) )
 		{
-			//int var = allPseudoObservables.size();
-			allPseudoObservables.resize( Input.GetIndex()+1, NULL );
-			if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
-			allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
+			int var = allPseudoObservables2.size();
+			allPseudoObservables2.resize( Input.GetIndex()+1, NULL );
+			allPseudoObservables2[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
 			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
 		}
 		else
 		{
-			if( allPseudoObservables[(unsigned)Input.GetIndex()] == NULL )
+			if( allPseudoObservables2[(unsigned)Input.GetIndex()] == NULL )
 			{
-				if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
-				allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
-				//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
+				allPseudoObservables2[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
+				//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables2.size()-1 << endl;
 			}
+			//cout << "requested at (3) " << (unsigned)Input.GetIndex() << " of " << allPseudoObservables2.size()-1 << endl;
 		}
 	}
 
-	PseudoObservable* thisObservable = allPseudoObservables[ (unsigned)Input.GetIndex() ];
+	PseudoObservable* thisObservable = allPseudoObservables2[ (unsigned)Input.GetIndex() ];
 
 	double outputObservable = 0.;
 
 	if( thisObservable->GetValid( Values ) )
 	{
-		//cout << "Cached" << endl;
 		outputObservable = thisObservable->GetPseudoObservable();
 	}
 	else
@@ -378,10 +394,21 @@ void DataPoint::Print() const
 
 void DataPoint::ClearPsuedoObservable()
 {
-	for( unsigned int i=0; i< allPseudoObservables.size(); ++i )
+	while( !allPseudoObservables.empty() )
 	{
-		if( allPseudoObservables[i] != NULL ) delete allPseudoObservables[i];
-		allPseudoObservables[i]=NULL;
+		if( allPseudoObservables.back() != NULL )
+		{
+			delete allPseudoObservables.back();
+		}
+		allPseudoObservables.pop_back();
+	}
+	while( !allPseudoObservables2.empty() )                          
+	{                                                               
+		if( allPseudoObservables2.back() != NULL )               
+		{                                                       
+			delete allPseudoObservables2.back();             
+		}                                                       
+		allPseudoObservables2.pop_back();                        
 	}
 }
 

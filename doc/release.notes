@@ -1,6 +1,10 @@
 // $Id: release.notes $
 
 2012/07/16 Rob Currie
+   - Fixed PsuedoObservable code in DataPoint, the methods access unique lists to save mistakes in addressing the vector elements
+   - Re-enabled numerical integration checking in the fits by default
+
+2012/07/16 Rob Currie
    - Added Constraint XML output from a set of fit results
    - Temporarily disabled Numerical Integral tests at the start of RapidFit
    - Added some minor documentation to --help runtime flag

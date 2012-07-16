@@ -59,7 +59,7 @@ class PseudoObservable
 
 		void Print() const;
 
-		void ExtraInput() const;
+		vector<double> GetCacheInput() const;
 
 	private:
 		double (*internal_function)(vector<double>);

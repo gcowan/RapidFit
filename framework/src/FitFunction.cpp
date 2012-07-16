@@ -111,7 +111,7 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 		resultIntegrator->SetDebug( debug );
 		allIntegrators.push_back( resultIntegrator );
 
-		allIntegrators.back()->ForceTestStatus( true );
+		allIntegrators.back()->ForceTestStatus( false );
 		double someval=0.;
 		if( testIntegrator == false ) allIntegrators.back()->ForceTestStatus( true );
 		else someval = allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
@@ -234,6 +234,7 @@ double FitFunction::Evaluate()
 	{
 		minimiseValue = DBL_MAX;
 	}
+	//cout << endl;
 	return minimiseValue;
 }
 
