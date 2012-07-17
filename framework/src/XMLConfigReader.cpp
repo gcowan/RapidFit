@@ -1647,10 +1647,28 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
 		string fractionName = "unspecified";
 
+		if( overloadConfigurator != NULL )
+		{
+			vector<XMLTag*> optional = overloadConfigurator->GetChildren();
+			vector<string> names;
+			string fracstr="FractionName";
+			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
+			for( int i=int(optional.size()-1); i != -1; ++i ) 
+			{       
+				if( optional[i]->GetName() == "FractionName" )
+				{            
+					cout << optional[i]->GetValue()[0] << endl;
+					fractionName = optional[(unsigned)i]->GetValue()[0];
+					overloadConfigurator->RemoveChild( i );
+					break;
+				}
+			}
+		}
+
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
-			if ( pdfConfig[configIndex]->GetName() == "FractionName" )
+			if( pdfConfig[configIndex]->GetName() == "FractionName" && fractionName == "unspecified" )
 			{
 				fractionName = pdfConfig[configIndex]->GetValue()[0];
 			}
@@ -1710,10 +1728,15 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 			vector<string> names;
 			string fracstr="FractionName";
 			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
-			int lookup = StringProcessing::VectorContains( &names, &fracstr );
-			if( lookup != -1 )
+			for( int i=int(optional.size()-1); i != -1; ++i )
 			{
-				fractionName = optional[lookup]->GetValue()[0];
+				if( optional[i]->GetName() == "FractionName" )
+				{
+					cout << optional[i]->GetValue()[0] << endl;
+					fractionName = optional[(unsigned)i]->GetValue()[0];
+					overloadConfigurator->RemoveChild( i );
+					break;
+				}
 			}
 		}
 

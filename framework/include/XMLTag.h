@@ -87,6 +87,7 @@ class XMLTag
 		 */
 		vector<string> GetValue();
 
+		void RemoveChild( int num );
 	private:
 		/*!
 		 * Don't Copy the class this way!
@@ -125,7 +126,7 @@ class XMLTag
 		 */
 		vector<string> SplitContent( vector<string>&, int, int, int );
 
-		vector< XMLTag* > children;			/*!	Children within this XML Tag		*/
+		vector<XMLTag*> children;			/*!	Children within this XML Tag		*/
 		vector<string> value;				/*!	Value of this XML Tag			*/
 		string name;					/*!	Name of this XML Tag			*/
 		XMLTag* parent;					/*!	Address of the parent of this tag	*/

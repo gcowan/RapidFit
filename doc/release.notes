@@ -1,6 +1,11 @@
 // $Id: release.notes $
 
 2012/07/17 Rob Currie
+   - Added support for multiple Fraction Names within the CommonPDF structure
+   - Added RemoveChild function to XMLTag
+   - Updated unittest/framework_tests/component_plotting.xml to use commonPDF structure to test new code
+
+2012/07/17 Rob Currie
    - Fixed bug in NLL where you were fitting with weight**2 rather than weight in the fit.... ooops
 
 2012/07/17 Greig Cowan

@@ -76,9 +76,29 @@ vector< XMLTag* > XMLTag::GetChildren()
 			path.Append( "/" + children[(unsigned)NamePos]->GetValue()[0] );
 		}
 	}
-	vector<XMLTag*> new_children = children;
-	//cout << path << endl;
-	return new_children;
+
+	return children;
+}
+
+void XMLTag::RemoveChild( int num )
+{
+	if( num<0 || num>=(int)children.size() ) return;
+
+	vector<XMLTag*>::iterator toBeRemoved;
+
+	int counter=0;
+	for( vector<XMLTag*>::iterator child_i = children.begin(); child_i != children.end(); ++child_i, ++counter )
+	{
+		if( counter == num )
+		{
+			toBeRemoved = child_i;
+
+		break;
+		}
+	}
+
+	if( children[(unsigned)num] != NULL ) delete children[(unsigned)num];
+	children.erase( toBeRemoved );
 }
 
 //Return the value
