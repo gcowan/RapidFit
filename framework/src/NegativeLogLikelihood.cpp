@@ -68,9 +68,11 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 			weight = temporaryDataPoint->GetObservable(weightObservableName)->GetValue();
 		}
 
-		if( weightsSquared ) weight*=weight;
 		double pointValue= log( value / integral );
-		if( useWeights ) pointValue *=weight;
+
+		if( useWeights ) pointValue *= weight;
+		if( weightsSquared ) pointValue *= weight;
+
 		total+=pointValue;
 	}
 
