@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/07/17 Greig Cowan
+   - Added PDFs and histograms for wrongPV background.
+
 2012/07/16 Rob Currie
    - Fixed PsuedoObservable code in DataPoint, the methods access unique lists to save mistakes in addressing the vector elements
    - Re-enabled numerical integration checking in the fits by default
