@@ -52,8 +52,7 @@ string XMLTag::GetPath()
 //Return the tag name
 string XMLTag::GetName()
 {
-	string new_name = name;
-	return new_name;
+	return name;
 }
 
 //Return the children

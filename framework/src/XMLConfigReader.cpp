@@ -1728,7 +1728,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 			vector<string> names;
 			string fracstr="FractionName";
 			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
-			for( int i=int(optional.size()-1); i != -1; ++i )
+			for( int i=int(optional.size()-1); i > -1; --i )
 			{
 				if( optional[i]->GetName() == "FractionName" )
 				{
