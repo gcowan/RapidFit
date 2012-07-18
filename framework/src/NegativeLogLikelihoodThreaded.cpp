@@ -78,6 +78,7 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 	{
 		fit_thread_data[threadnum].dataSubSet = StoredDataSubSet[(unsigned)number][threadnum];
 		fit_thread_data[threadnum].fittingPDF = stored_pdfs[((unsigned)number)*(unsigned)Threads + threadnum];
+		fit_thread_data[threadnum].fittingPDF->SetDebugMutex( &eval_lock, false );
 		fit_thread_data[threadnum].useWeights = useWeights;					//	Defined in the fitfunction baseclass
 		fit_thread_data[threadnum].weightName = ObservableRef( weightObservableName );		//	Defined in the fitfunction baseclass
 		fit_thread_data[threadnum].FitBoundary = StoredBoundary[(unsigned)Threads*((unsigned)number)+threadnum];
@@ -167,7 +168,12 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 			integral = DBL_MAX;
 		}
 
-		//if(num==5) exit(0);
+		/*
+		if(num==5) exit(0);
+		pthread_mutex_lock( debug_lock );
+		cout << "hello" << endl;
+		pthread_mutex_unlock( debug_lock );
+		*/
 
 		if( isnan(value) == true )
 		{
