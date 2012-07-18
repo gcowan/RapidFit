@@ -378,106 +378,106 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 	if( projComps.size() == 0 )
 	{
 		returnable_config->observableName = CompTag->GetValue()[0];
-		if( CompTag->GetName() == "Projection" ) returnable_config->OnlyZero = true;
-		else returnable_config->OnlyZero = false;
 	}
-	else
+
+	if( CompTag->GetName() == "Projection" ) returnable_config->OnlyZero = true;
+	else returnable_config->OnlyZero = false;
+
+	for( unsigned int childIndex = 0; childIndex < projComps.size(); ++childIndex )
 	{
-		for( unsigned int childIndex = 0; childIndex < projComps.size(); ++childIndex )
+		if( projComps[childIndex]->GetName() == "DataBins" )
 		{
-			if( projComps[childIndex]->GetName() == "DataBins" )
+			returnable_config->data_bins = atoi( projComps[childIndex]->GetValue()[0].c_str() );
+		}
+		else if( projComps[childIndex]->GetName() == "PDFpoints" )
+		{
+			returnable_config->PDF_points = atoi( projComps[childIndex]->GetValue()[0].c_str() );
+		}
+		else if( projComps[childIndex]->GetName() == "LogY" )
+		{
+			string value =  projComps[childIndex]->GetValue()[0];
+			if( value == "True" )
 			{
-				returnable_config->data_bins = atoi( projComps[childIndex]->GetValue()[0].c_str() );
-			}
-			else if( projComps[childIndex]->GetName() == "PDFpoints" )
-			{
-				returnable_config->PDF_points = atoi( projComps[childIndex]->GetValue()[0].c_str() );
-			}
-			else if( projComps[childIndex]->GetName() == "LogY" )
-			{
-				string value =  projComps[childIndex]->GetValue()[0];
-				if( value == "True" )
-				{
-					returnable_config->logY = true;
-				}
-			}
-			else if( projComps[childIndex]->GetName() == "Name" )
-			{
-				returnable_config->observableName = projComps[childIndex]->GetValue()[0];
-			}
-			else if( projComps[childIndex]->GetName() == "WidthKey" )
-			{
-				vector<string> widths = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-				if( widths.empty() ) returnable_config->width_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
-				for( vector<string>::iterator width_i = widths.begin(); width_i != widths.end(); ++width_i ) returnable_config->width_key.push_back( atoi( width_i->c_str() ) );
-			}
-			else if( projComps[childIndex]->GetName() == "ColorKey" )
-			{
-				vector<string> colors = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-				if( colors.empty() ) returnable_config->style_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
-				for( vector<string>::iterator color_i = colors.begin(); color_i != colors.end(); ++color_i ) returnable_config->color_key.push_back( atoi( color_i->c_str() ) );
-			}
-			else if( projComps[childIndex]->GetName() == "StyleKey" )
-			{
-				vector<string> styles = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-				if( styles.empty() ) returnable_config->style_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
-				for( vector<string>::iterator style_i = styles.begin(); style_i != styles.end(); ++style_i ) returnable_config->style_key.push_back( atoi( style_i->c_str() ) );
-			}
-			else if( projComps[childIndex]->GetName() == "Title" )
-			{
-				returnable_config->PlotTitle = projComps[childIndex]->GetValue()[0];
-			}
-			else if( projComps[childIndex]->GetName() == "CompNames" )
-			{
-				returnable_config->component_names = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-				if( returnable_config->component_names.empty() ) returnable_config->component_names.push_back( projComps[childIndex]->GetValue()[0] );
-			}
-			else if( projComps[childIndex]->GetName() == "Xmax" )
-			{
-				returnable_config->xmax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
-			}
-			else if( projComps[childIndex]->GetName() == "Xmin" )
-			{
-				returnable_config->xmin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
-			}
-			else if( projComps[childIndex]->GetName() == "Ymax" )
-			{
-				returnable_config->ymax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
-			}
-			else if( projComps[childIndex]->GetName() == "Ymin" )
-			{
-				returnable_config->ymin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
-			}
-			else if( projComps[childIndex]->GetName() == "XTitle" )
-			{
-				returnable_config->xtitle = TString(projComps[childIndex]->GetValue()[0]);
-			}
-			else if( projComps[childIndex]->GetName() == "YTitle" )
-			{
-				returnable_config->ytitle = TString(projComps[childIndex]->GetValue()[0]);
-			}
-			else if( projComps[childIndex]->GetName() == "TrustNumerical" )
-			{
-				string value =  projComps[childIndex]->GetValue()[0];
-				if( value == "True" )
-				{
-					returnable_config->ScaleNumerical = false;
-				}
-			}
-			else if( projComps[childIndex]->GetName() == "CalcChi2" )
-			{
-				string value =  projComps[childIndex]->GetValue()[0];
-				if( value == "True" )
-				{
-					returnable_config->CalcChi2 = true;
-				}
-			}
-			else
-			{
-				cerr << "Sorry Don't understand: " << projComps[childIndex]->GetName() << " ignoring!" << endl;
+				returnable_config->logY = true;
 			}
 		}
+		else if( projComps[childIndex]->GetName() == "Name" )
+		{
+			returnable_config->observableName = projComps[childIndex]->GetValue()[0];
+		}
+		else if( projComps[childIndex]->GetName() == "WidthKey" )
+		{
+			vector<string> widths = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
+			if( widths.empty() ) returnable_config->width_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
+			for( vector<string>::iterator width_i = widths.begin(); width_i != widths.end(); ++width_i ) returnable_config->width_key.push_back( atoi( width_i->c_str() ) );
+		}
+		else if( projComps[childIndex]->GetName() == "ColorKey" )
+		{
+			vector<string> colors = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
+			if( colors.empty() ) returnable_config->style_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
+			for( vector<string>::iterator color_i = colors.begin(); color_i != colors.end(); ++color_i ) returnable_config->color_key.push_back( atoi( color_i->c_str() ) );
+		}
+		else if( projComps[childIndex]->GetName() == "StyleKey" )
+		{
+			vector<string> styles = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
+			if( styles.empty() ) returnable_config->style_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
+			for( vector<string>::iterator style_i = styles.begin(); style_i != styles.end(); ++style_i ) returnable_config->style_key.push_back( atoi( style_i->c_str() ) );
+		}
+		else if( projComps[childIndex]->GetName() == "Title" )
+		{
+			returnable_config->PlotTitle = projComps[childIndex]->GetValue()[0];
+		}
+		else if( projComps[childIndex]->GetName() == "CompNames" )
+		{
+			returnable_config->component_names = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
+			if( returnable_config->component_names.empty() ) returnable_config->component_names.push_back( projComps[childIndex]->GetValue()[0] );
+		}
+		else if( projComps[childIndex]->GetName() == "Xmax" )
+		{
+			returnable_config->xmax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+		}
+		else if( projComps[childIndex]->GetName() == "Xmin" )
+		{
+			returnable_config->xmin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+		}
+		else if( projComps[childIndex]->GetName() == "Ymax" )
+		{
+			returnable_config->ymax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+		}
+		else if( projComps[childIndex]->GetName() == "Ymin" )
+		{
+			returnable_config->ymin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+		}
+		else if( projComps[childIndex]->GetName() == "XTitle" )
+		{
+			returnable_config->xtitle = TString(projComps[childIndex]->GetValue()[0]);
+		}
+		else if( projComps[childIndex]->GetName() == "YTitle" )
+		{
+			returnable_config->ytitle = TString(projComps[childIndex]->GetValue()[0]);
+		}
+		else if( projComps[childIndex]->GetName() == "TrustNumerical" )
+		{
+			string value =  projComps[childIndex]->GetValue()[0];
+			if( value == "True" )
+			{
+				returnable_config->ScaleNumerical = false;
+			}
+		}
+		else if( projComps[childIndex]->GetName() == "CalcChi2" )
+		{
+			string value =  projComps[childIndex]->GetValue()[0];
+			if( value == "True" )
+			{
+				returnable_config->CalcChi2 = true;
+			}
+		}
+		else
+		{
+			cerr << "Sorry Don't understand: " << projComps[childIndex]->GetName() << " ignoring!" << endl;
+		}
 	}
+
 
 	return returnable_config;
 }
@@ -1653,10 +1653,10 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 			vector<string> names;
 			string fracstr="FractionName";
 			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
-			for( int i=int(optional.size()-1); i != -1; --i ) 
-			{       
+			for( int i=int(optional.size()-1); i != -1; --i )
+			{
 				if( optional[i]->GetName() == "FractionName" )
-				{            
+				{
 					cout << optional[i]->GetValue()[0] << endl;
 					fractionName = optional[(unsigned)i]->GetValue()[0];
 					overloadConfigurator->RemoveChild( i );
