@@ -1662,6 +1662,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 					overloadConfigurator->RemoveChild( i );
 					break;
 				}
+				cout << optional[i]->GetName() << endl;
 			}
 		}
 

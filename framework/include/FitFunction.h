@@ -69,7 +69,7 @@ class FitFunction
 		 *
 		 * @return true Changed the ParameterSet with no problems, false there was an error (I don't think this can be trusted and this should be made void)
 		 */
-		bool SetParameterSet( const ParameterSet* );
+		void SetParameterSet( const ParameterSet* );
 
 		/*!
 		 * @brief Get a Pointer to the Internal Parameter Set
@@ -178,7 +178,8 @@ class FitFunction
 		vector<Double_t> branch_objects;	/*!	Undocumented	*/
 		vector<ObservableRef> branch_names;	/*!	Undocumented	*/
 		Double_t fit_calls;			/*!	Undocumented	*/
-
+		int traceNum;				/*!	Undocumented	*/
+		void SetupTraceTree();
 
 		int Threads;				/*!	Undocumented	*/
 		vector<IPDF*> stored_pdfs;		/*!	Undocumented	*/

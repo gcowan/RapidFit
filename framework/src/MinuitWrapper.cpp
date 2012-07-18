@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <float.h>
 #include <iomanip>
+#include <exception>
 
 using namespace::std;
 
@@ -290,7 +291,6 @@ void MinuitWrapper::Minimise()
 
 	vector<FunctionContour*> allContours = this->ConstructContours( allNames, newParameters );
 
-	function->GetPhysicsBottle()->GetParameterSet()->SetTrusted( false );
 	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, function->GetPhysicsBottle(), covarianceMatrix, allContours );
 
 	string testnewError="TestNewErrors";
@@ -474,14 +474,17 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	//}
 
 	ParameterSet* test = function->GetParameterSet();
-	if( test->SetPhysicsParameters( (double*)xval, npar ) == true )
+
+	try
 	{
+		test->UpdatePhysicsParameters( (double*)xval, npar );
+
 		function->SetParameterSet( test );
 		fval = function->Evaluate();
-	}
-	else
+	}	
+	catch(...)
 	{
-		cerr << "Failed to set physics parameters" << endl;
+		cerr << "Failed to set physics parameters or Eval Function" << endl;
 		throw(-99999);
 	}
 }

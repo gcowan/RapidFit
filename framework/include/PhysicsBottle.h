@@ -53,7 +53,9 @@ class PhysicsBottle
 
 		ParameterSet * GetParameterSet() const;
 
-		bool SetParameterSet( const ParameterSet* );
+		void SetParameterSet( const ParameterSet* );
+
+		void Print() const;
 
 	private:
 		/*!

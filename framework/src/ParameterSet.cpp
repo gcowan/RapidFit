@@ -18,7 +18,7 @@
 
 using namespace::std;
 
-ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), allNames(), trusted_set(), trusted( false ), uniqueID(0)
+ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), allNames(), uniqueID(0)
 {
 	for( vector<ParameterSet*>::iterator set_i = input.begin(); set_i != input.end(); ++set_i )
 	{
@@ -47,7 +47,7 @@ ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), all
 	uniqueID = reinterpret_cast<size_t>(this);
 }
 
-ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames), trusted_set(), trusted( false ), uniqueID(0)
+ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames), uniqueID(0)
 {
 	vector<PhysicsParameter*>::const_iterator param_i = input.allParameters.begin();
 	for( ; param_i != input.allParameters.end(); ++param_i )
@@ -72,29 +72,23 @@ ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 			this->allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
 		}
 		this->allNames = input.allNames;
-		this->trusted = false;
-		this->trusted_set = vector<ObservableRef*>();
-		for( vector<string>::const_iterator name_i = allNames.begin(); name_i != allNames.end(); ++name_i )
-		{
-			this->trusted_set.push_back( new ObservableRef( *name_i ) );
-		}
 		this->uniqueID = reinterpret_cast<size_t>(this)+1;
 	}
 	return *this;
 }
 
 //Constructor with correct arguments
-ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(), trusted_set(false), trusted( false ), uniqueID(0)
+ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(), uniqueID(0)
 {
 	vector<string> duplicates;
 	allNames = StringProcessing::RemoveDuplicates( NewNames, duplicates );
 	if( allNames.size() != NewNames.size() )
 	{
 		cerr << "WARNING: Cannot Generate a ParameterSet with 2 Occurances of the same name" << endl;
-                for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
-                {
-                        cout << *str_i << endl;
-                }
+		for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
+		{
+			cout << *str_i << endl;
+		}
 	}
 	//Populate the map
 	for( unsigned int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex )
@@ -107,11 +101,6 @@ ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allName
 //Destructor
 ParameterSet::~ParameterSet()
 {
-	while( !trusted_set.empty() )
-	{
-		if( trusted_set.back() != NULL ) delete trusted_set.back();
-		trusted_set.pop_back();
-	}
 	while( !allParameters.empty() )
 	{
 		if( allParameters.back() != NULL ) delete allParameters.back();
@@ -229,91 +218,70 @@ bool ParameterSet::SetPhysicsParameter( string Name, double Value, double Minimu
 	return returnValue;
 }
 
+/*
 //Set all physics parameters
 bool ParameterSet::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
-	if( NewParameterSet->GetTrusted() )
-	{
-		if( trusted_set.empty() )
-		{
-			for( unsigned int i=0; i < allNames.size(); ++i )
-			{
-				ObservableRef* new_ref = new ObservableRef( allNames[i] );
-				allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *new_ref )->GetValue() );
-				trusted_set.push_back( new_ref );
-			}
-		}
-		else
-		{
-			for( unsigned int i=0; i< trusted_set.size(); ++i )
-			{
-				allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *(trusted_set[i]) )->GetValue() );
-			}
-		}
-	}
-	else
-	{
-		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
-		{
-			PhysicsParameter* inputParameter = new PhysicsParameter( *(NewParameterSet->GetPhysicsParameter( allNames[nameIndex] )) );
-			if ( inputParameter->GetUnit() == "NameNotFoundError" )
-			{
-				//Fail if a required parameter is missing
-				cerr << "Parameter \"" << allNames[nameIndex] << "\" expected but not found" << endl;
-				return false;
-			}
-			else
-			{
-				if( allParameters[nameIndex] != NULL ) delete allParameters[nameIndex];
-				allParameters[nameIndex] = inputParameter;
-			}
-		}
-	}
-
-	return true;
+if( NewParameterSet->GetTrusted() )
+{
+if( trusted_set.empty() )
+{
+for( unsigned int i=0; i < allNames.size(); ++i )
+{
+ObservableRef* new_ref = new ObservableRef( allNames[i] );
+allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *new_ref )->GetValue() );
+trusted_set.push_back( new_ref );
 }
+}
+else
+{
+for( unsigned int i=0; i< trusted_set.size(); ++i )
+{
+allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *(trusted_set[i]) )->GetValue() );
+}
+}
+}
+else
+{
+for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
+{
+PhysicsParameter* inputParameter = new PhysicsParameter( *(NewParameterSet->GetPhysicsParameter( allNames[nameIndex] )) );
+if ( inputParameter->GetUnit() == "NameNotFoundError" )
+{
+//Fail if a required parameter is missing
+cerr << "Parameter \"" << allNames[nameIndex] << "\" expected but not found" << endl;
+return false;
+}
+else
+{
+if( allParameters[nameIndex] != NULL ) delete allParameters[nameIndex];
+allParameters[nameIndex] = inputParameter;
+}
+}
+}
+
+return true;
+}
+*/
 
 //Set all physics parameters
 bool ParameterSet::SetPhysicsParameters( const ParameterSet * NewParameterSet )
 {
-	if( NewParameterSet->GetTrusted() )
+	vector<string> input_names = NewParameterSet->GetAllNames();
+	for (unsigned short int nameIndex = 0; nameIndex < input_names.size(); nameIndex++)
 	{
-		if( trusted_set.empty() )
+		string thisName = input_names[nameIndex];
+		int lookup = StringProcessing::VectorContains( &allNames, &thisName );
+		if( lookup == -1 )
 		{
-			for( unsigned int i=0; i < allNames.size(); ++i )
-			{
-				ObservableRef* new_ref = new ObservableRef( allNames[i] );
-				allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *new_ref )->GetValue() );
-				trusted_set.push_back( new_ref );
-			}
+			//Fail if a required parameter is missing
+			//cerr << "SetParmaters: Parameter \"" << thisName << "\" expected but not found" << endl;
 		}
 		else
 		{
-			for( unsigned int i=0; i< trusted_set.size(); ++i )
-			{
-				allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *(trusted_set[i]) )->GetValue() );
-			}
+			allParameters[lookup]->SetValue( NewParameterSet->GetPhysicsParameter(thisName)->GetValue() );
 		}
 	}
-	else
-	{
-		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
-		{
-			PhysicsParameter* inputParameter = new PhysicsParameter( *(NewParameterSet->GetPhysicsParameter( allNames[nameIndex] )) );
-			if ( inputParameter->GetUnit() == "NameNotFoundError" )
-			{
-				//Fail if a required parameter is missing
-				cerr << "Parameter \"" << allNames[nameIndex] << "\" expected but not found" << endl;
-				return false;
-			}
-			else
-			{
-				if( allParameters[nameIndex] != NULL ) delete allParameters[nameIndex];
-				allParameters[nameIndex] = inputParameter;
-			}
-		}
-	}
-
 	return true;
 }
 
@@ -365,7 +333,7 @@ bool ParameterSet::AddPhysicsParameters( ParameterSet * NewParameterSet, bool re
 }
 
 //Not very pleasant in OO terms, and unsafe. Quick however.
-bool ParameterSet::SetPhysicsParameters( double* NewValues, int npar )
+void ParameterSet::UpdatePhysicsParameters( double* NewValues, int npar )
 {
 	if( npar <= -1 )
 	{
@@ -383,7 +351,6 @@ bool ParameterSet::SetPhysicsParameters( double* NewValues, int npar )
 			(*parameterIndex)->SetValue( NewValues[i] );
 		}
 	}
-	return true;
 }
 
 double* ParameterSet::GetPhysicsParameters() const
@@ -397,7 +364,7 @@ double* ParameterSet::GetPhysicsParameters() const
 	return returnable;
 }
 
-bool ParameterSet::SetPhysicsParameters( vector<double> NewValues )
+void ParameterSet::SetPhysicsParameters( vector<double> NewValues )
 {
 	if( NewValues.size() == allParameters.size() )
 	{
@@ -406,12 +373,10 @@ bool ParameterSet::SetPhysicsParameters( vector<double> NewValues )
 		{
 			(*parameterIndex)->SetValue( *temp );
 		}
-		return true;
 	}
 	else
 	{
 		cerr << "Parameter number mismatch: " << NewValues.size() << " vs " << allParameters.size();
-		return false;
 	}
 }
 
@@ -423,16 +388,6 @@ void ParameterSet::Print() const
 		cout << "Parameter name: " << allNames[i] <<  endl;
 		allParameters[i]->Print();
 	}
-}
-
-bool ParameterSet::GetTrusted() const
-{
-	return trusted;
-}
-
-void ParameterSet::SetTrusted( bool input )
-{
-	trusted = input;
 }
 
 string ParameterSet::XML() const

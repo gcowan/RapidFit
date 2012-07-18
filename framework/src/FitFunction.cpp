@@ -72,10 +72,16 @@ FitFunction::~FitFunction()
 	if( debug != NULL ) delete debug;
 }
 
-void FitFunction::SetupTrace( const TString FileName, const int traceNum )
+void FitFunction::SetupTrace( const TString FileName, const int inputTraceNum )
 {
 	//	Create the output file
 	Fit_File = new TFile( FileName, "UPDATE" );
+	traceNum = inputTraceNum;
+}
+
+void FitFunction::SetupTraceTree()
+{
+	Fit_File->cd();
 	TString TraceName("Trace_");
 	TraceName+=traceNum;
 	Fit_Tree = new TTree( TraceName, TraceName );
@@ -103,10 +109,13 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 {
 	allData = new PhysicsBottle( *NewBottle );
 
+	if( Fit_File != NULL ) this->SetupTraceTree();
+
 	//Initialise the integrators
 	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); ++resultIndex )
 	{
 		NewBottle->GetResultPDF(resultIndex)->UpdatePhysicsParameters( allData->GetParameterSet() );
+
 		RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
 		resultIntegrator->SetDebug( debug );
 		allIntegrators.push_back( resultIntegrator );
@@ -149,28 +158,23 @@ PhysicsBottle* FitFunction::GetPhysicsBottle() const
 }
 
 // Get and set the fit parameters
-bool FitFunction::SetParameterSet( const ParameterSet * NewParameters )
+void FitFunction::SetParameterSet( const ParameterSet * NewParameters )
 {
-	bool result = allData->SetParameterSet(NewParameters);
+	allData->SetParameterSet(NewParameters);
 
-	if( result )
+	//Initialise the integrators
+	for ( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
 	{
-		//Initialise the integrators
-		for ( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
+		allData->SetParameterSet( NewParameters );
+
+		allData->GetResultPDF( resultIndex )->UpdatePhysicsParameters( allData->GetParameterSet() );
+
+		for( int i=0; i< Threads; ++i )
 		{
-			allData->SetParameterSet( NewParameters );
-
-			allData->GetResultPDF( resultIndex )->UpdatePhysicsParameters( allData->GetParameterSet() );
-
-			for( int i=0; i< Threads; ++i )
-			{
-				stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UpdatePhysicsParameters( allData->GetParameterSet() );
-				stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UnsetCache();
-			}
+			stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UpdatePhysicsParameters( allData->GetParameterSet() );
+			stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UnsetCache();
 		}
 	}
-
-	return result;
 }
 
 ParameterSet * FitFunction::GetParameterSet() const

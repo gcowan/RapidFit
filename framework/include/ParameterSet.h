@@ -140,8 +140,6 @@ class ParameterSet
 		 *
 		 * @return true = everything went as expected , false an error occurred (This is 'never' tested should this just be a void routine?)
 		 */
-		bool SetPhysicsParameters( ParameterSet* Input );
-
 		bool SetPhysicsParameters( const ParameterSet* Input );
 
 		/*!
@@ -153,7 +151,7 @@ class ParameterSet
 		 *
 		 * @return true = everything went as expected , false an error occurred (This is 'never' tested should this just be a void routine?)
 		 */
-		bool SetPhysicsParameters( double* Input, int npar =-1 );
+		void UpdatePhysicsParameters( double* Input, int npar =-1 );
 
 		/*!
 		 * @brief This returns the Values of all of the Physics Parameters in a flat 1D double array
@@ -169,7 +167,7 @@ class ParameterSet
 		 *
 		 * @return true = everything went as expected , false an error occurred (This is 'never' tested should this just be a void routine?)
 		 */
-		bool SetPhysicsParameters( vector<double> Input );
+		void SetPhysicsParameters( vector<double> Input );
 
 		/*!
 		 * @brief This Adds a New PhysicsParameter which is the same as the PhysicsParameter Provided
@@ -198,20 +196,6 @@ class ParameterSet
 		bool AddPhysicsParameters( ParameterSet* InputParam, bool replace =false );
 
 		/*!
-		 * @brief Is this a trusted ParameterSet instance
-		 *
-		 * @return true = this is trusted, false = this is not trusted
-		 */
-		bool GetTrusted() const;
-
-		/*!
-		 * @brief Set the Trusted status of this instance
-		 *
-		 * @param Input true = this is trusted, false = this is not trusted
-		 */
-		void SetTrusted( bool );
-
-		/*!
 		 * @brief Output some debugging info
 		 *
 		 * @return Void
@@ -234,8 +218,6 @@ class ParameterSet
 
 		vector<PhysicsParameter*> allParameters;	/*!	vector of pointers to all of the Physics Parameters managed by this ParameterSet			*/
 		vector<string> allNames;			/*!	vector of strings of the names of all of the Physics Parameters						*/
-		vector<ObservableRef*> trusted_set;		/*!	A vector of pointers to ObservableRef objects. If trusted==true then this is used			*/
-		bool trusted;					/*!	Is the ParameterSet trusted, i.e. from a section of code where ParameterSet has a fixed structure	*/
 		size_t uniqueID;
 };
 

@@ -61,15 +61,17 @@ double Minuit2Function::operator()( const vector<double>& NewParameterValues ) c
 {
 	//Make parameter set and pass to wrapped function
 	ParameterSet * temporaryParameters = function->GetParameterSet();
-	if ( temporaryParameters->SetPhysicsParameters(NewParameterValues) )
+
+	try
 	{
+		temporaryParameters->SetPhysicsParameters(NewParameterValues);
 		function->SetParameterSet(temporaryParameters);
 		return function->Evaluate();
 	}
-	else
+	catch(...)
 	{
-		cerr << "Minuit does not provide the correct parameters" << endl;
-		exit(1);
+		cerr << "Minuit2 does not provide the correct parameters" << endl;
+		throw(-9999);
 	}
 }
 

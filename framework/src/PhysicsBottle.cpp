@@ -23,7 +23,7 @@ PhysicsBottle::PhysicsBottle( const ParameterSet * NewParameters ) : allPDFs(), 
 }
 
 PhysicsBottle::PhysicsBottle(const PhysicsBottle& newParameters ) :
-	allPDFs(), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters()
+	allPDFs(), allDataSets(newParameters.allDataSets), allConstraints(newParameters.allConstraints), bottleParameters(NULL)
 {
 	for( unsigned int i=0; i< newParameters.allPDFs.size(); ++i )
 	{
@@ -104,7 +104,7 @@ ParameterSet * PhysicsBottle::GetParameterSet() const
 }
 
 //Change the parameter values
-bool PhysicsBottle::SetParameterSet( const ParameterSet * NewParameters )
+void PhysicsBottle::SetParameterSet( const ParameterSet * NewParameters )
 {
 	bottleParameters->SetPhysicsParameters( NewParameters );
 
@@ -115,7 +115,10 @@ bool PhysicsBottle::SetParameterSet( const ParameterSet * NewParameters )
 		allPDFs[pdfIndex]->UnsetCache();
 	}
 
-	return true;
 }
 
+void PhysicsBottle::Print() const
+{
+	bottleParameters->Print();
+}
 
