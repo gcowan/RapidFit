@@ -59,6 +59,7 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 		try{
 			//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
 			//	Do a scan point fit
+			//BottleParameters->Print();
 			scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
 		}
 		catch( int e )

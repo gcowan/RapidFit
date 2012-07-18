@@ -4,6 +4,7 @@
    - Removed the old throw/false statements from the SetPhysicsParameters
    - Now looping over all of the input to change the internal PhysicsParameters
    - Checked that objects are initialized with the correct ParameterSets in FitAssembler
+   - Changed whether a ParameterSet is added or set in the phasespace to fix LLscans
 
 2012/07/17 Rob Currie
    - Added support for multiple Fraction Names within the CommonPDF structure

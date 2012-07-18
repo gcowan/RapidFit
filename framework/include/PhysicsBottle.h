@@ -38,6 +38,7 @@ class PhysicsBottle
 		 */
 		PhysicsBottle( const PhysicsBottle& );
 
+		vector<IPDF*> GetAllPDFs() const;
 
 		void AddResult( const IPDF*, IDataSet* );
 

@@ -1287,6 +1287,8 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 
 void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 {
+	if( this->DebugMutex() != NULL ) pthread_mutex_lock( this->DebugMutex() );
+
 	(void) message; (void) value;
 	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
 	cout << message << value << endl <<endl ;
@@ -1303,5 +1305,6 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 	cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
 	cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
 
+	if( this->DebugMutex() != NULL ) pthread_mutex_unlock( this->DebugMutex() );
 }
 

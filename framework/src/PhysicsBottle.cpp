@@ -106,7 +106,7 @@ ParameterSet * PhysicsBottle::GetParameterSet() const
 //Change the parameter values
 void PhysicsBottle::SetParameterSet( const ParameterSet * NewParameters )
 {
-	bottleParameters->SetPhysicsParameters( NewParameters );
+	bottleParameters->AddPhysicsParameters( NewParameters );
 
 	//Propagate the change to all stored PDFs
 	for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); ++pdfIndex)
@@ -120,5 +120,10 @@ void PhysicsBottle::SetParameterSet( const ParameterSet * NewParameters )
 void PhysicsBottle::Print() const
 {
 	bottleParameters->Print();
+}
+
+vector<IPDF*> PhysicsBottle::GetAllPDFs() const
+{
+	return allPDFs;
 }
 

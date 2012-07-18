@@ -108,7 +108,6 @@ void FitFunction::SetupTraceTree()
 void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 {
 	allData = new PhysicsBottle( *NewBottle );
-
 	if( Fit_File != NULL ) this->SetupTraceTree();
 
 	//Initialise the integrators

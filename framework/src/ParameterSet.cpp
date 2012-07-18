@@ -141,7 +141,8 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter( const string Name ) const
 {
 	//Check if the name is stored in the map
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
-	if ( nameIndex == -1 )
+	//cout << Name << "\t" << nameIndex << endl;
+	if( nameIndex == -1 )
 	{
 		cerr << "PhysicsParameter " << Name << " not found(1)" << endl;
 		throw(-20);
@@ -149,6 +150,7 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter( const string Name ) const
 	}
 	else
 	{
+		if( allParameters[unsigned(nameIndex)] == NULL ) allParameters[unsigned(nameIndex)] = new PhysicsParameter( allNames[nameIndex] );
 		//	This has to be here to ensure that badly constructed parameters don't cause headaches!
 		if( allParameters[unsigned(nameIndex)]->GetName().empty() || allParameters[unsigned(nameIndex)]->GetName() == "" )
 		{
@@ -203,8 +205,9 @@ bool ParameterSet::SetPhysicsParameter( string Name, PhysicsParameter * NewPhysi
 	}
 	else
 	{
+		if( allParameters[unsigned(nameIndex)] != NULL ) delete allParameters[unsigned(nameIndex)];
 		//	Copy the new parameter into the old one so no need to delete anything
-		allParameters[unsigned(nameIndex)] = NewPhysicsParameter;
+		allParameters[unsigned(nameIndex)] = new PhysicsParameter(*NewPhysicsParameter);
 		return true;
 	}
 }
@@ -279,13 +282,15 @@ bool ParameterSet::SetPhysicsParameters( const ParameterSet * NewParameterSet )
 		}
 		else
 		{
-			allParameters[lookup]->SetValue( NewParameterSet->GetPhysicsParameter(thisName)->GetValue() );
+			if( allParameters[lookup] != NULL ) delete allParameters[lookup];
+			//cout << thisName << endl;
+			allParameters[lookup] = new PhysicsParameter( *NewParameterSet->GetPhysicsParameter(thisName) );
 		}
 	}
 	return true;
 }
 
-bool ParameterSet::AddPhysicsParameter( PhysicsParameter* NewParameter, bool replace )
+bool ParameterSet::AddPhysicsParameter( const PhysicsParameter* NewParameter, bool replace )
 {
 	string name = NewParameter->GetName();
 	int paramIndex = StringProcessing::VectorContains( &allNames, &name );
@@ -308,16 +313,18 @@ bool ParameterSet::AddPhysicsParameter( PhysicsParameter* NewParameter, bool rep
 }
 
 //Set all physics parameters
-bool ParameterSet::AddPhysicsParameters( ParameterSet * NewParameterSet, bool replace )
+bool ParameterSet::AddPhysicsParameters( const ParameterSet * NewParameterSet, bool replace )
 {
 	for (unsigned short int nameIndex = 0; nameIndex < NewParameterSet->GetAllNames().size(); nameIndex++)
 	{
+		string thisName = NewParameterSet->GetAllNames()[nameIndex];
 		//PhysicsParameter * inputParameter = NewParameterSet->GetPhysicsParameter( NewParameterSet->GetAllNames()[nameIndex] );
-		int paramIndex = StringProcessing::VectorContains( &allNames, &(NewParameterSet->GetAllNames()[nameIndex]) );
+		int paramIndex = StringProcessing::VectorContains( &allNames, &thisName );
 		if( paramIndex == -1 )
 		{
-			allNames.push_back( NewParameterSet->GetAllNames()[nameIndex] );
-			allParameters.push_back( new PhysicsParameter( *(NewParameterSet->GetPhysicsParameter( NewParameterSet->GetAllNames()[nameIndex] )) ) );
+			allNames.push_back( thisName );
+			PhysicsParameter* temp = new PhysicsParameter( *(NewParameterSet->GetPhysicsParameter( thisName )) );
+			allParameters.push_back( temp );
 		}
 		else
 		{

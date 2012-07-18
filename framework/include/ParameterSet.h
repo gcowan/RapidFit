@@ -180,7 +180,7 @@ class ParameterSet
 		 *
 		 * @return true = everything went as expected , false an error occurred (This is 'never' tested should this just be a void routine?)
 		 */
-		bool AddPhysicsParameter( PhysicsParameter* InputParam, bool replace =false );
+		bool AddPhysicsParameter( const PhysicsParameter* InputParam, bool replace =false );
 
 		/*!
 		 * @brief This Adds the given ParameterSet to this set
@@ -193,7 +193,7 @@ class ParameterSet
 		 *
 		 * @return true = everything went as expected , false an error occurred (This is 'never' tested should this just be a void routine?)
 		 */
-		bool AddPhysicsParameters( ParameterSet* InputParam, bool replace =false );
+		bool AddPhysicsParameters( const ParameterSet* InputParam, bool replace =false );
 
 		/*!
 		 * @brief Output some debugging info
@@ -216,9 +216,9 @@ class ParameterSet
 	private:
 		void SetUniqueID( size_t );
 
-		vector<PhysicsParameter*> allParameters;	/*!	vector of pointers to all of the Physics Parameters managed by this ParameterSet			*/
+		mutable vector<PhysicsParameter*> allParameters;	/*!	vector of pointers to all of the Physics Parameters managed by this ParameterSet			*/
 		vector<string> allNames;			/*!	vector of strings of the names of all of the Physics Parameters						*/
-		size_t uniqueID;
+		mutable size_t uniqueID;
 };
 
 #endif

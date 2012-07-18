@@ -75,6 +75,14 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	minimiser->SetDebug( debug );
 	cout << endl;
 
+	/*
+	vector<IPDF*> pdfs = Bottle->GetAllPDFs();
+	for( unsigned int i=0; i< pdfs.size(); ++i )
+	{
+		pdfs[i]->GetPhysicsParameters()->Print();
+	}
+	*/
+
 	FitFunction * theFunction = FunctionConfig->GetFitFunction();
 	theFunction->SetDebug( debug );
 	theFunction->SetPhysicsBottle(Bottle);
@@ -107,6 +115,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	ParameterSet* checkedBottleParameters = CheckInputParams( BottleParameters, allPDFs );
 
 	checkedBottleParameters->FloatedFirst();
+
+	//checkedBottleParameters->Print();
 
 	ParameterSet* checkedGenerationParameters = GenerationParameters( checkedBottleParameters, BottleParameters );
 
