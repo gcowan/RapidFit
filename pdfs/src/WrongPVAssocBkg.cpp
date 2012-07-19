@@ -36,6 +36,8 @@ WrongPVAssocBkg::WrongPVAssocBkg( PDFConfigurator* config ) :
 	, ymin(), ymax()
 	, deltax(), deltay()
 	, total_num_entries()
+	, total_num_entries_phase_space()
+	, normalisationDone(false)
 {
 
 	cout << "Constructing PDF: WrongPVAssocBkg  " << endl ;
@@ -157,10 +159,10 @@ WrongPVAssocBkg::WrongPVAssocBkg( PDFConfigurator* config ) :
 		cout << endl;
 
 		// Check.  This order works for both bases since phi is always the third one.
-		if ((xmax-xmin) < 25. || (ymax-ymin) < 200. ) 
+		if (xmin>0.3 || xmax<14.0 || ymin >5200. || ymax<5550. ) 
 		{
-			cout << "In WrongPVAssocBkg::WrongPVAssocBkg: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
-			exit(1);
+			cout << "In WrongPVAssocBkg::WrongPVAssocBkg: The histo range does not cover t[0.3-14] m[5200-5550]- *****you should worry******" << endl;
+			//exit(1);
 		}
 
 		cout << "Finishing processing histo" << endl;
@@ -175,8 +177,11 @@ xmin(input.xmin), xmax(input.xmax),
 ymin(input.ymin), ymax(input.ymax), 
 deltax(input.deltax), deltay(input.deltay), 
 total_num_entries(input.total_num_entries), 
+total_num_entries_phase_space(input.total_num_entries),
+normalisationDone(input.normalisationDone),
 massName(input.massName), timeName(input.timeName), eventResolutionName( input.eventResolutionName ), 
 mass(input.mass), time(input.time)
+//firstxbin(input.firstxbin),lastxbin(input.lastxbin),lotimebin_correction_factor(input.lotimebin_correction_factor)
 {
 }
 
@@ -201,7 +206,7 @@ void WrongPVAssocBkg::MakePrototypes()
 vector<string> WrongPVAssocBkg::GetDoNotIntegrateList()
 {
         vector<string> list;
-        list.push_back(eventResolutionName);
+        //list.push_back(eventResolutionName);
         return list;
 }
 
@@ -215,6 +220,30 @@ bool WrongPVAssocBkg::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Main method to build the PDF return value
 double WrongPVAssocBkg::Evaluate(DataPoint * measurement)
 {
+
+	//This bit has to be done once to find the total number of entries within the phase space boundary	
+	if( ! normalisationDone )
+	{
+		double tlow = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMinimum();
+		double thigh = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMaximum();
+		double mlow = measurement->GetPhaseSpaceBoundary()->GetConstraint( massName )->GetMinimum();
+		double mhigh = measurement->GetPhaseSpaceBoundary()->GetConstraint( massName )->GetMaximum();		
+		total_num_entries_phase_space = 0;		
+		for(int i=1; i < nxbins+1; ++i)	{ 
+			for (int j=1; j < nybins+1; ++j)
+			{
+				double xcenter = (histo->GetXaxis())->GetBinCenter(i) ;
+				double ycenter = (histo->GetYaxis())->GetBinCenter(j) ;
+				if( (xcenter>=tlow)&&(xcenter<=thigh)&&(ycenter>=mlow)&&(ycenter<=mhigh) ) {
+					total_num_entries_phase_space += histo->GetBinContent(i,j);
+				}
+			}
+		}		
+		normalisationDone = true ;
+		cout << "WrongPVAssocBkg::Evaluate: Total number entries = "  <<total_num_entries << "  of which in phase space = " << total_num_entries_phase_space << endl ;
+	}
+	
+	
 	// Observable
 	mass = measurement->GetObservable( massName )->GetValue();
 	time = measurement->GetObservable( timeName )->GetValue();
@@ -241,19 +270,16 @@ double WrongPVAssocBkg::timeMassFactor( )
 {
 	double returnValue = 0.;
 
-	int globalbin = -1;
 	int xbin = -1, ybin = -1;
 	double num_entries_bin = -1.;
 
-		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-		xbin = xaxis->FindFixBin( time ); if( xbin > nxbins ) xbin = nxbins;
-		ybin = yaxis->FindFixBin( mass ); if( ybin > nybins ) ybin = nybins;
-		
-		globalbin = histo->GetBin( xbin, ybin );
-		num_entries_bin = histo->GetBinContent(globalbin);
-
-		//Angular factor normalized with phase space of histogram and total number of entries in the histogram
-		returnValue = num_entries_bin / (deltax * deltay) / total_num_entries ;
 	
+	//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
+	xbin = xaxis->FindFixBin( time ); if( xbin > nxbins ) xbin = nxbins; if( xbin < 1 ) xbin = 1;
+	ybin = yaxis->FindFixBin( mass ); if( ybin > nybins ) ybin = nybins; if( ybin < 1 ) ybin = 1;
+	num_entries_bin = histo->GetBinContent(xbin,ybin);
+	
+	returnValue = num_entries_bin / (deltax * deltay) / total_num_entries_phase_space ;
+
 	return returnValue;
 }

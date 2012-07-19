@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/07/19 Pete Clarke
+   - Modified WrongPVAssocBkg   to do normalisation correctly for a reduced phase space w.r.t. the histogram
+
 2012/07/18 Rob Currie
    - Removed the old throw/false statements from the SetPhysicsParameters
    - Now looping over all of the input to change the internal PhysicsParameters

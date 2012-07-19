@@ -56,6 +56,8 @@ class WrongPVAssocBkg : public BasePDF
 		int nxbins, nybins;
 		double xmin, xmax, ymin, ymax, deltax, deltay;
 		double total_num_entries;
+		double total_num_entries_phase_space;
+		bool normalisationDone ;
 };
 
 #endif
