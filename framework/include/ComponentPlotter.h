@@ -33,7 +33,7 @@
  *
  * For each of these points it projects the PDF and renormalises the value to compare it to data
  *
- * 
+ *
  * Component 0 is defined as the total value from the PDF (the PDF should return the full Evaluate here
  *
  * Discrete Combination 0 is defined as the total of each of the Discrete Combinations within the PhaseSpace
@@ -163,6 +163,18 @@ class ComponentPlotter
 		 */
 		pair<double,double> GetChi2Numbers();
 
+		/*!
+		 * @brief Return Data which is to be used by the Pull Plot
+		 *
+		 * @return This returns a vector of values for each mass bin
+		 *         This has dimension MassBins x 3
+		 *         Each nested vector contains the total PDF value at the lower edge, center and upper edge of each bin
+		 */
+		vector<double> GetFunctionEval();
+
+		static TGraphErrors* PullPlot1D( vector<double> input_bin_theory_data, TGraphErrors* input_data, string observableName, string CombinationDescription,
+
+				TRandom* rand = NULL, CompPlotter_config* conf=NULL, DebugClass* debug = NULL );
 
 		/*!
 		 * @brief A Function which can correctly merge seperate datasets into a single TGraphErrors object
@@ -210,19 +222,25 @@ class ComponentPlotter
 
 				TRandom* rand=NULL, CompPlotter_config* config=NULL, DebugClass* =NULL );
 
+		static void OutputPlotPull( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary,
+
+				vector<double> input_bin_theory_data, TRandom* rand=NULL, CompPlotter_config* config=NULL, DebugClass* =NULL );
 
 		/*!
 		 * @brief Required for wrapping this class in a TF1 for Chi2 calculations
-		 * 
+		 *
 		 * @param x  this is a pointer to the Oservable Value
 		 *
-		 * @param p  this is unused but is there to interface with ROOT
+		 * @param p  this is explicitly unused but is there to interface with ROOT
 		 *
 		 * @return This returns the Projection at the observable value X and allows the PDF to be truth for a Chi2 test
 		 */
 		double operator() (double *x, double *p);
 
+
 		void SetDebug( DebugClass* debug );
+
+
 	private:
 
 		/*!
@@ -289,7 +307,7 @@ class ComponentPlotter
 		 *
 		 * @param Name  This is the name of the Component being interrogated
 		 *
-		 * @return This returns the Y coordinates of the various Projections in the chosen Observable 
+		 * @return This returns the Y coordinates of the various Projections in the chosen Observable
 		 */
 		vector<vector<double>* >* MakeYProjectionData( string Name );
 
@@ -333,7 +351,7 @@ class ComponentPlotter
 
 		/*!
 		 * @brief This is a slimmed down version of the AddBranch function I have written elsewhere
-		 * 
+		 *
 		 * This requires that the branch_data has the same number of points as already in the tuple and will ONLY write the values as doubles.
 		 *
 		 * @param input_tree   This is the Tree we want to add a branch to
@@ -353,7 +371,7 @@ class ComponentPlotter
 
 		/*!
 		 * @brief Populate a vector of datasets containing the observable Values from the input fit
-		 * 
+		 *
 		 * Populates the minimum, maximum and binNumber vectors
 		 *
 		 * At the moment I use the min, max and binnum of the total dataset for this PDF (all combinations)
@@ -382,7 +400,7 @@ class ComponentPlotter
 		 *
 		 * @param Min    This is the absolute minimum of this Observable in the whole PhaseSpace
 		 *
-		 * @param Max    This is the absolute maximum of this Observable in the whole PhaseSpace	
+		 * @param Max    This is the absolute maximum of this Observable in the whole PhaseSpace
 		 *
 		 * @param Bins   This is the optimal Binning for the Whole DataSet if it wa all Gaussianly Distributed
 		 *
@@ -526,6 +544,8 @@ class ComponentPlotter
 		CompPlotter_config* this_config;
 
 		bool onlyZero;				/*!	Should this class mimic the old Plotter behaviour?	*/
+
+		vector<double> allPullData;	/*!	This will store the value of the total PDF evaluated at each bin, lower edge, center, and upper edge	*/
 
 		DebugClass* debug;
 };

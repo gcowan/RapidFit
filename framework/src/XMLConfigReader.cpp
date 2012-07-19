@@ -458,7 +458,7 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		}
 		else if( projComps[childIndex]->GetName() == "TrustNumerical" )
 		{
-			string value =  projComps[childIndex]->GetValue()[0];
+			string value = projComps[childIndex]->GetValue()[0];
 			if( value == "True" )
 			{
 				returnable_config->ScaleNumerical = false;
@@ -466,10 +466,18 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		}
 		else if( projComps[childIndex]->GetName() == "CalcChi2" )
 		{
-			string value =  projComps[childIndex]->GetValue()[0];
+			string value = projComps[childIndex]->GetValue()[0];
 			if( value == "True" )
 			{
 				returnable_config->CalcChi2 = true;
+			}
+		}
+		else if( projComps[childIndex]->GetName() == "DrawPull" )
+		{
+			string value = projComps[childIndex]->GetValue()[0];
+			if( value == "True" )
+			{
+				returnable_config->DrawPull = true;
 			}
 		}
 		else

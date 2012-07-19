@@ -11,6 +11,7 @@
 #include "TTree.h"
 #include "TGraph.h"
 #include "TGraphErrors.h"
+#include "TCanvas.h"
 //	RapidFit Headers
 #include "OutputConfiguration.h"
 #include "ResultFormatter.h"
@@ -281,7 +282,9 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 		vector< pair<double,double> > chi2_results;
 
-		for (int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
+		vector< vector<double> > pullFunctionEvals;
+
+		for( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 		{
 			string thisObservable = (*projection_i)->observableName;
 
@@ -321,6 +324,8 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 			chi2_results.push_back( thisPlotter->GetChi2Numbers() );
 
+			pullFunctionEvals.push_back( thisPlotter->GetFunctionEval() );
+
 			all_datasets_for_all_results.push_back( thisPlotter->GetBinnedData()[0] );
 			all_components_for_all_results.push_back( thisPlotter->GetComponents()[0] );
 		}
@@ -334,7 +339,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 				total_chi2 += chi2_results[i].first;
 				total_N += chi2_results[i].second;
 			}
-			double final_corrected_chi2 = total_chi2 / ( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. ) ;
+			double final_corrected_chi2 = total_chi2 / ( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. );
 			(*projection_i)->Chi2Value = final_corrected_chi2;
 
 			cout << endl << "\tFinal chi2/ndof = " << setprecision(10) << final_corrected_chi2 << endl << endl;
@@ -356,6 +361,9 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			if( (int)all_components_for_all_results[i].size() != num ) compatible = false;
 		}
 
+		TGraphErrors* Total_BinnedData = NULL;
+
+		vector<TGraph*> Total_Components;
 
 		//	We only want to overlay the output when all of the PDFs have the same number of components
 		//	Eg it is difficult to justify trying to overlay data from JpsiPhi and Jpsif0 in one component plot, although I'm sure it's possible
@@ -364,9 +372,9 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 			//	These static functions will take the global Random function from ROOT if need be, but lets not force that issue and give it an already initialized generator
 			//	This, alas is a ROOT solution to a ROOT problem, and it creates a MESS that often is left to some code outside of ROOT to cleanup!
-			TGraphErrors* Total_BinnedData = ComponentPlotter::MergeBinnedData( all_datasets_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
+			Total_BinnedData = ComponentPlotter::MergeBinnedData( all_datasets_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
 
-			vector<TGraph*> Total_Components = ComponentPlotter::MergeComponents( all_components_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
+			Total_Components = ComponentPlotter::MergeComponents( all_components_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
 
 			output_file->cd();
 			output_file->mkdir( "Total" );
@@ -377,6 +385,25 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 					resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
 		}
 
+		if( (Total_BinnedData != NULL) && ((*projection_i)->DrawPull == true) )
+		{
+			vector<double> finalPullEvals;					//	This will contain a nested vectors of 3 in size
+
+			for( unsigned int i=0; i< pullFunctionEvals[0].size(); ++i )		//	Loop over all Bins
+			{
+				double this_bin=0.;
+				for( unsigned int j=0; j< pullFunctionEvals.size(); ++j )	//	Loop over all PDFs (all ToFits)
+				{
+					this_bin+= pullFunctionEvals[j][i];
+				}
+				finalPullEvals.push_back( this_bin );
+			}
+
+			TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_All_Data", resultBottle->GetResultPDF(0)->GetRandomFunction() );
+			(void) pullGraph;
+
+			ComponentPlotter::OutputPlotPull( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(), finalPullEvals, resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
+		}
 
 		//	it is now safe to remove the instances of ComponentPlotter
 		for( vector<ComponentPlotter*>::iterator compP_i = allComponentPlotters.begin(); compP_i != allComponentPlotters.end(); ++compP_i )

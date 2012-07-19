@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/07/19 Rob Currie
+   - Added DrawPull option to Projections in XML
+   - Added 1D pull Histogram support. Errors in pull are hard-coded to 1.
+       This seems sensible as this is calculated after normalisation, but I'm not certain...
+   - Added support functions to ComponentPlotter and modified OutputConfiguration to perform this new plotting
+
 2012/07/19 Pete Clarke
    - Modified WrongPVAssocBkg   to do normalisation correctly for a reduced phase space w.r.t. the histogram
 

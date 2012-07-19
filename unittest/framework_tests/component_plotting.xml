@@ -239,6 +239,7 @@
 			<WidthKey>0:3:3:3:3:3:3:3:3</WidthKey>
 			<YTitle>Events</YTitle>
 			<XTitle>Mass</XTitle>
+			<DrawPull>True</DrawPull>
 		</ComponentProjection>
 	</Output>
 

@@ -30,8 +30,8 @@ class CompPlotter_config
                  */                                                                                                                      
                 CompPlotter_config() :                                                                                                   
                         data_bins(100), PDF_points(128), observableName("undefined"), logY(false), color_key(), style_key(), width_key(), component_names(), PlotTitle(""),
-                        xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false), ScaleNumerical(true)
-
+                        xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false), ScaleNumerical(true),
+			DrawPull(false)
                 {}                                                                                                                       
                                                                                                                                          
                                                                                                                                          
@@ -50,6 +50,7 @@ class CompPlotter_config
                 double Chi2Value;               /*!     This is where the Chi2 final value is stored after it's calculated                                                      */
                 bool OnlyZero;                  /*!     If true this class will mimic the correct behaviour of the old Plotter class                                            */
 		bool ScaleNumerical;		/*!	Do you scale the Numerical or Analytical Integral                                                                       */
+		bool DrawPull;			/*!	Should I draw the Pull Plot from this projection over the data?								*/
 };
 
 #endif

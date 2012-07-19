@@ -22,6 +22,7 @@
 #include "TGraphErrors.h"
 #include "TF1.h"
 #include "TLatex.h"
+#include "TPad.h"
 ///	RapidFit Headers
 #include "ComponentPlotter.h"
 #include "StatisticsFunctions.h"
@@ -49,7 +50,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ), logY( (config!=NULL)?config->logY:false ),
 	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false ),
 	combination_integral(0.), ratioOfIntegrals(0.), wanted_weights(), format(), data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(),
-	total_components(), chi2(), N(), debug( new DebugClass(false) )
+	total_components(), chi2(), N(), allPullData(), debug( new DebugClass(false) )
 {
 	plotPDF->TurnCachingOff();
 
@@ -628,6 +629,27 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				   Chi2test->Write("",TObject::kOverwrite);
 				   */
 			}
+
+			if( combinationIndex == 0 && this_config->DrawPull == true )
+			{
+				cout << endl;
+				cout << "Calculatig Pull Values" << endl;
+
+				TF1* PDF_function = new TF1( "total_PDF", this, boundary_min, boundary_max, 1, "" );        //      I REFUSE to pass the class name
+
+				for( unsigned int i=0; i< (unsigned)binned_data.back()->GetN(); ++i )
+				{
+					double bin_center = binned_data.back()->GetX()[i];
+
+					double this_bin = PDF_function->Eval( bin_center );
+
+					allPullData.push_back( this_bin );
+				}
+
+				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc, plotPDF->GetRandomFunction() );
+
+				(void)pullPlot;
+			}
 		}
 
 		delete temp;
@@ -895,6 +917,263 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( !component_names.empty() ) leg->Draw();
 
 	c1->Update();
+
+	c1->Write("",TObject::kOverwrite);
+
+	TString Clean_Description = StringProcessing::Clean( CombinationDescription.c_str() );
+
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
+	ofstream filestr;
+
+	int fd=0;
+	fpos_t pos;
+
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			filestr.open ("/dev/null");
+			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
+			cout_bak = cout.rdbuf();
+			cerr_bak = cerr.rdbuf();
+			clog_bak = clog.rdbuf();
+			nullbuf = filestr.rdbuf();
+			fflush(stderr);
+			fgetpos(stderr, &pos);
+			fd = dup(fileno(stdout));
+			freopen("/dev/null", "w", stderr);
+			cout.rdbuf(nullbuf);
+			cerr.rdbuf(nullbuf);
+			clog.rdbuf(nullbuf);
+		}
+	}
+
+	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
+	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
+	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
+
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			fflush(stderr);
+			dup2(fd,fileno(stderr));
+			close(fd);
+			clearerr(stderr);
+			fsetpos(stderr, &pos);
+			cout.rdbuf( cout_bak );
+			cerr.rdbuf( cerr_bak );
+			clog.rdbuf( clog_bak );
+		}
+	}
+
+}
+
+//	Plot all components on this combinations and print and save the canvas
+void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary, vector<double> input_bin_theory_data, TRandom* rand, CompPlotter_config* conf, DebugClass* debug )
+{
+	if( rand == NULL ) rand = gRandom;
+	TString TCanvas_Name("Overlay_"+observableName+"_"+CombinationDescription+"_");TCanvas_Name+=rand->Rndm();
+
+	bool logy=false;
+
+	TCanvas* c1 = new TCanvas( TCanvas_Name, "", 1680, 1050 );
+
+	if( conf != NULL )
+	{
+		if( conf->logY )
+		{
+			logy=true;
+			c1->SetLogy( true );
+			//c1->Update();
+		}
+	}
+
+	TPad* pad1 = new TPad("pad1","pad1", 0., 0.3, 1., 1.);
+	TPad* pad2 = new TPad("pad2","pad2", 0., 0.0, 1., 0.3);
+	pad1->Draw();
+	pad2->Draw();
+
+	pad1->cd();
+	TString plotTitle;
+
+	vector<int> Style_Key, Color_Key, Width_Key;
+
+	vector<string> component_names;
+
+	double X_min=-999, X_max=-999;
+	double Y_min=-999, Y_max=-999;
+
+	TString X_Title, Y_Title;
+
+	double final_chi2=-999;
+
+	if( conf != NULL )
+	{
+		if( conf->logY )
+		{
+			logy=true;
+			pad1->SetLogy( true );
+			//c1->Update();
+		}
+		plotTitle = conf->PlotTitle;
+		Style_Key = conf->style_key;
+		Color_Key = conf->color_key;
+		Width_Key = conf->width_key;
+		component_names = conf->component_names;
+		X_min = conf->xmin;
+		X_max = conf->xmax;
+		Y_min = conf->ymin;
+		Y_max = conf->ymax;
+		X_Title = conf->xtitle;
+		Y_Title = conf->ytitle;
+		final_chi2 = conf->Chi2Value;
+	}
+
+	input_data->SetTitle( plotTitle );
+	input_data->Draw("AP9");
+	pad1->Modified();
+	pad1->Update();
+	c1->Update();
+	if( logy ) pad1->SetLogy( true );
+
+	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
+	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
+	if( Y_min <= -999 ) Y_min = logy==true?0.5:0.;
+	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
+
+	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
+	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Candidates";
+
+	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
+	input_data->GetYaxis()->SetTitle( Y_Title );
+	input_data->GetXaxis()->SetRangeUser( X_min, X_max );
+	input_data->GetXaxis()->SetTitle( X_Title );
+
+	pad1->Modified();
+	pad1->Update();
+	if( logy ) pad1->SetLogy( true );
+	c1->Update();
+
+	TLatex *myLatex = new TLatex(0.5,0.5,"");
+	myLatex->SetTextAlign(11);
+	myLatex->SetNDC(kTRUE);
+	myLatex->DrawLatex(0.59, 0.75,"LHCb");
+
+	TLegend* leg = EdStyle::LHCbLegend();
+
+	leg->AddEntry( input_data, "Data", "pl" );
+
+	unsigned int num=0;
+	for( vector<TGraph*>::iterator comp_i = input_components.begin(); comp_i != input_components.end(); ++comp_i, ++num )
+	{
+		if( !Style_Key.empty() )
+		{
+			if( num < Style_Key.size() )
+			{
+				(*comp_i)->SetLineStyle( (Style_t)Style_Key[num] );
+			}
+		}
+		if( !Color_Key.empty() )
+		{
+			if( num < Color_Key.size() )
+			{
+				(*comp_i)->SetLineColor( (Color_t)Color_Key[num] );
+			}
+		}
+		if( !Width_Key.empty() )
+		{
+			if( num < Width_Key.size() )
+			{
+				(*comp_i)->SetLineWidth( (Width_t)Width_Key[num] );
+			}
+		}
+
+		if( (*comp_i)->GetLineWidth() != 0 )
+		{
+			(*comp_i)->Draw("L9");
+
+			if( !component_names.empty() )
+			{
+				if( num < component_names.size() )
+				{
+					leg->AddEntry( (*comp_i), TString(component_names[num]), "l" );
+				}
+				else
+				{
+					leg->AddEntry( (*comp_i), "Unnamed", "l" );
+				}
+			}
+		}
+	}
+
+	if( final_chi2 > 0 )
+	{
+		TString Chi2Text( "#chi^{2}/ndof : " );
+		stringstream chi_stream; chi_stream << setprecision(4) << final_chi2;
+		Chi2Text.Append( chi_stream.str() );
+		leg->AddEntry( (TObject*)NULL, Chi2Text, "" );
+	}
+
+	pad1->Modified();
+	pad1->Update();
+	c1->Update();
+	if( !component_names.empty() ) leg->Draw();
+	pad1->Modified();
+	pad1->Update();
+	if( logy ) pad1->SetLogy( true );
+	c1->Update();
+
+
+	pad2->cd();
+
+
+
+	vector<double> pull_value, pull_error_value,  x_values,  x_errs;
+
+	for( unsigned int i=0; i< input_bin_theory_data.size(); ++i )		//	Explicit Assumption that theory.size() == input_data->GetN()
+	{
+		double theory_y = input_bin_theory_data[i];
+
+		double data_y = input_data->GetY()[i];
+		double data_err = input_data->GetErrorY( i );
+
+		double pull = (data_y - theory_y) / data_err;
+
+		/*!
+		 * From what I understand in comparing the PDF to data in this way the residuals are normalised with an error of 1.
+		 *
+		 * I don't implicitly trust this, however I don't have a better solution to calculate a sensible error at the time of writing
+		 */
+		double pull_err = 1.;
+
+		if( pull >= DBL_MAX || data_err < 1E-10 )	pull = 0.;
+		if( data_y < 1E-10 ) pull_err = 0.;
+
+		pull_value.push_back( pull );
+		pull_error_value.push_back( pull_err );
+
+		x_values.push_back( input_data->GetX()[i] );
+		x_errs.push_back( input_data->GetErrorX( i ) );
+
+		//cout << pull << "\t" << data_y << "-" << theory_y << "/" << data_err << "\t\t\t" << pull_err << "\t\t\t" << x_values.back() << "\t" << x_errs.back() << endl;
+	}
+	//cout << endl;
+
+	TGraphErrors* pullGraph = new TGraphErrors( (int)pull_value.size(), &(x_values[0]), &(pull_value[0]), &(x_errs[0]), &(pull_error_value[0]) );
+	pullGraph->Draw("AP");
+	pad2->Modified();
+	pad2->Update();
+	c1->Update();
+
+	pullGraph->GetYaxis()->SetTitle( "Pull" );
+	pullGraph->GetXaxis()->SetRangeUser( X_min, X_max );
+	pullGraph->GetXaxis()->SetTitle( X_Title );
+	pad2->Modified();
+	pad2->Update();
+	c1->Update();
+
+
 
 	c1->Write("",TObject::kOverwrite);
 
@@ -1323,7 +1602,7 @@ vector<vector<TGraph*> > ComponentPlotter::GetComponents()
 
 double ComponentPlotter::operator() (double *x, double *p)
 {
-	(void) p;
+	(void) p;			//	NOT USED OR UNDERSTOOD IN THIS CONTEXT
 	double fixed_obs_val = x[0];
 
 	Observable* oldObs=NULL;
@@ -1392,5 +1671,125 @@ void ComponentPlotter::SetDebug( DebugClass* input_debug )
 		if( debug != NULL ) delete debug;
 		debug = new DebugClass(false);
 	}
+}
+
+
+vector<double> ComponentPlotter::GetFunctionEval()
+{
+	return allPullData;
+}
+
+TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data, TGraphErrors* input_data, string observableName, string CombinationDescription, TRandom* rand, CompPlotter_config* conf, DebugClass* debug )
+{
+	if( rand == NULL ) rand = gRandom;
+
+	vector<double> pull_value;
+	vector<double> pull_error_value;
+
+	vector<double> x_values;
+	vector<double> x_errs;
+
+	cout << endl;
+	for( unsigned int i=0; i< input_bin_theory_data.size(); ++i )		//	Explicit Assumption that theory.size() == input_data->GetN()
+	{
+		double theory_y = input_bin_theory_data[i];
+
+		double data_y = input_data->GetY()[i];
+		double data_err = input_data->GetErrorY( i );
+
+		double pull = (data_y - theory_y) / data_err;
+
+		/*!
+		 * From what I understand in comparing the PDF to data in this way the residuals are normalised with an error of 1.
+		 *
+		 * I don't implicitly trust this, however I don't have a better solution to calculate a sensible error at the time of writing
+		 */
+		double pull_err = 1.;
+
+		if( pull >= DBL_MAX || data_err < 1E-10 )	pull = 0.;
+		if( data_y < 1E-10 ) pull_err = 0.;
+
+		pull_value.push_back( pull );
+		pull_error_value.push_back( pull_err );
+
+		x_values.push_back( input_data->GetX()[i] );
+		x_errs.push_back( input_data->GetErrorX( i ) );
+
+		//cout << pull << "\t" << data_y << "-" << theory_y << "/" << data_err << "\t\t\t" << pull_err << "\t\t\t" << x_values.back() << "\t" << x_errs.back() << endl;
+	}
+	cout << endl;
+
+	TGraphErrors* pullGraph = new TGraphErrors( (int)pull_value.size(), &(x_values[0]), &(pull_value[0]), &(x_errs[0]), &(pull_error_value[0]) );
+
+	TString pullGraphName="PullGraph_"; pullGraphName+=rand->Rndm();
+
+	pullGraph->SetName( pullGraphName ); pullGraph->SetTitle( pullGraphName );
+
+	TString canvas_name = "PullPlot_"; canvas_name.Append(observableName); canvas_name.Append("_"); canvas_name+=rand->Rndm();
+	TCanvas* c1 = new TCanvas( canvas_name, canvas_name, 1680, 1050 );
+	pullGraph->Draw("AP");
+	c1->Update();
+	//pullGraph->GetYaxis()->SetRangeUser(-5.,5.);
+
+	TString X_Title;
+	TString Y_Title;
+
+	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
+        if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Pull";
+
+        input_data->GetYaxis()->SetTitle( Y_Title );
+        //input_data->GetXaxis()->SetRangeUser( X_min, X_max );
+        input_data->GetXaxis()->SetTitle( X_Title );
+
+	c1->Update();
+
+	TString Clean_Description = StringProcessing::Clean( CombinationDescription.c_str() );
+
+	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
+	ofstream filestr;
+
+	int fd=0;
+	fpos_t pos;
+
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			filestr.open ("/dev/null");
+			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
+			cout_bak = cout.rdbuf();
+			cerr_bak = cerr.rdbuf();
+			clog_bak = clog.rdbuf();
+			nullbuf = filestr.rdbuf();
+			fflush(stderr);
+			fgetpos(stderr, &pos);
+			fd = dup(fileno(stdout));
+			freopen("/dev/null", "w", stderr);
+			cout.rdbuf(nullbuf);
+			cerr.rdbuf(nullbuf);
+			clog.rdbuf(nullbuf);
+		}
+	}
+
+	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
+	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
+	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
+
+	if( debug != NULL )
+	{
+		if( !debug->GetStatus() )
+		{
+			fflush(stderr);
+			dup2(fd,fileno(stderr));
+			close(fd);
+			clearerr(stderr);
+			fsetpos(stderr, &pos);
+			cout.rdbuf( cout_bak );
+			cerr.rdbuf( cerr_bak );
+			clog.rdbuf( clog_bak );
+		}
+	}
+
+	return pullGraph;
 }
 
