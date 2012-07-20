@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/07/20 Greig Cowan
+   - Added PDFs for dealing with per-event errors. LogNormal parameterisation and PDF for taking histogram.
+   - Modified PDFs to allow for use of Punzi terms.
+
 2012/07/20 Pete Clarke
    - Added a  "MakeFalat" configuration boolean to WrongPVAssocBkg  - lets you forc it flat in time and mass
 

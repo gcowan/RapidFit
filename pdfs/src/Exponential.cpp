@@ -38,10 +38,12 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 	, _useEventResolution(false)
 	, _useTimeAcceptance(false)
 , _numericIntegralForce(false)
+, _usePunziSigmat(false)
 {
 	_useEventResolution = configurator->isTrue( "UseEventResolution" );
 	_useTimeAcceptance  = configurator->isTrue( "UseTimeAcceptance" );
 	_numericIntegralForce = configurator->isTrue( "UseNumericalIntegration" );
+        _usePunziSigmat = configurator->isTrue( "UsePunziSigmat" );
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0033 );
@@ -81,6 +83,7 @@ Exponential::Exponential( const Exponential &copy ) :
 	, _useEventResolution( copy._useEventResolution )
         , _useTimeAcceptance( copy._useTimeAcceptance )
 	, _numericIntegralForce( copy._numericIntegralForce )
+	, _usePunziSigmat( copy._usePunziSigmat )
 {
         timeAcc = new SlicedAcceptance( *(copy.timeAcc) );
 	cout << "making copy " << tau << endl;
@@ -118,7 +121,7 @@ void Exponential::MakePrototypes()
 vector<string> Exponential::GetDoNotIntegrateList()
 {
 	vector<string> list;
-	if( useEventResolution() ) list.push_back(eventResolutionName);
+	if( useEventResolution() && !_usePunziSigmat ) list.push_back(eventResolutionName);
 	return list;
 }
 

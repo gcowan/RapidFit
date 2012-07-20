@@ -89,6 +89,9 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 
 	string weightName2 = weightName+"2";
 
+	double sum = 0.;
+	double sum2 = 0.;
+
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
 	{
 		//Calculate the sWeight
@@ -121,10 +124,15 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
 		newEvent->AddObservable( weightName, numerator / denominator, 0.0, "Unitless" );
 		newEvent->AddObservable( weightName2, numerator2 / denominator2, 0.0, "Unitless" );
 
+                sum += numerator / denominator;
+                sum2 += numerator2 / denominator2;
+
 		allValues.push_back( numerator / denominator );
 		allValues2.push_back( numerator2 / denominator2 );
 		allPoints.push_back( newEvent );
 	}
+
+	cout << sum << " " << sum2 << endl;
 
         PhaseSpaceBoundary* dataSetBoundary = new PhaseSpaceBoundary( *(InputData->GetBoundary()) );
 	double min=0., max=0., min2=0., max2=0.;

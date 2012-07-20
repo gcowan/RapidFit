@@ -67,8 +67,6 @@ class DoubleExponential : public BasePDF
 		double resolutionScale1;
 		double resolutionScale2;
 		double resolutionScale3;
-		bool _useEventResolution;
-		inline bool useEventResolution() const {return _useEventResolution;}
 
 		double tlow, thigh; // integration limits
 
@@ -83,8 +81,10 @@ class DoubleExponential : public BasePDF
 		//Configurationparameters
 		bool _useTimeAcceptance;
 		bool _numericIntegralForce;
+		bool _useEventResolution;
+		bool _usePunziSigmat;
+		inline bool useEventResolution() const {return _useEventResolution;}
         	inline bool useTimeAcceptance() const { return _useTimeAcceptance;}
-
 };
 
 #endif
