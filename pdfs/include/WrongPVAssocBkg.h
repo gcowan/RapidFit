@@ -58,6 +58,7 @@ class WrongPVAssocBkg : public BasePDF
 		double total_num_entries;
 		double total_num_entries_phase_space;
 		bool normalisationDone ;
+		bool _makeFlat ;
 };
 
 #endif

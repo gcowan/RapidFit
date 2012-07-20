@@ -38,12 +38,20 @@ WrongPVAssocBkg::WrongPVAssocBkg( PDFConfigurator* config ) :
 	, total_num_entries()
 	, total_num_entries_phase_space()
 	, normalisationDone(false)
+	, _makeFlat(false)
 {
 
 	cout << "Constructing PDF: WrongPVAssocBkg  " << endl ;
 
 	//Make prototypes
 	MakePrototypes();
+
+	// If the flat distribution is chosen, ther eis nothing needed 
+	_makeFlat  = config->isTrue( "MakeFlat") ;
+	if( _makeFlat ) {
+		cout << " WrongPVAssocBkg::WrongPVAssocBkg: constructing with flat time and mass distributions " << endl ;
+		return ;
+	}
 	
 	//Find name of histogram needed to define 3-D angular distribution
 	string fileName = config->getConfigurationValue( "TimeMassHistogram" ) ;
@@ -180,8 +188,8 @@ total_num_entries(input.total_num_entries),
 total_num_entries_phase_space(input.total_num_entries),
 normalisationDone(input.normalisationDone),
 massName(input.massName), timeName(input.timeName), eventResolutionName( input.eventResolutionName ), 
-mass(input.mass), time(input.time)
-//firstxbin(input.firstxbin),lastxbin(input.lastxbin),lotimebin_correction_factor(input.lotimebin_correction_factor)
+mass(input.mass), time(input.time),
+_makeFlat(input._makeFlat)
 {
 }
 
@@ -221,7 +229,18 @@ bool WrongPVAssocBkg::SetPhysicsParameters( ParameterSet * NewParameterSet )
 double WrongPVAssocBkg::Evaluate(DataPoint * measurement)
 {
 
-	//This bit has to be done once to find the total number of entries within the phase space boundary	
+	// If flat, then nothing to do
+	if( _makeFlat ) {
+		double tlow = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMinimum();
+		double thigh = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMaximum();
+		double mlow = measurement->GetPhaseSpaceBoundary()->GetConstraint( massName )->GetMinimum();
+		double mhigh = measurement->GetPhaseSpaceBoundary()->GetConstraint( massName )->GetMaximum();		
+		return 1. / (thigh-tlow) / (mhigh-mlow) ;
+	}
+	
+	
+	//If not flat, then this bit has to be done once to find the total number of entries within the phase space boundary	
+	// Has to be done here as this is first time phase space boundary is avaialble.
 	if( ! normalisationDone )
 	{
 		double tlow = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMinimum();
@@ -249,6 +268,8 @@ double WrongPVAssocBkg::Evaluate(DataPoint * measurement)
 	time = measurement->GetObservable( timeName )->GetValue();
 	
 	return this->timeMassFactor();
+	
+	
 }
 
 

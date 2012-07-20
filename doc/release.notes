@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/07/20 Pete Clarke
+   - Added a  "MakeFalat" configuration boolean to WrongPVAssocBkg  - lets you forc it flat in time and mass
+
 2012/07/19 Rob Currie
    - Added DrawPull option to Projections in XML
    - Added 1D pull Histogram support. Errors in pull are hard-coded to 1.
