@@ -368,3 +368,14 @@ extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
 
 #endif
 
+
+/*!
+ * @brief some common thread locking commands
+ */
+
+#define PDF_THREAD_LOCK\
+	if( this->DebugMutex() != NULL ) pthread_mutex_lock( this->DebugMutex() );\
+
+#define PDF_THREAD_UNLOCK\
+	if( this->DebugMutex() != NULL ) pthread_mutex_unlock( this->DebugMutex() );
+

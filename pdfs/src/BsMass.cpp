@@ -178,6 +178,7 @@ double BsMass::Evaluate(DataPoint * measurement)
 
 	if( isnan(returnValue) )
 	{
+		PDF_THREAD_LOCK
 		measurement->Print();
 		measurement->GetPhaseSpaceBoundary()->Print();
 		allParameters.Print();
@@ -187,6 +188,7 @@ double BsMass::Evaluate(DataPoint * measurement)
 		cout << "s1_erf_factor: " << erf((mhigh-m_Bs)/(sigma_m1*sqrt(2.))) << "-" << erf((mlow-m_Bs)/(sigma_m1*sqrt(2.))) << "   s2_erf_factor: " << s2_erf_factor << endl;
 		cout << "factor1: " <<  "1./(" << sigma_m1 << " * " << sqrt(2.*Mathematics::Pi()) << ")" << endl;
 		cout << "factor2: " << 1./(sigma_m2*sqrt(2.*Mathematics::Pi())) << endl;
+		PDF_THREAD_UNLOCK
 	}
 
 	return returnValue;

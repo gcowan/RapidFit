@@ -289,7 +289,10 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 
 	if (returnValue <= 0)
 	{
-		cout << "PDF returns zero!" << endl;
+		PDF_THREAD_LOCK
+		cout << "3D Background PDF returns zero!" << endl;
+		measurement->Print();
+		PDF_THREAD_UNLOCK
 	}
 
 	return returnValue;
@@ -311,8 +314,10 @@ double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
 	double val1=-1., val2=-1., norm1=-1., norm2=-1.;
 	if( f_LL1 >= 0.9999 ) {
 		if( tauLL1 <= 0 ) {
+			PDF_THREAD_LOCK
 			cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
-			exit(1) ;
+			PDF_THREAD_UNLOCK
+			throw(-7632);
 		}
 		val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
 		norm1= Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
@@ -320,8 +325,10 @@ double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
 	}
 	else {
 		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
+			PDF_THREAD_LOCK
 			cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
-			exit(1) ;
+			PDF_THREAD_UNLOCK
+			throw(7632);
 		}
 		val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
 		norm1= Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);

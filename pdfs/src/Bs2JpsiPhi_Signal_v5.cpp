@@ -1213,6 +1213,8 @@ void Bs2JpsiPhi_Signal_v5::prepareCDS()
 
 void Bs2JpsiPhi_Signal_v5::DebugPrint( string message, double value )  const
 {
+	PDF_THREAD_LOCK
+
 	(void) message; (void) value;
 	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrint ***************************" << endl ;
 	cout << message << value << endl <<endl ;
@@ -1238,11 +1240,14 @@ void Bs2JpsiPhi_Signal_v5::DebugPrint( string message, double value )  const
 	cout << "   ctheta_1 " << ctheta_1 << endl ;
 	cout << "   phi_tr " << phi_tr << endl ;
 
+	PDF_THREAD_UNLOCK
 }
 
 
 void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 {
+	PDF_THREAD_LOCK
+
 	(void) message; (void) value;
 	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintXsec ***************************" << endl ;
 	cout << message << value << endl <<endl ;
@@ -1283,11 +1288,12 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 	cout << "   Pwave Only : " << PwaveTot << endl ;
 	cout << "   Swave add : " <<  SwaveAdditions << endl ;
 
+	PDF_THREAD_UNLOCK
 }
 
 void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 {
-	if( this->DebugMutex() != NULL ) pthread_mutex_lock( this->DebugMutex() );
+	PDF_THREAD_LOCK
 
 	(void) message; (void) value;
 	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
@@ -1305,6 +1311,6 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 	cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
 	cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
 
-	if( this->DebugMutex() != NULL ) pthread_mutex_unlock( this->DebugMutex() );
+	PDF_THREAD_UNLOCK
 }
 

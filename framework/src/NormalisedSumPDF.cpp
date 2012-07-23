@@ -231,11 +231,14 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 
 	if( isnan(termOne) || isnan(termTwo) )
 	{
+		PDF_THREAD_LOCK
+
 		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
-		exit(0);
+		PDF_THREAD_UNLOCK
+		throw(-653102);
 	}
 	//Return the sum
 	return termOne + termTwo;
@@ -264,9 +267,10 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 
 	if( isnan(termOne) || isnan(termTwo) )
 	{
+		PDF_THREAD_LOCK
 		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
-
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
+		PDF_THREAD_UNLOCK
 	}
 
 	//Return the sum

@@ -1,5 +1,15 @@
 // $Id: release.notes $
 
+2012/07/23 Rob Currie
+   - Added new macros to IPDF header, PDF_THREAD_LOCK and PDF_THREAD_UNLOCK
+       These are intended to be used to lock sections of code that must be run in single threaded mode. This particularly includes stdio streams
+       The macro produces code that has no effect on unthreaded calls but when multi-threading allows a simple way to lock a section of code using the main thread-lock inherited from NLLThreaded
+       Use:
+           PDF_THREAD_LOCK
+           cout << "Hi from Inside PDF" << endl;
+           PDF_THREAD_UNLOCK
+       Beware not to throw from inside a thread-lock, I have no idea what will happen, it may eat your machine, burn your results, or just hang with no responce
+
 2012/07/20 Greig Cowan
    - Added PDFs for dealing with per-event errors. LogNormal parameterisation and PDF for taking histogram.
    - Modified PDFs to allow for use of Punzi terms.

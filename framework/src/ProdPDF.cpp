@@ -153,8 +153,10 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 
 	if( isnan(termOne) || isnan(termTwo) )
 	{
+		PDF_THREAD_LOCK
 		cout << this->GetLabel() << endl;
 		cout << termOne << "\tx\t" << termTwo << endl;
+		PDF_THREAD_UNLOCK
 	}
 	return termOne * termTwo;
 }
@@ -174,9 +176,10 @@ double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	double termTwo = secondPDF->EvaluateForNumericIntegral( NewDataPoint );
 	if( isnan(termOne) || isnan(termTwo) )
 	{
+		PDF_THREAD_LOCK
 		cout << this->GetLabel() << endl;
-
 		cout << termOne << " x " << termTwo << endl;
+		PDF_THREAD_UNLOCK
 	}
 	return termOne * termTwo;
 }

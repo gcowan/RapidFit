@@ -72,7 +72,9 @@ double Bs2JpsiPhiMassBkg::Normalisation(PhaseSpaceBoundary * boundary)
 	IConstraint * massBound = boundary->GetConstraint( constraint_recoMassName );
 	if ( massBound->GetUnit() == "NameNotFoundError" )
 	{
+		PDF_THREAD_LOCK
 		cerr << "Bound on mass not provided in Bs2JpsiPhiMassBkg" << endl;
+		PDF_THREAD_UNLOCK
 		return 1.0 ;
 	}
 	else
@@ -97,11 +99,13 @@ double Bs2JpsiPhiMassBkg::Normalisation(PhaseSpaceBoundary * boundary)
 
 	if( isnan(integral) )
 	{
+		PDF_THREAD_LOCK
 		cout << "scale factor: " << exp( -alphaM_pr * 5366.0 ) << endl;
 		cout << "alphaM_pr: " << alphaM_pr << endl;
 		cout << integral << endl;
 		boundary->Print();
 		allParameters.Print();
+		PDF_THREAD_UNLOCK
 	}
 
 	return integral;
