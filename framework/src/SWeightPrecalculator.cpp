@@ -21,19 +21,28 @@
 #include <stdlib.h>
 #include <time.h>
 
-SWeightPrecalculator::SWeightPrecalculator( FitResult* InputResult, string WeightName, unsigned int config ) : inputResult(InputResult), signalPDF(NULL), backgroundPDF(NULL), weightName(WeightName), fractionName()
+SWeightPrecalculator::SWeightPrecalculator( FitResult* InputResult, string WeightName, unsigned int Inputconfig ) :
+	inputResult(InputResult), signalPDF(NULL), backgroundPDF(NULL), weightName(WeightName), fractionName(), config( Inputconfig)
 {
-	if( inputResult->GetPhysicsBottle()->GetResultPDF( 0 )->GetName() == "NormalisedSum" )
+}
+
+void SWeightPrecalculator::ConfigurePDFs( IPDF* InputPDF )
+{
+	if( InputPDF->GetName() == "NormalisedSum" )
 	{
-		NormalisedSumPDF* inputNorm = (NormalisedSumPDF*)inputResult->GetPhysicsBottle()->GetResultPDF( 0 );
+		NormalisedSumPDF* inputNorm = (NormalisedSumPDF*)InputPDF;
 		if( config == 1 )
 		{
+			if( signalPDF != NULL ) delete signalPDF;
 			signalPDF = ClassLookUp::CopyPDF( inputNorm->GetFirstPDF() );
+			if( backgroundPDF != NULL ) delete backgroundPDF;
 			backgroundPDF = ClassLookUp::CopyPDF( inputNorm->GetSecondPDF() );
 		}
 		else if ( config == 2 )
 		{
+			if( signalPDF != NULL ) delete signalPDF;
 			signalPDF = ClassLookUp::CopyPDF( inputNorm->GetSecondPDF() );
+			if( backgroundPDF != NULL ) delete backgroundPDF;
 			backgroundPDF = ClassLookUp::CopyPDF( inputNorm->GetFirstPDF() );
 		}
 		else
@@ -49,6 +58,9 @@ SWeightPrecalculator::SWeightPrecalculator( FitResult* InputResult, string Weigh
 		exit(-3);
 	}
 
+	ParameterSet* inputSet = inputResult->GetResultParameterSet()->GetDummyParameterSet();
+	signalPDF->UpdatePhysicsParameters( inputSet );
+	backgroundPDF->UpdatePhysicsParameters( inputSet );
 }
 
 //Destructor
@@ -60,18 +72,23 @@ SWeightPrecalculator::~SWeightPrecalculator()
 }
 
 //Calculate the sWeights
-IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData )
+IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* InputPDF )
 {
+	this->ConfigurePDFs( InputPDF );
+
 	cout << endl << "Calculating sWeights" << endl;
 
 	//Retrieve the correct fraction
 	double signalFraction = inputResult->GetResultParameterSet()->GetResultParameter( fractionName )->GetValue();
-	long numberSignalEvents = (long)floor( InputData->GetDataNumber() * signalFraction );
-	long numberBackgroundEvents = (long)ceil( InputData->GetDataNumber() * ( 1 - signalFraction ) );
+	int numberSignalEvents = (int)floor( (double)(InputData->GetDataNumber()) * signalFraction );
+	int numberBackgroundEvents = (int)ceil( (double)(InputData->GetDataNumber()) * ( 1. - signalFraction ) );
 
 	//Debug
 	cout << "Signal events: " << numberSignalEvents << endl;
 	cout << "Background events: " << numberBackgroundEvents << endl;
+
+	cout << "SignalFraction: " << fractionName << "\t" << signalFraction << endl;
+	cout << "Number of Events: " << InputData->GetDataNumber() << endl;
 
 	double denom_2=0.; vector<double> numer_2;
 

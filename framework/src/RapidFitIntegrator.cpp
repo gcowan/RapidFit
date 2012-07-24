@@ -266,7 +266,7 @@ double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint,
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->GetStatus() || haveTestedIntegral )
 		{
 			cout_bak = cout.rdbuf();
 			cerr_bak = cerr.rdbuf();
@@ -281,7 +281,7 @@ double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint,
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->GetStatus() || haveTestedIntegral )
 		{
 			cout.rdbuf( cout_bak );
 			cerr.rdbuf( cerr_bak );
@@ -323,7 +323,7 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->GetStatus() || haveTestedIntegral )
 		{
 			cout_bak = cout.rdbuf();
 			cerr_bak = cerr.rdbuf();
@@ -343,7 +343,7 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->GetStatus() || haveTestedIntegral )
 		{
 			cout.rdbuf( cout_bak );
 			cerr.rdbuf( cerr_bak );

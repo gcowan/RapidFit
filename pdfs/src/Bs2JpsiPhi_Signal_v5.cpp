@@ -611,13 +611,26 @@ double Bs2JpsiPhi_Signal_v5::Evaluate(DataPoint * measurement)
 
 double Bs2JpsiPhi_Signal_v5::EvaluateTimeOnly(DataPoint * measurement)
 {
+	_datapoint = measurement;
+
+	A0A0_value = measurement->GetPseudoObservable( A0A0_Obs );
+	APAP_value = measurement->GetPseudoObservable( APAP_Obs );
+	ATAT_value = measurement->GetPseudoObservable( ATAT_Obs );
+	ASAS_value = measurement->GetPseudoObservable( ASAS_Obs );
+	ImAPAT_value = measurement->GetPseudoObservable( ImAPAT_Obs );
+	ReA0AP_value = measurement->GetPseudoObservable( ReA0AP_Obs );
+	ImA0AT_value = measurement->GetPseudoObservable( ImA0AT_Obs );
+	ReASAP_value = measurement->GetPseudoObservable( ReASAP_Obs );
+	ImASAT_value = measurement->GetPseudoObservable( ImASAT_Obs );
+	ReASA0_value = measurement->GetPseudoObservable( ReASA0_Obs );
+
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
 	if( useEventResolution() ) eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
 
-	double returnValue ;
+	double returnValue;
 
 
 	if( resolutionScale <= 0. ) {
@@ -1215,7 +1228,7 @@ void Bs2JpsiPhi_Signal_v5::DebugPrint( string message, double value )  const
 {
 	PDF_THREAD_LOCK
 
-	(void) message; (void) value;
+		(void) message; (void) value;
 	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrint ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 
@@ -1248,7 +1261,7 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 {
 	PDF_THREAD_LOCK
 
-	(void) message; (void) value;
+		(void) message; (void) value;
 	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintXsec ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 	cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * A0A0_value << endl ;
@@ -1295,7 +1308,7 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 {
 	PDF_THREAD_LOCK
 
-	(void) message; (void) value;
+		(void) message; (void) value;
 	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 

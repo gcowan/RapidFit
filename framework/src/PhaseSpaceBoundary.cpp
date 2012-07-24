@@ -306,7 +306,7 @@ vector<DataPoint*> PhaseSpaceBoundary::GetDiscreteCombinations() const
 	vector<DataPoint*> newDataPoints;
 
 	DataPoint* tempPoint = this->GetMidPoint();
-	if( tempPoint == NULL ) newDataPoints;
+	if( tempPoint == NULL ) return newDataPoints;
 
 	for( unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
 	{

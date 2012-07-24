@@ -50,7 +50,7 @@ PDFWithData::~PDFWithData()
 }
 
 //Return the PDF
-IPDF * PDFWithData::GetPDF()
+IPDF * PDFWithData::GetPDF() const
 {
 	return fitPDF;
 }
@@ -133,7 +133,7 @@ void PDFWithData::RemoveFromCache( int request )
 }
 
 //Return the data set associated with the PDF
-IDataSet * PDFWithData::GetDataSet()
+IDataSet * PDFWithData::GetDataSet() const
 {
 	//Combine all data sources
 	IDataSet * newDataSet=NULL;

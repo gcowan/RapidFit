@@ -9,6 +9,7 @@
 
 ///  Root Headers
 #include "TString.h"
+#include "TH2D.h"
 #include "TH3D.h"
 #include "RooMath.h"
 ///  RapidFit Headers
@@ -578,9 +579,9 @@ int PerformMainFit( RapidFitConfiguration* config )
 		{
 			for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
 			{
-				cout << endl << "Weighting DataSet " << i << endl;
+				cout << endl << "Weighting DataSet " << i+1 << endl;
 				config->calculator = config->calcConfig->GetPreCalculator( config->GlobalResult );
-				IDataSet* weightedDataSet = config->calculator->ProcessDataSet( config->pdfsAndData[i]->GetDataSet() );
+				IDataSet* weightedDataSet = config->calculator->ProcessDataSet( config->pdfsAndData[i]->GetDataSet(), config->pdfsAndData[i]->GetPDF() );
 				vector<IDataSet*> weightedDataSet_v; weightedDataSet_v.push_back( weightedDataSet );
 				TString filename = config->calcConfig->GetFileName();
 				filename.Append("_"); filename+=i; filename.Append(".root");
@@ -764,7 +765,7 @@ int calculateAcceptanceWeightsWithSwave( RapidFitConfiguration* config )
 }
 
 TH1D* ProjectAxis( TH3* input_histo, TString axis, TString name )
-{       
+{
 	TH1D* X_proj = (TH1D*)input_histo->Project3D( axis );
 	X_proj->SetName( name );
 	X_proj->SetTitle( name );
@@ -786,10 +787,11 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	PDFConfigurator* tr_config = (pdf->GetConfigurator()==NULL)?new PDFConfigurator():pdf->GetConfigurator();
 	PDFConfigurator* helicity_config = new PDFConfigurator( *tr_config );
 	helicity_config->addConfigurationParameter( Helicity_Switch );
-	IPDF* helpdf = ClassLookUp::LookUpPDFName( pdf_name, helicity_config ); 
-	helpdf->UpdatePhysicsParameters( pdf->GetPhysicsParameters() ); 
+	IPDF* helpdf = ClassLookUp::LookUpPDFName( pdf_name, helicity_config );
+	helpdf->UpdatePhysicsParameters( pdf->GetPhysicsParameters() );
 
 	vector<double> weights = Mathematics::calculateAcceptanceWeights(dataSet, pdf);
+
 	TString FileName("acceptance_weights_and_histos_"); FileName.Append( StringProcessing::TimeString() );
 	FileName.Append(".root");
 	TFile * file = TFile::Open(FileName, "RECREATE");
@@ -804,47 +806,96 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	PhaseSpaceBoundary* phase = new PhaseSpaceBoundary(*dataSet->GetBoundary());
 	PhaseSpaceBoundary* helphase = new PhaseSpaceBoundary(*dataSet->GetBoundary());
 	int factor = 10;
-	int nToyEvents = factor*nMCEvents;
-	MemoryDataSet * toy = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nToyEvents );
+	int nToyEvents = nMCEvents;
+	MemoryDataSet * toy = NULL;
 	file->cd();
 	double pi = TMath::Pi();
 	output_file->cd();
-	TH3D * num = new TH3D("trnum", "trnum", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
-	TH3D * den = new TH3D("trden", "trden", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
-	TH3D * acc = new TH3D("tracc", "tracc", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
-	TH3D * numh = new TH3D("helnum", "helnum", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
-	TH3D * denh = new TH3D("helden", "helden", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
-	TH3D * acch = new TH3D("helacc", "helacc", 7, -1., 1., 7, -1., 1., 9, -pi, pi);
+
+	int cosThetabin = 7;
+	int cosPsibin = 7;
+	int phibin = 9;
+	int costhetaKbin = 7;
+	int costhetaLbin = 7;
+	int helphibin = 9;
+
+	TH3D * num = new TH3D("trnum", "trnum", cosPsibin, -1., 1., cosThetabin, -1., 1., phibin, -pi, pi);
+	TH2D* num_psith = new TH2D( "num_tr_psitheta", "num_tr_psitheta", cosPsibin, -1., 1., cosThetabin, -1., 1. );
+	TH2D* num_psiphi = new TH2D( "num_tr_psiphi", "num_tr_psiphi", cosPsibin, -1., 1., phibin, -pi, pi );
+	TH2D* num_phith = new TH2D( "num_tr_phitheta", "num_tr_phi_theta", phibin, -pi, pi, cosThetabin, -1., 1. );
+
+	TH3D * den = new TH3D("trden", "trden", cosPsibin, -1., 1., cosThetabin, -1., 1., phibin, -pi, pi);
+	TH2D* den_psith = new TH2D( "den_tr_psitheta", "den_tr_psitheta", cosPsibin, -1., 1., cosThetabin, -1., 1. );
+	TH2D* den_psiphi = new TH2D( "den_tr_psiphi", "den_tr_psiphi", cosPsibin, -1., 1., phibin, -pi, pi );
+	TH2D* den_phith = new TH2D( "den_tr_phitheta", "den_tr_phitheta", phibin, -pi, pi, cosThetabin, -1., 1. );
+
+	TH3D * acc = new TH3D("tracc", "tracc", cosPsibin, -1., 1., cosThetabin, -1., 1., phibin, -pi, pi);
+	TH2D* acc_psith = new TH2D( "acc_tr_psitheta", "acc_tr_psitheta", cosPsibin, -1., 1., cosThetabin, -1, 1. );
+	TH2D* acc_psiphi = new TH2D( "acc_tr_psiphi", "acc_tr_psiphi", cosPsibin, -1., 1., phibin, -pi, pi );
+	TH2D* acc_phith = new TH2D( "acc_tr_phitheta", "acc_tr_phitheta", phibin, -pi, pi, cosThetabin, -1., 1. );
+
+	TH3D * numh = new TH3D("helnum", "helnum", costhetaKbin, -1., 1., costhetaLbin, -1., 1., helphibin, -pi, pi);
+        TH2D* num_kl = new TH2D( "num_hel_thetaKthetaL", "num_hel_thetaKthetaL", costhetaKbin, -1., 1., costhetaLbin, -1., 1. );
+	TH2D* num_kphi = new TH2D( "num_hel_thetaKphi", "num_hel_thetaKphi", costhetaKbin, -1., 1., helphibin, -pi, pi );
+	TH2D* num_lphi = new TH2D( "num_hel_thetaLphi", "num_hel_thetaLphi", costhetaLbin, -1., 1., helphibin, -pi, pi );
+
+	TH3D * denh = new TH3D("helden", "helden", costhetaKbin, -1., 1., costhetaLbin, -1., 1., phibin, -pi, pi);
+	TH2D* den_kl = new TH2D( "den_hel_thetaKthetaL", "den_hel_thetaKthetaL", costhetaKbin, -1., 1., costhetaLbin, -1., 1. );
+	TH2D* den_kphi = new TH2D( "den_hel_thetaKphi", "den_hel_thetaKphi", costhetaKbin, -1., 1., helphibin, -pi, pi );
+	TH2D* den_lphi = new TH2D( "den_hel_thetaLphi", "den_hel_thetaLphi", costhetaLbin, -1., 1., helphibin, -pi, pi );
+
+	TH3D * acch = new TH3D("helacc", "helacc", costhetaKbin, -1., 1., costhetaLbin, -1., 1., helphibin, -pi, pi);
+	TH2D* acc_kl = new TH2D( "acc_hel_thetaKthetaL", "acc_hel_thetaKthetaL", costhetaKbin, -1., 1., costhetaLbin, -1., 1. );
+	TH2D* acc_kphi = new TH2D( "acc_hel_thetaKphi", "acc_hel_thetaKphi", costhetaKbin, -1., 1., helphibin, -pi, pi );
+	TH2D* acc_lphi = new TH2D( "acc_hel_thetaLphi", "acc_hel_thetaLphi", costhetaLbin, -1., 1., helphibin, -pi, pi );
+
 	num->Sumw2(), numh->Sumw2();
 	den->Sumw2(), denh->Sumw2();
 	acc->Sumw2(), acch->Sumw2();
 	double cosTheta, phi, cosPsi;
 	double helcosk, helcosl, helphi;
-	output_file->cd();
-	for ( int i = 0; i < nToyEvents; i++ ) {
-		if (i % 10000 == 0) cout << "Toy event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
-		DataPoint * event = toy->GetDataPoint(i);
-		cosPsi   = event->GetObservable("cosPsi")->GetValue();
-		cosTheta = event->GetObservable("cosTheta")->GetValue();
-		phi      = event->GetObservable("phi")->GetValue();
-		den->Fill(cosPsi, cosTheta, phi);
-		//delete event;
+	for( unsigned int i=0; i< (unsigned)factor; ++i )
+	{
+		cout << "Generating TOY DataSet: " << i+1 << " of " << factor << endl;
+		toy = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nToyEvents );
+		output_file->cd();
+		for( int i = 0; i < nToyEvents; i++ ) {
+			if (i % 10000 == 0) cout << "Toy event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
+			DataPoint * event = toy->GetDataPoint(i);
+			cosPsi   = event->GetObservable("cosPsi")->GetValue();
+			cosTheta = event->GetObservable("cosTheta")->GetValue();
+			phi      = event->GetObservable("phi")->GetValue();
+			den->Fill(cosPsi, cosTheta, phi);
+			den_psith->Fill( cosPsi, cosTheta );
+			den_psiphi->Fill( cosPsi, phi );
+			den_phith->Fill( phi, cosTheta );
+			//delete event;
+		}
+		delete toy;	toy = NULL;
 	}
-	delete toy;
 	output_file->cd();
-	toy = (MemoryDataSet*)dataConfig->MakeDataSet( helphase, helpdf, nToyEvents );
-	output_file->cd();
-	for ( int i = 0; i < nToyEvents; i++ ) {
-		if (i % 10000 == 0) cout << "Toy event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
-		DataPoint * event = toy->GetDataPoint(i);
-		helcosk  = event->GetObservable("helcosthetaK")->GetValue();
-		helcosl  = event->GetObservable("helcosthetaL")->GetValue();
-		helphi   = event->GetObservable("helphi")->GetValue();
-		denh->Fill(helcosk, helcosl, helphi);
-		//delete event;
+
+	for( unsigned int i=0; i< (unsigned)factor; ++i )
+	{
+		cout << "Generating TOY DataSet: " << i+1 << " of " << factor << endl;
+		toy = (MemoryDataSet*)dataConfig->MakeDataSet( helphase, helpdf, nToyEvents );
+		output_file->cd();
+		for ( int i = 0; i < nToyEvents; i++ ) {
+			if (i % 10000 == 0) cout << "Toy event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
+			DataPoint * event = toy->GetDataPoint(i);
+			helcosk  = event->GetObservable("helcosthetaK")->GetValue();
+			helcosl  = event->GetObservable("helcosthetaL")->GetValue();
+			helphi   = event->GetObservable("helphi")->GetValue();
+			denh->Fill(helcosk, helcosl, helphi);
+			den_kl->Fill( helcosk, helcosl );
+			den_kphi->Fill( helcosk, helphi );
+			den_lphi->Fill( helcosl, helphi );
+			//delete event;
+		}
+		delete toy;	toy = NULL;
 	}
-	delete toy;
 	output_file->cd();
+
 	for ( int i = 0; i < nMCEvents; i++ ) {
 		if (i % 10000 == 0) cout << "MC event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
 		DataPoint * event = dataSet->GetDataPoint(i);
@@ -852,15 +903,28 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 		cosTheta = event->GetObservable("cosTheta")->GetValue();
 		phi      = event->GetObservable("phi")->GetValue();
 		num->Fill(cosPsi, cosTheta, phi);
+		num_psith->Fill( cosPsi, cosTheta );
+		num_psiphi->Fill( cosPsi, phi );
+		num_phith->Fill( phi, cosTheta );
 		helcosk  = event->GetObservable("helcosthetaK")->GetValue();
 		helcosl  = event->GetObservable("helcosthetaL")->GetValue();
 		helphi   = event->GetObservable("helphi")->GetValue();
-		if( helphi > pi ) helphi-=2*pi;
 		numh->Fill(helcosk, helcosl, helphi);
+		num_kl->Fill( helcosk, helcosl );
+		num_kphi->Fill( helcosk, helphi );
+		num_lphi->Fill( helcosl, helphi );
 		//delete event;
 	}
-	acc->Divide(num, den);
-	acch->Divide(numh, denh);
+
+	acc->Divide( num, den );
+	acc_psith->Divide( num_psith, den_psith );
+	acc_psiphi->Divide( num_psiphi, den_psiphi );
+	acc_phith->Divide( num_phith, den_phith );
+
+	acch->Divide( numh, denh );
+	acc_kl->Divide( num_kl, den_kl );
+	acc_kphi->Divide( num_kphi, den_kphi );
+	acc_lphi->Divide( num_lphi, den_lphi );
 
 	TH1D* num_x = ProjectAxis( num, "x", "num_cosPsi" );
 	TH1D* num_y = ProjectAxis( num, "y", "num_cosTheta" );
@@ -868,16 +932,16 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	TH1D* den_x = ProjectAxis( den, "x", "den_cosPsi" );
 	TH1D* den_y = ProjectAxis( den, "y", "den_cosTheta" );
 	TH1D* den_z = ProjectAxis( den, "z", "den_phi" );
-	TH1D* acc_x = new TH1D( "acc_cosPsi", "acc_cosPsi", 7, -1., 1 );
-	acc_x->Divide( num_x, den_x, factor, 1 );
+	TH1D* acc_x = new TH1D( "acc_cosPsi", "acc_cosPsi", cosPsibin, -1., 1. );
+	acc_x->Divide( num_x, den_x, factor, 1. );
 	acc_x->Write("",TObject::kOverwrite);
 	acc_x->GetYaxis()->SetRangeUser( 0., acc_x->GetYaxis()->GetXmax() );
-	TH1D* acc_y = new TH1D( "acc_cosTheta", "acc_cosTheta", 7, -1, 1 );
-	acc_y->Divide( num_y, den_y, factor, 1 );
+	TH1D* acc_y = new TH1D( "acc_cosTheta", "acc_cosTheta", cosThetabin, -1., 1. );
+	acc_y->Divide( num_y, den_y, factor, 1. );
 	acc_y->Write("",TObject::kOverwrite);
 	acc_y->GetYaxis()->SetRangeUser( 0., acc_y->GetYaxis()->GetXmax() );
-	TH1D* acc_z = new TH1D( "acc_phi", "acc_cosphi", 9, -pi, pi );
-	acc_z->Divide( num_z, den_z, factor, 1 );
+	TH1D* acc_z = new TH1D( "acc_phi", "acc_cosphi", phibin, -pi, pi );
+	acc_z->Divide( num_z, den_z, factor, 1. );
 	acc_z->Write("",TObject::kOverwrite);
 	acc_z->GetYaxis()->SetRangeUser( 0., acc_z->GetYaxis()->GetXmax() );
 
@@ -891,29 +955,49 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	TH1D* denh_x = ProjectAxis( denh, "x", "denh_helcosthetaK" );
 	TH1D* denh_y = ProjectAxis( denh, "y", "denh_helcosthetaL" );
 	TH1D* denh_z = ProjectAxis( denh, "z", "denh_helphi" );
-	TH1D* acch_x = new TH1D( "acch_helcosthetaK", "acch_helcosthetaK", 7, -1., 1 );
-	acch_x->Divide( numh_x, denh_x, factor, 1 );
+	TH1D* acch_x = new TH1D( "acch_helcosthetaK", "acch_helcosthetaK", costhetaKbin, -1., 1. );
+	acch_x->Divide( numh_x, denh_x, factor, 1. );
 	acch_x->Write("",TObject::kOverwrite);
 	acch_x->GetYaxis()->SetRangeUser( 0., acch_x->GetYaxis()->GetXmax() );
-	TH1D* acch_y = new TH1D( "acch_helcosthetaL", "acch_helcosthetaL", 7, -1., 1 );
-	acch_y->Divide( numh_y, denh_y, factor, 1 );
+	TH1D* acch_y = new TH1D( "acch_helcosthetaL", "acch_helcosthetaL", costhetaLbin, -1., 1. );
+	acch_y->Divide( numh_y, denh_y, factor, 1. );
 	acch_y->Write("",TObject::kOverwrite);
 	acch_y->GetYaxis()->SetRangeUser( 0., acch_y->GetYaxis()->GetXmax() );
-	TH1D* acch_z = new TH1D( "acc_helphi", "acc_helphi", 9, -pi, pi );
-	acch_z->Divide( numh_z, denh_z, factor, 1 );
+	TH1D* acch_z = new TH1D( "acc_helphi", "acc_helphi", helphibin, -pi, pi );
+	acch_z->Divide( numh_z, denh_z, factor, 1. );
 	acch_z->Write("",TObject::kOverwrite);
 	acch_z->GetYaxis()->SetRangeUser( 0., acch_z->GetYaxis()->GetXmax() );
 
-	//ProjectAxis( acch, "x", "acch_helcosthetaK" );
-	//ProjectAxis( acch, "y", "acch_helcosthetaL" );
-	//ProjectAxis( acch, "z", "acch_helphi" );
-
 	num->Write("",TObject::kOverwrite);
+	num_psith->Write("",TObject::kOverwrite);
+	num_psiphi->Write("",TObject::kOverwrite);
+	num_phith->Write("",TObject::kOverwrite);
+
 	den->Write("",TObject::kOverwrite);
+	den_psith->Write("",TObject::kOverwrite);
+	den_psiphi->Write("",TObject::kOverwrite);
+	den_phith->Write("",TObject::kOverwrite);
+
 	acc->Write("",TObject::kOverwrite);
+	acc_psith->Write("",TObject::kOverwrite);
+	acc_psiphi->Write("",TObject::kOverwrite);
+	acc_phith->Write("",TObject::kOverwrite);
+
 	numh->Write("",TObject::kOverwrite);
+	num_kl->Write("",TObject::kOverwrite);
+	num_kphi->Write("",TObject::kOverwrite);
+	num_lphi->Write("",TObject::kOverwrite);
+
 	denh->Write("",TObject::kOverwrite);
+	den_kl->Write("",TObject::kOverwrite);
+	den_kphi->Write("",TObject::kOverwrite);
+	den_lphi->Write("",TObject::kOverwrite);
+
 	acch->Write("",TObject::kOverwrite);
+	acc_kl->Write("",TObject::kOverwrite);
+	acc_kphi->Write("",TObject::kOverwrite);
+	acc_lphi->Write("",TObject::kOverwrite);
+
 	tree->Write("",TObject::kOverwrite);
 
 	//file->Write("",TObject::kOverwrite);

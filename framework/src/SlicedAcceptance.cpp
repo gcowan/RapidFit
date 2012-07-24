@@ -190,7 +190,9 @@ double SlicedAcceptance::getValue( Observable* time, double timeOffset ) const
 {
 	if( time->GetBinNumber() != -1 )
 	{
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if( time->GetOffSet() == timeOffset ) return time->GetAcceptance();
+#pragma GCC diagnostic pop
 	}
 
 	double t= time->GetValue() - timeOffset;

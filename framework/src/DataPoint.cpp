@@ -46,7 +46,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 }
 
 DataPoint::DataPoint( const DataPoint& input ) :
-	allObservables(NULL), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
+	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
 	thisDiscreteIndex(input.thisDiscreteIndex)
 	, allPseudoNames2(input.allPseudoNames2), allPseudoObservables2()
 {
@@ -268,7 +268,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 	{
 		if( Input.GetIndex()>(int)(allPseudoObservables.size()-1) )
 		{
-			int var = allPseudoObservables.size();
+			//int var = (int)allPseudoObservables.size();
 			allPseudoObservables.resize( Input.GetIndex()+1, NULL );
 			if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
 			allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
@@ -294,7 +294,9 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 		outputObservable = thisObservable->GetPseudoObservable();
 	}
 
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 	if( !thisObservable->GetValid() || outputObservable == 0. )
+#pragma GCC diagnostic pop
 	{
 		vector<ObservableRef>* deps = thisObservable->GetDependencies();
 		vector<double> input;
@@ -340,7 +342,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> V
 	{
 		if( Input.GetIndex()>(int)(allPseudoObservables2.size()-1) )
 		{
-			int var = allPseudoObservables2.size();
+			//int var = (int)allPseudoObservables2.size();
 			allPseudoObservables2.resize( Input.GetIndex()+1, NULL );
 			allPseudoObservables2[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
 			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;

@@ -13,6 +13,7 @@
 
 ///	RapidFit Headers
 #include "IDataSet.h"
+#include "IPDF.h"
 
 using namespace::std;
 
@@ -24,7 +25,7 @@ class IPrecalculator
 		 *
 		 * @param Input   This is a pointer to the DataSet wished to be processed
 		 */
-		virtual IDataSet * ProcessDataSet( IDataSet* Input ) = 0;
+		virtual IDataSet * ProcessDataSet( IDataSet* Input, IPDF* InputPDF ) = 0;
 
 		/*!
 		 * @brief Virtual Destructor

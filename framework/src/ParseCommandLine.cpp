@@ -135,6 +135,7 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "       When used in conjunction with a toy/MC/FC study this will cause all toys generated to be saved." << endl;
 	cout << "       This creates a LOT of extra .root files from the toy study, but is a useful way to generate multiple toy datasets from one XML." << endl;
 
+	cout << endl;
 	cout << "--testIntegrator" << endl;
 	cout << "       This allows you to test the Numerical vs Analytical Integrals from an XML" << endl;
 

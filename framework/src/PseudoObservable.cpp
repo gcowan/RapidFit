@@ -112,7 +112,9 @@ double PseudoObservable::GetPseudoObservable()
 	if( valid == true )
 	{
 		double returnable=0.;
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if( Value == 0. )
+#pragma GCC diagnostic pop
 		{
 			valid = false;	//	Valid=false here to trigger the re-calculation
 			returnable = this->GetValue();
@@ -155,7 +157,9 @@ bool PseudoObservable::GetValid( const vector<double> Input ) const
 		bool check_ok = true;
 		for( unsigned int i=0; i< internal_Input.size(); ++i )
 		{
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 			if( internal_Input[i] != Input[i] )
+#pragma GCC diagnostic pop
 			{
 				check_ok = false;
 				break;

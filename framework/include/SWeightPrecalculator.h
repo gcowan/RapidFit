@@ -25,10 +25,11 @@ class SWeightPrecalculator : public IPrecalculator
 		SWeightPrecalculator( FitResult* inputResult, string WeightName = "sWeight", unsigned int config=1 );
 		~SWeightPrecalculator();
 
-		virtual IDataSet * ProcessDataSet( IDataSet* );
+		virtual IDataSet * ProcessDataSet( IDataSet*, IPDF* );
 		pair< double, double > CalculateMatrixElements( long, long, IDataSet*, vector<double>&, vector<double>&, double&, vector<double>& );
 
 	private:
+		void ConfigurePDFs( IPDF* InputPDF );
 
 		//	Uncopyable!
 		SWeightPrecalculator ( const SWeightPrecalculator& );
@@ -38,6 +39,7 @@ class SWeightPrecalculator : public IPrecalculator
 		IPDF * backgroundPDF;
 		string weightName;
 		string fractionName;
+		unsigned int config;
 };
 
 #endif

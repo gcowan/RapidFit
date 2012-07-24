@@ -1681,6 +1681,7 @@ vector<double> ComponentPlotter::GetFunctionEval()
 
 TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data, TGraphErrors* input_data, string observableName, string CombinationDescription, TRandom* rand, CompPlotter_config* conf, DebugClass* debug )
 {
+	(void) conf;
 	if( rand == NULL ) rand = gRandom;
 
 	vector<double> pull_value;

@@ -83,7 +83,7 @@ class PDFWithData
 		 *
 		 * @return Returns a pointer to the PDF stored in this class
 		 */
-		IPDF * GetPDF();
+		IPDF * GetPDF() const;
 
 		/*!
 		 * @brief Get a new/cached dataset.
@@ -92,7 +92,7 @@ class PDFWithData
 		 *
 		 * @return Returns a pointer to the DataSet. It is assumed that the DataSet is NOT destroyed externally to this class
 		 */
-		IDataSet * GetDataSet();
+		IDataSet * GetDataSet() const;
 
 		/*!
 		 * @brief Get the dataset Configuration used to generate the data
@@ -175,9 +175,9 @@ class PDFWithData
 		PhaseSpaceBoundary * inputBoundary;		/*!	This contains the PhaseSpace that the DataSets have been allowed to Occupy		*/
 		bool parametersAreSet;				/*!	Undocumented	*/
 		vector< DataSetConfiguration* > dataSetMakers;	/*!	This is the DataSetConfiguration objects which govern the creation of new DataSets	*/
-		vector< IDataSet* > cached_data;		/*!	This is the internal Cache of DataSets that this instance 'looks after'			*/
+		mutable vector< IDataSet* > cached_data;	/*!	This is the internal Cache of DataSets that this instance 'looks after'			*/
 
-		bool useCache;					/*!	Should PDFWithData return the last cached DataSet that it has (default false)		*/
+		mutable bool useCache;				/*!	Should PDFWithData return the last cached DataSet that it has (default false)		*/
 
 		DebugClass* debug;
 };

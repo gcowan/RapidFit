@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2012/07/24 Rob Currie
+   - Fixed bug in sWeighting when you are weighting multiple ToFit segments within the same XML
+   - Added some gcc pragma into the code to stop explicitly valid exact double comparisons throwing warnings or errors at compile time
+   - Made some methods const as appropriate when reading through the codebase
+   - Fixed bug which caused JpsiPhi_v5 to segfault when generating angAcc weights
+   - Added 2D projections for AngularAcceptance histograms for diagnostics
+
 2012/07/24 Greig Cowan
    - Added Novosibirsk PDF for dealing with per-event errors. I think analytical integration is OK...  
 

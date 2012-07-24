@@ -481,6 +481,7 @@ namespace Mathematics
 		// average acceptance weights for Bs2JpsiPhi.
 		RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
 		PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
+
 		const int numAngularTerms = 10;//6;
 		double*  f = new double[numAngularTerms]; // the angular functions
 		double xi[numAngularTerms]; // the angular weights
@@ -493,6 +494,7 @@ namespace Mathematics
 		double Sum_sq[numAngularTerms][numAngularTerms];
 		double cov[numAngularTerms][numAngularTerms];
 		double cor[numAngularTerms][numAngularTerms];
+
 		for (int i = 0; i < numAngularTerms; i++) {
 			Sum[i] = 0.0;
 			for (int k = 0; k < numAngularTerms; k++) {
@@ -501,9 +503,15 @@ namespace Mathematics
 			}
 		}
 
-		cout << endl;
-
-		double testEval = PDF->EvaluateTimeOnly( dataSet->GetDataPoint(0) );
+		double testEval = 0.;
+		try
+		{
+			testEval = PDF->EvaluateTimeOnly( dataSet->GetDataPoint(0) );
+		}
+		catch(...)
+		{
+			testEval=-1.;
+		}
 		bool usePDF = testEval>=0. && !(isnan(testEval));
 
 		for (int e = 0; e < numEvents; e++)
