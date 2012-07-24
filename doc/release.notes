@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/07/24 Greig Cowan
+   - Added Novosibirsk PDF for dealing with per-event errors. I think analytical integration is OK...  
+
 2012/07/23 Rob Currie
    - Added new macros to IPDF header, PDF_THREAD_LOCK and PDF_THREAD_UNLOCK
        These are intended to be used to lock sections of code that must be run in single threaded mode. This particularly includes stdio streams
