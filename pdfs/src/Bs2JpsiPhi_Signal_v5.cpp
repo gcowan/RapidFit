@@ -174,6 +174,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) :
 	//........................
 	// Now do some actual work
 	this->MakePrototypes();
+	this->prepareTimeFac();
 	this->SetupAngularTerms();
 
 	//PELC  - debug to plot the distribution of PDF values for each event
@@ -251,17 +252,6 @@ void Bs2JpsiPhi_Signal_v5::SetupAngularTerms()
 		ReASA0_Obs.AddFunction( Bs2JpsiPhi_Angular_Terms::TangleFactorReASA0 );
 	}
 
-	//	The cached Values per data point will ALWAYS BE VALID
-	A0A0_Obs.SetValid( true );
-	APAP_Obs.SetValid( true );
-	ATAT_Obs.SetValid( true );
-	ASAS_Obs.SetValid( true );
-	ImAPAT_Obs.SetValid( true );
-	ReA0AP_Obs.SetValid( true );
-	ImA0AT_Obs.SetValid( true );
-	ReASAP_Obs.SetValid( true );
-	ImASAT_Obs.SetValid( true );
-	ReASA0_Obs.SetValid( true );
 }
 
 
@@ -438,7 +428,6 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet * NewParameterSet 
 
 	// New: Prepare the coefficients of all of the time dependent terms (C,D,S etc)
 	this->prepareCDS() ;
-	this->prepareTimeFac();
 	return result;
 }
 
@@ -466,30 +455,30 @@ void Bs2JpsiPhi_Signal_v5::prepareTimeFac()
 		_intexpCosObs = PseudoObservable( "intexpCos_time" );
 		_intexpCosObs.AddFunction( Mathematics::ExpCosInt_Wrapper );
 	}
-	/*
-	   else
-	   {
 
-	// This Code DOES WORK, it just ends up consuming a HUGE amount of memory and as such ends up being a worse bottleneck than the one it was intended to remove
-
-	for( unsigned int i=0; i< timeAcc->numberOfSlices(); ++i )
+	else
 	{
-	TString _intexpLObs_vec_name="intexpL_time_"; _intexpLObs_vec_name+=i;
-	_intexpLObs_vec.push_back( PseudoObservable( _intexpLObs_vec_name.Data() ) );
-	_intexpLObs_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
-	TString _intexpHObs_vec_name="intexpH_time"; _intexpHObs_vec_name+=i;
-	_intexpHObs_vec.push_back( PseudoObservable( _intexpHObs_vec_name.Data() ) );
-	_intexpHObs_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
-	TString _intexpSinObs_vec_name="intexpSin_time"; _intexpSinObs_vec_name+=i;
-	_intexpSinObs_vec.push_back( PseudoObservable( _intexpSinObs_vec_name.Data() ) );
-	_intexpSinObs_vec.back().AddFunction( Mathematics::ExpSinInt_Wrapper );
-	TString _intexpCosObs_vec_name="intexpCos_time"; _intexpCosObs_vec_name+=i;
-	_intexpCosObs_vec.push_back( PseudoObservable( _intexpCosObs_vec_name.Data() ) );
-	_intexpCosObs_vec.back().AddFunction( Mathematics::ExpCosInt_Wrapper );
-	}
+
+		// This Code DOES WORK, it just ends up consuming a HUGE amount of memory and as such ends up being a worse bottleneck than the one it was intended to remove
+
+		for( unsigned int i=0; i< timeAcc->numberOfSlices(); ++i )
+		{
+			TString _intexpLObs_vec_name="intexpL_time_"; _intexpLObs_vec_name+=i;
+			_intexpLObs_vec.push_back( PseudoObservable( _intexpLObs_vec_name.Data() ) );
+			_intexpLObs_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
+			TString _intexpHObs_vec_name="intexpH_time"; _intexpHObs_vec_name+=i;
+			_intexpHObs_vec.push_back( PseudoObservable( _intexpHObs_vec_name.Data() ) );
+			_intexpHObs_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
+			TString _intexpSinObs_vec_name="intexpSin_time"; _intexpSinObs_vec_name+=i;
+			_intexpSinObs_vec.push_back( PseudoObservable( _intexpSinObs_vec_name.Data() ) );
+			_intexpSinObs_vec.back().AddFunction( Mathematics::ExpSinInt_Wrapper );
+			TString _intexpCosObs_vec_name="intexpCos_time"; _intexpCosObs_vec_name+=i;
+			_intexpCosObs_vec.push_back( PseudoObservable( _intexpCosObs_vec_name.Data() ) );
+			_intexpCosObs_vec.back().AddFunction( Mathematics::ExpCosInt_Wrapper );
+		}
 
 	}
-	*/
+
 }
 
 
@@ -828,36 +817,33 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs, Input_2 );
 		intExpCos_stored = _datapoint->GetPseudoObservable( _intexpCosObs, Input_2 );
 	}
-	else
+	else if( useTimeAcceptance() && useEventResolution() )
+	{
+		//	This works, it just ends up storing the result and input for 160 calculations per datapoint. This requires a HUGE amount of i/o between processor and RAM
+		//	even on machines where this is good this isn't as fast as simply lining up the calculation on the CPU.
+		//	It also drinks in excess of 1Gb of RAM in it's current form (this isn't likely to reduce) so we can't be clever in the case of timeAcceptance && eventResolution
+
+		vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlo; Exp_Input_1[1]=thi; Exp_Input_1[2]=gamma_l(); Exp_Input_1[3]=resolution;
+		vector<double> Exp_Input_2(4,0.); Exp_Input_2[0]=tlo; Exp_Input_2[1]=thi; Exp_Input_2[2]=gamma_h(); Exp_Input_2[3]=resolution;
+		vector<double> Input_2(5,0.); Input_2[0]=tlo; Input_2[1]=thi; Input_2[2]=gamma(); Input_2[3]=delta_ms; Input_2[4]=resolution;
+
+		intExpL_stored = _datapoint->GetPseudoObservable( _intexpLObs_vec[ timeBinNum ], Exp_Input_1 );
+		intExpH_stored = _datapoint->GetPseudoObservable( _intexpHObs_vec[ timeBinNum ], Exp_Input_2 );
+		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs_vec[ timeBinNum ], Input_2 );
+		intExpCos_stored = _datapoint->GetPseudoObservable( _intexpCosObs_vec[ timeBinNum ], Input_2 );
+	}
+	else    
 	{
 		intExpL_stored = Mathematics::ExpInt( tlo, thi, gamma_l(), resolution );
 		intExpH_stored = Mathematics::ExpInt( tlo, thi, gamma_h(), resolution );
 		intExpSin_stored = Mathematics::ExpSinInt( tlo, thi, gamma(), delta_ms, resolution );
 		intExpCos_stored = Mathematics::ExpCosInt( tlo, thi, gamma(), delta_ms, resolution );
 	}
-
-
-	/*else if( useTimeAcceptance() && useEventResolution() )
-	  {
-	//	This works, it just ends up storing the result and input for 160 calculations per datapoint. This requires a HUGE amount of i/o between processor and RAM
-	//	even on machines where this is good this isn't as fast as simply lining up the calculation on the CPU.
-	//	It also drinks in excess of 1Gb of RAM in it's current form (this isn't likely to reduce) so we can't be clever in the case of timeAcceptance && eventResolution
-
-	vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlo; Exp_Input_1[1]=thi; Exp_Input_1[2]=gamma_l(); Exp_Input_1[3]=resolution;
-	vector<double> Exp_Input_2(4,0.); Exp_Input_2[0]=tlo; Exp_Input_2[1]=thi; Exp_Input_2[2]=gamma_h(); Exp_Input_2[3]=resolution;
-	vector<double> Input_2(5,0.); Input_2[0]=tlo; Input_2[1]=thi; Input_2[2]=gamma(); Input_2[3]=delta_ms; Input_2[4]=resolution;
-
-	intExpL_stored = _datapoint->GetPseudoObservable( _intexpLObs_vec[ timeBinNum ], Exp_Input_1 );
-	intExpH_stored = _datapoint->GetPseudoObservable( _intexpHObs_vec[ timeBinNum ], Exp_Input_2 );
-	intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs_vec[ timeBinNum ], Input_2 );
-	intExpCos_stored = _datapoint->GetPseudoObservable( _intexpCosObs_vec[ timeBinNum ], Input_2 );
-	}*/
 	return;
 }
 
 vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 {
-	vector<string> component_list;
 	component_list.push_back( "CP-Even" );
 	component_list.push_back( "CP-Odd" );
 	component_list.push_back( "As" );
@@ -922,22 +908,6 @@ double Bs2JpsiPhi_Signal_v5::diffXsec()
 			break;
 		default:	//	Everything
 			xsec =
-
-				/*
-				   A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
-				   AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
-				   AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
-
-				   AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
-				   A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
-				   A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
-
-				   AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
-
-				   AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
-				   AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
-				   AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
-				   */
 
 				CachedA1 * timeFactorA0A0(  ) +
 				CachedA2 * timeFactorAPAP(  ) +
@@ -1077,7 +1047,6 @@ double Bs2JpsiPhi_Signal_v5::diffXsecCompositeNorm1( int resolutionIndex )
 // New speed up method to Cache time integrals
 void Bs2JpsiPhi_Signal_v5::CacheAmplitudesAndAngles()
 {
-
 	CachedA1 = A0()*A0() * A0A0_value;
 	CachedA2 = AP()*AP() * APAP_value;
 	CachedA3 = AT()*AT() * ATAT_value;
@@ -1091,25 +1060,6 @@ void Bs2JpsiPhi_Signal_v5::CacheAmplitudesAndAngles()
 	CachedA8 = ASint()*AP() * ReASAP_value;
 	CachedA9 = ASint()*AT() * ImASAT_value;
 	CachedA10= ASint()*A0() * ReASA0_value;
-
-	/*
-	   CachedA1 = A0()*A0() * angleFactorA0A0();
-	   CachedA2 = AP()*AP() * angleFactorAPAP();
-	   CachedA3 = AT()*AT() * angleFactorATAT();
-
-	   CachedA4 = AP()*AT() * angleFactorImAPAT();
-	   CachedA5 = A0()*AP() * angleFactorReA0AP();
-	   CachedA6 = A0()*AT() * angleFactorImA0AT();
-
-	   CachedA7 = AS()*AS() * angleFactorASAS();
-
-	   CachedA8 = AS()*AP() * angleFactorReASAP();
-	   CachedA9 = AS()*AT() * angleFactorImASAT();
-	   CachedA10= AS()*A0() * angleFactorReASA0();
-	   CachedA8 = ASint()*AP() * angleFactorReASAP();
-	   CachedA9 = ASint()*AT() * angleFactorImASAT();
-	   CachedA10= ASint()*A0() * angleFactorReASA0();
-	   */
 }
 
 //.......................................................

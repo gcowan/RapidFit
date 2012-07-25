@@ -295,7 +295,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 	}
 
 //#pragma GCC diagnostic ignored "-Wfloat-equal"
-	if( !thisObservable->GetValid() || outputObservable == 0. )
+	if( !thisObservable->GetValid() ) //|| outputObservable == 0. )
 //#pragma GCC diagnostic pop
 	{
 		vector<ObservableRef>* deps = thisObservable->GetDependencies();

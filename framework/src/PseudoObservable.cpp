@@ -25,7 +25,7 @@ PseudoObservable::PseudoObservable( string InputName ) :
 
 PseudoObservable::PseudoObservable( const PseudoObservable& Input ) :
 	internal_function( Input.internal_function ), Dependencies(Input.Dependencies),
-	Value( Input.Value), valid( false ), Name( Input.Name ), Index( Input.Index ),
+	Value( Input.Value), valid( Input.valid ), Name( Input.Name ), Index( Input.Index ),
 	internal_Input( Input.internal_Input )
 {
 }
@@ -82,7 +82,7 @@ bool PseudoObservable::GetValid() const
 	return valid;
 }
 
-vector<ObservableRef>* PseudoObservable::GetDependencies()
+vector<ObservableRef>* PseudoObservable::GetDependencies() const
 {
 	return &Dependencies;
 }
@@ -106,7 +106,7 @@ string PseudoObservable::GetName() const
 	return Name;
 }
 
-double PseudoObservable::GetPseudoObservable()
+double PseudoObservable::GetPseudoObservable() const
 {
 	if( internal_Input.empty() ) return 0.;
 	if( valid == true )

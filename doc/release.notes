@@ -2,6 +2,7 @@
 
 2012/07/25 Rob Currie
    - Removed #pragma temporarilly until a better solution is found
+   - Removed some dead code from JpsiPhi, fixed bug so that we can now perform per-event time integral caching with time acceptance turned on
 
 2012/07/25 Greig Cowan
    - Modified LogNormalDistribution to be the sum of two LN distributions with a fraction. Empirically, this appears

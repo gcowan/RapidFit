@@ -43,7 +43,7 @@ class PseudoObservable
 
 		bool GetValid( const vector<double> input ) const;
 
-		vector<ObservableRef>* GetDependencies();
+		vector<ObservableRef>* GetDependencies() const;
 
 		void SetInput( const vector<double> );
 
@@ -51,7 +51,7 @@ class PseudoObservable
 
 		string GetName() const;
 
-		double GetPseudoObservable();
+		double GetPseudoObservable() const;
 
 		int GetIndex() const;
 
@@ -64,7 +64,7 @@ class PseudoObservable
 	private:
 		double (*internal_function)(vector<double>);
 
-		vector<ObservableRef> Dependencies;
+		mutable vector<ObservableRef> Dependencies;
 
 		mutable double Value;
 		mutable bool valid;
