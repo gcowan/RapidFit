@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/07/25 Greig Cowan
+   - Modified LogNormalDistribution to be the sum of two LN distributions with a fraction. Empirically, this appears
+     to be a very good model for the per-event error distributions of signal and background.
+
 2012/07/24 Rob Currie
    - Fixed bug in sWeighting when you are weighting multiple ToFit segments within the same XML
    - Added some gcc pragma into the code to stop explicitly valid exact double comparisons throwing warnings or errors at compile time

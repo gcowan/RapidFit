@@ -35,12 +35,20 @@ class LogNormalDistribution : public BasePDF
 		//TF1 * PDF ;
 	
 		// Physics parameters
-		double sigma ;
-		double theta ;
-		double m ;
-		ObservableRef LNsigmaName;
-		ObservableRef LNthetaName;
-		ObservableRef LNmName;
+		double sigma1 ;
+		double theta1 ;
+		double m1 ;
+		double sigma2 ;
+		double theta2 ;
+		double m2 ;
+		double f ;
+		ObservableRef LNsigma1Name;
+		ObservableRef LNtheta1Name;
+		ObservableRef LNm1Name;
+		ObservableRef LNsigma2Name;
+		ObservableRef LNtheta2Name;
+		ObservableRef LNm2Name;
+		ObservableRef LNfName;
 
 		// Observables
 		double x ;

@@ -18,9 +18,13 @@ PDF_CREATOR( LogNormalDistribution );
 //Constructor
 LogNormalDistribution::LogNormalDistribution(PDFConfigurator* configurator) :
 	// Physics parameters
-	LNsigmaName	( configurator->getName("LNsigma" ) ),
-	LNthetaName	( configurator->getName("LNtheta" ) ),
-	LNmName	( configurator->getName("LNm" ) ),
+	LNsigma1Name	( configurator->getName("LNsigma1" ) ),
+	LNtheta1Name	( configurator->getName("LNtheta1" ) ),
+	LNm1Name	( configurator->getName("LNm1" ) ),
+	LNsigma2Name	( configurator->getName("LNsigma2" ) ),
+	LNtheta2Name	( configurator->getName("LNtheta2" ) ),
+	LNm2Name	( configurator->getName("LNm2" ) ),
+	LNfName		( configurator->getName("LNf1" ) ),
 	// Observables
 	LNxName( configurator->getName("LNx") )
 {
@@ -38,9 +42,13 @@ void LogNormalDistribution::MakePrototypes()
 
 	//Make the parameter set
 	vector<string> parameterNames;
-	parameterNames.push_back( LNsigmaName );
-	parameterNames.push_back( LNthetaName );
-	parameterNames.push_back( LNmName );
+	parameterNames.push_back( LNsigma1Name );
+	parameterNames.push_back( LNtheta1Name );
+	parameterNames.push_back( LNm1Name );
+	parameterNames.push_back( LNsigma2Name );
+	parameterNames.push_back( LNtheta2Name );
+	parameterNames.push_back( LNm2Name );
+	parameterNames.push_back( LNfName );
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -53,9 +61,13 @@ LogNormalDistribution::~LogNormalDistribution()
 bool LogNormalDistribution::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
-  	sigma = allParameters.GetPhysicsParameter( LNsigmaName )->GetValue();
-  	theta = allParameters.GetPhysicsParameter( LNthetaName )->GetValue();
-  	m     = allParameters.GetPhysicsParameter( LNmName )->GetValue();
+  	sigma1 = allParameters.GetPhysicsParameter( LNsigma1Name )->GetValue();
+  	theta1 = allParameters.GetPhysicsParameter( LNtheta1Name )->GetValue();
+  	m1     = allParameters.GetPhysicsParameter( LNm1Name )->GetValue();
+  	sigma2 = allParameters.GetPhysicsParameter( LNsigma2Name )->GetValue();
+  	theta2 = allParameters.GetPhysicsParameter( LNtheta2Name )->GetValue();
+  	m2     = allParameters.GetPhysicsParameter( LNm2Name )->GetValue();
+  	f      = allParameters.GetPhysicsParameter( LNfName )->GetValue();
 	
 	return isOK;
 }
@@ -70,7 +82,7 @@ double LogNormalDistribution::Evaluate(DataPoint * measurement)
 	
 	double returnValue = 0.000000000001;
 
-	if ( x > theta ) returnValue = TMath::LogNormal( x, sigma, theta, m );
+	if ( x > theta1 && x > theta2 ) returnValue = f*TMath::LogNormal( x, sigma1, theta1, m1 ) + (1.-f)*TMath::LogNormal( x, sigma2, theta2, m2 );
 
   	return returnValue;
 }
