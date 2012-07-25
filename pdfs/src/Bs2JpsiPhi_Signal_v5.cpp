@@ -174,7 +174,6 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) :
 	//........................
 	// Now do some actual work
 	this->MakePrototypes();
-	this->prepareTimeFac();
 	this->SetupAngularTerms();
 
 	//PELC  - debug to plot the distribution of PDF values for each event
@@ -183,7 +182,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) :
 	//histCounter = 0;
 	//~PELC
 
-
+	this->prepareTimeFac();
 }
 
 void Bs2JpsiPhi_Signal_v5::SetupAngularTerms()
@@ -455,7 +454,6 @@ void Bs2JpsiPhi_Signal_v5::prepareTimeFac()
 		_intexpCosObs = PseudoObservable( "intexpCos_time" );
 		_intexpCosObs.AddFunction( Mathematics::ExpCosInt_Wrapper );
 	}
-
 	else
 	{
 
@@ -478,7 +476,6 @@ void Bs2JpsiPhi_Signal_v5::prepareTimeFac()
 		}
 
 	}
-
 }
 
 
@@ -832,7 +829,7 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs_vec[ timeBinNum ], Input_2 );
 		intExpCos_stored = _datapoint->GetPseudoObservable( _intexpCosObs_vec[ timeBinNum ], Input_2 );
 	}
-	else    
+	else
 	{
 		intExpL_stored = Mathematics::ExpInt( tlo, thi, gamma_l(), resolution );
 		intExpH_stored = Mathematics::ExpInt( tlo, thi, gamma_h(), resolution );
@@ -844,6 +841,7 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 
 vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 {
+	vector<string> component_list;
 	component_list.push_back( "CP-Even" );
 	component_list.push_back( "CP-Odd" );
 	component_list.push_back( "As" );
@@ -908,6 +906,22 @@ double Bs2JpsiPhi_Signal_v5::diffXsec()
 			break;
 		default:	//	Everything
 			xsec =
+
+				/*
+				   A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
+				   AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
+				   AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
+
+				   AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
+				   A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
+				   A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
+
+				   AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
+
+				   AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
+				   AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
+				   AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
+				   */
 
 				CachedA1 * timeFactorA0A0(  ) +
 				CachedA2 * timeFactorAPAP(  ) +
@@ -1047,6 +1061,7 @@ double Bs2JpsiPhi_Signal_v5::diffXsecCompositeNorm1( int resolutionIndex )
 // New speed up method to Cache time integrals
 void Bs2JpsiPhi_Signal_v5::CacheAmplitudesAndAngles()
 {
+
 	CachedA1 = A0()*A0() * A0A0_value;
 	CachedA2 = AP()*AP() * APAP_value;
 	CachedA3 = AT()*AT() * ATAT_value;
@@ -1060,6 +1075,25 @@ void Bs2JpsiPhi_Signal_v5::CacheAmplitudesAndAngles()
 	CachedA8 = ASint()*AP() * ReASAP_value;
 	CachedA9 = ASint()*AT() * ImASAT_value;
 	CachedA10= ASint()*A0() * ReASA0_value;
+
+	/*
+	   CachedA1 = A0()*A0() * angleFactorA0A0();
+	   CachedA2 = AP()*AP() * angleFactorAPAP();
+	   CachedA3 = AT()*AT() * angleFactorATAT();
+
+	   CachedA4 = AP()*AT() * angleFactorImAPAT();
+	   CachedA5 = A0()*AP() * angleFactorReA0AP();
+	   CachedA6 = A0()*AT() * angleFactorImA0AT();
+
+	   CachedA7 = AS()*AS() * angleFactorASAS();
+
+	   CachedA8 = AS()*AP() * angleFactorReASAP();
+	   CachedA9 = AS()*AT() * angleFactorImASAT();
+	   CachedA10= AS()*A0() * angleFactorReASA0();
+	   CachedA8 = ASint()*AP() * angleFactorReASAP();
+	   CachedA9 = ASint()*AT() * angleFactorImASAT();
+	   CachedA10= ASint()*A0() * angleFactorReASA0();
+	   */
 }
 
 //.......................................................
