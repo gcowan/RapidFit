@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/07/25 Rob Currie
+   - Removed #pragma temporarilly until a better solution is found
+
 2012/07/25 Greig Cowan
    - Modified LogNormalDistribution to be the sum of two LN distributions with a fraction. Empirically, this appears
      to be a very good model for the per-event error distributions of signal and background.
@@ -23,6 +26,11 @@
            cout << "Hi from Inside PDF" << endl;
            PDF_THREAD_UNLOCK
        Beware not to throw from inside a thread-lock, I have no idea what will happen, it may eat your machine, burn your results, or just hang with no responce
+   - Caught unhandled error in JpsiPhi_v5 constructor, exists cleanly on bad XML and doesn't segfault
+   - Added 'make gsl' option to Makefile and added code into main.cpp and Mathematics.{h,cpp} to switch between ROOT and GSL-based implementations of an error function for complex arguments
+       This is in the earlu stages of testing but uses more CPU as it doesn't cache results, but is thread-safe so it's unclear which implementation is actually faster/more effificent
+       When gsl is not requested it the code doesn't attempt to look for the GSL library to protect machines that don't have it installed in the standard place
+   - Cleaned up some compiler warnings out of DataPoint.cpp harmless recasting of size_t to int
 
 2012/07/20 Greig Cowan
    - Added PDFs for dealing with per-event errors. LogNormal parameterisation and PDF for taking histogram.
