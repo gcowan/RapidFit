@@ -194,6 +194,7 @@ double FitFunction::Evaluate()
 			cerr << "Are you aware DataSet: " << resultIndex+1 << " has zero size?" << endl;
 			continue;
 		}
+		allIntegrators[unsigned(resultIndex)]->SetPDF( allData->GetResultPDF( resultIndex ) );
 		temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)], resultIndex );
 		if( temp >= DBL_MAX )
 		{
