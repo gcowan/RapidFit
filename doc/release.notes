@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/08/03 Rob Currie
+   - Fixed a 1 line bug which has plagued me since introducing the Chi2 test
+        When this bug presented itself the results were obvious i.e. >10 sigma!
+
 2012/07/25 Rob Currie
    - Removed #pragma temporarilly until a better solution is found
    - Removed some dead code from JpsiPhi, fixed bug so that we can now perform per-event time integral caching with time acceptance turned on

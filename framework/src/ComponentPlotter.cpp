@@ -92,6 +92,22 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	vector<vector<double> > observableValues = GetCombinationStatistics( observableName, minimum, maximum, binNumber );
 
 	(void) minimum; (void) maximum; (void) binNumber;
+
+	if( config != NULL )
+	{
+		if( config->component_names.empty() )
+		{
+			config->component_names.push_back( "Total" );
+			config->LegendTextSize = 0.03;
+			vector<string> pdfComponents = plotPDF->PDFComponents();
+			for( unsigned int i=0; i< pdfComponents.size(); ++i )
+			{
+				ComponentRef* thisRef = new ComponentRef( pdfComponents[i] );
+				config->component_names.push_back( plotPDF->GetComponentName( thisRef ) );
+				delete thisRef;
+			}
+		}
+	}
 }
 
 //Destructor
@@ -633,27 +649,44 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			if( combinationIndex == 0 && this_config->DrawPull == true )
 			{
 				cout << endl;
-				cout << "Calculatig Pull Values" << endl;
+				cout << "Calculating Pull Values" << endl;
 
-				TF1* PDF_function = new TF1( "total_PDF", this, boundary_min, boundary_max, 1, "" );        //      I REFUSE to pass the class name
+				TString TF1_Name( "total_PDF_" ); TF1_Name.Append( desc );
+				TF1* PDF_function = new TF1( TF1_Name, this, boundary_min, boundary_max, 1, "" );        //      I REFUSE to pass the class name
 
-				for( unsigned int i=0; i< (unsigned)binned_data.back()->GetN(); ++i )
+				if( allPullData.size() != (unsigned)binned_data[combinationIndex]->GetN() ) allPullData.resize( (unsigned)binned_data[combinationIndex]->GetN(), 0. );
+
+
+				//cout << desc << endl;
+				for( unsigned int i=0; i< (unsigned)binned_data[combinationIndex]->GetN(); ++i )
 				{
-					double bin_center = binned_data.back()->GetX()[i];
+					double bin_center = binned_data[combinationIndex]->GetX()[i];
 
-					double this_bin = PDF_function->Eval( bin_center );
-
-					allPullData.push_back( this_bin );
+					//cout << "bin_center:\t" << bin_center << endl;
+					double this_bin = PDF_function->Eval( bin_center );// cout << endl;
+					//cout << "this_bin:\t" << this_bin << "\t";
+					allPullData[i]+= this_bin;
+					//cout << allPullData[i] << "\t" << endl;
 				}
 
-				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc, plotPDF->GetRandomFunction() );
+				TString desc_pull( desc );
+				desc_pull.Append("_pull");
+
+				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc_pull.Data(), plotPDF->GetRandomFunction() );
+
+				/*
+				for( unsigned int i=0; i< (unsigned)binned_data[combinationIndex]->GetN(); ++i )
+				{
+					cout << pullPlot->GetY()[i] <<  endl;
+				}
+				*/
 
 				(void)pullPlot;
 			}
 		}
-
 		delete temp;
 	}
+
 }
 
 //	Again I won't be bothered coding this to check the input, this is the USERS problem!
@@ -811,6 +844,8 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	double final_chi2=-999;
 
+	bool addLHCb=false;
+
 	if( conf != NULL )
 	{
 		if( conf->logY )
@@ -831,6 +866,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		X_Title = conf->xtitle;
 		Y_Title = conf->ytitle;
 		final_chi2 = conf->Chi2Value;
+		addLHCb = conf->addLHCb;
 	}
 
 	input_data->SetTitle( plotTitle );
@@ -852,10 +888,13 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	c1->Update();
 
-	TLatex *myLatex = new TLatex(0.5,0.5,"");
-	myLatex->SetTextAlign(11);
-	myLatex->SetNDC(kTRUE);
-	myLatex->DrawLatex(0.59, 0.75,"LHCb");
+	if( addLHCb )
+	{
+		TLatex *myLatex = new TLatex(0.5,0.5,"");
+		myLatex->SetTextAlign(11);
+		myLatex->SetNDC(kTRUE);
+		myLatex->DrawLatex(0.59, 0.75,"LHCb");
+	}
 
 	TLegend* leg = EdStyle::LHCbLegend();
 
@@ -1007,7 +1046,9 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	TString X_Title, Y_Title;
 
 	double final_chi2=-999;
+	double legend_size=1.;
 
+	bool addLHCb;
 	if( conf != NULL )
 	{
 		if( conf->logY )
@@ -1021,6 +1062,8 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		Color_Key = conf->color_key;
 		Width_Key = conf->width_key;
 		component_names = conf->component_names;
+		legend_size = conf->LegendTextSize;
+		addLHCb = conf->addLHCb;
 		X_min = conf->xmin;
 		X_max = conf->xmax;
 		Y_min = conf->ymin;
@@ -1055,12 +1098,16 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	if( logy ) pad1->SetLogy( true );
 	c1->Update();
 
-	TLatex *myLatex = new TLatex(0.5,0.5,"");
-	myLatex->SetTextAlign(11);
-	myLatex->SetNDC(kTRUE);
-	myLatex->DrawLatex(0.59, 0.75,"LHCb");
+	if( addLHCb )
+	{
+		TLatex *myLatex = new TLatex(0.5,0.5,"");
+		myLatex->SetTextAlign(11);
+		myLatex->SetNDC(kTRUE);
+		myLatex->DrawLatex(0.59, 0.75,"LHCb");
+	}
 
 	TLegend* leg = EdStyle::LHCbLegend();
+	leg->SetTextSize( legend_size );
 
 	leg->AddEntry( input_data, "Data", "pl" );
 
@@ -1138,7 +1185,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		double data_y = input_data->GetY()[i];
 		double data_err = input_data->GetErrorY( i );
 
-		double pull = (data_y - theory_y) / data_err;
+		double pull = ( data_y -theory_y ) / data_err;
 
 		/*!
 		 * From what I understand in comparing the PDF to data in this way the residuals are normalised with an error of 1.
@@ -1169,6 +1216,12 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	pullGraph->GetYaxis()->SetTitle( "Pull" );
 	pullGraph->GetXaxis()->SetRangeUser( X_min, X_max );
 	pullGraph->GetXaxis()->SetTitle( X_Title );
+	pad2->Modified();
+	pad2->Update();
+	pullGraph->GetYaxis()->SetTitleOffset((Float_t)(pullGraph->GetYaxis()->GetTitleOffset()/3.));
+	pullGraph->GetYaxis()->SetTitleSize((Float_t)(pullGraph->GetYaxis()->GetTitleSize()*2.));
+	pullGraph->GetXaxis()->SetTitleOffset((Float_t)(pullGraph->GetXaxis()->GetTitleOffset()/3.));
+	pullGraph->GetXaxis()->SetTitleSize((Float_t)(pullGraph->GetXaxis()->GetTitleSize()*2.));
 	pad2->Modified();
 	pad2->Update();
 	c1->Update();
@@ -1612,7 +1665,6 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 	ComponentRef* comp_obj = new ComponentRef( "0" );
 
-
 	unsigned int comb_num=0;
 
 	for( vector<DataPoint*>::iterator comb_i = allCombinations.begin();  comb_i != allCombinations.end(); ++comb_i, ++comb_num )
@@ -1626,7 +1678,9 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 		double temp_integral_value = pdfIntegrator->ProjectObservable( InputPoint, full_boundary, observableName, comp_obj );
 
-		temp_integral_value = temp_integral_value * ratioOfIntegrals[comb_num] * (double)plotData->GetDataNumber() * (boundary_max-boundary_min) / combination_integral[comb_num];
+		double dataNum = plotData->GetDataNumber( *comb_i );
+
+		temp_integral_value = temp_integral_value * ratioOfIntegrals[comb_num] * dataNum * (boundary_max-boundary_min) / combination_integral[comb_num];
 
 		temp_integral_value = temp_integral_value * ( combinationWeights[comb_num] / double(data_binning) );
 
@@ -1698,7 +1752,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 		double data_y = input_data->GetY()[i];
 		double data_err = input_data->GetErrorY( i );
 
-		double pull = (data_y - theory_y) / data_err;
+		double pull = ( data_y - theory_y ) / data_err;
 
 		/*!
 		 * From what I understand in comparing the PDF to data in this way the residuals are normalised with an error of 1.

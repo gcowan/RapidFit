@@ -159,8 +159,8 @@ gcc47: all
 gcc48: override CC=g++-4.8
 gcc48: all
 
-gsl: override CXXFLAGS+= -D__USE_GSL_ERR=true 
-gsl: override LINKFLAGS+= -lgsl -lgslcblas -lm 
+gsl: override CXXFLAGS+= -D__USE_GSL_ERR $(gsl-config --cflags) 
+gsl: override LINKFLAGS+= -lgsl -lgslcblas -lm $(gsl-config --libs)
 gsl: all
 
 #	Have a build option that SCREAMS at the user for potential mistakes!!!

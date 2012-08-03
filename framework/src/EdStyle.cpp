@@ -129,7 +129,7 @@ void EdStyle::SetStyle()
 	gStyle->SetTitleBorderSize(0);
 	gStyle->SetTitleFont(lhcbFont,"title");
 	gStyle->SetTitleX(0.0);
-	gStyle->SetTitleY(1.0); 
+	gStyle->SetTitleY(1.0);
 	gStyle->SetTitleW(1.0);
 	gStyle->SetTitleH((Float_t)0.05);
 
@@ -218,7 +218,7 @@ TString EdStyle::GetParamRootUnit( string Param_Name )
 	{
 		returnable_string = "[ps^{-1}]";
 
-	} else if( Param_Name == "deltaGamma" ) { 
+	} else if( Param_Name == "deltaGamma" ) {
 
 		returnable_string = "[ps^{-1}]";
 
@@ -455,6 +455,30 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 	} else if ( Param_Name == "F_s" ) {
 
 		Name.Append("F_S");
+
+	} else if ( Param_Name == "F_s990" ) {
+
+		Name.Append("F_S (990)");
+
+	} else if ( Param_Name == "F_s1008" ) {
+
+		Name.Append("F_S (1008)");
+
+	} else if ( Param_Name == "F_s1016" ) {
+
+		Name.Append("F_S (1016)");
+
+	} else if ( Param_Name == "F_s1020" ) {
+
+		Name.Append("F_S (1020)");
+
+	} else if ( Param_Name == "F_s1024" ) {
+
+		Name.Append("F_S (1024)");
+
+	} else if ( Param_Name == "F_s1032" ) {
+
+		Name.Append("F_S (1032)");
 
 	} else if ( Param_Name == "delta_para" ) {
 
@@ -716,10 +740,34 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 		Name.Append("C_{S-P}");
 
+	} else if ( Param_Name == "Csp990" ) {
+
+		Name.Append("C_{S-P}(990)");
+
+	} else if ( Param_Name == "Csp1008" ) {
+
+		Name.Append("C_{S-P}(1008)");
+
+	} else if ( Param_Name == "Csp1016" ) {
+
+		Name.Append("C_{S-P}(1016)");
+
+	} else if ( Param_Name == "Csp1020" ) {
+
+		Name.Append("C_{S-P}(1020)");
+
+	} else if ( Param_Name == "Csp1024" ) {
+
+		Name.Append("C_{S-P}(1024)");
+
+	} else if ( Param_Name == "Csp1032" ) {
+
+		Name.Append("C_{S-P}(1032)");
+
 	} else if ( Param_Name == "mistagP0" ) {
 
 		Name.Append("\\omega_{P0}");
-	
+
 	} else if ( Param_Name == "mistagP1" ) {
 
 		Name.Append("\\omega_{P1}");
@@ -860,7 +908,7 @@ TString EdStyle::GetParamRootUnit( TString arg )
 TString EdStyle::GetParamLatexName( TString arg )
 {
 	return GetParamLatexName( string( arg.Data() ) );
-} 
+}
 TString EdStyle::GetParamRootName( TString arg )
 {
 	return GetParamRootName( string( arg.Data() ) );
@@ -880,7 +928,7 @@ TString EdStyle::Remove_Suffix( TString arg )
 
 TLegend* EdStyle::LHCbLegend()
 {
-	TLegend* thisLegend = new TLegend( 0.75, 0.65, 0.9, 0.9 );
+	TLegend* thisLegend = new TLegend( 0.5, 0.65, 0.9, 0.9 );
 	thisLegend->SetFillColor( kWhite );
 	thisLegend->SetFillStyle( 3001 );
 	return thisLegend;

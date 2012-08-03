@@ -387,7 +387,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 		if( (Total_BinnedData != NULL) && ((*projection_i)->DrawPull == true) )
 		{
-			vector<double> finalPullEvals;					//	This will contain a nested vectors of 3 in size
+			vector<double> finalPullEvals;
 
 			for( unsigned int i=0; i< pullFunctionEvals[0].size(); ++i )		//	Loop over all Bins
 			{
@@ -399,7 +399,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 				finalPullEvals.push_back( this_bin );
 			}
 
-			TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_All_Data", resultBottle->GetResultPDF(0)->GetRandomFunction() );
+			TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_PullPlot", resultBottle->GetResultPDF(0)->GetRandomFunction() );
 			(void) pullGraph;
 
 			ComponentPlotter::OutputPlotPull( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(), finalPullEvals, resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );

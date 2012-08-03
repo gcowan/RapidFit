@@ -333,3 +333,46 @@ void SumPDF::SetDebug( DebugClass* input_debug )
 	}
 }
 
+string SumPDF::GetComponentName( ComponentRef* componentIndexObj )
+{
+	if( componentIndexObj == NULL ) return "Unknown";
+	else
+	{
+		string componentIndex = componentIndexObj->getComponentName();
+		int component_num = componentIndexObj->getComponentNumber();
+
+		if( component_num == -1 || componentIndexObj->getSubComponent() == NULL )
+		{
+			component_num = StringProcessing::GetNumberOnLeft( componentIndex );
+			componentIndexObj->setComponentNumber( component_num );
+			componentIndexObj->addSubComponent( StringProcessing::RemoveFirstNumber( componentIndex ) );
+		}
+
+		//      All components are:
+		//                              0       :       total of the whole NormalisedSumPDF
+		//                              1xx     :       all of the components in the first PDF
+		//                              2yy     :       all of the components in the second PDF
+
+		//      !!!!!   NORMALISE THE VALUE     !!!!!
+		switch( component_num )
+		{
+			case 1:
+				//      We want a component from the first PDF
+				return firstPDF->GetComponentName( componentIndexObj->getSubComponent() );
+
+			case 2:
+				//      We want a component from the second PDF
+				return secondPDF->GetComponentName( componentIndexObj->getSubComponent() );
+
+			case 0:
+				//      We wanr this PDF
+				return this->GetLabel();
+
+			default:
+				return "Unknown-Sum";
+		}
+
+	}
+	return "Invalid-Sum";
+}
+

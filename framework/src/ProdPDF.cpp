@@ -15,7 +15,7 @@ using namespace::std;
 ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) )
 {
 	this->SetName( "Prod" );
-        this->SetLabel( "Prod["+FirstPDF->GetLabel()+"]x["+SecondPDF->GetLabel()+"]" );
+	this->SetLabel( "Prod["+FirstPDF->GetLabel()+"]x["+SecondPDF->GetLabel()+"]" );
 
 	MakePrototypes();
 
@@ -154,7 +154,7 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 	if( isnan(termOne) || isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
-		cout << this->GetLabel() << endl;
+			cout << this->GetLabel() << endl;
 		cout << termOne << "\tx\t" << termTwo << endl;
 		PDF_THREAD_UNLOCK
 	}
@@ -177,7 +177,7 @@ double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	if( isnan(termOne) || isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
-		cout << this->GetLabel() << endl;
+			cout << this->GetLabel() << endl;
 		cout << termOne << " x " << termTwo << endl;
 		PDF_THREAD_UNLOCK
 	}
@@ -323,5 +323,52 @@ void ProdPDF::SetDebug( DebugClass* input_debug )
 		if( debug != NULL ) delete debug;
 		debug = new DebugClass( false );
 	}
+}
+
+string ProdPDF::GetComponentName( ComponentRef* componentIndexObj )
+{
+	if( componentIndexObj == NULL ) return "Unknown";
+	else
+	{
+		string componentIndex = componentIndexObj->getComponentName();
+		int component_num = componentIndexObj->getComponentNumber();
+
+		if( component_num == -1 || componentIndexObj->getSubComponent() == NULL )
+		{
+			if( componentIndex=="" || componentIndex=="0" ) component_num = 0;
+			else if( componentIndex=="10" || componentIndex=="20" ) component_num = 0;
+			else component_num = StringProcessing::GetNumberOnLeft( componentIndex );
+
+			componentIndexObj->setComponentNumber( component_num );
+			componentIndexObj->addSubComponent( StringProcessing::RemoveFirstNumber( componentIndex ) );
+
+		}
+
+		//      All components are:
+		//                              0       :       total of the whole NormalisedSumPDF
+		//                              1xx     :       all of the components in the first PDF
+		//                              2yy     :       all of the components in the second PDF
+
+		//      !!!!!   NORMALISE THE VALUE     !!!!!
+		switch( component_num )
+		{
+			case 1:
+				//      We want a component from the first PDF
+				return firstPDF->GetComponentName( componentIndexObj->getSubComponent() );
+
+			case 2:
+				//      We want a component from the second PDF
+				return secondPDF->GetComponentName( componentIndexObj->getSubComponent() );
+
+			case 0:
+				//      We wanr this PDF
+				return this->GetLabel();
+
+			default:
+				return "Unknown-Prod";
+		}
+
+	}
+	return "Invalid-Prob";
 }
 

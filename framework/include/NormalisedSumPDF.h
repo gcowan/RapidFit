@@ -71,6 +71,8 @@ class NormalisedSumPDF : public BasePDF
 
 		void SetDebug( DebugClass* input_debug );
 
+		virtual string GetComponentName( ComponentRef* = NULL );
+
 	private:
 		//	Uncopyable!
 		NormalisedSumPDF& operator=(const NormalisedSumPDF&);

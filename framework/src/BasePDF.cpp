@@ -540,3 +540,14 @@ void BasePDF::SetDebug( DebugClass* input_debug )
 	}
 }
 
+string BasePDF::GetComponentName( ComponentRef* input )
+{
+	if( input == NULL ) return this->GetName();
+	else
+	{
+		if( input->getComponentName() == "0" ) return this->GetName();
+		else return string( this->GetName() + "::" + input->getComponentName() );
+	}
+}
+
+

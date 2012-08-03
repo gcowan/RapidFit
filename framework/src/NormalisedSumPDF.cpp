@@ -233,12 +233,12 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 	{
 		PDF_THREAD_LOCK
 
-		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+			cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-		throw(-653102);
+			throw(-653102);
 	}
 	//Return the sum
 	return termOne + termTwo;
@@ -268,7 +268,7 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	if( isnan(termOne) || isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
-		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+			cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 		PDF_THREAD_UNLOCK
 	}
@@ -439,5 +439,47 @@ void NormalisedSumPDF::SetDebug( DebugClass* input_debug )
 		if( debug != NULL ) delete debug;
 		debug = new DebugClass( false );
 	}
+}
+
+string NormalisedSumPDF::GetComponentName( ComponentRef* componentIndexObj )
+{
+	if( componentIndexObj == NULL ) return "Unknown"; 
+	else
+	{
+		string componentIndex = componentIndexObj->getComponentName();
+		int component_num = componentIndexObj->getComponentNumber();
+
+		if( component_num == -1 || componentIndexObj->getSubComponent() == NULL )
+		{
+			component_num = StringProcessing::GetNumberOnLeft( componentIndex );
+			componentIndexObj->setComponentNumber( component_num );
+			componentIndexObj->addSubComponent( StringProcessing::RemoveFirstNumber( componentIndex ) );
+		}
+
+		//      All components are:
+		//                              0       :       total of the whole NormalisedSumPDF
+		//                              1xx     :       all of the components in the first PDF
+		//                              2yy     :       all of the components in the second PDF
+
+		//      !!!!!   NORMALISE THE VALUE     !!!!!
+		switch( component_num )
+		{
+			case 1:
+				//      We want a component from the first PDF
+				return firstPDF->GetComponentName( componentIndexObj->getSubComponent() );
+
+			case 2:
+				//      We want a component from the second PDF
+				return secondPDF->GetComponentName( componentIndexObj->getSubComponent() );
+
+			case 0:
+				//	We wanr this PDF
+				return this->GetLabel();
+
+			default:
+				return "Unknown-NormalisedSum";
+		}
+	}
+	return "Invalid-NormalisedSum";
 }
 

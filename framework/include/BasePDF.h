@@ -332,6 +332,8 @@
 		 */
 		virtual vector<string> PDFComponents();
 
+		virtual string GetComponentName( ComponentRef* = NULL );
+
 		/*!
 		 * @brief Interface Function: Return the value of the component given by ComponentRef, component 0 by default
 		 *

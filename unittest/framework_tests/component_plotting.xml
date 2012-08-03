@@ -241,6 +241,11 @@
 			<XTitle>Mass</XTitle>
 			<DrawPull>True</DrawPull>
 		</ComponentProjection>
+		<Scan>
+			<Name>Fraction1</Name>
+			<Sigma>3</Sigma>
+			<Points>10</Points>
+		</Scan>
 	</Output>
 
 </RapidFit>

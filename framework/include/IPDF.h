@@ -262,6 +262,8 @@ class IPDF
 		 */
 		virtual vector<string> PDFComponents() = 0;
 
+		virtual string GetComponentName( ComponentRef* ) = 0;
+
 		/*!
 		 * Interface Function:
 		 * Return the function value at the given point

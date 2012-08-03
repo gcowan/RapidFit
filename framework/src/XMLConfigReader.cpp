@@ -480,6 +480,14 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 				returnable_config->DrawPull = true;
 			}
 		}
+		else if( projComps[childIndex]->GetName() == "AddLHCb" )
+		{
+			string value = projComps[childIndex]->GetValue()[0];
+			if( value == "True" )
+			{
+				returnable_config->addLHCb = true;
+			}
+		}
 		else
 		{
 			cerr << "Sorry Don't understand: " << projComps[childIndex]->GetName() << " ignoring!" << endl;
