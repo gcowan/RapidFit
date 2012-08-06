@@ -150,14 +150,14 @@ void Foam::Init()
 				InputPDF->Remove_Cache();
 
 				//      Generate unique name for this foam instance
-				TString Name("Foam-");
+				Name="Foam-";
 				Name.Append(InputPDF->GetLabel());
 				Name.Append("-");
 				Name+=combinationIndex;
 				Name.Append("_");Name+=rand;
-				TString FoamName("Foam_");FoamName+=combinationIndex;
+				FoamName="Foam_";FoamName+=combinationIndex;
 				//      Create a root file to store the TFoam universe
-				TString RootName(Name);
+				RootName=Name;
 				RootName.Append(".root");
 
 				cout << "FOAM NOT Cached, Generating Foam:\t" << Name << endl;

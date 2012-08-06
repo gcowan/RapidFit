@@ -248,8 +248,8 @@ void RapidFitIntegrator::SetPDF( IPDF* input )
 	functionToWrap = input;
 }
 
-double RapidFitIntegrator::OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate,
-		bool haveTestedIntegral, DebugClass* debug )
+double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, IntegratorOneDim * oneDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, bool haveTestedIntegral, DebugClass* debug )
 {
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
 	if( debug != NULL ) quickFunction->SetDebug( debug );
@@ -405,7 +405,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			//Chose the one dimensional or multi-dimensional method
 			if( doIntegrate.size() == 1 )
 			{
-				numericalIntegral += this->OneDimentionIntegral( *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+				numericalIntegral += this->OneDimentionIntegral( functionToWrap, oneDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
 			}
 			else
 			{

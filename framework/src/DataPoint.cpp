@@ -240,6 +240,7 @@ bool DataPoint::operator() ( pair<DataPoint*,pair<string,int> > first, pair<Data
 	return (param_val_1 < param_val_2 );
 }
 
+//#pragma GCC diagnostic ignored "-Wfloat-equal"
 double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 {
 	if(Input.GetIndex()<0)
@@ -294,9 +295,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 		outputObservable = thisObservable->GetPseudoObservable();
 	}
 
-//#pragma GCC diagnostic ignored "-Wfloat-equal"
 	if( !thisObservable->GetValid() ) //|| outputObservable == 0. )
-//#pragma GCC diagnostic pop
 	{
 		vector<ObservableRef>* deps = thisObservable->GetDependencies();
 		vector<double> input;
@@ -313,6 +312,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 
 	return outputObservable;
 }
+//#pragma GCC diagnostic pop
 
 double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> Values )
 {

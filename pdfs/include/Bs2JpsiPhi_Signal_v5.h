@@ -323,7 +323,9 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		inline double gamma_l() const {
 			const double gl = gamma() + ( dgam *0.5 ) ;
 			if( gl < 0. ) {
-				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_v4 : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
+				PDF_THREAD_LOCK
+				cerr << " In Bs2JpsiPhi_Signal_v5 : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
+				PDF_THREAD_UNLOCK
 				return 0.0000001 ;
 			}
 			else
@@ -333,7 +335,9 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		inline double gamma_h() const {
 			const double gh = gamma() - ( dgam *0.5 ) ;
 			if( gh < 0. ) {
-				cerr << " In Bs2JpsiPhi_SignalAlt_BaseClass_v4 : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
+				PDF_THREAD_LOCK
+				cerr << " In Bs2JpsiPhi_Signal_v5 : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
+				PDF_THREAD_UNLOCK
 				return 0.0000001 ;
 			}
 			else
@@ -361,15 +365,21 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 				if( returnValue > 0.5) returnValue = 0.5 ;
 			}
 			else if( _mistag < 0.0 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistag() : _mistag < 0 so set to 0 " << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistag() : _mistag < 0 so set to 0 " << endl ;
+				PDF_THREAD_UNLOCK
 				returnValue = 0 ;
 			}
 			else if( _mistag > 0.5 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistag() : _mistag > 0.5 so set to 0.5 "  << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistag() : _mistag > 0.5 so set to 0.5 "  << endl ;
+				PDF_THREAD_UNLOCK
 				returnValue = 0.5 ;
 			}
 			else {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistag() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistag() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				PDF_THREAD_UNLOCK
 				exit(1);
 			}
 			return returnValue ;
@@ -389,15 +399,21 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 				if( returnValue > 0.5) returnValue = 0.5 ;
 			}
 			else if( _mistag < 0.0 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagB() : _mistag < 0 so deltaMistag set to 0 also " << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistagB() : _mistag < 0 so deltaMistag set to 0 also " << endl ;
+				PDF_THREAD_UNLOCK
 				returnValue = 0 ;
 			}
 			else if( _mistag > 0.5 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagB() : _mistag > 0.5 so so deltaMistag set to 0.5 also "  << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistagB() : _mistag > 0.5 so so deltaMistag set to 0.5 also "  << endl ;
+				PDF_THREAD_UNLOCK
 				returnValue = 0.5 ;
 			}
 			else {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagB() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistagB() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				PDF_THREAD_UNLOCK
 				exit(1);
 			}
 			return returnValue ;
@@ -417,15 +433,21 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 				if( returnValue > 0.5) returnValue = 0.5 ;
 			}
 			else if( _mistag < 0.0 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagBbar() : _mistag < 0 so deltaMistag set to 0 also " << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistagBbar() : _mistag < 0 so deltaMistag set to 0 also " << endl ;
+				PDF_THREAD_UNLOCK
 				returnValue = 0 ;
 			}
 			else if( _mistag > 0.5 ) {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagBbar() : _mistag > 0.5 so so deltaMistag set to 0.5 also "  << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistagBbar() : _mistag > 0.5 so so deltaMistag set to 0.5 also "  << endl ;
+				PDF_THREAD_UNLOCK
 				returnValue = 0.5 ;
 			}
 			else {
-				cout << "Bs2JpsiPhi_SignalAlt_BaseClass_v4::mistagBbar() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				PDF_THREAD_LOCK
+				cout << "Bs2JpsiPhi_Signal_v5::mistagBbar() : WARNING ******If you got here you dont know what you are doing  "  << endl ;
+				PDF_THREAD_UNLOCK
 				exit(1);
 			}
 			return returnValue ;
@@ -496,7 +518,8 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 
 			//DEBUG
 			if( DEBUGFLAG && (result < 0) ) {
-				cout << " Bs2JpsiPhi_SignalAlt_BaseClass_v4::timeFactorEven() : result < 0 " << endl ;
+				PDF_THREAD_LOCK
+				cout << " Bs2JpsiPhi_Signal_v5::timeFactorEven() : result < 0 " << endl ;
 				cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
 				cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
 				cout << " ->term3 " << q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) << endl ;
@@ -504,6 +527,7 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 				cout << "   -->expSin    "  << expSin() << endl ;
 				cout << "   -->tagFrac   "  << mistag() << endl ;
 				cout << "   -->delta_ms  "  << delta_ms << endl ;
+				PDF_THREAD_UNLOCK
 			}
 			return result ;
 		}

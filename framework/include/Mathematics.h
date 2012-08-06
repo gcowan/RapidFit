@@ -26,8 +26,6 @@
 
 using namespace::std;
 
-extern RooMath* math_object;
-
 namespace Mathematics
 {
 	//	This comes up A LOT, save some CPU cycles and cache it!

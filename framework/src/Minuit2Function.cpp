@@ -76,9 +76,9 @@ double Minuit2Function::operator()( const vector<double>& NewParameterValues ) c
 }
 
 //Set the up value for error calculation
-void Minuit2Function::SetErrorDef( double Up )
+void Minuit2Function::SetErrorDef( double thisUp )
 {
-	up = Up;
+	up = thisUp;
 }
 void Minuit2Function::SetSigma( int Sigma )
 {

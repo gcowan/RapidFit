@@ -295,10 +295,10 @@ string PhaseSpaceBoundary::DiscreteDescription( const DataPoint* input ) const
 vector<DataPoint*> PhaseSpaceBoundary::GetDiscreteCombinations() const
 {
 	//Calculate all possible combinations of discrete observables
-	vector<string> allNames = this->GetAllNames();
+	vector<string> thisAllNames = this->GetAllNames();
 	vector<vector<double> > discreteValues;
 	vector<string> discreteNames, continuousNames;
-	vector<vector<double> > discreteCombinations = StatisticsFunctions::DiscreteCombinations( &allNames, this, discreteNames, continuousNames, discreteValues );
+	vector<vector<double> > discreteCombinations = StatisticsFunctions::DiscreteCombinations( &thisAllNames, this, discreteNames, continuousNames, discreteValues );
 
 	(void) continuousNames;
 

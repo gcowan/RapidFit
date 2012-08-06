@@ -23,10 +23,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <fstream>
+#include <signal.h>
 
 using namespace::std;
 
-
+//	We will catch any throw statments internal to the minimisation process
 void FitAssembler::SafeMinimise( IMinimiser* Minimiser )
 {
 	try
@@ -76,12 +77,12 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	cout << endl;
 
 	/*
-	vector<IPDF*> pdfs = Bottle->GetAllPDFs();
-	for( unsigned int i=0; i< pdfs.size(); ++i )
-	{
-		pdfs[i]->GetPhysicsParameters()->Print();
-	}
-	*/
+	   vector<IPDF*> pdfs = Bottle->GetAllPDFs();
+	   for( unsigned int i=0; i< pdfs.size(); ++i )
+	   {
+	   pdfs[i]->GetPhysicsParameters()->Print();
+	   }
+	 */
 
 	FitFunction * theFunction = FunctionConfig->GetFitFunction();
 	theFunction->SetDebug( debug );
@@ -275,27 +276,52 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, ParameterSet* BottleParameters )
 {
 	vector<string> already_found = ReturnableFitResult->GetResultParameterSet()->GetAllNames();
+	vector<string> bottle_names = BottleParameters->GetAllNames();
 
-	for( unsigned int i=0; i< BottleParameters->GetAllNames().size(); ++i )
+	for( unsigned int i=0; i< bottle_names.size(); ++i )
 	{
-		int found = StringProcessing::VectorContains( &already_found, &(BottleParameters->GetAllNames()[i]) );
+		int found = StringProcessing::VectorContains( &already_found, &(bottle_names[i]) );
+
+		PhysicsParameter* Phys_Param = BottleParameters->GetPhysicsParameter( bottle_names[i] );
 
 		//	There was something in the ParameterSet not in the FitResult, i.e. an unclaimed object which can't have changed during the fit
 		if( found == -1 )
 		{
 			//cout << "ALERT:\t" << "Parameter " << BottleParameters->GetAllNames()[i] << " was not claimed by any PDF in the fit and was NOT passed to the Minimiser!!!" << endl;
-			double Value = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetValue();
-			double OriginalValue = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetValue();
-			double Minimum = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetMinimum();
-			double Maximum = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetMaximum();
-			double Error = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetStepSize();
-			string Type = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetType();
-			string Unit = BottleParameters->GetPhysicsParameter( BottleParameters->GetAllNames()[i] )->GetUnit();
-			bool added = ReturnableFitResult->GetResultParameterSet()->ForceNewResultParameter( BottleParameters->GetAllNames()[i],  Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
+			double Value = Phys_Param->GetValue();
+			double OriginalValue = Phys_Param->GetValue();
+			double Minimum = Phys_Param->GetMinimum();
+			double Maximum = Phys_Param->GetMaximum();
+			double Error = Phys_Param->GetStepSize();
+			string Type = Phys_Param->GetType();
+			string Unit = Phys_Param->GetUnit();
+			bool added = ReturnableFitResult->GetResultParameterSet()->ForceNewResultParameter( bottle_names[i],  Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
 			if( !added )
 			{
 				cerr << "Error finalizing FitResultVector Object" << endl << endl;
 				exit(-984);
+			}
+		}
+		else
+		{
+			if( Phys_Param->GetType() != "Fixed" )
+			{
+				ResultParameter* result_Param = ReturnableFitResult->GetResultParameterSet()->GetResultParameter( already_found[found] );
+				double result_val = result_Param->GetValue();
+				double result_err = result_Param->GetError();
+				double param_min = Phys_Param->GetMinimum();
+				double param_max = Phys_Param->GetMaximum();
+				bool nolim = fabs( param_min - param_max ) > 1E-6;
+				if( (fabs( result_val - param_min ) <= (0.5 * result_err)) && nolim )
+				{
+					cout << "Caution: Parameter " << bottle_names[i] << " is within 0.5 sigma of a limit!!!" << endl;
+					cout << "\t\t" << bottle_names[i] << ": " << result_val << " Min: " << param_min << endl << endl;
+				}
+				if( (fabs( result_val - param_max ) <= (0.5 * result_err)) && nolim )
+				{
+					cout << "Caution: Parameter " << bottle_names[i] << " is within 0.5 sigma of a limit!!!" << endl;
+					cout << "\t\t" << bottle_names[i] << ": " << result_val << " Max: " << param_min << endl << endl;
+				}
 			}
 		}
 	}

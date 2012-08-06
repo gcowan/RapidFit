@@ -20,8 +20,8 @@ using namespace::std;
  * Constructor with correct arguments, including covariance Matrix and contours
  */
 FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle,
-		RapidFitMatrix* covarianceMatrix, vector< FunctionContour* > ContourPlots ) :
-	minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( covarianceMatrix ),
+		RapidFitMatrix* CovarianceMatrix, vector< FunctionContour* > ContourPlots ) :
+	minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( CovarianceMatrix ),
 	contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( new PhysicsBottle(*FittedBottle) )
 {
 }

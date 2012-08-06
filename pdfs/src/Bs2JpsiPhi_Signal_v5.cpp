@@ -803,12 +803,11 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeFactors()
 // Pre calculate the time integrals : this is becaue these functions are called many times for each event due to the 10 angular terms
 void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 {
+	vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlo; Exp_Input_1[1]=thi; Exp_Input_1[2]=gamma_l(); Exp_Input_1[3]=resolution;
+	vector<double> Exp_Input_2(4,0.); Exp_Input_2[0]=tlo; Exp_Input_2[1]=thi; Exp_Input_2[2]=gamma_h(); Exp_Input_2[3]=resolution;
+	vector<double> Input_2(5,0.); Input_2[0]=tlo; Input_2[1]=thi; Input_2[2]=gamma(); Input_2[3]=delta_ms; Input_2[4]=resolution;
 	if( !useTimeAcceptance() && useEventResolution() )
 	{
-		vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlo; Exp_Input_1[1]=thi; Exp_Input_1[2]=gamma_l(); Exp_Input_1[3]=resolution;
-		vector<double> Exp_Input_2(4,0.); Exp_Input_2[0]=tlo; Exp_Input_2[1]=thi; Exp_Input_2[2]=gamma_h(); Exp_Input_2[3]=resolution;
-		vector<double> Input_2(5,0.); Input_2[0]=tlo; Input_2[1]=thi; Input_2[2]=gamma(); Input_2[3]=delta_ms; Input_2[4]=resolution;
-
 		intExpL_stored = _datapoint->GetPseudoObservable( _intexpLObs, Exp_Input_1 );
 		intExpH_stored = _datapoint->GetPseudoObservable( _intexpHObs, Exp_Input_2 );
 		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs, Input_2 );
@@ -816,14 +815,6 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 	}
 	else if( useTimeAcceptance() && useEventResolution() )
 	{
-		//	This works, it just ends up storing the result and input for 160 calculations per datapoint. This requires a HUGE amount of i/o between processor and RAM
-		//	even on machines where this is good this isn't as fast as simply lining up the calculation on the CPU.
-		//	It also drinks in excess of 1Gb of RAM in it's current form (this isn't likely to reduce) so we can't be clever in the case of timeAcceptance && eventResolution
-
-		vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlo; Exp_Input_1[1]=thi; Exp_Input_1[2]=gamma_l(); Exp_Input_1[3]=resolution;
-		vector<double> Exp_Input_2(4,0.); Exp_Input_2[0]=tlo; Exp_Input_2[1]=thi; Exp_Input_2[2]=gamma_h(); Exp_Input_2[3]=resolution;
-		vector<double> Input_2(5,0.); Input_2[0]=tlo; Input_2[1]=thi; Input_2[2]=gamma(); Input_2[3]=delta_ms; Input_2[4]=resolution;
-
 		intExpL_stored = _datapoint->GetPseudoObservable( _intexpLObs_vec[ timeBinNum ], Exp_Input_1 );
 		intExpH_stored = _datapoint->GetPseudoObservable( _intexpHObs_vec[ timeBinNum ], Exp_Input_2 );
 		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs_vec[ timeBinNum ], Input_2 );
@@ -841,12 +832,12 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 
 vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 {
-	vector<string> component_list;
-	component_list.push_back( "CP-Even" );
-	component_list.push_back( "CP-Odd" );
-	component_list.push_back( "As" );
-	component_list.push_back( "0" );
-	return component_list;
+	vector<string> this_component_list;
+	this_component_list.push_back( "CP-Even" );
+	this_component_list.push_back( "CP-Odd" );
+	this_component_list.push_back( "As" );
+	this_component_list.push_back( "0" );
+	return this_component_list;
 }
 
 double Bs2JpsiPhi_Signal_v5::EvaluateComponent( DataPoint* input, ComponentRef* Component )

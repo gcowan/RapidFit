@@ -59,8 +59,8 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 
 	for( int is=1; is <= (N-1) ; is++ )    //The N-1 is important as the N one is included as the +dh/2 in first slice
 	{
-		double th = tlow + is*dt  ;
-		slices.push_back( new AcceptanceSlice( tlow, th, dh ) ) ;
+		double this_th = tlow + is*dt  ;
+		slices.push_back( new AcceptanceSlice( tlow, this_th, dh ) ) ;
 	}
 		
 	//....done.....
@@ -87,10 +87,10 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 		
 	for( int is=0; is < N ; is++ ) 
 	{
-		double tlow = ts[is] ;
-		double thigh = 14.0 ;
+		double this_tlow = ts[is] ;
+		double this_thigh = 14.0 ;
 		double height = is > 0 ? ac[is] - ac[is-1] : ac[is] ;
-		slices.push_back( new AcceptanceSlice( tlow, thigh, height ) ) ;
+		slices.push_back( new AcceptanceSlice( this_tlow, this_thigh, height ) ) ;
 	}
 	
 	//....done.....
@@ -161,11 +161,11 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 	
 	for( unsigned int is=0; is < lowEdge.size() ; is++ ) 
 	{
-		double tlow = lowEdge[is];
-		double thigh = hiEdge[is] ;
+		double this_tlow = lowEdge[is];
+		double this_thigh = hiEdge[is] ;
 		double height = binContent[is]  ;
 		//cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
-		slices.push_back( new AcceptanceSlice( tlow, thigh, height ) ) ;
+		slices.push_back( new AcceptanceSlice( this_tlow, this_thigh, height ) ) ;
 	}
 	
 	//....done.....
@@ -195,7 +195,7 @@ double SlicedAcceptance::getValue( Observable* time, double timeOffset ) const
 //#pragma GCC diagnostic pop
 	}
 
-	double t= time->GetValue() - timeOffset;
+	double t = time->GetValue() - timeOffset;
 	double returnValue = 0;
 	unsigned int is = 0;
        	for( ; is < slices.size() ; ++is )
@@ -226,10 +226,10 @@ AcceptanceSlice * SlicedAcceptance::getSlice( unsigned int s ) const
 
 //............................................
 //Helpers
-double SlicedAcceptance::stream(ifstream& stream)
+double SlicedAcceptance::stream(ifstream& thisStream)
 {
 	double tmpVal;
-	stream >> tmpVal;
+	thisStream >> tmpVal;
 	return tmpVal;
 }
 

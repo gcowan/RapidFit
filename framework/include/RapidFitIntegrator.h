@@ -288,8 +288,8 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-		double OneDimentionIntegral( const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate,
-				bool, DebugClass* debug=new DebugClass(false) );
+		static double OneDimentionIntegral( IPDF* functionToWrap, IntegratorOneDim * oneDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
+				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, bool, DebugClass* debug=new DebugClass(false) );
 
 		/*!
 		 * This stores the Ratio of the Integrals after the Comparison between Analytical and Numerical

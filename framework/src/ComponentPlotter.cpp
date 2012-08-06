@@ -89,7 +89,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	vector<int> binNumber;
 
 	//Get the data needed to make the histogram
-	vector<vector<double> > observableValues = GetCombinationStatistics( observableName, minimum, maximum, binNumber );
+	observableValues = GetCombinationStatistics( observableName, minimum, maximum, binNumber );
 
 	(void) minimum; (void) maximum; (void) binNumber;
 
@@ -423,14 +423,14 @@ TH1* ComponentPlotter::FormatData( unsigned int combinationNumber )
 	vector<DataPoint*> wanted_points = data_subsets[combinationNumber];
 	TString component_num_str;component_num_str+=combinationNumber;
 	TH1* returnable = new TH1D( "Data_For_Component_"+component_num_str, "Data_For_Component_"+component_num_str, data_binning, boundary_min, boundary_max );
-	vector<double> wanted_data, wanted_weights;
+	vector<double> wanted_data, this_wanted_weights;
 	ObservableRef* new_ref = new ObservableRef( observableName );
 	ObservableRef* weight_ref = new ObservableRef( weightName );
 	for( vector<DataPoint*>::iterator point_i = wanted_points.begin(); point_i != wanted_points.end(); ++point_i )
 	{
 		wanted_data.push_back( (*point_i)->GetObservable( *new_ref )->GetValue() );
-		if( weightsWereUsed ) wanted_weights.push_back( (*point_i)->GetObservable( *weight_ref )->GetValue() );
-		else wanted_weights.push_back( 1. );
+		if( weightsWereUsed ) this_wanted_weights.push_back( (*point_i)->GetObservable( *weight_ref )->GetValue() );
+		else this_wanted_weights.push_back( 1. );
 	}
 	delete new_ref;
 
@@ -438,7 +438,7 @@ TH1* ComponentPlotter::FormatData( unsigned int combinationNumber )
 	//	Think of this as multiplying by a very clever version of the number 1 ;)
 	//	This gives the correct normalisation
 	vector<double>::iterator point_i = wanted_data.begin();
-	vector<double>::iterator weight_i = wanted_weights.begin();
+	vector<double>::iterator weight_i = this_wanted_weights.begin();
 	for( ; point_i != wanted_data.end(); ++point_i, ++weight_i )
 	{
 		returnable->Fill( *point_i, *weight_i/weight_norm );
@@ -1309,20 +1309,20 @@ void ComponentPlotter::WriteBranch( TTree* input_tree, TString Branch_Name, vect
 vector<double> ComponentPlotter::GetStatistics( string ObservableName, double & Minimum, double & Maximum, int & BinNumber )
 {
 	//Make a vector of the values found for the observable
-	vector<double> observableValues;
+	vector<double> this_observableValues;
 	for ( int dataIndex = 0; dataIndex < plotData->GetDataNumber(); ++dataIndex )
 	{
-		observableValues.push_back( plotData->GetDataPoint(dataIndex)->GetObservable(ObservableName)->GetValue() );
+		this_observableValues.push_back( plotData->GetDataPoint(dataIndex)->GetObservable(ObservableName)->GetValue() );
 	}
 
 	//Find out number and range of data points needed
-	Maximum = StatisticsFunctions::Maximum(observableValues);
-	Minimum = StatisticsFunctions::Minimum(observableValues);
-	BinNumber = StatisticsFunctions::OptimumBinNumber(observableValues);
+	Maximum = StatisticsFunctions::Maximum(this_observableValues);
+	Minimum = StatisticsFunctions::Minimum(this_observableValues);
+	BinNumber = StatisticsFunctions::OptimumBinNumber(this_observableValues);
 
 	cout << endl << "Optimally:\t" << "Max: " << Maximum << "\tMin: " << Minimum << "\tBinning: " << BinNumber << endl;
 
-	return observableValues;
+	return this_observableValues;
 }
 
 //Return the values tracing the PDF projection in the Observable of choice
@@ -1462,24 +1462,24 @@ vector<vector<double> > ComponentPlotter::GetCombinationStatistics( string Obser
 			//print( discreteNames );
 			//print( values_for_this_combination );
 
-			vector<double> discrete_observableValues_i;
+			vector<double> this_discrete_observableValues_i;
 			//	Get all values of the wanted parameter from this subset
 			for( unsigned int j=0; j< data_subsets.back().size(); ++j )
 			{
-				discrete_observableValues_i.push_back( (data_subsets.back())[j]->GetObservable( ObservableName )->GetValue() );
+				this_discrete_observableValues_i.push_back( (data_subsets.back())[j]->GetObservable( ObservableName )->GetValue() );
 			}
 
-			//print( discrete_observableValues_i );
+			//print( this_discrete_observableValues_i );
 
 			//	Save the min/max and optimal bin number for this subset
-			Max.push_back( StatisticsFunctions::Maximum( discrete_observableValues_i ) );
-			Min.push_back( StatisticsFunctions::Minimum( discrete_observableValues_i ) );
-			BinNum.push_back( StatisticsFunctions::OptimumBinNumber( discrete_observableValues_i ) );
+			Max.push_back( StatisticsFunctions::Maximum( this_discrete_observableValues_i ) );
+			Min.push_back( StatisticsFunctions::Minimum( this_discrete_observableValues_i ) );
+			BinNum.push_back( StatisticsFunctions::OptimumBinNumber( this_discrete_observableValues_i ) );
 
 			cout << "Min: " << Min.back() << "\tMax: " << Max.back() << "\tBinNum: " << BinNum.back() << endl;
 
 			//	store all of the values of this observable
-			temp_discrete_observableValues.push_back( discrete_observableValues_i );
+			temp_discrete_observableValues.push_back( this_discrete_observableValues_i );
 		}
 	}
 
@@ -1541,7 +1541,7 @@ vector<DataPoint*> ComponentPlotter::GetDiscreteCombinations( vector<double>& Da
 	}
 
 	//Calculate averages and weights
-	vector<double> combinationWeights;
+	vector<double> this_combinationWeights;
 	double dataNumber = (double)plotData->GetDataNumber();
 	for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
 	{
@@ -1557,7 +1557,7 @@ vector<DataPoint*> ComponentPlotter::GetDiscreteCombinations( vector<double>& Da
 	}
 	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
 	{
-		combinationWeights.push_back( (double)combinationCounts[combinationIndex] / (dataNumber) );
+		this_combinationWeights.push_back( (double)combinationCounts[combinationIndex] / (dataNumber) );
 	}
 
 	//Create the data points to return
@@ -1609,7 +1609,7 @@ vector<DataPoint*> ComponentPlotter::GetDiscreteCombinations( vector<double>& Da
 
 	//Output the results
 	DataPointDescriptions = allDescriptions;
-	DataPointWeights = combinationWeights;
+	DataPointWeights = this_combinationWeights;
 	return newDataPoints;
 }
 

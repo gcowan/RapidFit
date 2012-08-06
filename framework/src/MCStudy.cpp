@@ -112,7 +112,7 @@ void MCStudy::DoWholeStudy( int OutputLevel )
 
 		if( StartingEntries.size() == 1 )
 		{
-			for( unsigned int i=0; i < xmlConfig->GetAllDataSetSizes().size(); ++i )
+			for( unsigned int j=0; j < xmlConfig->GetAllDataSetSizes().size(); ++j )
 			{
 				local_Start_entries.push_back( local_Start_entries[0] );
 			}

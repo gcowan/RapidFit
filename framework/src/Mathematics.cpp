@@ -27,6 +27,68 @@ pthread_mutex_t ROOT_Lock;
 
 using namespace::std;
 
+#ifdef __USE_GSL_ERR
+
+#include <gsl/gsl_complex_math.h>
+#include <gsl/gsl_sf_erf.h>
+#include <gsl/gsl_sf_pow_int.h>
+#include <gsl/gsl_sf_gamma.h>
+
+const gsl_complex prefix = gsl_complex_rect( (2./sqrt( Mathematics::Pi())), 0. );
+
+gsl_complex gsl_erf( gsl_complex z )
+{
+	gsl_complex result = gsl_complex_rect( 0., 0. );
+	gsl_complex numerator  = gsl_complex_rect( 0., 0.);
+	gsl_complex denominator  = gsl_complex_rect( 0., 0. );
+
+	//	Common factor which changes term to term
+	int factor=-1;
+	//gsl_complex gsl_factor = gsl_complex_rect( 0., 0. );
+
+	//	Running numerator turn in the expansion
+	gsl_complex z_raised = z;
+
+	//	Common Factor in the expansion
+	gsl_complex z_square = gsl_complex_mul( z, z );
+
+	//	Running factor to govern the size of each step
+	unsigned int fact =1;
+
+	numerator = z;
+	GSL_SET_REAL( &denominator, fact );
+	result  = gsl_complex_add( result, gsl_complex_div( numerator, denominator ) );
+
+	//	Can't get better than double precision
+	//	If the numerator varies by less than this we should assume we've reached as good as we can get
+	for( unsigned int i = 1;
+		GSL_REAL(z_raised)>(GSL_REAL(z)*1E-10) && GSL_IMAG(z_raised)>(GSL_IMAG(z)*1E-10);
+			++i )
+	{
+		factor*=-1;
+		//	Assumed Quicker than constructing a complex number and doing a complex multiplication
+		GSL_SET_REAL( &z, (double)factor*GSL_REAL(z) );
+
+		z_raised = gsl_complex_mul( z_raised, z_square );
+		fact*=i;
+
+		//numerator  = gsl_complex_pow_real( z, 2*i+1 );
+		numerator = z_raised;
+
+		//	Only a real number
+		GSL_SET_REAL( &denominator, (2*i + 1)*fact );
+
+		//	Add this term in the series to the result
+		result  = gsl_complex_add( result, gsl_complex_div( numerator, denominator ) );
+	}
+
+	result = gsl_complex_mul( prefix, result );
+
+	return result;
+}
+
+#endif
+
 namespace Mathematics
 {
 
@@ -67,7 +129,7 @@ namespace Mathematics
 		RooComplex zc(u+c,-swt_c);
 		RooComplex zsq= z*z;
 		RooComplex v= -zsq - u*u;
-		return v.exp()*(-zsq.exp()/(zc*rootpi) + 1)*2 ; //why shoule be a 2 here?
+		return v.exp()*(-zsq.exp()/(zc*rootpi) + 1.)*2.; //why shoule be a 2 here?
 		//   return v.exp()*(-zsq.exp()/(zc*rootpi) + 1);
 	}
 
@@ -75,11 +137,18 @@ namespace Mathematics
 	double evalCerfRe( double swt, double u, double c)  {
 		RooComplex* z = new RooComplex( swt*c, u+c );
 		double returnable = 0.;
-		if( z->im() > -4.0 )
+		if( (u+c) > -4.0 )
 		{
+#ifdef __USE_GSL_ERR
+			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
+			returnable = GSL_REAL( gsl_erf( gsl_z ) );
+#else
 			pthread_mutex_lock( &ROOT_Lock );
+			RooMath* math_object = new RooMath();
 			returnable = math_object->ITPComplexErrFuncRe( *z, 10 )*exp( -u*u );
+			delete math_object;
 			pthread_mutex_unlock( &ROOT_Lock );
+#endif
 		}
 		else
 		{
@@ -93,11 +162,18 @@ namespace Mathematics
 	double evalCerfIm( double swt, double u, double c)  {
 		RooComplex* z = new RooComplex( swt*c, u+c );
 		double returnable = 0.;
-		if( z->im() > -4.0 )
+		if( (u+c) > -4.0 )
 		{
+#ifdef __USE_GSL_ERR
+			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
+			returnable = GSL_IMAG( gsl_erf( gsl_z ) );
+#else
 			pthread_mutex_lock( &ROOT_Lock );
+			RooMath* math_object = new RooMath();
 			returnable = math_object->ITPComplexErrFuncIm( *z, 10 )*exp( -u*u );
+			delete math_object;
 			pthread_mutex_unlock( &ROOT_Lock );
+#endif
 		}
 		else
 		{

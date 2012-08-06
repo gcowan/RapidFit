@@ -126,11 +126,6 @@ int PerformJackKnife( RapidFitConfiguration* config );
 //	The 'meat' of the Code
 int RapidFit( int argc, char * argv[] )
 {
-	//	An attempt to make sure that the caching is enabled for the complex calculations
-	RooMath* math_object = new RooMath();
-	math_object->cacheCERF( true );
-	RooSentinel::activate();
-
 	RapidFitWelcome();
 
 	RapidFitConfiguration* thisConfig = new RapidFitConfiguration();
@@ -354,28 +349,28 @@ int PerformLLScan( RapidFitConfiguration* config )
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( false );
 		}
 
-		for(unsigned int scan_num=0; scan_num < LLscanList.size(); ++scan_num )
+		for(unsigned int this_scan_num=0; this_scan_num < LLscanList.size(); ++this_scan_num )
 		{
 			TString new_output_scan_dat( "LLScanData" );
 			TString time_stamped_name( new_output_scan_dat ); time_stamped_name.Append( "_" ); time_stamped_name.Append( StringProcessing::TimeString() );
 			new_output_scan_dat.Append(".root"); time_stamped_name.Append(".root");
 			vector<FitResultVector*> ammended_format;
-			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( true );
+			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[this_scan_num] )->SetScanStatus( true );
 
 			//	The output file format is [0] = Global_CV, [1] = Scan_CV_1, [2] = Global_CV, [3] = Scan_CV_2 ...
-			for( int i=0; i< scanSoloResults[scan_num]->NumberResults(); ++i )
+			for( int i=0; i< scanSoloResults[this_scan_num]->NumberResults(); ++i )
 			{
 				ammended_format.push_back( config->GlobalFitResult );
-				FitResultVector* temp_vec = new FitResultVector( scanSoloResults[scan_num]->GetAllNames() );
-				temp_vec->AddFitResult( scanSoloResults[scan_num]->GetFitResult( i ), false );
-				temp_vec->AddRealTime( scanSoloResults[scan_num]->GetRealTime(i) );
-				temp_vec->AddCPUTime( scanSoloResults[scan_num]->GetCPUTime(i) );
+				FitResultVector* temp_vec = new FitResultVector( scanSoloResults[this_scan_num]->GetAllNames() );
+				temp_vec->AddFitResult( scanSoloResults[this_scan_num]->GetFitResult( i ), false );
+				temp_vec->AddRealTime( scanSoloResults[this_scan_num]->GetRealTime(i) );
+				temp_vec->AddCPUTime( scanSoloResults[this_scan_num]->GetCPUTime(i) );
 				ammended_format.push_back( temp_vec );
 			}
 			FitResultVector* corrected_format = new FitResultVector( ammended_format );
 			ResultFormatter::WriteFlatNtuple( string( new_output_scan_dat ), corrected_format );
 			ResultFormatter::WriteFlatNtuple( string( time_stamped_name ), corrected_format );
-			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( false );
+			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[this_scan_num] )->SetScanStatus( false );
 		}
 	}
 	return 0;
@@ -859,9 +854,9 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 		cout << "Generating TOY DataSet: " << i+1 << " of " << factor << endl;
 		toy = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nToyEvents );
 		output_file->cd();
-		for( int i = 0; i < nToyEvents; i++ ) {
-			if (i % 10000 == 0) cout << "Toy event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
-			DataPoint * event = toy->GetDataPoint(i);
+		for( int j = 0; j < nToyEvents; ++j ) {
+			if (j % 10000 == 0) cout << "Toy event # " << j << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
+			DataPoint * event = toy->GetDataPoint(j);
 			cosPsi   = event->GetObservable("cosPsi")->GetValue();
 			cosTheta = event->GetObservable("cosTheta")->GetValue();
 			phi      = event->GetObservable("phi")->GetValue();
@@ -880,9 +875,9 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 		cout << "Generating TOY DataSet: " << i+1 << " of " << factor << endl;
 		toy = (MemoryDataSet*)dataConfig->MakeDataSet( helphase, helpdf, nToyEvents );
 		output_file->cd();
-		for ( int i = 0; i < nToyEvents; i++ ) {
-			if (i % 10000 == 0) cout << "Toy event # " << i << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
-			DataPoint * event = toy->GetDataPoint(i);
+		for( int j = 0; j < nToyEvents; ++j ) {
+			if( j % 10000 == 0) cout << "Toy event # " << j << "\b\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r";
+			DataPoint * event = toy->GetDataPoint(j);
 			helcosk  = event->GetObservable("helcosthetaK")->GetValue();
 			helcosl  = event->GetObservable("helcosthetaL")->GetValue();
 			helphi   = event->GetObservable("helphi")->GetValue();

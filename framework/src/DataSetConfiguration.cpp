@@ -150,31 +150,31 @@ IDataSet * DataSetConfiguration::MakeDataSet( PhaseSpaceBoundary * DataBoundary,
 	return newDataSet;
 }
 
-IDataSet* DataSetConfiguration::LoadGeneratorDataset( string source, PhaseSpaceBoundary* internalBoundary, int numberEvents, IPDF* FitPDF )
+IDataSet* DataSetConfiguration::LoadGeneratorDataset( string Source, PhaseSpaceBoundary* InternalBoundary, int NumberEvents, IPDF* FitPDF )
 {
 	//Assume it's an accept/reject generator, or some child of it
 	IDataGenerator * dataGenerator = NULL;
 	if (separateGeneratePDF)
 	{
-		dataGenerator = ClassLookUp::LookUpDataGenerator( source, internalBoundary, generatePDF );
+		dataGenerator = ClassLookUp::LookUpDataGenerator( Source, InternalBoundary, generatePDF );
 	}
 	else
 	{
-		dataGenerator = ClassLookUp::LookUpDataGenerator( source, internalBoundary, FitPDF );
+		dataGenerator = ClassLookUp::LookUpDataGenerator( Source, InternalBoundary, FitPDF );
 	}
 	if( dataGenerator == NULL )
 	{
 		cerr << "Generator NOT found!" << endl;
 		exit(-9864);
 	}
-	dataGenerator->GenerateData( int(numberEvents) );
+	dataGenerator->GenerateData( int(NumberEvents) );
 	IDataSet* newDataSet = dataGenerator->GetDataSet();
 	delete dataGenerator;
 
 	return newDataSet;
 }
 
-IDataSet* DataSetConfiguration::FoamFile( vector<string> arguments, vector<string> ArgumentNames, PhaseSpaceBoundary* internalBoundary, int numberEvents, IPDF* FitPDF )
+IDataSet* DataSetConfiguration::FoamFile( vector<string> Arguments, vector<string> ArgumentNames, PhaseSpaceBoundary* InternalBoundary, int NumberEvents, IPDF* FitPDF )
 {
 	string searchName = "FileName";
 	int fileNameIndex = StringProcessing::VectorContains( &ArgumentNames, &searchName );
@@ -183,16 +183,16 @@ IDataSet* DataSetConfiguration::FoamFile( vector<string> arguments, vector<strin
 	{
 		fileName = "tempFile.root";
 		ArgumentNames.push_back( "FileName" );
-		arguments.push_back( fileName );
+		Arguments.push_back( fileName );
 	}
 	else
 	{
-		fileName = arguments[(unsigned)fileNameIndex];
+		fileName = Arguments[(unsigned)fileNameIndex];
 	}
 
-	string source="Foam";
+	string Source="Foam";
 
-	IDataSet* FoamDataSet = this->LoadGeneratorDataset( source, internalBoundary, numberEvents, FitPDF );
+	IDataSet* FoamDataSet = this->LoadGeneratorDataset( Source, InternalBoundary, NumberEvents, FitPDF );
 
 	vector<IDataSet*> TotalFoamDataSet(1, FoamDataSet);
 
@@ -202,7 +202,7 @@ IDataSet* DataSetConfiguration::FoamFile( vector<string> arguments, vector<strin
 
 	delete FoamDataSet;
 
-	IDataSet* FileDataSet = this->LoadDataFile( arguments, ArgumentNames, internalBoundary, numberEvents );
+	IDataSet* FileDataSet = this->LoadDataFile( Arguments, ArgumentNames, InternalBoundary, NumberEvents );
 
 	remove( fileName.c_str() );
 
@@ -283,10 +283,10 @@ void DataSetConfiguration::get_object_list( TString current_path, vector<pair<st
 
 			for( vector<pair<string,string> >::iterator found_i=found_names->begin(); found_i!=found_names->end(); ++found_i )
 			{
-				string full_name = found_i->first;
-				full_name.append( string("/") );
-				full_name.append( found_i->second );
-				all_found_names.push_back( full_name );
+				string this_full_name = found_i->first;
+				this_full_name.append( string("/") );
+				this_full_name.append( found_i->second );
+				all_found_names.push_back( this_full_name );
 			}
 
 			//  If this is an object of the wanted type we foud ignore it

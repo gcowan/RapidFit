@@ -1,11 +1,11 @@
 /**
-        @class XMLTag
+  @class XMLTag
 
-        A class used to parse an xml config file. Represents a single xml tag and its contents.
+  A class used to parse an xml config file. Represents a single xml tag and its contents.
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+ */
 
 //	RapidFit Headers
 #include "XMLTag.h"
@@ -92,7 +92,7 @@ void XMLTag::RemoveChild( int num )
 		{
 			toBeRemoved = child_i;
 
-		break;
+			break;
 		}
 	}
 
@@ -192,24 +192,24 @@ string XMLTag::FindNextTagOpen( vector<string> Content, int & LineNumber, int & 
 				if ( closePosition > openPosition )
 				{
 					//Tag is complete
-					string name( Content[lineIndex], unsigned(openPosition + 1), unsigned(closePosition - openPosition - 1) );
-	
+					string this_name( Content[lineIndex], unsigned(openPosition + 1), unsigned(closePosition - openPosition - 1) );
+
 					//Error check
-						if ( name.size() == 0 )
+					if ( this_name.size() == 0 )
 					{
 						cerr << "Found tag with no name in line: \"" << Content[lineIndex] << "\"" << endl;
 						exit(1);
 					}
-		
-					if ( name[0] == '/' )
+
+					if ( this_name[0] == '/' )
 					{
-						cerr << "Found a closing tag <" << name << "> when opening tag expected" << endl;
+						cerr << "Found a closing tag <" << this_name << "> when opening tag expected" << endl;
 						exit(1);
 					}
 
 					LineNumber = int(lineIndex);
 					LinePosition = openPosition;
-					return name;
+					return this_name;
 				}
 				else
 				{

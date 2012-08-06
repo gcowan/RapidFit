@@ -106,15 +106,14 @@ string PseudoObservable::GetName() const
 	return Name;
 }
 
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 double PseudoObservable::GetPseudoObservable() const
 {
 	if( internal_Input.empty() ) return 0.;
 	if( valid == true )
 	{
 		double returnable=0.;
-//#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if( Value == 0. )
-//#pragma GCC diagnostic pop
 		{
 			valid = false;	//	Valid=false here to trigger the re-calculation
 			returnable = this->GetValue();
@@ -129,6 +128,7 @@ double PseudoObservable::GetPseudoObservable() const
 		return returnable;
 	}
 }
+#pragma GCC diagnostic pop
 
 int PseudoObservable::GetIndex() const
 {
@@ -145,6 +145,7 @@ void PseudoObservable::Print() const
 	return;
 }
 
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 bool PseudoObservable::GetValid( const vector<double> Input ) const
 {
 	if( Input.size() != internal_Input.size() )
@@ -157,9 +158,7 @@ bool PseudoObservable::GetValid( const vector<double> Input ) const
 		bool check_ok = true;
 		for( unsigned int i=0; i< internal_Input.size(); ++i )
 		{
-//#pragma GCC diagnostic ignored "-Wfloat-equal"
 			if( internal_Input[i] != Input[i] )
-//#pragma GCC diagnostic pop
 			{
 				check_ok = false;
 				break;
@@ -169,6 +168,7 @@ bool PseudoObservable::GetValid( const vector<double> Input ) const
 		return check_ok;
 	}
 }
+#pragma GCC diagnostic pop
 
 vector<double> PseudoObservable::GetCacheInput() const
 {
