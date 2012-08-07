@@ -533,9 +533,9 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 
 	// Sum of all amplitudes must equal 1
 	//fracKst892 = ((1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS) < 0.) ? 0. : (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
-	cout << "a\t " <<  fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
+	//cout << "a\t " <<  fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
 	double fracKst892 = (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
-	cout << "b " << fracKst892 << " " << fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
+	//cout << "b " << fracKst892 << " " << fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
 	
 	double magA0Zplus   = sqrt(fracA0sqZplus*fracZplus);
 	double magApZplus   = sqrt(fracApsqZplus*fracZplus);
@@ -551,8 +551,8 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	double magApKst1680 = sqrt(fracApsqKst1680*fracKst1680);
 	double magAmKst1680 = ( (fracKst1680 - magA0Kst1680*magA0Kst1680 - magApKst1680*magApKst1680) < 0.) ? 0. : sqrt(fracKst1680 - magA0Kst1680*magA0Kst1680 - magApKst1680*magApKst1680);
 
-	cout << fracKst892 << " " << magA0Kst892 << " " << magApKst892 << " " << magAmKst892 << " " << (1.- (fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892)) << endl;
-	cout << fracKst1410 << " " << magA0Kst1410 << " " << magApKst1410 << " " << magAmKst1410 << " " << (1.- (fracKst1410 - magA0Kst1410*magA0Kst1410 - magApKst1410*magApKst1410)) << endl;
+	//cout << fracKst892 << " " << magA0Kst892 << " " << magApKst892 << " " << magAmKst892 << " " << (1.- (fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892)) << endl;
+	//cout << fracKst1410 << " " << magA0Kst1410 << " " << magApKst1410 << " " << magAmKst1410 << " " << (1.- (fracKst1410 - magA0Kst1410*magA0Kst1410 - magApKst1410*magApKst1410)) << endl;
 	
 	massZplus  = allParameters.GetPhysicsParameter( massZplusName )->GetValue();
 	widthZplus = allParameters.GetPhysicsParameter( widthZplusName )->GetValue();
@@ -583,9 +583,9 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
 	KpiComponents[2]->setHelicityAmplitudes(magA0Kst1680, magApKst1680, magAmKst1680, phaseA0Kst1680, phaseApKst1680, phaseAmKst1680);
-	KpiComponents[3]->setHelicityAmplitudes(fracK01430, 0., 0., phaseA0K01430, 0., 0.);
-	KpiComponents[4]->setHelicityAmplitudes(fracK21430, 0., 0., phaseA0K21430, 0., 0.);
-	KpiComponents[5]->setHelicityAmplitudes(frac_LASS, 0., 0., 0., 0., 0.);
+	KpiComponents[3]->setHelicityAmplitudes(sqrt(fracK01430), 0., 0., phaseA0K01430, 0., 0.);
+	KpiComponents[4]->setHelicityAmplitudes(sqrt(fracK21430), 0., 0., phaseA0K21430, 0., 0.);
+	KpiComponents[5]->setHelicityAmplitudes(sqrt(frac_LASS), 0., 0., 0., 0., 0.);
 
 	return isOK;
 }
