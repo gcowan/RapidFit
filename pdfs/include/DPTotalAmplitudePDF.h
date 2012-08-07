@@ -18,6 +18,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
+#include "THnSparse.h"
 #include "TLorentzVector.h"
 
 class DPTotalAmplitudePDF : public BasePDF
@@ -33,6 +34,7 @@ class DPTotalAmplitudePDF : public BasePDF
 		vector<string> PDFComponents();
 
 	protected:
+                virtual double Normalisation(PhaseSpaceBoundary*);
 
 	private:
 		void MakePrototypes();
@@ -63,7 +65,6 @@ class DPTotalAmplitudePDF : public BasePDF
 		
 		ObservableRef fracA0sqKst892Name;
 		ObservableRef fracApsqKst892Name;
-		ObservableRef fracKst892Name;
 		ObservableRef phaseA0Kst892Name;
 		ObservableRef phaseApKst892Name;
 		ObservableRef phaseAmKst892Name;
@@ -113,7 +114,6 @@ class DPTotalAmplitudePDF : public BasePDF
 		
 		double fracA0sqKst892;
 		double fracApsqKst892;
-		double fracKst892;
 		double phaseA0Kst892;
 		double phaseApKst892;
 		double phaseAmKst892;
@@ -176,9 +176,12 @@ class DPTotalAmplitudePDF : public BasePDF
 		bool useAngularAcceptance;
 		string fullFileName;
 		TFile * histogramFile;
-		TH1D * angularAccHistCosTheta1;
-		TH1D * angularAccHistPhi;
-		TH2D * angularAccHistMassCosTheta2;
+		//TH1D * angularAccHistCosTheta1;
+		//TH1D * angularAccHistPhi;
+		//TH2D * angularAccHistMassCosTheta2;
+                THnSparse * histo;
+                TAxis *xaxis, *yaxis, *zaxis, *maxis;
+                int nxbins, nybins, nzbins, nmbins;
 };
 
 #endif

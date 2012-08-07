@@ -34,7 +34,6 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	
 	, fracA0sqKst892Name	( configurator->getName("fracA0sqKst892") )
 	, fracApsqKst892Name	( configurator->getName("fracApsqKst892") )
-	//, fracKst892Name	( configurator->getName("fracKst892") )
 	, phaseA0Kst892Name	( configurator->getName("phaseA0Kst892") )
 	, phaseApKst892Name	( configurator->getName("phaseApKst892") )
 	, phaseAmKst892Name	( configurator->getName("phaseAmKst892") )
@@ -82,7 +81,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, r_LASSName	( configurator->getName("r_LASS") )
 	// The actual values of the parameters and observables
 	, fracA0sqZplus(),  fracApsqZplus(),  fracZplus(),  phaseA0Zplus(),  phaseApZplus(),  phaseAmZplus()
-	, fracA0sqKst892(),  fracApsqKst892(),  fracKst892(),  phaseA0Kst892(),  phaseApKst892(),  phaseAmKst892()
+	, fracA0sqKst892(),  fracApsqKst892(),  phaseA0Kst892(),  phaseApKst892(),  phaseAmKst892()
 	, fracA0sqKst1410(), fracApsqKst1410(), fracKst1410(), phaseA0Kst1410(), phaseApKst1410(), phaseAmKst1410()
 	, fracA0sqKst1680(), fracApsqKst1680(), fracKst1680(), phaseA0Kst1680(), phaseApKst1680(), phaseAmKst1680()
 	, fracK01430(),  				  phaseA0K01430()
@@ -100,7 +99,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
-	, fullFileName(), histogramFile(), angularAccHistCosTheta1(), angularAccHistPhi(), angularAccHistMassCosTheta2()
+	, fullFileName(), histogramFile(), histo() //angularAccHistCosTheta1(), angularAccHistPhi(), angularAccHistMassCosTheta2()
+        , xaxis(), yaxis(), zaxis(), maxis()
+        , nxbins(), nybins(), nzbins(), nmbins()
 {
 	MakePrototypes();
 
@@ -194,9 +195,66 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                 }
 
 		histogramFile = TFile::Open(fullFileName.c_str());
+                histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
+ 
+                // cos mu
+                xaxis = histo->GetAxis(0);
+                nxbins = xaxis->GetNbins();
+
+                // cos k
+                yaxis = histo->GetAxis(1);
+                nybins = yaxis->GetNbins();
+
+                // delta phi
+                zaxis = histo->GetAxis(2);
+                nzbins = zaxis->GetNbins();
+
+                // m Kpi
+                maxis = histo->GetAxis(3);
+                nmbins = maxis->GetNbins();
+
+                int total_num_bins = nxbins * nybins * nzbins * nmbins;
+		int sum = 0;
+		
+		vector<int> zero_bins;
+                //loop over each bin in histogram and print out how many zero bins there are
+                int idx[4] = {0,0,0,0};
+                for (int i=1; i < nxbins+1; ++i)
+                {
+                        for (int j=1; j < nybins+1; ++j)
+                        {
+                                for (int k=1; k < nzbins+1; ++k)
+                                {
+                                        for (int l=1; l < nmbins+1; ++l)
+                                        {
+                                                idx[0] = i; idx[1] = j; idx[2] = k; idx[3] = l;
+                                                double bin_content = histo->GetBinContent(idx);
+                                                //cout << "Bin content: " << bin_content << endl;
+                                                if(bin_content<=0)
+                                                {
+                                                        zero_bins.push_back(1);
+                                                }
+                                                //cout << " Zero bins " << zero_bins.size() << endl;}
+                                                else if (bin_content>0)
+                                                {
+                                                        sum += (int) bin_content;
+                                                }
+                                        }
+                                }
+                        }
+                }
+
+                int average_bin_content = sum / total_num_bins;
+
+                cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
+                cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
+                cout << endl;
+
+		/*
 		angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
 		angularAccHistPhi 	= (TH1D*)histogramFile->Get("delta_phi_effTot");
 		angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
+		*/
 	}
 }
 
@@ -219,7 +277,6 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	
 	,fracA0sqKst892Name(copy.fracA0sqKst892Name)
 	,fracApsqKst892Name(copy.fracApsqKst892Name)
-	//,fracKst892Name(copy.fracKst892Name)
 	,phaseA0Kst892Name(copy.phaseA0Kst892Name)
 	,phaseApKst892Name(copy.phaseApKst892Name)
 	,phaseAmKst892Name(copy.phaseAmKst892Name)
@@ -270,7 +327,6 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	
 	,fracA0sqKst892(copy.fracA0sqKst892)
 	,fracApsqKst892(copy.fracApsqKst892)
-	,fracKst892(copy.fracKst892)
 	,phaseA0Kst892(copy.phaseA0Kst892)
 	,phaseApKst892(copy.phaseApKst892)
 	,phaseAmKst892(copy.phaseAmKst892)
@@ -319,10 +375,12 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,cosARefs(copy.cosARefs)
 	,fullFileName(copy.fullFileName)
 	,histogramFile()//copy.histogramFile)
-	,angularAccHistCosTheta1()//copy.angularAccHistCosTheta1)
-	,angularAccHistPhi()//copy.angularAccHistPhi)
-	,angularAccHistMassCosTheta2()//copy.angularAccHistMassCosTheta2)
-
+	//,angularAccHistCosTheta1()//copy.angularAccHistCosTheta1)
+	//,angularAccHistPhi()//copy.angularAccHistPhi)
+	//,angularAccHistMassCosTheta2()//copy.angularAccHistMassCosTheta2)
+	,histo()
+	,xaxis(copy.xaxis), yaxis(copy.yaxis), zaxis(copy.zaxis), maxis(copy.maxis)
+	,nxbins(copy.nxbins), nybins(copy.nybins), nzbins(copy.nzbins), nmbins(copy.nmbins)
 	,frac_LASS(copy.frac_LASS)
         ,a_LASS(copy.a_LASS)
         ,r_LASS(copy.r_LASS)
@@ -344,9 +402,12 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	if ( useAngularAcceptance )
         {
                 histogramFile = TFile::Open(fullFileName.c_str());
-                angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
+                histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
+		/*
+	        angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
                 angularAccHistPhi       = (TH1D*)histogramFile->Get("delta_phi_effTot");
                 angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
+		*/
 	}
 }
 
@@ -371,7 +432,6 @@ void DPTotalAmplitudePDF::MakePrototypes()
 	
 	parameterNames.push_back( fracA0sqKst892Name );
 	parameterNames.push_back( fracApsqKst892Name );
-	//parameterNames.push_back( fracKst892Name );
 	parameterNames.push_back( phaseA0Kst892Name );
 	parameterNames.push_back( phaseApKst892Name );
 	parameterNames.push_back( phaseAmKst892Name );
@@ -445,7 +505,6 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	
 	fracA0sqKst892    = allParameters.GetPhysicsParameter( fracA0sqKst892Name )->GetValue();
 	fracApsqKst892    = allParameters.GetPhysicsParameter( fracApsqKst892Name )->GetValue();
-	//fracKst892    = allParameters.GetPhysicsParameter( fracKst892Name )->GetValue();
 	phaseA0Kst892  = allParameters.GetPhysicsParameter( phaseA0Kst892Name )->GetValue();
 	phaseApKst892  = allParameters.GetPhysicsParameter( phaseApKst892Name )->GetValue();
 	phaseAmKst892  = allParameters.GetPhysicsParameter( phaseAmKst892Name )->GetValue();
@@ -473,9 +532,10 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 
 
 	// Sum of all amplitudes must equal 1
-	fracKst892 = ((1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS) < 0.) ? 0. : (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
-
-	//cout << fracKst892 << " " << fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << endl;
+	//fracKst892 = ((1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS) < 0.) ? 0. : (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
+	cout << "a\t " <<  fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
+	double fracKst892 = (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
+	cout << "b " << fracKst892 << " " << fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
 	
 	double magA0Zplus   = sqrt(fracA0sqZplus*fracZplus);
 	double magApZplus   = sqrt(fracApsqZplus*fracZplus);
@@ -491,7 +551,8 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	double magApKst1680 = sqrt(fracApsqKst1680*fracKst1680);
 	double magAmKst1680 = ( (fracKst1680 - magA0Kst1680*magA0Kst1680 - magApKst1680*magApKst1680) < 0.) ? 0. : sqrt(fracKst1680 - magA0Kst1680*magA0Kst1680 - magApKst1680*magApKst1680);
 
-	//cout << fracKst892 << " " << magA0Kst892 << " " << magApKst892 << " " << magAmKst892 << " " << (1.- (fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892)) << endl;
+	cout << fracKst892 << " " << magA0Kst892 << " " << magApKst892 << " " << magAmKst892 << " " << (1.- (fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892)) << endl;
+	cout << fracKst1410 << " " << magA0Kst1410 << " " << magApKst1410 << " " << magAmKst1410 << " " << (1.- (fracKst1410 - magA0Kst1410*magA0Kst1410 - magApKst1410*magApKst1410)) << endl;
 	
 	massZplus  = allParameters.GetPhysicsParameter( massZplusName )->GetValue();
 	widthZplus = allParameters.GetPhysicsParameter( widthZplusName )->GetValue();
@@ -522,9 +583,9 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
 	KpiComponents[2]->setHelicityAmplitudes(magA0Kst1680, magApKst1680, magAmKst1680, phaseA0Kst1680, phaseApKst1680, phaseAmKst1680);
-	KpiComponents[3]->setHelicityAmplitudes(sqrt(fracK01430), 0., 0., phaseA0K01430, 0., 0.);
-	KpiComponents[4]->setHelicityAmplitudes(sqrt(fracK21430), 0., 0., phaseA0K21430, 0., 0.);
-	KpiComponents[5]->setHelicityAmplitudes(sqrt(frac_LASS), 0., 0., 0., 0., 0.);
+	KpiComponents[3]->setHelicityAmplitudes(fracK01430, 0., 0., phaseA0K01430, 0., 0.);
+	KpiComponents[4]->setHelicityAmplitudes(fracK21430, 0., 0., phaseA0K21430, 0., 0.);
+	KpiComponents[5]->setHelicityAmplitudes(frac_LASS, 0., 0., 0., 0., 0.);
 
 	return isOK;
 }
@@ -538,14 +599,31 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	cosTheta2 = measurement->GetObservable( cosTheta2Name )->GetValue();
 	phi       = measurement->GetObservable( phiName )->GetValue();
 
+	int globalbin = -1;
+        int xbin = -1, ybin = -1, zbin = -1, mbin = -1;
+
+	double angularAcc = 1.;
 	double angularAccCosTheta1 = 1.;
 	double angularAccPhi = 1.;
 	double angularAccMassCosTheta2 = 1.;
 	if ( useAngularAcceptance )
 	{
+		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
+                xbin = xaxis->FindFixBin( cosTheta1 ); if( xbin > nxbins ) xbin = nxbins;
+                ybin = yaxis->FindFixBin( cosTheta2 ); if( ybin > nybins ) ybin = nybins;
+                zbin = zaxis->FindFixBin( phi  	    ); if( zbin > nzbins ) zbin = nzbins;
+                mbin = maxis->FindFixBin( m23 	    ); if( mbin > nmbins ) mbin = nmbins;
+
+                int idx[4] = { xbin, ybin, zbin, mbin };
+                globalbin = (int)histo->GetBin( idx );
+                angularAcc = histo->GetBinContent(globalbin);
+		
+		/*
 		angularAccCosTheta1     = angularAccHistCosTheta1	->GetBinContent( angularAccHistCosTheta1	->FindBin(cosTheta1) );
 		angularAccPhi           = angularAccHistPhi		->GetBinContent( angularAccHistPhi		->FindBin(phi) );
 		angularAccMassCosTheta2 = angularAccHistMassCosTheta2	->GetBinContent( angularAccHistMassCosTheta2	->FindBin(m23, cosTheta2) );
+		angularAcc = angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2;
+		*/
 	}
 	/*
 	// Need angle between reference axis
@@ -586,7 +664,7 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 			{
 				tmp += KpiComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
 						twoLambda, twoLambdaPsi);
-				//cout << "m23: " << m23 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << endl;
+				//cout << "m23: " << m23 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
 			}
 
 			/*
@@ -623,7 +701,7 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	double p1_st = sqrt(t1*t2)/m23/2 ;
 	double p3    = sqrt(t31*t32)/MB0/2;
 
-	double returnable_value = result * angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2* p1_st * p3;
+	double returnable_value = result * angularAcc * p1_st * p3;
 
 	if( isnan(returnable_value) || returnable_value < 0 ) return 0.;
 	else return returnable_value;
@@ -633,13 +711,11 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
 {
         vector<string> component_list;
         component_list.push_back( "892" );
-        //component_list.push_back( "1410" );
-        //component_list.push_back( "1680" );
-        //component_list.push_back( "1430" );
-        //component_list.push_back( "1430_2" );
-        component_list.push_back( "LASS" );   //HACK
-// =======
-//         //component_list.push_back( "LASS" );
+        component_list.push_back( "1410" );
+        component_list.push_back( "1680" );
+        component_list.push_back( "1430" );
+        component_list.push_back( "1430_2" );
+        component_list.push_back( "LASS" );
         component_list.push_back( "0" );
         return component_list;
 }
@@ -692,3 +768,10 @@ double DPTotalAmplitudePDF::EvaluateComponent(DataPoint * measurement, Component
 
         return return_value;
 }
+
+double DPTotalAmplitudePDF::Normalisation(PhaseSpaceBoundary * boundary)
+{
+        (void) boundary;
+	return -1.;
+}
+

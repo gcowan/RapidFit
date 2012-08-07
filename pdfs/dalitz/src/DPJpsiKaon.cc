@@ -17,9 +17,9 @@ DPJpsiKaon::DPJpsiKaon(int fLB, int fLR, double fmB, double mR,
                                double RB, double RR, double fmJpsi,
                                int spin,std::string mShape,
                                double a, double r):
-A0(1,0),
-Aplus(1,0),
-Aminus(1,0),
+A0(0,0),
+Aplus(0,0),
+Aminus(0,0),
 spinKaon(spin)
 {
   this->LB=fLB;
