@@ -534,8 +534,10 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	// Sum of all amplitudes must equal 1
 	//fracKst892 = ((1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS) < 0.) ? 0. : (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
 	//cout << "a\t " <<  fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
-	double fracKst892 = (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
+	//double fracKst892 = (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
 	//cout << "b " << fracKst892 << " " << fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
+	
+	double fracKst892 = 1.;
 	
 	double magA0Zplus   = sqrt(fracA0sqZplus*fracZplus);
 	double magApZplus   = sqrt(fracApsqZplus*fracZplus);
