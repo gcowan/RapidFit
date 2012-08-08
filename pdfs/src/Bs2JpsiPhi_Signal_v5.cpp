@@ -91,6 +91,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) :
 	, _usePunziMistag(false)
 	, _usePunziSigmat(false)
 	, allowNegativeAsSq(false)
+	, _usePlotComponents(false)
 	//objects
 	,t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(), tag(),
 	_gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
@@ -117,6 +118,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) :
 	_usePunziSigmat = configurator->isTrue( "UsePunziSigmat" ) ;
 	_usePunziMistag = configurator->isTrue( "UsePunziMistag" ) ;
 	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
+	_usePlotComponents = configurator->isTrue( "PlotComponents" ) ;
 
 
 	//...............................................
@@ -833,10 +835,12 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 {
 	vector<string> this_component_list;
-	this_component_list.push_back( "CP-Even" );
-	this_component_list.push_back( "CP-Odd" );
-	this_component_list.push_back( "As" );
-	this_component_list.push_back( "0" );
+	if( _usePlotComponents ) {
+	  this_component_list.push_back( "CP-Even" );
+	  this_component_list.push_back( "CP-Odd" );
+	  this_component_list.push_back( "As" );
+	  this_component_list.push_back( "0" );
+	}
 	return this_component_list;
 }
 

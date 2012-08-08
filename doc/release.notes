@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/08/08 Pete Clarke
+   - Added a configurator to switch off component plotting in _v5_  so that by default
+     one doesnt get them , ans plotting is a lot quicker
+
 2012/08/05 Rob Currie
    - Fixed some minor gcc complaints about local objects having same name as globals
    - Added gsl implementation of erf(z) for z=x+yi this appears to give the same result as the RooFit cod

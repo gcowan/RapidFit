@@ -293,6 +293,7 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		bool _usePunziSigmat ;
 		bool _usePunziMistag ;
 		bool allowNegativeAsSq ;
+		bool _usePlotComponents ;
 
 		//....................................
 		//Internal helper functions
