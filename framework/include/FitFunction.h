@@ -101,6 +101,8 @@ class FitFunction
 		 */
 		bool GetWeightsWereUsed() const;
 
+		string GetWeightName() const;
+
 		/*!
 		 * @brief Set the FitFunction to use Weights squared
 		 *

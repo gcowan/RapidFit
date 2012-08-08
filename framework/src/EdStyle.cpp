@@ -6,7 +6,7 @@
 
   @author Greig A Cowan greig.alan.cowan@cern.ch
   @date 2009-10-02
- */
+  */
 
 // Include files
 
@@ -45,11 +45,11 @@ EdStyle::~EdStyle()
 }
 
 void EdStyle::SetStyle()
-/*!
- * Compared to: Erasmus/trunk/RootTools/LHCbStyle/src/lhcbStyle.C -r 139227
- *
- * From: svn co svn+ssh://svn.cern.ch/reps/lhcb/Erasmus/trunk/RootTools/LHCbStyle/src
- */
+	/*!
+	 * Compared to: Erasmus/trunk/RootTools/LHCbStyle/src/lhcbStyle.C -r 139227
+	 *
+	 * From: svn co svn+ssh://svn.cern.ch/reps/lhcb/Erasmus/trunk/RootTools/LHCbStyle/src
+	 */
 {
 
 	//Start of LHCb Style choices
@@ -81,14 +81,14 @@ void EdStyle::SetStyle()
 
 
 	gStyle->SetPaperSize(20,26);
-        gStyle->SetPadLeftMargin( (Float_t) 0.13 );
-        gStyle->SetPadBottomMargin( (Float_t) 0.16 );
-        gStyle->SetPadRightMargin( (Float_t)0.08 ); // increase for colz plots!!
-        gStyle->SetPadTopMargin( (Float_t)0.05 );
+	gStyle->SetPadLeftMargin( (Float_t) 0.13 );
+	gStyle->SetPadBottomMargin( (Float_t) 0.16 );
+	gStyle->SetPadRightMargin( (Float_t)0.08 ); // increase for colz plots!!
+	gStyle->SetPadTopMargin( (Float_t)0.05 );
 
 
 	//      Set default fonts for axis and titles on all plots
-        gStyle->SetTextFont( lhcbFont );
+	gStyle->SetTextFont( lhcbFont );
 	gStyle->SetTextSize( (Float_t) lhcbTSize );
 	gStyle->SetLabelFont( lhcbFont, "xyz" );
 	gStyle->SetLabelSize( (Float_t)lhcbTSize, "xyz" );
@@ -97,27 +97,27 @@ void EdStyle::SetStyle()
 	gStyle->SetStatFont( lhcbFont );
 
 	// use bold lines and markers
-        gStyle->SetLineWidth( lhcbWidth );
-        gStyle->SetFrameLineWidth( lhcbWidth );
-        gStyle->SetHistLineWidth( lhcbWidth );
-        gStyle->SetFuncWidth( lhcbWidth );
-        gStyle->SetGridWidth( lhcbWidth );
-        gStyle->SetLineStyleString( 2, "[12 12]"); // postscript dashes
-        gStyle->SetMarkerStyle( 20 );
-        gStyle->SetMarkerSize( (Float_t)2.1 );
+	gStyle->SetLineWidth( lhcbWidth );
+	gStyle->SetFrameLineWidth( lhcbWidth );
+	gStyle->SetHistLineWidth( lhcbWidth );
+	gStyle->SetFuncWidth( lhcbWidth );
+	gStyle->SetGridWidth( lhcbWidth );
+	gStyle->SetLineStyleString( 2, "[12 12]"); // postscript dashes
+	gStyle->SetMarkerStyle( 20 );
+	gStyle->SetMarkerSize( (Float_t)2.1 );
 
 
 	// label offsets
-        gStyle->SetLabelOffset( (Float_t)0.010, "X" );
+	gStyle->SetLabelOffset( (Float_t)0.010, "X" );
 	gStyle->SetLabelOffset( (Float_t)0.010, "Y" );
 
 
 	// by default, do not display histogram decorations:
-        gStyle->SetOptStat(0);  // show only nent, mean, rms
-        gStyle->SetOptStat("emr");
-        gStyle->SetStatFormat("6.3g");
-        gStyle->SetOptTitle(0);
-        gStyle->SetOptFit(0);
+	gStyle->SetOptStat(0);  // show only nent, mean, rms
+	gStyle->SetOptStat("emr");
+	gStyle->SetStatFormat("6.3g");
+	gStyle->SetOptTitle(0);
+	gStyle->SetOptFit(0);
 
 
 	//titles
@@ -134,21 +134,21 @@ void EdStyle::SetStyle()
 	gStyle->SetTitleH((Float_t)0.05);
 
 	// look of the statistics box:
-        gStyle->SetStatBorderSize( 0 );
-        gStyle->SetStatFont( lhcbFont );
-        gStyle->SetStatFontSize( (Float_t)0.05 );
-        gStyle->SetStatX( (Float_t)0.9 );
-        gStyle->SetStatY( (Float_t)0.9 );
-        gStyle->SetStatW( (Float_t)0.25 );
-        gStyle->SetStatH( (Float_t)0.15 );
+	gStyle->SetStatBorderSize( 0 );
+	gStyle->SetStatFont( lhcbFont );
+	gStyle->SetStatFontSize( (Float_t)0.05 );
+	gStyle->SetStatX( (Float_t)0.9 );
+	gStyle->SetStatY( (Float_t)0.9 );
+	gStyle->SetStatW( (Float_t)0.25 );
+	gStyle->SetStatH( (Float_t)0.15 );
 
 	// put tick marks on top and RHS of plots
-        gStyle->SetPadTickX( 1 );
-        gStyle->SetPadTickY( 1 );
+	gStyle->SetPadTickX( 1 );
+	gStyle->SetPadTickY( 1 );
 
 	// histogram divisions: only 5 in x to avoid label overlaps
-        gStyle->SetNdivisions( 505, "x" );
-        gStyle->SetNdivisions( 510, "y" );
+	gStyle->SetNdivisions( 505, "x" );
+	gStyle->SetNdivisions( 510, "y" );
 
 
 
@@ -928,9 +928,18 @@ TString EdStyle::Remove_Suffix( TString arg )
 
 TLegend* EdStyle::LHCbLegend()
 {
-	TLegend* thisLegend = new TLegend( 0.5, 0.65, 0.9, 0.9 );
+	TLegend* thisLegend = new TLegend( 0.6, 0.65, 0.9, 0.9 );
 	thisLegend->SetFillColor( kWhite );
 	thisLegend->SetFillStyle( 3001 );
 	return thisLegend;
+}
+
+TLatex* EdStyle::LHCbLabel()
+{
+	TLatex *myLatex = new TLatex(0.5,0.5,"");
+	myLatex->SetTextAlign(11);
+	myLatex->SetNDC(kTRUE);
+	myLatex->DrawLatex(0.59, 0.75,"LHCb");
+	return myLatex;
 }
 

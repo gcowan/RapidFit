@@ -236,6 +236,11 @@ class DataPoint
 		 */
 		void SetDiscreteIndex( int );
 
+
+		void SetEventWeight( const double WeightVal );
+
+		double GetEventWeight() const;
+
 	private:
 		/*!
 		 * Don't Copy the class this way!
@@ -283,6 +288,7 @@ class DataPoint
 		 */
 		int thisDiscreteIndex;
 
+		double WeightValue;
 };
 
 #endif

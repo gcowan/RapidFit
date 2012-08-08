@@ -294,7 +294,8 @@ void MinuitWrapper::Minimise()
 	fitResult = new FitResult( minimumValue, fittedParameters, fitStatus, function->GetPhysicsBottle(), covarianceMatrix, allContours );
 
 	string testnewError="TestNewErrors";
-	if( StringProcessing::VectorContains( &Options, &testnewError) != -1 )
+	string rooFitError="RooFitErrors";
+	if( ( StringProcessing::VectorContains( &Options, &testnewError) != -1 ) || ( StringProcessing::VectorContains( &Options, &rooFitError) != -1 ) )
 	{
 		//	This will also call ApplyCovarianceMatrix which will change the fitResult
 		RapidFitMatrix* newMatrix = CorrectedCovariance::GetCorrectedCovarianceMatrix( this );

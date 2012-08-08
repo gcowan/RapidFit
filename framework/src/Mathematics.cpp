@@ -145,7 +145,7 @@ namespace Mathematics
 #else
 			pthread_mutex_lock( &ROOT_Lock );
 			RooMath* math_object = new RooMath();
-			returnable = math_object->ITPComplexErrFuncRe( *z, 10 )*exp( -u*u );
+			returnable = math_object->ITPComplexErrFuncRe( *z, 13 )*exp( -u*u );
 			delete math_object;
 			pthread_mutex_unlock( &ROOT_Lock );
 #endif
@@ -170,7 +170,7 @@ namespace Mathematics
 #else
 			pthread_mutex_lock( &ROOT_Lock );
 			RooMath* math_object = new RooMath();
-			returnable = math_object->ITPComplexErrFuncIm( *z, 10 )*exp( -u*u );
+			returnable = math_object->ITPComplexErrFuncIm( *z, 13 )*exp( -u*u );
 			delete math_object;
 			pthread_mutex_unlock( &ROOT_Lock );
 #endif

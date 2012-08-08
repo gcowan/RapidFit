@@ -148,6 +148,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		//cout << "Generate Here:" << endl;
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
 
+		if( FunctionConfig->GetNormaliseWeights() ) Requested_DataSet->NormaliseWeights();
+
 		bottle->AddResult( Requested_PDF, Requested_DataSet );
 	}
 
@@ -470,6 +472,14 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 		cout.rdbuf(0);
 		cerr.rdbuf(0);
 		clog.rdbuf(0);
+	}
+
+	if( FunctionConfig->GetWeightsWereUsed() )
+	{
+		for( unsigned int i=0; i< BottleData.size(); ++i )
+		{
+			BottleData[i]->UseEventWeights( FunctionConfig->GetWeightName() );
+		}
 	}
 
 	FitResult* ReturnableFitResult=NULL;

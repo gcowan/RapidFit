@@ -156,6 +156,8 @@ class EdStyle {
 		 */
 		static TLegend* LHCbLegend();
 
+		static TLatex* LHCbLabel();
+
 		/*!
 		 * @brief Destructor
 		 */

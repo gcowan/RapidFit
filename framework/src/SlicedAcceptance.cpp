@@ -111,10 +111,14 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 
 	input_file.open( fileName.c_str(), ifstream::in );
 	input_file.close();
-
 	bool local_fail = input_file.fail();
 
-	if( !getenv("RAPIDFITROOT") && local_fail )
+	string fileName_pwd = "pdfs/configdata/";
+	fileName_pwd.append( fileName );
+	input_file.open( fileName_pwd.c_str(), ifstream::in );
+	bool pwd_fail = input_file.fail();
+
+	if( !getenv("RAPIDFITROOT") && ( local_fail && pwd_fail ) )
 	{
 		cerr << "\n" << endl;
 		//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
@@ -125,6 +129,8 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 	}
 
 	string fullFileName;
+
+	if( (local_fail && !pwd_fail) || !(getenv("RAPIDFITROOT")) ) fullFileName=fileName_pwd;
 
 	if( getenv("RAPIDFITROOT") )
 	{
@@ -139,7 +145,7 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 	}
 	bool elsewhere_fail = input_file.fail();
 
-	if( elsewhere_fail && local_fail )
+	if( elsewhere_fail && ( local_fail && pwd_fail ) )
 	{
 		cerr << "\n\tFILE NAMED:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
 		exit(-89);

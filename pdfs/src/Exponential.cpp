@@ -37,13 +37,13 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 	, tlow(), thigh(), time()
 	, _useEventResolution(false)
 	, _useTimeAcceptance(false)
-, _numericIntegralForce(false)
-, _usePunziSigmat(false)
+	, _numericIntegralForce(false)
+	, _usePunziSigmat(false)
 {
 	_useEventResolution = configurator->isTrue( "UseEventResolution" );
 	_useTimeAcceptance  = configurator->isTrue( "UseTimeAcceptance" );
 	_numericIntegralForce = configurator->isTrue( "UseNumericalIntegration" );
-        _usePunziSigmat = configurator->isTrue( "UsePunziSigmat" );
+	_usePunziSigmat = configurator->isTrue( "UsePunziSigmat" );
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0033 );
@@ -63,8 +63,8 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 
 
 Exponential::Exponential( const Exponential &copy ) :
-        BasePDF( (BasePDF)copy )
-        , tauName ( copy.tauName )
+	BasePDF( (BasePDF)copy )
+	, tauName ( copy.tauName )
 	, eventResolutionName   ( copy.eventResolutionName )
 	, resScale1Name          ( copy.resScale1Name )
 	, resScale2Name          ( copy.resScale2Name )
@@ -78,15 +78,15 @@ Exponential::Exponential( const Exponential &copy ) :
 	, tau( copy.tau )
 	, sigma( copy.sigma ), sigma1( copy.sigma1 ), sigma2( copy.sigma2 ), sigma3( copy.sigma3 )
 	, timeRes2Frac( copy.timeRes2Frac), timeRes3Frac( copy.timeRes3Frac )
-        , resolutionScale1( copy.resolutionScale1 ), resolutionScale2( copy.resolutionScale2 ), resolutionScale3( copy.resolutionScale3 )
-        , tlow( copy.tlow ), thigh( copy.thigh ), time( copy.time )
+	, resolutionScale1( copy.resolutionScale1 ), resolutionScale2( copy.resolutionScale2 ), resolutionScale3( copy.resolutionScale3 )
+	, tlow( copy.tlow ), thigh( copy.thigh ), time( copy.time )
 	, _useEventResolution( copy._useEventResolution )
-        , _useTimeAcceptance( copy._useTimeAcceptance )
+	, _useTimeAcceptance( copy._useTimeAcceptance )
 	, _numericIntegralForce( copy._numericIntegralForce )
 	, _usePunziSigmat( copy._usePunziSigmat )
 {
-        timeAcc = new SlicedAcceptance( *(copy.timeAcc) );
-	cout << "making copy " << tau << endl;
+	timeAcc = new SlicedAcceptance( *(copy.timeAcc) );
+	//cout << "making copy " << tau << endl;
 }
 
 
@@ -140,7 +140,7 @@ bool Exponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 		sigma1    = allParameters.GetPhysicsParameter( sigma1Name )->GetValue();
 		sigma2    = allParameters.GetPhysicsParameter( sigma2Name )->GetValue();
 		sigma3    = allParameters.GetPhysicsParameter( sigma3Name )->GetValue();
-	} 
+	}
 	resolutionScale1 = allParameters.GetPhysicsParameter( resScale1Name )->GetValue();
 	resolutionScale2 = allParameters.GetPhysicsParameter( resScale2Name )->GetValue();
 	resolutionScale3 = allParameters.GetPhysicsParameter( resScale3Name )->GetValue();
@@ -215,7 +215,9 @@ double Exponential::buildPDFnumerator()
 	// Sum of two exponentials, using the time resolution functions
 
 	if( tau <= 0 ) {
+		PDF_THREAD_LOCK
 		cout << " In Exponential() you gave a negative or zero lifetime for tau " << endl ;
+		PDF_THREAD_UNLOCK
 		throw(10) ;
 	}
 	double val = Mathematics::Exp(time, 1./tau, sigma);
@@ -233,12 +235,14 @@ double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
 	{
 		IConstraint * timeBound = boundary->GetConstraint( timeName );
 		if ( timeBound->GetUnit() == "NameNotFoundError" )
-		{            
+		{
+			PDF_THREAD_LOCK
 			cerr << "Bound on time not provided" << endl;
+			PDF_THREAD_UNLOCK
 			norm = -1.;
-		}            
-		else         
-		{            
+		}
+		else
+		{
 			tlow = timeBound->GetMinimum();
 			thigh = timeBound->GetMaximum();
 		}
@@ -247,7 +251,7 @@ double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
 			// Set the member variable for time resolution to the first value and calculate
 			sigma = sigma1;
 			norm = buildPDFdenominator();
-		}       
+		}
 		else
 		{
 			// Set the member variable for time resolution to the first value and calculate
@@ -256,9 +260,9 @@ double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
 			// Set the member variable for time resolution to the second value and calculate
 			sigma = sigma2;
 			double val2 = buildPDFdenominator();
-                        sigma = sigma3;
-                        double val3 = buildPDFdenominator();
-                        norm = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
+			sigma = sigma3;
+			double val3 = buildPDFdenominator();
+			norm = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
 		}
 	}
 	return norm;
@@ -273,7 +277,9 @@ double Exponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 	IConstraint * timeBound = boundary->GetConstraint( timeName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
 	{
+		PDF_THREAD_LOCK
 		cerr << "Bound on time not provided" << endl;
+		PDF_THREAD_UNLOCK
 		norm = -1.;
 	}
 	else
@@ -310,7 +316,7 @@ double Exponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 			// Set the member variable for time resolution to the first value and calculate
 			sigma = sigma1;
 			norm = buildPDFdenominator();
-		}       
+		}
 		else
 		{
 			// Set the member variable for time resolution to the first value and calculate
@@ -319,9 +325,9 @@ double Exponential::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * 
 			// Set the member variable for time resolution to the second value and calculate
 			sigma = sigma2;
 			double val2 = buildPDFdenominator();
-                        sigma = sigma3;
-                        double val3 = buildPDFdenominator();
-                        norm = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
+			sigma = sigma3;
+			double val3 = buildPDFdenominator();
+			norm = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
 		}
 	}
 	return norm;
@@ -331,8 +337,11 @@ double Exponential::buildPDFdenominator()
 {
 	// Sum of two exponentials, using the time resolution functions
 
-	if( tau <= 0 ) {
+	if( tau <= 0 )
+	{
+		PDF_THREAD_LOCK
 		cout << " In Exponential() you gave a negative or zero lifetime for tau " << endl ;
+		PDF_THREAD_UNLOCK
 		throw(10) ;
 	}
 

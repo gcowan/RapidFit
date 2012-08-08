@@ -294,6 +294,11 @@ void FitFunction::SetUseWeightsSquared( const bool Input )
 	weightsSquared = Input;
 }
 
+string FitFunction::GetWeightName() const
+{
+	return weightObservableName;
+}
+
 bool FitFunction::GetWeightsWereUsed() const
 {
 	return useWeights;

@@ -509,7 +509,7 @@ string StringProcessing::MultNames( const string& input1, const string& input2 )
 
 TString StringProcessing::Clean( const TString input )
 {
-	string temp(input.Data());
+	string temp=string(input.Data());
 
 	replace(temp.begin(), temp.end(), '.', '_');
 	replace(temp.begin(), temp.end(), '/', '_');
@@ -526,7 +526,7 @@ TString StringProcessing::Clean( const TString input )
 		{
 			if( temp[i] == temp[i+1] )
 			{
-				if( temp[i] == '_' )    remove_list.push_back( ch );
+				if( temp[i] == '_' )	remove_list.push_back( ch );
 			}
 		}
 	}

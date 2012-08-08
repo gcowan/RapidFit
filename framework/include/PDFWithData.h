@@ -1,11 +1,11 @@
 /**
-	@class PDFWithData
+  @class PDFWithData
 
-	A class for creating/storing a PDF and its associated data set
+  A class for creating/storing a PDF and its associated data set
 
-	@author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-5
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-5
+  */
 
 #pragma once
 #ifndef PDF_WITH_DATA_H
@@ -161,14 +161,28 @@ class PDFWithData
 		void SetUseCache( bool );
 
 		void SetDebug( DebugClass* debug );
+
+		/*!
+		 * @brief Set the Name of the Weights to use and the fact that Weights were used in the fit
+		 *
+		 * @param Name    This sets the name of the Weights to be used when Evaluating the DataSet
+		 *
+		 * @return Void
+		 */
+		void UseEventWeights( const string Name );
+
+		bool GetWeightsWereUsed() const;
+
+		string GetWeightName() const;
+
 	private:
 		/*!
-                 * Don't Copy the class this way!
-                 */
+		 * Don't Copy the class this way!
+		 */
 		PDFWithData ( const PDFWithData& );
 		/*!
-                 * Don't Copy the class this way!
-                 */
+		 * Don't Copy the class this way!
+		 */
 		PDFWithData& operator = ( const PDFWithData& );
 
 		IPDF * fitPDF;					/*!	This if the PDF which is used to Evaluate the DataSet					*/
@@ -178,6 +192,9 @@ class PDFWithData
 		mutable vector< IDataSet* > cached_data;	/*!	This is the internal Cache of DataSets that this instance 'looks after'			*/
 
 		mutable bool useCache;				/*!	Should PDFWithData return the last cached DataSet that it has (default false)		*/
+
+		string WeightName;
+		bool useWeights;
 
 		DebugClass* debug;
 };

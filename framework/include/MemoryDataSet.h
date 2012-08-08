@@ -45,6 +45,11 @@ class MemoryDataSet : public IDataSet
 		 */                      
 		virtual int Yield();
 
+		string GetWeightName() const;
+		bool GetWeightsWereUsed() const;
+		void UseEventWeights( const string Name );
+
+		void NormaliseWeights();
 	private:
 		//	Uncopyable!
 		MemoryDataSet ( const MemoryDataSet& );
@@ -52,6 +57,9 @@ class MemoryDataSet : public IDataSet
 		vector<DataPoint*> allData;
 		PhaseSpaceBoundary * dataBoundary;
 		mutable vector<int> allSubSets;
+
+		bool useWeights;
+		string WeightName;
 };
 
 bool compare_datapoints ( pair<DataPoint,pair<string,int> > first, pair<DataPoint,pair<string,int> > second );

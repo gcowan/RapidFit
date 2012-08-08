@@ -39,6 +39,13 @@ class LongLivedBkg_3Dangular : public BasePDF
 		double buildPDFdenominator();
 		double angularFactor( );
 
+		void SetupPseudoObs();
+		PseudoObservable _intexpLL1aObs;
+		PseudoObservable _intexpLL2aObs;
+		PseudoObservable _intexpLL1bObs;
+		PseudoObservable _intexpLL2bObs;
+		int res;
+
 		// Physics parameters
 		ObservableRef f_LL1Name;		// fraction of decay const 1
                 ObservableRef tauLL1Name;            // decay constant 1

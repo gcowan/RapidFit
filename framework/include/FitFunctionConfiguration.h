@@ -93,6 +93,10 @@ class FitFunctionConfiguration
 		 * Return the XML configuration required to reproduce this class in string format
 		 */
 		string XML() const;
+
+		void SetNormaliseWeights( bool Input );
+
+		bool GetNormaliseWeights() const;
 	private:
 
 		string functionName, weightName;/*!	Name of the Function and Weight to use		*/
@@ -103,6 +107,7 @@ class FitFunctionConfiguration
 		int Threads;			/*!	Number of Threads to Construct FitFunction With	*/
 		string Strategy;		/*!	Name of Strategy to use				*/
 		bool testIntegrator;		/*!	Decision about wether to test the integrator	*/
+		bool NormaliseWeights;
 };
 
 #endif

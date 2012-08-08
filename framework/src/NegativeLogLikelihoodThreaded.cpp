@@ -228,15 +228,15 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 		//	If we have a weighted dataset then weight the result (if not don't perform a *1.)
 		if( thread_input->useWeights == true )
 		{
-			weight = (*data_i)->GetObservable( thread_input->weightName )->GetValue();
-			pthread_mutex_lock( &eval_lock );
+			weight = (*data_i)->GetEventWeight();//GetObservable( thread_input->weightName )->GetValue();
+			//pthread_mutex_lock( &eval_lock );
 			result *= weight;
 			if( thread_input->weightsSquared )
 			{
 				result *= weight;
 				if( weight < 0 ) result *= -1.;
 			}
-			pthread_mutex_unlock( &eval_lock );
+			//pthread_mutex_unlock( &eval_lock );
 		}
 
 		//	Push back the result from evaluating this datapoint

@@ -106,6 +106,14 @@ class IDataSet
 		 * @brief Returns an estimate of the total Yield
 		 */
 		virtual int Yield() = 0;
+
+		virtual void UseEventWeights( const string Name ) = 0;
+
+		virtual bool GetWeightsWereUsed() const = 0;
+
+		virtual string GetWeightName() const = 0;
+
+		virtual void NormaliseWeights() = 0;
 	private:
 
 		/*!

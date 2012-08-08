@@ -53,7 +53,9 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 	_useHelicityBasis = config->isTrue( "UseHelicityBasis" ) ;
 
 	//Make prototypes
-	MakePrototypes();
+	this->MakePrototypes();
+
+	this->SetupPseudoObs();
 
 	//Find name of histogram needed to define 3-D angular distribution
 	string fileName = config->getConfigurationValue( "AngularDistributionHistogram" ) ;
@@ -76,7 +78,13 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 
 		bool local_fail = input_file.fail();
 
-		if( !getenv("RAPIDFITROOT") && local_fail )
+		string fileName_pwd = "pdfs/configdata/";
+		fileName_pwd.append( fileName );
+		input_file.open( fileName_pwd.c_str(), ifstream::in );
+		input_file.close();
+		bool pwd_fail = input_file.fail();
+
+		if( !getenv("RAPIDFITROOT") && ( local_fail && pwd_fail ) )
 		{
 			cerr << "\n" << endl;
 			//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
@@ -88,14 +96,15 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 
 		string fullFileName;
 
+		if( (local_fail && !pwd_fail) || !getenv("RAPIDFITROOT") )	fullFileName=fileName_pwd;
+
 		if( getenv("RAPIDFITROOT") )
 		{
 			string path( getenv("RAPIDFITROOT") ) ;
 
 			cout << "RAPIDFITROOT defined as: " << path << endl;
 
-			fullFileName = path+"/pdfs/configdata/"+fileName ;
-
+			fullFileName = path+"/pdfs/configdata/"+fileName;
 			input_file.open( fullFileName.c_str(), ifstream::in );
 			input_file.close();
 		}
@@ -108,17 +117,16 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 			exit(-89);
 		}
 
-		if( fullFileName.empty() || !local_fail )
-		{
-			fullFileName = fileName;
-		}
+		if( fullFileName.empty() || !local_fail ) fullFileName = fileName;
 
 		//Read in histo
 		TFile* f =  TFile::Open(fullFileName.c_str());
-		if( _useHelicityBasis ) {
+		if( _useHelicityBasis )
+		{
 			histo = (TH3D*) f->Get("histoHel"); //(fileName.c_str())));
 		}
-		else {
+		else
+		{
 			histo = (TH3D*) f->Get("histo"); //(fileName.c_str())));
 		}
 
@@ -161,12 +169,11 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 			{
 				for (int k=1; k < nzbins+1; ++k)
 				{
-
 					double bin_content = histo->GetBinContent(i,j,k);
 					//cout << "Bin content: " << bin_content << endl;
 					if(bin_content<=0)
 					{
-						zero_bins.push_back(1);
+						zero_bins.push_back(0);
 					}
 					//cout << " Zero bins " << zero_bins.size() << endl;}
 					else if (bin_content>0)
@@ -181,7 +188,6 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 
 	cout << "\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
 	cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
-	//cout << endl;
 	cout << endl;
 
 	// Check.  This order works for both bases since phi is always the third one.
@@ -209,9 +215,6 @@ void LongLivedBkg_3Dangular::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
-	//allObservables.push_back( cosThetaName );
-	//allObservables.push_back( phiName );
-	//allObservables.push_back( cosPsiName );
 	if( _useHelicityBasis ) {
 		allObservables.push_back( cthetakName );
 		allObservables.push_back( cthetalName );
@@ -235,6 +238,18 @@ void LongLivedBkg_3Dangular::MakePrototypes()
 	allParameters = ParameterSet(parameterNames);
 }
 
+void LongLivedBkg_3Dangular::SetupPseudoObs()
+{
+	_intexpLL1aObs = PseudoObservable( "LLBkg::intexpLL1a_time" );
+	_intexpLL1aObs.AddFunction( Mathematics::ExpInt_Wrapper );
+	_intexpLL2aObs = PseudoObservable( "LLBkg::intexpLL2a_time" );
+	_intexpLL2aObs.AddFunction( Mathematics::ExpInt_Wrapper );
+
+	_intexpLL1bObs = PseudoObservable( "LLBkg::intexpLL1b_time" );
+	_intexpLL1bObs.AddFunction( Mathematics::ExpInt_Wrapper );
+	_intexpLL2bObs = PseudoObservable( "LLBkg::intexpLL2b_time" );
+	_intexpLL2bObs.AddFunction( Mathematics::ExpInt_Wrapper );
+}
 
 //.................................................................
 bool LongLivedBkg_3Dangular::SetPhysicsParameters( ParameterSet * NewParameterSet )
@@ -274,15 +289,18 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	{
 		// Set the member variable for time resolution to the first value and calculate
 		sigmaLL = sigmaLL1;
+		res=1;
 		returnValue =  this->buildPDFnumerator(measurement) ;
 	}
 	else
 	{
 		// Set the member variable for time resolution to the first value and calculate
 		sigmaLL = sigmaLL1;
+		res=1;
 		val1 = this->buildPDFnumerator(measurement);
 		// Set the member variable for time resolution to the second value and calculate
 		sigmaLL = sigmaLL2;
+		res=2;
 		val2 = this->buildPDFnumerator(measurement);
 		returnValue = (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2) ;
 	}
@@ -290,7 +308,7 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	if (returnValue <= 0)
 	{
 		PDF_THREAD_LOCK
-		cout << "3D Background PDF returns zero!" << endl;
+			cout << "3D Background PDF returns zero!" << endl;
 		measurement->Print();
 		PDF_THREAD_UNLOCK
 	}
@@ -315,29 +333,62 @@ double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
 	if( f_LL1 >= 0.9999 ) {
 		if( tauLL1 <= 0 ) {
 			PDF_THREAD_LOCK
-			cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
+				cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
 			PDF_THREAD_UNLOCK
-			throw(-7632);
+				throw(-7632);
 		}
-		val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
-		norm1= Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
-		returnValue = val1 /norm1 ;
+		double inv_tau=1./tauLL1;
+		vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlow; Exp_Input_1[1]=thigh; Exp_Input_1[2]=inv_tau; Exp_Input_1[3]=sigmaLL;
+		val1 = Mathematics::Exp(time, inv_tau, sigmaLL);
+		//norm1= Mathematics::ExpInt(tlow, thigh, inv_tau, sigmaLL);
+		if( res == 1 )
+		{
+			norm1 = _datapoint->GetPseudoObservable( _intexpLL1aObs, Exp_Input_1 );
+		}
+		else
+		{
+			norm1 = _datapoint->GetPseudoObservable( _intexpLL1bObs, Exp_Input_1 );
+		}
+		returnValue = val1 /norm1;
 	}
 	else {
 		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
 			PDF_THREAD_LOCK
-			cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
+				cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
 			PDF_THREAD_UNLOCK
-			throw(7632);
+				throw(7632);
 		}
-		val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
-		norm1= Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
-		val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
-		norm2= Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
+		double inv_tau_LL1 = 1./tauLL1;
+		double inv_tau_LL2 = 1./tauLL2;
+		vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlow; Exp_Input_1[1]=thigh; Exp_Input_1[2]=inv_tau_LL1; Exp_Input_1[3]=sigmaLL;
+		vector<double> Exp_Input_2(4,0.); Exp_Input_2[0]=tlow; Exp_Input_2[1]=thigh; Exp_Input_2[2]=inv_tau_LL2; Exp_Input_2[3]=sigmaLL;
+
+		val1 = Mathematics::Exp(time, inv_tau_LL1, sigmaLL);
+		//norm1= Mathematics::ExpInt(tlow, thigh, inv_tau_LL1, sigmaLL);
+		if( res == 1 )
+		{
+			norm1 = _datapoint->GetPseudoObservable( _intexpLL1aObs, Exp_Input_1 );
+		}
+		else
+		{
+			norm1 = _datapoint->GetPseudoObservable( _intexpLL1bObs, Exp_Input_1 );
+		}
+
+		val2 = Mathematics::Exp(time, inv_tau_LL2, sigmaLL);
+		//norm2= Mathematics::ExpInt(tlow, thigh, inv_tau_LL2, sigmaLL);
+		if( res == 1 )
+		{
+			norm2 = _datapoint->GetPseudoObservable( _intexpLL2aObs, Exp_Input_2 );
+		}
+		else
+		{
+			norm2 = _datapoint->GetPseudoObservable( _intexpLL2bObs, Exp_Input_2 );
+		}
 		returnValue = f_LL1 * val1/norm1 + (1. - f_LL1) * val2/norm2;
 	}
 
-	returnValue *= angularFactor();
+	double acc=angularFactor();
+	returnValue *= acc;
 
 	return returnValue;
 }
@@ -347,7 +398,7 @@ double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
 // Normlisation
 double LongLivedBkg_3Dangular::Normalisation(PhaseSpaceBoundary * boundary)
 {
-
+	(void) boundary;
 	return 1. ;
 
 	/*
@@ -438,7 +489,7 @@ double LongLivedBkg_3Dangular::angularFactor( )
 	if( !_useHelicityBasis ) cos1Obs = _datapoint->GetObservable( cosPsiName );
 	else cos1Obs = _datapoint->GetObservable( cthetakName );
 
-	if( cos1Obs->GetBkgBinNumber() > -1 )
+	if( cos1Obs->GetBkgBinNumber() != -1 )
 	{
 		return cos1Obs->GetBkgAcceptance();
 	}
@@ -456,15 +507,15 @@ double LongLivedBkg_3Dangular::angularFactor( )
 		}
 
 		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-		xbin = xaxis->FindFixBin( cos1 ); if( xbin > nxbins ) xbin = nxbins;
-		ybin = yaxis->FindFixBin( cos2 ); if( ybin > nybins ) ybin = nybins;
-		zbin = zaxis->FindFixBin( phi ); if( zbin > nzbins ) zbin = nzbins;
+		xbin = xaxis->FindFixBin( cos1 ); if( xbin > nxbins ) xbin = nxbins; if( xbin == 0 ) xbin = 1;
+		ybin = yaxis->FindFixBin( cos2 ); if( ybin > nybins ) ybin = nybins; if( ybin == 0 ) ybin = 1;
+		zbin = zaxis->FindFixBin( phi ); if( zbin > nzbins ) zbin = nzbins; if( zbin == 0 ) zbin = 1;
 
 		globalbin = histo->GetBin( xbin, ybin, zbin );
-		num_entries_bin = histo->GetBinContent(globalbin);
+		num_entries_bin = (double)histo->GetBinContent(globalbin);
 
 		//Angular factor normalized with phase space of histogram and total number of entries in the histogram
-		returnValue = num_entries_bin / (deltax * deltay * deltaz) / total_num_entries ;
+		returnValue = (double)num_entries_bin / (deltax * deltay * deltaz) / (double)total_num_entries;
 
 		cos1Obs->SetBkgBinNumber( xbin ); cos1Obs->SetBkgAcceptance( returnValue );
 		cos2Obs->SetBkgBinNumber( ybin ); cos2Obs->SetBkgAcceptance( returnValue );

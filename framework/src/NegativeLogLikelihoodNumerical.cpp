@@ -212,11 +212,11 @@ void* NegativeLogLikelihoodNumerical::ThreadWork( void *input_data )
 		//	If we have a weighted dataset then weight the result (if not don't perform a *1.)
 		if( thread_input->useWeights == true )
 		{
-			weight = (*data_i)->GetObservable( thread_input->weightName )->GetValue();
-			pthread_mutex_lock( &_n_eval_lock );
+			weight = (*data_i)->GetEventWeight();
+			//pthread_mutex_lock( &_n_eval_lock );
 			result *= weight;
 			if( thread_input->weightsSquared ) result *= weight;
-			pthread_mutex_unlock( &_n_eval_lock );
+			//pthread_mutex_unlock( &_n_eval_lock );
 		}
 
 		//	Push back the result from evaluating this datapoint

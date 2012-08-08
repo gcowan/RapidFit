@@ -610,6 +610,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		string Strategy;
 		int Threads = -1;
 		bool integratorTest = true;
+		bool NormaliseWeights=false;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		if ( functionInfo.size() == 0 )
 		{
@@ -655,6 +656,17 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 						integratorTest = false;
 					}
 				}
+				else if ( functionInfo[childIndex]->GetName() == "NormaliseWeights" )
+				{
+					if( functionInfo[childIndex]->GetValue()[0] == "True" )
+					{
+						NormaliseWeights = true;
+					}
+					else
+					{
+						NormaliseWeights = false;
+					}
+				}
 				else
 				{
 					cerr << "Unrecognised FitFunction component: " << functionInfo[childIndex]->GetName() << endl;
@@ -687,7 +699,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		}
 
 		returnable_function->SetThreads( Threads );
-
+		returnable_function->SetNormaliseWeights( NormaliseWeights );
 		returnable_function->SetIntegratorTest( integratorTest );
 
 		return returnable_function;
@@ -1721,7 +1733,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 	}
 
 	returnable_SUMPDF->SetName( "Sum" );
-	returnable_SUMPDF->SetLabel( "Sum_("+componentPDFs[0]->GetLabel()+")v("+componentPDFs[1]->GetLabel()+")" );
+	returnable_SUMPDF->SetLabel( "Sum_("+componentPDFs[0]->GetLabel()+")+("+componentPDFs[1]->GetLabel()+")" );
 
 	delete componentPDFs[0]; delete componentPDFs[1];
 	//	returnable_SUMPDF->SetRandomFunction( GetSeed() );
@@ -1775,7 +1787,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		{
 			if ( fractionName == "unspecified" )
 			{
-				cerr << "Error Must Provide a FractionName for this PDF!\tNormalisedSum_(" << componentPDFs[0]->GetLabel()<<")v("<<componentPDFs[1]->GetLabel()<< ")" << endl;
+				cerr << "Error Must Provide a FractionName for this PDF!\tNormalisedSum_(" << componentPDFs[0]->GetLabel()<<")+("<<componentPDFs[1]->GetLabel()<< ")" << endl;
 				exit(1);
 			}
 			else

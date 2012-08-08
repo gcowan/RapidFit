@@ -19,13 +19,13 @@ using namespace::std;
 
 //Constructor with only name of FitFunction
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) :
-	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true)
+	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false)
 {
 }
 
 //Constructor for FitFunction with event weights
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) :
-	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true)
+	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false)
 {
 }
 
@@ -115,5 +115,15 @@ string FitFunctionConfiguration::XML() const
 	xml << "</FitFunction>" << endl;
 
 	return xml.str();
+}
+
+void FitFunctionConfiguration::SetNormaliseWeights( const bool Input )
+{
+	NormaliseWeights = Input;
+}
+
+bool FitFunctionConfiguration::GetNormaliseWeights() const
+{
+	return NormaliseWeights;
 }
 

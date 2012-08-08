@@ -1,5 +1,17 @@
 // $Id: release.notes $
 
+2012/08/08 Rob Currie
+   - Added new process to 'Normalise' the use of Weights within a fit
+        This has to be explicitly turned on with the XMLTag <NormaliseWeights> set to True in the FitFunctionConfiguration XML segment
+        This required adding new features through IDataSet and into a few other classes such as PDFWithData.
+        The code largely adds to existing methods with minimal internal changes so nothing should be at high risk of breaking
+   - Added <RooFitErrors> Tag to replace <TestNewErrors> tag which is more correct and activates the error correction due to correlation matrix mathematics
+   - Added the option for various sections of code to try using $PWD as $RAPIDFITROOT as this is my normal convention and I change RAPIDFITROOT based on my current location quite a lot
+   - Added Get/Set EventWeight to DataPoints. By default this returns the EventWeight when it has been set. When it has not been set it returns 1.
+        This allows for an easy interface to get the event weight without having to worry about the name of the observable that the event weight is stored in.
+        This is necessary when using the NormaliseWeights tag as I wish to keep the weight observable in memory and not to start to modify the contents of observables throughout the framework (messy and potentially dangerous)
+   - Added PseudoObservables to the LL_3D PDF which should allow it to be slightly faster when using event resolution
+
 2012/08/08 Pete Clarke
    - Added a configurator to switch off component plotting in _v5_  so that by default
      one doesnt get them , ans plotting is a lot quicker

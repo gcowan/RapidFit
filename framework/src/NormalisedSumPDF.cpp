@@ -46,7 +46,7 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 	this->SetName("NormalisedSum");
 	cout << "Constructing NormalisedSum"<< endl;
 	cout << "FractionName:\t" << FractionName << endl;
-	this->SetLabel( "NormalisedSum_("+firstPDF->GetLabel()+")v("+secondPDF->GetLabel()+")" );
+	this->SetLabel( "NormalisedSum_("+firstPDF->GetLabel()+")+("+secondPDF->GetLabel()+")" );
 	firstIntegrator->SetPDF( firstPDF );
 	secondIntegrator->SetPDF( secondPDF );
 	//firstPDF->AssociateIntegrator( firstIntegrator );

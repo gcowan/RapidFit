@@ -108,6 +108,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			}
 		}
 	}
+
+	TH1::SetDefaultSumw2( true );
 }
 
 //Destructor
@@ -439,9 +441,34 @@ TH1* ComponentPlotter::FormatData( unsigned int combinationNumber )
 	//	This gives the correct normalisation
 	vector<double>::iterator point_i = wanted_data.begin();
 	vector<double>::iterator weight_i = this_wanted_weights.begin();
-	for( ; point_i != wanted_data.end(); ++point_i, ++weight_i )
+	if( weightsWereUsed )
 	{
-		returnable->Fill( *point_i, *weight_i/weight_norm );
+		for( ; point_i != wanted_data.end(); ++point_i, ++weight_i )
+		{
+			returnable->Fill( *point_i, *weight_i / weight_norm );
+		}
+		double weight_sum=0.;
+		for( vector<double>::iterator w_i = wanted_weights.begin(); w_i != wanted_weights.end(); ++w_i )
+		{       
+			weight_sum+=*w_i;
+		}
+		for( unsigned int i=0; i< (unsigned)returnable->GetNbinsX(); ++i )
+		{
+			double bin_err = returnable->GetBinError( i );
+			double weight_term=weight_err*weight_err/(weight_sum*weight_sum);
+			double bin_term=bin_err*bin_err/ (returnable->GetBinContent( i )*returnable->GetBinContent( i ));
+			if( isnan(bin_term) ) bin_term=0.;
+			//cout << endl << i << "\t" << returnable->GetBinContent( i ) << "\t" << weight_term << "\t" << bin_term << endl;
+			double final_err = returnable->GetBinContent( i )*sqrt( weight_term + bin_term );
+			returnable->SetBinError( i, final_err );
+		}
+	}
+	else
+	{
+		for( ; point_i != wanted_data.end(); ++point_i, ++weight_i )
+		{
+			returnable->Fill( *point_i, 1. );
+		}
 	}
 
 	return returnable;
@@ -675,11 +702,11 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc_pull.Data(), plotPDF->GetRandomFunction() );
 
 				/*
-				for( unsigned int i=0; i< (unsigned)binned_data[combinationIndex]->GetN(); ++i )
-				{
-					cout << pullPlot->GetY()[i] <<  endl;
-				}
-				*/
+				   for( unsigned int i=0; i< (unsigned)binned_data[combinationIndex]->GetN(); ++i )
+				   {
+				   cout << pullPlot->GetY()[i] <<  endl;
+				   }
+				   */
 
 				(void)pullPlot;
 			}
@@ -888,13 +915,14 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	c1->Update();
 
+	TLatex* myLatex=NULL;
+
 	if( addLHCb )
 	{
-		TLatex *myLatex = new TLatex(0.5,0.5,"");
-		myLatex->SetTextAlign(11);
-		myLatex->SetNDC(kTRUE);
-		myLatex->DrawLatex(0.59, 0.75,"LHCb");
+		myLatex = EdStyle::LHCbLabel();
 	}
+
+	if( myLatex != NULL ) myLatex->Draw();
 
 	TLegend* leg = EdStyle::LHCbLegend();
 
@@ -1048,7 +1076,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	double final_chi2=-999;
 	double legend_size=1.;
 
-	bool addLHCb;
+	bool addLHCb=false;
 	if( conf != NULL )
 	{
 		if( conf->logY )
@@ -1098,16 +1126,16 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	if( logy ) pad1->SetLogy( true );
 	c1->Update();
 
+	TLatex* myLatex=NULL;
 	if( addLHCb )
 	{
-		TLatex *myLatex = new TLatex(0.5,0.5,"");
-		myLatex->SetTextAlign(11);
-		myLatex->SetNDC(kTRUE);
-		myLatex->DrawLatex(0.59, 0.75,"LHCb");
+		 myLatex = EdStyle::LHCbLabel();
 	}
 
+	if( myLatex != NULL ) myLatex->Draw();
+
 	TLegend* leg = EdStyle::LHCbLegend();
-	leg->SetTextSize( legend_size );
+	leg->SetTextSize( (Float_t) legend_size );
 
 	leg->AddEntry( input_data, "Data", "pl" );
 
@@ -1195,7 +1223,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		double pull_err = 1.;
 
 		if( pull >= DBL_MAX || data_err < 1E-10 )	pull = 0.;
-		if( data_y < 1E-10 ) pull_err = 0.;
+		if( fabs(data_y) < 1E-10 ) pull_err = 0.;
 
 		pull_value.push_back( pull );
 		pull_error_value.push_back( pull_err );
@@ -1627,6 +1655,7 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 	delete weight_ref;
 
 	weight_norm=0.;
+	weight_err=0.;
 	if( weightsWereUsed )
 	{
 		for( vector<double>::iterator w_i = wanted_weights.begin(); w_i != wanted_weights.end(); ++w_i )
@@ -1634,15 +1663,21 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 			weight_norm+=*w_i;
 		}
 		weight_norm /= plotData->GetDataNumber();
+		for( vector<double>::iterator w_i = wanted_weights.begin(); w_i != wanted_weights.end(); ++w_i )
+		{
+			double temp = (*w_i)/weight_norm;
+			weight_err = temp*temp;
+		}
+		weight_err=sqrt(weight_err);
 	}
 	else
 	{
 		weight_norm=1.;
+		weight_err=1.;
 	}
 }
 
 //	Functions to access the internal results in this class
-
 vector<TGraphErrors*> ComponentPlotter::GetBinnedData()
 {
 	return binned_data;
@@ -1762,7 +1797,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 		double pull_err = 1.;
 
 		if( pull >= DBL_MAX || data_err < 1E-10 )	pull = 0.;
-		if( data_y < 1E-10 ) pull_err = 0.;
+		if( fabs(data_y) < 1E-10 ) pull_err = 0.;
 
 		pull_value.push_back( pull );
 		pull_error_value.push_back( pull_err );
@@ -1790,11 +1825,11 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	TString Y_Title;
 
 	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
-        if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Pull";
+	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Pull";
 
-        input_data->GetYaxis()->SetTitle( Y_Title );
-        //input_data->GetXaxis()->SetRangeUser( X_min, X_max );
-        input_data->GetXaxis()->SetTitle( X_Title );
+	input_data->GetYaxis()->SetTitle( Y_Title );
+	//input_data->GetXaxis()->SetRangeUser( X_min, X_max );
+	input_data->GetXaxis()->SetTitle( X_Title );
 
 	c1->Update();
 

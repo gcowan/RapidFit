@@ -23,7 +23,7 @@
 using namespace::std;
 
 //Constructor with correct argument
-MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) : allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets()
+MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) : allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets(), WeightName(""), useWeights(false)
 {
 	for( unsigned int i=0; i< (unsigned)dataBoundary->GetNumberCombinations(); ++i )
 	{
@@ -207,5 +207,46 @@ void MemoryDataSet::Print()
 int MemoryDataSet::Yield()
 {
 	return this->GetDataNumber();
+}
+
+string MemoryDataSet::GetWeightName() const
+{
+	return WeightName;
+}
+
+bool MemoryDataSet::GetWeightsWereUsed() const
+{
+	return useWeights;
+}
+
+void MemoryDataSet::UseEventWeights( const string Name )
+{
+	WeightName = Name;
+	useWeights = true;
+	for( unsigned int i=0; i< allData.size(); ++i )
+	{
+		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightName )->GetValue() );
+	}
+}
+
+void MemoryDataSet::NormaliseWeights()
+{
+	if( useWeights )
+	{
+		double alpha=0.;
+		double sum_Val=0.;
+		double sum_Val2=0.;
+		for( unsigned int i=0; i< allData.size(); ++i )
+		{
+			double thisVal=allData[i]->GetEventWeight();
+			sum_Val += thisVal;
+			sum_Val2 += thisVal*thisVal;
+		}
+		alpha=sum_Val/sum_Val2;
+		for( unsigned int i=0; i< allData.size(); ++i )
+		{
+			allData[i]->SetEventWeight( allData[i]->GetObservable( WeightName )->GetValue() * alpha );
+		}
+	}
 }
 

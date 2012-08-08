@@ -20,12 +20,12 @@
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1)
+DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1)
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -47,8 +47,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 
 DataPoint::DataPoint( const DataPoint& input ) :
 	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
-	thisDiscreteIndex(input.thisDiscreteIndex)
-	, allPseudoNames2(input.allPseudoNames2), allPseudoObservables2()
+	thisDiscreteIndex(input.thisDiscreteIndex), allPseudoNames2(input.allPseudoNames2), allPseudoObservables2(), WeightValue(input.WeightValue)
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
@@ -432,5 +431,15 @@ int DataPoint::GetDiscreteIndex() const
 void DataPoint::SetDiscreteIndex( int Input )
 {
 	thisDiscreteIndex = Input;
+}
+
+double DataPoint::GetEventWeight() const
+{
+	return WeightValue;
+}
+
+void DataPoint::SetEventWeight( const double Input )
+{
+	WeightValue = Input;
 }
 

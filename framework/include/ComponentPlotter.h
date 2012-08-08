@@ -476,6 +476,7 @@ class ComponentPlotter
 		bool weightsWereUsed;					/*!	True if Weights have been used and have been setup	*/
 		string weightName;					/*!	Name of the weight parameter				*/
 		double weight_norm;					/*!	Normalisation Value to correct the effect of weighting	*/
+		double weight_err;
 		vector<double> wanted_weights;
 
 
@@ -549,6 +550,5 @@ class ComponentPlotter
 
 		DebugClass* debug;
 };
-
 #endif
 
