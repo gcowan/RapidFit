@@ -174,11 +174,12 @@ class DPTotalAmplitudePDF : public BasePDF
 		double mJpsi;
 
 		bool useAngularAcceptance;
+		bool useFourDHistogram;
 		string fullFileName;
 		TFile * histogramFile;
-		//TH1D * angularAccHistCosTheta1;
-		//TH1D * angularAccHistPhi;
-		//TH2D * angularAccHistMassCosTheta2;
+		TH1D * angularAccHistCosTheta1;
+		TH1D * angularAccHistPhi;
+		TH2D * angularAccHistMassCosTheta2;
                 THnSparse * histo;
                 TAxis *xaxis, *yaxis, *zaxis, *maxis;
                 int nxbins, nybins, nzbins, nmbins;

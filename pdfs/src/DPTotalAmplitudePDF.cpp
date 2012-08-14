@@ -99,7 +99,8 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
-	, fullFileName(), histogramFile(), histo() //angularAccHistCosTheta1(), angularAccHistPhi(), angularAccHistMassCosTheta2()
+	, useFourDHistogram(false)
+	, fullFileName(), histogramFile(), histo(), angularAccHistCosTheta1(), angularAccHistPhi(), angularAccHistMassCosTheta2()
         , xaxis(), yaxis(), zaxis(), maxis()
         , nxbins(), nybins(), nzbins(), nmbins()
 {
@@ -195,7 +196,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                 }
 
 		histogramFile = TFile::Open(fullFileName.c_str());
-                histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
+                
+		if (useFourDHistogram) {
+		histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
  
                 // cos mu
                 xaxis = histo->GetAxis(0);
@@ -249,12 +252,12 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                 cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
                 cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
                 cout << endl;
+		}
 
-		/*
 		angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
 		angularAccHistPhi 	= (TH1D*)histogramFile->Get("delta_phi_effTot");
 		angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
-		*/
+
 	}
 }
 
@@ -373,11 +376,12 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,useAngularAcceptance(copy.useAngularAcceptance)
 	,pB(copy.pB)
 	,cosARefs(copy.cosARefs)
+	,useFourDHistogram(copy.useFourDHistogram)
 	,fullFileName(copy.fullFileName)
 	,histogramFile()//copy.histogramFile)
-	//,angularAccHistCosTheta1()//copy.angularAccHistCosTheta1)
-	//,angularAccHistPhi()//copy.angularAccHistPhi)
-	//,angularAccHistMassCosTheta2()//copy.angularAccHistMassCosTheta2)
+	,angularAccHistCosTheta1()//copy.angularAccHistCosTheta1)
+	,angularAccHistPhi()//copy.angularAccHistPhi)
+	,angularAccHistMassCosTheta2()//copy.angularAccHistMassCosTheta2)
 	,histo()
 	,xaxis(copy.xaxis), yaxis(copy.yaxis), zaxis(copy.zaxis), maxis(copy.maxis)
 	,nxbins(copy.nxbins), nybins(copy.nybins), nzbins(copy.nzbins), nmbins(copy.nmbins)
@@ -402,12 +406,13 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	if ( useAngularAcceptance )
         {
                 histogramFile = TFile::Open(fullFileName.c_str());
-                histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
-		/*
-	        angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
-                angularAccHistPhi       = (TH1D*)histogramFile->Get("delta_phi_effTot");
-                angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
-		*/
+                
+		if (useFourDHistogram) histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
+		else {
+	        	angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
+                	angularAccHistPhi       = (TH1D*)histogramFile->Get("delta_phi_effTot");
+                	angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
+		}
 	}
 }
 
@@ -610,22 +615,23 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	double angularAccMassCosTheta2 = 1.;
 	if ( useAngularAcceptance )
 	{
-		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-                xbin = xaxis->FindFixBin( cosTheta1 ); if( xbin > nxbins ) xbin = nxbins;
-                ybin = yaxis->FindFixBin( cosTheta2 ); if( ybin > nybins ) ybin = nybins;
-                zbin = zaxis->FindFixBin( phi  	    ); if( zbin > nzbins ) zbin = nzbins;
-                mbin = maxis->FindFixBin( m23 	    ); if( mbin > nmbins ) mbin = nmbins;
+		if ( useFourDHistogram ) {
+			//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
+                	xbin = xaxis->FindFixBin( cosTheta1 ); if( xbin > nxbins ) xbin = nxbins;
+                	ybin = yaxis->FindFixBin( cosTheta2 ); if( ybin > nybins ) ybin = nybins;
+                	zbin = zaxis->FindFixBin( phi  	    ); if( zbin > nzbins ) zbin = nzbins;
+                	mbin = maxis->FindFixBin( m23 	    ); if( mbin > nmbins ) mbin = nmbins;
 
-                int idx[4] = { xbin, ybin, zbin, mbin };
-                globalbin = (int)histo->GetBin( idx );
-                angularAcc = histo->GetBinContent(globalbin);
-		
-		/*
-		angularAccCosTheta1     = angularAccHistCosTheta1	->GetBinContent( angularAccHistCosTheta1	->FindBin(cosTheta1) );
-		angularAccPhi           = angularAccHistPhi		->GetBinContent( angularAccHistPhi		->FindBin(phi) );
-		angularAccMassCosTheta2 = angularAccHistMassCosTheta2	->GetBinContent( angularAccHistMassCosTheta2	->FindBin(m23, cosTheta2) );
-		angularAcc = angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2;
-		*/
+                	int idx[4] = { xbin, ybin, zbin, mbin };
+                	globalbin = (int)histo->GetBin( idx );
+                	angularAcc = histo->GetBinContent(globalbin);
+		}
+		else {
+			angularAccCosTheta1     = angularAccHistCosTheta1	->GetBinContent( angularAccHistCosTheta1	->FindBin(cosTheta1) );
+			angularAccPhi           = angularAccHistPhi		->GetBinContent( angularAccHistPhi		->FindBin(phi) );
+			angularAccMassCosTheta2 = angularAccHistMassCosTheta2	->GetBinContent( angularAccHistMassCosTheta2	->FindBin(m23, cosTheta2) );
+			angularAcc = angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2;
+		}
 	}
 	/*
 	// Need angle between reference axis
