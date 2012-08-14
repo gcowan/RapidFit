@@ -2,6 +2,7 @@
 
 2012/08/14 Greig Cowan
    - Added option to switch between 4D and factorised acceptance histograms in DPTotalAmplitude.
+   - Fixed bug in WrongPVAssocBkg PDF which I believe was causing the normalisation to be wrong. Added new histograms with reduced number of bins.
 
 2012/08/08 Rob Currie
    - Added new process to 'Normalise' the use of Weights within a fit

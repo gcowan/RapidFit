@@ -902,7 +902,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
 	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
-	if( Y_min <= -999 ) Y_min = logy==true?0.5:0.;
+	if( Y_min <= -999 ) Y_min = logy==true?0.1:0.;
 	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
 
 	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );

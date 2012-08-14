@@ -112,7 +112,7 @@ WrongPVAssocBkg::WrongPVAssocBkg( PDFConfigurator* config ) :
 
 		//Read in histo
 		TFile* f =  TFile::Open(fullFileName.c_str());
-		histo = (TH2D*) f->Get("time_and_mass"); //(fileName.c_str())));
+		histo = (TH2D*) f->Get("Bs_time_and_mass"); //(fileName.c_str())));
 
 		// time
 		xaxis = histo->GetXaxis();
@@ -185,7 +185,7 @@ xmin(input.xmin), xmax(input.xmax),
 ymin(input.ymin), ymax(input.ymax), 
 deltax(input.deltax), deltay(input.deltay), 
 total_num_entries(input.total_num_entries), 
-total_num_entries_phase_space(input.total_num_entries),
+total_num_entries_phase_space(input.total_num_entries_phase_space),
 normalisationDone(input.normalisationDone),
 massName(input.massName), timeName(input.timeName), eventResolutionName( input.eventResolutionName ), 
 mass(input.mass), time(input.time),
@@ -237,8 +237,7 @@ double WrongPVAssocBkg::Evaluate(DataPoint * measurement)
 		double mhigh = measurement->GetPhaseSpaceBoundary()->GetConstraint( massName )->GetMaximum();		
 		return 1. / (thigh-tlow) / (mhigh-mlow) ;
 	}
-	
-	
+
 	//If not flat, then this bit has to be done once to find the total number of entries within the phase space boundary	
 	// Has to be done here as this is first time phase space boundary is avaialble.
 	if( ! normalisationDone )
@@ -261,8 +260,6 @@ double WrongPVAssocBkg::Evaluate(DataPoint * measurement)
 		normalisationDone = true ;
 		cout << "WrongPVAssocBkg::Evaluate: Total number entries = "  <<total_num_entries << "  of which in phase space = " << total_num_entries_phase_space << endl ;
 	}
-	
-	
 	// Observable
 	mass = measurement->GetObservable( massName )->GetValue();
 	time = measurement->GetObservable( timeName )->GetValue();
@@ -299,7 +296,7 @@ double WrongPVAssocBkg::timeMassFactor( )
 	xbin = xaxis->FindFixBin( time ); if( xbin > nxbins ) xbin = nxbins; if( xbin < 1 ) xbin = 1;
 	ybin = yaxis->FindFixBin( mass ); if( ybin > nybins ) ybin = nybins; if( ybin < 1 ) ybin = 1;
 	num_entries_bin = histo->GetBinContent(xbin,ybin);
-	
+
 	returnValue = num_entries_bin / (deltax * deltay) / total_num_entries_phase_space ;
 
 	return returnValue;

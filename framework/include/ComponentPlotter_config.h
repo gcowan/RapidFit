@@ -31,7 +31,7 @@ class CompPlotter_config
                 CompPlotter_config() :
                         data_bins(100), PDF_points(128), observableName("undefined"), logY(false), color_key(), style_key(), width_key(), component_names(), PlotTitle(""),
                         xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false), ScaleNumerical(true),
-			DrawPull(false), LegendTextSize(1), addLHCb(false)
+			DrawPull(false), LegendTextSize(0.03), addLHCb(false)
                 {}
 
 

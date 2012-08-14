@@ -931,6 +931,7 @@ TLegend* EdStyle::LHCbLegend()
 	TLegend* thisLegend = new TLegend( 0.6, 0.65, 0.9, 0.9 );
 	thisLegend->SetFillColor( kWhite );
 	thisLegend->SetFillStyle( 3001 );
+	thisLegend->SetTextSize( 0.03 );
 	return thisLegend;
 }
 
