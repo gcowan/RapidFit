@@ -20,12 +20,12 @@
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
+DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoNames2(), allPseudoObservables(), allPseudoObservables2(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoNames2(), allPseudoObservables(), allPseudoObservables2(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -118,34 +118,17 @@ Observable* DataPoint::GetObservable( unsigned int wanted ) const
 	return allObservables[ wanted ];
 }
 
-//Retrieve an observable it's cached index, or find it and save it's index for reference
-Observable* DataPoint::GetObservable( pair<string,int>* wanted_param ) const
-{
-	if( wanted_param->second != -1 )
-	{
-		return allObservables[(unsigned)wanted_param->second];
-	} else {
-		wanted_param->second = StringProcessing::VectorContains( &allNames, &(wanted_param->first) );
-	}
-	if( wanted_param->second == -1 ){
-		cerr << "Observable name " << wanted_param->first << " not found (1)" << endl;
-	}else{
-		return allObservables[unsigned(wanted_param->second)];
-	}
-	exit(-1);
-}
-
 //Retrieve an observable by its name
 //	!!!THIS IS VERY, VERY, VERY WASTEFUL FOR LARGE DATASETS!!!
-Observable* DataPoint::GetObservable(string const Name) const
+Observable* DataPoint::GetObservable(string const Name, const bool silence ) const
 {
 	//Check if the name is stored in the map
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if( nameIndex == -1 )
 	{
-		cerr << "Observable name " << Name << " not found (2)" << endl;
-		this->Print();
-		exit(1);
+		if( !silence ) cerr << "Observable name " << Name << " not found (2)" << endl;
+		//this->Print();
+		throw(-1543);
 		//return new Observable( Name, 0.0, 0.0, "NameNotFoundError");
 	}
 	else
@@ -232,10 +215,10 @@ bool DataPoint::SetObservable( string Name, double Value, double Error, string U
 }
 
 //	Used for Sorting DataPoints
-bool DataPoint::operator() ( pair<DataPoint*,pair<string,int> > first, pair<DataPoint*,pair<string,int> > second )
+bool DataPoint::operator() ( pair<DataPoint*,ObservableRef> first, pair<DataPoint*,ObservableRef> second )
 {
-	double param_val_1 = first.first->GetObservable( &first.second )->GetValue();
-	double param_val_2 = second.first->GetObservable( &second.second )->GetValue();
+	double param_val_1 = first.first->GetObservable( first.second )->GetValue();
+	double param_val_2 = second.first->GetObservable( second.second )->GetValue();
 	return (param_val_1 < param_val_2 );
 }
 
@@ -403,14 +386,16 @@ void DataPoint::ClearPsuedoObservable()
 		}
 		allPseudoObservables.pop_back();
 	}
-	while( !allPseudoObservables2.empty() )                          
-	{                                                               
-		if( allPseudoObservables2.back() != NULL )               
-		{                                                       
-			delete allPseudoObservables2.back();             
-		}                                                       
-		allPseudoObservables2.pop_back();                        
+	while( !allPseudoObservables2.empty() )
+	{
+		if( allPseudoObservables2.back() != NULL )
+		{
+			delete allPseudoObservables2.back();
+		}
+		allPseudoObservables2.pop_back();
 	}
+	allPseudoNames.clear();
+	allPseudoNames2.clear();
 }
 
 PhaseSpaceBoundary* DataPoint::GetPhaseSpaceBoundary() const

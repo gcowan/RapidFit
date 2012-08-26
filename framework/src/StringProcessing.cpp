@@ -335,6 +335,7 @@ void StringProcessing::RemoveElement( vector<string>& Input, string Element )
 //Return the position of a search string within a vector of strings, or -1 if not found
 int StringProcessing::VectorContains( vector<string> const* InputVector, string const* SearchString )
 {
+	if( InputVector == NULL || SearchString == NULL ) return -1;
 	if( InputVector->empty() ) return -1;
 	vector<string>::const_iterator begin = InputVector->begin();
 	vector<string>::const_iterator ending = InputVector->end();

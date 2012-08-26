@@ -380,7 +380,7 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet * NewParameterSet 
 	}
 
 	double fs = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
-	if( (fs < 0.) || (fs >= 1.) ) { cout << "Warning in Bs2JpsiPhi_SignalAlt_MP_dev::SetPhysicsParameters: As_sq <0 or >=1 but left as is" <<  endl ;	}
+	if( (fs < 0.) || (fs >= 1.) ) { cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: As_sq <0 or >=1 but left as is" <<  endl ;	}
 	As_sq = fs / (1. - fs ) ;
 
 	Csp = allParameters.GetPhysicsParameter( CspName )->GetValue();

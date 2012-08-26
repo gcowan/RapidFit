@@ -29,7 +29,7 @@ class MemoryDataSet : public IDataSet
 		virtual DataPoint * GetDataPoint(int) const;
 		virtual void ReserveDataSpace( int numberOfPoints );
 		virtual bool AddDataPoint( DataPoint* );
-		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL ) const;
+		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL, bool silence=false ) const;
 		virtual PhaseSpaceBoundary * GetBoundary() const;
 
 		virtual void SortBy( string );
@@ -62,7 +62,7 @@ class MemoryDataSet : public IDataSet
 		string WeightName;
 };
 
-bool compare_datapoints ( pair<DataPoint,pair<string,int> > first, pair<DataPoint,pair<string,int> > second );
+bool compare_datapoints ( pair<DataPoint,ObservableRef> first, pair<DataPoint,ObservableRef> second );
 
 #endif
 

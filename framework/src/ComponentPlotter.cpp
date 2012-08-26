@@ -31,6 +31,7 @@
 #include "PhaseSpaceBoundary.h"
 #include "ClassLookUp.h"
 #include "ComponentRef.h"
+#include "NormalisedSumPDF.h"
 ///	System Headers
 #include <iostream>
 #include <iomanip>
@@ -44,18 +45,37 @@
 using namespace::std;
 
 //Constructor with correct arguments
-ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config ):
+ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num ):
 	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ), pdfIntegrator( new RapidFitIntegrator(NewPDF) ), weightsWereUsed(false), weight_norm(1.),
 	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ), logY( (config!=NULL)?config->logY:false ),
 	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false ),
-	combination_integral(0.), ratioOfIntegrals(0.), wanted_weights(), format(), data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(),
-	total_components(), chi2(), N(), allPullData(), debug( new DebugClass(false) )
+	combination_integral(0.), ratioOfIntegrals(1,1.), wanted_weights(), format(), data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(),
+	total_components(), chi2(), N(), allPullData(), debug( new DebugClass(false) ), PDFNum(PDF_Num)
 {
 	plotPDF->TurnCachingOff();
 
+
 	pdfIntegrator->SetPDF( plotPDF );
 	pdfIntegrator->ProjectionSettings();
+	pdfIntegrator->SetDebug(debug);
+
+	vector<string> disc_contr = full_boundary->GetDiscreteNames();
+	vector<string> pdf_const = plotPDF->GetPrototypeDataPoint();
+	for( unsigned int i=0; i< disc_contr.size(); ++i )
+	{
+		if( StringProcessing::VectorContains( &pdf_const, &(disc_contr[i]) ) == -1 )
+		{
+			full_boundary->RemoveConstraint( disc_contr[i] );
+		}
+	}
+
+	if( plotPDF->GetName() == "NormalisedSum" )
+	{
+		NormalisedSumPDF* thisNorm = (NormalisedSumPDF*) plotPDF;
+		thisNorm->ChangePhaseSpace( full_boundary );
+	}
+
 	//////////////////////////////////////////////////////////////////
 	//Make the histogram of this observable
 	format = new EdStyle();
@@ -74,7 +94,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	for( unsigned int i=0; i< allCombinations.size(); ++i )
 	{
 		pdfIntegrator->ForceTestStatus( false );
-		double thisIntegral = pdfIntegrator->Integral( allCombinations[i], full_boundary );
+		allCombinations[i]->SetPhaseSpaceBoundary( full_boundary );
+		double thisIntegral = pdfIntegrator->NumericallyIntegrateDataPoint( allCombinations[i], full_boundary, plotPDF->GetDoNotIntegrateList() );
 		combination_integral.push_back( thisIntegral );
 
 		if( plotPDF->GetNumericalNormalisation() == true ) ratioOfIntegrals.push_back( 1. );
@@ -84,6 +105,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			else ratioOfIntegrals.push_back( 1./pdfIntegrator->GetRatioOfIntegrals() );
 		}
 	}
+
+	if( ratioOfIntegrals.size() == 0 || ratioOfIntegrals.empty() ) ratioOfIntegrals =vector<double> ( 1, 1. );
 
 	vector<double> minimum, maximum;
 	vector<int> binNumber;
@@ -110,6 +133,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	}
 
 	TH1::SetDefaultSumw2( true );
+
+	pdfIntegrator->ForceTestStatus( true );
 }
 
 //Destructor
@@ -131,13 +156,11 @@ void ComponentPlotter::ProjectObservable()
 {
 	vector<string> doNotIntegrate = plotPDF->GetDoNotIntegrateList();
 
-	for(vector<string>::iterator comb_i = combinationDescriptions.begin(); comb_i != combinationDescriptions.end(); ++comb_i ) cout << *comb_i << endl;
-
 	plotPDF->UnsetCache();
 	//Check the observable can be plotted
 	bool continuous = !( plotData->GetBoundary()->GetConstraint( observableName )->IsDiscrete() );
 	bool doIntegrate = ( StringProcessing::VectorContains( &doNotIntegrate, &(observableName) ) == -1 );
-	if ( continuous && doIntegrate )
+	if( continuous && doIntegrate )
 	{
 		//Do the projecting of the pdfs
 		cout << "Projecting " << observableName << endl;
@@ -225,23 +248,24 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 
 		//Update the data average values, and make the projection graph arrays
 		vector<double>* projectionValueArray = new vector<double>();
-		projectionValueArray->resize((unsigned)total_points);
-		double range = ( boundary_max - boundary_min );
+		*projectionValueArray = *projectionValueVector;
+		double range = fabs( boundary_max - boundary_min );
 
-		//	Perform Normalization							THIS IS COMPLEX AND IS COPIED LARGELY FROM PLOTTER CLASS
+		//cout << "Normalizing" << endl;
+		double n_events = (double)plotData->GetDataNumber( allCombinations[combinationIndex], true );
+		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM PLOTTER CLASS
 		for (int pointIndex = 0; pointIndex < total_points; ++pointIndex )
 		{
 			//Projection graph
-			//
-			(*projectionValueArray)[(unsigned)pointIndex] =
-				//						ratio Numerical/Analytical		n-points		Observable range	full Integral
-				(*projectionValueVector)[(unsigned)pointIndex] * ratioOfIntegrals[combinationIndex] * (double)plotData->GetDataNumber( allCombinations[combinationIndex] ) * range / combination_integral[combinationIndex];
+			//						ratio Numerical/Analytical		n-points		Observable range	full Integral
+			(*projectionValueArray)[(unsigned)pointIndex] *= fabs(ratioOfIntegrals[combinationIndex]) * n_events * range / combination_integral[combinationIndex];
 
 			//	'Fraction of this Combination in Combination 0'
 			(*projectionValueArray)[(unsigned)pointIndex] *= combinationWeights[combinationIndex];
 
 			//	This is due to ROOT binning the data into 100 bins by default
 			(*projectionValueArray)[(unsigned)pointIndex] /= double(data_binning);
+
 		}
 
 		delete projectionValueVector;
@@ -350,11 +374,19 @@ void ComponentPlotter::GenerateProjectionData()
 	//	exit(12375);
 	//}
 
+	if( debug != NULL )
+	{
+		if( debug->GetStatus() )
+		{
+			cout << "ComponentPlotter: Counting Number of Events " << endl;
+		}
+	}
+
 	vector<int> num_observables;
 	for( unsigned int i=0; i< observableValues.size(); ++i )
 	{
 		num_observables.push_back( (int)observableValues[i].size() );
-		cout << "Combination: " << i+1 << " has " << num_observables.back() << " events." << endl;
+		//cout << "Combination: " << i+1 << " has " << num_observables.back() << " events." << endl;
 	}
 
 
@@ -412,6 +444,17 @@ void ComponentPlotter::GenerateProjectionData()
 
 	//	Write the output to the output file
 	TDirectory* here = gDirectory;
+
+	TString PDFDesc; PDFDesc+=PDFNum;
+	vector<string> combDescs=combinationDescriptions;
+	for( unsigned int i=0; i< combDescs.size(); ++i )
+	{
+		combDescs[i].append("_PDF_");
+		combDescs[i].append(PDFDesc.Data());
+	}
+
+	for( unsigned int i=0; i< combinationDescriptions.size(); ++i ) cout << combinationDescriptions[i] << endl;
+
 	this->WriteOutput( X_values, Y_values, combinationDescriptions );
 	here->cd();
 
@@ -449,7 +492,7 @@ TH1* ComponentPlotter::FormatData( unsigned int combinationNumber )
 		}
 		double weight_sum=0.;
 		for( vector<double>::iterator w_i = wanted_weights.begin(); w_i != wanted_weights.end(); ++w_i )
-		{       
+		{
 			weight_sum+=*w_i;
 		}
 		for( unsigned int i=0; i< (unsigned)returnable->GetNbinsX(); ++i )
@@ -633,6 +676,10 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			}
 		}
 
+		TString PDFDesc;PDFDesc+=PDFNum;
+
+		desc.append("_PDF_"); desc.append(PDFDesc.Data());
+
 		//	For the moment haven't decided if I should pass the global config to ALL sub plots, I shall get user input on this
 		CompPlotter_config* temp = new CompPlotter_config();
 		temp->logY = logY;
@@ -650,7 +697,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				TF1* fitting_function = new TF1( "total_PDF", this, boundary_min, boundary_max, 1, "" );        //      I REFUSE to pass the class name
 				chi2 = binned_data.back()->Chisquare( fitting_function );
 
-				N = plotData->GetDataNumber();
+				N = plotData->GetDataNumber(NULL,true);
 				double n = (double) plotPDF->GetPhysicsParameters()->GetAllFloatNames().size();
 				double denominator = (double)(N - n - 1. );
 				cout << endl << "Chi^2/ndof :\t" << setprecision(10) << chi2 / denominator << endl;
@@ -708,6 +755,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				   }
 				   */
 
+				this->OutputPlotPull( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), allPullData, plotPDF->GetRandomFunction(), temp );
 				(void)pullPlot;
 			}
 		}
@@ -997,7 +1045,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->DebugThisClass("ComponentPlotter") )
 		{
 			filestr.open ("/dev/null");
 			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
@@ -1014,6 +1062,22 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 			clog.rdbuf(nullbuf);
 		}
 	}
+	else
+	{
+		filestr.open ("/dev/null");
+		//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
+		cout_bak = cout.rdbuf();
+		cerr_bak = cerr.rdbuf();
+		clog_bak = clog.rdbuf();
+		nullbuf = filestr.rdbuf();
+		fflush(stderr);
+		fgetpos(stderr, &pos);
+		fd = dup(fileno(stdout));
+		freopen("/dev/null", "w", stderr);
+		cout.rdbuf(nullbuf);
+		cerr.rdbuf(nullbuf);
+		clog.rdbuf(nullbuf);
+	}
 
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
@@ -1021,7 +1085,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->DebugThisClass("ComponentPlotter") )
 		{
 			fflush(stderr);
 			dup2(fd,fileno(stderr));
@@ -1032,6 +1096,17 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 			cerr.rdbuf( cerr_bak );
 			clog.rdbuf( clog_bak );
 		}
+	}
+	else
+	{
+		fflush(stderr);
+		dup2(fd,fileno(stderr));
+		close(fd);
+		clearerr(stderr);
+		fsetpos(stderr, &pos);
+		cout.rdbuf( cout_bak );
+		cerr.rdbuf( cerr_bak );
+		clog.rdbuf( clog_bak );
 	}
 
 }
@@ -1129,7 +1204,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	TLatex* myLatex=NULL;
 	if( addLHCb )
 	{
-		 myLatex = EdStyle::LHCbLabel();
+		myLatex = EdStyle::LHCbLabel();
 	}
 
 	if( myLatex != NULL ) myLatex->Draw();
@@ -1268,7 +1343,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->DebugThisClass("ComponentPlotter") )
 		{
 			filestr.open ("/dev/null");
 			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
@@ -1285,6 +1360,22 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 			clog.rdbuf(nullbuf);
 		}
 	}
+	else
+	{
+		filestr.open ("/dev/null");
+		//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
+		cout_bak = cout.rdbuf();
+		cerr_bak = cerr.rdbuf();
+		clog_bak = clog.rdbuf();
+		nullbuf = filestr.rdbuf();
+		fflush(stderr);
+		fgetpos(stderr, &pos);
+		fd = dup(fileno(stdout));
+		freopen("/dev/null", "w", stderr);
+		cout.rdbuf(nullbuf);
+		cerr.rdbuf(nullbuf);
+		clog.rdbuf(nullbuf);
+	}
 
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
@@ -1292,7 +1383,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->DebugThisClass("ComponentPlotter") )
 		{
 			fflush(stderr);
 			dup2(fd,fileno(stderr));
@@ -1303,6 +1394,17 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 			cerr.rdbuf( cerr_bak );
 			clog.rdbuf( clog_bak );
 		}
+	}
+	else
+	{
+		fflush(stderr);
+		dup2(fd,fileno(stderr));
+		close(fd);
+		clearerr(stderr);
+		fsetpos(stderr, &pos);
+		cout.rdbuf( cout_bak );
+		cerr.rdbuf( cerr_bak );
+		clog.rdbuf( clog_bak );
 	}
 
 }
@@ -1338,7 +1440,7 @@ vector<double> ComponentPlotter::GetStatistics( string ObservableName, double & 
 {
 	//Make a vector of the values found for the observable
 	vector<double> this_observableValues;
-	for ( int dataIndex = 0; dataIndex < plotData->GetDataNumber(); ++dataIndex )
+	for ( int dataIndex = 0; dataIndex < plotData->GetDataNumber(NULL,true); ++dataIndex )
 	{
 		this_observableValues.push_back( plotData->GetDataPoint(dataIndex)->GetObservable(ObservableName)->GetValue() );
 	}
@@ -1386,7 +1488,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 
 		if( debug->GetStatus() )
 		{
-			cout << "Debug: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << observableValue << "\t";
+			cout << "Debug: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << ObservableName << "==" << observableValue << "\t";
 			pdfIntegrator->SetDebug( debug );
 		}
 		//	perform actual evaluation of the PDF with the configuration in the InputPoint, in the whole boundary with the given name and for selected component
@@ -1401,9 +1503,12 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	}
 	delete comp_obj;
 
-	if( debug->GetStatus() )
+	if( debug != NULL )
 	{
-		cout << "Debug: Performing Sanity Check" << endl;
+		if( debug->DebugThisClass("ComponentPlotter") )
+		{
+			cout << endl << "Debug: Performing Sanity Check" << endl;
+		}
 	}
 
 	this->Sanity_Check( pointValues, component );
@@ -1443,7 +1548,7 @@ vector<vector<double> > ComponentPlotter::GetCombinationStatistics( string Obser
 	//	If we have 'no discrete combinations' then get the whole dataset for this pdf
 	vector<DataPoint*> whole_dataset;
 
-	cout << plotData->GetDataNumber() << endl;
+	cout << plotData->GetDataNumber(NULL,true) << endl;
 
 	for( int i=0; i< plotData->GetDataNumber(); ++i )
 	{
@@ -1587,6 +1692,10 @@ vector<DataPoint*> ComponentPlotter::GetDiscreteCombinations( vector<double>& Da
 	{
 		this_combinationWeights.push_back( (double)combinationCounts[combinationIndex] / (dataNumber) );
 	}
+	if( discreteCombinations.size() == 0 )
+	{
+		this_combinationWeights.push_back( 1. );
+	}
 
 	//Create the data points to return
 	vector<DataPoint*> newDataPoints;
@@ -1647,7 +1756,7 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 	weightName = input;
 
 	ObservableRef* weight_ref = new ObservableRef( weightName );
-	for( int i=0 ; i < plotData->GetDataNumber(); ++i )
+	for( int i=0 ; i < plotData->GetDataNumber(NULL,true); ++i )
 	{
 		if( weightsWereUsed ) wanted_weights.push_back( plotData->GetDataPoint( i )->GetObservable( *weight_ref )->GetValue() );
 		else wanted_weights.push_back( 1. );
@@ -1662,7 +1771,7 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 		{
 			weight_norm+=*w_i;
 		}
-		weight_norm /= plotData->GetDataNumber();
+		weight_norm /= plotData->GetDataNumber(NULL,true);
 		for( vector<double>::iterator w_i = wanted_weights.begin(); w_i != wanted_weights.end(); ++w_i )
 		{
 			double temp = (*w_i)/weight_norm;
@@ -1713,7 +1822,7 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 		double temp_integral_value = pdfIntegrator->ProjectObservable( InputPoint, full_boundary, observableName, comp_obj );
 
-		double dataNum = plotData->GetDataNumber( *comb_i );
+		double dataNum = plotData->GetDataNumber( *comb_i, true );
 
 		temp_integral_value = temp_integral_value * ratioOfIntegrals[comb_num] * dataNum * (boundary_max-boundary_min) / combination_integral[comb_num];
 
@@ -1860,6 +1969,21 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 			clog.rdbuf(nullbuf);
 		}
 	}
+	else
+	{
+		//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
+		cout_bak = cout.rdbuf();
+		cerr_bak = cerr.rdbuf();
+		clog_bak = clog.rdbuf();
+		nullbuf = filestr.rdbuf();
+		fflush(stderr);
+		fgetpos(stderr, &pos);
+		fd = dup(fileno(stdout));
+		freopen("/dev/null", "w", stderr);
+		cout.rdbuf(nullbuf);
+		cerr.rdbuf(nullbuf);
+		clog.rdbuf(nullbuf);
+	}
 
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
@@ -1878,6 +2002,17 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 			cerr.rdbuf( cerr_bak );
 			clog.rdbuf( clog_bak );
 		}
+	}
+	else
+	{
+		fflush(stderr);
+		dup2(fd,fileno(stderr));
+		close(fd);
+		clearerr(stderr);
+		fsetpos(stderr, &pos);
+		cout.rdbuf( cout_bak );
+		cerr.rdbuf( cerr_bak );
+		clog.rdbuf( clog_bak );
 	}
 
 	return pullGraph;

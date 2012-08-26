@@ -37,8 +37,9 @@ pthread_mutex_t _n_eval_lock;
 pthread_mutex_t _n_int_lock;
 
 //Default constructor
-NegativeLogLikelihoodNumerical::NegativeLogLikelihoodNumerical()
+NegativeLogLikelihoodNumerical::NegativeLogLikelihoodNumerical() : FitFunction()
 {
+	Name="NegativeLogLikelihoodNumerical";
 }
 
 //Destructor

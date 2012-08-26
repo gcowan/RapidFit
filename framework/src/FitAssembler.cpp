@@ -54,7 +54,7 @@ void FitAssembler::SafeMinimise( IMinimiser* Minimiser )
 }
 
 //The final stage - do the minimisation
-FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFunction )
+FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFunction, DebugClass* debug )
 {
 	Minimiser->SetupFit( TheFunction );
 
@@ -66,12 +66,42 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 
 	FitResult* final_result = Minimiser->GetFitResult();
 
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Returning FitResult" << endl;
+		}
+	}
+
 	return final_result;
 }
 
 //Create the minimiser and fit function
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, PhysicsBottle * Bottle, DebugClass* debug )
 {
+	if( Bottle->GetParameterSet()->GetAllFloatNames().size() == 0 )
+	{
+		vector<string> ParamNames = Bottle->GetParameterSet()->GetAllFixedNames();
+		ResultParameterSet* fixed_set = new ResultParameterSet( ParamNames );
+		for( unsigned int i=0; i< ParamNames.size(); ++i )
+		{
+			PhysicsParameter* param = Bottle->GetParameterSet()->GetPhysicsParameter( ParamNames[i] );
+			fixed_set->SetResultParameter( ParamNames[i], param->GetValue(), param->GetValue(), 0., 0., 0., param->GetType(), param->GetUnit() );
+		}
+
+		FitResult* fixed_result = new FitResult( 0., fixed_set, 3, Bottle );
+		return fixed_result;
+	}
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Constructing Minimiser" << endl;
+		}
+	}
+
 	IMinimiser * minimiser = MinimiserConfig->GetMinimiser( int(Bottle->GetParameterSet()->GetAllNames().size()) );
 	minimiser->SetDebug( debug );
 	cout << endl;
@@ -82,15 +112,39 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	   {
 	   pdfs[i]->GetPhysicsParameters()->Print();
 	   }
-	 */
+	   */
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Constructing FitFunction" << endl;
+		}
+	}
 
 	FitFunction * theFunction = FunctionConfig->GetFitFunction();
 	theFunction->SetDebug( debug );
+
+	if( debug != NULL )           
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler:  About to pass PhysicsBottle to FitFunction and Test Integrator" << endl;
+		}
+	}
+
 	theFunction->SetPhysicsBottle(Bottle);
 	cout << endl;
 
-	FitResult* result = DoFit( minimiser, theFunction );
+	FitResult* result = DoFit( minimiser, theFunction, debug );
 
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Destroying FitFunction and returning FitResult" << endl;
+		}
+	}
 	delete theFunction;
 
 	return result;
@@ -113,11 +167,28 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 	}
 
-	ParameterSet* checkedBottleParameters = CheckInputParams( BottleParameters, allPDFs );
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: For PDFs:" << endl;
+			for( unsigned int i=0; i< allPDFs.size(); ++i ) cout << allPDFs[i]->GetLabel() << endl;
+			cout << "FitAssembler: Constructing PhaseSpace:" << endl;
+		}
+	}
+
+	ParameterSet* checkedBottleParameters = FitAssembler::CheckInputParams( BottleParameters, allPDFs, debug );
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			checkedBottleParameters->Print();
+			cout << "FitAssembler: Sorting Parameters to get Floated Parameters first" << endl;
+		}
+	}
 
 	checkedBottleParameters->FloatedFirst();
-
-	//checkedBottleParameters->Print();
 
 	ParameterSet* checkedGenerationParameters = GenerationParameters( checkedBottleParameters, BottleParameters );
 
@@ -145,12 +216,36 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			BottleData[resultIndex]->GetPDF()->SetDebug( debug );
 			(void) someVal;
 		}
-		//cout << "Generate Here:" << endl;
+
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitAssembler" ) )
+			{
+				cout << "FitAssembler: Generating DataSet: " << resultIndex+1 << " of: " << BottleData.size() << endl;
+			}
+		}
+
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
 
 		if( FunctionConfig->GetNormaliseWeights() ) Requested_DataSet->NormaliseWeights();
 
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitAssembler" ) )
+			{
+				cout << "FitAssembler: Adding PDF & DataSet to Bottle: " << resultIndex << " of: " << BottleData.size() << endl;
+			}
+		}
+
 		bottle->AddResult( Requested_PDF, Requested_DataSet );
+	}
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Adding Constraints" << endl;
+		}
 	}
 
 	//Add the constraints
@@ -161,7 +256,23 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	delete checkedBottleParameters;
 
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Passing MinimiserConfig, FunctionConfig and Bottle" << endl;
+		}
+	}
+
 	FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle, debug );
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Adding all PhysicsParameters from XML to output" << endl;
+		}
+	}
 
 	BottleParameters->AddPhysicsParameters( bottle->GetParameterSet(), true );
 
@@ -177,7 +288,27 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 		if( !wasAdded ) result->GetResultParameterSet()->SetResultParameter( *name_i, thisResult );
 
+		if( wasAdded )
+		{
+			if( result->GetResultParameterSet()->GetResultParameter( *name_i )->GetType() == "Fixed" )
+			{
+				result->GetResultParameterSet()->GetResultParameter( *name_i )->SetError(-2.);
+			}
+			else
+			{
+				result->GetResultParameterSet()->GetResultParameter( *name_i )->SetError(-1.);
+			}
+		}
+
 		delete thisResult;
+	}
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Destroying Bottle and returning FitResult" << endl;
+		}
 	}
 
 	delete checkedGenerationParameters;
@@ -188,8 +319,15 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Check that the provided ParameterSet only Contains the Parameters claimed by the PDFs to protect the Minimiser from runtime mistakes
-ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs )
+ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs, DebugClass* debug )
 {
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Checking ParameterSet from XML" << endl;
+		}
+	}
 	vector<string> param_names;
 	for( unsigned int i=0; i< allPDFs.size(); ++i )
 	{
@@ -200,19 +338,22 @@ ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, c
 	if( param_names.size() != givenParams->GetAllNames().size() )
 	{
 		vector<string> temp = givenParams->GetAllNames();
-		//for( unsigned int i=0; i< temp.size(); ++i )
-		//{
-		//	if( StringProcessing::VectorContains( &param_names, &(temp[i]) ) == -1 )
-		//	{
-		//		cout << "Physics Parameter: " << temp[i] << " Provided, but not requested by a PDF, Ignoring" << endl;
-		//	}
-		//}
 	}
 
 	ParameterSet* wantedParameterSet = ( new ParameterSet( param_names ) );
 	for( unsigned int i=0; i< param_names.size(); ++i )
 	{
-		PhysicsParameter* phys_param = givenParams->GetPhysicsParameter( param_names[i] );
+		PhysicsParameter* phys_param = NULL;
+		try
+		{
+			phys_param = givenParams->GetPhysicsParameter( param_names[i] );
+		}
+		catch(...)
+		{
+			cout << endl;
+			cout << "FitAssembler: You are missing the Parameter: " << param_names[i] << " in your XML File. Please add it to the ParameterSet!" << endl << endl;
+			exit(0);
+		}
 		wantedParameterSet->SetPhysicsParameter( param_names[i], new PhysicsParameter(*phys_param) );
 	}
 
@@ -275,8 +416,15 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //     This checks the ParameterSet in the Physics Parameters against all of the parameters given in the XML and then adds any missing parameters the user requested
-void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, ParameterSet* BottleParameters )
+void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, ParameterSet* BottleParameters, DebugClass* debug )
 {
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Checking Result ParameterSet" << endl;
+		}
+	}
 	vector<string> already_found = ReturnableFitResult->GetResultParameterSet()->GetAllNames();
 	vector<string> bottle_names = BottleParameters->GetAllNames();
 
@@ -294,10 +442,10 @@ void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, ParameterS
 			double OriginalValue = Phys_Param->GetValue();
 			double Minimum = Phys_Param->GetMinimum();
 			double Maximum = Phys_Param->GetMaximum();
-			double Error = Phys_Param->GetStepSize();
+			//double Error = Phys_Param->GetStepSize();
 			string Type = Phys_Param->GetType();
 			string Unit = Phys_Param->GetUnit();
-			bool added = ReturnableFitResult->GetResultParameterSet()->ForceNewResultParameter( bottle_names[i],  Value, OriginalValue, Error, Minimum, Maximum, Type, Unit );
+			bool added = ReturnableFitResult->GetResultParameterSet()->ForceNewResultParameter( bottle_names[i],  Value, OriginalValue, -1., Minimum, Maximum, Type, Unit );
 			if( !added )
 			{
 				cerr << "Error finalizing FitResultVector Object" << endl << endl;
@@ -322,7 +470,7 @@ void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, ParameterS
 				if( (fabs( result_val - param_max ) <= (0.5 * result_err)) && nolim )
 				{
 					cout << "Caution: Parameter " << bottle_names[i] << " is within 0.5 sigma of a limit!!!" << endl;
-					cout << "\t\t" << bottle_names[i] << ": " << result_val << " Max: " << param_min << endl << endl;
+					cout << "\t\t" << bottle_names[i] << ": " << result_val << " Max: " << param_max << endl << endl;
 				}
 			}
 		}
@@ -355,7 +503,7 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 	}
 
 	/*!	Check that the ParameterSet in the output contains the provided ParameterSet regardless of what was passed to the Minimiser	*/
-	CheckParameterSet( ReturnableFitResult, internalBottleParameters );
+	FitAssembler::CheckParameterSet( ReturnableFitResult, internalBottleParameters, debug );
 
 	BottleParameters->AddPhysicsParameters( internalBottleParameters, true );
 
@@ -667,6 +815,5 @@ FitResult * FitAssembler::PetesGamma_DoSafeFit( MinimiserConfiguration * Minimis
 	BottleParameters->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( deltaGamma ) ;
 
 	return res ;
-
 }
 

@@ -66,15 +66,6 @@ class DataPoint
 		Observable* GetObservable( unsigned int Input ) const;
 
 		/*!
-		 * @brief This returns the Observable Requested by the Name and stores the location
-		 *
-		 * @param Input    This contains the Name of the Requested Observable and will store the position of the Observable once it's been found for future reference
-		 *
-		 * @return returns the Observable with the requested Name, or at the given location if it's already been found once before and it's location stored
-		 */
-		Observable* GetObservable( pair<string,int>* Input ) const;
-
-		/*!
 		 * @brief This returns the Observable Requested by the Name
 		 *
 		 * This used to cause the most CPU to be spent in RapidFit before intelligent Caching was coded up
@@ -83,7 +74,7 @@ class DataPoint
 		 *
 		 * @return returns the Observable with the requested Name
 		 */
-		Observable* GetObservable( const string Name ) const;
+		Observable* GetObservable( const string Name, const bool silence=false ) const;
 
 		/*!
 		 * @brief This returns the Observable Requested by the Name and stores the location
@@ -199,7 +190,7 @@ class DataPoint
 		 *
 		 * @return true/false result of a comparison
 		 */
-		bool operator() ( pair<DataPoint* , pair<string,int> >, pair<DataPoint* , pair<string,int> > );
+		bool operator() ( pair<DataPoint* , ObservableRef >, pair<DataPoint* , ObservableRef > );
 
 		/*!
 		 * @brief Output some debugging info

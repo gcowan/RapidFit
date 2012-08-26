@@ -196,6 +196,8 @@ class FitFunction
 		bool weightsSquared;			/*!	Should Weights squared be used in evaluating the function	*/
 
 		DebugClass* debug;				/*!	Flag controlling the turning on/off of extra debug information	*/
+
+		string Name;
 };
 
 #endif

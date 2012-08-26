@@ -32,6 +32,8 @@ class StatisticsFunctions
 		static vector< vector<double> > DiscreteCombinations( vector<string>*, const PhaseSpaceBoundary*, vector<string>&, vector<string>&, vector< vector<double> >& );
 		static void DoDontIntegrateLists( IPDF*, const PhaseSpaceBoundary*, const vector<string>*, vector<string>&, vector<string>& );
 		static vector<DataPoint*> DataAverage( IDataSet*, vector< vector<double> >, vector< vector<double> >, vector<string>, vector<string>, vector<string>&, vector<double>& );
+		static vector<vector<double> > Combinatorix( vector<vector<double> > input_values );
+		static unsigned int NumberOfCombinations( vector<vector<double> > input, unsigned int index );
 };
 
 #endif

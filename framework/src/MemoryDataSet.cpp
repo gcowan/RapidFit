@@ -12,6 +12,8 @@
 #include "MemoryDataSet.h"
 #include "IConstraint.h"
 #include "ObservableDiscreteConstraint.h"
+#include "StringProcessing.h"
+#include "StatisticsFunctions.h"
 //	System Headers
 #include <iostream>
 #include <vector>
@@ -80,37 +82,83 @@ DataPoint * MemoryDataSet::GetDataPoint( int Index ) const
 }
 
 //Get the number of data points in the set
-int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint ) const
+int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint, bool silence ) const
 {
 	if( templateDataPoint == NULL )	return int(allData.size());
 	else
 	{
-		int number = allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint ) ];
-
-		if( number != -1 ) return number;
-		else
+		try
 		{
+			int number = allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint, silence ) ];
 
-			int counter = 0;
+			if( number != -1 ) return number;
+			else
+			{
+
+				int counter = 0;
+				vector<string> allDiscrete = dataBoundary->GetDiscreteNames();
+
+				PhaseSpaceBoundary* temp_Boundary = new PhaseSpaceBoundary( *dataBoundary );
+
+				for( vector<string>::iterator disc_i = allDiscrete.begin(); disc_i != allDiscrete.end(); ++disc_i )
+				{
+					double val = templateDataPoint->GetObservable( *disc_i, silence )->GetValue();
+					ObservableDiscreteConstraint* thisConstraint = (ObservableDiscreteConstraint*) temp_Boundary->GetConstraint( *disc_i );
+					vector<double> vec_val( 1, val );
+					thisConstraint->SetValues( vec_val );
+				}
+
+				for( vector<DataPoint*>::const_iterator point_i = allData.begin(); point_i != allData.end(); ++point_i )
+				{
+					if( temp_Boundary->IsPointInBoundary( *point_i, silence ) )	++counter;
+				}
+				delete temp_Boundary;
+				allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint ) ] = counter;
+				return counter;
+			}
+		}
+		catch(...)
+		{
+			vector<ObservableRef> missing;
+			vector<string> observables = templateDataPoint->GetAllNames();
 			vector<string> allDiscrete = dataBoundary->GetDiscreteNames();
-
-			PhaseSpaceBoundary* temp_Boundary = new PhaseSpaceBoundary( *dataBoundary );
 
 			for( vector<string>::iterator disc_i = allDiscrete.begin(); disc_i != allDiscrete.end(); ++disc_i )
 			{
-				double val = templateDataPoint->GetObservable( *disc_i )->GetValue();
-				ObservableDiscreteConstraint* thisConstraint = (ObservableDiscreteConstraint*) temp_Boundary->GetConstraint( *disc_i );
-				vector<double> vec_val( 1, val );
-				thisConstraint->SetValues( vec_val );
+				if( StringProcessing::VectorContains( &observables, &(*disc_i) ) ==  -1 )
+				{
+					missing.push_back( *disc_i );
+					//cout << string(missing.back()) << endl;
+				}
 			}
 
-			for( vector<DataPoint*>::const_iterator point_i = allData.begin(); point_i != allData.end(); ++point_i )
+			vector<vector<double> > possible_values;
+
+			for( vector<ObservableRef>::iterator missing_i = missing.begin(); missing_i != missing.end(); ++missing_i )
 			{
-				if( temp_Boundary->IsPointInBoundary( *point_i ) )	++counter;
+				possible_values.push_back( dataBoundary->GetConstraint( *missing_i )->GetValues() );
 			}
 
-			allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint ) ] = counter;
-			return counter;
+			int total_count=0;
+
+			vector<vector<double> > possible_datapoints = StatisticsFunctions::Combinatorix( possible_values );
+
+			for( unsigned int i=0; i< possible_datapoints.size(); ++i )
+			{
+				DataPoint* newPoint = new DataPoint( *templateDataPoint );
+				for( unsigned int j=0; j< possible_datapoints[i].size(); ++j )
+				{
+					Observable* this_obs = new Observable( string(missing[j]), possible_datapoints[i][j], 0., "unitless" );
+					//cout << string(missing[i]) << "\t" << possible_datapoints[i][j] << endl;
+					newPoint->AddObservable( string(missing[j]), this_obs );
+					delete this_obs;
+				}
+				//cout << string(missing[j]) << endl;
+				total_count+=this->GetDataNumber( newPoint );
+				delete newPoint;
+			}
+
+			return total_count;
 		}
 	}
 }
@@ -133,11 +181,11 @@ void MemoryDataSet::SortBy( string parameter )
 	cout << "Sorting" << endl;
 	if( allData.size() > 0 )
 	{
-		vector<pair<DataPoint*,pair<string,int> > > allData_sort;
+		vector<pair<DataPoint*,ObservableRef> > allData_sort;
 
 		for( vector<DataPoint*>::iterator data_i = allData.begin(); data_i != allData.end(); ++data_i )
 		{
-			allData_sort.push_back( make_pair( *data_i, make_pair( parameter, -1 ) ) );
+			allData_sort.push_back( make_pair( *data_i, ObservableRef( parameter ) ) );
 		}
 
 		//cout << "hello" << endl;
@@ -147,7 +195,7 @@ void MemoryDataSet::SortBy( string parameter )
 
 		while( !allData.empty() ) allData.pop_back();
 
-		for( vector<pair<DataPoint*,pair<string,int> > >::iterator sort_i = allData_sort.begin(); sort_i != allData_sort.end(); ++sort_i )
+		for( vector<pair<DataPoint*,ObservableRef> >::iterator sort_i = allData_sort.begin(); sort_i != allData_sort.end(); ++sort_i )
 		{
 			allData.push_back( sort_i->first );
 		}

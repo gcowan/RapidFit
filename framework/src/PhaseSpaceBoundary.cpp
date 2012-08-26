@@ -25,7 +25,7 @@
 
 //Constructor with correct arguments
 PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
-	allConstraints(), allNames(), DiscreteCombinationNumber(-1)
+	allConstraints(), allNames(), DiscreteCombinationNumber(-1), uniqueID(0)
 {
 	allConstraints.reserve(NewNames.size());
 	//Populate the map
@@ -43,10 +43,12 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
 			cout << *str_i << endl;
 		}
 	}
+
+	uniqueID = reinterpret_cast<size_t>(this);
 }
 
 PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) :
-	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber)
+	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber), uniqueID(0)
 {
 	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
@@ -66,6 +68,8 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) 
 			allConstraints.push_back(NULL);
 		}
 	}
+
+	uniqueID = reinterpret_cast<size_t>(this)+1;
 }
 
 //Destructor
@@ -105,10 +109,39 @@ vector<string> PhaseSpaceBoundary::GetContinuousNames() const
 	return cont_names;
 }
 
+void PhaseSpaceBoundary::RemoveConstraint( string Name )
+{
+	int lookup = StringProcessing::VectorContains( &allNames, &Name );
+
+	if( lookup != -1 )
+	{
+		vector<string>::iterator name_i = allNames.begin();
+		vector<string>::iterator remove_name;
+		vector<IConstraint*>::iterator const_i = allConstraints.begin();
+		vector<IConstraint*>::iterator remove_const;
+		for( ; name_i != allNames.end(); ++name_i, ++const_i )
+		{
+			if( Name == *name_i )
+			{
+				remove_name = name_i;
+				remove_const = const_i;
+				break;
+			}
+		}
+		allNames.erase( remove_name );
+		if( *remove_const != NULL ) delete *remove_const;
+		allConstraints.erase( remove_const );
+		++uniqueID;
+	}
+}
+
 IConstraint * PhaseSpaceBoundary::GetConstraint( ObservableRef& object ) const
 {
+	if( object.GetExternalID() != uniqueID ) object.SetIndex(-1);
+
 	if( object.GetIndex() < 0 ) {
 		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef()) );
+		object.SetExternalID( uniqueID );
 		if( object.GetIndex() >= 0 ) return allConstraints[ (unsigned) object.GetIndex() ];
 	} else {
 		return allConstraints[ (unsigned) object.GetIndex() ];
@@ -124,9 +157,9 @@ IConstraint * PhaseSpaceBoundary::GetConstraint(string Name) const
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		cerr << "Constraint on " << Name << " not found" << endl;
-		exit(1);
-		//return new ObservableContinuousConstraint( Name, 0.0, 0.0, "NameNotFoundError" );
+		cerr << "Constraint on " << Name << " not found(1)" << endl;
+		throw(3823);
+		return NULL;//new ObservableContinuousConstraint( Name, 0.0, 0.0, "NameNotFoundError" );
 	}
 	else
 	{
@@ -141,9 +174,9 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
-		cerr << "Constraint on " << Name << " not found" << endl;
-		exit(1);
-		//return false;
+		cerr << "Constraint on " << Name << " not found(2)" << endl;
+		throw(81258);
+		return false;
 	}
 	else
 	{
@@ -198,12 +231,12 @@ void PhaseSpaceBoundary::AddConstraint( string Name, IConstraint* NewConstraint,
 }
 
 //Returns whether a point is within the boundary
-bool PhaseSpaceBoundary::IsPointInBoundary( DataPoint * TestDataPoint )
+bool PhaseSpaceBoundary::IsPointInBoundary( DataPoint * TestDataPoint, bool silence )
 {
 	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
 		//Check if test Observable exists in the DataPoint
-		Observable * testObservable = TestDataPoint->GetObservable( allNames[nameIndex] );
+		Observable * testObservable = TestDataPoint->GetObservable( allNames[nameIndex], silence );
 		if ( testObservable->GetUnit() == "NameNotFoundError" )
 		{
 			cerr << "Observable \"" << allNames[nameIndex] << "\" expected but not found" << endl;
@@ -364,7 +397,7 @@ string PhaseSpaceBoundary::XML() const
 	return xml.str();
 }
 
-unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input ) const
+unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool silence ) const
 {
 	int thisIndex = Input->GetDiscreteIndex();
 	if( thisIndex != -1 ) return (unsigned)thisIndex;
@@ -383,8 +416,8 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input ) const
 		bool match = true;
 		for( ; name_i != allDiscreteNames.end(); ++name_i )
 		{
-			double wanted_val = (*comb_i)->GetObservable( *name_i )->GetValue();
-			double this_val = Input->GetObservable( *name_i )->GetValue();
+			double wanted_val = (*comb_i)->GetObservable( *name_i, true )->GetValue();
+			double this_val = Input->GetObservable( *name_i, true )->GetValue();
 			if( fabs( wanted_val - this_val ) > 1E-6 )
 			{
 				match = false;
@@ -440,5 +473,27 @@ int PhaseSpaceBoundary::GetNumberCombinations() const
 	}
 
 	return DiscreteCombinationNumber;
+}
+
+void PhaseSpaceBoundary::CheckPhaseSpace( IPDF* toCheck ) const
+{
+	cout << endl;
+	vector<string> needed = toCheck->GetPrototypeDataPoint();
+
+	for( unsigned int i=0; i< needed.size(); ++i )
+	{
+		int lookup = StringProcessing::VectorContains( &allNames, &(needed[i]) );
+		if( lookup == -1 )
+		{
+			cout << endl;
+			cout << "ERROR: Missing Constraint on: " << needed[i] << endl;
+			cout << endl;
+		}
+		else
+		{
+			cout << "Constraint Found:\t";
+			allConstraints[i]->Print();
+		}
+	}
 }
 

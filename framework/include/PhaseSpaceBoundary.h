@@ -15,11 +15,14 @@
 #include "IConstraint.h"
 #include "DataPoint.h"
 #include "ObservableRef.h"
+#include "IPDF.h"
 //	System Headers
 #include <vector>
 #include <string>
 
 using namespace::std;
+
+class IPDF;
 
 class PhaseSpaceBoundary
 {
@@ -38,7 +41,9 @@ class PhaseSpaceBoundary
 		void AddConstraint( string, IConstraint*, bool overwrite=false );
 		IConstraint * GetConstraint( ObservableRef& ) const;
 		IConstraint * GetConstraint( string ) const;
-		bool IsPointInBoundary( DataPoint* );
+		bool IsPointInBoundary( DataPoint*, bool silence=false );
+
+		void RemoveConstraint( string Name );
 
 		virtual void Print() const;
 
@@ -50,7 +55,9 @@ class PhaseSpaceBoundary
 
 		virtual int GetNumberCombinations() const;
 
-		virtual unsigned int GetDiscreteIndex( DataPoint* Input ) const;
+		virtual unsigned int GetDiscreteIndex( DataPoint* Input, const bool silence=false ) const;
+
+		void CheckPhaseSpace( IPDF* toCheck ) const;
 
 		string XML() const;
 
@@ -59,6 +66,8 @@ class PhaseSpaceBoundary
 		vector< IConstraint* > allConstraints;
 		vector<string> allNames;
 		mutable int DiscreteCombinationNumber;
+
+		mutable size_t uniqueID;
 };
 
 #endif

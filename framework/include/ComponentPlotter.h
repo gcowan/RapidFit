@@ -109,7 +109,7 @@ class ComponentPlotter
 		 *
 		 * @warning This class will make copies of the PDF and config, however it will NOT make copies of the DataSet and file pointer which should always remain valid
 		 */
-		ComponentPlotter( IPDF* InputPDF, IDataSet* InputDataSet, TString PDFStr, TFile* filename, string Name, CompPlotter_config* config=NULL );
+		ComponentPlotter( IPDF* InputPDF, IDataSet* InputDataSet, TString PDFStr, TFile* filename, string Name, CompPlotter_config* config=NULL, int PDF_Num=0 );
 
 		/*!
 		 * @brief Destructor Function
@@ -549,6 +549,9 @@ class ComponentPlotter
 		vector<double> allPullData;	/*!	This will store the value of the total PDF evaluated at each bin, lower edge, center, and upper edge	*/
 
 		DebugClass* debug;
+
+		int PDFNum;
 };
+
 #endif
 

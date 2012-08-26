@@ -55,7 +55,7 @@ class IDataSet
 		 *
 		 * @return Returns the size of the DataSet (this could/should be an unsigned int, but this would require fixing a lot more warnings in RapidFit)
 		 */
-		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL ) const = 0;
+		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL, bool silence=false ) const = 0;
 
 		/*!
 		 * @brief Interface Function:

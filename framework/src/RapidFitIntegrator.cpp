@@ -114,7 +114,17 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 		exit(-69);
 	}
 
-	double PDF_test_result = functionToWrap->Integral( NewDataPoint, NewBoundary );
+	double PDF_test_result = 0.;
+	
+	try
+	{
+		PDF_test_result = functionToWrap->Integral( NewDataPoint, NewBoundary );
+	}
+	catch(...)
+	{
+		cerr << "RapidFitIntegrator: PDF " << functionToWrap->GetLabel() << " has failed the basic test of not crashing, check your PhaseSpace and/or return -1 for Numerical Integration" << endl;
+		throw(1280);
+	}
 
 	//cout << "PDF: " << PDF_test_result << endl;
 
@@ -203,7 +213,16 @@ double RapidFitIntegrator::TestIntegral( DataPoint * NewDataPoint, PhaseSpaceBou
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 
-	double testIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
+	double testIntegral = 0.;
+	try
+	{
+		testIntegral = functionToWrap->Integral( NewDataPoint, NewBoundary );
+	}
+	catch(...)
+	{
+		cerr << "RapidFitIntegrator: PDF " << functionToWrap->GetLabel() << " Failed to Integrate Correctly" << endl;
+		throw(-762);
+	}
 	double numericalIntegral = 0.;
 
 	int NumberCombinations = NewBoundary->GetNumberCombinations();
@@ -254,7 +273,19 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
 	if( debug != NULL ) quickFunction->SetDebug( debug );
 	//Find the observable range to integrate over
-	IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
+	IConstraint * newConstraint = NULL;                           
+	try                                                           
+	{                                                             
+		newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
+	}                                                             
+	catch(...)                                                    
+	{                                                             
+		cerr << "RapidFitIntegrator: Could NOT find required Constraint " << doIntegrate[0] << " in Data PhaseSpaceBoundary" << endl;                                                                          
+		cerr << "RapidFitIntegrator: Please Fix this by Adding the Constraint to your PhaseSpace for PDF: " << functionToWrap->GetLabel() << endl;
+		cerr << endl;                                         
+		exit(-8737);                                          
+	}
+	//IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
 	double minimum = newConstraint->GetMinimum();
 	double maximum = newConstraint->GetMaximum();
 
@@ -303,7 +334,18 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 
 	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 	{
-		IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[observableIndex] );
+		IConstraint * newConstraint = NULL;
+		try
+		{
+			newConstraint = NewBoundary->GetConstraint( doIntegrate[observableIndex] );
+		}
+		catch(...)
+		{
+			cerr << "RapidFitIntegrator: Could NOT find required Constraint " << doIntegrate[observableIndex] << " in Data PhaseSpaceBoundary" << endl;
+			cerr << "RapidFitIntegrator: Please Fix this by Adding the Constraint to your PhaseSpace for PDF: " << functionToWrap->GetLabel() << endl;
+			cerr << endl;
+			exit(-8737);
+		}
 		minima[observableIndex] = (double)newConstraint->GetMinimum();
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}

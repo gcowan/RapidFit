@@ -114,7 +114,7 @@ class FitAssembler
 		 *
 		 * @return Returns a ParamaterSet containing ONLY the parameters wanted by the PDFs during the fit
 		 */
-		static ParameterSet* CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs );
+		static ParameterSet* CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs, DebugClass* =NULL );
 
 
 		/*!
@@ -150,7 +150,7 @@ class FitAssembler
 		 *
 		 * These parameters are expected further up in RapidFit and this should be considered a User error at runtime more than a RapidFit error, performing the check keeps everything in balance
 		 */
-		static void CheckParameterSet( FitResult*, ParameterSet* );
+		static void CheckParameterSet( FitResult*, ParameterSet*, DebugClass* =NULL );
 
 
 		/*!
@@ -162,7 +162,7 @@ class FitAssembler
 		 *
 		 * @return Passes the FitResult up the chain
 		 */
-		static FitResult * DoFit( IMinimiser*, FitFunction* );
+		static FitResult * DoFit( IMinimiser*, FitFunction*, DebugClass* =NULL );
 
 		/*!
 		 * @brief Second DoFit - Used for Constructing a FitFunction for passing to the Minimiser

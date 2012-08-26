@@ -123,6 +123,8 @@ int Perform2DLLScan( RapidFitConfiguration* config );
 
 int PerformJackKnife( RapidFitConfiguration* config );
 
+void SaveXML( RapidFitConfiguration* config );
+
 //	The 'meat' of the Code
 int RapidFit( int argc, char * argv[] )
 {
@@ -132,6 +134,17 @@ int RapidFit( int argc, char * argv[] )
 
 	int command_check = ParseCommandLine::ParseThisCommandLine( *thisConfig, argc, argv );
 
+	if( thisConfig->debug != NULL )
+	{
+		if( thisConfig->debug->DebugThisClass( "main" ) )
+		{
+			cout << endl;
+			cout << "Finished Procesing Command Line" << endl;
+			cout << "main: Debugging Enabled" << endl;
+		}
+	}
+
+
 	if( command_check != 0 )
 	{
 		return command_check;
@@ -139,7 +152,27 @@ int RapidFit( int argc, char * argv[] )
 
 	if( thisConfig->makeTemplateXML ) BuildTemplateXML( thisConfig );
 
+	if( thisConfig->debug != NULL )
+	{
+		if( thisConfig->debug->DebugThisClass( "main" ) )
+		{
+			cout << endl;
+			cout << "About to Configure RapidFit with the given XML and command line options" << endl;
+		}
+	}
+
 	ConfigureRapidFit( thisConfig );
+
+	if( thisConfig->debug != NULL )
+	{
+		if( thisConfig->debug->DebugThisClass( "main" ) )
+		{
+			cout << endl;
+			cout << "RapidFit has been Configured and initial objects in XML/CommandLine have been constructed" << endl;
+		}
+	}
+
+	int main_fitResult=0;
 
 	//	Work out what we want to do, now that everything is configured
 
@@ -192,23 +225,21 @@ int RapidFit( int argc, char * argv[] )
 	}
 
 	//	8)	MC Study
-	else if( thisConfig->MCStudyFlag ) PerformMCStudy( thisConfig );
-
 	//	9)
-	else if( !thisConfig->FC_LL_PART_Flag ) PerformMainFit( thisConfig );
+	else if( !thisConfig->FC_LL_PART_Flag ) main_fitResult = PerformMainFit( thisConfig );
 
 	//	10)
 	//	Do LL scan
-	if( thisConfig->doLLscanFlag ) PerformLLScan( thisConfig );
+	if( main_fitResult>-1 && thisConfig->doLLscanFlag ) PerformLLScan( thisConfig );
 
 	//		This is re-used for FC scans and forms FC Step 2
 	//	11)
 	//Do 2D LL scan
-	if( ( ( thisConfig->doLLcontourFlag || thisConfig->doFC_Flag ) && ( !thisConfig->FC_LL_PART_Flag ) ) && !thisConfig->doLLscanFlag ) Perform2DLLScan( thisConfig );
+	if( main_fitResult>-1 &&( ( ( thisConfig->doLLcontourFlag || thisConfig->doFC_Flag ) && ( !thisConfig->FC_LL_PART_Flag ) ) && !thisConfig->doLLscanFlag ) ) Perform2DLLScan( thisConfig );
 
 	//	12b)
 	//	Do the main work of the FC scan
-	if( thisConfig->doFC_Flag && !thisConfig->doLLscanFlag ) PerformFCStudy( thisConfig );
+	if( main_fitResult>-1 && (thisConfig->doFC_Flag && !thisConfig->doLLscanFlag )) PerformFCStudy( thisConfig );
 
 
 
@@ -376,6 +407,59 @@ int PerformLLScan( RapidFitConfiguration* config )
 	return 0;
 }
 
+void SaveXML( RapidFitConfiguration* config )
+{
+	stringstream full_xml;
+
+	full_xml << "<RapidFit>" << endl;
+	full_xml << endl;
+	if( config->generateToyXML == true )
+	{
+		full_xml << config->GlobalResult->GetResultParameterSet()->ToyXML();
+		for( vector<PDFWithData*>::iterator toFit_i = config->pdfsAndData.begin(); toFit_i != config->pdfsAndData.end(); ++toFit_i )
+		{
+			vector<DataSetConfiguration*> gen_list = (*toFit_i)->GetAllDataSetConfigs();
+			for( vector<DataSetConfiguration*>::iterator gen_i = gen_list.begin(); gen_i != gen_list.end(); ++gen_i )
+			{
+				(*gen_i)->SetSource("Foam");
+			}
+		}
+	}
+	else
+	{
+		full_xml << config->GlobalResult->GetResultParameterSet()->FitXML();
+	}
+	full_xml << endl;
+	full_xml << config->theMinimiser->XML() << endl;
+	full_xml << endl;
+	full_xml << config->theFunction->XML() << endl;
+	full_xml << endl;
+	for( vector<ConstraintFunction*>::iterator const_i = config->XMLConstraints.begin(); const_i != config->XMLConstraints.end(); ++const_i )
+	{
+		full_xml << (*const_i)->XML() << endl;
+		full_xml << endl;
+	}
+	full_xml << endl;
+	for( vector<PDFWithData*>::iterator toFit_i = config->pdfsAndData.begin(); toFit_i != config->pdfsAndData.end(); ++toFit_i )
+	{
+		full_xml << (*toFit_i)->XML() << endl;
+		full_xml << endl;
+	}
+	full_xml << "</RapidFit>" << endl;
+
+	string xml_filename = "outputXMLFile";
+	xml_filename.append( StringProcessing::TimeString() );
+	xml_filename.append( ".xml" );
+	ofstream output_xmlFile;
+	output_xmlFile.open( xml_filename.c_str() );
+
+	output_xmlFile << full_xml.str() ;
+
+	output_xmlFile.close();
+
+	cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
+}
+
 int PerformMainFit( RapidFitConfiguration* config )
 {
 	//	This is for code collapsing and to clearly outline the 'Fit' step of this file
@@ -383,67 +467,43 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	cout << "\n\n\t\tStarting Fit to Find Global Minima!\n"<<endl;
 
+	if( config->debug != NULL )
+	{
+		if( config->debug->DebugThisClass( "main" ) )
+		{
+			cout << "main: Starting Timer" << endl;
+		}
+	}
+
 	//Do the fit to find GLOBAL MINIMA
 	config->GlobalFitResult = new FitResultVector( config->argumentParameterSet->GetAllNames() );
 	config->GlobalFitResult->StartStopwatch();
+
+	if( config->debug != NULL )
+	{
+		if( config->debug->DebugThisClass( "main" ) )
+		{
+			cout << "main: Requesting External Constraints from XML" << endl;
+		}
+	}
 
 	config->XMLConstraints = config->xmlFile->GetConstraints();
 
 	config->GlobalResult = FitAssembler::DoSafeFit( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData, config->XMLConstraints, config->OutputLevel, config->debug );
 
+        if( config->debug != NULL )
+        {       
+                if( config->debug->DebugThisClass( "main" ) )
+                {
+                        cout << "main: Stopping Timer" << endl;
+                }
+        }
+
 	config->GlobalFitResult->AddFitResult( config->GlobalResult );
 
 	if( config->saveFitXML == true || config->generateToyXML == true )
 	{
-		stringstream full_xml;
-
-		full_xml << "<RapidFit>" << endl;
-		full_xml << endl;
-		if( config->generateToyXML == true )
-		{
-			full_xml << config->GlobalResult->GetResultParameterSet()->ToyXML();
-			for( vector<PDFWithData*>::iterator toFit_i = config->pdfsAndData.begin(); toFit_i != config->pdfsAndData.end(); ++toFit_i )
-			{
-				vector<DataSetConfiguration*> gen_list = (*toFit_i)->GetAllDataSetConfigs();
-				for( vector<DataSetConfiguration*>::iterator gen_i = gen_list.begin(); gen_i != gen_list.end(); ++gen_i )
-				{
-					(*gen_i)->SetSource("Foam");
-				}
-			}
-		}
-		else
-		{
-			full_xml << config->GlobalResult->GetResultParameterSet()->FitXML();
-		}
-		full_xml << endl;
-		full_xml << config->theMinimiser->XML() << endl;
-		full_xml << endl;
-		full_xml << config->theFunction->XML() << endl;
-		full_xml << endl;
-		for( vector<ConstraintFunction*>::iterator const_i = config->XMLConstraints.begin(); const_i != config->XMLConstraints.end(); ++const_i )
-		{
-			full_xml << (*const_i)->XML() << endl;
-			full_xml << endl;
-		}
-		full_xml << endl;
-		for( vector<PDFWithData*>::iterator toFit_i = config->pdfsAndData.begin(); toFit_i != config->pdfsAndData.end(); ++toFit_i )
-		{
-			full_xml << (*toFit_i)->XML() << endl;
-			full_xml << endl;
-		}
-		full_xml << "</RapidFit>" << endl;
-
-		string xml_filename = "outputXMLFile";
-		xml_filename.append( StringProcessing::TimeString() );
-		xml_filename.append( ".xml" );
-		ofstream output_xmlFile;
-		output_xmlFile.open( xml_filename.c_str() );
-
-		output_xmlFile << full_xml.str() ;
-
-		output_xmlFile.close();
-
-		cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
+		SaveXML( config );
 	}
 
 	if( config->BuildConstraints )
@@ -592,7 +652,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	cout << "\n\n\t\tFit Output:" <<endl;
 
-	if( config->OutputLevel >= 0 )
+	if( config->Force_Scan_Flag || config->OutputLevel >= 0 )
 	{
 		//Output results
 		config->makeOutput->SetInputResults( config->GlobalResult->GetResultParameterSet() );
@@ -830,7 +890,7 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	TH2D* acc_phith = new TH2D( "acc_tr_phitheta", "acc_tr_phitheta", phibin, -pi, pi, cosThetabin, -1., 1. );
 
 	TH3D * numh = new TH3D("helnum", "helnum", costhetaKbin, -1., 1., costhetaLbin, -1., 1., helphibin, -pi, pi);
-        TH2D* num_kl = new TH2D( "num_hel_thetaKthetaL", "num_hel_thetaKthetaL", costhetaKbin, -1., 1., costhetaLbin, -1., 1. );
+	TH2D* num_kl = new TH2D( "num_hel_thetaKthetaL", "num_hel_thetaKthetaL", costhetaKbin, -1., 1., costhetaLbin, -1., 1. );
 	TH2D* num_kphi = new TH2D( "num_hel_thetaKphi", "num_hel_thetaKphi", costhetaKbin, -1., 1., helphibin, -pi, pi );
 	TH2D* num_lphi = new TH2D( "num_hel_thetaLphi", "num_hel_thetaLphi", costhetaLbin, -1., 1., helphibin, -pi, pi );
 

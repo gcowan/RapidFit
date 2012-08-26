@@ -37,8 +37,9 @@ using namespace::std;
 pthread_mutex_t eval_lock;
 
 //Default constructor
-NegativeLogLikelihoodThreaded::NegativeLogLikelihoodThreaded()
+NegativeLogLikelihoodThreaded::NegativeLogLikelihoodThreaded() : FitFunction()
 {
+	Name="NegativeLogLikelihoodThreaded";
 }
 
 //Destructor
@@ -174,6 +175,8 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 		cout << "hello" << endl;
 		pthread_mutex_unlock( debug_lock );
 		*/
+
+		//cout << value << "\t" << integral << endl;
 
 		if( isnan(value) == true )
 		{

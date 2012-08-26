@@ -1,5 +1,25 @@
 // $Id: release.notes $
 
+2012/07/2x Rob Currie
+   - Added lots more debug info for input just run a fit with/out --Debug to see what some of RapidFit is doing behind the scenes
+   - Added a method in FitAssembler to return artificial FitResult for a completely fixed ParameterSet
+   - Modified ComponentPloter to construct PDF dependent PhaseSpace
+        This required expanding the functionality within MemoryDataSet::GetDataNumber
+        When a DataPoint is passed with a Discrete Combination which is a super-set of the available PhaseSpace (i.e. missing one or more discrete boundary condition values)
+        the correct total for the dataset is totalled and returned.
+        This means it's no longer an extremely cheap operation in terms of CPU but is not called enough times to be a bottleneck
+   - Added new functions to StatisticsFunctions for constructing a vector of vectors, each vector containing the values for one discrete combination.
+        This should be easier to use than the existing functions which return a vector of DataPoints which can require some attention whilst being used.
+   - Added Print() to BasePDF this can easily expanded to make debugging much easier
+   - Expanded XML() for PDFs
+   - Added the ability to externally change the internal PhaseSpace within a NormalisedSumPDF
+   - Added the ability for a PhaseSpace to check itself against a given PDF. Will add a throw mechanism in this when one ever becomes needed
+   - Added a sinusoid PDF. It is a PDF that wiggles with cos/sin and is always +ve with a float-able amplitude. I will add per-time resolution when I can be bothered
+   - Added a template PDF. I got bored copying and gutting a PDF whenever I want a new one so saved the result of gutting a PDF an uploaded it for others to build on
+   - Modified Exponential PDF to use only per-event normalisation as well as using per-event caching of complex normalisation quantities.
+        This gives some speed improvement over the complex case with little slow down to the simple
+   - Fixed Memory leak in PhaseSpaceBoundary that displays during use of the caching code (this leads to speed improvements and a lot less memory during jpsiphi fits)
+
 2012/08/17 Greig Cowan
    - Added Bs2JpsiPhi Hlt acceptance histograms for "unbiased" and "biased" lines.
 

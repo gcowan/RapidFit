@@ -35,6 +35,7 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :  Open_Files(), I
 
 	//Retrieve all combinations of discrete variables
 	allNames = generationBoundary->GetAllNames();
+
 	discreteCombinations = StatisticsFunctions::DiscreteCombinations( &allNames, generationBoundary, discreteNames, continuousNames, discreteValues );
 
 	for( vector<string>::iterator disc_i = discreteNames.begin(); disc_i != discreteNames.end(); ++disc_i )
@@ -66,18 +67,38 @@ void Foam::Init()
 	double rand = rootRandom->Rndm();
 
 	//Make a Foam generator for each combination
-	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
+	for( unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
 	{
 		//Make the data point for the combination
 		DataPoint * init_temporaryDataPoint = new DataPoint(allNames);
-		for (unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); ++discreteIndex )
+		for( unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); ++discreteIndex )
 		{
-			string unit = generationBoundary->GetConstraint( *discreteNames_ref[discreteIndex] )->GetUnit();
+			IConstraint* thisConst=NULL;
+			try
+			{
+				thisConst=generationBoundary->GetConstraint( *discreteNames_ref[discreteIndex] );
+			}
+			catch(...)
+			{
+				cout << endl;
+				exit(52);
+			}
+			string unit = thisConst->GetUnit();
 			init_temporaryDataPoint->SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 0.0, unit );
 		}
 		for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
 		{
-			string unit = generationBoundary->GetConstraint( *continuousNames_ref[continuousIndex] )->GetUnit();
+			IConstraint* thisConst=NULL;
+			try
+			{
+				thisConst=generationBoundary->GetConstraint( *continuousNames_ref[continuousIndex] );
+			}
+			catch(...)
+			{
+				cout << endl;
+				exit(53);
+			}
+			string unit = thisConst->GetUnit();
 			init_temporaryDataPoint->SetObservable( continuousNames[continuousIndex], 0.0, 0.0, unit );
 		}
 
@@ -219,7 +240,7 @@ void Foam::Init()
 		//foamGenerator->RootPlot2dim(filename);
 		//foamGenerator->PrintCells();
 
-			//Store the foam generator
+		//Store the foam generator
 		foamGenerators.push_back( foamGenerator );
 		storedIntegrator.push_back( combinationFunction );
 		storedDatapoint.push_back( init_temporaryDataPoint );
@@ -322,3 +343,4 @@ IDataSet * Foam::GetDataSet() const
 {
 	return newDataSet;
 }
+

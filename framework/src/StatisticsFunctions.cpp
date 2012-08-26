@@ -308,3 +308,58 @@ vector<DataPoint*> StatisticsFunctions::DataAverage( IDataSet * InputData, vecto
 	DataPointWeights = combinationWeights;
 	return newDataPoints;
 }
+
+vector<vector<double> > StatisticsFunctions::Combinatorix( vector<vector<double> > input_values )
+{
+	unsigned int output_size=1;
+	for( unsigned int i=0; i< input_values.size(); ++i )
+	{
+		output_size *= (unsigned)input_values[i].size();
+	}
+
+	//cout << output_size << "\t" << input_values.size() << endl;
+	vector<vector<double> > output( output_size, vector<double>( input_values.size(), 0. ) );
+
+	/*cout << "input:" << endl;
+	for( unsigned int i=0; i<input_values.size(); ++i )
+	{
+		for( unsigned int j=0; j<input_values[i].size(); ++j )
+		{
+			cout << "\t" << input_values[i][j];// << endl;
+		}
+		cout << endl;
+	}*/
+
+	for( unsigned int i=0; i< input_values.size(); ++i )
+	{
+		unsigned int modulo = NumberOfCombinations( input_values, i );
+		unsigned int repeats = output_size/input_values[i].size();
+		//cout << "i: " << i << "\tmodulo: " << modulo << "\trepeats: " << repeats << endl << endl;
+
+		for( unsigned int repeat_num=0; repeat_num < repeats; ++repeat_num )
+		{
+			//cout << input_values[i].size() << endl;
+			for( unsigned int k=0; k< input_values[i].size(); ++k )
+			{
+				//cout << repeat_num*(input_values[i].size()-1)+k << "\t" << i << "\t\t" << repeat_num*(input_values[i].size()-1) << "\t" << k << endl;
+				//output[repeat_num*(input_values[i].size()-1)+k][i] = 0.;
+				output[repeat_num*input_values[i].size()+k][i] = input_values[i][k];
+				//cout << (repeat_num*input_values[i].size()+k) << "\t" << i << "\t" << output[repeat_num*input_values[i].size()+k][i] << endl;
+			}
+		}
+	}
+
+	return output;
+}
+
+unsigned int StatisticsFunctions::NumberOfCombinations( vector<vector<double> > input, unsigned int index )
+{
+	unsigned int output=1;
+	for( unsigned int i=0; i< input.size(); ++i )
+	{
+		//cout << index << "\t" << i << "\tsize: " << input[i].size() << endl;
+		if( i != index ) output *= (unsigned)input[i].size();
+	}
+	return output;
+}
+

@@ -28,7 +28,7 @@ using namespace::std;
 
 //Default constructor
 FitFunction::FitFunction() :
-	allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
+	Name("Unknown"), allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
 	debug(new DebugClass(false) )
 {
@@ -110,29 +110,96 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 	allData = new PhysicsBottle( *NewBottle );
 	if( Fit_File != NULL ) this->SetupTraceTree();
 
-	//Initialise the integrators
-	for ( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); ++resultIndex )
+	if( debug != NULL )
 	{
+		if( debug->DebugThisClass( "FitFunction" ) )
+		{
+			cout << "FitFunction: I am Performing a fit with " << NewBottle->NumberResults() << " seperate NLLs" << endl;
+			cout << "FitFunction: I am using the " << Name << " Fit Function to Evaluate" << endl;
+			cout << "FitFunction: I have been asked to use " << Threads << " parallel threads" << endl;
+		}
+	}
+
+	//Initialise the integrators
+	for( int resultIndex = 0; resultIndex < NewBottle->NumberResults(); ++resultIndex )
+	{
+		//	Update Internal ParameterSet in PDF
 		NewBottle->GetResultPDF(resultIndex)->UpdatePhysicsParameters( allData->GetParameterSet() );
+
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitFunction" ) )
+			{
+				cout << "FitFuntion: Constructing Integrator Object for ToFit " << resultIndex+1 << endl;
+			}
+		}
 
 		RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
 		resultIntegrator->SetDebug( debug );
 		allIntegrators.push_back( resultIntegrator );
 
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitFunction" ) )
+			{
+				if( testIntegrator )
+				{
+					cout << "FitFunction: Performing Integrator test" << endl;
+				}
+				else
+				{
+					cout << "FitFunction: NOT Performing Integrator test" << endl;
+				}
+			}
+		}
+
 		allIntegrators.back()->ForceTestStatus( false );
 		double someval=0.;
 		if( testIntegrator == false ) allIntegrators.back()->ForceTestStatus( true );
-		else someval = allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
-		(void) someval;
+		else
+		{
+			try
+			{
+				someval = allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
+				(void) someval;
+			}
+			catch(...)
+			{
+				cerr << "FitFunction: Failed to Test Integral Correctly aborting" << endl;
+				NewBottle->GetResultDataSet(resultIndex)->GetBoundary()->CheckPhaseSpace( NewBottle->GetResultPDF(resultIndex) );
+				exit(-247);
+			}
+		}
 		allIntegrators.back()->ForceTestStatus( true );
 
 		if( Threads > 0 )
 		{
 			//      Create simple data subsets. We no longer care about the handles that IDataSet takes care of
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass( "FitFunction" ) )
+				{
+					cout << "FitFunction: Splitting DataSet" << endl;
+				}
+			}
 			StoredDataSubSet.push_back( Threading::divideData( NewBottle->GetResultDataSet(resultIndex), Threads ) );
 			for( int i=0; i< Threads; ++i )
 			{
+				if( debug != NULL )
+				{
+					if( debug->DebugThisClass( "FitFunction" ) )
+					{
+						cout << "FitFunction: Cloning PhaseSpaceBoundary" << endl;
+					}
+				}
 				StoredBoundary.push_back( new PhaseSpaceBoundary( *(NewBottle->GetResultDataSet(resultIndex)->GetBoundary()) ) );
+				if( debug != NULL )
+				{
+					if( debug->DebugThisClass( "FitFunction" ) )
+					{
+						cout << "FitFunction: CopyingPdf " << NewBottle->GetResultPDF( resultIndex )->GetLabel() << endl;
+					}
+				}
 				stored_pdfs.push_back( ClassLookUp::CopyPDF( NewBottle->GetResultPDF( resultIndex ) ) );
 				stored_pdfs.back()->SetDebug( debug );
 				StoredIntegrals.push_back( new RapidFitIntegrator( stored_pdfs.back() ) );
@@ -195,7 +262,14 @@ double FitFunction::Evaluate()
 			continue;
 		}
 		allIntegrators[unsigned(resultIndex)]->SetPDF( allData->GetResultPDF( resultIndex ) );
-		temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)], resultIndex );
+		if( allData->GetResultDataSet( resultIndex )->GetDataNumber() < 1 )
+		{
+			temp = 0.;
+		}
+		else
+		{
+			temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)], resultIndex );
+		}
 		if( temp >= DBL_MAX )
 		{
 			minimiseValue=DBL_MAX;

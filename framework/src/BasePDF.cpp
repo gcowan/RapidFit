@@ -482,8 +482,10 @@ void BasePDF::SetLabel( string input )
 string BasePDF::XML() const
 {
 	stringstream xml;
-	xml << "<PDF>";
-	xml << this->GetName();
+	xml << "<PDF>" << endl;
+	xml << "\t<Name>" << this->GetName() << "</Name>" << endl;
+	string config = thisConfig->XML();
+	if( !config.empty() ) xml << config << endl;
 	xml << "</PDF>" << endl;
 	return xml.str();
 }
@@ -550,4 +552,8 @@ string BasePDF::GetComponentName( ComponentRef* input )
 	}
 }
 
+void BasePDF::Print() const
+{
+	cout << "This PDF is: " << this->GetLabel() << endl;
+}
 

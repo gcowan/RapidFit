@@ -531,6 +531,7 @@ void ResultFormatter::LatexMinimumFitResultTable( FitResult * OutputData, string
 //Display the covariance matrix of a fit in a LaTeX table using cout
 void ResultFormatter::LatexCovMatrix( FitResult * OutputData, stringstream& latex )
 {
+	if( OutputData->GetCovarianceMatrix() == NULL ) return;
 	TMatrixDSym* covarianceMatrix = OutputData->GetCovarianceMatrix()->thisMatrix;
 	if( covarianceMatrix == NULL )
 	{

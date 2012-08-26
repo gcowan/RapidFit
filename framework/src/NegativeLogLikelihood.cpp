@@ -16,8 +16,9 @@
 #include <iostream>
 
 //Default constructor
-NegativeLogLikelihood::NegativeLogLikelihood()
+NegativeLogLikelihood::NegativeLogLikelihood() : FitFunction()
 {
+	Name="NegativeLogLikelihood";
 }
 
 //Destructor

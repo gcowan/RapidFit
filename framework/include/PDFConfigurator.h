@@ -21,6 +21,8 @@
 
 using namespace::std;
 
+class IDataSet;
+
 class PDFConfigurator
 {
 	public:

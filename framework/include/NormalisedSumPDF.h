@@ -73,6 +73,7 @@ class NormalisedSumPDF : public BasePDF
 
 		virtual string GetComponentName( ComponentRef* = NULL );
 
+		void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary );
 	private:
 		//	Uncopyable!
 		NormalisedSumPDF& operator=(const NormalisedSumPDF&);

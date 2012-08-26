@@ -308,10 +308,19 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			cout << "Projecting ToFit: " << resultIndex+1 << endl << endl;
 			TString PDFStr = "PDF_";PDFStr+=resultIndex;
 
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass( "OutputConfiguration" ) )
+				{
+					cout << "OutputConfiguration: Constructing ComponentPlotter: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
+				}
+			}
+
 			//	ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
 			ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex),
 
-					PDFStr, output_file, thisObservable, (*projection_i) );
+					PDFStr, output_file, thisObservable, (*projection_i), resultIndex );
+
 
 			thisPlotter->SetDebug( debug );
 
@@ -319,10 +328,20 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 			allComponentPlotters.push_back( thisPlotter );
 
+			if( debug != NULL )
+                        {
+                                if( debug->DebugThisClass( "OutputConfiguration" ) )
+                                {
+                                        cout << "OutputConfiguration: Requesting Projection: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
+                                }
+                        }
+
 			//	In ComponentPlotter this still does all of the work, but each ComponentPlotter object is created for each observable to allow you to do more easily
 			thisPlotter->ProjectObservable();
 
-			chi2_results.push_back( thisPlotter->GetChi2Numbers() );
+			cout << "Projected" << endl;
+
+			if( (*projection_i)->CalcChi2 ) chi2_results.push_back( thisPlotter->GetChi2Numbers() );
 
 			pullFunctionEvals.push_back( thisPlotter->GetFunctionEval() );
 

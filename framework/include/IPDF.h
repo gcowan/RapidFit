@@ -43,6 +43,7 @@
 using namespace::std;
 
 class IPDF;
+class PDFConfigurator;
 
 /*!
  * @brief typedef for the class-factory objects which actually create the new class instances in memory
@@ -317,6 +318,8 @@ class IPDF
 		virtual void SetDebugMutex( pthread_mutex_t* Input, bool =true ) = 0;
 
 		virtual void SetDebug( DebugClass* input_debug ) = 0;
+
+		virtual void Print() const = 0;
 	protected:
 
 		virtual bool SetPhysicsParameters( ParameterSet* Input ) = 0;

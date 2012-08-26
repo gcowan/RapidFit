@@ -113,6 +113,13 @@ void NormalisedSumPDF::TurnCachingOff()
 	secondPDF->TurnCachingOff();
 }
 
+void NormalisedSumPDF::ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary )
+{
+	if( integrationBoundary != NULL ) delete integrationBoundary;
+	integrationBoundary = new PhaseSpaceBoundary( *InputBoundary );
+	this->MakePrototypes( InputBoundary );
+}
+
 //Assemble the vectors of parameter/observable names needed
 void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 {
@@ -120,7 +127,8 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 	prototypeParameterSet = StringProcessing::CombineUniques( firstPDF->GetPrototypeParameterSet(), secondPDF->GetPrototypeParameterSet() );
 
 	//Add in the fraction Parameter as required
-	prototypeParameterSet.push_back( fractionName );
+	string fractionStr = fractionName;
+	if( StringProcessing::VectorContains( &prototypeParameterSet, &fractionStr ) == -1 ) prototypeParameterSet.push_back( fractionName );
 
 	//Make the prototype data point
 	vector<string> firstObservables = firstPDF->GetPrototypeDataPoint();
@@ -268,7 +276,7 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	if( isnan(termOne) || isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
-			cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 		PDF_THREAD_UNLOCK
 	}
