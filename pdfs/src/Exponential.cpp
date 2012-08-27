@@ -236,7 +236,8 @@ double Exponential::buildPDFnumerator()
 
 double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
 {
-	if( _dataPoint == NULL ) return -1.;
+	return -1.;
+	//if( _dataPoint == NULL ) return -1.;
 	/*
 	double norm = 0.;
 	if( useEventResolution() )

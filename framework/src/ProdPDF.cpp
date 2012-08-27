@@ -154,7 +154,7 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 	if( isnan(termOne) || isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
-			cout << this->GetLabel() << endl;
+		cout << this->GetLabel() << endl;
 		cout << termOne << "\tx\t" << termTwo << endl;
 		PDF_THREAD_UNLOCK
 	}
