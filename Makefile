@@ -84,13 +84,15 @@ OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJD
 ##Dependencies
 
 LINKER=ld
-LINKFLAGS=-lpthread
+LINKFLAGS=-Wl,--rpath,$(LD_LIBRARY_PATH) -lpthread
 
 LIBS=-lstdc++
 
 CXXFLAGSUTIL = $(CXXFLAGS_BASE) -I$(INCUTILS) $(ROOTCFLAGS) -Iframework/include
 CXXFLAGS     = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) $(ROOTCFLAGS)
 CXXFLAGS_LIB = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) $(ROOTCFLAGS)
+
+LIBLINKFLAGS = -pie -m64
 
 # Linux
 ifeq "$(UNAME)" "Linux"
@@ -247,5 +249,5 @@ $(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp
 
 #	Finally, Compile RapidFit as a library making use of the existing binaries for other classes
 $(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS) $(PDFOBJS) $(DALITZOBJS) $(OBJDIR)/ClassLookUp.o
-	$(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS) $(ROOTLIBS) $(EXTRA_ROOTLIBS)
+	$(CXX) $(LIBLINKFLAGS) $(LINKFLAGS) -o $@ $^ $(LIBS) $(ROOTLIBS) $(EXTRA_ROOTLIBS)
 

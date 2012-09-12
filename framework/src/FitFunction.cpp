@@ -30,7 +30,7 @@ using namespace::std;
 FitFunction::FitFunction() :
 	Name("Unknown"), allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
-	debug(new DebugClass(false) )
+	debug(new DebugClass(false) ), traceNum(0)
 {
 }
 
@@ -268,7 +268,9 @@ double FitFunction::Evaluate()
 		}
 		else
 		{
+			//cout << "Eval Set: " << allData->GetResultDataSet( resultIndex ) << "\t" << resultIndex << endl;
 			temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)], resultIndex );
+			//cout << "Result: " << temp << endl;
 		}
 		if( temp >= DBL_MAX )
 		{
@@ -312,7 +314,8 @@ double FitFunction::Evaluate()
 	{
 		minimiseValue = DBL_MAX;
 	}
-	//cout << endl;
+
+	//cout << endl; exit(2572);
 	return minimiseValue;
 }
 

@@ -315,13 +315,41 @@ double BasePDF::Evaluate(DataPoint * NewDataPoint)
 //Return the function value at the given point for generation
 double BasePDF::EvaluateForNumericGeneration( DataPoint* NewDataPoint )
 {
-	return this->Evaluate( NewDataPoint );
+	double returnable=0.;
+	try
+	{
+		returnable = this->Evaluate( NewDataPoint );
+	}
+	catch(...)
+	{
+		PDF_THREAD_LOCK
+		cerr << "BasePDF: Failed to Correctly Generate a Sensible Value here:" << endl;
+		NewDataPoint->Print();
+		cerr << "BasePDF: Returning 0.!!!" << endl;
+		PDF_THREAD_UNLOCK
+		return 0.;
+	}
+	return returnable;
 }
 
 //Calculate the function value for numerical integration
 double BasePDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 {
-	return this->Evaluate( NewDataPoint );
+	double returnable=0.;
+	try 
+	{ 
+		returnable = this->Evaluate( NewDataPoint );
+	}
+	catch(...)
+	{
+		PDF_THREAD_LOCK
+		cerr << "BasePDF: Failed to Correctly Integrate a Sensible Value here:" << endl;
+		NewDataPoint->Print();
+		cerr << "BasePDF: Returning 0.!!!" << endl;
+		PDF_THREAD_UNLOCK
+		return 0.;
+	}
+	return returnable;
 }
 
 double BasePDF::EvaluateTimeOnly( DataPoint* )

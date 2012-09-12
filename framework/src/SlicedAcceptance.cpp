@@ -13,7 +13,7 @@
 //............................................
 // Constructor for flat acceptance
 SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
-  slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(0)
+  slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0)
 {
 	
 	//Reality checks
@@ -30,7 +30,17 @@ SlicedAcceptance::SlicedAcceptance( const SlicedAcceptance& input ) : slices(), 
 {
 	for( unsigned int i=0; i< input.slices.size(); ++i )
 	{
-		slices.push_back( new AcceptanceSlice( *(input.slices[i]) ) );
+		if( (input.slices[i]) != NULL ) slices.push_back( new AcceptanceSlice( *(input.slices[i]) ) );
+	}
+}
+
+SlicedAcceptance::~SlicedAcceptance()
+{
+	if( nullSlice != NULL ) delete nullSlice;
+	while( !slices.empty() )
+	{
+		if( slices.back() != NULL ) delete slices.back();
+		slices.pop_back();
 	}
 }
 
@@ -71,7 +81,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 //............................................
 // Constructor for simple 2010 version of lower time acceptance only
 SlicedAcceptance::SlicedAcceptance( string s ) :
-slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
+slices(), nullSlice( NULL ), tlow(), thigh(), beta()
 {
 	(void)s;	
 	int N = 31;
@@ -101,7 +111,7 @@ slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 //............................................
 // Constructor for accpetance from a file
 SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
-slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
+slices(), nullSlice(NULL), tlow(), thigh(), beta()
 {
 	(void)type;	
 	

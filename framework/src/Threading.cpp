@@ -93,7 +93,8 @@ vector<vector<DataPoint*> > Threading::divideData( IDataSet* input, int subsets 
 {
 	vector<vector<DataPoint*> > output_datasets;
 	if( subsets <= 0 ) subsets = 1;
-	int subset_size = ( input->GetDataNumber() / subsets );
+
+	int subset_size = int( (double)input->GetDataNumber() / (double)subsets );
 
 	for( int setnum = 0; setnum < subsets; ++setnum )
 	{
@@ -106,7 +107,7 @@ vector<vector<DataPoint*> > Threading::divideData( IDataSet* input, int subsets 
 	}
 
 	//	The theory goes that the subset_size >> subsets and hence lumping this all onto one subset is negligible in the effect on runtime and _MUCH_ easier to code
-	if( (subsets+1)*subset_size != input->GetDataNumber() )
+	if( subsets*subset_size != input->GetDataNumber() )
 	{
 		for( int i= subsets*subset_size; i< input->GetDataNumber() ; ++i )
 		{

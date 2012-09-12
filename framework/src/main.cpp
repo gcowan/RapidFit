@@ -1112,7 +1112,7 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 	{
 		config->xmlFile = new XMLConfigReader( config->configFileName, config->XMLOverrideList );
 		config->xmlFile->SetDebug( config->debug );
-		cout << "XML config file " << config->configFileName << " loaded" << endl;
+		cout << endl << "XML config file: " << config->configFileName << " loaded" << endl << endl;
 	}
 
 	if( config->WeightDataSet == true )	{	config->calcConfig = config->xmlFile->GetPrecalculatorConfig();		}

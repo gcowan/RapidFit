@@ -44,9 +44,13 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName), integrationBoundary(new PhaseSpaceBoundary(*InputBoundary) )
 {
 	this->SetName("NormalisedSum");
-	cout << "Constructing NormalisedSum"<< endl;
-	cout << "FractionName:\t" << FractionName << endl;
 	this->SetLabel( "NormalisedSum_("+firstPDF->GetLabel()+")+("+secondPDF->GetLabel()+")" );
+
+        cout << endl;
+        cout << "Constructing NormalisedSum "<< this->GetLabel() << endl;
+        cout << "FractionName:\t" << FractionName << endl;
+	cout << endl;
+
 	firstIntegrator->SetPDF( firstPDF );
 	secondIntegrator->SetPDF( secondPDF );
 	//firstPDF->AssociateIntegrator( firstIntegrator );
@@ -237,19 +241,25 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 	double termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / firstIntegral;
 	double termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
 
-	if( isnan(termOne) || isnan(termTwo) )
+	//cout << firstIntegral << " , " << secondIntegral << endl;
+	//cout << termOne << " + " << termTwo << endl;
+
+	double sum=termOne + termTwo;
+
+	if( isnan(sum) ||  sum <= 0. )
 	{
 		PDF_THREAD_LOCK
 
-			cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-			throw(-653102);
+		throw(-653102);
 	}
+
 	//Return the sum
-	return termOne + termTwo;
+	return sum;
 }
 
 double NormalisedSumPDF::GetFirstIntegral( DataPoint* NewDataPoint )

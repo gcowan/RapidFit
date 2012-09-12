@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 // #include "TF1.h"
 
 #define DEBUGFLAG true
@@ -21,10 +22,102 @@ using namespace::std;
 
 PDF_CREATOR( Bs2JpsiPhi_Signal_v5 );
 
+
+Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) : BasePDF( (BasePDF&) input )
+        , gammaName(input.gammaName), deltaGammaName(input.deltaGammaName), deltaMName(input.deltaMName), Phi_sName(input.Phi_sName), Azero_sqName(input.Azero_sqName)
+
+	, Apara_sqName(input.Apara_sqName), Aperp_sqName(input.Aperp_sqName), delta_zeroName(input.delta_zeroName), delta_paraName(input.delta_paraName)
+
+        , delta_perpName(input.delta_perpName), As_sqName(input.As_sqName), delta_sName(input.delta_sName), CspName(input.CspName), cosdparName(input.cosdparName)
+
+	, cosphisName(input.cosphisName), sinphisName(input.sinphisName), lambdaName(input.lambdaName), mistagName(input.mistagName)
+
+        , mistagP1Name(input.mistagP1Name), mistagP0Name(input.mistagP0Name), mistagSetPointName(input.mistagSetPointName), mistagDeltaP1Name(input.mistagDeltaP1Name)
+
+	, mistagDeltaP0Name(input.mistagDeltaP0Name), mistagDeltaSetPointName(input.mistagDeltaSetPointName), resScaleName(input.resScaleName)
+
+        , eventResolutionName(input.eventResolutionName), res1Name(input.res1Name), res2Name(input.res2Name), res3Name(input.res3Name)
+
+	, res2FractionName(input.res2FractionName), res3FractionName(input.res3FractionName), timeOffsetName(input.timeOffsetName), angAccI1Name(input.angAccI1Name)
+
+        , angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name), angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name)
+
+	, angAccI7Name(input.angAccI7Name), angAccI8Name(input.angAccI8Name), angAccI9Name(input.angAccI9Name), angAccI10Name(input.angAccI10Name)
+
+        , timeName(input.timeName), cosThetaName(input.cosThetaName), cosPsiName(input.cosPsiName), phiName(input.phiName)
+
+	, cthetakName(input.cthetakName), cthetalName(input.cthetalName), phihName(input.phihName), tagName(input.tagName)
+
+	, _useEventResolution(input._useEventResolution), _useTimeAcceptance(input._useTimeAcceptance), _useHelicityBasis(input._useHelicityBasis)
+
+	, _numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly)
+
+        , _useCosAndSin(input._useCosAndSin), _useCosDpar(input._useCosDpar), _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
+
+	, allowNegativeAsSq(input.allowNegativeAsSq), _usePlotComponents(input._usePlotComponents), t(input.t), ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr)
+
+	, ctheta_1(input.ctheta_1), ctheta_k(input.ctheta_k), phi_h(input.phi_h), ctheta_l(input.ctheta_l), tag(input.tag), _gamma(input._gamma), dgam(input.dgam)
+
+	, Aperp_sq(input.Aperp_sq), Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq), As_sq(input.As_sq), delta_para(input.delta_para)
+
+	, delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2), delta_ms(input.delta_ms)
+
+	, phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag), _mistagP1(input._mistagP1), _mistagP0(input._mistagP0)
+
+	, _mistagSetPoint(input._mistagSetPoint), resolutionScale(input.resolutionScale), resolution1(input.resolution1), resolution2(input.resolution2)
+
+	, resolution3(input.resolution3), resolution2Fraction(input.resolution2Fraction), resolution3Fraction(input.resolution3Fraction), timeOffset(input.timeOffset)
+
+	, angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4), angAccI5(input.angAccI5), angAccI6(input.angAccI6)
+
+	, angAccI7(input.angAccI7), angAccI8(input.angAccI8), angAccI9(input.angAccI9), angAccI10(input.angAccI10), tlo(input.tlo), thi(input.thi), expL_stored(input.expL_stored)
+
+	, expH_stored(input.expH_stored), expSin_stored(input.expSin_stored), expCos_stored(input.expCos_stored), intExpL_stored(input.intExpL_stored)
+
+	, intExpH_stored(input.intExpH_stored), intExpSin_stored(input.intExpSin_stored), intExpCos_stored(input.intExpCos_stored), timeAcc(NULL), angAcc(NULL)
+
+	, normalisationCacheValid(input.normalisationCacheValid), CachedA1(input.CachedA1), CachedA2(input.CachedA2), CachedA3(input.CachedA3), CachedA4(input.CachedA4)
+
+	, CachedA5(input.CachedA5), CachedA6(input.CachedA6), CachedA7(input.CachedA7), CachedA8(input.CachedA8), CachedA9(input.CachedA9), CachedA10(input.CachedA10)
+
+	, resolution(input.resolution), eventResolution(input.eventResolution), timeIntegralCacheValid(input.timeIntegralCacheValid), storeExpL(input.storeExpL), storeExpH(input.storeExpH)
+
+	, storeExpSin(input.storeExpSin), storeExpCos(input.storeExpCos), normalisationCacheUntagged(input.normalisationCacheUntagged)
+
+	, _expLObs(input._expLObs), _expHObs(input._expHObs), _expSinObs(input._expSinObs), _expCosObs(input._expCosObs), _intexpLObs(input._intexpLObs), _intexpHObs(input._intexpHObs)
+
+	, _intexpSinObs(input._intexpSinObs), _intexpCosObs(input._intexpCosObs), _intexpLObs_vec(input._intexpLObs_vec), _intexpHObs_vec(input._intexpHObs_vec)
+	
+	, _intexpSinObs_vec(input._intexpSinObs_vec), _intexpCosObs_vec(input._intexpCosObs_vec), timeBinNum(input.timeBinNum), _datapoint(NULL), componentIndex(input.componentIndex)
+
+	, angularTermDependencies(input.angularTermDependencies), A0A0_Obs(input.A0A0_Obs), APAP_Obs(input.APAP_Obs), ATAT_Obs(input.ATAT_Obs), ASAS_Obs(input.ASAS_Obs)
+
+	, ImAPAT_Obs(input.ImAPAT_Obs), ReA0AP_Obs(input.ReA0AP_Obs), ImA0AT_Obs(input.ImA0AT_Obs), ReASAP_Obs(input.ReASAP_Obs), ImASAT_Obs(input.ImASAT_Obs), ReASA0_Obs(input.ReASA0_Obs)
+
+	, A0A0_value(input.A0A0_value), APAP_value(input.APAP_value), ATAT_value(input.ATAT_value), ASAS_value(input.ASAS_value), ImAPAT_value(input.ImAPAT_value)
+
+	, ReA0AP_value(input.ReA0AP_value), ImA0AT_value(input.ImA0AT_value), ReASAP_value(input.ReASAP_value), ImASAT_value(input.ImASAT_value), ReASA0_value(input.ReASA0_value)
+
+	, Csp(input.Csp), cosdpar(input.cosdpar), lambda(input.lambda), _CC(input._CC), _DD(input._DD), _SS(input._SS), _mistagDeltaP1(input._mistagDeltaP1)
+
+	, _mistagDeltaP0(input._mistagDeltaP0), _mistagDeltaSetPoint(input._mistagDeltaSetPoint), _angAccIgnoreNumerator(input._angAccIgnoreNumerator), sin_delta_perp_s(input.sin_delta_perp_s)
+
+	, cos_delta_perp_s(input.cos_delta_perp_s), sin_delta_zero_s(input.sin_delta_zero_s), cos_delta_zero_s(input.cos_delta_zero_s), sin_delta_para_s(input.sin_delta_para_s)
+
+	, cos_delta_para_s(input.cos_delta_para_s), sin_delta1(input.sin_delta1), cos_delta1(input.cos_delta1), sin_delta2(input.sin_delta2), cos_delta2(input.cos_delta2)
+
+	, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1), stored_AT(input.stored_AT), stored_AP(input.stored_AP), stored_A0(input.stored_A0)
+
+	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah)
+{
+	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
+	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
+}
+
 //......................................
 //Constructor(s)
 //New one with configurator
-Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) :
+Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : BasePDF(),
 	// Physics parameters
 	gammaName				( configurator->getName("gamma") )
 	, deltaGammaName		( configurator->getName("deltaGamma") )
@@ -105,7 +198,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) :
 {
 	componentIndex = 0;
 
-	std::cout << "Constructing PDF: Bs2JpsiPhi_Signal_v5 " << std::endl ;
+	std::cout << "Constructing PDF: Bs2JpsiPhi_Signal_v5 " << endl;
 
 	//...........................................
 	// Configure  options
@@ -128,16 +221,16 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) :
 	if( angAccFile == "" ) cout << "Bs2JpsiPhi_Signal_v5:: Using flat angular acceptance " << endl ;
 	else cout << "Bs2JpsiPhi_Signal_v5:: Constructing angAcc using file: " << angAccFile << endl ;
 	angAcc = new AngularAcceptance( angAccFile, _useHelicityBasis ) ;
-	angAccI1 = angAcc->af1() ;  cout << "  af1 = " << angAccI1 << endl ;
-	angAccI2 = angAcc->af2() ;	cout << "  af2 = " << angAccI2 << endl ;
-	angAccI3 = angAcc->af3() ;	cout << "  af3 = " << angAccI3 << endl ;
-	angAccI4 = angAcc->af4() ;	cout << "  af4 = " << angAccI4 << endl ;
-	angAccI5 = angAcc->af5() ;	cout << "  af5 = " << angAccI5 << endl ;
-	angAccI6 = angAcc->af6() ;	cout << "  af6 = " << angAccI6 << endl ;
-	angAccI7 = angAcc->af7() ;	cout << "  af7 = " << angAccI7 << endl ;
-	angAccI8 = angAcc->af8() ;	cout << "  af8 = " << angAccI8 << endl ;
-	angAccI9 = angAcc->af9() ;	cout << "  af9 = " << angAccI9 << endl ;
-	angAccI10 = angAcc->af10();	cout << "  af10 = " << angAccI10 << endl ;
+	angAccI1 = angAcc->af1() ;      cout << "  af1 = " << setprecision(6) << setw(15) << angAccI1 << setw(10) << " ";
+	angAccI2 = angAcc->af2() ;	cout << "  af2 = " << setprecision(6) << setw(15) << angAccI2 << setw(10) << " ";
+	angAccI3 = angAcc->af3() ;	cout << "  af3 = " << setprecision(6) << setw(15) << angAccI3 << endl ;
+	angAccI4 = angAcc->af4() ;	cout << "  af4 = " << setprecision(6) << setw(15) << angAccI4 << setw(10) << " ";
+	angAccI5 = angAcc->af5() ;	cout << "  af5 = " << setprecision(6) << setw(15) << angAccI5 << setw(10) << " ";
+	angAccI6 = angAcc->af6() ;	cout << "  af6 = " << setprecision(6) << setw(15) << angAccI6 << endl ;
+	angAccI7 = angAcc->af7() ;	cout << "  af7 = " << setprecision(6) << setw(15) << angAccI7 << setw(10) << " ";
+	angAccI8 = angAcc->af8() ;	cout << "  af8 = " << setprecision(6) << setw(15) << angAccI8 << setw(10) << " ";
+	angAccI9 = angAcc->af9() ;	cout << "  af9 = " << setprecision(6) << setw(15) << angAccI9 << setw(10) << " ";
+	angAccI10 = angAcc->af10();	cout << "  af10 = " << setprecision(6) << setw(15) << angAccI10 << endl ;
 	if( _angAccIgnoreNumerator ) cout << "Bs2JpsiPhi_Signal_v5:: Ignoring angular acceptance numerator " << endl ;
 
 	//...........................................
@@ -357,7 +450,7 @@ vector<string> Bs2JpsiPhi_Signal_v5::GetDoNotIntegrateList()
 //........................................................
 //Set the physics parameters into member variables
 
-bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet )
 {
 	normalisationCacheValid = false;  //This is only used for the untagged events and only if not useing event resolution
 	timeIntegralCacheValid = false;   //This cannot be used if event resolution is used
@@ -429,6 +522,34 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet * NewParameterSet 
 
 	// New: Prepare the coefficients of all of the time dependent terms (C,D,S etc)
 	this->prepareCDS() ;
+
+	stored_AT = Aperp_sq > 0. ? sqrt(Aperp_sq) : 0.;
+	stored_A0 = Azero_sq > 0. ? sqrt(Azero_sq) : 0.;
+	stored_AP = Apara_sq > 0. ? sqrt(Apara_sq) : 0.;
+	stored_AS = As_sq > 0. ? sqrt(As_sq) : 0.;
+	stored_ASint = stored_AS * Csp;
+
+	stored_gammal = (gamma() + ( dgam *0.5 )) > 0. ? (gamma() + ( dgam *0.5 )) : 0.;
+	stored_gammah = (gamma() - ( dgam *0.5 )) > 0. ? (gamma() - ( dgam *0.5 )) : 0.;
+
+	double delta_perp_s = delta_perp - delta_s;
+	double delta_para_s = delta_para - delta_s;
+	double delta_zero_s = delta_zero - delta_s;
+	sin_delta_perp_s = sin(delta_perp_s);
+	cos_delta_perp_s = cos(delta_perp_s);
+	sin_delta_zero_s = sin(delta_zero_s);
+	cos_delta_zero_s = cos(delta_zero_s);
+	sin_delta_para_s = sin(delta_para_s);
+	cos_delta_para_s = cos(delta_para_s);
+
+	sin_delta1 = sin(delta1);
+	cos_delta1 = cos(delta1);
+	sin_delta2 = sin(delta2);
+	cos_delta2 = cos(delta2);
+	double delta_2_1 = delta2 - delta1;
+	sin_delta_2_1 = sin(delta_2_1);
+	cos_delta_2_1 = cos(delta_2_1);
+
 	return result;
 }
 
@@ -589,8 +710,9 @@ double Bs2JpsiPhi_Signal_v5::Evaluate(DataPoint * measurement)
 	}
 
 
-	if( _angAccIgnoreNumerator ) return returnValue ;
-	else return returnValue  * angAcceptanceFactor ;
+	if( ! _angAccIgnoreNumerator ) returnValue*=angAcceptanceFactor;
+
+	return returnValue;
 }
 
 
@@ -769,7 +891,6 @@ double Bs2JpsiPhi_Signal_v5::Normalisation(DataPoint * measurement, PhaseSpaceBo
 		if( returnValue <= 0. ) throw 10 ;
 	}
 
-
 	return returnValue ;
 }
 
@@ -836,10 +957,10 @@ vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 {
 	vector<string> this_component_list;
 	if( _usePlotComponents ) {
-	  this_component_list.push_back( "CP-Even" );
-	  this_component_list.push_back( "CP-Odd" );
-	  this_component_list.push_back( "As" );
-	  this_component_list.push_back( "0" );
+		this_component_list.push_back( "CP-Even" );
+		this_component_list.push_back( "CP-Odd" );
+		this_component_list.push_back( "As" );
+		this_component_list.push_back( "0" );
 	}
 	return this_component_list;
 }

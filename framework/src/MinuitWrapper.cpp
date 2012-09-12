@@ -253,6 +253,16 @@ void MinuitWrapper::Minimise()
 	//arguments[0] = maxSteps;
 	//minuit->mnexcm("IMPROVE", arguments, 2, errorFlag);
 
+        //Get the fit status
+        double minimumValue = 0.0;
+        double fedm = 0.0;
+        double errdef = 0.0;
+        int variableParameters = 0;
+        int parameterNumber = 0;
+        int fitStatus = 0;
+        minuit->mnstat( minimumValue, fedm, errdef, variableParameters, parameterNumber, fitStatus );
+
+	cout << "\nFinal NLL: " << minimumValue << "\t\tStatus: " << fitStatus << endl << endl;
 
 	string NoHesse("NoHesse");
 	if( StringProcessing::VectorContains( &Options, &NoHesse ) == -1 )
@@ -276,13 +286,7 @@ void MinuitWrapper::Minimise()
 	time(&timeNow);
 	cout << "Minuit finished: " << ctime( &timeNow ) << endl;
 
-	//Get the fit status
-	double minimumValue = 0.0;
-	double fedm = 0.0;
-	double errdef = 0.0;
-	int variableParameters = 0;
-	int parameterNumber = 0;
-	int fitStatus = 0;
+	//Get the final fit status
 	minuit->mnstat( minimumValue, fedm, errdef, variableParameters, parameterNumber, fitStatus );
 
 	ResultParameterSet * fittedParameters = this->GetResultParameters( allNames, newParameters );

@@ -26,6 +26,7 @@ Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg(PDFConfigurator* configurator) :
         , recoMassName  (configurator->getName( "mass" ))
 	, constraint_recoMassName( "mass" )
 {
+	cout << "Constructing Bs2JpsiPhiMassBkg" << endl;
 	MakePrototypes();
 }
 

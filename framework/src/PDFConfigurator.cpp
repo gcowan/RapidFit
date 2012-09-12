@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 using namespace::std;
 
@@ -93,7 +94,8 @@ void PDFConfigurator::addParameterSubstitution( string substitution ) {
 
 	// Find position of ":" character
 	size_t pos = substitution.find_first_of(":") ;
-	if( pos == string::npos ) {
+	if( pos == string::npos )
+	{
 		cout << "  In PDFConfigurator::addParameterSubstitution : No separator found  in string : " << substitution << endl ;
 		exit(1);
 	}
@@ -101,20 +103,23 @@ void PDFConfigurator::addParameterSubstitution( string substitution ) {
 	// Break into 2 strings
 	string defaultName     =  substitution.substr( 0, pos ) ;
 	string replacementName =  substitution.substr( pos+1, string::npos ) ;
-	//cout << " In PDFConfigurator::addParameterSubstitution : storing substitution [" << defaultName << "--->" << replacementName << "]" << endl ;
-	defaultNames.push_back( defaultName ) ;
-	replacementNames.push_back( replacementName ) ;
+	//cout << " Sub[" << defaultName << "->" << replacementName << "]" << endl;//setw(3) << " ";
+	defaultNames.push_back( defaultName );
+	replacementNames.push_back( replacementName );
 
 	return ;
 }
 
 // Method to return a substitute name against an input default name.
 // If no substitution then the input name is returned unchanged
-string PDFConfigurator::getName( string defaultName ) {
-	for( unsigned int ii=0; ii<defaultNames.size() ; ii++ ) {
+string PDFConfigurator::getName( string defaultName )
+{
+	for( unsigned int ii=0; ii<defaultNames.size() ; ++ii )
+	{
 		//cout << " Testing " << defaultName <<  "   against   " << defaultNames[ii] << endl ;
-		if( defaultName == defaultNames[ii] ) {
-			cout << " PDFConfigurator substituting [" << defaultName << "--->" << replacementNames[ii] << "]" << endl ;
+		if( defaultName == defaultNames[ii] )
+		{
+			//cout << " PDFConfig::sub[" << defaultName << "->" << replacementNames[ii] << "]" << endl;
 			return replacementNames[ii] ;
 		}
 	}
@@ -127,20 +132,20 @@ string PDFConfigurator::getName( string defaultName ) {
 
 // Method to store a configuration parmeter
 // The configuration parameter is of the form parameter:value
-void PDFConfigurator::addConfigurationParameter( string configString ) {
-
-
+void PDFConfigurator::addConfigurationParameter( string configString )
+{
 	// Find position of ":" character
 	size_t pos = configString.find_first_of(":") ;
-	if( pos == string::npos ) {
+	if( pos == string::npos )
+	{
 		cout << "  In PDFConfigurator::addConfigurationParameter : No separator found  in string : " << configString << endl ;
 		exit(1);
 	}
 
 	// Break into 2 strings
 	string configParameter  =  configString.substr( 0, pos ) ;
-	string configValue		=  configString.substr( pos+1, string::npos ) ;
-	cout << " In PDFConfigurator::addConfigurationParameter : storing configParameter [" << configParameter << " : " << configValue << "]" << endl ;
+	string configValue      =  configString.substr( pos+1, string::npos ) ;
+	//cout << " ConfigParam[" << configParameter << " : " << configValue << "]" << endl;//setw(3) << " ";
 	configParameters.push_back( configParameter ) ;
 	configValues.push_back( configValue ) ;
 
@@ -150,10 +155,13 @@ void PDFConfigurator::addConfigurationParameter( string configString ) {
 
 // Method to return a configuration parameter value
 // If not found then returns " "
-string PDFConfigurator::getConfigurationValue( string configParam ) {
-	for( unsigned int ii=0; ii<configParameters.size() ; ii++ ) {
+string PDFConfigurator::getConfigurationValue( string configParam )
+{
+	for( unsigned int ii=0; ii<configParameters.size() ; ++ii )
+	{
 		//cout << " Testing " << configParam <<  "   against   " << configParameters[ii] << endl ;
-		if( configParam == configParameters[ii] ) {
+		if( configParam == configParameters[ii] )
+		{
 			//cout << " PDFConfiguratorgetConfigurationValue setting [" << configParam << "--->" << configValues[ii] << "]" << endl ;
 			return configValues[ii] ;
 		}
@@ -162,11 +170,14 @@ string PDFConfigurator::getConfigurationValue( string configParam ) {
 }
 
 // Method to check for a configuration parameter value
-bool PDFConfigurator::hasConfigurationValue( string configParam, string paramValue ) {
-	for( unsigned int ii=0; ii<configParameters.size() ; ii++ ) {
+bool PDFConfigurator::hasConfigurationValue( string configParam, string paramValue )
+{
+	for( unsigned int ii=0; ii<configParameters.size() ; ++ii )
+	{
 		//cout << " Testing " << configParam <<  "   against   " << configParameters[ii] << endl ;
-		if( configParam == configParameters[ii] ) {
-			cout << " PDFConfigurator::hasConfigurationValue found [" << configParam << " == " << configValues[ii] << "]" << endl ;
+		if( configParam == configParameters[ii] )
+		{
+			//cout << " PDFConfigurator::hasConfigurationValue found [" << configParam << " == " << configValues[ii] << "]" << endl ;
 			return ( configValues[ii] == paramValue ) ;
 		}
 	}
@@ -174,12 +185,15 @@ bool PDFConfigurator::hasConfigurationValue( string configParam, string paramVal
 }
 
 // Method to check for a configuration parameter value boolean
-bool PDFConfigurator::isTrue( string configParam ) {
-	for( unsigned int ii=0; ii<configParameters.size() ; ii++ ) {
+bool PDFConfigurator::isTrue( string configParam )
+{
+	for( unsigned int ii=0; ii<configParameters.size() ; ++ii )
+	{
 		//cout << " Testing " << configParam <<  "   against   " << configParameters[ii] << endl ;
-		if( configParam == configParameters[ii] ) {
+		if( configParam == configParameters[ii] )
+		{
 			bool returnValue =  ( strcasecmp( configValues[ii].c_str() , "TRUE" ) == 0 )  ;
-			cout << " PDFConfigurator::isTrue found [" << configParam << " == " << returnValue << " ]" << endl ;
+			//cout << " PDFConfigurator::isTrue found [" << configParam << " == " << returnValue << " ]" << endl ;
 			return returnValue ;
 		}
 	}
@@ -200,4 +214,21 @@ string PDFConfigurator::XML() const
 	return xml.str();
 }
 
+void PDFConfigurator::Print() const
+{
+	for( unsigned int i=0; i< configParameters.size() ; ++i )
+	{
+		cout << " PDFConfigurator::Param   [ " << configParameters[i] << " : " << configValues[i] << " ]" << endl;
+	}
+	for( unsigned int i=0; i< defaultNames.size(); ++i )
+	{
+		cout << " PDFConfigurator::Sub     [ " << defaultNames[i] << " ---> " << replacementNames[i] << " ]" << endl;
+	}
+	return;
+}
+
+bool PDFConfigurator::empty() const
+{
+	return configParameters.empty() && defaultNames.empty();
+}
 

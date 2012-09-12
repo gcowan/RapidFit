@@ -1,6 +1,22 @@
 // $Id: release.notes $
 
-2012/07/2x Rob Currie
+2012/09/12 Rob Currie
+   - Modified PDF Constructors to take slightly less space when printing out construction info
+   - Modified XMLConfigurationReader to be able to print PDFConfiguration data in a manner easier to parse from output
+   - Modified PDFConfiguration to only print when called with the Print() method, it's easier to manipulate and use
+   - Modified v5 to save more information per SetPhysicsParameters
+   - Modified BsMass to be slightly faster and cache more results
+   - Modified LongLivedAngular_3d to be slightly faster and cache more results
+   - Fixed some compiler warnings about classes not being fully initiailzed in constructors
+   - Added destructor to Time Acc code
+   - Added some (for now) commented out debugging class information
+   - Fixed bug in Threading code to deal with 'leftover' events sometimes being dropped in some rare situations (chaning number of threads fixed or this update)
+   - Added a lookup check which is performed once per data point in projections to catch wether an integration or evaluation of a datapoint should be done...
+        This requires some additional work to narrow down what the value of non-integable values should be when they're passed to the PDF
+        ATM this is the average(mean) value of the unknown observable from the dataset distribution. (Not perfect but damn close to ideal)
+        This appears i.e. when projecting the Exponential with timeRes on over a DataSet
+
+2012/08/2x Rob Currie
    - Added lots more debug info for input just run a fit with/out --Debug to see what some of RapidFit is doing behind the scenes
    - Added a method in FitAssembler to return artificial FitResult for a completely fixed ParameterSet
    - Modified ComponentPloter to construct PDF dependent PhaseSpace

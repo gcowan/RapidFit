@@ -120,7 +120,14 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	{
 		if( config->component_names.empty() )
 		{
-			config->component_names.push_back( "Total" );
+			if( plotPDF->GetName() == plotPDF->GetLabel() )
+			{
+				config->component_names.push_back( plotPDF->GetName() );
+			}
+			else
+			{
+				config->component_names.push_back( "Total" );
+			}
 			config->LegendTextSize = 0.03;
 			vector<string> pdfComponents = plotPDF->PDFComponents();
 			for( unsigned int i=0; i< pdfComponents.size(); ++i )
@@ -1488,7 +1495,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 
 		if( debug->GetStatus() )
 		{
-			cout << "Debug: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << ObservableName << "==" << observableValue << "\t";
+			cout << "ComponentPlotter: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << ObservableName << "==" << observableValue << "\t";
 			pdfIntegrator->SetDebug( debug );
 		}
 		//	perform actual evaluation of the PDF with the configuration in the InputPoint, in the whole boundary with the given name and for selected component
@@ -1496,7 +1503,10 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 
 		if( debug->GetStatus() )
 		{
-			cout << "\tI got: " << integralvalue << endl;
+			cout << "ComponentPlotter: \tI got: " << integralvalue << endl;
+			InputPoint->Print();
+			cout << "ComponentPlotter: Using: " << plotPDF->GetLabel() << "\tProjecting Component: " << component << "\tObservable: " << observableName << endl;
+			full_boundary->Print();
 		}
 
 		pointValues->push_back( integralvalue );
@@ -1507,7 +1517,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	{
 		if( debug->DebugThisClass("ComponentPlotter") )
 		{
-			cout << endl << "Debug: Performing Sanity Check" << endl;
+			cout << endl << "ComponentPlotter: Performing Sanity Check" << endl;
 		}
 	}
 

@@ -332,8 +332,8 @@ vector<vector<double> > StatisticsFunctions::Combinatorix( vector<vector<double>
 
 	for( unsigned int i=0; i< input_values.size(); ++i )
 	{
-		unsigned int modulo = NumberOfCombinations( input_values, i );
-		unsigned int repeats = output_size/input_values[i].size();
+		//unsigned int modulo = NumberOfCombinations( input_values, i );
+		unsigned int repeats = (unsigned)output_size/input_values[i].size();
 		//cout << "i: " << i << "\tmodulo: " << modulo << "\trepeats: " << repeats << endl << endl;
 
 		for( unsigned int repeat_num=0; repeat_num < repeats; ++repeat_num )

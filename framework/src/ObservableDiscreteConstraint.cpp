@@ -33,7 +33,7 @@ ObservableDiscreteConstraint::ObservableDiscreteConstraint( string Name, vector<
 	if( tf1 == "" || tf1.empty() ) tf1 = name;
 }
 
-ObservableDiscreteConstraint::ObservableDiscreteConstraint( const IConstraint* input )
+ObservableDiscreteConstraint::ObservableDiscreteConstraint( const IConstraint* input ) : name(), allValues(), unit(), tf1()
 {
 	if( input->IsDiscrete() )
 	{

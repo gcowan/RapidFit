@@ -237,15 +237,17 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		cerr << endl << "All of your data is biased by > 5 sigma, please check you understand what is going on!" << endl;
 		cerr << "Removing cut that removes all fit results with a pull > 5" << endl << endl;
 		noPullCuts = true;
-	}
+	}		//	50% 'Turn Off Cut' test
 	else if( ((double)usable_rows)<=(0.5*(double)total_rows)  )
 	{
 		cerr << endl << "More than half of your data is biased by > 5 sigma, check you understand what is going on!" << endl << endl;
 	}
 
+		//	90% Cut test			   &&		50% 'Turn Off Cut' test
 	if( ((double)usable_rows)<=(0.9*(double)total_rows)&&((double)usable_rows)>(0.5*(double)total_rows)  )
 	{
 		cerr << "More than 10\% of data has been removed by the cut 'All pulls <=5'. To replot with all data use the option --allData" << endl << endl;
+		cerr << "Total Fit Results: " << total_rows << "\tNumber of Fit Results Cut by demanding 'All pulls <=5': " << total_rows-usable_rows << endl;
 	}
 
 	//      Results at >5 sigma are heavily biased, fit is by definition badly behaved

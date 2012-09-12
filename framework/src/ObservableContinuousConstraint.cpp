@@ -39,7 +39,7 @@ ObservableContinuousConstraint::ObservableContinuousConstraint( string Name, dou
 	if( tf1 == "" || tf1.empty() ) tf1 = name;
 }
 
-ObservableContinuousConstraint::ObservableContinuousConstraint( const IConstraint* input )
+ObservableContinuousConstraint::ObservableContinuousConstraint( const IConstraint* input ) : name(), minimum(), maximum(), unit(), tf1()
 {
 	if( !input->IsDiscrete() )
 	{

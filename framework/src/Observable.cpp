@@ -18,7 +18,7 @@ using namespace::std;
 
 //Constructor with correct argument
 Observable::Observable( string Name, double NewValue, double NewError, string NewUnit )
-	: name(Name), value(NewValue), error(NewError), unit(NewUnit), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.)
+	: name(Name), value(NewValue), error(NewError), unit(NewUnit), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.), offset()
 {
 	if (unit == "")
 	{
@@ -26,7 +26,7 @@ Observable::Observable( string Name, double NewValue, double NewError, string Ne
 	}
 }
 
-Observable::Observable( string Name ) : name(Name), value(0.), error(0.), unit("Uninitialised"), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.)
+Observable::Observable( string Name ) : name(Name), value(0.), error(0.), unit("Uninitialised"), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.), offset()
 {
 }
 
@@ -105,6 +105,7 @@ void Observable::Print() const
 	cout << "\tError: " << error;
 	cout << "\tUnit: " << unit ;
 	if( bin_num != -1 ) cout << "\tBinNum: " << bin_num << "\tAcceptance: " << acceptance;
+	if( bkg_bin_num != -1 ) cout << "\tBkgBinNum: " << bkg_bin_num << "\tBkgAcceptance: " << bkg_acceptance;
 	cout << endl;
 }
 
@@ -135,3 +136,4 @@ double Observable::GetOffSet() const
 {
 	return offset;
 }
+

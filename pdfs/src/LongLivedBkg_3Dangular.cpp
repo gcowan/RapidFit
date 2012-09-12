@@ -63,12 +63,12 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 	//Initialise depending upon whether configuration parameter was found
 	if( fileName == "" )
 	{
-		cout << "   No AngularDistributionHistogram found: using flat background " << endl ;
+		cout << " No AngularDistributionHistogram found: using flat background " << endl ;
 		useFlatAngularDistribution = true ;
 	}
 	else
 	{
-		cout << "   AngularDistributionHistogram requested: " << fileName << endl ;
+		cout << " AngularDistributionHistogram requested: " << fileName << endl ;
 		useFlatAngularDistribution = false ;
 
 		//File location
@@ -123,40 +123,43 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 		TFile* f =  TFile::Open(fullFileName.c_str());
 		if( _useHelicityBasis )
 		{
-			histo = (TH3D*) f->Get("histoHel"); //(fileName.c_str())));
+			histo = new TH3D( *(TH3D*) f->Get("histoHel") ); //(fileName.c_str())));
 		}
 		else
 		{
-			histo = (TH3D*) f->Get("histo"); //(fileName.c_str())));
+			histo = new TH3D( *(TH3D*) f->Get("histo") ); //(fileName.c_str())));
 		}
 
+		TString Name = histo->GetName();
+		TString Title = histo->GetTitle();
+		TString ext = "_";
+		ext+=this->GetRandomFunction()->Rndm();
+		Name.Append(ext);
+		Title.Append(ext);
+
 		xaxis = histo->GetXaxis();
-		cout << "X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << endl;
-		xmin = xaxis->GetXmin();
-		xmax = xaxis->GetXmax();
-		nxbins = histo->GetNbinsX();
-		cout << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
-		deltax = (xmax-xmin)/nxbins;
+                xmin = xaxis->GetXmin();
+                xmax = xaxis->GetXmax();
+                nxbins = histo->GetNbinsX();
+                deltax = (xmax-xmin)/nxbins;
+		cout << " X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << "\t\t" << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
 
 		yaxis = histo->GetYaxis();
-		cout << "Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << endl;
-		ymin = yaxis->GetXmin();
-		ymax = yaxis->GetXmax();
-		nybins = histo->GetNbinsY();
-		cout << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
+                ymin = yaxis->GetXmin();
+                ymax = yaxis->GetXmax();
+                nybins = histo->GetNbinsY();
 		deltay = (ymax-ymin)/nybins;
+		cout << " Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << "\t\t" << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
 
 		zaxis = histo->GetZaxis();
-		cout << "Z axis Name: " << zaxis->GetName() << "\tTitle: " << zaxis->GetTitle() << endl;
-		zmin = zaxis->GetXmin();
-		zmax = zaxis->GetXmax();
-		nzbins = histo->GetNbinsZ();
-		cout << "Z axis Min: " << zmin << "\tMax: " << zmax << "\tBins: " << nzbins << endl;
-		deltaz = (zmax-zmin)/nzbins;
+                zmin = zaxis->GetXmin();
+                zmax = zaxis->GetXmax();
+                nzbins = histo->GetNbinsZ();
+                deltaz = (zmax-zmin)/nzbins;
+		cout << " Z axis Name: " << zaxis->GetName() << "\tTitle: " << zaxis->GetTitle() << "\t\t" << "Z axis Min: " << zmin << "\tMax: " << zmax << "\tBins: " << nzbins << "\t\t\t";
 
 		//method for Checking whether histogram is sensible
 
-		total_num_entries = histo->GetEntries();
 		int total_num_bins = nxbins * nybins * nzbins;
 		int sum = 0;
 
@@ -180,25 +183,28 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 					{
 						sum += (int) bin_content;
 					}
+				}
 			}
 		}
+
+                total_num_entries = histo->GetEntries();
+                int average_bin_content = sum / total_num_bins;
+
+                cout << "Total Bins: " << total_num_bins << "\tEmpty Bins: " << zero_bins.size() << "\tAvg Bin Content: " << average_bin_content << endl;
+
+		//cout << "\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
+		//cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
+		//cout << endl;
+
+		// Check.  This order works for both bases since phi is always the third one.
+		if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*Mathematics::Pi() )
+		{
+			cout << endl << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
+			exit(1);
+		}
+
+		//cout << "Finishing processing histo" << endl;
 	}
-
-	int average_bin_content = sum / total_num_bins;
-
-	cout << "\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
-	cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
-	cout << endl;
-
-	// Check.  This order works for both bases since phi is always the third one.
-	if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*Mathematics::Pi() )
-	{
-		cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
-		exit(1);
-	}
-
-	//cout << "Finishing processing histo" << endl;
-}
 }
 
 //................................................................

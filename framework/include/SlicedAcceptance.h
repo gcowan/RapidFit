@@ -44,6 +44,7 @@ class SlicedAcceptance
 	public:
 
 		//Constructors
+		~SlicedAcceptance();
 		SlicedAcceptance( double tlow, double thigh ) ;
 		SlicedAcceptance( double tlow, double thigh, double beta  ) ;
 		SlicedAcceptance( string s  ) ;

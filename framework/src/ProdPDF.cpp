@@ -17,6 +17,10 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 	this->SetName( "Prod" );
 	this->SetLabel( "Prod["+FirstPDF->GetLabel()+"]x["+SecondPDF->GetLabel()+"]" );
 
+	cout << endl;
+	cout << "Constructing ProdPDF " << this->GetLabel() << endl;
+	cout << endl;
+
 	MakePrototypes();
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
@@ -151,14 +155,21 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 	double termOne = firstPDF->Integral( NewDataPoint, NewBoundary );
 	double termTwo = secondPDF->Integral( NewDataPoint, NewBoundary );
 
-	if( isnan(termOne) || isnan(termTwo) )
+	double prod = termOne * termTwo;
+
+	if( isnan(prod) || prod <= 0. )
 	{
 		PDF_THREAD_LOCK
-		cout << this->GetLabel() << endl;
-		cout << termOne << "\tx\t" << termTwo << endl;
+
+		cout << "ProdPDF::Normalisation\t\t" << termOne << "\tx\t" << termTwo << endl;
+
+		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
+
 		PDF_THREAD_UNLOCK
+		throw(-653102);
 	}
-	return termOne * termTwo;
+
+	return prod;
 }
 
 //Return the function value at the given point
@@ -166,7 +177,22 @@ double ProdPDF::Evaluate( DataPoint * NewDataPoint )
 {
 	double termOne = firstPDF->Evaluate( NewDataPoint );
 	double termTwo = secondPDF->Evaluate( NewDataPoint );
-	return termOne * termTwo;
+
+	double prod = termOne * termTwo;
+
+	if( isnan(prod) || prod <= 0. )
+	{
+		PDF_THREAD_LOCK
+
+		cout << "ProdPDF::Evaluate\t\t" << termOne << "\tx\t" << termTwo << endl;
+
+		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
+
+		PDF_THREAD_UNLOCK
+		throw(-653102);
+	}
+
+	return prod;
 }
 
 //Return the function value at the given point for numerical integration
@@ -174,14 +200,22 @@ double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 {
 	double termOne = firstPDF->EvaluateForNumericIntegral( NewDataPoint );
 	double termTwo = secondPDF->EvaluateForNumericIntegral( NewDataPoint );
-	if( isnan(termOne) || isnan(termTwo) )
+
+	double prod = termOne * termTwo;
+
+	if( isnan(prod) || prod <= 0. )
 	{
 		PDF_THREAD_LOCK
-			cout << this->GetLabel() << endl;
-		cout << termOne << " x " << termTwo << endl;
+
+		cout << "ProdPDF::EvaluateForNumerical\t\t" << termOne << "\tx\t" << termTwo << endl;
+
+		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
+
 		PDF_THREAD_UNLOCK
+		throw(-653102);
 	}
-	return termOne * termTwo;
+
+	return prod;
 }
 
 //Return a prototype data point

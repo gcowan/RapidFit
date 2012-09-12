@@ -28,6 +28,8 @@ class BsMass : public BasePDF
 		//Calculate the PDF normalisation
 		virtual double Normalisation(PhaseSpaceBoundary*);
 
+		bool SetPhysicsParameters( ParameterSet* );
+
 	private:
 		void MakePrototypes();
 
@@ -49,6 +51,10 @@ class BsMass : public BasePDF
 		bool plotComponents;
 	
 		bool _useSig1Sig2 ;
+
+		double denom_sigmam1_root2, denom_sigmam2_root2;
+		double numer_factor1, numer_factor2;
+		double exp1_denom, exp2_denom;
 };
 
 #endif

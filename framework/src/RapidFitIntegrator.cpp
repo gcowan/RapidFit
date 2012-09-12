@@ -479,21 +479,32 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 {
 	//Make the list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
-	dontIntegrate.push_back(ProjectThis);
 	double value = -1.;
 
 	vector<string> allIntegrable = functionToWrap->GetPrototypeDataPoint();
 
-	if( allIntegrable.size() == 1 )
+	vector<string> testedIntegrable;
+
+	for( unsigned int i=0; i< allIntegrable.size(); ++i )
 	{
-		if( allIntegrable[0] == ProjectThis )
+		if( StringProcessing::VectorContains( &dontIntegrate, &(allIntegrable[i]) ) == -1 )
+		{
+			testedIntegrable.push_back( allIntegrable[i] );
+		}
+	}
+
+	dontIntegrate.push_back(ProjectThis);
+
+	if( testedIntegrable.size() == 1 )
+	{
+		if( testedIntegrable[0] == ProjectThis )
 		{
 			value = functionToWrap->EvaluateComponent( NewDataPoint, Component );
 		}
 		else
 		{
-			cerr << "This PDF only knows about: " << allIntegrable[0] << " CAN NOT INTEGRATE: " << ProjectThis << endl << endl;
-			exit(-342);
+			cerr << "This PDF only knows how to Integrate: " << testedIntegrable[0] << " CAN NOT INTEGRATE: " << ProjectThis << endl << endl;
+			throw(-342);
 		}
 	}
 	else

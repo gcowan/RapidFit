@@ -35,10 +35,10 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 {
 	public:
 		Bs2JpsiPhi_Signal_v5( PDFConfigurator* );
-		//Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& );
+		Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& );
 		~Bs2JpsiPhi_Signal_v5();
 
-		//Mandatory RapidFit Methods
+		// Mandatory RapidFit Methods
 		virtual double EvaluateForNumericIntegral(DataPoint*) ;
 		virtual double Evaluate(DataPoint*);
 		virtual double EvaluateTimeOnly(DataPoint*) ;
@@ -295,34 +295,54 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		bool allowNegativeAsSq ;
 		bool _usePlotComponents ;
 
+		double sin_delta_perp_s;
+		double cos_delta_perp_s;
+		double sin_delta_zero_s;
+		double cos_delta_zero_s;
+		double sin_delta_para_s;
+		double cos_delta_para_s;
+
+		double sin_delta1;
+		double cos_delta1;
+		double sin_delta2;
+		double cos_delta2;
+		double sin_delta_2_1;
+		double cos_delta_2_1;
+
 		//....................................
 		//Internal helper functions
 
-		inline double AT() const {
-			if( Aperp_sq <= 0. ) return 0. ;
+		double stored_AT;
+		inline double AT() const { return stored_AT; }
+		/*	if( Aperp_sq <= 0. ) return 0. ;
 			else return sqrt(Aperp_sq) ;
-		}
-		inline double AP() const {
-			if( Apara_sq <= 0. ) return 0. ;
+		}*/
+		double stored_AP;
+		inline double AP() const { return stored_AP; }
+		/*	if( Apara_sq <= 0. ) return 0. ;
 			else return sqrt(Apara_sq) ;
-		}
-		inline double A0() const {
-			if( Azero_sq <= 0. ) return 0. ;
+		}*/
+		double stored_A0;
+		inline double A0() const { return stored_A0; }
+		/*	if( Azero_sq <= 0. ) return 0. ;
 			else return sqrt(Azero_sq) ;
-		}
-		inline double AS() const {
-			if( As_sq <= 0. ) return 0. ;
+		}*/
+		double stored_AS;
+		inline double AS() const { return stored_AS; }
+		/*	if( As_sq <= 0. ) return 0. ;
 			else return sqrt(As_sq) ;
-		}
-		inline double ASint() const {
-			if( As_sq <= 0. ) return 0. ;
+		}*/
+		double stored_ASint;
+		inline double ASint() const { return stored_ASint; }
+		/*	if( As_sq <= 0. ) return 0. ;
 			else return sqrt(As_sq) * Csp ;
-		}
+		}*/
 
 		//....................
 		// Safety for gammas
-		inline double gamma_l() const {
-			const double gl = gamma() + ( dgam *0.5 ) ;
+		double stored_gammal;
+		inline double gamma_l() const { return stored_gammal; }
+		/*	const double gl = gamma() + ( dgam *0.5 ) ;
 			if( gl < 0. ) {
 				PDF_THREAD_LOCK
 				cerr << " In Bs2JpsiPhi_Signal_v5 : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
@@ -331,10 +351,11 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 			}
 			else
 				return gl ;
-		}
+		}*/
 
-		inline double gamma_h() const {
-			const double gh = gamma() - ( dgam *0.5 ) ;
+		double stored_gammah;
+		inline double gamma_h() const { return stored_gammah; }
+		/*	const double gh = gamma() - ( dgam *0.5 ) ;
 			if( gh < 0. ) {
 				PDF_THREAD_LOCK
 				cerr << " In Bs2JpsiPhi_Signal_v5 : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
@@ -343,7 +364,7 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 			}
 			else
 				return gh ;
-		}
+		}*/
 
 		inline double gamma() const { return _gamma ; }
 
@@ -596,11 +617,11 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		{
 			return
 				D1() * (
-						( expL( ) - expH( ) ) * cos(delta1) * sinphis()
-						+ ( expL( ) + expH( ) ) * sin(delta1) * CC()
+						( expL( ) - expH( ) ) * cos_delta1 * sinphis()
+						+ ( expL( ) + expH( ) ) * sin_delta1 * CC()
 				       ) +
 				D2() * (
-						2.0  * ( sin(delta1)*expCos( ) - cos(delta1)*cosphis()*expSin( ) )
+						2.0  * ( sin_delta1*expCos( ) - cos_delta1*cosphis()*expSin( ) )
 				       ) ;
 		}
 
@@ -608,11 +629,11 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		{
 			return
 				D1() * (
-						( intExpL() - intExpH() ) * cos(delta1) * sinphis()
-						+ ( intExpL() + intExpH() ) * sin(delta1) * CC()
+						( intExpL() - intExpH() ) * cos_delta1 * sinphis()
+						+ ( intExpL() + intExpH() ) * sin_delta1 * CC()
 				       ) +
 				D2() * (
-						2.0  * ( sin(delta1)*intExpCos() - cos(delta1)*cosphis()*intExpSin() )
+						2.0  * ( sin_delta1*intExpCos() - cos_delta1*cosphis()*intExpSin() )
 				       ) ;
 		}
 
@@ -621,13 +642,13 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		inline double timeFactorReA0AP( )  const
 		{
 			if( _useCosDpar ) return cosdpar * this->timeFactorEven(  ) ;//PELC-COSDPAR Special for fitting cosdpar separately
-			else return cos(delta2-delta1) * this->timeFactorEven(  ) ;
+			else return cos_delta_2_1 * this->timeFactorEven(  ) ;
 		}
 
 		inline double timeFactorReA0APInt( ) const
 		{
 			if( _useCosDpar ) return cosdpar * this->timeFactorEvenInt( ) ;//PELC-COSDPAR Special for fitting cosdpar separately
-			else return cos(delta2-delta1) * this->timeFactorEvenInt( ) ;
+			else return cos_delta_2_1 * this->timeFactorEvenInt( ) ;
 		}
 
 
@@ -636,11 +657,11 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		{
 			return
 				D1() * (
-						( expL( ) - expH( ) ) * cos(delta2) * sinphis()
-						+ ( expL( ) + expH( ) ) * sin(delta2) * CC()
+						( expL( ) - expH( ) ) * cos_delta2 * sinphis()
+						+ ( expL( ) + expH( ) ) * sin_delta2 * CC()
 				       ) +
 				D2() * (
-						2.0  * ( sin(delta2)*expCos( ) - cos(delta2)*cosphis()*expSin( ) )
+						2.0  * ( sin_delta2*expCos( ) - cos_delta2*cosphis()*expSin( ) )
 				       ) ;
 		}
 
@@ -649,11 +670,11 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 
 			return
 				D1() * (
-						( intExpL() - intExpH()  ) * cos(delta2) * sinphis()
-						+ ( intExpL() + intExpH()  ) * sin(delta2) * CC()
+						( intExpL() - intExpH()  ) * cos_delta2 * sinphis()
+						+ ( intExpL() + intExpH()  ) * sin_delta2 * CC()
 				       ) +
 				D2() * (
-						2.0  * ( sin(delta2)*intExpCos() - cos(delta2)*cosphis()*intExpSin()  )
+						2.0  * ( sin_delta2*intExpCos() - cos_delta2*cosphis()*intExpSin()  )
 				       ) ;
 		}
 
@@ -667,29 +688,25 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		//...........................
 		inline double timeFactorReASAP( ) const
 		{
-			double delta = delta_para - delta_s ;
 			return
 				D1() * (
-						( expL( ) - expH( ) ) * sin(delta) * sinphis()
-						+ ( expL( ) + expH( ) ) * cos(delta) * CC()
+						( expL( ) - expH( ) ) * sin_delta_para_s * sinphis()
+						+ ( expL( ) + expH( ) ) * cos_delta_para_s * CC()
 				       ) +
 				D2() * (
-						2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) )
+						2.0  * ( cos_delta_para_s*expCos( ) - sin_delta_para_s*cosphis()*expSin( ) )
 				       ) ;
 		}
 
 		inline double timeFactorReASAPInt( ) const
 		{
-
-			double delta = delta_para - delta_s ;
-
 			return
 				D1() * (
-						( intExpL() - intExpH() ) * sin(delta) * sinphis()
-						+ ( intExpL() + intExpH() ) * cos(delta) * CC()
+						( intExpL() - intExpH() ) * sin_delta_para_s * sinphis()
+						+ ( intExpL() + intExpH() ) * cos_delta_para_s * CC()
 				       ) +
 				D2() * (
-						2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() )
+						2.0  * ( cos_delta_para_s*intExpCos() - sin_delta_para_s*cosphis()*intExpSin() )
 				       ) ;
 		}
 
@@ -697,40 +714,36 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		//...........................
 		inline double timeFactorImASAT( )  const
 		{
-			return sin(delta_perp-delta_s) * this->timeFactorOdd(  ) ;
+			return sin_delta_perp_s * this->timeFactorOdd(  ) ;
 		}
 
 		inline double timeFactorImASATInt( ) const
 		{
-			return sin(delta_perp-delta_s) * this->timeFactorOddInt( ) ;
+			return sin_delta_perp_s * this->timeFactorOddInt( ) ;
 		}
 
 		//...........................
 		inline double timeFactorReASA0( ) const
 		{
-			double delta = delta_zero - delta_s ;
 			return
 				D1() * (
-						( expL( ) - expH( ) ) * sin(delta) * sinphis()
-						+ ( expL( ) + expH( ) ) * cos(delta) * CC()
+						( expL( ) - expH( ) ) * sin_delta_zero_s * sinphis()
+						+ ( expL( ) + expH( ) ) * cos_delta_zero_s * CC()
 				       ) +
 				D2() * (
-						2.0  * ( cos(delta)*expCos( ) - sin(delta)*cosphis()*expSin( ) )
+						2.0  * ( cos_delta_zero_s*expCos( ) - sin_delta_zero_s*cosphis()*expSin( ) )
 				       ) ;
 		}
 
 		inline double timeFactorReASA0Int( ) const
 		{
-
-			double delta = delta_zero - delta_s ;
-
 			return
 				D1() * (
-						( intExpL() - intExpH() ) * sin(delta) * sinphis()
-						+ ( intExpL() + intExpH() ) * cos(delta) * CC()
+						( intExpL() - intExpH() ) * sin_delta_zero_s * sinphis()
+						+ ( intExpL() + intExpH() ) * cos_delta_zero_s * CC()
 				       ) +
 				D2() * (
-						2.0  * ( cos(delta)*intExpCos() - sin(delta)*cosphis()*intExpSin() )
+						2.0  * ( cos_delta_zero_s*intExpCos() - sin_delta_zero_s*cosphis()*intExpSin() )
 				       ) ;
 		}
 

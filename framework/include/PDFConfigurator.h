@@ -50,6 +50,9 @@ class PDFConfigurator
 
 		string XML() const;
 
+		void Print() const;
+
+		bool empty() const;
 	private:
 		//      Uncopyable This Way!
 		PDFConfigurator& operator = ( const PDFConfigurator& );

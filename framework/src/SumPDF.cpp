@@ -28,6 +28,9 @@ SumPDF::SumPDF( const SumPDF& input ) : BasePDF( (BasePDF) input ), prototypeDat
 //Constructor specifying fraction parameter name
 SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName)
 {
+	cout << endl;
+	cout << "Constructing SumPDF" << endl;
+	cout << endl;
 	MakePrototypes(InputBoundary);
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );

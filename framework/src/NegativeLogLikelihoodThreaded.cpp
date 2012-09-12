@@ -74,6 +74,22 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 	//cout << "Setup Threads: " << Threads << endl;
 	ObservableRef weightObservableRef( weightObservableName );
 
+	/*
+	   for( int i=0; i< StoredDataSubSet.size(); ++i )
+	   {
+	   if( i == number )
+	   {
+	   int tot=0;
+	   for( int j=0; j< StoredDataSubSet[i].size(); ++j )
+	   {
+	   cout << "+" << StoredDataSubSet[i][j].size() << endl;
+	   tot+=StoredDataSubSet[i][j].size();
+	   }
+	   cout << "=" << tot << endl;
+	   }
+	   }
+	 */
+
 	//	Initialize the Fitting_Thread objects which contain the objects to be passed to each thread
 	for( unsigned int threadnum=0; threadnum< (unsigned)Threads; ++threadnum )
 	{
@@ -170,11 +186,11 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 		}
 
 		/*
-		if(num==5) exit(0);
-		pthread_mutex_lock( debug_lock );
-		cout << "hello" << endl;
-		pthread_mutex_unlock( debug_lock );
-		*/
+		   if(num==5) exit(0);
+		   pthread_mutex_lock( debug_lock );
+		   cout << "hello" << endl;
+		   pthread_mutex_unlock( debug_lock );
+		 */
 
 		//cout << value << "\t" << integral << endl;
 

@@ -9,6 +9,7 @@
 
 #include "Exponential.h"
 #include "Mathematics.h"
+#include "SlicedAcceptance.h"
 #include <iostream>
 #include <cmath>
 
@@ -372,15 +373,16 @@ double Exponential::buildPDFdenominator()
 
 	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
 	{
-		tlow  = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
-		thigh = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh();
+		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
+		tlow  = tlo_boundary > thisSlice->tlow() ? tlo_boundary : thisSlice->tlow();
+		thigh = thi_boundary < thisSlice->thigh() ? thi_boundary : thisSlice->thigh();
 		//if( thigh > tlow ) val += Mathematics::ExpInt(tlow, thigh, 1./tau, sigma) * timeAcc->getSlice(islice)->height();
 		vector<double> input(4, 0.); input[0]=tlow; input[1]=thigh; input[2]=gamma; input[3]=sigma;
 		if( thigh > tlow )
 		{
 			//val += Mathematics::ExpInt(tlow, thigh, gamma, sigma) * timeAcc->getSlice(islice)->height();
 			unsigned int index = islice + timeAcc->numberOfSlices()*sigmaNum;
-			val += _dataPoint->GetPseudoObservable( _intexpIntObs_vec[ index ], input ) * timeAcc->getSlice(islice)->height();
+			val += _dataPoint->GetPseudoObservable( _intexpIntObs_vec[ index ], input ) * thisSlice->height();
 		}
 	}
 
