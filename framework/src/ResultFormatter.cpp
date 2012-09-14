@@ -93,7 +93,7 @@ void ResultFormatter::MakeRootDataFile( string FullFileName, vector<IDataSet*> O
 
 			//Populate the NTuple
 			dataNTuple->Fill(observables);
-			delete observables;
+			delete[] observables;
 		}
 
 		//Write the file

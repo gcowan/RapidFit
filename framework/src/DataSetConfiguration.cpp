@@ -167,7 +167,7 @@ IDataSet* DataSetConfiguration::LoadGeneratorDataset( string Source, PhaseSpaceB
 		cerr << "Generator NOT found!" << endl;
 		exit(-9864);
 	}
-	dataGenerator->GenerateData( int(NumberEvents) );
+	dataGenerator->GenerateData( (int)NumberEvents );
 	IDataSet* newDataSet = dataGenerator->GetDataSet();
 	delete dataGenerator;
 

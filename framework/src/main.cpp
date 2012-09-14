@@ -552,23 +552,30 @@ int PerformMainFit( RapidFitConfiguration* config )
 		cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
 	}
 
-	if( config->GlobalResult->GetFitStatus() != 3 )
+	if( config->GlobalResult->GetFitStatus() < 2 )
 	{
-		cerr << "--------------------------------------------------------------" << endl;
-		cerr << "---------------------FIT RESULT IS NOT 3----------------------" << endl;
-		cerr << "--------------------------------------------------------------" << endl;
-		cerr << "--------------------------------------------------------------" << endl;
-		cerr << "---------If this is a Foam study, change seed and re-run------" << endl;
-		cerr << "--------------------------------------------------------------" << endl;
-		cerr << "--------------------------------------------------------------" << endl;
-		cerr << "-If your sure you want to continue employ the following flag--" << endl;
-		cerr << "--------------------------------------------------------------" << endl;
-		cerr << "--------------      \'--ForceScan\'            -----------------" << endl;
-		cerr << "--------------------------------------------------------------" << endl;
+		cout << "--------------------------------------------------------------" << endl;
+		cout << "---------------------FIT RESULT IS NOT 3----------------------" << endl;
+		cout << "--------------------------------------------------------------" << endl;
+		cout << "--------------------------------------------------------------" << endl;
+		cout << "---------If this is a Foam study, change seed and re-run------" << endl;
+		cout << "--------------------------------------------------------------" << endl;
+		cout << "--------------------------------------------------------------" << endl;
+		cout << "-If your sure you want to continue employ the following flag--" << endl;
+		cout << "--------------------------------------------------------------" << endl;
+		cout << "--------------      \'--ForceScan\'            -----------------" << endl;
+		cout << "--------------------------------------------------------------" << endl;
 		if( !config->Force_Scan_Flag || ( config->GlobalResult->GetMinimumValue() < 0 )  )
 		{
 			return -1;
 		}
+	}
+
+	if( config->GlobalResult->GetFitStatus() == 2 )
+	{
+		cout << "ALERT ALERT ALERT " << endl << endl;
+		cout << "Fit Status was 2, this means your correlation matrix was forced +ve def" << endl;
+		cout << "Carrying on Regardless, but, BUYER BEWARE!" << endl << endl;
 	}
 
 	if( config->saveOneFoamDataSetFlag )

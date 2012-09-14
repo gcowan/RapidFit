@@ -52,7 +52,8 @@ ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNa
 	vector<PhysicsParameter*>::const_iterator param_i = input.allParameters.begin();
 	for( ; param_i != input.allParameters.end(); ++param_i )
 	{
-		allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
+		if( *param_i != NULL ) allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
+		else allParameters.push_back( NULL );
 	}
 
 	uniqueID = reinterpret_cast<size_t>(this)+1;

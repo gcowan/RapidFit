@@ -145,7 +145,7 @@ void Foam::Init()
 			//			foamGenerator->ResetRho( combinationFunction );	//	Can afford to Boot Foam's ability if we're using just one cached instance :D
 			//			foamGenerator->Initialize();
 			//	As we haven't cached yet, write to file
-			foamGenerator->Write(Name);
+			foamGenerator->Write(Name.Data());
 			cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
 			InputPDF->AddCacheObject( Name.Data() );
 			MC_Cache->Write();
