@@ -34,12 +34,12 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 	// Get a pointer to the physics parameter to be scanned and fix it	
 	// CAREFUL:  this must be reset as it was at the end.
 	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName);
-	double originalValue = scanParameter->GetBlindedValue( ) ;
-	string originalType = scanParameter->GetType( ) ;
+	double originalValue = scanParameter->GetBlindedValue();
+	string originalType = scanParameter->GetType();
 	scanParameter->SetType( "Fixed" ) ;
 
 	// Need to set up a loop , fixing the scan parameter at each point
-	double deltaScan;
+	double deltaScan=0.;
 
 	for( int si=0; si<int(npoints); ++si)
 	{
@@ -48,6 +48,7 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 		if( int(npoints)!=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
 		else deltaScan=0;
 		double scanVal = lolim+deltaScan*si;
+		scanParameter = BottleParameters->GetPhysicsParameter(scanName);
 		scanParameter->SetBlindedValue( scanVal ) ;
 
 		cout << "Fitting at:\t" << scanName << "=" << scanVal << endl;
@@ -153,7 +154,8 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 		output_interface->AddFitResult( scanStepResult );
 	}
 
-	//Reset the parameter as it was
+	// Reset the parameter as it was
+	scanParameter = BottleParameters->GetPhysicsParameter(scanName);
 	scanParameter->SetType( originalType ) ;
 	scanParameter->SetBlindedValue( originalValue ) ;
 }

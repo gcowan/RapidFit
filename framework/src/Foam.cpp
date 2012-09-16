@@ -145,7 +145,8 @@ void Foam::Init()
 			//			foamGenerator->ResetRho( combinationFunction );	//	Can afford to Boot Foam's ability if we're using just one cached instance :D
 			//			foamGenerator->Initialize();
 			//	As we haven't cached yet, write to file
-			foamGenerator->Write(Name.Data());
+			MC_Cache->Write();
+			foamGenerator->Write("",TObject::kOverwrite);
 			cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
 			InputPDF->AddCacheObject( Name.Data() );
 			MC_Cache->Write();
@@ -201,7 +202,8 @@ void Foam::Init()
 				//                      foamGenerator->ResetRho( combinationFunction ); //      Can afford to Boot Foam's ability if we're using just one cached instance :D
 				//                      foamGenerator->Initialize();
 				//      As we haven't cached yet, write to file
-				foamGenerator->Write(Name);
+				MC_Cache->Write();
+				foamGenerator->Write("",TObject::kOverwrite);
 				cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
 				InputPDF->AddCacheObject( Name.Data() );
 				MC_Cache->Write();
@@ -328,7 +330,7 @@ int Foam::GenerateData( int DataAmount )
 			//cout << continuousNames[continuousIndex] << "\t" << newValue << "\t" << 0.0 << "\t" << unit << endl;
 		}
 
-		delete generatedEvent;
+		delete[] generatedEvent;
 		//	Store the event
 		newDataSet->AddDataPoint(temporaryDataPoint);
 	}

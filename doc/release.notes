@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/09/16 Rob Currie
+   - Fixed a bug to do with addressing bad parameters in ScanStudies, this was picked up by valgrind --tool=memcheck
+
 2012/09/14 Rob Currie
    - Fixed some malloc bugs valgrind --tool=memcheck now works without barfing at the screen about bad malloc/delete commands
 
