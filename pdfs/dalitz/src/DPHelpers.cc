@@ -157,3 +157,36 @@ double DPHelpers::referenceAxisCosAngle(TLorentzVector& pB, TLorentzVector& pMuP
 
   return cosTheta;
 }
+
+double DPHelpers::referenceAxisCosAngleMu(TLorentzVector& pB, TLorentzVector& pMuPlus,
+      TLorentzVector& pMuMinus, TLorentzVector& pPi, TLorentzVector& pK)
+{
+  TLorentzVector p4Jpsi=pMuPlus+pMuMinus;
+  TLorentzVector p4Zplus=p4Jpsi+pPi;
+
+  if ( pB.BoostVector().Mag() != 0 )
+  {
+    p4Jpsi.Boost(-1.0*pB.BoostVector());
+    p4Zplus.Boost(-1.0*pB.BoostVector());
+    pMuPlus.Boost(-1.0*pB.BoostVector());
+    pMuMinus.Boost(-1.0*pB.BoostVector());
+    pPi.Boost(-1.0*pB.BoostVector());
+    pK.Boost(-1.0*pB.BoostVector());
+  }
+
+  // First reference momentum
+  TLorentzVector ref1(pB);
+  ref1.Boost(-1.0*p4Jpsi.BoostVector());
+
+  // Second reference momentum
+  TLorentzVector p4Pi(pPi);
+  p4Pi.Boost(-1.0*p4Zplus.BoostVector());
+  p4Jpsi.Boost(-1.0*p4Zplus.BoostVector()); 
+  TLorentzVector ref2=p4Pi+p4Jpsi;
+
+  // Cos of the angle
+  double cosTheta=ref1.Vect().Dot(ref2.Vect())/ref1.Vect().Mag()/ref2.Vect().Mag();
+
+  return cosTheta;
+}
+

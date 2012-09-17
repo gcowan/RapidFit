@@ -15,6 +15,8 @@ namespace DPHelpers
         double* cosThetaZ, double* cosThetaPsi, double* dphi); 
   double referenceAxisCosAngle(TLorentzVector& pB, TLorentzVector& pMuPlus,
         TLorentzVector& pMuMinus, TLorentzVector& pPi, TLorentzVector& pK);
+  double referenceAxisCosAngleMu(TLorentzVector& pB, TLorentzVector& pMuPlus,
+        TLorentzVector& pMuMinus, TLorentzVector& pPi, TLorentzVector& pK);
 };
 
 #endif

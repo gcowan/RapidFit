@@ -79,6 +79,38 @@ double DPTotalAmplitude::matrixElement(double m23, double cosTheta1, double cosT
 
   TComplex tmp(0,0);
 
+  // Precalculate Z+ amplitudes as we need to do rotation and thus we would
+  // keep calculating same things twice.
+  // Need angle between reference axis
+  TLorentzVector pMuPlus;
+  TLorentzVector pMuMinus;
+  TLorentzVector pPi;
+  TLorentzVector pK;
+  DPHelpers::calculateFinalStateMomenta(5.279, m23, mJpsi,
+        cosTheta1,  cosTheta2, phi, 0.105, 0.105, 0.13957018, 0.493677,
+        pMuPlus, pMuMinus, pPi, pK);
+  TLorentzVector pB(0,0,0,5.279);
+  TComplex Zamps[ZComponents.size()][3][3];
+  // Component [i][1][j] is intentionally not filled
+  for (unsigned int i=0;i<ZComponents.size();++i)
+  {
+    Zamps[i][0][0]=ZComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
+                              -2,-2);
+    Zamps[i][2][0]=ZComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
+                              2,-2);
+    Zamps[i][0][1]=ZComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
+                              -2,0);
+    Zamps[i][2][1]=ZComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
+                              2,0);
+    Zamps[i][0][2]=ZComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
+                              -2,2);
+    Zamps[i][2][2]=ZComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
+                              2,2);
+  }
+
+  // Cos of the angle between psi reference axis
+  double cosARefs=DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
+
   // Now sum over final state helicities (this is not general code, but
   // knows about internals of components
 
@@ -95,23 +127,11 @@ double DPTotalAmplitude::matrixElement(double m23, double cosTheta1, double cosT
       // Now comes sum over Z+ components and lambdaPsiPrime
       for (unsigned int i=0; i<ZComponents.size();++i)
       {
-        // Need angle between reference axis
-        TLorentzVector pMuPlus;
-        TLorentzVector pMuMinus;
-        TLorentzVector pPi;
-        TLorentzVector pK;
-        DPHelpers::calculateFinalStateMomenta(5.279, m23, mJpsi,
-              cosTheta1,  cosTheta2, phi, 0.105, 0.105, 0.13957018, 0.493677,
-              pMuPlus, pMuMinus, pPi, pK);
-        TLorentzVector pB(0,0,0,5.279);
-        // Cos of the angle between psi reference axis
-        double cosARefs=DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
         // Sum over lambdaPsiPrime
         for (int twoLambdaPsiPrime=-2; twoLambdaPsiPrime<=2; twoLambdaPsiPrime+=2)
         {
           tmp+=wigner.function(cosARefs,twoLambdaPsiPrime/2,twoLambdaPsi/2)*
-               ZComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
-                                         twoLambda,twoLambdaPsiPrime);
+               Zamps[i][twoLambda/2+1][twoLambdaPsi/2+1];
         }
       }
     }
