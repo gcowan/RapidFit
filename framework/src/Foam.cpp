@@ -102,6 +102,7 @@ void Foam::Init()
 			init_temporaryDataPoint->SetObservable( continuousNames[continuousIndex], 0.0, 0.0, unit );
 		}
 
+		//init_temporaryDataPoint->Print();
 		//Make the function wrapper
 		IntegratorFunction * combinationFunction = new IntegratorFunction( InputPDF, init_temporaryDataPoint, continuousNames, discreteNames, minima, ranges, generationBoundary );
 
@@ -146,7 +147,7 @@ void Foam::Init()
 			//			foamGenerator->Initialize();
 			//	As we haven't cached yet, write to file
 			MC_Cache->Write();
-			foamGenerator->Write("",TObject::kOverwrite);
+			foamGenerator->Write( Name.Data() );//,TObject::kOverwrite);
 			cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
 			InputPDF->AddCacheObject( Name.Data() );
 			MC_Cache->Write();
@@ -203,7 +204,7 @@ void Foam::Init()
 				//                      foamGenerator->Initialize();
 				//      As we haven't cached yet, write to file
 				MC_Cache->Write();
-				foamGenerator->Write("",TObject::kOverwrite);
+				foamGenerator->Write( Name.Data() );//,TObject::kOverwrite);
 				cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
 				InputPDF->AddCacheObject( Name.Data() );
 				MC_Cache->Write();
@@ -224,6 +225,7 @@ void Foam::Init()
 				if( MC_Cache == NULL || foamGenerator == NULL )
 				{
 					cerr << "Error re-aquiring TFOAM object. This is unrecoverable" << endl;
+					cout << "Error re-aquiring TFOAM object. This is unrecoverable" << endl;
 					exit(-6542);
 				}
 				foamGenerator->SetPseRan( rootRandom );

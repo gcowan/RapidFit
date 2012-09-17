@@ -137,7 +137,7 @@ Observable* DataPoint::GetObservable(string const Name, const bool silence ) con
 	}
 }
 
-Observable* DataPoint::GetObservable( const ObservableRef& object ) const
+Observable* DataPoint::GetObservable( const ObservableRef& object, const bool silence ) const
 {
 	if( object.GetIndex() < 0 )
 	{
@@ -148,7 +148,7 @@ Observable* DataPoint::GetObservable( const ObservableRef& object ) const
 	{
 		return allObservables[ (unsigned) object.GetIndex() ];
 	}
-	cerr << "Observable name " << object.Name().c_str() << " not found (3)" << endl;
+	if( !silence ) cerr << "Observable name " << object.Name().c_str() << " not found (3)" << endl;
 	throw(-20);
 }
 

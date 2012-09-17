@@ -84,7 +84,7 @@ class DataPoint
 		 *
 		 * @return returns the Observable with the requested Name, or at the given location if it's already been found once before and it's location stored
 		 */
-		Observable* GetObservable( const ObservableRef& NameRef ) const;
+		Observable* GetObservable( const ObservableRef& NameRef, const bool silence=false ) const;
 
 		/*!
 		 * @brief Remove the requested Observable

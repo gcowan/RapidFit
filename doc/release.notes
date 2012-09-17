@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/09/17 Rob Currie
+   - Fixed bug which caused all Toy Studies to fail to re-aquire cached TFoam objects
+   - Possibly fixed a bug to do with caching code not correctly picking up tag+1 vs -1 (people will likely have noticed if this made an effect)
+
 2012/09/16 Rob Currie
    - Fixed a bug to do with addressing bad parameters in ScanStudies, this was picked up by valgrind --tool=memcheck
 

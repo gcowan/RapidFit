@@ -1122,6 +1122,7 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 		else
 		{
 			cerr << "Ambiguous definition for parameter " << ParameterName << endl;
+			cerr << "\t\tTry Adding A <Value> tag to the Parameter definition." << endl;
 			exit(1);
 		}
 	}

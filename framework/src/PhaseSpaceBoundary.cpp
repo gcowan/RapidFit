@@ -399,31 +399,49 @@ string PhaseSpaceBoundary::XML() const
 
 unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool silence ) const
 {
+	//	Exit on simple case
 	int thisIndex = Input->GetDiscreteIndex();
 	if( thisIndex != -1 ) return (unsigned)thisIndex;
-
 	if( this->GetDiscreteNames().empty() ) return 0;
 
+	//	Get all possible discrete combination datapoints and the names of all discrete observables
 	vector<DataPoint*> allCombinations = this->GetDiscreteCombinations();
-
 	vector<string> allDiscreteNames = this->GetDiscreteNames();
 
+	//	Construct array of ObservableRef objects to pick out Discrete Observables
 	vector<string>::iterator name_i = allDiscreteNames.begin();
-	vector<DataPoint*>::iterator comb_i = allCombinations.begin();
+	vector<string>::iterator end_name_i = allDiscreteNames.end();
+	vector<ObservableRef> allDiscreteObs;
+	for( ; name_i != end_name_i; ++name_i ) allDiscreteObs.push_back( ObservableRef( *name_i ) );
 
-	for( int index=0 ; comb_i != allCombinations.end(); ++comb_i, ++index )
+	//	Initialize iterators
+	vector<ObservableRef>::iterator start_Obsname_i = allDiscreteObs.begin();
+	vector<ObservableRef>::iterator Obsname_i = start_Obsname_i;
+	vector<ObservableRef>::iterator end_Obsname_i = allDiscreteObs.end();
+	//vector<DataPoint*>::iterator start_comb_i = allCombinations.begin();
+	vector<DataPoint*>::iterator comb_i = allCombinations.begin();
+	vector<DataPoint*>::iterator end_comb_i = allCombinations.end();
+
+	//	Construct objects
+	bool match=true;
+	double wanted_val=0., this_val=0.;
+	//	Loop over all possible combinations
+	for( int index=0 ; comb_i != end_comb_i; ++comb_i, ++index )
 	{
-		bool match = true;
-		for( ; name_i != allDiscreteNames.end(); ++name_i )
+		//	Check if this datapoint is the same as this combination
+		match = true;
+		for( Obsname_i = start_Obsname_i; Obsname_i != end_Obsname_i; ++Obsname_i )
 		{
-			double wanted_val = (*comb_i)->GetObservable( *name_i, true )->GetValue();
-			double this_val = Input->GetObservable( *name_i, true )->GetValue();
+			wanted_val = (*comb_i)->GetObservable( *Obsname_i, true )->GetValue();
+			this_val = Input->GetObservable( *Obsname_i, true )->GetValue();
+			//	Stop checking once we have at least one discrtete observable different
 			if( fabs( wanted_val - this_val ) > 1E-6 )
 			{
 				match = false;
 				break;
 			}
 		}
+		//	If this combination matches set the index and leave
 		if( match )
 		{
 			thisIndex = index;
@@ -431,12 +449,14 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		}
 	}
 
+	//	Destory temporary objects
 	while( !allCombinations.empty() )
 	{
 		if( allCombinations.back() != NULL ) delete allCombinations.back();
 		allCombinations.pop_back();
 	}
 
+	//	Check for error
 	if( thisIndex == -1 )
 	{
 		cerr << "This DataPoint does not Lie within this PhaseSpace." << endl;
@@ -446,6 +466,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		exit(-99865);
 	}
 
+	//	Store and return the lookup of the DataPoint's index
 	Input->SetDiscreteIndex( thisIndex );
 	return (unsigned)thisIndex;
 }
