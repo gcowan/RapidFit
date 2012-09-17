@@ -128,10 +128,10 @@ double DPTotalAmplitude::matrixElement(double m23, double cosTheta1, double cosT
       for (unsigned int i=0; i<ZComponents.size();++i)
       {
         // Sum over lambdaPsiPrime
-        for (int twoLambdaPsiPrime=-2; twoLambdaPsiPrime<=2; twoLambdaPsiPrime+=2)
+        for (int twoLambdaPrime=-2; twoLambdaPrime<=2; twoLambdaPrime+=4)
         {
-          tmp+=wigner.function(cosARefs,twoLambdaPsiPrime/2,twoLambdaPsi/2)*
-               Zamps[i][twoLambda/2+1][twoLambdaPsi/2+1];
+          tmp+=wigner.function(cosARefs,twoLambdaPrime/2,twoLambda/2)*
+               Zamps[i][twoLambdaPrime/2+1][twoLambdaPsi/2+1];
         }
       }
     }

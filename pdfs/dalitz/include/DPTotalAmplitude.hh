@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "DPComponent.hh"
-#include "DPWignerFunctionJ1.hh"
+#include "DPWignerFunctionJ1over2.hh"
 
 class DPTotalAmplitude
 {
@@ -20,7 +20,7 @@ class DPTotalAmplitude
     std::vector<DPComponent*> KpiComponents;
     std::vector<DPComponent*> ZComponents;
 
-    DPWignerFunctionJ1 wigner;
+    DPWignerFunctionJ1over2 wigner;
 
     double mJpsi;
 };

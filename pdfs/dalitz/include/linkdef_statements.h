@@ -9,6 +9,7 @@
 #pragma link C++ clas DPWignerFunctionJ0;
 #pragma link C++ clas DPWignerFunctionJ1;
 #pragma link C++ clas DPWignerFunctionJ2;
+#pragma link C++ clas DPWignerFunctionJ1over2;
 
 #pragma link C++ class DPMassShape;
 #pragma link C++ class DPBWResonanceShape;
