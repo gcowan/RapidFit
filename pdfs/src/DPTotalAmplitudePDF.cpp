@@ -25,37 +25,38 @@ PDF_CREATOR( DPTotalAmplitudePDF );
 DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 	// Physics parameters
-	  fracA0sqZplusName	( configurator->getName("fracA0sqZplus") )
-	, fracApsqZplusName	( configurator->getName("fracApsqZplus") )
-	, fracZplusName		( configurator->getName("fracZplus") )
+	  magA0ZplusName		( configurator->getName("magA0Zplus") )
+	, magApZplusName		( configurator->getName("magApZplus") )
+	, magAmZplusName		( configurator->getName("magAmZplus") )
 	, phaseA0ZplusName	( configurator->getName("phaseA0Zplus") )
 	, phaseApZplusName	( configurator->getName("phaseApZplus") )
 	, phaseAmZplusName	( configurator->getName("phaseAmZplus") )
 	
-	, fracA0sqKst892Name	( configurator->getName("fracA0sqKst892") )
-	, fracApsqKst892Name	( configurator->getName("fracApsqKst892") )
+	, magA0Kst892Name	( configurator->getName("magA0Kst892") )
+	, magApKst892Name	( configurator->getName("magApKst892") )
+	, magAmKst892Name	( configurator->getName("magAmKst892") )
 	, phaseA0Kst892Name	( configurator->getName("phaseA0Kst892") )
 	, phaseApKst892Name	( configurator->getName("phaseApKst892") )
 	, phaseAmKst892Name	( configurator->getName("phaseAmKst892") )
 	
-	, fracA0sqKst1410Name	( configurator->getName("fracA0sqKst1410") )
-	, fracApsqKst1410Name	( configurator->getName("fracApsqKst1410") )
-	, fracKst1410Name	( configurator->getName("fracKst1410") )
+	, magA0Kst1410Name	( configurator->getName("magA0Kst1410") )
+	, magApKst1410Name	( configurator->getName("magApKst1410") )
+	, magAmKst1410Name	( configurator->getName("magAmKst1410") )
 	, phaseA0Kst1410Name	( configurator->getName("phaseA0Kst1410") )
 	, phaseApKst1410Name	( configurator->getName("phaseApKst1410") )
 	, phaseAmKst1410Name	( configurator->getName("phaseAmKst1410") )
 	
-	, fracA0sqKst1680Name	( configurator->getName("fracA0sqKst1680") )
-	, fracApsqKst1680Name	( configurator->getName("fracApsqKst1680") )
-	, fracKst1680Name	( configurator->getName("fracKst1680") )
+	, magA0Kst1680Name	( configurator->getName("magA0Kst1680") )
+	, magApKst1680Name	( configurator->getName("magApKst1680") )
+	, magAmKst1680Name	( configurator->getName("magAmKst1680") )
 	, phaseA0Kst1680Name	( configurator->getName("phaseA0Kst1680") )
 	, phaseApKst1680Name	( configurator->getName("phaseApKst1680") )
 	, phaseAmKst1680Name	( configurator->getName("phaseAmKst1680") )
 	
-	, fracK01430Name	( configurator->getName("fracK01430") )
+	, magA0K01430Name	( configurator->getName("magA0K01430") )
 	, phaseA0K01430Name	( configurator->getName("phaseA0K01430") )
 	
-	, fracK21430Name	( configurator->getName("fracK21430") )
+	, magA0K21430Name	( configurator->getName("magA0K21430") )
 	, phaseA0K21430Name	( configurator->getName("phaseA0K21430") )
 	
 	, massZplusName		( configurator->getName("massZplus") )
@@ -76,16 +77,16 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, cosTheta2Name	( configurator->getName("cosTheta2") )
 	, phiName	( configurator->getName("phi") )
 
-  	, frac_LASSName	( configurator->getName("frac_LASS") )
+  	, mag_LASSName	( configurator->getName("mag_LASS") )
 	, a_LASSName	( configurator->getName("a_LASS") )
 	, r_LASSName	( configurator->getName("r_LASS") )
 	// The actual values of the parameters and observables
-	, fracA0sqZplus(),  fracApsqZplus(),  fracZplus(),  phaseA0Zplus(),  phaseApZplus(),  phaseAmZplus()
-	, fracA0sqKst892(),  fracApsqKst892(),  phaseA0Kst892(),  phaseApKst892(),  phaseAmKst892()
-	, fracA0sqKst1410(), fracApsqKst1410(), fracKst1410(), phaseA0Kst1410(), phaseApKst1410(), phaseAmKst1410()
-	, fracA0sqKst1680(), fracApsqKst1680(), fracKst1680(), phaseA0Kst1680(), phaseApKst1680(), phaseAmKst1680()
-	, fracK01430(),  				  phaseA0K01430()
-	, fracK21430(),  				  phaseA0K21430()
+	, magA0Zplus(),  magApZplus(),  magAmZplus(),  phaseA0Zplus(),  phaseApZplus(),  phaseAmZplus()
+	, magA0Kst892(),  magApKst892(), magAmKst892(), phaseA0Kst892(),  phaseApKst892(),  phaseAmKst892()
+	, magA0Kst1410(), magApKst1410(), magAmKst1410(), phaseA0Kst1410(), phaseApKst1410(), phaseAmKst1410()
+	, magA0Kst1680(), magApKst1680(), magAmKst1680(), phaseA0Kst1680(), phaseApKst1680(), phaseAmKst1680()
+	, magA0K01430(),  				  phaseA0K01430()
+	, magA0K21430(),  				  phaseA0K21430()
 	, massZplus(), widthZplus()
 	, massKst892(), widthKst892()
 	, massKst1410(), widthKst1410()
@@ -95,7 +96,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, m23(), cosTheta1(), cosTheta2(), phi()
 
 	//LASS parameters
-	  , a_LASS(), r_LASS(), frac_LASS() 
+	  , a_LASS(), r_LASS(), mag_LASS() 
 
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
@@ -271,36 +272,37 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,cosTheta1(copy.cosTheta1)
 	,cosTheta2(copy.cosTheta2)
 	,phi(copy.phi)
-	,fracA0sqZplusName(copy.fracA0sqZplusName)
-	,fracApsqZplusName(copy.fracApsqZplusName)
-	,fracZplusName(copy.fracZplusName)
+	,magA0ZplusName(copy.magA0ZplusName)
+	,magApZplusName(copy.magApZplusName)
+	,magAmZplusName(copy.magAmZplusName)
 	,phaseA0ZplusName(copy.phaseA0ZplusName)
 	,phaseApZplusName(copy.phaseApZplusName)
 	,phaseAmZplusName(copy.phaseAmZplusName)
 	
-	,fracA0sqKst892Name(copy.fracA0sqKst892Name)
-	,fracApsqKst892Name(copy.fracApsqKst892Name)
+	,magA0Kst892Name(copy.magA0Kst892Name)
+	,magApKst892Name(copy.magApKst892Name)
+	,magAmKst892Name(copy.magAmKst892Name)
 	,phaseA0Kst892Name(copy.phaseA0Kst892Name)
 	,phaseApKst892Name(copy.phaseApKst892Name)
 	,phaseAmKst892Name(copy.phaseAmKst892Name)
 	
-	,fracA0sqKst1410Name(copy.fracA0sqKst1410Name)
-	,fracApsqKst1410Name(copy.fracApsqKst1410Name)
-	,fracKst1410Name(copy.fracKst1410Name)
+	,magA0Kst1410Name(copy.magA0Kst1410Name)
+	,magApKst1410Name(copy.magApKst1410Name)
+	,magAmKst1410Name(copy.magAmKst1410Name)
 	,phaseA0Kst1410Name(copy.phaseA0Kst1410Name)
 	,phaseApKst1410Name(copy.phaseApKst1410Name)
 	,phaseAmKst1410Name(copy.phaseAmKst1410Name)
 	
-	,fracA0sqKst1680Name(copy.fracA0sqKst1680Name)
-	,fracApsqKst1680Name(copy.fracApsqKst1680Name)
-	,fracKst1680Name(copy.fracKst1680Name)
+	,magA0Kst1680Name(copy.magA0Kst1680Name)
+	,magApKst1680Name(copy.magApKst1680Name)
+	,magAmKst1680Name(copy.magAmKst1680Name)
 	,phaseA0Kst1680Name(copy.phaseA0Kst1680Name)
 	,phaseApKst1680Name(copy.phaseApKst1680Name)
 	,phaseAmKst1680Name(copy.phaseAmKst1680Name)
 	
-	,fracK01430Name(copy.fracK01430Name)
+	,magA0K01430Name(copy.magA0K01430Name)
 	,phaseA0K01430Name(copy.phaseA0K01430Name)
-	,fracK21430Name(copy.fracK21430Name)
+	,magA0K21430Name(copy.magA0K21430Name)
 	,phaseA0K21430Name(copy.phaseA0K21430Name)
 	
 	,massZplusName(copy.massZplusName)
@@ -317,40 +319,41 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,widthK21430Name(copy.widthK21430Name)
 
 
-  	,frac_LASSName(copy.frac_LASSName)
+  	,mag_LASSName(copy.mag_LASSName)
 	,a_LASSName(copy.a_LASSName)
 	,r_LASSName(copy.r_LASSName)
 	
-	,fracA0sqZplus(copy.fracA0sqZplus)
-	,fracApsqZplus(copy.fracApsqZplus)
-	,fracZplus(copy.fracZplus)
+	,magA0Zplus(copy.magA0Zplus)
+	,magApZplus(copy.magApZplus)
+	,magAmZplus(copy.magAmZplus)
 	,phaseA0Zplus(copy.phaseA0Zplus)
 	,phaseApZplus(copy.phaseApZplus)
 	,phaseAmZplus(copy.phaseAmZplus)
 	
-	,fracA0sqKst892(copy.fracA0sqKst892)
-	,fracApsqKst892(copy.fracApsqKst892)
+	,magA0Kst892(copy.magA0Kst892)
+	,magApKst892(copy.magApKst892)
+	,magAmKst892(copy.magAmKst892)
 	,phaseA0Kst892(copy.phaseA0Kst892)
 	,phaseApKst892(copy.phaseApKst892)
 	,phaseAmKst892(copy.phaseAmKst892)
 	
-	,fracA0sqKst1410(copy.fracA0sqKst1410)
-	,fracApsqKst1410(copy.fracApsqKst1410)
-	,fracKst1410(copy.fracKst1410)
+	,magA0Kst1410(copy.magA0Kst1410)
+	,magApKst1410(copy.magApKst1410)
+	,magAmKst1410(copy.magAmKst1410)
 	,phaseA0Kst1410(copy.phaseA0Kst1410)
 	,phaseApKst1410(copy.phaseApKst1410)
 	,phaseAmKst1410(copy.phaseAmKst1410)
 	
-	,fracA0sqKst1680(copy.fracA0sqKst1680)
-	,fracApsqKst1680(copy.fracApsqKst1680)
-	,fracKst1680(copy.fracKst1680)
+	,magA0Kst1680(copy.magA0Kst1680)
+	,magApKst1680(copy.magApKst1680)
+	,magAmKst1680(copy.magAmKst1680)
 	,phaseA0Kst1680(copy.phaseA0Kst1680)
 	,phaseApKst1680(copy.phaseApKst1680)
 	,phaseAmKst1680(copy.phaseAmKst1680)
 	
-	,fracK01430(copy.fracK01430)
+	,magA0K01430(copy.magA0K01430)
 	,phaseA0K01430(copy.phaseA0K01430)
-	,fracK21430(copy.fracK21430)
+	,magA0K21430(copy.magA0K21430)
 	,phaseA0K21430(copy.phaseA0K21430)
 	
 	,massZplus(copy.massZplus)
@@ -385,7 +388,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,histo()
 	,xaxis(copy.xaxis), yaxis(copy.yaxis), zaxis(copy.zaxis), maxis(copy.maxis)
 	,nxbins(copy.nxbins), nybins(copy.nybins), nzbins(copy.nzbins), nmbins(copy.nmbins)
-	,frac_LASS(copy.frac_LASS)
+	,mag_LASS(copy.mag_LASS)
         ,a_LASS(copy.a_LASS)
         ,r_LASS(copy.r_LASS)
 {
@@ -428,36 +431,37 @@ void DPTotalAmplitudePDF::MakePrototypes()
 
 	//Make the parameter set
 	vector<string> parameterNames;
-	parameterNames.push_back( fracA0sqZplusName );
-	parameterNames.push_back( fracApsqZplusName );
-	parameterNames.push_back( fracZplusName );
+	parameterNames.push_back( magA0ZplusName );
+	parameterNames.push_back( magApZplusName );
+	parameterNames.push_back( magAmZplusName );
 	parameterNames.push_back( phaseA0ZplusName );
 	parameterNames.push_back( phaseApZplusName );
 	parameterNames.push_back( phaseAmZplusName );
 	
-	parameterNames.push_back( fracA0sqKst892Name );
-	parameterNames.push_back( fracApsqKst892Name );
+	parameterNames.push_back( magA0Kst892Name );
+	parameterNames.push_back( magApKst892Name );
+	parameterNames.push_back( magAmKst892Name );
 	parameterNames.push_back( phaseA0Kst892Name );
 	parameterNames.push_back( phaseApKst892Name );
 	parameterNames.push_back( phaseAmKst892Name );
 	
-	parameterNames.push_back( fracA0sqKst1410Name );
-	parameterNames.push_back( fracApsqKst1410Name );
-	parameterNames.push_back( fracKst1410Name );
+	parameterNames.push_back( magA0Kst1410Name );
+	parameterNames.push_back( magApKst1410Name );
+	parameterNames.push_back( magAmKst1410Name );
 	parameterNames.push_back( phaseA0Kst1410Name );
 	parameterNames.push_back( phaseApKst1410Name );
 	parameterNames.push_back( phaseAmKst1410Name );
 	
-	parameterNames.push_back( fracA0sqKst1680Name );
-	parameterNames.push_back( fracApsqKst1680Name );
-	parameterNames.push_back( fracKst1680Name );
+	parameterNames.push_back( magA0Kst1680Name );
+	parameterNames.push_back( magApKst1680Name );
+	parameterNames.push_back( magAmKst1680Name );
 	parameterNames.push_back( phaseA0Kst1680Name );
 	parameterNames.push_back( phaseApKst1680Name );
 	parameterNames.push_back( phaseAmKst1680Name );
 	
-	parameterNames.push_back( fracK01430Name );
+	parameterNames.push_back( magA0K01430Name );
 	parameterNames.push_back( phaseA0K01430Name );
-	parameterNames.push_back( fracK21430Name );
+	parameterNames.push_back( magA0K21430Name );
 	parameterNames.push_back( phaseA0K21430Name );
 	
 	parameterNames.push_back( massZplusName );
@@ -473,7 +477,7 @@ void DPTotalAmplitudePDF::MakePrototypes()
 	parameterNames.push_back( massK21430Name );
 	parameterNames.push_back( widthK21430Name );
 
-	parameterNames.push_back( frac_LASSName );
+	parameterNames.push_back( mag_LASSName );
 	parameterNames.push_back( a_LASSName );
 	parameterNames.push_back( r_LASSName );
 
@@ -501,66 +505,39 @@ DPTotalAmplitudePDF::~DPTotalAmplitudePDF()
 bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
-	fracA0sqZplus    = allParameters.GetPhysicsParameter( fracA0sqZplusName )->GetValue();
-	fracApsqZplus    = allParameters.GetPhysicsParameter( fracApsqZplusName )->GetValue();
-	fracZplus    = allParameters.GetPhysicsParameter( fracZplusName )->GetValue();
+	magA0Zplus    = allParameters.GetPhysicsParameter( magA0ZplusName )->GetValue();
+	magApZplus    = allParameters.GetPhysicsParameter( magApZplusName )->GetValue();
+	magAmZplus    = allParameters.GetPhysicsParameter( magAmZplusName )->GetValue();
 	phaseA0Zplus   = allParameters.GetPhysicsParameter( phaseA0ZplusName )->GetValue();
 	phaseApZplus   = allParameters.GetPhysicsParameter( phaseApZplusName )->GetValue();
 	phaseAmZplus   = allParameters.GetPhysicsParameter( phaseAmZplusName )->GetValue();
 	
-	fracA0sqKst892    = allParameters.GetPhysicsParameter( fracA0sqKst892Name )->GetValue();
-	fracApsqKst892    = allParameters.GetPhysicsParameter( fracApsqKst892Name )->GetValue();
+	magA0Kst892    = allParameters.GetPhysicsParameter( magA0Kst892Name )->GetValue();
+	magApKst892    = allParameters.GetPhysicsParameter( magApKst892Name )->GetValue();
+	magAmKst892        = allParameters.GetPhysicsParameter( magAmKst892Name )->GetValue();
 	phaseA0Kst892  = allParameters.GetPhysicsParameter( phaseA0Kst892Name )->GetValue();
 	phaseApKst892  = allParameters.GetPhysicsParameter( phaseApKst892Name )->GetValue();
 	phaseAmKst892  = allParameters.GetPhysicsParameter( phaseAmKst892Name )->GetValue();
 	
-	fracA0sqKst1410   = allParameters.GetPhysicsParameter( fracA0sqKst1410Name )->GetValue();
-	fracApsqKst1410   = allParameters.GetPhysicsParameter( fracApsqKst1410Name )->GetValue();
-	fracKst1410   = allParameters.GetPhysicsParameter( fracKst1410Name )->GetValue();
+	magA0Kst1410   = allParameters.GetPhysicsParameter( magA0Kst1410Name )->GetValue();
+	magApKst1410   = allParameters.GetPhysicsParameter( magApKst1410Name )->GetValue();
+	magAmKst1410   = allParameters.GetPhysicsParameter( magAmKst1410Name )->GetValue();
 	phaseA0Kst1410 = allParameters.GetPhysicsParameter( phaseA0Kst1410Name )->GetValue();
 	phaseApKst1410 = allParameters.GetPhysicsParameter( phaseApKst1410Name )->GetValue();
 	phaseAmKst1410 = allParameters.GetPhysicsParameter( phaseAmKst1410Name )->GetValue();
 	
-	fracA0sqKst1680   = allParameters.GetPhysicsParameter( fracA0sqKst1680Name )->GetValue();
-	fracApsqKst1680   = allParameters.GetPhysicsParameter( fracApsqKst1680Name )->GetValue();
-	fracKst1680   = allParameters.GetPhysicsParameter( fracKst1680Name )->GetValue();
+	magA0Kst1680   = allParameters.GetPhysicsParameter( magA0Kst1680Name )->GetValue();
+	magApKst1680   = allParameters.GetPhysicsParameter( magApKst1680Name )->GetValue();
+	magAmKst1680   = allParameters.GetPhysicsParameter( magAmKst1680Name )->GetValue();
 	phaseA0Kst1680 = allParameters.GetPhysicsParameter( phaseA0Kst1680Name )->GetValue();
 	phaseApKst1680 = allParameters.GetPhysicsParameter( phaseApKst1680Name )->GetValue();
 	phaseAmKst1680 = allParameters.GetPhysicsParameter( phaseAmKst1680Name )->GetValue();
 	
-	fracK01430    = allParameters.GetPhysicsParameter( fracK01430Name )->GetValue();
+	magA0K01430    = allParameters.GetPhysicsParameter( magA0K01430Name )->GetValue();
 	phaseA0K01430  = allParameters.GetPhysicsParameter( phaseA0K01430Name )->GetValue();
-	fracK21430    = allParameters.GetPhysicsParameter( fracK21430Name )->GetValue();
+	magA0K21430    = allParameters.GetPhysicsParameter( magA0K21430Name )->GetValue();
 	phaseA0K21430  = allParameters.GetPhysicsParameter( phaseA0K21430Name )->GetValue();
 
-	frac_LASS    = allParameters.GetPhysicsParameter( frac_LASSName )->GetValue();
-
-
-	// Sum of all amplitudes must equal 1
-	//fracKst892 = ((1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS) < 0.) ? 0. : (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
-	//cout << "a\t " <<  fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
-	//double fracKst892 = (1. - fracZplus - fracKst1410 - fracKst1680 - fracK01430 - fracK21430 - frac_LASS);
-	//cout << "b " << fracKst892 << " " << fracZplus << " " << fracKst1410 << " " << fracKst1680 << " " << fracK01430 << " " << fracK21430 << " " << frac_LASS << endl;
-	
-	double fracKst892 = 1.;
-	
-	double magA0Zplus   = sqrt(fracA0sqZplus*fracZplus);
-	double magApZplus   = sqrt(fracApsqZplus*fracZplus);
-	double magAmZplus   = ( (fracZplus - magA0Zplus*magA0Zplus - magApZplus*magApZplus) < 0.) ? 0. : sqrt(fracZplus - magA0Zplus*magA0Zplus - magApZplus*magApZplus);
-	(void) magAmZplus;
-	double magA0Kst892  = sqrt(fracA0sqKst892*fracKst892);
-	double magApKst892  = sqrt(fracApsqKst892*fracKst892);
-	double magAmKst892  = ( (fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892) < 0.) ? 0. : sqrt(fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892);
-	double magA0Kst1410 = sqrt(fracA0sqKst1410*fracKst1410);
-	double magApKst1410 = sqrt(fracApsqKst1410*fracKst1410);
-	double magAmKst1410 = ( (fracKst1410 - magA0Kst1410*magA0Kst1410 - magApKst1410*magApKst1410) < 0.) ? 0. : sqrt(fracKst1410 - magA0Kst1410*magA0Kst1410 - magApKst1410*magApKst1410);
-	double magA0Kst1680 = sqrt(fracA0sqKst1680*fracKst1680);
-	double magApKst1680 = sqrt(fracApsqKst1680*fracKst1680);
-	double magAmKst1680 = ( (fracKst1680 - magA0Kst1680*magA0Kst1680 - magApKst1680*magApKst1680) < 0.) ? 0. : sqrt(fracKst1680 - magA0Kst1680*magA0Kst1680 - magApKst1680*magApKst1680);
-
-	//cout << fracKst892 << " " << magA0Kst892 << " " << magApKst892 << " " << magAmKst892 << " " << (1.- (fracKst892 - magA0Kst892*magA0Kst892 - magApKst892*magApKst892)) << endl;
-	//cout << fracKst1410 << " " << magA0Kst1410 << " " << magApKst1410 << " " << magAmKst1410 << " " << (1.- (fracKst1410 - magA0Kst1410*magA0Kst1410 - magApKst1410*magApKst1410)) << endl;
-	
 	massZplus  = allParameters.GetPhysicsParameter( massZplusName )->GetValue();
 	widthZplus = allParameters.GetPhysicsParameter( widthZplusName )->GetValue();
 	massKst892  = allParameters.GetPhysicsParameter( massKst892Name )->GetValue();
@@ -590,9 +567,9 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
 	KpiComponents[2]->setHelicityAmplitudes(magA0Kst1680, magApKst1680, magAmKst1680, phaseA0Kst1680, phaseApKst1680, phaseAmKst1680);
-	KpiComponents[3]->setHelicityAmplitudes(sqrt(fracK01430), 0., 0., phaseA0K01430, 0., 0.);
-	KpiComponents[4]->setHelicityAmplitudes(sqrt(fracK21430), 0., 0., phaseA0K21430, 0., 0.);
-	KpiComponents[5]->setHelicityAmplitudes(sqrt(frac_LASS), 0., 0., 0., 0., 0.);
+	KpiComponents[3]->setHelicityAmplitudes(magA0K01430, 0., 0., phaseA0K01430, 0., 0.);
+	KpiComponents[4]->setHelicityAmplitudes(magA0K21430, 0., 0., phaseA0K21430, 0., 0.);
+	KpiComponents[5]->setHelicityAmplitudes(mag_LASS, 0., 0., 0., 0., 0.);
 
 	return isOK;
 }

@@ -56,36 +56,37 @@ class DPTotalAmplitudePDF : public BasePDF
 		// These contain the ObservableRefs that correspond
 		// to the observable names that are used in the
 		// PDF. 
-		ObservableRef fracA0sqZplusName;
-		ObservableRef fracApsqZplusName;
-		ObservableRef fracZplusName;
+		ObservableRef magA0ZplusName;
+		ObservableRef magApZplusName;
+		ObservableRef magAmZplusName;
 		ObservableRef phaseA0ZplusName;
 		ObservableRef phaseApZplusName;
 		ObservableRef phaseAmZplusName;
 		
-		ObservableRef fracA0sqKst892Name;
-		ObservableRef fracApsqKst892Name;
+		ObservableRef magA0Kst892Name;
+		ObservableRef magApKst892Name;
+		ObservableRef magAmKst892Name;
 		ObservableRef phaseA0Kst892Name;
 		ObservableRef phaseApKst892Name;
 		ObservableRef phaseAmKst892Name;
 		
-		ObservableRef fracA0sqKst1410Name;
-		ObservableRef fracApsqKst1410Name;
-		ObservableRef fracKst1410Name;
+		ObservableRef magA0Kst1410Name;
+		ObservableRef magApKst1410Name;
+		ObservableRef magAmKst1410Name;
 		ObservableRef phaseA0Kst1410Name;
 		ObservableRef phaseApKst1410Name;
 		ObservableRef phaseAmKst1410Name;
 		
-		ObservableRef fracA0sqKst1680Name;
-		ObservableRef fracApsqKst1680Name;
-		ObservableRef fracKst1680Name;
+		ObservableRef magA0Kst1680Name;
+		ObservableRef magApKst1680Name;
+		ObservableRef magAmKst1680Name;
 		ObservableRef phaseA0Kst1680Name;
 		ObservableRef phaseApKst1680Name;
 		ObservableRef phaseAmKst1680Name;
 		
-		ObservableRef fracK01430Name;
+		ObservableRef magA0K01430Name;
 		ObservableRef phaseA0K01430Name;
-		ObservableRef fracK21430Name;
+		ObservableRef magA0K21430Name;
 		ObservableRef phaseA0K21430Name;
 		
 		ObservableRef massZplusName;
@@ -101,40 +102,41 @@ class DPTotalAmplitudePDF : public BasePDF
 		ObservableRef massK21430Name;
 		ObservableRef widthK21430Name;
 
-		ObservableRef frac_LASSName;
+		ObservableRef mag_LASSName;
 		ObservableRef a_LASSName;
 		ObservableRef r_LASSName;
 
-		double fracA0sqZplus;
-		double fracApsqZplus;
-		double fracZplus;
+		double magA0Zplus;
+		double magApZplus;
+		double magAmZplus;
 		double phaseA0Zplus;
 		double phaseApZplus;
 		double phaseAmZplus;
 		
-		double fracA0sqKst892;
-		double fracApsqKst892;
+		double magA0Kst892;
+		double magApKst892;
+		double magAmKst892;
 		double phaseA0Kst892;
 		double phaseApKst892;
 		double phaseAmKst892;
 		
-		double fracA0sqKst1410;
-		double fracApsqKst1410;
-		double fracKst1410;
+		double magA0Kst1410;
+		double magApKst1410;
+		double magAmKst1410;
 		double phaseA0Kst1410;
 		double phaseApKst1410;
 		double phaseAmKst1410;
 		
-		double fracA0sqKst1680;
-		double fracApsqKst1680;
-		double fracKst1680;
+		double magA0Kst1680;
+		double magApKst1680;
+		double magAmKst1680;
 		double phaseA0Kst1680;
 		double phaseApKst1680;
 		double phaseAmKst1680;
 		
-		double fracK01430;
+		double magA0K01430;
 		double phaseA0K01430;
-		double fracK21430;
+		double magA0K21430;
 		double phaseA0K21430;
 		
 		double massZplus;
@@ -152,7 +154,7 @@ class DPTotalAmplitudePDF : public BasePDF
 
 
 		//LASS
-		double frac_LASS;
+		double mag_LASS;
 		double a_LASS;
 		double r_LASS;
 		  
