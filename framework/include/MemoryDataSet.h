@@ -38,8 +38,6 @@ class MemoryDataSet : public IDataSet
 
 		void Clear();
 
-		virtual void Print();
-
 		/*!                      
 		 * @brief Returns an estimate of the total Yield
 		 */                      
@@ -50,6 +48,8 @@ class MemoryDataSet : public IDataSet
 		void UseEventWeights( const string Name );
 
 		void NormaliseWeights();
+
+		virtual void Print() const;
 	private:
 		//	Uncopyable!
 		MemoryDataSet ( const MemoryDataSet& );

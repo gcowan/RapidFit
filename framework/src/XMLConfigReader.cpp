@@ -1655,7 +1655,11 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
                 if( overloadConfigurator != NULL )
                 {
                         pdfConfig = overloadConfigurator->GetChildren();
-                }
+		}
+		else
+		{
+			pdfConfig = vector<XMLTag*>();
+		}
 
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
@@ -1678,7 +1682,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 			}
 			else
 			{
-				cerr << "(1)Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
+				cerr << "(1b)Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
 				exit(1);
 			}
 		}

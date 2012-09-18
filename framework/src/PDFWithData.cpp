@@ -173,7 +173,9 @@ IDataSet * PDFWithData::GetDataSet() const
 
 	if( useWeights ) newDataSet->UseEventWeights( WeightName );
 
-	cout << "DataSet contains " << newDataSet->GetDataNumber() << " events" << endl << endl;
+	newDataSet->Print();
+
+	cout << endl;
 	//cout << "Providing DataSet At: " << newDataSet << endl;
 
 	return newDataSet;

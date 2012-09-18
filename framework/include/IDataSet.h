@@ -95,7 +95,7 @@ class IDataSet
 		 *
 		 * @warning This gets stupidly verbose for large amounts of data so use with caution
 		 */
-		virtual void Print() = 0;
+		virtual void Print() const = 0;
 
 		/*!
 		 * @brief Virtual Destructor
@@ -114,6 +114,7 @@ class IDataSet
 		virtual string GetWeightName() const = 0;
 
 		virtual void NormaliseWeights() = 0;
+
 	private:
 
 		/*!

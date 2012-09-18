@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/09/18 Rob Currie
+   - Changed infomation to be output from DataSet in case of Weighted DataSet
+   - Attempted to fix bug in XMLConfigurationReader
+
 2012/09/18 Greig Cowan
    - Changed parameterisation of DP PDF.
 
