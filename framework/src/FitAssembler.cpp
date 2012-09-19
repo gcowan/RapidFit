@@ -456,7 +456,7 @@ void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, ParameterS
 		{
 			if( Phys_Param->GetType() != "Fixed" )
 			{
-				ResultParameter* result_Param = ReturnableFitResult->GetResultParameterSet()->GetResultParameter( already_found[found] );
+				ResultParameter* result_Param = ReturnableFitResult->GetResultParameterSet()->GetResultParameter( already_found[(unsigned)found] );
 				double result_val = result_Param->GetValue();
 				double result_err = result_Param->GetError();
 				double param_min = Phys_Param->GetMinimum();

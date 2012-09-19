@@ -151,13 +151,13 @@ PhysicsParameter * ParameterSet::GetPhysicsParameter( const string Name ) const
 	}
 	else
 	{
-		if( allParameters[unsigned(nameIndex)] == NULL ) allParameters[unsigned(nameIndex)] = new PhysicsParameter( allNames[nameIndex] );
+		if( allParameters[(unsigned)nameIndex] == NULL ) allParameters[(unsigned)nameIndex] = new PhysicsParameter( allNames[(unsigned)nameIndex] );
 		//	This has to be here to ensure that badly constructed parameters don't cause headaches!
-		if( allParameters[unsigned(nameIndex)]->GetName().empty() || allParameters[unsigned(nameIndex)]->GetName() == "" )
+		if( allParameters[(unsigned)nameIndex]->GetName().empty() || allParameters[(unsigned)nameIndex]->GetName() == "" )
 		{
-			allParameters[unsigned(nameIndex)]->SetName( Name );
+			allParameters[(unsigned)nameIndex]->SetName( Name );
 		}
-		return allParameters[unsigned(nameIndex)];
+		return allParameters[(unsigned)nameIndex];
 	}
 }
 
@@ -283,9 +283,9 @@ bool ParameterSet::SetPhysicsParameters( const ParameterSet * NewParameterSet )
 		}
 		else
 		{
-			if( allParameters[lookup] != NULL ) delete allParameters[lookup];
+			if( allParameters[(unsigned)lookup] != NULL ) delete allParameters[(unsigned)lookup];
 			//cout << thisName << endl;
-			allParameters[lookup] = new PhysicsParameter( *NewParameterSet->GetPhysicsParameter(thisName) );
+			allParameters[(unsigned)lookup] = new PhysicsParameter( *NewParameterSet->GetPhysicsParameter(thisName) );
 		}
 	}
 	return true;

@@ -237,6 +237,7 @@ double Exponential::buildPDFnumerator()
 
 double Exponential::Normalisation( PhaseSpaceBoundary* boundary )
 {
+	(void) boundary;
 	return -1.;
 	//if( _dataPoint == NULL ) return -1.;
 	/*
@@ -381,7 +382,7 @@ double Exponential::buildPDFdenominator()
 		if( thigh > tlow )
 		{
 			//val += Mathematics::ExpInt(tlow, thigh, gamma, sigma) * timeAcc->getSlice(islice)->height();
-			unsigned int index = islice + timeAcc->numberOfSlices()*sigmaNum;
+			unsigned int index = islice + timeAcc->numberOfSlices()*(unsigned)sigmaNum;
 			val += _dataPoint->GetPseudoObservable( _intexpIntObs_vec[ index ], input ) * thisSlice->height();
 		}
 	}

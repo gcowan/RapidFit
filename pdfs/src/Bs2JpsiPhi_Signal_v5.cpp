@@ -938,10 +938,10 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 	}
 	else if( useTimeAcceptance() && useEventResolution() )
 	{
-		intExpL_stored = _datapoint->GetPseudoObservable( _intexpLObs_vec[ timeBinNum ], Exp_Input_1 );
-		intExpH_stored = _datapoint->GetPseudoObservable( _intexpHObs_vec[ timeBinNum ], Exp_Input_2 );
-		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs_vec[ timeBinNum ], Input_2 );
-		intExpCos_stored = _datapoint->GetPseudoObservable( _intexpCosObs_vec[ timeBinNum ], Input_2 );
+		intExpL_stored = _datapoint->GetPseudoObservable( _intexpLObs_vec[ (unsigned)timeBinNum ], Exp_Input_1 );
+		intExpH_stored = _datapoint->GetPseudoObservable( _intexpHObs_vec[ (unsigned)timeBinNum ], Exp_Input_2 );
+		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs_vec[ (unsigned)timeBinNum ], Input_2 );
+		intExpCos_stored = _datapoint->GetPseudoObservable( _intexpCosObs_vec[ (unsigned)timeBinNum ], Input_2 );
 	}
 	else
 	{

@@ -1588,7 +1588,9 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 //Create a PDF from an appropriate xml tag
 IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigurator, bool print )
 {
-	IPDF* returnable_NamedPDF;
+	(void) print;
+	IPDF* returnable_NamedPDF=NULL;
+
 	//Check the tag actually is a PDF
 	if( InputTag->GetName() == "PDF" )
 	{
@@ -1719,14 +1721,14 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
 			for( int i=int(optional.size()-1); i != -1; --i )
 			{
-				if( optional[i]->GetName() == "FractionName" )
+				if( optional[(unsigned)i]->GetName() == "FractionName" )
 				{
-					cout << optional[i]->GetValue()[0] << endl;
+					cout << optional[(unsigned)i]->GetValue()[0] << endl;
 					fractionName = optional[(unsigned)i]->GetValue()[0];
 					overloadConfigurator->RemoveChild( i );
 					break;
 				}
-				cout << optional[i]->GetName() << endl;
+				//cout << optional[i]->GetName() << endl;
 			}
 		}
 
@@ -1800,7 +1802,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
 			for( int i=int(optional.size()-1); i > -1; --i )
 			{
-				if( optional[i]->GetName() == "FractionName" )
+				if( optional[(unsigned)i]->GetName() == "FractionName" )
 				{
 					//cout << optional[i]->GetValue()[0] << endl;
 					fractionName = optional[(unsigned)i]->GetValue()[0];

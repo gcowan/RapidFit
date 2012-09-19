@@ -55,7 +55,6 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 {
 	plotPDF->TurnCachingOff();
 
-
 	pdfIntegrator->SetPDF( plotPDF );
 	pdfIntegrator->ProjectionSettings();
 	pdfIntegrator->SetDebug(debug);
@@ -504,13 +503,13 @@ TH1* ComponentPlotter::FormatData( unsigned int combinationNumber )
 		}
 		for( unsigned int i=0; i< (unsigned)returnable->GetNbinsX(); ++i )
 		{
-			double bin_err = returnable->GetBinError( i );
+			double bin_err = returnable->GetBinError( (int)i );
 			double weight_term=weight_err*weight_err/(weight_sum*weight_sum);
-			double bin_term=bin_err*bin_err/ (returnable->GetBinContent( i )*returnable->GetBinContent( i ));
+			double bin_term=bin_err*bin_err/ (returnable->GetBinContent( (int)i )*returnable->GetBinContent( (int)i ));
 			if( isnan(bin_term) ) bin_term=0.;
 			//cout << endl << i << "\t" << returnable->GetBinContent( i ) << "\t" << weight_term << "\t" << bin_term << endl;
-			double final_err = returnable->GetBinContent( i )*sqrt( weight_term + bin_term );
-			returnable->SetBinError( i, final_err );
+			double final_err = returnable->GetBinContent( (int)i )*sqrt( weight_term + bin_term );
+			returnable->SetBinError( (int)i, final_err );
 		}
 	}
 	else
@@ -1293,7 +1292,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		double theory_y = input_bin_theory_data[i];
 
 		double data_y = input_data->GetY()[i];
-		double data_err = input_data->GetErrorY( i );
+		double data_err = input_data->GetErrorY( (int)i );
 
 		double pull = ( data_y -theory_y ) / data_err;
 
@@ -1311,7 +1310,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		pull_error_value.push_back( pull_err );
 
 		x_values.push_back( input_data->GetX()[i] );
-		x_errs.push_back( input_data->GetErrorX( i ) );
+		x_errs.push_back( input_data->GetErrorX( (int)i ) );
 
 		//cout << pull << "\t" << data_y << "-" << theory_y << "/" << data_err << "\t\t\t" << pull_err << "\t\t\t" << x_values.back() << "\t" << x_errs.back() << endl;
 	}
@@ -1513,6 +1512,8 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	}
 	delete comp_obj;
 
+	cout << "Finished Projecting" << endl;
+
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass("ComponentPlotter") )
@@ -1522,6 +1523,8 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	}
 
 	this->Sanity_Check( pointValues, component );
+
+	cout << "Returning pointValues" << endl;
 
 	return pointValues;
 }
@@ -1904,7 +1907,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 		double theory_y = input_bin_theory_data[i];
 
 		double data_y = input_data->GetY()[i];
-		double data_err = input_data->GetErrorY( i );
+		double data_err = input_data->GetErrorY( (int)i );
 
 		double pull = ( data_y - theory_y ) / data_err;
 
@@ -1922,7 +1925,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 		pull_error_value.push_back( pull_err );
 
 		x_values.push_back( input_data->GetX()[i] );
-		x_errs.push_back( input_data->GetErrorX( i ) );
+		x_errs.push_back( input_data->GetErrorX( (int)i ) );
 
 		//cout << pull << "\t" << data_y << "-" << theory_y << "/" << data_err << "\t\t\t" << pull_err << "\t\t\t" << x_values.back() << "\t" << x_errs.back() << endl;
 	}

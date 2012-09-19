@@ -252,7 +252,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 		if( Input.GetIndex()>(int)(allPseudoObservables.size()-1) )
 		{
 			//int var = (int)allPseudoObservables.size();
-			allPseudoObservables.resize( Input.GetIndex()+1, NULL );
+			allPseudoObservables.resize( (unsigned)Input.GetIndex()+1, NULL );
 			if( allPseudoObservables[(unsigned)Input.GetIndex()] != NULL ) delete allPseudoObservables[(unsigned)Input.GetIndex()];
 			allPseudoObservables[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
 			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
@@ -325,7 +325,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> V
 		if( Input.GetIndex()>(int)(allPseudoObservables2.size()-1) )
 		{
 			//int var = (int)allPseudoObservables2.size();
-			allPseudoObservables2.resize( Input.GetIndex()+1, NULL );
+			allPseudoObservables2.resize( (unsigned)Input.GetIndex()+1, NULL );
 			allPseudoObservables2[(unsigned)Input.GetIndex()] = new PseudoObservable( Input );
 			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
 		}

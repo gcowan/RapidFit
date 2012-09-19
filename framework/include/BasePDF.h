@@ -503,7 +503,7 @@
 		 *
 		 * @return Void
 		 */
-		void SetCopyConstructor( const IPDF* Input ) const;
+		void SetCopyConstructor( CopyPDF_t* Input ) const;
 
 		/*!
 		 * @breif Get the pointer to the PDF copy constructor

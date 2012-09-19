@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/09/19 Rob Currie
+   - Fixed bug in PhaseSpaceBoundary
+   - Cleaned up some code to fix warnings from clang
+
 2012/09/18 Rob Currie
    - Changed infomation to be output from DataSet in case of Weighted DataSet
    - Attempted to fix bug in XMLConfigurationReader

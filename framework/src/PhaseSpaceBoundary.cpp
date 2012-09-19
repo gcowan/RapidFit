@@ -220,7 +220,7 @@ void PhaseSpaceBoundary::AddConstraint( string Name, IConstraint* NewConstraint,
 		allConstraints.push_back( NULL );
 		this->SetConstraint( Name, NewConstraint );
 	}
-	else if( allConstraints[lookup] == NULL )
+	else if( allConstraints[(unsigned)lookup] == NULL )
 	{
 		this->SetConstraint( Name, NewConstraint );
 	}
@@ -399,13 +399,29 @@ string PhaseSpaceBoundary::XML() const
 
 unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool silence ) const
 {
+	(void) silence;
 	//	Exit on simple case
 	int thisIndex = Input->GetDiscreteIndex();
 	if( thisIndex != -1 ) return (unsigned)thisIndex;
-	if( this->GetDiscreteNames().empty() ) return 0;
+
+	if( this->GetDiscreteNames().empty() || (this->GetDiscreteNames().size() == 1) )
+	{
+		Input->SetDiscreteIndex( 0 );
+		return 0;
+	}
+
+	/*
+	if( this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() > 1 )
+	{
+		cout << "This DataPoint is:" << endl;
+		Input->Print();
+		cout << this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() << endl;
+	}
+	*/
 
 	//	Get all possible discrete combination datapoints and the names of all discrete observables
 	vector<DataPoint*> allCombinations = this->GetDiscreteCombinations();
+	if( allCombinations.empty() ) return 0;
 	vector<string> allDiscreteNames = this->GetDiscreteNames();
 
 	//	Construct array of ObservableRef objects to pick out Discrete Observables
@@ -434,6 +450,12 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		{
 			wanted_val = (*comb_i)->GetObservable( *Obsname_i, true )->GetValue();
 			this_val = Input->GetObservable( *Obsname_i, true )->GetValue();
+			//if( this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() > 1 )
+			//{
+			//	cout << "wanted: " << wanted_val << endl;
+			//	cout << "this_val: " << this_val << endl;
+			//}
+
 			//	Stop checking once we have at least one discrtete observable different
 			if( fabs( wanted_val - this_val ) > 1E-6 )
 			{
@@ -449,6 +471,12 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		}
 	}
 
+	//if( this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() > 1 )
+	//{
+	//	cout << "This Index is: " << thisIndex << endl;
+	//	//exit(-520);
+	//}
+
 	//	Destory temporary objects
 	while( !allCombinations.empty() )
 	{
@@ -459,6 +487,8 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	//	Check for error
 	if( thisIndex == -1 )
 	{
+		cerr << "wanted_val: " << wanted_val << endl;
+		cerr << "this_val: " << this_val << endl;
 		cerr << "This DataPoint does not Lie within this PhaseSpace." << endl;
 		cerr << "This is a SERIOUS MISCONFIGURATION!!! Exiting :(" << endl;
 		Input->Print();

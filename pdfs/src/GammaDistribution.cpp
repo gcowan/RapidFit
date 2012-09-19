@@ -72,7 +72,7 @@ double GammaDistribution::Evaluate(DataPoint * measurement)
 	//PDF->SetParameters(10.4,0.0027, 0.003,1);
 	
 	// Get the observable
-	double x = measurement->GetObservable( GFxName )->GetValue();
+	x = measurement->GetObservable( GFxName )->GetValue();
 	
 	double returnValue = 0.000000000001;
 

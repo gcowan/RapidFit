@@ -63,9 +63,9 @@ BasePDF::~BasePDF()
 	if( debug != NULL ) delete debug;
 }
 
-void BasePDF::SetCopyConstructor( const IPDF* input ) const
+void BasePDF::SetCopyConstructor( CopyPDF_t* input ) const
 {
-	copy_object = (CopyPDF_t*) input;
+	copy_object = input;
 }
 
 CopyPDF_t* BasePDF::GetCopyConstructor() const
