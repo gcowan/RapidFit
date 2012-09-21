@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/09/21 Rob Currie
+   - Fixed the 1DLL bug in the 2DLL code
+
 2012/09/19 Rob Currie
    - Fixed bug in PhaseSpaceBoundary
    - Cleaned up some code to fix warnings from clang

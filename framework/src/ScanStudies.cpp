@@ -44,10 +44,13 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 	for( int si=0; si<int(npoints); ++si)
 	{
 		cout << "\n\nSINGLE SCAN NUMBER\t\t" << si+1 << "\t\tOF\t\t" <<int(npoints)<< endl<<endl;
+
 		// Set scan parameter value
 		if( int(npoints)!=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
 		else deltaScan=0;
 		double scanVal = lolim+deltaScan*si;
+
+		//      The FitFunction has the ability to change the content of the input ParameterSet by definition as it isn't defined as const
 		scanParameter = BottleParameters->GetPhysicsParameter(scanName);
 		scanParameter->SetBlindedValue( scanVal ) ;
 
@@ -100,7 +103,7 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 				{
 					left_right = -1;
 				}
-										//  0/2 and 1/2 are both 0 as an integer
+										//  remember 0/2 and 1/2 are both 0 as an integer
 
 				scanVal = scanVal_orig + (double)left_right * wiggle_step_size * (double)int((wiggle_step_num)/2 + 1);
 
@@ -109,6 +112,9 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 				++wiggle_step_num;
 			}
 
+			//	Perform 10 steps either side of minima with 20th of the step size
+			//	when more than 10 steps either side have strayed into next point on the scan
+			//	This 'wiggle is only done in 1D here
 			if( wiggle_step_num >= 20 ) break;
 
 			scanParameter->SetBlindedValue( scanVal ) ;
@@ -118,8 +124,8 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 
 
 		cout << "Fit Finished!\n" <<endl;
-		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
 
+		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
 		string name = Wanted_Param->GetName();
 		string type = BottleParameters->GetPhysicsParameter( name )->GetType();
 		string unit = BottleParameters->GetPhysicsParameter( name )->GetUnit();
@@ -196,10 +202,19 @@ void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctio
 
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan;
+
+		//	The FitFunction has the ability to change the content of the input ParameterSet by definition as it isn't defined as const
+		scanParameter = BottleParameters->GetPhysicsParameter(scanName);
 		scanParameter->SetBlindedValue( scanVal ) ;
 
 		// Do a scan point fit
 		ScanStudies::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result, OutputLevel );
+
+		//
+		//
+		//	Would be nice to add an additional wiggle here for the 2D as this would improve things at the usual cost
+		//
+		//
 
 		//  THIS IS ALWAYS TRUE BY DEFINITION OF THE SCAN
 		string name = Param_Set.first->GetName();
@@ -216,6 +231,7 @@ void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctio
 	}
 
 	//Reset the parameter as it was
+	scanParameter = BottleParameters->GetPhysicsParameter(scanName);
 	scanParameter->SetType( originalType ) ;
 	scanParameter->SetBlindedValue( originalValue ) ;
 }
