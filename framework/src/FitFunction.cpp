@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <float.h>
 #include <cstdlib>
+#include <ctime>
 
 using namespace::std;
 
@@ -30,7 +31,7 @@ using namespace::std;
 FitFunction::FitFunction() :
 	Name("Unknown"), allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
-	debug(new DebugClass(false) ), traceNum(0)
+	debug(new DebugClass(false) ), traceNum(0), step_time(-1)
 {
 }
 
@@ -102,6 +103,7 @@ void FitFunction::SetupTraceTree()
 	branch_objects.push_back( 0 );
 	Fit_Tree->Branch( "NLL", &(branch_objects.back()), "NLL/D" );
 	Fit_Tree->Branch( "Call", &(fit_calls), "Call/D" );
+	Fit_Tree->Branch( "time", &(step_time), "time/D" );
 }
 
 //Set the physics bottle to fit with
@@ -251,6 +253,8 @@ ParameterSet * FitFunction::GetParameterSet() const
 //Return the value to minimise
 double FitFunction::Evaluate()
 {
+	time_t start, end;
+	time(&start);
 	double minimiseValue = 0.0;
 	double temp=0.;
 	//Calculate the function value for each PDF-DataSet pair
@@ -293,7 +297,9 @@ double FitFunction::Evaluate()
 		}
 	}
 
+	time(&end);
 	++fit_calls;
+	step_time = difftime( end, start );
 
 	if( Fit_Tree !=NULL )
 	{
@@ -306,8 +312,11 @@ double FitFunction::Evaluate()
 		branch_objects[branch_objects.size()] = (Double_t) minimiseValue;
 		Fit_Tree->SetBranchAddress( "NLL", &(branch_objects[branch_objects.size()]) );
 		Fit_Tree->SetBranchAddress( "Call", &(fit_calls) );
+		Fit_Tree->SetBranchAddress( "time", &(step_time) );
 		//cout << endl;
 		Fit_Tree->Fill();
+		Fit_Tree->Write("",TObject::kOverwrite);
+		Fit_File->Write("",TObject::kOverwrite);
 	}
 	cout << "NLL: " << setprecision(10) << minimiseValue << "\b\b\b\b\r\r\r\r" << flush;
 	if( isnan(minimiseValue) )

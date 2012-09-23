@@ -198,6 +198,8 @@ class FitFunction
 		DebugClass* debug;				/*!	Flag controlling the turning on/off of extra debug information	*/
 
 		string Name;
+
+		double step_time;
 };
 
 #endif

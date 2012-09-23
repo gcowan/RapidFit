@@ -29,7 +29,7 @@ PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configP
 
 PDFConfigurator::PDFConfigurator( const PDFConfigurator& input ) :
 	defaultNames( input.defaultNames ), replacementNames( input.replacementNames ), configParameters( input.configParameters ), configValues( input.configValues ),
-	input_DataSet( input.input_DataSet ), fitFunction( input.fitFunction )
+	input_DataSet( input.input_DataSet ), fitFunction( input.fitFunction ), input_observable()
 {
 }
 

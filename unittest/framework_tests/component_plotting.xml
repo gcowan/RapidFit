@@ -246,6 +246,18 @@
 			<Sigma>3</Sigma>
 			<Points>10</Points>
 		</Scan>
+		<TwoDScan>
+			<X_Param>
+				<Name>sigma_m1b</Name>
+				<Sigma>3</Sigma>
+				<Points>10</Points>
+			</X_Param>
+			<Y_Param>
+				<Name>sigma_m1</Name>
+				<Sigma>3</Sigma>
+				<Points>10</Points>
+			</Y_Param>
+		</TwoDScan>
 	</Output>
 
 </RapidFit>

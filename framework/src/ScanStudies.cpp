@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
 
 using namespace::std;
 
@@ -33,9 +34,23 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 
 	// Get a pointer to the physics parameter to be scanned and fix it	
 	// CAREFUL:  this must be reset as it was at the end.
-	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName);
+	PhysicsParameter* scanParameter = NULL;
+	try{
+		scanParameter = BottleParameters->GetPhysicsParameter(scanName);
+	}
+	catch(...)
+	{
+		cerr << "Couldn't find Parameter: " << scanName << ". Can NOT perform scan!" << endl << endl;
+		exit(3763);
+	}
 	double originalValue = scanParameter->GetBlindedValue();
 	string originalType = scanParameter->GetType();
+
+	if( originalType == "Fixed" && fabs(uplim-lolim) < 1E-5 )
+	{
+		cerr << "Cannot Run a scan Using Parameter: " << scanName << endl;
+		exit(3764);
+	}
 	scanParameter->SetType( "Fixed" ) ;
 
 	// Need to set up a loop , fixing the scan parameter at each point
@@ -54,7 +69,7 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 		scanParameter = BottleParameters->GetPhysicsParameter(scanName);
 		scanParameter->SetBlindedValue( scanVal ) ;
 
-		cout << "Fitting at:\t" << scanName << "=" << scanVal << endl;
+		cout << "Fitting at:\t" << scanName << "=" << setw(6) << scanVal << setw(6) << " " << "StepSize: " << deltaScan << endl;
 
 		output_interface->StartStopwatch();
 
@@ -103,7 +118,7 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 				{
 					left_right = -1;
 				}
-										//  remember 0/2 and 1/2 are both 0 as an integer
+				//  remember 0/2 and 1/2 are both 0 as an integer
 
 				scanVal = scanVal_orig + (double)left_right * wiggle_step_size * (double)int((wiggle_step_num)/2 + 1);
 
@@ -149,7 +164,7 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 				string fixed_unit = BottleParameters->GetPhysicsParameter( Fixed_List[i] )->GetUnit();
 				double fixed_value = BottleParameters->GetPhysicsParameter( Fixed_List[i] )->GetValue();
 				scanStepResult->GetResultParameterSet()->ForceNewResultParameter( Fixed_List[i],
-												fixed_value, fixed_value, 0., fixed_value, fixed_value, fixed_type, fixed_unit );
+						fixed_value, fixed_value, 0., fixed_value, fixed_value, fixed_type, fixed_unit );
 			}
 		}
 
@@ -183,18 +198,32 @@ void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctio
 
 	// Get a pointer to the physics parameter to be scanned and fix it
 	// CAREFUL:  this must be reset as it was at the end.
-	PhysicsParameter* scanParameter = BottleParameters->GetPhysicsParameter(scanName);
+	PhysicsParameter* scanParameter = NULL;
+	try{
+		scanParameter = BottleParameters->GetPhysicsParameter(scanName);
+	}
+	catch(...)
+	{
+		cerr << "Couldn't find Parameter: " << scanName << ". Can NOT perform scan!" << endl << endl;
+		exit(3763);
+	}
 	double originalValue = scanParameter->GetBlindedValue( );
 	string originalType = scanParameter->GetType( );
+
+	if( originalType == "Fixed" && fabs(uplim-lolim) < 1E-5 )
+	{
+		cerr << "Cannot Run a scan Using Parameter: " << scanName << endl << endl;
+		exit(3764);
+	}
 	scanParameter->SetType( "Fixed" );
 
 	// Need to set up a loop , fixing the scan parameter at each point
 
-	double deltaScan;
+	double deltaScan=0.;
 	if( int(npoints) !=1 ) deltaScan = (uplim-lolim) / (npoints-1.) ;
 	else deltaScan=0.;
 
-	for( int si=0; si < int(npoints); ++si)
+	for( int si=0; si < int(npoints); ++si )
 	{
 
 		cout << "\n\n2DSCAN OUTER NUMBER\t\t" << si+1 << "\t\tOF\t\t" << int(npoints) <<endl<<endl;
@@ -203,9 +232,11 @@ void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctio
 		// Set scan parameter value
 		double scanVal = lolim + si*deltaScan;
 
+		cout << "Fitting at:\t" << scanName << "=" << setw(6) << scanVal << setw(6) << " " << "StepSize: " << deltaScan << endl;
+
 		//	The FitFunction has the ability to change the content of the input ParameterSet by definition as it isn't defined as const
 		scanParameter = BottleParameters->GetPhysicsParameter(scanName);
-		scanParameter->SetBlindedValue( scanVal ) ;
+		scanParameter->SetBlindedValue( scanVal );
 
 		// Do a scan point fit
 		ScanStudies::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result, OutputLevel );

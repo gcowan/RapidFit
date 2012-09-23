@@ -352,6 +352,11 @@ ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, c
 		{
 			cout << endl;
 			cout << "FitAssembler: You are missing the Parameter: " << param_names[i] << " in your XML File. Please add it to the ParameterSet!" << endl << endl;
+			cout << "Eg:" << endl;
+			PhysicsParameter* temp = new PhysicsParameter( param_names[i] );
+			string xmlStr = temp->XML();
+			delete temp;
+			cout << xmlStr << endl << endl;
 			exit(0);
 		}
 		wantedParameterSet->SetPhysicsParameter( param_names[i], new PhysicsParameter(*phys_param) );
