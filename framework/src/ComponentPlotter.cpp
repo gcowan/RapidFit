@@ -259,6 +259,11 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 
 		//cout << "Normalizing" << endl;
 		double n_events = (double)plotData->GetDataNumber( allCombinations[combinationIndex], true );
+
+		//cout << n_events << " for:" << endl;
+		//allCombinations[combinationIndex]->Print();
+		//cout << "combinationWeights[combinationIndex]: " << combinationWeights[combinationIndex] << endl;
+
 		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM PLOTTER CLASS
 		for (int pointIndex = 0; pointIndex < total_points; ++pointIndex )
 		{
@@ -267,7 +272,7 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 			(*projectionValueArray)[(unsigned)pointIndex] *= fabs(ratioOfIntegrals[combinationIndex]) * n_events * range / combination_integral[combinationIndex];
 
 			//	'Fraction of this Combination in Combination 0'
-			(*projectionValueArray)[(unsigned)pointIndex] *= combinationWeights[combinationIndex];
+			//(*projectionValueArray)[(unsigned)pointIndex] *= combinationWeights[combinationIndex];
 
 			//	This is due to ROOT binning the data into 100 bins by default
 			(*projectionValueArray)[(unsigned)pointIndex] /= double(data_binning);
@@ -1824,6 +1829,8 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 	unsigned int comb_num=0;
 
+	double range = fabs( boundary_max-boundary_min );
+
 	for( vector<DataPoint*>::iterator comb_i = allCombinations.begin();  comb_i != allCombinations.end(); ++comb_i, ++comb_num )
 	{
 		DataPoint* InputPoint = new DataPoint( *( (*comb_i) ) );
@@ -1837,13 +1844,15 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 		double dataNum = plotData->GetDataNumber( *comb_i, true );
 
-		temp_integral_value = temp_integral_value * ratioOfIntegrals[comb_num] * dataNum * (boundary_max-boundary_min) / combination_integral[comb_num];
+		temp_integral_value = temp_integral_value * fabs(ratioOfIntegrals[comb_num]) * dataNum * range / combination_integral[comb_num];
 
-		temp_integral_value = temp_integral_value * ( combinationWeights[comb_num] / double(data_binning) );
+		//temp_integral_value = temp_integral_value * ( combinationWeights[comb_num] / double(data_binning) );
+
+		temp_integral_value = temp_integral_value / double(data_binning);
 
 		integral_value += temp_integral_value;
 
-		//delete InputPoint;
+		delete InputPoint;
 	}
 
 	cout << "Value At: " << setprecision(3) << x[0] << "\tis:\t" << setprecision(4) << integral_value << "\r\r";

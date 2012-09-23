@@ -183,7 +183,7 @@ void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctio
 
 	// Get a pointer to the physics parameter to be scanned and fix it
 	// CAREFUL:  this must be reset as it was at the end.
-	PhysicsParameter * scanParameter = BottleParameters->GetPhysicsParameter(scanName);
+	PhysicsParameter* scanParameter = BottleParameters->GetPhysicsParameter(scanName);
 	double originalValue = scanParameter->GetBlindedValue( );
 	string originalType = scanParameter->GetType( );
 	scanParameter->SetType( "Fixed" );
