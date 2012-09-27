@@ -130,7 +130,8 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
 	tmp=new DPJpsiKaon(0, 0, 5.279, 1.4324, 0.109, 0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,2);
+			0.13957018, 5.0, 1.5, 3.096916,0);
+//			0.13957018, 5.0, 1.5, 3.096916,2);
 	KpiComponents.push_back(tmp);
   
 	// Kpi s-wave using LASS
@@ -656,12 +657,9 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 			// Now comes sum over Z+ components and lambdaPsiPrime
 			for (unsigned int i = 0; i < ZComponents.size(); ++i)
 			{
-			// Sum over lambdaPsiPrime
-			for (int twoLambdaPsiPrime = -2; twoLambdaPsiPrime <= 2; twoLambdaPsiPrime += 2)
 			{
-			tmp += wigner.function(cosARefs, twoLambdaPsiPrime/2, twoLambdaPsi/2)*
-			ZComponents[i]->amplitude(m13, cosThetaZ, cosThetaPsi, dphi,
-			twoLambda,twoLambdaPsiPrime);
+			tmp += ZComponents[i]->amplitude(m13, cosThetaZ, cosThetaPsi, dphi,
+			twoLambda,twoLambdaPsi); // need to check that we pass right helicities
 			}
 			}
 			 */
@@ -687,6 +685,8 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	double p3    = sqrt(t31*t32)/MB0/2;
 
 	double returnable_value = result * angularAcc * p1_st * p3;
+
+//  std::cout<<"DEBUG: "<<m23<<" "<<cosTheta1<<" "<<cosTheta2<<" "<<phi<<" "<<result<<" "<<p1_st*p3<<std::endl;
 
 	if( isnan(returnable_value) || returnable_value < 0 ) return 0.;
 	else return returnable_value;
