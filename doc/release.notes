@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2011/10/01 Rob Currie
+   - Changed C++ wrapper for gsl code.   Now uses:     '__RAPIDFIT_USE_GSL' to wrap GSL codeblocks
+   - Removed Reseve function in MemoryDataSet, no longer required and was causing malloc issues on some systems
+
 2011/09/23 Rob Currie
    - Fixed bug in ComponentProjections exposed due to bug in ParameterSet
         This has allowed me to remove the 'combination weight' term from the normalisation of the integrals between data/theory

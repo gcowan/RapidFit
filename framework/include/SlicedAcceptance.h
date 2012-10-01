@@ -24,8 +24,8 @@ using namespace::std;
 
 //=======================================
 
-class AcceptanceSlice{
-
+class AcceptanceSlice
+{
 	public:
 		AcceptanceSlice( double tl, double th, double h ) : _tlow(tl), _thigh(th), _height(h) {}
 		double tlow()   const { return _tlow ; }
@@ -45,21 +45,21 @@ class SlicedAcceptance
 
 		//Constructors
 		~SlicedAcceptance();
-		SlicedAcceptance( double tlow, double thigh ) ;
-		SlicedAcceptance( double tlow, double thigh, double beta  ) ;
-		SlicedAcceptance( string s  ) ;
-		SlicedAcceptance( string s1, string s2  ) ;
+		SlicedAcceptance( double tlow, double thigh );
+		SlicedAcceptance( double tlow, double thigh, double beta  );
+		SlicedAcceptance( string s  );
+		SlicedAcceptance( string s1, string s2  );
 		//	Copy Constructor
 		SlicedAcceptance( const SlicedAcceptance& input );
 
 		// Methods for numerator of PDF to return acceptance for event
-		double getValue( double time ) const ;
+		double getValue( double time ) const;
 
-		double getValue( Observable* time, double timeOffset=0. ) const ;
+		double getValue( Observable* time, double timeOffset=0. ) const;
 
 		// Methods for the normalisation integral in slices
-		unsigned int numberOfSlices() const ;
-		AcceptanceSlice * getSlice( unsigned int slice ) const ;
+		unsigned int numberOfSlices() const;
+		AcceptanceSlice * getSlice( unsigned int slice ) const;
 
 	private:	
 		//      Uncopyable!

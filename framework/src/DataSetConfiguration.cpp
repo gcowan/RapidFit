@@ -511,10 +511,9 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	// Now populate the dataset
 	int numberOfDataPointsAdded = 0;
 	int numberOfDataPointsRead = 0;
+
 	//  Now we have all of the data stored in memory in real_data_array which has a 1<->1 with observableName
 	//  Create and store data points for each event as before and throw away events outside of the PhaseSpace
-	if ( int(numberEventsToRead) < int(numberOfEventsAfterCut) )	data->ReserveDataSpace( int(numberEventsToRead) );
-	else	data->ReserveDataSpace( int(numberOfEventsAfterCut) );
 	for( ; (numberOfDataPointsRead < numberOfEventsAfterCut) && (numberOfDataPointsAdded < numberEventsToRead) ; ++numberOfDataPointsRead )
 	{
 		DataPoint* point = new DataPoint( observableNames );

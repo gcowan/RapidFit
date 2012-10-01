@@ -44,11 +44,6 @@ MemoryDataSet::~MemoryDataSet()
 	}
 }
 
-void MemoryDataSet::ReserveDataSpace( int numberOfPoints )
-{
-	allData.reserve( unsigned(numberOfPoints) );
-}
-
 //Add a data point to the set
 bool MemoryDataSet::AddDataPoint( DataPoint* NewDataPoint )
 {

@@ -161,7 +161,7 @@ gcc47: all
 gcc48: override CC=g++-4.8
 gcc48: all
 
-gsl: override CXXFLAGS+= -D__USE_GSL_ERR $(gsl-config --cflags) 
+gsl: override CXXFLAGS+= -D__RAPIDFIT_USE_GSL $(gsl-config --cflags) 
 gsl: override LINKFLAGS+= -lgsl -lgslcblas -lm $(gsl-config --libs)
 gsl: all
 
@@ -211,6 +211,11 @@ $(OBJUTILDIR)/Template_Functions.o: $(UTILSSRC)/Template_Functions.C
 $(EXEDIR)/print: $(OBJUTILDIR)/print.o $(OBJDIR)/EdStyle.o $(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/print.o: $(UTILSSRC)/print.C
+	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
+
+$(EXEDIR)/AngularDist: $(OBJUTILDIR)/AngularDist.o $(OBJDIR)/EdStyle.o $(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+$(OBJUTILDIR)/AngularDist.o: $(UTILSSRC)/AngularDist.C
 	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
 
 $(EXEDIR)/weighted: $(OBJUTILDIR)/weighted.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o

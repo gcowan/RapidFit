@@ -27,7 +27,6 @@ class MemoryDataSet : public IDataSet
 
 		//Interface functions
 		virtual DataPoint * GetDataPoint(int) const;
-		virtual void ReserveDataSpace( int numberOfPoints );
 		virtual bool AddDataPoint( DataPoint* );
 		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL, bool silence=false ) const;
 		virtual PhaseSpaceBoundary * GetBoundary() const;

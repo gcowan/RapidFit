@@ -27,7 +27,7 @@ pthread_mutex_t ROOT_Lock;
 
 using namespace::std;
 
-#ifdef __USE_GSL_ERR
+#ifdef __RAPIDFIT_USE_GSL
 
 #include <gsl/gsl_complex_math.h>
 #include <gsl/gsl_sf_erf.h>
@@ -139,7 +139,7 @@ namespace Mathematics
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
-#ifdef __USE_GSL_ERR
+#ifdef __RAPIDFIT_USE_GSL
 			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
 			returnable = GSL_REAL( gsl_erf( gsl_z ) );
 #else
@@ -164,7 +164,7 @@ namespace Mathematics
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
-#ifdef __USE_GSL_ERR
+#ifdef __RAPIDFIT_USE_GSL
 			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
 			returnable = GSL_IMAG( gsl_erf( gsl_z ) );
 #else
