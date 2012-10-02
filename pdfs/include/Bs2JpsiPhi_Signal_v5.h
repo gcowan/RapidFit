@@ -579,7 +579,7 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 				       ) +
 				D2() * (
 						-  ( 2.0 * sinphis() ) * expSin( )
-						-  ( 2.0 * CC()      ) * expCos( )
+						+  ( 2.0 * CC()      ) * expCos( )
 				       ) ;
 		}
 
@@ -592,7 +592,7 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 				       ) +
 				D2() * (
 						-  ( 2.0 * sinphis() ) * intExpSin( )
-						-  ( 2.0 * CC()      ) * intExpCos( )
+						+  ( 2.0 * CC()      ) * intExpCos( )
 				       ) ;
 		}
 
