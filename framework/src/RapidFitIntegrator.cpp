@@ -27,8 +27,10 @@
 #include <pthread.h>
 #include <exception>
 
+#ifdef __RAPIDFIT_USE_GSL
 // GSL for MC integration
 #include <gsl/gsl_qrng.h>
+#endif
 
 pthread_mutex_t multi_mutex;
 pthread_mutex_t multi_mutex2;
@@ -329,6 +331,7 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 	return output;
 }
 
+#ifdef __RAPIDFIT_USE_GSL
 double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, 
 				vector<string> doIntegrate )
 {
@@ -389,6 +392,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	delete point;
 	return result;
 }
+#endif
 
 double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
 		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, bool haveTestedIntegral, DebugClass* debug )
