@@ -610,7 +610,8 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		string Strategy;
 		int Threads = -1;
 		bool integratorTest = true;
-		bool NormaliseWeights=false;
+		bool gslIntegrator = false;
+		bool NormaliseWeights = false;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		if ( functionInfo.size() == 0 )
 		{
@@ -626,6 +627,17 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 				{
 					functionName = functionInfo[childIndex]->GetValue()[0];
 				}
+                                else if ( functionInfo[childIndex]->GetName() == "UseGSLNumericalIntegration" )
+                                {
+                                        if( functionInfo[childIndex]->GetValue()[0] == "True" )
+                                        {
+                                                gslIntegrator = true;
+                                        }
+                                        else
+                                        {
+                                                gslIntegrator = false;
+                                        }
+                                }
 				else if ( functionInfo[childIndex]->GetName() == "WeightName" )
 				{
 					hasWeight = true;
@@ -701,6 +713,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		returnable_function->SetThreads( Threads );
 		returnable_function->SetNormaliseWeights( NormaliseWeights );
 		returnable_function->SetIntegratorTest( integratorTest );
+                returnable_function->SetGSLIntegrator( gslIntegrator );
 
 		return returnable_function;
 	}

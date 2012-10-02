@@ -30,6 +30,8 @@
 #include <iostream>
 #include <pthread.h>
 #include <float.h>
+#include "TFile.h"
+#include "TNtuple.h"
 
 using namespace::std;
 
@@ -135,7 +137,8 @@ double NegativeLogLikelihoodNumerical::EvaluateDataSet( IPDF * FittingPDF, IData
 		}
 		while( !fit_thread_data[threadnum].dataPoint_Result.empty() ) fit_thread_data[threadnum].dataPoint_Result.pop_back();
 	}
-
+	//cout << -total << endl;
+	//exit(100);
 	//delete [] fit_thread_data;
 	delete [] Thread;
 
@@ -149,6 +152,9 @@ void* NegativeLogLikelihoodNumerical::ThreadWork( void *input_data )
 
 	double value=0, weight=0, integral=0, result=0;
 	int num=0;
+	//TFile * file = TFile::Open("integral.root", "UPDATE");
+	//TNtuple * ntuple = new TNtuple("test_good","test", "value");
+	//TNtuple * ntuple = new TNtuple("integral","test", "integral");
 	//bool isnorm = thread_input->fittingPDF->GetName()=="NormalisedSum";
 	for( vector<DataPoint*>::iterator data_i=thread_input->dataSubSet.begin(); data_i != thread_input->dataSubSet.end(); ++data_i, ++num )
 	{
@@ -209,6 +215,9 @@ void* NegativeLogLikelihoodNumerical::ThreadWork( void *input_data )
 
 		//	Result of evaluating the DataPoint
 		result = log( value / integral );
+		//result = integral;
+		//result = value;
+		//cout << value << " " << integral << endl;
 
 		//	If we have a weighted dataset then weight the result (if not don't perform a *1.)
 		if( thread_input->useWeights == true )
@@ -223,7 +232,9 @@ void* NegativeLogLikelihoodNumerical::ThreadWork( void *input_data )
 		//	Push back the result from evaluating this datapoint
 		thread_input->dataPoint_Result.push_back( result );
 	}
-
+	//ntuple->Fill(integral);
+	//file->Write();
+	//file->Close();
 	//	Finished evaluating this thread
 	pthread_exit( NULL );
 }

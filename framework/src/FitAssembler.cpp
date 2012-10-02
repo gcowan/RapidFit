@@ -80,6 +80,7 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 //Create the minimiser and fit function
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, PhysicsBottle * Bottle, DebugClass* debug )
 {
+	
 	if( Bottle->GetParameterSet()->GetAllFloatNames().size() == 0 )
 	{
 		vector<string> ParamNames = Bottle->GetParameterSet()->GetAllFixedNames();
@@ -89,11 +90,15 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			PhysicsParameter* param = Bottle->GetParameterSet()->GetPhysicsParameter( ParamNames[i] );
 			fixed_set->SetResultParameter( ParamNames[i], param->GetValue(), param->GetValue(), 0., 0., 0., param->GetType(), param->GetUnit() );
 		}
+	
+		FitFunction * theFunction = FunctionConfig->GetFitFunction();
+		theFunction->SetPhysicsBottle(Bottle);
 
 		FitResult* fixed_result = new FitResult( 0., fixed_set, 3, Bottle );
+		fixed_result->SetMinimumValue(theFunction->Evaluate());
 		return fixed_result;
 	}
-
+	
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass( "FitAssembler" ) )

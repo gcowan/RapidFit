@@ -31,12 +31,14 @@ DoubleExponential::DoubleExponential( PDFConfigurator* configurator) :
 	, sigma3Name	( configurator->getName("timeResolution3") )
 	, timeRes2FracName( configurator->getName("timeResolution2Fraction") )
 	, timeRes3FracName( configurator->getName("timeResolution3Fraction") )
+	, timeOffsetName( configurator->getName("timeOffset") )
 	// Observables
 	, timeName      ( configurator->getName("time") )
 	//objects used in XML
 	, tau1(), tau2(), fraction1()
 	, sigma(), sigma1(), sigma2(), sigma3(), timeRes2Frac(), timeRes3Frac()
 	, resolutionScale1(), resolutionScale2(), resolutionScale3()
+	, timeOffset()
 	, tlow(), thigh(), time()
 	, _useEventResolution(false)
 	, _useTimeAcceptance(false)
@@ -79,6 +81,7 @@ DoubleExponential::DoubleExponential( const DoubleExponential &copy ) :
 	, sigma3Name	( copy.sigma3Name )
 	, timeRes2FracName( copy.timeRes2FracName )
 	, timeRes3FracName( copy.timeRes3FracName )
+	, timeOffsetName( copy.timeOffsetName )
 	, timeName      ( copy.timeName )
 	, tau1( copy.tau1 )
 	, tau2( copy.tau2 )
@@ -86,7 +89,8 @@ DoubleExponential::DoubleExponential( const DoubleExponential &copy ) :
 	, sigma( copy.sigma ), sigma1( copy.sigma1 ), sigma2( copy.sigma2 ), sigma3( copy.sigma3 )
 	, timeRes2Frac( copy.timeRes2Frac), timeRes3Frac( copy.timeRes3Frac )
         , resolutionScale1( copy.resolutionScale1 ), resolutionScale2( copy.resolutionScale2 ), resolutionScale3( copy.resolutionScale3 )
-        , tlow( copy.tlow ), thigh( copy.thigh ), time( copy.time )
+        , timeOffset( copy.timeOffset )
+	, tlow( copy.tlow ), thigh( copy.thigh ), time( copy.time )
 	, _useEventResolution( copy._useEventResolution )
         , _useTimeAcceptance( copy._useTimeAcceptance )
 	, _numericIntegralForce( copy._numericIntegralForce )
@@ -122,6 +126,7 @@ void DoubleExponential::MakePrototypes()
 	parameterNames.push_back( resScale1Name );
 	parameterNames.push_back( resScale2Name );
 	parameterNames.push_back( resScale3Name );
+	parameterNames.push_back( timeOffsetName );
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -154,6 +159,7 @@ bool DoubleExponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	resolutionScale1 = allParameters.GetPhysicsParameter( resScale1Name )->GetValue();
 	resolutionScale2 = allParameters.GetPhysicsParameter( resScale2Name )->GetValue();
 	resolutionScale3 = allParameters.GetPhysicsParameter( resScale3Name )->GetValue();
+	timeOffset       = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
 
 	return isOK;
 }
@@ -162,7 +168,7 @@ bool DoubleExponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 double DoubleExponential::Evaluate(DataPoint * measurement)
 {
 	// Observable
-	time = measurement->GetObservable( timeName )->GetValue();
+	time = measurement->GetObservable( timeName )->GetValue() - timeOffset;
 	if( useEventResolution() ) eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
 
 	double num = 0.;
@@ -215,7 +221,8 @@ double DoubleExponential::Evaluate(DataPoint * measurement)
 			num = (1. - timeRes2Frac - timeRes3Frac)*val1 + timeRes2Frac*val2 + timeRes3Frac*val3;
 		}
 	}
-	if( useTimeAcceptance() ) num = num * timeAcc->getValue(time);
+	Observable * timeObs = measurement->GetObservable( timeName );
+	if( useTimeAcceptance() ) num = num * timeAcc->getValue(timeObs, timeOffset);
 	//cout << eventResolution << endl;
 	return num;
 }

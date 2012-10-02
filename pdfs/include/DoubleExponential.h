@@ -44,6 +44,7 @@ class DoubleExponential : public BasePDF
 		ObservableRef resScale1Name;                     // Scale to multiply all Gaussians with 
 		ObservableRef resScale2Name;                     // Scale to multiply all Gaussians with 
 		ObservableRef resScale3Name;                     // Scale to multiply all Gaussians with 
+		ObservableRef timeOffsetName;  
 		ObservableRef sigma1Name;		// time res sigma 1
 		ObservableRef sigma2Name;		// time res sigma 2
 		ObservableRef sigma3Name;		// time res sigma 2
@@ -67,6 +68,7 @@ class DoubleExponential : public BasePDF
 		double resolutionScale1;
 		double resolutionScale2;
 		double resolutionScale3;
+		double timeOffset;
 
 		double tlow, thigh; // integration limits
 

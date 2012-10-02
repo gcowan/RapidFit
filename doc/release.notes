@@ -1,5 +1,19 @@
 // $Id: release.notes $
 
+2011/10/02 Greig Cowan
+   - Lots of changes:
+	- Added option to perform numerical integration using quasi-random numbers
+	from GSL. This is just MC integration, but faster. Can be configured using
+	switch in XML, but the code for the integration is specific to the DP 
+	analysis. I will try and make it more general for next iteration. Also have
+	a problem getting it to work with projections.
+	- Some rearrangement of the DP PDF.
+	- Added option for time offset in Exponential PDF - needs some testing.
+	- Changed FitAssembler slightly to set the NLL which is returned from 
+	evaluating the function. This is useful when you want to do some debugging
+	by making an LL scan of a parameter without actually fitting anything else
+	(i.e., just evaluate the LL at each scan point).
+
 2011/10/02 Rob Currie
    - Committing sign fix for |lambda| fitting in v5
 

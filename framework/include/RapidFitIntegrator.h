@@ -48,7 +48,7 @@ class RapidFitIntegrator
 		 *
 		 *                            The value of this is stored in the object RapidFitIntegratorNumerical
 		 */
-		RapidFitIntegrator( IPDF* InputPDF, bool ForceNumerical = false );
+		RapidFitIntegrator( IPDF* InputPDF, bool ForceNumerical = false, bool UsePseudoRandomIntegration = false );
 
 		/*!
 		 * @breif Copy Constructor
@@ -272,6 +272,14 @@ class RapidFitIntegrator
 
 
 		/*!
+		 * @brief This is the Interface which allows us to perform psuedo-random number integration using GSL
+		 *
+		 * @return This Should return a double > 0 unless there has been an error
+		 */
+		static double PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
+				vector<string> doIntegrate);
+
+		/*!
 		 * @brief This is the Interface to The MuliDimentional Integral class within ROOT
 		 *
 		 * This has been moved to be a static double in order to test which object weren't thread safe in an easier way
@@ -346,6 +354,11 @@ class RapidFitIntegrator
 		 * @brief A boolean to make sure that the Observables DataSet is only checked to be Integrable only once
 		 */
 		bool obs_check;
+
+		/*!
+		 * @brief to let the user choose if they want to use MC integration using pseudo-random numbers.
+		 */
+		bool pseudoRandomIntegration;
 
 		DebugClass* debug;
 };

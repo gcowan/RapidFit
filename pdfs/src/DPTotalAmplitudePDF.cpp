@@ -78,6 +78,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, phiName	( configurator->getName("phi") )
 
   	, mag_LASSName	( configurator->getName("mag_LASS") )
+  	, phase_LASSName	( configurator->getName("phase_LASS") )
 	, a_LASSName	( configurator->getName("a_LASS") )
 	, r_LASSName	( configurator->getName("r_LASS") )
 	// The actual values of the parameters and observables
@@ -96,7 +97,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, m23(), cosTheta1(), cosTheta2(), phi()
 
 	//LASS parameters
-	  , a_LASS(), r_LASS(), mag_LASS() 
+	  , a_LASS(), r_LASS(), mag_LASS(), phase_LASS() 
 
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
@@ -130,15 +131,14 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
 	tmp=new DPJpsiKaon(0, 0, 5.279, 1.4324, 0.109, 0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,0);
-//			0.13957018, 5.0, 1.5, 3.096916,2);
+			0.13957018, 5.0, 1.5, 3.096916,2);
 	KpiComponents.push_back(tmp);
   
 	// Kpi s-wave using LASS
 
-  	tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
+  	tmp=new DPJpsiKaon(0, 0, 5.279, 1.435, 0.279, 0.493677,
                      0.13957018, 5.0, 1.5, 3.096916,0,
-                     "LASS", 0.00415, 0.00136);
+                     "LASS", 1.94, 1.76);
 
 	KpiComponents.push_back(tmp);
 
@@ -156,7 +156,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	if ( configurator->isTrue( "UseAngularAcceptance" ) )
 	{
 		useAngularAcceptance = true;
-                //File location
+		//File location
                 ifstream input_file;
                 input_file.open( fileName.c_str(), ifstream::in );
                 input_file.close();
@@ -233,7 +233,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                                         for (int l=1; l < nmbins+1; ++l)
                                         {
                                                 idx[0] = i; idx[1] = j; idx[2] = k; idx[3] = l;
-                                                double bin_content = histo->GetBinContent(idx);
+                                                double bin_content = 0.;//histo->GetBinContent(idx); // why does this not work anymore?
                                                 //cout << "Bin content: " << bin_content << endl;
                                                 if(bin_content<=0)
                                                 {
@@ -259,7 +259,6 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 		angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
 		angularAccHistPhi 	= (TH1D*)histogramFile->Get("delta_phi_effTot");
 		angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
-
 	}
 }
 
@@ -321,6 +320,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 
 
   	,mag_LASSName(copy.mag_LASSName)
+  	,phase_LASSName(copy.phase_LASSName)
 	,a_LASSName(copy.a_LASSName)
 	,r_LASSName(copy.r_LASSName)
 	
@@ -390,12 +390,15 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,xaxis(copy.xaxis), yaxis(copy.yaxis), zaxis(copy.zaxis), maxis(copy.maxis)
 	,nxbins(copy.nxbins), nybins(copy.nybins), nzbins(copy.nzbins), nmbins(copy.nmbins)
 	,mag_LASS(copy.mag_LASS)
+	,phase_LASS(copy.phase_LASS)
         ,a_LASS(copy.a_LASS)
         ,r_LASS(copy.r_LASS)
 {
 	this->SetNumericalNormalisation(true);
 	this->TurnCachingOff();
 	componentIndex = 0;
+
+	cout << "Making copy of DPTotalAmplitudePDF. Acceptance: " << useAngularAcceptance << endl;
 
 	for( unsigned int i=0; i < copy.KpiComponents.size(); ++i )
 	{
@@ -479,6 +482,7 @@ void DPTotalAmplitudePDF::MakePrototypes()
 	parameterNames.push_back( widthK21430Name );
 
 	parameterNames.push_back( mag_LASSName );
+	parameterNames.push_back( phase_LASSName );
 	parameterNames.push_back( a_LASSName );
 	parameterNames.push_back( r_LASSName );
 
@@ -552,6 +556,8 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	massK21430  = allParameters.GetPhysicsParameter( massK21430Name )->GetValue();
 	widthK21430 = allParameters.GetPhysicsParameter( widthK21430Name )->GetValue();
 
+	mag_LASS = allParameters.GetPhysicsParameter( mag_LASSName )->GetValue();
+	phase_LASS = allParameters.GetPhysicsParameter( phase_LASSName )->GetValue();
 	a_LASS = allParameters.GetPhysicsParameter( a_LASSName )->GetValue();
 	r_LASS = allParameters.GetPhysicsParameter( r_LASSName )->GetValue();
 
@@ -570,7 +576,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[2]->setHelicityAmplitudes(magA0Kst1680, magApKst1680, magAmKst1680, phaseA0Kst1680, phaseApKst1680, phaseAmKst1680);
 	KpiComponents[3]->setHelicityAmplitudes(magA0K01430, 0., 0., phaseA0K01430, 0., 0.);
 	KpiComponents[4]->setHelicityAmplitudes(magA0K21430, 0., 0., phaseA0K21430, 0., 0.);
-	KpiComponents[5]->setHelicityAmplitudes(mag_LASS, 0., 0., 0., 0., 0.);
+	KpiComponents[5]->setHelicityAmplitudes(mag_LASS, 0., 0., phase_LASS, 0., 0.);
 
 	return isOK;
 }
@@ -608,7 +614,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 			angularAccCosTheta1     = angularAccHistCosTheta1	->GetBinContent( angularAccHistCosTheta1	->FindBin(cosTheta1) );
 			angularAccPhi           = angularAccHistPhi		->GetBinContent( angularAccHistPhi		->FindBin(phi) );
 			angularAccMassCosTheta2 = angularAccHistMassCosTheta2	->GetBinContent( angularAccHistMassCosTheta2	->FindBin(m23, cosTheta2) );
-			angularAcc = angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2;
+			angularAcc = angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2; // factor of 81 = 3^4 to get acceptance on same scale as other quantities
 		}
 	}
 	/*
@@ -633,7 +639,7 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	unsigned int lower = (unsigned)(componentIndex - 1);
 	unsigned int upper = (unsigned)componentIndex;
 
-	//cout << "componentIndex " << componentIndex << endl;
+	//std::cout << "componentIndex " << componentIndex << std::endl;
 
 	if ( componentIndex == 0 ) {
 		lower = 0;
@@ -680,9 +686,10 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	double t31 = MB0*MB0 - (m23 + m3)*(m23 + m3);
 	double t32 = MB0*MB0 - (m23 - m3)*(m23 - m3);
 
+	double p1_st = sqrt(t1*t2)/m23/2.;
+	double p3    = sqrt(t31*t32)/MB0/2.;
 
-	double p1_st = sqrt(t1*t2)/m23/2 ;
-	double p3    = sqrt(t31*t32)/MB0/2;
+	//std::cout << result << " " << angularAcc << " " << p1_st << " " << p3 << std::endl;
 
 	double returnable_value = result * angularAcc * p1_st * p3;
 
@@ -694,15 +701,15 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 
 vector<string> DPTotalAmplitudePDF::PDFComponents()
 {
-        vector<string> component_list;
-        component_list.push_back( "892" );
-        component_list.push_back( "1410" );
-        component_list.push_back( "1680" );
-        component_list.push_back( "1430" );
-        component_list.push_back( "1430_2" );
-        component_list.push_back( "LASS" );
-        component_list.push_back( "0" );
-        return component_list;
+        vector<string> components_list;
+        components_list.push_back( "892" );
+        components_list.push_back( "1410" );
+        components_list.push_back( "1680" );
+        components_list.push_back( "1430" );
+        components_list.push_back( "1430_2" );
+        components_list.push_back( "LASS" );
+        components_list.push_back( "0" );
+        return components_list;
 }
 
 //Calculate the function value

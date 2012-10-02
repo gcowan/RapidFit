@@ -80,6 +80,11 @@ void FitFunction::SetupTrace( const TString FileName, const int inputTraceNum )
 	traceNum = inputTraceNum;
 }
 
+void FitFunction::SetGSLIntegrator( const bool gsl )
+{
+	gslIntegrator = gsl;	
+}
+
 void FitFunction::SetupTraceTree()
 {
 	Fit_File->cd();
@@ -136,7 +141,7 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 			}
 		}
 
-		RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex) );
+		RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex), false, gslIntegrator );
 		resultIntegrator->SetDebug( debug );
 		allIntegrators.push_back( resultIntegrator );
 
@@ -204,7 +209,7 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 				}
 				stored_pdfs.push_back( ClassLookUp::CopyPDF( NewBottle->GetResultPDF( resultIndex ) ) );
 				stored_pdfs.back()->SetDebug( debug );
-				StoredIntegrals.push_back( new RapidFitIntegrator( stored_pdfs.back() ) );
+				StoredIntegrals.push_back( new RapidFitIntegrator( stored_pdfs.back(), false, gslIntegrator ) );
 				StoredIntegrals.back()->SetDebug( debug );
 
 				// Give the Integral Testing code a Sharp Kick!!!

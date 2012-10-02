@@ -47,6 +47,11 @@ class FitFunction
 		void SetupTrace( const TString FileName, const int traceNum );
 
 		/*!
+		 * @brief Set the name of the numerical integration method to use 
+		 */
+		void SetGSLIntegrator( const bool gsl );
+
+		/*!
 		 * @brief Set the Physics Bottle to be used
 		 *
 		 * @param Input This is the PhysicsBottle that the FitFunction will use to calculate the result in Evalute
@@ -102,7 +107,7 @@ class FitFunction
 		bool GetWeightsWereUsed() const;
 
 		string GetWeightName() const;
-
+		
 		/*!
 		 * @brief Set the FitFunction to use Weights squared
 		 *
@@ -171,6 +176,7 @@ class FitFunction
 		double testDouble;			/*!	Undocumented	*/
 		bool useWeights;			/*!	Undocumented	*/
 		string weightObservableName;		/*!	Undocumented	*/
+		bool gslIntegrator;
 
 		//	This is for training Minuit
 		//	(this could give some VERY cool graphs in ResultSpace :D )

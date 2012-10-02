@@ -7,7 +7,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-8
-  */
+ */
 
 //	ROOT Headers
 #include "RVersion.h"
@@ -27,6 +27,9 @@
 #include <pthread.h>
 #include <exception>
 
+// GSL for MC integration
+#include <gsl/gsl_qrng.h>
+
 pthread_mutex_t multi_mutex;
 pthread_mutex_t multi_mutex2;
 pthread_mutex_t multi_mutex3;
@@ -40,16 +43,16 @@ using namespace::std;
 //const double INTEGRAL_PRECISION_THRESHOLD = 0.01;
 
 //Constructor with correct argument
-RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical ) :
+RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical, bool UsePseudoRandomIntegration ) :
 	ratioOfIntegrals(-1.), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL),
 	functionCanIntegrate(false), haveTestedIntegral(false),
-	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(new DebugClass(false))
+	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(new DebugClass(false) ), pseudoRandomIntegration( UsePseudoRandomIntegration )
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
 	multiDimensionIntegrator->SetAbsTolerance( 1E-9 );      //      Absolute error for things such as plots
-	multiDimensionIntegrator->SetRelTolerance( 1E-6 );
-	multiDimensionIntegrator->SetMaxPts( 100000 );		//	These are the defaults, and it's unlikely you will be able to realistically push the integral without using "double double"'s
+	multiDimensionIntegrator->SetRelTolerance( 1E-9 );
+	multiDimensionIntegrator->SetMaxPts( 1000000 );		//	These are the defaults, and it's unlikely you will be able to realistically push the integral without using "double double"'s
 #endif
 
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
@@ -58,6 +61,7 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerica
 
 RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : ratioOfIntegrals( input.ratioOfIntegrals ),
 	fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
+	pseudoRandomIntegration(input.pseudoRandomIntegration),
 	functionCanIntegrate( input.functionCanIntegrate ), haveTestedIntegral( true ),//input.haveTestedIntegral ),
 	RapidFitIntegratorNumerical( input.RapidFitIntegratorNumerical ), obs_check( input.obs_check ), checked_list( input.checked_list ), debug((input.debug==NULL)?NULL:new DebugClass(*input.debug))
 {
@@ -72,8 +76,8 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 		//      These functions only exist with ROOT > 5.27 I think, at least they exist in 5.28/29
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
 		multiDimensionIntegrator->SetAbsTolerance( 1E-9 );      //      Absolute error for things such as plots
-		multiDimensionIntegrator->SetRelTolerance( 1E-6 );
-		multiDimensionIntegrator->SetMaxPts( 100000 );
+		multiDimensionIntegrator->SetRelTolerance( 1E-9 );
+		multiDimensionIntegrator->SetMaxPts( 1000000 );
 #endif
 	}
 	if( input.oneDimensionIntegrator != NULL )
@@ -115,7 +119,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 	}
 
 	double PDF_test_result = 0.;
-	
+
 	try
 	{
 		PDF_test_result = functionToWrap->Integral( NewDataPoint, NewBoundary );
@@ -325,6 +329,67 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 	return output;
 }
 
+double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, 
+				vector<string> doIntegrate )
+{
+	//Make arrays of the observable ranges to integrate over
+	double* minima = new double[ doIntegrate.size() ];
+	double* maxima = new double[ doIntegrate.size() ];
+
+	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
+	{
+		IConstraint * newConstraint = NULL;
+		try
+		{
+			newConstraint = NewBoundary->GetConstraint( doIntegrate[observableIndex] );
+		}
+		catch(...)
+		{
+			cerr << "RapidFitIntegrator: Could NOT find required Constraint " << doIntegrate[observableIndex] << " in Data PhaseSpaceBoundary" << endl;
+			cerr << "RapidFitIntegrator: Please Fix this by Adding the Constraint to your PhaseSpace for PDF: " << functionToWrap->GetLabel() << endl;
+			cerr << endl;
+			exit(-8737);
+		}
+		minima[observableIndex] = (double)newConstraint->GetMinimum();
+		maxima[observableIndex] = (double)newConstraint->GetMaximum();
+	}
+
+	//Do a 4D integration
+	int npoint = 10000;
+	std::vector<double> integrationPoints1;
+	std::vector<double> integrationPoints2;
+	std::vector<double> integrationPoints3;
+	std::vector<double> integrationPoints4;
+
+	gsl_qrng * q = gsl_qrng_alloc (gsl_qrng_sobol, 4);
+	for (int i = 0; i < npoint; i++)
+	{
+		double v[4];
+		gsl_qrng_get (q, v);
+		integrationPoints1.push_back(v[0]);
+		integrationPoints2.push_back(v[1]);
+		integrationPoints3.push_back(v[2]);
+		integrationPoints4.push_back(v[3]);
+	}
+	gsl_qrng_free (q);
+
+	double result=0;
+	DataPoint * point = new DataPoint(*NewDataPoint);
+	for (unsigned int i=0; i<integrationPoints1.size();++i)
+	{
+		point->SetObservable("m23", 	  integrationPoints1[i]*(maxima[0]-minima[0])+minima[0], 0.0, "GeV/c^{2}"); 
+		point->SetObservable("cosTheta1", integrationPoints2[i]*(maxima[1]-minima[1])+minima[1], 0.0, " "); 
+		point->SetObservable("cosTheta2", integrationPoints3[i]*(maxima[2]-minima[2])+minima[2], 0.0, " "); 
+		point->SetObservable("phi",       integrationPoints4[i]*(maxima[3]-minima[3])+minima[3], 0.0, "rad"); 
+		result += functionToWrap->Evaluate( point );
+	}
+	result /= double(integrationPoints1.size());
+
+	delete minima; delete maxima;
+	delete point;
+	return result;
+}
+
 double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
 		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, bool haveTestedIntegral, DebugClass* debug )
 {
@@ -451,9 +516,13 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			}
 			else
 			{
-				numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+				if ( !pseudoRandomIntegration )
+				{
+					numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+				} else {
+					numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate );
+				}
 			}
-
 			if( !haveTestedIntegral )
 			{
 				double testIntegral = functionToWrap->Integral( *dataPoint_i, NewBoundary );
@@ -470,7 +539,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 		if( DiscreteIntegrals.back() != NULL ) delete DiscreteIntegrals.back();
 		DiscreteIntegrals.pop_back();
 	}
-
+	
 	return output_val;
 }
 

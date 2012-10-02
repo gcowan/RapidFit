@@ -67,6 +67,11 @@ double FitResult::GetMinimumValue()
 	return minimumValue;
 }
 
+void FitResult::SetMinimumValue( double min )
+{
+	minimumValue = min;
+}
+
 ResultParameterSet * FitResult::GetResultParameterSet()
 {
 	return fittedParameters;

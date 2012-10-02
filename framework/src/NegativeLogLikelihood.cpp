@@ -75,8 +75,11 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		if( useWeights && weightsSquared ) pointValue *= weight;
 
 		total+=pointValue;
-	}
 
+		cout << total << " " << value << " " << integral << endl;
+	}
+	exit(100);
+		
 	if( false ) cerr << "PDF evaluates to " << value << endl;
 
 	//Return negative log likelihood

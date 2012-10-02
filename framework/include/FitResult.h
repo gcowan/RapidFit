@@ -42,6 +42,7 @@ class FitResult
 		 * Returns the Minimum total function value i.e. the NLL for this Result
 		 */
 		double GetMinimumValue();
+		void SetMinimumValue( double );
 
 		/*!
 		 * Return a copy of the Covarience Matrix as provided by the Minimiser

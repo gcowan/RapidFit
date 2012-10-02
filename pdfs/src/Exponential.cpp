@@ -30,6 +30,7 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 	, sigma3Name	( configurator->getName("timeResolution3") )
 	, timeRes2FracName( configurator->getName("timeResolution2Fraction") )
 	, timeRes3FracName( configurator->getName("timeResolution3Fraction") )
+        , timeOffsetName                ( configurator->getName("timeOffset") )
 	// Observables
 	, timeName      ( configurator->getName("time") )
 	//objects used in XML
@@ -71,6 +72,7 @@ Exponential::Exponential( const Exponential &copy ) :
 	, resScale1Name          ( copy.resScale1Name )
 	, resScale2Name          ( copy.resScale2Name )
 	, resScale3Name          ( copy.resScale3Name )
+	, timeOffsetName         ( copy.timeOffsetName )
 	, sigma1Name	( copy.sigma1Name )
 	, sigma2Name	( copy.sigma2Name )
 	, sigma3Name	( copy.sigma3Name )
@@ -81,6 +83,7 @@ Exponential::Exponential( const Exponential &copy ) :
 	, sigma( copy.sigma ), sigma1( copy.sigma1 ), sigma2( copy.sigma2 ), sigma3( copy.sigma3 )
 	, timeRes2Frac( copy.timeRes2Frac), timeRes3Frac( copy.timeRes3Frac )
 	, resolutionScale1( copy.resolutionScale1 ), resolutionScale2( copy.resolutionScale2 ), resolutionScale3( copy.resolutionScale3 )
+	, timeOffset( copy.timeOffset )
 	, tlow( copy.tlow ), thigh( copy.thigh ), time( copy.time )
 	, _useEventResolution( copy._useEventResolution )
 	, _useTimeAcceptance( copy._useTimeAcceptance )
@@ -120,6 +123,7 @@ void Exponential::MakePrototypes()
 	parameterNames.push_back( resScale1Name );
 	parameterNames.push_back( resScale2Name );
 	parameterNames.push_back( resScale3Name );
+	parameterNames.push_back( timeOffsetName );
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -141,7 +145,7 @@ bool Exponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
 	timeRes2Frac = allParameters.GetPhysicsParameter( timeRes2FracName )->GetValue();
 	timeRes3Frac = allParameters.GetPhysicsParameter( timeRes3FracName )->GetValue();
-	tau = allParameters.GetPhysicsParameter( tauName )->GetValue();
+	tau = allParameters.GetPhysicsParameter( tauName )->GetValue() - timeOffset;
 	gamma = 1./tau;
 	if( ! useEventResolution() ) {
 		sigma1    = allParameters.GetPhysicsParameter( sigma1Name )->GetValue();
@@ -151,6 +155,7 @@ bool Exponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	resolutionScale1 = allParameters.GetPhysicsParameter( resScale1Name )->GetValue();
 	resolutionScale2 = allParameters.GetPhysicsParameter( resScale2Name )->GetValue();
 	resolutionScale3 = allParameters.GetPhysicsParameter( resScale3Name )->GetValue();
+        timeOffset       = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
 
 	return isOK;
 }

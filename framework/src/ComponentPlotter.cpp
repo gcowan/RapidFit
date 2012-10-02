@@ -127,7 +127,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			{
 				config->component_names.push_back( "Total" );
 			}
-			config->LegendTextSize = 0.03;
+			config->LegendTextSize = 0.05;
 			vector<string> pdfComponents = plotPDF->PDFComponents();
 			for( unsigned int i=0; i< pdfComponents.size(); ++i )
 			{

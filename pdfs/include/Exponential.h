@@ -48,6 +48,7 @@ class Exponential : public BasePDF
 		ObservableRef sigma3Name;		// time res sigma 2
 		ObservableRef timeRes2FracName;
 		ObservableRef timeRes3FracName;
+		ObservableRef timeOffsetName;
 		// Observable
 		ObservableRef timeName;		// proper time
 
@@ -68,6 +69,7 @@ class Exponential : public BasePDF
 		double resolutionScale1;
 		double resolutionScale2;
 		double resolutionScale3;
+		double timeOffset;
 
 		double tlow, thigh; // integration limits
 

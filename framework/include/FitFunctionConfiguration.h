@@ -55,6 +55,11 @@ class FitFunctionConfiguration
 		bool GetWeightsWereUsed();
 
 		/*!
+		 * What was the Numerical Integrator Name
+		 */
+		void SetGSLIntegrator( bool );
+		
+		/*!
 		 * What was the Weight Observable Name
 		 */
 		string GetWeightName();
@@ -106,6 +111,7 @@ class FitFunctionConfiguration
 		int traceCount;			/*!	Trace Number, to avoid overwriting the output file	*/
 		int Threads;			/*!	Number of Threads to Construct FitFunction With	*/
 		string Strategy;		/*!	Name of Strategy to use				*/
+		bool gslIntegrator;		/*!	Decision about Numerical integrator to use	*/
 		bool testIntegrator;		/*!	Decision about wether to test the integrator	*/
 		bool NormaliseWeights;
 };

@@ -198,7 +198,7 @@ DPHistoBackground::DPHistoBackground( PDFConfigurator* config ) :
 
 // Copy
 DPHistoBackground::DPHistoBackground( const DPHistoBackground& input ) : BasePDF( (BasePDF) input ),
-xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), maxis(input.maxis),
+xaxis(), yaxis(), zaxis(), maxis(),
 nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), nmbins(input.nmbins),
 xmin(input.xmin), xmax(input.xmax), 
 ymin(input.ymin), ymax(input.ymax), 
@@ -209,10 +209,15 @@ total_num_entries(input.total_num_entries), useFlatAngularDistribution(input.use
 massName(input.massName), cosTheta1Name(input.cosTheta1Name), phiName(input.phiName), cosTheta2Name(input.cosTheta2Name), 
 mass(input.mass), cos1(input.cos1), cos2(input.cos2), phi(input.phi),
 histogramFile(), histo()
+,fullFileName(input.fullFileName)
 {
 	if ( !useFlatAngularDistribution ) {
                 histogramFile = TFile::Open(fullFileName.c_str());
                 histo = (THnSparse*)histogramFile->Get("histo_4var_SB");
+		xaxis = histo->GetAxis(0);
+		yaxis = histo->GetAxis(1);
+		zaxis = histo->GetAxis(2);
+		maxis = histo->GetAxis(3);
 	}
 }
 
@@ -253,7 +258,6 @@ double DPHistoBackground::Evaluate(DataPoint * measurement)
 	cos1 = measurement->GetObservable( cosTheta1Name )->GetValue();
 	phi  = measurement->GetObservable( phiName )->GetValue();
 	cos2 = measurement->GetObservable( cosTheta2Name )->GetValue();
-	
 	return this->angleMassFactor();
 }
 
@@ -285,8 +289,8 @@ double DPHistoBackground::angleMassFactor( )
 	}
 	else {
 		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-		xbin = xaxis->FindFixBin( cos1 ); if( xbin > nxbins ) xbin = nxbins;
-		ybin = yaxis->FindFixBin( cos2 ); if( ybin > nybins ) ybin = nybins;
+		xbin = xaxis->FindFixBin( cos2 ); if( xbin > nxbins ) xbin = nxbins;
+		ybin = yaxis->FindFixBin( cos1 ); if( ybin > nybins ) ybin = nybins;
 		zbin = zaxis->FindFixBin( phi  ); if( zbin > nzbins ) zbin = nzbins;
 		mbin = maxis->FindFixBin( mass ); if( mbin > nmbins ) mbin = nmbins;
 		

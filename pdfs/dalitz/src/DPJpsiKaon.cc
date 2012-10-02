@@ -103,8 +103,9 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
                         break;
                 }
         }
-//  std::cout<<"DEBUG, used copy constructor\n";
-//  std::cout<<"BarierFactors are "<<barrierB<<" "<<barrierR<<std::endl;
+	std::cout<<"DEBUG, used copy constructor\n";
+	std::cout<<"BarierFactors are "<<barrierB<<" "<<barrierR<<std::endl;
+	std::cout<<"Parameters are "<<m1 << " "<<mR<< " " << spinKaon<<" "<<A0<<std::endl;
 }
 
 TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1, 
@@ -141,6 +142,8 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
                  barrierR->barrier(DPHelpers::daughterMomentum(this->mR,
                                    this->m1, this->m2), pR);
 
+  //std::cout << "Barrier factor "<< m23 << " " << barrierFactor<< std::endl;
+
   TComplex massFactor = this->massShape->massShape(m23);
 
   // Angular part
@@ -170,9 +173,6 @@ void DPJpsiKaon::setHelicityAmplitudes(double magA0, double magAplus,
   A0=TComplex(magA0*TMath::Cos(phaseA0),magA0*TMath::Sin(phaseA0));
   Aplus=TComplex(magAplus*TMath::Cos(phaseAplus),magAplus*TMath::Sin(phaseAplus));
   Aminus=TComplex(magAminus*TMath::Cos(phaseAminus),magAminus*TMath::Sin(phaseAminus));
-
-//  std::cout<<"Setting Helicity Amplitudes to "<<mR<<" "<<A0<<" "
-//            <<Aplus<<" "<<Aminus<<std::endl;
 }
 
 void DPJpsiKaon::setResonanceParameters(double mass, double sigma)

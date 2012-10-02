@@ -19,13 +19,13 @@ using namespace::std;
 
 //Constructor with only name of FitFunction
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) :
-	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false)
+	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), gslIntegrator(false)
 {
 }
 
 //Constructor for FitFunction with event weights
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) :
-	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false)
+	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), gslIntegrator(false)
 {
 }
 
@@ -45,6 +45,8 @@ FitFunction * FitFunctionConfiguration::GetFitFunction()
 		theFunction->UseEventWeights(weightName);
 	}
 
+	theFunction->SetGSLIntegrator(gslIntegrator);
+
 	if( wantTrace )
 	{
 		theFunction->SetupTrace( TraceFileName, traceCount );
@@ -56,6 +58,11 @@ FitFunction * FitFunctionConfiguration::GetFitFunction()
 	theFunction->SetIntegratorTest( testIntegrator );
 
 	return theFunction;
+}
+
+void FitFunctionConfiguration::SetGSLIntegrator( bool gsl )
+{
+	gslIntegrator = gsl;
 }
 
 //Return whether weights are being used
