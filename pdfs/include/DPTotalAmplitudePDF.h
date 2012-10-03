@@ -86,8 +86,16 @@ class DPTotalAmplitudePDF : public BasePDF
 		
 		ObservableRef magA0K01430Name;
 		ObservableRef phaseA0K01430Name;
+		
 		ObservableRef magA0K21430Name;
+		ObservableRef magApK21430Name;
+		ObservableRef magAmK21430Name;
 		ObservableRef phaseA0K21430Name;
+		ObservableRef phaseApK21430Name;
+		ObservableRef phaseAmK21430Name;
+		
+		ObservableRef magA0K800Name;
+		ObservableRef phaseA0K800Name;
 		
 		ObservableRef massZplusName;
 		ObservableRef widthZplusName;
@@ -101,6 +109,8 @@ class DPTotalAmplitudePDF : public BasePDF
 		ObservableRef widthK01430Name;
 		ObservableRef massK21430Name;
 		ObservableRef widthK21430Name;
+		ObservableRef massK800Name;
+		ObservableRef widthK800Name;
 
 		ObservableRef mag_LASSName;
 		ObservableRef phase_LASSName;
@@ -137,8 +147,16 @@ class DPTotalAmplitudePDF : public BasePDF
 		
 		double magA0K01430;
 		double phaseA0K01430;
+		
 		double magA0K21430;
+		double magApK21430;
+		double magAmK21430;
 		double phaseA0K21430;
+		double phaseApK21430;
+		double phaseAmK21430;
+		
+		double magA0K800;
+		double phaseA0K800;
 		
 		double massZplus;
 		double widthZplus;
@@ -152,14 +170,14 @@ class DPTotalAmplitudePDF : public BasePDF
 		double widthK01430;
 		double massK21430;
 		double widthK21430;
-
+		double massK800;
+		double widthK800;
 
 		//LASS
 		double mag_LASS;
 		double phase_LASS;
 		double a_LASS;
 		double r_LASS;
-		  
 
 		// These values are cached since they are calculated for each event
 		TLorentzVector pMuPlus;

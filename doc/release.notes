@@ -3,6 +3,7 @@
 2011/10/03 Greig Cowan
    - GSL integrator now working with projections (always was, just didn't realise it!).
    - GSL integrator should now be able to handle arbitatry PDFs (needs some testing).
+   - Added additional polarisation for spin-2 K2(1430). Added K(800) parameters.
 
 2011/10/02 Greig Cowan
    - Lots of changes:
