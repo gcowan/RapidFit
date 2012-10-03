@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2011/10/03 Greig Cowan
+   - GSL integrator now working with projections (always was, just didn't realise it!).
+   - GSL integrator should now be able to handle arbitatry PDFs (needs some testing).
+
 2011/10/02 Greig Cowan
    - Lots of changes:
 	- Added option to perform numerical integration using quasi-random numbers

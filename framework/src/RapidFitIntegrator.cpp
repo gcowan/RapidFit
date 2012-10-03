@@ -357,36 +357,33 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}
 
-	//Do a 4D integration
-	int npoint = 10000;
-	std::vector<double> integrationPoints1;
-	std::vector<double> integrationPoints2;
-	std::vector<double> integrationPoints3;
-	std::vector<double> integrationPoints4;
+	unsigned int npoint = 10000;
+	std::vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
 
-	gsl_qrng * q = gsl_qrng_alloc (gsl_qrng_sobol, 4);
-	for (int i = 0; i < npoint; i++)
+	gsl_qrng * q = gsl_qrng_alloc (gsl_qrng_sobol, int(doIntegrate.size()));
+	for (unsigned int i = 0; i < npoint; i++)
 	{
-		double v[4];
-		gsl_qrng_get (q, v);
-		integrationPoints1.push_back(v[0]);
-		integrationPoints2.push_back(v[1]);
-		integrationPoints3.push_back(v[2]);
-		integrationPoints4.push_back(v[3]);
+		double v[doIntegrate.size()];
+		gsl_qrng_get(q, v);
+		for ( unsigned int j = 0; j < doIntegrate.size(); j++)
+		{
+			integrationPoints[j].push_back(v[j]);
+		}
 	}
-	gsl_qrng_free (q);
+	gsl_qrng_free(q);
 
-	double result=0;
+	double result = 0.;
 	DataPoint * point = new DataPoint(*NewDataPoint);
-	for (unsigned int i=0; i<integrationPoints1.size();++i)
+	for (unsigned int i = 0; i < integrationPoints[0].size(); ++i)
 	{
-		point->SetObservable("m23", 	  integrationPoints1[i]*(maxima[0]-minima[0])+minima[0], 0.0, "GeV/c^{2}"); 
-		point->SetObservable("cosTheta1", integrationPoints2[i]*(maxima[1]-minima[1])+minima[1], 0.0, " "); 
-		point->SetObservable("cosTheta2", integrationPoints3[i]*(maxima[2]-minima[2])+minima[2], 0.0, " "); 
-		point->SetObservable("phi",       integrationPoints4[i]*(maxima[3]-minima[3])+minima[3], 0.0, "rad"); 
+		for ( unsigned int j = 0; j < doIntegrate.size(); j++)
+		{	
+			//cout << doIntegrate[j] << " " << maxima[j] << " " << minima[j] << " " << integrationPoints[j][i] << endl;
+			point->SetObservable(doIntegrate[j], integrationPoints[j][i]*(maxima[j]-minima[j])+minima[j], 0.0, "Unit"); 
+		}
 		result += functionToWrap->Evaluate( point );
 	}
-	result /= double(integrationPoints1.size());
+	result /= double(integrationPoints[0].size());
 
 	delete minima; delete maxima;
 	delete point;
