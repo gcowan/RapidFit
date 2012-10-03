@@ -386,6 +386,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	result /= double(integrationPoints[0].size());
 
 	delete minima; delete maxima;
+	delete[] integrationPoints;
 	delete point;
 	return result;
 }
