@@ -384,18 +384,18 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	double result = 0.;
 	for (unsigned int i = 0; i < integrationPoints[0].size(); ++i)
 	{
-		double * point = new double[ doIntegrate.size() ];
+		double* point = new double[ doIntegrate.size() ];
 		for ( unsigned int j = 0; j < doIntegrate.size(); j++)
 		{	
 			//cout << doIntegrate[j] << " " << maxima[j] << " " << minima[j] << " " << integrationPoints[j][i] << endl;
 			point[j] = integrationPoints[j][i]*(maxima[j]-minima[j])+minima[j]; 
 		}
 		result += quickFunction->DoEval( point );
-		delete point;
+		delete[] point;
 	}
 	result /= double(integrationPoints[0].size());
 
-	delete minima; delete maxima;
+	delete[] minima; delete[] maxima;
 	delete[] integrationPoints;
 	delete quickFunction;
 	return result;

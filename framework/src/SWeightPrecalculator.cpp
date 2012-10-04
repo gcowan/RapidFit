@@ -41,7 +41,7 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
 	{
 		total_sWeight += inputDataSet->GetDataPoint( i )->GetObservable( sWeightName )->GetValue();
-		total_sWeight_sq += inputDataSet->GetDataPoint( i )->GetObservable( sWeightsqName )->GetValue();
+		total_sWeight_sq += inputDataSet->GetDataPoint( i )->GetObservable( sWeightName )->GetValue()*inputDataSet->GetDataPoint( i )->GetObservable( sWeightName )->GetValue();//inputDataSet->GetDataPoint( i )->GetObservable( sWeightsqName )->GetValue();
 	}
 	double alpha = total_sWeight / total_sWeight_sq;
 	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
@@ -53,6 +53,7 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 		Observable* sWeight_sq_corrected = new Observable( sWeightsqName, thisWeight*thisWeight, 0., "WeightSq-Unit" );
 		thisPoint->SetObservable( sWeightName, sWeight_corrected );
 		thisPoint->SetObservable( sWeightsqName, sWeight_sq_corrected );
+		delete sWeight_corrected, sWeight_sq_corrected;
 	}
 }
 
