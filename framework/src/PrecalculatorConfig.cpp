@@ -9,7 +9,7 @@
 
 using namespace::std;
 
-PrecalculatorConfig::PrecalculatorConfig() : name("undefined"), weightName("undefined"), filename("WeightedFile"), config(0)
+PrecalculatorConfig::PrecalculatorConfig() : name("undefined"), weightName("undefined"), filename("WeightedFile"), config(0), useAlpha(false)
 {
 }
 
@@ -26,6 +26,11 @@ void PrecalculatorConfig::SetWeightName( string input )
 void PrecalculatorConfig::SetConfig( unsigned int input )
 {
 	config = input;
+}
+
+void PrecalculatorConfig::SetAlpha( bool input )
+{
+	useAlpha = input;
 }
 
 void PrecalculatorConfig::SetFileName( string input )
@@ -48,6 +53,8 @@ string PrecalculatorConfig::GetFileName()
 
 IPrecalculator* PrecalculatorConfig::GetPreCalculator( FitResult* inputResult )
 {
-	return ClassLookUp::LookUpPrecalculator( name, weightName, inputResult, config );
+	IPrecalculator* thisCalculator = ClassLookUp::LookUpPrecalculator( name, weightName, inputResult, config );
+	thisCalculator->SetApplyAlphaCorrection( useAlpha );
+	return thisCalculator;
 }
 

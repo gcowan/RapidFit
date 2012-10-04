@@ -1996,6 +1996,7 @@ PrecalculatorConfig* XMLConfigReader::GetPrecalculatorConfig( )
 			string precalculatorName = "Unspecified";
 			string weightName = "Unspecified";
 			string filename = "WeightedFile";
+			bool useAlpha=false;
 			int config=1;
 			vector< XMLTag* > newchildren = children[childIndex]->GetChildren();
 			for ( unsigned int newchildIndex = 0; newchildIndex < newchildren.size(); ++newchildIndex )
@@ -2017,6 +2018,10 @@ PrecalculatorConfig* XMLConfigReader::GetPrecalculatorConfig( )
 				{
 					filename = newchildren[newchildIndex]->GetValue()[0];
 				}
+				else if ( name == "UseAlpha" )
+				{
+					useAlpha = newchildren[newchildIndex]->GetValue()[0] == "True";
+				}
 				else
 				{
 					cerr << "Unrecognised Precalculator component: " << name << endl;
@@ -2027,6 +2032,7 @@ PrecalculatorConfig* XMLConfigReader::GetPrecalculatorConfig( )
 			preconfig->SetWeightName( weightName );
 			preconfig->SetConfig( (unsigned)config );
 			preconfig->SetFileName( filename );
+			preconfig->SetAlpha( useAlpha );
 			return preconfig;
 		}
 	}

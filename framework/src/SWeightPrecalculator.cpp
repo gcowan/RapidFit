@@ -16,14 +16,44 @@
 #include "ClassLookUp.h"
 #include "StatisticsFunctions.h"
 #include "ObservableContinuousConstraint.h"
+#include "ObservableRef.h"
 //	System Headers
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 
 SWeightPrecalculator::SWeightPrecalculator( FitResult* InputResult, string WeightName, unsigned int Inputconfig ) :
-	inputResult(InputResult), signalPDF(NULL), backgroundPDF(NULL), weightName(WeightName), fractionName(), config( Inputconfig)
+	inputResult(InputResult), signalPDF(NULL), backgroundPDF(NULL), weightName(WeightName), fractionName(), config( Inputconfig), useAlpha(false)
 {
+}
+
+void SWeightPrecalculator::SetApplyAlphaCorrection( bool input )
+{
+	useAlpha = input;
+}
+
+void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
+{
+	double total_sWeight=0.;
+	double total_sWeight_sq=0.;
+	ObservableRef sWeightName("sWeight");
+	ObservableRef sWeightsqName("sWeight2");
+	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
+	{
+		total_sWeight += inputDataSet->GetDataPoint( i )->GetObservable( sWeightName )->GetValue();
+		total_sWeight_sq += inputDataSet->GetDataPoint( i )->GetObservable( sWeightsqName )->GetValue();
+	}
+	double alpha = total_sWeight / total_sWeight_sq;
+	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
+	{
+		DataPoint* thisPoint = inputDataSet->GetDataPoint( i );
+		double thisWeight = thisPoint->GetObservable( sWeightName )->GetValue();
+		thisWeight *= alpha;
+		Observable* sWeight_corrected = new Observable( sWeightName, thisWeight, 0., "Weight-Unit" );
+		Observable* sWeight_sq_corrected = new Observable( sWeightsqName, thisWeight*thisWeight, 0., "WeightSq-Unit" );
+		thisPoint->SetObservable( sWeightName, sWeight_corrected );
+		thisPoint->SetObservable( sWeightsqName, sWeight_sq_corrected );
+	}
 }
 
 void SWeightPrecalculator::ConfigurePDFs( IPDF* InputPDF )
@@ -173,6 +203,8 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* Inp
 	time(&timeNow);
 	cout << "Finished calculating sWeights: " << ctime( &timeNow ) << endl;
 	//exit(0);
+
+	if( useAlpha ) ApplyAlphaCorrection( (IDataSet*)newDataSet );
 
 	return (IDataSet*) newDataSet;
 }

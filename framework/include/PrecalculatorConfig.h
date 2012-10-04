@@ -20,6 +20,7 @@ class PrecalculatorConfig
 		void SetWeightName( string );
 		void SetConfig( unsigned int );
 		void SetFileName( string );
+		void SetAlpha( bool );
 		string GetFileName();
 
 		IPrecalculator* GetPreCalculator( FitResult* input );
@@ -29,7 +30,7 @@ class PrecalculatorConfig
 		string weightName;
 		string filename;
 		unsigned int config;
-
+		bool useAlpha;
 };
 
 #endif

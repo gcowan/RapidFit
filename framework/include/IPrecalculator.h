@@ -27,6 +27,8 @@ class IPrecalculator
 		 */
 		virtual IDataSet * ProcessDataSet( IDataSet* Input, IPDF* InputPDF ) = 0;
 
+		virtual void SetApplyAlphaCorrection( bool ) = 0;
+
 		/*!
 		 * @brief Virtual Destructor
 		 */

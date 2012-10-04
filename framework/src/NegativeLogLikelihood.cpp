@@ -76,7 +76,7 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 
 		total+=pointValue;
 
-		cout << total << " " << value << " " << integral << endl;
+		//cout << total << " " << value << " " << integral << endl;
 	}
 	exit(100);
 		

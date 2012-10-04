@@ -28,18 +28,24 @@ class SWeightPrecalculator : public IPrecalculator
 		virtual IDataSet * ProcessDataSet( IDataSet*, IPDF* );
 		pair< double, double > CalculateMatrixElements( long, long, IDataSet*, vector<double>&, vector<double>&, double&, vector<double>& );
 
+		virtual void SetApplyAlphaCorrection( bool useAlpha );
+
 	private:
 		void ConfigurePDFs( IPDF* InputPDF );
 
 		//	Uncopyable!
 		SWeightPrecalculator ( const SWeightPrecalculator& );
 		SWeightPrecalculator& operator = ( const SWeightPrecalculator& );
+
+		void ApplyAlphaCorrection( IDataSet* );
+
 		FitResult* inputResult;
 		IPDF * signalPDF;
 		IPDF * backgroundPDF;
 		string weightName;
 		string fractionName;
 		unsigned int config;
+		bool useAlpha;
 };
 
 #endif

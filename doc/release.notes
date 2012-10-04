@@ -1,11 +1,15 @@
 // $Id: release.notes $
 
-2011/10/03 Greig Cowan
+2012/10/03 Rob Currie
+   - Fixed GSL code to compile&&link without 'make gsl'
+   - Added <UseAlpha> to sWeighting XML which allows for the sWeights to be normalised at Calculation and removes the need for: <NormaliseWeights> 
+
+2012/10/03 Greig Cowan
    - GSL integrator now working with projections (always was, just didn't realise it!).
    - GSL integrator should now be able to handle arbitatry PDFs (needs some testing).
    - Added additional polarisation for spin-2 K2(1430). Added K(800) parameters.
 
-2011/10/02 Greig Cowan
+2012/10/02 Greig Cowan
    - Lots of changes:
 	- Added option to perform numerical integration using quasi-random numbers
 	from GSL. This is just MC integration, but faster. Can be configured using
@@ -19,14 +23,14 @@
 	by making an LL scan of a parameter without actually fitting anything else
 	(i.e., just evaluate the LL at each scan point).
 
-2011/10/02 Rob Currie
+2012/10/02 Rob Currie
    - Committing sign fix for |lambda| fitting in v5
 
-2011/10/01 Rob Currie
+2012/10/01 Rob Currie
    - Changed C++ wrapper for gsl code.   Now uses:     '__RAPIDFIT_USE_GSL' to wrap GSL codeblocks
    - Removed Reseve function in MemoryDataSet, no longer required and was causing malloc issues on some systems
 
-2011/09/23 Rob Currie
+2012/09/23 Rob Currie
    - Fixed bug in ComponentProjections exposed due to bug in ParameterSet
         This has allowed me to remove the 'combination weight' term from the normalisation of the integrals between data/theory
    - Improved the Trace in FitFunction to save the TTree to disk for each new entry
