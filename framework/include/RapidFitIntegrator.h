@@ -277,7 +277,7 @@ class RapidFitIntegrator
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
 		static double PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
-				vector<string> doIntegrate);
+				vector<string> doIntegrate, vector<string> doNotIntegrate);
 
 		/*!
 		 * @brief This is the Interface to The MuliDimentional Integral class within ROOT

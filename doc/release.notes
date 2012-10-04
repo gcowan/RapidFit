@@ -5,6 +5,12 @@
    - Added <UseAlpha> to sWeighting XML which allows for the sWeights to be normalised at Calculation and removes the need for: <NormaliseWeights> 
 
 2012/10/03 Greig Cowan
+   - Switched GSL integrator to use IntegratorFunction so that we can handle 
+     ComponentPlotting in a nice way.
+   - Fixed couple of bugs in DP PDF (K2 resonace had wrong L in constructor and
+     DPBarrierL1 factor had wrong Blatt-Weisskopf term.
+
+2011/10/03 Greig Cowan
    - GSL integrator now working with projections (always was, just didn't realise it!).
    - GSL integrator should now be able to handle arbitatry PDFs (needs some testing).
    - Added additional polarisation for spin-2 K2(1430). Added K(800) parameters.

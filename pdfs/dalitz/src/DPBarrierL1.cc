@@ -16,5 +16,5 @@ double DPBarrierL1::barrier(double p0, double p)
 
 double DPBarrierL1::function(double z)
 {
-  return TMath::Sqrt(1+z*z);
+  return TMath::Sqrt(1+z);
 }

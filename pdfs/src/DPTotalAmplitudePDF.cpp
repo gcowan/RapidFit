@@ -106,10 +106,10 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, massK21430(), widthK21430()
 	, massK800(), widthK800()
 	, m23(), cosTheta1(), cosTheta2(), phi()
-
 	//LASS parameters
-	  , a_LASS(), r_LASS(), mag_LASS(), phase_LASS() 
-
+	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS() 
+	//, massPsi(3.096916) // Jpsi
+	, massPsi(3.686109) // psi(2S)
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
 	, useFourDHistogram(false)
@@ -121,44 +121,43 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 	componentIndex = 0;
 
-	mJpsi=3.096916;
 	// Construct all components we need
 	DPComponent * tmp;
 	// B0 --> J/psi K*
 	tmp=new DPJpsiKaon(0, 1, 5.279, 0.89594, 0.0487, 0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,1);
+			0.13957018, 5.0, 1.5, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1410)
 	tmp=new DPJpsiKaon(0, 1, 5.279, 1.414, 0.232, 0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,1);
+			0.13957018, 5.0, 1.5, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1680)
 	tmp=new DPJpsiKaon(0, 1, 5.279, 1.717, 0.322, 0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,1);
+			0.13957018, 5.0, 1.5, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K0(1430)
 	tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,0);
+			0.13957018, 5.0, 1.5, massPsi, 0);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
-	tmp=new DPJpsiKaon(0, 0, 5.279, 1.4324, 0.109, 0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,2);
+	tmp=new DPJpsiKaon(0, 2, 5.279, 1.4324, 0.109, 0.493677,
+			0.13957018, 5.0, 1.5, massPsi, 2);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K(800)
 	tmp=new DPJpsiKaon(0, 0, 5.279, 682., 0.574, 0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,0);
+			0.13957018, 5.0, 1.5, massPsi, 0);
 	KpiComponents.push_back(tmp);
   
 	// Kpi s-wave using LASS
   	tmp=new DPJpsiKaon(0, 0, 5.279, 1.435, 0.279, 0.493677,
-                     0.13957018, 5.0, 1.5, 3.096916,0,
+                     0.13957018, 5.0, 1.5, massPsi, 0,
                      "LASS", 1.94, 1.76);
 
 	KpiComponents.push_back(tmp);
 
 	// B0 --> Z+ K-
 	tmp=new DPZplusK(0,0,5.279,4.430,0.100,0.493677,
-			0.13957018, 5.0, 1.5, 3.096916,0);
+			0.13957018, 5.0, 1.5, massPsi, 0);
 	//ZComponents.push_back(tmp);
 
 	this->SetNumericalNormalisation( true );
@@ -400,6 +399,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,widthK21430(copy.widthK21430)
 	,massK800(copy.massK800)
 	,widthK800(copy.widthK800)
+	
+	,massPsi(copy.massPsi)
+	
 	,pMuPlus(copy.pMuPlus)
 	,pMuMinus(copy.pMuMinus)
 	,pPi(copy.pPi)
@@ -407,7 +409,6 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,KpiComponents()//copy.KpiComponents)
 	,ZComponents()//copy.ZComponents)
 	,wigner(copy.wigner)
-	,mJpsi(copy.mJpsi)
 	,useAngularAcceptance(copy.useAngularAcceptance)
 	,pB(copy.pB)
 	,cosARefs(copy.cosARefs)
@@ -671,7 +672,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	}
 	/*
 	// Need angle between reference axis
-	DPHelpers::calculateFinalStateMomenta(5.279, m23, mJpsi,
+	DPHelpers::calculateFinalStateMomenta(5.279, m23, massPsi,
 	cosTheta1,  cosTheta2, phi, 0.105, 0.105, 0.13957018, 0.493677,
 	pMuPlus, pMuMinus, pPi, pK);
 	// Cos of the angle between psi reference axis
@@ -679,10 +680,10 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	double cosThetaZ;
 	double cosThetaPsi;
 	double dphi;
-DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
+	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	&cosThetaZ, &cosThetaPsi, &dphi);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
-
+	
 	cout << cosARefs << " " << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << endl;
 	 */
 	double result = 0.;
@@ -711,16 +712,16 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 				//cout << "m23: " << m23 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
 			}
 
-			/*
+			
 			// Now comes sum over Z+ components and lambdaPsiPrime
 			for (unsigned int i = 0; i < ZComponents.size(); ++i)
 			{
 			{
-			tmp += ZComponents[i]->amplitude(m13, cosThetaZ, cosThetaPsi, dphi,
-			twoLambda,twoLambdaPsi); // need to check that we pass right helicities
+			//tmp += ZComponents[i]->amplitude(m13, cosThetaZ, cosThetaPsi, dphi,
+			//twoLambda,twoLambdaPsi); // need to check that we pass right helicities
 			}
 			}
-			 */
+			
 		}
 		result += tmp.Rho2();
 	}
@@ -729,14 +730,13 @@ DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	//momenta are defined on eq 39.20a/b of the 2010 PDG
 	const double m1 = 0.493677;    // kaon mass
 	const double m2 = 0.13957018; // pion mass
-	const double m3 = 3.096916;   // psi mass
 	const double MB0= 5.2795; // B0 mass
 
 	double t1 = m23*m23-(m1+m2)*(m1+m2);
 	double t2 = m23*m23-(m1-m2)*(m1-m2);
 	
-	double t31 = MB0*MB0 - (m23 + m3)*(m23 + m3);
-	double t32 = MB0*MB0 - (m23 - m3)*(m23 - m3);
+	double t31 = MB0*MB0 - (m23 + massPsi)*(m23 + massPsi);
+	double t32 = MB0*MB0 - (m23 - massPsi)*(m23 - massPsi);
 
 	double p1_st = sqrt(t1*t2)/m23/2.;
 	double p3    = sqrt(t31*t32)/MB0/2.;
@@ -761,6 +761,7 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         components_list.push_back( "1430_2" );
         components_list.push_back( "800" );
         components_list.push_back( "LASS" );
+        //components_list.push_back( "Z4430" );
         components_list.push_back( "0" );
         return components_list;
 }
@@ -806,6 +807,11 @@ double DPTotalAmplitudePDF::EvaluateComponent(DataPoint * measurement, Component
                 {
                         Component->setComponentNumber( 7 );
                         componentIndex = 7;
+                }
+                else if( ComponentName.compare( "Z4430" ) == 0 )
+                {
+                        Component->setComponentNumber( 8 );
+                        componentIndex = 8;
                 }
                 else
                 {

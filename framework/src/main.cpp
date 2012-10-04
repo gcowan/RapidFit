@@ -679,6 +679,13 @@ int PerformMainFit( RapidFitConfiguration* config )
 	}
 
 	if( config->GOF_Flag ) {
+	        PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
+        	pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
+               	IDataSet * data = pdfAndData->GetDataSet();
+                IPDF * pdf = pdfAndData->GetPDF(); 
+                PhaseSpaceBoundary * phase = data->GetBoundary();
+		GoodnessOfFit::plotUstatistic( pdf, data, phase, "ustat.pdf" );
+		/*
 		TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
 		//double pvalue = GoodnessOfFit::gofLoop( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, nData );
 		double pvalue = GoodnessOfFit::fitDataCalculatePvalue( config->xmlFile, config->theMinimiser, config->theFunction, config->argumentParameterSet, config->GlobalResult );
@@ -689,6 +696,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 		outputFile->Close();
 		delete pvalueHist;
 		delete outputFile;
+		*/
 	}
 	return 0;
 }

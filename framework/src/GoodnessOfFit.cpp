@@ -193,7 +193,7 @@ namespace GoodnessOfFit
 		double level = (double)nD/(double)bins;
 		TH1D * distances = new TH1D( "distances", "U", bins, 0., 1.);
 		distances->Sumw2();
-		calculateUstatistic(pdf, data, phase, distances);
+		calculateUstatisticNum(pdf, data, phase, distances);
 
 		char buff[10];
 		sprintf( buff, "%f", level );
@@ -256,9 +256,9 @@ namespace GoodnessOfFit
 
 			//double distToCosThetaBoundary = 1. - fabs(event_i->GetObservable( "cosTheta" )->GetValue()) ;
 			//double distToCosPsiBoundary = 1. - fabs(event_i->GetObservable( "cosPsi" )->GetValue()) ;
-			double distToTimeBoundary = event_i->GetObservable( "time" )->GetValue() - 0.3;
-			double distToMassBoundary = min(fabs(event_i->GetObservable( "mass" )->GetValue() - 5200.),fabs(event_i->GetObservable( "mass" )->GetValue() - 5550.)) ;
-			(void) distToTimeBoundary; (void) distToMassBoundary;	//Unused
+			//double distToTimeBoundary = event_i->GetObservable( "time" )->GetValue() - 0.3;
+			//double distToMassBoundary = min(fabs(event_i->GetObservable( "mass" )->GetValue() - 5200.),fabs(event_i->GetObservable( "mass" )->GetValue() - 5550.)) ;
+			//(void) distToTimeBoundary; (void) distToMassBoundary;	//Unused
 			double f1 = 1.;
 			double f2 = 1.;
 			//if( sd > distToCosThetaBoundary ) f1 = 1. - acos(distToCosThetaBoundary/sd)/TMath::Pi() ;
@@ -287,9 +287,9 @@ namespace GoodnessOfFit
 
 	void calculateUstatisticNum( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, TH1D * distances)
 	{
-		double volume = 0.;
+                double pdfValue = 0.;
 		double distance = 0.;
-		double smallest_distance = 0.;
+		double smallest_distance = 0., sd = 0.;
 		double U = 0;
 		DataPoint * event_i = 0;
 		DataPoint * event_j = 0;
@@ -299,10 +299,15 @@ namespace GoodnessOfFit
 		if ( dimension == 7 ) dimension = 5;
 		cout << "number of dimensions: " << dimension << endl;
 		unsigned int nD = (unsigned) data->GetDataNumber();
-		int count = 0;
+		RapidFitIntegrator * integrator = new RapidFitIntegrator( pdf, false, false );
+		vector<string> doNotIntegrate;
+		doNotIntegrate.push_back("fsig_sw");
+		double volume = integrator->NumericallyIntegratePhaseSpace( phase, doNotIntegrate );
+		delete integrator;
 		for (unsigned int i = 0; i < nD; i++) {
-			if ( !(i % 100) ) cout << "Event " << i << endl;
+			if ( !(i % 100) ) cout << i << endl;
 			event_i = data->GetDataPoint( (int)i );
+                        pdfValue = pdf->Evaluate( event_i );
 			firstEvent = true;
 			for (unsigned int j = 0; j < nD; j++) {
 				if ( j == i ) continue;
@@ -318,25 +323,17 @@ namespace GoodnessOfFit
 					closest = event_j;
 				}
 			}
-			vector<double> vectorOfDistances = getDistances( event_i, closest );
-			if ( vectorOfDistances[0] > vectorOfDistances[1] ) count++;
-			PhaseSpaceBoundary * tempPhase = new PhaseSpaceBoundary( phase->GetAllNames() );
-			copyPhaseSpaceBoundary( tempPhase, phase );
-			updatePhaseSpaceBoundary( event_i, tempPhase, phase, vectorOfDistances ); 
-			RapidFitIntegrator * integrator = new RapidFitIntegrator( pdf, true );
-			volume = integrator->Integral( event_i, tempPhase );
-			//delete tempPhase;
-			//delete integrator;
-			U = exp( -1. * nD * volume );
-			double anaVolume = TMath::Pi() * pow(smallest_distance, 2);
-			double anaU = exp(-1.*nD         *     TMath::Pi()     * pow(smallest_distance, 2) *   pdf->Evaluate( event_i ) );
-			//double anaVolume = 2.*smallest_distance;
-			//double anaU = exp(-1.*nD*2.                            *     smallest_distance     * pdf->Evaluate( event_i ) );
-			double pdfVal = pdf->Evaluate( event_i );
-			cout << "sd " << smallest_distance << " numVol: " << volume << " anaVol: " << anaVolume << " numU: " << U << " anaU: " << anaU << " pdfVal: " << pdfVal << endl;
+			sd = smallest_distance;
+			if ( dimension == 1 ) U = exp(-1.*nD*2.                            *     sd     * pdfValue/volume );
+                        if ( dimension == 2 ) U = exp(-1.*nD         *     TMath::Pi()     * pow(sd, 2) * pdfValue/volume );
+                        if ( dimension == 3 ) U = exp(-1.*nD*4./3.   *     TMath::Pi()     * pow(sd, 3) * pdfValue/volume );
+                        if ( dimension == 4 ) U = exp(-1.*nD*1./2.   *pow( TMath::Pi(), 2) * pow(sd, 4) * pdfValue/volume );
+                        if ( dimension == 5 ) U = exp(-1.*nD*8./15.  *pow( TMath::Pi(), 2) * pow(sd, 5) * pdfValue/volume );
+                        if ( dimension == 6 ) U = exp(-1.*nD*1./6.   *pow( TMath::Pi(), 3) * pow(sd, 6) * pdfValue/volume );
+                        if ( dimension == 7 ) U = exp(-1.*nD*16./105.*pow( TMath::Pi(), 3) * pow(sd, 7) * pdfValue/volume );
+			//cout << sd << " " << pdfValue << " " << volume << endl;
 			distances->Fill( U );
 		}
-		cout << "count " << count << endl;
 	}
 
 	void copyPhaseSpaceBoundary( PhaseSpaceBoundary * newBoundary, PhaseSpaceBoundary * oldBoundary )
@@ -581,25 +578,29 @@ namespace GoodnessOfFit
 					xVal = ( xVar->GetValue() - 1.6 )/1.2;
 					yVal = ( yVar->GetValue() - 1.6 )/1.2;
 				}
-				else if ( (*xIter == "mass") ) {
-					xVal = ( xVar->GetValue() - 5366. )/47.;
-					yVal = ( yVar->GetValue() - 5366. )/47.;
+				else if ( (*xIter == "m23") ) {
+					xVal = ( xVar->GetValue() - 1. )/0.33;
+					yVal = ( yVar->GetValue() - 1. )/0.33;
 				}
-				else if ( (*xIter == "cosTheta") ) {
-					xVal = ( xVar->GetValue() - 0. )/0.5;
-					yVal = ( yVar->GetValue() - 0. )/0.5;
+				else if ( (*xIter == "cosTheta1") ) {
+					xVal = ( xVar->GetValue() - 0. )/1.;
+					yVal = ( yVar->GetValue() - 0. )/1.;
 				}
-				else if(  (*xIter == "cosPsi") ) {
-					xVal = ( xVar->GetValue() - 0. )/0.5;
-					yVal = ( yVar->GetValue() - 0. )/0.5;
+				else if(  (*xIter == "cosTheta2") ) {
+					xVal = ( xVar->GetValue() - 0. )/1.;
+					yVal = ( yVar->GetValue() - 0. )/1.;
 				}
 				else if ( (*xIter == "phi") ) {
-					xVal = ( xVar->GetValue() - 0. )/(3.14159/2.);
-					yVal = ( yVar->GetValue() - 0. )/(3.14159/2.);
+					xVal = ( xVar->GetValue() - 3.14159 )/3.14159;
+					yVal = ( yVar->GetValue() - 3.14159 )/3.14159;
+				}
+				else {
+					xVal = 0.;
+					yVal = 0.;
 				}
 				distance += ( (xVal - yVal)*(xVal - yVal) );
-				//sprintf(buffer, "%f %f %f", xVar->GetValue(), yVar->GetValue(), sqrt(distance));
-				//cout << buffer << endl;
+				//sprintf(buffer, " %f %f %f", xVar->GetValue(), yVar->GetValue(), sqrt(distance));
+				//cout << (*xIter) << buffer << endl;
 				++xIter, ++yIter;
 				if ( xIter == xListOfNames.end() || yIter == yListOfNames.end() ) break;
 			}

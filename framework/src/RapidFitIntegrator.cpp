@@ -331,8 +331,8 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 	return output;
 }
 
-double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex, 
-				vector<string> doIntegrate )
+double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
 {
 #ifdef __RAPIDFIT_USE_GSL
 
@@ -373,22 +373,31 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	}
 	gsl_qrng_free(q);
 
+        vector<double> minima_v, maxima_v;
+        for( unsigned int i=0; i< doIntegrate.size(); ++i )
+        {
+                minima_v.push_back( minima[i] );
+                maxima_v.push_back( maxima[i] );
+        }
+	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
+	
 	double result = 0.;
-	DataPoint * point = new DataPoint(*NewDataPoint);
 	for (unsigned int i = 0; i < integrationPoints[0].size(); ++i)
 	{
+		double * point = new double[ doIntegrate.size() ];
 		for ( unsigned int j = 0; j < doIntegrate.size(); j++)
 		{	
 			//cout << doIntegrate[j] << " " << maxima[j] << " " << minima[j] << " " << integrationPoints[j][i] << endl;
-			point->SetObservable(doIntegrate[j], integrationPoints[j][i]*(maxima[j]-minima[j])+minima[j], 0.0, "Unit"); 
+			point[j] = integrationPoints[j][i]*(maxima[j]-minima[j])+minima[j]; 
 		}
-		result += functionToWrap->Evaluate( point );
+		result += quickFunction->DoEval( point );
+		delete point;
 	}
 	result /= double(integrationPoints[0].size());
 
 	delete minima; delete maxima;
 	delete[] integrationPoints;
-	delete point;
+	delete quickFunction;
 	return result;
 #else
 	(void) functionToWrap; (void) NewDataPoint; (void) NewBoundary; (void) componentIndex; (void) doIntegrate;
@@ -526,7 +535,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 				{
 					numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
 				} else {
-					numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate );
+					numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
 				}
 			}
 			if( !haveTestedIntegral )

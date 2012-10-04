@@ -116,7 +116,7 @@ class DPTotalAmplitudePDF : public BasePDF
 		ObservableRef phase_LASSName;
 		ObservableRef a_LASSName;
 		ObservableRef r_LASSName;
-
+		
 		double magA0Zplus;
 		double magApZplus;
 		double magAmZplus;
@@ -193,7 +193,7 @@ class DPTotalAmplitudePDF : public BasePDF
 
 		DPWignerFunctionJ1 wigner;
 
-		double mJpsi;
+		double massPsi;
 
 		bool useAngularAcceptance;
 		bool useFourDHistogram;
