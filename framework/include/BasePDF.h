@@ -166,6 +166,16 @@
 		 */
 		virtual void SetCachingEnabled( bool );
 
+
+		/*!
+		 * @brief   Return a pointer to the internal object used for numerically Integrating this PDF
+		 *
+		 * @warning This is deleted along with PDF
+		 *
+		 * @return  reference to internal RapidFitIntegrator instance
+		 */
+		RapidFitIntegrator* GetMyIntegrator() const;
+
 		/*!
 		 * @brief   Interface Function: Does the PDF want to use Numerical Normalisation
 		 *
@@ -688,6 +698,7 @@
 
 		PDFConfigurator* thisConfig;	/*!	PDFConfigurator containing the Configurator which knowsn how this PDF was configured	*/
 
+		RapidFitIntegrator* myIntegrator;
 };
 
 #endif

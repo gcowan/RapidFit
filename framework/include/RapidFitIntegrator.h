@@ -23,7 +23,11 @@
 #include "IDataSet.h"
 #include "DebugClass.h"
 
+class IPDF;
+class FoamIntegrator;
+
 using namespace ROOT::Math;
+using namespace::std;
 
 class RapidFitIntegrator
 {

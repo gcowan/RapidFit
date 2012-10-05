@@ -23,6 +23,7 @@
 #include "ParameterSet.h"
 #include "ComponentRef.h"
 #include "DebugClass.h"
+#include "RapidFitIntegrator.h"
 ///	System Headers
 #include <vector>
 #include <string>
@@ -44,6 +45,7 @@ using namespace::std;
 
 class IPDF;
 class PDFConfigurator;
+class RapidFitIntegrator;
 
 /*!
  * @brief typedef for the class-factory objects which actually create the new class instances in memory
@@ -92,6 +94,11 @@ class IPDF
 		 * Change the behaviour of Caching in this PDF.
 		 */
 		virtual void SetCachingEnabled( bool ) = 0;
+
+		/*!
+		 *
+		 */
+		virtual RapidFitIntegrator* GetMyIntegrator() const = 0;
 
 		/*!
 		 * Interface Function:

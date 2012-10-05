@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2012/10/05 Rob Currie
+   - Improved an error message from RapidFit in FitAssembler
+   - Changed the interface to allow for a public RapidFitIntegrator object to be requested
+         ***THIS IS NOT WORKING AND RAPIDFITINTEGRATOR OBJECTS ARE NOT USED! I JUST WANT TO FIX THE API FOR REFERENCE BEFORE I CHANGE CODE WE ACTUALLY USE***
+   - Added a minor bug-fix to prevent less than optimal behaviour in toys. This is a minor bugfix and changes fit stability without effecting wether the fit result is good or not
+   - Added 'SimpleGauss' PDF. This is intended to be kept as a minimal PDF which I will reference in the RapidFit Tutorials I am writing!
+
 2012/10/03 Rob Currie
    - Fixed GSL code to compile&&link without 'make gsl'
    - Added <UseAlpha> to sWeighting XML which allows for the sWeights to be normalised at Calculation and removes the need for: <NormaliseWeights> 

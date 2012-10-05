@@ -356,12 +356,19 @@ ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, c
 		catch(...)
 		{
 			cout << endl;
-			cout << "FitAssembler: You are missing the Parameter: " << param_names[i] << " in your XML File. Please add it to the ParameterSet!" << endl << endl;
-			cout << "Eg:" << endl;
-			PhysicsParameter* temp = new PhysicsParameter( param_names[i] );
-			string xmlStr = temp->XML();
-			delete temp;
-			cout << xmlStr << endl << endl;
+			if( param_names[i] == "UnNamed" )
+			{
+				cout << "You haven't Named this Parameter, please check all PhysicsParameter-s are named correctly in your PDF Constructor" << endl << endl;
+			}
+			else
+			{
+				cout << "FitAssembler: You are missing the Parameter: " << param_names[i] << " in your XML File. Please add it to the ParameterSet!" << endl << endl;
+				cout << "Eg:" << endl;
+				PhysicsParameter* temp = new PhysicsParameter( param_names[i] );
+				string xmlStr = temp->XML();
+				delete temp;
+				cout << xmlStr << endl << endl;
+			}
 			exit(0);
 		}
 		wantedParameterSet->SetPhysicsParameter( param_names[i], new PhysicsParameter(*phys_param) );

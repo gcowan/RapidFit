@@ -14,6 +14,7 @@
 #include "StringProcessing.h"
 #include "ObservableRef.h"
 #include "PhaseSpaceBoundary.h"
+#include "RapidFitIntegrator.h"
 ///	System Headers
 #include <iostream>
 #include <cmath>
@@ -26,10 +27,11 @@ using namespace::std;
 BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ), requiresBoundary(false),
 	do_i_control_the_cache(false), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()),
-	debug_mutex(NULL), can_remove_mutex(true), debug(new DebugClass(false) )
+	debug_mutex(NULL), can_remove_mutex(true), debug(new DebugClass(false) ), myIntegrator(NULL)
 {
 	component_list.push_back( "0" );
 	debug_mutex = new pthread_mutex_t();
+	myIntegrator = new RapidFitIntegrator( this );
 }
 
 BasePDF::BasePDF( const BasePDF& input ) :
@@ -48,6 +50,16 @@ BasePDF::BasePDF( const BasePDF& input ) :
 		(*cache_i) = -1;
 	}
 	if( !input.debug->GetStatus() ) debug->SetStatus(false);
+
+	if( input.myIntegrator == NULL )
+	{
+		myIntegrator = new RapidFitIntegrator( this );
+	}
+	else
+	{
+		myIntegrator = new RapidFitIntegrator( *input.myIntegrator );
+		myIntegrator->SetPDF( this );
+	}
 }
 
 //Destructor
@@ -61,6 +73,12 @@ BasePDF::~BasePDF()
 	if( debug_mutex != NULL && can_remove_mutex == true ) delete debug_mutex;
 
 	if( debug != NULL ) delete debug;
+	if( myIntegrator != NULL ) delete myIntegrator;
+}
+
+RapidFitIntegrator* BasePDF::GetMyIntegrator() const
+{
+	return myIntegrator;
 }
 
 void BasePDF::SetCopyConstructor( CopyPDF_t* input ) const

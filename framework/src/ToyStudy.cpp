@@ -89,7 +89,11 @@ void ToyStudy::DoWholeStudy( int OutputLevel )
 		cout << "\n\n\t\tStarting ToyStudy\t\t" << studyIndex+1 << "\tof:\t" << numberStudies << endl;
 		allResults->StartStopwatch();
 
-		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, studyParameters, pdfsAndData, allConstraints, OutputLevel );
+		ParameterSet* thisSet = new ParameterSet( *studyParameters );
+
+		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, thisSet, pdfsAndData, allConstraints, OutputLevel );
+
+		delete thisSet;
 
 		//cout << "\n\nFinished Study" << endl;
 

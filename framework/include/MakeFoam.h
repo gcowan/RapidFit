@@ -7,6 +7,12 @@
 #include "IPDF.h"
 #include "PhaseSpaceBoundary.h"
 
+#include <vector>
+
+class IPDF;
+
+using namespace::std;
+
 class MakeFoam
 {
 	public:
