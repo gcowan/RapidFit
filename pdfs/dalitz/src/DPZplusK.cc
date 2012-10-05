@@ -94,18 +94,13 @@ DPZplusK::DPZplusK( const DPZplusK& input ) :
  * need to recalculate observables relevant for Z+ K- and then get
  * amplitude
  */
-/*
 TComplex DPZplusK::amplitude(double m23, double cosTheta1, 
                              double cosTheta2, double phi, 
-                             int twoLambda, int twoLambdaPsi)
-*/
-TComplex DPZplusK::amplitude(double m13, double cosThetaZ, 
-                             double cosThetaPsi, double dphi, 
                              int twoLambda, int twoLambdaPsi)
 {
   TComplex result(0,0);
 
-  /*
+  
   // First get final state particles momenta
   TLorentzVector pMuPlus;
   TLorentzVector pMuMinus;
@@ -123,7 +118,7 @@ TComplex DPZplusK::amplitude(double m13, double cosThetaZ,
   DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
        &cosThetaZ, &cosThetaPsi, &dphi);
   double m13=(pMuPlus+pMuMinus+pPi).M();
-  */
+  
   // Call function which calculates amplitude using proper variables
   result=amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, twoLambda,
                       twoLambdaPsi);

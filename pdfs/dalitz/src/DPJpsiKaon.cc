@@ -179,3 +179,10 @@ void DPJpsiKaon::setResonanceParameters(double mass, double sigma)
 {
         massShape->setResonanceParameters( mass, sigma );
 }
+
+TComplex DPJpsiKaon::amplitudeProperVars(double m23, double cosTheta1, 
+                             double cosTheta2, double phi, 
+                             int twoLambda, int twoLambdaPsi)
+{
+  return amplitude(m23,cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
+}

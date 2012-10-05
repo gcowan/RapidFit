@@ -158,7 +158,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	// B0 --> Z+ K-
 	tmp=new DPZplusK(0,0,5.279,4.430,0.100,0.493677,
 			0.13957018, 5.0, 1.5, massPsi, 0);
-	//ZComponents.push_back(tmp);
+	ZComponents.push_back(tmp);
 
 	this->SetNumericalNormalisation( true );
 	this->TurnCachingOff();
@@ -614,7 +614,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	r_LASS = allParameters.GetPhysicsParameter( r_LASSName )->GetValue();
 
 	// No checks performed here to ensure that parameters are set correctly		
-	//ZComponents[0]  ->setResonanceParameters( massZplus, widthZplus );
+	ZComponents[0]  ->setResonanceParameters( massZplus, widthZplus );
 	KpiComponents[0]->setResonanceParameters( massKst892, widthKst892 );
 	KpiComponents[1]->setResonanceParameters( massKst1410, widthKst1410 );
 	KpiComponents[2]->setResonanceParameters( massKst1680, widthKst1680 );
@@ -622,7 +622,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[4]->setResonanceParameters( massK21430, widthK21430 );
 	KpiComponents[5]->setResonanceParameters( massK800, widthK800 );
 	KpiComponents[6]->setResonanceParameters( a_LASS, r_LASS );
-	//ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
+	ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
 	KpiComponents[2]->setHelicityAmplitudes(magA0Kst1680, magApKst1680, magAmKst1680, phaseA0Kst1680, phaseApKst1680, phaseAmKst1680);
@@ -670,13 +670,13 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 			angularAcc = angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2; // factor of 81 = 3^4 to get acceptance on same scale as other quantities
 		}
 	}
-	/*
+	
 	// Need angle between reference axis
 	DPHelpers::calculateFinalStateMomenta(5.279, m23, massPsi,
 	cosTheta1,  cosTheta2, phi, 0.105, 0.105, 0.13957018, 0.493677,
 	pMuPlus, pMuMinus, pPi, pK);
 	// Cos of the angle between psi reference axis
-	cosARefs = DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
+	//cosARefs = DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
 	double cosThetaZ;
 	double cosThetaPsi;
 	double dphi;
@@ -684,8 +684,8 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	&cosThetaZ, &cosThetaPsi, &dphi);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
 	
-	cout << cosARefs << " " << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << endl;
-	 */
+	//cout << cosARefs << " " << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << endl;
+	 
 	double result = 0.;
 	TComplex tmp(0,0);
 
@@ -716,10 +716,8 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 			// Now comes sum over Z+ components and lambdaPsiPrime
 			for (unsigned int i = 0; i < ZComponents.size(); ++i)
 			{
-			{
-			//tmp += ZComponents[i]->amplitude(m13, cosThetaZ, cosThetaPsi, dphi,
-			//twoLambda,twoLambdaPsi); // need to check that we pass right helicities
-			}
+			  tmp += ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi,
+			  twoLambda,twoLambdaPsi); // need to check that we pass right helicities
 			}
 			
 		}
@@ -761,7 +759,7 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         components_list.push_back( "1430_2" );
         components_list.push_back( "800" );
         components_list.push_back( "LASS" );
-        //components_list.push_back( "Z4430" );
+        components_list.push_back( "Z4430" );
         components_list.push_back( "0" );
         return components_list;
 }
