@@ -1,6 +1,12 @@
 // $Id: release.notes $
 
 2012/10/05 Rob Currie
+   - Added copy constructors to DPComponent derived classes. Fit with Z wasn't
+     working without them.
+   - Fixed component plotting of DPTotalAmplitude PDF when including the Z.
+   - Moved some of the old DP code to deprecated.
+
+2012/10/05 Rob Currie
    - Improved an error message from RapidFit in FitAssembler
    - Changed the interface to allow for a public RapidFitIntegrator object to be requested
          ***THIS IS NOT WORKING AND RAPIDFITINTEGRATOR OBJECTS ARE NOT USED! I JUST WANT TO FIX THE API FOR REFERENCE BEFORE I CHANGE CODE WE ACTUALLY USE***

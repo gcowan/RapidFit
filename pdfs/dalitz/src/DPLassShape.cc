@@ -8,17 +8,18 @@
 
 #define DOUBLE_TOLERANCE 1E-6
 
-DPLassShape::DPLassShape(double mR, double gammaR, int L,
-                         double m1, double m2, double R, double a, double r):
-   mR(mR)
-  ,gammaR(gammaR)
+DPLassShape::DPLassShape(double mRR, double gammaRR, int L,
+                         double mm1, double mm2, double RR, double aa, double rr):
+   mR(mRR)
+  ,gammaR(gammaRR)
   ,LR(L)
-  ,m1(m1)
-  ,m2(m2)
-  ,a(a)
-  ,r(r)
+  ,m1(mm1)
+  ,m2(mm2)
+  ,R(RR)
+  ,a(aa)
+  ,r(rr)
 {
-  switch (L)
+  switch (LR)
   {
     case 0: barrier=new DPBarrierL0(R);
             break;
@@ -29,6 +30,25 @@ DPLassShape::DPLassShape(double mR, double gammaR, int L,
 
   pR0=daughterMomentum(mR);
 }
+
+DPLassShape::DPLassShape( const DPLassShape& other ) : DPMassShape( other ),
+        mR( other.mR ), gammaR( other.gammaR ), LR(other.LR),
+        m1(other.m1), m2(other.m2), a(other.a), r(other.r), R(other.R),
+        barrier(NULL)
+{
+        if ( other.barrier != NULL )
+        {
+                switch (LR)
+                {
+                        case 0: barrier=new DPBarrierL0(R);
+                        break;
+                default: std::cout<<"WARNING: Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
+                        barrier=new DPBarrierL0(R);
+                        break;
+                }
+        }       
+        pR0=daughterMomentum(mR);
+}       
 
 DPLassShape::~DPLassShape()
 {

@@ -13,6 +13,7 @@ class DPBWResonanceShape: public virtual DPMassShape
 
     DPBWResonanceShape(double mR, double gammaR, int L, double m1, 
                        double m2, double R);
+    DPBWResonanceShape( const DPBWResonanceShape& );
     ~DPBWResonanceShape();
 
     TComplex massShape(double m);
@@ -23,9 +24,10 @@ class DPBWResonanceShape: public virtual DPMassShape
 
     double mR;
     double gammaR;
-    double LR;
+    int LR;
     double m1;
     double m2; 
+    double R; 
     DPBarrierFactor* barrier;
     double pR0;  // Momentum of daughters at mR
 

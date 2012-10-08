@@ -13,6 +13,8 @@ class DPLassShape: public virtual DPMassShape
 
     DPLassShape(double mR, double gammaR, int L, double m1, 
                        double m2, double R, double a, double r);
+
+    DPLassShape( const DPLassShape& );
     ~DPLassShape();
 
     TComplex massShape(double m);
@@ -24,11 +26,12 @@ class DPLassShape: public virtual DPMassShape
 
     double mR;
     double gammaR;
-    double LR;
+    int LR;
     double m1;
     double m2; 
     double a;
     double r;
+    double R; // Blatt-Weisskopf radius
     DPBarrierFactor* barrier;
     double pR0;  // Momentum of daughters at mR
 

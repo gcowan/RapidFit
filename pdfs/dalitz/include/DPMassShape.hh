@@ -9,6 +9,7 @@ class DPMassShape
   public:
 
     DPMassShape() {};
+    DPMassShape( const DPMassShape& ) {};
     ~DPMassShape() {};
 
     virtual TComplex massShape(double m) = 0;

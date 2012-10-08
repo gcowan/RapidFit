@@ -13,6 +13,7 @@ class DPGLassShape: public virtual DPMassShape
 
     DPGLassShape(double mR, double gammaR, int L, double m1, 
                        double m2, double R, double a, double r);
+    DPGLassShape( const DPGLassShape& );
     ~DPGLassShape();
 
     TComplex massShape(double m);
@@ -24,11 +25,12 @@ class DPGLassShape: public virtual DPMassShape
 
     double mR;
     double gammaR;
-    double LR;
+    int LR;
     double m1;
     double m2; 
     double a;
     double r;
+    double R;
     DPBarrierFactor* barrier;
     double pR0;  // Momentum of daughters at mR
 

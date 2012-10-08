@@ -8,20 +8,21 @@
 
 #define DOUBLE_TOLERANCE 1E-6
 
-DPGLassShape::DPGLassShape(double mR, double gammaR, int L,
-                    double m1, double m2, double R, double a, double r):
-   mR(mR)
-  ,gammaR(gammaR)
+DPGLassShape::DPGLassShape(double mRR, double gammaRR, int L,
+                    double mm1, double mm2, double RR, double aa, double rr):
+   mR(mRR)
+  ,gammaR(gammaRR)
   ,LR(L)
-  ,m1(m1)
-  ,m2(m2)
-  ,a(a)
-  ,r(r)
+  ,m1(mm1)
+  ,m2(mm2)
+  ,a(aa)
+  ,r(rr)
+  ,R(RR)
   ,fraction(0.5)
   ,phaseR(0)
   ,phaseB(0)
 {
-  switch (L)
+  switch (LR)
   {
     case 0: barrier=new DPBarrierL0(R);
             break;
@@ -31,6 +32,26 @@ DPGLassShape::DPGLassShape(double mR, double gammaR, int L,
   }
 
   pR0=daughterMomentum(mR);
+}
+
+DPGLassShape::DPGLassShape( const DPGLassShape& other ) : DPMassShape( other ),
+	mR( other.mR ), gammaR( other.gammaR ), LR(other.LR),
+	m1(other.m1), m2(other.m2), a(other.a), r(other.r), R(other.R),
+	fraction(other.fraction), phaseR(other.phaseR), phaseB(other.phaseB),
+	barrier(NULL)
+{
+	if ( other.barrier != NULL )
+	{
+  		switch (LR)
+  		{
+    			case 0: barrier=new DPBarrierL0(R);
+            		break;
+    		default: std::cout<<"WARNING: Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
+             		barrier=new DPBarrierL0(R);
+             		break;
+  		}
+	}
+	pR0=daughterMomentum(mR);
 }
 
 DPGLassShape::~DPGLassShape()

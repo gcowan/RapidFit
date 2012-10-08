@@ -103,9 +103,9 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
                         break;
                 }
         }
-	std::cout<<"DEBUG, used copy constructor\n";
-	std::cout<<"BarierFactors are "<<barrierB<<" "<<barrierR<<std::endl;
-	std::cout<<"Parameters are "<<m1 << " "<<mR<< " " << spinKaon<<" "<<A0<<std::endl;
+	//std::cout<<"DEBUG, used copy constructor\n";
+	//std::cout<<"BarierFactors are "<<barrierB<<" "<<barrierR<<std::endl;
+	//std::cout<<"Parameters are "<<m1 << " "<<mR<< " " << spinKaon<<" "<<A0<<std::endl;
 }
 
 TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1, 
