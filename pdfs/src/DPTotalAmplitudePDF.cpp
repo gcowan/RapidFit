@@ -123,6 +123,10 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 	// Construct all components we need
 	DPComponent * tmp;
+	// B0 --> Z+ K-
+	tmp=new DPZplusK(0,0,5.279,4.430,0.100,0.493677,
+			0.13957018, 5.0, 1.5, massPsi, 0);
+	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
 	tmp=new DPJpsiKaon(0, 1, 5.279, 0.89594, 0.0487, 0.493677,
 			0.13957018, 5.0, 1.5, massPsi, 1);
@@ -144,7 +148,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 			0.13957018, 5.0, 1.5, massPsi, 2);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K(800)
-	tmp=new DPJpsiKaon(0, 0, 5.279, 682., 0.574, 0.493677,
+	tmp=new DPJpsiKaon(0, 0, 5.279, 0.682, 0.574, 0.493677,
 			0.13957018, 5.0, 1.5, massPsi, 0);
 	KpiComponents.push_back(tmp);
   
@@ -155,10 +159,6 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 	KpiComponents.push_back(tmp);
 
-	// B0 --> Z+ K-
-	tmp=new DPZplusK(0,0,5.279,4.430,0.100,0.493677,
-			0.13957018, 5.0, 1.5, massPsi, 0);
-	ZComponents.push_back(tmp);
 
 	this->SetNumericalNormalisation( true );
 	this->TurnCachingOff();
@@ -431,6 +431,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	componentIndex = 0;
 
 	cout << "Making copy of DPTotalAmplitudePDF. Acceptance: " << useAngularAcceptance << endl;
+        std::cout << "In DPTotal copy" << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 
 	for( unsigned int i=0; i < copy.KpiComponents.size(); ++i )
 	{
@@ -671,33 +672,51 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 		}
 	}
 	
+	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 	// Need angle between reference axis
 	DPHelpers::calculateFinalStateMomenta(5.279, m23, massPsi,
 	cosTheta1,  cosTheta2, phi, 0.105, 0.105, 0.13957018, 0.493677,
 	pMuPlus, pMuMinus, pPi, pK);
+	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 	// Cos of the angle between psi reference axis
 	//cosARefs = DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
 	double cosThetaZ;
 	double cosThetaPsi;
 	double dphi;
+	pB.SetPxPyPzE(0., 0., 0., 5.279);
 	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	&cosThetaZ, &cosThetaPsi, &dphi);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
 	
-	//cout << cosARefs << " " << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << endl;
+	//cout << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << " " << pMuPlus.X() << " " << pMuMinus.X() << " " << pPi.X() << endl;
 	 
 	double result = 0.;
 	TComplex tmp(0,0);
 
+	// This deals with the separate Kpi components
 	unsigned int lower = (unsigned)(componentIndex - 1);
 	unsigned int upper = (unsigned)componentIndex;
+	unsigned int lowerZ = 0; 
+	unsigned int upperZ = 0;
 
-	//std::cout << "componentIndex " << componentIndex << std::endl;
-
-	if ( componentIndex == 0 ) {
+	// And this switchs things to deal with the Z components.
+        if ( componentIndex > KpiComponents.size() ) 
+	{
 		lower = 0;
-		upper = (unsigned)KpiComponents.size();
+		upper = 0;
+		lowerZ = (unsigned)(componentIndex - KpiComponents.size() - 1);
+                upperZ = (unsigned)(componentIndex - KpiComponents.size());
+
 	}
+
+	// Finally, for the total of all components
+	if ( componentIndex == 0 ) {
+		lower  = 0;
+		upper  = (unsigned)KpiComponents.size();
+		lowerZ = 0;
+		upperZ = (unsigned)ZComponents.size();
+	}
+
 	// Now sum over final state helicities (this is not general code, but
 	// knows about internals of components
 	for (int twoLambda = -2; twoLambda <= 2; twoLambda += 4) // Sum over +-1
@@ -714,10 +733,11 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 
 			
 			// Now comes sum over Z+ components and lambdaPsiPrime
-			for (unsigned int i = 0; i < ZComponents.size(); ++i)
+			for (unsigned int i = lowerZ; i < upperZ; ++i)
 			{
 			  tmp += ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi,
 			  twoLambda,twoLambdaPsi); // need to check that we pass right helicities
+			       //cout << "Z: " << m13 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
 			}
 			
 		}
