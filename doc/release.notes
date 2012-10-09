@@ -1,6 +1,9 @@
 // $Id: release.notes $
 
-2012/10/05 Rob Currie
+2012/10/09 Greig Cowan
+   - Changed default mass and width of the LASS component.
+
+2012/10/08 Greig Cowan
    - Added copy constructors to DPComponent derived classes. Fit with Z wasn't
      working without them.
    - Fixed component plotting of DPTotalAmplitude PDF when including the Z.

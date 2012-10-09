@@ -153,7 +153,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	KpiComponents.push_back(tmp);
   
 	// Kpi s-wave using LASS
-  	tmp=new DPJpsiKaon(0, 0, 5.279, 1.435, 0.279, 0.493677,
+  	tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
                      0.13957018, 5.0, 1.5, massPsi, 0,
                      "LASS", 1.94, 1.76);
 
