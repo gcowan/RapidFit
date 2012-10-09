@@ -140,20 +140,20 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 			0.13957018, 5.0, 1.5, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K0(1430)
-	tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
+	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
 			0.13957018, 5.0, 1.5, massPsi, 0);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
-	tmp=new DPJpsiKaon(0, 2, 5.279, 1.4324, 0.109, 0.493677,
+	tmp=new DPJpsiKaon(1, 2, 5.279, 1.4324, 0.109, 0.493677,
 			0.13957018, 5.0, 1.5, massPsi, 2);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K(800)
-	tmp=new DPJpsiKaon(0, 0, 5.279, 0.682, 0.574, 0.493677,
+	tmp=new DPJpsiKaon(1, 0, 5.279, 0.682, 0.574, 0.493677,
 			0.13957018, 5.0, 1.5, massPsi, 0);
 	KpiComponents.push_back(tmp);
   
 	// Kpi s-wave using LASS
-  	tmp=new DPJpsiKaon(0, 0, 5.279, 1.425, 0.270, 0.493677,
+  	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
                      0.13957018, 5.0, 1.5, massPsi, 0,
                      "LASS", 1.94, 1.76);
 
