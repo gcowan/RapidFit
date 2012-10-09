@@ -124,7 +124,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	// Construct all components we need
 	DPComponent * tmp;
 	// B0 --> Z+ K-
-	tmp=new DPZplusK(0,0,5.279,4.430,0.100,0.493677,
+	tmp=new DPZplusK(1,0,5.279,4.430,0.100,0.493677,
 			0.13957018, 5.0, 1.5, massPsi, 0);
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
