@@ -133,9 +133,11 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
   
   double pB = DPHelpers::daughterMomentum(this->mB, this->mJpsi, m23);
   double pR = DPHelpers::daughterMomentum(m23, this->m1, this->m2);
+  double pB0 = DPHelpers::daughterMomentum(this->mB, this->mJpsi, this->mR);
+  double pR0 = DPHelpers::daughterMomentum(this->mR, this->m1, this->m2);
 
-  double orbitalFactor = TMath::Power(pB/this->mB, this->LB)*
-                         TMath::Power(pR/m23, this->LR);
+  double orbitalFactor = TMath::Power(pB/pB0, this->LB)*
+                         TMath::Power(pR/pR0, this->LR);
 
   double barrierFactor = barrierB->barrier( DPHelpers::daughterMomentum(this->mB,
                                             this->mJpsi, this->mR), pB)*

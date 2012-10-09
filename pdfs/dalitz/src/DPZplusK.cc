@@ -151,9 +151,11 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 
 	double pB = DPHelpers::daughterMomentum(this->mB, this->m1, m13);
 	double pR = DPHelpers::daughterMomentum(m13, this->mJpsi, this->m2);
+	double pB0 = DPHelpers::daughterMomentum(this->mB, this->m1, this->mR);
+	double pR0 = DPHelpers::daughterMomentum(this->mR, this->mJpsi, this->m2);
 
-	double orbitalFactor = TMath::Power(pB/this->mB, this->LB)*
-		TMath::Power(pR/m13, this->LR);
+	double orbitalFactor = TMath::Power(pB/pB0, this->LB)*
+		TMath::Power(pR/pR0, this->LR);
 
 	double barrierFactor = barrierB->barrier( DPHelpers::daughterMomentum(this->mB,
 				this->m1, this->mR), pB)*
