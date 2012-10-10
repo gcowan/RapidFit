@@ -41,9 +41,12 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
 	{
 		total_sWeight += inputDataSet->GetDataPoint( i )->GetObservable( sWeightName )->GetValue();
-		total_sWeight_sq += inputDataSet->GetDataPoint( i )->GetObservable( sWeightName )->GetValue()*inputDataSet->GetDataPoint( i )->GetObservable( sWeightName )->GetValue();//inputDataSet->GetDataPoint( i )->GetObservable( sWeightsqName )->GetValue();
+		total_sWeight_sq += inputDataSet->GetDataPoint( i )->GetObservable( sWeightsqName )->GetValue();
 	}
 	double alpha = total_sWeight / total_sWeight_sq;
+	cout << total_sWeight << " / " << total_sWeight_sq << endl;
+	cout << "Applying Weight: " << alpha << endl;
+
 	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
 	{
 		DataPoint* thisPoint = inputDataSet->GetDataPoint( i );
@@ -53,7 +56,8 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 		Observable* sWeight_sq_corrected = new Observable( sWeightsqName, thisWeight*thisWeight, 0., "WeightSq-Unit" );
 		thisPoint->SetObservable( sWeightName, sWeight_corrected );
 		thisPoint->SetObservable( sWeightsqName, sWeight_sq_corrected );
-		delete sWeight_corrected, sWeight_sq_corrected;
+		delete sWeight_corrected;
+		delete sWeight_sq_corrected;
 	}
 }
 
@@ -111,8 +115,8 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* Inp
 
 	//Retrieve the correct fraction
 	double signalFraction = inputResult->GetResultParameterSet()->GetResultParameter( fractionName )->GetValue();
-	int numberSignalEvents = (int)floor( (double)(InputData->GetDataNumber()) * signalFraction );
-	int numberBackgroundEvents = (int)ceil( (double)(InputData->GetDataNumber()) * ( 1. - signalFraction ) );
+	double numberSignalEvents = /*(int)floor(*/ (double)(InputData->GetDataNumber()) * signalFraction;// );
+	double numberBackgroundEvents = /*(int)ceil(*/ (double)(InputData->GetDataNumber()) * ( 1. - signalFraction );// );
 
 	//Debug
 	cout << "Signal events: " << numberSignalEvents << endl;
@@ -211,7 +215,8 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* Inp
 }
 
 //A separate method for calculating the martix elements for the weight
-pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long NumberSignal, long NumberBackground, IDataSet * InputData, vector<double> & SignalValues, vector<double> & BackgroundValues, double& denom_2, vector<double>& numer_2 )
+pair< double, double > SWeightPrecalculator::CalculateMatrixElements( double NumberSignal, double NumberBackground, IDataSet * InputData,
+		vector<double> & SignalValues, vector<double> & BackgroundValues, double& denom_2, vector<double>& numer_2 )
 {
 	//The three unique components of the matrix (one is used twice)
 	double signalSignal = 0.0;
@@ -253,7 +258,9 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( long Numbe
 	double returnSignalSignal = backgroundBackground / discriminant;
 	double returnSignalBackground = -signalBackground / discriminant;
 
-	double den_2 = (signalSignal*backgroundBackground)*(signalSignal*backgroundBackground) + (signalBackground*signalBackground)*(signalBackground*signalBackground) - 2.*(signalSignal*backgroundBackground)*(signalBackground*signalBackground);
+	double den_2 = (signalSignal*backgroundBackground)*(signalSignal*backgroundBackground)
+			+ (signalBackground*signalBackground)*(signalBackground*signalBackground)
+			- 2.*(signalSignal*backgroundBackground)*(signalBackground*signalBackground);
 	denom_2 = den_2;
 
 	vector<double> num_2; num_2.push_back( backgroundBackground ); num_2.push_back( -signalBackground );

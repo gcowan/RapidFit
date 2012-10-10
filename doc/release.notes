@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/10/10 Rob Currie
+   - Committed small bugfix to sWeighting (has 0 effect but it's more 'correct' now)
+   - Committed some small fixes to savetoXML
+
 2012/10/09 Greig Cowan
    - Changed default mass and width of the LASS component.
 

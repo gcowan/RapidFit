@@ -176,7 +176,7 @@ string ObservableDiscreteConstraint::XML() const
 	stringstream xml;   
 
 	xml << "\t<Observable>" << endl;
-	xml << "\t\t<Name>" << name << "</Name" << endl;
+	xml << "\t\t<Name>" << name << "</Name>" << endl;
 	for( vector<double>::const_iterator val_i = allValues.begin(); val_i != allValues.end(); ++val_i )
 	{
 		xml << "\t\t<Value>" << *val_i << "</Value>" << endl;

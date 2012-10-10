@@ -60,6 +60,7 @@ BasePDF::BasePDF( const BasePDF& input ) :
 		myIntegrator = new RapidFitIntegrator( *input.myIntegrator );
 		myIntegrator->SetPDF( this );
 	}
+	if( input.thisConfig != NULL ) thisConfig = new PDFConfigurator( *(input.thisConfig) );
 }
 
 //Destructor
