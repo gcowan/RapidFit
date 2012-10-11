@@ -169,7 +169,8 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 	TComplex angular(0,0);
 	angular=wignerPsi.function(cosTheta2,twoLambdaPsi/2,twoLambda/2)*
 		wigner->function(cosTheta1,0,twoLambdaPsi/2)*
-		TComplex::Exp(-0.5*twoLambdaPsi*TComplex::I()*phi);
+		TComplex::Exp(-0.5*(twoLambdaPsi-twoLambda)*TComplex::I()*phi);
+//		TComplex::Exp(-0.5*twoLambdaPsi*TComplex::I()*phi);
 	switch (twoLambdaPsi)
 	{
 		case 0: angular*=A0;
