@@ -21,7 +21,9 @@ using namespace::std;
 
 
 //  Interface for internal calls
-void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, FitResultVector* output_interface, int OutputLevel )
+void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
+	vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, ScanParam* Wanted_Param, FitResultVector* output_interface,
+	int OutputLevel, DebugClass* debug, bool forceContinue )
 {
 	FunctionConfig->SetIntegratorTest( false );
 
@@ -51,7 +53,10 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 		cerr << "Cannot Run a scan Using Parameter: " << scanName << endl;
 		exit(3764);
 	}
+
 	scanParameter->SetType( "Fixed" ) ;
+	BottleParameters->FloatedFirst();
+	scanParameter = BottleParameters->GetPhysicsParameter(scanName);
 
 	// Need to set up a loop , fixing the scan parameter at each point
 	double deltaScan=0.;
@@ -75,11 +80,13 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 
 		FitResult* scanStepResult=NULL;
 
+		BottleParameters->Print();
+
 		try{
 			//	Use the SafeFit as this always returns something when a PDF has been written to throw not exit
 			//	Do a scan point fit
 			//BottleParameters->Print();
-			scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
+			scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 		}
 		catch( int e )
 		{
@@ -134,7 +141,7 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 
 			scanParameter->SetBlindedValue( scanVal ) ;
 			output_interface->StartStopwatch();
-			scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel );
+			scanStepResult = FitAssembler::DoSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 		}
 
 
@@ -182,7 +189,9 @@ void ScanStudies::DoScan( MinimiserConfiguration * MinimiserConfig, FitFunctionC
 }
 
 //  Interface for internal calls
-void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, pair<ScanParam*, ScanParam*> Param_Set, vector<FitResultVector*>* output_interface, int OutputLevel )
+void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
+	vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, pair<ScanParam*, ScanParam*> Param_Set,
+	vector<FitResultVector*>* output_interface, int OutputLevel, DebugClass* debug, bool forceContinue )
 {
 	FunctionConfig->SetIntegratorTest( false );
 
@@ -239,7 +248,7 @@ void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctio
 		scanParameter->SetBlindedValue( scanVal );
 
 		// Do a scan point fit
-		ScanStudies::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result, OutputLevel );
+		ScanStudies::DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set.second, Returnable_Result, OutputLevel, debug, forceContinue );
 
 		//
 		//
@@ -268,25 +277,29 @@ void ScanStudies::DoScan2D( MinimiserConfiguration * MinimiserConfig, FitFunctio
 }
 
 // Interface for external calls
-vector<FitResultVector*> ScanStudies::ContourScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName, string scanName2, int OutputLevel )
+vector<FitResultVector*> ScanStudies::ContourScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig,
+	ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints,
+	OutputConfiguration* OutputConfig, string scanName, string scanName2, int OutputLevel, DebugClass* debug, bool forceContinue )
 {
 	vector<FitResultVector*>* Returnable_Result = new vector<FitResultVector*>;
 
 	pair< ScanParam*, ScanParam* > Param_Set = OutputConfig->Get2DScanParams( scanName, scanName2 );
 
-	DoScan2D( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set, Returnable_Result, OutputLevel );
+	DoScan2D( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, Param_Set, Returnable_Result, OutputLevel, debug, forceContinue );
 
 	return *Returnable_Result;
 }
 
 //  Interface for external calls
-FitResultVector* ScanStudies::SingleScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters, vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName, int OutputLevel )
+FitResultVector* ScanStudies::SingleScan( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
+	vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, OutputConfiguration* OutputConfig, string scanName,
+	int OutputLevel, DebugClass* debug, bool forceContinue )
 {
 	FitResultVector* Returnable_Result = new FitResultVector( BottleParameters->GetAllNames() );
 
 	ScanParam* local_param = OutputConfig->GetScanParam( scanName );
 
-	DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, local_param, Returnable_Result, OutputLevel );
+	DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, local_param, Returnable_Result, OutputLevel, debug, forceContinue );
 
 	return Returnable_Result;
 }

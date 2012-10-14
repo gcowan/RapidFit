@@ -319,7 +319,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			//	ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
 			ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex),
 
-					PDFStr, output_file, thisObservable, (*projection_i), resultIndex );
+					PDFStr, output_file, thisObservable, (*projection_i), resultIndex, debug );
 
 
 			thisPlotter->SetDebug( debug );
@@ -396,7 +396,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			Total_Components = ComponentPlotter::MergeComponents( all_components_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
 
 			output_file->cd();
-			output_file->mkdir( "Total" );
+			if( output_file->GetDirectory( "Total" ) == 0 ) output_file->mkdir( "Total" );
 			output_file->cd( "Total" );
 
 			ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data",
@@ -421,7 +421,8 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_PullPlot", resultBottle->GetResultPDF(0)->GetRandomFunction() );
 			(void) pullGraph;
 
-			ComponentPlotter::OutputPlotPull( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(), finalPullEvals, resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
+			ComponentPlotter::OutputPlotPull( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(),
+								finalPullEvals, resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
 		}
 
 		//	it is now safe to remove the instances of ComponentPlotter

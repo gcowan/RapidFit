@@ -421,7 +421,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 
 	//	Get all possible discrete combination datapoints and the names of all discrete observables
 	vector<DataPoint*> allCombinations = this->GetDiscreteCombinations();
-	if( allCombinations.empty() ) return 0;
+	if( allCombinations.empty() || allCombinations.size() == 1 ) return 0;
 	vector<string> allDiscreteNames = this->GetDiscreteNames();
 
 	//	Construct array of ObservableRef objects to pick out Discrete Observables
@@ -546,5 +546,10 @@ void PhaseSpaceBoundary::CheckPhaseSpace( IPDF* toCheck ) const
 			allConstraints[i]->Print();
 		}
 	}
+}
+
+size_t PhaseSpaceBoundary::GetID() const
+{
+	return uniqueID;
 }
 

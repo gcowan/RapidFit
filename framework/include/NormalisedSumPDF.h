@@ -31,6 +31,8 @@ class NormalisedSumPDF : public BasePDF
 
 		void TurnCachingOff();
 
+		virtual void SetUseGSLIntegrator( bool input );
+
 		//Return the integral of the function over the given boundary
 		double Normalisation( DataPoint*, PhaseSpaceBoundary* );
 
@@ -85,11 +87,10 @@ class NormalisedSumPDF : public BasePDF
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;
 		IPDF * firstPDF;
 		IPDF * secondPDF;
-		RapidFitIntegrator * firstIntegrator;
-		RapidFitIntegrator * secondIntegrator;
 		double firstFraction, firstIntegralCorrection, secondIntegralCorrection;
 		ObservableRef fractionName;
 		PhaseSpaceBoundary * integrationBoundary;
 };
 
 #endif
+

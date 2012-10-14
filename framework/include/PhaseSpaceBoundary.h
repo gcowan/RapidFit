@@ -61,6 +61,8 @@ class PhaseSpaceBoundary
 
 		string XML() const;
 
+		size_t GetID() const;
+
 	private:
 		PhaseSpaceBoundary& operator=(const PhaseSpaceBoundary&);
 		vector< IConstraint* > allConstraints;

@@ -50,12 +50,12 @@ NegativeLogLikelihoodNumerical::~NegativeLogLikelihoodNumerical()
 }
 
 //Return the negative log likelihood for a PDF/DataSet result
-double NegativeLogLikelihoodNumerical::EvaluateDataSet( IPDF * FittingPDF, IDataSet * TotalDataSet, RapidFitIntegrator * ResultIntegrator, int number )
+double NegativeLogLikelihoodNumerical::EvaluateDataSet( IPDF * FittingPDF, IDataSet * TotalDataSet, int number )
 {
 	(void) FittingPDF;
 
 	//	Have to provide a datapoint even though one is _not_ expected to be explicitly used for this fittting function
-	double this_integral = ResultIntegrator->Integral( TotalDataSet->GetDataPoint(0), TotalDataSet->GetBoundary() );
+	double this_integral = FittingPDF->GetPDFIntegrator()->Integral( TotalDataSet->GetDataPoint(0), TotalDataSet->GetBoundary() );
 
 	if( TotalDataSet->GetDataNumber() == 0 ) return 0.;
 

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace::std;
 
@@ -12,11 +13,12 @@ DebugClass::DebugClass( bool input ) : perform_debugging( input ), classes_to_de
 	if( !input ) classes_to_debug.push_back( "default" );
 }
 
-DebugClass::DebugClass( const DebugClass& input ) : perform_debugging( true ), classes_to_debug( input.classes_to_debug )
+DebugClass::DebugClass( const DebugClass& input ) :
+	perform_debugging( input.perform_debugging ), classes_to_debug( input.classes_to_debug )
 {
 }
 
-bool DebugClass::GetStatus()
+bool DebugClass::GetStatus() const
 {
 	return perform_debugging;
 }
@@ -31,12 +33,12 @@ void DebugClass::SetClassNames( vector<string> input )
 	classes_to_debug = input;
 }
 
-vector<string> DebugClass::GetClassNames()
+vector<string> DebugClass::GetClassNames() const
 {
 	return classes_to_debug;
 }
 
-bool DebugClass::DebugThisClass( string name )
+bool DebugClass::DebugThisClass( const string name )
 {
 	if( !perform_debugging ) return false;
 	else
@@ -47,7 +49,10 @@ bool DebugClass::DebugThisClass( string name )
 		}
 		else
 		{
-			int num = StringProcessing::VectorContains( classes_to_debug, name );
+			string thisName=name;
+			//cout << thisName << " : " << classes_to_debug[0] << endl;
+			int num = StringProcessing::VectorContains( &classes_to_debug, &thisName );
+			//cout << num << endl;
 			if( num == -1 ) return false;
 			else return true;
 		}

@@ -48,10 +48,9 @@ NegativeLogLikelihoodThreaded::~NegativeLogLikelihoodThreaded()
 }
 
 //Return the negative log likelihood for a PDF/DataSet result
-double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataSet * TotalDataSet, RapidFitIntegrator * ResultIntegrator, int number )
+double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataSet * TotalDataSet, int number )
 {
 	(void) FittingPDF;
-	(void) ResultIntegrator;
 
 	if( TotalDataSet->GetDataNumber() == 0 ) return 0.;
 
@@ -99,7 +98,6 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 		fit_thread_data[threadnum].useWeights = useWeights;					//	Defined in the fitfunction baseclass
 		fit_thread_data[threadnum].weightName = ObservableRef( weightObservableName );		//	Defined in the fitfunction baseclass
 		fit_thread_data[threadnum].FitBoundary = StoredBoundary[(unsigned)Threads*((unsigned)number)+threadnum];
-		fit_thread_data[threadnum].ResultIntegrator = StoredIntegrals[(unsigned)Threads*((unsigned)number)+threadnum];
 		fit_thread_data[threadnum].dataPoint_Result = vector<double>();
 		fit_thread_data[threadnum].weightsSquared = weightsSquared;
 	}
@@ -178,7 +176,7 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 
 		try
 		{
-			integral = thread_input->ResultIntegrator->Integral( *data_i, thread_input->FitBoundary );
+			integral = thread_input->fittingPDF->Integral( *data_i, thread_input->FitBoundary );
 		}
 		catch( ... )
 		{
@@ -235,11 +233,17 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 		{
 			pthread_mutex_lock( debug_lock );
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
-			cerr << endl << "Caught invalid value from PDF" << endl;
+			cerr << endl << "Caught invalid value from PDF: " << endl;
+			cerr << "Val: " << value << "\tNorm: " << integral << endl;
 			(*data_i)->Print();
 			pthread_mutex_unlock( debug_lock );
 			break;
 		}
+
+		//if( value / integral > 1. )
+		//{
+		//	cout << "SERIOUSE: " << value / integral << endl;
+		//}
 
 		//	Result of evaluating the DataPoint
 		result = log( value / integral );

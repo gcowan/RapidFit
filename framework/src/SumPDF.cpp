@@ -70,6 +70,12 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 
 }
 
+void SumPDF::SetUseGSLIntegrator( bool input )
+{
+	firstPDF->SetUseGSLIntegrator( input );
+	secondPDF->SetUseGSLIntegrator( input );
+}
+
 void SumPDF::TurnThisCachingOff()
 {
 	this->ReallyTurnCachingOff();

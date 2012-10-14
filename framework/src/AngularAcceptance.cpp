@@ -168,6 +168,9 @@ string AngularAcceptance::openFile( string fileName ) {
 	input_file2.close();
 	bool local_fail2 = input_file2.fail();
 
+	cout << "Looking For: " << fileName << endl;
+	if( !local_fail2 ) cout << "Found Locally!" << endl;
+
 	string fileName_pwd = "pdfs/configdata/";
 	fileName_pwd.append( fileName );
 	input_file2.open( fileName_pwd.c_str(), ifstream::in );

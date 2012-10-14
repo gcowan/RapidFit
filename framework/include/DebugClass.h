@@ -15,14 +15,14 @@ class DebugClass
 		DebugClass( const DebugClass& );
 		~DebugClass(){};
 
-		bool GetStatus();
-		void SetStatus( bool input ); 
+		bool GetStatus() const;
+		void SetStatus( bool input );
 
 		void SetClassNames( vector<string> input );
 
-		vector<string> GetClassNames();
+		vector<string> GetClassNames() const;
 
-		bool DebugThisClass( string name );
+		bool DebugThisClass( const string name );
 
 	private:
 

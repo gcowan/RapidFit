@@ -1,0 +1,18 @@
+
+\let\oldpm\pm
+\renewcommand{\pm}{\ensuremath{\oldpm}}
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{@{}|l|r|r|@{}}
+\hline
+Paramater & Sensitivity & Pull Bias \\
+\hline
+$\text{sigma}$ & 0.0447 & -0.035 \pm 0.00317\\
+\hline
+\end{tabular}
+\caption{Some Caption}
+\label{thisTable}
+\end{center}
+\end{table}
+\renewcommand{\pm}{\oldpm}
+

@@ -80,7 +80,7 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 //Create the minimiser and fit function
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, PhysicsBottle * Bottle, DebugClass* debug )
 {
-	
+
 	if( Bottle->GetParameterSet()->GetAllFloatNames().size() == 0 )
 	{
 		vector<string> ParamNames = Bottle->GetParameterSet()->GetAllFixedNames();
@@ -90,15 +90,19 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			PhysicsParameter* param = Bottle->GetParameterSet()->GetPhysicsParameter( ParamNames[i] );
 			fixed_set->SetResultParameter( ParamNames[i], param->GetValue(), param->GetValue(), 0., 0., 0., param->GetType(), param->GetUnit() );
 		}
-	
+
 		FitFunction * theFunction = FunctionConfig->GetFitFunction();
 		theFunction->SetPhysicsBottle(Bottle);
+
+		double someTest = theFunction->Evaluate();
+		cout << someTest << endl;
+		exit(0);
 
 		FitResult* fixed_result = new FitResult( 0., fixed_set, 3, Bottle );
 		fixed_result->SetMinimumValue(theFunction->Evaluate());
 		return fixed_result;
 	}
-	
+
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass( "FitAssembler" ) )
@@ -117,7 +121,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	   {
 	   pdfs[i]->GetPhysicsParameters()->Print();
 	   }
-	   */
+	 */
 
 	if( debug != NULL )
 	{
@@ -496,7 +500,7 @@ void FitAssembler::CheckParameterSet( FitResult* ReturnableFitResult, ParameterS
 
 //  Perform a safer fit which should always to return something which you can use :D
 FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
-		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, int OutputLevel, DebugClass* debug )
+		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, bool forceContinue, int OutputLevel, DebugClass* debug )
 {
 	FitResult* ReturnableFitResult=NULL;
 	ParameterSet* internalBottleParameters = new ParameterSet( *BottleParameters );
@@ -504,19 +508,27 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 	//	Decide what 'Strategy' to use By default just perform the fit
 	if( FunctionConfig->GetStrategy() == "Petes" )
 	{
-		ReturnableFitResult = Petes_DoSafeFit( MinimiserConfig, FunctionConfig, internalBottleParameters, BottleData, BottleConstraints, OutputLevel, debug );
+		ReturnableFitResult = Petes_DoSafeFit( MinimiserConfig, FunctionConfig, internalBottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	}
 	else if( FunctionConfig->GetStrategy() == "PetesGamma" )
 	{
-		ReturnableFitResult = PetesGamma_DoSafeFit( MinimiserConfig, FunctionConfig, internalBottleParameters, BottleData, BottleConstraints, OutputLevel, debug );
+		ReturnableFitResult = PetesGamma_DoSafeFit( MinimiserConfig, FunctionConfig, internalBottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	}
 	else if( FunctionConfig->GetStrategy() == "Robs" )
 	{
-		ReturnableFitResult = Robs_DoSafeFit( MinimiserConfig, FunctionConfig, internalBottleParameters, BottleData, BottleConstraints, OutputLevel, debug );
+		ReturnableFitResult = Robs_DoSafeFit( MinimiserConfig, FunctionConfig, internalBottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	}
 	else  //	Default!
 	{
-		ReturnableFitResult = DoSingleSafeFit( MinimiserConfig, FunctionConfig, internalBottleParameters, BottleData, BottleConstraints, OutputLevel, debug );
+		ReturnableFitResult = DoSingleSafeFit( MinimiserConfig, FunctionConfig, internalBottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
+	}
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler:: Finished Passing Back, checking Ourput FitResult contains all input Parameters" << endl;
+		}
 	}
 
 	/*!	Check that the ParameterSet in the output contains the provided ParameterSet regardless of what was passed to the Minimiser	*/
@@ -526,11 +538,19 @@ FitResult * FitAssembler::DoSafeFit( MinimiserConfiguration * MinimiserConfig, F
 
 	delete internalBottleParameters;
 
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler:: Returning FitResult" << endl;
+		}
+	}
+
 	return ReturnableFitResult;
 }
 
 FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, const ParameterSet* BottleParameters,
-		const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, const int OutputLevel, DebugClass* debug )
+		const vector< PDFWithData* > BottleData, const vector< ConstraintFunction* > BottleConstraints, bool forceContinue, const int OutputLevel, DebugClass* debug )
 {
 	cout << "Starting Fit1:" << endl;
 	double deltaPara = BottleParameters->GetPhysicsParameter( string("delta_para") )->GetBlindedValue();
@@ -541,7 +561,7 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	ParameterSet* set1 = new ParameterSet( *BottleParameters );
 
 	// Normal fit
-	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, set1, BottleData, BottleConstraints, OutputLevel, debug );
+	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, set1, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	bool good_result_0 = res0->GetFitStatus() == 3;
 	cout << "Finished Fit1." << endl;
 	if( !good_result_0  ) cout << "Fit-1 failed" << endl;
@@ -554,7 +574,7 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	if( set2->GetPhysicsParameter( string("delta_perp") )->GetType() != "Fixed" ) set2->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp );
 	//BottleParameters->GetPhysicsParameter( string("delta_s") )->SetBlindedValue( -deltaS );
 	cout << endl << "Starting Fit2:" << endl;
-	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, set2, BottleData, BottleConstraints, OutputLevel, debug );
+	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, set2, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	cout << "Finished Fit2." << endl;
 	bool good_result_1 = res1->GetFitStatus() == 3;
 
@@ -565,7 +585,7 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	if( set3->GetPhysicsParameter( string("deltaGamma") )->GetType() != "Fixed" ) set3->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma );
 	if( set3->GetPhysicsParameter( string("Phi_s") )->GetType() != "Fixed" ) set3->GetPhysicsParameter( string("Phi_s") )->SetBlindedValue( 3.14159-phi_s );
 	cout << endl << "Starting Fit3:" << endl;
-	FitResult* res2 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, set3, BottleData, BottleConstraints, OutputLevel, debug );
+	FitResult* res2 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, set3, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	cout << "Finished Fit3." << endl;
 	bool good_result_2 = res2->GetFitStatus() == 3;
 
@@ -576,7 +596,7 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 	if( set4->GetPhysicsParameter( string("deltaGamma") )->GetType() != "Fixed" ) set4->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma );
 	if( set4->GetPhysicsParameter( string("Phi_s") )->GetType() != "Fixed" ) set4->GetPhysicsParameter( string("Phi_s") )->SetBlindedValue( 3.14159-phi_s );
 	cout << endl << "Starting Fit4:" << endl;
-	FitResult* res3 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, set4, BottleData, BottleConstraints, OutputLevel, debug );
+	FitResult* res3 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, set4, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	cout << "Finished Fit4." << endl;
 	bool good_result_3 = res3->GetFitStatus() == 3;
 
@@ -616,9 +636,13 @@ FitResult * FitAssembler::Robs_DoSafeFit( MinimiserConfiguration * MinimiserConf
 }
 
 FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
-		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, int OutputLevel, DebugClass* debug )
+		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, bool forceContinue, int OutputLevel, DebugClass* debug )
 {
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+
+	cout_bak = cout.rdbuf();
+	cerr_bak = cerr.rdbuf();
+	clog_bak = clog.rdbuf();
 
 	if( debug != NULL )
 	{
@@ -631,9 +655,6 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 	//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
 	if( OutputLevel <= -1 && !debug )
 	{
-		cout_bak = cout.rdbuf();
-		cerr_bak = cerr.rdbuf();
-		clog_bak = clog.rdbuf();
 		cout.rdbuf(0);
 		cerr.rdbuf(0);
 		clog.rdbuf(0);
@@ -660,7 +681,7 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 	ReturnableFitResult = FitAssembler::DoFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, debug );
 
 	//      Reset Std Output Streams
-	if( OutputLevel <= -1 && !debug )
+	if( OutputLevel <= -1 || !debug )
 	{
 		cout.rdbuf(cout_bak);
 		cerr.rdbuf(cerr_bak);
@@ -672,7 +693,7 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 	//	Have to protect against null objects being returned from the Wrappers
 	if( ReturnableFitResult != NULL )
 	{
-		if( ReturnableFitResult->GetFitStatus() != 3 )
+		if( ReturnableFitResult->GetFitStatus() < 2 )
 		{
 			bad_fit = true;
 		}
@@ -680,7 +701,7 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 		bad_fit = true;
 	}
 
-	if( bad_fit )
+	if( !forceContinue && bad_fit )
 	{
 		cerr << "\n\n\t\tFit Did NOT Converge Correctly, CHECK YOUR RESULTS!\n\n";
 		for( unsigned short int j=0; j < other_params.size(); ++j )
@@ -713,12 +734,12 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 
 
 FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
-		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, int OutputLevel, DebugClass* debug )
+		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, bool forceContinue, int OutputLevel, DebugClass* debug )
 {
 	cout << endl << "******* Result of Petes Double fit strategy  (NOT flipping delta_s as well) *********" << endl ;
 	cout << "Starting Fit1:" << endl;
 	// Normal fit
-	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel, debug ) ;
+	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug ) ;
 	double LLmin0 = res0->GetMinimumValue() ;
 	bool good_result_0 = res0->GetFitStatus() == 3;
 	cout << "Finished Fit1." << endl;
@@ -732,7 +753,7 @@ FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserCon
 	BottleParameters->GetPhysicsParameter( string("delta_perp") )->SetBlindedValue( 3.14159-deltaPerp );
 	//BottleParameters->GetPhysicsParameter( string("delta_s") )->SetBlindedValue( -deltaS );
 	cout << endl << "Starting Fit2:" << endl;
-	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel, debug );
+	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	double LLmin1 = res1->GetMinimumValue();
 	bool good_result_1 = res1->GetFitStatus() == 3;
 
@@ -779,12 +800,12 @@ FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserCon
 }
 
 FitResult * FitAssembler::PetesGamma_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
-		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, int OutputLevel, DebugClass* debug )
+		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, bool forceContinue, int OutputLevel, DebugClass* debug )
 {
 	cout << endl << "******* Result of Petes Double fit strategy for flipping deltaGamma *********" << endl ;
 	cout << "Starting Fit1:" << endl;
 	// Normal fit
-	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel, debug );
+	FitResult* res0 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	double LLmin0 = res0->GetMinimumValue() ;
 	bool good_result_0 = res0->GetFitStatus() == 3;
 	cout << "Finished Fit1." << endl;
@@ -794,7 +815,7 @@ FitResult * FitAssembler::PetesGamma_DoSafeFit( MinimiserConfiguration * Minimis
 	double deltaGamma = BottleParameters->GetPhysicsParameter( string("deltaGamma") )->GetBlindedValue() ;
 	BottleParameters->GetPhysicsParameter( string("deltaGamma") )->SetBlindedValue( -deltaGamma ) ;
 	cout << endl << "Starting Fit2:" << endl;
-	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, OutputLevel, debug );
+	FitResult* res1 = DoSingleSafeFit( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, forceContinue, OutputLevel, debug );
 	double LLmin1 = res1->GetMinimumValue() ;
 	bool good_result_1 = res1->GetFitStatus() == 3;
 

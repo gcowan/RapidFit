@@ -296,7 +296,8 @@ int Perform2DLLScan( RapidFitConfiguration* config )
 		}
 
 		vector<FitResultVector*> Temp_Results = ScanStudies::ContourScan( config->theMinimiser, config->theFunction, config->argumentParameterSet,
-				config->pdfsAndData, config->xmlFile->GetConstraints(), config->makeOutput, name1, name2, config->OutputLevel2 );
+
+				config->pdfsAndData, config->xmlFile->GetConstraints(), config->makeOutput, name1, name2, config->OutputLevel2, config->debug, config->Force_Continue_Flag );
 
 		vector<FitResultVector*> Ordered_Results;
 
@@ -355,7 +356,9 @@ int PerformLLScan( RapidFitConfiguration* config )
 		}
 
 		FitResultVector* scan_result = ScanStudies::SingleScan( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData,
-				config->xmlFile->GetConstraints(), config->makeOutput, LLscanList[scan_num], config->OutputLevel2 );
+
+				config->xmlFile->GetConstraints(), config->makeOutput, LLscanList[scan_num], config->OutputLevel2, config->debug, config->Force_Continue_Flag );
+
 		scanSoloResults.push_back( scan_result );
 
 		cout << "Scan Finished" << endl;
@@ -489,7 +492,9 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	config->XMLConstraints = config->xmlFile->GetConstraints();
 
-	config->GlobalResult = FitAssembler::DoSafeFit( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData, config->XMLConstraints, config->OutputLevel, config->debug );
+	config->GlobalResult = FitAssembler::DoSafeFit( config->theMinimiser, config->theFunction, config->argumentParameterSet,
+
+				config->pdfsAndData, config->XMLConstraints, config->Force_Continue_Flag, config->OutputLevel, config->debug );
 
         if( config->debug != NULL )
         {       
@@ -552,7 +557,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 		cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
 	}
 
-	if( config->GlobalResult->GetFitStatus() < 2 )
+	if( config->GlobalResult->GetFitStatus() < 3 )
 	{
 		cout << "--------------------------------------------------------------" << endl;
 		cout << "---------------------FIT RESULT IS NOT 3----------------------" << endl;
@@ -563,9 +568,9 @@ int PerformMainFit( RapidFitConfiguration* config )
 		cout << "--------------------------------------------------------------" << endl;
 		cout << "-If your sure you want to continue employ the following flag--" << endl;
 		cout << "--------------------------------------------------------------" << endl;
-		cout << "--------------      \'--ForceScan\'            -----------------" << endl;
+		cout << "--------------      \'--ForceContinue\'      -----------------" << endl;
 		cout << "--------------------------------------------------------------" << endl;
-		if( !config->Force_Scan_Flag || ( config->GlobalResult->GetMinimumValue() < 0 )  )
+		if( !config->Force_Continue_Flag  )
 		{
 			return -1;
 		}
@@ -659,7 +664,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	cout << "\n\n\t\tFit Output:" <<endl;
 
-	if( config->Force_Scan_Flag || config->OutputLevel >= 0 )
+	if( config->Force_Continue_Flag || config->OutputLevel >= 0 )
 	{
 		//Output results
 		config->makeOutput->SetInputResults( config->GlobalResult->GetResultParameterSet() );

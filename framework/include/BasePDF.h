@@ -174,7 +174,9 @@
 		 *
 		 * @return  reference to internal RapidFitIntegrator instance
 		 */
-		RapidFitIntegrator* GetMyIntegrator() const;
+		RapidFitIntegrator* GetPDFIntegrator() const;
+
+		virtual void SetUseGSLIntegrator( bool input );
 
 		/*!
 		 * @brief   Interface Function: Does the PDF want to use Numerical Normalisation
@@ -599,6 +601,8 @@
 		 */
 		void ReallyTurnCachingOff();
 
+		bool CheckFixed( PhaseSpaceBoundary* NewBoundary );
+
 		/*!
 		 * @brief Protected Function for each PDF which provides a method for the PDF to analytically integrate over the whole phase space
 		 *
@@ -699,6 +703,9 @@
 		PDFConfigurator* thisConfig;	/*!	PDFConfigurator containing the Configurator which knowsn how this PDF was configured	*/
 
 		RapidFitIntegrator* myIntegrator;
+
+		bool fixed_checked, isFixed;
+		size_t fixedID;
 };
 
 #endif

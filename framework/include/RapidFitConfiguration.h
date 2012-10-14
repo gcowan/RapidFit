@@ -85,7 +85,7 @@ class RapidFitConfiguration
 		bool UUID_Flag;
 		bool BurnToROOTFlag;
 		bool MCStudyFlag;
-		bool Force_Scan_Flag;
+		bool Force_Continue_Flag;
 		bool FC_LL_PART_Flag;
 		bool GOF_Flag;
 		bool StartAtCenterFlag;

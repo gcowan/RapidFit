@@ -41,16 +41,19 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 	, cthetalName		( config->getName("helcosthetaL") )
 	, phihName			( config->getName("helphi") )
 	, timeconstName		( config->getName("time") )
-, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cos1(),
+	, eventResolutionName	( config->getName("eventResolution") )
+	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cos1(),
 	cos2(), phi(), histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
 	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true),
-	_useHelicityBasis(false)
+	_useHelicityBasis(false), _usePerEvent(false), _usePunziSigmat(false)
 {
 
 	cout << "Constructing PDF: LongLivedBkg_3Dangular  " << endl ;
 
 	//Configure
 	_useHelicityBasis = config->isTrue( "UseHelicityBasis" ) ;
+	_usePerEvent = config->isTrue( "UsePerEvent" ) ;
+	_usePunziSigmat = config->isTrue( "UsePunziSigmat" );
 
 	//Make prototypes
 	this->MakePrototypes();
@@ -58,12 +61,12 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 	this->SetupPseudoObs();
 
 	//Find name of histogram needed to define 3-D angular distribution
-	string fileName = config->getConfigurationValue( "AngularDistributionHistogram" ) ;
+	string fileName = config->getConfigurationValue( "AngularDistributionHistogram" );
 
 	//Initialise depending upon whether configuration parameter was found
 	if( fileName == "" )
 	{
-		cout << " No AngularDistributionHistogram found: using flat background " << endl ;
+		cout << " No AngularDistributionHistogram found: using flat background " << endl;
 		useFlatAngularDistribution = true ;
 	}
 	else
@@ -138,24 +141,24 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 		Title.Append(ext);
 
 		xaxis = histo->GetXaxis();
-                xmin = xaxis->GetXmin();
-                xmax = xaxis->GetXmax();
-                nxbins = histo->GetNbinsX();
-                deltax = (xmax-xmin)/nxbins;
+		xmin = xaxis->GetXmin();
+		xmax = xaxis->GetXmax();
+		nxbins = histo->GetNbinsX();
+		deltax = (xmax-xmin)/nxbins;
 		cout << " X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << "\t\t" << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
 
 		yaxis = histo->GetYaxis();
-                ymin = yaxis->GetXmin();
-                ymax = yaxis->GetXmax();
-                nybins = histo->GetNbinsY();
+		ymin = yaxis->GetXmin();
+		ymax = yaxis->GetXmax();
+		nybins = histo->GetNbinsY();
 		deltay = (ymax-ymin)/nybins;
 		cout << " Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << "\t\t" << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
 
 		zaxis = histo->GetZaxis();
-                zmin = zaxis->GetXmin();
-                zmax = zaxis->GetXmax();
-                nzbins = histo->GetNbinsZ();
-                deltaz = (zmax-zmin)/nzbins;
+		zmin = zaxis->GetXmin();
+		zmax = zaxis->GetXmax();
+		nzbins = histo->GetNbinsZ();
+		deltaz = (zmax-zmin)/nzbins;
 		cout << " Z axis Name: " << zaxis->GetName() << "\tTitle: " << zaxis->GetTitle() << "\t\t" << "Z axis Min: " << zmin << "\tMax: " << zmax << "\tBins: " << nzbins << "\t\t\t";
 
 		//method for Checking whether histogram is sensible
@@ -183,28 +186,29 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 					{
 						sum += (int) bin_content;
 					}
-				}
 			}
 		}
-
-                total_num_entries = histo->GetEntries();
-                int average_bin_content = sum / total_num_bins;
-
-                cout << "Total Bins: " << total_num_bins << "\tEmpty Bins: " << zero_bins.size() << "\tAvg Bin Content: " << average_bin_content << endl;
-
-		//cout << "\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
-		//cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
-		//cout << endl;
-
-		// Check.  This order works for both bases since phi is always the third one.
-		if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*Mathematics::Pi() )
-		{
-			cout << endl << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
-			exit(1);
-		}
-
-		//cout << "Finishing processing histo" << endl;
 	}
+
+	total_num_entries = histo->GetEntries();
+	int average_bin_content = sum / total_num_bins;
+
+	cout << "Total Bins: " << total_num_bins << "\tEmpty Bins: " << zero_bins.size() << "\tAvg Bin Content: " << average_bin_content << endl;
+
+	//cout << "\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
+	//cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
+	//cout << endl;
+
+	// Check.  This order works for both bases since phi is always the third one.
+	if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*Mathematics::Pi() )
+	{
+		cout << endl << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
+		exit(1);
+	}
+
+	//cout << "Finishing processing histo" << endl;
+}
+
 }
 
 //................................................................
@@ -213,7 +217,12 @@ LongLivedBkg_3Dangular::~LongLivedBkg_3Dangular()
 {
 }
 
-
+vector<string> LongLivedBkg_3Dangular::GetDoNotIntegrateList()
+{
+	vector<string> doNotList;
+	if( _usePerEvent && !_usePunziSigmat ) doNotList.push_back( eventResolutionName ); 
+	return doNotList;
+}
 
 //..................................................................
 //Make the data point and parameter set
@@ -237,9 +246,17 @@ void LongLivedBkg_3Dangular::MakePrototypes()
 	parameterNames.push_back( f_LL1Name );
 	parameterNames.push_back( tauLL1Name );
 	parameterNames.push_back( tauLL2Name );
-	parameterNames.push_back( timeResLL1FracName );
-	parameterNames.push_back( sigmaLL1Name );
-	parameterNames.push_back( sigmaLL2Name );
+
+	if( !_usePerEvent )
+	{
+		parameterNames.push_back( timeResLL1FracName );
+		parameterNames.push_back( sigmaLL1Name );
+		parameterNames.push_back( sigmaLL2Name );
+	}
+	else
+	{
+		allObservables.push_back( eventResolutionName );
+	}
 
 	allParameters = ParameterSet(parameterNames);
 }
@@ -264,10 +281,12 @@ bool LongLivedBkg_3Dangular::SetPhysicsParameters( ParameterSet * NewParameterSe
 	f_LL1       = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
 	tauLL1      = allParameters.GetPhysicsParameter( tauLL1Name )->GetValue();
 	tauLL2      = allParameters.GetPhysicsParameter( tauLL2Name )->GetValue();
-	timeResLL1Frac = allParameters.GetPhysicsParameter( timeResLL1FracName )->GetValue();
-	sigmaLL1    = allParameters.GetPhysicsParameter( sigmaLL1Name )->GetValue();
-	sigmaLL2    = allParameters.GetPhysicsParameter( sigmaLL2Name )->GetValue();
-
+	if( !_usePerEvent )
+	{
+		timeResLL1Frac = allParameters.GetPhysicsParameter( timeResLL1FracName )->GetValue();
+		sigmaLL1    = allParameters.GetPhysicsParameter( sigmaLL1Name )->GetValue();
+		sigmaLL2    = allParameters.GetPhysicsParameter( sigmaLL2Name )->GetValue();
+	}
 	return isOK;
 }
 
@@ -277,12 +296,14 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 {
 	// Observable
 	time = measurement->GetObservable( timeName )->GetValue();
-	if( _useHelicityBasis ) {
+	if( _useHelicityBasis )
+	{
 		cos1   = measurement->GetObservable( cthetakName )->GetValue();
 		cos2   = measurement->GetObservable( cthetalName )->GetValue();
 		phi    = measurement->GetObservable( phihName )->GetValue();  // Pi offset is difference between angle calculator and "Our Paper"
 	}
-	else {
+	else
+	{
 		cos1   = measurement->GetObservable( cosPsiName )->GetValue();
 		cos2   = measurement->GetObservable( cosThetaName )->GetValue();
 		phi    = measurement->GetObservable( phiName )->GetValue();
@@ -290,25 +311,34 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 
 	double returnValue = 0;
 	double val1=-1., val2=-1.;
-	//Deal with propertime resolution
-	if( timeResLL1Frac >= 0.9999 )
+	if( _usePerEvent )
 	{
-		// Set the member variable for time resolution to the first value and calculate
-		sigmaLL = sigmaLL1;
+		sigmaLL = measurement->GetObservable( eventResolutionName )->GetValue();
 		res=1;
-		returnValue =  this->buildPDFnumerator(measurement) ;
+		returnValue =  this->buildPDFnumerator(measurement);
 	}
 	else
 	{
-		// Set the member variable for time resolution to the first value and calculate
-		sigmaLL = sigmaLL1;
-		res=1;
-		val1 = this->buildPDFnumerator(measurement);
-		// Set the member variable for time resolution to the second value and calculate
-		sigmaLL = sigmaLL2;
-		res=2;
-		val2 = this->buildPDFnumerator(measurement);
-		returnValue = (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2) ;
+		//Deal with propertime resolution
+		if( timeResLL1Frac >= 0.9999 )
+		{
+			// Set the member variable for time resolution to the first value and calculate
+			sigmaLL = sigmaLL1;
+			res=1;
+			returnValue =  this->buildPDFnumerator(measurement) ;
+		}
+		else
+		{
+			// Set the member variable for time resolution to the first value and calculate
+			sigmaLL = sigmaLL1;
+			res=1;
+			val1 = this->buildPDFnumerator(measurement);
+			// Set the member variable for time resolution to the second value and calculate
+			sigmaLL = sigmaLL2;
+			res=2;
+			val2 = this->buildPDFnumerator(measurement);
+			returnValue = (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2) ;
+		}
 	}
 
 	if (returnValue <= 0)
@@ -336,8 +366,10 @@ double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
 	thigh = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMaximum();
 
 	double val1=-1., val2=-1., norm1=-1., norm2=-1.;
-	if( f_LL1 >= 0.9999 ) {
-		if( tauLL1 <= 0 ) {
+	if( f_LL1 >= 0.9999 )
+	{
+		if( tauLL1 <= 0 )
+		{
 			PDF_THREAD_LOCK
 				cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
 			PDF_THREAD_UNLOCK
@@ -357,8 +389,10 @@ double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
 		}
 		returnValue = val1 /norm1;
 	}
-	else {
-		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
+	else
+	{
+		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) )
+		{
 			PDF_THREAD_LOCK
 				cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
 			PDF_THREAD_UNLOCK
@@ -405,7 +439,7 @@ double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
 double LongLivedBkg_3Dangular::Normalisation(PhaseSpaceBoundary * boundary)
 {
 	(void) boundary;
-	return 1. ;
+	return 1.;
 
 	/*
 	   IConstraint * timeBound = boundary->GetConstraint( timeconstName );
@@ -440,7 +474,7 @@ double LongLivedBkg_3Dangular::Normalisation(PhaseSpaceBoundary * boundary)
 	}
 
 	return returnValue ;
-	*/
+	 */
 }
 
 //.............................................................
@@ -473,7 +507,7 @@ double LongLivedBkg_3Dangular::buildPDFdenominator()
 
 	//This PDF only works for full angular phase space= 8pi factor included in the factors in the Evaluate() method - so no angular normalisation term.
 	return returnValue ;
-	*/
+	 */
 
 }
 
@@ -507,7 +541,8 @@ double LongLivedBkg_3Dangular::angularFactor( )
 			cos2Obs   = _datapoint->GetObservable( cthetalName );
 			phiObs    = _datapoint->GetObservable( phihName );  // Pi offset is difference between angle calculator and "Our Paper"
 		}
-		else {
+		else
+		{
 			cos2Obs   = _datapoint->GetObservable( cosThetaName );
 			phiObs    = _datapoint->GetObservable( phiName );
 		}
@@ -522,6 +557,7 @@ double LongLivedBkg_3Dangular::angularFactor( )
 
 		//Angular factor normalized with phase space of histogram and total number of entries in the histogram
 		returnValue = (double)num_entries_bin / (deltax * deltay * deltaz) / (double)total_num_entries;
+		//returnValue = (double)num_entries_bin / histo->Integral();
 
 		cos1Obs->SetBkgBinNumber( xbin ); cos1Obs->SetBkgAcceptance( returnValue );
 		cos2Obs->SetBkgBinNumber( ybin ); cos2Obs->SetBkgAcceptance( returnValue );

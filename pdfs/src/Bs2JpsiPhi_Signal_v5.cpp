@@ -351,7 +351,11 @@ void Bs2JpsiPhi_Signal_v5::SetupAngularTerms()
 
 //........................................................
 //Destructor
-Bs2JpsiPhi_Signal_v5::~Bs2JpsiPhi_Signal_v5() {}
+Bs2JpsiPhi_Signal_v5::~Bs2JpsiPhi_Signal_v5()
+{
+	if( timeAcc != NULL ) delete timeAcc;
+	if( angAcc != NULL ) delete angAcc;
+}
 
 
 //......................................
@@ -1117,8 +1121,8 @@ double Bs2JpsiPhi_Signal_v5::diffXsecTimeOnly()
 
 double Bs2JpsiPhi_Signal_v5::diffXsecNorm1()
 {
-	//preCalculateTimeIntegrals() ;  Replaced by new Caching mechanism , but this cant be used when event resolution is selected
-	if( useEventResolution() ) preCalculateTimeIntegrals() ;
+	preCalculateTimeIntegrals() ;//  Replaced by new Caching mechanism , but this cant be used when event resolution is selected
+	//if( useEventResolution() ) preCalculateTimeIntegrals() ;
 
 	double norm =
 

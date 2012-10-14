@@ -27,7 +27,7 @@ using namespace::std;
 BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ), requiresBoundary(false),
 	do_i_control_the_cache(false), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()),
-	debug_mutex(NULL), can_remove_mutex(true), debug(new DebugClass(false) ), myIntegrator(NULL)
+	debug_mutex(NULL), can_remove_mutex(true), debug(NULL), myIntegrator(NULL) , fixed_checked(false), isFixed(false), fixedID(0)
 {
 	component_list.push_back( "0" );
 	debug_mutex = new pthread_mutex_t();
@@ -41,7 +41,7 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	seed_function( input.seed_function ), seed_num( input.seed_num ), PDFName( input.PDFName ), PDFLabel( input.PDFLabel ), copy_object( input.copy_object ),
 	do_i_control_the_cache( input.do_i_control_the_cache ), cachingEnabled( input.cachingEnabled ), haveTestedIntegral( input.haveTestedIntegral ),
 	thisConfig(NULL), discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL),
-	debug_mutex(input.debug_mutex), can_remove_mutex(false), debug((input.debug==NULL)?NULL:new DebugClass(*input.debug))
+	debug_mutex(input.debug_mutex), can_remove_mutex(false), debug(NULL), fixed_checked(input.fixed_checked), isFixed(input.isFixed), fixedID(input.fixedID)
 {
 	allParameters.SetPhysicsParameters( &(input.allParameters) );
 	DiscreteCaches = new vector<double>( input.DiscreteCaches->size() );
@@ -49,7 +49,8 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	{
 		(*cache_i) = -1;
 	}
-	if( !input.debug->GetStatus() ) debug->SetStatus(false);
+
+	debug = (input.debug==NULL)?NULL:new DebugClass(*input.debug);
 
 	if( input.myIntegrator == NULL )
 	{
@@ -59,6 +60,7 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	{
 		myIntegrator = new RapidFitIntegrator( *input.myIntegrator );
 		myIntegrator->SetPDF( this );
+		myIntegrator->ForceTestStatus( true );
 	}
 	if( input.thisConfig != NULL ) thisConfig = new PDFConfigurator( *(input.thisConfig) );
 }
@@ -77,9 +79,14 @@ BasePDF::~BasePDF()
 	if( myIntegrator != NULL ) delete myIntegrator;
 }
 
-RapidFitIntegrator* BasePDF::GetMyIntegrator() const
+RapidFitIntegrator* BasePDF::GetPDFIntegrator() const
 {
 	return myIntegrator;
+}
+
+void BasePDF::SetUseGSLIntegrator( bool input )
+{
+	myIntegrator->SetUseGSLIntegrator( input );
 }
 
 void BasePDF::SetCopyConstructor( CopyPDF_t* input ) const
@@ -104,6 +111,15 @@ void BasePDF::ReallyTurnCachingOff()
 
 bool BasePDF::CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary )
 {
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "BasePDF" ) )
+		{
+			PDF_THREAD_LOCK
+			cout << "BasePDF: Checking Cache" << endl;
+			PDF_THREAD_UNLOCK
+		}
+	}
 	//	Force the cache to be not valid when caching is NOT enabled
 	if( !cachingEnabled ) return false;
 
@@ -141,6 +157,15 @@ void BasePDF::SetNumericalNormalisation( bool input )
 
 void BasePDF::SetCache( double input, DataPoint* InputPoint, PhaseSpaceBoundary* InputBoundary )
 {
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "BasePDF" ) )
+		{
+			PDF_THREAD_LOCK
+			cout << "BasePDF: Setting Cache. Discrete DataSet " << InputBoundary->GetDiscreteIndex( InputPoint ) << " Value: " << input << endl;
+			PDF_THREAD_UNLOCK
+		}
+	}
 	this->CheckCaches( InputBoundary );
 	/*!
 	 * Get the Number Corresponding to the Unique Combination that this DataPoint is in
@@ -203,18 +228,32 @@ bool BasePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 
 double BasePDF::GetCache( DataPoint* InputPoint, PhaseSpaceBoundary* NewBoundary )
 {
-	//cout << "I have : " << DiscreteCaches->size() << " caches." << endl;
-	this->CheckCaches( NewBoundary );
 
-	//cout << "I now have: " << DiscreteCaches->size() << " caches." << endl;
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "BasePDF" ) )
+		{
+			PDF_THREAD_LOCK
+			cout << "BasePDF: Requesting Cache For DataSet " << NewBoundary->GetDiscreteIndex( InputPoint ) << " of " << DiscreteCaches->size() << endl;
+			PDF_THREAD_UNLOCK
+		}
+	}
+
+	this->CheckCaches( NewBoundary );
 
 	unsigned int thisIndex = NewBoundary->GetDiscreteIndex( InputPoint );
 
-	//cout << "I want this: " << thisIndex << " Index" << endl;
-
 	double thisVal = DiscreteCaches->at(thisIndex);
 
-	//cout << "I get this: " << thisVal << endl;
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "BasePDF" ) )
+		{
+			PDF_THREAD_LOCK
+			cout << "BasePDF: Cache Value is " << thisVal << endl;
+			PDF_THREAD_UNLOCK
+		}
+	}
 
 	if( thisVal > 0 )
 	{
@@ -226,40 +265,208 @@ double BasePDF::GetCache( DataPoint* InputPoint, PhaseSpaceBoundary* NewBoundary
 	}
 }
 
+bool BasePDF::CheckFixed( PhaseSpaceBoundary* NewBoundary )
+{
+	if( !( fixed_checked && (fixedID == NewBoundary->GetID()) ) )
+	{
+		fixedID = NewBoundary->GetID();
+		vector<string> required = this->GetPrototypeDataPoint();
+		isFixed = true;
+		for( unsigned int i=0; i< required.size(); ++i )
+		{
+			isFixed = isFixed && NewBoundary->GetConstraint( required[i] )->IsDiscrete();
+		}
+		fixed_checked = true;
+	}
+	return isFixed;
+}
+
 //Return the integral of the function over the given boundary
 double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary)
 {
 	double thisCache = this->GetCache( NewDataPoint, NewBoundary );
 
-	//cout << "thisCache: " << thisCache << endl;
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "BasePDF" ) )
+		{
+			if( cachingEnabled )
+			{
+				PDF_THREAD_LOCK
+				cout << "BasePDF: Caching Enabled!" << endl;
+				PDF_THREAD_UNLOCK
+			}
+			else
+			{
+				PDF_THREAD_LOCK
+				cout << "BasePDF: Caching Disabled!" << endl;
+				PDF_THREAD_UNLOCK
+			}
+		}
+	}
+
+	if( this->CheckFixed( NewBoundary ) )
+	{
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "BasePDF" ) )
+			{
+				PDF_THREAD_LOCK
+				cout << "BasePDF: FixedPhaseSpace. Integral == Evaluate " << endl;
+				PDF_THREAD_UNLOCK
+			}
+		}
+		if( this->CacheValid( NewDataPoint, NewBoundary ) )
+		{
+			return thisCache;
+		}
+		else
+		{
+			double thisEval = this->Evaluate( NewDataPoint );
+			if( cachingEnabled )
+			{
+				this->SetCache( thisEval, NewDataPoint, NewBoundary );
+			}
+			return thisEval;
+		}
+	}
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "BasePDF" ) )
+		{
+			PDF_THREAD_LOCK
+			cout << "BasePDF: thisCache " << thisCache << endl;
+			PDF_THREAD_UNLOCK
+		}
+	}
 
 	// If the PDF has been configured to rely on Numerical Normalisation we can't calculate the Normalisation here at all
 	// Just return what has been cached so far
-	if( numericalNormalisation && cachingEnabled )
+	if( numericalNormalisation )
 	{
-		return thisCache;
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "BasePDF" ) )
+			{
+				PDF_THREAD_LOCK
+				cout << "BasePDF: using Numerical Normalisation" << endl;
+				PDF_THREAD_UNLOCK
+			}
+		}
+		if( this->CacheValid( NewDataPoint, NewBoundary ) )
+		{
+			return thisCache;
+		}
+		else
+		{
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass( "BasePDF" ) )
+				{
+					PDF_THREAD_LOCK
+					cout << "BasePDF: Calculating Numerical Integral ";
+					PDF_THREAD_UNLOCK
+				}
+			}
+			double thisNumericalIntegral =-1.;
+
+			try
+			{
+				thisNumericalIntegral = myIntegrator->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, this->GetDoNotIntegrateList() );
+			}
+			catch(...)
+			{
+				cerr << "CANNOT ANALYTICALLY OR NUMERICALLY INTEGRATE THIS PDF IT FELL OVER!!\t" << this->GetLabel() << endl;
+				exit(-834);
+			}
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass( "BasePDF" ) )
+				{
+					PDF_THREAD_LOCK
+					cout << thisNumericalIntegral << endl;
+					PDF_THREAD_UNLOCK
+				}
+			}
+
+			if( thisNumericalIntegral < 0 )
+			{
+				cerr << "CANNOT ANALYTICALLY OR NUMERICALLY INTEGRATE THIS PDF!!\t" << this->GetLabel() << endl;
+				exit(-833);
+			}
+
+			if( cachingEnabled )
+			{
+				this->SetCache( thisNumericalIntegral, NewDataPoint, NewBoundary );
+			}
+			return thisNumericalIntegral;
+		}
 	}
 
 
 	//	Once we have checked which analytical form to use:
 	if( haveTestedIntegral )
 	{
-		//cout << "Have Tested" << endl;
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "BasePDF" ) )
+			{
+				PDF_THREAD_LOCK
+				cout << "BasePDF: Have Previously Texted Analytical Integral and it is GOOD :D" << endl;
+				PDF_THREAD_UNLOCK
+			}
+		}
 		if( this->CacheValid( NewDataPoint, NewBoundary ) )
 		{
-			//cout << this->GetLabel() << "\t:\t" << thisCache << endl;
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass( "BasePDF" ) )
+				{
+					PDF_THREAD_LOCK
+					cout << "BasePDF: Using Cache " << thisCache << endl;
+					PDF_THREAD_UNLOCK
+				}
+			}
 			return thisCache;
 		}
 		else
 		{
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass( "BasePDF" ) )
+				{
+					PDF_THREAD_LOCK
+					cout << "BasePDF: Calculating Integral Value" << endl;
+					PDF_THREAD_UNLOCK
+				}
+			}
 			if( discrete_Normalisation )
 			{
+				if( debug != NULL )
+				{
+					if( debug->DebugThisClass( "BasePDF" ) )
+					{
+						PDF_THREAD_LOCK
+						cout << "BasePDF: Using Normalisation( DataPoint*, PhaseSpaceBoundary* )" << endl;
+						PDF_THREAD_UNLOCK
+					}
+				}
 				double norm = this->Normalisation(NewDataPoint, NewBoundary);
 				this->SetCache( norm, NewDataPoint, NewBoundary );
 				return norm;
 			}
 			else
 			{
+				if( debug != NULL )
+				{
+					if( debug->DebugThisClass( "BasePDF" ) )
+					{
+						PDF_THREAD_LOCK
+						cout << "BasePDF: Using Normalisation( PhaseSpaceBoundary* )" << endl;
+						PDF_THREAD_UNLOCK
+					}
+				}
 				double norm = this->Normalisation(NewBoundary);
 				this->SetCache( norm, NewDataPoint, NewBoundary );
 				return norm;
@@ -267,7 +474,15 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		}
 	}
 
-	//cout << "Performing Test: " << endl;
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "BasePDF" ) )
+		{
+			PDF_THREAD_LOCK
+			cout << "BasePDF: Testing Analytical Normalisation" << endl;
+			PDF_THREAD_UNLOCK
+		}
+	}
 	//	Here we don't know if we're using an e_by_e or using a cache, let's test them
 
 
@@ -280,8 +495,15 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		discrete_Normalisation = false;
 		cachingEnabled = true;
 		this->SetCache( Norm, NewDataPoint, NewBoundary );
-		//cout << "This Val1: " << Norm << endl;
-		//cout << "Using Analytical Integration1 For: " << this->GetName() << endl;
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "BasePDF" ) )
+			{
+				PDF_THREAD_LOCK
+				cout << "BasePDF: PDF can use Normalisation( PhaseSpaceBoundary* )" << endl;
+				PDF_THREAD_UNLOCK
+			}
+		}
 		return Norm;
 	}
 
@@ -292,8 +514,15 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		numericalNormalisation = false;
 		discrete_Normalisation = true;
 		this->SetCache( Norm, NewDataPoint, NewBoundary );
-		//cout << "This Val2: " << Norm << endl;
-		//cout << "Using Analytical Integration2 For: " << this->GetName() << endl;
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "BasePDF" ) )
+			{
+				PDF_THREAD_LOCK
+				cout << "BasePDF: PDF can use Normalisation( DataPoint*, PhaseSpaceBoundary* )" << endl;
+				PDF_THREAD_UNLOCK
+			}
+		}
 		return Norm;
 	}
 
@@ -301,9 +530,30 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	numericalNormalisation = true;
 	discrete_Normalisation = true;
 
-	//cout << "Using Numerical Integration For:" << this->GetName() << endl;
-	//	We can't produce a valid PDF Normalisation
-	return -1.;
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "BasePDF" ) )
+		{
+			PDF_THREAD_LOCK
+			cout << "BasePDF: PDF requires Numerical Normalisation" << endl;
+			PDF_THREAD_UNLOCK
+		}
+	}
+	double thisNumericalIntegral = myIntegrator->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, this->GetDoNotIntegrateList() );
+
+	if( thisNumericalIntegral < 0 )
+	{
+		cerr << "CANNOT ANALYTICALLY OR NUMERICALLY INTEGRATE THIS PDF!!\t" << this->GetLabel() << endl;
+		cerr << "Integral: " << thisNumericalIntegral << endl;
+		exit(-832);
+	}
+
+	if( cachingEnabled )
+	{
+		this->SetCache( thisNumericalIntegral, NewDataPoint, NewBoundary );
+	}
+
+	return thisNumericalIntegral;
 }
 
 //Do the integration

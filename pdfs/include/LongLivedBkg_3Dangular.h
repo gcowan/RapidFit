@@ -27,6 +27,8 @@ class LongLivedBkg_3Dangular : public BasePDF
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
 
+		virtual vector<string> GetDoNotIntegrateList();
+
 	protected:
 		//Calculate the PDF normalisation
 		virtual double Normalisation(PhaseSpaceBoundary*);
@@ -38,6 +40,8 @@ class LongLivedBkg_3Dangular : public BasePDF
 		double buildPDFnumerator(DataPoint*);
 		double buildPDFdenominator();
 		double angularFactor( );
+
+		bool _usePunziSigmat;
 
 		void SetupPseudoObs();
 		PseudoObservable _intexpLL1aObs;
@@ -60,6 +64,8 @@ class LongLivedBkg_3Dangular : public BasePDF
 		// to the observable names that are used in the
 		// PDF.
 		ObservableRef timeName;		
+		ObservableRef eventResolutionName;
+		bool _usePerEvent;
 	    // For transversity angles
 		ObservableRef cosThetaName;	
 		ObservableRef phiName;			

@@ -24,7 +24,7 @@ class NegativeLogLikelihoodThreaded : public FitFunction
 		virtual double UpErrorValue(int);
 
 	protected:
-		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator*, int );
+		virtual double EvaluateDataSet( IPDF*, IDataSet*, int );
 
 	private:
 		#ifndef __CINT__

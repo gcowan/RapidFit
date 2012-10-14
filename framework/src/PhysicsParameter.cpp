@@ -97,7 +97,7 @@ string PhysicsParameter::GetName() const
 //Get the unblinded value. 
 double PhysicsParameter::GetValue() const
 {
-	return this->GetTrueValue() ;
+	return this->GetTrueValue();
 }
 
 // Set the blinded value 

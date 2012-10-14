@@ -1,5 +1,31 @@
 // $Id: release.notes $
 
+2012/10/11 Rob Currie
+   - Commit is FAR TOO LARGE for comfort.
+       I appologise but this is the culmination of changing the API to use RapidFitIntegrator within BasePDF and a LOT of debugging to make tutorials work 'out of the box'
+   - Adding SimpleGauss PDF and derrivatives
+   - Added tutorial XMLs SimpleGauss, SimpleGauss2D, SimpleGauss3D, SimpleDoubleGauss, OptimisedDoubleGauss in tutorials folder
+   - Moved RapidFitIntegrator to be a member object of the BasePDF
+       Updated Caching code to allow for NumericallyIntegrateDataPoint to be called in PDF
+       Added Member function to BasePDF SetUseGSLIntegrator which is overloaded by the BasePDF
+          This is correctly overloaded by the NormaliseSumPDF, ProdPDF, SumPDF 
+   - General Updates to RapidFitIntegrator
+       Updated Code in RapidFitIntegrator to catch NumericalIntegration exception
+       Removed code which delt with output verbosity, was too much of a pain to maintain and was causing more problems than it solved.
+       Added Correction Factor to the GSL Normalisation. NLL and projections are now correct.
+   - ComponentPlotter takes the RapidFitIntegrator in the BasePDF and copies it. Therefore it should work with projections correctly
+   - FitFunction has had the code to initialising the RapidFitIntegrator objects removed and now all it has to do is copy the PDFs after changing the GSL
+       FitFunction modifies internal passed PDF object instances.
+       FitAssembler now modifies PDF instances passed to class to be the same as the PDFs at the end of minimisation
+   - Fixed bug to do with opening local vs locally stored files in SlicedAcceptance (Only noticed using relative file paths and running on ECDF/Grid/Batch...)
+   - Fixed RapidFitIntegrator to Correctly cope with fixed or 0-sized PaseSpace's
+   - Added initial try an an Implementation for multi-threaded PseudoRandom GSL Numerical Integration, but so far no luck...
+   - Fixed small memory leak in JpsiPhi PDF (prob wouldn't notice given memory requirements for the per-event caching anyway)
+   - Fixed ComponentPlotter to cope with 1D PDF Numerical and Analytical Projections
+   - Added v5_old PDF which can be used as reference
+   - Added Per-Event Time Resolution to LLBkg_3D This PDF REQUIRED TIME ACCEPTANCE TO BE ADDED!
+   - Mistag PDF modified to cope with untagged events and other conditions
+
 2012/10/10 Rob Currie
    - Committed small bugfix to sWeighting (has 0 effect but it's more 'correct' now)
    - Committed some small fixes to savetoXML

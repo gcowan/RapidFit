@@ -110,6 +110,12 @@ ProdPDF::ProdPDF( const ProdPDF& input ) : BasePDF( (BasePDF) input ),
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 }
 
+void ProdPDF::SetUseGSLIntegrator( bool input )
+{
+	firstPDF->SetUseGSLIntegrator( input );
+	secondPDF->SetUseGSLIntegrator( input );
+}
+
 void ProdPDF::TurnThisCachingOff()
 {
 	this->ReallyTurnCachingOff();
@@ -161,12 +167,12 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 	{
 		PDF_THREAD_LOCK
 
-		cout << "ProdPDF::Normalisation\t\t" << termOne << "\tx\t" << termTwo << endl;
+			cout << "ProdPDF::Normalisation\t\t" << termOne << "\tx\t" << termTwo << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-		throw(-653102);
+			throw(-653102);
 	}
 
 	return prod;
@@ -184,12 +190,12 @@ double ProdPDF::Evaluate( DataPoint * NewDataPoint )
 	{
 		PDF_THREAD_LOCK
 
-		cout << "ProdPDF::Evaluate\t\t" << termOne << "\tx\t" << termTwo << endl;
+			cout << "ProdPDF::Evaluate\t\t" << termOne << "\tx\t" << termTwo << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-		throw(-653102);
+			throw(-653102);
 	}
 
 	return prod;
@@ -207,12 +213,12 @@ double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	{
 		PDF_THREAD_LOCK
 
-		cout << "ProdPDF::EvaluateForNumerical\t\t" << termOne << "\tx\t" << termTwo << endl;
+			cout << "ProdPDF::EvaluateForNumerical\t\t" << termOne << "\tx\t" << termTwo << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-		throw(-653102);
+			throw(-653102);
 	}
 
 	return prod;

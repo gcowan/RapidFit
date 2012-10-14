@@ -169,10 +169,9 @@ class FitFunction
 		/*!
 		 * Overload these functions in child classes
 		 */
-		virtual double EvaluateDataSet( IPDF*, IDataSet*, RapidFitIntegrator*, int );
+		virtual double EvaluateDataSet( IPDF*, IDataSet*, int );
 
 		PhysicsBottle * allData;			/*!	Undocumented	*/
-		vector< RapidFitIntegrator* > allIntegrators;	/*!	Undocumented	*/
 		double testDouble;			/*!	Undocumented	*/
 		bool useWeights;			/*!	Undocumented	*/
 		string weightObservableName;		/*!	Undocumented	*/

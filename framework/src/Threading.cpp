@@ -118,3 +118,33 @@ vector<vector<DataPoint*> > Threading::divideData( IDataSet* input, int subsets 
 	return output_datasets;
 }
 
+
+//      Method to return a vector of data subset(s)
+vector<vector<double*> > Threading::divideDataNormalise( vector<double*> input, int subsets )
+{
+        vector<vector<double*> > output_datasets;
+        if( subsets <= 0 ) subsets = 1;
+
+        unsigned int subset_size = (unsigned)int( (double)input.size() / (double)subsets );
+
+        for( unsigned int setnum = 0; setnum < (unsigned)subsets; ++setnum )
+        {
+                vector<double*> temp_dataset;
+                for( unsigned int i=0; i< (unsigned) subset_size; ++i )
+                {
+                        temp_dataset.push_back( input[ (unsigned)( (unsigned)setnum * subset_size + i ) ] );
+                }
+                output_datasets.push_back( temp_dataset );
+        }
+
+        //      The theory goes that the subset_size >> subsets and hence lumping this all onto one subset is negligible in the effect on runtime and _MUCH_ easier to code
+        if( ((unsigned)subsets)*subset_size != input.size() )
+        {
+                for( unsigned int i= subsets*subset_size; i< (unsigned)input.size(); ++i )
+                {
+                        output_datasets[0].push_back( input[ i ] );
+                }
+        }
+
+        return output_datasets;
+}

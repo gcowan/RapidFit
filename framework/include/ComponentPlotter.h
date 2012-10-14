@@ -109,7 +109,7 @@ class ComponentPlotter
 		 *
 		 * @warning This class will make copies of the PDF and config, however it will NOT make copies of the DataSet and file pointer which should always remain valid
 		 */
-		ComponentPlotter( IPDF* InputPDF, IDataSet* InputDataSet, TString PDFStr, TFile* filename, string Name, CompPlotter_config* config=NULL, int PDF_Num=0 );
+		ComponentPlotter( IPDF* InputPDF, IDataSet* InputDataSet, TString PDFStr, TFile* filename, string Name, CompPlotter_config* config=NULL, int PDF_Num=0, DebugClass* debug=NULL );
 
 		/*!
 		 * @brief Destructor Function

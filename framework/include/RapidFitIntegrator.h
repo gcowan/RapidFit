@@ -25,9 +25,16 @@
 
 class IPDF;
 class FoamIntegrator;
+class IntegratorFunction;
 
 using namespace ROOT::Math;
 using namespace::std;
+
+struct Normalise_Thread{
+	IntegratorFunction* function;
+	vector<double*> normalise_points;
+	vector<double> dataPoint_Result;
+};
 
 class RapidFitIntegrator
 {
@@ -47,7 +54,7 @@ class RapidFitIntegrator
 		 * @param ForceNumerical      default false: This class will determine if the PDF can analytically integrate and return this value if it can
 		 *                                           will safely fall back to Numerical Integration
 		 *
-		 *                                    true:  This will force the class to 
+		 *                                    true:  This will force the class to
 		 *                                           When this is true the class will not perform a comparison between the Analytical and Numerical as it's assumed to be not required
 		 *
 		 *                            The value of this is stored in the object RapidFitIntegratorNumerical
@@ -69,6 +76,9 @@ class RapidFitIntegrator
 		 * Destructor Function
 		 */
 		~RapidFitIntegrator();
+
+		bool GetUseGSLIntegrator() const;
+		void SetUseGSLIntegrator( bool input );
 
 		/*!
 		 *
@@ -135,7 +145,7 @@ class RapidFitIntegrator
 		 * @param InputPhaseSpace     This is the PhaseSpace that will be Integrated over Analytically and Numerically
 		 *
 		 * @return Returns the correct Integral with the Analytical Integral being preferred
-		 * 
+		 *
 		 * @warning because it may return an Analytical Integral which may not be valid this is Never called if RapidFitIntegratorNumerical is true
 		 *
 		 * @warning If you compare the Numerical Integral to an Analytical for a PDF with per event Normalisation enabled expect some discrepancy which cannot be resolved!
@@ -172,7 +182,7 @@ class RapidFitIntegrator
 		 * @brief Get the ratio between the 2 integrals
 		 *
 		 * This returns the Ratio of Analytical to Numerical Integrals
-		 * 
+		 *
 		 * It is used as a minor correction factor in Projections to correct for the fact that the Numerical Integral might under/over estimate the total integral by some small amount
 		 *
 		 * @warning This is a 'fudge factor'. There is no way of Fixing this problem completely,
@@ -280,8 +290,10 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-		static double PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
-				vector<string> doIntegrate, vector<string> doNotIntegrate);
+                static double PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
+                                vector<string> doIntegrate, vector<string> doNotIntegrate );
+		static double PseudoRandomNumberIntegralThreaded( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
+				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int num_threads=4 );
 
 		/*!
 		 * @brief This is the Interface to The MuliDimentional Integral class within ROOT
@@ -365,6 +377,19 @@ class RapidFitIntegrator
 		bool pseudoRandomIntegration;
 
 		DebugClass* debug;
+
+		unsigned int num_threads;
+
+#ifndef __CINT__
+		//      CINT behaves badly with this attribute
+		//      and,
+		//      g++ complains that this is a good place for it...
+		//      let's keep em happy
+		//
+		static void* ThreadWork( void* ) __attribute__ ((noreturn));
+#else
+		static void* ThreadWork( void* );
+#endif
 };
 
 #endif

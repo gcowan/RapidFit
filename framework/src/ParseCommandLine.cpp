@@ -591,7 +591,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--useUUID" )				{	config.UUID_Flag = true;				}
 		else if( currentArgument == "--BurnToROOT" )				{	config.BurnToROOTFlag = true;				}
 		else if( currentArgument == "--MCStudy" )				{	config.MCStudyFlag = true;				}
-		else if( currentArgument == "--ForceScan" )				{	config.Force_Scan_Flag = true;				}
+		else if( currentArgument == "--ForceContinue" )				{	config.Force_Continue_Flag = true;			}
 		else if( currentArgument == "--DontStartAtCenter" )			{	config.StartAtCenterFlag = false;			}
 		else if( currentArgument == "--WeightDataSet" ) 			{       config.WeightDataSet=true;				}
 		else if( currentArgument == "--saveFitXML" )				{	config.saveFitXML = true;				}

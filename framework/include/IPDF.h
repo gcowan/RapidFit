@@ -98,7 +98,9 @@ class IPDF
 		/*!
 		 *
 		 */
-		virtual RapidFitIntegrator* GetMyIntegrator() const = 0;
+		virtual RapidFitIntegrator* GetPDFIntegrator() const = 0;
+
+		virtual void SetUseGSLIntegrator( bool input ) = 0;
 
 		/*!
 		 * Interface Function:

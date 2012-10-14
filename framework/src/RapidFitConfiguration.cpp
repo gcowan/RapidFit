@@ -61,7 +61,7 @@ numberRepeats(),
 	UUID_Flag(),
 	BurnToROOTFlag(),
 	MCStudyFlag(),
-	Force_Scan_Flag(),
+	Force_Continue_Flag(),
 	FC_LL_PART_Flag(),
 	GOF_Flag(),
 	StartAtCenterFlag(),
@@ -144,7 +144,7 @@ numberRepeats(),
 		UUID_Flag = false;
 		BurnToROOTFlag = false;
 		MCStudyFlag=false;
-		Force_Scan_Flag=false;
+		Force_Continue_Flag=false;
 		FC_LL_PART_Flag=false;
 		GOF_Flag=false;
 		StartAtCenterFlag=true;

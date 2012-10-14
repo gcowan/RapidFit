@@ -63,7 +63,7 @@ bool MistagDistribution::SetPhysicsParameters( ParameterSet * NewParameterSet )
   	mu    = allParameters.GetPhysicsParameter( GFmuName )->GetValue();
   	beta  = allParameters.GetPhysicsParameter( GFbetaName )->GetValue();
   	shoulder  = allParameters.GetPhysicsParameter( GFshoulderName )->GetValue();
-	
+
 	return isOK;
 }
 
@@ -72,12 +72,12 @@ bool MistagDistribution::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Calculate the function value
 double MistagDistribution::Evaluate(DataPoint * measurement)
 {
-	//if( measurement->GetObservable( tagName )->GetValue() == 0 ) return 1.;
+	if( measurement->GetObservable( tagName )->GetValue() == 0 ) return 1.;
 	// Get the observable
 	double x = 0.5 - measurement->GetObservable( GFxName )->GetValue();
-	
+
 	double returnValue ;
-	
+
 	if( x > mu ) returnValue = TMath::GammaDist( x, gamma, mu, beta );
 	else if( shoulder > 0.0) returnValue = shoulder ;
 	else returnValue = 0.0000001 ;
@@ -87,9 +87,15 @@ double MistagDistribution::Evaluate(DataPoint * measurement)
 
 
 // Normalisation
-double MistagDistribution::Normalisation(PhaseSpaceBoundary * boundary)
+double MistagDistribution::Normalisation( DataPoint* input, PhaseSpaceBoundary * boundary)
 {
 	(void)boundary;
+	if( boundary->GetConstraint( GFxName )->IsDiscrete() )
+	{
+		return this->Evaluate( input );
+	}
+	if( input->GetObservable( tagName )->GetValue() == 0 ) return 1.;
+	//return -1.;
 	return 1.0  +  shoulder*mu;
 }
 

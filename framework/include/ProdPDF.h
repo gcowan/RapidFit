@@ -43,6 +43,8 @@ class ProdPDF : public BasePDF
 		 */
 		~ProdPDF();
 
+		virtual void SetUseGSLIntegrator( bool input );
+
 		void TurnCachingOff();
 
 		/*!

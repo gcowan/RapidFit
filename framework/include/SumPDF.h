@@ -27,6 +27,8 @@ class SumPDF : public BasePDF
 		SumPDF( const SumPDF& );
 		~SumPDF();
 
+		virtual void SetUseGSLIntegrator( bool input );
+
 		void TurnCachingOff();
 
 		//Set the function parameters

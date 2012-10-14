@@ -16,7 +16,7 @@
 //	This object is useful as multiple bits of information need to be provided to the running thread
 struct Fitting_Thread{
 	explicit Fitting_Thread() :
-		dataSubSet(), fittingPDF(NULL), useWeights(false), weightName("no-weight"), dataPoint_Result(), FitBoundary(NULL), ResultIntegrator(NULL),
+		dataSubSet(), fittingPDF(NULL), useWeights(false), weightName("no-weight"), dataPoint_Result(), FitBoundary(NULL),
 		stored_integral(0.), weightsSquared(false)
 	{}
 	//~Fitting_Thread()
@@ -31,7 +31,6 @@ struct Fitting_Thread{
 	ObservableRef weightName;
 	vector<double> dataPoint_Result;
 	PhaseSpaceBoundary* FitBoundary;
-	RapidFitIntegrator* ResultIntegrator;
 	double stored_integral;
 	bool weightsSquared;
 	private:
@@ -47,6 +46,8 @@ class Threading
 
 		//	Split the data into subset(s) with a safe default
 		static vector<vector<DataPoint*> > divideData( IDataSet*, int=1 );
+
+		static vector<vector<double*> > divideDataNormalise( vector<double*> input, int subsets=1 );
 	private:
 		Threading();
 };

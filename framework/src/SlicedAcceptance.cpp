@@ -1,10 +1,10 @@
 /**
- @class SlicedAcceptance
- 
- A class for holding a sliced propertime acceptance
- 
- @author Pete Clarke
- @data 2011-06-07
+  @class SlicedAcceptance
+
+  A class for holding a sliced propertime acceptance
+
+  @author Pete Clarke
+  @data 2011-06-07
  */
 
 
@@ -15,16 +15,16 @@ using namespace::std;
 //............................................
 // Constructor for flat acceptance
 SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
-  slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0)
+	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0)
 {
-	
+
 	//Reality checks
 	if( tl > th )
 	{
 		cout << "SlicedAcceptance::SlicedAcceptance :  tl > th  - exiting" << endl;
 		exit(1);
 	}
-	
+
 	//Create single slice with acceptance=1.0
 	slices.push_back( new AcceptanceSlice( tlow, thigh, 1.0 ) );
 
@@ -33,7 +33,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
 }
 
 SlicedAcceptance::SlicedAcceptance( const SlicedAcceptance& input ) :
-		slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta )
+	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta )
 {
 	for( unsigned int i=0; i< input.slices.size(); ++i )
 	{
@@ -67,13 +67,13 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 		cout << "SlicedAcceptance::SlicedAcceptance :  beta < 0  - exiting" << endl;
 		exit(1);
 	}
-		
-	// The upper time acceptance formula is (1 - beta*time) so determine highest and lowest acceptance 
+
+	// The upper time acceptance formula is (1 - beta*time) so determine highest and lowest acceptance
 	double accUp = 1.0 - beta*tlow;
 	double accLow = 1.0 - beta*thigh;
-	
-	
-	//Create N more, equispaced 
+
+
+	//Create N more, equispaced
 	int N = 15 ;
 	double dh = (accUp-accLow) / (double)N;
 	double dt = (thigh - tlow) / (double)N;
@@ -86,7 +86,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 		double this_th = tlow + is*dt;
 		slices.push_back( new AcceptanceSlice( tlow, this_th, dh ) );
 	}
-		
+
 	//....done.....
 }
 
@@ -98,24 +98,24 @@ SlicedAcceptance::SlicedAcceptance( string s ) :
 {
 	(void)s;
 	int N = 31;
-	
-	double ts[31] = {0, 0.05,  0.1, 0.15, 0.2, 0.25, 0.3, 0.34, 0.38, 0.42, 0.46, 0.5, 0.54, 0.58, 0.62, 0.66, 
+
+	double ts[31] = {0, 0.05,  0.1, 0.15, 0.2, 0.25, 0.3, 0.34, 0.38, 0.42, 0.46, 0.5, 0.54, 0.58, 0.62, 0.66,
 		0.7,  0.75,  0.8, 0.85 , 0.9, 0.95, 1.0, 1.05, 1.1,  1.2, 1.3, 1.4,1.6 , 1.8, 2};
 
-	double ac[31] = {0.000122069 , 0.00436829 , 0.022288 , 0.0633692 , 0.132094 , 0.225401 , 0.321979 , 0.409769 , 
-		0.494438 , 0.570185 , 0.637997 , 0.695043 , 0.744576 , 0.784799 , 0.816805 , 0.844606 , 0.869917 , 
-		0.891761 , 0.910512 , 0.926418 , 0.937439 , 0.947105 , 0.953599 , 0.960726 , 0.968278 , 0.976149 , 
+	double ac[31] = {0.000122069 , 0.00436829 , 0.022288 , 0.0633692 , 0.132094 , 0.225401 , 0.321979 , 0.409769 ,
+		0.494438 , 0.570185 , 0.637997 , 0.695043 , 0.744576 , 0.784799 , 0.816805 , 0.844606 , 0.869917 ,
+		0.891761 , 0.910512 , 0.926418 , 0.937439 , 0.947105 , 0.953599 , 0.960726 , 0.968278 , 0.976149 ,
 		0.980624 , 0.98685 , 0.991765 , 0.995575 , 1 };
-	
-		
-	for( int is=0; is < N ; is++ ) 
+
+
+	for( int is=0; is < N ; is++ )
 	{
 		double this_tlow = ts[is];
 		double this_thigh = 14.0;
 		double height = is > 0 ? ac[is] - ac[is-1] : ac[is];
 		slices.push_back( new AcceptanceSlice( this_tlow, this_thigh, height ) );
 	}
-	
+
 	//....done.....
 }
 
@@ -125,15 +125,18 @@ SlicedAcceptance::SlicedAcceptance( string s ) :
 SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
 {
-	(void)type;	
-	
-	if( type != "File" ) {   }//do nothing for now  
+	(void)type;
+
+	if( type != "File" ) {   }//do nothing for now
 
 	ifstream input_file;
 
 	input_file.open( fileName.c_str(), ifstream::in );
 	input_file.close();
 	bool local_fail = input_file.fail();
+
+	cout << "Looking For: " << fileName << endl;
+	if( !local_fail ) cout << "Found Locally" << endl;
 
 	string fileName_pwd = "pdfs/configdata/";
 	fileName_pwd.append( fileName );
@@ -152,20 +155,25 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 
 	string fullFileName;
 
-	if( (local_fail && !pwd_fail) || !(getenv("RAPIDFITROOT")) ) fullFileName=fileName_pwd;
+	if( (local_fail && !pwd_fail) || !(getenv("RAPIDFITROOT") && local_fail) ) fullFileName=fileName_pwd;
 
-	if( getenv("RAPIDFITROOT") )
+	bool elsewhere_fail=false;
+	if( getenv("RAPIDFITROOT") && local_fail )
 	{
 		string path( getenv("RAPIDFITROOT") ) ;
 
 		cout << "RAPIDFITROOT defined as: " << path << endl;
-	
+
 		fullFileName = path+"/pdfs/configdata/"+fileName ;
 
 		input_file.open( fullFileName.c_str(), ifstream::in );
 		input_file.close();
+		elsewhere_fail = input_file.fail();
 	}
-	bool elsewhere_fail = input_file.fail();
+	else
+	{
+		elsewhere_fail = true;
+	}
 
 	if( elsewhere_fail && ( local_fail && pwd_fail ) )
 	{
@@ -173,11 +181,13 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 		exit(-89);
 	}
 
-	if( fullFileName.empty() ) fullFileName = fileName; 
+	if( fullFileName.empty() ) fullFileName = fileName;
+
+	cout << "Opening: " << fullFileName << endl;
 
 	ifstream in;
 	in.open(fullFileName.c_str());
-	if( in.fail() )
+	if( in.fail() && (local_fail && pwd_fail) )
 	{
 		cout << "SlicedAcceptance::SlicedAcceptance : failed to open acceptance file  '  " << fullFileName  << "  '  " << endl;
 		exit(1);
@@ -186,13 +196,13 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 	vector<double> lowEdge; vector<double> hiEdge; vector<double> binContent;
 	int ok = true;
 	while (ok)
-	{  
+	{
 		lowEdge.push_back(stream(in));  hiEdge.push_back(stream(in)); binContent.push_back(stream(in) );
-		if (in.eof()  == true || in.good() == false) ok =false; 
-	}		
+		if (in.eof()  == true || in.good() == false) ok =false;
+	}
 	in.close();
-	
-	for( unsigned int is=0; is < lowEdge.size() ; ++is ) 
+
+	for( unsigned int is=0; is < lowEdge.size() ; ++is )
 	{
 		double this_tlow = lowEdge[is];
 		double this_thigh = hiEdge[is];
@@ -200,7 +210,12 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 		//cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
 		slices.push_back( new AcceptanceSlice( this_tlow, this_thigh, height ) );
 	}
-
+	cout << "Time Acc Slices: " << lowEdge.size() << endl;
+	if( lowEdge.size() == 1 )
+	{
+		cout << "SlicedAcceptance: SERIOUSE ERROR" << endl;
+		exit(0);
+	}
 	//....done.....
 }
 
@@ -222,18 +237,18 @@ double SlicedAcceptance::getValue( Observable* time, double timeOffset ) const
 {
 	if( time->GetBinNumber() != -1 )
 	{
-//#pragma GCC diagnostic ignored "-Wfloat-equal"
+		//#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if( time->GetOffSet() == timeOffset ) return time->GetAcceptance();
-//#pragma GCC diagnostic pop
+		//#pragma GCC diagnostic pop
 	}
 
 	double t = time->GetValue() - timeOffset;
 	double returnValue = 0;
 	unsigned int is = 0;
-       	for( ; is < (unsigned)slices.size() ; ++is )
+	for( ; is < (unsigned)slices.size() ; ++is )
 	{
 		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
-       	}
+	}
 	time->SetBinNumber( (int)is );
 	time->SetAcceptance( returnValue );
 	time->SetOffSet( timeOffset );

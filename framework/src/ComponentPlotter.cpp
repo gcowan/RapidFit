@@ -45,19 +45,25 @@
 using namespace::std;
 
 //Constructor with correct arguments
-ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num ):
-	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ), pdfIntegrator( new RapidFitIntegrator(NewPDF) ), weightsWereUsed(false), weight_norm(1.),
+ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num, DebugClass* Debug ):
+	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ), pdfIntegrator( new RapidFitIntegrator( *(NewPDF->GetPDFIntegrator()) ) ), weightsWereUsed(false), weight_norm(1.),
 	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ), logY( (config!=NULL)?config->logY:false ),
 	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false ),
 	combination_integral(0.), ratioOfIntegrals(1,1.), wanted_weights(), format(), data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(),
-	total_components(), chi2(), N(), allPullData(), debug( new DebugClass(false) ), PDFNum(PDF_Num)
+	total_components(), chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num)
 {
+	if( Debug != NULL ) debug = new DebugClass(*Debug);
+	else debug = new DebugClass(false);
 	plotPDF->TurnCachingOff();
+
+	//plotPDF->GetPhysicsParameters()->Print();
 
 	pdfIntegrator->SetPDF( plotPDF );
 	pdfIntegrator->ProjectionSettings();
 	pdfIntegrator->SetDebug(debug);
+
+	if( pdfIntegrator->GetUseGSLIntegrator() ) cout << "Using GSL for projections" << endl;
 
 	vector<string> disc_contr = full_boundary->GetDiscreteNames();
 	vector<string> pdf_const = plotPDF->GetPrototypeDataPoint();
@@ -94,7 +100,17 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	{
 		pdfIntegrator->ForceTestStatus( false );
 		allCombinations[i]->SetPhaseSpaceBoundary( full_boundary );
-		double thisIntegral = pdfIntegrator->NumericallyIntegrateDataPoint( allCombinations[i], full_boundary, plotPDF->GetDoNotIntegrateList() );
+		double thisIntegral = 0.;
+		try
+		{
+			thisIntegral = pdfIntegrator->NumericallyIntegrateDataPoint( allCombinations[i], full_boundary, plotPDF->GetDoNotIntegrateList() );
+		}
+		catch(...)
+		{
+			thisIntegral = 1.;
+			cout << endl << "CANNOT PROPERLY NORMALISE WHOLE PDF, THIS WILL LEAD TO NORMALISATION ISSUES OVER THE WHOLE PDF" << endl << endl;
+		}
+
 		combination_integral.push_back( thisIntegral );
 
 		if( plotPDF->GetNumericalNormalisation() == true ) ratioOfIntegrals.push_back( 1. );
@@ -264,8 +280,16 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 		//allCombinations[combinationIndex]->Print();
 		//cout << "combinationWeights[combinationIndex]: " << combinationWeights[combinationIndex] << endl;
 
-		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM PLOTTER CLASS
-		for (int pointIndex = 0; pointIndex < total_points; ++pointIndex )
+		/*
+		cout << "combination_integral[combinationIndex]: " << combination_integral[combinationIndex] << endl;
+		cout << "fabs(ratioOfIntegrals[combinationIndex]): " << fabs(ratioOfIntegrals[combinationIndex]) << endl;
+		cout << "n_events: " << n_events << endl;
+		cout << "range: " << range << endl;
+		cout << "double(data_binning): " << double(data_binning) << endl;
+		*/
+
+		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM ORIGINAL PLOTTER CLASS
+		for( int pointIndex = 0; pointIndex < total_points; ++pointIndex )
 		{
 			//Projection graph
 			//						ratio Numerical/Analytical		n-points		Observable range	full Integral
@@ -387,7 +411,7 @@ void ComponentPlotter::GenerateProjectionData()
 
 	if( debug != NULL )
 	{
-		if( debug->GetStatus() )
+		if( debug->DebugThisClass( "ComponentPlotter" ) )
 		{
 			cout << "ComponentPlotter: Counting Number of Events " << endl;
 		}
@@ -1056,7 +1080,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( debug != NULL )
 	{
-		if( !debug->DebugThisClass("ComponentPlotter") )
+		if( debug->DebugThisClass("ComponentPlotter") )
 		{
 			filestr.open ("/dev/null");
 			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
@@ -1096,7 +1120,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( debug != NULL )
 	{
-		if( !debug->DebugThisClass("ComponentPlotter") )
+		if( debug->DebugThisClass("ComponentPlotter") )
 		{
 			fflush(stderr);
 			dup2(fd,fileno(stderr));
@@ -1354,7 +1378,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	if( debug != NULL )
 	{
-		if( !debug->DebugThisClass("ComponentPlotter") )
+		if( debug->DebugThisClass("ComponentPlotter") )
 		{
 			filestr.open ("/dev/null");
 			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
@@ -1394,7 +1418,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	if( debug != NULL )
 	{
-		if( !debug->DebugThisClass("ComponentPlotter") )
+		if( debug->DebugThisClass("ComponentPlotter") )
 		{
 			fflush(stderr);
 			dup2(fd,fileno(stderr));
@@ -1497,20 +1521,27 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		InputPoint->SetObservable( ObservableName, newObs );
 		delete newObs; newObs = NULL;
 
-		if( debug->GetStatus() )
+		if( debug != NULL )
 		{
-			cout << "ComponentPlotter: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << ObservableName << "==" << observableValue << "\t";
-			pdfIntegrator->SetDebug( debug );
+			if( debug->DebugThisClass( "ComponentPlotter" ) )
+			{
+				cout << "ComponentPlotter: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << ObservableName << "==" << observableValue << "\t";
+				InputPoint->Print();
+				pdfIntegrator->SetDebug( debug );
+			}
 		}
 		//	perform actual evaluation of the PDF with the configuration in the InputPoint, in the whole boundary with the given name and for selected component
 		integralvalue = pdfIntegrator->ProjectObservable( InputPoint, full_boundary, ObservableName, comp_obj );
 
-		if( debug->GetStatus() )
+		if( debug != NULL )
 		{
-			cout << "ComponentPlotter: \tI got: " << integralvalue << endl;
-			InputPoint->Print();
-			cout << "ComponentPlotter: Using: " << plotPDF->GetLabel() << "\tProjecting Component: " << component << "\tObservable: " << observableName << endl;
-			full_boundary->Print();
+			if( debug->DebugThisClass( "ComponentPlotter" ) )
+			{
+				cout << "ComponentPlotter: \tI got: " << integralvalue << endl;
+				InputPoint->Print();
+				cout << "ComponentPlotter: Using: " << plotPDF->GetLabel() << "\tProjecting Component: " << component << "\tObservable: " << observableName << endl;
+				full_boundary->Print();
+			}
 		}
 
 		pointValues->push_back( integralvalue );
@@ -1974,7 +2005,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->DebugThisClass( "ComponentPlotter" ) )
 		{
 			filestr.open ("/dev/null");
 			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
@@ -2013,7 +2044,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 
 	if( debug != NULL )
 	{
-		if( !debug->GetStatus() )
+		if( !debug->DebugThisClass( "ComponentPlotter" ) )
 		{
 			fflush(stderr);
 			dup2(fd,fileno(stderr));

@@ -6,7 +6,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 //	ROOT Headers
 #include "TFile.h"
 #include "TTree.h"
@@ -18,6 +18,7 @@
 #include "ClassLookUp.h"
 #include "RapidFitIntegrator.h"
 #include "StringProcessing.h"
+#include "ProdPDF.h"
 //	System Headers
 #include <iostream>
 #include <iomanip>
@@ -29,7 +30,7 @@ using namespace::std;
 
 //Default constructor
 FitFunction::FitFunction() :
-	Name("Unknown"), allData(), allIntegrators(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
+	Name("Unknown"), allData(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
 	debug(new DebugClass(false) ), traceNum(0), step_time(-1)
 {
@@ -64,11 +65,6 @@ FitFunction::~FitFunction()
 		if( StoredIntegrals.back() != NULL ) delete StoredIntegrals.back();
 		StoredIntegrals.pop_back();
 	}
-	while( !allIntegrators.empty() )
-	{
-		if( allIntegrators.back() != NULL ) delete allIntegrators.back();
-		allIntegrators.pop_back();
-	}
 
 	if( debug != NULL ) delete debug;
 }
@@ -82,7 +78,7 @@ void FitFunction::SetupTrace( const TString FileName, const int inputTraceNum )
 
 void FitFunction::SetGSLIntegrator( const bool gsl )
 {
-	gslIntegrator = gsl;	
+	gslIntegrator = gsl;
 }
 
 void FitFunction::SetupTraceTree()
@@ -143,7 +139,6 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 
 		RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex), false, gslIntegrator );
 		resultIntegrator->SetDebug( debug );
-		allIntegrators.push_back( resultIntegrator );
 
 		if( debug != NULL )
 		{
@@ -160,24 +155,32 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 			}
 		}
 
-		allIntegrators.back()->ForceTestStatus( false );
-		double someval=0.;
-		if( testIntegrator == false ) allIntegrators.back()->ForceTestStatus( true );
-		else
+		if( debug != NULL )
 		{
-			try
+			if( debug->DebugThisClass( "FitFunction" ) )
 			{
-				someval = allIntegrators.back()->Integral( NewBottle->GetResultDataSet(resultIndex)->GetDataPoint(0), NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
-				(void) someval;
-			}
-			catch(...)
-			{
-				cerr << "FitFunction: Failed to Test Integral Correctly aborting" << endl;
-				NewBottle->GetResultDataSet(resultIndex)->GetBoundary()->CheckPhaseSpace( NewBottle->GetResultPDF(resultIndex) );
-				exit(-247);
+				cout << "FitFunction: Performing Integration Test" << endl;
 			}
 		}
-		allIntegrators.back()->ForceTestStatus( true );
+
+		double someVal=0.;
+		NewBottle->GetResultPDF(resultIndex)->GetPDFIntegrator()->ForceTestStatus( false );
+		NewBottle->GetResultPDF(resultIndex)->SetUseGSLIntegrator( gslIntegrator );
+		allData->GetResultPDF(resultIndex)->SetUseGSLIntegrator( gslIntegrator );
+
+		if( gslIntegrator ) cout << "Using GSL!" << endl;
+
+		if( NewBottle->GetResultDataSet(resultIndex)->GetDataNumber() > 0 )
+		{
+			if( testIntegrator )
+			{
+				allData->GetResultPDF(resultIndex)->GetPDFIntegrator()->ForceTestStatus( false );
+				someVal = allData->GetResultPDF(resultIndex)->GetPDFIntegrator()->Integral(
+						allData->GetResultDataSet(resultIndex)->GetDataPoint( 0 ),
+						allData->GetResultDataSet(resultIndex)->GetBoundary() );
+			}
+		}
+		(void) someVal;
 
 		if( Threads > 0 )
 		{
@@ -209,11 +212,7 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 				}
 				stored_pdfs.push_back( ClassLookUp::CopyPDF( NewBottle->GetResultPDF( resultIndex ) ) );
 				stored_pdfs.back()->SetDebug( debug );
-				StoredIntegrals.push_back( new RapidFitIntegrator( stored_pdfs.back(), false, gslIntegrator ) );
-				StoredIntegrals.back()->SetDebug( debug );
-
-				// Give the Integral Testing code a Sharp Kick!!!
-				StoredIntegrals.back()->ForceTestStatus( true );
+				stored_pdfs.back()->SetUseGSLIntegrator( gslIntegrator );
 			}
 		}
 	}
@@ -265,12 +264,12 @@ double FitFunction::Evaluate()
 	//Calculate the function value for each PDF-DataSet pair
 	for( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
 	{
-		if( allData->GetResultDataSet( resultIndex )->GetBoundary() == 0 )
+		//cout << endl << resultIndex << ": " << allData->GetResultDataSet( resultIndex )->GetDataNumber() << endl;
+		if( allData->GetResultDataSet( resultIndex )->GetDataNumber() == 0 )
 		{
 			cerr << "Are you aware DataSet: " << resultIndex+1 << " has zero size?" << endl;
 			continue;
 		}
-		allIntegrators[unsigned(resultIndex)]->SetPDF( allData->GetResultPDF( resultIndex ) );
 		if( allData->GetResultDataSet( resultIndex )->GetDataNumber() < 1 )
 		{
 			temp = 0.;
@@ -278,18 +277,18 @@ double FitFunction::Evaluate()
 		else
 		{
 			//cout << "Eval Set: " << allData->GetResultDataSet( resultIndex ) << "\t" << resultIndex << endl;
-			temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), allIntegrators[unsigned(resultIndex)], resultIndex );
+			temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex );
 			//cout << "Result: " << temp << endl;
 		}
-		if( temp >= DBL_MAX )
+		if( abs(temp) >= DBL_MAX )
 		{
-			minimiseValue=DBL_MAX;
-			break;
+			return DBL_MAX;
 		}
 		else
 		{
 			minimiseValue+=temp;
 		}
+		//cout << "temp: " << minimiseValue << endl;
 	}
 
 	//Calculate the value of each constraint
@@ -329,16 +328,28 @@ double FitFunction::Evaluate()
 		minimiseValue = DBL_MAX;
 	}
 
-	//cout << endl; exit(2572);
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitFunction" ) )
+		{
+			cout << endl;
+		}
+	}
+
+	/*if( minimiseValue < 0. )
+	  {
+	  cout << endl << endl;
+	  this->GetParameterSet()->Print();
+	  exit(2572);
+	  }*/
 	return minimiseValue;
 }
 
 //Return the value to minimise for a given PDF/DataSet pair
-double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator, int number )
+double FitFunction::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, int number )
 {
 	(void)TestPDF;
 	(void)TestDataSet;
-	(void)ResultIntegrator;
 	(void)number;
 
 	return 1.0;

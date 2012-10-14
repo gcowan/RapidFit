@@ -27,7 +27,7 @@ NegativeLogLikelihood::~NegativeLogLikelihood()
 }
 
 //Return the negative log likelihood for a PDF/DataSet result
-double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, RapidFitIntegrator * ResultIntegrator, int number )
+double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDataSet, int number )
 {
 	(void)number;
 	//Initialise the integral caching
@@ -46,7 +46,7 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		temporaryDataPoint = TestDataSet->GetDataPoint(dataIndex);
 		value = TestPDF->Evaluate(temporaryDataPoint);
 
-		if( debug->GetStatus() ) cout << "V: " << value << endl;
+		if( debug != NULL )	if( debug->DebugThisClass( "NegativeLogLikelihood" ) ) cout << "V: " << value << endl;
 		//Idiot check
 		//if ( value < 0 || isnan(value) )
 		//{
@@ -58,9 +58,9 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 		//flag = ( (value < 0) || isnan(value) );
 		
 		//Find out the integral
-		integral = ResultIntegrator->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );
+		integral = TestPDF->Integral( temporaryDataPoint, TestDataSet->GetBoundary() );
 		
-		if( debug->GetStatus() ) cout << "I: " << integral << endl;
+		if( debug != NULL )	if( debug->DebugThisClass( "NegativeLogLikelihood" ) ) cout << "I: " << integral << endl;
 
 		//Get the weight for this DataPoint (event)
 		weight = 1.0;
@@ -78,12 +78,11 @@ double NegativeLogLikelihood::EvaluateDataSet( IPDF * TestPDF, IDataSet * TestDa
 
 		//cout << total << " " << value << " " << integral << endl;
 	}
-	exit(100);
-		
+
 	if( false ) cerr << "PDF evaluates to " << value << endl;
 
 	//Return negative log likelihood
-	return -/*1.0 **/ total;
+	return -total;
 }
 
 //Return the up value for error calculations
