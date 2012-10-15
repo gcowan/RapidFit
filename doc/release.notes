@@ -2,6 +2,7 @@
 
 2012/10/15 Rob Currie
    - Committing some changes to Makefile and some additional utils progs which aren't compiled by default but serve as nice examples on using code in the utils folder
+   - Adding 2nd Talk on RapidFit to tutorials
 
 2012/10/14 Rob Currie
    - Commit is FAR TOO LARGE for comfort.

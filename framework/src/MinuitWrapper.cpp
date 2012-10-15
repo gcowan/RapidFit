@@ -247,8 +247,11 @@ void MinuitWrapper::Minimise()
 	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
 
 	//	Now Do the minimisation
-	minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
-
+	string HesseOnly("HesseOnly");
+	if( StringProcessing::VectorContains( &Options, &SetEPS ) == -1 )
+	{
+		minuit->mnexcm("MIGRAD", arguments, 2, errorFlag);
+	}
 	//Apply an improve step
 	//arguments[0] = maxSteps;
 	//minuit->mnexcm("IMPROVE", arguments, 2, errorFlag);

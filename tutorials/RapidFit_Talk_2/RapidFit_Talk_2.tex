@@ -1,0 +1,749 @@
+\documentclass{beamer}
+\usetheme{Amsterdam}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{cmap}
+\usepackage{listings}
+\lstset{language=C}
+
+\title{\textbf{RapidFit}\newline~A beginners Guide, Talk 2 of ?}
+\author{\textbf{Robert Currie}, Edinburgh University\newline\hspace{.5cm} \textcolor{white}{\textbf{\insertframenumber \vspace{-.33cm}/ \vspace{-.33cm}\inserttotalframenumber}}}
+\date{}
+
+\usepackage{color}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+
+\begin{document}
+
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  showstringspaces=false,
+  commentstyle=\color{gray}\upshape
+}
+
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  stringstyle=\color{black},
+  identifierstyle=\color{darkblue},
+  keywordstyle=\color{cyan},
+  morekeywords={xmlns,version,type}% list your attributes here
+}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\section{Intro}
+
+\begin{frame}
+ \frametitle{Introduction}
+ \begin{itemize}
+  \item Tutorials\newline
+  \item More on XML Options \textit{(A LOT more)}\newline
+  \item RapidFit C++ Objects you see in your PDF\newline
+%  \item Optimising your PDF
+%  \item Component Projections\newline
+  \item Q \& A\newline
+  \item Plan of next talk
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Introduction cont}
+
+\begin{center}
+\textit{\textbf{\Large Disclaimer!}}
+\end{center}
+
+I do \textbf{NOT} intend everyone to follow everything in this tutorial.\newline
+I do \textbf{NOT} intend to try and stop and explain every little sordid detail about the inner workings of what is not important.\newline
+This document \textbf{IS} trying to be definitive.\newline
+
+This 'talk' is dry and technical. \textbf{Please} shout if you're falling asleep so I can speed things up.\newline
+
+I \textbf{will} answer questions and intend to give people a view of what can can't be done in the XML.\newline
+
+\tiny
+I will \textbf{NOT} cover constructors/operators/object scope/passing by reference/memory management/polymorphism/inheritance/templates/interfaces/any other C++ idioms.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Introduction cont}
+
+I asked for feedback and have so far only been asked to address 2 things:\newline
+Blinding and Running on Batch Systems.\newline
+
+I can and will be covering blinding in this talk but will not be covering running on Batch Systems till next week. (Technical reasons combined with the fact that it's a wide topic)\newline
+
+If I don't get other questions I will spend next week on Runtime arguments and batch systems.\newline
+
+The Week After I will discuss writing your own study in RapidFit / Modifying the Toy Study. As well as how to easily intercept the Input/Output at the various stages of RapidFit.
+
+
+
+\end{frame}
+
+
+\section{Tutorials}
+\begin{frame}
+\frametitle{Tutorials and SVN commits}
+The tutorial XMLs and pdfs are in HEAD, checked, working and verified as of 15/10/2012.\newline
+
+I won't give everyone the long turgid details but the examples I wrote last week didn't 'just work'.\newline\newline But: RapidFit now works extremely well 'Out of the Box'.\newline\newline
+
+I have committed and tested:\newline
+\begin{itemize}
+\item SimpleGauss, SimpleGauss2D, SimpleGauss3D\newline
+\item SimpleDoubleGauss, OptimisedDoubleGauss\newline
+\end{itemize}
+
+I will run an example fit or 2 at the end to show these off.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Tutorials}
+I have added XML into a new directory '/path/to/RapidFit/tutorial'.\newline
+
+I've added some sensibly named XML which demonstrate the basics.\newline
+
+I encourage everyone to perform 'svn up' and run on the latest code. There are a LOT of cumulative bugfixes/improvements and such in the codebase.\newline
+
+I am going to cover a lot of 'other Options' in the XML and will add some basic XMLs showing how to use each of these.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Tutorials cont}
+I have added new XML and talks to svn in the new tutorials folder.\newline
+
+Specifically I recommend looking at:\newline
+\scriptsize
+
+SimpleGauss PDF.\newline
+(Simplest PDF I ever plan to write)\newline
+
+SimpleDoubleGauss PDF.\newline
+A simple way to implement Components in your PDF without the code associated with everything else everyone normally does.\newline
+
+OptimisedDoubleGauss PDF.\newline
+An Optimised form of the DoubleGauss PDF which cuts >50\% of the CPU out from fitting.\newline
+
+\normalsize
+I cannot go through everything that everyone will ever need to do. But, OptimisedDoubleGauss is well worth reading and understanding and comparing to SimpleDoubleGauss if you intend to use more complex features in your PDF.
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Miscellaneous Stuff...}
+RapidFit uses it's own XML parser.\newline
+This allows us to do things such as comment out a line of XML by making the first non-whitespace character '\#'.\newline
+This is NOT standards compliant, but is fast and convenient compared to wrapping code inside <!-- --!> which is a pain when you want to comment out the 1 line in many places in the same file.\newline (It happens more often than you think!)\newline\newline
+
+\normalsize~RapidFit is doing more and more for the user as time goes on. It doesn't remove the need to you to think for yourself. But you no longer have to worry about strange quirks or not being able to do certain things in the code.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Miscellaneous cont}
+<\textcolor{darkblue}{Seed}>\newline
+This technically falls under miscellaneous because I don't know where else to put it.\newline
+RapidFit makes use of the TRandom3 object wherever we require random numbers. This means we have chosen a good random sampling and that we can choose the start seed of our random number chains.\newline
+I have modified RapidFit to use a consistent set of Random number generators throughout the codebase. This means that you can select a random number in the XML, and, provided nothing changes that can effect the random number distributions you can get exactly the same results back out.\newline
+
+<\textcolor{darkblue}{Repeats}>\newline
+This XML tag allows us to control the size of a Toy Study within the XML.
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{XML}
+I plan to go through a lof of the 'hidden'/'undocumented' features in the XML that people use day to day in fitting. There are probably some half dozen I have forgotten about or don't care for.\newline
+
+If you want to know what XML options you can use, read XMLConfigurationReader.cpp\newline
+
+If you want to know what Runtime arguments you can use, read ParseCommandLine.cpp\newline
+
+I cannot sit down and explain everything in these files, and in some exotic cases I can't tell you what the code does because I simply don't know.
+
+\end{frame}
+
+\section{<ParameterSet>}
+\begin{frame}[fragile]
+\frametitle{<\textcolor{darkblue}{ParameterSet}>}
+\scriptsize~A <\textcolor{darkblue}{ParameterSet}> is composed of <\textcolor{darkblue}{PhysicsParameter}>-s. Nothing else.\newline
+
+\scriptsize~A <\textcolor{darkblue}{PhysicsParameter}> MUST have a <\textcolor{darkblue}{Name}> and a <\textcolor{darkblue}{Value}> tags.\newline
+This is where a Parameter starts from in the Fit and MUST be defined!
+\lstset{
+  language=XML,
+  morekeywords={encoding,
+  xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+}\tiny
+\begin{lstlisting}[tabsize=8]
+<ParameterSet>
+  <PhysicsParameter>
+    <Name>sigma</Name>
+    <Value>2.</Value>
+  </PhysicsParameter>
+  <PhysicsParameter>
+    <Name>sigma2</Name>
+    <Minimum>0.</Minimum>
+    <Maximum>20.</Maximum>
+    <Type>Free</Type>
+    <Value>5.</Value>
+    <BlindString>FooBar</BlindString>
+    <BlindScale>1.</BlindScale>
+    <StepSize>0.01</StepSize>
+  </PhysicsParameter>
+</ParameterSet>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{ParameterSet}> cont}
+
+\scriptsize~<\textcolor{darkblue}{PhysicsParameter}> may have <\textcolor{darkblue}{Maximum}> \& <\textcolor{darkblue}{Minimum}> tags.\newline
+These represent physical ranges of Parameters. i.e. $ 0.< \text{fraction} <1.$\newline
+This may alternately be a way of constraining an unstable fit.\newline
+Eg: $-2\pi < \delta_i < 2\pi$.\newline
+
+
+<\textcolor{darkblue}{PhysicsParameter}> may also have a <\textcolor{darkblue}{StepSize}> tag.\newline
+This is the first guess at the Parameter's Error.\newline
+
+<\textcolor{darkblue}{Type}> This allows you to fix/free Parameters in the fit.
+Fixed Parameters are not exposed to Minuit but are ALWAYS passed to your PDF.\newline
+In order to fix a parameter the value 'Fixed' must be used.\newline
+
+By default a <\textcolor{darkblue}{PhysicsParameter}> has a Name a starting value, the assumed error of 0.1 and the range of $\pm\inf$ in the fit.\newline\newline
+
+At the moment options passed to these sections of the XML are evaluated as raw numbers/string as appropriate. I would like someone to add the ability to accept TF1-s as the arguments to numerical numbers to allow the use of constants and such.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{ParameterSet}> cont + Blinding}
+
+\footnotesize~<\textcolor{darkblue}{PhysicsParameter}> may also include <\textcolor{darkblue}{BlindString}> and <\textcolor{darkblue}{BlindScale}> tags.\newline
+These tags are important as they control blinding in your fits.\newline
+
+The value of the Blinding Offset in \textcolor{orange}{PhysicsParameter} is~\textit{internally} calculated in RapidFit and \textcolor{red}{\textbf{NOT}} exposed to the user!\newline\newline
+
+\textcolor{orange}{PhysicsParameter} objects in C++ have 2 sets of Functions:\newline
+\textcolor{blue}{GetBlindedValue/SetBlindedValue} and \textcolor{blue}{GetValue/SetValue}.\newline
+
+Your PDF is exposed to the \textcolor{red}{\textit{\textbf{\Large True}}} Value of the \textcolor{orange}{PhysicsParameter} through \textcolor{blue}{GetValue/GetTrueValue}.\newline
+
+\textcolor{red}{\textbf{ALWAYS}} use \textcolor{blue}{GetBlindedValue} for your PDF debugging Output!\newline
+
+Minuit and \textbf{EVERYTHING ELSE} you see in the Output to screen \& file in RapidFit is hidden behind the \textcolor{blue}{GetBlindedValue} method.
+
+\tiny More on this later under the C++ section.
+
+\end{frame}
+
+\section{<Minimiser>}
+\begin{frame}[fragile]
+\frametitle{<\textcolor{darkblue}{Minimiser}>}
+\scriptsize~The simplest Minimiser is <\textcolor{darkblue}{Minimiser}>Minuit</\textcolor{darkblue}{Minimiser}>. This hides a lot of things from the user. 90\% of the time you don't want/need more than this.\newline
+\lstset{
+  language=XML,
+  morekeywords={encoding,
+  xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+}\tiny
+\begin{lstlisting}[tabsize=8]
+<Minimiser>
+  <MinimiserName>Minuit</MinimiserName>
+  <MaxSteps>100000</MaxSteps>
+  <GradTolerance>0.001</GradTolerance>
+  <Quality>1</Quality>
+  <ConfigureMinimiser>HesseFirst</ConfigureMinimiser>
+</Minimiser>
+\end{lstlisting}\scriptsize
+<\textcolor{darkblue}{MaxSteps}> is the Maximum number of calls Minuit can make before it gives up.\newline\newline
+<\textcolor{darkblue}{GradTolerance}> is 1000*(DistanceToMinimim) of whole LL function.\newline\newline
+<\textcolor{darkblue}{Quality}> is how much Minuit should care about the error matrix on 1st pass.\newline
+0: it doesn't, 1: it does a bit, 2: error matrix must be correct before Hesse.\newline\newline
+<\textcolor{darkblue}{ConfigureMinimiser}> special arguments passed to the Minimiser class.\newline Specialist Functions, only need to know/care once you've done a LOT of work.
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{Minimiser}> cont}
+The only officially supported and sanction Minimiser is Minuit.\newline
+Minuit2 and Fumili are available but mileage will vary.\newline
+
+Minuit also is the only Minimiser which fully supports <\textcolor{darkblue}{ConfigureMinimiser}>.\newline
+
+The Available Options are:\newline
+\begin{itemize}
+\item '\textit{HesseFirst}' This runs Hesse first before Migrad
+\item '\textit{SeekFirst}' This runs Seek first before Migrad
+\item '\textit{SimplexFirst}' This runs Simplex first before Migrad
+\item '\textit{NoHesse}' This Doesn't run Hesse after finishing Migrad
+\item '\textit{MinosErrors}' This runs Minos after running Hesse
+\item '\textit{RooFitErrors}' Use Correlation Matricies to correct parameter errors for non unitary event weighting
+\end{itemize}
+\end{frame}
+
+
+\section{<FitFunction>}
+\begin{frame}[fragile]
+\frametitle{<\textcolor{darkblue}{FitFunction}>}
+\scriptsize~The simplest Minimiser is <\textcolor{darkblue}{FitFunction}>NegativeLogLikelihood</\textcolor{darkblue}{FitFunction}>. This hides a lot of things from the user.\newline 99\% of the time you don't want/need more than this.\newline
+
+The <\textcolor{darkblue}{FitFunction}> tag is quite powerful so I will spend 2/3 slides discussing this.\newline
+
+A more complete example of the options available through the <\textcolor{darkblue}{FitFunction}> tag are:
+
+\lstset{
+  language=XML,
+  morekeywords={encoding,
+  xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+}\tiny
+\begin{lstlisting}[tabsize=8]
+<FitFunction>
+  <FunctionName>NegativeLogLikelihoodThreaded</FuntionName>
+  <Threads>4</Threads>
+  <UseGSLNumericalIntegration>True</UseGSLNumericalIntegration>
+  <WeightName>sWeight</WeightName>
+  <NormaliseWeights>True</NormaliseWeights>
+  <Trace>FileName.root</Trace>
+  <Strategy>SomeStrategy</Strategy>
+  <SetIntegratorTest>False</SetIntegratorTest>
+</FitFunction>
+\end{lstlisting}\scriptsize
+<\textcolor{darkblue}{FunctionName}> is either \textbf{NegativeLogLikelihood}, \textbf{NegativeLogLikelihoodThreaded}, \textbf{NegativeLogLikelihoodNumerical} or whatever you code up.\newline
+\tiny~NegativeLogLikelihood is the normal class, Threaded is faster and makes use of multi-threading across multiple cores, Numerical is even more optimal for analyses relying on Numerical Normalisation.\scriptsize
+
+<\textcolor{darkblue}{Threads}> is number of simultaneous threads to use when fitting.
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{FitFunction}> cont}
+\scriptsize~<\textcolor{darkblue}{UseGSLNumericalIntegration}> is a new flag that has just been introduced but allows you to try using a GSL function for numerical integration.\newline
+(I have had some success with this speeding up Projections)\newline\newline
+
+<\textcolor{darkblue}{WeightName}> This is the XML tag that turns your fit into an sFit.\newline
+The argument passed to this XMLTag is the name of the Observable you wish to use as the per-event weight in your fit.\newline
+NB: This Observable MUST be in your PhaseSpaceBoundary!\newline\newline
+
+<\textcolor{darkblue}{NormaliseWeights}> This flag allows you to use RapidFit to apply a statistical correction to your DataSet in order to get the correct Errors from your Fit.\newline
+This is correct to within 90\% and is the easiest way to apply this correction factor for an nTuple.\newline BUT BE CAREFUL, THIS DOES NOT MAGICALLY SOLVE ALL YOUR WOES!\newline
+
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{FitFunction}> cont}
+\scriptsize~<\textcolor{darkblue}{Trace}> This is a Special Tag.\newline
+This allows you to 'trace' everything that happened within the fit.\newline
+This takes the argument of a \textbf{fileName.root} and this is the file where the result of every single Minuit call is saved.\newline
+This is extremely useful for satisfying your curiosity or for performing diagnostics to watch Minuit diverge or mis-behave.\newline\newline
+
+<\textcolor{darkblue}{SetIntegratorTest}> This allows you to turn off the Integrator test at the start of RapidFit which compares the Numerical and Analytical Integrals.\newline Numerical Integration uses the \textcolor{orange}{PDF}::\textcolor{blue}{Evaluate} function and Analytical is \textcolor{orange}{PDF}::\textcolor{blue}{Normalise} so it's a self consistency test of the PDF.\newline\newline
+
+<\textcolor{darkblue}{Strategy}> This allows you to employ a 'Fit Strategy' to fit a dataset or to perform an LL scan. This is another specialist feature but allows you to overcome the limitations of Minuit to find the correct minima.
+\end{frame}
+
+
+
+\section{<ToFit>}
+\begin{frame}[fragile]
+\frametitle{<\textcolor{darkblue}{ToFit}>}
+This is the most complex part of the XML and will take a while to fully cover all the available options.
+\lstset{
+  language=XML,
+  morekeywords={encoding,
+  xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+}\tiny
+\begin{lstlisting}[tabsize=8]
+<ToFit>
+  <PDF>
+      <Name>SimpleGauss</Name>
+  </PDF>
+  <DataSet>
+    <Source>Foam</Source>
+    <NumberEntries>1000</NumberEntries>
+    <PhaseSpaceBoundary>
+      <Observable>
+        <Name>x</Name>
+        <Minimum>-10.</Minimum>
+        <Maximum>10.</Maximum>
+        <Unit>someUnit</Unit>
+      </Observable>
+    </PhaseSpaceBoundary>
+  </DataSet>
+</ToFit>
+<ToFit>
+  <ConstraintFunction>
+    <ExternalConstraint>
+      <Name>deltaM</Name>
+      <Value>17.63</Value>
+      <Error>0.11</Error>
+    </ExternalConstraint>
+  </ConstraintFunction>
+</ToFit>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{ToFit}> cont}
+\scriptsize~<\textcolor{darkblue}{PDF}> This Section of the ToFit MUST contain at least a <\textcolor{darkblue}{Name}> tag.\newline
+<\textcolor{darkblue}{CommonPDF}> May also be used here.\newline
+This Section May also contain:\newline
+<\textcolor{darkblue}{ParameterSubstitution}> and/or <\textcolor{darkblue}{AppendParameterNames}> \textit{(same effect)}\newline
+as well as <\textcolor{darkblue}{ConfigurationParameter}>.\newline
+This allows you to configure the PDF at runtime to have \textit{(subtley)} different behaviour for different XMLs.\newline\newline
+
+<\textcolor{darkblue}{ConstraintFunction}> This section allows you to use an ExternalConstraint which is effectively constraining free PhysicsParameter(s) in the fit.\newline You will likely know of this only when you need to.\newline\newline
+
+<\textcolor{darkblue}{DataSet}> This section Contains everything you will need to select your dataset and is a complex topic to cover.
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{ToFit}> cont <\textcolor{darkblue}{DataSet}>}
+\scriptsize~<\textcolor{darkblue}{DataSet}> MUST contain:\newline
+<\textcolor{darkblue}{Source}>\newline
+This is either File/Foam/FoamFile\newline
+<\textcolor{darkblue}{NumberEntries}>\newline
+This is the (Maximum)Number of Events to Read in\newline
+<\textcolor{darkblue}{PhaseSpaceBoundary}>\newline
+This is the possible PhaseSpaceBoundary for all Data.\newline
+
+When the <\textcolor{darkblue}{Source}> is 'File' the XML tag <\textcolor{darkblue}{FileName}> should be added.\newline
+RapidFit by default will pick up the first nTuple in the file it finds.\newline
+The XML tag <\textcolor{darkblue}{NTuplePath}> can also be added which allows you to pick a specific nTuple within a file when there is more than 1.\newline
+
+When the <\textcolor{darkblue}{Source}> is 'Foam' the \textcolor{orange}{PDF}::\textcolor{blue}{Evaluate} function is used to generate a dataset.\newline
+When the <\textcolor{darkblue}{Source}> is 'FoamFile' is used. Foam is used to produce an nTuple and the nTuple is saved and read back in from disk. (reason why is probably not important to you.)
+
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{ToFit}> cont <\textcolor{darkblue}{PhaseSpaceBoundary}>}
+\scriptsize~<\textcolor{darkblue}{PhaseSpaceBoundary}> defines the contents of the DataSet in memory and the region the data can populate.\newline\newline
+The PhaseSpaceBoundary is populated by <\textcolor{darkblue}{Observable}> objects.\newline
+
+<\textcolor{darkblue}{Observable}> tags MUST contain a <\textcolor{darkblue}{Name}> and <\textcolor{darkblue}{Unit}> tag.\newline\newline
+
+The <\textcolor{darkblue}{Observable}> tag must contain either a Continuous or Discrete Range that the Data can populate.\newline
+A Continuous Constraint is defined with <\textcolor{darkblue}{Maximum}> \& <\textcolor{darkblue}{Minimum}> tags.\newline
+A Discrete Constraint is defined as a set of <\textcolor{darkblue}{Value}> tags.\newline\newline
+
+In RapidFit a Discrete and Continuous Observable are different. A PDF can be addressed with any value within a continuous Constraint that can vary by any amount whilst it has one Discrete value at a time.
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{ToFit}> cont <\textcolor{darkblue}{PhaseSpaceBoundary}> cont}
+\scriptsize~<\textcolor{darkblue}{Observable}> allow the user to read in data from an nTuple.\newline\newline
+
+RapidFit can cope with nTuples having different structures really easily.\newline\newline
+When reading in an Observable from an nTuple each Observable in RapidFit contains the result of evaluating a <\textcolor{darkblue}{TF1}> tag in the Observable structure.\newline If none is provided then RapidFit evaluates the \textbf{Name} of the Observble as the object to read in.\newline
+
+The use of <\textcolor{darkblue}{TF1}> tags allows for RapidFit to read in and perform a complex transform 'on the fly' which means that the PDF can be coded up in such a way that it doesn't depend \textit{too strongly} on the contents of the nTuple.\newline\newline
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{<\textcolor{darkblue}{ToFit}> cont}
+\scriptsize Many <\textcolor{darkblue}{ToFit}> segments can be used in parallel.
+The more complex the analysis the more <\textcolor{darkblue}{ToFit}> segments you're likely going to need.\newline
+To try and combat this increased complexity I recently introduced <\textcolor{darkblue}{CommonPDF}> and <\textcolor{darkblue}{CommonPhaseSpace}> which can be used as such:
+
+\lstset{
+  language=XML,
+  morekeywords={encoding,
+  xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+}\tiny
+\begin{lstlisting}[tabsize=8]
+<CommonPDF>
+  <PDF>
+    <Name>SomePDF</Name>
+  </PDF>
+</CommonPDF>
+<CommonPhaseSpace>
+  ...
+</CommonPhaseSpace>
+<ToFit>
+  <CommonPDF>True</CommonPDF>
+  <DataSet>
+    <Source>File</Source>
+    <FileName>File1.root</FileName>
+    <CommonPhaseSpace>True</CommonPhaseSpace>
+  </DataSet>
+</ToFit>
+<ToFit>
+  <CommonPDF>True</CommonPDF>
+  <DataSet>
+    <Source>File</Source>
+    <FileName>File2.root</FileName>
+    <CommonPhaseSpace>True</CommonPhaseSpace>
+  </DataSet>
+</ToFit>
+\end{lstlisting}
+\end{frame}
+
+\section{<Output>}
+\begin{frame}[fragile]
+\frametitle{<\textcolor{darkblue}{Output}>}
+\scriptsize~There is a lot of different output that can be extracted from the RapidFit tool.\newline
+This is generally broken down into Parameter scans or Observable Projections.
+\lstset{
+  language=XML,
+  morekeywords={encoding,
+  xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+}\tiny
+\begin{lstlisting}[tabsize=8]
+<Output>
+  <Projection>x</Projection>
+  <ComponentProjection>y</ComponentProjection>
+  <Scan>
+    <Name>sigma</Name>
+    <Sigma>3</Sigma>
+    <Points>100</Points>
+  </Scan>
+  <TwoDScan>
+    <X_Param>
+      <Name>sigma</Name>
+      <Sigma>3</Sigma>
+      <Points>30</Points>
+    </X_Param>
+    <Y_Param>
+      <Name>sigma2</Name>
+      <Minium>3.</Minimum>
+      <Maximum>5.<Maximum>
+      <Points>30</Points>
+    </Y_Param>
+  </TwoDScan>
+</Output>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{<\textcolor{darkblue}{ComponentProjection}>}
+For complex full analyses RapidFit can perform projections but they will likely take a long time to run.\newline
+For simpler analyses the projections don't take too long and are highly configurable.
+\lstset{
+  language=XML,
+  morekeywords={encoding,
+  xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+}\tiny
+\begin{lstlisting}[tabsize=8]
+<Output>
+  <ComponentProjection>
+    <Name>mass</Name>
+    <DataBins>256</DataBins>
+    <PDFpoints>1024</PDFpoints>
+    <LogY>True</LogY>
+    <ColorKey>0:2:3:4:6:7:8:9:11</ColorKey>
+    <StyleKey>1:2:3:4:5:6:7:8:9</StyleKey>
+    <WidthKey>0:3:3:3:3:3:3:3:3</WidthKey>
+    <YTitle>Events</YTitle>
+    <XTitle>Mass</XTitle>
+    <XMin>5000</XMin>
+    <XMax>6000</XMax>
+    <YMin>100</YMin>
+    <YMax>20000</YMax>
+    <DrawPull>True</DrawPull>
+    <CalcChi2>True</CalcChi2>
+  </ComponentProjection>
+</Output>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{<\textcolor{darkblue}{ComponentProjection}> cont}
+\scriptsize~We always need to know the <\textcolor{darkblue}{Name}> of what is being projected.\newline
+
+The Number of Bins in the histogram for Data <\textcolor{darkblue}{DataBins}> can be varied.\newline
+The Number of Points PDF is Numerically Integrated at <\textcolor{darkblue}{PDFpoints}> can be varied.\newline
+Setting Log on the Y axis can be turned on/off <\textcolor{darkblue}{LogY}>.\newline
+
+The ROOT Colour, Style and Line Width can be set according to he keys.\newline
+(0 width means a line is not actually drawn but is saved to the .root file)\newline
+
+The Ranges of the X and Y axis can be altered.\newline
+
+The Total $\chi^2 / \text{NDOF}$ can be calculated from your PDF and data in a projection <\textcolor{darkblue}{CalcChi2}>.\newline
+
+The Residuals (pull per-bin) can be calculated and drawn <\textcolor{darkblue}{DrawPull}>. (Alongside Projection and Separately).
+
+Projections used to be something RapidFit was extremely poor at.
+The tool does not yet do as much hand-holding as some other tools (RooFit) already out there do, but it's improving in leaps and bounds.
+\end{frame}
+
+\section{<PreCalculator>}
+\begin{frame}[fragile]
+\frametitle{<\textcolor{darkblue}{PreCalculator}>}
+This is the section of RapidFit that allows us to calculate per-event weights and store then in an nTuple.
+\lstset{
+  language=XML,
+  morekeywords={encoding,
+  xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+}\tiny
+\begin{lstlisting}[tabsize=8]
+<Precalculator>
+  <Name>SWeightPrecalculator</Name>
+  <WeightName>sWeight</WeightName>
+  <OutputFile>1fbUB-6binSig.root</OutputFile>
+  <Config>1</Config>
+  <UseAlpha>True</UseAlpha>
+</Precalculator>
+\end{lstlisting}\scriptsize~
+The <\textcolor{darkblue}{PreCalculator}> section of the XML contains a lot of Info:
+
+<\textcolor{darkblue}{Name}> Name of the Weighting tool to use.\newline
+<\textcolor{darkblue}{WeightName}> The Name of the new branch you wish to save the weight as in the new nTuple.\newline
+<\textcolor{darkblue}{OutputFile}> The Name of the new Weighted nTuple that is to be produced.\newline
+<\textcolor{darkblue}{Config}> This changes whether to use the first or second PDF in your Sum/NormalisedSum PDF as the signal component.\newline
+
+<\textcolor{darkblue}{UseAlpha}> This applies the statistical correction factor directly to the weights as they're written to disk.\newline
+This is important if you plan to get the errors consistent and correct, but is NOT recommended if you plan to read yields from the nTuple directly.
+
+\end{frame}
+
+\section{C++}
+\begin{frame}
+\frametitle{C++ Objects in RapidFit}
+
+In RapidFit you need to be aware of at MOST about 12 classes from the perspective of doing physics and getting something working.
+
+The most obvious are:
+\begin{itemize}
+ \item DataPoint
+ \item ObservableRef
+ \item ComponentRef
+ \item YourPDF
+ \item PhaseSpaceBoundary
+ \item IConstraint
+ \item Observable
+ \item ParameterSet
+ \item PhysicsParameter
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{DataPoint and Observable}
+%\scriptsize
+Each DataPoint object in C++ in RapidFit corresponds to an event on the nTuple which has passed all of the cuts and been read into memory.\newline
+
+A DataPoint exists as the object which manages the Observables for each Event.\newline
+
+Each Observable can be Requested from the DataPoint with \textcolor{orange}{DataPoint}::\textcolor{blue}{GetObservable}( string )\newline
+
+Each DataPoint may know what PhaseSpaceBoundary it lies in.\newline
+
+Each Observable contains a Value and a Unit and these may be retrieved with \textcolor{orange}{Observable}::\textcolor{blue}{GetValue}() and \textcolor{orange}{Observable}::\textcolor{blue}{GetUnit}() accordingly.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{ParameterSet and PhysicsParameter}
+\scriptsize
+These objects correspond to the objects in your XML on a 1-to-1 comparison.\newline\newline
+
+The ParameterSet exists as an object which Manages the PhysicsParameters for a given PDF.\newline
+
+When using a PhysicsParameter in your PDF to do calculations always request the PhysicsParameter to return it's true value.\newline\newline
+
+This is done with \textcolor{orange}{PhysicsParameter}::\textcolor{blue}{GetValue}() or \textcolor{orange}{PhysicsParameter}::\textcolor{blue}{GetTrueValue}().
+(These are identical, but \textcolor{blue}{GetTrueValue} is more explicit!)\newline\newline
+
+
+WARNING: IF YOU PRINT A VALUE TO SCREEN FROM YOUR PDF MAKE SURE IT'S FROM:\newline
+\textcolor{orange}{PhysicsParameter}::\textcolor{blue}{GetBlindedValue}()\newline
+
+
+\tiny
+Note: We use the RooFit blinding numbers to be compatible for cross-checks.
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{ObservableRef}
+All PDFs now use ObservableRef objects to store Observable/PhysicsParameter names.\newline
+(The name of this class is historically unfortunate)\newline
+
+Each ObservableRef object contains knowledge of the string inside itself and where that string is in a lookup table.\newline
+
+Keeping this information in the same place means that I don't have to repeat lookup operations.\newline (These are slow and inefficient in terms of CPU)\newline
+
+These are used for:\newline
+\textcolor{orange}{ParameterSet}::\textcolor{blue}{GetPhysicsParameter}( ObservableRef )
+\textcolor{orange}{DataPoint}::\textcolor{blue}{GetObservable}( ObservableRef )
+
+\end{frame}
+
+\begin{frame}
+\frametitle{PhaseSpaceBoundary}
+A PhaseSpaceBoundary in RapidFit is the class which Manages the Constraints (IConstraint) placed on each Observable in RapidFit.\newline
+
+In RapidFit there are 2 types of constraints, Continuous and Discrete.\newline
+
+Discrete constraints return true from \textcolor{orange}{IConstraint}::\textcolor{blue}{IsDiscrete}().
+
+Discrete Constraints contain a list of possible values which can be requested by:
+\textcolor{orange}{IConstraint}::\textcolor{blue}{GetValues}()\newline
+
+Continuous Constraints contain a range of continuous values. The maximum and minimum can be requested by: \textcolor{orange}{IConstraint}::\textcolor{blue}{GetMaximum}() and \textcolor{orange}{IConstraint}::\textcolor{blue}{GetMinimum}()
+
+\end{frame}
+
+\begin{frame}
+\frametitle{C++ Component Plotting}
+Your PDF can produce Component Plots if you set it up to.\newline
+
+The Simplest example is shown in the \textcolor{orange}{SimpleDoubleGauss} PDF.\newline
+
+This PDF adds the functions:\newline\scriptsize
+\textcolor{orange}{SimpleDoubleGauss}::\textcolor{blue}{PDFComponents}()\normalsize ~and \scriptsize \textcolor{orange}{SimpleDoubleGauss}::\textcolor{blue}{EvaluateComponent}( DataPoint*, ComponentRef* ).\normalsize
+
+The ComponentRef class has the ability to store the Component Name and Reference Number in the one place to reduce the cost of lookups in your PDF (which are slow and stupid).\newline
+
+I've shown an example in \textcolor{orange}{SimpleDoubleGauss} how to implement ComponentPlotting in a way that it runs very quickly.\newline
+
+Although I recommend understanding \textcolor{orange}{OptimisedDoubleGauss} as it implements ComponentPlotting in a way that is much better.
+
+\end{frame}
+
+
+\section{Conclusion}
+\begin{frame}
+\frametitle{Conclusion}
+We have Covered \textbf{A LOT} of information in this talk.\newline\newline
+
+This is me giving people a guided tour of the kingdom and then letting you go home and study the map.\newline\newline
+
+I don't expect you to know what everything is or be able to use it all but it's available should you need/want to use it.\newline\newline
+
+Apologies for the lack of running examples, but there are some new XML and highly documented pdfs to try in HEAD.\newline\newline
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Next Week}
+Next week I plan to give a talk on 2 things:\newline
+\begin{itemize}
+ \item Runtime Arguments for RapidFit
+ \item Running on a batch system in RapidFit\newline
+\end{itemize}
+
+I will be working on making XML/scripts/PDFs available on this and will encourage people's feedback and suggestions as appropriate.\newline
+
+\end{frame}
+
+
+
+\end{document}
