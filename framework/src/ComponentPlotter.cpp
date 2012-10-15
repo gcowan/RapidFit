@@ -148,7 +148,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			for( unsigned int i=0; i< pdfComponents.size(); ++i )
 			{
 				ComponentRef* thisRef = new ComponentRef( pdfComponents[i] );
-				config->component_names.push_back( plotPDF->GetComponentName( thisRef ) );
+				if( pdfComponents[i] != "0" ) config->component_names.push_back( plotPDF->GetComponentName( thisRef ) );
 				delete thisRef;
 			}
 		}
