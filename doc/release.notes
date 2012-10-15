@@ -1,8 +1,11 @@
 // $Id: release.notes $
 
-2012/10/11 Rob Currie
+2012/10/15 Rob Currie
+   - Committing some changes to Makefile and some additional utils progs which aren't compiled by default but serve as nice examples on using code in the utils folder
+
+2012/10/14 Rob Currie
    - Commit is FAR TOO LARGE for comfort.
-       I appologise but this is the culmination of changing the API to use RapidFitIntegrator within BasePDF and a LOT of debugging to make tutorials work 'out of the box'
+       I apologise but this is the culmination of changing the API to use RapidFitIntegrator within BasePDF and a LOT of debugging to make tutorials work 'out of the box'
    - Adding SimpleGauss PDF and derrivatives
    - Added tutorial XMLs SimpleGauss, SimpleGauss2D, SimpleGauss3D, SimpleDoubleGauss, OptimisedDoubleGauss in tutorials folder
    - Moved RapidFitIntegrator to be a member object of the BasePDF

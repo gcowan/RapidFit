@@ -287,3 +287,28 @@ TTree* TTree_Processing::vecvec2TTree( vector<vector<Float_t> > input_vec )
 
 	return new_tree;
 }
+
+void TTree_Processing::AddBranch( TTree* input_tree, string title, vector<double> data )
+{
+	if( (input_tree->GetEntries() != (int)data.size()) && (input_tree->GetEntries() != 0) )
+	{
+		cout << "ERROR: CANNOT ADD BRANCH " << title << " DATA SIZE DID NOT MATCH TREE." << endl;
+		return;
+	}
+
+	unsigned int size = (unsigned)input_tree->GetEntries();
+
+	double thisValue=0.;
+	TString name=title.c_str();
+	name.Append("/D");
+	TBranch* output_branch_obj = input_tree->Branch( title.c_str(), &thisValue, name );
+
+	input_tree->SetEntries( (int)size );
+
+	for( unsigned int i=0; i< size; ++i )
+	{
+		thisValue = data[i];
+		output_branch_obj->Fill();
+	}
+}
+

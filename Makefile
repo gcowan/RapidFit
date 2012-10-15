@@ -84,7 +84,7 @@ OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJD
 ##Dependencies
 
 LINKER=ld
-LINKFLAGS=-Wl,--rpath,$(LD_LIBRARY_PATH) -lpthread
+LINKFLAGS= -lpthread
 
 LIBS=-lstdc++
 
@@ -99,13 +99,13 @@ ifeq "$(UNAME)" "Linux"
 	GCC_V:=$(shell gcc -dumpversion | awk -F '.' '{print $$2}')
 	CXX_LTO:=$(shell if [ ${GCC_V} -ge 6 ]; then echo '-flto '; else echo ''; fi)
 	CXXFLAGS+=${CXX_LTO}-fPIE
-	LINKFLAG+= -flto -pie -m64
+	LINKFLAG+= -flto -pie -m64 -Wl,--rpath,$(LD_LIBRARY_PATH)
 endif
 
 # OS X
 ifeq "$(UNAME)" "Darwin"
 	CXXFLAGS+= -fPIE
-	LINKFLAGS+= $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo " -m64"; else echo ""; fi)
+	LINKFLAGS+= $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo " -m64"; else echo ""; fi) -Wl,-rpath,$(LD_LIBRARY_PATH)
 endif
 
 
@@ -113,7 +113,7 @@ endif
 
 
 #	Default build command when someone asks for 'make'
-all : $(EXEDIR)/fitting utils lib 
+all : $(EXEDIR)/fitting utils lib
 
 $(OBJDALITZDIR)/%.o : $(SRCDALITZDIR)/%.$(SRCDALITZEXT) $(INCDALITZDIR)/%.$(HDRDALITZEXT)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -161,7 +161,7 @@ gcc47: all
 gcc48: override CC=g++-4.8
 gcc48: all
 
-gsl: override CXXFLAGS+= -D__RAPIDFIT_USE_GSL $(gsl-config --cflags) 
+gsl: override CXXFLAGS+= -D__RAPIDFIT_USE_GSL $(gsl-config --cflags)
 gsl: override LINKFLAGS+= -lgsl -lgslcblas -lm $(gsl-config --libs)
 gsl: all
 
@@ -187,8 +187,10 @@ $(OBJUTILDIR)/RapidFit_Output_File.o: $(UTILSSRC)/RapidFit_Output_File.C
 $(OBJUTILDIR)/Mathematics.o: $(UTILSSRC)/Mathematics.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
+SHARED_UTIL_LIBS=$(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJDIR)/StringProcessing.o $(OBJDIR)/EdStyle.o $(OBJUTILDIR)/StringOperations.o  $(OBJUTILDIR)/Template_Functions.o $(OBJUTILDIR)/RapidFit_Output_File.o
+
 #       New mostly automated plotting tool taking the pain out of plotting RapidFit output
-$(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/Mathematics.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/RapidLL.o $(OBJUTILDIR)/Rapid2DLL.o $(OBJUTILDIR)/Toy_Study.o $(OBJDIR)/EdStyle.o $(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Component_Projections.o $(OBJUTILDIR)/RapidFit_Output_File.o $(OBJUTILDIR)/Template_Functions.o
+$(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/RapidLL.o $(OBJUTILDIR)/Rapid2DLL.o $(OBJUTILDIR)/Toy_Study.o $(OBJUTILDIR)/Component_Projections.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/RapidPlot.o: $(UTILSSRC)/RapidPlot.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
@@ -208,17 +210,32 @@ $(OBJUTILDIR)/Template_Functions.o: $(UTILSSRC)/Template_Functions.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
 #       Tool for printing information about a ROOT file and it's contents
-$(EXEDIR)/print: $(OBJUTILDIR)/print.o $(OBJDIR)/EdStyle.o $(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o
+$(EXEDIR)/print: $(OBJUTILDIR)/print.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/print.o: $(UTILSSRC)/print.C
 	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
 
-$(EXEDIR)/AngularDist: $(OBJUTILDIR)/AngularDist.o $(OBJDIR)/EdStyle.o $(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o
+$(EXEDIR)/AngularDist: $(OBJUTILDIR)/AngularDist.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/AngularDist.o: $(UTILSSRC)/AngularDist.C
 	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
 
-$(EXEDIR)/weighted: $(OBJUTILDIR)/weighted.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJUTILDIR)/StringOperations.o $(OBJUTILDIR)/Template_Functions.o
+$(EXEDIR)/tupleDiff: $(OBJUTILDIR)/tupleDiff.o $(SHARED_UTIL_LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+$(OBJUTILDIR)/tupleDiff.o: $(UTILSSRC)/tupleDiff.C
+	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
+
+$(EXEDIR)/Compare: $(OBJUTILDIR)/Compare.o $(SHARED_UTIL_LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+$(OBJUTILDIR)/Compare.o: $(UTILSSRC)/Compare.C
+	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
+
+$(EXEDIR)/ApplyWeights: $(OBJUTILDIR)/ApplyWeights.o $(SHARED_UTIL_LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+$(OBJUTILDIR)/ApplyWeights.o: $(UTILSSRC)/ApplyWeights.C
+	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
+
+$(EXEDIR)/weighted: $(OBJUTILDIR)/weighted.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/weighted.o: $(UTILSSRC)/weighted.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<

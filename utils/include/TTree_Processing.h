@@ -56,6 +56,7 @@ class TTree_Processing
 		//	ATTENTION: THIS WILL MANGLE DATA COMPARED TO HOW IT APPEARS IN THE INPUT TREE, BUT IT GIVE UNIQUE SORTED DATA POINTS SO I DONT CARE!
 		static vector<vector<Double_t> > Plotter_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom* random=NULL, int upper_lim=-1 );
 
+		static void AddBranch( TTree* input_tree, string title, vector<double> data );
 };
 
 #endif
