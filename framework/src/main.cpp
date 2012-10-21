@@ -74,6 +74,10 @@ void RapidFitWelcome()
 	string mod="M";
 	size_t found = string( STR(SVN_REV) ).find( mod );
 
+#ifdef __RAPIDFIT_USE_GSL
+	cout << "Compiled With Optional GSL Components"
+#endif
+
 	if( found != string::npos )
 	{
 		cout << "!!YOU HAVE LOCAL CODE MODIFICATIONS!!" << endl;
@@ -1132,7 +1136,15 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 	{
 		config->xmlFile = new XMLConfigReader( config->configFileName, config->XMLOverrideList );
 		config->xmlFile->SetDebug( config->debug );
-		cout << endl << "XML config file: " << config->configFileName << " loaded" << endl << endl;
+		if( config->xmlFile->IsValid() )
+		{
+			cout << endl << "XML config file: " << config->configFileName << " loaded Successfully!" << endl << endl;
+		}
+		else
+		{
+			cout << endl << "XML config file: " << config->configFileName << " Failed to load!" << endl << endl;
+			exit(-8365);
+		}
 	}
 
 	if( config->WeightDataSet == true )	{	config->calcConfig = config->xmlFile->GetPrecalculatorConfig();		}

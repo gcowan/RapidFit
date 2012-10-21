@@ -190,6 +190,7 @@ PhysicsParameter* ParameterSet::GetPhysicsParameter( const ObservableRef& object
 	}
 	object.Print();
 	cerr << "PhysicsParameter " << object.Name().c_str() << " not found(2)" << endl;
+	cerr << "The Likely Cause of this is that your PDF is NOT adveritising that it requires: " << object.Name().c_str() << " please cheack and remedy this!" << endl << endl;
 	throw(-20);
 }
 

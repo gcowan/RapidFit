@@ -23,12 +23,15 @@
 using namespace::std;
 
 //Default constructor
-ResultParameter::ResultParameter() : name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false)
+ResultParameter::ResultParameter() :
+	name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false),
+	assym_err(false), err_hi(0.), err_low(0.)
 {
 }
 
 ResultParameter::ResultParameter( const PhysicsParameter* Input )
-	: name("Undefined"), value(0.0), originalValue(-9999.), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.0), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false)
+	: name("Undefined"), value(0.0), originalValue(-9999.), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.0), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false),
+	assym_err(false), err_hi(0.), err_low(0.)
 {
 	name = Input->GetName();
 	value = Input->GetValue();
@@ -65,7 +68,9 @@ ResultParameter::ResultParameter( const PhysicsParameter* Input )
 }
 
 //Constructor with correct argument
-ResultParameter::ResultParameter( string Name, double NewValue, double NewOriginalValue, double NewError, double NewMinimum, double NewMaximum, string NewType, string NewUnit ) : name(Name), value(NewValue), originalValue(NewOriginalValue), error(NewError), minimum(NewMinimum), maximum(NewMaximum), stepSize(NewError), type(NewType), unit(NewUnit), ScanStatus(false)
+ResultParameter::ResultParameter( string Name, double NewValue, double NewOriginalValue, double NewError, double NewMinimum, double NewMaximum, string NewType, string NewUnit ) :
+	name(Name), value(NewValue), originalValue(NewOriginalValue), error(NewError), minimum(NewMinimum), maximum(NewMaximum), stepSize(NewError), type(NewType), unit(NewUnit), ScanStatus(false),
+	assym_err(false), err_hi(0.), err_low(0.)
 {
 	if (maximum < minimum)
 	{
@@ -93,6 +98,29 @@ ResultParameter::ResultParameter( string Name, double NewValue, double NewOrigin
 //Destructor
 ResultParameter::~ResultParameter()
 {
+}
+
+bool ResultParameter::GetAssym() const
+{
+	return assym_err;
+}
+
+void ResultParameter::SetAssymErrors( const double err_plus, const double err_minus, const double err_para )
+{
+	assym_err=true;
+	error = err_para;
+	err_low = err_minus;
+	err_hi = err_plus;
+}
+
+double ResultParameter::GetErrLow() const
+{
+	return err_low;
+}
+
+double ResultParameter::GetErrHi() const
+{
+	return err_hi;
 }
 
 PhysicsParameter* ResultParameter::GetDummyPhysicsParameter() const

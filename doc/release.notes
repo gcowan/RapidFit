@@ -1,5 +1,16 @@
 // $Id: release.notes $
 
+2012/10/20 Rob Currie
+   - Added check to XML Initialization to catch obviously badly formatted XMLs
+   - Created new Common StringProcessing::FindFileName to look for a file depending on where it is likely to be
+       This has allowed me to replace code in several classes which may or may not have worked as expected on the Grid
+   - Re-Written some code around handling TH3D in Angular Acceptance which makes code more consistent.
+       This simply means that we now copy create/destroy objects in a cleaner way without relying on ROOT to do whatever it claims it does.
+       This fixes strange/weird pdf effects from code in the pdfs which was correct
+   - Added Call info to NLL output which makes tracking the progress of long fits very easy :D
+       Also added timestamp to the output from Migrad
+   - Added redimentary support for Minos output. We still cannot write the output to disk from Toy Studies and such, this is expected to come in the near future
+
 2012/10/15 Rob Currie
    - Committing some changes to Makefile and some additional utils progs which aren't compiled by default but serve as nice examples on using code in the utils folder
    - Adding 2nd Talk on RapidFit to tutorials

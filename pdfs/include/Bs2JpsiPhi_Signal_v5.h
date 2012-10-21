@@ -95,6 +95,7 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		ObservableRef deltaMName;		// delta mass
 		ObservableRef Azero_sqName;	// amplitude
 		ObservableRef Apara_sqName;	// amplitude
+		bool _fitDirectlyForApara;
 		ObservableRef Aperp_sqName;	// amplitude
 		ObservableRef As_sqName;		// amplitude
 		ObservableRef CspName;		// amplitude

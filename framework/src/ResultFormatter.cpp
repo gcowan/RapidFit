@@ -469,8 +469,16 @@ void ResultFormatter::LatexSimpleFitResultTable( FitResult * OutputData, strings
 		string name = *nameIterator;
 
 		latex << setw(20) << EdStyle::GetParamLatexName(name) << " & "
-			<< setw(12) << setprecision(5) << fitValue << " \\pm "
-			<< setw(10) <<                    fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
+			<< setw(12) << setprecision(5) << fitValue;
+		if( outputParameter->GetAssym() )
+		{
+			latex << " + " << outputParameter->GetErrHi() << " - " << outputParameter->GetErrLow() << " ";
+		}
+		else
+		{
+			latex << " \\pm " << setw(10) << fitError << " ";
+		}
+		latex	<< setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
 			<< setw(20) << setprecision(2) << sigmaFromInputValue << "\\\\" << endl;
 	}
 
@@ -495,8 +503,16 @@ void ResultFormatter::LatexFullFitResultTable( FitResult * OutputData, stringstr
 		string unit = outputParameter->GetUnit();
 		string name = *nameIterator;
 		latex << setw(20) << EdStyle::GetParamLatexName(name) << " & "
-			<< setw(12) << setprecision(5) << fitValue << " \\pm "
-			<< setw(10) <<  		  fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
+			<< setw(12) << setprecision(5) << fitValue;
+		if( outputParameter->GetAssym() )
+		{
+			latex << " + " << outputParameter->GetErrHi() << " - " << outputParameter->GetErrLow() << " ";
+		}
+		else
+		{
+			latex << " \\pm " << setw(10) << fitError << " ";
+		}
+		latex	<< setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
 			<< setw(20) << setprecision(2) << sigmaFromInputValue << " & "
 			<< setw(15) << setprecision(5) << fitValue-inputValue << "\\\\" << endl;
 	}
@@ -521,8 +537,16 @@ void ResultFormatter::LatexMinimumFitResultTable( FitResult * OutputData, string
 		string name = *nameIterator;
 
 		latex << setw(20) << EdStyle::GetParamLatexName(name) << " & "
-			<< setw(12) << setprecision(3) << fitValue << " \\pm "
-			<< setw(10) <<  		  fitError << " " << setw(15) << EdStyle::GetParamLatexUnit(unit)  << "\\\\" << endl;
+			<< setw(12) << setprecision(3) << fitValue;
+		if( outputParameter->GetAssym() )
+		{
+			latex << " + " << outputParameter->GetErrHi() << " - " << outputParameter->GetErrLow() << " ";
+		}
+		else
+		{
+			latex << " \\pm " << setw(10) << fitError << " ";
+		}
+		latex << setw(15) << EdStyle::GetParamLatexUnit(unit)  << "\\\\" << endl;
 	}
 
 	ResultFormatter::TableFooter( latex );
@@ -743,7 +767,7 @@ void ResultFormatter::ReviewOutput( FitResult * OutputData )
 	cout << "\nFit Review:\t\tStatus:\t" <<OutputData->GetFitStatus()<<"\t\tNLL:\t"<<setprecision(10)<<OutputData->GetMinimumValue()<<endl<<endl;
 
 	//Ouput each parameter
-	for ( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
+	for( nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
 	{
 		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
 		double fitValue = outputParameter->GetValue();
@@ -751,8 +775,15 @@ void ResultFormatter::ReviewOutput( FitResult * OutputData )
 		string unit = outputParameter->GetUnit();
 		string name = *nameIterator;
 		cout << setw(25) << name << " : "
-			<< setw(13) << setprecision(5) << fitValue << "  \\pm  "
-			<< setw(13) << setprecision(5) << fitError << endl;
+			<< setw(13) << setprecision(5) << fitValue;
+		if( outputParameter->GetAssym() )
+		{
+			cout << "  +  " << setprecision(5) << setw(8) << outputParameter->GetErrHi() << "  -  " << setw(6) << outputParameter->GetErrLow() << endl;
+		}
+		else
+		{
+			cout << "  ±  " << setw(13) << setprecision(5) << fitError << endl;
+		}
 	}
 	cout << endl;
 	cout << "--------------------------------------------------" <<endl;

@@ -18,6 +18,10 @@
 #include "TAxis.h"
 #include "TH1.h"
 
+#include "StringProcessing.h"
+
+using namespace::std;
+
 PDF_CREATOR( LongLivedBkg_3Dangular );
 
 //.....................................................
@@ -75,52 +79,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 		useFlatAngularDistribution = false ;
 
 		//File location
-		ifstream input_file;
-		input_file.open( fileName.c_str(), ifstream::in );
-		input_file.close();
-
-		bool local_fail = input_file.fail();
-
-		string fileName_pwd = "pdfs/configdata/";
-		fileName_pwd.append( fileName );
-		input_file.open( fileName_pwd.c_str(), ifstream::in );
-		input_file.close();
-		bool pwd_fail = input_file.fail();
-
-		if( !getenv("RAPIDFITROOT") && ( local_fail && pwd_fail ) )
-		{
-			cerr << "\n" << endl;
-			//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-			cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
-			//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-			cerr << "\n" << endl;
-			exit(-987);
-		}
-
-		string fullFileName;
-
-		if( (local_fail && !pwd_fail) || !getenv("RAPIDFITROOT") )	fullFileName=fileName_pwd;
-
-		if( getenv("RAPIDFITROOT") )
-		{
-			string path( getenv("RAPIDFITROOT") ) ;
-
-			cout << "RAPIDFITROOT defined as: " << path << endl;
-
-			fullFileName = path+"/pdfs/configdata/"+fileName;
-			input_file.open( fullFileName.c_str(), ifstream::in );
-			input_file.close();
-		}
-		bool elsewhere_fail = input_file.fail();
-
-		if( elsewhere_fail && local_fail )
-		{
-			cerr << "\n\tFileName:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
-			cerr << "\t\tAlternativley make sure your XML points to the correct file, or that the file is in the current working directory\n" << endl;
-			exit(-89);
-		}
-
-		if( fullFileName.empty() || !local_fail ) fullFileName = fileName;
+		string fullFileName = StringProcessing::FindFileName( fileName );
 
 		//Read in histo
 		TFile* f =  TFile::Open(fullFileName.c_str());

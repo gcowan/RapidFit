@@ -108,7 +108,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) 
 
 	, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1), stored_AT(input.stored_AT), stored_AP(input.stored_AP), stored_A0(input.stored_A0)
 
-	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah)
+	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
 {
 	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
@@ -195,6 +195,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL), normalisationCacheValid(false),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 	resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(), storeExpCos(), normalisationCacheUntagged()
+	, _fitDirectlyForApara(false)
 {
 	componentIndex = 0;
 
@@ -212,7 +213,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	_usePunziMistag = configurator->isTrue( "UsePunziMistag" ) ;
 	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
 	_usePlotComponents = configurator->isTrue( "PlotComponents" ) ;
-
+	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
 
 	//...............................................
 	// Configure to use angular acceptance machinery
@@ -422,6 +423,11 @@ void Bs2JpsiPhi_Signal_v5::MakePrototypes()
 	}
 	parameterNames.push_back( timeOffsetName );
 
+	if( _fitDirectlyForApara )
+	{
+		parameterNames.push_back( Apara_sqName );
+	}
+
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -470,7 +476,15 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	Aperp_sq = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
 	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}
 
-	Apara_sq = (1. - Azero_sq - Aperp_sq ) ;
+	Apara_sq = 0.;
+	if( _fitDirectlyForApara )
+	{
+		Apara_sq = allParameters.GetPhysicsParameter( Apara_sqName )->GetValue();
+	}
+	else
+	{
+		Apara_sq = (1. - Azero_sq - Aperp_sq );
+	}
 	if( Apara_sq < 0. ) {
 		cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: derived parameter Apara_sq <0  and so set to zero" <<  endl ;
 		Apara_sq = 0. ;

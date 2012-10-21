@@ -66,6 +66,8 @@ class XMLConfigReader
 		 */
 		~XMLConfigReader();
 
+		bool IsValid() const;
+
 		/*!
 		 * @brief Return the Input XML from the file
 		 *
@@ -306,6 +308,12 @@ class XMLConfigReader
 		int seed;				/*!	Random Seed	*/
 
 		DebugClass* debug;
+
+		bool TestXML();
+
+		string fileName;
+		vector<XMLTag*> fileTags;
+		bool XMLValid;
 };
 
 #endif

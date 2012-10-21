@@ -20,14 +20,40 @@ AngularAcceptance::AngularAcceptance( const AngularAcceptance& input ) :
 	, _af7(input._af7), _af8(input._af8), _af9(input._af9), _af10(input._af10), useFlatAngularAcceptance(input.useFlatAngularAcceptance)
 	, histo(input.histo) , xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins)
 	, xmin(input.xmin), xmax(input.xmax), ymin(input.ymin), ymax(input.ymax), zmin(input.zmin), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz)
-																						      , total_num_entries(input.total_num_entries), average_bin_content(input.average_bin_content)
+	, total_num_entries(input.total_num_entries), average_bin_content(input.average_bin_content)
 {
+	TString Histo_Name="histo_";
+	TString XAxis_Name="Xaxis_";
+	TString YAxis_Name="Yaxis_";
+	TString ZAxis_Name="Zaxis_";
+	size_t uniqueNum = reinterpret_cast<size_t>(this);
+	Histo_Name+=uniqueNum;
+	XAxis_Name+=uniqueNum;
+	YAxis_Name+=uniqueNum;
+	ZAxis_Name+=uniqueNum;
+	if( input.histo != NULL )
+	{
+		histo = (TH3D*)input.histo->Clone(Histo_Name);
+		xaxis = (TAxis*)histo->GetXaxis()->Clone(XAxis_Name);
+		yaxis = (TAxis*)histo->GetYaxis()->Clone(YAxis_Name);
+		zaxis = (TAxis*)histo->GetZaxis()->Clone(ZAxis_Name);
+	}
+}
+
+AngularAcceptance::~AngularAcceptance()
+{
+	if( histo != NULL ) delete histo;
+	//	Objects claim to be looked after by the Histogram so cannot be 'doubly deleted'
+	//	This sounds suspicious but we can't delete them here due to segfaults
+	//if( xaxis != NULL ) delete xaxis;
+	//if( yaxis != NULL ) delete yaxis;
+	//if( zaxis != NULL ) delete zaxis;
 }
 
 //............................................
 // Constructor for accpetance from a file
 AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
-	_af1(1), _af2(1), _af3(1), _af4(0), _af5(0), _af6(0), _af7(1), _af8(0), _af9(0), _af10(0), useFlatAngularAcceptance()
+	_af1(1), _af2(1), _af3(1), _af4(0), _af5(0), _af6(0), _af7(1), _af8(0), _af9(0), _af10(0), useFlatAngularAcceptance(false)
 	, histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(), ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), average_bin_content()
 {
 
@@ -64,8 +90,10 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
 			cerr << "Cannot Open a Valid NTuple" << endl;
 			exit(0);
 		}
-
-		this->processHistogram() ;
+		histo->SetDirectory(0);
+		size_t uniqueNum = reinterpret_cast<size_t>(this);
+		TString Histo_Name="Histo_";Histo_Name+=uniqueNum;
+		this->processHistogram();
 
 
 		// Get the 10 angular factors
@@ -84,6 +112,7 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
 		//for( int ii=0; ii <10; ii++) {
 		//	cout << "AcceptanceWeight "<<ii+1<< " = "  << (*pvect)[ii] << endl ;
 		//}
+		f->Close();
 	}
 
 }
@@ -94,7 +123,6 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
 // Return numerator for evaluate
 double AngularAcceptance::getValue( double cosPsi, double cosTheta, double phi ) const
 {
-
 	if( useFlatAngularAcceptance ) return 1. ;
 
 	double returnValue=0.;
@@ -113,7 +141,7 @@ double AngularAcceptance::getValue( double cosPsi, double cosTheta, double phi )
 
 	returnValue = num_entries_bin; /// (deltax * deltay * deltaz) / total_num_entries ;
 
-	return returnValue / average_bin_content ;
+	return returnValue / average_bin_content;
 }
 
 double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Observable* phi ) const
@@ -161,8 +189,8 @@ double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Ob
 
 //............................................
 // Open the input file containing the acceptance
-string AngularAcceptance::openFile( string fileName ) {
-
+string AngularAcceptance::openFile( string fileName )
+{
 	ifstream input_file2;
 	input_file2.open( fileName.c_str(), ifstream::in );
 	input_file2.close();
@@ -226,8 +254,16 @@ string AngularAcceptance::openFile( string fileName ) {
 // Open the input file containing the acceptance
 void AngularAcceptance::processHistogram()
 {
+	TString XAxis_Name="XAxis_";
+	TString YAxis_Name="YAxis_";
+	TString ZAxis_Name="ZAxis_";
+	size_t uniqueNum = reinterpret_cast<size_t>(this);
+	XAxis_Name+=uniqueNum;
+	YAxis_Name+=uniqueNum;
+	ZAxis_Name+=uniqueNum;
 
 	xaxis = histo->GetXaxis();
+	xaxis->SetName(XAxis_Name);
 	xmin = xaxis->GetXmin();
 	xmax = xaxis->GetXmax();
 	nxbins = histo->GetNbinsX();
@@ -235,6 +271,7 @@ void AngularAcceptance::processHistogram()
 	cout << " X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << "\t\t" << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
 
 	yaxis = histo->GetYaxis();
+	yaxis->SetName(YAxis_Name);
 	ymin = yaxis->GetXmin();
 	ymax = yaxis->GetXmax();
 	nybins = histo->GetNbinsY();
@@ -242,6 +279,7 @@ void AngularAcceptance::processHistogram()
 	cout << " Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << "\t\t" << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
 
 	zaxis = histo->GetZaxis();
+	zaxis->SetName(ZAxis_Name);
 	zmin = zaxis->GetXmin();
 	zmax = zaxis->GetXmax();
 	nzbins = histo->GetNbinsZ();
@@ -269,7 +307,8 @@ void AngularAcceptance::processHistogram()
 					zero_bins.push_back(1);
 				}
 				//cout << " Zero bins " << zero_bins.size() << endl;}
-				else if (bin_content>0)                                        {
+				else if (bin_content>0)
+				{
 					sum += bin_content;
 				}
 			}
@@ -284,7 +323,7 @@ void AngularAcceptance::processHistogram()
 	//cout << "Average number of entries of non-zero bins: " << average_bin_content <<  endl;
 
 	// Check.  This order works for both bases since phi is always the third one.
-	if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < (2.*TMath::Pi()-0.01) )
+	if( (xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < (2.*TMath::Pi()-0.01) )
 	{
 		cout << endl << "In AngularAcceptance::processHistogram: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
 		exit(1);

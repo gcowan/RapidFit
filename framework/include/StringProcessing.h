@@ -1,11 +1,11 @@
 /**
-        @class StringProcessing
+  @class StringProcessing
 
-        Collection of static functions for string processing
+  Collection of static functions for string processing
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+ */
 
 #pragma once
 #ifndef STRING_PROCESSING_H
@@ -22,15 +22,29 @@ using namespace::std;
 class StringProcessing
 {
 	public:
+		//	Return the current time as a time-stamp string
 		static string TimeString();
+
+		//	Split a string into a vector of strings by the deliminator
 		static vector<string> SplitString( const string, const char );
+
+		//	Get the Position of a Character in a string (first occurance)
 		static int CharacterPosition( const string, const char );
+
+		//	Get all of the string Positions of a chatacter in a string
 		static vector<int> StringPositions( const string, const string );
+
+		//	Remove the first occurance? of a selected character
 		static void RemoveCharacter( string&, const char );
+
+		//	Replace an instance of a substring within a 
 		static string ReplaceString( const string&, const string, const string );
 		static void RemoveWhiteSpace( vector<string>& );
 
+		//	Replace non-Latex safe characters with '_'
 		static string LatexSafe( const string input );
+
+		//	Replace non-Latex safe chatacters with '_'
 		static string LatexSafe( const TString input );
 
 		/*!
@@ -58,19 +72,31 @@ class StringProcessing
 		static vector<TString> StripStrings( const vector<TString>, const TString );
 		static vector<string> Convert( const vector<TString> );
 
-                static int GetNumberOnLeft( const string& );
-                static string AddNumberToLeft( const string&, const int& );
-                static string RemoveFirstNumber( const string& );
-                static vector<string> FillList( const int, const int=0 );
+		//	Get the left most character in a string in Numerical Form
+		static int GetNumberOnLeft( const string& );
 
-                static string AddNames( const string&, const string& );
-                static string MultNames( const string&, const string& );
+		//	Add a number to the start of a string
+		static string AddNumberToLeft( const string&, const int& );
+		static string RemoveFirstNumber( const string& );
+		static vector<string> FillList( const int, const int=0 );
+
+		static string AddNames( const string&, const string& );
+		static string MultNames( const string&, const string& );
 
 		//	ported from utils / StringOperations
 		//	Remove characters not nice in filenames and multiple '_' occurances
 		static TString Clean( const TString input );
 		//      Is a TString empty ?
-                static bool is_empty( const TString input );
+		static bool is_empty( const TString input );
+
+		/*!
+		 * Return the full Path of a file if it exists:
+		 * The priority of the file existing is:
+		 *		local			i.e. ./filename.ext
+		 *		RAPIDFITROOT=$PWD	i.e. $PWD/pdfs/configdata/filename.ext
+		 *		RAPDFITROOT is defined	i.e. $RAPIDFITROOT/pdfs/configdata/filename.ext
+		 */
+		static string FindFileName( const string fileName );
 };
 
 #endif

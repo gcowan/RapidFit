@@ -246,6 +246,9 @@ void MinuitWrapper::Minimise()
 	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
 	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
 
+        time_t timeNow;
+        time(&timeNow);
+
 	//	Now Do the minimisation
 	string HesseOnly("HesseOnly");
 	if( StringProcessing::VectorContains( &Options, &SetEPS ) == -1 )
@@ -265,7 +268,8 @@ void MinuitWrapper::Minimise()
         int fitStatus = 0;
         minuit->mnstat( minimumValue, fedm, errdef, variableParameters, parameterNumber, fitStatus );
 
-	cout << "\nFinal NLL: " << minimumValue << "\t\tStatus: " << fitStatus << endl << endl;
+	time(&timeNow);
+	cout << "\nFinal NLL: " << minimumValue << "\t\tStatus: " << fitStatus << "\t\t" << ctime(&timeNow) << endl << endl;
 
 	string NoHesse("NoHesse");
 	if( StringProcessing::VectorContains( &Options, &NoHesse ) == -1 )
@@ -285,7 +289,6 @@ void MinuitWrapper::Minimise()
 
 
 	//Output time information
-	time_t timeNow;
 	time(&timeNow);
 	cout << "Minuit finished: " << ctime( &timeNow ) << endl;
 
@@ -314,6 +317,8 @@ ResultParameterSet* MinuitWrapper::GetResultParameters( vector<string> allNames,
 {
 	//Get the fitted parameters
 	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
+	string MinosOption("MinosErrors");
+	bool usedMinos = StringProcessing::VectorContains( &Options, &MinosOption ) != -1;
 	for( unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
 		string parameterName = allNames[nameIndex];
@@ -325,9 +330,22 @@ ResultParameterSet* MinuitWrapper::GetResultParameters( vector<string> allNames,
 		TString temporaryString;
 		minuit->mnpout( nameIndex, temporaryString, parameterValue, parameterError, xlolim, xuplim, iuint );
 
+		double err_plus, err_minus, err_para, gcc;
+
+		if( usedMinos )
+		{
+			minuit->mnerrs( nameIndex, err_plus, err_minus, err_para, gcc );
+		}
+
 		PhysicsParameter * oldParameter = newParameters->GetPhysicsParameter( parameterName );
 		fittedParameters->SetResultParameter( parameterName, parameterValue, oldParameter->GetOriginalValue(), parameterError,
 				xlolim, xuplim, oldParameter->GetType(), oldParameter->GetUnit() );
+
+		if( usedMinos )
+		{
+			ResultParameter* thisParam = fittedParameters->GetResultParameter( parameterName );
+			thisParam->SetAssymErrors( err_plus, fabs(err_minus), err_para );
+		}
 	}
 	return fittedParameters;
 }

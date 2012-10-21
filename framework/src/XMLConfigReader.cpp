@@ -33,7 +33,7 @@ using namespace::std;
 #define DOUBLE_TOLERANCE 1E-6
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(new DebugClass(false) )
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(new DebugClass(false) ), XMLValid(false)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -56,12 +56,127 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 	vector<string> value;
 	vector<XMLTag*> File_Tags = All_XML_Tags->FindTagsInContent( wholeFile, value );
 	children = File_Tags[0]->GetChildren();
+	fileTags = File_Tags;
 
-	if( ( File_Tags.size() != 1) || ( children.size() == 0 ) )
+	XMLValid = this->TestXML();
+}
+
+bool XMLConfigReader::IsValid() const
+{
+	return XMLValid;
+}
+
+bool XMLConfigReader::TestXML()
+{
+	if( fileTags.size() != 1 )
 	{
-		cerr << "Error processing XMLFile" << endl;
-		exit( -234 );
+		cout << "XMLConfigReader: Possible Error! your XML should contain only 1 top level <RapidFit> tag!" << endl;
+		cout << "XMLConfigReader: Everything must be included within these tags." << endl;
+		return false;
 	}
+	else
+	{
+		unsigned int numParamSets=0;
+		unsigned int numToFits=0;
+		unsigned int numMinimisers=0;
+		unsigned int numFitFunctions=0;
+		unsigned int numOutputs=0;
+		unsigned int numPrecalculators=0;
+		unsigned int numSeeds=0;
+		unsigned int numRepeats=0;
+		unsigned int numCommonPDFs=0;
+		unsigned int numCommonPhaseSpaces=0;
+		for( unsigned int i=0; i< children.size(); ++i )
+		{
+			string name = children[i]->GetName();
+			if( name == "ParameterSet" ) ++numParamSets;
+			else if( name == "Minimiser" ) ++numMinimisers;
+			else if( name == "FitFunction" ) ++numFitFunctions;
+			else if( name == "ToFit" ) ++numToFits;
+			else if( name == "Output" ) ++numOutputs;
+			else if( name == "Precalculator" ) ++numPrecalculators;
+			else if( name == "Seed" ) ++numSeeds;
+			else if( name == "NumberRepeats" ) ++numRepeats;
+			else if( name == "CommonPDF" ) ++numCommonPDFs;
+			else if( name == "CommonPhaseSpace" ) ++numCommonPhaseSpaces;
+			else
+			{
+				cout << "XMLConfigReader: Possible Error, Tag: <" << name << "> unknown. Ignoring!" << endl;
+			}
+		}
+		bool returnable=true;
+		if( numParamSets != 1 )
+		{
+			if( numParamSets == 0 )
+			{
+				cout << "XMLConfigReader: You need to include a <ParameterSet> in your XML!" << endl;
+			}
+			if( numParamSets > 1 )
+			{
+				cout << "XMLConfigReader: You need to have just 1 <ParameterSet> in your XML" << endl;
+			}
+			returnable=false;
+		}
+		if( numToFits == 0 )
+		{
+			cout << "XMLConfigReader: You Must include at least 1 <ToFit> segment in your XML" << endl;
+			returnable=false;
+		}
+		if( numMinimisers != 1 )
+		{
+			if( numMinimisers == 0 )
+			{
+				cout << "XMLConfigReader: You need to include a <Minimiser> in your XML!" << endl;
+			}
+			if( numMinimisers > 1 )
+			{
+				cout << "XMLConfigReader: You need to have just 1 <Minimiser> in your XML" << endl;
+			}
+			returnable=false;
+		}
+		if( numFitFunctions != 1 )
+		{
+			if( numFitFunctions == 0 )
+			{
+				cout << "XMLConfigReader: You need to include a <FitFunction> in your XML!" << endl;
+			}
+			if( numFitFunctions > 1 )
+			{
+				cout << "XMLConfigReader: You need to have just 1 <FitFunction> in your XML" << endl;
+			}
+			returnable=false;
+		}
+		if( numOutputs > 1 )
+		{
+			cout << "XMLConfigReader: You need to have at most 1 <Output> in your XML" << endl;
+			returnable=false;
+		}
+		if( numPrecalculators > 1 )
+		{
+			cout << "XMLConfigReader: You need to have at most 1 <Precalculator> in your XML" << endl;
+			returnable=false;
+		}
+		if( numSeeds > 1 )
+		{
+			cout << "XMLConfigReader: You need to have at most 1 <Seed> in your XML" << endl;
+			returnable=false;
+		}
+		if( numRepeats > 1 )
+		{
+			cout << "XMLConfigReader: You need to have at most 1 <NumberRepeat> in your XML" << endl;
+			returnable=false;
+		}
+		if( numCommonPDFs > 1 )
+		{
+			cout << "XMLConfigReader: You need to have at most 1 <CommonPDF> in your XML" << endl;
+		}
+		if( numCommonPhaseSpaces > 1 )
+		{
+			cout << "XMLConfigReader: You need to have at most 1 <CommonPhaseSpace> in your XML" << endl;
+		}
+		return returnable;
+	}
+	return true;
 }
 
 //Destructor
@@ -692,7 +807,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		//Make the function
 		if (hasWeight)
 		{
-			cerr <<"Weighted events have been asked for in XML using:\t\t" << weightName << endl ;
+			cout <<"Weighted events have been asked for in XML using:\t\t" << weightName << endl ;
 			returnable_function = new FitFunctionConfiguration( functionName, weightName );
 		}
 		else

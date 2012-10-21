@@ -438,7 +438,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "Azero_sq" ) {
 
-		Name.Append("{A_0}^2");
+		Name.Append("A_0^2");
 
 	} else if ( Param_Name == "Aperp_sq" ) {
 
@@ -446,11 +446,11 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "Apara_sq" ) {
 
-		Name.Append("{A_{\\parallel}}^2");
+		Name.Append("A_{\\parallel}^2");
 
 	} else if ( Param_Name == "As_sq" ) {
 
-		Name.Append("{A_s}^2");
+		Name.Append("A_s^2");
 
 	} else if ( Param_Name == "F_s" ) {
 
@@ -491,6 +491,30 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 	} else if ( Param_Name == "delta_s" ) {
 
 		Name.Append("\\delta_s");
+
+        } else if ( Param_Name == "delta_s990" ) {
+
+                Name.Append("\\delta_S (990)");
+
+        } else if ( Param_Name == "delta_s1008" ) {
+
+                Name.Append("\\delta_S (1008)");
+
+        } else if ( Param_Name == "delta_s1016" ) {
+
+                Name.Append("\\delta_S (1016)");
+
+        } else if ( Param_Name == "delta_s1020" ) {
+
+                Name.Append("\\delta_S (1020)");
+
+        } else if ( Param_Name == "delta_s1024" ) {
+
+                Name.Append("\\delta_S (1024)");
+
+        } else if ( Param_Name == "delta_s1032" ) {
+
+                Name.Append("\\delta_S (1032)");
 
 	} else if ( Param_Name == "Phi_s" ) {
 

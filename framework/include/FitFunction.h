@@ -205,6 +205,8 @@ class FitFunction
 		string Name;
 
 		double step_time;
+
+		unsigned int callNum;
 };
 
 #endif

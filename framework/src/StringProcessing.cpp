@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	ROOT Headers
 #include "TString.h"
@@ -14,6 +14,7 @@
 //	System Headers
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <time.h>
 
@@ -576,5 +577,72 @@ string StringProcessing::LatexSafe( const TString input )
 {                   
 	string temp(input.Data());
 	return LatexSafe(temp);
+}
+
+string StringProcessing::FindFileName( const string fileName )
+{
+	ifstream input_file;
+
+	input_file.open( fileName.c_str(), ifstream::in );
+	input_file.close();
+	bool local_fail = input_file.fail();
+
+	cout << "Looking For: " << fileName << endl;
+	if( !local_fail )
+	{
+		cout << "Found Locally" << endl;
+		return fileName;
+	}
+
+	string fileName_pwd = "pdfs/configdata/";
+	fileName_pwd.append( fileName );
+	input_file.open( fileName_pwd.c_str(), ifstream::in );
+	bool pwd_fail = input_file.fail();
+
+	//      Assume RAPIDFITROOT=$PWD and try
+	if( !pwd_fail )
+	{
+		return fileName_pwd;
+	}
+
+	if( !getenv("RAPIDFITROOT") )
+	{
+		cerr << "\n" << endl;
+		//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
+		//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		cerr << "\n" << endl;
+		exit(-987);
+	}
+
+	string fullFileName=fileName;
+
+	bool elsewhere_fail=false;
+	if( getenv("RAPIDFITROOT") && local_fail )
+	{
+		string path( getenv("RAPIDFITROOT") ) ;
+
+		cout << "RAPIDFITROOT defined as: " << path << endl;
+
+		fullFileName = path+"/pdfs/configdata/"+fileName ;
+
+		input_file.open( fullFileName.c_str(), ifstream::in );
+		input_file.close();
+		elsewhere_fail = input_file.fail();
+	}
+	else
+	{
+		elsewhere_fail = true;
+	}
+
+	if( elsewhere_fail )
+	{
+		cerr << "\n\tFILE NAMED:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
+		exit(-89);
+	}
+	else
+	{
+		return fullFileName;
+	}
 }
 

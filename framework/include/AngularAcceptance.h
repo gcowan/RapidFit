@@ -35,6 +35,7 @@ class AngularAcceptance
 
 		// Constructors
 		AngularAcceptance( string fileName, bool useHelicityBasis ) ;
+		~AngularAcceptance();
 		AngularAcceptance( const AngularAcceptance& );
 
 		// Methods for numerator of PDF to return acceptance factor

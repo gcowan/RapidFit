@@ -26,6 +26,11 @@ class ResultParameter
 		ResultParameter( string, double, double, double, double, double, string, string );
 		~ResultParameter();
 
+		bool GetAssym() const;
+		void SetAssymErrors( const double err_plus, const double err_minus, const double err_para );
+		double GetErrLow() const;
+		double GetErrHi() const;
+
 		string GetName() const;
 		double GetValue() const;
 		double GetOriginalValue() const;
@@ -63,6 +68,9 @@ class ResultParameter
 		bool ScanStatus;
 
 		string XML( const bool=true ) const;
+
+		bool assym_err;
+		double err_hi, err_low;
 };
 
 #endif
