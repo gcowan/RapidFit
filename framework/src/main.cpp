@@ -75,7 +75,7 @@ void RapidFitWelcome()
 	size_t found = string( STR(SVN_REV) ).find( mod );
 
 #ifdef __RAPIDFIT_USE_GSL
-	cout << "Compiled With Optional GSL Components"
+	cout << "Compiled With Optional GSL Components";
 #endif
 
 	if( found != string::npos )
