@@ -170,6 +170,8 @@ int main( int argc, char* argv[] )
 
 	//	Perform analysis
 
+	TMultiGraph* GraphsToOverlay = new TMultiGraph( "top_level_overlay", "top_level_overlay" );
+
 	for( vector<struct study_to_plot*>::iterator study_i =  Studies_to_Plot.begin(); study_i != Studies_to_Plot.end(); ++study_i )
 	{
 		if( (*study_i)->control_parameters.empty() == true )
@@ -189,7 +191,8 @@ int main( int argc, char* argv[] )
 				if( (*study_i)->control_parameters.size() == 1 )
 				{
 					cout << "\n\tPlotting the Results in LLscan format.\n" << endl;
-					RapidLL::PlotRapidLL( (*study_i)->control_parameters[0], (*study_i)->tree_to_plot, rand_gen, other_params );
+					TGraph* thisGraph = RapidLL::PlotRapidLL( (*study_i)->control_parameters[0], (*study_i)->tree_to_plot, rand_gen, other_params );
+					GraphsToOverlay->Add( thisGraph );
 				}
 				else if( (*study_i)->control_parameters.size() == 2 )
 				{
@@ -201,6 +204,15 @@ int main( int argc, char* argv[] )
 	}
 
 	//	Merge multiple outputs
+
+	if( GraphsToOverlay->GetListOfGraphs()->Capacity() > 1 )
+	{
+		TCanvas* newOverlay = new TCanvas( "OverlayCanvas", "OverlayCanvas", 1680, 1050 );
+		GraphsToOverlay->GetListOfGraphs()->At(0)->Draw("APL");
+		GraphsToOverlay->Draw("PL");
+		newOverlay->Update();
+		newOverlay->Print("Overlay_Graph.pdf");
+	}
 
 	//	To be written, but this will likely call member functions in each Analysis space to add multiple plots which are returned from each file analysed.
 

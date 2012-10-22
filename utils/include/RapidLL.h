@@ -6,11 +6,16 @@
 #include "TRandom3.h"
 #include "TGraph.h"
 
+#include <vector>
+#include <string>
+
+using namespace::std;
+
 class RapidLL
 {
 	public:
 
-		static int PlotRapidLL( TString controlled_parameter, TTree* input_trees, TRandom3* rand_gen, vector<string> other_params );
+		static TGraph* PlotRapidLL( TString controlled_parameter, TTree* input_trees, TRandom3* rand_gen, vector<string> other_params );
 
 		//	Do the work to extract a pair of vectors
 		//	X data is stored in output.first

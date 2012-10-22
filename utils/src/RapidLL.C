@@ -62,7 +62,7 @@ using namespace::std;
 	return 0;
 }*/
 
-int RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, TRandom3* rand_gen, vector<string> other_params )
+TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, TRandom3* rand_gen, vector<string> other_params )
 {
 	(void) other_params;
 
@@ -212,7 +212,7 @@ int RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, TRand
 		Histogram_Processing::Silent_Print( param_c, param_file+"_"+error_suffix+".png" );
 	}
 
-	return 0;
+	return color_graph;
 }
 
 pair<vector<double>,vector<double> > RapidLL::LL_Plot_Histo( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString NLL, TString param )

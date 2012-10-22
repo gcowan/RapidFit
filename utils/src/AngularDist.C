@@ -20,6 +20,11 @@ void AngDist( int argc, char* argv[] );
 
 int main( int argc, char* argv[] )
 {
+	if( argc != 2 )
+	{
+		cout << "Usage: " << argv[0] << " someInputFile.root"<< endl;
+		exit(0);
+	}
 	AngDist(argc,argv);
 	return 0;
 }
@@ -39,7 +44,7 @@ void AngDist( int argc, char* argv[] )
 
 	//TString CutString="sWeight*(time>0.3&&time<20.)";
 
-	TString CutString="(time>0.3&&time<20.)&&"+MassCut;
+	TString CutString="(time>0.3&&time<14.)&&"+MassCut;
 
 	int binning_costheta = 7;	double costheta_hi=1., costheta_lo=-1.;
 	int binning_cospsi = 5;		double cospsi_hi=1., cospsi_lo=-1.;
@@ -49,9 +54,9 @@ void AngDist( int argc, char* argv[] )
 	int binning_costhetaL = 24;	double costhetaL_lo=-1., costhetaL_hi=1.;
 	int binning_phih = 5;		double helphi_lo=-TMath::Pi(), helphi_hi=TMath::Pi();
 
-	TString cosPsiName="cosPsi";//"trcospsi";
-	TString cosThetaName="cosTheta";//"trcostheta";
-	TString phiName="phi";//"trphi";
+	TString cosPsiName="trcospsi";
+	TString cosThetaName="trcostheta";
+	TString phiName="trphi";
 
 	TString helcosthetaKName="helcosthetaK";
 	TString helcosthetaLName="helcosthetaL";

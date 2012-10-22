@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/10/22 Rob Currie
+   - Added initial attempt to Overlay multiple LL scans
+
 2012/10/20 Rob Currie
    - Added check to XML Initialization to catch obviously badly formatted XMLs
    - Created new Common StringProcessing::FindFileName to look for a file depending on where it is likely to be
