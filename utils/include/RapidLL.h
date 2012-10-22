@@ -25,6 +25,7 @@ class RapidLL
 		//	Do everyting required to return a 1DLL plot from the given 'param' branch within 'input_TTree'
 		static TGraph* LL_Plot( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString NLL, TString param, TRandom3* rand );
 
+		static void OverlayMutliplePlots( TMultiGraph* graph );
 };
 
 #endif

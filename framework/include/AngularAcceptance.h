@@ -54,6 +54,7 @@ class AngularAcceptance
 		double getValue( double cosPsi, double cosTheta, double phi ) const;
 		double getValue( Observable* cosPsi, Observable* cosTheta, Observable* phi ) const;
 	private:	
+		AngularAcceptance& operator= ( const AngularAcceptance& );
 
 		//	double stream(ifstream& stream) ;
 

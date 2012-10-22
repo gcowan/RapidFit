@@ -46,21 +46,21 @@
 using namespace::std;
 
 /*int RapidLL::PlotRapidFitLL( TTree* input_tree, TString controlled_parameter, TRandom3* rand, vector<string> other_params )
-{
-	(void) other_params;
+  {
+  (void) other_params;
 
-	vector<string> controlled_parameters( 1, controlled_parameter.Data() );
+  vector<string> controlled_parameters( 1, controlled_parameter.Data() );
 
-	vector<TString> free_parameters = 
+  vector<TString> free_parameters = 
 
-	TString Draw_String = controlled_parameter+value_suffix + ":NLL";
+  TString Draw_String = controlled_parameter+value_suffix + ":NLL";
 
-	TString Cut_String = "Fit_Status==3";
+  TString Cut_String = "Fit_Status==3";
 
-	vector<vector<double> > plotting_data = TTree_Processing::Plotter_Data( input_tree, Draw_String, Cut_String, rand );
+  vector<vector<double> > plotting_data = TTree_Processing::Plotter_Data( input_tree, Draw_String, Cut_String, rand );
 
-	return 0;
-}*/
+  return 0;
+  }*/
 
 TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, TRandom3* rand_gen, vector<string> other_params )
 {
@@ -79,7 +79,24 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	//      Make OutputDir
 	TDirectory* output_dir=NULL;
-	gSystem->mkdir( output_path );
+
+	TString pwd = TString( gSystem->WorkingDirectory() );
+
+	if( gSystem->mkdir( output_path ) < 0 )
+	{
+		int could_make=-1;
+		for( unsigned int i=0; could_make < 0; ++i )
+		{
+			TString new_output_path = output_path;
+			new_output_path.Append("_"); new_output_path+=i;
+			could_make = gSystem->mkdir( output_path );
+			if( could_make >= 0 )
+			{
+				output_path=new_output_path;
+				break;
+			}
+		}
+	}
 	gSystem->cd( output_path );
 	output_dir=gDirectory;
 
@@ -212,6 +229,9 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 		Histogram_Processing::Silent_Print( param_c, param_file+"_"+error_suffix+".png" );
 	}
 
+
+	gSystem->cd( pwd );
+
 	return color_graph;
 }
 
@@ -275,3 +295,67 @@ TGraph* RapidLL::LL_Plot( TTree* input_TTree, TString Cut_String, double Global_
 
 	return new_graph;
 }
+
+void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
+{
+	TString OverlayName="OverlayPlots";
+	gSystem->mkdir( OverlayName );
+	gSystem->cd( OverlayName );
+
+	string timeStamp = StringOperations::TimeString();
+
+	TCanvas* newOverlay = new TCanvas( "OverlayCanvas", "OverlayCanvas", 1680, 1050 );
+
+	TLegend* thisLegend = EdStyle::LHCbLegend();
+	GraphsToOverlay->Draw("A");
+	newOverlay->Update();
+
+	for( unsigned int i=0; i< GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
+	{
+		TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At(i);
+		thisGraph->SetLineColor( (Color_t)(i+1) );
+		thisGraph->SetMarkerColor( (Color_t)(i+1) );
+		thisGraph->SetFillColor( kWhite );
+	}
+	GraphsToOverlay->Draw("PC");
+	newOverlay->Update();
+	for( unsigned int i=0; i< GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
+	{
+		TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At(i);
+		TString Name="#Delta Log Likelihood Function ";Name+=(i+1);
+		thisLegend->AddEntry( thisGraph, Name );
+	}
+	thisLegend->Draw();
+	newOverlay->Update();
+
+	GraphsToOverlay->GetXaxis()->SetTitle( ((TGraph*)GraphsToOverlay->GetListOfGraphs()->At(0) )->GetXaxis()->GetTitle() );
+	GraphsToOverlay->GetYaxis()->SetTitle( ((TGraph*)GraphsToOverlay->GetListOfGraphs()->At(0) )->GetYaxis()->GetTitle() );
+	newOverlay->Update();
+
+	TString Name="Overlay_Graph";
+	newOverlay->Print(Name+".pdf");
+	newOverlay->Print(Name+".C");
+	Name.Append("_");Name.Append(timeStamp);
+	newOverlay->Print(Name+".pdf");
+	newOverlay->Print(Name+".C");
+
+
+	TCanvas* newOverlay2 = new TCanvas( "OverlayCanvas2", "OverlayCanvas2", 1680, 1050 );
+	
+	GraphsToOverlay->Draw("A");
+	newOverlay2->Update();
+	
+	GraphsToOverlay->Draw("C");
+	thisLegend->Draw();
+	newOverlay2->Update();
+
+	Name="Overlay_Graph_noPoints";
+	newOverlay2->Print(Name+".pdf");
+	newOverlay2->Print(Name+".C");
+	Name.Append("_");Name.Append(timeStamp);
+	newOverlay2->Print(Name+".pdf");
+	newOverlay2->Print(Name+".C");
+	
+	return;
+}
+

@@ -51,7 +51,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ), logY( (config!=NULL)?config->logY:false ),
 	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false ),
 	combination_integral(0.), ratioOfIntegrals(1,1.), wanted_weights(), format(), data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(),
-	total_components(), chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num)
+	total_components(), chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num), weight_err()
 {
 	if( Debug != NULL ) debug = new DebugClass(*Debug);
 	else debug = new DebugClass(false);
@@ -94,7 +94,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	step_size = ( boundary_max - boundary_min ) / (double)( total_points - 1 );
 
 	//Work out what to plot
-	allCombinations = this->GetDiscreteCombinations( combinationWeights, combinationDescriptions );
+	allCombinations = full_boundary->GetDiscreteCombinations();
 
 	for( unsigned int i=0; i< allCombinations.size(); ++i )
 	{
@@ -417,12 +417,14 @@ void ComponentPlotter::GenerateProjectionData()
 		}
 	}
 
+	/*
 	vector<int> num_observables;
 	for( unsigned int i=0; i< observableValues.size(); ++i )
 	{
 		num_observables.push_back( (int)observableValues[i].size() );
 		//cout << "Combination: " << i+1 << " has " << num_observables.back() << " events." << endl;
 	}
+	*/
 
 
 	//vector<double> plotInterval, projectionIntegral;
@@ -1586,7 +1588,6 @@ void ComponentPlotter::Sanity_Check( vector<double>* pointValues, TString compon
 	}
 }
 
-
 //	Calculate the statistics and return each data subset corresponding to each combination that has been defined
 vector<vector<double> > ComponentPlotter::GetCombinationStatistics( string ObservableName, vector<double>& Min, vector<double>& Max, vector<int>& BinNum )
 {
@@ -1666,137 +1667,6 @@ vector<vector<double> > ComponentPlotter::GetCombinationStatistics( string Obser
 	}
 
 	return temp_discrete_observableValues;
-}
-
-//Return a list of data points
-//Each should take the data average value of each continuous observable
-//Each should represent one combination of possible discrete values
-vector<DataPoint*> ComponentPlotter::GetDiscreteCombinations( vector<double>& DataPointWeights, vector<string>& DataPointDescriptions )
-{
-	//Calculate all possible combinations of discrete observables
-	vector<string> allNames = full_boundary->GetAllNames();
-	vector<vector<double> > discreteValues;
-	vector< vector<double> > discreteCombinations = StatisticsFunctions::DiscreteCombinations( &allNames, plotData->GetBoundary(), discreteNames, continuousNames, discreteValues );
-
-	//Initialise the data averaging
-	vector<double> continuousSums, continuousStdevs;
-	vector<long> combinationCounts;
-	for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
-	{
-		continuousSums.push_back(0.0);
-		continuousStdevs.push_back(0.0);
-	}
-	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
-	{
-		combinationCounts.push_back(0);
-	}
-
-	//Examine the data set. Find the average value for each continuous observable, and the weight for each discrete combination
-	for (int dataIndex = 0; dataIndex < plotData->GetDataNumber(); ++dataIndex )
-	{
-		DataPoint* readDataPoint = plotData->GetDataPoint(dataIndex);
-
-		//Sum the continuous values, in preparation for taking the average
-		for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
-		{
-			continuousSums[continuousIndex] += readDataPoint->GetObservable( continuousNames[continuousIndex] )->GetValue();
-		}
-
-		//Calculate the index for the discrete combination, and increment the corresponding count
-		int combinationIndex = 0;
-		int incrementValue = 1;
-		for (int discreteIndex = int(discreteNames.size() - 1); discreteIndex >= 0; discreteIndex-- )
-		{
-			double currentValue = readDataPoint->GetObservable( discreteNames[unsigned(discreteIndex)] )->GetValue();
-
-			for (unsigned int valueIndex = 0; valueIndex < discreteValues[unsigned(discreteIndex)].size(); ++valueIndex )
-			{
-				if ( fabs( discreteValues[unsigned(discreteIndex)][valueIndex] - currentValue ) < DOUBLE_TOLERANCE )
-				{
-					combinationIndex += ( incrementValue * int(valueIndex) );
-					incrementValue *= int(discreteValues[unsigned(discreteIndex)].size());
-					break;
-				}
-			}
-		}
-		++combinationCounts[unsigned(combinationIndex)];
-	}
-
-	//Calculate averages and weights
-	vector<double> this_combinationWeights;
-	double dataNumber = (double)plotData->GetDataNumber();
-	for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
-	{
-		continuousSums[continuousIndex] /= dataNumber;
-		for( int dataIndex = 0; dataIndex < dataNumber; ++dataIndex )
-		{
-			DataPoint* readDataPoint = plotData->GetDataPoint(dataIndex);
-			double val = readDataPoint->GetObservable( continuousNames[continuousIndex] )->GetValue();
-			continuousStdevs[continuousIndex]+=( val - continuousSums[continuousIndex] )*( val -continuousSums[continuousIndex] );
-		}
-		continuousStdevs[continuousIndex] = sqrt( continuousStdevs[continuousIndex] );
-		continuousStdevs[continuousIndex] /= ((double)dataNumber-1.);
-	}
-	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
-	{
-		this_combinationWeights.push_back( (double)combinationCounts[combinationIndex] / (dataNumber) );
-	}
-	if( discreteCombinations.size() == 0 )
-	{
-		this_combinationWeights.push_back( 1. );
-	}
-
-	//Create the data points to return
-	vector<DataPoint*> newDataPoints;
-	vector<string> allDescriptions;
-
-	for (unsigned int combinationIndex = 0; combinationIndex < discreteCombinations.size(); ++combinationIndex )
-	{
-		DataPoint* templateDataPoint = new DataPoint( full_boundary->GetAllNames() );
-
-		for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
-		{
-			Observable* oldValue = templateDataPoint->GetObservable( continuousNames[continuousIndex] );
-			Observable* newValue = new Observable( oldValue->GetName(), continuousSums[continuousIndex], continuousStdevs[continuousIndex], oldValue->GetUnit() );
-			templateDataPoint->SetObservable( continuousNames[continuousIndex], newValue );
-			delete newValue;
-		}
-
-		string description = "(";
-
-		//Output the discrete values for this combination
-		for (unsigned int discreteIndex = 0; discreteIndex < discreteNames.size(); ++discreteIndex )
-		{
-			//Set the data point
-			Observable* oldValue = templateDataPoint->GetObservable( discreteNames[discreteIndex] );
-
-			Observable* newValue = new Observable( oldValue->GetName(), discreteCombinations[combinationIndex][discreteIndex],
-					0, oldValue->GetUnit() );
-			templateDataPoint->SetObservable( discreteNames[discreteIndex], newValue );
-			delete newValue;
-
-			stringstream valuestream;
-			valuestream << discreteCombinations[combinationIndex][discreteIndex];
-			string value = valuestream.str();
-
-			description.append(discreteNames[discreteIndex]);
-			description.append("=");
-			description.append(value);
-
-			if( discreteIndex != discreteNames.size() - 1 ) description.append(")(");
-		}
-
-		description.append(")");
-		allDescriptions.push_back(description);
-		newDataPoints.push_back(templateDataPoint);
-	}
-
-	cout << "Unique Combinations: " << newDataPoints.size() << endl << endl;
-
-	//Output the results
-	DataPointDescriptions = allDescriptions;
-	DataPointWeights = this_combinationWeights;
-	return newDataPoints;
 }
 
 void ComponentPlotter::SetWeightsWereUsed( string input )

@@ -424,19 +424,6 @@ class ComponentPlotter
 		vector<PhaseSpaceBoundary*> GeneratePhaseSpaceBoundary( vector<DataPoint*> AllCombinations, vector<double> minimum, vector<double> maximum, vector<double>& plotInterval );
 
 		/*!
-		 * @brief heavily altered this to generate a vector of datapoints which each contain a unique combination of discrete observable(s)
-		 *
-		 * This gives the Weights of each Discrete Combination so that when the PDF is normalised you get the correct amount of eg:  tagged +1 vs tagged -1
-		 *
-		 * @param DataPointWeights      This will be populated with the Weight of Each Unique Discrete Combination
-		 *
-		 * @param DataPointDescriptions This will be populated with a string for each Discrete Combination to describe the DataSet
-		 *
-		 * @return This will return a DataPoint for each Discrete Combination. The Values of the Observables are defined as the central values from the PhaseSpace
-		 */
-		vector<DataPoint*> GetDiscreteCombinations( vector<double>& DataPointWeights, vector<string>& DataPointDescriptions );
-
-		/*!
 		 * @brief helper function for testing that the integrator has actually worked
 		 *
 		 * This is a check that everything worked.

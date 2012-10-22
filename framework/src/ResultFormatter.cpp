@@ -19,6 +19,7 @@
 #include "TGraphErrors.h"
 #include "TString.h"
 #include "TSystem.h"
+#include "TMatrixDSym.h"
 ///	RapidFit Headers
 #include "ResultFormatter.h"
 #include "StatisticsFunctions.h"
@@ -830,6 +831,21 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 		parameterNTuple->Fill( resultArr );
 		delete [] resultArr;
 	}
+	vector<double> MatrixElements;
+        TTree * tree = new TTree("corr_matrix", "Elements from Correlation Matricies");
+	tree->Branch("MartrixElements", "std::vector<double>", &MatrixElements );
+	for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
+	{
+		TMatrixDSym* thisMatrix = ToyResult->GetFitResult(resultIndex)->GetCovarianceMatrix()->thisMatrix;
+		double* MatrixArray = thisMatrix->GetMatrixArray();
+		MatrixElements.clear();
+		for( unsigned int i=0; i< (unsigned) thisMatrix->GetNoElements(); ++i )
+		{
+			MatrixElements.push_back( MatrixArray[i] );
+		}
+		tree->Fill();
+	}
+	tree->Write("",TObject::kOverwrite);
 	rootFile->Write();
 	rootFile->Close();
 	//	THIS SHOULD BE SAFE... BUT THIS IS ROOT so 'of course' it isn't...

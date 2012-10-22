@@ -32,7 +32,7 @@ using namespace::std;
 FitFunction::FitFunction() :
 	Name("Unknown"), allData(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
-	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0)
+	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), gslIntegrator(false)
 {
 }
 
@@ -323,7 +323,7 @@ double FitFunction::Evaluate()
 		Fit_Tree->Write("",TObject::kOverwrite);
 		Fit_File->Write("",TObject::kOverwrite);
 	}
-	cout << "Call: " << left << setw(5) << callNum << " NLL: " << setprecision(10) << minimiseValue << "\b\b\b\b\r\r\r\r" << flush;
+	cout << "Call: " << left << setw(5) << callNum << " NLL: " << setprecision(10) << minimiseValue << setw(10) << " " <<  "\r" << flush;
 	if( isnan(minimiseValue) )
 	{
 		minimiseValue = DBL_MAX;

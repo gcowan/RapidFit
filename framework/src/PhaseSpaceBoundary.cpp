@@ -421,7 +421,18 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 
 	//	Get all possible discrete combination datapoints and the names of all discrete observables
 	vector<DataPoint*> allCombinations = this->GetDiscreteCombinations();
-	if( allCombinations.empty() || allCombinations.size() == 1 ) return 0;
+	if( allCombinations.empty() )
+	{
+		Input->SetDiscreteIndex( 0 );
+		return 0;
+	}
+	if( allCombinations.size() == 1 )
+	{
+		if( allCombinations.back() != NULL ) delete allCombinations.back();
+		Input->SetDiscreteIndex( 0 );
+		return 0;
+	}
+
 	vector<string> allDiscreteNames = this->GetDiscreteNames();
 
 	//	Construct array of ObservableRef objects to pick out Discrete Observables
@@ -508,7 +519,7 @@ int PhaseSpaceBoundary::GetNumberCombinations() const
 
 	vector<DataPoint*> thisMany = this->GetDiscreteCombinations();
 
-	if( thisMany.empty() || (thisMany.size() == 0) )
+	if( thisMany.empty() )
 	{
 		DiscreteCombinationNumber = 1;
 	}

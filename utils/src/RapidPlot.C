@@ -142,7 +142,7 @@ int main( int argc, char* argv[] )
 	for( unsigned int file_i=0; file_i < input_trees.size(); ++file_i )
 	{
 		vector<string> controlled_parameters_scan = RapidFit_Output_File::get_control_parameters( input_trees[file_i] );
-	
+
 		vector<string> controlled_parameters;
 		for( vector<string>::iterator index_i = controlled_parameters_scan.begin(); index_i != controlled_parameters_scan.end(); ++index_i )
 		{
@@ -171,6 +171,8 @@ int main( int argc, char* argv[] )
 	//	Perform analysis
 
 	TMultiGraph* GraphsToOverlay = new TMultiGraph( "top_level_overlay", "top_level_overlay" );
+
+	TString Here = TString( gSystem->pwd() );
 
 	for( vector<struct study_to_plot*>::iterator study_i =  Studies_to_Plot.begin(); study_i != Studies_to_Plot.end(); ++study_i )
 	{
@@ -201,17 +203,59 @@ int main( int argc, char* argv[] )
 				}
 			}
 		}
+		gSystem->cd( Here );
 	}
 
 	//	Merge multiple outputs
 
 	if( GraphsToOverlay->GetListOfGraphs()->Capacity() > 1 )
 	{
+		RapidLL::OverlayMutliplePlots( GraphsToOverlay );
+		/*
+		string timeStamp = StringOperations::TimeString(); 
 		TCanvas* newOverlay = new TCanvas( "OverlayCanvas", "OverlayCanvas", 1680, 1050 );
-		GraphsToOverlay->GetListOfGraphs()->At(0)->Draw("APL");
-		GraphsToOverlay->Draw("PL");
+		TLegend* thisLegend = EdStyle::LHCbLegend();
+		GraphsToOverlay->Draw("A");                                       
 		newOverlay->Update();
-		newOverlay->Print("Overlay_Graph.pdf");
+		for( unsigned int i=0; i< GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
+		{
+			TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At(i);
+			thisGraph->SetLineColor( (Color_t)(i+1) );
+			thisGraph->SetMarkerColor( (Color_t)(i+1) );
+			thisGraph->SetFillColor( kWhite );
+		}
+		GraphsToOverlay->Draw("PC");                                      
+		newOverlay->Update();
+		for( unsigned int i=0; i< GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
+		{
+			TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At(i);
+			TString Name="#Delta Log Likelihood Function ";Name+=(i+1);
+			thisLegend->AddEntry( thisGraph, Name );
+		}
+		thisLegend->Draw();
+		newOverlay->Update();
+		GraphsToOverlay->GetXaxis()->SetTitle( ((TGraph*)GraphsToOverlay->GetListOfGraphs()->At(0) )->GetXaxis()->GetTitle() );
+		GraphsToOverlay->GetYaxis()->SetTitle( ((TGraph*)GraphsToOverlay->GetListOfGraphs()->At(0) )->GetYaxis()->GetTitle() );
+		newOverlay->Update();
+		TString Name="Overlay_Graph";
+		newOverlay->Print(Name+".pdf");
+		newOverlay->Print(Name+".C");
+		Name.Append("_");Name.Append(timeStamp);
+		newOverlay->Print(Name+".pdf");
+		newOverlay->Print(Name+".C");
+		TCanvas* newOverlay2 = new TCanvas( "OverlayCanvas2", "OverlayCanvas2", 1680, 1050 );
+		GraphsToOverlay->Draw("A");
+		newOverlay2->Update();
+		GraphsToOverlay->Draw("C");
+		thisLegend->Draw();
+		newOverlay2->Update();
+		Name="Overlay_Graph_noPoints";
+		newOverlay2->Print(Name+".pdf");
+		newOverlay2->Print(Name+".C");
+		Name.Append("_");Name.Append(timeStamp);
+		newOverlay2->Print(Name+".pdf");
+		newOverlay2->Print(Name+".C");
+		*/
 	}
 
 	//	To be written, but this will likely call member functions in each Analysis space to add multiple plots which are returned from each file analysed.

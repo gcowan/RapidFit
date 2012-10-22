@@ -2,6 +2,12 @@
 
 2012/10/22 Rob Currie
    - Added initial attempt to Overlay multiple LL scans
+   - Updated the Overlay LL Code to call static function in RapidLL which is cleaner
+   - Started removing redundant code from ComponentPlotter.
+       This code which used to exist within Plotter but has been either moved or made redundant due improvements in the codebase.
+       This allows the codebase to be made much cleaner and easier to understand
+   - Fixed Memleak in BasePDF to do with caching of objects with just 1 discrete observable with 1 value in the PhaseSpace Boundary.
+       This wouldn't have effected final results, just would have made RapidFit grind to an eventual halt when no memory was left
 
 2012/10/20 Rob Currie
    - Added check to XML Initialization to catch obviously badly formatted XMLs
