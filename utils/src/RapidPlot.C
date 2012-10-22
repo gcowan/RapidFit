@@ -170,10 +170,10 @@ int main( int argc, char* argv[] )
 
 	//	Perform analysis
 
+	//	Construct Objects which must be used to store the result from mutliple scans for merging the output
 	TMultiGraph* GraphsToOverlay = new TMultiGraph( "top_level_overlay", "top_level_overlay" );
 
 	TString Here = TString( gSystem->pwd() );
-
 	for( vector<struct study_to_plot*>::iterator study_i =  Studies_to_Plot.begin(); study_i != Studies_to_Plot.end(); ++study_i )
 	{
 		if( (*study_i)->control_parameters.empty() == true )
@@ -203,6 +203,7 @@ int main( int argc, char* argv[] )
 				}
 			}
 		}
+
 		gSystem->cd( Here );
 	}
 
@@ -211,54 +212,9 @@ int main( int argc, char* argv[] )
 	if( GraphsToOverlay->GetListOfGraphs()->Capacity() > 1 )
 	{
 		RapidLL::OverlayMutliplePlots( GraphsToOverlay );
-		/*
-		string timeStamp = StringOperations::TimeString(); 
-		TCanvas* newOverlay = new TCanvas( "OverlayCanvas", "OverlayCanvas", 1680, 1050 );
-		TLegend* thisLegend = EdStyle::LHCbLegend();
-		GraphsToOverlay->Draw("A");                                       
-		newOverlay->Update();
-		for( unsigned int i=0; i< GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
-		{
-			TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At(i);
-			thisGraph->SetLineColor( (Color_t)(i+1) );
-			thisGraph->SetMarkerColor( (Color_t)(i+1) );
-			thisGraph->SetFillColor( kWhite );
-		}
-		GraphsToOverlay->Draw("PC");                                      
-		newOverlay->Update();
-		for( unsigned int i=0; i< GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
-		{
-			TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At(i);
-			TString Name="#Delta Log Likelihood Function ";Name+=(i+1);
-			thisLegend->AddEntry( thisGraph, Name );
-		}
-		thisLegend->Draw();
-		newOverlay->Update();
-		GraphsToOverlay->GetXaxis()->SetTitle( ((TGraph*)GraphsToOverlay->GetListOfGraphs()->At(0) )->GetXaxis()->GetTitle() );
-		GraphsToOverlay->GetYaxis()->SetTitle( ((TGraph*)GraphsToOverlay->GetListOfGraphs()->At(0) )->GetYaxis()->GetTitle() );
-		newOverlay->Update();
-		TString Name="Overlay_Graph";
-		newOverlay->Print(Name+".pdf");
-		newOverlay->Print(Name+".C");
-		Name.Append("_");Name.Append(timeStamp);
-		newOverlay->Print(Name+".pdf");
-		newOverlay->Print(Name+".C");
-		TCanvas* newOverlay2 = new TCanvas( "OverlayCanvas2", "OverlayCanvas2", 1680, 1050 );
-		GraphsToOverlay->Draw("A");
-		newOverlay2->Update();
-		GraphsToOverlay->Draw("C");
-		thisLegend->Draw();
-		newOverlay2->Update();
-		Name="Overlay_Graph_noPoints";
-		newOverlay2->Print(Name+".pdf");
-		newOverlay2->Print(Name+".C");
-		Name.Append("_");Name.Append(timeStamp);
-		newOverlay2->Print(Name+".pdf");
-		newOverlay2->Print(Name+".C");
-		*/
 	}
 
-	//	To be written, but this will likely call member functions in each Analysis space to add multiple plots which are returned from each file analysed.
+	//	2D case possible to be written but as of this time 2012/10 There is no useful call to write this so it has not been addressed
 
 	return 0;
 }

@@ -369,59 +369,7 @@ class ComponentPlotter
 		//	Functions used internally within this class
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		/*!
-		 * @brief Populate a vector of datasets containing the observable Values from the input fit
-		 *
-		 * Populates the minimum, maximum and binNumber vectors
-		 *
-		 * At the moment I use the min, max and binnum of the total dataset for this PDF (all combinations)
-		 * There exists the possibility to expand this to look at different datasets rather trivially but this isn't required (yet?)
-		 * This may change depending on the required output
-		 *
-		 * @param Name   This is the Name of the Observable being Projected
-		 *
-		 * @param Min    This contains the minimum value of each of the Discrete Combinations in the PhaseSpace
-		 *
-		 * @param Max    This contains the maximum value of each of the Discrete Combinations in the PhaseSpace
-		 *
-		 * @param Bins   This the is the optimal numbers that you should use should the data be Gaussianly distributed
-		 *
-		 *
-		 * @return This returns the Values sorted into each Discrete Combination
-		 */
-		vector<vector<double> > GetCombinationStatistics( string Name, vector<double>& Min, vector<double>& Max, vector<int>& Bins );
-
-		/*!
-		 * @brief Calculate the min, max and optimal binnum of the observable in question
-		 *
-		 * Uses the total dataset from this PDF atm...
-		 *
-		 * @param Name   This is the name of the Observable being tested
-		 *
-		 * @param Min    This is the absolute minimum of this Observable in the whole PhaseSpace
-		 *
-		 * @param Max    This is the absolute maximum of this Observable in the whole PhaseSpace
-		 *
-		 * @param Bins   This is the optimal Binning for the Whole DataSet if it wa all Gaussianly Distributed
-		 *
-		 * @return This returns all of the values of this Observable in the DataSet
-		 */
-		vector<double> GetStatistics( string Name, double& Min, double& Max, int& Bins );
-
-		/*!
-		 * @brief Generate all unique discrete phase-space boundaries and initialize plotInterval object
-		 *
-		 * @param AllCombinations   This contains a vector of each of the Unique Discrete DataSets within the PhaseSpace
-		 *
-		 * @param minimum           This contains the Minimum for the Projected Observable in this subset
-		 *
-		 * @param maximum           This contains the Maximum for the Projected Observable in this subset
-		 *
-		 * @param plotInterval      This contains the Effective Step size to take in this Obervble in this Discrete PhaseSpace
-		 *
-		 * @return This returns a vector of PhaseSpaces each containing a single Discrete DataSet Combination with the appropriate upper and lower limits
-		 */
-		vector<PhaseSpaceBoundary*> GeneratePhaseSpaceBoundary( vector<DataPoint*> AllCombinations, vector<double> minimum, vector<double> maximum, vector<double>& plotInterval );
+		void SetupCombinationDescriptions();
 
 		/*!
 		 * @brief helper function for testing that the integrator has actually worked

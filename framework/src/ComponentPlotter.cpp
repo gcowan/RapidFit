@@ -96,6 +96,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	//Work out what to plot
 	allCombinations = full_boundary->GetDiscreteCombinations();
 
+	this->SetupCombinationDescriptions();
+
 	for( unsigned int i=0; i< allCombinations.size(); ++i )
 	{
 		pdfIntegrator->ForceTestStatus( false );
@@ -127,7 +129,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	vector<int> binNumber;
 
 	//Get the data needed to make the histogram
-	observableValues = GetCombinationStatistics( observableName, minimum, maximum, binNumber );
+	//observableValues = GetCombinationStatistics( observableName, minimum, maximum, binNumber );
 
 	(void) minimum; (void) maximum; (void) binNumber;
 
@@ -281,12 +283,12 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 		//cout << "combinationWeights[combinationIndex]: " << combinationWeights[combinationIndex] << endl;
 
 		/*
-		cout << "combination_integral[combinationIndex]: " << combination_integral[combinationIndex] << endl;
-		cout << "fabs(ratioOfIntegrals[combinationIndex]): " << fabs(ratioOfIntegrals[combinationIndex]) << endl;
-		cout << "n_events: " << n_events << endl;
-		cout << "range: " << range << endl;
-		cout << "double(data_binning): " << double(data_binning) << endl;
-		*/
+		   cout << "combination_integral[combinationIndex]: " << combination_integral[combinationIndex] << endl;
+		   cout << "fabs(ratioOfIntegrals[combinationIndex]): " << fabs(ratioOfIntegrals[combinationIndex]) << endl;
+		   cout << "n_events: " << n_events << endl;
+		   cout << "range: " << range << endl;
+		   cout << "double(data_binning): " << double(data_binning) << endl;
+		   */
 
 		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM ORIGINAL PLOTTER CLASS
 		for( int pointIndex = 0; pointIndex < total_points; ++pointIndex )
@@ -351,37 +353,6 @@ vector<vector<double>* >* ComponentPlotter::GenerateComponentZero( vector<vector
 	return new_dataarray;
 }
 
-
-//	Generate all unique discrete phase-space boundaries and initialize plotInterval object
-vector<PhaseSpaceBoundary*> ComponentPlotter::GeneratePhaseSpaceBoundary( vector<DataPoint*> AllCombinations, vector<double> minimum, vector<double> maximum, vector<double>& plotInterval )
-{
-	vector<PhaseSpaceBoundary*> discrete_boundaries;
-	//      for each combination of components in the PDF phasespace
-	for( unsigned int combinationIndex=0; combinationIndex< AllCombinations.size(); ++combinationIndex )
-	{
-		//      Copy the phasespace so we can safely alter and destroy it
-		PhaseSpaceBoundary* new_boundary = new PhaseSpaceBoundary( *full_boundary );
-
-		//      Store the plotInterval (stepsize) for this observable combination
-		plotInterval.push_back( ( maximum[combinationIndex] - minimum[combinationIndex] ) / (double)( total_points - 1 ) );
-
-		//      for each discrete observable
-		for( unsigned int discreteIndex=0; discreteIndex< discreteNames.size(); ++discreteIndex )
-		{
-			//      Read this unique combination
-			double val = AllCombinations[combinationIndex]->GetObservable( discreteNames[discreteIndex] )->GetValue();
-			vector<double> constraint_val; constraint_val.push_back( val );
-			//      Store the combination so that we have set the phase-space up
-			new_boundary->SetConstraint( discreteNames[discreteIndex], constraint_val,
-					AllCombinations[combinationIndex]->GetObservable( discreteNames[discreteIndex] )->GetUnit() );
-		}
-		//      Store the boundary
-		discrete_boundaries.push_back( new_boundary );
-	}
-
-	return discrete_boundaries;
-}
-
 //	Generate Projection Data for a given Observable
 //
 //	When this function starts it collects statistical information and infromation on the boundary of the observable
@@ -392,23 +363,6 @@ vector<PhaseSpaceBoundary*> ComponentPlotter::GeneratePhaseSpaceBoundary( vector
 //
 void ComponentPlotter::GenerateProjectionData()
 {
-	//	Not interested in the max/min per subset as ROOT is unable to correctly add histograms over different ranges/binnings (almost an understandable issue)
-	//if( plotData->GetBoundary() != NULL )
-	//{
-	//	if( minimum.size() != observableValues.size() ) minimum.resize( observableValues.size() );
-	//	if( maximum.size() != observableValues.size() ) maximum.resize( observableValues.size() );
-	//	for( unsigned int i=0; i<= minimum.size(); ++i )
-	//	{
-	//		minimum[i] = boundary_min;
-	//		maximum[i] = boundary_max;
-	//	}
-	//}
-	//else
-	//{
-	//	cerr << "Cannot normalise without a valid Boundary in the PhaseSpace!!!" << endl;
-	//	exit(12375);
-	//}
-
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass( "ComponentPlotter" ) )
@@ -416,23 +370,6 @@ void ComponentPlotter::GenerateProjectionData()
 			cout << "ComponentPlotter: Counting Number of Events " << endl;
 		}
 	}
-
-	/*
-	vector<int> num_observables;
-	for( unsigned int i=0; i< observableValues.size(); ++i )
-	{
-		num_observables.push_back( (int)observableValues[i].size() );
-		//cout << "Combination: " << i+1 << " has " << num_observables.back() << " events." << endl;
-	}
-	*/
-
-
-	//vector<double> plotInterval, projectionIntegral;
-
-	//vector<PhaseSpaceBoundary*> discrete_boundaries = this->GeneratePhaseSpaceBoundary( allCombinations, minimum, maximum, plotInterval );
-
-
-	//if( allCombinations.size() > 1 ) plotInterval.push_back( ( maximum.back() - minimum.back() ) / (double)( total_points - 1 ) );
 
 	//	Now we have:
 	//			plot phase-space
@@ -1472,27 +1409,75 @@ void ComponentPlotter::WriteBranch( TTree* input_tree, TString Branch_Name, vect
 	}
 }
 
-//Run the statistics functions
-vector<double> ComponentPlotter::GetStatistics( string ObservableName, double & Minimum, double & Maximum, int & BinNumber )
+//	Initialize the Desciptions of the Relevant Combinations in the DataSet
+void ComponentPlotter::SetupCombinationDescriptions()
 {
-	//Make a vector of the values found for the observable
-	vector<double> this_observableValues;
-	for ( int dataIndex = 0; dataIndex < plotData->GetDataNumber(NULL,true); ++dataIndex )
-	{
-		this_observableValues.push_back( plotData->GetDataPoint(dataIndex)->GetObservable(ObservableName)->GetValue() );
-	}
+       cout << "Optimally:" << endl << endl;
 
-	//Find out number and range of data points needed
-	Maximum = StatisticsFunctions::Maximum(this_observableValues);
-	Minimum = StatisticsFunctions::Minimum(this_observableValues);
-	BinNumber = StatisticsFunctions::OptimumBinNumber(this_observableValues);
+       //      If we have 'no discrete combinations' then get the whole dataset for this pdf
+       vector<DataPoint*> whole_dataset;
 
-	cout << endl << "Optimally:\t" << "Max: " << Maximum << "\tMin: " << Minimum << "\tBinning: " << BinNumber << endl;
+       cout << plotData->GetDataNumber(NULL,true) << endl;
 
-	return this_observableValues;
+       for( int i=0; i< plotData->GetDataNumber(); ++i )
+       {
+               whole_dataset.push_back( plotData->GetDataPoint( i ) );
+       }
+
+       data_subsets.push_back( whole_dataset );
+
+       ObservableRef ObservableName( observableName ); 
+
+       vector<double> discrete_observableValues_i;
+       //      Get all values of the wanted parameter from this subset
+       for( unsigned int j=0; j< whole_dataset.size(); ++j )
+       {
+               discrete_observableValues_i.push_back( whole_dataset[j]->GetObservable( ObservableName )->GetValue() );
+       }
+
+       cout << "Combination: 1 " << "Min: " << StatisticsFunctions::Minimum( discrete_observableValues_i );
+       cout << "\tMax: " << StatisticsFunctions::Maximum( discrete_observableValues_i ) << "\tBinNum: " << StatisticsFunctions::OptimumBinNumber( discrete_observableValues_i ) << endl;
+
+       //      If we have discrete combinations then we need to loop over each set seperatley to split up the data and information about the data
+       if( allCombinations.size() > 1 )
+       {
+               //      For all discrete combinations that have been calculated elsewhere
+               for( unsigned int combinationIndex=0; combinationIndex< allCombinations.size(); ++combinationIndex )
+               {
+                       cout << "Combination: " << combinationIndex+2 << " ";
+                       //      For this combination work out what values correspond to the discrete parameters
+                       vector<double> values_for_this_combination;
+                       for( unsigned int paramIndex=0; paramIndex< discreteNames.size(); ++paramIndex )
+                       {
+                               values_for_this_combination.push_back( allCombinations[combinationIndex]->GetObservable( discreteNames[paramIndex] )->GetValue() );
+                       }
+
+                       //              Get all data which falls within this paramreter set
+                       data_subsets.push_back( plotData->GetDiscreteSubSet( discreteNames, values_for_this_combination ) );
+
+                       //print( discreteNames );
+                       //print( values_for_this_combination );
+
+                       vector<double> this_discrete_observableValues_i;
+                       //      Get all values of the wanted parameter from this subset
+                       for( unsigned int j=0; j< data_subsets.back().size(); ++j )
+                       {
+                               this_discrete_observableValues_i.push_back( (data_subsets.back())[j]->GetObservable( ObservableName )->GetValue() );
+                       }
+
+                       //print( this_discrete_observableValues_i );
+
+                       cout << "Min: " << StatisticsFunctions::Maximum( this_discrete_observableValues_i );
+                       cout << "\tMax: " << StatisticsFunctions::Maximum( this_discrete_observableValues_i );
+                       cout << "\tBinNum: " << StatisticsFunctions::OptimumBinNumber( this_discrete_observableValues_i ) << endl;
+
+               }
+       }
+
+       return;
 }
 
-//Return the values tracing the PDF projection in the Observable of choice
+		//Return the values tracing the PDF projection in the Observable of choice
 vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPoint, string ObservableName, double Minimum, int PlotNumber, double PlotInterval, string component )
 {
 	//	Move initializer(s) outside of for loop
@@ -1586,87 +1571,6 @@ void ComponentPlotter::Sanity_Check( vector<double>* pointValues, TString compon
 		cerr << "\nCheck your Plots!" << endl;
 		//exit(-99);
 	}
-}
-
-//	Calculate the statistics and return each data subset corresponding to each combination that has been defined
-vector<vector<double> > ComponentPlotter::GetCombinationStatistics( string ObservableName, vector<double>& Min, vector<double>& Max, vector<int>& BinNum )
-{
-	cout << "Optimally:" << endl << endl;
-	//	Object to contain the output data
-	vector<vector<double> > temp_discrete_observableValues;
-
-	//	If we have 'no discrete combinations' then get the whole dataset for this pdf
-	vector<DataPoint*> whole_dataset;
-
-	cout << plotData->GetDataNumber(NULL,true) << endl;
-
-	for( int i=0; i< plotData->GetDataNumber(); ++i )
-	{
-		whole_dataset.push_back( plotData->GetDataPoint( i ) );
-	}
-
-	data_subsets.push_back( whole_dataset );
-
-	vector<double> discrete_observableValues_i;
-	//	Get all values of the wanted parameter from this subset
-	for( unsigned int j=0; j< whole_dataset.size(); ++j )
-	{
-		discrete_observableValues_i.push_back( whole_dataset[j]->GetObservable( ObservableName )->GetValue() );
-	}
-
-	//	Save the min/max and optimal bin number for this subset
-	Max.push_back( StatisticsFunctions::Maximum( discrete_observableValues_i ) );
-	Min.push_back( StatisticsFunctions::Minimum( discrete_observableValues_i ) );
-	BinNum.push_back( StatisticsFunctions::OptimumBinNumber( discrete_observableValues_i ) );
-
-	cout << "Combination: 1 " << "Min: " << Min.back() << "\tMax: " << Max.back() << "\tBinNum: " << BinNum.back() << endl;
-
-	//	store all of the values of this observable
-	temp_discrete_observableValues.push_back( discrete_observableValues_i );
-
-	//	If we have discrete combinations then we need to loop over each set seperatley to split up the data and information about the data
-	if( allCombinations.size() > 1 )
-	{
-		//	For all discrete combinations that have been calculated elsewhere
-		for( unsigned int combinationIndex=0; combinationIndex< allCombinations.size(); ++combinationIndex )
-		{
-			cout << "Combination: " << combinationIndex+2 << " ";
-			//	For this combination work out what values correspond to the discrete parameters
-			vector<double> values_for_this_combination;
-			for( unsigned int paramIndex=0; paramIndex< discreteNames.size(); ++paramIndex )
-			{
-				values_for_this_combination.push_back( allCombinations[combinationIndex]->GetObservable( discreteNames[paramIndex] )->GetValue() );
-			}
-
-			//		Get all data which falls within this paramreter set
-			//vector<DataPoint*> discrete_set_i = plotData->GetDiscreteSubSet( discreteNames, values_for_this_combination );
-			data_subsets.push_back( plotData->GetDiscreteSubSet( discreteNames, values_for_this_combination ) );
-
-			//print( discreteNames );
-			//print( values_for_this_combination );
-
-			vector<double> this_discrete_observableValues_i;
-			//	Get all values of the wanted parameter from this subset
-			for( unsigned int j=0; j< data_subsets.back().size(); ++j )
-			{
-				this_discrete_observableValues_i.push_back( (data_subsets.back())[j]->GetObservable( ObservableName )->GetValue() );
-			}
-
-			//print( this_discrete_observableValues_i );
-
-			//	Save the min/max and optimal bin number for this subset
-			Max.push_back( StatisticsFunctions::Maximum( this_discrete_observableValues_i ) );
-			Min.push_back( StatisticsFunctions::Minimum( this_discrete_observableValues_i ) );
-			BinNum.push_back( StatisticsFunctions::OptimumBinNumber( this_discrete_observableValues_i ) );
-
-			cout << "Min: " << Min.back() << "\tMax: " << Max.back() << "\tBinNum: " << BinNum.back() << endl;
-
-			//	store all of the values of this observable
-			temp_discrete_observableValues.push_back( this_discrete_observableValues_i );
-		}
-	}
-
-	return temp_discrete_observableValues;
 }
 
 void ComponentPlotter::SetWeightsWereUsed( string input )
