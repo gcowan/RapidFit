@@ -281,6 +281,30 @@ void MinuitWrapper::Minimise()
 	string MinosOption("MinosErrors");
 	if( StringProcessing::VectorContains( &Options, &MinosOption ) != -1 )
 	{
+		vector<string> allFreeNames = function->GetParameterSet()->GetAllFloatNames();
+		for( unsigned int i=0; i< Options.size(); ++i )
+		{
+			string thisOption = Options[i];
+			vector<string> thisList = StringProcessing::SplitString( thisOption, ':' );
+			string Command = thisList[0];
+			if( Command == "MinosFix" )
+			{
+				for( unsigned int j=1; j< thisList.size(); ++j )
+				{
+					string thisParam = thisList[j];
+					int thisIndex = StringProcessing::VectorContains( &allFreeNames, &thisParam );
+					if( thisIndex != -1 )
+					{
+						cout << "MINOSFIX: FIXING " << thisParam << ". This should only be used for uncorrolated and well defined parameters!" << endl;
+						minuit->FixParameter( thisIndex );
+					}
+					else
+					{
+						cout << "MINOSFIX: CANNOT FIX PARAMETER " << thisParam << ". It is likely fixed or not in your ParameterSet." << endl;
+					}
+				}
+			}
+		}
 		//	Call MINOS to calculate the non-parabolic errors.
 		//	MINOS rather than assuming parabolic shape about the minimum, MINOS climbs
 		//	out of the minimum on either side up until the UP value.

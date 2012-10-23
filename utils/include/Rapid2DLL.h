@@ -1,3 +1,4 @@
+
 #ifndef RAPID_2DLL_H
 #define RAPID_2DLL_H
 
@@ -31,7 +32,8 @@ class Rapid2DLL
 
 	private:
 
-		static void get_Plotting_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom* rand, vector<vector<Double_t> >& nll_data, vector<vector<Double_t> >& nll_data_rotated, vector<vector<Double_t> >& coords, vector<vector<Double_t> >& );
+		static void get_Plotting_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom* rand, vector<vector<Double_t> >& nll_data,
+					vector<vector<Double_t> >& nll_data_rotated, vector<vector<Double_t> >& coords, vector<vector<Double_t> >& );
 
 };
 

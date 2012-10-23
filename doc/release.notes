@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/10/23 Rob Currie
+   - Added a preliminary tool for plotting the correlation Matricies from out of a fit.
+       Simply Write the fit output to a .root file using the '--BurnToROOT' runtime flag then run it through the RapidPlot tool. (you will get a 1 event set of pull plots I've not disabled this condition yet...)
+       I plan to expand this to allow us to say something qualitative about expected correlations between parameters
+       This entails making changes to the output mechanism in RapidFit to write out information that was already available as well as adding the CorrMatrix class to the utils directory to handle the processing/plotting methods
+
 2012/10/22 Rob Currie
    - Added initial attempt to Overlay multiple LL scans
    - Updated the Overlay LL Code to call static function in RapidLL which is cleaner

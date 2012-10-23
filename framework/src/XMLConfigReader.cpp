@@ -807,7 +807,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		//Make the function
 		if (hasWeight)
 		{
-			cout <<"Weighted events have been asked for in XML using:\t\t" << weightName << endl ;
+			cout <<"Weighted events have been asked for in XML using:\t\t" << weightName << endl << endl;
 			returnable_function = new FitFunctionConfiguration( functionName, weightName );
 		}
 		else

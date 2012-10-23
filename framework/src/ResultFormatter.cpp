@@ -831,12 +831,14 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 		parameterNTuple->Fill( resultArr );
 		delete [] resultArr;
 	}
-	vector<double> MatrixElements;
+	vector<double> MatrixElements; vector<string> MatrixNames;
         TTree * tree = new TTree("corr_matrix", "Elements from Correlation Matricies");
 	tree->Branch("MartrixElements", "std::vector<double>", &MatrixElements );
+	tree->Branch("MartrixNames", "std::vector<string>", &MatrixNames );
 	for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
 	{
 		TMatrixDSym* thisMatrix = ToyResult->GetFitResult(resultIndex)->GetCovarianceMatrix()->thisMatrix;
+		MatrixNames = ToyResult->GetFitResult(resultIndex)->GetCovarianceMatrix()->theseParameters;
 		double* MatrixArray = thisMatrix->GetMatrixArray();
 		MatrixElements.clear();
 		for( unsigned int i=0; i< (unsigned) thisMatrix->GetNoElements(); ++i )
@@ -846,7 +848,7 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 		tree->Fill();
 	}
 	tree->Write("",TObject::kOverwrite);
-	rootFile->Write();
+	rootFile->Write("",TObject::kOverwrite);
 	rootFile->Close();
 	//	THIS SHOULD BE SAFE... BUT THIS IS ROOT so 'of course' it isn't...
 	//delete parameterNTuple;

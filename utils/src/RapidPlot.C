@@ -24,6 +24,7 @@
 #include "TLeaf.h"
 #include "TTree.h"
 #include "TMultiGraph.h"
+#include "TMatrixDSym.h"
 //	RapidFit Headers
 #include "EdStyle.h"
 //	RapidFit Utils Headers
@@ -37,6 +38,7 @@
 #include "Histo_Processing.h"
 #include "Component_Projections.h"
 #include "RapidFit_Output_File.h"
+#include "CorrMatrix.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -110,6 +112,14 @@ int main( int argc, char* argv[] )
 	}
 
 	vector<TTree*> input_trees = ROOT_File_Processing::GetMultipleTrees( input_filenames, RapidFitOutputTupleName );
+
+	string CorrMatrixName="corr_matrix";
+	vector<TTree*> corr_trees = ROOT_File_Processing::GetMultipleTrees( input_filenames, CorrMatrixName );
+
+	if( !corr_trees.empty() )
+	{
+		CorrMatrix::Analyse( corr_trees );
+	}
 
 	int good_files=0;
 	for( unsigned int i=0; i< input_trees.size(); ++i )

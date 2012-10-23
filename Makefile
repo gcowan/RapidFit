@@ -190,7 +190,7 @@ $(OBJUTILDIR)/Mathematics.o: $(UTILSSRC)/Mathematics.C
 SHARED_UTIL_LIBS=$(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJDIR)/StringProcessing.o $(OBJDIR)/EdStyle.o $(OBJUTILDIR)/StringOperations.o  $(OBJUTILDIR)/Template_Functions.o $(OBJUTILDIR)/RapidFit_Output_File.o
 
 #       New mostly automated plotting tool taking the pain out of plotting RapidFit output
-$(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/RapidLL.o $(OBJUTILDIR)/Rapid2DLL.o $(OBJUTILDIR)/Toy_Study.o $(OBJUTILDIR)/Component_Projections.o $(SHARED_UTIL_LIBS)
+$(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/RapidLL.o $(OBJUTILDIR)/Rapid2DLL.o $(OBJUTILDIR)/Toy_Study.o $(OBJUTILDIR)/Component_Projections.o $(OBJUTILDIR)/CorrMatrix.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/RapidPlot.o: $(UTILSSRC)/RapidPlot.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
@@ -207,6 +207,8 @@ $(OBJUTILDIR)/DoFCAnalysis.o: $(UTILSSRC)/DoFCAnalysis.C
 $(OBJUTILDIR)/OutputPlots.o: $(UTILSSRC)/OutputPlots.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 $(OBJUTILDIR)/Template_Functions.o: $(UTILSSRC)/Template_Functions.C
+	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
+$(OBJUTILDIR)/CorrMatrix.o: $(UTILSSRC)/CorrMatrix.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
 #       Tool for printing information about a ROOT file and it's contents
