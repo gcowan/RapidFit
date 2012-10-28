@@ -97,6 +97,14 @@ class StringProcessing
 		 *		RAPDFITROOT is defined	i.e. $RAPIDFITROOT/pdfs/configdata/filename.ext
 		 */
 		static string FindFileName( const string fileName );
+
+		/*!
+		 * Returns a vector populated with the contents of the original vector
+		 * If the element is NOT in the input vector this returns the input
+		 * else
+		 * The vector that is returned has the element of choice moved to the start and the order of the elements otherwise is preserved
+		 */
+		static vector<string> MoveElementToStart( const vector<string> input, const string element );
 };
 
 #endif

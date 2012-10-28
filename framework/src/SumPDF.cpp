@@ -14,6 +14,7 @@
 ///	System Headers
 #include <iostream>
 #include <sstream>
+#include <float.h>
 
 using namespace::std;
 
@@ -48,6 +49,9 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 	if( StringProcessing::VectorContains( &firstpdf_components, &zero ) == -1 ) firstpdf_components.push_back("0");
 	if( StringProcessing::VectorContains( &secondpdf_components, &zero ) == -1 ) secondpdf_components.push_back("0");
 
+	firstpdf_components = StringProcessing::MoveElementToStart( firstpdf_components, "0" );
+	secondpdf_components = StringProcessing::MoveElementToStart( secondpdf_components, "0" );
+
 	//unsigned int start_1 = 0, start_2 = 0;
 
 	//if( firstPDF->GetName() == "Prod" )//&& firstpdf_components.size() != 1 )
@@ -67,7 +71,7 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 	{
 		component_list.push_back( StringProcessing::AddNumberToLeft( firstpdf_components[j], 2 ) );
 	}
-
+	component_list = StringProcessing::MoveElementToStart( component_list, "0" );
 }
 
 void SumPDF::SetUseGSLIntegrator( bool input )
@@ -197,6 +201,11 @@ double SumPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewB
 //Return the function value at the given point
 double SumPDF::Evaluate( DataPoint * NewDataPoint )
 {
+	if( firstFraction > 1.0 || firstFraction < 0.0 )                  
+	{
+		cerr << "Requested impossible fraction: " << firstFraction << endl;
+		return DBL_MAX;
+	}
 	//Get the PDFs' values, weighted by firstFraction
 	double termOne = firstPDF->Evaluate( NewDataPoint ) * firstFraction;
 	double termTwo = secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction );

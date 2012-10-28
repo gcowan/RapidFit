@@ -49,6 +49,9 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 	if( first_components.empty() || (StringProcessing::VectorContains( &first_components, &zero ) == -1 ) ) first_components.push_back("0");
 	if( second_components.empty() || (StringProcessing::VectorContains( &second_components, &zero ) == -1 ) ) second_components.push_back("0");
 
+	first_components = StringProcessing::MoveElementToStart( first_components, "0" );
+	second_components = StringProcessing::MoveElementToStart( second_components, "0" );
+
 	component_list = vector<string>();
 
 	if( (first_components.size() != 1) && (second_components.size() == 1) )
@@ -67,7 +70,6 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 		{
 			component_list[ (unsigned)StringProcessing::VectorContains( &component_list, &total ) ] = "0";
 		}
-
 	}
 	else if( (second_components.size() != 1) && (first_components.size() == 1) )
 	{
@@ -94,6 +96,8 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 		}
 		component_list.push_back( "0" );
 	}
+
+	component_list = StringProcessing::MoveElementToStart( component_list, "0" );
 
 	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
 	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );

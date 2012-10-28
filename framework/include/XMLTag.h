@@ -57,37 +57,39 @@ class XMLTag
 		 *
 		 * @return the path of the XML Tag in the form '/top/middle/bottom/this'
 		 */
-		string GetPath();
+		string GetPath() const;
 
 		/*!
 		 * @brief Return the Name of this Tag
 		 */
-		string GetName();
+		string GetName() const;
 
 		/*!
 		 * @brief Return the Override Tags and the override values
 		 *
 		 * @return a pointer to the list of override tags and the values that they should take
 		 */
-		vector<pair<string,string> >* GetForbidden();
+		vector<pair<string,string> >* GetForbidden() const;
 
 		/*!
 		 * @brief Return a vector of pointers to the children Tags of this Tag
 		 *
 		 * @return  Vector containing pointers to the children, empty if none
 		 */
-		vector< XMLTag* > GetChildren();
-
-		/*!
-		 * @brief Get the Value of this Tag
-		 *
-		 * This will be multi valued for tags which have multiple values on multiple lines
-		 *
-		 * @return Return a list of the vector of Values
-		 */
-		vector<string> GetValue();
+		vector< XMLTag* > GetChildren() const;
 
 		void RemoveChild( int num );
+
+		static bool GetBooleanValue( const XMLTag* input );
+
+		static int GetIntegerValue( const XMLTag* input );
+
+		static string GetStringValue( const XMLTag* input );
+
+		static double GetDoubleValue( const XMLTag* input );
+
+		static double GetTF1Eval( const XMLTag* input );
+
 	private:
 		/*!
 		 * Don't Copy the class this way!
@@ -127,11 +129,20 @@ class XMLTag
 		vector<string> SplitContent( vector<string>&, int, int, int );
 
 		vector<XMLTag*> children;			/*!	Children within this XML Tag		*/
-		vector<string> value;				/*!	Value of this XML Tag			*/
+		mutable vector<string> value;			/*!	Value of this XML Tag			*/
 		string name;					/*!	Name of this XML Tag			*/
 		XMLTag* parent;					/*!	Address of the parent of this tag	*/
-		TString path;					/*!	Path of this XML Tag			*/
+		mutable TString path;				/*!	Path of this XML Tag			*/
 		vector<pair<string, string> >* forbidden;	/*!	override xml path and values		*/
+
+		/*!
+		 * @brief Get the Value of this Tag
+		 *
+		 * This will be multi valued for tags which have multiple values on multiple lines
+		 *
+		 * @return Return a list of the vector of Values
+		 */
+		vector<string> GetValue() const;
 };
 
 #endif

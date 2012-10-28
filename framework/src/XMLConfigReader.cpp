@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
 #include "XMLConfigReader.h"
@@ -224,8 +224,6 @@ ParameterSet* XMLConfigReader::GetFitParameters( vector<string> CommandLineParam
 		{
 			string Unit = try_get_param->GetUnit();
 
-			//		min			-		max			< 	1E-5
-
 			double step = strtod(input_args[4].c_str(),NULL);
 			double max = strtod(input_args[3].c_str(),NULL);
 			double min = strtod(input_args[2].c_str(),NULL);
@@ -303,7 +301,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		//Examine all minimiser components
 		string minimiserName = "Uninitialised";
 		vector< XMLTag* > minimiserComponents = MinimiserTag->GetChildren();
-		//vector<string> valueLines = MinimiserTag->GetValue();
+		//vector<string> valueLines = XMLTag::GetStringValue( MinimiserTag );
 		int MAXIMUM_MINIMISATION_STEPS = 1000000;
 		double FINAL_GRADIENT_TOLERANCE = 0.001;
 		MinimiserConfiguration* returnableConfig = NULL;
@@ -312,7 +310,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		bool MultiMini=false;
 		if ( minimiserComponents.size() == 0 )
 		{
-			minimiserName = MinimiserTag->GetValue()[0];
+			minimiserName = XMLTag::GetStringValue( MinimiserTag );
 		}
 		else
 		{
@@ -321,30 +319,27 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 			{
 				if ( minimiserComponents[childIndex]->GetName() == "MinimiserName" )
 				{
-					minimiserName = minimiserComponents[childIndex]->GetValue()[0];
+					minimiserName = XMLTag::GetStringValue( minimiserComponents[childIndex] );
 				}
 				else if( minimiserComponents[childIndex]->GetName() == "MaxSteps" )
 				{
-					MAXIMUM_MINIMISATION_STEPS = atoi( minimiserComponents[childIndex]->GetValue()[0].c_str() );
+					MAXIMUM_MINIMISATION_STEPS = XMLTag::GetIntegerValue( minimiserComponents[childIndex] );
 				}
 				else if( minimiserComponents[childIndex]->GetName() == "GradTolerance" )
 				{
-					FINAL_GRADIENT_TOLERANCE = strtod( minimiserComponents[childIndex]->GetValue()[0].c_str(), NULL );
+					FINAL_GRADIENT_TOLERANCE = XMLTag::GetDoubleValue( minimiserComponents[childIndex] );
 				}
 				else if( minimiserComponents[childIndex]->GetName() == "ConfigureMinimiser" )
 				{
-					minimiserOptions.push_back( minimiserComponents[childIndex]->GetValue()[0] );
+					minimiserOptions.push_back( XMLTag::GetStringValue( minimiserComponents[childIndex] ) );
 				}
 				else if( minimiserComponents[childIndex]->GetName() == "Quality" )
 				{
-					Quality = atoi( minimiserComponents[childIndex]->GetValue()[0].c_str() );
+					Quality = XMLTag::GetIntegerValue( minimiserComponents[childIndex] );
 				}
 				else if( minimiserComponents[childIndex]->GetName() == "MultiMini" )
 				{
-					if( minimiserComponents[childIndex]->GetValue()[0] == "true" )
-					{
-						MultiMini = true;
-					}
+					MultiMini = XMLTag::GetBooleanValue( minimiserComponents[childIndex] );
 				}
 				else
 				{
@@ -429,7 +424,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 			else if ( outputComponents[childIndex]->GetName() == "DoPullPlots" )
 			{
-				pullType = outputComponents[childIndex]->GetValue()[0];
+				pullType = XMLTag::GetStringValue( outputComponents[childIndex] );
 			}
 			else if ( outputComponents[childIndex]->GetName() == "Scan" )
 			{
@@ -492,7 +487,7 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 	//	If we have no extra config just take the name and use defaults
 	if( projComps.size() == 0 )
 	{
-		returnable_config->observableName = CompTag->GetValue()[0];
+		returnable_config->observableName = XMLTag::GetStringValue( CompTag );
 	}
 
 	if( CompTag->GetName() == "Projection" ) returnable_config->OnlyZero = true;
@@ -502,106 +497,115 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 	{
 		if( projComps[childIndex]->GetName() == "DataBins" )
 		{
-			returnable_config->data_bins = atoi( projComps[childIndex]->GetValue()[0].c_str() );
+			returnable_config->data_bins = XMLTag::GetIntegerValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "PDFpoints" )
 		{
-			returnable_config->PDF_points = atoi( projComps[childIndex]->GetValue()[0].c_str() );
+			returnable_config->PDF_points = XMLTag::GetIntegerValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "LogY" )
 		{
-			string value =  projComps[childIndex]->GetValue()[0];
-			if( value == "True" )
-			{
-				returnable_config->logY = true;
-			}
+			returnable_config->logY = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "Name" )
 		{
-			returnable_config->observableName = projComps[childIndex]->GetValue()[0];
+			returnable_config->observableName = XMLTag::GetStringValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "WidthKey" )
 		{
-			vector<string> widths = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-			if( widths.empty() ) returnable_config->width_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
-			for( vector<string>::iterator width_i = widths.begin(); width_i != widths.end(); ++width_i ) returnable_config->width_key.push_back( atoi( width_i->c_str() ) );
+			vector<string> widths = StringProcessing::SplitString(
+					XMLTag::GetStringValue( projComps[childIndex] ), ':' );
+
+			if( widths.empty() )
+			{
+				returnable_config->width_key.push_back( XMLTag::GetIntegerValue( projComps[childIndex] ) );
+			}
+
+			for( vector<string>::iterator width_i = widths.begin(); width_i != widths.end(); ++width_i )
+				returnable_config->width_key.push_back( atoi( width_i->c_str() ) );
+
 		}
 		else if( projComps[childIndex]->GetName() == "ColorKey" )
 		{
-			vector<string> colors = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-			if( colors.empty() ) returnable_config->style_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
-			for( vector<string>::iterator color_i = colors.begin(); color_i != colors.end(); ++color_i ) returnable_config->color_key.push_back( atoi( color_i->c_str() ) );
+			vector<string> colors = StringProcessing::SplitString(
+					XMLTag::GetStringValue( projComps[childIndex] ), ':' );
+
+			if( colors.empty() )
+			{
+				returnable_config->style_key.push_back( XMLTag::GetIntegerValue( projComps[childIndex] ) );
+			}
+
+			for( vector<string>::iterator color_i = colors.begin(); color_i != colors.end(); ++color_i )
+				returnable_config->color_key.push_back( atoi( color_i->c_str() ) );
+
 		}
 		else if( projComps[childIndex]->GetName() == "StyleKey" )
 		{
-			vector<string> styles = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-			if( styles.empty() ) returnable_config->style_key.push_back( atoi(projComps[childIndex]->GetValue()[0].c_str()) );
-			for( vector<string>::iterator style_i = styles.begin(); style_i != styles.end(); ++style_i ) returnable_config->style_key.push_back( atoi( style_i->c_str() ) );
+			vector<string> styles = StringProcessing::SplitString(
+					XMLTag::GetStringValue( projComps[childIndex] ), ':' );
+			if( styles.empty() )
+			{
+				returnable_config->style_key.push_back( XMLTag::GetIntegerValue( projComps[childIndex] ) );
+			}
+			for( vector<string>::iterator style_i = styles.begin(); style_i != styles.end(); ++style_i )
+				returnable_config->style_key.push_back( atoi( style_i->c_str() ) );
+
 		}
 		else if( projComps[childIndex]->GetName() == "Title" )
 		{
-			returnable_config->PlotTitle = projComps[childIndex]->GetValue()[0];
+			returnable_config->PlotTitle = XMLTag::GetStringValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "CompNames" )
 		{
-			returnable_config->component_names = StringProcessing::SplitString( projComps[childIndex]->GetValue()[0], ':' );
-			if( returnable_config->component_names.empty() ) returnable_config->component_names.push_back( projComps[childIndex]->GetValue()[0] );
+			returnable_config->component_names = StringProcessing::SplitString(
+					XMLTag::GetStringValue( projComps[childIndex] ), ':' );
+
+			if( returnable_config->component_names.empty() )
+				returnable_config->component_names.push_back( XMLTag::GetStringValue( projComps[childIndex] ) );
 		}
 		else if( projComps[childIndex]->GetName() == "Xmax" )
 		{
-			returnable_config->xmax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+			returnable_config->xmax = XMLTag::GetDoubleValue( projComps[childIndex] );;
 		}
 		else if( projComps[childIndex]->GetName() == "Xmin" )
 		{
-			returnable_config->xmin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+			returnable_config->xmin = XMLTag::GetDoubleValue( projComps[childIndex] );;
 		}
 		else if( projComps[childIndex]->GetName() == "Ymax" )
 		{
-			returnable_config->ymax = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+			returnable_config->ymax = XMLTag::GetDoubleValue( projComps[childIndex] );;
 		}
 		else if( projComps[childIndex]->GetName() == "Ymin" )
 		{
-			returnable_config->ymin = strtod( projComps[childIndex]->GetValue()[0].c_str(), NULL );
+			returnable_config->ymin = XMLTag::GetDoubleValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "XTitle" )
 		{
-			returnable_config->xtitle = TString(projComps[childIndex]->GetValue()[0]);
+			returnable_config->xtitle = TString( XMLTag::GetStringValue( projComps[childIndex] ) );
 		}
 		else if( projComps[childIndex]->GetName() == "YTitle" )
 		{
-			returnable_config->ytitle = TString(projComps[childIndex]->GetValue()[0]);
+			returnable_config->ytitle = TString( XMLTag::GetStringValue( projComps[childIndex] ) );
 		}
 		else if( projComps[childIndex]->GetName() == "TrustNumerical" )
 		{
-			string value = projComps[childIndex]->GetValue()[0];
-			if( value == "True" )
-			{
-				returnable_config->ScaleNumerical = false;
-			}
+			returnable_config->ScaleNumerical = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "CalcChi2" )
 		{
-			string value = projComps[childIndex]->GetValue()[0];
-			if( value == "True" )
-			{
-				returnable_config->CalcChi2 = true;
-			}
+			returnable_config->CalcChi2 = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "DrawPull" )
 		{
-			string value = projComps[childIndex]->GetValue()[0];
-			if( value == "True" )
-			{
-				returnable_config->DrawPull = true;
-			}
+			returnable_config->DrawPull = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "AddLHCb" )
 		{
-			string value = projComps[childIndex]->GetValue()[0];
-			if( value == "True" )
-			{
-				returnable_config->addLHCb = true;
-			}
+			returnable_config->addLHCb = XMLTag::GetBooleanValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "LegendTextSize" )
+		{
+			returnable_config->LegendTextSize =  XMLTag::GetDoubleValue( projComps[childIndex] );
 		}
 		else
 		{
@@ -629,12 +633,12 @@ pair< string, string > XMLConfigReader::MakeContourPlot( XMLTag * PlotTag )
 			{
 				if ( plotComponents[childIndex]->GetName() == "XParameter" )
 				{
-					xName = plotComponents[childIndex]->GetValue()[0];
+					xName = XMLTag::GetStringValue( plotComponents[childIndex] );
 					hasX = true;
 				}
 				else if ( plotComponents[childIndex]->GetName() == "YParameter" )
 				{
-					yName = plotComponents[childIndex]->GetValue()[0];
+					yName = XMLTag::GetStringValue( plotComponents[childIndex] );
 					hasY = true;
 				}
 				else
@@ -685,7 +689,7 @@ int XMLConfigReader::GetNumberRepeats()
 	{
 		if ( children[childIndex]->GetName() == "NumberRepeats" )
 		{
-			return atoi( children[childIndex]->GetValue()[0].c_str() );
+			return XMLTag::GetIntegerValue( children[childIndex] );
 		}
 	}
 
@@ -731,7 +735,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		if ( functionInfo.size() == 0 )
 		{
 			//Old style - just specifies the function name
-			functionName = FunctionTag->GetValue()[0];
+			functionName = XMLTag::GetStringValue( FunctionTag );
 		}
 		else
 		{
@@ -740,59 +744,38 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 			{
 				if ( functionInfo[childIndex]->GetName() == "FunctionName" )
 				{
-					functionName = functionInfo[childIndex]->GetValue()[0];
+					functionName = XMLTag::GetStringValue( functionInfo[childIndex] );
 				}
-                                else if ( functionInfo[childIndex]->GetName() == "UseGSLNumericalIntegration" )
-                                {
-                                        if( functionInfo[childIndex]->GetValue()[0] == "True" )
-                                        {
-                                                gslIntegrator = true;
-                                        }
-                                        else
-                                        {
-                                                gslIntegrator = false;
-                                        }
-                                }
+				else if ( functionInfo[childIndex]->GetName() == "UseGSLNumericalIntegration" )
+				{
+					gslIntegrator = XMLTag::GetBooleanValue( functionInfo[childIndex] );
+				}
 				else if ( functionInfo[childIndex]->GetName() == "WeightName" )
 				{
 					hasWeight = true;
-					weightName = functionInfo[childIndex]->GetValue()[0];
+					weightName = XMLTag::GetStringValue( functionInfo[childIndex] );
 				}
 				else if ( functionInfo[childIndex]->GetName() == "Trace" )
 				{
 					want_Trace = true;
-					Trace_FileName = functionInfo[childIndex]->GetValue()[0];
+					Trace_FileName = XMLTag::GetStringValue( functionInfo[childIndex] );
 				}
 				else if ( functionInfo[childIndex]->GetName() == "Strategy" )
 				{
 					change_style = true;
-					Strategy = functionInfo[childIndex]->GetValue()[0];
+					Strategy = XMLTag::GetStringValue( functionInfo[childIndex] );
 				}
 				else if ( functionInfo[childIndex]->GetName() == "Threads" )
 				{
-					Threads = atoi( functionInfo[childIndex]->GetValue()[0].c_str() );
+					Threads = XMLTag::GetIntegerValue( functionInfo[childIndex] );
 				}
 				else if ( functionInfo[childIndex]->GetName() == "SetIntegratorTest" )
 				{
-					if( functionInfo[childIndex]->GetValue()[0] == "True" )
-					{
-						integratorTest = true;
-					}
-					else
-					{
-						integratorTest = false;
-					}
+					integratorTest = XMLTag::GetBooleanValue( functionInfo[childIndex] );
 				}
 				else if ( functionInfo[childIndex]->GetName() == "NormaliseWeights" )
 				{
-					if( functionInfo[childIndex]->GetValue()[0] == "True" )
-					{
-						NormaliseWeights = true;
-					}
-					else
-					{
-						NormaliseWeights = false;
-					}
+					NormaliseWeights = XMLTag::GetBooleanValue( functionInfo[childIndex] );
 				}
 				else
 				{
@@ -828,7 +811,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		returnable_function->SetThreads( Threads );
 		returnable_function->SetNormaliseWeights( NormaliseWeights );
 		returnable_function->SetIntegratorTest( integratorTest );
-                returnable_function->SetGSLIntegrator( gslIntegrator );
+		returnable_function->SetGSLIntegrator( gslIntegrator );
 
 		return returnable_function;
 	}
@@ -893,7 +876,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 				}
 				else if ( name == "CommonPDF" )
 				{
-					string value = fitComponents[componentIndex]->GetValue()[0];
+					string value = XMLTag::GetStringValue( fitComponents[componentIndex] );
 					if( value == "True" )
 					{
 						pdfTag = this->FindCommonPDFXML();
@@ -1039,15 +1022,15 @@ ExternalConstraint * XMLConfigReader::GetExternalConstraint( XMLTag * InputTag )
 		{
 			if ( externalComponents[componentIndex]->GetName() == "Name" )
 			{
-				name = externalComponents[componentIndex]->GetValue()[0];
+				name = XMLTag::GetStringValue( externalComponents[componentIndex] );
 			}
 			else if ( externalComponents[componentIndex]->GetName() == "Value" )
 			{
-				value = strtod( externalComponents[componentIndex]->GetValue()[0].c_str(), NULL );
+				value = XMLTag::GetDoubleValue( externalComponents[componentIndex] );
 			}
 			else if ( externalComponents[componentIndex]->GetName() == "Error" )
 			{
-				error = strtod( externalComponents[componentIndex]->GetValue()[0].c_str(), NULL );
+				error = XMLTag::GetDoubleValue( externalComponents[componentIndex] );
 			}
 			else
 			{
@@ -1133,44 +1116,44 @@ PhysicsParameter * XMLConfigReader::GetPhysicsParameter( XMLTag * InputTag, stri
 			string name = elements[elementIndex]->GetName();
 			if ( name == "Name" )
 			{
-				ParameterName = elements[elementIndex]->GetValue()[0];
+				ParameterName = XMLTag::GetStringValue( elements[elementIndex] );
 			}
 			else if ( name == "Value" )
 			{
 				hasValue = true;
-				value = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+				value = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else if ( name == "Minimum" )
 			{
 				hasMinimum = true;
-				minimum = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+				minimum = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else if ( name == "Maximum" )
 			{
 				hasMaximum = true;
-				maximum = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+				maximum = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else if ( name == "Type" )
 			{
-				type = elements[elementIndex]->GetValue()[0];
+				type = XMLTag::GetStringValue( elements[elementIndex] );
 			}
 			else if ( name == "Unit" )
 			{
-				unit = elements[elementIndex]->GetValue()[0];
+				unit = XMLTag::GetStringValue( elements[elementIndex] );
 			}
 			else if ( name == "BlindString" )
 			{
 				hasBlindString = true ;
-				blindString = elements[elementIndex]->GetValue()[0];
+				blindString = XMLTag::GetStringValue( elements[elementIndex] );
 			}
 			else if ( name == "BlindScale" )
 			{
 				hasBlindScale =  true ;
-				blindScale = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+				blindScale = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else if ( name == "StepSize" )
 			{
-				stepSize = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+				stepSize = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else
 			{
@@ -1287,7 +1270,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			string name = dataComponents[dataIndex]->GetName();
 			if ( name == "Source" )
 			{
-				dataSource = dataComponents[dataIndex]->GetValue()[0];
+				dataSource = XMLTag::GetStringValue( dataComponents[dataIndex] );
 			}
 			else if ( name == "Subset" )
 			{
@@ -1295,16 +1278,16 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			}
 			else if ( name == "CutString" )
 			{
-				cutString = dataComponents[dataIndex]->GetValue()[0];
+				cutString = XMLTag::GetStringValue( dataComponents[dataIndex] );
 			}
 			else if ( name == "FileName" || name == "NTuplePath" )
 			{
 				argumentNames.push_back(name);
-				dataArguments.push_back( dataComponents[dataIndex]->GetValue()[0] );
+				dataArguments.push_back( XMLTag::GetStringValue( dataComponents[dataIndex] ) );
 			}
 			else if ( name == "NumberEvents" )
 			{
-				numberEvents = strtol( dataComponents[dataIndex]->GetValue()[0].c_str(), NULL, 10 );
+				numberEvents = XMLTag::GetIntegerValue( dataComponents[dataIndex] );
 			}
 			else if ( name == "PhaseSpaceBoundary" )
 			{
@@ -1339,7 +1322,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			{
 				if( Starting_Value < 0 )
 				{
-					Starting_Value = atoi( dataComponents[dataIndex]->GetValue()[0].c_str() );
+					Starting_Value = XMLTag::GetIntegerValue( dataComponents[dataIndex] );
 				}
 			}
 			else
@@ -1429,20 +1412,20 @@ DataSetConfiguration * XMLConfigReader::MakeDataSetConfiguration( XMLTag * DataT
 			string name = dataComponents[dataIndex]->GetName();
 			if ( name == "Source" )
 			{
-				dataSource = dataComponents[dataIndex]->GetValue()[0];
+				dataSource = XMLTag::GetStringValue( dataComponents[dataIndex] );
 			}
 			else if ( name == "CutString" )
 			{
-				cutString = dataComponents[dataIndex]->GetValue()[0];
+				cutString = XMLTag::GetStringValue( dataComponents[dataIndex] );
 			}
 			else if ( name == "FileName" || name == "NTuplePath" )
 			{
 				argumentNames.push_back(name);
-				dataArguments.push_back( dataComponents[dataIndex]->GetValue()[0] );
+				dataArguments.push_back( XMLTag::GetStringValue( dataComponents[dataIndex] ) );
 			}
 			else if ( name == "NumberEvents" )
 			{
-				numberEvents = strtol( dataComponents[dataIndex]->GetValue()[0].c_str(), NULL, 10 );
+				numberEvents = XMLTag::GetIntegerValue( dataComponents[dataIndex] );
 			}
 			else if ( name == "PDF" || name == "SumPDF" || name == "NormalisedSumPDF" || name == "ProdPDF" )
 			{
@@ -1661,27 +1644,27 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 		{
 			if ( elements[elementIndex]->GetName() == "Name" )
 			{
-				Name = elements[elementIndex]->GetValue()[0];
+				Name = XMLTag::GetStringValue( elements[elementIndex] );
 			}
 			else if ( elements[elementIndex]->GetName() == "Minimum" )
 			{
-				minimum = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+				minimum = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else if ( elements[elementIndex]->GetName() == "Maximum" )
 			{
-				maximum = strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL );
+				maximum = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else if ( elements[elementIndex]->GetName() == "Value" )
 			{
-				allValues.push_back( strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL ) );
+				allValues.push_back( XMLTag::GetDoubleValue( elements[elementIndex] ) );
 			}
 			else if ( elements[elementIndex]->GetName() == "Unit" )
 			{
-				unit = elements[elementIndex]->GetValue()[0];
+				unit = XMLTag::GetStringValue( elements[elementIndex] );
 			}
 			else if ( elements[elementIndex]->GetName() == "TF1" )
 			{
-				tf1 = elements[elementIndex]->GetValue()[0];
+				tf1 = XMLTag::GetStringValue( elements[elementIndex] );
 			}
 			else
 			{
@@ -1741,27 +1724,27 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 		{
 			if ( pdfConfig[configIndex]->GetName() == "Name" )
 			{
-				name = pdfConfig[configIndex]->GetValue()[0];
+				name = XMLTag::GetStringValue( pdfConfig[configIndex] );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ObservableName" )
 			{
-				observableNames.push_back( pdfConfig[configIndex]->GetValue()[0] );
+				observableNames.push_back( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ParameterName" )
 			{
-				parameterNames.push_back( pdfConfig[configIndex]->GetValue()[0] );
+				parameterNames.push_back( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ParameterSubstitution" )
 			{
-				configurator->addParameterSubstitution( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->addParameterSubstitution( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "AppendParameterNames" )
 			{
-				configurator->appendParameterNames( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{
-				configurator->addConfigurationParameter( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
 			{
@@ -1782,9 +1765,9 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 			configurator->Print();
 		}
 
-                if( overloadConfigurator != NULL )
-                {
-                        pdfConfig = overloadConfigurator->GetChildren();
+		if( overloadConfigurator != NULL )
+		{
+			pdfConfig = overloadConfigurator->GetChildren();
 		}
 		else
 		{
@@ -1796,15 +1779,15 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 		{
 			if ( pdfConfig[configIndex]->GetName() == "ParameterSubstitution" )
 			{
-				configurator->addParameterSubstitution( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->addParameterSubstitution( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "AppendParameterNames" )
 			{
-				configurator->appendParameterNames( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{
-				configurator->addConfigurationParameter( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
 			{
@@ -1851,8 +1834,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 			{
 				if( optional[(unsigned)i]->GetName() == "FractionName" )
 				{
-					cout << optional[(unsigned)i]->GetValue()[0] << endl;
-					fractionName = optional[(unsigned)i]->GetValue()[0];
+					fractionName = XMLTag::GetStringValue( optional[(unsigned)i] );
 					overloadConfigurator->RemoveChild( i );
 					break;
 				}
@@ -1866,7 +1848,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		{
 			if( pdfConfig[configIndex]->GetName() == "FractionName" && fractionName == "unspecified" )
 			{
-				fractionName = pdfConfig[configIndex]->GetValue()[0];
+				fractionName = XMLTag::GetStringValue( pdfConfig[configIndex] );
 			}
 			else
 			{
@@ -1932,8 +1914,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 			{
 				if( optional[(unsigned)i]->GetName() == "FractionName" )
 				{
-					//cout << optional[i]->GetValue()[0] << endl;
-					fractionName = optional[(unsigned)i]->GetValue()[0];
+					fractionName = XMLTag::GetStringValue( optional[(unsigned)i] );
 					overloadConfigurator->RemoveChild( i );
 					break;
 				}
@@ -1946,7 +1927,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		{
 			if( pdfConfig[configIndex]->GetName() == "FractionName" && fractionName == "unspecified" )
 			{
-				fractionName = pdfConfig[configIndex]->GetValue()[0];
+				fractionName = XMLTag::GetStringValue( pdfConfig[configIndex] );
 			}
 			else
 			{
@@ -2046,15 +2027,15 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 		{
 			if ( pdfConfig[configIndex]->GetName() == "ParameterSubstitution" )
 			{
-				configurator->addParameterSubstitution( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->addParameterSubstitution( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "AppendParameterNames" )
 			{
-				configurator->appendParameterNames( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{
-				configurator->addConfigurationParameter( pdfConfig[configIndex]->GetValue()[0] );
+				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 		}
 
@@ -2119,23 +2100,23 @@ PrecalculatorConfig* XMLConfigReader::GetPrecalculatorConfig( )
 				string name = newchildren[newchildIndex]->GetName();
 				if ( name == "Name" )
 				{
-					precalculatorName = newchildren[newchildIndex]->GetValue()[0];
+					precalculatorName = XMLTag::GetStringValue( newchildren[newchildIndex] );
 				}
 				else if ( name == "WeightName" )
 				{
-					weightName = newchildren[newchildIndex]->GetValue()[0];
+					weightName = XMLTag::GetStringValue( newchildren[newchildIndex] );
 				}
 				else if ( name == "Config" )
 				{
-					config = atoi( newchildren[newchildIndex]->GetValue()[0].c_str() );
+					config = XMLTag::GetIntegerValue( newchildren[newchildIndex] );
 				}
 				else if ( name == "OutputFile" )
 				{
-					filename = newchildren[newchildIndex]->GetValue()[0];
+					filename = XMLTag::GetStringValue( newchildren[newchildIndex] );
 				}
 				else if ( name == "UseAlpha" )
 				{
-					useAlpha = newchildren[newchildIndex]->GetValue()[0] == "True";
+					useAlpha = XMLTag::GetBooleanValue( newchildren[newchildIndex] );
 				}
 				else
 				{
@@ -2166,7 +2147,7 @@ unsigned int XMLConfigReader::GetSeed()
 		{
 			if ( children[childIndex]->GetName() == "Seed" )
 			{
-				seed = abs( atoi( children[childIndex]->GetValue( )[0].c_str() ) );
+				seed = XMLTag::GetIntegerValue( children[childIndex] );
 				cout << "Using seed: " << seed << " from input file." << endl;
 				return unsigned(seed);
 			}
@@ -2242,23 +2223,23 @@ ScanParam * XMLConfigReader::GetScanParam( XMLTag * InputTag )
 			string name = elements[elementIndex]->GetName();
 			if ( name == "Name" )
 			{
-				name_tag.push_back( elements[elementIndex]->GetValue()[0].c_str() );
+				name_tag.push_back( XMLTag::GetStringValue( elements[elementIndex] ) );
 			}
 			else if ( name == "Minimum" )
 			{
-				minimum.push_back( strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL ) );
+				minimum.push_back( XMLTag::GetDoubleValue( elements[elementIndex] ) );
 			}
 			else if ( name == "Maximum" )
 			{
-				maximum.push_back( strtod( elements[elementIndex]->GetValue()[0].c_str(), NULL ) );
+				maximum.push_back( XMLTag::GetDoubleValue( elements[elementIndex] ) );
 			}
 			else if ( name == "Points" )
 			{
-				points.push_back( atoi( elements[elementIndex]->GetValue()[0].c_str() ) );
+				points.push_back( XMLTag::GetIntegerValue( elements[elementIndex] ) );
 			}
 			else if ( name == "Sigma" )
 			{
-				sigma.push_back( atoi( elements[elementIndex]->GetValue()[0].c_str() ) );
+				sigma.push_back( XMLTag::GetIntegerValue( elements[elementIndex] ) );
 			}
 			else
 			{
@@ -2324,7 +2305,7 @@ int XMLConfigReader::GetTotalDataSetSize()
 				{
 					if ( dataComponents[dataIndex]->GetName() == "NumberEvents" )
 					{
-						DataSetSize += (int) atoi( dataComponents[dataIndex]->GetValue()[0].c_str() );
+						DataSetSize += XMLTag::GetIntegerValue( dataComponents[dataIndex] );
 					}
 				}
 			}
@@ -2360,7 +2341,7 @@ vector<int> XMLConfigReader::GetAllDataSetSizes()
 				{
 					if ( dataComponents[dataIndex]->GetName() == "NumberEvents" )
 					{
-						DataSetSizes.push_back( (int) atoi( dataComponents[dataIndex]->GetValue()[0].c_str() ) );
+						DataSetSizes.push_back( XMLTag::GetIntegerValue( dataComponents[dataIndex] ) );
 					}
 				}
 			}
@@ -2397,7 +2378,7 @@ vector<int> XMLConfigReader::GetAllStartEntries()
 					if ( dataComponents[dataIndex]->GetName() == "NumberEvents" )
 					{
 						found_one = true;
-						StartEntries.push_back( (int) atoi( dataComponents[dataIndex]->GetValue()[0].c_str() ) );
+						StartEntries.push_back( XMLTag::GetIntegerValue( dataComponents[dataIndex] ) );
 					}
 				}
 				if( !found_one )

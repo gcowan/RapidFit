@@ -6,7 +6,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 //	ROOT Headers
 #include "TFile.h"
 #include "TTree.h"
@@ -300,6 +300,10 @@ double FitFunction::Evaluate()
 		{
 			minimiseValue += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
 		}
+		else
+		{
+			return DBL_MAX;
+		}
 	}
 
 	time(&end);
@@ -323,12 +327,15 @@ double FitFunction::Evaluate()
 		Fit_Tree->Write("",TObject::kOverwrite);
 		Fit_File->Write("",TObject::kOverwrite);
 	}
+
+
 	cout << "Call: " << left << setw(5) << callNum << " NLL: " << setprecision(10) << minimiseValue << setw(10) << " " <<  "\r" << flush;
+
 	if( isnan(minimiseValue) )
 	{
+		this->GetParameterSet()->Print();
 		minimiseValue = DBL_MAX;
 	}
-
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass( "FitFunction" ) )
@@ -337,12 +344,6 @@ double FitFunction::Evaluate()
 		}
 	}
 
-	/*if( minimiseValue < 0. )
-	  {
-	  cout << endl << endl;
-	  this->GetParameterSet()->Print();
-	  exit(2572);
-	  }*/
 	return minimiseValue;
 }
 

@@ -1,5 +1,18 @@
 // $Id: release.notes $
 
+2012/10/25 Rob Currie
+   - Added SingleGauss PDF Use this one for Fitting, please don't alter SimpleGauss it's intended as an educational PDF
+   - Added LandauGauss PDF which is VERY CPU intensive but gives a Gaussian+Landau convolution
+   - Drastically altered the way the world sees the XMLTag class
+       I have moved the GetValue() method to be private to XMLTag objects
+       I have added GetIntegerValue, GetBooleanValue, GetStringValue, GetDoubleValue methods which return simple types which makes getting the contents of a XMLTag much easier and case-insensitive for 'True'/'true'/'TRuE'
+   - Moved XMLConfigReader to use the new XMLTag methods which makes the code more consistent
+   - Added LegendFontSize to Projection Config XML
+   - Changes Projections to use Splines rather than lines and to print all graphs at 'high' quality
+   - Added a Sorting Operation such that the '0' Component is ALWAYS the first component evaluated from a PDF regardless of where the user may define it to exist.
+       This makes using Color/Line and other Key's much easier to write
+   - Added sec time to timestamp for output files and such
+
 2012/10/23 Rob Currie
    - Added a preliminary tool for plotting the correlation Matricies from out of a fit.
        Simply Write the fit output to a .root file using the '--BurnToROOT' runtime flag then run it through the RapidPlot tool. (you will get a 1 event set of pull plots I've not disabled this condition yet...)

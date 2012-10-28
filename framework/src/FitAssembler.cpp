@@ -96,7 +96,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 		double someTest = theFunction->Evaluate();
 		cout << someTest << endl;
-		exit(0);
+		//exit(0);
 
 		FitResult* fixed_result = new FitResult( 0., fixed_set, 3, Bottle );
 		fixed_result->SetMinimumValue(theFunction->Evaluate());

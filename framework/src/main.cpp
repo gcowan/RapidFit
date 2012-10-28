@@ -500,6 +500,8 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 				config->pdfsAndData, config->XMLConstraints, config->Force_Continue_Flag, config->OutputLevel, config->debug );
 
+	cout << "Finished Fitting :D" << endl;
+
         if( config->debug != NULL )
         {       
                 if( config->debug->DebugThisClass( "main" ) )

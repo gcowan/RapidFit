@@ -145,8 +145,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			{
 				config->component_names.push_back( "Total" );
 			}
-			config->LegendTextSize = 0.05;
 			vector<string> pdfComponents = plotPDF->PDFComponents();
+			pdfComponents = StringProcessing::MoveElementToStart( pdfComponents, "0" );
 			for( unsigned int i=0; i< pdfComponents.size(); ++i )
 			{
 				ComponentRef* thisRef = new ComponentRef( pdfComponents[i] );
@@ -376,18 +376,26 @@ void ComponentPlotter::GenerateProjectionData()
 	//	Lets plot the projection
 
 	//	Check if the 0'th component has been defined and add it if it's missing.
-	vector<string> PDF_Components = plotPDF->PDFComponents();
-	if( StringProcessing::VectorContains( PDF_Components, string("0") ) == -1 )
+	vector<string> PDF_Components;
+	if( onlyZero == true )
 	{
-		vector<string> temp_PDF_Components( 1, "0" );
-		for(vector<string>::iterator comb_i = PDF_Components.begin(); comb_i != PDF_Components.end(); ++comb_i )
-		{
-			temp_PDF_Components.push_back( *comb_i );
-		}
-		PDF_Components = temp_PDF_Components;
+		PDF_Components = vector<string>(1,"0");
 	}
-
-	if( onlyZero == true ) PDF_Components = vector<string>(1,"0");
+	else
+	{
+		PDF_Components = plotPDF->PDFComponents();
+		if( StringProcessing::VectorContains( PDF_Components, string("0") ) == -1 )
+		{
+			vector<string> temp_PDF_Components( 1, "0" );
+			for(vector<string>::iterator comb_i = PDF_Components.begin(); comb_i != PDF_Components.end(); ++comb_i )
+			{
+				temp_PDF_Components.push_back( *comb_i );
+			}
+			PDF_Components = temp_PDF_Components;
+		}
+		PDF_Components = StringProcessing::MoveElementToStart( PDF_Components, "0" );
+	}
+	
 
 	cout << endl << "Components: " << PDF_Components.size() << endl;
 
@@ -586,7 +594,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			TCanvas* c1 = new TCanvas( Canvas_Name, "", 1680, 1050 );
 
 			data_plot->Draw();
-			data_graph->Draw("PL9 SAME");
+			data_graph->Draw("PC9 SAME");
 			c1->Update();
 			data_graph->GetYaxis()->SetRangeUser( 0., data_graph->GetYaxis()->GetXmax() );
 			c1->Update();
@@ -895,6 +903,8 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	bool addLHCb=false;
 
+	double legend_size=1.;
+
 	if( conf != NULL )
 	{
 		if( conf->logY )
@@ -908,6 +918,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		Color_Key = conf->color_key;
 		Width_Key = conf->width_key;
 		component_names = conf->component_names;
+		legend_size = conf->LegendTextSize;
 		X_min = conf->xmin;
 		X_max = conf->xmax;
 		Y_min = conf->ymin;
@@ -947,6 +958,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( myLatex != NULL ) myLatex->Draw();
 
 	TLegend* leg = EdStyle::LHCbLegend();
+	leg->SetTextSize( (Float_t) legend_size );
 
 	leg->AddEntry( input_data, "Data", "pl" );
 
@@ -977,7 +989,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 		if( (*comp_i)->GetLineWidth() != 0 )
 		{
-			(*comp_i)->Draw("L9");
+			(*comp_i)->Draw("C9");
 
 			if( !component_names.empty() )
 			{
@@ -1215,7 +1227,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 		if( (*comp_i)->GetLineWidth() != 0 )
 		{
-			(*comp_i)->Draw("L9");
+			(*comp_i)->Draw("C9");
 
 			if( !component_names.empty() )
 			{
@@ -1285,7 +1297,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	//cout << endl;
 
 	TGraphErrors* pullGraph = new TGraphErrors( (int)pull_value.size(), &(x_values[0]), &(pull_value[0]), &(x_errs[0]), &(pull_error_value[0]) );
-	pullGraph->Draw("AP");
+	pullGraph->Draw("AP9");
 	pad2->Modified();
 	pad2->Update();
 	c1->Update();
@@ -1753,7 +1765,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 
 	TString canvas_name = "PullPlot_"; canvas_name.Append(observableName); canvas_name.Append("_"); canvas_name+=rand->Rndm();
 	TCanvas* c1 = new TCanvas( canvas_name, canvas_name, 1680, 1050 );
-	pullGraph->Draw("AP");
+	pullGraph->Draw("AP9");
 	c1->Update();
 	//pullGraph->GetYaxis()->SetRangeUser(-5.,5.);
 

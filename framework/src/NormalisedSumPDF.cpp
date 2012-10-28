@@ -16,6 +16,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <sstream>
+#include <float.h>
 
 using namespace::std;
 
@@ -71,6 +72,9 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 		if( StringProcessing::VectorContains( &secondpdf_components, &zero ) == -1 ) secondpdf_components.push_back( "0" );
 	}
 
+	firstpdf_components = StringProcessing::MoveElementToStart( firstpdf_components, "0" );
+	secondpdf_components = StringProcessing::MoveElementToStart( secondpdf_components, "0" );
+
 	//      All components are:
 	//                              0       :       total of the whole NormalisedSumPDF
 	//                              1xx     :       all of the components in the first PDF
@@ -86,6 +90,8 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 	{
 		component_list.push_back( StringProcessing::AddNumberToLeft( secondpdf_components[j], 2 ) );
 	}
+
+	component_list = StringProcessing::MoveElementToStart( component_list, "0" );
 
 	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
 	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );
@@ -195,8 +201,8 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 		//Stupidity check
 		if ( newFractionValue > 1.0 || newFractionValue < 0.0 )
 		{
-			cerr << "Requested impossible fraction: " << newFractionValue << endl;
-			return false;
+			//cerr << "Requested impossible fraction: " << newFractionValue << endl;
+			//return false;
 		}
 		else
 		{
@@ -221,6 +227,12 @@ double NormalisedSumPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBound
 //Return the function value at the given point
 double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 {
+	if( firstFraction > 1.0 || firstFraction < 0.0 )
+	{
+		cerr << "Requested impossible fraction: " << firstFraction << endl;
+		return DBL_MAX;
+	}
+
 	//Calculate the integrals of the PDFs
 	double firstIntegral = this->GetFirstIntegral( NewDataPoint );
 	double secondIntegral = this->GetSecondIntegral( NewDataPoint );

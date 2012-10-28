@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	ROOT Headers
 #include "TString.h"
@@ -27,6 +27,7 @@ string StringProcessing::TimeString()
 
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
+	int sec = timeinfo->tm_sec;
 	int min = timeinfo->tm_min;
 	int hr = timeinfo->tm_hour;
 	int day = timeinfo->tm_mday;
@@ -42,7 +43,9 @@ string StringProcessing::TimeString()
 	if( hr < 10 ) time_stream << "0";	
 	time_stream << hr;
 	if( min < 10 ) time_stream << "0";
-	time_stream << min ;
+	time_stream << min;
+	if( sec < 10 ) time_stream << "0";
+	time_stream << sec;
 
 	string returnable_time = time_stream.str();
 
@@ -643,6 +646,26 @@ string StringProcessing::FindFileName( const string fileName )
 	else
 	{
 		return fullFileName;
+	}
+}
+
+vector<string> StringProcessing::MoveElementToStart( const vector<string> input, const string element )
+{
+	int address = StringProcessing::VectorContains( &input, &element );
+
+	if( address == -1 ) return input;
+	else
+	{
+		vector<string> returnable_vec;
+
+		returnable_vec.push_back( element );
+
+		for( unsigned int i=0; i< input.size(); ++i )
+		{
+			if( i != (unsigned)address ) returnable_vec.push_back( input[i] );
+		}
+
+		return returnable_vec;
 	}
 }
 

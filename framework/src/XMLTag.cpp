@@ -5,14 +5,18 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
+#include "TF1.h"
 //	RapidFit Headers
 #include "XMLTag.h"
 #include "StringProcessing.h"
 //	System Headers
 #include <iostream>
 #include <stdlib.h>
+#include <string>
+
+using namespace::std;
 
 //Default constructor w Override tags
 XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden(Override_Tags)
@@ -38,30 +42,30 @@ XMLTag::~XMLTag()
 	}
 }
 
-vector<pair<string,string> >* XMLTag::GetForbidden()
+vector<pair<string,string> >* XMLTag::GetForbidden() const
 {
 	return forbidden;
 }
 
 //Return the complete Path of the Object within the XML Structure
-string XMLTag::GetPath()
+string XMLTag::GetPath() const
 {
-	return string( path.Data() );
+	return path.Data();
 }
 
 //Return the tag name
-string XMLTag::GetName()
+string XMLTag::GetName() const
 {
 	return name;
 }
 
 //Return the children
-vector< XMLTag* > XMLTag::GetChildren()
+vector< XMLTag* > XMLTag::GetChildren() const
 {
 	string NameStr="Name";
 	vector<string> children_names;
 	int NamePos=0;
-	for( vector<XMLTag*>::iterator child_i = children.begin(); child_i != children.end(); ++child_i )
+	for( vector<XMLTag*>::const_iterator child_i = children.begin(); child_i != children.end(); ++child_i )
 	{
 		children_names.push_back( (*child_i)->GetName() );
 	}
@@ -101,7 +105,7 @@ void XMLTag::RemoveChild( int num )
 }
 
 //Return the value
-vector<string> XMLTag::GetValue()
+vector<string> XMLTag::GetValue() const
 {
 	vector<string> new_value = value;
 	path = parent->GetPath();
@@ -111,7 +115,7 @@ vector<string> XMLTag::GetValue()
 	vector<string> forbidden_paths;
 	if( forbidden != NULL )
 	{
-		for( vector<pair<string,string> >::iterator fpath_i = forbidden->begin(); fpath_i != forbidden->end(); ++fpath_i )
+		for( vector<pair<string,string> >::const_iterator fpath_i = forbidden->begin(); fpath_i != forbidden->end(); ++fpath_i )
 		{
 			forbidden_paths.push_back( fpath_i->first );
 		}
@@ -352,3 +356,34 @@ vector<string> XMLTag::SplitContent( vector<string> & Content, int LineNumber, i
 	Content = tail;
 	return head;
 }
+
+
+bool XMLTag::GetBooleanValue( const XMLTag* input )
+{
+	string value = input->GetValue()[0].c_str();
+	return strcasecmp( value.c_str() , "TRUE" ) == 0 ;
+}
+
+int XMLTag::GetIntegerValue( const XMLTag* input )
+{
+	return atoi( input->GetValue()[0].c_str() );
+}
+
+string XMLTag::GetStringValue( const XMLTag* input )
+{
+	return input->GetValue()[0];
+}
+
+double XMLTag::GetDoubleValue( const XMLTag* input )
+{
+	return strtod( input->GetValue()[0].c_str(), NULL );
+}
+
+double XMLTag::GetTF1Eval( const XMLTag* input )
+{
+	TF1* thisFunc = new TF1( "someFunc", input->GetValue()[0].c_str() );
+	double returnable = thisFunc->Eval( 0 );
+	delete thisFunc;
+	return returnable;
+}
+
