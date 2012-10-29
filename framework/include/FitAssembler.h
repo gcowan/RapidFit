@@ -86,19 +86,19 @@ class FitAssembler
 		 * @brief This Will perform Pete's Strategy of DoSafeFit which checks for Alternate Minimia in the Strong Phases of JpsiPhi
 		 */
 		static FitResult * Petes_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
-				vector< ConstraintFunction* >, bool forceContinue=false, int=1, DebugClass* =NULL);
+				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=1, DebugClass* =NULL);
 
 		/*!
 		 * @brief Undocumented
 		 */
 		static FitResult * PetesGamma_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
-				vector< ConstraintFunction* >, bool forceContinue=false, int=1, DebugClass* =NULL);
+				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=1, DebugClass* =NULL);
 
 		/*!
 		 * @brief This Will perform Rob's Strategy of DoSafeFit which checks for Alternate Minima in Strong Phases and dG and Phi_s in JpsiPhi
 		 */
 		static FitResult * Robs_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const ParameterSet*, const vector< PDFWithData* >,
-				const vector< ConstraintFunction* >, bool forceContinue=false, const int=1, DebugClass* =NULL);
+				const vector< ConstraintFunction* >, bool forceContinue=false, const int OutputLevel=1, DebugClass* =NULL);
 
 
 		/*!
@@ -141,7 +141,7 @@ class FitAssembler
 		 * @return Returns the final checked FitResult
 		 */
 		static FitResult * DoSingleSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
-				vector< ConstraintFunction* >, bool forceContinue=false, int=1, DebugClass* =NULL );
+				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=-1, DebugClass* =NULL );
 
 		/*!
 		 * @brief Used for checking a ResultDataSet against the input Parameter to insert 'missing' parameters to avoid bugs downstream in further analysis in RapidFit

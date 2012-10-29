@@ -22,7 +22,7 @@ class VectoredFeldmanCousins : public IStudy
 
 		void SetOutput( int OutputLevel );
 
-		void DoWholeStudy( int OutputLevel );
+		void DoWholeStudy( int OutputLevel =-1 );
 
 		FitResultVector* GetStudyResult();
 

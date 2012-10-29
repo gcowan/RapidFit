@@ -223,7 +223,7 @@ int RapidFit( int argc, char * argv[] )
 
 	//	7)	Toy Study
 	//Pick a toy study if there are repeats, or if pull plots are wanted
-	else if( ( thisConfig->numberRepeats > 1 ) || thisConfig->doPullsFlag )
+	else if( (thisConfig->numberRepeats > 1 || thisConfig->doPullsFlag ) && !( thisConfig->doFC_Flag || thisConfig->doLLscanFlag || thisConfig->doLLcontourFlag ) )
 	{
 		PerformToyStudy( thisConfig );
 	}
@@ -234,12 +234,14 @@ int RapidFit( int argc, char * argv[] )
 
 	//	10)
 	//	Do LL scan
-	if( main_fitResult>-1 && thisConfig->doLLscanFlag ) PerformLLScan( thisConfig );
+	if( main_fitResult>-1 && ( thisConfig->doLLscanFlag || ( thisConfig->doFC_Flag && thisConfig->makeOutput->Get2DScanList().empty() ) ) ) PerformLLScan( thisConfig );
 
 	//		This is re-used for FC scans and forms FC Step 2
 	//	11)
 	//Do 2D LL scan
-	if( main_fitResult>-1 &&( ( ( thisConfig->doLLcontourFlag || thisConfig->doFC_Flag ) && ( !thisConfig->FC_LL_PART_Flag ) ) && !thisConfig->doLLscanFlag ) ) Perform2DLLScan( thisConfig );
+	if( main_fitResult>-1 )
+		if( thisConfig->doLLcontourFlag || ( thisConfig->doFC_Flag && !thisConfig->makeOutput->Get2DScanList().empty() ) )
+				if( !thisConfig->FC_LL_PART_Flag && !thisConfig->doLLscanFlag ) Perform2DLLScan( thisConfig );
 
 	//	12b)
 	//	Do the main work of the FC scan
@@ -279,7 +281,7 @@ int Perform2DLLScan( RapidFitConfiguration* config )
 		initial_scan = unsigned( _2DLLscanList.size()-1 );
 	}
 
-	if( ( _2DLLscanList.size() == 0 ) && ( config->doFC_Flag) )
+	if( ( ( _2DLLscanList.size() == 0 ) && ( config->doFC_Flag) ) && !config->makeOutput->GetScanList().empty() )
 	{
 		cerr << "\n\n\t\tNO 2D SCAN DATA, I'M NOT GOING TO DO FC, GO AWAY!\n\n"<<endl;
 		exit(-54);

@@ -83,17 +83,20 @@ void MinuitWrapper::SetQuality( int newQuality )
 void MinuitWrapper::SetOutputLevel( int output_level )
 {
 	print_verbosity = output_level;
-	Double_t arg=output_level;
+	double* arg = new double[1];
+	arg[0] = output_level;
 	Int_t err;
+	//cout << "Changing Output Level to: " << output_level << endl;
 	if( output_level < 0 )
 	{
-		arg=-1;
-		minuit->mnexcm("SET PRINT", &arg, 1, err);
-		minuit->mnexcm("SET NOWarnings", &arg, 1, err );
+		arg[0]=-1;
+		minuit->mnexcm("SET PRINT", arg, 1, err);
+		minuit->mnexcm("SET NOWarnings", arg, 1, err );
 		err = minuit->Command("SET OUTputfile /dev/zero");
 	} else {
-		minuit->mnexcm("SET PRINT", &arg, 1, err);
+		minuit->mnexcm("SET PRINT", arg, 1, err);
 	}
+	delete arg;
 	//	minuit->SetPrintLevel( print_verbosity );
 }
 

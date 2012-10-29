@@ -53,9 +53,12 @@ IMinimiser* MinimiserConfiguration::GetMinimiser()
 //Return an appropriate minimiser instance
 IMinimiser * MinimiserConfiguration::GetMinimiser( int ParameterNumber )
 {
-	if( theMinimiser != NULL && MultiMini ) {
+	if( theMinimiser != NULL && MultiMini )
+	{
 		return theMinimiser;
-	} else {
+	}
+	else
+	{
 		if( theMinimiser != NULL )
 		{
 			delete theMinimiser;
@@ -64,10 +67,10 @@ IMinimiser * MinimiserConfiguration::GetMinimiser( int ParameterNumber )
 	}
 
 	theMinimiser = ClassLookUp::LookUpMinimiserName( minimiserName, ParameterNumber );
-	theMinimiser->SetOutputLevel(short(OutputLevel));
+	theMinimiser->SetOutputLevel( OutputLevel );
 
 	//Supply the output configuration
-	if ( contours.size() > 0 )
+	if( contours.size() > 0 )
 	{
 		theMinimiser->ContourPlots(contours);
 	}

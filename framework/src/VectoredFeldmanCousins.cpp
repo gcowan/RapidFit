@@ -167,7 +167,8 @@ vector<IDataSet*> VectoredFeldmanCousins::GetNewDataSets( ParameterSet* input_pa
 
 void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 {
-
+	cout << "Doing Study: " << OutputLevel << endl;
+	theMinimiser->SetOutputLevel( OutputLevel );
 	cout << "\n\tStarting Fit:" <<endl;
 
 	for( unsigned int i=0; i< pdfsAndData.size(); ++i )
@@ -213,13 +214,13 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 			ParameterSet* FittingParameterSetWithFixedParameters = this->getParameterSet( ParameterSetWithFixedParameters, InputResult->GetResultParameterSet() );
 
 			//	Generate and cache a set of data
-			this->SetOutput( OutputLevel );
+			this->SetOutput( -1 );//OutputLevel );
 			cout << "Generating Data With:" << endl;
 			FittingParameterSetWithFreeParameters->Print(); cout << endl;
 			vector<IDataSet*> dataset_p = this->GetNewDataSets( FittingParameterSetWithFreeParameters );
 			this->ResetOutput();
 			cout << "Storing The DataSet at this Coordinate" << endl;
-			this->SetOutput( OutputLevel );
+			this->SetOutput( -1 );//OutputLevel );
 			for( unsigned int i=0; i< pdfsAndData.size(); ++i )
 			{
 				pdfsAndData[i]->AddCachedData( dataset_p[i] );
@@ -238,15 +239,16 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 			FitResultVector* temp_vec = new FitResultVector( GlobalFitResult->GetAllNames() );
 			temp_vec->StartStopwatch();
 			cout << endl << "Fitting to the Dataset with Control Parameter(s) Fixed" << endl;
-			this->SetOutput( OutputLevel );
+			this->SetOutput( -1 );//OutputLevel );
 			cout << "Fitting With:" << endl;
 			FittingParameterSetWithFixedParameters->Print(); cout << endl;
-			FitResult* fit1Result = FitAssembler::DoSafeFit( theMinimiser, theFunction, FittingParameterSetWithFixedParameters, pdfsAndData, allConstraints, OutputLevel );
+			FitResult* fit1Result = FitAssembler::DoSafeFit( theMinimiser, theFunction, FittingParameterSetWithFixedParameters, pdfsAndData, allConstraints, true, OutputLevel );
 			for( vector<string>::iterator param_i = controlled_parameters.begin(); param_i != controlled_parameters.end(); ++param_i )
 			{
 				fit1Result->GetResultParameterSet()->GetResultParameter( *param_i )->ForceType( "Free" );
 			}
 
+			this->ResetOutput();
 			if( fit1Result->GetFitStatus() != 3 )
 			{
 				cout << "Fit FAILED!!!!" << endl;
@@ -261,7 +263,6 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 				++this_study;
 				if( FittingParameterSetWithFreeParameters != NULL ) delete FittingParameterSetWithFreeParameters;
 				if( FittingParameterSetWithFixedParameters != NULL ) delete FittingParameterSetWithFixedParameters;
-				this->ResetOutput();
 				continue;
 			}
 			temp_vec->AddFitResult( fit1Result );
@@ -272,8 +273,8 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 			FitResultVector* temp_vec2 = new FitResultVector( GlobalFitResult->GetAllNames() );
 			temp_vec2->StartStopwatch();
 			cout << endl << "Fitting to the Dataset with Control Parameter(s) Free" << endl;
-			this->SetOutput( OutputLevel );
-			FitResult* fit2Result = FitAssembler::DoSafeFit( theMinimiser, theFunction, FittingParameterSetWithFreeParameters, pdfsAndData, allConstraints, OutputLevel );
+			this->SetOutput( -1 );//OutputLevel );
+			FitResult* fit2Result = FitAssembler::DoSafeFit( theMinimiser, theFunction, FittingParameterSetWithFreeParameters, pdfsAndData, allConstraints, true, OutputLevel );
 			for( vector<string>::iterator param_i = controlled_parameters.begin(); param_i != controlled_parameters.end(); ++param_i )
 			{
 				fit2Result->GetResultParameterSet()->GetResultParameter( *param_i )->ForceType( "Free" );
@@ -281,6 +282,7 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 
 			if( fit2Result->GetFitStatus() != 3 )
 			{
+				this->ResetOutput();
 				cout << "Fit FAILED!!!!!" << endl;
 				cout << endl << "Requesting additional toy dataset" << endl;
 				for( unsigned int i=0; i< pdfsAndData.size(); ++i )
@@ -296,7 +298,6 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 				++this_study;
 				if( FittingParameterSetWithFreeParameters != NULL ) delete FittingParameterSetWithFreeParameters;
 				if( FittingParameterSetWithFixedParameters != NULL ) delete FittingParameterSetWithFixedParameters;
-				this->ResetOutput();
 				continue;
 			}
 			temp_vec2->AddFitResult( fit2Result );
@@ -324,11 +325,11 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 void VectoredFeldmanCousins::SetOutput( int OutputLevel )
 {
 	//	If the user wanted silence we point the Std Output Streams to /dev/null
-	if( OutputLevel <= -1 )
+	if( OutputLevel <= 0 )
 	{
-		cout.rdbuf(0);
-		cerr.rdbuf(0);
-		clog.rdbuf(0);
+		cout.rdbuf(NULL);
+		cerr.rdbuf(NULL);
+		clog.rdbuf(NULL);
 	}
 }
 

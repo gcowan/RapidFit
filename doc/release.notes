@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/10/29 Rob Currie
+   - Fixed bugs to do with working out what to actually do in main based on runtime config and other stuff
+   - Fixed bug in VectoredFC which would have produce an extreme amount of noise to stdout
+
 2012/10/25 Rob Currie
    - Added SingleGauss PDF Use this one for Fitting, please don't alter SimpleGauss it's intended as an educational PDF
    - Added LandauGauss PDF which is VERY CPU intensive but gives a Gaussian+Landau convolution
