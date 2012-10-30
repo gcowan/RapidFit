@@ -395,7 +395,7 @@ void ComponentPlotter::GenerateProjectionData()
 		}
 		PDF_Components = StringProcessing::MoveElementToStart( PDF_Components, "0" );
 	}
-	
+
 
 	cout << endl << "Components: " << PDF_Components.size() << endl;
 
@@ -435,7 +435,9 @@ void ComponentPlotter::GenerateProjectionData()
 		combDescs[i].append(PDFDesc.Data());
 	}
 
+	cout << endl << "Writing Combinations:" << endl;
 	for( unsigned int i=0; i< combinationDescriptions.size(); ++i ) cout << combinationDescriptions[i] << endl;
+	cout << endl;
 
 	this->WriteOutput( X_values, Y_values, combinationDescriptions );
 	here->cd();
@@ -1424,72 +1426,83 @@ void ComponentPlotter::WriteBranch( TTree* input_tree, TString Branch_Name, vect
 //	Initialize the Desciptions of the Relevant Combinations in the DataSet
 void ComponentPlotter::SetupCombinationDescriptions()
 {
-       cout << "Optimally:" << endl << endl;
+	cout << "Optimally:" << endl << endl;
 
-       //      If we have 'no discrete combinations' then get the whole dataset for this pdf
-       vector<DataPoint*> whole_dataset;
+	//      If we have 'no discrete combinations' then get the whole dataset for this pdf
+	vector<DataPoint*> whole_dataset;
 
-       cout << plotData->GetDataNumber(NULL,true) << endl;
+	cout << plotData->GetDataNumber(NULL,true) << endl;
 
-       for( int i=0; i< plotData->GetDataNumber(); ++i )
-       {
-               whole_dataset.push_back( plotData->GetDataPoint( i ) );
-       }
+	for( int i=0; i< plotData->GetDataNumber(); ++i )
+	{
+		whole_dataset.push_back( plotData->GetDataPoint( i ) );
+	}
 
-       data_subsets.push_back( whole_dataset );
+	data_subsets.push_back( whole_dataset );
 
-       ObservableRef ObservableName( observableName ); 
+	ObservableRef ObservableName( observableName ); 
 
-       vector<double> discrete_observableValues_i;
-       //      Get all values of the wanted parameter from this subset
-       for( unsigned int j=0; j< whole_dataset.size(); ++j )
-       {
-               discrete_observableValues_i.push_back( whole_dataset[j]->GetObservable( ObservableName )->GetValue() );
-       }
+	vector<double> discrete_observableValues_i;
+	//      Get all values of the wanted parameter from this subset
+	for( unsigned int j=0; j< whole_dataset.size(); ++j )
+	{
+		discrete_observableValues_i.push_back( whole_dataset[j]->GetObservable( ObservableName )->GetValue() );
+	}
 
-       cout << "Combination: 1 " << "Min: " << StatisticsFunctions::Minimum( discrete_observableValues_i );
-       cout << "\tMax: " << StatisticsFunctions::Maximum( discrete_observableValues_i ) << "\tBinNum: " << StatisticsFunctions::OptimumBinNumber( discrete_observableValues_i ) << endl;
+	cout << "Combination: 1 " << "Min: " << StatisticsFunctions::Minimum( discrete_observableValues_i );
+	cout << "\tMax: " << StatisticsFunctions::Maximum( discrete_observableValues_i ) << "\tBinNum: " << StatisticsFunctions::OptimumBinNumber( discrete_observableValues_i ) << endl;
 
-       //      If we have discrete combinations then we need to loop over each set seperatley to split up the data and information about the data
-       if( allCombinations.size() > 1 )
-       {
-               //      For all discrete combinations that have been calculated elsewhere
-               for( unsigned int combinationIndex=0; combinationIndex< allCombinations.size(); ++combinationIndex )
-               {
-                       cout << "Combination: " << combinationIndex+2 << " ";
-                       //      For this combination work out what values correspond to the discrete parameters
-                       vector<double> values_for_this_combination;
-                       for( unsigned int paramIndex=0; paramIndex< discreteNames.size(); ++paramIndex )
-                       {
-                               values_for_this_combination.push_back( allCombinations[combinationIndex]->GetObservable( discreteNames[paramIndex] )->GetValue() );
-                       }
+	combinationDescriptions.push_back( "AllData" );
 
-                       //              Get all data which falls within this paramreter set
-                       data_subsets.push_back( plotData->GetDiscreteSubSet( discreteNames, values_for_this_combination ) );
+	discreteNames = full_boundary->GetDiscreteNames();
 
-                       //print( discreteNames );
-                       //print( values_for_this_combination );
+	//      If we have discrete combinations then we need to loop over each set seperatley to split up the data and information about the data
+	if( allCombinations.size() > 1 )
+	{
+		combinationDescriptions.clear();
+		//      For all discrete combinations that have been calculated elsewhere
+		for( unsigned int combinationIndex=0; combinationIndex< allCombinations.size(); ++combinationIndex )
+		{
+			cout << "Combination: " << combinationIndex+2 << " ";
+			//      For this combination work out what values correspond to the discrete parameters
+			vector<double> values_for_this_combination;
+			for( unsigned int paramIndex=0; paramIndex< discreteNames.size(); ++paramIndex )
+			{
+				values_for_this_combination.push_back( allCombinations[combinationIndex]->GetObservable( discreteNames[paramIndex] )->GetValue() );
+			}
 
-                       vector<double> this_discrete_observableValues_i;
-                       //      Get all values of the wanted parameter from this subset
-                       for( unsigned int j=0; j< data_subsets.back().size(); ++j )
-                       {
-                               this_discrete_observableValues_i.push_back( (data_subsets.back())[j]->GetObservable( ObservableName )->GetValue() );
-                       }
+			//              Get all data which falls within this paramreter set
+			data_subsets.push_back( plotData->GetDiscreteSubSet( discreteNames, values_for_this_combination ) );
 
-                       //print( this_discrete_observableValues_i );
+			vector<double> this_discrete_observableValues_i;
+			//      Get all values of the wanted parameter from this subset
+			for( unsigned int j=0; j< data_subsets.back().size(); ++j )
+			{
+				this_discrete_observableValues_i.push_back( (data_subsets.back())[j]->GetObservable( ObservableName )->GetValue() );
+			}
 
-                       cout << "Min: " << StatisticsFunctions::Maximum( this_discrete_observableValues_i );
-                       cout << "\tMax: " << StatisticsFunctions::Maximum( this_discrete_observableValues_i );
-                       cout << "\tBinNum: " << StatisticsFunctions::OptimumBinNumber( this_discrete_observableValues_i ) << endl;
+			cout << "Min: " << StatisticsFunctions::Minimum( this_discrete_observableValues_i );
+			cout << "\tMax: " << StatisticsFunctions::Maximum( this_discrete_observableValues_i );
+			cout << "\tBinNum: " << StatisticsFunctions::OptimumBinNumber( this_discrete_observableValues_i ) << endl;
 
-               }
-       }
 
-       return;
+			TString ThisName;
+			for( unsigned int paramIndex=0; paramIndex< discreteNames.size(); ++paramIndex )
+			{
+				ThisName.Append( discreteNames[paramIndex] );
+				ThisName.Append( "=" );
+				ThisName+= values_for_this_combination[paramIndex];
+				ThisName.Append( "_" );
+			}
+			cout << "Adding This: " << ThisName << endl;
+			combinationDescriptions.push_back( ThisName.Data() );
+		}
+	}
+
+	return;
 }
 
-		//Return the values tracing the PDF projection in the Observable of choice
+//Return the values tracing the PDF projection in the Observable of choice
 vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPoint, string ObservableName, double Minimum, int PlotNumber, double PlotInterval, string component )
 {
 	//	Move initializer(s) outside of for loop
