@@ -4,6 +4,7 @@
    - Fixed bugs to do with working out what to actually do in main based on runtime config and other stuff
    - Fixed bug in VectoredFC which would have produce an extreme amount of noise to stdout
    - Fixed bug to do with saving of different Discrete Combinations in ComponentPlotter
+   - Fixed bug in 1DFC
 
 2012/10/25 Rob Currie
    - Added SingleGauss PDF Use this one for Fitting, please don't alter SimpleGauss it's intended as an educational PDF

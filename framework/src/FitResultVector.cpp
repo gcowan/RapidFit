@@ -205,7 +205,7 @@ vector<double> FitResultVector::GetParameterPulls( string ParameterName )
 //Allow access to the vector of results
 int FitResultVector::NumberResults()
 {
-	return int(allResults.size());
+	return (int)allResults.size();
 }
 
 unsigned int FitResultVector::size()

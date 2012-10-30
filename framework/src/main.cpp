@@ -719,6 +719,8 @@ int PerformFCStudy( RapidFitConfiguration* config )
 	vector<unsigned int> numberRepeatsVec;
 	if( config->numberRepeatsFlag ) numberRepeatsVec.push_back( unsigned(config->numberRepeats) );
 
+	if( config->_2DResultForFC == NULL ) return 0;
+
 	//	Do FC scan
 	vector<pair<string, string> > _2DLLscanList = config->makeOutput->Get2DScanList();
 	VectoredFeldmanCousins* new_study =
