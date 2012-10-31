@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2012/10/31 Rob Currie
+   - Adding TimeAcc to LongLived_3DAngular PDF, disabled by PDF but can be used by the user if requested
+       This may require further testing
+
 2012/10/29 Rob Currie
    - Fixed bugs to do with working out what to actually do in main based on runtime config and other stuff
    - Fixed bug in VectoredFC which would have produce an extreme amount of noise to stdout

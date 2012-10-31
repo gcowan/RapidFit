@@ -14,7 +14,13 @@
 #include "TFile.h"
 #include "TH3D.h"
 
+#include "SlicedAcceptance.h"
 #include "BasePDF.h"
+
+#include <vector>
+#include <string>
+
+using namespace::std;
 
 class LongLivedBkg_3Dangular : public BasePDF
 {
@@ -37,22 +43,32 @@ class LongLivedBkg_3Dangular : public BasePDF
 		LongLivedBkg_3Dangular& operator=( const LongLivedBkg_3Dangular& );
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
-		double buildPDFnumerator(DataPoint*);
-		double buildPDFdenominator();
+
+		double buildPDFnumerator( unsigned int sigmaNum );
+		double buildPDFdenominator( double input_tau, double input_sigmaLL, double input_tlo, double input_thi, unsigned int thetaNum, unsigned int sigmaNum );
+
 		double angularFactor( );
 
 		bool _usePunziSigmat;
+		bool _useTimeAcceptance;
 
-		void SetupPseudoObs();
-		PseudoObservable _intexpLL1aObs;
-		PseudoObservable _intexpLL2aObs;
-		PseudoObservable _intexpLL1bObs;
-		PseudoObservable _intexpLL2bObs;
-		int res;
+		//Time acceptance
+		SlicedAcceptance * timeAcc;
+
+		void InitializeCaching();
+		PseudoObservable LL1a_int;
+		PseudoObservable LL1b_int;
+		PseudoObservable LL2a_int;
+		PseudoObservable LL2b_int;
+
+		vector<PseudoObservable> LL1a_int_vec;
+		vector<PseudoObservable> LL1b_int_vec;
+		vector<PseudoObservable> LL2a_int_vec;
+		vector<PseudoObservable> LL2b_int_vec;
 
 		// Physics parameters
 		ObservableRef f_LL1Name;		// fraction of decay const 1
-                ObservableRef tauLL1Name;            // decay constant 1
+		ObservableRef tauLL1Name;            // decay constant 1
 		ObservableRef tauLL2Name;            // decay constant 2
 
 		//Detector parameters
@@ -64,9 +80,13 @@ class LongLivedBkg_3Dangular : public BasePDF
 		// to the observable names that are used in the
 		// PDF.
 		ObservableRef timeName;		
+		ObservableRef resScaleName;
+		double timeOffset;
+		double resolutionScale;
 		ObservableRef eventResolutionName;
+		ObservableRef timeOffsetName;
 		bool _usePerEvent;
-	    // For transversity angles
+		// For transversity angles
 		ObservableRef cosThetaName;	
 		ObservableRef phiName;			
 		ObservableRef cosPsiName;	
@@ -74,7 +94,7 @@ class LongLivedBkg_3Dangular : public BasePDF
 		ObservableRef cthetakName;	
 		ObservableRef cthetalName;		
 		ObservableRef phihName;			
-	
+
 		ObservableRef timeconstName;
 
 		double tauLL1;
@@ -113,3 +133,4 @@ class LongLivedBkg_3Dangular : public BasePDF
 };
 
 #endif
+

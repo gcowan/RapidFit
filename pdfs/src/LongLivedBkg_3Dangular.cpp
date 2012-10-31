@@ -45,24 +45,49 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 	, cthetalName		( config->getName("helcosthetaL") )
 	, phihName			( config->getName("helphi") )
 	, timeconstName		( config->getName("time") )
+	, resScaleName                  ( config->getName("timeResolutionScale") )
 	, eventResolutionName	( config->getName("eventResolution") )
+	, timeOffsetName                ( config->getName("timeOffset") )
 	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cos1(),
 	cos2(), phi(), histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
 	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true),
 	_useHelicityBasis(false), _usePerEvent(false), _usePunziSigmat(false)
+	, _useTimeAcceptance(false), timeAcc(NULL)
 {
 
-	cout << "Constructing PDF: LongLivedBkg_3Dangular  " << endl ;
+	cout << "Constructing PDF: LongLivedBkg_3Dangular  " << endl;
 
 	//Configure
-	_useHelicityBasis = config->isTrue( "UseHelicityBasis" ) ;
-	_usePerEvent = config->isTrue( "UsePerEvent" ) ;
+	_useHelicityBasis = config->isTrue( "UseHelicityBasis" );
+	_usePerEvent = config->isTrue( "UsePerEvent" );
 	_usePunziSigmat = config->isTrue( "UsePunziSigmat" );
+	_useTimeAcceptance = config->isTrue( "UseTimeAcceptance" );
 
 	//Make prototypes
 	this->MakePrototypes();
 
-	this->SetupPseudoObs();
+	//...........................................
+	// Configure to use time acceptance machinery
+	if( _useTimeAcceptance )
+	{
+		if( config->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) )
+		{
+			timeAcc = new SlicedAcceptance( 0., 14.0, /*0.0157*/ 0.0112);
+			cout << "LongLivedBkg_3Dangular:: Constructing timeAcc: Upper time acceptance beta=0.0112 [0 < t < 14] " << endl;
+		}
+		else if( config->getConfigurationValue( "TimeAcceptanceFile" ) != "" )
+		{
+			timeAcc = new SlicedAcceptance( "File" , config->getConfigurationValue( "TimeAcceptanceFile" ) );
+			cout << "LongLivedBkg_3Dangular:: Constructing timeAcc: using file: " << config->getConfigurationValue( "TimeAcceptanceFile" ) << endl;
+		}
+	}
+	else
+	{
+		timeAcc = new SlicedAcceptance( 0., 14. );
+		cout << "LongLivedBkg_3Dangular:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl;
+	}
+
+	this->InitializeCaching();	//	Depends on Acceptance File
 
 	//Find name of histogram needed to define 3-D angular distribution
 	string fileName = config->getConfigurationValue( "AngularDistributionHistogram" );
@@ -176,10 +201,53 @@ LongLivedBkg_3Dangular::~LongLivedBkg_3Dangular()
 {
 }
 
+void LongLivedBkg_3Dangular::InitializeCaching()
+{
+	if( _useTimeAcceptance )
+	{
+		for( unsigned int i=0; i< timeAcc->numberOfSlices(); ++i )
+		{
+			TString LL1a_int_vec_name="LLBKG_LL1a_time_"; LL1a_int_vec_name+=i;
+			LL1a_int_vec.push_back( PseudoObservable( LL1a_int_vec_name.Data() ) );
+			LL1a_int_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
+
+			TString LL2a_int_vec_name="LLBKG_LL2a_time_"; LL2a_int_vec_name+=i;
+			LL2a_int_vec.push_back( PseudoObservable( LL2a_int_vec_name.Data() ) );
+			LL2a_int_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
+
+			TString LL1b_int_vec_name="LLBKG_LL1b_time_"; LL1b_int_vec_name+=i;
+			LL1b_int_vec.push_back( PseudoObservable( LL1b_int_vec_name.Data() ) );
+			LL1b_int_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
+
+			TString LL2b_int_vec_name="LLBKG_LL2b_time_"; LL2b_int_vec_name+=i;
+			LL2b_int_vec.push_back( PseudoObservable( LL2b_int_vec_name.Data() ) );
+			LL2b_int_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
+		}
+	}
+	else
+	{
+		TString LL1a_Cache_name="LLBKG_LL1a_time";
+		LL1a_int = PseudoObservable( LL1a_Cache_name.Data() );
+		LL1a_int.AddFunction( Mathematics::ExpInt_Wrapper );
+
+		TString LL2a_Cache_name="LLBKG_LL2a_time";
+		LL2a_int = PseudoObservable( LL2a_Cache_name.Data() );
+		LL2a_int.AddFunction( Mathematics::ExpInt_Wrapper );		
+
+		TString LL1b_Cache_name="LLBKG_LL1b_time";
+		LL1b_int = PseudoObservable( LL1b_Cache_name.Data() );
+		LL1b_int.AddFunction( Mathematics::ExpInt_Wrapper );
+
+		TString LL2b_Cache_name="LLBKG_LL2b_time";
+		LL2b_int = PseudoObservable( LL2b_Cache_name.Data() );
+		LL2b_int.AddFunction( Mathematics::ExpInt_Wrapper );
+	}
+}
+
 vector<string> LongLivedBkg_3Dangular::GetDoNotIntegrateList()
 {
 	vector<string> doNotList;
-	if( _usePerEvent && !_usePunziSigmat ) doNotList.push_back( eventResolutionName ); 
+	if( _usePerEvent && !_usePunziSigmat ) doNotList.push_back( eventResolutionName );
 	return doNotList;
 }
 
@@ -214,23 +282,16 @@ void LongLivedBkg_3Dangular::MakePrototypes()
 	}
 	else
 	{
+		parameterNames.push_back( resScaleName );
 		allObservables.push_back( eventResolutionName );
 	}
 
+	if( _useTimeAcceptance )
+	{
+		parameterNames.push_back( timeOffsetName );
+	}
+
 	allParameters = ParameterSet(parameterNames);
-}
-
-void LongLivedBkg_3Dangular::SetupPseudoObs()
-{
-	_intexpLL1aObs = PseudoObservable( "LLBkg::intexpLL1a_time" );
-	_intexpLL1aObs.AddFunction( Mathematics::ExpInt_Wrapper );
-	_intexpLL2aObs = PseudoObservable( "LLBkg::intexpLL2a_time" );
-	_intexpLL2aObs.AddFunction( Mathematics::ExpInt_Wrapper );
-
-	_intexpLL1bObs = PseudoObservable( "LLBkg::intexpLL1b_time" );
-	_intexpLL1bObs.AddFunction( Mathematics::ExpInt_Wrapper );
-	_intexpLL2bObs = PseudoObservable( "LLBkg::intexpLL2b_time" );
-	_intexpLL2bObs.AddFunction( Mathematics::ExpInt_Wrapper );
 }
 
 //.................................................................
@@ -240,12 +301,23 @@ bool LongLivedBkg_3Dangular::SetPhysicsParameters( ParameterSet * NewParameterSe
 	f_LL1       = allParameters.GetPhysicsParameter( f_LL1Name )->GetValue();
 	tauLL1      = allParameters.GetPhysicsParameter( tauLL1Name )->GetValue();
 	tauLL2      = allParameters.GetPhysicsParameter( tauLL2Name )->GetValue();
+
 	if( !_usePerEvent )
 	{
 		timeResLL1Frac = allParameters.GetPhysicsParameter( timeResLL1FracName )->GetValue();
 		sigmaLL1    = allParameters.GetPhysicsParameter( sigmaLL1Name )->GetValue();
 		sigmaLL2    = allParameters.GetPhysicsParameter( sigmaLL2Name )->GetValue();
 	}
+	else
+	{
+		resolutionScale = allParameters.GetPhysicsParameter( resScaleName )->GetValue();
+	}
+
+	if( _useTimeAcceptance )
+	{
+		timeOffset = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
+	}
+
 	return isOK;
 }
 
@@ -253,8 +325,17 @@ bool LongLivedBkg_3Dangular::SetPhysicsParameters( ParameterSet * NewParameterSe
 //Main method to build the PDF return value
 double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 {
+	_datapoint=measurement;		//	Needed for AngAcc caching
+
 	// Observable
-	time = measurement->GetObservable( timeName )->GetValue();
+	Observable* timeObs = measurement->GetObservable( timeName );
+	time = timeObs->GetValue();
+
+	IConstraint* timeConst = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName );
+
+	tlow = timeConst->GetMinimum();
+	thigh = timeConst->GetMaximum();
+
 	if( _useHelicityBasis )
 	{
 		cos1   = measurement->GetObservable( cthetakName )->GetValue();
@@ -270,35 +351,35 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 
 	double returnValue = 0;
 	double val1=-1., val2=-1.;
+
+	//Deal with propertime resolution
 	if( _usePerEvent )
 	{
-		sigmaLL = measurement->GetObservable( eventResolutionName )->GetValue();
-		res=1;
-		returnValue =  this->buildPDFnumerator(measurement);
+		sigmaLL = measurement->GetObservable( eventResolutionName )->GetValue() * resolutionScale;
+
+		returnValue =  this->buildPDFnumerator( 1 );
 	}
 	else
 	{
-		//Deal with propertime resolution
 		if( timeResLL1Frac >= 0.9999 )
 		{
 			// Set the member variable for time resolution to the first value and calculate
 			sigmaLL = sigmaLL1;
-			res=1;
-			returnValue =  this->buildPDFnumerator(measurement) ;
+			returnValue =  this->buildPDFnumerator( 1 );
 		}
 		else
 		{
 			// Set the member variable for time resolution to the first value and calculate
 			sigmaLL = sigmaLL1;
-			res=1;
-			val1 = this->buildPDFnumerator(measurement);
-			// Set the member variable for time resolution to the second value and calculate
+			val1 = this->buildPDFnumerator( 1 );
+
 			sigmaLL = sigmaLL2;
-			res=2;
-			val2 = this->buildPDFnumerator(measurement);
-			returnValue = (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2) ;
+			val2 = this->buildPDFnumerator( 2 );
+
+			returnValue = (timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2);
 		}
 	}
+
 
 	if (returnValue <= 0)
 	{
@@ -308,86 +389,80 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 		PDF_THREAD_UNLOCK
 	}
 
+	if( _useTimeAcceptance )
+	{
+		returnValue *= timeAcc->getValue( timeObs, timeOffset );
+	}
+
 	return returnValue;
 }
 
 
 //.............................................................
 // Core calculation of PDF value
-double LongLivedBkg_3Dangular::buildPDFnumerator(DataPoint * measurement)
+double LongLivedBkg_3Dangular::buildPDFnumerator( unsigned int sigmaNum )
 {
-	_datapoint = measurement;
 	// Sum of two exponentials, using the time resolution functions
 
 	double returnValue = 0.;
 
-	tlow = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMinimum();
-	thigh = measurement->GetPhaseSpaceBoundary()->GetConstraint( timeName )->GetMaximum();
-
 	double val1=-1., val2=-1., norm1=-1., norm2=-1.;
-	if( f_LL1 >= 0.9999 )
+	if( _usePerEvent )
 	{
-		if( tauLL1 <= 0 )
-		{
-			PDF_THREAD_LOCK
-				cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
-			PDF_THREAD_UNLOCK
-				throw(-7632);
-		}
 		double inv_tau=1./tauLL1;
-		vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlow; Exp_Input_1[1]=thigh; Exp_Input_1[2]=inv_tau; Exp_Input_1[3]=sigmaLL;
+
 		val1 = Mathematics::Exp(time, inv_tau, sigmaLL);
-		//norm1= Mathematics::ExpInt(tlow, thigh, inv_tau, sigmaLL);
-		if( res == 1 )
-		{
-			norm1 = _datapoint->GetPseudoObservable( _intexpLL1aObs, Exp_Input_1 );
-		}
-		else
-		{
-			norm1 = _datapoint->GetPseudoObservable( _intexpLL1bObs, Exp_Input_1 );
-		}
-		returnValue = val1 /norm1;
+
+		norm1= this->buildPDFdenominator( tauLL1, sigmaLL, tlow, thigh, 1, 1 );
+
+		returnValue = val1 / norm1;
 	}
 	else
 	{
-		if( (tauLL1 <= 0) ||  (tauLL2 <= 0) )
+		if( f_LL1 >= 0.9999 )
 		{
-			PDF_THREAD_LOCK
+			if( tauLL1 <= 0 )
+			{
+				PDF_THREAD_LOCK
+				cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
+				PDF_THREAD_UNLOCK
+				throw(-7632);
+			}
+
+			double inv_tau=1./tauLL1;
+
+			val1 = Mathematics::Exp(time, inv_tau, sigmaLL);
+
+			norm1= this->buildPDFdenominator( tauLL1, sigmaLL, tlow, thigh, 1, sigmaNum );
+
+			returnValue = val1 /norm1;
+		}
+		else
+		{
+			if( (tauLL1 <= 0) ||  (tauLL2 <= 0) )
+			{
+				PDF_THREAD_LOCK
 				cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
-			PDF_THREAD_UNLOCK
+				PDF_THREAD_UNLOCK
 				throw(7632);
-		}
-		double inv_tau_LL1 = 1./tauLL1;
-		double inv_tau_LL2 = 1./tauLL2;
-		vector<double> Exp_Input_1(4,0.); Exp_Input_1[0]=tlow; Exp_Input_1[1]=thigh; Exp_Input_1[2]=inv_tau_LL1; Exp_Input_1[3]=sigmaLL;
-		vector<double> Exp_Input_2(4,0.); Exp_Input_2[0]=tlow; Exp_Input_2[1]=thigh; Exp_Input_2[2]=inv_tau_LL2; Exp_Input_2[3]=sigmaLL;
+			}
 
-		val1 = Mathematics::Exp(time, inv_tau_LL1, sigmaLL);
-		//norm1= Mathematics::ExpInt(tlow, thigh, inv_tau_LL1, sigmaLL);
-		if( res == 1 )
-		{
-			norm1 = _datapoint->GetPseudoObservable( _intexpLL1aObs, Exp_Input_1 );
-		}
-		else
-		{
-			norm1 = _datapoint->GetPseudoObservable( _intexpLL1bObs, Exp_Input_1 );
-		}
+			double inv_tau_LL1 = 1./ tauLL1;
+			double inv_tau_LL2 = 1./ tauLL2;
 
-		val2 = Mathematics::Exp(time, inv_tau_LL2, sigmaLL);
-		//norm2= Mathematics::ExpInt(tlow, thigh, inv_tau_LL2, sigmaLL);
-		if( res == 1 )
-		{
-			norm2 = _datapoint->GetPseudoObservable( _intexpLL2aObs, Exp_Input_2 );
+
+			val1 = Mathematics::Exp(time, inv_tau_LL1, sigmaLL );
+			val2 = Mathematics::Exp(time, inv_tau_LL2, sigmaLL );
+
+
+			norm1= this->buildPDFdenominator( tauLL1, sigmaLL, tlow, thigh, 1, sigmaNum );
+			norm2= this->buildPDFdenominator( tauLL2, sigmaLL, tlow, thigh, 2, sigmaNum );
+
+			returnValue = f_LL1 * val1/norm1 + (1. - f_LL1) * val2/norm2;
 		}
-		else
-		{
-			norm2 = _datapoint->GetPseudoObservable( _intexpLL2bObs, Exp_Input_2 );
-		}
-		returnValue = f_LL1 * val1/norm1 + (1. - f_LL1) * val2/norm2;
 	}
 
-	double acc=angularFactor();
-	returnValue *= acc;
+	returnValue *= angularFactor();
 
 	return returnValue;
 }
@@ -399,75 +474,97 @@ double LongLivedBkg_3Dangular::Normalisation(PhaseSpaceBoundary * boundary)
 {
 	(void) boundary;
 	return 1.;
-
-	/*
-	   IConstraint * timeBound = boundary->GetConstraint( timeconstName );
-	   if ( timeBound->GetUnit() == "NameNotFoundError" )
-	   {
-	   cerr << "Bound on time not provided" << endl;
-	   return -1.;
-	   }
-	   else
-	   {
-	   tlow = timeBound->GetMinimum();
-	   thigh = timeBound->GetMaximum();
-	   }
-
-	   double returnValue = 0;
-
-	   if( timeResLL1Frac >= 0.9999 )
-	   {
-	// Set the member variable for time resolution to the first value and calculate
-	sigmaLL = sigmaLL1;
-	returnValue = buildPDFdenominator();
-	}
-	else
-	{
-	// Set the member variable for time resolution to the first value and calculate
-	sigmaLL = sigmaLL1;
-	double val1 = buildPDFdenominator();
-	// Set the member variable for time resolution to the second value and calculate
-	sigmaLL = sigmaLL2;
-	double val2 = buildPDFdenominator();
-	returnValue =  timeResLL1Frac*val1 + (1. - timeResLL1Frac)*val2;
-	}
-
-	return returnValue ;
-	 */
 }
 
 //.............................................................
 //
-double LongLivedBkg_3Dangular::buildPDFdenominator()
+double LongLivedBkg_3Dangular::buildPDFdenominator( double input_tauLL, double input_sigmaLL, double t_min, double t_max, unsigned int LLnum, unsigned int sigmaNum )
 {
-	return 1. ;
-	/*
-	// Sum of two exponentials, using the time resolution functions
+	double inv_tau=1./input_tauLL;
 
-	double returnValue = 0;
+	double tlo_boundary = t_min;
+	double thi_boundary = t_max;
 
-	if( f_LL1 >= 0.9999 ) {
-	if( tauLL1 <= 0 ) {
-	cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1 " << endl ;
-	exit(1) ;
+	double returnValue=0.;
+	double tlow_temp=0., thigh_temp=0.;
+
+	vector<double> ExpInt_Input( 4, 0. );
+
+	if( _useTimeAcceptance )
+	{
+		ExpInt_Input[0] = tlow_temp; ExpInt_Input[1] = thigh_temp;  ExpInt_Input[2] = inv_tau; ExpInt_Input[3] = input_sigmaLL;
+		//This loops over each time slice, does the normalisation between the limits, and accumulates
+		for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
+		{
+			tlow_temp = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
+			thigh_temp = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
+
+			if( thigh > tlow )
+			{
+				ExpInt_Input[0] = tlow_temp; ExpInt_Input[1] = thigh_temp;
+
+				if( LLnum == 1 )
+				{
+					if( sigmaNum == 1)
+					{
+						returnValue += _datapoint->GetPseudoObservable( LL1a_int_vec[islice], ExpInt_Input ) * timeAcc->getSlice(islice)->height();
+					}
+					else
+					{
+						returnValue += _datapoint->GetPseudoObservable( LL1b_int_vec[islice], ExpInt_Input ) * timeAcc->getSlice(islice)->height();
+					}
+				}
+				else if ( LLnum == 2 )
+				{
+					if( sigmaNum == 1 )
+					{
+						returnValue += _datapoint->GetPseudoObservable( LL2a_int_vec[islice], ExpInt_Input ) * timeAcc->getSlice(islice)->height();
+					}
+					else
+					{
+						returnValue += _datapoint->GetPseudoObservable( LL2b_int_vec[islice], ExpInt_Input ) * timeAcc->getSlice(islice)->height();
+					}
+				}
+				else
+				{
+					returnValue += Mathematics::ExpInt( tlow_temp, thigh_temp, inv_tau, input_sigmaLL ) * timeAcc->getSlice(islice)->height();
+				}
+			}
+
+		}
 	}
-	returnValue = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
-
+	else
+	{
+		ExpInt_Input[0] = t_min; ExpInt_Input[1] = t_max;  ExpInt_Input[2] = inv_tau; ExpInt_Input[3] = input_sigmaLL;
+		if( LLnum == 1 )
+		{
+			if( sigmaNum == 1 )
+			{
+				returnValue = _datapoint->GetPseudoObservable( LL1a_int, ExpInt_Input );
+			}
+			else
+			{
+				returnValue = _datapoint->GetPseudoObservable( LL1b_int, ExpInt_Input );
+			}
+		}
+		else if( LLnum == 2 )
+		{
+			if( sigmaNum == 1 )
+			{
+				returnValue = _datapoint->GetPseudoObservable( LL2a_int, ExpInt_Input );
+			}
+			else
+			{
+				returnValue = _datapoint->GetPseudoObservable( LL2b_int, ExpInt_Input );
+			}
+		}
+		else
+		{
+			returnValue = Mathematics::ExpInt( t_min, t_min, inv_tau, input_sigmaLL );
+		}
 	}
-	else {
-	if( (tauLL1 <= 0) ||  (tauLL2 <= 0) ) {
-	cout << " In LongLivedBkg_3Dangular() you gave a negative or zero lifetime for tauLL1/2 " << endl ;
-	exit(1) ;
-	}
-	double val1 = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
-	double val2 = Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
-	returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
-	}
 
-	//This PDF only works for full angular phase space= 8pi factor included in the factors in the Evaluate() method - so no angular normalisation term.
-	return returnValue ;
-	 */
-
+	return returnValue;
 }
 
 
