@@ -828,13 +828,26 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 	//Collect all ToFit elements
 	vector< XMLTag* > toFits;
 	vector< PDFWithData* > pdfsAndData;
+	unsigned int PDFNum_Counter=0;
 	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ToFit" )
 		{
+			for( unsigned int i=0; i< children[childIndex]->GetChildren().size(); ++i )
+			{
+				if( children[childIndex]->GetChildren()[i]->GetName() == "PDF" || children[childIndex]->GetChildren()[i]->GetName() == "CommonPDF" )
+				{
+					TString ThisNum=""; ThisNum+=PDFNum_Counter;
+					children[childIndex]->AppendPath( ThisNum.Data() );
+					++PDFNum_Counter;
+					break;
+				}
+			}
 			toFits.push_back( children[childIndex] );
 		}
 	}
+
+	cout << endl << endl << endl << "Finished Updating PDF Paths" << endl << endl << endl;
 
 	//Go through the collected ToFit elements
 	if ( toFits.size() == 0 )
@@ -905,6 +918,9 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 				} else {
 					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, -1, overloadConfigurator ) );
 				}
+				TString ThisLabel = pdfsAndData.back()->GetPDF()->GetLabel();
+				ThisLabel.Append( "_PDF" ); ThisLabel+=fitIndex;
+				pdfsAndData.back()->GetPDF()->SetLabel( ThisLabel.Data() );
 			}
 			else if( !foundConstraint )
 			{
@@ -1564,10 +1580,48 @@ XMLTag* XMLConfigReader::FindCommonPDFXML()
 	{
 		if( children[childIndex]->GetName() == "CommonPDF" )
 		{
+			unsigned int subParamNum=0;
+			unsigned int appendParamNum=0;
+			unsigned int configParamNum=0;
+			for( unsigned int i=0; i< children[childIndex]->GetChildren().size(); ++i )
+			{
+				AppendCommonNames( children[childIndex]->GetChildren()[i], subParamNum, appendParamNum, configParamNum );
+			}
+
 			return children[childIndex]->GetChildren()[0];
 		}
 	}
 	return NULL;
+}
+
+void XMLConfigReader::AppendCommonNames( XMLTag* input, unsigned int &subParamNum, unsigned int &appendParamNum, unsigned int &configParamNum )
+{
+	for( unsigned int i=0; i< input->GetChildren().size(); ++i )
+	{
+		if( input->GetChildren()[i]->GetName() == "ParameterSubstitution" )
+		{
+			TString ThisNum("Common"); ThisNum+=subParamNum;
+			input->GetChildren()[i]->AppendPath( ThisNum.Data() );
+			++subParamNum;
+		}
+		else if ( input->GetChildren()[i]->GetName() == "AppendParameterNames" )
+		{
+			TString ThisNum("Common"); ThisNum+=appendParamNum;
+			input->GetChildren()[i]->AppendPath( ThisNum.Data() );
+			++appendParamNum;
+		}
+		else if ( input->GetChildren()[i]->GetName() == "ConfigurationParameter" )
+		{
+			TString ThisNum("Common"); ThisNum+=configParamNum;
+			input->GetChildren()[i]->AppendPath( ThisNum.Data() );
+			++configParamNum;
+		}
+
+		for( unsigned int j=0; j< input->GetChildren()[i]->GetChildren().size(); ++j )
+		{
+			AppendCommonNames( input->GetChildren()[i]->GetChildren()[j], subParamNum, appendParamNum, configParamNum );
+		}
+	}
 }
 
 XMLTag* XMLConfigReader::FindCommonPDFConfiguratorXML()
@@ -1701,7 +1755,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 {
 	(void) print;
 	IPDF* returnable_NamedPDF=NULL;
-
+	string label;
 	//Check the tag actually is a PDF
 	if( InputTag->GetName() == "PDF" )
 	{
@@ -1719,12 +1773,20 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 		vector<string> observableNames, parameterNames;
 		PDFConfigurator* configurator = new PDFConfigurator();
 
+		unsigned int appendParamNum=0;
+		unsigned int configParamNum=0;
+		unsigned int subParamNum=0;
+
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
 			if ( pdfConfig[configIndex]->GetName() == "Name" )
 			{
 				name = XMLTag::GetStringValue( pdfConfig[configIndex] );
+			}
+			else if ( pdfConfig[configIndex]->GetName() == "Label" )
+			{
+				label = XMLTag::GetStringValue( pdfConfig[configIndex] );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ObservableName" )
 			{
@@ -1736,15 +1798,24 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ParameterSubstitution" )
 			{
+				TString ThisNum; ThisNum+=subParamNum;
+				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				configurator->addParameterSubstitution( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+				++subParamNum;
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "AppendParameterNames" )
 			{
+				TString ThisNum; ThisNum+=appendParamNum;
+				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+				++appendParamNum;
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{
+				TString ThisNum; ThisNum+=configParamNum;
+				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+				++configParamNum;
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
 			{
@@ -1764,6 +1835,9 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 			cout << "Options Passed to this PDF" << endl;
 			configurator->Print();
 		}
+
+
+		//	XMLTags from the CommonPDF XML object
 
 		if( overloadConfigurator != NULL )
 		{
@@ -1810,13 +1884,15 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 	}
 
 	//	returnable_NamedPDF->SetRandomFunction( GetSeed() );
+	if( !label.empty() ) returnable_NamedPDF->SetLabel( label );
 	return returnable_NamedPDF;
 }
 
 //Create a SumPDF from an appropriate xml tag
 IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator, bool print )
 {
-	IPDF* returnable_SUMPDF;
+	IPDF* returnable_SUMPDF=NULL;
+	string label;
 	vector< IPDF* > componentPDFs;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "SumPDF" )
@@ -1849,6 +1925,10 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 			if( pdfConfig[configIndex]->GetName() == "FractionName" && fractionName == "unspecified" )
 			{
 				fractionName = XMLTag::GetStringValue( pdfConfig[configIndex] );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "Label" )
+			{
+				label = XMLTag::GetStringValue( pdfConfig[configIndex] );
 			}
 			else
 			{
@@ -1885,11 +1965,8 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		exit(1);
 	}
 
-	returnable_SUMPDF->SetName( "Sum" );
-	returnable_SUMPDF->SetLabel( "Sum_("+componentPDFs[0]->GetLabel()+")+("+componentPDFs[1]->GetLabel()+")" );
-
 	delete componentPDFs[0]; delete componentPDFs[1];
-	//	returnable_SUMPDF->SetRandomFunction( GetSeed() );
+	if( !label.empty() ) returnable_SUMPDF->SetLabel( label );
 	return returnable_SUMPDF;
 }
 
@@ -1897,6 +1974,7 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator, bool print )
 {
 	IPDF* returnable_NormPDF = NULL;
+	string label;
 	vector< IPDF* > componentPDFs;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "NormalisedSumPDF" )
@@ -1928,6 +2006,10 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 			if( pdfConfig[configIndex]->GetName() == "FractionName" && fractionName == "unspecified" )
 			{
 				fractionName = XMLTag::GetStringValue( pdfConfig[configIndex] );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "Label" )
+			{
+				label = XMLTag::GetStringValue( pdfConfig[configIndex] );
 			}
 			else
 			{
@@ -1967,14 +2049,15 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 	//cout << returnable_NormPDF->GetName() << "\t\t" << returnable_NormPDF->GetLabel() << endl;
 
 	delete componentPDFs[0]; delete componentPDFs[1];
-	//	returnable_NormPDF->SetRandomFunction( GetSeed() );
+	if( !label.empty() ) returnable_NormPDF->SetLabel( label );
 	return returnable_NormPDF;
 }
 
 //Create a ProdPDF from an appropriate xml tag
 IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator, bool print )
 {
-	IPDF* returnable_ProdPDF;
+	IPDF* returnable_ProdPDF=NULL;
+	string label;
 	vector< IPDF* > componentPDFs;
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "ProdPDF" )
@@ -1984,11 +2067,18 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
-			//cout << "--------------------------------------------------------------------------------------------------------------------" << endl;
-			//cout << "Constructing ProdPDF Component: " << i << endl;
-			//cout << endl;
-			componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, print ) );
-			++i;
+			if( pdfConfig[configIndex]->GetName() == "Label" )
+			{
+				label = XMLTag::GetStringValue( pdfConfig[configIndex] );
+			}
+			else
+			{
+				//cout << "--------------------------------------------------------------------------------------------------------------------" << endl;
+				//cout << "Constructing ProdPDF Component: " << i << endl;
+				//cout << endl;
+				componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, print ) );
+				++i;
+			}
 		}
 
 		//Check there are two component PDFs to sum
@@ -2009,7 +2099,7 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 	}
 
 	delete componentPDFs[0]; delete componentPDFs[1];
-	//	returnable_ProdPDF->SetRandomFunction( GetSeed() );
+	if( !label.empty() ) returnable_ProdPDF->SetLabel( label );
 	return returnable_ProdPDF;
 }
 
@@ -2022,20 +2112,33 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 
 		PDFConfigurator* configurator = new PDFConfigurator();
 
+		unsigned int appendParamNum=0;
+		unsigned int configParamNum=0;
+		unsigned int subParamNum=0;
+
 		//Load the PDF configuration
 		for( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
 			if ( pdfConfig[configIndex]->GetName() == "ParameterSubstitution" )
 			{
+				TString ThisNum; ThisNum+=subParamNum;
+				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				configurator->addParameterSubstitution( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+				++subParamNum;
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "AppendParameterNames" )
 			{
+				TString ThisNum; ThisNum+=appendParamNum;
+				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+				++appendParamNum;
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{
+				TString ThisNum; ThisNum+=configParamNum;
+				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+				++configParamNum;
 			}
 		}
 
@@ -2071,6 +2174,8 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 		cerr << "(2)Unrecognised PDF configuration: " << InputTag->GetName() << endl;
 		exit(1);
 	}
+
+	cout << returnable_pdf->GetLabel() << endl;
 
 	returnable_pdf->SetRandomFunction( int(GetSeed()) );
 	returnable_pdf->SetMCCacheStatus( false );

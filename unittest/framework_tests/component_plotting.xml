@@ -193,9 +193,11 @@
 						<ParameterSubstitution>f_sig_m1:f_sig_m1d</ParameterSubstitution>
 						<ParameterSubstitution>sigma_m1:sigma_m1d</ParameterSubstitution>
 						<ParameterSubstitution>m_Bs:m_Bsd</ParameterSubstitution>
+						<Label>MYPDF</Label>
 					</PDF>
 				</NormalisedSumPDF>
 			</NormalisedSumPDF>
+			<Label>MainPDF</Label>
 		</NormalisedSumPDF>
 	</CommonPDF>
 

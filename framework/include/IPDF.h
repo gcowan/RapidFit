@@ -36,7 +36,7 @@
 #ifdef __CINT__ 
 #undef __GNUC__ 
 #define _SYS__SELECT_H_
-	struct pthread_mutex_t;
+struct pthread_mutex_t;
 #undef __SYS__SELECT_H_
 #define __GNUC__
 #endif
@@ -262,12 +262,6 @@ class IPDF
 
 		/*!
 		 * Interface Function:
-		 * Get the Name of the PDF
-		 */
-		virtual void SetName( string ) = 0;
-
-		/*!
-		 * Interface Function:
 		 * Return a list of PDF components addresses in string format
 		 */
 		virtual vector<string> PDFComponents() = 0;
@@ -329,6 +323,13 @@ class IPDF
 		virtual void SetDebug( DebugClass* input_debug ) = 0;
 
 		virtual void Print() const = 0;
+
+		/*!
+		 * Interface Function:
+		 * Get the Name of the PDF
+		 */
+		virtual void SetName( string ) = 0;
+
 	protected:
 
 		virtual bool SetPhysicsParameters( ParameterSet* Input ) = 0;
@@ -374,10 +375,14 @@ extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
 	extern "C" IPDF* CreatePDF_##X( PDFConfigurator* config ) { \
 		IPDF* thisObject = (IPDF*) new X( config );\
 		thisObject->SetConfigurator( config );\
+		thisObject->SetName( #X );\
+		thisObject->SetLabel( #X );\
 		return thisObject;\
 	} \
 extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
-	return (IPDF*) new X( (X&) input ); \
+	IPDF* returnable = (IPDF*) new X( (X&) input );\
+	returnable->SetName( #X );\
+	return returnable;\
 }
 
 #endif

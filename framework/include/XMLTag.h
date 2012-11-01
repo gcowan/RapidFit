@@ -59,6 +59,9 @@ class XMLTag
 		 */
 		string GetPath() const;
 
+		void PrePendPath( const string input );
+		void AppendPath( const string input );
+
 		/*!
 		 * @brief Return the Name of this Tag
 		 */
@@ -116,6 +119,8 @@ class XMLTag
 		 */
 		void FindTagCloses( string, vector<string>, vector<int>&, vector<int>& );
 
+		void RegeneratePath();
+
 		/*!
 		 * @brief Find the content of a tag.
 		 *
@@ -132,6 +137,7 @@ class XMLTag
 		mutable vector<string> value;			/*!	Value of this XML Tag			*/
 		string name;					/*!	Name of this XML Tag			*/
 		XMLTag* parent;					/*!	Address of the parent of this tag	*/
+		TString parent_append;
 		mutable TString path;				/*!	Path of this XML Tag			*/
 		vector<pair<string, string> >* forbidden;	/*!	override xml path and values		*/
 

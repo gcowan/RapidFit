@@ -124,8 +124,6 @@ IPDF* ClassLookUp::LookUpPDFName( string Name, PDFConfigurator* configurator )
 
 	IPDF* returnable_PDF = (IPDF*) pdf_creator( configurator );
 
-	returnable_PDF->SetName( Name ); 
-	returnable_PDF->SetLabel( Name );
 	returnable_PDF->SetConfigurator( configurator );
 
 	return returnable_PDF;
@@ -179,7 +177,6 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 		}
 	}
 
-	returnable_PDF->SetName( Name );
 	returnable_PDF->Can_Remove_Cache( false );
 
 	return returnable_PDF;

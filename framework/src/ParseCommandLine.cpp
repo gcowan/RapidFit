@@ -323,11 +323,11 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 				temp_pair.first = path;
 				temp_pair.second = value;
 				cout << endl;
-				cout << "WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING" << endl;
+				cout << "ATTENTION!!ATTENTION!!ATTENTION!!ATTENTION!!ATTENTION!!ATTENTION!!ATTENTION" << endl;
 				cout << "Overriding an XMLTag with:" << endl;
 				cout << "\t" << path << "\t" << value << endl;
 				cout << "NB:\t this is an expert option for complex situations which haven't been forseen in the design yet" << endl;
-				cout << "WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING!!WARNING" << endl << endl;
+				cout << "ATTENTION!!ATTENTION!!ATTENTION!!ATTENTION!!ATTENTION!!ATTENTION!!ATTENTION" << endl << endl;
 				config.XMLOverrideList->push_back( temp_pair );
 			}
 			else

@@ -32,6 +32,7 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 	cout << endl;
 	cout << "Constructing SumPDF" << endl;
 	cout << endl;
+	this->SetLabel( "Sum_("+firstPDF->GetLabel()+")+("+firstPDF->GetLabel()+")" );
 	MakePrototypes(InputBoundary);
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );

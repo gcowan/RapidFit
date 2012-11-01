@@ -69,15 +69,15 @@
  *             (This interfaces with the NumericalIntegrator class)
  *
  *          EvaluateForNumericGeneration( DataPoint* )
- *             (This interfaces with the Toy DataSet Generators like Foam)
- *
- *
- *
- *
- * @author Benjamin M Wynne bwynne@cern.ch
- * @author Robert Currie rcurrie@cern.ch
- *
- */
+*             (This interfaces with the Toy DataSet Generators like Foam)
+	*
+	*
+	*
+	*
+	* @author Benjamin M Wynne bwynne@cern.ch
+	* @author Robert Currie rcurrie@cern.ch
+	*
+	*/
 
 #pragma once
 #ifndef BASE_PDF_H
@@ -480,17 +480,6 @@
 		string GetName() const;
 
 		/*!
-		 * @brief Set the Name of the PDF
-		 *
-		 * @warning Use With CAUTION!
-		 *
-		 * @return Name   This is the new Name we want to give to this PDF
-		 *
-		 * @return Void
-		 */
-		void SetName( string Name );
-
-		/*!
 		 * @brief Get the Label of this PDF
 		 *
 		 * @return Return the Label of the PDF which describes the PDF better than the Name
@@ -559,6 +548,18 @@
 		virtual void SetDebug( DebugClass* input_debug );
 
 		virtual void Print() const;
+
+		/*!
+		 * @brief Set the Name of the PDF
+		 *
+		 * @warning Use With CAUTION!
+		 *
+		 * @return Name   This is the new Name we want to give to this PDF
+		 *
+		 * @return Void
+		 */
+		void SetName( string Name );
+
 	protected:
 
 		/*!

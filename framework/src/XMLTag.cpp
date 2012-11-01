@@ -19,12 +19,12 @@
 using namespace::std;
 
 //Default constructor w Override tags
-XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden(Override_Tags)
+XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden(Override_Tags), parent_append()
 {
 }
 
 //Constructor with correct arguments
-XMLTag::XMLTag( string TagName, vector<string> TagContent, XMLTag* Parent ) : children(), value(), name(TagName), parent(Parent), path(Parent->GetPath()), forbidden(Parent->GetForbidden())
+XMLTag::XMLTag( string TagName, vector<string> TagContent, XMLTag* Parent ) : children(), value(), name(TagName), parent(Parent), path(Parent->GetPath()), forbidden(Parent->GetForbidden()), parent_append()
 {
 	path.Append( "/" + name );
 	//Find the child tags
@@ -72,11 +72,9 @@ vector< XMLTag* > XMLTag::GetChildren() const
 	NamePos = StringProcessing::VectorContains( &children_names, &NameStr );
 	if( NamePos != -1  )
 	{
-		size_t found = string::npos;
-		found = string( path.Data() ).find( children[(unsigned)NamePos]->GetValue()[0] );
-		if( found == string::npos )
+		for( unsigned int i=0; i< children.size(); ++i )
 		{
-			path.Append( "/" + children[(unsigned)NamePos]->GetValue()[0] );
+			children[i]->PrePendPath( "/" + children[(unsigned)NamePos]->GetValue()[0] );
 		}
 	}
 
@@ -108,8 +106,15 @@ void XMLTag::RemoveChild( int num )
 vector<string> XMLTag::GetValue() const
 {
 	vector<string> new_value = value;
-	path = parent->GetPath();
-	path.Append( "/" + name );
+	//cout << "MyPath " << path << endl;
+	//path = parent->GetPath();
+	//cout << "Parent Path " << path << endl;
+	//path.Append( "/" + name );
+	//cout << "ModPar Path " << path << endl;
+	for( unsigned int i=0; i< children.size(); ++i )
+	{
+		children[i]->RegeneratePath();
+	}
 	//cout << path << endl;
 	string pathStr = path.Data();
 	vector<string> forbidden_paths;
@@ -127,7 +132,7 @@ vector<string> XMLTag::GetValue() const
 			new_value[0] = value[0];
 		}
 	}
-	//cout << path << "\t" << name << "\t" << "\t" << new_value[0] << endl;
+	if( forbidden != NULL ) if( !forbidden->empty() ) cout << "XMLTag- USING: " << path << "\t\t" << name << "\t\t" << new_value[0] << endl;
 	if ( value.size() == 0 )
 	{
 		cerr << "Requested value of tag " << name << ", but the value is empty" << endl;
@@ -385,5 +390,37 @@ double XMLTag::GetTF1Eval( const XMLTag* input )
 	double returnable = thisFunc->Eval( 0 );
 	delete thisFunc;
 	return returnable;
+}
+
+void XMLTag::PrePendPath( const string input )
+{
+	path = parent->GetPath();
+	path.Append( input.c_str() );
+	path.Append( "/" + name );
+	for( unsigned int i=0; i< children.size(); ++i )
+	{
+		children[i]->RegeneratePath();
+	}
+}
+
+void XMLTag::AppendPath( const string input )
+{
+	path.Append( input.c_str() );
+	for( unsigned int i=0; i< children.size(); ++i )
+	{
+		children[i]->RegeneratePath();
+	}
+}
+
+void XMLTag::RegeneratePath()
+{
+	TString parent_path;
+	if( parent != NULL ) parent_path = parent->GetPath();
+	path = parent_path;
+	path.Append( "/" + name );
+	for( unsigned int i=0; i< children.size(); ++i )
+	{
+		children[i]->RegeneratePath();
+	}
 }
 

@@ -314,6 +314,8 @@ class XMLConfigReader
 		string fileName;
 		vector<XMLTag*> fileTags;
 		bool XMLValid;
+
+		void AppendCommonNames( XMLTag* input, unsigned int &subParamNum, unsigned int &appendParamNum, unsigned int &configParamNum );
 };
 
 #endif
