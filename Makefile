@@ -24,7 +24,7 @@ SVN_REV ="$(shell svnversion -n .)"
 #		Compiler Flags
 CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
-CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -Os -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
+CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
 #		Some Useful global variables, makes this file MUCH easier to maintain
 SRCEXT    = cpp
@@ -252,6 +252,7 @@ utils: $(EXEDIR)/weighted $(EXEDIR)/print $(EXEDIR)/RapidPlot
 #	For building RapidFit as a library to use within CINT which makes life easier on the grid... (supposedly)
 #	make lib
 
+lib:	override CXXFLAGS_BASE=$(CXX_FLAGS_LITE)
 lib:    $(LIBDIR)/libRapidRun.so
 
 

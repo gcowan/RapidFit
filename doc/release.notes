@@ -7,6 +7,7 @@
    - Cleaned up code in XMLTag to make use of new Append/PrePend Path functions which make the OverrideXML feature more stable
    - Moved more SetName/SetLabel calls out of ClassLookUp and XMLConfigurationReader
    - Added <Label> XML Tag for PDFs (not fully tested but appears to be working :D
+   - Updated MakeFile to build smaller library form of RapidFit
 
 2012/10/29 Rob Currie
    - Fixed bugs to do with working out what to actually do in main based on runtime config and other stuff
