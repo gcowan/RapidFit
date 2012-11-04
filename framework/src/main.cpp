@@ -895,7 +895,7 @@ int calculateFitFractions( RapidFitConfiguration* config )
     std::cout << "Sum of fractions (not necessarily 1!): " << sumOfFractions << std::endl;
 
     fitFractions.push_back( sumOfFractions );
-    tree->Branch("weights", "std::vector<double>", &fitFractions);
+    tree->Branch("fractions", "std::vector<double>", &fitFractions);
     tree->Fill();
     f->Write();
 	f->Close();
