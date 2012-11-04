@@ -872,7 +872,7 @@ int calculateFitFractions( RapidFitConfiguration* config )
 	double total_integral(0.);
 	double integral(0.);
 	double fraction(0.);
-    double sumOfFractions(0.);
+    double sumOfFractions(-1.);
 
     TFile * f = TFile::Open("fitFractions.root", "RECREATE");
     TTree * tree = new TTree("tree", "tree containing fit fractions");
@@ -902,8 +902,6 @@ int calculateFitFractions( RapidFitConfiguration* config )
 
     delete testIntegrator;
 	delete pdfAndData;
-    delete tree;
-    delete f;
     return 1;
 }
 
