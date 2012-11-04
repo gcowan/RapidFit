@@ -6,7 +6,7 @@
 
 using namespace::std;
 
-RapidFitConfiguration::RapidFitConfiguration() : 
+RapidFitConfiguration::RapidFitConfiguration() :
 numberRepeats(),
 	Nuisencemodel(),
 	jobNum(),
@@ -52,6 +52,7 @@ numberRepeats(),
 	doLLscanFlag(),
 	doLLcontourFlag(),
 	testRapidIntegratorFlag(),
+	calculateFitFractionsFlag(),
 	calculateAcceptanceWeights(),
 	calculateAcceptanceWeightsWithSwave(),
 	calculatePerEventAcceptance(),
@@ -135,6 +136,7 @@ numberRepeats(),
 		doLLscanFlag = false;
 		doLLcontourFlag = false;
 		testRapidIntegratorFlag = false;
+		calculateFitFractionsFlag = false;
 		calculateAcceptanceWeights = false;
 		calculateAcceptanceWeightsWithSwave = false;
 		calculatePerEventAcceptance = false;
@@ -165,7 +167,7 @@ numberRepeats(),
 		argumentParameterSet = NULL;
 		xmlFile = NULL;
 		SoloContourResults = vector<FitResultVector*>();
-		
+
 		templatePDFs = vector<string>();
 		debug = new DebugClass(false);
 		debug->SetClassNames(vector<string>(1,"default"));

@@ -139,7 +139,7 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "--testIntegrator" << endl;
 	cout << "       This allows you to test the Numerical vs Analytical Integrals from an XML" << endl;
 
-	cout << endl;  
+	cout << endl;
 }
 
 void ParseCommandLine::RapidFitAbout( string name )
@@ -582,6 +582,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		//	The Parameters beyond here are for setting boolean flags
 		else if( currentArgument == "--testIntegrator" )			{	config.testIntegratorFlag = true;			}
 		else if( currentArgument == "--testRapidIntegrator" )			{	config.testRapidIntegratorFlag = true;			}
+		else if( currentArgument == "--calculateFitFractions" )		{	config.calculateFitFractionsFlag = true;		}
 		else if( currentArgument == "--calculateAcceptanceWeights" )		{	config.calculateAcceptanceWeights = true;		}
 		else if( currentArgument == "--calculateAcceptanceWeightsWithSwave" )	{	config.calculateAcceptanceWeightsWithSwave = true;	}
 		else if( currentArgument == "--calculatePerEventAcceptance" )		{	config.calculatePerEventAcceptance = true;		}

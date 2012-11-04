@@ -107,6 +107,8 @@ int testIntegrator( RapidFitConfiguration* config );
 
 int testComponentPlot( RapidFitConfiguration* config );
 
+int calculateFitFractions( RapidFitConfiguration* config );
+
 int calculateAcceptanceWeights( RapidFitConfiguration* config );
 
 int calculateAcceptanceWeightsWithSwave( RapidFitConfiguration* config );
@@ -247,7 +249,7 @@ int RapidFit( int argc, char * argv[] )
 	//	Do the main work of the FC scan
 	if( main_fitResult>-1 && (thisConfig->doFC_Flag && !thisConfig->doLLscanFlag )) PerformFCStudy( thisConfig );
 
-
+	if( main_fitResult > -1 && thisConfig->calculateFitFractionsFlag ) calculateFitFractions( thisConfig );
 
 	//	Should only happen under the condition that no CV fit was performed or anything else
 	//if( thisConfig->GlobalFitResult == NULL )
@@ -505,7 +507,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 	cout << "Finished Fitting :D" << endl;
 
         if( config->debug != NULL )
-        {       
+        {
                 if( config->debug->DebugThisClass( "main" ) )
                 {
                         cout << "main: Stopping Timer" << endl;
@@ -695,7 +697,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 	        PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
         	pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
                	IDataSet * data = pdfAndData->GetDataSet();
-                IPDF * pdf = pdfAndData->GetPDF(); 
+                IPDF * pdf = pdfAndData->GetPDF();
                 PhaseSpaceBoundary * phase = data->GetBoundary();
 		GoodnessOfFit::plotUstatistic( pdf, data, phase, "ustat.pdf" );
 		/*
@@ -856,6 +858,53 @@ TH1D* ProjectAxis( TH3* input_histo, TString axis, TString name )
 	X_proj->SetTitle( name );
 	X_proj->Write("",TObject::kOverwrite);
 	return X_proj;
+}
+
+int calculateFitFractions( RapidFitConfiguration* config )
+{
+	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
+	pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
+
+    IDataSet * dataSet = pdfAndData->GetDataSet();
+	IPDF * pdf = pdfAndData->GetPDF();
+
+    RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( pdf );
+	double total_integral(0.);
+	double integral(0.);
+	double fraction(0.);
+    double sumOfFractions(0.);
+
+    TFile * f = TFile::Open("fitFractions.root", "RECREATE");
+    TTree * tree = new TTree("tree", "tree containing fit fractions");
+
+    vector<double> fitFractions;
+    vector<string> doNotIntegrate;
+    vector<string> pdfComponents = pdf->PDFComponents();
+    pdfComponents = StringProcessing::MoveElementToStart( pdfComponents, "0" );
+	for( unsigned int i = 0; i < pdfComponents.size(); ++i )
+	{
+		ComponentRef * thisRef = new ComponentRef( pdfComponents[i] );
+        integral = testIntegrator->NumericallyIntegratePhaseSpace( dataSet->GetBoundary(), doNotIntegrate, thisRef );
+		if ( pdfComponents[i] == "0" ) total_integral = integral;
+        delete thisRef;
+        fraction = integral/total_integral;
+        std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
+	    fitFractions.push_back( fraction );
+        sumOfFractions += fraction;
+    }
+    std::cout << "Sum of fractions (not necessarily 1!): " << sumOfFractions << std::endl;
+
+    fitFractions.push_back( sumOfFractions );
+    tree->Branch("weights", "std::vector<double>", &fitFractions);
+    tree->Fill();
+    f->Write();
+	f->Close();
+
+    delete testIntegrator;
+	delete pdfAndData;
+    delete tree;
+    delete f;
+    return 1;
 }
 
 int calculateAcceptanceWeights( RapidFitConfiguration* config )

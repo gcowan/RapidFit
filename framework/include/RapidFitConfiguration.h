@@ -76,6 +76,7 @@ class RapidFitConfiguration
 		bool doLLscanFlag;
 		bool doLLcontourFlag;
 		bool testRapidIntegratorFlag;
+		bool calculateFitFractionsFlag;
 		bool calculateAcceptanceWeights;
 		bool calculateAcceptanceWeightsWithSwave;
 		bool calculatePerEventAcceptance;
@@ -108,7 +109,7 @@ class RapidFitConfiguration
 		ParameterSet* argumentParameterSet;
 		XMLConfigReader* xmlFile;
 		vector<FitResultVector*> SoloContourResults;
-		
+
 		vector<string> templatePDFs;
 
 		DebugClass* debug;
