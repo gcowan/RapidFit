@@ -888,7 +888,7 @@ int calculateFitFractions( RapidFitConfiguration* config )
 		if ( pdfComponents[i] == "0" ) total_integral = integral;
         delete thisRef;
         fraction = integral/total_integral;
-        std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
+        if ( pdfComponents[i] != "0" ) std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
 	    fitFractions.push_back( fraction );
         sumOfFractions += fraction;
     }
