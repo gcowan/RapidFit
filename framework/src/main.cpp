@@ -863,7 +863,7 @@ TH1D* ProjectAxis( TH3* input_histo, TString axis, TString name )
 int calculateFitFractions( RapidFitConfiguration* config )
 {
 	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
-	pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
+	pdfAndData->SetPhysicsParameters( config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
 
     IDataSet * dataSet = pdfAndData->GetDataSet();
 	IPDF * pdf = pdfAndData->GetPDF();
