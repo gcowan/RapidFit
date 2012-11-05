@@ -276,7 +276,7 @@ void ResultFormatter::LatexOutputCovarianceMatrix( FitResult * OutputData )
 
 			}
 			cout << " \\\\" << endl;
-			row += 1;
+			++row;
 		}
 		cout << "\\hline \n\\end{tabular}" << endl;
 		cout << "\\end{center}\n" << endl;

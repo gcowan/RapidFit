@@ -39,7 +39,7 @@ class RapidFitMatrix
 			if( input.thisMatrix != NULL )
 			{
 				//	This has not been checked and may be broken for non-square matricies depending on how you count columns/rows
-				thisMatrix = new TMatrixDSym( input.thisMatrix->GetNcols(), input.thisMatrix->GetNrows() );
+				thisMatrix = new TMatrixDSym( input.thisMatrix->GetNcols() );
 				for( int i=0; i< input.thisMatrix->GetNcols(); ++i )
 				{
 					for( int j=0; j< input.thisMatrix->GetNrows(); ++j )

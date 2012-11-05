@@ -22,7 +22,7 @@ RM           = rm -f
 SVN_REV ="$(shell svnversion -n .)"
 
 #		Compiler Flags
-CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -g -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
+CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -Os -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
 CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
@@ -97,9 +97,8 @@ LIBLINKFLAGS = -pie -m64
 # Linux
 ifeq "$(UNAME)" "Linux"
 	GCC_V:=$(shell gcc -dumpversion | awk -F '.' '{print $$2}')
-	CXX_LTO:=$(shell if [ ${GCC_V} -ge 6 ]; then echo '-flto '; else echo ''; fi)
-	CXXFLAGS+=${CXX_LTO}-fPIE
-	LINKFLAG+= -flto -pie -m64 -Wl,--rpath,$(LD_LIBRARY_PATH)
+	CXXFLAGS+= -fPIE
+	LINKFLAG+= -pie -m64 -Wl,--rpath,$(LD_LIBRARY_PATH)
 endif
 
 # OS X
@@ -113,7 +112,7 @@ endif
 
 
 #	Default build command when someone asks for 'make'
-all : $(EXEDIR)/fitting utils lib
+all : $(EXEDIR)/fitting utils
 
 $(OBJDALITZDIR)/%.o : $(SRCDALITZDIR)/%.$(SRCDALITZEXT) $(INCDALITZDIR)/%.$(HDRDALITZEXT)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -252,7 +251,6 @@ utils: $(EXEDIR)/weighted $(EXEDIR)/print $(EXEDIR)/RapidPlot
 #	For building RapidFit as a library to use within CINT which makes life easier on the grid... (supposedly)
 #	make lib
 
-lib:	override CXXFLAGS_BASE=$(CXX_FLAGS_LITE)
 lib:    $(LIBDIR)/libRapidRun.so
 
 

@@ -118,7 +118,13 @@ int main( int argc, char* argv[] )
 
 	if( !corr_trees.empty() )
 	{
-		CorrMatrix::Analyse( corr_trees );
+		vector<string> argv_str;
+		for( unsigned int i=0; i< (unsigned) argc; ++i ) argv_str.push_back( argv[i] );
+		string CorrMatrix = "--CorrMatrix";
+		if( StringOperations::VectorContains( &argv_str , &CorrMatrix ) != -1 )
+		{
+			CorrMatrix::Analyse( corr_trees );
+		}
 	}
 
 	int good_files=0;

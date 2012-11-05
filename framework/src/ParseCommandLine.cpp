@@ -182,7 +182,9 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 
 	for ( int argumentIndex = 1; argumentIndex < argc; ++argumentIndex )
 	{
-		string currentArgument = argv[argumentIndex];
+		string currentArgument = string( argv[argumentIndex] );
+
+		cout << "Current Argument: " << currentArgument << endl;
 
 		if( currentArgument == "--about" )
 		{
@@ -316,9 +318,13 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 			if( argumentIndex + 2 < argc )
 			{
 				++argumentIndex;
-				string path = argv[argumentIndex];
+				string path = string( argv[argumentIndex] );
+				if( path[path.size()-1] == 'Q' )
+				{
+					path = path.substr(0, path.size()-2);
+				}
 				++argumentIndex;
-				string value = argv[argumentIndex];
+				string value = string( argv[argumentIndex] );
 				pair<string,string> temp_pair;
 				temp_pair.first = path;
 				temp_pair.second = value;

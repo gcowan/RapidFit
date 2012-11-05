@@ -62,7 +62,7 @@ gsl_complex gsl_erf( gsl_complex z )
 	//	Can't get better than double precision
 	//	If the numerator varies by less than this we should assume we've reached as good as we can get
 	for( unsigned int i = 1;
-		(GSL_REAL(z_raised)>(1E-17)*GSL_REAL(z)) && (GSL_IMAG(z_raised)>(1E-17)*GSL_IMAG(z));
+		(GSL_REAL(z_raised)>(1E-25)*GSL_REAL(z)) && (GSL_IMAG(z_raised)>(1E-25)*GSL_IMAG(z));
 			++i )
 	{
 		factor*=-1;

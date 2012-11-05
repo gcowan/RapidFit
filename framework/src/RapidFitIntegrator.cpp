@@ -779,7 +779,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			{
 				double testIntegral = functionToWrap->Integral( *dataPoint_i, NewBoundary );
 				cout << "Integration Test: numerical : analytical  " << setw(7) << numericalIntegral << " : " << testIntegral;
-				cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i );
+				cout << "  " << NewBoundary->DiscreteDescription( *dataPoint_i ) << "  " << functionToWrap->GetLabel();
 			}
 
 			output_val += numericalIntegral;

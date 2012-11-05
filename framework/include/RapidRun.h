@@ -5,6 +5,7 @@
 
 
 //	ROOT Headers
+#include "Rtypes.h"
 #include "TList.h"
 #include "TObject.h"
 #include "TObjString.h"
@@ -20,13 +21,15 @@
 class RapidRun : public TObject
 {
 	public:
-		RapidRun() : args(){}//needed by Root IO
+		RapidRun(); //needed by Root IO
 		RapidRun( TList* );
 		int run();
 
 	private:
 		std::auto_ptr<TList> args;
-		ClassDef( RapidRun, 1 )//Needed for Cint
+
+	public:
+		ClassDef( RapidRun, 2 ); //Needed for Cint
 };
 
 #endif

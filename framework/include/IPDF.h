@@ -347,6 +347,8 @@ class IPDF
 		virtual double Normalisation( DataPoint*, PhaseSpaceBoundary* ) = 0;
 };
 
+#ifndef __CINT__
+
 /*!
  * @brief Macro for adding a class lookup and copy function instance to the main function index
  *
@@ -385,8 +387,6 @@ extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
 	return returnable;\
 }
 
-#endif
-
 
 /*!
  * @brief some common thread locking commands
@@ -397,4 +397,8 @@ extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
 
 #define PDF_THREAD_UNLOCK\
 	if( this->DebugMutex() != NULL ) pthread_mutex_unlock( this->DebugMutex() );
+
+#endif
+
+#endif
 
