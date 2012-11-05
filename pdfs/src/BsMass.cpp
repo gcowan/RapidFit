@@ -125,7 +125,8 @@ bool BsMass::SetPhysicsParameters( ParameterSet* Input )
 	}
 
 	denom_sigmam1_root2 = 1./(sigma_m1*Mathematics::SQRT_2());
-	denom_sigmam2_root2 = 1./(sigma_m1*Mathematics::SQRT_2());
+	//PELC -> bug denom_sigmam2_root2 = 1./(sigma_m1*Mathematics::SQRT_2());
+	denom_sigmam2_root2 = 1./(sigma_m2*Mathematics::SQRT_2());
 
 	numer_factor1 = 1./(sigma_m1*sqrt(2.*Mathematics::Pi()));
 	numer_factor2 = 1./(sigma_m2*sqrt(2.*Mathematics::Pi()));
