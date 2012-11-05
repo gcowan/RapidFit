@@ -4,6 +4,8 @@
    - Cleaned up some Code in RapidPlot to only analyse correlation matricies when asked
    - Cleaned up code to do with compiling RapidFit as a ROOT library
    - Added ugly hack into OverriteXML to remove leading 'Q' characters from 'command line arguments' due to some as yet unidentified or fixed bug
+   - Removed all references to using 'link-time-optimisation' in build process. Should build faster binaries but resultant objects are too large due to a bug somewhere,
+       it's more effort than it's worth to try to use
 
 2012/11/04 Greig Cowan
    - Added ability to calculate fit fractions from a PDF. This should really
