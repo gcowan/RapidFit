@@ -115,7 +115,7 @@ TString RapidFit_Output_File::Data_At_Grid_ij( vector<string>& controlled_parame
 	for( ; param_i != controlled_parameter_name.end(); ++param_i, ++grid_ij )
 	{
 		TString grid_str; grid_str+=*grid_ij;
-		TString temp_data_cut = "( abs( " + TString(*param_i) + "_value - " + grid_str + " ) < " + double_tolerance + ")";
+		TString temp_data_cut = "( abs( " + TString(*param_i) + "_value - " + grid_str + " ) < " + double_tolerance + ")&&(" + TString(*param_i) + "_scan == 1)";
 		data_cuts.push_back( temp_data_cut );
 	}
 	TString data_cut = data_cuts[0];

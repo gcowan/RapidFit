@@ -429,7 +429,7 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 					cout << num.str() << setw(12);
 
 					//	Cut String to select only a SINGLE fit result for the LL at this point
-					TString data_cut = Grid_Cut_String + "&&" + RapidFit_Output_File::Data_At_Grid_ij( controlled_parameter_name, *grid_i ); 
+					TString data_cut = RapidFit_Output_File::Data_At_Grid_ij( controlled_parameter_name, *grid_i ); 
 
 					//	Slect only toy Results which were generated at this grid point
 					//	By definition the _gen value is equal to the fit minima from the LL scan result at this point
@@ -536,7 +536,7 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 
 					//      Record and output the DLL from data at this point
 					double LOCAL_DATA_DLL = Data_Coordinate[0][0] - GLOBAL_BEST_NLL;
-					//cout << LOCAL_DATA_DLL << endl;
+					cout << Data_Coordinate[0][0] << " - " << GLOBAL_BEST_NLL << " = " << LOCAL_DATA_DLL << endl;
 					DATA_DLL.push_back( LOCAL_DATA_DLL );
 
 					//	Make some plots of the distributions of all free parameters fluctuating over the fit
@@ -694,6 +694,7 @@ for( vector<double>::iterator dll_i = Toy_DLL_Dist.begin(); dll_i != Toy_DLL_Dis
 }
 double LOCAL_CL_FROM_FC = double(toy_dll_smaller)/double(Toy_DLL_Dist.size());
 
+cout << "Data DLL: " << LOCAL_DATA_DLL << endl;
 cout << "\tC.L.:\t" << setprecision(10) << LOCAL_CL_FROM_FC << "\tNumber:\t" << Toy_DLL_Dist.size() << "\tEfficiency:\t" << double(double(Toy_DLL_Dist.size()) / double(Fixed_Toy_NLL->size())) << endl;
 
 //	Print some more output for this Grid Point

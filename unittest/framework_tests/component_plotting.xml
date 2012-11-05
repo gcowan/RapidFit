@@ -165,7 +165,7 @@
 	</FitFunction>
 
 
-	#<NumberRepeats>1</NumberRepeats>
+	<NumberRepeats>50</NumberRepeats>
 
 	<CommonPDF>
 		<NormalisedSumPDF>
@@ -215,7 +215,7 @@
 		<DataSet>
 			<Source>FoamFile</Source>
 			<FileName>output.root</FileName>
-			<NumberEvents>100000</NumberEvents>
+			<NumberEvents>1000</NumberEvents>
 
 			<PhaseSpaceBoundary>
 				<Observable>
@@ -245,21 +245,21 @@
 		</ComponentProjection>
 		<Scan>
 			<Name>Fraction1</Name>
-			<Sigma>3</Sigma>
-			<Points>10</Points>
+			<Sigma>1</Sigma>
+			<Points>5</Points>
 		</Scan>
-		<TwoDScan>
-			<X_Param>
-				<Name>sigma_m1b</Name>
-				<Sigma>3</Sigma>
-				<Points>10</Points>
-			</X_Param>
-			<Y_Param>
-				<Name>sigma_m1</Name>
-				<Sigma>3</Sigma>
-				<Points>10</Points>
-			</Y_Param>
-		</TwoDScan>
+		#<TwoDScan>
+		#	<X_Param>
+		#		<Name>sigma_m1b</Name>
+		#		<Sigma>3</Sigma>
+		#		<Points>10</Points>
+		#	</X_Param>
+		#	<Y_Param>
+		#		<Name>sigma_m1</Name>
+		#		<Sigma>3</Sigma>
+		#		<Points>10</Points>
+		#	</Y_Param>
+		#</TwoDScan>
 	</Output>
 
 </RapidFit>
