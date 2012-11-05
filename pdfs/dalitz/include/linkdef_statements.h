@@ -13,13 +13,11 @@
 
 #pragma link C++ class DPMassShape;
 #pragma link C++ class DPBWResonanceShape;
+#pragma link C++ class DPNonresonant;
 #pragma link C++ class DPLassShape;
 #pragma link C++ class DPGLassShape;
 
 #pragma link C++ class DPComponent;
-#pragma link C++ class DPJpsiKSpinZero;
-#pragma link C++ class DPJpsiKSpinOne;
-#pragma link C++ class DPJpsiKSpinTwo;
 #pragma link C++ class DPZplusK;
 #pragma link C++ class DPJpsiKaon;
 

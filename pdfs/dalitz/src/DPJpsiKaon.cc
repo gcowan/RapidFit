@@ -1,6 +1,7 @@
 
 #include "DPJpsiKaon.hh"
 #include "DPBWResonanceShape.hh"
+#include "DPNonresonant.hh"
 #include "DPLassShape.hh"
 #include "DPGLassShape.hh"
 #include "DPBarrierFactor.hh"
@@ -38,6 +39,11 @@ spinKaon(spin)
   {
     std::cout<<"Using generalize Lass parametrization\n";
     massShape = new DPGLassShape(mR, gammaR, LR, m1, m2, RR, a, r);
+  }
+  else if ( mShape == "NR" )
+  {
+    std::cout<<"Using nonresonant component\n";
+    massShape = new DPNonresonant(mR, gammaR, LR, m1, m2, RR);
   }
   else
   {
