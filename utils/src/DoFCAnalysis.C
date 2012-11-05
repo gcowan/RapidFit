@@ -100,31 +100,31 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 
 			vector<Double_t>* param_data_free = TTree_Processing::Buffer_Branch( input_tree, *Param_i+*var_i, free_toys ); //Free_this_Grid_Coordinate[0];
 			vector<Double_t>* nll_free = TTree_Processing::Buffer_Branch( input_tree, "NLL", free_toys );
-			vector<Double_t>* nll_free_Asr = TTree_Processing::Buffer_Branch( input_tree, "As_sq_error", free_toys );
-			vector<Double_t>* nll_free_dpa = TTree_Processing::Buffer_Branch( input_tree, "delta_para_value", free_toys );
-			vector<Double_t>* nll_free_dpar = TTree_Processing::Buffer_Branch( input_tree, "delta_para_error", free_toys );
-			vector<Double_t>* nll_free_dpe = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))", free_toys );
-			vector<Double_t>* nll_free_dper = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_error", free_toys );
-			vector<Double_t>* nll_free_ds = TTree_Processing::Buffer_Branch( input_tree, "delta_s_value*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))", free_toys );
-			vector<Double_t>* nll_free_dsr = TTree_Processing::Buffer_Branch( input_tree, "delta_s_error", free_toys );
-			vector<Double_t>* nll_free_game = TTree_Processing::Buffer_Branch( input_tree, "gamma_error", free_toys );
-			vector<Double_t>* nll_free_dmr = TTree_Processing::Buffer_Branch( input_tree, "deltaM_error", free_toys );
+			/*vector<Double_t>* nll_free_Asr = TTree_Processing::Buffer_Branch( input_tree, "As_sq_error", free_toys );
+			  vector<Double_t>* nll_free_dpa = TTree_Processing::Buffer_Branch( input_tree, "delta_para_value", free_toys );
+			  vector<Double_t>* nll_free_dpar = TTree_Processing::Buffer_Branch( input_tree, "delta_para_error", free_toys );
+			  vector<Double_t>* nll_free_dpe = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))", free_toys );
+			  vector<Double_t>* nll_free_dper = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_error", free_toys );
+			  vector<Double_t>* nll_free_ds = TTree_Processing::Buffer_Branch( input_tree, "delta_s_value*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))", free_toys );
+			  vector<Double_t>* nll_free_dsr = TTree_Processing::Buffer_Branch( input_tree, "delta_s_error", free_toys );
+			  vector<Double_t>* nll_free_game = TTree_Processing::Buffer_Branch( input_tree, "gamma_error", free_toys );
+			  vector<Double_t>* nll_free_dmr = TTree_Processing::Buffer_Branch( input_tree, "deltaM_error", free_toys ); */
 			//vector<Double_t>* nll_free_phi = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_value", free_toys );
-			vector<Double_t>* nll_free_phr = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_error", free_toys );
+			//vector<Double_t>* nll_free_phr = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_error", free_toys );
 			//vector<Double_t>* nll_free_p1e = TTree_Processing::Buffer_Branch( input_tree, "mistagP1_error", free_toys );
 			//vector<Double_t>* nll_free_p0e = TTree_Processing::Buffer_Branch( input_tree, "mistagP0_error", free_toys );
 
 			vector<Double_t>* param_data_fixed = TTree_Processing::Buffer_Branch( input_tree, *Param_i+*var_i, fixed_toys ); //Fixed_this_Grid_Coordinate[0];
-			vector<Double_t>* nll_fixed_Asr = TTree_Processing::Buffer_Branch( input_tree, "As_sq_error", fixed_toys );
-			vector<Double_t>* nll_fixed_dpa = TTree_Processing::Buffer_Branch( input_tree, "delta_para_value", fixed_toys );
-			vector<Double_t>* nll_fixed_dpar = TTree_Processing::Buffer_Branch( input_tree, "delta_para_error", fixed_toys );
-			vector<Double_t>* nll_fixed_dpe = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))", fixed_toys );
-			vector<Double_t>* nll_fixed_dper = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_error", fixed_toys );
+			/*vector<Double_t>* nll_fixed_Asr = TTree_Processing::Buffer_Branch( input_tree, "As_sq_error", fixed_toys );
+			  vector<Double_t>* nll_fixed_dpa = TTree_Processing::Buffer_Branch( input_tree, "delta_para_value", fixed_toys );
+			  vector<Double_t>* nll_fixed_dpar = TTree_Processing::Buffer_Branch( input_tree, "delta_para_error", fixed_toys );
+			  vector<Double_t>* nll_fixed_dpe = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))", fixed_toys );
+			  vector<Double_t>* nll_fixed_dper = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_error", fixed_toys );*/
 			vector<Double_t>* nll_fixed = TTree_Processing::Buffer_Branch( input_tree, "NLL", fixed_toys );
-			vector<Double_t>* nll_fixed_ds = TTree_Processing::Buffer_Branch( input_tree, "delta_s_value*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))", fixed_toys );
-			vector<Double_t>* nll_fixed_dsr = TTree_Processing::Buffer_Branch( input_tree, "delta_s_error", fixed_toys );
-			vector<Double_t>* nll_fixed_game = TTree_Processing::Buffer_Branch( input_tree, "gamma_error", fixed_toys );
-			vector<Double_t>* nll_fixed_dmr = TTree_Processing::Buffer_Branch( input_tree, "deltaM_error", fixed_toys );
+			/*vector<Double_t>* nll_fixed_ds = TTree_Processing::Buffer_Branch( input_tree, "delta_s_value*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))", fixed_toys );
+			  vector<Double_t>* nll_fixed_dsr = TTree_Processing::Buffer_Branch( input_tree, "delta_s_error", fixed_toys );
+			  vector<Double_t>* nll_fixed_game = TTree_Processing::Buffer_Branch( input_tree, "gamma_error", fixed_toys );
+			  vector<Double_t>* nll_fixed_dmr = TTree_Processing::Buffer_Branch( input_tree, "deltaM_error", fixed_toys );
 			//vector<Double_t>* nll_fixed_phi = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_value", fixed_toys );
 			vector<Double_t>* nll_fixed_phr = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_error", fixed_toys );
 			//vector<Double_t>* nll_fixed_p1e = TTree_Processing::Buffer_Branch( input_tree, "mistagP1_error", fixed_toys );
@@ -133,6 +133,8 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 			vector<Double_t>* Free_Toy_diff = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value-delta_s_value", free_toys );
 			vector<Double_t>* Fixed_Toy_diff = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value-delta_s_value", fixed_toys );
 
+			 */
+
 			bool bad = false;
 
 			vector<Double_t> free_2_plot, fixed_2_plot;
@@ -140,6 +142,7 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 			for( unsigned int i=0; i != param_data_free->size(); ++i )
 			{
 				double strong_upper = 2.5, strong_lower = 1.;
+
 				//if( (*nll_free_As)[i] > 0.012 && (*nll_fixed_As)[i] > 0.012 )
 				//{
 				//if( (*nll_free_dpa)[i] < strong_upper && (*nll_fixed_dpa)[i] < strong_upper )
@@ -148,480 +151,488 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 				//{
 				//if( (*nll_free_dpa)[i] > 0 && (*nll_fixed_dpa)[i] > 0 )
 				//{
-				if( fabs((*Free_Toy_diff)[i]) < 1. && fabs((*Fixed_Toy_diff)[i]) < 1. )
+				//if( fabs((*Free_Toy_diff)[i]) < 1. && fabs((*Fixed_Toy_diff)[i]) < 1. )
+				//{
+				/*if( (*nll_free_dpe)[i] > strong_lower && (*nll_fixed_dpe)[i] > strong_lower )
+				  {
+				  if( (*nll_free_dpe)[i] < strong_upper && (*nll_fixed_dpe)[i] < strong_upper )
+				  {
+				  if( (*nll_free_ds)[i] > strong_lower && (*nll_fixed_ds)[i] > strong_lower )
+				  {
+				  if( (*nll_free_ds)[i] < strong_upper && (*nll_fixed_ds)[i] < strong_upper )
+				  {*/
+				/*
+				   if( (*nll_free_game)[i] < 0.00575 && (*nll_fixed_game)[i] < 0.00575 )
+				   {
+				   if( (*nll_free_dpar)[i] > 0.05 && (*nll_fixed_dpar)[i] > 0.05 )
+				   {
+				   if( (*nll_free_dpar)[i] < 0.35 && (*nll_fixed_dpar)[i] < 0.35 )
+				   {
+				   if( (*nll_free_dper)[i] > 0.15 && (*nll_fixed_dper)[i] > 0.15 )
+				   {
+				   if( (*nll_free_dper)[i] < 0.4 && (*nll_fixed_dper)[i] < 0.4 )
+				   {
+				   if( (*nll_free_dsr)[i] < 0.35 && (*nll_fixed_dsr)[i] < 0.35 )
+				   {
+				   if( (*nll_free_dsr)[i] > 0.15 && (*nll_fixed_dsr)[i] > 0.15 )
+				   {
+				   if( (*nll_free_Asr)[i] < 0.0125 && (*nll_fixed_Asr)[i] < 0.0125 )
+				   {
+				   if( (*nll_free_Asr)[i] > 0.0075 && (*nll_fixed_Asr)[i] > 0.0075 )
+				   {
+				   if( (*nll_free_dmr)[i] < 0.125 && (*nll_fixed_dmr)[i] < 0.125 )
+				   {
+				   if( (*nll_free_phr)[i] < 0.15 && (*nll_fixed_phr)[i] < 0.15 )
+				   {*//*
+				if( (*nll_free_p1e)[i] < 0.02425 && (*nll_fixed_p1e)[i] < 0.02425 )
 				{
-					/*if( (*nll_free_dpe)[i] > strong_lower && (*nll_fixed_dpe)[i] > strong_lower )
-					  {
-					  if( (*nll_free_dpe)[i] < strong_upper && (*nll_fixed_dpe)[i] < strong_upper )
-					  {
-					  if( (*nll_free_ds)[i] > strong_lower && (*nll_fixed_ds)[i] > strong_lower )
-					  {
-					  if( (*nll_free_ds)[i] < strong_upper && (*nll_fixed_ds)[i] < strong_upper )
-					  {*/
-					/*
-					   if( (*nll_free_game)[i] < 0.00575 && (*nll_fixed_game)[i] < 0.00575 )
-					   {
-					   if( (*nll_free_dpar)[i] > 0.05 && (*nll_fixed_dpar)[i] > 0.05 )
-					   {
-					   if( (*nll_free_dpar)[i] < 0.35 && (*nll_fixed_dpar)[i] < 0.35 )
-					   {
-					   if( (*nll_free_dper)[i] > 0.15 && (*nll_fixed_dper)[i] > 0.15 )
-					   {
-					   if( (*nll_free_dper)[i] < 0.4 && (*nll_fixed_dper)[i] < 0.4 )
-					   {
-					   if( (*nll_free_dsr)[i] < 0.35 && (*nll_fixed_dsr)[i] < 0.35 )
-					   {
-					   if( (*nll_free_dsr)[i] > 0.15 && (*nll_fixed_dsr)[i] > 0.15 )
-					   {
-					   if( (*nll_free_Asr)[i] < 0.0125 && (*nll_fixed_Asr)[i] < 0.0125 )
-					   {
-					   if( (*nll_free_Asr)[i] > 0.0075 && (*nll_fixed_Asr)[i] > 0.0075 )
-					   {
-					   if( (*nll_free_dmr)[i] < 0.125 && (*nll_fixed_dmr)[i] < 0.125 )
-					   {
-					   if( (*nll_free_phr)[i] < 0.15 && (*nll_fixed_phr)[i] < 0.15 )
-					   {*//*
-					if( (*nll_free_p1e)[i] < 0.02425 && (*nll_fixed_p1e)[i] < 0.02425 )
+					if( (*nll_free_p1e)[i] > 0.02375 && (*nll_fixed_p1e)[i] > 0.02375 )
 					{
-						if( (*nll_free_p1e)[i] > 0.02375 && (*nll_fixed_p1e)[i] > 0.02375 )
+						if( (*nll_free_p0e)[i] < 0.0088 && (*nll_fixed_p1e)[i] < 0.0088 )
 						{
-							if( (*nll_free_p0e)[i] < 0.0088 && (*nll_fixed_p1e)[i] < 0.0088 )
+							if( (*nll_free_p0e)[i] > 0.0084 && (*nll_fixed_p1e)[i] > 0.0084 )
 							{
-								if( (*nll_free_p0e)[i] > 0.0084 && (*nll_fixed_p1e)[i] > 0.0084 )
+								if( (*nll_free_dpe)[i] < strong_upper && (*nll_fixed_dpe)[i] < strong_upper )
 								{
-									if( (*nll_free_dpe)[i] < strong_upper && (*nll_fixed_dpe)[i] < strong_upper )
+									if( (*nll_free_ds)[i] < strong_upper && (*nll_fixed_ds)[i] < strong_upper )
 									{
-										if( (*nll_free_ds)[i] < strong_upper && (*nll_fixed_ds)[i] < strong_upper )
+										if( (*nll_free_dpa)[i] > 2.5 && (*nll_fixed_dpa)[i] > 2.5 )
 										{
-											if( (*nll_free_dpa)[i] > 2.5 && (*nll_fixed_dpa)[i] > 2.5 )
+											if( (*nll_free_dpe)[i] > strong_lower && (*nll_fixed_dpe)[i] > strong_lower )
 											{
-												if( (*nll_free_dpe)[i] > strong_lower && (*nll_fixed_dpe)[i] > strong_lower )
-												{
-													if( (*nll_free_ds)[i] > strong_lower && (*nll_fixed_ds)[i] > strong_lower )
-													{*/
-														if( ((*nll_fixed)[i]-(*nll_free)[i]) < 0 )
-														{	bad = true;
-															cout << "BAD:\t" << *Param_i+*var_i << "\tFREE: " << (*param_data_free)[i] << "\tFIXED: " << (*param_data_fixed)[i] << "\t\tNLL: " << (*nll_free)[i] << "\t"  << (*nll_fixed)[i] << "\tDLL(data): " << DLL_Data << "\tDLL(toy): " << ((*nll_fixed)[i]-(*nll_free)[i]) << endl;;	}
-														else if( ((*nll_fixed)[i]-(*nll_free)[i]) > 2.*DLL_Data )//&& ((*nll_free_As)[i] > 0.012 && (*nll_fixed_As)[i] > 0.012 ) )
-														{	bad = true;
-															cout << "BAD2:\t" << *Param_i+*var_i << "\tFREE: " << (*param_data_free)[i] << "\tFIXED: " << (*param_data_fixed)[i] << "\t\tNLL: " << (*nll_free)[i] << "\t"  << (*nll_fixed)[i] << "\tDLL(data): " << DLL_Data << "\tDLL(toy): " << ((*nll_fixed)[i]-(*nll_free)[i]) << endl;	}
-															free_2_plot.push_back( (*param_data_free)[i] );
-															fixed_2_plot.push_back( (*param_data_fixed)[i] );
-															//}}}}}}}}}}}
-				}
-				}
+												if( (*nll_free_ds)[i] > strong_lower && (*nll_fixed_ds)[i] > strong_lower )
+												{*/
+													if( ((*nll_fixed)[i]-(*nll_free)[i]) < 0 )
+													{
+														bad = true;
+														cout << "BAD:\t" << *Param_i+*var_i << "\tFREE: " << (*param_data_free)[i] << "\tFIXED: " << (*param_data_fixed)[i] ;
+														cout << "\t\tNLL: " << (*nll_free)[i] << "\t"  << (*nll_fixed)[i] << "\tDLL(data): " << DLL_Data;
+														cout << "\tDLL(toy): " << ((*nll_fixed)[i]-(*nll_free)[i]) << endl;
+													}
+													else if( ((*nll_fixed)[i]-(*nll_free)[i]) > 2.*DLL_Data )//&& ((*nll_free_As)[i] > 0.012 && (*nll_fixed_As)[i] > 0.012 ) )
+													{
+														bad = true;
+														cout << "BAD2:\t" << *Param_i+*var_i << "\tFREE: " << (*param_data_free)[i] << "\tFIXED: " << (*param_data_fixed)[i] ;
+														cout << "\t\tNLL: " << (*nll_free)[i] << "\t"  << (*nll_fixed)[i] << "\tDLL(data): " << DLL_Data;
+														cout << "\tDLL(toy): " << ((*nll_fixed)[i]-(*nll_free)[i]) << endl;
+													}
+													free_2_plot.push_back( (*param_data_free)[i] );
+													fixed_2_plot.push_back( (*param_data_fixed)[i] );
+													//}}}}}}}}}}}
+													//}
+			}
 
-				if( bad ) cout << endl;
+			if( bad ) cout << endl;
 
+			TCanvas* free_c1 = new TCanvas( "TCanv_free_"+rand_str, "TCanv_free_"+rand_str, 1680, 1050 );
+			TH1* free_data_th1 = Histogram_Processing::Get_TH1( free_2_plot, rand );//, get_optimal_histo_bins(param_data_free) );
+			free_data_th1->Draw();
+			free_c1->Update();
+			Histogram_Processing::Silent_Print( free_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_free.pdf" );
+
+			TCanvas* fixed_c1 = new TCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str, 1680, 1050 );
+			TH1* fixed_data_th1 = Histogram_Processing::Get_TH1( fixed_2_plot, rand );//, get_optimal_histo_bins(param_data_fixed) );
+			fixed_data_th1->Draw();
+			fixed_c1->Update();
+			Histogram_Processing::Silent_Print( fixed_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_fixed.pdf" );
+
+			TGraph* free_graph = new TGraph( free_data_th1 );
+			TGraph* fixed_graph = new TGraph( fixed_data_th1 );
+
+			TMultiGraph* multi_graph = new TMultiGraph( "TMulti_"+rand_str, "TMulti_"+rand_str );
+
+			multi_graph->Add( free_graph );
+			multi_graph->Add( fixed_graph );
+
+			TCanvas* c1 = new TCanvas( "TCanv_"+rand_str, "TCanv_"+rand_str, 1680, 1050 );
+
+			multi_graph->Draw( "APL" );
+
+			c1->Update();
+			Histogram_Processing::Silent_Print( c1, *Param_i+"_"+*var_i+"_"+grid_name+"_multi.pdf" );
+			}
+			}
+			}
+
+			//	Construct and write out the nll distributions of the toys to root file and as plots
+			void FeldmanCousinsAnalysis::NLL_dists( vector<Double_t>& param_data_free, vector<Double_t>& param_data_fixed, vector<string>& controlled_parameter_name, vector<Double_t>& coordinate, TRandom3* rand )
+			{
+				TString grid_name = Flat_Coord_String( controlled_parameter_name, coordinate );
+				TString rand_str; rand_str += rand->Rndm();
 				TCanvas* free_c1 = new TCanvas( "TCanv_free_"+rand_str, "TCanv_free_"+rand_str, 1680, 1050 );
-				TH1* free_data_th1 = Histogram_Processing::Get_TH1( free_2_plot, rand );//, get_optimal_histo_bins(param_data_free) );
+				TH1* free_data_th1 = Histogram_Processing::Get_TH1( param_data_free, rand );//, get_optimal_histo_bins(param_data_free) );
 				free_data_th1->Draw();
 				free_c1->Update();
-				Histogram_Processing::Silent_Print( free_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_free.pdf" );
+				Histogram_Processing::Silent_Print( free_c1, "NLL_"+grid_name+"_free.pdf" );
 
 				TCanvas* fixed_c1 = new TCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str, 1680, 1050 );
-				TH1* fixed_data_th1 = Histogram_Processing::Get_TH1( fixed_2_plot, rand );//, get_optimal_histo_bins(param_data_fixed) );
+				TH1* fixed_data_th1 = Histogram_Processing::Get_TH1( param_data_fixed, rand );//, get_optimal_histo_bins(param_data_fixed) );
 				fixed_data_th1->Draw();
 				fixed_c1->Update();
-				Histogram_Processing::Silent_Print( fixed_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_fixed.pdf" );
+				Histogram_Processing::Silent_Print( fixed_c1, "NLL_"+grid_name+"_fixed.pdf" );
 
 				TGraph* free_graph = new TGraph( free_data_th1 );
 				TGraph* fixed_graph = new TGraph( fixed_data_th1 );
 
 				TMultiGraph* multi_graph = new TMultiGraph( "TMulti_"+rand_str, "TMulti_"+rand_str );
 
+				free_graph->SetLineColor(1);
 				multi_graph->Add( free_graph );
 				multi_graph->Add( fixed_graph );
 
 				TCanvas* c1 = new TCanvas( "TCanv_"+rand_str, "TCanv_"+rand_str, 1680, 1050 );
 
-				multi_graph->Draw( "APL" );
+				multi_graph->Draw("APL");
 
 				c1->Update();
-				Histogram_Processing::Silent_Print( c1, *Param_i+"_"+*var_i+"_"+grid_name+"_multi.pdf" );
-				}
-				}
-				}
+				Histogram_Processing::Silent_Print( c1, "NLL_"+grid_name+"_multi.pdf" );
+			}
 
-				//	Construct and write out the nll distributions of the toys to root file and as plots
-				void FeldmanCousinsAnalysis::NLL_dists( vector<Double_t>& param_data_free, vector<Double_t>& param_data_fixed, vector<string>& controlled_parameter_name, vector<Double_t>& coordinate, TRandom3* rand )
+			//	Print some useful information to the screen&file about this grid point
+			void FeldmanCousinsAnalysis::Output_GridPoint( vector<string>& controlled_parameter_name, vector<Double_t>& coordinate, double LOCAL_DATA_DLL, vector<Double_t>& Toy_DLL_Dist )
+			{
+				TString grid_name = Flat_Coord_String( controlled_parameter_name, coordinate );
+
+				TFile* grid_point = new TFile( "File_"+grid_name+".root", "RECREATE" );
+
+				double dll_min = 0.;
+				double dll_max = 0.;
+
+				for( vector<Double_t>::iterator toy_i = Toy_DLL_Dist.begin(); toy_i !=Toy_DLL_Dist.end(); ++toy_i )
 				{
-					TString grid_name = Flat_Coord_String( controlled_parameter_name, coordinate );
-					TString rand_str; rand_str += rand->Rndm();
-					TCanvas* free_c1 = new TCanvas( "TCanv_free_"+rand_str, "TCanv_free_"+rand_str, 1680, 1050 );
-					TH1* free_data_th1 = Histogram_Processing::Get_TH1( param_data_free, rand );//, get_optimal_histo_bins(param_data_free) );
-					free_data_th1->Draw();
-					free_c1->Update();
-					Histogram_Processing::Silent_Print( free_c1, "NLL_"+grid_name+"_free.pdf" );
-
-					TCanvas* fixed_c1 = new TCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str, 1680, 1050 );
-					TH1* fixed_data_th1 = Histogram_Processing::Get_TH1( param_data_fixed, rand );//, get_optimal_histo_bins(param_data_fixed) );
-					fixed_data_th1->Draw();
-					fixed_c1->Update();
-					Histogram_Processing::Silent_Print( fixed_c1, "NLL_"+grid_name+"_fixed.pdf" );
-
-					TGraph* free_graph = new TGraph( free_data_th1 );
-					TGraph* fixed_graph = new TGraph( fixed_data_th1 );
-
-					TMultiGraph* multi_graph = new TMultiGraph( "TMulti_"+rand_str, "TMulti_"+rand_str );
-
-					free_graph->SetLineColor(1);
-					multi_graph->Add( free_graph );
-					multi_graph->Add( fixed_graph );
-
-					TCanvas* c1 = new TCanvas( "TCanv_"+rand_str, "TCanv_"+rand_str, 1680, 1050 );
-
-					multi_graph->Draw("APL");
-
-					c1->Update();
-					Histogram_Processing::Silent_Print( c1, "NLL_"+grid_name+"_multi.pdf" );
+					if( *toy_i < dll_min ) dll_min = *toy_i;
+					if( *toy_i > dll_max ) dll_max = *toy_i;
 				}
 
-				//	Print some useful information to the screen&file about this grid point
-				void FeldmanCousinsAnalysis::Output_GridPoint( vector<string>& controlled_parameter_name, vector<Double_t>& coordinate, double LOCAL_DATA_DLL, vector<Double_t>& Toy_DLL_Dist )
+				if( LOCAL_DATA_DLL > dll_max ) dll_max = LOCAL_DATA_DLL;
+
+				TH1D* grid_th1 = new TH1D( "TH1_"+grid_name,"TH1_"+grid_name, 100, dll_min, dll_max );//&(Toy_DLL_Dist[0]) );
+
+				for( unsigned int i=0; i< Toy_DLL_Dist.size(); ++i )
 				{
-					TString grid_name = Flat_Coord_String( controlled_parameter_name, coordinate );
+					grid_th1->Fill( Toy_DLL_Dist[i] );
+				}
 
-					TFile* grid_point = new TFile( "File_"+grid_name+".root", "RECREATE" );
+				TCanvas* c1 = new TCanvas( "TCanvas_"+grid_name, "TCanvas_"+grid_name, 1680, 1050 );
 
-					double dll_min = 0.;
-					double dll_max = 0.;
+				grid_th1->Draw("PE");
+				c1->Update();           //      STUPID ROOT
 
-					for( vector<Double_t>::iterator toy_i = Toy_DLL_Dist.begin(); toy_i !=Toy_DLL_Dist.end(); ++toy_i )
+				double y_max = grid_th1->GetBinContent( grid_th1->GetMaximumBin() );
+
+				TLine* data_DLL = new TLine( (Double_t)LOCAL_DATA_DLL, 0., (Double_t)LOCAL_DATA_DLL, (Double_t)y_max );
+
+				data_DLL->Draw( "SAME" );
+				c1->Update();
+
+				c1->SetLogy();
+				c1->Update();
+
+				Histogram_Processing::Silent_Print( c1, "DLL_Dist"+grid_name+".pdf");
+				Histogram_Processing::Silent_Print( c1, "DLL_Dist"+grid_name+".png");
+
+				grid_th1->Write("",TObject::kOverwrite);
+				c1->Write("",TObject::kOverwrite);
+
+				grid_point->Close();
+			}
+
+			//	Return a pair of vectors first=CV of each control parameter second=CV_err of each control parameter
+			pair<vector<double>*, vector<double>* > FeldmanCousinsAnalysis::Get_Best_CV( TTree* input_tree, vector<string>& controlled_param_name )
+			{
+				//      By definition the first event in a file is the Global Best fit hence can safely extract the NLL
+				input_tree->Draw("NLL","","goff",1,0);
+				double GLOBAL_BEST_NLL = input_tree->GetV1()[0];
+
+				TString NLL_Cut_String = "(abs(NLL-"; NLL_Cut_String+=GLOBAL_BEST_NLL; NLL_Cut_String.Append( ")<"+double_tolerance+")" );
+
+				vector<double>* Global_CV=new vector<double>();
+				vector<double>* Global_CV_err = new vector<double>();
+
+				for( vector<string>::iterator param_i = controlled_param_name.begin(); param_i != controlled_param_name.end(); ++param_i )
+				{
+					TString param=param_i->c_str();
+					input_tree->Draw( param+"_value", NLL_Cut_String, "goff", 1, 0 );
+					double param_val = input_tree->GetV1()[0];
+					input_tree->Draw( param+"_error", NLL_Cut_String, "goff", 1, 0 );
+					double param_err = input_tree->GetV1()[0];
+					Global_CV->push_back( param_val );
+					Global_CV_err->push_back( param_err );
+				}
+				return make_pair( Global_CV, Global_CV_err );
+			}
+
+			//	Perform the full analysis of a FC output file from RapidFit
+			void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& controlled_parameter_name, TRandom3* rand, vector<string>& OtherOptions )
+			{
+				cout << "Starting FC Analysis" << endl;
+				print( controlled_parameter_name );
+
+				(void) OtherOptions;
+
+				//	Just to make sure we never lose any informatio
+				input_tree->SetEstimate( input_tree->GetEntries() );
+
+				//	DLL coordinates have the same _gen as the global CV, but all have unique fixed _value
+				vector<TString> Free_Params = RapidFit_Output_File::get_free_non_scanned_parameters( input_tree, controlled_parameter_name );
+
+				//	This Draw String gives the returned control parameters from the cut string
+				TString Grid_Draw_String = RapidFit_Output_File::Construct_Draw_String( controlled_parameter_name );
+
+				//	This Cut String returns only the fit results which are 
+				TString Grid_Cut_String = RapidFit_Output_File::Construct_Cut_String( input_tree, controlled_parameter_name, true );
+
+				//	Output for the user
+				cout << "Draw:\t" << Grid_Draw_String << endl;
+				cout << "Cut: \t" << Grid_Cut_String << endl;
+
+				//	By definition the first event in a file is the Global Best fit hence can safely extract the NLL
+				input_tree->Draw("NLL","","goff",1,0);
+				double GLOBAL_BEST_NLL = input_tree->GetV1()[0];
+
+				vector<double>* Global_CV=NULL;
+				vector<double>* Global_CV_err=NULL;
+
+				pair<vector<double>*, vector<double>* > Global_Params = Get_Best_CV( input_tree, controlled_parameter_name );
+
+				Global_CV = Global_Params.first; Global_CV_err = Global_Params.second;
+
+				//	The results from the Plotter_Data are BY DEFINITION mangled, but they are a unique sorted set of grid_coordinates
+
+				//      return the *UNIQUE* corrdinates contained in the input_tree from the Draw_String after applying the Cut_String
+				vector<vector<Double_t> > Grid_Coordinates = TTree_Processing::Plotter_Data( input_tree, Grid_Draw_String, Grid_Cut_String, rand );
+				Grid_Coordinates = rotate( Grid_Coordinates );
+
+				//	Output for the user
+				cout << "DIMENTION: " << Grid_Coordinates[0].size() << "\t" << "COORDINATES: " << Grid_Coordinates.size() << endl;
+
+				//	Vectors to store the output from the analysis
+				vector<double> DATA_DLL;
+				vector<pair<vector<double>, double> > ALL_CL_FROM_FC;
+
+				//	Make an output Directory for the FC analysis tool
+				gSystem->mkdir("RapidFit_FC_distributions");
+				gSystem->cd("RapidFit_FC_distributions");
+
+				TDirectory* here = gDirectory;
+
+				cout << endl;
+
+				unsigned int coord=1;
+
+				//vector<vector<Double_t> >::iterator grid_i = Grid_Coordinates.begin();
+				//for( ; grid_i != Grid_Coordinates.end(); ++grid_i, ++coord )
+				vector<vector<Double_t> >::iterator grid_i = Grid_Coordinates.end();
+				for( --grid_i; grid_i != Grid_Coordinates.begin()-1; --grid_i, ++coord )
+				{
+					stringstream num; num << coord << "/" << Grid_Coordinates.size();
+					cout << num.str() << setw(12);
+
+					//	Cut String to select only a SINGLE fit result for the LL at this point
+					TString data_cut = Grid_Cut_String + "&&" + RapidFit_Output_File::Data_At_Grid_ij( controlled_parameter_name, *grid_i ); 
+
+					//	Slect only toy Results which were generated at this grid point
+					//	By definition the _gen value is equal to the fit minima from the LL scan result at this point
+					//	Could even expand on this to use the _gen of all nuisence too, but thata extreme belt&braces
+					TString toys_cut = RapidFit_Output_File::Fits_At_Grid_ij( controlled_parameter_name, *grid_i, true );
+
+					//	Cut string which will return only free toys
+					TString free_condition = RapidFit_Output_File::Construct_Fixed_condition( controlled_parameter_name, false );
+
+					//	Cut string which will return only fixed toys
+					TString fixed_condition = RapidFit_Output_File::Construct_Fixed_condition( controlled_parameter_name, true );
+
+					//	Only Fixed/Free toys at this coordinate
+					TString free_toys = RapidFit_Output_File::Fits_At_Grid_ij( controlled_parameter_name, *grid_i, true ) + "&&" + free_condition;// + "&&" + "(Phi_s_gen!=Phi_s_value)" + "&&(NLL>0)" + "&&(Phi_s_scan!=1)";
+					//TString fixed_toys = toys_cut + "&&" + fixed_condition + "&&(NLL>0)" + "&&(Phi_s_scan!=1)";
+					TString fixed_toys = RapidFit_Output_File::Fits_At_Grid_ij( controlled_parameter_name, *grid_i, true ) + "&&" + fixed_condition;// + "&&" + "(Phi_s_gen==Phi_s_value)" + "&&(NLL>0)" + "&&(Phi_s_scan!=1)";
+
+					//	Some output for the user
+					cout << "Free CUT:\t" << free_toys << endl;
+					cout << "Fixed CUT:\t" << fixed_toys << endl;
+					cout << "data_cut:\t" << data_cut << endl;
+
+					//	this data will be mangled, however we only want the single unique result so don't care
+					vector<vector<Double_t> > Data_Coordinate = TTree_Processing::Plotter_Data( input_tree, "NLL", data_cut, rand );
+
+					//	Get the NLL for the fixed/free toys in a completely UNMANGLED way
+					vector<Double_t>* Fixed_Toy_NLL = TTree_Processing::Buffer_Branch( input_tree, "NLL", fixed_toys );
+					/*vector<Double_t>* Fixed_Toy_As = TTree_Processing::Buffer_Branch( input_tree, "As_sq_value", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dpe = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dper = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dpa = TTree_Processing::Buffer_Branch( input_tree, "delta_para_value", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dpar = TTree_Processing::Buffer_Branch( input_tree, "delta_para_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dsp = TTree_Processing::Buffer_Branch( input_tree, "delta_s_value*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dsr = TTree_Processing::Buffer_Branch( input_tree, "delta_s_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_phi = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_value", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_phe = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_gae = TTree_Processing::Buffer_Branch( input_tree, "gamma_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_Aser = TTree_Processing::Buffer_Branch( input_tree, "As_sq_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_trer = TTree_Processing::Buffer_Branch( input_tree, "timeResolutionScale_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dMe = TTree_Processing::Buffer_Branch( input_tree, "deltaM_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_mp0 = TTree_Processing::Buffer_Branch( input_tree, "mistagP0_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_mp1 = TTree_Processing::Buffer_Branch( input_tree, "mistagP1_error", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dGe = TTree_Processing::Buffer_Branch( input_tree, "deltaGamma_error", fixed_toys );
+					 */vector<Double_t>* Free_Toy_NLL = TTree_Processing::Buffer_Branch( input_tree, "NLL", free_toys );
+					/*vector<Double_t>* Free_Toy_As = TTree_Processing::Buffer_Branch( input_tree, "As_sq_value", free_toys );
+					  vector<Double_t>* Free_Toy_dpe = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))", free_toys );
+					  vector<Double_t>* Free_Toy_dpa = TTree_Processing::Buffer_Branch( input_tree, "delta_para_value", free_toys );
+					  vector<Double_t>* Free_Toy_dsp = TTree_Processing::Buffer_Branch( input_tree, "delta_s_value*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))", free_toys );
+					  vector<Double_t>* Free_Toy_phi = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_value", free_toys );
+					  vector<Double_t>* Free_Toy_phe = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_error", free_toys );
+					  vector<Double_t>* Free_Toy_gae = TTree_Processing::Buffer_Branch( input_tree, "gamma_error", free_toys );
+					  vector<Double_t>* Free_Toy_dper = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_error", free_toys );
+					  vector<Double_t>* Free_Toy_dpar = TTree_Processing::Buffer_Branch( input_tree, "delta_para_error", free_toys );
+					  vector<Double_t>* Free_Toy_dsr = TTree_Processing::Buffer_Branch( input_tree, "delta_s_error", free_toys );
+					  vector<Double_t>* Free_Toy_Aser = TTree_Processing::Buffer_Branch( input_tree, "As_sq_error", free_toys );
+					  vector<Double_t>* Free_Toy_trer = TTree_Processing::Buffer_Branch( input_tree, "timeResolutionScale_error", free_toys );
+					  vector<Double_t>* Free_Toy_dMe = TTree_Processing::Buffer_Branch( input_tree, "deltaM_error", free_toys );
+					  vector<Double_t>* Free_Toy_mp0 = TTree_Processing::Buffer_Branch( input_tree, "mistagP0_error", free_toys );
+					  vector<Double_t>* Free_Toy_mp1 = TTree_Processing::Buffer_Branch( input_tree, "mistagP1_error", free_toys );
+					  vector<Double_t>* Free_Toy_dGe = TTree_Processing::Buffer_Branch( input_tree, "deltaGamma_error", free_toys );
+
+					  vector<Double_t>* Free_Toy_diff = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value-delta_s_value", free_toys );
+					  vector<Double_t>* Fixed_Toy_diff = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value-delta_s_value", fixed_toys );
+
+					  vector<Double_t>* Free_Toy_ds_cut = TTree_Processing::Buffer_Branch( input_tree, "(delta_s_value)*(abs(delta_perp_value-delta_s_value)<=1)", free_toys );
+					  vector<Double_t>* Free_Toy_dp_cut = TTree_Processing::Buffer_Branch( input_tree, "(delta_perp_value)*(abs(delta_perp_value-delta_s_value)<=1)", free_toys );
+					  vector<Double_t>* Fixed_Toy_ds_cut = TTree_Processing::Buffer_Branch( input_tree, "(delta_s_value)*(abs(delta_perp_value-delta_s_value)<=1)", fixed_toys );
+					  vector<Double_t>* Fixed_Toy_dp_cut = TTree_Processing::Buffer_Branch( input_tree, "(delta_perp_value)*(abs(delta_perp_value-delta_s_value)<=1)", fixed_toys );
+					 */
+					gStyle->SetOptStat(0);
+					TString grid_name = Flat_Coord_String( controlled_parameter_name, *grid_i );
+
+					/*									TString colz("colz"), e("");
+
+														TH2* th1 = Histogram_Processing::Plot_2D( *Free_Toy_dsp, *Free_Toy_dpe, "scat_free_"+grid_name+".pdf", e, rand );
+														TH2* th2 = Histogram_Processing::Plot_2D( *Free_Toy_dsp, *Free_Toy_dpe, "scat_free_"+grid_name+"_contz.pdf", colz, rand );
+
+														TH2* th3 = Histogram_Processing::Plot_2D( *Fixed_Toy_dsp, *Fixed_Toy_dpe, "scat_fix_"+grid_name+".pdf", e, rand );
+														TH2* th4 = Histogram_Processing::Plot_2D( *Fixed_Toy_dsp, *Fixed_Toy_dpe, "scat_fix_"+grid_name+"_contz.pdf", colz, rand );
+
+														TH2* th5 = Histogram_Processing::Plot_2D( *Free_Toy_ds_cut, *Free_Toy_dp_cut, "scat_free_cut"+grid_name+".pdf", e, rand );
+														TH2* th6 = Histogram_Processing::Plot_2D( *Free_Toy_ds_cut, *Free_Toy_dp_cut, "scat_free_cut_"+grid_name+"_contz.pdf", colz, rand );
+
+														TH2* th7 = Histogram_Processing::Plot_2D( *Fixed_Toy_ds_cut, *Fixed_Toy_dp_cut, "scat_fix_cut_"+grid_name+".pdf", e, rand );
+														TH2* th8 = Histogram_Processing::Plot_2D( *Fixed_Toy_ds_cut, *Fixed_Toy_dp_cut, "scat_fix_cut_"+grid_name+"_contz.pdf", colz, rand );
+
+														TH1* diff_th1 = Histogram_Processing::Get_TH1( *Free_Toy_diff, rand );
+														TH1* diff2_th1 = Histogram_Processing::Get_TH1( *Fixed_Toy_diff, rand );
+														TString canv_nam_p("name");canv_nam_p+=rand->Rndm();
+														here->cd();                                              
+														TCanvas*  canv_p = new TCanvas( canv_nam_p, canv_nam_p, 1680, 1050 );
+														canv_p->SetLogy();
+														diff_th1->Draw();
+														diff2_th1->Draw("SAME");
+														canv_p->Update();
+														canv_p->Write("Overlay_diff_"+grid_name+".pdf");
+					 */
+
+					//	Draw the NLL distributions at this point
+					//NLL_dists( *Free_Toy_NLL, *Fixed_Toy_NLL, controlled_parameter_name, *grid_i, rand );
+
+					//	Print some information on the toys at this grid point
+					//Print_Toy_Info( controlled_parameter_name, *grid_i, (int)Fixed_Toy_NLL->size(), (int)Free_Toy_NLL->size() );
+
+					//      Record and output the DLL from data at this point
+					double LOCAL_DATA_DLL = Data_Coordinate[0][0] - GLOBAL_BEST_NLL;
+					//cout << LOCAL_DATA_DLL << endl;
+					DATA_DLL.push_back( LOCAL_DATA_DLL );
+
+					//	Make some plots of the distributions of all free parameters fluctuating over the fit
+					//Plot_Nuisance_Parameters( input_tree, free_toys, fixed_toys, Free_Params, controlled_parameter_name, *grid_i, rand, LOCAL_DATA_DLL );
+
+					//	Check the total number of 'good' toys which we can use at this grid point
+					unsigned int toys_to_test = (unsigned)Free_Toy_NLL->size();
+					if( Free_Toy_NLL->size() != Fixed_Toy_NLL->size() )
 					{
-						if( *toy_i < dll_min ) dll_min = *toy_i;
-						if( *toy_i > dll_max ) dll_max = *toy_i;
+						cerr << "\tWARNING: DIFFERENT NUMBERS OF TOYS BETWEEN FIXED/FREE" << endl;
+						cerr << Free_Toy_NLL->size() << "\t" << Fixed_Toy_NLL->size() << endl << endl;
+						//	This if statement is to protect the CL from errors in the data
+						//exit(-5);
+						continue;
 					}
+					if( toys_to_test == 0 ) continue;
 
-					if( LOCAL_DATA_DLL > dll_max ) dll_max = LOCAL_DATA_DLL;
+					cout << Free_Toy_NLL->size() << "\t" << Fixed_Toy_NLL->size() << endl << endl;
 
-					TH1D* grid_th1 = new TH1D( "TH1_"+grid_name,"TH1_"+grid_name, 100, dll_min, dll_max );//&(Toy_DLL_Dist[0]) );
-
-					for( unsigned int i=0; i< Toy_DLL_Dist.size(); ++i )
+					//	Store the DLL from the toys in an array
+					vector<double> Toy_DLL_Dist, other_dist, total;
+					for( unsigned int i=0; i != toys_to_test; ++i )
 					{
-						grid_th1->Fill( Toy_DLL_Dist[i] );
-					}
-
-					TCanvas* c1 = new TCanvas( "TCanvas_"+grid_name, "TCanvas_"+grid_name, 1680, 1050 );
-
-					grid_th1->Draw("PE");
-					c1->Update();           //      STUPID ROOT
-
-					double y_max = grid_th1->GetBinContent( grid_th1->GetMaximumBin() );
-
-					TLine* data_DLL = new TLine( (Double_t)LOCAL_DATA_DLL, 0., (Double_t)LOCAL_DATA_DLL, (Double_t)y_max );
-
-					data_DLL->Draw( "SAME" );
-					c1->Update();
-
-					c1->SetLogy();
-					c1->Update();
-
-					Histogram_Processing::Silent_Print( c1, "DLL_Dist"+grid_name+".pdf");
-					Histogram_Processing::Silent_Print( c1, "DLL_Dist"+grid_name+".png");
-
-					grid_th1->Write("",TObject::kOverwrite);
-					c1->Write("",TObject::kOverwrite);
-
-					grid_point->Close();
-				}
-
-				//	Return a pair of vectors first=CV of each control parameter second=CV_err of each control parameter
-				pair<vector<double>*, vector<double>* > FeldmanCousinsAnalysis::Get_Best_CV( TTree* input_tree, vector<string>& controlled_param_name )
-				{
-					//      By definition the first event in a file is the Global Best fit hence can safely extract the NLL
-					input_tree->Draw("NLL","","goff",1,0);
-					double GLOBAL_BEST_NLL = input_tree->GetV1()[0];
-
-					TString NLL_Cut_String = "(abs(NLL-"; NLL_Cut_String+=GLOBAL_BEST_NLL; NLL_Cut_String.Append( ")<"+double_tolerance+")" );
-
-					vector<double>* Global_CV=new vector<double>();
-					vector<double>* Global_CV_err = new vector<double>();
-
-					for( vector<string>::iterator param_i = controlled_param_name.begin(); param_i != controlled_param_name.end(); ++param_i )
-					{
-						TString param=param_i->c_str();
-						input_tree->Draw( param+"_value", NLL_Cut_String, "goff", 1, 0 );
-						double param_val = input_tree->GetV1()[0];
-						input_tree->Draw( param+"_error", NLL_Cut_String, "goff", 1, 0 );
-						double param_err = input_tree->GetV1()[0];
-						Global_CV->push_back( param_val );
-						Global_CV_err->push_back( param_err );
-					}
-					return make_pair( Global_CV, Global_CV_err );
-				}
-
-				//	Perform the full analysis of a FC output file from RapidFit
-				void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& controlled_parameter_name, TRandom3* rand, vector<string>& OtherOptions )
-				{
-					cout << "Starting FC Analysis" << endl;
-					print( controlled_parameter_name );
-
-					(void) OtherOptions;
-
-					//	Just to make sure we never lose any informatio
-					input_tree->SetEstimate( input_tree->GetEntries() );
-
-					//	DLL coordinates have the same _gen as the global CV, but all have unique fixed _value
-					vector<TString> Free_Params = RapidFit_Output_File::get_free_non_scanned_parameters( input_tree, controlled_parameter_name );
-
-					//	This Draw String gives the returned control parameters from the cut string
-					TString Grid_Draw_String = RapidFit_Output_File::Construct_Draw_String( controlled_parameter_name );
-
-					//	This Cut String returns only the fit results which are 
-					TString Grid_Cut_String = RapidFit_Output_File::Construct_Cut_String( input_tree, controlled_parameter_name, true );
-
-					//	Output for the user
-					cout << "Draw:\t" << Grid_Draw_String << endl;
-					cout << "Cut: \t" << Grid_Cut_String << endl;
-
-					//	By definition the first event in a file is the Global Best fit hence can safely extract the NLL
-					input_tree->Draw("NLL","","goff",1,0);
-					double GLOBAL_BEST_NLL = input_tree->GetV1()[0];
-
-					vector<double>* Global_CV=NULL;
-					vector<double>* Global_CV_err=NULL;
-
-					pair<vector<double>*, vector<double>* > Global_Params = Get_Best_CV( input_tree, controlled_parameter_name );
-
-					Global_CV = Global_Params.first; Global_CV_err = Global_Params.second;
-
-					//	The results from the Plotter_Data are BY DEFINITION mangled, but they are a unique sorted set of grid_coordinates
-
-					//      return the *UNIQUE* corrdinates contained in the input_tree from the Draw_String after applying the Cut_String
-					vector<vector<Double_t> > Grid_Coordinates = TTree_Processing::Plotter_Data( input_tree, Grid_Draw_String, Grid_Cut_String, rand );
-					Grid_Coordinates = rotate( Grid_Coordinates );
-
-					//	Output for the user
-					cout << "DIMENTION: " << Grid_Coordinates[0].size() << "\t" << "COORDINATES: " << Grid_Coordinates.size() << endl;
-
-					//	Vectors to store the output from the analysis
-					vector<double> DATA_DLL;
-					vector<pair<vector<double>, double> > ALL_CL_FROM_FC;
-
-					//	Make an output Directory for the FC analysis tool
-					gSystem->mkdir("RapidFit_FC_distributions");
-					gSystem->cd("RapidFit_FC_distributions");
-
-					TDirectory* here = gDirectory;
-
-					cout << endl;
-
-					unsigned int coord=1;
-
-					//vector<vector<Double_t> >::iterator grid_i = Grid_Coordinates.begin();
-					//for( ; grid_i != Grid_Coordinates.end(); ++grid_i, ++coord )
-					vector<vector<Double_t> >::iterator grid_i = Grid_Coordinates.end();
-					for( --grid_i; grid_i != Grid_Coordinates.begin()-1; --grid_i, ++coord )
-					{
-						stringstream num; num << coord << "/" << Grid_Coordinates.size();
-						cout << num.str() << setw(12);
-
-						//	Cut String to select only a SINGLE fit result for the LL at this point
-						TString data_cut = Grid_Cut_String + "&&" + RapidFit_Output_File::Data_At_Grid_ij( controlled_parameter_name, *grid_i ); 
-
-						//	Slect only toy Results which were generated at this grid point
-						//	By definition the _gen value is equal to the fit minima from the LL scan result at this point
-						//	Could even expand on this to use the _gen of all nuisence too, but thata extreme belt&braces
-						TString toys_cut = RapidFit_Output_File::Fits_At_Grid_ij( controlled_parameter_name, *grid_i, true );
-
-						//	Cut string which will return only free toys
-						TString free_condition = RapidFit_Output_File::Construct_Fixed_condition( controlled_parameter_name, false );
-
-						//	Cut string which will return only fixed toys
-						TString fixed_condition = RapidFit_Output_File::Construct_Fixed_condition( controlled_parameter_name, true );
-
-						//	Only Fixed/Free toys at this coordinate
-						TString free_toys = RapidFit_Output_File::Fits_At_Grid_ij( controlled_parameter_name, *grid_i, true ) + "&&" + "(Phi_s_gen!=Phi_s_value)" + "&&(NLL>0)" + "&&(Phi_s_scan!=1)";
-						//TString fixed_toys = toys_cut + "&&" + fixed_condition + "&&(NLL>0)" + "&&(Phi_s_scan!=1)";
-						TString fixed_toys = RapidFit_Output_File::Fits_At_Grid_ij( controlled_parameter_name, *grid_i, true ) + "&&" + "(Phi_s_gen==Phi_s_value)" + "&&(NLL>0)" + "&&(Phi_s_scan!=1)";
-
-						//	Some output for the user
-						cout << "Free CUT:\t" << free_toys << endl;
-						cout << "Fixed CUT:\t" << fixed_toys << endl;
-						cout << "data_cut:\t" << data_cut << endl;
-
-						//	this data will be mangled, however we only want the single unique result so don't care
-						vector<vector<Double_t> > Data_Coordinate = TTree_Processing::Plotter_Data( input_tree, "NLL", data_cut, rand );
-
-						//	Get the NLL for the fixed/free toys in a completely UNMANGLED way
-						vector<Double_t>* Fixed_Toy_NLL = TTree_Processing::Buffer_Branch( input_tree, "NLL", fixed_toys );
-						vector<Double_t>* Fixed_Toy_As = TTree_Processing::Buffer_Branch( input_tree, "As_sq_value", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dpe = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dper = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dpa = TTree_Processing::Buffer_Branch( input_tree, "delta_para_value", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dpar = TTree_Processing::Buffer_Branch( input_tree, "delta_para_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dsp = TTree_Processing::Buffer_Branch( input_tree, "delta_s_value*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dsr = TTree_Processing::Buffer_Branch( input_tree, "delta_s_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_phi = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_value", fixed_toys );
-						vector<Double_t>* Fixed_Toy_phe = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_gae = TTree_Processing::Buffer_Branch( input_tree, "gamma_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_Aser = TTree_Processing::Buffer_Branch( input_tree, "As_sq_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_trer = TTree_Processing::Buffer_Branch( input_tree, "timeResolutionScale_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dMe = TTree_Processing::Buffer_Branch( input_tree, "deltaM_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_mp0 = TTree_Processing::Buffer_Branch( input_tree, "mistagP0_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_mp1 = TTree_Processing::Buffer_Branch( input_tree, "mistagP1_error", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dGe = TTree_Processing::Buffer_Branch( input_tree, "deltaGamma_error", fixed_toys );
-						vector<Double_t>* Free_Toy_NLL = TTree_Processing::Buffer_Branch( input_tree, "NLL", free_toys );
-						vector<Double_t>* Free_Toy_As = TTree_Processing::Buffer_Branch( input_tree, "As_sq_value", free_toys );
-						vector<Double_t>* Free_Toy_dpe = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))", free_toys );
-						vector<Double_t>* Free_Toy_dpa = TTree_Processing::Buffer_Branch( input_tree, "delta_para_value", free_toys );
-						vector<Double_t>* Free_Toy_dsp = TTree_Processing::Buffer_Branch( input_tree, "delta_s_value*(delta_s_value>=0.)*(delta_s_value<=(2*3.14159))*(delta_perp_value>=0.)*(delta_perp_value<=(2*3.14159))", free_toys );
-						vector<Double_t>* Free_Toy_phi = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_value", free_toys );
-						vector<Double_t>* Free_Toy_phe = TTree_Processing::Buffer_Branch( input_tree, "Phi_s_error", free_toys );
-						vector<Double_t>* Free_Toy_gae = TTree_Processing::Buffer_Branch( input_tree, "gamma_error", free_toys );
-						vector<Double_t>* Free_Toy_dper = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_error", free_toys );
-						vector<Double_t>* Free_Toy_dpar = TTree_Processing::Buffer_Branch( input_tree, "delta_para_error", free_toys );
-						vector<Double_t>* Free_Toy_dsr = TTree_Processing::Buffer_Branch( input_tree, "delta_s_error", free_toys );
-						vector<Double_t>* Free_Toy_Aser = TTree_Processing::Buffer_Branch( input_tree, "As_sq_error", free_toys );
-						vector<Double_t>* Free_Toy_trer = TTree_Processing::Buffer_Branch( input_tree, "timeResolutionScale_error", free_toys );
-						vector<Double_t>* Free_Toy_dMe = TTree_Processing::Buffer_Branch( input_tree, "deltaM_error", free_toys );
-						vector<Double_t>* Free_Toy_mp0 = TTree_Processing::Buffer_Branch( input_tree, "mistagP0_error", free_toys );
-						vector<Double_t>* Free_Toy_mp1 = TTree_Processing::Buffer_Branch( input_tree, "mistagP1_error", free_toys );
-						vector<Double_t>* Free_Toy_dGe = TTree_Processing::Buffer_Branch( input_tree, "deltaGamma_error", free_toys );
-
-						vector<Double_t>* Free_Toy_diff = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value-delta_s_value", free_toys );
-						vector<Double_t>* Fixed_Toy_diff = TTree_Processing::Buffer_Branch( input_tree, "delta_perp_value-delta_s_value", fixed_toys );
-
-						vector<Double_t>* Free_Toy_ds_cut = TTree_Processing::Buffer_Branch( input_tree, "(delta_s_value)*(abs(delta_perp_value-delta_s_value)<=1)", free_toys );
-						vector<Double_t>* Free_Toy_dp_cut = TTree_Processing::Buffer_Branch( input_tree, "(delta_perp_value)*(abs(delta_perp_value-delta_s_value)<=1)", free_toys );
-						vector<Double_t>* Fixed_Toy_ds_cut = TTree_Processing::Buffer_Branch( input_tree, "(delta_s_value)*(abs(delta_perp_value-delta_s_value)<=1)", fixed_toys );
-						vector<Double_t>* Fixed_Toy_dp_cut = TTree_Processing::Buffer_Branch( input_tree, "(delta_perp_value)*(abs(delta_perp_value-delta_s_value)<=1)", fixed_toys );
-
-						gStyle->SetOptStat(0);
-						TString grid_name = Flat_Coord_String( controlled_parameter_name, *grid_i );
-
-						/*									TString colz("colz"), e("");
-
-															TH2* th1 = Histogram_Processing::Plot_2D( *Free_Toy_dsp, *Free_Toy_dpe, "scat_free_"+grid_name+".pdf", e, rand );
-															TH2* th2 = Histogram_Processing::Plot_2D( *Free_Toy_dsp, *Free_Toy_dpe, "scat_free_"+grid_name+"_contz.pdf", colz, rand );
-
-															TH2* th3 = Histogram_Processing::Plot_2D( *Fixed_Toy_dsp, *Fixed_Toy_dpe, "scat_fix_"+grid_name+".pdf", e, rand );
-															TH2* th4 = Histogram_Processing::Plot_2D( *Fixed_Toy_dsp, *Fixed_Toy_dpe, "scat_fix_"+grid_name+"_contz.pdf", colz, rand );
-
-															TH2* th5 = Histogram_Processing::Plot_2D( *Free_Toy_ds_cut, *Free_Toy_dp_cut, "scat_free_cut"+grid_name+".pdf", e, rand );
-															TH2* th6 = Histogram_Processing::Plot_2D( *Free_Toy_ds_cut, *Free_Toy_dp_cut, "scat_free_cut_"+grid_name+"_contz.pdf", colz, rand );
-
-															TH2* th7 = Histogram_Processing::Plot_2D( *Fixed_Toy_ds_cut, *Fixed_Toy_dp_cut, "scat_fix_cut_"+grid_name+".pdf", e, rand );
-															TH2* th8 = Histogram_Processing::Plot_2D( *Fixed_Toy_ds_cut, *Fixed_Toy_dp_cut, "scat_fix_cut_"+grid_name+"_contz.pdf", colz, rand );
-
-															TH1* diff_th1 = Histogram_Processing::Get_TH1( *Free_Toy_diff, rand );
-															TH1* diff2_th1 = Histogram_Processing::Get_TH1( *Fixed_Toy_diff, rand );
-															TString canv_nam_p("name");canv_nam_p+=rand->Rndm();
-															here->cd();                                              
-															TCanvas*  canv_p = new TCanvas( canv_nam_p, canv_nam_p, 1680, 1050 );
-															canv_p->SetLogy();
-															diff_th1->Draw();
-															diff2_th1->Draw("SAME");
-															canv_p->Update();
-															canv_p->Write("Overlay_diff_"+grid_name+".pdf");
-						 */
-
-						//	Draw the NLL distributions at this point
-						//NLL_dists( *Free_Toy_NLL, *Fixed_Toy_NLL, controlled_parameter_name, *grid_i, rand );
-
-						//	Print some information on the toys at this grid point
-						//Print_Toy_Info( controlled_parameter_name, *grid_i, (int)Fixed_Toy_NLL->size(), (int)Free_Toy_NLL->size() );
-
-						//      Record and output the DLL from data at this point
-						double LOCAL_DATA_DLL = Data_Coordinate[0][0] - GLOBAL_BEST_NLL;
-						//cout << LOCAL_DATA_DLL << endl;
-						DATA_DLL.push_back( LOCAL_DATA_DLL );
-
-						//	Make some plots of the distributions of all free parameters fluctuating over the fit
-						//Plot_Nuisance_Parameters( input_tree, free_toys, fixed_toys, Free_Params, controlled_parameter_name, *grid_i, rand, LOCAL_DATA_DLL );
-
-						//	Check the total number of 'good' toys which we can use at this grid point
-						unsigned int toys_to_test = (unsigned)Free_Toy_NLL->size();
-						if( Free_Toy_NLL->size() != Fixed_Toy_NLL->size() )
-						{
-							cerr << "\tWARNING: DIFFERENT NUMBERS OF TOYS BETWEEN FIXED/FREE" << endl;
-							cerr << Free_Toy_NLL->size() << "\t" << Fixed_Toy_NLL->size() << endl << endl;
-							//	This if statement is to protect the CL from errors in the data
-							//exit(-5);
-							continue;
-						}
-						if( toys_to_test == 0 ) continue;
-
-						cout << Free_Toy_NLL->size() << "\t" << Fixed_Toy_NLL->size() << endl << endl;
-
-						//	Store the DLL from the toys in an array
-						vector<double> Toy_DLL_Dist, other_dist, total;
-						for( unsigned int i=0; i != toys_to_test; ++i )
-						{
-							bool added = false;
-							//if( (*Fixed_Toy_As)[i] > 0.0012 && (*Free_Toy_As)[i] > 0.0012 )
-							//{
-							//if( fabs((*Free_Toy_dpa)[i]) < strong_up_lim && fabs((*Fixed_Toy_dpa)[i]) < strong_up_lim )
-							//{
-							/*
-							   if( fabs((*Free_Toy_phi)[i]) < 1 && fabs((*Fixed_Toy_phi)[i]) < 1 )
-							   {*/
-							if( fabs((*Free_Toy_diff)[i]) < 1. && fabs((*Fixed_Toy_diff)[i]) < 1. )
-							{
-								//if( (*Free_Toy_As)[i] > 0.0012 && (*Fixed_Toy_As)[i] > 0.0012 )
-								//{
-								//if( (*Free_Toy_dsp)[i] > 0. && (*Fixed_Toy_dsp)[i] > 0. )
-								//{
-								//if( (*Free_Toy_dsp)[i] > strong_lo_lim && (*Fixed_Toy_dsp)[i] > strong_lo_lim )
-								//{
-								//if( (*Free_Toy_dpe)[i] > 0. && (*Fixed_Toy_dpe)[i] > 0. )
-								//{
-								//if( (*Free_Toy_dpa)[i] > 0 && (*Fixed_Toy_dpa)[i] > 0. )
-								//{
-								//if( (*Free_Toy_dpe)[i] > strong_lo_lim && (*Fixed_Toy_dpe)[i] > strong_lo_lim )
-								//{
-								//if( (*Free_Toy_dpa)[i] > 3.14159 && (*Fixed_Toy_dpa)[i] > 3.14159 )
-								//{
-								/*
-								   if( fabs((*Free_Toy_phi)[i]) < 1.5 && fabs((*Fixed_Toy_phi)[i]) < 1.5 )
-								   {*/
-								/*if( (*Free_Toy_gae)[i] < 0.00575 && (*Fixed_Toy_gae)[i] < 0.00575  )
-								  {
-								  if( (*Fixed_Toy_dper)[i] > 0.15 && (*Free_Toy_dper)[i] > 0.15 )
-								  {
-								  if( (*Fixed_Toy_dper)[i] < 0.4 && (*Free_Toy_dper)[i] < 0.4 )
-								  {
-								  if( (*Fixed_Toy_dpar)[i] < 0.35 && (*Free_Toy_dpar)[i] < 0.35 )
-								  {
-								  if( (*Fixed_Toy_dpar)[i] > 0.05 && (*Free_Toy_dpar)[i] > 0.05 )
-								  {
-								  if( (*Fixed_Toy_dsr)[i] < 0.35 && fabs((*Free_Toy_dsr)[i]) < 0.35 )
-								  {
-								  if( (*Fixed_Toy_dsr)[i] > 0.15 && fabs((*Free_Toy_dsr)[i]) > 0.15 )
-								  {
-								  if( (*Fixed_Toy_Aser)[i] > 0.0075 && (*Free_Toy_Aser)[i] > 0.0075 )
-								  {
-								  if( (*Fixed_Toy_Aser)[i] < 0.0125 && (*Free_Toy_Aser)[i] < 0.0125 )
-								  {
-								  if( (*Fixed_Toy_dMe)[i] < 0.125 && (*Free_Toy_dMe)[i] < 0.125 )
-								  {
-								  if( (*Fixed_Toy_dMe)[i] > 0.05 && (*Free_Toy_dMe)[i] > 0.05 )
-								  {				*/	/*
-													   if( (*Fixed_Toy_phe)[i] < 0.15 && (*Free_Toy_phe)[i] < 0.15 )
-													   {
-													   if( (*Fixed_Toy_phe)[i] > 0.05 && (*Free_Toy_phe)[i] > 0.05 )
-													   {
-													   if( (*Fixed_Toy_trer)[i] < 0.04 && (*Free_Toy_trer)[i] < 0.04 )
-													   {
-													   if( (*Fixed_Toy_mp0)[i] < 0.0088 && (*Free_Toy_mp0)[i] < 0.0088 )
-													   {
-													   if( (*Fixed_Toy_mp0)[i] > 0.0084 && (*Free_Toy_mp0)[i] > 0.0084 )
-													   {
-													   if( (*Fixed_Toy_mp1)[i] < 0.02425 && (*Free_Toy_mp1)[i] < 0.02425 )
-													   {
-													   if( (*Fixed_Toy_mp1)[i] > 0.02375 && (*Free_Toy_mp1)[i] > 0.02375 )
-													   {
-													   if( fabs((*Fixed_Toy_dGe)[i])  <= 0.03 && fabs((*Free_Toy_dGe)[i]) <= 0.03 )
-													   {*/
-								//cout << Fixed_Toy_NLL[i] << "\t" << Free_Toy_NLL[i] << "\t\t" << Fixed_Toy_NLL[i] - Free_Toy_NLL[i] << endl;
-								double toy_dll = (*Fixed_Toy_NLL)[i] - (*Free_Toy_NLL)[i];
-								/*if( toy_dll < 0. )*/ Toy_DLL_Dist.push_back( toy_dll );
-								added=true;
-								//}
-								//}}}}}}}}}}}}}}}}}}}}}}}}}
-								//}}}}}}}}}}}//}}
-				}//}}}}}}}}}}//}
+						bool added = false;
+						//if( (*Fixed_Toy_As)[i] > 0.0012 && (*Free_Toy_As)[i] > 0.0012 )
+						//{
+						//if( fabs((*Free_Toy_dpa)[i]) < strong_up_lim && fabs((*Fixed_Toy_dpa)[i]) < strong_up_lim )
+						//{
+						/*
+						   if( fabs((*Free_Toy_phi)[i]) < 1 && fabs((*Fixed_Toy_phi)[i]) < 1 )
+						   {*/
+						//if( fabs((*Free_Toy_diff)[i]) < 1. && fabs((*Fixed_Toy_diff)[i]) < 1. )
+						//{
+						//if( (*Free_Toy_As)[i] > 0.0012 && (*Fixed_Toy_As)[i] > 0.0012 )
+						//{
+						//if( (*Free_Toy_dsp)[i] > 0. && (*Fixed_Toy_dsp)[i] > 0. )
+						//{
+						//if( (*Free_Toy_dsp)[i] > strong_lo_lim && (*Fixed_Toy_dsp)[i] > strong_lo_lim )
+						//{
+						//if( (*Free_Toy_dpe)[i] > 0. && (*Fixed_Toy_dpe)[i] > 0. )
+						//{
+						//if( (*Free_Toy_dpa)[i] > 0 && (*Fixed_Toy_dpa)[i] > 0. )
+						//{
+						//if( (*Free_Toy_dpe)[i] > strong_lo_lim && (*Fixed_Toy_dpe)[i] > strong_lo_lim )
+						//{
+						//if( (*Free_Toy_dpa)[i] > 3.14159 && (*Fixed_Toy_dpa)[i] > 3.14159 )
+						//{
+						/*
+						   if( fabs((*Free_Toy_phi)[i]) < 1.5 && fabs((*Fixed_Toy_phi)[i]) < 1.5 )
+						   {*/
+						/*if( (*Free_Toy_gae)[i] < 0.00575 && (*Fixed_Toy_gae)[i] < 0.00575  )
+						  {
+						  if( (*Fixed_Toy_dper)[i] > 0.15 && (*Free_Toy_dper)[i] > 0.15 )
+						  {
+						  if( (*Fixed_Toy_dper)[i] < 0.4 && (*Free_Toy_dper)[i] < 0.4 )
+						  {
+						  if( (*Fixed_Toy_dpar)[i] < 0.35 && (*Free_Toy_dpar)[i] < 0.35 )
+						  {
+						  if( (*Fixed_Toy_dpar)[i] > 0.05 && (*Free_Toy_dpar)[i] > 0.05 )
+						  {
+						  if( (*Fixed_Toy_dsr)[i] < 0.35 && fabs((*Free_Toy_dsr)[i]) < 0.35 )
+						  {
+						  if( (*Fixed_Toy_dsr)[i] > 0.15 && fabs((*Free_Toy_dsr)[i]) > 0.15 )
+						  {
+						  if( (*Fixed_Toy_Aser)[i] > 0.0075 && (*Free_Toy_Aser)[i] > 0.0075 )
+						  {
+						  if( (*Fixed_Toy_Aser)[i] < 0.0125 && (*Free_Toy_Aser)[i] < 0.0125 )
+						  {
+						  if( (*Fixed_Toy_dMe)[i] < 0.125 && (*Free_Toy_dMe)[i] < 0.125 )
+						  {
+						  if( (*Fixed_Toy_dMe)[i] > 0.05 && (*Free_Toy_dMe)[i] > 0.05 )
+						  {				*/	/*
+											   if( (*Fixed_Toy_phe)[i] < 0.15 && (*Free_Toy_phe)[i] < 0.15 )
+											   {
+											   if( (*Fixed_Toy_phe)[i] > 0.05 && (*Free_Toy_phe)[i] > 0.05 )
+											   {
+											   if( (*Fixed_Toy_trer)[i] < 0.04 && (*Free_Toy_trer)[i] < 0.04 )
+											   {
+											   if( (*Fixed_Toy_mp0)[i] < 0.0088 && (*Free_Toy_mp0)[i] < 0.0088 )
+											   {
+											   if( (*Fixed_Toy_mp0)[i] > 0.0084 && (*Free_Toy_mp0)[i] > 0.0084 )
+											   {
+											   if( (*Fixed_Toy_mp1)[i] < 0.02425 && (*Free_Toy_mp1)[i] < 0.02425 )
+											   {
+											   if( (*Fixed_Toy_mp1)[i] > 0.02375 && (*Free_Toy_mp1)[i] > 0.02375 )
+											   {
+											   if( fabs((*Fixed_Toy_dGe)[i])  <= 0.03 && fabs((*Free_Toy_dGe)[i]) <= 0.03 )
+											   {*/
+						//cout << Fixed_Toy_NLL[i] << "\t" << Free_Toy_NLL[i] << "\t\t" << Fixed_Toy_NLL[i] - Free_Toy_NLL[i] << endl;
+						double toy_dll = (*Fixed_Toy_NLL)[i] - (*Free_Toy_NLL)[i];
+						/*if( toy_dll < 0. )*/ Toy_DLL_Dist.push_back( toy_dll );
+						added=true;
+						//}
+						//}}}}}}}}}}}}}}}}}}}}}}}}}
+						//}}}}}}}}}}}//}}
+						//}//}}}}}}}}}}//}
 if( !added )
 {
 	other_dist.push_back( (*Fixed_Toy_NLL)[i] - (*Free_Toy_NLL)[i] );

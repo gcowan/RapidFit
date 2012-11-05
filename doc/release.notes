@@ -1,6 +1,9 @@
 // $Id: release.notes $
 
 2012/11/05 Rob Currie
+   - **Temp** fix to FC Analysis codebase
+
+2012/11/05 Rob Currie
    - Cleaned up some Code in RapidPlot to only analyse correlation matricies when asked
    - Cleaned up code to do with compiling RapidFit as a ROOT library
    - Added ugly hack into OverriteXML to remove leading 'Q' characters from 'command line arguments' due to some as yet unidentified or fixed bug

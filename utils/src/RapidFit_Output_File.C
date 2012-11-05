@@ -171,19 +171,20 @@ TString RapidFit_Output_File::Construct_Fixed_condition( vector<string>& control
 	{
 		//TString temp_fixed_str = "( abs( " + TString( *param_i ) + "_value - " + TString( *param_i ) + "_gen ) " + conditional + " " + double_tolerance + " )";
 		TString temp_fixed_str;
-		TString conditional;
+		//TString conditional;
 		if( Fixed )
 		{
-			temp_fixed_str.Append( "( abs( " + TString( *param_i ) + "_value - " + TString( *param_i ) + "_gen ) < " + double_tolerance + " )" );
-			conditional.Append( "<=" );
+			temp_fixed_str.Append( "(" + /* "abs(" + */ TString( *param_i ) + "_value == " + TString( *param_i ) + "_gen ) " ); //< " + double_tolerance + " )" );
+			temp_fixed_str.Append( "&&(" + TString( *param_i ) + "_scan != 1 )" );
+			//conditional.Append( "<=" );
 		}
 		else
 		{
 			//temp_fixed_str.Append( "( abs( " + TString( *param_i ) + "_value - " + TString( *param_i ) + "_gen ) >= " + double_tolerance + ")" );
 			temp_fixed_str.Append( "( " + TString( *param_i ) + "_value != " + TString( *param_i ) + "_gen )" );
-			conditional.Append( ">" );
+			//conditional.Append( ">" );
 		}
-		temp_fixed_str.Append( "&&( abs( " + TString( *param_i ) + "_error ) " + conditional + " " + double_tolerance + ")" );
+		//temp_fixed_str.Append( "&&( abs( " + TString( *param_i ) + "_error ) " + conditional + " " + double_tolerance + ")" );
 		fix_conditions.push_back( temp_fixed_str );
 	}
 	vector<TString>::iterator fix_i = fix_conditions.begin();
