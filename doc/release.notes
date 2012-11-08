@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/11/08 Rob Currie
+   - Makefile changes
+
 2012/11/05 Rob Currie
    - **Temp** fix to FC Analysis codebase
 

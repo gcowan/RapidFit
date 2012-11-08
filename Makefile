@@ -1,7 +1,7 @@
 # $Id: Makefile,v 1.30 2009/11/11 17:18:14 gcowan Exp $
-SHELL = /bin/bash
-UNAME = $(shell uname)
-CC = g++
+SHELL=/bin/bash
+UNAME=$(shell uname -s )
+CC=g++
 
 #		ROOT
 TEMPCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags)
@@ -22,7 +22,7 @@ RM           = rm -f
 SVN_REV ="$(shell svnversion -n .)"
 
 #		Compiler Flags
-CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -Os -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
+CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
 CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
@@ -94,17 +94,14 @@ CXXFLAGS_LIB = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) $(R
 
 LIBLINKFLAGS = -pie -m64
 
-# Linux
-ifeq "$(UNAME)" "Linux"
-	GCC_V:=$(shell gcc -dumpversion | awk -F '.' '{print $$2}')
-	CXXFLAGS+= -fPIE
-	LINKFLAG+= -pie -m64 -Wl,--rpath,$(LD_LIBRARY_PATH)
-endif
-
 # OS X
-ifeq "$(UNAME)" "Darwin"
+DARWIN=Darwin
+ifeq ($(UNAME),$(Darwin))
 	CXXFLAGS+= -fPIE
 	LINKFLAGS+= $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo " -m64"; else echo ""; fi) -Wl,-rpath,$(LD_LIBRARY_PATH)
+else
+	CXXFLAGS+= -fPIE
+	LINKFLAGS+= -pie -m64 -Wl,--rpath,$(LD_LIBRARY_PATH)
 endif
 
 
