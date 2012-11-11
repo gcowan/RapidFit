@@ -172,7 +172,7 @@ double LongLivedBkg::buildPDFnumerator()
 		}
 		double val1 = Mathematics::Exp(time, 1./tauLL1, sigmaLL);
 		double val2 = Mathematics::Exp(time, 1./tauLL2, sigmaLL);
-		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
+		returnValue = f_LL1 * val1/tauLL1 + (1. - f_LL1) * val2/tauLL2;
 	}
 
 	return returnValue;
@@ -271,7 +271,7 @@ double LongLivedBkg::buildPDFdenominator()
 		}
 		double val1 = Mathematics::ExpInt(tlow, thigh, 1./tauLL1, sigmaLL);
 		double val2 = Mathematics::ExpInt(tlow, thigh, 1./tauLL2, sigmaLL);
-		returnValue = f_LL1 * val1 + (1. - f_LL1) * val2;
+		returnValue = f_LL1 * val1/tauLL1 + (1. - f_LL1) * val2/tauLL2;
 	}
 
 	//This PDF only works for full angular phase space= 8pi factor included in the factors in the Evaluate() method - so no angular normalisation term.
