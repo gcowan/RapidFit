@@ -308,7 +308,7 @@ string SumPDF::XML() const
 {
 	stringstream xml;
 
-	xml << "SumPDF>" << endl;
+	xml << "<SumPDF>" << endl;
 	xml << firstPDF->XML() << endl;
 	xml << secondPDF->XML() << endl;
 	xml << "</SumPDF>" << endl;

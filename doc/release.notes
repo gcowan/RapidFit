@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2012/11/11 Rob Currie
+   - Cleaned up some bugs in SaveFitXML
+   - Stored some extra information in DataSetConfiguration class
+   - Cleaned up PDF labelling
+
 2012/11/08 Rob Currie
    - Makefile changes
 

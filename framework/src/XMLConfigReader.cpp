@@ -857,6 +857,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 	}
 	else
 	{
+		unsigned int PDF_NUM=0;
 		//Loop over all ToFits
 		for ( unsigned int fitIndex = 0; fitIndex < toFits.size(); ++fitIndex )
 		{
@@ -908,6 +909,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 				}
 			}
 
+
 			//Make the data set, and populate the physics bottle
 			if( foundData && foundPDF )
 			{
@@ -919,7 +921,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 					pdfsAndData.push_back( GetPDFWithData( dataTag, pdfTag, -1, overloadConfigurator ) );
 				}
 				TString ThisLabel = pdfsAndData.back()->GetPDF()->GetLabel();
-				ThisLabel.Append( "_PDF" ); ThisLabel+=fitIndex;
+				ThisLabel.Append( "_PDF" ); ThisLabel+=PDF_NUM; ++PDF_NUM;
 				pdfsAndData.back()->GetPDF()->SetLabel( ThisLabel.Data() );
 			}
 			else if( !foundConstraint )
@@ -2003,9 +2005,16 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		//Load the PDF configuration
 		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
-			if( pdfConfig[configIndex]->GetName() == "FractionName" && fractionName == "unspecified" )
+			if( pdfConfig[configIndex]->GetName() == "FractionName" )
 			{
-				fractionName = XMLTag::GetStringValue( pdfConfig[configIndex] );
+				if( fractionName == "unspecified" )
+				{
+					fractionName = XMLTag::GetStringValue( pdfConfig[configIndex] );
+				}
+				else
+				{
+					//	Silently Ignore
+				}
 			}
 			else if( pdfConfig[configIndex]->GetName() == "Label" )
 			{
@@ -2168,6 +2177,11 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	else if ( InputTag->GetName() == "ProdPDF" )
 	{
 		returnable_pdf = GetProdPDF( InputTag, InputBoundary, overloadConfigurator, false );
+	}
+	else if ( InputTag->GetName() == "FractionName" )
+	{
+		//	Silently Ignore this option
+		return NULL;
 	}
 	else
 	{

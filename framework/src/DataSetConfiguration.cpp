@@ -39,7 +39,7 @@ using namespace::std;
 DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, int starting_entry, PhaseSpaceBoundary* Boundary ) :
 	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
 	generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false), Start_Entry(starting_entry), DEBUG_DATA(false), internalBoundary(NULL),
-	internalRef(NULL), debug( new DebugClass(false) )
+	internalRef(NULL), debug( new DebugClass(false) ), fileName("undefined")
 {
 	if( Boundary != NULL )
 	{
@@ -52,7 +52,7 @@ DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, 
 DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF, PhaseSpaceBoundary* Boundary ) :
 	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
 	generatePDF( ClassLookUp::CopyPDF(DataPDF) ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false), internalBoundary(NULL),
-	internalRef(NULL), debug( new DebugClass(false) )
+	internalRef(NULL), debug( new DebugClass(false) ), fileName("undefined")
 {
 	if( Boundary != NULL )
 	{
@@ -64,7 +64,7 @@ DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, 
 DataSetConfiguration::DataSetConfiguration ( const DataSetConfiguration& input ) :
 	source(input.source), cutString(input.cutString), numberEvents(input.numberEvents), arguments(input.arguments), argumentNames(input.argumentNames),
 	generatePDF( (input.generatePDF==NULL)?NULL:ClassLookUp::CopyPDF(input.generatePDF) ), separateGeneratePDF(input.separateGeneratePDF), parametersAreSet(input.parametersAreSet),
-	Start_Entry(input.Start_Entry), DEBUG_DATA(input.DEBUG_DATA), internalBoundary(NULL), internalRef(NULL), debug( new DebugClass(*input.debug))
+	Start_Entry(input.Start_Entry), DEBUG_DATA(input.DEBUG_DATA), internalBoundary(NULL), internalRef(NULL), debug( new DebugClass(*input.debug)), fileName( input.fileName )
 {
 	if( !(input.debug->GetStatus()) ) debug->SetStatus(false);
 	if( input.internalBoundary != NULL )
@@ -178,7 +178,6 @@ IDataSet* DataSetConfiguration::FoamFile( vector<string> Arguments, vector<strin
 {
 	string searchName = "FileName";
 	int fileNameIndex = StringProcessing::VectorContains( &ArgumentNames, &searchName );
-	string fileName;
 	if( fileNameIndex == -1 )
 	{
 		fileName = "tempFile.root";
@@ -216,13 +215,13 @@ IDataSet* DataSetConfiguration::FoamFile( vector<string> Arguments, vector<strin
 	return FileDataSet;
 }
 
-string DataSetConfiguration::getNtuplePath( string fileName )
+string DataSetConfiguration::getNtuplePath( string this_fileName )
 {
-	TFile* temp_file = TFile::Open( fileName.c_str(), "READ" );
+	TFile* temp_file = TFile::Open( this_fileName.c_str(), "READ" );
 
 	if( temp_file == NULL )
 	{
-		cerr << "Can't open File: " << fileName << endl << endl;
+		cerr << "Can't open File: " << this_fileName << endl << endl;
 		exit(8547);
 	}
 
@@ -320,7 +319,6 @@ IDataSet * DataSetConfiguration::LoadDataFile( vector<string> Arguments, vector<
 	//Find file name
 	string searchName = "FileName";
 	int fileNameIndex = StringProcessing::VectorContains( &ArgumentNames, &searchName );
-	string fileName = "NotFound";
 	if ( fileNameIndex >= 0 )
 	{
 		fileName = Arguments[unsigned(fileNameIndex)];
@@ -371,13 +369,13 @@ IDataSet * DataSetConfiguration::LoadDataFile( vector<string> Arguments, vector<
 	}
 }
 
-IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string ntuplePath, long numberEventsToRead, PhaseSpaceBoundary * DataBoundary )
+IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string this_fileName, string ntuplePath, long numberEventsToRead, PhaseSpaceBoundary * DataBoundary )
 {
 	MemoryDataSet * data = new MemoryDataSet(DataBoundary);
 	vector<string> observableNames = DataBoundary->GetAllNames();
 	int numberOfObservables = int(observableNames.size());
 
-	TFile * inputFile = new TFile( fileName.c_str(), "READ" );
+	TFile * inputFile = new TFile( this_fileName.c_str(), "READ" );
 	TNtuple * ntuple = (TNtuple*)inputFile->Get( ntuplePath.c_str() );
 	if ( ntuple == NULL )
 	{
@@ -472,7 +470,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 		if( (tempFormula->GetTree() == NULL) || (tempFormula->GetNdim() == 0 ) )
 		{
 			cerr << "Error evaluating: " << PlotString << " within your NTuple " << ntuple->GetName() << " titled: " << ntuple->GetTitle() << endl;
-			cerr << "This was for file: " << fileName << endl;
+			cerr << "This was for file: " << this_fileName << endl;
 			cerr << "Cannot process DataSet. exiting!" << endl << endl;
 			exit(-765);
 		}
@@ -535,7 +533,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 
 	inputFile->Close();
 	delete inputFile;
-	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << fileName << " which are consistent with the PhaseSpaceBoundary" << endl;
+	cout << "Added " << numberOfDataPointsAdded << " events from ROOT file: " << this_fileName << " which are consistent with the PhaseSpaceBoundary" << endl;
 	time_t timeNow;
 	time(&timeNow);
 	cout << "Time: " << ctime( &timeNow );
@@ -543,7 +541,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string fileName, string
 	return data;
 }
 
-IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long numberEventsToRead, PhaseSpaceBoundary * DataBoundary )
+IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string this_fileName, long numberEventsToRead, PhaseSpaceBoundary * DataBoundary )
 {
 	MemoryDataSet * data = new MemoryDataSet(DataBoundary);
 	std::vector<string> observableNamesInFile;
@@ -561,7 +559,7 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 	int numberOfDataPoints = 0;
 
 	//Open the file
-	std::ifstream file_to_read( fileName.c_str() );
+	std::ifstream file_to_read( this_fileName.c_str() );
 	if ( file_to_read.is_open() )
 	{
 		//Stop reading at EOF or when sufficient events loaded
@@ -609,7 +607,7 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 				{
 					if ( StringProcessing::VectorContains( &observableNamesInFile, &( observableNames[observableIndex] ) ) == -1 )
 					{
-						cerr << "Observable " << observableNames[observableIndex] << " not provided by file " << fileName << endl;
+						cerr << "Observable " << observableNames[observableIndex] << " not provided by file " << this_fileName << endl;
 						exit(1);
 					}
 				}
@@ -618,12 +616,12 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string fileName, long 
 			}
 		}
 		file_to_read.close();
-		cout << "Read " << numberOfDataPoints << " events from file: " << fileName << endl;
+		cout << "Read " << numberOfDataPoints << " events from file: " << this_fileName << endl;
 		return data;
 	}
 	else
 	{
-		cerr << "Failed to open input data file: " << fileName << endl;
+		cerr << "Failed to open input data file: " << this_fileName << endl;
 		exit(1);
 	}
 }
@@ -634,6 +632,17 @@ string DataSetConfiguration::XML() const
 
 	xml << "<DataSet>" << endl;
 	xml << "\t" << "<Source>" << source << "</Source>" << endl;
+	if( source == "File" || source == "FoamFile" )
+	{
+		if( !cutString.empty() )
+		{
+			xml << "\t" << "<CutString>"  << cutString << "</CutString>" << endl;
+		}
+		if( !fileName.empty() )
+		{
+			xml << "\t" << "<FileName>" << fileName << "</FileName>" << endl;
+		}
+	}
 	xml << "\t<NumberEvents>";
 	if( internalRef != NULL ) xml << internalRef->Yield() << "</NumberEvents>" << endl;
 	else xml << 10000 << "</NumberEvents>" << endl;

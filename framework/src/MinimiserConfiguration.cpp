@@ -123,7 +123,7 @@ string MinimiserConfiguration::XML() const
 	stringstream xml;
 
 	xml << "<Minimiser>" << endl;
-	xml << "\t" << "<MinimiserName>" << minimiserName << "</MinimiserConfiguration>" << endl;
+	xml << "\t" << "<MinimiserName>" << minimiserName << "</MinimiserName>" << endl;
 	xml << "\t" << "<MaxSteps>" << maxSteps << "</MaxSteps>" << endl;
 	xml << "\t" << "<GradTolerance>" << bestTolerance << "</GradTolerance>" << endl;
 	xml << "\t" << "<Quality>" << Quality << "</Quality>" << endl;

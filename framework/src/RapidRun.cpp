@@ -28,7 +28,7 @@ RapidRun::RapidRun( TList* _args ) : args( _args )
 int RapidRun::run()
 {
 	//convert the TList args into a main compatible list
-	const Int_t argc = args->GetSize();
+	//const Int_t argc = args->GetSize();
 	//memory is dynamically allocated
 	//char** argv = new char*[size_t(argc)];
 
@@ -45,6 +45,7 @@ int RapidRun::run()
 		++count;
 	}
 	cout << "RapidRun Launching RapidFit!" <<endl;
+
 
 	vector<char*> argv;
 	for( unsigned int i=0; i< argv_str.size(); ++i )

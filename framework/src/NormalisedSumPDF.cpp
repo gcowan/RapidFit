@@ -213,6 +213,7 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 			return output;
 		}
 	}
+	return false;
 }
 
 //Return the integral of the function over the given boundary
@@ -414,11 +415,11 @@ string NormalisedSumPDF::XML() const
 {
 	stringstream xml;
 
-	xml << "<NormalisedSum>" << endl;
+	xml << "<NormalisedSumPDF>" << endl;
 	xml << "<FractionName>" << (string)fractionName << "</FractionName>" << endl;
 	xml << firstPDF->XML();
 	xml << secondPDF->XML();
-	xml << "</NormalisedSum>" << endl;
+	xml << "</NormalisedSumPDF>" << endl;
 
 	return xml.str();
 }

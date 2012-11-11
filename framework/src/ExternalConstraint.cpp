@@ -56,11 +56,13 @@ string ExternalConstraint::XML() const
 	stringstream xml;
 
 	xml << "<ToFit>" << endl;
-	xml << "\t<ExternalConstraint>" << endl;
-	xml << "\t\t<Name>" << name << "</Name>" << endl;
-	xml << "\t\t<Value>" << value << "</Value>" << endl;
-	xml << "\t\t<Error>" << error << "</Error>" << endl;
-	xml << "\t</ExternalConstraint>" << endl;
+	xml << "\t<ConstraintFunction>" << endl;
+	xml << "\t\t<ExternalConstraint>" << endl;
+	xml << "\t\t\t<Name>" << name << "</Name>" << endl;
+	xml << "\t\t\t<Value>" << value << "</Value>" << endl;
+	xml << "\t\t\t<Error>" << error << "</Error>" << endl;
+	xml << "\t\t</ExternalConstraint>" << endl;
+	xml << "\t</ConstraintFunction>" << endl;
 	xml << "</ToFit>" << endl;
 
 	return xml.str();

@@ -238,6 +238,8 @@ class DataSetConfiguration
 		IDataSet* internalRef;		/*!	This is the internal reference to the DataSet that has just been created. It is NOT to be destroyed here	*/
 
 		DebugClass* debug;
+
+		string fileName;
 };
 
 #endif
