@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/11/11 Dianne Ferguson
+  - Updated LLB to include 1/tau factor for syracuse repeat.
+  - Included the new time acceptance file for syracuse repeat.
+  - Updated the jpsifzero v5 pdf to working version.
+  - Included test version of jpsifzero v5 pdf.
+
 2012/11/11 Rob Currie
    - Cleaned up some bugs in SaveFitXML
    - Stored some extra information in DataSetConfiguration class
