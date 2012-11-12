@@ -78,6 +78,54 @@ ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 	return *this;
 }
 
+bool ParameterSet::operator== ( const ParameterSet& input_rhs )
+{
+	bool names_match=true;
+	vector<string> input_names_lhs = this->allNames;
+	vector<string> input_names_rhs = input_rhs.allNames;
+	vector<int> input_index_lhs_in_rhs( input_names_lhs.size(), -1 );
+	for( unsigned int i=0; i< input_names_lhs.size(); ++i )
+	{
+		int this_index = StringProcessing::VectorContains( &input_names_rhs, &(input_names_lhs[i]) );
+		if( this_index == -1 )
+		{
+			names_match = false;
+			break;
+		}
+		else
+		{
+			input_index_lhs_in_rhs[i] = this_index;
+		}
+	}
+	if( !names_match )
+	{
+		return false;
+	}
+	else
+	{
+		bool changed = false;
+		for( unsigned int i=0; i< input_names_lhs.size(); ++i )
+		{
+			ObservableRef thisLHSObs = ObservableRef( input_names_lhs[i] );
+			ObservableRef thisRHSObs = ObservableRef( input_names_lhs[i] );
+
+			thisLHSObs.SetIndex( i ); thisRHSObs.SetIndex( input_index_lhs_in_rhs[i] );
+			thisLHSObs.SetExternalID( this->GetUniqueID() ); thisRHSObs.SetExternalID( input_rhs.GetUniqueID() );
+
+			double lhs_val = this->GetPhysicsParameter( thisLHSObs )->GetValue();
+			double rhs_val = input_rhs.GetPhysicsParameter( thisRHSObs )->GetValue();
+			if( lhs_val != rhs_val )
+			{
+				changed = true;
+				break;
+			}
+		}
+		return !changed;
+		//if( !changed ) return true;
+		//else return false;
+	}
+}
+
 //Constructor with correct arguments
 ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(), uniqueID(0)
 {

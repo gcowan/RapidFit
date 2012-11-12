@@ -69,15 +69,15 @@
  *             (This interfaces with the NumericalIntegrator class)
  *
  *          EvaluateForNumericGeneration( DataPoint* )
-*             (This interfaces with the Toy DataSet Generators like Foam)
-	*
-	*
-	*
-	*
-	* @author Benjamin M Wynne bwynne@cern.ch
-	* @author Robert Currie rcurrie@cern.ch
-	*
-	*/
+ *             (This interfaces with the Toy DataSet Generators like Foam)
+ *
+ *
+ *
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ *
+ */
 
 #pragma once
 #ifndef BASE_PDF_H

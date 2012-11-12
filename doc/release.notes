@@ -10,12 +10,18 @@
    - Cleaned up some bugs in SaveFitXML
    - Stored some extra information in DataSetConfiguration class
    - Cleaned up PDF labelling
+   - Added new comparison operator for ParameterSet. This checks the LHS against the RHS. The comparison is true if the RHS contains all Parameters in the LHS and they're identically valued
+   - PDF cache is only unset when a Physics Parameter for the PDF in question is changed. Of course this doesn't effect PDFs with caching requested to be turned off
+   - Fixed some basic bugs in hiding unwanted output
+   - BurnToROOT now outputs 2 files one with and one without the timestamp
 
 2012/11/08 Rob Currie
    - Makefile changes
 
 2012/11/05 Rob Currie
    - **Temp** fix to FC Analysis codebase
+   - Updated Grid scripts in new_scripts to be able to use PFN or LFN form of libRapidRun
+   - Added a 2nd output from BurnToROOT which adds a timeStamp to the output .root file
 
 2012/11/05 Rob Currie
    - Cleaned up some Code in RapidPlot to only analyse correlation matricies when asked

@@ -244,7 +244,7 @@ void FitFunction::SetParameterSet( const ParameterSet * NewParameters )
 		for( int i=0; i< Threads; ++i )
 		{
 			stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UpdatePhysicsParameters( allData->GetParameterSet() );
-			stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UnsetCache();
+			//stored_pdfs[ (unsigned)(i + resultIndex*Threads) ]->UnsetCache();
 		}
 	}
 }

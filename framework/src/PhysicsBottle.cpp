@@ -112,7 +112,7 @@ void PhysicsBottle::SetParameterSet( const ParameterSet * NewParameters )
 	for (unsigned int pdfIndex = 0; pdfIndex < allPDFs.size(); ++pdfIndex)
 	{
 		allPDFs[pdfIndex]->UpdatePhysicsParameters( bottleParameters );
-		allPDFs[pdfIndex]->UnsetCache();
+		//allPDFs[pdfIndex]->UnsetCache();
 	}
 
 }

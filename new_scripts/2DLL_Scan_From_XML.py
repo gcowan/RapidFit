@@ -34,13 +34,13 @@ output_file_list = [ 'LLScanData.root' ]
 X_par="Phi_s"
 Y_par="deltaGamma"
 
-X_min=-1.
-X_max=1.
-Y_min=0.
-Y_max=0.25
+X_min=-0.4
+X_max=0.5
+Y_min=0.0
+Y_max=0.2
 
-resolution=100
-sqrt_jobs_per_core=2
+resolution=40
+sqrt_jobs_per_core=1
 
 LFN_LIST=[]
 FILE_LIST=[]
@@ -48,17 +48,22 @@ FILE_LIST=[]
 xml = str()
 script_name = str()
 
-#	written up here for clarity, process all possible LFNs and PFNs that have to be processed
+RAPIDFIT_LIB = str()
+
+#       written up here for clarity, process all possible LFNs and PFNs that have to be processed
 if is_ganga:
 	for arg in sys.argv:
 		if string.find( arg, "LFN:" ) != -1 :
-			LFN_LIST.append( str( arg ) )
+			LFN_LIST.append( str( arg.replace('//','/') ).replace('LFN:/','LFN://') )
 		elif string.find( arg, ".xml" ) != -1 :
 			xml = str( arg )
 		elif string.find( arg, ".py" ) != -1 :
 			script_name = str(arg)
 		else:
 			FILE_LIST.append( str( arg ) )
+	for arg in sys.argv:
+		if string.find( arg, ".so" ) != -1 :
+			RAPIDFIT_LIB=arg
 	print "running:"
 	print script_name
 	print "using XML:"
@@ -140,22 +145,27 @@ def LL_2DSplitter(XML='XML.xml',par1='x',par1min=0.,par1max=0.,par1res=1,par2='y
 if is_ganga:
 
 	ROOT_VERSION = str( os.popen("root-config --version | sed -e \'s/\\//\./g' ").readline() )[:-1]
-	RapidFit_Path = os.environ.get("RAPIDFITROOT")
-        if not RapidFit_Path:
-                print ""
-                print "\t\tCouldn't find $RAPIDFITROOT, Please check this!!"
-                print ""
-                sys.exit(-3)
 
-        RapidFit_Library=RapidFit_Path+"/lib/libRapidRun.so"
+        RapidFit_Library=str()
 
-        if not os.path.isfile( RapidFit_Library ):
-                print "Please (re) compile RapidFit for submitting to a batch system"
-                print "              run:    'make lib'           not just:   'make'"
-                print ""
-                print "This could also mean you haven't defined '$RAPIDFITROOT, please check!!"
-                print ""
-                sys.exit(-42)
+	if len(RAPIDFIT_LIB) == 0:
+
+		RapidFit_Path = os.environ.get("RAPIDFITROOT")
+		if not RapidFit_Path:
+			print ""
+			print "\t\tCouldn't find $RAPIDFITROOT, Please check this!!"
+			print ""
+			sys.exit(-3)
+
+		RapidFit_Library=RapidFit_Path+"/lib/libRapidRun.so"
+
+		if not os.path.isfile( RapidFit_Library ):
+			print "Please (re) compile RapidFit for submitting to a batch system"
+			print "              run:    'make lib'           not just:   'make'"
+			print ""
+			print "This could also mean you haven't defined '$RAPIDFITROOT, please check!!"
+			print ""
+			sys.exit(-42)
 
         #       Input Parameters
         script_onlyname = script_name
@@ -175,15 +185,18 @@ if is_ganga:
 	#
 	j.application.script = File( name=script_name )
 	#	Tell the script where the RapidFit library is
-	j.inputsandbox = [ script_name, xml, RapidFit_Library ]
-
+        #       Tell the script where the RapidFit library is
+	if len(RAPIDFIT_LIB) == 0:
+		j.inputsandbox = [ script_name, xml, RapidFit_Library ]
+	else:
+		j.inputsandbox = [ script_name, xml ]
 
 	#	Backend to submit jobs to
 	#	This changes based on the system your on
 
 	host_name = os.popen('hostname').readline()
 
-	if ( string.find( host_name, "frontend" ) != -1 ):
+	if ( string.find( host_name, "frontend" ) != -1 or string.find( host_name, "eddie" ) != -1 ):
 		print "Running on ECDF, submitting to SGE"
 		j.backend = SGE()
 		j.outputsandbox = output_file_list
@@ -205,16 +218,51 @@ if is_ganga:
 			choice = 1
 		if choice == 1:
 			j.backend = Dirac()
-			j.inputdata = LFN_LIST			#	Point the job to the data
-			j.backend.inputSandboxLFNs = LFN_LIST	#	Tell Dirac we need a local copy in order to process it
-			sandbox_data = [ script_name, xml, RapidFit_Library ]
+			print "Input Data:"
+			#print LFN_LIST
+			new_list=[]
+			for i in LFN_LIST:
+				new_list.append( str(i.replace('//','/')) )
+			LFN_LIST=new_list
+			LHCB_DATA = LHCbDataset( LFN_LIST )
+			#for wanted_lfn in LFN_LIST:
+			#       print "Adding: "+wanted_lfn.replace('//','/')
+			#       LHCB_DATA.extend( wanted_lfn.replace('//','/') )
+			#       #print wanted_lfn.replace('//','/')
+			j.inputdata = LHCB_DATA                 #       Point the job to the data
+			print "INPUTDATA:"
+			print LHCB_DATA.files
+			inputDataList = []
+			for i in LHCB_DATA.files:
+				inputDataList.append( 'LFN:'+i.name.replace('//','/') )
+			print "INPUTLFNs:"
+			print inputDataList
+			j.backend.inputSandboxLFNs = inputDataList   #       Tell Dirac we need a local copy in order to process it
+			#sys.exit(0)
+			if len(RAPIDFIT_LIB) == 0:
+				sandbox_data = [ script_name, xml, RapidFit_Library ]
+			else:
+				sandbox_data = [ script_name, xml ]
 			#print sandbox_data
 			for k in FILE_LIST:
 				sandbox_data.append( k )
-			#print sandbox_data
+			print "Input Sandbox:"
+			print sandbox_data
 			j.inputsandbox = sandbox_data
-			j.outputdata = output_file_list
 			j.outputsandbox = output_file_list
+			j.outputdata = output_file_list
+			#sys.exit(0)
+
+			#j.inputdata = LFN_LIST			#	Point the job to the data
+			#j.backend.inputSandboxLFNs = LFN_LIST	#	Tell Dirac we need a local copy in order to process it
+			#sandbox_data = [ script_name, xml, RapidFit_Library ]
+			##print sandbox_data
+			#for k in FILE_LIST:
+			#	sandbox_data.append( k )
+			##print sandbox_data
+			#j.inputsandbox = sandbox_data
+			#j.outputdata = output_file_list
+			#j.outputsandbox = output_file_list
 		if choice == 2:
 			j.backend = LSF()
 			j.backend.queue = '8nh'		#	1nh, 8nh, 1nd, 2nd, 1nw, 2nw

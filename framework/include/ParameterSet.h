@@ -54,6 +54,11 @@ class ParameterSet
 		ParameterSet& operator = ( const ParameterSet& );
 
 		/*!
+		 * @brief Comparison Operator
+		 */
+		bool operator== ( const ParameterSet& );
+
+		/*!
 		 * @brief Destructor
 		 */
 		~ParameterSet();

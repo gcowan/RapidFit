@@ -91,7 +91,7 @@ void ToyStudy::DoWholeStudy( int OutputLevel )
 
 		ParameterSet* thisSet = new ParameterSet( *studyParameters );
 
-		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, thisSet, pdfsAndData, allConstraints, OutputLevel );
+		FitResult* new_result = FitAssembler::DoSafeFit( theMinimiser, theFunction, thisSet, pdfsAndData, allConstraints, false, OutputLevel );
 
 		delete thisSet;
 

@@ -214,7 +214,7 @@ void BasePDF::UpdatePhysicsParameters( ParameterSet* Input )
 	}
 
 	//Invalidate the cache
-	this->UnsetCache();
+	if( !(allParameters == (*Input)) )  this->UnsetCache();
 
 	this->SetPhysicsParameters( Input );
 }

@@ -36,7 +36,7 @@ job_name = "RapidFit-1D"
 output_file_list = [ ]
 
 #param_name="gamma"
-#X_min=0.64
+#X_min=0.65
 #X_max=0.7
 
 #param_name="Phi_s"
@@ -44,24 +44,49 @@ output_file_list = [ ]
 #X_max=0.49
 
 #param_name="Aperp_sq"
-#X_min=0.187
-#X_max=0.307
+#X_min=0.19
+#X_max=0.305
 
 #param_name="As_sq"
 #X_min=0.
 #X_max=0.08
 
 #param_name="Azero_sq"
-#X_min=0.483
-#X_max=0.563
+#X_min=0.485
+#X_max=0.555
+
+#param_name="F_s990"
+#X_min=0.
+#X_max=0.55
+#param_name="F_s1008"
+#X_min=0.
+#X_max=0.2
+#param_name="F_s1016"
+#X_min=0.
+#X_max=0.1
+#param_name="F_s1020"
+#X_min=0.
+#X_max=0.1
+#param_name="F_s1024"
+#X_min=0.
+#X_max=0.2
+#param_name="F_s1032"
+#X_min=0.
+#X_max=0.4
+
+#STEPS=15
 
 #param_name="deltaGamma"
 #X_min=0.015
-#X_max=0.215
+#X_max=0.185
+
+#STEPS=10
 
 #param_name="delta_perp"
 #X_min=1.05
 #X_max=4.65
+
+#STEPS=10
 
 #param_name="delta_para"
 #X_min=2.4
@@ -75,8 +100,10 @@ output_file_list = [ ]
 #STEPS=20
 
 #param_name="Phi_s"
-#X_min=-3.3
-#X_max=3.3
+#X_min=-1.2
+#X_max=1.5
+
+#STEPS=50
 
 #param_name="delta_para"
 #X_min=-3.2
@@ -86,16 +113,50 @@ output_file_list = [ ]
 #X_min=-3.2
 #X_max=3.2
 
-#param_name="delta_s"
+#param_name="delta_s990"
+#X_min=-3.2
+#X_max=3.2
+#param_name="delta_s1008"
+#X_min=-3.2
+#X_max=3.2
+#param_name="delta_s1016"
+#X_min=-3.2
+#X_max=3.2
+#param_name="delta_s1020"
+#X_min=-3.2
+#X_max=3.2
+#param_name="delta_s1024"
+#X_min=-3.2
+#X_max=3.2
+#param_name="delta_s1032"
 #X_min=-3.2
 #X_max=3.2
 
+#STEPS=100
+
+#param_name="lambda"
+#X_min=0.8
+#X_max=1.05
+#STEPS=20
+
 #STEPS=60
 
+#param_name="deltaM"
+#X_min=5
+#X_max=30
+
 param_name="deltaM"
-X_min=10
-X_max=25
-STEPS=100
+X_min=16
+X_max=19
+STEPS=20
+
+#STEPS=100
+#STEPS=2
+
+#param_name="Apara_sq"
+#X_max=3.0
+#X_min=1.0
+#STEPS=50
 
 Output_File = 'LLScanData'+str(param_name)+'.root'
 Output_File2 = 'LLScanData.root'
@@ -108,6 +169,8 @@ STEPS_PER_CORE=1
 LFN_LIST=[]
 FILE_LIST=[]
 
+RAPIDFIT_LIB = str()
+
 xml = str()
 script_name = str()
 
@@ -115,13 +178,16 @@ script_name = str()
 if is_ganga:
 	for arg in sys.argv:
 		if string.find( arg, "LFN:" ) != -1 :
-			LFN_LIST.append( str( arg ) )
+			LFN_LIST.append( str( arg.replace('//','/') ).replace('LFN:/','LFN://') )
 		elif string.find( arg, ".xml" ) != -1 :
 			xml = str( arg )
 		elif string.find( arg, ".py" ) != -1 :
 			script_name = str(arg)
 		else:
 			FILE_LIST.append( str( arg ) )
+	for arg in sys.argv:
+		if string.find( arg, ".so" ) != -1 :
+			RAPIDFIT_LIB=arg
 	print "running:"
 	print script_name
 	print "using XML:"
@@ -169,22 +235,27 @@ def _1DLL_Splitter( XML='XML.xml', STEPS=10, STEPS_PER_CORE=2 ):
 if is_ganga:
 
 	ROOT_VERSION = str( os.popen("root-config --version | sed -e \'s/\\//\./g' ").readline() )[:-1]
-	RapidFit_Path = os.environ.get("RAPIDFITROOT")
-	if not RapidFit_Path:
-		print ""
-		print "\t\tCouldn't find $RAPIDFITROOT, Please check this!!"
-		print ""
-		sys.exit(-3)
 
-	RapidFit_Library=RapidFit_Path+"/lib/libRapidRun.so"
+	RapidFit_Library=str()
 
-	if not os.path.isfile( RapidFit_Library ):
-		print "Please (re) compile RapidFit for submitting to a batch system"
-		print "              run:    'make lib'           not just:   'make'"
-		print ""
-		print "This could also mean you haven't defined '$RAPIDFITROOT, please check!!"
-		print ""
-		sys.exit(-42)
+	if len(RAPIDFIT_LIB) == 0:
+
+		RapidFit_Path = os.environ.get("RAPIDFITROOT")
+		if not RapidFit_Path:
+			print ""
+			print "\t\tCouldn't find $RAPIDFITROOT, Please check this!!"
+			print ""
+			sys.exit(-3)
+
+		RapidFit_Library=RapidFit_Path+"/lib/libRapidRun.so"
+
+		if not os.path.isfile( RapidFit_Library ):
+			print "Please (re) compile RapidFit for submitting to a batch system"
+			print "              run:    'make lib'           not just:   'make'"
+			print ""
+			print "This could also mean you haven't defined '$RAPIDFITROOT, please check!!"
+			print ""
+			sys.exit(-42)
 
         #       Input Parameters
         script_onlyname = script_name
@@ -204,15 +275,17 @@ if is_ganga:
 	#
 	j.application.script = File( name=script_name )
 	#	Tell the script where the RapidFit library is
-	j.inputsandbox = [ script_name, xml, RapidFit_Library ]
-
+	if len(RAPIDFIT_LIB) == 0:
+		j.inputsandbox = [ script_name, xml, RapidFit_Library ]
+	else:
+		j.inputsandbox = [ script_name, xml ]
 
 	#	Backend to submit jobs to
 	#	This changes based on the system your on
 
 	host_name = os.popen('hostname').readline()
 
-	if ( string.find( host_name, "frontend" ) != -1 ):
+	if ( string.find( host_name, "frontend" ) != -1 or string.find( host_name, "eddie" ) != -1 ):
 		print "Running on ECDF, submitting to SGE"
 		j.backend = SGE()
 		j.outputsandbox = output_file_list
@@ -235,10 +308,30 @@ if is_ganga:
 		if choice == 1:
 			j.backend = Dirac()
 			print "Input Data:"
-			print LFN_LIST
-			j.inputdata = LFN_LIST                  #       Point the job to the data
-			j.backend.inputSandboxLFNs = LFN_LIST   #       Tell Dirac we need a local copy in order to process it
-			sandbox_data = [ script_name, xml, RapidFit_Library ]
+			#print LFN_LIST
+			new_list=[]
+			for i in LFN_LIST:
+				new_list.append( str(i.replace('//','/')) )
+			LFN_LIST=new_list
+			LHCB_DATA = LHCbDataset( LFN_LIST )
+			#for wanted_lfn in LFN_LIST:
+			#	print "Adding: "+wanted_lfn.replace('//','/')
+			#	LHCB_DATA.extend( wanted_lfn.replace('//','/') )
+			#	#print wanted_lfn.replace('//','/')
+			j.inputdata = LHCB_DATA                 #       Point the job to the data
+			print "INPUTDATA:"
+			print LHCB_DATA.files
+			inputDataList = []	
+			for i in LHCB_DATA.files: 
+				inputDataList.append( 'LFN:'+i.name.replace('//','/') )
+			print "INPUTLFNs:"
+			print inputDataList
+			j.backend.inputSandboxLFNs = inputDataList   #       Tell Dirac we need a local copy in order to process it
+			#sys.exit(0)
+			if len(RAPIDFIT_LIB) == 0:
+				sandbox_data = [ script_name, xml, RapidFit_Library ]
+			else:
+				sandbox_data = [ script_name, xml ]
 			#print sandbox_data
 			for k in FILE_LIST:
 				sandbox_data.append( k )
@@ -247,6 +340,7 @@ if is_ganga:
 			j.inputsandbox = sandbox_data
 			j.outputsandbox = output_file_list
 			#j.outputdata = output_file_list
+			#sys.exit(0)
 		if choice == 2:
 			j.backend = LSF()
 			j.backend.queue = '1nh'         #       1nh, 8nh, 1nd, 2nd, 1nw, 2nw
@@ -322,6 +416,7 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 	args = ROOT.TList()
 	#	Construct the RapidFit Arguments as you would when running the fitter binary
 	args.Add( ROOT.TObjString( "RapidFit"     ) )
+	#args.Add( ROOT.TObjString( "--help" ) )
 	args.Add( ROOT.TObjString( "-f"           ) )
 	args.Add( ROOT.TObjString( str( FIT_XML ) ) )
 	args.Add( ROOT.TObjString( "--defineScan" ) )
@@ -335,6 +430,7 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 
 	#	Construct an instance of the Fitting algorithm
 	fitter = ROOT.RapidRun( args )
+
 	#	Run the Fit
 	result = fitter.run()
 

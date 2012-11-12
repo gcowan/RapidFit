@@ -169,11 +169,13 @@
 
 	<CommonPDF>
 		<NormalisedSumPDF>
+			<FractionName>Fraction1</FractionName>
 			<PDF>
 				<Name>BsMass</Name>
 				<ConfigurationParameter>PlotComponents:True</ConfigurationParameter>
 			</PDF>
 			<NormalisedSumPDF>
+				<FractionName>Fraction2</FractionName>
 				<PDF>
 					<Name>BsMass</Name>
 					<ParameterSubstitution>f_sig_m1:f_sig_m1b</ParameterSubstitution>
@@ -181,6 +183,7 @@
 					<ParameterSubstitution>m_Bs:m_Bsb</ParameterSubstitution>
 				</PDF>
 				<NormalisedSumPDF>
+					<FractionName>Fraction3</FractionName>
 					<PDF>
 						<Name>BsMass</Name>
 						<ParameterSubstitution>f_sig_m1:f_sig_m1c</ParameterSubstitution>
@@ -206,14 +209,14 @@
 
 		<CommonPDF>True</CommonPDF>
 
-		<PDFConfigurator>
-			<FractionName>Fraction1</FractionName>
-			<FractionName>Fraction2</FractionName>
-			<FractionName>Fraction3</FractionName>
-		</PDFConfigurator>
+		#<PDFConfigurator>
+		#	<FractionName>Fraction1</FractionName>
+		#	<FractionName>Fraction2</FractionName>
+		#	<FractionName>Fraction3</FractionName>
+		#</PDFConfigurator>
 
 		<DataSet>
-			<Source>FoamFile</Source>
+			<Source>Foam</Source>
 			<FileName>output.root</FileName>
 			<NumberEvents>1000</NumberEvents>
 

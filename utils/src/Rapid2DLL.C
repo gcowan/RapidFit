@@ -6,6 +6,7 @@
 #include "TROOT.h"
 #include "TSystem.h"
 #include "TFile.h"
+#include "TGraphErrors.h"
 
 #include "Rapid2DLL.h"
 #include "Histo_Processing.h"
@@ -216,6 +217,10 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 	}
 	TString filename( controlled_parameter1 + "_" + controlled_parameter2 + ".pdf" );
 	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand );
+	filename = TString( controlled_parameter1 + "_" + controlled_parameter2 + ".png" );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand );
+	filename = TString( controlled_parameter1 + "_" + controlled_parameter2 + ".C" );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand );
 
 	vector<pair<TMultiGraph*,TString> > named_nll_contours_rotated;
 	cont_num=0;
@@ -224,6 +229,10 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 		named_nll_contours_rotated.push_back( make_pair( *cont_i, return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
 	}
 	TString filename_rotated( controlled_parameter2 + "_" + controlled_parameter1 + ".pdf" );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand );
+	filename_rotated = TString( controlled_parameter2 + "_" + controlled_parameter1 + ".png" );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand );
+	filename_rotated = TString( controlled_parameter2 + "_" + controlled_parameter1 + ".C" );
 	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand );
 
 	cout << endl;
@@ -266,6 +275,14 @@ void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1,
 	c1->Update();
 	leg->Draw();
 	label->Draw();
+	double* px = new double[1]; px[0] = 0.036;//0.087;
+	double* xerr = new double[1]; xerr[0] = 0.002;//0.021;
+	double* py = new double[1]; py[0] = 0.087;//0.036;
+	double* yerr = new double[1]; yerr[0] = 0.021;//0.002;
+	TGraphErrors* CV = new TGraphErrors( 1, px, py, xerr, yerr );
+	CV->SetName( "Standard Model" );
+	leg->AddEntry( CV, "Standard Model", "PE" );
+	CV->Draw("LP SAME");
 	c1->Update();
 	Histogram_Processing::Silent_Print( c1, filename );
 	return;
@@ -313,9 +330,15 @@ void Rapid2DLL::Plot_Free_Parameters( TTree* input_tree, TString controlled_para
 		c1->Update();
 		TString filename( *param_i+"_cont1z.pdf" );
 		c1->Print( filename );
+		filename = TString( *param_i+"_cont1z.png" );
+		c1->Print( filename );
+		filename = TString( *param_i+"_cont1z.C" );
+		c1->Print( filename );
 		param_hist->Draw("colz");
 		c1->Update();
 		c1->Print( *param_i+"_colz.pdf" );
+		c1->Print( *param_i+"_colz.png" );
+		c1->Print( *param_i+"_colz.C" );
 		c1->Close();
 	}
 

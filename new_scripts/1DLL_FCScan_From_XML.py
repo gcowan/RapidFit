@@ -25,7 +25,7 @@ stored_seed = int(rand_seed)
 #	ganga script_name.py xml_for_job.xml LFN1  LFN2 		to run on the GRID
 #
 
-TOYS_PER_GRID_POINT = 2500
+TOYS_PER_GRID_POINT = 100
 TOYS_PER_GRID_NODE = 10
 nuisence = 1
 
@@ -43,11 +43,11 @@ output_file_list = [ ]
 #X_min=0.64
 #X_max=0.7
 
-#param_name="Phi_s"
-#X_min=-0.4
+param_name="Phi_s"
+X_min=0.067
 #X_min=0.15593220293521881
-#X_max=0.4
-#STEPS=19
+X_max=0.5067
+STEPS=20
 
 #param_name="Aperp_sq"
 #X_min=0.187
@@ -61,15 +61,15 @@ output_file_list = [ ]
 #X_min=0.483
 #X_max=0.563
 
-param_name="deltaGamma"
+#param_name="deltaGamma"
 #X_min=0.
 #X_max=0.25
-X_min=0.11157
-X_max=0.2
+#X_min=0.11157
+#X_max=0.2
 #X_min=0.135
 #X_max=0.15
 #STEPS=3
-STEPS=20
+#STEPS=20
 
 #param_name="delta_perp"
 #X_min=1.05
@@ -107,7 +107,7 @@ STEPS=20
 Output_File = 'LLScanData'+str(param_name)+'.root'
 Output_File2 = 'LLScanData.root'
 
-output_file_list.append( "1DLL_FCScan.root" )
+output_file_list.append( "FCScan.root" )
 #output_file_list.append( Output_File )
 #output_file_list.append( Output_File2 )
 

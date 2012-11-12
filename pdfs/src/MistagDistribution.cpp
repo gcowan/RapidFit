@@ -26,7 +26,9 @@ MistagDistribution::MistagDistribution(PDFConfigurator* configurator) : BasePDF(
 	GFxName( configurator->getName("mistag") ),
 	tagName( configurator->getName("tag") )
 	, gamma(0.), mu(0.), beta(0.)
+	, NumericallyIntegrate(false)
 {
+	NumericallyIntegrate = configurator->
 	std::cout << "Constructing PDF: MistagDistribution " << std::endl ;
 
 	MakePrototypes();
@@ -89,6 +91,7 @@ double MistagDistribution::Evaluate(DataPoint * measurement)
 // Normalisation
 double MistagDistribution::Normalisation( DataPoint* input, PhaseSpaceBoundary * boundary)
 {
+	return -1.;
 	(void)boundary;
 	if( boundary->GetConstraint( GFxName )->IsDiscrete() )
 	{

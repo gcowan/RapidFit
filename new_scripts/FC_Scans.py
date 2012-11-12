@@ -56,20 +56,37 @@ sqrt_jobs_per_core=1
 LFN_LIST=[]
 FILE_LIST=[]
 
+STEPS_PER_CORE=1
 
+LFN_LIST=[]
+FILE_LIST=[]
 
-#	written up here for clarity, process all possible LFNs and PFNs that have to be processed
+RAPIDFIT_LIB = str()
+
+xml = str()
+script_name = str()
+
+#       written up here for clarity, process all possible LFNs and PFNs that have to be processed
 if is_ganga:
-	i=0
 	for arg in sys.argv:
-		if i > 1:
-			if string.find( arg, "LFN:" ) != -1 :
-				LFN_LIST.append( str( arg ) )
-			else:
-				FILE_LIST.append( str( arg ) )
-		i=i+1
-	print "LFNs:"
-	print LFN_LIST
+		if string.find( arg, "LFN:" ) != -1 :
+			LFN_LIST.append( str( arg.replace('//','/') ).replace('LFN:/','LFN://') )
+		elif string.find( arg, ".xml" ) != -1 :
+			xml = str( arg )
+		elif string.find( arg, ".py" ) != -1 :
+			script_name = str(arg)
+		else:
+			FILE_LIST.append( str( arg ) )
+	for arg in sys.argv:
+		if string.find( arg, ".so" ) != -1 :
+			RAPIDFIT_LIB=arg
+	print "running:"
+	print script_name
+	print "using XML:"
+	print xml
+	if LFN_LIST:
+		print "LFNs:"
+		print LFN_LIST
 	print "FILEs:"
 	print FILE_LIST
 
