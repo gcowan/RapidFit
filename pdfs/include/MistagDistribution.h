@@ -44,6 +44,8 @@ class MistagDistribution : public BasePDF
 		double x ;
 		ObservableRef GFxName;	
 		ObservableRef tagName;
+
+		bool NumericallyIntegrate;
 };
 
 #endif
