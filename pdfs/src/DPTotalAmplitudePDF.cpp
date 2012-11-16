@@ -65,7 +65,10 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	
 	, magA0K800Name		( configurator->getName("magA0K800") )
 	, phaseA0K800Name	( configurator->getName("phaseA0K800") )
-	
+
+	, magA0NRName		( configurator->getName("magA0NR") )
+	, phaseA0NRName  	( configurator->getName("phaseA0NR") )
+
 	, massZplusName		( configurator->getName("massZplus") )
 	, widthZplusName	( configurator->getName("widthZplus") )
 	, massKst892Name	( configurator->getName("massKst892") )
@@ -98,6 +101,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, magA0K01430(),  				  phaseA0K01430()
 	, magA0K21430(), magApK21430(), magAmK21430(), phaseA0K21430(), phaseApK21430(), phaseAmK21430()
 	, magA0K800(),  				  phaseA0K800()
+	, magA0NR(),    				  phaseA0NR()
 	, massZplus(), widthZplus()
 	, massKst892(), widthKst892()
 	, massKst1410(), widthKst1410()
@@ -108,7 +112,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, m23(), cosTheta1(), cosTheta2(), phi()
 	//LASS parameters
 	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS() 
-	//, massPsi(3.096916) // Jpsi
+// 	, massPsi(3.096916) // Jpsi
 	, massPsi(3.686109) // psi(2S)
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
@@ -124,38 +128,48 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	// Construct all components we need
 	DPComponent * tmp;
 	// B0 --> Z+ K-
+// 	tmp=new DPZplusK(0,1,5.279,4.430,0.100,0.493677,
+// 			 0.13957018, 3.0, 3.0, massPsi, 1); // spin 1 Z, for MC testing 
+
 	tmp=new DPZplusK(1,0,5.279,4.430,0.100,0.493677,
-			0.13957018, 5.0, 1.5, massPsi, 0);
+			0.13957018, 3.0, 3.0, massPsi, 0); // spin 0 Z for datafit
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
 	tmp=new DPJpsiKaon(0, 1, 5.279, 0.89594, 0.0487, 0.493677,
-			0.13957018, 5.0, 1.5, massPsi, 1);
+			0.13957018, 3.0, 3.0, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1410)
 	tmp=new DPJpsiKaon(0, 1, 5.279, 1.414, 0.232, 0.493677,
-			0.13957018, 5.0, 1.5, massPsi, 1);
+			0.13957018, 3.0, 3.0, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1680)
 	tmp=new DPJpsiKaon(0, 1, 5.279, 1.717, 0.322, 0.493677,
-			0.13957018, 5.0, 1.5, massPsi, 1);
+			0.13957018, 3.0, 3.0, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K0(1430)
 	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
-			0.13957018, 5.0, 1.5, massPsi, 0);
+			0.13957018, 3.0, 3.0, massPsi, 0);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
 	tmp=new DPJpsiKaon(1, 2, 5.279, 1.4324, 0.109, 0.493677,
-			0.13957018, 5.0, 1.5, massPsi, 2);
+			0.13957018, 3.0, 3.0, massPsi, 2);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K(800)
 	tmp=new DPJpsiKaon(1, 0, 5.279, 0.682, 0.574, 0.493677,
-			0.13957018, 5.0, 1.5, massPsi, 0);
+			0.13957018, 3.0, 3.0, massPsi, 0);
 	KpiComponents.push_back(tmp);
   
 	// Kpi s-wave using LASS
   	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
-                     0.13957018, 5.0, 1.5, massPsi, 0,
+                     0.13957018, 3.0, 3.0, massPsi, 0,
                      "LASS", 1.94, 1.76);
+
+	KpiComponents.push_back(tmp);
+
+	// Kpi s-wave using Non Resonnant
+  	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
+                     0.13957018, 3.0, 3.0, massPsi, 0,
+                     "NR", 1.94, 1.76);
 
 	KpiComponents.push_back(tmp);
 
@@ -323,6 +337,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	
 	,magA0K800Name(copy.magA0K800Name)
 	,phaseA0K800Name(copy.phaseA0K800Name)
+
+	,magA0NRName(copy.magA0NRName)
+	,phaseA0NRName(copy.phaseA0NRName)
 	
 	,massZplusName(copy.massZplusName)
 	,widthZplusName(copy.widthZplusName)
@@ -385,6 +402,10 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,magA0K800(copy.magA0K800)
 	,phaseA0K800(copy.phaseA0K800)
 	
+	,magA0NR(copy.magA0NR)
+	,phaseA0NR(copy.phaseA0NR)
+
+
 	,massZplus(copy.massZplus)
 	,widthZplus(copy.widthZplus)
 	,massKst892(copy.massKst892)
@@ -509,6 +530,9 @@ void DPTotalAmplitudePDF::MakePrototypes()
 	parameterNames.push_back( magA0K800Name );
 	parameterNames.push_back( phaseA0K800Name );
 	
+	parameterNames.push_back( magA0NRName );
+	parameterNames.push_back( phaseA0NRName );
+
 	parameterNames.push_back( massZplusName );
 	parameterNames.push_back( widthZplusName );
 	parameterNames.push_back( massKst892Name );
@@ -594,6 +618,10 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	magA0K800    = allParameters.GetPhysicsParameter( magA0K800Name )->GetValue();
 	phaseA0K800  = allParameters.GetPhysicsParameter( phaseA0K800Name )->GetValue();
 
+	magA0NR    = allParameters.GetPhysicsParameter( magA0NRName )->GetValue();
+	phaseA0NR  = allParameters.GetPhysicsParameter( phaseA0NRName )->GetValue();
+
+
 	massZplus  = allParameters.GetPhysicsParameter( massZplusName )->GetValue();
 	widthZplus = allParameters.GetPhysicsParameter( widthZplusName )->GetValue();
 	massKst892  = allParameters.GetPhysicsParameter( massKst892Name )->GetValue();
@@ -631,6 +659,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	KpiComponents[4]->setHelicityAmplitudes(magA0K21430, magApK21430, magAmK21430, phaseA0K21430, phaseApK21430, phaseAmK21430);
 	KpiComponents[5]->setHelicityAmplitudes(magA0K800, 0., 0., phaseA0K800, 0., 0.);
 	KpiComponents[6]->setHelicityAmplitudes(mag_LASS, 0., 0., phase_LASS, 0., 0.);
+	KpiComponents[7]->setHelicityAmplitudes(magA0NR, 0., 0., phaseA0NR, 0., 0.);
 
 	return isOK;
 }
@@ -779,6 +808,7 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
         components_list.push_back( "1430_2" );
         components_list.push_back( "800" );
         components_list.push_back( "LASS" );
+        components_list.push_back( "NR" );
         components_list.push_back( "Z4430" );
         components_list.push_back( "0" );
         return components_list;
@@ -826,9 +856,14 @@ double DPTotalAmplitudePDF::EvaluateComponent(DataPoint * measurement, Component
                         Component->setComponentNumber( 7 );
                         componentIndex = 7;
                 }
-                else if( ComponentName.compare( "Z4430" ) == 0 )
+                else if( ComponentName.compare( "NR" ) == 0 )
                 {
                         Component->setComponentNumber( 8 );
+                        componentIndex = 7;
+                }
+                else if( ComponentName.compare( "Z4430" ) == 0 )
+                {
+                        Component->setComponentNumber( 9 );
                         componentIndex = 8;
                 }
                 else
