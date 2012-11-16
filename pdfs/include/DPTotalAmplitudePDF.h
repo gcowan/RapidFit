@@ -96,6 +96,9 @@ class DPTotalAmplitudePDF : public BasePDF
 		
 		ObservableRef magA0K800Name;
 		ObservableRef phaseA0K800Name;
+
+		ObservableRef magA0NRName;
+		ObservableRef phaseA0NRName;
 		
 		ObservableRef massZplusName;
 		ObservableRef widthZplusName;
@@ -158,6 +161,9 @@ class DPTotalAmplitudePDF : public BasePDF
 		double magA0K800;
 		double phaseA0K800;
 		
+		double magA0NR;
+		double phaseA0NR;
+
 		double massZplus;
 		double widthZplus;
 		double massKst892;
