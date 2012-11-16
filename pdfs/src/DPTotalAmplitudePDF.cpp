@@ -31,38 +31,38 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, phaseA0ZplusName	( configurator->getName("phaseA0Zplus") )
 	, phaseApZplusName	( configurator->getName("phaseApZplus") )
 	, phaseAmZplusName	( configurator->getName("phaseAmZplus") )
-	
+
 	, magA0Kst892Name	( configurator->getName("magA0Kst892") )
 	, magApKst892Name	( configurator->getName("magApKst892") )
 	, magAmKst892Name	( configurator->getName("magAmKst892") )
 	, phaseA0Kst892Name	( configurator->getName("phaseA0Kst892") )
 	, phaseApKst892Name	( configurator->getName("phaseApKst892") )
 	, phaseAmKst892Name	( configurator->getName("phaseAmKst892") )
-	
+
 	, magA0Kst1410Name	( configurator->getName("magA0Kst1410") )
 	, magApKst1410Name	( configurator->getName("magApKst1410") )
 	, magAmKst1410Name	( configurator->getName("magAmKst1410") )
 	, phaseA0Kst1410Name	( configurator->getName("phaseA0Kst1410") )
 	, phaseApKst1410Name	( configurator->getName("phaseApKst1410") )
 	, phaseAmKst1410Name	( configurator->getName("phaseAmKst1410") )
-	
+
 	, magA0Kst1680Name	( configurator->getName("magA0Kst1680") )
 	, magApKst1680Name	( configurator->getName("magApKst1680") )
 	, magAmKst1680Name	( configurator->getName("magAmKst1680") )
 	, phaseA0Kst1680Name	( configurator->getName("phaseA0Kst1680") )
 	, phaseApKst1680Name	( configurator->getName("phaseApKst1680") )
 	, phaseAmKst1680Name	( configurator->getName("phaseAmKst1680") )
-	
+
 	, magA0K01430Name	( configurator->getName("magA0K01430") )
 	, phaseA0K01430Name	( configurator->getName("phaseA0K01430") )
-	
+
 	, magA0K21430Name	( configurator->getName("magA0K21430") )
 	, magApK21430Name	( configurator->getName("magApK21430") )
 	, magAmK21430Name	( configurator->getName("magAmK21430") )
 	, phaseA0K21430Name	( configurator->getName("phaseA0K21430") )
 	, phaseApK21430Name	( configurator->getName("phaseApK21430") )
 	, phaseAmK21430Name	( configurator->getName("phaseAmK21430") )
-	
+
 	, magA0K800Name		( configurator->getName("magA0K800") )
 	, phaseA0K800Name	( configurator->getName("phaseA0K800") )
 
@@ -111,7 +111,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, massK800(), widthK800()
 	, m23(), cosTheta1(), cosTheta2(), phi()
 	//LASS parameters
-	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS() 
+	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS()
 // 	, massPsi(3.096916) // Jpsi
 	, massPsi(3.686109) // psi(2S)
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
@@ -129,7 +129,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	DPComponent * tmp;
 	// B0 --> Z+ K-
 // 	tmp=new DPZplusK(0,1,5.279,4.430,0.100,0.493677,
-// 			 0.13957018, 3.0, 3.0, massPsi, 1); // spin 1 Z, for MC testing 
+// 			 0.13957018, 3.0, 3.0, massPsi, 1); // spin 1 Z, for MC testing
 
 	tmp=new DPZplusK(1,0,5.279,4.430,0.100,0.493677,
 			0.13957018, 3.0, 3.0, massPsi, 0); // spin 0 Z for datafit
@@ -158,7 +158,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	tmp=new DPJpsiKaon(1, 0, 5.279, 0.682, 0.574, 0.493677,
 			0.13957018, 3.0, 3.0, massPsi, 0);
 	KpiComponents.push_back(tmp);
-  
+
 	// Kpi s-wave using LASS
   	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
                      0.13957018, 3.0, 3.0, massPsi, 0,
@@ -223,10 +223,10 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                 }
 
 		histogramFile = TFile::Open(fullFileName.c_str());
-                
+
 		if (useFourDHistogram) {
 		histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
- 
+
                 // cos mu
                 xaxis = histo->GetAxis(0);
                 nxbins = xaxis->GetNbins();
@@ -245,7 +245,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
                 int total_num_bins = nxbins * nybins * nzbins * nmbins;
 		int sum = 0;
-		
+
 		vector<int> zero_bins;
                 //loop over each bin in histogram and print out how many zero bins there are
                 int idx[4] = {0,0,0,0};
@@ -303,44 +303,44 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,phaseA0ZplusName(copy.phaseA0ZplusName)
 	,phaseApZplusName(copy.phaseApZplusName)
 	,phaseAmZplusName(copy.phaseAmZplusName)
-	
+
 	,magA0Kst892Name(copy.magA0Kst892Name)
 	,magApKst892Name(copy.magApKst892Name)
 	,magAmKst892Name(copy.magAmKst892Name)
 	,phaseA0Kst892Name(copy.phaseA0Kst892Name)
 	,phaseApKst892Name(copy.phaseApKst892Name)
 	,phaseAmKst892Name(copy.phaseAmKst892Name)
-	
+
 	,magA0Kst1410Name(copy.magA0Kst1410Name)
 	,magApKst1410Name(copy.magApKst1410Name)
 	,magAmKst1410Name(copy.magAmKst1410Name)
 	,phaseA0Kst1410Name(copy.phaseA0Kst1410Name)
 	,phaseApKst1410Name(copy.phaseApKst1410Name)
 	,phaseAmKst1410Name(copy.phaseAmKst1410Name)
-	
+
 	,magA0Kst1680Name(copy.magA0Kst1680Name)
 	,magApKst1680Name(copy.magApKst1680Name)
 	,magAmKst1680Name(copy.magAmKst1680Name)
 	,phaseA0Kst1680Name(copy.phaseA0Kst1680Name)
 	,phaseApKst1680Name(copy.phaseApKst1680Name)
 	,phaseAmKst1680Name(copy.phaseAmKst1680Name)
-	
+
 	,magA0K01430Name(copy.magA0K01430Name)
 	,phaseA0K01430Name(copy.phaseA0K01430Name)
-	
+
 	,magA0K21430Name(copy.magA0K21430Name)
 	,magApK21430Name(copy.magApK21430Name)
 	,magAmK21430Name(copy.magAmK21430Name)
 	,phaseA0K21430Name(copy.phaseA0K21430Name)
 	,phaseApK21430Name(copy.phaseApK21430Name)
 	,phaseAmK21430Name(copy.phaseAmK21430Name)
-	
+
 	,magA0K800Name(copy.magA0K800Name)
 	,phaseA0K800Name(copy.phaseA0K800Name)
 
 	,magA0NRName(copy.magA0NRName)
 	,phaseA0NRName(copy.phaseA0NRName)
-	
+
 	,massZplusName(copy.massZplusName)
 	,widthZplusName(copy.widthZplusName)
 	,massKst892Name(copy.massKst892Name)
@@ -360,48 +360,48 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
   	,phase_LASSName(copy.phase_LASSName)
 	,a_LASSName(copy.a_LASSName)
 	,r_LASSName(copy.r_LASSName)
-	
+
 	,magA0Zplus(copy.magA0Zplus)
 	,magApZplus(copy.magApZplus)
 	,magAmZplus(copy.magAmZplus)
 	,phaseA0Zplus(copy.phaseA0Zplus)
 	,phaseApZplus(copy.phaseApZplus)
 	,phaseAmZplus(copy.phaseAmZplus)
-	
+
 	,magA0Kst892(copy.magA0Kst892)
 	,magApKst892(copy.magApKst892)
 	,magAmKst892(copy.magAmKst892)
 	,phaseA0Kst892(copy.phaseA0Kst892)
 	,phaseApKst892(copy.phaseApKst892)
 	,phaseAmKst892(copy.phaseAmKst892)
-	
+
 	,magA0Kst1410(copy.magA0Kst1410)
 	,magApKst1410(copy.magApKst1410)
 	,magAmKst1410(copy.magAmKst1410)
 	,phaseA0Kst1410(copy.phaseA0Kst1410)
 	,phaseApKst1410(copy.phaseApKst1410)
 	,phaseAmKst1410(copy.phaseAmKst1410)
-	
+
 	,magA0Kst1680(copy.magA0Kst1680)
 	,magApKst1680(copy.magApKst1680)
 	,magAmKst1680(copy.magAmKst1680)
 	,phaseA0Kst1680(copy.phaseA0Kst1680)
 	,phaseApKst1680(copy.phaseApKst1680)
 	,phaseAmKst1680(copy.phaseAmKst1680)
-	
+
 	,magA0K01430(copy.magA0K01430)
 	,phaseA0K01430(copy.phaseA0K01430)
-	
+
 	,magA0K21430(copy.magA0K21430)
 	,magApK21430(copy.magApK21430)
 	,magAmK21430(copy.magAmK21430)
 	,phaseA0K21430(copy.phaseA0K21430)
 	,phaseApK21430(copy.phaseApK21430)
 	,phaseAmK21430(copy.phaseAmK21430)
-	
+
 	,magA0K800(copy.magA0K800)
 	,phaseA0K800(copy.phaseA0K800)
-	
+
 	,magA0NR(copy.magA0NR)
 	,phaseA0NR(copy.phaseA0NR)
 
@@ -420,9 +420,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,widthK21430(copy.widthK21430)
 	,massK800(copy.massK800)
 	,widthK800(copy.widthK800)
-	
+
 	,massPsi(copy.massPsi)
-	
+
 	,pMuPlus(copy.pMuPlus)
 	,pMuMinus(copy.pMuMinus)
 	,pPi(copy.pPi)
@@ -463,11 +463,11 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	{
 		ZComponents.push_back( new DPZplusK( *((DPZplusK*)copy.ZComponents[i]) ) );
 	}
-        
+
 	if ( useAngularAcceptance )
         {
                 histogramFile = TFile::Open(fullFileName.c_str());
-                
+
 		if (useFourDHistogram) histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
 		else {
 	        	angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
@@ -495,41 +495,41 @@ void DPTotalAmplitudePDF::MakePrototypes()
 	parameterNames.push_back( phaseA0ZplusName );
 	parameterNames.push_back( phaseApZplusName );
 	parameterNames.push_back( phaseAmZplusName );
-	
+
 	parameterNames.push_back( magA0Kst892Name );
 	parameterNames.push_back( magApKst892Name );
 	parameterNames.push_back( magAmKst892Name );
 	parameterNames.push_back( phaseA0Kst892Name );
 	parameterNames.push_back( phaseApKst892Name );
 	parameterNames.push_back( phaseAmKst892Name );
-	
+
 	parameterNames.push_back( magA0Kst1410Name );
 	parameterNames.push_back( magApKst1410Name );
 	parameterNames.push_back( magAmKst1410Name );
 	parameterNames.push_back( phaseA0Kst1410Name );
 	parameterNames.push_back( phaseApKst1410Name );
 	parameterNames.push_back( phaseAmKst1410Name );
-	
+
 	parameterNames.push_back( magA0Kst1680Name );
 	parameterNames.push_back( magApKst1680Name );
 	parameterNames.push_back( magAmKst1680Name );
 	parameterNames.push_back( phaseA0Kst1680Name );
 	parameterNames.push_back( phaseApKst1680Name );
 	parameterNames.push_back( phaseAmKst1680Name );
-	
+
 	parameterNames.push_back( magA0K01430Name );
 	parameterNames.push_back( phaseA0K01430Name );
-	
+
 	parameterNames.push_back( magA0K21430Name );
 	parameterNames.push_back( magApK21430Name );
 	parameterNames.push_back( magAmK21430Name );
 	parameterNames.push_back( phaseA0K21430Name );
 	parameterNames.push_back( phaseApK21430Name );
 	parameterNames.push_back( phaseAmK21430Name );
-	
+
 	parameterNames.push_back( magA0K800Name );
 	parameterNames.push_back( phaseA0K800Name );
-	
+
 	parameterNames.push_back( magA0NRName );
 	parameterNames.push_back( phaseA0NRName );
 
@@ -583,38 +583,38 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	phaseA0Zplus   = allParameters.GetPhysicsParameter( phaseA0ZplusName )->GetValue();
 	phaseApZplus   = allParameters.GetPhysicsParameter( phaseApZplusName )->GetValue();
 	phaseAmZplus   = allParameters.GetPhysicsParameter( phaseAmZplusName )->GetValue();
-	
+
 	magA0Kst892    = allParameters.GetPhysicsParameter( magA0Kst892Name )->GetValue();
 	magApKst892    = allParameters.GetPhysicsParameter( magApKst892Name )->GetValue();
 	magAmKst892        = allParameters.GetPhysicsParameter( magAmKst892Name )->GetValue();
 	phaseA0Kst892  = allParameters.GetPhysicsParameter( phaseA0Kst892Name )->GetValue();
 	phaseApKst892  = allParameters.GetPhysicsParameter( phaseApKst892Name )->GetValue();
 	phaseAmKst892  = allParameters.GetPhysicsParameter( phaseAmKst892Name )->GetValue();
-	
+
 	magA0Kst1410   = allParameters.GetPhysicsParameter( magA0Kst1410Name )->GetValue();
 	magApKst1410   = allParameters.GetPhysicsParameter( magApKst1410Name )->GetValue();
 	magAmKst1410   = allParameters.GetPhysicsParameter( magAmKst1410Name )->GetValue();
 	phaseA0Kst1410 = allParameters.GetPhysicsParameter( phaseA0Kst1410Name )->GetValue();
 	phaseApKst1410 = allParameters.GetPhysicsParameter( phaseApKst1410Name )->GetValue();
 	phaseAmKst1410 = allParameters.GetPhysicsParameter( phaseAmKst1410Name )->GetValue();
-	
+
 	magA0Kst1680   = allParameters.GetPhysicsParameter( magA0Kst1680Name )->GetValue();
 	magApKst1680   = allParameters.GetPhysicsParameter( magApKst1680Name )->GetValue();
 	magAmKst1680   = allParameters.GetPhysicsParameter( magAmKst1680Name )->GetValue();
 	phaseA0Kst1680 = allParameters.GetPhysicsParameter( phaseA0Kst1680Name )->GetValue();
 	phaseApKst1680 = allParameters.GetPhysicsParameter( phaseApKst1680Name )->GetValue();
 	phaseAmKst1680 = allParameters.GetPhysicsParameter( phaseAmKst1680Name )->GetValue();
-	
+
 	magA0K01430    = allParameters.GetPhysicsParameter( magA0K01430Name )->GetValue();
 	phaseA0K01430  = allParameters.GetPhysicsParameter( phaseA0K01430Name )->GetValue();
-	
+
 	magA0K21430    = allParameters.GetPhysicsParameter( magA0K21430Name )->GetValue();
 	magApK21430   = allParameters.GetPhysicsParameter( magApK21430Name )->GetValue();
 	magAmK21430   = allParameters.GetPhysicsParameter( magAmK21430Name )->GetValue();
 	phaseA0K21430  = allParameters.GetPhysicsParameter( phaseA0K21430Name )->GetValue();
 	phaseApK21430 = allParameters.GetPhysicsParameter( phaseApK21430Name )->GetValue();
 	phaseAmK21430 = allParameters.GetPhysicsParameter( phaseAmK21430Name )->GetValue();
-	
+
 	magA0K800    = allParameters.GetPhysicsParameter( magA0K800Name )->GetValue();
 	phaseA0K800  = allParameters.GetPhysicsParameter( phaseA0K800Name )->GetValue();
 
@@ -642,7 +642,7 @@ bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	a_LASS = allParameters.GetPhysicsParameter( a_LASSName )->GetValue();
 	r_LASS = allParameters.GetPhysicsParameter( r_LASSName )->GetValue();
 
-	// No checks performed here to ensure that parameters are set correctly		
+	// No checks performed here to ensure that parameters are set correctly
 	ZComponents[0]  ->setResonanceParameters( massZplus, widthZplus );
 	KpiComponents[0]->setResonanceParameters( massKst892, widthKst892 );
 	KpiComponents[1]->setResonanceParameters( massKst1410, widthKst1410 );
@@ -700,7 +700,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 			angularAcc = angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2; // factor of 81 = 3^4 to get acceptance on same scale as other quantities
 		}
 	}
-	
+
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 	// Need angle between reference axis
 	DPHelpers::calculateFinalStateMomenta(5.279, m23, massPsi,
@@ -716,20 +716,20 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	&cosThetaZ, &cosThetaPsi, &dphi);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
-	
+
 	//cout << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << " " << pMuPlus.X() << " " << pMuMinus.X() << " " << pPi.X() << endl;
-	 
+
 	double result = 0.;
 	TComplex tmp(0,0);
 
 	// This deals with the separate Kpi components
 	unsigned int lower = (unsigned)(componentIndex - 1);
 	unsigned int upper = (unsigned)componentIndex;
-	unsigned int lowerZ = 0; 
+	unsigned int lowerZ = 0;
 	unsigned int upperZ = 0;
 
 	// And this switchs things to deal with the Z components.
-        if ( componentIndex > KpiComponents.size() ) 
+        if ( componentIndex > KpiComponents.size() )
 	{
 		lower = 0;
 		upper = 0;
@@ -760,7 +760,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 				//cout << "m23: " << m23 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
 			}
 
-			
+
 			// Now comes sum over Z+ components and lambdaPsiPrime
 			for (unsigned int i = lowerZ; i < upperZ; ++i)
 			{
@@ -768,7 +768,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 			  twoLambda,twoLambdaPsi); // need to check that we pass right helicities
 			       //cout << "Z: " << m13 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
 			}
-			
+
 		}
 		result += tmp.Rho2();
 	}
@@ -781,7 +781,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 
 	double t1 = m23*m23-(m1+m2)*(m1+m2);
 	double t2 = m23*m23-(m1-m2)*(m1-m2);
-	
+
 	double t31 = MB0*MB0 - (m23 + massPsi)*(m23 + massPsi);
 	double t32 = MB0*MB0 - (m23 - massPsi)*(m23 - massPsi);
 
@@ -859,12 +859,12 @@ double DPTotalAmplitudePDF::EvaluateComponent(DataPoint * measurement, Component
                 else if( ComponentName.compare( "NR" ) == 0 )
                 {
                         Component->setComponentNumber( 8 );
-                        componentIndex = 7;
+                        componentIndex = 8;
                 }
                 else if( ComponentName.compare( "Z4430" ) == 0 )
                 {
                         Component->setComponentNumber( 9 );
-                        componentIndex = 8;
+                        componentIndex = 9;
                 }
                 else
                 {

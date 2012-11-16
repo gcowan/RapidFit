@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/11/16 Greig Cowan and Joel Bressieux
+  - Added NR component to DPTotalAmplitude.
+
 2012/11/11 Dianne Ferguson
   - Updated LLB to include 1/tau factor for syracuse repeat.
   - Included the new time acceptance file for syracuse repeat.

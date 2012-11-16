@@ -1137,7 +1137,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	TString X_Title, Y_Title;
 
 	double final_chi2=-999;
-	double legend_size=1.;
+	double legend_size=0.25;
 
 	bool addLHCb=false;
 	if( conf != NULL )
@@ -1440,7 +1440,7 @@ void ComponentPlotter::SetupCombinationDescriptions()
 
 	data_subsets.push_back( whole_dataset );
 
-	ObservableRef ObservableName( observableName ); 
+	ObservableRef ObservableName( observableName );
 
 	vector<double> discrete_observableValues_i;
 	//      Get all values of the wanted parameter from this subset
