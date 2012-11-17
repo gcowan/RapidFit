@@ -154,6 +154,9 @@ class FitFunction
 		virtual vector<string> ConstrainedParameter() const;
 
 		void SetDebug( DebugClass* debug );
+
+		vector<string> GetNotConstrainedList() const;
+
 	protected:
 		/*!
 		 * Don't Copy the class this way!
@@ -207,6 +210,8 @@ class FitFunction
 		double step_time;
 
 		unsigned int callNum;
+
+		mutable vector<string> GlobalDoNotIntegrate;
 };
 
 #endif

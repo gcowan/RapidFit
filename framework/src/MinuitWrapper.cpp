@@ -271,6 +271,8 @@ void MinuitWrapper::Minimise()
         int fitStatus = 0;
         minuit->mnstat( minimumValue, fedm, errdef, variableParameters, parameterNumber, fitStatus );
 
+	int preHesseStatus = fitStatus;
+
 	time(&timeNow);
 	cout << "\nFinal NLL: " << minimumValue << "\t\tStatus: " << fitStatus << "\t\t" << ctime(&timeNow) << endl << endl;
 
@@ -314,10 +316,11 @@ void MinuitWrapper::Minimise()
 		minuit->mnexcm("MINOS", arguments, 2, errorFlag);
 	}
 
+	minuit->mnstat( minimumValue, fedm, errdef, variableParameters, parameterNumber, fitStatus );
 
 	//Output time information
 	time(&timeNow);
-	cout << "Minuit finished: " << ctime( &timeNow ) << endl;
+	cout << "Minuit finished: " << "\t\tStatus: " << fitStatus << "\t\t" << ctime(&timeNow) << endl;
 
 	//Get the final fit status
 	minuit->mnstat( minimumValue, fedm, errdef, variableParameters, parameterNumber, fitStatus );

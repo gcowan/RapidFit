@@ -15,6 +15,7 @@
 #include "Foam.h"
 #include "StatisticsFunctions.h"
 #include "PhaseSpaceBoundary.h"
+#include "ClassLookUp.h"
 //	System Headers
 #include <iostream>
 #include <cmath>
@@ -29,7 +30,10 @@
 using namespace::std;
 
 //Constructor with correct argument
-Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :  Open_Files(), InputPDF(NewPDF), generationFunction(), generationBoundary(NewBoundary), newDataSet(), rootRandom(), foamGenerators(), storedIntegrator(), storedDatapoint(), discreteCombinations(), allNames(), discreteNames(), continuousNames(), discreteNames_ref(), continuousNames_ref(), discreteValues(), minima(), ranges()
+Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :
+	Open_Files(), InputPDF(NewPDF), generationFunction(), generationBoundary(NewBoundary), newDataSet(), rootRandom(), foamGenerators(),
+	storedIntegrator(), storedDatapoint(), discreteCombinations(), allNames(), discreteNames(), continuousNames(), discreteNames_ref(),
+	continuousNames_ref(), discreteValues(), minima(), ranges()
 {
 	rootRandom = InputPDF->GetRandomFunction();
 
@@ -50,7 +54,7 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :  Open_Files(), I
 	newDataSet = new MemoryDataSet(generationBoundary);
 	cout << "Initializing Generator(s)" << endl;
 
-	Foam::Init();
+	this->Init();
 }
 
 void Foam::Init()
@@ -104,7 +108,7 @@ void Foam::Init()
 
 		//init_temporaryDataPoint->Print();
 		//Make the function wrapper
-		IntegratorFunction * combinationFunction = new IntegratorFunction( InputPDF, init_temporaryDataPoint, continuousNames, discreteNames, minima, ranges, generationBoundary );
+		IntegratorFunction* combinationFunction = new IntegratorFunction( InputPDF, init_temporaryDataPoint, continuousNames, discreteNames, minima, ranges, generationBoundary );
 
 		//cout << InputPDF->GET_ID() << endl;
 		//if( InputPDF->GetCacheStatus() )	cout << "HAS CACHED FOAM" << endl;
@@ -228,9 +232,17 @@ void Foam::Init()
 					cout << "Error re-aquiring TFOAM object. This is unrecoverable" << endl;
 					exit(-6542);
 				}
-				foamGenerator->SetPseRan( rootRandom );
-				foamGenerator->SetRho( combinationFunction );
-				foamGenerator->SetChat( 0 );
+				foamGenerator->ResetPseRan( rootRandom );
+				foamGenerator->ResetRho( combinationFunction );
+                                foamGenerator->SetnCells( 1000 );       //      1000    Total number of bins to construct
+                                foamGenerator->SetnSampl( 200 );        //      200     Samples to take when constructing bins
+                                foamGenerator->SetnBin( 8 );            //      8       Bins along each axis
+                                foamGenerator->SetOptRej( 1 );          //      1/0     Don't/Use Weighted Distribution
+                                foamGenerator->SetOptDrive( 2 );        //      1/2     Best Varience/Weights
+                                foamGenerator->SetEvPerBin( 25 );       //      25      Weights per bin... This doesn't Saturate as object is written before generating events
+                                foamGenerator->SetChat( 0 );            //      0       verbosity
+                                foamGenerator->SetMaxWtRej( 1.1 );      //      1.1     Unknown what effect this has, something to do with weights
+				foamGenerator->CheckAll(1);
 				//	Make one event here to check everything was processed correctly
 				foamGenerator->MakeEvent();
 				cout << "Check OK" << endl;
@@ -256,7 +268,7 @@ void Foam::Init()
 //Destructor
 Foam::~Foam()
 {
-	//Foam::RemoveGenerator();
+	this->RemoveGenerator();
 	//delete rootRandom;
 }
 
@@ -264,8 +276,8 @@ void Foam::RemoveGenerator()
 {
 	while( !foamGenerators.empty() )
 	{
-		Double_t one, two;
-		foamGenerators.back()->Finalize( one, two );
+		//Double_t one, two;
+		//foamGenerators.back()->Finalize( one, two );
 		delete foamGenerators.back();
 		foamGenerators.pop_back();
 	}
@@ -279,11 +291,10 @@ void Foam::RemoveGenerator()
 		delete storedDatapoint.back();
 		storedDatapoint.pop_back();
 	}
-
 	while( !Open_Files.empty() )
 	{
 		Open_Files.back()->Close();
-		delete Open_Files.back();
+		//delete Open_Files.back();
 		Open_Files.pop_back();
 	}
 }
@@ -292,7 +303,7 @@ void Foam::RemoveGenerator()
 int Foam::GenerateData( int DataAmount )
 {
 	//if( newDataSet->GetDataNumber() < DataAmount ) newDataSet->ReserveDataSpace( DataAmount );
-	for (int dataIndex = 0; dataIndex < DataAmount; ++dataIndex )
+	for( int dataIndex = 0; dataIndex < DataAmount; ++dataIndex )
 	{
 		//Generate the discrete observables, and select the correct Foam generator to use
 		int combinationIndex = 0;
@@ -338,7 +349,7 @@ int Foam::GenerateData( int DataAmount )
 	}
 
 	//cout << "Destroying Generator(s)" << endl;
-	Foam::RemoveGenerator();
+	this->RemoveGenerator();
 	return DataAmount;
 }
 

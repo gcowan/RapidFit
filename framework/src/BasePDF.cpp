@@ -206,15 +206,15 @@ void BasePDF::UpdatePhysicsParameters( ParameterSet* Input )
 {
 	if( allParameters.GetAllNames().size() != 0 )
 	{
+		//  Invalidate the cache
+		if( !(allParameters == (*Input)) ) this->UnsetCache();
 		allParameters.SetPhysicsParameters( Input );
 	}
 	else
 	{
 		allParameters.AddPhysicsParameters( Input );
+		this->UnsetCache();
 	}
-
-	//Invalidate the cache
-	if( !(allParameters == (*Input)) )  this->UnsetCache();
 
 	this->SetPhysicsParameters( Input );
 }
