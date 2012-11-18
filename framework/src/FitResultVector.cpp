@@ -225,11 +225,13 @@ FitResult * FitResultVector::GetFitResult( int Index )
 		return NULL;
 	}
 }
+
 double FitResultVector::GetRealTime( int Index )
 {
 	if( Index < int(allRealTimes.size()) ) return allRealTimes[ unsigned(Index) ];
 	else return -1;
 }
+
 void FitResultVector::AddRealTimes( vector<double> input_times )
 {
 	for( unsigned int i=0; i< input_times.size(); ++i)
@@ -237,20 +239,24 @@ void FitResultVector::AddRealTimes( vector<double> input_times )
 		allRealTimes.push_back( input_times[i] );
 	}
 }
+
 void FitResultVector::AddRealTime( double input_time )
 {
 	allRealTimes.push_back( input_time );
 }
+
 void FitResultVector::SetRealTime( int Index, double input_time )
 {
 	if( int(allRealTimes.size()) < Index ) allRealTimes.resize( unsigned(Index) );
 	allRealTimes[unsigned(Index)] = input_time;
 }
+
 double FitResultVector::GetCPUTime( int Index )
 {
 	if( Index < int(allCPUTimes.size()) ) return allCPUTimes[ unsigned(Index) ];
 	else return -1;
 }
+
 void FitResultVector::AddCPUTimes( vector<double> input_times )
 {
 	for( unsigned int i=0; i< input_times.size(); ++i)
@@ -258,10 +264,12 @@ void FitResultVector::AddCPUTimes( vector<double> input_times )
 		allCPUTimes.push_back( input_times[i] );
 	}
 }
+
 void FitResultVector::AddCPUTime( double input_time )
 {
 	allCPUTimes.push_back( input_time );
 }
+
 void FitResultVector::SetCPUTime( int Index, double input_time )
 {
 	if( Index < int(allCPUTimes.size()) ) allCPUTimes.resize( unsigned(Index) );
@@ -279,6 +287,7 @@ vector<double> FitResultVector::GetAllRealTimes()
 {
 	return allRealTimes;
 }
+
 vector<double> FitResultVector::GetAllCPUTimes()
 {
 	return allCPUTimes;

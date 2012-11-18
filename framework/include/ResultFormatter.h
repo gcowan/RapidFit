@@ -38,6 +38,9 @@ class ResultFormatter
 		static void TableHeader( stringstream& latex, unsigned int colnum );
 		static void TableHeaderLandscape( stringstream& latex, unsigned int colnum );
 
+		static void AddBranch( TTree* inputTree, const string& BranchName, const vector<int>& IntData );
+		static void AddBranch( TTree* inputTree, const string& BranchName, const vector<double>& DoubleData );
+
 		static void WriteOutputLatex( FitResult* OutputData );
 
 		static void LatexSimpleFitResultTable( FitResult * OutputData, stringstream& latex );

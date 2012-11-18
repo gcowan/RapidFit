@@ -560,6 +560,8 @@
 		 */
 		void SetName( string Name );
 
+		virtual void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary );
+
 	protected:
 
 		/*!

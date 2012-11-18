@@ -65,6 +65,8 @@ class IDataSet
 		 */
 		virtual PhaseSpaceBoundary * GetBoundary() const = 0;
 
+		virtual void SetBoundary( const PhaseSpaceBoundary* ) = 0;
+
 		/*!
 		 * @brief Interface Function:
 		 *        Sort the DataSet by a chosen parameter

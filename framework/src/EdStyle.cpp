@@ -335,6 +335,10 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 
 		returnable_string = "#phi_{s}";
 
+	} else if ( Param_Name == "lambda" ) {
+
+		returnable_string = "#lambda";
+
 	} else if ( Param_Name == "m_Bs" ) {
 
 		returnable_string = "m_{B_s}";
@@ -492,29 +496,29 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 		Name.Append("\\delta_s");
 
-        } else if ( Param_Name == "delta_s990" ) {
+	} else if ( Param_Name == "delta_s990" ) {
 
-                Name.Append("\\delta_S (990)");
+		Name.Append("\\delta_S (990)");
 
-        } else if ( Param_Name == "delta_s1008" ) {
+	} else if ( Param_Name == "delta_s1008" ) {
 
-                Name.Append("\\delta_S (1008)");
+		Name.Append("\\delta_S (1008)");
 
-        } else if ( Param_Name == "delta_s1016" ) {
+	} else if ( Param_Name == "delta_s1016" ) {
 
-                Name.Append("\\delta_S (1016)");
+		Name.Append("\\delta_S (1016)");
 
-        } else if ( Param_Name == "delta_s1020" ) {
+	} else if ( Param_Name == "delta_s1020" ) {
 
-                Name.Append("\\delta_S (1020)");
+		Name.Append("\\delta_S (1020)");
 
-        } else if ( Param_Name == "delta_s1024" ) {
+	} else if ( Param_Name == "delta_s1024" ) {
 
-                Name.Append("\\delta_S (1024)");
+		Name.Append("\\delta_S (1024)");
 
-        } else if ( Param_Name == "delta_s1032" ) {
+	} else if ( Param_Name == "delta_s1032" ) {
 
-                Name.Append("\\delta_S (1032)");
+		Name.Append("\\delta_S (1032)");
 
 	} else if ( Param_Name == "Phi_s" ) {
 
@@ -670,7 +674,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "lambda" ) {
 
-		Name.Append("\\left|\\lambda\\right|^2");
+		Name.Append("\\lambda^2");
 
 	} else if ( Param_Name == "SignalFractionUBU" ) {
 
@@ -953,6 +957,33 @@ TString EdStyle::Remove_Suffix( TString arg )
 TLegend* EdStyle::LHCbLegend()
 {
 	TLegend* thisLegend = new TLegend( 0.6, 0.65, 0.9, 0.9 );
+	thisLegend->SetFillColor( kWhite );
+	thisLegend->SetFillStyle( 3001 );
+	thisLegend->SetTextSize( (Float_t)0.03 );
+	return thisLegend;
+}
+
+TLegend* EdStyle::LHCbLeftLegend()
+{
+	TLegend* thisLegend = new TLegend( 0.15, 0.65, 0.4, 0.9 );
+	thisLegend->SetFillColor( kWhite );
+	thisLegend->SetFillStyle( 3001 );
+	thisLegend->SetTextSize( (Float_t)0.03 );
+	return thisLegend;
+}
+
+TLegend* EdStyle::LHCbBottomLegend()
+{
+	TLegend* thisLegend = new TLegend( 0.6, 0.2, 0.9, 0.45 );
+	thisLegend->SetFillColor( kWhite );
+	thisLegend->SetFillStyle( 3001 );
+	thisLegend->SetTextSize( (Float_t)0.03 );
+	return thisLegend;
+}
+
+TLegend* EdStyle::LHCbBottomLeftLegend()
+{
+	TLegend* thisLegend = new TLegend( 0.15, 0.2, 0.45, 0.45 );
 	thisLegend->SetFillColor( kWhite );
 	thisLegend->SetFillStyle( 3001 );
 	thisLegend->SetTextSize( (Float_t)0.03 );

@@ -118,6 +118,8 @@ void NormalisedSumPDF::ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary )
 	if( integrationBoundary != NULL ) delete integrationBoundary;
 	integrationBoundary = new PhaseSpaceBoundary( *InputBoundary );
 	this->MakePrototypes( InputBoundary );
+	firstPDF->ChangePhaseSpace( InputBoundary );
+	secondPDF->ChangePhaseSpace( InputBoundary );
 }
 
 //Assemble the vectors of parameter/observable names needed

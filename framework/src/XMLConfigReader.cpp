@@ -607,6 +607,38 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			returnable_config->LegendTextSize =  XMLTag::GetDoubleValue( projComps[childIndex] );
 		}
+		else if( projComps[childIndex]->GetName() == "TopRightLegend" )
+		{
+			returnable_config->TopRightLegend =  XMLTag::GetBooleanValue( projComps[childIndex] );
+			returnable_config->TopLeftLegend=false;
+			returnable_config->BottomRightLegend=false;
+			returnable_config->BottomLeftLegend=false;
+		}
+		else if( projComps[childIndex]->GetName() == "TopLeftLegend" )
+		{
+			returnable_config->TopRightLegend=false;
+			returnable_config->TopLeftLegend =  XMLTag::GetBooleanValue( projComps[childIndex] );
+			returnable_config->BottomRightLegend=false;
+			returnable_config->BottomLeftLegend=false;
+		}
+		else if( projComps[childIndex]->GetName() == "BottomRightLegend" )
+		{
+			returnable_config->TopRightLegend=false;
+			returnable_config->TopLeftLegend=false;
+			returnable_config->BottomRightLegend =  XMLTag::GetBooleanValue( projComps[childIndex] );
+			returnable_config->BottomLeftLegend=false;
+		}
+		else if( projComps[childIndex]->GetName() == "BottomLeftLegend" )
+		{
+			returnable_config->TopRightLegend=false;
+			returnable_config->TopLeftLegend=false;
+			returnable_config->BottomRightLegend=false;
+			returnable_config->BottomLeftLegend =  XMLTag::GetBooleanValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "NoLegend" )
+		{
+			returnable_config->useLegend =  !XMLTag::GetBooleanValue( projComps[childIndex] );
+		}
 		else
 		{
 			cerr << "Sorry Don't understand: " << projComps[childIndex]->GetName() << " ignoring!" << endl;

@@ -164,6 +164,12 @@ PhaseSpaceBoundary * MemoryDataSet::GetBoundary() const
 	return dataBoundary;
 }
 
+void MemoryDataSet::SetBoundary( const PhaseSpaceBoundary* Input )
+{
+	delete dataBoundary;
+	dataBoundary = new PhaseSpaceBoundary( *Input );
+}
+
 //Empty the data set
 void MemoryDataSet::Clear()
 {

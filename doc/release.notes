@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2012/11/18 Rob Currie
+  - Fixed bug to do with Projections
+  - Changed RapidFit Output to use a TTree Output rather than a TNtuple.
+       This has been written to swap out the TNtuple for the TTree so should be transparent
+
 2012/11/17 Rob Currie
   - Fixed bug in Normalisation Caching that was introduced on 2012/11/11
   - Changed some code in Foam to be more explicit for the sake of FC studies

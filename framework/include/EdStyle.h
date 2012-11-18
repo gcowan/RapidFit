@@ -155,6 +155,9 @@ class EdStyle {
 		 * @return Returns a pointer to the TLegend object for plotting
 		 */
 		static TLegend* LHCbLegend();
+		static TLegend* LHCbLeftLegend();
+		static TLegend* LHCbBottomLegend();
+		static TLegend* LHCbBottomLeftLegend();
 
 		static TLatex* LHCbLabel();
 

@@ -380,7 +380,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 			}
 			else
 			{
-				cerr << "Path to store plot file not specified" << endl;
+				cerr << "Observable Name not specified" << endl;
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}

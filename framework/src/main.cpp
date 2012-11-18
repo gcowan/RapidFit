@@ -818,6 +818,7 @@ int testComponentPlot( RapidFitConfiguration* config )
 	PDFWithData * quickData = config->xmlFile->GetPDFsAndData()[0];
 	quickData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
 	IDataSet * quickDataSet = quickData->GetDataSet();
+	if( config->observableName.empty() ) config->observableName = "time";
 	TFile* testFile = new TFile( "testFile.root", "UPDATE" );
 	ComponentPlotter * testPlotter = new ComponentPlotter( quickData->GetPDF(), quickDataSet, "testPDF", testFile, config->observableName );
 	testPlotter->ProjectObservable();

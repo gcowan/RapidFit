@@ -30,6 +30,7 @@ class MemoryDataSet : public IDataSet
 		virtual bool AddDataPoint( DataPoint* );
 		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL, bool silence=false ) const;
 		virtual PhaseSpaceBoundary * GetBoundary() const;
+		virtual void SetBoundary( const PhaseSpaceBoundary* );
 
 		virtual void SortBy( string );
 

@@ -815,12 +815,141 @@ void ResultFormatter::FlatNTuplePullPlots( string Filename, FitResultVector* Toy
 	ResultFormatter::WriteFlatNtuple( Filename, ToyResult );
 }
 
+void ResultFormatter::AddBranch( TTree* inputTree, const string& BranchName, const vector<double>& DoubleData )
+{
+	if( inputTree->GetEntries() != 0 )
+	{
+		if( inputTree->GetEntries() != (int) DoubleData.size() )
+		{
+			cerr << "CANNOT ADD BRANCH: " << BranchName << " TO: " << inputTree->GetName() << endl;
+			return;
+		}
+	}
+
+	TString branchName( BranchName );
+	TString branchLabel=branchName; branchLabel.Append("/D");
+
+	double thisValue=0.;
+
+	TBranch* newBranch = inputTree->Branch( branchName, &thisValue, branchLabel );
+
+	inputTree->SetEntries( (int) DoubleData.size() );
+
+	for( unsigned int i=0; i< DoubleData.size(); ++i )
+	{
+		thisValue=DoubleData[i];
+		newBranch->Fill();
+	}
+	return;
+}
+
+void ResultFormatter::AddBranch( TTree* inputTree, const string& BranchName, const vector<int>& IntData )
+{
+	if( inputTree->GetEntries() != 0 )
+	{
+		if( inputTree->GetEntries() != (int) IntData.size() )
+		{
+			cerr << "CANNOT ADD BRANCH: " << BranchName << " TO: " << inputTree->GetName() << endl;
+			return;
+		}
+	}
+
+	TString branchName( BranchName );
+	TString branchLabel=branchName; branchLabel.Append("/I");
+
+	int thisValue=0.;
+
+	TBranch* newBranch = inputTree->Branch( branchName, &thisValue, branchLabel );
+
+	inputTree->SetEntries( (int) IntData.size() );
+
+	for( unsigned int i=0; i< IntData.size(); ++i )
+	{
+		thisValue=IntData[i];
+		newBranch->Fill();
+	}
+	return;
+}
+
 //Make pull plots from the output of a toy study
 void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResult )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
+	rootFile->SetCompressionLevel( 9 );
+
+	TTree* outputTree = new TTree( "RapidFitResult", "RapidFitResult" );
+
+	ResultParameterSet* resultSet = ToyResult->GetFitResult( 0 )->GetResultParameterSet();
+
+	vector<string> allNames = resultSet->GetAllNames();
+
+	for( unsigned int param_i=0; param_i< allNames.size(); ++param_i )
+	{
+		ObservableRef thisParamName( allNames[param_i] );
+
+		vector<double> ParameterValues, ParameterErrors, ParameterOriginalValues;
+		vector<double> ParameterPulls, ParameterStepSizes;
+		vector<double> ParameterErrorsHigh, ParameterErrorsLow;
+		vector<double> ParameterMinimums, ParameterMaximums;
+		vector<int> ParameterScanStatus, ParameterFixedStatus;
+		for( unsigned int resultNum=0; resultNum< (unsigned)ToyResult->NumberResults(); ++resultNum )
+		{
+			ResultParameter* thisParam = ToyResult->GetFitResult( resultNum )->GetResultParameterSet()->GetResultParameter( thisParamName );
+
+			ParameterValues.push_back( thisParam->GetValue() );
+			ParameterErrors.push_back( thisParam->GetError() );
+			ParameterPulls.push_back( thisParam->GetPull() );
+			ParameterMinimums.push_back( thisParam->GetMinimum() );
+			ParameterMaximums.push_back( thisParam->GetMaximum() );
+			ParameterOriginalValues.push_back( thisParam->GetOriginalValue() );
+
+			if( thisParam->GetType() == "Fixed" )	ParameterFixedStatus.push_back( 1 );
+			else ParameterFixedStatus.push_back( 0 );
+			if( thisParam->GetScanStatus() ) ParameterScanStatus.push_back( 1 );
+			else ParameterScanStatus.push_back( 0 );
+			if( thisParam->GetAssym() )
+			{
+				ParameterErrorsHigh.push_back( thisParam->GetErrHi() );
+				ParameterErrorsLow.push_back( thisParam->GetErrLow() );
+			} else {
+				ParameterErrorsHigh.push_back( 0. );
+				ParameterErrorsLow.push_back( 0. );
+			}
+			ParameterStepSizes.push_back( thisParam->GetStepSize() );
+		}
+		string BranchName=allNames[param_i];
+		ResultFormatter::AddBranch( outputTree, BranchName+"_value", ParameterValues );
+		if( ToyResult->GetFitResult(0)->GetResultParameterSet()->GetResultParameter(thisParamName)->GetType() != "Fixed" )
+		{
+			ResultFormatter::AddBranch( outputTree, BranchName+"_error", ParameterErrors );
+			ResultFormatter::AddBranch( outputTree, BranchName+"_gen", ParameterOriginalValues );
+			ResultFormatter::AddBranch( outputTree, BranchName+"_pull", ParameterPulls );
+			ResultFormatter::AddBranch( outputTree, BranchName+"_max", ParameterMaximums );
+			ResultFormatter::AddBranch( outputTree, BranchName+"_min", ParameterMinimums );
+			ResultFormatter::AddBranch( outputTree, BranchName+"_step", ParameterStepSizes );
+			ResultFormatter::AddBranch( outputTree, BranchName+"_errHi", ParameterErrorsHigh );
+			ResultFormatter::AddBranch( outputTree, BranchName+"_errLo", ParameterErrorsLow );
+		}
+		ResultFormatter::AddBranch( outputTree, BranchName+"_scan", ParameterScanStatus );
+		ResultFormatter::AddBranch( outputTree, BranchName+"_fix", ParameterFixedStatus );
+	}
+
+	ResultFormatter::AddBranch( outputTree, "Fit_RealTime", ToyResult->GetAllRealTimes() );
+	ResultFormatter::AddBranch( outputTree, "Fit_CPUTime", ToyResult->GetAllCPUTimes() );
+
+	vector<int> fitStatus;
+	vector<double> NLL_Values;
+	for( unsigned int i=0; i< (unsigned) ToyResult->NumberResults(); ++i )
+	{
+		fitStatus.push_back( ToyResult->GetFitResult( i )->GetFitStatus() );
+		NLL_Values.push_back(  ToyResult->GetFitResult( i )->GetMinimumValue() );
+	}
+
+	ResultFormatter::AddBranch( outputTree, "Fit_Status", fitStatus );
+	ResultFormatter::AddBranch( outputTree, "NLL", NLL_Values );
+
 	//	Ntuples are 'stupid' objects in ROOT and the basic one can only handle float type objects
-	TNtuple * parameterNTuple;
+	/*TNtuple * parameterNTuple;
 	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader());
 	Float_t * resultArr;
 	for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
@@ -830,7 +959,8 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 		copy( result.begin(), result.end(), resultArr);
 		parameterNTuple->Fill( resultArr );
 		delete [] resultArr;
-	}
+	}*/
+
 	vector<double> MatrixElements; vector<string> MatrixNames;
         TTree * tree = new TTree("corr_matrix", "Elements from Correlation Matricies");
 	tree->Branch("MartrixElements", "std::vector<double>", &MatrixElements );

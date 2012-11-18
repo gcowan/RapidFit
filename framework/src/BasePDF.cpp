@@ -854,3 +854,9 @@ void BasePDF::Print() const
 	cout << "This PDF is: " << this->GetLabel() << endl;
 }
 
+void BasePDF::ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary )
+{
+	(void) InputBoundary;
+	return;
+}
+

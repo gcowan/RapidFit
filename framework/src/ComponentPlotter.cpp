@@ -57,6 +57,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	else debug = new DebugClass(false);
 	plotPDF->TurnCachingOff();
 
+	plotPDF->ChangePhaseSpace( full_boundary );
+
 	//plotPDF->GetPhysicsParameters()->Print();
 
 	pdfIntegrator->SetPDF( plotPDF );
@@ -75,11 +77,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		}
 	}
 
-	if( plotPDF->GetName() == "NormalisedSum" )
-	{
-		NormalisedSumPDF* thisNorm = (NormalisedSumPDF*) plotPDF;
-		thisNorm->ChangePhaseSpace( full_boundary );
-	}
+	NewDataSet->SetBoundary( full_boundary );
 
 	//////////////////////////////////////////////////////////////////
 	//Make the histogram of this observable
@@ -278,17 +276,17 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 		//cout << "Normalizing" << endl;
 		double n_events = (double)plotData->GetDataNumber( allCombinations[combinationIndex], true );
 
-		//cout << n_events << " for:" << endl;
-		//allCombinations[combinationIndex]->Print();
-		//cout << "combinationWeights[combinationIndex]: " << combinationWeights[combinationIndex] << endl;
+		/*cout << n_events << " for:" << endl;
+		allCombinations[combinationIndex]->Print();
+		cout << "combinationWeights[combinationIndex]: " << combinationWeights[combinationIndex] << endl;
 
-		/*
-		   cout << "combination_integral[combinationIndex]: " << combination_integral[combinationIndex] << endl;
-		   cout << "fabs(ratioOfIntegrals[combinationIndex]): " << fabs(ratioOfIntegrals[combinationIndex]) << endl;
-		   cout << "n_events: " << n_events << endl;
-		   cout << "range: " << range << endl;
-		   cout << "double(data_binning): " << double(data_binning) << endl;
-		   */
+		
+		cout << "combination_integral[combinationIndex]: " << combination_integral[combinationIndex] << endl;
+		cout << "fabs(ratioOfIntegrals[combinationIndex]): " << fabs(ratioOfIntegrals[combinationIndex]) << endl;
+		cout << "n_events: " << n_events << endl;
+		cout << "range: " << range << endl;
+		cout << "double(data_binning): " << double(data_binning) << endl;
+		*/
 
 		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM ORIGINAL PLOTTER CLASS
 		for( int pointIndex = 0; pointIndex < total_points; ++pointIndex )
@@ -959,10 +957,27 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( myLatex != NULL ) myLatex->Draw();
 
-	TLegend* leg = EdStyle::LHCbLegend();
-	leg->SetTextSize( (Float_t) legend_size );
+	TLegend* leg = NULL;
+	if( conf->useLegend )
+	{
+		if( conf->TopRightLegend )
+		{
+			leg = EdStyle::LHCbLegend();
+		} else if( conf->TopLeftLegend )
+		{
+			leg = EdStyle::LHCbLeftLegend();
+		} else if( conf->BottomRightLegend )
+		{
+			leg = EdStyle::LHCbBottomLegend();
+		} else if( conf->BottomLeftLegend )
+		{
+			leg = EdStyle::LHCbBottomLeftLegend();
+		}
+	}
 
-	leg->AddEntry( input_data, "Data", "pl" );
+	if( leg != NULL ) leg->SetTextSize( (Float_t) legend_size );
+
+	if( leg != NULL ) leg->AddEntry( input_data, "Data", "pl" );
 
 	unsigned int num=0;
 	for( vector<TGraph*>::iterator comp_i = input_components.begin(); comp_i != input_components.end(); ++comp_i, ++num )
@@ -997,11 +1012,11 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 			{
 				if( num < component_names.size() )
 				{
-					leg->AddEntry( (*comp_i), TString(component_names[num]), "l" );
+					if( leg != NULL ) leg->AddEntry( (*comp_i), TString(component_names[num]), "l" );
 				}
 				else
 				{
-					leg->AddEntry( (*comp_i), "Unnamed", "l" );
+					if( leg != NULL ) leg->AddEntry( (*comp_i), "Unnamed", "l" );
 				}
 			}
 		}
@@ -1012,12 +1027,12 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		TString Chi2Text( "#chi^{2}/ndof : " );
 		stringstream chi_stream; chi_stream << setprecision(4) << final_chi2;
 		Chi2Text.Append( chi_stream.str() );
-		leg->AddEntry( (TObject*)NULL, Chi2Text, "" );
+		if( leg != NULL ) leg->AddEntry( (TObject*)NULL, Chi2Text, "" );
 	}
 
 	c1->Update();
 
-	if( !component_names.empty() ) leg->Draw();
+	if( !component_names.empty() ) if( leg != NULL ) leg->Draw();
 
 	c1->Update();
 
@@ -1197,10 +1212,27 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	if( myLatex != NULL ) myLatex->Draw();
 
-	TLegend* leg = EdStyle::LHCbLegend();
-	leg->SetTextSize( (Float_t) legend_size );
+	TLegend* leg = NULL;
+	if( conf->useLegend )
+	{
+		if( conf->TopRightLegend )
+		{
+			leg = EdStyle::LHCbLegend();
+		} else if( conf->TopLeftLegend )
+		{
+			leg = EdStyle::LHCbLeftLegend();
+		} else if( conf->BottomRightLegend )
+		{
+			leg = EdStyle::LHCbBottomLegend();
+		} else if( conf->BottomLeftLegend )
+		{
+			leg = EdStyle::LHCbBottomLeftLegend();
+		}
+	}
 
-	leg->AddEntry( input_data, "Data", "pl" );
+	if( leg != NULL ) leg->SetTextSize( (Float_t) legend_size );
+
+	if( leg != NULL ) leg->AddEntry( input_data, "Data", "pl" );
 
 	unsigned int num=0;
 	for( vector<TGraph*>::iterator comp_i = input_components.begin(); comp_i != input_components.end(); ++comp_i, ++num )
@@ -1235,11 +1267,11 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 			{
 				if( num < component_names.size() )
 				{
-					leg->AddEntry( (*comp_i), TString(component_names[num]), "l" );
+					if( leg != NULL ) leg->AddEntry( (*comp_i), TString(component_names[num]), "l" );
 				}
 				else
 				{
-					leg->AddEntry( (*comp_i), "Unnamed", "l" );
+					if( leg != NULL ) leg->AddEntry( (*comp_i), "Unnamed", "l" );
 				}
 			}
 		}
@@ -1250,13 +1282,13 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		TString Chi2Text( "#chi^{2}/ndof : " );
 		stringstream chi_stream; chi_stream << setprecision(4) << final_chi2;
 		Chi2Text.Append( chi_stream.str() );
-		leg->AddEntry( (TObject*)NULL, Chi2Text, "" );
+		if( leg !=NULL ) leg->AddEntry( (TObject*)NULL, Chi2Text, "" );
 	}
 
 	pad1->Modified();
 	pad1->Update();
 	c1->Update();
-	if( !component_names.empty() ) leg->Draw();
+	if( !component_names.empty() ) if( leg != NULL ) leg->Draw();
 	pad1->Modified();
 	pad1->Update();
 	if( logy ) pad1->SetLogy( true );

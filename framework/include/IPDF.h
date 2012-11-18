@@ -330,6 +330,8 @@ class IPDF
 		 */
 		virtual void SetName( string ) = 0;
 
+		virtual void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary ) = 0;
+
 	protected:
 
 		virtual bool SetPhysicsParameters( ParameterSet* Input ) = 0;
