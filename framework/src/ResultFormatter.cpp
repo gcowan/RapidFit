@@ -61,44 +61,67 @@ void ResultFormatter::MakeRootDataFile( string FullFileName, vector<IDataSet*> O
 		string FileName = TString_FileName.Data();
 
 		cout << "ResultFormatter writing to " << FileName << endl;
+
+		vector<string> allNames = (*data_iter)->GetBoundary()->GetAllNames();
+
+		/*
 		//Make a string naming all observables
 		string observableNames = "";
-		vector<string> allNames = (*data_iter)->GetBoundary()->GetAllNames();
 		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
 		{
-			if (nameIndex == 0)
-			{
-				observableNames += allNames[0];
-			}
-			else
-			{
-				observableNames += ":" + allNames[nameIndex];
-			}
+		if (nameIndex == 0)
+		{
+		observableNames += allNames[0];
 		}
+		else
+		{
+		observableNames += ":" + allNames[nameIndex];
+		}
+		}
+		*/
 
 		//Make the file and NTuple
 		TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
-		TNtuple * dataNTuple = new TNtuple( "dataNTuple", "All data", observableNames.c_str() );
+
+		TTree* dataTree = new TTree( "dataNTuple", "All data" );
+
+		for( unsigned int i=0; i< allNames.size(); ++i )
+		{
+			ObservableRef thisObs( allNames[i] );
+			vector<double> thisValues;
+			for( int dataIndex = 0; dataIndex < (*data_iter)->GetDataNumber(); ++dataIndex )
+			{
+				thisValues.push_back( (*data_iter)->GetDataPoint( dataIndex )->GetObservable( thisObs )->GetValue() );
+			}
+			ResultFormatter::AddBranch( dataTree, allNames[i], thisValues );
+		}
+
+
+		/*
+		   TNtuple * dataNTuple = new TNtuple( "dataNTuple", "All data", observableNames.c_str() );
 
 		//Loop over all data points and add them to the NTuple
 		for ( int dataIndex = 0; dataIndex < (*data_iter)->GetDataNumber(); ++dataIndex)
 		{
-			//Retrieve the values of all observables
-			Float_t* observables = new Float_t[ allNames.size() ];
-			for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
-			{
-				DataPoint * temporaryDataPoint = (*data_iter)->GetDataPoint(dataIndex);
-				observables[nameIndex] = Float_t(temporaryDataPoint->GetObservable( allNames[nameIndex] )->GetValue());
-				//delete temporaryDataPoint;
-			}
-
-			//Populate the NTuple
-			dataNTuple->Fill(observables);
-			delete[] observables;
+		//Retrieve the values of all observables
+		Float_t* observables = new Float_t[ allNames.size() ];
+		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex)
+		{
+		DataPoint * temporaryDataPoint = (*data_iter)->GetDataPoint(dataIndex);
+		observables[nameIndex] = Float_t(temporaryDataPoint->GetObservable( allNames[nameIndex] )->GetValue());
+		//delete temporaryDataPoint;
 		}
 
+		//Populate the NTuple
+		dataNTuple->Fill(observables);
+		delete[] observables;
+		}
+		*/
+
 		//Write the file
-		rootFile->Write("dataNTuple");
+		dataTree->Write("",TObject::kOverwrite);
+		//dataNTuple->Write("",TObject::kOverwrite);
+		rootFile->Write("",TObject::kOverwrite);
 		rootFile->Close();
 
 	}
@@ -885,7 +908,7 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 
 	for( unsigned int param_i=0; param_i< allNames.size(); ++param_i )
 	{
-		ObservableRef thisParamName( allNames[param_i] );
+		string thisParamName( allNames[param_i] );
 
 		vector<double> ParameterValues, ParameterErrors, ParameterOriginalValues;
 		vector<double> ParameterPulls, ParameterStepSizes;
@@ -903,10 +926,26 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 			ParameterMaximums.push_back( thisParam->GetMaximum() );
 			ParameterOriginalValues.push_back( thisParam->GetOriginalValue() );
 
-			if( thisParam->GetType() == "Fixed" )	ParameterFixedStatus.push_back( 1 );
-			else ParameterFixedStatus.push_back( 0 );
-			if( thisParam->GetScanStatus() ) ParameterScanStatus.push_back( 1 );
-			else ParameterScanStatus.push_back( 0 );
+			if( thisParam->GetType() == "Fixed" )
+			{
+				ParameterFixedStatus.push_back( 1 );
+			}
+			else
+			{
+				ParameterFixedStatus.push_back( 0 );
+			}
+
+			if( thisParam->GetScanStatus() ) cout << "Scanned: " << string(thisParamName) << endl;
+
+			if( thisParam->GetScanStatus() )
+			{
+				ParameterScanStatus.push_back( 1 );
+			}
+			else
+			{
+				ParameterScanStatus.push_back( 0 );
+			}
+
 			if( thisParam->GetAssym() )
 			{
 				ParameterErrorsHigh.push_back( thisParam->GetErrHi() );
@@ -919,7 +958,9 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 		}
 		string BranchName=allNames[param_i];
 		ResultFormatter::AddBranch( outputTree, BranchName+"_value", ParameterValues );
-		if( ToyResult->GetFitResult(0)->GetResultParameterSet()->GetResultParameter(thisParamName)->GetType() != "Fixed" )
+		bool fixed_param = ToyResult->GetFitResult(0)->GetResultParameterSet()->GetResultParameter(thisParamName)->GetType() == "Fixed";
+		bool scanned_param = ToyResult->GetFitResult(0)->GetResultParameterSet()->GetResultParameter(thisParamName)->GetScanStatus();
+		if( !fixed_param || scanned_param )
 		{
 			ResultFormatter::AddBranch( outputTree, BranchName+"_error", ParameterErrors );
 			ResultFormatter::AddBranch( outputTree, BranchName+"_gen", ParameterOriginalValues );
@@ -950,19 +991,19 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 
 	//	Ntuples are 'stupid' objects in ROOT and the basic one can only handle float type objects
 	/*TNtuple * parameterNTuple;
-	parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader());
-	Float_t * resultArr;
-	for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
-	{
-		vector<double> result = ToyResult->GetFlatResult(resultIndex);
-		resultArr = new Float_t [result.size()];
-		copy( result.begin(), result.end(), resultArr);
-		parameterNTuple->Fill( resultArr );
-		delete [] resultArr;
-	}*/
+	  parameterNTuple = new TNtuple("RapidFitResult", "RapidFitResult", ToyResult->GetFlatResultHeader());
+	  Float_t * resultArr;
+	  for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
+	  {
+	  vector<double> result = ToyResult->GetFlatResult(resultIndex);
+	  resultArr = new Float_t [result.size()];
+	  copy( result.begin(), result.end(), resultArr);
+	  parameterNTuple->Fill( resultArr );
+	  delete [] resultArr;
+	  }*/
 
 	vector<double> MatrixElements; vector<string> MatrixNames;
-        TTree * tree = new TTree("corr_matrix", "Elements from Correlation Matricies");
+	TTree * tree = new TTree("corr_matrix", "Elements from Correlation Matricies");
 	tree->Branch("MartrixElements", "std::vector<double>", &MatrixElements );
 	tree->Branch("MartrixNames", "std::vector<string>", &MatrixNames );
 	for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )

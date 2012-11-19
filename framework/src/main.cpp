@@ -243,7 +243,7 @@ int RapidFit( int argc, char * argv[] )
 	//Do 2D LL scan
 	if( main_fitResult>-1 )
 		if( thisConfig->doLLcontourFlag || ( thisConfig->doFC_Flag && !thisConfig->makeOutput->Get2DScanList().empty() ) )
-				if( !thisConfig->FC_LL_PART_Flag && !thisConfig->doLLscanFlag ) Perform2DLLScan( thisConfig );
+			if( !thisConfig->FC_LL_PART_Flag && !thisConfig->doLLscanFlag ) Perform2DLLScan( thisConfig );
 
 	//	12b)
 	//	Do the main work of the FC scan
@@ -351,6 +351,11 @@ int PerformLLScan( RapidFitConfiguration* config )
 	//  Store
 	vector<string> LLscanList = config->makeOutput->GetScanList();
 
+	for( unsigned int scan_num=0; scan_num < LLscanList.size() ; ++scan_num)
+	{
+		cout << "Scanning: " << LLscanList[scan_num] << endl;
+	}
+
 	for(unsigned int scan_num=0; scan_num < LLscanList.size() ; ++scan_num)
 	{
 		if( config->StartAtCenterFlag )
@@ -397,7 +402,7 @@ int PerformLLScan( RapidFitConfiguration* config )
 			TString time_stamped_name( new_output_scan_dat ); time_stamped_name.Append( "_" ); time_stamped_name.Append( StringProcessing::TimeString() );
 			new_output_scan_dat.Append(".root"); time_stamped_name.Append(".root");
 			vector<FitResultVector*> ammended_format;
-			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[this_scan_num] )->SetScanStatus( true );
+			config->GlobalResult->GetResultParameterSet()->GetResultParameter( string(LLscanList[this_scan_num]) )->SetScanStatus( true );
 
 			//	The output file format is [0] = Global_CV, [1] = Scan_CV_1, [2] = Global_CV, [3] = Scan_CV_2 ...
 			for( int i=0; i< scanSoloResults[this_scan_num]->NumberResults(); ++i )
@@ -502,17 +507,17 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	config->GlobalResult = FitAssembler::DoSafeFit( config->theMinimiser, config->theFunction, config->argumentParameterSet,
 
-				config->pdfsAndData, config->XMLConstraints, config->Force_Continue_Flag, config->OutputLevel, config->debug );
+			config->pdfsAndData, config->XMLConstraints, config->Force_Continue_Flag, config->OutputLevel, config->debug );
 
 	cout << "Finished Fitting :D" << endl;
 
-        if( config->debug != NULL )
-        {
-                if( config->debug->DebugThisClass( "main" ) )
-                {
-                        cout << "main: Stopping Timer" << endl;
-                }
-        }
+	if( config->debug != NULL )
+	{
+		if( config->debug->DebugThisClass( "main" ) )
+		{
+			cout << "main: Stopping Timer" << endl;
+		}
+	}
 
 	config->GlobalFitResult->AddFitResult( config->GlobalResult );
 
@@ -695,14 +700,14 @@ int PerformMainFit( RapidFitConfiguration* config )
 	}
 
 	if( config->GOF_Flag ) {
-	        PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
-        	pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
-               	IDataSet * data = pdfAndData->GetDataSet();
-                IPDF * pdf = pdfAndData->GetPDF();
-                PhaseSpaceBoundary * phase = data->GetBoundary();
+		PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
+		pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
+		IDataSet * data = pdfAndData->GetDataSet();
+		IPDF * pdf = pdfAndData->GetPDF();
+		PhaseSpaceBoundary * phase = data->GetBoundary();
 		GoodnessOfFit::plotUstatistic( pdf, data, phase, "ustat.pdf" );
 		/*
-		TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
+		   TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
 		//double pvalue = GoodnessOfFit::gofLoop( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, nData );
 		double pvalue = GoodnessOfFit::fitDataCalculatePvalue( config->xmlFile, config->theMinimiser, config->theFunction, config->argumentParameterSet, config->GlobalResult );
 		pvalueHist->Fill( pvalue );
@@ -867,44 +872,44 @@ int calculateFitFractions( RapidFitConfiguration* config )
 	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
 	pdfAndData->SetPhysicsParameters( config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
 
-    IDataSet * dataSet = pdfAndData->GetDataSet();
+	IDataSet * dataSet = pdfAndData->GetDataSet();
 	IPDF * pdf = pdfAndData->GetPDF();
 
-    RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( pdf );
+	RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( pdf );
 	double total_integral(0.);
 	double integral(0.);
 	double fraction(0.);
-    double sumOfFractions(-1.);
+	double sumOfFractions(-1.);
 
-    TFile * f = TFile::Open("fitFractions.root", "RECREATE");
-    TTree * tree = new TTree("tree", "tree containing fit fractions");
+	TFile * f = TFile::Open("fitFractions.root", "RECREATE");
+	TTree * tree = new TTree("tree", "tree containing fit fractions");
 
-    vector<double> fitFractions;
-    vector<string> doNotIntegrate;
-    vector<string> pdfComponents = pdf->PDFComponents();
-    pdfComponents = StringProcessing::MoveElementToStart( pdfComponents, "0" );
+	vector<double> fitFractions;
+	vector<string> doNotIntegrate;
+	vector<string> pdfComponents = pdf->PDFComponents();
+	pdfComponents = StringProcessing::MoveElementToStart( pdfComponents, "0" );
 	for( unsigned int i = 0; i < pdfComponents.size(); ++i )
 	{
 		ComponentRef * thisRef = new ComponentRef( pdfComponents[i] );
-        integral = testIntegrator->NumericallyIntegratePhaseSpace( dataSet->GetBoundary(), doNotIntegrate, thisRef );
+		integral = testIntegrator->NumericallyIntegratePhaseSpace( dataSet->GetBoundary(), doNotIntegrate, thisRef );
 		if ( pdfComponents[i] == "0" ) total_integral = integral;
-        delete thisRef;
-        fraction = integral/total_integral;
-        if ( pdfComponents[i] != "0" ) std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
-	    fitFractions.push_back( fraction );
-        sumOfFractions += fraction;
-    }
-    std::cout << "Sum of fractions (not necessarily 1!): " << sumOfFractions << std::endl;
+		delete thisRef;
+		fraction = integral/total_integral;
+		if ( pdfComponents[i] != "0" ) std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
+		fitFractions.push_back( fraction );
+		sumOfFractions += fraction;
+	}
+	std::cout << "Sum of fractions (not necessarily 1!): " << sumOfFractions << std::endl;
 
-    fitFractions.push_back( sumOfFractions );
-    tree->Branch("fractions", "std::vector<double>", &fitFractions);
-    tree->Fill();
-    f->Write();
+	fitFractions.push_back( sumOfFractions );
+	tree->Branch("fractions", "std::vector<double>", &fitFractions);
+	tree->Fill();
+	f->Write();
 	f->Close();
 
-    delete testIntegrator;
+	delete testIntegrator;
 	delete pdfAndData;
-    return 1;
+	return 1;
 }
 
 int calculateAcceptanceWeights( RapidFitConfiguration* config )
@@ -1158,6 +1163,7 @@ int testIntegrator( RapidFitConfiguration* config )
 int saveOneDataSet( RapidFitConfiguration* config )
 {
 	//Make a file containing toy data from the PDF
+	cout << "Saving One DataSet: Constructing PDFs&DataSets " << endl;
 	vector<PDFWithData*> quickDataGen = config->xmlFile->GetPDFsAndData();
 	for( unsigned int i=0; i< quickDataGen.size(); ++i )
 	{
