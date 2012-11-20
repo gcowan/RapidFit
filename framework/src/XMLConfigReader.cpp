@@ -348,14 +348,14 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 				}
 			}
 		}
-		if( debug->GetStatus() ) cout << "XMLConfigReader:\tMinimiser: " << minimiserName << " requested in XML, creating" << endl;
+		if( debug->DebugThisClass( "XMLConfigReader" ) ) cout << "XMLConfigReader:\tMinimiser: " << minimiserName << " requested in XML, creating" << endl;
 		returnableConfig = new MinimiserConfiguration( minimiserName, GetOutputConfiguration() );
 		returnableConfig->SetSteps( MAXIMUM_MINIMISATION_STEPS );
 		returnableConfig->SetTolerance( FINAL_GRADIENT_TOLERANCE );
 		returnableConfig->SetOptions( minimiserOptions );
 		returnableConfig->SetQuality( Quality );
 		returnableConfig->SetMultiMini( MultiMini );
-		if( debug->GetStatus() )
+		if( debug->DebugThisClass( "XMLConfigReader" ) )
 		{
 			cout << "XMLConfigReader:\tMinimiser Configured With:\t" << endl;
 			cout << "XMLConfigReader:\tSteps:\t" << MAXIMUM_MINIMISATION_STEPS << endl;
@@ -449,7 +449,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 		}
 
-		if( debug->GetStatus() )
+		if( debug->DebugThisClass( "XMLConfigReader" ) )
 		{
 			cout << "XMLConfigReader:\tOutput Configuration Requested, Contructing." << endl;
 		}
@@ -598,6 +598,10 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		else if( projComps[childIndex]->GetName() == "DrawPull" )
 		{
 			returnable_config->DrawPull = XMLTag::GetBooleanValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "LimitPulls" )
+		{
+			returnable_config->LimitPulls = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
 		else if( projComps[childIndex]->GetName() == "AddLHCb" )
 		{
@@ -2544,25 +2548,7 @@ vector<int> XMLConfigReader::GetAllStartEntries()
 
 void XMLConfigReader::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass( *input_debug );
-
-		if( debug->DebugThisClass("XMLConfigReader") )
-		{
-			debug->SetStatus(true);
-			cout << "XMLConfigReader: Debugging Enabled!" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 

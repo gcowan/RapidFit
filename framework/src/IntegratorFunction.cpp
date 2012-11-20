@@ -101,7 +101,6 @@ IntegratorFunction::IntegratorFunction ( const IntegratorFunction& input ) :
 	newDataPoint( new DataPoint(*input.newDataPoint) ), cache_lookup( input.cache_lookup ), lower_limit( input.lower_limit ), upper_limit( input.upper_limit ), generateFunc( input.generateFunc ),
 	integrateFunc( input.integrateFunc ), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *input.myPhaseSpaceBoundary ) ), debug( (input.debug==NULL)?NULL:new DebugClass(*input.debug) )
 {
-	if(input.debug!=NULL) if( !(input.debug->GetStatus()) ) debug->SetStatus(false);
 }
 
 //Return the IPDF inside the wrapper
@@ -223,7 +222,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 			result = wrappedFunction->EvaluateComponent( newDataPoint, componentIndex );
 			if( isnan(result) || fabs(result)>=DBL_MAX )
 			{
-				if( debug->GetStatus() )
+				if( debug->DebugThisClass( "IntegratorFunction" ) )
 				{
 					cout << "Component Value:" << result << endl;
 					newDataPoint->Print();
@@ -236,7 +235,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 			result = wrappedFunction->EvaluateForNumericIntegral( newDataPoint );
 			if( isnan(result) || fabs(result)>=DBL_MAX )
 			{
-				if( debug->GetStatus() )
+				if( debug->DebugThisClass( "IntegratorFunction" ) )
 				{
 					cout << "Evaluate for Numerical Integral Value:" << result << endl;
 					newDataPoint->Print();
@@ -311,24 +310,7 @@ Double_t IntegratorFunction::Density( Int_t ndim, Double_t * xArray )
 
 void IntegratorFunction::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(*input_debug);
-		if( debug->DebugThisClass( "IntegratorFunction" ) )
-		{
-			debug->SetStatus(true);
-			cout << "IntegratorFunction: Debugging Enabled" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 

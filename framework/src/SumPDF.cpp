@@ -327,29 +327,8 @@ void SumPDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
 
 void SumPDF::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		firstPDF->SetDebug( input_debug );
-		secondPDF->SetDebug( input_debug );
-
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(*input_debug);
-
-		if( debug->DebugThisClass("SumPDF") )
-		{
-			debug->SetStatus(true);
-			cout << "SumPDF: Debugging Enabled!" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass( false );
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 
 string SumPDF::GetComponentName( ComponentRef* componentIndexObj )

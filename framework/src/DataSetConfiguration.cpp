@@ -66,7 +66,6 @@ DataSetConfiguration::DataSetConfiguration ( const DataSetConfiguration& input )
 	generatePDF( (input.generatePDF==NULL)?NULL:ClassLookUp::CopyPDF(input.generatePDF) ), separateGeneratePDF(input.separateGeneratePDF), parametersAreSet(input.parametersAreSet),
 	Start_Entry(input.Start_Entry), DEBUG_DATA(input.DEBUG_DATA), internalBoundary(NULL), internalRef(NULL), debug( new DebugClass(*input.debug)), fileName( input.fileName )
 {
-	if( !(input.debug->GetStatus()) ) debug->SetStatus(false);
 	if( input.internalBoundary != NULL )
 	{
 		internalBoundary = new PhaseSpaceBoundary( *input.internalBoundary );
@@ -655,26 +654,8 @@ string DataSetConfiguration::XML() const
 
 void DataSetConfiguration::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass( *input_debug );
-
-		if( debug->DebugThisClass("DataSetConfiguration") )
-		{
-			debug->SetStatus(true);
-			cout << "DataSetConfiguration: Debugging Enabled!" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 
 PhaseSpaceBoundary* DataSetConfiguration::GetPhaseSpace() const

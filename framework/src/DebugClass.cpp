@@ -10,7 +10,6 @@ using namespace::std;
 
 DebugClass::DebugClass( bool input ) : perform_debugging( input ), classes_to_debug()
 {
-	if( !input ) classes_to_debug.push_back( "default" );
 }
 
 DebugClass::DebugClass( const DebugClass& input ) :
@@ -18,14 +17,9 @@ DebugClass::DebugClass( const DebugClass& input ) :
 {
 }
 
-bool DebugClass::GetStatus() const
+void DebugClass::SetDebugAll( bool input )
 {
-	return perform_debugging;
-}
-
-void DebugClass::SetStatus( bool input )
-{
-	perform_debugging = input;
+	perform_debugging = true;
 }
 
 void DebugClass::SetClassNames( vector<string> input )
@@ -38,24 +32,30 @@ vector<string> DebugClass::GetClassNames() const
 	return classes_to_debug;
 }
 
-bool DebugClass::DebugThisClass( const string name )
+bool DebugClass::DebugThisClass( const string name ) const
 {
-	if( !perform_debugging ) return false;
+	if( name.empty() ) return false;
+	if( perform_debugging )
+	{
+		return true;
+	}
 	else
 	{
 		if( classes_to_debug.empty() )
 		{
-			return true;
+			return false;
 		}
 		else
 		{
 			string thisName=name;
 			//cout << thisName << " : " << classes_to_debug[0] << endl;
-			int num = StringProcessing::VectorContains( &classes_to_debug, &thisName );
+			int num = -1;
+			num = StringProcessing::VectorContains( &classes_to_debug, &thisName );
 			//cout << num << endl;
 			if( num == -1 ) return false;
 			else return true;
 		}
 	}
+	return false;
 }
 

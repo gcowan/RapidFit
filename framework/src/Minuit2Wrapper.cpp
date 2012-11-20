@@ -224,24 +224,7 @@ void Minuit2Wrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 
 void Minuit2Wrapper::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass( *input_debug );
-		if( debug->DebugThisClass("Minuit2Wrapper") )
-		{
-			debug->SetStatus(true);
-			cout << "Minuit2Wrapper: Debugging Enabled!" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 

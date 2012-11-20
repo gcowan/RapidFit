@@ -558,24 +558,7 @@ void OutputConfiguration::SetInputResults( ResultParameterSet* oneResult )
 
 void OutputConfiguration::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass( *input_debug );
-		if( debug->DebugThisClass("OutputConfiguration") )
-		{
-			debug->SetStatus(true);
-			cout << "OutputConfiguration: Debugging Enabled!" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 

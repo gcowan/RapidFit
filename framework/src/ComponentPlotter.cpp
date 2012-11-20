@@ -728,7 +728,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				TString desc_pull( desc );
 				desc_pull.Append("_pull");
 
-				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc_pull.Data(), plotPDF->GetRandomFunction() );
+				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc_pull.Data(), plotPDF->GetRandomFunction(), this_config );
 
 				/*
 				   for( unsigned int i=0; i< (unsigned)binned_data[combinationIndex]->GetN(); ++i )
@@ -1115,7 +1115,8 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 }
 
 //	Plot all components on this combinations and print and save the canvas
-void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary, vector<double> input_bin_theory_data, TRandom* rand, CompPlotter_config* conf, DebugClass* debug )
+void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName,
+		string CombinationDescription, PhaseSpaceBoundary* total_boundary, vector<double> input_bin_theory_data, TRandom* rand, CompPlotter_config* conf, DebugClass* debug )
 {
 	if( rand == NULL ) rand = gRandom;
 	TString TCanvas_Name("Overlay_"+observableName+"_"+CombinationDescription+"_");TCanvas_Name+=rand->Rndm();
@@ -1155,6 +1156,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	double legend_size=0.25;
 
 	bool addLHCb=false;
+	bool limitPulls=false;
 	if( conf != NULL )
 	{
 		if( conf->logY )
@@ -1177,6 +1179,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		X_Title = conf->xtitle;
 		Y_Title = conf->ytitle;
 		final_chi2 = conf->Chi2Value;
+		limitPulls = conf->LimitPulls;
 	}
 
 	input_data->SetTitle( plotTitle );
@@ -1345,6 +1348,10 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	pullGraph->GetYaxis()->SetTitleSize((Float_t)(pullGraph->GetYaxis()->GetTitleSize()*2.));
 	pullGraph->GetXaxis()->SetTitleOffset((Float_t)(pullGraph->GetXaxis()->GetTitleOffset()/3.));
 	pullGraph->GetXaxis()->SetTitleSize((Float_t)(pullGraph->GetXaxis()->GetTitleSize()*2.));
+	if( limitPulls )
+	{
+		pullGraph->GetYaxis()->SetRangeUser( -5., 5. );
+	}
 	pad2->Modified();
 	pad2->Update();
 	c1->Update();
@@ -1729,30 +1736,8 @@ pair<double,double> ComponentPlotter::GetChi2Numbers()
 
 void ComponentPlotter::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass( *input_debug );
-		if( debug->DebugThisClass("ComponentPlotter") )
-		{
-			debug->SetStatus(true);
-			vector<string> names = debug->GetClassNames();
-			names.push_back( "RapidFitIntegrator" );
-			names.push_back( "IntegrationFunction" );
-			pdfIntegrator->SetDebug( debug );
-			debug->SetClassNames( names );
-			cout << "ComponentPlotter: Debugging Enabled!" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 
 
@@ -1763,7 +1748,6 @@ vector<double> ComponentPlotter::GetFunctionEval()
 
 TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data, TGraphErrors* input_data, string observableName, string CombinationDescription, TRandom* rand, CompPlotter_config* conf, DebugClass* debug )
 {
-	(void) conf;
 	if( rand == NULL ) rand = gRandom;
 
 	vector<double> pull_value;
@@ -1812,6 +1796,16 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	TCanvas* c1 = new TCanvas( canvas_name, canvas_name, 1680, 1050 );
 	pullGraph->Draw("AP9");
 	c1->Update();
+
+	if( conf != NULL )
+	{
+		if( conf->LimitPulls )
+		{
+			pullGraph->GetYaxis()->SetRangeUser(-5.,5.);
+			c1->Update();
+		}
+	}
+
 	//pullGraph->GetYaxis()->SetRangeUser(-5.,5.);
 
 	TString X_Title;

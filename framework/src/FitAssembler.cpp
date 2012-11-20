@@ -226,6 +226,23 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			(void) someVal;
 		}
 
+		IPDF* genPDF = BottleData[resultIndex]->GetDataSetConfig()->GetGenerationPDF();
+
+		if( genPDF != NULL )
+		{
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass( "FitAssembler" ) )
+				{
+					cout << "FitAssembler: Checking for all required Generation PDFs" << endl;
+				}
+			}
+
+			CheckInputParams( checkedGenerationParameters, vector<IPDF*>(1,genPDF), debug );
+
+			genPDF->UpdatePhysicsParameters( checkedGenerationParameters );
+		}
+
 		if( debug != NULL )
 		{
 			if( debug->DebugThisClass( "FitAssembler" ) )

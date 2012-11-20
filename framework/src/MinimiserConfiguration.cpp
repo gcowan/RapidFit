@@ -134,25 +134,7 @@ string MinimiserConfiguration::XML() const
 
 void MinimiserConfiguration::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass( *input_debug );
-
-		if( debug->DebugThisClass("MinimiserConfiguration") )
-		{
-			debug->SetStatus(true);
-			cout << "MinimiserConfiguration: Debugging Enabled!" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 

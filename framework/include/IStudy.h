@@ -106,26 +106,8 @@ class IStudy
 
 		virtual void SetDebug( DebugClass* input_debug )
 		{
-			if( input_debug != NULL )
-			{
-				if( debug != NULL ) delete debug;
-				debug = new DebugClass( *input_debug );
-
-				if( debug->DebugThisClass("IStudy") )
-				{
-					debug->SetStatus(true);
-					cout << "IStudy: Debugging Enabled!" << endl;
-				}
-				else
-				{
-					debug->SetStatus(false);
-				}
-			}
-			else
-			{
-				if( debug != NULL ) delete debug;
-				debug = new DebugClass(false);
-			}
+			if( debug != NULL ) delete debug;
+			debug = new DebugClass( *input_debug );
 		}
 
 	private:

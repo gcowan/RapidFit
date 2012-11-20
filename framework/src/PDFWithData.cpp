@@ -225,26 +225,8 @@ string PDFWithData::XML() const
 
 void PDFWithData::SetDebug( DebugClass* input_debug )
 {
-        if( input_debug != NULL )
-        {
-                if( debug != NULL ) delete debug;
-                debug = new DebugClass( *input_debug );
-
-                if( debug->DebugThisClass("PDFWithData") )
-                {
-                        debug->SetStatus(true);
-                        cout << "PDFWithData: Debugging Enabled!" << endl;
-                }
-                else
-                {
-                        debug->SetStatus(false);
-                }
-        }
-        else
-        {
-                if( debug != NULL ) delete debug;
-                debug = new DebugClass(false);
-        }
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 
 void PDFWithData::UseEventWeights( const string Name )

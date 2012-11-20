@@ -178,13 +178,18 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		return exit_RapidFit;
 	}
 
+	cout << "Current Runtime Arguments: " << endl;
+	for( int i=0; i< argc; ++i )
+	{
+		cout << argv[i] << " ";
+	}
+	cout << endl;
+
 	//Parse command line arguments
 
 	for ( int argumentIndex = 1; argumentIndex < argc; ++argumentIndex )
 	{
 		string currentArgument = string( argv[argumentIndex] );
-
-		cout << "Current Argument: " << currentArgument << endl;
 
 		if( currentArgument == "--about" )
 		{
@@ -577,7 +582,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 			{
 				++argumentIndex;
 				vector<string> class_names = StringProcessing::SplitString( argv[argumentIndex], ':' );
-				DebugClass* thisDebug = new DebugClass( true );
+				DebugClass* thisDebug = new DebugClass( false );
 				thisDebug->SetClassNames( class_names );
 
 				if( config.debug != NULL ) delete config.debug;
@@ -588,7 +593,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		//	The Parameters beyond here are for setting boolean flags
 		else if( currentArgument == "--testIntegrator" )			{	config.testIntegratorFlag = true;			}
 		else if( currentArgument == "--testRapidIntegrator" )			{	config.testRapidIntegratorFlag = true;			}
-		else if( currentArgument == "--calculateFitFractions" )		{	config.calculateFitFractionsFlag = true;		}
+		else if( currentArgument == "--calculateFitFractions" )			{	config.calculateFitFractionsFlag = true;		}
 		else if( currentArgument == "--calculateAcceptanceWeights" )		{	config.calculateAcceptanceWeights = true;		}
 		else if( currentArgument == "--calculateAcceptanceWeightsWithSwave" )	{	config.calculateAcceptanceWeightsWithSwave = true;	}
 		else if( currentArgument == "--calculatePerEventAcceptance" )		{	config.calculatePerEventAcceptance = true;		}

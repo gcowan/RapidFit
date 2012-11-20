@@ -29,6 +29,7 @@ BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string
 	do_i_control_the_cache(false), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()),
 	debug_mutex(NULL), can_remove_mutex(true), debug(NULL), myIntegrator(NULL) , fixed_checked(false), isFixed(false), fixedID(0)
 {
+	debug = new DebugClass();
 	component_list.push_back( "0" );
 	debug_mutex = new pthread_mutex_t();
 	myIntegrator = new RapidFitIntegrator( this );
@@ -813,30 +814,8 @@ void BasePDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
 
 void BasePDF::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL  ) delete debug;
-		debug = new DebugClass(*input_debug);
-
-		if( debug->DebugThisClass("BasePDF") )
-		{
-			debug->SetStatus(true);
-			cout << "BasePDF: Debugging Enabled!" << endl;
-		}
-		else if( debug->DebugThisClass("PDF") )
-		{
-			debug->SetStatus(true);
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 }
 
 string BasePDF::GetComponentName( ComponentRef* input )

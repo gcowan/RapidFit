@@ -94,8 +94,6 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 		(void) type;	//	For the global state of ROOT
 		oneDimensionIntegrator = new IntegratorOneDim( );//*(input.oneDimensionIntegrator) );
 	}
-
-	if(input.debug!=NULL) if( !(input.debug->GetStatus()) ) debug->SetStatus(false);
 }
 
 bool RapidFitIntegrator::GetUseGSLIntegrator() const
@@ -846,26 +844,8 @@ void RapidFitIntegrator::ForceTestStatus( bool input )
 
 void RapidFitIntegrator::SetDebug( DebugClass* input_debug )
 {
-	if( input_debug != NULL )
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(*input_debug);
-
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			debug->SetStatus(true);
-			cout << "RapidFitIntegrator: Debugging Enabled!" << endl;
-		}
-		else
-		{
-			debug->SetStatus(false);
-		}
-	}
-	else
-	{
-		if( debug != NULL ) delete debug;
-		debug = new DebugClass(false);
-	}
+	if( debug != NULL ) delete debug;
+	debug = new DebugClass( *input_debug );
 	if( functionToWrap != NULL ) functionToWrap->SetDebug( input_debug );
 }
 
