@@ -645,7 +645,7 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		}
 		else
 		{
-			cerr << "Sorry Don't understand: " << projComps[childIndex]->GetName() << " ignoring!" << endl;
+			cerr << "XMLConfigurationReader: Sorry Don't understand XMLTag: " << projComps[childIndex]->GetName() << " ignoring!" << endl;
 		}
 	}
 
