@@ -2,6 +2,8 @@
 
 2012/11/21 Rob Currie
   - Fixed bugs in DebugClass usage
+  - Fixed .C output from ComponentPlotter
+       Generated Code is not 100% human readable due to auto-generated names inside RapidFit&&ROOT but it allows you to modify the plot after it's been produced
 
 2012/11/20 Rob Currie
   - Fixed a bug to do with missing parameters in the XML for the PDF to do with Generation

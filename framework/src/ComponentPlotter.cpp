@@ -40,6 +40,7 @@
 #include <math.h>
 #include <float.h>
 #include <cstdlib>
+#include <algorithm>
 #define DOUBLE_TOLERANCE 1E-6
 
 using namespace::std;
@@ -578,20 +579,30 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			TH1* data_plot = this->FormatData( combinationIndex );
 			TString ext("_"); ext+=componentIndex; ext.Append("_"); ext+=combinationIndex;
 			ext.Append("_"); ext+=plotPDF->GetRandomFunction()->Rndm();
-			data_plot->SetName( data_plot->GetName() + ext );
+			string cleanExt( ext.Data() );
+			replace( cleanExt.begin(), cleanExt.end(), '.', '_' );
+			data_plot->SetName( data_plot->GetName() + TString(cleanExt.c_str()) );
 			data_plot->SetTitle( "" );
 
 			//	Plot the component on this combination and save the TCanvas
 			TString Graph_Name("TGraph_");Graph_Name+=componentIndex;
 			Graph_Name.Append("_");Graph_Name+=combinationIndex;
 			Graph_Name.Append("_");Graph_Name+=plotPDF->GetRandomFunction()->Rndm();
+
+			string graphCleanName( Graph_Name.Data() );
+			replace( graphCleanName.begin(), graphCleanName.end(), '.', '_' );
+
 			TGraph* data_graph = new TGraph( total_points,  &((*(*(*X_values)[componentIndex])[combinationIndex])[0]),  &((*(*(*Y_values)[componentIndex])[combinationIndex])[0]) );
-			data_graph->SetTitle( "" ); data_graph->SetName( Graph_Name );
+			data_graph->SetTitle( "" ); data_graph->SetName( graphCleanName.c_str() );
 
 			TString Canvas_Name("TCanvas_");Canvas_Name+=componentIndex;
 			Canvas_Name.Append("_");Canvas_Name+=combinationIndex;
 			Canvas_Name.Append("_");Canvas_Name+=plotPDF->GetRandomFunction()->Rndm();
-			TCanvas* c1 = new TCanvas( Canvas_Name, "", 1680, 1050 );
+
+			string CanvasCleanName( Canvas_Name.Data() );
+			replace( CanvasCleanName.begin(), CanvasCleanName.end(), '.', '_' );
+
+			TCanvas* c1 = new TCanvas( CanvasCleanName.c_str(), "", 1680, 1050 );
 
 			data_plot->Draw();
 			data_graph->Draw("PC9 SAME");
@@ -630,7 +641,11 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			TGraph* data_graph = new TGraph( total_points,  &((*(*(*X_values)[componentIndex])[combinationIndex])[0]),  &((*(*(*Y_values)[componentIndex])[combinationIndex])[0]) );
 			TString data_name("data_"+combinationIndexstr+"_");data_name+=componentIndex;
 			data_name.Append("_"); data_name+=plotPDF->GetRandomFunction()->Rndm();
-			data_graph->SetName( data_name ); data_graph->SetTitle( data_name );
+
+			string dataCleanName( data_name );
+			replace( dataCleanName.begin(), dataCleanName.end(), '.', '_' );
+
+			data_graph->SetName( dataCleanName.c_str() ); data_graph->SetTitle( dataCleanName.c_str() );
 			data_graph->SetLineColor( (Color_t)(componentIndex+1) );
 			data_graph->SetMarkerColor( (Color_t)(componentIndex+1) );
 			these_components.push_back( data_graph );
@@ -639,7 +654,9 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 		TH1* data_plot = this->FormatData( combinationIndex );
 		TString ext("_"); ext+=combinationIndex; ext.Append("_"); ext+=plotPDF->GetRandomFunction()->Rndm();
-		data_plot->SetName( data_plot->GetName() + ext );
+		string cleanExt( ext.Data() );
+		replace( cleanExt.begin(), cleanExt.end(), '.', '_' );
+		data_plot->SetName( data_plot->GetName() + TString(cleanExt.c_str()) );
 		data_plot->SetTitle( "" );
 
 		//	Object to hold the binned data for the life of this plot
@@ -800,8 +817,12 @@ vector<TGraph*> ComponentPlotter::MergeComponents( vector<vector<TGraph*> > inpu
 
 		//      Objects must have unqiue names, even though they exist in different memory locations, THANK YOU ROOT GARBAGE COLLECTION!!! (this is the singally worst idea ever to grace c++!)
 		TString TGraphName("TGraph_");TGraphName+=rand->Rndm();
+
+		string TGRaphCleanName( TGraphName.Data() );
+		replace( TGRaphCleanName.begin(), TGRaphCleanName.end(), '.', '_' );
+
 		TGraph* output_graph = new TGraph( (Int_t)X_val[0].size(), &(final_X_val[0]), &(final_Y_val[0]) );
-		output_graph->SetName( TGraphName );
+		output_graph->SetName( TGRaphCleanName.c_str() );
 		output_graph->SetTitle("");
 		output_graph->SetLineColor( this_component[0]->GetLineColor() );
 		output_graph->SetLineStyle( this_component[0]->GetLineStyle() );
@@ -865,8 +886,12 @@ TGraphErrors* ComponentPlotter::MergeBinnedData( vector<TGraphErrors*> input, TR
 
 	//      Objects must have unqiue names, even though they exist in different memory locations, THANK YOU ROOT GARBAGE COLLECTION!!! (this is the singally worst idea ever to grace c++!)
 	TString TGraphErrorsName("TGraphErrors_");TGraphErrorsName+=rand->Rndm();
+
+	string TGraphErrorsCleanName( TGraphErrorsName.Data() );
+	replace( TGraphErrorsCleanName.begin(), TGraphErrorsCleanName.end(), '.', '_' );
+
 	TGraphErrors* output_graph = new TGraphErrors( (Int_t)X_val[0].size(), &(final_X_val[0]), &(final_Y_val[0]), &(final_X_err[0]), &(final_Y_err[0]) );
-	output_graph->SetName( TGraphErrorsName );
+	output_graph->SetName( TGraphErrorsCleanName.c_str() );
 	output_graph->SetTitle("");
 
 	output_graph->SetLineColor( input[0]->GetLineColor() );
@@ -884,7 +909,10 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( rand == NULL ) rand = gRandom;
 	TString TCanvas_Name("Overlay_"+observableName+"_"+CombinationDescription+"_");TCanvas_Name+=rand->Rndm();
 
-	TCanvas* c1 = new TCanvas( TCanvas_Name, "", 1680, 1050 );
+	string TCanvasCleanName( TCanvas_Name.Data() );
+	replace( TCanvasCleanName.begin(), TCanvasCleanName.end(), '.', '_' );
+
+	TCanvas* c1 = new TCanvas( TCanvasCleanName.c_str(), "", 1680, 1050 );
 
 	TString plotTitle;
 
@@ -1121,9 +1149,12 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	if( rand == NULL ) rand = gRandom;
 	TString TCanvas_Name("Overlay_"+observableName+"_"+CombinationDescription+"_");TCanvas_Name+=rand->Rndm();
 
+	string TCanvasCleanName( TCanvas_Name.Data() );
+	replace( TCanvasCleanName.begin(), TCanvasCleanName.end(), '.', '_' );
+
 	bool logy=false;
 
-	TCanvas* c1 = new TCanvas( TCanvas_Name, "", 1680, 1050 );
+	TCanvas* c1 = new TCanvas( TCanvasCleanName.c_str(), "", 1680, 1050 );
 
 	if( conf != NULL )
 	{
@@ -1790,10 +1821,17 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 
 	TString pullGraphName="PullGraph_"; pullGraphName+=rand->Rndm();
 
-	pullGraph->SetName( pullGraphName ); pullGraph->SetTitle( pullGraphName );
+	string pullGraphCleanName( pullGraphName.Data() );
+	replace( pullGraphCleanName.begin(), pullGraphCleanName.end(), '.', '_' );
+
+	pullGraph->SetName( pullGraphCleanName.c_str() ); pullGraph->SetTitle( pullGraphCleanName.c_str() );
 
 	TString canvas_name = "PullPlot_"; canvas_name.Append(observableName); canvas_name.Append("_"); canvas_name+=rand->Rndm();
-	TCanvas* c1 = new TCanvas( canvas_name, canvas_name, 1680, 1050 );
+
+	string canvas_clean_name( canvas_name.Data() );
+	replace( canvas_clean_name.begin(), canvas_clean_name.end(), '.', '_' );
+
+	TCanvas* c1 = new TCanvas( canvas_clean_name.c_str(), canvas_name, 1680, 1050 );
 	pullGraph->Draw("AP9");
 	c1->Update();
 
