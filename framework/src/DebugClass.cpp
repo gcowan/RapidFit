@@ -8,21 +8,26 @@
 
 using namespace::std;
 
-DebugClass::DebugClass( bool input ) : perform_debugging( input ), classes_to_debug()
+DebugClass::DebugClass( const bool input ) : perform_debugging( input ), classes_to_debug()
 {
 }
 
 DebugClass::DebugClass( const DebugClass& input ) :
-	perform_debugging( input.perform_debugging ), classes_to_debug( input.classes_to_debug )
+	perform_debugging(false), classes_to_debug()
 {
+	if( &input != NULL )
+	{
+		perform_debugging = input.perform_debugging;
+		classes_to_debug = classes_to_debug;
+	}
 }
 
-void DebugClass::SetDebugAll( bool input )
+void DebugClass::SetDebugAll( const bool input )
 {
 	perform_debugging = true;
 }
 
-void DebugClass::SetClassNames( vector<string> input )
+void DebugClass::SetClassNames( const vector<string> input )
 {
 	classes_to_debug = input;
 }

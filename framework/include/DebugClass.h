@@ -11,13 +11,12 @@ using namespace::std;
 class DebugClass
 {
 	public:
-		DebugClass( bool=false );
+		DebugClass( const bool=false );
 		DebugClass( const DebugClass& );
-		~DebugClass(){};
 
-		void SetDebugAll( bool=true );
+		void SetDebugAll( const bool=true );
 
-		void SetClassNames( vector<string> input );
+		void SetClassNames( const vector<string> input );
 
 		vector<string> GetClassNames() const;
 

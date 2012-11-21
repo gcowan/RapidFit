@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/11/21 Rob Currie
+  - Fixed bugs in DebugClass usage
+
 2012/11/20 Rob Currie
   - Fixed a bug to do with missing parameters in the XML for the PDF to do with Generation
   - Changed the code to do with Debugging so that it is MUCH simpler and 'just works'. We don't care about performance within Debugging Code (too much)

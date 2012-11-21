@@ -133,7 +133,7 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 		{
 			if( debug->DebugThisClass( "FitFunction" ) )
 			{
-				cout << "FitFuntion: Constructing Integrator Object for ToFit " << resultIndex+1 << endl;
+				cout << "FitFunction: Constructing Integrator Object for ToFit " << resultIndex+1 << endl;
 			}
 		}
 

@@ -346,8 +346,9 @@ void ProdPDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
 
 void ProdPDF::SetDebug( DebugClass* input_debug )
 {
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
+	BasePDF::SetDebug( input_debug );
+	firstPDF->SetDebug( input_debug );
+	secondPDF->SetDebug( input_debug );
 }
 
 string ProdPDF::GetComponentName( ComponentRef* componentIndexObj )

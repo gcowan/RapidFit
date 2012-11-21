@@ -207,7 +207,23 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	for( unsigned int resultIndex = 0; resultIndex < BottleData.size(); ++resultIndex )
 	{
 		//	Use the Raw input as the Generation PDF may require Parameters not involved in the main fit
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitAssembler" ) )
+			{
+				cout << "Setting Physics Parameters in Bottle" << endl;
+			}
+		}
 		BottleData[resultIndex]->SetPhysicsParameters( checkedGenerationParameters );
+
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitAssembler" ) )
+			{
+				cout << "Dsyncing Random Number Generators between PDFs" << endl;
+			}
+		}
+
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
 		for( unsigned int i=0; i<resultIndex; ++i )
 		{
@@ -222,7 +238,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 				}
 			}
 			someVal = BottleData[resultIndex]->GetPDF()->GetRandomFunction()->Rndm();
-			BottleData[resultIndex]->GetPDF()->SetDebug( debug );
+			//BottleData[resultIndex]->GetPDF()->SetDebug( debug );
 			(void) someVal;
 		}
 
@@ -259,7 +275,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		{
 			if( debug->DebugThisClass( "FitAssembler" ) )
 			{
-				cout << "FitAssembler: Adding PDF & DataSet to Bottle: " << resultIndex << " of: " << BottleData.size() << endl;
+				cout << "FitAssembler: Adding PDF & DataSet to Bottle: " << resultIndex+1 << " of: " << BottleData.size() << endl;
 			}
 		}
 
