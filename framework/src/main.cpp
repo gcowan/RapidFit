@@ -695,7 +695,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 	{
 		cout << "If you get any errors here and/or an empty Global_Fit_Result.root file, check your xml ONLY contains parameters in the fit." << endl;
 		cout << "(There is a known bug which requires a bit of work to fix)" << endl;
-		ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result.root" ), config->GlobalFitResult );
+		ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result"+StringProcessing::TimeString()+".root" ), config->GlobalFitResult );
 		ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result_"+StringProcessing::TimeString()+".root" ), config->GlobalFitResult );
 	}
 

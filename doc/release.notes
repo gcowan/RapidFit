@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2012/11/22 Rob Currie
+  - Removed the need to thread-locking all of the RooMath calls which has lead to 2-3x speed improvement in JpsiPhi
+       The class intiialization is not thread-safe so the initialization needs to be manually protected and called, but the calculations appear to be thread-safe
+       Tested on the final JpsiPhi sFit XML for the 6bin 1fb UBB analysis and it reproduces the expected results so is safe
+
 2012/11/21 Rob Currie
   - Fixed bugs in DebugClass usage
   - Fixed .C output from ComponentPlotter
