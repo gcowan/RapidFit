@@ -31,7 +31,7 @@ void DPHelpers::calculateFinalStateMomenta(double mB0, double m23, double mMuMu,
   // 4-momenta of dimuon and Kpi system in B0 rest frame aligned along
   // z-axis.
   double pJpsi=DPHelpers::daughterMomentum(mB0, mMuMu, m23);
-  TLorentzVector p4Jpsi(0,0,pJpsi,TMath::Sqrt(mMuMu*mMuMu+pJpsi*pJpsi));
+  TLorentzVector p4Jpsi(0,0,+pJpsi,TMath::Sqrt(mMuMu*mMuMu+pJpsi*pJpsi));
   TLorentzVector p4Kpi(0,0,-pJpsi,TMath::Sqrt(m23*m23+pJpsi*pJpsi));
 
   // 4-momenta of muons, first in dimuon rest frame which are then boosted
@@ -48,8 +48,8 @@ void DPHelpers::calculateFinalStateMomenta(double mB0, double m23, double mMuMu,
   double ppK=DPHelpers::daughterMomentum(m23, mK, mPi);
   double pz=ppK*cosTheta2;
   double pT=ppK*TMath::Sqrt(1-cosTheta2*cosTheta2);
-  double py=pT*TMath::Sin(phi);
-  double px=pT*TMath::Cos(phi);
+  double py=-pT*TMath::Sin(phi);
+  double px=-pT*TMath::Cos(phi);
   pK.SetPxPyPzE(-px,-py,-pz,TMath::Sqrt(mK*mK+ppK*ppK));
   pPi.SetPxPyPzE(px,py,pz,TMath::Sqrt(mPi*mPi+ppK*ppK));
   pK.Boost(p4Kpi.BoostVector());
@@ -83,6 +83,7 @@ void DPHelpers::calculateZplusAngles(TLorentzVector& pB, TLorentzVector& pMuPlus
   TLorentzVector p4MuMinus(pMuMinus);
   TLorentzVector p4K(pK);
   TLorentzVector p4Pi(pPi);
+  TLorentzVector p4Jpsi(pJpsi);
 
   // Go to Z+ rest frame
   pB.Boost(-1.0*p4Zplus.BoostVector());
@@ -108,12 +109,15 @@ void DPHelpers::calculateZplusAngles(TLorentzVector& pB, TLorentzVector& pMuPlus
 
   // Finally angle between J/psi-pi plane and Mu+ Mu- plane
   // Get normals to two planes and then calculate angle between them  (0;2pi)
-  TVector3 normal1=p4Jpsi.Vect().Cross(pB.Vect());
-  TVector3 normal2=p4Jpsi.Vect().Cross(p4MuPlus.Vect());
+//  TVector3 normal1=p4Jpsi.Vect().Cross(pB.Vect());
+//  TVector3 normal2=p4Jpsi.Vect().Cross(p4MuPlus.Vect());
+  TVector3 normal1=pJpsi.Vect().Cross(pPi.Vect());
+  TVector3 normal2=pMuMinus.Vect().Cross(pMuPlus.Vect());
   *dphi=TMath::ACos(normal1.Dot(normal2)/normal1.Mag()/normal2.Mag());
   // Now we still need to check in which quadrant we should be
   TVector3 dir(normal1.Cross(normal2));
-  float a1=dir.Dot(p4Jpsi.Vect())/dir.Mag()/p4Jpsi.Vect().Mag();
+//  float a1=dir.Dot(p4Jpsi.Vect())/dir.Mag()/p4Jpsi.Vect().Mag();
+  float a1=dir.Dot(pPi.Vect())/dir.Mag()/pPi.Vect().Mag();
   a1=TMath::ACos(a1);
 
   if ( a1 > TMath::Pi() -0.0001 )
