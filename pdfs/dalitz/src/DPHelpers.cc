@@ -83,7 +83,6 @@ void DPHelpers::calculateZplusAngles(TLorentzVector& pB, TLorentzVector& pMuPlus
   TLorentzVector p4MuMinus(pMuMinus);
   TLorentzVector p4K(pK);
   TLorentzVector p4Pi(pPi);
-  TLorentzVector p4Jpsi(pJpsi);
 
   // Go to Z+ rest frame
   pB.Boost(-1.0*p4Zplus.BoostVector());
