@@ -64,3 +64,10 @@ bool DebugClass::DebugThisClass( const string name ) const
 	return false;
 }
 
+void DebugClass::SegFault()
+{
+	int *p = NULL;
+	*p = 1;
+	return;
+}
+

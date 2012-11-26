@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/11/26 Rob Currie
+  - Reduced ROOT verbosity by default in main
+  - Fixed bug in minor angularAcceptance code
+  - Fixed bug in ComponentPlotter
+  - Added SegFault() function to DebugClass which allows you to call a SegFault on demand to get a backtrace from your current position
+
 2012/11/22 Rob Currie
   - Removed the need to thread-locking all of the RooMath calls which has lead to 2-3x speed improvement in JpsiPhi
        The class intiialization is not thread-safe so the initialization needs to be manually protected and called, but the calculations appear to be thread-safe

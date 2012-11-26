@@ -421,17 +421,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 
 	//	Get all possible discrete combination datapoints and the names of all discrete observables
 	vector<DataPoint*> allCombinations = this->GetDiscreteCombinations();
-	if( allCombinations.empty() )
-	{
-		Input->SetDiscreteIndex( 0 );
-		return 0;
-	}
-	if( allCombinations.size() == 1 )
-	{
-		if( allCombinations.back() != NULL ) delete allCombinations.back();
-		Input->SetDiscreteIndex( 0 );
-		return 0;
-	}
+
 
 	vector<string> allDiscreteNames = this->GetDiscreteNames();
 
@@ -452,6 +442,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	//	Construct objects
 	bool match=true;
 	double wanted_val=0., this_val=0.;
+	string thisName;
 	//	Loop over all possible combinations
 	for( int index=0 ; comb_i != end_comb_i; ++comb_i, ++index )
 	{
@@ -471,6 +462,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 			if( fabs( wanted_val - this_val ) > 1E-6 )
 			{
 				match = false;
+				thisName=*Obsname_i;
 				break;
 			}
 		}
@@ -478,6 +470,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		if( match )
 		{
 			thisIndex = index;
+			thisName="end";
 			break;
 		}
 	}
@@ -498,13 +491,15 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	//	Check for error
 	if( thisIndex == -1 )
 	{
+		cerr << thisName << ":" << endl;
 		cerr << "wanted_val: " << wanted_val << endl;
 		cerr << "this_val: " << this_val << endl;
 		cerr << "This DataPoint does not Lie within this PhaseSpace." << endl;
 		cerr << "This is a SERIOUS MISCONFIGURATION!!! Exiting :(" << endl;
 		Input->Print();
 		this->Print();
-		exit(-99865);
+		//exit(-99865);
+		DebugClass::SegFault();
 	}
 
 	//	Store and return the lookup of the DataPoint's index

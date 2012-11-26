@@ -134,6 +134,14 @@ void SaveXML( RapidFitConfiguration* config );
 //	The 'meat' of the Code
 int RapidFit( int argc, char * argv[] )
 {
+	//  reduce root verbosity:
+	//  gErrorIgnoreLevel = kInfo; // The default is kError 
+	//  gErrorIgnoreLevel = kFatal; // Explicitly remove all messages 
+	//  gErrorIgnoreLevel = kError; // Only error message (default) 
+	gErrorIgnoreLevel = kWarning; // error and warning message 
+	//  gErrorIgnoreLevel = kNote; // error, warning and note 
+	//  gErrorIgnoreLevel = kInfo; // Display all information (same as -v) 
+
 	RapidFitWelcome();
 
 	RapidFitConfiguration* thisConfig = new RapidFitConfiguration();
@@ -954,9 +962,9 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	int cosThetabin = 7;
 	int cosPsibin = 7;
 	int phibin = 9;
-	int costhetaKbin = 7;
-	int costhetaLbin = 7;
-	int helphibin = 9;
+	int costhetaKbin = 10;
+	int costhetaLbin = 24;
+	int helphibin = 5;
 
 	TH3D * num = new TH3D("trnum", "trnum", cosPsibin, -1., 1., cosThetabin, -1., 1., phibin, -pi, pi);
 	TH2D* num_psith = new TH2D( "num_tr_psitheta", "num_tr_psitheta", cosPsibin, -1., 1., cosThetabin, -1., 1. );
@@ -973,12 +981,12 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	TH2D* acc_psiphi = new TH2D( "acc_tr_psiphi", "acc_tr_psiphi", cosPsibin, -1., 1., phibin, -pi, pi );
 	TH2D* acc_phith = new TH2D( "acc_tr_phitheta", "acc_tr_phitheta", phibin, -pi, pi, cosThetabin, -1., 1. );
 
-	TH3D * numh = new TH3D("helnum", "helnum", costhetaKbin, -1., 1., costhetaLbin, -1., 1., helphibin, -pi, pi);
+	TH3D * numh = new TH3D( "helnum", "helnum", costhetaKbin, -1., 1., costhetaLbin, -1., 1., helphibin, -pi, pi);
 	TH2D* num_kl = new TH2D( "num_hel_thetaKthetaL", "num_hel_thetaKthetaL", costhetaKbin, -1., 1., costhetaLbin, -1., 1. );
 	TH2D* num_kphi = new TH2D( "num_hel_thetaKphi", "num_hel_thetaKphi", costhetaKbin, -1., 1., helphibin, -pi, pi );
 	TH2D* num_lphi = new TH2D( "num_hel_thetaLphi", "num_hel_thetaLphi", costhetaLbin, -1., 1., helphibin, -pi, pi );
 
-	TH3D * denh = new TH3D("helden", "helden", costhetaKbin, -1., 1., costhetaLbin, -1., 1., phibin, -pi, pi);
+	TH3D * denh = new TH3D( "helden", "helden", costhetaKbin, -1., 1., costhetaLbin, -1., 1., helphibin, -pi, pi);
 	TH2D* den_kl = new TH2D( "den_hel_thetaKthetaL", "den_hel_thetaKthetaL", costhetaKbin, -1., 1., costhetaLbin, -1., 1. );
 	TH2D* den_kphi = new TH2D( "den_hel_thetaKphi", "den_hel_thetaKphi", costhetaKbin, -1., 1., helphibin, -pi, pi );
 	TH2D* den_lphi = new TH2D( "den_hel_thetaLphi", "den_hel_thetaLphi", costhetaLbin, -1., 1., helphibin, -pi, pi );
@@ -1144,6 +1152,7 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	//delete tree;
 	//delete file;
 	delete pdfAndData;
+	delete helpdf;
 	return 0;
 }
 

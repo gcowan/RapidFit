@@ -22,6 +22,7 @@ class DebugClass
 
 		bool DebugThisClass( const string name ) const;
 
+		static void SegFault();
 	private:
 
 		bool perform_debugging;

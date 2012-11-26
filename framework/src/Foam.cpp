@@ -242,7 +242,7 @@ void Foam::Init()
                                 foamGenerator->SetEvPerBin( 25 );       //      25      Weights per bin... This doesn't Saturate as object is written before generating events
                                 foamGenerator->SetChat( 0 );            //      0       verbosity
                                 foamGenerator->SetMaxWtRej( 1.1 );      //      1.1     Unknown what effect this has, something to do with weights
-				foamGenerator->CheckAll(1);
+				foamGenerator->CheckAll(0);
 				//	Make one event here to check everything was processed correctly
 				foamGenerator->MakeEvent();
 				cout << "Check OK" << endl;

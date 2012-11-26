@@ -58,7 +58,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	else debug = new DebugClass(false);
 	plotPDF->TurnCachingOff();
 
-	plotPDF->ChangePhaseSpace( full_boundary );
+	//plotPDF->ChangePhaseSpace( full_boundary );
 
 	//plotPDF->GetPhysicsParameters()->Print();
 
@@ -77,7 +77,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			full_boundary->RemoveConstraint( disc_contr[i] );
 		}
 	}
-
+	plotPDF->ChangePhaseSpace( full_boundary );
 	NewDataSet->SetBoundary( full_boundary );
 
 	//////////////////////////////////////////////////////////////////
@@ -104,6 +104,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		double thisIntegral = 0.;
 		try
 		{
+			allCombinations[i]->SetPhaseSpaceBoundary( full_boundary );
 			thisIntegral = pdfIntegrator->NumericallyIntegrateDataPoint( allCombinations[i], full_boundary, plotPDF->GetDoNotIntegrateList() );
 		}
 		catch(...)
@@ -1084,10 +1085,10 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 			cerr_bak = cerr.rdbuf();
 			clog_bak = clog.rdbuf();
 			nullbuf = filestr.rdbuf();
-			fflush(stderr);
-			fgetpos(stderr, &pos);
-			fd = dup(fileno(stdout));
-			freopen("/dev/null", "w", stderr);
+			//fflush(stderr);
+			//fgetpos(stderr, &pos);
+			//fd = dup(fileno(stdout));
+			//freopen("/dev/null", "w", stderr);
 			cout.rdbuf(nullbuf);
 			cerr.rdbuf(nullbuf);
 			clog.rdbuf(nullbuf);
@@ -1101,10 +1102,10 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		cerr_bak = cerr.rdbuf();
 		clog_bak = clog.rdbuf();
 		nullbuf = filestr.rdbuf();
-		fflush(stderr);
-		fgetpos(stderr, &pos);
-		fd = dup(fileno(stdout));
-		freopen("/dev/null", "w", stderr);
+		//fflush(stderr);
+		//fgetpos(stderr, &pos);
+		//fd = dup(fileno(stdout));
+		//freopen("/dev/null", "w", stderr);
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
@@ -1409,10 +1410,10 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 			cerr_bak = cerr.rdbuf();
 			clog_bak = clog.rdbuf();
 			nullbuf = filestr.rdbuf();
-			fflush(stderr);
-			fgetpos(stderr, &pos);
-			fd = dup(fileno(stdout));
-			freopen("/dev/null", "w", stderr);
+			//fflush(stderr);
+			//fgetpos(stderr, &pos);
+			//fd = dup(fileno(stdout));
+			//freopen("/dev/null", "w", stderr);
 			cout.rdbuf(nullbuf);
 			cerr.rdbuf(nullbuf);
 			clog.rdbuf(nullbuf);
@@ -1426,10 +1427,10 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		cerr_bak = cerr.rdbuf();
 		clog_bak = clog.rdbuf();
 		nullbuf = filestr.rdbuf();
-		fflush(stderr);
-		fgetpos(stderr, &pos);
-		fd = dup(fileno(stdout));
-		freopen("/dev/null", "w", stderr);
+		//fflush(stderr);
+		//fgetpos(stderr, &pos);
+		//fd = dup(fileno(stdout));
+		//freopen("/dev/null", "w", stderr);
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
@@ -1876,10 +1877,10 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 			cerr_bak = cerr.rdbuf();
 			clog_bak = clog.rdbuf();
 			nullbuf = filestr.rdbuf();
-			fflush(stderr);
-			fgetpos(stderr, &pos);
-			fd = dup(fileno(stdout));
-			freopen("/dev/null", "w", stderr);
+			//fflush(stderr);
+			//fgetpos(stderr, &pos);
+			//fd = dup(fileno(stdout));
+			//freopen("/dev/null", "w", stderr);
 			cout.rdbuf(nullbuf);
 			cerr.rdbuf(nullbuf);
 			clog.rdbuf(nullbuf);
@@ -1892,10 +1893,10 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 		cerr_bak = cerr.rdbuf();
 		clog_bak = clog.rdbuf();
 		nullbuf = filestr.rdbuf();
-		fflush(stderr);
-		fgetpos(stderr, &pos);
-		fd = dup(fileno(stdout));
-		freopen("/dev/null", "w", stderr);
+		//fflush(stderr);
+		//fgetpos(stderr, &pos);
+		//fd = dup(fileno(stdout));
+		//freopen("/dev/null", "w", stderr);
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
