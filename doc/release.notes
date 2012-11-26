@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/11/26 Greig Cowan
+  - Fixed compilation bugs in DPHelpers for Z angle calculating code.
+
 2012/11/26 Rob Currie
   - Reduced ROOT verbosity by default in main
   - Fixed bug in minor angularAcceptance code

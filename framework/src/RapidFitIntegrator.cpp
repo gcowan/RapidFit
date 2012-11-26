@@ -366,7 +366,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	}
 
 	//unsigned int npoint = 10000;
-	unsigned int npoint = 10000;
+	unsigned int npoint = 100000;
 	vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
 
 	gsl_qrng * q = gsl_qrng_alloc (gsl_qrng_sobol, int(doIntegrate.size()));

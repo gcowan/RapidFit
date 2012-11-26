@@ -451,8 +451,8 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	this->TurnCachingOff();
 	componentIndex = 0;
 
-	cout << "Making copy of DPTotalAmplitudePDF. Acceptance: " << useAngularAcceptance << endl;
-        std::cout << "In DPTotal copy" << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
+	//cout << "Making copy of DPTotalAmplitudePDF. Acceptance: " << useAngularAcceptance << endl;
+    //    std::cout << "In DPTotal copy" << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 
 	for( unsigned int i=0; i < copy.KpiComponents.size(); ++i )
 	{

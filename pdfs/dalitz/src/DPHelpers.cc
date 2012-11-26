@@ -21,8 +21,8 @@ double DPHelpers::daughterMomentum(double m, double m1, double m2)
  * all final state particles in B0 rest frame. Due to the rotational
  * symmetry, J/psi momentum is along z-axis and muons are in x-z plane.
  */
-void DPHelpers::calculateFinalStateMomenta(double mB0, double m23, double mMuMu, double cosTheta1, 
-        double cosTheta2, double phi, double mMuPlus, double mMuMinus, 
+void DPHelpers::calculateFinalStateMomenta(double mB0, double m23, double mMuMu, double cosTheta1,
+        double cosTheta2, double phi, double mMuPlus, double mMuMinus,
         double mPi, double mK, TLorentzVector& pMuPlus,
         TLorentzVector& pMuMinus, TLorentzVector& pPi, TLorentzVector& pK)
 {
@@ -66,7 +66,7 @@ void DPHelpers::calculateZplusAngles(TLorentzVector& pB, TLorentzVector& pMuPlus
   //std::cout << "Z " << p4Zplus.X() << " " << pPi.X() << std::endl;
 
   // If we are not in B0 rest frame, boost there
-  if ( pB.BoostVector().Mag() != 0 )
+  if ( pB.BoostVector().Mag() > 0. )
   {
     p4Jpsi.Boost(-1.0*pB.BoostVector());
     p4Zplus.Boost(-1.0*pB.BoostVector());
@@ -110,13 +110,13 @@ void DPHelpers::calculateZplusAngles(TLorentzVector& pB, TLorentzVector& pMuPlus
   // Get normals to two planes and then calculate angle between them  (0;2pi)
 //  TVector3 normal1=p4Jpsi.Vect().Cross(pB.Vect());
 //  TVector3 normal2=p4Jpsi.Vect().Cross(p4MuPlus.Vect());
-  TVector3 normal1=pJpsi.Vect().Cross(pPi.Vect());
+  TVector3 normal1=p4Jpsi.Vect().Cross(pPi.Vect());
   TVector3 normal2=pMuMinus.Vect().Cross(pMuPlus.Vect());
   *dphi=TMath::ACos(normal1.Dot(normal2)/normal1.Mag()/normal2.Mag());
   // Now we still need to check in which quadrant we should be
   TVector3 dir(normal1.Cross(normal2));
 //  float a1=dir.Dot(p4Jpsi.Vect())/dir.Mag()/p4Jpsi.Vect().Mag();
-  float a1=dir.Dot(pPi.Vect())/dir.Mag()/pPi.Vect().Mag();
+  double a1=dir.Dot(pPi.Vect())/dir.Mag()/pPi.Vect().Mag();
   a1=TMath::ACos(a1);
 
   if ( a1 > TMath::Pi() -0.0001 )
@@ -135,7 +135,7 @@ double DPHelpers::referenceAxisCosAngle(TLorentzVector& pB, TLorentzVector& pMuP
   TLorentzVector p4Jpsi=pMuPlus+pMuMinus;
   TLorentzVector p4Zplus=p4Jpsi+pPi;
 
-  if ( pB.BoostVector().Mag() != 0 )
+  if ( pB.BoostVector().Mag() > 0. )
   {
     p4Jpsi.Boost(-1.0*pB.BoostVector());
     p4Zplus.Boost(-1.0*pB.BoostVector());
@@ -152,7 +152,7 @@ double DPHelpers::referenceAxisCosAngle(TLorentzVector& pB, TLorentzVector& pMuP
   // Second reference momentum
   TLorentzVector p4Pi(pPi);
   p4Pi.Boost(-1.0*p4Zplus.BoostVector());
-  p4Jpsi.Boost(-1.0*p4Zplus.BoostVector()); 
+  p4Jpsi.Boost(-1.0*p4Zplus.BoostVector());
   p4Pi.Boost(-1.0*p4Jpsi.BoostVector());
 
   // Cos of the angle
@@ -167,7 +167,7 @@ double DPHelpers::referenceAxisCosAngleMu(TLorentzVector& pB, TLorentzVector& pM
   TLorentzVector p4Jpsi=pMuPlus+pMuMinus;
   TLorentzVector p4Zplus=p4Jpsi+pPi;
 
-  if ( pB.BoostVector().Mag() != 0 )
+  if ( pB.BoostVector().Mag() > 0. )
   {
     p4Jpsi.Boost(-1.0*pB.BoostVector());
     p4Zplus.Boost(-1.0*pB.BoostVector());
@@ -184,7 +184,7 @@ double DPHelpers::referenceAxisCosAngleMu(TLorentzVector& pB, TLorentzVector& pM
   // Second reference momentum
   TLorentzVector p4Pi(pPi);
   p4Pi.Boost(-1.0*p4Zplus.BoostVector());
-  p4Jpsi.Boost(-1.0*p4Zplus.BoostVector()); 
+  p4Jpsi.Boost(-1.0*p4Zplus.BoostVector());
   TLorentzVector ref2=p4Pi+p4Jpsi;
 
   // Cos of the angle
