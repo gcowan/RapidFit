@@ -28,10 +28,12 @@ class AcceptanceSlice
 {
 	public:
 		AcceptanceSlice( double tl, double th, double h ) : _tlow(tl), _thigh(th), _height(h) {}
+		AcceptanceSlice( const AcceptanceSlice& input );
 		double tlow()   const { return _tlow ; }
 		double thigh()  const { return _thigh ; }
 		double height() const { return _height ; }
 	private:
+		AcceptanceSlice& operator = ( const AcceptanceSlice& );
 		double _tlow;
 		double _thigh;
 		double _height;
@@ -53,25 +55,27 @@ class SlicedAcceptance
 		SlicedAcceptance( const SlicedAcceptance& input );
 
 		// Methods for numerator of PDF to return acceptance for event
-		double getValue( double time ) const;
+		double getValue( const double time ) const;
 
-		double getValue( Observable* time, double timeOffset=0. ) const;
+		double getValue( const Observable* time, const double timeOffset=0. ) const;
 
 		// Methods for the normalisation integral in slices
 		unsigned int numberOfSlices() const;
-		AcceptanceSlice * getSlice( unsigned int slice ) const;
+		AcceptanceSlice * getSlice( const unsigned int slice ) const;
 
 	private:	
 		//      Uncopyable!
 		SlicedAcceptance& operator = ( const SlicedAcceptance& );
 
-		double stream(ifstream& stream) ;
+		double stream(ifstream& stream);
 
-		vector <AcceptanceSlice*> slices ;
-		AcceptanceSlice* nullSlice ;	
+		vector <AcceptanceSlice*> slices;
+		AcceptanceSlice* nullSlice;
 		double tlow;
 		double thigh;
-		double beta;	
+		double beta;
+
+		mutable size_t uniqueID;
 };
 
 #endif

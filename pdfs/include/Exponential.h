@@ -26,10 +26,11 @@ class Exponential : public BasePDF
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation( PhaseSpaceBoundary* );
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
+		Exponential operator = ( const Exponential& );
+
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 		double buildPDFnumerator();

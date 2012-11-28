@@ -1,5 +1,16 @@
 // $Id: release.notes $
 
+2012/11/28 Rob Currie
+  - Fixed bug to do with Projections for pdfs with strong acceptance functions
+  - Fixed a bug in Observable class to do with anything involving communicating with ROOT when making use of caching technology
+  - Added a 2nd stopwatch class TGLStopWatch to watch individual function calls when talking to Minuit this offers sub-sec timing rather than using stl object
+       This requires linking against an additional library
+  - Improved writing out from VectoredFC, and in general by adding an additional warning of a copy bug of FitResultVector objetcs.
+  - Fixed bug to do with writing extra info to output files (icing on cake type data...)
+  - Changed RooMath to initialize according to defaults. If anyone wants to explore tweaking this they should only go for finer resolutions
+  - May (in future) comment out GSL replacement for RooMath now that it can be addressed safely in a threaded environment
+  - Made some extensive changes to improve Exponential class to enable new features in a tested way and the normalisation is now performed 'correctly' for the double expoential resolution case at the cost of the simpler case
+
 2012/11/26 Greig Cowan
   - Fixed compilation bugs in DPHelpers for Z angle calculating code.
 

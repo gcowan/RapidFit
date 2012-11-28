@@ -152,7 +152,7 @@ namespace Mathematics
 			{
 				pthread_mutex_lock( &ROOT_Lock );
 				//      default RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
-				if( !RooMathinit ) RooMath::initFastCERF( 1600, -8.0, 8.0, 1600, -8.0, 12.0 );
+				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 				RooMathinit = true;
 				pthread_mutex_unlock( &ROOT_Lock );
 			}
@@ -187,7 +187,7 @@ namespace Mathematics
                         {
                                 pthread_mutex_lock( &ROOT_Lock );
 				//	default RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
-                                if( !RooMathinit ) RooMath::initFastCERF( 1600, -8.0, 8.0, 1600, -8.0, 12.0 );
+                                if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
                                 RooMathinit = true;
                                 pthread_mutex_unlock( &ROOT_Lock );
                         }

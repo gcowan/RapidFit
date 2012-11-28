@@ -59,7 +59,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 
 	//Configure
 	_useHelicityBasis = config->isTrue( "UseHelicityBasis" );
-	_usePerEvent = config->isTrue( "UsePerEvent" );
+	_usePerEvent = config->isTrue( "UseEventResolution" );
 	_usePunziSigmat = config->isTrue( "UsePunziSigmat" );
 	_useTimeAcceptance = config->isTrue( "UseTimeAcceptance" );
 
@@ -384,7 +384,7 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	if (returnValue <= 0)
 	{
 		PDF_THREAD_LOCK
-			cout << "3D Background PDF returns zero!" << endl;
+		cout << "3D Background PDF returns zero!" << endl;
 		measurement->Print();
 		PDF_THREAD_UNLOCK
 	}

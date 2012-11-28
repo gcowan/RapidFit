@@ -18,11 +18,12 @@
 using namespace::std;
 
 //  Constructor to Return a single array from multiple arrays
-FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
+FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock(NULL), gl_clock(NULL), allGLTimes()
 {
 	if( !Result_Array.empty() )
 	{
 		clock = new TStopwatch();
+		gl_clock = new TGLStopwatch();
 		allNames = Result_Array[0]->GetAllNames();
 		//Construct the result data structure
 		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
@@ -34,25 +35,31 @@ FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allR
 		}
 		for(unsigned int i=0; i < Result_Array.size(); ++i )
 		{
-			for( short int j=0; j < Result_Array[i]->NumberResults(); ++j )
+			for( int j=0; j < Result_Array[i]->NumberResults(); ++j )
 			{
-				AddFitResult(  Result_Array[i]->GetFitResult( j ), false );
+				AddFitResult( Result_Array[i]->GetFitResult( j ), false );
 			}
 
 			vector<double> input_real_times = Result_Array[i]->GetAllRealTimes();
 			vector<double> input_cpu_times = Result_Array[i]->GetAllCPUTimes();
-			for(unsigned int j2=0; j2 < input_real_times.size(); ++j2)
+			vector<double> input_gl_times = Result_Array[i]->GetAllGLTimes();
+			for( unsigned int j2=0; j2 < input_real_times.size(); ++j2 )
 			{
 				allRealTimes.push_back( input_real_times[j2] );
 				allCPUTimes.push_back( input_cpu_times[j2] );
+				allGLTimes.push_back( input_gl_times[j2] );
 			}
 
+			if( input_real_times.size() != Result_Array[i]->NumberResults() || input_cpu_times.size() != Result_Array[i]->NumberResults() )
+			{
+				cout << "ERROR: Time Data from Fits not consistent!!! Ignoring!" << endl;
+			}
 		}
 	}
 }
 
 //Constructor with correct argument
-FitResultVector::FitResultVector( vector<string> AllParameterNames ) : allResults(), allNames(AllParameterNames), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock()
+FitResultVector::FitResultVector( vector<string> AllParameterNames ) : allResults(), allNames(AllParameterNames), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock(NULL), gl_clock(NULL), allGLTimes()
 {
 	vector<string> duplicates;
 	allNames = StringProcessing::RemoveDuplicates( AllParameterNames, duplicates );
@@ -76,16 +83,20 @@ FitResultVector::FitResultVector( vector<string> AllParameterNames ) : allResult
 	}
 
 	clock = new TStopwatch();
+	gl_clock = new TGLStopwatch();
 }
 
 //Destructor
 FitResultVector::~FitResultVector()
 {
+	if( clock != NULL ) delete clock;
+	if( gl_clock != NULL ) delete gl_clock;
 }
 
 //Note the time the study starts
 void FitResultVector::StartStopwatch()
 {
+	gl_clock->Start();
 	clock->Start();
 }
 
@@ -126,10 +137,12 @@ bool FitResultVector::AddFitResult( FitResult * NewResult, bool with_clock )
 		allGenValues[nameIndex].push_back( newParameterGenValues[nameIndex] );
 	}
 
-	if( with_clock )
+	if( with_clock && clock != NULL )
 	{
 		//Store the duration
+		double thisTime = gl_clock->End();
 		clock->Stop();
+		allGLTimes.push_back( thisTime );
 		allRealTimes.push_back( clock->RealTime() );
 		allCPUTimes.push_back( clock->CpuTime() );
 	}
@@ -270,6 +283,17 @@ void FitResultVector::AddCPUTime( double input_time )
 	allCPUTimes.push_back( input_time );
 }
 
+void FitResultVector::AddGLTime( double input_time )
+{
+        allGLTimes.push_back( input_time );
+}
+
+double FitResultVector::GetGLTime( int Index )
+{
+        if( Index < int(allGLTimes.size()) ) return allGLTimes[ unsigned(Index) ];
+        else return -1;
+}
+
 void FitResultVector::SetCPUTime( int Index, double input_time )
 {
 	if( Index < int(allCPUTimes.size()) ) allCPUTimes.resize( unsigned(Index) );
@@ -293,6 +317,10 @@ vector<double> FitResultVector::GetAllCPUTimes()
 	return allCPUTimes;
 }
 
+vector<double> FitResultVector::GetAllGLTimes()
+{
+	return allGLTimes;
+}
 
 vector<double> FitResultVector::GetFlatResult( int Index )
 {

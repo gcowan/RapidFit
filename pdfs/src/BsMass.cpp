@@ -229,6 +229,8 @@ double BsMass::Evaluate(DataPoint * measurement)
 		PDF_THREAD_UNLOCK
 	}
 
+	if( returnValue <=1E-15) returnValue=1E-15;
+
 	return returnValue;
 }
 

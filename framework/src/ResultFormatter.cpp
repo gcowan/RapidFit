@@ -935,7 +935,7 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 				ParameterFixedStatus.push_back( 0 );
 			}
 
-			if( thisParam->GetScanStatus() ) cout << "Scanned: " << string(thisParamName) << endl;
+			//if( thisParam->GetScanStatus() ) cout << "Scanned: " << string(thisParamName) << endl;
 
 			if( thisParam->GetScanStatus() )
 			{
@@ -960,7 +960,7 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 		ResultFormatter::AddBranch( outputTree, BranchName+"_value", ParameterValues );
 		bool fixed_param = ToyResult->GetFitResult(0)->GetResultParameterSet()->GetResultParameter(thisParamName)->GetType() == "Fixed";
 		bool scanned_param = ToyResult->GetFitResult(0)->GetResultParameterSet()->GetResultParameter(thisParamName)->GetScanStatus();
-		if( !fixed_param || scanned_param )
+		if( (!fixed_param) || (scanned_param) )
 		{
 			ResultFormatter::AddBranch( outputTree, BranchName+"_error", ParameterErrors );
 			ResultFormatter::AddBranch( outputTree, BranchName+"_gen", ParameterOriginalValues );
@@ -977,9 +977,10 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 
 	ResultFormatter::AddBranch( outputTree, "Fit_RealTime", ToyResult->GetAllRealTimes() );
 	ResultFormatter::AddBranch( outputTree, "Fit_CPUTime", ToyResult->GetAllCPUTimes() );
+	ResultFormatter::AddBranch( outputTree, "Fit_GLTime", ToyResult->GetAllGLTimes() );
 
 	vector<int> fitStatus;
-	vector<double> NLL_Values;
+	vector<double> NLL_Values, RealTimes, CPUTimes;
 	for( unsigned int i=0; i< (unsigned) ToyResult->NumberResults(); ++i )
 	{
 		fitStatus.push_back( ToyResult->GetFitResult( i )->GetFitStatus() );
@@ -988,6 +989,8 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 
 	ResultFormatter::AddBranch( outputTree, "Fit_Status", fitStatus );
 	ResultFormatter::AddBranch( outputTree, "NLL", NLL_Values );
+	//ResultFormatter::AddBranch( outputTree, "Fit_RealTime", RealTimes );
+	//ResultFormatter::AddBranch( outputTree, "Fit_CPUTime", CPUTimes );
 
 	//	Ntuples are 'stupid' objects in ROOT and the basic one can only handle float type objects
 	/*TNtuple * parameterNTuple;

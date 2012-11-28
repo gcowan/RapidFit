@@ -17,6 +17,11 @@
 
 using namespace::std;
 
+AcceptanceSlice::AcceptanceSlice( const AcceptanceSlice& input ) :
+	_tlow(input._tlow), _thigh(input._thigh), _height(input._height)
+{
+}
+
 //............................................
 // Constructor for flat acceptance
 SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
@@ -43,6 +48,7 @@ SlicedAcceptance::SlicedAcceptance( const SlicedAcceptance& input ) :
 	for( unsigned int i=0; i< input.slices.size(); ++i )
 	{
 		if( (input.slices[i]) != NULL ) slices.push_back( new AcceptanceSlice( *(input.slices[i]) ) );
+		else slices.push_back( NULL );
 	}
 }
 
@@ -168,13 +174,13 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 		exit(0);
 	}
 	//....done.....
+
+	
 }
-
-
 
 //............................................
 // Return numerator for evaluate
-double SlicedAcceptance::getValue( double t ) const
+double SlicedAcceptance::getValue( const double t ) const
 {
 	double returnValue = 0;
 	for( unsigned int is = 0; is < slices.size() ; ++is )
@@ -184,22 +190,33 @@ double SlicedAcceptance::getValue( double t ) const
 	return returnValue;
 }
 
-double SlicedAcceptance::getValue( Observable* time, double timeOffset ) const
+double SlicedAcceptance::getValue( const Observable* time, const double timeOffset ) const
 {
+	//return this->getValue( time->GetValue() - timeOffset );
+
 	if( time->GetBinNumber() != -1 )
 	{
 		//#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if( time->GetOffSet() == timeOffset ) return time->GetAcceptance();
 		//#pragma GCC diagnostic pop
+		else
+		{
+			time->SetBinNumber( -1 );
+			time->SetOffSet( 0. );
+		}
 	}
 
 	double t = time->GetValue() - timeOffset;
 	double returnValue = 0;
 	unsigned int is = 0;
-	for( ; is < (unsigned)slices.size() ; ++is )
+	for( ; is < slices.size(); ++is )
 	{
-		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
+		if( (t >= this->getSlice(is)->tlow() ) && ( t < this->getSlice(is)->thigh() ) )
+		{
+			returnValue = this->getSlice(is)->height();
+		}
 	}
+
 	time->SetBinNumber( (int)is );
 	time->SetAcceptance( returnValue );
 	time->SetOffSet( timeOffset );
@@ -215,14 +232,14 @@ unsigned int SlicedAcceptance::numberOfSlices() const
 
 //............................................
 // Return a slice
-AcceptanceSlice * SlicedAcceptance::getSlice( unsigned int s ) const
+AcceptanceSlice * SlicedAcceptance::getSlice( const unsigned int s ) const
 {
 	if( s>=(unsigned)slices.size() ) return nullSlice;
 	return slices[s];
 }
 
 //............................................
-//Helpers
+//Helpers	Only Used in Constructor
 double SlicedAcceptance::stream(ifstream& thisStream)
 {
 	double tmpVal;

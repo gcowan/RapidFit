@@ -167,7 +167,7 @@ vector<IDataSet*> VectoredFeldmanCousins::GetNewDataSets( ParameterSet* input_pa
 
 void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 {
-	cout << "Doing Study: " << OutputLevel << endl;
+	//cout << "Doing Study: " << OutputLevel << endl;
 	theMinimiser->SetOutputLevel( OutputLevel );
 	cout << "\n\tStarting Fit:" <<endl;
 
@@ -197,6 +197,9 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 		grid_pointResultVector.push_back( GlobalFitResult );
 		FitResultVector* temp_gridpoint = new FitResultVector( GlobalFitResult->GetAllNames() );
 		temp_gridpoint->AddFitResult( InputResult, false );
+		temp_gridpoint->AddCPUTime( FitAtGridPoints->GetCPUTime( (int)result_i ) );
+		temp_gridpoint->AddRealTime( FitAtGridPoints->GetRealTime( (int)result_i ) );
+		temp_gridpoint->AddGLTime( FitAtGridPoints->GetGLTime( (int)result_i ) );
 		grid_pointResultVector.push_back( temp_gridpoint );
 
 		unsigned int this_study = (unsigned)numberStudies;
@@ -245,7 +248,7 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 			FitResult* fit1Result = FitAssembler::DoSafeFit( theMinimiser, theFunction, FittingParameterSetWithFixedParameters, pdfsAndData, allConstraints, true, OutputLevel );
 			for( vector<string>::iterator param_i = controlled_parameters.begin(); param_i != controlled_parameters.end(); ++param_i )
 			{
-				fit1Result->GetResultParameterSet()->GetResultParameter( *param_i )->ForceType( "Free" );
+				fit1Result->GetResultParameterSet()->GetResultParameter( *param_i )->ForceType( "Fixed" );
 			}
 
 			this->ResetOutput();
@@ -319,6 +322,7 @@ void VectoredFeldmanCousins::DoWholeStudy( int OutputLevel )
 		FitResultVector* allGridPointResult = new FitResultVector( grid_pointResultVector );
 		temp_complete_vec.push_back( allGridPointResult );
 	}
+	cout << endl << "Finalizing all FC Results" << endl;
 	allResults = new FitResultVector( temp_complete_vec );
 }
 

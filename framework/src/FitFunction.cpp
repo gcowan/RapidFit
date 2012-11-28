@@ -12,6 +12,7 @@
 #include "TTree.h"
 #include "TBranch.h"
 #include "TString.h"
+#include "TGLStopwatch.h"
 //	RapidFit Headers
 #include "FitFunction.h"
 #include "Threading.h"
@@ -258,8 +259,14 @@ ParameterSet * FitFunction::GetParameterSet() const
 double FitFunction::Evaluate()
 {
 	++callNum;
-	time_t start, end;
-	time(&start);
+	//time_t start, end;
+	//time(&start);
+	TGLStopwatch* thisWatch = NULL;
+	if( Fit_Tree !=NULL )
+	{
+		thisWatch = new TGLStopwatch();
+		thisWatch->Start();
+	}
 	double minimiseValue = 0.0;
 	double temp=0.;
 	//Calculate the function value for each PDF-DataSet pair
@@ -306,12 +313,16 @@ double FitFunction::Evaluate()
 		}
 	}
 
-	time(&end);
+	//time(&end);
 	++fit_calls;
-	step_time = difftime( end, start );
-
+	//step_time = difftime( end, start );
 	if( Fit_Tree !=NULL )
 	{
+		step_time = thisWatch->End();
+		//thisWatch->Stop();
+		//step_time = thisWatch->CpuTime();
+		//delete thisWatch;
+
 		for(unsigned int i=0; i< allData->GetParameterSet()->GetAllNames().size(); ++i )
 		{
 			branch_objects[i] = (Double_t) allData->GetParameterSet()->GetPhysicsParameter( branch_names[i] )->GetBlindedValue();

@@ -14,6 +14,7 @@
 
 //	ROOT Headers
 #include "TStopwatch.h"
+#include "TGLStopwatch.h"
 //	RapidFit Headers
 #include "FitResult.h"
 //	System Headers
@@ -90,6 +91,12 @@ class FitResultVector
 		 * Contains the length of 'CPU' time taken for all of the fits to converge
 		 */
 		vector<double> GetAllCPUTimes();
+
+		vector<double> GetAllGLTimes();
+
+		double GetGLTime( int index );
+
+		void AddGLTime( double input );
 
 		/*!
 		 * Contains the final value 'NLL' of the Function after Minimisation
@@ -200,7 +207,10 @@ class FitResultVector
 
 		vector<double> allRealTimes;		/*!	All of the Real times for all FitResults			*/
 		vector<double> allCPUTimes;		/*!	All of the CPU times for all FitResults				*/
-		TStopwatch * clock;			/*!	Stop Watch to time the length of time to generate a FitResult	*/
+		TStopwatch* clock;			/*!	Stop Watch to time the length of time to generate a FitResult	*/
+
+		vector<double> allGLTimes;
+		TGLStopwatch* gl_clock;
 };
 
 #endif

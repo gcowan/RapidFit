@@ -20,9 +20,11 @@ class Observable
 {
 	public:
 
-		Observable( string );
+		Observable( const string );
 
-		Observable( string, double, double, string );
+		Observable( const string, const double, const double, const string );
+
+		Observable( const Observable& input );
 
 		/*!
 		 * @brief Destruction
@@ -38,26 +40,26 @@ class Observable
 		/*!
 		 * @brief An ugly lie, but it keeps the compiler happy for more abstract functions which should be treated as const!
 		 */
-		void SetBinNumber( int ) const;
-		void SetBkgBinNumber( int ) const;
+		void SetBinNumber( const int ) const;
+		void SetBkgBinNumber( const int ) const;
 		int GetBinNumber() const;
 		int GetBkgBinNumber() const;
 
 		double GetAcceptance() const;
 		double GetBkgAcceptance() const;
-		void SetAcceptance( double ) const;
-		void SetBkgAcceptance( double ) const;
+		void SetAcceptance( const double ) const;
+		void SetBkgAcceptance( const double ) const;
 
-		void SetOffSet( double ) const;
+		void SetOffSet( const double ) const;
 		double GetOffSet() const;
 
 		string GetName() const;
 
 		void Print() const;
 
-		void SetObservable( Observable* );
-		void ExternallySetValue( double );
-		void ExternallySetError( double );
+		void SetObservable( const Observable* );
+		void ExternallySetValue( const double );
+		void ExternallySetError( const double );
 
 	private:
 		string name;
