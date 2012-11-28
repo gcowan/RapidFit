@@ -13,7 +13,7 @@ ROOTLIBS     = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --libs)
 ROOTGLIBS    = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --glibs)
 
 #               On some Systems with Mathmore compiled, sometimes things need to be resolved against it... I don't know why
-EXTRA_ROOTLIBS=-lTreePlayer -lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam $(shell if [ "$(shell root-config --features | grep mathmore)" = "" ]; then echo "" ; else echo "-lMathMore" ; fi)
+EXTRA_ROOTLIBS=-lTreePlayer -lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam -lRGL $(shell if [ "$(shell root-config --features | grep mathmore)" = "" ]; then echo "" ; else echo "-lMathMore" ; fi)
 
 #		Command Line Tools
 CXX          = $(CC) $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo ""; else echo "--arch=i386"; fi)

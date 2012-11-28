@@ -496,10 +496,10 @@ double LongLivedBkg_3Dangular::buildPDFdenominator( double input_tauLL, double i
 		//This loops over each time slice, does the normalisation between the limits, and accumulates
 		for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice )
 		{
-			tlow_temp = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
-			thigh_temp = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
+			tlow_temp = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
+			thigh_temp = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh();
 
-			if( thigh > tlow )
+			if( thigh_temp > tlow_temp )
 			{
 				ExpInt_Input[0] = tlow_temp; ExpInt_Input[1] = thigh_temp;
 

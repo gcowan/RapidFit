@@ -664,6 +664,8 @@ int PerformMainFit( RapidFitConfiguration* config )
 		if( config->calcConfig == NULL )
 		{
 			cerr << "No PreCalculator Defined in the XML" << endl;
+			cerr << "You need to add a section to your XML to tell this tool what PreCalculator to calculate event weights" << endl;
+			exit(7239);
 		}
 		else
 		{

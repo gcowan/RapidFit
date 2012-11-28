@@ -42,6 +42,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 		{
 			cout << *str_i << endl;
 		}
+		cerr << "This is harmless, but you will now have some merged Observable(s)" << endl;
 	}
 }
 

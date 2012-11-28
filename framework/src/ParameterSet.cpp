@@ -138,6 +138,7 @@ ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allName
 		{
 			cout << *str_i << endl;
 		}
+		cerr << "This is harmless, but you will now have some merged PhysicsParameter(s)" << endl;
 	}
 	//Populate the map
 	for( unsigned int nameIndex = 0; nameIndex < NewNames.size(); ++nameIndex )
