@@ -187,7 +187,7 @@ XMLConfigReader::~XMLConfigReader()
 	if( All_XML_Tags != NULL ) delete All_XML_Tags;
 	//cout << "Hello from XMLConfigReader destructor" << endl;
 	if( debug != NULL ) delete debug;
-	while( !fileTags.empty() )
+/*	while( !fileTags.empty() )
 	{
 		if( fileTags.back() != NULL ) delete fileTags.back();
 		fileTags.pop_back();
@@ -196,7 +196,7 @@ XMLConfigReader::~XMLConfigReader()
 	{
 		if( children.back() != NULL ) delete children.back();
 		children.pop_back();
-	}
+	}*/
 }
 
 vector<string> XMLConfigReader::GetXML() const
