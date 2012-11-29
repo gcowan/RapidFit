@@ -56,7 +56,7 @@ void BsMass::MakePrototypes()
 	parameterNames.push_back( sigma_m1Name );
 
 	if( _useSig1Sig2 ) parameterNames.push_back( sigma_m2Name );
-	else			   parameterNames.push_back( ratio_21Name );
+	else		   parameterNames.push_back( ratio_21Name );
 
 	parameterNames.push_back( m_BsName );
 	allParameters = ParameterSet(parameterNames);
