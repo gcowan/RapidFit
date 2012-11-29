@@ -202,7 +202,7 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 		else
 		{
 			time->SetBinNumber( -1 );
-			time->SetOffSet( 0. );
+			time->SetOffSet( -999. );
 		}
 	}
 
@@ -211,9 +211,9 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 	unsigned int is = 0;
 	for( ; is < slices.size(); ++is )
 	{
-		if( (t >= this->getSlice(is)->tlow() ) && ( t < this->getSlice(is)->thigh() ) )
+		if( (t >= slices[is]->tlow() ) && ( t < slices[is]->thigh() ) )
 		{
-			returnValue = this->getSlice(is)->height();
+			returnValue += slices[is]->height();
 		}
 	}
 
