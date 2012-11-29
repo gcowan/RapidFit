@@ -19,6 +19,7 @@
 #include <vector>
 #include <algorithm>
 #include <math.h>
+#include <iomanip>
 
 #define DOUBLE_TOLERANCE_DATA 1E-6
 
@@ -288,8 +289,8 @@ void MemoryDataSet::NormaliseWeights()
 		{
 			allData[i]->SetEventWeight( allData[i]->GetObservable( WeightName )->GetValue() * alpha );
 		}
-		cout << "alpha = " << sum_Val << "  /  " << sum_Val2 << endl; 
-		cout << "Correction Factor: " << alpha << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
+		cout << "alpha = " << setprecision(10) << sum_Val << "  /  " << sum_Val2 << endl; 
+		cout << "Correction Factor: " << setprecision(5) << alpha << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
 	}
 }
 
