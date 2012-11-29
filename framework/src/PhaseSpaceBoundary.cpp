@@ -56,11 +56,11 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) 
 		{
 			if( NewBoundary.allConstraints[i]->IsDiscrete() )
 			{
-				allConstraints.push_back( new ObservableDiscreteConstraint( NewBoundary.allConstraints[i] ));
+				allConstraints.push_back( new ObservableDiscreteConstraint( *((ObservableDiscreteConstraint*)NewBoundary.allConstraints[i]) ));
 			}
 			else
 			{
-				allConstraints.push_back( new ObservableContinuousConstraint( NewBoundary.allConstraints[i] ));
+				allConstraints.push_back( new ObservableContinuousConstraint( *((ObservableContinuousConstraint*)NewBoundary.allConstraints[i]) ));
 			}
 		}
 		else

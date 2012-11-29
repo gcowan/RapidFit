@@ -138,8 +138,8 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 			}
 		}
 
-		RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex), false, gslIntegrator );
-		resultIntegrator->SetDebug( debug );
+		//RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex), false, gslIntegrator );
+		//resultIntegrator->SetDebug( debug );
 
 		if( debug != NULL )
 		{

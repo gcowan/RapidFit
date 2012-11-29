@@ -41,10 +41,10 @@ using namespace::std;
 FitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
-MinuitWrapper::MinuitWrapper(): minuit(NULL), fitResult(NULL), contours(), print_verbosity( 0 ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
-{
-	minuit = new TMinuit( 1 );
-}
+//MinuitWrapper::MinuitWrapper(): minuit(NULL), fitResult(NULL), contours(), print_verbosity( 0 ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
+//{
+//	minuit = new TMinuit( 1 );
+//}
 
 //Constructor with correct argument
 MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(NULL), fitResult(NULL), contours(), print_verbosity( output_level ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
@@ -96,7 +96,7 @@ void MinuitWrapper::SetOutputLevel( int output_level )
 	} else {
 		minuit->mnexcm("SET PRINT", arg, 1, err);
 	}
-	delete arg;
+	delete[] arg;
 	//	minuit->SetPrintLevel( print_verbosity );
 }
 
@@ -104,7 +104,7 @@ void MinuitWrapper::SetupFit( FitFunction* NewFunction )
 {
 	function = NewFunction;
 	int errorFlag = 0;
-	double arguments[2] = {0.0, 0.0};
+	double* arguments = new double[2];// = {0.0, 0.0};
 
 	//Set the function
 	minuit->SetFCN( &MinuitWrapper::Function );
@@ -167,6 +167,8 @@ void MinuitWrapper::SetupFit( FitFunction* NewFunction )
 	minuit->mnexcm("SET STR", arguments, 1, errorFlag);
 
 	minuit->mnexcm("SET NOGradient", arguments, 0, errorFlag);
+
+	delete[] arguments;
 }
 
 FitFunction* MinuitWrapper::GetFitFunction()
@@ -189,7 +191,7 @@ void MinuitWrapper::FixParameters( vector<double> fix_values, vector<string> Par
 
 void MinuitWrapper::CallHesse()
 {
-	double arguments[2];
+	double* arguments = new double[2];
 	int errorFlag=0;
 	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
 	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE;
@@ -201,13 +203,15 @@ void MinuitWrapper::CallHesse()
 	arguments[0] = maxSteps;//MAXIMUM_MINIMISATION_STEPS
 	arguments[1] = bestTolerance;//FINAL_GRADIENT_TOLERANCE
 	minuit->mnexcm("HESSE", arguments, 2, errorFlag);
+
+	delete[] arguments;
 }
 
 //Use Migrad to minimise the given function
 void MinuitWrapper::Minimise()
 {
 	int errorFlag = 0;
-	double arguments[2] = {0.0, 0.0};
+	double* arguments = new double[2];// = {0.0, 0.0};
 	vector<string> allNames = function->GetParameterSet()->GetAllNames();
 	ParameterSet * newParameters = function->GetParameterSet();
 
@@ -341,6 +345,8 @@ void MinuitWrapper::Minimise()
 		RapidFitMatrix* newMatrix = CorrectedCovariance::GetCorrectedCovarianceMatrix( this );
 		(void) newMatrix;
 	}
+
+	delete[] arguments;
 }
 
 ResultParameterSet* MinuitWrapper::GetResultParameters( vector<string> allNames, ParameterSet* newParameters )
@@ -502,6 +508,13 @@ vector<FunctionContour*> MinuitWrapper::ConstructContours( vector<string> allNam
 			newContour->SetPlot( 2, numberOfPoints, xCoordinates2, yCoordinates2 );
 			newContour->SetPlot( 3, numberOfPoints, xCoordinates3, yCoordinates3 );
 			allContours.push_back(newContour);
+
+			delete[] xCoordinates1;
+			delete[] xCoordinates2;
+			delete[] xCoordinates3;
+			delete[] yCoordinates1;
+			delete[] yCoordinates2;
+			delete[] yCoordinates3;
 		}
 	}
 	return allContours;

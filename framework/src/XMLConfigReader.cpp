@@ -33,7 +33,8 @@ using namespace::std;
 #define DOUBLE_TOLERANCE 1E-6
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(new DebugClass(false) ), XMLValid(false)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) :
+	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(new DebugClass(false) ), XMLValid(false)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -52,6 +53,7 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 	}
 
 	StringProcessing::RemoveWhiteSpace(wholeFile);
+	StringProcessing::RemoveLeadingWhiteSpace(wholeFile);
 
 	vector<string> value;
 	vector<XMLTag*> File_Tags = All_XML_Tags->FindTagsInContent( wholeFile, value );
@@ -182,9 +184,19 @@ bool XMLConfigReader::TestXML()
 //Destructor
 XMLConfigReader::~XMLConfigReader()
 {
-	delete All_XML_Tags;
+	if( All_XML_Tags != NULL ) delete All_XML_Tags;
 	//cout << "Hello from XMLConfigReader destructor" << endl;
 	if( debug != NULL ) delete debug;
+	while( !fileTags.empty() )
+	{
+		if( fileTags.back() != NULL ) delete fileTags.back();
+		fileTags.pop_back();
+	}
+	while( !children.empty() )
+	{
+		if( children.back() != NULL ) delete children.back();
+		children.pop_back();
+	}
 }
 
 vector<string> XMLConfigReader::GetXML() const

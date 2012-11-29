@@ -375,8 +375,8 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string this_fileName, s
 	int numberOfObservables = int(observableNames.size());
 
 	TFile * inputFile = new TFile( this_fileName.c_str(), "READ" );
-	TNtuple * ntuple = (TNtuple*)inputFile->Get( ntuplePath.c_str() );
-	if ( ntuple == NULL )
+	TTree * ntuple = (TTree*)inputFile->Get( ntuplePath.c_str() );
+	if( ntuple == NULL )
 	{
 		cerr << "Ntuple not found. Are you specifying the correct file and ntuple path?" << endl;
 		exit(2374);
@@ -497,7 +497,9 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string this_fileName, s
 		real_data_array.push_back( temp_vector );
 
 		//	Cleanup
-		while( !temp_vector.empty() ) { temp_vector.pop_back(); }
+		while( !temp_vector.empty() ) { temp_vector.clear(); }
+
+		delete tempFormula;
 	}
 	delete bob;
 	//time_t timeNow2;
@@ -662,5 +664,4 @@ PhaseSpaceBoundary* DataSetConfiguration::GetPhaseSpace() const
 {
 	return internalBoundary;
 }
-
 

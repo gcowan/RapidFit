@@ -31,7 +31,7 @@ void Function( Int_t&, Double_t*, Double_t&, Double_t*, Int_t);
 class MinuitWrapper : public IMinimiser
 {
 	public:
-		MinuitWrapper();
+		//MinuitWrapper();
 		MinuitWrapper( int, int=0 );
 		~MinuitWrapper();
 

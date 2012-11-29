@@ -99,6 +99,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		//exit(0);
 
 		FitResult* fixed_result = new FitResult( 0., fixed_set, 3, Bottle );
+		delete fixed_set;
 		fixed_result->SetMinimumValue(theFunction->Evaluate());
 		return fixed_result;
 	}
@@ -254,9 +255,11 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 				}
 			}
 
-			CheckInputParams( checkedGenerationParameters, vector<IPDF*>(1,genPDF), debug );
+			ParameterSet* checkedSet = CheckInputParams( checkedGenerationParameters, vector<IPDF*>(1,genPDF), debug );
 
-			genPDF->UpdatePhysicsParameters( checkedGenerationParameters );
+			genPDF->UpdatePhysicsParameters( checkedSet );
+
+			delete checkedSet;
 		}
 
 		if( debug != NULL )

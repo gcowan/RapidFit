@@ -680,7 +680,7 @@ TRandom3 * BasePDF::GetRandomFunction() const
 void BasePDF::SetRandomFunction( TRandom3 * new_function )
 {
 	if( seed_function != NULL ) delete seed_function;
-	seed_function = new_function;
+	seed_function = new TRandom3( *new_function );
 }
 
 //  Seed the Random Number Generator correctly

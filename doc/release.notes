@@ -11,6 +11,7 @@
   - May (in future) comment out GSL replacement for RooMath now that it can be addressed safely in a threaded environment
   - Made some extensive changes to improve Exponential class to enable new features in a tested way and the normalisation is now performed 'correctly' for the double expoential resolution case at the cost of the simpler case
   - Minor bugfixes
+  - Fixed Some MemLeaks and improved the ability of the '#' character to comment out xml
 
 2012/11/26 Greig Cowan
   - Fixed compilation bugs in DPHelpers for Z angle calculating code.

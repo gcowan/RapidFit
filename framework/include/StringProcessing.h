@@ -34,11 +34,15 @@ class StringProcessing
 		//	Get all of the string Positions of a chatacter in a string
 		static vector<int> StringPositions( const string, const string );
 
+		static void RemoveLeadingCharacters( string & Input, const char SearchCharacter );
+
 		//	Remove the first occurance? of a selected character
 		static void RemoveCharacter( string&, const char );
 
 		//	Replace an instance of a substring within a 
 		static string ReplaceString( const string&, const string, const string );
+
+		static void RemoveLeadingWhiteSpace( vector<string>& );
 		static void RemoveWhiteSpace( vector<string>& );
 
 		//	Replace non-Latex safe characters with '_'

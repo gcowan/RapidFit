@@ -23,6 +23,7 @@
 #include <limits.h>
 #include <float.h>
 #include <fstream>
+#include <algorithm>
 
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
@@ -125,6 +126,7 @@ void Foam::Init()
 			Name.Append("-");
 			Name+=combinationIndex;
 			Name.Append("_");Name+=rand;
+			string CleanName=Name.Data(); replace( CleanName.begin(), CleanName.end(), '.', '_' ); Name=CleanName.c_str();
 			TString FoamName("Foam_");FoamName+=combinationIndex;
 			//      Create a root file to store the TFoam universe
 			TString RootName(Name);
@@ -132,6 +134,16 @@ void Foam::Init()
 
 			cout << "FOAM NOT Cached, Generating Foam:\t" << Name << endl;
 			MC_Cache = new TFile( RootName, "RECREATE" );
+			MC_Cache->Write( "", TObject::kOverwrite );
+			/*
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass("Foam") )
+				{
+					cout << "File Created" << endl;
+				}
+			}
+			*/
 			//Initialise Foam
 			foamGenerator = new TFoam( Name );
 			foamGenerator->SetkDim( Int_t(continuousNames.size()) );
@@ -145,17 +157,34 @@ void Foam::Init()
 			foamGenerator->SetEvPerBin( 25 );	//	25	Weights per bin... This doesn't Saturate as object is written before generating events
 			foamGenerator->SetChat( 0 );		//	0	verbosity
 			foamGenerator->SetMaxWtRej( 1.1 );	//	1.1	Unknown what effect this has, something to do with weights
+			/*
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass("Foam") )
+				{
+					cout << "Initializing Foam" << endl;
+				}
+			}
+			*/
 			foamGenerator->Initialize();
 			//			foamGenerator->ResetPseRan( rootRandom );
 			//			foamGenerator->ResetRho( combinationFunction );	//	Can afford to Boot Foam's ability if we're using just one cached instance :D
 			//			foamGenerator->Initialize();
 			//	As we haven't cached yet, write to file
-			MC_Cache->Write();
-			foamGenerator->Write( Name.Data() );//,TObject::kOverwrite);
+			foamGenerator->Write( Name, TObject::kOverwrite );
 			cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
+			/*
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass("Foam") )
+				{
+					cout << "Adding Cache" << endl;
+				}
+			}
+			*/
 			InputPDF->AddCacheObject( Name.Data() );
-			MC_Cache->Write();
-			InputPDF->Can_Remove_Cache( false );
+			MC_Cache->Write( "", TObject::kOverwrite );
+			InputPDF->Can_Remove_Cache( true );
 			//MC_Cache->Close();
 		}
 		else
@@ -182,6 +211,7 @@ void Foam::Init()
 				Name.Append("-");
 				Name+=combinationIndex;
 				Name.Append("_");Name+=rand;
+				string CleanName=Name.Data(); replace( CleanName.begin(), CleanName.end(), '.', '_' ); Name=CleanName.c_str();
 				FoamName="Foam_";FoamName+=combinationIndex;
 				//      Create a root file to store the TFoam universe
 				RootName=Name;
@@ -189,6 +219,7 @@ void Foam::Init()
 
 				cout << "FOAM NOT Cached, Generating Foam:\t" << Name << endl;
 				MC_Cache = new TFile( RootName, "RECREATE" );
+				MC_Cache->Write( "", TObject::kOverwrite );
 				//Initialise Foam
 				foamGenerator = new TFoam( Name );
 				foamGenerator->SetkDim( Int_t(continuousNames.size()) );
@@ -207,12 +238,12 @@ void Foam::Init()
 				//                      foamGenerator->ResetRho( combinationFunction ); //      Can afford to Boot Foam's ability if we're using just one cached instance :D
 				//                      foamGenerator->Initialize();
 				//      As we haven't cached yet, write to file
-				MC_Cache->Write();
-				foamGenerator->Write( Name.Data() );//,TObject::kOverwrite);
+				//MC_Cache->Write( "", TObject::kOverwrite );
+				foamGenerator->Write( Name, TObject::kOverwrite );
 				cout << "Storing TFOAM TObject in:\t\t" << RootName << endl;
 				InputPDF->AddCacheObject( Name.Data() );
-				MC_Cache->Write();
-				InputPDF->Can_Remove_Cache( false );
+				MC_Cache->Write( "", TObject::kOverwrite );
+				InputPDF->Can_Remove_Cache( true );
 			}
 			else
 			{
@@ -349,7 +380,7 @@ int Foam::GenerateData( int DataAmount )
 	}
 
 	//cout << "Destroying Generator(s)" << endl;
-	this->RemoveGenerator();
+	//this->RemoveGenerator();
 	return DataAmount;
 }
 

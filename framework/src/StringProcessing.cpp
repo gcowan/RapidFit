@@ -177,15 +177,45 @@ vector<string> StringProcessing::RemoveDuplicates( const vector<string> input, v
 	return output;
 }
 
+void StringProcessing::RemoveLeadingCharacters( string & Input, const char SearchCharacter )
+{
+	if( Input.empty() ) return;
+	char* passedCharacters = new char[ Input.size() + 1 ];
+	unsigned int leadingCharacters=0;
+
+	for( unsigned int characterIndex=0; characterIndex < Input.size(); ++characterIndex )
+	{
+		if( Input[characterIndex] == SearchCharacter )
+		{
+			++leadingCharacters;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	unsigned int addedCharacters=0;
+	for( unsigned int characterIndex = leadingCharacters; characterIndex < Input.size(); ++characterIndex )
+	{
+		passedCharacters[characterIndex-leadingCharacters] = Input[characterIndex];
+		++addedCharacters;
+	}
+
+	passedCharacters[addedCharacters] = '\0';
+	Input = passedCharacters;
+	delete[] passedCharacters;
+}
+
 //Remove any instances of a particular character in a string
 void StringProcessing::RemoveCharacter( string & Input, const char SearchCharacter )
 {
 	char* passedCharacters = new char[ Input.size() + 1 ];
-	int addedCharacters = 0;
+	unsigned int addedCharacters = 0;
 
-	for (unsigned int characterIndex = 0; characterIndex < Input.size(); ++characterIndex )
+	for( unsigned int characterIndex = 0; characterIndex < Input.size(); ++characterIndex )
 	{
-		if ( Input[characterIndex] != SearchCharacter )
+		if( Input[characterIndex] != SearchCharacter )
 		{
 			passedCharacters[addedCharacters] = Input[characterIndex];
 			++addedCharacters;
@@ -194,6 +224,7 @@ void StringProcessing::RemoveCharacter( string & Input, const char SearchCharact
 
 	passedCharacters[addedCharacters] = '\0';
 	Input = passedCharacters;
+	delete[] passedCharacters;
 }
 
 //Replace any instances of a particular character in a string
@@ -234,24 +265,32 @@ string StringProcessing::ReplaceString( const string & Input, const string FindS
 	return output;
 }
 
+void StringProcessing::RemoveLeadingWhiteSpace( vector<string> & newContent )
+{
+	for( unsigned int lineIndex = 0; lineIndex < newContent.size(); ++lineIndex )
+	{
+		RemoveLeadingCharacters( newContent[lineIndex], ' ' );
+	}
+	//newContent = output;
+}
+
 //Remove white space from passed lines
 void StringProcessing::RemoveWhiteSpace( vector<string> & newContent )
 {
-	vector<string> output;
-
-	for (unsigned int lineIndex = 0; lineIndex < newContent.size(); ++lineIndex )
+	//vector<string> output;
+	for( unsigned int lineIndex = 0; lineIndex < newContent.size(); ++lineIndex )
 	{
 		//Remove tabs
 		RemoveCharacter( newContent[lineIndex], '\t' );
+		//RemoveCharacter( newContent[lineIndex], ' ' );
 
 		//Remove empty lines
-		if ( newContent[lineIndex] != "" )
-		{
-			output.push_back( newContent[lineIndex] );
-		}
+		//if ( newContent[lineIndex] != "" )
+		//{
+		//	output.push_back( newContent[lineIndex] );
+		//}
 	}
-
-	newContent = output;
+	//newContent = output;
 }
 
 //Return a vector containing all the unique strings from the two input vectors
