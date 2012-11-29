@@ -288,7 +288,7 @@ void MemoryDataSet::NormaliseWeights()
 		{
 			allData[i]->SetEventWeight( allData[i]->GetObservable( WeightName )->GetValue() * alpha );
 		}
-		cout << "alpha = " << sum_Val << "  /  " << endl; 
+		cout << "alpha = " << sum_Val << "  /  " << sum_Val2 << endl; 
 		cout << "Correction Factor: " << alpha << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
 	}
 }
