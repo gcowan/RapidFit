@@ -115,6 +115,12 @@ class IDataSet
 
 		virtual string GetWeightName() const = 0;
 
+		virtual double GetSumWeights() const = 0;
+
+		virtual double GetSumWeightsSq() const = 0;
+
+		virtual void ApplyAlpha( const double, const double ) = 0;
+
 		virtual void NormaliseWeights() = 0;
 
 	private:

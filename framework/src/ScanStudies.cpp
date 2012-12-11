@@ -299,7 +299,11 @@ FitResultVector* ScanStudies::SingleScan( MinimiserConfiguration * MinimiserConf
 
 	ScanParam* local_param = OutputConfig->GetScanParam( scanName );
 
+	cout << "Performing Single Scan" << endl;
+
 	DoScan( MinimiserConfig, FunctionConfig, BottleParameters, BottleData, BottleConstraints, local_param, Returnable_Result, OutputLevel, debug, forceContinue );
+
+	cout << "Returning Result" << endl;
 
 	return Returnable_Result;
 }

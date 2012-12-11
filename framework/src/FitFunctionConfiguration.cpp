@@ -129,8 +129,18 @@ void FitFunctionConfiguration::SetNormaliseWeights( const bool Input )
 	NormaliseWeights = Input;
 }
 
+void FitFunctionConfiguration::SetSingleNormaliseWeights( const bool Input )
+{
+	SingleNormaliseWeights = Input;
+}
+
 bool FitFunctionConfiguration::GetNormaliseWeights() const
 {
 	return NormaliseWeights;
+}
+
+bool FitFunctionConfiguration::GetSingleNormaliseWeights() const
+{
+	return SingleNormaliseWeights;
 }
 

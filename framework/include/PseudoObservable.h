@@ -61,6 +61,8 @@ class PseudoObservable
 
 		vector<double> GetCacheInput() const;
 
+		double Eval( const vector<double> ) const;
+
 	private:
 		double (*internal_function)(vector<double>);
 

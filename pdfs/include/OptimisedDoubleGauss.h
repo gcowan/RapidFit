@@ -61,7 +61,7 @@ class OptimisedDoubleGauss : public BasePDF
 		ObservableRef sigma1Name;
 		ObservableRef sigma2Name;
 		ObservableRef fracName;
-
+		ObservableRef centerName;
 
 		//	Internal object(s)
 
@@ -70,6 +70,6 @@ class OptimisedDoubleGauss : public BasePDF
 		unsigned int componentIndex;
 
 		//	Storing the Result of Calculations
-		double sigma1_denom, sigma2_denom, f, f2, denominator;
+		double sigma1_denom, sigma2_denom, f, f2, denominator, center;
 };
 

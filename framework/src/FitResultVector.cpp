@@ -24,7 +24,7 @@ FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allR
 	{
 		clock = new TStopwatch();
 		gl_clock = new TGLStopwatch();
-		allNames = Result_Array[0]->GetAllNames();
+		allNames = Result_Array.empty()? vector<string>() : Result_Array[0]->GetAllNames();
 		//Construct the result data structure
 		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 		{

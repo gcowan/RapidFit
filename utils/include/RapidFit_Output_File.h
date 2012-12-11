@@ -62,8 +62,8 @@ const TString value_suffix = "_value";
 const TString pull_suffix = "_pull";
 const TString gen_suffix = "_gen";
 const TString ScanStatus_suffix = "_scan";
-const double DOUBLE_TOLERANCE = 0.0000001;
-const TString double_tolerance = "0.0000001";
+const double DOUBLE_TOLERANCE = 0.00001;
+const TString double_tolerance = "0.00001";
 const string RapidFitOutputTupleName = "RapidFitResult";
 
 #endif

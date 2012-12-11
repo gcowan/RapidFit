@@ -102,6 +102,10 @@ class FitFunctionConfiguration
 		void SetNormaliseWeights( bool Input );
 
 		bool GetNormaliseWeights() const;
+
+		void SetSingleNormaliseWeights( bool Input );
+
+		bool GetSingleNormaliseWeights() const;
 	private:
 
 		string functionName, weightName;/*!	Name of the Function and Weight to use		*/
@@ -114,6 +118,7 @@ class FitFunctionConfiguration
 		bool gslIntegrator;		/*!	Decision about Numerical integrator to use	*/
 		bool testIntegrator;		/*!	Decision about wether to test the integrator	*/
 		bool NormaliseWeights;
+		bool SingleNormaliseWeights;
 };
 
 #endif

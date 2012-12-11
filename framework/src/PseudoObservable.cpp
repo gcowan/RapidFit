@@ -95,7 +95,7 @@ double PseudoObservable::GetValue() const
 		if( valid ) return Value;
 		else
 		{
-			Value = internal_function( internal_Input );
+			Value = this->Eval( internal_Input );
 			return Value;
 		}
 	}
@@ -173,5 +173,10 @@ bool PseudoObservable::GetValid( const vector<double> Input ) const
 vector<double> PseudoObservable::GetCacheInput() const
 {
 	return internal_Input;
+}
+
+double PseudoObservable::Eval( const vector<double> Input ) const
+{
+	return internal_function( Input );
 }
 

@@ -127,7 +127,7 @@ void RapidFitIntegrator::ProjectionSettings()
 RapidFitIntegrator::~RapidFitIntegrator()
 {
 	if( multiDimensionIntegrator != NULL ) delete multiDimensionIntegrator;
-	if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
+	//if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
 	if( fastIntegrator != NULL ) delete fastIntegrator;
 	if( debug != NULL ) delete debug;
 }

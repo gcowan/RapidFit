@@ -20,8 +20,8 @@ OptimisedDoubleGauss::OptimisedDoubleGauss( PDFConfigurator* config ) :
   //  ClassLookUp assigns this PDFConriguator to this PDF 'behind the scenes' and is available on request for derrived objects
   BasePDF(),
   //  Constructing objects here in the 'initialization' phase is recommended as it's quicker
-  xName( "x" ), fracName( "f_sig1" ), sigma1Name( "sigma" ), sigma2Name( "sigma2" ),
-  plotComponents(false), componentIndex(0), sigma1_denom(0.), sigma2_denom(0.), f(0.), f2(0.), denominator(0.)
+  xName( "x" ), fracName( "f_sig1" ), sigma1Name( "sigma" ), sigma2Name( "sigma2" ), centerName( "center" ),
+  plotComponents(false), componentIndex(0), sigma1_denom(0.), sigma2_denom(0.), f(0.), f2(0.), denominator(0.), center(0.)
 {
   //  Work out of we want to plot Components when we do Projections
   plotComponents = config->isTrue( "PlotComponents" );
@@ -38,7 +38,7 @@ void OptimisedDoubleGauss::MakePrototypes()
   //  Setup the PhysicsParameters we expect to find
   vector<string> ParamNames;
   ParamNames.push_back( sigma1Name ); ParamNames.push_back( sigma2Name );
-  ParamNames.push_back( fracName );
+  ParamNames.push_back( fracName ); ParamNames.push_back( centerName );
   allParameters = ParameterSet( ParamNames );
 }
 
@@ -47,7 +47,8 @@ void OptimisedDoubleGauss::MakePrototypes()
 OptimisedDoubleGauss::OptimisedDoubleGauss( const OptimisedDoubleGauss& input ) :
   BasePDF( input ), xName( input.xName ), fracName( input.fracName ), sigma1Name( input.sigma1Name ), sigma2Name( input.sigma2Name ),
   plotComponents( input.plotComponents ), componentIndex( input.componentIndex ), sigma1_denom( input.sigma1_denom ),
-  sigma2_denom( input.sigma2_denom ), f( input.f ), f2( input.f2 ), denominator( input.denominator )
+  sigma2_denom( input.sigma2_denom ), f( input.f ), f2( input.f2 ), denominator( input.denominator ),
+  centerName( input.centerName ), center( input.center )
 {
   //  Copy BY HAND all objects which are initialized with the new pointer here unless you know a direct copy by reference is safe.
   //  You can either define an object as global and give copied/derrived PDFs no ability to remove the object
@@ -74,6 +75,8 @@ bool OptimisedDoubleGauss::SetPhysicsParameters( ParameterSet* input )
   f = allParameters.GetPhysicsParameter( fracName )->GetValue();
   f2 = 1. - f;
 
+  center = allParameters.GetPhysicsParameter( centerName )->GetValue();
+
   // Divisions are VERY expensive computationally, cache results where possible
   sigma1_denom = 1. / (2.*sigma1Value*sigma1Value);
   sigma2_denom = 1. / (2.*sigma2Value*sigma2Value);
@@ -90,7 +93,7 @@ bool OptimisedDoubleGauss::SetPhysicsParameters( ParameterSet* input )
 double OptimisedDoubleGauss::Evaluate( DataPoint* input )
 {
   //  Read Observables
-  double xVal = input->GetObservable( xName )->GetValue();
+  double xVal = input->GetObservable( xName )->GetValue() - center;
 
   //  PreCalculate this to save CPU
   double xVal_sq = xVal*xVal;

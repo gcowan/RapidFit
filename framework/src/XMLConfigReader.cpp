@@ -779,6 +779,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		bool integratorTest = true;
 		bool gslIntegrator = false;
 		bool NormaliseWeights = false;
+		bool SingleNormaliseWeights = false;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		if ( functionInfo.size() == 0 )
 		{
@@ -825,6 +826,10 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 				{
 					NormaliseWeights = XMLTag::GetBooleanValue( functionInfo[childIndex] );
 				}
+				else if ( functionInfo[childIndex]->GetName() == "SingleNormaliseWeights" )
+				{
+					SingleNormaliseWeights = XMLTag::GetBooleanValue( functionInfo[childIndex] );
+				}
 				else
 				{
 					cerr << "Unrecognised FitFunction component: " << functionInfo[childIndex]->GetName() << endl;
@@ -858,6 +863,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 
 		returnable_function->SetThreads( Threads );
 		returnable_function->SetNormaliseWeights( NormaliseWeights );
+		returnable_function->SetSingleNormaliseWeights( SingleNormaliseWeights );
 		returnable_function->SetIntegratorTest( integratorTest );
 		returnable_function->SetGSLIntegrator( gslIntegrator );
 

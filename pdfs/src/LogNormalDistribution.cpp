@@ -26,10 +26,13 @@ LogNormalDistribution::LogNormalDistribution(PDFConfigurator* configurator) :
 	LNm2Name	( configurator->getName("LNm2" ) ),
 	LNfName		( configurator->getName("LNf1" ) ),
 	// Observables
-	LNxName( configurator->getName("LNx") )
+	LNxName( configurator->getName("LNx") ),
+	plotComponents(false)
 {
 	
 	std::cout << "Constructing PDF: LogNormalDistribution " << std::endl ;
+
+	plotComponents = configurator->isTrue( "PlotComponents" );
 
 	MakePrototypes();
 }
@@ -94,6 +97,58 @@ double LogNormalDistribution::Normalisation(PhaseSpaceBoundary * boundary)
 	(void)boundary;
 	// Assumes that the mass integration limits are +/- Infinity
 	// So take sufficiently large mass window.
-	return -1.0;
+	return 1.0;
+}
+
+vector<string> LogNormalDistribution::PDFComponents()
+{
+        vector<string> components;
+
+        if( plotComponents )
+        {
+                components.push_back( "Log1" );
+                components.push_back( "Log2" );
+        }
+
+        return components;
+}
+
+double LogNormalDistribution::EvaluateComponent( DataPoint* input, ComponentRef* Component )
+{
+        int componentIndex = Component->getComponentNumber();
+        if( componentIndex == -1 )
+        {
+		double x = input->GetObservable( LNxName )->GetValue();
+                string ComponentName = Component->getComponentName();
+                if( ComponentName.compare( "Log1" ) == 0 )
+                {
+                        Component->setComponentNumber( 1 );
+			return f*TMath::LogNormal( x, sigma1, theta1, m1 );
+		}
+		else if( ComponentName.compare( "Log2" ) == 0 )
+		{
+			Component->setComponentNumber( 2 );
+			return (1.-f)*TMath::LogNormal( x, sigma2, theta2, m2 );
+		}
+		else
+		{
+			Component->setComponentNumber( 0 );
+			return this->Evaluate( input );
+		}
+	}
+	else if( componentIndex == 1 )
+	{
+		double x = input->GetObservable( LNxName )->GetValue();
+		return f*TMath::LogNormal( x, sigma1, theta1, m1 );
+	}
+	else if( componentIndex == 2 )
+	{
+		double x = input->GetObservable( LNxName )->GetValue();
+		return (1.-f)*TMath::LogNormal( x, sigma2, theta2, m2 );
+	}
+	else
+	{
+		return this->Evaluate( input );
+	}
 }
 

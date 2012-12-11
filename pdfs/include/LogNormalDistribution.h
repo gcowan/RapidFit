@@ -24,6 +24,10 @@ class LogNormalDistribution : public BasePDF
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
 
+                double EvaluateComponent( DataPoint*, ComponentRef* );
+
+                vector<string> PDFComponents();
+
 	protected:
 		//Calculate the PDF normalisation
 		virtual double Normalisation(PhaseSpaceBoundary*);
@@ -53,6 +57,8 @@ class LogNormalDistribution : public BasePDF
 		// Observables
 		double x ;
 		ObservableRef LNxName;	
+
+		bool plotComponents;
 };
 
 #endif

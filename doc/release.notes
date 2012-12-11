@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2012/12/11 Rob Currie
+  - Added SingleNormaliseWeights to calculate a single global alpha based on per-event weights
+  - Added Components to LogNormal PDF
+  - Made modifications to OptimisedDoubleGauss PDF to use any central value
+
 2012/11/28 Rob Currie
   - Fixed bug to do with Projections for pdfs with strong acceptance functions
   - Fixed a bug in Observable class to do with anything involving communicating with ROOT when making use of caching technology

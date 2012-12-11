@@ -47,6 +47,10 @@ class MemoryDataSet : public IDataSet
 		bool GetWeightsWereUsed() const;
 		void UseEventWeights( const string Name );
 
+		double GetSumWeights() const;
+		double GetSumWeightsSq() const;
+		void ApplyAlpha( const double, const double );
+
 		void NormaliseWeights();
 
 		virtual void Print() const;

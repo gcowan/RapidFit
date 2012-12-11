@@ -384,13 +384,38 @@ int PerformLLScan( RapidFitConfiguration* config )
 
 		cout << "Scan Finished" << endl;
 
+		if( config->doFC_Flag ) cout << "Wanting FC Scan" << endl;
+		else cout << "NOT Wanting FC Scan" << endl;
+
 		if( config->doFC_Flag )
 		{
+			cout << "Performing 1DFC Scan" << endl;
 			FitResultVector* new_1D = new FitResultVector( scanSoloResults );
-			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( true );
+
+			//config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( true );
+
+			if( config->debug != NULL )
+			{
+				if( config->debug->DebugThisClass( "main" ) )
+				{
+					cout << "main: Constructing FeldmanCousins" << endl;
+				}
+			}
+
+			for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )	config->pdfsAndData[i]->ClearCache();
+
 			VectoredFeldmanCousins* new_study = new VectoredFeldmanCousins( config->GlobalFitResult, new_1D, config->Nuisencemodel, config->makeOutput, config->theMinimiser,
 					config->theFunction, config->xmlFile, config->pdfsAndData );
 			new_study->SetNumRepeats( config->numberRepeats );
+
+			if( config->debug != NULL )
+			{
+				if( config->debug->DebugThisClass( "main" ) )
+				{
+					cout << "main: Starting FeldmanCousins" << endl;
+				}
+			}
+
 			new_study->DoWholeStudy( config->OutputLevel2 );
 			//	Doesn't hurt to be sure we obay the file format standard
 			vector<FitResultVector*> file_output;
@@ -420,6 +445,7 @@ int PerformLLScan( RapidFitConfiguration* config )
 				temp_vec->AddFitResult( scanSoloResults[this_scan_num]->GetFitResult( i ), false );
 				temp_vec->AddRealTime( scanSoloResults[this_scan_num]->GetRealTime(i) );
 				temp_vec->AddCPUTime( scanSoloResults[this_scan_num]->GetCPUTime(i) );
+				temp_vec->AddGLTime( scanSoloResults[this_scan_num]->GetGLTime(i) );
 				ammended_format.push_back( temp_vec );
 			}
 			FitResultVector* corrected_format = new FitResultVector( ammended_format );

@@ -258,6 +258,9 @@ TH1* Histogram_Processing::Get_Histo( TTree* input_tree, TString draw_str, TStri
 {
 	if( rand == NULL ) rand = gRandom;
 	TString rand_str; rand_str+=rand->Rndm();
+	string rand_num( rand_str.Data() );
+	replace( rand_num.begin(), rand_num.end(), '.', '_' );
+	rand_str = rand_num.c_str();
 	input_tree->Draw( draw_str, weight_str, "goff" );
 	TH1* output_histo = (TH1*) input_tree->GetHistogram();
 	output_histo->SetName(output_histo->GetName()+rand_str);
@@ -268,6 +271,9 @@ TGraph* Histogram_Processing::Get_Graph( TTree* input_tree, TString draw_str, TS
 {
 	if( rand == NULL ) rand = gRandom;
 	TString rand_str; rand_str+=rand->Rndm();
+        string rand_num( rand_str.Data() );
+        replace( rand_num.begin(), rand_num.end(), '.', '_' );
+        rand_str = rand_num.c_str();
 	TGraph* new_graph = new TGraph( Get_Histo( input_tree, draw_str, weight_str, rand ) );
 	new_graph->SetName("Graph_"+rand_str);
 	return new_graph;
@@ -286,6 +292,9 @@ TH1* Histogram_Processing::Get_TH1( const vector<Double_t>& input, TRandom* rand
 	if( X_MIN != -DBL_MAX ) input_min = X_MIN;
 	if( X_MAX != DBL_MAX ) input_max = X_MAX;
 	TString rand_num; rand_num += rand->Rndm();
+        string rand_str( rand_num.Data() );
+        replace( rand_str.begin(), rand_str.end(), '.', '_' );
+        rand_num = rand_str.c_str();
 	TH1* returnable_hist = new TH1D( "TH1_"+rand_num, "TH1_"+rand_num, bins, input_min, input_max );
 	vector<Double_t>::const_iterator index_i = input.begin();
 	vector<Double_t>::const_iterator index_e = input.end();
@@ -304,6 +313,9 @@ TH1* Histogram_Processing::Plot_1D( const vector<double>& input, TString Filenam
 	TH1* temp_histo = Histogram_Processing::Get_TH1( input, rand );
 
 	TString canv_name("canv_"); canv_name+=rand->Rndm();
+        string rand_num( canv_name.Data() );
+        replace( rand_num.begin(), rand_num.end(), '.', '_' );
+        canv_name = rand_num.c_str();
 
 	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
 
@@ -325,6 +337,9 @@ TGraph* Histogram_Processing::Get_TGraph( const vector<vector<Double_t> >& input
 	TGraph* returnable_graph = new TGraph( input[0].size(), &(input[0][0]), &(input[1][0]) );
 
 	TString TGraph_Name("TGraph_"); TGraph_Name+=rand->Rndm();
+        string rand_num( TGraph_Name.Data() );
+        replace( rand_num.begin(), rand_num.end(), '.', '_' );
+        TGraph_Name = rand_num.c_str();
 
 	returnable_graph->SetTitle( TGraph_Name );
 	returnable_graph->SetName( TGraph_Name );
@@ -341,6 +356,9 @@ TGraph2D* Histogram_Processing::Get_TGraph2D( const vector<vector<Double_t> >& i
 	TGraph2D* returnable_TGraph2D = new TGraph2D( input[0].size(), const_cast<Double_t*>(&(input[0][0])), const_cast<Double_t*>(&(input[1][0])), const_cast<Double_t*>(&(input[2][0])) );
 
 	TString TGraph2D_Name("TGraph2D_"); TGraph2D_Name+=rand->Rndm();
+        string rand_num( TGraph2D_Name.Data() );
+        replace( rand_num.begin(), rand_num.end(), '.', '_' );
+        TGraph2D_Name = rand_num.c_str();
 
 	returnable_TGraph2D->SetName( TGraph2D_Name );
 	returnable_TGraph2D->SetTitle( TGraph2D_Name );
@@ -358,6 +376,10 @@ TH2* Histogram_Processing::Get_TH2( const vector<vector<Double_t> >& input, TRan
 		return NULL;
 	}
 	TString rand_num; rand_num += rand->Rndm();
+        string rand_str( rand_num.Data() );
+        replace( rand_str.begin(), rand_str.end(), '.', '_' );
+        rand_num = rand_str.c_str();
+
 	vector<Double_t> X_data = input[0];
 	vector<Double_t> Y_data = input[1];
 	vector<Double_t> weight;
@@ -392,6 +414,9 @@ TH2* Histogram_Processing::Plot_2D( const vector<double>& X, const vector<double
 	TH2* temp_plot = Histogram_Processing::Get_TH2( data, rand );
 
 	TString canv_name("Canv_"); canv_name += rand->Rndm();
+        string rand_num( canv_name.Data() );
+        replace( rand_num.begin(), rand_num.end(), '.', '_' );
+        canv_name = rand_num.c_str();
 
 	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
 
@@ -414,6 +439,10 @@ TH3* Histogram_Processing::Get_TH3( const vector<vector<Double_t> >& input, TRan
 		return NULL;
 	}
 	TString rand_num; rand_num += rand->Rndm();
+        string rand_str( rand_num.Data() );
+        replace( rand_str.begin(), rand_str.end(), '.', '_' );
+        rand_num = rand_str.c_str();
+
 	vector<Double_t> X_data = input[0];
 	vector<Double_t> Y_data = input[1];
 	vector<Double_t> Z_data = input[2];
@@ -450,6 +479,9 @@ TH3* Histogram_Processing::Plot_3D( const vector<double>& X, const vector<double
 	TH3* temp_plot = Histogram_Processing::Get_TH3( data, rand );
 
 	TString canv_name("Canv_"); canv_name+=rand->Rndm();
+        string rand_str( canv_name.Data() );
+        replace( rand_str.begin(), rand_str.end(), '.', '_' );
+        canv_name = rand_str.c_str();
 
 	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
 
@@ -510,6 +542,9 @@ vector<TMultiGraph*> Histogram_Processing::GetContoursFromTH2( TH2* input_th2, c
 	vector<TMultiGraph*> returnable_Contours;
 
 	TString TCanvas_Name("TCanvas_");TCanvas_Name+=rand->Rndm();
+        string rand_str_( TCanvas_Name.Data() );
+        replace( rand_str_.begin(), rand_str_.end(), '.', '_' );
+        TCanvas_Name = rand_str_.c_str();
 	TCanvas* c1 = new TCanvas( TCanvas_Name, TCanvas_Name, 1680, 1050 );
 
 	input_th2->SetContour( contour_list.size(), &(contour_list[0]) );
@@ -522,6 +557,9 @@ vector<TMultiGraph*> Histogram_Processing::GetContoursFromTH2( TH2* input_th2, c
 	if( generated_contours == NULL ) return returnable_Contours;
 
 	TString rand_str; rand_str+=rand->Rndm();
+	string rand_str2( rand_str.Data() );
+	replace( rand_str2.begin(), rand_str2.end(), '.', '_' );
+	rand_str = rand_str2.c_str();
 
 	for( unsigned int i=0; i< generated_contours->GetSize(); ++i )
 	{

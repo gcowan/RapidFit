@@ -285,6 +285,23 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		bottle->AddResult( Requested_PDF, Requested_DataSet );
 	}
 
+	if( FunctionConfig->GetSingleNormaliseWeights() )
+	{
+		double sum_total=0.;
+		double sum_sq_total=0.;
+		for( unsigned int i=0; i< bottle->NumberResults(); ++i )
+		{
+			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
+			sum_total += Requested_DataSet->GetSumWeights();
+			sum_sq_total += Requested_DataSet->GetSumWeightsSq();
+		}
+		for( unsigned int i=0; i< BottleData.size(); ++i )
+		{
+			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
+			Requested_DataSet->ApplyAlpha( sum_total, sum_sq_total );
+		}
+	}
+
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass( "FitAssembler" ) )

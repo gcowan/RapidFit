@@ -96,6 +96,9 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 		for( ; var_i != var_e; ++var_i )
 		{
 			TString rand_str; rand_str+=rand->Rndm();
+			string rand_string( rand_str.Data() );
+			replace( rand_string.begin(), rand_string.end(), '.', '_' );
+			rand_str = rand_string.c_str();
 			//vector<vector<Double_t> > Free_this_Grid_Coordinate = Plotter_Data( input_tree, *Param_i+*var_i, free_toys, rand );
 			//vector<vector<Double_t> > Fixed_this_Grid_Coordinate = Plotter_Data( input_tree, *Param_i+*var_i, fixed_toys, rand );
 
@@ -230,12 +233,16 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 			free_data_th1->Draw();
 			free_c1->Update();
 			Histogram_Processing::Silent_Print( free_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_free.pdf" );
+			Histogram_Processing::Silent_Print( free_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_free.png" );
+			Histogram_Processing::Silent_Print( free_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_free.C" );
 
 			TCanvas* fixed_c1 = new TCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str, 1680, 1050 );
 			TH1* fixed_data_th1 = Histogram_Processing::Get_TH1( fixed_2_plot, rand );//, get_optimal_histo_bins(param_data_fixed) );
 			fixed_data_th1->Draw();
 			fixed_c1->Update();
 			Histogram_Processing::Silent_Print( fixed_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_fixed.pdf" );
+			Histogram_Processing::Silent_Print( fixed_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_fixed.png" );
+			Histogram_Processing::Silent_Print( fixed_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_fixed.C" );
 
 			TGraph* free_graph = new TGraph( free_data_th1 );
 			TGraph* fixed_graph = new TGraph( fixed_data_th1 );
@@ -251,6 +258,8 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 
 			c1->Update();
 			Histogram_Processing::Silent_Print( c1, *Param_i+"_"+*var_i+"_"+grid_name+"_multi.pdf" );
+			Histogram_Processing::Silent_Print( c1, *Param_i+"_"+*var_i+"_"+grid_name+"_multi.png" );
+			Histogram_Processing::Silent_Print( c1, *Param_i+"_"+*var_i+"_"+grid_name+"_multi.C" );
 		}
 	}
 }
@@ -260,17 +269,24 @@ void FeldmanCousinsAnalysis::NLL_dists( vector<Double_t>& param_data_free, vecto
 {
 	TString grid_name = Flat_Coord_String( controlled_parameter_name, coordinate );
 	TString rand_str; rand_str += rand->Rndm();
+	string rand_string( rand_str.Data() );
+	replace( rand_string.begin(), rand_string.end(), '.', '_' );
+	rand_str = rand_string.c_str();
 	TCanvas* free_c1 = new TCanvas( "TCanv_free_"+rand_str, "TCanv_free_"+rand_str, 1680, 1050 );
 	TH1* free_data_th1 = Histogram_Processing::Get_TH1( param_data_free, rand );//, get_optimal_histo_bins(param_data_free) );
 	free_data_th1->Draw();
 	free_c1->Update();
 	Histogram_Processing::Silent_Print( free_c1, "NLL_"+grid_name+"_free.pdf" );
+	Histogram_Processing::Silent_Print( free_c1, "NLL_"+grid_name+"_free.png" );
+	Histogram_Processing::Silent_Print( free_c1, "NLL_"+grid_name+"_free.C" );
 
 	TCanvas* fixed_c1 = new TCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str, 1680, 1050 );
 	TH1* fixed_data_th1 = Histogram_Processing::Get_TH1( param_data_fixed, rand );//, get_optimal_histo_bins(param_data_fixed) );
 	fixed_data_th1->Draw();
 	fixed_c1->Update();
 	Histogram_Processing::Silent_Print( fixed_c1, "NLL_"+grid_name+"_fixed.pdf" );
+	Histogram_Processing::Silent_Print( fixed_c1, "NLL_"+grid_name+"_fixed.png" );
+	Histogram_Processing::Silent_Print( fixed_c1, "NLL_"+grid_name+"_fixed.C" );
 
 	TGraph* free_graph = new TGraph( free_data_th1 );
 	TGraph* fixed_graph = new TGraph( fixed_data_th1 );
@@ -287,6 +303,8 @@ void FeldmanCousinsAnalysis::NLL_dists( vector<Double_t>& param_data_free, vecto
 
 	c1->Update();
 	Histogram_Processing::Silent_Print( c1, "NLL_"+grid_name+"_multi.pdf" );
+	Histogram_Processing::Silent_Print( c1, "NLL_"+grid_name+"_multi.png" );
+	Histogram_Processing::Silent_Print( c1, "NLL_"+grid_name+"_multi.C" );
 }
 
 //	Print some useful information to the screen&file about this grid point
@@ -331,6 +349,7 @@ void FeldmanCousinsAnalysis::Output_GridPoint( vector<string>& controlled_parame
 
 	Histogram_Processing::Silent_Print( c1, "DLL_Dist"+grid_name+".pdf");
 	Histogram_Processing::Silent_Print( c1, "DLL_Dist"+grid_name+".png");
+	Histogram_Processing::Silent_Print( c1, "DLL_Dist"+grid_name+".C" );
 
 	grid_th1->Write("",TObject::kOverwrite);
 	c1->Write("",TObject::kOverwrite);
@@ -523,7 +542,10 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 		TH1* diff_th1 = Histogram_Processing::Get_TH1( *Free_Toy_diff, rand );
 		TH1* diff2_th1 = Histogram_Processing::Get_TH1( *Fixed_Toy_diff, rand );
 		TString canv_nam_p("name");canv_nam_p+=rand->Rndm();
-		here->cd();                                              
+                string caonvas_string( canvas_nam_p.Data() );
+                replace( canvas_string.begin(), canvas_string.end(), '.', '_' );
+		canv_nam_p = canvas_string.c_str();
+		here->cd();
 		TCanvas*  canv_p = new TCanvas( canv_nam_p, canv_nam_p, 1680, 1050 );
 		canv_p->SetLogy();
 		diff_th1->Draw();
@@ -538,7 +560,10 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 		//	Print some information on the toys at this grid point
 		//Print_Toy_Info( controlled_parameter_name, *grid_i, (int)Fixed_Toy_NLL->size(), (int)Free_Toy_NLL->size() );
 
+		cout << "here" << endl;
+
 		//      Record and output the DLL from data at this point
+		cout << Data_Coordinate.size() << "\t" << Data_Coordinate[0].size() << endl;
 		double LOCAL_DATA_DLL = Data_Coordinate[0][0] - GLOBAL_BEST_NLL;
 		cout << Data_Coordinate[0][0] << " - " << GLOBAL_BEST_NLL << " = " << LOCAL_DATA_DLL << endl;
 		DATA_DLL.push_back( LOCAL_DATA_DLL );
@@ -659,8 +684,14 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 		//TGraph* rejected_graph = new TGraph( rej_th1 ); rejected_graph->SetMarkerColor( 2 ); rejected_graph->SetLineColor( 2 );
 	
 		TString TMulti_Name("TMultiGraph_"); TMulti_Name+=rand->Rndm();
+                string MultiStr( TMulti_Name.Data() );
+                replace( MultiStr.begin(), MultiStr.end(), '.', '_' );
+		TMulti_Name = MultiStr.c_str();
 		//TMultiGraph* acc_rej = new TMultiGraph( TMulti_Name, TMulti_Name );
 		TString m_canvas_name("TCanvas_"); m_canvas_name+=rand->Rndm();
+                string CanvasStr( m_canvas_name.Data() );
+                replace( CanvasStr.begin(), CanvasStr.end(), '.', '_' );
+		m_canvas_name = CanvasStr.c_str();
 		TCanvas* DLL_Overlay = new TCanvas( m_canvas_name, m_canvas_name, 1680, 1050 );
 		DLL_Overlay->SetLogy();
 		total_th1->Draw("lp9");
@@ -682,6 +713,8 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 		tleg->Draw();
 		DLL_Overlay->Update();
 		DLL_Overlay->Print("DLL_Overlay"+grid_name+".pdf");
+		DLL_Overlay->Print("DLL_Overlay"+grid_name+".png");
+		DLL_Overlay->Print("DLL_Overlay"+grid_name+".C");
 
 		//sort( Toy_DLL_Dist.begin(), Toy_DLL_Dist.end() );
 		//print( Toy_DLL_Dist );
@@ -816,7 +849,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	final_graph->SetMarkerColor(2);
 
 	TGraph* final_cl = new TGraph( (int)Y_data2.size(), &(X_data2[0]), &(Y_data2[0]) );
-	final_cl->SetTitle( "" );final_graph->SetName("C.L.");
+	final_cl->SetTitle( "" );final_graph->SetName("C_L_");
 	final_cl->SetLineColor(4);
 	final_cl->SetMarkerColor(4);
 
@@ -889,11 +922,15 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	mult->GetXaxis()->SetTitle( EdStyle::GetParamRootName(controlled_parameter_name[0]) + " " + EdStyle::GetParamRootUnit(controlled_parameter_name[0]) );
 
 	Histogram_Processing::Silent_Print( cf, "Final.pdf" );
+	Histogram_Processing::Silent_Print( cf, "Final.png" );
+	Histogram_Processing::Silent_Print( cf, "Final.C" );
 
 	mult->GetYaxis()->SetRangeUser( 0.5, 1. );
 	cf->Update();
 
 	Histogram_Processing::Silent_Print( cf, "Final_zoom.pdf" );
+	Histogram_Processing::Silent_Print( cf, "Final_zoom.png" );
+	Histogram_Processing::Silent_Print( cf, "Final_zoom.C" );
 
 	TCanvas* cfz = new TCanvas( "cfz", "", 1680, 1050 );
 
@@ -906,6 +943,8 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	mult_z->GetYaxis()->SetTitle( "C.L." );
 	mult_z->GetXaxis()->SetTitle( EdStyle::GetParamRootName(controlled_parameter_name[0]) + " " + EdStyle::GetParamRootUnit(controlled_parameter_name[0]) );
 	Histogram_Processing::Silent_Print( cfz, "logFinal.pdf" );
+	Histogram_Processing::Silent_Print( cfz, "logFinal.png" );
+	Histogram_Processing::Silent_Print( cfz, "logFinal.C" );
 
 
 
@@ -997,6 +1036,8 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	cf2->Update();
 
 	Histogram_Processing::Silent_Print( cf2, "1-Final.pdf" );
+	Histogram_Processing::Silent_Print( cf2, "1-Final.png" );
+	Histogram_Processing::Silent_Print( cf2, "1-Final.C" );
 
 
 
@@ -1090,6 +1131,8 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	cf3->Update();
 
 	Histogram_Processing::Silent_Print( cf3, "1-Final_sqrt.pdf" );
+	Histogram_Processing::Silent_Print( cf3, "1-Final_sqrt.png" );
+	Histogram_Processing::Silent_Print( cf3, "1-Final_sqrt.C" );
 
 }
 
@@ -1177,7 +1220,7 @@ OutputPlots* FeldmanCousinsAnalysis::Plot_1D_Vectors( pair<vector<double>,vector
 	FC_graph->SetMarkerColor(2);
 
 	TGraph* theory_graph = new TGraph( (int)theory.first.size(), &(theory.first[0]), &(theory.second[0]) );
-	theory_graph->SetTitle( "" );theory_graph->SetName("C.L.");
+	theory_graph->SetTitle( "" );theory_graph->SetName("C_L_");
 	theory_graph->SetLineColor(4);
 	theory_graph->SetMarkerColor(4);
 
@@ -1194,6 +1237,9 @@ OutputPlots* FeldmanCousinsAnalysis::Plot_1D_Vectors( pair<vector<double>,vector
 
 
 	TString rand_num; rand_num+=rand->Rndm();
+	string rand_string( rand_num.Data() );
+	replace( rand_string.begin(), rand_string.end(), '.', '_' );
+	rand_num = rand_string.c_str();
 	TCanvas* cf = new TCanvas( "canv_"+rand_num, "", 1680, 1050 );
 	mult->Draw("APC");
 	cf->Update();
@@ -1370,7 +1416,8 @@ mult->GetYaxis()->SetTitle( "C.L." );
 mult->GetXaxis()->SetTitle( EdStyle::GetParamRootName(controlled_parameter_name[0]) + " " + EdStyle::GetParamRootUnit(controlled_parameter_name[0]) );
 
 Histogram_Processing::Silent_Print( cf, "Final.pdf" );
-
+Histogram_Processing::Silent_Print( cf, "Final.png" );
+Histogram_Processing::Silent_Print( cf, "Final.C" );
 
 
 TGraph* final_graph2 = new TGraph( (int)Y_1_data.size(), &(X_1_data[0]), &(Y_1_data[0]) );

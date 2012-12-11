@@ -6,7 +6,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	RapidFit Headers
 #include "MemoryDataSet.h"
@@ -275,7 +275,6 @@ void MemoryDataSet::NormaliseWeights()
 {
 	if( useWeights )
 	{
-		double alpha=0.;
 		double sum_Val=0.;
 		double sum_Val2=0.;
 		for( unsigned int i=0; i< allData.size(); ++i )
@@ -284,13 +283,8 @@ void MemoryDataSet::NormaliseWeights()
 			sum_Val += thisVal;
 			sum_Val2 += thisVal*thisVal;
 		}
-		alpha=sum_Val/sum_Val2;
-		for( unsigned int i=0; i< allData.size(); ++i )
-		{
-			allData[i]->SetEventWeight( allData[i]->GetObservable( WeightName )->GetValue() * alpha );
-		}
-		cout << "alpha = " << setprecision(10) << sum_Val << "  /  " << sum_Val2 << endl; 
-		cout << "Correction Factor: " << setprecision(5) << alpha << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
+
+		this->ApplyAlpha( sum_Val, sum_Val2 );
 	}
 }
 
@@ -318,5 +312,53 @@ void MemoryDataSet::Print() const
 	{
 		cout << "DataSet contains a total of:     " << allData.size() << "     events. In " << this->GetBoundary()->GetNumberCombinations() << " Discrete DataSets." << endl;
 	}
+}
+
+double MemoryDataSet::GetSumWeights() const
+{
+	if( this->GetWeightsWereUsed() )
+	{
+		double total=0.;
+		ObservableRef weightRef( WeightName );
+		for( unsigned int i=0; i< allData.size(); ++i )
+		{
+			total+=allData[i]->GetObservable( WeightName )->GetValue();
+		}
+		return total;
+	}
+	else
+	{
+		return (double)this->GetDataNumber();
+	}
+}
+
+double MemoryDataSet::GetSumWeightsSq() const
+{
+	if( this->GetWeightsWereUsed() )
+	{
+		double total=0.;
+		ObservableRef weightRef( WeightName );
+		for( unsigned int i=0; i< allData.size(); ++i )
+		{
+			total+=(allData[i]->GetObservable( WeightName )->GetValue()*allData[i]->GetObservable( WeightName )->GetValue());
+		}
+		return total;
+	}
+	else
+	{
+		return (double)this->GetDataNumber();
+	}
+}
+
+void MemoryDataSet::ApplyAlpha( const double total_sum, const double total_sum_sq )
+{
+	double alpha= total_sum / total_sum_sq;
+	ObservableRef WeightNameRef( WeightName );
+	for( unsigned int i=0; i< allData.size(); ++i )
+	{
+		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightNameRef )->GetValue() * alpha );
+	}
+	cout << "alpha = " << setprecision(10) << total_sum << "  /  " << total_sum_sq << endl;
+	cout << "Correction Factor: " << setprecision(5) << alpha << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
 }
 
