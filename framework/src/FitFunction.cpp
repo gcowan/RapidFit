@@ -275,7 +275,10 @@ double FitFunction::Evaluate()
 		//cout << endl << resultIndex << ": " << allData->GetResultDataSet( resultIndex )->GetDataNumber() << endl;
 		if( allData->GetResultDataSet( resultIndex )->GetDataNumber() == 0 )
 		{
-			cerr << "Are you aware DataSet: " << resultIndex+1 << " has zero size?" << endl;
+			if( callNum < 6 )
+			{
+				cerr << "Are you aware DataSet: " << resultIndex+1 << " has zero size?" << endl;
+			}
 			continue;
 		}
 		if( allData->GetResultDataSet( resultIndex )->GetDataNumber() < 1 )

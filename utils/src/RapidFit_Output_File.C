@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <string>
+#include <cstdlib>
 
 using namespace::std;
 
@@ -75,6 +76,10 @@ TString RapidFit_Output_File::Construct_Cut_String( TTree* input_tree, vector<st
 	vector<TString> global_param_cuts;
 
 	vector<string>::iterator name_i = controlled_parameter_name.begin();
+
+	//print( controlled_parameter_name );
+	//exit(0);
+
 	for( unsigned int counter=0; name_i != controlled_parameter_name.end(); ++name_i, ++counter )
 	{
 		TString plot_val = *name_i;

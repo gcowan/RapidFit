@@ -1,6 +1,13 @@
 // $Id: release.notes $
 
 2012/12/11 Rob Currie
+  - Added ability to turn use of splines off by default in projections. by default they're on
+  - Added Flat and Box PDF for simple fits
+  - Added some bugfixes to utils directory to make .C scripts work
+  - Changed 0 sized dataset bugging to stop after a few calls to stop spamming the user
+  - Adding lifetime_tool which is used to extract gammaH gammaL from an angular moment analysis for jpsiphi
+
+2012/12/11 Rob Currie
   - Added SingleNormaliseWeights to calculate a single global alpha based on per-event weights
   - Added Components to LogNormal PDF
   - Made modifications to OptimisedDoubleGauss PDF to use any central value

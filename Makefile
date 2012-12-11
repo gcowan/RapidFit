@@ -207,16 +207,23 @@ $(OBJUTILDIR)/Template_Functions.o: $(UTILSSRC)/Template_Functions.C
 $(OBJUTILDIR)/CorrMatrix.o: $(UTILSSRC)/CorrMatrix.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
+
+###   Various tools for the utils directory
+
 #       Tool for printing information about a ROOT file and it's contents
 $(EXEDIR)/print: $(OBJUTILDIR)/print.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/print.o: $(UTILSSRC)/print.C
 	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
 
+###	Tool for extracting the angular distribution from the sidebands in JpsiPhi
+
 $(EXEDIR)/AngularDist: $(OBJUTILDIR)/AngularDist.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/AngularDist.o: $(UTILSSRC)/AngularDist.C
 	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
+
+###	Tool for making an exact comparison between 2 tuple branches and plotting the output
 
 $(EXEDIR)/tupleDiff: $(OBJUTILDIR)/tupleDiff.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
@@ -236,6 +243,13 @@ $(OBJUTILDIR)/ApplyWeights.o: $(UTILSSRC)/ApplyWeights.C
 $(EXEDIR)/weighted: $(OBJUTILDIR)/weighted.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 $(OBJUTILDIR)/weighted.o: $(UTILSSRC)/weighted.C
+	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
+
+###	Tool for calculating gamma/deltaGamma from angular momentum analysis
+
+$(EXEDIR)/lifetime_tool: $(OBJUTILDIR)/lifetime_tool.o $(SHARED_UTIL_LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAFS) $(ROOTLIBS)
+$(OBJUTILDIR)/lifetime_tool.o: $(UTILSSRC)/lifetime_tool.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
 utils: $(EXEDIR)/weighted $(EXEDIR)/print $(EXEDIR)/RapidPlot

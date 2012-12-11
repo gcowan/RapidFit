@@ -49,14 +49,13 @@ double LandauGauss::Evaluate( DataPoint* input )
 
 	double stepSize = (xhigh-xlow) / 1000.;
 
-
 	//	Convolution integral of Landau and Gaussian by sum
 	double landau_part=0.;
 
 	double sum=0.;
 
-	double running_xlow=xlow+0.5*stepSize;
-	double running_xhigh=xhigh-0.5*stepSize;
+	double running_xlow=xlow-0.5*stepSize;
+	double running_xhigh=xhigh+0.5*stepSize;
 
 	for( unsigned int i=1; i<= 500; ++i )
 	{

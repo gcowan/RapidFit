@@ -36,7 +36,7 @@ double Landau::Evaluate( DataPoint* input )
 	double mpvValue = allParameters.GetPhysicsParameter( mpvName )->GetValue();
 	double CVal = allParameters.GetPhysicsParameter( CName )->GetValue();
 	double xVal = input->GetObservable( xName )->GetValue();
-	double numerator = CVal * TMath::Landau( xVal, mpvValue, sigmaVal, true );
+	double numerator = CVal * TMath::Landau( xVal, mpvValue, sigmaVal, true ) / sqrt(sigmaVal);
 	//double numerator = 351 *  TMath::Gaus(xVal-mpvValue,sigmaVal,sqrt(sigmaVal),true);
 	if( numerator < 1E-9 ) numerator=1E-9;
 	return numerator;

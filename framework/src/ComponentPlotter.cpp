@@ -934,6 +934,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	double legend_size=1.;
 
+	bool drawSpline=true;
 	if( conf != NULL )
 	{
 		if( conf->logY )
@@ -956,6 +957,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		Y_Title = conf->ytitle;
 		final_chi2 = conf->Chi2Value;
 		addLHCb = conf->addLHCb;
+		drawSpline = conf->useSpline;
 	}
 
 	input_data->SetTitle( plotTitle );
@@ -964,7 +966,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
 	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
-	if( Y_min <= -999 ) Y_min = logy==true?0.1:0.;
+	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.1:0.;
 	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
 
 	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
@@ -1035,7 +1037,14 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 		if( (*comp_i)->GetLineWidth() != 0 )
 		{
-			(*comp_i)->Draw("C9");
+			if( drawSpline )
+			{
+				(*comp_i)->Draw("C9");
+			}
+			else
+			{
+				(*comp_i)->Draw("L9");
+			}
 
 			if( !component_names.empty() )
 			{
@@ -1189,6 +1198,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	bool addLHCb=false;
 	bool limitPulls=false;
+	bool drawSpline=true;
 	if( conf != NULL )
 	{
 		if( conf->logY )
@@ -1212,6 +1222,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		Y_Title = conf->ytitle;
 		final_chi2 = conf->Chi2Value;
 		limitPulls = conf->LimitPulls;
+		drawSpline = conf->useSpline;
 	}
 
 	input_data->SetTitle( plotTitle );
@@ -1223,7 +1234,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
 	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
-	if( Y_min <= -999 ) Y_min = logy==true?0.5:0.;
+	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.5:0.;
 	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
 
 	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
@@ -1296,7 +1307,14 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 		if( (*comp_i)->GetLineWidth() != 0 )
 		{
-			(*comp_i)->Draw("C9");
+			if( drawSpline )
+			{
+				(*comp_i)->Draw("C9");
+			}
+			else
+			{
+				(*comp_i)->Draw("L9");
+			}
 
 			if( !component_names.empty() )
 			{

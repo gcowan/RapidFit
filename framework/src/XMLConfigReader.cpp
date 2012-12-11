@@ -655,6 +655,10 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			returnable_config->useLegend =  !XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
+		else if( projComps[childIndex]->GetName() == "UseSpline" )
+		{
+			returnable_config->useSpline =  XMLTag::GetBooleanValue( projComps[childIndex] );
+		}
 		else
 		{
 			cerr << "XMLConfigurationReader: Sorry Don't understand XMLTag: " << projComps[childIndex]->GetName() << " ignoring!" << endl;

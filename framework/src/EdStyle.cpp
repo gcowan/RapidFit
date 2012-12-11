@@ -262,6 +262,10 @@ TString EdStyle::GetParamRootUnit( string Param_Name )
 
 		//returnable_string = "MeV/c^{2}";
 		returnable_string = "[ps^{-1}]";
+	} else if ( Param_Name == "tau" ) {
+
+		returnable_string = "[ps]";
+
 	}
 
 	return returnable_string;
@@ -406,6 +410,10 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 	} else if (Param_Name =="delta_zero") {
 
 		returnable_string = "#delta_{0}";
+
+	} else if (Param_Name =="tau") {
+
+		returnable_string = "#tau";
 
 	} else {
 
@@ -835,6 +843,10 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 	} else if ( Param_Name == "ratio_21" ) {
 
 		Name.Append("r_{21}");
+
+	} else if ( Param_Name == "tau" ) {
+
+		Name.Append("\\tau");
 
 	} else {
 		Name.Append("\\text{");
