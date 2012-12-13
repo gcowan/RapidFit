@@ -290,7 +290,7 @@ void MemoryDataSet::NormaliseWeights()
 
 void MemoryDataSet::Print() const
 {
-	if( this->GetWeightsWereUsed() )
+	if( this->GetWeightsWereUsed() && this->GetDataNumber() > 0 )
 	{
 		double total=0.;
 		double avr=0.;

@@ -166,6 +166,7 @@ class EdStyle {
 		 */
 		~EdStyle( );
 
+		static void SetColzPlotStyle();
 	private:
 		/*!
 		 * Don't Copy the class this way!

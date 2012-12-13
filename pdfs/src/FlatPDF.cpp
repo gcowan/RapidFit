@@ -25,19 +25,26 @@ bool FlatPDF::SetPhysicsParameters( ParameterSet* input )
 
 double FlatPDF::Evaluate( DataPoint* input )
 {
-	(void) input;
-	return 1.;
-}
+	PhaseSpaceBoundary* range = input->GetPhaseSpaceBoundary();
 
-double FlatPDF::Normalisation( PhaseSpaceBoundary* range )
-{
 	IConstraint* x_const = range->GetConstraint( xName );
 
 	double min = x_const->GetMinimum();
 	double max = x_const->GetMaximum();
 
 	double num_range = fabs(max-min);
+	return 1./num_range;
+}
 
-	return (1./num_range);
+double FlatPDF::Normalisation( PhaseSpaceBoundary* range )
+{
+	return 1.;
+	IConstraint* x_const = range->GetConstraint( xName );
+
+	double min = x_const->GetMinimum();
+	double max = x_const->GetMaximum();
+
+	double num_range = fabs(max-min);
+	return num_range;
 }
 

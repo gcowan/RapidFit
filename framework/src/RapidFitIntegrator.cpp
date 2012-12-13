@@ -135,6 +135,7 @@ RapidFitIntegrator::~RapidFitIntegrator()
 //Return the integral over all observables
 double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
+	NewDataPoint->SetPhaseSpaceBoundary( NewBoundary );
 	if( functionToWrap == NULL )
 	{
 		cerr << "WHAT ARE YOU DOING TO ME, YOUR TRYING TO INTEGRATE OVER A NULL OBJECT!!!" << endl;
@@ -245,6 +246,7 @@ vector<string> RapidFitIntegrator::DontNumericallyIntegrateList( const DataPoint
 
 double RapidFitIntegrator::TestIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
+	NewDataPoint->SetPhaseSpaceBoundary( NewBoundary );
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 
@@ -698,6 +700,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 		if( NewDataPoint != NULL )
 		{
 			DataPoint* thisDataPoint = new DataPoint( *NewDataPoint );
+			thisDataPoint->SetPhaseSpaceBoundary( NewBoundary );
 			double returnVal = functionToWrap->Evaluate( thisDataPoint );
 			delete thisDataPoint;
 			return returnVal;
@@ -722,6 +725,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 	if( IntegrateDataPoint )
 	{
 		DiscreteIntegrals.push_back( new DataPoint(*NewDataPoint) );
+		DiscreteIntegrals.back()->SetPhaseSpaceBoundary( NewBoundary );
 	}
 	else
 	{

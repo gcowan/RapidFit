@@ -140,6 +140,8 @@ class DataSetConfiguration
 
 		PhaseSpaceBoundary* GetPhaseSpace() const;
 
+		int GetDataSetSize() const;
+
 	private:
 		/*!
 		 * @brief Don't Copy the class this way!

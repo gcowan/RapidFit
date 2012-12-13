@@ -384,8 +384,9 @@ double LongLivedBkg_3Dangular::Evaluate(DataPoint * measurement)
 	if (returnValue <= 0)
 	{
 		PDF_THREAD_LOCK
-		cout << "3D Background PDF returns zero!" << endl;
-		measurement->Print();
+		//cout << "3D Background PDF returns zero!" << endl;
+		returnValue=1E-99;
+		//measurement->Print();
 		PDF_THREAD_UNLOCK
 	}
 

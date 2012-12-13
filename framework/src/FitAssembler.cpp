@@ -122,7 +122,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	   {
 	   pdfs[i]->GetPhysicsParameters()->Print();
 	   }
-	 */
+	   */
 
 	if( debug != NULL )
 	{
@@ -144,6 +144,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	}
 
 	theFunction->SetPhysicsBottle(Bottle);
+
 	cout << endl;
 
 	FitResult* result = DoFit( minimiser, theFunction, debug );
@@ -187,7 +188,10 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 	}
 
-	ParameterSet* checkedBottleParameters = FitAssembler::CheckInputParams( BottleParameters, allPDFs, debug );
+	vector<int> allDataNum;
+	for( unsigned int i=0; i< BottleData.size(); ++i )	allDataNum.push_back( BottleData[i]->GetDataSetConfig()->GetDataSetSize() );
+
+	ParameterSet* checkedBottleParameters = FitAssembler::CheckInputParams( BottleParameters, allPDFs, allDataNum, debug );
 
 	if( debug != NULL )
 	{
@@ -255,7 +259,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 				}
 			}
 
-			ParameterSet* checkedSet = CheckInputParams( checkedGenerationParameters, vector<IPDF*>(1,genPDF), debug );
+			ParameterSet* checkedSet = CheckInputParams( checkedGenerationParameters, vector<IPDF*>(1,genPDF), vector<int>(1,1), debug );
 
 			genPDF->UpdatePhysicsParameters( checkedSet );
 
@@ -272,24 +276,39 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
 
-		if( FunctionConfig->GetNormaliseWeights() ) Requested_DataSet->NormaliseWeights();
-
-		if( debug != NULL )
+		if( Requested_DataSet->GetDataNumber() > 0 )
 		{
-			if( debug->DebugThisClass( "FitAssembler" ) )
+
+			if( FunctionConfig->GetNormaliseWeights() ) Requested_DataSet->NormaliseWeights();
+
+			if( debug != NULL )
 			{
-				cout << "FitAssembler: Adding PDF & DataSet to Bottle: " << resultIndex+1 << " of: " << BottleData.size() << endl;
+				if( debug->DebugThisClass( "FitAssembler" ) )
+				{
+					cout << "FitAssembler: Adding PDF & DataSet to Bottle: " << resultIndex+1 << " of: " << BottleData.size() << endl;
+				}
+			}
+
+			bottle->AddResult( Requested_PDF, Requested_DataSet );
+		}
+		else
+		{
+			if( debug != NULL )
+			{
+				if( debug->DebugThisClass( "FitAssembler" ) )
+				{
+					cout << "FitAssembler: ***NOT*** Adding PDF & DataSet to Bottle: " << resultIndex+1 << " of: " << BottleData.size() << endl;
+					cout << "FitAssembler: DataSet Size is <= 0!!" << endl;
+				}
 			}
 		}
-
-		bottle->AddResult( Requested_PDF, Requested_DataSet );
 	}
 
 	if( FunctionConfig->GetSingleNormaliseWeights() )
 	{
 		double sum_total=0.;
 		double sum_sq_total=0.;
-		for( unsigned int i=0; i< bottle->NumberResults(); ++i )
+		for( unsigned int i=0; i< (unsigned)bottle->NumberResults(); ++i )
 		{
 			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
 			sum_total += Requested_DataSet->GetSumWeights();
@@ -381,7 +400,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 }
 
 //Check that the provided ParameterSet only Contains the Parameters claimed by the PDFs to protect the Minimiser from runtime mistakes
-ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs, DebugClass* debug )
+ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs, const vector<int> allDataNum, DebugClass* debug )
 {
 	if( debug != NULL )
 	{
@@ -393,8 +412,11 @@ ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, c
 	vector<string> param_names;
 	for( unsigned int i=0; i< allPDFs.size(); ++i )
 	{
-		vector<string> input_from_PDF = allPDFs[i]->GetPrototypeParameterSet();
-		param_names = StringProcessing::CombineUniques( param_names, input_from_PDF );
+		if( allDataNum[i] > 0 )
+		{
+			vector<string> input_from_PDF = allPDFs[i]->GetPrototypeParameterSet();
+			param_names = StringProcessing::CombineUniques( param_names, input_from_PDF );
+		}
 	}
 
 	if( param_names.size() != givenParams->GetAllNames().size() )
@@ -453,7 +475,10 @@ ParameterSet* FitAssembler::GenerationParameters( const ParameterSet* checkedBot
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
 		vector< IPDF* > AllPDFs, vector< IDataSet* > AllData, vector< ConstraintFunction* > BottleConstraints, DebugClass* debug )
 {
-	ParameterSet* internalBottleParameters = FitAssembler::CheckInputParams( BottleParameters, AllPDFs );
+	vector<int> allDataNum;
+	for( unsigned int i=0; i< AllData.size(); ++i )	allDataNum.push_back( AllData[i]->GetDataNumber() );
+
+	ParameterSet* internalBottleParameters = FitAssembler::CheckInputParams( BottleParameters, AllPDFs, allDataNum, debug );
 
 	if ( AllPDFs.size() == AllData.size() )
 	{
@@ -462,8 +487,11 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		//Fill the bottle - data already generated
 		for ( unsigned int resultIndex = 0; resultIndex < AllData.size(); ++resultIndex )
 		{
-			AllPDFs[resultIndex]->UpdatePhysicsParameters(internalBottleParameters);
-			bottle->AddResult( AllPDFs[resultIndex], AllData[resultIndex] );
+			if( allDataNum[resultIndex] > 0 )
+			{
+				AllPDFs[resultIndex]->UpdatePhysicsParameters(internalBottleParameters);
+				bottle->AddResult( AllPDFs[resultIndex], AllData[resultIndex] );
+			}
 		}
 
 		//Add the constraints

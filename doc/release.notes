@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2012/12/12 Rob Currie
+  - Improved handling of 0 (or -ve) sized datasets such that they are not added to the PhysicsBottle in the FitAssembler and so don't go any further
+       This avoids adding any free non constrained parameters to the fit at any later stage, thus removing any problems of adding/removing 0 sized datasets during fit development
+  - Averted segfault in sWeighting code which occurs when calling the Integrator test (also avoids un-needed calls to integrator test)
+  - Improved some warnings
+  - Added PolyPDF which constructs a polynomial PDF which takes the ConfigurationParameter: "Order" which governs what order the polynomial is and what parameters it requires all called Poly_n where n<= Order
+
 2012/12/11 Rob Currie
   - Added ability to turn use of splines off by default in projections. by default they're on
   - Added Flat and Box PDF for simple fits

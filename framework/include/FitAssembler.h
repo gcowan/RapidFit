@@ -112,9 +112,11 @@ class FitAssembler
 		 *
 		 * @param allPDFs           These are the PDFs which claim the Physics Parameters in the Fit
 		 *
+		 * @param allDataNum        These are the size of the requested datasets corresponding to each PDF
+		 *
 		 * @return Returns a ParamaterSet containing ONLY the parameters wanted by the PDFs during the fit
 		 */
-		static ParameterSet* CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs, DebugClass* =NULL );
+		static ParameterSet* CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs, const vector<int> allDataNum, DebugClass* =NULL );
 
 
 		/*!

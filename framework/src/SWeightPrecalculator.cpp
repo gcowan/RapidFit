@@ -228,7 +228,9 @@ pair< double, double > SWeightPrecalculator::CalculateMatrixElements( double Num
 
 	//Make the PDF integrators
 	RapidFitIntegrator * signalIntegrator = new RapidFitIntegrator( signalPDF );
+	signalIntegrator->ForceTestStatus( true );
 	RapidFitIntegrator * backgroundIntegrator = new RapidFitIntegrator( backgroundPDF );
+	backgroundIntegrator->ForceTestStatus( true );
 
 	//The matrix is a sum over all events
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )

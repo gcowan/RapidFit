@@ -665,3 +665,8 @@ PhaseSpaceBoundary* DataSetConfiguration::GetPhaseSpace() const
 	return internalBoundary;
 }
 
+int DataSetConfiguration::GetDataSetSize() const
+{
+	return numberEvents;
+}
+

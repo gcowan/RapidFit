@@ -44,6 +44,12 @@ EdStyle::~EdStyle()
 {
 }
 
+void EdStyle::SetColzPlotStyle()
+{
+	gStyle->SetPadRightMargin( (Float_t)0.15 );
+	return;
+}
+
 void EdStyle::SetStyle()
 	/*!
 	 * Compared to: Erasmus/trunk/RootTools/LHCbStyle/src/lhcbStyle.C -r 139227

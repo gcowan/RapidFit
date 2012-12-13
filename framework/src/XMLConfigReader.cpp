@@ -2093,7 +2093,7 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		{
 			if ( fractionName == "unspecified" )
 			{
-				cerr << "Error Must Provide a FractionName for this PDF!\tNormalisedSum_(" << componentPDFs[0]->GetLabel()<<")+("<<componentPDFs[1]->GetLabel()<< ")" << endl;
+				cerr << endl << "Error Must Provide a FractionName for this PDF!\tNormalisedSum_(" << componentPDFs[0]->GetLabel()<<")+("<<componentPDFs[1]->GetLabel()<< ")" << endl << endl;
 				exit(1);
 			}
 			else

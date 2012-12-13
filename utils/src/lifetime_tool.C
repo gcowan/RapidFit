@@ -25,6 +25,8 @@ int main( int argc, char* argv[] )
 	EdStyle* RapidFit_Style = new EdStyle();
 	RapidFit_Style->SetStyle();
 
+	RapidFit_Style->SetColzPlotStyle();
+
 	gStyle->SetOptFit(111);
 
 	//	Open First TTree in the file
@@ -231,7 +233,7 @@ int main( int argc, char* argv[] )
 	corr_graph->GetYaxis()->SetTitle("#Gamma_{H}");
 	c7->Update();
 
-	TString funcStr_Orig("("); funcStr_Orig+=corr;funcStr_Orig.Append("*x+[0])");
+	TString funcStr_Orig("("); funcStr_Orig+=1./corr;funcStr_Orig.Append("*x+[0])");
 
 	TString funcStr("([1]*x+[0])");
 
@@ -292,8 +294,10 @@ int main( int argc, char* argv[] )
 		thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
 	}
 
-	int xbins = Histogram_Processing::OptimumBinNumber( thisHisto );
-	int ybins = Histogram_Processing::OptimumBinNumber( thisHisto, 2 );
+	int xbins = 100;//Histogram_Processing::OptimumBinNumber( thisHisto, 1 );
+	int ybins = 100;//Histogram_Processing::OptimumBinNumber( thisHisto, 2 );
+
+	cout << xbins << "\t\t" << ybins << endl;
 
 	thisHisto = new TH2D( "histo_colz", "histo_colz", xbins, xmin, xmax, ybins, ymin, ymax );
 
@@ -308,6 +312,8 @@ int main( int argc, char* argv[] )
 	thisHisto->Draw("colz");
 
 	c8->Update();
+	thisHisto->GetXaxis()->SetTitle("#Gamma_{L}");
+	thisHisto->GetYaxis()->SetTitle("#Gamma_{H}");
 
 	thisCorrGraph->Draw("SAMEL");
 	thisCorrGraph2->Draw("SAMEL");
