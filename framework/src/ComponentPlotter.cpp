@@ -279,16 +279,16 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 		double n_events = (double)plotData->GetDataNumber( allCombinations[combinationIndex], true );
 
 		/*cout << n_events << " for:" << endl;
-		allCombinations[combinationIndex]->Print();
-		cout << "combinationWeights[combinationIndex]: " << combinationWeights[combinationIndex] << endl;
+		  allCombinations[combinationIndex]->Print();
+		  cout << "combinationWeights[combinationIndex]: " << combinationWeights[combinationIndex] << endl;
 
-		
-		cout << "combination_integral[combinationIndex]: " << combination_integral[combinationIndex] << endl;
-		cout << "fabs(ratioOfIntegrals[combinationIndex]): " << fabs(ratioOfIntegrals[combinationIndex]) << endl;
-		cout << "n_events: " << n_events << endl;
-		cout << "range: " << range << endl;
-		cout << "double(data_binning): " << double(data_binning) << endl;
-		*/
+
+		  cout << "combination_integral[combinationIndex]: " << combination_integral[combinationIndex] << endl;
+		  cout << "fabs(ratioOfIntegrals[combinationIndex]): " << fabs(ratioOfIntegrals[combinationIndex]) << endl;
+		  cout << "n_events: " << n_events << endl;
+		  cout << "range: " << range << endl;
+		  cout << "double(data_binning): " << double(data_binning) << endl;
+		  */
 
 		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM ORIGINAL PLOTTER CLASS
 		for( int pointIndex = 0; pointIndex < total_points; ++pointIndex )
@@ -964,6 +964,9 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	input_data->Draw("AP9");
 	c1->Update();
 
+	TString Y_ext(" / ");Y_ext+=input_data->GetXaxis()->GetBinWidth(0);
+	Y_ext.Append(" ");Y_ext.Append( EdStyle::GetParamRootUnit( observableName ) );
+
 	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
 	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
 	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.1:0.;
@@ -971,6 +974,8 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
 	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Candidates";
+
+	Y_Title.Append( Y_ext );
 
 	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
 	input_data->GetYaxis()->SetTitle( Y_Title );
@@ -1232,6 +1237,9 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	c1->Update();
 	if( logy ) pad1->SetLogy( true );
 
+	TString Y_ext(" / ");Y_ext+=input_data->GetXaxis()->GetBinWidth(0);
+	Y_ext.Append(" ");Y_ext.Append( EdStyle::GetParamRootUnit( observableName ) );
+
 	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
 	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
 	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.5:0.;
@@ -1239,6 +1247,8 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
 	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Candidates";
+
+	Y_Title.Append( Y_ext );
 
 	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
 	input_data->GetYaxis()->SetTitle( Y_Title );
