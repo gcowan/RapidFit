@@ -216,6 +216,7 @@ bool DataPoint::operator() ( pair<DataPoint*,ObservableRef> first, pair<DataPoin
 //#pragma GCC diagnostic ignored "-Wfloat-equal"
 double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 {
+	//return Input.Eval( Values );
 	if(Input.GetIndex()<0)
 	{
 		string name = Input.GetName();
@@ -282,6 +283,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 
 double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> Values )
 {
+	return Input.Eval( Values );
 	if(Input.GetIndex()<0)
 	{
 		string name = Input.GetName();

@@ -151,8 +151,13 @@ namespace Mathematics
 			if( !RooMathinit )
 			{
 				pthread_mutex_lock( &ROOT_Lock );
+#if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,0)
 				//      default RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
+#else
+				//	Should call the init function internally
+				returnable = RooMath::ITPComplexErrFuncRe( *z, 13 )*exp( -u*u );
+#endif
 				RooMathinit = true;
 				pthread_mutex_unlock( &ROOT_Lock );
 			}
@@ -183,14 +188,19 @@ namespace Mathematics
 			//pthread_mutex_lock( &ROOT_Lock );
 			//RooMath* math_object = new RooMath();
 			//RooMath::cacheCERF( false );
-                        if( !RooMathinit )
-                        {
-                                pthread_mutex_lock( &ROOT_Lock );
+			if( !RooMathinit )
+			{
+				pthread_mutex_lock( &ROOT_Lock );
+#if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,0)
 				//	default RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
-                                if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
-                                RooMathinit = true;
-                                pthread_mutex_unlock( &ROOT_Lock );
-                        }
+				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
+#else
+				//      Should call the init function internally
+				returnable = RooMath::ITPComplexErrFuncIm( *z, 13 )*exp( -u*u );
+#endif
+				RooMathinit = true;
+				pthread_mutex_unlock( &ROOT_Lock );
+			}
 			//RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 			returnable = RooMath::ITPComplexErrFuncIm( *z, 13 )*exp( -u*u );
 			//math_object->cleanup();

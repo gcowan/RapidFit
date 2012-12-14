@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/12/14 Rob Currie
+  - Added patch to backport RooMath fix to earlier versions of ROOT
+
 2012/12/12 Rob Currie
   - Improved handling of 0 (or -ve) sized datasets such that they are not added to the PhysicsBottle in the FitAssembler and so don't go any further
        This avoids adding any free non constrained parameters to the fit at any later stage, thus removing any problems of adding/removing 0 sized datasets during fit development
