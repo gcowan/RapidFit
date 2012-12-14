@@ -283,7 +283,7 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 
 double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> Values )
 {
-	return Input.Eval( Values );
+	//return Input.Eval( Values );
 	if(Input.GetIndex()<0)
 	{
 		string name = Input.GetName();
