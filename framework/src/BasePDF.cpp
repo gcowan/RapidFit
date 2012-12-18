@@ -33,6 +33,7 @@ BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string
 	component_list.push_back( "0" );
 	debug_mutex = new pthread_mutex_t();
 	myIntegrator = new RapidFitIntegrator( this );
+	myIntegrator->SetDebug( debug );
 }
 
 BasePDF::BasePDF( const BasePDF& input ) :
@@ -56,12 +57,14 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	if( input.myIntegrator == NULL )
 	{
 		myIntegrator = new RapidFitIntegrator( this );
+		myIntegrator->SetDebug( debug );
 	}
 	else
 	{
 		myIntegrator = new RapidFitIntegrator( *input.myIntegrator );
 		myIntegrator->SetPDF( this );
 		myIntegrator->ForceTestStatus( true );
+		myIntegrator->SetDebug( debug );
 	}
 	if( input.thisConfig != NULL ) thisConfig = new PDFConfigurator( *(input.thisConfig) );
 }
@@ -374,6 +377,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 
 			try
 			{
+				NewDataPoint->SetPhaseSpaceBoundary( NewBoundary );
 				thisNumericalIntegral = myIntegrator->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, this->GetDoNotIntegrateList() );
 			}
 			catch(...)
@@ -816,6 +820,7 @@ void BasePDF::SetDebug( DebugClass* input_debug )
 {
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
+	if( myIntegrator != NULL ) myIntegrator->SetDebug( debug );
 }
 
 string BasePDF::GetComponentName( ComponentRef* input )

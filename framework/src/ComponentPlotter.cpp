@@ -964,7 +964,10 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	input_data->Draw("AP9");
 	c1->Update();
 
-	TString Y_ext(" / ( ");Y_ext+=(float)input_data->GetXaxis()->GetBinWidth(0);
+	TString Y_ext(" / ( ");
+	stringstream thisStream;
+	thisStream << setprecision(4) << scientific << (float)input_data->GetXaxis()->GetBinWidth(0);
+	Y_ext+=thisStream.str();
 	Y_ext.Append(" ");
 	TString Unit; Unit.Append( EdStyle::GetParamRootUnit( observableName ) );
 	if( !StringProcessing::is_empty(Unit) ) Unit.Append(" ");
@@ -1240,11 +1243,14 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	c1->Update();
 	if( logy ) pad1->SetLogy( true );
 
-	TString Y_ext(" / ( ");Y_ext+=(float)input_data->GetXaxis()->GetBinWidth(0);
+	TString Y_ext(" / ( ");
+	stringstream thisStream;
+	thisStream << setprecision(4) << scientific << (float)input_data->GetXaxis()->GetBinWidth(0);
+	Y_ext+=thisStream.str();
 	Y_ext.Append(" ");
-        TString Unit; Unit.Append( EdStyle::GetParamRootUnit( observableName ) );
-        if( !StringProcessing::is_empty(Unit) ) Unit.Append(" ");
-        Y_ext.Append(Unit); Y_ext.Append(")");
+	TString Unit; Unit.Append( EdStyle::GetParamRootUnit( observableName ) );
+	if( !StringProcessing::is_empty(Unit) ) Unit.Append(" ");
+	Y_ext.Append(Unit); Y_ext.Append(")");
 
 	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
 	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();

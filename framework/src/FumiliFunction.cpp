@@ -17,12 +17,12 @@
 #include <cmath>
 
 //Default constructor
-FumiliFunction::FumiliFunction() : ParametricFunction(1), function(), parameters()
-{
-}
+//FumiliFunction::FumiliFunction() : ParametricFunction(1), function(), parameters()
+//{
+//}
 
 //Constructor with correct argument
-FumiliFunction::FumiliFunction( FitFunction* NewFitFunction ) : ParametricFunction( int(NewFitFunction->GetParameterSet()->GetAllNames().size()) ), function(NewFitFunction), parameters()
+FumiliFunction::FumiliFunction( FitFunction* NewFitFunction, int NSigma ) : ParametricFunction( int(NewFitFunction->GetParameterSet()->GetAllNames().size()) ), function(NewFitFunction), parameters(), nSigma(NSigma)
 {
 	// Need to change this constructor since we now pass the numParams and not the fit function
 	// Not entirely sure what to do here.
@@ -90,7 +90,7 @@ double FumiliFunction::operator()( const vector<double>& NewParameterValues) con
 
 double FumiliFunction::Up() const
 {
-	return function->UpErrorValue(1);
+	return function->UpErrorValue( nSigma );
 }
 
 //Return the parameters to minimise with

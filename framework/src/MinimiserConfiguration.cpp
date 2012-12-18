@@ -18,7 +18,7 @@ using namespace::std;
 
 //Constructor for a minimiser only specified by name
 MinimiserConfiguration::MinimiserConfiguration( string InputName ) :
-	theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality(), debug(new DebugClass(false) )
+	theMinimiser(), OutputLevel(), minimiserName(InputName), contours(), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality(), debug(new DebugClass(false) ), nSigma(1)
 {
 	theMinimiser = NULL;
 	OutputLevel=0;
@@ -26,7 +26,7 @@ MinimiserConfiguration::MinimiserConfiguration( string InputName ) :
 
 //Constructor for a minimiser with requested contour plots
 MinimiserConfiguration::MinimiserConfiguration( string InputName, OutputConfiguration * Formatting ) :
-	theMinimiser(), OutputLevel(), minimiserName(InputName),
+	theMinimiser(), OutputLevel(), minimiserName(InputName), nSigma(1),
 	contours( Formatting != NULL ? Formatting->GetContourPlots() : vector< pair< string, string > >() ), maxSteps(), bestTolerance(), MinimiseOptions(), MultiMini(false), Quality(), debug(new DebugClass(false) )
 {
 	theMinimiser = NULL;
@@ -78,6 +78,7 @@ IMinimiser * MinimiserConfiguration::GetMinimiser( int ParameterNumber )
 	theMinimiser->SetTolerance( bestTolerance );
 	theMinimiser->SetOptions( MinimiseOptions );
 	theMinimiser->SetQuality( Quality );
+	theMinimiser->SetNSigma( nSigma );
 	return theMinimiser;
 }
 
@@ -110,6 +111,11 @@ void MinimiserConfiguration::SetQuality( int newQuality )
 void MinimiserConfiguration::SetMultiMini( bool decision )
 {
 	MultiMini = decision;
+}
+
+void MinimiserConfiguration::SetNSigma( int input )
+{
+	nSigma = input;
 }
 
 void MinimiserConfiguration::Print() const

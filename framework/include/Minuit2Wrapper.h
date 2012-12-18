@@ -42,6 +42,7 @@ class Minuit2Wrapper : public IMinimiser
                 virtual void SetTolerance( double );
                 virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
+		virtual void SetNSigma( int );
 		virtual FitFunction* GetFitFunction();
 
 		void CallHesse();
@@ -63,6 +64,7 @@ class Minuit2Wrapper : public IMinimiser
                 double bestTolerance;
                 vector<string> Options;
 		int Quality;
+		int nSigma;
 
 		DebugClass* debug;
 };

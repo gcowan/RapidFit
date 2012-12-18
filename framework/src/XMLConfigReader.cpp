@@ -319,6 +319,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		MinimiserConfiguration* returnableConfig = NULL;
 		vector<string> minimiserOptions;
 		int Quality = 1;
+		int nSigma = 1;
 		bool MultiMini=false;
 		if ( minimiserComponents.size() == 0 )
 		{
@@ -332,6 +333,10 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 				if ( minimiserComponents[childIndex]->GetName() == "MinimiserName" )
 				{
 					minimiserName = XMLTag::GetStringValue( minimiserComponents[childIndex] );
+				}
+				else if ( minimiserComponents[childIndex]->GetName() == "NSigma" )
+				{
+					nSigma = XMLTag::GetIntegerValue( minimiserComponents[childIndex] );
 				}
 				else if( minimiserComponents[childIndex]->GetName() == "MaxSteps" )
 				{
@@ -367,6 +372,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		returnableConfig->SetOptions( minimiserOptions );
 		returnableConfig->SetQuality( Quality );
 		returnableConfig->SetMultiMini( MultiMini );
+		returnableConfig->SetNSigma( nSigma );
 		if( debug->DebugThisClass( "XMLConfigReader" ) )
 		{
 			cout << "XMLConfigReader:\tMinimiser Configured With:\t" << endl;

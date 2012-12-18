@@ -47,6 +47,7 @@ class MinuitWrapper : public IMinimiser
 		virtual void SetTolerance( double );
 		virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
+		virtual void SetNSigma( int );
 		virtual FitFunction* GetFitFunction();
 
 		ResultParameterSet* GetResultParameters( vector<string> allNames, ParameterSet* );
@@ -75,6 +76,7 @@ class MinuitWrapper : public IMinimiser
 		double bestTolerance;
 		vector<string> Options;
 		int Quality;
+		int nSigma;
 		//ParameterSet* test;
 
 		DebugClass* debug;

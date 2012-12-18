@@ -23,8 +23,8 @@ using namespace ROOT::Minuit2;
 class Minuit2Function : public FCNBase
 {
 	public:
-		Minuit2Function();
-		Minuit2Function( FitFunction* );
+		//Minuit2Function();
+		Minuit2Function( FitFunction*, int );
 		~Minuit2Function();
 
 		void SetSigma(int);

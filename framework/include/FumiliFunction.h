@@ -23,8 +23,8 @@ using namespace ROOT::Minuit2;
 class FumiliFunction : public ParametricFunction
 {
 	public:
-		FumiliFunction();
-		FumiliFunction( FitFunction* );
+		//FumiliFunction();
+		FumiliFunction( FitFunction*, int );
 		//FumiliFunction( int );
 		~FumiliFunction();
 
@@ -43,6 +43,7 @@ class FumiliFunction : public ParametricFunction
 
 		FitFunction * function;
 		MnUserParameters * parameters;
+		int nSigma;
 };
 
 #endif

@@ -47,7 +47,8 @@ FitFunction * MinuitWrapper::function = 0;
 //}
 
 //Constructor with correct argument
-MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ): minuit(NULL), fitResult(NULL), contours(), print_verbosity( output_level ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
+MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ) :
+	minuit(NULL), fitResult(NULL), contours(), print_verbosity( output_level ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) ), nSigma(1)
 {
 	minuit = new TMinuit( NumberParameters );
 }
@@ -159,7 +160,7 @@ void MinuitWrapper::SetupFit( FitFunction* NewFunction )
 	//      minuit->mnexcm("SOMECOMMAND",&SOMEARGUMENTS,NUMBEROFARGUMENTS,ERRORFLAG);
 
 	//      Set the error analysis
-	arguments[0] = NewFunction->UpErrorValue(1);
+	arguments[0] = NewFunction->UpErrorValue( nSigma );
 	minuit->mnexcm("SET ERR", arguments, 1, errorFlag);
 
 	//      Set Migrad Strategy 2
@@ -585,5 +586,10 @@ void MinuitWrapper::SetDebug( DebugClass* input_debug )
 {
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
+}
+
+void MinuitWrapper::SetNSigma( int input )
+{
+	nSigma = input;
 }
 

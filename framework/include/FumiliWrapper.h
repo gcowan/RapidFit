@@ -57,6 +57,7 @@ class FumiliWrapper : public IMinimiser
 		virtual void SetTolerance( double );
 		virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
+		virtual void SetNSigma( int );
 		virtual FitFunction* GetFitFunction();
 
 		void CallHesse();
@@ -78,6 +79,7 @@ class FumiliWrapper : public IMinimiser
 		double bestTolerance;
 		vector<string> Options;
 		int Quality;
+		int nSigma;
 
 		DebugClass* debug;
 };

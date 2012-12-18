@@ -7,7 +7,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-8
- */
+  */
 
 //	ROOT Headers
 #include "RVersion.h"
@@ -41,6 +41,8 @@ pthread_mutex_t multi_mutex2;
 pthread_mutex_t multi_mutex3;
 
 pthread_mutex_t gsl_mutex;
+
+pthread_mutex_t one_dim_lock;
 
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
@@ -575,12 +577,12 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		}
 		fit_thread_data[threadnum].dataPoint_Result.clear();
 	}
-        double factor=1.;
-        for( unsigned int i=0; i< (unsigned)doIntegrate.size(); ++i )
-        {
-                factor *= maxima[i]-minima[i];
-        }
-        result /= ( (double)integrationPoints[0].size() / factor );
+	double factor=1.;
+	for( unsigned int i=0; i< (unsigned)doIntegrate.size(); ++i )
+	{
+		factor *= maxima[i]-minima[i];
+	}
+	result /= ( (double)integrationPoints[0].size() / factor );
 
 	//cout << "Hello :D" << endl;
 
@@ -750,14 +752,32 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			//Chose the one dimensional or multi-dimensional method
 			if( doIntegrate.size() == 1 )
 			{
+				if( debug != NULL )
+				{
+					if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+					{
+						cout << "RapidFitIntegrator: One Dimensional Integral" << endl;
+					}
+				}
+				pthread_mutex_lock( &one_dim_lock );
 				numericalIntegral += this->OneDimentionIntegral( functionToWrap, oneDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
 				//cout << "ret: " << numericalIntegral << endl;
+				pthread_mutex_unlock( &one_dim_lock );
 			}
 			else
 			{
+				if( debug != NULL )
+				{
+					if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+					{
+						cout << "RapidFitIntegrator: Multi Dimensional Integral" << endl;
+					}
+				}
 				if( !pseudoRandomIntegration )
 				{
+					pthread_mutex_lock( &one_dim_lock );
 					numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+					pthread_mutex_unlock( &one_dim_lock );
 				}
 				else
 				{
@@ -850,6 +870,6 @@ void RapidFitIntegrator::SetDebug( DebugClass* input_debug )
 {
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
-	if( functionToWrap != NULL ) functionToWrap->SetDebug( input_debug );
+	//if( functionToWrap != NULL ) functionToWrap->SetDebug( input_debug );
 }
 

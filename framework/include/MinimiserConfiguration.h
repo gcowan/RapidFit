@@ -38,6 +38,7 @@ class MinimiserConfiguration
 		void SetOptions(vector<string>);
 		void SetQuality( int );
 		void SetMultiMini( bool );
+		void SetNSigma( int );
 
 		//Output some debugging info
 		void Print() const;
@@ -59,6 +60,7 @@ class MinimiserConfiguration
 		vector<string> MinimiseOptions;
 		bool MultiMini;
 		int Quality;
+		int nSigma;
 		DebugClass* debug;
 };
 

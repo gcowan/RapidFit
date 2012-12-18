@@ -28,7 +28,7 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
+FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) ), nSigma(1)
 {
 }
 
@@ -63,7 +63,7 @@ void FumiliWrapper::SetupFit( FitFunction* NewFunction )
 {
 	// Instantiate the FumiliFunction (which is just a parametric function)
 	// There is another constructor that takes a vector of parameters
-	function = new FumiliFunction( NewFunction );
+	function = new FumiliFunction( NewFunction, nSigma );
 	RapidFunction = NewFunction;
 }
 
@@ -231,5 +231,10 @@ void FumiliWrapper::SetDebug( DebugClass* input_debug )
 {
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
+}
+
+void FumiliWrapper::SetNSigma( int input )
+{
+	nSigma = input;
 }
 

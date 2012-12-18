@@ -27,7 +27,8 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-Minuit2Wrapper::Minuit2Wrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug( new DebugClass(false) )
+Minuit2Wrapper::Minuit2Wrapper() :
+	function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug( new DebugClass(false) ), nSigma(1)
 {
 }
 
@@ -60,7 +61,7 @@ void Minuit2Wrapper::SetQuality( int newQuality )
 void Minuit2Wrapper::SetupFit( FitFunction* NewFunction )
 {
 	//Make a wrapper for the function
-	function = new Minuit2Function( NewFunction );
+	function = new Minuit2Function( NewFunction, nSigma );
 	RapidFunction = NewFunction;
 }
 
@@ -78,6 +79,7 @@ void Minuit2Wrapper::FixParameters( vector<double> fix_values, vector<string> Pa
 //Use Migrad to minimise the given function
 void Minuit2Wrapper::Minimise()
 {
+	function->SetSigma(nSigma);
 
 	//Minimise the wrapped function
 	MnMigrad mig( *function, *( function->GetMnUserParameters() ), (unsigned)Quality );//MINUIT_QUALITY );
@@ -226,5 +228,10 @@ void Minuit2Wrapper::SetDebug( DebugClass* input_debug )
 {
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
+}
+
+void Minuit2Wrapper::SetNSigma( int input )
+{
+	nSigma = input;
 }
 
