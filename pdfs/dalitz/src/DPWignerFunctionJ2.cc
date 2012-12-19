@@ -3,9 +3,11 @@
 
 #include "DPWignerFunctionJ2.hh"
 
-double DPWignerFunctionJ2::function(double cosTheta, int m, int n)
+double DPWignerFunctionJ2::function(double cosTheta, double mm, double nn)
 {
 
+  int m=(int)mm;
+  int n=(int)nn;
   if ( m == 0 )
   {
     switch (n)

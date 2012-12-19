@@ -9,7 +9,7 @@ class DPWignerFunction
     DPWignerFunction() {};
     ~DPWignerFunction() {};
 
-    virtual double function(double cosTheta, int m, int n) = 0;
+    virtual double function(double cosTheta, double m, double n) = 0;
 
   protected:
 

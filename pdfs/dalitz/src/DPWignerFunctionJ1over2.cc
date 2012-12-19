@@ -4,9 +4,11 @@
 #include "DPWignerFunctionJ1over2.hh"
 
 // parameter theta is actually cos(theta)
-double DPWignerFunctionJ1over2::function(double cosTheta, int m, int n)
+double DPWignerFunctionJ1over2::function(double cosTheta, double mm, double nn)
 {
 
+  int m=(int)2*mm;
+  int n=(int)2*nn;
   double theta=TMath::ACos(cosTheta);
   if ( m == 1 )
   {

@@ -2,7 +2,7 @@
 
 #include "DPWignerFunctionJ0.hh"
 
-double DPWignerFunctionJ0::function(double theta, int m, int n)
+double DPWignerFunctionJ0::function(double theta, double m, double n)
 {
   return 1;
 }

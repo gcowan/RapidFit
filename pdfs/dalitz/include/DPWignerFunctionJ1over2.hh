@@ -12,7 +12,7 @@ class DPWignerFunctionJ1over2 : public virtual DPWignerFunction
     ~DPWignerFunctionJ1over2() {};
 
 // This will take helicity*2 rather than helicity used by integer spins
-    double function(double cosTheta, int m, int n);
+    double function(double cosTheta, double m, double n);
 
   protected:
 

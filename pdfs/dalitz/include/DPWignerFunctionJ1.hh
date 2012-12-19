@@ -11,7 +11,7 @@ class DPWignerFunctionJ1 : public virtual DPWignerFunction
     DPWignerFunctionJ1() {};
     ~DPWignerFunctionJ1() {};
 
-    double function(double cosTheta, int m, int n);
+    double function(double cosTheta, double m, double n);
 
   protected:
 

@@ -4,9 +4,11 @@
 #include "DPWignerFunctionJ1.hh"
 
 // parameter theta is actually cos(theta)
-double DPWignerFunctionJ1::function(double theta, int m, int n)
+double DPWignerFunctionJ1::function(double theta, double mm, double nn)
 {
 
+  int m=(int)mm;
+  int n=(int)nn;
   if ( m == 0 )
   {
     switch (n)

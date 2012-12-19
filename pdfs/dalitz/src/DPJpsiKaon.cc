@@ -10,6 +10,7 @@
 #include "DPBarrierL2.hh"
 #include "DPBarrierL3.hh"
 #include "DPHelpers.hh"
+#include "DPWignerFunctionGeneral.hh"
 
 #include <iostream>
 
@@ -85,6 +86,8 @@ spinKaon(spin)
             break;
     case 2: wigner=new DPWignerFunctionJ2();
             break;
+    default: wigner=new DPWignerFunctionGeneral(spin);
+            break;
   }
 }
 
@@ -106,6 +109,8 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
                         case 1: wigner=new DPWignerFunctionJ1();
                         break;
                         case 2: wigner=new DPWignerFunctionJ2();
+                        break;
+                        default: wigner=new DPWignerFunctionGeneral(spinKaon);
                         break;
                 }
         }
