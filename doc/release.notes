@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2012/12/21 Greig Cowan
+  - Added spin-3 K* resonance to DP PDF, using the new code from Michal for the Wigner functions.
+
 2012/12/18 Rob Currie
   - Modified BinWidth text in ComponentPlotter
   - Added <NSigma> XMLTag to the MinimiserConfiguration to allow the size of the error in NLL to be controlled from the XML
