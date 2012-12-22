@@ -587,6 +587,7 @@ TString StringProcessing::Clean( const TString input )
 //      Is a TString empty ?
 bool StringProcessing::is_empty( const TString input )
 {
+	if( input.IsWhitespace() ) return true;
 	string temp("");
 	if ( temp.compare( string(input.Data()) ) == 0 ) return true;
 	return false;

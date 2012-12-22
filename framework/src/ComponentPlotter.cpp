@@ -288,7 +288,7 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 		  cout << "n_events: " << n_events << endl;
 		  cout << "range: " << range << endl;
 		  cout << "double(data_binning): " << double(data_binning) << endl;
-		  */
+		 */
 
 		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM ORIGINAL PLOTTER CLASS
 		for( int pointIndex = 0; pointIndex < total_points; ++pointIndex )
@@ -717,7 +717,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				   tf1_graph->Draw("C");
 				   Chi2test->Print(Chi2Name+".pdf");
 				   Chi2test->Write("",TObject::kOverwrite);
-				   */
+				 */
 			}
 
 			if( combinationIndex == 0 && this_config->DrawPull == true )
@@ -753,7 +753,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				   {
 				   cout << pullPlot->GetY()[i] <<  endl;
 				   }
-				   */
+				 */
 
 				this->OutputPlotPull( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), allPullData, plotPDF->GetRandomFunction(), temp );
 				(void)pullPlot;
@@ -966,7 +966,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	TString Y_ext(" / ( ");
 	stringstream thisStream;
-	thisStream << setprecision(4) << scientific << (float)input_data->GetXaxis()->GetBinWidth(0);
+	thisStream << setprecision(2) << scientific << (float)input_data->GetXaxis()->GetBinWidth(0);
 	Y_ext+=thisStream.str();
 	Y_ext.Append(" ");
 	TString Unit; Unit.Append( EdStyle::GetParamRootUnit( observableName ) );
@@ -978,10 +978,21 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.1:0.;
 	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
 
-	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
-	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Candidates";
-
-	Y_Title.Append( Y_ext );
+	if( StringProcessing::is_empty( X_Title ) )
+	{
+		X_Title = EdStyle::GetParamRootName( observableName );
+		TString unit = EdStyle::GetParamRootUnit( observableName );
+		if( !StringProcessing::is_empty( unit ) )
+		{
+			X_Title.Append( " " );
+			X_Title.Append( unit );
+		}
+	}
+	if( StringProcessing::is_empty( Y_Title ) )
+	{
+		Y_Title = "Candidates";
+		Y_Title.Append( Y_ext );
+	}
 
 	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
 	input_data->GetYaxis()->SetTitle( Y_Title );
@@ -1245,7 +1256,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 
 	TString Y_ext(" / ( ");
 	stringstream thisStream;
-	thisStream << setprecision(4) << scientific << (float)input_data->GetXaxis()->GetBinWidth(0);
+	thisStream << setprecision(2) << scientific << (float)input_data->GetXaxis()->GetBinWidth(0);
 	Y_ext+=thisStream.str();
 	Y_ext.Append(" ");
 	TString Unit; Unit.Append( EdStyle::GetParamRootUnit( observableName ) );
@@ -1257,10 +1268,21 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.5:0.;
 	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
 
-	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
-	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Candidates";
-
-	Y_Title.Append( Y_ext );
+	if( StringProcessing::is_empty( X_Title ) )
+	{
+		X_Title = EdStyle::GetParamRootName( observableName );
+		TString unit = EdStyle::GetParamRootUnit( observableName );
+		if( !StringProcessing::is_empty( unit ) )
+		{
+			X_Title.Append( " " );
+			X_Title.Append( unit );
+		}
+	}
+	if( StringProcessing::is_empty( Y_Title ) )
+	{
+		Y_Title = "Candidates";
+		Y_Title.Append( Y_ext );
+	}
 
 	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
 	input_data->GetYaxis()->SetTitle( Y_Title );
@@ -1828,7 +1850,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	vector<double> x_values;
 	vector<double> x_errs;
 
-	cout << endl;
+	//cout << endl;
 	for( unsigned int i=0; i< input_bin_theory_data.size(); ++i )		//	Explicit Assumption that theory.size() == input_data->GetN()
 	{
 		double theory_y = input_bin_theory_data[i];
@@ -1856,7 +1878,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 
 		//cout << pull << "\t" << data_y << "-" << theory_y << "/" << data_err << "\t\t\t" << pull_err << "\t\t\t" << x_values.back() << "\t" << x_errs.back() << endl;
 	}
-	cout << endl;
+	//cout << endl;
 
 	TGraphErrors* pullGraph = new TGraphErrors( (int)pull_value.size(), &(x_values[0]), &(pull_value[0]), &(x_errs[0]), &(pull_error_value[0]) );
 
@@ -1890,7 +1912,16 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	TString X_Title;
 	TString Y_Title;
 
-	if( StringProcessing::is_empty( X_Title ) ) X_Title = EdStyle::GetParamRootName( observableName ) + " " + EdStyle::GetParamRootUnit( observableName );
+	if( StringProcessing::is_empty( X_Title ) )
+	{
+		X_Title = EdStyle::GetParamRootName( observableName );
+		TString unit = EdStyle::GetParamRootUnit( observableName );
+		if( !StringProcessing::is_empty( unit ) )
+		{
+			X_Title.Append( " " );
+			X_Title.Append( unit );
+		}
+	}
 	if( StringProcessing::is_empty( Y_Title ) ) Y_Title = "Pull";
 
 	input_data->GetYaxis()->SetTitle( Y_Title );
