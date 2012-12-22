@@ -57,6 +57,8 @@ class TTree_Processing
 		static vector<vector<Double_t> > Plotter_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom* random=NULL, int upper_lim=-1 );
 
 		static void AddBranch( TTree* input_tree, string title, vector<double> data );
+		static void AddBranch( TTree* input_tree, string title, vector<int> data );
+		static void AddBranch( TTree* input_tree, string title, vector<bool> data );
 };
 
 #endif

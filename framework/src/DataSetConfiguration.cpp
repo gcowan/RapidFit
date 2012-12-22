@@ -520,7 +520,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string this_fileName, s
 		{
 			string name = observableNames[unsigned(obsIndex)];
 			string unit = data->GetBoundary()->GetConstraint( name )->GetUnit();
-			point->SetObservable( name, real_data_array[unsigned(obsIndex)][unsigned(numberOfDataPointsRead)], 0.0, unit, true, obsIndex);
+			point->SetObservable( name, real_data_array[unsigned(obsIndex)][unsigned(numberOfDataPointsRead)], unit, true, obsIndex);
 			//cout << real_data_array[unsigned(obsIndex)][unsigned(numberOfDataPointsRead)] << endl;
 		}
 		bool dataPointAdded = data->AddDataPoint( point );
@@ -590,7 +590,7 @@ IDataSet * DataSetConfiguration::LoadAsciiFileIntoMemory( string this_fileName, 
 				{
 					string name = observableNamesInFile[i];
 					string unit = observableNamesToUnits[ name ];
-					point.SetObservable( name, strtod( splitVec[i].c_str(), NULL ), 0.0, unit );
+					point.SetObservable( name, strtod( splitVec[i].c_str(), NULL ), unit );
 				}
 				++numberOfDataPoints;
 				data->AddDataPoint( &point );

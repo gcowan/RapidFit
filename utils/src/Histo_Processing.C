@@ -112,6 +112,9 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 	streambuf *nullbuf=NULL, *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
 	ofstream filestr;
 	filestr.open ("/dev/null");
+
+	int thisErr = gErrorIgnoreLevel;
+
 	//      If the user wanted silence we point the Std Output Streams to /dev/null
 	if( OutputLevel <= -1 )
 	{
@@ -123,6 +126,7 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
+		gErrorIgnoreLevel = kFatal;
 	}
 
 
@@ -164,6 +168,8 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 		clog.rdbuf(clog_bak);
 	}
 
+	gErrorIgnoreLevel = thisErr;
+
 	return fit_type;
 }
 
@@ -174,6 +180,8 @@ void Histogram_Processing::Silent_Fit( TH1* input_histo, TString fit_type, int O
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
 	ofstream filestr;
 	filestr.open ("/dev/null");
+
+	int thisErr = gErrorIgnoreLevel;
 	//      If the user wanted silence we point the Std Output Streams to /dev/null
 	if( OutputLevel <= -1 )
 	{
@@ -186,6 +194,7 @@ void Histogram_Processing::Silent_Fit( TH1* input_histo, TString fit_type, int O
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
+		gErrorIgnoreLevel = kFatal;
 	}
 	//  Redirect the errors to the empty void of nullness
 	//freopen("/dev/null", "w", stderr);
@@ -196,6 +205,7 @@ void Histogram_Processing::Silent_Fit( TH1* input_histo, TString fit_type, int O
 		cout.rdbuf(cout_bak);
 		cerr.rdbuf(cerr_bak);
 		clog.rdbuf(clog_bak);
+		gErrorIgnoreLevel = thisErr;
 	}
 }
 
@@ -204,6 +214,8 @@ void Histogram_Processing::Silent_Draw( TCanvas* c1, TH1* input_histo, TString o
 	//      the gamma function in ROOT has issues with verbosity, let's silence it and then return the verbosity back at the end
 
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+
+	int thisErr = gErrorIgnoreLevel;
 	//      If the user wanted silence we point the Std Output Streams to /dev/null
 	if( OutputLevel <= -1 )
 	{
@@ -215,6 +227,7 @@ void Histogram_Processing::Silent_Draw( TCanvas* c1, TH1* input_histo, TString o
 		cout.rdbuf(0);
 		cerr.rdbuf(0);
 		clog.rdbuf(0);
+		gErrorIgnoreLevel = kFatal;
 	}
 	input_histo->Draw(options);
 	c1->Update();
@@ -224,6 +237,7 @@ void Histogram_Processing::Silent_Draw( TCanvas* c1, TH1* input_histo, TString o
 		cout.rdbuf(cout_bak);
 		cerr.rdbuf(cerr_bak);
 		clog.rdbuf(clog_bak);
+		thisErr = gErrorIgnoreLevel;
 	}
 }
 
@@ -232,6 +246,8 @@ void Histogram_Processing::Silent_Print( TCanvas* c1, TString Print_String, int 
 	//      the gamma function in ROOT has issues with verbosity, let's silence it and then return the verbosity back at the end
 
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
+
+	int thisErr = gErrorIgnoreLevel;
 	//      If the user wanted silence we point the Std Output Streams to /dev/null
 	if( OutputLevel <= -1 )
 	{
@@ -240,6 +256,7 @@ void Histogram_Processing::Silent_Print( TCanvas* c1, TString Print_String, int 
 		clog_bak = clog.rdbuf();
 		//  Redirect the errors to the empty void of nullness
 		//freopen("/dev/null", "w", stderr);
+		gErrorIgnoreLevel = kFatal;
 	}
 	c1->Update();
 	c1->Print( Print_String );
@@ -249,6 +266,7 @@ void Histogram_Processing::Silent_Print( TCanvas* c1, TString Print_String, int 
 		cout.rdbuf(cout_bak);
 		cerr.rdbuf(cerr_bak);
 		clog.rdbuf(clog_bak);
+		gErrorIgnoreLevel = thisErr;
 	}
 }
 

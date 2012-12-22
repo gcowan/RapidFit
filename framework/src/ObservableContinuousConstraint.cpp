@@ -156,7 +156,7 @@ Observable * ObservableContinuousConstraint::CreateObservable() const
 Observable * ObservableContinuousConstraint::CreateObservable( TRandom3 * RandomNumberGenerator ) const
 {
 	double value = minimum + ( ( maximum - minimum ) * RandomNumberGenerator->Rndm() );
-	return new Observable( name, value, 0.0, unit );
+	return new Observable( name, value/*, 0.0*/, unit );
 }
 
 bool ObservableContinuousConstraint::IsDiscrete() const
@@ -171,8 +171,8 @@ void ObservableContinuousConstraint::Print() const
 
 Observable* ObservableContinuousConstraint::GetMidRangeValue() const
 {
-	double err=(maximum-minimum)/2.;
-	return new Observable( name, minimum+err, err, unit ); 
+	double diff=(maximum-minimum)/2.;
+	return new Observable( name, minimum+diff, unit ); 
 }
 
 string ObservableContinuousConstraint::GetTF1() const

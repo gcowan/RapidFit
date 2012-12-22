@@ -89,7 +89,7 @@ void Foam::Init()
 				exit(52);
 			}
 			string unit = thisConst->GetUnit();
-			init_temporaryDataPoint->SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], 0.0, unit );
+			init_temporaryDataPoint->SetObservable( discreteNames[discreteIndex], discreteCombinations[combinationIndex][discreteIndex], unit );
 		}
 		for (unsigned int continuousIndex = 0; continuousIndex < continuousNames.size(); ++continuousIndex )
 		{
@@ -104,7 +104,7 @@ void Foam::Init()
 				exit(53);
 			}
 			string unit = thisConst->GetUnit();
-			init_temporaryDataPoint->SetObservable( continuousNames[continuousIndex], 0.0, 0.0, unit );
+			init_temporaryDataPoint->SetObservable( continuousNames[continuousIndex], 0.0, unit );
 		}
 
 		//init_temporaryDataPoint->Print();
@@ -370,7 +370,7 @@ int Foam::GenerateData( int DataAmount )
 		{
 			string unit = generationBoundary->GetConstraint( *continuousNames_ref[continuousIndex] )->GetUnit();
 			double newValue = minima[continuousIndex] + ( ranges[continuousIndex] * generatedEvent[continuousIndex] );
-			temporaryDataPoint->SetObservable( continuousNames[continuousIndex], newValue, 0.0, unit );
+			temporaryDataPoint->SetObservable( continuousNames[continuousIndex], newValue, unit );
 			//cout << continuousNames[continuousIndex] << "\t" << newValue << "\t" << 0.0 << "\t" << unit << endl;
 		}
 

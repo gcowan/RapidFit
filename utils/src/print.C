@@ -38,6 +38,7 @@ int main( int argc, char* argv[] )
 		cout << endl << "For Tree: " << found_names[i].first <<found_names[i].second << ":" << endl;
 		gDirectory->cd( found_names[i].first.c_str() );
 		TTree* local_tree = (TTree*) gDirectory->Get( found_names[i].second.c_str() );
+		cout << "Entries: " << local_tree->GetEntries() << endl;
 		vector<TString> branchNames = TTree_Processing::get_branch_names( local_tree );
 		vector<TString> branchTitles = TTree_Processing::get_branch_titles( local_tree );
 		vector<TString> branchTypes = TTree_Processing::get_branch_types( local_tree );

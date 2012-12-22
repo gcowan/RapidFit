@@ -17,8 +17,8 @@
 using namespace::std;
 
 //Constructor with correct argument
-Observable::Observable( const string Name, const double NewValue, const double NewError, const string NewUnit )
-	: name(Name), value(NewValue), error(NewError), unit(NewUnit), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.), offset(-999.)
+Observable::Observable( const string Name, const double NewValue, const string NewUnit )
+	: name(Name), value(NewValue), unit(NewUnit), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.), offset(-999.)
 {
 	if (unit == "")
 	{
@@ -26,12 +26,12 @@ Observable::Observable( const string Name, const double NewValue, const double N
 	}
 }
 
-Observable::Observable( const string Name ) : name(Name), value(0.), error(0.), unit("Uninitialised"), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.), offset(-999.)
+Observable::Observable( const string Name ) : name(Name), value(0.), unit("Uninitialised"), bin_num(-1), acceptance(-1.), bkg_bin_num(-1), bkg_acceptance(-1.), offset(-999.)
 {
 }
 
 Observable::Observable( const Observable& input ) :
-	name(input.name), value(input.value), error(input.error), unit(input.unit), bin_num(input.bin_num),
+	name(input.name), value(input.value), unit(input.unit), bin_num(input.bin_num),
 	acceptance(input.acceptance), bkg_bin_num(input.bkg_bin_num), bkg_acceptance(input.bkg_acceptance), offset(input.offset)
 {
 }
@@ -45,12 +45,6 @@ Observable::~Observable()
 double Observable::GetValue() const
 {
 	return value;
-}
-
-//Get and set the error on the value
-double Observable::GetError() const
-{
-	return error;
 }
 
 //Get the unit
@@ -108,7 +102,6 @@ void Observable::Print() const
 {
 	cout << "Name: " << name;
 	cout << "\tValue: " << value;
-	cout << "\tError: " << error;
 	cout << "\tUnit: " << unit ;
 	if( bin_num != -1 ) cout << "\tBinNum: " << bin_num << "\tAcceptance: " << acceptance;
 	if( bkg_bin_num != -1 ) cout << "\tBkgBinNum: " << bkg_bin_num << "\tBkgAcceptance: " << bkg_acceptance;
@@ -119,7 +112,6 @@ void Observable::SetObservable( const Observable* input )
 {
 	name = input->GetName();
 	value = input->GetValue();
-	error = input->GetError();
 	unit = input->GetUnit();
 	bin_num = input->GetBinNumber();
 	acceptance = input->GetAcceptance();
@@ -131,11 +123,6 @@ void Observable::SetObservable( const Observable* input )
 void Observable::ExternallySetValue( const double input )
 {
 	value = input;
-}
-
-void Observable::ExternallySetError( const double input )
-{
-	error = input;
 }
 
 void Observable::SetOffSet( const double input ) const

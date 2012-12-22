@@ -266,7 +266,7 @@ vector<DataPoint*> StatisticsFunctions::DataAverage( IDataSet * InputData, vecto
 	for (unsigned int continuousIndex = 0; continuousIndex < ContinuousNames.size(); ++continuousIndex )
 	{
 		Observable * newValue = templateDataPoint->GetObservable( ContinuousNames[continuousIndex] );
-		Observable* newValue2 = new Observable( newValue->GetName(), continuousSums[continuousIndex], newValue->GetError(), newValue->GetUnit() );
+		Observable* newValue2 = new Observable( newValue->GetName(), continuousSums[continuousIndex], newValue->GetUnit() );
 		templateDataPoint->SetObservable( ContinuousNames[continuousIndex], newValue2 );
 		delete newValue2;
 	}
@@ -279,7 +279,7 @@ vector<DataPoint*> StatisticsFunctions::DataAverage( IDataSet * InputData, vecto
 		{
 			//Set the data point
 			Observable * newValue = templateDataPoint->GetObservable( DiscreteNames[discreteIndex] );
-			Observable* newValue2 = new Observable( newValue->GetName(), DiscreteCombinations[combinationIndex][discreteIndex], newValue->GetError(), newValue->GetUnit() );
+			Observable* newValue2 = new Observable( newValue->GetName(), DiscreteCombinations[combinationIndex][discreteIndex], newValue->GetUnit() );
 			templateDataPoint->SetObservable( DiscreteNames[discreteIndex], newValue2 );
 			delete newValue2;
 

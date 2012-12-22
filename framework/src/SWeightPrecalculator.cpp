@@ -52,8 +52,8 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 		DataPoint* thisPoint = inputDataSet->GetDataPoint( i );
 		double thisWeight = thisPoint->GetObservable( sWeightName )->GetValue();
 		thisWeight *= alpha;
-		Observable* sWeight_corrected = new Observable( sWeightName, thisWeight, 0., "Weight-Unit" );
-		Observable* sWeight_sq_corrected = new Observable( sWeightsqName, thisWeight*thisWeight, 0., "WeightSq-Unit" );
+		Observable* sWeight_corrected = new Observable( sWeightName, thisWeight, "Weight-Unit" );
+		Observable* sWeight_sq_corrected = new Observable( sWeightsqName, thisWeight*thisWeight, "WeightSq-Unit" );
 		thisPoint->SetObservable( sWeightName, sWeight_corrected );
 		thisPoint->SetObservable( sWeightsqName, sWeight_sq_corrected );
 		delete sWeight_corrected;
@@ -173,8 +173,8 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* Inp
 		DataPoint * newEvent = new DataPoint( *currentEvent );
 
 		//Add the sWeight as an Observable
-		newEvent->AddObservable( weightName, numerator / denominator, 0.0, "Unitless" );
-		newEvent->AddObservable( weightName2, numerator2 / denominator2, 0.0, "Unitless" );
+		newEvent->AddObservable( weightName, numerator / denominator, "Unitless" );
+		newEvent->AddObservable( weightName2, numerator2 / denominator2, "Unitless" );
 
                 sum += numerator / denominator;
                 sum2 += numerator2 / denominator2;

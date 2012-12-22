@@ -174,9 +174,9 @@ void DataPoint::AddObservable( string Name, Observable* NewObservable )
 	}
 }
 
-void DataPoint::AddObservable( string Name, double Value, double Error, string Unit, bool trusted, int nameIndex )
+void DataPoint::AddObservable( string Name, double Value, string Unit, bool trusted, int nameIndex )
 {
-	Observable *tempObservable = new Observable( Name, Value, Error, Unit );
+	Observable *tempObservable = new Observable( Name, Value, Unit );
 	if( trusted )
 	{
 		allObservables[unsigned(nameIndex)]->SetObservable( tempObservable );
@@ -188,9 +188,9 @@ void DataPoint::AddObservable( string Name, double Value, double Error, string U
 }
 
 //Initialise observable
-bool DataPoint::SetObservable( string Name, double Value, double Error, string Unit, bool trusted, int nameIndex )
+bool DataPoint::SetObservable( string Name, double Value, string Unit, bool trusted, int nameIndex )
 {
-	Observable * temporaryObservable = new Observable( Name, Value, Error, Unit );
+	Observable * temporaryObservable = new Observable( Name, Value, Unit );
 	bool returnValue=false;
 	if( trusted )
 	{

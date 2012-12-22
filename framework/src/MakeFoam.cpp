@@ -163,7 +163,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 			{
 				//Use the mid points for the integrable values
 				Observable * temporaryObservable = cellCenter->GetObservable( doIntegrate[observableIndex] );
-				Observable* temporaryObservable2 = new Observable( temporaryObservable->GetName(), midPoints[observableIndex], 0, temporaryObservable->GetUnit() );
+				Observable* temporaryObservable2 = new Observable( temporaryObservable->GetName(), midPoints[observableIndex], temporaryObservable->GetUnit() );
 				cellCenter->SetObservable( doIntegrate[observableIndex], temporaryObservable2 );
 				delete temporaryObservable2;
 			}
@@ -245,7 +245,7 @@ MakeFoam::MakeFoam( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, DataPoi
 
 					//Use the mid points for the integrable values
 					Observable * temporaryObservable = cellCenter->GetObservable( doIntegrate[observableIndex] );
-					Observable* temporaryObservable2 = new Observable( temporaryObservable->GetName(), midPoint, 0, temporaryObservable->GetUnit() );
+					Observable* temporaryObservable2 = new Observable( temporaryObservable->GetName(), midPoint, temporaryObservable->GetUnit() );
 					cellCenter->SetObservable( doIntegrate[observableIndex], temporaryObservable2 );
 					delete temporaryObservable2;
 				}

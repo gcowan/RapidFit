@@ -256,7 +256,7 @@ bool PhaseSpaceBoundary::IsPointInBoundary( DataPoint * TestDataPoint, bool sile
 				{
 					if( fabs( testObservable->GetValue() - temp_vec[i] ) < DOUBLE_TOLERANCE_PHASE )
 					{
-						Observable* temp = new Observable( testObservable->GetName(), temp_vec[i], testObservable->GetError(), testObservable->GetUnit() );
+						Observable* temp = new Observable( testObservable->GetName(), temp_vec[i], testObservable->GetUnit() );
 						TestDataPoint->SetObservable( testObservable->GetName(), temp );
 						delete temp;
 					}
@@ -351,8 +351,7 @@ vector<DataPoint*> PhaseSpaceBoundary::GetDiscreteCombinations() const
 			//Set the data point
 			Observable* oldValue = templateDataPoint->GetObservable( discreteNames[discreteIndex] );
 
-			Observable* newValue = new Observable( oldValue->GetName(), discreteCombinations[combinationIndex][discreteIndex],
-					0, oldValue->GetUnit() );
+			Observable* newValue = new Observable( oldValue->GetName(), discreteCombinations[combinationIndex][discreteIndex], oldValue->GetUnit() );
 
 			templateDataPoint->SetObservable( discreteNames[discreteIndex], newValue );
 			delete newValue;

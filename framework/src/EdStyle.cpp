@@ -268,10 +268,17 @@ TString EdStyle::GetParamRootUnit( string Param_Name )
 
 		//returnable_string = "MeV/c^{2}";
 		returnable_string = "[ps^{-1}]";
-	} else if ( Param_Name == "tau" ) {
+	} else if ( Param_Name == "time" ) {
 
 		returnable_string = "[ps]";
 
+	} else if ( Param_Name == "mass" ) {
+
+		returnable_string = "[MeV]";
+
+	} else if ( Param_Name == "tau" ) {
+
+		returnable_string = "[ps]";
 	}
 
 	return returnable_string;

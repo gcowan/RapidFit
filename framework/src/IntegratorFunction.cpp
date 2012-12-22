@@ -194,7 +194,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		{
 
 		}
-		newDataPoint->SetObservable( doIntegrate[observableIndex], (double)x[observableIndex], currentObservable->GetError(), " ", true, (int)true_index );
+		newDataPoint->SetObservable( doIntegrate[observableIndex], (double)x[observableIndex], " ", true, (int)true_index );
 		newDataPoint->GetObservable( true_index )->SetBinNumber(-1);
 	}
 
@@ -205,7 +205,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		true_index = (unsigned)cache_lookup[observableIndex + (unsigned)doIntegrate.size()];
 		Observable* currentObservable = currentPoint->GetObservable( true_index );
 		currentObservable->SetBinNumber(-1);
-		newDataPoint->SetObservable( dontIntegrate[observableIndex], currentObservable->GetValue(), currentObservable->GetError(), " ", true, (int)true_index );
+		newDataPoint->SetObservable( dontIntegrate[observableIndex], currentObservable->GetValue(), " ", true, (int)true_index );
 	}
 
 	if( newDataPoint->GetPhaseSpaceBoundary() == NULL ) newDataPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );

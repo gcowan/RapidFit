@@ -130,7 +130,7 @@ Observable * ObservableDiscreteConstraint::CreateObservable() const
 Observable * ObservableDiscreteConstraint::CreateObservable( TRandom3 * RandomNumberGenerator ) const
 {
 	int randomIndex = (int)floor( int(allValues.size()) * RandomNumberGenerator->Rndm() );
-	return new Observable( name, allValues[unsigned(randomIndex)], 0.0, unit );
+	return new Observable( name, allValues[unsigned(randomIndex)]/*, 0.0*/, unit );
 }
 
 bool ObservableDiscreteConstraint::IsDiscrete() const
@@ -158,7 +158,7 @@ Observable* ObservableDiscreteConstraint::GetMidRangeValue() const
 	{
 		middle_val+=*val_i;
 	}
-	return new Observable( name, middle_val, 0., unit );
+	return new Observable( name, middle_val, unit );
 }
 
 string ObservableDiscreteConstraint::GetTF1() const

@@ -1640,7 +1640,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		//	Set the value of Observable to the new step value
 		//	All other CONTINUOUS observables set to average of range
 		oldObs = InputPoint->GetObservable(ObservableName);
-		newObs = new Observable( ObservableName, observableValue, 0, oldObs->GetUnit() );
+		newObs = new Observable( ObservableName, observableValue, oldObs->GetUnit() );
 		InputPoint->SetObservable( ObservableName, newObs );
 		delete newObs; newObs = NULL;
 
@@ -1777,7 +1777,7 @@ double ComponentPlotter::operator() (double *x, double *p)
 		DataPoint* InputPoint = new DataPoint( *( (*comb_i) ) );
 
 		oldObs = InputPoint->GetObservable( observableName );
-		newObs = new Observable( observableName, fixed_obs_val, 0, oldObs->GetUnit() );
+		newObs = new Observable( observableName, fixed_obs_val, oldObs->GetUnit() );
 		InputPoint->SetObservable( observableName, newObs );
 		//delete oldObs;
 

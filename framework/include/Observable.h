@@ -22,7 +22,7 @@ class Observable
 
 		Observable( const string );
 
-		Observable( const string, const double, const double, const string );
+		Observable( const string, const double, const string );
 
 		Observable( const Observable& input );
 
@@ -32,8 +32,6 @@ class Observable
 		~Observable();
 
 		double GetValue() const;
-
-		double GetError() const;
 
 		string GetUnit() const;
 
@@ -59,12 +57,10 @@ class Observable
 
 		void SetObservable( const Observable* );
 		void ExternallySetValue( const double );
-		void ExternallySetError( const double );
 
 	private:
 		string name;
 		double value;
-		double error;
 		string unit;
 		mutable int bin_num;
 		mutable int bkg_bin_num;

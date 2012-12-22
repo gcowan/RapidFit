@@ -250,11 +250,21 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		cerr << "Total Fit Results: " << total_rows << "\tNumber of Fit Results Cut by demanding 'All pulls <=5': " << total_rows-usable_rows << endl;
 	}
 
+	if( usable_rows!=total_rows )
+	{
+		cerr << "This Tool has thrown Away " << total_rows - usable_rows << " by insisting that all toys are <= 5 sigma." << endl;
+		cerr << endl << "To use ALL DATA regardless of outliers run with the additional option: --allData" << endl << endl;
+	}
+
 	//      Results at >5 sigma are heavily biased, fit is by definition badly behaved
 	if( !noPullCuts ) cut_str.Append( all_pulls_lt5 );
 
+	cout << endl;
 	for( unsigned int j=0; j< all_parameter_plots.size(); ++j )
 	{
+
+		cout << "Plotting: " << all_parameter_plots[j] << setw(20) << " " <<  "\r" << flush;
+
 		input_tree->Draw( all_parameter_plots[j], cut_str, "goff" );
 
 		TH1* input_histo = (TH1*) input_tree->GetHistogram();
@@ -272,7 +282,9 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		TCanvas* c1 = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
 		Histogram_Processing::Silent_Draw( c1, input_histo );
 		TAxis* x_axis = input_histo->GetXaxis();
-		x_axis->SetTitle( EdStyle::GetParamRootName( all_parameter_plots[j] ) );
+		x_axis->SetTitle( EdStyle::GetParamRootName( EdStyle::Remove_Suffix(all_parameter_plots[j]) ) + " " 
+				+ EdStyle::Get_Suffix( all_parameter_plots[j] ) + " "
+				+ EdStyle::GetParamRootUnit( EdStyle::Remove_Suffix(all_parameter_plots[j]) ) );
 		input_histo->SetTitle( "Toy Study " + EdStyle::GetParamRootName( all_parameter_plots[j] ) + " distribution" );
 
 		c1->Update();
@@ -300,7 +312,8 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		Histogram_Processing::Silent_Print( c1, Output_Dir+"/"+all_parameter_plots[j]+"_c_thru.pdf" );
 		Histogram_Processing::Silent_Print( c1, Output_Dir+"/"+all_parameter_plots[j]+"_c_thru.C" );
 	}
-
+	cout << "Finished" << setw(40) << " " << endl;
+	cout << endl;
 	ProcessTableContent( latexTable, all_parameter_plots, table_content );
 
 	TableFooter( latexTable );
@@ -315,6 +328,7 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 	latex << "\\clearpage" << endl;
 
 	stringstream latexImage;
+
 
 	ProcessImageContent( latexImage, all_parameter_plots );
 

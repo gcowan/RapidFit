@@ -296,11 +296,59 @@ void TTree_Processing::AddBranch( TTree* input_tree, string title, vector<double
 		return;
 	}
 
-	unsigned int size = (unsigned)input_tree->GetEntries();
+	unsigned int size = (unsigned)data.size();
 
 	double thisValue=0.;
 	TString name=title.c_str();
 	name.Append("/D");
+	TBranch* output_branch_obj = input_tree->Branch( title.c_str(), &thisValue, name );
+
+	input_tree->SetEntries( (int)size );
+
+	for( unsigned int i=0; i< size; ++i )
+	{
+		thisValue = data[i];
+		output_branch_obj->Fill();
+	}
+}
+
+void TTree_Processing::AddBranch( TTree* input_tree, string title, vector<int> data )
+{
+	if( (input_tree->GetEntries() != (int)data.size()) && (input_tree->GetEntries() != 0) )
+	{
+		cout << "ERROR: CANNOT ADD BRANCH " << title << " DATA SIZE DID NOT MATCH TREE." << endl;
+		return;
+	}
+
+	unsigned int size = (unsigned)data.size();
+
+	int thisValue=0;
+	TString name=title.c_str();
+	name.Append("/I");
+	TBranch* output_branch_obj = input_tree->Branch( title.c_str(), &thisValue, name );
+
+	input_tree->SetEntries( (int)size );
+
+	for( unsigned int i=0; i< size; ++i )
+	{
+		thisValue = data[i];
+		output_branch_obj->Fill();
+	}
+}
+
+void TTree_Processing::AddBranch( TTree* input_tree, string title, vector<bool> data )
+{
+	if( (input_tree->GetEntries() != (int)data.size()) && (input_tree->GetEntries() != 0) )
+	{
+		cout << "ERROR: CANNOT ADD BRANCH " << title << " DATA SIZE DID NOT MATCH TREE." << endl;
+		return;
+	}
+
+	unsigned int size = (unsigned)data.size();
+
+	bool thisValue=false;
+	TString name=title.c_str();
+	name.Append("/B");
 	TBranch* output_branch_obj = input_tree->Branch( title.c_str(), &thisValue, name );
 
 	input_tree->SetEntries( (int)size );

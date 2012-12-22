@@ -137,8 +137,6 @@ class DataPoint
 		 *
 		 * @param Value    The Value we want it to take
 		 *
-		 * @param Error    The Error we want it to have
-		 *
 		 * @param Unit     The corresponding Unit
 		 *
 		 * @param trusted  Is this trusted? i.e. Do we know the parameter to already exist in the DataPoint (possibly as a NULL parameter in a default DataPoint)
@@ -147,7 +145,7 @@ class DataPoint
 		 *
 		 * @return Void
 		 */
-		void AddObservable( string Name, double Value, double Error, string Unit, bool trusted = false, int position = -1 );
+		void AddObservable( string Name, double Value, string Unit, bool trusted = false, int position = -1 );
 	
 		/*!
 		 * @brief Set an internal Observable of the given name to be equal to this Observable
@@ -171,8 +169,6 @@ class DataPoint
                  *                                                 
                  * @param Value    The Value we want it to take    
                  *                                                 
-                 * @param Error    The Error we want it to have    
-                 *                                                 
                  * @param Unit     The corresponding Unit          
                  *                                                 
                  * @param trusted  Is this trusted? i.e. Do we know the parameter to already exist in the DataPoint (possibly as a NULL parameter in a default DataPoint)
@@ -181,7 +177,7 @@ class DataPoint
 		 *
 		 * @return boolean, true is sucessful, false if not
 		 */
-		bool SetObservable( string Name, double Value, double Error, string Unit, bool trusted =false, int position =-1 );
+		bool SetObservable( string Name, double Value, string Unit, bool trusted =false, int position =-1 );
 
 		/*!
 		 * @brief Wanted for sorting DataPoints

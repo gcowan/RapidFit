@@ -144,7 +144,7 @@ int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint, bool silence ) c
 				DataPoint* newPoint = new DataPoint( *templateDataPoint );
 				for( unsigned int j=0; j< possible_datapoints[i].size(); ++j )
 				{
-					Observable* this_obs = new Observable( string(missing[j]), possible_datapoints[i][j], 0., "unitless" );
+					Observable* this_obs = new Observable( string(missing[j]), possible_datapoints[i][j], "unitless" );
 					//cout << string(missing[i]) << "\t" << possible_datapoints[i][j] << endl;
 					newPoint->AddObservable( string(missing[j]), this_obs );
 					delete this_obs;

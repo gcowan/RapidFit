@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2012/12/22 Rob Currie
+  - Removed Error quantity from Observable interface, this is defunct and we have a 1-1 mapping between Observables and quantities on disk, this includes Measured errors as Observables in their own right
+    (besides we were ALWAYS assigning the value to be 0 which is meaningless)
+  - Made improvements to RapidPlot for toy studies and improved some back-end code there
+  - Made some improvements to the lifetime_tool which is used in projection studies for JpsiPhi
+
 2012/12/21 Greig Cowan
   - Added spin-3 K* resonance to DP PDF, using the new code from Michal for the Wigner functions.
 

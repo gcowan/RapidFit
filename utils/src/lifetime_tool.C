@@ -4,9 +4,11 @@
 #include "ROOT_File_Processing.h"
 #include "Histo_Processing.h"
 #include "Template_Functions.h"
+
+#include "TROOT.h"
+#include "TF2.h"
 #include "TGraphErrors.h"
 #include "TGraph2DErrors.h"
-
 #include "TPaveStats.h"
 
 #include <iomanip>
@@ -16,7 +18,7 @@ using namespace::std;
 
 int main( int argc, char* argv[] )
 {
-	if( argc != 3 )
+	if( argc < 3 || argc > 4 )
 	{
 		cout << "Usage: " << argv[0] << " gammaL.root gammaH.root" << endl << endl;
 	}
@@ -28,6 +30,7 @@ int main( int argc, char* argv[] )
 	RapidFit_Style->SetColzPlotStyle();
 
 	gStyle->SetOptFit(111);
+	gStyle->SetPalette(1);
 
 	//	Open First TTree in the file
 	TTree* gammaLTree = ROOT_File_Processing::GetFirstTree( argv[1] );
@@ -43,11 +46,33 @@ int main( int argc, char* argv[] )
 	vector<double>* gammaH_tau_error = TTree_Processing::Buffer_Branch( gammaHTree, "tau_error/(tau_value*tau_value)" );
 	vector<double>* gammaH_FitStatus = TTree_Processing::Buffer_Branch( gammaHTree, "Fit_Status" );
 
-	TTree* gammaTree = ROOT_File_Processing::GetFirstTree( argv[3] );
+	cout << "Storing GLGH Data" << endl;
+	TFile* newFile = new TFile( "GLGHData.root", "RECREATE" );
+	TTree* GLGHTree = new TTree( "GLGHTree", "GLGHTree" );
 
-	vector<double>* gamma_value = TTree_Processing::Buffer_Branch( gammaTree, "gamma_value" );
-	vector<double>* deltaGamma_value = TTree_Processing::Buffer_Branch( gammaTree, "deltaGamma_value" );
-	vector<double>* FitStatus_value = TTree_Processing::Buffer_Branch( gammaTree, "Fit_Status" );
+	TTree_Processing::AddBranch( GLGHTree, "gammaH_value", *gammaH_tau_value );
+	TTree_Processing::AddBranch( GLGHTree, "gammaH_error", *gammaH_tau_error );
+	TTree_Processing::AddBranch( GLGHTree, "gammaL_value", *gammaL_tau_value );
+	TTree_Processing::AddBranch( GLGHTree, "gammaL_error", *gammaL_tau_error );
+
+	GLGHTree->Write("",TObject::kOverwrite);
+	newFile->Write("",TObject::kOverwrite);
+
+	cout << "Stored!" << endl;
+
+	TTree* gammaTree = NULL;
+
+	vector<double>* gamma_value = NULL;
+	vector<double>* deltaGamma_value = NULL;
+	vector<double>* FitStatus_value = NULL;
+
+	if( argc == 4 )
+	{
+		gammaTree = ROOT_File_Processing::GetFirstTree( argv[3] );
+		gamma_value = TTree_Processing::Buffer_Branch( gammaTree, "gamma_value" );
+		deltaGamma_value = TTree_Processing::Buffer_Branch( gammaTree, "deltaGamma_value" ); 
+		FitStatus_value = TTree_Processing::Buffer_Branch( gammaTree, "Fit_Status" );
+	}
 
 	vector<double> gammaS_value, gammaS_error, deltaGammaS_value, deltaGammaS_error;
 
@@ -57,6 +82,9 @@ int main( int argc, char* argv[] )
 
 	TGraphErrors* corr_graph = new TGraphErrors( gammaH_tau_value->size(), &((*gammaL_tau_value)[0]), &((*gammaH_tau_value)[0]),
 			&((*gammaL_tau_error)[0]), &((*gammaH_tau_error)[0]) );
+
+	TGraphErrors* corr_graph2 = new TGraphErrors( gammaH_tau_value->size(), &((*gammaH_tau_value)[0]), &((*gammaL_tau_value)[0]),
+			&((*gammaH_tau_error)[0]), &((*gammaL_tau_error)[0]) );
 
 	double GL_sum=0., GH_sum=0.;
 	double GL_sum_sq=0., GH_sum_sq=0.;
@@ -85,63 +113,33 @@ int main( int argc, char* argv[] )
 		double gammaS_val=0., gammaS_err=0., delGammaS_val=0., delGammaS_err=0.;
 
 		gammaS_val = 0.5 * ( (*gammaL_tau_value)[i] + (*gammaH_tau_value)[i] );
-		gammaS_err = 0.5 * ( sqrt( (*gammaL_tau_error)[i]*(*gammaL_tau_error)[i]+(*gammaH_tau_error)[i]*(*gammaH_tau_error)[i] ) );
+		gammaS_err = 0.5 * ( sqrt( (*gammaL_tau_error)[i]*(*gammaL_tau_error)[i]+(*gammaH_tau_error)[i]*(*gammaH_tau_error)[i] ) + 0.7938*2.*(*gammaH_tau_error)[i]*(*gammaL_tau_error)[i] );
 
 		delGammaS_val = (*gammaL_tau_value)[i] - (*gammaH_tau_value)[i];
-		delGammaS_err = sqrt( (*gammaL_tau_error)[i]*(*gammaL_tau_error)[i]+(*gammaH_tau_error)[i]*(*gammaH_tau_error)[i] );
+		delGammaS_err = sqrt( (*gammaL_tau_error)[i]*(*gammaL_tau_error)[i]+(*gammaH_tau_error)[i]*(*gammaH_tau_error)[i] + 0.7938*2.*(*gammaH_tau_error)[i]*(*gammaL_tau_error)[i] );
 
 		gammaS_value.push_back( gammaS_val );
 		gammaS_error.push_back( gammaS_err );
 
 		deltaGammaS_value.push_back( delGammaS_val );
 		deltaGammaS_error.push_back( delGammaS_err );
-
-		if( (*gammaH_FitStatus)[i] == 3 )
-		{
-			if( (*gammaL_FitStatus)[i] == 3 )
-			{
-				if( (*FitStatus_value)[i] == 3 )
-				{
-
-					gamma_diff.push_back( gammaS_val - (*gamma_value)[i] );
-
-					angGammaTrudiff.push_back( gammaS_val );
-					untagGammaTrudiff.push_back( (*gamma_value)[i] );
-
-					deltaGamma_diff.push_back( delGammaS_val - (*deltaGamma_value)[i] );
-
-					angdGammaTrudiff.push_back( delGammaS_val );
-					untagdGammaTrudiff.push_back( (*deltaGamma_value)[i] );
-				}
-			}
-		}
 	}
 
+	int thisOptStat = gStyle->GetOptStat();
+
+	gStyle->SetOptStat(0);
+
 	TH1* gamma_histo = new TH1D( "gamma_dist", "gamma_dist", gammaS_value.size(), get_minimum(gammaS_value), get_maximum(gammaS_value) );
+	TH1* gammaErr_histo = new TH1D( "gammaErr_dist", "gammaErr_dist", gammaS_error.size(), get_minimum(gammaS_error), get_maximum(gammaS_error) );
 	for( unsigned int i=0; i< gammaS_value.size(); ++i ) gamma_histo->Fill( gammaS_value[i] );
+	for( unsigned int i=0; i< gammaS_error.size(); ++i ) gammaErr_histo->Fill( gammaS_error[i] );
 
 	TH1* dGamma_histo = new TH1D( "deltaGamma_dist", "deltaGamma_dist", deltaGammaS_value.size(), get_minimum(deltaGammaS_value), get_maximum(deltaGammaS_value) );
+	TH1* dGammaErr_histo = new TH1D( "deltaGammaErr_dist", "deltaGammaErr_dist", deltaGammaS_error.size(), get_minimum(deltaGammaS_error), get_maximum(deltaGammaS_error) );
 	for( unsigned int i=0; i< gammaS_value.size(); ++i ) dGamma_histo->Fill( deltaGammaS_value[i] );
+	for( unsigned int i=0; i< gammaS_error.size(); ++i ) dGammaErr_histo->Fill( deltaGammaS_error[i] );
 
-	TH1* delta_gamma_histo = new TH1D( "gammadiff_dist", "gammadiff_dist", gamma_diff.size(), get_minimum(gamma_diff), get_maximum(gamma_diff) );
-	for( unsigned int i=0; i< gamma_diff.size(); ++i ) delta_gamma_histo->Fill( gamma_diff[i] );
-
-	TH1* delta_dGamma_histo = new TH1D( "dGammadiff_dist", "dGammadiff_dist", deltaGamma_diff.size(), get_minimum(deltaGamma_diff), get_maximum(deltaGamma_diff) );
-	for( unsigned int i=0; i< gamma_diff.size(); ++i ) delta_dGamma_histo->Fill( deltaGamma_diff[i] );
-
-	TH1* gamma_truth =new TH1D( "gamma_tru", "gamma_tru", angGammaTrudiff.size(), get_minimum(angGammaTrudiff), get_maximum(angGammaTrudiff) );
-	for( unsigned int i=0; i< angGammaTrudiff.size(); ++i ) gamma_truth->Fill( angGammaTrudiff[i] );
-	Histogram_Processing::OptimallyRebin( gamma_truth ); gamma_truth->SetLineColor( 2 );
-	TH1* gamma_untag =new TH1D( "gamma_untag", "gamma_untag", untagGammaTrudiff.size(), get_minimum(untagGammaTrudiff), get_maximum(untagGammaTrudiff) );
-	for( unsigned int i=0; i< untagGammaTrudiff.size(); ++i ) gamma_untag->Fill( untagGammaTrudiff[i] );
-	Histogram_Processing::OptimallyRebin( gamma_untag ); gamma_untag->SetLineColor( 3 );
-
-	TH1* dGamma_truth = new TH1D( "deltaGamma_tru", "deltaGamma_tru", angdGammaTrudiff.size(), get_minimum(angdGammaTrudiff), get_maximum(angdGammaTrudiff) );
-	for( unsigned int i=0; i< angdGammaTrudiff.size(); ++i ) dGamma_truth->Fill( angdGammaTrudiff[i] );
-	Histogram_Processing::OptimallyRebin( dGamma_truth ); dGamma_truth->SetLineColor( 2 );
-	TH1* dGamma_untag =new TH1D( "deltaGamma_untag", "deltaGamma_untag", untagdGammaTrudiff.size(), get_minimum(untagdGammaTrudiff), get_maximum(untagdGammaTrudiff) );
-	for( unsigned int i=0; i< untagdGammaTrudiff.size(); ++i ) dGamma_untag->Fill( untagdGammaTrudiff[i] );
-	Histogram_Processing::OptimallyRebin( dGamma_untag ); dGamma_untag->SetLineColor( 3 );
+	cout << "gamma_output" << endl;
 
 	TCanvas* c1 = new TCanvas( "gamma_C", "gamma_C", 1680, 1050 );
 
@@ -150,14 +148,43 @@ int main( int argc, char* argv[] )
 	Histogram_Processing::OptimallyRebin( gamma_histo );
 	TString fit_type = Histogram_Processing::Best_Fit_Function( gamma_histo );
 	Histogram_Processing::Silent_Fit( gamma_histo, fit_type );
+	gamma_histo->Draw();
+	c1->Update();
 	TPaveStats* thisStats = (TPaveStats*)gamma_histo->GetListOfFunctions()->FindObject("stats");
-	thisStats->SetFillStyle(3023);
-	thisStats->SetTextColor(1);
-	thisStats->Draw();
-	gamma_histo->GetXaxis()->SetTitle("#Gamma [ps^{-1}]");
+	if( thisStats != NULL )
+	{
+		thisStats->SetFillStyle(3023);
+		thisStats->SetTextColor(1);
+		thisStats->Draw();
+	}
+
+	gamma_histo->GetXaxis()->SetTitle("#Gamma value [ps^{-1}]");
 	gamma_histo->GetYaxis()->SetTitle("Candidates");
 	c1->Update();
 	c1->Print("gammaOutput.pdf");
+
+	c1->cd();
+	gammaErr_histo->Draw();
+	c1->Update();
+	Histogram_Processing::OptimallyRebin( gammaErr_histo );
+	fit_type = Histogram_Processing::Best_Fit_Function( gammaErr_histo );
+	Histogram_Processing::Silent_Fit( gammaErr_histo, fit_type );
+	gammaErr_histo->Draw();
+	c1->Update();
+	thisStats = (TPaveStats*)gammaErr_histo->GetListOfFunctions()->FindObject("stats");
+	if( thisStats != NULL )
+	{
+		thisStats->SetFillStyle(3023);
+		thisStats->SetTextColor(1);
+		thisStats->Draw();
+	}
+
+	gammaErr_histo->GetXaxis()->SetTitle("#Gamma error [ps^{-1}]");
+	gammaErr_histo->GetYaxis()->SetTitle("Candidates");
+	c1->Update();
+	c1->Print("gammaErrOutput.pdf");
+
+	cout << "dGamma_output" << endl;
 
 	TCanvas* c2 = new TCanvas( "dgamma_C", "dgamma_C", 1680, 1050 );
 
@@ -166,160 +193,332 @@ int main( int argc, char* argv[] )
 	Histogram_Processing::OptimallyRebin( dGamma_histo );
 	fit_type = Histogram_Processing::Best_Fit_Function( dGamma_histo );
 	Histogram_Processing::Silent_Fit( dGamma_histo, fit_type );
+	dGamma_histo->Draw();
+	c2->Update();
 	thisStats = (TPaveStats*)dGamma_histo->GetListOfFunctions()->FindObject("stats");
-	thisStats->SetFillStyle(3023);
-	thisStats->SetTextColor(1);
-	dGamma_histo->GetXaxis()->SetTitle("#Delta#Gamma [ps^{-1}]");
+	if( thisStats != NULL )
+	{
+		thisStats->SetFillStyle(3023);
+		thisStats->SetTextColor(1);
+		thisStats->Draw();
+	}
+	dGamma_histo->GetXaxis()->SetTitle("#Delta#Gamma value [ps^{-1}]");
 	dGamma_histo->GetYaxis()->SetTitle("Candidates");
-	thisStats->Draw();
 	c2->Update();
 	c2->Print("deltaGammaOutput.pdf");
 
-	TCanvas* c3 = new TCanvas( "diffgamma_C", "diffgamma_C", 1680, 1050 );
-
-	delta_gamma_histo->Draw();
-	c3->Update();
-	Histogram_Processing::OptimallyRebin( delta_gamma_histo );
-	fit_type = Histogram_Processing::Best_Fit_Function( delta_gamma_histo );
-	Histogram_Processing::Silent_Fit( delta_gamma_histo, fit_type );
-	thisStats = (TPaveStats*)delta_gamma_histo->GetListOfFunctions()->FindObject("stats");
-	thisStats->SetFillStyle(3023);
-	thisStats->SetTextColor(1);
-	thisStats->Draw();
-	delta_gamma_histo->GetXaxis()->SetTitle("#delta(#Gamma) [ps^{-1}]");
-	delta_gamma_histo->GetYaxis()->SetTitle("Candidates");
-	c3->Update();
-	c3->Print("diff_Gamma.pdf");
-
-	TCanvas* c4 = new TCanvas( "diffdGamma_C", "diffdGamma_C", 1680, 1050 );
-
-	delta_dGamma_histo->Draw();
-	c4->Update();
-	Histogram_Processing::OptimallyRebin( delta_dGamma_histo );
-	fit_type = Histogram_Processing::Best_Fit_Function( delta_dGamma_histo );
-	Histogram_Processing::Silent_Fit( delta_dGamma_histo, fit_type );
-	thisStats = (TPaveStats*)delta_dGamma_histo->GetListOfFunctions()->FindObject("stats");
-	thisStats->SetFillStyle(3023);
-	thisStats->SetTextColor(1);
-	delta_dGamma_histo->GetXaxis()->SetTitle("#delta(#Delta#Gamma) [ps^{-1}]");
-	delta_dGamma_histo->GetYaxis()->SetTitle("Candidates");
-	thisStats->Draw();
-	c4->Update();
-	c4->Print("diff_deltaGamma.pdf");
-
-	TCanvas* c5 = new TCanvas( "gamma_overlay", "gamma_overlay", 1680, 1050 );
-
-	gamma_truth->Draw();
-	gamma_truth->GetXaxis()->SetTitle("#Gamma [ps^{-1}]");
-	gamma_truth->GetYaxis()->SetTitle("Candidates");
-	gamma_untag->Draw("SAME");
-	c5->Update();
-	c5->Print("gamma_overlay.pdf");
-
-	TCanvas* c6 = new TCanvas( "dGamma_overlay", "dGamma_overlay", 1680, 1050 );
-
-	dGamma_truth->Draw();
-	dGamma_truth->GetXaxis()->SetTitle("#Delta#Gamma [ps^{-1}]");
-	dGamma_truth->GetYaxis()->SetTitle("Candidates");
-	dGamma_untag->Draw("SAME");
-	c6->Update();
-	c6->Print("deltaGamma_overlay.pdf");
-
-	TCanvas* c7 = new TCanvas( "corr_Graph", "corr_Graph", 1680, 1050 );
-
-	corr_graph->Draw("AP");
-	c7->Update();
-	corr_graph->GetXaxis()->SetTitle("#Gamma_{L}");
-	corr_graph->GetYaxis()->SetTitle("#Gamma_{H}");
-	c7->Update();
-
-	TString funcStr_Orig("("); funcStr_Orig+=1./corr;funcStr_Orig.Append("*x+[0])");
-
-	TString funcStr("([1]*x+[0])");
-
-	double xmin = corr_graph->GetXaxis()->GetXmin();
-	double xmax = corr_graph->GetXaxis()->GetXmax();
-	double ymin = corr_graph->GetYaxis()->GetXmin();
-	double ymax = corr_graph->GetYaxis()->GetXmax();
-
-	TF1* corr_funct = new TF1( "corr_func", funcStr, xmin, xmax );
-
-	corr_funct->SetParameters( 1.18579, corr );
-
-	corr_graph->Fit( corr_funct, "R" );
-
-	double* x_func = new double[100];
-	double* y_func = new double[100];
-
-	double xstep = (xmax-xmin)/99.;
-	for( unsigned int i=0; i< 100; ++i )
+	c2->cd();
+	dGammaErr_histo->Draw();
+	c2->Update();
+	Histogram_Processing::OptimallyRebin( dGammaErr_histo );
+	fit_type = Histogram_Processing::Best_Fit_Function( dGammaErr_histo );
+	Histogram_Processing::Silent_Fit( dGammaErr_histo, fit_type );
+	dGammaErr_histo->Draw();
+	c2->Update();
+	thisStats = (TPaveStats*)dGammaErr_histo->GetListOfFunctions()->FindObject("stats");
+	if( thisStats != NULL )
 	{
-		x_func[i] = xmin + xstep * i;
-		y_func[i] = corr_funct->Eval( x_func[i] );
+		thisStats->SetFillStyle(3023);
+		thisStats->SetTextColor(1);
+		thisStats->Draw();
 	}
+	dGammaErr_histo->GetXaxis()->SetTitle("#Delta#Gamma error [ps^{-1}]");
+	dGammaErr_histo->GetYaxis()->SetTitle("Candidates");
+	c2->Update();
+	c2->Print("deltaGammaErrOutput.pdf");
 
-	TGraph* thisCorrGraph = new TGraph( 100, x_func, y_func );
-	thisCorrGraph->SetLineColor(3);
+	gStyle->SetOptStat( thisOptStat );
 
-	thisCorrGraph->Draw("SAMEL");
-	c7->Update();
-
-	TF1* corr_funct2 = new TF1( "corr_func2", funcStr_Orig, xmin, xmax );
-
-	corr_graph->Fit( corr_funct2, "R" );
-
-	double* x_func2 = new double[100];
-	double* y_func2 = new double[100];
-
-	for( unsigned int i=0; i< 100; ++i )
+	if( argc == 4 )
 	{
-		x_func2[i] = xmin + xstep * i;
-		y_func2[i] = corr_funct2->Eval( x_func2[i] );
+
+		for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
+		{
+			if( (*gammaH_FitStatus)[i] == 3 )
+			{
+				if( (*gammaL_FitStatus)[i] == 3 )
+				{
+					if( (*FitStatus_value)[i] == 3 )
+					{
+						gamma_diff.push_back( gammaS_value[i] - (*gamma_value)[i] );
+
+						angGammaTrudiff.push_back( gammaS_value[i] );
+						untagGammaTrudiff.push_back( (*gamma_value)[i] );
+
+						deltaGamma_diff.push_back( deltaGammaS_value[i] - (*deltaGamma_value)[i] );
+
+						angdGammaTrudiff.push_back( deltaGammaS_value[i] );
+						untagdGammaTrudiff.push_back( (*deltaGamma_value)[i] );
+					}
+				}
+			}
+		}
+
+		TH1* delta_gamma_histo = new TH1D( "gammadiff_dist", "gammadiff_dist", gamma_diff.size(), get_minimum(gamma_diff), get_maximum(gamma_diff) );
+		for( unsigned int i=0; i< gamma_diff.size(); ++i ) delta_gamma_histo->Fill( gamma_diff[i] );
+
+		TH1* delta_dGamma_histo = new TH1D( "dGammadiff_dist", "dGammadiff_dist", deltaGamma_diff.size(), get_minimum(deltaGamma_diff), get_maximum(deltaGamma_diff) );
+		for( unsigned int i=0; i< gamma_diff.size(); ++i ) delta_dGamma_histo->Fill( deltaGamma_diff[i] );
+
+		TH1* gamma_truth =new TH1D( "gamma_tru", "gamma_tru", angGammaTrudiff.size(), get_minimum(angGammaTrudiff), get_maximum(angGammaTrudiff) );
+		for( unsigned int i=0; i< angGammaTrudiff.size(); ++i ) gamma_truth->Fill( angGammaTrudiff[i] );
+		Histogram_Processing::OptimallyRebin( gamma_truth ); gamma_truth->SetLineColor( 2 );
+		TH1* gamma_untag =new TH1D( "gamma_untag", "gamma_untag", untagGammaTrudiff.size(), get_minimum(untagGammaTrudiff), get_maximum(untagGammaTrudiff) );
+		for( unsigned int i=0; i< untagGammaTrudiff.size(); ++i ) gamma_untag->Fill( untagGammaTrudiff[i] );
+		Histogram_Processing::OptimallyRebin( gamma_untag ); gamma_untag->SetLineColor( 3 );
+
+		TH1* dGamma_truth = new TH1D( "deltaGamma_tru", "deltaGamma_tru", angdGammaTrudiff.size(), get_minimum(angdGammaTrudiff), get_maximum(angdGammaTrudiff) );
+		for( unsigned int i=0; i< angdGammaTrudiff.size(); ++i ) dGamma_truth->Fill( angdGammaTrudiff[i] );
+		Histogram_Processing::OptimallyRebin( dGamma_truth ); dGamma_truth->SetLineColor( 2 );
+		TH1* dGamma_untag =new TH1D( "deltaGamma_untag", "deltaGamma_untag", untagdGammaTrudiff.size(), get_minimum(untagdGammaTrudiff), get_maximum(untagdGammaTrudiff) );
+		for( unsigned int i=0; i< untagdGammaTrudiff.size(); ++i ) dGamma_untag->Fill( untagdGammaTrudiff[i] );
+		Histogram_Processing::OptimallyRebin( dGamma_untag ); dGamma_untag->SetLineColor( 3 );
+
+		cout << "diff_Gamma" << endl;
+
+		TCanvas* c3 = new TCanvas( "diffgamma_C", "diffgamma_C", 1680, 1050 );
+
+		delta_gamma_histo->Draw();
+		c3->Update();
+		Histogram_Processing::OptimallyRebin( delta_gamma_histo );
+		fit_type = Histogram_Processing::Best_Fit_Function( delta_gamma_histo );
+		Histogram_Processing::Silent_Fit( delta_gamma_histo, fit_type );
+		thisStats = (TPaveStats*)delta_gamma_histo->GetListOfFunctions()->FindObject("stats");
+		if( thisStats != NULL )
+		{
+			thisStats->SetFillStyle(3023);
+			thisStats->SetTextColor(1);
+			thisStats->Draw();
+		}
+		delta_gamma_histo->GetXaxis()->SetTitle("#delta(#Gamma) [ps^{-1}]");
+		delta_gamma_histo->GetYaxis()->SetTitle("Candidates");
+		c3->Update();
+		c3->Print("diff_Gamma.pdf");
+
+		TCanvas* c4 = new TCanvas( "diffdGamma_C", "diffdGamma_C", 1680, 1050 );
+
+		delta_dGamma_histo->Draw();
+		c4->Update();
+		Histogram_Processing::OptimallyRebin( delta_dGamma_histo );
+		fit_type = Histogram_Processing::Best_Fit_Function( delta_dGamma_histo );
+		Histogram_Processing::Silent_Fit( delta_dGamma_histo, fit_type );
+		thisStats = (TPaveStats*)delta_dGamma_histo->GetListOfFunctions()->FindObject("stats");
+		if( thisStats != NULL )
+		{
+			thisStats->SetFillStyle(3023);
+			thisStats->SetTextColor(1);
+			thisStats->Draw();
+		}
+		delta_dGamma_histo->GetXaxis()->SetTitle("#delta(#Delta#Gamma) [ps^{-1}]");
+		delta_dGamma_histo->GetYaxis()->SetTitle("Candidates");
+		c4->Update();
+		c4->Print("diff_deltaGamma.pdf");
+
+		cout << "gamma_overlay" << endl;
+
+		TCanvas* c5 = new TCanvas( "gamma_overlay", "gamma_overlay", 1680, 1050 );
+
+		gamma_truth->Draw();
+		gamma_truth->GetXaxis()->SetTitle("#Gamma [ps^{-1}]");
+		gamma_truth->GetYaxis()->SetTitle("Candidates");
+		gamma_untag->Draw("SAME");
+		c5->Update();
+		c5->Print("gamma_overlay.pdf");
+
+		TCanvas* c6 = new TCanvas( "dGamma_overlay", "dGamma_overlay", 1680, 1050 );
+
+		dGamma_truth->Draw();
+		dGamma_truth->GetXaxis()->SetTitle("#Delta#Gamma [ps^{-1}]");
+		dGamma_truth->GetYaxis()->SetTitle("Candidates");
+		dGamma_untag->Draw("SAME");
+		c6->Update();
+		c6->Print("deltaGamma_overlay.pdf");
+
 	}
-
-	TGraph* thisCorrGraph2 = new TGraph( 100, x_func2, y_func2 );
-
-	thisCorrGraph2->SetLineColor(2);
-	thisCorrGraph2->Draw("SAMEL");
-
-	c7->Update();
-
-	c7->Print("corr2DErr.pdf");
-
-	cout << "build" << endl;
-	TH2* thisHisto = new TH2D( "histo_colz2", "histo_colz2", 100, xmin, xmax, 100, ymin, ymax );
-	cout << "fill" << endl;
-	for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
+	else
 	{
-		thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
+		gStyle->SetOptStat(0);
+
+		cout << "Working on Correlation Graph" << endl;
+
+		TCanvas* c7 = new TCanvas( "corr_Graph", "corr_Graph", 1680, 1050 );
+
+		corr_graph->Draw("AP");
+		c7->Update();
+		corr_graph->GetXaxis()->SetTitle("#Gamma_{L}");
+		corr_graph->GetYaxis()->SetTitle("#Gamma_{H}");
+		c7->Update();
+
+		TString funcStr_Orig("("); funcStr_Orig+=1./corr;funcStr_Orig.Append("*x+[0])");
+
+		TString funcStr("([1]*x+[0])");
+
+		double xmin = corr_graph->GetXaxis()->GetXmin();
+		double xmax = corr_graph->GetXaxis()->GetXmax();
+		double ymin = corr_graph->GetYaxis()->GetXmin();
+		double ymax = corr_graph->GetYaxis()->GetXmax();
+
+		TF1* corr_funct = new TF1( "corr_func", funcStr, xmin, xmax );
+
+		corr_funct->SetParameters( 1.18579, corr );
+
+		corr_graph->Fit( corr_funct, "FEM" );
+
+		double* x_func = new double[100];
+		double* y_func = new double[100];
+
+		double xstep = (xmax-xmin)/99.;
+		for( unsigned int i=0; i< 100; ++i )
+		{
+			x_func[i] = xmin + xstep * i;
+			y_func[i] = corr_funct->Eval( x_func[i] );
+		}
+
+		TGraph* thisCorrGraph = new TGraph( 100, x_func, y_func );
+		thisCorrGraph->SetLineColor(3);
+
+		thisCorrGraph->Draw("SAMEL");
+		c7->Update();
+
+		TF1* corr_funct2 = new TF1( "corr_func2", funcStr_Orig, xmin, xmax );
+
+		corr_graph->Fit( corr_funct2, "FEM" );
+
+		double* x_func2 = new double[100];
+		double* y_func2 = new double[100];
+
+		for( unsigned int i=0; i< 100; ++i )
+		{
+			x_func2[i] = xmin + xstep * i;
+			y_func2[i] = corr_funct2->Eval( x_func2[i] );
+		}
+
+		TGraph* thisCorrGraph2 = new TGraph( 100, x_func2, y_func2 );
+
+		thisCorrGraph2->SetLineColor(2);
+		thisCorrGraph2->Draw("SAMEL");
+
+		c7->Update();
+
+		c7->Print("corr2DErr.pdf");
+
+		cout << "build" << endl;
+		TH2* thisHisto = new TH2D( "histo_colz2", "histo_colz2", 100, xmin, xmax, 100, ymin, ymax );
+		cout << "fill" << endl;
+		for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
+		{
+			thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
+		}
+
+		int xbins =100;// /*100;*/Histogram_Processing::OptimumBinNumber( thisHisto, 1 );
+		int ybins =100;// /*100;*/Histogram_Processing::OptimumBinNumber( thisHisto, 2 );
+
+		cout << xbins << "\t\t" << ybins << endl;
+
+		thisHisto = new TH2D( "histo_colz", "histo_colz", xbins, xmin, xmax, ybins, ymin, ymax );
+
+		for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
+		{
+			thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
+		}
+
+		TCanvas* c8 = new TCanvas( "corr_Histo", "corr_Histo", 1680, 1050 );
+
+		cout << "plot" << endl;
+		thisHisto->Draw("colz");
+
+		c8->Update();
+		thisHisto->GetXaxis()->SetTitle("#Gamma_{L}");
+		thisHisto->GetYaxis()->SetTitle("#Gamma_{H}");
+
+		thisCorrGraph->Draw("SAMEL");
+		thisCorrGraph2->Draw("SAMEL");
+
+		c8->Update();
+		c8->Print("corr2DHist.pdf");
+
+		TFile* thisRoot = new TFile("corr2Doutput.root","RECREATE");
+
+		thisHisto->Write("",TObject::kOverwrite);
+
+		thisRoot->Write("",TObject::kOverwrite);
+
+		//	See http://www.cs.ubc.ca/~murphyk/Teaching/CS340-Fall06/reading/gaussians.pdf 2.1 Bivariate Gaussian function
+		TF2* corr_function = new TF2( "corr_matrix", "1./(2*TMath::Pi()*[0]*[1]*TMath::Sqrt(1 - [2]*[2])) * TMath::Exp( -1./(2*(1-[2]*[2]))*(((x-[3])*(x-[3]))/([0]*[0])+((y-[4])*(y-[4]))/([1]*[1])-(2*[2]*(x-[3])*(y-[4]))/([0]*[1])) )", xmin, xmax, ymin, ymax );
+
+		corr_function->SetParameters( 0.010, 0.020, -0.7, 0.717, 0.631 );// xmin+((xmax-xmin)*0.5), ymin+((ymax-ymin)*0.5) );
+
+		//corr_function->FixParameter( 0, 0.010 );
+		//corr_function->FixParameter( 1, 0.020 );
+		//corr_function->FixParameter( 2, -0.7 );
+		//corr_function->FixParameter( 3, 0.717 );//xmin+((xmax-xmin)*0.5)-0.005 );
+		//corr_function->FixParameter( 4, 0.631 );//ymin+((ymax-ymin)*0.5)-0.005 );
+
+		int contour_num=3;
+		//double* contours = new double[(unsigned)contour_num];
+		//contours[0]=0.68;
+		//contours[1]=0.9;
+		//contours[2]=0.95;
+		//corr_function->SetContour( contour_num, contours );
+
+		gStyle->SetTitleOffset((Float_t)1.2,"X");
+		gStyle->SetTitleOffset((Float_t)1.2,"Y");
+		gROOT->UseCurrentStyle();
+		gROOT->ForceStyle( true );
+
+
+		TCanvas* c9 = new TCanvas( "corr_func", "corr_func", 1680, 1050 );
+
+		corr_function->SetContour( 0, NULL );
+
+		thisHisto->Fit( corr_function, "EN" );
+
+		double Integral = corr_function->Integral( xmin, xmax, ymin, ymax, 1E-12 );
+
+		/*double* contours = new double[(unsigned)contour_num];
+		  contours[0]=0.68*Integral;
+		  contours[1]=0.9*Integral;
+		  contours[2]=0.95*Integral;
+		  corr_function->SetContour( contour_num, contours );*/
+
+		thisHisto->GetXaxis()->SetNdivisions( 505, true );
+		thisHisto->GetYaxis()->SetNdivisions( 505, true );
+
+		thisHisto->Draw("");
+		c9->Update();
+
+		corr_function->Draw("SAME");
+
+		c9->Update();
+
+		c9->Print("corr_func_scatter.pdf");
+
+		thisHisto->Draw("colz");
+		c9->Update();
+
+		corr_function->Draw("SAME");
+
+		c9->Update();
+
+		c9->Print("corr_func.pdf");
+
+		corr_function->SetLineWidth(8);
+
+		thisHisto->GetXaxis()->SetTitleOffset((Float_t)1.2);
+		thisHisto->GetYaxis()->SetTitleOffset((Float_t)1.2);
+
+		thisHisto->Draw("lego2");
+		corr_function->Draw("CONT1 SAME");
+		c9->Update();
+		c9->Print("corr_func3D.pdf");
+		c9->Print("corr_func3D.C");
+
+		TFile* corrfuncFile = new TFile("corrFunc.root","RECREATE");
+
+		c9->Write("",TObject::kOverwrite);
+
+		corrfuncFile->Write("",TObject::kOverwrite);
 	}
-
-	int xbins = 100;//Histogram_Processing::OptimumBinNumber( thisHisto, 1 );
-	int ybins = 100;//Histogram_Processing::OptimumBinNumber( thisHisto, 2 );
-
-	cout << xbins << "\t\t" << ybins << endl;
-
-	thisHisto = new TH2D( "histo_colz", "histo_colz", xbins, xmin, xmax, ybins, ymin, ymax );
-
-	for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
-	{
-		thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
-	}
-
-	TCanvas* c8 = new TCanvas( "corr_Histo", "corr_Histo", 1680, 1050 );
-
-	cout << "plot" << endl;
-	thisHisto->Draw("colz");
-
-	c8->Update();
-	thisHisto->GetXaxis()->SetTitle("#Gamma_{L}");
-	thisHisto->GetYaxis()->SetTitle("#Gamma_{H}");
-
-	thisCorrGraph->Draw("SAMEL");
-	thisCorrGraph2->Draw("SAMEL");
-
-	c8->Update();
-	c8->Print("corr2DHist.pdf");
 
 	return 0;
 }
