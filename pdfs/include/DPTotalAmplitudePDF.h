@@ -45,6 +45,7 @@ class DPTotalAmplitudePDF : public BasePDF
 		ObservableRef cosTheta1Name;
 		ObservableRef cosTheta2Name;
 		ObservableRef phiName;
+        ObservableRef pionIDName;
 
 		int componentIndex;
 
@@ -52,6 +53,7 @@ class DPTotalAmplitudePDF : public BasePDF
 		double cosTheta1; // This is the member variable used in the "builder" functions
 		double cosTheta2; // These are the physics parameters varied in the fit and passed from the XML;
 		double phi;
+        int pionID;
 
 		// These contain the ObservableRefs that correspond
 		// to the observable names that are used in the

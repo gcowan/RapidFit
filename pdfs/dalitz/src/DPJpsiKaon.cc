@@ -14,9 +14,9 @@
 
 #include <iostream>
 
-DPJpsiKaon::DPJpsiKaon(int fLB, int fLR, double fmB, double mmR, 
-                               double gammaR, double mm1, double mm2, 
-                               double RB, double RR, double fmJpsi,
+DPJpsiKaon::DPJpsiKaon(int fLB, int fLR, double fmB, double mmR,
+                               double gammaR, double mm1, double mm2,
+		       double RB, double RR, double fmJpsi,
                                int spin,std::string mShape,
                                double a, double r):
 A0(0,0),
@@ -86,7 +86,7 @@ spinKaon(spin)
             break;
     case 2: wigner=new DPWignerFunctionJ2();
             break;
-    default: wigner=new DPWignerFunctionGeneral(spin);
+    case 3: wigner=new DPWignerFunctionGeneral(3);
             break;
   }
 }
@@ -97,9 +97,9 @@ DPJpsiKaon::~DPJpsiKaon()
 }
 
 DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
-        mJpsi(input.mJpsi), m1(input.m1), m2(input.m2), pR0(input.pR0), A0(input.A0), Aplus(input.Aplus),
+						    mJpsi(input.mJpsi), m1(input.m1), m2(input.m2), pR0(input.pR0), A0(input.A0), Aplus(input.Aplus),
         Aminus(input.Aminus), spinKaon(input.spinKaon), wigner(NULL), wignerPsi(input.wignerPsi)
-{    
+{
         if( input.wigner != NULL )
         {
                 switch(spinKaon)
@@ -110,7 +110,7 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
                         break;
                         case 2: wigner=new DPWignerFunctionJ2();
                         break;
-                        default: wigner=new DPWignerFunctionGeneral(spinKaon);
+                        case 3: wigner=new DPWignerFunctionGeneral(3);
                         break;
                 }
         }
@@ -119,9 +119,9 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
 	//std::cout<<"Parameters are "<<m1 << " "<<mR<< " " << spinKaon<<" "<<A0<<std::endl;
 }
 
-TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1, 
-                             double cosTheta2, double phi, 
-                             int twoLambda, int twoLambdaPsi)
+TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
+			       double cosTheta2, double phi,
+			       int twoLambda, int twoLambdaPsi, int pionID = -211)
 {
   TComplex result(0,0);
   // Muon helicity
@@ -129,19 +129,19 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
   {
     return result;
   }
-  
+
   // Psi helicity
   if ( twoLambdaPsi != 2 && twoLambdaPsi != -2 && twoLambdaPsi != 0 ) // Not right option
   {
     return result;
   }
 
-  // 
+  //
   if ( spinKaon==0 && twoLambdaPsi != 0 )
   {
     return result;
   }
-  
+
   double pB = DPHelpers::daughterMomentum(this->mB, this->mJpsi, m23);
   double pR = DPHelpers::daughterMomentum(m23, this->m1, this->m2);
   double pB0 = DPHelpers::daughterMomentum(this->mB, this->mJpsi, this->mR);
@@ -193,8 +193,8 @@ void DPJpsiKaon::setResonanceParameters(double mass, double sigma)
         massShape->setResonanceParameters( mass, sigma );
 }
 
-TComplex DPJpsiKaon::amplitudeProperVars(double m23, double cosTheta1, 
-                             double cosTheta2, double phi, 
+TComplex DPJpsiKaon::amplitudeProperVars(double m23, double cosTheta1,
+					 double cosTheta2, double phi, int pionID,
                              int twoLambda, int twoLambdaPsi)
 {
   return amplitude(m23,cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);

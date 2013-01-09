@@ -35,6 +35,7 @@ UTILSSRC  = utils/src
 INCDIR    = framework/include
 INCPDFDIR = pdfs/include
 INCUTILS  = utils/include
+INCGSL    = /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include
 OBJDIR    = framework/build
 OBJPDFDIR = pdfs/build
 OBJUTILDIR= utils/build
@@ -89,8 +90,8 @@ LINKFLAGS= -lpthread
 LIBS=-lstdc++
 
 CXXFLAGSUTIL = $(CXXFLAGS_BASE) -I$(INCUTILS) $(ROOTCFLAGS) -Iframework/include
-CXXFLAGS     = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) $(ROOTCFLAGS)
-CXXFLAGS_LIB = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) $(ROOTCFLAGS)
+CXXFLAGS     = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
+CXXFLAGS_LIB = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
 
 LIBLINKFLAGS = -pie -m64
 
@@ -101,7 +102,7 @@ ifeq ($(UNAME),$(Darwin))
 	LINKFLAGS+= $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo " -m64"; else echo ""; fi) -Wl,-rpath,$(LD_LIBRARY_PATH)
 else
 	CXXFLAGS+= -fPIE
-	LINKFLAGS+= -pie -m64 -Wl,--rpath,$(LD_LIBRARY_PATH)
+	LINKFLAGS+= -pie -m64 -Wl,-rpath,$(LD_LIBRARY_PATH)
 endif
 
 
@@ -158,7 +159,7 @@ gcc48: override CC=g++-4.8
 gcc48: all
 
 gsl: override CXXFLAGS+= -D__RAPIDFIT_USE_GSL $(gsl-config --cflags)
-gsl: override LINKFLAGS+= -lgsl -lgslcblas -lm $(gsl-config --libs)
+gsl: override LINKFLAGS+= -L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/lib -lgsl -lgslcblas -lm $(gsl-config --libs)
 gsl: all
 
 #	Have a build option that SCREAMS at the user for potential mistakes!!!

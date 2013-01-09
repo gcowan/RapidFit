@@ -418,10 +418,10 @@ namespace Mathematics
 		if( resolution > 0.) {
 			//Added by Pete after getting code from Yuehong 120118
 			const double c = gamma * resolution * _over_sqrt_2;
-			const double umax = (thigh / resolution) *_over_sqrt_2 ;	
-			const double umin = (tlow / resolution) *_over_sqrt_2 ;	
+			const double umax = (thigh / resolution) *_over_sqrt_2 ;
+			const double umin = (tlow / resolution) *_over_sqrt_2 ;
 			const double wt = deltaM / gamma ;
-			RooComplex evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;			
+			RooComplex evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;
 			double deltaCos = -0.5/gamma/(1+wt*wt) * ( evalDif.re() + wt*evalDif.im() + RooMath::erf(-umax) - RooMath::erf(-umin) ) ;
 			return deltaCos ;
 		}
@@ -483,10 +483,10 @@ namespace Mathematics
 		if( resolution > 0. ) {
 			//Added by Pete after getting code from Yuehong 120118
 			const double c = gamma * resolution * _over_sqrt_2;
-			const double umax = (thigh / resolution) *_over_sqrt_2 ;	
-			const double umin = (tlow / resolution) *_over_sqrt_2 ;	
+			const double umax = (thigh / resolution) *_over_sqrt_2 ;
+			const double umin = (tlow / resolution) *_over_sqrt_2 ;
 			const double wt = deltaM / gamma ;
-			RooComplex evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;			
+			RooComplex evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;
 			double deltaSin = -0.5/gamma/(1.+wt*wt) * ( -evalDif.im() +   wt*evalDif.re() -   -wt*(RooMath::erf(-umax) - RooMath::erf(-umin)) ) ;
 			return deltaSin ;
 		}
@@ -652,6 +652,7 @@ namespace Mathematics
 				evalPDFnorm = rapidInt->NumericallyIntegrateDataPoint( event, boundary, dontIntegrate );
 			}
 			val = evalPDFraw/evalPDFnorm;
+			//val = 1./(8*TMath::Pi());
 			//cout << f[0] << " " << f[1]<< " " <<  f[2]<< " " <<  f[3]<< " " <<  f[4]<< " " <<  f[5]<< " " << f[6]<< " " <<  f[7]<< " " <<  f[8]<< " " <<  f[9]<< endl;
 			//cout << time << " " << cosTheta  << " " << phi << " " << cosPsi << " " << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
 			for (int i = 0; i < numAngularTerms; i++)
@@ -693,9 +694,9 @@ namespace Mathematics
 		cout << "Weight +- error " << endl;
 		for (int i = 0; i < numAngularTerms; i++)
 		{
-			cout << fixed << setprecision(4) << xi[i]/numEvents << " \\pm " << sqrt(cov[i][i]) << endl;
+			cout << fixed << setprecision(5) << xi[i]/numEvents << " \\pm " << sqrt(cov[i][i]) << endl;
 			weights.push_back(xi[i]/numEvents);
-		}	
+		}
 		return weights;
 	}
 

@@ -1216,7 +1216,7 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	TString X_Title, Y_Title;
 
 	double final_chi2=-999;
-	double legend_size=0.25;
+	double legend_size=0.1;
 
 	bool addLHCb=false;
 	bool limitPulls=false;

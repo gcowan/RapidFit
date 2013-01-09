@@ -73,7 +73,7 @@ DPTotalAmplitude::~DPTotalAmplitude()
 }
 
 double DPTotalAmplitude::matrixElement(double m23, double cosTheta1, double cosTheta2,
-                         double phi)
+				       double phi, int pionID)
 {
   double result=0; 
 
@@ -87,8 +87,8 @@ double DPTotalAmplitude::matrixElement(double m23, double cosTheta1, double cosT
   TLorentzVector pPi;
   TLorentzVector pK;
   DPHelpers::calculateFinalStateMomenta(5.279, m23, mJpsi,
-        cosTheta1,  cosTheta2, phi, 0.105, 0.105, 0.13957018, 0.493677,
-        pMuPlus, pMuMinus, pPi, pK);
+					cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, 0.13957018, 0.493677,
+					pMuPlus, pMuMinus, pPi, pK);
   TLorentzVector pB(0,0,0,5.279);
   TComplex Zamps[ZComponents.size()][3][3];
   // Component [i][1][j] is intentionally not filled

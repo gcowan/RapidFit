@@ -22,10 +22,10 @@ class DPJpsiKaon: public DPComponent
     virtual ~DPJpsiKaon();
 
     TComplex amplitude(double m23, double cosTheta1, double cosTheta2, 
-                       double phi, int twoLambda, int twoLambdaPsi);
+                       double phi, int twoLambda, int twoLambdaPsi, int pionID);
   
     TComplex amplitudeProperVars(double m23, double cosTheta1, double cosTheta2, 
-                       double phi, int twoLambda, int twoLambdaPsi);
+				 double phi, int pionID, int twoLambda, int twoLambdaPsi);
   
     void setHelicityAmplitudes(double magA0, double magAplus, 
                      double magAminus, double phaseA0, double phaseAplus,

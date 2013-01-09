@@ -13,7 +13,7 @@ class DPTotalAmplitude
     DPTotalAmplitude();
     ~DPTotalAmplitude();
 
-    double matrixElement(double m23, double cosTheta1, double cosTheta2, double phi);
+  double matrixElement(double m23, double cosTheta1, double cosTheta2, double phi, int pionID);
 
   private:
 

@@ -10,15 +10,16 @@
 
 #include <iostream>
 
-DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double mR, 
-		double gammaR, double m1, double m2, 
-		double RB, double RR, double fmJpsi,
-		int spin):
+DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double mR,
+		   double gammaR, double m1, double m2,
+		   double RB, double RR, double fmJpsi,
+		   int spin):
 	A0(1,0),
 	Aplus(1,0),
 	Aminus(1,0),
 	spinZplus(spin)
 {
+//         this->pionID=pionID;
 	this->LB=fLB;
 	this->LR=fLR;
 	this->mB=fmB;
@@ -72,9 +73,9 @@ DPZplusK::~DPZplusK()
 }
 
 DPZplusK::DPZplusK( const DPZplusK& input ) : DPComponent( input ),
-	mJpsi(input.mJpsi), m1(input.m1), m2(input.m2), pR0(input.pR0), A0(input.A0), Aplus(input.Aplus),
-	Aminus(input.Aminus), spinZplus(input.spinZplus), wigner(NULL), wignerPsi(input.wignerPsi)
-{  
+					      mJpsi(input.mJpsi),  m1(input.m1), m2(input.m2), pR0(input.pR0), A0(input.A0), Aplus(input.Aplus),
+					      Aminus(input.Aminus), spinZplus(input.spinZplus), wigner(NULL), wignerPsi(input.wignerPsi)
+{
 	if( input.wigner != NULL )
 	{
 		switch(spinZplus)
@@ -94,9 +95,9 @@ DPZplusK::DPZplusK( const DPZplusK& input ) : DPComponent( input ),
  * need to recalculate observables relevant for Z+ K- and then get
  * amplitude
  */
-TComplex DPZplusK::amplitude(double m23, double cosTheta1, 
-		double cosTheta2, double phi, 
-		int twoLambda, int twoLambdaPsi)
+TComplex DPZplusK::amplitude(double m23, double cosTheta1,
+			     double cosTheta2, double phi,
+			     int twoLambda, int twoLambdaPsi, int pionID)
 {
 	TComplex result(0,0);
 
@@ -107,7 +108,7 @@ TComplex DPZplusK::amplitude(double m23, double cosTheta1,
 	TLorentzVector pPi;
 	TLorentzVector pK;
 	DPHelpers::calculateFinalStateMomenta(this->mB, m23, mJpsi,
-			cosTheta1,  cosTheta2, phi, 0.105, 0.105, m2, m1, pMuPlus, pMuMinus, pPi, pK);
+					      cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, m2, m1, pMuPlus, pMuMinus, pPi, pK);
 	TLorentzVector pB(0,0,0,this->mB);
 	// Cos of the angle between psi reference axis (not needed in this place)
 	//  double cosARefs=DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
@@ -116,19 +117,19 @@ TComplex DPZplusK::amplitude(double m23, double cosTheta1,
 	double cosThetaPsi;
 	double dphi;
 	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
-			&cosThetaZ, &cosThetaPsi, &dphi);
+					&cosThetaZ, &cosThetaPsi, &dphi, pionID);
 	double m13=(pMuPlus+pMuMinus+pPi).M();
 
 	// Call function which calculates amplitude using proper variables
-	result=amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, twoLambda,
+	result=amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID, twoLambda,
 			twoLambdaPsi);
 
 	return result;
 }
 
-TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1, 
-		double cosTheta2, double phi, 
-		int twoLambda, int twoLambdaPsi)
+TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
+				       double cosTheta2, double phi, int pionID,
+				       int twoLambda, int twoLambdaPsi)
 {
 	TComplex result(0,0);
 	// Muon helicity
@@ -143,7 +144,7 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 		return result;
 	}
 
-	// 
+	//
 	if ( spinZplus==0 && twoLambdaPsi != 0 )
 	{
 		return result;

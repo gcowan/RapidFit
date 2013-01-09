@@ -88,6 +88,8 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, widthK01430Name	( configurator->getName("widthK01430") )
 	, massK21430Name	( configurator->getName("massK21430") )
 	, widthK21430Name	( configurator->getName("widthK21430") )
+	, massK31780Name	( configurator->getName("massK31780") )
+	, widthK31780Name	( configurator->getName("widthK31780") )
 	, massK800Name	( configurator->getName("massK800") )
 	, widthK800Name	( configurator->getName("widthK800") )
 	// Observables
@@ -95,8 +97,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, cosTheta1Name	( configurator->getName("cosTheta1") )
 	, cosTheta2Name	( configurator->getName("cosTheta2") )
 	, phiName	( configurator->getName("phi") )
+    , pionIDName( configurator->getName("pionID") )
 
-  	, mag_LASSName	( configurator->getName("mag_LASS") )
+    , mag_LASSName	( configurator->getName("mag_LASS") )
   	, phase_LASSName	( configurator->getName("phase_LASS") )
 	, a_LASSName	( configurator->getName("a_LASS") )
 	, r_LASSName	( configurator->getName("r_LASS") )
@@ -118,7 +121,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, massK21430(), widthK21430()
 	, massK31780(), widthK31780()
 	, massK800(), widthK800()
-	, m23(), cosTheta1(), cosTheta2(), phi()
+	, m23(), cosTheta1(), cosTheta2(), phi(), pionID()
 	//LASS parameters
 	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS()
 // 	, massPsi(3.096916) // Jpsi
@@ -185,7 +188,6 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                      "NR", 1.94, 1.76);
 
 	KpiComponents.push_back(tmp);
-
 
 	this->SetNumericalNormalisation( true );
 	this->TurnCachingOff();
@@ -306,10 +308,12 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
 	,cosTheta1Name(copy.cosTheta1Name)
 	,cosTheta2Name(copy.cosTheta2Name)
 	,phiName(copy.phiName)
-	,m23(copy.m23)
+	,pionIDName(copy.pionIDName)
+    ,m23(copy.m23)
 	,cosTheta1(copy.cosTheta1)
 	,cosTheta2(copy.cosTheta2)
 	,phi(copy.phi)
+	,pionID(copy.pionID)
 	,magA0ZplusName(copy.magA0ZplusName)
 	,magApZplusName(copy.magApZplusName)
 	,magAmZplusName(copy.magAmZplusName)
@@ -517,8 +521,9 @@ void DPTotalAmplitudePDF::MakePrototypes()
 	allObservables.push_back( cosTheta1Name );
 	allObservables.push_back( cosTheta2Name );
 	allObservables.push_back( phiName );
+    allObservables.push_back( pionIDName );
 
-	//Make the parameter set
+    //Make the parameter set
 	vector<string> parameterNames;
 	parameterNames.push_back( magA0ZplusName );
 	parameterNames.push_back( magApZplusName );
@@ -723,6 +728,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	cosTheta1 = measurement->GetObservable( cosTheta1Name )->GetValue();
 	cosTheta2 = measurement->GetObservable( cosTheta2Name )->GetValue();
 	phi       = measurement->GetObservable( phiName )->GetValue();
+	pionID    = measurement->GetObservable( pionIDName )->GetValue();
 
 	int globalbin = -1;
         int xbin = -1, ybin = -1, zbin = -1, mbin = -1;
@@ -755,7 +761,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 	// Need angle between reference axis
 	DPHelpers::calculateFinalStateMomenta(5.279, m23, massPsi,
-	cosTheta1,  cosTheta2, phi, 0.105, 0.105, 0.13957018, 0.493677,
+	cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, 0.13957018, 0.493677,
 	pMuPlus, pMuMinus, pPi, pK);
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 	// Cos of the angle between psi reference axis
@@ -765,7 +771,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	double dphi;
 	pB.SetPxPyPzE(0., 0., 0., 5.279);
 	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
-	&cosThetaZ, &cosThetaPsi, &dphi);
+	&cosThetaZ, &cosThetaPsi, &dphi, pionID);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
 
 	//cout << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << " " << pMuPlus.X() << " " << pMuMinus.X() << " " << pPi.X() << endl;
@@ -815,7 +821,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 			// Now comes sum over Z+ components and lambdaPsiPrime
 			for (unsigned int i = lowerZ; i < upperZ; ++i)
 			{
-			  tmp += ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi,
+			  tmp += ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
 			  twoLambda,twoLambdaPsi); // need to check that we pass right helicities
 			       //cout << "Z: " << m13 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
 			}
