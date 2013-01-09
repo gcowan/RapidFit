@@ -1,7 +1,7 @@
 /**
   @namespace GoodnessOfFit
 
-  Namespace holding some common GOF tools 
+  Namespace holding some common GOF tools
 
   @author Greig A Cowan greig.cowan@cern.ch
   @date 2011-04-06
@@ -61,7 +61,7 @@ namespace GoodnessOfFit
 			GoodnessOfFit::generateFitAndCalculatePvalue( xmlFile, parSet, theMinimiser, theFunction, argumentParameterSet, nData, 50, &distOfPvalues );
 
 			// Finally, compare dataPvalue with distribution of pvalues to get the actual p-value of the fit, which correctly accounts for the bias
-			pvalue = GoodnessOfFit::getPvalue( dataPvalue[0], distOfPvalues );	
+			pvalue = GoodnessOfFit::getPvalue( dataPvalue[0], distOfPvalues );
 		}
 		return pvalue;
 	}
@@ -105,13 +105,13 @@ namespace GoodnessOfFit
 			data.push_back( (*iter)->GetDataSet() );
 			nData = (unsigned)data.back()->GetDataNumber();
 			phase = data.back()->GetBoundary();
-			
+
 			(*iter)->SetPhysicsParameters( parSetFromFit );
 			ulTime = static_cast<unsigned int>( time( NULL ));
 			pdf = (*iter)->GetPDF();
 			pdf->SetRandomFunction( (int)ulTime );
 			pdf->SetMCCacheStatus( false );
-			
+
 			dataConfig = (*iter)->GetDataSetConfig();
 			dataConfig->SetSource( "Foam" );
 
@@ -277,7 +277,7 @@ namespace GoodnessOfFit
 			  cout << "pdfValue " << pdfValue << " smallest " << sd <<  " U " << U << " time " << event_i->GetObservable( "time" )->GetValue()
 			  << " mass " << event_i->GetObservable( "mass" )->GetValue()
 			  << " cosTheta " << event_i->GetObservable( "cosTheta" )->GetValue()
-			  << " phi " << event_i->GetObservable( "phi" )->GetValue() 
+			  << " phi " << event_i->GetObservable( "phi" )->GetValue()
 			  << " cosPsi " << event_i->GetObservable( "cosPsi" )->GetValue()  << endl;
 			  }*/
 			distances->Fill( U );
@@ -317,7 +317,7 @@ namespace GoodnessOfFit
 					smallest_distance = distance;
 					firstEvent = false;
 				}
-				if (distance < smallest_distance) 
+				if (distance < smallest_distance)
 				{
 					smallest_distance = distance;
 					closest = event_j;
@@ -353,8 +353,8 @@ namespace GoodnessOfFit
 				newBoundary->SetConstraint( *nameIter, values, unit );
 			}
 			else {
-				min = constraint->GetMinimum(); 
-				max = constraint->GetMaximum(); 
+				min = constraint->GetMinimum();
+				max = constraint->GetMaximum();
 				newBoundary->SetConstraint( *nameIter, min, max, unit );
 			}
 		}
@@ -393,7 +393,7 @@ namespace GoodnessOfFit
 	}
 
 	void updatePhaseSpaceBoundary( DataPoint * x, PhaseSpaceBoundary * newPhase, PhaseSpaceBoundary * oldPhase, vector<double> distances )
-	{	
+	{
 		vector<string> xListOfNames = x->GetAllNames();
 		vector<string>::iterator xIter = xListOfNames.begin();
 		Observable * xVar = 0;
@@ -417,15 +417,16 @@ namespace GoodnessOfFit
 
 		double pValueFromPoint2PointDissimilarity(IDataSet * data, IDataSet * mcData)
 		{
-			double T = calculateTstatistic( data, mcData );
-			//char buffer[20];
-			//sprintf( buffer, "T = %f", T );
-			//cout << buffer << endl;
+            std::cout << "GC: calculating T stat for data" << std::endl;
+            double T = calculateTstatistic( data, mcData );
+			char buffer[20];
+			sprintf( buffer, "Tdata = %f", T );
+			cout << buffer << endl;
 
 			int nPerm = 25;
 			vector<double> Tvalues = permutation( data, mcData, nPerm );
 
-			/*	
+			/*
 				TH1D * tHist = new TH1D("tvalues", "tvalues", 50, 1.0, 1.3);
 				for ( int i = 0; i < nPerm; i++ ) tHist->Fill(Tvalues[i]);
 				TFile * outputFile = new TFile("tvalues.root", "UPDATE");
@@ -516,23 +517,29 @@ namespace GoodnessOfFit
 
 		double sumEvents( IDataSet * data )
 		{
-			int n = data->GetDataNumber();
+            int n = data->GetDataNumber();
 			double distance = 0.;
-			double T = 0.;
+            double weight_i = 1.;
+            double weight_j = 1.;
+            double sum_weights_i = 0.;
+            double T = 0.;
 			for ( int i = 0; i < n; i++ ){
 				DataPoint * event_i = data->GetDataPoint(i);
+                weight_i = getWeight( event_i );
+                sum_weights_i += weight_i;
 				for ( int j = i+1; j < n; j++){
 					DataPoint * event_j = data->GetDataPoint(j);
 					distance = getDistance( event_i, event_j );
+                    weight_j = getWeight( event_j );
 					//cout << "sumEvents " << distance << " " << event_j->GetObservable("mass")->GetValue() << " " << event_i->GetObservable("mass")->GetValue() << endl;
 					//if ( distance == 0. ) cout << "sumEvents " << distance << " " << i << " " << j << endl;
 					//T += 1./distance;  // This is an alternative function which could be used
 					//T += exp( -distance * distance / (2.*0.01) ); // sigma = 0.1 is a nuisance parameter. 0.1 is chosen arbitrarily.
 					//T += distance * distance;
-					T += -log( distance + 1./n );
+					T += -log( distance + 1./n ) * (weight_i * weight_j);
 				}
 			}
-			T *= 1./(n * n); 
+			T *= 1. / (sum_weights_i * sum_weights_i);
 			return T;
 		}
 
@@ -541,9 +548,14 @@ namespace GoodnessOfFit
 			int nD = data->GetDataNumber();
 			int nMC = mcData->GetDataNumber();
 			double distance = 0.;
+            double weight_i = 1.;
+            double weight_j = 1.; // MC weight should always be 1 for an sFit since signal only
+            double sum_weights_i = 0.;
 			double T = 0.;
 			for ( int i = 0; i < nD; i++){
 				DataPoint* event_i = data->GetDataPoint(i);
+                weight_i = getWeight( event_i );
+                sum_weights_i += weight_i;
 				for ( int j = 0; j < nMC; j++){
 					DataPoint * event_j = mcData->GetDataPoint(j);
 					distance = getDistance( event_i, event_j );
@@ -552,12 +564,28 @@ namespace GoodnessOfFit
 					//T += 1./distance;
 					//T += exp( -distance * distance / (2.*0.01) );
 					//T += distance * distance;
-					T += -log( distance + 1./nD );
+					T += -log( distance + 1./nD ) * (weight_i * weight_j);
 				}
 			}
-			T *= 1./(nD * nMC);
+			T *= 1. / (sum_weights_i * nMC);
 			return T;
 		}
+
+        double getWeight( DataPoint * x )
+        {
+       		vector<string> xListOfNames = x->GetAllNames();
+			vector<string>::iterator xIter = xListOfNames.begin();
+			Observable * xVar = 0;
+			double xVal = 1.;
+			while ( ( xVar = x->GetObservable( *xIter ) ) ) {
+                if ( (*xIter == "fsig_sw") ) {
+					xVal = xVar->GetValue();
+				}
+				++xIter;
+				if ( xIter == xListOfNames.end() ) break;
+            }
+            return xVal;
+        }
 
 		double getDistance(DataPoint * x, DataPoint * y)
 		{
@@ -579,8 +607,8 @@ namespace GoodnessOfFit
 					yVal = ( yVar->GetValue() - 1.6 )/1.2;
 				}
 				else if ( (*xIter == "m23") ) {
-					xVal = ( xVar->GetValue() - 1. )/0.33;
-					yVal = ( yVar->GetValue() - 1. )/0.33;
+					xVal = ( xVar->GetValue() - 0. )/1.;
+					yVal = ( yVar->GetValue() - 0. )/1.;
 				}
 				else if ( (*xIter == "cosTheta1") ) {
 					xVal = ( xVar->GetValue() - 0. )/1.;
@@ -591,8 +619,8 @@ namespace GoodnessOfFit
 					yVal = ( yVar->GetValue() - 0. )/1.;
 				}
 				else if ( (*xIter == "phi") ) {
-					xVal = ( xVar->GetValue() - 3.14159 )/3.14159;
-					yVal = ( yVar->GetValue() - 3.14159 )/3.14159;
+					xVal = ( xVar->GetValue() - 0. )/3.14159;
+					yVal = ( yVar->GetValue() - 0. )/3.14159;
 				}
 				else {
 					xVal = 0.;

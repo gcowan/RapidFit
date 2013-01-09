@@ -3,6 +3,7 @@
 2013/01/09 Greig Cowan
   - Added in the new angle calculating code for DP PDF.
   - Fixed bug when constructing spin-3 Kpi resonance.
+  - Modified GoodnessOfFit code to deal with (s)weighted data. Not completely general, so be careful.
 
 2012/12/22 Rob Currie
   - Removed Error quantity from Observable interface, this is defunct and we have a 1-1 mapping between Observables and quantities on disk, this includes Measured errors as Observables in their own right

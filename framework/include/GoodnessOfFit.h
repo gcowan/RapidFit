@@ -20,7 +20,7 @@
 #include "MinimiserConfiguration.h"
 #include "FitFunctionConfiguration.h"
 
-namespace GoodnessOfFit 
+namespace GoodnessOfFit
 {
 	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int nData );
         double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, FitResult * result);
@@ -35,6 +35,7 @@ namespace GoodnessOfFit
 	void plotUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, string plot );
 	void calculateUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, TH1D * distances);
         void calculateUstatisticNum( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, TH1D * distances);
+	double getWeight( DataPoint * x );
 	double getDistance( DataPoint * x, DataPoint * y );
 	vector<double> getDistances( DataPoint * x, DataPoint * y );
         void copyPhaseSpaceBoundary( PhaseSpaceBoundary * newBoundary, PhaseSpaceBoundary * oldBoundary );

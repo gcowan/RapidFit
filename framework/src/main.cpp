@@ -135,12 +135,12 @@ void SaveXML( RapidFitConfiguration* config );
 int RapidFit( int argc, char * argv[] )
 {
 	//  reduce root verbosity:
-	//  gErrorIgnoreLevel = kInfo; // The default is kError 
-	//  gErrorIgnoreLevel = kFatal; // Explicitly remove all messages 
-	//  gErrorIgnoreLevel = kError; // Only error message (default) 
-	gErrorIgnoreLevel = kWarning; // error and warning message 
-	//  gErrorIgnoreLevel = kNote; // error, warning and note 
-	//  gErrorIgnoreLevel = kInfo; // Display all information (same as -v) 
+	//  gErrorIgnoreLevel = kInfo; // The default is kError
+	//  gErrorIgnoreLevel = kFatal; // Explicitly remove all messages
+	//  gErrorIgnoreLevel = kError; // Only error message (default)
+	gErrorIgnoreLevel = kWarning; // error and warning message
+	//  gErrorIgnoreLevel = kNote; // error, warning and note
+	//  gErrorIgnoreLevel = kInfo; // Display all information (same as -v)
 
 	RapidFitWelcome();
 
@@ -741,9 +741,9 @@ int PerformMainFit( RapidFitConfiguration* config )
 		IDataSet * data = pdfAndData->GetDataSet();
 		IPDF * pdf = pdfAndData->GetPDF();
 		PhaseSpaceBoundary * phase = data->GetBoundary();
-		GoodnessOfFit::plotUstatistic( pdf, data, phase, "ustat.pdf" );
-		/*
-		   TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
+		//GoodnessOfFit::plotUstatistic( pdf, data, phase, "ustat.pdf" );
+
+		TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
 		//double pvalue = GoodnessOfFit::gofLoop( xmlFile, theMinimiser, theFunction, argumentParameterSet, CommandLineParam, nData );
 		double pvalue = GoodnessOfFit::fitDataCalculatePvalue( config->xmlFile, config->theMinimiser, config->theFunction, config->argumentParameterSet, config->GlobalResult );
 		pvalueHist->Fill( pvalue );
@@ -753,7 +753,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 		outputFile->Close();
 		delete pvalueHist;
 		delete outputFile;
-		*/
+
 	}
 	return 0;
 }
