@@ -141,50 +141,50 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	DPComponent * tmp;
 	// B0 --> Z+ K-
 // 	tmp=new DPZplusK(0,1,5.279,4.430,0.100,0.493677,
-// 			 0.13957018, 3.0, 3.0, massPsi, 1); // spin 1 Z, for MC testing
+// 			 0.13957018, 1.6, 1.6, massPsi, 1); // spin 1 Z, for MC testing
 
 	tmp=new DPZplusK(1,0,5.279,4.430,0.100,0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 0); // spin 0 Z for datafit
+			0.13957018, 1.6, 1.6, massPsi, 0); // spin 0 Z for datafit
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
 	tmp=new DPJpsiKaon(0, 1, 5.279, 0.89594, 0.0487, 0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 1);
+			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1410)
 	tmp=new DPJpsiKaon(0, 1, 5.279, 1.414, 0.232, 0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 1);
+			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1680)
 	tmp=new DPJpsiKaon(0, 1, 5.279, 1.717, 0.322, 0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 1);
+			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K0(1430)
 	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 0);
+			0.13957018, 1.6, 1.6, massPsi, 0);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
 	tmp=new DPJpsiKaon(1, 2, 5.279, 1.4324, 0.109, 0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 2);
+			0.13957018, 1.6, 1.6, massPsi, 2);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K3(1780)
 	tmp=new DPJpsiKaon(1, 3, 5.279, 1.4324, 0.109, 0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 3);
+			0.13957018, 1.6, 1.6, massPsi, 3);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K(800)
 	tmp=new DPJpsiKaon(1, 0, 5.279, 0.682, 0.574, 0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 0);
+			0.13957018, 1.6, 1.6, massPsi, 0);
 	KpiComponents.push_back(tmp);
 
 	// Kpi s-wave using LASS
   	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
-                     0.13957018, 3.0, 3.0, massPsi, 0,
+                     0.13957018, 1.6, 1.6, massPsi, 0,
                      "LASS", 1.94, 1.76);
 
 	KpiComponents.push_back(tmp);
 
 	// Kpi s-wave using Non Resonnant
   	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
-                     0.13957018, 3.0, 3.0, massPsi, 0,
+                     0.13957018, 1.6, 1.6, massPsi, 0,
                      "NR", 1.94, 1.76);
 
 	KpiComponents.push_back(tmp);
@@ -239,8 +239,9 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 		histogramFile = TFile::Open(fullFileName.c_str());
 
-		if (useFourDHistogram) {
-		histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
+        if ( configurator->isTrue( "Use4DHistogram" ) ) {
+		    useFourDHistogram = true;
+		    histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
 
                 // cos mu
                 xaxis = histo->GetAxis(0);
@@ -295,11 +296,12 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                 cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
                 cout << endl;
 		}
-
-		angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
-		angularAccHistPhi 	= (TH1D*)histogramFile->Get("delta_phi_effTot");
-		angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
-	}
+        else {
+		    angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
+	    	angularAccHistPhi 	= (TH1D*)histogramFile->Get("delta_phi_effTot");
+		    angularAccHistMassCosTheta2 = (TH2D*)histogramFile->Get("mass_cos_effTot");
+	    }
+    }
 }
 
 DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
