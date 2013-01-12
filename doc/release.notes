@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/01/13 Rob Currie
+  - I've re-written the code to calculate chi2/nDoF for the full fit. This doesn't have the problems associated with the previous method.
+    This code seems to give numbers which are more sensible and in agreement with the observed plots
+
 2013/01/09 Greig Cowan
   - Added in the new angle calculating code for DP PDF.
   - Fixed bug when constructing spin-3 Kpi resonance.

@@ -46,13 +46,15 @@
 using namespace::std;
 
 //Constructor with correct arguments
-ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num, DebugClass* Debug ):
-	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ), pdfIntegrator( new RapidFitIntegrator( *(NewPDF->GetPDFIntegrator()) ) ), weightsWereUsed(false), weight_norm(1.),
+ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num, DebugClass* Debug ) :
+	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ),
+	pdfIntegrator( new RapidFitIntegrator( *(NewPDF->GetPDFIntegrator()) ) ), weightsWereUsed(false), weight_norm(1.),
 	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
-	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ), logY( (config!=NULL)?config->logY:false ),
-	this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ), onlyZero( (config!=NULL)?config->OnlyZero:false ),
-	combination_integral(0.), ratioOfIntegrals(1,1.), wanted_weights(), format(), data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(),
-	total_components(), chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num), weight_err()
+	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ),
+	logY( (config!=NULL)?config->logY:false ), this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ),
+	onlyZero( (config!=NULL)?config->OnlyZero:false ), combination_integral(0.), ratioOfIntegrals(1,1.), wanted_weights(), format(),
+	data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(), total_components(),
+	chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num), weight_err()
 {
 	if( Debug != NULL ) debug = new DebugClass(*Debug);
 	else debug = new DebugClass(false);
@@ -127,9 +129,6 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 
 	vector<double> minimum, maximum;
 	vector<int> binNumber;
-
-	//Get the data needed to make the histogram
-	//observableValues = GetCombinationStatistics( observableName, minimum, maximum, binNumber );
 
 	(void) minimum; (void) maximum; (void) binNumber;
 
@@ -608,7 +607,16 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			data_plot->Draw();
 			data_graph->Draw("PC9 SAME");
 			c1->Update();
-			data_graph->GetYaxis()->SetRangeUser( 0., data_graph->GetYaxis()->GetXmax() );
+			double Y_min = -999.;
+			double Y_max = -999.;
+			if( this_config != NULL )
+			{
+				Y_min = this_config->ymin;
+				Y_max = this_config->ymax;
+			}
+			if( Y_min <= -999. ) Y_min = data_graph->GetYaxis()->GetXmin();
+			if( Y_max <= -999. ) Y_max = data_graph->GetYaxis()->GetXmax();
+			data_graph->GetYaxis()->SetRangeUser( Y_min, Y_max );
 			c1->Update();
 			c1->Write();
 
@@ -681,7 +689,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		desc.append("_PDF_"); desc.append(PDFDesc.Data());
 
 		//	For the moment haven't decided if I should pass the global config to ALL sub plots, I shall get user input on this
-		CompPlotter_config* temp = new CompPlotter_config();
+		CompPlotter_config* temp = new CompPlotter_config( *this_config );
 		temp->logY = logY;
 
 		//	Static function so has to be told everything about what you want to plot!
@@ -695,10 +703,31 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				cout << "Calculating Chi^2:" << endl;
 
 				TF1* fitting_function = new TF1( "total_PDF", this, boundary_min, boundary_max, 1, "" );        //      I REFUSE to pass the class name
-				chi2 = binned_data.back()->Chisquare( fitting_function );
+				//chi2 = binned_data.back()->Chisquare( fitting_function );
 
-				N = plotData->GetDataNumber(NULL,true);
+				//double chi2_2 = 0.;
+				for( unsigned int i=0; i< (unsigned) binned_data[0]->GetN(); ++i )
+				{
+					double bin_center = binned_data[combinationIndex]->GetX()[i];
+					double this_bin = fitting_function->Eval( bin_center );
+					double actual_bin = binned_data[combinationIndex]->GetY()[i];
+					double this_chi = actual_bin-this_bin;
+					this_chi/=binned_data[combinationIndex]->GetEY()[i];//sqrt(fabs(actual_bin));
+					//cout << endl << actual_bin << "\t" << this_bin << endl;
+					this_chi*=this_chi;
+					if( this_chi < 1./0. ) chi2+=this_chi;
+				}
+
+				//chi2 = chi2_2;
+
+				//	dof = num Populated Bins - ndof in PDF
+				N =  binned_data.back()->GetXaxis()->GetNbins();//plotData->GetDataNumber(NULL,true);
+				for( unsigned int i=0; i< (unsigned) binned_data[0]->GetN(); ++i ) if( fabs(binned_data[combinationIndex]->GetY()[i]) <= 0 ) --N;
+
 				double n = (double) plotPDF->GetPhysicsParameters()->GetAllFloatNames().size();
+
+				//cout << endl << chi2 << "\t" << chi2_2 << "\t" << N << "\t" << n << endl;
+
 				double denominator = (double)(N - n - 1. );
 				cout << endl << "Chi^2/ndof :\t" << setprecision(10) << chi2 / denominator << endl;
 
@@ -962,6 +991,8 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	input_data->SetTitle( plotTitle );
 	input_data->Draw("AP9");
+
+	if( logy ) c1->SetLogy( true );
 	c1->Update();
 
 	TString Y_ext(" / ( ");
@@ -975,7 +1006,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
 	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
-	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.1:0.;
+	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();
 	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
 
 	if( StringProcessing::is_empty( X_Title ) )
@@ -1103,9 +1134,6 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
 	ofstream filestr;
 
-	int fd=0;
-	fpos_t pos;
-
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass("ComponentPlotter") )
@@ -1116,10 +1144,6 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 			cerr_bak = cerr.rdbuf();
 			clog_bak = clog.rdbuf();
 			nullbuf = filestr.rdbuf();
-			//fflush(stderr);
-			//fgetpos(stderr, &pos);
-			//fd = dup(fileno(stdout));
-			//freopen("/dev/null", "w", stderr);
 			cout.rdbuf(nullbuf);
 			cerr.rdbuf(nullbuf);
 			clog.rdbuf(nullbuf);
@@ -1133,10 +1157,6 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		cerr_bak = cerr.rdbuf();
 		clog_bak = clog.rdbuf();
 		nullbuf = filestr.rdbuf();
-		//fflush(stderr);
-		//fgetpos(stderr, &pos);
-		//fd = dup(fileno(stdout));
-		//freopen("/dev/null", "w", stderr);
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
@@ -1150,11 +1170,6 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	{
 		if( debug->DebugThisClass("ComponentPlotter") )
 		{
-			fflush(stderr);
-			dup2(fd,fileno(stderr));
-			close(fd);
-			clearerr(stderr);
-			fsetpos(stderr, &pos);
 			cout.rdbuf( cout_bak );
 			cerr.rdbuf( cerr_bak );
 			clog.rdbuf( clog_bak );
@@ -1162,11 +1177,6 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	}
 	else
 	{
-		fflush(stderr);
-		dup2(fd,fileno(stderr));
-		close(fd);
-		clearerr(stderr);
-		fsetpos(stderr, &pos);
 		cout.rdbuf( cout_bak );
 		cerr.rdbuf( cerr_bak );
 		clog.rdbuf( clog_bak );
@@ -1459,9 +1469,6 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
 	ofstream filestr;
 
-	int fd=0;
-	fpos_t pos;
-
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass("ComponentPlotter") )
@@ -1472,10 +1479,6 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 			cerr_bak = cerr.rdbuf();
 			clog_bak = clog.rdbuf();
 			nullbuf = filestr.rdbuf();
-			//fflush(stderr);
-			//fgetpos(stderr, &pos);
-			//fd = dup(fileno(stdout));
-			//freopen("/dev/null", "w", stderr);
 			cout.rdbuf(nullbuf);
 			cerr.rdbuf(nullbuf);
 			clog.rdbuf(nullbuf);
@@ -1489,10 +1492,6 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 		cerr_bak = cerr.rdbuf();
 		clog_bak = clog.rdbuf();
 		nullbuf = filestr.rdbuf();
-		//fflush(stderr);
-		//fgetpos(stderr, &pos);
-		//fd = dup(fileno(stdout));
-		//freopen("/dev/null", "w", stderr);
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
@@ -1506,11 +1505,6 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	{
 		if( debug->DebugThisClass("ComponentPlotter") )
 		{
-			fflush(stderr);
-			dup2(fd,fileno(stderr));
-			close(fd);
-			clearerr(stderr);
-			fsetpos(stderr, &pos);
 			cout.rdbuf( cout_bak );
 			cerr.rdbuf( cerr_bak );
 			clog.rdbuf( clog_bak );
@@ -1518,11 +1512,6 @@ void ComponentPlotter::OutputPlotPull( TGraphErrors* input_data, vector<TGraph*>
 	}
 	else
 	{
-		fflush(stderr);
-		dup2(fd,fileno(stderr));
-		close(fd);
-		clearerr(stderr);
-		fsetpos(stderr, &pos);
 		cout.rdbuf( cout_bak );
 		cerr.rdbuf( cerr_bak );
 		clog.rdbuf( clog_bak );
@@ -1935,9 +1924,6 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
 	ofstream filestr;
 
-	int fd=0;
-	fpos_t pos;
-
 	if( debug != NULL )
 	{
 		if( !debug->DebugThisClass( "ComponentPlotter" ) )
@@ -1948,10 +1934,6 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 			cerr_bak = cerr.rdbuf();
 			clog_bak = clog.rdbuf();
 			nullbuf = filestr.rdbuf();
-			//fflush(stderr);
-			//fgetpos(stderr, &pos);
-			//fd = dup(fileno(stdout));
-			//freopen("/dev/null", "w", stderr);
 			cout.rdbuf(nullbuf);
 			cerr.rdbuf(nullbuf);
 			clog.rdbuf(nullbuf);
@@ -1964,10 +1946,6 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 		cerr_bak = cerr.rdbuf();
 		clog_bak = clog.rdbuf();
 		nullbuf = filestr.rdbuf();
-		//fflush(stderr);
-		//fgetpos(stderr, &pos);
-		//fd = dup(fileno(stdout));
-		//freopen("/dev/null", "w", stderr);
 		cout.rdbuf(nullbuf);
 		cerr.rdbuf(nullbuf);
 		clog.rdbuf(nullbuf);
@@ -1981,11 +1959,6 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	{
 		if( !debug->DebugThisClass( "ComponentPlotter" ) )
 		{
-			fflush(stderr);
-			dup2(fd,fileno(stderr));
-			close(fd);
-			clearerr(stderr);
-			fsetpos(stderr, &pos);
 			cout.rdbuf( cout_bak );
 			cerr.rdbuf( cerr_bak );
 			clog.rdbuf( clog_bak );
@@ -1993,11 +1966,6 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	}
 	else
 	{
-		fflush(stderr);
-		dup2(fd,fileno(stderr));
-		close(fd);
-		clearerr(stderr);
-		fsetpos(stderr, &pos);
 		cout.rdbuf( cout_bak );
 		cerr.rdbuf( cerr_bak );
 		clog.rdbuf( clog_bak );
