@@ -163,6 +163,40 @@ double ConstraintFunction::Evaluate( const ParameterSet * NewParameters )
 			}
 			constraintValue += chisq ;
 		}
+		else if ( name == "Gammas-DeltaGamma-1fbPaper" )
+		{
+			//GammaObs^-1 = Gamma^-1 * ( 1 + (deltaGamma/2*Gamma)^2 ) / ( 1 - (deltaGamma/2*Gamma)^2 )
+			// Get gamma and delta gamma
+			string gammaName("gamma");
+			string deltaGammaName("deltaGamma");
+			int gamma_i = StringProcessing::VectorContains(&parameterNames,&gammaName);
+			int dG_i = StringProcessing::VectorContains(&parameterNames,&deltaGammaName);
+			if( (gamma_i == -1) || (dG_i == -1) )
+			{
+				cerr << "Cannot Apply " << name << " constraint" << endl;
+				to_be_removed.push_back(constraintIndex);
+				continue;
+			}
+			double gamma = NewParameters->GetPhysicsParameter(gammaName)->GetValue();
+			double dgam =  NewParameters->GetPhysicsParameter(deltaGammaName)->GetValue();
+			double gamma_con = 0.6631 ;
+			double dgam_con = 0.100 ;
+			double v[2] ;
+			v[0] = gamma-gamma_con ;
+			v[1] = dgam-dgam_con ;
+			double E[2][2] ;
+			E[0][0] = 16850.7 ;
+			E[1][1] = 3988.85  ;
+			E[1][0] = 1904.58  ;
+			E[0][1] = E[1][0] ;
+			double chisq = 0;
+			for( int ix=0; ix<2; ++ix ) {
+				for( int iy=0; iy<2; ++iy ) {
+					chisq += v[ix]*E[ix][iy]*v[iy] ;
+				}
+			}
+			constraintValue += chisq ;
+		}
 		else if ( name == "ATOTAL" )
 		{
 			// This is a special one to contrain the sum of the amplitudes to 1

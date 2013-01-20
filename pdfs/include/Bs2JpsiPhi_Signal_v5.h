@@ -295,6 +295,7 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		bool _usePunziMistag ;
 		bool allowNegativeAsSq ;
 		bool _usePlotComponents ;
+        double _offsetToGammaForBetaFactor ;
 
 		double sin_delta_perp_s;
 		double cos_delta_perp_s;

@@ -40,11 +40,11 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) 
 
 	, res2FractionName(input.res2FractionName), res3FractionName(input.res3FractionName), timeOffsetName(input.timeOffsetName), angAccI1Name(input.angAccI1Name)
 
-        , angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name), angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name)
+    , angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name), angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name)
 
 	, angAccI7Name(input.angAccI7Name), angAccI8Name(input.angAccI8Name), angAccI9Name(input.angAccI9Name), angAccI10Name(input.angAccI10Name)
 
-        , timeName(input.timeName), cosThetaName(input.cosThetaName), cosPsiName(input.cosPsiName), phiName(input.phiName)
+    , timeName(input.timeName), cosThetaName(input.cosThetaName), cosPsiName(input.cosPsiName), phiName(input.phiName)
 
 	, cthetakName(input.cthetakName), cthetalName(input.cthetalName), phihName(input.phihName), tagName(input.tagName)
 
@@ -52,7 +52,9 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) 
 
 	, _numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly)
 
-        , _useCosAndSin(input._useCosAndSin), _useCosDpar(input._useCosDpar), _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
+    , _useCosAndSin(input._useCosAndSin), _useCosDpar(input._useCosDpar), _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
+
+    , _offsetToGammaForBetaFactor( input._offsetToGammaForBetaFactor) 
 
 	, allowNegativeAsSq(input.allowNegativeAsSq), _usePlotComponents(input._usePlotComponents), t(input.t), ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr)
 
@@ -185,6 +187,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	, _usePunziSigmat(false)
 	, allowNegativeAsSq(false)
 	, _usePlotComponents(false)
+    , _offsetToGammaForBetaFactor()
 	//objects
 	,t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(), tag(),
 	_gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
@@ -215,6 +218,15 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	_usePlotComponents = configurator->isTrue( "PlotComponents" ) ;
 	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
 
+    string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
+    if( offsetToGammaForBetaFactor == "" ) {
+        _offsetToGammaForBetaFactor = 0.0 ;
+    }
+    else {
+        _offsetToGammaForBetaFactor = atof( offsetToGammaForBetaFactor.c_str() ) ;
+        cout << "Bs2JpsiPhi_Signal_v5:: Adding OffsetToGammaForBetaFactor = " << _offsetToGammaForBetaFactor << endl ;
+    }
+    
 	//...............................................
 	// Configure to use angular acceptance machinery
 	string angAccFile = configurator->getConfigurationValue( "AngularAcceptanceFile" ) ;
@@ -239,8 +251,8 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
-			timeAcc = new SlicedAcceptance( 0., 14.0, /*0.0157*/ 0.0112) ;
-			cout << "Bs2JpsiPhi_Signal_v5:: Constructing timeAcc: Upper time acceptance beta=0.0112 [0 < t < 14] " << endl ;
+			timeAcc = new SlicedAcceptance( 0., 14.0, 0.00826) ;
+			cout << "Bs2JpsiPhi_Signal_v5:: Constructing timeAcc: Upper time acceptance beta=0.00826 [0 < t < 14] " << endl ;
 		}
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
 			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
@@ -470,7 +482,7 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
 
 	// Physics parameters.
-	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue() + _offsetToGammaForBetaFactor ;
 	dgam      = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 
 	Azero_sq = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
