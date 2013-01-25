@@ -159,6 +159,7 @@ vector<int> StringProcessing::StringPositions( const string Input, const string 
 
 vector<string> StringProcessing::RemoveDuplicates( const vector<string> input, vector<string>& duplicated )
 {
+	if( &duplicated == NULL ) duplicated = vector<string>();
 	vector<string> output, temp;
 	for( vector<string>::const_iterator string_i = input.begin(); string_i != input.end(); ++string_i )
 	{
@@ -320,61 +321,6 @@ vector<string> StringProcessing::CombineUniques( const vector<string> VectorOne,
 	return result;
 }
 
-vector<string> StringProcessing::RemoveCommon( const vector<string> VectorOne, const vector<string> VectorTwo )
-{
-	vector<string> result;
-	vector<string> erasable;
-	vector<string>::const_iterator stringIterator;
-
-	vector<vector<string>::const_iterator> remove_list;
-
-	//Don't assume VectorOne is unique
-	for ( stringIterator = VectorOne.begin(); stringIterator != VectorOne.end(); ++stringIterator )
-	{
-		if ( VectorContains( &result, &(*stringIterator) ) == -1 )
-		{
-			result.push_back( *stringIterator );
-		}
-		else
-		{
-			erasable.push_back( *stringIterator );
-		}
-	}
-
-	//Now add in VectorTwo
-	for ( stringIterator = VectorTwo.begin(); stringIterator != VectorTwo.end(); ++stringIterator )
-	{
-		if ( VectorContains( &result, &(*stringIterator) ) == -1 )
-		{
-			result.push_back( *stringIterator );
-		}
-	}
-
-	for( vector<string>::iterator e_i = erasable.begin(); e_i != erasable.end(); ++e_i )
-	{
-		StringProcessing::RemoveElement( result, *e_i );
-	}
-
-	return result;
-}
-
-void StringProcessing::RemoveElement( vector<string>& Input, string Element )
-{
-	vector<string>::iterator obj_i = Input.begin();
-	vector<vector<string>::iterator> element_i;
-	vector<string>::iterator end_i = Input.end();
-
-	for( ; obj_i != end_i; ++obj_i )
-	{
-		if( *obj_i == Element ) element_i.push_back( obj_i );
-	}
-
-	for( vector<vector<string>::iterator>::iterator remov_i = element_i.begin(); remov_i != element_i.end(); ++remov_i )
-	{
-		Input.erase( *remov_i );
-	}
-}
-
 //Return the position of a search string within a vector of strings, or -1 if not found
 int StringProcessing::VectorContains( vector<string> const* InputVector, string const* SearchString )
 {
@@ -495,10 +441,9 @@ vector<string> StringProcessing::FillList( const int max, const int min )
 	vector<string> returnable_list;
 	for( int i=min; i<= max; ++i )
 	{
-		char numberchar[1];
-		sprintf( numberchar, "%d", i );
-		string temp( numberchar );
-		returnable_list.push_back( temp );
+		stringstream thisStream;
+		thisStream << i;
+		returnable_list.push_back( thisStream.str() );
 	}
 	return returnable_list;
 }
@@ -534,19 +479,19 @@ string StringProcessing::MultNames( const string& input1, const string& input2 )
 {
 	if( !input1.empty() && !input2.empty() )
 	{
-		return input1+":"+input2;
+		return input1+"x"+input2;
 	}
 	if( input1.empty() && input2.empty() )
 	{
-		return "unknown:unknown";
+		return "unknownxunknown";
 	}
 	if( input1.empty() )
 	{
-		return "unknown:"+input2;
+		return "unknownx"+input2;
 	}
 	if( input2.empty() )
 	{
-		return input1+":unknown";
+		return input1+"xunknown";
 	}
 	return "";
 }

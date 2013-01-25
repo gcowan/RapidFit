@@ -26,8 +26,19 @@ class IDataSet;
 class PDFConfigurator
 {
 	public:
+		/*!
+		 * @brief Constructor
+		 */
 		PDFConfigurator();
+
+		/*!
+		 * @brief Copy Constructor
+		 */
 		PDFConfigurator( const PDFConfigurator& );
+
+		/*!
+		 * @brief Destructor
+		 */
 		~PDFConfigurator();
 
 		//Custom functions for modelling a phenomenological parameter in the PDF
@@ -43,9 +54,32 @@ class PDFConfigurator
 		string getName( string defaultName ) ; 
 
 		// Set configuration parameter
+		/*!
+		 * @brief
+		 *
+		 * @return void
+		 */
 		void addConfigurationParameter( string configString ) ;
+
+		/*!
+		 * @brief
+		 *
+		 * @return
+		 */
 		string getConfigurationValue( string configParam );
+
+		/*!
+		 * @brief
+		 *
+		 * @return
+		 */
 		bool hasConfigurationValue( string configParam, string val );
+
+		/*!
+		 * @brief
+		 *
+		 * @return
+		 */
 		bool isTrue( string configParam );
 
 		string XML() const;

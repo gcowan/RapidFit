@@ -50,7 +50,7 @@ FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allR
 				allGLTimes.push_back( input_gl_times[j2] );
 			}
 
-			if( input_real_times.size() != Result_Array[i]->NumberResults() || input_cpu_times.size() != Result_Array[i]->NumberResults() )
+			if( ((int)input_real_times.size() != Result_Array[i]->NumberResults()) || ((int)input_cpu_times.size() != Result_Array[i]->NumberResults()) )
 			{
 				cout << "ERROR: Time Data from Fits not consistent!!! Ignoring!" << endl;
 			}

@@ -25,10 +25,58 @@ class ScanStudies
 	public:
 
 		//	New Interface to Scanning Code
-		static vector<FitResultVector*> ContourScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, const vector< PDFWithData* >,
-				const vector< ConstraintFunction* >, OutputConfiguration*, const string, const string, const int=-999, DebugClass* debug=NULL, bool forceContinue=false );
-		static FitResultVector* SingleScan(  MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, const vector< PDFWithData* >,
-				const vector< ConstraintFunction* >, OutputConfiguration*, const string, const int=-999, DebugClass* debug=NULL, bool forceContinue=false );
+
+		/*!
+		 * @brief Function to call to perform a ContourScan
+		 *
+		 * @Param inputMinimiser
+		 *
+		 * @Param inputParam
+		 *
+		 * @Param inputPDFWithData
+		 *
+		 * @Param inputConstraints
+		 *
+		 * @Param inputConfig
+		 *
+		 * @Param param1
+		 *
+		 * @Param param2
+		 *
+		 * @Param output
+		 *
+		 * @Param debug
+		 *
+		 * @Param forceContinue
+		 */
+		static vector<FitResultVector*> ContourScan( MinimiserConfiguration* inputMinimiser, FitFunctionConfiguration* inputFunction, ParameterSet* inputParam,
+				const vector< PDFWithData* > inputPDFWithData, const vector< ConstraintFunction* > inputConstraints, OutputConfiguration* inputConfig,
+				const string param1, const string param2, const int output=-999, DebugClass* debug=NULL, bool forceContinue=false );
+
+		/*!
+		 * @brief Function to call to perform a SingleScan
+		 *
+		 * @Param inputMinimiser
+		 *
+		 * @Param inputParam
+		 *
+		 * @Param inputPDFWithData
+		 *
+		 * @Param inputConstraints
+		 *
+		 * @Param inputConfig
+		 *
+		 * @Param param
+		 *
+		 * @Param output
+		 *
+		 * @Param debug
+		 *
+		 * @Param forceContinue
+		 */
+		static FitResultVector* SingleScan(  MinimiserConfiguration* inputMinimiser, FitFunctionConfiguration* inputFunction, ParameterSet* inputParam,
+				const vector< PDFWithData* > inputPDFWithData, const vector< ConstraintFunction* > inputConstraints, OutputConfiguration* inputConfig,
+				const string param, const int output=-999, DebugClass* debug=NULL, bool forceContinue=false );
 
 	private:
 

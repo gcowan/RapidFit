@@ -369,7 +369,21 @@ class ComponentPlotter
 		//	Functions used internally within this class
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		/*!
+		 * @brief Used for setting up a set of strings to describe each combination
+		 *
+		 * @return void
+		 */
 		void SetupCombinationDescriptions();
+
+		/*!
+		 * @brief Function to determine the normalisation required to map the PDF to the dataset
+		 *
+		 * @param combinationIndex  This is the combination number which is being Normalised
+		 *
+		 * @return Retuns the scaling normalisation factor to project the PDF function over data
+		 */
+		double PDF2DataNormalisation( unsigned int combinationIndex ) const;
 
 		/*!
 		 * @brief helper function for testing that the integrator has actually worked
@@ -411,7 +425,6 @@ class ComponentPlotter
 		bool weightsWereUsed;					/*!	True if Weights have been used and have been setup	*/
 		string weightName;					/*!	Name of the weight parameter				*/
 		double weight_norm;					/*!	Normalisation Value to correct the effect of weighting	*/
-		double weight_err;
 		vector<double> wanted_weights;
 
 

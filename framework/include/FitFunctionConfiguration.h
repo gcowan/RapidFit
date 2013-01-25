@@ -52,7 +52,9 @@ class FitFunctionConfiguration
 		/*!
 		 * Were Weights Used?
 		 */
-		bool GetWeightsWereUsed();
+		bool GetWeightsWereUsed() const;
+
+		bool GetUseCustomAlpha() const;
 
 		/*!
 		 * What was the Numerical Integrator Name
@@ -62,7 +64,11 @@ class FitFunctionConfiguration
 		/*!
 		 * What was the Weight Observable Name
 		 */
-		string GetWeightName();
+		string GetWeightName() const;
+
+		string GetAlphaName() const;
+
+		void SetAlphaName( const string );
 
 		/*!
 		 * Setup a Trace and write the output to the given filename
@@ -72,7 +78,7 @@ class FitFunctionConfiguration
 		/*!
 		 * Get the Name of the Strategy Used
 		 */
-		string GetStrategy();
+		string GetStrategy() const;
 
 		/*!
 		 * Set the Name of the Strategy to Use
@@ -119,6 +125,8 @@ class FitFunctionConfiguration
 		bool testIntegrator;		/*!	Decision about wether to test the integrator	*/
 		bool NormaliseWeights;
 		bool SingleNormaliseWeights;
+		bool hasAlpha;
+		string alphaName;
 };
 
 #endif

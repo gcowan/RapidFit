@@ -62,6 +62,7 @@ class Foam : public IDataGenerator
 		virtual IDataSet * GetDataSet() const;
 
 	protected:
+
 		/*!
 		 * Don't Copy the class this way!
 		 */

@@ -85,7 +85,6 @@ double NegativeLogLikelihoodNumerical::EvaluateDataSet( IPDF * FittingPDF, IData
 		fit_thread_data[threadnum].dataSubSet = StoredDataSubSet[(unsigned)number][threadnum];
 		fit_thread_data[threadnum].fittingPDF = stored_pdfs[((unsigned)number)*(unsigned)Threads + threadnum];
 		fit_thread_data[threadnum].useWeights = useWeights;					//	Defined in the fitfunction baseclass
-		fit_thread_data[threadnum].weightName = ObservableRef( weightObservableName );		//	Defined in the fitfunction baseclass
 		fit_thread_data[threadnum].FitBoundary = StoredBoundary[(unsigned)Threads*((unsigned)number)+threadnum];
 		//fit_thread_data[threadnum].ResultIntegrator = StoredIntegrals[(unsigned)Threads*((unsigned)number)+threadnum];
 		fit_thread_data[threadnum].stored_integral = this_integral;

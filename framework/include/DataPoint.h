@@ -104,7 +104,16 @@ class DataPoint
 		 */
 		double GetPseudoObservable( PseudoObservable& Input );
 
-		double GetPseudoObservable( PseudoObservable& Input, vector<double> );
+		/*!
+		 * @brief This allows you to add a new Psuedo-Observable to this DataPoint, useful when you have a per-event complex object which you don't want to calculate multiple times
+		 *
+		 * @param Input    This is the new PseudoObservable class which allows for all of the information required to be wrapped up in a convenient wrapper
+		 *
+		 * @param Input2   These are external per-event input used in the derrivation of a per-event value
+		 *
+		 * @return returns a pointer to an observable which can be interrogated in exactly the same way as a normal Observable object
+		 */
+		double GetPseudoObservable( PseudoObservable& Input, vector<double> Input2 );
 
 		/*!
 		 * @brief Remove all stored Pseudo-Observable Objects
@@ -146,7 +155,7 @@ class DataPoint
 		 * @return Void
 		 */
 		void AddObservable( string Name, double Value, string Unit, bool trusted = false, int position = -1 );
-	
+
 		/*!
 		 * @brief Set an internal Observable of the given name to be equal to this Observable
 		 *
@@ -166,14 +175,14 @@ class DataPoint
 		 * This WILL NOT add an observable to the DataPoint if one does not exist with the given name
 		 *
 		 * @param Name     Name of the New observable we want to add                                                
-                 *                                                 
-                 * @param Value    The Value we want it to take    
-                 *                                                 
-                 * @param Unit     The corresponding Unit          
-                 *                                                 
-                 * @param trusted  Is this trusted? i.e. Do we know the parameter to already exist in the DataPoint (possibly as a NULL parameter in a default DataPoint)
-                 *                                                 
-                 * @param position If this is trusted use this position to save performing a lookup of known DataPoints
+		 *                                                 
+		 * @param Value    The Value we want it to take    
+		 *                                                 
+		 * @param Unit     The corresponding Unit          
+		 *                                                 
+		 * @param trusted  Is this trusted? i.e. Do we know the parameter to already exist in the DataPoint (possibly as a NULL parameter in a default DataPoint)
+		 *                                                 
+		 * @param position If this is trusted use this position to save performing a lookup of known DataPoints
 		 *
 		 * @return boolean, true is sucessful, false if not
 		 */
@@ -214,18 +223,33 @@ class DataPoint
 		void SetPhaseSpaceBoundary( PhaseSpaceBoundary* Input );
 
 		/*!
+		 * @brief Return the Discrete Index that has been assigned to this datapoint within a PhaseSpaceBoundary
 		 *
+		 * @return Returns an integer corresponding to the discrete index of this datapoint (-1 if not set)
 		 */
 		int GetDiscreteIndex() const;
 
 		/*!
+		 * @brief Set the Discrete Index that has been assigned to this datapoint within a PhaseSpaceBoundary
 		 *
+		 * @param An integer corresponding to the discrete index of this datapoint
 		 */
-		void SetDiscreteIndex( int );
+		void SetDiscreteIndex( int index );
 
-
+		/*!
+		 * @brief Sets the even weight to be used for fitting/projecting etc.
+		 *
+		 * To avoid the possibility of modifying stored Observables in a DataPoint (NOT ADVISED) this allows a runtime object to contain a possibly modified weight
+		 *
+		 * @param WeightVal This is the value of the weight corresponding to this DataPoint
+		 */
 		void SetEventWeight( const double WeightVal );
 
+		/*!
+		 * @brief Gets the even weight to be used for fitting/projecting etc.
+		 *
+		 * @return Returns the value of the weight corresponding to this DataPoint
+		 */
 		double GetEventWeight() const;
 
 	private:

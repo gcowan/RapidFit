@@ -22,13 +22,6 @@
 
 using namespace::std;
 
-//Default constructor
-ResultParameter::ResultParameter() :
-	name("Undefined"), value(0.0), originalValue(-9999.0), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false),
-	assym_err(false), err_hi(0.), err_low(0.)
-{
-}
-
 ResultParameter::ResultParameter( const PhysicsParameter* Input )
 	: name("Undefined"), value(0.0), originalValue(-9999.), error(0.0), minimum(0.0), maximum(0.0), stepSize(0.0), type("Uninitialised"), unit("Uninitialised"), ScanStatus(false),
 	assym_err(false), err_hi(0.), err_low(0.)

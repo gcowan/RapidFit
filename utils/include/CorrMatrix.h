@@ -15,8 +15,9 @@ class CorrMatrix
 
 	public:
 
-	static void Analyse( const vector<TTree*> corr_trees );
+	static void Analyse( const vector<TTree*> corr_trees, const vector<string> other_params );
 
+	static void Help();
 };
 
 #endif

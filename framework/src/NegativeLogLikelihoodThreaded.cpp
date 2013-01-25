@@ -96,7 +96,6 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 		fit_thread_data[threadnum].fittingPDF = stored_pdfs[((unsigned)number)*(unsigned)Threads + threadnum];
 		fit_thread_data[threadnum].fittingPDF->SetDebugMutex( &eval_lock, false );
 		fit_thread_data[threadnum].useWeights = useWeights;					//	Defined in the fitfunction baseclass
-		fit_thread_data[threadnum].weightName = ObservableRef( weightObservableName );		//	Defined in the fitfunction baseclass
 		fit_thread_data[threadnum].FitBoundary = StoredBoundary[(unsigned)Threads*((unsigned)number)+threadnum];
 		fit_thread_data[threadnum].dataPoint_Result = vector<double>();
 		fit_thread_data[threadnum].weightsSquared = weightsSquared;
@@ -251,7 +250,7 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 		//	If we have a weighted dataset then weight the result (if not don't perform a *1.)
 		if( thread_input->useWeights == true )
 		{
-			weight = (*data_i)->GetEventWeight();//GetObservable( thread_input->weightName )->GetValue();
+			weight = (*data_i)->GetEventWeight();
 			//pthread_mutex_lock( &eval_lock );
 			result *= weight;
 			if( thread_input->weightsSquared )

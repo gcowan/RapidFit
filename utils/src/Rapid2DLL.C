@@ -216,11 +216,11 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 		named_nll_contours.push_back( make_pair( *cont_i, return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
 	}
 	TString filename( controlled_parameter1 + "_" + controlled_parameter2 + ".pdf" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
 	filename = TString( controlled_parameter1 + "_" + controlled_parameter2 + ".png" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
 	filename = TString( controlled_parameter1 + "_" + controlled_parameter2 + ".C" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
 
 	vector<pair<TMultiGraph*,TString> > named_nll_contours_rotated;
 	cont_num=0;
@@ -229,11 +229,11 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 		named_nll_contours_rotated.push_back( make_pair( *cont_i, return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
 	}
 	TString filename_rotated( controlled_parameter2 + "_" + controlled_parameter1 + ".pdf" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
 	filename_rotated = TString( controlled_parameter2 + "_" + controlled_parameter1 + ".png" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
 	filename_rotated = TString( controlled_parameter2 + "_" + controlled_parameter1 + ".C" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand );
+	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
 
 	cout << endl;
 
@@ -243,10 +243,18 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 }
 
 
-void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1, TString controlled_parameter2, TH1* nll_hist, vector<pair<TMultiGraph*,TString> > nll_contours, TString filename, TRandom* rand )
+void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1, TString controlled_parameter2, TH1* nll_hist, vector<pair<TMultiGraph*,TString> > nll_contours,
+		TString filename, TRandom* rand, vector<string> other_params )
 {
 	if( rand == NULL ) rand = gRandom;
-	TPaveText* label = Histogram_Processing::addLHCbLabel( "" );
+
+	TPaveText* label = NULL;
+
+	string addLHCb="--addLHCb";
+	string addLHCbFinal="--addLHCbFinal";
+
+	if( StringOperations::VectorContains( &other_params, &addLHCb ) != -1 )		label = Histogram_Processing::addLHCbLabel( "", false );
+	if( StringOperations::VectorContains( &other_params, &addLHCbFinal ) != -1 )	label = Histogram_Processing::addLHCbLabel( "", true );
 
 	TLegend* leg = new TLegend( 0.75, 0.65, 0.9, 0.9 );
 	leg->SetFillStyle(0);
@@ -274,7 +282,7 @@ void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1,
 	nll_hist->GetYaxis()->SetTitle( EdStyle::GetParamRootName(controlled_parameter2) + " " + EdStyle::GetParamRootUnit(controlled_parameter2) );
 	c1->Update();
 	leg->Draw();
-	label->Draw();
+	if( label )	label->Draw();
 	double* px = new double[1]; px[0] = 0.036;//0.087;
 	double* xerr = new double[1]; xerr[0] = 0.002;//0.021;
 	double* py = new double[1]; py[0] = 0.087;//0.036;

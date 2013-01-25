@@ -87,19 +87,54 @@ int main( int argc, char* argv[] )
 			&((*gammaH_tau_error)[0]), &((*gammaL_tau_error)[0]) );
 
 	double GL_sum=0., GH_sum=0.;
+	//double GL_sum_err=0., GH_sum_err=0.;
 	double GL_sum_sq=0., GH_sum_sq=0.;
+	//double GL_sum_err_sq=0., GH_sum_err_sq=0.;
 	double GLGH_prod_sum=0.;
+	//double GLGH_prod_err_sum=0.;
 	double GL_avr=0., GH_avr=0.;
+	//double GL_avr_err=0., GH_avr_err=0.;
 	double N = (double)(gammaL_tau_value->size());
 
 	for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
 	{
 		GL_sum += (*gammaL_tau_value)[i];
+	//	GL_sum_err += (*gammaL_tau_error)[i]*(*gammaL_tau_error)[i];
 		GH_sum += (*gammaH_tau_value)[i];
+	//	GH_sum_err += (*gammaH_tau_error)[i]*(*gammaH_tau_error)[i];
 		GL_sum_sq += (*gammaL_tau_value)[i]*(*gammaL_tau_value)[i];
+	//	GL_sum_err_sq += (*gammaL_tau_value)[i]*(*gammaL_tau_value)[i]*sqrt( ((*gammaL_tau_error)[i]*(*gammaL_tau_error)[i])/((*gammaL_tau_value)[i]*(*gammaL_tau_value)[i]) *2. );
 		GH_sum_sq += (*gammaH_tau_value)[i]*(*gammaH_tau_value)[i];
+	//	GH_sum_err_sq += (*gammaH_tau_value)[i]*(*gammaH_tau_value)[i]*sqrt( ((*gammaH_tau_error)[i]*(*gammaH_tau_error)[i])/((*gammaH_tau_value)[i]*(*gammaH_tau_value)[i]) *2. );
 		GLGH_prod_sum += (*gammaL_tau_value)[i]*(*gammaH_tau_value)[i];
+	//	GLGH_prod_err_sum += (*gammaL_tau_value)[i]*(*gammaH_tau_value)[i]*sqrt( ((*gammaL_tau_error)[i]*(*gammaL_tau_error)[i])/((*gammaL_tau_value)[i]*(*gammaL_tau_value)[i])
+	//				 + ((*gammaH_tau_error)[i]*(*gammaH_tau_error)[i])/((*gammaH_tau_value)[i]*(*gammaH_tau_value)[i]) );
 	}
+
+	/*
+	GL_sum_err = sqrt( GL_sum_err );
+	GH_sum_err = sqrt( GH_sum_err );
+	GL_sum_err_sq = sqrt( GL_sum_err_sq );
+	GH_sum_err_sq = sqrt( GH_sum_err_sq );
+	GLGH_prod_err_sum = sqrt( GLGH_prod_err_sum );
+
+	GL_avr = GL_sum / (double)(gammaL_tau_value->size());
+	GH_avr = GH_sum / (double)(gammaH_tau_value->size());
+
+	GL_avr_err = GL_sum_err / (double)(gammaL_tau_value->size());
+	GH_avr_err = GH_sum_err / (double)(gammaH_tau_value->size());
+
+	double corr = N*GLGH_prod_sum - GL_sum*GH_sum;
+	corr /= sqrt( (N*GL_sum_sq - GL_sum*GL_sum) * (N*GH_sum_sq - GH_sum*GH_sum) );
+
+	double corr_err_numer = N* sqrt( GLGH_prod_err_sum*GLGH_prod_err_sum + ( (GL_sum_err*GL_sum_err) + (GH_sum_err*GH_sum_err) ) );
+
+	double corr_err_denom = sqrt( ( N*GL_sum_err_sq*GL_sum_err_sq + ( (GL_sum_err*GL_sum_err) *2. ) ) 
+				    + ( N*GH_sum_err_sq*GH_sum_err_sq + ( (GH_sum_err*GH_sum_err) *2. ) ) );
+
+	double corr_err = corr* sqrt( corr_err_numer*corr_err_numer + corr_err_denom*corr_err_denom );
+	*/
+
 	GL_avr = GL_sum / (double)(gammaL_tau_value->size());
 	GH_avr = GH_sum / (double)(gammaH_tau_value->size());
 
@@ -113,7 +148,7 @@ int main( int argc, char* argv[] )
 		double gammaS_val=0., gammaS_err=0., delGammaS_val=0., delGammaS_err=0.;
 
 		gammaS_val = 0.5 * ( (*gammaL_tau_value)[i] + (*gammaH_tau_value)[i] );
-		gammaS_err = 0.5 * ( sqrt( (*gammaL_tau_error)[i]*(*gammaL_tau_error)[i]+(*gammaH_tau_error)[i]*(*gammaH_tau_error)[i] ) + 0.7938*2.*(*gammaH_tau_error)[i]*(*gammaL_tau_error)[i] );
+		gammaS_err = 0.5 * ( sqrt( (*gammaL_tau_error)[i]*(*gammaL_tau_error)[i]+(*gammaH_tau_error)[i]*(*gammaH_tau_error)[i] /*));*/- 0.7938*2.*(*gammaH_tau_error)[i]*(*gammaL_tau_error)[i] ) );
 
 		delGammaS_val = (*gammaL_tau_value)[i] - (*gammaH_tau_value)[i];
 		delGammaS_err = sqrt( (*gammaL_tau_error)[i]*(*gammaL_tau_error)[i]+(*gammaH_tau_error)[i]*(*gammaH_tau_error)[i] + 0.7938*2.*(*gammaH_tau_error)[i]*(*gammaL_tau_error)[i] );
@@ -227,7 +262,7 @@ int main( int argc, char* argv[] )
 	c2->Update();
 	c2->Print("deltaGammaErrOutput.pdf");
 
-	gStyle->SetOptStat( thisOptStat );
+	gStyle->SetOptStat( 0 );//thisOptStat );
 
 	if( argc == 4 )
 	{
@@ -254,6 +289,8 @@ int main( int argc, char* argv[] )
 			}
 		}
 
+		int rebin_factor=1;
+
 		TH1* delta_gamma_histo = new TH1D( "gammadiff_dist", "gammadiff_dist", gamma_diff.size(), get_minimum(gamma_diff), get_maximum(gamma_diff) );
 		for( unsigned int i=0; i< gamma_diff.size(); ++i ) delta_gamma_histo->Fill( gamma_diff[i] );
 
@@ -263,16 +300,22 @@ int main( int argc, char* argv[] )
 		TH1* gamma_truth =new TH1D( "gamma_tru", "gamma_tru", angGammaTrudiff.size(), get_minimum(angGammaTrudiff), get_maximum(angGammaTrudiff) );
 		for( unsigned int i=0; i< angGammaTrudiff.size(); ++i ) gamma_truth->Fill( angGammaTrudiff[i] );
 		Histogram_Processing::OptimallyRebin( gamma_truth ); gamma_truth->SetLineColor( 2 );
-		TH1* gamma_untag =new TH1D( "gamma_untag", "gamma_untag", untagGammaTrudiff.size(), get_minimum(untagGammaTrudiff), get_maximum(untagGammaTrudiff) );
+		TH1* gamma_untag =new TH1D( "gamma_untag", "gamma_untag", untagGammaTrudiff.size(), get_minimum(angGammaTrudiff), get_maximum(angGammaTrudiff) );
 		for( unsigned int i=0; i< untagGammaTrudiff.size(); ++i ) gamma_untag->Fill( untagGammaTrudiff[i] );
-		Histogram_Processing::OptimallyRebin( gamma_untag ); gamma_untag->SetLineColor( 3 );
+		//Histogram_Processing::OptimallyRebin( gamma_untag ); gamma_untag->SetLineColor( 3 );
+
+		rebin_factor = int( ( (double) gamma_untag->GetNbinsX() ) / ( (double) gamma_truth->GetNbinsX() ) );
+		gamma_untag->Rebin( rebin_factor ); gamma_untag->SetLineColor( 3 );
 
 		TH1* dGamma_truth = new TH1D( "deltaGamma_tru", "deltaGamma_tru", angdGammaTrudiff.size(), get_minimum(angdGammaTrudiff), get_maximum(angdGammaTrudiff) );
 		for( unsigned int i=0; i< angdGammaTrudiff.size(); ++i ) dGamma_truth->Fill( angdGammaTrudiff[i] );
 		Histogram_Processing::OptimallyRebin( dGamma_truth ); dGamma_truth->SetLineColor( 2 );
-		TH1* dGamma_untag =new TH1D( "deltaGamma_untag", "deltaGamma_untag", untagdGammaTrudiff.size(), get_minimum(untagdGammaTrudiff), get_maximum(untagdGammaTrudiff) );
+		TH1* dGamma_untag =new TH1D( "deltaGamma_untag", "deltaGamma_untag", untagdGammaTrudiff.size(), get_minimum(angdGammaTrudiff), get_maximum(angdGammaTrudiff) );
 		for( unsigned int i=0; i< untagdGammaTrudiff.size(); ++i ) dGamma_untag->Fill( untagdGammaTrudiff[i] );
-		Histogram_Processing::OptimallyRebin( dGamma_untag ); dGamma_untag->SetLineColor( 3 );
+		//Histogram_Processing::OptimallyRebin( dGamma_untag ); dGamma_untag->SetLineColor( 3 );
+
+		rebin_factor = int( ( (double) dGamma_untag->GetNbinsX() ) / ( (double) dGamma_truth->GetNbinsX() ) );
+		dGamma_untag->Rebin( rebin_factor ); dGamma_untag->SetLineColor( 3 );
 
 		cout << "diff_Gamma" << endl;
 
@@ -283,6 +326,7 @@ int main( int argc, char* argv[] )
 		Histogram_Processing::OptimallyRebin( delta_gamma_histo );
 		fit_type = Histogram_Processing::Best_Fit_Function( delta_gamma_histo );
 		Histogram_Processing::Silent_Fit( delta_gamma_histo, fit_type );
+		c3->Update();
 		thisStats = (TPaveStats*)delta_gamma_histo->GetListOfFunctions()->FindObject("stats");
 		if( thisStats != NULL )
 		{
@@ -290,7 +334,7 @@ int main( int argc, char* argv[] )
 			thisStats->SetTextColor(1);
 			thisStats->Draw();
 		}
-		delta_gamma_histo->GetXaxis()->SetTitle("#delta(#Gamma) [ps^{-1}]");
+		delta_gamma_histo->GetXaxis()->SetTitle("#delta(#Gamma_{s}) [ps^{-1}]");
 		delta_gamma_histo->GetYaxis()->SetTitle("Candidates");
 		c3->Update();
 		c3->Print("diff_Gamma.pdf");
@@ -302,6 +346,7 @@ int main( int argc, char* argv[] )
 		Histogram_Processing::OptimallyRebin( delta_dGamma_histo );
 		fit_type = Histogram_Processing::Best_Fit_Function( delta_dGamma_histo );
 		Histogram_Processing::Silent_Fit( delta_dGamma_histo, fit_type );
+		c4->Update();
 		thisStats = (TPaveStats*)delta_dGamma_histo->GetListOfFunctions()->FindObject("stats");
 		if( thisStats != NULL )
 		{
@@ -309,7 +354,7 @@ int main( int argc, char* argv[] )
 			thisStats->SetTextColor(1);
 			thisStats->Draw();
 		}
-		delta_dGamma_histo->GetXaxis()->SetTitle("#delta(#Delta#Gamma) [ps^{-1}]");
+		delta_dGamma_histo->GetXaxis()->SetTitle("#delta(#Delta#Gamma_{s}) [ps^{-1}]");
 		delta_dGamma_histo->GetYaxis()->SetTitle("Candidates");
 		c4->Update();
 		c4->Print("diff_deltaGamma.pdf");
@@ -318,207 +363,226 @@ int main( int argc, char* argv[] )
 
 		TCanvas* c5 = new TCanvas( "gamma_overlay", "gamma_overlay", 1680, 1050 );
 
-		gamma_truth->Draw();
-		gamma_truth->GetXaxis()->SetTitle("#Gamma [ps^{-1}]");
-		gamma_truth->GetYaxis()->SetTitle("Candidates");
-		gamma_untag->Draw("SAME");
+		gamma_untag->Draw();
+		c5->Update();
+		gamma_untag->GetXaxis()->SetTitle("#Gamma_{s} [ps^{-1}]");
+		gamma_untag->GetYaxis()->SetTitle("Candidates");
+		gamma_truth->Draw("SAME");
+		c5->Update();
+		TLegend* thisLegend = EdStyle::LHCbLegend();
+		thisLegend->AddEntry( gamma_untag, "#Gamma_{s} UnTagged Analysis", "l" );
+		thisLegend->AddEntry( gamma_truth, "#Gamma_{s} Angular Moment Analysis", "l" );
+		thisLegend->SetFillStyle(3023);
+		thisLegend->SetTextColor(1);
+		thisLegend->Draw();
 		c5->Update();
 		c5->Print("gamma_overlay.pdf");
 
 		TCanvas* c6 = new TCanvas( "dGamma_overlay", "dGamma_overlay", 1680, 1050 );
 
-		dGamma_truth->Draw();
-		dGamma_truth->GetXaxis()->SetTitle("#Delta#Gamma [ps^{-1}]");
-		dGamma_truth->GetYaxis()->SetTitle("Candidates");
-		dGamma_untag->Draw("SAME");
+		dGamma_untag->Draw();
+		c6->Update();
+		dGamma_untag->GetXaxis()->SetTitle("#Delta#Gamma_{s} [ps^{-1}]");
+		dGamma_untag->GetYaxis()->SetTitle("Candidates");
+		dGamma_truth->Draw("SAME");
+		c6->Update();
+		TLegend* thisLegend2 = EdStyle::LHCbLegend();
+		thisLegend2->AddEntry( dGamma_untag, "#Delta#Gamma_{s} UnTagged Analysis", "l" );
+		thisLegend2->AddEntry( dGamma_truth, "#Delta#Gamma_{s} Angular Moment Analysis", "l" );
+		thisLegend2->SetFillStyle(3023);
+		thisLegend2->SetTextColor(1);
+		thisLegend2->Draw();
 		c6->Update();
 		c6->Print("deltaGamma_overlay.pdf");
-
 	}
-	else
+	//else
+	//{
+	gStyle->SetOptStat(0);
+
+	cout << "Working on Correlation Graph" << endl;
+
+	TCanvas* c7 = new TCanvas( "corr_Graph", "corr_Graph", 1680, 1050 );
+
+	corr_graph->Draw("AP");
+	c7->Update();
+	corr_graph->GetXaxis()->SetTitle("#Gamma_{L}");
+	corr_graph->GetYaxis()->SetTitle("#Gamma_{H}");
+	c7->Update();
+
+	TString funcStr_Orig("("); funcStr_Orig+=1./corr;funcStr_Orig.Append("*x+[0])");
+
+	TString funcStr("([1]*x+[0])");
+
+	double xmin = corr_graph->GetXaxis()->GetXmin();
+	double xmax = corr_graph->GetXaxis()->GetXmax();
+	double ymin = corr_graph->GetYaxis()->GetXmin();
+	double ymax = corr_graph->GetYaxis()->GetXmax();
+
+	TF1* corr_funct = new TF1( "corr_func", funcStr, xmin, xmax );
+
+	corr_funct->SetParameters( 1.18579, corr );
+
+	corr_graph->Fit( corr_funct, "FEM" );
+
+	double* x_func = new double[100];
+	double* y_func = new double[100];
+
+	double xstep = (xmax-xmin)/99.;
+	for( unsigned int i=0; i< 100; ++i )
 	{
-		gStyle->SetOptStat(0);
-
-		cout << "Working on Correlation Graph" << endl;
-
-		TCanvas* c7 = new TCanvas( "corr_Graph", "corr_Graph", 1680, 1050 );
-
-		corr_graph->Draw("AP");
-		c7->Update();
-		corr_graph->GetXaxis()->SetTitle("#Gamma_{L}");
-		corr_graph->GetYaxis()->SetTitle("#Gamma_{H}");
-		c7->Update();
-
-		TString funcStr_Orig("("); funcStr_Orig+=1./corr;funcStr_Orig.Append("*x+[0])");
-
-		TString funcStr("([1]*x+[0])");
-
-		double xmin = corr_graph->GetXaxis()->GetXmin();
-		double xmax = corr_graph->GetXaxis()->GetXmax();
-		double ymin = corr_graph->GetYaxis()->GetXmin();
-		double ymax = corr_graph->GetYaxis()->GetXmax();
-
-		TF1* corr_funct = new TF1( "corr_func", funcStr, xmin, xmax );
-
-		corr_funct->SetParameters( 1.18579, corr );
-
-		corr_graph->Fit( corr_funct, "FEM" );
-
-		double* x_func = new double[100];
-		double* y_func = new double[100];
-
-		double xstep = (xmax-xmin)/99.;
-		for( unsigned int i=0; i< 100; ++i )
-		{
-			x_func[i] = xmin + xstep * i;
-			y_func[i] = corr_funct->Eval( x_func[i] );
-		}
-
-		TGraph* thisCorrGraph = new TGraph( 100, x_func, y_func );
-		thisCorrGraph->SetLineColor(3);
-
-		thisCorrGraph->Draw("SAMEL");
-		c7->Update();
-
-		TF1* corr_funct2 = new TF1( "corr_func2", funcStr_Orig, xmin, xmax );
-
-		corr_graph->Fit( corr_funct2, "FEM" );
-
-		double* x_func2 = new double[100];
-		double* y_func2 = new double[100];
-
-		for( unsigned int i=0; i< 100; ++i )
-		{
-			x_func2[i] = xmin + xstep * i;
-			y_func2[i] = corr_funct2->Eval( x_func2[i] );
-		}
-
-		TGraph* thisCorrGraph2 = new TGraph( 100, x_func2, y_func2 );
-
-		thisCorrGraph2->SetLineColor(2);
-		thisCorrGraph2->Draw("SAMEL");
-
-		c7->Update();
-
-		c7->Print("corr2DErr.pdf");
-
-		cout << "build" << endl;
-		TH2* thisHisto = new TH2D( "histo_colz2", "histo_colz2", 100, xmin, xmax, 100, ymin, ymax );
-		cout << "fill" << endl;
-		for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
-		{
-			thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
-		}
-
-		int xbins =100;// /*100;*/Histogram_Processing::OptimumBinNumber( thisHisto, 1 );
-		int ybins =100;// /*100;*/Histogram_Processing::OptimumBinNumber( thisHisto, 2 );
-
-		cout << xbins << "\t\t" << ybins << endl;
-
-		thisHisto = new TH2D( "histo_colz", "histo_colz", xbins, xmin, xmax, ybins, ymin, ymax );
-
-		for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
-		{
-			thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
-		}
-
-		TCanvas* c8 = new TCanvas( "corr_Histo", "corr_Histo", 1680, 1050 );
-
-		cout << "plot" << endl;
-		thisHisto->Draw("colz");
-
-		c8->Update();
-		thisHisto->GetXaxis()->SetTitle("#Gamma_{L}");
-		thisHisto->GetYaxis()->SetTitle("#Gamma_{H}");
-
-		thisCorrGraph->Draw("SAMEL");
-		thisCorrGraph2->Draw("SAMEL");
-
-		c8->Update();
-		c8->Print("corr2DHist.pdf");
-
-		TFile* thisRoot = new TFile("corr2Doutput.root","RECREATE");
-
-		thisHisto->Write("",TObject::kOverwrite);
-
-		thisRoot->Write("",TObject::kOverwrite);
-
-		//	See http://www.cs.ubc.ca/~murphyk/Teaching/CS340-Fall06/reading/gaussians.pdf 2.1 Bivariate Gaussian function
-		TF2* corr_function = new TF2( "corr_matrix", "1./(2*TMath::Pi()*[0]*[1]*TMath::Sqrt(1 - [2]*[2])) * TMath::Exp( -1./(2*(1-[2]*[2]))*(((x-[3])*(x-[3]))/([0]*[0])+((y-[4])*(y-[4]))/([1]*[1])-(2*[2]*(x-[3])*(y-[4]))/([0]*[1])) )", xmin, xmax, ymin, ymax );
-
-		corr_function->SetParameters( 0.010, 0.020, -0.7, 0.717, 0.631 );// xmin+((xmax-xmin)*0.5), ymin+((ymax-ymin)*0.5) );
-
-		//corr_function->FixParameter( 0, 0.010 );
-		//corr_function->FixParameter( 1, 0.020 );
-		//corr_function->FixParameter( 2, -0.7 );
-		//corr_function->FixParameter( 3, 0.717 );//xmin+((xmax-xmin)*0.5)-0.005 );
-		//corr_function->FixParameter( 4, 0.631 );//ymin+((ymax-ymin)*0.5)-0.005 );
-
-		int contour_num=3;
-		//double* contours = new double[(unsigned)contour_num];
-		//contours[0]=0.68;
-		//contours[1]=0.9;
-		//contours[2]=0.95;
-		//corr_function->SetContour( contour_num, contours );
-
-		gStyle->SetTitleOffset((Float_t)1.2,"X");
-		gStyle->SetTitleOffset((Float_t)1.2,"Y");
-		gROOT->UseCurrentStyle();
-		gROOT->ForceStyle( true );
-
-
-		TCanvas* c9 = new TCanvas( "corr_func", "corr_func", 1680, 1050 );
-
-		corr_function->SetContour( 0, NULL );
-
-		thisHisto->Fit( corr_function, "EN" );
-
-		double Integral = corr_function->Integral( xmin, xmax, ymin, ymax, 1E-12 );
-
-		/*double* contours = new double[(unsigned)contour_num];
-		  contours[0]=0.68*Integral;
-		  contours[1]=0.9*Integral;
-		  contours[2]=0.95*Integral;
-		  corr_function->SetContour( contour_num, contours );*/
-
-		thisHisto->GetXaxis()->SetNdivisions( 505, true );
-		thisHisto->GetYaxis()->SetNdivisions( 505, true );
-
-		thisHisto->Draw("");
-		c9->Update();
-
-		corr_function->Draw("SAME");
-
-		c9->Update();
-
-		c9->Print("corr_func_scatter.pdf");
-
-		thisHisto->Draw("colz");
-		c9->Update();
-
-		corr_function->Draw("SAME");
-
-		c9->Update();
-
-		c9->Print("corr_func.pdf");
-
-		corr_function->SetLineWidth(8);
-
-		thisHisto->GetXaxis()->SetTitleOffset((Float_t)1.2);
-		thisHisto->GetYaxis()->SetTitleOffset((Float_t)1.2);
-
-		thisHisto->Draw("lego2");
-		corr_function->Draw("CONT1 SAME");
-		c9->Update();
-		c9->Print("corr_func3D.pdf");
-		c9->Print("corr_func3D.C");
-
-		TFile* corrfuncFile = new TFile("corrFunc.root","RECREATE");
-
-		c9->Write("",TObject::kOverwrite);
-
-		corrfuncFile->Write("",TObject::kOverwrite);
+		x_func[i] = xmin + xstep * i;
+		y_func[i] = corr_funct->Eval( x_func[i] );
 	}
+
+	TGraph* thisCorrGraph = new TGraph( 100, x_func, y_func );
+	thisCorrGraph->SetLineColor(3);
+
+	thisCorrGraph->Draw("SAMEL");
+	c7->Update();
+
+	TF1* corr_funct2 = new TF1( "corr_func2", funcStr_Orig, xmin, xmax );
+
+	corr_graph->Fit( corr_funct2, "FEM" );
+
+	double* x_func2 = new double[100];
+	double* y_func2 = new double[100];
+
+	for( unsigned int i=0; i< 100; ++i )
+	{
+		x_func2[i] = xmin + xstep * i;
+		y_func2[i] = corr_funct2->Eval( x_func2[i] );
+	}
+
+	TGraph* thisCorrGraph2 = new TGraph( 100, x_func2, y_func2 );
+
+	thisCorrGraph2->SetLineColor(2);
+	thisCorrGraph2->Draw("SAMEL");
+
+	c7->Update();
+
+	c7->Print("corr2DErr.pdf");
+
+	cout << "build" << endl;
+	TH2* thisHisto = new TH2D( "histo_colz2", "histo_colz2", 100, xmin, xmax, 100, ymin, ymax );
+	cout << "fill" << endl;
+	for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
+	{
+		thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
+	}
+
+	int xbins =100;// /*100;*/Histogram_Processing::OptimumBinNumber( thisHisto, 1 );
+	int ybins =100;// /*100;*/Histogram_Processing::OptimumBinNumber( thisHisto, 2 );
+
+	cout << xbins << "\t\t" << ybins << endl;
+
+	thisHisto = new TH2D( "histo_colz", "histo_colz", xbins, xmin, xmax, ybins, ymin, ymax );
+
+	for( unsigned int i=0; i< gammaL_tau_value->size(); ++i )
+	{
+		thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
+	}
+
+	TCanvas* c8 = new TCanvas( "corr_Histo", "corr_Histo", 1680, 1050 );
+
+	cout << "plot" << endl;
+	thisHisto->Draw("colz");
+
+	c8->Update();
+	thisHisto->GetXaxis()->SetTitle("#Gamma_{L}");
+	thisHisto->GetYaxis()->SetTitle("#Gamma_{H}");
+
+	thisCorrGraph->Draw("SAMEL");
+	thisCorrGraph2->Draw("SAMEL");
+
+	c8->Update();
+	c8->Print("corr2DHist.pdf");
+
+	TFile* thisRoot = new TFile("corr2Doutput.root","RECREATE");
+
+	thisHisto->Write("",TObject::kOverwrite);
+
+	thisRoot->Write("",TObject::kOverwrite);
+
+	//	See http://www.cs.ubc.ca/~murphyk/Teaching/CS340-Fall06/reading/gaussians.pdf 2.1 Bivariate Gaussian function
+	//	http://www.maths.qmul.ac.uk/~ig/MTH5118/Notes11-09.pdf
+	//
+	TF2* corr_function = new TF2( "corr_matrix",
+				"1./(2*TMath::Pi()*[0]*[1]*TMath::Sqrt(1 - [2]*[2])) * TMath::Exp( -1./(2*(1-[2]*[2]))*(((x-[3])*(x-[3]))/([0]*[0])+((y-[4])*(y-[4]))/([1]*[1])-(2*[2]*(x-[3])*(y-[4]))/([0]*[1])) )",
+				xmin, xmax, ymin, ymax );
+
+	corr_function->SetParameters( 0.010, 0.020, -0.7, 0.717, 0.631 );// xmin+((xmax-xmin)*0.5), ymin+((ymax-ymin)*0.5) );
+
+	//corr_function->FixParameter( 0, 0.010 );
+	//corr_function->FixParameter( 1, 0.020 );
+	//corr_function->FixParameter( 2, -0.7 );
+	//corr_function->FixParameter( 3, 0.717 );//xmin+((xmax-xmin)*0.5)-0.005 );
+	//corr_function->FixParameter( 4, 0.631 );//ymin+((ymax-ymin)*0.5)-0.005 );
+
+	int contour_num=3;
+	//double* contours = new double[(unsigned)contour_num];
+	//contours[0]=0.68;
+	//contours[1]=0.9;
+	//contours[2]=0.95;
+	//corr_function->SetContour( contour_num, contours );
+
+	gStyle->SetTitleOffset((Float_t)1.2,"X");
+	gStyle->SetTitleOffset((Float_t)1.2,"Y");
+	gROOT->UseCurrentStyle();
+	gROOT->ForceStyle( true );
+
+
+	TCanvas* c9 = new TCanvas( "corr_func", "corr_func", 1680, 1050 );
+
+	corr_function->SetContour( 0, NULL );
+
+	thisHisto->Fit( corr_function, "EN" );
+
+	double Integral = corr_function->Integral( xmin, xmax, ymin, ymax, 1E-12 );
+
+	/*double* contours = new double[(unsigned)contour_num];
+	  contours[0]=0.68*Integral;
+	  contours[1]=0.9*Integral;
+	  contours[2]=0.95*Integral;
+	  corr_function->SetContour( contour_num, contours );*/
+
+	thisHisto->GetXaxis()->SetNdivisions( 505, true );
+	thisHisto->GetYaxis()->SetNdivisions( 505, true );
+
+	thisHisto->Draw("");
+	c9->Update();
+
+	corr_function->Draw("SAME");
+
+	c9->Update();
+
+	c9->Print("corr_func_scatter.pdf");
+
+	thisHisto->Draw("colz");
+	c9->Update();
+
+	corr_function->Draw("SAME");
+
+	c9->Update();
+
+	c9->Print("corr_func.pdf");
+
+	corr_function->SetLineWidth(8);
+
+	thisHisto->GetXaxis()->SetTitleOffset((Float_t)1.2);
+	thisHisto->GetYaxis()->SetTitleOffset((Float_t)1.2);
+
+	thisHisto->Draw("lego2");
+	corr_function->Draw("CONT1 SAME");
+	c9->Update();
+	c9->Print("corr_func3D.pdf");
+	c9->Print("corr_func3D.C");
+
+	TFile* corrfuncFile = new TFile("corrFunc.root","RECREATE");
+
+	c9->Write("",TObject::kOverwrite);
+
+	corrfuncFile->Write("",TObject::kOverwrite);
+	//}
 
 	return 0;
 }

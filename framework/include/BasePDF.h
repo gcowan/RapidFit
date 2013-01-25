@@ -240,7 +240,7 @@
 		 * @brief Return the integral of the function over the given boundary
 		 *
 		 * @param InputPoint       DataPoint to be used as a guide for the Integration, i.e. tag +/-
-		 * @oaram InputPhaseSpace  Whole PhaseSpace to be integrated, unless the DataPoint is relied upon by the PDF
+		 * @param InputPhaseSpace  Whole PhaseSpace to be integrated, unless the DataPoint is relied upon by the PDF
 		 *
 		 * @warning       If both Normalise( PhaseSpaceBoundary* ) and Normalise( DataPoint*, PhaseSpaceBoundary* ) are defined
 		 *                Normalise( PhaseSpaceBoundary* ) will take precedent!!!
@@ -636,10 +636,11 @@
 
 		vector<string> component_list;	/*!	This is the list of components that this PDF can provide	*/
 
-		pthread_mutex_t* debug_mutex;
-		bool can_remove_mutex;
+		pthread_mutex_t* debug_mutex;	/*!	This is the pthread mutex object which is to be used for thread-locking sections of code in the PDFs that is not thread safe, e.g. using streamers*/
 
-		DebugClass* debug;
+		bool can_remove_mutex;		/*!	This is internal to let the PDF know if it's safe to remove the shared mutex	*/
+
+		DebugClass* debug;		/*!	This is the DebugClass which will allow you to turn on selective debugging at runtime	*/
 	private:
 
 		bool numericalNormalisation;                  /*!     Does this PDF require Numerical Integration, or has Numerical Integration been requested?       */

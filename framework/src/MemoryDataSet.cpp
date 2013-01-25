@@ -26,7 +26,8 @@
 using namespace::std;
 
 //Constructor with correct argument
-MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) : allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets(), WeightName(""), useWeights(false)
+MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) :
+	allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets(), WeightName(""), useWeights(false), alpha(1.), alphaName("uninitialized")
 {
 	for( unsigned int i=0; i< (unsigned)dataBoundary->GetNumberCombinations(); ++i )
 	{
@@ -352,7 +353,7 @@ double MemoryDataSet::GetSumWeightsSq() const
 
 void MemoryDataSet::ApplyAlpha( const double total_sum, const double total_sum_sq )
 {
-	double alpha= total_sum / total_sum_sq;
+	alpha= total_sum / total_sum_sq;
 	ObservableRef WeightNameRef( WeightName );
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
@@ -361,4 +362,36 @@ void MemoryDataSet::ApplyAlpha( const double total_sum, const double total_sum_s
 	cout << "alpha = " << setprecision(10) << total_sum << "  /  " << total_sum_sq << endl;
 	cout << "Correction Factor: " << setprecision(5) << alpha << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
 }
+
+double MemoryDataSet::GetAlpha() const
+{
+	if( alphaName != "uninitialized" )
+	{
+		double alphaSum=0.;
+		ObservableRef alphaNameRef( alphaName );
+		for( unsigned int i=0; i< allData.size(); ++i )
+		{
+			alphaSum+=allData[i]->GetObservable( alphaNameRef )->GetValue();
+		}
+		alphaSum/=(double)allData.size();
+		return alphaSum;
+	}
+	else
+	{
+		return alpha;
+	}
+}
+
+void MemoryDataSet::ApplyExternalAlpha( const string AlphaName )
+{
+	alphaName = AlphaName;
+	ObservableRef alphaNameRef( alphaName );
+	ObservableRef WeightNameRef( WeightName );
+	for( unsigned int i=0; i< allData.size(); ++i )
+	{
+		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightNameRef )->GetValue() * allData[i]->GetObservable( alphaNameRef )->GetValue() );
+	}
+	cout << "Using Observable: " << alphaName << " to apply a per-event alpha correction to the per-event weights used." << endl << endl;
+}
+
 

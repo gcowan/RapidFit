@@ -26,6 +26,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <float.h>
+#include <vector>
 
 using namespace::std;
 
@@ -780,7 +781,9 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 	{
 		string functionName = "Uninitialised";
 		string weightName = "Uninitialised";
+		string alphaName = "undefined";
 		bool hasWeight = false;
+		bool hasAlpha = false;
 		bool want_Trace = false;
 		bool change_style = false;
 		string Trace_FileName;
@@ -813,6 +816,11 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 				{
 					hasWeight = true;
 					weightName = XMLTag::GetStringValue( functionInfo[childIndex] );
+				}
+				else if ( functionInfo[childIndex]->GetName() == "AlphaName" )
+				{
+					hasAlpha = true;
+					alphaName = XMLTag::GetStringValue( functionInfo[childIndex] );
 				}
 				else if ( functionInfo[childIndex]->GetName() == "Trace" )
 				{
@@ -869,6 +877,11 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		if( change_style )
 		{
 			returnable_function->SetStrategy( Strategy );
+		}
+
+		if( hasAlpha )
+		{
+			returnable_function->SetAlphaName( alphaName );
 		}
 
 		returnable_function->SetThreads( Threads );

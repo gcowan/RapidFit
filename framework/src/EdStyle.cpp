@@ -279,6 +279,14 @@ TString EdStyle::GetParamRootUnit( string Param_Name )
 	} else if ( Param_Name == "tau" ) {
 
 		returnable_string = "[ps]";
+
+	} else if ( Param_Name == "helphi" ) {
+
+		returnable_string = "[rad]";
+
+	} else if ( Param_Name == "helcosthetaK" || Param_Name == "helcosthetaL" ) {
+
+		returnable_string = "unitless";
 	}
 
 	return returnable_string;
@@ -310,7 +318,7 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 
 	} else if( Param_Name == "gamma" ) {
 
-		returnable_string = "#Gamma";
+		returnable_string = "#Gamma_{s}";
 
 	} else if ( Param_Name == "deltaGamma" ) {
 
@@ -334,7 +342,59 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 
 	} else if ( Param_Name == "F_s" ) {
 
-		returnable_string = "F_S";
+		returnable_string = "F_{S}";
+
+	} else if ( Param_Name == "F_s990" ) {
+
+		returnable_string = "F_{S} (990)";
+
+	} else if ( Param_Name == "F_s1008" ) {
+
+		returnable_string = "F_{S} (1008)";
+
+	} else if ( Param_Name == "F_s1016" ) {
+
+		returnable_string = "F_{S} (1016)";
+
+	} else if ( Param_Name == "F_s1020" ) {
+
+		returnable_string = "F_{S} (1020)";
+
+	} else if ( Param_Name == "F_s1024" ) {
+
+		returnable_string = "F_{S} (1024)";
+
+	} else if ( Param_Name == "F_s1032" ) {
+
+		returnable_string = "F_{S} (1032)";
+
+	} else if ( Param_Name == "delta_s" ) {
+
+		returnable_string = "#delta_{S}";
+
+	} else if ( Param_Name == "delta_s990" ) {
+
+		returnable_string = "#delta_{S} (990)";
+
+	} else if ( Param_Name == "delta_s1008" ) {
+
+		returnable_string = "#delta_{S} (1008)";
+
+	} else if ( Param_Name == "delta_s1016" ) {
+
+		returnable_string = "#delta_{S} (1016)";
+
+	} else if ( Param_Name == "delta_s1020" ) {
+
+		returnable_string = "#delta_{S} (1020)";
+
+	} else if ( Param_Name == "delta_s1024" ) {
+
+		returnable_string = "#delta_{S} (1024)";
+
+	} else if ( Param_Name == "delta_s1032" ) {
+
+		returnable_string = "#delta_{S} (1032)";
 
 	} else if ( Param_Name == "delta_para" ) {
 
@@ -343,10 +403,6 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 	} else if ( Param_Name == "delta_perp" ) {
 
 		returnable_string = "#delta_{#perp} ";
-
-	} else if ( Param_Name == "delta_s" ) {
-
-		returnable_string = "#delta_{s}";
 
 	} else if ( Param_Name == "Phi_s" ) {
 
@@ -358,7 +414,7 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 
 	} else if ( Param_Name == "m_Bs" ) {
 
-		returnable_string = "m_{B_s}";
+		returnable_string = "m_{B_{s}}";
 
 	} else if (Param_Name == "sigma_m1" ) {
 
@@ -428,6 +484,82 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 
 		returnable_string = "#tau";
 
+	} else if ( Param_Name == "mistagP1_OS" ) {
+
+		returnable_string = "#omega_{P1}^{OS}";
+
+	} else if ( Param_Name == "mistagDeltaP1_OS" ) {
+
+		returnable_string = "#delta_{P1}^{OS}";
+
+	} else if ( Param_Name == "mistagP0_OS" ) {
+
+		returnable_string = "#omega_{P0}^{OS}";
+
+	} else if ( Param_Name == "mistagDeltaP0_OS" ) {
+
+		returnable_string = "#delta_{P0}^{OS}";
+
+	} else if ( Param_Name == "mistagSetPoint_OS" ) {
+
+		returnable_string = "#bar{#omega}_{#omega^{OS}}";
+
+	} else if ( Param_Name == "mistagDeltaSetPoint_OS" ) {
+
+		returnable_string = "#delta_{#bar{#omega}}^{OS}";
+
+	} else if ( Param_Name == "mistagP1_SS" ) {
+
+		returnable_string = "#omega_{P1}^{SS}";
+
+	} else if ( Param_Name == "mistagDeltaP1_SS" ) {
+
+		returnable_string = "#delta_{P1}^{SS}";
+
+	} else if ( Param_Name == "mistagP0_SS" ) {
+
+		returnable_string = "#omega_{P0}^{SS}";
+
+	} else if ( Param_Name == "mistagDeltaP0_SS" ) {
+
+		returnable_string = "#delta_{P0}^{SS}";
+
+	} else if ( Param_Name == "mistagSetPoint_SS" ) {
+
+		returnable_string = "#bar{#omega}_{#omega^{SS}}";
+
+	} else if ( Param_Name == "mistagDeltaSetPoint_SS" ) {
+
+		returnable_string = "#delta_{#bar{#omega}}^{SS}";
+
+	} else if ( Param_Name == "mistagP1_OSSS" ) {
+
+		returnable_string = "#omega_{P1}^{OS+SS}";
+
+	} else if ( Param_Name == "mistagDeltaP1_OSSS" ) {
+
+		returnable_string = "#delta_{P1}^{OS+SS}";
+
+	} else if ( Param_Name == "mistagP0_OSSS" ) {
+
+		returnable_string = "#omega_{P0}^{OS+SS}";
+
+	} else if ( Param_Name == "mistagDeltaP0_OSSS" ) {
+
+		returnable_string = "#delta_{P0}^{OS+SS}";
+
+	} else if ( Param_Name == "mistagSetPoint_OSSS" ) {
+
+		returnable_string = "#bar{#omega}_{{#omega}^{OS+SS}}";
+
+	} else if ( Param_Name == "mistagDeltaSetPoint_OSSS" ) {
+
+		returnable_string = "#delta_{#bar{#omega}}^{OS+SS}";
+
+	} else if ( Param_Name == "timeResolutionScale" ) {
+
+		returnable_string = "#sigma(#tau)_{scale}^{resolution}";
+
 	} else {
 
 		returnable_string = Param_Name;
@@ -435,7 +567,7 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 
 	if( suffix != -1 )
 	{
-		returnable_string += Get_Suffix( Param_Name_orig );
+		returnable_string.Append( Get_Suffix( Param_Name_orig ) );
 	}
 	return returnable_string;
 }
@@ -515,7 +647,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "delta_s" ) {
 
-		Name.Append("\\delta_s");
+		Name.Append("\\delta_S");
 
 	} else if ( Param_Name == "delta_s990" ) {
 
@@ -695,7 +827,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "lambda" ) {
 
-		Name.Append("\\lambda^2");
+		Name.Append("\\lambda");
 
 	} else if ( Param_Name == "SignalFractionUBU" ) {
 
@@ -823,7 +955,7 @@ TString EdStyle::GetParamLatexName( string Param_Name_orig )
 
 	} else if ( Param_Name == "timeResolutionScale" ) {
 
-		Name.Append("\\delta\\tau_{\\text{res}}^{\\text{scale}}");
+		Name.Append("\\sigma\\left(\\tau\\right)_{\\text{scale}}^{\\text{resolution}}");
 
 	} else if ( Param_Name == "mistagSetPoint" ) {
 

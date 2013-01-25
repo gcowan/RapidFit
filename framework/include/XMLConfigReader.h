@@ -52,10 +52,10 @@ class XMLConfigReader
 		/*!
 		 * @brief Constructor with Input FileName and optional override flags
 		 *
-		 * @Param FileName   This is the name of the input file to parse.
+		 * @param FileName   This is the name of the input file to parse.
 		 *                   This will exit cleanly if none is found
 		 *
-		 * @Param Override   This is a very expert feature of RapidFit
+		 * @param Override   This is a very expert feature of RapidFit
 		 *                   This allows us to construct sequential tests modify some part of the XML file each run
 		 *
 		 */
@@ -66,6 +66,11 @@ class XMLConfigReader
 		 */
 		~XMLConfigReader();
 
+		/*!
+		 * @brief Returns the result of a boolean decision to determine if the XML has passed some basic sanity checks for having a complete configuration
+		 *
+		 * @return True if the file can be used by RapidFit, False if it cannot
+		 */
 		bool IsValid() const;
 
 		/*!
@@ -166,6 +171,7 @@ class XMLConfigReader
 		 * @brief Set the Random Number Generator Seed externally to override any number in the XML
 		 */
 		void SetSeed( unsigned int new_seed );
+
 
 		void SetDebug( DebugClass* input_debug );
 
@@ -295,26 +301,29 @@ class XMLConfigReader
 		 */
 		CompPlotter_config* getCompPlotterConfigs( XMLTag* CompTag );
 
-		PhaseSpaceBoundary* FindCommonPhaseSpace( XMLTag* PhaseTag = NULL );
+		PhaseSpaceBoundary* FindCommonPhaseSpace( XMLTag* PhaseTag = NULL );	/*!	Find the Common PhaseSpace for the whole fit, which is top level under RapidFit	*/
 
-		IPDF* FindCommonPDF( PhaseSpaceBoundary* override );
+		IPDF* FindCommonPDF( PhaseSpaceBoundary* override );	/*!	Find the CommonPDF and construct it (not currently used due to complex issues!)	*/
 
-		XMLTag* FindCommonPDFXML();
+		XMLTag* FindCommonPDFXML();		/*!	Finds the CommonPDF object in the XML file which has to be a top level under RapidFit	*/
 
-		XMLTag* FindCommonPDFConfiguratorXML();
+		XMLTag* FindCommonPDFConfiguratorXML(); /*!	Finds the CommonPDFConfigrator XML object in the file which is top level under RapidFit	*/
 
 		vector< XMLTag* > children;		/*!	All of the Children of the tag wholeFile	*/
 
 		int seed;				/*!	Random Seed	*/
 
-		DebugClass* debug;
+		DebugClass* debug;			/*!	Debug Class for controlling turning debug warnings on/off at runtime	*/
 
-		bool TestXML();
+		bool TestXML();				/*!	Internal method for determininig if an XML is valid on class Construction	*/
 
-		string fileName;
-		vector<XMLTag*> fileTags;
-		bool XMLValid;
+		string fileName;			/*!	Name of the XML File that this was constructed with	*/
+		vector<XMLTag*> fileTags;		/*!	XMLTags extracted from the XML File used as input	*/
+		bool XMLValid;				/*! 	Internal boolean to know if the XML is valid or not	*/
 
+		/*!
+		 * @brief This is an internal function which appends the label of each PDF to have a unique number which makes deciphering which PDF in a large fit exactly threw the error
+		 */
 		void AppendCommonNames( XMLTag* input, unsigned int &subParamNum, unsigned int &appendParamNum, unsigned int &configParamNum );
 };
 

@@ -45,6 +45,8 @@ class ProdPDF : public BasePDF
 
 		virtual void SetUseGSLIntegrator( bool input );
 
+		vector<string> PDFComponents();
+
 		void TurnCachingOff();
 
 		/*!

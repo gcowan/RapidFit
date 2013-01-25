@@ -244,6 +244,7 @@
 			<WidthKey>0:3:3:3:3:3:3:3:3</WidthKey>
 			<CalcChi2>True</CalcChi2>
 			<DrawPull>True</DrawPull>
+			<CalcChi2>True</CalcChi2>
 		</ComponentProjection>
 		<Scan>
 			<Name>Fraction1</Name>

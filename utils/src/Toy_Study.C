@@ -27,7 +27,7 @@
 
 using namespace::std;
 
-void LatexDocHeader( stringstream& latex )
+void ToyStudyAnalysis::LatexDocHeader( stringstream& latex )
 {
 	latex << "\\documentclass[a4paper,10pt]{article}" << endl;
 	latex << "\\usepackage[utf8]{inputenc}" << endl;
@@ -46,21 +46,22 @@ void LatexDocHeader( stringstream& latex )
 	latex << endl;
 	latex << "\\usepackage{amsmath}" << endl;
 	latex << "\\usepackage{caption}" << endl;
-	latex << "\\usepackage{subcaption}" << endl;
 	latex << "\\usepackage{graphicx}" << endl;
+	latex << "\\usepackage{float}" << endl;
+	latex << "\\usepackage{subfig}" << endl;
 	latex << endl;
 	latex << "\\begin{document}" << endl;
 	latex << endl;
 }
 
-void LatexDocFooter( stringstream& latex )
+void ToyStudyAnalysis::LatexDocFooter( stringstream& latex )
 {
 	latex << endl;
 	latex << "\\end{document}" << endl;
 	latex << endl;
 }
 
-void TableHeader( stringstream& latex )
+void ToyStudyAnalysis::TableHeader( stringstream& latex )
 {
 	latex << endl;
 	latex << "\\let\\oldpm\\pm" << endl;
@@ -74,7 +75,7 @@ void TableHeader( stringstream& latex )
 }
 
 
-void TableFooter( stringstream& latex )
+void ToyStudyAnalysis::TableFooter( stringstream& latex )
 {
 	latex << "\\hline" << endl;
 	latex << "\\end{tabular}" << endl;
@@ -86,7 +87,7 @@ void TableFooter( stringstream& latex )
 	latex << endl;
 }
 
-void ImageSplit( stringstream& latex )
+void ToyStudyAnalysis::ImageSplit( stringstream& latex )
 {
 	latex << "\\caption{Some Caption for The Image}" << endl;
 	latex << "\\label{fig:Some_Label}" << endl;
@@ -97,7 +98,7 @@ void ImageSplit( stringstream& latex )
 	latex << "\\ContinuedFloat" << endl;
 }
 
-void ProcessImageContent( stringstream& latex, vector<TString> all_parameter_plots )
+void ToyStudyAnalysis::ProcessImageContent( stringstream& latex, vector<TString> all_parameter_plots )
 {
 	//      3 x each parameter, value, error, pull
 	int num_params = (int)all_parameter_plots.size()/3;
@@ -112,13 +113,11 @@ void ProcessImageContent( stringstream& latex, vector<TString> all_parameter_plo
 		}
 		string param_name = EdStyle::Remove_Suffix( all_parameter_plots[i] ).Data();
 		string latex_name = string(EdStyle::GetParamLatexName( param_name ) );
-		latex << "\\begin{subfigure}[" << latex_name << "]{\\textwidth}" << endl;
-		latex << "{\\includegraphics[width=0.3\\textwidth]{" << param_name << "_error_c_thru.png} }" << endl;
-		latex << "{\\includegraphics[width=0.3\\textwidth]{" << param_name << "_value_c_thru.png} }" << endl;
-		latex << "{\\includegraphics[width=0.3\\textwidth]{" << param_name << "_pull_c_thru.png} }" << endl;
-		latex << "\\caption{some sub-caption " << latex_name << "}" << endl;
-		latex << "\\label{fig:" << param_name << "}" << endl;
-		latex << "\\end{subfigure}" << endl;
+		latex << "\\subfloat[" << latex_name << " error, value and pull ]{" << endl;
+		latex << "\\includegraphics[width=0.3\\textwidth]{" << param_name << "_error_c_thru.png}" << endl;
+		latex << "\\includegraphics[width=0.3\\textwidth]{" << param_name << "_value_c_thru.png}" << endl;
+		latex << "\\includegraphics[width=0.3\\textwidth]{" << param_name << "_pull_c_thru.png}" << endl;
+		latex << "\\label{fig:" << param_name << "}}" << endl;
 		latex << "\\newline" << endl;
 	}
 
@@ -128,7 +127,7 @@ void ProcessImageContent( stringstream& latex, vector<TString> all_parameter_plo
 	latex << endl;
 }
 
-void ProcessTableContent( stringstream& latex, vector<TString> all_parameter_plots, vector<pair<pair<double,double>,pair<double,double> > > table_content )
+void ToyStudyAnalysis::ProcessTableContent( stringstream& latex, vector<TString> all_parameter_plots, vector<pair<pair<double,double>,pair<double,double> > > table_content )
 {
 	//	3 x each parameter, value, error, pull
 	int num_params = (int)all_parameter_plots.size()/3;
@@ -146,6 +145,17 @@ void ProcessTableContent( stringstream& latex, vector<TString> all_parameter_plo
 	}
 }
 
+void ToyStudyAnalysis::Help()
+{
+	cout << endl << "Toy Studies currently accept the extra run time arguments:" << endl << endl;
+	cout << "--allData" << "\t\t" << "This option stops the tool automatically filtering toys which have a parameter with a pull > 5 sigma from being used" << endl;
+	cout << "\t\t\t\t" << "Currently this useful to keep turned on as the toys are post-processed in a binned fasion rather than an un-binned fit" << endl;
+	cout << endl;
+	cout << "--runWithAnyToys" << "\t" << "This option is used to force the tool to run when you have < 100 toys in the input file" << endl;
+	cout << "\t\t\t\t" << "This is known to likely cause problems in poorly behaved studies due to low stats" << endl;
+	cout << endl;
+}
+
 int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<string> OtherOptions )
 {
 	bool noPullCuts=false;
@@ -160,12 +170,33 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		}
 	}
 
+	string runAlways="--runWithAnyToys";
+
+	if( input_tree->GetEntries() < 100 )
+	{
+		cout << "You will likely end up with errors due to the low number of entries in this study" << endl;
+		cout << input_tree->GetEntries() << endl;
+		cout << "If you are serious about continuing then re-run with --runWithAnyToys" << endl;
+		cout << "Try using hadd to merge the contents of smaller studies which are part of a larger run" << endl << endl;
+		cout << "i.e. hadd myStudy.root file1.root file2.root ..." << endl;
+		cout << endl;
+		if( StringOperations::VectorContains( OtherOptions, runAlways ) == -1 )
+		{
+			cout << "Silently continuing without running Toy Study analysis" << endl;
+			return -1;
+		}
+		else
+		{
+			cout << "Performing Toy Study despite having less than 100 toys in the study... good luck" << endl;
+		}
+	}
+
 	gStyle->SetOptStat(0);
 	gStyle->SetOptFit(111);
 
 	TString Output_Dir;
 
-	Output_Dir = "Output" ;
+	Output_Dir = "ToyStudy_Output_"; Output_Dir.Append( StringOperations::TimeString() );
 
 	gSystem->mkdir( Output_Dir );
 
@@ -243,7 +274,7 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		cerr << endl << "More than half of your data is biased by > 5 sigma, check you understand what is going on!" << endl << endl;
 	}
 
-		//	90% Cut test			   &&		50% 'Turn Off Cut' test
+	//	90% Cut test			   &&		50% 'Turn Off Cut' test
 	if( ((double)usable_rows)<=(0.9*(double)total_rows)&&((double)usable_rows)>(0.5*(double)total_rows)  )
 	{
 		cerr << "More than 10\% of data has been removed by the cut 'All pulls <=5'. To replot with all data use the option --allData" << endl << endl;
@@ -346,6 +377,16 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 	outFile.open( Output_Dir+"/ToyStudy_LaTeX.tex" );
 	outFile << latex.str();
 	outFile.close();
+
+	cout << "Compiling Latex Summary..." << endl;
+
+	gSystem->cd( Output_Dir );
+
+	TString command="pdflatex -interaction=batchmode ToyStudy_LaTeX.tex > /dev/null";
+	//cout << command << endl;
+	system( command );
+
+	gSystem->cd("..");
 
 	return 0;
 }

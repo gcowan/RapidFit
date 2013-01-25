@@ -385,6 +385,19 @@ int StringOperations::VectorContains( vector<TString> const& InputVector, TStrin
 	return VectorContains( &(temp_vec), &temp_str );
 }
 
+int StringOperations::VectorContains( const vector<string>& InputVector, const string& SearchString )
+{
+	if( InputVector.empty() ) return -1;
+	vector<string>::const_iterator begin = InputVector.begin();
+	vector<string>::const_iterator ending = InputVector.end();
+	vector<string>::const_iterator result = find( begin, ending, SearchString);
+	int position=int( result - InputVector.begin() );
+	if( position < (int) InputVector.size() ) return position;
+
+	//If you've got this far, it wasn't found
+	return -1;
+}
+
 //Return the position of a search string within a vector of strings, or -1 if not found
 int StringOperations::VectorContains( vector<string> const* InputVector, string const* SearchString )
 {
@@ -523,34 +536,34 @@ TString StringOperations::Clean( TString input )
 
 string StringOperations::TimeString()
 {
-        time_t rawtime;
-        struct tm * timeinfo;
+	time_t rawtime;
+	struct tm * timeinfo;
 
-        time ( &rawtime );
-        timeinfo = localtime ( &rawtime );
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
 	int sec = timeinfo->tm_sec;
-        int min = timeinfo->tm_min;
-        int hr = timeinfo->tm_hour;
-        int day = timeinfo->tm_mday;
-        int month = 1+timeinfo->tm_mon;
-        int year = 1900+timeinfo->tm_year;
+	int min = timeinfo->tm_min;
+	int hr = timeinfo->tm_hour;
+	int day = timeinfo->tm_mday;
+	int month = 1+timeinfo->tm_mon;
+	int year = 1900+timeinfo->tm_year;
 
-        stringstream time_stream;
-        time_stream << year;
-        if( month < 10 ) time_stream << "0";
-        time_stream << month;
-        if( day < 10 ) time_stream << "0";
-        time_stream << day << "_";
-        if( hr < 10 ) time_stream << "0";
-        time_stream << hr;
-        if( min < 10 ) time_stream << "0";
-        time_stream << min;
+	stringstream time_stream;
+	time_stream << year;
+	if( month < 10 ) time_stream << "0";
+	time_stream << month;
+	if( day < 10 ) time_stream << "0";
+	time_stream << day << "_";
+	if( hr < 10 ) time_stream << "0";
+	time_stream << hr;
+	if( min < 10 ) time_stream << "0";
+	time_stream << min;
 	if( sec < 10 ) time_stream << "0";
 	time_stream << sec;
 
-        string returnable_time = time_stream.str();
+	string returnable_time = time_stream.str();
 
-        return returnable_time;
+	return returnable_time;
 }
 
 

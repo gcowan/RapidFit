@@ -110,7 +110,7 @@ endif
 
 
 #	Default build command when someone asks for 'make'
-all : $(EXEDIR)/fitting utils
+all : $(EXEDIR)/fitting utils lib
 
 $(OBJDALITZDIR)/%.o : $(SRCDALITZDIR)/%.$(SRCDALITZEXT) $(INCDALITZDIR)/%.$(HDRDALITZEXT)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

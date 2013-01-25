@@ -64,32 +64,38 @@ namespace Mathematics
 
 	double Exp( double t, double gamma, double resolution );
 	double Exp_Wrapper( vector<double> input );
+
 	double ExpInt( double tlow, double thigh, double gamma, double resolution  );
 	double ExpInt_Wrapper( vector<double> input );
 
-	//Added thes to include an upper time acceptance of form ( 1 - beta*t)
+	//Added these to include an upper time acceptance of form ( 1 - beta*t)
 	double Exp_betaAcceptance( double t, double gamma, double resolution, double betaParameter );
 	double Exp_betaAcceptance_Wrapper( vector<double> input );
+
 	double ExpInt_betaAcceptance( double tlow, double thigh, double gamma, double resolution, double betaParameter );
 	double ExpInt_betaAcceptance_Wrapper( vector<double> input );
 
 	double ExpCosh( double t, double gamma, double deltaGamma, double resolution );
 	double ExpCosh_Wrapper( vector<double> input );
+
 	double ExpCoshInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 	double ExpCoshInt_Wrapper( vector<double> input );
 
 	double ExpSinh( double t, double gamma, double deltaGamma, double resolution );
 	double ExpSinh_Wrapper( vector<double> input );
+
 	double ExpSinhInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 	double ExpSinhInt_Wrapper( vector<double> input );
 
 	double ExpCos( double t, double gamma, double deltaM, double resolution );
 	double ExpCos_Wrapper( vector<double> input );
+
 	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 	double ExpCosInt_Wrapper( vector<double> input );
 
 	double ExpSin( double t, double gamma, double deltaM, double resolution );
 	double ExpSin_Wrapper( vector<double> input );
+
 	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 	double ExpSinInt_Wrapper( vector<double> input );
 
@@ -101,6 +107,7 @@ namespace Mathematics
 
 	vector<double> calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
 	void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF );
+
 }
 
 #endif

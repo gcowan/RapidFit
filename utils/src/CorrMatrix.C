@@ -1,4 +1,5 @@
 
+#include "TROOT.h"
 #include "TTree.h"
 #include "TH1.h"
 #include "TMatrixDSym.h"
@@ -6,6 +7,7 @@
 #include "TStyle.h"
 #include "TSystem.h"
 
+#include "StringOperations.h"
 #include "Histo_Processing.h"
 #include "CorrMatrix.h"
 
@@ -18,14 +20,37 @@
 
 using namespace::std;
 
-void CorrMatrix::Analyse( const vector<TTree*> corr_trees )
+void CorrMatrix::Help()
+{
+	cout << endl;
+	cout << "Correlation Matricies are post-processed from a RapidFit file ONLY when requested." << endl;
+	cout << "To request for Correlation Matricies to be plotted you should pass the runtime option of:" << endl;
+	cout << endl << "--CorrMatrix" << "\t\t" << "This allows the Correlation Matrix code to be run over the file and the output to be post-processed and plotted" << endl;
+	cout << endl;
+}
+
+void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> other_params )
 {
 	cout << "Processing Correlation Matricies" << endl;
-	gSystem->mkdir( "MatrixPlots" );
+	if( gDirectory->GetDirectory( "MatrixPlots" ) == 0 ) gSystem->mkdir( "MatrixPlots" );
 	gSystem->cd( "MatrixPlots" );
+
 	gStyle->SetPalette(1);
-	gStyle->SetPadRightMargin( (Float_t)0.15 );
+	if( StringOperations::VectorContains( other_params, "--noLegend" ) == -1 )
+	{
+		gStyle->SetPadRightMargin( (Float_t)0.2375 );
+	}
+	else
+	{
+		gStyle->SetPadRightMargin( (Float_t)0.15 );
+	}
 	gStyle->SetOptStat(0);
+	Double_t lhcbTSize = 0.06;
+	//gStyle->SetTitleSize( (Float_t)0.8*(Float_t)lhcbTSize, "xyz" );
+
+	gROOT->UseCurrentStyle();
+	gROOT->ForceStyle( true );
+
 	vector<double>* thisMatrix = new vector<double>();
 	vector<string>* thisNames = new vector<string>();
 
@@ -70,33 +95,72 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees )
 				TCanvas* c1 = new TCanvas( Name, Name, 1680, 1050 );
 				newMatrix->Draw("colz");
 				c1->Update();
-				TH1* matrixPlot = (TH1*) c1->GetPrimitive("TMatrixDBase");
+				TH1* matrixPlot = (TH1*) c1->GetPrimitive("TMatrixDBase")->Clone("newMatrixPlot");
 				matrixPlot->SetTitle("Correlation Matrix");
 				c1->SetTitle("Correlation Matrix");
-				for( unsigned int k=0; k< thisNames->size(); ++k )
+
+				if( StringOperations::VectorContains( other_params, "--noLegend" ) != -1 )
 				{
-					matrixPlot->GetXaxis()->SetBinLabel( k+1, (*thisNames)[k].c_str() );
-					matrixPlot->GetYaxis()->SetBinLabel( k+1, (*thisNames)[k].c_str() );
+					for( unsigned int k=0; k< thisNames->size(); ++k )
+					{
+						matrixPlot->GetXaxis()->SetBinLabel( k+1, EdStyle::GetParamRootName( TString((*thisNames)[k].c_str()) ) );
+						matrixPlot->GetYaxis()->SetBinLabel( k+1, EdStyle::GetParamRootName( TString((*thisNames)[k].c_str()) ) );
+					}
 				}
-				matrixPlot->GetZaxis()->SetRangeUser( 0., 1. );
+				else
+				{
+					TLegend* thisLegend = new TLegend( 0.875, 0., 1., 1. );
+					thisLegend->SetFillColor( kWhite );
+					thisLegend->SetFillStyle( 3001 );
+					for( unsigned int k=0; k< thisNames->size(); ++k )
+					{
+						TString num; num+=k;
+						matrixPlot->GetXaxis()->SetBinLabel( k+1, num );
+						matrixPlot->GetYaxis()->SetBinLabel( k+1, num );
+
+						TString thisEntry = num;
+						thisEntry.Append(" "); thisEntry.Append( EdStyle::GetParamRootName( TString((*thisNames)[k].c_str()) ) );
+						thisLegend->AddEntry((TObject*)0, thisEntry, "");
+					}
+					thisLegend->Draw("SAME");
+				}
+
+				if( StringOperations::VectorContains( other_params, "--noLegend" ) != -1 )
+				{
+					matrixPlot->GetXaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
+					matrixPlot->GetYaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
+				}
+				else
+				{
+					matrixPlot->GetXaxis()->SetLabelSize( (Float_t)0.8*(Float_t)lhcbTSize );
+					matrixPlot->GetYaxis()->SetLabelSize( (Float_t)0.8*(Float_t)lhcbTSize );
+				}
+				matrixPlot->LabelsOption("v");
+				matrixPlot->GetZaxis()->SetRangeUser( -1., 1. );
+				matrixPlot->Draw("colz");
 				c1->Update();
 				Histogram_Processing::Silent_Print( c1 , Name+".pdf" );
+				Histogram_Processing::Silent_Print( c1 , Name+".C" );
 			}
 		}
 		cout << endl;
 	}
+
 	unsigned int dim = allData[0].size();
 	vector<vector<TH1*> > allHistos;
-	for( unsigned int i=0; i< dim; ++i )
+	if( corr_trees[0]->GetEntries() > 5 )
 	{
-		for( unsigned int j=0; i< dim; ++j )
+		for( unsigned int i=0; i< dim; ++i )
 		{
-			vector<double> thisElement;
-			for( unsigned int k=0; k< allData.size(); ++k )
+			for( unsigned int j=0; i< dim; ++j )
 			{
-				thisElement.push_back( allData[k][i][j] );
+				vector<double> thisElement;
+				for( unsigned int k=0; k< allData.size(); ++k )
+				{
+					thisElement.push_back( allData[k][i][j] );
+				}
+				TH1* thisHisto = Histogram_Processing::Get_TH1( thisElement );
 			}
-			TH1* thisHisto = Histogram_Processing::Get_TH1( thisElement );
 		}
 	}
 	gStyle->SetPadRightMargin( (Float_t)0.08 );

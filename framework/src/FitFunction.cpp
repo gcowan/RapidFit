@@ -343,7 +343,7 @@ double FitFunction::Evaluate()
 	}
 
 
-	cout << "Call: " << left << setw(5) << callNum << " NLL: " << setprecision(10) << minimiseValue << setw(10) << " " <<  "\r" << flush;
+	cout << "Call: " << left << setw(5) << callNum << " NLL: " << setprecision(10) << minimiseValue << setw(20) << " " <<  "\r" << flush;
 
 	if( isnan(minimiseValue) )
 	{

@@ -19,13 +19,15 @@ using namespace::std;
 
 //Constructor with only name of FitFunction
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) :
-	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), gslIntegrator(false)
+	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0),
+	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), gslIntegrator(false), SingleNormaliseWeights(false), alphaName("undefined"), hasAlpha(false)
 {
 }
 
 //Constructor for FitFunction with event weights
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) :
-	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0), Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), gslIntegrator(false)
+	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0),
+	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), gslIntegrator(false), SingleNormaliseWeights(false), alphaName("undefined"), hasAlpha(false)
 {
 }
 
@@ -40,7 +42,7 @@ FitFunction * FitFunctionConfiguration::GetFitFunction()
 	FitFunction * theFunction = ClassLookUp::LookUpFitFunctionName(functionName);
 
 	//Use event weights if specified
-	if (hasWeight)
+	if( hasWeight )
 	{
 		theFunction->UseEventWeights(weightName);
 	}
@@ -66,15 +68,31 @@ void FitFunctionConfiguration::SetGSLIntegrator( bool gsl )
 }
 
 //Return whether weights are being used
-bool FitFunctionConfiguration::GetWeightsWereUsed()
+bool FitFunctionConfiguration::GetWeightsWereUsed() const
 {
 	return hasWeight;
 }
 
 //Return weight name
-string FitFunctionConfiguration::GetWeightName()
+string FitFunctionConfiguration::GetWeightName() const
 {
 	return weightName;
+}
+
+bool FitFunctionConfiguration::GetUseCustomAlpha() const
+{
+	return hasAlpha;
+}
+
+string FitFunctionConfiguration::GetAlphaName() const
+{
+	return alphaName;
+}
+
+void FitFunctionConfiguration::SetAlphaName( const string input )
+{
+	hasAlpha=true;
+	alphaName = input;
 }
 
 void FitFunctionConfiguration::SetupTrace( TString FileName )
@@ -88,7 +106,7 @@ void FitFunctionConfiguration::SetStrategy( string newStrategy )
 	Strategy = newStrategy;
 }
 
-string FitFunctionConfiguration::GetStrategy()
+string FitFunctionConfiguration::GetStrategy() const
 {
 	return Strategy;
 }

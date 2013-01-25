@@ -19,12 +19,12 @@
 using namespace::std;
 
 //Default constructor w Override tags
-XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden(Override_Tags), parent_append()
+XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden(Override_Tags)
 {
 }
 
 //Constructor with correct arguments
-XMLTag::XMLTag( string TagName, vector<string> TagContent, XMLTag* Parent ) : children(), value(), name(TagName), parent(Parent), path(Parent->GetPath()), forbidden(Parent->GetForbidden()), parent_append()
+XMLTag::XMLTag( string TagName, vector<string> TagContent, XMLTag* Parent ) : children(), value(), name(TagName), parent(Parent), path(Parent->GetPath()), forbidden(Parent->GetForbidden())
 {
 	path.Append( "/" + name );
 	//Find the child tags

@@ -62,9 +62,19 @@ using namespace::std;
   return 0;
   }*/
 
+void RapidLL::Help()
+{
+	cout << endl << "RapidLL which plots the LL scans accepts the following additional Runtime Arguments" << endl;
+	cout << endl;
+	cout << "--isFinal" << "\t\t" << "This replaces the LHCb Preliminary text box with just an LHCb Stamp on plots" << endl;
+	cout << endl;
+}
+
 TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, TRandom3* rand_gen, vector<string> other_params )
 {
-	(void) other_params;
+	bool isFinal=false;
+	string isFinalString="--isFinal";
+	isFinal = StringOperations::VectorContains( other_params, isFinalString ) != -1;
 
 	TString param_string = controlled_parameter;
 	TString param_val = param_string+value_suffix;
@@ -138,7 +148,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	drawn_histo->Draw( "AC*" );
 	new_canvas->Update();
-	TPaveText* text_1 = Histogram_Processing::addLHCbLabel("",true);
+	TPaveText* text_1 = Histogram_Processing::addLHCbLabel("",isFinal);
 	text_1->SetFillStyle(0);
 	text_1->Draw("SAME");
 
@@ -341,10 +351,10 @@ void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 
 
 	TCanvas* newOverlay2 = new TCanvas( "OverlayCanvas2", "OverlayCanvas2", 1680, 1050 );
-	
+
 	GraphsToOverlay->Draw("A");
 	newOverlay2->Update();
-	
+
 	GraphsToOverlay->Draw("C");
 	thisLegend->Draw();
 	newOverlay2->Update();
@@ -355,7 +365,7 @@ void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 	Name.Append("_");Name.Append(timeStamp);
 	newOverlay2->Print(Name+".pdf");
 	newOverlay2->Print(Name+".C");
-	
+
 	return;
 }
 

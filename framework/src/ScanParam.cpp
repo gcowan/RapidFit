@@ -17,9 +17,9 @@
 
 using namespace::std;
 
-ScanParam::ScanParam() : name(), minimum(), maximum(), sigma(), points()
+/*ScanParam::ScanParam() : name(), minimum(), maximum(), sigma(), points()
 {
-}
+}*/
 
 ScanParam::ScanParam( vector<string> nName, vector<double> nMinimum, vector<double> nMaximum, vector<int> nSigma, vector<int> nPoints) :
 	name(nName), minimum(nMinimum), maximum(nMaximum), sigma(nSigma), points(nPoints)

@@ -667,6 +667,6 @@ PhaseSpaceBoundary* DataSetConfiguration::GetPhaseSpace() const
 
 int DataSetConfiguration::GetDataSetSize() const
 {
-	return numberEvents;
+	return (int)numberEvents;
 }
 

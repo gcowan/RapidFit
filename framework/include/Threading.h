@@ -16,23 +16,18 @@
 //	This object is useful as multiple bits of information need to be provided to the running thread
 struct Fitting_Thread{
 	explicit Fitting_Thread() :
-		dataSubSet(), fittingPDF(NULL), useWeights(false), weightName("no-weight"), dataPoint_Result(), FitBoundary(NULL),
+		dataSubSet(), fittingPDF(NULL), useWeights(false), dataPoint_Result(), FitBoundary(NULL),
 		stored_integral(0.), weightsSquared(false)
 	{}
-	//~Fitting_Thread()
-	//{
-	//	if( FitBoundary != NULL ) delete FitBoundary;
-	//	if( ResultIntegrator != NULL ) delete ResultIntegrator;
-	//	if( fittingPDF != NULL ) delete fittingPDF;
-	//}
-	vector<DataPoint*> dataSubSet;
-	IPDF* fittingPDF;
-	bool useWeights;
-	ObservableRef weightName;
-	vector<double> dataPoint_Result;
-	PhaseSpaceBoundary* FitBoundary;
-	double stored_integral;
-	bool weightsSquared;
+
+	vector<DataPoint*> dataSubSet;		/*!	DataPoints to be evaluated by this thread		*/
+	IPDF* fittingPDF;			/*!	Pointer to the PDF instance to be used by this thread	*/
+	bool useWeights;			/*!	Are we performing a weighted fit?			*/
+	vector<double> dataPoint_Result;	/*!	Result for evaluating each datapoint			*/
+	PhaseSpaceBoundary* FitBoundary;	/*!	PhaseSpaceBoundary containing all data			*/
+	double stored_integral;			/*!	Stored Integral for Numerical Integral fits		*/
+	bool weightsSquared;			/*!	Are we using Weight Squared?				*/
+
 	private:
 		Fitting_Thread(const Fitting_Thread&);
 		Fitting_Thread& operator=(const Fitting_Thread&);
@@ -47,8 +42,11 @@ class Threading
 		//	Split the data into subset(s) with a safe default
 		static vector<vector<DataPoint*> > divideData( IDataSet*, int=1 );
 
+		//	Function to divide the data values used in the threaded GSL Norm function
 		static vector<vector<double*> > divideDataNormalise( vector<double*> input, int subsets=1 );
+
 	private:
+		//	Cannot Construct this class, it's simply a collection of static methods
 		Threading();
 };
 

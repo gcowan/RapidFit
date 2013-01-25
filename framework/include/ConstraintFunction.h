@@ -28,6 +28,9 @@ class ConstraintFunction
 		 */
 		ConstraintFunction( const vector<ExternalConstraint*> Input );
 
+		/*!
+		 * @brief Copy Constructor
+		 */
 		ConstraintFunction( const ConstraintFunction& );
 
 		/*!
@@ -58,8 +61,15 @@ class ConstraintFunction
 		 */
 		string XML() const;
 
+		/*!
+		 * @brief
+		 *
+		 * @return
+		 */
 		vector<string> ConstrainedParameter() const;
+
 	private:
+
 		/*!
 		 * Don't Copy the class this way!
 		 */

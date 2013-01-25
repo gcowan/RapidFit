@@ -214,11 +214,22 @@ class ParameterSet
 		 */
 		string XML() const;
 
+		/*!
+		 * @brief 
+		 *
+		 * @return
+		 */
 		size_t GetUniqueID() const;
 
+		/*!
+		 * @brief
+		 *
+		 * @return void
+		 */
 		void FloatedFirst();
 
 	private:
+
 		void SetUniqueID( size_t );
 
 		mutable vector<PhysicsParameter*> allParameters;	/*!	vector of pointers to all of the Physics Parameters managed by this ParameterSet			*/

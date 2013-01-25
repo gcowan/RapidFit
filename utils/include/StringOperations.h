@@ -64,6 +64,7 @@ class StringOperations
 		static vector<string> CombineUniques( vector<string>, vector<string> );
 		static int VectorContains( vector<TString> const&, TString const& );
 		static int VectorContains( vector<string> const*, string const* );
+		static int VectorContains( const vector<string>& inputVec, const string& inputStr );
 		static TString CondenseStrings( vector<string>, int, int );
 
 		//	Filter the vector TStrings and return a sublist which contains the second argument

@@ -121,6 +121,10 @@ class IDataSet
 
 		virtual void ApplyAlpha( const double, const double ) = 0;
 
+		virtual double GetAlpha() const =0;
+
+		virtual void ApplyExternalAlpha( const string alphaName ) = 0;
+
 		virtual void NormaliseWeights() = 0;
 
 	private:

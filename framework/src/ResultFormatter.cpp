@@ -376,7 +376,9 @@ void ResultFormatter::WriteOutputLatex( FitResult* OutputData )
 
 	gSystem->cd( output_folder );
 
-	system("pdflatex main.tex >/dev/null");
+	cout << "Compiling LaTeX output..." << endl;
+
+	system("pdflatex -interaction=batchmode main.tex >/dev/null");
 
 	gSystem->cd( ".." );
 }

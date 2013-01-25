@@ -28,7 +28,8 @@ class Rapid2DLL
 
 		static void Plot_Free_Parameters( TTree* input_tree, TString controlled_parameter1, TString controlled_parameter2, TRandom3* rand );
 
-		static void Plot_Contours( TTree* input_tree, TString controlled_parameter1, TString controlled_parameter2, TH1* nll_hist, vector<pair<TMultiGraph*,TString> > nll_contours, TString filename, TRandom* rand );
+		static void Plot_Contours( TTree* input_tree, TString controlled_parameter1, TString controlled_parameter2, TH1* nll_hist,
+				vector<pair<TMultiGraph*,TString> > nll_contours, TString filename, TRandom* rand, vector<string> other_options );
 
 	private:
 

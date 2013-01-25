@@ -22,7 +22,6 @@ class LandauGauss : public BasePDF
 		ObservableRef landauSigmaName;
 		ObservableRef gaussSigmaName;
 		ObservableRef mpvName;
-		ObservableRef CName;
 		//	Internal object(s)
 };
 

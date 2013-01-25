@@ -50,7 +50,7 @@ class XMLTag
 		 *
 		 * @return          A vector of all children tags within Content (empty if none found)
 		 */
-		vector< XMLTag* > FindTagsInContent( const vector<string> Content, vector<string>& Value );
+		vector<XMLTag*> FindTagsInContent( const vector<string> Content, vector<string>& Value );
 
 		/*!
 		 * @brief Get the path of this XML tag relative to the top level of the XML File
@@ -59,11 +59,24 @@ class XMLTag
 		 */
 		string GetPath() const;
 
+		/*!
+		 * @brief Modify the Internal path of this XMLTag with a string in front of the tag name
+		 *
+		 * @input String that is to be pre-pended to the internal path
+		 */
 		void PrePendPath( const string input );
+
+		/*!
+		 * @brief Modify the Internal path of this XMLTag with a string after the name of this tag
+		 *
+		 * @input String that is to be appended to the internal path
+		 */
 		void AppendPath( const string input );
 
 		/*!
 		 * @brief Return the Name of this Tag
+		 *
+		 * @return returns the name of this XMLTag as a string
 		 */
 		string GetName() const;
 
@@ -81,16 +94,48 @@ class XMLTag
 		 */
 		vector< XMLTag* > GetChildren() const;
 
+		/*!
+		 * @brief Remove a chosen child from an XMLTag
+		 *
+		 * @param num This is the number of the XMLTag to be removed from this tag
+		 *
+		 * @return void
+		 */
 		void RemoveChild( int num );
 
+		/*!
+		 * @brief This method will evaluate the first string content as a boolean and return a c++ bool
+		 *
+		 * @brief boolean calculated from case insensitive check for the string true in a string
+		 */
 		static bool GetBooleanValue( const XMLTag* input );
 
+		/*!
+		 * @brief This method will evaluate the first string content as an integer value and return a c++ integer
+		 *
+		 * @return a signed integer based on the first string content in XMLTag
+		 */
 		static int GetIntegerValue( const XMLTag* input );
 
+		/*!
+		 * @brief This method will return the first string content of this XMLTag as the value of this XMLTag
+		 *
+		 * @return a string which is the first string in the XMLTag
+		 */
 		static string GetStringValue( const XMLTag* input );
 
+		/*!
+		 * @brief This method will evaluate the first string content as a double value and return a c++ double
+		 *
+		 * @return a double based on the first string content in XMLTag
+		 */
 		static double GetDoubleValue( const XMLTag* input );
 
+		/*!
+		 * @brief This method will evaluate the first string content as a TF1 expression value and return a c++ double
+		 *
+		 * @return a double based on the first string content in the XMLTag evaluated as a TF1
+		 */
 		static double GetTF1Eval( const XMLTag* input );
 
 	private:
@@ -119,6 +164,9 @@ class XMLTag
 		 */
 		void FindTagCloses( string, vector<string>, vector<int>&, vector<int>& );
 
+		/*!
+		 * @brief Internal method to trigger the re-generation of the path inside this XMLTag
+		 */
 		void RegeneratePath();
 
 		/*!
@@ -137,7 +185,6 @@ class XMLTag
 		mutable vector<string> value;			/*!	Value of this XML Tag			*/
 		string name;					/*!	Name of this XML Tag			*/
 		XMLTag* parent;					/*!	Address of the parent of this tag	*/
-		TString parent_append;
 		mutable TString path;				/*!	Path of this XML Tag			*/
 		vector<pair<string, string> >* forbidden;	/*!	override xml path and values		*/
 

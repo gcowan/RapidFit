@@ -38,31 +38,41 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 
+}
+
+vector<string> SumPDF::PDFComponents()
+{
+	vector<string> firstpdf_components;
+	for( unsigned int i=0; i< firstPDF->PDFComponents().size(); ++i )
+	{
+		firstpdf_components.push_back( string( firstPDF->PDFComponents()[i] ) );
+	}
+	vector<string> secondpdf_components;
+	for( unsigned int j=0; j< secondPDF->PDFComponents().size(); ++j )
+	{
+		secondpdf_components.push_back( string( secondPDF->PDFComponents()[j] ) );
+	}
+
+	string zero="0";
+
+	if( firstPDF->GetName() != "NormalisedSum" || firstPDF->GetName() != "Sum" )
+	{
+		if( StringProcessing::VectorContains( &firstpdf_components, &zero ) == -1 ) firstpdf_components.push_back( "0" );
+	}
+	if( secondPDF->GetName() != "NormalisedSum" || secondPDF->GetName() != "Sum" )
+	{
+		if( StringProcessing::VectorContains( &secondpdf_components, &zero ) == -1 ) secondpdf_components.push_back( "0" );
+	}
+
+	firstpdf_components = StringProcessing::MoveElementToStart( firstpdf_components, "0" );
+	secondpdf_components = StringProcessing::MoveElementToStart( secondpdf_components, "0" );
+
 	//      All components are:
 	//                              0       :       total of the whole NormalisedSumPDF
 	//                              1xx     :       all of the components in the first PDF
 	//                              2yy     :       all of the components in the second PDF
 
-	vector<string> firstpdf_components = vector<string>(firstPDF->PDFComponents());
-	vector<string> secondpdf_components = vector<string>(secondPDF->PDFComponents());
-
-	string zero("0");
-	if( StringProcessing::VectorContains( &firstpdf_components, &zero ) == -1 ) firstpdf_components.push_back("0");
-	if( StringProcessing::VectorContains( &secondpdf_components, &zero ) == -1 ) secondpdf_components.push_back("0");
-
-	firstpdf_components = StringProcessing::MoveElementToStart( firstpdf_components, "0" );
-	secondpdf_components = StringProcessing::MoveElementToStart( secondpdf_components, "0" );
-
-	//unsigned int start_1 = 0, start_2 = 0;
-
-	//if( firstPDF->GetName() == "Prod" )//&& firstpdf_components.size() != 1 )
-	//{
-	//	start_1 = 1;
-	//}
-	//if( secondPDF->GetName() == "Prod" )//&& secondpdf_components.size() != 1 )
-	//{
-	//	start_2 = 1;
-	//}
+	component_list.clear();
 
 	for( unsigned int i=0; i< firstpdf_components.size(); ++i )
 	{
@@ -70,9 +80,12 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 	}
 	for( unsigned int j=0; j< secondpdf_components.size(); ++j )
 	{
-		component_list.push_back( StringProcessing::AddNumberToLeft( firstpdf_components[j], 2 ) );
+		component_list.push_back( StringProcessing::AddNumberToLeft( secondpdf_components[j], 2 ) );
 	}
+
 	component_list = StringProcessing::MoveElementToStart( component_list, "0" );
+
+	return component_list;
 }
 
 void SumPDF::SetUseGSLIntegrator( bool input )

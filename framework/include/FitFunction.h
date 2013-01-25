@@ -210,8 +210,6 @@ class FitFunction
 		double step_time;
 
 		unsigned int callNum;
-
-		mutable vector<string> GlobalDoNotIntegrate;
 };
 
 #endif

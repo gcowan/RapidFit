@@ -117,7 +117,9 @@ void VectoredFeldmanCousins::InitializePhysicsParameters( ParameterSet* inputPar
 		temp_freeParam->GetPhysicsParameter( *fixed_param_i )->SetType( "Free" );//Just to be explicit, even though this is expected to not be needed
 	}
 
+	if( ParameterSetWithFreeParameters != NULL ) delete ParameterSetWithFreeParameters;
 	ParameterSetWithFreeParameters = temp_freeParam;
+	if( ParameterSetWithFixedParameters != NULL ) delete ParameterSetWithFixedParameters;
 	ParameterSetWithFixedParameters = temp_fixedParam;
 }
 

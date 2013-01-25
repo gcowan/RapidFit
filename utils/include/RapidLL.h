@@ -15,6 +15,7 @@ using namespace::std;
 class RapidLL
 {
 	public:
+		static void Help();
 
 		static TGraph* PlotRapidLL( TString controlled_parameter, TTree* input_trees, TRandom3* rand_gen, vector<string> other_params );
 

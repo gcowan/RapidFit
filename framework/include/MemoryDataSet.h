@@ -50,6 +50,9 @@ class MemoryDataSet : public IDataSet
 		double GetSumWeights() const;
 		double GetSumWeightsSq() const;
 		void ApplyAlpha( const double, const double );
+		double GetAlpha() const;
+
+		void ApplyExternalAlpha( const string alphaName );
 
 		void NormaliseWeights();
 
@@ -64,6 +67,8 @@ class MemoryDataSet : public IDataSet
 
 		bool useWeights;
 		string WeightName;
+		double alpha;
+		string alphaName;
 };
 
 bool compare_datapoints ( pair<DataPoint,ObservableRef> first, pair<DataPoint,ObservableRef> second );

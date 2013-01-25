@@ -174,7 +174,7 @@ class Histogram_Processing
 		static void Silent_Print( TCanvas* c1, TString Print_String, int OutputLevel=-1 );
 
 		//	Addds the LHCb text to a plot
-		static TPaveText* addLHCbLabel(TString footer, bool DATA=true);
+		static TPaveText* addLHCbLabel(TString footer, bool final=false );
 
 		//	Plot a vector to a 1D file and return a pointer to the histogram created when this was done
 		static TH1* Plot_1D( const vector<double>& input, TString Filename, TString Options, TRandom* rand=NULL );

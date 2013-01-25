@@ -276,6 +276,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 		storeExpCos.push_back( empty ) ;
 	}
 
+	cout << "here" << endl;
 
 	this->TurnCachingOff();
 
@@ -991,7 +992,10 @@ vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 	if( _usePlotComponents ) {
 		this_component_list.push_back( "CP-Even" );
 		this_component_list.push_back( "CP-Odd" );
-		this_component_list.push_back( "As" );
+		if( allParameters.GetPhysicsParameter(As_sqName)->GetValue() > 1E-10 )
+		{
+			this_component_list.push_back( "As" );
+		}
 		this_component_list.push_back( "0" );
 	}
 	return this_component_list;

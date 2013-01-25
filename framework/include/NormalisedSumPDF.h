@@ -29,6 +29,8 @@ class NormalisedSumPDF : public BasePDF
 		NormalisedSumPDF( const NormalisedSumPDF& );
 		~NormalisedSumPDF();
 
+		vector<string> PDFComponents();
+
 		void TurnCachingOff();
 
 		virtual void SetUseGSLIntegrator( bool input );

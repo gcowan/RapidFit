@@ -81,8 +81,34 @@ void usage()
 	cout << "\t" << "RapidPlot" << "\tSomeFile.root" << "\tSomeFile2.root\t..." << endl;
 	cout << endl << "\teg:\t" << "RapidPlot" << "\tFile1.root\tFile2.root"<<endl;
 	cout << endl;
+	cout << "Any options passed starting with the '-' option are treated as runtime arguments not filenames.... sorry I don't like files starting with '-' but can't you think of a nicer filename?" << endl;
+	cout << endl;
+	cout << "For more optional commands and advanced usage try running with --help" << endl;
+	cout << endl;
 	return;
 };
+
+void helpFunction()
+{
+	cout << endl;
+	cout << "Welcome to RapidPlot :)" << endl << endl;
+	cout << "RapidPlot has been designed to perform post-processing of data from the RapidFit fitter." << endl;
+	cout << endl << "RapidPlot currently knows how to handle:" << endl;
+	cout << endl;
+	cout << "Toy Studies" << endl;
+	cout << "1DLL scans" << endl;
+	cout << "2DLL scans" << endl;
+	cout << "FC scans" << endl;
+	cout << "Plotting of Correlation Matricies" << endl;
+	cout << endl;
+	cout << "Each of these has additional command line options which alter there behaviour" << endl;
+	cout << "The additional Commands are:" << endl;
+	ToyStudyAnalysis::Help();
+	RapidLL::Help();
+	//Rapid2DLL::Help();				Not yet Implemented
+	//FeldmanCousinsAnalysis::Help();		Not yet Implemented
+	CorrMatrix::Help();
+}
 
 int main( int argc, char* argv[] )
 {
@@ -113,6 +139,14 @@ int main( int argc, char* argv[] )
 		else	input_filenames.push_back( argv[i] );
 	}
 
+	string helpOption="--help";
+	string helpOption2="-help";
+	if( StringOperations::VectorContains( &other_params, &helpOption ) != -1 || StringOperations::VectorContains( &other_params, &helpOption2 ) != -1 )
+	{
+		helpFunction();
+		exit(0);
+	}
+
 	vector<TTree*> input_trees = ROOT_File_Processing::GetMultipleTrees( input_filenames, RapidFitOutputTupleName );
 
 	string CorrMatrixName="corr_matrix";
@@ -125,7 +159,7 @@ int main( int argc, char* argv[] )
 		string CorrMatrix = "--CorrMatrix";
 		if( StringOperations::VectorContains( &argv_str , &CorrMatrix ) != -1 )
 		{
-			CorrMatrix::Analyse( corr_trees );
+			CorrMatrix::Analyse( corr_trees, other_params );
 		}
 	}
 
@@ -221,18 +255,23 @@ int main( int argc, char* argv[] )
 				}
 			}
 		}
-
 		gSystem->cd( Here );
 	}
 
 	//	Merge multiple outputs
-
-	if( GraphsToOverlay->GetListOfGraphs()->Capacity() > 1 )
+	if( GraphsToOverlay->GetListOfGraphs() != NULL )
 	{
-		RapidLL::OverlayMutliplePlots( GraphsToOverlay );
+		if( GraphsToOverlay->GetListOfGraphs()->Capacity() > 1 )
+		{
+			RapidLL::OverlayMutliplePlots( GraphsToOverlay );
+		}
 	}
-
 	//	2D case possible to be written but as of this time 2012/10 There is no useful call to write this so it has not been addressed
+
+	cout << endl;
+	cout << "Any segfaults beyond here are likely problems with ROOT..." << endl;
+	cout << "Goodbye from RapidPlot :D" << endl;
+	cout << endl;
 
 	return 0;
 }

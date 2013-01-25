@@ -24,7 +24,7 @@ DebugClass::DebugClass( const DebugClass& input ) :
 
 void DebugClass::SetDebugAll( const bool input )
 {
-	perform_debugging = true;
+	perform_debugging = input;
 }
 
 void DebugClass::SetClassNames( const vector<string> input )

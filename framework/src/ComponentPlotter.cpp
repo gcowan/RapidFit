@@ -52,10 +52,12 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ),
 	logY( (config!=NULL)?config->logY:false ), this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ),
-	onlyZero( (config!=NULL)?config->OnlyZero:false ), combination_integral(0.), ratioOfIntegrals(1,1.), wanted_weights(), format(),
+	onlyZero( (config!=NULL)?config->OnlyZero:false ), combination_integral(vector<double>()), ratioOfIntegrals(1,1.), wanted_weights(), format(),
 	data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(), total_components(),
-	chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num), weight_err()
+	chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num)
 {
+	TH1::SetDefaultSumw2(true);
+
 	if( Debug != NULL ) debug = new DebugClass(*Debug);
 	else debug = new DebugClass(false);
 	plotPDF->TurnCachingOff();
@@ -272,36 +274,14 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 		//Update the data average values, and make the projection graph arrays
 		vector<double>* projectionValueArray = new vector<double>();
 		*projectionValueArray = *projectionValueVector;
-		double range = fabs( boundary_max - boundary_min );
 
-		//cout << "Normalizing" << endl;
-		double n_events = (double)plotData->GetDataNumber( allCombinations[combinationIndex], true );
-
-		/*cout << n_events << " for:" << endl;
-		  allCombinations[combinationIndex]->Print();
-		  cout << "combinationWeights[combinationIndex]: " << combinationWeights[combinationIndex] << endl;
+		double PDFNormalisation = this->PDF2DataNormalisation( combinationIndex );
 
 
-		  cout << "combination_integral[combinationIndex]: " << combination_integral[combinationIndex] << endl;
-		  cout << "fabs(ratioOfIntegrals[combinationIndex]): " << fabs(ratioOfIntegrals[combinationIndex]) << endl;
-		  cout << "n_events: " << n_events << endl;
-		  cout << "range: " << range << endl;
-		  cout << "double(data_binning): " << double(data_binning) << endl;
-		 */
-
-		//	Perform Normalisation							THIS IS COMPLEX AND IS COPIED LARGELY FROM ORIGINAL PLOTTER CLASS
-		for( int pointIndex = 0; pointIndex < total_points; ++pointIndex )
+		//	Perform Normalisation
+		for( unsigned int pointIndex = 0; pointIndex < (unsigned)total_points; ++pointIndex )
 		{
-			//Projection graph
-			//						ratio Numerical/Analytical		n-points		Observable range	full Integral
-			(*projectionValueArray)[(unsigned)pointIndex] *= fabs(ratioOfIntegrals[combinationIndex]) * n_events * range / combination_integral[combinationIndex];
-
-			//	'Fraction of this Combination in Combination 0'
-			//(*projectionValueArray)[(unsigned)pointIndex] *= combinationWeights[combinationIndex];
-
-			//	This is due to ROOT binning the data into 100 bins by default
-			(*projectionValueArray)[(unsigned)pointIndex] /= double(data_binning);
-
+			(*projectionValueArray)[ pointIndex ] *= PDFNormalisation;
 		}
 
 		delete projectionValueVector;
@@ -453,14 +433,16 @@ TH1* ComponentPlotter::FormatData( unsigned int combinationNumber )
 	TH1* returnable = new TH1D( "Data_For_Component_"+component_num_str, "Data_For_Component_"+component_num_str, data_binning, boundary_min, boundary_max );
 	vector<double> wanted_data, this_wanted_weights;
 	ObservableRef* new_ref = new ObservableRef( observableName );
-	ObservableRef* weight_ref = new ObservableRef( weightName );
+
 	for( vector<DataPoint*>::iterator point_i = wanted_points.begin(); point_i != wanted_points.end(); ++point_i )
 	{
 		wanted_data.push_back( (*point_i)->GetObservable( *new_ref )->GetValue() );
-		if( weightsWereUsed ) this_wanted_weights.push_back( (*point_i)->GetObservable( *weight_ref )->GetValue() );
-		else this_wanted_weights.push_back( 1. );
 	}
 	delete new_ref;
+
+	if( wanted_weights.empty() && weightsWereUsed ) wanted_weights = vector<double>( wanted_data.size(), 1. );	//	'Should' never occur... but better than a segfault
+
+	this_wanted_weights = wanted_weights;
 
 	//	Fill a histogram with the weighted data, with weights normalised to 1
 	//	Think of this as multiplying by a very clever version of the number 1 ;)
@@ -471,27 +453,12 @@ TH1* ComponentPlotter::FormatData( unsigned int combinationNumber )
 	{
 		for( ; point_i != wanted_data.end(); ++point_i, ++weight_i )
 		{
-			returnable->Fill( *point_i, *weight_i / weight_norm );
-		}
-		double weight_sum=0.;
-		for( vector<double>::iterator w_i = wanted_weights.begin(); w_i != wanted_weights.end(); ++w_i )
-		{
-			weight_sum+=*w_i;
-		}
-		for( unsigned int i=0; i< (unsigned)returnable->GetNbinsX(); ++i )
-		{
-			double bin_err = returnable->GetBinError( (int)i );
-			double weight_term=weight_err*weight_err/(weight_sum*weight_sum);
-			double bin_term=bin_err*bin_err/ (returnable->GetBinContent( (int)i )*returnable->GetBinContent( (int)i ));
-			if( isnan(bin_term) ) bin_term=0.;
-			//cout << endl << i << "\t" << returnable->GetBinContent( i ) << "\t" << weight_term << "\t" << bin_term << endl;
-			double final_err = returnable->GetBinContent( (int)i )*sqrt( weight_term + bin_term );
-			returnable->SetBinError( (int)i, final_err );
+			returnable->Fill( *point_i, *weight_i );
 		}
 	}
 	else
 	{
-		for( ; point_i != wanted_data.end(); ++point_i, ++weight_i )
+		for( ; point_i != wanted_data.end(); ++point_i )
 		{
 			returnable->Fill( *point_i, 1. );
 		}
@@ -746,7 +713,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				   tf1_graph->Draw("C");
 				   Chi2test->Print(Chi2Name+".pdf");
 				   Chi2test->Write("",TObject::kOverwrite);
-				 */
+				   */
 			}
 
 			if( combinationIndex == 0 && this_config->DrawPull == true )
@@ -782,7 +749,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				   {
 				   cout << pullPlot->GetY()[i] <<  endl;
 				   }
-				 */
+				   */
 
 				this->OutputPlotPull( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), allPullData, plotPDF->GetRandomFunction(), temp );
 				(void)pullPlot;
@@ -1574,7 +1541,7 @@ void ComponentPlotter::SetupCombinationDescriptions()
 	cout << "Combination: 1 " << "Min: " << StatisticsFunctions::Minimum( discrete_observableValues_i );
 	cout << "\tMax: " << StatisticsFunctions::Maximum( discrete_observableValues_i ) << "\tBinNum: " << StatisticsFunctions::OptimumBinNumber( discrete_observableValues_i ) << endl;
 
-	combinationDescriptions.push_back( "AllData" );
+	combinationDescriptions.push_back( "All_Data" );
 
 	discreteNames = full_boundary->GetDiscreteNames();
 
@@ -1643,7 +1610,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	for (int pointIndex = 0; pointIndex < PlotNumber; ++pointIndex )
 	{
 		//	Inform the user of how far we have got :D
-		cout << setprecision(3) << setw(4) << (pointIndex+1.)/PlotNumber*100 << "\%\tComplete\r\r" << flush;
+		cout << left << setw(5) << setprecision(3)  << (pointIndex+1.)/PlotNumber*100 << "\% Complete" << setw(20) << " " << "\r" << flush;
 
 		//	Value of Observable we want to evaluate for this step
 		observableValue = Minimum + ( PlotInterval * pointIndex );
@@ -1722,37 +1689,61 @@ void ComponentPlotter::Sanity_Check( vector<double>* pointValues, TString compon
 
 void ComponentPlotter::SetWeightsWereUsed( string input )
 {
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "ComponentPlotter" ) )
+		{
+			cout << "ComponentPlotter: Setting Weights Were Used:" << endl;
+			cout << "ComponentPlotter: WeightName: " << input << endl;
+
+		}
+	}
+
+	double sum=0.;
+	for( int i=0 ; i < plotData->GetDataNumber(NULL,true); ++i )
+	{
+		sum+=plotData->GetDataPoint( i )->GetObservable( input )->GetValue();
+	}
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "ComponentPlotter" ) )
+		{
+			cout << "ComponentPlotter: Sum of Weights: " << sum << endl;
+			cout << "ComponentPlotter: DataSet Size: " << plotData->GetDataNumber() << endl;
+		}
+	}
 	weightsWereUsed = true;
 	weightName = input;
+
+	double alpha=plotData->GetSumWeights()/plotData->GetSumWeightsSq();
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "ComponentPlotter" ) )
+		{
+			cout << "ComponentPlotter: Alpha: " << alpha << endl;
+		}
+	}
 
 	ObservableRef* weight_ref = new ObservableRef( weightName );
 	for( int i=0 ; i < plotData->GetDataNumber(NULL,true); ++i )
 	{
-		if( weightsWereUsed ) wanted_weights.push_back( plotData->GetDataPoint( i )->GetObservable( *weight_ref )->GetValue() );
-		else wanted_weights.push_back( 1. );
+		wanted_weights.push_back( plotData->GetDataPoint( i )->GetObservable( *weight_ref )->GetValue() );
 	}
 	delete weight_ref;
 
 	weight_norm=0.;
-	weight_err=0.;
-	if( weightsWereUsed )
+	double weight_sum=plotData->GetSumWeights();
+
+	weight_norm = weight_sum / plotData->GetDataNumber(NULL,true);
+
+	if( debug != NULL )
 	{
-		for( vector<double>::iterator w_i = wanted_weights.begin(); w_i != wanted_weights.end(); ++w_i )
+		if( debug->DebugThisClass( "ComponentPlotter" ) )
 		{
-			weight_norm+=*w_i;
+			cout << "Weight Norm: " << weight_norm << endl;
 		}
-		weight_norm /= plotData->GetDataNumber(NULL,true);
-		for( vector<double>::iterator w_i = wanted_weights.begin(); w_i != wanted_weights.end(); ++w_i )
-		{
-			double temp = (*w_i)/weight_norm;
-			weight_err = temp*temp;
-		}
-		weight_err=sqrt(weight_err);
-	}
-	else
-	{
-		weight_norm=1.;
-		weight_err=1.;
 	}
 }
 
@@ -1781,8 +1772,6 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 	unsigned int comb_num=0;
 
-	double range = fabs( boundary_max-boundary_min );
-
 	for( vector<DataPoint*>::iterator comb_i = allCombinations.begin();  comb_i != allCombinations.end(); ++comb_i, ++comb_num )
 	{
 		DataPoint* InputPoint = new DataPoint( *( (*comb_i) ) );
@@ -1792,24 +1781,38 @@ double ComponentPlotter::operator() (double *x, double *p)
 		InputPoint->SetObservable( observableName, newObs );
 		//delete oldObs;
 
-		double temp_integral_value = pdfIntegrator->ProjectObservable( InputPoint, full_boundary, observableName, comp_obj );
+		double PDFProjection = pdfIntegrator->ProjectObservable( InputPoint, full_boundary, observableName, comp_obj );
 
-		double dataNum = plotData->GetDataNumber( *comb_i, true );
+		double PDFNormalisation = this->PDF2DataNormalisation( comb_num );
 
-		temp_integral_value = temp_integral_value * fabs(ratioOfIntegrals[comb_num]) * dataNum * range / combination_integral[comb_num];
-
-		//temp_integral_value = temp_integral_value * ( combinationWeights[comb_num] / double(data_binning) );
-
-		temp_integral_value = temp_integral_value / double(data_binning);
-
-		integral_value += temp_integral_value;
+		integral_value += PDFProjection*PDFNormalisation;
 
 		delete InputPoint;
 	}
 
-	cout << "Value At: " << setprecision(3) << x[0] << "\tis:\t" << setprecision(4) << integral_value << "\r\r";
+	cout << "Value At: " << left << setw(5) << setprecision(3) << x[0] << "\tis:\t" << setprecision(4) << integral_value << setw(20) << " " <<  "\r" << flush;
 
 	return integral_value;
+}
+
+double ComponentPlotter::PDF2DataNormalisation( const unsigned int combinationIndex ) const
+{
+	double normalisation=1.;
+
+	normalisation *= fabs(ratioOfIntegrals[ combinationIndex ]);			//	Attempt to correct for Numerical != analytical due to any constant factor due to numerical inaccuracy
+	//	(some constant close to 1. exactly 1. for numerical PDFs)
+
+	double dataNum = plotData->GetDataNumber( allCombinations[combinationIndex], true );
+	normalisation *= dataNum / (double) data_binning;				//	Normalise to this density of events	(Num of events per bin in flatPDF)
+
+	double range = fabs( boundary_max-boundary_min );
+	normalisation *= range;								//	Correct for the range of the dataset	(absolute range of Observable being projected)
+
+	normalisation /= combination_integral[ combinationIndex ];			//	Total Integral of the PDF	(We're plotting prob of PDF being at this point for a non-unitary PDF)
+
+	normalisation *= weight_norm;							//	Correct for the effect of non-unitary weights used in the fit
+
+	return normalisation;
 }
 
 pair<double,double> ComponentPlotter::GetChi2Numbers()

@@ -523,31 +523,25 @@ TH1* Histogram_Processing::Plot( const vector<vector<double> >& input, TString F
 }
 
 //	Originally Written by Conor Fitzpatrick
-TPaveText* Histogram_Processing::addLHCbLabel(TString footer, bool DATA)
+TPaveText* Histogram_Processing::addLHCbLabel(TString footer, bool final/*, bool DATA*/)
 {
 	//TPaveText * label = new TPaveText(0.18, 0.77, 0.18, 0.88,"BRNDC");
 	TPaveText* label = new TPaveText( gStyle->GetPadLeftMargin() + 0.05, 
 			0.87 - gStyle->GetPadTopMargin(),
 			gStyle->GetPadLeftMargin() + 0.30,
-			0.95 - gStyle->GetPadTopMargin(),
-
-			//TPaveText* label = new TPaveText(0.7 - gStyle->GetPadRightMargin(),
-			//                        0.87 - gStyle->GetPadTopMargin(),
-			//                        1. - gStyle->GetPadRightMargin(),
-			//                        0.95 - gStyle->GetPadTopMargin(),
-		"BRNDC");
+			0.95 - gStyle->GetPadTopMargin(), "BRNDC");
 
 			label->SetFillStyle(0);         //Transparent i.e. Opacity of 0 :D
 			label->SetBorderSize(0);
 			label->SetTextAlign(11);
-			label->SetTextSize(Float_t(0.04));
-			//TString labelstring( "LHC#font[12]{b} 2011" );
-			//TString labelstring( "LHCb 2011 " );
+			label->SetTextSize(Float_t(0.07));
 			TString labelstring( "LHCb" );//"#splitline{LHCb}{#scale[1.0]{Preliminary}}" );
 			//if( DATA ) labeltstring.Append( " Data" );
 			//if( !DATA ) labeltstring.Append( " Simulation" );
+
 			label->AddText( labelstring );
-			label->AddText( "#scale[1.0]{Preliminary}" );
+			if( !final )	label->AddText( "#scale[1.0]{Preliminary}" );
+
 			//label->AddText("#sqrt{s} = 7TeV " + footer );
 			return label;
 }

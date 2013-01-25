@@ -21,9 +21,9 @@
 using namespace::std;
 
 //Constructor with correct arguments
-ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, ParameterSet* StudyParameters, vector< PDFWithData* > PDFsAndData,
-		vector< ConstraintFunction* > InputConstraints, int NumberStudies ) :
-	IStudy(), fixedNumToys(false), saveAllToys(false)
+ToyStudy::ToyStudy( MinimiserConfiguration * TheMinimiser, FitFunctionConfiguration * TheFunction, ParameterSet* StudyParameters,
+		vector< PDFWithData* > PDFsAndData, vector< ConstraintFunction* > InputConstraints, int NumberStudies ) :
+		IStudy(), fixedNumToys(false), saveAllToys(false)
 {
 	pdfsAndData = PDFsAndData;
 	studyParameters = StudyParameters;

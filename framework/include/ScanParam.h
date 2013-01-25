@@ -25,12 +25,15 @@ using namespace::std;
 class ScanParam
 {
 	public:
-		ScanParam();
 		ScanParam( vector<string>, vector<double>, vector<double>, vector<int>, vector<int> );
 		ScanParam( string, double, double, int );
 		ScanParam( string, int, int );
 		ScanParam( string, int );
 		ScanParam( string );
+
+		/*!
+		 * @brief Destructor
+		 */
 		~ScanParam();
 
 		//  These should probably be implemented in the .cpp but I'm being VERY lazy

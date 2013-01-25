@@ -27,17 +27,65 @@ using namespace::std;
 class ToyStudy	:	public IStudy
 {
 	public:
-		ToyStudy( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >, vector< ConstraintFunction* >, int );
+		/*!
+		 * @brief Constructor
+		 *
+		 * @param inputMinimiser This is the InputMinimiser to be used to perform the minimisations
+		 *
+		 * @param inputFunction  This is the FitFunctionConfiguration to be used to construct the fits
+		 *
+		 * @param inputPDFWData  This is the vector of input PDFs and Datasets
+		 *
+		 * @param input_Const  This is a vector of external constraints to the fit
+		 *
+		 * @param num  Number of Repeats to perform in the study
+		 */
+		ToyStudy( MinimiserConfiguration* inputMinimiser, FitFunctionConfiguration* inputFunction, ParameterSet* inputParam,
+				vector< PDFWithData* > inputPDFWData, vector< ConstraintFunction* > input_Const, int num );
+
+		/*!
+		 * @brief Destructor
+		 */
 		~ToyStudy();
 
-		void DoWholeStudy( int = -999 );
+		/*!
+		 * @brief Function to call the Toy Study to start
+		 *
+		 * @param output This is the output verbosity level
+		 */
+		void DoWholeStudy( int output = -999 );
+
+		/*!
+		 * @brief Function to return the output from the whole Study
+		 *
+		 * @return This returns a pointer to the internal FitResultVector
+		 *
+		 * @warning The returned object is controlled and destoryed by this class
+		 */
 		FitResultVector* GetStudyResult();
 
-		void SetNumRepeats( int );			//	Set number of Repeats
-		void SetCommandLineParams( vector<string> );	//	Set Command Line Physics Parameters
+		/*!
+		 * @brief Function to Change the number of repeats that the Toy Study will perform
+		 */
+		void SetNumRepeats( int );
 
+		/*!
+		 * @brief Function to pass additional Command Line Parameters to the Fit
+		 */
+		void SetCommandLineParams( vector<string> );
+
+		/*!
+		 * @brief Calling this will stop the Toy Study attempting to obtain the required good number of fit results
+		 *
+		 * This is useful if you suspect the Study may fall over and perform infinite repeats
+		 */
 		void SetFixedNumberToys();
+
+		/*!
+		 * @brief Calling this will alow the output from all (including failed) toys to be saved
+		 */
 		void setSaveAllToys();
+
 	private:
 		//	Uncopyable!
 		ToyStudy ( const ToyStudy& );

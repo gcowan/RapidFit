@@ -461,7 +461,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 			if( fabs( wanted_val - this_val ) > 1E-6 )
 			{
 				match = false;
-				thisName=*Obsname_i;
+				thisName=string(*Obsname_i);
 				break;
 			}
 		}

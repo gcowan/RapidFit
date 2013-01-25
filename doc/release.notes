@@ -1,12 +1,24 @@
 // $Id: release.notes $
 
-2013-/01/20 Pete Clarke
+2013/01/25 Rob Currie
+  - Added a big chunk more documentation
+  - Some basic fixes here and there removing unused objects and fixing extremely obviously broken code
+  - Changed ComponentProjections to only scale the PDF to the data rather than the half scaling of both data and PDF when using sWeights
+    This involved moving around a few things as well as defining the PDF2DataNormalise method in ComponentPlotter which cleans up some code
+  - Added some helper functions to expose and store more internal objects in alpha-scaling from per-event Weights
+  - Cleaned up comment blocks
+  - Fixed crash in RapidPlot dur to NULL pointer being addressed
+  - Added RapidFit lib back to the default build requirements
+  - Added Help and more runtime configure options to RapidPlot
+  - Added some checks to warn about bad toys in RapidPlot
+  - Improved code for plotting the correlation Matrix stored from RapidFit
+
+2013/01/20 Pete Clarke
   - Added new Gamma-DeltaGamma constraint with correlation. Its called "Gammas-DeltaGamma-1fbPaper"
   - Added new <ConfigurationParameter> to allow to add the relative offset to Gamma coming from the beta factor. 
     It is used in this senset you want the Minuit fit parameter to be the true Gamma then you provide a positive offset.
     This will be added to the Minuit fit parameter internally and the higher number will be used in the pdf
-    <ConfigurationParameter>OffsetToGammaForBetaFactor:0.0xx</ConfigurationParameter>
- 
+    <ConfigurationParameter>OffsetToGammaForBetaFactor:0.0xx</ConfigurationParameter> 
 
 2013/01/13 Rob Currie
   - I've re-written the code to calculate chi2/nDoF for the full fit. This doesn't have the problems associated with the previous method.

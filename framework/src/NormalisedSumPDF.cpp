@@ -40,9 +40,9 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 	this->SetName("NormalisedSum");
 	this->SetLabel( "NormalisedSum_("+firstPDF->GetLabel()+")+("+secondPDF->GetLabel()+")" );
 
-        cout << endl;
-        cout << "Constructing NormalisedSum "<< this->GetLabel() << endl;
-        cout << "FractionName:\t" << FractionName << endl;
+	cout << endl;
+	cout << "Constructing NormalisedSum "<< this->GetLabel() << endl;
+	cout << "FractionName:\t" << FractionName << endl;
 	cout << endl;
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
@@ -50,6 +50,16 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 
 	MakePrototypes(InputBoundary);
 
+	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
+	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );
+	allParameters.AddPhysicsParameters( secondPDF->GetPhysicsParameters(), false );
+	PhysicsParameter* frac_param = new PhysicsParameter( fractionName );
+	allParameters.AddPhysicsParameter( frac_param, false );
+
+}
+
+vector<string> NormalisedSumPDF::PDFComponents()
+{
 	vector<string> firstpdf_components;
 	for( unsigned int i=0; i< firstPDF->PDFComponents().size(); ++i )
 	{
@@ -63,11 +73,11 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 
 	string zero="0";
 
-	if( firstPDF->GetName() != "NormalisedSum" )
+	if( firstPDF->GetName() != "NormalisedSum" || firstPDF->GetName() != "Sum" )
 	{
 		if( StringProcessing::VectorContains( &firstpdf_components, &zero ) == -1 ) firstpdf_components.push_back( "0" );
 	}
-	if( secondPDF->GetName() != "NormalisedSum" )
+	if( secondPDF->GetName() != "NormalisedSum" || secondPDF->GetName() != "Sum" )
 	{
 		if( StringProcessing::VectorContains( &secondpdf_components, &zero ) == -1 ) secondpdf_components.push_back( "0" );
 	}
@@ -93,12 +103,7 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 
 	component_list = StringProcessing::MoveElementToStart( component_list, "0" );
 
-	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
-	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );
-	allParameters.AddPhysicsParameters( secondPDF->GetPhysicsParameters(), false );
-	PhysicsParameter* frac_param = new PhysicsParameter( fractionName );
-	allParameters.AddPhysicsParameter( frac_param, false );
-
+	return component_list;
 }
 
 void NormalisedSumPDF::SetUseGSLIntegrator( bool input )
@@ -253,12 +258,12 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 	{
 		PDF_THREAD_LOCK
 
-		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+			cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-		throw(-653102);
+			throw(-653102);
 	}
 
 	//Return the sum
@@ -289,7 +294,7 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	if( isnan(termOne) || isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
-		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+			cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 		PDF_THREAD_UNLOCK
 	}

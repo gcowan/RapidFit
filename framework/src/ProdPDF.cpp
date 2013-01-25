@@ -33,6 +33,13 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 
 	this->TurnThisCachingOff();
 
+	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
+	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );
+	allParameters.AddPhysicsParameters( secondPDF->GetPhysicsParameters(), false );
+}
+
+vector<string> ProdPDF::PDFComponents()
+{
 	vector<string> first_components;
 	for( unsigned int i=0; i< firstPDF->PDFComponents().size(); ++i )
 	{
@@ -99,9 +106,7 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 
 	component_list = StringProcessing::MoveElementToStart( component_list, "0" );
 
-	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
-	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );
-	allParameters.AddPhysicsParameters( secondPDF->GetPhysicsParameters(), false );
+	return component_list;
 }
 
 ProdPDF::ProdPDF( const ProdPDF& input ) : BasePDF( (BasePDF) input ),

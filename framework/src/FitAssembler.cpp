@@ -321,6 +321,15 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 	}
 
+	if( FunctionConfig->GetUseCustomAlpha() )
+	{
+		for( unsigned int i=0; i< BottleData.size(); ++i )
+		{
+			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
+			Requested_DataSet->ApplyExternalAlpha( FunctionConfig->GetAlphaName() );
+		}
+	}
+
 	if( debug != NULL )
 	{
 		if( debug->DebugThisClass( "FitAssembler" ) )

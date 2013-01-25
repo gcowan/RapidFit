@@ -35,7 +35,6 @@ class CompPlotter_config
 			useLegend(true), LimitPulls(false), useSpline(true)
 		{}
 
-
                 int data_bins;                  /*!     This is the total number of bins which should be used when binning the dataset                                          */
                 int PDF_points;                 /*!     This is the number of points which the PDF should be interrogated for across the whole Observable range                 */
                 string observableName;          /*!     This is the Name of the Observable that is being Projected                                                              */
@@ -44,7 +43,7 @@ class CompPlotter_config
                 vector<int> style_key;          /*!     This is a vector of numbers, each number corresponding to the Style_t which is given to the corresponding component     */
                 vector<int> width_key;          /*!     This is a vector of numbers, each number corresponding to the Width_t which is given to the corresponding component     */
                 vector<string> component_names; /*!     This ia a vector of strings which are names passed to the TLegend for all of the Components                             */
-                double LegendTextSize;
+                double LegendTextSize;		/*!	This chaneges the ROOT text size in the Legend box									*/
                 string PlotTitle;               /*!     This is the Name of the Plot                                                                                            */
                 double xmin, xmax, ymin, ymax;  /*!     These are the ranges that should be plotted on the X and Y axis                                                         */
                 TString xtitle, ytitle;         /*!     These are the titles of the X and Y axis                                                                                */
@@ -52,15 +51,16 @@ class CompPlotter_config
                 double Chi2Value;               /*!     This is where the Chi2 final value is stored after it's calculated                                                      */
                 bool OnlyZero;                  /*!     If true this class will mimic the correct behaviour of the old Plotter class                                            */
 		bool ScaleNumerical;		/*!	Do you scale the Numerical or Analytical Integral                                                                       */
-		bool addLHCb;
+		bool addLHCb;			/*!	Add an LHCb 'Stamp' to the plot												*/
 		bool DrawPull;			/*!	Should I draw the Pull Plot from this projection over the data?								*/
-		bool TopRightLegend;
-		bool TopLeftLegend;
-		bool BottomRightLegend;
-		bool BottomLeftLegend;
-		bool useLegend;
-		bool LimitPulls;
-		bool useSpline;
+		bool TopRightLegend;		/*!	Use a Top Right Legend Box												*/
+		bool TopLeftLegend;		/*!	Use a Top Left Legend Box												*/
+		bool BottomRightLegend;		/*!	Use a Bottom Right Legend Box												*/
+		bool BottomLeftLegend;		/*!	Use a Bottom Left Legend Box												*/
+		bool useLegend;			/*!	Use a Legend in the Plot												*/
+		bool LimitPulls;		/*!	Place a 5-sigma limit on the Pull Distribution to fight a few bogus pulls killing the Distribution			*/
+		bool useSpline;			/*!	Use Spline to Interpolate between the projected points?									*/
 };
 
 #endif
+
