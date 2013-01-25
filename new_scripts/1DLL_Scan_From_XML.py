@@ -339,7 +339,7 @@ if is_ganga:
 			print sandbox_data
 			j.inputsandbox = sandbox_data
 			j.outputsandbox = output_file_list
-			#j.outputdata = output_file_list
+			j.outputdata = output_file_list
 			#sys.exit(0)
 		if choice == 2:
 			j.backend = LSF()

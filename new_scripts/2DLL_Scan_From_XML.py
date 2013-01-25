@@ -39,7 +39,7 @@ X_max=0.5
 Y_min=0.0
 Y_max=0.2
 
-resolution=40
+resolution=50
 sqrt_jobs_per_core=1
 
 LFN_LIST=[]

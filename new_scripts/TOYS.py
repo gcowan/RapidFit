@@ -21,10 +21,10 @@ is_ganga = "Ganga.Core" in sys.modules
 
 #	Configurables
 
-job_name = "TOYZ-DataLike"
+job_name = "untagged_Bc"
 
-TOYS_PER_SUBJOB=10
-NUM_OF_SUBJOBS=100
+TOYS_PER_SUBJOB=20
+NUM_OF_SUBJOBS=50
 
 #	All the possible output files right now
 #
