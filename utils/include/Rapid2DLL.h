@@ -16,6 +16,9 @@ using namespace::std;
 class Rapid2DLL
 {
 	public:
+
+		static void Help();
+
 		//	This class has been completely re-written again from the ground up as the old codebase was simply impossible to folllow/maintain
 
 		static unsigned int GetColors( unsigned int input );

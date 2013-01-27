@@ -645,10 +645,13 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		if( combinationIndex> 0 ) desc = CombinationDescriptions[combinationIndex-1];
 		if( combinationIndex == 0 )
 		{
+			desc = "All_Data";
+			/*
 			for( vector<string>::iterator desc_i = CombinationDescriptions.begin(); desc_i != CombinationDescriptions.end(); ++desc_i )
 			{
 				desc.append( *desc_i );
 			}
+			*/
 		}
 
 		TString PDFDesc;PDFDesc+=PDFNum;
@@ -1716,7 +1719,16 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 	weightsWereUsed = true;
 	weightName = input;
 
-	double alpha=plotData->GetSumWeights()/plotData->GetSumWeightsSq();
+	double alpha=1.;
+	
+	if( fabs(plotData->GetAlpha()-1.)<1E-6 )
+	{
+		alpha = plotData->GetSumWeights()/plotData->GetSumWeightsSq();
+	}
+	else
+	{
+		alpha = plotData->GetAlpha();
+	}
 
 	if( debug != NULL )
 	{

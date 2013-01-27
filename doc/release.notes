@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/01/27 Rob Currie
+  - Adding fix to XML output from the FitFunctionConfiguration to correctly setup the fit as a Weighted fit with an appropriate alpha
+  - Changed the ComponentPlotter to use the user defined alpha rather than forcing it to be recalculated on a per-dataset basis.
+
 2013/01/25 Rob Currie
   - Added a big chunk more documentation
   - Some basic fixes here and there removing unused objects and fixing extremely obviously broken code

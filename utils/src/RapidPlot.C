@@ -105,7 +105,7 @@ void helpFunction()
 	cout << "The additional Commands are:" << endl;
 	ToyStudyAnalysis::Help();
 	RapidLL::Help();
-	//Rapid2DLL::Help();				Not yet Implemented
+	Rapid2DLL::Help();
 	//FeldmanCousinsAnalysis::Help();		Not yet Implemented
 	CorrMatrix::Help();
 }

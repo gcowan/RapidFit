@@ -133,6 +133,8 @@ string FitFunctionConfiguration::XML() const
 	xml << "<FitFunction>" << endl;
 	xml << "\t" << "<FunctionName>" << functionName << "</FunctionName>" << endl;
 	if(Threads>0) xml << "\t" << "<Threads>" << Threads << "</Threads>" << endl;
+	if( hasWeight == true ) xml << "<WeightName>" << weightName << "</WeightName>" << endl;
+	if( hasAlpha == true ) xml << "<AlphaName>" << alphaName << "</AlphaName>" << endl;
 	xml << "\t" << "<SetIntegratorTest>";
 	if( testIntegrator == true ) xml << "True</SetIntegratorTest>" << endl;
 	if( testIntegrator == false ) xml << "False</SetIntegratorTest>" << endl;

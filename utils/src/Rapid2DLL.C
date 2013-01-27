@@ -203,7 +203,6 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 
 	cout << "Plotting Contours" << endl;
 
-	gStyle->SetPadRightMargin( (Float_t)0.15 );
 	gROOT->UseCurrentStyle();
 	gROOT->ForceStyle( true );
 
@@ -237,24 +236,39 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 
 	cout << endl;
 
+
+        gStyle->SetPadRightMargin( (Float_t)0.15 );
+        gROOT->UseCurrentStyle();
+        gROOT->ForceStyle( true );
+
+	cout << "Plotting Variation in Nuisence Parameters!" << endl << endl;
+
 	Rapid2DLL::Plot_Free_Parameters( input_tree, controlled_parameter1, controlled_parameter2, rand );
 
 	return 0;
 }
 
+void Rapid2DLL::Help()
+{
+	cout << endl << "Rapid2DLL can Accept the following arguments for producing 2DLL plots" << endl;
+	cout << "--isFinal" << "\t\t" << "As in producing 1DLL this decides whether we are adding 'LHCb' or 'LHCb Preliminary' to the Plots" << endl;
+	cout << endl;
+}
 
 void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1, TString controlled_parameter2, TH1* nll_hist, vector<pair<TMultiGraph*,TString> > nll_contours,
 		TString filename, TRandom* rand, vector<string> other_params )
 {
+	(void) input_tree;
 	if( rand == NULL ) rand = gRandom;
 
 	TPaveText* label = NULL;
 
-	string addLHCb="--addLHCb";
-	string addLHCbFinal="--addLHCbFinal";
+	string addLHCb="--isFinal";
+	string addSMPhisString="--addPhis";
+	bool addSMPhis = StringOperations::VectorContains( &other_params, &addSMPhisString ) != -1;
 
-	if( StringOperations::VectorContains( &other_params, &addLHCb ) != -1 )		label = Histogram_Processing::addLHCbLabel( "", false );
-	if( StringOperations::VectorContains( &other_params, &addLHCbFinal ) != -1 )	label = Histogram_Processing::addLHCbLabel( "", true );
+	if( StringOperations::VectorContains( &other_params, &addLHCb ) != -1 )		label = Histogram_Processing::addLHCbLabel( "", true );
+	else										label = Histogram_Processing::addLHCbLabel( "", false );
 
 	TLegend* leg = new TLegend( 0.75, 0.65, 0.9, 0.9 );
 	leg->SetFillStyle(0);
@@ -270,11 +284,11 @@ void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1,
 	{
 		cont_i->first->Draw("C");
 		TList* this_cont = cont_i->first->GetListOfGraphs();
-		for( unsigned int i=0; i< this_cont->GetSize(); ++i )
+		for( unsigned int i=0; i< (unsigned)this_cont->GetSize(); ++i )
 		{
 			TGraph* this_part = (TGraph*) this_cont->At( i );
-			this_part->SetLineColor( Rapid2DLL::GetColors( cont_num ) );
-			this_part->SetLineStyle( Rapid2DLL::GetStyle( cont_num ) );
+			this_part->SetLineColor( (Color_t)Rapid2DLL::GetColors( cont_num ) );
+			this_part->SetLineStyle( (Style_t)Rapid2DLL::GetStyle( cont_num ) );
 		}
 		leg->AddEntry( cont_i->first->GetListOfGraphs()->First() , nll_contours[cont_num].second, "L" );
 	}
@@ -283,14 +297,35 @@ void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1,
 	c1->Update();
 	leg->Draw();
 	if( label )	label->Draw();
-	double* px = new double[1]; px[0] = 0.036;//0.087;
-	double* xerr = new double[1]; xerr[0] = 0.002;//0.021;
-	double* py = new double[1]; py[0] = 0.087;//0.036;
-	double* yerr = new double[1]; yerr[0] = 0.021;//0.002;
-	TGraphErrors* CV = new TGraphErrors( 1, px, py, xerr, yerr );
-	CV->SetName( "Standard Model" );
-	leg->AddEntry( CV, "Standard Model", "PE" );
-	CV->Draw("LP SAME");
+	if( addSMPhis )
+	{
+		double* px=NULL;
+		double* xerr=NULL;
+		double* py=NULL;
+		double* yerr=NULL;
+		if( controlled_parameter1 == "Phi_s" )
+		{
+			px = new double[1]; px[0] = -0.036;//0.087;
+			xerr = new double[1]; xerr[0] = 0.002;//0.021;
+			py = new double[1]; py[0] = 0.087;//0.036;
+			yerr = new double[1]; yerr[0] = 0.021;//0.002;
+		}
+		else
+		{
+			px = new double[1]; px[0] = 0.087;
+			xerr = new double[1]; xerr[0] = 0.021;
+			py = new double[1]; py[0] = -0.036;
+			yerr = new double[1]; yerr[0] = 0.002;
+		}
+
+		if( ( controlled_parameter1 == "Phi_s" || controlled_parameter1 == "deltaGamma" )&&( controlled_parameter2 == "Phi_s" || controlled_parameter2 == "deltaGamma" ) )
+		{
+			TGraphErrors* CV = new TGraphErrors( 1, px, py, xerr, yerr );
+			CV->SetName( "Standard Model" );
+			leg->AddEntry( CV, "Standard Model", "PE" );
+			CV->Draw("LP SAME");
+		}
+	}
 	c1->Update();
 	Histogram_Processing::Silent_Print( c1, filename );
 	return;
