@@ -111,6 +111,8 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) 
 	, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1), stored_AT(input.stored_AT), stored_AP(input.stored_AP), stored_A0(input.stored_A0)
 
 	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
+
+	, performingComponentProjection( input.performingComponentProjection )
 {
 	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
@@ -198,7 +200,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL), normalisationCacheValid(false),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 	resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(), storeExpCos(), normalisationCacheUntagged()
-	, _fitDirectlyForApara(false)
+	, _fitDirectlyForApara(false), performingComponentProjection(false)
 {
 	componentIndex = 0;
 
@@ -1003,6 +1005,7 @@ vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 
 double Bs2JpsiPhi_Signal_v5::EvaluateComponent( DataPoint* input, ComponentRef* Component )
 {
+	performingComponentProjection = true;
 	componentIndex = Component->getComponentNumber();
 	if( componentIndex == -1 )
 	{
@@ -1032,6 +1035,7 @@ double Bs2JpsiPhi_Signal_v5::EvaluateComponent( DataPoint* input, ComponentRef* 
 	double return_value = this->Evaluate( input );
 	componentIndex = 0;
 
+	performingComponentProjection = false;
 	return return_value;
 }
 
@@ -1364,30 +1368,34 @@ void Bs2JpsiPhi_Signal_v5::DebugPrint( string message, double value )  const
 {
 	PDF_THREAD_LOCK
 
+	if( !performingComponentProjection )
+	{
 		(void) message; (void) value;
-	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrint ***************************" << endl ;
-	cout << message << value << endl <<endl ;
+		cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrint ***************************" << endl ;
+		cout << message << value << endl <<endl ;
 
-	cout << endl ;
-	cout << "   gamma " << gamma() << endl ;
-	cout << "   gl    " << gamma_l() << endl ;
-	cout << "   gh    " << gamma_h()  << endl;
-	cout << "   AT^2    " << AT()*AT() << endl;
-	cout << "   AP^2    " << AP()*AP() << endl;
-	cout << "   A0^2    " << A0()*A0() << endl ;
-	cout << "   AS^2    " << AS()*AS() << endl ;
-	cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
-	cout << "   delta_ms       " << delta_ms << endl ;
-	cout << "   mistag         " << mistag() << endl ;
-	cout << "   mistagP1       " << _mistagP1 << endl ;
-	cout << "   mistagP0       " << _mistagP0 << endl ;
-	cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
-	cout << "   resolution " << resolution << endl ;
-	cout << " For event with:  " << endl ;
-	cout << "   time      " << t << endl ;
-	cout << "   ctheta_tr " << ctheta_tr << endl ;
-	cout << "   ctheta_1 " << ctheta_1 << endl ;
-	cout << "   phi_tr " << phi_tr << endl ;
+		cout << endl ;
+		cout << "   gamma " << gamma() << endl ;
+		cout << "   gl    " << gamma_l() << endl ;
+		cout << "   gh    " << gamma_h()  << endl;
+		cout << "   AT^2    " << AT()*AT() << endl;
+		cout << "   AP^2    " << AP()*AP() << endl;
+		cout << "   A0^2    " << A0()*A0() << endl ;
+		cout << "   AS^2    " << AS()*AS() << endl ;
+		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
+		cout << "   delta_ms       " << delta_ms << endl ;
+		cout << "   mistag         " << mistag() << endl ;
+		cout << "   mistagP1       " << _mistagP1 << endl ;
+		cout << "   mistagP0       " << _mistagP0 << endl ;
+		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
+		cout << "   resolution " << resolution << endl ;
+		cout << " For event with:  " << endl ;
+		//cout << "   time      " << t << endl ;
+		//cout << "   ctheta_tr " << ctheta_tr << endl ;
+		//cout << "   ctheta_1 " << ctheta_1 << endl ;
+		//cout << "   phi_tr " << phi_tr << endl ;
+		if( _datapoint ) _datapoint->Print();
+	}
 
 	PDF_THREAD_UNLOCK
 }
@@ -1397,45 +1405,49 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 {
 	PDF_THREAD_LOCK
 
+	if( !performingComponentProjection )
+	{
 		(void) message; (void) value;
-	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintXsec ***************************" << endl ;
-	cout << message << value << endl <<endl ;
-	cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * A0A0_value << endl ;
-	cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * APAP_value << endl ;
-	cout << "   AT()*AT() term: " <<AT()*AT() * timeFactorATAT(  ) * ATAT_value << endl << endl ;
+		cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintXsec ***************************" << endl ;
+		cout << message << value << endl <<endl ;
+		cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * A0A0_value << endl ;
+		cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * APAP_value << endl ;
+		cout << "   AT()*AT() term: " <<AT()*AT() * timeFactorATAT(  ) * ATAT_value << endl << endl ;
 
-	cout << "   AP()*AT() term: " <<AP()*AT() * timeFactorImAPAT(  ) * ImAPAT_value << endl ;
-	cout << "                 : " <<AP()*AT() <<" / "<<  timeFactorImAPAT( )  <<" / "<<  ImAPAT_value << endl ;
-	cout << "   A0()*AP() term: " <<A0()*AP() * timeFactorReA0AP(  ) * ReA0AP_value << endl ;
-	cout << "                 : " <<A0()*AP() <<" / "<<  timeFactorReA0AP(  ) <<" / "<<  ReA0AP_value << endl ;
-	cout << "   A0()*AT() term: " <<A0()*AT() * timeFactorImA0AT(  ) * ImA0AT_value << endl << endl;
-	cout << "                 : " <<A0()*AT() <<" / "<<  timeFactorImA0AT(  ) <<" / "<<  ImA0AT_value << endl << endl;
+		cout << "   AP()*AT() term: " <<AP()*AT() * timeFactorImAPAT(  ) * ImAPAT_value << endl ;
+		cout << "                 : " <<AP()*AT() <<" / "<<  timeFactorImAPAT( )  <<" / "<<  ImAPAT_value << endl ;
+		cout << "   A0()*AP() term: " <<A0()*AP() * timeFactorReA0AP(  ) * ReA0AP_value << endl ;
+		cout << "                 : " <<A0()*AP() <<" / "<<  timeFactorReA0AP(  ) <<" / "<<  ReA0AP_value << endl ;
+		cout << "   A0()*AT() term: " <<A0()*AT() * timeFactorImA0AT(  ) * ImA0AT_value << endl << endl;
+		cout << "                 : " <<A0()*AT() <<" / "<<  timeFactorImA0AT(  ) <<" / "<<  ImA0AT_value << endl << endl;
 
-	cout << "   AS()*AS() term: " <<AS()*AS() * timeFactorASAS(  ) * ASAS_value << endl << endl ;
+		cout << "   AS()*AS() term: " <<AS()*AS() * timeFactorASAS(  ) * ASAS_value << endl << endl ;
 
-	cout << "   AS()*AP() term: " <<AS()*AP() * timeFactorReASAP(  ) * ReASAP_value << endl ;
-	cout << "                 : " <<AS()*AP() <<" / "<<   timeFactorReASAP(  ) <<" / "<<  ReASAP_value << endl ;
-	cout << "   AS()*AT() term: " <<AS()*AT() * timeFactorImASAT(  ) * ImASAT_value << endl ;
-	cout << "                 : " <<AS()*AT() <<" / "<<   timeFactorImASAT(  ) <<" / "<<   ImASAT_value << endl ;
-	cout << "   AS()*A0() term: " <<AS()*A0() * timeFactorReASA0(  ) * ReASA0_value<< endl ;
-	cout << "                 : " <<AS()*A0() <<" / "<<   timeFactorReASA0(  ) <<" / "<<  ReASA0_value << endl << endl ;
+		cout << "   AS()*AP() term: " <<AS()*AP() * timeFactorReASAP(  ) * ReASAP_value << endl ;
+		cout << "                 : " <<AS()*AP() <<" / "<<   timeFactorReASAP(  ) <<" / "<<  ReASAP_value << endl ;
+		cout << "   AS()*AT() term: " <<AS()*AT() * timeFactorImASAT(  ) * ImASAT_value << endl ;
+		cout << "                 : " <<AS()*AT() <<" / "<<   timeFactorImASAT(  ) <<" / "<<   ImASAT_value << endl ;
+		cout << "   AS()*A0() term: " <<AS()*A0() * timeFactorReASA0(  ) * ReASA0_value<< endl ;
+		cout << "                 : " <<AS()*A0() <<" / "<<   timeFactorReASA0(  ) <<" / "<<  ReASA0_value << endl << endl ;
 
-	double PwaveTot =
-		A0()*A0() * timeFactorA0A0(  ) * A0A0_value +
-		AP()*AP() * timeFactorAPAP(  ) * APAP_value +
-		AT()*AT() * timeFactorATAT(  ) * ATAT_value +
-		AP()*AT() * timeFactorImAPAT(  ) * ImAPAT_value +
-		A0()*AP() * timeFactorReA0AP(  ) * ReA0AP_value +
-		A0()*AT() * timeFactorImA0AT(  ) * ImA0AT_value ;
+		double PwaveTot =
+			A0()*A0() * timeFactorA0A0(  ) * A0A0_value +
+			AP()*AP() * timeFactorAPAP(  ) * APAP_value +
+			AT()*AT() * timeFactorATAT(  ) * ATAT_value +
+			AP()*AT() * timeFactorImAPAT(  ) * ImAPAT_value +
+			A0()*AP() * timeFactorReA0AP(  ) * ReA0AP_value +
+			A0()*AT() * timeFactorImA0AT(  ) * ImA0AT_value ;
 
-	double SwaveAdditions =
-		AS()*AS() * timeFactorASAS(  ) * ASAS_value +
-		AS()*AP() * timeFactorReASAP(  ) * ReASAP_value +
-		AS()*AT() * timeFactorImASAT(  ) * ImASAT_value +
-		AS()*A0() * timeFactorReASA0(  ) * ReASA0_value ;
+		double SwaveAdditions =
+			AS()*AS() * timeFactorASAS(  ) * ASAS_value +
+			AS()*AP() * timeFactorReASAP(  ) * ReASAP_value +
+			AS()*AT() * timeFactorImASAT(  ) * ImASAT_value +
+			AS()*A0() * timeFactorReASA0(  ) * ReASA0_value ;
 
-	cout << "   Pwave Only : " << PwaveTot << endl ;
-	cout << "   Swave add : " <<  SwaveAdditions << endl ;
+		cout << "   Pwave Only : " << PwaveTot << endl ;
+		cout << "   Swave add : " <<  SwaveAdditions << endl ;
+		if( _datapoint ) _datapoint->Print();
+	}
 
 	PDF_THREAD_UNLOCK
 }
@@ -1444,7 +1456,7 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 {
 	PDF_THREAD_LOCK
 
-		(void) message; (void) value;
+	(void) message; (void) value;
 	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
 	cout << message << value << endl <<endl ;
 

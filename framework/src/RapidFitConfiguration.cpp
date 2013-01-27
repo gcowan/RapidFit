@@ -85,6 +85,7 @@ numberRepeats(),
 	SoloContourResults(),
 	templatePDFs(),
 	debug(),
+	disableLatexOutput(),
 	BuildConstraints()
 {
 		//Variables to store command line arguments
@@ -158,6 +159,7 @@ numberRepeats(),
 		JackKnife_Flag=false;
 		fixedTotalToys = false;
 		saveAllToys = false;
+		disableLatexOutput = false;
 
 		_2DResultForFC = NULL;
 		GlobalFitResult = NULL;

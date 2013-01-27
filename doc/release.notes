@@ -3,6 +3,9 @@
 2013/01/27 Rob Currie
   - Adding fix to XML output from the FitFunctionConfiguration to correctly setup the fit as a Weighted fit with an appropriate alpha
   - Changed the ComponentPlotter to use the user defined alpha rather than forcing it to be recalculated on a per-dataset basis.
+  - Modified v5 to not complain during Projections
+  - Added --disableLatexOutput to the runtime arguments, useful when doing fast development and don't want to save the output
+  - Minor verbosity changes
 
 2013/01/25 Rob Currie
   - Added a big chunk more documentation

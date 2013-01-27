@@ -39,9 +39,9 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		~Bs2JpsiPhi_Signal_v5();
 
 		// Mandatory RapidFit Methods
-		virtual double EvaluateForNumericIntegral(DataPoint*) ;
+		virtual double EvaluateForNumericIntegral(DataPoint*);
 		virtual double Evaluate(DataPoint*);
-		virtual double EvaluateTimeOnly(DataPoint*) ;
+		virtual double EvaluateTimeOnly(DataPoint*);
 		virtual bool SetPhysicsParameters(ParameterSet*);
 		virtual vector<string> GetDoNotIntegrateList();
 
@@ -52,7 +52,7 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 	private:
 		//Bs2JpsiPhi_Signal_v5& operator=( const Bs2JpsiPhi_Signal_v5& );
 		void MakePrototypes();
-		double normalisationCacheUntagged ;
+		double normalisationCacheUntagged;
 		void prepareCDS();
 
 		void prepareTimeFac();
@@ -128,16 +128,16 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		ObservableRef res3FractionName;		// fraction of tail
 		ObservableRef timeOffsetName;		// time offset
 
-		ObservableRef angAccI1Name ;
-		ObservableRef angAccI2Name ;
-		ObservableRef angAccI3Name ;
-		ObservableRef angAccI4Name ;
-		ObservableRef angAccI5Name ;
-		ObservableRef angAccI6Name ;
-		ObservableRef angAccI7Name ;
-		ObservableRef angAccI8Name ;
-		ObservableRef angAccI9Name ;
-		ObservableRef angAccI10Name ;
+		ObservableRef angAccI1Name;
+		ObservableRef angAccI2Name;
+		ObservableRef angAccI3Name;
+		ObservableRef angAccI4Name;
+		ObservableRef angAccI5Name;
+		ObservableRef angAccI6Name;
+		ObservableRef angAccI7Name;
+		ObservableRef angAccI8Name;
+		ObservableRef angAccI9Name;
+		ObservableRef angAccI10Name;
 
 		// Observables
 		ObservableRef timeName;		// proper time
@@ -175,127 +175,128 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		double ReASA0_value;
 
 		// Measured Event Observables
-		double t ;
-		int tag ;
+		double t;
+		int tag;
 		// Transversity angles
-		double ctheta_tr ;
-		double phi_tr ;
-		double ctheta_1 ;
+		double ctheta_tr;
+		double phi_tr;
+		double ctheta_1;
 		// Helicity angles
 		double ctheta_k;
 		double ctheta_l;
 		double phi_h;
-		bool _useHelicityBasis ;
+		bool _useHelicityBasis;
 
 
 		// Physics Fit Parameters
-		double _gamma ;
-		double dgam ;
+		double _gamma;
+		double dgam;
 
-		double Aperp_sq ;
-		double Apara_sq ;
-		double Azero_sq ;
-		double As_sq ;
-		double Csp ;
-		double CachedA1 ;
-		double CachedA2 ;
-		double CachedA3 ;
-		double CachedA4 ;
-		double CachedA5 ;
-		double CachedA6 ;
-		double CachedA7 ;
-		double CachedA8 ;
-		double CachedA9 ;
-		double CachedA10 ;
-		void CacheAmplitudesAndAngles() ;
+		double Aperp_sq;
+		double Apara_sq;
+		double Azero_sq;
+		double As_sq;
+		double Csp;
+		double CachedA1;
+		double CachedA2;
+		double CachedA3;
+		double CachedA4;
+		double CachedA5;
+		double CachedA6;
+		double CachedA7;
+		double CachedA8;
+		double CachedA9;
+		double CachedA10;
+		void CacheAmplitudesAndAngles();
 
-		double delta_para ;
-		double delta_perp ;
-		double delta_zero ;
-		double delta_s ;
-		double delta1 ;
-		double delta2 ;
-		double cosdpar ; //PELC-COSDPAR Special for fitting cosdpar separately
+		double delta_para;
+		double delta_perp;
+		double delta_zero;
+		double delta_s;
+		double delta1;
+		double delta2;
+		double cosdpar; //PELC-COSDPAR Special for fitting cosdpar separately
 
-		double delta_ms ;
-		double phi_s ;
-		double _cosphis ;
-		double _sinphis ;
-		double lambda ;
+		double delta_ms;
+		double phi_s;
+		double _cosphis;
+		double _sinphis;
+		double lambda;
 		double _CC, _DD, _SS;
 
-		double _mistag ;
-		double _mistagP1 ;
-		double _mistagP0 ;
-		double _mistagSetPoint ;
-		double _mistagDeltaP1 ;
-		double _mistagDeltaP0 ;
-		double _mistagDeltaSetPoint ;
-		;
-		double resolution ;
-		double eventResolution ;
-		double resolutionScale ;
-		double resolution1 ;
-		double resolution2 ;
-		double resolution3 ;
-		double resolution2Fraction ;
-		double resolution3Fraction ;
-		double timeOffset ;
-		bool _useEventResolution ;
-		inline bool useEventResolution() const {return _useEventResolution ; }
-		inline bool useTimeAcceptance() const { return _useTimeAcceptance ; }
+		double _mistag;
+		double _mistagP1;
+		double _mistagP0;
+		double _mistagSetPoint;
+		double _mistagDeltaP1;
+		double _mistagDeltaP0;
+		double _mistagDeltaSetPoint;
+
+		double resolution;
+		double eventResolution;
+		double resolutionScale;
+		double resolution1;
+		double resolution2;
+		double resolution3;
+		double resolution2Fraction;
+		double resolution3Fraction;
+		double timeOffset;
+		bool _useEventResolution;
+		inline bool useEventResolution() const {return _useEventResolution; }
+		inline bool useTimeAcceptance() const { return _useTimeAcceptance; }
 
 
-		double angAccI1 ;
-		double angAccI2 ;
-		double angAccI3 ;
-		double angAccI4 ;
-		double angAccI5 ;
-		double angAccI6 ;
-		double angAccI7 ;
-		double angAccI8 ;
-		double angAccI9 ;
-		double angAccI10 ;
-		AngularAcceptance * angAcc ;
-		bool _angAccIgnoreNumerator ;
+		double angAccI1;
+		double angAccI2;
+		double angAccI3;
+		double angAccI4;
+		double angAccI5;
+		double angAccI6;
+		double angAccI7;
+		double angAccI8;
+		double angAccI9;
+		double angAccI10;
+		AngularAcceptance * angAcc;
+		bool _angAccIgnoreNumerator;
 
 		// Othere things calculated later on the fly
-		double tlo, thi ;
+		double tlo, thi;
 
 		// stored time primitives
-		mutable double expL_stored ;
-		mutable double expH_stored ;
-		mutable double expSin_stored ;
-		mutable double expCos_stored ;
-		mutable double intExpL_stored ;
-		mutable double intExpH_stored ;
-		mutable double intExpSin_stored ;
-		mutable double intExpCos_stored ;
+		mutable double expL_stored;
+		mutable double expH_stored;
+		mutable double expSin_stored;
+		mutable double expCos_stored;
+		mutable double intExpL_stored;
+		mutable double intExpH_stored;
+		mutable double intExpSin_stored;
+		mutable double intExpCos_stored;
 		void preCalculateTimeFactors();
 		void preCalculateTimeIntegrals();
 
-		bool timeIntegralCacheValid ;
+		bool timeIntegralCacheValid;
 		vector< vector<double> > storeExpL;
 		vector< vector<double> > storeExpH;
 		vector< vector<double> > storeExpSin;
 		vector< vector<double> > storeExpCos;
-		void CacheTimeIntegrals() ;
-		void deCacheTimeIntegrals( unsigned int ires, unsigned int islice ) ;
+		void CacheTimeIntegrals();
+		void deCacheTimeIntegrals( unsigned int ires, unsigned int islice );
 
 		//Time acceptance
-		SlicedAcceptance * timeAcc ;
+		SlicedAcceptance* timeAcc;
 
 		//Configurationparameters
-		bool _useTimeAcceptance ;
-		bool _numericIntegralForce ;
-		bool _numericIntegralTimeOnly ;
-		bool _useCosAndSin ;
-		bool _useCosDpar ;
-		bool _usePunziSigmat ;
-		bool _usePunziMistag ;
-		bool allowNegativeAsSq ;
-		bool _usePlotComponents ;
-        double _offsetToGammaForBetaFactor ;
+		bool _useTimeAcceptance;
+		bool _numericIntegralForce;
+		bool _numericIntegralTimeOnly;
+		bool _useCosAndSin;
+		bool _useCosDpar;
+		bool _usePunziSigmat;
+		bool _usePunziMistag;
+		bool allowNegativeAsSq;
+		bool _usePlotComponents;
+		bool performingComponentProjection;
+		double _offsetToGammaForBetaFactor;
 
 		double sin_delta_perp_s;
 		double cos_delta_perp_s;

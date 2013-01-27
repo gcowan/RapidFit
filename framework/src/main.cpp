@@ -721,7 +721,10 @@ int PerformMainFit( RapidFitConfiguration* config )
 		config->makeOutput->SetInputResults( config->GlobalResult->GetResultParameterSet() );
 		if( !config->doLLcontourFlag && ( !config->doFC_Flag && !config->doLLscanFlag  ) )
 		{
-			config->makeOutput->OutputFitResult( config->GlobalFitResult->GetFitResult(0) );
+			if( !config->disableLatexOutput )
+			{
+				config->makeOutput->OutputFitResult( config->GlobalFitResult->GetFitResult(0) );
+			}
 		}
 		ResultFormatter::ReviewOutput( config->GlobalResult );
 	}

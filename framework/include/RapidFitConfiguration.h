@@ -99,6 +99,7 @@ class RapidFitConfiguration
 		bool fixedTotalToys;
 		bool saveAllToys;
 		bool BuildConstraints;
+		bool disableLatexOutput;
 
 		string currentArgument;
 		FitResultVector* _2DResultForFC;

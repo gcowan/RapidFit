@@ -387,11 +387,15 @@ void MemoryDataSet::ApplyExternalAlpha( const string AlphaName )
 	alphaName = AlphaName;
 	ObservableRef alphaNameRef( alphaName );
 	ObservableRef WeightNameRef( WeightName );
+	double avr=0.;
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
-		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightNameRef )->GetValue() * allData[i]->GetObservable( alphaNameRef )->GetValue() );
+		double alpha = allData[i]->GetObservable( alphaNameRef )->GetValue();
+		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightNameRef )->GetValue() * alpha );
+		avr+=alpha;
 	}
-	cout << "Using Observable: " << alphaName << " to apply a per-event alpha correction to the per-event weights used." << endl << endl;
+	avr/=(double)allData.size();
+	cout << "Using Observable: " << alphaName << " to apply a per-event alpha correction to the per-event weights used. Average Weight: " << avr << endl << endl;
 }
 
 

@@ -612,6 +612,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--saveAllToys" )				{	config.saveAllToys = true;				}
 		else if( currentArgument == "--Debug" )	{  if( config.debug != NULL ){ delete config.debug;}	config.debug = new DebugClass(true);	}
 		else if( currentArgument == "--BuildConstraints" )			{	config.BuildConstraints = true;				}
+		else if( currentArgument == "--disableLatexOutput" )			{	config.disableLatexOutput = true;			}
 
 		//	We didn't understand the argument to end up here
 		else
