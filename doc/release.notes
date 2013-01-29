@@ -4,6 +4,7 @@
   - Updated plots in RapidPlot. These are changes in the Plotting code to improve the general quality of the plots, but the EdStyle style is still close to the official style
   - Fixed some bugs in ComponentPlotter such as performing a deep copy in place of a deep copy by reference
   - Fixed a minor memory leak in ComponentPlotter
+  - Fixed a bug where non-pull plots were being incorrectly overwritten
   - Now correctly writing unNormalised and Normalisation to ROOT file to check raw unNormalised PDF projection
   - Fixed bug in DebugClass to do with Debug Copy constructor. Some classes could be accessed from runtime arg, some could not...
   - Added a few more minor debug output statements

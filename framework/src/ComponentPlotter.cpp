@@ -815,7 +815,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				   }
 				   */
 
-				this->OutputPlotPull( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), allPullData, plotPDF->GetRandomFunction(), temp );
+				this->OutputPlotPull( binned_data.back(), these_components, observableName, desc_pull.Data(), plotData->GetBoundary(), allPullData, plotPDF->GetRandomFunction(), temp );
 				(void)pullPlot;
 			}
 		}
