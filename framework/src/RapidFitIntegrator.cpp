@@ -369,7 +369,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}
 
-	unsigned int npoint = 1000;
+	unsigned int npoint = 10000;
 	//unsigned int npoint = 100000;
 	vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
 
@@ -393,6 +393,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	}
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
 
+	//cout << endl;
 	double result = 0.;
 	for (unsigned int i = 0; i < integrationPoints[0].size(); ++i)
 	{
@@ -402,6 +403,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 			//cout << doIntegrate[j] << " " << maxima[j] << " " << minima[j] << " " << integrationPoints[j][i] << endl;
 			point[j] = integrationPoints[j][i]*(maxima[j]-minima[j])+minima[j];
 		}
+		//cout << i << "\r" << flush;
 		result += quickFunction->DoEval( point );
 		delete[] point;
 	}
@@ -789,6 +791,13 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 						}
 					}
 					numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
+					if( debug != NULL )
+					{
+						if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+						{
+							cout << "RapidFitIntegrator: Finished: " << numericalIntegral << endl;
+						}
+					}
 					if( numericalIntegral < 0 )
 					{
 						cout << "Calculated a -ve Integral: " << numericalIntegral << ". Did you Compile with the GSL options Enabled with 'make gsl'?" << endl;
@@ -841,6 +850,24 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 	}
 
 	dontIntegrate.push_back(ProjectThis);
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
+			cout << endl << "Dont:" << endl;
+			for( unsigned int i=0; i< dontIntegrate.size(); ++i )
+			{
+				cout << dontIntegrate[i] << "  ";
+			}
+			cout << endl << "Do:" << endl;
+			for( unsigned int i=0; i< allIntegrable.size(); ++i )
+			{
+				cout << allIntegrable[i] << "  ";
+			}
+			cout << endl;
+		}
+	}
 
 	if( testedIntegrable.size() == 1 )
 	{

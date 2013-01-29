@@ -46,7 +46,7 @@
 using namespace::std;
 
 //Constructor with correct arguments
-ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num, DebugClass* Debug ) :
+ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num, const DebugClass* Debug ) :
 	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ),
 	pdfIntegrator( new RapidFitIntegrator( *(NewPDF->GetPDFIntegrator()) ) ), weightsWereUsed(false), weight_norm(1.),
 	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
@@ -97,7 +97,11 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	step_size = ( boundary_max - boundary_min ) / (double)( total_points - 1 );
 
 	//Work out what to plot
-	allCombinations = full_boundary->GetDiscreteCombinations();
+	vector<DataPoint*> allCombinations_input = full_boundary->GetDiscreteCombinations();
+	for( unsigned int i=0; i< allCombinations_input.size(); ++i )
+	{
+		allCombinations.push_back( new DataPoint( *(allCombinations_input[i]) ) );
+	}
 
 	this->SetupCombinationDescriptions();
 
@@ -272,8 +276,17 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 		//Normalise the PDF such that the final decision of bin number is the only variable missing.
 
 		//Update the data average values, and make the projection graph arrays
-		vector<double>* projectionValueArray = new vector<double>();
-		*projectionValueArray = *projectionValueVector;
+
+		vector<double>* projectionValueArray = projectionValueVector;
+
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "ComponentPlotter" ) )
+			{
+				cout << "ComponentPlotter:: Normalising the PDF component: " << combinationIndex << endl;
+				cout << "ComponentPlotter:: Normalisation: " << this->PDF2DataNormalisation( combinationIndex );
+			}
+		}
 
 		double PDFNormalisation = this->PDF2DataNormalisation( combinationIndex );
 
@@ -283,8 +296,6 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 		{
 			(*projectionValueArray)[ pointIndex ] *= PDFNormalisation;
 		}
-
-		delete projectionValueVector;
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -421,6 +432,26 @@ void ComponentPlotter::GenerateProjectionData()
 	this->WriteOutput( X_values, Y_values, combinationDescriptions );
 	here->cd();
 
+	for( unsigned int i=0; i< X_values->size(); ++i )
+	{
+		for( unsigned int j=0; j< (*X_values)[i]->size(); ++j )
+		{
+			delete (*(*X_values)[i])[j];
+		}
+		delete (*X_values)[i];
+	}
+	delete X_values;
+
+	for( unsigned int i=0; i< Y_values->size(); ++i )
+	{
+                for( unsigned int j=0; j< (*Y_values)[i]->size(); ++j )
+                {
+                        delete (*(*Y_values)[i])[j];
+                }
+                delete (*Y_values)[i];
+        }
+        delete Y_values;
+
 	return;
 }
 
@@ -504,22 +535,50 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			TString TTree_title( TTree_name );
 			TTree_name.Append("_");TTree_name+=plotPDF->GetRandomFunction()->Rndm();
 
-			TTree* this_data = new TTree( TTree_name, TTree_title );
+			string TTreeName( TTree_name.Data() );
+			replace( TTreeName.begin(), TTreeName.end(), '.', '_' );
+
+			TTree* this_data = new TTree( TTreeName.c_str(), TTree_title );
 
 			vector<double>* unnormalised = new vector<double>();
+			vector<double>* normalisation = new vector<double>();
+
+			double Normalisation = 0.;
+
+			if( (*X_values)[componentIndex]->size() > 1 )
+			{
+				if( combinationIndex == 0 )
+				{
+					for( unsigned int i=0; i< (*X_values)[componentIndex]->size()-1; ++i )
+					{
+						Normalisation += this->PDF2DataNormalisation( i );
+					}
+				}
+				else
+				{
+					Normalisation = this->PDF2DataNormalisation( combinationIndex-1 );
+				}
+			}
+			else
+			{
+				Normalisation = this->PDF2DataNormalisation( 0 );
+			}
 
 			for( vector<double>::iterator num_i = (*(*Y_values)[componentIndex])[combinationIndex]->begin(); num_i != (*(*Y_values)[componentIndex])[combinationIndex]->end(); ++num_i )
 			{
-				unnormalised->push_back( (*num_i) * data_binning );
+				unnormalised->push_back( (*num_i) / Normalisation );
+				normalisation->push_back( Normalisation );
 			}
 
 			this->WriteBranch( this_data, "X_data", (*(*X_values)[componentIndex])[combinationIndex] );
 			this->WriteBranch( this_data, "Y_data", (*(*Y_values)[componentIndex])[combinationIndex] );
 			this->WriteBranch( this_data, "Y_data_unNormalised", unnormalised );
+			this->WriteBranch( this_data, "Y_data_Normalisation", normalisation );
 
 			this_data->Write( "", TObject::kOverwrite );
 
 			delete unnormalised;
+			delete normalisation;
 
 			TString Data_Name("Raw_Data_"); Data_Name+=componentIndex; Data_Name.Append("_");Data_Name+=combinationIndex;
 			TString Data_Title( Data_Name );
@@ -592,6 +651,8 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 		PlotDirectory->cd();
 	}
+
+	cout << "Data Written to File, Making Graphs" << endl;
 
 	//	Starting at the top of the file again
 	PlotFile->cd();
@@ -760,6 +821,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		}
 		delete temp;
 	}
+
 
 }
 
@@ -1607,7 +1669,9 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	cout << ObservableName << ": " << Minimum << " <-> " << Minimum + ( PlotInterval * (PlotNumber-1) ) << endl;
 
 	//	This class object has been created to speed up the communication between this class and the basePDF as it may pass through several PDF wrappers
-	ComponentRef* comp_obj = new ComponentRef( component );
+	ComponentRef comp_obj = ComponentRef( component );
+
+	string unit = InputPoint->GetObservable( string(ObservableName) )->GetUnit();
 
 	//	Step over the whole observable range
 	for (int pointIndex = 0; pointIndex < PlotNumber; ++pointIndex )
@@ -1620,22 +1684,24 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 
 		//	Set the value of Observable to the new step value
 		//	All other CONTINUOUS observables set to average of range
-		oldObs = InputPoint->GetObservable(ObservableName);
-		newObs = new Observable( ObservableName, observableValue, oldObs->GetUnit() );
-		InputPoint->SetObservable( ObservableName, newObs );
+		oldObs = InputPoint->GetObservable( string(ObservableName) );
+		newObs = new Observable( string(ObservableName), observableValue, unit );
+		DataPoint* thisPoint = new DataPoint( *InputPoint );
+		thisPoint->SetObservable( string(ObservableName), newObs );
 		delete newObs; newObs = NULL;
 
 		if( debug != NULL )
 		{
 			if( debug->DebugThisClass( "ComponentPlotter" ) )
 			{
-				cout << "ComponentPlotter: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << ObservableName << "==" << observableValue << "\t";
-				InputPoint->Print();
+				cout << endl << "ComponentPlotter: Calling RapidFitIntegrator::ProjectObservable " << pointIndex << " of " << PlotNumber << "\t" << ObservableName << "==" << observableValue << "\t";
+				//InputPoint->Print();
 				pdfIntegrator->SetDebug( debug );
 			}
 		}
+
 		//	perform actual evaluation of the PDF with the configuration in the InputPoint, in the whole boundary with the given name and for selected component
-		integralvalue = pdfIntegrator->ProjectObservable( InputPoint, full_boundary, ObservableName, comp_obj );
+		integralvalue = pdfIntegrator->ProjectObservable( thisPoint, full_boundary, ObservableName, &comp_obj );
 
 		if( debug != NULL )
 		{
@@ -1649,8 +1715,8 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		}
 
 		pointValues->push_back( integralvalue );
+		delete thisPoint;
 	}
-	delete comp_obj;
 
 	cout << "Finished Projecting" << endl;
 

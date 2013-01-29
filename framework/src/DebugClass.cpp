@@ -18,7 +18,7 @@ DebugClass::DebugClass( const DebugClass& input ) :
 	if( &input != NULL )
 	{
 		perform_debugging = input.perform_debugging;
-		classes_to_debug = classes_to_debug;
+		classes_to_debug = input.classes_to_debug;
 	}
 }
 

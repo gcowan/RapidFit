@@ -20,7 +20,20 @@
 
 using namespace::std;
 
+unsigned int Rapid2DLL::GetFunctionLineWidth()
+{
+	return 3;
+}
 
+unsigned int Rapid2DLL::GetAxisWidth()
+{
+	return 3;
+}
+
+double Rapid2DLL::GetLegTextSize()
+{
+	return 0.04;
+}
 
 unsigned int Rapid2DLL::GetColors( unsigned int input )
 {
@@ -203,6 +216,7 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 
 	cout << "Plotting Contours" << endl;
 
+	gStyle->SetLineWidth( (Width_t)Rapid2DLL::GetAxisWidth() );
 	gROOT->UseCurrentStyle();
 	gROOT->ForceStyle( true );
 
@@ -215,11 +229,11 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 		named_nll_contours.push_back( make_pair( *cont_i, return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
 	}
 	TString filename( controlled_parameter1 + "_" + controlled_parameter2 + ".pdf" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
+	Rapid2DLL::Plot_Contours( controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
 	filename = TString( controlled_parameter1 + "_" + controlled_parameter2 + ".png" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
+	Rapid2DLL::Plot_Contours( controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
 	filename = TString( controlled_parameter1 + "_" + controlled_parameter2 + ".C" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
+	Rapid2DLL::Plot_Contours( controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
 
 	vector<pair<TMultiGraph*,TString> > named_nll_contours_rotated;
 	cont_num=0;
@@ -228,11 +242,11 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 		named_nll_contours_rotated.push_back( make_pair( *cont_i, return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
 	}
 	TString filename_rotated( controlled_parameter2 + "_" + controlled_parameter1 + ".pdf" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
+	Rapid2DLL::Plot_Contours( controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
 	filename_rotated = TString( controlled_parameter2 + "_" + controlled_parameter1 + ".png" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
+	Rapid2DLL::Plot_Contours( controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
 	filename_rotated = TString( controlled_parameter2 + "_" + controlled_parameter1 + ".C" );
-	Rapid2DLL::Plot_Contours( input_tree, controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
+	Rapid2DLL::Plot_Contours( controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
 
 	cout << endl;
 
@@ -253,12 +267,13 @@ void Rapid2DLL::Help()
 	cout << endl << "Rapid2DLL can Accept the following arguments for producing 2DLL plots" << endl;
 	cout << "--isFinal" << "\t\t" << "As in producing 1DLL this decides whether we are adding 'LHCb' or 'LHCb Preliminary' to the Plots" << endl;
 	cout << endl;
+	cout << "--addPhis" << "\t\t" << "Add the Phi_s Theory" << endl;
+	cout << endl;
 }
 
-void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1, TString controlled_parameter2, TH1* nll_hist, vector<pair<TMultiGraph*,TString> > nll_contours,
+void Rapid2DLL::Plot_Contours( TString controlled_parameter1, TString controlled_parameter2, TH1* nll_hist, vector<pair<TMultiGraph*,TString> > nll_contours,
 		TString filename, TRandom* rand, vector<string> other_params )
 {
-	(void) input_tree;
 	if( rand == NULL ) rand = gRandom;
 
 	TPaveText* label = NULL;
@@ -270,9 +285,10 @@ void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1,
 	if( StringOperations::VectorContains( &other_params, &addLHCb ) != -1 )		label = Histogram_Processing::addLHCbLabel( "", true );
 	else										label = Histogram_Processing::addLHCbLabel( "", false );
 
-	TLegend* leg = new TLegend( 0.75, 0.65, 0.9, 0.9 );
+	TLegend* leg = new TLegend( 0.65, 0.65, 0.9, 0.9 );
 	leg->SetFillStyle(0);
 	leg->SetBorderSize(0);
+	leg->SetTextSize( (Float_t)Rapid2DLL::GetLegTextSize() );
 
 	TString TCanvas_Name("TCanvas_");TCanvas_Name+=rand->Rndm();
 	TCanvas* c1 = new TCanvas( TCanvas_Name, TCanvas_Name, 1680, 1050 );
@@ -289,6 +305,7 @@ void Rapid2DLL::Plot_Contours( TTree* input_tree, TString controlled_parameter1,
 			TGraph* this_part = (TGraph*) this_cont->At( i );
 			this_part->SetLineColor( (Color_t)Rapid2DLL::GetColors( cont_num ) );
 			this_part->SetLineStyle( (Style_t)Rapid2DLL::GetStyle( cont_num ) );
+			this_part->SetLineWidth( (Width_t)Rapid2DLL::GetFunctionLineWidth() );
 		}
 		leg->AddEntry( cont_i->first->GetListOfGraphs()->First() , nll_contours[cont_num].second, "L" );
 	}

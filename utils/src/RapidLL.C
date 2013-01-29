@@ -45,6 +45,16 @@
 
 using namespace::std;
 
+unsigned int RapidLL::GetFunctionLineWidth()
+{
+	return 3;
+}
+
+unsigned int RapidLL::GetAxisWidth()
+{
+	return 3;
+}
+
 /*int RapidLL::PlotRapidFitLL( TTree* input_tree, TString controlled_parameter, TRandom3* rand, vector<string> other_params )
   {
   (void) other_params;
@@ -128,6 +138,9 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 	TString NLL_Min;		//	Of course ROOT doesn't have USEFUL constructors!
 	NLL_Min+=true_min_NLL;
 
+	gStyle->SetLineWidth( (Width_t)RapidLL::GetAxisWidth() );
+	gROOT->UseCurrentStyle();
+	gROOT->ForceStyle( true );
 
 	//	Do the NLL plotting
 
@@ -300,14 +313,22 @@ TGraph* RapidLL::LL_Plot( TTree* input_TTree, TString Cut_String, double Global_
 	new_graph = new TGraph( (Int_t)size, temp2, temp1 );
 	TString Name="Graph";
 	Name+=rand->Rndm();
-	new_graph->SetName( Name );
+	string rand_str_( Name.Data() );
+	replace( rand_str_.begin(), rand_str_.end(), '.', '_' );
+	new_graph->SetName( rand_str_.c_str() );
 	new_graph->SetTitle("");
+
+	new_graph->SetLineWidth( RapidLL::GetFunctionLineWidth() );
 
 	return new_graph;
 }
 
 void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 {
+	gStyle->SetLineWidth( (Width_t)RapidLL::GetAxisWidth() );
+	gROOT->UseCurrentStyle();
+	gROOT->ForceStyle( true );
+
 	TString OverlayName="OverlayPlots";
 	gSystem->mkdir( OverlayName );
 	gSystem->cd( OverlayName );

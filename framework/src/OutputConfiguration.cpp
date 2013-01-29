@@ -42,7 +42,7 @@ OutputConfiguration::OutputConfiguration( vector< pair< string, string > > Input
 	Global_2DScan_List( _2DScanParameters ),
 	Stored_Fit_Results(),
 	proj_components( Components ),
-	debug(new DebugClass(false) )
+	debug(new DebugClass() )
 {
 }
 

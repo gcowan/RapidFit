@@ -278,8 +278,6 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 		storeExpCos.push_back( empty ) ;
 	}
 
-	cout << "here" << endl;
-
 	this->TurnCachingOff();
 
 	this->SetNumericalNormalisation( false );
@@ -734,14 +732,17 @@ double Bs2JpsiPhi_Signal_v5::Evaluate(DataPoint * measurement)
 	}
 
 
-	//conditions to throw exception
-	bool c1 = isnan(returnValue) ;
-	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
-	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;
-	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
-		this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Evaluate() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw 10 ;
-		if( returnValue <= 0. ) throw 10 ;
+	if( !performingComponentProjection )
+	{
+		//conditions to throw exception
+		bool c1 = isnan(returnValue) ;
+		bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
+		bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;
+		if( DEBUGFLAG && (c1 || c2 || c3)  ) {
+			this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Evaluate() returns <=0 or nan :" , returnValue ) ;
+			if( isnan(returnValue) ) throw 10 ;
+			if( returnValue <= 0. ) throw 10 ;
+		}
 	}
 
 
@@ -1093,10 +1094,6 @@ double Bs2JpsiPhi_Signal_v5::diffXsec()
 				CachedA9 * timeFactorImASAT(  ) +
 				CachedA10 * timeFactorReASA0(  );
 
-			Observable* timeObs = _datapoint->GetObservable( timeName );
-			if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
-			if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsec( ) : return value < 0 = ", xsec ) ;
-
 			//PELC - This turned out to be an important debugging tool
 			//switch it on to see the values of PDF being returend.  If ANY go negative, it means there is a sign wrong in one or more of the terms
 			//You need to enable in the .h file as well
@@ -1110,6 +1107,10 @@ double Bs2JpsiPhi_Signal_v5::diffXsec()
 			//}
 			break;
 	}
+
+	Observable* timeObs = _datapoint->GetObservable( timeName );
+	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
+	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsec( ) : return value < 0 = ", xsec ) ;
 
 	return xsec;
 }

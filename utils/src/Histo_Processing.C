@@ -526,7 +526,7 @@ TH1* Histogram_Processing::Plot( const vector<vector<double> >& input, TString F
 TPaveText* Histogram_Processing::addLHCbLabel(TString footer, bool final/*, bool DATA*/)
 {
 	//TPaveText * label = new TPaveText(0.18, 0.77, 0.18, 0.88,"BRNDC");
-	TPaveText* label = new TPaveText( gStyle->GetPadLeftMargin() + 0.05, 
+	TPaveText* label = new TPaveText( gStyle->GetPadLeftMargin() + 0.08, 
 			0.87 - gStyle->GetPadTopMargin(),
 			gStyle->GetPadLeftMargin() + 0.30,
 			0.95 - gStyle->GetPadTopMargin(), "BRNDC");
