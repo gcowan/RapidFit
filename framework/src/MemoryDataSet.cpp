@@ -175,7 +175,13 @@ void MemoryDataSet::SetBoundary( const PhaseSpaceBoundary* Input )
 //Empty the data set
 void MemoryDataSet::Clear()
 {
-	allData.clear();
+	vector<DataPoint*> empty;
+	while( !allData.empty() )
+	{
+		if( allData.back() != NULL ) delete allData.back();
+		allData.pop_back();
+	}
+	allData.swap(empty);
 }
 
 void MemoryDataSet::SortBy( string parameter )

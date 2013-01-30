@@ -7,6 +7,10 @@
 #define _STR(x) #x
 #define STR(x) _STR(x)
 
+#include <vector>
+
+using namespace::std;
+
 /*!
  * This is required to be able to compile all of the code for running on the grid.
  *
@@ -14,7 +18,7 @@
  *
  * This is effectively main but with another name which allows us to call it within main and from elsewhere
  */
-int RapidFit( int, char** );
+int RapidFit( vector<string> );
 
 #endif
 

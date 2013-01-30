@@ -168,9 +168,9 @@ void ParseCommandLine::RapidFitAbout( string name )
 	cout << "\t\t" << name << "\t --help" << endl << endl;
 }
 
-int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int argc, char* argv[] )
+int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vector<string> argv )
 {
-	if( argc == 1 )
+	if( argv.size() == 1 )
 	{
 		cout << endl << "This is the Edinburgh, RapidFit Fitter!" << endl;
 		cout << endl <<"for the priority of command line arguments run:" << endl <<endl<<"\t"<< argv[0] << " --about" << endl;
@@ -179,7 +179,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 	}
 
 	cout << "Current Runtime Arguments: " << endl;
-	for( int i=0; i< argc; ++i )
+	for( unsigned int i=0; i< argv.size(); ++i )
 	{
 		cout << argv[i] << " ";
 	}
@@ -187,7 +187,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 
 	//Parse command line arguments
 
-	for ( int argumentIndex = 1; argumentIndex < argc; ++argumentIndex )
+	for( unsigned int argumentIndex = 1; argumentIndex < argv.size(); ++argumentIndex )
 	{
 		string currentArgument = string( argv[argumentIndex] );
 
@@ -203,7 +203,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "-f" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.configFileName = argv[argumentIndex];
@@ -217,7 +217,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "-p" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.parameterTemplates.push_back( argv[argumentIndex] );
@@ -231,7 +231,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "-minimiser" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.theMinimiser = new MinimiserConfiguration( argv[argumentIndex] );
@@ -245,7 +245,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "-function" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.theFunction = new FitFunctionConfiguration( argv[argumentIndex] );
@@ -259,7 +259,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--saveOneDataSet" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.saveOneDataSetFileName = argv[argumentIndex];
@@ -273,7 +273,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--saveOneFoamDataSet" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.saveOneDataSetFileName = argv[argumentIndex];
@@ -287,7 +287,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "-PDF" )
 		{
-			if( argumentIndex + 3 < argc )
+			if( argumentIndex + 3 < argv.size() )
 			{
 				++argumentIndex;
 				string pdfName = argv[argumentIndex];
@@ -306,10 +306,10 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "-repeats" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
-				config.numberRepeats = atoi( argv[argumentIndex] );
+				config.numberRepeats = atoi( argv[argumentIndex].c_str() );
 				config.numberRepeatsFlag = true;
 			}
 			else
@@ -320,14 +320,10 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--OverrideXML" )
 		{
-			if( argumentIndex + 2 < argc )
+			if( argumentIndex + 2 < argv.size() )
 			{
 				++argumentIndex;
 				string path = string( argv[argumentIndex] );
-				if( path[path.size()-1] == 'Q' )
-				{
-					path = path.substr(0, path.size()-2);
-				}
 				++argumentIndex;
 				string value = string( argv[argumentIndex] );
 				pair<string,string> temp_pair;
@@ -349,7 +345,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--PhysParam" )
 		{
-			if( argumentIndex +1 < argc )
+			if( argumentIndex +1 < argv.size() )
 			{
 				++argumentIndex;
 				string PhysParam = argv[argumentIndex];
@@ -364,7 +360,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--testComponentPlot" )
 		{
 			config.testComponentPlotFlag = true;
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.plotFileName = argv[argumentIndex];
@@ -378,7 +374,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--observableName" )
 		{
 			config.observableNameFlag = true;
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.observableName = argv[argumentIndex];
@@ -392,7 +388,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--doPlotting" )
 		{
 			config.doPlottingFlag = true;
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.plotFileName = argv[argumentIndex];
@@ -406,7 +402,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--doPulls" )
 		{
 			config.doPullsFlag = true;
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.pullFileName = argv[argumentIndex];
@@ -419,7 +415,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--defineScan" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.defineScanFlag = true;
@@ -433,7 +429,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--defineContour" )
 		{
-			if( argumentIndex + 2 < argc )
+			if( argumentIndex + 2 < argv.size() )
 			{
 				config.defineContourFlag = true;
 				++argumentIndex;
@@ -449,10 +445,10 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--NuisenceModel" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
-				config.Nuisencemodel = (unsigned)atoi( argv[argumentIndex] );
+				config.Nuisencemodel = (unsigned)atoi( argv[argumentIndex].c_str() );
 			}
 			else
 			{
@@ -462,10 +458,10 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--SetSeed" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
-				config.RuntimeSeed.push_back( atoi( argv[argumentIndex] ) );
+				config.RuntimeSeed.push_back( atoi( argv[argumentIndex].c_str() ) );
 			}
 			else
 			{
@@ -475,7 +471,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--MCStepSize" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.MCStepSize = ( argv[argumentIndex] );
@@ -488,7 +484,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--MCStartEntry" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				config.MCStartEntry = ( argv[argumentIndex] );
@@ -501,10 +497,10 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--OutputLevel" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
-				config.OutputLevel = atoi( argv[argumentIndex] );
+				config.OutputLevel = atoi( argv[argumentIndex].c_str() );
 				config.OutputLevelSet=true;
 			}
 			else
@@ -515,10 +511,10 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--OutputLevelScans" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
-				config.OutputLevel2 = atoi( argv[argumentIndex] );
+				config.OutputLevel2 = atoi( argv[argumentIndex].c_str() );
 				config.OutputLevelSet=true;
 			}
 			else
@@ -530,12 +526,12 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--GOF" )
 		{
 			config.GOF_Flag = true;
-			if( argumentIndex + 2 < argc )
+			if( argumentIndex + 2 < argv.size() )
 			{
 				++argumentIndex;
-				config.jobNum = atoi( argv[argumentIndex] );
+				config.jobNum = atoi( argv[argumentIndex].c_str() );
 				++argumentIndex;
-				config.nData  = atoi( argv[argumentIndex] );
+				config.nData  = atoi( argv[argumentIndex].c_str() );
 			}
 			else
 			{
@@ -546,12 +542,12 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--JackKnife" )
 		{
 			config.JackKnife_Flag = true;
-			if( argumentIndex + 2 < argc )
+			if( argumentIndex + 2 < argv.size() )
 			{
 				++argumentIndex;
-				config.jackStartNum = atoi( argv[argumentIndex] );
+				config.jackStartNum = atoi( argv[argumentIndex].c_str() );
 				++argumentIndex;
-				config.jackStopNum  = atoi( argv[argumentIndex] );
+				config.jackStopNum  = atoi( argv[argumentIndex].c_str() );
 			}
 			else
 			{
@@ -562,10 +558,10 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		else if( currentArgument == "--MakeTemplate" )
 		{
 			config.makeTemplateXML = true;
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
-				for( ; argumentIndex < argc; ++argumentIndex )
+				for( ; argumentIndex < argv.size(); ++argumentIndex )
 				{
 					config.templatePDFs.push_back( argv[argumentIndex] );
 				}
@@ -578,7 +574,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, int a
 		}
 		else if( currentArgument == "--DebugClass" )
 		{
-			if( argumentIndex + 1 < argc )
+			if( argumentIndex + 1 < argv.size() )
 			{
 				++argumentIndex;
 				vector<string> class_names = StringProcessing::SplitString( argv[argumentIndex], ':' );

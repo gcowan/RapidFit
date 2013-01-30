@@ -59,7 +59,12 @@ using namespace::std;
 #ifndef __CINT__
 int main( int argc, char * argv[] )
 {
-	return RapidFit( argc, argv );
+	vector<string> input;
+	for( int i=0; i< argc; ++i )
+	{
+		input.push_back( argv[i] );
+	}
+	return RapidFit( input );
 }
 #endif
 
@@ -132,7 +137,7 @@ int PerformJackKnife( RapidFitConfiguration* config );
 void SaveXML( RapidFitConfiguration* config );
 
 //	The 'meat' of the Code
-int RapidFit( int argc, char * argv[] )
+int RapidFit( vector<string> input )
 {
 	//  reduce root verbosity:
 	//  gErrorIgnoreLevel = kInfo; // The default is kError
@@ -146,7 +151,7 @@ int RapidFit( int argc, char * argv[] )
 
 	RapidFitConfiguration* thisConfig = new RapidFitConfiguration();
 
-	int command_check = ParseCommandLine::ParseThisCommandLine( *thisConfig, argc, argv );
+	int command_check = ParseCommandLine::ParseThisCommandLine( *thisConfig, input );
 
 	if( thisConfig->debug != NULL )
 	{

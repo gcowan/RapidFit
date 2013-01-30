@@ -710,6 +710,8 @@
 
 		bool fixed_checked, isFixed;
 		size_t fixedID;
+
+		bool debuggingON;
 };
 
 #endif

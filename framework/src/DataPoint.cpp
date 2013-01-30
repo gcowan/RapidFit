@@ -365,10 +365,12 @@ void DataPoint::Print() const
 
 void DataPoint::ClearPsuedoObservable()
 {
-	allPseudoObservables.clear();
-	allPseudoObservables2.clear();
-	allPseudoNames.clear();
-	allPseudoNames2.clear();
+	vector<PseudoObservable> first, second;
+	allPseudoObservables.swap( first );
+	allPseudoObservables2.swap( second );
+	vector<string> name1, name2;
+	allPseudoNames.swap( name1 );
+	allPseudoNames2.swap( name2 );
 }
 
 PhaseSpaceBoundary* DataPoint::GetPhaseSpaceBoundary() const

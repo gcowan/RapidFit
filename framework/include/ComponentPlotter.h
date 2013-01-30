@@ -250,9 +250,9 @@ class ComponentPlotter
 		ComponentPlotter ( const ComponentPlotter& );
 
 		/*!
-                 * @brief Uncopyable!
-                 * No good reason to want to copy these objects so these won't be written
-                 */
+		 * @brief Uncopyable!
+		 * No good reason to want to copy these objects so these won't be written
+		 */
 		ComponentPlotter& operator = ( const ComponentPlotter& );
 
 
@@ -459,8 +459,8 @@ class ComponentPlotter
 		vector<double> combinationWeights;
 
 		/*!
-                 * Weights of each of the unique combinations
-                 */
+		 * Weights of each of the unique combinations
+		 */
 		vector<string> combinationDescriptions;
 
 		/*!

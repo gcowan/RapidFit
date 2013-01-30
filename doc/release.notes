@@ -1,5 +1,15 @@
 // $Id: release.notes $
 
+2013/01/30 Rob Currie
+  - Fixed performance bug in BasePDF to do with debugging
+  - Fixed bug with Alpha XML tags causing crashes which take too long to debug
+  - Fixed bug in v5 which causes the projections to hang. This doesn't fix anything but avoids the code causing the problem
+  - Fixed bug in v5 which was causing component not to be projected including time acceptance
+  - Fixed a nasty bug in RapidRun which was causing the runtime arguments to be garbled in memory
+  - Re-written ParseCommandLine to use a vector of strings rather than an int and char* [] which has required more changes than I would like, but this is much better quality code
+  - Modified the main function to intercept the argc, argv from runtime and assemble a vector of strings to pass to the RapidFit method
+  - Removed possible rare, small memory leaks but every little helps.
+
 2013/01/29 Rob Currie
   - Updated plots in RapidPlot. These are changes in the Plotting code to improve the general quality of the plots, but the EdStyle style is still close to the official style
   - Fixed some bugs in ComponentPlotter such as performing a deep copy in place of a deep copy by reference
@@ -8,7 +18,6 @@
   - Now correctly writing unNormalised and Normalisation to ROOT file to check raw unNormalised PDF projection
   - Fixed bug in DebugClass to do with Debug Copy constructor. Some classes could be accessed from runtime arg, some could not...
   - Added a few more minor debug output statements
-  - Fixed bug in v5 which was causing component not to be projected including time acceptance
 
 2013/01/27 Rob Currie
   - Adding fix to XML output from the FitFunctionConfiguration to correctly setup the fit as a Weighted fit with an appropriate alpha

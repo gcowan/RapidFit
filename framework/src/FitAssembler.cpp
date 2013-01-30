@@ -279,7 +279,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		if( Requested_DataSet->GetDataNumber() > 0 )
 		{
 
-			if( FunctionConfig->GetNormaliseWeights() ) Requested_DataSet->NormaliseWeights();
+			if( FunctionConfig->GetNormaliseWeights() && Requested_DataSet->GetWeightsWereUsed() ) Requested_DataSet->NormaliseWeights();
 
 			if( debug != NULL )
 			{
@@ -304,6 +304,14 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 	}
 
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Checking Weights and Normalisation" << endl;
+		}
+	}
+
 	if( FunctionConfig->GetSingleNormaliseWeights() )
 	{
 		double sum_total=0.;
@@ -311,13 +319,20 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		for( unsigned int i=0; i< (unsigned)bottle->NumberResults(); ++i )
 		{
 			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
-			sum_total += Requested_DataSet->GetSumWeights();
-			sum_sq_total += Requested_DataSet->GetSumWeightsSq();
+			if( Requested_DataSet->GetWeightsWereUsed() )
+			{
+				sum_total += Requested_DataSet->GetSumWeights();
+				sum_sq_total += Requested_DataSet->GetSumWeightsSq();
+			}
 		}
 		for( unsigned int i=0; i< BottleData.size(); ++i )
 		{
 			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
-			Requested_DataSet->ApplyAlpha( sum_total, sum_sq_total );
+			if( Requested_DataSet->GetWeightsWereUsed() )
+			{
+				Requested_DataSet->ApplyAlpha( sum_total, sum_sq_total );
+				//Requested_DataSet->SortBy( "time" );
+			}
 		}
 	}
 

@@ -90,7 +90,8 @@ vector<string> NormalisedSumPDF::PDFComponents()
 	//                              1xx     :       all of the components in the first PDF
 	//                              2yy     :       all of the components in the second PDF
 
-	component_list.clear();
+	vector<string> empty;
+	component_list.swap(empty);
 
 	for( unsigned int i=0; i< firstpdf_components.size(); ++i )
 	{
