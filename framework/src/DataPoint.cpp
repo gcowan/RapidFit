@@ -232,7 +232,8 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 		else
 		{
 			Input.SetIndex( lookup );
-			allPseudoObservables[ (unsigned)Input.GetIndex() ] = PseudoObservable( Input );
+			allPseudoObservables.resize( (unsigned)Input.GetIndex()+1 );
+			allPseudoObservables[ (unsigned)Input.GetIndex() ] = Input;
 			//cout << "found at " << lookup << endl;
 		}
 	}
@@ -242,12 +243,12 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input )
 		{
 			//int var = (int)allPseudoObservables.size();
 			allPseudoObservables.resize( (unsigned)Input.GetIndex()+1 );
-			allPseudoObservables[(unsigned)Input.GetIndex()] = PseudoObservable( Input );
+			allPseudoObservables[(unsigned)Input.GetIndex()] = Input;
 			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
 		}
 		else
 		{
-			allPseudoObservables[(unsigned)Input.GetIndex()] = PseudoObservable( Input );
+			allPseudoObservables[(unsigned)Input.GetIndex()] = Input;
 			//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
 			//cout << "requested at (2) " << (unsigned)Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
 		}
@@ -299,7 +300,8 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> V
 		else
 		{
 			Input.SetIndex( lookup );
-			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = PseudoObservable( Input );
+			allPseudoObservables2.resize( (unsigned)Input.GetIndex()+1 );
+			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = Input;
 			//cout << "found at " << lookup << endl;
 		}
 	}
@@ -309,12 +311,12 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> V
 		{
 			//int var = (int)allPseudoObservables2.size();
 			allPseudoObservables2.resize( (unsigned)Input.GetIndex()+1 );
-			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = PseudoObservable( Input );
+			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = Input;
 			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
 		}
 		else
 		{
-			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = PseudoObservable( Input );
+			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = Input;
 			//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables2.size()-1 << endl;
 			//cout << "requested at (3) " << (unsigned)Input.GetIndex() << " of " << allPseudoObservables2.size()-1 << endl;
 		}

@@ -333,6 +333,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 				Requested_DataSet->ApplyAlpha( sum_total, sum_sq_total );
 				//Requested_DataSet->SortBy( "time" );
 			}
+			//Requested_DataSet->SortBy( "time" );
 		}
 	}
 

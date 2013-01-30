@@ -251,12 +251,15 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	//...........................................
 	// Configure to use time acceptance machinery
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
-	if( useTimeAcceptance() ) {
-		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
+	if( useTimeAcceptance() )
+	{
+		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) )
+		{
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.00826) ;
 			cout << "Bs2JpsiPhi_Signal_v5:: Constructing timeAcc: Upper time acceptance beta=0.00826 [0 < t < 14] " << endl ;
 		}
-		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
+		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" )
+		{
 			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
 			cout << "Bs2JpsiPhi_Signal_v5:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
 		}
@@ -271,7 +274,8 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	//Make empty Cache for the time integrals. This has to be done now after the SlicedAcceptance is created
 	vector<double> empty;
 	for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice ) empty.push_back(0.0) ;
-	for( int ires=0; ires < 4 ; ++ires ) {
+	for( int ires=0; ires < 4 ; ++ires )
+	{
 		storeExpL.push_back( empty ) ;
 		storeExpH.push_back( empty ) ;
 		storeExpSin.push_back( empty ) ;
@@ -381,12 +385,14 @@ void Bs2JpsiPhi_Signal_v5::MakePrototypes()
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
 
-	if( _useHelicityBasis ) {
+	if( _useHelicityBasis )
+	{
 		allObservables.push_back( cthetakName );
 		allObservables.push_back( cthetalName );
 		allObservables.push_back( phihName );
 	}
-	else {
+	else
+	{
 		allObservables.push_back( cosThetaName );
 		allObservables.push_back( phiName );
 		allObservables.push_back( cosPsiName );
@@ -412,7 +418,8 @@ void Bs2JpsiPhi_Signal_v5::MakePrototypes()
 	if( _useCosDpar ) parameterNames.push_back( cosdparName ); //PELC-COSDPAR Special for fitting cosdpar separately
 	parameterNames.push_back( deltaMName );
 
-	if( _useCosAndSin ) {
+	if( _useCosAndSin )
+	{
 		parameterNames.push_back( cosphisName );
 		parameterNames.push_back( sinphisName );
 	}
@@ -429,7 +436,8 @@ void Bs2JpsiPhi_Signal_v5::MakePrototypes()
 	parameterNames.push_back( mistagDeltaSetPointName );
 
 	parameterNames.push_back( resScaleName );
-	if( ! useEventResolution() ) {
+	if( ! useEventResolution() )
+	{
 		parameterNames.push_back( res1Name );
 		parameterNames.push_back( res2Name );
 		parameterNames.push_back( res3Name );
@@ -456,13 +464,16 @@ vector<string> Bs2JpsiPhi_Signal_v5::GetDoNotIntegrateList()
 	if( ! _usePunziMistag) list.push_back(mistagName) ;
 	if( useEventResolution() && ! _usePunziSigmat) list.push_back(eventResolutionName) ;
 
-	if( _numericIntegralTimeOnly ) {
-		if( _useHelicityBasis ) {
+	if( _numericIntegralTimeOnly )
+	{
+		if( _useHelicityBasis )
+		{
 			list.push_back( cthetakName );
 			list.push_back( cthetalName ) ;
 			list.push_back( phihName ) ;
 		}
-		else {
+		else
+		{
 			list.push_back( cosThetaName );
 			list.push_back( cosPsiName ) ;
 			list.push_back( phiName ) ;
@@ -487,9 +498,15 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	dgam      = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 
 	Azero_sq = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
-	if( (Azero_sq < 0.) || (Azero_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;	}
+	if( (Azero_sq < 0.) || (Azero_sq > 1.)  )
+	{
+		cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;
+	}
 	Aperp_sq = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
-	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}
+	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  )
+	{
+		cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl;
+	}
 
 	Apara_sq = 0.;
 	if( _fitDirectlyForApara )
@@ -500,13 +517,17 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	{
 		Apara_sq = (1. - Azero_sq - Aperp_sq );
 	}
-	if( Apara_sq < 0. ) {
+	if( Apara_sq < 0. )
+	{
 		cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: derived parameter Apara_sq <0  and so set to zero" <<  endl ;
 		Apara_sq = 0. ;
 	}
 
 	double fs = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
-	if( (fs < 0.) || (fs >= 1.) ) { cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: As_sq <0 or >=1 but left as is" <<  endl ;	}
+	if( (fs < 0.) || (fs >= 1.) )
+	{
+		cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: As_sq <0 or >=1 but left as is" <<  endl ;
+	}
 	As_sq = fs / (1. - fs ) ;
 
 	Csp = allParameters.GetPhysicsParameter( CspName )->GetValue();
@@ -523,11 +544,13 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet )
 
 	delta_ms = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 
-	if(_useCosAndSin){
+	if(_useCosAndSin)
+	{
 		_cosphis = allParameters.GetPhysicsParameter( cosphisName )->GetValue();
 		_sinphis = allParameters.GetPhysicsParameter( sinphisName )->GetValue();
 	}
-	else{
+	else
+	{
 		phi_s     = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
 		_cosphis = cos(phi_s) ;
 		_sinphis = sin(phi_s) ;
@@ -699,32 +722,38 @@ double Bs2JpsiPhi_Signal_v5::Evaluate(DataPoint * measurement)
 
 	//***** This will be returned*****
 	//It gets constructed according to what you want to do with resolution
-	double returnValue ;
+	double returnValue=-1.;
 
 
-	if( resolutionScale <= 0. ) {
+	if( resolutionScale <= 0. )
+	{
 		//This is the "code" to run with resolution=0
 		resolution = 0. ;
 		returnValue = this->diffXsec( );
 	}
-	else if( useEventResolution() ) {
+	else if( useEventResolution() )
+	{
 		// Event-by-event resolution has been selected
 		resolution = eventResolution * resolutionScale ;
 		returnValue = this->diffXsec( );
 	}
-	else {
+	else
+	{
 		//Good old fashioned triple Gaussian resolution is selected
 		double val1=0. , val2=0., val3=0. ;
 		double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
-		if(resolution1Fraction > 0 ) {
+		if(resolution1Fraction > 0 )
+		{
 			resolution = resolution1 * resolutionScale ;
 			val1 = this->diffXsec( );
 		}
-		if(resolution2Fraction > 0 ) {
+		if(resolution2Fraction > 0 )
+		{
 			resolution = resolution2 * resolutionScale ;
 			val2 = this->diffXsec( );
 		}
-		if(resolution3Fraction > 0 ) {
+		if(resolution3Fraction > 0 )
+		{
 			resolution = resolution3 * resolutionScale ;
 			val3 = this->diffXsec( );
 		}
@@ -738,7 +767,8 @@ double Bs2JpsiPhi_Signal_v5::Evaluate(DataPoint * measurement)
 		bool c1 = isnan(returnValue) ;
 		bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 		bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;
-		if( DEBUGFLAG && (c1 || c2 || c3)  ) {
+		if( DEBUGFLAG && (c1 || c2 || c3)  )
+		{
 			this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Evaluate() returns <=0 or nan :" , returnValue ) ;
 			if( isnan(returnValue) ) throw 10 ;
 			if( returnValue <= 0. ) throw 10 ;
@@ -829,20 +859,22 @@ double Bs2JpsiPhi_Signal_v5::Normalisation(DataPoint * measurement, PhaseSpaceBo
 {
 	_datapoint = measurement;
 
-	if( _numericIntegralForce ) return -1. ;
+	if( _numericIntegralForce ) return -1.;
 
 	// Get observables into member variables
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
-	_mistag = measurement->GetObservable( mistagName )->GetValue() ;
+	_mistag = measurement->GetObservable( mistagName )->GetValue();
 	if( useEventResolution() ) eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
 
 	// Get time boundaries into member variables
 	IConstraint * timeBound = boundary->GetConstraint( timeName );
-	if ( timeBound->GetUnit() == "NameNotFoundError" ) {
+	if ( timeBound->GetUnit() == "NameNotFoundError" )
+	{
 		cerr << "Bound on time not provided" << endl;
 		return 0;
 	}
-	else {
+	else
+	{
 		tlo = timeBound->GetMinimum();
 		thi = timeBound->GetMaximum();
 	}
@@ -1147,7 +1179,7 @@ double Bs2JpsiPhi_Signal_v5::diffXsecTimeOnly()
 
 	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsecTimeOnly( ) : return value < 0 = ", xsec ) ;
 
-	return xsec ;
+	return xsec;
 }
 
 
@@ -1255,7 +1287,8 @@ void Bs2JpsiPhi_Signal_v5::CacheAmplitudesAndAngles()
 
 //.......................................................
 // New speed up method to Cache time integrals
-void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals() {
+void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals()
+{
 
 	// This need to know  (and be modified for)
 	//  --> Number of resolutions
@@ -1265,13 +1298,16 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals() {
 	double tlo_boundary = tlo ;
 	double thi_boundary = thi ;
 
-	if( useEventResolution() ) {
+	if( useEventResolution() )
+	{
 		unsigned int ires = 0 ;
 		resolution = eventResolution * resolutionScale ;
-		for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice ) {
+		for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice )
+		{
 			tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
 			thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
-			if( thi > tlo ) {
+			if( thi > tlo )
+			{
 				this->preCalculateTimeIntegrals() ;
 				//cout << " >>>>> caching time integrals / " << intExpL_stored << "  /  "<< intExpH_stored << "  /  "<< intExpSin_stored << "  /  "<< intExpCos_stored << "  /  " << endl ;
 
@@ -1280,7 +1316,8 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals() {
 				storeExpSin[ires][islice] = intExpSin_stored ;
 				storeExpCos[ires][islice] = intExpCos_stored ;
 			}
-			else {
+			else
+			{
 				storeExpL[ires][islice] = 0 ;
 				storeExpH[ires][islice] = 0 ;
 				storeExpSin[ires][islice] = 0 ;
@@ -1289,19 +1326,22 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals() {
 
 		}
 	}
-
-	else {
-		for( unsigned int ires=0; ires < 4 ; ++ires ) {
+	else
+	{
+		for( unsigned int ires=0; ires < 4 ; ++ires )
+		{
 
 			if( ires==0 ) resolution = 0.0 ;
 			if( ires==1 ) resolution = resolution1 * resolutionScale ;
 			if( ires==2 ) resolution = resolution2 * resolutionScale ;
 			if( ires==3 ) resolution = resolution3 * resolutionScale ;
 
-			for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice ) {
+			for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice )
+			{
 				tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
 				thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
-				if( thi > tlo ) {
+				if( thi > tlo )
+				{
 					this->preCalculateTimeIntegrals() ;
 					//cout << " >>>>> caching time integrals / " << intExpL_stored << "  /  "<< intExpH_stored << "  /  "<< intExpSin_stored << "  /  "<< intExpCos_stored << "  /  " << endl ;
 
@@ -1310,7 +1350,8 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals() {
 					storeExpSin[ires][islice] = intExpSin_stored ;
 					storeExpCos[ires][islice] = intExpCos_stored ;
 				}
-				else {
+				else
+				{
 					storeExpL[ires][islice] = 0 ;
 					storeExpH[ires][islice] = 0 ;
 					storeExpSin[ires][islice] = 0 ;
@@ -1457,21 +1498,24 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 {
 	PDF_THREAD_LOCK
 
-	(void) message; (void) value;
-	cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
-	cout << message << value << endl <<endl ;
+	if( !performingComponentProjection )
+	{
+		(void) message; (void) value;
+		cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
+		cout << message << value << endl <<endl ;
 
-	cout << endl ;
-	cout <<  A0()*A0() * timeFactorA0A0Int(  )* angAccI1  << endl ;
-	cout <<  AP()*AP() * timeFactorAPAPInt(  )* angAccI2 << endl ;
-	cout <<  AT()*AT() * timeFactorATATInt(  )* angAccI3 << endl << endl ;
-	cout <<  AP()*AT() * timeFactorImAPATInt(  ) * angAccI4<< endl ;
-	cout <<  A0()*AP() * timeFactorReA0APInt(  ) * angAccI5<< endl ;
-	cout <<  A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6<< endl << endl;
-	cout <<  AS()*AS() * timeFactorASASInt(  ) * angAccI7 << endl ;
-	cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl ;
-	cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
-	cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
+		cout << endl ;
+		cout <<  A0()*A0() * timeFactorA0A0Int(  )* angAccI1  << endl ;
+		cout <<  AP()*AP() * timeFactorAPAPInt(  )* angAccI2 << endl ;
+		cout <<  AT()*AT() * timeFactorATATInt(  )* angAccI3 << endl << endl ;
+		cout <<  AP()*AT() * timeFactorImAPATInt(  ) * angAccI4<< endl ;
+		cout <<  A0()*AP() * timeFactorReA0APInt(  ) * angAccI5<< endl ;
+		cout <<  A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6<< endl << endl;
+		cout <<  AS()*AS() * timeFactorASASInt(  ) * angAccI7 << endl ;
+		cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl ;
+		cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
+		cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
+	}
 
 	PDF_THREAD_UNLOCK
 }
