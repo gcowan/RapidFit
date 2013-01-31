@@ -200,6 +200,23 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 
 	gSystem->mkdir( Output_Dir );
 
+        vector<TString> free_param = RapidFit_Output_File::get_free_parameters( input_tree );
+
+	vector<TString> all_parameters, all_parameter_values, all_parameter_errors, all_parameter_pulls;
+
+	for( unsigned int i=0; i< free_param.size(); ++i )
+	{
+		//cout << free_param[i] << " " << i << endl;
+		string this_param = free_param[i].Data();
+		all_parameters.push_back( this_param );
+		all_parameter_values.push_back( this_param+string(value_suffix.Data()) );
+		all_parameter_errors.push_back( this_param+string(error_suffix.Data()) );
+		all_parameter_pulls.push_back( this_param+string(pull_suffix.Data()) );
+	}
+
+	/*
+	 *	OLD WAY THAT PLOTTED TOO MUCH USELESS FREE IGNORED PARAMETERS
+	 *
 	//      Get a list of all branches in allresults
 	vector<TString> all_parameters = TTree_Processing::get_branch_names( input_tree );
 	//      Get a list of all branches in allresults with '_value' in their name
@@ -223,7 +240,7 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 	{
 		int position = StringOperations::VectorContains( all_parameter_values, *j );
 		if( position != -1 ) all_parameter_values.erase( all_parameter_values.begin() + position );
-	}
+	}*/
 
 	vector<vector<TString> > all; all.push_back( all_parameter_values ); all.push_back( all_parameter_errors ); all.push_back( all_parameter_pulls );
 
@@ -313,9 +330,16 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		TCanvas* c1 = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
 		Histogram_Processing::Silent_Draw( c1, input_histo );
 		TAxis* x_axis = input_histo->GetXaxis();
+		string units;
+		string suffix = EdStyle::Get_Suffix( string(all_parameter_plots[j].Data()) );
+		if( suffix != EdStyle::Get_Suffix(string(pull_suffix.Data())) )
+		{
+			units = " " + EdStyle::GetParamRootUnit( EdStyle::Remove_Suffix(all_parameter_plots[j]) );
+		}
+		//cout << endl << suffix << "  " << pull_suffix << endl;
 		x_axis->SetTitle( EdStyle::GetParamRootName( EdStyle::Remove_Suffix(all_parameter_plots[j]) ) + " " 
-				+ EdStyle::Get_Suffix( all_parameter_plots[j] ) + " "
-				+ EdStyle::GetParamRootUnit( EdStyle::Remove_Suffix(all_parameter_plots[j]) ) );
+				+ EdStyle::Get_Suffix( all_parameter_plots[j] )
+				+ units.c_str() );
 		input_histo->SetTitle( "Toy Study " + EdStyle::GetParamRootName( all_parameter_plots[j] ) + " distribution" );
 
 		c1->Update();

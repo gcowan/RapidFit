@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/01/31 Rob Currie
+  - Gave Minuit2 code a kick, gives same results for jpsiphi 1fb paper :D
+  - Changed way that Toy_Study assembles the free parameters in RapidPlot to ignore parameters with a wholely <=0. error as this means that parameter is fixed/ignored
+  - Changed the background of some scripts in RapidPlot which should speed up the plots and ignore plots we don't care about by design
+
 2013/01/30 Rob Currie
   - Fixed performance bug in BasePDF to do with debugging
   - Fixed bug with Alpha XML tags causing crashes which take too long to debug

@@ -278,8 +278,7 @@ TH1* Histogram_Processing::Get_Histo( TTree* input_tree, TString draw_str, TStri
 	replace( rand_num.begin(), rand_num.end(), '.', '_' );
 	rand_str = rand_num.c_str();
 	input_tree->Draw( draw_str, weight_str, "goff" );
-	TH1* output_histo = (TH1*) input_tree->GetHistogram();
-	output_histo->SetName(output_histo->GetName()+rand_str);
+	TH1* output_histo = (TH1*)((TH1*)(input_tree->GetHistogram())->Clone(output_histo->GetName()+rand_str));
 	return output_histo;
 }
 

@@ -255,6 +255,16 @@ vector<TString> RapidFit_Output_File::get_free_parameter_values( TTree* local_tr
 		{
 			to_be_removed.push_back( *j );
 		}
+		else
+		{
+			//	If the maximum error for this parameter in the whole study is <= 0
+			//	then the parameter was either fixed or was ignored in fitting so we should ignore it here
+			double max_error = local_tree->GetMaximum( temp );
+			if( max_error <= 0. )
+			{
+				to_be_removed.push_back( *j );
+			}
+		}
 	}
 
 	for( vector<TString>::iterator j= to_be_removed.begin(); j!= to_be_removed.end(); ++j )
