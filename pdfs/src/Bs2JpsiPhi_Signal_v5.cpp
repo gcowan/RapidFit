@@ -528,7 +528,7 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	{
 		cout << "Warning in Bs2JpsiPhi_Signal_v5::SetPhysicsParameters: As_sq <0 or >=1 but left as is" <<  endl ;
 	}
-	As_sq = fs / (1. - fs ) ;
+	As_sq = fs / (1. - fs );
 
 	Csp = allParameters.GetPhysicsParameter( CspName )->GetValue();
 

@@ -399,9 +399,11 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			if( output_file->GetDirectory( "Total" ) == 0 ) output_file->mkdir( "Total" );
 			output_file->cd( "Total" );
 
+			ComponentPlotter::WriteData( Total_BinnedData, Total_Components, "Final_ProjectionData" );
+
 			ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data",
 
-					resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
+					resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug );
 		}
 
 		if( (Total_BinnedData != NULL) && ((*projection_i)->DrawPull == true) )
@@ -421,8 +423,8 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_PullPlot", resultBottle->GetResultPDF(0)->GetRandomFunction() );
 			(void) pullGraph;
 
-			ComponentPlotter::OutputPlotPull( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(),
-								finalPullEvals, resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
+			ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(),
+								resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug, finalPullEvals );
 		}
 
 		//	it is now safe to remove the instances of ComponentPlotter

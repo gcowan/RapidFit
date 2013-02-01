@@ -216,15 +216,31 @@ class ComponentPlotter
 		 *
 		 * @param config           This contains the Configuration from the XML, if none is provided this will go with whatever ROOT wants to do
 		 *
+		 * @param debug            Satandard Debugging class interface in RapidFit
+		 *
+		 * @param input_bin_theory_data  This contains the (optional) Data required to produce a plot of the residuals across the fit
+		 *
 		 * @return Void
 		 */
+
 		static void OutputPlot( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary,
 
-				TRandom* rand=NULL, CompPlotter_config* config=NULL, DebugClass* =NULL );
+				TRandom* rand=NULL, CompPlotter_config* config=NULL, DebugClass* =NULL, vector<double> input_bin_theory_data=vector<double>() );
 
-		static void OutputPlotPull( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary,
-
-				vector<double> input_bin_theory_data, TRandom* rand=NULL, CompPlotter_config* config=NULL, DebugClass* =NULL );
+		/*!
+		 * @breif helper function to write out the numerical data from the Final merged component plot into a TTree to make any post-projection work easier
+		 *
+		 * @param Total_BinnedData  This is the TGraphErrors used in the projection of the data in a plot
+		 *
+		 * @param Total_Components  This is the vector of TGraphs corresponding to the various components in the final Projection plot
+		 *
+		 * @param destination       This is the name of the TTree which should be used for the output
+		 *
+		 * @param config            This will be used to assign any custom titles to the branches in the TTree which we are using
+		 *
+		 * @return Void
+		 */
+		static void WriteData( TGraphErrors* Total_BinnedData, vector<TGraph*> Total_Components, TString destination );
 
 		/*!
 		 * @brief Required for wrapping this class in a TF1 for Chi2 calculations
@@ -338,7 +354,7 @@ class ComponentPlotter
 		 *
 		 * @return Void
 		 */
-		void WriteOutput( vector<vector<vector<double>* >* >* , vector<vector<vector<double>* >* >* Y, vector<string> combinationDescriptions  );
+		void WriteOutput( vector<vector<vector<double>* >* >* X, vector<vector<vector<double>* >* >* Y, vector<string> combinationDescriptions  );
 
 		/*!
 		 * @brief Get a TH1 containing this discrete combination
@@ -362,8 +378,7 @@ class ComponentPlotter
 		 *
 		 * @return Void
 		 */
-		void WriteBranch( TTree* input_tree, TString Branch_Name, vector<double>* branch_data );
-
+		static void WriteBranch( TTree* input_tree, TString Branch_Name, vector<double>* branch_data );
 
 
 		//	Functions used internally within this class
