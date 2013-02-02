@@ -80,6 +80,8 @@ class RapidFitIntegrator
 		bool GetUseGSLIntegrator() const;
 		void SetUseGSLIntegrator( bool input );
 
+		void SetNumThreads( unsigned int input );
+
 		/*!
 		 *
 		 * @brief Setup the Integrator for Projections (potentially speeds up the process slightly)

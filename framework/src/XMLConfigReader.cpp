@@ -666,6 +666,10 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			returnable_config->useSpline =  XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
+		else if( projComps[childIndex]->GetName() == "Threads" )
+		{
+			returnable_config->numThreads =  (unsigned)XMLTag::GetIntegerValue( projComps[childIndex] );
+		}
 		else
 		{
 			cerr << "XMLConfigurationReader: Sorry Don't understand XMLTag: " << projComps[childIndex]->GetName() << " ignoring!" << endl;

@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/02/02 Rob Currie
+  - Enabling multi-threaded GSL integration. I didn't change any of this code and was surprised to see it 'just work'.
+    Added the ability to request number of threads in XML for projections
+
 2013/02/01 Rob Currie
   - Cleaned up some ComponentPlotter code
   - Added the output for the Final plot which should make overlaying the plots easier.

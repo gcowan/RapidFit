@@ -98,6 +98,11 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 	}
 }
 
+void RapidFitIntegrator::SetNumThreads( unsigned int input )
+{
+	num_threads = input;
+}
+
 bool RapidFitIntegrator::GetUseGSLIntegrator() const
 {
 	return pseudoRandomIntegration;
@@ -432,6 +437,8 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 {
 #ifdef __RAPIDFIT_USE_GSL
 
+	//cout << endl << "Using: " << num_threads << endl;
+
 	//Make arrays of the observable ranges to integrate over
 	double* minima = new double[ doIntegrate.size() ];
 	double* maxima = new double[ doIntegrate.size() ];
@@ -454,7 +461,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}
 
-	unsigned int npoint = 1000000;
+	unsigned int npoint = 1000;
 	std::vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
 
 	//pthread_mutex_lock( &gsl_mutex );
@@ -497,7 +504,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		minima_v.push_back( minima[i] );
 		maxima_v.push_back( maxima[i] );
 	}
-	cout << "Constructing Functions" << endl;
+	//cout << "Constructing Functions" << endl;
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
 
 	vector<double*> doEval_points;
@@ -790,7 +797,8 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 							cout << "RapidFitIntegrator: Using GSL PseudoRandomNumber :D" << endl;
 						}
 					}
-					numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
+					//numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
+					numericalIntegral += this->PseudoRandomNumberIntegralThreaded( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, num_threads );
 					if( debug != NULL )
 					{
 						if( debug->DebugThisClass( "RapidFitIntegrator" ) )

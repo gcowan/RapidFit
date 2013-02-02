@@ -32,7 +32,7 @@ class CompPlotter_config
                         data_bins(100), PDF_points(128), observableName("undefined"), logY(false), color_key(), style_key(), width_key(), component_names(), PlotTitle(""),
                         xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false), ScaleNumerical(true),
 			DrawPull(false), LegendTextSize(0.05), addLHCb(false), TopRightLegend(true), TopLeftLegend(false), BottomRightLegend(false), BottomLeftLegend(false),
-			useLegend(true), LimitPulls(false), useSpline(true)
+			useLegend(true), LimitPulls(false), useSpline(true), numThreads(4)
 		{}
 
                 int data_bins;                  /*!     This is the total number of bins which should be used when binning the dataset                                          */
@@ -60,6 +60,7 @@ class CompPlotter_config
 		bool useLegend;			/*!	Use a Legend in the Plot												*/
 		bool LimitPulls;		/*!	Place a 5-sigma limit on the Pull Distribution to fight a few bogus pulls killing the Distribution			*/
 		bool useSpline;			/*!	Use Spline to Interpolate between the projected points?									*/
+		unsigned int numThreads;	/*!	The number of threads to use during projections with multi-threaded GSL							*/
 };
 
 #endif

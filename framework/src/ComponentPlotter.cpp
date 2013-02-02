@@ -58,6 +58,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 {
 	TH1::SetDefaultSumw2(true);
 
+	pdfIntegrator->SetNumThreads( config!=NULL?config->numThreads:4 );
+
 	if( Debug != NULL ) debug = new DebugClass(*Debug);
 	else debug = new DebugClass(false);
 	plotPDF->TurnCachingOff();
