@@ -26,7 +26,7 @@ class FitResult
 		/*!
 		 * Constructor containing the ResultParameterSet and the PhysicsBottle as well as the Covarience Matrix and Contours
 		 */
-		FitResult( double, ResultParameterSet*, int, PhysicsBottle*, RapidFitMatrix* =NULL, vector<FunctionContour*> =vector<FunctionContour*>());
+		FitResult( const double, const ResultParameterSet*, const int, const PhysicsBottle*, const RapidFitMatrix* =NULL, const vector<FunctionContour*> =vector<FunctionContour*>());
 
 		/*!
 		 * Correct Copy Constructor
@@ -41,40 +41,40 @@ class FitResult
 		/*!
 		 * Returns the Minimum total function value i.e. the NLL for this Result
 		 */
-		double GetMinimumValue();
+		double GetMinimumValue() const;
 		void SetMinimumValue( double );
 
 		/*!
 		 * Return a copy of the Covarience Matrix as provided by the Minimiser
 		 */
-		RapidFitMatrix* GetCovarianceMatrix();
+		RapidFitMatrix* GetCovarianceMatrix() const;
 
-		void ApplyCovarianceMatrix( RapidFitMatrix* Input );
+		void ApplyCovarianceMatrix( const RapidFitMatrix* Input );
 
 		/*!
 		 * Get the Contours extracted using Minuit's internal Functions
 		 */
-		vector<FunctionContour*> GetContours();
+		vector<FunctionContour*> GetContours() const;
 
 		/*!
 		 * Get the Result Parameter Set from this FitReult
 		 */
-		ResultParameterSet* GetResultParameterSet();
+		ResultParameterSet* GetResultParameterSet() const;
 
 		/*!
 		 * Get the Final FitStatus from the Minimiser
 		 */
-		int GetFitStatus();
+		int GetFitStatus() const;
 
 		/*!
 		 * Forcibly alter the FitStatus
 		 */
-		void ForceFitStatus( int );
+		void ForceFitStatus( const int );
 
 		/*!
 		 * Get the Pointer to the Physics Bottle from this FitResult
 		 */
-		PhysicsBottle* GetPhysicsBottle();
+		PhysicsBottle* GetPhysicsBottle() const;
 
 		/*!
 		 * Output Useful Debugging Info
@@ -96,3 +96,4 @@ class FitResult
 };
 
 #endif
+

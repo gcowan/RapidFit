@@ -175,6 +175,9 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 	if ( nameIndex == -1 )
 	{
 		cerr << "Constraint on " << Name << " not found(2)" << endl;
+		cerr << "If you wish to Add a NEW constraint, and know it may not yet exist, use:" << endl;
+		cerr << "PhaseSpaceBoundary::AddConstraint()" << endl;
+		cerr << endl;
 		throw(81258);
 		return false;
 	}

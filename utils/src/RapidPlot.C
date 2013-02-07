@@ -45,6 +45,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
 #include <math.h>
 
 using namespace::std;
@@ -95,6 +97,9 @@ void helpFunction()
 	cout << "RapidPlot has been designed to perform post-processing of data from the RapidFit fitter." << endl;
 	cout << endl << "RapidPlot currently knows how to handle:" << endl;
 	cout << endl;
+	cout << "RapidPlot now also knows how to summarise the content of a RapidFit Fit output, latest versions only" << endl;
+	cout << "In order to produce one of these summaries you need to run with: --Summarise to give a summary of the contents of a file" << endl;
+	cout << endl;
 	cout << "Toy Studies" << endl;
 	cout << "1DLL scans" << endl;
 	cout << "2DLL scans" << endl;
@@ -108,6 +113,98 @@ void helpFunction()
 	Rapid2DLL::Help();
 	//FeldmanCousinsAnalysis::Help();		Not yet Implemented
 	CorrMatrix::Help();
+}
+
+void Summarise( vector<string> input_filenames, vector<string> other_params )
+{
+	(void) other_params;
+
+	for( unsigned int i=0; i< input_filenames.size(); ++i )
+	{
+		TTree* runtimeArgs = ROOT_File_Processing::GetTree( input_filenames[i], "RuntimeArgs" );
+
+		vector<string>* thisArgs = new vector<string>();
+
+		runtimeArgs->SetBranchAddress( "RuntimeArgs", &thisArgs );
+
+		runtimeArgs->GetEntry( 0 );
+
+		cout << "File:\t" << input_filenames[i] << "\tgenerated with the following args:" << endl;
+		cout << endl;
+		cout << "\t";
+		for( unsigned int j=0; j< thisArgs->size(); ++j )
+		{
+			cout << (*thisArgs)[j] << " ";
+		}
+		cout << endl << endl;
+	}
+}
+
+void RestoreXML( vector<string> input_filenames, vector<string> other_params )
+{
+	string SaveAs="--SaveAs";
+	string SaveAs2="-SaveAs";
+
+	TString XMLName = "XMLFile_";
+
+	for( unsigned int i=0; i< other_params.size(); ++i )
+	{
+		string thisString = other_params[i];
+		size_t found = thisString.find(SaveAs);
+		size_t found2 = thisString.find(SaveAs2);
+
+		if( found2 != string::npos )
+		{
+			found = found2;
+		}
+
+		if( found != string::npos )
+		{
+			string newName = StringOperations::SplitString( thisString, ':' )[1];
+			string xmlext=".xml";
+			size_t foundext = newName.find(xmlext);
+			if( foundext != string::npos ) newName = StringOperations::SplitString( thisString, '.' )[0];
+
+			XMLName = newName.c_str();
+			XMLName.Append("_");
+		}
+	}
+
+	for( unsigned int i=0; i< input_filenames.size(); ++i )
+	{
+		TString thisXMLName = XMLName;
+
+		thisXMLName+=i; thisXMLName.Append("_");
+
+		thisXMLName.Append( StringOperations::TimeString() );
+
+		thisXMLName.Append( ".xml" );
+
+		TTree* runtimeXML = ROOT_File_Processing::GetTree( input_filenames[i], "FittingXML" );
+
+		vector<string>* thisXML = new vector<string>();
+
+		runtimeXML->SetBranchAddress( "FittingXML", &thisXML );
+
+		runtimeXML->GetEntry(0);
+
+		cout << "Saving output XML to file:\t" << thisXMLName << endl;
+		cout << endl;
+
+		stringstream full_xml;
+
+		for( unsigned int j=0; j< thisXML->size(); ++j )
+		{
+			full_xml << (*thisXML)[j] << endl;
+		}
+
+		ofstream output_xmlFile;
+		output_xmlFile.open( thisXMLName.Data() );
+
+		output_xmlFile << full_xml.str();
+
+		output_xmlFile.close();
+	}
 }
 
 int main( int argc, char* argv[] )
@@ -147,6 +244,22 @@ int main( int argc, char* argv[] )
 		exit(0);
 	}
 
+	string SummeriseText="--Summarise";
+	string SummeriseText2="-Summarise";
+	if( StringOperations::VectorContains( &other_params, &SummeriseText ) != -1 || StringOperations::VectorContains( &other_params, &SummeriseText2 ) != -1 )
+	{
+		Summarise( input_filenames, other_params );
+		exit(0);
+	}
+
+	string restoreXML="--RestoreXML";
+	string restoreXML2="-RestoreXML";
+	if( StringOperations::VectorContains( &other_params, &restoreXML ) != -1 || StringOperations::VectorContains( &other_params, &restoreXML2 ) != -1 )
+	{
+		RestoreXML( input_filenames, other_params );
+		exit(0);
+	}
+
 	vector<TTree*> input_trees = ROOT_File_Processing::GetMultipleTrees( input_filenames, RapidFitOutputTupleName );
 
 	string CorrMatrixName="corr_matrix";
@@ -174,6 +287,7 @@ int main( int argc, char* argv[] )
 	if( good_files==0 )
 	{
 		ProjFile = ROOT_File_Processing::OpenFile( argv[1] );
+		(void) ProjFile;
 		TString top_dir = gDirectory->GetPath();
 
 		ROOT_File_Processing::get_TDirectory_list( top_dir, &Directories_in_file );

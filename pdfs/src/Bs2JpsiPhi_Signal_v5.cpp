@@ -950,16 +950,20 @@ double Bs2JpsiPhi_Signal_v5::Normalisation(DataPoint * measurement, PhaseSpaceBo
 
 	}
 
-	// Conditions to throw exception
-	bool c1 = isnan(returnValue)  ;
-	bool c2 = (returnValue <= 0.) ;
-	if( DEBUGFLAG && (c1 || c2 ) ) {
-		this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Normalisation() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw 10 ;
-		if( returnValue <= 0. ) throw 10 ;
+	if( !performingComponentProjection )
+	{
+		// Conditions to throw exception
+		bool c1 = isnan(returnValue);
+		bool c2 = (returnValue <= 0.);
+		if( DEBUGFLAG && (c1 || c2 ) )
+		{
+			this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Normalisation() returns <=0 or nan :" , returnValue ) ;
+			if( isnan(returnValue) ) throw 10 ;
+			if( returnValue <= 0. ) throw 10 ;
+		}
 	}
 
-	return returnValue ;
+	return returnValue;
 }
 
 
@@ -1177,7 +1181,7 @@ double Bs2JpsiPhi_Signal_v5::diffXsecTimeOnly()
 	Observable* timeObs = _datapoint->GetObservable( timeName );
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
 
-	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsecTimeOnly( ) : return value < 0 = ", xsec ) ;
+	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsecTimeOnly( ) : return value < 0 = ", xsec );
 
 	return xsec;
 }
@@ -1212,7 +1216,7 @@ double Bs2JpsiPhi_Signal_v5::diffXsecNorm1()
 		ASint()*AT() * timeFactorImASATInt(  ) * angAccI9 +
 		ASint()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
 
-	if( DEBUGFLAG && (norm < 0) ) this->DebugPrintNorm( " Bs2JpsiPhi_Signal_v5_v1::diffXsecNorm1( ) : return value < 0 = ", norm ) ;
+	if( DEBUGFLAG && (norm < 0) ) this->DebugPrintNorm( " Bs2JpsiPhi_Signal_v5_v1::diffXsecNorm1( ) : return value < 0 = ", norm );
 
 	return norm ;
 }
@@ -1233,11 +1237,11 @@ double Bs2JpsiPhi_Signal_v5::diffXsecCompositeNorm1( int resolutionIndex )
 	{
 		timeBinNum = islice;
 		//De cache the time integrals  (unles using event Resolution
-		/*if( ! useEventResolution() )*/ this->deCacheTimeIntegrals( (unsigned)resolutionIndex, islice ) ;
+		/*if( ! useEventResolution() )*/ this->deCacheTimeIntegrals( (unsigned)resolutionIndex, islice );
 
-		tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
-		thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
-		if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * timeAcc->getSlice(islice)->height() ;
+		tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
+		thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh();
+		if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * timeAcc->getSlice(islice)->height();
 	}
 
 	tlo = tlo_boundary;
@@ -1295,33 +1299,33 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals()
 	//  --> Number fo slices
 	//  --->  tlo and thi for each slice
 
-	double tlo_boundary = tlo ;
-	double thi_boundary = thi ;
+	double tlo_boundary = tlo;
+	double thi_boundary = thi;
 
 	if( useEventResolution() )
 	{
-		unsigned int ires = 0 ;
-		resolution = eventResolution * resolutionScale ;
+		unsigned int ires = 0;
+		resolution = eventResolution * resolutionScale;
 		for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice )
 		{
-			tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
-			thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
+			tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
+			thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh();
 			if( thi > tlo )
 			{
 				this->preCalculateTimeIntegrals() ;
 				//cout << " >>>>> caching time integrals / " << intExpL_stored << "  /  "<< intExpH_stored << "  /  "<< intExpSin_stored << "  /  "<< intExpCos_stored << "  /  " << endl ;
 
-				storeExpL[ires][islice] = intExpL_stored ;
-				storeExpH[ires][islice] = intExpH_stored ;
-				storeExpSin[ires][islice] = intExpSin_stored ;
-				storeExpCos[ires][islice] = intExpCos_stored ;
+				storeExpL[ires][islice] = intExpL_stored;
+				storeExpH[ires][islice] = intExpH_stored;
+				storeExpSin[ires][islice] = intExpSin_stored;
+				storeExpCos[ires][islice] = intExpCos_stored;
 			}
 			else
 			{
-				storeExpL[ires][islice] = 0 ;
-				storeExpH[ires][islice] = 0 ;
-				storeExpSin[ires][islice] = 0 ;
-				storeExpCos[ires][islice] = 0 ;
+				storeExpL[ires][islice] = 0;
+				storeExpH[ires][islice] = 0;
+				storeExpSin[ires][islice] = 0;
+				storeExpCos[ires][islice] = 0;
 			}
 
 		}
@@ -1331,31 +1335,31 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals()
 		for( unsigned int ires=0; ires < 4 ; ++ires )
 		{
 
-			if( ires==0 ) resolution = 0.0 ;
-			if( ires==1 ) resolution = resolution1 * resolutionScale ;
-			if( ires==2 ) resolution = resolution2 * resolutionScale ;
-			if( ires==3 ) resolution = resolution3 * resolutionScale ;
+			if( ires==0 ) resolution = 0.0;
+			if( ires==1 ) resolution = resolution1 * resolutionScale;
+			if( ires==2 ) resolution = resolution2 * resolutionScale;
+			if( ires==3 ) resolution = resolution3 * resolutionScale;
 
 			for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice )
 			{
-				tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow() ;
-				thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh() ;
+				tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
+				thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh();
 				if( thi > tlo )
 				{
-					this->preCalculateTimeIntegrals() ;
+					this->preCalculateTimeIntegrals();
 					//cout << " >>>>> caching time integrals / " << intExpL_stored << "  /  "<< intExpH_stored << "  /  "<< intExpSin_stored << "  /  "<< intExpCos_stored << "  /  " << endl ;
 
-					storeExpL[ires][islice] = intExpL_stored ;
-					storeExpH[ires][islice] = intExpH_stored ;
-					storeExpSin[ires][islice] = intExpSin_stored ;
-					storeExpCos[ires][islice] = intExpCos_stored ;
+					storeExpL[ires][islice] = intExpL_stored;
+					storeExpH[ires][islice] = intExpH_stored;
+					storeExpSin[ires][islice] = intExpSin_stored;
+					storeExpCos[ires][islice] = intExpCos_stored;
 				}
 				else
 				{
-					storeExpL[ires][islice] = 0 ;
-					storeExpH[ires][islice] = 0 ;
-					storeExpSin[ires][islice] = 0 ;
-					storeExpCos[ires][islice] = 0 ;
+					storeExpL[ires][islice] = 0;
+					storeExpH[ires][islice] = 0;
+					storeExpSin[ires][islice] = 0;
+					storeExpCos[ires][islice] = 0;
 				}
 
 			}
@@ -1363,7 +1367,7 @@ void Bs2JpsiPhi_Signal_v5::CacheTimeIntegrals()
 	}
 
 	tlo = tlo_boundary;
-	thi = thi_boundary ;
+	thi = thi_boundary;
 
 
 }
@@ -1414,24 +1418,24 @@ void Bs2JpsiPhi_Signal_v5::DebugPrint( string message, double value )  const
 	{
 		(void) message; (void) value;
 		cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrint ***************************" << endl ;
-		cout << message << value << endl <<endl ;
+		cout << message << value << endl <<endl;
 
 		cout << endl ;
-		cout << "   gamma " << gamma() << endl ;
-		cout << "   gl    " << gamma_l() << endl ;
+		cout << "   gamma " << gamma() << endl;
+		cout << "   gl    " << gamma_l() << endl;
 		cout << "   gh    " << gamma_h()  << endl;
 		cout << "   AT^2    " << AT()*AT() << endl;
 		cout << "   AP^2    " << AP()*AP() << endl;
-		cout << "   A0^2    " << A0()*A0() << endl ;
-		cout << "   AS^2    " << AS()*AS() << endl ;
-		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;
-		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag         " << mistag() << endl ;
-		cout << "   mistagP1       " << _mistagP1 << endl ;
-		cout << "   mistagP0       " << _mistagP0 << endl ;
-		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
-		cout << "   resolution " << resolution << endl ;
-		cout << " For event with:  " << endl ;
+		cout << "   A0^2    " << A0()*A0() << endl;
+		cout << "   AS^2    " << AS()*AS() << endl;
+		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl;
+		cout << "   delta_ms       " << delta_ms << endl;
+		cout << "   mistag         " << mistag() << endl;
+		cout << "   mistagP1       " << _mistagP1 << endl;
+		cout << "   mistagP0       " << _mistagP0 << endl;
+		cout << "   mistagSetPoint " << _mistagSetPoint << endl;
+		cout << "   resolution " << resolution << endl;
+		cout << " For event with:  " << endl;
 		//cout << "   time      " << t << endl ;
 		//cout << "   ctheta_tr " << ctheta_tr << endl ;
 		//cout << "   ctheta_1 " << ctheta_1 << endl ;
@@ -1450,27 +1454,27 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 	if( !performingComponentProjection )
 	{
 		(void) message; (void) value;
-		cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintXsec ***************************" << endl ;
-		cout << message << value << endl <<endl ;
-		cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * A0A0_value << endl ;
-		cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * APAP_value << endl ;
-		cout << "   AT()*AT() term: " <<AT()*AT() * timeFactorATAT(  ) * ATAT_value << endl << endl ;
+		cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintXsec ***************************" << endl;
+		cout << message << value << endl << endl;
+		cout << "   A0()*A0() term: " <<  A0()*A0() * timeFactorA0A0(  ) * A0A0_value << endl;
+		cout << "   AP()*AP() term: " <<AP()*AP() * timeFactorAPAP(  ) * APAP_value << endl;
+		cout << "   AT()*AT() term: " <<AT()*AT() * timeFactorATAT(  ) * ATAT_value << endl << endl;
 
-		cout << "   AP()*AT() term: " <<AP()*AT() * timeFactorImAPAT(  ) * ImAPAT_value << endl ;
-		cout << "                 : " <<AP()*AT() <<" / "<<  timeFactorImAPAT( )  <<" / "<<  ImAPAT_value << endl ;
-		cout << "   A0()*AP() term: " <<A0()*AP() * timeFactorReA0AP(  ) * ReA0AP_value << endl ;
-		cout << "                 : " <<A0()*AP() <<" / "<<  timeFactorReA0AP(  ) <<" / "<<  ReA0AP_value << endl ;
+		cout << "   AP()*AT() term: " <<AP()*AT() * timeFactorImAPAT(  ) * ImAPAT_value << endl;
+		cout << "                 : " <<AP()*AT() <<" / "<<  timeFactorImAPAT( )  <<" / "<<  ImAPAT_value << endl;
+		cout << "   A0()*AP() term: " <<A0()*AP() * timeFactorReA0AP(  ) * ReA0AP_value << endl;
+		cout << "                 : " <<A0()*AP() <<" / "<<  timeFactorReA0AP(  ) <<" / "<<  ReA0AP_value << endl;
 		cout << "   A0()*AT() term: " <<A0()*AT() * timeFactorImA0AT(  ) * ImA0AT_value << endl << endl;
 		cout << "                 : " <<A0()*AT() <<" / "<<  timeFactorImA0AT(  ) <<" / "<<  ImA0AT_value << endl << endl;
 
-		cout << "   AS()*AS() term: " <<AS()*AS() * timeFactorASAS(  ) * ASAS_value << endl << endl ;
+		cout << "   AS()*AS() term: " <<AS()*AS() * timeFactorASAS(  ) * ASAS_value << endl << endl;
 
-		cout << "   AS()*AP() term: " <<AS()*AP() * timeFactorReASAP(  ) * ReASAP_value << endl ;
-		cout << "                 : " <<AS()*AP() <<" / "<<   timeFactorReASAP(  ) <<" / "<<  ReASAP_value << endl ;
-		cout << "   AS()*AT() term: " <<AS()*AT() * timeFactorImASAT(  ) * ImASAT_value << endl ;
-		cout << "                 : " <<AS()*AT() <<" / "<<   timeFactorImASAT(  ) <<" / "<<   ImASAT_value << endl ;
-		cout << "   AS()*A0() term: " <<AS()*A0() * timeFactorReASA0(  ) * ReASA0_value<< endl ;
-		cout << "                 : " <<AS()*A0() <<" / "<<   timeFactorReASA0(  ) <<" / "<<  ReASA0_value << endl << endl ;
+		cout << "   AS()*AP() term: " <<AS()*AP() * timeFactorReASAP(  ) * ReASAP_value << endl;
+		cout << "                 : " <<AS()*AP() <<" / "<<   timeFactorReASAP(  ) <<" / "<<  ReASAP_value << endl;
+		cout << "   AS()*AT() term: " <<AS()*AT() * timeFactorImASAT(  ) * ImASAT_value << endl;
+		cout << "                 : " <<AS()*AT() <<" / "<<   timeFactorImASAT(  ) <<" / "<<   ImASAT_value << endl;
+		cout << "   AS()*A0() term: " <<AS()*A0() * timeFactorReASA0(  ) * ReASA0_value<< endl;
+		cout << "                 : " <<AS()*A0() <<" / "<<   timeFactorReASA0(  ) <<" / "<<  ReASA0_value << endl << endl;
 
 		double PwaveTot =
 			A0()*A0() * timeFactorA0A0(  ) * A0A0_value +
@@ -1478,16 +1482,16 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintXsec( string message, double value )  const
 			AT()*AT() * timeFactorATAT(  ) * ATAT_value +
 			AP()*AT() * timeFactorImAPAT(  ) * ImAPAT_value +
 			A0()*AP() * timeFactorReA0AP(  ) * ReA0AP_value +
-			A0()*AT() * timeFactorImA0AT(  ) * ImA0AT_value ;
+			A0()*AT() * timeFactorImA0AT(  ) * ImA0AT_value;
 
 		double SwaveAdditions =
 			AS()*AS() * timeFactorASAS(  ) * ASAS_value +
 			AS()*AP() * timeFactorReASAP(  ) * ReASAP_value +
 			AS()*AT() * timeFactorImASAT(  ) * ImASAT_value +
-			AS()*A0() * timeFactorReASA0(  ) * ReASA0_value ;
+			AS()*A0() * timeFactorReASA0(  ) * ReASA0_value;
 
-		cout << "   Pwave Only : " << PwaveTot << endl ;
-		cout << "   Swave add : " <<  SwaveAdditions << endl ;
+		cout << "   Pwave Only : " << PwaveTot << endl;
+		cout << "   Swave add : " <<  SwaveAdditions << endl;
 		if( _datapoint ) _datapoint->Print();
 	}
 
@@ -1501,20 +1505,20 @@ void Bs2JpsiPhi_Signal_v5::DebugPrintNorm( string message, double value )  const
 	if( !performingComponentProjection )
 	{
 		(void) message; (void) value;
-		cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl ;
-		cout << message << value << endl <<endl ;
+		cout << "*************DEBUG OUTPUT FROM Bs2JpsiPhi_Signal_v5::DebugPrintNorm ***************************" << endl;
+		cout << message << value << endl << endl;
 
-		cout << endl ;
-		cout <<  A0()*A0() * timeFactorA0A0Int(  )* angAccI1  << endl ;
-		cout <<  AP()*AP() * timeFactorAPAPInt(  )* angAccI2 << endl ;
-		cout <<  AT()*AT() * timeFactorATATInt(  )* angAccI3 << endl << endl ;
-		cout <<  AP()*AT() * timeFactorImAPATInt(  ) * angAccI4<< endl ;
-		cout <<  A0()*AP() * timeFactorReA0APInt(  ) * angAccI5<< endl ;
-		cout <<  A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6<< endl << endl;
-		cout <<  AS()*AS() * timeFactorASASInt(  ) * angAccI7 << endl ;
-		cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl ;
-		cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl ;
-		cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl ;
+		cout << endl;
+		cout <<  A0()*A0() * timeFactorA0A0Int(  )* angAccI1 << endl;
+		cout <<  AP()*AP() * timeFactorAPAPInt(  )* angAccI2 << endl;
+		cout <<  AT()*AT() * timeFactorATATInt(  )* angAccI3 << endl << endl;
+		cout <<  AP()*AT() * timeFactorImAPATInt(  ) * angAccI4 << endl;
+		cout <<  A0()*AP() * timeFactorReA0APInt(  ) * angAccI5 << endl;
+		cout <<  A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 << endl << endl;
+		cout <<  AS()*AS() * timeFactorASASInt(  ) * angAccI7 << endl;
+		cout <<  AS()*AP() * timeFactorReASAPInt(  ) * angAccI8<< endl;
+		cout <<  AS()*AT() * timeFactorImASATInt(  ) * angAccI9<< endl;
+		cout <<  AS()*A0() * timeFactorReASA0Int(  ) * angAccI10<< endl;
 	}
 
 	PDF_THREAD_UNLOCK

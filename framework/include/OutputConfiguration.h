@@ -51,6 +51,7 @@ class OutputConfiguration
 
 		void OutputCompProjections( FitResult* );
 
+		string GetPullFileName() const;
 
 		//Change the configuration
 		void MakeAllPlots( string );

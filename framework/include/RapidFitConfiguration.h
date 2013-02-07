@@ -113,6 +113,8 @@ class RapidFitConfiguration
 
 		vector<string> templatePDFs;
 
+		vector<string> runtimeArgs;
+
 		DebugClass* debug;
 	private:
 		/*!

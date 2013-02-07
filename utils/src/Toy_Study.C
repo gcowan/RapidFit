@@ -174,6 +174,7 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 
 	if( input_tree->GetEntries() < 100 )
 	{
+		cout << endl << endl;
 		cout << "You will likely end up with errors due to the low number of entries in this study" << endl;
 		cout << input_tree->GetEntries() << endl;
 		cout << "If you are serious about continuing then re-run with --runWithAnyToys" << endl;

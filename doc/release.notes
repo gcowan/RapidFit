@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/02/07 Rob Currie
+  - Fixed bug in FC analysis when using separate alpha parameter not included in the fit
+  - Fixed code around FitResult and FitResultVector to protect objects with const as much as possible/sane
+  - Added XML and runtimeArgs to the output XML file which is small extra overhead to allow you to be able to regenerate an analysis very easily
+  - Added --RestoreXML and --Summarise to let you know what is stored in these objects in the output ROOT file
+  - Expanded some warnings in the codebase to include likely reasons why RapidFit is about to exit which should help with debugging
+  - Fixed bug in v5 that caused some complex projections to hang
+
 2013/02/02 Rob Currie
   - Enabling multi-threaded GSL integration. I didn't change any of this code and was surprised to see it 'just work'.
     Added the ability to request number of threads in XML for projections

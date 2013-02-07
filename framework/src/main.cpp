@@ -151,6 +151,8 @@ int RapidFit( vector<string> input )
 
 	RapidFitConfiguration* thisConfig = new RapidFitConfiguration();
 
+	thisConfig->runtimeArgs = input;
+
 	int command_check = ParseCommandLine::ParseThisCommandLine( *thisConfig, input );
 
 	if( thisConfig->debug != NULL )
@@ -348,8 +350,8 @@ int Perform2DLLScan( RapidFitConfiguration* config )
 			vector<FitResultVector*> TempContourResults;
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList[scanNum].first )->SetScanStatus( true );
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList[scanNum].second )->SetScanStatus( true );
-			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), config->SoloContourResults[scanNum] );
-			ResultFormatter::WriteFlatNtuple( string( time_stamped_name ), config->SoloContourResults[scanNum] );
+			ResultFormatter::WriteFlatNtuple( string( output_scan_dat ), config->SoloContourResults[scanNum], config->xmlFile->GetXML(), config->runtimeArgs );
+			ResultFormatter::WriteFlatNtuple( string( time_stamped_name ), config->SoloContourResults[scanNum], config->xmlFile->GetXML(), config->runtimeArgs );
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList[scanNum].first )->SetScanStatus( false );
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList[scanNum].second )->SetScanStatus( false );
 		}
@@ -429,8 +431,8 @@ int PerformLLScan( RapidFitConfiguration* config )
 			file_output.push_back( study_output );
 			FitResultVector* for_file = new FitResultVector( file_output );
 			//	Making the assumption the user isn't running more than one of these at a time and isn't an idiot
-			ResultFormatter::WriteFlatNtuple( "1DLL_FCScan.root", for_file );
-			ResultFormatter::WriteFlatNtuple( "FCScan.root", for_file );
+			ResultFormatter::WriteFlatNtuple( "1DLL_FCScan.root", for_file, config->xmlFile->GetXML(), config->runtimeArgs );
+			ResultFormatter::WriteFlatNtuple( "FCScan.root", for_file, config->xmlFile->GetXML(), config->runtimeArgs );
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( false );
 		}
 
@@ -454,8 +456,8 @@ int PerformLLScan( RapidFitConfiguration* config )
 				ammended_format.push_back( temp_vec );
 			}
 			FitResultVector* corrected_format = new FitResultVector( ammended_format );
-			ResultFormatter::WriteFlatNtuple( string( new_output_scan_dat ), corrected_format );
-			ResultFormatter::WriteFlatNtuple( string( time_stamped_name ), corrected_format );
+			ResultFormatter::WriteFlatNtuple( string( new_output_scan_dat ), corrected_format, config->xmlFile->GetXML(), config->runtimeArgs );
+			ResultFormatter::WriteFlatNtuple( string( time_stamped_name ), corrected_format, config->xmlFile->GetXML(), config->runtimeArgs );
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[this_scan_num] )->SetScanStatus( false );
 		}
 	}
@@ -737,10 +739,12 @@ int PerformMainFit( RapidFitConfiguration* config )
 	//	If requested write the central value to a single file
 	if( config->BurnToROOTFlag )
 	{
-		cout << "If you get any errors here and/or an empty Global_Fit_Result.root file, check your xml ONLY contains parameters in the fit." << endl;
-		cout << "(There is a known bug which requires a bit of work to fix)" << endl;
-		ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result"+StringProcessing::TimeString()+".root" ), config->GlobalFitResult );
-		ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result_"+StringProcessing::TimeString()+".root" ), config->GlobalFitResult );
+		string fileName=string( "Global_Fit_Result_"+StringProcessing::TimeString()+".root" );
+		cout << "Fit Output is being saved in: " << fileName << endl;
+		cout << endl << "This Contains the fit result in a nTulple output, the runtime and XML used to construct the fit and the final correlation matrix" << endl;
+		cout << endl;
+		//ResultFormatter::WriteFlatNtuple( string( "Global_Fit_Result"+StringProcessing::TimeString()+".root" ), config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs );
+		ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs );
 	}
 
 	if( config->GOF_Flag ) {
@@ -784,8 +788,8 @@ int PerformFCStudy( RapidFitConfiguration* config )
 	config->GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList.back().first )->SetScanStatus( true );
 	config->GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList.back().second )->SetScanStatus( true );
 	//      Making the assumption the user isn't running more than one of these at a time and isn't an idiot
-	ResultFormatter::WriteFlatNtuple( "2DLL_FCScan.root", study_output );
-	ResultFormatter::WriteFlatNtuple( "FCScan.root", study_output );
+	ResultFormatter::WriteFlatNtuple( "2DLL_FCScan.root", study_output, config->xmlFile->GetXML(), config->runtimeArgs );
+	ResultFormatter::WriteFlatNtuple( "FCScan.root", study_output, config->xmlFile->GetXML(), config->runtimeArgs );
 	config->GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList.back().first )->SetScanStatus( false );
 	config->GlobalResult->GetResultParameterSet()->GetResultParameter( _2DLLscanList.back().second )->SetScanStatus( false );
 
@@ -825,7 +829,7 @@ int PerformMCStudy( RapidFitConfiguration* config )
 	//	Perform Toy Study
 	newMCStudy->DoWholeStudy();
 
-	ResultFormatter::WriteFlatNtuple( string( "MC_Study.root" ), newMCStudy->GetStudyResult() );
+	ResultFormatter::WriteFlatNtuple( string( "MC_Study.root" ), newMCStudy->GetStudyResult(), config->xmlFile->GetXML(), config->runtimeArgs );
 
 	delete newMCStudy;
 	return 0;
@@ -848,8 +852,10 @@ int PerformToyStudy( RapidFitConfiguration* config )
 	FitResultVector* fitResults = newStudy->GetStudyResult();
 
 	//Output results
-	config->makeOutput->OutputToyResult( fitResults );
+	//config->makeOutput->OutputToyResult( fitResults );
 	//makeOutput->OutputFitResult( fitResults->GetFitResult(0) );
+
+	ResultFormatter::WriteFlatNtuple( config->makeOutput->GetPullFileName(), fitResults, config->xmlFile->GetXML(), config->runtimeArgs );
 
 	while( !XMLConstraints.empty() )
 	{

@@ -564,3 +564,8 @@ void OutputConfiguration::SetDebug( DebugClass* input_debug )
 	debug = new DebugClass( *input_debug );
 }
 
+string OutputConfiguration::GetPullFileName() const
+{
+	return pullFileName;
+}
+

@@ -18,7 +18,9 @@
 using namespace::std;
 
 //  Constructor to Return a single array from multiple arrays
-FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock(NULL), gl_clock(NULL), allGLTimes()
+FitResultVector::FitResultVector( const vector<FitResultVector*> Result_Array ) :
+	allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(),
+	allRealTimes(), allCPUTimes(), clock(NULL), gl_clock(NULL), allGLTimes()
 {
 	if( !Result_Array.empty() )
 	{
@@ -59,7 +61,9 @@ FitResultVector::FitResultVector( vector<FitResultVector*> Result_Array ) : allR
 }
 
 //Constructor with correct argument
-FitResultVector::FitResultVector( vector<string> AllParameterNames ) : allResults(), allNames(AllParameterNames), allValues(), allErrors(), allPulls(), allGenValues(), allRealTimes(), allCPUTimes(), clock(NULL), gl_clock(NULL), allGLTimes()
+FitResultVector::FitResultVector( const vector<string> AllParameterNames ) :
+	allResults(), allNames(AllParameterNames), allValues(), allErrors(), allPulls(), allGenValues(),
+	allRealTimes(), allCPUTimes(), clock(NULL), gl_clock(NULL), allGLTimes()
 {
 	vector<string> duplicates;
 	allNames = StringProcessing::RemoveDuplicates( AllParameterNames, duplicates );
@@ -101,7 +105,7 @@ void FitResultVector::StartStopwatch()
 }
 
 //Add a new fit result
-bool FitResultVector::AddFitResult( FitResult * NewResult, bool with_clock )
+bool FitResultVector::AddFitResult( FitResult * NewResult, const bool with_clock )
 {
 	vector<double> newParameterValues, newParameterErrors, newParameterPulls, newParameterGenValues;
 	vector<string>::iterator nameIterator;
@@ -152,7 +156,7 @@ bool FitResultVector::AddFitResult( FitResult * NewResult, bool with_clock )
 
 
 //  Return an array of the MLL values of the fits
-vector<double> FitResultVector::GetAllMLL()
+vector<double> FitResultVector::GetAllMLL() const
 {
 	vector<double> output_MLL;
 	for (unsigned short int i=0; i < allResults.size(); ++i )
@@ -169,7 +173,7 @@ vector<double> FitResultVector::GetAllMLL()
 }
 
 //Return vectors of values, errors and pulls for a particular parameter name
-vector<double> FitResultVector::GetParameterValues( string ParameterName )
+vector<double> FitResultVector::GetParameterValues( const string ParameterName ) const
 {
 	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
@@ -184,7 +188,7 @@ vector<double> FitResultVector::GetParameterValues( string ParameterName )
 	cerr << "Result parameter name \"" << ParameterName << "\" not found" << endl;
 	return vector<double>();
 }
-vector<double> FitResultVector::GetParameterErrors( string ParameterName )
+vector<double> FitResultVector::GetParameterErrors( const string ParameterName ) const
 {
 	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
@@ -199,7 +203,7 @@ vector<double> FitResultVector::GetParameterErrors( string ParameterName )
 	cerr << "Result parameter name \"" << ParameterName << "\" not found" << endl;
 	return vector<double>();
 }
-vector<double> FitResultVector::GetParameterPulls( string ParameterName )
+vector<double> FitResultVector::GetParameterPulls( const string ParameterName ) const
 {
 	for (unsigned int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
 	{
@@ -216,17 +220,17 @@ vector<double> FitResultVector::GetParameterPulls( string ParameterName )
 }
 
 //Allow access to the vector of results
-int FitResultVector::NumberResults()
+int FitResultVector::NumberResults() const
 {
 	return (int)allResults.size();
 }
 
-unsigned int FitResultVector::size()
+unsigned int FitResultVector::size() const
 {
 	return (unsigned)allResults.size();
 }
 
-FitResult * FitResultVector::GetFitResult( int Index )
+FitResult * FitResultVector::GetFitResult( const int Index ) const
 {
 	if ( Index < int(allResults.size()) )
 	{
@@ -239,13 +243,13 @@ FitResult * FitResultVector::GetFitResult( int Index )
 	}
 }
 
-double FitResultVector::GetRealTime( int Index )
+double FitResultVector::GetRealTime( const int Index ) const
 {
 	if( Index < int(allRealTimes.size()) ) return allRealTimes[ unsigned(Index) ];
 	else return -1;
 }
 
-void FitResultVector::AddRealTimes( vector<double> input_times )
+void FitResultVector::AddRealTimes( const vector<double> input_times )
 {
 	for( unsigned int i=0; i< input_times.size(); ++i)
 	{
@@ -253,24 +257,24 @@ void FitResultVector::AddRealTimes( vector<double> input_times )
 	}
 }
 
-void FitResultVector::AddRealTime( double input_time )
+void FitResultVector::AddRealTime( const double input_time )
 {
 	allRealTimes.push_back( input_time );
 }
 
-void FitResultVector::SetRealTime( int Index, double input_time )
+void FitResultVector::SetRealTime( const int Index, const double input_time )
 {
 	if( int(allRealTimes.size()) < Index ) allRealTimes.resize( unsigned(Index) );
 	allRealTimes[unsigned(Index)] = input_time;
 }
 
-double FitResultVector::GetCPUTime( int Index )
+double FitResultVector::GetCPUTime( const int Index ) const
 {
 	if( Index < int(allCPUTimes.size()) ) return allCPUTimes[ unsigned(Index) ];
 	else return -1;
 }
 
-void FitResultVector::AddCPUTimes( vector<double> input_times )
+void FitResultVector::AddCPUTimes( const vector<double> input_times )
 {
 	for( unsigned int i=0; i< input_times.size(); ++i)
 	{
@@ -278,51 +282,51 @@ void FitResultVector::AddCPUTimes( vector<double> input_times )
 	}
 }
 
-void FitResultVector::AddCPUTime( double input_time )
+void FitResultVector::AddCPUTime( const double input_time )
 {
 	allCPUTimes.push_back( input_time );
 }
 
-void FitResultVector::AddGLTime( double input_time )
+void FitResultVector::AddGLTime( const double input_time )
 {
         allGLTimes.push_back( input_time );
 }
 
-double FitResultVector::GetGLTime( int Index )
+double FitResultVector::GetGLTime( const int Index ) const
 {
         if( Index < int(allGLTimes.size()) ) return allGLTimes[ unsigned(Index) ];
         else return -1;
 }
 
-void FitResultVector::SetCPUTime( int Index, double input_time )
+void FitResultVector::SetCPUTime( const int Index, const double input_time )
 {
 	if( Index < int(allCPUTimes.size()) ) allCPUTimes.resize( unsigned(Index) );
 	allCPUTimes[unsigned(Index)] = input_time;
 }
 
 //Return names of all variables
-vector<string> FitResultVector::GetAllNames()
+vector<string> FitResultVector::GetAllNames() const
 {
 	return allNames;
 }
 
 //Return the time taken for each fit
-vector<double> FitResultVector::GetAllRealTimes()
+vector<double> FitResultVector::GetAllRealTimes() const
 {
 	return allRealTimes;
 }
 
-vector<double> FitResultVector::GetAllCPUTimes()
+vector<double> FitResultVector::GetAllCPUTimes() const
 {
 	return allCPUTimes;
 }
 
-vector<double> FitResultVector::GetAllGLTimes()
+vector<double> FitResultVector::GetAllGLTimes() const
 {
 	return allGLTimes;
 }
 
-vector<double> FitResultVector::GetFlatResult( int Index )
+vector<double> FitResultVector::GetFlatResult( const int Index ) const
 {
 	vector<double> Flatresult;
 	for(unsigned int i = 0; i<allNames.size(); ++i)
@@ -347,7 +351,7 @@ vector<double> FitResultVector::GetFlatResult( int Index )
 	return Flatresult;
 }
 
-TString FitResultVector::GetFlatResultHeader()
+TString FitResultVector::GetFlatResultHeader() const
 {
 	TString header = "";
 	for(unsigned short int i = 0; i<allNames.size(); ++i)

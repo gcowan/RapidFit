@@ -897,11 +897,15 @@ void ResultFormatter::AddBranch( TTree* inputTree, const string& BranchName, con
 }
 
 //Make pull plots from the output of a toy study
-void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResult )
+void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVector* ToyResult, const vector<string> inputXML, const vector<string> runtimeArgs )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	rootFile->SetCompressionLevel( 9 );
 
+	//	Important!
+	//	The output from this is typically run through the RapidPlot file
+	//	For sake of backwards compatibility the RapidPlot tool makes use of the ability to look for the 'first' TTree in a ROOT file for some of it's internal logic
+	//	KEEP THIS TREE AS THE FIRST TREE CREATED AND WRITTEN TO THE FILE TO BE ABLE TO KEEP USING THIS TOOL!!!
 	TTree* outputTree = new TTree( "RapidFitResult", "RapidFitResult" );
 
 	ResultParameterSet* resultSet = ToyResult->GetFitResult( 0 )->GetResultParameterSet();
@@ -1024,8 +1028,35 @@ void ResultFormatter::WriteFlatNtuple( string FileName, FitResultVector* ToyResu
 		tree->Fill();
 	}
 	tree->Write("",TObject::kOverwrite);
+
+	if( !inputXML.empty() )
+	{
+		TTree* XMLTree = new TTree( "FittingXML", "FittingXML" );
+
+		vector<string> thisXML = inputXML;
+
+		XMLTree->Branch( "FittingXML", "std::vector<string>", &thisXML );
+
+		XMLTree->Fill();
+
+		XMLTree->Write("",TObject::kOverwrite);
+	}
+	if( !runtimeArgs.empty() )
+	{
+		TTree* RuntimeTree = new TTree( "RuntimeArgs", "RuntimeArgs" );
+
+		vector<string> thisRuntime = runtimeArgs;
+
+		RuntimeTree->Branch( "RuntimeArgs", "std::vector<string>", &thisRuntime );
+
+		RuntimeTree->Fill();
+
+		RuntimeTree->Write("",TObject::kOverwrite);
+	}
+
 	rootFile->Write("",TObject::kOverwrite);
 	rootFile->Close();
+
 	//	THIS SHOULD BE SAFE... BUT THIS IS ROOT so 'of course' it isn't...
 	//delete parameterNTuple;
 	delete rootFile;

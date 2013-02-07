@@ -19,9 +19,9 @@ using namespace::std;
 /*!
  * Constructor with correct arguments, including covariance Matrix and contours
  */
-FitResult::FitResult( double MinimumValue, ResultParameterSet * FittedParameters, int FitStatus, PhysicsBottle* FittedBottle,
-		RapidFitMatrix* CovarianceMatrix, vector< FunctionContour* > ContourPlots ) :
-	minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( CovarianceMatrix ),
+FitResult::FitResult( const double MinimumValue, const ResultParameterSet * FittedParameters, const int FitStatus, const PhysicsBottle* FittedBottle,
+		const RapidFitMatrix* CovarianceMatrix, const vector< FunctionContour* > ContourPlots ) :
+	minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( new RapidFitMatrix(*CovarianceMatrix) ),
 	contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( new PhysicsBottle(*FittedBottle) )
 {
 }
@@ -42,52 +42,52 @@ FitResult::~FitResult()
 		delete fittedParameters;
 }
 
-vector< FunctionContour* > FitResult::GetContours()
+vector< FunctionContour* > FitResult::GetContours() const
 {
 	return contours;
 }
 
-RapidFitMatrix* FitResult::GetCovarianceMatrix()
+RapidFitMatrix* FitResult::GetCovarianceMatrix() const
 {
 	return covarianceMatrix;
 }
 
-void FitResult::ApplyCovarianceMatrix( RapidFitMatrix* Input )
+void FitResult::ApplyCovarianceMatrix( const RapidFitMatrix* Input )
 {
 	cout << "Applying FitResult:  ";
 	for( unsigned int i=0; i< (unsigned)Input->theseParameters.size(); ++i ) cout << Input->theseParameters[i] << "\t";
 	cout << endl;
 	if( covarianceMatrix != NULL ) delete covarianceMatrix;
-	covarianceMatrix = Input;
-	fittedParameters->ApplyCovarianceMatrix( Input );
+	covarianceMatrix = new RapidFitMatrix(*Input);
+	fittedParameters->ApplyCovarianceMatrix( covarianceMatrix );
 }
 
-double FitResult::GetMinimumValue()
+double FitResult::GetMinimumValue() const
 {
 	return minimumValue;
 }
 
-void FitResult::SetMinimumValue( double min )
+void FitResult::SetMinimumValue( const double min )
 {
 	minimumValue = min;
 }
 
-ResultParameterSet * FitResult::GetResultParameterSet()
+ResultParameterSet * FitResult::GetResultParameterSet() const
 {
 	return fittedParameters;
 }
 
-int FitResult::GetFitStatus()
+int FitResult::GetFitStatus() const
 {
 	return fitStatus;
 }
 
-void FitResult::ForceFitStatus( int input_status )
+void FitResult::ForceFitStatus( const int input_status )
 {
 	fitStatus = input_status;
 }
 
-PhysicsBottle* FitResult::GetPhysicsBottle()
+PhysicsBottle* FitResult::GetPhysicsBottle() const
 {
 	return fittedBottle;
 }

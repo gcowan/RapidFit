@@ -29,12 +29,12 @@ class FitResultVector
 		/*!
 		 * Create a FitResultVector from a vector of FitResults
 		 */
-		FitResultVector( vector<FitResultVector*> );
+		FitResultVector( const vector<FitResultVector*> );
 
 		/*!
 		 * Create a FitResultVector based on the Input ResultParameter Names
 		 */
-		FitResultVector( vector<string> );
+		FitResultVector( const vector<string> );
 
 		/*!
 		 * Destructor
@@ -54,22 +54,22 @@ class FitResultVector
 		 * By default this looks to calculate the internal clock difference due to the length of time to perform a fit
 		 * To Stop this behaviour, pass (FitResult*, false)
 		 */
-		bool AddFitResult( FitResult*, bool=true );
+		bool AddFitResult( FitResult*, const bool=true );
 
 		/*!
 		 * The Number of FitResults in this FitResultVector
 		 */
-		unsigned int size();
+		unsigned int size() const;
 
 		/*!
 		 * The Number of FitResults in this FitResultVector
 		 */
-		int NumberResults();
+		int NumberResults() const;
 
 		/*!
 		 * Get a requested FitResult from the Vector
 		 */
-		FitResult * GetFitResult(int);
+		FitResult * GetFitResult( const int ) const;
 
 		/*!
 		 * Set the Stat of the 'stopwatch' to time how long a fit takes
@@ -80,94 +80,94 @@ class FitResultVector
 		 * Get the Names of all of the Parameters in the FitResultVector
 		 * This includes all of the Parameters in the FitResult as well as some information on elapsed real and cpu time taken to converge
 		 */
-		vector<string> GetAllNames();
+		vector<string> GetAllNames() const;
 
 		/*!
 		 * Contains the length of 'real' time taken for all of the fits to converge
 		 */
-		vector<double> GetAllRealTimes();
+		vector<double> GetAllRealTimes() const;
 
 		/*!
 		 * Contains the length of 'CPU' time taken for all of the fits to converge
 		 */
-		vector<double> GetAllCPUTimes();
+		vector<double> GetAllCPUTimes() const;
 
-		vector<double> GetAllGLTimes();
+		vector<double> GetAllGLTimes() const;
 
-		double GetGLTime( int index );
+		double GetGLTime( const int index ) const;
 
-		void AddGLTime( double input );
+		void AddGLTime( const double input );
 
 		/*!
 		 * Contains the final value 'NLL' of the Function after Minimisation
 		 */
-		vector<double> GetAllMLL();
+		vector<double> GetAllMLL() const;
 
 		/*!
 		 * Get a vector containing the value from all of the FitResults for the Requested ResultParameter
 		 */
-		vector<double> GetParameterValues(string);
+		vector<double> GetParameterValues( const string ) const;
 
 		/*!
 		 * Get a vector containing the error from all of the FitResults for the Requested ResultParameter
 		 */
-		vector<double> GetParameterErrors(string);
+		vector<double> GetParameterErrors( const string ) const;
 
 		/*!
 		 * Get a vector containing the pull from all of the FitResults for the Requested ResultParameter
 		 */
-		vector<double> GetParameterPulls(string);
+		vector<double> GetParameterPulls( const string ) const;
 
 		/*!
 		 * Get the 'Flat' result of all values/errors/pulls from the requested FitResult
 		 * This is useful when populating a TTree with all of the fit data
 		 */
-		vector<double> GetFlatResult(int);
+		vector<double> GetFlatResult( const int ) const;
 
 		/*!
 		 * Names of the Branches that a TTree will have in order to store all of this data, seperated by ':'
 		 */
-		TString GetFlatResultHeader();
+		TString GetFlatResultHeader() const;
 
 		/*!
 		 * Get the CPU time for the requested FitResult
 		 */
-		double GetCPUTime( int );
+		double GetCPUTime( const int ) const;
 
 		/*!
 		 * Get the Real CPU time for the requested FitResult
 		 */
-		double GetRealTime( int );
+		double GetRealTime( const int ) const;
 
 		/*!
 		 * Fill the CPU times for all results with the given vector
 		 */
-		void AddCPUTimes( vector<double> );
+		void AddCPUTimes( const vector<double> );
 
 		/*!
 		 * Fill the Real times for all results with the given vector
 		 */
-		void AddRealTimes( vector<double> );
+		void AddRealTimes( const vector<double> );
 
 		/*!
 		 * Add a CPU time to the last FitResult
 		 */
-		void AddCPUTime( double );
+		void AddCPUTime( const double );
 
 		/*!
 		 * Add a Real time to the last FitResult
 		 */
-		void AddRealTime( double );
+		void AddRealTime( const double );
 
 		/*!
 		 * Add a CPU time to the requested FitResult
 		 */
-		void SetCPUTime( int, double );
+		void SetCPUTime( const int, const double );
 
 		/*!
 		 * Add a Real time to the requested FitResult
 		 */
-		void SetRealTime( int, double );
+		void SetRealTime( const int, const double );
 
 		/*!
 		 * Output some debugging info

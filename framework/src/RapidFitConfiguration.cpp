@@ -86,7 +86,8 @@ numberRepeats(),
 	templatePDFs(),
 	debug(),
 	disableLatexOutput(),
-	BuildConstraints()
+	BuildConstraints(),
+	runtimeArgs()
 {
 		//Variables to store command line arguments
 		numberRepeats = 0;
@@ -175,6 +176,8 @@ numberRepeats(),
 		debug->SetClassNames(vector<string>(1,"default"));
 
 		BuildConstraints = false;
+
+		runtimeArgs = vector<string>();
 }
 
 RapidFitConfiguration::~RapidFitConfiguration()

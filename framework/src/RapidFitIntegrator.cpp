@@ -462,7 +462,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	}
 
 	unsigned int npoint = 1000;
-	std::vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
+	vector<double> * integrationPoints = new vector<double>[doIntegrate.size()];
 
 	//pthread_mutex_lock( &gsl_mutex );
 	//cout << "Allocating GSL Integration Tool" << endl;

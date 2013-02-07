@@ -62,24 +62,68 @@ void VectoredFeldmanCousins::InitalizeNewPDFWithData()
 		//	Read in the real data and culculate the sWeight error and dataset size
 		allPhaseSpaces.push_back( new PhaseSpaceBoundary( *(file_input->GetBoundary()) ) );
 
+		//	sWeighted FC studies are performed to compare the sensitivity between FC and the NLL from data
+		//	In order to do this we need to account for the alpha parameter
+		//	The NLL function is scaled by alpha in the fit to determine the correct sensitivity to a parameter
+		//	Because of this if toys are generated with a scaled yield to have a comprable sensitivity
+
 		if( sWeighted_study )
 		{
 			string sWeightName = theFunction->GetWeightName();
 			ObservableRef sWeightObsRef ( sWeightName );
 
+			string alphaName;
+			ObservableRef alphaNameRef;
+
+			//	When using a custom alpha with the result stored on an event by event basis then we need to retrieve it this way
+
+			if( theFunction->GetUseCustomAlpha() )
+			{
+				alphaName = theFunction->GetAlphaName();
+				alphaNameRef = ObservableRef( alphaName );
+			}
+
 			//Only generate toys with an sWeight of 1
 			vector<double> new_constraint(1,1.0);
 			allPhaseSpaces.back()->SetConstraint( sWeightName, new_constraint, " " );
+			// 	If we have a per-event alpha we need to modify the constraint to remove it from the toys
+			if( theFunction->GetUseCustomAlpha() )
+			{
+				allPhaseSpaces.back()->SetConstraint( alphaName, new_constraint, " " );
+			}
 
 			int datasetsize = file_input->GetDataNumber();
-			double data_num=0; double data_err=0;
+			double data_num=0.; double data_err=0.;
 			for( int i=0; i < datasetsize; ++i)
 			{
 				double sweight_val = file_input->GetDataPoint( i )->GetObservable( sWeightObsRef )->GetValue();
-				data_num+=sweight_val;
-				data_err+=sweight_val*sweight_val;
+				if( theFunction->GetUseCustomAlpha() )
+				{
+					double this_alpha = file_input->GetDataPoint( i )->GetObservable( alphaNameRef )->GetValue();
+					data_num+=sweight_val*this_alpha;
+					data_err+=sweight_val*sweight_val*this_alpha*this_alpha;
+				}
+				else
+				{
+					data_num+=sweight_val;
+					data_err+=sweight_val*sweight_val;
+				}
 			}
 			data_err=sqrt(data_err);
+
+			//	When alpha has been calculated at runTime it isn't stored in a new Observable
+			//	Because of this we need to call the GetAlpha to determine what was calculated for the dataset
+			//	This is not done on a per-event basis and alpha is initialized to 1. by default so this should always be safe
+
+			if( !theFunction->GetUseCustomAlpha() )
+			{
+				if( theFunction->GetNormaliseWeights() || theFunction->GetSingleNormaliseWeights() )
+				{
+					double this_alpha = file_input->GetAlpha();
+					data_err*=this_alpha;
+					data_num*=this_alpha;
+				}
+			}
 
 			sweight_error.push_back( data_err );
 			generate_n_events.push_back( data_num );
