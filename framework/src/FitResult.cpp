@@ -21,7 +21,7 @@ using namespace::std;
  */
 FitResult::FitResult( const double MinimumValue, const ResultParameterSet * FittedParameters, const int FitStatus, const PhysicsBottle* FittedBottle,
 		const RapidFitMatrix* CovarianceMatrix, const vector< FunctionContour* > ContourPlots ) :
-	minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( new RapidFitMatrix(*CovarianceMatrix) ),
+	minimumValue( MinimumValue ), fittedParameters( new ResultParameterSet(*FittedParameters) ), covarianceMatrix( (CovarianceMatrix==NULL)?(new RapidFitMatrix()):(new RapidFitMatrix(*CovarianceMatrix)) ),
 	contours( ContourPlots ), fitStatus( FitStatus ), fittedBottle( new PhysicsBottle(*FittedBottle) )
 {
 }

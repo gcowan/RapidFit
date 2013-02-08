@@ -7,6 +7,7 @@
   - Added --RestoreXML and --Summarise to let you know what is stored in these objects in the output ROOT file
   - Expanded some warnings in the codebase to include likely reasons why RapidFit is about to exit which should help with debugging
   - Fixed bug in v5 that caused some complex projections to hang
+  - Fixed bug introduced in handling completely fixed FitResults (present before now, but only exposed due to another bugfix)
 
 2013/02/02 Rob Currie
   - Enabling multi-threaded GSL integration. I didn't change any of this code and was surprised to see it 'just work'.

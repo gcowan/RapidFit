@@ -81,6 +81,14 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, PhysicsBottle * Bottle, DebugClass* debug )
 {
 
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitAssembler" ) )
+		{
+			cout << "FitAssembler: Testing if Fixed ParameterSet" << endl;
+		}
+	}
+
 	if( Bottle->GetParameterSet()->GetAllFloatNames().size() == 0 )
 	{
 		vector<string> ParamNames = Bottle->GetParameterSet()->GetAllFixedNames();
@@ -91,14 +99,47 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			fixed_set->SetResultParameter( ParamNames[i], param->GetValue(), param->GetValue(), 0., 0., 0., param->GetType(), param->GetUnit() );
 		}
 
+        if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "FitAssembler" ) )
+                {
+                        cout << "FitAssembler: Setting Fixed Physics Bottle" << endl;
+                }
+        }
+
 		FitFunction * theFunction = FunctionConfig->GetFitFunction();
 		theFunction->SetPhysicsBottle(Bottle);
+
+        if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "FitAssembler" ) )
+                {
+                        cout << "FitAssembler: Evaluating DataSet" << endl;
+                }
+        }
 
 		double someTest = theFunction->Evaluate();
 		cout << someTest << endl;
 		//exit(0);
 
+        if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "FitAssembler" ) )
+                {
+                        cout << "FitAssembler: Constructing Fixed Result" << endl;
+                }
+        }
+
 		FitResult* fixed_result = new FitResult( 0., fixed_set, 3, Bottle );
+
+        if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "FitAssembler" ) )
+                {
+                        cout << "FitAssembler: Setting Result Minimum Value" << endl;
+                }
+        }
+
 		delete fixed_set;
 		fixed_result->SetMinimumValue(theFunction->Evaluate());
 		return fixed_result;
