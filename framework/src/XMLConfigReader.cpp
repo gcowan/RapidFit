@@ -626,6 +626,10 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			returnable_config->addLHCb = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
+		else if( projComps[childIndex]->GetName() == "AddRightLHCb" )
+		{
+			returnable_config->addRightLHCb = XMLTag::GetBooleanValue( projComps[childIndex] );
+		}
 		else if( projComps[childIndex]->GetName() == "LegendTextSize" )
 		{
 			returnable_config->LegendTextSize =  XMLTag::GetDoubleValue( projComps[childIndex] );

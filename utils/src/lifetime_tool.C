@@ -13,6 +13,7 @@
 
 #include <iomanip>
 #include <vector>
+#include <cstdlib>
 
 using namespace::std;
 
@@ -405,8 +406,8 @@ int main( int argc, char* argv[] )
 
 	corr_graph->Draw("AP");
 	c7->Update();
-	corr_graph->GetXaxis()->SetTitle("#Gamma_{L}");
-	corr_graph->GetYaxis()->SetTitle("#Gamma_{H}");
+	corr_graph->GetXaxis()->SetTitle("#Gamma_{L} [ps^{-1}]");
+	corr_graph->GetYaxis()->SetTitle("#Gamma_{H} [ps^{-1}]");
 	c7->Update();
 
 	TString funcStr_Orig("("); funcStr_Orig+=1./corr;funcStr_Orig.Append("*x+[0])");
@@ -455,7 +456,8 @@ int main( int argc, char* argv[] )
 
 	TGraph* thisCorrGraph2 = new TGraph( 100, x_func2, y_func2 );
 
-	thisCorrGraph2->SetLineColor(2);
+	thisCorrGraph2->SetLineColor( 2 );
+	thisCorrGraph2->SetLineWidth( 20 );
 	thisCorrGraph2->Draw("SAMEL");
 
 	c7->Update();
@@ -488,8 +490,8 @@ int main( int argc, char* argv[] )
 	thisHisto->Draw("colz");
 
 	c8->Update();
-	thisHisto->GetXaxis()->SetTitle("#Gamma_{L}");
-	thisHisto->GetYaxis()->SetTitle("#Gamma_{H}");
+	thisHisto->GetXaxis()->SetTitle("#Gamma_{L} [ps^{-1}]");
+	thisHisto->GetYaxis()->SetTitle("#Gamma_{H} [ps^{-1}]");
 
 	thisCorrGraph->Draw("SAMEL");
 	thisCorrGraph2->Draw("SAMEL");
@@ -509,6 +511,9 @@ int main( int argc, char* argv[] )
 	TF2* corr_function = new TF2( "corr_matrix",
 				"1./(2*TMath::Pi()*[0]*[1]*TMath::Sqrt(1 - [2]*[2])) * TMath::Exp( -1./(2*(1-[2]*[2]))*(((x-[3])*(x-[3]))/([0]*[0])+((y-[4])*(y-[4]))/([1]*[1])-(2*[2]*(x-[3])*(y-[4]))/([0]*[1])) )",
 				xmin, xmax, ymin, ymax );
+
+	corr_function->SetLineStyle(1);
+	corr_function->SetLineWidth(20);
 
 	corr_function->SetParameters( 0.010, 0.020, -0.7, 0.717, 0.631 );// xmin+((xmax-xmin)*0.5), ymin+((ymax-ymin)*0.5) );
 
@@ -533,7 +538,7 @@ int main( int argc, char* argv[] )
 
 	TCanvas* c9 = new TCanvas( "corr_func", "corr_func", 1680, 1050 );
 
-	corr_function->SetContour( 0, NULL );
+	//corr_function->SetContour( 0, NULL );
 
 	thisHisto->Fit( corr_function, "EN" );
 
@@ -545,35 +550,77 @@ int main( int argc, char* argv[] )
 	  contours[2]=0.95*Integral;
 	  corr_function->SetContour( contour_num, contours );*/
 
+	corr_function->SetLineStyle( 1 );
+	corr_function->SetLineWidth( 3 );
+
 	thisHisto->GetXaxis()->SetNdivisions( 505, true );
 	thisHisto->GetYaxis()->SetNdivisions( 505, true );
 
 	thisHisto->Draw("");
 	c9->Update();
+	corr_function->SetLineStyle( 1 );
+	int orig_contour_num = corr_function->GetContour();
+	corr_function->SetContour( 10 );
+	thisHisto->SetMarkerColor( 15 );
+	c9->Update();
 
-	corr_function->Draw("SAME");
+	corr_function->DrawCopy("SAME");
 
 	c9->Update();
 
 	c9->Print("corr_func_scatter.pdf");
 
+	corr_function->SetContour( orig_contour_num );
+
 	thisHisto->Draw("colz");
 	c9->Update();
 
-	corr_function->Draw("SAME");
+	corr_function->DrawCopy("SAME");
 
 	c9->Update();
 
 	c9->Print("corr_func.pdf");
 
-	corr_function->SetLineWidth(8);
+	corr_function->SetLineWidth(20);
 
 	thisHisto->GetXaxis()->SetTitleOffset((Float_t)1.2);
 	thisHisto->GetYaxis()->SetTitleOffset((Float_t)1.2);
 
+	thisHisto->Rebin2D();
+	thisHisto->Rebin2D();
 	thisHisto->Draw("lego2");
-	corr_function->Draw("CONT1 SAME");
+	
+	corr_function->SetLineWidth( 20 );
+	//corr_function->SetContour( 10 );
+	corr_function->DrawCopy("CONT3 SAME LIST");
 	c9->Update();
+	corr_function->SetLineWidth( 20 );
+	c9->Update();
+
+	//TObjArray* contours= (TObjArray*) gROOT->GetListOfSpecials()->FindObject("contours");
+
+	TObjArray* contours2= (TObjArray*) gROOT->GetListOfSpecials();
+	TList* contours = gPad->GetListOfPrimitives();
+
+	cout << contours << endl;
+
+	for( unsigned int i=0; i< (unsigned)contours->GetEntries(); ++i )
+	{
+		cout << i << "\t" << contours->At(i)->GetName() << endl;
+		/*TList* thisContour = (TList*) contours->At(i);
+		cout << thisContour << "\t" << i << endl;
+		//	All closed contours in this program!
+		TGraph* thisLine = (TGraph*) thisContour->First();
+		cout << thisLine << endl;
+		thisLine->SetLineWidth( 5 );*/
+	}
+	for( unsigned int i=0; i< (unsigned)contours2->GetEntries(); ++i )
+	{
+		cout << i << "\t" << contours2->At(i)->GetName() << endl;
+	}
+	//exit(0);
+	c9->Update();
+
 	c9->Print("corr_func3D.pdf");
 	c9->Print("corr_func3D.C");
 

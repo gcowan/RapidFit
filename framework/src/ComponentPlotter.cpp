@@ -666,8 +666,11 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 	//	Overlay all components for each combination
 	//
-	//	This is painful as your looping over a the upper 2D of a 3D vector inside out...
+	//	This is painful as your looping over the upper 2D of a 3D vector inside out...
 	//	Sorry but I'm not rewriting the whole class or inverting the vector of vectors as we will just get more mistakes
+	//
+	//	This definitely works and isn't quite so bad as I feares but knowing which component we are using is a pain
+	//
 	for( unsigned int combinationIndex=0; combinationIndex < (*X_values)[0]->size(); ++combinationIndex )
 	{
 		TString combinationIndexstr;combinationIndexstr+=combinationIndex;
@@ -686,6 +689,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 			data_graph->SetName( dataCleanName.c_str() ); data_graph->SetTitle( dataCleanName.c_str() );
 			data_graph->SetLineColor( (Color_t)(componentIndex+1) );
+			data_graph->SetLineWidth( (Width_t)3 );
 			data_graph->SetMarkerColor( (Color_t)(componentIndex+1) );
 			these_components.push_back( data_graph );
 		}
@@ -808,6 +812,8 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				TString desc_pull( desc );
 				desc_pull.Append("_pull");
 
+				cout << endl << "Making Plots" << endl;
+
 				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc_pull.Data(), plotPDF->GetRandomFunction(), this_config );
 
 				/*
@@ -889,6 +895,7 @@ vector<TGraph*> ComponentPlotter::MergeComponents( vector<vector<TGraph*> > inpu
 		output_graph->SetName( TGRaphCleanName.c_str() );
 		output_graph->SetTitle("");
 		output_graph->SetLineColor( this_component[0]->GetLineColor() );
+		output_graph->SetLineWidth( this_component[0]->GetLineWidth() );
 		output_graph->SetLineStyle( this_component[0]->GetLineStyle() );
 		output_graph->SetMarkerColor( this_component[0]->GetMarkerColor() );
 		output_graph->SetMarkerStyle( this_component[0]->GetMarkerStyle() );
@@ -959,6 +966,7 @@ TGraphErrors* ComponentPlotter::MergeBinnedData( vector<TGraphErrors*> input, TR
 	output_graph->SetTitle("");
 
 	output_graph->SetLineColor( input[0]->GetLineColor() );
+	output_graph->SetLineWidth( input[0]->GetLineWidth() );
 	output_graph->SetLineStyle( input[0]->GetLineStyle() );
 	output_graph->SetMarkerColor( input[0]->GetMarkerColor() );
 	output_graph->SetMarkerStyle( input[0]->GetMarkerStyle() );
@@ -1019,6 +1027,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	double legend_size=0.1;
 
 	bool addLHCb=false;
+	bool addRightLHCb=false;
 	bool limitPulls=false;
 	bool drawSpline=true;
 	if( conf != NULL )
@@ -1043,6 +1052,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		component_names = conf->component_names;
 		legend_size = conf->LegendTextSize;
 		addLHCb = conf->addLHCb;
+		addRightLHCb = conf->addRightLHCb;
 		X_min = conf->xmin;
 		X_max = conf->xmax;
 		Y_min = conf->ymin;
@@ -1124,6 +1134,10 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( addLHCb )
 	{
 		myLatex = EdStyle::LHCbLabel();
+	}
+	if( addRightLHCb )
+	{
+		myLatex = EdStyle::RightLHCbLabel();
 	}
 
 	if( myLatex != NULL ) myLatex->Draw();

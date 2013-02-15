@@ -160,6 +160,7 @@ class EdStyle {
 		static TLegend* LHCbBottomLeftLegend();
 
 		static TLatex* LHCbLabel();
+		static TLatex* RightLHCbLabel();
 
 		/*!
 		 * @brief Destructor

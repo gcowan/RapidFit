@@ -134,7 +134,7 @@ void RapidFitIntegrator::ProjectionSettings()
 RapidFitIntegrator::~RapidFitIntegrator()
 {
 	if( multiDimensionIntegrator != NULL ) delete multiDimensionIntegrator;
-	//if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
+	if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
 	if( fastIntegrator != NULL ) delete fastIntegrator;
 	if( debug != NULL ) delete debug;
 }
@@ -487,12 +487,13 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	for (unsigned int i = 0; i < npoint; i++)
 	{
-		double v[doIntegrate.size()];
+		double* v = new double[doIntegrate.size()];
 		gsl_qrng_get( q, v );
 		for( unsigned int j = 0; j < (unsigned)doIntegrate.size(); j++)
 		{
-			integrationPoints[j].push_back(v[j]);
+			integrationPoints[j].push_back( v[j] );
 		}
+		delete v;
 	}
 	gsl_qrng_free(q);
 	//cout << "Freed GSL Integration Tool" << endl;
@@ -505,7 +506,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		maxima_v.push_back( maxima[i] );
 	}
 	//cout << "Constructing Functions" << endl;
-	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
+	//IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
 
 	vector<double*> doEval_points;
 	for (unsigned int i = 0; i < integrationPoints[0].size(); ++i)
@@ -528,8 +529,8 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	//	Construct Integrator Functions (1 per theread)
 	vector<IntegratorFunction*> evalFunctions;
-	for( unsigned int i=0; i< num_threads; ++i ) evalFunctions.push_back( new IntegratorFunction(
-				ClassLookUp::CopyPDF( functionToWrap ), NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v ) );
+	for( unsigned int i=0; i< num_threads; ++i ) evalFunctions.push_back( new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate,
+										dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v ) );
 
 	//	Split Points to evaluate between threads
 	vector<vector<double*> > eval_perThread = Threading::divideDataNormalise( doEval_points, num_threads );
@@ -553,7 +554,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	//      Create the Threads and set them to be joinable
 	for( unsigned int threadnum=0; threadnum< num_threads; ++threadnum )
 	{
-		int status = pthread_create(&Thread[threadnum], &attrib, RapidFitIntegrator::ThreadWork, (void *) &fit_thread_data[threadnum] );
+		int status = pthread_create(&(Thread[threadnum]), &attrib, RapidFitIntegrator::ThreadWork, (void *) &(fit_thread_data[threadnum]) );
 		if( status )
 		{
 			cerr << "ERROR:\tfrom pthread_create()\t" << status << "\t...Exiting\n" << endl;
@@ -609,7 +610,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	}
 	delete[] fit_thread_data;
 	delete[] Thread;
-	delete quickFunction;
+	//delete quickFunction;
 	return result;
 #else
 	(void) functionToWrap; (void) NewDataPoint; (void) NewBoundary; (void) componentIndex; (void) doIntegrate; (void) dontIntegrate; (void) num_threads;

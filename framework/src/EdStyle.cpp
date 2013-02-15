@@ -1152,7 +1152,16 @@ TLatex* EdStyle::LHCbLabel()
 	TLatex *myLatex = new TLatex(0.5,0.5,"");
 	myLatex->SetTextAlign(11);
 	myLatex->SetNDC(kTRUE);
-	myLatex->DrawLatex(0.59, 0.45,"LHCb");
+	myLatex->DrawLatex( 0.25, 0.75, "LHCb" );
+	return myLatex;
+}
+
+TLatex* EdStyle::RightLHCbLabel()
+{
+	TLatex *myLatex = new TLatex(0.5,0.5,"");
+	myLatex->SetTextAlign(11);
+	myLatex->SetNDC(kTRUE);
+	myLatex->DrawLatex( 0.75, 0.75, "LHCb" );
 	return myLatex;
 }
 
