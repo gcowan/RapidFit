@@ -11,6 +11,8 @@
 
 ///	ROOT Headers
 #include "TString.h"
+///	RapidFit Headers
+#include "RapidFitIntegratorConfig.h"
 ///	System Headers
 #include <vector>
 #include <string>
@@ -32,8 +34,24 @@ class CompPlotter_config
                         data_bins(100), PDF_points(128), observableName("undefined"), logY(false), color_key(), style_key(), width_key(), component_names(), PlotTitle(""),
                         xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false), ScaleNumerical(true),
 			DrawPull(false), LegendTextSize(0.05), addLHCb(false), TopRightLegend(true), TopLeftLegend(false), BottomRightLegend(false), BottomLeftLegend(false),
-			useLegend(true), LimitPulls(false), useSpline(true), numThreads(4), addRightLHCb(false)
+			useLegend(true), LimitPulls(false), useSpline(true), addRightLHCb(false), integratorConfig(new RapidFitIntegratorConfig())
 		{}
+
+		~CompPlotter_config()
+		{
+			if( integratorConfig != NULL ) delete integratorConfig;
+		}
+
+		CompPlotter_config( const CompPlotter_config& input ) :
+			data_bins(input.data_bins), PDF_points(input.PDF_points), observableName(input.observableName), logY(input.logY), color_key(input.color_key),
+			style_key(input.style_key), width_key(input.width_key), component_names(input.component_names), PlotTitle(input.PlotTitle), xmin(input.xmin), xmax(input.xmax),
+			ymin(input.ymin), ymax(input.ymax), xtitle(input.xtitle), ytitle(input.ytitle), CalcChi2(input.CalcChi2), Chi2Value(input.Chi2Value), OnlyZero(input.OnlyZero),
+			ScaleNumerical(input.ScaleNumerical), DrawPull(input.DrawPull), LegendTextSize(input.LegendTextSize), addLHCb(input.addLHCb), TopRightLegend(input.TopRightLegend),
+			TopLeftLegend(input.TopLeftLegend), BottomRightLegend(input.BottomRightLegend), BottomLeftLegend(input.BottomLeftLegend), useLegend(input.useLegend),
+			LimitPulls(input.LimitPulls), useSpline(input.useSpline), addRightLHCb(input.addRightLHCb), integratorConfig(NULL)
+		{
+			if( input.integratorConfig != NULL ) integratorConfig = new RapidFitIntegratorConfig( *(input.integratorConfig) );
+		}
 
                 int data_bins;                  /*!     This is the total number of bins which should be used when binning the dataset                                          */
                 int PDF_points;                 /*!     This is the number of points which the PDF should be interrogated for across the whole Observable range                 */
@@ -61,7 +79,10 @@ class CompPlotter_config
 		bool useLegend;			/*!	Use a Legend in the Plot												*/
 		bool LimitPulls;		/*!	Place a 5-sigma limit on the Pull Distribution to fight a few bogus pulls killing the Distribution			*/
 		bool useSpline;			/*!	Use Spline to Interpolate between the projected points?									*/
-		unsigned int numThreads;	/*!	The number of threads to use during projections with multi-threaded GSL							*/
+		RapidFitIntegratorConfig* integratorConfig;
+
+	private:
+		CompPlotter_config& operator= ( const CompPlotter_config& input );
 };
 
 #endif

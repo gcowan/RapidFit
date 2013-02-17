@@ -17,11 +17,15 @@
 #include "Math/AdaptiveIntegratorMultiDim.h"
 #include "Math/Integrator.h"
 ///	RapidFit Headers
+#include "RapidFitIntegratorConfig.h"
 #include "IntegratorFunction.h"
 #include "IPDF.h"
 #include "FoamIntegrator.h"
 #include "IDataSet.h"
 #include "DebugClass.h"
+///	System Headers
+#include <string>
+#include <vector>
 
 class IPDF;
 class FoamIntegrator;
@@ -30,10 +34,19 @@ class IntegratorFunction;
 using namespace ROOT::Math;
 using namespace::std;
 
-struct Normalise_Thread{
-	IntegratorFunction* function;
-	vector<double*> normalise_points;
-	vector<double> dataPoint_Result;
+class Normalise_Thread
+{
+	public:
+		Normalise_Thread() : function(NULL), normalise_points(), dataPoint_Result()	{}
+		~Normalise_Thread() {}
+
+		IntegratorFunction* function;
+		vector<double*> normalise_points;
+		vector<double> dataPoint_Result;
+
+	private:
+		Normalise_Thread( const Normalise_Thread& );
+		Normalise_Thread& operator=( const Normalise_Thread );
 };
 
 class RapidFitIntegrator
@@ -77,10 +90,20 @@ class RapidFitIntegrator
 		 */
 		~RapidFitIntegrator();
 
-		bool GetUseGSLIntegrator() const;
-		void SetUseGSLIntegrator( bool input );
+		void SetUpIntegrator( const RapidFitIntegratorConfig* config );
 
-		void SetNumThreads( unsigned int input );
+		void SetMaxIntegrationSteps( const unsigned int );
+
+		void SetIntegrationAbsTolerance( const double input );
+
+		void SetIntegrationRelTolerance( const double input );
+
+		bool GetUseGSLIntegrator() const;
+		void SetUseGSLIntegrator( const bool input );
+
+		void SetFixedIntegralPoints( const unsigned int input );
+
+		void SetNumThreads( const unsigned int input );
 
 		/*!
 		 *
@@ -292,10 +315,11 @@ class RapidFitIntegrator
 		 *
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
-                static double PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
-                                vector<string> doIntegrate, vector<string> doNotIntegrate );
+		static double PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
+				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int GSLFixedPoints=10000 );
+
 		static double PseudoRandomNumberIntegralThreaded( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
-				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int num_threads=4 );
+				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int num_threads=4, unsigned int GSLFixedPoints=10000 );
 
 		/*!
 		 * @brief This is the Interface to The MuliDimentional Integral class within ROOT
@@ -381,6 +405,8 @@ class RapidFitIntegrator
 		DebugClass* debug;
 
 		unsigned int num_threads;
+
+		unsigned int GSLFixedPoints;
 
 #ifndef __CINT__
 		//      CINT behaves badly with this attribute

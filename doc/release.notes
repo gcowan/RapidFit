@@ -1,5 +1,33 @@
 // $Id: release.notes $
 
+2013/02/17 Rob Currie
+    (Got bored Friday evening so made some improvements to the existing codebase...)
+  - Added changes to Makefile to automatically build in GSL components by default
+       if gsl-config is in the users $PATH then RapidFit will be compiled with the GSL optional Integrator.
+       if gsl-config is not in the users $PATH then if the GSL integrator is requested RapidFit will fall back to the non-GSL method.
+  - Added RapidFitIntegratorConfig class which contains information to configure the RapidFitIntegrator
+       This class contains definitions of the various default configuration options for a RapidFitIntegrator instance
+       ALL variables that have defaults can be changed at runtime
+       (New Function in RapidFitIntegrator of SetUpIntegrator has been defined to change objects based on the new Configuration being passed)
+  - Changed IPDF interface:
+         virtual void SetUseGSLIntegrator( bool input ) = 0;
+    to:  virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig ) = 0;
+       This means that the RapidFitIntegratorConfig can carry complex configuration options to the RapidFitIntegrator object
+  - This change in the IPDF has been propagated to the Sum/Prod/Norm PDF instances as well as the BasePDF this should NOT effect any user PDFs unless the user has their own Integrator usage
+  - Introduction of RapidFitIntegratorConfig has meant that the interface from XMLConfigurationReader has changed
+       This also means that code in the FitFunction classes has changed to allow the full Integrator Configuration to be propogated
+  - Wrapped GSL implementation of time-Gaussian convolution in Mathematics inside __RAPIDFIT_USE_GSL_MATH
+       This code is used when 'make gsl' is called but the standard build uses __RAPIDFIT_USE_GSL to build the custom Integral objects
+  Now for the fruits of this:
+  - Added new XMLTag <FixedIntegrationPoints> this controls the number of integration points used by the GSL integrator
+       This can be used within the FitFunctionConfiguration and Projection XMLTags
+       This number is only 10000 by default as this seems to give reasonable results whilst not being too CPU consuming
+  - Added new Threads XMLTag to the Projection code
+  - Added new UseGSLNumericalIntegration XMLTag to explicitly enable/disable GSL in Projections
+       GSL projections using 4 threads are now enabled by default. This is faster and has been tested with jpsiphi for the 1fb result
+  - Fixed a 'bug' in the SlicedAcceptance class which was causing projections to drop the top edge of fits involving projections
+       This was a subtle bug that caused by avoiding 'double counting' events on bin edges but actually caused the top edge of the last bin to be lost
+
 2013/02/15 Rob Currie
   - Updated lifetime tool to improve plots
   - Moved standard LHCb stamp to the left of the Canvas and added AddRightLHCb boolean XML tag to add a left/right LHCb Stamp

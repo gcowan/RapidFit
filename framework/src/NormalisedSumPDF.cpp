@@ -107,10 +107,10 @@ vector<string> NormalisedSumPDF::PDFComponents()
 	return component_list;
 }
 
-void NormalisedSumPDF::SetUseGSLIntegrator( bool input )
+void NormalisedSumPDF::SetUpIntegrator( const RapidFitIntegratorConfig* input )
 {
-	firstPDF->SetUseGSLIntegrator( input );
-	secondPDF->SetUseGSLIntegrator( input );
+	firstPDF->SetUpIntegrator( input );
+	secondPDF->SetUpIntegrator( input );
 }
 
 void NormalisedSumPDF::TurnCachingOff()

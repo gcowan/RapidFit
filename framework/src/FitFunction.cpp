@@ -33,7 +33,7 @@ using namespace::std;
 FitFunction::FitFunction() :
 	Name("Unknown"), allData(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
-	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), gslIntegrator(false)
+	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig())
 {
 }
 
@@ -68,6 +68,7 @@ FitFunction::~FitFunction()
 	}
 
 	if( debug != NULL ) delete debug;
+	if( integrationConfig != NULL ) delete integrationConfig;
 }
 
 void FitFunction::SetupTrace( const TString FileName, const int inputTraceNum )
@@ -77,9 +78,10 @@ void FitFunction::SetupTrace( const TString FileName, const int inputTraceNum )
 	traceNum = inputTraceNum;
 }
 
-void FitFunction::SetGSLIntegrator( const bool gsl )
+void FitFunction::SetIntegratorConfig( const RapidFitIntegratorConfig* gsl )
 {
-	gslIntegrator = gsl;
+	if( integrationConfig != NULL ) delete integrationConfig;
+	integrationConfig = new RapidFitIntegratorConfig( *gsl );
 }
 
 void FitFunction::SetupTraceTree()
@@ -166,10 +168,10 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 
 		double someVal=0.;
 		NewBottle->GetResultPDF(resultIndex)->GetPDFIntegrator()->ForceTestStatus( false );
-		NewBottle->GetResultPDF(resultIndex)->SetUseGSLIntegrator( gslIntegrator );
-		allData->GetResultPDF(resultIndex)->SetUseGSLIntegrator( gslIntegrator );
+		NewBottle->GetResultPDF(resultIndex)->SetUpIntegrator( integrationConfig );
+		allData->GetResultPDF(resultIndex)->SetUpIntegrator( integrationConfig );
 
-		if( gslIntegrator ) cout << "Using GSL!" << endl;
+		if( integrationConfig->useGSLIntegrator ) cout << "Using GSL!" << endl;
 
 		if( NewBottle->GetResultDataSet(resultIndex)->GetDataNumber() > 0 )
 		{
@@ -213,7 +215,7 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 				}
 				stored_pdfs.push_back( ClassLookUp::CopyPDF( NewBottle->GetResultPDF( resultIndex ) ) );
 				stored_pdfs.back()->SetDebug( debug );
-				stored_pdfs.back()->SetUseGSLIntegrator( gslIntegrator );
+				stored_pdfs.back()->SetUpIntegrator( integrationConfig );
 			}
 		}
 	}

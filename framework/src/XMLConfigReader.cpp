@@ -21,6 +21,7 @@
 #include "Blinder.h"
 #include "ScanParam.h"
 #include "PDFConfigurator.h"
+#include "RapidFitIntegrator.h"
 //	System Headers
 #include <fstream>
 #include <iostream>
@@ -503,6 +504,14 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 
 	returnable_config->OnlyZero = false;
 
+	RapidFitIntegratorConfig* projectionIntegratorConfig = returnable_config->integratorConfig;
+
+#ifdef __RAPIDFIT_USE_GSL
+	//	When GSL is available we prefer it for Projections
+	//	This Integrator is highly user configurable and is multi-thread safe
+	projectionIntegratorConfig->useGSLIntegrator = true;
+#endif
+
 	//	If we have no extra config just take the name and use defaults
 	if( projComps.size() == 0 )
 	{
@@ -672,7 +681,15 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		}
 		else if( projComps[childIndex]->GetName() == "Threads" )
 		{
-			returnable_config->numThreads =  (unsigned)XMLTag::GetIntegerValue( projComps[childIndex] );
+			projectionIntegratorConfig->numThreads =  (unsigned)XMLTag::GetIntegerValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "FixedIntegrationPoints" )
+		{
+			projectionIntegratorConfig->FixedIntegrationPoints = (unsigned)XMLTag::GetIntegerValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "UseGSLNumericalIntegration" )
+		{
+			projectionIntegratorConfig->useGSLIntegrator =  XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
 		else
 		{
@@ -802,6 +819,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		bool NormaliseWeights = false;
 		bool SingleNormaliseWeights = false;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
+		RapidFitIntegratorConfig* thisConfig = new RapidFitIntegratorConfig();
 		if ( functionInfo.size() == 0 )
 		{
 			//Old style - just specifies the function name
@@ -818,7 +836,11 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 				}
 				else if ( functionInfo[childIndex]->GetName() == "UseGSLNumericalIntegration" )
 				{
-					gslIntegrator = XMLTag::GetBooleanValue( functionInfo[childIndex] );
+					thisConfig->useGSLIntegrator = XMLTag::GetBooleanValue( functionInfo[childIndex] );
+				}
+				else if ( functionInfo[childIndex]->GetName() == "FixedIntegrationPoints" )
+				{
+					thisConfig->FixedIntegrationPoints = XMLTag::GetIntegerValue( functionInfo[childIndex] );
 				}
 				else if ( functionInfo[childIndex]->GetName() == "WeightName" )
 				{
@@ -896,8 +918,9 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		returnable_function->SetNormaliseWeights( NormaliseWeights );
 		returnable_function->SetSingleNormaliseWeights( SingleNormaliseWeights );
 		returnable_function->SetIntegratorTest( integratorTest );
-		returnable_function->SetGSLIntegrator( gslIntegrator );
+		returnable_function->SetIntegratorConfig( thisConfig );
 
+		delete thisConfig;
 		return returnable_function;
 	}
 	else

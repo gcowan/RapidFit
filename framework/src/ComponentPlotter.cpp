@@ -58,7 +58,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 {
 	TH1::SetDefaultSumw2(true);
 
-	pdfIntegrator->SetNumThreads( config!=NULL?config->numThreads:4 );
+	//pdfIntegrator->SetNumThreads( config!=NULL?config->numThreads:4 );
 
 	if( Debug != NULL ) debug = new DebugClass(*Debug);
 	else debug = new DebugClass(false);
@@ -69,10 +69,21 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	//plotPDF->GetPhysicsParameters()->Print();
 
 	pdfIntegrator->SetPDF( plotPDF );
-	pdfIntegrator->ProjectionSettings();
 	pdfIntegrator->SetDebug(debug);
 
 	if( pdfIntegrator->GetUseGSLIntegrator() ) cout << "Using GSL for projections" << endl;
+
+	RapidFitIntegratorConfig* projectionIntegratorConfig = NULL;
+	
+	if( config != NULL ) projectionIntegratorConfig = config->integratorConfig;
+
+	if( projectionIntegratorConfig != NULL )
+	{
+		RapidFitIntegratorConfig* thisIntConfig = new RapidFitIntegratorConfig( *projectionIntegratorConfig );
+		pdfIntegrator->SetUpIntegrator( thisIntConfig );
+		NewPDF->SetUpIntegrator( thisIntConfig );
+		delete thisIntConfig;
+	}
 
 	vector<string> disc_contr = full_boundary->GetDiscreteNames();
 	vector<string> pdf_const = plotPDF->GetPrototypeDataPoint();

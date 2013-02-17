@@ -5,7 +5,7 @@
 
   @author Pete Clarke
   @data 2011-06-07
- */
+  */
 
 
 #include "SlicedAcceptance.h"
@@ -170,12 +170,11 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 	cout << "Time Acc Slices: " << lowEdge.size() << endl;
 	if( lowEdge.size() == 1 )
 	{
-		cout << "SlicedAcceptance: SERIOUSE ERROR" << endl;
+		cout << "SlicedAcceptance: SERIOUS ERROR" << endl;
 		exit(0);
 	}
 	//....done.....
 
-	
 }
 
 //............................................
@@ -187,6 +186,7 @@ double SlicedAcceptance::getValue( const double t ) const
 	{
 		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
 	}
+	if( t == slices.back()->thigh() ) returnValue += slices.back()->height();
 	return returnValue;
 }
 
@@ -215,6 +215,10 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 		{
 			returnValue += slices[is]->height();
 		}
+	}
+	if( t == slices.back()->thigh() )
+	{
+		returnValue += slices.back()->height();
 	}
 
 	time->SetBinNumber( (int)is );

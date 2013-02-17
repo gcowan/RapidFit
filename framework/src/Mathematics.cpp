@@ -141,7 +141,7 @@ namespace Mathematics
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
-#ifdef __RAPIDFIT_USE_GSL
+#ifdef __RAPIDFIT_USE_GSL_MATH
 			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
 			returnable = GSL_REAL( gsl_erf( gsl_z ) );
 #else
@@ -181,7 +181,7 @@ namespace Mathematics
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
-#ifdef __RAPIDFIT_USE_GSL
+#ifdef __RAPIDFIT_USE_GSL_MATH
 			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
 			returnable = GSL_IMAG( gsl_erf( gsl_z ) );
 #else

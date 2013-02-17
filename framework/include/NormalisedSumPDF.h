@@ -33,7 +33,7 @@ class NormalisedSumPDF : public BasePDF
 
 		void TurnCachingOff();
 
-		virtual void SetUseGSLIntegrator( bool input );
+		virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig );
 
 		//Return the integral of the function over the given boundary
 		double Normalisation( DataPoint*, PhaseSpaceBoundary* );

@@ -119,10 +119,10 @@ ProdPDF::ProdPDF( const ProdPDF& input ) : BasePDF( (BasePDF) input ),
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 }
 
-void ProdPDF::SetUseGSLIntegrator( bool input )
+void ProdPDF::SetUpIntegrator( const RapidFitIntegratorConfig* input )
 {
-	firstPDF->SetUseGSLIntegrator( input );
-	secondPDF->SetUseGSLIntegrator( input );
+	firstPDF->SetUpIntegrator( input );
+	secondPDF->SetUpIntegrator( input );
 }
 
 void ProdPDF::TurnThisCachingOff()

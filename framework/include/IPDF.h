@@ -24,6 +24,7 @@
 #include "ComponentRef.h"
 #include "DebugClass.h"
 #include "RapidFitIntegrator.h"
+#include "RapidFitIntegratorConfig.h"
 ///	System Headers
 #include <vector>
 #include <string>
@@ -46,6 +47,7 @@ using namespace::std;
 class IPDF;
 class PDFConfigurator;
 class RapidFitIntegrator;
+class RapidFitIntegratorConfig;
 
 /*!
  * @brief typedef for the class-factory objects which actually create the new class instances in memory
@@ -100,7 +102,7 @@ class IPDF
 		 */
 		virtual RapidFitIntegrator* GetPDFIntegrator() const = 0;
 
-		virtual void SetUseGSLIntegrator( bool input ) = 0;
+		virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig ) = 0;
 
 		/*!
 		 * Interface Function:

@@ -12,6 +12,11 @@
 #include <vector>
 #include <string>
 
+using namespace::std;
+
+class IPDF;
+class IDataSet;
+
 //      Threading Struct which contains all of the objects required for running multiple concurrent fits to data subsets
 //	This object is useful as multiple bits of information need to be provided to the running thread
 struct Fitting_Thread{

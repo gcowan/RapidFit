@@ -20,20 +20,23 @@ using namespace::std;
 //Constructor with only name of FitFunction
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) :
 	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0),
-	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), gslIntegrator(false), SingleNormaliseWeights(false), alphaName("undefined"), hasAlpha(false)
+	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), SingleNormaliseWeights(false), alphaName("undefined"),
+	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() )
 {
 }
 
 //Constructor for FitFunction with event weights
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) :
 	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0),
-	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), gslIntegrator(false), SingleNormaliseWeights(false), alphaName("undefined"), hasAlpha(false)
+	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), SingleNormaliseWeights(false), alphaName("undefined"),
+	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() )
 {
 }
 
 //Destructor
 FitFunctionConfiguration::~FitFunctionConfiguration()
 {
+	if( integratorConfig != NULL ) delete integratorConfig;
 }
 
 //Return appropriate instance of FitFunction
@@ -47,7 +50,7 @@ FitFunction * FitFunctionConfiguration::GetFitFunction()
 		theFunction->UseEventWeights(weightName);
 	}
 
-	theFunction->SetGSLIntegrator(gslIntegrator);
+	theFunction->SetIntegratorConfig( integratorConfig );
 
 	if( wantTrace )
 	{
@@ -62,9 +65,10 @@ FitFunction * FitFunctionConfiguration::GetFitFunction()
 	return theFunction;
 }
 
-void FitFunctionConfiguration::SetGSLIntegrator( bool gsl )
+void FitFunctionConfiguration::SetIntegratorConfig( const RapidFitIntegratorConfig* config )
 {
-	gslIntegrator = gsl;
+	if( integratorConfig != NULL ) delete integratorConfig;
+	integratorConfig = new RapidFitIntegratorConfig( *config );
 }
 
 //Return whether weights are being used

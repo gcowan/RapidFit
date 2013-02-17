@@ -176,7 +176,7 @@
 		 */
 		RapidFitIntegrator* GetPDFIntegrator() const;
 
-		virtual void SetUseGSLIntegrator( bool input );
+		virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig );
 
 		/*!
 		 * @brief   Interface Function: Does the PDF want to use Numerical Normalisation

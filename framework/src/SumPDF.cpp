@@ -89,10 +89,10 @@ vector<string> SumPDF::PDFComponents()
 	return component_list;
 }
 
-void SumPDF::SetUseGSLIntegrator( bool input )
+void SumPDF::SetUpIntegrator( const RapidFitIntegratorConfig* input )
 {
-	firstPDF->SetUseGSLIntegrator( input );
-	secondPDF->SetUseGSLIntegrator( input );
+	firstPDF->SetUpIntegrator( input );
+	secondPDF->SetUpIntegrator( input );
 }
 
 void SumPDF::TurnThisCachingOff()

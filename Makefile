@@ -3,6 +3,8 @@ SHELL=/bin/bash
 UNAME=$(shell uname -s )
 CC=g++
 
+
+
 #		ROOT
 TEMPCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags)
 
@@ -13,7 +15,7 @@ ROOTLIBS     = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --libs)
 ROOTGLIBS    = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --glibs)
 
 #               On some Systems with Mathmore compiled, sometimes things need to be resolved against it... I don't know why
-EXTRA_ROOTLIBS=-lTreePlayer -lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam -lRGL $(shell if [ "$(shell root-config --features | grep mathmore)" = "" ]; then echo "" ; else echo "-lMathMore" ; fi)
+EXTRA_ROOTLIBS=-lTreePlayer -lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam -lRGL $(shell if [ "$(shell root-config --features | grep mathmore)" == "" ]; then echo "" ; else echo "-lMathMore" ; fi)
 
 #		Command Line Tools
 CXX          = $(CC) $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo ""; else echo "--arch=i386"; fi)
@@ -35,7 +37,10 @@ UTILSSRC  = utils/src
 INCDIR    = framework/include
 INCPDFDIR = pdfs/include
 INCUTILS  = utils/include
-INCGSL    = /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include
+INCGSL    = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "$(shell gsl-config --cflags)" ; else echo"" ; fi )
+LINKGSL   = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "$(shell gsl-config --libs)" ; else echo"" ; fi )
+USE_GSL   = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "-D__RAPIDFIT_USE_GSL" ; else echo "" ; fi )
+#INCGSL    = /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include
 OBJDIR    = framework/build
 OBJPDFDIR = pdfs/build
 OBJUTILDIR= utils/build
@@ -113,18 +118,18 @@ endif
 all : $(EXEDIR)/fitting utils lib
 
 $(OBJDALITZDIR)/%.o : $(SRCDALITZDIR)/%.$(SRCDALITZEXT) $(INCDALITZDIR)/%.$(HDRDALITZEXT)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(USE_GSL) $(INCGSL) -c $< -o $@
 
 $(OBJPDFDIR)/%.o : $(SRCPDFDIR)/%.$(SRCEXT) $(INCPDFDIR)/%.$(HDREXT)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(USE_GSL) $(INCGSL) -c $< -o $@
 
 #	Some fairly cool Makefile code for linking the build together :D
 $(OBJDIR)/%.o : $(SRCDIR)/%.$(SRCEXT) $(INCDIR)/%.$(HDREXT)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(USE_GSL) $(INCGSL) -c $< -o $@
 
 #	Main Build of RapidFit Binary
 $(EXEDIR)/fitting : $(OBJS) $(PDFOBJS) $(DALITZOBJS) $(OBJDIR)/rapidfit_dict.o
-	$(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS) $(ROOTLIBS) $(EXTRA_ROOTLIBS)
+	$(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS) $(USE_GSL) $(ROOTLIBS) $(EXTRA_ROOTLIBS) $(LINKGSL)
 
 
 
@@ -158,7 +163,7 @@ gcc47: all
 gcc48: override CC=g++-4.8
 gcc48: all
 
-gsl: override CXXFLAGS+= -D__RAPIDFIT_USE_GSL $(gsl-config --cflags)
+gsl: override CXXFLAGS+= -D__RAPIDFIT_USE_GSL -D__RAPIDFIT_USE_GSL_MATH $(gsl-config --cflags)
 gsl: override LINKFLAGS+= -L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/lib -lgsl -lgslcblas -lm $(gsl-config --libs)
 gsl: all
 
@@ -284,5 +289,5 @@ $(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp
 
 #	Finally, Compile RapidFit as a library making use of the existing binaries for other classes
 $(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS) $(PDFOBJS) $(DALITZOBJS) $(OBJDIR)/ClassLookUp.o
-	$(CXX) $(LIBLINKFLAGS) $(LINKFLAGS) -o $@ $^ $(LIBS) $(ROOTLIBS) $(EXTRA_ROOTLIBS)
+	$(CXX) $(LIBLINKFLAGS) $(LINKFLAGS) -o $@ $^ $(LIBS) $(ROOTLIBS) $(EXTRA_ROOTLIBS) $(LINKGSL)
 

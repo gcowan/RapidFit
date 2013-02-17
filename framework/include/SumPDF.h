@@ -42,7 +42,7 @@ class SumPDF : public BasePDF
 
 		vector<string> PDFComponents();
 
-		virtual void SetUseGSLIntegrator( bool input );
+		virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig );
 
 		/*!
 		 * @brief Explicitly request caching to be turned OFF

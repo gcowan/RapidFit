@@ -36,13 +36,12 @@
 #include "Math/GSLMCIntegrator.h"
 #endif
 
-pthread_mutex_t multi_mutex;
-pthread_mutex_t multi_mutex2;
-pthread_mutex_t multi_mutex3;
+pthread_mutex_t check_settings_lock;
 
 pthread_mutex_t gsl_mutex;
 
 pthread_mutex_t one_dim_lock;
+pthread_mutex_t multi_dim_lock;
 
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
@@ -56,13 +55,14 @@ using namespace::std;
 RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical, bool UsePseudoRandomIntegration ) :
 	ratioOfIntegrals(-1.), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL),
 	functionCanIntegrate(false), haveTestedIntegral(false), num_threads(4),
-	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(new DebugClass(false) ), pseudoRandomIntegration( UsePseudoRandomIntegration )
+	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(new DebugClass(false) ),
+	pseudoRandomIntegration( UsePseudoRandomIntegration ), GSLFixedPoints( __DEFAULT_RAPIDFIT_FIXEDINTEGRATIONPOINTS )
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
-	multiDimensionIntegrator->SetAbsTolerance( 1E-9 );      //      Absolute error for things such as plots
-	multiDimensionIntegrator->SetRelTolerance( 1E-9 );
-	multiDimensionIntegrator->SetMaxPts( 1000000 );		//	These are the defaults, and it's unlikely you will be able to realistically push the integral without using "double double"'s
+	multiDimensionIntegrator->SetAbsTolerance( __DEFAULT_RAPIDFIT_INTABSTOL );      //      Absolute error for things such as plots
+	multiDimensionIntegrator->SetRelTolerance( __DEFAULT_RAPIDFIT_INTRELTOL );
+	multiDimensionIntegrator->SetMaxPts( __DEFAULT_RAPIDFIT_MAXINTEGRALSTEPS );		//	These are the defaults, and it's unlikely you will be able to realistically push the integral without using "double double"'s
 #endif
 
 	ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
@@ -73,7 +73,7 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 	fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
 	pseudoRandomIntegration(input.pseudoRandomIntegration), functionCanIntegrate( input.functionCanIntegrate ), haveTestedIntegral( true ),
 	RapidFitIntegratorNumerical( input.RapidFitIntegratorNumerical ), obs_check( input.obs_check ), checked_list( input.checked_list ),
-	debug((input.debug==NULL)?NULL:new DebugClass(*input.debug)), num_threads(input.num_threads)
+	debug((input.debug==NULL)?NULL:new DebugClass(*input.debug)), num_threads(input.num_threads), GSLFixedPoints( input.GSLFixedPoints )
 {
 	//	We don't own the PDF so no need to duplicate it as we have to be told which one to use
 	//if( input.functionToWrap != NULL ) functionToWrap = ClassLookUp::CopyPDF( input.functionToWrap );
@@ -85,9 +85,9 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 		multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();// *(input.multiDimensionIntegrator) );//new AdaptiveIntegratorMultiDim();
 		//      These functions only exist with ROOT > 5.27 I think, at least they exist in 5.28/29
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
-		multiDimensionIntegrator->SetAbsTolerance( 1E-9 );      //      Absolute error for things such as plots
-		multiDimensionIntegrator->SetRelTolerance( 1E-9 );
-		multiDimensionIntegrator->SetMaxPts( 1000000 );
+		multiDimensionIntegrator->SetAbsTolerance( __DEFAULT_RAPIDFIT_INTABSTOL );      //      Absolute error for things such as plots
+		multiDimensionIntegrator->SetRelTolerance( __DEFAULT_RAPIDFIT_INTRELTOL );
+		multiDimensionIntegrator->SetMaxPts( __DEFAULT_RAPIDFIT_MAXINTEGRALSTEPS );
 #endif
 	}
 	if( input.oneDimensionIntegrator != NULL )
@@ -98,7 +98,38 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 	}
 }
 
-void RapidFitIntegrator::SetNumThreads( unsigned int input )
+void RapidFitIntegrator::SetUpIntegrator( const RapidFitIntegratorConfig* config )
+{
+	this->SetNumThreads( config->numThreads );
+	this->SetUseGSLIntegrator( config->useGSLIntegrator );
+	this->SetFixedIntegralPoints( config->FixedIntegrationPoints );
+	this->SetMaxIntegrationSteps( config->MaxIntegrationSteps );
+	this->SetIntegrationAbsTolerance( config->IntegrationRelTolerance );
+	this->SetIntegrationRelTolerance( config->IntegrationAbsTolerance );
+}
+
+void RapidFitIntegrator::SetMaxIntegrationSteps( const unsigned int input )
+{
+#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
+	multiDimensionIntegrator->SetMaxPts( input );
+#endif
+}
+
+void RapidFitIntegrator::SetIntegrationAbsTolerance( const double input )
+{
+#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
+	multiDimensionIntegrator->SetAbsTolerance( input );
+#endif
+}
+
+void RapidFitIntegrator::SetIntegrationRelTolerance( const double input )
+{
+#if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
+	multiDimensionIntegrator->SetRelTolerance( input );
+#endif
+}
+
+void RapidFitIntegrator::SetNumThreads( const unsigned int input )
 {
 	num_threads = input;
 }
@@ -108,7 +139,7 @@ bool RapidFitIntegrator::GetUseGSLIntegrator() const
 	return pseudoRandomIntegration;
 }
 
-void RapidFitIntegrator::SetUseGSLIntegrator( bool input )
+void RapidFitIntegrator::SetUseGSLIntegrator( const bool input )
 {
 	pseudoRandomIntegration = input;
 	if( debug != NULL )
@@ -116,6 +147,19 @@ void RapidFitIntegrator::SetUseGSLIntegrator( bool input )
 		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
 		{
 			if( input ) cout << "Requesting GSL." << endl;
+		}
+	}
+}
+
+void RapidFitIntegrator::SetFixedIntegralPoints( const unsigned int input )
+{
+	GSLFixedPoints = input;
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
+			cout << "Setting the Fixed number of Integration Points" << endl;
 		}
 	}
 }
@@ -348,7 +392,7 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 }
 
 double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, unsigned int GSLFixedPoints )
 {
 #ifdef __RAPIDFIT_USE_GSL
 
@@ -374,7 +418,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}
 
-	unsigned int npoint = 10000;
+	unsigned int npoint = GSLFixedPoints;
 	//unsigned int npoint = 100000;
 	vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
 
@@ -433,7 +477,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 
 
 double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, unsigned int num_threads )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, unsigned int num_threads, unsigned int GSLFixedPoints )
 {
 #ifdef __RAPIDFIT_USE_GSL
 
@@ -461,7 +505,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}
 
-	unsigned int npoint = 1000;
+	unsigned int npoint = GSLFixedPoints;
 	vector<double> * integrationPoints = new vector<double>[doIntegrate.size()];
 
 	//pthread_mutex_lock( &gsl_mutex );
@@ -536,7 +580,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	vector<vector<double*> > eval_perThread = Threading::divideDataNormalise( doEval_points, num_threads );
 
 	//	Construct 'structs' to be passed to each thread
-	struct Normalise_Thread* fit_thread_data = new Normalise_Thread[ num_threads ];
+	Normalise_Thread* fit_thread_data = new Normalise_Thread[ num_threads ];
 	for( unsigned int i=0; i< num_threads; ++i )
 	{
 		fit_thread_data[i].function = evalFunctions[i];
@@ -620,7 +664,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 void* RapidFitIntegrator::ThreadWork( void* inputData )
 {
-	struct Normalise_Thread* thread_object = (struct Normalise_Thread*) inputData;
+	Normalise_Thread* thread_object = (Normalise_Thread*) inputData;
 	for( unsigned int i=0; i< (unsigned)thread_object->normalise_points.size(); ++i )
 	{
 		thread_object->dataPoint_Result.push_back( thread_object->function->DoEval( thread_object->normalise_points[i] ) );
@@ -785,9 +829,9 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 				}
 				if( !pseudoRandomIntegration )
 				{
-					pthread_mutex_lock( &one_dim_lock );
+					pthread_mutex_lock( &multi_dim_lock );
 					numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
-					pthread_mutex_unlock( &one_dim_lock );
+					pthread_mutex_unlock( &multi_dim_lock );
 				}
 				else
 				{
@@ -798,8 +842,8 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 							cout << "RapidFitIntegrator: Using GSL PseudoRandomNumber :D" << endl;
 						}
 					}
-					//numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
-					numericalIntegral += this->PseudoRandomNumberIntegralThreaded( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, num_threads );
+					//numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, GSLFixedPoints );
+					numericalIntegral += this->PseudoRandomNumberIntegralThreaded( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, num_threads, GSLFixedPoints );
 					if( debug != NULL )
 					{
 						if( debug->DebugThisClass( "RapidFitIntegrator" ) )
@@ -809,8 +853,25 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 					}
 					if( numericalIntegral < 0 )
 					{
-						cout << "Calculated a -ve Integral: " << numericalIntegral << ". Did you Compile with the GSL options Enabled with 'make gsl'?" << endl;
-						cout << endl;	exit(-2356);
+						pthread_mutex_lock( &check_settings_lock );
+						cout << "Calculated a -ve Integral: " << numericalIntegral << ". Did you Compile with the GSL options Enabled with gsl available?" << endl;
+						//cout << endl;	exit(-2356);
+						cout << "Reverting to non-GSL integration" << endl;
+
+						if( doIntegrate.size() == 1 )
+						{
+							pthread_mutex_lock( &one_dim_lock );
+							numericalIntegral = this->OneDimentionIntegral( functionToWrap, oneDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+							pthread_mutex_unlock( &one_dim_lock );
+						}
+						else
+						{
+							pthread_mutex_lock( &multi_dim_lock );
+							numericalIntegral = this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+							pthread_mutex_unlock( &multi_dim_lock );
+						}
+						this->SetUseGSLIntegrator( false );
+						pthread_mutex_unlock( &check_settings_lock );
 					}
 				}
 			}

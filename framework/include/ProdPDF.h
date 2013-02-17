@@ -43,7 +43,7 @@ class ProdPDF : public BasePDF
 		 */
 		~ProdPDF();
 
-		virtual void SetUseGSLIntegrator( bool input );
+		virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig );
 
 		vector<string> PDFComponents();
 

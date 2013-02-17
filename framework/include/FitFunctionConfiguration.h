@@ -16,6 +16,7 @@
 ///	RapidFit Headers
 #include "FitFunction.h"
 #include "PhysicsBottle.h"
+#include "RapidFitIntegratorConfig.h"
 ///	System Headers
 #include <string>
 
@@ -59,8 +60,8 @@ class FitFunctionConfiguration
 		/*!
 		 * What was the Numerical Integrator Name
 		 */
-		void SetGSLIntegrator( bool );
-		
+		void SetIntegratorConfig( const RapidFitIntegratorConfig* config );
+
 		/*!
 		 * What was the Weight Observable Name
 		 */
@@ -114,6 +115,10 @@ class FitFunctionConfiguration
 		bool GetSingleNormaliseWeights() const;
 	private:
 
+		FitFunctionConfiguration( const FitFunctionConfiguration& input );
+
+		FitFunctionConfiguration& operator= ( const FitFunctionConfiguration& input );
+
 		string functionName, weightName;/*!	Name of the Function and Weight to use		*/
 		bool hasWeight;			/*!	Should a Weight be used by the FitFunction	*/
 		bool wantTrace;			/*!	Should a Trace Be Performed			*/
@@ -121,8 +126,8 @@ class FitFunctionConfiguration
 		int traceCount;			/*!	Trace Number, to avoid overwriting the output file	*/
 		int Threads;			/*!	Number of Threads to Construct FitFunction With	*/
 		string Strategy;		/*!	Name of Strategy to use				*/
-		bool gslIntegrator;		/*!	Decision about Numerical integrator to use	*/
-		bool testIntegrator;		/*!	Decision about wether to test the integrator	*/
+		RapidFitIntegratorConfig* integratorConfig;/*!	Object for holding all of the config data for the Integrators	*/
+		bool testIntegrator;
 		bool NormaliseWeights;
 		bool SingleNormaliseWeights;
 		bool hasAlpha;

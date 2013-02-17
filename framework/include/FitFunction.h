@@ -20,6 +20,7 @@
 ///	RapidFit Headers
 #include "PhysicsBottle.h"
 #include "RapidFitIntegrator.h"
+#include "RapidFitIntegratorConfig.h"
 #include "ObservableRef.h"
 #include "DebugClass.h"
 
@@ -49,7 +50,7 @@ class FitFunction
 		/*!
 		 * @brief Set the name of the numerical integration method to use 
 		 */
-		void SetGSLIntegrator( const bool gsl );
+		void SetIntegratorConfig( const RapidFitIntegratorConfig* gsl );
 
 		/*!
 		 * @brief Set the Physics Bottle to be used
@@ -178,7 +179,7 @@ class FitFunction
 		double testDouble;			/*!	Undocumented	*/
 		bool useWeights;			/*!	Undocumented	*/
 		string weightObservableName;		/*!	Undocumented	*/
-		bool gslIntegrator;
+		RapidFitIntegratorConfig* integrationConfig;
 
 		//	This is for training Minuit
 		//	(this could give some VERY cool graphs in ResultSpace :D )

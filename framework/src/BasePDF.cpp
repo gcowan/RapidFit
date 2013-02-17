@@ -88,9 +88,9 @@ RapidFitIntegrator* BasePDF::GetPDFIntegrator() const
 	return myIntegrator;
 }
 
-void BasePDF::SetUseGSLIntegrator( bool input )
+void BasePDF::SetUpIntegrator( const RapidFitIntegratorConfig* input )
 {
-	myIntegrator->SetUseGSLIntegrator( input );
+	myIntegrator->SetUpIntegrator( input );
 }
 
 void BasePDF::SetCopyConstructor( CopyPDF_t* input ) const
