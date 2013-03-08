@@ -319,7 +319,7 @@ class RapidFitIntegrator
 				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int GSLFixedPoints=10000 );
 
 		static double PseudoRandomNumberIntegralThreaded( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
-				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int num_threads=4, unsigned int GSLFixedPoints=10000 );
+				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int num_threads=4, unsigned int GSLFixedPoints=10000, DebugClass* debug=new DebugClass(false) );
 
 		/*!
 		 * @brief This is the Interface to The MuliDimentional Integral class within ROOT

@@ -160,9 +160,13 @@ class SlicedAcceptance
 		 *
 		 * @return
 		 */
-		AcceptanceSlice * getSlice( const unsigned int slice ) const;
+		AcceptanceSlice* getSlice( const unsigned int slice ) const;
 
-	private:	
+		unsigned int findSliceNum( const Observable* time, const double offSet=0. ) const;
+
+		bool GetIsSorted() const;
+
+	private:
 		//      Uncopyable!
 		SlicedAcceptance& operator = ( const SlicedAcceptance& );
 
@@ -173,6 +177,9 @@ class SlicedAcceptance
 		double tlow;
 		double thigh;
 		double beta;
+		bool _sortedSlices;
+
+		bool isSorted() const;
 };
 
 #endif

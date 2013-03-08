@@ -25,7 +25,7 @@ AcceptanceSlice::AcceptanceSlice( const AcceptanceSlice& input ) :
 //............................................
 // Constructor for flat acceptance
 SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
-	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0)
+	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0), _sortedSlices(false)
 {
 
 	//Reality checks
@@ -40,10 +40,11 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
 
 	//....done.....
 
+	_sortedSlices = true;
 }
 
 SlicedAcceptance::SlicedAcceptance( const SlicedAcceptance& input ) :
-	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta )
+	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta ), _sortedSlices( input._sortedSlices )
 {
 	for( unsigned int i=0; i< input.slices.size(); ++i )
 	{
@@ -65,7 +66,7 @@ SlicedAcceptance::~SlicedAcceptance()
 //............................................
 // Constructor for simple upper time acceptance only
 SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b)
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b), _sortedSlices(false)
 {
 	//Reality checks
 	if( tlow > thigh )
@@ -99,13 +100,14 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 	}
 
 	//....done.....
+	_sortedSlices = this->isSorted();
 }
 
 
 //............................................
 // Constructor for simple 2010 version of lower time acceptance only
 SlicedAcceptance::SlicedAcceptance( string s ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false)
 {
 	(void)s;
 	int N = 31;
@@ -128,12 +130,13 @@ SlicedAcceptance::SlicedAcceptance( string s ) :
 	}
 
 	//....done.....
+	_sortedSlices = this->isSorted();
 }
 
 //............................................
 // Constructor for accpetance from a file
 SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta()
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false)
 {
 	(void)type;
 	if( type != "File" ) {   }//do nothing for now
@@ -175,6 +178,7 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 	}
 	//....done.....
 
+	_sortedSlices = this->isSorted();
 }
 
 //............................................
@@ -185,6 +189,7 @@ double SlicedAcceptance::getValue( const double t ) const
 	for( unsigned int is = 0; is < slices.size() ; ++is )
 	{
 		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
+		if( _sortedSlices ) if( t<slices[is]->thigh() ) break;
 	}
 	if( t == slices.back()->thigh() ) returnValue += slices.back()->height();
 	return returnValue;
@@ -209,19 +214,41 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 	double t = time->GetValue() - timeOffset;
 	double returnValue = 0;
 	unsigned int is = 0;
-	for( ; is < slices.size(); ++is )
+
+	int finalBin = -1;
+
+	if( time->GetBinNumber() >= 0 )
 	{
-		if( (t >= slices[is]->tlow() ) && ( t < slices[is]->thigh() ) )
-		{
-			returnValue += slices[is]->height();
-		}
+		finalBin = time->GetBinNumber();
 	}
-	if( t == slices.back()->thigh() )
+	else
 	{
-		returnValue += slices.back()->height();
+		finalBin = this->findSliceNum( time, timeOffset );
 	}
 
-	time->SetBinNumber( (int)is );
+	//cout << finalBin << endl;
+
+	if( _sortedSlices )
+	{
+		returnValue += slices[(unsigned)finalBin]->height();
+	}
+	else
+	{
+		for( ; is < slices.size(); ++is )
+		{
+			if( (t >= slices[is]->tlow() ) && ( t < slices[is]->thigh() ) )
+			{
+				returnValue += slices[is]->height();
+			}
+		}
+
+		if( t == slices.back()->thigh() )
+		{
+			returnValue += slices.back()->height();
+		}
+	}
+
+	time->SetBinNumber( finalBin );
 	time->SetAcceptance( returnValue );
 	time->SetOffSet( timeOffset );
 	return returnValue;
@@ -251,3 +278,55 @@ double SlicedAcceptance::stream(ifstream& thisStream)
 	return tmpVal;
 }
 
+unsigned int SlicedAcceptance::findSliceNum( const Observable* time, const double timeOffset ) const
+{
+	double t = time->GetValue() - timeOffset;
+	if( time->GetBinNumber() >= 0 ) return (unsigned) time->GetBinNumber();
+	unsigned int is=0;
+	for( ; is < slices.size(); ++is )
+	{
+		if( (t >= slices[is]->tlow() ) && ( t < slices[is]->thigh() ) )
+		{
+			break;
+		}
+		else
+		{
+			continue;
+		}
+	}
+	if( t == slices.back()->thigh() ) --is;
+	time->SetBinNumber( (int)is );
+	return is;
+}
+
+bool SlicedAcceptance::isSorted() const
+{
+	bool isReallySorted = true;
+	double last_thigh = -999.;
+	for( unsigned int i=0; i< slices.size(); ++i )
+	{
+		if( isReallySorted )
+		{
+			if( last_thigh <= slices[i]->tlow() )
+			{
+				isReallySorted = true;
+				last_thigh = slices[i]->thigh();
+			}
+			else
+			{
+				isReallySorted = false;
+			}
+			continue;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return isReallySorted;
+}
+
+bool SlicedAcceptance::GetIsSorted() const
+{
+	return _sortedSlices;
+}

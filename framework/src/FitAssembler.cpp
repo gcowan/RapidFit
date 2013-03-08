@@ -359,7 +359,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		double sum_sq_total=0.;
 		for( unsigned int i=0; i< (unsigned)bottle->NumberResults(); ++i )
 		{
-			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
+			IDataSet* Requested_DataSet = bottle->GetResultDataSet( (int)i );
 			if( Requested_DataSet->GetWeightsWereUsed() )
 			{
 				sum_total += Requested_DataSet->GetSumWeights();
@@ -368,7 +368,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 		for( unsigned int i=0; i< BottleData.size(); ++i )
 		{
-			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
+			IDataSet* Requested_DataSet = bottle->GetResultDataSet( (int)i );
 			if( Requested_DataSet->GetWeightsWereUsed() )
 			{
 				Requested_DataSet->ApplyAlpha( sum_total, sum_sq_total );
@@ -382,7 +382,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	{
 		for( unsigned int i=0; i< BottleData.size(); ++i )
 		{
-			IDataSet* Requested_DataSet = bottle->GetResultDataSet( i );
+			IDataSet* Requested_DataSet = bottle->GetResultDataSet( (int)i );
 			Requested_DataSet->ApplyExternalAlpha( FunctionConfig->GetAlphaName() );
 		}
 	}

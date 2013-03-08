@@ -18,7 +18,8 @@
 
 using namespace::std;
 
-ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), allNames(), uniqueID(0)
+ParameterSet::ParameterSet( vector<ParameterSet*> input ) :
+	allParameters(), allNames(), uniqueID(0), allInternalNames(), allForeignNames()
 {
 	for( vector<ParameterSet*>::iterator set_i = input.begin(); set_i != input.end(); ++set_i )
 	{
@@ -45,9 +46,15 @@ ParameterSet::ParameterSet( vector<ParameterSet*> input ) : allParameters(), all
 		}
 	}
 	uniqueID = reinterpret_cast<size_t>(this);
+	for( unsigned int i=0; i< allNames.size(); ++i )
+	{
+		allInternalNames.push_back( ObservableRef(allNames[i]) );
+		allForeignNames.push_back( ObservableRef(allNames[i]) );
+	}
 }
 
-ParameterSet::ParameterSet( const ParameterSet& input ) : allParameters(), allNames(input.allNames), uniqueID(0)
+ParameterSet::ParameterSet( const ParameterSet& input ) :
+	allParameters(), allNames(input.allNames), uniqueID(0), allInternalNames(input.allInternalNames), allForeignNames(input.allForeignNames)
 {
 	vector<PhysicsParameter*>::const_iterator param_i = input.allParameters.begin();
 	for( ; param_i != input.allParameters.end(); ++param_i )
@@ -73,6 +80,8 @@ ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 			this->allParameters.push_back( new PhysicsParameter( *(*param_i) ) );
 		}
 		this->allNames = input.allNames;
+		this->allInternalNames = input.allInternalNames;
+		this->allForeignNames = input.allForeignNames;
 		this->uniqueID = reinterpret_cast<size_t>(this)+1;
 	}
 	return *this;
@@ -83,37 +92,34 @@ bool ParameterSet::operator== ( const ParameterSet& input_rhs )
 	bool names_match=true;
 	vector<string> input_names_lhs = this->allNames;
 	vector<string> input_names_rhs = input_rhs.allNames;
-	vector<int> input_index_lhs_in_rhs( input_names_lhs.size(), -1 );
+	//	Simple logical check for all wanted objects
+	if( input_names_rhs.size() < input_names_lhs.size() ) return false;
+
+	//	Check to see if wanted objects exist
 	for( unsigned int i=0; i< input_names_lhs.size(); ++i )
 	{
-		int this_index = StringProcessing::VectorContains( &input_names_rhs, &(input_names_lhs[i]) );
+		//int this_index = StringProcessing::VectorContains( &input_names_rhs, &(input_names_lhs[i]) );
+		input_rhs.GetPhysicsParameter( allInternalNames[i] );
+		int this_index = allInternalNames[i].GetIndex();
 		if( this_index == -1 )
 		{
 			names_match = false;
 			break;
 		}
-		else
-		{
-			input_index_lhs_in_rhs[i] = this_index;
-		}
 	}
+
 	if( !names_match )
 	{
 		return false;
 	}
 	else
 	{
+		//	Finally if needed compare the numerical values
 		bool changed = false;
 		for( unsigned int i=0; i< input_names_lhs.size(); ++i )
 		{
-			ObservableRef thisLHSObs = ObservableRef( input_names_lhs[i] );
-			ObservableRef thisRHSObs = ObservableRef( input_names_lhs[i] );
-
-			thisLHSObs.SetIndex( i ); thisRHSObs.SetIndex( input_index_lhs_in_rhs[i] );
-			thisLHSObs.SetExternalID( this->GetUniqueID() ); thisRHSObs.SetExternalID( input_rhs.GetUniqueID() );
-
-			double lhs_val = this->GetPhysicsParameter( thisLHSObs )->GetValue();
-			double rhs_val = input_rhs.GetPhysicsParameter( thisRHSObs )->GetValue();
+			double lhs_val = this->GetPhysicsParameter( allInternalNames[i] )->GetValue();
+			double rhs_val = input_rhs.GetPhysicsParameter( allForeignNames[i] )->GetValue();
 			if( lhs_val != rhs_val )
 			{
 				changed = true;
@@ -127,7 +133,7 @@ bool ParameterSet::operator== ( const ParameterSet& input_rhs )
 }
 
 //Constructor with correct arguments
-ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(), uniqueID(0)
+ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allNames(), uniqueID(0), allInternalNames(), allForeignNames()
 {
 	vector<string> duplicates;
 	allNames = StringProcessing::RemoveDuplicates( NewNames, duplicates );
@@ -146,6 +152,11 @@ ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allName
 		allParameters.push_back( new PhysicsParameter( NewNames[nameIndex] ) );
 	}
 	uniqueID = reinterpret_cast<size_t>(this)+1;
+	for( unsigned int i=0; i< allNames.size(); ++i )
+	{
+		allInternalNames.push_back( ObservableRef(allNames[i]) );
+		allForeignNames.push_back( ObservableRef(allNames[i]) );
+	}
 }
 
 //Destructor
@@ -272,52 +283,6 @@ bool ParameterSet::SetPhysicsParameter( string Name, double Value, double Minimu
 	return returnValue;
 }
 
-/*
-//Set all physics parameters
-bool ParameterSet::SetPhysicsParameters( ParameterSet * NewParameterSet )
-{
-if( NewParameterSet->GetTrusted() )
-{
-if( trusted_set.empty() )
-{
-for( unsigned int i=0; i < allNames.size(); ++i )
-{
-ObservableRef* new_ref = new ObservableRef( allNames[i] );
-allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *new_ref )->GetValue() );
-trusted_set.push_back( new_ref );
-}
-}
-else
-{
-for( unsigned int i=0; i< trusted_set.size(); ++i )
-{
-allParameters[i]->SetValue( NewParameterSet->GetPhysicsParameter( *(trusted_set[i]) )->GetValue() );
-}
-}
-}
-else
-{
-for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); nameIndex++)
-{
-PhysicsParameter* inputParameter = new PhysicsParameter( *(NewParameterSet->GetPhysicsParameter( allNames[nameIndex] )) );
-if ( inputParameter->GetUnit() == "NameNotFoundError" )
-{
-//Fail if a required parameter is missing
-cerr << "Parameter \"" << allNames[nameIndex] << "\" expected but not found" << endl;
-return false;
-}
-else
-{
-if( allParameters[nameIndex] != NULL ) delete allParameters[nameIndex];
-allParameters[nameIndex] = inputParameter;
-}
-}
-}
-
-return true;
-}
-*/
-
 //Set all physics parameters
 bool ParameterSet::SetPhysicsParameters( const ParameterSet * NewParameterSet )
 {
@@ -359,6 +324,13 @@ bool ParameterSet::AddPhysicsParameter( const PhysicsParameter* NewParameter, bo
 
 		}
 	}
+
+	allInternalNames.clear();	allForeignNames.clear();
+	for( unsigned int i=0; i< allNames.size(); ++i )
+	{
+		allInternalNames.push_back( ObservableRef(allNames[i]) );
+		allForeignNames.push_back( ObservableRef(allNames[i]) );
+	}
 	++uniqueID;
 	return true;
 }
@@ -385,6 +357,13 @@ bool ParameterSet::AddPhysicsParameters( const ParameterSet * NewParameterSet, b
 				allParameters[(unsigned)paramIndex] = new PhysicsParameter( *(NewParameterSet->GetPhysicsParameter( NewParameterSet->GetAllNames()[nameIndex] )) );
 			}
 		}
+	}
+
+	allInternalNames.clear();       allForeignNames.clear();
+	for( unsigned int i=0; i< allNames.size(); ++i )
+	{
+		allInternalNames.push_back( ObservableRef(allNames[i]) );
+		allForeignNames.push_back( ObservableRef(allNames[i]) );
 	}
 	++uniqueID;
 	return true;
@@ -494,5 +473,12 @@ void ParameterSet::FloatedFirst()
 
 	allParameters = sorted_parameters;
 	allNames = sorted_names;
+
+	allInternalNames.clear();       allForeignNames.clear();
+	for( unsigned int i=0; i< allNames.size(); ++i )
+	{
+		allInternalNames.push_back( ObservableRef(allNames[i]) );
+		allForeignNames.push_back( ObservableRef(allNames[i]) );
+	}
 }
 

@@ -40,8 +40,8 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 	ObservableRef sWeightsqName("sWeight2");
 	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
 	{
-		total_sWeight += inputDataSet->GetDataPoint( i )->GetObservable( sWeightName )->GetValue();
-		total_sWeight_sq += inputDataSet->GetDataPoint( i )->GetObservable( sWeightsqName )->GetValue();
+		total_sWeight += inputDataSet->GetDataPoint( (int)i )->GetObservable( sWeightName )->GetValue();
+		total_sWeight_sq += inputDataSet->GetDataPoint( (int)i )->GetObservable( sWeightsqName )->GetValue();
 	}
 	double alpha = total_sWeight / total_sWeight_sq;
 	cout << total_sWeight << " / " << total_sWeight_sq << endl;
@@ -49,7 +49,7 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 
 	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
 	{
-		DataPoint* thisPoint = inputDataSet->GetDataPoint( i );
+		DataPoint* thisPoint = inputDataSet->GetDataPoint( (int)i );
 		double thisWeight = thisPoint->GetObservable( sWeightName )->GetValue();
 		thisWeight *= alpha;
 		Observable* sWeight_corrected = new Observable( sWeightName, thisWeight, "Weight-Unit" );

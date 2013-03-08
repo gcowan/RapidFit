@@ -751,8 +751,8 @@ int PerformMainFit( RapidFitConfiguration* config )
 		PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
 		pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
 		IDataSet * data = pdfAndData->GetDataSet();
-		IPDF * pdf = pdfAndData->GetPDF();
-		PhaseSpaceBoundary * phase = data->GetBoundary();
+		IPDF * pdf = pdfAndData->GetPDF();	(void) pdf;
+		PhaseSpaceBoundary * phase = data->GetBoundary();	(void) phase;
 		//GoodnessOfFit::plotUstatistic( pdf, data, phase, "ustat.pdf" );
 
 		TH1D * pvalueHist = new TH1D("pvalues", "pvalues", 10, 0, 1);
@@ -940,7 +940,7 @@ int calculateFitFractions( RapidFitConfiguration* config )
 	pdfComponents = StringProcessing::MoveElementToStart( pdfComponents, "0" );
 	for( unsigned int i = 0; i < pdfComponents.size(); ++i )
 	{
-		ComponentRef * thisRef = new ComponentRef( pdfComponents[i] );
+		ComponentRef * thisRef = new ComponentRef( pdfComponents[i], "dummyObservable" );
 		integral = testIntegrator->NumericallyIntegratePhaseSpace( dataSet->GetBoundary(), doNotIntegrate, thisRef );
 		if ( pdfComponents[i] == "0" ) total_integral = integral;
 		delete thisRef;

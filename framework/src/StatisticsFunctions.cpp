@@ -19,7 +19,7 @@
 #define DOUBLE_TOLERANCE 1E-6
 
 //Return the mean of a vector of doubles
-double StatisticsFunctions::Mean( vector<double> Numbers )
+double StatisticsFunctions::Mean( const vector<double> Numbers )
 {
 	double sum = 0.0;
 	for (unsigned int index = 0; index < Numbers.size(); ++index )
@@ -31,7 +31,7 @@ double StatisticsFunctions::Mean( vector<double> Numbers )
 }
 
 //Return the variance of a vector of doubles
-double StatisticsFunctions::Variance( vector<double> Numbers )
+double StatisticsFunctions::Variance( const vector<double> Numbers )
 {
 	double sum = 0.0;
 	double mean = Mean(Numbers);
@@ -45,7 +45,7 @@ double StatisticsFunctions::Variance( vector<double> Numbers )
 
 //Return the ideal number of bins for a histogram of a vector of doubles
 //Uses D. Scott's method, published 1979
-int StatisticsFunctions::OptimumBinNumber( vector<double> Numbers )
+int StatisticsFunctions::OptimumBinNumber( const vector<double> Numbers )
 {
 	double width = 3.49 * sqrt( Variance(Numbers) ) * pow( double(Numbers.size()), -(1.0/3.0) );
 	double range = Maximum(Numbers) - Minimum(Numbers);
@@ -53,7 +53,7 @@ int StatisticsFunctions::OptimumBinNumber( vector<double> Numbers )
 }
 
 //Returns the maximum and minimum of a vector of doubles 
-double StatisticsFunctions::Maximum( vector<double> Numbers )
+double StatisticsFunctions::Maximum( const vector<double> Numbers )
 {
 	if ( Numbers.size() > 0 )
 	{
@@ -73,7 +73,8 @@ double StatisticsFunctions::Maximum( vector<double> Numbers )
 		return 0.0;
 	}
 }
-double StatisticsFunctions::Minimum( vector<double> Numbers )
+
+double StatisticsFunctions::Minimum( const vector<double> Numbers )
 {       
 	if ( Numbers.size() > 0 )
 	{
@@ -95,11 +96,11 @@ double StatisticsFunctions::Minimum( vector<double> Numbers )
 }
 
 //Returns all possible combinations of discrete observable values from a PhaseSpaceBoundary
-vector< vector<double> > StatisticsFunctions::DiscreteCombinations( vector<string> * AllNames, const PhaseSpaceBoundary * InputBoundary, vector<string> & DiscreteNames,
-		vector<string> & ContinuousNames, vector< vector<double> > & discreteValues )
+vector< vector<double> > StatisticsFunctions::DiscreteCombinations( const vector<string> * AllNames, const PhaseSpaceBoundary * InputBoundary,
+	vector<string> & DiscreteNames, vector<string> & ContinuousNames, vector< vector<double> > & discreteValues )
 {
 	//Construct a vector<vector> containing all discrete values. List the names of discrete and continuous observables.
-	vector<string>::iterator nameIterator;
+	vector<string>::const_iterator nameIterator;
 	for( nameIterator = AllNames->begin(); nameIterator != AllNames->end(); ++nameIterator )
 	{
 		IConstraint * observableConstraint = InputBoundary->GetConstraint( *nameIterator );
@@ -200,8 +201,9 @@ void StatisticsFunctions::DoDontIntegrateLists( IPDF * InputPDF, const PhaseSpac
 }
 
 //Perform data averaging
-vector<DataPoint*> StatisticsFunctions::DataAverage( IDataSet * InputData, vector< vector<double> > DiscreteCombinations, vector< vector<double> > DiscreteValues, vector<string> DiscreteNames, vector<string> ContinuousNames,
-	       vector<string> & DataPointDescriptions, vector<double> & DataPointWeights )
+vector<DataPoint*> StatisticsFunctions::DataAverage( const IDataSet * InputData, const vector< vector<double> > DiscreteCombinations,
+	const vector< vector<double> > DiscreteValues, const vector<string> DiscreteNames, const vector<string> ContinuousNames,
+	vector<string> & DataPointDescriptions, vector<double> & DataPointWeights )
 {
 	//Initialise the data averaging
 	vector<double> continuousSums;
@@ -309,7 +311,7 @@ vector<DataPoint*> StatisticsFunctions::DataAverage( IDataSet * InputData, vecto
 	return newDataPoints;
 }
 
-vector<vector<double> > StatisticsFunctions::Combinatorix( vector<vector<double> > input_values )
+vector<vector<double> > StatisticsFunctions::Combinatorix( const vector<vector<double> > input_values )
 {
 	unsigned int output_size=1;
 	for( unsigned int i=0; i< input_values.size(); ++i )
@@ -352,13 +354,13 @@ vector<vector<double> > StatisticsFunctions::Combinatorix( vector<vector<double>
 	return output;
 }
 
-unsigned int StatisticsFunctions::NumberOfCombinations( vector<vector<double> > input, unsigned int index )
+unsigned int StatisticsFunctions::NumberOfCombinations( const vector<vector<double> > input, const int index )
 {
 	unsigned int output=1;
 	for( unsigned int i=0; i< input.size(); ++i )
 	{
 		//cout << index << "\t" << i << "\tsize: " << input[i].size() << endl;
-		if( i != index ) output *= (unsigned)input[i].size();
+		if( (int)i != index ) output *= (unsigned)input[i].size();
 	}
 	return output;
 }

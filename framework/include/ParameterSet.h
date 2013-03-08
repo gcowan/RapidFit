@@ -235,6 +235,9 @@ class ParameterSet
 		mutable vector<PhysicsParameter*> allParameters;	/*!	vector of pointers to all of the Physics Parameters managed by this ParameterSet			*/
 		vector<string> allNames;			/*!	vector of strings of the names of all of the Physics Parameters						*/
 		mutable size_t uniqueID;
+
+		mutable vector<ObservableRef> allInternalNames;
+		mutable vector<ObservableRef> allForeignNames;
 };
 
 #endif

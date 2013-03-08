@@ -406,10 +406,10 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 					resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug );
 		}
 
+		vector<double> finalPullEvals;
+
 		if( (Total_BinnedData != NULL) && ((*projection_i)->DrawPull == true) )
 		{
-			vector<double> finalPullEvals;
-
 			for( unsigned int i=0; i< pullFunctionEvals[0].size(); ++i )		//	Loop over all Bins
 			{
 				double this_bin=0.;
@@ -426,6 +426,31 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(),
 								resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug, finalPullEvals );
 		}
+
+		CompPlotter_config* datasets_config = new CompPlotter_config( *(*projection_i) );
+		vector<TGraph*> allDataSubSets;
+		allDataSubSets.push_back( Total_Components.back() );
+		vector<string> datasetID; datasetID.push_back( "All Datasets" );
+		for( unsigned int i=0; i< all_components_for_all_results.size(); ++i )
+		{
+			allDataSubSets.push_back( all_components_for_all_results[i].back() );
+			allDataSubSets.back()->SetLineColor( (Color_t)(i+2) );
+			datasetID.push_back( resultBottle->GetResultPDF( i )->GetLabel() );
+		}
+
+		datasets_config->component_names = datasetID;
+		datasets_config->LegendTextSize = (Size_t)0.02;
+
+		ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets",
+						resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, debug );
+
+		if( !finalPullEvals.empty() )
+		{
+			ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets_wPulls",
+						resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, debug, finalPullEvals );
+		}
+
+		delete datasets_config;
 
 		//	it is now safe to remove the instances of ComponentPlotter
 		for( vector<ComponentPlotter*>::iterator compP_i = allComponentPlotters.begin(); compP_i != allComponentPlotters.end(); ++compP_i )

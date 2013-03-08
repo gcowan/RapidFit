@@ -490,7 +490,7 @@ class ComponentPlotter
 		const int total_points;
 		const int data_binning;
 		const bool logY;
-
+		const bool logX;
 
 		/*!
 		 * These are effectivley the output objects which can be requested as long as this class was still alive

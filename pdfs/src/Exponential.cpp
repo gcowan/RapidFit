@@ -37,27 +37,29 @@ Exponential::Exponential( PDFConfigurator* configurator) :
 	, tau(), gamma(), sigmaNum(0), sigma(), sigma1(), sigma2(), sigma3(), timeRes2Frac(), timeRes3Frac()
 	, resolutionScale1(), resolutionScale2(), resolutionScale3(), _dataPoint(NULL)
 	, tlow(), thigh(), time()
-	, _useEventResolution(false)
-	, _useTimeAcceptance(false)
-	, _numericIntegralForce(false)
-	, _usePunziSigmat(false), 
+	, _useEventResolution(false), _useTimeAcceptance(false), _numericIntegralForce(false), _usePunziSigmat(false), _useSteppedProjection(false),
 	_intexpIntObs_vec(), timeAcc( NULL ), eventResolution(), timeOffset()
 {
 	_useEventResolution = configurator->isTrue( "UseEventResolution" );
 	_useTimeAcceptance  = configurator->isTrue( "UseTimeAcceptance" );
 	_numericIntegralForce = configurator->isTrue( "UseNumericalIntegration" );
 	_usePunziSigmat = configurator->isTrue( "UsePunziSigmat" );
-	if( useTimeAcceptance() ) {
-		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
+	_useSteppedProjection = configurator->isTrue( "UseSteppedProjection" );
+	if( useTimeAcceptance() )
+	{
+		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) )
+		{
 			timeAcc = new SlicedAcceptance( 0., 14.0, 0.0033 );
 			cout << "Exponential:: Constructing timeAcc: Upper time acceptance beta=0.0033 [0 < t < 14] " << endl;
 		}
-		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
+		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" )
+		{
 			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) );
 			cout << "Exponential:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl;
 		}
 	}
-	else {
+	else
+	{
 		timeAcc = new SlicedAcceptance( -25., 25. );
 		cout << "Exponential:: Constructing timeAcc: DEFAULT FLAT [-25 < t < 25]  " << endl;
 	}
@@ -84,12 +86,9 @@ Exponential::Exponential( const Exponential &copy ) :
 	, timeRes2Frac( copy.timeRes2Frac), timeRes3Frac( copy.timeRes3Frac )
 	, resolutionScale1( copy.resolutionScale1 ), resolutionScale2( copy.resolutionScale2 ), resolutionScale3( copy.resolutionScale3 )
 	, timeOffset( copy.timeOffset )
-	, tlow( copy.tlow ), thigh( copy.thigh ), time( copy.time )
-	, _useEventResolution( copy._useEventResolution )
-	, _useTimeAcceptance( copy._useTimeAcceptance )
-	, _numericIntegralForce( copy._numericIntegralForce )
-	, _usePunziSigmat( copy._usePunziSigmat )
-	, eventResolution( copy.eventResolution ), timeAcc( NULL )
+	, tlow( copy.tlow ), thigh( copy.thigh ), time( copy.time ), _useEventResolution( copy._useEventResolution )
+	, _useTimeAcceptance( copy._useTimeAcceptance ), _numericIntegralForce( copy._numericIntegralForce ), _usePunziSigmat( copy._usePunziSigmat )
+	, _useSteppedProjection( copy._useSteppedProjection ), eventResolution( copy.eventResolution ), timeAcc( NULL )
 {
 	timeAcc = new SlicedAcceptance( *(copy.timeAcc) );
 	for( unsigned int i=0; i< copy._intexpIntObs_vec.size(); ++i )
@@ -147,6 +146,7 @@ Exponential::~Exponential()
 bool Exponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
+	timeOffset       = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
 	tau = allParameters.GetPhysicsParameter( tauName )->GetValue() - timeOffset;
 	gamma = 1./tau;
 	if( ! useEventResolution() )
@@ -165,9 +165,45 @@ bool Exponential::SetPhysicsParameters( ParameterSet * NewParameterSet )
 		resolutionScale1 = allParameters.GetPhysicsParameter( resScale1Name )->GetValue();
 	}     
 
-	timeOffset       = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
-
 	return isOK;
+}
+
+double Exponential::EvaluateComponent( DataPoint* input, ComponentRef* thisRef )
+{
+	(void) thisRef;		//	This PDF has no concept of a component, it is JUST an exponential
+	Observable* timeObs = input->GetObservable( timeName );
+	if( _useSteppedProjection )
+	{
+		if( timeAcc->GetIsSorted() )
+		{
+			unsigned int binNum = timeAcc->findSliceNum( timeObs, timeOffset );
+			double t_low = timeAcc->getSlice( binNum )->tlow();
+			double t_high = timeAcc->getSlice( binNum )->thigh();
+			double frac=0.5;
+			//frac = ( exp(-gamma*t_low) - exp(-gamma*(t_low+0.5*(t_high-t_low))) ) / ( exp(-gamma*t_low) - exp(-gamma*t_high) );
+			frac = ( exp(-gamma*(t_low+0.5*(t_high-t_low))) - exp(-gamma*t_low) ) / ( exp(-gamma*t_high) - exp(-gamma*t_low) );
+			double mean = t_low+(1.-frac)*( t_high-t_low );
+			DataPoint* thisPoint = new DataPoint( *input );
+			Observable* newTimeObs = new Observable( timeName, mean, " " );
+			thisPoint->SetObservable( timeName, newTimeObs );
+			double returnable = this->Evaluate( thisPoint );
+			delete newTimeObs;
+			delete thisPoint;
+			return returnable;
+		}
+		else
+		{
+			cerr << "Acceptance Histogram has to be in an ordered format (histogram-like) in order to do this!" << endl;
+			cerr << "Disabling the Stepped Projections" << endl;
+			_useSteppedProjection = false;
+			return this->Evaluate( input );
+		}
+	}
+	else
+	{
+		return this->Evaluate( input );
+	}
+	return 0.;
 }
 
 //Calculate the function value
@@ -193,7 +229,8 @@ double Exponential::Evaluate(DataPoint * measurement)
 
 		num = numer / denom;
 	}
-	else if( resolutionScale1 <= 0. ) {
+	else if( resolutionScale1 <= 0. )
+	{
 		//This is the "code" to run with resolution=0
 		sigma = 0.;
 		double numer = buildPDFnumerator();
@@ -202,7 +239,8 @@ double Exponential::Evaluate(DataPoint * measurement)
 
 		num = numer / denom;
 	}
-	else {
+	else
+	{
 		if(  (1. - timeRes2Frac - timeRes3Frac ) >= 0.9999 )
 		{
 			// Set the member variable for time resolution to the first value and calculate
@@ -251,7 +289,8 @@ double Exponential::Evaluate(DataPoint * measurement)
 double Exponential::buildPDFnumerator()
 {
 	// Sum of two exponentials, using the time resolution functions
-	if( tau <= 0 ) {
+	if( tau <= 0 )
+	{
 		PDF_THREAD_LOCK
 		cout << " In Exponential() you gave a negative or zero lifetime for tau " << endl ;
 		PDF_THREAD_UNLOCK

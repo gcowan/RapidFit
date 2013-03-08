@@ -16,8 +16,6 @@
 #include <iomanip>
 // #include "TF1.h"
 
-#define DEBUGFLAG true
-
 using namespace::std;
 
 PDF_CREATOR( Bs2JpsiPhi_Signal_v5 );
@@ -40,11 +38,11 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) 
 
 	, res2FractionName(input.res2FractionName), res3FractionName(input.res3FractionName), timeOffsetName(input.timeOffsetName), angAccI1Name(input.angAccI1Name)
 
-    , angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name), angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name)
+	, angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name), angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name)
 
 	, angAccI7Name(input.angAccI7Name), angAccI8Name(input.angAccI8Name), angAccI9Name(input.angAccI9Name), angAccI10Name(input.angAccI10Name)
 
-    , timeName(input.timeName), cosThetaName(input.cosThetaName), cosPsiName(input.cosPsiName), phiName(input.phiName)
+	, timeName(input.timeName), cosThetaName(input.cosThetaName), cosPsiName(input.cosPsiName), phiName(input.phiName)
 
 	, cthetakName(input.cthetakName), cthetalName(input.cthetalName), phihName(input.phihName), tagName(input.tagName)
 
@@ -52,9 +50,9 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) 
 
 	, _numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly)
 
-    , _useCosAndSin(input._useCosAndSin), _useCosDpar(input._useCosDpar), _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
+	, _useCosAndSin(input._useCosAndSin), _useCosDpar(input._useCosDpar), _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
 
-    , _offsetToGammaForBetaFactor( input._offsetToGammaForBetaFactor) 
+	, _offsetToGammaForBetaFactor( input._offsetToGammaForBetaFactor) 
 
 	, allowNegativeAsSq(input.allowNegativeAsSq), _usePlotComponents(input._usePlotComponents), t(input.t), ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr)
 
@@ -112,7 +110,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) 
 
 	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
 
-	, performingComponentProjection( input.performingComponentProjection )
+	, performingComponentProjection( input.performingComponentProjection ), DebugFlag_v5( input.DebugFlag_v5 )
 {
 	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
@@ -189,7 +187,8 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	, _usePunziSigmat(false)
 	, allowNegativeAsSq(false)
 	, _usePlotComponents(false)
-    , _offsetToGammaForBetaFactor()
+	, DebugFlag_v5(true)
+	, _offsetToGammaForBetaFactor()
 	//objects
 	,t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(), tag(),
 	_gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
@@ -219,15 +218,18 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
 	_usePlotComponents = configurator->isTrue( "PlotComponents" ) ;
 	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
+	DebugFlag_v5 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
-    string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
-    if( offsetToGammaForBetaFactor == "" ) {
-        _offsetToGammaForBetaFactor = 0.0 ;
-    }
-    else {
-        _offsetToGammaForBetaFactor = atof( offsetToGammaForBetaFactor.c_str() ) ;
-        cout << "Bs2JpsiPhi_Signal_v5:: Adding OffsetToGammaForBetaFactor = " << _offsetToGammaForBetaFactor << endl ;
-    }
+	string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
+	if( offsetToGammaForBetaFactor == "" )
+	{
+		_offsetToGammaForBetaFactor = 0.0 ;
+	}
+	else
+	{
+		_offsetToGammaForBetaFactor = atof( offsetToGammaForBetaFactor.c_str() ) ;
+		cout << "Bs2JpsiPhi_Signal_v5:: Adding OffsetToGammaForBetaFactor = " << _offsetToGammaForBetaFactor << endl ;
+	}
     
 	//...............................................
 	// Configure to use angular acceptance machinery
@@ -763,15 +765,18 @@ double Bs2JpsiPhi_Signal_v5::Evaluate(DataPoint * measurement)
 
 	if( !performingComponentProjection )
 	{
-		//conditions to throw exception
-		bool c1 = isnan(returnValue) ;
-		bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
-		bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;
-		if( DEBUGFLAG && (c1 || c2 || c3)  )
+		if( DebugFlag_v5 )
 		{
-			this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Evaluate() returns <=0 or nan :" , returnValue ) ;
-			if( isnan(returnValue) ) throw 10 ;
-			if( returnValue <= 0. ) throw 10 ;
+        	        //conditions to throw exception
+        	        bool c1 = isnan(returnValue);
+        	        bool c2 = (resolutionScale> 0.) && (returnValue <= 0.);
+        	        bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.);
+			if( c1 || c2 || c3 )
+			{
+				this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Evaluate() returns <=0 or nan :" , returnValue ) ;
+				if( isnan(returnValue) ) throw 10 ;
+				if( returnValue <= 0. ) throw 10 ;
+			}
 		}
 	}
 
@@ -836,14 +841,18 @@ double Bs2JpsiPhi_Signal_v5::EvaluateTimeOnly(DataPoint * measurement)
 	}
 
 
-	//conditions to throw exception
-	bool c1 = isnan(returnValue) ;
-	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
-	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;
-	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
-		this->DebugPrint( " Bs2JpsiPhi_Signal_v5::EvaluateTimeOnly() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw 10 ;
-		if( returnValue <= 0. ) throw 10 ;
+	if( DebugFlag_v5 )
+	{
+        	//conditions to throw exception
+		bool c1 = isnan(returnValue) ;
+		bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
+		bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;
+		if( (c1 || c2 || c3)  )
+		{
+			this->DebugPrint( " Bs2JpsiPhi_Signal_v5::EvaluateTimeOnly() returns <=0 or nan :" , returnValue ) ;
+			if( isnan(returnValue) ) throw 10 ;
+			if( returnValue <= 0. ) throw 10 ;
+		}
 	}
 
 
@@ -952,14 +961,17 @@ double Bs2JpsiPhi_Signal_v5::Normalisation(DataPoint * measurement, PhaseSpaceBo
 
 	if( !performingComponentProjection )
 	{
-		// Conditions to throw exception
-		bool c1 = isnan(returnValue);
-		bool c2 = (returnValue <= 0.);
-		if( DEBUGFLAG && (c1 || c2 ) )
+		if( DebugFlag_v5 )
 		{
-			this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Normalisation() returns <=0 or nan :" , returnValue ) ;
-			if( isnan(returnValue) ) throw 10 ;
-			if( returnValue <= 0. ) throw 10 ;
+			// Conditions to throw exception
+			bool c1 = isnan(returnValue);
+			bool c2 = (returnValue <= 0.);
+			if( c1 || c2 )
+			{
+				this->DebugPrint( " Bs2JpsiPhi_Signal_v5::Normalisation() returns <=0 or nan :" , returnValue ) ;
+				if( isnan(returnValue) ) throw 10 ;
+				if( returnValue <= 0. ) throw 10 ;
+			}
 		}
 	}
 
@@ -1029,8 +1041,14 @@ vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 {
 	vector<string> this_component_list;
 	if( _usePlotComponents ) {
-		this_component_list.push_back( "CP-Even" );
-		this_component_list.push_back( "CP-Odd" );
+		if( allParameters.GetPhysicsParameter(Azero_sqName)->GetValue() > 1E-10 )
+		{
+			this_component_list.push_back( "CP-Even" );
+		}
+		if( allParameters.GetPhysicsParameter(Aperp_sqName)->GetValue() > 1E-10 )
+		{
+			this_component_list.push_back( "CP-Odd" );
+		}
 		if( allParameters.GetPhysicsParameter(As_sqName)->GetValue() > 1E-10 )
 		{
 			this_component_list.push_back( "As" );
@@ -1146,7 +1164,13 @@ double Bs2JpsiPhi_Signal_v5::diffXsec()
 
 	Observable* timeObs = _datapoint->GetObservable( timeName );
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
-	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsec( ) : return value < 0 = ", xsec ) ;
+	if( DebugFlag_v5 )
+	{
+		if( xsec < 0)
+		{
+			this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsec( ) : return value < 0 = ", xsec );
+		}
+	}
 
 	return xsec;
 }
@@ -1181,7 +1205,13 @@ double Bs2JpsiPhi_Signal_v5::diffXsecTimeOnly()
 	Observable* timeObs = _datapoint->GetObservable( timeName );
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
 
-	if( DEBUGFLAG && (xsec < 0) ) this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsecTimeOnly( ) : return value < 0 = ", xsec );
+	if( DebugFlag_v5 )
+	{
+		if( xsec < 0 )
+		{
+			this->DebugPrintXsec( " Bs2JpsiPhi_Signal_v5_v1::diffXsecTimeOnly( ) : return value < 0 = ", xsec );
+		}
+	}
 
 	return xsec;
 }
@@ -1216,8 +1246,13 @@ double Bs2JpsiPhi_Signal_v5::diffXsecNorm1()
 		ASint()*AT() * timeFactorImASATInt(  ) * angAccI9 +
 		ASint()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
 
-	if( DEBUGFLAG && (norm < 0) ) this->DebugPrintNorm( " Bs2JpsiPhi_Signal_v5_v1::diffXsecNorm1( ) : return value < 0 = ", norm );
-
+	if( DebugFlag_v5 )
+	{
+		if( norm < 0 )
+		{
+			this->DebugPrintNorm( " Bs2JpsiPhi_Signal_v5_v1::diffXsecNorm1( ) : return value < 0 = ", norm );
+		}
+	}
 	return norm ;
 }
 

@@ -97,10 +97,14 @@ IntegratorFunction::~IntegratorFunction()
 IntegratorFunction::IntegratorFunction ( const IntegratorFunction& input ) :
 	IBaseFunctionMultiDim( input ), IBaseFunctionOneDim( input ), TFoamIntegrand( input ),
 	wrappedFunction( ClassLookUp::CopyPDF( input.wrappedFunction ) ), currentPoint( new DataPoint(*input.currentPoint) ), doIntegrate( input.doIntegrate ), dontIntegrate( input.dontIntegrate ),
-	minima( input.minima ), ranges( input.ranges ), cache_positions( input.cache_positions ), componentIndex( input.componentIndex==NULL?NULL:(new ComponentRef(*input.componentIndex)) ),
+	minima( input.minima ), ranges( input.ranges ), cache_positions( input.cache_positions ), componentIndex( NULL ),
 	newDataPoint( new DataPoint(*input.newDataPoint) ), cache_lookup( input.cache_lookup ), lower_limit( input.lower_limit ), upper_limit( input.upper_limit ), generateFunc( input.generateFunc ),
 	integrateFunc( input.integrateFunc ), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *input.myPhaseSpaceBoundary ) ), debug( (input.debug==NULL)?NULL:new DebugClass(*input.debug) )
 {
+	if( input.componentIndex != NULL )
+	{
+		componentIndex = new ComponentRef( *(input.componentIndex) );
+	}
 }
 
 //Return the IPDF inside the wrapper
@@ -143,20 +147,25 @@ IntegratorFunction& IntegratorFunction::operator=( const IntegratorFunction & Ne
 {
 	if( &NewFunction != this )
 	{
+		if( this->wrappedFunction != NULL ) delete this->wrappedFunction;
 		this->wrappedFunction = ClassLookUp::CopyPDF( NewFunction.wrappedFunction );
+		if( this->currentPoint != NULL ) delete this->currentPoint;
 		this->currentPoint = new DataPoint( *NewFunction.currentPoint );
 		this->doIntegrate = NewFunction.doIntegrate;
 		this->dontIntegrate = NewFunction.dontIntegrate;
 		this->minima = NewFunction.minima;
 		this->ranges = NewFunction.ranges;
 		this->cache_positions = NewFunction.cache_positions;
+		if( this->componentIndex != NULL ) delete this->componentIndex;
 		this->componentIndex = NewFunction.componentIndex==NULL ? NULL : (new ComponentRef(*NewFunction.componentIndex));
+		if( this->newDataPoint != NULL ) delete this->newDataPoint;
 		this->newDataPoint = new DataPoint( *NewFunction.newDataPoint );
 		this->cache_lookup = NewFunction.cache_lookup;
 		this->lower_limit = NewFunction.lower_limit;
 		this->upper_limit = NewFunction.upper_limit;
 		this->generateFunc = NewFunction.generateFunc;
 		this->integrateFunc = NewFunction.integrateFunc;
+		if( this->myPhaseSpaceBoundary != NULL ) delete this->myPhaseSpaceBoundary;
 		this->myPhaseSpaceBoundary = new PhaseSpaceBoundary( *NewFunction.myPhaseSpaceBoundary );
 	}
 	return *(this);
@@ -196,6 +205,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		}
 		newDataPoint->SetObservable( doIntegrate[observableIndex], (double)x[observableIndex], " ", true, (int)true_index );
 		newDataPoint->GetObservable( true_index )->SetBinNumber(-1);
+		newDataPoint->GetObservable( true_index )->SetBkgBinNumber(-1);
 	}
 
 	//	Fixed values, no need to set them equal to themselves
@@ -205,6 +215,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		true_index = (unsigned)cache_lookup[observableIndex + (unsigned)doIntegrate.size()];
 		Observable* currentObservable = currentPoint->GetObservable( true_index );
 		currentObservable->SetBinNumber(-1);
+		currentObservable->SetBkgBinNumber(-1);
 		newDataPoint->SetObservable( dontIntegrate[observableIndex], currentObservable->GetValue(), " ", true, (int)true_index );
 	}
 

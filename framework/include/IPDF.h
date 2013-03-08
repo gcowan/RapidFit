@@ -397,10 +397,23 @@ extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
  */
 
 #define PDF_THREAD_LOCK\
-	if( this->DebugMutex() != NULL ) pthread_mutex_lock( this->DebugMutex() );\
+	bool hasOwnership=false;\
+	if( this->DebugMutex() != NULL )\
+	{\
+		if( pthread_mutex_trylock( this->DebugMutex() ) == 0 )\
+		{\
+			hasOwnership=true;\
+			pthread_mutex_lock( this->DebugMutex() );\
+		}\
+		else\
+		{\
+			cout << "not locking thread..." << endl;\
+		}\
+	}\
+
 
 #define PDF_THREAD_UNLOCK\
-	if( this->DebugMutex() != NULL ) pthread_mutex_unlock( this->DebugMutex() );
+	if( this->DebugMutex() != NULL && hasOwnership ) pthread_mutex_unlock( this->DebugMutex() );
 
 #endif
 

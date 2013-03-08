@@ -422,7 +422,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	//unsigned int npoint = 100000;
 	vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
 
-	gsl_qrng * q = gsl_qrng_alloc (gsl_qrng_sobol, int(doIntegrate.size()));
+	gsl_qrng * q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)(doIntegrate.size()) );
 	for (unsigned int i = 0; i < npoint; i++)
 	{
 		double v[doIntegrate.size()];
@@ -477,7 +477,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 
 
 double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, unsigned int num_threads, unsigned int GSLFixedPoints )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, unsigned int num_threads, unsigned int GSLFixedPoints, DebugClass* debug )
 {
 #ifdef __RAPIDFIT_USE_GSL
 
@@ -486,6 +486,14 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	//Make arrays of the observable ranges to integrate over
 	double* minima = new double[ doIntegrate.size() ];
 	double* maxima = new double[ doIntegrate.size() ];
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
+			cout << "RapidFitIntegrator: Starting to use GSL PseudoRandomNumberThreaded :D" << endl;
+		}
+	}
 
 	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 	{
@@ -504,6 +512,14 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		minima[observableIndex] = (double)newConstraint->GetMinimum();
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}
+
+        if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+                {
+                        cout << "RapidFitIntegrator: Doing GSL stuff..." << endl;
+                }
+        }
 
 	unsigned int npoint = GSLFixedPoints;
 	vector<double> * integrationPoints = new vector<double>[doIntegrate.size()];
@@ -543,6 +559,14 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	//cout << "Freed GSL Integration Tool" << endl;
 	//pthread_mutex_unlock( &gsl_mutex );
 
+        if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+                {
+                        cout << "RapidFitIntegrator: Finished GSL stuff..." << endl;
+                }
+        }
+
 	vector<double> minima_v, maxima_v;
 	for( unsigned int i=0; i< doIntegrate.size(); ++i )
 	{
@@ -574,10 +598,10 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	//	Construct Integrator Functions (1 per theread)
 	vector<IntegratorFunction*> evalFunctions;
 	for( unsigned int i=0; i< num_threads; ++i ) evalFunctions.push_back( new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate,
-										dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v ) );
+				dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v ) );
 
 	//	Split Points to evaluate between threads
-	vector<vector<double*> > eval_perThread = Threading::divideDataNormalise( doEval_points, num_threads );
+	vector<vector<double*> > eval_perThread = Threading::divideDataNormalise( doEval_points, (unsigned)num_threads );
 
 	//	Construct 'structs' to be passed to each thread
 	Normalise_Thread* fit_thread_data = new Normalise_Thread[ num_threads ];
@@ -843,7 +867,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 						}
 					}
 					//numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, GSLFixedPoints );
-					numericalIntegral += this->PseudoRandomNumberIntegralThreaded( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, num_threads, GSLFixedPoints );
+					numericalIntegral += this->PseudoRandomNumberIntegralThreaded( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, num_threads, GSLFixedPoints, debug );
 					if( debug != NULL )
 					{
 						if( debug->DebugThisClass( "RapidFitIntegrator" ) )

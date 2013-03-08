@@ -51,7 +51,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	pdfIntegrator( new RapidFitIntegrator( *(NewPDF->GetPDFIntegrator()) ) ), weightsWereUsed(false), weight_norm(1.),
 	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ),
-	logY( (config!=NULL)?config->logY:false ), this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ),
+	logY( (config!=NULL)?config->logY:false ), logX( (config!=NULL)?config->logX:false ), this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ),
 	onlyZero( (config!=NULL)?config->OnlyZero:false ), combination_integral(vector<double>()), ratioOfIntegrals(1,1.), wanted_weights(), format(),
 	data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(), total_components(),
 	chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num)
@@ -74,7 +74,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	if( pdfIntegrator->GetUseGSLIntegrator() ) cout << "Using GSL for projections" << endl;
 
 	RapidFitIntegratorConfig* projectionIntegratorConfig = NULL;
-	
+
 	if( config != NULL ) projectionIntegratorConfig = config->integratorConfig;
 
 	if( projectionIntegratorConfig != NULL )
@@ -116,10 +116,30 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		allCombinations.push_back( new DataPoint( *(allCombinations_input[i]) ) );
 	}
 
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "ComponentPlotter" ) )
+		{
+			cout << "ComponentPlotter:: Setting up Combination Descriptions based on XML" << endl;
+		}
+	}
+
 	this->SetupCombinationDescriptions();
+
+	if( config != NULL )
+	{
+		if( !config->combination_names.empty() ) combinationDescriptions = config->combination_names;
+	}
 
 	for( unsigned int i=0; i< allCombinations.size(); ++i )
 	{
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "ComponentPlotter" ) )
+			{
+				cout << "ComponentPlotter:: Calculating Test integrals:\t" << i << endl;
+			}
+		}
 		pdfIntegrator->ForceTestStatus( false );
 		allCombinations[i]->SetPhaseSpaceBoundary( full_boundary );
 		double thisIntegral = 0.;
@@ -133,6 +153,13 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			thisIntegral = 1.;
 			cout << endl << "CANNOT PROPERLY NORMALISE WHOLE PDF, THIS WILL LEAD TO NORMALISATION ISSUES OVER THE WHOLE PDF" << endl << endl;
 		}
+                if( debug != NULL )
+                {
+                        if( debug->DebugThisClass( "ComponentPlotter" ) )
+                        {
+				cout << "ComponentPlotter:: Finished Inetgral" << endl;
+			}
+		}
 
 		combination_integral.push_back( thisIntegral );
 
@@ -144,6 +171,17 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		}
 	}
 
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "ComponentPlotter" ) )
+		{
+			cout << "ComponentPlotter:: Calculated the ratio of Integrals (analytic/numeric) to be:" << endl;
+			for( unsigned int i=0; i< ratioOfIntegrals.size(); ++i )
+			{
+				cout << ratioOfIntegrals[i] << endl;
+			}
+		}
+	}
 	if( ratioOfIntegrals.size() == 0 || ratioOfIntegrals.empty() ) ratioOfIntegrals =vector<double> ( 1, 1. );
 
 	vector<double> minimum, maximum;
@@ -167,7 +205,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			pdfComponents = StringProcessing::MoveElementToStart( pdfComponents, "0" );
 			for( unsigned int i=0; i< pdfComponents.size(); ++i )
 			{
-				ComponentRef* thisRef = new ComponentRef( pdfComponents[i] );
+				ComponentRef* thisRef = new ComponentRef( pdfComponents[i], observableName );
 				if( pdfComponents[i] != "0" ) config->component_names.push_back( plotPDF->GetComponentName( thisRef ) );
 				delete thisRef;
 			}
@@ -457,13 +495,13 @@ void ComponentPlotter::GenerateProjectionData()
 
 	for( unsigned int i=0; i< Y_values->size(); ++i )
 	{
-                for( unsigned int j=0; j< (*Y_values)[i]->size(); ++j )
-                {
-                        delete (*(*Y_values)[i])[j];
-                }
-                delete (*Y_values)[i];
-        }
-        delete Y_values;
+		for( unsigned int j=0; j< (*Y_values)[i]->size(); ++j )
+		{
+			delete (*(*Y_values)[i])[j];
+		}
+		delete (*Y_values)[i];
+	}
+	delete Y_values;
 
 	return;
 }
@@ -725,11 +763,11 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		{
 			desc = "All_Data";
 			/*
-			for( vector<string>::iterator desc_i = CombinationDescriptions.begin(); desc_i != CombinationDescriptions.end(); ++desc_i )
-			{
-				desc.append( *desc_i );
-			}
-			*/
+			   for( vector<string>::iterator desc_i = CombinationDescriptions.begin(); desc_i != CombinationDescriptions.end(); ++desc_i )
+			   {
+			   desc.append( *desc_i );
+			   }
+			   */
 		}
 
 		TString PDFDesc;PDFDesc+=PDFNum;
@@ -739,6 +777,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		//	For the moment haven't decided if I should pass the global config to ALL sub plots, I shall get user input on this
 		CompPlotter_config* temp = new CompPlotter_config( *this_config );
 		temp->logY = logY;
+		temp->logX = logX;
 
 		//	Static function so has to be told everything about what you want to plot!
 		this->OutputPlot( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), plotPDF->GetRandomFunction(), temp, debug );
@@ -841,6 +880,57 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		delete temp;
 	}
 
+	//	If there is more than 1 combination it's useful to plot the total's on the same graph with total component 0
+	if( this->GetComponents().size() > 1 )
+	{
+		vector<TGraph*> allZerothComponents;
+		vector<vector<TGraph*> > allGraphs = this->GetComponents();
+		for( unsigned int i=0; i< allGraphs.size(); ++i )
+		{
+			allZerothComponents.push_back( allGraphs[i][0] );
+		}
+
+		string desc("_All_Combinations");
+		TString PDFDesc;PDFDesc+=PDFNum;
+		desc.append("_PDF_"); desc.append(PDFDesc.Data());
+
+		vector<string> combDescs;
+		if( this_config->combination_names.empty() )
+		{
+			combDescs.push_back( "Total");
+			for( unsigned int i=0; i< combinationDescriptions.size(); ++i )
+			{
+				combDescs.push_back( combinationDescriptions[i] );
+			}
+		}
+
+		CompPlotter_config* temp = new CompPlotter_config( *this_config );
+
+		vector<int> colorVec;
+
+		for( unsigned int i=0; i< combinationDescriptions.size(); ++i )
+		{
+			colorVec.push_back( (int)(i+2) );
+		}
+
+		if( temp->color_key.empty() )
+		{
+			temp->color_key = colorVec;
+		}
+
+		if( temp->combination_names.empty() )	temp->component_names = combDescs;
+		else temp->component_names = temp->combination_names;
+
+		ComponentPlotter::OutputPlot( binned_data[0], allZerothComponents, observableName, desc, plotData->GetBoundary(), plotPDF->GetRandomFunction(), temp, debug );
+
+		if( !allPullData.empty() )
+		{
+			desc.append("_wPulls");
+			ComponentPlotter::OutputPlot( binned_data[0], allZerothComponents, observableName, desc, plotData->GetBoundary(), plotPDF->GetRandomFunction(), temp, debug, allPullData );
+		}
+
+		delete temp;
+	}
 
 }
 
@@ -997,6 +1087,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	replace( TCanvasCleanName.begin(), TCanvasCleanName.end(), '.', '_' );
 
 	bool logy=false;
+	bool logx=false;
 
 	TCanvas* c1 = new TCanvas( TCanvasCleanName.c_str(), "", 1680, 1050 );
 
@@ -1007,6 +1098,11 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 			logy=true;
 			c1->SetLogy( true );
 			//c1->Update();
+		}
+		if( conf->logX )
+		{
+			logx=true;
+			c1->SetLogx( true );
 		}
 	}
 
@@ -1056,6 +1152,19 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 			}
 			//c1->Update();
 		}
+		if( conf->logX )
+		{
+			logx=true;
+			if( !input_bin_theory_data.empty() )
+			{
+				pad1->SetLogx( true );
+				pad2->SetLogx( true );
+			}
+			else
+			{
+				c1->SetLogx( true );
+			}
+		}
 		plotTitle = conf->PlotTitle;
 		Style_Key = conf->style_key;
 		Color_Key = conf->color_key;
@@ -1085,10 +1194,16 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( !input_bin_theory_data.empty() )
 	{
 		if( logy ) pad1->SetLogy( true );
+		if( logx )
+		{
+			pad1->SetLogx( true );
+			pad2->SetLogx( true );
+		}
 	}
 	else
 	{
 		if( logy ) c1->SetLogy( true );
+		if( logx ) c1->SetLogx( true );
 	}
 	c1->Update();
 	TString Y_ext(" / ( ");
@@ -1132,10 +1247,16 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		pad1->Update();
 
 		if( logy ) pad1->SetLogy( true );
+		if( logx )
+		{
+			pad1->SetLogx( true );
+			pad2->SetLogx( true );
+		}
 	}
 	else
 	{
 		if( logy ) c1->SetLogy( true );
+		if( logx ) c1->SetLogx( true );
 	}
 
 	c1->Update();
@@ -1252,10 +1373,16 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( !input_bin_theory_data.empty() )
 	{
 		if( logy ) pad1->SetLogy( true );
+		if( logx )
+		{
+			pad1->SetLogx( true );
+			pad2->SetLogx( true );
+		}
 	}
 	else
 	{
 		if( logy ) c1->SetLogy( true );
+		if( logx ) c1->SetLogx( true );
 	}
 
 	c1->Update();
@@ -1496,7 +1623,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	cout << ObservableName << ": " << Minimum << " <-> " << Minimum + ( PlotInterval * (PlotNumber-1) ) << endl;
 
 	//	This class object has been created to speed up the communication between this class and the basePDF as it may pass through several PDF wrappers
-	ComponentRef comp_obj = ComponentRef( component );
+	ComponentRef* comp_obj = new ComponentRef( component, ObservableName );
 
 	string unit = InputPoint->GetObservable( string(ObservableName) )->GetUnit();
 
@@ -1529,7 +1656,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		}
 
 		//	perform actual evaluation of the PDF with the configuration in the InputPoint, in the whole boundary with the given name and for selected component
-		integralvalue = pdfIntegrator->ProjectObservable( thisPoint, full_boundary, ObservableName, &comp_obj );
+		integralvalue = pdfIntegrator->ProjectObservable( thisPoint, full_boundary, ObservableName, comp_obj );
 
 		if( debug != NULL )
 		{
@@ -1559,6 +1686,8 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	this->Sanity_Check( pointValues, component );
 
 	cout << "Returning pointValues" << endl;
+
+	delete comp_obj;
 
 	return pointValues;
 }
@@ -1614,7 +1743,7 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 	weightName = input;
 
 	double alpha=1.;
-	
+
 	if( fabs(plotData->GetAlpha()-1.)<1E-6 )
 	{
 		alpha = plotData->GetSumWeights()/plotData->GetSumWeightsSq();
@@ -1674,7 +1803,7 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 	double integral_value=0.;
 
-	ComponentRef* comp_obj = new ComponentRef( "0" );
+	ComponentRef* comp_obj = new ComponentRef( "0", observableName );
 
 	unsigned int comb_num=0;
 
@@ -1695,6 +1824,8 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 		delete InputPoint;
 	}
+
+	delete comp_obj;
 
 	cout << "Value At: " << left << setw(5) << setprecision(3) << x[0] << "\tis:\t" << setprecision(4) << integral_value << setw(20) << " " <<  "\r" << flush;
 
@@ -1888,7 +2019,7 @@ void ComponentPlotter::WriteData( TGraphErrors* Total_BinnedData, vector<TGraph*
 {
 	TTree* outputTree = new TTree( destination, destination );
 
-	unsigned int points = Total_BinnedData->GetN();
+	unsigned int points = (unsigned)Total_BinnedData->GetN();
 
 	vector<double> X_val;
 	vector<double> X_err;
@@ -1911,7 +2042,7 @@ void ComponentPlotter::WriteData( TGraphErrors* Total_BinnedData, vector<TGraph*
 	{
 		vector<double> this_X_val;
 		vector<double> this_Y_val;
-		unsigned int this_points=Total_Components[i]->GetN();
+		unsigned int this_points = (unsigned)Total_Components[i]->GetN();
 		for( unsigned int j=0; j< this_points; ++j )
 		{
 			this_X_val.push_back( Total_Components[i]->GetX()[j] );

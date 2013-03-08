@@ -26,7 +26,6 @@
 #include "TCanvas.h"
 
 #define DOUBLE_TOLERANCE 1E-6
-#define DEBUGFLAG true
 
 using namespace::std;
 
@@ -76,6 +75,8 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 		int timeBinNum;
 
 		DataPoint* _datapoint;
+
+		bool DebugFlag_v5;
 
 	protected:
 		//Calculate the PDF normalisation
@@ -542,19 +543,23 @@ class Bs2JpsiPhi_Signal_v5 : public BasePDF
 				       );
 
 			//DEBUG
-			if( DEBUGFLAG && (result < 0) ) {
-				PDF_THREAD_LOCK
-				cout << " Bs2JpsiPhi_Signal_v5::timeFactorEven() : result < 0 " << endl ;
-				cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
-				cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
-				cout << " ->term3 " << q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) << endl ;
-				cout << "   -->sin(phis) "  << sinphis() << endl ;
-				cout << "   -->expSin    "  << expSin() << endl ;
-				cout << "   -->tagFrac   "  << mistag() << endl ;
-				cout << "   -->delta_ms  "  << delta_ms << endl ;
-				PDF_THREAD_UNLOCK
+			if( DebugFlag_v5 )
+			{
+				if( result < 0 )
+				{
+					PDF_THREAD_LOCK
+					cout << " Bs2JpsiPhi_Signal_v5::timeFactorEven() : result < 0 " << endl ;
+					cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
+					cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
+					cout << " ->term3 " << q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) << endl ;
+					cout << "   -->sin(phis) "  << sinphis() << endl ;
+					cout << "   -->expSin    "  << expSin() << endl ;
+					cout << "   -->tagFrac   "  << mistag() << endl ;
+					cout << "   -->delta_ms  "  << delta_ms << endl ;
+					PDF_THREAD_UNLOCK
+				}
 			}
-			return result ;
+			return result;
 		}
 
 		inline double timeFactorEvenInt()  const

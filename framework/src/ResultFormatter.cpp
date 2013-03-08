@@ -923,7 +923,7 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 		vector<int> ParameterScanStatus, ParameterFixedStatus;
 		for( unsigned int resultNum=0; resultNum< (unsigned)ToyResult->NumberResults(); ++resultNum )
 		{
-			ResultParameter* thisParam = ToyResult->GetFitResult( resultNum )->GetResultParameterSet()->GetResultParameter( thisParamName );
+			ResultParameter* thisParam = ToyResult->GetFitResult( (unsigned)resultNum )->GetResultParameterSet()->GetResultParameter( thisParamName );
 
 			ParameterValues.push_back( thisParam->GetValue() );
 			ParameterErrors.push_back( thisParam->GetError() );
@@ -989,8 +989,8 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 	vector<double> NLL_Values, RealTimes, CPUTimes;
 	for( unsigned int i=0; i< (unsigned) ToyResult->NumberResults(); ++i )
 	{
-		fitStatus.push_back( ToyResult->GetFitResult( i )->GetFitStatus() );
-		NLL_Values.push_back(  ToyResult->GetFitResult( i )->GetMinimumValue() );
+		fitStatus.push_back( ToyResult->GetFitResult( (int)i )->GetFitStatus() );
+		NLL_Values.push_back(  ToyResult->GetFitResult( (int)i )->GetMinimumValue() );
 	}
 
 	ResultFormatter::AddBranch( outputTree, "Fit_Status", fitStatus );

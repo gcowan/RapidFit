@@ -535,6 +535,10 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			returnable_config->logY = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
+		else if( projComps[childIndex]->GetName() == "LogX" )
+		{
+			returnable_config->logX = XMLTag::GetBooleanValue( projComps[childIndex] );
+		}
 		else if( projComps[childIndex]->GetName() == "Name" )
 		{
 			returnable_config->observableName = XMLTag::GetStringValue( projComps[childIndex] );
@@ -590,6 +594,14 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 
 			if( returnable_config->component_names.empty() )
 				returnable_config->component_names.push_back( XMLTag::GetStringValue( projComps[childIndex] ) );
+		}
+		else if( projComps[childIndex]->GetName() == "CombinationNames" )
+		{
+			returnable_config->combination_names = StringProcessing::SplitString(
+					XMLTag::GetStringValue( projComps[childIndex] ), ':' );
+
+			if( returnable_config->combination_names.empty() )
+				returnable_config->combination_names.push_back( XMLTag::GetStringValue( projComps[childIndex] ) );
 		}
 		else if( projComps[childIndex]->GetName() == "Xmax" )
 		{
@@ -815,7 +827,6 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		string Strategy;
 		int Threads = -1;
 		bool integratorTest = true;
-		bool gslIntegrator = false;
 		bool NormaliseWeights = false;
 		bool SingleNormaliseWeights = false;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
@@ -840,7 +851,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 				}
 				else if ( functionInfo[childIndex]->GetName() == "FixedIntegrationPoints" )
 				{
-					thisConfig->FixedIntegrationPoints = XMLTag::GetIntegerValue( functionInfo[childIndex] );
+					thisConfig->FixedIntegrationPoints = (unsigned)XMLTag::GetIntegerValue( functionInfo[childIndex] );
 				}
 				else if ( functionInfo[childIndex]->GetName() == "WeightName" )
 				{

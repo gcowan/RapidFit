@@ -1,5 +1,34 @@
 // $Id: release.notes $
 
+2013/03/08 Rob Currie
+    (This mainly consists of fixes I needed to implement to make pretty plots for the thesis and comprises about a month of minor bugfixes I have in my private branch)
+  - Added ability to project with LogX using <LogX> XMLtag (this will scale pull plots to match data in X axis only)
+  - Added const to SlicedAcceptance code
+  - Added const and knowledge of Projection Observable Name to ComponentRef
+    (This will beome important in future, I'd just never considered a use case until phiphi)
+  - Improved readability of ParameterSet operator== method
+    (doesn't appear to impact performance but is now a lot easier to understand)
+  - Added missing All Combinations overlay plot from ComponentPlotter
+  - Added additional All PDFs overlay plot in OutputConfiguration which plots the output from all ComponentPlotter instances
+  - Added debug statements to code
+  - Added a check in TFoam to make sure PhaseSpace is compatible with PDF before wasting time initializing the function
+  - Added ability to configure Combination name strings from XML <CombinationNames>
+  - Fixed mem-leak in Interface class to ROOT
+    (This didn't appear serious but is better safe than sorry)
+  - Added UseSteppedProjection to the Exponential class. This allows Projections to plot the average occupancy per acceptance slice (if the acceptance histo is sorted)
+    This has to be turned on but is useful as it allows for projections showing that the acceptance function well matches in data rather than being sliced exponential functions in each bin
+    (This was prompted after the work was done for phiphi after a question from a referee about time acceptance function)
+  - Added helper functions to SlicedAcceptance to avoid people re-inventing the wheel too much if they look to implement something like UseSteppedProjection in their PDF
+    (these include a slightly more optimal improvement to the SlicedAcceptance codebase with break/continue lookups which should add a speed factor to people with this bottleneck)
+  - Fixed a few compiler warnings so some code shows explicit casting of objects
+  - Fixed a bug in PDF_THREAD_LOCK... your code will now fail to compile if you mis-use this rather than running and then simply hanging forever
+  - Changed v5 to NOT use hard-coded DEBUGFLAG object... (Debugging is left ON by default) We can now turn off the debugging at runtime which is VERY useful as it silences the PDF during projetions
+    (PDF has been benchmarked against 1fb paper and no result has changed)
+
+    Will PDF authors PLEASE avoid using '#define' to declare objects it can cause strange problems
+    (If you frequently want to turn on/off a piece of code consider using a ConfigurationParameter in your XML rather than (re)compiling code)
+
+
 2013/02/17 Rob Currie
     (Got bored Friday evening so made some improvements to the existing codebase...)
   - Added changes to Makefile to automatically build in GSL components by default

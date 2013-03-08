@@ -19,7 +19,7 @@ class RapidFitIntegratorConfig
 		RapidFitIntegratorConfig() : 
 			FixedIntegrationPoints( __DEFAULT_RAPIDFIT_FIXEDINTEGRATIONPOINTS ), useGSLIntegrator( __DEFAULT_RAPIDFIT_USEGSL ),
 			MaxIntegrationSteps( __DEFAULT_RAPIDFIT_MAXINTEGRALSTEPS ), IntegrationAbsTolerance( __DEFAULT_RAPIDFIT_INTABSTOL ),
-			IntegrationRelTolerance( __DEFAULT_RAPIDFIT_INTRELTOL ), numThreads( Threading::numCores() )
+			IntegrationRelTolerance( __DEFAULT_RAPIDFIT_INTRELTOL ), numThreads( (unsigned)Threading::numCores() )
 		{
 		}
 

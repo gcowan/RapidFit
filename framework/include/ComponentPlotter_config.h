@@ -31,8 +31,8 @@ class CompPlotter_config
                  * @brief Explicit Constructor containing the hard-coded defaults
                  */
                 CompPlotter_config() :
-                        data_bins(100), PDF_points(128), observableName("undefined"), logY(false), color_key(), style_key(), width_key(), component_names(), PlotTitle(""),
-                        xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false), ScaleNumerical(true),
+                        data_bins(100), PDF_points(128), observableName("undefined"), logY(false), logX(false), color_key(), style_key(), width_key(), component_names(), PlotTitle(""),
+                        xmin(-999), xmax(-999), ymin(-999), ymax(-999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-999), OnlyZero(false), ScaleNumerical(true), combination_names(),
 			DrawPull(false), LegendTextSize(0.05), addLHCb(false), TopRightLegend(true), TopLeftLegend(false), BottomRightLegend(false), BottomLeftLegend(false),
 			useLegend(true), LimitPulls(false), useSpline(true), addRightLHCb(false), integratorConfig(new RapidFitIntegratorConfig())
 		{}
@@ -43,12 +43,12 @@ class CompPlotter_config
 		}
 
 		CompPlotter_config( const CompPlotter_config& input ) :
-			data_bins(input.data_bins), PDF_points(input.PDF_points), observableName(input.observableName), logY(input.logY), color_key(input.color_key),
+			data_bins(input.data_bins), PDF_points(input.PDF_points), observableName(input.observableName), logY(input.logY), logX(input.logX), color_key(input.color_key),
 			style_key(input.style_key), width_key(input.width_key), component_names(input.component_names), PlotTitle(input.PlotTitle), xmin(input.xmin), xmax(input.xmax),
 			ymin(input.ymin), ymax(input.ymax), xtitle(input.xtitle), ytitle(input.ytitle), CalcChi2(input.CalcChi2), Chi2Value(input.Chi2Value), OnlyZero(input.OnlyZero),
 			ScaleNumerical(input.ScaleNumerical), DrawPull(input.DrawPull), LegendTextSize(input.LegendTextSize), addLHCb(input.addLHCb), TopRightLegend(input.TopRightLegend),
 			TopLeftLegend(input.TopLeftLegend), BottomRightLegend(input.BottomRightLegend), BottomLeftLegend(input.BottomLeftLegend), useLegend(input.useLegend),
-			LimitPulls(input.LimitPulls), useSpline(input.useSpline), addRightLHCb(input.addRightLHCb), integratorConfig(NULL)
+			LimitPulls(input.LimitPulls), useSpline(input.useSpline), addRightLHCb(input.addRightLHCb), integratorConfig(NULL), combination_names(input.combination_names)
 		{
 			if( input.integratorConfig != NULL ) integratorConfig = new RapidFitIntegratorConfig( *(input.integratorConfig) );
 		}
@@ -57,10 +57,12 @@ class CompPlotter_config
                 int PDF_points;                 /*!     This is the number of points which the PDF should be interrogated for across the whole Observable range                 */
                 string observableName;          /*!     This is the Name of the Observable that is being Projected                                                              */
                 bool logY;                      /*!     This is the boolean governing if the Y axis should be on a log scale                                                    */
+		bool logX;			/*!	This is the boolean governing if the X axis shoulw be on a log scale							*/
                 vector<int> color_key;          /*!     This is a vector of numbers, each number corresponding to the Color_t which is given to the corresponding component     */
                 vector<int> style_key;          /*!     This is a vector of numbers, each number corresponding to the Style_t which is given to the corresponding component     */
                 vector<int> width_key;          /*!     This is a vector of numbers, each number corresponding to the Width_t which is given to the corresponding component     */
                 vector<string> component_names; /*!     This ia a vector of strings which are names passed to the TLegend for all of the Components                             */
+		vector<string> combination_names;/*!	This is a vector of strings which are names passed to a seperate TLegend for the different Combinations			*/
                 double LegendTextSize;		/*!	This chaneges the ROOT text size in the Legend box									*/
                 string PlotTitle;               /*!     This is the Name of the Plot                                                                                            */
                 double xmin, xmax, ymin, ymax;  /*!     These are the ranges that should be plotted on the X and Y axis                                                         */

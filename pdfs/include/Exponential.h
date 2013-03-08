@@ -21,12 +21,14 @@ class Exponential : public BasePDF
 		~Exponential();
 
 		//Calculate the PDF value
-		virtual double Evaluate(DataPoint*);
-		virtual vector<string> GetDoNotIntegrateList();
+		double Evaluate(DataPoint*);
+		vector<string> GetDoNotIntegrateList();
+
+		double EvaluateComponent( DataPoint*, ComponentRef* );
 
 	protected:
 		//Calculate the PDF normalisation
-		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
+		double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
 		Exponential operator = ( const Exponential& );
@@ -87,7 +89,8 @@ class Exponential : public BasePDF
 		bool _numericIntegralForce;
 		bool _useEventResolution;
 		bool _usePunziSigmat;
-        	inline bool useTimeAcceptance() const { return _useTimeAcceptance;}
+		bool _useSteppedProjection;
+		inline bool useTimeAcceptance() const { return _useTimeAcceptance;}
 		inline bool useEventResolution() const {return _useEventResolution;}
 };
 

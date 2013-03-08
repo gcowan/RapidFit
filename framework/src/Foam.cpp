@@ -16,6 +16,7 @@
 #include "StatisticsFunctions.h"
 #include "PhaseSpaceBoundary.h"
 #include "ClassLookUp.h"
+#include "StringProcessing.h"
 //	System Headers
 #include <iostream>
 #include <cmath>
@@ -37,6 +38,33 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :
 	continuousNames_ref(), discreteValues(), minima(), ranges()
 {
 	rootRandom = InputPDF->GetRandomFunction();
+
+	vector<string> constrainedObs = NewBoundary->GetAllNames();
+	vector<string> wantedObs = NewPDF->GetPrototypeDataPoint();
+
+	vector<string> misssingObsConstraints;
+
+	for( unsigned int i=0; i< wantedObs.size(); ++i )
+	{
+		string wantedObservable = wantedObs[i];
+		if( StringProcessing::VectorContains( &constrainedObs, &(wantedObs[i]) ) == -1 )
+		{
+			misssingObsConstraints.push_back( wantedObs[i] );
+		}
+	}
+
+	if( !misssingObsConstraints.empty() )
+	{
+		cerr << "FOAM ERROR!!" << endl;
+		cerr << "You need to add constraints to your Phase-Space for:" << endl;
+		for( unsigned int i=0; i< misssingObsConstraints.size(); ++i )
+		{
+			cerr << misssingObsConstraints[i] << endl;
+		}
+		cerr << "Can't recover. Please Fix your XML!" << endl << "Exiting!" << endl;
+		cerr << endl;
+		exit(0);
+	}
 
 	//Retrieve all combinations of discrete variables
 	allNames = generationBoundary->GetAllNames();

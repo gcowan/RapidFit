@@ -23,9 +23,11 @@ class ComponentRef
 		/*!
 		 * @brief Constructor with full name of component
 		 *
-		 * @param Name   This is the full name of the Component
+		 * @param Name	This is the full name of the Component
+		 *
+		 * @param Obs	This is the name of the Observable being projected
 		 */
-		ComponentRef( const string Name );
+		ComponentRef( const string Name, const string Obs );
 
 		/*!
 		 * @brief Destructor
@@ -55,7 +57,7 @@ class ComponentRef
 		 *
 		 * @return Returns the pointer to the CompoentRef internally stored by this object
 		 */
-		ComponentRef* getSubComponent();
+		ComponentRef* getSubComponent() const;
 
 		/*!
 		 * @brief set the component number in this ComponentRef
@@ -71,14 +73,18 @@ class ComponentRef
 		 *
 		 * @return returns the stored result from a previous lookup
 		 */
-		int getComponentNumber();
+		int getComponentNumber() const;
 
 		/*!
 		 * @brief get the name of this ComponenRef
 		 *
 		 * @return returns the name of this component
 		 */
-		string getComponentName();
+		string getComponentName() const;
+
+		string getObservableName() const;
+
+		void setObservableName( const string );
 
 	private:
 		/*!
@@ -93,6 +99,7 @@ class ComponentRef
 
 		int thisIndex;		/*!	The index stored in this ComponentRef from an external lookup	*/
 		string thisName;	/*!	The name of this particluar ComponentRef			*/
+		string obsName;		/*!	The name of the Observable being Projected			*/
 };
 
 #endif
