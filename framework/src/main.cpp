@@ -42,6 +42,7 @@
 #include "RapidFitConfiguration.h"
 #include "ParseCommandLine.h"
 #include "JackKnife.h"
+#include "RapidRun.h"
 ///  System Headers
 #include <string>
 #include <vector>
@@ -744,7 +745,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 	//	If requested write the central value to a single file
 	if( config->BurnToROOTFlag )
 	{
-		string time = +StringProcessing::TimeString();
+		string time = StringProcessing::TimeString();
 		string fileName=string( "Global_Fit_Result_"+time+".root" );
 		cout << "Fit Output is being saved in: " << fileName << endl;
 		cout << endl << "This Contains the fit result in a nTulple output, the runtime and XML used to construct the fit and the final correlation matrix" << endl;
