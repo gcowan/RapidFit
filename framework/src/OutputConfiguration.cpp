@@ -261,6 +261,15 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 {
 	PhysicsBottle* resultBottle = TheResult->GetPhysicsBottle();
 
+	string outputFolderName = ResultFormatter::GetOutputFolder();
+	if( outputFolderName.empty() )
+	{
+		ResultFormatter::initOutputFolder();
+		ResultFormatter::GetOutputFolder();
+	}
+
+	gSystem->cd( outputFolderName.c_str() );
+
 	for( vector<CompPlotter_config*>::iterator projection_i = proj_components.begin(); projection_i != proj_components.end(); ++projection_i )
 	{
 		vector<vector<TGraph*> > all_components_for_all_results;
@@ -465,6 +474,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 	}
 
+	gSystem->cd( ".." );
 }
 
 //Make the requested output from a toy study

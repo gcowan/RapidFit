@@ -212,6 +212,6 @@ RapidFitConfiguration::~RapidFitConfiguration()
 			if( SoloContourResults.back() != NULL ) delete SoloContourResults.back();
 			SoloContourResults.pop_back();
 		}
-
+		ResultFormatter::CleanUp();
 }
 

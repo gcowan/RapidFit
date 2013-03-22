@@ -23,11 +23,11 @@
 #include <pthread.h>
 #include <iomanip>
 
-pthread_mutex_t ROOT_Lock;
+pthread_mutex_t ROOT_Lock = pthread_mutex_t();
 
 using namespace::std;
 
-static bool RooMathinit=false;
+bool RooMathinit=false;
 
 #ifdef __RAPIDFIT_USE_GSL
 
@@ -137,7 +137,7 @@ namespace Mathematics
 
 	// Calculate Re(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
 	double evalCerfRe( double swt, double u, double c)  {
-		RooComplex* z = new RooComplex( swt*c, u+c );
+		RooComplex z( swt*c, u+c );
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
@@ -145,9 +145,6 @@ namespace Mathematics
 			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
 			returnable = GSL_REAL( gsl_erf( gsl_z ) );
 #else
-			//pthread_mutex_lock( &ROOT_Lock );
-			//RooMath* math_object = new RooMath();
-			//RooMath::cacheCERF( false );
 			if( !RooMathinit )
 			{
 				pthread_mutex_lock( &ROOT_Lock );
@@ -156,14 +153,12 @@ namespace Mathematics
 				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 #else
 				//	Should call the init function internally
-				returnable = RooMath::ITPComplexErrFuncRe( *z, 13 )*exp( -u*u );
+				if( !RooMathinit ) returnable = RooMath::ITPComplexErrFuncRe( z, 13 )*exp( -u*u );
 #endif
 				RooMathinit = true;
 				pthread_mutex_unlock( &ROOT_Lock );
 			}
-			returnable = RooMath::ITPComplexErrFuncRe( *z, 13 )*exp( -u*u );
-			//math_object->cleanup();
-			//delete math_object;
+			returnable = RooMath::ITPComplexErrFuncRe( z, 13 )*exp( -u*u );
 			//pthread_mutex_unlock( &ROOT_Lock );
 #endif
 		}
@@ -171,13 +166,12 @@ namespace Mathematics
 		{
 			returnable = evalCerfApprox( swt, u, c ).re();
 		}
-		delete z;
 		return returnable;
 	}
 
 	// Calculate Im(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
 	double evalCerfIm( double swt, double u, double c)  {
-		RooComplex* z = new RooComplex( swt*c, u+c );
+		RooComplex z( swt*c, u+c );
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
@@ -185,9 +179,6 @@ namespace Mathematics
 			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
 			returnable = GSL_IMAG( gsl_erf( gsl_z ) );
 #else
-			//pthread_mutex_lock( &ROOT_Lock );
-			//RooMath* math_object = new RooMath();
-			//RooMath::cacheCERF( false );
 			if( !RooMathinit )
 			{
 				pthread_mutex_lock( &ROOT_Lock );
@@ -196,15 +187,12 @@ namespace Mathematics
 				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 #else
 				//      Should call the init function internally
-				returnable = RooMath::ITPComplexErrFuncIm( *z, 13 )*exp( -u*u );
+				if( !RooMathinit ) returnable = RooMath::ITPComplexErrFuncIm( z, 13 )*exp( -u*u );
 #endif
 				RooMathinit = true;
 				pthread_mutex_unlock( &ROOT_Lock );
 			}
-			//RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
-			returnable = RooMath::ITPComplexErrFuncIm( *z, 13 )*exp( -u*u );
-			//math_object->cleanup();
-			//delete math_object;
+			returnable = RooMath::ITPComplexErrFuncIm( z, 13 )*exp( -u*u );
 			//pthread_mutex_unlock( &ROOT_Lock );
 #endif
 		}
@@ -212,7 +200,6 @@ namespace Mathematics
 		{
 			returnable = evalCerfApprox( swt, u, c ).im();
 		}
-		delete z;
 		return returnable;
 	}
 

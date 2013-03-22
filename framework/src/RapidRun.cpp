@@ -26,9 +26,23 @@ RapidRun::RapidRun( TList* _args ) : args( _args )
 {
 }
 
+bool RapidRun::isGridified()
+{
+	return runningOnGrid;
+}
+
+void RapidRun::setGridification( bool input )
+{
+	runningOnGrid = input;
+}
+
+bool RapidRun::runningOnGrid = false;
+
 int RapidRun::run()
 {
 	cout << "Running Start" << endl;
+
+	RapidRun::setGridification( true );
 
 	vector<string> argv_str;
 	TObjLink *lnk = args->FirstLink();

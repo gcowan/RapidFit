@@ -316,12 +316,41 @@ bool ResultFormatter::IsParameterFree( FitResult * OutputData, string ParameterN
 	return decision;
 }
 
+string* ResultFormatter::thisOutputFolder = new string();
+
+void ResultFormatter::CleanUp()
+{
+	if( ResultFormatter::thisOutputFolder != NULL ) delete ResultFormatter::thisOutputFolder;
+	ResultFormatter::thisOutputFolder = NULL;
+}
+
+string ResultFormatter::GetOutputFolder()
+{
+	return *ResultFormatter::thisOutputFolder;
+}
+
+void ResultFormatter::initOutputFolder()
+{
+	if( ResultFormatter::thisOutputFolder == NULL ) ResultFormatter::thisOutputFolder = new string();
+	if( ResultFormatter::thisOutputFolder->empty() )
+	{
+		TString output_folder("RapidFitOutput_");
+		output_folder.Append( StringProcessing::TimeString() );
+		gSystem->mkdir( output_folder );
+		if( ResultFormatter::thisOutputFolder != NULL ) delete ResultFormatter::thisOutputFolder;
+		ResultFormatter::thisOutputFolder = new string( output_folder.Data() );
+	}
+}
+
 void ResultFormatter::WriteOutputLatex( FitResult* OutputData )
 {
-	TString output_folder("OutputLatex_");
-	output_folder.Append( StringProcessing::TimeString() );
+	TString output_folder;
+	if( thisOutputFolder->empty() )
+	{
+		ResultFormatter::initOutputFolder();
+	}
 
-	gSystem->mkdir( output_folder );
+	output_folder = TString( ResultFormatter::thisOutputFolder->c_str() );
 
 	stringstream latex;
 

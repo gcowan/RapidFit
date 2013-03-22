@@ -108,6 +108,9 @@ namespace Mathematics
 	vector<double> calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
 	void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF );
 
+	static bool RooMathinit;
+
+	static pthread_mutex_t ROOT_Lock;
 }
 
 #endif

@@ -26,6 +26,10 @@ using namespace::std;
 int Threading::numCores()
 {
 	int num_cores = 1;
+
+	//	This method returns true if we are running on the grid on a grid-based submission
+	if( RapidRun::isGridified() ) return num_cores;
+
 #ifndef __NUM_RAPID_THREADS__
 	//	I would __LOVE__ to use ROOT's library check as a way of determining if we're in CINT
 	//	OR even if __CINT__ has been defined....

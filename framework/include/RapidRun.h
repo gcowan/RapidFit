@@ -25,8 +25,13 @@ class RapidRun : public TObject
 		RapidRun( TList* );
 		int run();
 
+		static void setGridification( bool input );
+		static bool isGridified();
+
 	private:
 		std::auto_ptr<TList> args;
+
+		static bool runningOnGrid;
 
 	public:
 		ClassDef( RapidRun, 2 ); //Needed for Cint

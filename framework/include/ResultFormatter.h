@@ -61,6 +61,17 @@ class ResultFormatter
 		static void SeparateParameterPullPlots( string, FitResultVector* );
 
 		static vector<TString> get_branch_names( TTree* );
+
+		static string GetOutputFolder();
+
+		static void initOutputFolder();
+
+		static void CleanUp();
+	private:
+		ResultFormatter();
+		~ResultFormatter();
+
+		static string* thisOutputFolder;
 };
 
 #endif

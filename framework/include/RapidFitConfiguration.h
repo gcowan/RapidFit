@@ -15,6 +15,7 @@
 #include "XMLConfigReader.h"
 #include "MCStudy.h"
 #include "DebugClass.h"
+#include "ResultFormatter.h"
 
 #include <string>
 #include <vector>

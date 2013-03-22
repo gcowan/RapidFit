@@ -22,6 +22,7 @@
 #include "ScanParam.h"
 #include "PDFConfigurator.h"
 #include "RapidFitIntegrator.h"
+#include "RapidRun.h"
 //	System Headers
 #include <fstream>
 #include <iostream>
@@ -693,7 +694,8 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		}
 		else if( projComps[childIndex]->GetName() == "Threads" )
 		{
-			projectionIntegratorConfig->numThreads =  (unsigned)XMLTag::GetIntegerValue( projComps[childIndex] );
+			if( !RapidRun::isGridified() ) projectionIntegratorConfig->numThreads =  (unsigned)XMLTag::GetIntegerValue( projComps[childIndex] );
+			else projectionIntegratorConfig->numThreads = 1;
 		}
 		else if( projComps[childIndex]->GetName() == "FixedIntegrationPoints" )
 		{
@@ -925,7 +927,8 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 			returnable_function->SetAlphaName( alphaName );
 		}
 
-		returnable_function->SetThreads( Threads );
+		if( !RapidRun::isGridified() ) returnable_function->SetThreads( Threads );
+		else returnable_function->SetThreads( 1 );
 		returnable_function->SetNormaliseWeights( NormaliseWeights );
 		returnable_function->SetSingleNormaliseWeights( SingleNormaliseWeights );
 		returnable_function->SetIntegratorTest( integratorTest );

@@ -22,6 +22,7 @@ int main( int argc, char* argv[] )
 	if( argc < 3 || argc > 4 )
 	{
 		cout << "Usage: " << argv[0] << " gammaL.root gammaH.root" << endl << endl;
+		exit(0);
 	}
 
 	//      Setup the Canvas and such

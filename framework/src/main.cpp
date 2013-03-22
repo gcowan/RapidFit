@@ -75,19 +75,20 @@ void RapidFitWelcome()
 	time(&timeNow);
 
 	cout << endl << "RapidFit" << endl;
-	cout << "SVN Rev:\t" << STR(SVN_REV) << endl;
-	string mod="M";
-	size_t found = string( STR(SVN_REV) ).find( mod );
+	cout << "Framework SVN Rev:\t" << STR(SVN_REV) << endl;
+	cout << "PDF SVN REV:\t" << STR(SVN_PDF_REV) << endl;
 
 #ifdef __RAPIDFIT_USE_GSL
-	cout << "Compiled With Optional GSL Components";
+	cout << "Compiled With Optional GSL Components" << endl;
 #endif
 
+	string mod="M";
+	size_t found = string( STR(SVN_REV) ).find( mod );
 	if( found != string::npos )
 	{
-		cout << "!!YOU HAVE LOCAL CODE MODIFICATIONS!!" << endl;
+		cout << endl << "\t\t!!!YOU HAVE LOCAL CODE MODIFICATIONS!!!" << endl << endl;
 	}
-	cout << "Build Info:\t" << STR(BUILD_INFO) << endl;
+	cout << "Build Date:\t" << STR(BUILD_DATE) << endl;
 	cout << "Starting time: " << ctime( &timeNow ) << endl << endl;
 }
 
@@ -722,7 +723,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	cout << "\n\n\t\tFit Output:" <<endl;
 
-	if( config->Force_Continue_Flag || config->OutputLevel >= 0 )
+	if( ( !RapidRun::isGridified() ) && ( config->Force_Continue_Flag || config->OutputLevel >= 0 ) )
 	{
 		//Output results
 		config->makeOutput->SetInputResults( config->GlobalResult->GetResultParameterSet() );
@@ -733,13 +734,18 @@ int PerformMainFit( RapidFitConfiguration* config )
 				config->makeOutput->OutputFitResult( config->GlobalFitResult->GetFitResult(0) );
 			}
 		}
+		string fileName = ResultFormatter::GetOutputFolder();
+		string fileName_ext=string( "Global_Fit_Result_"+StringProcessing::TimeString()+".root" );
+		fileName.append("/"); fileName.append( fileName_ext );
+		ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs );
 		ResultFormatter::ReviewOutput( config->GlobalResult );
 	}
 
 	//	If requested write the central value to a single file
 	if( config->BurnToROOTFlag )
 	{
-		string fileName=string( "Global_Fit_Result_"+StringProcessing::TimeString()+".root" );
+		string time = +StringProcessing::TimeString();
+		string fileName=string( "Global_Fit_Result_"+time+".root" );
 		cout << "Fit Output is being saved in: " << fileName << endl;
 		cout << endl << "This Contains the fit result in a nTulple output, the runtime and XML used to construct the fit and the final correlation matrix" << endl;
 		cout << endl;

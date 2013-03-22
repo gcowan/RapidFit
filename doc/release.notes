@@ -1,5 +1,17 @@
 // $Id: release.notes $
 
+2013/03/20 Rob Currie
+  - Got annoyed by the hundreds of output folders I was getting so made some modifications to pull all output into one "RapidFitOutput_..." directory
+       This replaces the OutputLatex_... folder name, but NOT the content
+       I have added the default fit output to be stored from the job at the same time (this includes the runtime args, xml, final results and correlation matrix etc...)
+       This is where your output data is also stored for projections. 'where have my beautiful projection plots gone?' they've just moved to make managing your files easier
+       This doesn't effect the output from scans or from toys which are still better controlled by the user imo!
+  - Added a new feature to lock RapidFit from multi-threading when using the lib build
+       (running using multiple threads on a distributed system is bad... we break load management and get noticed by site admin!)
+       This has been handled through a static private member variable and get/set methods within the RapidRun class
+       (this is 'global scope' coding but it's close enough to OO and only uses a global boolean stored in a safe place)
+       Also, this stops projections running on multiple nodes when batch submitting (this burns CPU which is lost)
+
 2013/03/08 Rob Currie
     (This mainly consists of fixes I needed to implement to make pretty plots for the thesis and comprises about a month of minor bugfixes I have in my private branch)
   - Added ability to project with LogX using <LogX> XMLtag (this will scale pull plots to match data in X axis only)
