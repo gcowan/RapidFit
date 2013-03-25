@@ -217,10 +217,6 @@ int main( int argc, char* argv[] )
 	//	If we were provided no input files, exit 'cleanly'
 	if( argc < 2 ) exit(-42);
 
-	//	Setup the theme while we remember
-	EdStyle* thisStyle = new EdStyle();
-	thisStyle->SetStyle();
-
 	//	Use UUID based seed from ROOT, just used primarily for unique identification of ROOT objects
 	TRandom3* rand_gen = new TRandom3();
 

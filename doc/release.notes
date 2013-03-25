@@ -4,7 +4,8 @@
   - Changed the Style to be closer to current EB
   - Added a helper functions to get common LHCb EB standard variables (less code duplication)
   - Moved all of utils and ComponentPlotter to use as much of the common style in EdStyle as possible.
-  - ComponentPlotter, RapidLL and Rapid2DLL all use different approaches with the Y-axis and the Rapid2DLL tool uses a custom Legend position but is similar to the 'default'
+  - RapidLL uses a different offset with the Y-axis and the Rapid2DLL tool uses a custom Legend position and text size but is similar to the 'default'
+  - Changed code to use the default TCanvas size to match the 'expected' LHCb style
 
 2013/03/20 Rob Currie
   - Got annoyed by the hundreds of output folders I was getting so made some modifications to pull all output into one "RapidFitOutput_..." directory

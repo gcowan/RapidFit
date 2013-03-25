@@ -42,7 +42,10 @@
 </DataSet>
 </ToFit>
 <Output>
-<ComponentProjection>x</ComponentProjection>
+	<ComponentProjection>
+		<Name>x</Name>
+		<DrawPull>True</DrawPull>
+	</ComponentProjection>
 <Scan>
 <Name>sigma</Name>
 <Sigma>3</Sigma>

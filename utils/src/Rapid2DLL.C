@@ -65,6 +65,7 @@ unsigned int Rapid2DLL::GetStyle( unsigned int input )
 	return style[input];
 }
 
+/*
 vector<pair<double,TString> > Rapid2DLL::GetContour( TString input )
 {
 	vector<pair<double,TString> > returnable;
@@ -93,6 +94,39 @@ vector<pair<double,TString> > Rapid2DLL::GetContour( TString input )
 		returnable.push_back( make_pair( 0.90, "90 % C.L." ) );
 		returnable.push_back( make_pair( 0.95, "95 % C.L." ) );
 		returnable.push_back( make_pair( 0.99, "99 % C.L." ) );
+	}
+	return returnable;
+}
+*/
+
+vector<pair<double,TString> > Rapid2DLL::GetContour( TString input )
+{
+	vector<pair<double,TString> > returnable;
+	if( input == "2DLL" )
+	{
+		returnable.push_back( make_pair( 1.15, "68 % CL" ) );
+		returnable.push_back( make_pair( 2.36, "90 % CL" ) );
+		returnable.push_back( make_pair( 3., "95 % CL" ) );
+	}
+	if( input == "2DLL-99" )
+	{
+		returnable.push_back( make_pair( 1.15, "68 % CL" ) );
+		returnable.push_back( make_pair( 2.36, "90 % CL" ) );
+		returnable.push_back( make_pair( 3., "95 % CL" ) );
+		returnable.push_back( make_pair( 4.61, "99 % CL" ) );
+	}
+	if( input == "FC" )
+	{
+		returnable.push_back( make_pair( 0.6827, "68 % CL" ) );
+		returnable.push_back( make_pair( 0.90, "90 % CL" ) );
+		returnable.push_back( make_pair( 0.95, "95 % CL" ) );
+	}
+	if( input == "FC-99" )
+	{
+		returnable.push_back( make_pair( 0.6827, "68 % CL" ) );
+		returnable.push_back( make_pair( 0.90, "90 % CL" ) );
+		returnable.push_back( make_pair( 0.95, "95 % CL" ) );
+		returnable.push_back( make_pair( 0.99, "99 % CL" ) );
 	}
 	return returnable;
 }
@@ -130,8 +164,8 @@ void Rapid2DLL::get_Plotting_Data( TTree* input_tree, TString Draw_String, TStri
 
 int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controlled_parameter2, TTree* input_tree, TRandom3* rand, vector<string> other_params )
 {
-	gStyle->SetPadLeftMargin( (Float_t)0.15 );
-	gStyle->SetTitleOffset((Float_t)0.85,"Y");
+	//gStyle->SetPadLeftMargin( (Float_t)0.15 );
+	//gStyle->SetTitleOffset((Float_t)0.85,"Y");
 
 	gROOT->UseCurrentStyle();
 	gROOT->ForceStyle( true );
@@ -307,10 +341,10 @@ void Rapid2DLL::Plot_Contours( TString controlled_parameter1, TString controlled
 
 	//TLegend* leg = EdStyle::LHCbLegend();//0.65, 0.65, 0.9, 0.9 );
 
-	TLegend* leg = new TLegend( 0.7, 0.7, 0.9, 0.9 );
+	TLegend* leg = new TLegend( 0.675, 0.725, 0.9, 0.925 );
 	leg->SetFillColor( kWhite );
 	leg->SetFillStyle( EdStyle::GetTransparentFillStyle() );
-	leg->SetTextSize( EdStyle::GetLHCbTextSize() );
+	leg->SetTextSize( 0.050 );//EdStyle::GetLHCbTextSize() );
 	leg->SetTextFont( EdStyle::GetLHCbFont() );
 
 	//TString TCanvas_Namea("TCanvas_");TCanvas_Namea+=rand->Rndm();

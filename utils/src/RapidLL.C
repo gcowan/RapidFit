@@ -85,6 +85,12 @@ void RapidLL::Help()
 
 TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, TRandom3* rand_gen, vector<string> other_params )
 {
+	gStyle->SetTitleOffset((Float_t)0.8,"Y");
+	gStyle->SetPadLeftMargin( (Float_t)0.14 );
+
+	gROOT->UseCurrentStyle();
+	gROOT->ForceStyle( true );
+
 	bool isFinal=false;
 	string isFinalString="--isFinal";
 	isFinal = StringOperations::VectorContains( other_params, isFinalString ) != -1;

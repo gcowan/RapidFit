@@ -1243,6 +1243,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	input_data->GetYaxis()->SetTitle( Y_Title );
 	input_data->GetXaxis()->SetRangeUser( X_min, X_max );
 	input_data->GetXaxis()->SetTitle( X_Title );
+	//input_data->GetXaxis()->CenterTitle( true );
 
 	if( !input_bin_theory_data.empty() )
 	{
@@ -1434,12 +1435,13 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 		pullGraph->GetYaxis()->SetTitle( "Pull" );
 		pullGraph->GetXaxis()->SetRangeUser( X_min, X_max );
+		//pullGraph->GetXaxis()->CenterTitle( true );
 		pullGraph->GetXaxis()->SetTitle( X_Title );
 		pad2->Modified();
 		pad2->Update();
 		pullGraph->GetYaxis()->SetTitleOffset((Float_t)(pullGraph->GetYaxis()->GetTitleOffset()/3.));
 		pullGraph->GetYaxis()->SetTitleSize((Float_t)(pullGraph->GetYaxis()->GetTitleSize()*2.));
-		pullGraph->GetXaxis()->SetTitleOffset((Float_t)(pullGraph->GetXaxis()->GetTitleOffset()/3.));
+		pullGraph->GetXaxis()->SetTitleOffset((Float_t)(pullGraph->GetXaxis()->GetTitleOffset()/2.));
 		pullGraph->GetXaxis()->SetTitleSize((Float_t)(pullGraph->GetXaxis()->GetTitleSize()*2.));
 		if( limitPulls )
 		{
@@ -1958,6 +1960,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 
 	input_data->GetYaxis()->SetTitle( Y_Title );
 	//input_data->GetXaxis()->SetRangeUser( X_min, X_max );
+	//input_data->GetXaxis()->CenterTitle( true );
 	input_data->GetXaxis()->SetTitle( X_Title );
 
 	c1->Update();

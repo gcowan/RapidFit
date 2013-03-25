@@ -77,7 +77,7 @@ void EdStyle::SetStyle()
 	gStyle->SetPadTopMargin( (Float_t)0.05 );
 	gStyle->SetPadRightMargin( (Float_t)0.05 );
 	gStyle->SetPadBottomMargin( (Float_t)0.18 );
-	gStyle->SetPadLeftMargin( (Float_t)0.12 );
+	gStyle->SetPadLeftMargin( (Float_t)0.18 );
 
 	gStyle->SetFrameBorderMode(0);
 	gStyle->SetCanvasBorderMode(0);
@@ -132,7 +132,7 @@ void EdStyle::SetStyle()
 
 	//titles
 	gStyle->SetTitleOffset((Float_t)0.95,"X");
-	gStyle->SetTitleOffset((Float_t)0.6,"Y");
+	gStyle->SetTitleOffset((Float_t)0.95,"Y");
 	gStyle->SetTitleOffset((Float_t)1.2,"Z");
 	gStyle->SetTitleFillColor(0);
 	gStyle->SetTitleStyle(0);
@@ -1241,6 +1241,10 @@ Font_t EdStyle::GetLHCbFont()
 
 TCanvas* EdStyle::RapidFitCanvas( TString Name, TString Title )
 {
-	return new TCanvas( Name, Title, 1680, 1050 );
+	TCanvas* returnable = new TCanvas();
+	returnable->SetName( Name );
+	returnable->SetTitle( Title );
+	//, 1680, 1050 );
+	return returnable;
 }
 
