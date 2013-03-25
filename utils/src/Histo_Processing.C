@@ -332,7 +332,7 @@ TH1* Histogram_Processing::Plot_1D( const vector<double>& input, TString Filenam
         replace( rand_num.begin(), rand_num.end(), '.', '_' );
         canv_name = rand_num.c_str();
 
-	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( canv_name, canv_name );
 
 	temp_histo->Draw( Options );
 
@@ -433,7 +433,7 @@ TH2* Histogram_Processing::Plot_2D( const vector<double>& X, const vector<double
         replace( rand_num.begin(), rand_num.end(), '.', '_' );
         canv_name = rand_num.c_str();
 
-	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( canv_name, canv_name );
 
 	temp_plot->Draw( Option );
 
@@ -498,7 +498,7 @@ TH3* Histogram_Processing::Plot_3D( const vector<double>& X, const vector<double
         replace( rand_str.begin(), rand_str.end(), '.', '_' );
         canv_name = rand_str.c_str();
 
-	TCanvas* c1 = new TCanvas( canv_name, canv_name, 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( canv_name, canv_name );
 
 	temp_plot->Draw( Option );
 
@@ -554,7 +554,7 @@ vector<TMultiGraph*> Histogram_Processing::GetContoursFromTH2( TH2* input_th2, c
         string rand_str_( TCanvas_Name.Data() );
         replace( rand_str_.begin(), rand_str_.end(), '.', '_' );
         TCanvas_Name = rand_str_.c_str();
-	TCanvas* c1 = new TCanvas( TCanvas_Name, TCanvas_Name, 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( TCanvas_Name, TCanvas_Name );
 
 	input_th2->SetContour( contour_list.size(), &(contour_list[0]) );
 

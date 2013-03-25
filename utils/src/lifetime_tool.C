@@ -178,7 +178,7 @@ int main( int argc, char* argv[] )
 
 	cout << "gamma_output" << endl;
 
-	TCanvas* c1 = new TCanvas( "gamma_C", "gamma_C", 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( "gamma_C", "gamma_C" );
 
 	gamma_histo->Draw();
 	c1->Update();
@@ -223,7 +223,7 @@ int main( int argc, char* argv[] )
 
 	cout << "dGamma_output" << endl;
 
-	TCanvas* c2 = new TCanvas( "dgamma_C", "dgamma_C", 1680, 1050 );
+	TCanvas* c2 = EdStyle::RapidFitCanvas( "dgamma_C", "dgamma_C" );
 
 	dGamma_histo->Draw();
 	c2->Update();
@@ -321,7 +321,7 @@ int main( int argc, char* argv[] )
 
 		cout << "diff_Gamma" << endl;
 
-		TCanvas* c3 = new TCanvas( "diffgamma_C", "diffgamma_C", 1680, 1050 );
+		TCanvas* c3 = EdStyle::RapidFitCanvas( "diffgamma_C", "diffgamma_C" );
 
 		delta_gamma_histo->Draw();
 		c3->Update();
@@ -341,7 +341,7 @@ int main( int argc, char* argv[] )
 		c3->Update();
 		c3->Print("diff_Gamma.pdf");
 
-		TCanvas* c4 = new TCanvas( "diffdGamma_C", "diffdGamma_C", 1680, 1050 );
+		TCanvas* c4 = EdStyle::RapidFitCanvas( "diffdGamma_C", "diffdGamma_C" );
 
 		delta_dGamma_histo->Draw();
 		c4->Update();
@@ -363,7 +363,7 @@ int main( int argc, char* argv[] )
 
 		cout << "gamma_overlay" << endl;
 
-		TCanvas* c5 = new TCanvas( "gamma_overlay", "gamma_overlay", 1680, 1050 );
+		TCanvas* c5 = EdStyle::RapidFitCanvas( "gamma_overlay", "gamma_overlay" );
 
 		gamma_untag->Draw();
 		c5->Update();
@@ -380,7 +380,7 @@ int main( int argc, char* argv[] )
 		c5->Update();
 		c5->Print("gamma_overlay.pdf");
 
-		TCanvas* c6 = new TCanvas( "dGamma_overlay", "dGamma_overlay", 1680, 1050 );
+		TCanvas* c6 = EdStyle::RapidFitCanvas( "dGamma_overlay", "dGamma_overlay" );
 
 		dGamma_untag->Draw();
 		c6->Update();
@@ -403,7 +403,7 @@ int main( int argc, char* argv[] )
 
 	cout << "Working on Correlation Graph" << endl;
 
-	TCanvas* c7 = new TCanvas( "corr_Graph", "corr_Graph", 1680, 1050 );
+	TCanvas* c7 = EdStyle::RapidFitCanvas( "corr_Graph", "corr_Graph" );
 
 	corr_graph->Draw("AP");
 	c7->Update();
@@ -485,7 +485,7 @@ int main( int argc, char* argv[] )
 		thisHisto->Fill( gammaL_tau_value->at(i), gammaH_tau_value->at(i) );
 	}
 
-	TCanvas* c8 = new TCanvas( "corr_Histo", "corr_Histo", 1680, 1050 );
+	TCanvas* c8 = EdStyle::RapidFitCanvas( "corr_Histo", "corr_Histo" );
 
 	cout << "plot" << endl;
 	thisHisto->Draw("colz");
@@ -537,7 +537,7 @@ int main( int argc, char* argv[] )
 	gROOT->ForceStyle( true );
 
 
-	TCanvas* c9 = new TCanvas( "corr_func", "corr_func", 1680, 1050 );
+	TCanvas* c9 = EdStyle::RapidFitCanvas( "corr_func", "corr_func" );
 
 	//corr_function->SetContour( 0, NULL );
 

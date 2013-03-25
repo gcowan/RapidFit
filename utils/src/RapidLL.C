@@ -45,14 +45,17 @@
 
 using namespace::std;
 
+
+// 	Used to be 3 but whatever the EB wants the EB gets...
+
 unsigned int RapidLL::GetFunctionLineWidth()
 {
-	return 3;
+	return EdStyle::GetLHCbFunctionLineWidth();
 }
 
 unsigned int RapidLL::GetAxisWidth()
 {
-	return 3;
+	return EdStyle::GetLHCbAxisLineWidth();
 }
 
 /*int RapidLL::PlotRapidFitLL( TTree* input_tree, TString controlled_parameter, TRandom3* rand, vector<string> other_params )
@@ -157,11 +160,17 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	gSystem->cd( output_path );
 
-	TCanvas* new_canvas = new TCanvas( Name, Name, 1680, 1050 );
+	TCanvas* new_canvas = EdStyle::RapidFitCanvas( Name, Name );
 
 	drawn_histo->Draw( "AC*" );
 	new_canvas->Update();
-	TPaveText* text_1 = Histogram_Processing::addLHCbLabel("",isFinal);
+	TPaveText* text_1 = EdStyle::LHCbLabel();
+	if( !isFinal )
+	{
+		text_1->AddText("");
+		text_1->AddText( "Preliminary" );
+	}
+
 	text_1->SetFillStyle(0);
 	text_1->Draw("SAME");
 
@@ -213,7 +222,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	for( vector<TString>::iterator param_i = nuisance_parameters.begin(); param_i != nuisance_parameters.end(); ++param_i )
 	{
-		TCanvas* param_c = new TCanvas("param_canv_"+*param_i,"param_canv_"+*param_i,1680,1050);
+		TCanvas* param_c = EdStyle::RapidFitCanvas( "param_canv_"+*param_i, "param_canv_"+*param_i );
 
 		cout << *param_i << endl;
 
@@ -335,7 +344,7 @@ void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 
 	string timeStamp = StringOperations::TimeString();
 
-	TCanvas* newOverlay = new TCanvas( "OverlayCanvas", "OverlayCanvas", 1680, 1050 );
+	TCanvas* newOverlay = EdStyle::RapidFitCanvas( "OverlayCanvas", "OverlayCanvas" );
 
 	TLegend* thisLegend = EdStyle::LHCbLegend();
 	GraphsToOverlay->Draw("A");
@@ -371,7 +380,7 @@ void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 	newOverlay->Print(Name+".C");
 
 
-	TCanvas* newOverlay2 = new TCanvas( "OverlayCanvas2", "OverlayCanvas2", 1680, 1050 );
+	TCanvas* newOverlay2 = EdStyle::RapidFitCanvas( "OverlayCanvas2", "OverlayCanvas2" );
 
 	GraphsToOverlay->Draw("A");
 	newOverlay2->Update();

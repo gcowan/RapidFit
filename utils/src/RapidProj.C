@@ -57,7 +57,7 @@ int main( int argc, char* argv[] )
 	for( unsigned int i=0; i< all_TH1.size(); ++i )
 	{
 		TString Canvas_Name="Canvas_Name"; Canvas_Name+=i;
-		TCanvas* c1 = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
+		TCanvas* c1 = EdStyle::RapidFitCanvas( Canvas_Name, Canvas_Name );
 		all_TH1[i]->Draw();
 		OptimallyRebin( all_TH1[i], 1 );
 		c1->Print( Canvas_Name+".pdf" );

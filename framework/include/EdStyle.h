@@ -18,6 +18,8 @@
 #include "TText.h"
 #include "TLatex.h"
 #include "TLegend.h"
+#include "TPaveText.h"
+#include "TCanvas.h"
 ///	System Headers
 #include <string.h>
 
@@ -159,8 +161,19 @@ class EdStyle {
 		static TLegend* LHCbBottomLegend();
 		static TLegend* LHCbBottomLeftLegend();
 
-		static TLatex* LHCbLabel();
-		static TLatex* RightLHCbLabel();
+		static TPaveText* LHCbLabel();
+		static TPaveText* RightLHCbLabel();
+
+		static Size_t GetLHCbTextSize();
+		static Size_t GetLHCbAxisTextSize();
+		static Width_t GetLHCbFunctionLineWidth();
+		static Width_t GetLHCbAxisLineWidth();
+		static Short_t GetLHCbTextAlign();
+		static Style_t GetTransparentFillStyle();
+		static Style_t GetSolidFillStyle();
+		static Font_t GetLHCbFont();
+
+		static TCanvas* RapidFitCanvas( TString Name, TString Title );
 
 		/*!
 		 * @brief Destructor

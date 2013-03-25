@@ -20,19 +20,24 @@
 
 using namespace::std;
 
+
+//	The line widths were 3 and now are 2 and are always whatever the EB decides they will be tomorrrow...
+
 unsigned int Rapid2DLL::GetFunctionLineWidth()
 {
-	return 3;
+	return EdStyle::GetLHCbFunctionLineWidth();
 }
 
 unsigned int Rapid2DLL::GetAxisWidth()
 {
-	return 3;
+	return EdStyle::GetLHCbAxisLineWidth();
 }
+
+//	This was 0.04 because it looked sensible but the EB font size is 0.060...
 
 double Rapid2DLL::GetLegTextSize()
 {
-	return 0.04;
+	return EdStyle::GetLHCbTextSize();
 }
 
 unsigned int Rapid2DLL::GetColors( unsigned int input )
@@ -125,6 +130,12 @@ void Rapid2DLL::get_Plotting_Data( TTree* input_tree, TString Draw_String, TStri
 
 int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controlled_parameter2, TTree* input_tree, TRandom3* rand, vector<string> other_params )
 {
+	gStyle->SetPadLeftMargin( (Float_t)0.15 );
+	gStyle->SetTitleOffset((Float_t)0.85,"Y");
+
+	gROOT->UseCurrentStyle();
+	gROOT->ForceStyle( true );
+
 	//double CV_val_X = RapidFit_Output_File::GetCV_val( input_tree, controlled_parameter1 );
 	//double CV_val_Y = RapidFit_Output_File::GetCV_val( input_tree, controlled_parameter1 );
 	double CV_val_NLL = RapidFit_Output_File::GetCV_val( input_tree, "NLL", false );
@@ -155,13 +166,13 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 	TGraph* r_coord_graph = Histogram_Processing::Get_TGraph( coords_rotated, (TRandom*)rand );	
 
 	TString TCanvas_Name_c("TCanvas_"); TCanvas_Name_c+=rand->Rndm();
-	TCanvas* coord_c = new TCanvas( TCanvas_Name_c, TCanvas_Name_c, 1680, 1050 );
+	TCanvas* coord_c = EdStyle::RapidFitCanvas( TCanvas_Name_c, TCanvas_Name_c );
 	coord_graph->Draw("AP");
 	coord_c->Update();
 	Histogram_Processing::Silent_Print( coord_c, "coords.pdf" );
 
 	TString r_TCanvas_Name_c("TCanvas_"); r_TCanvas_Name_c+=rand->Rndm();
-	TCanvas* r_coord_c = new TCanvas( r_TCanvas_Name_c, r_TCanvas_Name_c, 1680, 1050 );
+	TCanvas* r_coord_c = EdStyle::RapidFitCanvas( r_TCanvas_Name_c, r_TCanvas_Name_c );
 	r_coord_graph->Draw("AP");
 	r_coord_c->Update();
 	Histogram_Processing::Silent_Print( r_coord_c, "coords_rotated.pdf" );
@@ -251,9 +262,9 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 	cout << endl;
 
 
-        gStyle->SetPadRightMargin( (Float_t)0.15 );
-        gROOT->UseCurrentStyle();
-        gROOT->ForceStyle( true );
+	gStyle->SetPadRightMargin( (Float_t)0.15 );
+	gROOT->UseCurrentStyle();
+	gROOT->ForceStyle( true );
 
 	cout << "Plotting Variation in Nuisence Parameters!" << endl << endl;
 
@@ -276,24 +287,50 @@ void Rapid2DLL::Plot_Contours( TString controlled_parameter1, TString controlled
 {
 	if( rand == NULL ) rand = gRandom;
 
-	TPaveText* label = NULL;
+	//TPaveText* label = NULL;
 
 	string addLHCb="--isFinal";
 	string addSMPhisString="--addPhis";
 	bool addSMPhis = StringOperations::VectorContains( &other_params, &addSMPhisString ) != -1;
 
-	if( StringOperations::VectorContains( &other_params, &addLHCb ) != -1 )		label = Histogram_Processing::addLHCbLabel( "", true );
-	else										label = Histogram_Processing::addLHCbLabel( "", false );
+	/*
+	   if( StringOperations::VectorContains( &other_params, &addLHCb ) != -1 )		label = Histogram_Processing::addLHCbLabel( "", true );
+	   else										label = Histogram_Processing::addLHCbLabel( "", false );
+	   */
 
-	TLegend* leg = new TLegend( 0.65, 0.65, 0.9, 0.9 );
-	leg->SetFillStyle(0);
-	leg->SetBorderSize(0);
-	leg->SetTextSize( (Float_t)Rapid2DLL::GetLegTextSize() );
+	TPaveText* label = EdStyle::LHCbLabel();
+	if( StringOperations::VectorContains( &other_params, &addLHCb ) == -1 )
+	{
+		label->AddText( "" );
+		label->AddText( "Preliminary" );
+	}
 
-	TString TCanvas_Name("TCanvas_");TCanvas_Name+=rand->Rndm();
-	TCanvas* c1 = new TCanvas( TCanvas_Name, TCanvas_Name, 1680, 1050 );
+	//TLegend* leg = EdStyle::LHCbLegend();//0.65, 0.65, 0.9, 0.9 );
+
+	TLegend* leg = new TLegend( 0.7, 0.7, 0.9, 0.9 );
+	leg->SetFillColor( kWhite );
+	leg->SetFillStyle( EdStyle::GetTransparentFillStyle() );
+	leg->SetTextSize( EdStyle::GetLHCbTextSize() );
+	leg->SetTextFont( EdStyle::GetLHCbFont() );
+
+	//TString TCanvas_Namea("TCanvas_");TCanvas_Namea+=rand->Rndm();
+	//TCanvas* c1a = EdStyle::RapidFitCanvas( TCanvas_Namea, TCanvas_Namea );
+	//nll_hist->Draw("AXIS");
+	//c1a->Update();
+
+	TString TCanvas_Name("TCanvas_"); TCanvas_Name+=rand->Rndm();
+	TCanvas* c1 = EdStyle::RapidFitCanvas( TCanvas_Name, TCanvas_Name );
 
 	nll_hist->Draw("AXIS");
+
+	//nll_contours.back().first->Draw("AXIS");
+
+	//c1->Update();
+
+	//nll_contours.back().first->GetXaxis()->SetRangeUser( nll_hist->GetXaxis()->GetXmin(), nll_hist->GetXaxis()->GetXmax() );
+	//nll_contours.back().first->GetYaxis()->SetRangeUser( nll_hist->GetYaxis()->GetXmin(), nll_hist->GetYaxis()->GetXmax() );
+
+	c1->Update();
 
 	unsigned int cont_num=0;
 	for( vector<pair<TMultiGraph*,TString> >::iterator cont_i = nll_contours.begin(); cont_i != nll_contours.end(); ++cont_i, ++cont_num )
@@ -382,7 +419,7 @@ void Rapid2DLL::Plot_Free_Parameters( TTree* input_tree, TString controlled_para
 
 		param_hist->SetContour( 40 );
 		TString canvas_name("TCanvas_"); canvas_name+=rand->Rndm();
-		TCanvas* c1 = new TCanvas( canvas_name, canvas_name, 1680, 1050 );
+		TCanvas* c1 = EdStyle::RapidFitCanvas( canvas_name, canvas_name );
 
 		c1->SetTitle( "Variation in " + *param_i );
 

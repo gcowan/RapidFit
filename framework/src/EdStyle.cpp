@@ -15,6 +15,7 @@
 #include "TText.h"
 #include "TPaveText.h"
 #include "TROOT.h"
+#include "TCanvas.h"
 //	RapidFit Headers
 #include "EdStyle.h"
 #include "StringProcessing.h"
@@ -61,13 +62,22 @@ void EdStyle::SetStyle()
 	//Start of LHCb Style choices
 
 	// use helvetica-bold-r-normal, precision 2 (rotatable)
-	Font_t lhcbFont = 132;
+	//Font_t lhcbFont = 132;
 
 	// line thickness
 	Width_t lhcbWidth = 1.; //Width_t is a SHORT INT, NOT a double
 
 	// text size
-	Double_t lhcbTSize = 0.06;
+	//Double_t lhcbTSize = 0.06;
+
+	//	Official EB Dictates these, but they just cause problems in compiled code!!!
+	//
+	// set the paper & margin sizes
+	gStyle->SetPaperSize(20,26);
+	gStyle->SetPadTopMargin( (Float_t)0.05 );
+	gStyle->SetPadRightMargin( (Float_t)0.05 );
+	gStyle->SetPadBottomMargin( (Float_t)0.18 );
+	gStyle->SetPadLeftMargin( (Float_t)0.12 );
 
 	gStyle->SetFrameBorderMode(0);
 	gStyle->SetCanvasBorderMode(0);
@@ -86,21 +96,15 @@ void EdStyle::SetStyle()
 	gStyle->SetPalette(8,colors);
 
 
-	gStyle->SetPaperSize(20,26);
-	gStyle->SetPadLeftMargin( (Float_t) 0.13 );
-	gStyle->SetPadBottomMargin( (Float_t) 0.16 );
-	gStyle->SetPadRightMargin( (Float_t)0.08 ); // increase for colz plots!!
-	gStyle->SetPadTopMargin( (Float_t)0.05 );
-
 
 	//      Set default fonts for axis and titles on all plots
-	gStyle->SetTextFont( lhcbFont );
-	gStyle->SetTextSize( (Float_t) lhcbTSize );
-	gStyle->SetLabelFont( lhcbFont, "xyz" );
-	gStyle->SetLabelSize( (Float_t)lhcbTSize, "xyz" );
-	gStyle->SetTitleFont( lhcbFont, "xyz" );
-	gStyle->SetTitleSize( (Float_t)1.2*(Float_t)lhcbTSize, "xyz" );
-	gStyle->SetStatFont( lhcbFont );
+	gStyle->SetTextFont( EdStyle::GetLHCbFont() );
+	gStyle->SetTextSize( (Float_t) EdStyle::GetLHCbTextSize() );
+	gStyle->SetLabelFont( EdStyle::GetLHCbFont(), "xyz" );
+	gStyle->SetLabelSize( (Float_t)EdStyle::GetLHCbTextSize(), "xyz" );
+	gStyle->SetTitleFont( EdStyle::GetLHCbFont(), "xyz" );
+	gStyle->SetTitleSize( (Float_t)1.2*EdStyle::GetLHCbTextSize(), "xyz" );
+	gStyle->SetStatFont( EdStyle::GetLHCbFont() );
 
 	// use bold lines and markers
 	gStyle->SetLineWidth( lhcbWidth );
@@ -110,7 +114,7 @@ void EdStyle::SetStyle()
 	gStyle->SetGridWidth( lhcbWidth );
 	gStyle->SetLineStyleString( 2, "[12 12]"); // postscript dashes
 	gStyle->SetMarkerStyle( 20 );
-	gStyle->SetMarkerSize( (Float_t)2.1 );
+	gStyle->SetMarkerSize( (Float_t)1.0 );
 
 
 	// label offsets
@@ -128,12 +132,12 @@ void EdStyle::SetStyle()
 
 	//titles
 	gStyle->SetTitleOffset((Float_t)0.95,"X");
-	gStyle->SetTitleOffset((Float_t)0.9,"Y");
+	gStyle->SetTitleOffset((Float_t)0.6,"Y");
 	gStyle->SetTitleOffset((Float_t)1.2,"Z");
 	gStyle->SetTitleFillColor(0);
 	gStyle->SetTitleStyle(0);
 	gStyle->SetTitleBorderSize(0);
-	gStyle->SetTitleFont(lhcbFont,"title");
+	gStyle->SetTitleFont(EdStyle::GetLHCbFont(),"title");
 	gStyle->SetTitleX(0.0);
 	gStyle->SetTitleY(1.0);
 	gStyle->SetTitleW(1.0);
@@ -141,7 +145,7 @@ void EdStyle::SetStyle()
 
 	// look of the statistics box:
 	gStyle->SetStatBorderSize( 0 );
-	gStyle->SetStatFont( lhcbFont );
+	gStyle->SetStatFont( EdStyle::GetLHCbFont() );
 	gStyle->SetStatFontSize( (Float_t)0.05 );
 	gStyle->SetStatX( (Float_t)0.9 );
 	gStyle->SetStatY( (Float_t)0.9 );
@@ -165,7 +169,7 @@ void EdStyle::SetStyle()
 
 	//	Custom choice by Edinburgh
 	gStyle->SetTitleFillColor(0);
-	gStyle->SetStatBorderSize(1);
+	gStyle->SetStatBorderSize(0);
 
 
 	// label offsets
@@ -177,17 +181,17 @@ void EdStyle::SetStyle()
 
 	//define style for text
 	TText *lhcbLabel = new TText();
-	lhcbLabel->SetTextFont(lhcbFont);
+	lhcbLabel->SetTextFont( EdStyle::GetLHCbFont() );
 	lhcbLabel->SetTextColor(1);
-	lhcbLabel->SetTextSize( (Float_t)0.04 );
-	lhcbLabel->SetTextAlign(12);
+	lhcbLabel->SetTextSize( EdStyle::GetLHCbTextSize() );
+	lhcbLabel->SetTextAlign( EdStyle::GetLHCbTextAlign() );
 
 	// define style of latex text
 	TLatex *lhcbLatex = new TLatex();
-	lhcbLatex->SetTextFont(lhcbFont);
+	lhcbLatex->SetTextFont( EdStyle::GetLHCbFont() );
 	lhcbLatex->SetTextColor(1);
-	lhcbLatex->SetTextSize((Float_t)0.04);
-	lhcbLatex->SetTextAlign(12);
+	lhcbLatex->SetTextSize( EdStyle::GetLHCbTextSize() );
+	lhcbLatex->SetTextAlign( EdStyle::GetLHCbTextAlign() );
 
 	gROOT->UseCurrentStyle();
 	gROOT->ForceStyle( true );
@@ -196,20 +200,20 @@ void EdStyle::SetStyle()
 
 void EdStyle::FormatTText( TText* input )
 {
-	Font_t lhcbFont=62;
-	input->SetTextFont(lhcbFont);
+	//Font_t lhcbFont=62;
+	input->SetTextFont( EdStyle::GetLHCbFont() );
 	input->SetTextColor(1);
-	input->SetTextSize((Float_t)0.04);
-	input->SetTextAlign(12);
+	input->SetTextSize( EdStyle::GetLHCbTextSize() );
+	input->SetTextAlign( EdStyle::GetLHCbTextAlign() );
 }
 
 void EdStyle::FormatTLatex( TLatex* input )
 {
-	Font_t lhcbFont=62;
-	input->SetTextFont(lhcbFont);
+	//Font_t lhcbFont=62;
+	input->SetTextFont( EdStyle::GetLHCbFont() );
 	input->SetTextColor(1);
-	input->SetTextSize((Float_t)0.04);
-	input->SetTextAlign(12);
+	input->SetTextSize( EdStyle::GetLHCbTextSize() );
+	input->SetTextAlign( EdStyle::GetLHCbTextAlign() );
 }
 
 //  These functions are not guaranteed correct but will people please add to them
@@ -1115,8 +1119,9 @@ TLegend* EdStyle::LHCbLegend()
 {
 	TLegend* thisLegend = new TLegend( 0.6, 0.65, 0.9, 0.9 );
 	thisLegend->SetFillColor( kWhite );
-	thisLegend->SetFillStyle( 3001 );
-	thisLegend->SetTextSize( (Float_t)0.03 );
+	thisLegend->SetFillStyle( EdStyle::GetTransparentFillStyle() );
+	thisLegend->SetTextSize( EdStyle::GetLHCbTextSize() );
+	thisLegend->SetTextFont( EdStyle::GetLHCbFont() );
 	return thisLegend;
 }
 
@@ -1124,8 +1129,9 @@ TLegend* EdStyle::LHCbLeftLegend()
 {
 	TLegend* thisLegend = new TLegend( 0.15, 0.65, 0.4, 0.9 );
 	thisLegend->SetFillColor( kWhite );
-	thisLegend->SetFillStyle( 3001 );
-	thisLegend->SetTextSize( (Float_t)0.03 );
+	thisLegend->SetFillStyle( EdStyle::GetTransparentFillStyle() );
+	thisLegend->SetTextSize( EdStyle::GetLHCbTextSize() );
+	thisLegend->SetTextFont( EdStyle::GetLHCbFont() );
 	return thisLegend;
 }
 
@@ -1133,8 +1139,9 @@ TLegend* EdStyle::LHCbBottomLegend()
 {
 	TLegend* thisLegend = new TLegend( 0.6, 0.2, 0.9, 0.45 );
 	thisLegend->SetFillColor( kWhite );
-	thisLegend->SetFillStyle( 3001 );
-	thisLegend->SetTextSize( (Float_t)0.03 );
+	thisLegend->SetFillStyle( EdStyle::GetTransparentFillStyle() );
+	thisLegend->SetTextSize( EdStyle::GetLHCbTextSize() );
+	thisLegend->SetTextFont( EdStyle::GetLHCbFont() );
 	return thisLegend;
 }
 
@@ -1142,26 +1149,98 @@ TLegend* EdStyle::LHCbBottomLeftLegend()
 {
 	TLegend* thisLegend = new TLegend( 0.15, 0.2, 0.45, 0.45 );
 	thisLegend->SetFillColor( kWhite );
-	thisLegend->SetFillStyle( 3001 );
-	thisLegend->SetTextSize( (Float_t)0.03 );
+	thisLegend->SetFillStyle( EdStyle::GetTransparentFillStyle() );
+	thisLegend->SetTextSize( EdStyle::GetLHCbTextSize() );
+	thisLegend->SetTextFont( EdStyle::GetLHCbFont() );
 	return thisLegend;
 }
 
-TLatex* EdStyle::LHCbLabel()
+/*
+   TLatex* EdStyle::LHCbLabel()
+   {
+   TLatex *myLatex = new TLatex(0.5,0.5,"");
+   myLatex->SetTextAlign(11);
+   myLatex->SetNDC(kTRUE);
+   myLatex->DrawLatex( 0.25, 0.75, "LHCb" );
+   return myLatex;
+   }
+
+   TLatex* EdStyle::RightLHCbLabel()
+   {
+   TLatex *myLatex = new TLatex(0.5,0.5,"");
+   myLatex->SetTextAlign(11);
+   myLatex->SetNDC(kTRUE);
+   myLatex->DrawLatex( 0.75, 0.75, "LHCb" );
+   return myLatex;
+   }
+   */
+
+TPaveText* EdStyle::LHCbLabel()
 {
-	TLatex *myLatex = new TLatex(0.5,0.5,"");
-	myLatex->SetTextAlign(11);
-	myLatex->SetNDC(kTRUE);
-	myLatex->DrawLatex( 0.25, 0.75, "LHCb" );
-	return myLatex;
+	TPaveText* myLHCb = new TPaveText( 0.24, 0.81, 0.37, 0.89, "BRNDC");
+	myLHCb->AddText("LHCb");
+	myLHCb->SetTextAlign( EdStyle::GetLHCbTextAlign() );
+	myLHCb->SetTextSize( (Size_t)0.072 );//EdStyle::GetLHCbTextSize() );
+	myLHCb->SetBorderSize(0);
+	myLHCb->SetFillStyle( EdStyle::GetTransparentFillStyle() );
+	myLHCb->SetFillColor(0);
+	return myLHCb;
 }
 
-TLatex* EdStyle::RightLHCbLabel()
+TPaveText* EdStyle::RightLHCbLabel()
 {
-	TLatex *myLatex = new TLatex(0.5,0.5,"");
-	myLatex->SetTextAlign(11);
-	myLatex->SetNDC(kTRUE);
-	myLatex->DrawLatex( 0.75, 0.75, "LHCb" );
-	return myLatex;
+	TPaveText* myLHCb = new TPaveText( 0.74, 0.81, 0.37, 0.89, "BRNDC");
+	myLHCb->AddText("LHCb");
+	myLHCb->SetTextAlign( EdStyle::GetLHCbTextAlign() );
+	myLHCb->SetTextSize( (Size_t)0.072 );//EdStyle::GetLHCbTextSize() );
+	myLHCb->SetBorderSize( 0 );
+	myLHCb->SetFillStyle( EdStyle::GetTransparentFillStyle() );
+	myLHCb->SetFillColor(0);
+	return myLHCb;
+}
+
+Size_t EdStyle::GetLHCbTextSize()
+{
+	return (Size_t)0.072;
+}
+
+Size_t EdStyle::GetLHCbAxisTextSize()
+{
+	return (Size_t)0.060;
+}
+
+Width_t EdStyle::GetLHCbFunctionLineWidth()
+{
+	return (Width_t)2.0;
+}
+
+Width_t EdStyle::GetLHCbAxisLineWidth()
+{
+	return EdStyle::GetLHCbFunctionLineWidth();
+}
+
+Short_t EdStyle::GetLHCbTextAlign()
+{
+	return 12;
+}
+
+Style_t EdStyle::GetTransparentFillStyle()
+{
+	return 3001;
+}
+
+Style_t EdStyle::GetSolidFillStyle()
+{
+	return 1001;
+}
+
+Font_t EdStyle::GetLHCbFont()
+{
+	return (Font_t)132;
+}
+
+TCanvas* EdStyle::RapidFitCanvas( TString Name, TString Title )
+{
+	return new TCanvas( Name, Title, 1680, 1050 );
 }
 

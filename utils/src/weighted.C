@@ -13,6 +13,7 @@
 #include "TStyle.h"
 #include "TGraph2D.h"
 
+#include "EdStyle.h"
 #include "TTree_Processing.h"
 
 #include <vector>
@@ -109,7 +110,7 @@ int main( int argc, char* argv[] )
 		diff_th->Fill( (*diff_val)[i] );
 	}
 
-	TCanvas* c1 = new TCanvas( "canv", "canv", 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( "canv", "canv" );
 
 	diff_th->Draw();
 

@@ -104,6 +104,9 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	//gStyle->SetMarkerStyle(15);
 	//gStyle->SetMarkerSize(Size_t(0.8));
 
+	gStyle->SetPadLeftMargin( (Float_t)0.15 );
+	gStyle->SetTitleOffset((Float_t)0.9,"Y");
+
 	boundary_min = full_boundary->GetConstraint( observableName )->GetMinimum();
 	boundary_max = full_boundary->GetConstraint( observableName )->GetMaximum();
 
@@ -679,7 +682,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			string CanvasCleanName( Canvas_Name.Data() );
 			replace( CanvasCleanName.begin(), CanvasCleanName.end(), '.', '_' );
 
-			TCanvas* c1 = new TCanvas( CanvasCleanName.c_str(), "", 1680, 1050 );
+			TCanvas* c1 = EdStyle::RapidFitCanvas( CanvasCleanName.c_str(), "" );
 
 			data_plot->Draw();
 			data_graph->Draw("PC9 SAME");
@@ -828,7 +831,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 				   TString Chi2Title("Chi2Title");
 				   TString Chi2Name(Chi2Title); Chi2Name+=plotPDF->GetRandomFunction()->Rndm();
-				   TCanvas* Chi2test = new TCanvas( Chi2Name, Chi2Title, 1680, 1050 );
+				   TCanvas* Chi2test = EdStyle::RapidFitCanvas( Chi2Name, Chi2Title );
 				   binned_data.back()->Draw("AP");
 				   tf1_graph->Draw("C");
 				   Chi2test->Print(Chi2Name+".pdf");
@@ -1089,7 +1092,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	bool logy=false;
 	bool logx=false;
 
-	TCanvas* c1 = new TCanvas( TCanvasCleanName.c_str(), "", 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( TCanvasCleanName.c_str(), "" );
 
 	if( conf != NULL )
 	{
@@ -1262,7 +1265,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	c1->Update();
 
 
-	TLatex* myLatex=NULL;
+	TPaveText* myLatex=NULL;
 	if( addLHCb )
 	{
 		myLatex = EdStyle::LHCbLabel();
@@ -1923,7 +1926,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	string canvas_clean_name( canvas_name.Data() );
 	replace( canvas_clean_name.begin(), canvas_clean_name.end(), '.', '_' );
 
-	TCanvas* c1 = new TCanvas( canvas_clean_name.c_str(), canvas_name, 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( canvas_clean_name.c_str(), canvas_name );
 	pullGraph->Draw("AP9");
 	c1->Update();
 

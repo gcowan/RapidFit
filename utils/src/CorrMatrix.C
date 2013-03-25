@@ -92,7 +92,7 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 				}
 				allData.push_back( thisMatrixData );
 				TString Name="Matrix_"; Name+=j;
-				TCanvas* c1 = new TCanvas( Name, Name, 1680, 1050 );
+				TCanvas* c1 = EdStyle::RapidFitCanvas( Name, Name );
 				newMatrix->Draw("colz");
 				c1->Update();
 				TH1* matrixPlot = (TH1*) c1->GetPrimitive("TMatrixDBase")->Clone("newMatrixPlot");

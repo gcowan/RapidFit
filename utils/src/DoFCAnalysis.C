@@ -228,7 +228,7 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 
 			if( bad ) cout << endl;
 
-			TCanvas* free_c1 = new TCanvas( "TCanv_free_"+rand_str, "TCanv_free_"+rand_str, 1680, 1050 );
+			TCanvas* free_c1 = EdStyle::RapidFitCanvas( "TCanv_free_"+rand_str, "TCanv_free_"+rand_str );
 			TH1* free_data_th1 = Histogram_Processing::Get_TH1( free_2_plot, rand );//, get_optimal_histo_bins(param_data_free) );
 			free_data_th1->Draw();
 			free_c1->Update();
@@ -236,7 +236,7 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 			Histogram_Processing::Silent_Print( free_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_free.png" );
 			Histogram_Processing::Silent_Print( free_c1, *Param_i+"_"+*var_i+"_"+grid_name+"_free.C" );
 
-			TCanvas* fixed_c1 = new TCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str, 1680, 1050 );
+			TCanvas* fixed_c1 = EdStyle::RapidFitCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str );
 			TH1* fixed_data_th1 = Histogram_Processing::Get_TH1( fixed_2_plot, rand );//, get_optimal_histo_bins(param_data_fixed) );
 			fixed_data_th1->Draw();
 			fixed_c1->Update();
@@ -252,7 +252,7 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 			multi_graph->Add( free_graph );
 			multi_graph->Add( fixed_graph );
 
-			TCanvas* c1 = new TCanvas( "TCanv_"+rand_str, "TCanv_"+rand_str, 1680, 1050 );
+			TCanvas* c1 = EdStyle::RapidFitCanvas( "TCanv_"+rand_str, "TCanv_"+rand_str );
 
 			multi_graph->Draw( "APL" );
 
@@ -272,7 +272,7 @@ void FeldmanCousinsAnalysis::NLL_dists( vector<Double_t>& param_data_free, vecto
 	string rand_string( rand_str.Data() );
 	replace( rand_string.begin(), rand_string.end(), '.', '_' );
 	rand_str = rand_string.c_str();
-	TCanvas* free_c1 = new TCanvas( "TCanv_free_"+rand_str, "TCanv_free_"+rand_str, 1680, 1050 );
+	TCanvas* free_c1 = EdStyle::RapidFitCanvas( "TCanv_free_"+rand_str, "TCanv_free_"+rand_str );
 	TH1* free_data_th1 = Histogram_Processing::Get_TH1( param_data_free, rand );//, get_optimal_histo_bins(param_data_free) );
 	free_data_th1->Draw();
 	free_c1->Update();
@@ -280,7 +280,7 @@ void FeldmanCousinsAnalysis::NLL_dists( vector<Double_t>& param_data_free, vecto
 	Histogram_Processing::Silent_Print( free_c1, "NLL_"+grid_name+"_free.png" );
 	Histogram_Processing::Silent_Print( free_c1, "NLL_"+grid_name+"_free.C" );
 
-	TCanvas* fixed_c1 = new TCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str, 1680, 1050 );
+	TCanvas* fixed_c1 = EdStyle::RapidFitCanvas( "TCanv_fixed_"+rand_str, "TCanv_fixed_"+rand_str );
 	TH1* fixed_data_th1 = Histogram_Processing::Get_TH1( param_data_fixed, rand );//, get_optimal_histo_bins(param_data_fixed) );
 	fixed_data_th1->Draw();
 	fixed_c1->Update();
@@ -297,7 +297,7 @@ void FeldmanCousinsAnalysis::NLL_dists( vector<Double_t>& param_data_free, vecto
 	multi_graph->Add( free_graph );
 	multi_graph->Add( fixed_graph );
 
-	TCanvas* c1 = new TCanvas( "TCanv_"+rand_str, "TCanv_"+rand_str, 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( "TCanv_"+rand_str, "TCanv_"+rand_str );
 
 	multi_graph->Draw("APL");
 
@@ -332,7 +332,7 @@ void FeldmanCousinsAnalysis::Output_GridPoint( vector<string>& controlled_parame
 		grid_th1->Fill( Toy_DLL_Dist[i] );
 	}
 
-	TCanvas* c1 = new TCanvas( "TCanvas_"+grid_name, "TCanvas_"+grid_name, 1680, 1050 );
+	TCanvas* c1 = EdStyle::RapidFitCanvas( "TCanvas_"+grid_name, "TCanvas_"+grid_name );
 
 	grid_th1->Draw("PE");
 	c1->Update();           //      STUPID ROOT
@@ -546,7 +546,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
                 replace( canvas_string.begin(), canvas_string.end(), '.', '_' );
 		canv_nam_p = canvas_string.c_str();
 		here->cd();
-		TCanvas*  canv_p = new TCanvas( canv_nam_p, canv_nam_p, 1680, 1050 );
+		TCanvas*  canv_p = EdStyle::RapidFitCanvas( canv_nam_p, canv_nam_p );
 		canv_p->SetLogy();
 		diff_th1->Draw();
 		diff2_th1->Draw("SAME");
@@ -692,7 +692,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
                 string CanvasStr( m_canvas_name.Data() );
                 replace( CanvasStr.begin(), CanvasStr.end(), '.', '_' );
 		m_canvas_name = CanvasStr.c_str();
-		TCanvas* DLL_Overlay = new TCanvas( m_canvas_name, m_canvas_name, 1680, 1050 );
+		TCanvas* DLL_Overlay = EdStyle::RapidFitCanvas( m_canvas_name, m_canvas_name );
 		DLL_Overlay->SetLogy();
 		total_th1->Draw("lp9");
 		DLL_Overlay->Update();
@@ -863,7 +863,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	mult->Add( final_cl );
 	mult->Add( data1 );
 
-	TCanvas* cf = new TCanvas( "cf", "", 1680, 1050 );
+	TCanvas* cf = EdStyle::RapidFitCanvas( "cf", "" );
 	cf->SetTitle("");
 	mult->Draw("APC");
 	cf->Update();
@@ -932,7 +932,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	Histogram_Processing::Silent_Print( cf, "Final_zoom.png" );
 	Histogram_Processing::Silent_Print( cf, "Final_zoom.C" );
 
-	TCanvas* cfz = new TCanvas( "cfz", "", 1680, 1050 );
+	TCanvas* cfz = EdStyle::RapidFitCanvas( "cfz", "" );
 
 	TMultiGraph* mult_z = new TMultiGraph( "cfz", "" );
 	mult_z->Add( final_graph );
@@ -970,7 +970,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	mult2->Add( final_cl2 );
 	mult2->Add( real_cl2 );
 
-	TCanvas* cf2 = new TCanvas( "cf2", "", 1680, 1050 );
+	TCanvas* cf2 = EdStyle::RapidFitCanvas( "cf2", "" );
 	cf2->SetTitle( "" );
 	cf2->SetLogy();
 	mult2->Draw("APC");
@@ -1063,7 +1063,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	mult3->Add( Theory_Graph );
 	mult3->Add( Data_Graph );
 
-	TCanvas* cf3 = new TCanvas( "cf3", "", 1680, 1050 );
+	TCanvas* cf3 = EdStyle::RapidFitCanvas( "cf3", "" );
 	cf3->SetTitle( "" );
 	cf3->SetLogy();
 	mult3->Draw("APC");
@@ -1240,7 +1240,7 @@ OutputPlots* FeldmanCousinsAnalysis::Plot_1D_Vectors( pair<vector<double>,vector
 	string rand_string( rand_num.Data() );
 	replace( rand_string.begin(), rand_string.end(), '.', '_' );
 	rand_num = rand_string.c_str();
-	TCanvas* cf = new TCanvas( "canv_"+rand_num, "", 1680, 1050 );
+	TCanvas* cf = EdStyle::RapidFitCanvas( "canv_"+rand_num, "" );
 	mult->Draw("APC");
 	cf->Update();
 
@@ -1368,7 +1368,7 @@ mult->Add( final_graph );
 mult->Add( final_cl );
 mult->Add( data1 );
 
-TCanvas* cf = new TCanvas( "cf", "", 1680, 1050 );
+TCanvas* cf = EdStyle::RapidFitCanvas( "cf", "" );
 cf->SetTitle("");
 mult->Draw("APC");
 cf->Update();
@@ -1440,7 +1440,7 @@ mult2->Add( final_graph2 );
 mult2->Add( final_cl2 );
 mult2->Add( real_cl2 );
 
-TCanvas* cf2 = new TCanvas( "cf2", "", 1680, 1050 );
+TCanvas* cf2 = EdStyle::RapidFitCanvas( "cf2", "" );
 cf2->SetTitle( "" );
 cf2->SetLogy();
 mult2->Draw("APC");

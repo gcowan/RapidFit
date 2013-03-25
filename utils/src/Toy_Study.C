@@ -328,7 +328,7 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		Histogram_Processing::Silent_Fit( input_histo, fit_type );
 
 		TString Canvas_Name("Canvas");	Canvas_Name+=rand_gen->Rndm();
-		TCanvas* c1 = new TCanvas( Canvas_Name, Canvas_Name, 1680, 1050 );
+		TCanvas* c1 = EdStyle::RapidFitCanvas( Canvas_Name, Canvas_Name );
 		Histogram_Processing::Silent_Draw( c1, input_histo );
 		TAxis* x_axis = input_histo->GetXaxis();
 		string units;

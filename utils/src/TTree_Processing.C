@@ -10,6 +10,7 @@
 #include "TPolyMarker3D.h"
 #include "Mathematics.h"
 
+#include "EdStyle.h"
 #include "TTree_Processing.h"
 
 #include <vector>
@@ -197,7 +198,7 @@ vector<vector<Double_t> > TTree_Processing::Plotter_Data( TTree* input_tree, TSt
 	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
 	TDirectory* temp_path = gDirectory;
 	TString canv_name = "Plot_Data_"; canv_name += random->Rndm()*1000;
-	TCanvas* temp_canv = new TCanvas( canv_name, canv_name, 1680, 1050 );
+	TCanvas* temp_canv = EdStyle::RapidFitCanvas( canv_name, canv_name );
 	//	Cannot implement goff in the case of 3D data that we wish to be in TPolyMarker3D form
 	input_tree->Draw( Draw_String, Cut_String, "", upper_lim, 0 );
 
