@@ -11,7 +11,8 @@
 #include "TString.h"
 #include "TH2D.h"
 #include "TH3D.h"
-#include "RooMath.h"
+#include "TSystem.h"
+#include "TROOT.h"
 ///  RapidFit Headers
 #include "Mathematics.h"
 #include "FitAssembler.h"
@@ -738,6 +739,9 @@ int PerformMainFit( RapidFitConfiguration* config )
 		string fileName = ResultFormatter::GetOutputFolder();
 		string fileName_ext=string( "Global_Fit_Result_"+StringProcessing::TimeString()+".root" );
 		fileName.append("/"); fileName.append( fileName_ext );
+		//cout << "Writing Output Tuple to:\t" << fileName << endl;
+		//cout << "Output Folder:\t" << ResultFormatter::GetOutputFolder() << endl;
+		//cout << "Current Folder:\t" << gSystem->pwd() << endl;
 		ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs );
 		ResultFormatter::ReviewOutput( config->GlobalResult );
 	}

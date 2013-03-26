@@ -875,7 +875,7 @@ void ResultFormatter::AddBranch( TTree* inputTree, const string& BranchName, con
 	{
 		if( inputTree->GetEntries() != (int) DoubleData.size() )
 		{
-			cerr << "CANNOT ADD BRANCH: " << BranchName << " TO: " << inputTree->GetName() << endl;
+			cerr << "CANNOT ADD DOUBLE BRANCH: " << BranchName << " TO: " << inputTree->GetName() << endl;
 			return;
 		}
 	}
@@ -903,7 +903,7 @@ void ResultFormatter::AddBranch( TTree* inputTree, const string& BranchName, con
 	{
 		if( inputTree->GetEntries() != (int) IntData.size() )
 		{
-			cerr << "CANNOT ADD BRANCH: " << BranchName << " TO: " << inputTree->GetName() << endl;
+			cerr << "CANNOT ADD INT BRANCH: " << BranchName << " TO: " << inputTree->GetName() << endl;
 			return;
 		}
 	}
@@ -930,6 +930,8 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	rootFile->SetCompressionLevel( 9 );
+
+	//cout << "Storing Fit Result Vector" << endl;
 
 	//	Important!
 	//	The output from this is typically run through the RapidPlot file
@@ -1010,6 +1012,8 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 		ResultFormatter::AddBranch( outputTree, BranchName+"_fix", ParameterFixedStatus );
 	}
 
+	//cout << "Stored Parameters" << endl;
+
 	ResultFormatter::AddBranch( outputTree, "Fit_RealTime", ToyResult->GetAllRealTimes() );
 	ResultFormatter::AddBranch( outputTree, "Fit_CPUTime", ToyResult->GetAllCPUTimes() );
 	ResultFormatter::AddBranch( outputTree, "Fit_GLTime", ToyResult->GetAllGLTimes() );
@@ -1024,6 +1028,9 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 
 	ResultFormatter::AddBranch( outputTree, "Fit_Status", fitStatus );
 	ResultFormatter::AddBranch( outputTree, "NLL", NLL_Values );
+
+	outputTree->Write("",TObject::kOverwrite);
+
 	//ResultFormatter::AddBranch( outputTree, "Fit_RealTime", RealTimes );
 	//ResultFormatter::AddBranch( outputTree, "Fit_CPUTime", CPUTimes );
 
@@ -1040,23 +1047,36 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 	  delete [] resultArr;
 	  }*/
 
-	vector<double> MatrixElements; vector<string> MatrixNames;
-	TTree * tree = new TTree("corr_matrix", "Elements from Correlation Matricies");
-	tree->Branch("MartrixElements", "std::vector<double>", &MatrixElements );
-	tree->Branch("MartrixNames", "std::vector<string>", &MatrixNames );
-	for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
+	//cout << "Storing Correlation Matrix" << endl;
+
+	if( ToyResult->GetFitResult(0)->GetResultParameterSet() != NULL )
 	{
-		TMatrixDSym* thisMatrix = ToyResult->GetFitResult(resultIndex)->GetCovarianceMatrix()->thisMatrix;
-		MatrixNames = ToyResult->GetFitResult(resultIndex)->GetCovarianceMatrix()->theseParameters;
-		double* MatrixArray = thisMatrix->GetMatrixArray();
-		MatrixElements.clear();
-		for( unsigned int i=0; i< (unsigned) thisMatrix->GetNoElements(); ++i )
+		if( !ToyResult->GetFitResult(0)->GetResultParameterSet()->GetAllFloatNames().empty() )
 		{
-			MatrixElements.push_back( MatrixArray[i] );
+			vector<double> MatrixElements; vector<string> MatrixNames;
+			TTree * tree = new TTree("corr_matrix", "Elements from Correlation Matricies");
+			tree->Branch("MartrixElements", "std::vector<double>", &MatrixElements );
+			tree->Branch("MartrixNames", "std::vector<string>", &MatrixNames );
+			for( int resultIndex = 0; resultIndex < ToyResult->NumberResults(); ++resultIndex )
+			{
+				TMatrixDSym* thisMatrix = ToyResult->GetFitResult(resultIndex)->GetCovarianceMatrix()->thisMatrix;
+				if( thisMatrix == NULL ) continue;
+				MatrixNames = ToyResult->GetFitResult(resultIndex)->GetCovarianceMatrix()->theseParameters;
+				if( MatrixNames.empty() ) continue;
+				double* MatrixArray = thisMatrix->GetMatrixArray();
+				if( MatrixArray == NULL ) continue;
+				MatrixElements.clear();
+				for( unsigned int i=0; i< (unsigned) thisMatrix->GetNoElements(); ++i )
+				{
+					MatrixElements.push_back( MatrixArray[i] );
+				}
+				if( thisMatrix->GetNoElements() > 0 ) tree->Fill();
+			}
+			tree->Write("",TObject::kOverwrite);
 		}
-		tree->Fill();
 	}
-	tree->Write("",TObject::kOverwrite);
+
+	//cout << "Saving XML and runtime" << endl;
 
 	if( !inputXML.empty() )
 	{
@@ -1088,7 +1108,7 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 
 	//	THIS SHOULD BE SAFE... BUT THIS IS ROOT so 'of course' it isn't...
 	//delete parameterNTuple;
-	delete rootFile;
+	//delete rootFile;
 }
 
 //Make pull plots from the output of a toy study
