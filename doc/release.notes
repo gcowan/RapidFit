@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/04/01 Rob Currie
+  - I wanted to plot a -ve component to a PDF and have to come to the conclusion that protecting the PDF integrator from -ve numbers is a bad thing.
+       The Integrators are still 'protected' from nan and inf and other problems, however -ve integrals are real and make sense for components of full pdfs (and other uses)
+       YOUR PDF SHOULD NOT (NORMALLY) BE -ve!!!
+       if you believe this should be protected for in RapidFit un-comment the code at around line 275 in the IntegrationFunction class which replaces -ve values with 0.
+  - Added the ability for the jpsiphi v5 to plot all 10 terms as individual projections. (Was just something I wanted to try and prove...)
+  - Added a single line of output to trace the seed being used by RapidFit instance (if not 0 this makes everything guaranteed reproducible)
+
 2013/03/25 Rob Currie
   - Changed the Style to be closer to current EB
   - Added a helper functions to get common LHCb EB standard variables (less code duplication)

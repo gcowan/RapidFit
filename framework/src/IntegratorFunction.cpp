@@ -272,7 +272,10 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		result = 0.;
 	}
 
-	if( result < 0 ) result = 0.;
+	//if( componentIndex == NULL )
+	//{
+	//	if( result < 0. ) result = 0.;
+	//}
 
 	if( fabs(result) >= DBL_MAX ) result = 0.;
 	if( isnan(result) ) result = 0.;

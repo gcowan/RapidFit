@@ -187,6 +187,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	, _usePunziSigmat(false)
 	, allowNegativeAsSq(false)
 	, _usePlotComponents(false)
+	, _usePlotAllComponents(false)
 	, DebugFlag_v5(true)
 	, _offsetToGammaForBetaFactor()
 	//objects
@@ -217,6 +218,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 	_usePunziMistag = configurator->isTrue( "UsePunziMistag" ) ;
 	allowNegativeAsSq = configurator->isTrue( "AllowNegativeAsSq" ) ;
 	_usePlotComponents = configurator->isTrue( "PlotComponents" ) ;
+	_usePlotAllComponents = configurator->isTrue( "PlotAllComponents" ) ; 
 	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
 	DebugFlag_v5 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
@@ -554,8 +556,8 @@ bool Bs2JpsiPhi_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	else
 	{
 		phi_s     = allParameters.GetPhysicsParameter( Phi_sName )->GetValue();
-		_cosphis = cos(phi_s) ;
-		_sinphis = sin(phi_s) ;
+		_cosphis = cos(phi_s);
+		_sinphis = sin(phi_s);
 	}
 	lambda = allParameters.GetPhysicsParameter( lambdaName )->GetValue();
 
@@ -1040,7 +1042,7 @@ void Bs2JpsiPhi_Signal_v5::preCalculateTimeIntegrals()
 vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 {
 	vector<string> this_component_list;
-	if( _usePlotComponents ) {
+	if( _usePlotComponents && !_usePlotAllComponents ) {
 		if( allParameters.GetPhysicsParameter(Azero_sqName)->GetValue() > 1E-10 )
 		{
 			this_component_list.push_back( "CP-Even" );
@@ -1055,6 +1057,21 @@ vector<string> Bs2JpsiPhi_Signal_v5::PDFComponents()
 		}
 		this_component_list.push_back( "0" );
 	}
+	else if( _usePlotAllComponents && !_usePlotComponents )
+	{
+		this_component_list.push_back( "0" );
+		this_component_list.push_back( "A0A0" );
+		this_component_list.push_back( "AparaApara" );
+		this_component_list.push_back( "AperpAperp" );
+		this_component_list.push_back( "ImAparaAperp" );
+		this_component_list.push_back( "ReA0Apara" );
+		this_component_list.push_back( "ImA0Aperp" );
+		this_component_list.push_back( "AsAs" );
+		this_component_list.push_back( "ImAsApara" );
+		this_component_list.push_back( "ReAsAperp" );
+		this_component_list.push_back( "ImAsA0" );
+	}
+
 	return this_component_list;
 }
 
@@ -1062,29 +1079,98 @@ double Bs2JpsiPhi_Signal_v5::EvaluateComponent( DataPoint* input, ComponentRef* 
 {
 	performingComponentProjection = true;
 	componentIndex = Component->getComponentNumber();
-	if( componentIndex == -1 )
+	if( _usePlotComponents && !_usePlotAllComponents )
 	{
-		string ComponentName = Component->getComponentName();
-		if( ComponentName.compare( "CP-Even" ) == 0 )
+		if( componentIndex == -1 )
 		{
-			Component->setComponentNumber( 1 );
-			componentIndex = 1;
+			string ComponentName = Component->getComponentName();
+			if( ComponentName.compare( "CP-Even" ) == 0 )
+			{
+				Component->setComponentNumber( 1 );
+				componentIndex = 1;
+			}
+			else if( ComponentName.compare( "CP-Odd" ) == 0 )
+			{
+				Component->setComponentNumber( 2 );
+				componentIndex = 2;
+			}
+			else if( ComponentName.compare( "As" ) == 0 )
+			{
+				Component->setComponentNumber( 3 );
+				componentIndex = 3;
+			}
+			else
+			{
+				Component->setComponentNumber( 0 );
+				componentIndex = 0;
+			}
 		}
-		else if( ComponentName.compare( "CP-Odd" ) == 0 )
+	}
+	else if( _usePlotAllComponents && !_usePlotComponents )
+	{
+		if( componentIndex == -1 )
 		{
-			Component->setComponentNumber( 2 );
-			componentIndex = 2;
+			string ComponentName = Component->getComponentName();
+			if( ComponentName.compare( "A0A0" ) == 0 )
+			{
+				Component->setComponentNumber( 1 );
+				componentIndex = 1;
+			}
+			else if( ComponentName.compare( "AparaApara" ) == 0 )
+			{
+				Component->setComponentNumber( 2 );
+				componentIndex = 2;
+			}
+			else if( ComponentName.compare( "AperpAperp" ) == 0 )
+			{
+				Component->setComponentNumber( 3 );
+				componentIndex = 3;
+			}
+			else if( ComponentName.compare( "ImAparaAperp" ) == 0 )
+			{
+				Component->setComponentNumber( 4 );
+				componentIndex = 4;
+			}
+			else if( ComponentName.compare( "ReA0Apara" ) == 0 )
+			{
+				Component->setComponentNumber( 6 );
+				componentIndex = 5;
+			}
+			else if( ComponentName.compare( "ImA0Aperp" ) == 0 )
+			{
+				Component->setComponentNumber( 6 );
+				componentIndex = 6;
+			}
+			else if( ComponentName.compare( "AsAs" ) == 0 )
+			{
+				Component->setComponentNumber( 7 );
+				componentIndex = 7;
+			}
+			else if( ComponentName.compare( "ImAsApara" ) == 0 )
+			{
+				Component->setComponentNumber( 8 );
+				componentIndex = 8;
+			}
+			else if( ComponentName.compare( "ReAsAperp" ) == 0 )
+			{
+				Component->setComponentNumber( 9 );
+				componentIndex = 9;
+			}
+			else if( ComponentName.compare( "ImAsA0" ) == 0 )
+			{
+				Component->setComponentNumber( 10 );
+				componentIndex = 10;
+			}
+			else
+			{
+				Component->setComponentNumber( 0 );
+				componentIndex = 0;
+			}
 		}
-		else if( ComponentName.compare( "As" ) == 0 )
-		{
-			Component->setComponentNumber( 3 );
-			componentIndex = 3;
-		}
-		else
-		{
-			Component->setComponentNumber( 0 );
-			componentIndex = 0;
-		}
+	}
+	else
+	{
+		return 0.;
 	}
 
 	double return_value = this->Evaluate( input );
@@ -1102,64 +1188,147 @@ double Bs2JpsiPhi_Signal_v5::diffXsec()
 	preCalculateTimeFactors();
 
 	double xsec=-1.;
-	switch( componentIndex )
+	if( _usePlotAllComponents && !_usePlotComponents )
 	{
-		case 1:		//	CP-Even		CP-Odd=0 && S-Wave=0
-			xsec = CachedA1 * timeFactorA0A0(  );
-			xsec += CachedA2 * timeFactorAPAP(  );
-			xsec += CachedA5 * timeFactorReA0AP(  );
-			break;
-		case 2:		//	CP-Odd		CP-Even=0 && S-Wave=0
-			xsec = CachedA3 * timeFactorATAT(  );
-			break;
-		case 3:		//	S-Wave		CP-Even=0 && CP-Odd=0
-			xsec = CachedA7 * timeFactorASAS(  );
-			break;
-		default:	//	Everything
-			xsec =
+		switch( componentIndex )
+		{
+			case 1:
+				xsec = CachedA1 * timeFactorA0A0(  );
+				break;
+			case 2:
+				xsec = CachedA2 * timeFactorAPAP(  );
+				break;
+			case 3:
+				xsec = CachedA3 * timeFactorATAT(  );
+				break;
+			case 4:
+				xsec = CachedA4 * timeFactorImAPAT(  );
+				break;
+			case 5:
+				xsec = CachedA5 * timeFactorReA0AP(  );
+				break;
+			case 6:
+				xsec = CachedA6 * timeFactorImA0AT(  );
+				break;
+			case 7:
+				xsec = CachedA7 * timeFactorASAS(  );
+				break;
+			case 8:
+				xsec = CachedA8 * timeFactorReASAP(  );
+				break;
+			case 9:
+				xsec = CachedA9 * timeFactorImASAT(  );
+				break;
+			case 10:
+				xsec = CachedA10 * timeFactorReASA0(  );
+				break;
+			default:
+				xsec = CachedA1 * timeFactorA0A0(  );
+				xsec+= CachedA2 * timeFactorAPAP(  );
+				xsec+= CachedA3 * timeFactorATAT(  );
+				xsec+= CachedA4 * timeFactorImAPAT(  );
+				xsec+= CachedA5 * timeFactorReA0AP(  );
+				xsec+= CachedA6 * timeFactorImA0AT(  );
+				xsec+= CachedA7 * timeFactorASAS(  );
+				xsec+= CachedA8 * timeFactorReASAP(  );
+				xsec+= CachedA9 * timeFactorImASAT(  );
+				xsec+= CachedA10 * timeFactorReASA0(  );
+				break;
+		}
+	}
+	else if( !_usePlotAllComponents && _usePlotComponents )
+	{
+		switch( componentIndex )
+		{
+			case 1:         //      CP-Even         CP-Odd=0 && S-Wave=0
+				xsec = CachedA1 * timeFactorA0A0(  );
+				xsec += CachedA2 * timeFactorAPAP(  );
+				xsec += CachedA5 * timeFactorReA0AP(  );
+				break;
+			case 2:         //      CP-Odd          CP-Even=0 && S-Wave=0
+				xsec = CachedA3 * timeFactorATAT(  );
+				break;
+			case 3:         //      S-Wave          CP-Even=0 && CP-Odd=0
+				xsec = CachedA7 * timeFactorASAS(  );
+				break;
+			default:        //      Everything
+				xsec =
 
-				/*
-				   A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
-				   AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
-				   AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
+					CachedA1 * timeFactorA0A0(  ) +
+					CachedA2 * timeFactorAPAP(  ) +
+					CachedA3 * timeFactorATAT(  ) +
 
-				   AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
-				   A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
-				   A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
+					CachedA4 * timeFactorImAPAT(  ) +
+					CachedA5 * timeFactorReA0AP(  ) +
+					CachedA6 * timeFactorImA0AT(  ) +
 
-				   AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
+					CachedA7 * timeFactorASAS(  ) +
 
-				   AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
-				   AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
-				   AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
-				   */
+					CachedA8 * timeFactorReASAP(  ) +
+					CachedA9 * timeFactorImASAT(  ) +
+					CachedA10 * timeFactorReASA0(  );
 
-				CachedA1 * timeFactorA0A0(  ) +
-				CachedA2 * timeFactorAPAP(  ) +
-				CachedA3 * timeFactorATAT(  ) +
+				//PELC - This turned out to be an important debugging tool
+				//switch it on to see the values of PDF being returend.  If ANY go negative, it means there is a sign wrong in one or more of the terms
+				//You need to enable in the .h file as well
+				//histOfPdfValues->Fill(xsec) ;
+				//histCounter++ ;
+				//if( histCounter > 10000 ) {
+				//      histOfPdfValues->Draw() ;
+				//      c0->Update() ;
+				//      c0->SaveAs( "histOfPdfValues-from-Evaluate.eps" ) ;
+				//      histCounter = 0 ;
+				//}
+				break;
+		}
+	}
+	else if( _usePlotAllComponents && _usePlotComponents )
+	{
+		return 0.;
+	}
+	else
+	{
+		xsec =
+			/*
+			   A0()*A0() * timeFactorA0A0(  ) * angleFactorA0A0( ) +
+			   AP()*AP() * timeFactorAPAP(  ) * angleFactorAPAP( ) +
+			   AT()*AT() * timeFactorATAT(  ) * angleFactorATAT( ) +
 
-				CachedA4 * timeFactorImAPAT(  ) +
-				CachedA5 * timeFactorReA0AP(  ) +
-				CachedA6 * timeFactorImA0AT(  ) +
+			   AP()*AT() * timeFactorImAPAT(  ) * angleFactorImAPAT( ) +
+			   A0()*AP() * timeFactorReA0AP(  ) * angleFactorReA0AP( ) +
+			   A0()*AT() * timeFactorImA0AT(  ) * angleFactorImA0AT( ) +
 
-				CachedA7 * timeFactorASAS(  ) +
+			   AS()*AS() * timeFactorASAS(  ) * angleFactorASAS( ) +
+			   AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
+			   AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
+			   AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
+			   */
 
-				CachedA8 * timeFactorReASAP(  ) +
-				CachedA9 * timeFactorImASAT(  ) +
-				CachedA10 * timeFactorReASA0(  );
+			CachedA1 * timeFactorA0A0(  ) +
+			CachedA2 * timeFactorAPAP(  ) +
+			CachedA3 * timeFactorATAT(  ) +
 
-			//PELC - This turned out to be an important debugging tool
-			//switch it on to see the values of PDF being returend.  If ANY go negative, it means there is a sign wrong in one or more of the terms
-			//You need to enable in the .h file as well
-			//histOfPdfValues->Fill(xsec) ;
-			//histCounter++ ;
-			//if( histCounter > 10000 ) {
-			//	histOfPdfValues->Draw() ;
-			//	c0->Update() ;
-			//	c0->SaveAs( "histOfPdfValues-from-Evaluate.eps" ) ;
-			//	histCounter = 0 ;
-			//}
-			break;
+			CachedA4 * timeFactorImAPAT(  ) +
+			CachedA5 * timeFactorReA0AP(  ) +
+			CachedA6 * timeFactorImA0AT(  ) +
+
+			CachedA7 * timeFactorASAS(  ) +
+
+			CachedA8 * timeFactorReASAP(  ) +
+			CachedA9 * timeFactorImASAT(  ) +
+			CachedA10 * timeFactorReASA0(  );
+
+		//PELC - This turned out to be an important debugging tool
+		//switch it on to see the values of PDF being returend.  If ANY go negative, it means there is a sign wrong in one or more of the terms
+		//You need to enable in the .h file as well
+		//histOfPdfValues->Fill(xsec) ;
+		//histCounter++ ;
+		//if( histCounter > 10000 ) {
+		//	histOfPdfValues->Draw() ;
+		//	c0->Update() ;
+		//	c0->SaveAs( "histOfPdfValues-from-Evaluate.eps" ) ;
+		//	histCounter = 0 ;
+		//}
 	}
 
 	Observable* timeObs = _datapoint->GetObservable( timeName );
@@ -1428,9 +1597,11 @@ void Bs2JpsiPhi_Signal_v5::deCacheTimeIntegrals( unsigned int ires, unsigned int
 // New to prepare all of the coeefficients needed in the time dependen terms
 void Bs2JpsiPhi_Signal_v5::prepareCDS()
 {
+	double lambda_sq = lambda*lambda;
+	double inv_lambda = 1./(1.0 + lambda_sq);
 
-	double F1 = 2.0*lambda / (1.0 + lambda*lambda);
-	double F2 = (1.0 - lambda*lambda) / (1.0 + lambda*lambda);
+	double F1 = 2.0*lambda *inv_lambda;
+	double F2 = (1.0 - lambda_sq) *inv_lambda;
 
 	_SS = _sinphis * F1;
 	_DD = _cosphis * F1;

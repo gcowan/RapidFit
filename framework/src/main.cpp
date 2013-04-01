@@ -1297,6 +1297,8 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 		config->xmlFile->SetSeed( unsigned(config->RuntimeSeed[0]) );
 	}
 
+	cout << "SEED being used is:\t" << config->xmlFile->GetSeed() << endl;
+
 	//	Command line arguments are passed and interpreted within the parser to override what is read from the XMLFile
 	if( config->parameterTemplateFlag )
 	{
