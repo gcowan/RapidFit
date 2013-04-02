@@ -1,4 +1,4 @@
-/** @class Bd2JpsiKstar_sWave Bd2JpsiKstar_sWave.cpp
+/** @class Bd2JpsiKstar_sWave_Fs Bd2JpsiKstar_sWave_Fs.cpp
  *
  *  RapidFit PDF for Bd2JpsiPhi with average angular acceptance input as a paramter
  *
@@ -6,7 +6,7 @@
  *  @date 2011-01-26
  */
 
-#include "Bd2JpsiKstar_sWave.h"
+#include "Bd2JpsiKstar_sWave_Fs.h"
 #include "Mathematics.h"
 #include "SlicedAcceptance.h"
 #include <iostream>
@@ -17,50 +17,50 @@
 #include "TH3D.h"
 #include "TROOT.h"
 
-PDF_CREATOR( Bd2JpsiKstar_sWave );
+PDF_CREATOR( Bd2JpsiKstar_sWave_Fs );
 //Constructor
-Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator* configurator ) :
+Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
 	cachedAzeroAzeroIntB(), cachedAparaAparaIntB(), cachedAperpAperpIntB(), cachedAparaAperpIntB(), cachedAzeroAparaIntB(), cachedAzeroAperpIntB(),
 	cachedAsAsIntB(), cachedAparaAsIntB(), cachedAperpAsIntB(), cachedAzeroAsIntB(), AzeroAzeroB(), AparaAparaB(), AperpAperpB(), AsAsB(), ImAparaAperpB(),
 	ReAzeroAparaB(), ImAzeroAperpB(), ReAparaAsB(), ImAperpAsB(), ReAzeroAsB(), cachedSinDeltaPerpPara(), cachedCosDeltaPara(), cachedSinDeltaPerp(),
 	cachedCosDeltaParaS(), cachedSinDeltaPerpS(), cachedCosDeltaS(), cachedAzero(), cachedApara(), cachedAperp(), cachedAs(), timeAcc(NULL),
 	// Physics parameters
-	  gammaName     ( "gamma" )
-	, Azero_sqName ( "Azero_sq")
-	, Apara_sqName  ( "Apara_sq" )
-	, Aperp_sqName  ( "Aperp_sq" )
-	, As_sqName	( "As_sq" )
-	, delta_zeroName( "delta_zero" )
-	, delta_paraName( "delta_para" )
-	, delta_perpName( "delta_perp" )
-	, delta_sName	( "delta_s" )
-	, angAccI1Name	( "angAccI1" )
-	, angAccI2Name	( "angAccI2" )
-	, angAccI3Name	( "angAccI3" )
-	, angAccI4Name	( "angAccI4" )
-	, angAccI5Name	( "angAccI5" )
-	, angAccI6Name	( "angAccI6" )
-	, angAccI7Name  ( "angAccI7" )
-	, angAccI8Name  ( "angAccI8" )
-	, angAccI9Name  ( "angAccI9" )
-	, angAccI10Name ( "angAccI10" )
-	, timeRes1Name	( "timeResolution1" )
-	, timeRes2Name	( "timeResolution2" )
-	, timeRes1FractionName	( "timeResolution1Fraction" )
+	  gammaName             ( configurator->getName("gamma" ))
+        , Rzero_sqName ( configurator->getName("Rzero_sq"))
+        , Rpara_sqName  ( configurator->getName("Rpara_sq" ))
+        , Rperp_sqName  ( configurator->getName("Rperp_sq" ))
+        , As_sqName     ( configurator->getName("As_sq" ))
+        , delta_zeroName( configurator->getName("delta_zero" ))
+        , delta_paraName( configurator->getName("delta_para" ))
+        , delta_perpName( configurator->getName("delta_perp" ))
+        , delta_sName   ( configurator->getName("delta_s" ))
+        , CspName   ( configurator->getName("Csp" ))
+        , angAccI1Name  ( configurator->getName("angAccI1" ))
+        , angAccI2Name  ( configurator->getName("angAccI2" ))
+        , angAccI3Name  ( configurator->getName("angAccI3" ))
+        , angAccI4Name  ( configurator->getName("angAccI4" ))
+        , angAccI5Name  ( configurator->getName("angAccI5" ))
+        , angAccI6Name  ( configurator->getName("angAccI6" ))
+        , angAccI7Name  ( configurator->getName("angAccI7" ))
+        , angAccI8Name  ( configurator->getName("angAccI8" ))
+        , angAccI9Name  ( configurator->getName("angAccI9" ))
+        , angAccI10Name ( configurator->getName("angAccI10" ))
+        , timeRes1Name  ( configurator->getName("timeResolution1") )
+        , timeRes2Name  ( configurator->getName("timeResolution2" ))
+        , timeRes1FractionName  ( configurator->getName("timeResolution1Fraction" ))
 	, _useTimeAcceptance(false)
 
 	// Observables (What we want to gain from the pdf after inserting physics parameter values)
 	, normalisationCacheValid(false)
 	, evaluationCacheValid(false)
-	, timeName	( "time" )
-	, cosThetaName	( "cosTheta" )
-	, phiName	( "phi" )
-	, cosPsiName	( "cosPsi" )
-	, KstarFlavourName  ( "KstarFlavour" )
-	//, timeres	( "resolution" )
+	 , timeName      ( configurator->getName("time" ))
+        , cosThetaName  ( configurator->getName("cosTheta" ))
+        , phiName       ( configurator->getName("phi" ))
+        , cosPsiName    ( configurator->getName("cosPsi" ))
+        , KstarFlavourName  ( configurator->getName("KstarFlavour" ))
 
 	, timeconstraintName( "time" )
-	, gamma(), Azero_sq(), Apara_sq(), Aperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
+	, gamma(), Rzero_sq(), Rpara_sq(), Rperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
 	delta_zero(), delta_para(), delta_perp(), delta_s(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(),
 	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), Ap_sq(), Ap(), time(), cosTheta(), phi(),
 	cosPsi(), KstarFlavour(), tlo(), thi(), useFlatAngularDistribution(true)
@@ -70,11 +70,11 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator* configurator ) :
 
        if( useTimeAcceptance() ) {
                         timeAcc = new SlicedAcceptance( 0., 14.0, 0.0171 ) ;
-                        cout << "Bd2JpsiKstar_sWave:: Constructing timeAcc: Upper time acceptance beta=0.0171 [0 < t < 14] " << endl ;
+                        cout << "Bd2JpsiKstar_sWave_Fs:: Constructing timeAcc: Upper time acceptance beta=0.0171 [0 < t < 14] " << endl ;
                 }
         else {
                         timeAcc = new SlicedAcceptance( 0., 14. ) ;
-                        cout << "Bd2JpsiKstar_sWave:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
+                        cout << "Bd2JpsiKstar_sWave_Fs:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
         }
 
 
@@ -220,7 +220,7 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator* configurator ) :
 
 
 //Make the data point and parameter set
-void Bd2JpsiKstar_sWave::MakePrototypes()
+void Bd2JpsiKstar_sWave_Fs::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
@@ -236,12 +236,13 @@ void Bd2JpsiKstar_sWave::MakePrototypes()
 	//Make the parameter set
 	vector<string> parameterNames;
 	parameterNames.push_back( gammaName );
-	parameterNames.push_back( Apara_sqName );
-	parameterNames.push_back( Aperp_sqName );
+	parameterNames.push_back( Rpara_sqName );
+	parameterNames.push_back( Rperp_sqName );
 	parameterNames.push_back( As_sqName );
 	parameterNames.push_back( delta_paraName );
 	parameterNames.push_back( delta_perpName );
 	parameterNames.push_back( delta_sName );
+	parameterNames.push_back( CspName );
 	parameterNames.push_back( timeRes1Name );
 	parameterNames.push_back( timeRes2Name );
 	parameterNames.push_back( timeRes1FractionName );
@@ -259,24 +260,25 @@ void Bd2JpsiKstar_sWave::MakePrototypes()
 }
 
 //Destructor
-Bd2JpsiKstar_sWave::~Bd2JpsiKstar_sWave()
+Bd2JpsiKstar_sWave_Fs::~Bd2JpsiKstar_sWave_Fs()
 {
 }
 
 //Not only set the physics parameters, but indicate that the cache is no longer valid
-bool Bd2JpsiKstar_sWave::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bd2JpsiKstar_sWave_Fs::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	normalisationCacheValid = false;
 	evaluationCacheValid = false;
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
-	Apara_sq   = allParameters.GetPhysicsParameter( Apara_sqName )->GetValue();
-	Aperp_sq   = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
-	As_sq   = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
+	Rpara_sq   = allParameters.GetPhysicsParameter( Rpara_sqName )->GetValue();
+	Rperp_sq   = allParameters.GetPhysicsParameter( Rperp_sqName )->GetValue();
+	double Fs   = allParameters.GetPhysicsParameter( As_sqName )->GetValue();
 	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
 	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
 	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue();
+	Csp = allParameters.GetPhysicsParameter( CspName )->GetValue();
 	timeRes1 = allParameters.GetPhysicsParameter( timeRes1Name )->GetValue();
 	timeRes2 = allParameters.GetPhysicsParameter( timeRes2Name )->GetValue();
 	timeRes1Frac = allParameters.GetPhysicsParameter( timeRes1FractionName )->GetValue();
@@ -291,7 +293,17 @@ bool Bd2JpsiKstar_sWave::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	angAccI9 = allParameters.GetPhysicsParameter( angAccI9Name )->GetValue();
 	angAccI10 = allParameters.GetPhysicsParameter( angAccI10Name )->GetValue();
 
-	Azero_sq = 1 - Aperp_sq - Apara_sq - As_sq ;
+	//Rzero_sq = 1 - Rperp_sq - Rpara_sq;
+        //Aperp_sq = Rperp_sq*(1-As_sq);
+        //Apara_sq = Rpara_sq*(1-As_sq);
+        //Azero_sq = Rzero_sq*(1-As_sq);
+
+	Rzero_sq = 1 - Rperp_sq - Rpara_sq;
+        Aperp_sq = Rperp_sq;
+        Apara_sq = Rpara_sq;
+        Azero_sq = Rzero_sq;
+	As_sq = Fs/(1-Fs);
+
 	AparaAperp = sqrt(Apara_sq)*sqrt(Aperp_sq);
 	AzeroApara = sqrt(Azero_sq)*sqrt(Apara_sq);
 	AzeroAperp = sqrt(Azero_sq)*sqrt(Aperp_sq);
@@ -303,18 +315,17 @@ bool Bd2JpsiKstar_sWave::SetPhysicsParameters( ParameterSet * NewParameterSet )
 }
 
 //Return a list of parameters not to be integrated
-vector<string> Bd2JpsiKstar_sWave::GetDoNotIntegrateList()
+vector<string> Bd2JpsiKstar_sWave_Fs::GetDoNotIntegrateList()
 {
 	vector<string> doNotIntList;
 	doNotIntList.push_back(timeName);
-
 	return doNotIntList;
 }
 
-double Bd2JpsiKstar_sWave::q() const { return KstarFlavour;}
+double Bd2JpsiKstar_sWave_Fs::q() const { return KstarFlavour;}
 
 //Calculate the function value
-double Bd2JpsiKstar_sWave::Evaluate(DataPoint * measurement)
+double Bd2JpsiKstar_sWave_Fs::Evaluate(DataPoint * measurement)
 {
 
 	double returnValue;
@@ -345,7 +356,7 @@ double Bd2JpsiKstar_sWave::Evaluate(DataPoint * measurement)
 }
 
 		 if( (returnValue <= 0.) || isnan(returnValue) ) {
-                cout << " Bd2JpsiKstar_sWave::Evaluate() returns <=0 or nan " << endl ;
+                cout << " Bd2JpsiKstar_sWave_Fs::Evaluate() returns <=0 or nan " << endl ;
                 cout << " AT    " << Aperp_sq ;
                 cout << " AP    " << Apara_sq ;
                 cout << " A0    " << Azero_sq;
@@ -364,7 +375,7 @@ double Bd2JpsiKstar_sWave::Evaluate(DataPoint * measurement)
 }
 
 
-double Bd2JpsiKstar_sWave::buildPDFnumerator()
+double Bd2JpsiKstar_sWave_Fs::buildPDFnumerator()
 {
 	// The angular functions f1->f6 as defined in roadmap Table 1.(same for Kstar)
 	double f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
@@ -389,9 +400,9 @@ double Bd2JpsiKstar_sWave::buildPDFnumerator()
 		+ f5 * ReAzeroAparaB
 		+ f6 * ImAzeroAperpB * q()
 		+ f7 * AsAsB
-		+ f8 * ReAparaAsB
-		+ f9 * ImAperpAsB * q()
-		+ f10 * ReAzeroAsB
+		+ Csp * f8 * ReAparaAsB
+		+ Csp * f9 * ImAperpAsB * q()
+		+ Csp * f10 * ReAzeroAsB
 		;
 	if( useTimeAcceptance() ) v1  = v1 * timeAcc->getValue(time);
 	
@@ -400,7 +411,7 @@ double Bd2JpsiKstar_sWave::buildPDFnumerator()
 }
 
 
-double Bd2JpsiKstar_sWave::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bd2JpsiKstar_sWave_Fs::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 
 
@@ -445,7 +456,7 @@ double Bd2JpsiKstar_sWave::Normalisation(DataPoint * measurement, PhaseSpaceBoun
 
 
 		 if( (returnValue <= 0.) || isnan(returnValue) ) {
-                cout << " Bd2JpsiKstar_sWave::Normalisation() returns <=0 or nan " << endl ;
+                cout << " Bd2JpsiKstar_sWave_Fs::Normalisation() returns <=0 or nan " << endl ;
                 cout << " AT    " << Aperp_sq ;
                 cout << " AP    " << Apara_sq ;
                 cout << " A0    " << Azero_sq;
@@ -467,7 +478,7 @@ return returnValue;
 // New method to calculate normalisation using a histogrammed "low-end" time acceptance function
 // The acceptance function information is all contained in the timeAcceptance member object,
 
-double Bd2JpsiKstar_sWave::buildCompositePDFdenominator( )
+double Bd2JpsiKstar_sWave_Fs::buildCompositePDFdenominator( )
 {
         double tlo_boundary = tlo ;
         double thi_boundary = thi ;
@@ -495,7 +506,7 @@ double Bd2JpsiKstar_sWave::buildCompositePDFdenominator( )
 
 
 
-double Bd2JpsiKstar_sWave::NormAnglesOnlyForAcceptanceWeights(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bd2JpsiKstar_sWave_Fs::NormAnglesOnlyForAcceptanceWeights(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	(void) boundary;
         double returnValue;
@@ -526,7 +537,7 @@ double Bd2JpsiKstar_sWave::NormAnglesOnlyForAcceptanceWeights(DataPoint * measur
 
 
                  if( (returnValue <= 0.) || isnan(returnValue) ) {
-                cout << " Bd2JpsiKstar_sWave::Normalisation() returns <=0 or nan " << endl ;
+                cout << " Bd2JpsiKstar_sWave_Fs::Normalisation() returns <=0 or nan " << endl ;
                 cout << " AT    " << Aperp_sq ;
                 cout << " AP    " << Apara_sq ;
                 cout << " A0    " << Azero_sq;
@@ -544,7 +555,7 @@ return returnValue;
 
 
 
-double Bd2JpsiKstar_sWave::buildPDFdenominator()
+double Bd2JpsiKstar_sWave_Fs::buildPDFdenominator()
 {
 
 
@@ -571,9 +582,9 @@ double Bd2JpsiKstar_sWave::buildPDFdenominator()
 		+ cachedAzeroAparaIntB * angAccI5
 		+ cachedAzeroAperpIntB * angAccI6 * q()
 		+ cachedAsAsIntB * angAccI7
-		+ cachedAparaAsIntB * angAccI8
-		+ cachedAperpAsIntB * angAccI9 * q()
-		+ cachedAzeroAsIntB * angAccI10
+		+ Csp * cachedAparaAsIntB * angAccI8
+		+ Csp * cachedAperpAsIntB * angAccI9 * q()
+		+ Csp * cachedAzeroAsIntB * angAccI10
 		;
 	return v1;
 
@@ -582,7 +593,7 @@ double Bd2JpsiKstar_sWave::buildPDFdenominator()
 
 }
 
-double Bd2JpsiKstar_sWave::buildPDFdenominatorAngles()  //test method
+double Bd2JpsiKstar_sWave_Fs::buildPDFdenominatorAngles()  //test method
 {
 
 	double f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
@@ -606,7 +617,7 @@ double Bd2JpsiKstar_sWave::buildPDFdenominatorAngles()  //test method
 }
 
 
-void Bd2JpsiKstar_sWave::getTimeDependentAmplitudes(
+void Bd2JpsiKstar_sWave_Fs::getTimeDependentAmplitudes(
 		double & AzeroAzero
 		, double & AparaApara
 		, double & AperpAperp
@@ -663,7 +674,7 @@ void Bd2JpsiKstar_sWave::getTimeDependentAmplitudes(
 	return;
 }
 
-void Bd2JpsiKstar_sWave::getTimeAmplitudeIntegrals(
+void Bd2JpsiKstar_sWave_Fs::getTimeAmplitudeIntegrals(
 		double & AzeroAzeroInt
 		, double & AparaAparaInt
 		, double & AperpAperpInt
@@ -718,7 +729,7 @@ return;
 }
 
 //Angular distribution function
-double Bd2JpsiKstar_sWave::angularFactor( )
+double Bd2JpsiKstar_sWave_Fs::angularFactor( )
 {
         double returnValue=0.;
 
