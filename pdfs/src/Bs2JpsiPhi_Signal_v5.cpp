@@ -52,7 +52,7 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5( const Bs2JpsiPhi_Signal_v5& input ) 
 
 	, _useCosAndSin(input._useCosAndSin), _useCosDpar(input._useCosDpar), _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
 
-	, _offsetToGammaForBetaFactor( input._offsetToGammaForBetaFactor) 
+	, _offsetToGammaForBetaFactor( input._offsetToGammaForBetaFactor), _usePlotAllComponents( input._usePlotAllComponents )
 
 	, allowNegativeAsSq(input.allowNegativeAsSq), _usePlotComponents(input._usePlotComponents), t(input.t), ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr)
 

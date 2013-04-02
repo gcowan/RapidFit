@@ -1690,7 +1690,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 
 	this->Sanity_Check( pointValues, component );
 
-	cout << "Returning pointValues" << endl;
+	//cout << "Returning pointValues" << endl;
 
 	delete comp_obj;
 
