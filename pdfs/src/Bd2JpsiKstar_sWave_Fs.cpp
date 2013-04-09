@@ -318,7 +318,7 @@ bool Bd2JpsiKstar_sWave_Fs::SetPhysicsParameters( ParameterSet * NewParameterSet
 vector<string> Bd2JpsiKstar_sWave_Fs::GetDoNotIntegrateList()
 {
 	vector<string> doNotIntList;
-	doNotIntList.push_back(timeName);
+	//doNotIntList.push_back(timeName);
 	return doNotIntList;
 }
 
