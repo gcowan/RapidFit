@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/04/10 Greig Cowan
+  - Added projections to the Bs2JpsiK* PDF.
+
 2013/04/01 Rob Currie
   - I wanted to plot a -ve component to a PDF and have to come to the conclusion that protecting the PDF integrator from -ve numbers is a bad thing.
        The Integrators are still 'protected' from nan and inf and other problems, however -ve integrals are real and make sense for components of full pdfs (and other uses)

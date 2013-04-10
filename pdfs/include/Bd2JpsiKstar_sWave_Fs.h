@@ -11,6 +11,7 @@
 
 //#ifndef __CINT__
 #include "BasePDF.h"
+#include "ComponentRef.h"
 #include "SlicedAcceptance.h"
 #include "TFile.h"
 #include <iostream>
@@ -29,11 +30,13 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
+		virtual double EvaluateComponent(DataPoint*, ComponentRef*);
 		virtual bool SetPhysicsParameters(ParameterSet*);
 		double NormAnglesOnlyForAcceptanceWeights(DataPoint*, PhaseSpaceBoundary*);
 		//Return a list of parameters not to be integrated
                 virtual vector<string> GetDoNotIntegrateList();
 		double angularFactor();
+        vector<string> PDFComponents();
 
 	protected:
 		//Calculate the PDF normalisation
@@ -54,6 +57,7 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 
 
 		double cachedAzero, cachedApara, cachedAperp, cachedAs;
+        int componentIndex;
 
 		// These contain the strings that correspond
 		// to the physics parameter names that will be

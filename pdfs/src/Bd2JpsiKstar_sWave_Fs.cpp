@@ -65,6 +65,7 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
 	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), Ap_sq(), Ap(), time(), cosTheta(), phi(),
 	cosPsi(), KstarFlavour(), tlo(), thi(), useFlatAngularDistribution(true)
 {
+    componentIndex = 0;
 	MakePrototypes();
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 
@@ -108,7 +109,7 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
                         cerr << "\n" << endl;
                         exit(-987);
                 }
-		
+
 
 		string fullFileName;
 
@@ -117,7 +118,7 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
                 //input_file2.open( fileName.c_str(), ifstream::in );
                 //input_file2.close();
                 //bool local_fail2 = input_file2.fail();
-  
+
               if( getenv("RAPIDFITROOT") )
                 {
                         string path( getenv("RAPIDFITROOT") ) ;
@@ -142,7 +143,7 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
                 {
                         fullFileName = fileName;
                 }
-	
+
 		TFile* f =  TFile::Open(fullFileName.c_str());
                 histo = (TH3D*) f->Get("histo"); //(fileName.c_str())));
 
@@ -318,6 +319,7 @@ bool Bd2JpsiKstar_sWave_Fs::SetPhysicsParameters( ParameterSet * NewParameterSet
 vector<string> Bd2JpsiKstar_sWave_Fs::GetDoNotIntegrateList()
 {
 	vector<string> doNotIntList;
+    doNotIntList.push_back( KstarFlavourName );
 	//doNotIntList.push_back(timeName);
 	return doNotIntList;
 }
@@ -392,20 +394,55 @@ double Bd2JpsiKstar_sWave_Fs::buildPDFnumerator()
 			, AsAsB, ReAparaAsB, ImAperpAsB, ReAzeroAsB
 			);
 
-	//q() tags the K* flavour - it changes the sign of f4, f6 and f9
-	double v1 = f1 * AzeroAzeroB
-		+ f2 * AparaAparaB
-		+ f3 * AperpAperpB
-		+ f4 * ImAparaAperpB * q()
-		+ f5 * ReAzeroAparaB
-		+ f6 * ImAzeroAperpB * q()
-		+ f7 * AsAsB
-		+ Csp * f8 * ReAparaAsB
-		+ Csp * f9 * ImAperpAsB * q()
-		+ Csp * f10 * ReAzeroAsB
-		;
+    double v1(0.);
+    switch( componentIndex )
+    {
+        case 1:
+            v1 = f1 * AzeroAzeroB;
+            break;
+        case 2:
+            v1 = f2 * AparaAparaB;
+            break;
+        case 3:
+            v1 = f3 * AperpAperpB;
+            break;
+        case 4:
+            v1 = f4 * ImAparaAperpB * q();
+            break;
+        case 5:
+            v1 = f5 * ReAzeroAparaB;
+            break;
+        case 6:
+            v1 = f6 * ImAzeroAperpB * q();
+            break;
+        case 7:
+            v1 = f7 * AsAsB;
+            break;
+        case 8:
+            v1 = Csp * f8 * ReAparaAsB;
+            break;
+        case 9:
+            v1 = Csp * f9 * ImAperpAsB * q();
+            break;
+        case 10:
+            v1 = Csp * f10 * ReAzeroAsB;
+            break;
+        default:
+	        //q() tags the K* flavour - it changes the sign of f4, f6 and f9
+            v1  = f1 * AzeroAzeroB
+		        + f2 * AparaAparaB
+		        + f3 * AperpAperpB
+		        + f4 * ImAparaAperpB * q()
+		        + f5 * ReAzeroAparaB
+		        + f6 * ImAzeroAperpB * q()
+		        + f7 * AsAsB
+		        + Csp * f8 * ReAparaAsB
+		        + Csp * f9 * ImAperpAsB * q()
+		        + Csp * f10 * ReAzeroAsB;
+            break;
+    }
 	if( useTimeAcceptance() ) v1  = v1 * timeAcc->getValue(time);
-	
+
 	v1  *=  angularFactor();
 	return v1;
 }
@@ -573,24 +610,53 @@ double Bd2JpsiKstar_sWave_Fs::buildPDFdenominator()
 				);
 
 
-
-
-	double v1 = cachedAzeroAzeroIntB * angAccI1
-		+ cachedAparaAparaIntB * angAccI2
-		+ cachedAperpAperpIntB * angAccI3
-		+ cachedAparaAperpIntB * angAccI4* q()
-		+ cachedAzeroAparaIntB * angAccI5
-		+ cachedAzeroAperpIntB * angAccI6 * q()
-		+ cachedAsAsIntB * angAccI7
-		+ Csp * cachedAparaAsIntB * angAccI8
-		+ Csp * cachedAperpAsIntB * angAccI9 * q()
-		+ Csp * cachedAzeroAsIntB * angAccI10
-		;
+    double v1(0.);
+    switch ( componentIndex )
+        {
+            case 1:
+                v1 = cachedAzeroAzeroIntB * angAccI1;
+                break;
+            case 2:
+                v1 = cachedAparaAparaIntB * angAccI2;
+                break;
+            case 3:
+                v1 = cachedAperpAperpIntB * angAccI3;
+                break;
+            case 4:
+                v1 = cachedAparaAperpIntB * angAccI4* q();
+                break;
+            case 5:
+                v1 = cachedAzeroAparaIntB * angAccI5;
+                break;
+            case 6:
+                v1 = cachedAzeroAperpIntB * angAccI6 * q();
+                break;
+            case 7:
+                v1 = cachedAsAsIntB * angAccI7;
+                break;
+            case 8:
+                v1 = Csp * cachedAparaAsIntB * angAccI8;
+                break;
+            case 9:
+                v1 = Csp * cachedAperpAsIntB * angAccI9 * q();
+                break;
+            case 10:
+                v1 = Csp * cachedAzeroAsIntB * angAccI10;
+                break;
+            default:
+	            v1 = cachedAzeroAzeroIntB * angAccI1
+		            + cachedAparaAparaIntB * angAccI2
+		            + cachedAperpAperpIntB * angAccI3
+		            + cachedAparaAperpIntB * angAccI4* q()
+		            + cachedAzeroAparaIntB * angAccI5
+		            + cachedAzeroAperpIntB * angAccI6 * q()
+		            + cachedAsAsIntB * angAccI7
+		            + Csp * cachedAparaAsIntB * angAccI8
+		            + Csp * cachedAperpAsIntB * angAccI9 * q()
+		            + Csp * cachedAzeroAsIntB * angAccI10;
+                break;
+        }
 	return v1;
-
-
-
-
 }
 
 double Bd2JpsiKstar_sWave_Fs::buildPDFdenominatorAngles()  //test method
@@ -756,3 +822,84 @@ double Bd2JpsiKstar_sWave_Fs::angularFactor( )
         return returnValue;
 }
 
+vector<string> Bd2JpsiKstar_sWave_Fs::PDFComponents()
+{
+	vector<string> this_component_list;
+	this_component_list.push_back( "0" );
+	this_component_list.push_back( "f1" );
+    this_component_list.push_back( "f2" );
+	this_component_list.push_back( "f3" );
+	this_component_list.push_back( "f4" );
+	this_component_list.push_back( "f5" );
+	this_component_list.push_back( "f6" );
+	this_component_list.push_back( "f7" );
+	this_component_list.push_back( "f8" );
+	this_component_list.push_back( "f9" );
+	this_component_list.push_back( "f10" );
+    return this_component_list;
+}
+
+double Bd2JpsiKstar_sWave_Fs::EvaluateComponent(DataPoint * measurement, ComponentRef* Component)
+{
+    componentIndex = Component->getComponentNumber();
+    if( componentIndex == -1 )
+    {
+        string ComponentName = Component->getComponentName();
+        if( ComponentName.compare( "f1" ) == 0 )
+        {
+            Component->setComponentNumber( 1 );
+            componentIndex = 1;
+        }
+        else if( ComponentName.compare( "f2" ) == 0 )
+        {
+            Component->setComponentNumber( 2 );
+            componentIndex = 2;
+        }
+        else if( ComponentName.compare( "f3" ) == 0 )
+        {
+            Component->setComponentNumber( 3 );
+            componentIndex = 3;
+        }
+        else if( ComponentName.compare( "f4" ) == 0 )
+        {
+            Component->setComponentNumber( 4 );
+            componentIndex = 4;
+        }
+        else if( ComponentName.compare( "f5" ) == 0 )
+        {
+            Component->setComponentNumber( 5 );
+            componentIndex = 5;
+        }
+        else if( ComponentName.compare( "f6" ) == 0 )
+        {
+            Component->setComponentNumber( 6 );
+            componentIndex = 6;
+        }
+        else if( ComponentName.compare( "f7" ) == 0 )
+        {
+            Component->setComponentNumber( 7 );
+            componentIndex = 7;
+        }
+        else if( ComponentName.compare( "f8" ) == 0 )
+        {
+            Component->setComponentNumber( 8 );
+            componentIndex = 8;
+        }
+        else if( ComponentName.compare( "f9" ) == 0 )
+        {
+            Component->setComponentNumber( 9 );
+            componentIndex = 9;
+        }
+        else if( ComponentName.compare( "f10" ) == 0 )
+        {
+            Component->setComponentNumber( 10 );
+            componentIndex = 10;
+        }
+        else
+        {
+            Component->setComponentNumber( 0 );
+            componentIndex = 0;
+        }
+    }
+    return this->Evaluate( measurement );
+}
