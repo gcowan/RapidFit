@@ -138,6 +138,7 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 		double Ap_sq, Ap;
 
 		bool _useTimeAcceptance ;
+		bool _plotAllComponents ;
 		inline bool useTimeAcceptance() const { return _useTimeAcceptance ; }
 		SlicedAcceptance * timeAcc ;
 
