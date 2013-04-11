@@ -48,10 +48,10 @@ using namespace::std;
 //Constructor with correct arguments
 ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num, const DebugClass* Debug ) :
 	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ),
-	pdfIntegrator( new RapidFitIntegrator( *(NewPDF->GetPDFIntegrator()) ) ), weightsWereUsed(false), weight_norm(1.),
+	pdfIntegrator( NULL ), weightsWereUsed(false), weight_norm(1.),
 	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ),
-	logY( (config!=NULL)?config->logY:false ), logX( (config!=NULL)?config->logX:false ), this_config( config ), boundary_min( -999 ), boundary_max( -999 ), step_size( -999 ),
+	logY( (config!=NULL)?config->logY:false ), logX( (config!=NULL)?config->logX:false ), this_config( config ), boundary_min( -99999 ), boundary_max( -99999 ), step_size( -99999 ),
 	onlyZero( (config!=NULL)?config->OnlyZero:false ), combination_integral(vector<double>()), ratioOfIntegrals(1,1.), wanted_weights(), format(),
 	data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(), total_components(),
 	chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num)
@@ -63,10 +63,13 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	if( Debug != NULL ) debug = new DebugClass(*Debug);
 	else debug = new DebugClass(false);
 	plotPDF->TurnCachingOff();
+	plotPDF->SetComponentStatus( true );
 
 	//plotPDF->ChangePhaseSpace( full_boundary );
 
 	//plotPDF->GetPhysicsParameters()->Print();
+
+	pdfIntegrator = new RapidFitIntegrator( plotPDF );
 
 	pdfIntegrator->SetPDF( plotPDF );
 	pdfIntegrator->SetDebug(debug);
@@ -81,7 +84,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	{
 		RapidFitIntegratorConfig* thisIntConfig = new RapidFitIntegratorConfig( *projectionIntegratorConfig );
 		pdfIntegrator->SetUpIntegrator( thisIntConfig );
-		NewPDF->SetUpIntegrator( thisIntConfig );
+		plotPDF->SetUpIntegrator( thisIntConfig );
 		delete thisIntConfig;
 	}
 
@@ -687,15 +690,16 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			data_plot->Draw();
 			data_graph->Draw("PC9 SAME");
 			c1->Update();
-			double Y_min = -999.;
-			double Y_max = -999.;
+			double Y_min = -99999.;
+			double Y_max = -99999.;
 			if( this_config != NULL )
 			{
 				Y_min = this_config->ymin;
 				Y_max = this_config->ymax;
 			}
-			if( Y_min <= -999. ) Y_min = data_graph->GetYaxis()->GetXmin();
-			if( Y_max <= -999. ) Y_max = data_graph->GetYaxis()->GetXmax();
+			c1->Update();
+			if( Y_min <= -99999. ) Y_min = data_graph->GetYaxis()->GetXmin();
+			if( Y_max <= -99999. ) Y_max = data_graph->GetYaxis()->GetXmax();
 			data_graph->GetYaxis()->SetRangeUser( Y_min, Y_max );
 			c1->Update();
 			c1->Write();
@@ -1128,12 +1132,12 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	vector<string> component_names;
 
-	double X_min=-999, X_max=-999;
-	double Y_min=-999, Y_max=-999;
+	double X_min=-99999, X_max=-99999;
+	double Y_min=-99999, Y_max=-99999;
 
 	TString X_Title, Y_Title;
 
-	double final_chi2=-999;
+	double final_chi2=-99999;
 	double legend_size=0.1;
 
 	bool addLHCb=false;
@@ -1218,10 +1222,10 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	if( !StringProcessing::is_empty(Unit) ) Unit.Append(" ");
 	Y_ext.Append(Unit); Y_ext.Append(")");
 
-	if( X_min <= -999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
-	if( X_max <= -999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
-	if( Y_min <= -999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.5:0.;
-	if( Y_max <= -999 ) Y_max = input_data->GetYaxis()->GetXmax();
+	if( X_min <= -99999 ) X_min = total_boundary->GetConstraint( observableName )->GetMinimum();
+	if( X_max <= -99999 ) X_max = total_boundary->GetConstraint( observableName )->GetMaximum();
+	if( Y_min <= -99999 ) Y_min = input_data->GetYaxis()->GetXmin();//logy==true?0.5:0.;
+	if( Y_max <= -99999 ) Y_max = input_data->GetYaxis()->GetXmax();
 
 	if( StringProcessing::is_empty( X_Title ) )
 	{
@@ -2065,4 +2069,49 @@ void ComponentPlotter::WriteData( TGraphErrors* Total_BinnedData, vector<TGraph*
 	outputTree->Write("",TObject::kOverwrite);
 }
 
+string ComponentPlotter::XML( int projectionType )
+{
+	stringstream xml;
+	string projectionOuterTag="ComponentProjection";
+	if( projectionType == 2 ) projectionOuterTag = "Projection";
+
+	xml << "<" << projectionOuterTag << ">" << endl;
+
+	xml << "<Name>" << "someObservable" << "</Name>" << endl;
+	xml << "<CompNames>" << "component1Name:component2Name:component3Name:..." << "</CompNames" << endl;
+	xml << "<CombinationNames>" << "combination1Name:combination2Name:combination3Name:..." << "</CombinationNames>" << endl;
+	xml << "<Xmax>" << "XaxisMax" << "</Xmax>" << endl;
+	xml << "<Xmin>" << "XaxisMin" << "</Xmin>" << endl;
+	xml << "<Ymax>" << "YaxisMax" << "</Ymax>" << endl;
+	xml << "<Ymin>" << "YaxisMin" << "</Ymin>" << endl;
+	xml << "<XTitle>" << "XaxisTitle" << "</XTitle>" << endl;
+	xml << "<YTitle>" << "YaxisTitle" << "</YTitle>" << endl;
+	xml << "<TrustNumerical>" << "True/False" << "</TrustNumerical> # Correct for Numerical vs analytical difference" << endl;
+	xml << "<CalcChi2>" << "True/False" << "</CalcChi2> # Calculate Chi2 for the Projection" << endl;
+	xml << "<DrawPull>" << "True/False" << "</DrawPull> # Draw Residual Plot" << endl;
+	xml << "<LimitPulls>" << "True/False" << "</LimitPulls> # limit pull plot to +/- 5" << endl;
+	xml << "<AddLHCb>" << "True/False" << "</AddLHCb> # Add LHCb logo on top left" << endl;
+	xml << "<AddRightLHCb>" << "True/False" << "</AddRightLHCb> # Add LHCb logo on top right" << endl;
+	xml << "<LegendTextSize>" << "Size_t" << "</LegendTextSize> # Legend font size default: 0.05" << endl;
+	xml << "<TopRightLegend>" << "True/False" << "</TopRightLegend> # Add Legend on top right of plot" << endl;
+	xml << "<TopLeftLegend>" << "True/False" << "</TopLeftLegend> # Add Legend on top left of plot" << endl;
+	xml << "<BottomRightLegend>" << "True/False" << "</BottomRightLegend> # Add Legend on bottom right of plot" << endl;
+	xml << "<BottomLeftLegend>" << "True/False" << "</BottomLeftLegend> # Add Legend on bottom left of plot" << endl;
+	xml << "<NoLegend>" << "True/False" << "</NoLegend> # Do Not draw the Legend" << endl;
+	xml << "<UseSpline>" << "True/False" << "</UseSpline> # Use a Spline to interpolate between PDF points" << endl;
+	xml << "<Threads>" << "NumberOfThreads" << "</Threads>" << endl;
+	xml << "<FixedIntegrationPoints>" << "numberOfPointsPerGSLIntegral" << "</FixedIntegrationPoints>" << endl;
+	xml << "<UseGSLNumericalIntegration>" << "True/False" << "</UseGSLNumericalIntegration>" << endl;
+	xml << "<StyleKey>" << "LineStyle1:LineStyle2:LineStyle3:..." << "</StyleKey>" << endl;
+	xml << "<ColorKey>" << "LineColor1:LineColor2:LineColor3:..." << "</ColorKey>" << endl;
+	xml << "<WidthKey>" << "LineWidth1:LineWidth2:LineWidth3:..." << "</WidthKey>" << endl;
+	xml << "<LogY>" << "True/False" << "</LogY>" << endl;
+	xml << "<LogX>" << "True/False" << "</LogX>" << endl;
+	xml << "<PDFpoints>" << "numberOfPDFIntegralPoints" << "</PDFpoints" << endl;
+	xml << "<DataBins>" << "numberOfBinsInDataHisto" << "</DataBins" << endl;
+
+	xml << "</" << projectionOuterTag << ">" << endl;
+
+	return xml.str();
+}
 

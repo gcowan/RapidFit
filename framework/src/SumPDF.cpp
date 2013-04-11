@@ -38,6 +38,21 @@ SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBou
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 
+	//this->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+	//secondPDF->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+	//firstPDF->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+}
+
+void SumPDF::SetComponentStatus( const bool input )
+{
+	firstPDF->SetComponentStatus( input );
+	secondPDF->SetComponentStatus( input );
+	this->ReallySetComponentStatus( input );
+}
+
+bool SumPDF::GetComponentStatus() const
+{
+        return this->ReallyGetComponentStatus();
 }
 
 vector<string> SumPDF::PDFComponents()

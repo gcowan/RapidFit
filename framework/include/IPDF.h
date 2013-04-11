@@ -91,6 +91,10 @@ class IPDF
 		 */
 		virtual bool GetCachingEnabled() const = 0;
 
+		virtual void SetComponentStatus( const bool input ) = 0;
+
+		virtual bool GetComponentStatus() const = 0;
+
 		/*!
 		 * Interface Function:
 		 * Change the behaviour of Caching in this PDF.

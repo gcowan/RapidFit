@@ -174,7 +174,11 @@ int RapidFit( vector<string> input )
 		return command_check;
 	}
 
-	if( thisConfig->makeTemplateXML ) BuildTemplateXML( thisConfig );
+	if( thisConfig->makeTemplateXML )
+	{
+		BuildTemplateXML( thisConfig );
+		exit(0);
+	}
 
 	if( thisConfig->debug != NULL )
 	{

@@ -36,6 +36,22 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
 	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );
 	allParameters.AddPhysicsParameters( secondPDF->GetPhysicsParameters(), false );
+
+	//this->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+	//secondPDF->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+	//firstPDF->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+}
+
+void ProdPDF::SetComponentStatus( const bool input )
+{
+        firstPDF->SetComponentStatus( input );
+        secondPDF->SetComponentStatus( input );
+        this->ReallySetComponentStatus( input );
+}
+
+bool ProdPDF::GetComponentStatus() const
+{
+        return this->ReallyGetComponentStatus();
 }
 
 vector<string> ProdPDF::PDFComponents()

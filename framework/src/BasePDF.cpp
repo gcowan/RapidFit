@@ -27,7 +27,7 @@ using namespace::std;
 BasePDF::BasePDF() : numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ), requiresBoundary(false),
 	do_i_control_the_cache(false), cachingEnabled( true ), haveTestedIntegral( false ), thisConfig(NULL), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()),
-	debug_mutex(NULL), can_remove_mutex(true), debug(NULL), myIntegrator(NULL) , fixed_checked(false), isFixed(false), fixedID(0), debuggingON(false)
+	debug_mutex(NULL), can_remove_mutex(true), debug(NULL), myIntegrator(NULL) , fixed_checked(false), isFixed(false), fixedID(0), debuggingON(false), _basePDFComponentStatus(false)
 {
 	debug = new DebugClass();
 	component_list.push_back( "0" );
@@ -43,7 +43,8 @@ BasePDF::BasePDF( const BasePDF& input ) :
 	seed_function( input.seed_function ), seed_num( input.seed_num ), PDFName( input.PDFName ), PDFLabel( input.PDFLabel ), copy_object( input.copy_object ),
 	do_i_control_the_cache( input.do_i_control_the_cache ), cachingEnabled( input.cachingEnabled ), haveTestedIntegral( input.haveTestedIntegral ),
 	thisConfig(NULL), discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL), debuggingON(input.debuggingON),
-	debug_mutex(input.debug_mutex), can_remove_mutex(false), debug(NULL), fixed_checked(input.fixed_checked), isFixed(input.isFixed), fixedID(input.fixedID), myIntegrator(NULL)
+	debug_mutex(input.debug_mutex), can_remove_mutex(false), debug(NULL), fixed_checked(input.fixed_checked), isFixed(input.isFixed), fixedID(input.fixedID), myIntegrator(NULL),
+	_basePDFComponentStatus(input._basePDFComponentStatus)
 {
 	allParameters.SetPhysicsParameters( &(input.allParameters) );
 	DiscreteCaches = new vector<double>( input.DiscreteCaches->size() );
@@ -81,6 +82,26 @@ BasePDF::~BasePDF()
 
 	if( debug != NULL ) delete debug;
 	if( myIntegrator != NULL ) delete myIntegrator;
+}
+
+void BasePDF::SetComponentStatus( const bool input )
+{
+	this->ReallySetComponentStatus( input );
+}
+
+void BasePDF::ReallySetComponentStatus( const bool input )
+{
+	_basePDFComponentStatus = input;
+}
+
+bool BasePDF::GetComponentStatus() const
+{
+	return this->GetComponentStatus();
+}
+
+bool BasePDF::ReallyGetComponentStatus() const
+{
+	return _basePDFComponentStatus;
 }
 
 RapidFitIntegrator* BasePDF::GetPDFIntegrator() const
@@ -359,6 +380,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 			}
 			catch(...)
 			{
+				//	It's legitimate to fall over due to this throwing as we don't know what to do afterwards
 				cerr << "CANNOT ANALYTICALLY OR NUMERICALLY INTEGRATE THIS PDF IT FELL OVER!!\t" << this->GetLabel() << endl;
 				exit(-834);
 			}
@@ -371,8 +393,13 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 
 			if( thisNumericalIntegral < 0 )
 			{
-				cerr << "CANNOT ANALYTICALLY OR NUMERICALLY INTEGRATE THIS PDF!!\t" << this->GetLabel() << endl;
-				exit(-833);
+				//	Component Integrals may be 0 by definition and the PDF can potentially be constructed in a non-trivial way
+				//	We MUST allow for this possibility
+				if( !( this->ReallyGetComponentStatus() ) )
+				{
+					cerr << "CANNOT ANALYTICALLY OR NUMERICALLY INTEGRATE THIS PDF!!\t" << this->GetLabel() << endl;
+					exit(-833);
+				}
 			}
 
 			if( cachingEnabled )
@@ -499,9 +526,14 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 
 	if( thisNumericalIntegral < 0 )
 	{
-		cerr << "CANNOT ANALYTICALLY OR NUMERICALLY INTEGRATE THIS PDF!!\t" << this->GetLabel() << endl;
-		cerr << "Integral: " << thisNumericalIntegral << endl;
-		exit(-832);
+		//      Component Integrals may be 0 by definition and the PDF can potentially be constructed in a non-trivial way
+		//      We MUST allow for this possibility
+		if( !( this->ReallyGetComponentStatus() ) )
+		{
+			cerr << "CANNOT ANALYTICALLY OR NUMERICALLY INTEGRATE THIS PDF!!\t" << this->GetLabel() << endl;
+			cerr << "Integral: " << thisNumericalIntegral << endl;
+			exit(-832);
+		}
 	}
 
 	if( cachingEnabled )

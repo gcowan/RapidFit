@@ -56,6 +56,21 @@ NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpac
 	PhysicsParameter* frac_param = new PhysicsParameter( fractionName );
 	allParameters.AddPhysicsParameter( frac_param, false );
 
+	//this->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+	//secondPDF->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+	//firstPDF->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+}
+
+void NormalisedSumPDF::SetComponentStatus( const bool input )
+{
+	firstPDF->SetComponentStatus( input );
+	secondPDF->SetComponentStatus( input );
+	this->ReallySetComponentStatus( input );
+}
+
+bool NormalisedSumPDF::GetComponentStatus() const
+{
+	return this->ReallyGetComponentStatus();
 }
 
 vector<string> NormalisedSumPDF::PDFComponents()
@@ -93,13 +108,32 @@ vector<string> NormalisedSumPDF::PDFComponents()
 	vector<string> empty;
 	component_list.swap(empty);
 
-	for( unsigned int i=0; i< firstpdf_components.size(); ++i )
+	if( firstFraction > 0. && firstFraction < 1. )
 	{
-		component_list.push_back( StringProcessing::AddNumberToLeft( firstpdf_components[i], 1 ) );
+		for( unsigned int i=0; i< firstpdf_components.size(); ++i )
+		{
+			component_list.push_back( StringProcessing::AddNumberToLeft( firstpdf_components[i], 1 ) );
+		}
+		for( unsigned int j=0; j< secondpdf_components.size(); ++j )
+		{
+			component_list.push_back( StringProcessing::AddNumberToLeft( secondpdf_components[j], 2 ) );
+		}
 	}
-	for( unsigned int j=0; j< secondpdf_components.size(); ++j )
+	else if( firstFraction >= 1. )
 	{
-		component_list.push_back( StringProcessing::AddNumberToLeft( secondpdf_components[j], 2 ) );
+		component_list = vector<string>();
+		for( unsigned int i=0; i< firstpdf_components.size(); ++i )
+		{
+			component_list.push_back( StringProcessing::AddNumberToLeft( firstpdf_components[i], 1 ) );
+		}
+	}
+	else if( firstFraction <= 0. )
+	{
+		component_list = vector<string>();
+		for( unsigned int j=0; j< secondpdf_components.size(); ++j )
+		{
+			component_list.push_back( StringProcessing::AddNumberToLeft( secondpdf_components[j], 2 ) );
+		}
 	}
 
 	component_list = StringProcessing::MoveElementToStart( component_list, "0" );
@@ -242,13 +276,30 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 		return DBL_MAX;
 	}
 
-	//Calculate the integrals of the PDFs
-	double firstIntegral = this->GetFirstIntegral( NewDataPoint );
-	double secondIntegral = this->GetSecondIntegral( NewDataPoint );
+	double termOne=0.;
+	double termTwo=0.;
 
-	//Get the PDFs' values, normalised and weighted by firstFraction
-	double termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / firstIntegral;
-	double termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+	double firstIntegral=0.;
+	double secondIntegral=0.;
+	if( firstFraction >= 1. )
+	{
+		firstIntegral = this->GetFirstIntegral( NewDataPoint );
+		termOne = ( firstPDF->Evaluate( NewDataPoint ) ) / firstIntegral;
+	}
+	else if( firstFraction <= 0. )
+	{
+		secondIntegral = this->GetSecondIntegral( NewDataPoint );
+		termTwo = ( secondPDF->Evaluate( NewDataPoint ) ) / secondIntegral;
+	}
+	else
+	{
+		//Calculate the integrals of the PDFs
+		firstIntegral = this->GetFirstIntegral( NewDataPoint );
+		secondIntegral = this->GetSecondIntegral( NewDataPoint );
+		//Get the PDFs' values, normalised and weighted by firstFraction
+		termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / firstIntegral;
+		termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+	}
 
 	//cout << firstIntegral << " , " << secondIntegral << endl;
 	//cout << termOne << " + " << termTwo << endl;
@@ -259,12 +310,12 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 	{
 		PDF_THREAD_LOCK
 
-			cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-			throw(-653102);
+		throw(-653102);
 	}
 
 	//Return the sum
@@ -284,18 +335,35 @@ double NormalisedSumPDF::GetSecondIntegral( DataPoint* NewDataPoint )
 //Return the function value at the given point
 double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 {
-	//Calculate the integrals of the PDFs
-	double firstIntegral = this->GetFirstIntegral( NewDataPoint );
-	double secondIntegral = this->GetSecondIntegral( NewDataPoint );
+        double termOne=0.;
+        double termTwo=0.;
 
-	//Get the PDFs' values, normalised and weighted by firstFraction
-	double termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / firstIntegral;
-	double termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+        double firstIntegral=0.;
+        double secondIntegral=0.;
+        if( firstFraction >= 1. )
+        {
+                firstIntegral = this->GetFirstIntegral( NewDataPoint );
+                termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / firstIntegral;
+        }
+        else if( firstFraction <= 0. )
+        {
+                secondIntegral = this->GetSecondIntegral( NewDataPoint );
+                termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / secondIntegral;
+        }
+        else
+        {
+                //Calculate the integrals of the PDFs
+                firstIntegral = this->GetFirstIntegral( NewDataPoint );
+                secondIntegral = this->GetSecondIntegral( NewDataPoint );
+                //Get the PDFs' values, normalised and weighted by firstFraction
+                termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / firstIntegral;
+                termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+        }
 
 	if( isnan(termOne) || isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
-			cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
+		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 		PDF_THREAD_UNLOCK
 	}

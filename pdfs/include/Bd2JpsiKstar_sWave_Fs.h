@@ -25,7 +25,8 @@
 class Bd2JpsiKstar_sWave_Fs : public BasePDF
 {
 	public:
-		Bd2JpsiKstar_sWave_Fs(PDFConfigurator*);
+		Bd2JpsiKstar_sWave_Fs( PDFConfigurator* );
+		Bd2JpsiKstar_sWave_Fs( const Bd2JpsiKstar_sWave_Fs& );
 		~Bd2JpsiKstar_sWave_Fs();
 
 		//Calculate the PDF value
@@ -36,7 +37,8 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 		//Return a list of parameters not to be integrated
                 virtual vector<string> GetDoNotIntegrateList();
 		double angularFactor();
-        vector<string> PDFComponents();
+		string GetComponentName( ComponentRef* Component );
+		vector<string> PDFComponents();
 
 	protected:
 		//Calculate the PDF normalisation
@@ -167,6 +169,11 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 		void getTimeDependentAmplitudes( double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
 		void getTimeAmplitudeIntegrals(double&, double&, double&, double&, double&, double&, double&, double&, double&, double&);
 		bool useFlatAngularDistribution;
+
+		DataPoint* _datapoint;
+
+		string fileName;
+		TFile* f;
 };
 
 #endif

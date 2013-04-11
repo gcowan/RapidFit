@@ -40,6 +40,10 @@ class SumPDF : public BasePDF
 		 */
 		~SumPDF();
 
+		void SetComponentStatus( const bool input );
+
+		bool GetComponentStatus() const;
+
 		vector<string> PDFComponents();
 
 		virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig );

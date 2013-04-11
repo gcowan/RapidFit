@@ -662,7 +662,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	}
 	result /= ( (double)integrationPoints[0].size() / factor );
 
-	//cout << "Hello :D" << endl;
+	//cout << "Hello :D " << result << endl;
 
 	delete[] minima; delete[] maxima;
 	delete[] integrationPoints;
@@ -682,7 +682,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	return result;
 #else
 	(void) functionToWrap; (void) NewDataPoint; (void) NewBoundary; (void) componentIndex; (void) doIntegrate; (void) dontIntegrate; (void) num_threads;
-	return -999.;
+	return -99999.;
 #endif
 }
 
@@ -875,7 +875,8 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 							cout << "RapidFitIntegrator: Finished: " << numericalIntegral << endl;
 						}
 					}
-					if( numericalIntegral <= -999. )
+
+					if( numericalIntegral <= -99999. )
 					{
 						pthread_mutex_lock( &check_settings_lock );
 						cout << "Calculated a -ve Integral: " << numericalIntegral << ". Did you Compile with the GSL options Enabled with gsl available?" << endl;

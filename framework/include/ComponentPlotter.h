@@ -256,6 +256,7 @@ class ComponentPlotter
 
 		void SetDebug( DebugClass* debug );
 
+		static string XML( const int projectionType=1 );
 
 	private:
 

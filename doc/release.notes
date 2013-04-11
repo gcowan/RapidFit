@@ -1,5 +1,14 @@
 // $Id: release.notes $
 
+2013/04/10 Rob Currie
+  - Added Get/SetComponentStatus function to BasePDF
+    This is not intended to be overloaded but we need to communicate that -ve integrations are sensible down to the BasePDF level.
+    This required adding methods to the NormaliseSum, Prod and Sum PDFs to propagate this request.
+    Unlike the Interface class where we want to be generic to this test was completely removed the BasePDF integration test is useful in >99% of situations
+  - Fixed Bd2JpsiK* to have total denominator at all times which is the correct thing to do for component plots
+    Also disabled thow statements when componentIndex != 0, and replaced all exits with throws (multiple exits in multiple threads, ALWAYS makes for horrible segfaults)
+  - Modified defaults for some parameters to be -99999. rather than -999. as I ran into a situation with -1000 not being picked up and triggering default behaviour
+
 2013/04/10 Greig Cowan
   - Added projections to the Bs2JpsiK* PDF.
 

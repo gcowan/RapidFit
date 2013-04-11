@@ -495,13 +495,13 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 	returnable_config->PDF_points = 128;
 	returnable_config->logY = false;
 
-	returnable_config->xmin = -999;
-	returnable_config->xmax = -999;
-	returnable_config->ymin = -999;
-	returnable_config->ymax = -999;
+	returnable_config->xmin = -99999;
+	returnable_config->xmax = -99999;
+	returnable_config->ymin = -99999;
+	returnable_config->ymax = -99999;
 
 	returnable_config->CalcChi2 = false;
-	returnable_config->Chi2Value = -999;
+	returnable_config->Chi2Value = -99999;
 
 	returnable_config->OnlyZero = false;
 
@@ -1812,8 +1812,8 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 		Name = "Uninitialised";
 		string unit = "Uninitialised";
 		string tf1;
-		double minimum = -9999.0;
-		double maximum = -9999.0;
+		double minimum = -99999.0;
+		double maximum = -99999.0;
 		vector<double> allValues;
 
 		//Loop over the tag children, which correspond to the parameter elements

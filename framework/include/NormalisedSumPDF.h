@@ -29,6 +29,10 @@ class NormalisedSumPDF : public BasePDF
 		NormalisedSumPDF( const NormalisedSumPDF& );
 		~NormalisedSumPDF();
 
+		void SetComponentStatus( const bool input );
+
+		bool GetComponentStatus() const;
+
 		vector<string> PDFComponents();
 
 		void TurnCachingOff();

@@ -43,6 +43,10 @@ class ProdPDF : public BasePDF
 		 */
 		~ProdPDF();
 
+		void SetComponentStatus( const bool input );
+
+		bool GetComponentStatus() const;
+
 		virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig );
 
 		vector<string> PDFComponents();

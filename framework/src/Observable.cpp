@@ -102,7 +102,7 @@ void Observable::Print() const
 {
 	cout << "Name: " << name;
 	cout << "\tValue: " << value;
-	cout << "\tUnit: " << unit ;
+	cout << "\tUnit: " << unit;
 	if( bin_num != -1 ) cout << "\tBinNum: " << bin_num << "\tAcceptance: " << acceptance;
 	if( bkg_bin_num != -1 ) cout << "\tBkgBinNum: " << bkg_bin_num << "\tBkgAcceptance: " << bkg_acceptance;
 	cout << endl;
