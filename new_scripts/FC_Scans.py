@@ -166,6 +166,10 @@ def FC_Splitter(XML='XML.xml',par1='x',par1min=0.,par1max=0.,par1res=1,par2='y',
 #	This is the section of code which will be executed within ganga
 if is_ganga:
 
+	print "This script appears unmaintained, please, PLEASE consider modifying the 1D FC script to your use case"
+	print "If you know what you're doing remove the following exit and have a go at re-running, I am not responsible for you frying the grid or deleting your analysis!"
+	sys.exit(0)
+
 	#	By definition of how this should be run!
 	script_name = str( sys.argv[0] )
 	xml = str( sys.argv[1] )

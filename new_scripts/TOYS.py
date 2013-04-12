@@ -138,21 +138,25 @@ if is_ganga:
 			choice = int( raw_input( "try again...  " ) )
 		if choice == 1:
 			j.backend = Dirac()
-			j.inputdata = LFN_LIST                  #       Point the job to the data
-			j.backend.inputSandboxLFNs = LFN_LIST   #       Tell Dirac we need a local copy in order to process it
+			#	Only do this if the LFN_LIST is NOT empty
+			if LFN_LIST:
+				j.inputdata = LFN_LIST                  #       Point the job to the data
+				j.backend.inputSandboxLFNs = LFN_LIST   #       Tell Dirac we need a local copy in order to process it
 			sandbox_data = [ script_name, xml, RapidFit_Library ]
 			#print sandbox_data
 			for k in FILE_LIST:
 				sandbox_data.append( k )
 			#print sandbox_data
 			j.inputsandbox = sandbox_data
-			j.outputdata = output_file_list
+			#	Now only works with ganga 6
+			j.outputfiles = output_file_list
+			#j.outputdata = output_file_list
 		if choice == 2:
 			j.backend = LSF()
 			j.backend.queue = '8nh'         #       1nh, 8nh, 1nd, 2nd, 1nw, 2nw
 			j.inputdata = FILE_LIST
-			j.outputsandbox = j.outputdata.files
-			j.outputdata=[]
+			#j.outputsandbox = j.outputdata.files
+			#j.outputdata=[]
 		if choice == 3:
 			j.backend = Interactive()
 			j.inputdata = FILE_LIST

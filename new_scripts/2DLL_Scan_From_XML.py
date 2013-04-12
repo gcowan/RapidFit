@@ -218,26 +218,28 @@ if is_ganga:
 			choice = 1
 		if choice == 1:
 			j.backend = Dirac()
-			print "Input Data:"
-			#print LFN_LIST
-			new_list=[]
-			for i in LFN_LIST:
-				new_list.append( str(i.replace('//','/')) )
-			LFN_LIST=new_list
-			LHCB_DATA = LHCbDataset( LFN_LIST )
-			#for wanted_lfn in LFN_LIST:
-			#       print "Adding: "+wanted_lfn.replace('//','/')
-			#       LHCB_DATA.extend( wanted_lfn.replace('//','/') )
-			#       #print wanted_lfn.replace('//','/')
-			j.inputdata = LHCB_DATA                 #       Point the job to the data
-			print "INPUTDATA:"
-			print LHCB_DATA.files
-			inputDataList = []
-			for i in LHCB_DATA.files:
-				inputDataList.append( 'LFN:'+i.name.replace('//','/') )
-			print "INPUTLFNs:"
-			print inputDataList
-			j.backend.inputSandboxLFNs = inputDataList   #       Tell Dirac we need a local copy in order to process it
+			#	Only run when LFN_LIST is NOT empty
+			if LFN_LIST:
+				print "Input Data:"
+				#print LFN_LIST
+				new_list=[]
+				for i in LFN_LIST:
+					new_list.append( str(i.replace('//','/')) )
+				LFN_LIST=new_list
+				LHCB_DATA = LHCbDataset( LFN_LIST )
+				#for wanted_lfn in LFN_LIST:
+				#       print "Adding: "+wanted_lfn.replace('//','/')
+				#       LHCB_DATA.extend( wanted_lfn.replace('//','/') )
+				#       #print wanted_lfn.replace('//','/')
+				j.inputdata = LHCB_DATA                 #       Point the job to the data
+				print "INPUTDATA:"
+				print LHCB_DATA.files
+				inputDataList = []
+				for i in LHCB_DATA.files:
+					inputDataList.append( 'LFN:'+i.name.replace('//','/') )
+				print "INPUTLFNs:"
+				print inputDataList
+				j.backend.inputSandboxLFNs = inputDataList   #       Tell Dirac we need a local copy in order to process it
 			#sys.exit(0)
 			if len(RAPIDFIT_LIB) == 0:
 				sandbox_data = [ script_name, xml, RapidFit_Library ]
@@ -249,8 +251,11 @@ if is_ganga:
 			print "Input Sandbox:"
 			print sandbox_data
 			j.inputsandbox = sandbox_data
-			j.outputsandbox = output_file_list
-			j.outputdata = output_file_list
+			#	Only works with ganga 6.x
+			j.outputfiles = sandbox_files
+			#	Older ganag 5.x output
+			#j.outputsandbox = output_file_list
+			#j.outputdata = output_file_list
 			#sys.exit(0)
 
 			#j.inputdata = LFN_LIST			#	Point the job to the data

@@ -263,8 +263,10 @@ if is_ganga:
 			j.backend = Dirac()
 			print "Input Data:"
 			print LFN_LIST
-			j.inputdata = LFN_LIST                  #       Point the job to the data
-			j.backend.inputSandboxLFNs = LFN_LIST   #       Tell Dirac we need a local copy in order to process it
+			#	Only run if LFN_LIST is NOT empty
+			if LFN_LIST:
+				j.inputdata = LFN_LIST                  #       Point the job to the data
+				j.backend.inputSandboxLFNs = LFN_LIST   #       Tell Dirac we need a local copy in order to process it
 			sandbox_data = [ script_name, xml, RapidFit_Library ]
 			#print sandbox_data
 			for k in FILE_LIST:
@@ -272,7 +274,10 @@ if is_ganga:
 			print "Input Sandbox:"
 			print sandbox_data
 			j.inputsandbox = sandbox_data
-			j.outputsandbox = output_file_list
+			#	Only works with ganga 6.x
+			j.outputfiles = output_file_list
+			#	older ganga 5.x output
+			#j.outputsandbox = output_file_list
 			#j.outputdata = output_file_list
 		if choice == 2:
 			j.backend = LSF()

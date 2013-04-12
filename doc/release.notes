@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/04/12 Rob Currie
+  - Committing changes to the .py scripts in the new_scripts folder to make them work under ganga 6.x
+    This required fairly minimal changes and as far as I know nothing major should break, but be aware teh decision has been to make the scripts 6.x compatible only
+       To get them to run on ganga 5.x i.e. lxplus and submitting to grid change the functions used for requesting job output as this was a major change between 5 and 6 (old code is simply commented out in file)
+
 2013/04/10 Rob Currie
   - Added Get/SetComponentStatus function to BasePDF
     This is not intended to be overloaded but we need to communicate that -ve integrations are sensible down to the BasePDF level.
