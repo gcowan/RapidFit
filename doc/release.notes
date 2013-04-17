@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/04/17 Greig Cowan
+  - Added code for calculating parameterisation of angular efficiency using Legrendre polynomials and spherical harmonics
+    for Bd2JpsiK* and subsequent visualisation. Not completely generalised yet but appears to work.
+
 2013/04/12 Rob Currie
   - Committing changes to the .py scripts in the new_scripts folder to make them work under ganga 6.x
     This required fairly minimal changes and as far as I know nothing major should break, but be aware teh decision has been to make the scripts 6.x compatible only
