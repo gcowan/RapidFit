@@ -106,7 +106,8 @@ namespace Mathematics
 	void getBs2JpsiPhiAngularFunctionsWithSwave( double & f1, double & f2, double & f3, double & f4, double & f5, double & f6, double & f7, double & f8, double & f9, double & f10, const double cosTheta, const double phi, const double cosPsi);
 
 	vector<double> calculateAcceptanceWeights( IDataSet * dataSet, IPDF * PDF );
-	void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF );
+    int calculateAcceptanceCoefficients( IDataSet * dataSet, IPDF * PDF );
+    void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF );
 
 }
 

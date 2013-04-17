@@ -1117,7 +1117,7 @@ TString EdStyle::Remove_Suffix( TString arg )
 
 TLegend* EdStyle::LHCbLegend()
 {
-	TLegend* thisLegend = new TLegend( 0.6, 0.65, 0.9, 0.9 );
+	TLegend* thisLegend = new TLegend( 0.6, 0.45, 0.9, 0.9 );
 	thisLegend->SetFillColor( kWhite );
 	thisLegend->SetFillStyle( EdStyle::GetTransparentFillStyle() );
 	thisLegend->SetTextSize( EdStyle::GetLHCbTextSize() );

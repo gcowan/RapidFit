@@ -143,7 +143,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* Inp
 
 	double sum = 0.;
 	double sum2 = 0.;
-
+    double sum_weight_sq = 0.;
 	for ( int eventIndex = 0; eventIndex < InputData->GetDataNumber(); ++eventIndex )
 	{
 		//Calculate the sWeight
@@ -182,9 +182,13 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* Inp
 		allValues.push_back( numerator / denominator );
 		allValues2.push_back( numerator2 / denominator2 );
 		allPoints.push_back( newEvent );
+
+        sum_weight_sq += (numerator / denominator)*(numerator / denominator);
 	}
 
 	cout << sum << " " << sum2 << endl;
+
+    cout << "FOM " << sum*sum/sum_weight_sq << endl;
 
         PhaseSpaceBoundary* dataSetBoundary = new PhaseSpaceBoundary( *(InputData->GetBoundary()) );
 	double min=0., max=0., min2=0., max2=0.;

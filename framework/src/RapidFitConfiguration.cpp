@@ -54,6 +54,7 @@ numberRepeats(),
 	testRapidIntegratorFlag(),
 	calculateFitFractionsFlag(),
 	calculateAcceptanceWeights(),
+	calculateAcceptanceCoefficients(),
 	calculateAcceptanceWeightsWithSwave(),
 	calculatePerEventAcceptance(),
 	defineContourFlag(),
@@ -140,6 +141,7 @@ numberRepeats(),
 		testRapidIntegratorFlag = false;
 		calculateFitFractionsFlag = false;
 		calculateAcceptanceWeights = false;
+		calculateAcceptanceCoefficients = false;
 		calculateAcceptanceWeightsWithSwave = false;
 		calculatePerEventAcceptance = false;
 		defineContourFlag = false;

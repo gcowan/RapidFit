@@ -11,11 +11,18 @@
 
 ///	ROOT Headers
 #include "TMath.h"
+#include "TH1D.h"
+#include "TF3.h"
+#include "TStyle.h"
+#include "TCanvas.h"
 #include "RooMath.h"
+#include "Math/WrappedMultiTF1.h"
+#include "Math/GSLMCIntegrator.h"
 ///	RapidFit Headers
 #include "main.h"
 #include "Mathematics.h"
 #include "Bd2JpsiKstar_sWave.h"
+#include "Bd2JpsiKstar_sWave_Fs_withAcc.h"
 ///	System Headers
 #include <vector>
 #include <cmath>
@@ -35,6 +42,7 @@ bool RooMathinit=false;
 #include <gsl/gsl_sf_erf.h>
 #include <gsl/gsl_sf_pow_int.h>
 #include <gsl/gsl_sf_gamma.h>
+#include <gsl/gsl_sf_legendre.h>
 
 const gsl_complex prefix = gsl_complex_rect( (2./sqrt( Mathematics::Pi())), 0. );
 
@@ -685,6 +693,223 @@ namespace Mathematics
 			weights.push_back(xi[i]/numEvents);
 		}
 		return weights;
+	}
+
+
+    struct AccParam
+    {
+        AccParam(double * pcoeff, int i_max, int j_max, int k_max, int numEvents):
+            pcoeff(pcoeff)
+            , i_max(i_max)
+            , j_max(j_max)
+            , k_max(k_max)
+            , num(numEvents)
+            {}
+        double parameterisation( double * omega, double * p )
+        {
+            p = NULL;
+            double returnValue(0.);
+            double cosTheta(omega[0]);
+            double phi     (omega[1]);
+            double cosPsi  (omega[2]);
+            //double cosTheta(0.);
+            //double phi     (0.);
+            //double cosPsi  (omega[0]);
+            double P_i(0.);
+            double Y_jk(0.);
+            for ( int i = 0; i < i_max+1; i++ )
+            {
+                for ( int k = 0; k < k_max+1; k++ )
+                {
+                    for ( int j = 0; j < j_max+1; j++ ) // must have l >= k
+                    {
+                        if (j < k) continue;
+                        P_i  = gsl_sf_legendre_Pl     (i,    cosPsi);
+                        // only consider case where k >= 0
+                        // these are the real valued spherical harmonics
+                        if ( k == 0 ) Y_jk =           gsl_sf_legendre_sphPlm (j, k, cosTheta);
+                        else          Y_jk = sqrt(2) * gsl_sf_legendre_sphPlm (j, k, cosTheta) * cos(k*phi);
+                        returnValue +=                pcoeff[(i*(k_max+1)+k)*(j_max+1)+j]*(P_i * Y_jk);
+                        //cout << i << k << j << " " << (i*(k_max+1)+k)*(j_max+1)+j << " " << pcoeff[(i*(k_max+1)+k)*(j_max+1)+j]/num << endl;
+                    }
+                }
+            }
+            return returnValue/num;
+        }
+        double * pcoeff;
+        int i_max;
+        int j_max;
+        int k_max;
+        int num;
+    };
+
+
+	int calculateAcceptanceCoefficients( IDataSet * dataSet, IPDF * PDF )
+	{
+		// This tries to implement the NIKHEF method for calculating the
+		// acceptance corefficients using Legendre polynomials and real
+        // valued spherical harmonics.
+		RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true);
+		PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
+
+        const int i_max(4);
+        const int j_max(4);
+        const int k_max(4);
+        double c[i_max+1][k_max+1][j_max+1];
+        double c_sq[i_max+1][k_max+1][j_max+1];
+        for ( int i = 0; i < i_max + 1; i++ )
+        {
+             for ( int k = 0; k < k_max + 1; k++ )
+             {
+                for ( int j = 0; j < j_max + 1; j++ )
+                {
+                    c[i][k][j] = 0.;
+                    c_sq[i][k][j] = 0.;
+                 }
+             }
+        }
+
+        double P_i(0.);
+        double Y_jk(0.);
+
+		int numEvents = dataSet->GetDataNumber();
+
+        double cosTheta(0.);
+        double phi(0.);
+        double cosPsi(0.);
+        double time(0.);
+		double evalPDFraw(0.);
+		double evalPDFnorm(0.);
+		double val(0.);
+        double coeff(0.);
+        for (int e = 0; e < numEvents; e++)
+		{
+			if (e % 1000 == 0) cout << "Event # " << e << "\t\t" << setprecision(4) << 100.*(double)e/(double)numEvents << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
+            DataPoint * event = dataSet->GetDataPoint(e);
+			cosTheta = event->GetObservable("cosTheta")->GetValue();
+			phi      = event->GetObservable("phi")->GetValue();
+			cosPsi   = event->GetObservable("cosPsi")->GetValue();
+			time     = event->GetObservable("time")->GetValue();
+
+			evalPDFraw = PDF->Evaluate( event );
+			// Now need to calculate the normalisation when integrated over the 3 angles
+            Bd2JpsiKstar_sWave_Fs_withAcc * bpdf = (Bd2JpsiKstar_sWave_Fs_withAcc *) PDF;
+            evalPDFnorm = bpdf->NormAnglesOnlyForAcceptanceWeights(event, boundary);
+			val = evalPDFraw/evalPDFnorm;
+            //cout << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
+
+            for ( int i = 0; i < i_max + 1; i++ )
+            {
+                for ( int k = 0; k < k_max + 1; k++ )
+                {
+                    for ( int j = 0; j < j_max + 1; j++ ) // must have j >= k
+                    {
+                        if ( j<k ) continue;
+                        P_i  = gsl_sf_legendre_Pl     (i,    cosPsi);
+                        // only consider case where k >= 0
+                        // these are the read valued spherical harmonics
+                        if ( k == 0 ) Y_jk =           gsl_sf_legendre_sphPlm (j, k, cosTheta);
+                        else          Y_jk = sqrt(2) * gsl_sf_legendre_sphPlm (j, k, cosTheta) * cos(k*phi);
+                        //cout << i << j << k << " " << P_i << " " << Y_jk <<  "  " << c[i][j][k] <<  " " << (2*i + 1)/2.*(P_i * Y_jk)/val << endl;
+                        coeff = (2*i + 1)/2.*(P_i * Y_jk)/val;
+                        c[i][k][j] += coeff;
+                        c_sq[i][k][j] += coeff*coeff;
+                    }
+                }
+            }
+        }
+		cout << endl;
+
+        double error(0.);
+        char buf[50];
+        for ( int i = 0; i < i_max + 1; i++ )
+        {
+            for ( int k = 0; k < k_max + 1; k++ )
+            {
+                for ( int j = 0; j < j_max + 1; j++ )
+                {
+                    if (j < k) continue;
+                    error = sqrt(1./numEvents/numEvents * ( c_sq[i][k][j] - c[i][k][j]*c[i][k][j]/numEvents) );
+                    if ( fabs(c[i][k][j]/numEvents) > 5.*error )
+                    {
+                        sprintf( buf, "c[%d][%d][%d] = %f;// +- %f", i, k, j, c[i][k][j]/numEvents, error );
+                        cout << buf << endl;
+                    }
+		        }
+             }
+        }
+
+        // Draw the acceptance function
+        AccParam * param = new AccParam(&c[0][0][0], i_max, j_max, k_max, numEvents);
+        TF3 * f3 = new TF3("f3", param, &AccParam::parameterisation, -1, 1, -TMath::Pi(), TMath::Pi(), -1, 1, 0, "AccParam", "parameterisation");
+        f3->SetNpx(25);
+        f3->SetNpy(25);
+        f3->SetNpz(25);
+        TH3F * h3 = (TH3F*)f3->CreateHistogram();
+        double cosTheta_i(0.);
+        double phi_i(0.);
+        double cosPsi_i(0.);
+        for (int i = 0; i < 20000000; i++)
+        {
+            f3->GetRandom3( cosTheta_i, phi_i, cosPsi_i );
+            h3->Fill(cosTheta_i, phi_i, cosPsi_i);
+        }
+
+        // Sum the inverse PDF values over the accepted events
+        TH1D * cosThetaAcc = new TH1D("cosThetaAcc", "cosThetaAcc", 20, -1, 1);
+        cosThetaAcc->Sumw2();
+        TH1D * phiAcc = new TH1D("phiAcc", "phiAcc", 20, -TMath::Pi(), TMath::Pi());
+        phiAcc->Sumw2();
+        TH1D * cosPsiAcc = new TH1D("cosPsiAcc", "cosPsiAcc", 20, -1, 1);
+        cosPsiAcc->Sumw2();
+        for (int e = 0; e < numEvents; e++)
+		{
+			if (e % 1000 == 0) cout << "Event # " << e << "\t\t" << setprecision(4) << 100.*(double)e/(double)numEvents << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
+            DataPoint * event = dataSet->GetDataPoint(e);
+			cosTheta = event->GetObservable("cosTheta")->GetValue();
+			phi      = event->GetObservable("phi")->GetValue();
+			cosPsi   = event->GetObservable("cosPsi")->GetValue();
+			time     = event->GetObservable("time")->GetValue();
+
+			evalPDFraw = PDF->Evaluate( event );
+			// Now need to calculate the normalisation when integrated over the 3 angles
+            Bd2JpsiKstar_sWave_Fs_withAcc * bpdf = (Bd2JpsiKstar_sWave_Fs_withAcc *) PDF;
+            evalPDFnorm = bpdf->NormAnglesOnlyForAcceptanceWeights(event, boundary);
+			val = evalPDFraw/evalPDFnorm;
+            //cout << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
+            cosThetaAcc->Fill(cosTheta, 1./val);
+            phiAcc->Fill(phi, 1./val);
+            cosPsiAcc->Fill(cosPsi, 1./val);
+        }
+        // Normalise
+        cosThetaAcc->Scale(1./cosThetaAcc->Integral());
+        phiAcc->Scale(1./phiAcc->Integral());
+        cosPsiAcc->Scale(1./cosPsiAcc->Integral());
+        TH1D * cosThetaAccProj = h3->ProjectionX();
+        TH1D * phiAccProj = h3->ProjectionY();
+        TH1D * cosPsiAccProj = h3->ProjectionZ();
+        cosThetaAccProj->Scale(1./cosThetaAccProj->Integral());
+        phiAccProj->Scale(1./phiAccProj->Integral());
+        cosPsiAccProj->Scale(1./cosPsiAccProj->Integral());
+
+        // Make some plots
+        gStyle->SetOptStat(0);
+        TCanvas * canvas = new TCanvas();
+        canvas->Divide(3,2);
+        canvas->cd(1);
+        cosThetaAcc->Draw();
+        canvas->cd(4);
+        cosThetaAccProj->Draw("C");
+        canvas->cd(2);
+        phiAcc->Draw();
+        canvas->cd(5);
+        phiAccProj->Draw("C");
+        canvas->cd(3);
+        cosPsiAcc->Draw();
+        canvas->cd(6);
+        cosPsiAccProj->Draw("C");
+        canvas->SaveAs("acceptance.pdf");
+        return 1.;
 	}
 
 	void calculateAcceptanceWeightsWithSwave( IDataSet * dataSet, IPDF * PDF )

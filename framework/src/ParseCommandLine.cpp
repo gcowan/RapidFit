@@ -115,6 +115,10 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "       Calculate the Angular Acceptance Weights and Histograms for both Helicity and Transverse Basis and store the results in a .root file" << endl;
 
 	cout << endl;
+	cout << "--calculateAcceptanceCoefficients" << endl;
+	cout << "       Calculate the Angular Acceptance Coefficients for Helicity Basis" << endl;
+
+	cout << endl;
 	cout << "--WeightDataSet" << endl;
 	cout << "       If a Preprocessor section is present in the XML the input data is weighted and the results are stored in the relevant file" << endl;
 
@@ -591,6 +595,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 		else if( currentArgument == "--testRapidIntegrator" )			{	config.testRapidIntegratorFlag = true;			}
 		else if( currentArgument == "--calculateFitFractions" )			{	config.calculateFitFractionsFlag = true;		}
 		else if( currentArgument == "--calculateAcceptanceWeights" )		{	config.calculateAcceptanceWeights = true;		}
+		else if( currentArgument == "--calculateAcceptanceCoefficients" )		{	config.calculateAcceptanceCoefficients = true;		}
 		else if( currentArgument == "--calculateAcceptanceWeightsWithSwave" )	{	config.calculateAcceptanceWeightsWithSwave = true;	}
 		else if( currentArgument == "--calculatePerEventAcceptance" )		{	config.calculatePerEventAcceptance = true;		}
 		else if( currentArgument == "--doLLscan" )				{	config.doLLscanFlag = true;				}

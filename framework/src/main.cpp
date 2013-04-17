@@ -119,6 +119,8 @@ int calculateFitFractions( RapidFitConfiguration* config );
 
 int calculateAcceptanceWeights( RapidFitConfiguration* config );
 
+int calculateAcceptanceCoefficients( RapidFitConfiguration* config );
+
 int calculateAcceptanceWeightsWithSwave( RapidFitConfiguration* config );
 
 int calculatePerEventAcceptance( RapidFitConfiguration* config );
@@ -233,6 +235,7 @@ int RapidFit( vector<string> input )
 
 	//	3)
 	else if( thisConfig->calculateAcceptanceWeights && thisConfig->configFileNameFlag ) calculateAcceptanceWeights( thisConfig );
+	else if( thisConfig->calculateAcceptanceCoefficients && thisConfig->configFileNameFlag ) calculateAcceptanceCoefficients( thisConfig );
 
 	//	4)
 	else if( thisConfig->calculateAcceptanceWeightsWithSwave && thisConfig->configFileNameFlag ) calculateAcceptanceWeightsWithSwave( thisConfig );
@@ -975,6 +978,17 @@ int calculateFitFractions( RapidFitConfiguration* config )
 	delete testIntegrator;
 	delete pdfAndData;
 	return 1;
+}
+
+int calculateAcceptanceCoefficients( RapidFitConfiguration* config )
+{
+	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
+	pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
+	IDataSet * dataSet = pdfAndData->GetDataSet();
+	int nMCEvents = dataSet->GetDataNumber();
+	IPDF * pdf = pdfAndData->GetPDF();
+
+	return Mathematics::calculateAcceptanceCoefficients(dataSet, pdf);
 }
 
 int calculateAcceptanceWeights( RapidFitConfiguration* config )

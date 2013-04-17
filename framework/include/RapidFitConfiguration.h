@@ -79,6 +79,7 @@ class RapidFitConfiguration
 		bool testRapidIntegratorFlag;
 		bool calculateFitFractionsFlag;
 		bool calculateAcceptanceWeights;
+		bool calculateAcceptanceCoefficients;
 		bool calculateAcceptanceWeightsWithSwave;
 		bool calculatePerEventAcceptance;
 		bool defineContourFlag;
