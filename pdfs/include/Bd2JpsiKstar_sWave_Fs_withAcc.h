@@ -152,16 +152,34 @@ class Bd2JpsiKstar_sWave_Fs_withAcc : public BasePDF
 		double cosPsi;
 		double KstarFlavour;
 		double q() const ;
+        // Acceptance parameterisation
+        static const int i_max = 4;
+        static const int j_max = 4;
+        static const int k_max = 4;
+        double c[i_max+1][k_max+1][j_max+1];
+        /*
+        for ( int i = 0; i < i_max + 1; i++ )
+        {
+        for ( int k = 0; k < k_max + 1; k++ )
+        {
+            for ( int j = k; j < j_max + 1; j++ )
+            {
+                c[i][j][k] = 0.;
+            }
+        }
+    }
 
-		//double tlow, thigh; // Integration limits
-
-		TH3D *histo;
-                TAxis *xaxis, *yaxis, *zaxis;
-                int nxbins, nybins, nzbins;
-                double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
-                double total_num_entries;
-
-
+    c[0][0][0] = 3.751735;// +- 0.003279
+    c[0][2][0] = -0.215756;// +- 0.006634
+    c[0][2][2] = 0.325259;// +- 0.007449
+    c[1][0][0] = -0.901950;// +- 0.010273
+    c[1][2][0] = 0.050091;// +- 0.009887
+    c[1][2][2] = -0.118334;// +- 0.012365
+    c[2][0][0] = -1.017506;// +- 0.014660
+    c[2][2][2] = -0.096013;// +- 0.017198
+    c[3][0][0] = -0.323704;// +- 0.017012
+    c[4][0][0] = -0.203926;// +- 0.019563
+        */
 		double buildPDFnumerator();
 		double buildPDFdenominator();
 		double buildCompositePDFdenominator();
