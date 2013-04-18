@@ -1127,7 +1127,7 @@ TLegend* EdStyle::LHCbLegend()
 
 TLegend* EdStyle::LHCbLeftLegend()
 {
-	TLegend* thisLegend = new TLegend( 0.15, 0.65, 0.4, 0.9 );
+	TLegend* thisLegend = new TLegend( 0.2, 0.65, 0.4, 0.9 );
 	thisLegend->SetFillColor( kWhite );
 	thisLegend->SetFillStyle( EdStyle::GetTransparentFillStyle() );
 	thisLegend->SetTextSize( EdStyle::GetLHCbTextSize() );
@@ -1147,7 +1147,7 @@ TLegend* EdStyle::LHCbBottomLegend()
 
 TLegend* EdStyle::LHCbBottomLeftLegend()
 {
-	TLegend* thisLegend = new TLegend( 0.15, 0.2, 0.45, 0.45 );
+	TLegend* thisLegend = new TLegend( 0.2, 0.2, 0.45, 0.45 );
 	thisLegend->SetFillColor( kWhite );
 	thisLegend->SetFillStyle( EdStyle::GetTransparentFillStyle() );
 	thisLegend->SetTextSize( EdStyle::GetLHCbTextSize() );

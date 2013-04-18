@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/04/18 Rob Currie
+  - Changed coordinates of some Legends to play nice with LHCb style
+
 2013/04/17 Rob Currie
   - Added new scripts for getting output from a Driac JobID, this has changed so the old .py script no longer works but the new .sh script works as before
     Added a ganga script to run a single fit which also runs correctly interactively, however you need to pass the full .xml path (not sure how/if ganga interactive uses sandboxes, but it runs interactive jobs ok)
