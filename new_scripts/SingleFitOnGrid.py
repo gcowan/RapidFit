@@ -23,14 +23,11 @@ is_ganga = "Ganga.Core" in sys.modules
 
 job_name = "untagged_Bc"
 
-TOYS_PER_SUBJOB=20
-NUM_OF_SUBJOBS=5
-
 #	All the possible output files right now
 #
 #			THIS HAS TO BE CHANGED BASED ON THE OUTPUT FROM YOUR SCAN
 
-output_file_list = [ 'pullPlots.root' ]
+output_file_list = [ '*.root', '*/*.root' ]
 
 
 LFN_LIST=[]
@@ -58,13 +55,13 @@ if is_ganga:
 	print FILE_LIST
 
 #	Splitter for toy studies
-def TOYStudy_Splitter( XML='XML.xml', All_Jobs=NUM_OF_SUBJOBS ):
+def Arg_Splitter( XML='XML.xml', RapidFit_Path="" ):
 	args = []
 
-	for i in range( 0, All_Jobs, 1 ):
-		temp = []
-		temp.append( str( XML ) )
-                args.append( temp )
+	temp = []
+	temp.append( str( XML ) )
+	temp.append( RapidFit_Path )
+        args.append( temp )
 	print args
 	return args
 
@@ -93,17 +90,15 @@ if is_ganga:
 
 	#	By definition of how this should be run!
 	script_name = str( sys.argv[0] )
-	xml = str( sys.argv[1] )
 
 	#	i.e.	> ganga script.py some.xml
 
         #       Input Parameters
-        script_onlyname = script_name
-        script_list = string.split( script_name, "/" )
-        if len( script_list ) == 1:
-                script_onlyname = string.split( script_name, "\\" )
-        script_onlyname = script_list[ int(len(script_list)-1) ]
-
+	script_onlyname = script_name
+	script_list = string.split( script_name, "/" )
+	if len( script_list ) == 1:
+		script_onlyname = string.split( script_name, "\\" )
+	script_onlyname = script_list[ int(len(script_list)-1) ]
 
 	#	Create the job
 	j = Job( application = Root( version = ROOT_VERSION ) )
@@ -123,6 +118,8 @@ if is_ganga:
 
 	host_name = os.popen('hostname').readline()
 
+	choice = -1
+
 	if ( string.find( host_name, "frontend" ) != -1 ):
 		print "Running on ECDF, submitting to SGE"
 		j.backend = SGE()
@@ -133,9 +130,14 @@ if is_ganga:
 		j.inputsandbox = sandbox_data
 
 	elif ( string.find( host_name, "lxplus" ) != -1 ):
-		choice = int( raw_input("Running on LXPLUS, submit to 1) GRID 2) lxplus Batch or 3) Interactive?\t") )
-		while ( choice != 1 ) and ( choice != 2 ):
-			choice = int( raw_input( "try again...  " ) )
+
+		if LFN_LIST:
+			choice = 1
+		else:
+			choice = int( raw_input("Running on LXPLUS, submit to 1) GRID 2) lxplus Batch or 3) Interactive?\t") )
+			while ( choice != 1 ) and ( choice != 2 ) and ( choice != 3 ):
+				choice = int( raw_input( "try again...  " ) )
+
 		if choice == 1:
 			j.backend = Dirac()
 			#	Only do this if the LFN_LIST is NOT empty
@@ -159,7 +161,7 @@ if is_ganga:
 			#j.outputdata=[]
 		if choice == 3:
 			j.backend = Interactive()
-			j.inputdata = FILE_LIST
+			j.inputsandbox = FILE_LIST
 
 	elif ( string.find( host_name, "ppe" ) != -1 ):
 		choice = int( raw_input("Running on PPE, submit to 1) CONDOR or 2) Interactive? ") )
@@ -200,7 +202,10 @@ if is_ganga:
         FIT_XML = FIT_LIST[ int(len(FIT_LIST)-1) ]
 
 	#	Splitter to use for job
-	j.splitter=ArgSplitter( args = TOYStudy_Splitter( FIT_XML ) )
+	if choice == 3 :
+		j.splitter=ArgSplitter( args = Arg_Splitter( xml, RapidFit_Path ) )
+	else :
+		j.splitter=ArgSplitter( args = Arg_Splitter( FIT_XML, RapidFit_Path ) )
 	#	submit the job
 	j.submit()
 
@@ -213,10 +218,15 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 	for i in sys.argv:
 		print i
 
+	sys.path.append( sys.argv[2]+"/lib" )
 	sys.path.append("/exports/work/ppe/sw/fitting-latest/root-5.29/lib")
+
+	print sys.path
 
 	#	We want ROOT
 	import ROOT
+
+	ROOT.gSystem.AddDynamicPath( sys.argv[2]+"/lib" )
 
 	#	Input Parameters
 	FIT_XML = sys.argv[1]
@@ -231,11 +241,8 @@ if ( __name__ == '__main__' ) and ( not is_ganga ) :
 	args.Add( ROOT.TObjString( "RapidFit"     ) )
 	args.Add( ROOT.TObjString( "-f"           ) )
 	args.Add( ROOT.TObjString( str( FIT_XML ) ) )
-	args.Add( ROOT.TObjString( "-repeats"     ) )
-	args.Add( ROOT.TObjString( str( TOYS_PER_SUBJOB ) ) )
-	args.Add( ROOT.TObjString( "--useUUID"    ) )
-	args.Add( ROOT.TObjString( "--doPulls"    ) )
-	args.Add( ROOT.TObjString( "pullPlots.root" ) )
+	args.Add( ROOT.TObjString( "-repeats" ))
+	args.Add( ROOT.TObjString( "10" ))
 	#	Print the command that is being run for reference
 	#print args
 
