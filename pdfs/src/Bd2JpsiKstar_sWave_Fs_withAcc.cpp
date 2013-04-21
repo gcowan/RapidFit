@@ -16,7 +16,10 @@
 #include "TFile.h"
 #include "TH3D.h"
 #include "TROOT.h"
+
+#ifdef __RAPIDFIT_USE_GSL
 #include <gsl/gsl_sf_legendre.h>
+#endif
 
 PDF_CREATOR( Bd2JpsiKstar_sWave_Fs_withAcc );
 
@@ -412,6 +415,7 @@ double Bd2JpsiKstar_sWave_Fs_withAcc::buildPDFnumerator()
 
 double Bd2JpsiKstar_sWave_Fs_withAcc::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+    //return -1.;
     _datapoint = measurement;
 
     double returnValue;
@@ -811,6 +815,7 @@ double Bd2JpsiKstar_sWave_Fs_withAcc::angularFactor( )
 {
     //return 1;
     double returnValue(0.);
+    #ifdef __RAPIDFIT_USE_GSL_MATH
     double P_i(0.);
     double Y_jk(0.);
     for ( int i = 0; i < i_max+1; i++ )
@@ -829,7 +834,7 @@ double Bd2JpsiKstar_sWave_Fs_withAcc::angularFactor( )
             }
         }
     }
-    //returnValue = 1.; //uniform acceptance
+    #endif
     return returnValue;
 }
 
