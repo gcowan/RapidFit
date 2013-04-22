@@ -1,4 +1,4 @@
-/** @class Bd2JpsiKstar_sWave_Fs Bd2JpsiKstar_sWave_Fs.cpp
+/** @class Bd2JpsiKstar_sWave_Fscopy Bd2JpsiKstar_sWave_Fscopy.cpp
  *
  *  RapidFit PDF for Bd2JpsiPhi with average angular acceptance input as a paramter
  *
@@ -6,7 +6,7 @@
  *  @date 2011-01-26
  */
 
-#include "Bd2JpsiKstar_sWave_Fs.h"
+#include "Bd2JpsiKstar_sWave_Fscopy.h"
 #include "Mathematics.h"
 #include "SlicedAcceptance.h"
 #include <iostream>
@@ -17,10 +17,12 @@
 #include "TH3D.h"
 #include "TROOT.h"
 
-PDF_CREATOR( Bd2JpsiKstar_sWave_Fs );
+bool TEMPUSEHEL2 = true ;
+
+PDF_CREATOR( Bd2JpsiKstar_sWave_Fscopy );
 
 
-Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs( const Bd2JpsiKstar_sWave_Fs& input ) : BasePDF( (BasePDF&) input ),
+Bd2JpsiKstar_sWave_Fscopy::Bd2JpsiKstar_sWave_Fscopy( const Bd2JpsiKstar_sWave_Fscopy& input ) : BasePDF( (BasePDF&) input ),
 	cachedAzeroAzeroIntB(input.cachedAzeroAzeroIntB), cachedAparaAparaIntB(input.cachedAparaAparaIntB), cachedAperpAperpIntB(input.cachedAperpAperpIntB),
 	cachedAparaAperpIntB(input.cachedAparaAperpIntB), cachedAzeroAparaIntB(input.cachedAzeroAparaIntB), cachedAzeroAperpIntB(input.cachedAzeroAperpIntB),
 	cachedAsAsIntB(input.cachedAsAsIntB), cachedAparaAsIntB(input.cachedAparaAsIntB), cachedAperpAsIntB(input.cachedAperpAsIntB), cachedAzeroAsIntB(input.cachedAzeroAsIntB),
@@ -40,6 +42,8 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs( const Bd2JpsiKstar_sWave_Fs& input
 	delta_s(input.delta_s), omega(input.omega), timeRes(input.timeRes), timeRes1(input.timeRes1), timeRes2(input.timeRes2), timeRes1Frac(input.timeRes1Frac), angAccI1(input.angAccI1), angAccI2(input.angAccI2),
 	angAccI3(input.angAccI3), angAccI4(input.angAccI4), angAccI5(input.angAccI5), angAccI6(input.angAccI6), angAccI7(input.angAccI7), angAccI8(input.angAccI8), angAccI9(input.angAccI9),
 	angAccI10(input.angAccI10), Ap_sq(input.Ap_sq), Ap(input.Ap), time(input.time), cosTheta(input.cosTheta), phi(input.phi), cosPsi(input.cosPsi), KstarFlavour(input.KstarFlavour), tlo(input.tlo),
+    _useHelicityBasis(input._useHelicityBasis), helcosthetaK(input.helcosthetaK), helcosthetaL(input.helcosthetaL), helphi(input.helphi),
+    helcosthetaKName(input.helcosthetaKName), helcosthetaLName(input.helcosthetaLName), helphiName(input.helphiName),
 	thi(input.thi), useFlatAngularDistribution(input.useFlatAngularDistribution), componentIndex(input.componentIndex), delta_sName(input.delta_sName), Azero_sq(input.Azero_sq),
 	Apara_sq(input.Apara_sq), Aperp_sq(input.Aperp_sq), Csp(input.Csp), CspAs(input.CspAs), _plotAllComponents(input._plotAllComponents),
     histo(input.histo), xaxis(NULL), yaxis(NULL), zaxis(NULL),
@@ -80,7 +84,7 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs( const Bd2JpsiKstar_sWave_Fs& input
 
 
 //Constructor
-Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
+Bd2JpsiKstar_sWave_Fscopy::Bd2JpsiKstar_sWave_Fscopy(PDFConfigurator* configurator ) :
 	cachedAzeroAzeroIntB(), cachedAparaAparaIntB(), cachedAperpAperpIntB(), cachedAparaAperpIntB(), cachedAzeroAparaIntB(), cachedAzeroAperpIntB(),
 	cachedAsAsIntB(), cachedAparaAsIntB(), cachedAperpAsIntB(), cachedAzeroAsIntB(), AzeroAzeroB(), AparaAparaB(), AperpAperpB(), AsAsB(), ImAparaAperpB(),
 	ReAzeroAparaB(), ImAzeroAperpB(), ReAparaAsB(), ImAperpAsB(), ReAzeroAsB(), cachedSinDeltaPerpPara(), cachedCosDeltaPara(), cachedSinDeltaPerp(),
@@ -111,34 +115,40 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
 	, timeRes1FractionName  ( configurator->getName("timeResolution1Fraction" ))
 	, _useTimeAcceptance(false)
 	, _plotAllComponents(false)
+    , _useHelicityBasis(false)
 
 	// Observables (What we want to gain from the pdf after inserting physics parameter values)
 	, normalisationCacheValid(false)
-, evaluationCacheValid(false)
+    , evaluationCacheValid(false)
 	, timeName      ( configurator->getName("time" ))
 	, cosThetaName  ( configurator->getName("cosTheta" ))
 	, phiName       ( configurator->getName("phi" ))
 	, cosPsiName    ( configurator->getName("cosPsi" ))
+    , helcosthetaLName    ( configurator->getName("helcosthetaL" ))
+    , helcosthetaKName    ( configurator->getName("helcosthetaK" ))
+    , helphiName    ( configurator->getName("helphi" ))
 	, KstarFlavourName  ( configurator->getName("KstarFlavour" ))
 
 	, timeconstraintName( "time" )
-, gamma(), Rzero_sq(), Rpara_sq(), Rperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
+    , gamma(), Rzero_sq(), Rpara_sq(), Rperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
 	delta_zero(), delta_para(), delta_perp(), delta_s(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(),
 	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), Ap_sq(), Ap(), time(), cosTheta(), phi(),
-	cosPsi(), KstarFlavour(), tlo(), thi(), useFlatAngularDistribution(true), _datapoint(NULL), f(NULL)
+	cosPsi(), KstarFlavour(), tlo(), thi(), useFlatAngularDistribution(true), _datapoint(NULL), f(NULL),
+    helcosthetaK(),helcosthetaL(),helphi()
 {
 	componentIndex = 0;
-	MakePrototypes();
+
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
+	_useHelicityBasis = configurator->isTrue( "UseHelicityBasis" ) ;
 	_plotAllComponents = configurator->isTrue( "PlotAllComponents" ) ;
 
 	if( useTimeAcceptance() ) {
 		timeAcc = new SlicedAcceptance( 0., 14.0, 0.0171 ) ;
-		cout << "Bd2JpsiKstar_sWave_Fs:: Constructing timeAcc: Upper time acceptance beta=0.0171 [0 < t < 14] " << endl ;
+		cout << "Bd2JpsiKstar_sWave_Fscopy:: Constructing timeAcc: Upper time acceptance beta=0.0171 [0 < t < 14] " << endl ;
 	}
 	else {
 		timeAcc = new SlicedAcceptance( 0., 14. ) ;
-		cout << "Bd2JpsiKstar_sWave_Fs:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
+		cout << "Bd2JpsiKstar_sWave_Fscopy:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
 	}
 
 
@@ -279,24 +289,30 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
 
 	cout << "Finishing processing histo" << endl;
     }
+    
+    // Always do this last after all flags are set
+    MakePrototypes();
 
 }
-// END AILSA
+
 
 
 //Make the data point and parameter set
-void Bd2JpsiKstar_sWave_Fs::MakePrototypes()
+void Bd2JpsiKstar_sWave_Fscopy::MakePrototypes()
 {
 	//Make the DataPoint prototype
 	allObservables.push_back( timeName );
-	allObservables.push_back( cosThetaName );
-	allObservables.push_back( phiName );
-	allObservables.push_back( cosPsiName );
 	allObservables.push_back( KstarFlavourName );
-	// Need to think about additional parameters like
-	// event-by-event propertime resolution and acceptance.
-	// This will require event-by-event PDF normalisation,
-	// but we are already doing this for tagging.
+	if( useHelicityBasis() ) {
+        allObservables.push_back( helcosthetaLName );
+        allObservables.push_back( helphiName );
+        allObservables.push_back( helcosthetaKName );
+    }
+    else {
+        allObservables.push_back( cosThetaName );
+        allObservables.push_back( phiName );
+        allObservables.push_back( cosPsiName );
+    }
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -325,7 +341,7 @@ void Bd2JpsiKstar_sWave_Fs::MakePrototypes()
 }
 
 //Destructor
-Bd2JpsiKstar_sWave_Fs::~Bd2JpsiKstar_sWave_Fs()
+Bd2JpsiKstar_sWave_Fscopy::~Bd2JpsiKstar_sWave_Fscopy()
 {
 	if( f != NULL ) f->Close();
 	f = NULL;
@@ -333,11 +349,12 @@ Bd2JpsiKstar_sWave_Fs::~Bd2JpsiKstar_sWave_Fs()
 }
 
 //Not only set the physics parameters, but indicate that the cache is no longer valid
-bool Bd2JpsiKstar_sWave_Fs::SetPhysicsParameters( ParameterSet * NewParameterSet )
+bool Bd2JpsiKstar_sWave_Fscopy::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	normalisationCacheValid = false;
 	evaluationCacheValid = false;
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
+
 	// Physics parameters (the stuff you want to extract from the physics model by plugging in the experimental measurements)
 	gamma      = allParameters.GetPhysicsParameter( gammaName )->GetValue();
 	Rpara_sq   = allParameters.GetPhysicsParameter( Rpara_sqName )->GetValue();
@@ -383,7 +400,7 @@ bool Bd2JpsiKstar_sWave_Fs::SetPhysicsParameters( ParameterSet * NewParameterSet
 }
 
 //Return a list of parameters not to be integrated
-vector<string> Bd2JpsiKstar_sWave_Fs::GetDoNotIntegrateList()
+vector<string> Bd2JpsiKstar_sWave_Fscopy::GetDoNotIntegrateList()
 {
 	vector<string> doNotIntList;
 	doNotIntList.push_back( KstarFlavourName );
@@ -391,22 +408,29 @@ vector<string> Bd2JpsiKstar_sWave_Fs::GetDoNotIntegrateList()
 	return doNotIntList;
 }
 
-double Bd2JpsiKstar_sWave_Fs::q() const { return KstarFlavour;}
+double Bd2JpsiKstar_sWave_Fscopy::q() const { return KstarFlavour;}
 
 //Calculate the function value
-double Bd2JpsiKstar_sWave_Fs::Evaluate(DataPoint * measurement)
+double Bd2JpsiKstar_sWave_Fscopy::Evaluate(DataPoint * measurement)
 {
 	_datapoint = measurement;
 
 	double returnValue;
 	time = measurement->GetObservable( timeName )->GetValue();
-	cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
-	phi      = measurement->GetObservable( phiName )->GetValue();
-	cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
 	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
-
-	//cout << gamma << " " << Aperp_sq << " " << Azero_sq << endl;
-
+    
+    if( useHelicityBasis() ) {
+        helcosthetaL = measurement->GetObservable( helcosthetaLName )->GetValue();
+        helphi      = measurement->GetObservable( helphiName )->GetValue() ;
+        helcosthetaK   = measurement->GetObservable( helcosthetaKName )->GetValue();
+    }
+    else {
+        cosTheta = measurement->GetObservable( cosThetaName )->GetValue();
+        phi      = measurement->GetObservable( phiName )->GetValue();
+        cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
+    }
+    
+    
 	if(timeRes1Frac >= 0.9999)
 	{
 		// Set the member variable for time resolution to the first value and calculate
@@ -430,7 +454,7 @@ double Bd2JpsiKstar_sWave_Fs::Evaluate(DataPoint * measurement)
 	{
 		if( (returnValue <= 0.) || isnan(returnValue) )
 		{
-			cout << " Bd2JpsiKstar_sWave_Fs::Evaluate() returns <=0 or nan " << endl ;
+			cout << " Bd2JpsiKstar_sWave_Fscopy::Evaluate() returns <=0 or nan " << endl ;
 			cout << " AT    " << Aperp_sq ;
 			cout << " AP    " << Apara_sq ;
 			cout << " A0    " << Azero_sq;
@@ -449,19 +473,17 @@ double Bd2JpsiKstar_sWave_Fs::Evaluate(DataPoint * measurement)
 }
 
 
-double Bd2JpsiKstar_sWave_Fs::buildPDFnumerator()
+double Bd2JpsiKstar_sWave_Fscopy::buildPDFnumerator()
 {
-	// The angular functions f1->f6 as defined in roadmap Table 1.(same for Kstar)
+	// The angular functions f1->f10 
 	double f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
-
-    Mathematics::getBs2JpsiPhiAngularFunctionsWithSwave( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, cosTheta, phi, cosPsi );
-    //this->getAngularFunctionsTransversity( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, cosTheta, phi, cosPsi );
-
-	// The time dependent amplitudes as defined in roadmap Eqns 48 -> 59  //No tagging so only need 2 (h± pg 72)
-	// First for the B
-	double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
-	double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
-	double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
+	if(useHelicityBasis()) {
+        this->getAngularFunctionsHelicity( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, helcosthetaL, helphi, helcosthetaK );
+    }
+    else {
+        Mathematics::getBs2JpsiPhiAngularFunctionsWithSwave( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, cosTheta, phi, cosPsi );
+        //this->getAngularFunctionsTransversity( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, cosTheta, phi, cosPsi );
+    }
 
 	getTimeDependentAmplitudes( AzeroAzeroB, AparaAparaB, AperpAperpB
 			, ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB
@@ -557,7 +579,7 @@ double Bd2JpsiKstar_sWave_Fs::buildPDFnumerator()
 }
 
 
-double Bd2JpsiKstar_sWave_Fs::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bd2JpsiKstar_sWave_Fscopy::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	_datapoint = measurement;
 
@@ -605,7 +627,7 @@ double Bd2JpsiKstar_sWave_Fs::Normalisation(DataPoint * measurement, PhaseSpaceB
 	{
 		if( (returnValue <= 0.) || isnan(returnValue) )
 		{
-			cout << " Bd2JpsiKstar_sWave_Fs::Normalisation() returns <=0 or nan " << endl ;
+			cout << " Bd2JpsiKstar_sWave_Fscopy::Normalisation() returns <=0 or nan " << endl ;
 			cout << " AT    " << Aperp_sq ;
 			cout << " AP    " << Apara_sq ;
 			cout << " A0    " << Azero_sq;
@@ -630,7 +652,7 @@ double Bd2JpsiKstar_sWave_Fs::Normalisation(DataPoint * measurement, PhaseSpaceB
 // New method to calculate normalisation using a histogrammed "low-end" time acceptance function
 // The acceptance function information is all contained in the timeAcceptance member object,
 
-double Bd2JpsiKstar_sWave_Fs::buildCompositePDFdenominator( )
+double Bd2JpsiKstar_sWave_Fscopy::buildCompositePDFdenominator( )
 {
 	double tlo_boundary = tlo ;
 	double thi_boundary = thi ;
@@ -658,7 +680,7 @@ double Bd2JpsiKstar_sWave_Fs::buildCompositePDFdenominator( )
 
 
 
-double Bd2JpsiKstar_sWave_Fs::NormAnglesOnlyForAcceptanceWeights(DataPoint * measurement, PhaseSpaceBoundary * boundary)
+double Bd2JpsiKstar_sWave_Fscopy::NormAnglesOnlyForAcceptanceWeights(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
 	_datapoint = measurement;
 	(void) boundary;
@@ -692,7 +714,7 @@ double Bd2JpsiKstar_sWave_Fs::NormAnglesOnlyForAcceptanceWeights(DataPoint * mea
 	{
 		if( (returnValue <= 0.) || isnan(returnValue) )
 		{
-			cout << " Bd2JpsiKstar_sWave_Fs::Normalisation() returns <=0 or nan " << endl ;
+			cout << " Bd2JpsiKstar_sWave_Fscopy::Normalisation() returns <=0 or nan " << endl ;
 			cout << " AT    " << Aperp_sq ;
 			cout << " AP    " << Apara_sq ;
 			cout << " A0    " << Azero_sq;
@@ -711,7 +733,7 @@ double Bd2JpsiKstar_sWave_Fs::NormAnglesOnlyForAcceptanceWeights(DataPoint * mea
 
 
 
-double Bd2JpsiKstar_sWave_Fs::buildPDFdenominator()
+double Bd2JpsiKstar_sWave_Fscopy::buildPDFdenominator()
 {
 
 
@@ -821,14 +843,20 @@ double Bd2JpsiKstar_sWave_Fs::buildPDFdenominator()
 return v1;
 }
 
-double Bd2JpsiKstar_sWave_Fs::buildPDFdenominatorAngles()  //test method
+double Bd2JpsiKstar_sWave_Fscopy::buildPDFdenominatorAngles()  //test method
 {
 
+    /*(
 	double f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
-    Mathematics::getBs2JpsiPhiAngularFunctionsWithSwave( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, cosTheta, phi, cosPsi );
-    //this->getAngularFunctionsTransversity( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, cosTheta, phi, cosPsi );
-    
 
+	if(useHelicityBasis() ) {
+        this->getAngularFunctionsHelicity( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, helcosthetaL, helphi, helcosthetaK );
+    }
+    else {
+        Mathematics::getBs2JpsiPhiAngularFunctionsWithSwave( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, cosTheta, phi, cosPsi );
+        //this->getAngularFunctionsTransversity( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, cosTheta, phi, cosPsi );
+    }
+     */
 
 	// The integrals of the time dependent amplitudes as defined in roadmap Eqns 48 -> 59
 	getTimeDependentAmplitudes( AzeroAzeroB, AparaAparaB, AperpAperpB,
@@ -847,7 +875,7 @@ double Bd2JpsiKstar_sWave_Fs::buildPDFdenominatorAngles()  //test method
 }
 
 
-void Bd2JpsiKstar_sWave_Fs::getTimeDependentAmplitudes(
+void Bd2JpsiKstar_sWave_Fscopy::getTimeDependentAmplitudes(
 		double & AzeroAzero
 		, double & AparaApara
 		, double & AperpAperp
@@ -904,7 +932,7 @@ void Bd2JpsiKstar_sWave_Fs::getTimeDependentAmplitudes(
 	return;
 }
 
-void Bd2JpsiKstar_sWave_Fs::getTimeAmplitudeIntegrals(
+void Bd2JpsiKstar_sWave_Fscopy::getTimeAmplitudeIntegrals(
 		double & AzeroAzeroInt
 		, double & AparaAparaInt
 		, double & AperpAperpInt
@@ -958,7 +986,7 @@ void Bd2JpsiKstar_sWave_Fs::getTimeAmplitudeIntegrals(
 	return;
 }
 
-double Bd2JpsiKstar_sWave_Fs::angularFactor( )
+double Bd2JpsiKstar_sWave_Fscopy::angularFactor( )
 {
 	double returnValue=0.;
 
@@ -966,7 +994,6 @@ double Bd2JpsiKstar_sWave_Fs::angularFactor( )
 	int xbin=-1, ybin=-1, zbin=-1;
 	double num_entries_bin=-1.;
 
-	//Observable* cos1Obs = cos1Obs = _datapoint->GetObservable( cosPsiName );
 	Observable* cos1Obs = _datapoint->GetObservable( cosPsiName );
 
 	if( cos1Obs->GetBkgBinNumber() != -1 )
@@ -998,36 +1025,8 @@ double Bd2JpsiKstar_sWave_Fs::angularFactor( )
 	return returnValue;
 }
 
-/*
-//Angular distribution function
-double Bd2JpsiKstar_sWave_Fs::angularFactor( )
-{
-double returnValue=0.;
 
-int globalbin=-1;
-int xbin=-1, ybin=-1, zbin=-1;
-double num_entries_bin=-1.;
-
-if( useFlatAngularDistribution ) {
-returnValue = 1.0; /// 8.0 / TMath::Pi() ;
-}
-else {
-//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-xbin = xaxis->FindFixBin( cosPsi ); if( xbin > nxbins ) xbin = nxbins;
-ybin = yaxis->FindFixBin( cosTheta ); if( ybin > nybins ) ybin = nybins;
-zbin = zaxis->FindFixBin( phi ); if( zbin > nzbins ) zbin = nzbins;
-
-globalbin = histo->GetBin( xbin, ybin, zbin );
-num_entries_bin = histo->GetBinContent(globalbin);
-
-//Angular factor normalized with phase space of histogram and total number of entries in the histogram
-returnValue = num_entries_bin; /// (deltax * deltay * deltaz) / total_num_entries ;
-}
-
-return returnValue;
-}*/
-
-vector<string> Bd2JpsiKstar_sWave_Fs::PDFComponents()
+vector<string> Bd2JpsiKstar_sWave_Fscopy::PDFComponents()
 {
 	vector<string> this_component_list;
 	this_component_list.push_back( "0" );
@@ -1051,12 +1050,12 @@ vector<string> Bd2JpsiKstar_sWave_Fs::PDFComponents()
 	return this_component_list;
 }
 
-string Bd2JpsiKstar_sWave_Fs::GetComponentName( ComponentRef* Component )
+string Bd2JpsiKstar_sWave_Fscopy::GetComponentName( ComponentRef* Component )
 {
 	return Component->getComponentName();
 }
 
-double Bd2JpsiKstar_sWave_Fs::EvaluateComponent(DataPoint * measurement, ComponentRef* Component)
+double Bd2JpsiKstar_sWave_Fscopy::EvaluateComponent(DataPoint * measurement, ComponentRef* Component)
 {
 	componentIndex = Component->getComponentNumber();
 	if ( !_plotAllComponents )
@@ -1151,12 +1150,12 @@ double Bd2JpsiKstar_sWave_Fs::EvaluateComponent(DataPoint * measurement, Compone
 	return this->Evaluate( measurement );
 }
 
-void Bd2JpsiKstar_sWave_Fs::getAngularFunctionsHelicity( double &f1, double &f2, double &f3, double &f4, double &f5, double &f6, double &f7, double &f8, double &f9, double &f10, double cosThetal, double phi, double cosThetaK )
+void Bd2JpsiKstar_sWave_Fscopy::getAngularFunctionsHelicity( double &f1, double &f2, double &f3, double &f4, double &f5, double &f6, double &f7, double &f8, double &f9, double &f10, double l_cosThetal, double l_helphi, double l_cosThetaK )
 {
    	vector<double> input ;
-    input.push_back(cosThetaK) ;
-    input.push_back(cosThetal) ;
-    input.push_back( phi ) ;
+    input.push_back(l_cosThetaK) ;
+    input.push_back(l_cosThetal) ;
+    input.push_back( l_helphi ) ;
     f1 = Bs2JpsiPhi_Angular_Terms::HangleFactorA0A0( input ) ;
     f2 = Bs2JpsiPhi_Angular_Terms::HangleFactorAPAP( input ) ;
     f3 = Bs2JpsiPhi_Angular_Terms::HangleFactorATAT( input ) ;
@@ -1171,12 +1170,12 @@ void Bd2JpsiKstar_sWave_Fs::getAngularFunctionsHelicity( double &f1, double &f2,
     return ;
 }
 
-void Bd2JpsiKstar_sWave_Fs::getAngularFunctionsTransversity( double &f1, double &f2, double &f3, double &f4, double &f5, double &f6, double &f7, double &f8, double &f9, double &f10, double cosTheta, double phi, double cosPsi )
+void Bd2JpsiKstar_sWave_Fscopy::getAngularFunctionsTransversity( double &f1, double &f2, double &f3, double &f4, double &f5, double &f6, double &f7, double &f8, double &f9, double &f10, double l_cosTheta, double l_phi, double l_cosPsi )
 {
    	vector<double> input ;
-    input.push_back(cosTheta) ;
-    input.push_back(cosPsi) ;
-    input.push_back( phi ) ;
+    input.push_back(l_cosTheta) ;
+    input.push_back(l_cosPsi) ;
+    input.push_back( l_phi ) ;
     f1 = Bs2JpsiPhi_Angular_Terms::TangleFactorA0A0( input ) ;
     f2 = Bs2JpsiPhi_Angular_Terms::TangleFactorAPAP( input ) ;
     f3 = Bs2JpsiPhi_Angular_Terms::TangleFactorATAT( input ) ;

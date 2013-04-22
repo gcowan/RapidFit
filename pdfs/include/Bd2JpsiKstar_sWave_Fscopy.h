@@ -6,8 +6,8 @@
  *  @date 2011-01-26
  */
 
-#ifndef Bd2JpsiKstar_sWave_Fs_H
-#define Bd2JpsiKstar_sWave_Fs_H
+#ifndef Bd2JpsiKstar_sWave_Fscopy_H
+#define Bd2JpsiKstar_sWave_Fscopy_H
 
 //#ifndef __CINT__
 #include "BasePDF.h"
@@ -23,12 +23,12 @@
 //#ifdef __CINT__
 //#endif
 
-class Bd2JpsiKstar_sWave_Fs : public BasePDF
+class Bd2JpsiKstar_sWave_Fscopy : public BasePDF
 {
 	public:
-		Bd2JpsiKstar_sWave_Fs( PDFConfigurator* );
-		Bd2JpsiKstar_sWave_Fs( const Bd2JpsiKstar_sWave_Fs& );
-		~Bd2JpsiKstar_sWave_Fs();
+		Bd2JpsiKstar_sWave_Fscopy( PDFConfigurator* );
+		Bd2JpsiKstar_sWave_Fscopy( const Bd2JpsiKstar_sWave_Fscopy& );
+		~Bd2JpsiKstar_sWave_Fscopy();
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
@@ -36,7 +36,7 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 		virtual bool SetPhysicsParameters(ParameterSet*);
 		double NormAnglesOnlyForAcceptanceWeights(DataPoint*, PhaseSpaceBoundary*);
 		//Return a list of parameters not to be integrated
-                virtual vector<string> GetDoNotIntegrateList();
+        virtual vector<string> GetDoNotIntegrateList();
 		double angularFactor();
 		string GetComponentName( ComponentRef* Component );
 		vector<string> PDFComponents();
@@ -54,7 +54,7 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 		double cachedAsAsIntB, cachedAparaAsIntB, cachedAperpAsIntB, cachedAzeroAsIntB ;
 		double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
 		double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
-	        double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
+        double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
 
 		double cachedSinDeltaPerpPara, cachedCosDeltaPara, cachedSinDeltaPerp, cachedCosDeltaParaS, cachedSinDeltaPerpS, cachedCosDeltaS;
 
@@ -99,35 +99,38 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		ObservableRef phiName;		// azimuthal angle of the mu+ in Jpsi frame
 		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
+        ObservableRef helcosthetaKName;	
+        ObservableRef helcosthetaLName;		
+        ObservableRef helphiName;		
 		ObservableRef KstarFlavourName;
 
 		ObservableRef timeconstraintName;
 		// Member variables that will contain the parameter values
-                double gamma;
-                double Rzero_sq;
-                double Rpara_sq;
-                double Rperp_sq;
-                double Azero_sq;
-                double Apara_sq;
-                double Aperp_sq;
+        double gamma;
+        double Rzero_sq;
+        double Rpara_sq;
+        double Rperp_sq;
+        double Azero_sq;
+        double Apara_sq;
+        double Aperp_sq;
 		double As_sq;
-                double AzeroApara;
-                double AzeroAperp;
-                double AparaAperp;
+        double AzeroApara;
+        double AzeroAperp;
+        double AparaAperp;
 		double AparaAs;
 		double AperpAs;
 		double AzeroAs;
-                double delta_zero;
-                double delta_para;
-                double delta_perp;
+        double delta_zero;
+        double delta_para;
+        double delta_perp;
 		double delta_s;
 		double Csp;
 		double CspAs;
-                double omega;
-                double timeRes;	 // This is the member variable used in the "builder" functions
-                double timeRes1; // These are the physics parameters varied in the fit and passed from the XML
-                double timeRes2;
-                double timeRes1Frac;
+        double omega;
+        double timeRes;	 // This is the member variable used in the "builder" functions
+        double timeRes1; // These are the physics parameters varied in the fit and passed from the XML
+        double timeRes2;
+        double timeRes1Frac;
 		double angAccI1;
 		double angAccI2;
 		double angAccI3;
@@ -140,10 +143,12 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 		double angAccI10;
 		double Ap_sq, Ap;
 
+        bool _useHelicityBasis ;
+        inline bool useHelicityBasis() const { return _useHelicityBasis ; }
 		bool _useTimeAcceptance ;
-		bool _plotAllComponents ;
 		inline bool useTimeAcceptance() const { return _useTimeAcceptance ; }
 		SlicedAcceptance * timeAcc ;
+        bool _plotAllComponents ;
 
 		 double tlo, thi ;
 		// Member variables for the observables
@@ -151,16 +156,33 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 		double cosTheta;
 		double phi;
 		double cosPsi;
+        double helcosthetaL ;
+        double helcosthetaK ;
+        double helphi ;
 		double KstarFlavour;
 		double q() const ;
 
+    /* PELC Work in progress
+        // PseudoObservables which allow for some calculations to be cached per event during Runtime
+        vector<ObservableRef> angularTermDependencies;
+        PseudoObservable f1_Obs;
+        PseudoObservable f2_Obs;
+        PseudoObservable f3_Obs;
+        PseudoObservable f1_Obs;
+        PseudoObservable f1_Obs;
+        PseudoObservable f1_Obs;
+        PseudoObservable f1_Obs;
+        PseudoObservable f1_Obs;
+        PseudoObservable f1_Obs;
+        PseudoObservable f1_Obs;
+    */
 		//double tlow, thigh; // Integration limits
 
 		TH3D *histo;
-                TAxis *xaxis, *yaxis, *zaxis;
-                int nxbins, nybins, nzbins;
-                double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
-                double total_num_entries;
+        TAxis *xaxis, *yaxis, *zaxis;
+        int nxbins, nybins, nzbins;
+        double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
+        double total_num_entries;
 
 
 		double buildPDFnumerator();
@@ -178,6 +200,7 @@ class Bd2JpsiKstar_sWave_Fs : public BasePDF
 
 		string fileName;
 		TFile* f;
+    
 };
 
 #endif

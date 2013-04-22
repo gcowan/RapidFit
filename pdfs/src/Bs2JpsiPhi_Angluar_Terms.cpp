@@ -146,7 +146,9 @@ double Bs2JpsiPhi_Angular_Terms::TangleFactorReASAP( vector<double> input )
 	double phi = input[2];
 	double sin2Phi = sin(2.*phi);
 
-	return Mathematics::Root_6()*Mathematics::Third() * sinPsi * sinTheta * sin2Phi *  Mathematics::Global_Frac();
+	// Corrected by PELC 130419 - it should have been sin^theta
+    //return Mathematics::Root_6()*Mathematics::Third() * sinPsi * sinTheta * sin2Phi *  Mathematics::Global_Frac();
+	return Mathematics::Root_6()*Mathematics::Third() * sinPsi * sinTheta*sinTheta * sin2Phi *  Mathematics::Global_Frac();
 }
 
 //...........................

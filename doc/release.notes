@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/04/22 Pete Clarke
+  - Fixed a BUG in the Mathematics::<transversity angle functions>  f8 was WRONG ?  How did this happen
+    See comment in code where a sin should have been sin^2.  Luckily we dont use transversity any more.
+  - Added a new version of the J/PsiKstar pdfs to allow helicity/transversity basis pdfs/src/Bd2JpsiKstar_sWave_Fscopy.cpp
+    Currently i leave it with a silly name as it needs a lot of work before its a nice pdf - but after the paper. 
+    We will rename it when there is a nice new version.
+
+
 2013/04/22 Greig Cowan
   - Added protection around GSL statements in Mathematics code.
 
