@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/04/22 Greig Cowan
+  - Added protection around GSL statements in Mathematics code.
+
 2013/04/21 Greig Cowan
   - Added protection around GSL statements in Bd2JpsiK* PDF.
 
