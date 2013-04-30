@@ -169,10 +169,8 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 	double orbitalFactor = TMath::Power(pB/pB0, this->LB)*
 		TMath::Power(pR/pR0, this->LR);
 
-	double barrierFactor = barrierB->barrier( DPHelpers::daughterMomentum(this->mB,
-				this->m1, this->mR), pB)*
-		barrierR->barrier(DPHelpers::daughterMomentum(this->mR,
-					this->mJpsi, this->m2), pR);
+	double barrierFactor = barrierB->barrier(pB0, pB)*
+		barrierR->barrier(pR0, pR);
 
 	TComplex massFactor = this->massShape->massShape(m13);
 
