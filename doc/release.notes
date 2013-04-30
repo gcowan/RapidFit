@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/04/30 Greig Cowan
+  - Modified code to calculate efficiency parameterisation to now work in 4D.
+  - Modified Dalitz PDF to use 4D efficiency (mass and angles).
+
 2013/04/22 Pete Clarke
   - Fixed a BUG in the Mathematics::<transversity angle functions>  f8 was WRONG ?  How did this happen
     See comment in code where a sin should have been sin^2.  Luckily we dont use transversity any more.

@@ -10,6 +10,7 @@
  */
 
 ///	ROOT Headers
+#include "TNtuple.h"
 #include "TMath.h"
 #include "TH1D.h"
 #include "TF3.h"
@@ -22,6 +23,7 @@
 #include "main.h"
 #include "Mathematics.h"
 #include "Bd2JpsiKstar_sWave.h"
+#include "Bd2JpsiKstar_sWave_Fscopy.h"
 #include "Bd2JpsiKstar_sWave_Fs_withAcc.h"
 ///	System Headers
 #include <vector>
@@ -43,6 +45,7 @@ bool RooMathinit=false;
 #include <gsl/gsl_sf_pow_int.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_legendre.h>
+#include <gsl/gsl_qrng.h>
 
 const gsl_complex prefix = gsl_complex_rect( (2./sqrt( Mathematics::Pi())), 0. );
 
@@ -698,11 +701,12 @@ namespace Mathematics
 
     struct AccParam
     {
-        AccParam(double * coefficients, int i_MAX, int j_MAX, int k_MAX, int numEvents):
+        AccParam(double * coefficients, int i_MAX, int j_MAX, int k_MAX, int l_MAX, int numEvents):
             pcoeff(coefficients)
+            , l_max(l_MAX)
             , i_max(i_MAX)
-            , j_max(j_MAX)
             , k_max(k_MAX)
+            , j_max(j_MAX)
             , num(numEvents)
             {}
         double parameterisation( double * omega, double * p )
@@ -712,12 +716,13 @@ namespace Mathematics
             double cosTheta(omega[0]);
             double phi     (omega[1]);
             double cosPsi  (omega[2]);
-            //double cosTheta(0.);
-            //double phi     (0.);
-            //double cosPsi  (omega[0]);
-            double P_i(0.);
-            double Y_jk(0.);
-#ifdef __RAPIDFIT_USE_GSL_MATH
+            double mKpi    (omega[3]);
+            double Q_l(0.);  // mKpi
+            double P_i(0.);  // cosPsi
+            double Y_jk(0.); // cosTheta, phi
+#ifdef __RAPIDFIT_USE_GSL
+            for ( int l = 0; l < l_max+1; l++ )
+            {
             for ( int i = 0; i < i_max+1; i++ )
             {
                 for ( int k = 0; k < k_max+1; k++ )
@@ -725,23 +730,27 @@ namespace Mathematics
                     for ( int j = 0; j < j_max+1; j++ ) // must have l >= k
                     {
                         if (j < k) continue;
+                        Q_l  = gsl_sf_legendre_Pl     (l,    mKpi);
                         P_i  = gsl_sf_legendre_Pl     (i,    cosPsi);
                         // only consider case where k >= 0
                         // these are the real valued spherical harmonics
                         if ( k == 0 ) Y_jk =           gsl_sf_legendre_sphPlm (j, k, cosTheta);
                         else          Y_jk = sqrt(2) * gsl_sf_legendre_sphPlm (j, k, cosTheta) * cos(k*phi);
-                        returnValue +=                pcoeff[(i*(k_max+1)+k)*(j_max+1)+j]*(P_i * Y_jk);
+                        //returnValue +=                pcoeff[             (i  * (k_max+1) + k) * (j_max+1) + j]*(      P_i * Y_jk);
+                        returnValue +=                pcoeff[((l*(i_max+1) + i) * (k_max+1) + k) * (j_max+1) + j]*(Q_l * P_i * Y_jk);
                         //cout << i << k << j << " " << (i*(k_max+1)+k)*(j_max+1)+j << " " << pcoeff[(i*(k_max+1)+k)*(j_max+1)+j]/num << endl;
                     }
                 }
+            }
             }
 #endif
             return returnValue/num;
         }
         double * pcoeff;
+        int l_max;
         int i_max;
-        int j_max;
         int k_max;
+        int j_max;
         int num;
     };
 
@@ -756,37 +765,60 @@ namespace Mathematics
 		rapidInt->SetFixedIntegralPoints(100);
         PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
 
+        const int l_max(4);
         const int i_max(4);
-        const int j_max(4);
         const int k_max(4);
-        double c[i_max+1][k_max+1][j_max+1];
-        double c_sq[i_max+1][k_max+1][j_max+1];
+        const int j_max(4);
+        double c[l_max+1][i_max+1][k_max+1][j_max+1];
+        double c_sq[l_max+1][i_max+1][k_max+1][j_max+1];
+        for ( int l = 0; l < l_max + 1; l++ )
+        {
         for ( int i = 0; i < i_max + 1; i++ )
         {
              for ( int k = 0; k < k_max + 1; k++ )
              {
                 for ( int j = 0; j < j_max + 1; j++ )
                 {
-                    c[i][k][j] = 0.;
-                    c_sq[i][k][j] = 0.;
-                 }
+                    c[l][i][k][j] = 0.;
+                    c_sq[l][i][k][j] = 0.;
+                }
              }
         }
+        }
 
+        double Q_l(0.);
         double P_i(0.);
         double Y_jk(0.);
 
 		int numEvents = dataSet->GetDataNumber();
 
+        double * minima = new double[4];
+        double * maxima = new double[4];
+        minima[0] = -1.;
+        minima[1] = -TMath::Pi();
+        minima[2] = -1.;
+        minima[3] = 0.64;
+        maxima[0] = 1.;
+        maxima[1] = TMath::Pi();
+        maxima[2] = 1.;
+        maxima[3] = 1.59;
         // Sum the inverse PDF values over the accepted events
         // These histograms will be used for drawing the acceptance
-        TH1D * cosThetaAcc = new TH1D("cosThetaAcc", "cosThetaAcc", 20, -1, 1);
+        TH1D * cosThetaAcc = new TH1D("cosThetaAcc", "cosThetaAcc", 20, minima[0], maxima[0]);
+        TH1D * phiAcc      = new TH1D("phiAcc", "phiAcc", 20, minima[1], maxima[1]);
+        TH1D * cosPsiAcc   = new TH1D("cosPsiAcc", "cosPsiAcc", 20, minima[2], maxima[2]);
+        TH1D * mKpiAcc     = new TH1D("mKpiAcc", "mKpiAcc", 25, minima[3], maxima[3]);
         cosThetaAcc->Sumw2();
-        TH1D * phiAcc = new TH1D("phiAcc", "phiAcc", 20, -TMath::Pi(), TMath::Pi());
         phiAcc->Sumw2();
-        TH1D * cosPsiAcc = new TH1D("cosPsiAcc", "cosPsiAcc", 20, -1, 1);
         cosPsiAcc->Sumw2();
+        mKpiAcc->Sumw2();
+        TH1D * cosThetaAccProj = new TH1D("cosThetaAccProj", "cosThetaAcc", 20, minima[0], maxima[0]);
+        TH1D * phiAccProj      = new TH1D("phiAccProj", "phiAcc", 20, minima[1], maxima[1]);
+        TH1D * cosPsiAccProj   = new TH1D("cosPsiAccProj", "cosPsiAcc", 20, minima[2], maxima[2]);
+        TH1D * mKpiAccProj     = new TH1D("mKpiAccProj", "mKpiAcc", 25, minima[3], maxima[3]);
 
+        double mKpi(0.);
+        double mKpi_mapped(0.);
         double cosTheta(0.);
         double phi(0.);
         double cosPsi(0.);
@@ -799,12 +831,13 @@ namespace Mathematics
 			if (e % 100 == 0) cout << "Event # " << e << "\t\t" << setprecision(4) << 100.*(double)e/(double)numEvents << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
             DataPoint * event = dataSet->GetDataPoint(e);
 
-
             // for the Bd2JpsiK* mass-angular analysis in helicity basis
             cosTheta = event->GetObservable("cosTheta1")->GetValue();
 			phi      = event->GetObservable("phi")->GetValue();
 			cosPsi   = event->GetObservable("cosTheta2")->GetValue();
-			vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
+			mKpi     = event->GetObservable("m23")->GetValue();
+		    mKpi_mapped = (mKpi - minima[3])/(maxima[3]-minima[3])*2.+ (-1);
+            vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
 			dontIntegrate.push_back("m23");
 			dontIntegrate.push_back("pionID");
 			//evalPDFnorm = rapidInt->NumericallyIntegrateDataPoint( event, boundary, dontIntegrate );
@@ -813,24 +846,39 @@ namespace Mathematics
 
 
             /*
+            // for the Bd2JpsiK* time-angular analysis in helicity basis
+            cosTheta = event->GetObservable("helcosthetaL")->GetValue();
+			phi      = event->GetObservable("helphi")->GetValue();
+			cosPsi   = event->GetObservable("helcosthetaK")->GetValue();
+
+            // Now need to calculate the normalisation when integrated over the 3 angles
+            Bd2JpsiKstar_sWave_Fscopy * bpdf = (Bd2JpsiKstar_sWave_Fscopy *) PDF;
+            evalPDFnorm = bpdf->NormAnglesOnlyForAcceptanceWeights(event, boundary);
+            */
+
+            /*
             // for the Bd2JpsiK* time-angular analysis in transversity basis
             cosTheta = event->GetObservable("cosTheta")->GetValue();
 			phi      = event->GetObservable("phi")->GetValue();
 			cosPsi   = event->GetObservable("cosPsi")->GetValue();
-
-            // Now need to calculate the normalisation when integrated over the 3 angles
             Bd2JpsiKstar_sWave_Fs_withAcc * bpdf = (Bd2JpsiKstar_sWave_Fs_withAcc *) PDF;
             evalPDFnorm = bpdf->NormAnglesOnlyForAcceptanceWeights(event, boundary);
             */
             evalPDFraw = PDF->Evaluate( event );
 			val = evalPDFraw/evalPDFnorm;
+            val = 1.;
             //cout << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
+
+            if (val < 1e-08) cout << cosTheta << " " << phi <<  " " << cosPsi << " " << mKpi << " " << val << " " << endl;
 
             cosThetaAcc->Fill(cosTheta, 1./val);
             phiAcc->Fill(phi, 1./val);
             cosPsiAcc->Fill(cosPsi, 1./val);
+            mKpiAcc->Fill(mKpi, 1./val);
 
-#ifdef __RAPIDFIT_USE_GSL_MATH
+#ifdef __RAPIDFIT_USE_GSL
+            for ( int l = 0; l < l_max + 1; l++ )
+            {
             for ( int i = 0; i < i_max + 1; i++ )
             {
                 for ( int k = 0; k < k_max + 1; k++ )
@@ -838,17 +886,19 @@ namespace Mathematics
                     for ( int j = 0; j < j_max + 1; j++ ) // must have j >= k
                     {
                         if (j < k) continue;
+                        Q_l  = gsl_sf_legendre_Pl     (l,    mKpi_mapped);
                         P_i  = gsl_sf_legendre_Pl     (i,    cosPsi);
                         // only consider case where k >= 0
                         // these are the read valued spherical harmonics
                         if ( k == 0 ) Y_jk =           gsl_sf_legendre_sphPlm (j, k, cosTheta);
                         else          Y_jk = sqrt(2) * gsl_sf_legendre_sphPlm (j, k, cosTheta) * cos(k*phi);
                         //cout << i << j << k << " " << P_i << " " << Y_jk <<  "  " << c[i][j][k] <<  " " << (2*i + 1)/2.*(P_i * Y_jk)/val << endl;
-                        coeff = (2*i + 1)/2.*(P_i * Y_jk)/val;
-                        c[i][k][j] += coeff;
-                        c_sq[i][k][j] += coeff*coeff;
+                        coeff = (2*l + 1)/2.*(2*i + 1)/2.*(P_i * Y_jk * Q_l)/val;
+                        c[l][i][k][j] += coeff;
+                        c_sq[l][i][k][j] += coeff*coeff;
                     }
                 }
+            }
             }
 #endif
         }
@@ -856,6 +906,8 @@ namespace Mathematics
 
         double error(0.);
         char buf[50];
+        for ( int l = 0; l < l_max + 1; l++ )
+        {
         for ( int i = 0; i < i_max + 1; i++ )
         {
             for ( int k = 0; k < k_max + 1; k++ )
@@ -863,18 +915,64 @@ namespace Mathematics
                 for ( int j = 0; j < j_max + 1; j++ )
                 {
                     if (j < k) continue;
-                    error = sqrt(1./numEvents/numEvents * ( c_sq[i][k][j] - c[i][k][j]*c[i][k][j]/numEvents) );
-                    if ( fabs(c[i][k][j]/numEvents) > 3.*error )
+                    error = sqrt(1./numEvents/numEvents * ( c_sq[l][i][k][j] - c[l][i][k][j]*c[l][i][k][j]/numEvents) );
+                    if (isnan(error)) error = 0.;
+                    if ( fabs(c[l][i][k][j]/numEvents) > 5.*error )
                     {
-                        sprintf( buf, "c[%d][%d][%d] = %f;// +- %f", i, k, j, c[i][k][j]/numEvents, error );
+                        sprintf( buf, "c[%d][%d][%d][%d] = %f;// +- %f", l, i, k, j, c[l][i][k][j]/numEvents, error );
                         cout << buf << endl;
                     }
 		        }
-             }
+            }
+        }
         }
 
+        // Now sample the acceptance surface so that we can make projections to check that it looks sensible
+        AccParam * param = new AccParam(&c[0][0][0][0], i_max, j_max, k_max, l_max, numEvents);
+        TNtuple * tree = new TNtuple("tuple", "tuple", "cosTheta1:phi:cosTheta2:mKpi:weight");
+        gsl_qrng * q = NULL;
+        try
+        {
+            q = gsl_qrng_alloc( gsl_qrng_sobol, 4);
+        }
+        catch(...)
+        {
+            cout << "can't allocate random numbers for integration" << endl;
+            exit(123);
+        }
+        double weight(0.);
+        for ( int i = 0; i < 10000; i++ )
+        {
+            double * point = new double[4];
+            double * point_mapped = new double[4];
+            double mKpi_range(0.);
+            gsl_qrng_get( q, point );
+            for ( int j = 0; j < 4; j++ )
+            {
+                point_mapped[j] = point[j]*(maxima[j]-minima[j])+minima[j];
+                if ( j > 2 ) {
+                    point_mapped[j] = point[j]*(maxima[j]-minima[j])*2 + (-1.);
+                    mKpi_range  = point[j]*(maxima[j]-minima[j]) + minima[j];
+                }
+            }
+            weight = param->parameterisation( point_mapped , NULL);
+            tree->Fill(point_mapped[0], point_mapped[1], point_mapped[2], mKpi_range, weight);
+            delete point;
+            delete point_mapped;
+        }
+        tree->Draw("cosTheta1>>cosThetaAccProj","weight");
+        tree->Draw("phi>>phiAccProj","weight");
+        tree->Draw("cosTheta2>>cosPsiAccProj","weight");
+        tree->Draw("mKpi>>mKpiAccProj","weight");
+        TFile * acceptance_file = TFile::Open("sampled_acceptance.root","RECREATE");
+        tree->Write();
+        acceptance_file->Close();
+        delete tree;
+        delete acceptance_file;
+
+        /*
+        // This works for a 3D surface, but need to use ntuple for more dimensions
         // Fill a histogram with the TF3 acceptance function
-        AccParam * param = new AccParam(&c[0][0][0], i_max, j_max, k_max, numEvents);
         TF3 * f3 = new TF3("f3", param, &AccParam::parameterisation, -1, 1, -TMath::Pi(), TMath::Pi(), -1, 1, 0, "AccParam", "parameterisation");
         f3->SetNpx(25);
         f3->SetNpy(25);
@@ -888,34 +986,41 @@ namespace Mathematics
             f3->GetRandom3( cosTheta_i, phi_i, cosPsi_i );
             h3->Fill(cosTheta_i, phi_i, cosPsi_i);
         }
-
-        // Normalise the histograms for drawing
-        cosThetaAcc->Scale(1./cosThetaAcc->Integral());
-        phiAcc->Scale(1./phiAcc->Integral());
-        cosPsiAcc->Scale(1./cosPsiAcc->Integral());
         TH1D * cosThetaAccProj = h3->ProjectionX();
         TH1D * phiAccProj = h3->ProjectionY();
         TH1D * cosPsiAccProj = h3->ProjectionZ();
+        */
+
+        // Normalise the histograms for drawing
+        cosThetaAcc    ->Scale(1./cosThetaAcc->Integral());
+        phiAcc         ->Scale(1./phiAcc->Integral());
+        cosPsiAcc      ->Scale(1./cosPsiAcc->Integral());
+        mKpiAcc        ->Scale(1./mKpiAcc->Integral());
         cosThetaAccProj->Scale(1./cosThetaAccProj->Integral());
-        phiAccProj->Scale(1./phiAccProj->Integral());
-        cosPsiAccProj->Scale(1./cosPsiAccProj->Integral());
+        phiAccProj     ->Scale(1./phiAccProj->Integral());
+        cosPsiAccProj  ->Scale(1./cosPsiAccProj->Integral());
+        mKpiAccProj    ->Scale(1./mKpiAccProj->Integral());
 
         // Make some plots
         gStyle->SetOptStat(0);
         TCanvas * canvas = new TCanvas();
-        canvas->Divide(3,2);
+        canvas->Divide(4,2);
         canvas->cd(1);
         cosThetaAcc->Draw();
-        canvas->cd(4);
+        canvas->cd(5);
         cosThetaAccProj->Draw("C");
         canvas->cd(2);
         phiAcc->Draw();
-        canvas->cd(5);
+        canvas->cd(6);
         phiAccProj->Draw("C");
         canvas->cd(3);
         cosPsiAcc->Draw();
-        canvas->cd(6);
+        canvas->cd(7);
         cosPsiAccProj->Draw("C");
+        canvas->cd(4);
+        mKpiAcc->Draw();
+        canvas->cd(8);
+        mKpiAccProj->Draw("C");
         canvas->SaveAs("acceptance.pdf");
         return 1.;
 	}
