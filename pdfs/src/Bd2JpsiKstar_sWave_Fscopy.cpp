@@ -16,6 +16,7 @@
 #include "TFile.h"
 #include "TH3D.h"
 #include "TROOT.h"
+#include <gsl/gsl_sf_legendre.h>
 
 bool TEMPUSEHEL2 = true ;
 
@@ -46,40 +47,23 @@ Bd2JpsiKstar_sWave_Fscopy::Bd2JpsiKstar_sWave_Fscopy( const Bd2JpsiKstar_sWave_F
     helcosthetaKName(input.helcosthetaKName), helcosthetaLName(input.helcosthetaLName), helphiName(input.helphiName),
 	thi(input.thi), useFlatAngularDistribution(input.useFlatAngularDistribution), componentIndex(input.componentIndex), delta_sName(input.delta_sName), Azero_sq(input.Azero_sq),
 	Apara_sq(input.Apara_sq), Aperp_sq(input.Aperp_sq), Csp(input.Csp), CspAs(input.CspAs), _plotAllComponents(input._plotAllComponents),
-    histo(input.histo), xaxis(NULL), yaxis(NULL), zaxis(NULL),
-    nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins), xmin(input.xmin), ymin(input.ymin), zmin(input.zmin),
-	xmax(input.xmax), ymax(input.ymax), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz),
-    total_num_entries(input.total_num_entries), _datapoint(NULL),
-	f(NULL), fileName(input.fileName)
+    _datapoint(NULL),
+    _useNumericalNormalisation(input._useNumericalNormalisation)
 {
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
-
-	if( histo != NULL )
+    if ( !useFlatAngularDistribution )
 	{
-
-		f =  TFile::Open( fileName.c_str() );
-		histo = (TH3D*) f->Get("histo");
-
-		xaxis = histo->GetXaxis();
-		xmin = xaxis->GetXmin();
-		xmax = xaxis->GetXmax();
-		nxbins = histo->GetNbinsX();
-		deltax = (xmax-xmin)/nxbins;
-
-		yaxis = histo->GetYaxis();
-		ymin = yaxis->GetXmin();
-		ymax = yaxis->GetXmax();
-		nybins = histo->GetNbinsY();
-		deltay = (ymax-ymin)/nybins;
-
-		zaxis = histo->GetZaxis();
-		zmin = zaxis->GetXmin();
-		zmax = zaxis->GetXmax();
-		nzbins = histo->GetNbinsZ();
-		deltaz = (zmax-zmin)/nzbins;
-
-		total_num_entries = histo->GetEntries();
-	}
+        for ( int i = 0; i < i_max + 1; i++ )
+        {
+            for ( int k = 0; k < k_max + 1; k++ )
+            {
+                for ( int j = k; j < j_max + 1; j++ )
+                {
+                    c[i][k][j] = input.c[i][k][j];
+                }
+            }
+        }
+    }
 }
 
 
@@ -116,6 +100,7 @@ Bd2JpsiKstar_sWave_Fscopy::Bd2JpsiKstar_sWave_Fscopy(PDFConfigurator* configurat
 	, _useTimeAcceptance(false)
 	, _plotAllComponents(false)
     , _useHelicityBasis(false)
+    , _useNumericalNormalisation(false)
 
 	// Observables (What we want to gain from the pdf after inserting physics parameter values)
 	, normalisationCacheValid(false)
@@ -133,7 +118,7 @@ Bd2JpsiKstar_sWave_Fscopy::Bd2JpsiKstar_sWave_Fscopy(PDFConfigurator* configurat
     , gamma(), Rzero_sq(), Rpara_sq(), Rperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
 	delta_zero(), delta_para(), delta_perp(), delta_s(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(),
 	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), Ap_sq(), Ap(), time(), cosTheta(), phi(),
-	cosPsi(), KstarFlavour(), tlo(), thi(), useFlatAngularDistribution(true), _datapoint(NULL), f(NULL),
+	cosPsi(), KstarFlavour(), tlo(), thi(), useFlatAngularDistribution(true), _datapoint(NULL),
     helcosthetaK(),helcosthetaL(),helphi()
 {
 	componentIndex = 0;
@@ -141,6 +126,8 @@ Bd2JpsiKstar_sWave_Fscopy::Bd2JpsiKstar_sWave_Fscopy(PDFConfigurator* configurat
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 	_useHelicityBasis = configurator->isTrue( "UseHelicityBasis" ) ;
 	_plotAllComponents = configurator->isTrue( "PlotAllComponents" ) ;
+	_useNumericalNormalisation = configurator->isTrue( "UseNumericalNormalisation" ) ;
+	useFlatAngularDistribution = configurator->isTrue( "UseFlatAngularAcceptanceInNumerator" ) ;
 
 	if( useTimeAcceptance() ) {
 		timeAcc = new SlicedAcceptance( 0., 14.0, 0.0171 ) ;
@@ -150,149 +137,33 @@ Bd2JpsiKstar_sWave_Fscopy::Bd2JpsiKstar_sWave_Fscopy(PDFConfigurator* configurat
 		timeAcc = new SlicedAcceptance( 0., 14. ) ;
 		cout << "Bd2JpsiKstar_sWave_Fscopy:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
 	}
-
-
-	//AILSA
-	//Find name of histogram needed to define 3-D angular distribution
-	fileName = configurator->getConfigurationValue( "AngularDistributionHistogram" ) ;
-
-	//Initialise depending upon whether configuration parameter was found
-	if( fileName == "" )
-	{
-		cout << "   No AngularAcceptanceHisto found" << endl ;
-		useFlatAngularDistribution = true ;
-        histo = NULL ;
-	}
-	else
-	{
-		cout << "   AngularAcceptanceHisto requested: " << fileName << endl ;
-		useFlatAngularDistribution = false ;
-
-
-
-		ifstream input_file2;
-		input_file2.open( fileName.c_str(), ifstream::in );
-		input_file2.close();
-		bool local_fail2 = input_file2.fail();
-		if( !getenv("RAPIDFITROOT") && local_fail2 )
-		{
-			cerr << "\n" << endl;
-			//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-			cerr << "$RAPIDFITROOT NOT DEFINED, PLEASE DEFINE IT SO I CAN USE ACCEPTANCE DATA" << endl;
-			//cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-			cerr << "\n" << endl;
-			exit(-987);
-		}
-
-
-		string fullFileName;
-
-		//File location
-		//ifstream input_file2;
-		//input_file2.open( fileName.c_str(), ifstream::in );
-		//input_file2.close();
-		//bool local_fail2 = input_file2.fail();
-
-		if( getenv("RAPIDFITROOT") )
-		{
-			string path( getenv("RAPIDFITROOT") ) ;
-
-			cout << "RAPIDFITROOT defined as: " << path << endl;
-			fullFileName = path+"/pdfs/configdata/"+fileName ;
-
-			input_file2.open( fullFileName.c_str(), ifstream::in );
-			input_file2.close();
-		}
-		bool elsewhere_fail = input_file2.fail();
-
-		if( elsewhere_fail && local_fail2 )
-		{
-			cerr << "\n\tFileName:\t" << fullFileName << "\t NOT FOUND PLEASE CHECK YOUR RAPIDFITROOT" << endl;
-			cerr << "\t\tAlternativley make sure your XML points to the correct file, or that the file is in the current working directory\n" << endl;
-			exit(-89);
-		}
-
-		if( fullFileName.empty() || !local_fail2 )
-		{
-			fullFileName = fileName;
-		}
-
-		fileName = fullFileName;
-		f =  TFile::Open(fullFileName.c_str());
-		histo = (TH3D*) f->Get("histo"); //(fileName.c_str())));
-
-		xaxis = histo->GetXaxis();
-		cout << "X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << endl;
-		xmin = xaxis->GetXmin();
-		xmax = xaxis->GetXmax();
-		nxbins = histo->GetNbinsX();
-		cout << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
-		deltax = (xmax-xmin)/nxbins;
-
-		yaxis = histo->GetYaxis();
-		cout << "Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << endl;
-		ymin = yaxis->GetXmin();
-		ymax = yaxis->GetXmax();
-		nybins = histo->GetNbinsY();
-		cout << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
-		deltay = (ymax-ymin)/nybins;
-
-		zaxis = histo->GetZaxis();
-		cout << "Z axis Name: " << zaxis->GetName() << "\tTitle: " << zaxis->GetTitle() << endl;
-		zmin = zaxis->GetXmin();
-		zmax = zaxis->GetXmax();
-		nzbins = histo->GetNbinsZ();
-		cout << "Z axis Min: " << zmin << "\tMax: " << zmax << "\tBins: " << nzbins << endl;
-		deltaz = (zmax-zmin)/nzbins;
-
-		//method for Checking whether histogram is sensible
-
-		total_num_entries = histo->GetEntries();
-		int total_num_bins = nxbins * nybins * nzbins;
-		int sum = 0;
-
-		vector<int> zero_bins;
-		//loop over each bin in histogram and print out how many zero bins there are
-		for (int i=1; i < nxbins+1; ++i)
-		{
-			for (int j=1; j < nybins+1; ++j)
-			{
-				for (int k=1; k < nzbins+1; ++k)
-				{
-					double bin_content = histo->GetBinContent(i,j,k);
-					//cout << "Bin content: " << bin_content << endl;
-					if(bin_content<=0)
-					{
-						zero_bins.push_back(1);
-					}
-					//cout << " Zero bins " << zero_bins.size() << endl;}
-					else if (bin_content>0)                                        {
-						sum += (int) bin_content;
-					}
-                }
+    for ( int i = 0; i < i_max + 1; i++ )
+    {
+        for ( int k = 0; k < k_max + 1; k++ )
+        {
+            for ( int j = 0; j < j_max + 1; j++ )
+            {
+                c[i][k][j] = 0.;
             }
         }
-
-	int average_bin_content = sum / total_num_bins;
-
-	cout << "\n\n\t\t" << "****" << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events " << "****" << endl;
-	cout <<  "\t\t\t" << "***" << "Average number of entries of non-zero bins: " << average_bin_content << "***" << endl;
-	cout << endl;
-	cout << endl;
-
-	// Check.  This order works for both bases since phi is always the third one.
-	if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() )
-	{
-		cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
-		exit(1);
-	}
-
-	cout << "Finishing processing histo" << endl;
     }
-    
-    // Always do this last after all flags are set
-    MakePrototypes();
+    // From the Bd -> JpsiK* PDF using helicity angles
+    c[0][0][0] = 3.751739;// +- 0.003279
+    c[0][0][2] = 0.389560;// +- 0.007650
+    c[0][0][4] = 0.030697;// +- 0.007622
+    c[0][1][2] = -0.070511;// +- 0.007140
+    c[0][2][2] = 0.024214;// +- 0.006402
+    c[1][0][0] = -0.901940;// +- 0.010273
+    c[1][0][2] = -0.127523;// +- 0.013467
+    c[1][1][2] = -0.113126;// +- 0.010785
+    c[2][0][0] = -1.017514;// +- 0.014660
+    c[2][0][2] = -0.112034;// +- 0.018161
+    c[3][0][0] = -0.323717;// +- 0.017012
+    c[3][0][2] = -0.065125;// +- 0.021149
+    c[3][1][2] = 0.071616;// +- 0.017404
+    c[4][0][0] = -0.203903;// +- 0.019563
 
+    MakePrototypes();
 }
 
 
@@ -343,8 +214,6 @@ void Bd2JpsiKstar_sWave_Fscopy::MakePrototypes()
 //Destructor
 Bd2JpsiKstar_sWave_Fscopy::~Bd2JpsiKstar_sWave_Fscopy()
 {
-	if( f != NULL ) f->Close();
-	f = NULL;
 	if( timeAcc != NULL ) delete timeAcc;
 }
 
@@ -418,7 +287,7 @@ double Bd2JpsiKstar_sWave_Fscopy::Evaluate(DataPoint * measurement)
 	double returnValue;
 	time = measurement->GetObservable( timeName )->GetValue();
 	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
-    
+
     if( useHelicityBasis() ) {
         helcosthetaL = measurement->GetObservable( helcosthetaLName )->GetValue();
         helphi      = measurement->GetObservable( helphiName )->GetValue() ;
@@ -429,8 +298,8 @@ double Bd2JpsiKstar_sWave_Fscopy::Evaluate(DataPoint * measurement)
         phi      = measurement->GetObservable( phiName )->GetValue();
         cosPsi   = measurement->GetObservable( cosPsiName )->GetValue();
     }
-    
-    
+
+
 	if(timeRes1Frac >= 0.9999)
 	{
 		// Set the member variable for time resolution to the first value and calculate
@@ -469,13 +338,13 @@ double Bd2JpsiKstar_sWave_Fscopy::Evaluate(DataPoint * measurement)
 	}
 
 	return returnValue;
-    
+
 }
 
 
 double Bd2JpsiKstar_sWave_Fscopy::buildPDFnumerator()
 {
-	// The angular functions f1->f10 
+	// The angular functions f1->f10
 	double f1, f2, f3, f4, f5, f6, f7, f8, f9, f10;
 	if(useHelicityBasis()) {
         this->getAngularFunctionsHelicity( f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, helcosthetaL, helphi, helcosthetaK );
@@ -570,17 +439,18 @@ double Bd2JpsiKstar_sWave_Fscopy::buildPDFnumerator()
 				break;
 		}
 	}
-    
+
 	if( useTimeAcceptance() ) v1  = v1 * timeAcc->getValue(time);
 
     if( ! useFlatAngularDistribution ) v1  *=  angularFactor();
-    
+
 	return v1;
 }
 
 
 double Bd2JpsiKstar_sWave_Fscopy::Normalisation(DataPoint * measurement, PhaseSpaceBoundary * boundary)
 {
+    if (_useNumericalNormalisation) return 1.;
 	_datapoint = measurement;
 
 	double returnValue;
@@ -642,7 +512,7 @@ double Bd2JpsiKstar_sWave_Fscopy::Normalisation(DataPoint * measurement, PhaseSp
 	}
 
     return returnValue;
-        
+
 	//return -1 ;
 }
 
@@ -687,7 +557,7 @@ double Bd2JpsiKstar_sWave_Fscopy::NormAnglesOnlyForAcceptanceWeights(DataPoint *
 	double returnValue;
 	time = measurement->GetObservable( timeName )->GetValue();
 	KstarFlavour = measurement->GetObservable( KstarFlavourName )->GetValue();
-    
+
 	//First job for any new set of parameters is to Cache the time integrals
 
 
@@ -988,41 +858,43 @@ void Bd2JpsiKstar_sWave_Fscopy::getTimeAmplitudeIntegrals(
 
 double Bd2JpsiKstar_sWave_Fscopy::angularFactor( )
 {
-	double returnValue=0.;
+    double returnValue(0.);
+    #ifdef __RAPIDFIT_USE_GSL
 
-	int globalbin=-1;
-	int xbin=-1, ybin=-1, zbin=-1;
-	double num_entries_bin=-1.;
+    double _cosPsi(0.);
+    double _cosTheta(0.);
+    double _phi(0.);
+    if( useHelicityBasis() ) {
+        _cosTheta = helcosthetaL;
+        _phi = helphi;
+        _cosPsi = helcosthetaK;
+    }
+    else {
+        _cosTheta = cosTheta;
+        _phi = phi;
+        _cosPsi = cosPsi;
+    }
 
-	Observable* cos1Obs = _datapoint->GetObservable( cosPsiName );
-
-	if( cos1Obs->GetBkgBinNumber() != -1 )
-	{
-		return cos1Obs->GetBkgAcceptance();
-	}
-	else
-	{
-		Observable* cos2Obs = _datapoint->GetObservable( cosThetaName );
-		Observable* phiObs = _datapoint->GetObservable( phiName );
-
-		//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-		xbin = xaxis->FindFixBin( cosPsi ); if( xbin > nxbins ) xbin = nxbins; if( xbin == 0 ) xbin = 1;
-		ybin = yaxis->FindFixBin( cosTheta ); if( ybin > nybins ) ybin = nybins; if( ybin == 0 ) ybin = 1;
-		zbin = zaxis->FindFixBin( phi ); if( zbin > nzbins ) zbin = nzbins; if( zbin == 0 ) zbin = 1;
-
-		globalbin = histo->GetBin( xbin, ybin, zbin );
-		num_entries_bin = (double)histo->GetBinContent(globalbin);
-
-		//Angular factor normalized with phase space of histogram and total number of entries in the histogram
-		returnValue = (double)num_entries_bin;// / (deltax * deltay * deltaz) / (double)total_num_entries;
-		//returnValue = (double)num_entries_bin / histo->Integral();
-
-		cos1Obs->SetBkgBinNumber( xbin ); cos1Obs->SetBkgAcceptance( returnValue );
-		cos2Obs->SetBkgBinNumber( ybin ); cos2Obs->SetBkgAcceptance( returnValue );
-		phiObs->SetBkgBinNumber( zbin ); phiObs->SetBkgAcceptance( returnValue );
-	}
-
-	return returnValue;
+    double P_i(0.);
+    double Y_jk(0.);
+    for ( int i = 0; i < i_max+1; i++ )
+    {
+        for ( int k = 0; k < k_max; k+=2) // limiting the loop here to only look at terms we need
+        {
+            for ( int j = 0; j < j_max; j+=2 ) // must have l >= k
+            {
+                if (j < k) continue;
+                P_i  = gsl_sf_legendre_Pl     (i,    _cosPsi);
+                // only consider case where k >= 0
+                // these are the real valued spherical harmonics
+                if ( k == 0 ) Y_jk =           gsl_sf_legendre_sphPlm (j, k, _cosTheta);
+                else          Y_jk = sqrt(2) * gsl_sf_legendre_sphPlm (j, k, _cosTheta) * cos(k*_phi);
+                returnValue += c[i][k][j]*(P_i * Y_jk);
+            }
+        }
+    }
+    #endif
+ 	return returnValue;
 }
 
 
@@ -1166,7 +1038,7 @@ void Bd2JpsiKstar_sWave_Fscopy::getAngularFunctionsHelicity( double &f1, double 
     f8 = Bs2JpsiPhi_Angular_Terms::HangleFactorReASAP( input ) ;
     f9 = Bs2JpsiPhi_Angular_Terms::HangleFactorImASAT( input ) ;
     f10 = Bs2JpsiPhi_Angular_Terms::HangleFactorReASA0( input ) ;
-    
+
     return ;
 }
 
@@ -1186,6 +1058,6 @@ void Bd2JpsiKstar_sWave_Fscopy::getAngularFunctionsTransversity( double &f1, dou
     f8 = Bs2JpsiPhi_Angular_Terms::TangleFactorReASAP( input ) ;
     f9 = Bs2JpsiPhi_Angular_Terms::TangleFactorImASAT( input ) ;
     f10 = Bs2JpsiPhi_Angular_Terms::TangleFactorReASA0( input ) ;
-    
+
     return ;
 }

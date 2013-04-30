@@ -99,9 +99,9 @@ class Bd2JpsiKstar_sWave_Fscopy : public BasePDF
 		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
 		ObservableRef phiName;		// azimuthal angle of the mu+ in Jpsi frame
 		ObservableRef cosPsiName;		// helicity angle between K+ and -ve Jpsi direction
-        ObservableRef helcosthetaKName;	
-        ObservableRef helcosthetaLName;		
-        ObservableRef helphiName;		
+        ObservableRef helcosthetaKName;
+        ObservableRef helcosthetaLName;
+        ObservableRef helphiName;
 		ObservableRef KstarFlavourName;
 
 		ObservableRef timeconstraintName;
@@ -143,6 +143,7 @@ class Bd2JpsiKstar_sWave_Fscopy : public BasePDF
 		double angAccI10;
 		double Ap_sq, Ap;
 
+        bool _useNumericalNormalisation ;
         bool _useHelicityBasis ;
         inline bool useHelicityBasis() const { return _useHelicityBasis ; }
 		bool _useTimeAcceptance ;
@@ -161,6 +162,12 @@ class Bd2JpsiKstar_sWave_Fscopy : public BasePDF
         double helphi ;
 		double KstarFlavour;
 		double q() const ;
+        // Acceptance parameterisation
+        static const int i_max = 4;
+        static const int j_max = 4;
+        static const int k_max = 4;
+        double c[i_max+1][k_max+1][j_max+1];
+
 
     /* PELC Work in progress
         // PseudoObservables which allow for some calculations to be cached per event during Runtime
@@ -195,12 +202,8 @@ class Bd2JpsiKstar_sWave_Fscopy : public BasePDF
 
         void getAngularFunctionsHelicity( double &,double &,double &,double &,double &,double &, double &, double &, double &, double &, double, double , double  );
         void getAngularFunctionsTransversity( double &,double &,double &,double &,double &,double &, double &, double &, double &, double &, double, double , double  );
-    
-		DataPoint* _datapoint;
 
-		string fileName;
-		TFile* f;
-    
+		DataPoint* _datapoint;
 };
 
 #endif
