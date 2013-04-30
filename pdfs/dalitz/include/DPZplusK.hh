@@ -14,7 +14,7 @@ class DPZplusK: public DPComponent
 
     DPZplusK(int LB, int LR, double mB, double mR, double gammaR,
 	     double m1, double m2, double RB, double RR, 
-	     double mJpsi, int spin); 
+	     double mJpsi, int spin, int resonanceIn=23); 
 
     DPZplusK( const DPZplusK& input );
     virtual ~DPZplusK();

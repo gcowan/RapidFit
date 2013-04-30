@@ -13,7 +13,7 @@
 DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double mR,
 		   double gammaR, double m1, double m2,
 		   double RB, double RR, double fmJpsi,
-		   int spin):
+		   int spin, int resonanceIn):
 	A0(1,0),
 	Aplus(1,0),
 	Aminus(1,0),
@@ -27,7 +27,18 @@ DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double mR,
 	this->m1=m1;
 	this->m2=m2;
 	mJpsi=fmJpsi;
-	massShape = new DPBWResonanceShape(mR, gammaR, LR, m1, m2, RR);
+  if ( resonanceIn == 12 )
+  {
+    massShape = new DPBWResonanceShape(mR, gammaR, LR, m1, m2, RR);
+  }
+  else if ( resonanceIn == 13 )
+  {
+    massShape = new DPBWResonanceShape(mR, gammaR, LR, m1, mJpsi, RR);
+  }
+  else
+  {
+    massShape = new DPBWResonanceShape(mR, gammaR, LR, m2, mJpsi, RR);
+  }
 	switch (LB)
 	{
 		case 0: barrierB=new DPBarrierL0(RB);
