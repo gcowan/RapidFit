@@ -41,10 +41,12 @@ UTILSSRC  = utils/src
 INCDIR    = framework/include
 INCPDFDIR = pdfs/include
 INCUTILS  = utils/include
-INCGSL    = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "$(shell gsl-config --cflags)" ; else echo"" ; fi )
-LINKGSL   = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "$(shell gsl-config --libs)" ; else echo"" ; fi )
-USE_GSL   = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "-D__RAPIDFIT_USE_GSL" ; else echo "" ; fi )
-#INCGSL    = /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include
+#INCGSL    = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "$(shell gsl-config --cflags)" ; else echo"" ; fi )
+#LINKGSL   = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "$(shell gsl-config --libs)" ; else echo"" ; fi )
+#USE_GSL   = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "-D__RAPIDFIT_USE_GSL" ; else echo "" ; fi )
+INCGSL    = -I/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include
+LINKGSL   = -L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/lib -lgsl -lgslcblas -lm
+USE_GSL   = -D__RAPIDFIT_USE_GSL
 OBJDIR    = framework/build
 OBJPDFDIR = pdfs/build
 OBJUTILDIR= utils/build

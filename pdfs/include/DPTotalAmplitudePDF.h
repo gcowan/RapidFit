@@ -228,7 +228,8 @@ class DPTotalAmplitudePDF : public BasePDF
 		TH1D * angularAccHistCosTheta1;
 		TH1D * angularAccHistPhi;
 		TH2D * angularAccHistMassCosTheta2;
-                THnSparse * histo;
+                //THnSparse * histo;
+                TH3D * histo;
                 TAxis *xaxis, *yaxis, *zaxis, *maxis;
                 int nxbins, nybins, nzbins, nmbins;
 };

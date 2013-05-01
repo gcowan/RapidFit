@@ -9,6 +9,7 @@
 #include "DPBarrierL1.hh"
 #include "DPBarrierL2.hh"
 #include "DPBarrierL3.hh"
+#include "DPBarrierL4.hh"
 #include "DPHelpers.hh"
 #include "DPWignerFunctionGeneral.hh"
 
@@ -60,6 +61,8 @@ spinKaon(spin)
             break;
     case 3: barrierB=new DPBarrierL3(RB);
             break;
+    case 4: barrierB=new DPBarrierL4(RB);
+            break;
     default: std::cout<<"WARNING DPJpsiKaon (LB): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
              barrierB=new DPBarrierL0(RB);
              break;
@@ -74,6 +77,8 @@ spinKaon(spin)
             break;
     case 3: barrierR=new DPBarrierL3(RR);
             break;
+    case 4: barrierR=new DPBarrierL4(RR);
+            break;
     default: std::cout<<"WARNING DPJpsiKaon (LR): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
              barrierR=new DPBarrierL0(RR);
              break;
@@ -87,6 +92,8 @@ spinKaon(spin)
     case 2: wigner=new DPWignerFunctionJ2();
             break;
     case 3: wigner=new DPWignerFunctionGeneral(3);
+            break;
+    case 4: wigner=new DPWignerFunctionGeneral(4);
             break;
   }
 }
@@ -111,6 +118,8 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
                         case 2: wigner=new DPWignerFunctionJ2();
                         break;
                         case 3: wigner=new DPWignerFunctionGeneral(3);
+                        break;
+                        case 4: wigner=new DPWignerFunctionGeneral(4);
                         break;
                 }
         }
@@ -142,13 +151,17 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
     return result;
   }
 
-  double pB = DPHelpers::daughterMomentum(this->mB, this->mJpsi, m23);
-  double pR = DPHelpers::daughterMomentum(m23, this->m1, this->m2);
-  double pB0 = DPHelpers::daughterMomentum(this->mB, this->mJpsi, this->mR);
-  double pR0 = DPHelpers::daughterMomentum(this->mR, this->m1, this->m2);
+  //std::cout << "B" << this->mB << " Jpsi " << this->mJpsi << " m23 " << m23 << " m1 " << this->m1 << " m2 " << this->m2 << " mR " << this->mR << std::endl;
+  double pB = DPHelpers::daughterMomentum(this->mB, this->mJpsi, m23);      // B, psi, K*
+  double pR = DPHelpers::daughterMomentum(m23, this->m1, this->m2);         // K*, K, pi
+  double pB0 = DPHelpers::daughterMomentum(this->mB, this->mJpsi, this->mR);// B, psi, resonance
+  double pR0 = DPHelpers::daughterMomentum(this->mR, this->m1, this->m2);   // resonance, K, pi
 
-  double orbitalFactor = TMath::Power(pB/pB0, this->LB)*
-                         TMath::Power(pR/pR0, this->LR);
+  //double orbitalFactor = TMath::Power(pB/pB0, this->LB)*
+  //                       TMath::Power(pR/pR0, this->LR);
+
+  double orbitalFactor = TMath::Power(pB/this->mB, this->LB)*
+                         TMath::Power(pR/this->mR, this->LR);
 
   double barrierFactor = barrierB->barrier( DPHelpers::daughterMomentum(this->mB,
                                             this->mJpsi, this->mR), pB)*

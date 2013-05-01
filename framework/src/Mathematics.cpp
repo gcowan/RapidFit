@@ -769,6 +769,10 @@ namespace Mathematics
         const int i_max(4);
         const int k_max(4);
         const int j_max(4);
+        //const int l_max(8); //mKpi
+        //const int i_max(2); //cosPsi
+        //const int k_max(2); //phi
+        //const int j_max(2); //cosTheta
         double c[l_max+1][i_max+1][k_max+1][j_max+1];
         double c_sq[l_max+1][i_max+1][k_max+1][j_max+1];
         for ( int l = 0; l < l_max + 1; l++ )
@@ -941,7 +945,7 @@ namespace Mathematics
             exit(123);
         }
         double weight(0.);
-        for ( int i = 0; i < 10000; i++ )
+        for ( int i = 0; i < 200000; i++ )
         {
             double * point = new double[4];
             double * point_mapped = new double[4];

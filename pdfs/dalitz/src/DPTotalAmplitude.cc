@@ -52,7 +52,7 @@ DPTotalAmplitude::DPTotalAmplitude()
 
   // B0 --> Z+ K-
   tmp=new DPZplusK(0,0,5.279,4.430,0.100,0.493677,
-                     0.13957018, 5.0, 1.5, 3.096916,0);
+                     0.13957018, 5.0, 1.5, 3.096916,0, 23);
   tmp->setHelicityAmplitudes(0.75, 0.42, 0.05, 0.0, 3.1, -1.45);
 //  ZComponents.push_back(tmp);
 }
@@ -75,7 +75,7 @@ DPTotalAmplitude::~DPTotalAmplitude()
 double DPTotalAmplitude::matrixElement(double m23, double cosTheta1, double cosTheta2,
 				       double phi, int pionID)
 {
-  double result=0; 
+  double result=0;
 
   TComplex tmp(0,0);
 

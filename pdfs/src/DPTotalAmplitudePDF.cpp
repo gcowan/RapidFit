@@ -124,8 +124,8 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	, m23(), cosTheta1(), cosTheta2(), phi(), pionID()
 	//LASS parameters
 	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS()
-// 	, massPsi(3.096916) // Jpsi
-	, massPsi(3.686109) // psi(2S)
+ 	, massPsi(3.096916) // Jpsi
+//    , massPsi(3.686109) // psi(2S)
 	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
 	, cosARefs()
 	, useFourDHistogram(false)
@@ -140,11 +140,11 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 	// Construct all components we need
 	DPComponent * tmp;
 	// B0 --> Z+ K-
-// 	tmp=new DPZplusK(0,1,5.279,4.430,0.100,0.493677,
-// 			 0.13957018, 1.6, 1.6, massPsi, 1); // spin 1 Z, for MC testing
+// 	tmp=new DPZplusK(1,0,5.279,4.430,0.100,0.493677,
+// 			 0.13957018, 1.6, 1.6, massPsi, 1, 23); // spin 1 Z, for MC testing
 
-	tmp=new DPZplusK(1,0,5.279,4.430,0.100,0.493677,
-			0.13957018, 1.6, 1.6, massPsi, 0); // spin 0 Z for datafit
+	tmp=new DPZplusK(0,1,5.279,4.430,0.100,0.493677,
+			0.13957018, 1.6, 1.6, massPsi, 0, 23); // spin 0 Z for datafit
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
 	tmp=new DPJpsiKaon(0, 1, 5.279, 0.89594, 0.0487, 0.493677,
@@ -241,24 +241,29 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
         if ( configurator->isTrue( "Use4DHistogram" ) ) {
 		    useFourDHistogram = true;
-		    histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
-
+		    //histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
+		    histo = (TH3D*)histogramFile->Get("histo"); //(fileName.c_str())));
+            histo->Print();
                 // cos mu
-                xaxis = histo->GetAxis(0);
+                //xaxis = histo->GetAxis(0);
+                xaxis = histo->GetXaxis();
                 nxbins = xaxis->GetNbins();
 
                 // cos k
-                yaxis = histo->GetAxis(1);
+                //yaxis = histo->GetAxis(1);
+                yaxis = histo->GetYaxis();
                 nybins = yaxis->GetNbins();
 
                 // delta phi
-                zaxis = histo->GetAxis(2);
+                //zaxis = histo->GetAxis(2);
+                zaxis = histo->GetZaxis();
                 nzbins = zaxis->GetNbins();
 
                 // m Kpi
-                maxis = histo->GetAxis(3);
-                nmbins = maxis->GetNbins();
-
+                //maxis = histo->GetAxis(3);
+                maxis = NULL;
+                //nmbins = maxis->GetNbins();
+                nmbins = 1;
                 int total_num_bins = nxbins * nybins * nzbins * nmbins;
 		int sum = 0;
 
@@ -505,7 +510,8 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( const DPTotalAmplitudePDF &copy ) :
         {
                 histogramFile = TFile::Open(fullFileName.c_str());
 
-		if (useFourDHistogram) histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
+		//if (useFourDHistogram) histo = (THnSparse*)histogramFile->Get("histo_4var_eff"); //(fileName.c_str())));
+		if (useFourDHistogram) histo = (TH3D*)histogramFile->Get("histo"); //(fileName.c_str())));
 		else {
 	        	angularAccHistCosTheta1 = (TH1D*)histogramFile->Get("cosmu_effTot");
                 	angularAccHistPhi       = (TH1D*)histogramFile->Get("delta_phi_effTot");
@@ -618,7 +624,10 @@ DPTotalAmplitudePDF::~DPTotalAmplitudePDF()
 		delete ZComponents[i];
 		ZComponents[i]=0;
 	}
-	if ( useAngularAcceptance ) histogramFile->Close();
+	if ( useAngularAcceptance ) {
+        histogramFile->Close();
+        delete histogramFile;
+    }
 }
 
 bool DPTotalAmplitudePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
@@ -743,21 +752,27 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	{
 		if ( useFourDHistogram ) {
 			//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
-                	xbin = xaxis->FindFixBin( cosTheta1 ); if( xbin > nxbins ) xbin = nxbins;
-                	ybin = yaxis->FindFixBin( cosTheta2 ); if( ybin > nybins ) ybin = nybins;
+                	/*
+                    xbin = xaxis->FindFixBin( cosTheta1 ); if( xbin > nxbins ) xbin = nxbins;
+                    ybin = yaxis->FindFixBin( cosTheta2 ); if( ybin > nybins ) ybin = nybins;
                 	zbin = zaxis->FindFixBin( phi  	    ); if( zbin > nzbins ) zbin = nzbins;
                 	mbin = maxis->FindFixBin( m23 	    ); if( mbin > nmbins ) mbin = nmbins;
-
                 	int idx[4] = { xbin, ybin, zbin, mbin };
                 	globalbin = (int)histo->GetBin( idx );
+                	*/
+                    globalbin = (int)histo->FindBin( cosTheta2, cosTheta1, phi );
                 	angularAcc = histo->GetBinContent(globalbin);
+
+            //double accCosThetaK[10] = { 76., 81., 84., 83., 80., 73., 65., 50., 45., 29. };
+            //int bin = (int)abs(ceil((-1-cosTheta2)/0.2));
+            //angularAcc = accCosThetaK[bin]/70.;
 		}
 		else {
 			angularAccCosTheta1     = angularAccHistCosTheta1	->GetBinContent( angularAccHistCosTheta1	->FindBin(cosTheta1) );
 			angularAccPhi           = angularAccHistPhi		->GetBinContent( angularAccHistPhi		->FindBin(phi) );
 			angularAccMassCosTheta2 = angularAccHistMassCosTheta2	->GetBinContent( angularAccHistMassCosTheta2	->FindBin(m23, cosTheta2) );
 			angularAcc = angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2; // factor of 81 = 3^4 to get acceptance on same scale as other quantities
-		}
+        }
 	}
 
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
@@ -812,14 +827,14 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 		tmp = TComplex(0,0);
 		for (int twoLambdaPsi = -2; twoLambdaPsi <= 2; twoLambdaPsi += 2) // Sum over -1,0,+1
 		{
+            if ( componentIndex != 100 )
+            {
 			for (unsigned int i = lower; i < upper; ++i) // sum over all components
 			{
 				tmp += KpiComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
 						twoLambda, twoLambdaPsi);
 				//cout << "m23: " << m23 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
 			}
-
-
 			// Now comes sum over Z+ components and lambdaPsiPrime
 			for (unsigned int i = lowerZ; i < upperZ; ++i)
 			{
@@ -827,6 +842,12 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 			  twoLambda,twoLambdaPsi); // need to check that we pass right helicities
 			       //cout << "Z: " << m13 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
 			}
+            }
+            else{
+                tmp += KpiComponents[4]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
+                tmp += KpiComponents[6]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
+                tmp += KpiComponents[8]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
+            }
 
 		}
 		result += tmp.Rho2();
@@ -861,15 +882,16 @@ vector<string> DPTotalAmplitudePDF::PDFComponents()
 {
         vector<string> components_list;
         components_list.push_back( "892" );
-        components_list.push_back( "1410" );
-        components_list.push_back( "1680" );
-        components_list.push_back( "1430" );
+        //components_list.push_back( "1410" );
+        //components_list.push_back( "1680" );
+        //components_list.push_back( "1430" );
         components_list.push_back( "1430_2" );
-        components_list.push_back( "1780_3" );
+        //components_list.push_back( "1780_3" );
         components_list.push_back( "800" );
-        components_list.push_back( "LASS" );
-        components_list.push_back( "NR" );
-        components_list.push_back( "Z4430" );
+        components_list.push_back( "S-wave" );
+        //components_list.push_back( "LASS" );
+        //components_list.push_back( "NR" );
+        //components_list.push_back( "Z4430" );
         components_list.push_back( "0" );
         return components_list;
 }
@@ -930,6 +952,11 @@ double DPTotalAmplitudePDF::EvaluateComponent(DataPoint * measurement, Component
                 {
                         Component->setComponentNumber( 10 );
                         componentIndex = 10;
+                }
+                else if( ComponentName.compare( "S-wave" ) == 0 )
+                {
+                        Component->setComponentNumber( 100 );
+                        componentIndex = 100;
                 }
                 else
                 {

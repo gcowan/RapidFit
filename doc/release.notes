@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/05/01 Greig Cowan
+  - Added code for angular momentum-4 barrier factor.
+  - Modofied Dalitz PDF to include spin-4 Kpi resonance.
+
 2013/04/30 Greig Cowan
   - Modified code to calculate efficiency parameterisation to now work in 4D.
   - Modified Dalitz PDF to use 4D efficiency (mass and angles).
