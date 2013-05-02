@@ -306,7 +306,7 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 
 	double sum=termOne + termTwo;
 
-	if( isnan(sum) ||  sum <= 0. )
+	if( std::isnan(sum) ||  sum <= 0. )
 	{
 		PDF_THREAD_LOCK
 
@@ -360,7 +360,7 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
                 termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
         }
 
-	if( isnan(termOne) || isnan(termTwo) )
+	if( std::isnan(termOne) || std::isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
 		cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;

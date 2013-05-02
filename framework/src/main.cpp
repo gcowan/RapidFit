@@ -1030,9 +1030,9 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	double pi = TMath::Pi();
 	output_file->cd();
 
-	int cosThetabin = 7;
-	int cosPsibin = 7;
-	int phibin = 9;
+	int cosThetabin = 30;
+	int cosPsibin = 1;
+	int phibin = 1;
 	int costhetaKbin = 10;
 	int costhetaLbin = 24;
 	int helphibin = 5;

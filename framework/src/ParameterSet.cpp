@@ -325,11 +325,12 @@ bool ParameterSet::AddPhysicsParameter( const PhysicsParameter* NewParameter, bo
 		}
 	}
 
-	allInternalNames.clear();	allForeignNames.clear();
+	vector<ObservableRef> emptystring, emptystring2;
+	allInternalNames.swap( emptystring );	allForeignNames.swap( emptystring2 );
 	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
-		allInternalNames.push_back( ObservableRef(allNames[i]) );
-		allForeignNames.push_back( ObservableRef(allNames[i]) );
+		allInternalNames.push_back( allNames[i] );
+		allForeignNames.push_back( allNames[i] );
 	}
 	++uniqueID;
 	return true;
@@ -359,7 +360,8 @@ bool ParameterSet::AddPhysicsParameters( const ParameterSet * NewParameterSet, b
 		}
 	}
 
-	allInternalNames.clear();       allForeignNames.clear();
+	vector<ObservableRef> emptystring, emptystring2;
+	allInternalNames.swap( emptystring );       allForeignNames.swap( emptystring2 );
 	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
 		allInternalNames.push_back( ObservableRef(allNames[i]) );
@@ -474,11 +476,12 @@ void ParameterSet::FloatedFirst()
 	allParameters = sorted_parameters;
 	allNames = sorted_names;
 
-	allInternalNames.clear();       allForeignNames.clear();
+	vector<ObservableRef> emptyNames, emptyNames2;
+	allInternalNames.swap( emptyNames );       allForeignNames.swap( emptyNames2 );
 	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
-		allInternalNames.push_back( ObservableRef(allNames[i]) );
-		allForeignNames.push_back( ObservableRef(allNames[i]) );
+		allInternalNames.push_back( allNames[i] );
+		allForeignNames.push_back( allNames[i] );
 	}
 }
 

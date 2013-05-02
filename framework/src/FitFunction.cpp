@@ -347,7 +347,7 @@ double FitFunction::Evaluate()
 
 	cout << "Call: " << left << setw(5) << callNum << " NLL: " << setprecision(10) << minimiseValue << setw(20) << " " <<  "\r" << flush;
 
-	if( isnan(minimiseValue) )
+	if( std::isnan(minimiseValue) )
 	{
 		this->GetParameterSet()->Print();
 		minimiseValue = DBL_MAX;

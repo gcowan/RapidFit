@@ -132,7 +132,7 @@ double LongLivedBkg::Evaluate(DataPoint * measurement)
 	}
 
 	if (returnValue <= 0) cout << "PDF returns zero!" << endl;
-	if(isnan(returnValue)) {
+	if(std::isnan(returnValue)) {
 		cout << "PDF returns nan!  " << returnValue << endl;
 		cout << "   f_LL1    "  << f_LL1 << endl;
 		cout << "   tauLL1   "  << tauLL1 << endl;

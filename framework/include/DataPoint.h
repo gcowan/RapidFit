@@ -100,20 +100,11 @@ class DataPoint
 		 *
 		 * @param Input    This is the new PseudoObservable class which allows for all of the information required to be wrapped up in a convenient wrapper
 		 *
-		 * @return returns a pointer to an observable which can be interrogated in exactly the same way as a normal Observable object
-		 */
-		double GetPseudoObservable( PseudoObservable& Input );
-
-		/*!
-		 * @brief This allows you to add a new Psuedo-Observable to this DataPoint, useful when you have a per-event complex object which you don't want to calculate multiple times
-		 *
-		 * @param Input    This is the new PseudoObservable class which allows for all of the information required to be wrapped up in a convenient wrapper
-		 *
 		 * @param Input2   These are external per-event input used in the derrivation of a per-event value
 		 *
 		 * @return returns a pointer to an observable which can be interrogated in exactly the same way as a normal Observable object
 		 */
-		double GetPseudoObservable( PseudoObservable& Input, vector<double> Input2 );
+		double GetPseudoObservable( PseudoObservable& Input, vector<double> Input2=vector<double>() );
 
 		/*!
 		 * @brief Remove all stored Pseudo-Observable Objects
@@ -122,7 +113,7 @@ class DataPoint
 		 *
 		 * @return Void
 		 */
-		void ClearPsuedoObservable();
+		void ClearPseudoObservable();
 
 		/*!
 		 * @brief Adds an Observable to This DataPoint
@@ -280,13 +271,11 @@ class DataPoint
 		 * A list of the names of the pseudo-Observables that exist in this DataPoint
 		 */
 		mutable vector<string> allPseudoNames;
-		mutable vector<string> allPseudoNames2;
 
 		/*!
 		 * A list of pointers to the pseudo-Observables that exist in the DataPoint
 		 */
-		mutable vector<PseudoObservable> allPseudoObservables; 
-		mutable vector<PseudoObservable> allPseudoObservables2;
+		mutable vector<PseudoObservable*> allPseudoObservables;
 
 		/*!
 		 * This is a pointer to the PhaseSpaceBoundary that this datapoint has been defined in

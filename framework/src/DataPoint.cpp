@@ -7,6 +7,8 @@
   @date 2009-10-02
   */
 
+#include "TRandom.h"
+
 //	RapidFit Headers
 #include "DataPoint.h"
 #include "ObservableRef.h"
@@ -20,12 +22,12 @@
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoNames2(), allPseudoObservables(), allPseudoObservables2(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
+DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoNames2(), allPseudoObservables(), allPseudoObservables2(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -47,20 +49,12 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 }
 
 DataPoint::DataPoint( const DataPoint& input ) :
-	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
-	thisDiscreteIndex(input.thisDiscreteIndex), allPseudoNames2(input.allPseudoNames2), allPseudoObservables2(), WeightValue(input.WeightValue)
+	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(input.allPseudoObservables), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
+	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue)
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
 		allObservables.push_back( new Observable(*(input.allObservables[i])) );
-	}
-	for( unsigned int i=0; i< input.allPseudoObservables.size(); ++i )
-	{
-		allPseudoObservables.push_back( PseudoObservable( (input.allPseudoObservables[i]) ) );
-	}
-	for( unsigned int i=0; i< input.allPseudoObservables2.size(); ++i )
-	{
-		allPseudoObservables2.push_back( PseudoObservable( (input.allPseudoObservables2[i]) ) );
 	}
 }
 
@@ -213,129 +207,74 @@ bool DataPoint::operator() ( pair<DataPoint*,ObservableRef> first, pair<DataPoin
 	return (param_val_1 < param_val_2 );
 }
 
-//#pragma GCC diagnostic ignored "-Wfloat-equal"
-double DataPoint::GetPseudoObservable( PseudoObservable& Input )
+double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> Values )
 {
-	//return Input.Eval( Values );
 	if(Input.GetIndex()<0)
 	{
 		string name = Input.GetName();
 		int lookup = StringProcessing::VectorContains( &allPseudoNames, &name );
 		if( lookup == -1 )
 		{
-			allPseudoObservables.push_back( PseudoObservable( Input ) );
+			allPseudoObservables.push_back( &Input );
 			allPseudoNames.push_back( name );
-			allPseudoObservables.back().SetIndex( (int)allPseudoObservables.size()-1 );
 			Input.SetIndex( (int)allPseudoObservables.size()-1 );
-			//cout << "<0 " << "creating" << " at " << allPseudoObservables.size()-1 << endl;
+			allPseudoObservables.back()->SetIndex( (int)allPseudoObservables.size()-1 );
 		}
 		else
 		{
 			Input.SetIndex( lookup );
-			allPseudoObservables.resize( (unsigned)Input.GetIndex()+1 );
-			allPseudoObservables[ (unsigned)Input.GetIndex() ] = Input;
-			//cout << "found at " << lookup << endl;
+			allPseudoObservables[ (unsigned)Input.GetIndex() ] = &Input;
 		}
 	}
 	else
 	{
 		if( Input.GetIndex()>(int)(allPseudoObservables.size()-1) )
 		{
-			//int var = (int)allPseudoObservables.size();
-			allPseudoObservables.resize( (unsigned)Input.GetIndex()+1 );
-			allPseudoObservables[(unsigned)Input.GetIndex()] = Input;
-			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
+			string name = Input.GetName();
+			int lookup = StringProcessing::VectorContains( &allPseudoNames, &name );
+			if( lookup == -1 )
+			{
+				allPseudoObservables.push_back( &Input);
+				allPseudoNames.push_back( name );
+				Input.SetIndex( (int)allPseudoObservables.size()-1 );
+				allPseudoObservables.back()->SetIndex( (int)allPseudoObservables.size()-1 );
+			}
+			else
+			{
+				Input.SetIndex( lookup );
+				allPseudoObservables[ (unsigned)Input.GetIndex() ] = &Input;
+			}
 		}
 		else
 		{
-			allPseudoObservables[(unsigned)Input.GetIndex()] = Input;
-			//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
-			//cout << "requested at (2) " << (unsigned)Input.GetIndex() << " of " << allPseudoObservables.size()-1 << endl;
+			Input = *(allPseudoObservables[ (unsigned)Input.GetIndex() ]);
 		}
 	}
 
-	PseudoObservable thisObservable = allPseudoObservables[ (unsigned)Input.GetIndex() ];
+	PseudoObservable* thisObservable = (allPseudoObservables[ (unsigned)Input.GetIndex() ]);
 
 	double outputObservable = 0.;
 
-	if( thisObservable.GetValid() )
+	if( Values.empty() )
 	{
-		outputObservable = thisObservable.GetPseudoObservable();
-	}
-
-	if( !(thisObservable.GetValid()) ) //|| outputObservable == 0. )
-	{
-		vector<ObservableRef>* deps = thisObservable.GetDependencies();
-		vector<double> input;
-		for( vector<ObservableRef>::iterator dep_i = deps->begin(); dep_i != deps->end(); ++dep_i )
+		vector<ObservableRef>* deps = thisObservable->GetDependencies();
+		vector<double> input;   input.resize( deps->size() );
+		unsigned int i=0;
+		for( vector<ObservableRef>::iterator dep_i = deps->begin(); dep_i != deps->end(); ++dep_i, ++i )
 		{
-			input.push_back( this->GetObservable( *(dep_i) )->GetValue() );
+			input[ i ] = ( this->GetObservable( *(dep_i) )->GetValue() );
 		}
-		thisObservable.SetInput( input );
-
-		outputObservable = thisObservable.GetPseudoObservable();
-	}
-
-	thisObservable.SetValid( Input.GetValid() );
-
-	return outputObservable;
-}
-//#pragma GCC diagnostic pop
-
-double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> Values )
-{
-	//return Input.Eval( Values );
-	if(Input.GetIndex()<0)
-	{
-		string name = Input.GetName();
-		int lookup = StringProcessing::VectorContains( &allPseudoNames2, &name );
-		if( lookup == -1 )
-		{
-			allPseudoObservables2.push_back( PseudoObservable( Input ) );
-			allPseudoNames2.push_back( name );
-			allPseudoObservables2.back().SetIndex( (int)allPseudoObservables2.size()-1 );
-			Input.SetIndex( (int)allPseudoObservables2.size()-1 );
-			//cout << "<0 " << "creating" << " at " << allPseudoObservables2.size()-1 << endl;
-		}
-		else
-		{
-			Input.SetIndex( lookup );
-			allPseudoObservables2.resize( (unsigned)Input.GetIndex()+1 );
-			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = Input;
-			//cout << "found at " << lookup << endl;
-		}
+		thisObservable->SetInput( input );
 	}
 	else
 	{
-		if( Input.GetIndex()>(int)(allPseudoObservables2.size()-1) )
+		if( !thisObservable->GetValid( Values ) )
 		{
-			//int var = (int)allPseudoObservables2.size();
-			allPseudoObservables2.resize( (unsigned)Input.GetIndex()+1 );
-			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = Input;
-			//cout << "resize to " << Input.GetIndex()+1 << " from " << var << endl;
-		}
-		else
-		{
-			allPseudoObservables2[ (unsigned)Input.GetIndex() ] = Input;
-			//cout << "define " << Input.GetIndex() << " of " << allPseudoObservables2.size()-1 << endl;
-			//cout << "requested at (3) " << (unsigned)Input.GetIndex() << " of " << allPseudoObservables2.size()-1 << endl;
+			thisObservable->SetInput( Values );
 		}
 	}
 
-	PseudoObservable thisObservable = allPseudoObservables2[ (unsigned)Input.GetIndex() ];
-
-	double outputObservable = 0.;
-
-	if( thisObservable.GetValid( Values ) )
-	{
-		outputObservable = thisObservable.GetPseudoObservable();
-	}
-	else
-	{
-		thisObservable.SetInput( Values );
-
-		outputObservable = thisObservable.GetPseudoObservable();
-	}
+	outputObservable = thisObservable->GetPseudoObservable();
 
 	return outputObservable;
 }
@@ -348,31 +287,20 @@ void DataPoint::Print() const
 		allObservables[i]->Print();
 	}
 
-	if( !allPseudoObservables.empty() )
-	{
-		for( unsigned int i=0; i< allPseudoObservables.size(); ++i )
-		{
-			allPseudoObservables[i].Print();
-		}
-	}
-        if( !allPseudoObservables2.empty() )
+        if( !allPseudoObservables.empty() )
         {
-                for( unsigned int i=0; i< allPseudoObservables2.size(); ++i )
+                for( unsigned int i=0; i< allPseudoObservables.size(); ++i )
                 {
-                        allPseudoObservables2[i].Print();
+                        allPseudoObservables[i]->Print();
                 }
         }
 	cout << endl;
 }
 
-void DataPoint::ClearPsuedoObservable()
+void DataPoint::ClearPseudoObservable()
 {
-	vector<PseudoObservable> first, second;
-	allPseudoObservables.swap( first );
-	allPseudoObservables2.swap( second );
-	vector<string> name1, name2;
+	vector<string> name1;
 	allPseudoNames.swap( name1 );
-	allPseudoNames2.swap( name2 );
 }
 
 PhaseSpaceBoundary* DataPoint::GetPhaseSpaceBoundary() const

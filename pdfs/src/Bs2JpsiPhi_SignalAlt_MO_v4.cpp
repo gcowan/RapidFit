@@ -495,12 +495,12 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate(DataPoint * measurement)
 	
 	
 	//conditions to throw exception
-	bool c1 = isnan(returnValue) ;
+	bool c1 = std::isnan(returnValue) ;
 	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::Evaluate() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw( 47 );
+		if( std::isnan(returnValue) ) throw( 47 );
 		if( returnValue <= 0. ) throw( 238 );
 	}
 	
@@ -553,12 +553,12 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateTimeOnly(DataPoint * measurement)
 	
 	
 	//conditions to throw exception
-	bool c1 = isnan(returnValue) ;
+	bool c1 = std::isnan(returnValue) ;
 	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
 		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::EvaluateTimeOnly() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw( 78 );
+		if( std::isnan(returnValue) ) throw( 78 );
 		if( returnValue <= 0. ) throw( 476 );
 	}
 		
@@ -660,11 +660,11 @@ double Bs2JpsiPhi_SignalAlt_MO_v4::Normalisation(DataPoint * measurement, PhaseS
 	}
 	
 	// Conditions to throw exception
-	bool c1 = isnan(returnValue)  ;
+	bool c1 = std::isnan(returnValue)  ;
 	bool c2 = (returnValue <= 0.) ;	
 	if( DEBUGFLAG && (c1 || c2 ) ) {
 		this->DebugPrint( " Bs2JpsiPhi_SignalAlt_MO_v4::Normalisation() returns <=0 or nan :" , returnValue ) ;
-		if( isnan(returnValue) ) throw( 23 );
+		if( std::isnan(returnValue) ) throw( 23 );
 		if( returnValue <= 0. ) throw( 823 );
 	}
 		

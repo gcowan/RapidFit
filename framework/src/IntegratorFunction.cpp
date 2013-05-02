@@ -175,7 +175,7 @@ IntegratorFunction& IntegratorFunction::operator=( const IntegratorFunction & Ne
 double IntegratorFunction::DoEval( const Double_t * x ) const
 {
 	if( currentPoint->GetPhaseSpaceBoundary() == NULL ) currentPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
-	currentPoint->ClearPsuedoObservable();
+	currentPoint->ClearPseudoObservable();
 	unsigned int true_index=100;
 	//Load the array into the data point
 	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
@@ -231,7 +231,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		if( componentIndex != NULL )
 		{
 			result = wrappedFunction->EvaluateComponent( newDataPoint, componentIndex );
-			if( isnan(result) || fabs(result)>=DBL_MAX )
+			if( std::isnan(result) || fabs(result)>=DBL_MAX )
 			{
 				if( debug->DebugThisClass( "IntegratorFunction" ) )
 				{
@@ -244,7 +244,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 		else if( integrateFunc == true )
 		{
 			result = wrappedFunction->EvaluateForNumericIntegral( newDataPoint );
-			if( isnan(result) || fabs(result)>=DBL_MAX )
+			if( std::isnan(result) || fabs(result)>=DBL_MAX )
 			{
 				if( debug->DebugThisClass( "IntegratorFunction" ) )
 				{
@@ -278,9 +278,9 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 	//}
 
 	if( fabs(result) >= DBL_MAX ) result = 0.;
-	if( isnan(result) ) result = 0.;
+	if( std::isnan(result) ) result = 0.;
 
-	newDataPoint->ClearPsuedoObservable();
+	newDataPoint->ClearPseudoObservable();
 	return result;
 }
 

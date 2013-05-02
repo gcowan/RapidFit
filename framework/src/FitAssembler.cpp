@@ -17,6 +17,7 @@
 #include "FitResultVector.h"
 #include "ResultFormatter.h"
 #include "StringProcessing.h"
+#include "PhysicsBottle.h"
 ///	System Headers
 #include <iostream>
 #include <iomanip>
@@ -72,6 +73,14 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFuncti
 		{
 			cout << "FitAssembler: Returning FitResult" << endl;
 		}
+	}
+
+	//      Now to remove any caches created from the current PDFs on data
+	PhysicsBottle* thisBottle = TheFunction->GetPhysicsBottle();
+	for( int i=0; i< thisBottle->NumberResults(); ++i )
+	{
+		IDataSet* thisDataSet = thisBottle->GetResultDataSet( i );
+		thisDataSet->ClearAllPseudoObservables();
 	}
 
 	return final_result;

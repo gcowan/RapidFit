@@ -484,7 +484,7 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string this_fileName, s
 		Double_t* values = ntuple->GetV1();
 
 		//	Use object recasting to make a copy of the data
-		for(int j=0; j < numberOfEventsAfterCut; ++j )	temp_vector.push_back( double(values[j]) );
+		for(int j=0; j < numberOfEventsAfterCut; ++j )	temp_vector.push_back( (double)(values[j]) );
 
 
 		if( DEBUG_DATA )
@@ -494,10 +494,11 @@ IDataSet * DataSetConfiguration::LoadRootFileIntoMemory( string this_fileName, s
 		}
 
 		//	Store the data
-		real_data_array.push_back( temp_vector );
+		real_data_array.push_back( vector<double>(temp_vector) );
 
 		//	Cleanup
-		while( !temp_vector.empty() ) { temp_vector.clear(); }
+		vector<Double_t> empty;
+		temp_vector.swap(empty);
 
 		delete tempFormula;
 	}

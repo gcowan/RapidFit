@@ -205,7 +205,7 @@ double Bd2JpsiKstar_sWave_KpiBins::Evaluate(DataPoint * measurement)
 		returnValue = timeRes1Frac*val1 + (1. - timeRes1Frac)*val2;
 	}
 
-	if( (returnValue <= 0.) || isnan(returnValue) ) {
+	if( (returnValue <= 0.) || std::isnan(returnValue) ) {
 		cout << " Bd2JpsiKstar_sWave_KpiBins::Evaluate() returns <=0 or nan " << endl ;
 		cout << " AT    " << Aperp_sq ;
 		cout << " AP    " << Apara_sq ;
@@ -301,7 +301,7 @@ double Bd2JpsiKstar_sWave_KpiBins::Normalisation(DataPoint * measurement, PhaseS
 	}
 
 
-	if( (returnValue <= 0.) || isnan(returnValue) ) {
+	if( (returnValue <= 0.) || std::isnan(returnValue) ) {
 		cout << " Bd2JpsiKstar_sWave_KpiBins::Normalisation() returns <=0 or nan " << endl ;
 		cout << " AT    " << Aperp_sq ;
 		cout << " AP    " << Apara_sq ;
@@ -382,7 +382,7 @@ double Bd2JpsiKstar_sWave_KpiBins::NormAnglesOnlyForAcceptanceWeights(DataPoint*
 	}
 
 
-	if( (returnValue <= 0.) || isnan(returnValue) ) {
+	if( (returnValue <= 0.) || std::isnan(returnValue) ) {
 		cout << " Bd2JpsiKstar_sWave_KpiBins::Normalisation() returns <=0 or nan " << endl ;
 		cout << " AT    " << Aperp_sq ;
 		cout << " AP    " << Apara_sq ;
@@ -515,7 +515,7 @@ void Bd2JpsiKstar_sWave_KpiBins::getTimeDependentAmplitudes(
 	ReAzeroAs = cachedAzero*cachedAs * cachedCosDeltaS * Exp; //AILSA
 
 
-	//if ( isnan(ImAparaAperp)) cout << Azero_sq << " " << Apara_sq << " " << Aperp_sq << " " << Exp << endl;
+	//if ( std::isnan(ImAparaAperp)) cout << Azero_sq << " " << Apara_sq << " " << Aperp_sq << " " << Exp << endl;
 
 	return;
 }

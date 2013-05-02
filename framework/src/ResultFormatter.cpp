@@ -1136,7 +1136,7 @@ void ResultFormatter::SeparateParameterPullPlots( string FileName, FitResultVect
 		string histogramTitle = allNames[nameIndex] + " pull plot";
 		double maximumPull = StatisticsFunctions::Maximum(parameterPulls);
 		double minimumPull = StatisticsFunctions::Minimum(parameterPulls);
-		bool makeHistogram = !isnan(maximumPull) && !isnan(minimumPull);
+		bool makeHistogram = !std::isnan(maximumPull) && !std::isnan(minimumPull);
 		if (makeHistogram)
 		{
 			pullHistogram = new TH1F( histogramName.c_str(), histogramTitle.c_str(),

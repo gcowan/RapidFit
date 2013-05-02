@@ -187,7 +187,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Evaluate(DataPoint * measurem
 	}
 
 
-	if(  ( (returnValue <= 0.) && (time>0.) ) || isnan(returnValue) ) {
+	if(  ( (returnValue <= 0.) && (time>0.) ) || std::isnan(returnValue) ) {
 		cout << endl ;
 		cout << " Bd2JpsiKstar_withTimeRes_withAverageAngAcc::evaluate() returns <=0 or nan :" << returnValue << endl ;
 		cout << "   Aperp    " << AT() ;
@@ -198,7 +198,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Evaluate(DataPoint * measurem
                 cout << " Delta_zero " << delta_zero << endl;
 		cout << " For event with: " << endl ;
 		cout << "   time " << time << endl ;
-		if( isnan(returnValue) ) exit(1) ;
+		if( std::isnan(returnValue) ) exit(1) ;
 	}
 
 	return returnValue;
@@ -283,7 +283,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Normalisation(DataPoint * mea
 	}
 
 
-	if( (returnValue <= 0.) || isnan(returnValue) ) {
+	if( (returnValue <= 0.) || std::isnan(returnValue) ) {
 		cout << " Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Normalisation() returns <=0 or nan " << endl ;
 		cout << " AT    " << Aperp_sq ;
 		cout << " AP    " << Apara_sq ;

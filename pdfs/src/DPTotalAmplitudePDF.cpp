@@ -874,7 +874,7 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 
 //  std::cout<<"DEBUG: "<<m23<<" "<<cosTheta1<<" "<<cosTheta2<<" "<<phi<<" "<<result<<" "<<p1_st*p3<<std::endl;
 
-	if( isnan(returnable_value) || returnable_value < 0 ) return 0.;
+	if( std::isnan(returnable_value) || returnable_value < 0 ) return 0.;
 	else return returnable_value;
 }
 

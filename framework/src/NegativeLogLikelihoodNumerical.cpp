@@ -175,14 +175,14 @@ void* NegativeLogLikelihoodNumerical::ThreadWork( void *input_data )
 			integral = DBL_MAX;
 		}
 
-		if( isnan(value) == true )
+		if( std::isnan(value) == true )
 		{
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
 			cout << endl << "PDF is nan" << endl;
 			(*data_i)->Print();
 			break;
 		}
-		if( isnan(integral) == true )
+		if( std::isnan(integral) == true )
 		{
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
 			cout << endl << "Integral is nan" << endl;

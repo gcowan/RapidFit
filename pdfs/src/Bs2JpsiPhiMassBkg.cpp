@@ -98,7 +98,7 @@ double Bs2JpsiPhiMassBkg::Normalisation(PhaseSpaceBoundary * boundary)
 		integral /= scaleFactor ;
 	}
 
-	if( isnan(integral) )
+	if( std::isnan(integral) )
 	{
 		PDF_THREAD_LOCK
 		cout << "scale factor: " << exp( -alphaM_pr * 5366.0 ) << endl;

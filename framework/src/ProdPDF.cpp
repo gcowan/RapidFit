@@ -188,7 +188,7 @@ double ProdPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * New
 
 	double prod = termOne * termTwo;
 
-	if( isnan(prod) || prod <= 0. )
+	if( std::isnan(prod) || prod <= 0. )
 	{
 		PDF_THREAD_LOCK
 
@@ -211,7 +211,7 @@ double ProdPDF::Evaluate( DataPoint * NewDataPoint )
 
 	double prod = termOne * termTwo;
 
-	if( isnan(prod) || prod <= 0. )
+	if( std::isnan(prod) || prod <= 0. )
 	{
 		PDF_THREAD_LOCK
 
@@ -234,7 +234,7 @@ double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 
 	double prod = termOne * termTwo;
 
-	if( isnan(prod) || prod <= 0. )
+	if( std::isnan(prod) || prod <= 0. )
 	{
 		PDF_THREAD_LOCK
 

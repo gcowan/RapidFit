@@ -201,7 +201,7 @@ double BsMass::Evaluate(DataPoint * measurement)
 		}
 	}
 
-	if( isnan(returnValue) )
+	if( std::isnan(returnValue) )
 	{
 		double sigma_m1 = allParameters.GetPhysicsParameter( sigma_m1Name )->GetValue();
 

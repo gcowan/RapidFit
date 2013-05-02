@@ -16,6 +16,8 @@
 #include <iostream>
 #include <cmath>
 
+using namespace::std;
+
 //Default constructor
 //FumiliFunction::FumiliFunction() : ParametricFunction(1), function(), parameters()
 //{
@@ -78,7 +80,7 @@ double FumiliFunction::operator()( const vector<double>& NewParameterValues) con
 	//Return function value
 	double value = function->Evaluate();
 	//cout << function->Evaluate() << endl;
-	if ( value < 0. or isnan(value) )
+	if ( value < 0. or std::isnan(value) )
 	{
 		return 1.;
 	}

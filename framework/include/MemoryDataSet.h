@@ -57,6 +57,8 @@ class MemoryDataSet : public IDataSet
 		void NormaliseWeights();
 
 		virtual void Print() const;
+
+		void ClearAllPseudoObservables();
 	private:
 		//	Uncopyable!
 		MemoryDataSet ( const MemoryDataSet& );

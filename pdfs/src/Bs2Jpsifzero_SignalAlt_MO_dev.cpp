@@ -175,7 +175,7 @@ double Bs2Jpsifzero_SignalAlt_MO_dev::Evaluate(DataPoint * measurement)
 	
 	
 	//conditions to throw exception
-	bool c1 = isnan(returnValue) ;
+	bool c1 = std::isnan(returnValue) ;
 	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
@@ -199,7 +199,7 @@ double Bs2Jpsifzero_SignalAlt_MO_dev::Evaluate(DataPoint * measurement)
 		cout << "   ctheta_tr " << ctheta_tr << endl ;
 		cout << "   ctheta_1 " << ctheta_1 << endl ;
 		cout << "   phi_tr " << phi_tr << endl ;		
-		if( isnan(returnValue) ) throw 10 ;
+		if( std::isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
 			
@@ -247,7 +247,7 @@ double Bs2Jpsifzero_SignalAlt_MO_dev::EvaluateTimeOnly(DataPoint * measurement)
 	
 	
 	//conditions to throw exception
-	bool c1 = isnan(returnValue) ;
+	bool c1 = std::isnan(returnValue) ;
 	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
@@ -271,7 +271,7 @@ double Bs2Jpsifzero_SignalAlt_MO_dev::EvaluateTimeOnly(DataPoint * measurement)
 		cout << "   ctheta_tr " << ctheta_tr << endl ;
 		cout << "   ctheta_1 " << ctheta_1 << endl ;
 		cout << "   phi_tr " << phi_tr << endl ;		
-		if( isnan(returnValue) ) throw 10 ;
+		if( std::isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
 	
@@ -333,7 +333,7 @@ double Bs2Jpsifzero_SignalAlt_MO_dev::Normalisation(DataPoint * measurement, Pha
 	}
 	
 	// Conditions to throw exception
-	bool c1 = isnan(returnValue)  ;
+	bool c1 = std::isnan(returnValue)  ;
 	bool c2 = (returnValue <= 0.) ;	
 	if( DEBUGFLAG && (c1 || c2 ) ) {
 		cout << endl ;
@@ -351,7 +351,7 @@ double Bs2Jpsifzero_SignalAlt_MO_dev::Normalisation(DataPoint * measurement, Pha
 		cout << "   mistagP1       " << _mistagP1 << endl ;
 		cout << "   mistagP0       " << _mistagP0 << endl ;
 		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;		
-		if( isnan(returnValue) ) throw 10 ;
+		if( std::isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
 	

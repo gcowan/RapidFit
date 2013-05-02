@@ -155,7 +155,7 @@ double Bs2JpsiPhi_SignalAlt_MO_1angle_v4::Evaluate(DataPoint * measurement)
 	
 	
 	//conditions to throw exception
-	bool c1 = isnan(returnValue) ;
+	bool c1 = std::isnan(returnValue) ;
 	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) 
@@ -177,7 +177,7 @@ double Bs2JpsiPhi_SignalAlt_MO_1angle_v4::Evaluate(DataPoint * measurement)
 		cout << " For event with:  " << endl ;
 		cout << "   time      " << t << endl ;
 		cout << "   ctheta_tr " << ctheta_tr << endl ;
-		if( isnan(returnValue) ) throw 10 ;
+		if( std::isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
 		
@@ -225,7 +225,7 @@ double Bs2JpsiPhi_SignalAlt_MO_1angle_v4::EvaluateTimeOnly(DataPoint * measureme
 	
 	
 	//conditions to throw exception
-	bool c1 = isnan(returnValue) ;
+	bool c1 = std::isnan(returnValue) ;
 	bool c2 = (resolutionScale> 0.) && (returnValue <= 0.) ;
 	bool c3 = (resolutionScale<=0.) && (t>0.) && (returnValue <= 0.)  ;	
 	if( DEBUGFLAG && (c1 || c2 || c3)  ) {
@@ -246,7 +246,7 @@ double Bs2JpsiPhi_SignalAlt_MO_1angle_v4::EvaluateTimeOnly(DataPoint * measureme
 		cout << " For event with:  " << endl ;
 		cout << "   time      " << t << endl ;
 		cout << "   ctheta_tr " << ctheta_tr << endl ;
-		if( isnan(returnValue) ) throw 10 ;
+		if( std::isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
 	
@@ -330,7 +330,7 @@ double Bs2JpsiPhi_SignalAlt_MO_1angle_v4::Normalisation(DataPoint * measurement,
 	}
 	
 	// Conditions to throw exception
-	bool c1 = isnan(returnValue)  ;
+	bool c1 = std::isnan(returnValue)  ;
 	bool c2 = (returnValue <= 0.) ;	
 	if( DEBUGFLAG && (c1 || c2 ) ) {
 		cout << endl ;
@@ -347,7 +347,7 @@ double Bs2JpsiPhi_SignalAlt_MO_1angle_v4::Normalisation(DataPoint * measurement,
 		cout << "   mistagP1       " << _mistagP1 << endl ;
 		cout << "   mistagP0       " << _mistagP0 << endl ;
 		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;		
-		if( isnan(returnValue) ) throw 10 ;
+		if( std::isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
 	

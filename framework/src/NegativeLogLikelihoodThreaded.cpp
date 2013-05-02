@@ -143,7 +143,8 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 			}
 			total+= fit_thread_data[threadnum].dataPoint_Result[ point_num ];
 		}
-		fit_thread_data[threadnum].dataPoint_Result.clear();
+		vector<double> empty;
+		fit_thread_data[threadnum].dataPoint_Result.swap( empty );
 	}
 
 	//delete [] fit_thread_data;
@@ -191,7 +192,7 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 
 		//cout << value << "\t" << integral << endl;
 
-		if( isnan(value) == true )
+		if( std::isnan(value) == true )
 		{
 			pthread_mutex_lock( debug_lock );
 			thread_input->dataPoint_Result.push_back( DBL_MAX );
@@ -200,7 +201,7 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 			pthread_mutex_unlock( debug_lock );
 			break;
 		}
-		if( isnan(integral) == true )
+		if( std::isnan(integral) == true )
 		{
 			pthread_mutex_lock( debug_lock );
 			thread_input->dataPoint_Result.push_back( DBL_MAX );

@@ -215,7 +215,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Evaluate(DataPoint * m
         }
 
 
-	        if(  ( (returnValue <= 0.) && (time>0.) ) || isnan(returnValue) ) {
+	        if(  ( (returnValue <= 0.) && (time>0.) ) || std::isnan(returnValue) ) {
                 cout << endl ;
                 cout << " Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::evaluate() returns <=0 or nan :" << returnValue << endl ;
                 cout << "   Aperp    " << Aperp_sq ;
@@ -227,7 +227,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Evaluate(DataPoint * m
 		cout << "   gamma   " << gamma << endl;
         cout << " For event with: " << endl ;
                 cout << "   time " << time << endl ;
-                if( isnan(returnValue) ) exit(1) ;
+                if( std::isnan(returnValue) ) exit(1) ;
         }
 
 	return returnValue;
@@ -292,7 +292,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::buildPDFnumerator()
 		+ q() * f6 * ImAzeroAperpB;
 
 	/*
-	if (isnan(v1))
+	if (std::isnan(v1))
 	{
 		cout << f1 << " " << f2 << " " << f3 << " " <<f4 << " " << f5 << " " << f6 << endl;
 			cout << AzeroAzeroB << " " << AperpAperpB << " " << AparaAparaB << " " << ImAparaAperpB << " " << ReAzeroAparaB << " " << ImAzeroAperpB << endl;
@@ -337,7 +337,7 @@ double Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Normalisation(DataPoin
         }
 
 
-	if( (returnValue <= 0.) || isnan(returnValue) ) {
+	if( (returnValue <= 0.) || std::isnan(returnValue) ) {
                 cout << " Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Normalisation() returns <=0 or nan " << endl ;
                 cout << " AT    " << Aperp_sq ;
                 cout << " AP    " << Apara_sq ;
@@ -425,7 +425,7 @@ void Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::getTimeDependentAmplitud
 
         ImAzeroAperp = cachedAzero*cachedAperp * cachedSinDeltaPerp * Exp;
 
-	//if ( isnan(ImAparaAperp)) cout << Azero_sq << " " << Apara_sq << " " << Aperp_sq << " " << Exp << endl;
+	//if ( std::isnan(ImAparaAperp)) cout << Azero_sq << " " << Apara_sq << " " << Aperp_sq << " " << Exp << endl;
 
 	return;
 }
