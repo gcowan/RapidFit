@@ -257,14 +257,17 @@ double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> V
 
 	if( Values.empty() )
 	{
-		vector<ObservableRef>* deps = thisObservable->GetDependencies();
-		vector<double> input;   input.resize( deps->size() );
-		unsigned int i=0;
-		for( vector<ObservableRef>::iterator dep_i = deps->begin(); dep_i != deps->end(); ++dep_i, ++i )
+		if( !thisObservable->GetValid() )
 		{
-			input[ i ] = ( this->GetObservable( *(dep_i) )->GetValue() );
+			vector<ObservableRef>* deps = thisObservable->GetDependencies();
+			vector<double> input;   input.resize( deps->size() );
+			unsigned int i=0;
+			for( vector<ObservableRef>::iterator dep_i = deps->begin(); dep_i != deps->end(); ++dep_i, ++i )
+			{
+				input[ i ] = ( this->GetObservable( *(dep_i) )->GetValue() );
+			}
+			thisObservable->SetInput( input );
 		}
-		thisObservable->SetInput( input );
 	}
 	else
 	{
