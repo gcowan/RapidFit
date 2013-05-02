@@ -78,6 +78,13 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( PDFConfigurator* confi
 	, phaseApK42045Name	( configurator->getName("phaseApK42045") )
 	, phaseAmK42045Name	( configurator->getName("phaseAmK42045") )
 
+	, magA0K52380Name	( configurator->getName("magA0K52380") )
+	, magApK52380Name	( configurator->getName("magApK52380") )
+	, magAmK52380Name	( configurator->getName("magAmK52380") )
+	, phaseA0K52380Name	( configurator->getName("phaseA0K52380") )
+	, phaseApK52380Name	( configurator->getName("phaseApK52380") )
+	, phaseAmK52380Name	( configurator->getName("phaseAmK52380") )
+
 	, magA0K800Name		( configurator->getName("magA0K800") )
 	, phaseA0K800Name	( configurator->getName("phaseA0K800") )
 
@@ -100,6 +107,8 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( PDFConfigurator* confi
 	, widthK31780Name	( configurator->getName("widthK31780") )
 	, massK42045Name	( configurator->getName("massK42045") )
 	, widthK42045Name	( configurator->getName("widthK42045") )
+	, massK52380Name	( configurator->getName("massK52380") )
+	, widthK52380Name	( configurator->getName("widthK52380") )
 	, massK800Name	( configurator->getName("massK800") )
 	, widthK800Name	( configurator->getName("widthK800") )
 	// Observables
@@ -122,6 +131,7 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( PDFConfigurator* confi
 	, magA0K21430(), magApK21430(), magAmK21430(), phaseA0K21430(), phaseApK21430(), phaseAmK21430()
 	, magA0K31780(), magApK31780(), magAmK31780(), phaseA0K31780(), phaseApK31780(), phaseAmK31780()
 	, magA0K42045(), magApK42045(), magAmK42045(), phaseA0K42045(), phaseApK42045(), phaseAmK42045()
+	, magA0K52380(), magApK52380(), magAmK52380(), phaseA0K52380(), phaseApK52380(), phaseAmK52380()
 	, magA0K800(),  				  phaseA0K800()
 	, magA0NR(),    				  phaseA0NR()
 	, massZplus(), widthZplus()
@@ -132,6 +142,7 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( PDFConfigurator* confi
 	, massK21430(), widthK21430()
 	, massK31780(), widthK31780()
 	, massK42045(), widthK42045()
+	, massK52380(), widthK52380()
 	, massK800(), widthK800()
 	, m23(), cosTheta1(), cosTheta2(), phi(), pionID()
 	//LASS parameters
@@ -181,6 +192,10 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( PDFConfigurator* confi
 	// B0 --> J/psi K4(2045)
 	tmp=new DPJpsiKaon(1, 4, 5.27953, 1.4324, 0.109, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 4);
+	KpiComponents.push_back(tmp);
+	// B0 --> J/psi K5(2380)
+	tmp=new DPJpsiKaon(1, 5, 5.27953, 1.4324, 0.109, 0.493677,
+			0.13957018, 1.6, 1.6, massPsi, 5);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K(800)
 	tmp=new DPJpsiKaon(1, 0, 5.27953, 0.682, 0.574, 0.493677,
@@ -401,6 +416,13 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( const DPTotalAmplitude
 	,phaseApK42045Name(copy.phaseApK42045Name)
 	,phaseAmK42045Name(copy.phaseAmK42045Name)
 
+	,magA0K52380Name(copy.magA0K52380Name)
+	,magApK52380Name(copy.magApK52380Name)
+	,magAmK52380Name(copy.magAmK52380Name)
+	,phaseA0K52380Name(copy.phaseA0K52380Name)
+	,phaseApK52380Name(copy.phaseApK52380Name)
+	,phaseAmK52380Name(copy.phaseAmK52380Name)
+
 	,magA0K800Name(copy.magA0K800Name)
 	,phaseA0K800Name(copy.phaseA0K800Name)
 
@@ -423,6 +445,8 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( const DPTotalAmplitude
 	,widthK31780Name(copy.widthK31780Name)
 	,massK42045Name(copy.massK42045Name)
 	,widthK42045Name(copy.widthK42045Name)
+	,massK52380Name(copy.massK52380Name)
+	,widthK52380Name(copy.widthK52380Name)
 	,massK800Name(copy.massK800Name)
 	,widthK800Name(copy.widthK800Name)
 
@@ -483,6 +507,13 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( const DPTotalAmplitude
 	,phaseApK42045(copy.phaseApK42045)
 	,phaseAmK42045(copy.phaseAmK42045)
 
+	,magA0K52380(copy.magA0K52380)
+	,magApK52380(copy.magApK52380)
+	,magAmK52380(copy.magAmK52380)
+	,phaseA0K52380(copy.phaseA0K52380)
+	,phaseApK52380(copy.phaseApK52380)
+	,phaseAmK52380(copy.phaseAmK52380)
+
 	,magA0K800(copy.magA0K800)
 	,phaseA0K800(copy.phaseA0K800)
 
@@ -506,6 +537,8 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( const DPTotalAmplitude
 	,widthK31780(copy.widthK31780)
 	,massK42045(copy.massK42045)
 	,widthK42045(copy.widthK42045)
+	,massK52380(copy.massK52380)
+	,widthK52380(copy.widthK52380)
 	,massK800(copy.massK800)
 	,widthK800(copy.widthK800)
 
@@ -628,6 +661,13 @@ void DPTotalAmplitudePDF_withAcc::MakePrototypes()
 	parameterNames.push_back( phaseApK42045Name );
 	parameterNames.push_back( phaseAmK42045Name );
 
+	parameterNames.push_back( magA0K52380Name );
+	parameterNames.push_back( magApK52380Name );
+	parameterNames.push_back( magAmK52380Name );
+	parameterNames.push_back( phaseA0K52380Name );
+	parameterNames.push_back( phaseApK52380Name );
+	parameterNames.push_back( phaseAmK52380Name );
+
 	parameterNames.push_back( magA0K800Name );
 	parameterNames.push_back( phaseA0K800Name );
 
@@ -650,6 +690,8 @@ void DPTotalAmplitudePDF_withAcc::MakePrototypes()
 	parameterNames.push_back( widthK31780Name );
 	parameterNames.push_back( massK42045Name );
 	parameterNames.push_back( widthK42045Name );
+	parameterNames.push_back( massK52380Name );
+	parameterNames.push_back( widthK52380Name );
 	parameterNames.push_back( massK800Name );
 	parameterNames.push_back( widthK800Name );
 
@@ -746,6 +788,13 @@ bool DPTotalAmplitudePDF_withAcc::SetPhysicsParameters( ParameterSet * NewParame
 	phaseApK42045 = allParameters.GetPhysicsParameter( phaseApK42045Name )->GetValue();
 	phaseAmK42045 = allParameters.GetPhysicsParameter( phaseAmK42045Name )->GetValue();
 
+	magA0K52380    = allParameters.GetPhysicsParameter( magA0K52380Name )->GetValue();
+	magApK52380   = allParameters.GetPhysicsParameter( magApK52380Name )->GetValue();
+	magAmK52380   = allParameters.GetPhysicsParameter( magAmK52380Name )->GetValue();
+	phaseA0K52380  = allParameters.GetPhysicsParameter( phaseA0K52380Name )->GetValue();
+	phaseApK52380 = allParameters.GetPhysicsParameter( phaseApK52380Name )->GetValue();
+	phaseAmK52380 = allParameters.GetPhysicsParameter( phaseAmK52380Name )->GetValue();
+
 	magA0K800    = allParameters.GetPhysicsParameter( magA0K800Name )->GetValue();
 	phaseA0K800  = allParameters.GetPhysicsParameter( phaseA0K800Name )->GetValue();
 
@@ -769,6 +818,8 @@ bool DPTotalAmplitudePDF_withAcc::SetPhysicsParameters( ParameterSet * NewParame
 	widthK31780 = allParameters.GetPhysicsParameter( widthK31780Name )->GetValue();
 	massK42045  = allParameters.GetPhysicsParameter( massK42045Name )->GetValue();
 	widthK42045 = allParameters.GetPhysicsParameter( widthK42045Name )->GetValue();
+	massK52380  = allParameters.GetPhysicsParameter( massK52380Name )->GetValue();
+	widthK52380 = allParameters.GetPhysicsParameter( widthK52380Name )->GetValue();
 	massK800  = allParameters.GetPhysicsParameter( massK800Name )->GetValue();
 	widthK800 = allParameters.GetPhysicsParameter( widthK800Name )->GetValue();
 
@@ -786,8 +837,9 @@ bool DPTotalAmplitudePDF_withAcc::SetPhysicsParameters( ParameterSet * NewParame
 	KpiComponents[4]->setResonanceParameters( massK21430, widthK21430 );
 	KpiComponents[5]->setResonanceParameters( massK31780, widthK31780 );
 	KpiComponents[6]->setResonanceParameters( massK42045, widthK42045 );
-	KpiComponents[7]->setResonanceParameters( massK800, widthK800 );
-	KpiComponents[8]->setResonanceParameters( a_LASS, r_LASS );
+	KpiComponents[7]->setResonanceParameters( massK52380, widthK52380 );
+	KpiComponents[8]->setResonanceParameters( massK800, widthK800 );
+	KpiComponents[9]->setResonanceParameters( a_LASS, r_LASS );
 	ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
@@ -796,9 +848,10 @@ bool DPTotalAmplitudePDF_withAcc::SetPhysicsParameters( ParameterSet * NewParame
 	KpiComponents[4]->setHelicityAmplitudes(magA0K21430, magApK21430, magAmK21430, phaseA0K21430, phaseApK21430, phaseAmK21430);
 	KpiComponents[5]->setHelicityAmplitudes(magA0K31780, magApK31780, magAmK31780, phaseA0K31780, phaseApK31780, phaseAmK31780);
 	KpiComponents[6]->setHelicityAmplitudes(magA0K42045, magApK42045, magAmK42045, phaseA0K42045, phaseApK42045, phaseAmK42045);
-	KpiComponents[7]->setHelicityAmplitudes(magA0K800, 0., 0., phaseA0K800, 0., 0.);
-	KpiComponents[8]->setHelicityAmplitudes(mag_LASS, 0., 0., phase_LASS, 0., 0.);
-	KpiComponents[9]->setHelicityAmplitudes(magA0NR, 0., 0., phaseA0NR, 0., 0.);
+	KpiComponents[7]->setHelicityAmplitudes(magA0K52380, magApK52380, magAmK52380, phaseA0K52380, phaseApK52380, phaseAmK52380);
+	KpiComponents[8]->setHelicityAmplitudes(magA0K800, 0., 0., phaseA0K800, 0., 0.);
+	KpiComponents[9]->setHelicityAmplitudes(mag_LASS, 0., 0., phase_LASS, 0., 0.);
+	KpiComponents[10]->setHelicityAmplitudes(magA0NR, 0., 0., phaseA0NR, 0., 0.);
 
 	return isOK;
 }
@@ -958,6 +1011,7 @@ vector<string> DPTotalAmplitudePDF_withAcc::PDFComponents()
         components_list.push_back( "1430_2" );
         components_list.push_back( "1780_3" );
         components_list.push_back( "2045_4" );
+        components_list.push_back( "2380_5" );
         components_list.push_back( "800" );
         components_list.push_back( "LASS" );
         components_list.push_back( "NR" );
@@ -1009,25 +1063,30 @@ double DPTotalAmplitudePDF_withAcc::EvaluateComponent(DataPoint * measurement, C
                         Component->setComponentNumber( 7 );
                         componentIndex = 7;
                 }
-                else if( ComponentName.compare( "800" ) == 0 )
+                else if( ComponentName.compare( "2380_5" ) == 0 )
                 {
                         Component->setComponentNumber( 8 );
                         componentIndex = 8;
                 }
-                else if( ComponentName.compare( "LASS" ) == 0 )
+                else if( ComponentName.compare( "800" ) == 0 )
                 {
                         Component->setComponentNumber( 9 );
                         componentIndex = 9;
                 }
-                else if( ComponentName.compare( "NR" ) == 0 )
+                else if( ComponentName.compare( "LASS" ) == 0 )
                 {
                         Component->setComponentNumber( 10 );
                         componentIndex = 10;
                 }
-                else if( ComponentName.compare( "Z4430" ) == 0 )
+                else if( ComponentName.compare( "NR" ) == 0 )
                 {
                         Component->setComponentNumber( 11 );
                         componentIndex = 11;
+                }
+                else if( ComponentName.compare( "Z4430" ) == 0 )
+                {
+                        Component->setComponentNumber( 12 );
+                        componentIndex = 12;
                 }
                 else if( ComponentName.compare( "S-wave" ) == 0 )
                 {

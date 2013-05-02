@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/05/02 Greig Cowan
+  - Added code for angular momentum-5 barrier factor.
+  - Modified Dalitz PDF to include spin-5 Kpi resonance.
+
 2013/05/02 Rob Currie
   - Had a moment of inspiration, fixed bug in PseudoObs code which caused excessive memory usage I couldn't account for
        Mem usage of v5 pdf now down from 2.G to 400M !
@@ -12,7 +16,7 @@
 
 2013/05/01 Greig Cowan
   - Added code for angular momentum-4 barrier factor.
-  - Modofied Dalitz PDF to include spin-4 Kpi resonance.
+  - Modified Dalitz PDF to include spin-4 Kpi resonance.
 
 2013/04/30 Greig Cowan
   - Modified code to calculate efficiency parameterisation to now work in 4D.

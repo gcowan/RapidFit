@@ -10,6 +10,7 @@
 #include "DPBarrierL2.hh"
 #include "DPBarrierL3.hh"
 #include "DPBarrierL4.hh"
+#include "DPBarrierL5.hh"
 #include "DPHelpers.hh"
 #include "DPWignerFunctionGeneral.hh"
 
@@ -63,6 +64,8 @@ spinKaon(spin)
             break;
     case 4: barrierB=new DPBarrierL4(RB);
             break;
+    case 5: barrierB=new DPBarrierL5(RB);
+            break;
     default: std::cout<<"WARNING DPJpsiKaon (LB): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
              barrierB=new DPBarrierL0(RB);
              break;
@@ -79,6 +82,8 @@ spinKaon(spin)
             break;
     case 4: barrierR=new DPBarrierL4(RR);
             break;
+    case 5: barrierR=new DPBarrierL5(RR);
+            break;
     default: std::cout<<"WARNING DPJpsiKaon (LR): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
              barrierR=new DPBarrierL0(RR);
              break;
@@ -94,6 +99,8 @@ spinKaon(spin)
     case 3: wigner=new DPWignerFunctionGeneral(3);
             break;
     case 4: wigner=new DPWignerFunctionGeneral(4);
+            break;
+    case 5: wigner=new DPWignerFunctionGeneral(5);
             break;
   }
 }
@@ -120,6 +127,8 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
                         case 3: wigner=new DPWignerFunctionGeneral(3);
                         break;
                         case 4: wigner=new DPWignerFunctionGeneral(4);
+                        break;
+                        case 5: wigner=new DPWignerFunctionGeneral(5);
                         break;
                 }
         }

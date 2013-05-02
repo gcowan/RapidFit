@@ -110,6 +110,13 @@ class DPTotalAmplitudePDF_withAcc : public BasePDF
 		ObservableRef phaseApK42045Name;
 		ObservableRef phaseAmK42045Name;
 
+		ObservableRef magA0K52380Name;
+		ObservableRef magApK52380Name;
+		ObservableRef magAmK52380Name;
+		ObservableRef phaseA0K52380Name;
+		ObservableRef phaseApK52380Name;
+		ObservableRef phaseAmK52380Name;
+
 		ObservableRef magA0K800Name;
 		ObservableRef phaseA0K800Name;
 
@@ -132,6 +139,8 @@ class DPTotalAmplitudePDF_withAcc : public BasePDF
 		ObservableRef widthK31780Name;
 		ObservableRef massK42045Name;
 		ObservableRef widthK42045Name;
+		ObservableRef massK52380Name;
+		ObservableRef widthK52380Name;
 		ObservableRef massK800Name;
 		ObservableRef widthK800Name;
 
@@ -192,6 +201,13 @@ class DPTotalAmplitudePDF_withAcc : public BasePDF
 		double phaseApK42045;
 		double phaseAmK42045;
 
+		double magA0K52380;
+		double magApK52380;
+		double magAmK52380;
+		double phaseA0K52380;
+		double phaseApK52380;
+		double phaseAmK52380;
+
 		double magA0K800;
 		double phaseA0K800;
 
@@ -214,6 +230,8 @@ class DPTotalAmplitudePDF_withAcc : public BasePDF
 		double widthK31780;
 		double massK42045;
 		double widthK42045;
+		double massK52380;
+		double widthK52380;
 		double massK800;
 		double widthK800;
 
