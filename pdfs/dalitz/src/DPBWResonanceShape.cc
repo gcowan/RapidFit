@@ -3,6 +3,7 @@
 #include "DPBarrierL1.hh"
 #include "DPBarrierL2.hh"
 #include "DPBarrierL3.hh"
+#include "DPBarrierL4.hh"
 
 #include <iostream>
 
@@ -24,6 +25,8 @@ DPBWResonanceShape::DPBWResonanceShape(double mRR, double gammaRR, int L,
     case 2: barrier=new DPBarrierL2(R);
             break;
     case 3: barrier=new DPBarrierL3(R);
+            break;
+    case 4: barrier=new DPBarrierL4(R);
             break;
     default: std::cout<<"WARNING: Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
              barrier=new DPBarrierL0(R);
@@ -47,6 +50,8 @@ DPBWResonanceShape::DPBWResonanceShape( const DPBWResonanceShape& other ) : DPMa
     			case 2: barrier=new DPBarrierL2(R);
             			break;
     			case 3: barrier=new DPBarrierL3(R);
+            			break;
+    			case 4: barrier=new DPBarrierL4(R);
             			break;
     			default: std::cout<<"WARNING: Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
              			barrier=new DPBarrierL0(R);
@@ -97,7 +102,7 @@ void DPBWResonanceShape::setResonanceParameters( double mass, double sigma )
 {
 	//std::cout << "DPBWResonanceShape setting" << std::endl;
 	mR = mass;
-	gammaR = sigma;	
+	gammaR = sigma;
 	//std::cout << "DPBWResonanceShape set" << std::endl;
 }
 

@@ -137,8 +137,8 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( PDFConfigurator* confi
 	//LASS parameters
 	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS()
 // 	, massPsi(3.096916) // Jpsi
-    , massPsi(3.686109) // psi(2S)
-	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.279)
+    , massPsi(3.68609) // psi(2S)
+	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.27953)
 	, cosARefs()
 {
 	MakePrototypes();
@@ -148,54 +148,54 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( PDFConfigurator* confi
 	// Construct all components we need
 	DPComponent * tmp;
 	// B0 --> Z+ K-
-// 	tmp=new DPZplusK(1,0,5.279,4.430,0.100,0.493677,
+// 	tmp=new DPZplusK(1,0,5.27953,4.430,0.100,0.493677,
 // 			 0.13957018, 1.6, 1.6, massPsi, 1, 23); // spin 1 Z, for MC testing
 
-	tmp=new DPZplusK(0,1,5.279,4.430,0.100,0.493677,
+	tmp=new DPZplusK(0,1,5.27953,4.430,0.100,0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 0, 23); // spin 0 Z for datafit
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
-	tmp=new DPJpsiKaon(0, 1, 5.279, 0.89594, 0.0487, 0.493677,
+	tmp=new DPJpsiKaon(0, 1, 5.27953, 0.89594, 0.0487, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1410)
-	tmp=new DPJpsiKaon(0, 1, 5.279, 1.414, 0.232, 0.493677,
+	tmp=new DPJpsiKaon(0, 1, 5.27953, 1.414, 0.232, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1680)
-	tmp=new DPJpsiKaon(0, 1, 5.279, 1.717, 0.322, 0.493677,
+	tmp=new DPJpsiKaon(0, 1, 5.27953, 1.717, 0.322, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K0(1430)
-	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
+	tmp=new DPJpsiKaon(1, 0, 5.27953, 1.425, 0.270, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 0);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
-	tmp=new DPJpsiKaon(1, 2, 5.279, 1.4324, 0.109, 0.493677,
+	tmp=new DPJpsiKaon(1, 2, 5.27953, 1.4324, 0.109, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 2);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K3(1780)
-	tmp=new DPJpsiKaon(1, 3, 5.279, 1.4324, 0.109, 0.493677,
+	tmp=new DPJpsiKaon(1, 3, 5.27953, 1.4324, 0.109, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 3);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K4(2045)
-	tmp=new DPJpsiKaon(1, 4, 5.279, 1.4324, 0.109, 0.493677,
+	tmp=new DPJpsiKaon(1, 4, 5.27953, 1.4324, 0.109, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 4);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K(800)
-	tmp=new DPJpsiKaon(1, 0, 5.279, 0.682, 0.574, 0.493677,
+	tmp=new DPJpsiKaon(1, 0, 5.27953, 0.682, 0.574, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 0);
 	KpiComponents.push_back(tmp);
 
 	// Kpi s-wave using LASS
-  	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
+  	tmp=new DPJpsiKaon(1, 0, 5.27953, 1.425, 0.270, 0.493677,
                      0.13957018, 1.6, 1.6, massPsi, 0,
                      "LASS", 1.94, 1.76);
 
 	KpiComponents.push_back(tmp);
 
 	// Kpi s-wave using Non Resonnant
-  	tmp=new DPJpsiKaon(1, 0, 5.279, 1.425, 0.270, 0.493677,
+  	tmp=new DPJpsiKaon(1, 0, 5.27953, 1.425, 0.270, 0.493677,
                      0.13957018, 1.6, 1.6, massPsi, 0,
                      "NR", 1.94, 1.76);
 
@@ -847,7 +847,7 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
     //if (angularAcc <= 0.) cout << "angular acc " << angularAcc << " " << m23 << " " << m23_mapped << " " << cosTheta1 << " " << phi << " " << cosTheta2 << endl;
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 	// Need angle between reference axis
-	DPHelpers::calculateFinalStateMomenta(5.279, m23, massPsi,
+	DPHelpers::calculateFinalStateMomenta(5.27953, m23, massPsi,
 	cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, 0.13957018, 0.493677,
 	pMuPlus, pMuMinus, pPi, pK);
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
@@ -856,7 +856,7 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 	double cosThetaZ;
 	double cosThetaPsi;
 	double dphi;
-	pB.SetPxPyPzE(0., 0., 0., 5.279);
+	pB.SetPxPyPzE(0., 0., 0., 5.27953);
 	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	&cosThetaZ, &cosThetaPsi, &dphi, pionID);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
@@ -927,7 +927,7 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 	//momenta are defined on eq 39.20a/b of the 2010 PDG
 	const double m1 = 0.493677;    // kaon mass
 	const double m2 = 0.13957018; // pion mass
-	const double MB0= 5.2795; // B0 mass
+	const double MB0= 5.27953; // B0 mass
 
 	double t1 = m23*m23-(m1+m2)*(m1+m2);
 	double t2 = m23*m23-(m1-m2)*(m1-m2);
