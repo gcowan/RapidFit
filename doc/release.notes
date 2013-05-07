@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/05/07 Greig Cowan
+  - Added StudentT PDF.
+
 2013/05/02 Greig Cowan
   - Added code for angular momentum-5 barrier factor.
   - Modified Dalitz PDF to include spin-5 Kpi resonance.
