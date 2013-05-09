@@ -16,13 +16,13 @@ class ROOT_File_Processing
 	public:
 
 		//	Open a .root file safely i.e. don't crash on failure
-		static TFile* OpenFile( string );
+		static TFile* OpenFile( string, string ReadWrite="" );
 
 		//	Open Multiple .root files safely
 		static vector<TFile*> OpenMultipleFiles( vector<string> );
 
 		//	Open a file and return the first TTree object (or object derrived from TTree)
-		static TTree* GetFirstTree( string filename );
+		static TTree* GetFirstTree( string filename, string ReadWrite="" );
 
 		//	Open a file ane get the requested TTree from the file
 		static TTree* GetTree( string filename, string tuplename );

@@ -25,7 +25,7 @@ AcceptanceSlice::AcceptanceSlice( const AcceptanceSlice& input ) :
 //............................................
 // Constructor for flat acceptance
 SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
-	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0), _sortedSlices(false)
+	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
 {
 
 	//Reality checks
@@ -44,7 +44,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
 }
 
 SlicedAcceptance::SlicedAcceptance( const SlicedAcceptance& input ) :
-	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta ), _sortedSlices( input._sortedSlices )
+	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta ), _sortedSlices( input._sortedSlices ), maxminset(input.maxminset), t_min(input.t_min), t_max(input.t_max)
 {
 	for( unsigned int i=0; i< input.slices.size(); ++i )
 	{
@@ -66,7 +66,7 @@ SlicedAcceptance::~SlicedAcceptance()
 //............................................
 // Constructor for simple upper time acceptance only
 SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b), _sortedSlices(false)
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
 {
 	//Reality checks
 	if( tlow > thigh )
@@ -107,7 +107,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 //............................................
 // Constructor for simple 2010 version of lower time acceptance only
 SlicedAcceptance::SlicedAcceptance( string s ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false)
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
 {
 	(void)s;
 	int N = 31;
@@ -136,7 +136,7 @@ SlicedAcceptance::SlicedAcceptance( string s ) :
 //............................................
 // Constructor for accpetance from a file
 SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false)
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
 {
 	(void)type;
 	if( type != "File" ) {   }//do nothing for now
@@ -216,6 +216,42 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 	unsigned int is = 0;
 
 	int finalBin = -1;
+
+	if( time->GetBinNumber() < 0 )
+	{
+		if( t < this->GetMin() )
+		{
+			if( time->GetValue() > this->GetMin() )
+			{
+				cout << "TIME OFFSET PUSHING VALUE BELOW ACCEPTANCE HISTOGRAM!!!" << endl;
+			}
+			else
+			{
+				cout << "TIME BELOW ACCEPTANCE HISTO!!!" << endl;
+			}
+	
+			cout << " time: " << time->GetValue() << " offset: " << timeOffset << " min: " << this->GetMin() << endl;
+			this->Print();
+			exit(0);
+			throw(-987643);
+		}
+		if( t > this->GetMax() )
+		{
+			if( time->GetValue() > this->GetMax() )
+			{
+				cout << "TIME OFFSET PUSHING VALUE ABOVE ACCEPTANCE HISTOGRAM!!!" << endl;
+			}
+			else
+			{
+				cout << "TIME ABOVE ACCEPTANCE HISTO!!!" << endl;
+			}
+			cout << " time: " << time->GetValue() << " offset: " << timeOffset << " max: " << this->GetMax() << endl;
+
+			this->Print();
+			exit(0);
+			throw(-987643);
+		}
+	}
 
 	if( time->GetBinNumber() >= 0 )
 	{
@@ -330,3 +366,49 @@ bool SlicedAcceptance::GetIsSorted() const
 {
 	return _sortedSlices;
 }
+
+double SlicedAcceptance::GetMax() const
+{
+	if( !maxminset ) this->FindMaxMin();
+	return t_max;
+}
+
+double SlicedAcceptance::GetMin() const
+{
+	if( !maxminset ) this->FindMaxMin();
+	return t_min;
+}
+
+void SlicedAcceptance::FindMaxMin() const
+{
+	double temp_max = slices[0]->tlow();
+	double temp_min = slices[0]->thigh();
+	if( _sortedSlices )
+	{
+		temp_min = (*slices.begin())->tlow();
+		temp_max = (*slices.back()).thigh();
+	}
+	else
+	{
+		for( unsigned int i=0; i< slices.size(); ++i )
+		{
+			if( slices[i]->tlow() < temp_min ) temp_min = slices[i]->tlow();
+			if( slices[i]->thigh() > temp_max ) temp_max = slices[i]->thigh();
+		}
+	}
+	t_min = temp_min;
+	t_max = temp_max;
+	maxminset = true;
+}
+
+void SlicedAcceptance::Print() const
+{
+	cout << "SlicedAcceptance:" << endl;
+	for( unsigned int i=0; i< slices.size(); ++i )
+	{
+		cout << "Slice: " << i << endl;
+		slices[i]->Print();
+		cout << endl;
+	}
+}
+

@@ -304,8 +304,8 @@ TH1* Histogram_Processing::Get_TH1( const vector<Double_t>& input, TRandom* rand
 	}
 	double input_min = get_minimum( input );
 	double input_max = get_maximum( input );
-	if( X_MIN != -DBL_MAX ) input_min = X_MIN;
-	if( X_MAX != DBL_MAX ) input_max = X_MAX;
+	if( X_MIN > -DBL_MAX ) input_min = X_MIN;
+	if( X_MAX < DBL_MAX ) input_max = X_MAX;
 	TString rand_num; rand_num += rand->Rndm();
         string rand_str( rand_num.Data() );
         replace( rand_str.begin(), rand_str.end(), '.', '_' );

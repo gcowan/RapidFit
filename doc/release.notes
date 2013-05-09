@@ -1,5 +1,16 @@
 // $Id: release.notes $
 
+2013/05/09 Rob Currie
+  - Added more helpful debug output to SlicedAcceptance::getValue( Observable*, double ),
+       I recommend using this function over SlicedAcceptance::getValue( double ) as it is safer and explains more, but the latter is much simpler code
+       (JpsiPhi is already using this and has been doing for many months, an in this case all that happens is that an exception is caught here and useful output is given)
+    Added simple functions to expose the Max/Min of a SlicedAcceptace Histogram to the end user. This may be useful to people using them in PDFs.
+  - Made sure that Numerical Integrals over the whole NormalisedSumPDF useGSL where requested. Until now only the components ran GSL, the whole PDF was always being integrated by ROOT
+  - Fixed minor bug in Histo_Processing in utils, added some extra functionality to some static routines but default behaviour is unchanged
+  - Added Per-Event object to utils, has to be built with 'make bin/Per-Event' or 'make extra'
+       Added extra binaries to 'make extra' in Makefile as most people will never use them, but if they're needed they're built without hassle
+       These are small programs designed to do some level of post-processing with RapidFit output files, at the very least they serve as examples of what can be done with the static routines I've written
+
 2013/05/07 Greig Cowan
   - Added StudentT PDF.
   - Added background PDF for Dalitz studies. Using 4D parameterisation of the background.

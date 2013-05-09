@@ -86,7 +86,7 @@ class Histogram_Processing
 		 *
 		 * @return Returns a pointer to a new TH1D that has been created
 		 */
-		static TH1* Get_TH1( const vector<Double_t>& input, TRandom* rand=NULL, int bins=100, double X_min=-DBL_MIN, double X_max=DBL_MAX );
+		static TH1* Get_TH1( const vector<Double_t>& input, TRandom* rand=NULL, int bins=100, double X_min=-DBL_MAX, double X_max=DBL_MAX );
 
 		/*!
 		 * @brief Get a TH2 from a vector of vectors which should be of outer dimension 2

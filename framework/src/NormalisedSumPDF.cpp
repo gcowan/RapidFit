@@ -145,6 +145,7 @@ void NormalisedSumPDF::SetUpIntegrator( const RapidFitIntegratorConfig* input )
 {
 	firstPDF->SetUpIntegrator( input );
 	secondPDF->SetUpIntegrator( input );
+        this->GetPDFIntegrator()->SetUpIntegrator( input );
 }
 
 void NormalisedSumPDF::TurnCachingOff()

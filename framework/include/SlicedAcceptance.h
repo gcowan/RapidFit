@@ -58,6 +58,9 @@ class AcceptanceSlice
 		 * @brief
 		 */
 		 double height() const { return _height ; }
+
+		void Print() const { cout << "Min: " << _tlow << endl << "Max: " << _thigh << endl << "Height: " << _height << endl; }
+
 	private:
 		/*!
 		 * @brief Don't Copy This Way
@@ -166,6 +169,10 @@ class SlicedAcceptance
 
 		bool GetIsSorted() const;
 
+		double GetMax() const;
+		double GetMin() const;
+
+		void Print() const;
 	private:
 		//      Uncopyable!
 		SlicedAcceptance& operator = ( const SlicedAcceptance& );
@@ -180,6 +187,12 @@ class SlicedAcceptance
 		bool _sortedSlices;
 
 		bool isSorted() const;
+
+		void FindMaxMin() const;
+
+		mutable double t_max;
+		mutable double t_min;
+		mutable bool maxminset;
 };
 
 #endif

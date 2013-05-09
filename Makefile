@@ -264,10 +264,15 @@ $(EXEDIR)/lifetime_tool: $(OBJUTILDIR)/lifetime_tool.o $(SHARED_UTIL_LIBS)
 $(OBJUTILDIR)/lifetime_tool.o: $(UTILSSRC)/lifetime_tool.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
-utils: $(EXEDIR)/weighted $(EXEDIR)/print $(EXEDIR)/RapidPlot
+$(EXEDIR)/Per-Event: $(OBJUTILDIR)/Per-Event.o $(SHARED_UTIL_LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+$(OBJUTILDIR)/Per-Event.o: $(UTILSSRC)/Per-Event.C
+	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
+
+utils:	$(EXEDIR)/print $(EXEDIR)/RapidPlot
 
 
-
+extra:	$(EXEDIR)/Per-Event $(EXEDIR)/lifetime_tool $(EXEDIR)/weighted $(EXEDIR)/ApplyWeights $(EXEDIR)/Compare $(EXEDIR)/tupleDiff $(EXEDIR)/AngularDist
 
 
 

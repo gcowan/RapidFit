@@ -23,8 +23,10 @@
 using namespace::std;
 
 //	Open a .root file without barfing if it doesn't exist, really this should be handled by ROOT SILENTLY && INTERNALLY
-TFile* ROOT_File_Processing::OpenFile( string filename )
+TFile* ROOT_File_Processing::OpenFile( string filename, string ReadWrite )
 {
+	string status = ReadWrite;
+	if( ReadWrite.empty() ) status = "READ";
 
 	ifstream input_file;
 
@@ -34,7 +36,7 @@ TFile* ROOT_File_Processing::OpenFile( string filename )
 	if( !input_file.fail() )
 	{
 		//      Open the File
-		return TFile::Open( filename.c_str() );
+		return TFile::Open( filename.c_str(), status.c_str() );
 	} else {
 		return NULL;
 	}
@@ -52,9 +54,9 @@ vector<TFile*> ROOT_File_Processing::OpenMultipleFiles( vector<string> all_filen
 	return output;
 }
 
-TTree* ROOT_File_Processing::GetFirstTree( string filename )
+TTree* ROOT_File_Processing::GetFirstTree( string filename, string ReadWrite )
 {
-	TFile* input_file = OpenFile( filename ); (void) input_file;
+	TFile* input_file = OpenFile( filename, ReadWrite ); (void) input_file;
 
 	vector<pair<string,string> > ttree_names;
 
