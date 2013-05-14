@@ -152,6 +152,6 @@ double DPBackground::Evaluate(DataPoint * measurement)
             }
         }
     }
-    if( isnan(returnable_value) || returnable_value < 0 ) return 0.;
+    if( std::isnan(returnable_value) || returnable_value < 0 ) return 0.;
 	else return returnable_value;
 }

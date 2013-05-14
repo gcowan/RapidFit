@@ -619,7 +619,7 @@ namespace Mathematics
 		{
 			testEval=-1.;
 		}
-		bool usePDF = testEval>=0. && !(isnan(testEval));
+		bool usePDF = testEval>=0. && !(std::isnan(testEval));
 
 		for (int e = 0; e < numEvents; e++)
 		{
@@ -920,7 +920,7 @@ namespace Mathematics
                 {
                     if (j < k) continue;
                     error = sqrt(1./numEvents/numEvents * ( c_sq[l][i][k][j] - c[l][i][k][j]*c[l][i][k][j]/numEvents) );
-                    if (isnan(error)) error = 0.;
+                    if (std::isnan(error)) error = 0.;
                     if ( fabs(c[l][i][k][j]/numEvents) > 5.*error )
                     {
                         sprintf( buf, "c[%d][%d][%d][%d] = %f;// +- %f", l, i, k, j, c[l][i][k][j]/numEvents, error );

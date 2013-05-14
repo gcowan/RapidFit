@@ -10,6 +10,7 @@
 <Minimiser>Minuit</Minimiser>
 <FitFunction>
 <FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+<Threads>16</Threads>
 </FitFunction>
 <ToFit>
 <PDF>

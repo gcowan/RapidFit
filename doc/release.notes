@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/05/14 Rob Currie
+  - Fixed some more isnan->std::isnan transforms which break the build for me
+  - Committed fix for bin width label in Projections... I don't know why but this was another case of ROOT not doing what I naively expected it to
+
 2013/05/09 Rob Currie
   - Added more helpful debug output to SlicedAcceptance::getValue( Observable*, double ),
        I recommend using this function over SlicedAcceptance::getValue( double ) as it is safer and explains more, but the latter is much simpler code
