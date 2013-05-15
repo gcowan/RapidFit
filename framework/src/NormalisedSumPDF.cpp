@@ -143,7 +143,7 @@ vector<string> NormalisedSumPDF::PDFComponents()
 
 void NormalisedSumPDF::SetUpIntegrator( const RapidFitIntegratorConfig* input )
 {
-	firstPDF->SetUpIntegrator( input );
+    firstPDF->SetUpIntegrator( input );
 	secondPDF->SetUpIntegrator( input );
         this->GetPDFIntegrator()->SetUpIntegrator( input );
 }
@@ -519,7 +519,7 @@ void NormalisedSumPDF::SetDebug( DebugClass* input_debug )
 
 string NormalisedSumPDF::GetComponentName( ComponentRef* componentIndexObj )
 {
-	if( componentIndexObj == NULL ) return "Unknown"; 
+	if( componentIndexObj == NULL ) return "Unknown";
 	else
 	{
 		string componentIndex = componentIndexObj->getComponentName();

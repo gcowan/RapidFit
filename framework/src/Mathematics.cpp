@@ -765,12 +765,12 @@ namespace Mathematics
 		rapidInt->SetFixedIntegralPoints(100);
         PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
 
-        const int l_max(4);
+        const int l_max(10);
         const int i_max(4);
         const int k_max(4);
         const int j_max(4);
-        //const int l_max(8); //mKpi
-        //const int i_max(2); //cosPsi
+        //const int l_max(20); //mKpi
+        //const int i_max(4); //cosPsi
         //const int k_max(2); //phi
         //const int j_max(2); //cosTheta
         double c[l_max+1][i_max+1][k_max+1][j_max+1];
@@ -808,18 +808,38 @@ namespace Mathematics
         maxima[3] = 1.59;
         // Sum the inverse PDF values over the accepted events
         // These histograms will be used for drawing the acceptance
-        TH1D * cosThetaAcc = new TH1D("cosThetaAcc", "cosThetaAcc", 20, minima[0], maxima[0]);
-        TH1D * phiAcc      = new TH1D("phiAcc", "phiAcc", 20, minima[1], maxima[1]);
-        TH1D * cosPsiAcc   = new TH1D("cosPsiAcc", "cosPsiAcc", 20, minima[2], maxima[2]);
-        TH1D * mKpiAcc     = new TH1D("mKpiAcc", "mKpiAcc", 25, minima[3], maxima[3]);
+        TH1D * cosThetaAcc = new TH1D("cosThetaAcc", "cosTheta1", 20, minima[0], maxima[0]);
+        TH1D * phiAcc      = new TH1D("phiAcc", "phi", 20, minima[1], maxima[1]);
+        TH1D * cosPsiAcc   = new TH1D("cosPsiAcc", "cosTheta2", 20, minima[2], maxima[2]);
+        TH1D * mKpiAcc     = new TH1D("mKpiAcc", "mKpiAcc", 35, minima[3], maxima[3]);
         cosThetaAcc->Sumw2();
         phiAcc->Sumw2();
         cosPsiAcc->Sumw2();
         mKpiAcc->Sumw2();
-        TH1D * cosThetaAccProj = new TH1D("cosThetaAccProj", "cosThetaAcc", 20, minima[0], maxima[0]);
-        TH1D * phiAccProj      = new TH1D("phiAccProj", "phiAcc", 20, minima[1], maxima[1]);
-        TH1D * cosPsiAccProj   = new TH1D("cosPsiAccProj", "cosPsiAcc", 20, minima[2], maxima[2]);
-        TH1D * mKpiAccProj     = new TH1D("mKpiAccProj", "mKpiAcc", 25, minima[3], maxima[3]);
+        cosThetaAcc->SetMarkerColor(kBlack);
+        phiAcc->SetMarkerColor(kBlack);
+        cosPsiAcc->SetMarkerColor(kBlack);
+        mKpiAcc->SetMarkerColor(kBlack);
+        cosThetaAcc->SetMarkerStyle(20);
+        phiAcc->SetMarkerStyle(20);
+        cosPsiAcc->SetMarkerStyle(20);
+        mKpiAcc->SetMarkerStyle(20);
+        cosThetaAcc->SetMarkerSize(0.5);
+        phiAcc->SetMarkerSize(0.5);
+        cosPsiAcc->SetMarkerSize(0.5);
+        mKpiAcc->SetMarkerSize(0.5);
+        cosThetaAcc->SetLineColor(kBlack);
+        phiAcc->SetLineColor(kBlack);
+        cosPsiAcc->SetLineColor(kBlack);
+        mKpiAcc->SetLineColor(kBlack);
+        TH1D * cosThetaAccProj = new TH1D("cosThetaAccProj", "cosTheta1", 20, minima[0], maxima[0]);
+        TH1D * phiAccProj      = new TH1D("phiAccProj", "phi", 20, minima[1], maxima[1]);
+        TH1D * cosPsiAccProj   = new TH1D("cosPsiAccProj", "cosTheta2", 20, minima[2], maxima[2]);
+        TH1D * mKpiAccProj     = new TH1D("mKpiAccProj", "mKpiAcc", 35, minima[3], maxima[3]);
+        cosThetaAccProj->SetLineWidth(2);
+        phiAccProj->SetLineWidth(2);
+        cosPsiAccProj->SetLineWidth(2);
+        mKpiAccProj->SetLineWidth(2);
 
         double mKpi(0.);
         double mKpi_mapped(0.);
@@ -921,7 +941,7 @@ namespace Mathematics
                     if (j < k) continue;
                     error = sqrt(1./numEvents/numEvents * ( c_sq[l][i][k][j] - c[l][i][k][j]*c[l][i][k][j]/numEvents) );
                     if (std::isnan(error)) error = 0.;
-                    if ( fabs(c[l][i][k][j]/numEvents) > 5.*error )
+                    if ( fabs(c[l][i][k][j]/numEvents) > 3.*error )
                     {
                         sprintf( buf, "c[%d][%d][%d][%d] = %f;// +- %f", l, i, k, j, c[l][i][k][j]/numEvents, error );
                         cout << buf << endl;
@@ -945,7 +965,8 @@ namespace Mathematics
             exit(123);
         }
         double weight(0.);
-        for ( int i = 0; i < 200000; i++ )
+        unsigned int nSample(1000000);
+        for ( int i = 0; i < nSample; i++ )
         {
             double * point = new double[4];
             double * point_mapped = new double[4];
@@ -996,35 +1017,26 @@ namespace Mathematics
         */
 
         // Normalise the histograms for drawing
-        cosThetaAcc    ->Scale(1./cosThetaAcc->Integral());
-        phiAcc         ->Scale(1./phiAcc->Integral());
-        cosPsiAcc      ->Scale(1./cosPsiAcc->Integral());
-        mKpiAcc        ->Scale(1./mKpiAcc->Integral());
-        cosThetaAccProj->Scale(1./cosThetaAccProj->Integral());
-        phiAccProj     ->Scale(1./phiAccProj->Integral());
-        cosPsiAccProj  ->Scale(1./cosPsiAccProj->Integral());
-        mKpiAccProj    ->Scale(1./mKpiAccProj->Integral());
-
+        cosThetaAccProj->Scale(1./cosThetaAccProj->Integral()*numEvents);
+        phiAccProj     ->Scale(1./phiAccProj->Integral()*numEvents);
+        cosPsiAccProj  ->Scale(1./cosPsiAccProj->Integral()*numEvents);
+        mKpiAccProj    ->Scale(1./mKpiAccProj->Integral()*numEvents);
         // Make some plots
         gStyle->SetOptStat(0);
         TCanvas * canvas = new TCanvas();
-        canvas->Divide(4,2);
+        canvas->Divide(2,2);
         canvas->cd(1);
         cosThetaAcc->Draw();
-        canvas->cd(5);
-        cosThetaAccProj->Draw("C");
+        cosThetaAccProj->Draw("Csame");
         canvas->cd(2);
         phiAcc->Draw();
-        canvas->cd(6);
-        phiAccProj->Draw("C");
+        phiAccProj->Draw("Csame");
         canvas->cd(3);
         cosPsiAcc->Draw();
-        canvas->cd(7);
-        cosPsiAccProj->Draw("C");
+        cosPsiAccProj->Draw("Csame");
         canvas->cd(4);
         mKpiAcc->Draw();
-        canvas->cd(8);
-        mKpiAccProj->Draw("C");
+        mKpiAccProj->Draw("Csame");
         canvas->SaveAs("acceptance.pdf");
         return 1.;
 	}

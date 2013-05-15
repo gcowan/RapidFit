@@ -422,6 +422,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
 
 	gsl_qrng * q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)(doIntegrate.size()) );
+	//gsl_qrng * q = gsl_qrng_alloc( gsl_qrng_niederreiter_2, (unsigned)(doIntegrate.size()) );
 	for (unsigned int i = 0; i < npoint; i++)
 	{
 		double v[doIntegrate.size()];
@@ -528,7 +529,8 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	gsl_qrng * q = NULL;
 	try
 	{
-		q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)doIntegrate.size() );
+		//q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)doIntegrate.size() );
+		q = gsl_qrng_alloc( gsl_qrng_niederreiter_2, (unsigned)doIntegrate.size() );
 	}
 	catch(...)
 	{

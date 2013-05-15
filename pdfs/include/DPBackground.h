@@ -22,6 +22,9 @@ class DPBackground : public BasePDF
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
 
+    protected:
+        double Normalisation( PhaseSpaceBoundary * );
+
 	private:
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
@@ -38,10 +41,10 @@ class DPBackground : public BasePDF
 		double phi;
 
         // Background parameterisation
-        static const int l_max = 5;
+        static const int l_max = 6;
         static const int i_max = 4;
-        static const int k_max = 0;
-        static const int j_max = 4;
+        static const int k_max = 2;
+        static const int j_max = 2;
         double c[l_max+1][i_max+1][k_max+1][j_max+1];
 };
 
