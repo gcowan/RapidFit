@@ -815,7 +815,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				//chi2 = chi2_2;
 
 				//	dof = num Populated Bins - ndof in PDF
-				N =  binned_data.back()->GetXaxis()->GetNbins();//plotData->GetDataNumber(NULL,true);
+				N =  binned_data.back()->GetXaxis()->GetNbins();//plotData->GetDataNumber(NULL);
 				for( unsigned int i=0; i< (unsigned) binned_data[0]->GetN(); ++i ) if( fabs(binned_data[combinationIndex]->GetY()[i]) <= 0 ) --N;
 
 				double n = (double) plotPDF->GetPhysicsParameters()->GetAllFloatNames().size();
@@ -1253,6 +1253,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
 	input_data->GetYaxis()->SetTitle( Y_Title );
+	input_data->GetYaxis()->SetTitleSize( 0.95*input_data->GetYaxis()->GetTitleSize() );
 	input_data->GetXaxis()->SetRangeUser( X_min, X_max );
 	input_data->GetXaxis()->SetTitle( X_Title );
 	//input_data->GetXaxis()->CenterTitle( true );
@@ -1556,9 +1557,9 @@ void ComponentPlotter::SetupCombinationDescriptions()
 	//      If we have 'no discrete combinations' then get the whole dataset for this pdf
 	vector<DataPoint*> whole_dataset;
 
-	cout << plotData->GetDataNumber(NULL,true) << endl;
+	cout << plotData->GetDataNumber(NULL) << endl;
 
-	for( int i=0; i< plotData->GetDataNumber(); ++i )
+	for( int i=0; i< plotData->GetDataNumber(NULL); ++i )
 	{
 		whole_dataset.push_back( plotData->GetDataPoint( i ) );
 	}
@@ -1743,7 +1744,7 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 	}
 
 	double sum=0.;
-	for( int i=0 ; i < plotData->GetDataNumber(NULL,true); ++i )
+	for( int i=0 ; i < plotData->GetDataNumber(NULL); ++i )
 	{
 		sum+=plotData->GetDataPoint( i )->GetObservable( input )->GetValue();
 	}
@@ -1753,7 +1754,7 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 		if( debug->DebugThisClass( "ComponentPlotter" ) )
 		{
 			cout << "ComponentPlotter: Sum of Weights: " << sum << endl;
-			cout << "ComponentPlotter: DataSet Size: " << plotData->GetDataNumber() << endl;
+			cout << "ComponentPlotter: DataSet Size: " << plotData->GetDataNumber(NULL) << endl;
 		}
 	}
 	weightsWereUsed = true;
@@ -1779,7 +1780,7 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 	}
 
 	ObservableRef* weight_ref = new ObservableRef( weightName );
-	for( int i=0 ; i < plotData->GetDataNumber(NULL,true); ++i )
+	for( int i=0 ; i < plotData->GetDataNumber(NULL); ++i )
 	{
 		wanted_weights.push_back( plotData->GetDataPoint( i )->GetObservable( *weight_ref )->GetValue() );
 	}
@@ -1788,7 +1789,7 @@ void ComponentPlotter::SetWeightsWereUsed( string input )
 	weight_norm=0.;
 	double weight_sum=plotData->GetSumWeights();
 
-	weight_norm = weight_sum / plotData->GetDataNumber(NULL,true);
+	weight_norm = weight_sum / plotData->GetDataNumber(NULL);
 
 	if( debug != NULL )
 	{
@@ -1856,7 +1857,7 @@ double ComponentPlotter::PDF2DataNormalisation( const unsigned int combinationIn
 	normalisation *= fabs(ratioOfIntegrals[ combinationIndex ]);			//	Attempt to correct for Numerical != analytical due to any constant factor due to numerical inaccuracy
 	//	(some constant close to 1. exactly 1. for numerical PDFs)
 
-	double dataNum = plotData->GetDataNumber( allCombinations[combinationIndex], true );
+	double dataNum = plotData->GetDataNumber( allCombinations[combinationIndex] );
 	normalisation *= dataNum / (double) data_binning;				//	Normalise to this density of events	(Num of events per bin in flatPDF)
 
 	double range = fabs( boundary_max-boundary_min );

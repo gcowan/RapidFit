@@ -1,5 +1,15 @@
 // $Id: release.notes $
 
+2013/05/15
+  - Added OptimisedGauss PDF to keep the SimpleGauss PDF as simple as possible so people can focus on RapidFit PDF structure
+  - 'Fixed' the GetDataNumber( DataPoint* input ) where input!=NULL
+      This replaces about 50 lines of code with 2 functions which makes life a lot simpler to understand.
+      This new code makes no attempt to cache lookup results and is potentially an extremely expensive operation to call when input!=NULL, but it's only used in non CPU limited code elsewhere atm
+  - Added additional output when reading in data which informs the user how many datapoints are in each discrete combination
+  - Added pair< vector<string>, vector<double > > PhaseSpaceBoundary::GetDiscreteInfo to work with IDataSet::GetDiscreteSubSet to make life easier when wanting the subset of data for a certain discrete observable combination.
+  - Minor improvement ot the Y axis title in ComponentPlotter and updated the code to use the cleaner IDataSet::GetDiscreteSubSet interface
+  - Updated XML in tutorial directory to fix broken XML
+
 2013/05/15 Greig Cowan
   - Updated code for calculating acceptance/background coefficients.
   - Changed default QRNG for GSL integration.

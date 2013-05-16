@@ -70,7 +70,7 @@ int main( int argc, char* argv[] )
 
 		vector<double> OneDiff;
 		vector<double> TwoDiff;
-		vector<double> Diff;
+		vector<double> AbsDiff;
 
 		vector<double> OnePull;
 		vector<double> TwoPull;
@@ -105,7 +105,7 @@ int main( int argc, char* argv[] )
 
 				OneDiff.push_back( OneDiffVal );
 				TwoDiff.push_back( TwoDiffVal );
-				Diff.push_back( DiffVal );
+				AbsDiff.push_back( DiffVal );
 				OnePull.push_back( OnePullVal );
 				TwoPull.push_back( TwoPullVal );
 				Pull.push_back( PullVal );
@@ -116,7 +116,7 @@ int main( int argc, char* argv[] )
 			{
 				OneDiff.push_back( -9999. );
 				TwoDiff.push_back( -9999. );
-				Diff.push_back( -9999. );
+				AbsDiff.push_back( -9999. );
 				OnePull.push_back( -9999. );
 				TwoPull.push_back( -9999. );
 				Pull.push_back( -9999. );
@@ -136,7 +136,7 @@ int main( int argc, char* argv[] )
 
 		TTree_Processing::AddBranch( outputTree, Param_Diff1, OneDiff );
 		TTree_Processing::AddBranch( outputTree, Param_Diff2, TwoDiff );
-		TTree_Processing::AddBranch( outputTree, DiffBranch, Diff );
+		TTree_Processing::AddBranch( outputTree, DiffBranch, AbsDiff );
 		TTree_Processing::AddBranch( outputTree, Param_Pull1, OnePull );
 		TTree_Processing::AddBranch( outputTree, Param_Pull2, TwoPull );
 		TTree_Processing::AddBranch( outputTree, Pull_Name, Pull );
@@ -150,8 +150,75 @@ int main( int argc, char* argv[] )
 		vector<double> DiffPlotData;
 		for( unsigned int i=0; i< PullDiff.size(); ++i ) if( PullDiff[i] > -9999. ) DiffPlotData.push_back( PullDiff[i] );
 
+		vector<double> AbsDiffData;
+		for( unsigned int i=0; i< AbsDiff.size(); ++i ) if( AbsDiff[i] > -9999. ) AbsDiffData.push_back( AbsDiff[i] );
+
 		string DiffPlotFileName = "PerEventOutput/"; DiffPlotFileName.append( PullDiff_Name ); DiffPlotFileName.append(".pdf");
-		Histogram_Processing::Plot_1D( DiffPlotData, DiffPlotFileName, "PE9" );
+		TString ThisCanv("ThisCanv");ThisCanv+=name_i;
+		TCanvas* c0 = new TCanvas( ThisCanv, ThisCanv );
+		TH1* thisTH1 = Histogram_Processing::Plot_1D( DiffPlotData, DiffPlotFileName, "PE9" );
+		c0->cd();
+		thisTH1->Draw( "PE9" );
+		c0->Update();
+		c0->Print( DiffPlotFileName.c_str() );
+
+		TString FuncName="newfunc_"; FuncName+=name_i;
+		//TF1* newFunc = new TF1( FuncName, "[0]*exp(-((x-[1])*(x-[1])/[2])) + [3]*exp(-((x-[4])*(x-[4])/[5]))" );
+		TF1* newFunc = new TF1( FuncName, "[0]*exp(-((x-[1])*(x-[1])/[2])) + [3]*exp(-((x-[1])*(x-[1])/[4]))" );
+		newFunc->SetParameter( 0, 100);
+		//newFunc->SetParameter( 1, 0.05);
+		newFunc->SetParameter( 1, thisTH1->GetBinCenter( thisTH1->GetMaximumBin()) );
+		newFunc->SetParameter( 2, 1.);
+		newFunc->SetParameter( 3, 500);
+		//newFunc->SetParameter( 4, -0.1);
+		//newFunc->SetParameter( 5, 50.);
+		newFunc->SetParameter( 4, 50. );
+
+		TString CanvName = "Canvas_"; CanvName+=name_i;
+		TCanvas* thisCanv = new TCanvas( CanvName, CanvName );
+
+		thisTH1->Fit( newFunc, "M" );
+
+		thisCanv->Update();
+
+		TString X_Title = allNames[name_i]; X_Title.Append( " Difference in measured Pull" );
+		thisTH1->GetYaxis()->SetTitle( "# of Results" );
+		thisTH1->GetXaxis()->SetTitle( X_Title );
+
+		thisCanv->Update();
+
+		TString FitFileName = "PerEventOutput/"; FitFileName.Append( PullDiff_Name ); FitFileName.Append( "_Fit.pdf" );
+		thisCanv->Print( FitFileName );
+
+		string DiffFileName = "PerEventOutput/Abs_"; DiffFileName.append( PullDiff_Name ); DiffFileName.append(".pdf");
+		TString ThisCanv2("ThisCanv"); ThisCanv2+=name_i; ThisCanv2.Append("_2");
+		TCanvas* c1 = new TCanvas( ThisCanv2, ThisCanv2 );
+		c1->cd();
+
+		TH1* thisTH1_2 = Histogram_Processing::Plot_1D( AbsDiffData, DiffFileName, "PE9" );
+		c1->cd();
+		thisTH1_2->Draw( "PE9" );
+		c1->Update();
+		thisTH1_2->GetYaxis()->SetTitle( "# of Results" );
+		X_Title = allNames[name_i]; X_Title.Append( " Absolute Difference" );
+		thisTH1_2->GetXaxis()->SetTitle( X_Title );
+		c1->Update();
+
+		TString FuncName2="newfunc2_"; FuncName2+=name_i;
+		TF1* newFunc2 = new TF1( FuncName2, "[0]*exp(-((x-[1])*(x-[1])/[2])) + [3]*exp(-((x-[1])*(x-[1])/[4]))" );
+                newFunc2->SetParameter( 0, 200.);
+                //newFunc2->SetParameter( 1, 0.05);
+                newFunc2->SetParameter( 1, thisTH1_2->GetBinCenter( thisTH1_2->GetMaximumBin()) );
+                newFunc2->SetParameter( 2, 0.3);
+                newFunc2->SetParameter( 3, 1000.);
+                //newFunc2->SetParameter( 4, -0.1);
+                //newFunc2->SetParameter( 5, 50.);
+                newFunc2->SetParameter( 4, 0.01 );
+
+		thisTH1_2->Fit( newFunc2, "M" );
+		c1->Update();
+
+		c1->Print( DiffFileName.c_str() );
 	}
 
 	/*

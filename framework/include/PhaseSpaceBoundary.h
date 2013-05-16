@@ -35,6 +35,8 @@ class PhaseSpaceBoundary
 		vector<string> GetDiscreteNames() const;
 		vector<string> GetContinuousNames() const;
 
+		pair< vector<string>, vector<double > > GetDiscreteInfo( DataPoint* input ) const;
+
 		bool SetConstraint( string, IConstraint* );
 		bool SetConstraint( string, double, double, string );
 		bool SetConstraint( string, vector<double>, string );

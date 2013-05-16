@@ -87,11 +87,15 @@ DataPoint * MemoryDataSet::GetDataPoint( int Index ) const
 }
 
 //Get the number of data points in the set
-int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint, bool silence ) const
+int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint ) const
 {
-	if( templateDataPoint == NULL )	return int(allData.size());
+	if( templateDataPoint == NULL )	return (int)allData.size();
 	else
 	{
+		pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( templateDataPoint );
+		unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
+		return (int) dataPointNum;
+		/*
 		try
 		{
 			int number = allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint, silence ) ];
@@ -165,6 +169,7 @@ int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint, bool silence ) c
 
 			return total_count;
 		}
+		*/
 	}
 }
 
@@ -222,8 +227,13 @@ void MemoryDataSet::SortBy( string parameter )
 	cout << "Sorted" << endl;
 }
 
-vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( vector<string> discreteParam, vector<double> discreteVal )
+vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const
 {
+	if( discreteParam.empty() || discreteVal.empty() )
+	{
+		return allData;
+	}
+
 	vector<DataPoint*> returnable_subset;
 	if( discreteParam.size() != discreteVal.size() )
 	{
@@ -322,10 +332,42 @@ void MemoryDataSet::Print() const
 		avr/=(double)allData.size(); avr_sq/=(double)allData.size();
 		double err = sqrt( avr_sq - avr*avr );
 		cout << "DataSet contains a total of:     " << total << " ± " << err << "     SIGNAL events.(" << allData.size() << " total). In " << this->GetBoundary()->GetNumberCombinations() << " Discrete DataSets." << endl;
+		if( this->GetBoundary()->GetNumberCombinations() > 1 )
+		{
+			vector<DataPoint*> combinations = this->GetBoundary()->GetDiscreteCombinations();
+			for( unsigned int i=0; i< combinations.size(); ++i )
+			{
+				string description = this->GetBoundary()->DiscreteDescription( combinations[i] );
+				for( unsigned int j=0; j< description.size(); ++j )
+				{
+					if( description[j] == '\n' ) description[j] = ' ';
+					if( description[j] == '\t' ) description[j] = ' ';
+				}
+				pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
+				unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
+				cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
+			}
+		}
 	}
 	else
 	{
 		cout << "DataSet contains a total of:     " << allData.size() << "     events. In " << this->GetBoundary()->GetNumberCombinations() << " Discrete DataSets." << endl;
+		if( this->GetBoundary()->GetNumberCombinations() > 1 )
+		{
+			vector<DataPoint*> combinations = this->GetBoundary()->GetDiscreteCombinations();
+			for( unsigned int i=0; i< combinations.size(); ++i )
+			{
+				string description = this->GetBoundary()->DiscreteDescription( combinations[i] );
+				for( unsigned int j=0; j< description.size(); ++j )
+				{
+					if( description[j] == '\n' ) description[j] = ' ';
+					if( description[j] == '\t' ) description[j] = ' ';
+				}
+				pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
+				unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
+				cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
+			}
+		}
 	}
 }
 

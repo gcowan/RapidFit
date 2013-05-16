@@ -109,6 +109,35 @@ vector<string> PhaseSpaceBoundary::GetContinuousNames() const
 	return cont_names;
 }
 
+pair< vector<string>, vector<double> > PhaseSpaceBoundary::GetDiscreteInfo( DataPoint* input ) const
+{
+	vector<string> discreteInfoNames = this->GetDiscreteNames();
+	vector<double> discreteInfoValues;
+	for( unsigned int i=0; i< discreteInfoNames.size(); ++i )
+	{
+		ObservableDiscreteConstraint* thisDisc = (ObservableDiscreteConstraint*) this->GetConstraint( discreteInfoNames[i] );
+		vector<double> possibleValues = thisDisc->GetValues();
+		double thisValue = input->GetObservable( discreteInfoNames[i] )->GetValue();
+		for( unsigned int j=0; j< possibleValues.size(); ++j )
+		{
+			if( fabs( possibleValues[j] - thisValue ) < 1E-5 )
+			{
+				discreteInfoValues.push_back( possibleValues[j] );
+				break;
+			}
+		}
+	}
+
+	if( discreteInfoNames.size() == discreteInfoValues.size() )
+	{
+		return make_pair( discreteInfoNames, discreteInfoValues );
+	}
+	else
+	{
+		return make_pair( vector<string>(), vector<double>() );
+	}
+}
+
 void PhaseSpaceBoundary::RemoveConstraint( string Name )
 {
 	int lookup = StringProcessing::VectorContains( &allNames, &Name );

@@ -106,7 +106,11 @@ bool XMLConfigReader::TestXML()
 			else if( name == "CommonPhaseSpace" ) ++numCommonPhaseSpaces;
 			else
 			{
+				cout << endl << endl;
+				cout << "!!!WARNING!!!" << endl;
 				cout << "XMLConfigReader: Possible Error, Tag: <" << name << "> unknown. Ignoring!" << endl;
+				cout << "!!!WARNING!!!" << endl;
+				cout << endl << endl;
 			}
 		}
 		bool returnable=true;

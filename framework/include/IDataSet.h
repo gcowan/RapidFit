@@ -55,7 +55,7 @@ class IDataSet
 		 *
 		 * @return Returns the size of the DataSet (this could/should be an unsigned int, but this would require fixing a lot more warnings in RapidFit)
 		 */
-		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL, bool silence=false ) const = 0;
+		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL ) const = 0;
 
 		/*!
 		 * @brief Interface Function:
@@ -89,7 +89,7 @@ class IDataSet
 		 *
 		 * @return Returns a vector of DataPoints, This could be a seperate DataSet, but we do NOT duplicate the data or expect it to be changed/deleted this is effectively a wrapper to many calls to GetDataPoint
 		 */
-		virtual vector<DataPoint*> GetDiscreteSubSet( vector<string> Names, vector<double> Values ) = 0;
+		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<string> Names, const vector<double> Values ) const = 0;
 
 		/*!
 		 * @brief Interface Function:

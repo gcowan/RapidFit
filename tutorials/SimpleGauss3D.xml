@@ -21,8 +21,8 @@
 </ParameterSet>
 <Minimiser>Minuit</Minimiser>
 <FitFunction>
-<FunctionName>NegativeLogLikelihood</FunctionName>
-#<UseGSLNumericalIntegration>True</UseGSLNumericalIntegration>
+<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+<UseGSLNumericalIntegration>True</UseGSLNumericalIntegration>
 </FitFunction>
 <ToFit>
 <PDF>
@@ -51,7 +51,10 @@
 </DataSet>
 </ToFit>
 <Output>
-<Projection>x</Projection>
+<Projection>
+<Name>x</Name>
+<Threads>6</Threads>
+</Projection>
 <Scan>
 <Name>sigma</Name>
 <Sigma>3</Sigma>

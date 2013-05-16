@@ -28,13 +28,13 @@ class MemoryDataSet : public IDataSet
 		//Interface functions
 		virtual DataPoint * GetDataPoint(int) const;
 		virtual bool AddDataPoint( DataPoint* );
-		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL, bool silence=false ) const;
+		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL ) const;
 		virtual PhaseSpaceBoundary * GetBoundary() const;
 		virtual void SetBoundary( const PhaseSpaceBoundary* );
 
 		virtual void SortBy( string );
 
-		virtual vector<DataPoint*> GetDiscreteSubSet( vector<string> discreteParam, vector<double> discreteVal );
+		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const;
 
 		void Clear();
 

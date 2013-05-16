@@ -271,8 +271,8 @@ Bs2JpsiPhi_Signal_v5::Bs2JpsiPhi_Signal_v5(PDFConfigurator* configurator) : Base
 
 	if( timeAcc == NULL )
 	{
-		timeAcc = new SlicedAcceptance( 0., 14. ) ;
-		cout << "Bs2JpsiPhi_Signal_v5:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
+		timeAcc = new SlicedAcceptance( 0., 20. ) ;
+		cout << "Bs2JpsiPhi_Signal_v5:: Constructing timeAcc: DEFAULT FLAT [0 < t < 20]  " << endl ;
 	}
 
 	//Make empty Cache for the time integrals. This has to be done now after the SlicedAcceptance is created
