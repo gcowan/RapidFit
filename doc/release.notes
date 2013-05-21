@@ -1,10 +1,11 @@
 // $Id: release.notes $
 
-2013/05/21
+2013/05/21 Greig Cowan
+  - Changed number of terms in efficiency parameterisation for DP PDF.
   - Found bug in Mathematics when plotting projections of parameterised efficiency/background.
   - Added DPTotalAmplitudePDF_withAcc_withBkg
 
-2013/05/15
+2013/05/15 Rob Currie
   - Added OptimisedGauss PDF to keep the SimpleGauss PDF as simple as possible so people can focus on RapidFit PDF structure
   - 'Fixed' the GetDataNumber( DataPoint* input ) where input!=NULL
       This replaces about 50 lines of code with 2 functions which makes life a lot simpler to understand.

@@ -260,8 +260,8 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 
         // Acceptance parameterisation
         bool useAngularAcceptance;
-        static const int l_max = 4;
-        static const int i_max = 4;
+        static const int l_max = 6;
+        static const int i_max = 6;
         static const int k_max = 4;
         static const int j_max = 4;
         double c[l_max+1][i_max+1][k_max+1][j_max+1];

@@ -765,8 +765,8 @@ namespace Mathematics
 		rapidInt->SetFixedIntegralPoints(100);
         PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
 
-        const int l_max(10);
-        const int i_max(4);
+        const int l_max(6);
+        const int i_max(6);
         const int k_max(4);
         const int j_max(4);
         //const int l_max(10); //mKpi
@@ -941,7 +941,7 @@ namespace Mathematics
                     if (j < k) continue;
                     error = sqrt(1./numEvents/numEvents * ( c_sq[l][i][k][j] - c[l][i][k][j]*c[l][i][k][j]/numEvents) );
                     if (std::isnan(error)) error = 0.;
-                    if ( fabs(c[l][i][k][j]/numEvents) > 3.*error )
+                    if ( fabs(c[l][i][k][j]/numEvents) > 5.*error )
                     {
                         sprintf( buf, "c[%d][%d][%d][%d] = %f;// +- %f", l, i, k, j, c[l][i][k][j]/numEvents, error );
                         cout << buf << endl;
@@ -965,7 +965,7 @@ namespace Mathematics
             exit(123);
         }
         double weight(0.);
-        unsigned int nSample(1000000);
+        unsigned int nSample(500000);
         for ( int i = 0; i < nSample; i++ )
         {
             double * point = new double[4];
