@@ -769,7 +769,7 @@ namespace Mathematics
         const int i_max(4);
         const int k_max(4);
         const int j_max(4);
-        //const int l_max(20); //mKpi
+        //const int l_max(10); //mKpi
         //const int i_max(4); //cosPsi
         //const int k_max(2); //phi
         //const int j_max(2); //cosTheta
@@ -976,10 +976,11 @@ namespace Mathematics
             {
                 point_mapped[j] = point[j]*(maxima[j]-minima[j])+minima[j];
                 if ( j > 2 ) {
-                    point_mapped[j] = point[j]*(maxima[j]-minima[j])*2 + (-1.);
+                    point_mapped[j] = point[j]*2 + (-1.);
                     mKpi_range  = point[j]*(maxima[j]-minima[j]) + minima[j];
                 }
             }
+            //cout << point_mapped[0] << " " << point_mapped[1] << " " << point_mapped[2] << " " << point_mapped[3] << " " << mKpi_range << endl;
             weight = param->parameterisation( point_mapped , NULL);
             tree->Fill(point_mapped[0], point_mapped[1], point_mapped[2], mKpi_range, weight);
             delete point;

@@ -1,6 +1,7 @@
 // $Id: release.notes $
 
 2013/05/21
+  - Found bug in Mathematics when plotting projections of parameterised efficiency/background.
   - Added DPTotalAmplitudePDF_withAcc_withBkg
 
 2013/05/15
