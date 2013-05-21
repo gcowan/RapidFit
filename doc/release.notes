@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/05/21
+  - Added DPTotalAmplitudePDF_withAcc_withBkg
+
 2013/05/15
   - Added OptimisedGauss PDF to keep the SimpleGauss PDF as simple as possible so people can focus on RapidFit PDF structure
   - 'Fixed' the GetDataNumber( DataPoint* input ) where input!=NULL
