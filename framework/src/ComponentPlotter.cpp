@@ -1470,56 +1470,9 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	TString Clean_Description = StringProcessing::Clean( CombinationDescription.c_str() );
 
-	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
-	ofstream filestr;
-
-	if( debug != NULL )
-	{
-		if( !debug->DebugThisClass("ComponentPlotter") )
-		{
-			filestr.open ("/dev/null");
-			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
-			cout_bak = cout.rdbuf();
-			cerr_bak = cerr.rdbuf();
-			clog_bak = clog.rdbuf();
-			nullbuf = filestr.rdbuf();
-			cout.rdbuf(nullbuf);
-			cerr.rdbuf(nullbuf);
-			clog.rdbuf(nullbuf);
-		}
-	}
-	else
-	{
-		filestr.open ("/dev/null");
-		//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
-		cout_bak = cout.rdbuf();
-		cerr_bak = cerr.rdbuf();
-		clog_bak = clog.rdbuf();
-		nullbuf = filestr.rdbuf();
-		cout.rdbuf(nullbuf);
-		cerr.rdbuf(nullbuf);
-		clog.rdbuf(nullbuf);
-	}
-
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
-
-	if( debug != NULL )
-	{
-		if( !debug->DebugThisClass("ComponentPlotter") )
-		{
-			cout.rdbuf( cout_bak );
-			cerr.rdbuf( cerr_bak );
-			clog.rdbuf( clog_bak );
-		}
-	}
-	else
-	{
-		cout.rdbuf( cout_bak );
-		cerr.rdbuf( cerr_bak );
-		clog.rdbuf( clog_bak );
-	}
 
 }
 
@@ -1980,55 +1933,9 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 
 	TString Clean_Description = StringProcessing::Clean( CombinationDescription.c_str() );
 
-	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL, *nullbuf=NULL;
-	ofstream filestr;
-
-	if( debug != NULL )
-	{
-		if( !debug->DebugThisClass( "ComponentPlotter" ) )
-		{
-			filestr.open ("/dev/null");
-			//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
-			cout_bak = cout.rdbuf();
-			cerr_bak = cerr.rdbuf();
-			clog_bak = clog.rdbuf();
-			nullbuf = filestr.rdbuf();
-			cout.rdbuf(nullbuf);
-			cerr.rdbuf(nullbuf);
-			clog.rdbuf(nullbuf);
-		}
-	}
-	else
-	{
-		//      If the user wanted silence we point the Std Output Streams to the oblivion of NULL
-		cout_bak = cout.rdbuf();
-		cerr_bak = cerr.rdbuf();
-		clog_bak = clog.rdbuf();
-		nullbuf = filestr.rdbuf();
-		cout.rdbuf(nullbuf);
-		cerr.rdbuf(nullbuf);
-		clog.rdbuf(nullbuf);
-	}
-
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".C") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
-
-	if( debug != NULL )
-	{
-		if( !debug->DebugThisClass( "ComponentPlotter" ) )
-		{
-			cout.rdbuf( cout_bak );
-			cerr.rdbuf( cerr_bak );
-			clog.rdbuf( clog_bak );
-		}
-	}
-	else
-	{
-		cout.rdbuf( cout_bak );
-		cerr.rdbuf( cerr_bak );
-		clog.rdbuf( clog_bak );
-	}
 
 	return pullGraph;
 }

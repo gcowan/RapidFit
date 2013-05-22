@@ -269,10 +269,16 @@ $(EXEDIR)/Per-Event: $(OBJUTILDIR)/Per-Event.o $(SHARED_UTIL_LIBS)
 $(OBJUTILDIR)/Per-Event.o: $(UTILSSRC)/Per-Event.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
+#       Tool for printing information about a ROOT file and it's contents
+$(EXEDIR)/plotDists: $(OBJUTILDIR)/plotDists.o $(SHARED_UTIL_LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+$(OBJUTILDIR)/plotDists.o: $(UTILSSRC)/plotDists.C
+	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
+
 utils:	$(EXEDIR)/print $(EXEDIR)/RapidPlot
 
 
-extra:	$(EXEDIR)/Per-Event $(EXEDIR)/lifetime_tool $(EXEDIR)/weighted $(EXEDIR)/ApplyWeights $(EXEDIR)/Compare $(EXEDIR)/tupleDiff $(EXEDIR)/AngularDist
+extra:	$(EXEDIR)/Per-Event $(EXEDIR)/lifetime_tool $(EXEDIR)/weighted $(EXEDIR)/ApplyWeights $(EXEDIR)/Compare $(EXEDIR)/tupleDiff $(EXEDIR)/AngularDist $(EXEDIR)/plotDists
 
 
 

@@ -1,5 +1,15 @@
 // $Id: release.notes $
 
+2013/05/22 Rob Currie
+  - Added simple tool 'plotDists' to the make extra build list and svn
+      This is a simple tool for plotting the contents of an nTuple in a well formatted way quickly.
+      The tool will take multiple arguments and has quite a few 'sensible' defaults hard-coded in a way that are easily changeable
+      I was going to have to write a script of similar length for some plots I need for my thesis so made this as a little exercise in the benefits of modular programming
+      It should be easy to expand this tool if anyone wants to use it as most of the code should be self documenting
+  - Expanded EdStyle with a few missing Observable Names from the Jpsi analysis
+  - Added an additional line telling you where the output from your fit has been stored to make my life easier when running many fits
+  - Removed some pointless code in ComponentPlotter
+
 2013/05/21 Greig Cowan
   - Changed number of terms in efficiency parameterisation for DP PDF.
   - Found bug in Mathematics when plotting projections of parameterised efficiency/background.

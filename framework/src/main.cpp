@@ -44,6 +44,7 @@
 #include "ParseCommandLine.h"
 #include "JackKnife.h"
 #include "RapidRun.h"
+#include "ResultFormatter.h"
 ///  System Headers
 #include <string>
 #include <vector>
@@ -285,6 +286,10 @@ int RapidFit( vector<string> input )
 	//}
 
 
+	cout << "Any Fit Results and Projection Outputs are Stored in: " << ResultFormatter::GetOutputFolder().c_str() << endl;
+
+	//	thisConfig performs a cleanup on the ResultFormatter outputFolder object.
+	//	This is safe as long as it's not needed after here!
 	delete thisConfig;
 
 	RapidFitExit();

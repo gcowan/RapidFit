@@ -173,7 +173,7 @@ class EdStyle {
 		static Style_t GetSolidFillStyle();
 		static Font_t GetLHCbFont();
 
-		static TCanvas* RapidFitCanvas( TString Name, TString Title );
+		static TCanvas* RapidFitCanvas( TString Name, TString Title="" );
 
 		/*!
 		 * @brief Destructor

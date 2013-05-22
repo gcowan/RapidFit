@@ -284,11 +284,11 @@ TString EdStyle::GetParamRootUnit( string Param_Name )
 
 		returnable_string = "[ps]";
 
-	} else if ( Param_Name == "helphi" ) {
+	} else if ( ( Param_Name == "helphi" ) || ( Param_Name == "trphi" ) ) {
 
 		returnable_string = "[rad]";
 
-	} else if ( Param_Name == "helcosthetaK" || Param_Name == "helcosthetaL" ) {
+	} else if ( ( Param_Name == "helcosthetaK" || Param_Name == "helcosthetaL" ) || ( Param_Name == "trcostheta" || Param_Name == "trcospsi" ) ) {
 
 		returnable_string = "unitless";
 	}
@@ -563,6 +563,30 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 	} else if ( Param_Name == "timeResolutionScale" ) {
 
 		returnable_string = "#sigma(#tau)_{scale}^{resolution}";
+
+	} else if ( Param_Name == "helcosthetaK" ) {
+
+		returnable_string = "cos(#theta_{K})";
+
+	} else if ( Param_Name == "helcosthetaL" ) {
+
+		returnable_string = "cos(#theta_{#mu})";
+
+	} else if ( Param_Name == "helphi" ) {
+
+		returnable_string = "#phi_{H}";
+
+	} else if ( Param_Name == "trcostheta" ) {
+
+		returnable_string = "cos(#theta)";
+
+	} else if ( Param_Name == "trcospsi" ) {
+
+		returnable_string = "cos(#psi)";
+
+	} else if ( Param_Name == "trphi" ) {
+
+		returnable_string = "#phi";
 
 	} else {
 
@@ -1241,6 +1265,7 @@ Font_t EdStyle::GetLHCbFont()
 
 TCanvas* EdStyle::RapidFitCanvas( TString Name, TString Title )
 {
+	if( StringProcessing::is_empty( Title ) ) Title = Name;
 	TCanvas* returnable = new TCanvas();
 	returnable->SetName( Name );
 	returnable->SetTitle( Title );

@@ -19,6 +19,7 @@
 ///	System Headers
 #include <vector>
 #include <limits>
+#include <float>
 
 using namespace::std;
 
@@ -177,7 +178,7 @@ class Histogram_Processing
 		static TPaveText* addLHCbLabel(TString footer, bool final=false );
 
 		//	Plot a vector to a 1D file and return a pointer to the histogram created when this was done
-		static TH1* Plot_1D( const vector<double>& input, TString Filename, TString Options, TRandom* rand=NULL );
+		static TH1* Plot_1D( const vector<double>& input, TString Filename, TString Options, TRandom* rand=NULL, int bins=100, double min=-DBL_MAX, double max=DBL_MAX );
 
 		//	Plot 2 vectors to a 2D file and return a pointer to the histogram created when this was done
 		static TH2* Plot_2D( const vector<double>& X, const vector<double>& Y, TString Filename, TString Option, TRandom* rand=NULL );

@@ -345,7 +345,8 @@ void ResultFormatter::initOutputFolder()
 void ResultFormatter::WriteOutputLatex( FitResult* OutputData )
 {
 	TString output_folder;
-	if( thisOutputFolder->empty() )
+	if( thisOutputFolder == NULL )	ResultFormatter::initOutputFolder();
+	else if( thisOutputFolder->empty() )
 	{
 		ResultFormatter::initOutputFolder();
 	}

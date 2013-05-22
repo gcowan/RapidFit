@@ -320,12 +320,12 @@ TH1* Histogram_Processing::Get_TH1( const vector<Double_t>& input, TRandom* rand
 	return returnable_hist;
 }
 
-TH1* Histogram_Processing::Plot_1D( const vector<double>& input, TString Filename, TString Options, TRandom* rand )
+TH1* Histogram_Processing::Plot_1D( const vector<double>& input, TString Filename, TString Options, TRandom* rand, int bins, double min, double max )
 {
 	if( rand == NULL ) rand = gRandom;
 	if( input.empty() ) return NULL;
 
-	TH1* temp_histo = Histogram_Processing::Get_TH1( input, rand );
+	TH1* temp_histo = Histogram_Processing::Get_TH1( input, rand, bins, min, max );
 
 	TString canv_name("canv_"); canv_name+=rand->Rndm();
         string rand_num( canv_name.Data() );
