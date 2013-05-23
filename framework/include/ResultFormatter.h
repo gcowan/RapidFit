@@ -43,6 +43,8 @@ class ResultFormatter
 
 		static void WriteOutputLatex( FitResult* OutputData );
 
+		static void LatexJustFitResultTable( FitResult * OutputData, stringstream& latex );
+		static void LatexToShareResultTable( FitResult * OutputData, stringstream& latex );
 		static void LatexSimpleFitResultTable( FitResult * OutputData, stringstream& latex );
 		static void LatexFullFitResultTable( FitResult * OutputData, stringstream& latex );
 		static void LatexMinimumFitResultTable( FitResult * OutputData, stringstream& latex );

@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/05/23 Rob Currie
+  - Based on something I learnt writing my thesis I've corrected the estimated error from the yield of a weighted dataset
+      (I'm not sure what the old code was calculating, but it was obviously wrong...)
+  - Fixed minor typos and made minor changes in utils folder
+
 2013/05/22 Rob Currie
   - Added simple tool 'plotDists' to the make extra build list and svn
       This is a simple tool for plotting the contents of an nTuple in a well formatted way quickly.

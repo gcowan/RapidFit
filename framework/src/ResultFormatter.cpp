@@ -357,6 +357,14 @@ void ResultFormatter::WriteOutputLatex( FitResult* OutputData )
 
 	ResultFormatter::LatexDocHeader( latex );
 
+	latex << "\n\\input{ ./JustFit }" << endl;
+
+	latex << "\n\\clearpage" << endl;
+
+	latex << "\n\\input{ ./ToShare }" << endl;
+	
+	latex << "\n\\clearpage" << endl;
+
 	latex << "\n\\input{ ./FullTable }" << endl;
 
 	latex << "\n\\clearpage" << endl;
@@ -378,6 +386,18 @@ void ResultFormatter::WriteOutputLatex( FitResult* OutputData )
 	ofstream outFile;
 	outFile.open( output_folder+"/main.tex" );
 	outFile << latex.str();
+	outFile.close();
+
+	outFile.open( output_folder+"/JustFit.tex" );
+	stringstream justFit;
+	ResultFormatter::LatexJustFitResultTable( OutputData, justFit );
+	outFile << justFit.str();
+	outFile.close();
+
+	outFile.open( output_folder+"/ToShare.tex" );
+	stringstream toShare;
+	ResultFormatter::LatexToShareResultTable( OutputData, toShare );
+	outFile << toShare.str();
 	outFile.close();
 
 	outFile.open( output_folder+"/FullTable.tex" );
@@ -536,6 +556,79 @@ void ResultFormatter::LatexSimpleFitResultTable( FitResult * OutputData, strings
 		}
 		latex	<< setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
 			<< setw(20) << setprecision(2) << sigmaFromInputValue << "\\\\" << endl;
+	}
+
+	ResultFormatter::TableFooter( latex );
+}
+
+void ResultFormatter::LatexToShareResultTable( FitResult * OutputData, stringstream& latex )
+{
+	ResultFormatter::TableHeader( latex, 3 );
+	latex << "Parameter & Fit result and error & $\\sigma$ from input \\\\ \t\t\\hline \\hline\n" << endl;
+	
+	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
+	vector<string> allNames = outputParameters->GetAllNames();
+	for( vector<string>::iterator nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
+	{
+		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
+		if( outputParameter->GetError() >= 0. )
+		{
+			double fitValue = outputParameter->GetValue();
+			double fitError = outputParameter->GetError();
+			double sigmaFromInputValue = outputParameter->GetPull();
+			string unit = outputParameter->GetUnit();
+			string name = *nameIterator;
+
+			latex << setw(20) << EdStyle::GetParamLatexName(name) << " & "
+				<< setw(12) << setprecision(5) << fitValue;
+
+			if( outputParameter->GetAssym() )
+			{
+				latex << " + " << outputParameter->GetErrHi() << " - " << outputParameter->GetErrLow() << " ";
+			}
+			else
+			{
+				latex << " \\pm " << setw(10) << fitError << " ";
+			}
+			latex   << setw(15) << EdStyle::GetParamLatexUnit(unit) << " & "
+				<< setw(20) << setprecision(2) << sigmaFromInputValue << "\\\\" << endl;
+
+		}
+	}
+
+	ResultFormatter::TableFooter( latex );
+}
+
+void ResultFormatter::LatexJustFitResultTable( FitResult * OutputData, stringstream& latex )
+{
+	ResultFormatter::TableHeader( latex, 2 );
+	latex << "Parameter & Fit result and error \\\\ \t\t\\hline \\hline\n" << endl;
+
+	ResultParameterSet * outputParameters = OutputData->GetResultParameterSet();
+	vector<string> allNames = outputParameters->GetAllNames();
+	for( vector<string>::iterator nameIterator = allNames.begin(); nameIterator != allNames.end(); ++nameIterator )
+	{
+		ResultParameter * outputParameter = outputParameters->GetResultParameter( *nameIterator );
+		if( outputParameter->GetError() >= 0. )
+		{
+			double fitValue = outputParameter->GetValue();
+			double fitError = outputParameter->GetError();
+			string unit = outputParameter->GetUnit();
+			string name = *nameIterator;
+
+			latex << setw(20) << EdStyle::GetParamLatexName(name) << " & "
+				<< setw(12) << setprecision(5) << fitValue;
+
+			if( outputParameter->GetAssym() )
+			{
+				latex << " + " << outputParameter->GetErrHi() << " - " << outputParameter->GetErrLow() << " ";
+			}
+			else
+			{
+				latex << " \\pm " << setw(10) << fitError << " ";
+			}
+			latex   << setw(15) << EdStyle::GetParamLatexUnit(unit) << "\\\\" << endl;
+		}
 	}
 
 	ResultFormatter::TableFooter( latex );

@@ -19,7 +19,7 @@
 ///	System Headers
 #include <vector>
 #include <limits>
-#include <float>
+#include <float.h>
 
 using namespace::std;
 

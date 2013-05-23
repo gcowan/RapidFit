@@ -41,7 +41,8 @@ class MemoryDataSet : public IDataSet
 		/*!                      
 		 * @brief Returns an estimate of the total Yield
 		 */                      
-		virtual int Yield();
+		double Yield();
+		double YieldError();
 
 		string GetWeightName() const;
 		bool GetWeightsWereUsed() const;

@@ -107,7 +107,8 @@ class IDataSet
 		/*!
 		 * @brief Returns an estimate of the total Yield
 		 */
-		virtual int Yield() = 0;
+		virtual double Yield() = 0;
+		virtual double YieldError() = 0;
 
 		virtual void UseEventWeights( const string Name ) = 0;
 

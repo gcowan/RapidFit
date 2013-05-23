@@ -271,9 +271,16 @@ vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<string> discre
 	return returnable_subset;
 }
 
-int MemoryDataSet::Yield()
+double MemoryDataSet::Yield()
 {
-	return this->GetDataNumber();
+	if( useWeights )	return this->GetSumWeights();
+	else			return this->GetDataNumber();
+}
+
+double MemoryDataSet::YieldError()
+{
+	if( useWeights )	return sqrt( this->GetSumWeightsSq() );
+	else			return sqrt( this->GetDataNumber() );
 }
 
 string MemoryDataSet::GetWeightName() const
@@ -322,15 +329,18 @@ void MemoryDataSet::Print() const
 		double avr_sq=0.;
 		double val=0.;
 		ObservableRef weightRef( WeightName );
+		double err=0.;
 		for( unsigned int i=0; i< allData.size(); ++i )
 		{
 			val=allData[i]->GetObservable( WeightName )->GetValue();
 			avr+=val;
 			avr_sq+=val*val;
+			err+=val*val;
 		}
 		total=avr;
 		avr/=(double)allData.size(); avr_sq/=(double)allData.size();
-		double err = sqrt( avr_sq - avr*avr );
+		err = sqrt(err);
+		//err = sqrt( avr_sq - avr*avr );
 		cout << "DataSet contains a total of:     " << total << " ± " << err << "     SIGNAL events.(" << allData.size() << " total). In " << this->GetBoundary()->GetNumberCombinations() << " Discrete DataSets." << endl;
 		if( this->GetBoundary()->GetNumberCombinations() > 1 )
 		{
