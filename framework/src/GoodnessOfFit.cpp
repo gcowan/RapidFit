@@ -14,6 +14,7 @@
 #include "TMath.h"
 #include "TH1D.h"
 #include "TFile.h"
+#include "TVectorD.h"
 //	RapidFit Headers
 #include "GoodnessOfFit.h"
 #include "MemoryDataSet.h"
@@ -34,6 +35,7 @@
 #include <set>
 #include <algorithm>
 #include <time.h>
+#include <iomanip>
 
 using namespace::std;
 
@@ -115,7 +117,7 @@ namespace GoodnessOfFit
 			dataConfig = (*iter)->GetDataSetConfig();
 			dataConfig->SetSource( "Foam" );
 
-			mc = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*(int)nData );
+			mc = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 5*(int)nData );
 			mcData.push_back( mc );
 		}
 
@@ -426,24 +428,23 @@ namespace GoodnessOfFit
 			int nPerm = 25;
 			vector<double> Tvalues = permutation( data, mcData, nPerm );
 
-			/*
-				TH1D * tHist = new TH1D("tvalues", "tvalues", 50, 1.0, 1.3);
-				for ( int i = 0; i < nPerm; i++ ) tHist->Fill(Tvalues[i]);
-				TFile * outputFile = new TFile("tvalues.root", "UPDATE");
-				tHist->Write();
-				outputFile->Close();
-				delete outputFile;
-			 */
-
-			int count = 0;
+            int count = 0;
 			vector<double>::iterator Titer;
 			for ( Titer = Tvalues.begin(); Titer != Tvalues.end(); ++Titer ){
 				if ( T < *Titer ) count++;
 			}
 
 			double pvalue = count/double(nPerm);
-			return pvalue;
-		}
+
+            TFile * outputFile = new TFile("tvalues.root", "RECREATE");
+            TNtuple * ntuple = new TNtuple("tvalues", "tvalues", "T:Tdata:pvalue");
+            for ( int i = 0; i < nPerm; i++ ) ntuple->Fill(Tvalues[i], T, pvalue);
+            ntuple->Write();
+            outputFile->Close();
+            delete outputFile;
+
+       		return pvalue;
+        }
 
 		double calculateTstatistic( IDataSet * data, IDataSet * mcData )
 		{
@@ -452,8 +453,10 @@ namespace GoodnessOfFit
 
 		vector<double> permutation( IDataSet * data, IDataSet * mc, int nPerm )
 		{
+            cout << "Performing boostrapping " << nPerm << " times" << endl;
 			vector<double> bootstrappedTvalues;
 			for ( int i = 0; i < nPerm; i++ ) {
+                cout << "Boostrap #" << i << endl;
 				double T = permutationCore( data, mc, i );
 				bootstrappedTvalues.push_back(T);
 				char buffer[20];
@@ -524,7 +527,8 @@ namespace GoodnessOfFit
             double sum_weights_i = 0.;
             double T = 0.;
 			for ( int i = 0; i < n; i++ ){
-				DataPoint * event_i = data->GetDataPoint(i);
+				if (i % 100 == 0) cout << "sumEvents - Event # " << i << "\t\t" << setprecision(4) << 100.*(double)i/(double)n << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
+                DataPoint * event_i = data->GetDataPoint(i);
                 weight_i = getWeight( event_i );
                 sum_weights_i += weight_i;
 				for ( int j = i+1; j < n; j++){
@@ -539,6 +543,7 @@ namespace GoodnessOfFit
 					T += -log( distance + 1./n ) * (weight_i * weight_j);
 				}
 			}
+            cout << endl;
 			T *= 1. / (sum_weights_i * sum_weights_i);
 			return T;
 		}
@@ -553,6 +558,7 @@ namespace GoodnessOfFit
             double sum_weights_i = 0.;
 			double T = 0.;
 			for ( int i = 0; i < nD; i++){
+				if (i % 100 == 0) cout << "sumDataMCEvents - DataEvent # " << i << "\t\t" << setprecision(4) << 100.*(double)i/(double)nD << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
 				DataPoint* event_i = data->GetDataPoint(i);
                 weight_i = getWeight( event_i );
                 sum_weights_i += weight_i;
@@ -567,6 +573,7 @@ namespace GoodnessOfFit
 					T += -log( distance + 1./nD ) * (weight_i * weight_j);
 				}
 			}
+            cout << endl;
 			T *= 1. / (sum_weights_i * nMC);
 			return T;
 		}
@@ -602,25 +609,25 @@ namespace GoodnessOfFit
 			char buffer[100];	(void) buffer;	//	Unused
 			while ( (xVar = x->GetObservable( *xIter ) ) && (yVar = y->GetObservable( *yIter ) ) ) {
 				//cout << *xIter << endl;
-				if ( (*xIter == "time") ) {
-					xVal = ( xVar->GetValue() - 1.6 )/1.2;
-					yVal = ( yVar->GetValue() - 1.6 )/1.2;
-				}
-				else if ( (*xIter == "m23") ) {
-					xVal = ( xVar->GetValue() - 0. )/1.;
-					yVal = ( yVar->GetValue() - 0. )/1.;
+				//if ( (*xIter == "time") ) {
+				//	xVal = ( xVar->GetValue() - 1.6 )/1.2;
+			    //	yVal = ( yVar->GetValue() - 1.6 )/1.2;
+				//}
+				if ( (*xIter == "mass") ) {
+					xVal = ( xVar->GetValue() - 5200. )/350.;
+					yVal = ( yVar->GetValue() - 5200. )/350.;
 				}
 				else if ( (*xIter == "cosTheta1") ) {
-					xVal = ( xVar->GetValue() - 0. )/1.;
-					yVal = ( yVar->GetValue() - 0. )/1.;
+					xVal = ( xVar->GetValue() );
+					yVal = ( yVar->GetValue() );
 				}
 				else if(  (*xIter == "cosTheta2") ) {
-					xVal = ( xVar->GetValue() - 0. )/1.;
-					yVal = ( yVar->GetValue() - 0. )/1.;
+					xVal = ( xVar->GetValue() );
+					yVal = ( yVar->GetValue() );
 				}
 				else if ( (*xIter == "phi") ) {
-					xVal = ( xVar->GetValue() - 0. )/3.14159;
-					yVal = ( yVar->GetValue() - 0. )/3.14159;
+					xVal = ( xVar->GetValue() )/3.14159;
+					yVal = ( yVar->GetValue() )/3.14159;
 				}
 				else {
 					xVal = 0.;

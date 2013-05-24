@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/05/24 Greig Cowan
+  - Updated GoodnessOfFit so that it prints out some more helpful messages during computation and a ROOT file containing results.
+
 2013/05/23 Rob Currie
   - Based on something I learnt writing my thesis I've corrected the estimated error from the yield of a weighted dataset
       (I'm not sure what the old code was calculating, but it was obviously wrong...)
