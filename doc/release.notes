@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/05/26 Rob Currie
+  - Reduced verbosity in telling the user where there isn't data in the discrete parameter space....
+      Instead the User will only be informed where the dataset that they requested is (this is easier to read when doing complicated things like 6 bins in UB+B...)
+      This reduces the excess verbosity when sWeighting a dataset with many Discrete Observables required to be present in the final tuple
+  - Renamed "SWeight2" parameter to "SWeightSq" to remove future confusions (This was only added as an exercise when we were testing the SWeighting Code in RapidFit a few months ago... and we found no bugs)
+      Code relating to this in the SWeightPrecalculator can probably be removed in the future and replaced with the final line to calculate the SWeightSq=sWeight*sWeight
+
 2013/05/24 Greig Cowan
   - Updated GoodnessOfFit so that it prints out some more helpful messages during computation and a ROOT file containing results.
 

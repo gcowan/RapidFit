@@ -37,7 +37,7 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 	double total_sWeight=0.;
 	double total_sWeight_sq=0.;
 	ObservableRef sWeightName("sWeight");
-	ObservableRef sWeightsqName("sWeight2");
+	ObservableRef sWeightsqName("sWeightSq");
 	for( unsigned int i=0; i< (unsigned)inputDataSet->GetDataNumber(); ++i )
 	{
 		total_sWeight += inputDataSet->GetDataPoint( (int)i )->GetObservable( sWeightName )->GetValue();

@@ -355,7 +355,7 @@ void MemoryDataSet::Print() const
 				}
 				pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
 				unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
-				cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
+				if( dataPointNum > 0 ) cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
 			}
 		}
 	}
@@ -375,7 +375,7 @@ void MemoryDataSet::Print() const
 				}
 				pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
 				unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
-				cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
+				if( dataPointNum > 0 ) cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
 			}
 		}
 	}
