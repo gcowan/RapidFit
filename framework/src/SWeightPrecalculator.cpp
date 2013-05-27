@@ -139,7 +139,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* Inp
 	vector<DataPoint*> allPoints;
 	vector<double> allValues, allValues2;
 
-	string weightName2 = weightName+"2";
+	string weightName2 = weightName+"Sq";
 
 	double sum = 0.;
 	double sum2 = 0.;
