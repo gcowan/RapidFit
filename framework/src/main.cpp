@@ -717,6 +717,8 @@ int PerformMainFit( RapidFitConfiguration* config )
 		}
 		else
 		{
+			//		Generate Weighted Datasets
+			vector<IDataSet*> WeightedDataSets;
 			for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
 			{
 				cout << endl << "Weighting DataSet " << i+1 << endl;
@@ -727,8 +729,43 @@ int PerformMainFit( RapidFitConfiguration* config )
 				filename.Append("_"); filename+=i; filename.Append(".root");
 				cout << "Saving Weighted DataSet " << i << " as: " << filename << endl;
 				ResultFormatter::MakeRootDataFile( filename.Data(), weightedDataSet_v );
-				delete weightedDataSet;
+				//delete weightedDataSet;
 				//delete calculator;
+				WeightedDataSets.push_back( weightedDataSet );
+			}
+
+			//		Do Something With them :D
+			double sum = 0.;
+			double sum_sq = 0.;
+			ObservableRef WeightsName( "sWeight" );
+			ObservableRef WeightsSquared( "sWeightSq" );
+
+			Observable* testObservable = WeightedDataSets[0]->GetDataPoint( 0 )->GetObservable( WeightsName );
+
+			if( WeightsName.GetIndex() >= 0 )
+			{
+				for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
+				{
+					for( unsigned int j=0; j< WeightedDataSets[i]->GetDataNumber(); ++j )
+					{
+						sum += WeightedDataSets[i]->GetDataPoint( j )->GetObservable( WeightsName )->GetValue();
+						sum_sq += WeightedDataSets[i]->GetDataPoint( j )->GetObservable( WeightsSquared )->GetValue();
+					}
+				}
+				cout << endl;
+				cout << "Total of All sWeights: " << sum << endl;
+				cout << "With an Error of:      " << sqrt( sum_sq ) << endl;
+				cout << endl;
+			}
+
+			//		Delete them as they're local objects
+			for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
+			{
+				while( !WeightedDataSets.empty() )
+				{
+					if( WeightedDataSets.back() != NULL ) delete WeightedDataSets.back();
+					WeightedDataSets.pop_back();
+				}
 			}
 		}
 	}

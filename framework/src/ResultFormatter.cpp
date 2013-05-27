@@ -377,7 +377,7 @@ void ResultFormatter::WriteOutputLatex( FitResult* OutputData )
 
 	latex << "\n\\clearpage" << endl;
 
-	latex << "\n\\input{ covMatrix }" << endl;
+	latex << "\n\\input{ CorrelationMatrix }" << endl;
 
 	latex << "\n\\clearpage\n" << endl;
 
@@ -418,9 +418,9 @@ void ResultFormatter::WriteOutputLatex( FitResult* OutputData )
 	outFile << minimal.str();
 	outFile.close();
 
-	outFile.open( output_folder+"/covMatrix.tex" );
+	outFile.open( output_folder+"/CorrelationMatrix.tex" );
 	stringstream matrix;
-	ResultFormatter::LatexCovMatrix( OutputData, matrix );
+	ResultFormatter::LatexCorrMatrix( OutputData, matrix );
 	outFile << matrix.str();
 	outFile.close();
 
@@ -702,7 +702,7 @@ void ResultFormatter::LatexMinimumFitResultTable( FitResult * OutputData, string
 }
 
 //Display the covariance matrix of a fit in a LaTeX table using cout
-void ResultFormatter::LatexCovMatrix( FitResult * OutputData, stringstream& latex )
+void ResultFormatter::LatexCorrMatrix( FitResult * OutputData, stringstream& latex )
 {
 	if( OutputData->GetCovarianceMatrix() == NULL ) return;
 	TMatrixDSym* covarianceMatrix = OutputData->GetCovarianceMatrix()->thisMatrix;

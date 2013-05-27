@@ -6,6 +6,13 @@
       This reduces the excess verbosity when sWeighting a dataset with many Discrete Observables required to be present in the final tuple
   - Renamed "SWeight2" parameter to "SWeightSq" to remove future confusions (This was only added as an exercise when we were testing the SWeighting Code in RapidFit a few months ago... and we found no bugs)
       Code relating to this in the SWeightPrecalculator can probably be removed in the future and replaced with the final line to calculate the SWeightSq=sWeight*sWeight
+  - Renamed CovMatrix to CorrelationMatrix which is the correct name for the latex file written out from fits
+      Renamed some methods in ResultFormatter to take this into account.
+      The Actual matrix stored in any .root is STILL the covariance matrix and requires to be transformed to get the correlation matrix
+  - Added an option to ignore multiple Combinations present in a dataset in Projections and an XML option for adding a default value for the Discrete Observable
+      <PlotAllCombinatons>False</PlotAllCombinatons> can almost double the speed of untagged projections
+      <DefaultDiscreteValue>0.</DefaultDiscreteValue> provides an explicit value to replace PhaseSpaces with >=2 combinations of values
+      (default is 0. i.e. untagged in the case of tags, but this can be user modified if needed)
 
 2013/05/24 Greig Cowan
   - Updated GoodnessOfFit so that it prints out some more helpful messages during computation and a ROOT file containing results.

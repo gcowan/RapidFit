@@ -709,6 +709,14 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			projectionIntegratorConfig->useGSLIntegrator =  XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
+		else if( projComps[childIndex]->GetName() == "PlotAllCombinatons" )
+		{
+			returnable_config->plotAllCombinations = XMLTag::GetBooleanValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "DefaultDiscreteValue" )
+		{
+			returnable_config->defaultCombinationValue = XMLTag::GetDoubleValue( projComps[childIndex] );
+		}
 		else
 		{
 			cerr << "XMLConfigurationReader: Sorry Don't understand XMLTag: " << projComps[childIndex]->GetName() << " ignoring!" << endl;

@@ -32,6 +32,7 @@
 #include "ClassLookUp.h"
 #include "ComponentRef.h"
 #include "NormalisedSumPDF.h"
+#include "ObservableDiscreteConstraint.h"
 ///	System Headers
 #include <iostream>
 #include <iomanip>
@@ -116,7 +117,26 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	step_size = ( boundary_max - boundary_min ) / (double)( total_points - 1 );
 
 	//Work out what to plot
-	vector<DataPoint*> allCombinations_input = full_boundary->GetDiscreteCombinations();
+	vector<DataPoint*> allCombinations_input;// = full_boundary->GetDiscreteCombinations();
+
+	if( !config->plotAllCombinations )
+	{
+		vector<string> DiscreteObs = full_boundary->GetDiscreteNames();
+		for( unsigned int i=0; i< DiscreteObs.size(); ++i )
+		{
+			if( full_boundary->GetConstraint( DiscreteObs[i] )->GetValues().size() > 1 )
+			{
+				full_boundary->RemoveConstraint( DiscreteObs[i] );
+				IConstraint* thisConstraint = (IConstraint*) new ObservableDiscreteConstraint( DiscreteObs[i], vector<double>(1,config->defaultCombinationValue), " ", "" );
+				full_boundary->AddConstraint( DiscreteObs[i], thisConstraint );
+				delete thisConstraint;
+			}
+		}
+		plotPDF->ChangePhaseSpace( full_boundary );
+	}
+
+	allCombinations_input = full_boundary->GetDiscreteCombinations();
+
 	for( unsigned int i=0; i< allCombinations_input.size(); ++i )
 	{
 		allCombinations.push_back( new DataPoint( *(allCombinations_input[i]) ) );
@@ -1253,7 +1273,7 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
 	input_data->GetYaxis()->SetTitle( Y_Title );
-	input_data->GetYaxis()->SetTitleSize( 0.95*input_data->GetYaxis()->GetTitleSize() );
+	input_data->GetYaxis()->SetTitleSize( (Float_t)0.95*input_data->GetYaxis()->GetTitleSize() );
 	input_data->GetXaxis()->SetRangeUser( X_min, X_max );
 	input_data->GetXaxis()->SetTitle( X_Title );
 	//input_data->GetXaxis()->CenterTitle( true );

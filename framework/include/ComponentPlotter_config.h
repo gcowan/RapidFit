@@ -34,7 +34,7 @@ class CompPlotter_config
                         data_bins(100), PDF_points(128), observableName("undefined"), logY(false), logX(false), color_key(), style_key(), width_key(), component_names(), PlotTitle(""),
                         xmin(-99999), xmax(-99999), ymin(-99999), ymax(-99999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-99999), OnlyZero(false), ScaleNumerical(true), combination_names(),
 			DrawPull(false), LegendTextSize(0.05), addLHCb(false), TopRightLegend(true), TopLeftLegend(false), BottomRightLegend(false), BottomLeftLegend(false),
-			useLegend(true), LimitPulls(false), useSpline(true), addRightLHCb(false), integratorConfig(new RapidFitIntegratorConfig())
+			useLegend(true), LimitPulls(false), useSpline(true), addRightLHCb(false), integratorConfig(new RapidFitIntegratorConfig()), plotAllCombinations(true), defaultCombinationValue(0.)
 		{}
 
 		~CompPlotter_config()
@@ -48,7 +48,8 @@ class CompPlotter_config
 			ymin(input.ymin), ymax(input.ymax), xtitle(input.xtitle), ytitle(input.ytitle), CalcChi2(input.CalcChi2), Chi2Value(input.Chi2Value), OnlyZero(input.OnlyZero),
 			ScaleNumerical(input.ScaleNumerical), DrawPull(input.DrawPull), LegendTextSize(input.LegendTextSize), addLHCb(input.addLHCb), TopRightLegend(input.TopRightLegend),
 			TopLeftLegend(input.TopLeftLegend), BottomRightLegend(input.BottomRightLegend), BottomLeftLegend(input.BottomLeftLegend), useLegend(input.useLegend),
-			LimitPulls(input.LimitPulls), useSpline(input.useSpline), addRightLHCb(input.addRightLHCb), integratorConfig(NULL), combination_names(input.combination_names)
+			LimitPulls(input.LimitPulls), useSpline(input.useSpline), addRightLHCb(input.addRightLHCb), integratorConfig(NULL), combination_names(input.combination_names),
+			plotAllCombinations(input.plotAllCombinations), defaultCombinationValue(input.defaultCombinationValue)
 		{
 			if( input.integratorConfig != NULL ) integratorConfig = new RapidFitIntegratorConfig( *(input.integratorConfig) );
 		}
@@ -82,6 +83,8 @@ class CompPlotter_config
 		bool LimitPulls;		/*!	Place a 5-sigma limit on the Pull Distribution to fight a few bogus pulls killing the Distribution			*/
 		bool useSpline;			/*!	Use Spline to Interpolate between the projected points?									*/
 		RapidFitIntegratorConfig* integratorConfig;
+		bool plotAllCombinations;	/*!	Plot a separate Projection for each Discrete Combination for all PDFs							*/
+		double defaultCombinationValue;	/*!	Default Value for the Discrete Values to be given if plotAllCombinations==false						*/
 
 	private:
 		CompPlotter_config& operator= ( const CompPlotter_config& input );

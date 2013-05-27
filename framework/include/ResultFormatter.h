@@ -48,7 +48,7 @@ class ResultFormatter
 		static void LatexSimpleFitResultTable( FitResult * OutputData, stringstream& latex );
 		static void LatexFullFitResultTable( FitResult * OutputData, stringstream& latex );
 		static void LatexMinimumFitResultTable( FitResult * OutputData, stringstream& latex );
-		static void LatexCovMatrix( FitResult * OutputData, stringstream& latex );
+		static void LatexCorrMatrix( FitResult * OutputData, stringstream& latex );
 
 		static void LatexOutputFitResult( FitResult* );
 		static void ReviewOutput( FitResult * OutputData );
