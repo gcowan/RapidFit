@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/05/28 Rob Currie
+  - Added additional '--helpProjections' which prints the ComponentPlotter::XML() function which contains a relatively complete list of Projection XML argumnets
+
 2013/05/26 Rob Currie
   - Reduced verbosity in telling the user where there isn't data in the discrete parameter space....
       Instead the User will only be informed where the dataset that they requested is (this is easier to read when doing complicated things like 6 bins in UB+B...)

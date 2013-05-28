@@ -3,6 +3,7 @@
 #include "ParseCommandLine.h"
 #include "InputParsing.h"
 #include "StringProcessing.h"
+#include "ComponentPlotter.h"
 
 #include <vector>
 #include <string>
@@ -144,6 +145,10 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "       This allows you to test the Numerical vs Analytical Integrals from an XML" << endl;
 
 	cout << endl;
+	cout << "--helpProjections" << endl;
+	cout << "       This will print a lot of options available for the Projections or ComponentProjections of a fit to data" << endl;
+
+	cout << endl;
 }
 
 void ParseCommandLine::RapidFitAbout( string name )
@@ -203,6 +208,13 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 		else if( currentArgument == "--help" )
 		{
 			RapidFitHelp();
+			return exit_RapidFit;
+		}
+		else if( currentArgument == "--helpProjections" )
+		{
+			cout << endl << endl;
+			cout << "Options available for Plotting Projections are:" << endl << endl;
+			cout << ComponentPlotter::XML() << endl;
 			return exit_RapidFit;
 		}
 		else if( currentArgument == "-f" )
