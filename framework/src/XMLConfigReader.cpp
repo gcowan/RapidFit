@@ -592,7 +592,7 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			returnable_config->PlotTitle = XMLTag::GetStringValue( projComps[childIndex] );
 		}
-		else if( projComps[childIndex]->GetName() == "CompNames" )
+		else if( projComps[childIndex]->GetName() == "CompNames" || projComps[childIndex]->GetName() == "ComponentNames" )
 		{
 			returnable_config->component_names = StringProcessing::SplitString(
 					XMLTag::GetStringValue( projComps[childIndex] ), ':' );
@@ -716,6 +716,22 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		else if( projComps[childIndex]->GetName() == "DefaultDiscreteValue" )
 		{
 			returnable_config->defaultCombinationValue = XMLTag::GetDoubleValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "XaxisTitleScale" )
+		{
+			returnable_config->XaxisTitleScale = XMLTag::GetDoubleValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "XaxisLabelScale" )
+		{
+			returnable_config->XaxisLabelScale = XMLTag::GetDoubleValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "YaxisTitleScale" )
+		{
+			returnable_config->YaxisTitleScale = XMLTag::GetDoubleValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "YaxisLabelScale" )
+		{
+			returnable_config->YaxisLabelScale = XMLTag::GetDoubleValue( projComps[childIndex] );
 		}
 		else
 		{

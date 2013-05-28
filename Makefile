@@ -136,7 +136,7 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.$(SRCEXT) $(INCDIR)/%.$(HDREXT)
 #	Main Build of RapidFit Binary
 $(EXEDIR)/fitting : $(OBJS) $(PDFOBJS) $(DALITZOBJS) $(OBJDIR)/rapidfit_dict.o
 	$(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS) $(USE_GSL) $(ROOTLIBS) $(EXTRA_ROOTLIBS) $(LINKGSL)
-
+	chmod +t $(EXEDIR)/fitting
 
 
 

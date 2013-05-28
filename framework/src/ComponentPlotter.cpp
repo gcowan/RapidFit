@@ -1164,6 +1164,11 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	bool addRightLHCb=false;
 	bool limitPulls=false;
 	bool drawSpline=true;
+
+	double XaxisTitleScale=1.;
+	double XaxisLabelScale=1.;
+	double YaxisTitleScale=1.;
+	double YaxisLabelScale=1.;
 	if( conf != NULL )
 	{
 		if( conf->logY )
@@ -1209,6 +1214,10 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		final_chi2 = conf->Chi2Value;
 		limitPulls = conf->LimitPulls;
 		drawSpline = conf->useSpline;
+		XaxisTitleScale = conf->XaxisTitleScale;
+		XaxisLabelScale = conf->XaxisLabelScale;
+		YaxisTitleScale = conf->YaxisTitleScale;
+		YaxisLabelScale = conf->YaxisLabelScale;
 	}
 
 	input_data->SetTitle( plotTitle );
@@ -1273,9 +1282,22 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 	input_data->GetYaxis()->SetRangeUser( Y_min, Y_max );
 	input_data->GetYaxis()->SetTitle( Y_Title );
-	input_data->GetYaxis()->SetTitleSize( (Float_t)0.95*input_data->GetYaxis()->GetTitleSize() );
+	input_data->GetYaxis()->SetTitleSize( (Float_t)YaxisTitleScale*input_data->GetYaxis()->GetTitleSize() );
+	input_data->GetYaxis()->SetLabelSize( (Float_t)YaxisLabelScale*input_data->GetYaxis()->GetLabelSize() );
 	input_data->GetXaxis()->SetRangeUser( X_min, X_max );
 	input_data->GetXaxis()->SetTitle( X_Title );
+	input_data->GetXaxis()->SetTitleSize( (Float_t)XaxisTitleScale*input_data->GetXaxis()->GetTitleSize() );
+	input_data->GetXaxis()->SetLabelSize( (Float_t)XaxisLabelScale*input_data->GetXaxis()->GetLabelSize() );
+
+	if( !input_bin_theory_data.empty() )
+	{
+		pad1->Modified();
+		pad1->Update();
+	}
+
+	c1->Modified();
+	c1->Update();
+
 	//input_data->GetXaxis()->CenterTitle( true );
 
 	if( !input_bin_theory_data.empty() )

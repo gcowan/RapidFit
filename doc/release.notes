@@ -13,6 +13,10 @@
       <PlotAllCombinatons>False</PlotAllCombinatons> can almost double the speed of untagged projections
       <DefaultDiscreteValue>0.</DefaultDiscreteValue> provides an explicit value to replace PhaseSpaces with >=2 combinations of values
       (default is 0. i.e. untagged in the case of tags, but this can be user modified if needed)
+  - Added <XaxisTitleScale> and <XaxisLabelScale> and corresponding Yaxis tags to ComponentPlotter XML
+      This allows the user to scale the relative label/title sizes by a relative amount, none of this annoying ROOT font size nonsense
+      These are by default 1. but can be set to any value (I suggest anything more than 0.8-1.2 becomes a bit extreme).
+      By default the LHCbStyle is used everywhere but this is required to make some plots more equal than others....
 
 2013/05/24 Greig Cowan
   - Updated GoodnessOfFit so that it prints out some more helpful messages during computation and a ROOT file containing results.
