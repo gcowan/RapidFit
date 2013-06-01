@@ -170,7 +170,6 @@ namespace Mathematics
 				pthread_mutex_unlock( &ROOT_Lock );
 			}
 			returnable = RooMath::ITPComplexErrFuncRe( z, 13 )*exp( -u*u );
-			//pthread_mutex_unlock( &ROOT_Lock );
 #endif
 		}
 		else
@@ -204,7 +203,6 @@ namespace Mathematics
 				pthread_mutex_unlock( &ROOT_Lock );
 			}
 			returnable = RooMath::ITPComplexErrFuncIm( z, 13 )*exp( -u*u );
-			//pthread_mutex_unlock( &ROOT_Lock );
 #endif
 		}
 		else
@@ -951,6 +949,7 @@ namespace Mathematics
         }
         }
 
+#ifdef __RAPIDFIT_USE_GSL_MATH
         // Now sample the acceptance surface so that we can make projections to check that it looks sensible
         AccParam * param = new AccParam(&c[0][0][0][0], i_max, j_max, k_max, l_max, numEvents);
         TNtuple * tree = new TNtuple("tuple", "tuple", "cosTheta1:phi:cosTheta2:mKpi:weight");
@@ -995,6 +994,10 @@ namespace Mathematics
         acceptance_file->Close();
         delete tree;
         delete acceptance_file;
+#else
+	cout << "Can't do this without GSL!" << endl;
+	exit(0);
+#endif
 
         /*
         // This works for a 3D surface, but need to use ntuple for more dimensions

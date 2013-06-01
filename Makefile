@@ -41,12 +41,12 @@ UTILSSRC  = utils/src
 INCDIR    = framework/include
 INCPDFDIR = pdfs/include
 INCUTILS  = utils/include
-#INCGSL    = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "$(shell gsl-config --cflags)" ; else echo"" ; fi )
-#LINKGSL   = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "$(shell gsl-config --libs)" ; else echo"" ; fi )
-#USE_GSL   = $(shell if [ "$(shell which gsl-config)" != "" ]; then echo "-D__RAPIDFIT_USE_GSL" ; else echo "" ; fi )
-INCGSL    = -I/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include
-LINKGSL   = -L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/lib -lgsl -lgslcblas -lm
-USE_GSL   = -D__RAPIDFIT_USE_GSL
+INCGSL_1  = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "$(shell gsl-config --cflags)"; else echo ""; fi )
+LINKGSL_1 = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "$(shell gsl-config --libs)"; else echo ""; fi )
+USE_GSL_1 = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "-D__RAPIDFIT_USE_GSL"; else echo ""; fi )
+INCGSL    = $(shell if test -d /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include; then echo "-I/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include"; else echo ${INCGSL_1}; fi )
+LINKGSL   = $(shell if test -d /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include; then echo "-L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/lib -lgsl -lgslcblas -lm"; else echo ${LINKGSL_1}; fi )
+USE_GSL   = $(shell if test -d /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include; then echo "-D__RAPIDFIT_USE_GSL"; else echo ${USE_GSL_1}; fi )
 OBJDIR    = framework/build
 OBJPDFDIR = pdfs/build
 OBJUTILDIR= utils/build
