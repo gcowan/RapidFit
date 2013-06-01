@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/06/01 Rob Currie
+  - Fixed non-GSL compile for Pete
+
 2013/05/28 Rob Currie
   - Added additional '--helpProjections' which prints the ComponentPlotter::XML() function which contains a relatively complete list of Projection XML argumnets
 
