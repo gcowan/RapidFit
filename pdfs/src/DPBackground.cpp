@@ -10,7 +10,9 @@
 #include "DPBackground.h"
 
 #include <iostream>
+#ifdef __RAPIDFIT_USE_GSL
 #include <gsl/gsl_sf_legendre.h>
+#endif
 
 PDF_CREATOR( DPBackground );
 
@@ -131,12 +133,16 @@ bool DPBackground::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Calculate the function value
 double DPBackground::Evaluate(DataPoint * measurement)
 {
-	// Observables
+
+	
+    // Observables
 	m23       = measurement->GetObservable( m23Name )->GetValue();
 	cosTheta1 = measurement->GetObservable( cosTheta1Name )->GetValue();
 	cosTheta2 = measurement->GetObservable( cosTheta2Name )->GetValue();
 	phi       = measurement->GetObservable( phiName )->GetValue();
     double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
+
+#ifdef __RAPIDFIT_USE_GSL
 
 	double returnable_value(0.);
     double Q_l(0.);
@@ -165,6 +171,8 @@ double DPBackground::Evaluate(DataPoint * measurement)
     }
     if( std::isnan(returnable_value) || returnable_value < 0 ) return 0.;
 	else return returnable_value;
+#endif
+    return 0 ;
 }
 
 double DPBackground::Normalisation(PhaseSpaceBoundary * boundary)

@@ -16,8 +16,9 @@
 #include "TFile.h"
 #include "TH3D.h"
 #include "TROOT.h"
+#ifdef __RAPIDFIT_USE_GSL
 #include <gsl/gsl_sf_legendre.h>
-
+#endif
 bool TEMPUSEHEL2 = true ;
 
 PDF_CREATOR( Bd2JpsiKstar_sWave_Fscopy );

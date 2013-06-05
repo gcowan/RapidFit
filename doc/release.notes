@@ -1,5 +1,16 @@
 // $Id: release.notes $
 
+2013/06/05 Peter Clarke
+  - Added the next version of the J/PsiPhi PDF: Bs2JpsiPhi_Signal_v6
+    This implements a contained ResolutionModel and as a result lots of other code is now commented out
+  - As part of the above added ResolutionModel into framework
+  - Also fixed several GSL compile errors for users who dont have GSL   
+	M       pdfs/src/DPTotalAmplitudePDF_withAcc.cpp
+	M       pdfs/src/DPTotalAmplitudePDF_withAcc_withBkg.cpp
+	M       pdfs/src/DPBackground.cpp
+	M       pdfs/src/Bd2JpsiKstar_sWave_Fscopy.cpp
+
+
 2013/06/01 Rob Currie
   - Fixed non-GSL compile for Pete
 

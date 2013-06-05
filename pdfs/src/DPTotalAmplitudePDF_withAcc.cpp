@@ -18,7 +18,10 @@
 #include "TMath.h"
 #include "TComplex.h"
 #include "RooMath.h"
+#ifdef __RAPIDFIT_USE_GSL
 #include <gsl/gsl_sf_legendre.h>
+#endif
+
 
 PDF_CREATOR( DPTotalAmplitudePDF_withAcc );
 
@@ -867,6 +870,8 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 	pionID    = measurement->GetObservable( pionIDName )->GetValue();
     double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
 
+#ifdef __RAPIDFIT_USE_GSL
+
 	double angularAcc(0.);
 	if ( useAngularAcceptance )
 	{
@@ -974,6 +979,7 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 
 		}
 		result += tmp.Rho2();
+        
 	}
 	//cout << angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2 << endl;
 
@@ -999,6 +1005,10 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 
 	if( std::isnan(returnable_value) || returnable_value < 0 ) return 0.;
 	else return returnable_value;
+    
+#endif
+
+    return 0;
 }
 
 vector<string> DPTotalAmplitudePDF_withAcc::PDFComponents()
