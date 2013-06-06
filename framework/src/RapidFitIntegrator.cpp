@@ -561,14 +561,14 @@ vector<double*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int number
 		clearGSLIntegrationPoints();
 		_global_doEval_points = initGSLDataPoints( number, maxima, minima, nDim );
 	}
-	return _global_doEval_points;
 	pthread_mutex_unlock( &GSL_DATAPOINT_GET_THREADLOCK );
+	return _global_doEval_points;
 }
 
 void RapidFitIntegrator::clearGSLIntegrationPoints()
 {
 	pthread_mutex_lock( &GSL_DATAPOINT_MANAGEMENT_THREADLOCK );
-	while( _global_doEval_points.empty() )
+	while( !_global_doEval_points.empty() )
 	{
 		if( _global_doEval_points.back() != NULL ) delete _global_doEval_points.back();
 		_global_doEval_points.pop_back();
@@ -719,11 +719,11 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		if( evalFunctions.back() != NULL ) delete evalFunctions.back();
 		evalFunctions.pop_back();
 	}
-	while( !doEval_points.empty() )
+	/*while( !doEval_points.empty() )
 	{
 		if( doEval_points.back() != NULL ) delete doEval_points.back();
 		doEval_points.pop_back();
-	}
+	}*/
 	delete[] fit_thread_data;
 	delete[] Thread;
 	//delete quickFunction;
