@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/06/06 Rob Currie
+  - Moved GSL initialization of integral points to get/set method which should buy some speed improvements and makes the GSLPseudoIntegrator cleaner
+       Tested on OptimisedDoubleGauss GSL projection in the tutorials folder and this feels like it's running faster.
+
 2013/06/05 Peter Clarke
   - Added the next version of the J/PsiPhi PDF: Bs2JpsiPhi_Signal_v6
     This implements a contained ResolutionModel and as a result lots of other code is now commented out
@@ -9,7 +13,6 @@
 	M       pdfs/src/DPTotalAmplitudePDF_withAcc_withBkg.cpp
 	M       pdfs/src/DPBackground.cpp
 	M       pdfs/src/Bd2JpsiKstar_sWave_Fscopy.cpp
-
 
 2013/06/01 Rob Currie
   - Fixed non-GSL compile for Pete

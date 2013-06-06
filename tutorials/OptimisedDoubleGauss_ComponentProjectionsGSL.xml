@@ -18,6 +18,12 @@
 <Minimum>0.</Minimum>
 <Maximum>1.</Maximum>
 </PhysicsParameter>
+<PhysicsParameter>
+<Name>center</Name>
+<Maximum>10</Maximum>
+<Minimum>-10</Minimum>
+<Value>0.</Value>
+</PhysicsParameter>
 </ParameterSet>
 <Minimiser>Minuit</Minimiser>
 <FitFunction>

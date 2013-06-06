@@ -34,6 +34,8 @@ class IntegratorFunction;
 using namespace ROOT::Math;
 using namespace::std;
 
+static vector<double*> _global_doEval_points;
+
 class Normalise_Thread
 {
 	public:
@@ -282,6 +284,10 @@ class RapidFitIntegrator
 		vector<string> DontNumericallyIntegrateList( const DataPoint*, vector<string> = vector<string>() );
 
 		void SetDebug( DebugClass* debug );
+
+		static void clearGSLIntegrationPoints();
+
+		static vector<double*> getGSLIntegrationPoints( unsigned int number, double* maxima, double* minima, unsigned int nDim );
 	private:
 		/*!
 		 * Don't Copy the class this way!
@@ -408,6 +414,8 @@ class RapidFitIntegrator
 
 		unsigned int GSLFixedPoints;
 
+
+		static vector<double*> initGSLDataPoints( unsigned int number, double* maxima, double* minima, unsigned int nDim );
 #ifndef __CINT__
 		//      CINT behaves badly with this attribute
 		//      and,

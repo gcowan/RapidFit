@@ -36,6 +36,10 @@
 #include "Math/GSLMCIntegrator.h"
 #endif
 
+
+pthread_mutex_t GSL_DATAPOINT_MANAGEMENT_THREADLOCK;
+pthread_mutex_t GSL_DATAPOINT_GET_THREADLOCK;
+
 pthread_mutex_t check_settings_lock;
 
 pthread_mutex_t gsl_mutex;
@@ -466,7 +470,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	//cout << "GSL :D" << endl;
 
 	delete[] minima; delete[] maxima;
-	delete[] integrationPoints;
+	//delete[] integrationPoints;
 	delete quickFunction;
 	return result;
 #else
@@ -475,6 +479,102 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 #endif
 }
 
+vector<double*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, double* maxima, double* minima, unsigned int nDim )
+{
+	vector<double*> doEval_points;
+	pthread_mutex_lock( &GSL_DATAPOINT_MANAGEMENT_THREADLOCK );
+
+#ifdef __RAPIDFIT_USE_GSL
+	unsigned int npoint = number;
+	vector<double> * integrationPoints = new vector<double>[ nDim ];
+
+	//pthread_mutex_lock( &gsl_mutex );
+	//cout << "Allocating GSL Integration Tool" << endl;
+	gsl_qrng * q = NULL;
+	try
+	{
+		//q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)nDim );
+		q = gsl_qrng_alloc( gsl_qrng_niederreiter_2, (unsigned)nDim );
+	}
+	catch(...)
+	{
+		cout << "Can't Allocate Integration Tool for GSL Integral." << endl;
+		cout << " Dim: " << nDim << endl;
+		exit(-742);
+	}
+
+	if( q == NULL )
+	{
+		cout << "Can't Allocate Integration Tool for GSL Integral." << endl;
+		cout << " Dim: " << nDim << endl;
+		exit(-741);
+	}
+
+	double* v = new double[ nDim ];
+	for (unsigned int i = 0; i < npoint; i++)
+	{
+		gsl_qrng_get( q, v );
+		for( unsigned int j = 0; j < nDim; j++)
+		{
+			integrationPoints[j].push_back( v[j] );
+		}
+	}
+	delete v;
+	gsl_qrng_free(q);
+	//cout << "Freed GSL Integration Tool" << endl;
+	//pthread_mutex_unlock( &gsl_mutex );
+
+	vector<double> minima_v, maxima_v;
+	for( unsigned int i=0; i< nDim; ++i )
+	{
+		minima_v.push_back( minima[i] );
+		maxima_v.push_back( maxima[i] );
+	}
+	//cout << "Constructing Functions" << endl;
+	//IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
+
+	for (unsigned int i = 0; i < integrationPoints[0].size(); ++i)
+	{
+		double* point = new double[ nDim ];
+		for ( unsigned int j = 0; j < nDim; j++)
+		{
+			//cout << doIntegrate[j] << " " << maxima[j] << " " << minima[j] << " " << integrationPoints[j][i] << endl;
+			point[j] = integrationPoints[j][i]*(maxima[j]-minima[j])+minima[j];
+		}
+		doEval_points.push_back( point );
+		//result += quickFunction->DoEval( point );
+		//delete[] point;
+	}
+
+	delete[] integrationPoints;
+#endif
+
+	pthread_mutex_unlock( &GSL_DATAPOINT_MANAGEMENT_THREADLOCK );
+	return doEval_points;
+}
+
+vector<double*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int number, double* maxima, double* minima, unsigned int nDim )
+{
+	pthread_mutex_lock( &GSL_DATAPOINT_GET_THREADLOCK );
+	if( number != _global_doEval_points.size() )
+	{
+		clearGSLIntegrationPoints();
+		_global_doEval_points = initGSLDataPoints( number, maxima, minima, nDim );
+	}
+	return _global_doEval_points;
+	pthread_mutex_unlock( &GSL_DATAPOINT_GET_THREADLOCK );
+}
+
+void RapidFitIntegrator::clearGSLIntegrationPoints()
+{
+	pthread_mutex_lock( &GSL_DATAPOINT_MANAGEMENT_THREADLOCK );
+	while( _global_doEval_points.empty() )
+	{
+		if( _global_doEval_points.back() != NULL ) delete _global_doEval_points.back();
+		_global_doEval_points.pop_back();
+	}
+	pthread_mutex_unlock( &GSL_DATAPOINT_MANAGEMENT_THREADLOCK );
+}
 
 double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
 		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, unsigned int num_threads, unsigned int GSLFixedPoints, DebugClass* debug )
@@ -513,60 +613,29 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}
 
-        if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-                {
-                        cout << "RapidFitIntegrator: Doing GSL stuff..." << endl;
-                }
-        }
-
-	unsigned int npoint = GSLFixedPoints;
-	vector<double> * integrationPoints = new vector<double>[doIntegrate.size()];
-
-	//pthread_mutex_lock( &gsl_mutex );
-	//cout << "Allocating GSL Integration Tool" << endl;
-	gsl_qrng * q = NULL;
-	try
+	if( debug != NULL )
 	{
-		//q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)doIntegrate.size() );
-		q = gsl_qrng_alloc( gsl_qrng_niederreiter_2, (unsigned)doIntegrate.size() );
-	}
-	catch(...)
-	{
-		cout << "Can't Allocate Integration Tool for GSL Integral." << endl;
-		cout << "Using: " <<functionToWrap->GetLabel() << " Dim: " << doIntegrate.size() << endl;
-		exit(-742);
-	}
-
-	if( q == NULL )
-	{
-		cout << "Can't Allocate Integration Tool for GSL Integral." << endl;
-		cout << "Using: " <<functionToWrap->GetLabel() << " Dim: " << doIntegrate.size() << endl;
-		exit(-741);
-	}
-
-	for (unsigned int i = 0; i < npoint; i++)
-	{
-		double* v = new double[doIntegrate.size()];
-		gsl_qrng_get( q, v );
-		for( unsigned int j = 0; j < (unsigned)doIntegrate.size(); j++)
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
 		{
-			integrationPoints[j].push_back( v[j] );
+			cout << "RapidFitIntegrator: Doing GSL stuff..." << endl;
 		}
-		delete v;
 	}
-	gsl_qrng_free(q);
-	//cout << "Freed GSL Integration Tool" << endl;
-	//pthread_mutex_unlock( &gsl_mutex );
 
-        if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-                {
-                        cout << "RapidFitIntegrator: Finished GSL stuff..." << endl;
-                }
-        }
+	vector<double*> doEval_points = RapidFitIntegrator::getGSLIntegrationPoints( GSLFixedPoints, maxima, minima, (unsigned)doIntegrate.size() );
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
+			cout << "RapidFitIntegrator: Finished GSL stuff..." << endl;
+		}
+	}
+
+	//result /= double(integrationPoints[0].size());
+
+	//      Construct Thread Objects
+	pthread_t* Thread = new pthread_t[ num_threads ];
+	pthread_attr_t attrib;
 
 	vector<double> minima_v, maxima_v;
 	for( unsigned int i=0; i< doIntegrate.size(); ++i )
@@ -574,27 +643,6 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		minima_v.push_back( minima[i] );
 		maxima_v.push_back( maxima[i] );
 	}
-	//cout << "Constructing Functions" << endl;
-	//IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
-
-	vector<double*> doEval_points;
-	for (unsigned int i = 0; i < integrationPoints[0].size(); ++i)
-	{
-		double* point = new double[ doIntegrate.size() ];
-		for ( unsigned int j = 0; j < doIntegrate.size(); j++)
-		{
-			//cout << doIntegrate[j] << " " << maxima[j] << " " << minima[j] << " " << integrationPoints[j][i] << endl;
-			point[j] = integrationPoints[j][i]*(maxima[j]-minima[j])+minima[j];
-		}
-		doEval_points.push_back( point );
-		//result += quickFunction->DoEval( point );
-		//delete[] point;
-	}
-	//result /= double(integrationPoints[0].size());
-
-	//      Construct Thread Objects
-	pthread_t* Thread = new pthread_t[ num_threads ];
-	pthread_attr_t attrib;
 
 	//	Construct Integrator Functions (1 per theread)
 	vector<IntegratorFunction*> evalFunctions;
@@ -661,12 +709,11 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	{
 		factor *= maxima[i]-minima[i];
 	}
-	result /= ( (double)integrationPoints[0].size() / factor );
+	result /= ( (double)doEval_points.size() / factor );
 
 	//cout << "Hello :D " << result << endl;
 
 	delete[] minima; delete[] maxima;
-	delete[] integrationPoints;
 	while( !evalFunctions.empty() )
 	{
 		if( evalFunctions.back() != NULL ) delete evalFunctions.back();

@@ -215,5 +215,6 @@ RapidFitConfiguration::~RapidFitConfiguration()
 			SoloContourResults.pop_back();
 		}
 		ResultFormatter::CleanUp();
+		RapidFitIntegrator::clearGSLIntegrationPoints();
 }
 
