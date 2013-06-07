@@ -149,6 +149,11 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "       This will print a lot of options available for the Projections or ComponentProjections of a fit to data" << endl;
 
 	cout << endl;
+	cout << "--SendOutput <folder name>" << endl;
+	cout << "	Write the output to a folder with the given name." << endl;
+
+	cout << endl;
+
 }
 
 void ParseCommandLine::RapidFitAbout( string name )
@@ -600,6 +605,18 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 				if( config.debug != NULL ) delete config.debug;
 				config.debug = thisDebug;
 			}
+		}
+		else if( currentArgument == "--SendOutput" )
+		{
+			if( argumentIndex + 1 < argv.size() )
+			{
+				++argumentIndex;
+				ResultFormatter::SetOutputFolder(argv[argumentIndex]);	
+			}
+			else{
+				cerr << "Required to give output folder name" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}	
 		}
 
 		//	The Parameters beyond here are for setting boolean flags

@@ -326,8 +326,25 @@ void ResultFormatter::CleanUp()
 
 string ResultFormatter::GetOutputFolder()
 {
+	if( ResultFormatter::thisOutputFolder == NULL )
+	{
+		ResultFormatter::thisOutputFolder = new string();
+	}	
 	return *ResultFormatter::thisOutputFolder;
 }
+
+void ResultFormatter::SetOutputFolder(string name)
+{
+	TString output_folder(name);
+	if( ResultFormatter::thisOutputFolder == NULL )
+	{
+		ResultFormatter::thisOutputFolder = new string();
+	}	
+	ResultFormatter::thisOutputFolder = new string( output_folder.Data() );
+	//*ResultFormatter::thisOutputFolder = name;
+	gSystem->mkdir( output_folder );
+}
+
 
 void ResultFormatter::initOutputFolder()
 {

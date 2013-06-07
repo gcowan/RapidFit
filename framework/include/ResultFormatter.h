@@ -67,6 +67,7 @@ class ResultFormatter
 		static string GetOutputFolder();
 
 		static void initOutputFolder();
+		static void SetOutputFolder(string);
 
 		static void CleanUp();
 	private:
