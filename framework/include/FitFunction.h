@@ -158,6 +158,7 @@ class FitFunction
 
 		vector<string> GetNotConstrainedList() const;
 
+		unsigned int GetCallNum();
 	protected:
 		/*!
 		 * Don't Copy the class this way!

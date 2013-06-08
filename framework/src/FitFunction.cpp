@@ -345,8 +345,6 @@ double FitFunction::Evaluate()
 	}
 
 
-	cout << "Call: " << left << setw(5) << callNum << " NLL: " << setprecision(10) << minimiseValue << setw(20) << " " <<  "\r" << flush;
-
 	if( std::isnan(minimiseValue) )
 	{
 		this->GetParameterSet()->Print();
@@ -439,5 +437,10 @@ void FitFunction::SetDebug( DebugClass* input_debug )
 {
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
+}
+
+unsigned int FitFunction::GetCallNum()
+{
+	return callNum;
 }
 

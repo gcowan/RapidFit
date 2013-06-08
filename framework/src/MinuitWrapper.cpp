@@ -211,6 +211,7 @@ void MinuitWrapper::CallHesse()
 //Use Migrad to minimise the given function
 void MinuitWrapper::Minimise()
 {
+	currentMinuitInstance = minuit;
 	int errorFlag = 0;
 	double* arguments = new double[2];// = {0.0, 0.0};
 	vector<string> allNames = function->GetParameterSet()->GetAllNames();
@@ -557,6 +558,13 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 		cerr << "Failed to set physics parameters or Eval Function" << endl;
 		throw(-99999);
 	}
+
+	double min, edm, errdef;
+	int mnpar, nparx, stat;
+	currentMinuitInstance->mnstat( min, edm, errdef, mnpar, nparx, stat );
+
+	cout << "Call: " << left << setw(5) << function->GetCallNum() << " NLL: " << setprecision(10) << fval << "   BestMin: " << min << " DistanceToBestMin: " << setprecision(3) << edm;
+	cout << " CovMatrixStatus: " << stat << setw(20) << " " <<  "\r" << flush;
 }
 
 //Return the result of minimisation

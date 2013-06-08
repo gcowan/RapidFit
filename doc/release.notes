@@ -1,7 +1,10 @@
 // $Id: release.notes $
 
-2012/06/07 Dianne Ferguson
- - Added --SendOutput <folder name> command line option, allows the user to assign the name of the folder into which the output is written.
+2013/06/08 Rob Currie
+  - Added 30sec hack to give some more update on current fit status
+
+2013/06/07 Dianne Ferguson
+  - Added --SendOutput <folder name> command line option, allows the user to assign the name of the folder into which the output is written.
 
 2013/06/06 Rob Currie
   - Moved GSL initialization of integral points to get/set method which should buy some speed improvements and makes the GSLPseudoIntegrator cleaner
