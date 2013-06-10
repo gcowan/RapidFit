@@ -122,7 +122,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 
 	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
 
-	, performingComponentProjection( input.performingComponentProjection ), DebugFlag_v5( input.DebugFlag_v5 )
+	, performingComponentProjection( input.performingComponentProjection ), DebugFlag_v6( input.DebugFlag_v6 )
 {
 	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
@@ -201,7 +201,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	, allowNegativeAsSq(false)
 	, _usePlotComponents(false)
 	, _usePlotAllComponents(false)
-	, DebugFlag_v5(true)
+	, DebugFlag_v6(true)
 	, _offsetToGammaForBetaFactor()
 	//objects
 	,t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(), tag(),
@@ -238,7 +238,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	_usePlotComponents = configurator->isTrue( "PlotComponents" ) ;
 	_usePlotAllComponents = configurator->isTrue( "PlotAllComponents" ) ; 
 	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
-	DebugFlag_v5 = !configurator->hasConfigurationValue( "DEBUG", "False" );
+	DebugFlag_v6 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
 	string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
 	if( offsetToGammaForBetaFactor == "" )
@@ -819,7 +819,7 @@ double Bs2JpsiPhi_Signal_v6::Evaluate(DataPoint * measurement)
 
 	if( !performingComponentProjection )
 	{
-		if( DebugFlag_v5 )
+		if( DebugFlag_v6 )
 		{
         	        //conditions to throw exception
         	        bool c1 = std::isnan(returnValue);
@@ -898,7 +898,7 @@ double Bs2JpsiPhi_Signal_v6::EvaluateTimeOnly(DataPoint * measurement)
     double returnValue = this->diffXsecTimeOnly( );
 
 
-	if( DebugFlag_v5 )
+	if( DebugFlag_v6 )
 	{
         	//conditions to throw exception
 		bool c1 = std::isnan(returnValue) ;
@@ -1026,7 +1026,7 @@ double Bs2JpsiPhi_Signal_v6::Normalisation(DataPoint * measurement, PhaseSpaceBo
 
 	if( !performingComponentProjection )
 	{
-		if( DebugFlag_v5 )
+		if( DebugFlag_v6 )
 		{
 			// Conditions to throw exception
 			bool c1 = std::isnan(returnValue);
@@ -1402,7 +1402,7 @@ double Bs2JpsiPhi_Signal_v6::diffXsec()
 	Observable* timeObs = _datapoint->GetObservable( timeName );
 	//if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, 0.0 );
-	if( DebugFlag_v5 )
+	if( DebugFlag_v6 )
 	{
 		if( xsec < 0)
 		{
@@ -1444,7 +1444,7 @@ double Bs2JpsiPhi_Signal_v6::diffXsecTimeOnly()
 	//if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, 0.0 );
 
-	if( DebugFlag_v5 )
+	if( DebugFlag_v6 )
 	{
 		if( xsec < 0 )
 		{
@@ -1485,7 +1485,7 @@ double Bs2JpsiPhi_Signal_v6::diffXsecNorm1()
 		ASint()*AT() * timeFactorImASATInt(  ) * angAccI9 +
 		ASint()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
 
-	if( DebugFlag_v5 )
+	if( DebugFlag_v6 )
 	{
 		if( norm < 0 )
 		{
@@ -1604,7 +1604,7 @@ void Bs2JpsiPhi_Signal_v6::CacheTimeIntegrals()
 			}
 
 		}
-/*	}
+/ *	}
 	else
 	{
 		for( unsigned int ires=0; ires < 4 ; ++ires )
@@ -1640,8 +1640,8 @@ void Bs2JpsiPhi_Signal_v6::CacheTimeIntegrals()
 			}
 		}
 	}
-*/
-/*
+* /
+/ *
 	tlo = tlo_boundary;
 	thi = thi_boundary;
 

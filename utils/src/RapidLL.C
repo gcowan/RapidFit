@@ -185,6 +185,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 	drawn_histo->GetYaxis()->SetTitle( EdStyle::GetParamRootName( TString("LLscan") ) );
 	new_canvas->Update();
 
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub.C");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub.png");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub.pdf");
 
@@ -192,6 +193,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 	new_canvas->SetTitle("");
 	text_1->Draw("SAME");
 	new_canvas->Update();
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub_nopoints.C");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub_nopoints.png");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub_nopoints.pdf");
 
@@ -205,6 +207,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 	color_graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( TString("LLscan") ) );
 	new_canvas->Update();
 
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf.C");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf.png");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf.pdf");
 
@@ -212,6 +215,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 	new_canvas->SetTitle("");
 	text_1->Draw("SAME");
 	new_canvas->Update();
+	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf_nopoints.C");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf_nopoints.png");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf_nopoints.pdf");
 
@@ -249,6 +253,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 		TString param_file = *param_i;
 
+		Histogram_Processing::Silent_Print( param_c, param_file+".C" );
 		Histogram_Processing::Silent_Print( param_c, param_file+".pdf" );
 		Histogram_Processing::Silent_Print( param_c, param_file+".png" );
 
@@ -263,6 +268,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 		err_graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param_string + value_suffix ) + " " + EdStyle::GetParamRootUnit( param_string ) );
 		err_graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( *param_i + error_suffix ) + " " + EdStyle::GetParamRootUnit( *param_i ) );
 
+		Histogram_Processing::Silent_Print( param_c, param_file+"_"+error_suffix+".C" );
 		Histogram_Processing::Silent_Print( param_c, param_file+"_"+error_suffix+".pdf" );
 		Histogram_Processing::Silent_Print( param_c, param_file+"_"+error_suffix+".png" );
 	}
@@ -379,9 +385,11 @@ void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 	newOverlay->Update();
 
 	TString Name="Overlay_Graph";
+	newOverlay->Print(Name+".png");
 	newOverlay->Print(Name+".pdf");
 	newOverlay->Print(Name+".C");
 	Name.Append("_");Name.Append(timeStamp);
+	newOverlay->Print(Name+".png");
 	newOverlay->Print(Name+".pdf");
 	newOverlay->Print(Name+".C");
 
@@ -396,9 +404,11 @@ void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 	newOverlay2->Update();
 
 	Name="Overlay_Graph_noPoints";
+	newOverlay2->Print(Name+".png");
 	newOverlay2->Print(Name+".pdf");
 	newOverlay2->Print(Name+".C");
 	Name.Append("_");Name.Append(timeStamp);
+	newOverlay2->Print(Name+".png");
 	newOverlay2->Print(Name+".pdf");
 	newOverlay2->Print(Name+".C");
 

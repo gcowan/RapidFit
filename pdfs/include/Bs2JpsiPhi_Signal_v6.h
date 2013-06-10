@@ -77,7 +77,7 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 
 		DataPoint* _datapoint;
 
-		bool DebugFlag_v5;
+		bool DebugFlag_v6;
 
 	protected:
 		//Calculate the PDF normalisation
@@ -551,7 +551,7 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 				       );
 
 			//DEBUG
-			if( DebugFlag_v5 )
+			if( DebugFlag_v6 )
 			{
 				if( result < 0 )
 				{

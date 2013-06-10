@@ -35,7 +35,7 @@
 </PDF>
 <DataSet>
 <Source>Foam</Source>
-<NumberEvents>1000000</NumberEvents>
+<NumberEvents>10000000</NumberEvents>
 <PhaseSpaceBoundary>
 <Observable>
 <Name>x</Name>
@@ -47,5 +47,10 @@
 </ToFit>
 <Output>
 <Projection>x</Projection>
+<Scan>
+<Name>sigma</Name>
+<Sigma>3.</Sigma>
+<Points>10</Points>
+</Scan>
 </Output>
 </RapidFit>

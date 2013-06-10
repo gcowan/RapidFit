@@ -61,6 +61,8 @@ int main( int argc, char* argv[] )
 		all_TH1[i]->Draw();
 		OptimallyRebin( all_TH1[i], 1 );
 		c1->Print( Canvas_Name+".pdf" );
+		c1->Print( Canvas_Name+".png" );
+		c1->Print( Canvas_Name+".C" );
 	}
 
 

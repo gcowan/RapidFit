@@ -328,8 +328,8 @@ string ResultFormatter::GetOutputFolder()
 {
 	if( ResultFormatter::thisOutputFolder == NULL )
 	{
-		ResultFormatter::thisOutputFolder = new string();
-	}	
+		ResultFormatter::initOutputFolder();
+	}
 	return *ResultFormatter::thisOutputFolder;
 }
 

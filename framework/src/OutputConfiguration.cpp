@@ -186,7 +186,7 @@ vector<double> OutputConfiguration::GetRange( ScanParam* Wanted_Param )
 	{
 
 		double error = Stored_Fit_Results[0]->GetResultParameter( wanted_param )->GetError();
-		error = Wanted_Param->GetSigma() * error;
+		error = Wanted_Param->GetSigma() * Wanted_Param->GetSigma() * error;
 		double maximum = Stored_Fit_Results[0]->GetResultParameter( wanted_param )->GetValue() + error;
 		double minimum = Stored_Fit_Results[0]->GetResultParameter( wanted_param )->GetValue() - error;
 		ReturnRange.push_back( maximum );

@@ -280,7 +280,7 @@ void MinuitWrapper::Minimise()
 	int preHesseStatus = fitStatus;
 
 	time(&timeNow);
-	cout << "\nFinal NLL: " << minimumValue << "\t\tStatus: " << fitStatus << "\t\t" << ctime(&timeNow) << endl << endl;
+	cout << "\nFinal NLL: " << setprecision(15) << minimumValue << "\t\tStatus: " << fitStatus << "\t\t" << ctime(&timeNow) << endl << endl;
 
 	string NoHesse("NoHesse");
 	if( StringProcessing::VectorContains( &Options, &NoHesse ) == -1 )
@@ -563,8 +563,8 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	int mnpar, nparx, stat;
 	currentMinuitInstance->mnstat( min, edm, errdef, mnpar, nparx, stat );
 
-	cout << "Call: " << left << setw(5) << function->GetCallNum() << " NLL: " << setprecision(10) << fval << "   BestMin: " << min << " DistanceToBestMin: " << setprecision(3) << edm;
-	cout << " CovMatrixStatus: " << stat << setw(20) << " " <<  "\r" << flush;
+	cout << "Call: " << left << setw(5) << function->GetCallNum() << " NLL: " << setprecision(10) << fval << " minNLL: " << setprecision(10) << min << " EDM: " << setprecision(3) << setw(5) << edm;
+	cout << " Status: " << setw(1) << stat << setw(20) << " " <<  "\r" << flush;
 }
 
 //Return the result of minimisation

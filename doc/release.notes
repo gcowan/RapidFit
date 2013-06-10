@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/06/09 Rob Currie
+  - Fixed bug due to unitialized output folder
+  - Added some .C outputs to RapidPlot output
+
 2013/06/08 Rob Currie
   - Added 30sec hack to give some more update on current fit status
 
