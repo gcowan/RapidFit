@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/06/17 Rob Currie
+  - Fixed numerous bugs in PolyPDF, hopefully this should now work and an example .xml is in the tutorials folder
+
 2013/06/09 Rob Currie
   - Fixed bug due to unitialized output folder
   - Added some .C outputs to RapidPlot output

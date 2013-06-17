@@ -34,6 +34,8 @@ PolyPDF::PolyPDF( PDFConfigurator* config ) :
 	}
 
 	allParameters = ParameterSet( parameterPrimitives );
+
+	allObservables.push_back( xName );
 }
 
 PolyPDF::~PolyPDF()
@@ -54,16 +56,19 @@ bool PolyPDF::SetPhysicsParameters( ParameterSet* input )
 
 double PolyPDF::Evaluate( DataPoint* input )
 {
-	double total = parameterValues[0];
+	double total = 0.;//parameterValues[0];
 
 	double x = input->GetObservable( xName )->GetValue();
 
-	for( unsigned int i=1; i<= order; ++i )
+	double running_x = 1.;
+
+	for( unsigned int i=0; i<= order; ++i )
 	{
-		total += parameterValues[i] * pow( x, (double)i );
+		total += parameterValues[i] * running_x;
+		running_x*=x;
 	}
 
-	if( total <= 1E-99 ) return 1E-99;
+	//if( total <= 1E-999 ) return 1E-999;
 
 	return total;
 }
@@ -77,14 +82,18 @@ double PolyPDF::Normalisation( PhaseSpaceBoundary* range )
 
 	double total=0.;
 
-	double const_val = (max - min) * parameterValues[0];
+	double running_max = max;
+	double running_min = min;
 
-	total+=const_val;
-
-	for( unsigned int i=1; i< order; ++i )
+	for( unsigned int i=0; i<= order; ++i )
 	{
-		total += (parameterValues[i] / (double)i) * ( pow( max, (double)(i+1) ) - pow( min, (double)(i+1) ) );
+		//total += (parameterValues[i] / ((double)i+1.)) * ( ( pow( max, (double)i+1. ) ) - ( pow( min, (double)i+1. ) ) );
+		total += ( parameterValues[i] / ((double)i+1.) ) * ( running_max - running_min );
+		running_max*=max;
+		running_min*=min;
 	}
+
+	//if( total <= 1E-999 ) return 1E-999;
 
 	return total;
 }

@@ -1,0 +1,57 @@
+<RapidFit>
+	<ParameterSet>
+		<PhysicsParameter>
+			<Name>Poly_0</Name>
+			<Value>500.</Value>
+			<Minimum>-1000.</Minimum>
+			<Maximum>1000.</Maximum>
+		#	<Type>Fixed</Type>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Poly_1</Name>
+			<Value>-3.</Value>
+			<Minimum>-100.</Minimum>
+			<Maximum>100.</Maximum>
+		#	<Type>Fixed</Type>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Poly_2</Name>
+			<Value>5.</Value>
+			<Minimum>-100.</Minimum>
+			<Maximum>100.</Maximum>
+		#	<Type>Fixed</Type>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Poly_3</Name>
+			<Value>5.</Value>
+			<Minimum>-100.</Minimum>
+			<Maximum>100.</Maximum>
+		#	<Type>Fixed</Type>
+		</PhysicsParameter>
+	</ParameterSet>
+	<Minimiser>Minuit</Minimiser>
+	<FitFunction>
+		<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+		<Threads>16</Threads>
+	</FitFunction>
+	<ToFit>
+		<PDF>
+			<Name>PolyPDF</Name>
+			<ConfigurationParameter>Order:2</ConfigurationParameter>
+		</PDF>
+		<DataSet>
+			<Source>Foam</Source>
+			<NumberEvents>1000000</NumberEvents>
+			<PhaseSpaceBoundary>
+				<Observable>
+					<Name>x</Name>
+					<Minimum>0.01</Minimum>
+					<Maximum>10.</Maximum>
+				</Observable>
+			</PhaseSpaceBoundary>
+		</DataSet>
+	</ToFit>
+	<Output>
+		<Projection>x</Projection>
+	</Output>
+</RapidFit>
