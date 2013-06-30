@@ -7,10 +7,12 @@
  *  @date 2009-07-30
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bs2JpsiPhiMassBkg.h"
 #include <iostream>
 #include "math.h"
-#include "TMath.h"
 #include <float.h>
 
 //#define DOUBLE_TOLERANCE DBL_MIN

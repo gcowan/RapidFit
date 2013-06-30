@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/06/30 Rob Currie
+  - Had to fight with a broken version of ROOT on a system so had to touch a LOT of pdfs to make sure that std::isnan points to a real object...
+       This is stricty working around a ROOT bug but as it's in a version of ROOT which was stable for a long time I think it's best we work around it
+  - Commented out the TGLStopwatch class unless building with make debug
+       This isn't ideal, but the current builds on lxplus are currently not all being built correctly and link against non-existant libGLEW libraries
+       This is an 'advanced' feature and this was only implemented to get sub-second time meaurements of the evaluate mathod in the FitFunction
+       As it's advanced disabling this is the best approach as it allows people to build RapidFit on lxplus without thinking
+
 2013/06/29 Rob Currie
   - Fixed Projections for complex PDFs
        Only reason I was not able to reproduce this in simpler XML is that these use much simpler code than the full numerical integral at each point

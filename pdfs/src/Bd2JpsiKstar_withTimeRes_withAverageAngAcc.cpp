@@ -7,11 +7,13 @@
  *  @date 2010-01-12
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bd2JpsiKstar_withTimeRes_withAverageAngAcc.h"
 #include "Mathematics.h"
 #include <iostream>
 #include "math.h"
-#include "TMath.h"
 
 PDF_CREATOR( Bd2JpsiKstar_withTimeRes_withAverageAngAcc );
 

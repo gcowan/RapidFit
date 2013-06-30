@@ -13,8 +13,9 @@
 #define RAPIDFIT_MATHEMATICS
 
 ///	ROOT Headers
-#include "RooMath.h"
 #include "TMath.h"
+#include <cmath>
+#include "RooMath.h"
 #include "RooSentinel.h"
 ///	RapidFit Headers
 #include "IDataSet.h"

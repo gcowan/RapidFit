@@ -7,10 +7,12 @@
  *  @date 2011-01-28
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bs2Jpsifzero_SignalAlt_MP_dev.h"
 #include <iostream>
 #include "math.h"
-#include "TMath.h"
 #include "Mathematics.h"
 
 #include <float.h>

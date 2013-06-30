@@ -7,10 +7,12 @@
  *  @date 2011-02-13
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bs2JpsiPhi_SignalAlt_MO_1angle_v4.h"
 #include <iostream>
 #include "math.h"
-#include "TMath.h"
 #include "Mathematics.h"
 
 #define DEBUGFLAG true

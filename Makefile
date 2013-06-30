@@ -174,7 +174,7 @@ gsl: override LINKFLAGS+= -L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/
 gsl: all
 
 #	Have a build option that SCREAMS at the user for potential mistakes!!!
-debug: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++ -ggdb -Wno-reorder -Wunused-function -Wunused-label -Wunused-value -Wunused-variable
+debug: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++ -ggdb -Wno-reorder -Wunused-function -Wunused-label -Wunused-value -Wunused-variable -DRAPIDFIT_USETGLTIMER
 debug: all
 debug-utils: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++
 debug-utils: utils

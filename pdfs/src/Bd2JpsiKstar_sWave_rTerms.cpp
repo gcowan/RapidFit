@@ -6,11 +6,13 @@
  *  @date 2011-01-26
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bd2JpsiKstar_sWave_rTerms.h"
 #include "Mathematics.h"
 #include <iostream>
 #include "math.h"
-#include "TMath.h"
 
 PDF_CREATOR( Bd2JpsiKstar_sWave_rTerms );
 

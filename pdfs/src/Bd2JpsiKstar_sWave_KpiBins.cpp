@@ -6,15 +6,17 @@
  *  @date 2011-01-26
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bd2JpsiKstar_sWave_KpiBins.h"
 #include "Mathematics.h"
 #include "SlicedAcceptance.h"
 #include <iostream>
-#include "math.h"
-#include "TMath.h"
+//#include "math.h"
+//#include "TMath.h"
 
 PDF_CREATOR( Bd2JpsiKstar_sWave_KpiBins );
-
 
 //Constructor
 Bd2JpsiKstar_sWave_KpiBins::Bd2JpsiKstar_sWave_KpiBins(PDFConfigurator* configurator) :

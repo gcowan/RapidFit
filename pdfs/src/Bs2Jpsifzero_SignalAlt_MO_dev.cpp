@@ -7,6 +7,9 @@
  *  @date 2011-02-13
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bs2Jpsifzero_SignalAlt_MO_dev.h"
 #include <iostream>
 #include "math.h"

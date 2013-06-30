@@ -7,6 +7,9 @@
  *  @date 2009-11-13
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "DPTotalAmplitudePDF.h"
 #include "DPJpsiKaon.hh"
 #include "DPZplusK.hh"
@@ -15,7 +18,6 @@
 
 #include <iostream>
 #include "math.h"
-#include "TMath.h"
 #include "TComplex.h"
 #include "RooMath.h"
 

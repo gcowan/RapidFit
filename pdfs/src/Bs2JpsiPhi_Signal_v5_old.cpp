@@ -7,10 +7,12 @@
  *  @date 2011-02-13
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bs2JpsiPhi_Signal_v5_old.h"
 #include <iostream>
 #include "math.h"
-#include "TMath.h"
 #include "TF1.h"
 #include "RooMath.h"
 #include "Mathematics.h"

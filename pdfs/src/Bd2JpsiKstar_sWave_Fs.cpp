@@ -6,19 +6,20 @@
  *  @date 2011-01-26
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bd2JpsiKstar_sWave_Fs.h"
 #include "Mathematics.h"
 #include "SlicedAcceptance.h"
 #include <iostream>
 #include <fstream>
-#include "math.h"
-#include "TMath.h"
+//#include "math.h"
 #include "TFile.h"
 #include "TH3D.h"
 #include "TROOT.h"
 
 PDF_CREATOR( Bd2JpsiKstar_sWave_Fs );
-
 
 Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs( const Bd2JpsiKstar_sWave_Fs& input ) : BasePDF( (BasePDF&) input ),
 	cachedAzeroAzeroIntB(input.cachedAzeroAzeroIntB), cachedAparaAparaIntB(input.cachedAparaAparaIntB), cachedAperpAperpIntB(input.cachedAperpAperpIntB),
@@ -271,7 +272,7 @@ Bd2JpsiKstar_sWave_Fs::Bd2JpsiKstar_sWave_Fs(PDFConfigurator* configurator ) :
 	cout << endl;
 
 	// Check.  This order works for both bases since phi is always the third one.
-	if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*TMath::Pi() )
+	if ((xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < 2.*Mathematics::Pi() )
 	{
 		cout << "In LongLivedBkg_3Dangular::LongLivedBkg_3Dangular: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
 		exit(1);

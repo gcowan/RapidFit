@@ -6,13 +6,15 @@
  *  @date 2011-01-26
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "Bd2JpsiKstar_sWave_Fscopy.h"
 #include "Mathematics.h"
 #include "SlicedAcceptance.h"
 #include <iostream>
 #include <fstream>
 #include "math.h"
-#include "TMath.h"
 #include "TFile.h"
 #include "TH3D.h"
 #include "TROOT.h"

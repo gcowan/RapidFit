@@ -14,7 +14,9 @@
 
 //	ROOT Headers
 #include "TStopwatch.h"
+#ifdef RAPIDFIT_USETGLTIMER
 #include "TGLStopwatch.h"
+#endif
 //	RapidFit Headers
 #include "FitResult.h"
 //	System Headers
@@ -209,8 +211,10 @@ class FitResultVector
 		vector<double> allCPUTimes;		/*!	All of the CPU times for all FitResults				*/
 		TStopwatch* clock;			/*!	Stop Watch to time the length of time to generate a FitResult	*/
 
+		#ifdef RAPIDFIT_USETGLTIMER
 		vector<double> allGLTimes;
 		TGLStopwatch* gl_clock;
+		#endif
 };
 
 #endif

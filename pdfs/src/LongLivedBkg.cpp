@@ -7,6 +7,9 @@
  *  @date 2011-05-30
  */
 
+#include "TMath.h"
+#include <cmath>
+
 #include "LongLivedBkg.h"
 #include "Mathematics.h"
 #include <iostream>

@@ -20,12 +20,17 @@ using namespace::std;
 //  Constructor to Return a single array from multiple arrays
 FitResultVector::FitResultVector( const vector<FitResultVector*> Result_Array ) :
 	allResults(), allNames(), allValues(), allErrors(), allPulls(), allGenValues(),
-	allRealTimes(), allCPUTimes(), clock(NULL), gl_clock(NULL), allGLTimes()
+	allRealTimes(), allCPUTimes(), clock(NULL)
+	#ifdef RAPIDFIT_USETGLTIMER
+	, gl_clock(NULL), allGLTimes()
+	#endif
 {
 	if( !Result_Array.empty() )
 	{
 		clock = new TStopwatch();
+		#ifdef RAPIDFIT_USETGLTIMER
 		gl_clock = new TGLStopwatch();
+		#endif
 		allNames = Result_Array.empty()? vector<string>() : Result_Array[0]->GetAllNames();
 		//Construct the result data structure
 		for (unsigned short int nameIndex = 0; nameIndex < allNames.size(); ++nameIndex )
@@ -49,7 +54,9 @@ FitResultVector::FitResultVector( const vector<FitResultVector*> Result_Array ) 
 			{
 				allRealTimes.push_back( input_real_times[j2] );
 				allCPUTimes.push_back( input_cpu_times[j2] );
+				#ifdef RAPIDFIT_USETGLTIMER
 				allGLTimes.push_back( input_gl_times[j2] );
+				#endif
 			}
 
 			if( ((int)input_real_times.size() != Result_Array[i]->NumberResults()) || ((int)input_cpu_times.size() != Result_Array[i]->NumberResults()) )
@@ -63,7 +70,10 @@ FitResultVector::FitResultVector( const vector<FitResultVector*> Result_Array ) 
 //Constructor with correct argument
 FitResultVector::FitResultVector( const vector<string> AllParameterNames ) :
 	allResults(), allNames(AllParameterNames), allValues(), allErrors(), allPulls(), allGenValues(),
-	allRealTimes(), allCPUTimes(), clock(NULL), gl_clock(NULL), allGLTimes()
+	allRealTimes(), allCPUTimes(), clock(NULL)
+	#ifdef RAPIDFIT_USETGLTIMER
+	, gl_clock(NULL), allGLTimes()
+	#endif
 {
 	vector<string> duplicates;
 	allNames = StringProcessing::RemoveDuplicates( AllParameterNames, duplicates );
@@ -87,20 +97,26 @@ FitResultVector::FitResultVector( const vector<string> AllParameterNames ) :
 	}
 
 	clock = new TStopwatch();
+	#ifdef RAPIDFIT_USETGLTIMER
 	gl_clock = new TGLStopwatch();
+	#endif
 }
 
 //Destructor
 FitResultVector::~FitResultVector()
 {
 	if( clock != NULL ) delete clock;
+	#ifdef RAPIDFIT_USETGLTIMER
 	if( gl_clock != NULL ) delete gl_clock;
+	#endif
 }
 
 //Note the time the study starts
 void FitResultVector::StartStopwatch()
 {
+	#ifdef RAPIDFIT_USETGLTIMER
 	gl_clock->Start();
+	#endif
 	clock->Start();
 }
 
@@ -144,9 +160,11 @@ bool FitResultVector::AddFitResult( FitResult * NewResult, const bool with_clock
 	if( with_clock && clock != NULL )
 	{
 		//Store the duration
+		#ifdef RAPIDFIT_USETGLTIMER
 		double thisTime = gl_clock->End();
-		clock->Stop();
 		allGLTimes.push_back( thisTime );
+		#endif
+		clock->Stop();
 		allRealTimes.push_back( clock->RealTime() );
 		allCPUTimes.push_back( clock->CpuTime() );
 	}
@@ -289,13 +307,22 @@ void FitResultVector::AddCPUTime( const double input_time )
 
 void FitResultVector::AddGLTime( const double input_time )
 {
+	#ifdef RAPIDFIT_USETGLTIMER
         allGLTimes.push_back( input_time );
+	#else
+	(void) input_time;
+	#endif
 }
 
 double FitResultVector::GetGLTime( const int Index ) const
 {
+	#ifdef RAPIDFIT_USETGLTIMER
         if( Index < int(allGLTimes.size()) ) return allGLTimes[ unsigned(Index) ];
         else return -1;
+	#else
+	(void) Index;
+	return -1;
+	#endif
 }
 
 void FitResultVector::SetCPUTime( const int Index, const double input_time )
@@ -323,7 +350,11 @@ vector<double> FitResultVector::GetAllCPUTimes() const
 
 vector<double> FitResultVector::GetAllGLTimes() const
 {
+	#ifdef RAPIDFIT_USETGLTIMER
 	return allGLTimes;
+	#else
+	return vector<double>( allCPUTimes.size(), -1. );
+	#endif
 }
 
 vector<double> FitResultVector::GetFlatResult( const int Index ) const
