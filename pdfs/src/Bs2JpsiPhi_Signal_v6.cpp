@@ -1238,7 +1238,7 @@ double Bs2JpsiPhi_Signal_v6::EvaluateComponent( DataPoint* input, ComponentRef* 
 	}
 	else
 	{
-		return 0.;
+		return this->Evaluate( input );
 	}
 
 	double return_value = this->Evaluate( input );

@@ -248,12 +248,14 @@ Bs2Jpsifzero_Signal_v5::Bs2Jpsifzero_Signal_v5(PDFConfigurator* configurator) : 
 		}
 	}
 	else {
-		timeAcc = new SlicedAcceptance( 0., 14. ) ;
+		timeAcc = new SlicedAcceptance( 0., 20. ) ;
 		cout << "Bs2Jpsifzero_Signal_v5:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
 	}
 
+	if( timeAcc = NULL ) timeAcc = new SlicedAcceptance( 0., 20. ) ;
+
 	//Make empty Cache for the time integrals. This has to be done now after the SlicedAcceptance is created
-	vector<double> empty ;
+	vector<double> empty;
 	for( unsigned int islice = 0; islice < timeAcc->numberOfSlices(); ++islice ) empty.push_back(0.0) ;
 	for( int ires=0; ires < 4 ; ++ires ) {
 		storeExpL.push_back( empty ) ;

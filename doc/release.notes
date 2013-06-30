@@ -1,5 +1,21 @@
 // $Id: release.notes $
 
+2013/06/29 Rob Currie
+  - Fixed Projections for complex PDFs
+       Only reason I was not able to reproduce this in simpler XML is that these use much simpler code than the full numerical integral at each point
+       We could do with a nice multi-dim multi-param XML in the tutorials folder to help catch problems like this
+       Code to cache the GSL points was unsuited to the projections as the stored dataponts didn't match the projection phase-space
+       This Should NOT effect any GSL numerical fits, but will effect the projections when using the GSL code
+       Users would have had to have a very complex set of conditions to notice this effect unless they were integrating with a low number of points in the phasespace (<1000)
+       As it stands this was only exposed in JpsiPhi by accident and in conflict with another bug which is now fixed
+  - Fixed minor bug in fzero PDF for conditions where the PDF would crash during construction
+       Also expanded flat timeAcc to 20fs from 14
+  - Changed Default behaviour of v6 PDF to project 'something' from EvaluateComponent rather than return 0.
+       Was this always the case as I don't remember coding this behaviour into the PDF!?!
+  - Fixed minor bug in autosaving an XML where the Yield rather than the number of events to be read in was written to the DataSource Section of the XML
+  - Added a call to request the pointer to the currentPoint object in the IntegrationFunction which corresonds to the DataPoint which was last constructed by this class to be passed to the PDF
+       This should hopefully help with debugging in future
+
 2013/06/17 Rob Currie
   - Fixed numerous bugs in PolyPDF, hopefully this should now work and an example .xml is in the tutorials folder
 

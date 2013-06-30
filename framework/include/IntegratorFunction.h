@@ -186,6 +186,8 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		IntegratorFunction& operator = ( const IntegratorFunction& );
 
 		void SetDebug( DebugClass* debug );
+
+		DataPoint* GetCurrentDataPoint() const;
 	private:
 
 		IPDF * wrappedFunction;					/*!	Pointer to the PDF being interfaced with ROOT objects		*/

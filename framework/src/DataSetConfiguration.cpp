@@ -646,7 +646,7 @@ string DataSetConfiguration::XML() const
 		}
 	}
 	xml << "\t<NumberEvents>";
-	if( internalRef != NULL ) xml << internalRef->Yield() << "</NumberEvents>" << endl;
+	if( internalRef != NULL ) xml << internalRef->GetDataNumber() << "</NumberEvents>" << endl;
 	else xml << 10000 << "</NumberEvents>" << endl;
 	if( source != "File" && generatePDF != NULL ) xml << generatePDF->XML() << endl;
 	if( internalBoundary != NULL ) xml << internalBoundary->XML() << endl;

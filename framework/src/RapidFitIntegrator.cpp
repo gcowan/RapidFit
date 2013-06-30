@@ -479,12 +479,15 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 #endif
 }
 
-vector<double*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, double* maxima, double* minima, unsigned int nDim )
+vector<double*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, vector<double> maxima, vector<double> minima )
 {
 	vector<double*> doEval_points;
 	pthread_mutex_lock( &GSL_DATAPOINT_MANAGEMENT_THREADLOCK );
 
 #ifdef __RAPIDFIT_USE_GSL
+
+	unsigned int nDim = (unsigned) minima.size();
+
 	unsigned int npoint = number;
 	vector<double> * integrationPoints = new vector<double>[ nDim ];
 
@@ -524,12 +527,12 @@ vector<double*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, doub
 	//cout << "Freed GSL Integration Tool" << endl;
 	//pthread_mutex_unlock( &gsl_mutex );
 
-	vector<double> minima_v, maxima_v;
+	/*vector<double> minima_v, maxima_v;
 	for( unsigned int i=0; i< nDim; ++i )
 	{
 		minima_v.push_back( minima[i] );
 		maxima_v.push_back( maxima[i] );
-	}
+	}*/
 	//cout << "Constructing Functions" << endl;
 	//IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
 
@@ -549,17 +552,20 @@ vector<double*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, doub
 	delete[] integrationPoints;
 #endif
 
+	(void) maxima; (void) minima; (void) number;
 	pthread_mutex_unlock( &GSL_DATAPOINT_MANAGEMENT_THREADLOCK );
 	return doEval_points;
 }
 
-vector<double*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int number, double* maxima, double* minima, unsigned int nDim )
+vector<double*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima )
 {
 	pthread_mutex_lock( &GSL_DATAPOINT_GET_THREADLOCK );
-	if( number != _global_doEval_points.size() )
+	if( ( number != _global_doEval_points.size() ) || ( ( _global_range_minima != minima ) || ( _global_range_maxima != maxima ) ) )
 	{
 		clearGSLIntegrationPoints();
-		_global_doEval_points = initGSLDataPoints( number, maxima, minima, nDim );
+		_global_doEval_points = initGSLDataPoints( number, maxima, minima );
+		_global_range_minima = minima;
+		_global_range_maxima = maxima;
 	}
 	pthread_mutex_unlock( &GSL_DATAPOINT_GET_THREADLOCK );
 	return _global_doEval_points;
@@ -572,6 +578,8 @@ void RapidFitIntegrator::clearGSLIntegrationPoints()
 	{
 		if( _global_doEval_points.back() != NULL ) delete _global_doEval_points.back();
 		_global_doEval_points.pop_back();
+		_global_range_minima.clear();
+		_global_range_maxima.clear();
 	}
 	pthread_mutex_unlock( &GSL_DATAPOINT_MANAGEMENT_THREADLOCK );
 }
@@ -581,7 +589,19 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 {
 #ifdef __RAPIDFIT_USE_GSL
 
-	//cout << endl << "Using: " << num_threads << endl;
+	/*
+	cout << endl << "Using: " << num_threads << endl;
+	cout << "Do:" << endl;
+	for( unsigned int i=0; i< doIntegrate.size();++i )
+	{
+		cout << doIntegrate[i] << endl;
+	}
+	cout << "Dont:" << endl;
+	for( unsigned int i=0; i< dontIntegrate.size();++i )
+	{
+		cout << dontIntegrate[i] << endl;
+	}
+	*/
 
 	//Make arrays of the observable ranges to integrate over
 	double* minima = new double[ doIntegrate.size() ];
@@ -621,7 +641,14 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		}
 	}
 
-	vector<double*> doEval_points = RapidFitIntegrator::getGSLIntegrationPoints( GSLFixedPoints, maxima, minima, (unsigned)doIntegrate.size() );
+        vector<double> minima_v, maxima_v;
+        for( unsigned int i=0; i< doIntegrate.size(); ++i )
+        {
+                minima_v.push_back( minima[i] );
+                maxima_v.push_back( maxima[i] );
+        }
+
+	vector<double*> doEval_points = RapidFitIntegrator::getGSLIntegrationPoints( GSLFixedPoints, maxima_v, minima_v );
 
 	if( debug != NULL )
 	{
@@ -637,13 +664,6 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	pthread_t* Thread = new pthread_t[ num_threads ];
 	pthread_attr_t attrib;
 
-	vector<double> minima_v, maxima_v;
-	for( unsigned int i=0; i< doIntegrate.size(); ++i )
-	{
-		minima_v.push_back( minima[i] );
-		maxima_v.push_back( maxima[i] );
-	}
-
 	//	Construct Integrator Functions (1 per theread)
 	vector<IntegratorFunction*> evalFunctions;
 	for( unsigned int i=0; i< num_threads; ++i ) evalFunctions.push_back( new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate,
@@ -658,6 +678,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	{
 		fit_thread_data[i].function = evalFunctions[i];
 		fit_thread_data[i].normalise_points = eval_perThread[i];
+		fit_thread_data[i].integral_dim = (unsigned)doIntegrate.size();
 	}
 
 	//	Construct Threads
@@ -700,6 +721,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	{
 		for( unsigned int point_num=0; point_num< fit_thread_data[threadnum].dataPoint_Result.size(); ++point_num )
 		{
+			//cout << fit_thread_data[threadnum].dataPoint_Result[ point_num ] << endl;
 			result+= fit_thread_data[threadnum].dataPoint_Result[ point_num ];
 		}
 		fit_thread_data[threadnum].dataPoint_Result.clear();
@@ -709,6 +731,9 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	{
 		factor *= maxima[i]-minima[i];
 	}
+
+	//cout << doEval_points.size() << " / " << factor << " = " << ( (double)doEval_points.size() / factor ) << endl;
+
 	result /= ( (double)doEval_points.size() / factor );
 
 	//cout << "Hello :D " << result << endl;
@@ -740,6 +765,16 @@ void* RapidFitIntegrator::ThreadWork( void* inputData )
 	for( unsigned int i=0; i< (unsigned)thread_object->normalise_points.size(); ++i )
 	{
 		thread_object->dataPoint_Result.push_back( thread_object->function->DoEval( thread_object->normalise_points[i] ) );
+		/*if( thread_object->dataPoint_Result.back() == 0 )
+		{
+			cout << "PDF Gave Exactly 0!?!" << endl;
+			for( unsigned int j=0; j< thread_object->integral_dim; ++j )
+			{
+				cout << thread_object->normalise_points[i][j] << endl;
+			}
+			thread_object->function->GetCurrentDataPoint()->Print();
+			exit(0);
+		}*/
 	}
 	//      Finished evaluating this thread
 	pthread_exit( NULL );
@@ -814,6 +849,16 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 
 	dontIntegrate = StringProcessing::CombineUniques( dontIntegrate, DontIntegrateThese );
 	dontIntegrate = this->DontNumericallyIntegrateList( NewDataPoint, dontIntegrate );
+
+	vector<string> safeDoIntegrate;
+	for( unsigned int i=0; i< doIntegrate.size(); ++i )
+	{
+		if( StringProcessing::VectorContains( &dontIntegrate, &(doIntegrate[i]) ) == -1 )
+		{
+			safeDoIntegrate.push_back( doIntegrate[i] );
+		}
+	}
+	doIntegrate = safeDoIntegrate;
 
 	vector<DataPoint*> DiscreteIntegrals;
 
@@ -980,6 +1025,8 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 	double value = -1.;
 
+	dontIntegrate.push_back(ProjectThis);
+
 	vector<string> allIntegrable = functionToWrap->GetPrototypeDataPoint();
 
 	vector<string> testedIntegrable;
@@ -991,8 +1038,6 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 			testedIntegrable.push_back( allIntegrable[i] );
 		}
 	}
-
-	dontIntegrate.push_back(ProjectThis);
 
 	if( debug != NULL )
 	{

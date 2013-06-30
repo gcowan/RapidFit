@@ -280,6 +280,7 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 	if( fabs(result) >= DBL_MAX ) result = 0.;
 	if( std::isnan(result) ) result = 0.;
 
+	//if( result == 0 ) newDataPoint->Print();
 	newDataPoint->ClearPseudoObservable();
 	return result;
 }
@@ -327,4 +328,10 @@ void IntegratorFunction::SetDebug( DebugClass* input_debug )
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
 }
+
+DataPoint* IntegratorFunction::GetCurrentDataPoint() const
+{
+	return newDataPoint;
+}
+
 
