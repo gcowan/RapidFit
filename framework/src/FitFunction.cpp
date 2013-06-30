@@ -12,7 +12,9 @@
 #include "TTree.h"
 #include "TBranch.h"
 #include "TString.h"
+#ifdef RAPIDFIT_USETGLTIMER
 #include "TGLStopwatch.h"
+#endif
 //	RapidFit Headers
 #include "FitFunction.h"
 #include "Threading.h"
@@ -263,12 +265,15 @@ double FitFunction::Evaluate()
 	++callNum;
 	//time_t start, end;
 	//time(&start);
+
+	#ifdef RAPIDFIT_USETGLTIMER
 	TGLStopwatch* thisWatch = NULL;
 	if( Fit_Tree !=NULL )
 	{
 		thisWatch = new TGLStopwatch();
 		thisWatch->Start();
 	}
+	#endif
 	double minimiseValue = 0.0;
 	double temp=0.;
 	//Calculate the function value for each PDF-DataSet pair
@@ -323,7 +328,11 @@ double FitFunction::Evaluate()
 	//step_time = difftime( end, start );
 	if( Fit_Tree !=NULL )
 	{
+		#ifdef RAPIDFIT_USETGLTIMER
 		step_time = thisWatch->End();
+		#else
+		step_time = -1.;
+		#endif
 		//thisWatch->Stop();
 		//step_time = thisWatch->CpuTime();
 		//delete thisWatch;
@@ -337,6 +346,7 @@ double FitFunction::Evaluate()
 		branch_objects[branch_objects.size()] = (Double_t) minimiseValue;
 		Fit_Tree->SetBranchAddress( "NLL", &(branch_objects[branch_objects.size()]) );
 		Fit_Tree->SetBranchAddress( "Call", &(fit_calls) );
+		
 		Fit_Tree->SetBranchAddress( "time", &(step_time) );
 		//cout << endl;
 		Fit_Tree->Fill();

@@ -15,7 +15,7 @@ ROOTLIBS     = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --libs)
 ROOTGLIBS    = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --glibs)
 
 #               On some Systems with Mathmore compiled, sometimes things need to be resolved against it... I don't know why
-EXTRA_ROOTLIBS=-lTreePlayer -lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam -lRGL $(shell if [ "$(shell root-config --features | grep mathmore)" == "" ]; then echo "" ; else echo "-lMathMore" ; fi)
+EXTRA_ROOTLIBS=-lTreePlayer -lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam $(shell if [ "$(shell root-config --features | grep mathmore)" == "" ]; then echo "" ; else echo "-lMathMore" ; fi)
 
 #		Command Line Tools
 CXX          = $(CC) $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo ""; else echo "--arch=i386"; fi)
@@ -175,6 +175,7 @@ gsl: all
 
 #	Have a build option that SCREAMS at the user for potential mistakes!!!
 debug: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++ -ggdb -Wno-reorder -Wunused-function -Wunused-label -Wunused-value -Wunused-variable -DRAPIDFIT_USETGLTIMER
+debug: override EXTRA_ROOTLIBS+= -lRGL
 debug: all
 debug-utils: override CXXFLAGS+= -Wall -Wextra -Wabi -Weffc++
 debug-utils: utils
