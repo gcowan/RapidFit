@@ -113,7 +113,7 @@ void ProcessInputOptions( struct PlottingConfig& configToModify, int argc, char*
 			{
 				configToModify.explicit_max = atof( ProcessThisInputOption( i, argc, argv, "Missing Maximum" ).c_str() );
 			}
-			else if( thisArg == "--setMin" )
+			else if( thisArg == "--setMax" )
 			{
 				configToModify.y_max = atof( ProcessThisInputOption( i, argc, argv, "Missing Minimum" ).c_str() );
 			}
@@ -193,6 +193,8 @@ int main( int argc, char* argv[] )
 
 	TString plotDistsOutput = "PlotDists_Output";
 
+	cout << "Output Plots Sotred in: " << plotDistsOutput << endl;
+
 	gSystem->mkdir( plotDistsOutput );
 
 	vector<Double_t>* weightData = NULL;
@@ -267,6 +269,8 @@ int main( int argc, char* argv[] )
 		if( thisConfig.y_max < DBL_MAX )		ymax = thisConfig.y_max;
 
 		thisTH1->GetYaxis()->SetRangeUser( ymin, ymax );
+		thisTH1->SetMinimum( ymin );
+		thisTH1->SetMaximum( ymax );
 
 		thisCanvas->Update();
 

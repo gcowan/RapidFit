@@ -1,5 +1,14 @@
 // $Id: release.notes $
 
+
+2013/07/03 Rob Currie
+  - Added lhcbStyle.C and Assym.C to utils/src folder
+       These correspond to:
+       The current LHCb style from:
+       http://svnweb.cern.ch/world/wsvn/lhcb/Urania/trunk/RootTools/LHCbStyle/src/lhcbStyle.C R154683
+       A script to generate the delta_S-delta_perp plot for JpsiPhi.
+       This is just a simple script that plots the results but is an example of how it's done for repeated analyses
+
 2013/06/30 Rob Currie
   - Had to fight with a broken version of ROOT on a system so had to touch a LOT of pdfs to make sure that std::isnan points to a real object...
        This is stricty working around a ROOT bug but as it's in a version of ROOT which was stable for a long time I think it's best we work around it
