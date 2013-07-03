@@ -20,10 +20,16 @@
 </PhysicsParameter>
 <PhysicsParameter>
 <Name>center</Name>
-<Value>0.</Value>
+<Value>0.1</Value>
+#<Type>Fixed</Type>
 </PhysicsParameter>
 </ParameterSet>
-<Minimiser>Minuit</Minimiser>
+<Minimiser>
+<MinimiserName>Minuit2</MinimiserName>
+#<ConfigureMinimiser>SimplexFirst</ConfigureMinimiser>
+<ConfigureMinimiser>MinosErrors</ConfigureMinimiser>
+<ConfigureMinimiser>NoHesse</ConfigureMinimiser>
+</Minimiser>
 <FitFunction>
 <FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
 #<UseGSLNumericalIntegration>True</UseGSLNumericalIntegration>
@@ -35,7 +41,7 @@
 </PDF>
 <DataSet>
 <Source>Foam</Source>
-<NumberEvents>10000</NumberEvents>
+<NumberEvents>100000</NumberEvents>
 <PhaseSpaceBoundary>
 <Observable>
 <Name>x</Name>

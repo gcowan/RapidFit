@@ -5,12 +5,14 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	ROOT Headers
 #include "Minuit2/FunctionMinimum.h"
 #include "Minuit2/MnContours.h"
 #include "Minuit2/MnHesse.h"
+#include "Minuit2/MnMinos.h"
+#include "Minuit2/MinosError.h"
 #include "TMatrixDSym.h"
 //	RapidFit Headers
 #include "Minuit2Wrapper.h"
@@ -28,7 +30,7 @@ const double STEP_SIZE = 0.01;
 
 //Default constructor
 Minuit2Wrapper::Minuit2Wrapper() :
-	function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug( new DebugClass(false) ), nSigma(1)
+	function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug( new DebugClass(false) ), nSigma(1), minimum(NULL)
 {
 }
 
@@ -36,6 +38,7 @@ Minuit2Wrapper::Minuit2Wrapper() :
 Minuit2Wrapper::~Minuit2Wrapper()
 {
 	if( debug != NULL ) delete debug;
+	if( minimum != NULL ) delete minimum;
 }
 
 void Minuit2Wrapper::SetSteps( int newSteps )
@@ -87,19 +90,19 @@ void Minuit2Wrapper::Minimise()
 	MnMigrad mig( *function, *( function->GetMnUserParameters() ), (unsigned)Quality );//MINUIT_QUALITY );
 
 	//Retrieve the result of the fit
-	FunctionMinimum minimum = mig( (unsigned)maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
+	minimum = new FunctionMinimum( mig( (unsigned)maxSteps, bestTolerance ) );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
 
 	//Work out the fit status - possibly dodgy
 	int fitStatus=0;
-	if ( !minimum.HasCovariance() )
+	if ( !minimum->HasCovariance() )
 	{
 		fitStatus = 0;
 	}
-	else if ( !minimum.HasAccurateCovar() )
+	else if ( !minimum->HasAccurateCovar() )
 	{
 		fitStatus = 1;
 	}
-	else if ( minimum.HasMadePosDefCovar() )
+	else if ( minimum->HasMadePosDefCovar() )
 	{
 		fitStatus = 2;
 	}
@@ -114,29 +117,98 @@ void Minuit2Wrapper::Minimise()
 
 	cout << endl << "Minuit2 MnMigrad finished:\tStatus: " << fitStatus << "\t\t" << ctime( &timeNow ) << endl;
 
-	cout << "Minuit2 Starting MnHesse!" << endl;
-
 	// May also want to run Hesse before the minimisation to get better estimate
 	// of the error matrix.
-	MnHesse hesse(1);
-	hesse( *function, minimum, 1000);
+	string NoHesse("NoHesse");
+	if( StringProcessing::VectorContains( &Options, &NoHesse ) == -1 )
+	{
+		cout << "Minuit2 Starting MnHesse!" << endl;
+		//      Finally Now call HESSE to properly calculate the error matrix
+		MnHesse hesse(1);
+		hesse( *function, *minimum, 100000);
 
-	minimum = mig( (unsigned)maxSteps, bestTolerance );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
+		const MnUserParameters * minimisedParameters = &(minimum->UserParameters());
+
+		for( unsigned int i=0; i< RapidFunction->GetParameterSet()->GetAllFloatNames().size(); ++i )
+		{
+			cout << RapidFunction->GetParameterSet()->GetAllFloatNames()[i] << "\t±\t" << minimisedParameters->Error( RapidFunction->GetParameterSet()->GetAllFloatNames()[i] ) << endl;
+		}
+
+		//Work out the fit status - possibly dodgy
+		if ( !minimum->HasCovariance() )
+		{
+			fitStatus = 0;
+		}
+		else if ( !minimum->HasAccurateCovar() )
+		{
+			fitStatus = 1;
+		}
+		else if ( minimum->HasMadePosDefCovar() )
+		{
+			fitStatus = 2;
+		}
+		else
+		{
+			fitStatus = 3;
+		}
+
+		time(&timeNow);
+		cout << endl << "Minuit2 MnHesse finished:\tStatus: " << fitStatus << "\t\t" << ctime( &timeNow ) << endl;
+	}
+
+	vector<double> allMin, allMax;
+
+	string MinosOption("MinosErrors");
+	if( StringProcessing::VectorContains( &Options, &MinosOption ) != -1 )
+	{	
+		cout << "Minuit2 Starting MnMinos!" << endl;
+		MnMinos minos( *function, *minimum, 100000 );
+		for( unsigned int i=0; i< RapidFunction->GetParameterSet()->GetAllFloatNames().size(); ++i )
+		{
+			MinosError thisErr = minos.Minos( i );
+			cout << RapidFunction->GetParameterSet()->GetAllFloatNames()[i] << "\t+\t" << thisErr.Upper() << "\t-\t" << thisErr.Lower() << endl;
+
+			allMin.push_back( thisErr.Lower() ); allMax.push_back( thisErr.Upper() );
+		}
+		//Work out the fit status - possibly dodgy
+		if ( !minimum->HasCovariance() )
+		{
+			fitStatus = 0;
+		}
+		else if ( !minimum->HasAccurateCovar() )
+		{
+			fitStatus = 1;
+		}
+		else if ( minimum->HasMadePosDefCovar() )
+		{
+			fitStatus = 2;
+		}
+		else
+		{
+			fitStatus = 3;
+		}
+
+		time(&timeNow);
+		cout << endl << "Minuit2 MnMinos finished:\tStatus: " << fitStatus << "\t\t" << ctime( &timeNow ) << endl;
+	}
+
+	//if( minimum != NULL ) delete minimum;
+	//minimum = new FunctionMinimum( mig( (unsigned)maxSteps, bestTolerance ) );//(int)MAXIMUM_MINIMISATION_STEPS, FINAL_GRADIENT_TOLERANCE );
 
 	// Need to add in the running of Hesse and Minos here. Should be configurable.
 
 	//Output time information
 	time(&timeNow);
 
-	if ( !minimum.HasCovariance() )
+	if ( !minimum->HasCovariance() )
 	{
 		fitStatus = 0;
 	}
-	else if ( !minimum.HasAccurateCovar() )
+	else if ( !minimum->HasAccurateCovar() )
 	{
 		fitStatus = 1;
 	}
-	else if ( minimum.HasMadePosDefCovar() )
+	else if ( minimum->HasMadePosDefCovar() )
 	{
 		fitStatus = 2;
 	}
@@ -148,7 +220,7 @@ void Minuit2Wrapper::Minimise()
 	cout << endl << "Minuit2 finished:\tStatus: " << fitStatus << "\t\t" << ctime( &timeNow ) << endl;
 
 	//Make a set of the fitted parameters
-	const MnUserParameters * minimisedParameters = &minimum.UserParameters();
+	const MnUserParameters * minimisedParameters = &(minimum->UserParameters());
 	ParameterSet * newParameters = RapidFunction->GetParameterSet();
 	vector<string> allNames = newParameters->GetAllNames();
 	ResultParameterSet * fittedParameters = new ResultParameterSet( allNames );
@@ -165,7 +237,7 @@ void Minuit2Wrapper::Minimise()
 	}
 
 	// Get the covariance matrix. Stored as an n*(n+1)/2 vector
-	const MnUserCovariance * covMatrix = &minimum.UserCovariance();
+	const MnUserCovariance * covMatrix = &(minimum->UserCovariance());
 	vector<double> covData = covMatrix->Data();
 
 	//Make a location to store the contour plots
@@ -202,7 +274,7 @@ void Minuit2Wrapper::Minimise()
 	}
 
 	//Make the contour plots
-	const MnContours contoursFromMinuit = MnContours( *function, minimum );
+	const MnContours contoursFromMinuit = MnContours( *function, *minimum );
 	for ( int sigma = 1; sigma <= sigmaMax; ++sigma )
 	{
 		//Set the sigma value for the contours
@@ -220,7 +292,15 @@ void Minuit2Wrapper::Minimise()
 	}
 
 	PhysicsBottle* newBottle = RapidFunction->GetPhysicsBottle();
-	fitResult = new FitResult( minimum.Fval(), fittedParameters, fitStatus, newBottle, NULL, allContours );
+	fitResult = new FitResult( minimum->Fval(), fittedParameters, fitStatus, newBottle, NULL, allContours );
+
+	vector<string> floated = RapidFunction->GetParameterSet()->GetAllFloatNames();
+	for( unsigned int i=0; i<allMax.size(); ++i )
+	{
+		ResultParameterSet* thisResultSet = fitResult->GetResultParameterSet();
+		ResultParameter* thisResult = thisResultSet->GetResultParameter( floated[i] );
+		thisResult->SetAssymErrors( allMax[i], fabs(allMin[i]), 0.5*(fabs(allMax[i])+fabs(allMin[i])) );
+	}
 }
 
 //Return the result of minimisation
@@ -239,7 +319,8 @@ void Minuit2Wrapper::ContourPlots( vector< pair< string, string > > ContourParam
 //	The following 3 functions are simply coded up to still have the class compile correctly, but these should be implemented in the future
 void Minuit2Wrapper::CallHesse()
 {
-	return;
+	MnHesse hesse(1);
+	hesse( *function, *minimum, 100000);
 }
 
 RapidFitMatrix* Minuit2Wrapper::GetCovarianceMatrix()

@@ -1,6 +1,5 @@
 // $Id: release.notes $
 
-
 2013/07/03 Rob Currie
   - Added lhcbStyle.C and Assym.C to utils/src folder
        These correspond to:
@@ -8,6 +7,10 @@
        http://svnweb.cern.ch/world/wsvn/lhcb/Urania/trunk/RootTools/LHCbStyle/src/lhcbStyle.C R154683
        A script to generate the delta_S-delta_perp plot for JpsiPhi.
        This is just a simple script that plots the results but is an example of how it's done for repeated analyses
+  - Realised that Minos in Minuit2 is better than Minuit and actually returns the full set of errors for the 1fb JpsiPhi analysis where Minuit always fails on the final parameter
+       I don't know if this is a bug in the way that we have implemented Minuit or the way in which we are calling Minos but as we can simply switch to Minuit2 in these situations I don't care
+       I've now also added the MinimiserConfiguration flags MinosErrors and NoHesse to the class to allow for this to be configured from the XML like with Minuit
+       For reference the tutorials/OptimisedDoubleGauss.xml has been updated to 'just work' with Minuit2 and Minos
 
 2013/06/30 Rob Currie
   - Had to fight with a broken version of ROOT on a system so had to touch a LOT of pdfs to make sure that std::isnan points to a real object...

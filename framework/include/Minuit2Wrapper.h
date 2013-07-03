@@ -57,6 +57,7 @@ class Minuit2Wrapper : public IMinimiser
 
 		//MnMigrad minuit;
 		Minuit2Function * function;
+		FunctionMinimum* minimum;
 		FitFunction* RapidFunction;
 		FitResult * fitResult;
 		vector< pair< string, string > > contours;
