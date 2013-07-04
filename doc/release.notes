@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/07/04 Rob Currie
+  - Fixed bad bug in fzero PDF where a pointer was being assigned to NULL rather than compared against... Fixing this as it causes segfaults
+
 2013/07/03 Rob Currie
   - Added lhcbStyle.C and Assym.C to utils/src folder
        These correspond to:
