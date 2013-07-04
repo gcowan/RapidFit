@@ -2,6 +2,7 @@
 
 2013/07/04 Rob Currie
   - Fixed bad bug in fzero PDF where a pointer was being assigned to NULL rather than compared against... Fixing this as it causes segfaults
+  - Updating Assym.C to include systematic errors in quadrature, this now looks almost identical to the plot in the paper which is good
 
 2013/07/03 Rob Currie
   - Added lhcbStyle.C and Assym.C to utils/src folder

@@ -38,22 +38,22 @@
 	double* YValues_Phi_zero      = new double[6];
 	double* YErrors_low_Phi_zero  = new double[6];
 	double* YErrors_high_Phi_zero = new double[6];
-	YValues_Phi_zero[0] = 1.3244;   YErrors_low_Phi_zero[0] = 0.50782; YErrors_high_Phi_zero[0] = 0.76539;
-	YValues_Phi_zero[1] = 0.77121;  YErrors_low_Phi_zero[1] = 0.23524; YErrors_high_Phi_zero[1] = 0.38682;
-	YValues_Phi_zero[2] = 0.4911;   YErrors_low_Phi_zero[2] = 0.46911; YErrors_high_Phi_zero[2] = 1.3086;
-	YValues_Phi_zero[3] = -0.51623; YErrors_low_Phi_zero[3] = 0.36407; YErrors_high_Phi_zero[3] = 0.2173;
-	YValues_Phi_zero[4] = -0.45231; YErrors_low_Phi_zero[4] = 0.25606; YErrors_high_Phi_zero[4] = 0.18422;
-	YValues_Phi_zero[5] = -0.65291; YErrors_low_Phi_zero[5] = 0.22554; YErrors_high_Phi_zero[5] = 0.19914;
+	YValues_Phi_zero[0] = 1.3244;   YErrors_low_Phi_zero[0] = sqrt(0.50782*0.50782+0.007*0.007); YErrors_high_Phi_zero[0] = sqrt(0.76539*0.76539+0.007*0.007);
+	YValues_Phi_zero[1] = 0.77121;  YErrors_low_Phi_zero[1] = sqrt(0.23524*0.23524+0.028*0.028); YErrors_high_Phi_zero[1] = sqrt(0.38682*0.38682+0.028*0.028);
+	YValues_Phi_zero[2] = 0.4911;   YErrors_low_Phi_zero[2] = sqrt(0.46911*0.46911+0.049*0.049); YErrors_high_Phi_zero[2] = sqrt(1.3086*1.3086+0.049*0.049);
+	YValues_Phi_zero[3] = -0.51623; YErrors_low_Phi_zero[3] = sqrt(0.36407*0.36407+0.025*0.025); YErrors_high_Phi_zero[3] = sqrt(0.2173*0.2173+0.025*0.025);
+	YValues_Phi_zero[4] = -0.45231; YErrors_low_Phi_zero[4] = sqrt(0.25606*0.25606+0.021*0.021); YErrors_high_Phi_zero[4] = sqrt(0.18422*0.18422+0.021*0.021);
+	YValues_Phi_zero[5] = -0.65291; YErrors_low_Phi_zero[5] = sqrt(0.22554*0.22554+0.020*0.020); YErrors_high_Phi_zero[5] = sqrt(0.19914*0.19914+0.020*0.020);
 
 	double* YValues_Phi_pi      = new double[6];
 	double* YErrors_Phi_pi_low  = new double[6];
 	double* YErrors_Phi_pi_high = new double[6];
-	YValues_Phi_pi[0] = 1.818;  YErrors_Phi_pi_low[0] = 0.76618; YErrors_Phi_pi_high[0] = 0.50701;
-	YValues_Phi_pi[1] = 2.3706; YErrors_Phi_pi_low[1] = 0.38721; YErrors_Phi_pi_high[1] = 0.235;
-	YValues_Phi_pi[2] = 2.6506; YErrors_Phi_pi_low[2] = 1.3087;  YErrors_Phi_pi_high[2] = 0.29762;
-	YValues_Phi_pi[3] = 3.658;  YErrors_Phi_pi_low[3] = 0.21753; YErrors_Phi_pi_high[3] = 0.36374;
-	YValues_Phi_pi[4] = 3.594;  YErrors_Phi_pi_low[4] = 0.18432; YErrors_Phi_pi_high[4] = 0.25597;
-	YValues_Phi_pi[5] = 3.7946; YErrors_Phi_pi_low[5] = 0.18395; YErrors_Phi_pi_high[5] = 0.2254;
+	YValues_Phi_pi[0] = 1.818;  YErrors_Phi_pi_low[0] = sqrt(0.76618*0.76618+0.007*0.007); YErrors_Phi_pi_high[0] = sqrt(0.50701*0.50701+0.007*0.007);
+	YValues_Phi_pi[1] = 2.3706; YErrors_Phi_pi_low[1] = sqrt(0.38721*0.38721+0.028*0.028); YErrors_Phi_pi_high[1] = sqrt(0.235*0.235+0.028*0.028);
+	YValues_Phi_pi[2] = 2.6506; YErrors_Phi_pi_low[2] = sqrt(1.3087*1.3087+0.049*0.049);   YErrors_Phi_pi_high[2] = sqrt(0.29762*0.29762+0.049*0.049);
+	YValues_Phi_pi[3] = 3.658;  YErrors_Phi_pi_low[3] = sqrt(0.21753*0.21753+0.025*0.025); YErrors_Phi_pi_high[3] = sqrt(0.36374*0.36374+0.025*0.025);
+	YValues_Phi_pi[4] = 3.594;  YErrors_Phi_pi_low[4] = sqrt(0.18432*0.18432+0.021*0.021); YErrors_Phi_pi_high[4] = sqrt(0.25597*0.25597+0.021*0.021);
+	YValues_Phi_pi[5] = 3.7946; YErrors_Phi_pi_low[5] = sqrt(0.18395*0.18395+0.020*0.020); YErrors_Phi_pi_high[5] = sqrt(0.2254*0.2254+0.020*0.020);
 
 	TCanvas* c1 = new TCanvas( "AssymPlot", "AssymPlot" );
 	c1->SetTitle("");
