@@ -1025,8 +1025,6 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 	double value = -1.;
 
-	dontIntegrate.push_back(ProjectThis);
-
 	vector<string> allIntegrable = functionToWrap->GetPrototypeDataPoint();
 
 	vector<string> testedIntegrable;
@@ -1038,6 +1036,8 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 			testedIntegrable.push_back( allIntegrable[i] );
 		}
 	}
+
+	dontIntegrate.push_back(ProjectThis);
 
 	if( debug != NULL )
 	{

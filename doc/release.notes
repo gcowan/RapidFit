@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/07/05 Rob Currie
+  - Fixed bug in 1D Projections which was introduced when the multi-dim case was fixed a week ago
+
 2013/07/04 Rob Currie
   - Fixed bad bug in fzero PDF where a pointer was being assigned to NULL rather than compared against... Fixing this as it causes segfaults
   - Updating Assym.C to include systematic errors in quadrature, this now looks almost identical to the plot in the paper which is good
