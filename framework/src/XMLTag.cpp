@@ -111,6 +111,7 @@ vector<string> XMLTag::GetRAWValue() const
 vector<string> XMLTag::GetValue() const
 {
 	vector<string> new_value = value;
+	if( value.empty() ) return vector<string>();
 	//cout << "MyPath " << path << endl;
 	//path = parent->GetPath();
 	//cout << "Parent Path " << path << endl;
@@ -138,7 +139,7 @@ vector<string> XMLTag::GetValue() const
 		}
 	}
 	if( forbidden != NULL ) if( !forbidden->empty() ) cout << "XMLTag- USING: " << path << "\t\t" << name << "\t\t" << new_value[0] << endl;
-	if ( value.size() == 0 )
+	if( value.empty() )
 	{
 	//	cerr << "Requested value of tag " << name << ", but the value is empty" << endl;
 	//	throw(-765);

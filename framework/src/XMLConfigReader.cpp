@@ -41,7 +41,7 @@ void XMLConfigReader::PrintTag( const XMLTag* thisTag )
 	cout << "PATH:\t" << thisTag->GetPath() << endl;
 	cout << "NAME:\t" << thisTag->GetName() << endl;
 	cout << "VALUE:\t" << endl;
-	
+
 	vector<string> values = thisTag->GetRAWValue();
 
 	for( unsigned int i=0; i< values.size(); ++i )
@@ -88,6 +88,26 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 	fileTags = File_Tags;
 
 	XMLValid = this->TestXML();
+
+	unsigned int PDFNum_Counter=0;
+	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
+	{
+		if ( children[childIndex]->GetName() == "ToFit" )
+		{
+			for( unsigned int i=0; i< children[childIndex]->GetChildren().size(); ++i )
+			{
+				if( children[childIndex]->GetChildren()[i]->GetName() == "PDF" || children[childIndex]->GetChildren()[i]->GetName() == "CommonPDF" )
+				{
+					TString ThisNum=""; ThisNum+=PDFNum_Counter;
+					children[childIndex]->AppendPath( ThisNum.Data() );
+					++PDFNum_Counter;
+					break;
+				}
+			}
+		}
+	}
+
+	cout << endl << endl << endl << "Finished Updating PDF Paths" << endl << endl << endl;
 
 	if( debug != NULL )
 	{
@@ -230,16 +250,16 @@ XMLConfigReader::~XMLConfigReader()
 	if( All_XML_Tags != NULL ) delete All_XML_Tags;
 	//cout << "Hello from XMLConfigReader destructor" << endl;
 	if( debug != NULL ) delete debug;
-/*	while( !fileTags.empty() )
-	{
+	/*	while( !fileTags.empty() )
+		{
 		if( fileTags.back() != NULL ) delete fileTags.back();
 		fileTags.pop_back();
-	}
-	while( !children.empty() )
-	{
+		}
+		while( !children.empty() )
+		{
 		if( children.back() != NULL ) delete children.back();
 		children.pop_back();
-	}*/
+		}*/
 }
 
 vector<string> XMLConfigReader::GetXML() const
@@ -1014,26 +1034,13 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 	//Collect all ToFit elements
 	vector< XMLTag* > toFits;
 	vector< PDFWithData* > pdfsAndData;
-	unsigned int PDFNum_Counter=0;
 	for ( unsigned int childIndex = 0; childIndex < children.size(); ++childIndex )
 	{
 		if ( children[childIndex]->GetName() == "ToFit" )
 		{
-			for( unsigned int i=0; i< children[childIndex]->GetChildren().size(); ++i )
-			{
-				if( children[childIndex]->GetChildren()[i]->GetName() == "PDF" || children[childIndex]->GetChildren()[i]->GetName() == "CommonPDF" )
-				{
-					TString ThisNum=""; ThisNum+=PDFNum_Counter;
-					children[childIndex]->AppendPath( ThisNum.Data() );
-					++PDFNum_Counter;
-					break;
-				}
-			}
 			toFits.push_back( children[childIndex] );
 		}
 	}
-
-	cout << endl << endl << endl << "Finished Updating PDF Paths" << endl << endl << endl;
 
 	//Go through the collected ToFit elements
 	if ( toFits.size() == 0 )
