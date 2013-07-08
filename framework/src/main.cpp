@@ -1317,8 +1317,8 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 	//Load a config file
 	if( config->configFileNameFlag )
 	{
-		config->xmlFile = new XMLConfigReader( config->configFileName, config->XMLOverrideList );
-		config->xmlFile->SetDebug( config->debug );
+		config->xmlFile = new XMLConfigReader( config->configFileName, config->XMLOverrideList, config->debug );
+		//config->xmlFile->SetDebug( config->debug );
 		if( config->xmlFile->IsValid() )
 		{
 			cout << endl << "XML config file: " << config->configFileName << " loaded Successfully!" << endl << endl;

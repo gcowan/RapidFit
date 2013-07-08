@@ -49,6 +49,9 @@ using namespace::std;
 class XMLConfigReader
 {
 	public:
+
+		static void PrintTag( const XMLTag* thisTag );
+
 		/*!
 		 * @brief Constructor with Input FileName and optional override flags
 		 *
@@ -59,7 +62,7 @@ class XMLConfigReader
 		 *                   This allows us to construct sequential tests modify some part of the XML file each run
 		 *
 		 */
-		XMLConfigReader( string FileName, vector<pair<string,string> >* Override = NULL );
+		XMLConfigReader( string FileName, vector<pair<string,string> >* Override = NULL, DebugClass* thisDebug = NULL );
 
 		/*!
 		 * Default Destructor

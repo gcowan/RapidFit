@@ -35,9 +35,33 @@ using namespace::std;
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
+
+void XMLConfigReader::PrintTag( const XMLTag* thisTag )
+{
+	cout << "PATH:\t" << thisTag->GetPath() << endl;
+	cout << "NAME:\t" << thisTag->GetName() << endl;
+	cout << "VALUE:\t" << endl;
+	
+	vector<string> values = thisTag->GetRAWValue();
+
+	for( unsigned int i=0; i< values.size(); ++i )
+	{
+		cout << values[i] << endl;
+	}
+	cout << endl;
+
+	vector<XMLTag*> theseChildren = thisTag->GetChildren();
+	for( unsigned int i=0; i< theseChildren.size(); ++i )
+	{
+		cout << "CHILD:\t" << i << "\t" << endl;
+		XMLConfigReader::PrintTag( theseChildren[i] );
+		cout << endl;
+	}
+}
+
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) :
-	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(new DebugClass(false) ), XMLValid(false)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML, DebugClass* thisDebug ) :
+	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(thisDebug==NULL?new DebugClass(false):new DebugClass(*thisDebug) ), XMLValid(false)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -64,6 +88,18 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 	fileTags = File_Tags;
 
 	XMLValid = this->TestXML();
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "XMLConfigReader_TAG" ) )
+		{
+			for( unsigned int childIndex=0; childIndex<children.size(); ++childIndex )
+			{
+				XMLConfigReader::PrintTag( children[childIndex] );
+			}
+			exit(0);
+		}
+	}
 }
 
 bool XMLConfigReader::IsValid() const

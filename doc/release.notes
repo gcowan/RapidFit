@@ -1,8 +1,10 @@
 // $Id: release.notes $
 
+2013/07/08 Rob Currie
+  - Added Option for "--DebugClass XMLConfigReader_TAG" this will dump the contents of ALL xml Tags and then cleanly exit and is intended for use with the --OverrideXML flag which is powerful/underused/broken
+
 2013/07/08 Conor Fitzpatrick
   - Added a modified version of the jpsifzero_Signal_v5 pdf (jpsifzero_signal_v5a) that incorporates changes made in jpsiPhi_Signal_v5. Seems to partially fix integration issues with projections. 
-
 
 2013/07/05 Rob Currie
   - Fixed bug in 1D Projections which was introduced when the multi-dim case was fixed a week ago

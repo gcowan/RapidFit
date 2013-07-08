@@ -102,6 +102,11 @@ void XMLTag::RemoveChild( int num )
 	children.erase( toBeRemoved );
 }
 
+vector<string> XMLTag::GetRAWValue() const
+{
+	return this->GetValue();
+}
+
 //Return the value
 vector<string> XMLTag::GetValue() const
 {
@@ -135,8 +140,9 @@ vector<string> XMLTag::GetValue() const
 	if( forbidden != NULL ) if( !forbidden->empty() ) cout << "XMLTag- USING: " << path << "\t\t" << name << "\t\t" << new_value[0] << endl;
 	if ( value.size() == 0 )
 	{
-		cerr << "Requested value of tag " << name << ", but the value is empty" << endl;
-		exit(1);
+	//	cerr << "Requested value of tag " << name << ", but the value is empty" << endl;
+	//	throw(-765);
+		return vector<string>();
 	}
 	else
 	{
