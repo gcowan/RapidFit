@@ -1271,14 +1271,22 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 
 int testIntegrator( RapidFitConfiguration* config )
 {
-	//Compare numerical and analytical integration
-	PDFWithData * quickData = config->xmlFile->GetPDFsAndData()[0];
-	quickData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
-	IDataSet * quickDataSet = quickData->GetDataSet();
-	RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( quickData->GetPDF() );
-	testIntegrator->Integral( quickDataSet->GetDataPoint(0), quickDataSet->GetBoundary() );
-	delete testIntegrator;
-	delete quickData;
+	vector<PDFWithData*> PDFinXML = config->xmlFile->GetPDFsAndData();
+	for( unsigned int i=0; i< PDFinXML.size(); ++i )
+	{
+		//Compare numerical and analytical integration
+		PDFWithData * quickData = PDFinXML[i];
+		quickData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
+		IDataSet * quickDataSet = quickData->GetDataSet();
+		RapidFitIntegrator * testIntegrator = quickData->GetPDF()->GetPDFIntegrator();
+		testIntegrator->ForceTestStatus( false );
+		testIntegrator->NumericallyIntegratePhaseSpace( quickDataSet->GetBoundary(), vector<string>(), NULL );//, vector<string>(), NULL, NULL );
+	}
+	while( !PDFinXML.empty() )
+	{
+		if( PDFinXML.back() != NULL ) delete PDFinXML.back();
+		PDFinXML.pop_back();
+	}
 	return 0;
 }
 
