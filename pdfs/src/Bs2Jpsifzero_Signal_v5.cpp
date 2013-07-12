@@ -106,9 +106,9 @@ Bs2Jpsifzero_Signal_v5::Bs2Jpsifzero_Signal_v5( const Bs2Jpsifzero_Signal_v5& in
 
 	//, cos_delta_para_s(input.cos_delta_para_s), sin_delta1(input.sin_delta1), cos_delta1(input.cos_delta1), sin_delta2(input.sin_delta2), cos_delta2(input.cos_delta2)
 
-	//, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1), stored_AT(input.stored_AT), stored_AP(input.stored_AP), stored_A0(input.stored_A0)
+	/*, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1)*/, stored_AT(input.stored_AT)//, stored_AP(input.stored_AP), stored_A0(input.stored_A0)
 
-	//, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
+	/*, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint)*/, stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah)//, _fitDirectlyForApara(input._fitDirectlyForApara)
 {
 	//if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
@@ -477,7 +477,7 @@ bool Bs2Jpsifzero_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet
 	// Physics parameters.
 	//_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue();
 	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue(); //subtraction for beta_s factor 
-	_gamma  = _gamma - 0.01; //subtraction for beta_s factor 
+	//_gamma  = _gamma - 0.01; //subtraction for beta_s factor 
 	dgam      = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
 /*
 	Azero_sq = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
@@ -1181,7 +1181,7 @@ double Bs2Jpsifzero_Signal_v5::diffXsecNorm1()
 //		ASint()*A0() * timeFactorReASA0Int(  ) * angAccI10 ;
 
 	if( DEBUGFLAG && (norm < 0) ) {
-		this->DebugPrintNorm( " Bs2Jpsifzero_Signal_v5_v1::diffXsecNorm1( ) : return value < 0 = ", norm ) ;
+		this->DebugPrintNorm( " Bs2Jpsifzero_Signal_v5_v1::diffXsecNorm1( ) : return value < 0 = ", timeFactorATATInt() ) ;
 
 	     cout << "XXXXXXX  AT()= " <<  AT()  << "      /    timeint=   " << timeFactorATATInt(  ) << endl ;
 	

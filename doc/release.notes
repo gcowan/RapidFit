@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/07/12 Dianne Ferguson
+  - Added the missing terms from the copy constructor to the fzero v5 pdf - Fixed the problem with integrator test and projections. Added the v6 fzero pdf which uses the resolution model. Removed exit statements from the sliced acceptance. 
+
 2013/07/08 Rob Currie
   - Added Option for "--DebugClass XMLConfigReader_TAG" this will dump the contents of ALL xml Tags and then cleanly exit and is intended for use with the --OverrideXML flag which is powerful/underused/broken
 

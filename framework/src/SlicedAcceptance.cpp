@@ -232,7 +232,6 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 	
 			cout << " time: " << time->GetValue() << " offset: " << timeOffset << " min: " << this->GetMin() << endl;
 			this->Print();
-			exit(0);
 			throw(-987643);
 		}
 		if( t > this->GetMax() )
@@ -248,7 +247,6 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 			cout << " time: " << time->GetValue() << " offset: " << timeOffset << " max: " << this->GetMax() << endl;
 
 			this->Print();
-			exit(0);
 			throw(-987643);
 		}
 	}
