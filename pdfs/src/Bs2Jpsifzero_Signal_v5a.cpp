@@ -52,7 +52,10 @@ Bs2Jpsifzero_Signal_v5a::Bs2Jpsifzero_Signal_v5a( const Bs2Jpsifzero_Signal_v5a&
 
         , _useCosAndSin(input._useCosAndSin)/*, _useCosDpar(input._useCosDpar)*/, _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
 
+	, _offsetToGammaForBetaFactor( input._offsetToGammaForBetaFactor)//, _usePlotAllComponents( input._usePlotAllComponents )
+	
 	/*, allowNegativeAsSq(input.allowNegativeAsSq), _usePlotComponents(input._usePlotComponents)*/, t(input.t)//, ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr)
+
 
 	/*, ctheta_1(input.ctheta_1), ctheta_k(input.ctheta_k), phi_h(input.phi_h), ctheta_l(input.ctheta_l)*/, tag(input.tag), _gamma(input._gamma), dgam(input.dgam)
 
@@ -104,9 +107,9 @@ Bs2Jpsifzero_Signal_v5a::Bs2Jpsifzero_Signal_v5a( const Bs2Jpsifzero_Signal_v5a&
 
 	//, cos_delta_para_s(input.cos_delta_para_s), sin_delta1(input.sin_delta1), cos_delta1(input.cos_delta1), sin_delta2(input.sin_delta2), cos_delta2(input.cos_delta2)
 
-	//, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1), stored_AT(input.stored_AT), stored_AP(input.stored_AP), stored_A0(input.stored_A0)
+	/*, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1)*/, stored_AT(input.stored_AT)//, stored_AP(input.stored_AP), stored_A0(input.stored_A0)
 
-	//, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
+	/*, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint)*/, stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah)//, _fitDirectlyForApara(input._fitDirectlyForApara)
 {
 	//if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
@@ -185,6 +188,7 @@ Bs2Jpsifzero_Signal_v5a::Bs2Jpsifzero_Signal_v5a(PDFConfigurator* configurator) 
 //	, _usePlotComponents(false)
 //	, _usePlotAllComponents(false)
 	, DebugFlag_v5a(true)
+	, _offsetToGammaForBetaFactor()
 	//objects
 	,t()/*, ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l()*/, tag(),
 	_gamma(), dgam(), Aperp_sq(), //Apara_sq(), Azero_sq(), As_sq(), delta_para(),
@@ -195,7 +199,7 @@ Bs2Jpsifzero_Signal_v5a::Bs2Jpsifzero_Signal_v5a(PDFConfigurator* configurator) 
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL), normalisationCacheValid(false),
 //	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 	resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH(), storeExpSin(), storeExpCos(), normalisationCacheUntagged()
-	//, _fitDirectlyForApara(false)
+	//, _fitDirectlyForApara(false),performingComponentProjection(false)
 {
 	//componentIndex = 0;
 
@@ -217,6 +221,17 @@ Bs2Jpsifzero_Signal_v5a::Bs2Jpsifzero_Signal_v5a(PDFConfigurator* configurator) 
 	//_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
 	DebugFlag_v5a = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
+	string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
+	if( offsetToGammaForBetaFactor == "" )
+	{
+		_offsetToGammaForBetaFactor = 0.0 ;
+	}
+	else
+	{
+		_offsetToGammaForBetaFactor = atof( offsetToGammaForBetaFactor.c_str() ) ;
+		cout << "Bs2JpsiPhi_Signal_v5:: Adding OffsetToGammaForBetaFactor = " << _offsetToGammaForBetaFactor << endl ;
+	}
+    
 	//...............................................
 	// Configure to use angular acceptance machinery
 /*	string angAccFile = configurator->getConfigurationValue( "AngularAcceptanceFile" ) ;
@@ -269,7 +284,7 @@ Bs2Jpsifzero_Signal_v5a::Bs2Jpsifzero_Signal_v5a(PDFConfigurator* configurator) 
 		storeExpSin.push_back( empty ) ;
 		storeExpCos.push_back( empty ) ;
 	}
-	
+
 	this->TurnCachingOff();
 
 	this->SetNumericalNormalisation( false );
@@ -454,7 +469,7 @@ vector<string> Bs2Jpsifzero_Signal_v5a::GetDoNotIntegrateList()
 	if( useEventResolution() && ! _usePunziSigmat) list.push_back(eventResolutionName) ;
 
 	/*if( _numericIntegralTimeOnly )
-	  {
+	{
 		if( _useHelicityBasis )
 		{
 			list.push_back( cthetakName );
@@ -483,21 +498,22 @@ bool Bs2Jpsifzero_Signal_v5a::SetPhysicsParameters( ParameterSet* NewParameterSe
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
 
 	// Physics parameters.
-	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue();
+	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue() + _offsetToGammaForBetaFactor ;
 	dgam      = allParameters.GetPhysicsParameter( deltaGammaName )->GetValue();
-/*
-	Azero_sq = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
-	if( (Azero_sq < 0.) || (Azero_sq > 1.)  )
-	{
-		cout << "Warning in Bs2Jpsifzero_Signal_v5a::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;
-	}
-	*/
-	//Aperp_sq = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
-	Aperp_sq = 1.0;
-	/*
-	if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) { cout << "Warning in Bs2Jpsifzero_Signal_v5a::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl ;	}
 
-	Apara_sq = 0.;
+	//Azero_sq = allParameters.GetPhysicsParameter( Azero_sqName )->GetValue();
+	//if( (Azero_sq < 0.) || (Azero_sq > 1.)  )
+	//{
+	//	cout << "Warning in Bs2Jpsifzero_Signal_v5a::SetPhysicsParameters: Azero_sq <0 or >1 but left as is" <<  endl ;
+	//}
+	//Aperp_sq = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue(); 
+	//Aperp_sq = 1.0;
+	//if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  ) 
+	//{
+	//	cout << "Warning in Bs2Jpsifzero_Signal_v5a::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl;
+	//}
+
+	/*Apara_sq = 0.;
 	if( _fitDirectlyForApara )
 	{
 		Apara_sq = allParameters.GetPhysicsParameter( Apara_sqName )->GetValue();
@@ -568,11 +584,11 @@ bool Bs2Jpsifzero_Signal_v5a::SetPhysicsParameters( ParameterSet* NewParameterSe
 	// New: Prepare the coefficients of all of the time dependent terms (C,D,S etc)
 	this->prepareCDS() ;
 
-	stored_AT = Aperp_sq > 0. ? sqrt(Aperp_sq) : 0.;
-	//stored_A0 = Azero_sq > 0. ? sqrt(Azero_sq) : 0.;
-	//stored_AP = Apara_sq > 0. ? sqrt(Apara_sq) : 0.;
-	//stored_AS = As_sq > 0. ? sqrt(As_sq) : 0.;
-	//stored_ASint = stored_AS * Csp;
+	stored_AT = 1.0;
+	stored_A0 = 0.0;
+	stored_AP = 0.0;
+	stored_AS = 0.0;
+	stored_ASint = stored_AS * Csp;
 
 	stored_gammal = (gamma() + ( dgam *0.5 )) > 0. ? (gamma() + ( dgam *0.5 )) : 0.;
 	stored_gammah = (gamma() - ( dgam *0.5 )) > 0. ? (gamma() - ( dgam *0.5 )) : 0.;
@@ -674,8 +690,9 @@ double Bs2Jpsifzero_Signal_v5a::Evaluate(DataPoint * measurement)
 	ReASAP_value = measurement->GetPseudoObservable( ReASAP_Obs );
 	ImASAT_value = measurement->GetPseudoObservable( ImASAT_Obs );
 	ReASA0_value = measurement->GetPseudoObservable( ReASA0_Obs );
+
+	double angAcceptanceFactor = 0 ;
 */
-	//double angAcceptanceFactor = 0 ;
 
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
@@ -855,7 +872,7 @@ double Bs2Jpsifzero_Signal_v5a::Normalisation(DataPoint * measurement, PhaseSpac
 {
 	_datapoint = measurement;
 
-	if( _numericIntegralForce ) return -1. ;
+	if( _numericIntegralForce ) return -1.;
 
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue(); //FIXME: Not in JpsiPhi?
@@ -1390,6 +1407,7 @@ double Bs2Jpsifzero_Signal_v5a::diffXsecNorm1()
 //		AP()*AP() * timeFactorAPAPInt(  ) * angAccI2   +
 		AT()*AT() * timeFactorATATInt(  );// * angAccI3;//   +
 
+
 //		AP()*AT() * timeFactorImAPATInt(  ) * angAccI4 +
 //		A0()*AP() * timeFactorReA0APInt(  ) * angAccI5 +
 //		A0()*AT() * timeFactorImA0ATInt(  ) * angAccI6 +
@@ -1444,8 +1462,7 @@ double Bs2Jpsifzero_Signal_v5a::diffXsecCompositeNorm1( int resolutionIndex )
 
 //.......................................................
 // New speed up method to Cache time integrals
-/*
-void Bs2Jpsifzero_Signal_v5a::CacheAmplitudesAndAngles()
+/* void Bs2Jpsifzero_Signal_v5a::CacheAmplitudesAndAngles()
 {
 
 	CachedA1 = A0()*A0() * A0A0_value;
@@ -1607,35 +1624,35 @@ void Bs2Jpsifzero_Signal_v5a::prepareCDS()
 void Bs2Jpsifzero_Signal_v5a::DebugPrint( string message, double value )  const
 {
 	PDF_THREAD_LOCK
-	
+
 	if( !performingComponentProjection )
 	{
 		(void) message; (void) value;
 		cout << "*************DEBUG OUTPUT FROM Bs2Jpsifzero_Signal_v5a::DebugPrint ***************************" << endl ;
-		cout << message << value << endl <<endl ;
+		cout << message << value << endl <<endl;
 
 		cout << endl ;
-		cout << "   gamma " << gamma() << endl ;
-		cout << "   gl    " << gamma_l() << endl ;
+		cout << "   gamma " << gamma() << endl;
+		cout << "   gl    " << gamma_l() << endl;
 		cout << "   gh    " << gamma_h()  << endl;
-		/*cout << "   AT^2    " << AT()*AT() << endl;
+		cout << "   AT^2    " << AT()*AT() << endl;/*
 		cout << "   AP^2    " << AP()*AP() << endl;
-		cout << "   A0^2    " << A0()*A0() << endl ;
-		cout << "   AS^2    " << AS()*AS() << endl ;
-		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl ;*/
-		cout << "   delta_ms       " << delta_ms << endl ;
-		cout << "   mistag         " << mistag() << endl ;
-		cout << "   mistagP1       " << _mistagP1 << endl ;
-		cout << "   mistagP0       " << _mistagP0 << endl ;
-		cout << "   mistagSetPoint " << _mistagSetPoint << endl ;
-		cout << "   resolution " << resolution << endl ;
-		cout << " For event with:  " << endl ;
-		cout << "   time      " << t << endl ;
-		/*cout << "   ctheta_tr " << ctheta_tr << endl ;
-		cout << "   ctheta_1 " << ctheta_1 << endl ;
-		cout << "   phi_tr " << phi_tr << endl ;
-		*/
-		}
+		cout << "   A0^2    " << A0()*A0() << endl;
+		cout << "   AS^2    " << AS()*AS() << endl;
+		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl;*/
+		cout << "   delta_ms       " << delta_ms << endl;
+		cout << "   mistag         " << mistag() << endl;
+		cout << "   mistagP1       " << _mistagP1 << endl;
+		cout << "   mistagP0       " << _mistagP0 << endl;
+		cout << "   mistagSetPoint " << _mistagSetPoint << endl;
+		cout << "   resolution " << resolution << endl;
+		cout << " For event with:  " << endl;
+		//cout << "   time      " << t << endl ;
+		//cout << "   ctheta_tr " << ctheta_tr << endl ;
+		//cout << "   ctheta_1 " << ctheta_1 << endl ;
+		//cout << "   phi_tr " << phi_tr << endl ;
+		if( _datapoint ) _datapoint->Print();
+	}
 	PDF_THREAD_UNLOCK
 }
 
@@ -1686,31 +1703,33 @@ void Bs2Jpsifzero_Signal_v5a::DebugPrintXsec( string message, double value )  co
 //	cout << "   Pwave Only : " << PwaveTot << endl ;
 //	cout << "   Swave add : " <<  SwaveAdditions << endl ;
 	}
+
 	PDF_THREAD_UNLOCK
 }
 
 void Bs2Jpsifzero_Signal_v5a::DebugPrintNorm( string message, double value )  const
 {
 	PDF_THREAD_LOCK
-	
+
 	if( !performingComponentProjection )
 	{
 		(void) message; (void) value;
-		cout << "*************DEBUG OUTPUT FROM Bs2Jpsifzero_Signal_v5a::DebugPrintNorm ***************************" << endl ;
-		cout << message << value << endl <<endl ;
+		cout << "*************DEBUG OUTPUT FROM Bs2Jpsifzero_Signal_v5a::DebugPrintNorm ***************************" << endl;
+		cout << message << value << endl <<endl;
 
-		cout << endl ;
-		cout <<  A0()*A0() * timeFactorA0A0Int(  )<<endl;//* angAccI1  << endl ;
-		cout <<  AP()*AP() * timeFactorAPAPInt(  ) << endl; //* angAccI2 << endl ;
-		cout <<  AT()*AT() * timeFactorATATInt(  )<< endl; //* angAccI3 << endl << endl ;
-		cout <<  AP()*AT() * timeFactorImAPATInt(  )<< endl;// * angAccI4<< endl ;
-		cout <<  A0()*AP() * timeFactorReA0APInt(  ) << endl;//* angAccI5<< endl ;
+		cout << endl;
+		cout <<  A0()*A0() * timeFactorA0A0Int(  )<<endl;//* angAccI1  << endl;
+		cout <<  AP()*AP() * timeFactorAPAPInt(  ) << endl; //* angAccI2 << endl;
+		cout <<  AT()*AT() * timeFactorATATInt(  )<< endl; //* angAccI3 << endl << endl;
+		cout <<  AP()*AT() * timeFactorImAPATInt(  )<< endl;// * angAccI4<< endl;
+		cout <<  A0()*AP() * timeFactorReA0APInt(  ) << endl;//* angAccI5<< endl;
 		cout <<  A0()*AT() * timeFactorImA0ATInt(  )<<endl;// * angAccI6<< endl << endl;
-		cout <<  AS()*AS() * timeFactorASASInt(  ) <<endl;//* angAccI7 << endl ;
-		cout <<  AS()*AP() * timeFactorReASAPInt(  ) <<endl;//* angAccI8<< endl ;
-		cout <<  AS()*AT() * timeFactorImASATInt(  )<<endl;// * angAccI9<< endl ;
-		cout <<  AS()*A0() * timeFactorReASA0Int(  ) <<endl;//* angAccI10<< endl ;
+		cout <<  AS()*AS() * timeFactorASASInt(  ) <<endl;//* angAccI7 << endl;
+		cout <<  AS()*AP() * timeFactorReASAPInt(  ) <<endl;//* angAccI8<< endl;
+		cout <<  AS()*AT() * timeFactorImASATInt(  )<<endl;// * angAccI9<< endl;
+		cout <<  AS()*A0() * timeFactorReASA0Int(  ) <<endl;//* angAccI10<< endl;
 	}
+
 	PDF_THREAD_UNLOCK
 }
 
