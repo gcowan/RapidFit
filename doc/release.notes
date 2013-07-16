@@ -5,6 +5,7 @@
        This was a subtlety to do with the pdf and the framework disagreeing over how nuisence parameters are delt with.
        Framework expected the 'tag' parameter to be on the donotintegrate list and te pdf assumed this would be ignored due to it being a discrete observable
        The framework now correctly moves ALL discrete observables onto the donotintegrate list from the phasespace regardless of what the PDF has told it.
+  - Fixed minor bug when using "--Debug"
 
 2013/07/12 Dianne Ferguson
   - Added the missing terms from the copy constructor to the fzero v5 pdf - Fixed the problem with integrator test and projections. Added the v6 fzero pdf which uses the resolution model. Removed exit statements from the sliced acceptance. 

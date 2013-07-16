@@ -117,7 +117,7 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 			{
 				XMLConfigReader::PrintTag( children[childIndex] );
 			}
-			exit(0);
+			if( !debug->GetClassNames().empty() ) exit(0);
 		}
 	}
 }
