@@ -44,7 +44,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
 }
 
 SlicedAcceptance::SlicedAcceptance( const SlicedAcceptance& input ) :
-	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta ), _sortedSlices( input._sortedSlices ), maxminset(input.maxminset), t_min(input.t_min), t_max(input.t_max)
+	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow( input.tlow ), thigh( input.thigh ), beta( input.beta ), _sortedSlices( input._sortedSlices ), maxminset(input.maxminset), t_min(input.t_min), t_max(input.t_max), _hasChecked(input._hasChecked), _storedDecision(input._storedDecision)
 {
 	for( unsigned int i=0; i< input.slices.size(); ++i )
 	{
@@ -66,7 +66,7 @@ SlicedAcceptance::~SlicedAcceptance()
 //............................................
 // Constructor for simple upper time acceptance only
 SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.), _hasChecked(false), _storedDecision(false)
 {
 	//Reality checks
 	if( tlow > thigh )
@@ -101,13 +101,22 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 
 	//....done.....
 	_sortedSlices = this->isSorted();
+
+        if( _sortedSlices )
+        {
+                cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
+        }
+        else
+        {
+                cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
+        }
 }
 
 
 //............................................
 // Constructor for simple 2010 version of lower time acceptance only
 SlicedAcceptance::SlicedAcceptance( string s ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.), _hasChecked(false), _storedDecision(false)
 {
 	(void)s;
 	int N = 31;
@@ -131,12 +140,21 @@ SlicedAcceptance::SlicedAcceptance( string s ) :
 
 	//....done.....
 	_sortedSlices = this->isSorted();
+
+        if( _sortedSlices )
+        {
+                cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
+        }
+        else
+        {
+                cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
+        }
 }
 
 //............................................
 // Constructor for accpetance from a file
 SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
-	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.), _hasChecked(false), _storedDecision(false)
 {
 	(void)type;
 	if( type != "File" ) {   }//do nothing for now
@@ -179,6 +197,15 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 	//....done.....
 
 	_sortedSlices = this->isSorted();
+
+	if( _sortedSlices )
+	{
+		cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
+	}
+	else
+	{
+		cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
+	}
 }
 
 //............................................
@@ -335,29 +362,35 @@ unsigned int SlicedAcceptance::findSliceNum( const Observable* time, const doubl
 
 bool SlicedAcceptance::isSorted() const
 {
-	bool isReallySorted = true;
-	double last_thigh = -999.;
-	for( unsigned int i=0; i< slices.size(); ++i )
+	if( _hasChecked ) return _storedDecision;
+	else
 	{
-		if( isReallySorted )
+		bool isReallySorted = true;
+		double last_thigh = -999.;
+		for( unsigned int i=0; i< slices.size(); ++i )
 		{
-			if( last_thigh <= slices[i]->tlow() )
+			if( isReallySorted )
 			{
-				isReallySorted = true;
-				last_thigh = slices[i]->thigh();
+				if( last_thigh <= slices[i]->tlow() )
+				{
+					isReallySorted = true;
+					last_thigh = slices[i]->thigh();
+				}
+				else
+				{
+					isReallySorted = false;
+				}
+				continue;
 			}
 			else
 			{
-				isReallySorted = false;
+				break;
 			}
-			continue;
 		}
-		else
-		{
-			break;
-		}
+		_storedDecision = isReallySorted;
+		_hasChecked = true;
+		return isReallySorted;
 	}
-	return isReallySorted;
 }
 
 bool SlicedAcceptance::GetIsSorted() const

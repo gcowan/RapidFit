@@ -193,6 +193,9 @@ class SlicedAcceptance
 		mutable double t_max;
 		mutable double t_min;
 		mutable bool maxminset;
+
+		mutable bool _hasChecked;
+		mutable bool _storedDecision;
 };
 
 #endif

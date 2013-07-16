@@ -850,6 +850,9 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 	dontIntegrate = StringProcessing::CombineUniques( dontIntegrate, DontIntegrateThese );
 	dontIntegrate = this->DontNumericallyIntegrateList( NewDataPoint, dontIntegrate );
 
+	vector<string> CANNOT_INTEGRATE_LIST = NewBoundary->GetDiscreteNames();
+	dontIntegrate = StringProcessing::CombineUniques( dontIntegrate, CANNOT_INTEGRATE_LIST );
+
 	vector<string> safeDoIntegrate;
 	for( unsigned int i=0; i< doIntegrate.size(); ++i )
 	{
@@ -912,7 +915,14 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 	{
 		for( vector<DataPoint*>::iterator dataPoint_i = DiscreteIntegrals.begin(); dataPoint_i != DiscreteIntegrals.end(); ++dataPoint_i )
 		{
-			output_val += functionToWrap->Integral( *dataPoint_i, NewBoundary );
+			try{
+				output_val += functionToWrap->Integral( *dataPoint_i, NewBoundary );
+			}
+			catch(...)
+			{
+				cerr << "Analytical Integral Fell over!" << endl;
+				return -9999.;
+			}
 		}
 	}
 	else
@@ -1037,7 +1047,20 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 		}
 	}
 
+	vector<string> CANNOT_INTEGRATE_LIST = NewBoundary->GetDiscreteNames();
+	dontIntegrate = StringProcessing::CombineUniques( dontIntegrate, CANNOT_INTEGRATE_LIST );
+
 	dontIntegrate.push_back(ProjectThis);
+
+	vector<string> doIntegrate;
+
+	for( unsigned int i=0; i< allIntegrable.size(); ++i )
+	{
+		if( StringProcessing::VectorContains( &dontIntegrate, &(allIntegrable[i]) ) == -1 )
+		{
+			doIntegrate.push_back( allIntegrable[i] );
+		}
+	}
 
 	if( debug != NULL )
 	{
@@ -1053,20 +1076,54 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 			{
 				cout << allIntegrable[i] << "  ";
 			}
+			cout << endl << "Left:" << endl;
+			for( unsigned int i=0; i< doIntegrate.size(); ++i )
+			{
+				cout << doIntegrate[i] << " ";
+			}
 			cout << endl;
 		}
 	}
 
-	if( testedIntegrable.size() == 1 )
+	if( testedIntegrable.size() <= 1 || doIntegrate.empty() )
 	{
-		if( testedIntegrable[0] == ProjectThis )
+		if( doIntegrate.empty() )
 		{
-			value = functionToWrap->EvaluateComponent( NewDataPoint, Component );
+			try{
+				value = functionToWrap->EvaluateComponent( NewDataPoint, Component );
+			}
+			catch(...)
+			{
+				cerr << "Cannot Evalate PDF AT:" << endl;
+				NewDataPoint->Print();
+				return 0.;
+			}
+		}
+		else if( testedIntegrable.size() == 1 )
+		{
+			if( testedIntegrable[0] == ProjectThis )
+			{
+				try{
+					value = functionToWrap->EvaluateComponent( NewDataPoint, Component );
+				}
+				catch(...)
+				{
+					cerr << "Cannot Evalate PDF AT:" << endl;
+					NewDataPoint->Print();
+					return 0.;
+				}
+			}
+			else
+			{
+				cerr << "This PDF only knows how to Integrate: " << testedIntegrable[0] << " CAN NOT INTEGRATE: " << ProjectThis << endl << endl;
+				//throw(-342);
+				return 0.;
+			}
 		}
 		else
 		{
-			cerr << "This PDF only knows how to Integrate: " << testedIntegrable[0] << " CAN NOT INTEGRATE: " << ProjectThis << endl << endl;
-			throw(-342);
+			cerr << "Unknown Error" << endl;
+			return 0.;
 		}
 	}
 	else
