@@ -465,7 +465,7 @@ void Bs2Jpsifzero_Signal_v5a::MakePrototypes()
 vector<string> Bs2Jpsifzero_Signal_v5a::GetDoNotIntegrateList()
 {
 	vector<string> list;
-
+	list.push_back(tagName);
 	if( ! _usePunziMistag) list.push_back(mistagName) ;
 	if( useEventResolution() && ! _usePunziSigmat) list.push_back(eventResolutionName) ;
 
