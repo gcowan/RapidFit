@@ -13,7 +13,7 @@ class StudentT : public BasePDF
 		void MakePrototypes();
 
 		double Evaluate( DataPoint* );
-
+                double Normalisation( PhaseSpaceBoundary* );
 		bool SetPhysicsParameters( ParameterSet* );
 	private:
 		//	Observable

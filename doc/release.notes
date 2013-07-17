@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/07/17 Dianne Ferguson
+ - Added Normalisation method to StudentT PDF.
+
 2013/07/16 Rob Currie
   - Fixed 1D projection bug with jpsifzero
        This was a subtlety to do with the pdf and the framework disagreeing over how nuisence parameters are delt with.

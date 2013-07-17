@@ -50,3 +50,10 @@ double StudentT::Evaluate( DataPoint* input )
     const double Z = sqrt(TMath::Pi()*ns2)*TMath::Gamma(0.5*nValue)/TMath::Gamma(0.5*(nValue+1));
     return 1./(factor*Z);
 }
+
+double StudentT::Normalisation( PhaseSpaceBoundary* range )
+{
+  (void) range;
+  return 1.0;
+}
+
