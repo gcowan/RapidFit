@@ -584,6 +584,11 @@ bool Bs2Jpsifzero_Signal_v5a::SetPhysicsParameters( ParameterSet* NewParameterSe
 	// New: Prepare the coefficients of all of the time dependent terms (C,D,S etc)
 	this->prepareCDS() ;
 
+
+	Aperp_sq = 1.0;
+	Apara_sq = 0.0;
+	As_sq = 0.0;
+	Azero_sq = 0.0;
 	stored_AT = 1.0;
 	stored_A0 = 0.0;
 	stored_AP = 0.0;
