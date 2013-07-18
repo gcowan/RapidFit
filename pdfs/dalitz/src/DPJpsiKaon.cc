@@ -16,23 +16,31 @@
 
 #include <iostream>
 
-DPJpsiKaon::DPJpsiKaon(int fLB, int fLR, double fmB, double mmR,
-                               double gammaR, double mm1, double mm2,
-		       double RB, double RR, double fmJpsi,
-                               int spin,std::string mShape,
-                               double a, double r):
+DPJpsiKaon::DPJpsiKaon(int fLB, int fLR, double fmB, double fmR,
+                               double fgammaR, double fm1, double fm2,
+		       double fRB, double fRR, double fmJpsi,
+                               int spin,std::string fmShape,
+                               double fa, double fr):
 A0(0,0),
 Aplus(0,0),
 Aminus(0,0),
-spinKaon(spin)
+spinKaon(spin),
+    m1(fm1),
+    m2(fm2),
+    LB(fLB),
+    LR(fLR),
+    mB(fmB),
+    mR(fmR),
+    gammaR(fgammaR),
+    mJpsi(fmJpsi),
+    RB(fRB),
+    RR(fRR),
+    a(fa),
+    r(fr),
+    mShape(fmShape)
 {
-  this->LB=fLB;
-  this->LR=fLR;
-  this->mB=fmB;
-  this->mR=mmR;
-  this->m1=mm1;
-  this->m2=mm2;
-  mJpsi=fmJpsi;
+
+    //std::cout << m1 << " " << m2 << " " << LB << " " << LR <<" " << gammaR <<  " " << mJpsi << " " << RB <<  " " << RR << " " << r << " " << a << " " << mShape << std::endl;
   if ( mShape == "LASS" )
   {
     std::cout<<"Using Lass parametrization\n";
@@ -50,6 +58,7 @@ spinKaon(spin)
   }
   else
   {
+    std::cout<<"Using BW component\n";
     massShape = new DPBWResonanceShape(mR, gammaR, LR, m1, m2, RR);
   }
   switch (LB)
@@ -88,7 +97,7 @@ spinKaon(spin)
              barrierR=new DPBarrierL0(RR);
              break;
   }
-  switch(spin)
+  switch(spinKaon)
   {
     case 0: wigner=new DPWignerFunctionJ0();
             break;
@@ -107,16 +116,88 @@ spinKaon(spin)
 
 DPJpsiKaon::~DPJpsiKaon()
 {
+  //if( barrierR != NULL ) delete barrierR;
   if( wigner != NULL ) delete wigner;
 }
 
 DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
-						    mJpsi(input.mJpsi), m1(input.m1), m2(input.m2), pR0(input.pR0), A0(input.A0), Aplus(input.Aplus),
-        Aminus(input.Aminus), spinKaon(input.spinKaon), wigner(NULL), wignerPsi(input.wignerPsi)
+    A0(input.A0),
+    Aplus(input.Aplus),
+    Aminus(input.Aminus),
+    spinKaon(input.spinKaon),
+    m1(input.m1),
+    m2(input.m2),
+    LB(input.LB),
+    LR(input.LR),
+    mB(input.mB),
+    mR(input.mR),
+    gammaR(input.gammaR),
+    mJpsi(input.mJpsi),
+    RB(input.RB),
+    RR(input.RR),
+    mShape(input.mShape),
+    a(input.a),
+    r(input.r),
+    massShape(NULL),
+    barrierB(NULL),
+    barrierR(NULL),
+    wigner(NULL), wignerPsi(input.wignerPsi)
 {
+  if ( input.mShape == "LASS" )
+  {
+    massShape = new DPLassShape(input.mR, input.gammaR, input.LR, input.m1, input.m2, input.RR, input.a, input.r);
+  }
+  else if ( input.mShape == "gLASS" )
+  {
+    massShape = new DPGLassShape(input.mR, input.gammaR, input.LR, input.m1, input.m2, input.RR, input.a, input.r);
+  }
+  else if ( input.mShape == "NR" )
+  {
+    massShape = new DPNonresonant(input.mR, input.gammaR, input.LR, input.m1, input.m2, input.RR);
+  }
+  else
+  {
+    massShape = new DPBWResonanceShape(input.mR, input.gammaR, input.LR, input.m1, input.m2, input.RR);
+  }
+  switch (input.LB)
+  {
+    case 0: barrierB=new DPBarrierL0(input.RB);
+            break;
+    case 1: barrierB=new DPBarrierL1(input.RB);
+            break;
+    case 2: barrierB=new DPBarrierL2(input.RB);
+            break;
+    case 3: barrierB=new DPBarrierL3(input.RB);
+            break;
+    case 4: barrierB=new DPBarrierL4(input.RB);
+            break;
+    case 5: barrierB=new DPBarrierL5(input.RB);
+            break;
+    default: std::cout<<"WARNING DPJpsiKaon (LB): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
+             barrierB=new DPBarrierL0(input.RB);
+             break;
+  }
+  switch (input.LR)
+  {
+    case 0: barrierR=new DPBarrierL0(input.RR);
+            break;
+    case 1: barrierR=new DPBarrierL1(input.RR);
+            break;
+    case 2: barrierR=new DPBarrierL2(input.RR);
+            break;
+    case 3: barrierR=new DPBarrierL3(input.RR);
+            break;
+    case 4: barrierR=new DPBarrierL4(input.RR);
+            break;
+    case 5: barrierR=new DPBarrierL5(input.RR);
+            break;
+    default: std::cout<<"WARNING DPJpsiKaon (LR): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
+             barrierR=new DPBarrierL0(input.RR);
+             break;
+  }
         if( input.wigner != NULL )
         {
-                switch(spinKaon)
+                switch(input.spinKaon)
                 {
                         case 0: wigner=new DPWignerFunctionJ0();
                         break;
@@ -160,26 +241,27 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
     return result;
   }
 
-  //std::cout << "B" << this->mB << " Jpsi " << this->mJpsi << " m23 " << m23 << " m1 " << this->m1 << " m2 " << this->m2 << " mR " << this->mR << std::endl;
-  double pB = DPHelpers::daughterMomentum(this->mB, this->mJpsi, m23);      // B, psi, K*
-  double pR = DPHelpers::daughterMomentum(m23, this->m1, this->m2);         // K*, K, pi
-  double pB0 = DPHelpers::daughterMomentum(this->mB, this->mJpsi, this->mR);// B, psi, resonance
-  double pR0 = DPHelpers::daughterMomentum(this->mR, this->m1, this->m2);   // resonance, K, pi
+  double m_min = m1 + m2;
+  double m_max = mB - mJpsi;
+  double m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
+  //std::cout << m_min << " " << m_max << " " << m0_eff<< std::endl;
 
-  //double orbitalFactor = TMath::Power(pB/pB0, this->LB)*
-  //                       TMath::Power(pR/pR0, this->LR);
+  //std::cout << "B" << mB << " Jpsi " << mJpsi << " m23 " << m23 << " m1 " << m1 << " m2 " << m2 << " mR " << mR << " m0_eff " << m0_eff << std::endl;
+  double pB = DPHelpers::daughterMomentum(mB, mJpsi, m23);      // B, psi, K*
+  double pR = DPHelpers::daughterMomentum(m23, m1, m2);         // K*, K, pi
+  double pB0 = DPHelpers::daughterMomentum(mB, mJpsi, m0_eff);// B, psi, resonance
+  double pR0 = DPHelpers::daughterMomentum(mR, m1, m2);   // resonance, K, pi
 
-  double orbitalFactor = TMath::Power(pB/this->mB, this->LB)*
-                         TMath::Power(pR/this->mR, this->LR);
+  //double orbitalFactor = TMath::Power(pB/pB0, LB)*
+  //                       TMath::Power(pR/pR0, LR);
 
-  double barrierFactor = barrierB->barrier( DPHelpers::daughterMomentum(this->mB,
-                                            this->mJpsi, this->mR), pB)*
-                 barrierR->barrier(DPHelpers::daughterMomentum(this->mR,
-                                   this->m1, this->m2), pR);
+  double orbitalFactor = TMath::Power(pB/mB, LB)*
+                         TMath::Power(pR/mR, LR);
 
-  //std::cout << "Barrier factor "<< m23 << " " << barrierFactor<< std::endl;
+  double barrierFactor = barrierB->barrier( pB0, pB )*
+                         barrierR->barrier( pR0, pR );
 
-  TComplex massFactor = this->massShape->massShape(m23);
+  TComplex massFactor = massShape->massShape(m23);
 
   // Angular part
   TComplex angular(0,0);
@@ -195,7 +277,6 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
     case -2: angular*=Aminus;
             break;
   }
-
   result = massFactor*barrierFactor*orbitalFactor*angular;
 
   return result;
@@ -212,6 +293,8 @@ void DPJpsiKaon::setHelicityAmplitudes(double magA0, double magAplus,
 
 void DPJpsiKaon::setResonanceParameters(double mass, double sigma)
 {
+        mR = mass;
+        gammaR = sigma;
         massShape->setResonanceParameters( mass, sigma );
 }
 

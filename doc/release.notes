@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/07/18 Greig Cowan
+ - Fixed nasty bug in DPTotalAmplitude code. Class inheritance changed and better copy constructors written.
+ - Added effective resonance mass calculation for treatment of resonances outside of kinematic limit.
+
 2013/07/17 Dianne Ferguson
  - Added Normalisation method to StudentT PDF.
 

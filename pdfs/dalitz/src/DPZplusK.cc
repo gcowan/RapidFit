@@ -10,23 +10,26 @@
 
 #include <iostream>
 
-DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double mR,
-		   double gammaR, double m1, double m2,
-		   double RB, double RR, double fmJpsi,
-		   int spin, int resonanceIn):
+DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double fmR,
+		   double fgammaR, double fm1, double fm2,
+		   double fRB, double fRR, double fmJpsi,
+		   int spin, int fresonanceIn):
 	A0(1,0),
 	Aplus(1,0),
 	Aminus(1,0),
-	spinZplus(spin)
+	spinZplus(spin),
+    m1(fm1),
+    m2(fm2),
+    LB(fLB),
+    LR(fLR),
+    mB(fmB),
+    mR(fmR),
+    gammaR(fgammaR),
+    mJpsi(fmJpsi),
+    RB(fRB),
+    RR(fRR),
+    resonanceIn(fresonanceIn)
 {
-//         this->pionID=pionID;
-	this->LB=fLB;
-	this->LR=fLR;
-	this->mB=fmB;
-	this->mR=mR;
-	this->m1=m1;
-	this->m2=m2;
-	mJpsi=fmJpsi;
   if ( resonanceIn == 12 )
   {
     massShape = new DPBWResonanceShape(mR, gammaR, LR, m1, m2, RR);
@@ -80,16 +83,75 @@ DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double mR,
 
 DPZplusK::~DPZplusK()
 {
+	if( massShape != NULL ) delete massShape;
 	if( wigner != NULL ) delete wigner;
 }
 
 DPZplusK::DPZplusK( const DPZplusK& input ) : DPComponent( input ),
-					      mJpsi(input.mJpsi),  m1(input.m1), m2(input.m2), pR0(input.pR0), A0(input.A0), Aplus(input.Aplus),
-					      Aminus(input.Aminus), spinZplus(input.spinZplus), wigner(NULL), wignerPsi(input.wignerPsi)
+    A0(input.A0),
+	Aplus(input.Aplus),
+	Aminus(input.Aminus),
+	spinZplus(input.spinZplus),
+    m1(input.m1),
+    m2(input.m2),
+    LB(input.LB),
+    LR(input.LR),
+    mB(input.mB),
+    mR(input.mR),
+    gammaR(input.gammaR),
+    mJpsi(input.mJpsi),
+    RB(input.RB),
+    RR(input.RR),
+    resonanceIn(input.resonanceIn),
+    massShape(NULL),
+    barrierB(NULL),
+    barrierR(NULL),
+	wigner(NULL), wignerPsi(input.wignerPsi)
 {
+
+  if ( input.resonanceIn == 12 )
+  {
+    massShape = new DPBWResonanceShape(input.mR, input.gammaR, input.LR, input.m1, input.m2, input.RR);
+  }
+  else if ( input.resonanceIn == 13 )
+  {
+    massShape = new DPBWResonanceShape(input.mR, input.gammaR, input.LR, input.m1, input.mJpsi, input.RR);
+  }
+  else
+  {
+    massShape = new DPBWResonanceShape(input.mR, input.gammaR, input.LR, input.m2, input.mJpsi, input.RR);
+  }
+	switch (input.LB)
+	{
+		case 0: barrierB=new DPBarrierL0(input.RB);
+			break;
+		case 1: barrierB=new DPBarrierL1(input.RB);
+			break;
+		case 2: barrierB=new DPBarrierL2(input.RB);
+			break;
+		case 3: barrierB=new DPBarrierL3(input.RB);
+			break;
+		default: std::cout<<"WARNING DPZplusK (LB): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
+			 barrierB=new DPBarrierL0(input.RB);
+			 break;
+	}
+	switch (input.LR)
+	{
+		case 0: barrierR=new DPBarrierL0(input.RR);
+			break;
+		case 1: barrierR=new DPBarrierL1(input.RR);
+			break;
+		case 2: barrierR=new DPBarrierL2(input.RR);
+			break;
+		case 3: barrierR=new DPBarrierL3(input.RR);
+			break;
+		default: std::cout<<"WARNING DPZplusK (LR): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
+			 barrierR=new DPBarrierL0(input.RR);
+			 break;
+	}
 	if( input.wigner != NULL )
 	{
-		switch(spinZplus)
+		switch(input.spinZplus)
 		{
 			case 0: wigner=new DPWignerFunctionJ0();
 				break;
@@ -118,9 +180,9 @@ TComplex DPZplusK::amplitude(double m23, double cosTheta1,
 	TLorentzVector pMuMinus;
 	TLorentzVector pPi;
 	TLorentzVector pK;
-	DPHelpers::calculateFinalStateMomenta(this->mB, m23, mJpsi,
+	DPHelpers::calculateFinalStateMomenta(mB, m23, mJpsi,
 					      cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, m2, m1, pMuPlus, pMuMinus, pPi, pK);
-	TLorentzVector pB(0,0,0,this->mB);
+	TLorentzVector pB(0,0,0,mB);
 	// Cos of the angle between psi reference axis (not needed in this place)
 	//  double cosARefs=DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
 	// Proper Z+ variables
@@ -160,19 +222,20 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 	{
 		return result;
 	}
+    //std::cout << "B" << mB << " Jpsi " << mJpsi << " m1 " << m1 << " m2 " << m2 << " mR " << mR << std::endl;
+    //std::cout << mR << std::endl;
+	double pB = DPHelpers::daughterMomentum(mB, m1, m13);
+	double pR = DPHelpers::daughterMomentum(m13, mJpsi, m2);
+	double pB0 = DPHelpers::daughterMomentum(mB, m1, mR);
+	double pR0 = DPHelpers::daughterMomentum(mR, mJpsi, m2);
 
-	double pB = DPHelpers::daughterMomentum(this->mB, this->m1, m13);
-	double pR = DPHelpers::daughterMomentum(m13, this->mJpsi, this->m2);
-	double pB0 = DPHelpers::daughterMomentum(this->mB, this->m1, this->mR);
-	double pR0 = DPHelpers::daughterMomentum(this->mR, this->mJpsi, this->m2);
-
-	double orbitalFactor = TMath::Power(pB/pB0, this->LB)*
-		TMath::Power(pR/pR0, this->LR);
+	double orbitalFactor = TMath::Power(pB/pB0, LB)*
+		TMath::Power(pR/pR0, LR);
 
 	double barrierFactor = barrierB->barrier(pB0, pB)*
 		barrierR->barrier(pR0, pR);
 
-	TComplex massFactor = this->massShape->massShape(m13);
+	TComplex massFactor = massShape->massShape(m13);
 
 
 	// Angular part
@@ -190,6 +253,8 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 			 break;
 	}
 
+    //std::cout << "Z " << massFactor<< " " << barrierFactor<< " " << orbitalFactor<< " " << angular << std::endl;
+
 	result = massFactor*barrierFactor*orbitalFactor*angular;
 
 	return result;
@@ -206,5 +271,7 @@ void DPZplusK::setHelicityAmplitudes(double magA0, double magAplus,
 
 void DPZplusK::setResonanceParameters(double mass, double sigma)
 {
+    mR = mass;
+    gammaR = sigma;
 	massShape->setResonanceParameters( mass, sigma );
 }
