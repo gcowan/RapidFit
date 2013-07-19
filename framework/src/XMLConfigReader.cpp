@@ -696,7 +696,7 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			returnable_config->CalcChi2 = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}
-		else if( projComps[childIndex]->GetName() == "DrawPull" )
+		else if( projComps[childIndex]->GetName() == "DrawPull" || projComps[childIndex]->GetName() == "DrawPulls" )
 		{
 			returnable_config->DrawPull = XMLTag::GetBooleanValue( projComps[childIndex] );
 		}

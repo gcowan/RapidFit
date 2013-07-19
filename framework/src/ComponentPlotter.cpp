@@ -1489,9 +1489,13 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		c1->Update();
 
 		pullGraph->GetYaxis()->SetTitle( "Pull" );
+		pullGraph->GetYaxis()->SetTitleSize( input_data->GetYaxis()->GetTitleSize() );
+		pullGraph->GetYaxis()->SetLabelSize( input_data->GetYaxis()->GetLabelSize() *1./0.5 );
+		pullGraph->GetXaxis()->SetTitleSize( input_data->GetXaxis()->GetTitleSize() );
+		pullGraph->GetXaxis()->SetLabelSize( input_data->GetXaxis()->GetLabelSize() *1./0.5 );
 		pullGraph->GetXaxis()->SetRangeUser( X_min, X_max );
 		//pullGraph->GetXaxis()->CenterTitle( true );
-		pullGraph->GetXaxis()->SetTitle( X_Title );
+		//pullGraph->GetXaxis()->SetTitle( X_Title );
 		pad2->Modified();
 		pad2->Update();
 		pullGraph->GetYaxis()->SetTitleOffset((Float_t)(pullGraph->GetYaxis()->GetTitleOffset()/3.));
@@ -1500,12 +1504,14 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 		pullGraph->GetXaxis()->SetTitleSize((Float_t)(pullGraph->GetXaxis()->GetTitleSize()*2.));
 		if( limitPulls )
 		{
+			pullGraph->GetYaxis()->SetNdivisions( 3 );
 			pullGraph->GetYaxis()->SetRangeUser( -5., 5. );
+			pullGraph->SetMaximum( 5. );
+			pullGraph->SetMinimum( -5. );
 		}
 		pad2->Modified();
 		pad2->Update();
 		c1->Update();
-
 	}
 
 	c1->Write("",TObject::kOverwrite);

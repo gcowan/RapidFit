@@ -48,6 +48,9 @@
 </DataSet>
 </ToFit>
 <Output>
-<ComponentProjection>x</ComponentProjection>
+	<ComponentProjection>
+		<Name>x</Name>
+		<DrawPull>True</DrawPull>
+	</ComponentProjection>
 </Output>
 </RapidFit>

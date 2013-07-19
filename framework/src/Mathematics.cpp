@@ -741,6 +741,9 @@ namespace Mathematics
                 }
             }
             }
+#else
+	cerr << "Can't do this without GSL" << endl;
+	exit(0);
 #endif
             return returnValue/num;
         }

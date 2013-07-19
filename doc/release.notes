@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/07/18 Rob Currie
+  - Added more documentation to RapidPlot to advertise the fact you can regenerate an XML and the fitting arguments from any fit based on the .root that RapidFit saves in the output folder!
+      This just saved me searching for an old XML to regenerate a plot for the thesis so I should probably advertise this!
+      With a little refactoring it would be nice to store the possible output XML from RapidFit in the .root as well which can be extracted using RapidPlot in the future
+  - After speaking to Matt I've modified the combined Signal+PullPlot plots to look more like the standard LHCb output, i.e. title fonts have been resized
+  - Fixed stupid typo in lhcbStyle.C stored in the utils/src folder
+
 2013/07/18 Greig Cowan
  - Fixed nasty bug in DPTotalAmplitude code. Class inheritance changed and better copy constructors written.
  - Added effective resonance mass calculation for treatment of resonances outside of kinematic limit.

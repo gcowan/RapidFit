@@ -113,6 +113,18 @@ void helpFunction()
 	Rapid2DLL::Help();
 	//FeldmanCousinsAnalysis::Help();		Not yet Implemented
 	CorrMatrix::Help();
+	cout << endl;
+	cout << "Did you Know that the full xml and runtime arguments that you ran your fit with are stored in the global .root output?!" << endl;
+	cout << endl;
+	cout << "To regenerate a copy of the XML you ran with run with:" << endl << endl;
+	cout << "RapidPlot Global_Fit_Output.root --RestoreXML" << endl;
+	cout << endl;
+	cout << "or you can chose the output XML name with:" << endl;
+	cout << "RapidPlot Global_Fit_Output.root --RestoreXML --SaveAs MyOutput.xml" << endl;
+	cout << endl;
+	cout << "To how this fit was executed run with:" << endl << endl;
+	cout << "RapidPlot Global_Fit_Output.root --Summarise" << endl;
+	cout << endl;
 }
 
 void Summarise( vector<string> input_filenames, vector<string> other_params )

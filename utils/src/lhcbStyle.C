@@ -23,7 +23,7 @@ void lhcbStyle()
 // USAGE:
 //
 // Include the lines
-//   gROOT->ProcessLine(".L lhcbstyle.C");
+//   gROOT->ProcessLine(".L lhcbStyle.C");
 //   lhcbStyle();
 // at the beginning of your root macro.
 //
