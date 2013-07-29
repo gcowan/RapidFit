@@ -4,11 +4,11 @@
 #include "DPBarrierFactor.hh"
 
 class DPBarrierL1: public virtual DPBarrierFactor
-{ 
+{
   public:
     DPBarrierL1(double radius);
-    ~DPBarrierL1() {};
- 
+    ~DPBarrierL1() {};//std::cout << "DPBarrierL1 dest" << std::endl;};
+
     double barrier(double p0, double p);
 
   private:
@@ -16,4 +16,4 @@ class DPBarrierL1: public virtual DPBarrierFactor
     static double function(double z);
 };
 
-#endif 
+#endif

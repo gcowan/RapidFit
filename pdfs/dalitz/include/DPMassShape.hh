@@ -2,6 +2,7 @@
 #define DP_MASS_SHAPE
 
 #include "TComplex.h"
+#include <iostream>
 
 class DPMassShape
 {
@@ -10,7 +11,7 @@ class DPMassShape
 
     DPMassShape() {};
     DPMassShape( const DPMassShape& ) {};
-    ~DPMassShape() {};
+    virtual ~DPMassShape() { };//std::cout << "MassShape destructor" << std::endl; };
 
     virtual TComplex massShape(double m) = 0;
 

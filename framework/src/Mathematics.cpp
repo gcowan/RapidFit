@@ -152,7 +152,7 @@ namespace Mathematics
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
-#ifdef __RAPIDFIT_USE_GSL_MATH
+#ifdef __RAPIDFIT_USE_GSL
 			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
 			returnable = GSL_REAL( gsl_erf( gsl_z ) );
 #else
@@ -185,7 +185,7 @@ namespace Mathematics
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
-#ifdef __RAPIDFIT_USE_GSL_MATH
+#ifdef __RAPIDFIT_USE_GSL
 			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
 			returnable = GSL_IMAG( gsl_erf( gsl_z ) );
 #else
@@ -766,14 +766,14 @@ namespace Mathematics
 		rapidInt->SetFixedIntegralPoints(100);
         PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
 
-        const int l_max(6);
-        const int i_max(6);
-        const int k_max(4);
-        const int j_max(4);
-        //const int l_max(10); //mKpi
-        //const int i_max(4); //cosPsi
-        //const int k_max(2); //phi
-        //const int j_max(2); //cosTheta
+        //const int l_max(6);
+        //const int i_max(6);
+        //const int k_max(4);
+        //const int j_max(4);
+        const int l_max(6); //mKpi
+        const int i_max(4); //cosPsi
+        const int k_max(2); //phi
+        const int j_max(2); //cosTheta
         double c[l_max+1][i_max+1][k_max+1][j_max+1];
         double c_sq[l_max+1][i_max+1][k_max+1][j_max+1];
         for ( int l = 0; l < l_max + 1; l++ )
@@ -812,7 +812,7 @@ namespace Mathematics
         TH1D * cosThetaAcc = new TH1D("cosThetaAcc", "cosTheta1", 20, minima[0], maxima[0]);
         TH1D * phiAcc      = new TH1D("phiAcc", "phi", 20, minima[1], maxima[1]);
         TH1D * cosPsiAcc   = new TH1D("cosPsiAcc", "cosTheta2", 20, minima[2], maxima[2]);
-        TH1D * mKpiAcc     = new TH1D("mKpiAcc", "mKpiAcc", 35, minima[3], maxima[3]);
+        TH1D * mKpiAcc     = new TH1D("mKpiAcc", "mKpi", 35, minima[3], maxima[3]);
         cosThetaAcc->Sumw2();
         phiAcc->Sumw2();
         cosPsiAcc->Sumw2();
@@ -942,7 +942,7 @@ namespace Mathematics
                     if (j < k) continue;
                     error = sqrt(1./numEvents/numEvents * ( c_sq[l][i][k][j] - c[l][i][k][j]*c[l][i][k][j]/numEvents) );
                     if (std::isnan(error)) error = 0.;
-                    if ( fabs(c[l][i][k][j]/numEvents) > 5.*error )
+                    if ( fabs(c[l][i][k][j]/numEvents) > 3.*error )
                     {
                         sprintf( buf, "c[%d][%d][%d][%d] = %f;// +- %f", l, i, k, j, c[l][i][k][j]/numEvents, error );
                         cout << buf << endl;
@@ -952,7 +952,7 @@ namespace Mathematics
         }
         }
 
-#ifdef __RAPIDFIT_USE_GSL_MATH
+#ifdef __RAPIDFIT_USE_GSL
         // Now sample the acceptance surface so that we can make projections to check that it looks sensible
         AccParam * param = new AccParam(&c[0][0][0][0], i_max, j_max, k_max, l_max, numEvents);
         TNtuple * tree = new TNtuple("tuple", "tuple", "cosTheta1:phi:cosTheta2:mKpi:weight");
@@ -1034,15 +1034,19 @@ namespace Mathematics
         canvas->Divide(2,2);
         canvas->cd(1);
         cosThetaAcc->Draw();
+        cosThetaAcc->SetMinimum(0);
         cosThetaAccProj->Draw("Csame");
         canvas->cd(2);
         phiAcc->Draw();
+        phiAcc->SetMinimum(0);
         phiAccProj->Draw("Csame");
         canvas->cd(3);
         cosPsiAcc->Draw();
+        cosPsiAcc->SetMinimum(0);
         cosPsiAccProj->Draw("Csame");
         canvas->cd(4);
         mKpiAcc->Draw();
+        mKpiAcc->SetMinimum(0);
         mKpiAccProj->Draw("Csame");
         canvas->SaveAs("acceptance.pdf");
         return 1.;

@@ -227,6 +227,7 @@ double RapidFitIntegrator::Integral( DataPoint * NewDataPoint, PhaseSpaceBoundar
 	//cout << "R:here" << endl;
 
 	bool cacheEnabled = functionToWrap->GetCachingEnabled();
+    //cout << "integral " << TestIntegral( NewDataPoint, NewBoundary ) << endl;
 
 	//Test the integration method the function has provided
 	if( haveTestedIntegral )
@@ -425,8 +426,8 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	unsigned int npoint = GSLFixedPoints;
 	vector<double> * integrationPoints = new std::vector<double>[doIntegrate.size()];
 
-	gsl_qrng * q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)(doIntegrate.size()) );
-	//gsl_qrng * q = gsl_qrng_alloc( gsl_qrng_niederreiter_2, (unsigned)(doIntegrate.size()) );
+	//gsl_qrng * q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)(doIntegrate.size()) );
+	gsl_qrng * q = gsl_qrng_alloc( gsl_qrng_niederreiter_2, (unsigned)(doIntegrate.size()) );
 	for (unsigned int i = 0; i < npoint; i++)
 	{
 		double v[doIntegrate.size()];
@@ -498,7 +499,7 @@ vector<double*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, vect
 	{
 		//q = gsl_qrng_alloc( gsl_qrng_sobol, (unsigned)nDim );
 		q = gsl_qrng_alloc( gsl_qrng_niederreiter_2, (unsigned)nDim );
-	}
+    }
 	catch(...)
 	{
 		cout << "Can't Allocate Integration Tool for GSL Integral." << endl;

@@ -83,8 +83,10 @@ DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double fmR,
 
 DPZplusK::~DPZplusK()
 {
-	if( massShape != NULL ) delete massShape;
-	if( wigner != NULL ) delete wigner;
+	delete barrierR;
+	delete barrierB;
+	delete massShape;
+	delete wigner;
 }
 
 DPZplusK::DPZplusK( const DPZplusK& input ) : DPComponent( input ),
@@ -229,8 +231,10 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 	double pB0 = DPHelpers::daughterMomentum(mB, m1, mR);
 	double pR0 = DPHelpers::daughterMomentum(mR, mJpsi, m2);
 
-	double orbitalFactor = TMath::Power(pB/pB0, LB)*
-		TMath::Power(pR/pR0, LR);
+	//double orbitalFactor = TMath::Power(pB/pB0, LB)*
+	//	TMath::Power(pR/pR0, LR);
+	double orbitalFactor = TMath::Power(pB/mB, LB)*
+		TMath::Power(pR/mR, LR);
 
 	double barrierFactor = barrierB->barrier(pB0, pB)*
 		barrierR->barrier(pR0, pR);
@@ -274,4 +278,5 @@ void DPZplusK::setResonanceParameters(double mass, double sigma)
     mR = mass;
     gammaR = sigma;
 	massShape->setResonanceParameters( mass, sigma );
+    //std::cout << mR << std::endl;
 }

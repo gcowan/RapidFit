@@ -7,7 +7,7 @@ class DPWignerFunction
   public:
 
     DPWignerFunction() {};
-    ~DPWignerFunction() {};
+    virtual ~DPWignerFunction() {};
 
     virtual double function(double cosTheta, double m, double n) = 0;
 

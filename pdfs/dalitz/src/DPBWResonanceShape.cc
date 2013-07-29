@@ -42,6 +42,7 @@ DPBWResonanceShape::DPBWResonanceShape(double mRR, double gammaRR, int L,
 DPBWResonanceShape::DPBWResonanceShape( const DPBWResonanceShape& other ) : DPMassShape(other),
    mR(other.mR), gammaR(other.gammaR), LR(other.LR), m1(other.m1), m2(other.m2), R(other.R), barrier(NULL)
 {
+    std::cout << "In DPBW copy const " << mR << " " << gammaR << " " << LR << " " << R << std::endl;
   	if ( other.barrier != NULL )
 	{
   		switch (LR)
@@ -68,6 +69,7 @@ DPBWResonanceShape::DPBWResonanceShape( const DPBWResonanceShape& other ) : DPMa
 
 DPBWResonanceShape::~DPBWResonanceShape()
 {
+  //std::cout << "DPBW destructor" << std::endl;
   if (barrier)
   {
     delete barrier;
@@ -76,6 +78,7 @@ DPBWResonanceShape::~DPBWResonanceShape()
 
 TComplex DPBWResonanceShape::massShape(double m)
 {
+  //std::cout << "DPBWResonanceShape m" << m << " " << mR << std::endl;
   TComplex result(1,0);
   TComplex denominator(mR*mR-m*m,-mR*gamma(m));
 
@@ -85,6 +88,7 @@ TComplex DPBWResonanceShape::massShape(double m)
 
 double DPBWResonanceShape::gamma(double m)
 {
+  //std::cout << "DPBWResonanceShape g" << m << " " << mR << " " << gammaR << std::endl;
   double pp=daughterMomentum(m);  // momentum of daughter at the actual mass
   double bb=barrier->barrier(pR0,pp);  // Barrier factor
   double gg=gammaR*mR/m*bb*bb*TMath::Power(pp/pR0,2*LR+1);
@@ -105,9 +109,10 @@ double DPBWResonanceShape::daughterMomentum(double m)
 
 void DPBWResonanceShape::setResonanceParameters( double mass, double sigma )
 {
-	//std::cout << "DPBWResonanceShape setting" << std::endl;
+	//std::cout << "DPBWResonanceShape setting " << mass << std::endl;
 	mR = mass;
 	gammaR = sigma;
-	//std::cout << "DPBWResonanceShape set" << std::endl;
+	pR0 = daughterMomentum(mR);
+    //std::cout << "DPBWResonanceShape set" << std::endl;
 }
 

@@ -138,13 +138,15 @@ void DPGLassShape::setParameters(double* pars)
   a=pars[2];
   r=pars[3];
   fraction=pars[4];
-  phaseR=pars[5];  
-  phaseB=pars[6];  
+  phaseR=pars[5];
+  phaseB=pars[6];
+  pR0=daughterMomentum(mR);
 }
 
 void DPGLassShape::setResonanceParameters(double a_lass, double r_lass)
 {
 	a = a_lass;
 	r = r_lass;
+    pR0=daughterMomentum(mR);
 	return;
 }

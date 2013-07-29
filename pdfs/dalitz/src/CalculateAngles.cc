@@ -14,7 +14,7 @@ double CalculateAngles::HelCos_Tomasz(const double & ms,const double &mz,const i
 {
   double m_b(5.2794),m_psi(3.686093),m_k(0.493677),m_pi(0.139570),m_mu(0.1056583715);
   //style = 0, K*, style =1, Z, style = 2, between axis
-  
+
   if(style == 0){
     double Epi = 0.5*(pow(ms,2)+pow(m_pi,2)-pow(m_k,2))/ms;
     double Epsi = 0.5*(pow(m_b,2)-pow(m_psi,2)-pow(ms,2))/ms;
@@ -41,11 +41,11 @@ double CalculateAngles::HelCos_Tomasz(const double & ms,const double &mz,const i
         double E_pi = 0.5*(mz*mz-m_pi*m_pi-m_psi*m_psi)/m_psi;
         double p_s = sqrt(E_s*E_s-ms*ms);
         double p_pi = sqrt(E_pi*E_pi-m_pi*m_pi);
-        return (2.*E_s*E_pi+m_k*m_k-ms*ms-m_pi*m_pi)/(2.*p_s*p_pi);	
+        return (2.*E_s*E_pi+m_k*m_k-ms*ms-m_pi*m_pi)/(2.*p_s*p_pi);
       } else return 0.0;
     }
-  }  
-  
+  }
+
 }
 
 
@@ -71,32 +71,32 @@ return temp;
 
 
 double CalculateAngles::coshel1_Tomasz(TLorentzVector particle, TLorentzVector parent,
-					 TLorentzVector grandparent,TLorentzVector grandgrandparent) 
+					 TLorentzVector grandparent,TLorentzVector grandgrandparent)
 {
 
   TVector3 boosttoB = -(grandgrandparent.BoostVector());
-  
+
   particle.Boost(boosttoB);
   parent.Boost(boosttoB);
   grandparent.Boost(boosttoB);
-  
+
   TVector3 boosttoZ = -(grandparent.BoostVector());
   particle.Boost(boosttoZ);
   parent.Boost(boosttoZ);
-  
+
   TVector3 boosttoP = -(parent.BoostVector());
   particle.Boost(boosttoP);
-  
-  
+
+
   TVector3 particle3 = particle.Vect();
   TVector3 parent3 = parent.Vect();
-  
+
   Double_t numerator = particle3.Dot(parent3);
   Double_t denominator = (particle3.Mag())*(parent3.Mag());
   Double_t temp = numerator/denominator;
-  
+
   return temp;
-  
+
 }
 
 
@@ -124,14 +124,14 @@ double CalculateAngles::planeAngle0_Tomasz(TLorentzVector particleFrame,
   TVector3 vecD = (boostedD.Vect()).Unit();
 
   TVector3 el = ( vecA.Cross( vecB ) ).Unit() ;
-  //TVector3 ek = ( vecC.Cross( vecD ) ).Unit() ;                                                                                                                                                                                                                                                         
+  //TVector3 ek = ( vecC.Cross( vecD ) ).Unit() ;
   TVector3 ek = ( vecD.Cross( vecC ) ).Unit() ;
 
   TVector3 ez = ( boostedAxis.Vect() ).Unit();
 
   double cosPhi = ( ek.Dot(el) );
   double sinPhi = ( el.Cross(ek) ).Dot( ez ) ;
-  //cout <<"cosPhi  " << cosPhi <<endl;                                                                                                                                                                                                                                                                   
+  //cout <<"cosPhi  " << cosPhi <<endl;
   double phi    = acos( cosPhi ) ;
 
   return ( sinPhi > 0.0 ? phi : -phi ) ;
@@ -168,14 +168,14 @@ Float_t CalculateAngles::planeAngle1_Tomasz(TLorentzVector particleFrame,
   TVector3 vecD = (boostedD.Vect()).Unit();
 
   TVector3 el = ( vecA.Cross( vecB ) ).Unit() ;
-  //TVector3 ek = ( vecC.Cross( vecD ) ).Unit() ;                                                                                                                                                                                                                                                         
+  //TVector3 ek = ( vecC.Cross( vecD ) ).Unit() ;
   TVector3 ek = ( vecD.Cross( vecC ) ).Unit() ;
 
   TVector3 ez = ( boostedAxis.Vect() ).Unit();
 
   double cosPhi = ( ek.Dot(el) );
   double sinPhi = ( el.Cross(ek) ).Dot( ez ) ;
-  //cout <<"cosPhi  " << cosPhi <<endl;                                                                                                                                                                                                                                                                   
+  //cout <<"cosPhi  " << cosPhi <<endl;
   double phi    = acos( cosPhi ) ;
 
   return ( sinPhi > 0.0 ? phi : -phi ) ;
@@ -183,20 +183,20 @@ Float_t CalculateAngles::planeAngle1_Tomasz(TLorentzVector particleFrame,
 
 
 double CalculateAngles::decayAngle
-( const TLorentzVector& P , 
+( const TLorentzVector& P ,
   const TLorentzVector& Q ,
-  const TLorentzVector& D ) 
+  const TLorentzVector& D )
 
 {
-  const double pd  = P.Dot  ( D ) ;       // P * D 
-  const double pq  = P.Dot  ( Q ) ;       // P * Q 
-  const double qd  = Q.Dot  ( D ) ;       // D * Q 
+  const double pd  = P.Dot  ( D ) ;       // P * D
+  const double pq  = P.Dot  ( Q ) ;       // P * Q
+  const double qd  = Q.Dot  ( D ) ;       // D * Q
   const double mq2 = Q.M2   (   ) ;       // Q^2
   const double mp2 = P.M2   (   ) ;       // P^2
   const double md2 = D.M2   (   ) ;       // D^2
-  
+
   const double value =  ( pq * pq - mq2 * mp2 ) * ( qd * qd - mq2 * md2 ) ;
-  if ( 0 > value ) 
+  if ( 0 > value )
     {
       std::cout << "LoKi::Kinematics::decayAngle(P,Q,D):: invalid 4-momenta, return InvalidAngle"  << std::endl;
     }
@@ -208,15 +208,15 @@ double CalculateAngles::decayAngle
 
 
 
-double CalculateAngles::decayAngleChi 
-( const TLorentzVector& d1 , 
-  const TLorentzVector& d2 , 
-  const TLorentzVector& h1 , 
-  const TLorentzVector& h2 ) 
+double CalculateAngles::decayAngleChi
+( const TLorentzVector& d1 ,
+  const TLorentzVector& d2 ,
+  const TLorentzVector& h1 ,
+  const TLorentzVector& h2 )
 {
-  
+
   TLorentzVector B = h1 + h2 + d1 + d2;
-  
+
 
   TVector3 boostToB = B.BoostVector();
 
@@ -226,53 +226,53 @@ double CalculateAngles::decayAngleChi
   TLorentzVector pPsi_KpiMuMu	  = d1 + d2;
   TLorentzVector pMplus_KpiMuMu   = d1;
   TLorentzVector pMminus_KpiMuMu  = d2;
-  
+
   pKstar_KpiMuMu  .Boost( -1.*boostToB );
   pKplus_KpiMuMu  .Boost( -1.*boostToB );
   pPiminus_KpiMuMu.Boost( -1.*boostToB );
   pPsi_KpiMuMu    .Boost( -1.*boostToB );
   pMplus_KpiMuMu  .Boost( -1.*boostToB );
   pMminus_KpiMuMu .Boost( -1.*boostToB );
-  
+
   TVector3 boostToKstar = pKstar_KpiMuMu.BoostVector();
   TVector3 boostToPsi   = pPsi_KpiMuMu.BoostVector();
   TLorentzVector pKplus_MuMu	(pKplus_KpiMuMu);
   TLorentzVector pPiminus_MuMu	(pPiminus_KpiMuMu);
   TLorentzVector pKplus_Kpi	(pKplus_KpiMuMu);
   TLorentzVector pPiminus_Kpi	(pPiminus_KpiMuMu);
-  
+
   TLorentzVector pMplus_MuMu	(pMplus_KpiMuMu);
   TLorentzVector pMminus_MuMu	(pMminus_KpiMuMu);
   TLorentzVector pMplus_Kpi	(pMplus_KpiMuMu);
   TLorentzVector pMminus_Kpi	(pMminus_KpiMuMu);
-  
-  
+
+
   pKplus_Kpi   .Boost( -1.*boostToKstar );
   pPiminus_Kpi .Boost( -1.*boostToKstar );
   pKplus_MuMu  .Boost( -1.*boostToPsi );
   pPiminus_MuMu.Boost( -1.*boostToPsi );
-  
+
   pMplus_Kpi  .Boost( -1.*boostToKstar );
   pMminus_Kpi .Boost( -1.*boostToKstar );
   pMplus_MuMu .Boost( -1.*boostToPsi );
   pMminus_MuMu.Boost( -1.*boostToPsi );
-  
-  
+
+
   // Now calculate the unit vectors etc
   TVector3 e_z_KpiMuMu =     ( pMplus_KpiMuMu.Vect() + pMminus_KpiMuMu.Vect() ).Unit();
   TVector3 e_z_Kpi     = -1.*( pMplus_Kpi.Vect()     + pMminus_Kpi.Vect()     ).Unit();
   TVector3 e_z_MuMu    = -1.*( pKplus_MuMu.Vect()    + pPiminus_MuMu.Vect()   ).Unit();
-  
+
   TVector3 n_KPi = ((pKplus_KpiMuMu.Vect()).Cross(pPiminus_KpiMuMu.Vect())).Unit();
   TVector3 n_MuMu = ((pMplus_KpiMuMu.Vect()).Cross(pMminus_KpiMuMu.Vect())).Unit();
-  
+
   // Calculate polar angles
-  double cos_thetaK = ((pKplus_Kpi.Vect()).Unit()).Dot(e_z_Kpi ); 
-  double cos_thetaL = ((pMplus_MuMu.Vect()).Unit()).Dot(e_z_MuMu); 
-  
+  double cos_thetaK = ((pKplus_Kpi.Vect()).Unit()).Dot(e_z_Kpi );
+  double cos_thetaL = ((pMplus_MuMu.Vect()).Unit()).Dot(e_z_MuMu);
+
   // Calculate phi
   double cos_phi = ( n_KPi.Dot( n_MuMu ) );
-  double sin_phi = ( n_KPi.Cross(n_MuMu)).Dot(e_z_KpiMuMu); 
+  double sin_phi = ( n_KPi.Cross(n_MuMu)).Dot(e_z_KpiMuMu);
   double _atan2 = atan2(sin_phi, cos_phi);
   double _phi = _atan2;
 
@@ -281,23 +281,23 @@ double CalculateAngles::decayAngleChi
 //     else _phi = -TMath::Pi() - _phi;
 //     // 		  if(_phi >0) _phi =  - _phi;
 //     // 		  else _phi = +TMath::Pi() - _phi;
-//     // 		  _phi = TMath::Pi() - _phi; 
+//     // 		  _phi = TMath::Pi() - _phi;
 //     cos_thetaL = -cos_thetaL;
 //   }
 
-  
+
   return _phi;
 
 }
 
 
-void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB, 
+void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
 						TLorentzVector& pMuPlus,
-						TLorentzVector& pMuMinus, 
-						TLorentzVector& pPi, 
+						TLorentzVector& pMuMinus,
+						TLorentzVector& pPi,
 						TLorentzVector& pK,
-						double* cosThetaZ, 
-						double* cosThetaPsi, 
+						double* cosThetaZ,
+						double* cosThetaPsi,
 						double* dphi,
 						int pion_ID)
 {
@@ -312,7 +312,7 @@ void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
 
 
   TLorentzVector pB2 = pMuPlus + pMuMinus + pPi + pK;
-  
+
   pB2 = pB;
 
   TLorentzVector p4Jpsi=pMuPlus+pMuMinus;
@@ -384,14 +384,14 @@ void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
  * all final state particles in B0 rest frame. Due to the rotational
  * symmetry, J/psi momentum is along z-axis and muons are in x-z plane.
  */
-void CalculateAngles::calculateFinalStateMomenta_GOLD(double mB0, double m23, double mMuMu, 
-						 double cosTheta1, double cosTheta2, double phi, 
+void CalculateAngles::calculateFinalStateMomenta_GOLD(double mB0, double m23, double mMuMu,
+						 double cosTheta1, double cosTheta2, double phi,
 						 double mMuPlus, double mMuMinus,
-						 double mPi, double mK, 
+						 double mPi, double mK,
 						 int pion_ID,
 						 TLorentzVector& pMuPlus,
-						 TLorentzVector& pMuMinus, 
-						 TLorentzVector& pPi, 
+						 TLorentzVector& pMuMinus,
+						 TLorentzVector& pPi,
 						 TLorentzVector& pK)
 {
 
@@ -524,9 +524,9 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 					      const TLorentzVector & pPiminus,
 					      const TLorentzVector & pKplus,
 					      int pion_ID,
-					      double& m23, 
+					      double& m23,
 					      double& cosTheta1,
-					      double& cosTheta2, 
+					      double& cosTheta2,
 					      double& phi)
 
 {
@@ -535,7 +535,7 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 
   TLorentzVector pKstar(pKplus.Px()+pPiminus.Px(), pKplus.Py()+pPiminus.Py(), pKplus.Pz()+pPiminus.Pz(), pKplus.E()+pPiminus.E());
   TLorentzVector pPsi  (pMplus.Px()+pMminus.Px(),pMplus.Py()+pMminus.Py(),pMplus.Pz()+pMminus.Pz(),pMplus.E()+pMminus.E());
-  TLorentzVector pZ    (pPsi.Px()+pPiminus.Px(), pPsi.Py()+pPiminus.Py(), pPsi.Pz()+pPiminus.Pz(), pPsi.E()+pPiminus.E()); 
+  TLorentzVector pZ    (pPsi.Px()+pPiminus.Px(), pPsi.Py()+pPiminus.Py(), pPsi.Pz()+pPiminus.Pz(), pPsi.E()+pPiminus.E());
   TLorentzVector B     (pKstar.Px()+pPsi.Px(), pKstar.Py()+pPsi.Py(), pKstar.Pz()+pPsi.Pz(), pKstar.E()+pPsi.E());
 
   // First boost everything to the B frame
@@ -561,44 +561,44 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
   TLorentzVector pPiminus_MuMu	(pPiminus_KpiMuMu);
   TLorentzVector pKplus_Kpi	(pKplus_KpiMuMu);
   TLorentzVector pPiminus_Kpi	(pPiminus_KpiMuMu);
-  
+
   TLorentzVector pMplus_MuMu	(pMplus_KpiMuMu);
   TLorentzVector pMminus_MuMu	(pMminus_KpiMuMu);
   TLorentzVector pMplus_Kpi	(pMplus_KpiMuMu);
   TLorentzVector pMminus_Kpi	(pMminus_KpiMuMu);
-  
+
   pKplus_Kpi   .Boost( -1.*boostToKstar );
   pPiminus_Kpi .Boost( -1.*boostToKstar );
   pKplus_MuMu  .Boost( -1.*boostToPsi );
   pPiminus_MuMu.Boost( -1.*boostToPsi );
-  
+
   pMplus_Kpi  .Boost( -1.*boostToKstar );
   pMminus_Kpi .Boost( -1.*boostToKstar );
   pMplus_MuMu .Boost( -1.*boostToPsi );
   pMminus_MuMu.Boost( -1.*boostToPsi );
-		
+
 
   // Now calculate the unit vectors etc
   TVector3 e_z_KpiMuMu =     ( pMplus_KpiMuMu.Vect() + pMminus_KpiMuMu.Vect() ).Unit();
   TVector3 e_z_Kpi     = -1.*( pMplus_Kpi.Vect()     + pMminus_Kpi.Vect()     ).Unit();
   TVector3 e_z_MuMu    = -1.*( pKplus_MuMu.Vect()    + pPiminus_MuMu.Vect()   ).Unit();
-  
+
   TVector3 n_KPi = ((pKplus_KpiMuMu.Vect()).Cross(pPiminus_KpiMuMu.Vect())).Unit();
   TVector3 n_MuMu = ((pMplus_KpiMuMu.Vect()).Cross(pMminus_KpiMuMu.Vect())).Unit();
 
   // Calculate polar angles
-  double cos_thetaK = ((pKplus_Kpi.Vect()).Unit()).Dot(e_z_Kpi ); 
-  double cos_thetaL = ((pMplus_MuMu.Vect()).Unit()).Dot(e_z_MuMu); 
-  
+  double cos_thetaK = ((pKplus_Kpi.Vect()).Unit()).Dot(e_z_Kpi );
+  double cos_thetaL = ((pMplus_MuMu.Vect()).Unit()).Dot(e_z_MuMu);
+
   // Calculate phi
   double cos_phi = ( n_KPi.Dot( n_MuMu ) );
-  double sin_phi = ( n_KPi.Cross(n_MuMu)).Dot(e_z_KpiMuMu); 
+  double sin_phi = ( n_KPi.Cross(n_MuMu)).Dot(e_z_KpiMuMu);
   double _atan2 = atan2(sin_phi, cos_phi);
   // 		double _phi = _atan2 > 0 ? _atan2 : _atan2 + 2.*TMath::Pi();
   // 		double _phi = _atan2 > 0 ? _atan2 : _atan2 + TMath::Pi();
   double _phi = _atan2;
-  
-	
+
+
   if (pion_ID > 0){ // anti-B0
     if(_phi >0) _phi = TMath::Pi() - _phi;
     else _phi  = -TMath::Pi() - _phi;
@@ -607,9 +607,9 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
   }
 
 
-  m23 = pKstar.M(); 
+  m23 = pKstar.M();
   cosTheta1 = cos_thetaL;
-  cosTheta2 = cos_thetaK; 
+  cosTheta2 = cos_thetaK;
   phi = _phi;
 
 }
@@ -626,7 +626,7 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // // 	TNtuple * tuple = new TNtuple("tuple", "tuple",  "phi:cosTheta2:cosTheta1:pion_ID:phi_Tomasz:cosTheta2_Tomasz:cosTheta1_Tomasz");
 // 	TNtuple * tuple = new TNtuple("tuple", "tuple",  "m23:B0_mass:cosThetaPsi_michal:cosThPsi_Z:cosThetaZ_michal:cosThZ:dphi_michal:phiZPsi_bin");
 // // 		tuple->Fill(cosThetaPsi_michal, cosThPsi_Z, cosThetaZ_michal, cosThZ, dphi_michal,  phiZPsi_bin );
-// // 	tuple->Fill( _phi, cos_thetaK, cos_thetaL, pion_ID, 
+// // 	tuple->Fill( _phi, cos_thetaK, cos_thetaL, pion_ID,
 // // 			    , phiKsPsi, cosThKs, cosThPsi);
 
 // 	ofstream myfile;
@@ -643,9 +643,9 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 
 // 		if ( !(
 // // 		       MuPlus_pt > 700 && MuMinus_pt > 700 &&
-// // 		       sqrt(MuPlus_px * MuPlus_px + MuPlus_py * MuPlus_py + MuPlus_pz * MuPlus_pz) > 10000 && 
-// // 		       sqrt(MuMinus_px * MuMinus_px + MuMinus_py * MuMinus_py + MuMinus_pz * MuMinus_pz) > 10000 && 
-// 		       (mKK > 1030 || mKK < 1010) && 
+// // 		       sqrt(MuPlus_px * MuPlus_px + MuPlus_py * MuPlus_py + MuPlus_pz * MuPlus_pz) > 10000 &&
+// // 		       sqrt(MuMinus_px * MuMinus_px + MuMinus_py * MuMinus_py + MuMinus_pz * MuMinus_pz) > 10000 &&
+// 		       (mKK > 1030 || mKK < 1010) &&
 // 		        B0_mass > 5200 && 5350 > B0_mass &&                            //NOMINAL SEL
 //                         B0_BPVLTIME > 0.25e-12 &&                                      //NOMINAL SEL
 //                         Psi_mass > 3625  && Psi_mass < 3750 &&                         //NOMINAL SEL
@@ -677,9 +677,9 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // 					 pMminus,
 // 					 pPiminus,
 // 					 pKplus,
-// 					 m23_EPFL, 
+// 					 m23_EPFL,
 // 					 cosTheta1_EPFL,
-// 					 cosTheta2_EPFL, 
+// 					 cosTheta2_EPFL,
 // 					 phi_EPFL);
 
 // // 		cout << "m23_EPFL      : " << m23_EPFL<< endl;
@@ -695,13 +695,13 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // 		double cosThetaPsi_michal;
 // 		double dphi_michal;
 
-// 		calculateZplusAngles(B, 
-// 				     pMplus, 
-// 				     pMminus,  
-// 				     pPiminus, 
-// 				     pKplus, 
-// 				     &cosThetaZ_michal, 
-// 				     &cosThetaPsi_michal, 
+// 		calculateZplusAngles(B,
+// 				     pMplus,
+// 				     pMminus,
+// 				     pPiminus,
+// 				     pKplus,
+// 				     &cosThetaZ_michal,
+// 				     &cosThetaPsi_michal,
 // 				     &dphi_michal,
 // 				     pion_ID);
 
@@ -710,7 +710,7 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // 		// 		Checks suggested by Tomasz: compute Z angles from Ks angles as done in the fitter
 // 		// First get 4vet from angles with function in the fit
 
-	
+
 
 
 // 		TLorentzVector  pMuPlus_fromAngles,  pMuMinus_fromAngles,  pPi_fromAngles,  pK_fromAngles;
@@ -718,27 +718,27 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 
 
 // 		calculateFinalStateMomenta(5279.58, // double mB0
-// 					   m23_EPFL, 
-// 					   3686, 
+// 					   m23_EPFL,
+// 					   3686,
 // 					   cosTheta1_EPFL,
-// 					   cosTheta2_EPFL, 
-// 					   phi_EPFL, 
-// 					   105.658, 
-// 					   105.658, 
+// 					   cosTheta2_EPFL,
+// 					   phi_EPFL,
+// 					   105.658,
+// 					   105.658,
 // 					   139.570,
 // 					   493.677,
 // 					   pion_ID,
-// 					   pMuPlus_fromAngles, 
-// 					   pMuMinus_fromAngles, 
-// 					   pPi_fromAngles, 
+// 					   pMuPlus_fromAngles,
+// 					   pMuMinus_fromAngles,
+// 					   pPi_fromAngles,
 // 					   pK_fromAngles);
 
 
 // // 		TLorentzVector B_fromAngles	= pMuPlus_fromAngles + pMuMinus_fromAngles + pPi_fromAngles + pK_fromAngles;
 // // 		TLorentzVector pKstar_fromAngles= pPi_fromAngles + pK_fromAngles;
-// // 		TLorentzVector pPsi_fromAngles  = pMuPlus_fromAngles + pMuMinus_fromAngles; 
+// // 		TLorentzVector pPsi_fromAngles  = pMuPlus_fromAngles + pMuMinus_fromAngles;
 // // 		TLorentzVector pZ_fromAngles  	= pMuPlus_fromAngles + pMuMinus_fromAngles + pPi_fromAngles;
-		
+
 
 // 		double m23_EPFL_fromAngles, cosTheta1_EPFL_fromAngles, cosTheta2_EPFL_fromAngles, phi_EPFL_fromAngles;
 
@@ -748,30 +748,30 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // 					 pMuMinus_fromAngles,
 // 					 pPi_fromAngles,
 // 					 pK_fromAngles,
-// 					 m23_EPFL_fromAngles, 
+// 					 m23_EPFL_fromAngles,
 // 					 cosTheta1_EPFL_fromAngles,
-// 					 cosTheta2_EPFL_fromAngles, 
+// 					 cosTheta2_EPFL_fromAngles,
 // 					 phi_EPFL_fromAngles);
 
 // 		calculateFinalStateMomenta(5279.58, // double mB0
-// 					   m23_EPFL_fromAngles, 
-// 					   3686, 
+// 					   m23_EPFL_fromAngles,
+// 					   3686,
 // 					   cosTheta1_EPFL_fromAngles,
-// 					   cosTheta2_EPFL_fromAngles, 
-// 					   phi_EPFL_fromAngles, 
-// 					   105.658, 
-// 					   105.658, 
+// 					   cosTheta2_EPFL_fromAngles,
+// 					   phi_EPFL_fromAngles,
+// 					   105.658,
+// 					   105.658,
 // 					   139.570,
 // 					   493.677,
 // 					   pion_ID,
-// 					   pMuPlus_fromAngles2, 
-// 					   pMuMinus_fromAngles2, 
-// 					   pPi_fromAngles2, 
+// 					   pMuPlus_fromAngles2,
+// 					   pMuMinus_fromAngles2,
+// 					   pPi_fromAngles2,
 // 					   pK_fromAngles2);
 
 // // 		double m_kpi_fromAngles   = pKstar_fromAngles.M();
 // // 		double m_psipi_fromAngles = pZ_fromAngles.M();
-		
+
 // // 		cout << "m_kpi_fromAngles  = " <<  m_kpi_fromAngles << endl;
 // // 		cout << "m_psipi_fromAngles= " <<  m_psipi_fromAngles << endl;
 // // 		cout << " " <<  endl;
@@ -780,17 +780,17 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 
 // // 		double cos_K_joel_fromAngles  =  HelCos_Tomasz(m_kpi_fromAngles, m_psipi_fromAngles, 0);
 // // 		double cos_Mu_joel_fromAngles =  coshel0_Tomasz( pMuPlus_fromAngles, pPsi_fromAngles, B_fromAngles);
-// // 		double phi_joel_fromAngles    =  planeAngle0_Tomasz( B_fromAngles, pMuPlus_fromAngles, pMuMinus_fromAngles, 
+// // 		double phi_joel_fromAngles    =  planeAngle0_Tomasz( B_fromAngles, pMuPlus_fromAngles, pMuMinus_fromAngles,
 // // 								     pK_fromAngles, pPi_fromAngles );
 
 
-		
+
 // // 		double cosThetaZ_fromAngles = HelCos_Tomasz(m23, m_psipi_fromAngles, 1);
 
-// // 		double cosThetaPsi_Z_fromAngles = coshel1_Tomasz( pMuPlus_fromAngles, pPsi_fromAngles, 
+// // 		double cosThetaPsi_Z_fromAngles = coshel1_Tomasz( pMuPlus_fromAngles, pPsi_fromAngles,
 // // 								  pZ_fromAngles, B_fromAngles );
 
-// // 		double dphi_fromAngles = planeAngle2_BIN( pMuPlus_fromAngles, pMuMinus_fromAngles, 
+// // 		double dphi_fromAngles = planeAngle2_BIN( pMuPlus_fromAngles, pMuMinus_fromAngles,
 // // 							  pPsi_fromAngles, pZ_fromAngles, B_fromAngles);
 
 
@@ -801,7 +801,7 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 
 // // 		  if(phi_joel_fromAngles >0) phi_joel_fromAngles = TMath::Pi() - phi_joel_fromAngles;
 // // 		  else phi_joel_fromAngles = -TMath::Pi() - phi_joel_fromAngles;
-		
+
 // // 		  if(dphi_fromAngles >0) dphi_fromAngles = TMath::Pi() - dphi_fromAngles;
 // // 		  else dphi_fromAngles = -TMath::Pi() - dphi_fromAngles;
 // // 		}
@@ -810,18 +810,18 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 
 
 // // 		calculateFinalStateMomenta(5.27958, // double mB0
-// // 					   m_kpi_fromAngles, 
-// // 					   3.686, 
+// // 					   m_kpi_fromAngles,
+// // 					   3.686,
 // // 					   cos_Mu_joel_fromAngles,
-// // 					   cos_K_joel_fromAngles, 
-// // 					   phi_joel_fromAngles, 
-// // 					   0.105658, 
-// // 					   0.105658, 
+// // 					   cos_K_joel_fromAngles,
+// // 					   phi_joel_fromAngles,
+// // 					   0.105658,
+// // 					   0.105658,
 // // 					   0.139570,
 // // 					   0.493677,
-// // 					   pMuPlus_fromAngles2, 
-// // 					   pMuMinus_fromAngles2, 
-// // 					   pPi_fromAngles2, 
+// // 					   pMuPlus_fromAngles2,
+// // 					   pMuMinus_fromAngles2,
+// // 					   pPi_fromAngles2,
 // // 					   pK_fromAngles2);
 
 
@@ -848,23 +848,23 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // 		TLorentzVector pZ_Tomasz   	((Psi_px+Pi_px)/1000, (Psi_py+Pi_py)/1000, (Psi_pz+Pi_pz)/1000, (Psi_E+Pi_E)/1000);
 // 		TLorentzVector pMplus_Tomasz 	(MuPlus_px/1000, MuPlus_py/1000, MuPlus_pz/1000, MuPlus_E/1000);
 // 		TLorentzVector pMminus_Tomasz 	(MuMinus_px/1000, MuMinus_py/1000, MuMinus_pz/1000, MuMinus_E/1000);
-		
+
 // 		double phiZPsi_bin = planeAngle2_BIN(pMplus_Tomasz, pMminus_Tomasz, pPsi_Tomasz, pZ_Tomasz, B_Tomasz);
-		
+
 // 		double m_kpi = pKstar.M()/1000;
 // 		double m_psipi = pZ.M()/1000;
 
 
-		
+
 // // 		cout << "Tomasz m_kpi  = " <<  m_kpi << endl;
 // // 		cout << "Tomasz m_psipi= " <<  m_psipi << endl;
 // // 		cout << " "  << endl;
 // // 		cout << " "  << endl;
 
-		
-// 		//  K* decay chain 
+
+// 		//  K* decay chain
 // 		double cosThKs = HelCos_Tomasz(m_kpi,m_psipi,0);
-		
+
 // 		double deg2rad = TMath::Pi()/180;
 
 // 		double cosThPsi = coshel0_Tomasz( pMplus_Tomasz, pPsi_Tomasz, B_Tomasz);
@@ -872,15 +872,15 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 
 // // 		double phiKsPsi = planeAngle0_Tomasz( B, pMplus, pMminus, pKplus, pPiminus )*deg2rad;
 // 		double phiKsPsi = planeAngle0_Tomasz( B_Tomasz, pMplus_Tomasz, pMminus_Tomasz, pKplus_Tomasz, pPiminus_Tomasz );
-		
+
 // 		//  Z decay chain
 // 		double cosThZ = HelCos_Tomasz(m_kpi,m_psipi,1);
-		
+
 // 		double cosThPsi_Z = coshel1_Tomasz( pMplus_Tomasz, pPsi_Tomasz, pZ_Tomasz, B_Tomasz );
 // // 		double phiZPsi = planeAngle1_Tomasz( B, pMplus, pMminus, pKplus, pPiminus )*deg2rad;
 // 		double phiZPsi = planeAngle1_Tomasz( B_Tomasz, pMplus_Tomasz, pMminus_Tomasz, pKplus_Tomasz, pPiminus_Tomasz );
-		
-		
+
+
 // // // // 		if(B_ID == -511){
 // 		if(pion_ID > 0){
 // 		  cosThPsi = -cosThPsi;
@@ -890,11 +890,11 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // 		  if(phiZPsi >0) phiZPsi = TMath::Pi() - phiZPsi;
 // 		  else phiZPsi = -TMath::Pi() - phiZPsi;
 // 		}
-		
-		
 
 
-	
+
+
+
 // 		//Bin's Z angle
 
 
@@ -915,7 +915,7 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // 		//---------------------------------------------------------------------------------------------------------------
 
 
-		
+
 // // 		tuple->Fill( _phi, cos_thetaK, cos_thetaL, pion_ID, 	     phiKsPsi, cosThKs, cosThPsi);
 // 		tuple->Fill(m23, B0_mass, cosThetaPsi_michal, cosThPsi_Z, cosThetaZ_michal, cosThZ, dphi_michal,  phiZPsi_bin );
 
@@ -934,7 +934,7 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // // 		pMuPlus_fromAngles .Boost( -1.*boostToB );
 // // 		pMuMinus_fromAngles.Boost( -1.*boostToB );
 
-		
+
 // 		myfile << "*********EVENT************" << endl;
 // 		myfile << " " << endl;
 // 		myfile << "pion ID: " << pion_ID << endl;
@@ -950,12 +950,12 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // 		myfile << "FROM ANGLES :(Pi_px, Pi_py, Pi_pz, Pi_E)= (" <<  pPi_fromAngles.Px()  << ", " << pPi_fromAngles.Py() << ", " << pPi_fromAngles.Pz() << ", " << pPi_fromAngles.E() <<  ") "<< endl;
 // 		myfile << "FROM ANGLES2:(Pi_px, Pi_py, Pi_pz, Pi_E)= (" <<  pPi_fromAngles2.Px()  << ", " << pPi_fromAngles2.Py() << ", " << pPi_fromAngles2.Pz() << ", " << pPi_fromAngles2.E() <<  ") "<< endl;
 // 		myfile << " " << endl;
-	
+
 // // 		myfile << "            (K_px, K_py, K_pz, K_E)= (" <<  K_px  << ", " << K_py << ", " << K_pz << ", " << K_E <<  ") "<< endl;
 // 		myfile << "FROM ANGLES :(K_px, K_py, K_pz, K_E)= (" <<  pK_fromAngles.Px()  << ", " << pK_fromAngles.Py() << ", " << pK_fromAngles.Pz() << ", " << pK_fromAngles.E() <<  ") "<< endl;
 // 		myfile << "FROM ANGLES2:(K_px, K_py, K_pz, K_E)= (" <<  pK_fromAngles2.Px()  << ", " << pK_fromAngles2.Py() << ", " << pK_fromAngles2.Pz() << ", " << pK_fromAngles2.E() <<  ") "<< endl;
 // 		myfile << " " << endl;
-				
+
 // // // 		myfile << "            (Psi_px, Psi_py, Psi_pz, Psi_E)= (" << Psi_px  << ", " << Psi_py << ", " << Psi_pz << ", " << Psi_E <<  ") " << endl;
 // // 		myfile << "FROM ANGLES:(Psi_px, Psi_py, Psi_pz, Psi_E)= (" << Psi_px  << ", " << Psi_py << ", " << Psi_pz << ", " << Psi_E <<  ") " << endl;
 // // // 		myfile << " " << endl;
@@ -968,15 +968,15 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // // 		myfile << "            (MuMinus_px, MuMinus_py, MuMinus_pz, MuMinus_E)= (" << MuMinus_px  << ", " << MuMinus_py << ", " << MuMinus_pz << ", " << MuMinus_E <<  ") " << endl;
 // 		myfile << "FROM ANGLES :(MuMinus_px, MuMinus_py, MuMinus_pz, MuMinus_E)= (" << pMuMinus_fromAngles.Px()  << ", " << pMuMinus_fromAngles.Py() << ", " << pMuMinus_fromAngles.Pz()<< ", " << pMuMinus_fromAngles.E() <<  ") " << endl;
 // 		myfile << "FROM ANGLES2:(MuMinus_px, MuMinus_py, MuMinus_pz, MuMinus_E)= (" << pMuMinus_fromAngles2.Px()  << ", " << pMuMinus_fromAngles2.Py() << ", " << pMuMinus_fromAngles2.Pz()<< ", " << pMuMinus_fromAngles2.E() <<  ") " << endl;
-	
+
 
 // //              double cos_K_joel_fromAngles =decayAngle( pK_fromAngles, pKstar_fromAngles , B_fromAngles );
 
 // // 		double phi_joel_fromAngles = decayAngleChi(  pMuPlus_fromAngles, pMuMinus_fromAngles, pK_fromAngles, pPi_fromAngles);
 
-// // 		m23_EPFL, 
+// // 		m23_EPFL,
 // // 		  cosTheta1_EPFL,
-// // 		  cosTheta2_EPFL, 
+// // 		  cosTheta2_EPFL,
 // // 		  phi_EPFL);
 // 		myfile << " " << endl;
 // 		myfile << " " << endl;
@@ -1004,7 +1004,7 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // // 		myfile << "phi_EPFL_fromAngles = " << _phi_fromAngles << endl;
 // 		myfile << "phi_CHECK_fromAngles= " << phi_EPFL_fromAngles << endl;
 // 		myfile << "phi_SYRA            = " << phiKsPsi << endl;
-// // 		myfile << "DIFF phi            = " << phiKsPsi - _phi <<endl; 
+// // 		myfile << "DIFF phi            = " << phiKsPsi - _phi <<endl;
 // 		myfile << " " << endl;
 // 		myfile << "cosThetaPsi_Z_EPFL            = " << cosThetaPsi_michal  << endl;
 // 		myfile << "cosThetaPsi_Z_SYRA            = " << cosThPsi_Z <<  endl;
@@ -1035,7 +1035,7 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // // 		myfile << "m psi pi = " << m13  << endl;
 // // // 		myfile << " " << endl;
 // // // 		myfile << " " << endl;
-// // 		myfile << "pPsi_fromAngles = " << pPsi_fromAngles.M() << endl; 
+// // 		myfile << "pPsi_fromAngles = " << pPsi_fromAngles.M() << endl;
 // // 		myfile << "pKPi_fromAngles = " << pKPi_fromAngles.M() << endl;
 // // 		myfile << "B_fromAngles = " << B_fromAngles.M() << endl;
 // // 		myfile << "cosTheta_Z = " << cosThetaZ_michal  << endl;
@@ -1044,9 +1044,9 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // // 		myfile << "cosThetaZ_fromAngles,  = " << cosThetaZ_fromAngles   << endl;
 // // 		myfile << "cosThetaPsi_fromAngles = " << cosThetaPsi_fromAngles  << endl;
 // // 		myfile << "dphi_fromAngles = " << dphi_fromAngles  << endl;
-// // 		myfile << "DIFF cos Z= " << cosThetaZ_fromAngles - cosThetaZ_michal <<endl; 
-// // 		myfile << "DIFF cos PsiZ= " << cosThetaPsi_fromAngles - cosThetaPsi_michal <<endl; 
-// // 		myfile << "DIFF phi Z= " << dphi_fromAngles - dphi_michal <<endl; 
+// // 		myfile << "DIFF cos Z= " << cosThetaZ_fromAngles - cosThetaZ_michal <<endl;
+// // 		myfile << "DIFF cos PsiZ= " << cosThetaPsi_fromAngles - cosThetaPsi_michal <<endl;
+// // 		myfile << "DIFF phi Z= " << dphi_fromAngles - dphi_michal <<endl;
 
 // // 		myfile << " " << endl;
 // // 		myfile << " " << endl;
@@ -1061,8 +1061,8 @@ void CalculateAngles::Calculates_Fit_Var_EPFL(const TLorentzVector & pMplus,
 // // 		myfile << "cosThPsi_Z = " << cosThPsi_Z <<  endl;
 // // 		myfile << "phiZPsi = " << phiZPsi << endl;
 // // 		myfile << "  " << endl;
-// // 		myfile << "DIFF phi Ks= " << phiKsPsi - _phi <<endl; 
-// // 		myfile << "DIFF phi Z= " << cosThPsi_Z - cosThetaZ_michal <<endl; 
+// // 		myfile << "DIFF phi Ks= " << phiKsPsi - _phi <<endl;
+// // 		myfile << "DIFF phi Z= " << cosThPsi_Z - cosThetaZ_michal <<endl;
 // // 		myfile << "  " << endl;
 // // 		myfile << "  " << endl;
 // // 		myfile << "  " << endl;

@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/07/29 Greig Cowan
+  - Found another bug in DPTotalAmplitude code. pR0 was no updated properly in MassShape.
+
 2013/07/18 Rob Currie
   - Added more documentation to RapidPlot to advertise the fact you can regenerate an XML and the fitting arguments from any fit based on the .root that RapidFit saves in the output folder!
       This just saved me searching for an old XML to regenerate a plot for the thesis so I should probably advertise this!

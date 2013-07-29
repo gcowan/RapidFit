@@ -116,8 +116,11 @@ spinKaon(spin),
 
 DPJpsiKaon::~DPJpsiKaon()
 {
-  //if( barrierR != NULL ) delete barrierR;
-  if( wigner != NULL ) delete wigner;
+  //std::cout << "DPJpsiKaon dest" << massShape << std::endl;
+  delete massShape;
+  delete barrierR;
+  delete barrierB;
+  delete wigner;
 }
 
 DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
@@ -143,6 +146,8 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
     barrierR(NULL),
     wigner(NULL), wignerPsi(input.wignerPsi)
 {
+    //std::cout << "In DPJpsiKaon copy const " << mR << " " << gammaR << " " << LR << " " << LB << " " << RR << " " << RB << " " << mShape << std::endl;
+    //std::cout << "In DPJpsiKaon copy const " << input.mR << " " << input.gammaR << " " << input.LR << " " << input.LB << " " << input.RR << " " << input.RB << " " << input.mShape << std::endl;
   if ( input.mShape == "LASS" )
   {
     massShape = new DPLassShape(input.mR, input.gammaR, input.LR, input.m1, input.m2, input.RR, input.a, input.r);
@@ -161,7 +166,8 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
   }
   switch (input.LB)
   {
-    case 0: barrierB=new DPBarrierL0(input.RB);
+      case 0: //std::cout << "Hi, I am about to construct DPBarrierL0" << std::endl;
+            barrierB=new DPBarrierL0(input.RB);
             break;
     case 1: barrierB=new DPBarrierL1(input.RB);
             break;
@@ -243,6 +249,8 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
 
   double m_min = m1 + m2;
   double m_max = mB - mJpsi;
+  //double m0_eff = mR;
+  //if (mR < m_min || mR > m_max)
   double m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
   //std::cout << m_min << " " << m_max << " " << m0_eff<< std::endl;
 
@@ -250,7 +258,7 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
   double pB = DPHelpers::daughterMomentum(mB, mJpsi, m23);      // B, psi, K*
   double pR = DPHelpers::daughterMomentum(m23, m1, m2);         // K*, K, pi
   double pB0 = DPHelpers::daughterMomentum(mB, mJpsi, m0_eff);// B, psi, resonance
-  double pR0 = DPHelpers::daughterMomentum(mR, m1, m2);   // resonance, K, pi
+  double pR0 = DPHelpers::daughterMomentum(m0_eff, m1, m2);   // resonance, K, pi
 
   //double orbitalFactor = TMath::Power(pB/pB0, LB)*
   //                       TMath::Power(pR/pR0, LR);
@@ -262,6 +270,8 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
                          barrierR->barrier( pR0, pR );
 
   TComplex massFactor = massShape->massShape(m23);
+
+  if (isnan(pR0)) std::cout << mR << " " << pB << " " << pR <<  " " << pB0 << " " << pR0 << " " << orbitalFactor << " " << barrierFactor << "  " << massFactor << std::endl;
 
   // Angular part
   TComplex angular(0,0);

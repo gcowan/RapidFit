@@ -396,25 +396,23 @@ c[6][6][0][0] = 0.003448;// +- 0.001116
     e[2][2][2] = -0.005063;// +- 0.000357
     e[3][1][2] = 0.002913;// +- 0.000435
     */
-
     // Background
 b[0][0][0][0] = 0.070524;// +- 0.000000
-b[0][0][0][2] = -0.005394;// +- 0.001064
-b[0][0][1][2] = 0.005547;// +- 0.001096
-b[0][1][0][0] = -0.006344;// +- 0.001872
-b[1][1][0][0] = 0.013542;// +- 0.002817
-b[1][1][1][2] = -0.009051;// +- 0.002820
-b[2][0][0][0] = -0.048220;// +- 0.001889
-b[2][0][0][2] = 0.010622;// +- 0.001962
-b[2][1][0][0] = -0.017056;// +- 0.003475
-b[2][2][0][0] = 0.016528;// +- 0.004483
-b[3][0][0][0] = 0.019681;// +- 0.002697
-b[3][1][0][0] = -0.016729;// +- 0.004664
-b[4][0][0][0] = -0.029545;// +- 0.002847
-b[4][1][0][0] = 0.030923;// +- 0.004890
-b[5][0][0][0] = -0.026361;// +- 0.003057
-b[5][4][2][2] = 0.028289;// +- 0.009332
-b[6][0][0][0] = 0.039573;// +- 0.003638
+b[0][0][0][2] = -0.006140;// +- 0.001129
+b[0][0][1][2] = 0.005151;// +- 0.001165
+b[1][1][0][0] = 0.013604;// +- 0.003015
+b[1][1][1][2] = -0.009820;// +- 0.003020
+b[2][0][0][0] = -0.047773;// +- 0.002055
+b[2][0][0][2] = 0.011558;// +- 0.002108
+b[2][1][0][0] = -0.019409;// +- 0.003751
+b[2][2][0][0] = 0.021200;// +- 0.004837
+b[3][0][0][0] = 0.015202;// +- 0.002853
+b[3][1][0][0] = -0.017231;// +- 0.004905
+b[4][0][0][0] = -0.024147;// +- 0.003050
+b[4][1][0][0] = 0.029003;// +- 0.005208
+b[5][0][0][0] = -0.024514;// +- 0.003292
+b[5][4][2][2] = 0.030472;// +- 0.010019
+b[6][0][0][0] = 0.029808;// +- 0.003891
 }
 
 DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( const DPTotalAmplitudePDF_withAcc_withBkg &copy ) :
@@ -1010,7 +1008,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	unsigned int upperZ = 0;
 
 	// And this switchs things to deal with the Z components.
-    if ( componentIndex > KpiComponents.size() )
+    if ( (unsigned)componentIndex > KpiComponents.size() )
 	{
 		lower = 0;
 		upper = 0;
@@ -1090,7 +1088,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 
     double background(0.);
 
-    if ( componentIndex == 0 || componentIndex == 13 )
+    if ( (componentIndex == 0 || componentIndex == 13) && fraction > 0. )
     {
     for ( int l = 0; l < l_max_b+1; l++ )
     {
@@ -1115,14 +1113,14 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
     }
     }
     //cout << background << " " << fraction << " " << returnable_value << endl;
-    returnable_value += fraction*background;
+    if (background > 0.) returnable_value += fraction*background;
     //returnable_value = background;
 
 	if( isnan(returnable_value) || returnable_value < 0 ) return 0.;
 	else return returnable_value;
-    
+
     #endif
-    
+
     return 0;
 }
 

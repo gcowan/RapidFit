@@ -171,10 +171,10 @@ DPTotalAmplitudePDF_withAcc::DPTotalAmplitudePDF_withAcc( PDFConfigurator* confi
 			0.13957018, 1.6, 1.6, massPsi, 0, 23); // spin 0 Z for datafit
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
-	tmp=new DPJpsiKaon(0, 1, 5.27953, 0.89594, 0.0487, 0.493677,
+	tmp=new DPJpsiKaon(0, 1, 5.27953, 10.289594, 10.0487, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
-	// B0 --> J/psi K*(1410)
+    // B0 --> J/psi K*(1410)
 	tmp=new DPJpsiKaon(0, 1, 5.27953, 1.414, 0.232, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
@@ -981,7 +981,7 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 
 		}
 		result += tmp.Rho2();
-        
+
 	}
 	//cout << angularAccCosTheta1*angularAccPhi*angularAccMassCosTheta2 << endl;
 
@@ -1007,7 +1007,7 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 
 	if( std::isnan(returnable_value) || returnable_value < 0 ) return 0.;
 	else return returnable_value;
-    
+
 #endif
 
     return 0;

@@ -1985,6 +1985,16 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".pdf") );
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
 
+	TCanvas* c2 = EdStyle::RapidFitCanvas( "pull", "pull");
+    TString pull_name = "pull_"; pull_name.Append(observableName);
+    TH1D * pull_histograms = new TH1D(pull_name, pull_name, 20, -5, 5);
+    for ( int i = 0; i < input_bin_theory_data.size() ; i++ ) pull_histograms->Fill(pull_value[i]);
+    pull_histograms->Draw();
+    gStyle->SetOptFit(1);
+    pull_histograms->Fit("gaus");
+    c2->Update();
+    c2->Print( TString("pull"+observableName+".pdf") );
+
 	return pullGraph;
 }
 
