@@ -183,7 +183,8 @@ TComplex DPZplusK::amplitude(double m23, double cosTheta1,
 	TLorentzVector pPi;
 	TLorentzVector pK;
 	DPHelpers::calculateFinalStateMomenta(mB, m23, mJpsi,
-					      cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, m2, m1, pMuPlus, pMuMinus, pPi, pK);
+					      cosTheta1,  cosTheta2, phi, pionID, 0.1056583715, 0.1056583715, m2, m1, pMuPlus, pMuMinus, pPi, pK);
+//					      cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, m2, m1, pMuPlus, pMuMinus, pPi, pK);
 	TLorentzVector pB(0,0,0,mB);
 	// Cos of the angle between psi reference axis (not needed in this place)
 	//  double cosARefs=DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
@@ -231,10 +232,10 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 	double pB0 = DPHelpers::daughterMomentum(mB, m1, mR);
 	double pR0 = DPHelpers::daughterMomentum(mR, mJpsi, m2);
 
-	//double orbitalFactor = TMath::Power(pB/pB0, LB)*
-	//	TMath::Power(pR/pR0, LR);
-	double orbitalFactor = TMath::Power(pB/mB, LB)*
-		TMath::Power(pR/mR, LR);
+	double orbitalFactor = TMath::Power(pB/pB0, LB)*
+		TMath::Power(pR/pR0, LR);
+	//double orbitalFactor = TMath::Power(pB/mB, LB)*
+	//	TMath::Power(pR/mR, LR);
 
 	double barrierFactor = barrierB->barrier(pB0, pB)*
 		barrierR->barrier(pR0, pR);
@@ -257,7 +258,7 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 			 break;
 	}
 
-    //std::cout << "Z " << massFactor<< " " << barrierFactor<< " " << orbitalFactor<< " " << angular << std::endl;
+    //std::cout << "Z " << twoLambdaPsi << " " << twoLambda << " " << massFactor<< " " << barrierFactor<< " " << orbitalFactor<< " " << angular << std::endl;
 
 	result = massFactor*barrierFactor*orbitalFactor*angular;
 

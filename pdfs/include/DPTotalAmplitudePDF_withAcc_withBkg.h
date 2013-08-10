@@ -12,7 +12,7 @@
 
 #include "BasePDF.h"
 #include "../dalitz/include/DPComponent.hh"
-#include "../dalitz/include/DPWignerFunctionJ1.hh"
+#include "../dalitz/include/DPWignerFunctionJ1over2.hh"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -38,6 +38,7 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 	private:
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
+        vector<string> GetDoNotIntegrateList();
 
 		// Experimental observables
 		ObservableRef m23Name;
@@ -254,7 +255,7 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 		std::vector<DPComponent*> KpiComponents;
 		std::vector<DPComponent*> ZComponents;
 
-		DPWignerFunctionJ1 wigner;
+		DPWignerFunctionJ1over2 wigner;
 
 		double massPsi;
 

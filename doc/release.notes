@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/08/10 Greig Cowan
+  - IMPORTANT: fixed the 4D Dalitz plot PDF. Now get consistent results with Syracuse.
+
 2013/07/29 Greig Cowan
   - Found another bug in DPTotalAmplitude code. pR0 was no updated properly in MassShape.
 

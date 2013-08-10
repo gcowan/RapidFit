@@ -1994,6 +1994,7 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
     pull_histograms->Fit("gaus");
     c2->Update();
     c2->Print( TString("pull"+observableName+".pdf") );
+    delete pull_histograms;
 
 	return pullGraph;
 }

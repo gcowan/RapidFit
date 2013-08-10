@@ -166,7 +166,7 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 // 	tmp=new DPZplusK(1,0,5.27953,4.430,0.100,0.493677,
 // 			 0.13957018, 1.6, 1.6, massPsi, 1, 23); // spin 1 Z, for MC testing
 
-	tmp=new DPZplusK(0,1,5.27953,4.430,0.100,0.493677,
+	tmp=new DPZplusK(0,1,5.27953,1.430,0.0100,0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 0, 23); // spin 0 Z for datafit
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
@@ -221,7 +221,7 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	KpiComponents.push_back(tmp);
 
 	this->SetNumericalNormalisation( true );
-	this->TurnCachingOff();
+	//this->TurnCachingOff();
     useAngularAcceptance = false;
     for ( int l = 0; l < l_max + 1; l++ )
     {
@@ -625,7 +625,7 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( const 
         ,r_LASS(copy.r_LASS)
 {
 	this->SetNumericalNormalisation(true);
-	this->TurnCachingOff();
+	//this->TurnCachingOff();
 	componentIndex = 0;
 
 	//cout << "Making copy of DPTotalAmplitudePDF_withAcc_withBkg. Acceptance: " << useAngularAcceptance << endl;
@@ -812,6 +812,13 @@ DPTotalAmplitudePDF_withAcc_withBkg::~DPTotalAmplitudePDF_withAcc_withBkg()
     */
 }
 
+vector<string> DPTotalAmplitudePDF_withAcc_withBkg::GetDoNotIntegrateList()
+{
+    vector<string> list;
+    list.push_back(pionIDName);
+    return list;
+}
+
 bool DPTotalAmplitudePDF_withAcc_withBkg::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	bool isOK = allParameters.SetPhysicsParameters(NewParameterSet);
@@ -981,22 +988,45 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
     }
     //if (angularAcc <= 0.) cout << "angular acc " << angularAcc << " " << m23 << " " << m23_mapped << " " << cosTheta1 << " " << phi << " " << cosTheta2 << endl;
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
-	// Need angle between reference axis
+
+    // Need angle between reference axis
 	DPHelpers::calculateFinalStateMomenta(5.27953, m23, massPsi,
-	cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, 0.13957018, 0.493677,
+	cosTheta1,  cosTheta2, phi, pionID, 0.1056583715, 0.1056583715, 0.13957018, 0.493677,
+	//cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, 0.13957018, 0.493677,
 	pMuPlus, pMuMinus, pPi, pK);
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 	// Cos of the angle between psi reference axis
-	//cosARefs = DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
-	double cosThetaZ;
+	double cosARefs = DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
+
+    double cosThetaZ;
 	double cosThetaPsi;
 	double dphi;
 	pB.SetPxPyPzE(0., 0., 0., 5.27953);
 	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	&cosThetaZ, &cosThetaPsi, &dphi, pionID);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
-
+	//cout << m23 << " " << cosTheta2 << " " << cosTheta1 << " " << phi << endl;
 	//cout << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << " " << pMuPlus.X() << " " << pMuMinus.X() << " " << pPi.X() << endl;
+    //cout << "cosTheta1 " << cosTheta1 << " " << cosThetaPsi << endl;
+
+    TComplex Zamps[ZComponents.size()][3][3];
+    // Component [i][1][j] is intentionally not filled
+    // First index is Z, Second is the lambda_mu^Z, Third is the lambda_psi^Z
+    for (unsigned int i=0;i<ZComponents.size();++i)
+    {
+        Zamps[i][0][0]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
+                              -2,-2);
+        Zamps[i][2][0]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
+                               2,-2);
+        Zamps[i][0][1]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
+                              -2,0);
+        Zamps[i][2][1]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
+                               2,0);
+        Zamps[i][0][2]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
+                              -2,2);
+        Zamps[i][2][2]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
+                               2,2);
+    }
 
 	double result = 0.;
 	TComplex tmp(0,0);
@@ -1043,26 +1073,28 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 		{
             if ( componentIndex != 100 )
             {
-			for (unsigned int i = lower; i < upper; ++i) // sum over all components
-			{
-				tmp += KpiComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
+			    for (unsigned int i = lower; i < upper; ++i) // sum over all components
+			    {
+				    tmp += KpiComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
 						twoLambda, twoLambdaPsi);
-				//cout << "m23: " << m23 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
-			}
-			// Now comes sum over Z+ components and lambdaPsiPrime
-			for (unsigned int i = lowerZ; i < upperZ; ++i)
-			{
-			  tmp += ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-			  twoLambda,twoLambdaPsi); // need to check that we pass right helicities
-			       //cout << "Z: " << m13 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
-			}
+				    //cout << "m23: " << m23 << " " << cosTheta1 << " " << cosTheta2 << " " << phi << " " << tmp.Re() << " " << tmp.Im() << " " << i << endl;
+			    }
+			    // Now comes sum over Z+ components and lambdaPsiPrime
+			    for (unsigned int i = lowerZ; i < upperZ; ++i)
+			    {
+                    // Sum over lambdaPsiPrime
+                    for (int twoLambdaPrime=-2; twoLambdaPrime<=2; twoLambdaPrime+=4)
+                    {
+                        tmp += wigner.function(cosARefs,double(twoLambdaPrime)/4,double(twoLambda)/4)*
+                            Zamps[i][twoLambdaPrime/2+1][twoLambdaPsi/2+1];
+                    }
+			    }
             }
             else{
                 tmp += KpiComponents[3]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
                 tmp += KpiComponents[6]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
                 tmp += KpiComponents[8]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
             }
-
 		}
 		result += tmp.Rho2();
 	}
@@ -1113,15 +1145,15 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
     }
     }
     //cout << background << " " << fraction << " " << returnable_value << endl;
-    if (background > 0.) returnable_value += fraction*background;
     //returnable_value = background;
+    returnable_value = returnable_value + fraction*background;
 
-	if( isnan(returnable_value) || returnable_value < 0 ) return 0.;
+	if( isnan(returnable_value) || returnable_value < 0. ) return 0.;
 	else return returnable_value;
 
     #endif
 
-    return 0;
+    return 0.;
 }
 
 vector<string> DPTotalAmplitudePDF_withAcc_withBkg::PDFComponents()

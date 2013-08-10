@@ -985,8 +985,8 @@ int calculateFitFractions( RapidFitConfiguration* config )
 	IDataSet * dataSet = pdfAndData->GetDataSet();
 	IPDF * pdf = pdfAndData->GetPDF();
 
-	RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( pdf );
-	double total_integral(0.);
+	RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( pdf, true, true );
+    double total_integral(0.);
 	double integral(0.);
 	double fraction(0.);
 	double sumOfFractions(-1.);

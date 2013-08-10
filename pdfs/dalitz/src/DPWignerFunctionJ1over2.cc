@@ -18,7 +18,7 @@ double DPWignerFunctionJ1over2::function(double cosTheta, double mm, double nn)
               break;
       case -1: return dm(theta);
               break;
-    }    
+    }
   }
   else if ( m == -1 )
   {
@@ -28,7 +28,7 @@ double DPWignerFunctionJ1over2::function(double cosTheta, double mm, double nn)
               break;
       case -1: return dp(theta);
               break;
-    }    
+    }
   }
 
   return -1000; // Give crazy number, alternatively we can exit or throw exception
@@ -38,10 +38,10 @@ double DPWignerFunctionJ1over2::dp(double theta)
 {
   return TMath::Cos(theta/2);
 }
- 
+
 double DPWignerFunctionJ1over2::dm(double theta)
 {
-  return TMath::Sin(theta/2);
+  return -TMath::Sin(theta/2);
 }
 
 
