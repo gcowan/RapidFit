@@ -377,7 +377,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 			{
 				NewDataPoint->SetPhaseSpaceBoundary( NewBoundary );
 				thisNumericalIntegral = myIntegrator->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, this->GetDoNotIntegrateList() );
-			}
+            }
 			catch(...)
 			{
 				//	It's legitimate to fall over due to this throwing as we don't know what to do afterwards
@@ -593,8 +593,8 @@ double BasePDF::EvaluateForNumericGeneration( DataPoint* NewDataPoint )
 double BasePDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 {
 	double returnable=0.;
-	try 
-	{ 
+	try
+	{
 		returnable = this->Evaluate( NewDataPoint );
 	}
 	catch(...)

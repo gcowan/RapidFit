@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/08/16 Greig Cowan
+  - Changed parameterisation of the NR term in the Dalit plot PDF. This appears to change the fit fractions without making much change to the minimum.
+
 2013/08/10 Greig Cowan
   - IMPORTANT: fixed the 4D Dalitz plot PDF. Now get consistent results with Syracuse.
 

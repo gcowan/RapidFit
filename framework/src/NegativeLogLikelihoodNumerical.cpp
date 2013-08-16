@@ -97,7 +97,7 @@ double NegativeLogLikelihoodNumerical::EvaluateDataSet( IPDF * FittingPDF, IData
 	//	Create the Threads and set them to be joinable
 	for( unsigned int threadnum=0; threadnum< (unsigned)Threads ; ++threadnum )
 	{
-		int status = pthread_create(&Thread[threadnum], &attrib, this->ThreadWork, (void *) &fit_thread_data[threadnum] ); 
+		int status = pthread_create(&Thread[threadnum], &attrib, this->ThreadWork, (void *) &fit_thread_data[threadnum] );
 		if( status )
 		{
 			cerr << "ERROR:\tfrom pthread_create()\t" << status << "\t...Exiting\n" << endl;

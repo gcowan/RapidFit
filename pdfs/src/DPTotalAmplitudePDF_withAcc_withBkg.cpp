@@ -153,7 +153,9 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS()
 // 	, massPsi(3.096916) // Jpsi
     , massPsi(3.68609) // psi(2S)
-	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.27953)
+    , massB(5.27953) // B0
+//    , massB(5.36677) // B_s0
+	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., massB)
 	, cosARefs()
 {
 	MakePrototypes();
@@ -163,58 +165,58 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	// Construct all components we need
 	DPComponent * tmp;
 	// B0 --> Z+ K-
-// 	tmp=new DPZplusK(1,0,5.27953,4.430,0.100,0.493677,
+// 	tmp=new DPZplusK(1,0,massB,4.430,0.100,0.493677,
 // 			 0.13957018, 1.6, 1.6, massPsi, 1, 23); // spin 1 Z, for MC testing
 
-	tmp=new DPZplusK(0,1,5.27953,1.430,0.0100,0.493677,
+	tmp=new DPZplusK(0,1,massB,1.430,0.0100,0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 0, 23); // spin 0 Z for datafit
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
-	tmp=new DPJpsiKaon(0, 1, 5.27953, 0.89594, 0.0487, 0.493677,
+	tmp=new DPJpsiKaon(0, 1, massB, 0.89594, 0.0487, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1410)
-	tmp=new DPJpsiKaon(0, 1, 5.27953, 1.414, 0.232, 0.493677,
+	tmp=new DPJpsiKaon(0, 1, massB, 1.414, 0.232, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K*(1680)
-	tmp=new DPJpsiKaon(0, 1, 5.27953, 1.717, 0.322, 0.493677,
+	tmp=new DPJpsiKaon(0, 1, massB, 1.717, 0.322, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 1);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K0(1430)
-	tmp=new DPJpsiKaon(1, 0, 5.27953, 1.425, 0.270, 0.493677,
+	tmp=new DPJpsiKaon(1, 0, massB, 1.425, 0.270, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 0);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
-	tmp=new DPJpsiKaon(1, 2, 5.27953, 1.4324, 0.109, 0.493677,
+	tmp=new DPJpsiKaon(1, 2, massB, 1.4324, 0.109, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 2);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K3(1780)
-	tmp=new DPJpsiKaon(1, 3, 5.27953, 1.4324, 0.109, 0.493677,
+	tmp=new DPJpsiKaon(2, 3, massB, 1.4324, 0.109, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 3);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K4(2045)
-	tmp=new DPJpsiKaon(1, 4, 5.27953, 1.4324, 0.109, 0.493677,
+	tmp=new DPJpsiKaon(3, 4, massB, 1.4324, 0.109, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 4);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K5(2380)
-	tmp=new DPJpsiKaon(1, 5, 5.27953, 1.4324, 0.109, 0.493677,
+	tmp=new DPJpsiKaon(4, 5, massB, 1.4324, 0.109, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 5);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K(800)
-	tmp=new DPJpsiKaon(1, 0, 5.27953, 0.682, 0.574, 0.493677,
+	tmp=new DPJpsiKaon(1, 0, massB, 0.682, 0.574, 0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 0);
 	KpiComponents.push_back(tmp);
 
 	// Kpi s-wave using LASS
-  	tmp=new DPJpsiKaon(1, 0, 5.27953, 1.425, 0.270, 0.493677,
+  	tmp=new DPJpsiKaon(1, 0, massB, 1.425, 0.270, 0.493677,
                      0.13957018, 1.6, 1.6, massPsi, 0,
                      "LASS", 1.94, 1.76);
 
 	KpiComponents.push_back(tmp);
 
 	// Kpi s-wave using Non Resonnant
-  	tmp=new DPJpsiKaon(1, 0, 5.27953, 1.425, 0.270, 0.493677,
+  	tmp=new DPJpsiKaon(1, 0, massB, 1., 0.270, 0.493677,
                      0.13957018, 1.6, 1.6, massPsi, 0,
                      "NR", 1.94, 1.76);
 
@@ -608,6 +610,7 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( const 
 	,widthK800(copy.widthK800)
 
 	,massPsi(copy.massPsi)
+	,massB(copy.massB)
 
 	,pMuPlus(copy.pMuPlus)
 	,pMuMinus(copy.pMuMinus)
@@ -953,6 +956,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	phi       = measurement->GetObservable( phiName )->GetValue();
 	pionID    = measurement->GetObservable( pionIDName )->GetValue();
     double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
+    //double m23_mapped = (m23 - 0.64)/(1.68 - 0.64)*2. + (-1); // should really do this in a generic way
 
 #ifdef __RAPIDFIT_USE_GSL
 
@@ -984,13 +988,13 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
         }
     }
     else {
-        angularAcc = 1.;
+        angularAcc = 1.;//0.0195;
     }
     //if (angularAcc <= 0.) cout << "angular acc " << angularAcc << " " << m23 << " " << m23_mapped << " " << cosTheta1 << " " << phi << " " << cosTheta2 << endl;
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 
     // Need angle between reference axis
-	DPHelpers::calculateFinalStateMomenta(5.27953, m23, massPsi,
+	DPHelpers::calculateFinalStateMomenta(massB, m23, massPsi,
 	cosTheta1,  cosTheta2, phi, pionID, 0.1056583715, 0.1056583715, 0.13957018, 0.493677,
 	//cosTheta1,  cosTheta2, phi, pionID, 0.105, 0.105, 0.13957018, 0.493677,
 	pMuPlus, pMuMinus, pPi, pK);
@@ -1001,7 +1005,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
     double cosThetaZ;
 	double cosThetaPsi;
 	double dphi;
-	pB.SetPxPyPzE(0., 0., 0., 5.27953);
+	pB.SetPxPyPzE(0., 0., 0., massB);
 	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
 	&cosThetaZ, &cosThetaPsi, &dphi, pionID);
 	double m13 = (pMuPlus + pMuMinus + pPi).M();
@@ -1056,7 +1060,14 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 		upperZ = 0;
     }
 
-	// Finally, for the total of all components
+    if ( componentIndex == 100 ){
+		lower  = 0;
+		upper  = (unsigned)KpiComponents.size();
+		lowerZ = 0;
+		upperZ = 0;
+    }
+
+    // Finally, for the total of all components
 	if ( componentIndex == 0 ) {
 		lower  = 0;
 		upper  = (unsigned)KpiComponents.size();
@@ -1071,8 +1082,6 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 		tmp = TComplex(0,0);
 		for (int twoLambdaPsi = -2; twoLambdaPsi <= 2; twoLambdaPsi += 2) // Sum over -1,0,+1
 		{
-            if ( componentIndex != 100 )
-            {
 			    for (unsigned int i = lower; i < upper; ++i) // sum over all components
 			    {
 				    tmp += KpiComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
@@ -1089,12 +1098,6 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
                             Zamps[i][twoLambdaPrime/2+1][twoLambdaPsi/2+1];
                     }
 			    }
-            }
-            else{
-                tmp += KpiComponents[3]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
-                tmp += KpiComponents[6]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
-                tmp += KpiComponents[8]->amplitude(m23, cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
-            }
 		}
 		result += tmp.Rho2();
 	}
@@ -1103,7 +1106,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	//momenta are defined on eq 39.20a/b of the 2010 PDG
 	const double m1 = 0.493677;    // kaon mass
 	const double m2 = 0.13957018; // pion mass
-	const double MB0= 5.27953; // B0 mass
+	const double MB0= massB; // B0 mass
 
 	double t1 = m23*m23-(m1+m2)*(m1+m2);
 	double t2 = m23*m23-(m1-m2)*(m1-m2);
@@ -1173,7 +1176,7 @@ vector<string> DPTotalAmplitudePDF_withAcc_withBkg::PDFComponents()
         components_list.push_back( "Z4430" );
         components_list.push_back( "background" );
         components_list.push_back( "0" );
-        //components_list.push_back( "S-wave" );
+        components_list.push_back( "1-Z" );
         return components_list;
 }
 
@@ -1249,7 +1252,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::EvaluateComponent(DataPoint * measur
                         Component->setComponentNumber( 13 );
                         componentIndex = 13;
                 }
-                else if( ComponentName.compare( "S-wave" ) == 0 )
+                else if( ComponentName.compare( "1-Z" ) == 0 )
                 {
                         Component->setComponentNumber( 100 );
                         componentIndex = 100;

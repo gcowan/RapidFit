@@ -258,6 +258,7 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 		DPWignerFunctionJ1over2 wigner;
 
 		double massPsi;
+		double massB;
 
         // Acceptance parameterisation
         bool useAngularAcceptance;

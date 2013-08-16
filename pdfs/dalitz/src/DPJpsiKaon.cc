@@ -252,7 +252,7 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
   //double m0_eff = mR;
   //if (mR < m_min || mR > m_max)
   double m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
-  //std::cout << m_min << " " << m_max << " " << m0_eff<< std::endl;
+  //if (mShape == "NR") std::cout << m_min << " " << m_max << " " << mR << " " << m0_eff<< std::endl;
 
   //std::cout << "B" << mB << " Jpsi " << mJpsi << " m23 " << m23 << " m1 " << m1 << " m2 " << m2 << " mR " << mR << " m0_eff " << m0_eff << std::endl;
   double pB = DPHelpers::daughterMomentum(mB, mJpsi, m23);      // B, psi, K*
@@ -270,6 +270,12 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
                          barrierR->barrier( pR0, pR );
 
   TComplex massFactor = massShape->massShape(m23);
+  if ( mShape == "NR" )
+  {
+    barrierFactor = 1.;
+    orbitalFactor = pB/mB;
+    //std::cout << orbitalFactor << " " << barrierFactor << std::endl;
+  }
 
   if (isnan(pR0)) std::cout << mR << " " << pB << " " << pR <<  " " << pB0 << " " << pR0 << " " << orbitalFactor << " " << barrierFactor << "  " << massFactor << std::endl;
 

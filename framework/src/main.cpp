@@ -980,7 +980,9 @@ TH1D* ProjectAxis( TH3* input_histo, TString axis, TString name )
 int calculateFitFractions( RapidFitConfiguration* config )
 {
 	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
-	pdfAndData->SetPhysicsParameters( config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
+	ParameterSet * parset = config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+    parset->SetPhysicsParameter("BkgFraction", 0., 0., 0., 0., "BkgFraction", "");
+    pdfAndData->SetPhysicsParameters( parset );//config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
 
 	IDataSet * dataSet = pdfAndData->GetDataSet();
 	IPDF * pdf = pdfAndData->GetPDF();
@@ -989,7 +991,7 @@ int calculateFitFractions( RapidFitConfiguration* config )
     double total_integral(0.);
 	double integral(0.);
 	double fraction(0.);
-	double sumOfFractions(-1.);
+	double sumOfFractions(0.);
 
 	TFile * f = TFile::Open("fitFractions.root", "RECREATE");
 	TTree * tree = new TTree("tree", "tree containing fit fractions");
@@ -1002,12 +1004,20 @@ int calculateFitFractions( RapidFitConfiguration* config )
 	{
 		ComponentRef * thisRef = new ComponentRef( pdfComponents[i], "dummyObservable" );
 		integral = testIntegrator->NumericallyIntegratePhaseSpace( dataSet->GetBoundary(), doNotIntegrate, thisRef );
-		if ( pdfComponents[i] == "0" ) total_integral = integral;
-		delete thisRef;
+		if ( pdfComponents[i] == "0" )
+        {
+            total_integral = integral;
+            std::cout << "Total integral: " << total_integral << std::endl;
+        }
+        delete thisRef;
 		fraction = integral/total_integral;
-		if ( pdfComponents[i] != "0" ) std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
-		fitFractions.push_back( fraction );
-		sumOfFractions += fraction;
+		if ( pdfComponents[i] != "0" && pdfComponents[i] != "1-Z" )
+        {
+            std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
+		    fitFractions.push_back( fraction );
+		    sumOfFractions += fraction;
+        }
+        if ( pdfComponents[i] == "1-Z" ) std::cout << pdfComponents[i] << "\t fraction: " << 1. - fraction << std::endl;
 	}
 	std::cout << "Sum of fractions (not necessarily 1!): " << sumOfFractions << std::endl;
 

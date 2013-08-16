@@ -29,7 +29,7 @@ DPBackground::DPBackground( PDFConfigurator* configurator) :
 	MakePrototypes();
 
 	this->SetNumericalNormalisation( true );
-	this->TurnCachingOff();
+	//this->TurnCachingOff();
     for ( int l = 0; l < l_max + 1; l++ )
     {
         for ( int i = 0; i < i_max + 1; i++ )
@@ -43,24 +43,23 @@ DPBackground::DPBackground( PDFConfigurator* configurator) :
             }
         }
     }
-// These are terms > 3sigma significance
-c[0][0][0][0] = 0.070524;// +- 0.000000
-c[0][0][0][2] = -0.005394;// +- 0.001064
-c[0][0][1][2] = 0.005547;// +- 0.001096
-c[0][1][0][0] = -0.006344;// +- 0.001872
-c[1][1][0][0] = 0.013542;// +- 0.002817
-c[1][1][1][2] = -0.009051;// +- 0.002820
-c[2][0][0][0] = -0.048220;// +- 0.001889
-c[2][0][0][2] = 0.010622;// +- 0.001962
-c[2][1][0][0] = -0.017056;// +- 0.003475
-c[2][2][0][0] = 0.016528;// +- 0.004483
-c[3][0][0][0] = 0.019681;// +- 0.002697
-c[3][1][0][0] = -0.016729;// +- 0.004664
-c[4][0][0][0] = -0.029545;// +- 0.002847
-c[4][1][0][0] = 0.030923;// +- 0.004890
-c[5][0][0][0] = -0.026361;// +- 0.003057
-c[5][4][2][2] = 0.028289;// +- 0.009332
-c[6][0][0][0] = 0.039573;// +- 0.003638
+
+  c[0][0][0][0] = 0.070524;// +- 0.000000
+  c[0][0][0][2] = -0.006140;// +- 0.001129
+  c[0][0][1][2] = 0.005151;// +- 0.001165
+  c[1][1][0][0] = 0.013604;// +- 0.003015
+  c[1][1][1][2] = -0.009820;// +- 0.003020
+  c[2][0][0][0] = -0.047773;// +- 0.002055
+  c[2][0][0][2] = 0.011558;// +- 0.002108
+  c[2][1][0][0] = -0.019409;// +- 0.003751
+  c[2][2][0][0] = 0.021200;// +- 0.004837
+  c[3][0][0][0] = 0.015202;// +- 0.002853
+  c[3][1][0][0] = -0.017231;// +- 0.004905
+  c[4][0][0][0] = -0.024147;// +- 0.003050
+  c[4][1][0][0] = 0.029003;// +- 0.005208
+  c[5][0][0][0] = -0.024514;// +- 0.003292
+  c[5][4][2][2] = 0.030472;// +- 0.010019
+  c[6][0][0][0] = 0.029808;// +- 0.003891
 }
 
 DPBackground::DPBackground( const DPBackground &copy ) :
@@ -75,7 +74,7 @@ DPBackground::DPBackground( const DPBackground &copy ) :
 	,phi(copy.phi)
 {
 	this->SetNumericalNormalisation(true);
-	this->TurnCachingOff();
+	//this->TurnCachingOff();
 
     for ( int l = 0; l < l_max + 1; l++ )
     {
@@ -134,7 +133,7 @@ bool DPBackground::SetPhysicsParameters( ParameterSet * NewParameterSet )
 double DPBackground::Evaluate(DataPoint * measurement)
 {
 
-	
+
     // Observables
 	m23       = measurement->GetObservable( m23Name )->GetValue();
 	cosTheta1 = measurement->GetObservable( cosTheta1Name )->GetValue();

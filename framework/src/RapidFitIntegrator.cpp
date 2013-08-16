@@ -98,7 +98,7 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 	{
 		ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
 		(void) type;	//	For the global state of ROOT
-		oneDimensionIntegrator = new IntegratorOneDim( );//*(input.oneDimensionIntegrator) );
+		//oneDimensionIntegrator = new IntegratorOneDim( );//*(input.oneDimensionIntegrator) );
 	}
 }
 
@@ -493,7 +493,7 @@ vector<double*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, vect
 	vector<double> * integrationPoints = new vector<double>[ nDim ];
 
 	//pthread_mutex_lock( &gsl_mutex );
-	//cout << "Allocating GSL Integration Tool" << endl;
+	cout << "Allocating GSL Integration Tool. nDim " << nDim << endl;
 	gsl_qrng * q = NULL;
 	try
 	{
