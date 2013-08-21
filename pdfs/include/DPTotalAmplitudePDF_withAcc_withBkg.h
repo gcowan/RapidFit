@@ -268,8 +268,8 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
         static const int j_max = 4;
         double c[l_max+1][i_max+1][k_max+1][j_max+1];
         static const int l_max_b = 6;
-        static const int i_max_b = 4;
-        static const int k_max_b = 2;
+        static const int i_max_b = 2;
+        static const int k_max_b = 1;
         static const int j_max_b = 2;
         double b[l_max_b+1][i_max_b+1][k_max_b+1][j_max_b+1];
 };

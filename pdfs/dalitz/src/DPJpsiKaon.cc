@@ -249,9 +249,8 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
 
   double m_min = m1 + m2;
   double m_max = mB - mJpsi;
-  //double m0_eff = mR;
-  //if (mR < m_min || mR > m_max)
-  double m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
+  double m0_eff = mR;
+  if (mR < m_min || mR > m_max) m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
   //if (mShape == "NR") std::cout << m_min << " " << m_max << " " << mR << " " << m0_eff<< std::endl;
 
   //std::cout << "B" << mB << " Jpsi " << mJpsi << " m23 " << m23 << " m1 " << m1 << " m2 " << m2 << " mR " << mR << " m0_eff " << m0_eff << std::endl;

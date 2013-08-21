@@ -1,7 +1,11 @@
 // $Id: release.notes $
 
+2013/08/21 Greig Cowan
+  - Modified background parameterisation using different sideband defintion (not much change).
+  - Modified DPJpsiKaon such that only for resonances outside of kinematic limits do we rescale to m0_eff.
+
 2013/08/16 Greig Cowan
-  - Changed parameterisation of the NR term in the Dalit plot PDF. This appears to change the fit fractions without making much change to the minimum.
+  - Changed parameterisation of the NR term in the Dalit plot PDF. Simply leads to rescaling of the amplitudes.
 
 2013/08/10 Greig Cowan
   - IMPORTANT: fixed the 4D Dalitz plot PDF. Now get consistent results with Syracuse.
