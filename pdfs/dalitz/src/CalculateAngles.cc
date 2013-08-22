@@ -301,67 +301,47 @@ void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
 						double* dphi,
 						int pion_ID)
 {
-
-
   TLorentzVector _muPlus(pMuPlus);
   TLorentzVector _muMinus(pMuMinus);
+  TLorentzVector _KPlus(pK);
+  TLorentzVector _piMinus(pPi);
   TLorentzVector _psi(pMuPlus + pMuMinus);
   TLorentzVector _z(pMuPlus + pMuMinus + pPi);
   TLorentzVector _b(pMuPlus + pMuMinus + pPi + pK);
 
-
-
-  TLorentzVector pB2 = pMuPlus + pMuMinus + pPi + pK;
-
-  pB2 = pB;
-
-  TLorentzVector p4Jpsi=pMuPlus+pMuMinus;
-  TLorentzVector p4Zplus=p4Jpsi+pPi;
-
   // If we are not in B0 rest frame, boost there
-  if ( pB2.BoostVector().Mag() != 0 )
+  if ( _b.BoostVector().Mag() != 0 )
   {
-    p4Jpsi.  Boost(-1.0*pB2.BoostVector());
-    p4Zplus. Boost(-1.0*pB2.BoostVector());
-    pMuPlus. Boost(-1.0*pB2.BoostVector());
-    pMuMinus.Boost(-1.0*pB2.BoostVector());
-    pPi.     Boost(-1.0*pB2.BoostVector());
-    pK.      Boost(-1.0*pB2.BoostVector());
+    _psi.    Boost(-1.0*_b.BoostVector());
+    _z.      Boost(-1.0*_b.BoostVector());
+    _muPlus. Boost(-1.0*_b.BoostVector());
+    _muMinus.Boost(-1.0*_b.BoostVector());
+    _piMinus.Boost(-1.0*_b.BoostVector());
+    _KPlus.  Boost(-1.0*_b.BoostVector());
   }
 
-
-  // For reminder, work with local copy of final state momenta
-  TLorentzVector p4MuPlus(pMuPlus);
-  TLorentzVector p4MuMinus(pMuMinus);
-  TLorentzVector p4K(pK);
-  TLorentzVector p4Pi(pPi);
-
-
   // Go to Z+ rest frame
-  pB2.      Boost(-1.0*p4Zplus.BoostVector());
-  p4Jpsi.   Boost(-1.0*p4Zplus.BoostVector());
-  p4MuMinus.Boost(-1.0*p4Zplus.BoostVector());
-  p4MuPlus. Boost(-1.0*p4Zplus.BoostVector());
-  p4K.      Boost(-1.0*p4Zplus.BoostVector());
-  p4Pi.     Boost(-1.0*p4Zplus.BoostVector());
-  p4Zplus.  Boost(-1.0*p4Zplus.BoostVector());
+  _b.      Boost(-1.0*_z.BoostVector());
+  _psi.    Boost(-1.0*_z.BoostVector());
+  _muMinus.Boost(-1.0*_z.BoostVector());
+  _muPlus. Boost(-1.0*_z.BoostVector());
+  _KPlus.  Boost(-1.0*_z.BoostVector());
+  _piMinus.Boost(-1.0*_z.BoostVector());
+  _z.      Boost(-1.0*_z.BoostVector());
 
   // Get cos of the angle between pi+ and B0
-  *cosThetaZ=p4Pi.Vect().Dot(pK.Vect())/p4Pi.Vect().Mag()/pK.Vect().Mag();
+  *cosThetaZ=_piMinus.Vect().Dot(_KPlus.Vect())/_piMinus.Vect().Mag()/_KPlus.Vect().Mag();
 
-
-  TLorentzVector p4MuPlusJpsiRest(p4MuPlus);
-  TLorentzVector p4ZPlusJpsiRest(p4Zplus);
-  p4MuPlusJpsiRest.Boost(-1.0*p4Jpsi.BoostVector());
-  p4ZPlusJpsiRest.Boost(-1.0*p4Jpsi.BoostVector());
-  *cosThetaPsi=p4MuPlusJpsiRest.Vect().Dot(p4ZPlusJpsiRest.Vect())/p4MuPlusJpsiRest.Vect().Mag()/p4ZPlusJpsiRest.Vect().Mag();
-
+  TLorentzVector p4MuPlusJpsiRest(_muPlus);
+  TLorentzVector p4ZPlusJpsiRest(_z);
+  p4MuPlusJpsiRest.Boost(-1.0*_psi.BoostVector());
+  p4ZPlusJpsiRest.Boost(-1.0*_psi.BoostVector());
+  *cosThetaPsi=p4MuPlusJpsiRest.Vect().Dot(-p4ZPlusJpsiRest.Vect())/p4MuPlusJpsiRest.Vect().Mag()/p4ZPlusJpsiRest.Vect().Mag();
 
   //Bin's version
-
   *dphi = planeAngle2_BIN_GOLD( _muPlus, _muMinus, _psi, _z, _b);
 
-
+/*
   if(pion_ID > 0)
     {
 //       (*cosThetaZ) = -(*cosThetaZ);
@@ -369,12 +349,7 @@ void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
       if(*dphi >0) {(*dphi) = TMath::Pi() - (*dphi);}
       else{ (*dphi) = -TMath::Pi() - (*dphi);}
     }
-
-
-//   *dphi = 0;
-//   *cosThetaPsi = 0;
-//   *cosThetaZ = 0;
-
+*/
 }
 
 
@@ -394,13 +369,13 @@ void CalculateAngles::calculateFinalStateMomenta_GOLD(double mB0, double m23, do
 						 TLorentzVector& pPi,
 						 TLorentzVector& pK)
 {
-
+/*
   if (pion_ID > 0){ // anti-B0
     if(phi >0) phi = TMath::Pi() - phi;
     else phi  = -TMath::Pi() - phi;
     cosTheta1 = -cosTheta1;
   }
-
+*/
   double pJpsi=CalculateAngles::daughterMomentum(mB0, mMuMu, m23);
   TLorentzVector p4Jpsi(0, 0, +pJpsi, TMath::Sqrt(mMuMu*mMuMu+pJpsi*pJpsi));
   TLorentzVector p4Kpi (0, 0, -pJpsi, TMath::Sqrt(m23*m23+pJpsi*pJpsi));
