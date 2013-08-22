@@ -25,6 +25,7 @@
 #include "Bd2JpsiKstar_sWave.h"
 #include "Bd2JpsiKstar_sWave_Fscopy.h"
 #include "Bd2JpsiKstar_sWave_Fs_withAcc.h"
+#include "DPHelpers.hh"
 ///	System Headers
 #include <vector>
 #include <cmath>
@@ -762,18 +763,19 @@ namespace Mathematics
 		// acceptance corefficients using Legendre polynomials and real
         // valued spherical harmonics.
 	    cout << "Calculating acceptance coefficients" << endl;
-        RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, false, true);
-		rapidInt->SetFixedIntegralPoints(100);
+        RapidFitIntegrator * rapidInt = new RapidFitIntegrator( PDF, true, true);
+		rapidInt->SetFixedIntegralPoints(10000);
+        ComponentRef * thisRef = new ComponentRef( "0", "dummyObservable" );
         PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
 
-        //const int l_max(6);
-        //const int i_max(6);
-        //const int k_max(4);
-        //const int j_max(4);
-        const int l_max(6); //mKpi
-        const int i_max(4); //cosPsi
-        const int k_max(2); //phi
-        const int j_max(2); //cosTheta
+        const int l_max(8);
+        const int i_max(6);
+        const int k_max(2);
+        const int j_max(2);
+        //const int l_max(6); //mKpi
+        //const int i_max(4); //cosPsi
+        //const int k_max(2); //phi
+        //const int j_max(2); //cosTheta
         double c[l_max+1][i_max+1][k_max+1][j_max+1];
         double c_sq[l_max+1][i_max+1][k_max+1][j_max+1];
         for ( int l = 0; l < l_max + 1; l++ )
@@ -802,11 +804,11 @@ namespace Mathematics
         minima[0] = -1.;
         minima[1] = -TMath::Pi();
         minima[2] = -1.;
-        minima[3] = 0.64;
+        minima[3] = 0.6332;
         maxima[0] = 1.;
         maxima[1] = TMath::Pi();
         maxima[2] = 1.;
-        maxima[3] = 1.59;
+        maxima[3] = 1.591;
         // Sum the inverse PDF values over the accepted events
         // These histograms will be used for drawing the acceptance
         TH1D * cosThetaAcc = new TH1D("cosThetaAcc", "cosTheta1", 20, minima[0], maxima[0]);
@@ -851,6 +853,9 @@ namespace Mathematics
 		double evalPDFnorm(0.);
 		double val(0.);
         double coeff(0.);
+        vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
+        evalPDFnorm = rapidInt->NumericallyIntegratePhaseSpace( boundary, dontIntegrate, thisRef );
+        //evalPDFnorm = 1.;
         for (int e = 0; e < numEvents; e++)
 		{
 			if (e % 100 == 0) cout << "Event # " << e << "\t\t" << setprecision(4) << 100.*(double)e/(double)numEvents << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
@@ -862,13 +867,6 @@ namespace Mathematics
 			cosPsi   = event->GetObservable("cosTheta2")->GetValue();
 			mKpi     = event->GetObservable("m23")->GetValue();
 		    mKpi_mapped = (mKpi - minima[3])/(maxima[3]-minima[3])*2.+ (-1);
-            vector<string> dontIntegrate = PDF->GetDoNotIntegrateList();
-			dontIntegrate.push_back("m23");
-			dontIntegrate.push_back("pionID");
-			//evalPDFnorm = rapidInt->NumericallyIntegrateDataPoint( event, boundary, dontIntegrate );
-            evalPDFnorm = 1.;
-            //cout << evalPDFnorm << endl;
-
 
             /*
             // for the Bd2JpsiK* time-angular analysis in helicity basis
@@ -889,10 +887,24 @@ namespace Mathematics
             Bd2JpsiKstar_sWave_Fs_withAcc * bpdf = (Bd2JpsiKstar_sWave_Fs_withAcc *) PDF;
             evalPDFnorm = bpdf->NormAnglesOnlyForAcceptanceWeights(event, boundary);
             */
+
             evalPDFraw = PDF->Evaluate( event );
-			val = evalPDFraw/evalPDFnorm;
-            val = 1.;
-            //cout << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
+            //cout << "PDF evaluate " << evalPDFraw << " " << evalPDFnorm << " " << evalPDFraw/evalPDFnorm << endl;
+            const double mK  = 0.493677;
+            const double mPi = 0.13957018;
+            const double mB  = 5.27953;
+            const double mPsi= 3.68609;
+            double t1 = mKpi*mKpi-(mK+mPi)*(mK+mPi);
+            double t2 = mKpi*mKpi-(mK-mPi)*(mK-mPi);
+            double t31 = mB*mB - (mKpi + mPsi)*(mKpi + mPsi);
+            double t32 = mB*mB - (mKpi - mPsi)*(mKpi - mPsi);
+            double p1_st = sqrt(t1*t2)/mKpi/2.;
+            double p3    = sqrt(t31*t32)/mB/2.;
+			double pB = DPHelpers::daughterMomentum(mB, mPsi, mKpi);
+            double evalPDFraw2 = p1_st*p3*0.95;
+            val = evalPDFraw2/evalPDFnorm;
+            //val = evalPDFraw2;
+            //cout << "Man evaluate " << evalPDFraw2 << " " << evalPDFnorm << " " << evalPDFraw2/evalPDFnorm << endl;
 
             if (val < 1e-08) cout << cosTheta << " " << phi <<  " " << cosPsi << " " << mKpi << " " << val << " " << endl;
 
@@ -1023,6 +1035,7 @@ namespace Mathematics
         TH1D * cosPsiAccProj = h3->ProjectionZ();
         */
 
+        std::cout << cosThetaAccProj->Integral() << " " << numEvents << std::endl;
         // Normalise the histograms for drawing
         cosThetaAccProj->Scale(1./cosThetaAccProj->Integral()*numEvents);
         phiAccProj     ->Scale(1./phiAccProj->Integral()*numEvents);

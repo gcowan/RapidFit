@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2013/08/22 Greig Cowan
+  - Was not calculating the angular acceptance correctly for mKpi due to incorrect use of the theoretical PDF. I was not multiplying it by the phase
+  space factor, meaning that the acceptance was just parameterising the phase space itself!
+  - Modified PDF to use the new coefficients.
+  - Modified DP PDF to read in Z angles directly from ntuple to avoid having to calculate them on the fly.
+
 2013/08/21 Greig Cowan
   - Modified background parameterisation using different sideband defintion (not much change).
   - Modified DPJpsiKaon such that only for resonances outside of kinematic limits do we rescale to m0_eff.

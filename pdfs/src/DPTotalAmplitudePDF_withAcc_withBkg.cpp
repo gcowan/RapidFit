@@ -119,6 +119,10 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	, cosTheta1Name	( configurator->getName("cosTheta1") )
 	, cosTheta2Name	( configurator->getName("cosTheta2") )
 	, phiName	( configurator->getName("phi") )
+	, m13Name	( configurator->getName("m13") )
+	, cosThetaZName	( configurator->getName("cosThetaZ") )
+	, cosThetaPsiName	( configurator->getName("cosThetaPsi") )
+	, dphiName	( configurator->getName("dphi") )
     , pionIDName( configurator->getName("pionID") )
 
     , mag_LASSName	( configurator->getName("mag_LASS") )
@@ -149,6 +153,7 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	, massK52380(), widthK52380()
 	, massK800(), widthK800()
 	, m23(), cosTheta1(), cosTheta2(), phi(), pionID()
+	, m13(), cosThetaZ(), cosThetaPsi(), dphi()
 	//LASS parameters
 	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS()
 // 	, massPsi(3.096916) // Jpsi
@@ -273,131 +278,57 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 
     // This is for the psi(2S)Kpi analysis.
     // First dimension is mKpi
+c[0][0][0][0] = 0.070335;// +- 0.000050
+c[0][0][0][2] = 0.003403;// +- 0.000112
+c[0][0][1][2] = -0.000778;// +- 0.000111
+c[0][0][2][2] = 0.004127;// +- 0.000107
+c[0][1][0][0] = -0.009491;// +- 0.000184
+c[0][1][0][2] = -0.001663;// +- 0.000190
+c[0][1][1][2] = 0.001551;// +- 0.000188
+c[0][1][2][2] = 0.000819;// +- 0.000182
+c[0][2][0][0] = -0.014304;// +- 0.000238
+c[0][2][1][2] = 0.001883;// +- 0.000242
+c[0][2][2][2] = -0.002778;// +- 0.000235
+c[0][3][0][0] = 0.000893;// +- 0.000284
+c[0][3][0][2] = 0.001146;// +- 0.000296
+c[0][3][2][2] = -0.000956;// +- 0.000276
+c[0][4][0][0] = -0.002936;// +- 0.000320
+c[0][4][0][2] = 0.001050;// +- 0.000333
+c[0][4][2][2] = -0.001487;// +- 0.000310
+c[0][5][1][2] = -0.001841;// +- 0.000357
+c[0][6][0][0] = -0.001692;// +- 0.000381
+c[1][0][0][0] = 0.014783;// +- 0.000232
+c[1][0][0][2] = -0.004777;// +- 0.000240
+c[1][0][1][2] = 0.001196;// +- 0.000238
+c[1][0][2][2] = 0.004180;// +- 0.000231
+c[1][1][0][0] = 0.013435;// +- 0.000404
+c[1][1][1][2] = 0.008704;// +- 0.000412
+c[1][2][0][0] = 0.012306;// +- 0.000522
+c[1][2][0][2] = 0.007930;// +- 0.000554
+c[1][2][2][2] = -0.003623;// +- 0.000514
+c[1][3][0][0] = 0.002489;// +- 0.000622
+c[1][3][1][2] = -0.004594;// +- 0.000627
+c[2][0][0][0] = 0.002752;// +- 0.000322
+c[2][1][0][2] = 0.001866;// +- 0.000596
+c[2][1][1][2] = 0.004185;// +- 0.000578
+c[2][2][0][0] = 0.009553;// +- 0.000730
+c[2][2][0][2] = 0.006662;// +- 0.000784
+c[2][3][0][0] = -0.004531;// +- 0.000870
+c[2][3][1][2] = -0.004133;// +- 0.000872
+c[2][4][0][0] = 0.004074;// +- 0.000968
+c[3][1][0][0] = -0.008709;// +- 0.000709
+c[3][1][0][2] = -0.003092;// +- 0.000749
+c[3][2][0][0] = -0.007995;// +- 0.000910
+c[4][1][0][0] = 0.004973;// +- 0.000831
+c[4][3][0][0] = 0.007048;// +- 0.001272
+c[4][4][0][0] = -0.004590;// +- 0.001405
+c[4][5][0][0] = 0.005652;// +- 0.001501
+c[5][0][0][0] = -0.003016;// +- 0.000516
+c[5][2][0][0] = -0.005673;// +- 0.001212
+c[6][0][0][0] = 0.004187;// +- 0.000569
+c[6][1][0][0] = -0.004113;// +- 0.001053
+c[6][2][0][0] = 0.005418;// +- 0.001349
 
-c[0][0][0][0] = 0.070524;// +- 0.000000
-c[0][0][0][2] = 0.002980;// +- 0.000098
-c[0][0][1][1] = 0.000347;// +- 0.000098
-c[0][0][1][2] = 0.000715;// +- 0.000099
-c[0][0][2][2] = 0.004388;// +- 0.000096
-c[0][0][2][4] = 0.000384;// +- 0.000097
-c[0][1][0][0] = -0.008333;// +- 0.000161
-c[0][1][0][2] = -0.001791;// +- 0.000164
-c[0][1][1][2] = -0.001693;// +- 0.000165
-c[0][1][2][2] = 0.000884;// +- 0.000159
-c[0][2][0][0] = -0.014439;// +- 0.000208
-c[0][2][1][2] = -0.002133;// +- 0.000214
-c[0][2][2][2] = -0.002838;// +- 0.000206
-c[0][3][0][0] = 0.001583;// +- 0.000248
-c[0][3][0][2] = 0.001321;// +- 0.000252
-c[0][3][2][2] = -0.000881;// +- 0.000244
-c[0][4][0][0] = -0.003311;// +- 0.000281
-c[0][4][0][2] = 0.001231;// +- 0.000286
-c[0][4][2][2] = -0.001492;// +- 0.000277
-c[0][5][0][0] = 0.001196;// +- 0.000311
-c[0][5][1][2] = 0.001836;// +- 0.000318
-c[0][6][0][0] = -0.002067;// +- 0.000338
-c[1][0][0][0] = 0.025088;// +- 0.000144
-c[1][0][0][2] = -0.002918;// +- 0.000150
-c[1][0][1][2] = -0.000957;// +- 0.000152
-c[1][0][2][2] = 0.003972;// +- 0.000147
-c[1][0][4][4] = 0.000637;// +- 0.000146
-c[1][1][0][0] = 0.009623;// +- 0.000249
-c[1][1][0][2] = 0.001174;// +- 0.000254
-c[1][1][1][2] = -0.007329;// +- 0.000254
-c[1][2][0][0] = 0.008595;// +- 0.000323
-c[1][2][0][2] = 0.006480;// +- 0.000330
-c[1][2][2][2] = -0.003222;// +- 0.000318
-c[1][3][0][0] = 0.002113;// +- 0.000383
-c[1][3][1][2] = 0.003574;// +- 0.000391
-c[2][0][0][0] = -0.039317;// +- 0.000186
-c[2][0][0][2] = -0.002022;// +- 0.000196
-c[2][0][2][2] = -0.002269;// +- 0.000192
-c[2][1][0][0] = 0.004749;// +- 0.000322
-c[2][1][0][2] = 0.002023;// +- 0.000328
-c[2][1][1][2] = -0.003358;// +- 0.000330
-c[2][2][0][0] = 0.016193;// +- 0.000417
-c[2][2][0][2] = 0.005249;// +- 0.000425
-c[2][2][1][2] = 0.002137;// +- 0.000427
-c[2][3][0][0] = -0.005474;// +- 0.000494
-c[2][3][0][2] = -0.002738;// +- 0.000502
-c[2][3][1][2] = 0.003839;// +- 0.000505
-c[2][4][0][0] = 0.005706;// +- 0.000560
-c[2][5][0][0] = -0.003598;// +- 0.000619
-c[2][6][0][0] = 0.003081;// +- 0.000673
-c[2][6][0][3] = 0.002170;// +- 0.000682
-c[3][0][0][0] = -0.012396;// +- 0.000232
-c[3][0][0][2] = 0.002478;// +- 0.000236
-c[3][0][1][2] = 0.001263;// +- 0.000238
-c[3][0][2][2] = -0.002444;// +- 0.000230
-c[3][1][0][0] = -0.011188;// +- 0.000388
-c[3][1][0][2] = -0.002202;// +- 0.000396
-c[3][1][1][2] = 0.004416;// +- 0.000397
-c[3][2][0][0] = -0.007664;// +- 0.000504
-c[3][2][0][2] = -0.002700;// +- 0.000515
-c[3][2][2][2] = 0.001844;// +- 0.000496
-c[3][3][0][0] = -0.002489;// +- 0.000597
-c[3][4][0][0] = -0.002788;// +- 0.000679
-c[4][0][0][0] = -0.011092;// +- 0.000263
-c[4][1][0][0] = 0.004571;// +- 0.000439
-c[4][1][1][2] = 0.003141;// +- 0.000448
-c[4][2][0][0] = -0.004099;// +- 0.000568
-c[4][2][0][2] = -0.002759;// +- 0.000581
-c[4][2][2][2] = 0.002143;// +- 0.000560
-c[4][3][0][0] = 0.006904;// +- 0.000673
-c[4][4][0][0] = -0.004414;// +- 0.000764
-c[4][5][0][0] = 0.005180;// +- 0.000845
-c[4][6][0][0] = -0.003568;// +- 0.000918
-c[5][0][0][0] = -0.005742;// +- 0.000292
-c[5][0][0][2] = -0.000914;// +- 0.000297
-c[5][1][0][0] = 0.003604;// +- 0.000487
-c[5][6][4][4] = -0.003044;// +- 0.001000
-c[6][0][3][4] = -0.000987;// +- 0.000317
-c[6][1][0][0] = -0.004894;// +- 0.000532
-c[6][2][0][0] = 0.003252;// +- 0.000691
-c[6][3][0][0] = -0.003484;// +- 0.000818
-c[6][5][0][0] = -0.004011;// +- 0.001026
-c[6][6][0][0] = 0.003448;// +- 0.001116
-
-    /*
-    // mKpi < 1GeV
-    c[0][0][0] = 0.070524;// +- 0.000000
-    c[0][0][2] = 0.007041;// +- 0.000196
-    c[0][1][2] = 0.002220;// +- 0.000194
-    c[0][2][2] = 0.002038;// +- 0.000183
-    c[1][0][0] = -0.022623;// +- 0.000298
-    c[1][0][2] = -0.003658;// +- 0.000313
-    c[1][1][2] = 0.003669;// +- 0.000311
-    c[2][0][0] = -0.025293;// +- 0.000393
-    c[2][0][2] = -0.004546;// +- 0.000412
-    c[2][1][2] = -0.003034;// +- 0.000407
-    c[3][0][0] = -0.002597;// +- 0.000474
-    c[3][1][2] = -0.003169;// +- 0.000484
-    c[4][0][0] = -0.003208;// +- 0.000540
-
-    //mKpi in [1.,1.29]GeV
-    d[0][0][0] = 0.070524;// +- 0.000000
-    d[0][0][2] = 0.002556;// +- 0.000159
-    d[0][2][2] = 0.004598;// +- 0.000156
-    d[1][0][0] = -0.005519;// +- 0.000259
-    d[1][0][2] = -0.001739;// +- 0.000262
-    d[2][0][0] = -0.017920;// +- 0.000333
-    d[2][0][2] = -0.001779;// +- 0.000339
-    d[2][1][2] = -0.002391;// +- 0.000343
-    d[2][2][2] = -0.001883;// +- 0.000331
-    d[3][0][0] = 0.005329;// +- 0.000397
-    d[3][0][2] = 0.002436;// +- 0.000402
-    d[3][1][2] = -0.002072;// +- 0.000405
-    d[4][0][0] = -0.005818;// +- 0.000450
-
-    //mKpi in [1.29,1.59]GeV
-    e[0][0][0] = 0.070524;// +- 0.000000
-    e[0][2][2] = 0.005909;// +- 0.000162
-    e[1][1][2] = -0.007255;// +- 0.000284
-    e[2][0][0] = -0.002897;// +- 0.000360
-    e[2][0][2] = 0.005830;// +- 0.000365
-    e[2][2][2] = -0.005063;// +- 0.000357
-    e[3][1][2] = 0.002913;// +- 0.000435
-    */
     // Background - with my phi-angle definition or Belle's
 b[0][0][0][0] = 0.070524;// +- 0.000000
 b[0][0][0][2] = -0.007277;// +- 0.001296
@@ -422,11 +353,19 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( const 
 	,cosTheta1Name(copy.cosTheta1Name)
 	,cosTheta2Name(copy.cosTheta2Name)
 	,phiName(copy.phiName)
+	,m13Name(copy.m13Name)
+	,cosThetaZName(copy.cosThetaZName)
+	,cosThetaPsiName(copy.cosThetaPsiName)
+	,dphiName(copy.dphiName)
 	,pionIDName(copy.pionIDName)
     ,m23(copy.m23)
 	,cosTheta1(copy.cosTheta1)
 	,cosTheta2(copy.cosTheta2)
 	,phi(copy.phi)
+    ,m13(copy.m13)
+	,cosThetaZ(copy.cosThetaZ)
+	,cosThetaPsi(copy.cosThetaPsi)
+	,dphi(copy.dphi)
 	,pionID(copy.pionID)
 	,fractionName(copy.fractionName)
 	,magA0ZplusName(copy.magA0ZplusName)
@@ -685,6 +624,10 @@ void DPTotalAmplitudePDF_withAcc_withBkg::MakePrototypes()
 	allObservables.push_back( cosTheta1Name );
 	allObservables.push_back( cosTheta2Name );
 	allObservables.push_back( phiName );
+	allObservables.push_back( m13Name );
+	allObservables.push_back( cosThetaZName );
+	allObservables.push_back( cosThetaPsiName );
+	allObservables.push_back( dphiName );
     allObservables.push_back( pionIDName );
 
     //Make the parameter set
@@ -818,6 +761,10 @@ vector<string> DPTotalAmplitudePDF_withAcc_withBkg::GetDoNotIntegrateList()
 {
     vector<string> list;
     list.push_back(pionIDName);
+    list.push_back(m13Name);
+    list.push_back(cosThetaZName);
+    list.push_back(cosThetaPsiName);
+    list.push_back(dphiName);
     return list;
 }
 
@@ -953,8 +900,13 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	cosTheta1 = measurement->GetObservable( cosTheta1Name )->GetValue();
 	cosTheta2 = measurement->GetObservable( cosTheta2Name )->GetValue();
 	phi       = measurement->GetObservable( phiName )->GetValue();
+	m13       = measurement->GetObservable( m13Name )->GetValue();
+	cosThetaZ = measurement->GetObservable( cosThetaZName )->GetValue();
+	cosThetaPsi = measurement->GetObservable( cosThetaPsiName )->GetValue();
+	dphi      = measurement->GetObservable( dphiName )->GetValue();
 	pionID    = measurement->GetObservable( pionIDName )->GetValue();
-    double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
+    double m23_mapped = (m23 - 0.6332)/(1.591 - 0.6332)*2. + (-1); // should really do this in a generic way
+    //double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
     //double m23_mapped = (m23 - 0.64)/(1.68 - 0.64)*2. + (-1); // should really do this in a generic way
 
 #ifdef __RAPIDFIT_USE_GSL
@@ -992,6 +944,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
     //if (angularAcc <= 0.) cout << "angular acc " << angularAcc << " " << m23 << " " << m23_mapped << " " << cosTheta1 << " " << phi << " " << cosTheta2 << endl;
 	//std::cout << "In DPTotal " << pMuPlus.X() << " " << pMuPlus.Y() << " " << pMuPlus.Z() << std::endl;
 
+    /*
     // Need angle between reference axis
 	DPHelpers::calculateFinalStateMomenta(massB, m23, massPsi,
 	cosTheta1,  cosTheta2, phi, pionID, 0.1056583715, 0.1056583715, 0.13957018, 0.493677,
@@ -1011,6 +964,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	//cout << m23 << " " << cosTheta2 << " " << cosTheta1 << " " << phi << endl;
 	//cout << m13 << " " << cosThetaZ << " " << cosThetaPsi << " " << dphi << " " << pMuPlus.X() << " " << pMuMinus.X() << " " << pPi.X() << endl;
     //cout << "cosTheta1 " << cosTheta1 << " " << cosThetaPsi << endl;
+    */
 
     TComplex Zamps[ZComponents.size()][3][3];
     // Component [i][1][j] is intentionally not filled
@@ -1116,7 +1070,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	double p1_st = sqrt(t1*t2)/m23/2.;
 	double p3    = sqrt(t31*t32)/MB0/2.;
 
-	//std::cout << result << " " << angularAcc << " " << p1_st << " " << p3 << std::endl;
+	//std::cout << result << " " << angularAcc << " " << p1_st << " " << p3 << " " << result*p1_st*p3 << std::endl;
 
 	double returnable_value = result * angularAcc * p1_st * p3;
 

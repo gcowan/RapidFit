@@ -45,14 +45,22 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 		ObservableRef cosTheta1Name;
 		ObservableRef cosTheta2Name;
 		ObservableRef phiName;
+		ObservableRef m13Name;
+		ObservableRef cosThetaZName;
+		ObservableRef cosThetaPsiName;
+		ObservableRef dphiName;
         ObservableRef pionIDName;
 
 		int componentIndex;
 
 		double m23;
-		double cosTheta1; // This is the member variable used in the "builder" functions
-		double cosTheta2; // These are the physics parameters varied in the fit and passed from the XML;
+		double cosTheta1;
+		double cosTheta2;
 		double phi;
+		double m13;
+		double cosThetaZ;
+		double cosThetaPsi;
+		double dphi;
         int pionID;
 
 		// These contain the ObservableRefs that correspond
@@ -264,8 +272,8 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
         bool useAngularAcceptance;
         static const int l_max = 6;
         static const int i_max = 6;
-        static const int k_max = 4;
-        static const int j_max = 4;
+        static const int k_max = 2;
+        static const int j_max = 2;
         double c[l_max+1][i_max+1][k_max+1][j_max+1];
         static const int l_max_b = 6;
         static const int i_max_b = 2;
