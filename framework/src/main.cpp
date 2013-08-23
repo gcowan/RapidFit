@@ -79,7 +79,7 @@ void RapidFitWelcome()
 
 	cout << endl << "RapidFit" << endl;
 	cout << "Framework SVN Rev:\t" << STR(SVN_REV) << endl;
-	cout << "PDF SVN REV:\t" << STR(SVN_PDF_REV) << endl;
+	cout << "PDF SVN REV:\t\t" << STR(SVN_PDF_REV) << endl;
 
 #ifdef __RAPIDFIT_USE_GSL
 	cout << "Compiled With Optional GSL Components" << endl;
@@ -91,8 +91,9 @@ void RapidFitWelcome()
 	{
 		cout << endl << "\t\t!!!YOU HAVE LOCAL CODE MODIFICATIONS!!!" << endl << endl;
 	}
-	cout << "Build Date:\t" << STR(BUILD_DATE) << endl;
-	cout << "Starting time: " << ctime( &timeNow ) << endl << endl;
+	cout << "Build Date:\t\t" << STR(BUILD_DATE) << endl;
+	cout << "Built Against ROOT:\t" << STR(ROOT_RELEASE) << endl;
+	cout << "Starting time:\t\t" << ctime( &timeNow ) << endl << endl;
 }
 
 void RapidFitExit()

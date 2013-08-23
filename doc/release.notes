@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/08/23 Rob Currie
+  - Adding quick ROOT version code to the top of the binary output, took 30sec to implement, will save a lot of hassle when I need to run on strange systems...
+
 2013/08/22 Greig Cowan
   - Was not calculating the angular acceptance correctly for mKpi due to incorrect use of the theoretical PDF. I was not multiplying it by the phase
   space factor, meaning that the acceptance was just parameterising the phase space itself!
