@@ -235,10 +235,18 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 	double pB0 = DPHelpers::daughterMomentum(mB, m1, m0_eff);
 	double pR0 = DPHelpers::daughterMomentum(mR, mJpsi, m2);
 
-	double orbitalFactor = TMath::Power(pB/pB0, LB)*
-		TMath::Power(pR/pR0, LR);
+/*
+ * There are different ways how this can be written. First two are
+ * equivalent and differ just by multiplicative factor as denominators are
+ * constants in both cases. Third way is one used in Belle Z+(4430) Dalitz
+ * analysis, which is only one I know about using this. (MK)
+ */
+	//double orbitalFactor = TMath::Power(pB/pB0, LB)*
+	//	TMath::Power(pR/pR0, LR);
 	//double orbitalFactor = TMath::Power(pB/mB, LB)*
 	//	TMath::Power(pR/mR, LR);
+  double orbitalFactor = TMath::Power(pB/mB, LB)*
+      TMath::Power(pR/m13, LR);
 
 	double barrierFactor = barrierB->barrier(pB0, pB)*
 		barrierR->barrier(pR0, pR);
