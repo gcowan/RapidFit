@@ -225,11 +225,14 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
 	{
 		return result;
 	}
-    //std::cout << "B" << mB << " Jpsi " << mJpsi << " m1 " << m1 << " m2 " << m2 << " mR " << mR << std::endl;
+
+    double m_min = mJpsi + m2;
+    double m_max = mB - m1;
+    double m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
     //std::cout << mR << std::endl;
 	double pB = DPHelpers::daughterMomentum(mB, m1, m13);
 	double pR = DPHelpers::daughterMomentum(m13, mJpsi, m2);
-	double pB0 = DPHelpers::daughterMomentum(mB, m1, mR);
+	double pB0 = DPHelpers::daughterMomentum(mB, m1, m0_eff);
 	double pR0 = DPHelpers::daughterMomentum(mR, mJpsi, m2);
 
 	double orbitalFactor = TMath::Power(pB/pB0, LB)*

@@ -8,8 +8,6 @@
 #include <iostream>
 #include <fstream>
 
-
-
 double CalculateAngles::HelCos_Tomasz(const double & ms,const double &mz,const int style)
 {
   double m_b(5.2794),m_psi(3.686093),m_k(0.493677),m_pi(0.139570),m_mu(0.1056583715);
@@ -395,7 +393,18 @@ void CalculateAngles::calculateFinalStateMomenta_GOLD(double mB0, double m23, do
 		      0,
 		      -pMu*cosTheta1,
 		      TMath::Sqrt(mMuMinus*mMuMinus+pMu*pMu));
+/*
 
+  pMuPlus.SetPxPyPzE(-pMu*TMath::Sqrt(1-cosTheta1*cosTheta1),
+		     0,
+		     -pMu*cosTheta1,
+                     TMath::Sqrt(mMuPlus*mMuPlus+pMu*pMu));
+
+  pMuMinus.SetPxPyPzE(pMu*TMath::Sqrt(1-cosTheta1*cosTheta1),
+		      0,
+		      pMu*cosTheta1,
+		      TMath::Sqrt(mMuMinus*mMuMinus+pMu*pMu));
+*/
   pMuPlus.Boost(+1.*p4Jpsi.BoostVector());
   pMuMinus.Boost(+1.*p4Jpsi.BoostVector());
 
@@ -403,11 +412,15 @@ void CalculateAngles::calculateFinalStateMomenta_GOLD(double mB0, double m23, do
   double ppK=CalculateAngles::daughterMomentum(m23, mK, mPi);
   double pz=ppK*cosTheta2;
   double pT=ppK*TMath::Sqrt(1-cosTheta2*cosTheta2);
-  double py=-pT*TMath::Sin(phi);
-  double px=-pT*TMath::Cos(phi);
+  //double py=-pT*TMath::Sin(phi);
+  //double px=-pT*TMath::Cos(phi);
+  double py=pT*TMath::Sin(phi);
+  double px=pT*TMath::Cos(phi);
 
-  pK.SetPxPyPzE(   px, -py, -pz, TMath::Sqrt(mK*mK+ppK*ppK));
-  pPi.SetPxPyPzE( -px,  py,  pz, TMath::Sqrt(mPi*mPi+ppK*ppK));
+  //pK.SetPxPyPzE(   px, -py, -pz, TMath::Sqrt(mK*mK+ppK*ppK));
+  //pPi.SetPxPyPzE( -px,  py,  pz, TMath::Sqrt(mPi*mPi+ppK*ppK));
+  pK.SetPxPyPzE(  -px, -py, -pz, TMath::Sqrt(mK*mK+ppK*ppK));
+  pPi.SetPxPyPzE( px, py, pz, TMath::Sqrt(mPi*mPi+ppK*ppK));
   pK.Boost(+1.*p4Kpi.BoostVector());
   pPi.Boost(+1.*p4Kpi.BoostVector());
 

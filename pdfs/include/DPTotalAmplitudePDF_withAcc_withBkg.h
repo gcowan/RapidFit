@@ -29,6 +29,7 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
+		virtual double EvaluateForNumericIntegral_TEST(DataPoint*);
 		double EvaluateComponent(DataPoint * measurement, ComponentRef* Component);
 		vector<string> PDFComponents();
 
@@ -45,10 +46,6 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 		ObservableRef cosTheta1Name;
 		ObservableRef cosTheta2Name;
 		ObservableRef phiName;
-		ObservableRef m13Name;
-		ObservableRef cosThetaZName;
-		ObservableRef cosThetaPsiName;
-		ObservableRef dphiName;
         ObservableRef pionIDName;
 
 		int componentIndex;
@@ -57,10 +54,6 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 		double cosTheta1;
 		double cosTheta2;
 		double phi;
-		double m13;
-		double cosThetaZ;
-		double cosThetaPsi;
-		double dphi;
         int pionID;
 
 		// These contain the ObservableRefs that correspond
@@ -271,7 +264,7 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
         // Acceptance parameterisation
         bool useAngularAcceptance;
         static const int l_max = 6;
-        static const int i_max = 6;
+        static const int i_max = 4;
         static const int k_max = 2;
         static const int j_max = 2;
         double c[l_max+1][i_max+1][k_max+1][j_max+1];

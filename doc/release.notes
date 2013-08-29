@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/08/29 Greig Cowan
+  - Minor changes to DP PDF to try and make it more like Syracuse result.
+  - Changes to the way that the 4D angular acceptance is calculated.
+
 2013/08/23 Rob Currie
   - Adding quick ROOT version code to the top of the binary output, took 30sec to implement, will save a lot of hassle when I need to run on strange systems...
 

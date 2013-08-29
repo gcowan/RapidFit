@@ -982,7 +982,7 @@ int calculateFitFractions( RapidFitConfiguration* config )
 {
 	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
 	ParameterSet * parset = config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
-    //parset->SetPhysicsParameter("BkgFraction", 0., 0., 0., 0., "BkgFraction", "");
+    parset->SetPhysicsParameter("BkgFraction", 0., 0., 0., 0., "BkgFraction", "");
     pdfAndData->SetPhysicsParameters( parset );//config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
 
 	IDataSet * dataSet = pdfAndData->GetDataSet();

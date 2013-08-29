@@ -249,21 +249,16 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
 
   double m_min = m1 + m2;
   double m_max = mB - mJpsi;
-  double m0_eff = mR;
-  if (mR < m_min || mR > m_max) m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
-  //if (mShape == "NR") std::cout << m_min << " " << m_max << " " << mR << " " << m0_eff<< std::endl;
+  double m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
 
   //std::cout << "B" << mB << " Jpsi " << mJpsi << " m23 " << m23 << " m1 " << m1 << " m2 " << m2 << " mR " << mR << " m0_eff " << m0_eff << std::endl;
   double pB = DPHelpers::daughterMomentum(mB, mJpsi, m23);      // B, psi, K*
   double pR = DPHelpers::daughterMomentum(m23, m1, m2);         // K*, K, pi
   double pB0 = DPHelpers::daughterMomentum(mB, mJpsi, m0_eff);// B, psi, resonance
-  double pR0 = DPHelpers::daughterMomentum(m0_eff, m1, m2);   // resonance, K, pi
+  double pR0 = DPHelpers::daughterMomentum(mR, m1, m2);   // resonance, K, pi // this is really mR here, not m0_eff
 
   double orbitalFactor = TMath::Power(pB/pB0, LB)*
                          TMath::Power(pR/pR0, LR);
-
-  //double orbitalFactor = TMath::Power(pB/mB, LB)*
-  //                       TMath::Power(pR/mR, LR);
 
   double barrierFactor = barrierB->barrier( pB0, pB )*
                          barrierR->barrier( pR0, pR );
@@ -273,10 +268,9 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
   {
     barrierFactor = 1.;
     orbitalFactor = pB/mB;
-    //std::cout << orbitalFactor << " " << barrierFactor << std::endl;
   }
 
-  if (isnan(pR0)) std::cout << mR << " " << pB << " " << pR <<  " " << pB0 << " " << pR0 << " " << orbitalFactor << " " << barrierFactor << "  " << massFactor << std::endl;
+  if (isnan(pR0)) std::cout << mShape << " " << mR << " " << pB << " " << pR <<  " " << pB0 << " " << pR0 << " " << orbitalFactor << " " << barrierFactor << "  " << massFactor << std::endl;
 
   // Angular part
   TComplex angular(0,0);
@@ -293,7 +287,7 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
             break;
   }
   result = massFactor*barrierFactor*orbitalFactor*angular;
-
+  //result = TComplex(1,0);
   return result;
 }
 

@@ -4,6 +4,207 @@
 #include "CalculateAngles.hh"
 #include <iostream>
 
+void DPHelpers::calculateFinalStateMomentaBelle(double m_b, double ms, double m_psi,
+                            double cos2s, double cospi, double phi2s,
+                            double m_mu,
+                            double m_pi, double m_k,
+                            TLorentzVector& p_mu_b, TLorentzVector& p_mu1_b,
+                            TLorentzVector& p_pi_b, TLorentzVector& p_k_b)
+{
+      TLorentzVector p_b_b(0,0,0,m_b);
+      const double p_mu_psi_p = sqrt( 0.25*m_psi*m_psi - m_mu*m_mu );
+
+      const double & m = ms;
+      const double q=0.5*sqrt( (m+m_k+m_pi)*(m+m_k-m_pi)*(m+m_pi-m_k)*(m-m_pi-m_k) )/m;
+      const double p=0.5*sqrt( (m_b+m_psi+m)*(m_b+m_psi-m)*(m_b+m-m_psi)*(m_b-m-m_psi) )/m_b;
+
+      const double p2 = p*p;
+      const double q2 = q*q;
+
+      const double ep = ( sqrt((m_psi*m_psi+p2)*(m*m+p2))+p2 )/m;
+      const double pp = sqrt(ep*ep-m_psi*m_psi);
+
+      const double spsipi = m_psi*m_psi + m_pi*m_pi + 2.0*( ep*sqrt(m_pi*m_pi+q2) - pp*q*cospi );
+
+      TLorentzVector p_psi_b(0,0,p,sqrt(m_psi*m_psi+p2));
+      TLorentzVector p_ks_b(0,0,-p,sqrt(m*m+p2));
+      TLorentzVector p_b_psi= p_b_b;
+      TLorentzVector p_b_ks= p_b_b;
+      TVector3 boostfromks_b;
+      TVector3 boostfrompsi_b;
+
+      TVector3 boosttopsi_b = -(p_psi_b.BoostVector());
+      p_b_psi.Boost( boosttopsi_b );
+      TVector3 boosttoks_b = -(p_ks_b.BoostVector());
+      p_b_ks.Boost( boosttoks_b );
+      boostfromks_b = -(p_b_ks.BoostVector());
+      boostfrompsi_b = -(p_b_psi.BoostVector());
+
+      double sinpi=sqrt(1.0-cospi*cospi);
+
+      const double & cospsi = cos2s;
+      const double sinpsi = sqrt( 1.0 - cospsi*cospsi );
+      TLorentzVector p_mu_psi( p_mu_psi_p * sinpsi, 0, p_mu_psi_p * cospsi, m_psi*0.5);
+      p_mu_b =p_mu_psi;
+      p_mu_b.Boost( boostfrompsi_b );
+      p_mu1_b = p_psi_b - p_mu_b;
+
+      TLorentzVector p_pi_ks(
+                           -q*sinpi*cos(phi2s),
+                           q*sinpi*sin(phi2s),
+                           q*cospi,
+                           sqrt(m_pi*m_pi+q2)
+                           );
+     p_pi_b = p_pi_ks;
+     p_pi_b.Boost( boostfromks_b );
+
+     TLorentzVector p_z_b(p_psi_b + p_pi_b);
+     p_k_b = p_ks_b - p_pi_b;
+}
+
+
+void DPHelpers::Belle(const TLorentzVector & _pMuPlus,
+           const TLorentzVector & _pMuMinus,
+           const TLorentzVector & _pPi,
+           const TLorentzVector & _pK,
+           double & m23,
+           double & cosKPi,
+           double & cosPsi,
+           double & phiKPiPsi,
+           double & m13,
+           double & cosZ,
+           double & cosPsi_Z,
+           double & phiPsiZ,
+           double & phiZPsiPsi)
+{
+  // inputs can be in any reference frame
+
+  TLorentzVector pB=_pMuPlus+_pMuMinus+_pPi+_pK;
+
+  TLorentzVector pMuPlus(_pMuPlus);
+  TLorentzVector pMuMinus(_pMuMinus);
+  TLorentzVector pPi(_pPi);
+  TLorentzVector pK(_pK);
+
+  // ============== B0 rest frame ========================
+
+  if ( pB.BoostVector().Mag() != 0 )
+  {
+    pMuPlus.Boost(-pB.BoostVector());
+    pMuMinus.Boost(-pB.BoostVector());
+    pPi.Boost(-pB.BoostVector());
+    pK.Boost(-pB.BoostVector());
+  }
+  TLorentzVector pKPi=pK+pPi;
+  TLorentzVector pPsi=pMuPlus+pMuMinus;
+  TLorentzVector pZ = pPsi + pPi;
+  m23 = pKPi.M();
+  m13 = pZ.M();
+
+  //
+  TVector3 p3KPi = pKPi.Vect();
+  TVector3 p3K = pK.Vect();
+  TVector3 p3Psi = pPsi.Vect();
+  TVector3 p3MuPlus = pMuPlus.Vect();
+
+  TVector3 aK = p3K - p3KPi * (p3K.Dot(p3KPi)/p3KPi.Mag2());
+  TVector3 aMuPlus = p3MuPlus - p3Psi * (p3MuPlus.Dot(p3Psi)/p3Psi.Mag2());
+
+  // angle between K* and Psi decay planes in B0 rest frame
+  phiKPiPsi = atan2(
+                            (p3Psi.Cross(aK)).Dot(aMuPlus)/(p3Psi.Mag()*aK.Mag()*aMuPlus.Mag()),
+                            aK.Dot(aMuPlus)/(aK.Mag()*aMuPlus.Mag())
+                            );
+
+
+  // ============= K* rest frame ============================
+
+  TLorentzVector pK_KPi(pK);
+  TLorentzVector pPsi_KPi(pPsi);
+
+  pK_KPi.Boost(-pKPi.BoostVector());
+  pPsi_KPi.Boost(-pKPi.BoostVector());
+
+  TVector3 p3K_KPi = pK_KPi.Vect();
+  TVector3 p3Psi_KPi = pPsi_KPi.Vect();
+
+  // K* helicity angle
+  cosKPi = - p3Psi_KPi.Dot(p3K_KPi)/(p3Psi_KPi.Mag()*p3K_KPi.Mag());
+
+  // ================== Z rest frame ================================
+
+  TLorentzVector pMuPlus_Z(pMuPlus);
+  TLorentzVector pPi_Z(pPi);
+  TLorentzVector pK_Z(pK);
+  TLorentzVector pPsi_Z(pPsi);
+  //
+
+  pMuPlus_Z.Boost(-pZ.BoostVector());
+  pPi_Z.Boost(-pZ.BoostVector());
+  pK_Z.Boost(-pZ.BoostVector());
+  pPsi_Z.Boost(-pZ.BoostVector());
+
+  TVector3 p3K_Z = pK_Z.Vect();
+  TVector3 p3Psi_Z = pPsi_Z.Vect();
+
+  // Z helicity angle
+  cosZ = - p3K_Z.Dot(p3Psi_Z)/(p3K_Z.Mag()*p3Psi_Z.Mag());
+
+  // ================== psi rest frame from Z ========================
+
+  TLorentzVector pMuPlus_Z_Psi(pMuPlus_Z);
+  TLorentzVector pPi_Z_Psi(pPi_Z);
+  TLorentzVector pK_Z_Psi(pK_Z);
+
+  pMuPlus_Z_Psi.Boost(-pPsi_Z.BoostVector());
+  pPi_Z_Psi.Boost(-pPsi_Z.BoostVector());
+  pK_Z_Psi.Boost(-pPsi_Z.BoostVector());
+
+  TVector3 p3MuPlus_Z_Psi = pMuPlus_Z_Psi.Vect();
+  TVector3 p3Pi_Z_Psi = pPi_Z_Psi.Vect();
+  TVector3 p3K_Z_Psi = pK_Z_Psi.Vect();
+
+  cosPsi_Z = - p3Pi_Z_Psi.Dot(p3MuPlus_Z_Psi)/(p3Pi_Z_Psi.Mag()*p3MuPlus_Z_Psi.Mag());
+
+
+  TVector3 aK_Z_Psi = p3K_Z_Psi - p3Pi_Z_Psi * (p3K_Z_Psi.Dot(p3Pi_Z_Psi)/p3Pi_Z_Psi.Mag2());
+  TVector3 aMuPlus_Z_Psi = p3MuPlus_Z_Psi - p3Pi_Z_Psi * (p3MuPlus_Z_Psi.Dot(p3Pi_Z_Psi)/p3Pi_Z_Psi.Mag2());
+  phiPsiZ = atan2(
+                          -(p3Pi_Z_Psi.Cross(aK_Z_Psi)).Dot(aMuPlus_Z_Psi)/(p3Pi_Z_Psi.Mag()*aK_Z_Psi.Mag()*aMuPlus_Z_Psi.Mag()),
+                          aK_Z_Psi.Dot(aMuPlus_Z_Psi)/(aK_Z_Psi.Mag()*aMuPlus_Z_Psi.Mag())
+                          );
+
+
+
+  // ================ psi rest frame from B (i.e. K* decay chain ) ===================
+
+  TLorentzVector pMuPlus_Psi(pMuPlus);
+  TLorentzVector pPi_Psi(pPi);
+  TLorentzVector pK_Psi(pK);
+  TLorentzVector pKPi_Psi(pKPi);
+  //
+
+  pMuPlus_Psi.Boost(-pPsi.BoostVector());
+  pPi_Psi.Boost(-pPsi.BoostVector());
+  pK_Psi.Boost(-pPsi.BoostVector());
+  pKPi_Psi.Boost(-pPsi.BoostVector());
+
+  TVector3 p3MuPlus_Psi = pMuPlus_Psi.Vect();
+  TVector3 p3Pi_Psi = pPi_Psi.Vect();
+  TVector3 p3K_Psi = pK_Psi.Vect();
+  TVector3 p3KPi_Psi = pKPi_Psi.Vect();
+
+  cosPsi = - p3KPi_Psi.Dot(p3MuPlus_Psi)/(p3KPi_Psi.Mag()*p3MuPlus_Psi.Mag());
+
+  TVector3 aKPi_Psi = p3KPi_Psi - p3MuPlus_Psi * (p3KPi_Psi.Dot(p3MuPlus_Psi)/p3MuPlus_Psi.Mag2());
+  TVector3 aPi_Psi = p3Pi_Psi - p3MuPlus_Psi * (p3Pi_Psi.Dot(p3MuPlus_Psi)/p3MuPlus_Psi.Mag2());
+  phiZPsiPsi =  atan2(
+                              (p3MuPlus_Psi.Cross(aPi_Psi)).Dot(aKPi_Psi)/(p3MuPlus_Psi.Mag()*aPi_Psi.Mag()*aKPi_Psi.Mag()),
+                              aPi_Psi.Dot(aKPi_Psi)/(aPi_Psi.Mag()*aKPi_Psi.Mag())
+                              );
+
+}
+
 double DPHelpers::daughterMomentum(double m, double m1, double m2)
 {
   double momentum;
@@ -23,24 +224,24 @@ double DPHelpers::daughterMomentum(double m, double m1, double m2)
  * symmetry, J/psi momentum is along z-axis and muons are in x-z plane.
  */
 void DPHelpers::calculateFinalStateMomenta(double mB0, double m23, double mMuMu, double cosTheta1,
-					   double cosTheta2, double phi, 
-					   int pion_ID, 
+					   double cosTheta2, double phi,
+					   int pion_ID,
 					   double mMuPlus, double mMuMinus,
 					   double mPi, double mK, TLorentzVector& pMuPlus,
 					   TLorentzVector& pMuMinus, TLorentzVector& pPi, TLorentzVector& pK)
 {
 
-  
 
- 
-// // void CalculateAngles::calculateFinalStateMomenta(double mB0, double m23, double mMuMu, 
-// // 						 double cosTheta1, double cosTheta2, double phi, 
+
+
+// // void CalculateAngles::calculateFinalStateMomenta(double mB0, double m23, double mMuMu,
+// // 						 double cosTheta1, double cosTheta2, double phi,
 // // 						 double mMuPlus, double mMuMinus,
-// // 						 double mPi, double mK, 
+// // 						 double mPi, double mK,
 // // 						 int pion_ID,
 // // 						 TLorentzVector& pMuPlus,
-// // 						 TLorentzVector& pMuMinus, 
-// // 						 TLorentzVector& pPi, 
+// // 						 TLorentzVector& pMuMinus,
+// // 						 TLorentzVector& pPi,
 // // 						 TLorentzVector& pK)
 //    if (pion_ID > 0){ // anti-B0
 //     if(phi >0) phi = TMath::Pi() - phi;
@@ -87,10 +288,10 @@ void DPHelpers::calculateFinalStateMomenta(double mB0, double m23, double mMuMu,
 
 
   CalculateAngles::calculateFinalStateMomenta_GOLD( mB0, m23, mMuMu, cosTheta1,
-					       cosTheta2, phi, 
+					       cosTheta2, phi,
 					       mMuPlus,  mMuMinus,
-					       mPi,  mK,  
-					       pion_ID, 
+					       mPi,  mK,
+					       pion_ID,
 					       pMuPlus,
 					       pMuMinus,  pPi,  pK);
 
@@ -101,22 +302,22 @@ void DPHelpers::calculateZplusAngles(TLorentzVector& pB, TLorentzVector& pMuPlus
 				     double* cosThetaZ, double* cosThetaPsi, double* dphi, int pion_ID)
 {
 
-  CalculateAngles::calculateZplusAngles_GOLD(pB, 
+  CalculateAngles::calculateZplusAngles_GOLD(pB,
 					     pMuPlus,
-					     pMuMinus, 
-					     pPi, 
+					     pMuMinus,
+					     pPi,
 					     pK,
-					     cosThetaZ, 
-					     cosThetaPsi, 
+					     cosThetaZ,
+					     cosThetaPsi,
 					     dphi,
 					     pion_ID);
-// void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB, 
+// void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
 // 						TLorentzVector& pMuPlus,
-// 						TLorentzVector& pMuMinus, 
-// 						TLorentzVector& pPi, 
+// 						TLorentzVector& pMuMinus,
+// 						TLorentzVector& pPi,
 // 						TLorentzVector& pK,
-// 						double* cosThetaZ, 
-// 						double* cosThetaPsi, 
+// 						double* cosThetaZ,
+// 						double* cosThetaPsi,
 // 						double* dphi,
 // 						int pion_ID)
 
@@ -171,7 +372,7 @@ void DPHelpers::calculateZplusAngles(TLorentzVector& pB, TLorentzVector& pMuPlus
   TLorentzVector _psi(pMuPlus + pMuMinus);
   TLorentzVector _z(pMuPlus + pMuMinus + pPi);
   TLorentzVector _b(pMuPlus + pMuMinus + pPi + pK);
-  
+
   *dphi = planeAngle2_BIN( _muPlus, _muMinus, _psi, _z, _b);
 
   if(pion_ID > 0)

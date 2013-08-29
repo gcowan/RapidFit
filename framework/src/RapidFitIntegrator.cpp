@@ -296,7 +296,6 @@ vector<string> RapidFitIntegrator::DontNumericallyIntegrateList( const DataPoint
 
 	//	Observables have been checked, set the dontIntegrate list to be the same as the checked list
 	dontIntegrate = StringProcessing::CombineUniques( checked_list, input );
-
 	return dontIntegrate;
 }
 

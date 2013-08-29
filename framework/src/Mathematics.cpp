@@ -768,7 +768,7 @@ namespace Mathematics
         ComponentRef * thisRef = new ComponentRef( "0", "dummyObservable" );
         PhaseSpaceBoundary * boundary = dataSet->GetBoundary();
 
-        const int l_max(8);
+        const int l_max(6);
         const int i_max(6);
         const int k_max(2);
         const int j_max(2);
@@ -804,11 +804,11 @@ namespace Mathematics
         minima[0] = -1.;
         minima[1] = -TMath::Pi();
         minima[2] = -1.;
-        minima[3] = 0.6332;
+        minima[3] = 0.64;
         maxima[0] = 1.;
         maxima[1] = TMath::Pi();
         maxima[2] = 1.;
-        maxima[3] = 1.591;
+        maxima[3] = 1.59;
         // Sum the inverse PDF values over the accepted events
         // These histograms will be used for drawing the acceptance
         TH1D * cosThetaAcc = new TH1D("cosThetaAcc", "cosTheta1", 20, minima[0], maxima[0]);
@@ -901,10 +901,11 @@ namespace Mathematics
             double p1_st = sqrt(t1*t2)/mKpi/2.;
             double p3    = sqrt(t31*t32)/mB/2.;
 			double pB = DPHelpers::daughterMomentum(mB, mPsi, mKpi);
-            double evalPDFraw2 = p1_st*p3*0.95;
+            double evalPDFraw2 = p1_st*p3*0.94;
             val = evalPDFraw2/evalPDFnorm;
             //val = evalPDFraw2;
             //cout << "Man evaluate " << evalPDFraw2 << " " << evalPDFnorm << " " << evalPDFraw2/evalPDFnorm << endl;
+            val = 1.;
 
             if (val < 1e-08) cout << cosTheta << " " << phi <<  " " << cosPsi << " " << mKpi << " " << val << " " << endl;
 
@@ -954,10 +955,14 @@ namespace Mathematics
                     if (j < k) continue;
                     error = sqrt(1./numEvents/numEvents * ( c_sq[l][i][k][j] - c[l][i][k][j]*c[l][i][k][j]/numEvents) );
                     if (std::isnan(error)) error = 0.;
-                    if ( fabs(c[l][i][k][j]/numEvents) > 3.*error )
+                    if ( fabs(c[l][i][k][j]/numEvents) > 5.*error )
                     {
                         sprintf( buf, "c[%d][%d][%d][%d] = %f;// +- %f", l, i, k, j, c[l][i][k][j]/numEvents, error );
                         cout << buf << endl;
+                    }
+                    else
+                    {
+                        c[l][i][k][j] = 0.;
                     }
 		        }
             }

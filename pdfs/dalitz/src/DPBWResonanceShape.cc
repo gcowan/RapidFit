@@ -91,7 +91,7 @@ double DPBWResonanceShape::gamma(double m)
   double pp=daughterMomentum(m);  // momentum of daughter at the actual mass
   double bb=barrier->barrier(pR0,pp);  // Barrier factor
   double gg=gammaR*mR/m*bb*bb*TMath::Power(pp/pR0,2*LR+1);
-  //std::cout << "DPBWResonanceShape g " << m << " " << mR << " " << gammaR << " " << pp << " " << pR0 << " " << bb <<  " " << m1 << " " << m2 <<std::endl;
+  //std::cout << "DPBWResonanceShape g " << R << " " << m << " " << mR << " " << gammaR << " " << pp << " " << pR0 << " " << bb <<  " " << m1 << " " << m2 <<std::endl;
 
   return gg;
 }
