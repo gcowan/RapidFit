@@ -584,6 +584,7 @@ string StringProcessing::FindFileName( const string fileName, bool quiet )
 			return fileName;
 		}
 	}
+	if( !local_fail )	return fileName;
 
 	string fileName_pwd = "pdfs/configdata/";
 	fileName_pwd.append( fileName );
