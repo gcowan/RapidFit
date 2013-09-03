@@ -94,7 +94,7 @@ class SlicedAcceptance
 		 * @param thigh
 		 *
 		 */
-		SlicedAcceptance( double tlow, double thigh );
+		SlicedAcceptance( double tlow, double thigh, bool quiet=false );
 
 		/*!
 		 * @brief 
@@ -104,7 +104,7 @@ class SlicedAcceptance
 		 * @param thigh
 		 *
 		 */
-		SlicedAcceptance( double tlow, double thigh, double beta  );
+		SlicedAcceptance( double tlow, double thigh, double beta, bool quiet=false  );
 
 		/*!
 		 * @brief
@@ -112,7 +112,7 @@ class SlicedAcceptance
 		 * @param s
 		 *
 		 */
-		SlicedAcceptance( string s  );
+		SlicedAcceptance( string s, bool quiet=false );
 
 		/*!
 		 * @brief
@@ -122,7 +122,7 @@ class SlicedAcceptance
 		 * @param s2
 		 *
 		 */
-		SlicedAcceptance( string s1, string s2  );
+		SlicedAcceptance( string s1, string s2, bool quiet=false  );
 
 		/*!
 		 * @brief Copy Constructor

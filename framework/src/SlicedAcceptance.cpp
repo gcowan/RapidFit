@@ -24,7 +24,7 @@ AcceptanceSlice::AcceptanceSlice( const AcceptanceSlice& input ) :
 
 //............................................
 // Constructor for flat acceptance
-SlicedAcceptance::SlicedAcceptance( double tl, double th ) :
+SlicedAcceptance::SlicedAcceptance( double tl, double th, bool quiet ) :
 	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
 {
 
@@ -65,7 +65,7 @@ SlicedAcceptance::~SlicedAcceptance()
 
 //............................................
 // Constructor for simple upper time acceptance only
-SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
+SlicedAcceptance::SlicedAcceptance( double tl, double th, double b, bool quiet ) :
 	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(tl), thigh(th), beta(b), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.), _hasChecked(false), _storedDecision(false)
 {
 	//Reality checks
@@ -104,18 +104,18 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b ) :
 
         if( _sortedSlices )
         {
-                cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
+		if( !quiet ) cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
         }
         else
         {
-                cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
+		if( !quiet ) cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
         }
 }
 
 
 //............................................
 // Constructor for simple 2010 version of lower time acceptance only
-SlicedAcceptance::SlicedAcceptance( string s ) :
+SlicedAcceptance::SlicedAcceptance( string s, bool quiet ) :
 	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.), _hasChecked(false), _storedDecision(false)
 {
 	(void)s;
@@ -143,25 +143,25 @@ SlicedAcceptance::SlicedAcceptance( string s ) :
 
         if( _sortedSlices )
         {
-                cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
+		if( !quiet ) cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
         }
         else
         {
-                cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
+		if( !quiet ) cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
         }
 }
 
 //............................................
 // Constructor for accpetance from a file
-SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
+SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.), _hasChecked(false), _storedDecision(false)
 {
 	(void)type;
 	if( type != "File" ) {   }//do nothing for now
 
-	string fullFileName = StringProcessing::FindFileName( fileName );
+	string fullFileName = StringProcessing::FindFileName( fileName, quiet );
 
-	cout << "Opening: " << fullFileName << endl;
+	if( !quiet ) cout << "Opening: " << fullFileName << endl;
 
 	ifstream in;
 	in.open(fullFileName.c_str());
@@ -188,7 +188,7 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 		//cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
 		slices.push_back( new AcceptanceSlice( this_tlow, this_thigh, height ) );
 	}
-	cout << "Time Acc Slices: " << lowEdge.size() << endl;
+	if( !quiet ) cout << "Time Acc Slices: " << lowEdge.size() << endl;
 	if( lowEdge.size() == 1 )
 	{
 		cout << "SlicedAcceptance: SERIOUS ERROR" << endl;
@@ -200,11 +200,11 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName ) :
 
 	if( _sortedSlices )
 	{
-		cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
+		if( !quiet ) cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
 	}
 	else
 	{
-		cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
+		if( !quiet ) cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
 	}
 }
 

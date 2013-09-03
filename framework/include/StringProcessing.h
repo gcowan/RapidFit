@@ -318,7 +318,7 @@ class StringProcessing
 		 *
 		 * @return Returns the path to a file if found that allows the file to be opened with open or TFile constructor
 		 */
-		static string FindFileName( const string fileName );
+		static string FindFileName( const string fileName, bool quiet=false );
 
 		/*!
 		 * @brief 

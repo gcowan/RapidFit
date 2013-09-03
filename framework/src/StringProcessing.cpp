@@ -567,7 +567,7 @@ string StringProcessing::LatexSafe( const TString input )
 	return LatexSafe(temp);
 }
 
-string StringProcessing::FindFileName( const string fileName )
+string StringProcessing::FindFileName( const string fileName, bool quiet )
 {
 	ifstream input_file;
 
@@ -575,11 +575,14 @@ string StringProcessing::FindFileName( const string fileName )
 	input_file.close();
 	bool local_fail = input_file.fail();
 
-	cout << "Looking For: " << fileName << endl;
-	if( !local_fail )
+	if( !quiet )
 	{
-		cout << "Found Locally" << endl;
-		return fileName;
+		cout << "Looking For: " << fileName << endl;
+		if( !local_fail )
+		{
+			cout << "Found Locally" << endl;
+			return fileName;
+		}
 	}
 
 	string fileName_pwd = "pdfs/configdata/";
@@ -610,7 +613,7 @@ string StringProcessing::FindFileName( const string fileName )
 	{
 		string path( getenv("RAPIDFITROOT") ) ;
 
-		cout << "RAPIDFITROOT defined as: " << path << endl;
+		if( !quiet ) cout << "RAPIDFITROOT defined as: " << path << endl;
 
 		fullFileName = path+"/pdfs/configdata/"+fileName ;
 

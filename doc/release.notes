@@ -14,6 +14,7 @@
           thisConfig->hasConfigurationValue( "RAPIDFIT_SAYS_THIS_IS_A_COPY", "True" )
        to determine if your PDF is a copy, this can potentially allow you to cut out a lot of verbosity that is generated each time a PDF object is created
   - I have also updated the lifetime tool which is used by the angular moment analysis, it now contains the code I used in running for my final thesis
+  - Added the ability to make some constructors quieter by passing an additional boolean argument to them
 
 2013/08/29 Greig Cowan
   - Minor changes to DP PDF to try and make it more like Syracuse result.

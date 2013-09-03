@@ -33,7 +33,7 @@ class ResolutionModel
 {
 public:
     
-    ResolutionModel( PDFConfigurator* configurator ) ;
+    ResolutionModel( PDFConfigurator* configurator, bool quiet=false ) ;
 
     void addParameters( vector<string> & parameterNames ) ;
     void setParameters( ParameterSet & parameters ) ;

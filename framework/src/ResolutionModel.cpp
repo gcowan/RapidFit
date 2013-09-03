@@ -22,11 +22,11 @@ using namespace::std;
 
 //............................................
 // Constructor 
-ResolutionModel::ResolutionModel( PDFConfigurator* configurator ) :
+ResolutionModel::ResolutionModel( PDFConfigurator* configurator, bool quiet ) :
     resScaleName		( configurator->getName("timeResolutionScale") ),
     eventResolutionName	( configurator->getName("eventResolution") )
 {
-    cout << "ResolutionModel:: Instance created " << endl ;
+    if( !quiet) cout << "ResolutionModel:: Instance created " << endl ;
 }
 
 

@@ -10,6 +10,7 @@
 
 #include "AngularAcceptance.h"
 #include "Mathematics.h"
+#include "StringProcessing.h"
 
 #include "TChain.h"
 
@@ -52,7 +53,7 @@ AngularAcceptance::~AngularAcceptance()
 
 //............................................
 // Constructor for accpetance from a file
-AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
+AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bool quiet ) :
 	_af1(1), _af2(1), _af3(1), _af4(0), _af5(0), _af6(0), _af7(1), _af8(0), _af9(0), _af10(0), useFlatAngularAcceptance(false)
 	, histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(), ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), average_bin_content()
 {
@@ -68,7 +69,7 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
 
 		// Get the acceptance histogram
 
-		string fullFileName = this->openFile( fileName ) ;
+		string fullFileName = StringProcessing::FindFileName( fileName, quiet );//this->openFile( fileName, quiet ) ;
 
 		TFile* f =  TFile::Open(fullFileName.c_str());
 
@@ -76,11 +77,11 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
 
 		if( useHelicityBasis ) {
 			histo = (TH3D*) f->Get("helacc"); //(fileName.c_str())));
-			cout << " AngularAcceptance::  Using heleicity basis" << endl ;
+			if( !quiet ) cout << " AngularAcceptance::  Using heleicity basis" << endl ;
 		}
 		else {
 			histo = (TH3D*) f->Get("tracc"); //(fileName.c_str())));
-			cout << " AngularAcceptance::  Using transversity basis" << endl ;
+			if( !quiet ) cout << " AngularAcceptance::  Using transversity basis" << endl ;
 		}
 
 		if( histo == NULL ) histo = (TH3D*) f->Get("acc");
@@ -93,7 +94,7 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis ) :
 		histo->SetDirectory(0);
 		size_t uniqueNum = reinterpret_cast<size_t>(this);
 		TString Histo_Name="Histo_";Histo_Name+=uniqueNum;
-		this->processHistogram();
+		this->processHistogram( quiet );
 
 
 		// Get the 10 angular factors
@@ -189,15 +190,18 @@ double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Ob
 
 //............................................
 // Open the input file containing the acceptance
-string AngularAcceptance::openFile( string fileName )
+string AngularAcceptance::openFile( string fileName, bool quiet )
 {
 	ifstream input_file2;
 	input_file2.open( fileName.c_str(), ifstream::in );
 	input_file2.close();
 	bool local_fail2 = input_file2.fail();
 
-	cout << "Looking For: " << fileName << endl;
-	if( !local_fail2 ) cout << "Found Locally!" << endl;
+	if( !quiet )
+	{
+		cout << "Looking For: " << fileName << endl;
+		if( !local_fail2 ) cout << "Found Locally!" << endl;
+	}
 
 	string fileName_pwd = "pdfs/configdata/";
 	fileName_pwd.append( fileName );
@@ -252,7 +256,7 @@ string AngularAcceptance::openFile( string fileName )
 
 //............................................
 // Open the input file containing the acceptance
-void AngularAcceptance::processHistogram()
+void AngularAcceptance::processHistogram( bool quiet )
 {
 	TString XAxis_Name="XAxis_";
 	TString YAxis_Name="YAxis_";
@@ -268,7 +272,7 @@ void AngularAcceptance::processHistogram()
 	xmax = xaxis->GetXmax();
 	nxbins = histo->GetNbinsX();
 	deltax = (xmax-xmin)/nxbins;
-	cout << " X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << "\t\t" << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
+	if( !quiet ) cout << " X axis Name: " << xaxis->GetName() << "\tTitle: " << xaxis->GetTitle() << "\t\t" << "X axis Min: " << xmin << "\tMax: " << xmax << "\tBins: " << nxbins << endl;
 
 	yaxis = histo->GetYaxis();
 	yaxis->SetName(YAxis_Name);
@@ -276,7 +280,7 @@ void AngularAcceptance::processHistogram()
 	ymax = yaxis->GetXmax();
 	nybins = histo->GetNbinsY();
 	deltay = (ymax-ymin)/nybins;
-	cout << " Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << "\t\t" << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
+	if( !quiet ) cout << " Y axis Name: " << yaxis->GetName() << "\tTitle: " << yaxis->GetTitle() << "\t\t" << "Y axis Min: " << ymin << "\tMax: " << ymax << "\tBins: " << nybins << endl;
 
 	zaxis = histo->GetZaxis();
 	zaxis->SetName(ZAxis_Name);
@@ -284,7 +288,7 @@ void AngularAcceptance::processHistogram()
 	zmax = zaxis->GetXmax();
 	nzbins = histo->GetNbinsZ();
 	deltaz = (zmax-zmin)/nzbins;
-	cout << " Z axis Name: " << zaxis->GetName() << "\tTitle: " << zaxis->GetTitle() << "\t\t" << "Z axis Min: " << zmin << "\tMax: " << zmax << "\tBins: " << nzbins << "\t\t\t";
+	if( !quiet ) cout << " Z axis Name: " << zaxis->GetName() << "\tTitle: " << zaxis->GetTitle() << "\t\t" << "Z axis Min: " << zmin << "\tMax: " << zmax << "\tBins: " << nzbins << "\t\t\t";
 
 	//method for Checking whether histogram is sensible
 
@@ -317,7 +321,7 @@ void AngularAcceptance::processHistogram()
 
 	average_bin_content = sum / total_num_bins;
 
-	cout << "Total Bins: " << total_num_bins << "\tEmpty Bins: " << zero_bins.size() << "\tAvg Bin Content: " << average_bin_content << endl;
+	if( !quiet ) cout << "Total Bins: " << total_num_bins << "\tEmpty Bins: " << zero_bins.size() << "\tAvg Bin Content: " << average_bin_content << endl;
 
 	//cout << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events "  << endl;
 	//cout << "Average number of entries of non-zero bins: " << average_bin_content <<  endl;

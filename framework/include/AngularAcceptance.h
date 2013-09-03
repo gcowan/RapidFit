@@ -34,7 +34,7 @@ class AngularAcceptance
 	public:
 
 		// Constructors
-		AngularAcceptance( string fileName, bool useHelicityBasis ) ;
+		AngularAcceptance( string fileName, bool useHelicityBasis, bool quiet=false ) ;
 		~AngularAcceptance();
 		AngularAcceptance( const AngularAcceptance& );
 
@@ -68,8 +68,8 @@ class AngularAcceptance
 		double total_num_entries;
 		double average_bin_content ;
 
-		string openFile( string fileName ) ;
-		void processHistogram() ;
+		string openFile( string fileName, bool quiet=false ) ;
+		void processHistogram( bool quiet=false ) ;
 
 };
 
