@@ -328,6 +328,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	//histCounter = 0;
 	//~PELC
 
+	//this->SetCopyConstructorSafe( false );
 }
 
 void Bs2JpsiPhi_Signal_v6::SetupAngularTerms()

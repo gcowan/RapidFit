@@ -294,6 +294,12 @@ class IPDF
 
 		/*!
 		 * Interface Function:
+		 * Can the PDF be safely copied through it's copy constructor?
+		 */
+		virtual bool IsCopyConstructorSafe() const = 0;
+
+		/*!
+		 * Interface Function:
 		 * Give the PDF a pointer to the template of it's copy constructor object
 		 */
 		virtual void SetCopyConstructor( CopyPDF_t* ) const = 0;
@@ -339,6 +345,12 @@ class IPDF
 		virtual void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary ) = 0;
 
 	protected:
+
+		/*!
+		* Interface Function:
+		* Set if the PDF be safely copied through it's copy constructor?
+		*/
+		virtual void SetCopyConstructorSafe( bool = true ) = 0;
 
 		virtual bool SetPhysicsParameters( ParameterSet* Input ) = 0;
 

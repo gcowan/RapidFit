@@ -28,4 +28,15 @@
 </PhaseSpaceBoundary>
 </DataSet>
 </ToFit>
+<Output>
+	<Projection>
+		<Name>x</Name>
+		<NoLegend>True</NoLegend>
+	</Projection>
+	<Scan>
+		<Name>sigma</Name>
+		<Sigma>2</Sigma>
+		<Points>50</Points>
+	</Scan>
+</Output>
 </RapidFit>

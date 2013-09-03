@@ -276,7 +276,8 @@
 	<Minimiser>Minuit</Minimiser>
 	<FitFunction>
 		<WeightName>Nsig_sw</WeightName>
-		<FunctionName>NegativeLogLikelihood</FunctionName>
+		<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+		<SetIntegratorTest>False</SetIntegratorTest>
 		<Threads>128</Threads>
 	</FitFunction>
 	<NumberRepeats>1</NumberRepeats>
@@ -654,6 +655,20 @@
 			<Maximum>2.5</Maximum>
 			<Points>20</Points>
 		</Scan>
+		<TwoDScan>
+			<X_Param>
+				<Name>Phi_s</Name>
+				<Minimum>-3.142</Minimum>
+				<Maximum>3.142</Maximum>
+				<Points>20</Points>
+			</X_Param>
+			<Y_Param>
+				<Name>deltaGamma</Name>
+				<Minimum>-0.2</Minimum>
+				<Maximum>0.2</Maximum>
+				<Points>20</Points>
+			</Y_Param>
+		</TwoDScan>
 	</Output>
 
 

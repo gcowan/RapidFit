@@ -135,46 +135,68 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 
 	string Name = inputPDF->GetName();
 
-	//	The PDF already knows where it's template is, no need to look for it again
-	if( inputPDF->GetCopyConstructor() != NULL )
+	if( inputPDF->IsCopyConstructorSafe() )
 	{
-		CopyPDF_t* pdf_copy = inputPDF->GetCopyConstructor();
-		returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
-	}
-	else
-	{
-		//	These special case PDFs explicitly need to be declared here as they're special case objects heavily integrated into the framework
-		if( Name == "NormalisedSum" )
+
+		//	The PDF already knows where it's template is, no need to look for it again
+		if( inputPDF->GetCopyConstructor() != NULL )
 		{
-			returnable_PDF = (IPDF*) new NormalisedSumPDF( *(const NormalisedSumPDF*) inputPDF );
-		}
-		else if( Name == "Prod" )
-		{
-			returnable_PDF = (IPDF*) new ProdPDF( *(const ProdPDF*) inputPDF );
-		}
-		else if( Name == "Sum" )
-		{
-			returnable_PDF = (IPDF*) new SumPDF( *(const SumPDF*) inputPDF );
+			CopyPDF_t* pdf_copy = inputPDF->GetCopyConstructor();
+			returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
 		}
 		else
 		{
-			//	Each PDF has a C wrapper function with an unmangled name of CopyPDF_SomePDF
-			string pdf_copy_Name = "CopyPDF_"+Name;
-
-			//	Find this object in the object which has been loaded as a library
-			CopyPDF_t* pdf_copy = (CopyPDF_t*) ClassLookUp::getObject( pdf_copy_Name );
-
-			if( pdf_copy == NULL )
+			//	These special case PDFs explicitly need to be declared here as they're special case objects heavily integrated into the framework
+			if( Name == "NormalisedSum" )
 			{
-				cerr << "Cannot Find Copy Constructor for: " << Name << " This is highly unsual and was thought to be impossible... I cannot continue" << endl;
-				cerr << "You may have used SetName and incorrectly named the PDF, Use SetLabel if this is the case." << endl << endl;
-				exit(21841);
+				returnable_PDF = (IPDF*) new NormalisedSumPDF( *(const NormalisedSumPDF*) inputPDF );
 			}
+			else if( Name == "Prod" )
+			{
+				returnable_PDF = (IPDF*) new ProdPDF( *(const ProdPDF*) inputPDF );
+			}
+			else if( Name == "Sum" )
+			{
+				returnable_PDF = (IPDF*) new SumPDF( *(const SumPDF*) inputPDF );
+			}
+			else
+			{
+				//	Each PDF has a C wrapper function with an unmangled name of CopyPDF_SomePDF
+				string pdf_copy_Name = "CopyPDF_"+Name;
 
-			//	Give the PDF object explicit knowledge of the path of it's constructor template
-			returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
-			inputPDF->SetCopyConstructor( pdf_copy );
+				//	Find this object in the object which has been loaded as a library
+				CopyPDF_t* pdf_copy = (CopyPDF_t*) ClassLookUp::getObject( pdf_copy_Name );
+
+				if( pdf_copy == NULL )
+				{
+					cerr << "Cannot Find Copy Constructor for: " << Name << " This is highly unsual and was thought to be impossible... I cannot continue" << endl;
+					cerr << "You may have used SetName and incorrectly named the PDF, Use SetLabel if this is the case." << endl << endl;
+					exit(21841);
+				}
+
+				//	Give the PDF object explicit knowledge of the path of it's constructor template
+				returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
+				inputPDF->SetCopyConstructor( pdf_copy );
+			}
 		}
+	}
+	else
+	{
+		PDFConfigurator* thisConfig = new PDFConfigurator( *(inputPDF->GetConfigurator()) );
+		if( !thisConfig->hasConfigurationValue( "RAPIDFIT_SAYS_THIS_IS_A_COPY", "True" ) )
+		{
+			if( thisConfig->hasConfigurationValue( "RAPIDFIT_SAYS_THIS_IS_A_COPY", "False" ) )
+			{
+				// OK Someone is intentionally messing around with the framework's behaviour!
+			}
+			else
+			{
+				thisConfig->addConfigurationParameter( "RAPIDFIT_SAYS_THIS_IS_A_COPY:True" );
+			}
+		}
+		returnable_PDF = ClassLookUp::LookUpPDFName( Name, thisConfig ); 
+		inputPDF->SetCopyConstructor( NULL );
+		delete thisConfig;
 	}
 
 	returnable_PDF->Can_Remove_Cache( false );

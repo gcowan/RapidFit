@@ -1,5 +1,20 @@
 // $Id: release.notes $
 
+2013/09/03 Rob Currie
+  - Updating RapidPlot tool
+       To Add the "LHCb" or "LHCb Preliminary" stamps to LLscans you need to use the "--addLHCb" option when generating plots, this is in the RapidPlot --help
+       I have also scaled the font used on the 'z-axis' when constructing 2D correlation matricies with RapidPlot so that the legend axis doesn't scream numbers when generated.
+  - Updating old XML for 2010 analysis to be able to run on the PDFs in RapidFit as well as generate some of the old plots
+  - Added the ability for RapidFit to copy PDFs without using Copy Constructors.
+       I encourage the use of copy constructors where sensible, but in the case of some PDFs which are highly complex or contain a LOT of internal variables this can become painful to maintain when needed
+       In order to allow RapidFit to create a copy of your PDF using the constructor ONLY add the line:
+          "this->SetCopyConstructorSafe( false );"
+       to your PDF constructor
+       The PDF is also passed the PDFConfigurator object which allows you to use:
+          thisConfig->hasConfigurationValue( "RAPIDFIT_SAYS_THIS_IS_A_COPY", "True" )
+       to determine if your PDF is a copy, this can potentially allow you to cut out a lot of verbosity that is generated each time a PDF object is created
+  - I have also updated the lifetime tool which is used by the angular moment analysis, it now contains the code I used in running for my final thesis
+
 2013/08/29 Greig Cowan
   - Minor changes to DP PDF to try and make it more like Syracuse result.
   - Changes to the way that the 4D angular acceptance is calculated.

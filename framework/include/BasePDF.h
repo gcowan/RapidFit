@@ -69,15 +69,15 @@
  *             (This interfaces with the NumericalIntegrator class)
  *
  *          EvaluateForNumericGeneration( DataPoint* )
- *             (This interfaces with the Toy DataSet Generators like Foam)
- *
- *
- *
- *
- * @author Benjamin M Wynne bwynne@cern.ch
- * @author Robert Currie rcurrie@cern.ch
- *
- */
+*             (This interfaces with the Toy DataSet Generators like Foam)
+	*
+	*
+	*
+	*
+	* @author Benjamin M Wynne bwynne@cern.ch
+	* @author Robert Currie rcurrie@cern.ch
+	*
+	*/
 
 #pragma once
 #ifndef BASE_PDF_H
@@ -499,6 +499,12 @@
 		void SetLabel( string Label );
 
 		/*!
+		 * Interface Function:
+		 * Can the PDF be safely copied through it's copy constructor?
+		 */
+		virtual bool IsCopyConstructorSafe() const;
+
+		/*!
 		 * @brief Give the PDF a pointer to the template of it's copy constructor object
 		 *
 		 * In theory a Copy Constructor can be written for IPDF which wraps back around to this but that breaks the concept of an Interface
@@ -566,6 +572,12 @@
 		virtual void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary );
 
 	protected:
+
+		/*!
+		 * Interface Function:
+		 * Set if the PDF be safely copied through it's copy constructor?
+		 */
+		virtual void SetCopyConstructorSafe( bool = true );
 
 		/*!
 		 * @brief   Interface Function:  This function is called ONCE per call from Minuit
@@ -722,6 +734,8 @@
 		bool debuggingON;
 
 		bool _basePDFComponentStatus;
+
+		bool CopyConstructorIsSafe;
 };
 
 #endif

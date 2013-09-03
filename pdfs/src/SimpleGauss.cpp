@@ -35,7 +35,7 @@ double SimpleGauss::Evaluate( DataPoint* input )
 double SimpleGauss::Normalisation( PhaseSpaceBoundary* range )
 {
   double sigmaVal = allParameters.GetPhysicsParameter( sigmaName )->GetValue();
-  double denominator =(sigmaVal*sqrt(2.*Mathematics::Pi()));
+  double denominator = (sigmaVal*sqrt(2.*Mathematics::Pi()));
   return denominator;
 }
 

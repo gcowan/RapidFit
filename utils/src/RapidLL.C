@@ -79,6 +79,8 @@ void RapidLL::Help()
 {
 	cout << endl << "RapidLL which plots the LL scans accepts the following additional Runtime Arguments" << endl;
 	cout << endl;
+	cout << "--addLHCb" << "\t\t" << "This triggers the tool to add the LHCb logo to plots" << endl;
+	cout << endl;
 	cout << "--isFinal" << "\t\t" << "This replaces the LHCb Preliminary text box with just an LHCb Stamp on plots" << endl;
 	cout << endl;
 }
@@ -94,6 +96,10 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 	bool isFinal=false;
 	string isFinalString="--isFinal";
 	isFinal = StringOperations::VectorContains( other_params, isFinalString ) != -1;
+
+	bool addLHCb=false;
+	string addLHCbString="--addLHCb";
+	addLHCb = StringOperations::VectorContains( other_params, addLHCbString ) != -1;
 
 	TString param_string = controlled_parameter;
 	TString param_val = param_string+value_suffix;
@@ -170,15 +176,21 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	drawn_histo->Draw( "AC*" );
 	new_canvas->Update();
-	TPaveText* text_1 = EdStyle::LHCbLabel();
-	if( !isFinal )
-	{
-		text_1->AddText("");
-		text_1->AddText( "Preliminary" );
-	}
+	TPaveText* text_1 = NULL;
 
-	text_1->SetFillStyle(0);
-	text_1->Draw("SAME");
+
+	if( addLHCb )
+	{
+		text_1 = EdStyle::LHCbLabel();
+		if( !isFinal )
+		{
+			text_1->AddText("");
+			text_1->AddText( "Preliminary" );
+		}
+
+		text_1->SetFillStyle(0);
+		text_1->Draw("SAME");
+	}
 
 	//      Now that the axis exist we can worry about labeling them
 	drawn_histo->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param_string ) + " " + EdStyle::GetParamRootUnit( param_string ) );
@@ -191,7 +203,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	drawn_histo->Draw( "AC" );
 	new_canvas->SetTitle("");
-	text_1->Draw("SAME");
+	if( text_1 != NULL ) text_1->Draw("SAME");
 	new_canvas->Update();
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub_nopoints.C");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_pub_nopoints.png");
@@ -200,7 +212,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	color_graph->Draw("AC*");
 	new_canvas->Update();
-	text_1->Draw("SAME");
+	if( text_1 != NULL ) text_1->Draw("SAME");
 
 	//      Now that the axis exist we can worry about labeling them
 	color_graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param_string ) + " " + EdStyle::GetParamRootUnit( param_string ) );
@@ -213,7 +225,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	color_graph->Draw("AC");
 	new_canvas->SetTitle("");
-	text_1->Draw("SAME");
+	if( text_1 != NULL ) text_1->Draw("SAME");
 	new_canvas->Update();
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf_nopoints.C");
 	Histogram_Processing::Silent_Print( new_canvas, Name_Base+"_conf_nopoints.png");
@@ -244,7 +256,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 		param_c->SetTitle("");
 
 		param_c->Update();
-		text_1->Draw("SAME");
+		if( text_1 != NULL ) text_1->Draw("SAME");
 
 
 		//      Now that the axis exist we can worry about labeling them
@@ -263,7 +275,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 		param_c->SetTitle("");
 
 		param_c->Update();
-		text_1->Draw("SAME");
+		if( text_1 != NULL ) text_1->Draw("SAME");
 
 		err_graph->GetXaxis()->SetTitle( EdStyle::GetParamRootName( param_string + value_suffix ) + " " + EdStyle::GetParamRootUnit( param_string ) );
 		err_graph->GetYaxis()->SetTitle( EdStyle::GetParamRootName( *param_i + error_suffix ) + " " + EdStyle::GetParamRootUnit( *param_i ) );

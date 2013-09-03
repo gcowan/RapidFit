@@ -6,6 +6,7 @@
 #include "TCanvas.h"
 #include "TStyle.h"
 #include "TSystem.h"
+#include "TPaletteAxis.h"
 
 #include "StringOperations.h"
 #include "Histo_Processing.h"
@@ -129,15 +130,21 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 				{
 					matrixPlot->GetXaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
 					matrixPlot->GetYaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
+					matrixPlot->GetZaxis()->SetLabelSize( (Float_t)0.6*lhcbTSize );
 				}
 				else
 				{
 					matrixPlot->GetXaxis()->SetLabelSize( (Float_t)0.8*(Float_t)lhcbTSize );
 					matrixPlot->GetYaxis()->SetLabelSize( (Float_t)0.8*(Float_t)lhcbTSize );
+					matrixPlot->GetZaxis()->SetLabelSize( (Float_t)0.8*lhcbTSize );
 				}
 				matrixPlot->LabelsOption("v");
 				matrixPlot->GetZaxis()->SetRangeUser( -1., 1. );
 				matrixPlot->Draw("colz");
+				c1->Update();
+				// Because this is obvious!...
+				TPaletteAxis *palette = (TPaletteAxis*)matrixPlot->GetListOfFunctions()->FindObject("palette");
+				palette->SetLabelSize( matrixPlot->GetZaxis()->GetLabelSize() );
 				c1->Update();
 				Histogram_Processing::Silent_Print( c1 , Name+".pdf" );
 				Histogram_Processing::Silent_Print( c1 , Name+".C" );
