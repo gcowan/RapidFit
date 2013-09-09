@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/09/09 Greig Cowan
+  - Latest version of DP PDF.
+
 2013/09/03 Rob Currie
   - Updating RapidPlot tool
        To Add the "LHCb" or "LHCb Preliminary" stamps to LLscans you need to use the "--addLHCb" option when generating plots, this is in the RapidPlot --help

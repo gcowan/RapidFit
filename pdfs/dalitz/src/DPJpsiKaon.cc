@@ -263,8 +263,8 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
  * constants in both cases. Third way is one used in Belle Z+(4430) Dalitz
  * analysis, which is only one I know about using this. (MK)
  */
-  //double orbitalFactor = TMath::Power(pB/pB0, LB)*
-  //                       TMath::Power(pR/pR0, LR);
+    //double orbitalFactor = TMath::Power(pB/pB0, LB)*
+    //                       TMath::Power(pR/pR0, LR);
 	//double orbitalFactor = TMath::Power(pB/mB, LB)*
 	//	                     TMath::Power(pR/mR, LR);
   double orbitalFactor = TMath::Power(pB/mB, LB)*
@@ -297,7 +297,7 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
             break;
   }
   result = massFactor*barrierFactor*orbitalFactor*angular;
-  //result = TComplex(1,0);
+
   return result;
 }
 

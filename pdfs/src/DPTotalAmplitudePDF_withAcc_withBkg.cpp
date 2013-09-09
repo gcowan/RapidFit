@@ -120,6 +120,11 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	, cosTheta1Name	( configurator->getName("cosTheta1") )
 	, cosTheta2Name	( configurator->getName("cosTheta2") )
 	, phiName	( configurator->getName("phi") )
+	, m13Name	( configurator->getName("m13") )
+	, cosZName	( configurator->getName("cosZ") )
+	, cosPsiZName	( configurator->getName("cosPsiZ") )
+	, phiZName	( configurator->getName("phiZ") )
+	, alphaName	( configurator->getName("alpha") )
     , pionIDName( configurator->getName("pionID") )
 
     , mag_LASSName	( configurator->getName("mag_LASS") )
@@ -150,6 +155,7 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	, massK52380(), widthK52380()
 	, massK800(), widthK800()
 	, m23(), cosTheta1(), cosTheta2(), phi(), pionID()
+	, m13(), cosZ(), cosPsiZ(), phiZ(), alpha()
 	//LASS parameters
 	, a_LASS(), r_LASS(), mag_LASS(), phase_LASS()
 // 	, massPsi(3.096916) // Jpsi
@@ -166,8 +172,8 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	// Construct all components we need
 	DPComponent * tmp;
 	// B0 --> Z+ K-
-// 	tmp=new DPZplusK(1,0,massB,4.430,0.100,0.493677,
-// 			 0.13957018, 1.6, 1.6, massPsi, 1, 23); // spin 1 Z, for MC testing
+ 	//tmp=new DPZplusK(1,0,massB,4.430,0.100,0.493677,
+ 	//		 0.13957018, 1.6, 1.6, massPsi, 1, 23); // spin 1 Z, for MC testing
 
 	tmp=new DPZplusK(0,1,massB,1.430,0.0100,0.493677,
 			0.13957018, 1.6, 1.6, massPsi, 0, 23); // spin 0 Z for datafit
@@ -190,7 +196,7 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K2(1430)
 	tmp=new DPJpsiKaon(1, 2, massB, 1.4324, 0.109, 0.493677,
-			0.13957018, 3.0, 3.0, massPsi, 2);
+			0.13957018, 1.6, 1.6, massPsi, 2);
 	KpiComponents.push_back(tmp);
 	// B0 --> J/psi K3(1780)
 	tmp=new DPJpsiKaon(2, 3, massB, 1.4324, 0.109, 0.493677,
@@ -334,11 +340,21 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( const 
 	,cosTheta1Name(copy.cosTheta1Name)
 	,cosTheta2Name(copy.cosTheta2Name)
 	,phiName(copy.phiName)
+	,m13Name(copy.m13Name)
+	,cosZName(copy.cosZName)
+	,cosPsiZName(copy.cosPsiZName)
+	,phiZName(copy.phiZName)
+	,alphaName(copy.alphaName)
 	,pionIDName(copy.pionIDName)
     ,m23(copy.m23)
 	,cosTheta1(copy.cosTheta1)
 	,cosTheta2(copy.cosTheta2)
 	,phi(copy.phi)
+    ,m13(copy.m13)
+	,cosZ(copy.cosZ)
+	,cosPsiZ(copy.cosPsiZ)
+	,phiZ(copy.phiZ)
+	,alpha(copy.alpha)
 	,pionID(copy.pionID)
 	,fractionName(copy.fractionName)
 	,magA0ZplusName(copy.magA0ZplusName)
@@ -597,6 +613,11 @@ void DPTotalAmplitudePDF_withAcc_withBkg::MakePrototypes()
 	allObservables.push_back( cosTheta1Name );
 	allObservables.push_back( cosTheta2Name );
 	allObservables.push_back( phiName );
+	//allObservables.push_back( m13Name );
+	//allObservables.push_back( cosZName );
+	//allObservables.push_back( cosPsiZName );
+	//allObservables.push_back( phiZName );
+	//allObservables.push_back( alphaName );
     allObservables.push_back( pionIDName );
 
     //Make the parameter set
@@ -842,6 +863,7 @@ bool DPTotalAmplitudePDF_withAcc_withBkg::SetPhysicsParameters( ParameterSet * N
 	KpiComponents[8]->setResonanceParameters( massK800, widthK800 );
 	KpiComponents[9]->setResonanceParameters( a_LASS, r_LASS );
 	ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
+	//ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magA0Zplus, magA0Zplus, phaseA0Zplus, phaseA0Zplus, phaseA0Zplus);
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
 	KpiComponents[2]->setHelicityAmplitudes(magA0Kst1680, magApKst1680, magAmKst1680, phaseA0Kst1680, phaseApKst1680, phaseAmKst1680);
@@ -865,8 +887,12 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	cosTheta1 = measurement->GetObservable( cosTheta1Name )->GetValue();
 	cosTheta2 = measurement->GetObservable( cosTheta2Name )->GetValue();
 	phi       = measurement->GetObservable( phiName )->GetValue();
+	//m13       = measurement->GetObservable( m13Name )->GetValue();
+	//cosZ = measurement->GetObservable( cosZName )->GetValue();
+	//cosPsiZ = measurement->GetObservable( cosPsiZName )->GetValue();
+	//phiZ       = measurement->GetObservable( phiZName )->GetValue();
+	//alpha      = measurement->GetObservable( alphaName )->GetValue();
 	pionID    = measurement->GetObservable( pionIDName )->GetValue();
-    //double m23_mapped = (m23 - 0.6333)/(1.591 - 0.6333)*2. + (-1); // should really do this in a generic way
     double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
     //double m23_mapped = (m23 - 0.64)/(1.68 - 0.64)*2. + (-1); // should really do this in a generic way
 
@@ -937,41 +963,11 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
             , belle_phiPsiZ
             , belle_phiZPsiPsi
             );
-	//cout << "K* " << m23 << " " << cosTheta2 << " " << cosTheta1 << " " << phi + TMath::Pi()<< endl;
-	//cout << "K* " << belle_m23 << " " << belle_cosKPi << " " << belle_cosPsi << " " << belle_phiKPiPsi << endl;
-	//cout << "Z  " << belle_m13 << " " << belle_cosZ << " " << belle_cosPsi_Z << " " << belle_phiPsiZ << endl;
 
-    /*
-	// Cos of the angle between psi reference axis
-	//double cosARefs = DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
-    double GcosThetaZ(0.);
-	double GcosThetaPsi(0.);
-	double Gdphi(0.);
-	double Gm13(0.);
-	pB.SetPxPyPzE(0., 0., 0., massB);
-	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
-	&GcosThetaZ, &GcosThetaPsi, &Gdphi, pionID);
-	Gm13 = (pMuPlus + pMuMinus + pPi).M();
-
-    TComplex Zamps[ZComponents.size()][3][3];
-    // Component [i][1][j] is intentionally not filled
-    // First index is Z, Second is the lambda_mu^Z, Third is the lambda_psi^Z
-    for (unsigned int i=0;i<ZComponents.size();++i)
-    {
-        Zamps[i][0][0]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                              -2,-2);
-        Zamps[i][2][0]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                               2,-2);
-        Zamps[i][0][1]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                              -2,0);
-        Zamps[i][2][1]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                               2,0);
-        Zamps[i][0][2]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                              -2,2);
-        Zamps[i][2][2]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                               2,2);
-    }
-    */
+    //cout << "K* ntuple " << m23 << " " << cosTheta2 << " " << cosTheta1 << " " << phi << " " << pionID << endl;
+    //cout << "K* calcul " << belle_m23 << " " << belle_cosKPi << " " << belle_cosPsi << " " << belle_phiKPiPsi << endl;
+	//cout << "Z  ntuple " << m13 << " " << cosZ << " " << cosPsiZ << " " << phiZ << " " << alpha << endl;
+	//cout << "Z  calcul " << belle_m13 << " " << belle_cosZ << " " << belle_cosPsi_Z << " " << belle_phiPsiZ << " " << belle_phiZPsiPsi << endl;
 
 	double result = 0.;
 	TComplex tmp(0,0);
@@ -1031,15 +1027,9 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 			    // Now comes sum over Z+ components and lambdaPsiPrime
 			    for (unsigned int i = lowerZ; i < upperZ; ++i)
 			    {
-                    tmp += ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi);
-                    /*
-                    // Sum over lambdaPsiPrime
-                    for (int twoLambdaPrime=-2; twoLambdaPrime<=2; twoLambdaPrime+=4)
-                    {
-                        tmp += wigner.function(cosARefs,double(twoLambdaPrime)/4,double(twoLambda)/4)*
-                            Zamps[i][twoLambdaPrime/2+1][twoLambdaPsi/2+1];
-                    }
-                    */
+                    //tmp += ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi);
+                    tmp += TComplex::Exp(0.5*TComplex::I()*twoLambda*belle_phiZPsiPsi)*(ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi));
+                    //std::cout << TComplex::Exp(0.5*TComplex::I()*twoLambda*belle_phiZPsiPsi) << " " << TComplex(cos(belle_phiZPsiPsi), 0.5*twoLambda*sin(belle_phiZPsiPsi)) << std::endl;
 			    }
 		}
 		result += tmp.Rho2();
@@ -1102,254 +1092,10 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
     return 0.;
 }
 
-
-//Calculate the function value for the numerical integral
-double DPTotalAmplitudePDF_withAcc_withBkg::EvaluateForNumericIntegral_TEST(DataPoint * measurement)
-{
-	// Observables
-	m23       = measurement->GetObservable( m23Name )->GetValue();
-	cosTheta1 = measurement->GetObservable( cosTheta1Name )->GetValue();
-	cosTheta2 = measurement->GetObservable( cosTheta2Name )->GetValue();
-	phi       = measurement->GetObservable( phiName )->GetValue();
-	pionID    = measurement->GetObservable( pionIDName )->GetValue();
-    //double m23_mapped = (m23 - 0.6333)/(1.591 - 0.6333)*2. + (-1); // should really do this in a generic way
-    double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
-    //double m23_mapped = (m23 - 0.64)/(1.68 - 0.64)*2. + (-1); // should really do this in a generic way
-
-#ifdef __RAPIDFIT_USE_GSL
-
-	double angularAcc(0.);
-    double Q_l(0.);
-    double P_i(0.);
-    double Y_jk(0.);
-	if ( useAngularAcceptance )
-	{
-        for ( int l = 0; l < l_max+1; l++ )
-        {
-        for ( int i = 0; i < i_max+1; i++ )
-        {
-            for ( int k = 0; k < 3; k++ )
-            {
-                for ( int j = 0; j < 3; j+=2 ) // limiting the loop here to only look at terms we need
-                {
-                    if (j < k) continue; // must have l >= k
-                    Q_l  = gsl_sf_legendre_Pl     (l,    m23_mapped);
-                    P_i  = gsl_sf_legendre_Pl     (i,    cosTheta2);
-                    // only consider case where k >= 0
-                    // these are the real valued spherical harmonics
-                    if ( k == 0 ) Y_jk =           gsl_sf_legendre_sphPlm (j, k, cosTheta1);
-                    else          Y_jk = sqrt(2) * gsl_sf_legendre_sphPlm (j, k, cosTheta1) * cos(k*phi);
-                    angularAcc += c[l][i][k][j]*(Q_l * P_i * Y_jk);
-                }
-            }
-        }
-        }
-    }
-    else {
-        angularAcc = 1.;//0.0195;
-    }
-    //if (angularAcc <= 0.) cout << "angular acc " << angularAcc << " " << m23 << " " << m23_mapped << " " << cosTheta1 << " " << phi << " " << cosTheta2 << endl;
-
-    // Calculate the Z angles
-    //DPHelpers::calculateFinalStateMomenta(massB, m23, massPsi,
-	//cosTheta1,  cosTheta2, phi, pionID, 0.1056583715, 0.1056583715, 0.13957018, 0.493677,
-	//pMuPlus, pMuMinus, pPi, pK);
-    DPHelpers::calculateFinalStateMomentaBelle(massB, m23, massPsi,
-                            cosTheta1, cosTheta2, phi,
-                            0.1056583715, 0.139570, 0.493677,
-                            pMuPlus, pMuMinus, pPi, pK);
-
-        double belle_m23(0.);
-        double belle_cosKPi(0.);
-        double belle_cosPsi(0.);
-        double belle_phiKPiPsi(0.);
-        double belle_m13(0.);
-        double belle_cosZ(0.);
-        double belle_cosPsi_Z(0.);
-        double belle_phiPsiZ(0.);
-        double belle_phiZPsiPsi(0.);
-        const TLorentzVector myMuPlus(pMuPlus);
-        const TLorentzVector myMuMinus(pMuMinus);
-        const TLorentzVector myPi(pPi);
-        const TLorentzVector myK(pK);
-        DPHelpers::Belle(myMuPlus, myMuMinus, myPi, myK
-            , belle_m23
-            , belle_cosKPi
-            , belle_cosPsi
-            , belle_phiKPiPsi
-            , belle_m13
-            , belle_cosZ
-            , belle_cosPsi_Z
-            , belle_phiPsiZ
-            , belle_phiZPsiPsi
-            );
-	//cout << "K* " << m23 << " " << cosTheta2 << " " << cosTheta1 << " " << phi + TMath::Pi()<< endl;
-	//cout << "K* " << belle_m23 << " " << belle_cosKPi << " " << belle_cosPsi << " " << belle_phiKPiPsi << endl;
-	//cout << "Z  " << belle_m13 << " " << belle_cosZ << " " << belle_cosPsi_Z << " " << belle_phiPsiZ << endl;
-
-    /*
-	// Cos of the angle between psi reference axis
-	//double cosARefs = DPHelpers::referenceAxisCosAngle(pB, pMuPlus, pMuMinus, pPi, pK);
-    double GcosThetaZ(0.);
-	double GcosThetaPsi(0.);
-	double Gdphi(0.);
-	double Gm13(0.);
-	pB.SetPxPyPzE(0., 0., 0., massB);
-	DPHelpers::calculateZplusAngles(pB, pMuPlus, pMuMinus, pPi, pK,
-	&GcosThetaZ, &GcosThetaPsi, &Gdphi, pionID);
-	Gm13 = (pMuPlus + pMuMinus + pPi).M();
-
-    TComplex Zamps[ZComponents.size()][3][3];
-    // Component [i][1][j] is intentionally not filled
-    // First index is Z, Second is the lambda_mu^Z, Third is the lambda_psi^Z
-    for (unsigned int i=0;i<ZComponents.size();++i)
-    {
-        Zamps[i][0][0]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                              -2,-2);
-        Zamps[i][2][0]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                               2,-2);
-        Zamps[i][0][1]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                              -2,0);
-        Zamps[i][2][1]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                               2,0);
-        Zamps[i][0][2]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                              -2,2);
-        Zamps[i][2][2]=ZComponents[i]->amplitudeProperVars(m13, cosThetaZ, cosThetaPsi, dphi, pionID,
-                               2,2);
-    }
-    */
-
-	double result = 0.;
-	TComplex tmp(0,0);
-
-	// This deals with the separate Kpi components
-	unsigned int lower = (unsigned)(componentIndex - 1);
-	unsigned int upper = (unsigned)componentIndex;
-	unsigned int lowerZ = 0;
-	unsigned int upperZ = 0;
-
-	// And this switchs things to deal with the Z components.
-    if ( (unsigned)componentIndex > KpiComponents.size() )
-	{
-		lower = 0;
-		upper = 0;
-		lowerZ = (unsigned)(componentIndex - KpiComponents.size() - 1);
-                upperZ = (unsigned)(componentIndex - KpiComponents.size());
-
-	}
-
-    // just plot the background
-    if ( componentIndex == 13 )
-    {
-		lower  = 0;
-		upper  = 0;
-		lowerZ = 0;
-		upperZ = 0;
-    }
-
-    if ( componentIndex == 100 ){
-		lower  = 0;
-		upper  = (unsigned)KpiComponents.size();
-		lowerZ = 0;
-		upperZ = 0;
-    }
-
-    // Finally, for the total of all components
-	if ( componentIndex == 0 ) {
-		lower  = 0;
-		upper  = (unsigned)KpiComponents.size();
-		lowerZ = 0;
-		upperZ = (unsigned)ZComponents.size();
-	}
-
-	// Now sum over final state helicities (this is not general code, but
-	// knows about internals of components
-	for (int twoLambda = -2; twoLambda <= 2; twoLambda += 4) // Sum over +-1
-	{
-		tmp = TComplex(0,0);
-		for (int twoLambdaPsi = -2; twoLambdaPsi <= 2; twoLambdaPsi += 2) // Sum over -1,0,+1
-		{
-			    for (unsigned int i = lower; i < upper; ++i) // sum over all components
-			    {
-				    tmp += KpiComponents[i]->amplitude(m23, cosTheta1, cosTheta2, phi,
-						twoLambda, twoLambdaPsi);
-			    }
-			    // Now comes sum over Z+ components and lambdaPsiPrime
-			    for (unsigned int i = lowerZ; i < upperZ; ++i)
-			    {
-                    tmp += ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi);
-                    /*
-                    // Sum over lambdaPsiPrime
-                    for (int twoLambdaPrime=-2; twoLambdaPrime<=2; twoLambdaPrime+=4)
-                    {
-                        tmp += wigner.function(cosARefs,double(twoLambdaPrime)/4,double(twoLambda)/4)*
-                            Zamps[i][twoLambdaPrime/2+1][twoLambdaPsi/2+1];
-                    }
-                    */
-			    }
-		}
-		result += tmp.Rho2();
-	}
-
-	//momenta are defined on eq 39.20a/b of the 2010 PDG
-	const double m1 = 0.493677;    // kaon mass
-	const double m2 = 0.139570; // pion mass
-	const double MB0= massB; // B0 mass
-
-	double t1 = m23*m23-(m1+m2)*(m1+m2);
-	double t2 = m23*m23-(m1-m2)*(m1-m2);
-
-	double t31 = MB0*MB0 - (m23 + massPsi)*(m23 + massPsi);
-	double t32 = MB0*MB0 - (m23 - massPsi)*(m23 - massPsi);
-
-	double p1_st = sqrt(t1*t2)/m23/2.;
-	double p3    = sqrt(t31*t32)/MB0/2.;
-
-	//std::cout << "NumInt " << result << " " << angularAcc << " " << p1_st << " " << p3 << " " << result*p1_st*p3 << std::endl;
-	double returnable_value = result * angularAcc * p1_st * p3;
-
-    double background(0.);
-
-    if ( (componentIndex == 0 || componentIndex == 13) && fraction > 0. )
-    {
-    for ( int l = 0; l < l_max_b+1; l++ )
-    {
-        for ( int i = 0; i < i_max_b+1; i++ )
-        {
-            for ( int k = 0; k < k_max_b+1; k++)
-            {
-                for ( int j = 0; j < 3; j+=2 ) // limiting the loop here to only look at terms we need
-                {
-                    //cout << "likj" << l << " " << i <<  " " << k << " " << j << endl;
-                    if (j < k) continue; // must have l >= k
-                    Q_l  = gsl_sf_legendre_Pl     (l,    m23_mapped);
-                    P_i  = gsl_sf_legendre_Pl     (i,    cosTheta2);
-                    // only consider case where k >= 0
-                    // these are the real valued spherical harmonics
-                    if ( k == 0 ) Y_jk =           gsl_sf_legendre_sphPlm (j, k, cosTheta1);
-                    else          Y_jk = sqrt(2) * gsl_sf_legendre_sphPlm (j, k, cosTheta1) * cos(k*phi);
-                    background += b[l][i][k][j]*(Q_l * P_i * Y_jk);
-                }
-            }
-        }
-    }
-    }
-    //cout << background << " " << fraction << " " << returnable_value << endl;
-    //returnable_value = background;
-    returnable_value = returnable_value + fraction*background;
-
-	if( isnan(returnable_value) || returnable_value < 0. ) return 0.;
-	else return returnable_value;
-
-    #endif
-
-    return 0.;
-}
-
 vector<string> DPTotalAmplitudePDF_withAcc_withBkg::PDFComponents()
 {
         vector<string> components_list;
-        /*components_list.push_back( "892" );
+        components_list.push_back( "892" );
         components_list.push_back( "1410" );
         components_list.push_back( "1680" );
         components_list.push_back( "1430" );
@@ -1362,8 +1108,8 @@ vector<string> DPTotalAmplitudePDF_withAcc_withBkg::PDFComponents()
         components_list.push_back( "NR" );
         components_list.push_back( "Z4430" );
         components_list.push_back( "background" );
-        */components_list.push_back( "0" );
-        //components_list.push_back( "1-Z" );
+        components_list.push_back( "0" );
+        components_list.push_back( "1-Z" );
         return components_list;
 }
 

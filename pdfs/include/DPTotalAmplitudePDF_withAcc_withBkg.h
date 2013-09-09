@@ -29,7 +29,6 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
-		virtual double EvaluateForNumericIntegral_TEST(DataPoint*);
 		double EvaluateComponent(DataPoint * measurement, ComponentRef* Component);
 		vector<string> PDFComponents();
 
@@ -47,6 +46,11 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 		ObservableRef cosTheta2Name;
 		ObservableRef phiName;
         ObservableRef pionIDName;
+		ObservableRef m13Name;
+		ObservableRef cosZName;
+		ObservableRef cosPsiZName;
+		ObservableRef phiZName;
+        ObservableRef alphaName;
 
 		int componentIndex;
 
@@ -55,6 +59,11 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 		double cosTheta2;
 		double phi;
         int pionID;
+		double m13;
+		double cosZ;
+		double cosPsiZ;
+		double phiZ;
+        double alpha;
 
 		// These contain the ObservableRefs that correspond
 		// to the observable names that are used in the

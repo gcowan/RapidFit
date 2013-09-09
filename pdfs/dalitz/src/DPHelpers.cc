@@ -115,6 +115,11 @@ void DPHelpers::Belle(const TLorentzVector & _pMuPlus,
                             (p3Psi.Cross(aK)).Dot(aMuPlus)/(p3Psi.Mag()*aK.Mag()*aMuPlus.Mag()),
                             aK.Dot(aMuPlus)/(aK.Mag()*aMuPlus.Mag())
                             );
+  if ( std::isnan(phiKPiPsi) )
+  {
+    //std::cout << "phi is nan" << std::endl;
+    phiKPiPsi = 0.;
+  }
 
 
   // ============= K* rest frame ============================
@@ -173,6 +178,11 @@ void DPHelpers::Belle(const TLorentzVector & _pMuPlus,
                           -(p3Pi_Z_Psi.Cross(aK_Z_Psi)).Dot(aMuPlus_Z_Psi)/(p3Pi_Z_Psi.Mag()*aK_Z_Psi.Mag()*aMuPlus_Z_Psi.Mag()),
                           aK_Z_Psi.Dot(aMuPlus_Z_Psi)/(aK_Z_Psi.Mag()*aMuPlus_Z_Psi.Mag())
                           );
+  if ( std::isnan(phiPsiZ) )
+  {
+    //std::cout << "phiZ is nan" << std::endl;
+    phiPsiZ = 0.;
+  }
 
 
 
@@ -202,6 +212,11 @@ void DPHelpers::Belle(const TLorentzVector & _pMuPlus,
                               (p3MuPlus_Psi.Cross(aPi_Psi)).Dot(aKPi_Psi)/(p3MuPlus_Psi.Mag()*aPi_Psi.Mag()*aKPi_Psi.Mag()),
                               aPi_Psi.Dot(aKPi_Psi)/(aPi_Psi.Mag()*aKPi_Psi.Mag())
                               );
+  if ( std::isnan(phiZPsiPsi) )
+  {
+    //std::cout << "phiZPsiPsi is nan" << std::endl; // this only happens once per integration, due to first point being exactly on the boundary
+    phiZPsiPsi = 0.;
+  }
 
 }
 
