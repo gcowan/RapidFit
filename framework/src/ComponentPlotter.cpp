@@ -1252,11 +1252,11 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 	stringstream thisStream;
 	if( conf != NULL )
 	{
-		thisStream << setprecision(2) << scientific << fabs(X_max-X_min)/((double)(conf->data_bins));
+		thisStream << setw(4) << setprecision(3) /*<< scientific*/ << fabs(X_max-X_min)/((double)(conf->data_bins));
 	}
 	else
 	{
-		thisStream << setprecision(2) << scientific << fabs(X_max-X_min)/100.;
+		thisStream << setw(4) << setprecision(3) /*<< scientific*/ << fabs(X_max-X_min)/100.;
 	}
 	Y_ext.Append( thisStream.str() );
 	Y_ext.Append(" ");
@@ -1490,9 +1490,9 @@ void ComponentPlotter::OutputPlot( TGraphErrors* input_data, vector<TGraph*> inp
 
 		pullGraph->GetYaxis()->SetTitle( "Pull" );
 		pullGraph->GetYaxis()->SetTitleSize( input_data->GetYaxis()->GetTitleSize() );
-		pullGraph->GetYaxis()->SetLabelSize( input_data->GetYaxis()->GetLabelSize() *1./0.5 );
+		pullGraph->GetYaxis()->SetLabelSize( input_data->GetYaxis()->GetLabelSize() *(Float_t)(1./0.5) );
 		pullGraph->GetXaxis()->SetTitleSize( input_data->GetXaxis()->GetTitleSize() );
-		pullGraph->GetXaxis()->SetLabelSize( input_data->GetXaxis()->GetLabelSize() *1./0.5 );
+		pullGraph->GetXaxis()->SetLabelSize( input_data->GetXaxis()->GetLabelSize() *(Float_t)(1./0.5) );
 		pullGraph->GetXaxis()->SetRangeUser( X_min, X_max );
 		//pullGraph->GetXaxis()->CenterTitle( true );
 		//pullGraph->GetXaxis()->SetTitle( X_Title );
@@ -1986,14 +1986,14 @@ TGraphErrors* ComponentPlotter::PullPlot1D( vector<double> input_bin_theory_data
 	c1->Print( TString("Overlay_"+observableName+"_"+Clean_Description+".png") );
 
 	TCanvas* c2 = EdStyle::RapidFitCanvas( "pull", "pull");
-    TString pull_name = "pull_"; pull_name.Append(observableName);
-    TH1D * pull_histograms = new TH1D(pull_name, pull_name, 20, -5, 5);
-    for ( int i = 0; i < input_bin_theory_data.size() ; i++ ) pull_histograms->Fill(pull_value[i]);
-    pull_histograms->Draw();
-    gStyle->SetOptFit(1);
-    pull_histograms->Fit("gaus");
-    c2->Update();
-    c2->Print( TString("pull"+observableName+".pdf") );
+	TString pull_name = "pull_"; pull_name.Append(observableName);
+	TH1D * pull_histograms = new TH1D(pull_name, pull_name, StatisticsFunctions::OptimumBinNumber( pull_value ), -5, 5);
+	for ( int i = 0; i < (int)input_bin_theory_data.size() ; i++ ) pull_histograms->Fill(pull_value[(unsigned)i]);
+	pull_histograms->Draw();
+	gStyle->SetOptFit(1);
+	pull_histograms->Fit("gaus");
+	c2->Update();
+	c2->Print( TString("pull"+observableName+"_"+Clean_Description+".pdf") );
     delete pull_histograms;
 
 	return pullGraph;

@@ -32,6 +32,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <iomanip>
+#include <complex>
 
 pthread_mutex_t ROOT_Lock = pthread_mutex_t();
 
@@ -136,79 +137,103 @@ namespace Mathematics
 
 	// use the approximation: erf(z) = exp(-z*z)/(sqrt(pi)*z) to explicitly cancel the divergent exp(y*y) behaviour of
 	// CWERF for z = x + i y with large negative y
-	RooComplex evalCerfApprox( double swt, double u, double c)
+	complex<double> evalCerfApprox( double swt, double u, double c)
 	{
 		const double swt_c=swt*c;
-		RooComplex z(swt_c,u+c);
-		RooComplex zc(u+c,-swt_c);
-		RooComplex zsq= z*z;
-		RooComplex v= -zsq - u*u;
-		return v.exp()*(-zsq.exp()/(zc*rootpi) + 1.)*2.; //why shoule be a 2 here?
+		complex<double> z(swt_c,u+c);
+		complex<double> zc(u+c,-swt_c);
+		complex<double> zsq= z*z;
+		complex<double> v= -zsq - u*u;
+		double v_mag = exp( v.real() );
+		complex<double> v_exp( v_mag*cos(v.imag()), v_mag*sin(v.imag()) );
+		double zsq_mag = exp( zsq.real() );
+		complex<double> zsq_exp( zsq_mag*cos(zsq.imag()), zsq_mag*sin(zsq.imag()) );
+		return v_exp*(-zsq_exp/(zc*rootpi) + 1.)*2.; //why shoule be a 2 here?
 		//   return v.exp()*(-zsq.exp()/(zc*rootpi) + 1);
 	}
 
 	// Calculate Re(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
 	double evalCerfRe( double swt, double u, double c)  {
+#if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 		RooComplex z( swt*c, u+c );
+#else
+		complex<double> z_stl( swt*c, u+c );
+#endif
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
-#ifdef __RAPIDFIT_USE_GSL
-			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
-			returnable = GSL_REAL( gsl_erf( gsl_z ) );
-#else
 			if( !RooMathinit )
 			{
 				pthread_mutex_lock( &ROOT_Lock );
 #if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,0)
+	#if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 				//      default RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
+	#endif
 #else
 				//	Should call the init function internally
+	#if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 				if( !RooMathinit ) returnable = RooMath::ITPComplexErrFuncRe( z, 13 )*exp( -u*u );
+	#else
+				if( !RooMathinit ) returnable = RooMath::faddeeva( z_stl ).real()*exp( -u*u );
+	#endif
+
 #endif
 				RooMathinit = true;
 				pthread_mutex_unlock( &ROOT_Lock );
 			}
+#if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 			returnable = RooMath::ITPComplexErrFuncRe( z, 13 )*exp( -u*u );
+#else
+			returnable = RooMath::faddeeva( z_stl ).real()*exp( -u*u );
 #endif
 		}
 		else
 		{
-			returnable = evalCerfApprox( swt, u, c ).re();
+			returnable = evalCerfApprox( swt, u, c ).real();
 		}
 		return returnable;
 	}
 
 	// Calculate Im(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
 	double evalCerfIm( double swt, double u, double c)  {
+#if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 		RooComplex z( swt*c, u+c );
+#else
+		complex<double> z_stl( swt*c, u+c );
+#endif
 		double returnable = 0.;
 		if( (u+c) > -4.0 )
 		{
-#ifdef __RAPIDFIT_USE_GSL
-			gsl_complex gsl_z = gsl_complex_rect( swt*c, u+c );
-			returnable = GSL_IMAG( gsl_erf( gsl_z ) );
-#else
 			if( !RooMathinit )
 			{
 				pthread_mutex_lock( &ROOT_Lock );
 #if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,0)
+	#if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 				//	default RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
+	#endif
 #else
 				//      Should call the init function internally
+	#if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 				if( !RooMathinit ) returnable = RooMath::ITPComplexErrFuncIm( z, 13 )*exp( -u*u );
+	#else
+				if( !RooMathinit ) returnable = RooMath::faddeeva( z_stl ).imag()*exp( -u*u );
+	#endif
+
 #endif
 				RooMathinit = true;
 				pthread_mutex_unlock( &ROOT_Lock );
 			}
+#if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 			returnable = RooMath::ITPComplexErrFuncIm( z, 13 )*exp( -u*u );
+#else
+			returnable = RooMath::faddeeva( z_stl ).imag()*exp( -u*u );
 #endif
 		}
 		else
 		{
-			returnable = evalCerfApprox( swt, u, c ).im();
+			returnable = evalCerfApprox( swt, u, c ).imag();
 		}
 		return returnable;
 	}
@@ -418,8 +443,8 @@ namespace Mathematics
 			const double umax = (thigh / resolution) *_over_sqrt_2 ;
 			const double umin = (tlow / resolution) *_over_sqrt_2 ;
 			const double wt = deltaM / gamma ;
-			RooComplex evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;
-			double deltaCos = -0.5/gamma/(1+wt*wt) * ( evalDif.re() + wt*evalDif.im() + RooMath::erf(-umax) - RooMath::erf(-umin) ) ;
+			complex<double> evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c));
+			double deltaCos = -0.5/gamma/(1+wt*wt) * ( evalDif.real() + wt*evalDif.imag() + RooMath::erf(-umax) - RooMath::erf(-umin) ) ;
 			return deltaCos ;
 		}
 
@@ -483,8 +508,8 @@ namespace Mathematics
 			const double umax = (thigh / resolution) *_over_sqrt_2 ;
 			const double umin = (tlow / resolution) *_over_sqrt_2 ;
 			const double wt = deltaM / gamma ;
-			RooComplex evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;
-			double deltaSin = -0.5/gamma/(1.+wt*wt) * ( -evalDif.im() +   wt*evalDif.re() -   -wt*(RooMath::erf(-umax) - RooMath::erf(-umin)) ) ;
+			complex<double> evalDif(evalCerfApprox(-wt,-umax,c) - evalCerfApprox(-wt,-umin,c)) ;
+			double deltaSin = -0.5/gamma/(1.+wt*wt) * ( -evalDif.imag() +   wt*evalDif.real() -   -wt*(RooMath::erf(-umax) - RooMath::erf(-umin)) ) ;
 			return deltaSin ;
 		}
 

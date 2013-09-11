@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/09/11 Rob Currie
+  - Minimal changes equired to make RapidFit 'play nice' with ROOT 5/34/10
+       Removed GSL implementation of cerf, it didn't work as expected (probably never will in current form)
+       Code still sits in Mathematics but is never called
+       Added new faddeeva cerf implementation, gets exactly the same results as before in ROOT
+       Moved a load of Mathematics code over to use complex<double> rather than RooComplex
+       Added missing stl:: and headers to pdf source code to make them compile, no other changes to the underlying code
+
 2013/09/09 Greig Cowan
   - Latest version of DP PDF.
 

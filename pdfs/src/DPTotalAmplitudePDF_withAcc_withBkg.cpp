@@ -1084,7 +1084,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
     //returnable_value = background;
     returnable_value = returnable_value + fraction*background;
 
-	if( isnan(returnable_value) || returnable_value < 0. ) return 0.;
+	if( std::isnan(returnable_value) || returnable_value < 0. ) return 0.;
 	else return returnable_value;
 
     #endif

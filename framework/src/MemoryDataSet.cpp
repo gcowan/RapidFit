@@ -419,14 +419,14 @@ double MemoryDataSet::GetSumWeightsSq() const
 
 void MemoryDataSet::ApplyAlpha( const double total_sum, const double total_sum_sq )
 {
-	alpha= total_sum / total_sum_sq;
+	alpha= fabs(total_sum / total_sum_sq);
 	ObservableRef WeightNameRef( WeightName );
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
 		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightNameRef )->GetValue() * alpha );
 	}
 	cout << "alpha = " << setprecision(10) << total_sum << "  /  " << total_sum_sq << endl;
-	cout << "Correction Factor: " << setprecision(5) << alpha << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
+	cout << "Correction Factor: " << setprecision(5) << fabs(alpha) << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
 }
 
 double MemoryDataSet::GetAlpha() const
@@ -440,7 +440,7 @@ double MemoryDataSet::GetAlpha() const
 			alphaSum+=allData[i]->GetObservable( alphaNameRef )->GetValue();
 		}
 		alphaSum/=(double)allData.size();
-		return alphaSum;
+		return fabs(alphaSum);
 	}
 	else
 	{

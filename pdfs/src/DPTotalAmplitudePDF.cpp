@@ -20,6 +20,7 @@
 #include "math.h"
 #include "TComplex.h"
 #include "RooMath.h"
+#include <fstream>
 
 PDF_CREATOR( DPTotalAmplitudePDF );
 

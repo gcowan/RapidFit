@@ -200,12 +200,14 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 	TGraph* r_coord_graph = Histogram_Processing::Get_TGraph( coords_rotated, (TRandom*)rand );	
 
 	TString TCanvas_Name_c("TCanvas_"); TCanvas_Name_c+=rand->Rndm();
+	TCanvas_Name_c = StringOperations::Clean( TCanvas_Name_c );
 	TCanvas* coord_c = EdStyle::RapidFitCanvas( TCanvas_Name_c, TCanvas_Name_c );
 	coord_graph->Draw("AP");
 	coord_c->Update();
 	Histogram_Processing::Silent_Print( coord_c, "coords.pdf" );
 
 	TString r_TCanvas_Name_c("TCanvas_"); r_TCanvas_Name_c+=rand->Rndm();
+	r_TCanvas_Name_c = StringOperations::Clean( r_TCanvas_Name_c );
 	TCanvas* r_coord_c = EdStyle::RapidFitCanvas( r_TCanvas_Name_c, r_TCanvas_Name_c );
 	r_coord_graph->Draw("AP");
 	r_coord_c->Update();
@@ -353,6 +355,7 @@ void Rapid2DLL::Plot_Contours( TString controlled_parameter1, TString controlled
 	//c1a->Update();
 
 	TString TCanvas_Name("TCanvas_"); TCanvas_Name+=rand->Rndm();
+	TCanvas_Name = StringOperations::Clean( TCanvas_Name );
 	TCanvas* c1 = EdStyle::RapidFitCanvas( TCanvas_Name, TCanvas_Name );
 
 	nll_hist->Draw("AXIS");
@@ -453,6 +456,7 @@ void Rapid2DLL::Plot_Free_Parameters( TTree* input_tree, TString controlled_para
 
 		param_hist->SetContour( 40 );
 		TString canvas_name("TCanvas_"); canvas_name+=rand->Rndm();
+		canvas_name = StringOperations::Clean( canvas_name );
 		TCanvas* c1 = EdStyle::RapidFitCanvas( canvas_name, canvas_name );
 
 		c1->SetTitle( "Variation in " + *param_i );
