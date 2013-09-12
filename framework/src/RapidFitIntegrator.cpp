@@ -378,7 +378,7 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 			cout << "RapidFitIntegrator: 1D Setting Up Constraints" << endl;
 		}
 	}
-	cout << "here" << endl;
+	//cout << "here" << endl;
 	//Find the observable range to integrate over
 	IConstraint * newConstraint = NULL;
 	try
@@ -396,16 +396,16 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 	double minimum = newConstraint->GetMinimum();
 	double maximum = newConstraint->GetMaximum();
 
-	cout << "here2" << endl;
-	cout << "1D Integration" << endl;
+	//cout << "here2" << endl;
+	//cout << "1D Integration" << endl;
 	//Do a 1D integration
 	oneDimensionIntegrator->SetFunction(*quickFunction);
 
-	cout << "Performing 1DInt" << endl;
+	//cout << "Performing 1DInt" << endl;
 	double output = oneDimensionIntegrator->Integral( minimum, maximum );
-	cout << output << endl;
+	//cout << output << endl;
 
-	cout << "here3" << endl;
+	//cout << "here3" << endl;
 	delete quickFunction;
 
 	return output;
