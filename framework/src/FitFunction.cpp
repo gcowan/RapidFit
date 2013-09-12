@@ -180,12 +180,21 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 			if( testIntegrator )
 			{
 				allData->GetResultPDF(resultIndex)->GetPDFIntegrator()->ForceTestStatus( false );
+				allData->GetResultPDF(resultIndex)->GetPDFIntegrator()->SetDebug( debug );
 				someVal = allData->GetResultPDF(resultIndex)->GetPDFIntegrator()->Integral(
 						allData->GetResultDataSet(resultIndex)->GetDataPoint( 0 ),
 						allData->GetResultDataSet(resultIndex)->GetBoundary() );
 			}
 		}
 		(void) someVal;
+
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitFunction" ) )
+			{
+				cout << "FitFunction: Finished Performing Integration Test" << endl;
+			}
+		}
 
 		if( Threads > 0 )
 		{
@@ -225,6 +234,14 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 	if( Threads > 0 )
 	{
 		fit_thread_data = new Fitting_Thread[ (unsigned) Threads ];
+	}
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "FitFunction" ) )
+		{
+			cout << "FitFunction: PhysicsBottle Set" << endl;
+		}
 	}
 }
 
@@ -266,14 +283,14 @@ double FitFunction::Evaluate()
 	//time_t start, end;
 	//time(&start);
 
-	#ifdef RAPIDFIT_USETGLTIMER
+#ifdef RAPIDFIT_USETGLTIMER
 	TGLStopwatch* thisWatch = NULL;
 	if( Fit_Tree !=NULL )
 	{
 		thisWatch = new TGLStopwatch();
 		thisWatch->Start();
 	}
-	#endif
+#endif
 	double minimiseValue = 0.0;
 	double temp=0.;
 	//Calculate the function value for each PDF-DataSet pair
@@ -328,11 +345,11 @@ double FitFunction::Evaluate()
 	//step_time = difftime( end, start );
 	if( Fit_Tree !=NULL )
 	{
-		#ifdef RAPIDFIT_USETGLTIMER
+#ifdef RAPIDFIT_USETGLTIMER
 		step_time = thisWatch->End();
-		#else
+#else
 		step_time = -1.;
-		#endif
+#endif
 		//thisWatch->Stop();
 		//step_time = thisWatch->CpuTime();
 		//delete thisWatch;
@@ -346,7 +363,7 @@ double FitFunction::Evaluate()
 		branch_objects[branch_objects.size()] = (Double_t) minimiseValue;
 		Fit_Tree->SetBranchAddress( "NLL", &(branch_objects[branch_objects.size()]) );
 		Fit_Tree->SetBranchAddress( "Call", &(fit_calls) );
-		
+
 		Fit_Tree->SetBranchAddress( "time", &(step_time) );
 		//cout << endl;
 		Fit_Tree->Fill();

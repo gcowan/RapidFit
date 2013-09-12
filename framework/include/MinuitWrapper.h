@@ -15,7 +15,7 @@
 #include "TMinuit.h"
 ///	RapidFit Headers
 #include "IMinimiser.h"
-#include "FitFunction.h"
+#include "IFitFunction.h"
 #include "FitResult.h"
 #include "FunctionContour.h"
 #include "ParameterSet.h"
@@ -39,7 +39,7 @@ class MinuitWrapper : public IMinimiser
 
 		//Interface functions
 		void SetOutputLevel( int );
-                virtual void SetupFit( FitFunction* );
+                virtual void SetupFit( IFitFunction* );
 		virtual void FixParameters( vector<double>, vector<string> );
 		virtual void Minimise();
 		virtual FitResult * GetFitResult();
@@ -50,7 +50,7 @@ class MinuitWrapper : public IMinimiser
 		virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
 		virtual void SetNSigma( int );
-		virtual FitFunction* GetFitFunction();
+		virtual IFitFunction* GetFitFunction();
 
 		ResultParameterSet* GetResultParameters( vector<string> allNames, ParameterSet* );
 		RapidFitMatrix* GetCovarianceMatrix();
@@ -68,7 +68,7 @@ class MinuitWrapper : public IMinimiser
 		MinuitWrapper& operator = ( const MinuitWrapper& );
 
 		static void Function( Int_t&, Double_t*, Double_t&, Double_t*, Int_t );
-		static FitFunction * function;
+		static IFitFunction * function;
 
 		TMinuit * minuit;
 		FitResult * fitResult;

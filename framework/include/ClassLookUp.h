@@ -15,7 +15,7 @@
 #include "IPDF.h"
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
-#include "FitFunction.h"
+#include "IFitFunction.h"
 #include "IMinimiser.h"
 #include "IDataGenerator.h"
 #include "IPrecalculator.h"
@@ -57,7 +57,7 @@ class ClassLookUp
 		 *
 		 * @return This returns a pointer to the FitFunction instance
 		 */
-		static FitFunction * LookUpFitFunctionName( string Name );
+		static IFitFunction * LookUpFitFunctionName( string Name );
 
 		/*!
 		 * @brief Function to return a named Minimiser by using a standard string comparison

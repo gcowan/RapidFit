@@ -11,7 +11,7 @@
 #define I_MINIMISER_H
 
 ///	RapidFit Headers
-#include "FitFunction.h"
+#include "IFitFunction.h"
 #include "FitResult.h"
 #include "PhysicsParameter.h"
 #include "RapidFitMatrix.h"
@@ -37,7 +37,7 @@ class IMinimiser
 		 *
 		 * @return Void
 		 */
-		virtual void SetupFit( FitFunction* ) = 0;
+		virtual void SetupFit( IFitFunction* ) = 0;
 
 		/*!
 		 * @brief Interface Function:
@@ -137,7 +137,7 @@ class IMinimiser
 		 *
 		 * @return Returns a pointer to the FitFunction that was Minimised in it's Minimised State
 		 */
-		virtual FitFunction* GetFitFunction() = 0;
+		virtual IFitFunction* GetFitFunction() = 0;
 
 		/*!
 		 * @brief Interface Function:

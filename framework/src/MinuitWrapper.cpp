@@ -38,7 +38,7 @@ using namespace::std;
 //const double STEP_SIZE = 0.001;
 
 //	Required to act as a 'global' pointer to the RapidFit fitfunction member of the MinuitWrapper Class
-FitFunction * MinuitWrapper::function = 0;
+IFitFunction * MinuitWrapper::function = 0;
 
 //Default constructor
 //MinuitWrapper::MinuitWrapper(): minuit(NULL), fitResult(NULL), contours(), print_verbosity( 0 ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
@@ -101,7 +101,7 @@ void MinuitWrapper::SetOutputLevel( int output_level )
 	//	minuit->SetPrintLevel( print_verbosity );
 }
 
-void MinuitWrapper::SetupFit( FitFunction* NewFunction )
+void MinuitWrapper::SetupFit( IFitFunction* NewFunction )
 {
 	function = NewFunction;
 	int errorFlag = 0;
@@ -172,7 +172,7 @@ void MinuitWrapper::SetupFit( FitFunction* NewFunction )
 	delete[] arguments;
 }
 
-FitFunction* MinuitWrapper::GetFitFunction()
+IFitFunction* MinuitWrapper::GetFitFunction()
 {
 	return function;
 }
@@ -277,7 +277,7 @@ void MinuitWrapper::Minimise()
         int fitStatus = 0;
         minuit->mnstat( minimumValue, fedm, errdef, variableParameters, parameterNumber, fitStatus );
 
-	int preHesseStatus = fitStatus;
+	//int preHesseStatus = fitStatus;
 
 	time(&timeNow);
 	cout << "\nFinal NLL: " << setprecision(15) << minimumValue << "\t\tStatus: " << fitStatus << "\t\t" << ctime(&timeNow) << endl << endl;

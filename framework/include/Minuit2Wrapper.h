@@ -17,6 +17,7 @@
 #include "RapidFitMatrix.h"
 //	RapidFit Headers
 #include "IMinimiser.h"
+#include "IFitFunction.h"
 #include "FitResult.h"
 //	Syetem Headers
 #include <vector>
@@ -31,7 +32,7 @@ class Minuit2Wrapper : public IMinimiser
 		~Minuit2Wrapper();
 
 		//Interface functions
-                virtual void SetupFit( FitFunction* );
+                virtual void SetupFit( IFitFunction* );
 		virtual void FixParameters( vector<double>, vector<string> );
 		virtual void Minimise();
 		virtual void SetOutputLevel( int ){};
@@ -43,7 +44,7 @@ class Minuit2Wrapper : public IMinimiser
                 virtual void SetOptions( vector<string> );
 		virtual void SetQuality( int );
 		virtual void SetNSigma( int );
-		virtual FitFunction* GetFitFunction();
+		virtual IFitFunction* GetFitFunction();
 
 		void CallHesse();
 		RapidFitMatrix* GetCovarianceMatrix();
@@ -58,7 +59,7 @@ class Minuit2Wrapper : public IMinimiser
 		//MnMigrad minuit;
 		Minuit2Function * function;
 		FunctionMinimum* minimum;
-		FitFunction* RapidFunction;
+		IFitFunction* RapidFunction;
 		FitResult * fitResult;
 		vector< pair< string, string > > contours;
                 int maxSteps;

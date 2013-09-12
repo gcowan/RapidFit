@@ -6,7 +6,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
 #include "MemoryDataSet.h"
@@ -25,9 +25,22 @@
 
 using namespace::std;
 
+MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary, vector<DataPoint*> inputData ) :
+	allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets(), WeightName(""), useWeights(false), alpha(1.), alphaName("uninitialized"), canDelete(false)
+{
+	for( unsigned int i=0; i< (unsigned)dataBoundary->GetNumberCombinations(); ++i )
+	{
+		allSubSets.push_back( -1 );
+	}
+	for( unsigned int i=0; i< inputData.size(); ++i )
+	{
+		this->AddDataPoint( inputData[i] );
+	}
+}
+
 //Constructor with correct argument
-MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) :
-	allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets(), WeightName(""), useWeights(false), alpha(1.), alphaName("uninitialized")
+MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary ) :
+	allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets(), WeightName(""), useWeights(false), alpha(1.), alphaName("uninitialized"), canDelete(true)
 {
 	for( unsigned int i=0; i< (unsigned)dataBoundary->GetNumberCombinations(); ++i )
 	{
@@ -39,7 +52,7 @@ MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary * NewBoundary ) :
 MemoryDataSet::~MemoryDataSet()
 {
 	delete dataBoundary;
-	while( !allData.empty() )
+	while( !allData.empty() && canDelete )
 	{
 		if( allData.back() != NULL ) delete allData.back();
 		allData.pop_back();
@@ -95,81 +108,6 @@ int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint ) const
 		pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( templateDataPoint );
 		unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
 		return (int) dataPointNum;
-		/*
-		try
-		{
-			int number = allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint, silence ) ];
-
-			if( number != -1 ) return number;
-			else
-			{
-
-				int counter = 0;
-				vector<string> allDiscrete = dataBoundary->GetDiscreteNames();
-
-				PhaseSpaceBoundary* temp_Boundary = new PhaseSpaceBoundary( *dataBoundary );
-
-				for( vector<string>::iterator disc_i = allDiscrete.begin(); disc_i != allDiscrete.end(); ++disc_i )
-				{
-					double val = templateDataPoint->GetObservable( *disc_i, silence )->GetValue();
-					ObservableDiscreteConstraint* thisConstraint = (ObservableDiscreteConstraint*) temp_Boundary->GetConstraint( *disc_i );
-					vector<double> vec_val( 1, val );
-					thisConstraint->SetValues( vec_val );
-				}
-
-				for( vector<DataPoint*>::const_iterator point_i = allData.begin(); point_i != allData.end(); ++point_i )
-				{
-					if( temp_Boundary->IsPointInBoundary( *point_i, silence ) )	++counter;
-				}
-				delete temp_Boundary;
-				allSubSets[ dataBoundary->GetDiscreteIndex( templateDataPoint ) ] = counter;
-				return counter;
-			}
-		}
-		catch(...)
-		{
-			vector<ObservableRef> missing;
-			vector<string> observables = templateDataPoint->GetAllNames();
-			vector<string> allDiscrete = dataBoundary->GetDiscreteNames();
-
-			for( vector<string>::iterator disc_i = allDiscrete.begin(); disc_i != allDiscrete.end(); ++disc_i )
-			{
-				if( StringProcessing::VectorContains( &observables, &(*disc_i) ) ==  -1 )
-				{
-					missing.push_back( *disc_i );
-					//cout << string(missing.back()) << endl;
-				}
-			}
-
-			vector<vector<double> > possible_values;
-
-			for( vector<ObservableRef>::iterator missing_i = missing.begin(); missing_i != missing.end(); ++missing_i )
-			{
-				possible_values.push_back( dataBoundary->GetConstraint( *missing_i )->GetValues() );
-			}
-
-			int total_count=0;
-
-			vector<vector<double> > possible_datapoints = StatisticsFunctions::Combinatorix( possible_values );
-
-			for( unsigned int i=0; i< possible_datapoints.size(); ++i )
-			{
-				DataPoint* newPoint = new DataPoint( *templateDataPoint );
-				for( unsigned int j=0; j< possible_datapoints[i].size(); ++j )
-				{
-					Observable* this_obs = new Observable( string(missing[j]), possible_datapoints[i][j], "unitless" );
-					//cout << string(missing[i]) << "\t" << possible_datapoints[i][j] << endl;
-					newPoint->AddObservable( string(missing[j]), this_obs );
-					delete this_obs;
-				}
-				//cout << string(missing[j]) << endl;
-				total_count+=this->GetDataNumber( newPoint );
-				delete newPoint;
-			}
-
-			return total_count;
-		}
-		*/
 	}
 }
 

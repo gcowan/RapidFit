@@ -96,9 +96,15 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 	}
 	if( input.oneDimensionIntegrator != NULL )
 	{
+		//ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
+		//(void) type;	//	For the global state of ROOT
+		//oneDimensionIntegrator = new IntegratorOneDim( type );//*(input.oneDimensionIntegrator) );
+		oneDimensionIntegrator = new IntegratorOneDim( *(input.oneDimensionIntegrator) );
+	}
+	else
+	{
 		ROOT::Math::IntegrationOneDim::Type type = ROOT::Math::IntegrationOneDim::kGAUSS;
-		(void) type;	//	For the global state of ROOT
-		//oneDimensionIntegrator = new IntegratorOneDim( );//*(input.oneDimensionIntegrator) );
+		oneDimensionIntegrator = new IntegratorOneDim(type);
 	}
 }
 
@@ -364,7 +370,15 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 {
 	(void) haveTestedIntegral;
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
-	if( debug != NULL ) quickFunction->SetDebug( debug );
+	if( debug != NULL )
+	{
+		quickFunction->SetDebug( debug );
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
+			cout << "RapidFitIntegrator: 1D Setting Up Constraints" << endl;
+		}
+	}
+	cout << "here" << endl;
 	//Find the observable range to integrate over
 	IConstraint * newConstraint = NULL;
 	try
@@ -382,14 +396,16 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 	double minimum = newConstraint->GetMinimum();
 	double maximum = newConstraint->GetMaximum();
 
-	//cout << "1D Integration" << endl;
+	cout << "here2" << endl;
+	cout << "1D Integration" << endl;
 	//Do a 1D integration
 	oneDimensionIntegrator->SetFunction(*quickFunction);
 
-	//cout << "Performing 1DInt" << endl;
+	cout << "Performing 1DInt" << endl;
 	double output = oneDimensionIntegrator->Integral( minimum, maximum );
-	//cout << output << endl;
+	cout << output << endl;
 
+	cout << "here3" << endl;
 	delete quickFunction;
 
 	return output;

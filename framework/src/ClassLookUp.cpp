@@ -205,23 +205,23 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 }
 
 //Look up the name of a fit function, and return an appropriate instance
-FitFunction * ClassLookUp::LookUpFitFunctionName( string Name )
+IFitFunction * ClassLookUp::LookUpFitFunctionName( string Name )
 {
 	if ( Name == "NegativeLogLikelihood" )
 	{
-		FitFunction* returnable = new NegativeLogLikelihood();
+		IFitFunction* returnable = (IFitFunction*) new NegativeLogLikelihood();
 		returnable->SetThreads(0);
 		return returnable;
 	}
 	if ( Name == "NegativeLogLikelihoodThreaded" )
 	{
-		FitFunction* returnable = new NegativeLogLikelihoodThreaded();
+		IFitFunction* returnable = (IFitFunction*) new NegativeLogLikelihoodThreaded();
 		returnable->SetThreads(-1);
 		return returnable;
 	}
 	if ( Name == "NegativeLogLikelihoodNumerical" )
 	{
-		FitFunction* returnable = new NegativeLogLikelihoodNumerical();
+		IFitFunction* returnable = (IFitFunction*) new NegativeLogLikelihoodNumerical();
 		returnable->SetThreads(-1);
 		return returnable;
 	}

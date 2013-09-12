@@ -24,7 +24,7 @@ using namespace::std;
 //}
 
 //Constructor with correct argument
-FumiliFunction::FumiliFunction( FitFunction* NewFitFunction, int NSigma ) : ParametricFunction( int(NewFitFunction->GetParameterSet()->GetAllNames().size()) ), function(NewFitFunction), parameters(), nSigma(NSigma)
+FumiliFunction::FumiliFunction( IFitFunction* NewFitFunction, int NSigma ) : ParametricFunction( int(NewFitFunction->GetParameterSet()->GetAllNames().size()) ), function(NewFitFunction), parameters(), nSigma(NSigma)
 {
 	// Need to change this constructor since we now pass the numParams and not the fit function
 	// Not entirely sure what to do here.

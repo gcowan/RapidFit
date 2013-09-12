@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/09/12 Rob Currie
+  - Added cleanF and cleanU make options to clean the framework and utils folder binaries to save having to rebuild binaries and cleanP to clean only the PDF objects
+  - Changed the way that FitFunction is passed around the codebase to use the new IFitFunction, just makes the codebase a little more consistent
+  - 'Fixed' bug to do with numerical 1D integration, i.e. it no longer segfaults when running some of the tutorials
+  - Changed preprocessor in IPDF to make --Debug instances of RapidFit finish when called
+  - Added new MultiThreaded Evaluate and Integrate functions. These aren't currently tied into anything useful and haven't been tested but will be plugged into a new FitFunction and/or Integration method which uses DataPoints
+
 2013/09/11 Rob Currie
   - Minimal changes equired to make RapidFit 'play nice' with ROOT 5/34/10
        Removed GSL implementation of cerf, it didn't work as expected (probably never will in current form)

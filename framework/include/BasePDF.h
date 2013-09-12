@@ -69,38 +69,38 @@
  *             (This interfaces with the NumericalIntegrator class)
  *
  *          EvaluateForNumericGeneration( DataPoint* )
-*             (This interfaces with the Toy DataSet Generators like Foam)
-	*
-	*
-	*
-	*
-	* @author Benjamin M Wynne bwynne@cern.ch
-	* @author Robert Currie rcurrie@cern.ch
-	*
-	*/
+ *             (This interfaces with the Toy DataSet Generators like Foam)
+ *
+ *
+ *
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ *
+*/
 
 #pragma once
 #ifndef BASE_PDF_H
 #define BASE_PDF_H
 
-	///	ROOT Headers
+///	ROOT Headers
 #include "TRandom.h"
 #include "TRandom3.h"
-	///	RapidFit Headers
+///	RapidFit Headers
 #include "IPDF.h"
 #include "ObservableRef.h"
 #include "PDFConfigurator.h"
 #include "ComponentRef.h"
 #include "PhaseSpaceBoundary.h"
 #include "ParameterSet.h"
-	///	System Headers
+///	System Headers
 #include <vector>
 #include <cmath>
 #include <pthread.h>
 
-	using namespace::std;
+using namespace::std;
 
-	class BasePDF : public IPDF
+class BasePDF : public IPDF
 {
 	public:
 		/*!

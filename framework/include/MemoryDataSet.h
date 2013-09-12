@@ -22,6 +22,7 @@ using namespace::std;
 class MemoryDataSet : public IDataSet
 {
 	public:
+		MemoryDataSet( PhaseSpaceBoundary*, vector<DataPoint*> );
 		MemoryDataSet( PhaseSpaceBoundary* );
 		~MemoryDataSet();
 
@@ -72,6 +73,8 @@ class MemoryDataSet : public IDataSet
 		string WeightName;
 		double alpha;
 		string alphaName;
+
+		bool canDelete;
 };
 
 bool compare_datapoints ( pair<DataPoint,ObservableRef> first, pair<DataPoint,ObservableRef> second );

@@ -16,6 +16,7 @@
 ///	RapidFit Headers
 #include "FitResult.h"
 #include "IMinimiser.h"
+#include "IFitFunction.h"
 #include "FitFunctionConfiguration.h"
 #include "MinimiserConfiguration.h"
 #include "PDFWithData.h"
@@ -164,7 +165,7 @@ class FitAssembler
 		 *
 		 * @return Passes the FitResult up the chain
 		 */
-		static FitResult * DoFit( IMinimiser*, FitFunction*, DebugClass* =NULL );
+		static FitResult * DoFit( IMinimiser*, IFitFunction*, DebugClass* =NULL );
 
 		/*!
 		 * @brief Second DoFit - Used for Constructing a FitFunction for passing to the Minimiser

@@ -155,6 +155,13 @@ distclean:
 	$(RM) $(EXEDIR)/* $(OBJDIR)/* $(OBJPDFDIR)/* $(OBJDALITZDIR)/* $(OBJUTILDIR)/* $(LIBDIR)/*
 #	$(RM) $(OUTPUT)
 
+cleanF  :
+	$(RM) $(EXEDIR)/* $(OBJDIR)/* $(LIBDIR)/*
+cleanU  :
+	$(RM) $(EXEDIR)/* $(OBJUTILDIR)/*
+cleanP  :
+	$(RM) $(OBJPDFDIR)/*
+
 
 #	Allow chosing of which compiler to use on systems with mutliple compilers
 clang: override CC=clang++

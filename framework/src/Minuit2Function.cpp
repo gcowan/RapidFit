@@ -21,7 +21,7 @@ const double ERROR_THINGY = 0.1;
 //}
 
 //Constructor with correct argument
-Minuit2Function::Minuit2Function( FitFunction * NewFitFunction, int nSigma ) : function(NewFitFunction), parameters(), up( NewFitFunction->UpErrorValue( nSigma ) )
+Minuit2Function::Minuit2Function( IFitFunction * NewFitFunction, int nSigma ) : function(NewFitFunction), parameters(), up( NewFitFunction->UpErrorValue( nSigma ) )
 {
 	parameters = new MnUserParameters();
 

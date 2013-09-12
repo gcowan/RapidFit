@@ -10,6 +10,7 @@
 //	RapidFit Headers
 #include "FitFunctionConfiguration.h"
 #include "ClassLookUp.h"
+#include "IFitFunction.h"
 ///	System Headers
 #include <string>
 #include <sstream>
@@ -40,9 +41,9 @@ FitFunctionConfiguration::~FitFunctionConfiguration()
 }
 
 //Return appropriate instance of FitFunction
-FitFunction * FitFunctionConfiguration::GetFitFunction()
+IFitFunction * FitFunctionConfiguration::GetFitFunction()
 {
-	FitFunction * theFunction = ClassLookUp::LookUpFitFunctionName(functionName);
+	IFitFunction * theFunction = ClassLookUp::LookUpFitFunctionName(functionName);
 
 	//Use event weights if specified
 	if( hasWeight )

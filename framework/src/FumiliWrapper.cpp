@@ -59,7 +59,7 @@ void FumiliWrapper::SetQuality( int newQuality )
 	Quality = newQuality;
 }
 
-void FumiliWrapper::SetupFit( FitFunction* NewFunction )
+void FumiliWrapper::SetupFit( IFitFunction* NewFunction )
 {
 	// Instantiate the FumiliFunction (which is just a parametric function)
 	// There is another constructor that takes a vector of parameters
@@ -67,7 +67,7 @@ void FumiliWrapper::SetupFit( FitFunction* NewFunction )
 	RapidFunction = NewFunction;
 }
 
-FitFunction* FumiliWrapper::GetFitFunction()
+IFitFunction* FumiliWrapper::GetFitFunction()
 {
 	return RapidFunction;
 }

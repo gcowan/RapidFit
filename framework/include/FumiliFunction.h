@@ -16,7 +16,7 @@
 #include "Minuit2/ParametricFunction.h"
 #include "Minuit2/MnUserParameters.h"
 ///	RapidFit Headers
-#include "FitFunction.h"
+#include "IFitFunction.h"
 
 using namespace ROOT::Minuit2;
 
@@ -24,7 +24,7 @@ class FumiliFunction : public ParametricFunction
 {
 	public:
 		//FumiliFunction();
-		FumiliFunction( FitFunction*, int );
+		FumiliFunction( IFitFunction*, int );
 		//FumiliFunction( int );
 		~FumiliFunction();
 
@@ -41,7 +41,7 @@ class FumiliFunction : public ParametricFunction
 		FumiliFunction ( const FumiliFunction& );
 		FumiliFunction& operator = ( const FumiliFunction& );
 
-		FitFunction * function;
+		IFitFunction * function;
 		MnUserParameters * parameters;
 		int nSigma;
 };

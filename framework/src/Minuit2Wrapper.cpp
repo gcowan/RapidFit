@@ -61,14 +61,14 @@ void Minuit2Wrapper::SetQuality( int newQuality )
 	Quality = newQuality;
 }
 
-void Minuit2Wrapper::SetupFit( FitFunction* NewFunction )
+void Minuit2Wrapper::SetupFit( IFitFunction* NewFunction )
 {
 	//Make a wrapper for the function
 	function = new Minuit2Function( NewFunction, nSigma );
 	RapidFunction = NewFunction;
 }
 
-FitFunction* Minuit2Wrapper::GetFitFunction()
+IFitFunction* Minuit2Wrapper::GetFitFunction()
 {
 	return RapidFunction;
 }

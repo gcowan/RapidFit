@@ -14,7 +14,7 @@
 ///	ROOT Headers
 #include "TString.h"
 ///	RapidFit Headers
-#include "FitFunction.h"
+#include "IFitFunction.h"
 #include "PhysicsBottle.h"
 #include "RapidFitIntegratorConfig.h"
 ///	System Headers
@@ -48,7 +48,7 @@ class FitFunctionConfiguration
 		/*!
 		 * Get a pointer to a newly constructed FitFunction
 		 */
-		FitFunction * GetFitFunction();
+		IFitFunction * GetFitFunction();
 	
 		/*!
 		 * Were Weights Used?

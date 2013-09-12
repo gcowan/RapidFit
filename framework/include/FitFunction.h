@@ -18,6 +18,7 @@
 #include "TTree.h"
 #include "TString.h"
 ///	RapidFit Headers
+#include "IFitFunction.h"
 #include "PhysicsBottle.h"
 #include "RapidFitIntegrator.h"
 #include "RapidFitIntegratorConfig.h"
@@ -29,7 +30,7 @@
 
 using namespace::std;
 
-class FitFunction
+class FitFunction : public IFitFunction
 {
 	public:
 		/*!

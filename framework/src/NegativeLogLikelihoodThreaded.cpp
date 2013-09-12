@@ -16,7 +16,7 @@
 
   @author Rob Currie rcurrie@cern.ch
   @date 2011
- */
+  */
 
 //	ROOT Headers
 #include "RooMath.h"
@@ -87,7 +87,7 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 	   cout << "=" << tot << endl;
 	   }
 	   }
-	 */
+	   */
 
 	//	Initialize the Fitting_Thread objects which contain the objects to be passed to each thread
 	for( unsigned int threadnum=0; threadnum< (unsigned)Threads; ++threadnum )
@@ -177,7 +177,7 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 		try
 		{
 			integral = thread_input->fittingPDF->Integral( *data_i, thread_input->FitBoundary );
-        }
+		}
 		catch( ... )
 		{
 			integral = DBL_MAX;
@@ -188,7 +188,7 @@ void* NegativeLogLikelihoodThreaded::ThreadWork( void *input_data )
 		   pthread_mutex_lock( debug_lock );
 		   cout << "hello" << endl;
 		   pthread_mutex_unlock( debug_lock );
-		 */
+		   */
 
 		//cout << value << "\t" << integral << endl;
 

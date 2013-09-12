@@ -16,7 +16,7 @@
 #include "Minuit2/MnUserParameters.h"
 #include "Minuit2/ParametricFunction.h"
 //	RapidFit Headers
-#include "FitFunction.h"
+#include "IFitFunction.h"
 
 using namespace ROOT::Minuit2;
 
@@ -24,7 +24,7 @@ class Minuit2Function : public FCNBase
 {
 	public:
 		//Minuit2Function();
-		Minuit2Function( FitFunction*, int );
+		Minuit2Function( IFitFunction*, int );
 		~Minuit2Function();
 
 		void SetSigma(int);
@@ -41,7 +41,7 @@ class Minuit2Function : public FCNBase
 		Minuit2Function ( const Minuit2Function& );
 		Minuit2Function& operator = ( const Minuit2Function& );
 
-		FitFunction * function;
+		IFitFunction * function;
 		MnUserParameters * parameters;
 		double up;
 };

@@ -63,7 +63,7 @@ class IDataSet
 		 *
 		 * @return Returns a pointer to the PaseSpace that the DataSet was allowed to fill
 		 */
-		virtual PhaseSpaceBoundary * GetBoundary() const = 0;
+		virtual PhaseSpaceBoundary* GetBoundary() const = 0;
 
 		virtual void SetBoundary( const PhaseSpaceBoundary* ) = 0;
 

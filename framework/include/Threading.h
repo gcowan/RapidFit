@@ -22,10 +22,11 @@ class IDataSet;
 struct Fitting_Thread{
 	explicit Fitting_Thread() :
 		dataSubSet(), fittingPDF(NULL), useWeights(false), dataPoint_Result(), FitBoundary(NULL),
-		stored_integral(0.), weightsSquared(false)
+		stored_integral(0.), weightsSquared(false), dataSet(NULL)
 	{}
 
 	vector<DataPoint*> dataSubSet;		/*!	DataPoints to be evaluated by this thread		*/
+	IDataSet* dataSet;			/*!	DataSet containtaining the DataPoints			*/
 	IPDF* fittingPDF;			/*!	Pointer to the PDF instance to be used by this thread	*/
 	bool useWeights;			/*!	Are we performing a weighted fit?			*/
 	vector<double> dataPoint_Result;	/*!	Result for evaluating each datapoint			*/

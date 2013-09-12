@@ -428,7 +428,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		if( debuggingON )
 		{
 			PDF_THREAD_LOCK
-			cout << "BasePDF: Have Previously Texted Analytical Integral and it is GOOD :D" << endl;
+			cout << "BasePDF: Have Previously Tested Analytical Integral and it is GOOD :D" << endl;
 			PDF_THREAD_UNLOCK
 		}
 		if( this->CacheValid( NewDataPoint, NewBoundary ) )
@@ -591,11 +591,11 @@ double BasePDF::EvaluateForNumericGeneration( DataPoint* NewDataPoint )
 	catch(...)
 	{
 		PDF_THREAD_LOCK
-			cerr << "BasePDF: Failed to Correctly Generate a Sensible Value here:" << endl;
+		cerr << "BasePDF: Failed to Correctly Generate a Sensible Value here:" << endl;
 		NewDataPoint->Print();
 		cerr << "BasePDF: Returning 0.!!!" << endl;
 		PDF_THREAD_UNLOCK
-			return 0.;
+		return 0.;
 	}
 	return returnable;
 }
@@ -611,11 +611,11 @@ double BasePDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	catch(...)
 	{
 		PDF_THREAD_LOCK
-			cerr << "BasePDF: Failed to Correctly Integrate a Sensible Value here:" << endl;
+		cerr << "BasePDF: Failed to Correctly Integrate a Sensible Value here:" << endl;
 		NewDataPoint->Print();
 		cerr << "BasePDF: Returning 0.!!!" << endl;
 		PDF_THREAD_UNLOCK
-			return 0.;
+		return 0.;
 	}
 	return returnable;
 }

@@ -55,7 +55,7 @@ void FitAssembler::SafeMinimise( IMinimiser* Minimiser )
 }
 
 //The final stage - do the minimisation
-FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, FitFunction * TheFunction, DebugClass* debug )
+FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, IFitFunction * TheFunction, DebugClass* debug )
 {
 	Minimiser->SetupFit( TheFunction );
 
@@ -116,7 +116,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
                 }
         }
 
-		FitFunction * theFunction = FunctionConfig->GetFitFunction();
+		IFitFunction* theFunction = FunctionConfig->GetFitFunction();
 		theFunction->SetPhysicsBottle(Bottle);
 
         if( debug != NULL )
@@ -182,7 +182,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 	}
 
-	FitFunction * theFunction = FunctionConfig->GetFitFunction();
+	IFitFunction* theFunction = FunctionConfig->GetFitFunction();
 	theFunction->SetDebug( debug );
 
 	if( debug != NULL )           
@@ -889,7 +889,7 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 }
 
 
-FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
+FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration* FunctionConfig, ParameterSet* BottleParameters,
 		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, bool forceContinue, int OutputLevel, DebugClass* debug )
 {
 	cout << endl << "******* Result of Petes Double fit strategy  (NOT flipping delta_s as well) *********" << endl ;
@@ -955,7 +955,7 @@ FitResult * FitAssembler::Petes_DoSafeFit( MinimiserConfiguration * MinimiserCon
 	return res;
 }
 
-FitResult * FitAssembler::PetesGamma_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
+FitResult * FitAssembler::PetesGamma_DoSafeFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration* FunctionConfig, ParameterSet* BottleParameters,
 		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints, bool forceContinue, int OutputLevel, DebugClass* debug )
 {
 	cout << endl << "******* Result of Petes Double fit strategy for flipping deltaGamma *********" << endl ;
