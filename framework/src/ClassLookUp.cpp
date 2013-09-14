@@ -21,6 +21,7 @@
 #include "FumiliWrapper.h"
 #include "NegativeLogLikelihood.h"
 #include "NegativeLogLikelihoodThreaded.h"
+#include "NegativeLogLikelihoodThreadedNew.h"
 #include "NegativeLogLikelihoodNumerical.h"
 #include "Foam.h"
 #include "AcceptReject.h"
@@ -213,13 +214,19 @@ IFitFunction * ClassLookUp::LookUpFitFunctionName( string Name )
 		returnable->SetThreads(0);
 		return returnable;
 	}
-	if ( Name == "NegativeLogLikelihoodThreaded" )
+	else if ( Name == "NegativeLogLikelihoodThreaded" )
 	{
 		IFitFunction* returnable = (IFitFunction*) new NegativeLogLikelihoodThreaded();
 		returnable->SetThreads(-1);
 		return returnable;
 	}
-	if ( Name == "NegativeLogLikelihoodNumerical" )
+	else if ( Name == "NegativeLogLikelihoodThreadedNew" )
+	{
+		IFitFunction* returnable = (IFitFunction*) new NegativeLogLikelihoodThreadedNew();
+		returnable->SetThreads(-1);
+		return returnable;
+	}
+	else if ( Name == "NegativeLogLikelihoodNumerical" )
 	{
 		IFitFunction* returnable = (IFitFunction*) new NegativeLogLikelihoodNumerical();
 		returnable->SetThreads(-1);

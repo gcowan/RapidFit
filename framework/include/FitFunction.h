@@ -213,6 +213,9 @@ class FitFunction : public IFitFunction
 		double step_time;
 
 		unsigned int callNum;
+
+		vector<vector<IDataSet*> > stored_datasets;
+
 };
 
 #endif

@@ -7,6 +7,7 @@
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
   */
+
 //	ROOT Headers
 #include "TFile.h"
 #include "TTree.h"
@@ -21,6 +22,7 @@
 #include "ClassLookUp.h"
 #include "RapidFitIntegrator.h"
 #include "StringProcessing.h"
+#include "MemoryDataSet.h"
 #include "ProdPDF.h"
 //	System Headers
 #include <iostream>
@@ -207,6 +209,12 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 				}
 			}
 			StoredDataSubSet.push_back( Threading::divideData( NewBottle->GetResultDataSet(resultIndex), Threads ) );
+			vector<IDataSet*> sets;
+			for( unsigned int i=0; i<  StoredDataSubSet.back().size(); ++i )
+			{
+				sets.push_back( new MemoryDataSet( NewBottle->GetResultDataSet(resultIndex)->GetBoundary(), StoredDataSubSet.back()[i] ) );
+			}
+			stored_datasets.push_back( sets );
 			for( int i=0; i< Threads; ++i )
 			{
 				if( debug != NULL )

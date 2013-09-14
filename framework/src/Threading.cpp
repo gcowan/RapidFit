@@ -7,6 +7,7 @@
 #include "IDataSet.h"
 #include "Threading.h"
 #include "ClassLookUp.h"
+#include "MemoryDataSet.h"
 //	System Headers
 #ifdef _WIN32
 #include <windows.h>
@@ -36,7 +37,7 @@ int Threading::numCores()
 	//
 	//	However,	ROOT does things in a painful way when dealing with a global scope and so it's
 	//			extremely difficult to determine if I was run as a library or a standalone exectuable
-	//			If anyone knows of a variable defined _ONLY_ duing running _within_ CINT
+	//			If anyone knows of a variable defined _ONLY_ during running _within_ CINT
 	//				PLEASE LET ME KNOW	rcurrie@cern.ch
 	string root_exe = "root.exe";
 	string pathName = ClassLookUp::getSelfPath();
@@ -115,13 +116,42 @@ vector<vector<DataPoint*> > Threading::divideData( IDataSet* input, int subsets 
 	{
 		for( int i= subsets*subset_size; i< input->GetDataNumber() ; ++i )
 		{
-			output_datasets[0].push_back( input->GetDataPoint( i ) );
+			output_datasets.back().push_back( input->GetDataPoint( i ) );
 		}
 	}
 
 	return output_datasets;
 }
 
+//      Method to return a vector of data subset(s)
+vector<IDataSet*> Threading::divideDataSet( IDataSet* input, unsigned int subsets )
+{
+	vector<IDataSet*> output_datasets;
+	if( subsets <= 0 ) subsets = 1;
+
+	unsigned int subset_size = (unsigned)int( (double)input->GetDataNumber() / (double)subsets );
+
+	for( unsigned int setnum = 0; setnum < subsets; ++setnum )
+	{
+		vector<DataPoint*> temp_dataset;
+		for( unsigned int i=0; i< subset_size; ++i )
+		{
+			temp_dataset.push_back( input->GetDataPoint( setnum * subset_size + i ) );
+		}
+		output_datasets.push_back( new MemoryDataSet( input->GetBoundary(), temp_dataset ) );
+	}
+
+	//      The theory goes that the subset_size >> subsets and hence lumping this all onto one subset is negligible in the effect on runtime and _MUCH_ easier to code
+	if( subsets*subset_size != (unsigned)input->GetDataNumber() )
+	{
+		for( unsigned int i= subsets*subset_size; i< (unsigned) input->GetDataNumber(); ++i )
+		{
+			output_datasets.back()->AddDataPoint( input->GetDataPoint( i ) );
+		}
+	}
+
+	return output_datasets;
+}
 
 //      Method to return a vector of data subset(s)
 vector<vector<double*> > Threading::divideDataNormalise( vector<double*> input, int subsets )
@@ -146,9 +176,10 @@ vector<vector<double*> > Threading::divideDataNormalise( vector<double*> input, 
 	{
 		for( unsigned int i= ((unsigned)subsets)*subset_size; i< (unsigned)input.size(); ++i )
 		{
-			output_datasets[0].push_back( input[ i ] );
+			output_datasets.back().push_back( input[ i ] );
 		}
 	}
 
 	return output_datasets;
 }
+

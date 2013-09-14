@@ -9,7 +9,7 @@
 </ParameterSet>
 <Minimiser>Minuit</Minimiser>
 <FitFunction>
-<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+<FunctionName>NegativeLogLikelihoodThreadedNew</FunctionName>
 <Threads>16</Threads>
 </FitFunction>
 <ToFit>
@@ -39,4 +39,5 @@
 		<Points>50</Points>
 	</Scan>
 </Output>
+<Seed>12345</Seed>
 </RapidFit>

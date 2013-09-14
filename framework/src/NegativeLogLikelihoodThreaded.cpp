@@ -151,6 +151,9 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 	delete [] Thread;
 
 	//cout << total << endl;
+	//exit(0);
+
+	//cout << total << endl;
 	return -total;
 }
 

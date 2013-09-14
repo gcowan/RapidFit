@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/09/13 Rob Currie
+  - Added preliminary NLLThreadedNew class which makes use of the MultiThreaded functions which have now been somewhat debugged.
+       This works for the 1fb JpsiPhi analysis but has a performance penalty for very simple toys, this is being explored
+
 2013/09/12 Rob Currie
   - Added cleanF and cleanU make options to clean the framework and utils folder binaries to save having to rebuild binaries and cleanP to clean only the PDF objects
   - Changed the way that FitFunction is passed around the codebase to use the new IFitFunction, just makes the codebase a little more consistent

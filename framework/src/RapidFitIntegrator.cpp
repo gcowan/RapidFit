@@ -1082,17 +1082,17 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 	{
 		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
 		{
-			cout << endl << "Dont:" << endl;
+			cout << endl << "Dont Integrate:" << endl;
 			for( unsigned int i=0; i< dontIntegrate.size(); ++i )
 			{
 				cout << dontIntegrate[i] << "  ";
 			}
-			cout << endl << "Do:" << endl;
+			cout << endl << "Do Integrate:" << endl;
 			for( unsigned int i=0; i< allIntegrable.size(); ++i )
 			{
 				cout << allIntegrable[i] << "  ";
 			}
-			cout << endl << "Left:" << endl;
+			cout << endl << "Left to Integrate:" << endl;
 			for( unsigned int i=0; i< doIntegrate.size(); ++i )
 			{
 				cout << doIntegrate[i] << " ";

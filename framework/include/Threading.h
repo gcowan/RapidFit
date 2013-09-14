@@ -48,12 +48,16 @@ class Threading
 		//	Split the data into subset(s) with a safe default
 		static vector<vector<DataPoint*> > divideData( IDataSet*, int=1 );
 
+		static vector<IDataSet*> divideDataSet( IDataSet* input, unsigned int subsets=1 );
+
 		//	Function to divide the data values used in the threaded GSL Norm function
 		static vector<vector<double*> > divideDataNormalise( vector<double*> input, int subsets=1 );
 
 	private:
+
 		//	Cannot Construct this class, it's simply a collection of static methods
 		Threading();
+		~Threading();
 };
 
 #endif

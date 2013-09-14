@@ -52,10 +52,13 @@ MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary ) :
 MemoryDataSet::~MemoryDataSet()
 {
 	delete dataBoundary;
-	while( !allData.empty() && canDelete )
+	if( canDelete )
 	{
-		if( allData.back() != NULL ) delete allData.back();
-		allData.pop_back();
+		while( !allData.empty() )
+		{
+			if( allData.back() != NULL ) delete allData.back();
+			allData.pop_back();
+		}
 	}
 }
 
