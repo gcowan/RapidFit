@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/09/16 Rob Currie
+  - Stripped down v6 PDF and added example of new Resolution model usage
+  - 'Moved' Resolution Model over to use an interface original class still in framework for testing and fzero v6 which is to be ported later
+  - Changed interface classes to have protected constructors to prevent them accidentally being constructed by a user
+  - Added initial implementation of Double Gaussian functions for per-event and Fixed time Res (these are yet to be tested)
+  - Some minor bugfixes
+
 2013/09/13 Rob Currie
   - Added preliminary NLLThreadedNew class which makes use of the MultiThreaded functions which have now been somewhat debugged.
        This works for the 1fb JpsiPhi analysis but has a performance penalty for very simple toys, this is being explored

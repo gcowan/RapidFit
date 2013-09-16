@@ -23,11 +23,6 @@ class IDataSet
 {
 	public:
 		/*!
-		 * @brief Default Destructor
-		 */
-		IDataSet() {};
-
-		/*!
 		 * @brief Interface Function:
 		 *        Return DataPoint at given number
 		 *
@@ -130,6 +125,12 @@ class IDataSet
 
 		virtual void ClearAllPseudoObservables() = 0;
 
+	protected:
+		/*!
+		 * @brief Default Destructor
+		 */
+		IDataSet() {};
+
 	private:
 
 		/*!
@@ -150,4 +151,5 @@ class IDataSet
 };
 
 #endif
+
 

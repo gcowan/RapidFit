@@ -61,6 +61,8 @@ class MemoryDataSet : public IDataSet
 		virtual void Print() const;
 
 		void ClearAllPseudoObservables();
+
+		void SafeAddDataPoint( DataPoint* NewDataPoint );
 	private:
 		//	Uncopyable!
 		MemoryDataSet ( const MemoryDataSet& );

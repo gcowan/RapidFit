@@ -33,11 +33,6 @@ class IFitFunction
 {
 	public:
 		/*!
-		 * @breif Default Constructor
-		 */
-		IFitFunction() {};
-
-		/*!
 		 * @brief Default Detructor
 		 */
 		virtual ~IFitFunction() {};
@@ -157,6 +152,8 @@ class IFitFunction
 		virtual unsigned int GetCallNum() = 0;
 
 	protected:
+		IFitFunction() {};
+
 		/*!
 		 * Don't Copy the class this way!
 		 */

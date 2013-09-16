@@ -15,7 +15,7 @@
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
 #include "SlicedAcceptance.h"
-#include "ResolutionModel.h"
+#include "IResolutionModel.h"
 #include "AngularAcceptance.h"
 #include "Mathematics.h"
 #include <iostream>
@@ -34,8 +34,8 @@ using namespace::std;
 class Bs2JpsiPhi_Signal_v6 : public BasePDF
 {
 	public:
+		Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input );
 		Bs2JpsiPhi_Signal_v6( PDFConfigurator* );
-		Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& );
 		~Bs2JpsiPhi_Signal_v6();
 
 		// Mandatory RapidFit Methods
@@ -50,9 +50,7 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		double EvaluateComponent( DataPoint* input, ComponentRef* );
 
 	private:
-		//Bs2JpsiPhi_Signal_v6& operator=( const Bs2JpsiPhi_Signal_v6& );
 		void MakePrototypes();
-		//double normalisationCacheUntagged;
 		void prepareCDS();
 
 		//void prepareTimeFac();
@@ -120,26 +118,6 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		ObservableRef mistagDeltaP1Name;		// mistag calib
 		ObservableRef mistagDeltaP0Name;		// mistag calib
 		ObservableRef mistagDeltaSetPointName;// mistag calib
-
-		//ObservableRef eventResolutionName;			// Scale to multiply all Gaussians with
-		//ObservableRef resScaleName;			// Scale to multiply all Gaussians with
-		//ObservableRef res1Name;				// time resolution narrow
-		//ObservableRef res2Name;				// time resolution wide
-		//ObservableRef res3Name;				// time resolution tail
-		//ObservableRef res2FractionName;		// fraction of wide
-		//ObservableRef res3FractionName;		// fraction of tail
-		//ObservableRef timeOffsetName;		// time offset
-
-		ObservableRef angAccI1Name;
-		ObservableRef angAccI2Name;
-		ObservableRef angAccI3Name;
-		ObservableRef angAccI4Name;
-		ObservableRef angAccI5Name;
-		ObservableRef angAccI6Name;
-		ObservableRef angAccI7Name;
-		ObservableRef angAccI8Name;
-		ObservableRef angAccI9Name;
-		ObservableRef angAccI10Name;
 
 		// Observables
 		ObservableRef timeName;		// proper time
@@ -234,22 +212,12 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		double _mistagDeltaP0;
 		double _mistagDeltaSetPoint;
 
-		//double resolution;
-		//double resolutionScale;
-		//double resolution1;
-		//double resolution2;
-		//double resolution3;
-		//double resolution2Fraction;
-		//double resolution3Fraction;
-		//double timeOffset;
-        //double eventResolution;
-
-        // This flag is somewhat outdated now that there is a ResolutionModel
-        // Kept for now as  aplaceholder as we will need other configuration to choose the model. 
-        bool _useEventResolution;
+		// This flag is somewhat outdated now that there is a ResolutionModel
+		// Kept for now as  aplaceholder as we will need other configuration to choose the model. 
+		bool _useEventResolution;
 		inline bool useEventResolution() const {return _useEventResolution; }
 
-        ResolutionModel * resolutionModel ;
+		IResolutionModel * resolutionModel;
 
 		double angAccI1;
 		double angAccI2;
@@ -279,19 +247,9 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		void preCalculateTimeFactors();
 		void preCalculateTimeIntegrals();
 
-    
-		//bool timeIntegralCacheValid;
-		//vector< double > storeExpL;
-		//vector< double > storeExpH;
-		//vector< double > storeExpSin;
-		//vector< double > storeExpCos;
-  
-        //void CacheTimeIntegrals();
-		//void deCacheTimeIntegrals( unsigned int islice );
-
 		//Time acceptance
-        bool _useTimeAcceptance;
-        inline bool useTimeAcceptance() const { return _useTimeAcceptance; }
+		bool _useTimeAcceptance;
+		inline bool useTimeAcceptance() const { return _useTimeAcceptance; }
 		SlicedAcceptance* timeAcc;
 
 		//Configurationparameters
@@ -326,57 +284,26 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 
 		double stored_AT;
 		inline double AT() const { return stored_AT; }
-		/*	if( Aperp_sq <= 0. ) return 0. ;
-			else return sqrt(Aperp_sq) ;
-		}*/
+
 		double stored_AP;
 		inline double AP() const { return stored_AP; }
-		/*	if( Apara_sq <= 0. ) return 0. ;
-			else return sqrt(Apara_sq) ;
-		}*/
+		
 		double stored_A0;
 		inline double A0() const { return stored_A0; }
-		/*	if( Azero_sq <= 0. ) return 0. ;
-			else return sqrt(Azero_sq) ;
-		}*/
+		
 		double stored_AS;
 		inline double AS() const { return stored_AS; }
-		/*	if( As_sq <= 0. ) return 0. ;
-			else return sqrt(As_sq) ;
-		}*/
+		
 		double stored_ASint;
 		inline double ASint() const { return stored_ASint; }
-		/*	if( As_sq <= 0. ) return 0. ;
-			else return sqrt(As_sq) * Csp ;
-		}*/
 
 		//....................
 		// Safety for gammas
 		double stored_gammal;
 		inline double gamma_l() const { return stored_gammal; }
-		/*	const double gl = gamma() + ( dgam *0.5 ) ;
-			if( gl < 0. ) {
-				PDF_THREAD_LOCK
-				cerr << " In Bs2JpsiPhi_Signal_v6 : gamma_l() < 0 so setting it to 0.0000001 " << endl ;
-				PDF_THREAD_UNLOCK
-				return 0.0000001 ;
-			}
-			else
-				return gl ;
-		}*/
 
 		double stored_gammah;
 		inline double gamma_h() const { return stored_gammah; }
-		/*	const double gh = gamma() - ( dgam *0.5 ) ;
-			if( gh < 0. ) {
-				PDF_THREAD_LOCK
-				cerr << " In Bs2JpsiPhi_Signal_v6 : gamma_h() < 0 so setting it to 0.0000001 " << endl ;
-				PDF_THREAD_UNLOCK
-				return 0.0000001 ;
-			}
-			else
-				return gh ;
-		}*/
 
 		inline double gamma() const { return _gamma ; }
 
@@ -489,8 +416,6 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 
 		inline double D1() const {  return 1.0 - q()*(mistagB()-mistagBbar()); }
 		inline double D2() const {  return q()*( 1.0 - mistagB() -mistagBbar() ); }
-		//inline double D1() const {  return 1.0 ; }
-		//inline double D2() const {  return  ( q()*( 1.0 - mistagB() -mistagBbar() ) ) / ( 1.0 - q()*(mistagB()-mistagBbar())  )  ; }
 
 
 		//.....................
@@ -524,9 +449,6 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		double diffXsecNorm1();
 		double diffXsecCompositeNorm1(  );
 
-		//bool normalisationCacheValid;
-		//double normalisationCacheValue[3];
-		//double normalisationCacheValueRes2[3] ;
 
 		void DebugPrint( string , double ) const;
 		void DebugPrintXsec( string , double ) const;

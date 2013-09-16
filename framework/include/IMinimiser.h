@@ -170,6 +170,9 @@ class IMinimiser
 		virtual void SetNSigma( int nSigma ) = 0;
 
 		virtual void SetDebug( DebugClass* debug ) = 0;
+
+	protected:
+		IMinimiser() {};
 };
 
 #endif

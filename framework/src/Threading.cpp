@@ -146,7 +146,7 @@ vector<IDataSet*> Threading::divideDataSet( IDataSet* input, unsigned int subset
 	{
 		for( unsigned int i= subsets*subset_size; i< (unsigned) input->GetDataNumber(); ++i )
 		{
-			output_datasets.back()->AddDataPoint( input->GetDataPoint( i ) );
+			((MemoryDataSet*)output_datasets.back())->SafeAddDataPoint( input->GetDataPoint( i ) );
 		}
 	}
 

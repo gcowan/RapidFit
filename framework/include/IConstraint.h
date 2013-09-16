@@ -25,10 +25,6 @@ class IConstraint
 {
 	public:
 		/*!
-		 * @brief Default Constructor
-		 */
-		IConstraint() {};
-		/*!
 		 * @brief Default Destructor
 		 */
 		virtual ~IConstraint() {};
@@ -144,6 +140,12 @@ class IConstraint
 		 * @return Returns the XML to construct this object as a flat string
 		 */
 		virtual string XML() const = 0;
+
+	protected:
+		/*!
+		 * @brief Default Constructor
+		 */
+		IConstraint() {};
 };
 
 #endif

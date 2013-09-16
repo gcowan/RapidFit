@@ -34,7 +34,7 @@ MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary, vector<DataPoint*
 	}
 	for( unsigned int i=0; i< inputData.size(); ++i )
 	{
-		this->AddDataPoint( inputData[i] );
+		this->SafeAddDataPoint( inputData[i] );
 	}
 }
 
@@ -85,6 +85,13 @@ bool MemoryDataSet::AddDataPoint( DataPoint* NewDataPoint )
 		//cerr << "Data point is not within data set boundary" << endl;
 		return false;
 	}
+}
+
+//Add a data point to the set
+void MemoryDataSet::SafeAddDataPoint( DataPoint* NewDataPoint )
+{
+	allData.push_back( NewDataPoint );
+	allData.back()->SetPhaseSpaceBoundary( dataBoundary );
 }
 
 //Retrieve the data point with the given index

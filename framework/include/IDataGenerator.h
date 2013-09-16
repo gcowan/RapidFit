@@ -35,7 +35,11 @@ class IDataGenerator
 		 * Virtual Destructor
 		 */
 		virtual ~IDataGenerator() {};
+
+	protected:
+		IDataGenerator() {};
 };
 
 #endif
+
 

@@ -33,6 +33,9 @@ class IPrecalculator
 		 * @brief Virtual Destructor
 		 */
 		virtual ~IPrecalculator() {};
+
+	protected:
+		IPrecalculator() {};
 };
 
 #endif

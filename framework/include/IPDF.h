@@ -62,11 +62,6 @@ class IPDF
 {
 	public:
 		/*!
-		 * Default Constructor
-		 */
-		IPDF() {};
-
-		/*!
 		 * Virtual Destructor
 		 */
 		virtual ~IPDF()
@@ -345,11 +340,15 @@ class IPDF
 		virtual void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary ) = 0;
 
 	protected:
+		/*!
+		 * Default Constructor
+		 */
+		IPDF() {};
 
 		/*!
-		* Interface Function:
-		* Set if the PDF be safely copied through it's copy constructor?
-		*/
+		 * Interface Function:
+		 * Set if the PDF be safely copied through it's copy constructor?
+		 */
 		virtual void SetCopyConstructorSafe( bool = true ) = 0;
 
 		virtual bool SetPhysicsParameters( ParameterSet* Input ) = 0;
@@ -413,11 +412,11 @@ extern "C" IPDF* CopyPDF_##X( const IPDF& input ) { \
  */
 #define PDF_THREAD_LOCK\
 	bool hasOwnership=false;\
-	if( this->DebugMutex() != NULL )\
-	{\
-		hasOwnership=true;\
-		pthread_mutex_lock( this->DebugMutex() );\
-	}\
+if( this->DebugMutex() != NULL )\
+{\
+	hasOwnership=true;\
+	pthread_mutex_lock( this->DebugMutex() );\
+}\
 
 
 #define PDF_THREAD_UNLOCK\
