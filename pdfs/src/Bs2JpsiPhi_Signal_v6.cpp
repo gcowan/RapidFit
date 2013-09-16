@@ -9,7 +9,7 @@
 
 #include "Mathematics.h"
 #include "PerEventResModel.h"
-#include "DoubleResolutionModel.h"
+#include "FixedResolutionModel.h"
 #include "Bs2JpsiPhi_Angluar_Terms.h"
 #include "Bs2JpsiPhi_Signal_v6.h"
 
@@ -107,7 +107,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 	}
 	else
 	{
-		resolutionModel = new DoubleResolutionModel( input.GetConfigurator(), true );
+		resolutionModel = new FixedResolutionModel( input.GetConfigurator(), true );
 	}
 }
 
@@ -280,7 +280,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	}
 	else
 	{
-		resolutionModel = new DoubleResolutionModel( configurator, isCopy );
+		resolutionModel = new FixedResolutionModel( configurator, isCopy );
 	}
 
 	if( resolutionModel->isPerEvent()  ) this->TurnCachingOff();

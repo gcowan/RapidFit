@@ -27,7 +27,7 @@ DoubleResolutionModel::DoubleResolutionModel( PDFConfigurator* configurator, boo
 	resScale2Name            ( configurator->getName( "timeResolutionScale2" ) ),
 	timeResFracName            ( configurator->getName( "timeResFraction" ) ),
 	eventResolutionName	( configurator->getName( "eventResolution" ) ),
-	numberComponents( 1 ), wantedComponent( 1 ), resFrac( 1. )
+	numberComponents( 2 ), wantedComponent( 1 ), resFrac( 1. )
 {
 	if( !quiet) cout << "DoubleResolutionModel:: Instance created " << endl ;
 }

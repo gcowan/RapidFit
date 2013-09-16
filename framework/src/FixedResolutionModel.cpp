@@ -1,5 +1,5 @@
 /**
-  @class DoubleFixedResModel
+  @class FixedResolutionModel
 
   A class for holding a sliced propertime acceptance
 
@@ -8,7 +8,7 @@
   */
 
 
-#include "DoubleFixedResModel.h"
+#include "FixedResolutionModel.h"
 #include "StringProcessing.h"
 #include "Mathematics.h"
 
@@ -22,42 +22,36 @@ using namespace::std;
 
 //............................................
 // Constructor 
-DoubleFixedResModel::DoubleFixedResModel( PDFConfigurator* configurator, bool quiet ) :
+FixedResolutionModel::FixedResolutionModel( PDFConfigurator* configurator, bool quiet ) :
 	resScaleName		( configurator->getName( "timeResolutionScale" ) ),
-	resScale2Name            ( configurator->getName( "timeResolutionScale2" ) ),
-	timeResFracName            ( configurator->getName( "timeResFraction" ) ),
 	eventResolutionName	( configurator->getName( "eventResolution" ) ),
-	numberComponents( 2 ), wantedComponent( 1 )
+	numberComponents( 1 ), wantedComponent( 1 )
 {
-	if( !quiet) cout << "DoubleFixedResModel:: Instance created " << endl ;
+	if( !quiet) cout << "FixedResolutionModel:: Instance created " << endl ;
 }
 
 
 //..........................
 //This method allows the instance to add the parameters it needs to the list
-void DoubleFixedResModel::addParameters( vector<string> & parameterNames )
+void FixedResolutionModel::addParameters( vector<string> & parameterNames )
 {
 	parameterNames.push_back( resScaleName );
-	parameterNames.push_back( resScale2Name );
-	parameterNames.push_back( timeResFracName );
 	parameterNames.push_back( eventResolutionName );
 	return;
 }
 
 //..........................
 //To take the current value of a parameter into the instance
-void DoubleFixedResModel::setParameters( ParameterSet & parameters )
+void FixedResolutionModel::setParameters( ParameterSet & parameters )
 {
 	eventResolution = parameters.GetPhysicsParameter( eventResolutionName )->GetValue();
 	resScale = parameters.GetPhysicsParameter( resScaleName )->GetValue();
-	resScale2 = parameters.GetPhysicsParameter( resScale2Name )->GetValue();
-	resFrac = parameters.GetPhysicsParameter( timeResFracName )->GetValue();
 	return;
 }
 
 //..........................
 //This method allows the instance to add the specific observables it needs to the list
-void DoubleFixedResModel::addObservables( vector<string> & observableNames )
+void FixedResolutionModel::addObservables( vector<string> & observableNames )
 {
 	(void) observableNames;
 	//observableNames.push_back( eventResolutionName );
@@ -66,7 +60,7 @@ void DoubleFixedResModel::addObservables( vector<string> & observableNames )
 
 //..........................
 //To take the current value of an obserable into the instance
-void DoubleFixedResModel::setObservables( DataPoint * measurement )
+void FixedResolutionModel::setObservables( DataPoint * measurement )
 {
 	(void) measurement;
 	//eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
@@ -75,63 +69,54 @@ void DoubleFixedResModel::setObservables( DataPoint * measurement )
 
 //..........................
 //To take the current value of an obserable into the instance
-bool DoubleFixedResModel::isPerEvent( ) {  return false; }
+bool FixedResolutionModel::isPerEvent( ) {  return false; }
 
 //..............................
 // Primitive Functions
-double DoubleFixedResModel::Exp( double time, double gamma ) {
+double FixedResolutionModel::Exp( double time, double gamma ) {
 	return Mathematics::Exp( time, gamma, this->GetThisScale() );
 }
 
-double DoubleFixedResModel::ExpInt( double tlow, double thigh, double gamma ) {
+double FixedResolutionModel::ExpInt( double tlow, double thigh, double gamma ) {
 	return Mathematics::ExpInt( tlow, thigh, gamma, this->GetThisScale() );
 }
 
-double DoubleFixedResModel::ExpSin( double time, double gamma, double dms ) {
+double FixedResolutionModel::ExpSin( double time, double gamma, double dms ) {
 	return Mathematics::ExpSin( time, gamma, dms, this->GetThisScale() );
 }
-double DoubleFixedResModel::ExpSinInt( double tlow, double thigh, double gamma, double dms ) {
+double FixedResolutionModel::ExpSinInt( double tlow, double thigh, double gamma, double dms ) {
 	return Mathematics::ExpSinInt( tlow, thigh, gamma, dms, this->GetThisScale() );
 }
 
-double DoubleFixedResModel::ExpCos( double time, double gamma, double dms ) {
+double FixedResolutionModel::ExpCos( double time, double gamma, double dms ) {
 	return Mathematics::ExpCos( time, gamma, dms, this->GetThisScale() );
 }
-double DoubleFixedResModel::ExpCosInt( double tlow, double thigh, double gamma, double dms ) {
+double FixedResolutionModel::ExpCosInt( double tlow, double thigh, double gamma, double dms ) {
 	//cout << " tlow" << tlow << "   thigh  "  << thigh << "   gamma  "  << gamma << "  dms  "  << dms  << "    res  " << eventResolution*resScale << endl;
 	return Mathematics::ExpCosInt( tlow, thigh, gamma, dms, this->GetThisScale() );
 }
 
-double DoubleFixedResModel::GetThisScale()
+double FixedResolutionModel::GetThisScale()
 {
 	double thisRes = eventResolution;
-	if( wantedComponent == 1 ) { eventResolution *= resScale; }
-	else if( wantedComponent == 2 ) { eventResolution *= resScale2; }
-	else { eventResolution *= resScale; }
+	eventResolution *= resScale;
 	return thisRes;
 }
 
-unsigned int DoubleFixedResModel::numComponents()
+unsigned int FixedResolutionModel::numComponents()
 {
 	return numberComponents;
 }
 
-void DoubleFixedResModel::requestComponent( unsigned int wanted )
+void FixedResolutionModel::requestComponent( unsigned int wanted )
 {
 	wantedComponent = wanted;
 	return;
 }
 
-double DoubleFixedResModel::GetFraction( unsigned int input )
+double FixedResolutionModel::GetFraction( unsigned int input )
 {
-	if( input == 1 )
-	{
-		return resFrac;
-	}
-	else if( input == 2 )
-	{
-		return (1.-resFrac);
-	}
-	else return 0.;
+	(void) input;
+	return 1.;
 }
 

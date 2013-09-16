@@ -2,8 +2,10 @@
 
 2013/09/16 Rob Currie
   - Stripped down v6 PDF and added example of new Resolution model usage
+  - Removed all reference to PseudoObservables, they were a nice idea, but were crashing and ultimately didn't work as hoped
   - 'Moved' Resolution Model over to use an interface original class still in framework for testing and fzero v6 which is to be ported later
   - Changed interface classes to have protected constructors to prevent them accidentally being constructed by a user
+  - Added simple Fixed timeResoltion Model which uses a PhysicsParameter to set the centre of the time res values
   - Added initial implementation of Double Gaussian functions for per-event and Fixed time Res (these are yet to be tested)
   - Some minor bugfixes
 
