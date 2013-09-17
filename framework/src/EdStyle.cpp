@@ -284,13 +284,15 @@ TString EdStyle::GetParamRootUnit( string Param_Name )
 
 		returnable_string = "[ps]";
 
-	} else if ( ( Param_Name == "helphi" ) || ( Param_Name == "trphi" ) ) {
+	} else if ( ( ( Param_Name == "helphi" ) || ( Param_Name == "trphi" ) ) || Param_Name == "phi" ) {
 
 		returnable_string = "[rad]";
 
-	} else if ( ( Param_Name == "helcosthetaK" || Param_Name == "helcosthetaL" ) || ( Param_Name == "trcostheta" || Param_Name == "trcospsi" ) ) {
+	} else if ( ( ( Param_Name == "helcosthetaK" || Param_Name == "helcosthetaL" ) || ( Param_Name == "trcostheta" || Param_Name == "trcospsi" ) )
 
-		returnable_string = "unitless";
+		    || ( Param_Name == "cosTheta" || Param_Name == "cosPsi" ) ) {
+
+		returnable_string = "";//[unitless]";
 	}
 
 	return returnable_string;
@@ -576,17 +578,17 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 
 		returnable_string = "#phi_{H}";
 
-	} else if ( Param_Name == "trcostheta" ) {
+	} else if ( Param_Name == "trcostheta" || Param_Name == "cosTheta" ) {
 
-		returnable_string = "cos(#theta)";
+		returnable_string = "cos(#theta_{tr})";
 
-	} else if ( Param_Name == "trcospsi" ) {
+	} else if ( Param_Name == "trcospsi" || Param_Name == "cosPsi" ) {
 
-		returnable_string = "cos(#psi)";
+		returnable_string = "cos(#psi_{tr})";
 
-	} else if ( Param_Name == "trphi" ) {
+	} else if ( Param_Name == "trphi" || Param_Name == "phi" ) {
 
-		returnable_string = "#phi";
+		returnable_string = "#phi_{tr}";
 
 	} else {
 

@@ -99,7 +99,7 @@ double FixedResolutionModel::ExpCosInt( double tlow, double thigh, double gamma,
 double FixedResolutionModel::GetThisScale()
 {
 	double thisRes = eventResolution;
-	eventResolution *= resScale;
+	thisRes *= resScale;
 	return thisRes;
 }
 

@@ -105,9 +105,9 @@ double DoubleFixedResModel::ExpCosInt( double tlow, double thigh, double gamma, 
 double DoubleFixedResModel::GetThisScale()
 {
 	double thisRes = eventResolution;
-	if( wantedComponent == 1 ) { eventResolution *= resScale; }
-	else if( wantedComponent == 2 ) { eventResolution *= resScale2; }
-	else { eventResolution *= resScale; }
+	if( wantedComponent == 1 ) { thisRes *= resScale; }
+	else if( wantedComponent == 2 ) { thisRes *= resScale2; }
+	else { thisRes *= resScale; }
 	return thisRes;
 }
 
@@ -134,4 +134,3 @@ double DoubleFixedResModel::GetFraction( unsigned int input )
 	}
 	else return 0.;
 }
-

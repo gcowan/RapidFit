@@ -73,9 +73,7 @@ class FixedResolutionModel : public IResolutionModel
 		double GetThisScale();
 
 		ObservableRef resScaleName;			// Scale to multiply e-by-e resolution
-		ObservableRef resScale2Name;
 		double resScale;
-		double resScale2;
 
 		ObservableRef eventResolutionName;  // Event-by-event resolution observable
 		double eventResolution;

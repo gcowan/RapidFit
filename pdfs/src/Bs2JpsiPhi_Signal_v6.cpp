@@ -295,7 +295,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	//histCounter = 0;
 	//~PELC
 
-	this->SetCopyConstructorSafe( false );
+	//this->SetCopyConstructorSafe( false );
 }
 
 //........................................................
@@ -635,7 +635,7 @@ double Bs2JpsiPhi_Signal_v6::Evaluate(DataPoint * measurement)
 
 	for( unsigned int i=0; i< resolutionModel->numComponents(); ++i )
 	{
-		resolutionModel->requestComponent( i );
+		resolutionModel->requestComponent( i+1 );
 		returnValue += this->diffXsec( ) * resolutionModel->GetFraction( i );
 	}
 
