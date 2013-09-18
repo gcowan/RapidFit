@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/09/18 Rob Currie
+  - Added TripleFixed time Resolution class
+  - Added improvement into FitAssembler to should about multiple missing PhysicsParameters at once, rather than aborting at the first missing parameter
+  - Added new tRes models to v6 to allow us to switch between models based on the XML
+      Moved a load of functions in the Resolution interface to be protected, nice structure which would be easy to modify in the future and works with v6
+      Testing the Double/Triple but they appear to be giving sensible NLL values so far
+
 2013/09/16 Rob Currie
   - Stripped down v6 PDF and added example of new Resolution model usage
   - Removed all reference to PseudoObservables, they were a nice idea, but were crashing and ultimately didn't work as hoped

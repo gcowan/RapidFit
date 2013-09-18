@@ -80,26 +80,57 @@ bool DoubleFixedResModel::isPerEvent( ) {  return false; }
 //..............................
 // Primitive Functions
 double DoubleFixedResModel::Exp( double time, double gamma ) {
-	return Mathematics::Exp( time, gamma, this->GetThisScale() );
+	double returnable = 0.;
+	this->requestComponent( 1 );
+	returnable += Mathematics::Exp( time, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
+	this->requestComponent( 2 );
+	returnable += Mathematics::Exp( time, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
+	return returnable;
 }
 
 double DoubleFixedResModel::ExpInt( double tlow, double thigh, double gamma ) {
-	return Mathematics::ExpInt( tlow, thigh, gamma, this->GetThisScale() );
+	double returnable = 0.;
+	this->requestComponent( 1 );
+	returnable += Mathematics::ExpInt( tlow, thigh, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
+	this->requestComponent( 2 );
+	returnable += Mathematics::ExpInt( tlow, thigh, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
+	return returnable;
 }
 
 double DoubleFixedResModel::ExpSin( double time, double gamma, double dms ) {
-	return Mathematics::ExpSin( time, gamma, dms, this->GetThisScale() );
+	double returnable = 0.;
+	this->requestComponent( 1 );
+	returnable += Mathematics::ExpSin( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	this->requestComponent( 2 );
+	returnable += Mathematics::ExpSin( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	return returnable;
 }
 double DoubleFixedResModel::ExpSinInt( double tlow, double thigh, double gamma, double dms ) {
-	return Mathematics::ExpSinInt( tlow, thigh, gamma, dms, this->GetThisScale() );
+	double returnable = 0.;
+	this->requestComponent( 1 );
+	returnable += Mathematics::ExpSinInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	this->requestComponent( 2 );
+	returnable += Mathematics::ExpSinInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	return returnable;
 }
 
 double DoubleFixedResModel::ExpCos( double time, double gamma, double dms ) {
-	return Mathematics::ExpCos( time, gamma, dms, this->GetThisScale() );
+	double returnable = 0.;
+	this->requestComponent( 1 );
+	returnable += Mathematics::ExpCos( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	this->requestComponent( 2 );
+	returnable += Mathematics::ExpCos( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	return returnable;
 }
+
 double DoubleFixedResModel::ExpCosInt( double tlow, double thigh, double gamma, double dms ) {
 	//cout << " tlow" << tlow << "   thigh  "  << thigh << "   gamma  "  << gamma << "  dms  "  << dms  << "    res  " << eventResolution*resScale << endl;
-	return Mathematics::ExpCosInt( tlow, thigh, gamma, dms, this->GetThisScale() );
+	double returnable = 0.;
+	this->requestComponent( 1 );
+	returnable += Mathematics::ExpCosInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	this->requestComponent( 2 );
+	returnable += Mathematics::ExpCosInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	return returnable;
 }
 
 double DoubleFixedResModel::GetThisScale()
@@ -134,3 +165,4 @@ double DoubleFixedResModel::GetFraction( unsigned int input )
 	}
 	else return 0.;
 }
+

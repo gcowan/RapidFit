@@ -31,8 +31,6 @@ class IResolutionModel
 {
 	public:
 
-		virtual ~IResolutionModel() {};
-
 		virtual void addParameters( vector<string> & parameterNames ) = 0;
 		virtual void setParameters( ParameterSet & parameters ) = 0;
 
@@ -50,15 +48,15 @@ class IResolutionModel
 
 		virtual bool isPerEvent() = 0;
 
+		virtual ~IResolutionModel() {};
+	protected:
+
 		virtual unsigned int numComponents() = 0;
 		virtual void requestComponent( unsigned int ) = 0;
 
 		virtual double GetFraction( unsigned int ) = 0;
 
-	protected:
-
 		IResolutionModel() {};
-
 };
 
 #endif

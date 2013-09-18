@@ -265,6 +265,8 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		bool performingComponentProjection;
 		double _offsetToGammaForBetaFactor;
 
+		bool _useDoubleTres, _useTripleTres;
+
 		double sin_delta_perp_s;
 		double cos_delta_perp_s;
 		double sin_delta_zero_s;

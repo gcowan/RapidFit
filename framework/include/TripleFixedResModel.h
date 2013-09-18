@@ -10,8 +10,8 @@
   */
 
 #pragma once
-#ifndef SingleResolution_Model_H
-#define SingleResolution_Model_H
+#ifndef TripleFixedResolution_Model_H
+#define TripleFixedResolution_Model_H
 
 //	RapidFir Headers
 #include "ParameterSet.h"
@@ -30,11 +30,11 @@ using namespace::std;
 
 //=======================================
 
-class FixedResolutionModel : public IResolutionModel
+class TripleFixedResModel : public IResolutionModel
 {
 	public:
 
-		FixedResolutionModel( PDFConfigurator* configurator, bool quiet=false ) ;
+		TripleFixedResModel( PDFConfigurator* configurator, bool quiet=false ) ;
 
 		void addParameters( vector<string> & parameterNames ) ;
 		void setParameters( ParameterSet & parameters ) ;
@@ -65,7 +65,11 @@ class FixedResolutionModel : public IResolutionModel
 		double GetThisScale();
 
 		ObservableRef resScaleName;			// Scale to multiply e-by-e resolution
+		ObservableRef resScale2Name;
+		ObservableRef resScale3Name;
 		double resScale;
+		double resScale2;
+		double resScale3;
 
 		ObservableRef eventResolutionName;  // Event-by-event resolution observable
 		double eventResolution;
@@ -73,8 +77,10 @@ class FixedResolutionModel : public IResolutionModel
 		unsigned int numberComponents;
 		unsigned int wantedComponent;
 
-		ObservableRef timeResFracName;
-		double resFrac;
+		ObservableRef timeResFrac2Name;
+		ObservableRef timeResFrac3Name;
+		double resFrac2;
+		double resFrac3;
 };
 
 #endif

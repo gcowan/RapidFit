@@ -9,7 +9,10 @@
 
 #include "Mathematics.h"
 #include "PerEventResModel.h"
+#include "DoubleResolutionModel.h"
 #include "FixedResolutionModel.h"
+#include "DoubleFixedResModel.h"
+#include "TripleFixedResModel.h"
 #include "Bs2JpsiPhi_Angluar_Terms.h"
 #include "Bs2JpsiPhi_Signal_v6.h"
 
@@ -23,6 +26,7 @@ using namespace::std;
 PDF_CREATOR( Bs2JpsiPhi_Signal_v6 );
 
 Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) : BasePDF( (BasePDF&) input )
+
         , gammaName(input.gammaName), deltaGammaName(input.deltaGammaName), deltaMName(input.deltaMName), Phi_sName(input.Phi_sName), Azero_sqName(input.Azero_sqName)
 
 	, Apara_sqName(input.Apara_sqName), Aperp_sqName(input.Aperp_sqName), delta_zeroName(input.delta_zeroName), delta_paraName(input.delta_paraName)
@@ -97,18 +101,37 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 
 	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
 
-	, performingComponentProjection( input.performingComponentProjection ), DebugFlag_v6( input.DebugFlag_v6 )
+	, performingComponentProjection( input.performingComponentProjection ), DebugFlag_v6( input.DebugFlag_v6 ), _useDoubleTres(input._useDoubleTres), _useTripleTres(input._useTripleTres)
 {
 	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
-        if( _useEventResolution )
-	{
-		resolutionModel = new PerEventResModel( input.GetConfigurator(), true );
-	}
-	else
-	{
-		resolutionModel = new FixedResolutionModel( input.GetConfigurator(), true );
-	}
+
+        if( input._useEventResolution )
+        {
+                if( input._useDoubleTres )
+                {
+                        resolutionModel = new DoubleResolutionModel( input.GetConfigurator(), true );
+                }
+                else
+                {
+                        resolutionModel = new PerEventResModel( input.GetConfigurator(), true );
+                }
+        }
+        else
+        {
+                if( input._useDoubleTres )
+                {
+                        resolutionModel = new DoubleFixedResModel( input.GetConfigurator(), true );
+                }
+                else if( input._useTripleTres )
+                {
+                        resolutionModel = new TripleFixedResModel( input.GetConfigurator(), true );
+                }
+                else
+                {
+                        resolutionModel = new FixedResolutionModel( input.GetConfigurator(), true );
+                }
+        }
 }
 
 //......................................
@@ -174,7 +197,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
-	_fitDirectlyForApara(false), performingComponentProjection(false)
+	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false)
 {
 	componentIndex = 0;
 
@@ -196,6 +219,8 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	_usePlotComponents = configurator->isTrue( "PlotComponents" ) ;
 	_usePlotAllComponents = configurator->isTrue( "PlotAllComponents" ) ; 
 	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
+	_useDoubleTres = configurator->isTrue( "useDoubleGaussTres" );
+	_useTripleTres = configurator->isTrue( "useTripleGaussTres" );
 	DebugFlag_v6 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
 	string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
@@ -276,11 +301,29 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 
    	if( _useEventResolution )
 	{
-		resolutionModel = new PerEventResModel( configurator, isCopy );
+		if( _useDoubleTres )
+		{
+			resolutionModel = new DoubleResolutionModel( configurator, isCopy );
+		}
+		else
+		{
+			resolutionModel = new PerEventResModel( configurator, isCopy );
+		}
 	}
 	else
 	{
-		resolutionModel = new FixedResolutionModel( configurator, isCopy );
+		if( _useDoubleTres )
+		{
+			resolutionModel = new DoubleFixedResModel( configurator, isCopy );
+		}
+		else if( _useTripleTres )
+		{
+			resolutionModel = new TripleFixedResModel( configurator, isCopy ); 
+		}
+		else
+		{
+			resolutionModel = new FixedResolutionModel( configurator, isCopy );
+		}
 	}
 
 	if( resolutionModel->isPerEvent()  ) this->TurnCachingOff();
@@ -631,13 +674,7 @@ double Bs2JpsiPhi_Signal_v6::Evaluate(DataPoint * measurement)
 	//Cache amplitues and angles terms used in cross section
 	this->CacheAmplitudesAndAngles() ;
 
-	double returnValue = 0.;
-
-	for( unsigned int i=0; i< resolutionModel->numComponents(); ++i )
-	{
-		resolutionModel->requestComponent( i+1 );
-		returnValue += this->diffXsec( ) * resolutionModel->GetFraction( i );
-	}
+	double returnValue = this->diffXsec( );
 
 	if( !performingComponentProjection )
 	{

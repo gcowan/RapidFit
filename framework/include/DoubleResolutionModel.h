@@ -53,10 +53,13 @@ class DoubleResolutionModel : public IResolutionModel
 
 		bool isPerEvent() ;
 
+	protected:
+
 		unsigned int numComponents();
 		void requestComponent( unsigned int );
 
 		double GetFraction( unsigned int );
+
 	private:
 
 		double GetThisScale();

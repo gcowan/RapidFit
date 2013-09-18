@@ -10,8 +10,8 @@
   */
 
 #pragma once
-#ifndef DoubleResolution_Model_H
-#define DoubleResolution_Model_H
+#ifndef DoubleFixedResolution_Model_H
+#define DoubleFixedResolution_Model_H
 
 //	RapidFir Headers
 #include "ParameterSet.h"
@@ -53,15 +53,7 @@ class DoubleFixedResModel : public IResolutionModel
 
 		bool isPerEvent() ;
 
-		//Wrappers
-		double Exp_Wrapper( vector<double> input) ;
-		double ExpInt_Wrapper( vector<double> input ) ;
-
-		double ExpSin_Wrapper( vector<double> input ) ;
-		double ExpSinInt_Wrapper( vector<double> input ) ;
-
-		double ExpCos_Wrapper( vector<double> input ) ;
-		double ExpCosInt_Wrapper( vector<double> input ) ;
+	protected:
 
 		unsigned int numComponents();
 		void requestComponent( unsigned int );

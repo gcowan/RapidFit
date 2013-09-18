@@ -499,6 +499,7 @@ ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, c
 		vector<string> temp = givenParams->GetAllNames();
 	}
 
+	bool caught = false;
 	ParameterSet* wantedParameterSet = ( new ParameterSet( param_names ) );
 	for( unsigned int i=0; i< param_names.size(); ++i )
 	{
@@ -523,10 +524,12 @@ ParameterSet* FitAssembler::CheckInputParams( const ParameterSet* givenParams, c
 				delete temp;
 				cout << xmlStr << endl << endl;
 			}
-			exit(0);
+			caught = true;
 		}
-		wantedParameterSet->SetPhysicsParameter( param_names[i], new PhysicsParameter(*phys_param) );
+		if( !caught ) wantedParameterSet->SetPhysicsParameter( param_names[i], new PhysicsParameter(*phys_param) );
 	}
+
+	if( caught ) exit(0);
 
 	return wantedParameterSet;
 }
