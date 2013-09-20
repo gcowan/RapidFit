@@ -2,6 +2,7 @@
 
 2013/09/20 Rob Currie
   - Adding 1fb XML and DataSet for JpsiKK
+  - Moving v6 Code to use IMistagCalib interface to make switching between tagging calibrations easy and reduces the amount of hacking within the v6 PDF
 
 2013/09/18 Rob Currie
   - Added TripleFixed time Resolution class

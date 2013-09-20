@@ -16,6 +16,7 @@
 #include "PDFConfigurator.h"
 #include "SlicedAcceptance.h"
 #include "IResolutionModel.h"
+#include "IMistagCalib.h"
 #include "AngularAcceptance.h"
 #include "Mathematics.h"
 #include <iostream>
@@ -218,6 +219,7 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline bool useEventResolution() const {return _useEventResolution; }
 
 		IResolutionModel * resolutionModel;
+		IMistagCalib* _mistagCalibModel;
 
 		double angAccI1;
 		double angAccI2;
@@ -309,117 +311,6 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 
 		inline double gamma() const { return _gamma ; }
 
-		//...............
-		//tagging
-
-
-		inline double q() const { return tag ;}
-
-		inline double mistag() const {
-			double returnValue = -1000.;
-
-			if( (fabs(q()) < 0.5) || (fabs(q()) > 1.) ) {
-				returnValue = 0.5;
-			}
-			else if( (_mistag>=0.0) && (_mistag <= 0.5) ) {
-				//Normal case
-				returnValue =  _mistagP0 + _mistagP1*(_mistag - _mistagSetPoint ) ;
-				if( returnValue < 0 )  returnValue = 0;
-				if( returnValue > 0.5) returnValue = 0.5;
-			}
-			else if( _mistag < 0.0 ) {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistag() : _mistag < 0 so set to 0 " << endl;
-				PDF_THREAD_UNLOCK
-				returnValue = 0;
-			}
-			else if( _mistag > 0.5 ) {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistag() : _mistag > 0.5 so set to 0.5 "  << endl;
-				PDF_THREAD_UNLOCK
-				returnValue = 0.5;
-			}
-			else {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistag() : WARNING ******If you got here you dont know what you are doing  "  << endl;
-				PDF_THREAD_UNLOCK
-				exit(1);
-			}
-			return returnValue;
-		}
-
-		inline double mistagB() const {
-			double returnValue = -1000.;
-
-			if( (fabs(q()) < 0.5) || (fabs(q()) > 1.) ) {
-				returnValue = 0.5;
-			}
-			else if( (_mistag>=0.0) && (_mistag <= 0.5) ) {
-				//Normal case
-				returnValue =  _mistagP0+(_mistagDeltaP0*0.5) + (_mistagP1+(_mistagDeltaP1*0.5))*(_mistag - (_mistagSetPoint+(_mistagDeltaSetPoint*0.5)) );
-				//if( true ) returnValue =  _mistagP0 + (_mistagP1)*(_mistag - (_mistagSetPoint) ) ;  // to mock up independent P1/P0 for each tag
-				if( returnValue < 0 )  returnValue = 0;
-				if( returnValue > 0.5) returnValue = 0.5;
-			}
-			else if( _mistag < 0.0 ) {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistagB() : _mistag < 0 so deltaMistag set to 0 also " << endl;
-				PDF_THREAD_UNLOCK
-				returnValue = 0;
-			}
-			else if( _mistag > 0.5 ) {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistagB() : _mistag > 0.5 so so deltaMistag set to 0.5 also "  << endl;
-				PDF_THREAD_UNLOCK
-				returnValue = 0.5;
-			}
-			else {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistagB() : WARNING ******If you got here you dont know what you are doing  "  << endl;
-				PDF_THREAD_UNLOCK
-				exit(1);
-			}
-			return returnValue;
-		}
-
-		inline double mistagBbar() const {
-			double returnValue = -1000.;
-
-			if( fabs(q()) < 0.5 ) {
-				returnValue = 0.5 ;
-			}
-			else if( (_mistag>=0.0) && (_mistag <= 0.5) ) {
-				//Normal case
-				returnValue =  _mistagP0-(_mistagDeltaP0*0.5) + (_mistagP1-(_mistagDeltaP1*0.5))*(_mistag - (_mistagSetPoint-(_mistagDeltaSetPoint*0.5)) );
-				//if( true ) returnValue =   _mistagDeltaP0 + (_mistagDeltaP1)*(_mistag - (_mistagDeltaSetPoint) ) ;// to mock up independent P1/P0 for each tag
-				if( returnValue < 0 )  returnValue = 0;
-				if( returnValue > 0.5) returnValue = 0.5;
-			}
-			else if( _mistag < 0.0 ) {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistagBbar() : _mistag < 0 so deltaMistag set to 0 also " << endl;
-				PDF_THREAD_UNLOCK
-				returnValue = 0;
-			}
-			else if( _mistag > 0.5 ) {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistagBbar() : _mistag > 0.5 so so deltaMistag set to 0.5 also "  << endl;
-				PDF_THREAD_UNLOCK
-				returnValue = 0.5;
-			}
-			else {
-				PDF_THREAD_LOCK
-				cout << "Bs2JpsiPhi_Signal_v6::mistagBbar() : WARNING ******If you got here you dont know what you are doing  "  << endl;
-				PDF_THREAD_UNLOCK
-				exit(1);
-			}
-			return returnValue;
-		}
-
-		inline double D1() const {  return 1.0 - q()*(mistagB()-mistagBbar()); }
-		inline double D2() const {  return q()*( 1.0 - mistagB() -mistagBbar() ); }
-
-
 		//.....................
 		// C, D, S
 		inline double cosphis() const { return _DD ; } //  _cosphis ; }
@@ -465,11 +356,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		{
 			//if( t < 0.0 ) return 0.0 ;
 			const double result =
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( 1.0 + cosphis() ) * expL( )
 						+ ( 1.0 - cosphis() ) * expH( )
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						( 2.0 * sinphis() ) * expSin( )
 						+ ( 2.0 * CC()      ) * expCos( )
 				       );
@@ -483,10 +374,10 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 					cout << " Bs2JpsiPhi_Signal_v6::timeFactorEven() : result < 0 " << endl ;
 					cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
 					cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
-					cout << " ->term3 " << q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*mistag()) << endl ;
+					cout << " ->term3 " << _mistagCalibModel->q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*_mistagCalibModel->mistag()) << endl ;
 					cout << "   -->sin(phis) "  << sinphis() << endl ;
 					cout << "   -->expSin    "  << expSin() << endl ;
-					cout << "   -->tagFrac   "  << mistag() << endl ;
+					cout << "   -->tagFrac   "  << _mistagCalibModel->mistag() << endl ;
 					cout << "   -->delta_ms  "  << delta_ms << endl ;
 					PDF_THREAD_UNLOCK
 				}
@@ -497,11 +388,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorEvenInt()  const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( 1.0 + cosphis() )  * intExpL()
 						+ ( 1.0 - cosphis() )  * intExpH()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						( 2.0 * sinphis() ) * intExpSin( )
 						+  ( 2.0 * CC()      ) * intExpCos( )
 				       ) ;
@@ -513,11 +404,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		{
 			//if( t < 0.0 ) return 0.0 ;
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( 1.0 - cosphis() ) * expL( )
 						+ ( 1.0 + cosphis() ) * expH( )
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						-  ( 2.0 * sinphis() ) * expSin( )
 						+  ( 2.0 * CC()      ) * expCos( )
 				       ) ;
@@ -526,11 +417,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorOddInt(  )  const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( 1.0 - cosphis() ) * intExpL()
 						+ ( 1.0 + cosphis() ) * intExpH()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						-  ( 2.0 * sinphis() ) * intExpSin( )
 						+  ( 2.0 * CC()      ) * intExpCos( )
 				       ) ;
@@ -556,11 +447,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorImAPAT( ) const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( expL( ) - expH( ) ) * cos_delta1 * sinphis()
 						+ ( expL( ) + expH( ) ) * sin_delta1 * CC()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						2.0  * ( sin_delta1*expCos( ) - cos_delta1*cosphis()*expSin( ) )
 				       ) ;
 		}
@@ -568,11 +459,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorImAPATInt( ) const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( intExpL() - intExpH() ) * cos_delta1 * sinphis()
 						+ ( intExpL() + intExpH() ) * sin_delta1 * CC()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						2.0  * ( sin_delta1*intExpCos() - cos_delta1*cosphis()*intExpSin() )
 				       ) ;
 		}
@@ -596,11 +487,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorImA0AT(  ) const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( expL( ) - expH( ) ) * cos_delta2 * sinphis()
 						+ ( expL( ) + expH( ) ) * sin_delta2 * CC()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						2.0  * ( sin_delta2*expCos( ) - cos_delta2*cosphis()*expSin( ) )
 				       ) ;
 		}
@@ -609,11 +500,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		{
 
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( intExpL() - intExpH()  ) * cos_delta2 * sinphis()
 						+ ( intExpL() + intExpH()  ) * sin_delta2 * CC()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						2.0  * ( sin_delta2*intExpCos() - cos_delta2*cosphis()*intExpSin()  )
 				       ) ;
 		}
@@ -629,11 +520,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorReASAP( ) const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( expL( ) - expH( ) ) * sin_delta_para_s * sinphis()
 						+ ( expL( ) + expH( ) ) * cos_delta_para_s * CC()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						2.0  * ( cos_delta_para_s*expCos( ) - sin_delta_para_s*cosphis()*expSin( ) )
 				       ) ;
 		}
@@ -641,11 +532,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorReASAPInt( ) const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( intExpL() - intExpH() ) * sin_delta_para_s * sinphis()
 						+ ( intExpL() + intExpH() ) * cos_delta_para_s * CC()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						2.0  * ( cos_delta_para_s*intExpCos() - sin_delta_para_s*cosphis()*intExpSin() )
 				       ) ;
 		}
@@ -666,11 +557,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorReASA0( ) const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( expL( ) - expH( ) ) * sin_delta_zero_s * sinphis()
 						+ ( expL( ) + expH( ) ) * cos_delta_zero_s * CC()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						2.0  * ( cos_delta_zero_s*expCos( ) - sin_delta_zero_s*cosphis()*expSin( ) )
 				       ) ;
 		}
@@ -678,11 +569,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		inline double timeFactorReASA0Int( ) const
 		{
 			return
-				D1() * (
+				_mistagCalibModel->D1() * (
 						( intExpL() - intExpH() ) * sin_delta_zero_s * sinphis()
 						+ ( intExpL() + intExpH() ) * cos_delta_zero_s * CC()
 				       ) +
-				D2() * (
+				_mistagCalibModel->D2() * (
 						2.0  * ( cos_delta_zero_s*intExpCos() - sin_delta_zero_s*cosphis()*intExpSin() )
 				       ) ;
 		}

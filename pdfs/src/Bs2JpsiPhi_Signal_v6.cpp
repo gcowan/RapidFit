@@ -15,6 +15,7 @@
 #include "TripleFixedResModel.h"
 #include "Bs2JpsiPhi_Angluar_Terms.h"
 #include "Bs2JpsiPhi_Signal_v6.h"
+#include "SimpleMistagCalib.h"
 
 #include <iostream>
 #include <cmath>
@@ -33,15 +34,11 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 
         , delta_perpName(input.delta_perpName), As_sqName(input.As_sqName), delta_sName(input.delta_sName), CspName(input.CspName), cosdparName(input.cosdparName)
 
-	, cosphisName(input.cosphisName), sinphisName(input.sinphisName), lambdaName(input.lambdaName), mistagName(input.mistagName)
-
-        , mistagP1Name(input.mistagP1Name), mistagP0Name(input.mistagP0Name), mistagSetPointName(input.mistagSetPointName), mistagDeltaP1Name(input.mistagDeltaP1Name)
-
-	, mistagDeltaP0Name(input.mistagDeltaP0Name), mistagDeltaSetPointName(input.mistagDeltaSetPointName)
+	, cosphisName(input.cosphisName), sinphisName(input.sinphisName), lambdaName(input.lambdaName)
 
 	, timeName(input.timeName), cosThetaName(input.cosThetaName), cosPsiName(input.cosPsiName), phiName(input.phiName)
 
-	, cthetakName(input.cthetakName), cthetalName(input.cthetalName), phihName(input.phihName), tagName(input.tagName)
+	, cthetakName(input.cthetakName), cthetalName(input.cthetalName), phihName(input.phihName)
 
 	, _useEventResolution(input._useEventResolution), _useTimeAcceptance(input._useTimeAcceptance), _useHelicityBasis(input._useHelicityBasis)
 
@@ -53,15 +50,13 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 
 	, allowNegativeAsSq(input.allowNegativeAsSq), _usePlotComponents(input._usePlotComponents), t(input.t), ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr)
 
-	, ctheta_1(input.ctheta_1), ctheta_k(input.ctheta_k), phi_h(input.phi_h), ctheta_l(input.ctheta_l), tag(input.tag), _gamma(input._gamma), dgam(input.dgam)
+	, ctheta_1(input.ctheta_1), ctheta_k(input.ctheta_k), phi_h(input.phi_h), ctheta_l(input.ctheta_l), _gamma(input._gamma), dgam(input.dgam)
 
 	, Aperp_sq(input.Aperp_sq), Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq), As_sq(input.As_sq), delta_para(input.delta_para)
 
 	, delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2), delta_ms(input.delta_ms)
 
-	, phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag), _mistagP1(input._mistagP1), _mistagP0(input._mistagP0)
-
-	, _mistagSetPoint(input._mistagSetPoint) , angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4)
+	, phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4)
 	
 	, angAccI5(input.angAccI5), angAccI6(input.angAccI6) , angAccI7(input.angAccI7), angAccI8(input.angAccI8), angAccI9(input.angAccI9), angAccI10(input.angAccI10)
 	
@@ -89,9 +84,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 
 	, ReA0AP_value(input.ReA0AP_value), ImA0AT_value(input.ImA0AT_value), ReASAP_value(input.ReASAP_value), ImASAT_value(input.ImASAT_value), ReASA0_value(input.ReASA0_value)
 
-	, Csp(input.Csp), cosdpar(input.cosdpar), lambda(input.lambda), _CC(input._CC), _DD(input._DD), _SS(input._SS), _mistagDeltaP1(input._mistagDeltaP1)
-
-	, _mistagDeltaP0(input._mistagDeltaP0), _mistagDeltaSetPoint(input._mistagDeltaSetPoint), _angAccIgnoreNumerator(input._angAccIgnoreNumerator), sin_delta_perp_s(input.sin_delta_perp_s)
+	, Csp(input.Csp), cosdpar(input.cosdpar), lambda(input.lambda), _CC(input._CC), _DD(input._DD), _SS(input._SS), _angAccIgnoreNumerator(input._angAccIgnoreNumerator), sin_delta_perp_s(input.sin_delta_perp_s)
 
 	, cos_delta_perp_s(input.cos_delta_perp_s), sin_delta_zero_s(input.sin_delta_zero_s), cos_delta_zero_s(input.cos_delta_zero_s), sin_delta_para_s(input.sin_delta_para_s)
 
@@ -102,6 +95,8 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
 
 	, performingComponentProjection( input.performingComponentProjection ), DebugFlag_v6( input.DebugFlag_v6 ), _useDoubleTres(input._useDoubleTres), _useTripleTres(input._useTripleTres)
+
+	, _mistagCalibModel( NULL  )
 {
 	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
@@ -132,6 +127,8 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
                         resolutionModel = new FixedResolutionModel( input.GetConfigurator(), true );
                 }
         }
+
+        if( input._mistagCalibModel != NULL ) _mistagCalibModel = new SimpleMistagCalib( input.GetConfigurator() );
 }
 
 //......................................
@@ -156,14 +153,6 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	, cosphisName			( configurator->getName("cosphis") )
 	, sinphisName			( configurator->getName("sinphis") )
 	, lambdaName			( configurator->getName("lambda") )
-	// tagging parameters
-	, mistagName			( configurator->getName("mistag") )
-	, mistagP1Name			( configurator->getName("mistagP1") )
-	, mistagP0Name			( configurator->getName("mistagP0") )
-	, mistagSetPointName	( configurator->getName("mistagSetPoint") )
-	, mistagDeltaP1Name		( configurator->getName("mistagDeltaP1") )
-	, mistagDeltaP0Name		( configurator->getName("mistagDeltaP0") )
-	, mistagDeltaSetPointName ( configurator->getName("mistagDeltaSetPoint") )
 	// Observables
 	, timeName				( configurator->getName("time") )
 	, cosThetaName			( configurator->getName("cosTheta") )
@@ -172,7 +161,6 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	, cthetakName 			( configurator->getName("helcosthetaK") )
 	, cthetalName			( configurator->getName("helcosthetaL") )
 	, phihName				( configurator->getName("helphi") )
-	, tagName				( configurator->getName("tag") )
 	// Other things
 	, _useEventResolution(false)
 	, _useTimeAcceptance(false)
@@ -189,10 +177,9 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	, DebugFlag_v6(true)
 	, _offsetToGammaForBetaFactor()
 	//objects
-	,t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(), tag(),
+	,t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(),
 	_gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
 	delta_perp(), delta_zero(), delta_s(), delta1(), delta2(), delta_ms(), phi_s(), _cosphis(), _sinphis(), 
-	_mistag(), _mistagP1(), _mistagP0(), _mistagSetPoint(),
 	angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(),
 	tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL),
@@ -326,6 +313,8 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 		}
 	}
 
+	_mistagCalibModel = new SimpleMistagCalib( configurator );
+
 	if( resolutionModel->isPerEvent()  ) this->TurnCachingOff();
 
 	//........................
@@ -348,6 +337,7 @@ Bs2JpsiPhi_Signal_v6::~Bs2JpsiPhi_Signal_v6()
 	if( timeAcc != NULL ) delete timeAcc;
 	if( angAcc != NULL ) delete angAcc;
 	if( resolutionModel != NULL ) delete resolutionModel;
+	if( _mistagCalibModel != NULL ) delete _mistagCalibModel;
 }
 
 
@@ -372,12 +362,10 @@ void Bs2JpsiPhi_Signal_v6::MakePrototypes()
 		allObservables.push_back( cosPsiName );
 	}
 
-	allObservables.push_back( tagName );
-	allObservables.push_back( mistagName );
-
 	//if(useEventResolution()) allObservables.push_back( eventResolutionName );    
-	resolutionModel->addObservables( allObservables ) ;
- 
+	resolutionModel->addObservables( allObservables );
+	_mistagCalibModel->addObservables( allObservables );
+
 	//...............................
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -404,21 +392,15 @@ void Bs2JpsiPhi_Signal_v6::MakePrototypes()
 	}
 	parameterNames.push_back( lambdaName );
 
-	parameterNames.push_back( mistagP1Name );
-	parameterNames.push_back( mistagP0Name );
-	parameterNames.push_back( mistagSetPointName );
-	parameterNames.push_back( mistagDeltaP1Name );
-	parameterNames.push_back( mistagDeltaP0Name );
-	parameterNames.push_back( mistagDeltaSetPointName );
-
 	if( _fitDirectlyForApara )
 	{
 		parameterNames.push_back( Apara_sqName );
 	}
 
 	//Now add additional paramaters for the resolution model
-	resolutionModel->addParameters( parameterNames ) ;
-    
+	resolutionModel->addParameters( parameterNames );
+	_mistagCalibModel->addParameters( parameterNames );
+
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -429,11 +411,11 @@ vector<string> Bs2JpsiPhi_Signal_v6::GetDoNotIntegrateList()
 {
 	vector<string> list;
 
-	if( ! _usePunziMistag) list.push_back(mistagName) ;
-
 	//***THIS NEEDS FIXING*** PROBLEM IS ONLY THE RESOULTION MODEL KNOWS THIS NOW - SO HOW DOES ONE ADD TO THE D.I.L CLEANLY ??
 	//list.push_back("eventResolution") ; 
     	resolutionModel->addObservables( list );
+
+	if( !_usePunziMistag ) _mistagCalibModel->addObservables( list );
 
 	if( _numericIntegralTimeOnly )
 	{
@@ -465,7 +447,8 @@ bool Bs2JpsiPhi_Signal_v6::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	bool result = allParameters.SetPhysicsParameters(NewParameterSet);
     
 	//Let the resolution model take its specific parameters out
-	resolutionModel->setParameters( allParameters ) ;
+	resolutionModel->setParameters( allParameters );
+	_mistagCalibModel->setParameters( allParameters );
 
 	// Physics parameters.
 	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue() + _offsetToGammaForBetaFactor ;
@@ -531,14 +514,6 @@ bool Bs2JpsiPhi_Signal_v6::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	}
 	lambda = allParameters.GetPhysicsParameter( lambdaName )->GetValue();
 
-	// Mistag parameters
-	_mistagP1		= allParameters.GetPhysicsParameter( mistagP1Name )->GetValue();
-	_mistagP0		= allParameters.GetPhysicsParameter( mistagP0Name )->GetValue();
-	_mistagSetPoint = allParameters.GetPhysicsParameter( mistagSetPointName )->GetValue();
-	_mistagDeltaP1		= allParameters.GetPhysicsParameter( mistagDeltaP1Name )->GetValue();
-	_mistagDeltaP0		= allParameters.GetPhysicsParameter( mistagDeltaP0Name )->GetValue();
-	_mistagDeltaSetPoint = allParameters.GetPhysicsParameter( mistagDeltaSetPointName )->GetValue();
-
 	// Detector parameters
 	/*resolutionScale		= allParameters.GetPhysicsParameter( resScaleName )->GetValue();
 	if( ! useEventResolution() ) {
@@ -586,7 +561,6 @@ bool Bs2JpsiPhi_Signal_v6::SetPhysicsParameters( ParameterSet* NewParameterSet )
 
 //.............................................................
 //Calculate the PDF value for a given set of observables for use by numeric integral
-
 double Bs2JpsiPhi_Signal_v6::EvaluateForNumericIntegral(DataPoint * measurement)
 {
 	if( _numericIntegralTimeOnly ) return this->EvaluateTimeOnly(measurement) ;
@@ -603,7 +577,8 @@ double Bs2JpsiPhi_Signal_v6::Evaluate(DataPoint * measurement)
     
 	//Let the resolution model pull out its specific obsrvables first.
 	//This can only be the case if event resolution is used (so far)
-	resolutionModel->setObservables( measurement ) ;
+	resolutionModel->setObservables( measurement );
+	_mistagCalibModel->setObservables( measurement );
 
 	vector<double> angularData;
 
@@ -668,9 +643,6 @@ double Bs2JpsiPhi_Signal_v6::Evaluate(DataPoint * measurement)
 		angAcceptanceFactor = angAcc->getValue( psi_obs, theta_obs, phi_obs );
 	}
 
-	tag = (int)measurement->GetObservable( tagName )->GetValue();
-	_mistag = measurement->GetObservable( mistagName )->GetValue();
-
 	//Cache amplitues and angles terms used in cross section
 	this->CacheAmplitudesAndAngles() ;
 
@@ -719,8 +691,6 @@ double Bs2JpsiPhi_Signal_v6::EvaluateTimeOnly(DataPoint * measurement)
 
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() ; // - timeOffset ;
-	tag = (int)measurement->GetObservable( tagName )->GetValue();
-	_mistag = measurement->GetObservable( mistagName )->GetValue();
 
 	double returnValue = this->diffXsecTimeOnly( );
 
@@ -750,14 +720,11 @@ double Bs2JpsiPhi_Signal_v6::Normalisation(DataPoint * measurement, PhaseSpaceBo
 {
 	_datapoint = measurement;
 
-	resolutionModel->setObservables( measurement ) ;
+	resolutionModel->setObservables( measurement );
+	_mistagCalibModel->setObservables( measurement );
 
 	if( _numericIntegralForce ) return -1.;
 
-	// Get observables into member variables
-	tag = (int)measurement->GetObservable( tagName )->GetValue();
-	_mistag = measurement->GetObservable( mistagName )->GetValue();
-	
 	// Get time boundaries into member variables
 	IConstraint * timeBound = boundary->GetConstraint( timeName );
 	if ( timeBound->GetUnit() == "NameNotFoundError" )
@@ -1285,10 +1252,10 @@ void Bs2JpsiPhi_Signal_v6::DebugPrint( string message, double value )  const
 		cout << "   AS^2    " << AS()*AS() << endl;
 		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl;
 		cout << "   delta_ms       " << delta_ms << endl;
-		cout << "   mistag         " << mistag() << endl;
-		cout << "   mistagP1       " << _mistagP1 << endl;
-		cout << "   mistagP0       " << _mistagP0 << endl;
-		cout << "   mistagSetPoint " << _mistagSetPoint << endl;
+		//cout << "   mistag         " << mistag() << endl;
+		//cout << "   mistagP1       " << _mistagP1 << endl;
+		//cout << "   mistagP0       " << _mistagP0 << endl;
+		//cout << "   mistagSetPoint " << _mistagSetPoint << endl;
 		cout << " For event with:  " << endl;
 		//cout << "   time      " << t << endl ;
 		//cout << "   ctheta_tr " << ctheta_tr << endl ;
