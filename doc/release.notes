@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/09/20 Rob Currie
+  - Adding 1fb XML and DataSet for JpsiKK
+
 2013/09/18 Rob Currie
   - Added TripleFixed time Resolution class
   - Added improvement into FitAssembler to should about multiple missing PhysicsParameters at once, rather than aborting at the first missing parameter

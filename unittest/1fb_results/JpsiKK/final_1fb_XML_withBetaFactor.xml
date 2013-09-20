@@ -1,0 +1,2217 @@
+<RapidFit>
+
+	//================================================
+	// Formal Parameters to be fitted or fixed
+
+	<ParameterSet>
+
+
+
+		<PhysicsParameter>
+			<Name>F_s990</Name>
+			<Value>0.22667</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.5</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>delta_s990</Name>
+			<Value>1.3246</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Csp990</Name>
+			#<Value>1.0</Value>
+			<Value>0.966</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>F_s1008</Name>
+			<Value>0.066726</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.25</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>delta_s1008</Name>
+			<Value>0.77137</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Csp1008</Name>
+			#<Value>1.0</Value>
+			<Value>0.956</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>F_s1016</Name>
+			<Value>0.0081429</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.25</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>delta_s1016</Name>
+			<Value>0.49054</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Csp1016</Name>
+			#<Value>1.0</Value>
+			<Value>0.926</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+
+		<PhysicsParameter>
+			<Name>F_s1020</Name>
+			<Value>0.016019</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.25</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>delta_s1020</Name>
+			<Value>-0.51648</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Csp1020</Name>
+			#<Value>1.0</Value>
+			<Value>0.926</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>F_s1024</Name>
+			<Value>0.055242</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.25</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>delta_s1024</Name>
+			<Value>-0.45233</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Csp1024</Name>
+			#<Value>1.0</Value>
+			<Value>0.956</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+
+		<PhysicsParameter>
+			<Name>F_s1032</Name>
+			<Value>0.16777</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.25</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>delta_s1032</Name>
+			<Value>-0.65285</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>Csp1032</Name>
+			#<Value>1.0</Value>
+			<Value>0.966</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+
+		// True Physics Parameters for signal
+
+		<PhysicsParameter>
+			<Name>gamma</Name>
+			<Value>0.67139</Value>
+			#<Value>0.663</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>2.0</Maximum>
+			<Type>Free</Type>
+			<Unit>ps^{-1}</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>deltaGamma</Name>
+			<Value>0.100</Value>
+			<Minimum>-0.1</Minimum>
+			<Maximum>0.3</Maximum>
+			<Type>Free</Type>
+			<Unit>ps^{-1}</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Aperp_sq</Name>
+			<Value>0.24868</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.5</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Azero_sq</Name>
+			<Value>0.52114</Value>
+			<Type>Free</Type>
+			<Minimum>0.</Minimum>
+			<Maximum>0.8</Maximum>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_para</Name>
+			<Value>3.3057</Value>
+			<Maximum>6.3</Maximum>
+			<Minimum>-6.3</Minimum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_perp</Name>
+			<Value>3.0775</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_zero</Name>
+			<Value>0.0</Value>
+			<Minimum>-3.3</Minimum>
+			<Maximum>3.3</Maximum>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>deltaM</Name>
+			<Value>17.67</Value>
+			<Type>Free</Type>
+			<Unit>ps-1</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Phi_s</Name>
+			<Value>0.067</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>lambda</Name>
+			<Value>0.944</Value> # 0.944
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+
+
+		//..................................
+		// Detector Parameters
+
+		//Signal PDF time resolution parameters for double gaussian model.
+
+		<PhysicsParameter>
+			<Name>timeResolutionScale</Name>
+			<Value>1.45</Value>
+			<Type>Free</Type>
+			<Unit>unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>timeOffset</Name>                 //Leave at Zero, this is not used anywhere yet.
+			<Value>0.000</Value>
+			<Type>Fixed</Type>
+			<Unit>ps</Unit>
+		</PhysicsParameter>
+
+
+
+		// Mistag parameters
+
+		// Mistag calibration
+		<PhysicsParameter>
+			<Name>mistagP1_OS</Name>
+			<Value>1.0004</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagP0_OS</Name>
+			<Value>0.3919</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagSetPoint_OS</Name>
+			<Value>0.392</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP1_OS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP0_OS</Name>
+			<Value>0.011052</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaSetPoint_OS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+
+		// Mistag calibration
+		<PhysicsParameter>
+			<Name>mistagP1_SS</Name>
+			<Value>1.0303</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagP0_SS</Name>
+			<Value>0.35542</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagSetPoint_SS</Name>
+			<Value>0.350</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP1_SS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP0_SS</Name>
+			<Value>-0.018936</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaSetPoint_SS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+
+		// Mistag calibration
+		<PhysicsParameter>
+			<Name>mistagP1_OSSS</Name>
+			<Value>1.000</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagP0_OSSS</Name>
+			<Value>0.0048104</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagSetPoint_OSSS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP1_OSSS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP0_OSSS</Name>
+			<Value>-0.011077</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaSetPoint_OSSS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+
+
+
+	</ParameterSet>
+
+
+	//==========================================
+	// Specify which minimiser to use.
+
+	<Minimiser>
+		<MinimiserName>Minuit</MinimiserName>
+		<MaxSteps>100000</MaxSteps>
+		<GradTolerance>0.0001</GradTolerance>
+		<Quality>0</Quality>
+		#<ConfigureMinimiser>MinosErrors</ConfigureMinimiser>
+		#<ConfigureMinimiser>NoHesse</ConfigureMinimiser>
+	</Minimiser>
+
+	<FitFunction>
+		<AlphaName>alpha</AlphaName>
+		<WeightName>sWeight</WeightName>
+		<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+		<Threads>16</Threads>
+		#<UseGSLNumericalIntegration>True</UseGSLNumericalIntegration>
+		#<FixedIntegrationPoints>1000000</FixedIntegrationPoints>
+		<SetIntegratorTest>False</SetIntegratorTest>
+		#<NormaliseWeights>True</NormaliseWeights>
+		#<Strategy>Petes</Strategy>
+	</FitFunction>
+
+
+	<NumberRepeats>1</NumberRepeats>
+
+
+
+	//==========================================
+	// Specify the fit
+
+	//...................................
+	// This applies a constraint on deltaM
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>deltaM</Name>
+				<Value>17.63</Value>
+				<Error>0.11</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>timeResolutionScale</Name>
+				<Value>1.45</Value>
+				<Error>0.06</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+	// This applies a constraint on mistag scale
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP1_OS</Name>
+				<Value>1.000</Value>
+				<Error>0.023</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP0_OS</Name>
+				<Value>0.392</Value>
+				<Error>0.008</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagDeltaP0_OS</Name>
+				<Value>0.011</Value>   # 0.011
+				<Error>0.0034</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP1_SS</Name>
+				<Value>1.000</Value>
+				<Error>0.16</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP0_SS</Name>
+				<Value>0.350</Value>
+				<Error>0.017</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagDeltaP0_SS</Name>
+				<Value>-0.019</Value>  # -0.019
+				<Error>0.005</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP0_OSSS</Name>
+				<Value>0.000</Value>
+				<Error>0.025</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagDeltaP0_OSSS</Name>
+				<Value>-0.011</Value>  # -0.011
+				<Error>0.004</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+
+	// ....................
+	// Attempt to constrain LLscan on the amplitudes
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>ATOTAL</Name>
+				<Value>1.0</Value>
+				<Error>0.00001</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+	// ....................
+	// Attempt to constrain GH and GL positive
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>GLandGH</Name>
+				<Value>0.0</Value>
+				<Error>0.00001</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// The commonpdf and phase space to all segments
+
+	<CommonPDF>
+		<PDF>
+			<Name>Bs2JpsiPhi_Signal_v6</Name>
+			<ConfigurationParameter>UseHelicityBasis:True</ConfigurationParameter>
+			<ConfigurationParameter>AngularAcceptanceFile:2011-1fbPaper/2011-AngularAcceptance-1fbPaper-UandB-30-20120706.root</ConfigurationParameter>
+			#<ConfigurationParameter>AngularAcceptanceIgnoreNumerator:True</ConfigurationParameter>
+			<ConfigurationParameter>UseTimeAcceptance:True</ConfigurationParameter>
+			<ConfigurationParameter>UseEventResolution:True</ConfigurationParameter>
+			<ConfigurationParameter>OffsetToGammaForBetaFactor:0.00826</ConfigurationParameter>
+			<ConfigurationParameter>PlotComponents:True</ConfigurationParameter>
+		</PDF>
+	</CommonPDF>
+
+	<CommonPhaseSpace>
+		<PhaseSpaceBoundary>
+			<Observable>
+				<Name>time</Name>
+				<Minimum>0.3</Minimum>
+				<Maximum>14.0</Maximum>
+				<Unit>ps</Unit>
+			</Observable>
+			#<Observable>
+				#	<Name>cosTheta</Name>
+				#	<TF1>trcostheta</TF1>
+				#	<Minimum>-1.0</Minimum>
+				#	<Maximum>1.0</Maximum>
+				#	<Unit> </Unit>
+				#</Observable>
+			#<Observable>
+				#	<Name>phi</Name>
+				#	<TF1>trphi</TF1>
+				#	<Minimum>-3.14159</Minimum>
+				#	<Maximum>3.14159</Maximum>
+				#	<Unit>rad</Unit>
+				#</Observable>
+			#<Observable>
+				#	<Name>cosPsi</Name>
+				#	<TF1>trcospsi</TF1>
+				#	<Minimum>-1.0</Minimum>
+				#	<Maximum>1.0</Maximum>
+				#	<Unit> </Unit>
+				#</Observable>
+			<Observable>
+				<Name>helcosthetaK</Name>
+				<Minimum>-1.0</Minimum>
+				<Maximum>1.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>helphi</Name>
+				<TF1>(helphi+TMath::Pi()-(helphi>0.)*(2.*TMath::Pi()))</TF1>
+				<Minimum>-3.1416</Minimum>
+				<Maximum>3.1416</Maximum>
+				<Unit>rad</Unit>
+			</Observable>
+			<Observable>
+				<Name>helcosthetaL</Name>
+				<Minimum>-1.0</Minimum>
+				<Maximum>1.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>tag</Name>
+				<TF1>tagdecision</TF1>
+				<Value>1.</Value>
+				<Value>-1.</Value>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>mistag</Name>
+				<TF1>tagomega</TF1>
+				<Minimum>0.</Minimum>
+				<Maximum>0.5</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>eventResolution</Name>
+				<TF1>sigmat</TF1>
+				<Minimum>0.0</Minimum>
+				<Maximum>0.12</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>sWeight</Name>
+				<Minimum>-10</Minimum>
+				<Maximum>10</Maximum>
+				<Unit> </Unit>
+			</Observable>
+		</PhaseSpaceBoundary>
+	</CommonPhaseSpace>
+
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=990
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction990</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>990)&&(1008>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.565834715057</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction990</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>990)&&(1008>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.565834715057</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction990</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>990)&&(1008>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.565834715057</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction990</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>990)&&(1008>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.565834715057</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1008
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1008</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1008)&&(1016>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.86322898286</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1008</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1008)&&(1016>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.86322898286</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1008</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1008)&&(1016>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.86322898286</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1008</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1008)&&(1016>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.86322898286</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1016
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1016</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1016)&&(1020>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.956385707227</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1016</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1016)&&(1020>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.956385707227</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1016</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1016)&&(1020>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.956385707227</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1016</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1016)&&(1020>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.956385707227</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1020
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1020</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1020)&&(1024>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.94778664525</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1020</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1020)&&(1024>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.94778664525</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1020</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1020)&&(1024>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.94778664525</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1020</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1020)&&(1024>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.94778664525</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1024
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1024</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1024)&&(1032>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.854743215818</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1024</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1024)&&(1032>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.854743215818</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1024</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1024)&&(1032>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.854743215818</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1024</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1024)&&(1032>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.854743215818</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1032
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1032</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1032)&&(1050>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.661739536146</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1032</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1032)&&(1050>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.661739536146</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1032</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1032)&&(1050>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.661739536146</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1032</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1032)&&(1050>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.661739536146</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=990
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction990</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>990)&&(1008>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.565834715057</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction990</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>990)&&(1008>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.565834715057</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction990</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>990)&&(1008>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.565834715057</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction990</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>990)&&(1008>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.565834715057</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1008
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1008</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1008)&&(1016>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.86322898286</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1008</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1008)&&(1016>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.86322898286</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1008</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1008)&&(1016>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.86322898286</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1008</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1008)&&(1016>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.86322898286</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1016
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1016</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1016)&&(1020>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.956385707227</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1016</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1016)&&(1020>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.956385707227</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1016</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1016)&&(1020>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.956385707227</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1016</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1016)&&(1020>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.956385707227</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1020
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1020</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1020)&&(1024>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.94778664525</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1020</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1020)&&(1024>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.94778664525</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1020</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1020)&&(1024>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.94778664525</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1020</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1020)&&(1024>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.94778664525</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1024
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1024</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1024)&&(1032>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.854743215818</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1024</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1024)&&(1032>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.854743215818</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1024</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1024)&&(1032>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.854743215818</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1024</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1024)&&(1032>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.854743215818</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	//===============================================================================================
+	// UN-BIASED UN-TAGGED events / mKK=1032
+
+	<ToFit>
+
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1032</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1032)&&(1050>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>tag</Name>
+					<TF1>tagdecision</TF1>
+					<Value>0.</Value>
+					<Unit> </Unit>
+				</Observable>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.661739536146</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1032</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1032)&&(1050>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss==0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.661739536146</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1032</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1032)&&(1050>mdau2)&&(tagdecision_os==0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.661739536146</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+	//========================================
+	// UN-BIASED OS+SS TAGGED events
+
+	<ToFit>
+		<CommonPDF>True</CommonPDF>
+		<PDFConfigurator>
+			<FractionName>SignalFraction1032</FractionName>
+			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
+			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
+			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>$RAPIDFITROOT/unittest/1fb_results/data/1fbUBB-6binSigNEW.root</FileName>
+			<CutString>(mdau2>1032)&&(1050>mdau2)&&(tagdecision_os!=0)&&(tagdecision_ss!=0)&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+
+			<CommonPhaseSpace>
+				<Observable>
+					<Name>alpha</Name>
+					<TF1>0.661739536146</TF1>
+					<Minimum>-50.0</Minimum>
+					<Maximum>50.0</Maximum>
+					<Unit> </Unit>
+				</Observable>
+			</CommonPhaseSpace>
+
+		</DataSet>
+	</ToFit>
+
+
+</RapidFit>
+
