@@ -44,6 +44,14 @@ class CombinedMistagCalib : public IMistagCalib
 
 		double getEta() const;
 
+		bool OSTagged() const;
+
+		bool SSTagged() const;
+
+		bool OSSSTagged() const;
+
+		bool _OSTagged, _SSTagged, _OSSSTagged;
+
 		int _tagOS, _tagSS, _combinedtag;
 		double _mistagOS, _mistagSS, _eta;
 		double _mistagP0_OS, _mistagP1_OS, _mistagSetPoint_OS, _mistagDeltaP1_OS, _mistagDeltaP0_OS, _mistagDeltaSetPoint_OS;
