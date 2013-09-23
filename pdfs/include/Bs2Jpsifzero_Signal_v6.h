@@ -1,10 +1,10 @@
-// $Id: Bs2Jpsifzero_Signal_v6.h,v 1.1 2009/12/06  Pete Clarke Exp $
+// $Id: Bs2Jpsifzero_Signal_v6.h,v 1.1 2013/07/17  Dianne Ferguson Exp $
 /** @class Bs2Jpsifzero_Signal_v6
  *
- *  Bs2JpsiPhi_SignalAlt series with mistag as observable
+ *  Bs2Jpsifzero 
  *
- *  @author Pete Clarke peter.clarke@ed.ac.uk
- *  @date 2011-11-05
+ *  @author Dianne Ferguson dferguso@cern.ch
+ *  @date 2013-07-17
  */
 
 #ifndef Bs2Jpsifzero_Signal_v6_H
@@ -50,8 +50,6 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		double normalisationCacheUntagged ;
 		void prepareCDS();
 
-		//void prepareTimeFac();
-
 		PseudoObservable _expLObs;
 		PseudoObservable _expHObs;
 		PseudoObservable _expSinObs;
@@ -86,18 +84,8 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		ObservableRef gammaName;		// gamma
 		ObservableRef deltaGammaName;	// delta gamma
 		ObservableRef deltaMName;		// delta mass
-		//ObservableRef Azero_sqName;	// amplitude
-		//ObservableRef Apara_sqName;	// amplitude
-		//bool _fitDirectlyForApara;
 		ObservableRef Aperp_sqName;	// amplitude
-		//ObservableRef As_sqName;		// amplitude
 		ObservableRef CspName;		// amplitude
-		//ObservableRef delta_zeroName;	// strong phase, set to 0
-		//ObservableRef delta_paraName;	// strong phase
-		//ObservableRef delta_perpName;	// strong phase
-		//ObservableRef delta_sName;		// strong phase for S-wave
-		//ObservableRef cosdparName;		//PELC-COSDPAR Special for fitting cosdpar separately
-
 
 		ObservableRef Phi_sName;		// what we want to measure!
 		ObservableRef cosphisName;		// fitting cosphis and sinphis independently
@@ -112,41 +100,13 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		ObservableRef mistagDeltaP0Name;		// mistag calib
 		ObservableRef mistagDeltaSetPointName;// mistag calib
 
-/*
-		ObservableRef eventResolutionName;			// Scale to multiply all Gaussians with
-		ObservableRef resScaleName;			// Scale to multiply all Gaussians with
-		ObservableRef res1Name;				// time resolution narrow
-		ObservableRef res2Name;				// time resolution wide
-		ObservableRef res3Name;				// time resolution tail
-		ObservableRef res2FractionName;		// fraction of wide
-		ObservableRef res3FractionName;		// fraction of tail
-		ObservableRef timeOffsetName;		// time offset
-*/
 		// Observables
 		ObservableRef timeName;		// proper time
 		ObservableRef tagName;			// B tag
 
-		//PseudoObservable A0A0_Obs;
-		//PseudoObservable APAP_Obs;
 		PseudoObservable ATAT_Obs;
-		//PseudoObservable ASAS_Obs;
-		//PseudoObservable ImAPAT_Obs;
-		//PseudoObservable ReA0AP_Obs;
-		//PseudoObservable ImA0AT_Obs;
-		//PseudoObservable ReASAP_Obs;
-		//PseudoObservable ImASAT_Obs;
-		//PseudoObservable ReASA0_Obs;
 
-		//double A0A0_value;
-		//double APAP_value;
 		double ATAT_value;
-		///double ASAS_value;
-		//double ImAPAT_value;
-		//double ReA0AP_value;
-		//double ImA0AT_value;
-		//double ReASAP_value;
-		//double ImASAT_value;
-		//double ReASA0_value;
 
 		// Measured Event Observables
 		double t ;
@@ -157,17 +117,7 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		double dgam ;
 
 		double Aperp_sq ;
-		//double Apara_sq ;
-		//double Azero_sq ;
-		//double As_sq ;
 		double Csp ;
-		//double delta_para ;
-		//double delta_perp ;
-		//double delta_zero ;
-		//double delta_s ;
-		//double delta1 ;
-		//double delta2 ;
-		//double cosdpar ; //PELC-COSDPAR Special for fitting cosdpar separately
 
 		double delta_ms ;
 		double phi_s ;
@@ -184,16 +134,6 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		double _mistagDeltaP0 ;
 		double _mistagDeltaSetPoint ;
 
-/*
-		double resolution ;
-		double eventResolution ;
-		double resolutionScale ;
-		double resolution1 ;
-		double resolution2 ;
-		double resolution3 ;
-		double resolution2Fraction ;
-		double resolution3Fraction ;
-*/
 		double timeOffset ;
 		bool _useEventResolution ;
 		inline bool useEventResolution() const {return _useEventResolution ; }
@@ -217,14 +157,6 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		void preCalculateTimeIntegrals();
 
 		bool timeIntegralCacheValid ;
-/*
-		vector< vector<double> > storeExpL;
-		vector< vector<double> > storeExpH;
-		vector< vector<double> > storeExpSin;
-		vector< vector<double> > storeExpCos;
-*/
-//		void CacheTimeIntegrals() ;
-//		void deCacheTimeIntegrals( unsigned int ires, unsigned int islice ) ;
 
 		//Time acceptance
 		SlicedAcceptance * timeAcc ;
@@ -238,33 +170,12 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		bool _usePunziSigmat ;
 		bool _usePunziMistag ;
 
-		//double sin_delta_perp_s;
-		//double cos_delta_perp_s;
-		//double sin_delta_zero_s;
-		//double cos_delta_zero_s;
-		//double sin_delta_para_s;
-		//double cos_delta_para_s;
-
-		//double sin_delta1;
-		//double cos_delta1;
-		//double sin_delta2;
-		//double cos_delta2;
-		//double sin_delta_2_1;
-		//double cos_delta_2_1;
 
 		//....................................
 		//Internal helper functions
 
 		double stored_AT;
 		inline double AT() const { return stored_AT; }
-		//double stored_AP;
-		//inline double AP() const { return stored_AP; }
-		//double stored_A0;
-		//inline double A0() const { return stored_A0; }
-		//double stored_AS;
-		//inline double AS() const { return stored_AS; }
-		//double stored_ASint;
-		//inline double ASint() const { return stored_ASint; }
 
 		//....................
 		// Safety for gammas
@@ -409,12 +320,10 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		double diffXsec();
 		double diffXsecTimeOnly();
 		double diffXsecNorm1();
-		//double diffXsecCompositeNorm1( int resolutionIndex )  ;
 		double diffXsecCompositeNorm1( )  ;
 
 		bool normalisationCacheValid ;
 		double normalisationCacheValue[3] ;
-		//double normalisationCacheValueRes2[3] ;
 
 		void DebugPrint( string , double ) const ;
 		void DebugPrintXsec( string , double ) const ;
@@ -427,7 +336,6 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		//..................................
 		inline double timeFactorEven()  const
 		{
-			//if( t < 0.0 ) return 0.0 ;
 			const double result =
 				D1() * (
 						( 1.0 + cosphis() ) * expL( )
@@ -471,7 +379,6 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		//..................................
 		inline double timeFactorOdd(  )   const
 		{
-			//if( t < 0.0 ) return 0.0 ;
 			return
 				D1() * (
 						( 1.0 - cosphis() ) * expL( )
@@ -501,152 +408,8 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		// These are the time factors and their analytic integrals for the three angle PDF
 
 		//...........................
-		//inline double timeFactorA0A0( )    const { return timeFactorEven( ) ; }
-		//inline double timeFactorA0A0Int( ) const { return timeFactorEvenInt( ) ; }
-
-		//...........................
-		//inline double timeFactorAPAP( )    const { return timeFactorEven( ) ; }
-		//inline double timeFactorAPAPInt( ) const { return timeFactorEvenInt( ) ; }
-
-		//...........................
 		inline double timeFactorATAT( )    const { return timeFactorOdd( ) ; }
 		inline double timeFactorATATInt( ) const { return timeFactorOddInt( ) ; }
-/*
-		//...........................
-		inline double timeFactorImAPAT( ) const
-		{
-			return
-				D1() * (
-						( expL( ) - expH( ) ) * cos_delta1 * sinphis()
-						+ ( expL( ) + expH( ) ) * sin_delta1 * CC()
-				       ) +
-				D2() * (
-						2.0  * ( sin_delta1*expCos( ) - cos_delta1*cosphis()*expSin( ) )
-				       ) ;
-		}
-
-		inline double timeFactorImAPATInt( ) const
-		{
-			return
-				D1() * (
-						( intExpL() - intExpH() ) * cos_delta1 * sinphis()
-						+ ( intExpL() + intExpH() ) * sin_delta1 * CC()
-				       ) +
-				D2() * (
-						2.0  * ( sin_delta1*intExpCos() - cos_delta1*cosphis()*intExpSin() )
-				       ) ;
-		}
-
-
-		//...........................
-		inline double timeFactorReA0AP( )  const
-		{
-			if( _useCosDpar ) return cosdpar * this->timeFactorEven(  ) ;//PELC-COSDPAR Special for fitting cosdpar separately
-			else return cos_delta_2_1 * this->timeFactorEven(  ) ;
-		}
-
-		inline double timeFactorReA0APInt( ) const
-		{
-			if( _useCosDpar ) return cosdpar * this->timeFactorEvenInt( ) ;//PELC-COSDPAR Special for fitting cosdpar separately
-			else return cos_delta_2_1 * this->timeFactorEvenInt( ) ;
-		}
-
-
-		//...........................
-		inline double timeFactorImA0AT(  ) const
-		{
-			return
-				D1() * (
-						( expL( ) - expH( ) ) * cos_delta2 * sinphis()
-						+ ( expL( ) + expH( ) ) * sin_delta2 * CC()
-				       ) +
-				D2() * (
-						2.0  * ( sin_delta2*expCos( ) - cos_delta2*cosphis()*expSin( ) )
-				       ) ;
-		}
-
-		inline double timeFactorImA0ATInt( ) const
-		{
-
-			return
-				D1() * (
-						( intExpL() - intExpH()  ) * cos_delta2 * sinphis()
-						+ ( intExpL() + intExpH()  ) * sin_delta2 * CC()
-				       ) +
-				D2() * (
-						2.0  * ( sin_delta2*intExpCos() - cos_delta2*cosphis()*intExpSin()  )
-				       ) ;
-		}
-
-		//.... S wave additions.......
-
-		//...........................
-		inline double timeFactorASAS( )    const { return timeFactorOdd( ) ; }
-		inline double timeFactorASASInt( ) const { return timeFactorOddInt( ) ; }
-
-
-		//...........................
-		inline double timeFactorReASAP( ) const
-		{
-			return
-				D1() * (
-						( expL( ) - expH( ) ) * sin_delta_para_s * sinphis()
-						+ ( expL( ) + expH( ) ) * cos_delta_para_s * CC()
-				       ) +
-				D2() * (
-						2.0  * ( cos_delta_para_s*expCos( ) - sin_delta_para_s*cosphis()*expSin( ) )
-				       ) ;
-		}
-
-		inline double timeFactorReASAPInt( ) const
-		{
-			return
-				D1() * (
-						( intExpL() - intExpH() ) * sin_delta_para_s * sinphis()
-						+ ( intExpL() + intExpH() ) * cos_delta_para_s * CC()
-				       ) +
-				D2() * (
-						2.0  * ( cos_delta_para_s*intExpCos() - sin_delta_para_s*cosphis()*intExpSin() )
-				       ) ;
-		}
-
-
-		//...........................
-		inline double timeFactorImASAT( )  const
-		{
-			return sin_delta_perp_s * this->timeFactorOdd(  ) ;
-		}
-
-		inline double timeFactorImASATInt( ) const
-		{
-			return sin_delta_perp_s * this->timeFactorOddInt( ) ;
-		}
-
-		//...........................
-		inline double timeFactorReASA0( ) const
-		{
-			return
-				D1() * (
-						( expL( ) - expH( ) ) * sin_delta_zero_s * sinphis()
-						+ ( expL( ) + expH( ) ) * cos_delta_zero_s * CC()
-				       ) +
-				D2() * (
-						2.0  * ( cos_delta_zero_s*expCos( ) - sin_delta_zero_s*cosphis()*expSin( ) )
-				       ) ;
-		}
-
-		inline double timeFactorReASA0Int( ) const
-		{
-			return
-				D1() * (
-						( intExpL() - intExpH() ) * sin_delta_zero_s * sinphis()
-						+ ( intExpL() + intExpH() ) * cos_delta_zero_s * CC()
-				       ) +
-				D2() * (
-						2.0  * ( cos_delta_zero_s*intExpCos() - sin_delta_zero_s*cosphis()*intExpSin() )
-				       ) ;
-		}
-*/
 };
 
 #endif

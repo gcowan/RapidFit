@@ -520,17 +520,20 @@ void SaveXML( RapidFitConfiguration* config )
 	}
 	full_xml << "</RapidFit>" << endl;
 
+	string fileName = ResultFormatter::GetOutputFolder();
+	fileName.append("/");
 	string xml_filename = "outputXMLFile";
 	xml_filename.append( StringProcessing::TimeString() );
 	xml_filename.append( ".xml" );
+	fileName.append(xml_filename);
 	ofstream output_xmlFile;
-	output_xmlFile.open( xml_filename.c_str() );
+	output_xmlFile.open( fileName.c_str() );
 
 	output_xmlFile << full_xml.str() ;
 
 	output_xmlFile.close();
 
-	cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
+	cout << endl << "Output XML Stored in:\t" << fileName << endl << endl;
 }
 
 int PerformMainFit( RapidFitConfiguration* config )
@@ -616,17 +619,20 @@ int PerformMainFit( RapidFitConfiguration* config )
 		full_xml << endl;
 
 
+		string fileName = ResultFormatter::GetOutputFolder();
+		fileName.append("/");
 		string xml_filename = "constraintXMLFile";
 		xml_filename.append( StringProcessing::TimeString() );
 		xml_filename.append( ".xml" );
+		fileName.append(xml_filename);
 		ofstream output_xmlFile;
-		output_xmlFile.open( xml_filename.c_str() );
+		output_xmlFile.open( fileName.c_str() );
 
 		output_xmlFile << full_xml.str() ;
 
 		output_xmlFile.close();
 
-		cout << endl << "Output XML Stored in:\t" << xml_filename << endl << endl;
+		cout << endl << "Output XML Stored in:\t" << fileName << endl << endl;
 	}
 
 	if( config->GlobalResult->GetFitStatus() < 3 )

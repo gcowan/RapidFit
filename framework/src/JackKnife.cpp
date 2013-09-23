@@ -28,6 +28,7 @@
 #include "DataSetConfiguration.h"
 #include "FitResult.h"
 #include "FitAssembler.h"
+#include "ResultFormatter.h"
 //	System Headers
 #include <math.h>
 #include <iostream>
@@ -64,7 +65,8 @@ namespace JackKnife
 
 		MemoryDataSet * subset = new MemoryDataSet( phase );
 		int nData = dataset->Yield();	
-                
+                string fileName = ResultFormatter::GetOutputFolder();
+                fileName.append("/jackknife.root");         
 		TFile * outputFile = new TFile("jackknife.root", "RECREATE");	
                 TNtuple * jack = new TNtuple("jack", "jackknifed - nominal", "diff_jackknifed_nominal:reco_time:true_time");
 

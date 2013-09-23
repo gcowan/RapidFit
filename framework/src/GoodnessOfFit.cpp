@@ -29,6 +29,7 @@
 #include "DataSetConfiguration.h"
 #include "FitResult.h"
 #include "FitAssembler.h"
+#include "ResultFormatter.h"
 //	System Headers
 #include <math.h>
 #include <iostream>
@@ -436,7 +437,10 @@ namespace GoodnessOfFit
 
 			double pvalue = count/double(nPerm);
 
-            TFile * outputFile = new TFile("tvalues.root", "RECREATE");
+	    string fileName = ResultFormatter::GetOutputFolder();	
+	    fileName.append("/tvalues.root");
+	    	
+            TFile * outputFile = new TFile(fileName.c_str(), "RECREATE");
             TNtuple * ntuple = new TNtuple("tvalues", "tvalues", "T:Tdata:pvalue");
             for ( int i = 0; i < nPerm; i++ ) ntuple->Fill(Tvalues[i], T, pvalue);
             ntuple->Write();

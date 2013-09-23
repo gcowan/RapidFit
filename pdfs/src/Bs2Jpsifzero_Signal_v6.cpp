@@ -1,20 +1,17 @@
-// $Id: Bs2Jpsifzero_Signal_v6.cpp,v 1.1 2009/12/06 Pete Clarke Exp $
+// $Id: Bs2Jpsifzero_Signal_v6.cpp,v 1.1 2013/07/17 Dianne Ferguson Exp $
 /** @class Bs2Jpsifzero_Signal_v6 Bs2Jpsifzero_Signal_v6.cpp
  *
- *  RapidFit PDF for Bs2JpsiPhi
+ *  RapidFit PDF for Bs2Jpsifzero
  *
- *  @author Peter Clarke peter.clarke@ed.ac.uk
- *  @date 2011-02-13
+ *  @author Dianne Ferguson dferguso@cern.ch
+ *  @date 2013-07-17
  */
 
 #include "Mathematics.h"
-//#include "Bs2JpsiPhi_Angluar_Terms.h"
 #include "Bs2Jpsifzero_Signal_v6.h"
-
 #include <iostream>
 #include <cmath>
 #include <iomanip>
-// #include "TF1.h"
 
 #define DEBUGFLAG true
 
@@ -48,9 +45,9 @@ Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6( const Bs2Jpsifzero_Signal_v6& in
 
 	, tag(input.tag), _gamma(input._gamma), dgam(input.dgam)
 
-	, Aperp_sq(input.Aperp_sq)//, Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq), As_sq(input.As_sq), delta_para(input.delta_para)
+	, Aperp_sq(input.Aperp_sq)
 
-	/*, delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2)*/, delta_ms(input.delta_ms)
+	, delta_ms(input.delta_ms)
 
 	, phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag), _mistagP1(input._mistagP1), _mistagP0(input._mistagP0)
 
@@ -74,7 +71,7 @@ Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6( const Bs2Jpsifzero_Signal_v6& in
 	
 	, _intexpSinObs_vec(input._intexpSinObs_vec), _intexpCosObs_vec(input._intexpCosObs_vec), timeBinNum(input.timeBinNum), _datapoint(NULL)
 
-	, Csp(input.Csp)/*, cosdpar(input.cosdpar)*/, lambda(input.lambda), _CC(input._CC), _DD(input._DD), _SS(input._SS), _mistagDeltaP1(input._mistagDeltaP1)
+	, Csp(input.Csp), lambda(input.lambda), _CC(input._CC), _DD(input._DD), _SS(input._SS), _mistagDeltaP1(input._mistagDeltaP1)
 
 	, _mistagDeltaP0(input._mistagDeltaP0), _mistagDeltaSetPoint(input._mistagDeltaSetPoint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah)
 
@@ -92,16 +89,8 @@ Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6(PDFConfigurator* configurator) : 
 	, deltaGammaName		( configurator->getName("deltaGamma") )
 	, deltaMName			( configurator->getName("deltaM") )
 	, Phi_sName				( configurator->getName("Phi_s") )
-//	, Azero_sqName			( configurator->getName("Azero_sq") )
-//	, Apara_sqName			( configurator->getName("Apara_sq") )
 	, Aperp_sqName			( configurator->getName("Aperp_sq") )
-//	, delta_zeroName		( configurator->getName("delta_zero") )
-//	, delta_paraName		( configurator->getName("delta_para") )
-//	, delta_perpName		( configurator->getName("delta_perp") )
-//	, As_sqName				( configurator->getName("F_s") )
-//	, delta_sName			( configurator->getName("delta_s") )
 	, CspName				( configurator->getName("Csp") )
-//	, cosdparName			( configurator->getName("cosdpar") ) //PELC-COSDPAR Special for fitting cosdpar separately
 	, cosphisName			( configurator->getName("cosphis") )
 	, sinphisName			( configurator->getName("sinphis") )
 	, lambdaName			( configurator->getName("lambda") )
@@ -176,8 +165,6 @@ Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6(PDFConfigurator* configurator) : 
 	//c0  = new TCanvas;
 	//histCounter = 0;
 	//~PELC
-
-	//this->prepareTimeFac();
 }
 
 //........................................................
@@ -186,7 +173,6 @@ Bs2Jpsifzero_Signal_v6::~Bs2Jpsifzero_Signal_v6()
 {
 	if( timeAcc != NULL ) delete timeAcc;
         if( resolutionModel != NULL ) delete resolutionModel;
-	//if( angAcc != NULL ) delete angAcc;
 }
 
 
@@ -279,8 +265,6 @@ bool Bs2Jpsifzero_Signal_v6::SetPhysicsParameters( ParameterSet* NewParameterSet
 	stored_AT = Aperp_sq > 0. ? sqrt(Aperp_sq) : 0.;
 	stored_gammal = (gamma() + ( dgam *0.5 )) > 0. ? (gamma() + ( dgam *0.5 )) : 0.;
 	stored_gammah = (gamma() - ( dgam *0.5 )) > 0. ? (gamma() - ( dgam *0.5 )) : 0.;
-//	this->DebugPrint( " Bs2Jpsifzero_Signal_v6:: AT :" , stored_AT ) ;
-//	this->DebugPrint( " Bs2Jpsifzero_Signal_v6:: delta gamma h:" , stored_gammah ) ;
 	return result;
 }
 
@@ -345,10 +329,7 @@ double Bs2Jpsifzero_Signal_v6::EvaluateTimeOnly(DataPoint * measurement)
 		if( std::isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
-
-
 	return returnValue ;
-
 }
 
 
@@ -377,7 +358,6 @@ double Bs2Jpsifzero_Signal_v6::Normalisation(DataPoint * measurement, PhaseSpace
 		thi = timeBound->GetMaximum();
 	}
 
-
 	//*** This is what will be returned.***
 	//How it is calcualted depends upon how resolution is treated
 	double returnValue=0 ;
@@ -390,7 +370,6 @@ double Bs2Jpsifzero_Signal_v6::Normalisation(DataPoint * measurement, PhaseSpace
 		if( std::isnan(returnValue) ) throw 10 ;
 		if( returnValue <= 0. ) throw 10 ;
 	}
-
 	return returnValue ;
 }
 
@@ -416,12 +395,6 @@ void Bs2Jpsifzero_Signal_v6::preCalculateTimeIntegrals()
         intExpH_stored = resolutionModel->ExpInt( tlo, thi, gamma_h() );
         intExpSin_stored = resolutionModel->ExpSinInt( tlo, thi, gamma(), delta_ms );
         intExpCos_stored = resolutionModel->ExpCosInt( tlo, thi, gamma(), delta_ms );
-	bool c1 = std::isnan(intExpL_stored)  ;
-	bool c2 = std::isnan(intExpH_stored)  ;
-	if( DEBUGFLAG && (c1 || c2 ) ) {
-		this->DebugPrint( " Bs2Jpsifzero_Signal_v6::precalculatetime integrals :" , gamma_l()) ;
-	}
-
 	return;
 }
 
@@ -431,10 +404,7 @@ void Bs2Jpsifzero_Signal_v6::preCalculateTimeIntegrals()
 double Bs2Jpsifzero_Signal_v6::diffXsec()
 {
 	preCalculateTimeFactors();
-
-	//double xsec=-1.;
 	double xsec = AT() * AT() * timeFactorATAT();
-
 
 	Observable* timeObs = _datapoint->GetObservable( timeName );
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
@@ -453,7 +423,6 @@ double Bs2Jpsifzero_Signal_v6::diffXsec()
 			//}
 //			break;
 //	}
-
 	return xsec;
 }
 
@@ -464,10 +433,7 @@ double Bs2Jpsifzero_Signal_v6::diffXsec()
 double Bs2Jpsifzero_Signal_v6::diffXsecTimeOnly()
 {
 	preCalculateTimeFactors() ;
-
-	double xsec =
-
-		AT()*AT() * timeFactorATAT(  );
+	double xsec = AT()*AT() * timeFactorATAT(  );
 
 	Observable* timeObs = _datapoint->GetObservable( timeName );
 	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
@@ -486,9 +452,7 @@ double Bs2Jpsifzero_Signal_v6::diffXsecTimeOnly()
 double Bs2Jpsifzero_Signal_v6::diffXsecNorm1()
 {
 	preCalculateTimeIntegrals() ;//  Replaced by new Caching mechanism , but this cant be used when event resolution is selected
-
-	double norm = 
-		AT()*AT() * timeFactorATATInt(  );
+	double norm = AT()*AT() * timeFactorATATInt(  );
 
 	//if( DEBUGFLAG && ((norm < 0)||(std::isnan(timeFactorATATInt()))) ) {
 	if( DEBUGFLAG && ((norm < 0)||(std::isnan(norm))) ) {
@@ -594,7 +558,7 @@ void Bs2Jpsifzero_Signal_v6::DebugPrintNorm( string message, double value )  con
 	cout << message << value << endl <<endl ;
 
 	cout << endl ;
-	cout <<  AT()*AT() * timeFactorATATInt(  )<< endl; //* angAccI3 << endl << endl ;
+	cout <<  AT()*AT() * timeFactorATATInt(  )<< endl; 
 
 	PDF_THREAD_UNLOCK
 }

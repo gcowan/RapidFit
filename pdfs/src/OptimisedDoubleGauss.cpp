@@ -20,7 +20,11 @@ OptimisedDoubleGauss::OptimisedDoubleGauss( PDFConfigurator* config ) :
   //  ClassLookUp assigns this PDFConriguator to this PDF 'behind the scenes' and is available on request for derrived objects
   BasePDF(),
   //  Constructing objects here in the 'initialization' phase is recommended as it's quicker
-  xName( "x" ), fracName( "f_sig1" ), sigma1Name( "sigma" ), sigma2Name( "sigma2" ), centerName( "center" ),
+	  xName( config->getName("x") )
+	, fracName( config->getName("f_sig1") )
+	, sigma1Name( config->getName("sigma") )
+	, sigma2Name( config->getName("sigma2") )
+	, centerName( config->getName("center") ),
   plotComponents(false), componentIndex(0), sigma1_denom(0.), sigma2_denom(0.), f(0.), f2(0.), denominator(0.), center(0.)
 {
   //  Work out of we want to plot Components when we do Projections
