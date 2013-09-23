@@ -127,3 +127,8 @@ vector<IPDF*> PhysicsBottle::GetAllPDFs() const
 	return allPDFs;
 }
 
+vector<IDataSet*> PhysicsBottle::GetAllDataSets() const
+{
+	return allDataSets;
+}
+

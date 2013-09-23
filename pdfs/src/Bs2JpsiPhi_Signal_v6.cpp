@@ -16,6 +16,7 @@
 #include "Bs2JpsiPhi_Angluar_Terms.h"
 #include "Bs2JpsiPhi_Signal_v6.h"
 #include "SimpleMistagCalib.h"
+#include "CombinedMistagCalib.h"
 
 #include <iostream>
 #include <cmath>
@@ -96,7 +97,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 
 	, performingComponentProjection( input.performingComponentProjection ), DebugFlag_v6( input.DebugFlag_v6 ), _useDoubleTres(input._useDoubleTres), _useTripleTres(input._useTripleTres)
 
-	, _mistagCalibModel( NULL  )
+	, _mistagCalibModel( NULL ), _useNewMistagModel( input._useNewMistagModel )
 {
 	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
 	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
@@ -128,7 +129,11 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
                 }
         }
 
-        if( input._mistagCalibModel != NULL ) _mistagCalibModel = new SimpleMistagCalib( input.GetConfigurator() );
+        if( input._mistagCalibModel != NULL )
+	{
+		if( input._useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( input.GetConfigurator() );
+		else _mistagCalibModel = new SimpleMistagCalib( input.GetConfigurator() );
+	}
 }
 
 //......................................
@@ -208,6 +213,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
 	_useDoubleTres = configurator->isTrue( "useDoubleGaussTres" );
 	_useTripleTres = configurator->isTrue( "useTripleGaussTres" );
+	_useNewMistagModel = configurator->isTrue( "useNewMistagModel" );
 	DebugFlag_v6 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
 	string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
@@ -313,7 +319,8 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 		}
 	}
 
-	_mistagCalibModel = new SimpleMistagCalib( configurator );
+	if( _useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( configurator );
+	else _mistagCalibModel = new SimpleMistagCalib( configurator );
 
 	if( resolutionModel->isPerEvent()  ) this->TurnCachingOff();
 

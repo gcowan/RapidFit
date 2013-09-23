@@ -101,6 +101,12 @@ class FitAssembler
 		static FitResult * Robs_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const ParameterSet*, const vector< PDFWithData* >,
 				const vector< ConstraintFunction* >, bool forceContinue=false, const int OutputLevel=1, DebugClass* =NULL);
 
+		/*!
+		 * @brief This checks the given PDFs and DataSets to make sure that they are consistent and can be used for fitting
+		 *
+		 * @return void
+		 */
+		static void CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDataSet*> allDataNum, const DebugClass* =NULL );
 
 		/*!
 		 * @brief This checks the given ParameterSet for the required Parameters

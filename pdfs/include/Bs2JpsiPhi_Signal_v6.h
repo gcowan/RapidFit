@@ -269,6 +269,8 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 
 		bool _useDoubleTres, _useTripleTres;
 
+		bool _useNewMistagModel;
+
 		double sin_delta_perp_s;
 		double cos_delta_perp_s;
 		double sin_delta_zero_s;

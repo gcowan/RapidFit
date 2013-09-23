@@ -420,6 +420,10 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 	}
 
+	vector<IPDF*> thesePDFs = bottle->GetAllPDFs();
+	vector<IDataSet*> theseDataSets = bottle->GetAllDataSets();
+	FitAssembler::CheckInputObs( thesePDFs, theseDataSets, debug );
+
 	FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle, debug );
 
 	if( debug != NULL )
@@ -472,6 +476,93 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	delete bottle;
 
 	return result;
+}
+
+void FitAssembler::CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDataSet*> allData, const DebugClass* debug )
+{
+	(void) debug;
+
+	if( AllPDFs.size() != allData.size() )
+	{
+		cerr << "FitAssembler: Number of User PDFs NOT the Same as the Number of DataSets being used to minimise" << endl;
+		cerr << endl;
+		exit(0);
+	}
+	else
+	{
+		for( unsigned int i=0; i< allData.size(); ++i )
+		{
+			if( allData[i] == NULL )
+			{
+				cerr << "FitAssembler: NULL Pointer to DataSet Please Fix!!!" << endl;
+				exit(0);
+			}
+			if( AllPDFs[i] == NULL )
+			{
+				cerr << "FitAssembler: NULL Pointer to PDF Please Fix!!!" << endl;
+				exit(0);
+			}
+
+			vector<ObservableRef> wantedObservables;
+			for( unsigned int j=0; j< AllPDFs[i]->GetPrototypeDataPoint().size(); ++j )
+			{
+				wantedObservables.push_back( ObservableRef( AllPDFs[i]->GetPrototypeDataPoint()[j] ) );
+			}
+			bool missing_any=false;
+			for( unsigned int j=0; j< wantedObservables.size(); ++j )
+			{
+
+				try
+				{
+					if( allData[i]->GetDataNumber() != 0 )
+					{
+						Observable* thisObs = allData[i]->GetDataPoint( 0 )->GetObservable( wantedObservables[j] );
+
+						if( thisObs == NULL || wantedObservables[j].GetIndex() < 0 )
+						{
+							missing_any = true;
+							cerr << "FitAssembler: Couldn't find Observable " << string( wantedObservables[j] ) << " in DataPoint 0!" << endl;
+							cerr << "FitAssembler: Please check it is in the DataSet for the PDF to access it!" << endl;
+							cerr << endl;
+						}
+					}
+				}
+				catch(...)
+				{
+					missing_any = true;
+					cerr << "FitAssembler: Fell over looking for Observable  " << string( wantedObservables[j] ) << " in DataPoint 0!" << endl;
+					cerr << "FitAssembler: Please check it is in the DataSet for the PDF to access it!" << endl;
+					cerr << endl;
+				}
+
+			}
+			for( unsigned int j=0; j< wantedObservables.size(); ++j )
+			{
+				try
+				{
+					PhaseSpaceBoundary* thisBoundary = allData[i]->GetBoundary();
+					IConstraint* thisConstraint = thisBoundary->GetConstraint( wantedObservables[j] );
+
+					if( thisConstraint == NULL || wantedObservables[j].GetIndex() < 0 )
+					{
+						missing_any = true;
+						cerr << "FitAssembler: Couldn't find a PhaseSpace Constraint Observable " << string( wantedObservables[j] ) << "!" << endl;
+						cerr << "FitAssembler: Please check it is in the PhaseSpaceBoundary!" << endl;
+						cerr << endl;
+					}
+				}
+				catch(...)
+				{
+					missing_any = true;
+					cerr << "FitAssembler: Fell over while finding a PhaseSpace Constraint Observable " << string( wantedObservables[j] ) << "!" << endl;
+					cerr << "FitAssembler: Please check it is in the PhaseSpaceBoundary!" << endl;
+					cerr << endl;
+				}
+			}
+
+			if( missing_any ) exit(0);
+		}
+	}
 }
 
 //Check that the provided ParameterSet only Contains the Parameters claimed by the PDFs to protect the Minimiser from runtime mistakes
@@ -557,6 +648,8 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	for( unsigned int i=0; i< AllData.size(); ++i )	allDataNum.push_back( AllData[i]->GetDataNumber() );
 
 	ParameterSet* internalBottleParameters = FitAssembler::CheckInputParams( BottleParameters, AllPDFs, allDataNum, debug );
+
+	FitAssembler::CheckInputObs( AllPDFs, AllData, debug );
 
 	if ( AllPDFs.size() == AllData.size() )
 	{

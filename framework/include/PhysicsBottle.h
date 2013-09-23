@@ -40,6 +40,8 @@ class PhysicsBottle
 
 		vector<IPDF*> GetAllPDFs() const;
 
+		vector<IDataSet*> GetAllDataSets() const;
+
 		void AddResult( const IPDF*, IDataSet* );
 
 		void AddConstraint( const ConstraintFunction* );

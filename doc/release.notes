@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/09/23 Rob Currie
+  - Adding initial implementation of Combined Mistag calibration class for v6 3fb measurement
+  - Added new method: FitAssembler::CheckInputObs to check the datasets which have been passed to the PDF to check that they are consistent
+      This will verbosely check the screen and exit if there are problems
+      This will check the 0th DataPoint and the PhaseSpaceBoundary to check that the required Observables are present in the DataSet and exit cleanly when the fit is not constructed correctly
+  - Added new v6 argument to allow the current code in head to pull in the combined mistag calibration object (default is NOT to do so) 
+
 2013/09/23 Dianne Ferguson
   - Added the separate fzero class for combined fits with JpsiPhi (v5).
 
