@@ -30,7 +30,7 @@ class IMistagCalib
 
 		virtual double D2() const = 0;
 
-	protected:
+	//protected:
 
 		IMistagCalib() {};
 
