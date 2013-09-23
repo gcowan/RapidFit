@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/09/23 Dianne Ferguson
+  - Added the separate fzero class for combined fits with JpsiPhi (v5).
+
+2013/09/23 Dianne Ferguson
+  - Updated places in main, jackknife, goodnessoffit to get the output location from ResultFormatter.
+  - Updated OptimisedDoubleGauss so you can use parametersubstituion.
+  - Updated v5 bs2Jpsifzero; tidied up.  
+
 2013/09/20 Rob Currie
   - Adding 1fb XML and DataSet for JpsiKK
   - Moving v6 Code to use IMistagCalib interface to make switching between tagging calibrations easy and reduces the amount of hacking within the v6 PDF
