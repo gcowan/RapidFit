@@ -25,26 +25,32 @@ class CombinedMistagCalib : public IMistagCalib
 		void addObservables( vector<string>& observableNames ) const;
 		void setObservables( const DataPoint* measurement );
 
-		double q() const;
+		double D1() const;
 
-		double mistag() const;
+		double D2() const;
+
+		void Print() const;
+
+		double q() const;
 
 		double mistagBbar() const;
 
 		double mistagB() const;
 
-		double D1() const;
-
-		double D2() const;
-
 	protected:
+
+		CombinedMistagCalib( const CombinedMistagCalib& );
+		CombinedMistagCalib& operator=(const CombinedMistagCalib );
 
 		double mistagSSB() const;
 		double mistagOSB() const;
+		double mistagOSSSB() const;
 		double mistagSSBbar() const;
 		double mistagOSBbar() const;
+		double mistagOSSSBbar() const;
 
-		double getEta() const;
+		double getFixedEta() const;
+		double getFloatedEta() const;
 
 		bool OSTagged() const;
 
@@ -58,7 +64,7 @@ class CombinedMistagCalib : public IMistagCalib
 		bool _OSTagged, _SSTagged, _OSSSTagged;
 
 		int _tagOS, _tagSS, _combinedtag;
-		double _mistagOS, _mistagSS, _eta;
+		double _mistagOS, _mistagSS, _mistagOSSS;
 		double _mistagP0_OS, _mistagP1_OS, _mistagSetPoint_OS, _mistagDeltaP1_OS, _mistagDeltaP0_OS, _mistagDeltaSetPoint_OS;
 		double _mistagP0_SS, _mistagP1_SS, _mistagSetPoint_SS, _mistagDeltaP1_SS, _mistagDeltaP0_SS, _mistagDeltaSetPoint_SS;
 		double _mistagP0_OSSS, _mistagP1_OSSS, _mistagSetPoint_OSSS, _mistagDeltaP1_OSSS, _mistagDeltaP0_OSSS, _mistagDeltaSetPoint_OSSS;
@@ -74,8 +80,10 @@ class CombinedMistagCalib : public IMistagCalib
 		IMistagCalib* _IMistagCalib_OS;
 		IMistagCalib* _IMistagCalib_SS;
 		IMistagCalib* _IMistagCalib_OSSS;
-		ObservableRef mistagName;
+		ObservableRef mistagOSSSName;
 
+		bool _onTuple;
+		bool _useFixedEta;
 };
 
 #endif

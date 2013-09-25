@@ -69,6 +69,7 @@ double SimpleMistagCalib::q() const
 	return _tag;
 }
 
+/*
 double SimpleMistagCalib::mistag() const
 {
 	double returnValue = -1000.;
@@ -107,6 +108,7 @@ double SimpleMistagCalib::mistag() const
 	}
 	return returnValue;
 }
+*/
 
 double SimpleMistagCalib::mistagBbar() const
 {
@@ -188,5 +190,18 @@ double SimpleMistagCalib::D2() const
 	return this->q()*( 1.0 - this->mistagB() - this->mistagBbar() );
 }
 
+void SimpleMistagCalib::Print() const
+{
+	cout << endl;
+	cout << "_mistagP0            " << _mistagP0 << "\t" << string(mistagP0Name) << endl;
+	cout << "_mistagDeltaP0       " << _mistagDeltaP0 << "\t" << string(mistagDeltaP0Name) << endl;
+	cout << "_mistagP1            " << _mistagP1 << "\t" << string(mistagP1Name) << endl;
+	cout << "_mistagDeltaP1       " << _mistagDeltaP1 << "\t" << string(mistagDeltaP1Name) << endl;
+	cout << "_mistag              " << _mistag << "\t" << string(mistagName) << endl;
+	cout << "_mistagSetPoint      " << _mistagSetPoint << "\t" << string(mistagSetPointName) << endl;
+	cout << "_mistagDeltaSetPoint " << _mistagDeltaSetPoint << "\t" << string(mistagDeltaSetPointName) << endl;
+	cout << "this->mistagB()      " << this->mistagB() << endl;
+	cout << "this->mistagBbar()   " << this->mistagBbar() << endl;
+}
 
 

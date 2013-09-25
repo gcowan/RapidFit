@@ -672,6 +672,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 			//Get the PDF from the fit with the CV from the fit still passed
 			IPDF* temp_pdf = config->pdfsAndData[i]->GetPDF();
 
+			/*
 			//Tell the PDF you want to copy the form of all continuous objects on the don't integrate list
 			for( unsigned int j=0; j< temp_pdf->GetDoNotIntegrateList().size(); ++j )
 			{
@@ -689,6 +690,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 					}
 				}
 			}
+			*/
 
 			//Construct the configuration to give a Foam generator
 			DataSetConfiguration* temp_config = new DataSetConfiguration( "Foam", config->pdfsAndData[i]->GetDataSet()->GetDataNumber(), "", vector<string>(), vector<string>(), temp_pdf );

@@ -21,6 +21,7 @@
 #include "Math/GSLMCIntegrator.h"
 ///	RapidFit Headers
 #include "main.h"
+#include "cerf.h"
 #include "Mathematics.h"
 #include "Bd2JpsiKstar_sWave.h"
 #include "Bd2JpsiKstar_sWave_Fscopy.h"
@@ -41,7 +42,7 @@ using namespace::std;
 bool RooMathinit=false;
 
 #ifdef __RAPIDFIT_USE_GSL
-
+///	GSL Headers
 #include <gsl/gsl_complex_math.h>
 #include <gsl/gsl_sf_erf.h>
 #include <gsl/gsl_sf_pow_int.h>
@@ -153,6 +154,19 @@ namespace Mathematics
 	}
 
 	// Calculate Re(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
+#ifdef _USE_NEW_CERF
+	double evalCerfRe( double swt, double u, double c)  {
+		complex<double> z_stl( swt*c, u+c );
+		if( (u+c) > -4.0 )
+		{
+			return Cerf::faddeeva_fast( z_stl ).real()*exp( -u*u );
+		}
+		else
+		{
+			return evalCerfApprox( swt, u, c ).real();
+		}
+	}
+#else
 	double evalCerfRe( double swt, double u, double c)  {
 #if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 		RooComplex z( swt*c, u+c );
@@ -194,8 +208,22 @@ namespace Mathematics
 		}
 		return returnable;
 	}
+#endif
 
 	// Calculate Im(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
+#ifdef _USE_NEW_CERF
+	double evalCerfIm( double swt, double u, double c)  {
+		complex<double> z_stl( swt*c, u+c );
+		if( (u+c) > -4.0 )
+		{
+			return Cerf::faddeeva_fast( z_stl ).imag()*exp( -u*u );
+		}
+		else
+		{
+			return evalCerfApprox( swt, u, c ).imag();
+		}
+	}
+#else
 	double evalCerfIm( double swt, double u, double c)  {
 #if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
 		RooComplex z( swt*c, u+c );
@@ -237,6 +265,7 @@ namespace Mathematics
 		}
 		return returnable;
 	}
+#endif
 
 	//----------------------------------------------------------------------------------------------
 	//........................................

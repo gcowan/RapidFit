@@ -15,6 +15,8 @@
 
 //	RapidFit Headers
 #include "IDataSet.h"
+#include "PhaseSpaceBoundary.h"
+#include "IPDF.h"
 //	System Headers
 #include <string>
 #include <vector>
@@ -22,6 +24,7 @@
 using namespace::std;
 
 class IDataSet;
+class IPDF;
 
 class PDFConfigurator
 {
@@ -40,12 +43,6 @@ class PDFConfigurator
 		 * @brief Destructor
 		 */
 		~PDFConfigurator();
-
-		//Custom functions for modelling a phenomenological parameter in the PDF
-		void addObservableToModel( string inputObservable, IDataSet* inputDataSet );
-		pair<string, IDataSet*> getObservableToModel();
-		void setFitFunc( string );
-		string getFitFunc();
 
 		// Methods for use when substituting a parameter name for a different name
 		// E.g. to substitute tau_LL  ->  tauLL2
@@ -87,7 +84,17 @@ class PDFConfigurator
 		void Print() const;
 
 		bool empty() const;
+
+		void AddDaughterPDF( const IPDF* input );
+
+		vector<IPDF*> GetDaughterPDFs() const;
+
+		void SetPhaseSpaceBoundary( PhaseSpaceBoundary* input );
+
+		PhaseSpaceBoundary* GetPhaseSpaceBoundary() const;
+
 	private:
+
 		//      Uncopyable This Way!
 		PDFConfigurator& operator = ( const PDFConfigurator& );
 
@@ -97,9 +104,8 @@ class PDFConfigurator
 		vector<string> configParameters;
 		vector<string> configValues;
 
-		string input_observable;
-		IDataSet* input_DataSet;
-		string fitFunction;
+		vector<IPDF*> daughterPDFs;
+		PhaseSpaceBoundary* thisPDFsBoundary;
 };
 
 #endif

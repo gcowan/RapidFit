@@ -685,6 +685,9 @@ double Bs2JpsiPhi_Signal_v6::EvaluateTimeOnly(DataPoint * measurement)
 {
 	_datapoint = measurement;
 
+        resolutionModel->setObservables( measurement );
+        _mistagCalibModel->setObservables( measurement );
+
 	A0A0_value = measurement->GetPseudoObservable( A0A0_Obs );
 	APAP_value = measurement->GetPseudoObservable( APAP_Obs );
 	ATAT_value = measurement->GetPseudoObservable( ATAT_Obs );

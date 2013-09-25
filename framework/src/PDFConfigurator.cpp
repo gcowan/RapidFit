@@ -11,6 +11,8 @@
 
 #include "PDFConfigurator.h"
 #include "StringProcessing.h"
+#include "ClassLookUp.h"
+#include "IPDF.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -23,39 +25,50 @@ using namespace::std;
 
 ///..........................................
 //Default constructor & destructor
-PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), input_observable(), input_DataSet(NULL), fitFunction("[0]")
+PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), daughterPDFs(), thisPDFsBoundary(NULL)
 {
 }
 
 PDFConfigurator::PDFConfigurator( const PDFConfigurator& input ) :
 	defaultNames( input.defaultNames ), replacementNames( input.replacementNames ), configParameters( input.configParameters ), configValues( input.configValues ),
-	input_DataSet( input.input_DataSet ), fitFunction( input.fitFunction ), input_observable()
+	daughterPDFs(), thisPDFsBoundary(NULL)
 {
+	for( unsigned int i=0; i< input.daughterPDFs.size(); ++i )
+	{
+		daughterPDFs.push_back( ClassLookUp::CopyPDF( input.daughterPDFs[i] ) );
+	}
+	if( input.thisPDFsBoundary != NULL ) thisPDFsBoundary = new PhaseSpaceBoundary( *(input.thisPDFsBoundary) );
 }
 
 PDFConfigurator::~PDFConfigurator()
 {
+	if( thisPDFsBoundary != NULL ) delete thisPDFsBoundary;
+	while( !daughterPDFs.empty() )
+	{
+		if( daughterPDFs.back() != NULL ) delete daughterPDFs.back();
+		daughterPDFs.pop_back();
+	}
 }
 
-void PDFConfigurator::addObservableToModel( string inputObservable, IDataSet* inputDataSet )
+void PDFConfigurator::AddDaughterPDF( const IPDF* input )
 {
-	input_observable = inputObservable;
-	input_DataSet = inputDataSet;
+	daughterPDFs.push_back( ClassLookUp::CopyPDF( input ) );
 }
 
-pair<string, IDataSet*> PDFConfigurator::getObservableToModel()
+vector<IPDF*> PDFConfigurator::GetDaughterPDFs() const
 {
-	return make_pair( input_observable, input_DataSet );
+	return daughterPDFs;
 }
 
-void PDFConfigurator::setFitFunc( string input )
+void PDFConfigurator::SetPhaseSpaceBoundary( PhaseSpaceBoundary* input )
 {
-	fitFunction = input;
+	if( thisPDFsBoundary != NULL ) delete thisPDFsBoundary;
+	thisPDFsBoundary = new PhaseSpaceBoundary( *input );
 }
 
-string PDFConfigurator::getFitFunc()
+PhaseSpaceBoundary* PDFConfigurator::GetPhaseSpaceBoundary() const
 {
-	return fitFunction;
+	return thisPDFsBoundary;
 }
 
 void PDFConfigurator::appendParameterNames( string names_list )

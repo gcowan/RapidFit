@@ -21,23 +21,25 @@ class SimpleMistagCalib : public IMistagCalib
 		void addObservables( vector<string>& observableNames ) const;
 		void setObservables( const DataPoint* measurement );
 
-		double q() const;
+		double D1() const;
 
-		double mistag() const;
+		double D2() const;
+
+		void Print() const;
+
+		double q() const;
 
 		double mistagBbar() const;
 
 		double mistagB() const;
 
-		double D1() const;
-
-		double D2() const;
-
-	protected:
+	private:
 
 		double _tag, _mistag, _mistagP0, _mistagP1, _mistagSetPoint, _mistagDeltaP1, _mistagDeltaP0, _mistagDeltaSetPoint;
 		ObservableRef tagName, mistagName, mistagP1Name, mistagP0Name, mistagSetPointName;
 		ObservableRef mistagDeltaP1Name, mistagDeltaP0Name, mistagDeltaSetPointName;
+
+		//double mistag() const;
 
 };
 

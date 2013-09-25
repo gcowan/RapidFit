@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/09/25 Rob Currie
+  - Fixed Combined Mistag model, LOTS of debugging statements have been left in this class but shoudn't hinder performance...
+  - Removed some defunct code from PDFConfigurator  (Removed the only PDF using this code as it is defunct)
+  - Added some new handler functions for PDFConfigurator with the aim to be able to pass a single PDFConfigurator to the NormalisedSum and Prod PDFs to construct them
+
 2013/09/23 Rob Currie
   - Adding initial implementation of Combined Mistag calibration class for v6 3fb measurement
   - Added new method: FitAssembler::CheckInputObs to check the datasets which have been passed to the PDF to check that they are consistent

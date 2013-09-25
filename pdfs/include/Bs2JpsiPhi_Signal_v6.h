@@ -376,11 +376,11 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 					cout << " Bs2JpsiPhi_Signal_v6::timeFactorEven() : result < 0 " << endl ;
 					cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
 					cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
-					cout << " ->term3 " << _mistagCalibModel->q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*_mistagCalibModel->mistag()) << endl ;
+					//cout << " ->term3 " << _mistagCalibModel->q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*_mistagCalibModel->mistag()) << endl ;
 					cout << "   -->sin(phis) "  << sinphis() << endl ;
 					cout << "   -->expSin    "  << expSin() << endl ;
-					cout << "   -->tagFrac   "  << _mistagCalibModel->mistag() << endl ;
-					cout << "   -->delta_ms  "  << delta_ms << endl ;
+					//cout << "   -->tagFrac   "  << _mistagCalibModel->mistag() << endl ;
+					//cout << "   -->delta_ms  "  << delta_ms << endl ;
 					PDF_THREAD_UNLOCK
 				}
 			}
