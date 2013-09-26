@@ -27,13 +27,29 @@ SumPDF::SumPDF( const SumPDF& input ) : BasePDF( (BasePDF) input ), prototypeDat
 }
 
 //Constructor specifying fraction parameter name
-SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName)
+//SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName)
+
+SumPDF::SumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL), firstFraction(0.5),
+	firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL)
 {
+	if( config->GetDaughterPDFs().size() != 2 )
+	{
+		cerr << "SumPDF requires ONLY 2 daughter PDFs" << endl;
+		exit(-54261);
+	}
+	else
+	{
+		firstPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[0] );
+		secondPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[1] );
+		fractionName = config->getName( config->GetFractionName() );
+		integrationBoundary = new PhaseSpaceBoundary( *(config->GetPhaseSpaceBoundary()) );
+	}
+
 	cout << endl;
 	cout << "Constructing SumPDF" << endl;
 	cout << endl;
 	this->SetLabel( "Sum_("+firstPDF->GetLabel()+")+("+firstPDF->GetLabel()+")" );
-	MakePrototypes(InputBoundary);
+	MakePrototypes(integrationBoundary);
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
@@ -52,7 +68,7 @@ void SumPDF::SetComponentStatus( const bool input )
 
 bool SumPDF::GetComponentStatus() const
 {
-        return this->ReallyGetComponentStatus();
+	return this->ReallyGetComponentStatus();
 }
 
 vector<string> SumPDF::PDFComponents()

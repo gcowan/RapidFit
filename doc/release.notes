@@ -1,5 +1,15 @@
 // $Id: release.notes $
 
+2013/09/26 Rob Currie
+  - BREAKING BACKWARDS COMPATIBILITY
+    The PDFConfigurator object has once again been expanded to include the PhaseSpaceBoundary and PDFDaughters this allows for the NormalisedSumPDF, ProdPDF and SumPDF objects to be constructed using a more common interface
+      This also allows for more information to be available to the PDFs on construction in addition to allowing for Parameter Substitution to be used for FitFractions
+    This explicitly disallows the use of FitFractions within the PDFConfigurator when using a CommonPDF.
+      It is now suggested that people use ParameterSubstitions which makes it explicit where the fractions come from within nested sum PDFs
+  - All PDFs now support the <Label> tag which allows for the PDF label to be set in the XML to make life easier when reading some debugging statements
+  - Looking to move PDFs in framework to use the common PDF macro for construction and lookup to allow for the XMLConfigReader to have to know even less about PDFs.
+      The amount of code within the XMLConfigReader which was horribly arbritraty in dealing with PDFs has been dramatically reduced
+
 2013/09/25 Rob Currie
   - Fixed Combined Mistag model, LOTS of debugging statements have been left in this class but shoudn't hinder performance...
   - Removed some defunct code from PDFConfigurator  (Removed the only PDF using this code as it is defunct)

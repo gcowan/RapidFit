@@ -12,10 +12,22 @@
 using namespace::std;
 
 //Constructor not specifying fraction parameter name
-ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) )
+//ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) )
+ProdPDF::ProdPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( NULL ), secondPDF( NULL )
 {
+	if( config->GetDaughterPDFs().size() != 2 )
+	{
+		cerr << "ProdPDF requires ONLY 2 daughter PDFs" << endl;
+		exit(-54262);
+	}
+	else
+	{
+		firstPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[0] );
+		secondPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[1] );
+	}
+
 	this->SetName( "Prod" );
-	this->SetLabel( "Prod["+FirstPDF->GetLabel()+"]x["+SecondPDF->GetLabel()+"]" );
+	this->SetLabel( "Prod["+firstPDF->GetLabel()+"]x["+secondPDF->GetLabel()+"]" );
 
 	cout << endl;
 	cout << "Constructing ProdPDF " << this->GetLabel() << endl;
@@ -44,14 +56,14 @@ ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeData
 
 void ProdPDF::SetComponentStatus( const bool input )
 {
-        firstPDF->SetComponentStatus( input );
-        secondPDF->SetComponentStatus( input );
-        this->ReallySetComponentStatus( input );
+	firstPDF->SetComponentStatus( input );
+	secondPDF->SetComponentStatus( input );
+	this->ReallySetComponentStatus( input );
 }
 
 bool ProdPDF::GetComponentStatus() const
 {
-        return this->ReallyGetComponentStatus();
+	return this->ReallyGetComponentStatus();
 }
 
 vector<string> ProdPDF::PDFComponents()

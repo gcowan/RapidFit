@@ -29,9 +29,10 @@ class ProdPDF : public BasePDF
 		 *
 		 * @param First   First fully constructed PDF object
 		 *
-		 * @patam Second  Second fully constructed PDF object
+		 * @param Second  Second fully constructed PDF object
 		 */
-		ProdPDF( IPDF* First, IPDF* Second );
+		ProdPDF( PDFConfigurator* config );
+		//ProdPDF( IPDF* First, IPDF* Second );
 
 		/*!
 		 * @brief Copy Constructor

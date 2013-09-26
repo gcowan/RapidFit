@@ -28,7 +28,8 @@ class SumPDF : public BasePDF
 		 * @brief Constructor
 		 *
 		 */
-		SumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string );
+		//SumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string );
+		SumPDF( PDFConfigurator* config );
 
 		/*!
 		 * @brief Copy Constructor
@@ -215,6 +216,7 @@ class SumPDF : public BasePDF
 		IPDF * secondPDF;
 		double firstFraction, firstIntegralCorrection, secondIntegralCorrection;
 		string fractionName;
+		PhaseSpaceBoundary * integrationBoundary;
 };
 
 #endif

@@ -25,7 +25,8 @@ using namespace::std;
 class NormalisedSumPDF : public BasePDF
 {
 	public:
-		NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string="fractionName" );
+		NormalisedSumPDF( PDFConfigurator* config );
+		//NormalisedSumPDF( IPDF*, IPDF*, PhaseSpaceBoundary*, string="fractionName" );
 		NormalisedSumPDF( const NormalisedSumPDF& );
 		~NormalisedSumPDF();
 

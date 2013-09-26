@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	RapidFit Headers
 #include "XMLConfigReader.h"
@@ -1946,11 +1946,11 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 }
 
 //Create a PDF from an appropriate xml tag
-IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigurator, bool print )
+IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* InputBoundary, XMLTag* overloadConfigurator, bool print )
 {
 	(void) print;
 	IPDF* returnable_NamedPDF=NULL;
-	string label;
+
 	//Check the tag actually is a PDF
 	if( InputTag->GetName() == "PDF" )
 	{
@@ -1981,7 +1981,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "Label" )
 			{
-				label = XMLTag::GetStringValue( pdfConfig[configIndex] );
+				configurator->SetPDFLabel( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ObservableName" )
 			{
@@ -2011,10 +2011,6 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 				++configParamNum;
-			}
-			else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
-			{
-				//	Silently ignore this option
 			}
 			else
 			{
@@ -2058,9 +2054,9 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 			{
 				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
-			else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
+			else if ( pdfConfig[configIndex]->GetName() == "Label" )
 			{
-				//      Silently ignore this option
+				configurator->SetPDFLabel( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else
 			{
@@ -2068,6 +2064,8 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 				exit(1);
 			}
 		}
+
+		configurator->SetPhaseSpaceBoundary( InputBoundary );
 
 		//Check if the name is recognised as a PDF
 		returnable_NamedPDF = ClassLookUp::LookUpPDFName( name, configurator );
@@ -2079,7 +2077,6 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 	}
 
 	//	returnable_NamedPDF->SetRandomFunction( GetSeed() );
-	if( !label.empty() ) returnable_NamedPDF->SetLabel( label );
 	return returnable_NamedPDF;
 }
 
@@ -2087,72 +2084,74 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, XMLTag* overloadConfigur
 IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator, bool print )
 {
 	IPDF* returnable_SUMPDF=NULL;
-	string label;
-	vector< IPDF* > componentPDFs;
+
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "SumPDF" )
 	{
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
-		string fractionName = "unspecified";
 
-		if( overloadConfigurator != NULL )
+		PDFConfigurator* configurator = new PDFConfigurator();
+
+		vector< XMLTag* > pdfConfig2 = overloadConfigurator->GetChildren();
+
+		//Load the PDF configuration
+		for ( unsigned int configIndex = 0; configIndex < pdfConfig2.size(); ++configIndex )
 		{
-			vector<XMLTag*> optional = overloadConfigurator->GetChildren();
-			vector<string> names;
-			string fracstr="FractionName";
-			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
-			for( int i=int(optional.size()-1); i != -1; --i )
+			if ( pdfConfig2[configIndex]->GetName() == "ParameterSubstitution" )
 			{
-				if( optional[(unsigned)i]->GetName() == "FractionName" )
-				{
-					fractionName = XMLTag::GetStringValue( optional[(unsigned)i] );
-					overloadConfigurator->RemoveChild( i );
-					break;
-				}
-				//cout << optional[i]->GetName() << endl;
+				configurator->addParameterSubstitution( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "AppendParameterNames" )
+			{
+				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "ConfigurationParameter" )
+			{
+				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "Label" )
+			{
+				configurator->SetPDFLabel( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
+			{
+			}
+			else
+			{
+				cerr << "(1b) Sum Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
+				exit(1);
 			}
 		}
 
-		unsigned int i=1;
 		//Load the PDF configuration
-		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
+		for( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
-			if( pdfConfig[configIndex]->GetName() == "FractionName" && fractionName == "unspecified" )
+			if( pdfConfig[configIndex]->GetName() == "FractionName" )
 			{
-				fractionName = XMLTag::GetStringValue( pdfConfig[configIndex] );
+				configurator->SetFractionName( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if( pdfConfig[configIndex]->GetName() == "Label" )
 			{
-				label = XMLTag::GetStringValue( pdfConfig[configIndex] );
+				configurator->SetPDFLabel( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
+			{
+				IPDF* thisPDF = GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, print );
+				configurator->AddDaughterPDF( thisPDF );
+				delete thisPDF;
 			}
 			else
 			{
-				//cout << "--------------------------------------------------------------------------------------------------------------------" << endl;
-				//cout << "Constructing SumPDF Component: " << i << endl;
-				//cout << endl;
-				componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, print ) );
-				++i;
+				cerr << "Unknown SumPDF Tag: " << pdfConfig[configIndex]->GetName() << endl << endl;
+				exit(4587);
 			}
 		}
 
-		//Check there are two component PDFs to sum
-		if( componentPDFs.size() == 2 )
-		{
-			if ( fractionName == "unspecified" )
-			{
-				cerr << "Please provide fractionName" << endl;
-				exit(-87632);
-			}
-			else
-			{
-				returnable_SUMPDF = new SumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
-			}
-		}
-		else
-		{
-			cerr << "Incorrect number of PDFs to sum: " << componentPDFs.size() << " not 2" << endl;
-			exit(1);
-		}
+		configurator->SetPhaseSpaceBoundary( InputBoundary );
+
+		returnable_SUMPDF = new SumPDF( configurator );
+
+		delete configurator;
 	}
 	else
 	{
@@ -2160,8 +2159,6 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		exit(1);
 	}
 
-	delete componentPDFs[0]; delete componentPDFs[1];
-	if( !label.empty() ) returnable_SUMPDF->SetLabel( label );
 	return returnable_SUMPDF;
 }
 
@@ -2169,78 +2166,75 @@ IPDF * XMLConfigReader::GetSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator, bool print )
 {
 	IPDF* returnable_NormPDF = NULL;
-	string label;
-	vector< IPDF* > componentPDFs;
+
 	//Check the tag actually is a PDF
-	if ( InputTag->GetName() == "NormalisedSumPDF" )
+	if( InputTag->GetName() == "NormalisedSumPDF" )
 	{
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
-		string fractionName = "unspecified";
 
-		if( overloadConfigurator != NULL )
+		PDFConfigurator* configurator = new PDFConfigurator();
+
+		vector< XMLTag* > pdfConfig2 = overloadConfigurator->GetChildren();
+
+		//Load the PDF configuration
+		for ( unsigned int configIndex = 0; configIndex < pdfConfig2.size(); ++configIndex )
 		{
-			vector<XMLTag*> optional = overloadConfigurator->GetChildren();
-			vector<string> names;
-			string fracstr="FractionName";
-			for( unsigned int i=0; i< optional.size(); ++i ) names.push_back( optional[i]->GetName() );
-			for( int i=int(optional.size()-1); i > -1; --i )
+			if ( pdfConfig2[configIndex]->GetName() == "ParameterSubstitution" )
 			{
-				if( optional[(unsigned)i]->GetName() == "FractionName" )
-				{
-					fractionName = XMLTag::GetStringValue( optional[(unsigned)i] );
-					overloadConfigurator->RemoveChild( i );
-					break;
-				}
+				configurator->addParameterSubstitution( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "AppendParameterNames" )
+			{
+				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "ConfigurationParameter" )
+			{
+				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "Label" )
+			{
+				configurator->SetPDFLabel( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
+			{
+			}
+			else
+			{
+				cerr << "(1b) NormalisedSum Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
+				exit(1);
 			}
 		}
 
-		unsigned int i=1;
 		//Load the PDF configuration
-		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
+		for( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
 			if( pdfConfig[configIndex]->GetName() == "FractionName" )
 			{
-				if( fractionName == "unspecified" )
-				{
-					fractionName = XMLTag::GetStringValue( pdfConfig[configIndex] );
-				}
-				else
-				{
-					//	Silently Ignore
-				}
+				configurator->SetFractionName( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			}
 			else if( pdfConfig[configIndex]->GetName() == "Label" )
 			{
-				label = XMLTag::GetStringValue( pdfConfig[configIndex] );
+				configurator->SetPDFLabel( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
+			{
+				IPDF* thisPDF = GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, print );
+				configurator->AddDaughterPDF( thisPDF );
+				delete thisPDF;
 			}
 			else
 			{
-				//cout << "--------------------------------------------------------------------------------------------------------------------" << endl;
-				//cout << "Constructing NormalisedSum Component: " << i << endl;
-				//cout << endl;
-				componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, print ) );
-				++i;
+				cerr << "Unknown NormalisedSum PDF Tag: " << pdfConfig[configIndex]->GetName() << endl << endl;
+				exit(4587);
 			}
 		}
 
-		//Check there are two component PDFs to sum
-		if ( componentPDFs.size() == 2 )
-		{
-			if ( fractionName == "unspecified" )
-			{
-				cerr << endl << "Error Must Provide a FractionName for this PDF!\tNormalisedSum_(" << componentPDFs[0]->GetLabel()<<")+("<<componentPDFs[1]->GetLabel()<< ")" << endl << endl;
-				exit(1);
-			}
-			else
-			{
-				returnable_NormPDF =  new NormalisedSumPDF( componentPDFs[0], componentPDFs[1], InputBoundary, fractionName );
-			}
-		}
-		else
-		{
-			cerr << "Incorrect number of PDFs to sum: " << componentPDFs.size() << " not 2" << endl;
-			exit(1);
-		}
+		configurator->SetPhaseSpaceBoundary( InputBoundary );
+
+		returnable_NormPDF =  new NormalisedSumPDF( configurator );
+
+		delete configurator;
+
 	}
 	else
 	{
@@ -2248,10 +2242,6 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 		exit(1);
 	}
 
-	//cout << returnable_NormPDF->GetName() << "\t\t" << returnable_NormPDF->GetLabel() << endl;
-
-	delete componentPDFs[0]; delete componentPDFs[1];
-	if( !label.empty() ) returnable_NormPDF->SetLabel( label );
 	return returnable_NormPDF;
 }
 
@@ -2259,40 +2249,72 @@ IPDF * XMLConfigReader::GetNormalisedSumPDF( XMLTag * InputTag, PhaseSpaceBounda
 IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator, bool print )
 {
 	IPDF* returnable_ProdPDF=NULL;
-	string label;
-	vector< IPDF* > componentPDFs;
+
 	//Check the tag actually is a PDF
 	if ( InputTag->GetName() == "ProdPDF" )
 	{
-		unsigned int i=1;
 		vector< XMLTag* > pdfConfig = InputTag->GetChildren();
+
+		PDFConfigurator* configurator = new PDFConfigurator();
+
+		vector< XMLTag* > pdfConfig2 = overloadConfigurator->GetChildren();
+
 		//Load the PDF configuration
-		for ( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
+		for ( unsigned int configIndex = 0; configIndex < pdfConfig2.size(); ++configIndex )
 		{
-			if( pdfConfig[configIndex]->GetName() == "Label" )
+			if ( pdfConfig2[configIndex]->GetName() == "ParameterSubstitution" )
 			{
-				label = XMLTag::GetStringValue( pdfConfig[configIndex] );
+				configurator->addParameterSubstitution( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "AppendParameterNames" )
+			{
+				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "ConfigurationParameter" )
+			{
+				configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if ( pdfConfig2[configIndex]->GetName() == "Label" )
+			{
+				configurator->SetPDFLabel( XMLTag::GetStringValue( pdfConfig2[configIndex] ) );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
+			{
 			}
 			else
 			{
-				//cout << "--------------------------------------------------------------------------------------------------------------------" << endl;
-				//cout << "Constructing ProdPDF Component: " << i << endl;
-				//cout << endl;
-				componentPDFs.push_back( GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, print ) );
-				++i;
+				cerr << "(1b) Prod Unrecognised PDF configuration: " << pdfConfig[configIndex]->GetName() << endl;
+				exit(1);
 			}
 		}
 
-		//Check there are two component PDFs to sum
-		if ( componentPDFs.size() == 2 )
+		//Load the PDF configuration
+		for( unsigned int configIndex = 0; configIndex < pdfConfig.size(); ++configIndex )
 		{
-			returnable_ProdPDF = new ProdPDF( componentPDFs[0], componentPDFs[1] );
+			if( pdfConfig[configIndex]->GetName() == "FractionName" )
+			{
+				configurator->SetFractionName( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "Label" )
+			{
+				configurator->SetPDFLabel( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+			}
+			else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
+			{
+				IPDF* thisPDF = GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, print );
+				configurator->AddDaughterPDF( thisPDF );
+				delete thisPDF;
+			}
+			else
+			{
+				cerr << "Unknown ProdPDF Tag: " << pdfConfig[configIndex]->GetName() << endl << endl;
+				exit(4587);
+			}
 		}
-		else
-		{
-			cerr << "Incorrect number of PDFs to multiply: " << componentPDFs.size() << " not 2" << endl;
-			exit(1);
-		}
+
+		configurator->SetPhaseSpaceBoundary( InputBoundary );
+
+		returnable_ProdPDF = new ProdPDF( configurator );
 	}
 	else
 	{
@@ -2300,8 +2322,6 @@ IPDF * XMLConfigReader::GetProdPDF( XMLTag * InputTag, PhaseSpaceBoundary * Inpu
 		exit(1);
 	}
 
-	delete componentPDFs[0]; delete componentPDFs[1];
-	if( !label.empty() ) returnable_ProdPDF->SetLabel( label );
 	return returnable_ProdPDF;
 }
 
@@ -2344,7 +2364,7 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 			}
 		}
 
-		if( ! configurator->empty() )
+		if( !configurator->empty() )
 		{
 			cout << "====================================================================================================================" << endl;
 			cout << "PDFConfigurator: Config Parameters Passed to CommonPDF" << endl;
@@ -2357,7 +2377,7 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	IPDF* returnable_pdf;
 	if ( InputTag->GetName() == "PDF" )
 	{
-		returnable_pdf = GetNamedPDF( InputTag, overloadConfigurator, false );
+		returnable_pdf = GetNamedPDF( InputTag, InputBoundary, overloadConfigurator, false );
 	}
 	else if ( InputTag->GetName() == "SumPDF" )
 	{
@@ -2370,11 +2390,6 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	else if ( InputTag->GetName() == "ProdPDF" )
 	{
 		returnable_pdf = GetProdPDF( InputTag, InputBoundary, overloadConfigurator, false );
-	}
-	else if ( InputTag->GetName() == "FractionName" )
-	{
-		//	Silently Ignore this option
-		return NULL;
 	}
 	else
 	{

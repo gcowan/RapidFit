@@ -232,7 +232,7 @@ class XMLConfigReader
 		/*!
 		 * @brief Use the LookUpNamedPDF in ClassLookUp to request and configure a PDF based on the given XML Tag
 		 */
-		IPDF * GetNamedPDF( XMLTag*, XMLTag*, bool print=true );
+		IPDF * GetNamedPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag*, bool print=true );
 
 		/*!
 		 * @brief Construct a Sum of 2 PDFs based on the XMLTag with the given PhaseSpaceBoundary

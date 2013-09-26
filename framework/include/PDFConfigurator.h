@@ -93,6 +93,14 @@ class PDFConfigurator
 
 		PhaseSpaceBoundary* GetPhaseSpaceBoundary() const;
 
+		void SetFractionName( const string thisName );
+
+		string GetFractionName() const;
+
+		void SetPDFLabel( const string input );
+
+		string GetPDFLabel() const;
+
 	private:
 
 		//      Uncopyable This Way!
@@ -106,6 +114,10 @@ class PDFConfigurator
 
 		vector<IPDF*> daughterPDFs;
 		PhaseSpaceBoundary* thisPDFsBoundary;
+
+		string fractionName;
+
+		string PDFLabel;
 };
 
 #endif

@@ -33,22 +33,39 @@ NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (
 }
 
 //Constructor specifying fraction parameter name
-NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : BasePDF(),
-	prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF( FirstPDF ) ), secondPDF( ClassLookUp::CopyPDF( SecondPDF ) ),
-	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName), integrationBoundary(new PhaseSpaceBoundary(*InputBoundary) )
+//NormalisedSumPDF::NormalisedSumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : BasePDF(),
+//	prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF( FirstPDF ) ), secondPDF( ClassLookUp::CopyPDF( SecondPDF ) ),
+//	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName), integrationBoundary(new PhaseSpaceBoundary(*InputBoundary) )
+
+NormalisedSumPDF::NormalisedSumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL),
+	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL)
 {
+
+	if( config->GetDaughterPDFs().size() != 2 )
+	{
+		cerr << "NormalisedSumPDF requires ONLY 2 daughter PDFs" << endl;
+		exit(-54263);
+	}
+	else
+	{
+		firstPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[0] );
+		secondPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[1] );
+		fractionName = config->getName( config->GetFractionName() );
+		if( config->GetPhaseSpaceBoundary() != NULL ) integrationBoundary = new PhaseSpaceBoundary( *(config->GetPhaseSpaceBoundary()) );
+	}
+
 	this->SetName("NormalisedSum");
 	this->SetLabel( "NormalisedSum_("+firstPDF->GetLabel()+")+("+secondPDF->GetLabel()+")" );
 
 	cout << endl;
 	cout << "Constructing NormalisedSum "<< this->GetLabel() << endl;
-	cout << "FractionName:\t" << FractionName << endl;
+	cout << "FractionName:\t" << string(fractionName) << endl;
 	cout << endl;
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 
-	MakePrototypes(InputBoundary);
+	MakePrototypes(integrationBoundary);
 
 	//This by design will create a ParameterSet with the same structure as the prototypeParameterSet list
 	allParameters.AddPhysicsParameters( firstPDF->GetPhysicsParameters(), false );

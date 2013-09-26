@@ -1,12 +1,12 @@
 /**
- @class PDFConfigurator
+  @class PDFConfigurator
 
- This is a class to contain configuration information for a PDF
- The information is taken from the XML  under the <PDF> tag
- Objects of this class are passed to PDF constructors to configure them
+  This is a class to contain configuration information for a PDF
+  The information is taken from the XML  under the <PDF> tag
+  Objects of this class are passed to PDF constructors to configure them
 
- @author Pete Clarke
- @date 2011-05-01
+  @author Pete Clarke
+  @date 2011-05-01
  */
 
 #include "PDFConfigurator.h"
@@ -25,13 +25,13 @@ using namespace::std;
 
 ///..........................................
 //Default constructor & destructor
-PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), daughterPDFs(), thisPDFsBoundary(NULL)
+PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), daughterPDFs(), thisPDFsBoundary(NULL), fractionName("UnsetFractionName"), PDFLabel("")
 {
 }
 
 PDFConfigurator::PDFConfigurator( const PDFConfigurator& input ) :
 	defaultNames( input.defaultNames ), replacementNames( input.replacementNames ), configParameters( input.configParameters ), configValues( input.configValues ),
-	daughterPDFs(), thisPDFsBoundary(NULL)
+	daughterPDFs(), thisPDFsBoundary(NULL), fractionName( input.fractionName ), PDFLabel(input.PDFLabel)
 {
 	for( unsigned int i=0; i< input.daughterPDFs.size(); ++i )
 	{
@@ -243,5 +243,25 @@ void PDFConfigurator::Print() const
 bool PDFConfigurator::empty() const
 {
 	return configParameters.empty() && defaultNames.empty();
+}
+
+void PDFConfigurator::SetFractionName( const string thisName )
+{
+	fractionName = thisName;
+}
+
+string PDFConfigurator::GetFractionName() const
+{
+	return fractionName;
+}
+
+void PDFConfigurator::SetPDFLabel( const string input )
+{
+	PDFLabel = input;
+}
+
+string PDFConfigurator::GetPDFLabel() const
+{
+	return PDFLabel;
 }
 
