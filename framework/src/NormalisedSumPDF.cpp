@@ -357,7 +357,7 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
                 termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / firstIntegral;
                 termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
         }
-	cout << "NSP numerical integrals " << firstIntegral << " , " << secondIntegral << endl;
+	//cout << "NSP numerical integrals " << firstIntegral << " , " << secondIntegral << endl;
 
 	if( std::isnan(termOne) || std::isnan(termTwo) )
 	{
