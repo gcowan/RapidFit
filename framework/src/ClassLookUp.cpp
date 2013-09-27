@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+*/
 
 //	ROOT Headers
 #include "TSystem.h"

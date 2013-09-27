@@ -235,21 +235,6 @@ class XMLConfigReader
 		IPDF * GetNamedPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag*, bool print=true );
 
 		/*!
-		 * @brief Construct a Sum of 2 PDFs based on the XMLTag with the given PhaseSpaceBoundary
-		 */
-		IPDF * GetSumPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag*, bool print=true );
-
-		/*!
-		 * @brief Construct a NormalisedSum PDF based on the XMLTag with the given PhaseSpaceBoundary
-		 */
-		IPDF * GetNormalisedSumPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag*, bool print=true );
-
-		/*!
-		 * @brief Construct a ProdPDF based on the XMLTag with the given PhaseSpaceBoundary
-		 */
-		IPDF * GetProdPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag*, bool print=true );
-
-		/*!
 		 * @brief Construct a PDF based on the XMLTag with the given PhaseSpaceBoundary
 		 */
 		IPDF * GetPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag* overloadConfigurator, bool print=true );

@@ -11,6 +11,8 @@
 
 using namespace::std;
 
+PDF_CREATOR( ProdPDF );
+
 //Constructor not specifying fraction parameter name
 //ProdPDF::ProdPDF( IPDF * FirstPDF, IPDF * SecondPDF ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) )
 ProdPDF::ProdPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( NULL ), secondPDF( NULL )

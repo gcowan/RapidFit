@@ -18,6 +18,8 @@
 #include <sstream>
 #include <float.h>
 
+PDF_CREATOR( NormalisedSumPDF );
+
 using namespace::std;
 
 NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (BasePDF) input ),

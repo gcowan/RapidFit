@@ -1,6 +1,9 @@
 // $Id: release.notes $
 
 2013/09/26 Rob Currie
+  - Moved the 3 pdfs in framework to use the PDF_CREATOR macro this allowed for 3 methods to be removes from the XMLConfigReader
+
+2013/09/26 Rob Currie
   - BREAKING BACKWARDS COMPATIBILITY
     The PDFConfigurator object has once again been expanded to include the PhaseSpaceBoundary and PDFDaughters this allows for the NormalisedSumPDF, ProdPDF and SumPDF objects to be constructed using a more common interface
       This also allows for more information to be available to the PDFs on construction in addition to allowing for Parameter Substitution to be used for FitFractions

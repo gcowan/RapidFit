@@ -18,6 +18,8 @@
 
 using namespace::std;
 
+PDF_CREATOR( SumPDF );
+
 SumPDF::SumPDF( const SumPDF& input ) : BasePDF( (BasePDF) input ), prototypeDataPoint(input.prototypeDataPoint), prototypeParameterSet(input.prototypeParameterSet), doNotIntegrateList(input.doNotIntegrateList),
 	firstPDF(ClassLookUp::CopyPDF(input.firstPDF) ), secondPDF( ClassLookUp::CopyPDF(input.secondPDF) ), firstFraction(input.firstFraction), firstIntegralCorrection(input.firstIntegralCorrection),
 	secondIntegralCorrection(input.secondIntegralCorrection), fractionName(input.fractionName)
