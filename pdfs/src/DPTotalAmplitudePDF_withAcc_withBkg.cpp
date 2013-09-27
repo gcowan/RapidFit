@@ -7,6 +7,8 @@
  *  @date 2009-11-13
  */
 
+#include "TMath.h"
+
 #include "DPTotalAmplitudePDF_withAcc_withBkg.h"
 #include "DPJpsiKaon.hh"
 #include "DPZplusK.hh"
@@ -15,8 +17,7 @@
 #include "DPComponent.hh"
 
 #include <iostream>
-#include "math.h"
-#include "TMath.h"
+#include <cmath>
 #include "TComplex.h"
 #include "RooMath.h"
 #ifdef __RAPIDFIT_USE_GSL

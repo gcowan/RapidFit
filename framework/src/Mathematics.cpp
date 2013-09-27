@@ -21,7 +21,6 @@
 #include "Math/GSLMCIntegrator.h"
 ///	RapidFit Headers
 #include "main.h"
-#include "cerf.h"
 #include "Mathematics.h"
 #include "Bd2JpsiKstar_sWave.h"
 #include "Bd2JpsiKstar_sWave_Fscopy.h"

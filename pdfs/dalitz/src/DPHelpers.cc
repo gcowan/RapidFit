@@ -1,8 +1,9 @@
-#include "DPHelpers.hh"
 #include "TMath.h"
+#include "DPHelpers.hh"
 #include "TLorentzVector.h"
 #include "CalculateAngles.hh"
 #include <iostream>
+#include <cmath>
 
 void DPHelpers::calculateFinalStateMomentaBelle(double m_b, double ms, double m_psi,
                             double cos2s, double cospi, double phi2s,
@@ -111,11 +112,12 @@ void DPHelpers::Belle(const TLorentzVector & _pMuPlus,
   TVector3 aMuPlus = p3MuPlus - p3Psi * (p3MuPlus.Dot(p3Psi)/p3Psi.Mag2());
 
   // angle between K* and Psi decay planes in B0 rest frame
-  phiKPiPsi = atan2(
-                            (p3Psi.Cross(aK)).Dot(aMuPlus)/(p3Psi.Mag()*aK.Mag()*aMuPlus.Mag()),
-                            aK.Dot(aMuPlus)/(aK.Mag()*aMuPlus.Mag())
-                            );
-  if ( std::isnan(phiKPiPsi) )
+  phiKPiPsi = atan2( 
+			(p3Psi.Cross(aK)).Dot(aMuPlus)/(p3Psi.Mag()*aK.Mag()*aMuPlus.Mag()),
+                        aK.Dot(aMuPlus)/(aK.Mag()*aMuPlus.Mag())
+			);
+
+  if( std::isnan( phiKPiPsi ) )
   {
     //std::cout << "phi is nan" << std::endl;
     phiKPiPsi = 0.;
