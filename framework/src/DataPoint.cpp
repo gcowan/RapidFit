@@ -22,12 +22,12 @@
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
+DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0)
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.)
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0)
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -50,7 +50,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 
 DataPoint::DataPoint( const DataPoint& input ) :
 	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(input.allPseudoObservables), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
-	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue)
+	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID)
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
@@ -334,5 +334,15 @@ double DataPoint::GetEventWeight() const
 void DataPoint::SetEventWeight( const double Input )
 {
 	WeightValue = Input;
+}
+
+                void DataPoint::SetDiscreteIndexID( size_t thisID )
+{
+	storedID = thisID;
+}
+                                                                   
+                                size_t DataPoint::GetDiscreteIndexID() const
+{
+	return storedID;
 }
 

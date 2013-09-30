@@ -69,15 +69,15 @@
  *             (This interfaces with the NumericalIntegrator class)
  *
  *          EvaluateForNumericGeneration( DataPoint* )
-*             (This interfaces with the Toy DataSet Generators like Foam)
-	*
-	*
-	*
-	*
-	* @author Benjamin M Wynne bwynne@cern.ch
-	* @author Robert Currie rcurrie@cern.ch
-	*
-	*/
+ *             (This interfaces with the Toy DataSet Generators like Foam)
+ *
+ *
+ *
+ *
+ * @author Benjamin M Wynne bwynne@cern.ch
+ * @author Robert Currie rcurrie@cern.ch
+ *
+ */
 
 #pragma once
 #ifndef BASE_FRAMEWORK_PDF_H
@@ -100,11 +100,10 @@
 #include <cmath>
 #include <pthread.h>
 
-	using namespace::std;
+using namespace::std;
 
-	class IPDF;
 
-	class BasePDF_Framework : public virtual IPDF_Framework
+class BasePDF_Framework : public virtual IPDF_Framework
 {
 	public:
 		/*!
@@ -288,5 +287,4 @@
 };
 
 #endif
-
 

@@ -6,6 +6,8 @@
   - This has allowed for a substantial amount of nternal methods and objects to be removed from the BasePDF
      The objects which are now explicitly used within the BasePDF correctly call protected or public methods with all member objects being private to the sub-classes
   - These new BaseClass objects cannot be constructed but I suppose the use of the interfaces could allow for some code to be cleaned up
+  - Added additional check in PhaseSpaceBoundary to check for the DiscreteIndex corresponding to the correct PhaseSpaceBoundary instance.
+     This will very likely never have effected any major analysis, however it is now not possible for this exception to screw with things like normalisation.
 
 2013/09/26 Rob Currie
   - Moved the 3 pdfs in framework to use the PDF_CREATOR macro this allowed for 3 methods to be removes from the XMLConfigReader

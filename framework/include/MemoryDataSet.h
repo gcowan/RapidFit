@@ -35,6 +35,9 @@ class MemoryDataSet : public IDataSet
 
 		virtual void SortBy( string );
 
+		virtual IDataSet* GetDiscreteDataSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const;
+
+		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const;
 		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const;
 
 		void Clear();
@@ -63,6 +66,7 @@ class MemoryDataSet : public IDataSet
 		void ClearAllPseudoObservables();
 
 		void SafeAddDataPoint( DataPoint* NewDataPoint );
+
 	private:
 		//	Uncopyable!
 		MemoryDataSet ( const MemoryDataSet& );

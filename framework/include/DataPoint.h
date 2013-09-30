@@ -227,6 +227,10 @@ class DataPoint
 		 */
 		void SetDiscreteIndex( int index );
 
+		void SetDiscreteIndexID( size_t thisID );
+
+		size_t GetDiscreteIndexID() const;
+
 		/*!
 		 * @brief Sets the even weight to be used for fitting/projecting etc.
 		 *
@@ -287,6 +291,7 @@ class DataPoint
 		 *
 		 */
 		int thisDiscreteIndex;
+		size_t storedID;
 
 		double WeightValue;
 };

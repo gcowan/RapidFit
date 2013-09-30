@@ -35,7 +35,7 @@ class PhaseSpaceBoundary
 		vector<string> GetDiscreteNames() const;
 		vector<string> GetContinuousNames() const;
 
-		pair< vector<string>, vector<double > > GetDiscreteInfo( DataPoint* input ) const;
+		pair< vector<ObservableRef>, vector<double > > GetDiscreteInfo( DataPoint* input ) const;
 
 		bool SetConstraint( string, IConstraint* );
 		bool SetConstraint( string, double, double, string );
@@ -72,6 +72,7 @@ class PhaseSpaceBoundary
 		mutable int DiscreteCombinationNumber;
 
 		mutable size_t uniqueID;
+
 };
 
 #endif

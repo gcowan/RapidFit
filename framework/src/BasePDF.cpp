@@ -104,7 +104,7 @@ bool BasePDF::CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBounda
 	if( this->IsDebuggingON() )
 	{
 		PDF_THREAD_LOCK
-		cout << "BasePDF: Checking Cache" << endl;
+			cout << "BasePDF: Checking Cache" << endl;
 		PDF_THREAD_UNLOCK
 	}
 
@@ -148,7 +148,7 @@ void BasePDF::SetCache( double input, DataPoint* InputPoint, PhaseSpaceBoundary*
 	if( this->IsDebuggingON() )
 	{
 		PDF_THREAD_LOCK
-		cout << "BasePDF: Setting Cache. Discrete DataSet " << InputBoundary->GetDiscreteIndex( InputPoint ) << " Value: " << input << endl;
+			cout << "BasePDF: Setting Cache. Discrete DataSet " << InputBoundary->GetDiscreteIndex( InputPoint ) << " Value: " << input << endl;
 		PDF_THREAD_UNLOCK
 	}
 
@@ -217,7 +217,7 @@ double BasePDF::GetCache( DataPoint* InputPoint, PhaseSpaceBoundary* NewBoundary
 	if( this->IsDebuggingON() )
 	{
 		PDF_THREAD_LOCK
-		cout << "BasePDF: Requesting Cache For DataSet " << NewBoundary->GetDiscreteIndex( InputPoint ) << " of " << DiscreteCaches->size() << endl;
+			cout << "BasePDF: Requesting Cache For DataSet " << NewBoundary->GetDiscreteIndex( InputPoint ) << " of " << DiscreteCaches->size() << endl;
 		PDF_THREAD_UNLOCK
 	}
 
@@ -230,7 +230,7 @@ double BasePDF::GetCache( DataPoint* InputPoint, PhaseSpaceBoundary* NewBoundary
 	if( this->IsDebuggingON() )
 	{
 		PDF_THREAD_LOCK
-		cout << "BasePDF: Cache Value is " << thisVal << endl;
+			cout << "BasePDF: Cache Value is " << thisVal << endl;
 		PDF_THREAD_UNLOCK
 	}
 
@@ -271,13 +271,13 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		if( cachingEnabled )
 		{
 			PDF_THREAD_LOCK
-			cout << "BasePDF: Caching Enabled!" << endl;
+				cout << "BasePDF: Caching Enabled!" << endl;
 			PDF_THREAD_UNLOCK
 		}
 		else
 		{
 			PDF_THREAD_LOCK
-			cout << "BasePDF: Caching Disabled!" << endl;
+				cout << "BasePDF: Caching Disabled!" << endl;
 			PDF_THREAD_UNLOCK
 		}
 	}
@@ -287,7 +287,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		if( this->IsDebuggingON() )
 		{
 			PDF_THREAD_LOCK
-			cout << "BasePDF: FixedPhaseSpace. Integral == Evaluate " << endl;
+				cout << "BasePDF: FixedPhaseSpace. Integral == Evaluate " << endl;
 			PDF_THREAD_UNLOCK
 		}
 		if( this->CacheValid( NewDataPoint, NewBoundary ) )
@@ -308,7 +308,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	if( this->IsDebuggingON() )
 	{
 		PDF_THREAD_LOCK
-		cout << "BasePDF: thisCache " << thisCache << endl;
+			cout << "BasePDF: thisCache " << thisCache << endl;
 		PDF_THREAD_UNLOCK
 	}
 
@@ -319,7 +319,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		if( this->IsDebuggingON() )
 		{
 			PDF_THREAD_LOCK
-			cout << "BasePDF: using Numerical Normalisation" << endl;
+				cout << "BasePDF: using Numerical Normalisation" << endl;
 			PDF_THREAD_UNLOCK
 		}
 
@@ -332,7 +332,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 			if( this->IsDebuggingON() )
 			{
 				PDF_THREAD_LOCK
-				cout << "BasePDF: Calculating Numerical Integral ";
+					cout << "BasePDF: Calculating Numerical Integral ";
 				PDF_THREAD_UNLOCK
 			}
 
@@ -342,7 +342,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 			{
 				NewDataPoint->SetPhaseSpaceBoundary( NewBoundary );
 				thisNumericalIntegral = this->GetPDFIntegrator()->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, this->GetDoNotIntegrateList() );
-            }
+			}
 			catch(...)
 			{
 				//	It's legitimate to fall over due to this throwing as we don't know what to do afterwards
@@ -352,7 +352,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 			if( this->IsDebuggingON() )
 			{
 				PDF_THREAD_LOCK
-				cout << thisNumericalIntegral << endl;
+					cout << thisNumericalIntegral << endl;
 				PDF_THREAD_UNLOCK
 			}
 
@@ -382,15 +382,16 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		if( this->IsDebuggingON() )
 		{
 			PDF_THREAD_LOCK
-			cout << "BasePDF: Have Previously Tested Analytical Integral and it is GOOD :D" << endl;
+				cout << "BasePDF: Have Previously Tested Analytical Integral and it is GOOD :D" << endl;
 			PDF_THREAD_UNLOCK
 		}
+
 		if( this->CacheValid( NewDataPoint, NewBoundary ) )
 		{
 			if( this->IsDebuggingON() )
 			{
 				PDF_THREAD_LOCK
-				cout << "BasePDF: Using Cache " << thisCache << endl;
+					cout << "BasePDF: Using Cache " << thisCache << endl;
 				PDF_THREAD_UNLOCK
 			}
 			return thisCache;
@@ -400,7 +401,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 			if( this->IsDebuggingON() )
 			{
 				PDF_THREAD_LOCK
-				cout << "BasePDF: Calculating Integral Value" << endl;
+					cout << "BasePDF: Calculating Integral Value" << endl;
 				PDF_THREAD_UNLOCK
 			}
 
@@ -409,12 +410,17 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 				if( this->IsDebuggingON() )
 				{
 					PDF_THREAD_LOCK
-					cout << "BasePDF: Using Normalisation( DataPoint*, PhaseSpaceBoundary* )" << endl;
+						cout << "BasePDF: Using Normalisation( DataPoint*, PhaseSpaceBoundary* )" << endl;
 					PDF_THREAD_UNLOCK
 				}
 
-				double norm = this->Normalisation(NewDataPoint, NewBoundary);
-				this->SetCache( norm, NewDataPoint, NewBoundary );
+				double norm = this->Normalisation( NewDataPoint, NewBoundary );
+				if( this->GetCachingEnabled() )
+				{
+					this->UnsetCache();
+				}
+				this->TurnCachingOff();
+				//this->SetCache( norm, NewDataPoint, NewBoundary );
 				return norm;
 			}
 			else
@@ -422,11 +428,12 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 				if( this->IsDebuggingON() )
 				{
 					PDF_THREAD_LOCK
-					cout << "BasePDF: Using Normalisation( PhaseSpaceBoundary* )" << endl;
+						cout << "BasePDF: Using Normalisation( PhaseSpaceBoundary* )" << endl;
 					PDF_THREAD_UNLOCK
 				}
 
 				double norm = this->Normalisation(NewBoundary);
+				if( this->GetCachingEnabled() ) this->SetCachingEnabled( true );
 				this->SetCache( norm, NewDataPoint, NewBoundary );
 				return norm;
 			}
@@ -436,7 +443,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	if( this->IsDebuggingON() )
 	{
 		PDF_THREAD_LOCK
-		cout << "BasePDF: Testing Analytical Normalisation" << endl;
+			cout << "BasePDF: Testing Analytical Normalisation" << endl;
 		PDF_THREAD_UNLOCK
 	}
 	//	Here we don't know if we're using an e_by_e or using a cache, let's test them
@@ -454,7 +461,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		if( this->IsDebuggingON() )
 		{
 			PDF_THREAD_LOCK
-			cout << "BasePDF: PDF can use Normalisation( PhaseSpaceBoundary* )" << endl;
+				cout << "BasePDF: PDF can use Normalisation( PhaseSpaceBoundary* )" << endl;
 			PDF_THREAD_UNLOCK
 		}
 		return Norm;
@@ -466,11 +473,11 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 		haveTestedIntegral = true;
 		numericalNormalisation = false;
 		discrete_Normalisation = true;
-		this->SetCache( Norm, NewDataPoint, NewBoundary );
+		if( cachingEnabled ) this->SetCache( Norm, NewDataPoint, NewBoundary );
 		if( this->IsDebuggingON() )
 		{
 			PDF_THREAD_LOCK
-			cout << "BasePDF: PDF can use Normalisation( DataPoint*, PhaseSpaceBoundary* )" << endl;
+				cout << "BasePDF: PDF can use Normalisation( DataPoint*, PhaseSpaceBoundary* )" << endl;
 			PDF_THREAD_UNLOCK
 		}
 		return Norm;
@@ -483,7 +490,7 @@ double BasePDF::Integral(DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBound
 	if( this->IsDebuggingON() )
 	{
 		PDF_THREAD_LOCK
-		cout << "BasePDF: PDF requires Numerical Normalisation" << endl;
+			cout << "BasePDF: PDF requires Numerical Normalisation" << endl;
 		PDF_THREAD_UNLOCK
 	}
 
@@ -545,11 +552,11 @@ double BasePDF::EvaluateForNumericGeneration( DataPoint* NewDataPoint )
 	catch(...)
 	{
 		PDF_THREAD_LOCK
-		cerr << "BasePDF: Failed to Correctly Generate a Sensible Value here:" << endl;
+			cerr << "BasePDF: Failed to Correctly Generate a Sensible Value here:" << endl;
 		NewDataPoint->Print();
 		cerr << "BasePDF: Returning 0.!!!" << endl;
 		PDF_THREAD_UNLOCK
-		return 0.;
+			return 0.;
 	}
 	return returnable;
 }
@@ -565,11 +572,11 @@ double BasePDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	catch(...)
 	{
 		PDF_THREAD_LOCK
-		cerr << "BasePDF: Failed to Correctly Integrate a Sensible Value here:" << endl;
+			cerr << "BasePDF: Failed to Correctly Integrate a Sensible Value here:" << endl;
 		NewDataPoint->Print();
 		cerr << "BasePDF: Returning 0.!!!" << endl;
 		PDF_THREAD_UNLOCK
-		return 0.;
+			return 0.;
 	}
 	return returnable;
 }

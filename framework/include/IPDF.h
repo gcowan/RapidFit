@@ -120,6 +120,7 @@ class IPDF : public virtual IPDF_NormalisationCaching, public virtual IPDF_MCCac
 		virtual double EvaluateComponent( DataPoint*, ComponentRef* ) = 0;
 
 	protected:
+
 		/*!
 		 * Default Constructor
 		 */

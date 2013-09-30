@@ -86,6 +86,10 @@ class IDataSet
 		 */
 		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<string> Names, const vector<double> Values ) const = 0;
 
+		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const = 0;
+
+		virtual IDataSet* GetDiscreteDataSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const = 0;
+
 		/*!
 		 * @brief Interface Function:
 		 *        Print out the dataset to provide extremely verbose output

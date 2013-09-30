@@ -109,9 +109,12 @@ vector<string> PhaseSpaceBoundary::GetContinuousNames() const
 	return cont_names;
 }
 
-pair< vector<string>, vector<double> > PhaseSpaceBoundary::GetDiscreteInfo( DataPoint* input ) const
+pair< vector<ObservableRef>, vector<double> > PhaseSpaceBoundary::GetDiscreteInfo( DataPoint* input ) const
 {
-	vector<string> discreteInfoNames = this->GetDiscreteNames();
+	pair<vector<ObservableRef>, vector<double> > stored_pair;
+
+	vector<ObservableRef> discreteInfoNames;
+	for( unsigned int i=0; i< this->GetDiscreteNames().size(); ++i ) discreteInfoNames.push_back( ObservableRef(this->GetDiscreteNames()[i]) );
 	vector<double> discreteInfoValues;
 	for( unsigned int i=0; i< discreteInfoNames.size(); ++i )
 	{
@@ -130,12 +133,14 @@ pair< vector<string>, vector<double> > PhaseSpaceBoundary::GetDiscreteInfo( Data
 
 	if( discreteInfoNames.size() == discreteInfoValues.size() )
 	{
-		return make_pair( discreteInfoNames, discreteInfoValues );
+		stored_pair = make_pair( discreteInfoNames, discreteInfoValues );
 	}
 	else
 	{
-		return make_pair( vector<string>(), vector<double>() );
+		stored_pair = make_pair( vector<ObservableRef>(), vector<double>() );
 	}
+
+	return stored_pair;
 }
 
 void PhaseSpaceBoundary::RemoveConstraint( string Name )
@@ -433,7 +438,8 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	(void) silence;
 	//	Exit on simple case
 	int thisIndex = Input->GetDiscreteIndex();
-	if( thisIndex != -1 ) return (unsigned)thisIndex;
+	size_t thisID = Input->GetDiscreteIndexID();
+	if( thisIndex != -1 && thisID == uniqueID ) return (unsigned)thisIndex;
 
 	if( this->GetDiscreteNames().empty() || (this->GetDiscreteNames().size() == 1) )
 	{
@@ -535,6 +541,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 
 	//	Store and return the lookup of the DataPoint's index
 	Input->SetDiscreteIndex( thisIndex );
+	Input->SetDiscreteIndexID( uniqueID );
 	return (unsigned)thisIndex;
 }
 

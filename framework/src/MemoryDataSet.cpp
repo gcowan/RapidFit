@@ -115,7 +115,7 @@ int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint ) const
 	if( templateDataPoint == NULL )	return (int)allData.size();
 	else
 	{
-		pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( templateDataPoint );
+		pair< vector<ObservableRef>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( templateDataPoint );
 		unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
 		return (int) dataPointNum;
 	}
@@ -174,6 +174,46 @@ void MemoryDataSet::SortBy( string parameter )
 	}
 	cout << "Sorted" << endl;
 }
+
+IDataSet* MemoryDataSet::GetDiscreteDataSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const
+{
+	return (IDataSet*) new MemoryDataSet( this->GetBoundary(), GetDiscreteSubSet( discreteParam, discreteVal ) );
+}
+
+vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const
+{
+	if( discreteParam.empty() || discreteVal.empty() )
+	{
+		return allData;
+	}
+
+	vector<DataPoint*> returnable_subset;
+	if( discreteParam.size() != discreteVal.size() )
+	{
+		cerr << "\n\n\t\tBadly Defined definitio`n of a subset, returning 0 events!\n\n" << endl;
+		return returnable_subset;
+	}
+
+	for( unsigned int i=0; i< allData.size(); ++i )
+	{
+		DataPoint* data_i = allData[i];
+
+		bool decision = true;       
+		for( unsigned int j=0; j< discreteParam.size(); ++j )
+		{
+			if( !( fabs( data_i->GetObservable( discreteParam[j] )->GetValue() - discreteVal[j] ) < DOUBLE_TOLERANCE_DATA ) )
+			{
+				decision = false;
+			}
+		}
+
+		if( decision ) returnable_subset.push_back( data_i );
+
+	}
+
+	return returnable_subset;
+}
+
 
 vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const
 {
@@ -301,7 +341,7 @@ void MemoryDataSet::Print() const
 					if( description[j] == '\n' ) description[j] = ' ';
 					if( description[j] == '\t' ) description[j] = ' ';
 				}
-				pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
+				pair< vector<ObservableRef>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
 				unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
 				if( dataPointNum > 0 ) cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
 			}
@@ -321,7 +361,7 @@ void MemoryDataSet::Print() const
 					if( description[j] == '\n' ) description[j] = ' ';
 					if( description[j] == '\t' ) description[j] = ' ';
 				}
-				pair< vector<string>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
+				pair< vector<ObservableRef>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
 				unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
 				if( dataPointNum > 0 ) cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
 			}
