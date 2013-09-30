@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/09/29 Rob Currie
+  - Moved a LOT of code out of BasePDF into classes with their own interfaces, this is designed to allow for the structure of the BasePDF to be greatly simplified from a development and supportability perspective
+     This code exploits the use of public virtual inheritance to allow for BasePDF_Frameowkr and BasePDF_MCCaching to have their own independent interfaces which are picked up by the IPDF
+  - This has allowed for a substantial amount of nternal methods and objects to be removed from the BasePDF
+     The objects which are now explicitly used within the BasePDF correctly call protected or public methods with all member objects being private to the sub-classes
+  - These new BaseClass objects cannot be constructed but I suppose the use of the interfaces could allow for some code to be cleaned up
+
 2013/09/26 Rob Currie
   - Moved the 3 pdfs in framework to use the PDF_CREATOR macro this allowed for 3 methods to be removes from the XMLConfigReader
 

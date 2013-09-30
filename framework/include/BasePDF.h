@@ -88,6 +88,8 @@
 #include "TRandom3.h"
 ///	RapidFit Headers
 #include "IPDF.h"
+#include "BasePDF_Framework.h"
+#include "BasePDF_MCCaching.h"
 #include "ObservableRef.h"
 #include "PDFConfigurator.h"
 #include "ComponentRef.h"
@@ -100,7 +102,7 @@
 
 using namespace::std;
 
-class BasePDF : public IPDF
+class BasePDF : public BasePDF_Framework, public BasePDF_MCCaching, public IPDF
 {
 	public:
 		/*!
@@ -169,17 +171,6 @@ class BasePDF : public IPDF
 		virtual void SetComponentStatus( const bool input );
 
 		virtual bool GetComponentStatus() const;
-
-		/*!
-		 * @brief   Return a pointer to the internal object used for numerically Integrating this PDF
-		 *
-		 * @warning This is deleted along with PDF
-		 *
-		 * @return  reference to internal RapidFitIntegrator instance
-		 */
-		RapidFitIntegrator* GetPDFIntegrator() const;
-
-		virtual void SetUpIntegrator( const RapidFitIntegratorConfig* thisConfig );
 
 		/*!
 		 * @brief   Interface Function: Does the PDF want to use Numerical Normalisation
@@ -368,216 +359,7 @@ class BasePDF : public IPDF
 		 */
 		virtual double EvaluateComponent( DataPoint* InputDataPoint, ComponentRef* InputRef = NULL );
 
-		/*!
-		 * @brief Provide a custom distribution for a continuous observable, variable will be placed on the DoNotIntegrate List
-		 *
-		 * This is used to associate a PDF which describes the phenomenology of a parameter with this PDF
-		 *
-		 * This is function may/may not stand the test of time, but is intended to be part of some common interface to model a whole dataset accurately
-		 *
-		 * @param InputObservable  This is the Observable which can't be modeled by the PDF (should be on the DoNotIntegrate List)
-		 * @param InputPDF         This is a PDF which describes the distribution of this parameter at some level that is not built into 'this'
-		 *
-		 * @return Void
-		 */
-		void SetObservableDistribution( string InputObservable, IPDF* InputPDF );
-
-		/*!
-		 * @brief Get a custom distribution function for a requested observable (returns NULL when non initialized)
-		 *
-		 * This is tied in with SetObservableDistribution and again, may/may-not stand the test of time
-		 *
-		 */
-		IPDF* GetObservableDistribution( string );
-
-		/*!
-		 * @brief Set the MC cache status
-		 *
-		 * @param Input    true = This PDF has an MC Cache Status on Disk , False This PDF does NOT have an MC Cache Status on Disk
-		 *
-		 * @return Void
-		 */
-		void SetMCCacheStatus( bool Input );
-
-		/*!
-		 * @brief Get the virtual cache status
-		 *
-		 * @return         true = This PDF has an MC Cache Status on Disk , False This PDF does NOT have an MC Cache Status on Disk
-		 */
-		bool GetMCCacheStatus() const;
-
-		/*!
-		 * @brief Get the names of the MC cache files (without the .root extensions)
-		 *
-		 * This is a vector of filenames as there may be multiple Discrete Combinations in the PhaseSpace requested
-		 * These each call the PDF separately to be sure that eg a tag+1 event is not modeled as being a tag0 event.
-		 *
-		 * @return	Vector of the Files containing the MC Caches on disk without the .root extentions on the filenames
-		 */
-		vector<string> GetMCCacheNames() const;
-
-		/*!
-		 * @brief Start a new TRandom3 instance with a given seed value
-		 *
-		 * @param num   This is the new number to use as a seed for creating a new TRandom3 instance and delete the existing one
-		 *
-		 * @return Void
-		 */
-		void SetRandomFunction( int num );
-
-		/*!
-		 * @brief Replace TRandom3 instance with a new function
-		 *
-		 * @param Input This is the new TRandom3 function we want to associate with this PDF
-		 *
-		 * @return Void
-		 */
-		void SetRandomFunction( TRandom3* Input );
-
-		/*!
-		 * @brief Get the seed number used to initialise the random number gen
-		 *
-		 * @return Returns the number used as the seed of the TRandom3 instance
-		 */
-		int GetSeedNum() const;
-
-		/*!
-		 * @brief Remove the cached files
-		 *
-		 * This also Sets the cache validity as false
-		 *
-		 * @return Void
-		 */
-		void Remove_Cache();
-
-		/*!
-		 * @brief Set whether this PDF can remove the MC cache object, i.e. is this instance the owner
-		 *
-		 * @param Input   false means that the PDF will not attempt to remove the TFoam disk instance on disk true means it will
-		 *
-		 * @return Void
-		 */
-		void Can_Remove_Cache( bool Input );
-
-		/*!
-		 * @brief Add a virtual cache object
-		 *
-		 * @pram Name   Add a new ROOT file name (minus the .root) which is a cache of the TFoam generator
-		 *
-		 * @return Void
-		 */
-		void AddCacheObject( string Name );
-
-		/*!
-		 * @brief Get the Random function stored in this PDF
-		 *
-		 * @return pointer to the TRandom3 instance inside the PDF
-		 */
-		TRandom3* GetRandomFunction() const;
-
-		/*!
-		 * @brief Get the Name of the PDF
-		 *
-		 * @return Returns the name of the PDF as a string
-		 */
-		string GetName() const;
-
-		/*!
-		 * @brief Get the Label of this PDF
-		 *
-		 * @return Return the Label of the PDF which describes the PDF better than the Name
-		 */
-		string GetLabel() const;
-
-		/*!
-		 * @brief Set the Label of this PDF
-		 *
-		 * @param Label    This is a description of this PDF (automatically generated by ClassLookUp but user configurable
-		 *
-		 * @return Void
-		 */
-		void SetLabel( string Label );
-
-		/*!
-		 * Interface Function:
-		 * Can the PDF be safely copied through it's copy constructor?
-		 */
-		virtual bool IsCopyConstructorSafe() const;
-
-		/*!
-		 * @brief Give the PDF a pointer to the template of it's copy constructor object
-		 *
-		 * In theory a Copy Constructor can be written for IPDF which wraps back around to this but that breaks the concept of an Interface
-		 *
-		 * @param Input  This is the CopyPDF_t which wraps the Copy Constructor for this PDF
-		 *
-		 * @return Void
-		 */
-		void SetCopyConstructor( CopyPDF_t* Input ) const;
-
-		/*!
-		 * @breif Get the pointer to the PDF copy constructor
-		 *
-		 * @return Returns the CopyPDF_t instance which references the Copy Constructor of this class
-		 */
-		CopyPDF_t* GetCopyConstructor() const;
-
-		/*!
-		 * @brief Return the required XML for this PDF
-		 *
-		 * @return Returns the name of the PDF in PDF tags
-		 */
-		virtual string XML() const;
-
-		/*!
-		 * @brief Set the internal PDFConfigurator Object
-		 *
-		 * Set the Internal Configurator Object to be this input.
-		 * This is called in the correct constructor for the class and this object is correctly duplicated for all copied instances.
-		 *
-		 * @warning THIS WILL NOT EFFECT THE WAY THE PDF IS CONFIGURED IT IS JUST FOR READING THE ACTUAL CONFIGURATION!!!!!!!
-		 *
-		 * @param config  This is the configuration you wish to replace the internal object with. This will NOT chane the way the PDF is configured
-		 *
-		 * @return Void
-		 */
-		void SetConfigurator( PDFConfigurator* config );
-
-		/*!
-		 * @brief Get a pointer to the PDF Configurator
-		 *
-		 * @return Returns a pointer ot the Configurator assigned to this PDF
-		 */
-		PDFConfigurator* GetConfigurator() const;
-
-		pthread_mutex_t* DebugMutex() const;
-
-		virtual void SetDebugMutex( pthread_mutex_t* Input, bool =true );
-
-		virtual void SetDebug( DebugClass* input_debug );
-
-		virtual void Print() const;
-
-		/*!
-		 * @brief Set the Name of the PDF
-		 *
-		 * @warning Use With CAUTION!
-		 *
-		 * @return Name   This is the new Name we want to give to this PDF
-		 *
-		 * @return Void
-		 */
-		void SetName( string Name );
-
-		virtual void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary );
-
 	protected:
-
-		/*!
-		 * Interface Function:
-		 * Set if the PDF be safely copied through it's copy constructor?
-		 */
-		virtual void SetCopyConstructorSafe( bool = true );
 
 		/*!
 		 * @brief   Interface Function:  This function is called ONCE per call from Minuit
@@ -676,66 +458,14 @@ class BasePDF : public IPDF
 		 */
 		BasePDF& operator=(const BasePDF&);
 
-		/*!
-		 * List of files on disk which contain TFoam caches
-		 * These should all be removed on exit or on call of Remove_Cache
-		 */
-		vector<string> cached_files;
-
-		/*!
-		 * Does this PDF have an MC cache generator stored on disk, i.e. is there a TFoam object on disk
-		 */
-		bool hasCachedMCGenerator;
-
-		/*!
-		 * vector of a single TRandom3 object for this PDF, this allows us to have a reproducable result for a defined seed
-		 * the seed_function.empty() is used to see if this is defined, should probably check for NULL pointer, but oh well
-		 */
-		mutable TRandom3 * seed_function;
-
-		/*!
-		 * vector of single seed value used in the construction of the TRandom3, again should probably check for a null value, but oh well
-		 */
-		int seed_num;
-
-		/*!
-		 * This is the Name of the PDF, it's name is tied in with the name of the C wrappers for the on disk elemends of the pdfs
-		 * Change this at your own risk!
-		 */
-		string PDFName;
-
-		/*!
-		 * This is a label describing the PDF, useful for knowing the structure of this PDF
-		 */
-		string PDFLabel;
-
-		/*!
-		 * Pointer to the 'on disk' copy constructor for this class
-		 * This means that the PDF only needs to look up it's own 'on disk' elements once
-		 */
-		mutable CopyPDF_t* copy_object;
-
-		/*!
-		 * Does this PDF control the on disk TFoam cache
-		 * This allows the on disk cach to removed after RapidFit exists cleanly and only removed once
-		 */
-		bool do_i_control_the_cache;
-
 		bool haveTestedIntegral;	/*!	Has the Integral Been tested?	*/
 		bool requiresBoundary;		/*!	Does the PDF require the PhaseSpaceBoundary to calculate the normalisation?	*/
-
-		PDFConfigurator* thisConfig;	/*!	PDFConfigurator containing the Configurator which knowsn how this PDF was configured	*/
-
-		RapidFitIntegrator* myIntegrator;
 
 		bool fixed_checked, isFixed;
 		size_t fixedID;
 
-		bool debuggingON;
-
 		bool _basePDFComponentStatus;
 
-		bool CopyConstructorIsSafe;
 };
 
 #endif
