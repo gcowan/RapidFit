@@ -50,7 +50,8 @@ SumPDF::SumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), pro
 	cout << endl;
 	cout << "Constructing SumPDF" << endl;
 	cout << endl;
-	this->SetLabel( "Sum_("+firstPDF->GetLabel()+")+("+firstPDF->GetLabel()+")" );
+	this->SetName( "SumPDF" );
+	this->SetLabel( "SumPDF_("+firstPDF->GetLabel()+")+("+firstPDF->GetLabel()+")" );
 	MakePrototypes(integrationBoundary);
 
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );

@@ -56,8 +56,8 @@ NormalisedSumPDF::NormalisedSumPDF( PDFConfigurator* config ) : BasePDF(), proto
 		if( config->GetPhaseSpaceBoundary() != NULL ) integrationBoundary = new PhaseSpaceBoundary( *(config->GetPhaseSpaceBoundary()) );
 	}
 
-	this->SetName("NormalisedSum");
-	this->SetLabel( "NormalisedSum_("+firstPDF->GetLabel()+")+("+secondPDF->GetLabel()+")" );
+	this->SetName("NormalisedSumPDF");
+	this->SetLabel( "NormalisedSumPDF_("+firstPDF->GetLabel()+")+("+secondPDF->GetLabel()+")" );
 
 	cout << endl;
 	cout << "Constructing NormalisedSum "<< this->GetLabel() << endl;

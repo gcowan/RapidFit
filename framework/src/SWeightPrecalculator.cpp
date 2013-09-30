@@ -63,7 +63,7 @@ void SWeightPrecalculator::ApplyAlphaCorrection( IDataSet* inputDataSet )
 
 void SWeightPrecalculator::ConfigurePDFs( IPDF* InputPDF )
 {
-	if( InputPDF->GetName() == "NormalisedSum" )
+	if( InputPDF->GetName() == "NormalisedSumPDF" )
 	{
 		NormalisedSumPDF* inputNorm = (NormalisedSumPDF*)InputPDF;
 		if( config == 1 )

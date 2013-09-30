@@ -28,8 +28,8 @@ ProdPDF::ProdPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), p
 		secondPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[1] );
 	}
 
-	this->SetName( "Prod" );
-	this->SetLabel( "Prod["+firstPDF->GetLabel()+"]x["+secondPDF->GetLabel()+"]" );
+	this->SetName( "ProdPDF" );
+	this->SetLabel( "ProdPDF["+firstPDF->GetLabel()+"]x["+secondPDF->GetLabel()+"]" );
 
 	cout << endl;
 	cout << "Constructing ProdPDF " << this->GetLabel() << endl;

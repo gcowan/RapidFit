@@ -2,6 +2,7 @@
 
 2013/09/30 Rob Currie
   - Resolved some strange circular dependencies which are constructed by rootcint on PPE machines, not sure why this happens as everything compiles with the same ROOT versions at CERN and locally for me but we should be aware of this
+  - Fixed minor bug in SWeighting code ans have modified the PDFs in the Framework such that the expected name of the PDF object is more clearly defined now that it's using the PDF macro
 
 2013/09/29 Rob Currie
   - Moved a LOT of code out of BasePDF into classes with their own interfaces, this is designed to allow for the structure of the BasePDF to be greatly simplified from a development and supportability perspective
