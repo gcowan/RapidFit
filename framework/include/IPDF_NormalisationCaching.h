@@ -18,13 +18,7 @@
 #include "TRandom3.h"
 ///	RapidFit Headers
 #include "DataPoint.h"
-#include "PDFConfigurator.h"
 #include "PhaseSpaceBoundary.h"
-#include "ParameterSet.h"
-#include "ComponentRef.h"
-#include "DebugClass.h"
-#include "RapidFitIntegrator.h"
-#include "RapidFitIntegratorConfig.h"
 ///	System Headers
 #include <vector>
 #include <string>

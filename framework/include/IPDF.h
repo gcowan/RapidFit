@@ -20,14 +20,8 @@
 #include "IPDF_MCCaching.h"
 #include "IPDF_Framework.h"
 #include "IPDF_NormalisationCaching.h"
-/*#include "DataPoint.h"
-#include "PDFConfigurator.h"
-#include "PhaseSpaceBoundary.h"
 #include "ParameterSet.h"
 #include "ComponentRef.h"
-#include "DebugClass.h"
-#include "RapidFitIntegrator.h"
-#include "RapidFitIntegratorConfig.h"*/
 ///	System Headers
 #include <vector>
 #include <string>

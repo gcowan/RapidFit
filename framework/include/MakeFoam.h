@@ -4,7 +4,6 @@
 #define MAKE_FOAM_H
 
 //	RapidFit Headers
-#include "IPDF.h"
 #include "PhaseSpaceBoundary.h"
 
 #include <vector>

@@ -15,7 +15,6 @@
 #include "Math/IFunction.h"
 #include "TFoamIntegrand.h"
 ///	RapidFit Headers
-#include "IPDF.h"
 #include "ObservableRef.h"
 #include "DataPoint.h"
 #include "PhaseSpaceBoundary.h"

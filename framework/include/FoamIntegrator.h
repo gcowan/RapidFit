@@ -10,7 +10,6 @@
 #define FOAM_INTEGRATOR_H
 
 ///	RapidFit Headers
-#include "IPDF.h"
 #include "IDataSet.h"
 #include "MakeFoam.h"
 ///	System Headers

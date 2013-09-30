@@ -18,16 +18,9 @@
 #include "TRandom3.h"
 ///	RapidFit Headers
 #include "PhaseSpaceBoundary.h"
-/*#include "DataPoint.h"
+#include "DebugClass.h"
 #include "PDFConfigurator.h"
-#include "PhaseSpaceBoundary.h"
-#include "ParameterSet.h"
-#include "ComponentRef.h"
-#include "DebugClass.h"
 #include "RapidFitIntegrator.h"
-#include "RapidFitIntegratorConfig.h"
-*/
-#include "DebugClass.h"
 ///	System Headers
 #include <vector>
 #include <string>
@@ -48,9 +41,6 @@ struct pthread_mutex_t;
 using namespace::std;
 
 class IPDF;
-class PDFConfigurator;
-class RapidFitIntegrator;
-class RapidFitIntegratorConfig;
 
 /*!
  *  * @brief typedef for the class-factory objects which actually create the new class instances in memory

@@ -19,7 +19,6 @@
 ///	RapidFit Headers
 #include "RapidFitIntegratorConfig.h"
 #include "IntegratorFunction.h"
-#include "IPDF.h"
 #include "FoamIntegrator.h"
 #include "IDataSet.h"
 #include "DebugClass.h"

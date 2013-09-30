@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/09/30 Rob Currie
+  - Resolved some strange circular dependencies which are constructed by rootcint on PPE machines, not sure why this happens as everything compiles with the same ROOT versions at CERN and locally for me but we should be aware of this
+
 2013/09/29 Rob Currie
   - Moved a LOT of code out of BasePDF into classes with their own interfaces, this is designed to allow for the structure of the BasePDF to be greatly simplified from a development and supportability perspective
      This code exploits the use of public virtual inheritance to allow for BasePDF_Frameowkr and BasePDF_MCCaching to have their own independent interfaces which are picked up by the IPDF
