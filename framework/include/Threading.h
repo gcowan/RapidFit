@@ -7,6 +7,7 @@
 #include "DataPoint.h"
 #include "IDataSet.h"
 #include "RapidFitIntegrator.h"
+#include "ComponentRef.h"
 
 #include <vector>
 #include <string>
@@ -21,7 +22,7 @@ class IDataSet;
 struct Fitting_Thread{
 	explicit Fitting_Thread() :
 		dataSubSet(), fittingPDF(NULL), useWeights(false), dataPoint_Result(), FitBoundary(NULL),
-		stored_integral(0.), weightsSquared(false), dataSet(NULL)
+		stored_integral(0.), weightsSquared(false), dataSet(NULL), thisComponent(NULL)
 	{}
 
 	vector<DataPoint*> dataSubSet;		/*!	DataPoints to be evaluated by this thread		*/
@@ -32,6 +33,8 @@ struct Fitting_Thread{
 	PhaseSpaceBoundary* FitBoundary;	/*!	PhaseSpaceBoundary containing all data			*/
 	double stored_integral;			/*!	Stored Integral for Numerical Integral fits		*/
 	bool weightsSquared;			/*!	Are we using Weight Squared?				*/
+
+	ComponentRef* thisComponent;
 
 	private:
 		Fitting_Thread(const Fitting_Thread&);

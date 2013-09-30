@@ -39,9 +39,9 @@ class MultiThreadedFunctions
 		MultiThreadedFunctions();
 		~MultiThreadedFunctions();
 
-		static vector<double>* ParallelEvaluate_pthreads( IPDF* thisFunction, IDataSet* thesePoints, unsigned int nThreads );
+		static vector<double>* ParallelEvaluate_pthreads( IPDF* thisFunction, IDataSet* thesePoints, unsigned int nThreads, ComponentRef* thisRef=NULL );
 
-		static vector<double>* ParallelEvaluate_pthreads( vector<IPDF*> thisFunction, vector<IDataSet*> thesePoints, unsigned int nThreads );
+		static vector<double>* ParallelEvaluate_pthreads( vector<IPDF*> thisFunction, vector<IDataSet*> thesePoints, unsigned int nThreads, ComponentRef* thisRef=NULL );
 
                 #ifndef __CINT__
                         //      CINT behaves badly with this attribute
@@ -50,9 +50,11 @@ class MultiThreadedFunctions
                         //      let's keep em happy
                         //
 			static void* Evaluate_pthread( void *input_data ) __attribute__ ((noreturn));
+			static void* EvaluateComponent_pthread( void *input_data ) __attribute__ ((noreturn));
 			static void* Integrate_pthread( void *input_data ) __attribute__ ((noreturn));
 		#else
 			static void* Evaluate_pthread( void *input_data );
+			static void* EvaluateComponent_pthread( void *input_data );
 			static void* Integrate_pthread( void *input_data );
 		#endif
 

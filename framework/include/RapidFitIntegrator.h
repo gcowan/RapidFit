@@ -33,25 +33,10 @@ class IntegratorFunction;
 using namespace ROOT::Math;
 using namespace::std;
 
-static vector<double*> _global_doEval_points;
+static vector<DataPoint*> _global_doEval_points;
 static vector<double> _global_range_minima;
 static vector<double> _global_range_maxima;
-
-class Normalise_Thread
-{
-	public:
-		Normalise_Thread() : function(NULL), normalise_points(), dataPoint_Result()	{}
-		~Normalise_Thread() {}
-
-		IntegratorFunction* function;
-		vector<double*> normalise_points;
-		vector<double> dataPoint_Result;
-		unsigned int integral_dim;
-
-	private:
-		Normalise_Thread( const Normalise_Thread& );
-		Normalise_Thread& operator=( const Normalise_Thread );
-};
+static vector<string> _global_observable_names;
 
 class RapidFitIntegrator
 {
@@ -289,7 +274,8 @@ class RapidFitIntegrator
 
 		static void clearGSLIntegrationPoints();
 
-		static vector<double*> getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima );
+		static vector<DataPoint*> getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* templateDataPoint, vector<string> doIntegrate );
+
 	private:
 		/*!
 		 * Don't Copy the class this way!
@@ -417,17 +403,10 @@ class RapidFitIntegrator
 		unsigned int GSLFixedPoints;
 
 
-		static vector<double*> initGSLDataPoints( unsigned int number, vector<double> maxima, vector<double> minima );
-#ifndef __CINT__
-		//      CINT behaves badly with this attribute
-		//      and,
-		//      g++ complains that this is a good place for it...
-		//      let's keep em happy
-		//
-		static void* ThreadWork( void* ) __attribute__ ((noreturn));
-#else
-		static void* ThreadWork( void* );
-#endif
+		//static vector<double*> initGSLDataPoints( unsigned int number, vector<double> maxima, vector<double> minima );
+
+		static vector<DataPoint*> initGSLDataPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* thisDataPoint, vector<string> doIntegrate );
+
 };
 
 #endif

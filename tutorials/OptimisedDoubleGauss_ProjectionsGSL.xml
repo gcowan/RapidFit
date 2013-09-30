@@ -35,7 +35,7 @@
 </PDF>
 <DataSet>
 <Source>Foam</Source>
-<NumberEvents>10000000</NumberEvents>
+<NumberEvents>100000</NumberEvents>
 <PhaseSpaceBoundary>
 <Observable>
 <Name>x</Name>

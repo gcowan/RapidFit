@@ -62,6 +62,7 @@ double NegativeLogLikelihoodThreadedNew::EvaluateDataSet( IPDF * FittingPDF, IDa
 
 	thisConfig->MultiThreadingInstance = "pthreads";
 	thisConfig->numThreads=(unsigned)Threads;
+	thisConfig->wantedComponent = NULL;
 
 	//cout << "Breaking into Threads" << endl;
 	vector<double>* values = MultiThreadedFunctions::ParallelEvaulate( FittingPDF, TotalDataSet, thisConfig ); 

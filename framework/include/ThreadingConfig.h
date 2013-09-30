@@ -12,6 +12,7 @@ class ThreadingConfig
 	public:
 		string MultiThreadingInstance;
 		unsigned int numThreads;
+		ComponentRef* wantedComponent;
 };
 
 #endif
