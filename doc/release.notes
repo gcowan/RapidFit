@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/10/01 Dianne Ferguson
+ - Updated Threading.h to get around linking problem.
+
 2013/09/30 Rob Currie
   - Moved the RapidFiIntegrator code over to use the MultiThreaded functions which are common to NLLThreadedNew this means that the multi-threading is taken care of elsewhere in a standardised way and not in an ad-hoc per-class basis
 

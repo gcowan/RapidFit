@@ -6,7 +6,6 @@
 
 #include "DataPoint.h"
 #include "IDataSet.h"
-#include "RapidFitIntegrator.h"
 #include "ComponentRef.h"
 
 #include <vector>
