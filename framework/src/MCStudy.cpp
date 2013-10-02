@@ -2,7 +2,7 @@
 
 //	RapidFit Headers
 #include "MCStudy.h"
-#include "XMLConfigReader.h"
+#include "I_XMLConfigReader.h"
 #include "FitResultVector.h"
 #include "FitAssembler.h"
 #include "PDFWithData.h"
@@ -18,7 +18,7 @@ MCStudy::~MCStudy()
 }
 
 //	XML Constructor
-MCStudy::MCStudy( XMLConfigReader* new_xmlConfig ) :
+MCStudy::MCStudy( I_XMLConfigReader* new_xmlConfig ) :
 IStudy(), events_to_step_over( new_xmlConfig->GetAllDataSetSizes() ), CommandLineParams(), StartingEntries( new_xmlConfig->GetAllStartEntries() ), PhysParams(), input_xml(new_xmlConfig)
 {
 	xmlConfig = new_xmlConfig;
@@ -31,7 +31,7 @@ IStudy(), events_to_step_over( new_xmlConfig->GetAllDataSetSizes() ), CommandLin
 }
 
 //	XML Constructor with events_to_step_over, num_repeats & starting_entry defined
-MCStudy::MCStudy( XMLConfigReader* new_xmlConfig, vector<int> new_events_to_step_over, int new_num_repeats, vector<int> starting_entries ) :
+MCStudy::MCStudy( I_XMLConfigReader* new_xmlConfig, vector<int> new_events_to_step_over, int new_num_repeats, vector<int> starting_entries ) :
 IStudy(), events_to_step_over( new_events_to_step_over ), CommandLineParams(), StartingEntries( starting_entries ), PhysParams(), input_xml(new_xmlConfig)
 {
 	xmlConfig = new_xmlConfig;

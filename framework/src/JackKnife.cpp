@@ -19,7 +19,7 @@
 #include "MemoryDataSet.h"
 #include "ObservableContinuousConstraint.h"
 #include "RapidFitIntegrator.h"
-#include "XMLConfigReader.h"
+#include "I_XMLConfigReader.h"
 #include "PDFWithData.h"
 #include "IPDF.h"
 #include "IDataSet.h"
@@ -40,7 +40,7 @@ using namespace::std;
 
 namespace JackKnife
 {
-	void jackknife( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, 
+	void jackknife( I_XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, 
 		FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int start, int stop )
 	{
 		cout << "Starting JackKnife" << endl;

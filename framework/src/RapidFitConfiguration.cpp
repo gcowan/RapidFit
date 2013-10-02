@@ -88,6 +88,8 @@ numberRepeats(),
 	debug(),
 	disableLatexOutput(),
 	BuildConstraints(),
+	configFileListFlag(),
+	configFileList(),
 	runtimeArgs()
 {
 		//Variables to store command line arguments
@@ -180,6 +182,9 @@ numberRepeats(),
 		BuildConstraints = false;
 
 		runtimeArgs = vector<string>();
+
+		configFileListFlag = false;
+		configFileList = vector<string>();
 }
 
 RapidFitConfiguration::~RapidFitConfiguration()
@@ -217,4 +222,5 @@ RapidFitConfiguration::~RapidFitConfiguration()
 		ResultFormatter::CleanUp();
 		RapidFitIntegrator::clearGSLIntegrationPoints();
 }
+
 

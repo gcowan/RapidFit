@@ -38,7 +38,7 @@ class VectoredFeldmanCousins : public IStudy
 		 */
 		VectoredFeldmanCousins( FitResultVector* input_GlobalResult, FitResultVector* ResultsForFC, unsigned int inputNuisenceModel,
 				OutputConfiguration* new_makeOutput, MinimiserConfiguration* newMinimiser, FitFunctionConfiguration* newFunction,
-				XMLConfigReader* new_xmlFile, vector< PDFWithData* > new_pdfsAndData );
+				I_XMLConfigReader* new_xmlFile, vector< PDFWithData* > new_pdfsAndData );
 
 		/*!
 		 * @brief Destructor Method

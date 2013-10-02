@@ -16,15 +16,15 @@
 #include "IDataSet.h"
 #include "IPDF.h"
 #include "PhaseSpaceBoundary.h"
-#include "XMLConfigReader.h"
+#include "I_XMLConfigReader.h"
 #include "MinimiserConfiguration.h"
 #include "FitFunctionConfiguration.h"
 
 namespace GoodnessOfFit
 {
-	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int nData );
-        double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, FitResult * result);
-        void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, ParameterSet* parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, int nData, int repeats, vector<double> * pvalues);
+	double gofLoop( I_XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int nData );
+        double fitDataCalculatePvalue( I_XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, FitResult * result);
+        void generateFitAndCalculatePvalue( I_XMLConfigReader * xmlFile, ParameterSet* parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, int nData, int repeats, vector<double> * pvalues);
 	double getPvalue( double datavalue, vector<double> distribution );
 	double pValueFromPoint2PointDissimilarity( IDataSet * data, IDataSet * mc );
 	double calculateTstatistic( IDataSet * data, IDataSet * mc);

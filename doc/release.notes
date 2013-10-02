@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2013/10/02 Rob Currie
+ - Added new I_XMLConfigReader interface to deal with reading 1 or many XML files, moved a lot of classes to use this Interface rather than the raw XMLConfigReader object
+ - Added new MultiXMLConfigReader class to read in and collect information from multiple XMLConfigReaders and present it in a coherent way to the rest of RapidFit
+ - Fixed minor bug in the ParameterSet( vector<ParameterSet*> ) constructor which added multiple occurances of the same PhysicsParameter to the final ParameterSet by accident despite promising to the contrary.
+     Use of StringProcessing class should have protected against 99% of the bad things this could have caused due to always finding the first parameter by lowest vector index
+
 2013/10/01 Dianne Ferguson
  - Updated Threading.h to get around linking problem.
 

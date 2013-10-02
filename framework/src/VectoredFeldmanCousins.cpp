@@ -7,7 +7,7 @@
 
 using namespace::std;
 
-VectoredFeldmanCousins::VectoredFeldmanCousins( FitResultVector* input_GlobalResult, FitResultVector* ResultsForFC, unsigned int inputNuisenceModel, OutputConfiguration* new_makeOutput, MinimiserConfiguration* newMinimiser, FitFunctionConfiguration* newFunction, XMLConfigReader* new_xmlFile, vector< PDFWithData* > new_pdfsAndData ) : 
+VectoredFeldmanCousins::VectoredFeldmanCousins( FitResultVector* input_GlobalResult, FitResultVector* ResultsForFC, unsigned int inputNuisenceModel, OutputConfiguration* new_makeOutput, MinimiserConfiguration* newMinimiser, FitFunctionConfiguration* newFunction, I_XMLConfigReader* new_xmlFile, vector< PDFWithData* > new_pdfsAndData ) : 
 	GlobalFitResult(), GlobalFitPhysicsParameters(), FitAtGridPoints(), cout_bak(NULL), cerr_bak(NULL), clog_bak(NULL), allPhaseSpaces(),
 	input_pdfsAndData(), controlled_parameters(), nuisenceModel(0), stored_pdfs(), stored_dataconfigs(), sWeighted_study(), sweight_error(), generate_n_events(0),
 	ParameterSetWithFreeParameters(), ParameterSetWithFixedParameters()

@@ -6,7 +6,6 @@
 //	RapidFit Headers
 #include "main.h"
 #include "RapidRun.h"
-#include "XMLConfigReader.h"
 //	System Headers
 #include <vector>
 #include <string>

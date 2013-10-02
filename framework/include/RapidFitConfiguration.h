@@ -110,7 +110,7 @@ class RapidFitConfiguration
 		vector<ConstraintFunction*> XMLConstraints;
 		OutputConfiguration* makeOutput;
 		ParameterSet* argumentParameterSet;
-		XMLConfigReader* xmlFile;
+		I_XMLConfigReader* xmlFile;
 		vector<FitResultVector*> SoloContourResults;
 
 		vector<string> templatePDFs;
@@ -118,6 +118,10 @@ class RapidFitConfiguration
 		vector<string> runtimeArgs;
 
 		DebugClass* debug;
+
+		bool configFileListFlag;
+		vector<string> configFileList;
+
 	private:
 		/*!
 		 * @brief DO NOT COPY THE CONFIGURATION OBJECT!!!!!

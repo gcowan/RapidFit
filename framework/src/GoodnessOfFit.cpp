@@ -20,7 +20,7 @@
 #include "MemoryDataSet.h"
 #include "ObservableContinuousConstraint.h"
 #include "RapidFitIntegrator.h"
-#include "XMLConfigReader.h"
+#include "I_XMLConfigReader.h"
 #include "PDFWithData.h"
 #include "IPDF.h"
 #include "IDataSet.h"
@@ -43,7 +43,7 @@ using namespace::std;
 namespace GoodnessOfFit
 {
 
-	double gofLoop( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int nData )
+	double gofLoop( I_XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int nData )
 	{
 		cout << "Starting GOF" << endl;
 
@@ -81,7 +81,7 @@ namespace GoodnessOfFit
 		return pvalue;
 	}
 
-	double fitDataCalculatePvalue( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, FitResult * result)
+	double fitDataCalculatePvalue( I_XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, FitResult * result)
 	{
 		//	Unused parameters, keep gcc happy
 		(void) theMinimiser; (void) theFunction; (void) argumentParameterSet;
@@ -128,7 +128,7 @@ namespace GoodnessOfFit
 		return pvalue;
 	}
 
-	void generateFitAndCalculatePvalue( XMLConfigReader * xmlFile, ParameterSet* parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, int nData, int repeats, vector<double> * pvalues)
+	void generateFitAndCalculatePvalue( I_XMLConfigReader * xmlFile, ParameterSet* parSet, MinimiserConfiguration * theMinimiser, FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, int nData, int repeats, vector<double> * pvalues)
 	{
 		PDFWithData * pdfAndData = xmlFile->GetPDFsAndData()[0];
 		pdfAndData->SetPhysicsParameters( parSet );

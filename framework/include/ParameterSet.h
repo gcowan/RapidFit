@@ -32,7 +32,7 @@ class ParameterSet
 		 *
 		 * @param Input this is the list of ParameterSets which you intend to merge
 		 */
-		ParameterSet( vector<ParameterSet*> Input );
+		ParameterSet( vector<ParameterSet*> Input, bool silent=false );
 
 		/*!
 		 * @brief This is the constructor which creates a set of pointers to PhysicsParameters

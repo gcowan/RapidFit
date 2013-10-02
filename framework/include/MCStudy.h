@@ -6,7 +6,7 @@
 
 //	RapidFit Headers
 #include "IStudy.h"
-#include "XMLConfigReader.h"
+#include "I_XMLConfigReader.h"
 #include "FitResultVector.h"
 //	System Headers
 #include <vector>
@@ -18,8 +18,8 @@ class MCStudy	:	public IStudy
 {
 	public:
 		//	Public Constructors
-		MCStudy( XMLConfigReader* );			//	Read defaults from XML
-		MCStudy( XMLConfigReader* , vector<int>, int, vector<int> );	//	Read defaults, apart from events_to_step_over, num_repeats, starting_entry
+		MCStudy( I_XMLConfigReader* );			//	Read defaults from XML
+		MCStudy( I_XMLConfigReader* , vector<int>, int, vector<int> );	//	Read defaults, apart from events_to_step_over, num_repeats, starting_entry
 		//	Destructor
 		~MCStudy();
 
@@ -39,7 +39,7 @@ class MCStudy	:	public IStudy
 		MCStudy& operator = ( const MCStudy& );
 
 		//	Internal Parameters
-		XMLConfigReader* input_xml;
+		I_XMLConfigReader* input_xml;
 		vector<int> events_to_step_over;
 		vector<string> CommandLineParams;
 		vector<int> StartingEntries;

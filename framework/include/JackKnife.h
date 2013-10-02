@@ -16,12 +16,12 @@
 #include "IDataSet.h"
 #include "IPDF.h"
 #include "PhaseSpaceBoundary.h"
-#include "XMLConfigReader.h"
+#include "I_XMLConfigReader.h"
 #include "MinimiserConfiguration.h"
 #include "FitFunctionConfiguration.h"
 
 namespace JackKnife {
-	void jackknife( XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, 
+	void jackknife( I_XMLConfigReader * xmlFile, MinimiserConfiguration * theMinimiser, 
 		FitFunctionConfiguration * theFunction, ParameterSet* argumentParameterSet, vector<string> CommandLineParam, int start, int stop);
 	void plotUstatistic( IPDF * pdf, IDataSet * data, PhaseSpaceBoundary * phase, string plot );
 }

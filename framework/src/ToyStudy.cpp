@@ -12,7 +12,7 @@
 //	RapidFit Headers
 #include "ToyStudy.h"
 #include "FitAssembler.h"
-#include "XMLConfigReader.h"
+#include "I_XMLConfigReader.h"
 #include "StringProcessing.h"
 #include "ResultFormatter.h"
 //	System Headers

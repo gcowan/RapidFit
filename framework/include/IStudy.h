@@ -12,7 +12,7 @@
 #define IStudy_H
 
 ///	RapidFit Headers
-#include "XMLConfigReader.h"
+#include "I_XMLConfigReader.h"
 #include "FitResultVector.h"
 #include "ParameterSet.h"
 #include "FitFunctionConfiguration.h"
@@ -153,7 +153,7 @@ class IStudy
 		/*!
 		 * This is the XML file which was used to initialize the whole study. It's a bit bad to rely on this to generate objects but it does make life easier
 		 */
-		XMLConfigReader* xmlConfig;
+		I_XMLConfigReader* xmlConfig;
 
 		/*!
 		 * This is the stored number of Repeats which were requested for this study

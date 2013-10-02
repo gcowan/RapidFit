@@ -40,13 +40,14 @@
 #include "ScanParam.h"
 #include "PrecalculatorConfig.h"
 #include "DebugClass.h"
+#include "I_XMLConfigReader.h"
 //	System Headers
 #include <vector>
 #include <string>
 
 using namespace::std;
 
-class XMLConfigReader
+class XMLConfigReader : public I_XMLConfigReader
 {
 	public:
 

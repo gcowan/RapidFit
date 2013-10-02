@@ -18,7 +18,7 @@
 
 using namespace::std;
 
-ParameterSet::ParameterSet( vector<ParameterSet*> input ) :
+ParameterSet::ParameterSet( vector<ParameterSet*> input, bool silent ) :
 	allParameters(), allNames(), uniqueID(0), allInternalNames(), allForeignNames()
 {
 	for( vector<ParameterSet*>::iterator set_i = input.begin(); set_i != input.end(); ++set_i )
@@ -36,12 +36,15 @@ ParameterSet::ParameterSet( vector<ParameterSet*> input ) :
 			}
 			else
 			{
-				cerr << "Physics Parameter: " << *param_i << " already defined." << endl;
-				cerr << "Using last definition of this Parameter." << endl;
-				(*set_i)->GetPhysicsParameter( temp_par )->Print();
+				if( !silent )
+				{
+					cerr << "Physics Parameter: " << *param_i << " already defined." << endl;
+					cerr << "Using last definition of this Parameter." << endl;
+					(*set_i)->GetPhysicsParameter( temp_par )->Print();
+				}
 				//this->AddPhysicsParameter( ((*set_i)->GetPhysicsParameter( temp_par )) );
-				allNames.push_back( temp_par );
-				allParameters.push_back( new PhysicsParameter( *((*set_i)->GetPhysicsParameter( temp_par )) ) );
+				//allNames.push_back( temp_par );
+				//allParameters.push_back( new PhysicsParameter( *((*set_i)->GetPhysicsParameter( temp_par )) ) );
 			}
 		}
 	}

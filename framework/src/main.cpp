@@ -17,7 +17,9 @@
 #include "Mathematics.h"
 #include "FitAssembler.h"
 #include "ToyStudy.h"
+#include "I_XMLConfigReader.h"
 #include "XMLConfigReader.h"
+#include "MultiXMLConfigReader.h"
 #include "ResultFormatter.h"
 #include "InputParsing.h"
 #include "RapidFitIntegrator.h"
@@ -1341,10 +1343,15 @@ int saveOneDataSet( RapidFitConfiguration* config )
 }
 int ConfigureRapidFit( RapidFitConfiguration* config )
 {
-	//Load a config file
-	if( config->configFileNameFlag )
+	//Load config file(s)
+	if( config->configFileListFlag )
 	{
-		config->xmlFile = new XMLConfigReader( config->configFileName, config->XMLOverrideList, config->debug );
+		config->xmlFile = (I_XMLConfigReader*) new MultiXMLConfigReader( config->configFileList, config->debug );
+		config->configFileNameFlag = true;
+	}
+	else if( config->configFileNameFlag )
+	{
+		config->xmlFile = (I_XMLConfigReader*) new XMLConfigReader( config->configFileName, config->XMLOverrideList, config->debug );
 		//config->xmlFile->SetDebug( config->debug );
 		if( config->xmlFile->IsValid() )
 		{
@@ -1359,15 +1366,16 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 
 	if( config->WeightDataSet == true )	{	config->calcConfig = config->xmlFile->GetPrecalculatorConfig();		}
 
-	//	CONFIGURE RAPIDFIT PARAMETERS
-
-
 	//	I am unaware of anything reasonable you can do with RapidFit without providing a driving XML
-	if ( !config->configFileNameFlag )
+	if ( !config->configFileNameFlag && !config->configFileListFlag )
 	{
 		cerr << "No Input XML defined" << endl;
 		return -33;
 	}
+
+
+	//      CONFIGURE RAPIDFIT PARAMETERS
+
 
 	//	This Section of Code deals with the seed value that is to be used to start whatever your studying
 	if( !config->RuntimeSeed.empty() && !config->UUID_Flag )

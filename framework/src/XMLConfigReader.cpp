@@ -5,9 +5,10 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
+#include "I_XMLConfigReader.h"
 #include "XMLConfigReader.h"
 #include "ClassLookUp.h"
 #include "SumPDF.h"
@@ -60,7 +61,7 @@ void XMLConfigReader::PrintTag( const XMLTag* thisTag )
 }
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML, DebugClass* thisDebug ) :
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML, DebugClass* thisDebug ) : I_XMLConfigReader(),
 	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(thisDebug==NULL?new DebugClass(false):new DebugClass(*thisDebug) ), XMLValid(false)
 {
 	//Open the config file
@@ -2016,9 +2017,23 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* Inpu
 			configurator->addConfigurationParameter( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			++configParamNum;
 		}
+		else if ( pdfConfig[configIndex]->GetName() == "AppendAllOthers" )
+		{
+			cerr << "AppendAllOthers has not been implemented yet!" << endl;
+			exit(-5623);
+			/*
+			   TString ThisNum; ThisNum+=appendParamNum;
+			   pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
+			   configurator->appendOtherParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+			   ++appendParamNum;
+			   */
+		}
 		else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
 		{
+			TString ThisNum; ThisNum+=configParamNum;
+			pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 			configurator->SetFractionName( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+			++configParamNum;
 		}
 		else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
 		{
@@ -2117,6 +2132,17 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				configurator->appendParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 				++appendParamNum;
+			}
+			else if ( pdfConfig[configIndex]->GetName() == "AppendAllOthers" )
+			{
+				cerr << "AppendAllOthers has not been implemented yet!" << endl;
+				exit(-2367);
+				/*
+				   TString ThisNum; ThisNum+=appendParamNum;
+				   pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
+				   configurator->appendOtherParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+				   ++appendParamNum;
+				   */
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{

@@ -229,10 +229,37 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 				++argumentIndex;
 				config.configFileName = argv[argumentIndex];
 				config.configFileNameFlag = true;
+				config.configFileListFlag = false;
 			}
 			else
 			{
 				cerr << "Configuration file name not specified" << endl;
+				return BAD_COMMAND_LINE_ARG;
+			}
+		}
+		else if( currentArgument == "--files" )
+		{
+			if( (argumentIndex + 2) < argv.size() )
+			{
+				++argumentIndex;
+				unsigned int fileNum= (unsigned)atoi( argv[argumentIndex].c_str() );
+				if( (argumentIndex + fileNum) > argv.size() )
+				{
+					cerr << "Failed to provide the correct number of files promised: " << fileNum << ", exiting..." << endl;
+					cerr << "I have: " << argv.size() << " arguments and expect: " << (argumentIndex+fileNum) << " of " << argumentIndex << endl << endl;
+					return BAD_COMMAND_LINE_ARG;
+				}
+				for( unsigned int i=0; i< fileNum; ++i  )
+				{
+					++argumentIndex;
+					config.configFileList.push_back( argv[argumentIndex] );
+				}
+				config.configFileNameFlag = false;
+				config.configFileListFlag = true;
+			}
+			else
+			{
+				cerr << "Need to provide the number of files which are about to be read in with the files command" << endl;
 				return BAD_COMMAND_LINE_ARG;
 			}
 		}
