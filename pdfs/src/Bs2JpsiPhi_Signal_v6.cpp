@@ -71,15 +71,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) 
 
 	, CachedA5(input.CachedA5), CachedA6(input.CachedA6), CachedA7(input.CachedA7), CachedA8(input.CachedA8), CachedA9(input.CachedA9), CachedA10(input.CachedA10)
 
-	, _expLObs(input._expLObs), _expHObs(input._expHObs), _expSinObs(input._expSinObs), _expCosObs(input._expCosObs), _intexpLObs(input._intexpLObs), _intexpHObs(input._intexpHObs)
-
-	, _intexpSinObs(input._intexpSinObs), _intexpCosObs(input._intexpCosObs), _intexpLObs_vec(input._intexpLObs_vec), _intexpHObs_vec(input._intexpHObs_vec)
-	
-	, _intexpSinObs_vec(input._intexpSinObs_vec), _intexpCosObs_vec(input._intexpCosObs_vec), timeBinNum(input.timeBinNum), _datapoint(NULL), componentIndex(input.componentIndex)
-
-	, angularTermDependencies(input.angularTermDependencies), A0A0_Obs(input.A0A0_Obs), APAP_Obs(input.APAP_Obs), ATAT_Obs(input.ATAT_Obs), ASAS_Obs(input.ASAS_Obs)
-
-	, ImAPAT_Obs(input.ImAPAT_Obs), ReA0AP_Obs(input.ReA0AP_Obs), ImA0AT_Obs(input.ImA0AT_Obs), ReASAP_Obs(input.ReASAP_Obs), ImASAT_Obs(input.ImASAT_Obs), ReASA0_Obs(input.ReASA0_Obs)
+	, timeBinNum(input.timeBinNum), _datapoint(NULL), componentIndex(input.componentIndex)
 
 	, A0A0_value(input.A0A0_value), APAP_value(input.APAP_value), ATAT_value(input.ATAT_value), ASAS_value(input.ASAS_value), ImAPAT_value(input.ImAPAT_value)
 
@@ -521,18 +513,6 @@ bool Bs2JpsiPhi_Signal_v6::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	}
 	lambda = allParameters.GetPhysicsParameter( lambdaName )->GetValue();
 
-	// Detector parameters
-	/*resolutionScale		= allParameters.GetPhysicsParameter( resScaleName )->GetValue();
-	if( ! useEventResolution() ) {
-		resolution1         = allParameters.GetPhysicsParameter( res1Name )->GetValue();
-		resolution2         = allParameters.GetPhysicsParameter( res2Name )->GetValue();
-		resolution3         = allParameters.GetPhysicsParameter( res3Name )->GetValue();
-		resolution2Fraction = allParameters.GetPhysicsParameter( res2FractionName )->GetValue();
-		resolution3Fraction = allParameters.GetPhysicsParameter( res3FractionName )->GetValue();
-	}
-	timeOffset          = allParameters.GetPhysicsParameter( timeOffsetName )->GetValue();
-       */
-
 	// New: Prepare the coefficients of all of the time dependent terms (C,D,S etc)
 	this->prepareCDS() ;
 
@@ -688,16 +668,42 @@ double Bs2JpsiPhi_Signal_v6::EvaluateTimeOnly(DataPoint * measurement)
         resolutionModel->setObservables( measurement );
         _mistagCalibModel->setObservables( measurement );
 
-	A0A0_value = measurement->GetPseudoObservable( A0A0_Obs );
-	APAP_value = measurement->GetPseudoObservable( APAP_Obs );
-	ATAT_value = measurement->GetPseudoObservable( ATAT_Obs );
-	ASAS_value = measurement->GetPseudoObservable( ASAS_Obs );
-	ImAPAT_value = measurement->GetPseudoObservable( ImAPAT_Obs );
-	ReA0AP_value = measurement->GetPseudoObservable( ReA0AP_Obs );
-	ImA0AT_value = measurement->GetPseudoObservable( ImA0AT_Obs );
-	ReASAP_value = measurement->GetPseudoObservable( ReASAP_Obs );
-	ImASAT_value = measurement->GetPseudoObservable( ImASAT_Obs );
-	ReASA0_value = measurement->GetPseudoObservable( ReASA0_Obs );
+        vector<double> angularData;
+
+        if( !_useHelicityBasis )
+        {
+                angularData.push_back( measurement->GetObservable( cosThetaName )->GetValue() );
+                angularData.push_back( measurement->GetObservable( cosPsiName )->GetValue() );
+                angularData.push_back( measurement->GetObservable( phiName )->GetValue() );
+
+                A0A0_value = Bs2JpsiPhi_Angular_Terms::TangleFactorA0A0( angularData );
+                APAP_value = Bs2JpsiPhi_Angular_Terms::TangleFactorAPAP( angularData );
+                ATAT_value = Bs2JpsiPhi_Angular_Terms::TangleFactorATAT( angularData );
+                ASAS_value = Bs2JpsiPhi_Angular_Terms::TangleFactorASAS( angularData );
+                ImAPAT_value = Bs2JpsiPhi_Angular_Terms::TangleFactorImAPAT( angularData );
+                ReA0AP_value = Bs2JpsiPhi_Angular_Terms::TangleFactorReA0AP( angularData );
+                ImA0AT_value = Bs2JpsiPhi_Angular_Terms::TangleFactorImA0AT( angularData );
+                ReASAP_value = Bs2JpsiPhi_Angular_Terms::TangleFactorReASAP( angularData );
+                ImASAT_value = Bs2JpsiPhi_Angular_Terms::TangleFactorImASAT( angularData );
+                ReASA0_value = Bs2JpsiPhi_Angular_Terms::TangleFactorReASA0( angularData );
+        }
+        else
+        {
+                angularData.push_back( measurement->GetObservable( cthetakName )->GetValue() );
+                angularData.push_back( measurement->GetObservable( cthetalName )->GetValue() );
+                angularData.push_back( measurement->GetObservable( phihName )->GetValue() );
+
+                A0A0_value = Bs2JpsiPhi_Angular_Terms::HangleFactorA0A0( angularData );
+                APAP_value = Bs2JpsiPhi_Angular_Terms::HangleFactorAPAP( angularData );
+                ATAT_value = Bs2JpsiPhi_Angular_Terms::HangleFactorATAT( angularData );
+                ASAS_value = Bs2JpsiPhi_Angular_Terms::HangleFactorASAS( angularData );
+                ImAPAT_value = Bs2JpsiPhi_Angular_Terms::HangleFactorImAPAT( angularData );
+                ReA0AP_value = Bs2JpsiPhi_Angular_Terms::HangleFactorReA0AP( angularData );
+                ImA0AT_value = Bs2JpsiPhi_Angular_Terms::HangleFactorImA0AT( angularData );
+                ReASAP_value = Bs2JpsiPhi_Angular_Terms::HangleFactorReASAP( angularData );
+                ImASAT_value = Bs2JpsiPhi_Angular_Terms::HangleFactorImASAT( angularData );
+                ReASA0_value = Bs2JpsiPhi_Angular_Terms::HangleFactorReASA0( angularData );
+        }
 
 	// Get observables into member variables
 	t = measurement->GetObservable( timeName )->GetValue() ; // - timeOffset ;

@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/10/06 Rob Currie
+ - Removing internal objects no longer used in jpsiphi v6 in an effort to clean up the codebase slightly
+
 2013/10/02 Rob Currie
  - Added new I_XMLConfigReader interface to deal with reading 1 or many XML files, moved a lot of classes to use this Interface rather than the raw XMLConfigReader object
  - Added new MultiXMLConfigReader class to read in and collect information from multiple XMLConfigReaders and present it in a coherent way to the rest of RapidFit
