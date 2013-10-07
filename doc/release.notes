@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/10/07 Dianne Ferguson
+ - Added a script to scripts folder to generate txt files from time acceptance histograms in root files. 
+
 2013/10/06 Rob Currie
  - Removing internal objects no longer used in jpsiphi v6 in an effort to clean up the codebase slightly
 
