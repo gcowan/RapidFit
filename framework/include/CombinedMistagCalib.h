@@ -61,6 +61,9 @@ class CombinedMistagCalib : public IMistagCalib
 		double RealD2() const;
 		double RealD1() const;
 
+		int GetCombinedTag() const;
+		int GetFloatedCombinedTag() const;
+
 		bool _OSTagged, _SSTagged, _OSSSTagged;
 
 		int _tagOS, _tagSS, _combinedtag;

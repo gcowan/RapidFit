@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#include <complex>
 
 using namespace::std;
 
@@ -60,6 +61,8 @@ class IPDF : public virtual IPDF_NormalisationCaching, public virtual IPDF_MCCac
 		 * Return the function value at the given point
 		 */
 		virtual double Evaluate( DataPoint* ) = 0;
+
+		virtual complex<double> EvaluteComplex( DataPoint* ) = 0;
 
 		/*!
 		 * Interface Function:

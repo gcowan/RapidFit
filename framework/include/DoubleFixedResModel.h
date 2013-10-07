@@ -64,19 +64,19 @@ class DoubleFixedResModel : public IResolutionModel
 
 		double GetThisScale();
 
-		ObservableRef resScaleName;			// Scale to multiply e-by-e resolution
-		ObservableRef resScale2Name;
-		double resScale;
-		double resScale2;
+		ObservableRef Resolution1Name;			// Scale to multiply e-by-e resolution
+		ObservableRef Resolution2Name;
+		double Resolution1;
+		double Resolution2;
 
-		ObservableRef eventResolutionName;  // Event-by-event resolution observable
-		double eventResolution;
+		ObservableRef ResolutionScaleName;  // Event-by-event resolution observable
+		double ResolutionScale;
 
 		unsigned int numberComponents;
 		unsigned int wantedComponent;
 
-		ObservableRef timeResFracName;
-		double resFrac;
+		ObservableRef Resolution2FractionName;
+		double Resolution2Fraction;
 };
 
 #endif

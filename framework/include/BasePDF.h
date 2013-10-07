@@ -221,6 +221,8 @@ class BasePDF : public BasePDF_Framework, public BasePDF_MCCaching, public IPDF
 		 */
 		virtual double Evaluate( DataPoint* Input );
 
+		virtual complex<double> EvaluteComplex( DataPoint* );
+
 		/*!
 		 * @brief   Interface Function:  This is a new wrapper between this PDF and the framework in RapidFit
 		 *

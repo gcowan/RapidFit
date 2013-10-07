@@ -68,7 +68,7 @@ class XMLConfigReader : public I_XMLConfigReader
 		/*!
 		 * Default Destructor
 		 */
-		~XMLConfigReader();
+		virtual ~XMLConfigReader();
 
 		/*!
 		 * @brief Returns the result of a boolean decision to determine if the XML has passed some basic sanity checks for having a complete configuration

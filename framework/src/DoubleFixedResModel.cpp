@@ -23,10 +23,10 @@ using namespace::std;
 //............................................
 // Constructor 
 DoubleFixedResModel::DoubleFixedResModel( PDFConfigurator* configurator, bool quiet ) :
-	resScaleName		( configurator->getName( "timeResolutionScale" ) ),
-	resScale2Name            ( configurator->getName( "timeResolutionScale2" ) ),
-	timeResFracName            ( configurator->getName( "timeResFraction" ) ),
-	eventResolutionName	( configurator->getName( "eventResolution" ) ),
+	Resolution1Name			( configurator->getName( "timeResolution1" ) ),
+	Resolution2Name			( configurator->getName( "timeResolution2" ) ),
+	Resolution2FractionName		( configurator->getName( "timeResolution2Fraction" ) ),
+	ResolutionScaleName		( configurator->getName( "timeResolutionScale" ) ),
 	numberComponents( 2 ), wantedComponent( 1 )
 {
 	if( !quiet) cout << "DoubleFixedResModel:: Instance created " << endl ;
@@ -37,10 +37,10 @@ DoubleFixedResModel::DoubleFixedResModel( PDFConfigurator* configurator, bool qu
 //This method allows the instance to add the parameters it needs to the list
 void DoubleFixedResModel::addParameters( vector<string> & parameterNames )
 {
-	parameterNames.push_back( resScaleName );
-	parameterNames.push_back( resScale2Name );
-	parameterNames.push_back( timeResFracName );
-	parameterNames.push_back( eventResolutionName );
+	parameterNames.push_back( Resolution1Name );
+	parameterNames.push_back( Resolution2Name );
+	parameterNames.push_back( Resolution2FractionName );
+	parameterNames.push_back( ResolutionScaleName );
 	return;
 }
 
@@ -48,10 +48,10 @@ void DoubleFixedResModel::addParameters( vector<string> & parameterNames )
 //To take the current value of a parameter into the instance
 void DoubleFixedResModel::setParameters( ParameterSet & parameters )
 {
-	eventResolution = parameters.GetPhysicsParameter( eventResolutionName )->GetValue();
-	resScale = parameters.GetPhysicsParameter( resScaleName )->GetValue();
-	resScale2 = parameters.GetPhysicsParameter( resScale2Name )->GetValue();
-	resFrac = parameters.GetPhysicsParameter( timeResFracName )->GetValue();
+	ResolutionScale = parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue();
+	Resolution1 = parameters.GetPhysicsParameter( Resolution1Name )->GetValue();
+	Resolution2 = parameters.GetPhysicsParameter( Resolution2Name )->GetValue();
+	Resolution2Fraction = parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue();
 	return;
 }
 
@@ -135,10 +135,10 @@ double DoubleFixedResModel::ExpCosInt( double tlow, double thigh, double gamma, 
 
 double DoubleFixedResModel::GetThisScale()
 {
-	double thisRes = eventResolution;
-	if( wantedComponent == 1 ) { thisRes *= resScale; }
-	else if( wantedComponent == 2 ) { thisRes *= resScale2; }
-	else { thisRes *= resScale; }
+	double thisRes = ResolutionScale;
+	if( wantedComponent == 1 ) { thisRes *= Resolution1; }
+	else if( wantedComponent == 2 ) { thisRes *= Resolution2; }
+	else { thisRes *= Resolution1; }
 	return thisRes;
 }
 
@@ -155,13 +155,13 @@ void DoubleFixedResModel::requestComponent( unsigned int wanted )
 
 double DoubleFixedResModel::GetFraction( unsigned int input )
 {
-	if( input == 1 )
+	if( input == 2 )
 	{
-		return resFrac;
+		return Resolution2Fraction;
 	}
-	else if( input == 2 )
+	else if( input == 1 )
 	{
-		return (1.-resFrac);
+		return (1.-Resolution2Fraction);
 	}
 	else return 0.;
 }

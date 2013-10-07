@@ -632,3 +632,8 @@ string BasePDF::GetComponentName( ComponentRef* input )
 	}
 }
 
+complex<double> BasePDF::EvaluteComplex( DataPoint* input )
+{
+	return complex<double>( this->Evaluate( input ), 0. );
+}
+

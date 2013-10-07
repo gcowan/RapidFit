@@ -20,7 +20,7 @@
 
 using namespace::std;
 
-MultiXMLConfigReader::MultiXMLConfigReader( vector<string> fileNames, DebugClass* thisDebug ) : I_XMLConfigReader(), XMLReaders()
+MultiXMLConfigReader::MultiXMLConfigReader( vector<string> fileNames, DebugClass* thisDebug ) : I_XMLConfigReader(), XMLReaders(), storedSeed(-1), storedRepeats(-1)
 {
 	for( unsigned int i=0; i< fileNames.size(); ++i )
 	{

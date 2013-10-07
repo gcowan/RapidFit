@@ -64,23 +64,23 @@ class TripleFixedResModel : public IResolutionModel
 
 		double GetThisScale();
 
-		ObservableRef resScaleName;			// Scale to multiply e-by-e resolution
-		ObservableRef resScale2Name;
-		ObservableRef resScale3Name;
-		double resScale;
-		double resScale2;
-		double resScale3;
+		ObservableRef Resolution1Name;			// Scale to multiply e-by-e resolution
+		ObservableRef Resolution2Name;
+		ObservableRef Resolution3Name;
+		double Resolution1;
+		double Resolution2;
+		double Resolution3;
 
-		ObservableRef eventResolutionName;  // Event-by-event resolution observable
-		double eventResolution;
+		ObservableRef ResolutionScaleName;  // Event-by-event resolution observable
+		double ResolutionScale;
 
 		unsigned int numberComponents;
 		unsigned int wantedComponent;
 
-		ObservableRef timeResFrac2Name;
-		ObservableRef timeResFrac3Name;
-		double resFrac2;
-		double resFrac3;
+		ObservableRef Resolution2FractionName;
+		ObservableRef Resolution3FractionName;
+		double Resolution2Fraction;
+		double Resolution3Fraction;
 };
 
 #endif

@@ -1,19 +1,24 @@
 // $Id: release.notes $
 
+2013/10/07 Rob Currie
+  - Added new complex evaluate to IPDF/BasePDF, intended for the rare situations where we want to explore a complex quantity as part of some analysis
+  - Fixed implementation and improved code for Double and Triple FixedTimeResolution models
+  - Added multiple XML options to the --help and fixed a minor bug in MultiXMLConfigReader class
+
 2013/10/07 Dianne Ferguson
- - Added a script to scripts folder to generate txt files from time acceptance histograms in root files. 
+  - Added a script to scripts folder to generate txt files from time acceptance histograms in root files. 
 
 2013/10/06 Rob Currie
- - Removing internal objects no longer used in jpsiphi v6 in an effort to clean up the codebase slightly
+  - Removing internal objects no longer used in jpsiphi v6 in an effort to clean up the codebase slightly
 
 2013/10/02 Rob Currie
- - Added new I_XMLConfigReader interface to deal with reading 1 or many XML files, moved a lot of classes to use this Interface rather than the raw XMLConfigReader object
- - Added new MultiXMLConfigReader class to read in and collect information from multiple XMLConfigReaders and present it in a coherent way to the rest of RapidFit
- - Fixed minor bug in the ParameterSet( vector<ParameterSet*> ) constructor which added multiple occurances of the same PhysicsParameter to the final ParameterSet by accident despite promising to the contrary.
-     Use of StringProcessing class should have protected against 99% of the bad things this could have caused due to always finding the first parameter by lowest vector index
+  - Added new I_XMLConfigReader interface to deal with reading 1 or many XML files, moved a lot of classes to use this Interface rather than the raw XMLConfigReader object
+  - Added new MultiXMLConfigReader class to read in and collect information from multiple XMLConfigReaders and present it in a coherent way to the rest of RapidFit
+  - Fixed minor bug in the ParameterSet( vector<ParameterSet*> ) constructor which added multiple occurances of the same PhysicsParameter to the final ParameterSet by accident despite promising to the contrary.
+      Use of StringProcessing class should have protected against 99% of the bad things this could have caused due to always finding the first parameter by lowest vector index
 
 2013/10/01 Dianne Ferguson
- - Updated Threading.h to get around linking problem.
+  - Updated Threading.h to get around linking problem.
 
 2013/09/30 Rob Currie
   - Moved the RapidFiIntegrator code over to use the MultiThreaded functions which are common to NLLThreadedNew this means that the multi-threading is taken care of elsewhere in a standardised way and not in an ad-hoc per-class basis
@@ -22,16 +27,16 @@
   - Resolved some strange circular dependencies which are constructed by rootcint on PPE machines, not sure why this happens as everything compiles with the same ROOT versions at CERN and locally for me but we should be aware of this
   - Fixed minor bug in SWeighting code ans have modified the PDFs in the Framework such that the expected name of the PDF object is more clearly defined now that it's using the PDF macro
   - Added the new Format nTuple for the 2011 analysis.
-     This produces the exact same results as in the 2011 1fb Analysis and uses the latest v6 code. Because the output is the same I see no need to add the fit output to svn.
+      This produces the exact same results as in the 2011 1fb Analysis and uses the latest v6 code. Because the output is the same I see no need to add the fit output to svn.
 
 2013/09/29 Rob Currie
   - Moved a LOT of code out of BasePDF into classes with their own interfaces, this is designed to allow for the structure of the BasePDF to be greatly simplified from a development and supportability perspective
-     This code exploits the use of public virtual inheritance to allow for BasePDF_Frameowkr and BasePDF_MCCaching to have their own independent interfaces which are picked up by the IPDF
+      This code exploits the use of public virtual inheritance to allow for BasePDF_Frameowkr and BasePDF_MCCaching to have their own independent interfaces which are picked up by the IPDF
   - This has allowed for a substantial amount of nternal methods and objects to be removed from the BasePDF
-     The objects which are now explicitly used within the BasePDF correctly call protected or public methods with all member objects being private to the sub-classes
+      The objects which are now explicitly used within the BasePDF correctly call protected or public methods with all member objects being private to the sub-classes
   - These new BaseClass objects cannot be constructed but I suppose the use of the interfaces could allow for some code to be cleaned up
   - Added additional check in PhaseSpaceBoundary to check for the DiscreteIndex corresponding to the correct PhaseSpaceBoundary instance.
-     This will very likely never have effected any major analysis, however it is now not possible for this exception to screw with things like normalisation.
+      This will very likely never have effected any major analysis, however it is now not possible for this exception to screw with things like normalisation.
 
 2013/09/26 Rob Currie
   - Moved the 3 pdfs in framework to use the PDF_CREATOR macro this allowed for 3 methods to be removes from the XMLConfigReader
@@ -39,9 +44,9 @@
 2013/09/26 Rob Currie
   - BREAKING BACKWARDS COMPATIBILITY
     The PDFConfigurator object has once again been expanded to include the PhaseSpaceBoundary and PDFDaughters this allows for the NormalisedSumPDF, ProdPDF and SumPDF objects to be constructed using a more common interface
-      This also allows for more information to be available to the PDFs on construction in addition to allowing for Parameter Substitution to be used for FitFractions
+       This also allows for more information to be available to the PDFs on construction in addition to allowing for Parameter Substitution to be used for FitFractions
     This explicitly disallows the use of FitFractions within the PDFConfigurator when using a CommonPDF.
-      It is now suggested that people use ParameterSubstitions which makes it explicit where the fractions come from within nested sum PDFs
+       It is now suggested that people use ParameterSubstitions which makes it explicit where the fractions come from within nested sum PDFs
   - All PDFs now support the <Label> tag which allows for the PDF label to be set in the XML to make life easier when reading some debugging statements
   - Looking to move PDFs in framework to use the common PDF macro for construction and lookup to allow for the XMLConfigReader to have to know even less about PDFs.
       The amount of code within the XMLConfigReader which was horribly arbritraty in dealing with PDFs has been dramatically reduced

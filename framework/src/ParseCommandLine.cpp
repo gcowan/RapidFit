@@ -153,6 +153,11 @@ void ParseCommandLine::RapidFitHelp()
 	cout << "	Write the output to a folder with the given name." << endl;
 
 	cout << endl;
+	cout << "--files n file1.xml file2.xml ... filen.xml" << endl;
+	cout << "       Used to fit to multiple XML files at once" << endl;
+	cout << "       eg:  --files 2 file1.xml file2.xml" << endl;
+
+	cout << endl;
 
 }
 
