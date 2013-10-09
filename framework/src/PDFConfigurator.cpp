@@ -133,7 +133,8 @@ string PDFConfigurator::getName( string defaultName )
 		if( defaultName == defaultNames[ii] )
 		{
 			//cout << " PDFConfig::sub[" << defaultName << "->" << replacementNames[ii] << "]" << endl;
-			return replacementNames[ii] ;
+			return this->getName(replacementNames[ii]);
+//			return replacementNames[ii] ;
 		}
 	}
 	return defaultName ;

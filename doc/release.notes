@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/10/09 Dianne Ferguson
+  - Modified PDFConfig to allow for two levels of parameter substitutions and append parameter.
+
 2013/10/07 Rob Currie
   - Added new complex evaluate to IPDF/BasePDF, intended for the rare situations where we want to explore a complex quantity as part of some analysis
   - Fixed implementation and improved code for Double and Triple FixedTimeResolution models
