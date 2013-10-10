@@ -21,7 +21,7 @@ CombinedMistagCalib::CombinedMistagCalib( PDFConfigurator* configurator ) : IMis
 	_mistagP0_OS(), _mistagP1_OS(), _mistagSetPoint_OS(), _mistagDeltaP1_OS(), _mistagDeltaP0_OS(), _mistagDeltaSetPoint_OS(),
 	_mistagP0_SS(), _mistagP1_SS(), _mistagSetPoint_SS(), _mistagDeltaP1_SS(), _mistagDeltaP0_SS(), _mistagDeltaSetPoint_SS(),
 	_mistagP0_OSSS(), _mistagP1_OSSS(), _mistagSetPoint_OSSS(), _mistagDeltaP1_OSSS(), _mistagDeltaP0_OSSS(), _mistagDeltaSetPoint_OSSS(),
-	_mistagOSSS(), _combinedtag(), _OSTagged(false), _SSTagged(false), _OSSSTagged(false), _storedD1(), _storedD2(),
+	_combinedtag(), _OSTagged(false), _SSTagged(false), _OSSSTagged(false), _storedD1(), _storedD2(),
 	//	Observable Names
 	tagOSName( configurator->getName("tagdecision_os") ),
 	tagSSName( configurator->getName("tagdecision_ss") ),
@@ -49,12 +49,10 @@ CombinedMistagCalib::CombinedMistagCalib( PDFConfigurator* configurator ) : IMis
 	mistagDeltaP0Name_OSSS( configurator->getName("mistagDeltaP0_OSSS") ),
 	mistagDeltaSetPointName_OSSS( configurator->getName("mistagDeltaSetPoint_OSSS") ),
 	_IMistagCalib_OS(NULL), _IMistagCalib_SS(NULL), _IMistagCalib_OSSS(NULL),
-	_debugMistag(false), _onTuple(false), _useFixedEta(false)
+	_debugMistag(false), _onTuple(false)
 {
 	_debugMistag = configurator->isTrue( "DebugMistagModel" );
-	_onTuple = configurator->isTrue( "MistagUseTuple" );
-
-	_useFixedEta = configurator->isTrue( "useFixedCombination" );
+	_onTuple = !configurator->isTrue( "Mistag3fbModel" );
 
 	if( _debugMistag )
 	{
@@ -104,12 +102,15 @@ void CombinedMistagCalib::addParameters( vector<string>& parameterNames ) const
 	parameterNames.push_back( mistagDeltaP0Name_SS );
 	parameterNames.push_back( mistagDeltaSetPointName_SS );
 
-	parameterNames.push_back( mistagP1Name_OSSS );
-	parameterNames.push_back( mistagP0Name_OSSS );
-	parameterNames.push_back( mistagSetPointName_OSSS );
-	parameterNames.push_back( mistagDeltaP1Name_OSSS );
-	parameterNames.push_back( mistagDeltaP0Name_OSSS );
-	parameterNames.push_back( mistagDeltaSetPointName_OSSS );
+	if( _onTuple || _debugMistag )
+	{
+		parameterNames.push_back( mistagP1Name_OSSS );
+		parameterNames.push_back( mistagP0Name_OSSS );
+		parameterNames.push_back( mistagSetPointName_OSSS );
+		parameterNames.push_back( mistagDeltaP1Name_OSSS );
+		parameterNames.push_back( mistagDeltaP0Name_OSSS );
+		parameterNames.push_back( mistagDeltaSetPointName_OSSS );
+	}
 }
 
 void CombinedMistagCalib::setParameters( const ParameterSet& parameters )
@@ -128,12 +129,15 @@ void CombinedMistagCalib::setParameters( const ParameterSet& parameters )
 	_mistagDeltaP0_SS = parameters.GetPhysicsParameter( mistagDeltaP0Name_SS )->GetValue();
 	_mistagDeltaSetPoint_SS = parameters.GetPhysicsParameter( mistagDeltaSetPointName_SS )->GetValue();
 
-	_mistagP1_OSSS = parameters.GetPhysicsParameter( mistagP1Name_OSSS )->GetValue();
-	_mistagP0_OSSS = parameters.GetPhysicsParameter( mistagP0Name_OSSS )->GetValue();
-	_mistagSetPoint_OSSS = parameters.GetPhysicsParameter( mistagSetPointName_OSSS )->GetValue();
-	_mistagDeltaP1_OSSS = parameters.GetPhysicsParameter( mistagDeltaP1Name_OSSS )->GetValue();
-	_mistagDeltaP0_OSSS = parameters.GetPhysicsParameter( mistagDeltaP0Name_OSSS )->GetValue();
-	_mistagDeltaSetPoint_OSSS = parameters.GetPhysicsParameter( mistagDeltaSetPointName_OSSS )->GetValue();
+	if( _onTuple || _debugMistag )
+	{
+		_mistagP1_OSSS = parameters.GetPhysicsParameter( mistagP1Name_OSSS )->GetValue();
+		_mistagP0_OSSS = parameters.GetPhysicsParameter( mistagP0Name_OSSS )->GetValue();
+		_mistagSetPoint_OSSS = parameters.GetPhysicsParameter( mistagSetPointName_OSSS )->GetValue();
+		_mistagDeltaP1_OSSS = parameters.GetPhysicsParameter( mistagDeltaP1Name_OSSS )->GetValue();
+		_mistagDeltaP0_OSSS = parameters.GetPhysicsParameter( mistagDeltaP0Name_OSSS )->GetValue();
+		_mistagDeltaSetPoint_OSSS = parameters.GetPhysicsParameter( mistagDeltaSetPointName_OSSS )->GetValue();
+	}
 
 	if( _debugMistag )
 	{
@@ -150,9 +154,59 @@ void CombinedMistagCalib::addObservables( vector<string>& observableNames ) cons
 	observableNames.push_back( mistagOSName );
 	observableNames.push_back( tagSSName );
 	observableNames.push_back( mistagSSName );
-	observableNames.push_back( tagCombName );
-	if( _debugMistag || _onTuple ) observableNames.push_back( mistagOSSSName );
+	if( _debugMistag ) observableNames.push_back( tagCombName );
+	if( _debugMistag ) observableNames.push_back( mistagOSSSName );
 }
+
+int CombinedMistagCalib::GetCombinedTag() const
+{
+	int decision = 0;
+
+	double p_OS = (1.-(double)_tagOS)*0.5 + ((double)_tagOS)*(1.-_mistagOS);
+	double p_SS = (1.-(double)_tagSS)*0.5 + ((double)_tagSS)*(1.-_mistagSS);
+
+	double _1_p_OS = (1.+(double)_tagOS)*0.5 - ((double)_tagOS)*(1.-_mistagOS);
+	double _1_p_SS = (1.+(double)_tagSS)*0.5 - ((double)_tagSS)*(1.-_mistagSS);
+
+	if( p_OS*p_SS > _1_p_OS*_1_p_SS ) decision = +1;
+	else if( p_OS*p_SS < _1_p_OS*_1_p_SS ) decision = -1;
+	else decision = 0;
+
+	return decision;
+}
+
+int CombinedMistagCalib::GetFloatedCombinedTag() const
+{
+	return this->GetCombinedTag();
+}
+
+/*
+int CombinedMistagCalib::GetFloatedCombinedTag() const
+{
+	int decision = 0;
+
+	double p_OS = (1.-(double)_tagOS)*0.5;
+	if( _tagOS == 1 ) p_OS += ((double)_tagOS)*(1.-this->mistagOSB());
+	else if( _tagOS == -1 ) p_OS += ((double)_tagOS)*(1.-this->mistagOSBbar());
+
+	double p_SS = (1.-(double)_tagSS)*0.5;
+	if( _tagSS == 1 ) p_SS += ((double)_tagSS)*(1.-this->mistagSSB());
+	else if( _tagSS == -1 ) p_SS += ((double)_tagSS)*(1.-this->mistagSSBbar());
+
+	double _1_p_OS = (1.+(double)_tagOS)*0.5;
+	if( _tagOS == 1 ) _1_p_OS -= ((double)_tagOS)*(1.-this->mistagOSB());
+	else if( _tagOS == -1 ) _1_p_OS -= ((double)_tagOS)*(1.-this->mistagOSBbar());
+
+	double _1_p_SS = (1.+(double)_tagSS)*0.5;
+	if( _tagSS == 1 ) _1_p_SS -= ((double)_tagSS)*(1.-this->mistagSSB());
+	else if( _tagSS == -1 ) _1_p_SS -= ((double)_tagSS)*(1.-this->mistagSSBbar());
+
+	if( p_OS*p_SS > _1_p_OS*_1_p_SS ) decision = +1;
+	else if( p_OS*p_SS < _1_p_OS*_1_p_SS ) decision = -1;
+
+	return decision;
+}
+*/
 
 void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 {
@@ -161,7 +215,14 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	_tagSS = (int) measurement->GetObservable( tagSSName )->GetValue();
 	_mistagSS = measurement->GetObservable( mistagSSName )->GetValue();
 
-	_combinedtag = (int)measurement->GetObservable( tagCombName )->GetValue();
+	if( _onTuple )
+	{
+		_combinedtag = this->GetCombinedTag();
+	}
+	else
+	{
+		_combinedtag = this->GetFloatedCombinedTag();
+	}
 
 	if( _tagOS != 0 && _tagSS == 0 ) _OSTagged = true;
 	else _OSTagged = false;
@@ -172,19 +233,11 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	if( _tagOS != 0 && _tagSS != 0 && _combinedtag != 0 ) _OSSSTagged = true;
 	else _OSSSTagged = false;
 
-	if( _onTuple )
-	{
-		_mistagOS = measurement->GetObservable( mistagOSSSName )->GetValue();
-		_mistagSS = measurement->GetObservable( mistagOSSSName )->GetValue();
-		_mistagOSSS = measurement->GetObservable( mistagOSSSName )->GetValue();
-	}
-	else
+	if( !_onTuple )
 	{
 		//_OSSSTagged = _OSTagged && _SSTagged;
 		if( _OSSSTagged )
 		{
-			if( _useFixedEta ) _mistagOSSS = this->getFixedEta();
-			else _mistagOSSS = this->getFloatedEta();
 			_mistagOS = 0.5;
 			_mistagSS = 0.5;
 		}
@@ -194,10 +247,6 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	{
 		_OSTagged = false;
 		_SSTagged = false;
-	}
-	else
-	{
-		_mistagOSSS = 0.5;
 	}
 
 	if( _OSTagged ) _mistagSS = 0.5;
@@ -537,7 +586,10 @@ double CombinedMistagCalib::mistagOSBbar() const
 	if( _mistagOS > 0.5 ) returnValue = 0.5;
 	else if( _mistagOS < 0. ) returnValue = 0.;
 	else returnValue = _mistagP0_OS-(_mistagDeltaP0_OS*0.5) + (_mistagP1_OS-(_mistagDeltaP1_OS*0.5))*( _mistagOS - (_mistagSetPoint_OS-(_mistagDeltaSetPoint_OS*0.5)) );
-	return returnValue;
+
+        if( returnValue > 0.5 ) returnValue = 0.5;
+        else if( returnValue < 0. ) returnValue = 0.;
+        return returnValue;
 }
 
 double CombinedMistagCalib::mistagSSBbar() const
@@ -548,7 +600,10 @@ double CombinedMistagCalib::mistagSSBbar() const
 	if( _mistagSS > 0.5 ) returnValue = 0.5;
 	else if( _mistagSS < 0. ) returnValue = 0.;
 	else returnValue = _mistagP0_SS-(_mistagDeltaP0_SS*0.5) + (_mistagP1_SS-(_mistagDeltaP1_SS*0.5))*( _mistagSS - (_mistagSetPoint_SS-(_mistagDeltaSetPoint_SS*0.5)) );
-	return returnValue;
+
+        if( returnValue > 0.5 ) returnValue = 0.5;
+        else if( returnValue < 0. ) returnValue = 0.;
+        return returnValue;
 }
 
 double CombinedMistagCalib::mistagOSSSBbar() const
@@ -556,9 +611,18 @@ double CombinedMistagCalib::mistagOSSSBbar() const
 	if( fabs(this->q()) < 0.5 ) return 0.5;
 
 	double returnValue = 0.;
-	if( _mistagOSSS > 0.5 ) returnValue = 0.5;
-	else if( _mistagOSSS < 0. ) returnValue = 0.;
-	else returnValue = _mistagP0_OSSS-(_mistagDeltaP0_OSSS*0.5) + (_mistagP1_OSSS-(_mistagDeltaP1_OSSS*0.5))*( _mistagOSSS - (_mistagSetPoint_OSSS-(_mistagDeltaSetPoint_OSSS*0.5)) );
+	if( _onTuple )
+	{
+		//      Mistag calculated from nTuple and so needs calibrating
+		returnValue = _mistagP0_OSSS-(_mistagDeltaP0_OSSS*0.5) + (_mistagP1_OSSS-(_mistagDeltaP1_OSSS*0.5))*( this->getFixedEta() - (_mistagSetPoint_OSSS-(_mistagDeltaSetPoint_OSSS*0.5)) );
+	}
+	else
+	{
+		//      Mistag calculated using calibrated OS and SS so doesn't need calibrating
+		returnValue = this->getFloatedEta();
+	}
+	if( returnValue > 0.5 ) returnValue = 0.5;
+	else if( returnValue < 0. ) returnValue = 0.;
 	return returnValue;
 }
 
@@ -570,6 +634,9 @@ double CombinedMistagCalib::mistagOSB() const
 	if( _mistagOS > 0.5 ) returnValue = 0.5;
 	else if( _mistagOS < 0. ) returnValue = 0.;
 	else returnValue = _mistagP0_OS+(_mistagDeltaP0_OS*0.5) + (_mistagP1_OS+(_mistagDeltaP1_OS*0.5))*( _mistagOS - (_mistagSetPoint_OS+(_mistagDeltaSetPoint_OS*0.5)) );
+
+	if( returnValue > 0.5 ) returnValue = 0.5;
+	else if( returnValue < 0. ) returnValue = 0.;
 	return returnValue;
 }
 
@@ -581,6 +648,9 @@ double CombinedMistagCalib::mistagSSB() const
 	if( _mistagSS > 0.5 ) returnValue = 0.5;
 	else if( _mistagSS < 0. ) returnValue = 0.;
 	else returnValue = _mistagP0_SS+(_mistagDeltaP0_SS*0.5) + (_mistagP1_SS+(_mistagDeltaP1_SS*0.5))*( _mistagSS - (_mistagSetPoint_SS+(_mistagDeltaSetPoint_SS*0.5)) );
+
+	if( returnValue > 0.5 ) returnValue = 0.5;
+	else if( returnValue < 0. ) returnValue = 0.;
 	return returnValue;
 }
 
@@ -589,9 +659,19 @@ double CombinedMistagCalib::mistagOSSSB() const
 	if( fabs(this->q()) < 0.5 ) return 0.5;
 
 	double returnValue = 0.;
-	if( _mistagOSSS > 0.5 ) returnValue = 0.5;
-	else if( _mistagOSSS < 0. ) returnValue = 0.;
-	else returnValue = _mistagP0_OSSS+(_mistagDeltaP0_OSSS*0.5) + (_mistagP1_OSSS+(_mistagDeltaP1_OSSS*0.5))*( _mistagOSSS - (_mistagSetPoint_OSSS+(_mistagDeltaSetPoint_OSSS*0.5)) ); 
+	if( _onTuple )
+	{
+		//	Mistag calculated from nTuple and so needs calibrating
+		returnValue = _mistagP0_OSSS+(_mistagDeltaP0_OSSS*0.5) + (_mistagP1_OSSS+(_mistagDeltaP1_OSSS*0.5))*( this->getFixedEta() - (_mistagSetPoint_OSSS+(_mistagDeltaSetPoint_OSSS*0.5)) ); 
+	}
+	else
+	{
+		//	Mistag calculated using calibrated OS and SS so doesn't need calibrating
+		returnValue = this->getFloatedEta();
+	}
+
+	if( returnValue > 0.5 ) returnValue = 0.5;
+	else if( returnValue < 0. ) returnValue = 0.;
 	return returnValue;
 }
 
@@ -665,7 +745,6 @@ void CombinedMistagCalib::Print() const
 	cout << "_mistagDeltaP1_OSSS       " << _mistagDeltaP1_OSSS << endl;
 	cout << "_mistagOS                 " << _mistagOS << endl;
 	cout << "_mistagSS                 " << _mistagSS << endl;
-	cout << "_mistagOSSS               " << _mistagOSSS << endl;
 	cout << "_mistagSetPoint_OS        " << _mistagSetPoint_OS << endl;
 	cout << "_mistagSetPoint_OSSS      " << _mistagSetPoint_OSSS << endl;
 	cout << "_mistagDeltaSetPoint_OS   " << _mistagDeltaSetPoint_OS << endl;

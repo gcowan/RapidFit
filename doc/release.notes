@@ -6,6 +6,7 @@
       Cleaned up code in framework to not segault due to this
       Caching now makes use of the uniqueID internal state of the PhaseSpaceBoundary which is changed whenever the object is modified to change the list of Constraints
   - Improved JpsiPhiMassBky pdf to make it faster. What improvement is noticed if any is unkown but the code is 'more optimal'
+  - Added improvements to the CombinedTagCalibration implementation in framework
 
 2013/10/09 Dianne Ferguson
   - Modified PDFConfig to allow for two levels of parameter substitutions and append parameter.
