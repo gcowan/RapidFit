@@ -151,6 +151,7 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 		}
 		else
 		{
+		/*
 			//	These special case PDFs explicitly need to be declared here as they're special case objects heavily integrated into the framework
 			if( Name == "NormalisedSum" )
 			{
@@ -165,7 +166,7 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 				returnable_PDF = (IPDF*) new SumPDF( *(const SumPDF*) inputPDF );
 			}
 			else
-			{
+			{ */
 				//	Each PDF has a C wrapper function with an unmangled name of CopyPDF_SomePDF
 				string pdf_copy_Name = "CopyPDF_"+Name;
 
@@ -182,7 +183,7 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 				//	Give the PDF object explicit knowledge of the path of it's constructor template
 				returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
 				inputPDF->SetCopyConstructor( pdf_copy );
-			}
+			//}
 		}
 	}
 	else

@@ -25,6 +25,8 @@ class Bs2JpsiPhiMassBkg : public BasePDF
 		//Calculate the PDF normalisation
 		virtual double Normalisation(PhaseSpaceBoundary*);
 
+		virtual bool SetPhysicsParameters( ParameterSet* input );
+
 	private:
 		void MakePrototypes();
 
@@ -33,6 +35,10 @@ class Bs2JpsiPhiMassBkg : public BasePDF
 		// Observables
 		ObservableRef recoMassName;	// reconstructed Bs mass
 		ObservableRef constraint_recoMassName;
+
+		double PDF_ScaleFactor;
+
+		double alphaM_pr, inv_alphaM_pr;
 };
 
 #endif

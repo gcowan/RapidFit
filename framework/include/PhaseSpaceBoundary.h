@@ -73,6 +73,9 @@ class PhaseSpaceBoundary
 
 		mutable size_t uniqueID;
 
+		mutable vector<DataPoint*> StoredCombinations;
+		mutable size_t storedCombinationID;
+
 };
 
 #endif

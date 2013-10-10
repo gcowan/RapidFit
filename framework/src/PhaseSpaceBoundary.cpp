@@ -25,7 +25,7 @@
 
 //Constructor with correct arguments
 PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
-	allConstraints(), allNames(), DiscreteCombinationNumber(-1), uniqueID(0)
+	allConstraints(), allNames(), DiscreteCombinationNumber(-1), uniqueID(0), storedCombinationID(9999), StoredCombinations()
 {
 	allConstraints.reserve(NewNames.size());
 	//Populate the map
@@ -48,7 +48,7 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
 }
 
 PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) :
-	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber), uniqueID(0)
+	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber), uniqueID(0), StoredCombinations(), storedCombinationID(0)
 {
 	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
@@ -70,11 +70,30 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) 
 	}
 
 	uniqueID = reinterpret_cast<size_t>(this)+1;
+
+	if( NewBoundary.storedCombinationID == NewBoundary.uniqueID )
+	{
+        	for( unsigned int i=0; i< NewBoundary.StoredCombinations.size(); ++i )
+        	{
+        	        StoredCombinations.push_back( new DataPoint( *NewBoundary.StoredCombinations[i] ) );
+        	}
+
+		storedCombinationID = uniqueID;
+	}
+	else
+	{
+		storedCombinationID = 0;
+	}
 }
 
 //Destructor
 PhaseSpaceBoundary::~PhaseSpaceBoundary()
 {
+	while( !StoredCombinations.empty() )
+	{
+		if( StoredCombinations.back() != NULL ) delete StoredCombinations.back();
+		StoredCombinations.pop_back();
+	}
 }
 
 //Return the names of all bounds stored
@@ -229,6 +248,8 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 		}
 		return true;
 	}
+
+	++uniqueID;
 }
 
 //Initialise bound
@@ -237,6 +258,7 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, double Minimum, double Maxi
 	ObservableContinuousConstraint * newConstraint = new ObservableContinuousConstraint( Name, Minimum, Maximum, Unit );
 	bool returnValue = this->SetConstraint( Name, newConstraint );
 	delete newConstraint;
+	++uniqueID;
 	return returnValue;
 }
 
@@ -245,6 +267,7 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, vector<double> Values, stri
 	ObservableDiscreteConstraint * newConstraint = new ObservableDiscreteConstraint( Name, Values, Unit );
 	bool returnValue = this->SetConstraint( Name, newConstraint );
 	delete newConstraint;
+	++uniqueID;
 	return returnValue;
 }
 
@@ -265,6 +288,8 @@ void PhaseSpaceBoundary::AddConstraint( string Name, IConstraint* NewConstraint,
 	{
 		if( overwrite ) this->SetConstraint( Name, NewConstraint );
 	}
+
+	++uniqueID;
 }
 
 //Returns whether a point is within the boundary
@@ -364,6 +389,17 @@ string PhaseSpaceBoundary::DiscreteDescription( const DataPoint* input ) const
 //Each should represent one combination of possible discrete values
 vector<DataPoint*> PhaseSpaceBoundary::GetDiscreteCombinations() const
 {
+	if( storedCombinationID == uniqueID && !StoredCombinations.empty() )
+	{
+		return StoredCombinations;
+	}
+
+	while( !StoredCombinations.empty() )
+	{
+		if( StoredCombinations.back() != NULL ) delete StoredCombinations.back();
+		StoredCombinations.pop_back();
+	}
+
 	//Calculate all possible combinations of discrete observables
 	vector<string> thisAllNames = this->GetAllNames();
 	vector<vector<double> > discreteValues;
@@ -398,6 +434,10 @@ vector<DataPoint*> PhaseSpaceBoundary::GetDiscreteCombinations() const
 	}
 
 	delete tempPoint;
+
+	StoredCombinations = newDataPoints;
+
+	storedCombinationID = uniqueID; 
 
 	return newDataPoints;
 }
@@ -519,11 +559,11 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	//}
 
 	//	Destory temporary objects
-	while( !allCombinations.empty() )
+	/*while	allCombinations.empty() )
 	{
 		if( allCombinations.back() != NULL ) delete allCombinations.back();
 		allCombinations.pop_back();
-	}
+	}*/
 
 	//	Check for error
 	if( thisIndex == -1 )
@@ -560,11 +600,11 @@ int PhaseSpaceBoundary::GetNumberCombinations() const
 	{
 		DiscreteCombinationNumber = (int)thisMany.size();
 
-		while( !thisMany.empty() )
+		/*while( !thisMany.empty() )
 		{
 			if( thisMany.back() != NULL ) delete thisMany.back();
 			thisMany.pop_back();
-		}
+		}*/
 	}
 
 	return DiscreteCombinationNumber;

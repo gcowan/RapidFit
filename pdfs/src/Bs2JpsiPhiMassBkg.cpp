@@ -26,7 +26,7 @@ Bs2JpsiPhiMassBkg::Bs2JpsiPhiMassBkg(PDFConfigurator* configurator) :
 	  alphaM_prName	( configurator->getName("alphaM_pr" ))
         // Observables
         , recoMassName  (configurator->getName( "mass" ))
-	, constraint_recoMassName( "mass" )
+	, constraint_recoMassName( "mass" ), PDF_ScaleFactor(0.)
 {
 	cout << "Constructing Bs2JpsiPhiMassBkg" << endl;
 	MakePrototypes();
@@ -42,6 +42,7 @@ void Bs2JpsiPhiMassBkg::MakePrototypes()
         vector<string> parameterNames;
         parameterNames.push_back( alphaM_prName );
         allParameters = ParameterSet(parameterNames);
+
 }
 
 //Destructor
@@ -49,20 +50,27 @@ Bs2JpsiPhiMassBkg::~Bs2JpsiPhiMassBkg()
 {
 }
 
+bool Bs2JpsiPhiMassBkg::SetPhysicsParameters( ParameterSet* input )
+{
+
+	allParameters.SetPhysicsParameters( input );
+
+	alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
+	PDF_ScaleFactor = 1./exp( -alphaM_pr * 5366.0 );
+
+	inv_alphaM_pr = 1./alphaM_pr;
+}
 
 //Calculate the function value
 double Bs2JpsiPhiMassBkg::Evaluate(DataPoint * measurement)
 {
-  	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
-
 	// Get the observable
         double mass = measurement->GetObservable( recoMassName )->GetValue();
 
 	double val = exp( -alphaM_pr * mass);
 	
 	//To take out a large scale variation  - this is arbitrary provided it is same in Evaluate() and Normalisation()
-	double scaleFactor = exp( -alphaM_pr * 5366.0 );
-	val /= scaleFactor ;
+	val *= PDF_ScaleFactor;
 	
   	return val;
 }
@@ -86,24 +94,22 @@ double Bs2JpsiPhiMassBkg::Normalisation(PhaseSpaceBoundary * boundary)
 		mhigh = massBound->GetMaximum();
 	}
 
-	double alphaM_pr = allParameters.GetPhysicsParameter( alphaM_prName )->GetValue();
 	double integral =0;
 
 	if( fabs( alphaM_pr - 0. ) < DOUBLE_TOLERANCE ) {
 		integral = mhigh-mlow ;   // this was added by PELC to catch a divide by zero Nov-2010
 	}
 	else {
-		integral = (1.0/alphaM_pr)* (exp(-alphaM_pr*mlow) - exp(-alphaM_pr*mhigh)) ;
-
-		//Code prepared to take out a large scale variation - this is arbitrary provided it is same in Evaluate() and Normalisation()
-		double scaleFactor = exp( -alphaM_pr * 5366.0 );
-		integral /= scaleFactor ;
+		integral = inv_alphaM_pr* (exp(-alphaM_pr*mlow) - exp(-alphaM_pr*mhigh)) ;
 	}
+
+	//Code prepared to take out a large scale variation - this is arbitrary provided it is same in Evaluate() and Normalisation()
+	integral *= PDF_ScaleFactor;
 
 	if( std::isnan(integral) )
 	{
 		PDF_THREAD_LOCK
-		cout << "scale factor: " << exp( -alphaM_pr * 5366.0 ) << endl;
+		cout << "scale factor: " << PDF_ScaleFactor << endl;
 		cout << "alphaM_pr: " << alphaM_pr << endl;
 		cout << integral << endl;
 		boundary->Print();

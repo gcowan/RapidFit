@@ -825,7 +825,8 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 		}
 		else
 		{
-			DiscreteIntegrals = NewBoundary->GetDiscreteCombinations();
+			vector<DataPoint*> theseCombs = NewBoundary->GetDiscreteCombinations();
+			for( unsigned int i=0; i< theseCombs.size(); ++i ) DiscreteIntegrals.push_back( new DataPoint( *(theseCombs[i]) ) );
 			double returnVal=0.;
 			for( unsigned int i=0; i< DiscreteIntegrals.size(); ++i )
 			{
@@ -847,7 +848,8 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 	}
 	else
 	{
-		DiscreteIntegrals = NewBoundary->GetDiscreteCombinations();
+		vector<DataPoint*> theseCombs = NewBoundary->GetDiscreteCombinations();
+		for( unsigned int i=0; i< theseCombs.size(); ++i ) DiscreteIntegrals.push_back( new DataPoint( *(theseCombs[i]) ) );
 	}
 
 	double output_val = 0.;
