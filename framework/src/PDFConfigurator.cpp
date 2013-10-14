@@ -25,13 +25,13 @@ using namespace::std;
 
 ///..........................................
 //Default constructor & destructor
-PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), daughterPDFs(), thisPDFsBoundary(NULL), fractionName("UnsetFractionName"), PDFLabel("")
+PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), daughterPDFs(), thisPDFsBoundary(NULL), fractionNames(), PDFLabel("")
 {
 }
 
 PDFConfigurator::PDFConfigurator( const PDFConfigurator& input ) :
 	defaultNames( input.defaultNames ), replacementNames( input.replacementNames ), configParameters( input.configParameters ), configValues( input.configValues ),
-	daughterPDFs(), thisPDFsBoundary(NULL), fractionName( input.fractionName ), PDFLabel(input.PDFLabel)
+	daughterPDFs(), thisPDFsBoundary(NULL), fractionNames( input.fractionNames ), PDFLabel(input.PDFLabel)
 {
 	for( unsigned int i=0; i< input.daughterPDFs.size(); ++i )
 	{
@@ -246,14 +246,14 @@ bool PDFConfigurator::empty() const
 	return configParameters.empty() && defaultNames.empty();
 }
 
-void PDFConfigurator::SetFractionName( const string thisName )
+void PDFConfigurator::AddFractionName( const string thisName )
 {
-	fractionName = thisName;
+	fractionNames.push_back( thisName );
 }
 
-string PDFConfigurator::GetFractionName() const
+vector<string> PDFConfigurator::GetFractionNames() const
 {
-	return fractionName;
+	return fractionNames;
 }
 
 void PDFConfigurator::SetPDFLabel( const string input )

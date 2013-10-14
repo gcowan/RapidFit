@@ -51,7 +51,7 @@ MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary ) :
 //Destructor
 MemoryDataSet::~MemoryDataSet()
 {
-	delete dataBoundary;
+	if( dataBoundary != NULL ) delete dataBoundary;
 	if( canDelete )
 	{
 		while( !allData.empty() )

@@ -1,5 +1,14 @@
 // $Id: release.notes $
 
+2013/10/14 Rob Currie
+  - Fixing bugs in numerical integration.
+      These are technical and were introduced VERY recently for nDim>1 and would have presented themselves as the PDF ALWAYS integrating to 0 or RapidFit crashing only when using the GSL integration tool
+  - Added a lot of new features into the DebugClass which are static templates for dumping vectors of data to text files very quickly and easily from within RapidFit
+      These allow you to dump the contents of a vector or a vector<vector> to a TTree or a text file with a single command which makes debugging quicker.
+      It is my intention to make use of these functions to store the output from complex calculations quickly and easily and to provide diagnostics after the fit has finished
+  - Changed PDFConfigurator to use multiple fraction Names ahead of some new development that is to be done for PDFs with more than 2 components
+      Added checks to relevant PDFs to panic an exit when confused by bad xml
+
 2013/10/10 Rob Currie
   - Removed ClassLookUp special cases for PDFs in Framework which are now 'copy-safe'
   - Modified PhaseSpaceBoundary::GetDiscreteCombinations() const to save and regenerate the vector<DataPoint*> objects it makes and explicityly controls the memory pointed to

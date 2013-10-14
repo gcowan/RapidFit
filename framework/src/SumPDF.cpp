@@ -34,6 +34,12 @@ SumPDF::SumPDF( const SumPDF& input ) : BasePDF( (BasePDF) input ), prototypeDat
 SumPDF::SumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL), firstFraction(0.5),
 	firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL)
 {
+	if( config->GetFractionNames().size() != 1 )                                                                                                                                                                                         
+	{         
+		cerr << "SumPDF requires ONLY 1 Fraction" << endl;
+		exit(-564891);
+	}
+
 	if( config->GetDaughterPDFs().size() != 2 )
 	{
 		cerr << "SumPDF requires ONLY 2 daughter PDFs" << endl;
@@ -43,7 +49,7 @@ SumPDF::SumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), pro
 	{
 		firstPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[0] );
 		secondPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[1] );
-		fractionName = config->getName( config->GetFractionName() );
+		fractionName = config->getName( config->GetFractionNames()[0] );
 		integrationBoundary = new PhaseSpaceBoundary( *(config->GetPhaseSpaceBoundary()) );
 	}
 

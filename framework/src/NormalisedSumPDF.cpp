@@ -43,6 +43,12 @@ NormalisedSumPDF::NormalisedSumPDF( PDFConfigurator* config ) : BasePDF(), proto
 	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL)
 {
 
+	if( config->GetFractionNames().size() != 1 )
+	{
+		cerr << "NormalisedSumPDF requires ONLY 1 Fraction" << endl;
+		exit(-564893);
+	}
+
 	if( config->GetDaughterPDFs().size() != 2 )
 	{
 		cerr << "NormalisedSumPDF requires ONLY 2 daughter PDFs" << endl;
@@ -52,7 +58,7 @@ NormalisedSumPDF::NormalisedSumPDF( PDFConfigurator* config ) : BasePDF(), proto
 	{
 		firstPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[0] );
 		secondPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[1] );
-		fractionName = config->getName( config->GetFractionName() );
+		fractionName = config->getName( config->GetFractionNames()[0] );
 		if( config->GetPhaseSpaceBoundary() != NULL ) integrationBoundary = new PhaseSpaceBoundary( *(config->GetPhaseSpaceBoundary()) );
 	}
 

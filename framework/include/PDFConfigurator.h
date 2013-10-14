@@ -92,9 +92,9 @@ class PDFConfigurator
 
 		PhaseSpaceBoundary* GetPhaseSpaceBoundary() const;
 
-		void SetFractionName( const string thisName );
+		void AddFractionName( const string thisName );
 
-		string GetFractionName() const;
+		vector<string> GetFractionNames() const;
 
 		void SetPDFLabel( const string input );
 
@@ -114,7 +114,7 @@ class PDFConfigurator
 		vector<IPDF*> daughterPDFs;
 		PhaseSpaceBoundary* thisPDFsBoundary;
 
-		string fractionName;
+		vector<string> fractionNames;
 
 		string PDFLabel;
 };

@@ -509,7 +509,7 @@ vector<DataPoint*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, v
 	vector<double> * integrationPoints = new vector<double>[ nDim ];
 
 	//pthread_mutex_lock( &gsl_mutex );
-	cout << "Allocating GSL Integration Tool. nDim " << nDim << endl;
+	//cout << "Allocating GSL Integration Tool. nDim " << nDim << endl;
 	gsl_qrng * q = NULL;
 	try
 	{
@@ -603,8 +603,8 @@ void RapidFitIntegrator::clearGSLIntegrationPoints()
 	while( !_global_doEval_points.empty() )
 	{
 		if( _global_doEval_points.back() != NULL ) delete _global_doEval_points.back();
+		_global_doEval_points.pop_back();
 	}
-	_global_doEval_points.pop_back();
 	_global_range_minima.clear();
 	_global_range_maxima.clear();
 	_global_observable_names.clear();
@@ -693,27 +693,58 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	ThreadingConfig* thisConfig = new ThreadingConfig();
 	thisConfig->numThreads = num_threads;
 	thisConfig->MultiThreadingInstance = "pthreads";
-	thisConfig->wantedComponent = new ComponentRef( *componentIndex );
+	if( componentIndex != NULL ) thisConfig->wantedComponent = new ComponentRef( *componentIndex );
+	else thisConfig->wantedComponent = NULL;
+
+//	thisDataSet->GetDataPoint( 0 )->Print();
+
+//	cout << functionToWrap->GetName() << "\t0:\t" << functionToWrap->Evaluate( thisDataSet->GetDataPoint( 0 ) ) << endl;
+
+//	cout << functionToWrap->GetName() << "\t100:\t" << functionToWrap->Evaluate( thisDataSet->GetDataPoint( 100 ) ) << endl;
+
+//	if( componentIndex != NULL ) cout << functionToWrap->GetName() << "\t" << thisConfig->wantedComponent->getComponentName() << ":\t" << functionToWrap->EvaluateComponent( thisDataSet->GetDataPoint( 0 ), thisConfig->wantedComponent ) << endl;
 
 	vector<double>* thisSet = MultiThreadedFunctions::ParallelEvaulate( functionToWrap, thisDataSet, thisConfig );
 
-	delete[] minima;
-	delete[] maxima;
-	delete thisConfig->wantedComponent;
+//	DebugClass::Dump2TTree( DebugClass::GetUniqueROOTFileName(), *thisSet );
+
+	if( thisConfig->wantedComponent != NULL ) delete thisConfig->wantedComponent;
 	delete thisConfig;
 
 	double result=0.;
-	for( unsigned int i=0; i< thisSet->size(); ++i )	result+=thisSet->at( i );
+	for( unsigned int i=0; i< thisSet->size(); ++i )
+	{
+		result+=thisSet->at( i );
+	}
 
-	delete thisSet;
+	//cout << result << endl;
 
 	double factor=1.;
 	for( unsigned int i=0; i< (unsigned)doIntegrate.size(); ++i )
 	{
-		factor *= maxima[i]-minima[i];
+		double diff = maxima[i]-minima[i];
+		//cout << factor << "\t\t" << diff << endl;
+		if( fabs( diff ) > 1E-99 ) factor *= diff;
 	}
 
-	result /= ( (double)doEval_points.size() / factor );
+	//cout << factor << endl;
+
+	//cout << GSLFixedPoints << endl;
+
+	//cout << doEval_points.size() << endl;
+
+	//cout << thisSet->size() << endl;
+
+	result /= ( (double)GSLFixedPoints / factor );
+	
+	//cout << result << endl;
+
+	delete thisSet;
+
+	delete[] minima;
+	delete[] maxima;
+
+	//cout << result << endl;
 
 	return result;
 #else

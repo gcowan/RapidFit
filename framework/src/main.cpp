@@ -1287,6 +1287,7 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	//delete file;
 	delete pdfAndData;
 	delete helpdf;
+	exit(0);
 	return 0;
 }
 

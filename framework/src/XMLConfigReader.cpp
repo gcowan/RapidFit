@@ -2032,7 +2032,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* Inpu
 		{
 			TString ThisNum; ThisNum+=configParamNum;
 			pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
-			configurator->SetFractionName( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
+			configurator->AddFractionName( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			++configParamNum;
 		}
 		else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
