@@ -221,7 +221,7 @@ Bs2Jpsifzero_Signal_v5_forcombined::Bs2Jpsifzero_Signal_v5_forcombined(PDFConfig
 	_angAccIgnoreNumerator = configurator->isTrue( "AngularAcceptanceIgnoreNumerator" ) ;
 	if( angAccFile == "" ) cout << "Bs2Jpsifzero_Signal_v5_forcombined:: Using flat angular acceptance " << endl ;
 	else cout << "Bs2Jpsifzero_Signal_v5_forcombined:: Constructing angAcc using file: " << angAccFile << endl ;
-	angAcc = new AngularAcceptance( angAccFile, _useHelicityBasis ) ;
+	angAcc = new AngularAcceptance( angAccFile, _angAccIgnoreNumerator, _useHelicityBasis ) ;
 	angAccI1 = angAcc->af1() ;      cout << "  af1 = " << setprecision(6) << setw(15) << angAccI1 << setw(10) << " ";
 	angAccI2 = angAcc->af2() ;	cout << "  af2 = " << setprecision(6) << setw(15) << angAccI2 << setw(10) << " ";
 	angAccI3 = angAcc->af3() ;	cout << "  af3 = " << setprecision(6) << setw(15) << angAccI3 << endl ;

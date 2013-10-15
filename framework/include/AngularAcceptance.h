@@ -34,7 +34,7 @@ class AngularAcceptance
 	public:
 
 		// Constructors
-		AngularAcceptance( string fileName, bool useHelicityBasis, bool quiet=false ) ;
+		AngularAcceptance( string fileName, bool useHelicityBasis, bool IgnoreAcceptanceHisto=false, bool quiet=false ) ;
 		~AngularAcceptance();
 		AngularAcceptance( const AngularAcceptance& );
 

@@ -5,6 +5,12 @@
       Bs_HltPropertimeAcceptance_Data_2011_40bins.root 3a67bebe298a279d869741d95ad3c4f0
       Bs_HltPropertimeAcceptance_Data_2012_40bins.root 240dea434e502c2e945091806dc39a4b
   - Removed unused booleans being passed to INTERNAL methods in RapidFitIntegrator, this removes the strange cases where the debugclass wasn't being propagated correctly
+  - Fixed some code in AngularAcceptance to make use of TFile and TTree methods over TChain, TChain makes closing files more difficult than TFile::Close so is overkill for where it's used!
+      Moved the code in a LOT of JpsiPhi/Jpsifzero(I know it isn't used) to use the new constructor arguments explicitly.
+      AngularAcceptance object can be told you don't care about the Acceptance Histograms which is useful if you don't have them
+  - Editted the 2011 .txt histograms to have an acceptance of 1. from the last bin edge until 20fs. A bit wide but the selection takes care of that
+  - Added the first angular acceptance weights made from a private nTuple B from /castor/cern.ch/grid/lhcb/user/w/wkanso/MC2011{MagUp,MagDown}Pythia6_BsJpsiPhi_DTT_20131006.root 
+      These are expected to change and this file is assumed wrong and DOES NOT have the acceptance Histogram due to an (as yet) undiendtified bug hindering their creation.
 
 2013/10/14 Rob Currie
   - Fixing bugs in numerical integration.

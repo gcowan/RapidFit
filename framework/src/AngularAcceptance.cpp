@@ -12,7 +12,8 @@
 #include "Mathematics.h"
 #include "StringProcessing.h"
 
-#include "TChain.h"
+#include "TFile.h"
+#include "TTree.h"
 
 using namespace::std;
 
@@ -53,7 +54,7 @@ AngularAcceptance::~AngularAcceptance()
 
 //............................................
 // Constructor for accpetance from a file
-AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bool quiet ) :
+AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bool IgnoreAcceptanceHisto, bool quiet ) :
 	_af1(1), _af2(1), _af3(1), _af4(0), _af5(0), _af6(0), _af7(1), _af8(0), _af9(0), _af10(0), useFlatAngularAcceptance(false)
 	, histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(), ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), average_bin_content()
 {
@@ -65,43 +66,47 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bo
 	}
 	else
 	{
-		useFlatAngularAcceptance = false ;
+		if( !IgnoreAcceptanceHisto ) useFlatAngularAcceptance = false ;
+		else useFlatAngularAcceptance = true;
 
 		// Get the acceptance histogram
 
 		string fullFileName = StringProcessing::FindFileName( fileName, quiet );//this->openFile( fileName, quiet ) ;
 
-		TFile* f =  TFile::Open(fullFileName.c_str());
-
-		//cout << " AngularAcceptance::AngularAcceptance fileName: " <<  fullFileName << endl;
-
-		if( useHelicityBasis ) {
-			histo = (TH3D*) f->Get("helacc"); //(fileName.c_str())));
-			if( !quiet ) cout << " AngularAcceptance::  Using heleicity basis" << endl ;
-		}
-		else {
-			histo = (TH3D*) f->Get("tracc"); //(fileName.c_str())));
-			if( !quiet ) cout << " AngularAcceptance::  Using transversity basis" << endl ;
-		}
-
-		if( histo == NULL ) histo = (TH3D*) f->Get("acc");
-
-		if( histo == NULL )
+		if( !useFlatAngularAcceptance )
 		{
-			cerr << "Cannot Open a Valid NTuple" << endl;
-			exit(0);
-		}
-		histo->SetDirectory(0);
-		size_t uniqueNum = reinterpret_cast<size_t>(this);
-		TString Histo_Name="Histo_";Histo_Name+=uniqueNum;
-		this->processHistogram( quiet );
 
+			TFile* f =  TFile::Open(fullFileName.c_str());
+
+			//cout << " AngularAcceptance::AngularAcceptance fileName: " <<  fullFileName << endl;
+
+			if( useHelicityBasis ) {
+				histo = (TH3D*) f->Get("helacc"); //(fileName.c_str())));
+				if( !quiet ) cout << " AngularAcceptance::  Using heleicity basis" << endl ;
+			}
+			else {
+				histo = (TH3D*) f->Get("tracc"); //(fileName.c_str())));
+				if( !quiet ) cout << " AngularAcceptance::  Using transversity basis" << endl ;
+			}
+
+			if( histo == NULL ) histo = (TH3D*) f->Get("acc");
+
+			if( histo == NULL )
+			{
+				cerr << "Cannot Open a Valid NTuple" << endl;
+				exit(0);
+			}
+			histo->SetDirectory(0);
+			size_t uniqueNum = reinterpret_cast<size_t>(this);
+			TString Histo_Name="Histo_";Histo_Name+=uniqueNum;
+			this->processHistogram( quiet );
+			f->Close();
+		}
 
 		// Get the 10 angular factors
 
-		TChain* decayTree ;
-		decayTree = new TChain("tree");
-		decayTree->Add(fullFileName.c_str());
+		TFile* decayFile = TFile::Open( fullFileName.c_str(), "READ" );
+		TTree* decayTree = (TTree*) decayFile->Get( "tree" );
 
 		vector<double> *pvect = new vector<double>() ;
 		decayTree->SetBranchAddress("weights", &pvect ) ;
@@ -113,7 +118,7 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bo
 		//for( int ii=0; ii <10; ii++) {
 		//	cout << "AcceptanceWeight "<<ii+1<< " = "  << (*pvect)[ii] << endl ;
 		//}
-		f->Close();
+		decayFile->Close();
 	}
 
 }

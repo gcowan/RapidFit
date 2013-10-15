@@ -228,7 +228,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	{
 		if( angAccFile == "" ) cout << "Bs2JpsiPhi_Signal_v6:: Using flat angular acceptance " << endl ;
 		else cout << "Bs2JpsiPhi_Signal_v6:: Constructing angAcc using file: " << angAccFile << endl ;
-		angAcc = new AngularAcceptance( angAccFile, _useHelicityBasis ) ;
+		angAcc = new AngularAcceptance( angAccFile, _angAccIgnoreNumerator, _useHelicityBasis ) ;
 		angAccI1 = angAcc->af1() ;      cout << "  af1 = " << setprecision(6) << setw(15) << angAccI1 << setw(10) << " ";
 		angAccI2 = angAcc->af2() ;	cout << "  af2 = " << setprecision(6) << setw(15) << angAccI2 << setw(10) << " ";
 		angAccI3 = angAcc->af3() ;	cout << "  af3 = " << setprecision(6) << setw(15) << angAccI3 << endl ;

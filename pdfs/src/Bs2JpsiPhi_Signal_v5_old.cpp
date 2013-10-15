@@ -114,7 +114,7 @@ resolution(), eventResolution(),timeIntegralCacheValid(), storeExpL(), storeExpH
 	_angAccIgnoreNumerator = configurator->isTrue( "AngularAcceptanceIgnoreNumerator" ) ;
 	if( angAccFile == "" ) cout << "Bs2JpsiPhi_Signal_v5_old:: Using flat angular acceptance " << endl ;
 	else cout << "Bs2JpsiPhi_Signal_v5_old:: Constructing angAcc using file: " << angAccFile << endl ;
-	angAcc = new AngularAcceptance( angAccFile, _useHelicityBasis );
+	angAcc = new AngularAcceptance( angAccFile, _angAccIgnoreNumerator, _useHelicityBasis );
 	angAccI1 = angAcc->af1() ;  cout << "  af1 = " << angAccI1 << endl ;
 	angAccI2 = angAcc->af2() ;	cout << "  af2 = " << angAccI2 << endl ;
 	angAccI3 = angAcc->af3() ;	cout << "  af3 = " << angAccI3 << endl ;
