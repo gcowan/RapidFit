@@ -367,9 +367,8 @@ void RapidFitIntegrator::SetPDF( IPDF* input )
 }
 
 double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, IntegratorOneDim * oneDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, bool haveTestedIntegral, DebugClass* debug )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug )
 {
-	(void) haveTestedIntegral;
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
 	if( debug != NULL )
 	{
@@ -754,9 +753,8 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 }
 
 double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, bool haveTestedIntegral, DebugClass* debug )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug )
 {
-	(void) haveTestedIntegral;
 	//Make arrays of the observable ranges to integrate over
 	double* minima = new double[ doIntegrate.size() ];
 	double* maxima = new double[ doIntegrate.size() ];

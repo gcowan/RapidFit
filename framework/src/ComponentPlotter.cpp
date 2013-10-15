@@ -57,6 +57,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(), total_components(),
 	chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num)
 {
+
 	TH1::SetDefaultSumw2(true);
 
 	//pdfIntegrator->SetNumThreads( config!=NULL?config->numThreads:4 );

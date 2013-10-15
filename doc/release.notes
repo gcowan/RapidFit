@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2013/10/15 Rob Currie
+  - Adding Relevant Acceptance Histograms for 2011 & 2012 RECO14 nTuples and the .root files they are extracted from using the get_histograms.py
+      Bs_HltPropertimeAcceptance_Data_2011_40bins.root 3a67bebe298a279d869741d95ad3c4f0
+      Bs_HltPropertimeAcceptance_Data_2012_40bins.root 240dea434e502c2e945091806dc39a4b
+  - Removed unused booleans being passed to INTERNAL methods in RapidFitIntegrator, this removes the strange cases where the debugclass wasn't being propagated correctly
+
 2013/10/14 Rob Currie
   - Fixing bugs in numerical integration.
       These are technical and were introduced VERY recently for nDim>1 and would have presented themselves as the PDF ALWAYS integrating to 0 or RapidFit crashing only when using the GSL integration tool
