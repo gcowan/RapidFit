@@ -675,6 +675,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 		else if( currentArgument == "--Debug" )	{  if( config.debug != NULL ){ delete config.debug;}	config.debug = new DebugClass(true);	}
 		else if( currentArgument == "--BuildConstraints" )			{	config.BuildConstraints = true;				}
 		else if( currentArgument == "--disableLatexOutput" )			{	config.disableLatexOutput = true;			}
+		else if( currentArgument == "--disableAngAccHisto" )			{	config.dontGenerateAcceptanceHistos = true;		}
 
 		//	We didn't understand the argument to end up here
 		else

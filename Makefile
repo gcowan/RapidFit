@@ -78,13 +78,6 @@ OBJS    := $(patsubst $(SRCDIR)/%.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 PDFOBJS := $(patsubst $(SRCPDFDIR)/%.$(SRCEXT),$(OBJPDFDIR)/%.o,$(PDFSRCS))
 DALITZOBJS := $(patsubst $(SRCDALITZDIR)/%.$(SRCDALITZEXT),$(OBJDALITZDIR)/%.o,$(DALITZSRCS))
 
-
-
-#	All Headers in their absolute paths as required by CINT to construct a dictionary of RapidFit
-ALL_HEADERS += $(HEADERS)
-ALL_HEADERS += $(PDFHEAD)
-ALL_HEADERS += $(DALITZHEAD)
-
 UTIL_HEADERS = $(shell find $(PWD)/$(INCUITLDIR) -name '*.$(HDREXT)' )
 
 #	BUILD OUTPUT
@@ -299,7 +292,7 @@ lib:    $(LIBDIR)/libRapidRun.so
 #	This command will generate a C++ file which interfaces the rest of humanity with root...
 #	It requires the explicit paths of all files, or that you remain in the same working directory at all times during the build process
 #	We want to place the output dictionary in the Build directory as this is CODE that is NOT to be editted by the $USER!
-$(OBJDIR)/rapidfit_dict.cpp: $(ALL_HEADERS) framework/include/LinkDef.h
+$(OBJDIR)/rapidfit_dict.cpp: $(HEADERS) framework/include/LinkDef.h
 	@echo "Building Root Dictionary:"
 	@echo "rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c -I\"$(PWD)/framework/include\" $^"
 	@rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c -I"$(PWD)/framework/include" $^

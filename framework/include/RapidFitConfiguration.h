@@ -122,6 +122,8 @@ class RapidFitConfiguration
 		bool configFileListFlag;
 		vector<string> configFileList;
 
+		bool dontGenerateAcceptanceHistos;
+
 	private:
 		/*!
 		 * @brief DO NOT COPY THE CONFIGURATION OBJECT!!!!!

@@ -1081,6 +1081,13 @@ int calculateAcceptanceWeights( RapidFitConfiguration* config )
 	tree->Branch("weights", "std::vector<double>", &weights);
 	tree->Fill();
 
+	tree->Write("",TObject::kOverwrite);
+	if( config->dontGenerateAcceptanceHistos )
+	{
+		file->Write("",TObject::kOverwrite);
+		exit(0);
+	}
+
 	// Now calculate the acceptance histograms from the data PDF/xml and MC sample
 	DataSetConfiguration * dataConfig = pdfAndData->GetDataSetConfig();
 	dataConfig->SetSource( "Foam" );

@@ -90,6 +90,7 @@ numberRepeats(),
 	BuildConstraints(),
 	configFileListFlag(),
 	configFileList(),
+	dontGenerateAcceptanceHistos(),
 	runtimeArgs()
 {
 		//Variables to store command line arguments
@@ -165,6 +166,7 @@ numberRepeats(),
 		fixedTotalToys = false;
 		saveAllToys = false;
 		disableLatexOutput = false;
+		dontGenerateAcceptanceHistos = false;
 
 		_2DResultForFC = NULL;
 		GlobalFitResult = NULL;
