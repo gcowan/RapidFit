@@ -35,7 +35,6 @@ using namespace::std;
 class Bs2JpsiPhi_Signal_v6 : public BasePDF
 {
 	public:
-		Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input );
 		Bs2JpsiPhi_Signal_v6( PDFConfigurator* );
 		~Bs2JpsiPhi_Signal_v6();
 

@@ -203,6 +203,9 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 		returnable_PDF = ClassLookUp::LookUpPDFName( Name, thisConfig ); 
 		inputPDF->SetCopyConstructor( NULL );
 		delete thisConfig;
+		//	I SHOULD NEVER DO THIS BUT USERS PDFS may modify the GetPhysicsParameters and not know about const (sigh)...
+		IPDF* SHOULDBESAFEPDF = const_cast<IPDF*>(inputPDF);
+		returnable_PDF->UpdatePhysicsParameters( SHOULDBESAFEPDF->GetPhysicsParameters() );
 	}
 
 	returnable_PDF->Can_Remove_Cache( false );

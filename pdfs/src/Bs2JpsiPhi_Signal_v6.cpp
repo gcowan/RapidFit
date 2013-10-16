@@ -27,107 +27,6 @@ using namespace::std;
 
 PDF_CREATOR( Bs2JpsiPhi_Signal_v6 );
 
-Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6( const Bs2JpsiPhi_Signal_v6& input ) : BasePDF( (BasePDF&) input )
-
-        , gammaName(input.gammaName), deltaGammaName(input.deltaGammaName), deltaMName(input.deltaMName), Phi_sName(input.Phi_sName), Azero_sqName(input.Azero_sqName)
-
-	, Apara_sqName(input.Apara_sqName), Aperp_sqName(input.Aperp_sqName), delta_zeroName(input.delta_zeroName), delta_paraName(input.delta_paraName)
-
-        , delta_perpName(input.delta_perpName), As_sqName(input.As_sqName), delta_sName(input.delta_sName), CspName(input.CspName), cosdparName(input.cosdparName)
-
-	, cosphisName(input.cosphisName), sinphisName(input.sinphisName), lambdaName(input.lambdaName)
-
-	, timeName(input.timeName), cosThetaName(input.cosThetaName), cosPsiName(input.cosPsiName), phiName(input.phiName)
-
-	, cthetakName(input.cthetakName), cthetalName(input.cthetalName), phihName(input.phihName)
-
-	, _useEventResolution(input._useEventResolution), _useTimeAcceptance(input._useTimeAcceptance), _useHelicityBasis(input._useHelicityBasis)
-
-	, _numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly)
-
-	, _useCosAndSin(input._useCosAndSin), _useCosDpar(input._useCosDpar), _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
-
-	, _offsetToGammaForBetaFactor( input._offsetToGammaForBetaFactor), _usePlotAllComponents( input._usePlotAllComponents )
-
-	, allowNegativeAsSq(input.allowNegativeAsSq), _usePlotComponents(input._usePlotComponents), t(input.t), ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr)
-
-	, ctheta_1(input.ctheta_1), ctheta_k(input.ctheta_k), phi_h(input.phi_h), ctheta_l(input.ctheta_l), _gamma(input._gamma), dgam(input.dgam)
-
-	, Aperp_sq(input.Aperp_sq), Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq), As_sq(input.As_sq), delta_para(input.delta_para)
-
-	, delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2), delta_ms(input.delta_ms)
-
-	, phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4)
-	
-	, angAccI5(input.angAccI5), angAccI6(input.angAccI6) , angAccI7(input.angAccI7), angAccI8(input.angAccI8), angAccI9(input.angAccI9), angAccI10(input.angAccI10)
-	
-	, tlo(input.tlo), thi(input.thi), expL_stored(input.expL_stored) , expH_stored(input.expH_stored), expSin_stored(input.expSin_stored)
-	
-	, expCos_stored(input.expCos_stored), intExpL_stored(input.intExpL_stored), intExpH_stored(input.intExpH_stored)
-	
-	, intExpSin_stored(input.intExpSin_stored), intExpCos_stored(input.intExpCos_stored), timeAcc(NULL), angAcc(NULL)
-
-	, CachedA1(input.CachedA1), CachedA2(input.CachedA2), CachedA3(input.CachedA3), CachedA4(input.CachedA4)
-
-	, CachedA5(input.CachedA5), CachedA6(input.CachedA6), CachedA7(input.CachedA7), CachedA8(input.CachedA8), CachedA9(input.CachedA9), CachedA10(input.CachedA10)
-
-	, timeBinNum(input.timeBinNum), _datapoint(NULL), componentIndex(input.componentIndex)
-
-	, A0A0_value(input.A0A0_value), APAP_value(input.APAP_value), ATAT_value(input.ATAT_value), ASAS_value(input.ASAS_value), ImAPAT_value(input.ImAPAT_value)
-
-	, ReA0AP_value(input.ReA0AP_value), ImA0AT_value(input.ImA0AT_value), ReASAP_value(input.ReASAP_value), ImASAT_value(input.ImASAT_value), ReASA0_value(input.ReASA0_value)
-
-	, Csp(input.Csp), cosdpar(input.cosdpar), lambda(input.lambda), _CC(input._CC), _DD(input._DD), _SS(input._SS), _angAccIgnoreNumerator(input._angAccIgnoreNumerator), sin_delta_perp_s(input.sin_delta_perp_s)
-
-	, cos_delta_perp_s(input.cos_delta_perp_s), sin_delta_zero_s(input.sin_delta_zero_s), cos_delta_zero_s(input.cos_delta_zero_s), sin_delta_para_s(input.sin_delta_para_s)
-
-	, cos_delta_para_s(input.cos_delta_para_s), sin_delta1(input.sin_delta1), cos_delta1(input.cos_delta1), sin_delta2(input.sin_delta2), cos_delta2(input.cos_delta2)
-
-	, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1), stored_AT(input.stored_AT), stored_AP(input.stored_AP), stored_A0(input.stored_A0)
-
-	, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah), _fitDirectlyForApara(input._fitDirectlyForApara)
-
-	, performingComponentProjection( input.performingComponentProjection ), DebugFlag_v6( input.DebugFlag_v6 ), _useDoubleTres(input._useDoubleTres), _useTripleTres(input._useTripleTres)
-
-	, _mistagCalibModel( NULL ), _useNewMistagModel( input._useNewMistagModel )
-{
-	if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
-	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
-
-        if( input._useEventResolution )
-        {
-                if( input._useDoubleTres )
-                {
-                        resolutionModel = new DoubleResolutionModel( input.GetConfigurator(), true );
-                }
-                else
-                {
-                        resolutionModel = new PerEventResModel( input.GetConfigurator(), true );
-                }
-        }
-        else
-        {
-                if( input._useDoubleTres )
-                {
-                        resolutionModel = new DoubleFixedResModel( input.GetConfigurator(), true );
-                }
-                else if( input._useTripleTres )
-                {
-                        resolutionModel = new TripleFixedResModel( input.GetConfigurator(), true );
-                }
-                else
-                {
-                        resolutionModel = new FixedResolutionModel( input.GetConfigurator(), true );
-                }
-        }
-
-        if( input._mistagCalibModel != NULL )
-	{
-		if( input._useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( input.GetConfigurator() );
-		else _mistagCalibModel = new SimpleMistagCalib( input.GetConfigurator() );
-	}
-}
-
 //......................................
 //Constructor(s)
 //New one with configurator
@@ -243,7 +142,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	}
 	else
 	{
-		angAcc = new AngularAcceptance( angAccFile, _useHelicityBasis, isCopy ) ;
+		angAcc = new AngularAcceptance( angAccFile, _angAccIgnoreNumerator, _useHelicityBasis, isCopy ) ;
 		angAccI1 = angAcc->af1() ;
 		angAccI2 = angAcc->af2() ;
 		angAccI3 = angAcc->af3() ;
@@ -326,7 +225,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	//histCounter = 0;
 	//~PELC
 
-	//this->SetCopyConstructorSafe( false );
+	this->SetCopyConstructorSafe( false );
 }
 
 //........................................................

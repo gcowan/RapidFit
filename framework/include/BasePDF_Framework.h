@@ -69,15 +69,15 @@
  *             (This interfaces with the NumericalIntegrator class)
  *
  *          EvaluateForNumericGeneration( DataPoint* )
- *             (This interfaces with the Toy DataSet Generators like Foam)
- *
- *
- *
- *
- * @author Benjamin M Wynne bwynne@cern.ch
- * @author Robert Currie rcurrie@cern.ch
- *
- */
+*             (This interfaces with the Toy DataSet Generators like Foam)
+	*
+	*
+	*
+	*
+	* @author Benjamin M Wynne bwynne@cern.ch
+	* @author Robert Currie rcurrie@cern.ch
+	*
+	*/
 
 #pragma once
 #ifndef BASE_FRAMEWORK_PDF_H
@@ -239,13 +239,13 @@ class BasePDF_Framework : public virtual IPDF_Framework
 
 		bool IsDebuggingON();
 
-	private:
-
 		/*!
 		 * Interface Function:
 		 * Set if the PDF be safely copied through it's copy constructor?
 		 */
 		void SetCopyConstructorSafe( bool = true );
+
+	private:
 
 		pthread_mutex_t* debug_mutex;   /*!     This is the pthread mutex object which is to be used for thread-locking sections of code in the PDFs that is not thread safe, e.g. using streamers*/
 

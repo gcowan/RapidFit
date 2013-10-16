@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2013/10/16 Rob Currie
+  - Moved the SetCopyConstructorSafe in BasePDF_Framework to be a protected method so that derrived PDFs can use it
+  - Moved JpsiPhi v6 PDF over to make use of this->SetCopyConstructorSafe( false ); this allows the framework to initialize a new instance rather than write a complex copy constructor which is required
+  - I have made use of const_cast to allow the ClassLookUp to perform newPDF->UpdatePhysicsParameters( oldPDF->GetPhysicsParameters() ); This assumes that the oldPDF method is actually const.
+      While this method should be const, a lot of users make use of this function and we don't want to face the implications of forcing all users to be aware of the correct use of const in c++...
+
 2013/10/15 Rob Currie
   - Adding Relevant Acceptance Histograms for 2011 & 2012 RECO14 nTuples and the .root files they are extracted from using the get_histograms.py
       Bs_HltPropertimeAcceptance_Data_2011_40bins.root 3a67bebe298a279d869741d95ad3c4f0
