@@ -4,6 +4,7 @@
   - Added new SetObservable method to DataPoint allowing use of ObservableRef which may improve Foam generation of datasets
   - Modified Foam to use new datasets and fixed a minor memleak around Foam.cpp instances.
   - Fixed bug in RapidFitIntegrator which incorrectly projected the wrong values when using GSL numerical integrator. This would have produced only a flat line for all values
+  - Moved to much more finely grained try-catch statements in IntegratorFunction to make debugging easier
 
 2013/10/16 Rob Currie
   - Moved the SetCopyConstructorSafe in BasePDF_Framework to be a protected method so that derrived PDFs can use it

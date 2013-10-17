@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-8
- */
+  */
 
 //	RapidFit Headers
 #include "StringProcessing.h"
@@ -225,51 +225,72 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 
 	//cout << "IntegratorFunction::Eval: " << componentIndex << endl;
 
-	try
+	//	if( ! (componentIndex.empty() || componentIndex == "") || !(componentIndex == "0") )
+	if( componentIndex != NULL )
 	{
-		//	if( ! (componentIndex.empty() || componentIndex == "") || !(componentIndex == "0") )
-		if( componentIndex != NULL )
+		try
 		{
 			result = wrappedFunction->EvaluateComponent( newDataPoint, componentIndex );
-			if( std::isnan(result) || fabs(result)>=DBL_MAX )
+		}
+		catch( ... )
+		{
+			cerr << "Caught Error in ::EvaluateComponent for " << wrappedFunction->GetName() << endl;
+			result = 0.;
+		}
+		if( std::isnan(result) || fabs(result)>=DBL_MAX )
+		{
+			if( debug->DebugThisClass( "IntegratorFunction" ) )
 			{
-				if( debug->DebugThisClass( "IntegratorFunction" ) )
-				{
-					cout << "Component Value:" << result << endl;
-					newDataPoint->Print();
-					myPhaseSpaceBoundary->Print();
-				}
+				cout << "Component Value:" << result << endl;
+				newDataPoint->Print();
+				myPhaseSpaceBoundary->Print();
 			}
 		}
-		else if( integrateFunc == true )
+	}
+	else if( integrateFunc == true )
+	{
+		try
 		{
 			result = wrappedFunction->EvaluateForNumericIntegral( newDataPoint );
-			if( std::isnan(result) || fabs(result)>=DBL_MAX )
+		}
+		catch(...)
+		{
+			cerr << "Caught Error in ::EvaluateForNumericIntegral for " << wrappedFunction->GetName() << endl;
+			result = 0.;
+		}
+		if( std::isnan(result) || fabs(result)>=DBL_MAX )
+		{
+			if( debug->DebugThisClass( "IntegratorFunction" ) )
 			{
-				if( debug->DebugThisClass( "IntegratorFunction" ) )
-				{
-					cout << "Evaluate for Numerical Integral Value:" << result << endl;
-					newDataPoint->Print();
-					myPhaseSpaceBoundary->Print();
-				}
+				cout << "Evaluate for Numerical Integral Value:" << result << endl;
+				newDataPoint->Print();
+				myPhaseSpaceBoundary->Print();
 			}
 		}
-		else if( generateFunc == true )
+	}
+	else if( generateFunc == true )
+	{
+		try	
 		{
 			result = wrappedFunction->EvaluateForNumericGeneration( newDataPoint );
 		}
-		else
+		catch( ... )
+		{
+			cerr << "Caught Error in ::EvaluateForNumericGeneration for " << wrappedFunction->GetName() << endl;
+			result = 0.;
+		}
+	}
+	else
+	{
+		try
 		{
 			result = wrappedFunction->Evaluate( newDataPoint );
 		}
-	}
-	catch ( int e )
-	{
-		result = 0.;
-	}
-	catch (...)
-	{
-		result = 0.;
+		catch(...)
+		{
+			cerr << "Caught Error in ::Evaluate for " << wrappedFunction->GetName() << endl;
+			result = 0.;
+		}
 	}
 
 	//if( componentIndex == NULL )
