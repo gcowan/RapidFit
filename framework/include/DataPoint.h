@@ -160,6 +160,8 @@ class DataPoint
 		 */
 		bool SetObservable( string Name, Observable* Input );
 
+		bool SetObservable( ObservableRef& Name, Observable* Input );
+
 		/*!
 		 * @brief Set the internal Observable using the given values
 		 *

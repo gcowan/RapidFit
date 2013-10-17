@@ -192,6 +192,7 @@ RapidFitIntegrator::~RapidFitIntegrator()
 	if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
 	if( fastIntegrator != NULL ) delete fastIntegrator;
 	if( debug != NULL ) delete debug;
+	this->clearGSLIntegrationPoints();
 }
 
 //Return the integral over all observables
@@ -639,6 +640,12 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
 		{
 			cout << "RapidFitIntegrator: Starting to use GSL PseudoRandomNumberThreaded :D" << endl;
+			for( unsigned int i=0; i< doIntegrate.size(); ++i ) cout << doIntegrate[i] << "\t";
+			cout << endl;
+			for( unsigned int i=0; i< dontIntegrate.size(); ++i ) cout << dontIntegrate[i] << "\t";
+			cout << endl;
+			cout << componentIndex << endl;
+			if( componentIndex != NULL ) cout << componentIndex->getComponentName() << endl;
 		}
 	}
 
@@ -744,6 +751,14 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	delete[] maxima;
 
 	//cout << result << endl;
+
+        if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+                {
+			cout << result << endl;
+		}
+	}
 
 	return result;
 #else
@@ -1001,12 +1016,36 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 	return output_val;
 }
 
+void RapidFitIntegrator::ModifiyStoredPoints( DataPoint* NewDataPoint, string ProjectThis )
+{
+	ObservableRef thisObs_Ext( ProjectThis );
+	ObservableRef thisObs_Int( ProjectThis );
+	for( unsigned int i=0; i< _global_doEval_points.size(); ++i )
+	{
+		Observable* InputObs = NewDataPoint->GetObservable( thisObs_Ext );
+		_global_doEval_points[i]->SetObservable( thisObs_Int, InputObs );
+	}
+}
+
 //Return the integral over all observables except one
 double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary, string ProjectThis, ComponentRef* Component )
 {
 	//Make the list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
 	double value = -1.;
+
+	if( this->GetUseGSLIntegrator() )
+	{
+		if( GSLvalidFor == ProjectThis )
+		{
+			this->ModifiyStoredPoints( NewDataPoint, ProjectThis );
+		}
+		else
+		{
+			this->clearGSLIntegrationPoints();
+			GSLvalidFor="";
+		}
+	}
 
 	vector<string> allIntegrable = functionToWrap->GetPrototypeDataPoint();
 
@@ -1058,6 +1097,8 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 		}
 	}
 
+	
+
 	if( testedIntegrable.size() <= 1 || doIntegrate.empty() )
 	{
 		if( doIntegrate.empty() )
@@ -1103,6 +1144,8 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 	{
 		value = this->NumericallyIntegrateDataPoint( NewDataPoint, NewBoundary, dontIntegrate, Component );
 	}
+
+	GSLvalidFor = ProjectThis;
 	return value;
 }
 

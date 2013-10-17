@@ -37,6 +37,7 @@ static vector<DataPoint*> _global_doEval_points;
 static vector<double> _global_range_minima;
 static vector<double> _global_range_maxima;
 static vector<string> _global_observable_names;
+static string GSLvalidFor;
 
 class RapidFitIntegrator
 {
@@ -272,11 +273,11 @@ class RapidFitIntegrator
 
 		void SetDebug( DebugClass* debug );
 
-		static void clearGSLIntegrationPoints();
-
 		static vector<DataPoint*> getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* templateDataPoint, vector<string> doIntegrate );
 
+		static void clearGSLIntegrationPoints();
 	private:
+
 		/*!
 		 * Don't Copy the class this way!
 		 */
@@ -406,6 +407,8 @@ class RapidFitIntegrator
 		//static vector<double*> initGSLDataPoints( unsigned int number, vector<double> maxima, vector<double> minima );
 
 		static vector<DataPoint*> initGSLDataPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* thisDataPoint, vector<string> doIntegrate );
+
+		static void ModifiyStoredPoints( DataPoint* NewDataPoint, string ProjectThis );
 
 };
 

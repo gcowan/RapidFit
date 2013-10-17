@@ -35,7 +35,7 @@ using namespace::std;
 Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :
 	Open_Files(), InputPDF(NewPDF), generationFunction(), generationBoundary(NewBoundary), newDataSet(), rootRandom(), foamGenerators(),
 	storedIntegrator(), storedDatapoint(), discreteCombinations(), allNames(), discreteNames(), continuousNames(), discreteNames_ref(),
-	continuousNames_ref(), discreteValues(), minima(), ranges()
+	continuousNames_ref(), discreteValues(), minima(), ranges(), discreteNames_ref2(), continuousNames_ref2()
 {
 	rootRandom = InputPDF->GetRandomFunction();
 
@@ -74,10 +74,12 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :
 	for( vector<string>::iterator disc_i = discreteNames.begin(); disc_i != discreteNames.end(); ++disc_i )
 	{
 		discreteNames_ref.push_back( new ObservableRef( *disc_i ) );
+		discreteNames_ref2.push_back( new ObservableRef( *disc_i ) );
 	}
 	for( vector<string>::iterator cont_i = continuousNames.begin(); cont_i != continuousNames.end(); ++cont_i )
 	{
 		continuousNames_ref.push_back( new ObservableRef( *cont_i ) );
+		continuousNames_ref2.push_back( new ObservableRef( *cont_i ) );
 	}
 
 	newDataSet = new MemoryDataSet(generationBoundary);
@@ -329,6 +331,26 @@ Foam::~Foam()
 {
 	this->RemoveGenerator();
 	//delete rootRandom;
+	while( !continuousNames_ref.empty() )
+	{
+		if( continuousNames_ref.back() != NULL ) delete continuousNames_ref.back();
+		continuousNames_ref.pop_back();
+	}
+	while( !discreteNames_ref.empty() )
+	{
+		if( discreteNames_ref.back() != NULL ) delete discreteNames_ref.back();
+		discreteNames_ref.pop_back();
+	}
+	while( !continuousNames_ref2.empty() )
+	{
+		if( continuousNames_ref2.back() != NULL ) delete continuousNames_ref2.back();
+		continuousNames_ref2.pop_back();
+	}
+	while( !discreteNames_ref2.empty() )
+	{
+		if( discreteNames_ref2.back() != NULL ) delete discreteNames_ref2.back();
+		discreteNames_ref2.pop_back();
+	}
 }
 
 void Foam::RemoveGenerator()
@@ -373,7 +395,7 @@ int Foam::GenerateData( int DataAmount )
 			//Create the discrete observable
 			Observable * temporaryObservable = generationBoundary->GetConstraint( *discreteNames_ref[unsigned(discreteIndex)] )->CreateObservable(rootRandom);
 			double currentValue = temporaryObservable->GetValue();
-			temporaryDataPoint->SetObservable( discreteNames[unsigned(discreteIndex)], temporaryObservable );
+			temporaryDataPoint->SetObservable( *discreteNames_ref2[unsigned(discreteIndex)], temporaryObservable );
 			delete temporaryObservable;
 
 			//Calculate the index
@@ -398,7 +420,7 @@ int Foam::GenerateData( int DataAmount )
 		{
 			string unit = generationBoundary->GetConstraint( *continuousNames_ref[continuousIndex] )->GetUnit();
 			double newValue = minima[continuousIndex] + ( ranges[continuousIndex] * generatedEvent[continuousIndex] );
-			temporaryDataPoint->SetObservable( continuousNames[continuousIndex], newValue, unit );
+			temporaryDataPoint->SetObservable( *continuousNames_ref2[continuousIndex], newValue, unit );
 			//cout << continuousNames[continuousIndex] << "\t" << newValue << "\t" << 0.0 << "\t" << unit << endl;
 		}
 

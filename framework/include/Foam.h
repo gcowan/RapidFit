@@ -106,6 +106,7 @@ class Foam : public IDataGenerator
 		vector< vector<double> > discreteCombinations;		/*!	A vector containing the values of all of the Discrete Combinations in the Phase-Space		*/
 		vector<string> allNames, discreteNames, continuousNames;/*!	The Names of the Doscrete and Continuous Observables in this PhaseSpace				*/
 		vector<ObservableRef*> continuousNames_ref, discreteNames_ref;	/*!	vectors of pointers to ObservableRef objects to reduce expensive lookup operations	*/
+		vector<ObservableRef*> continuousNames_ref2, discreteNames_ref2;
 		vector< vector<double> > discreteValues;		/*!	Undocumented, may be duplicate of discreteCombinations 			*/
 		vector<double> minima, ranges;				/*!	Minima and Range of Each Observable in the PhaseSpace, required to be passed to IntegratorFunction as a cross check	*/
 };

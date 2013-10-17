@@ -155,6 +155,33 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 	}
 }
 
+bool DataPoint::SetObservable( ObservableRef& Name, Observable * NewObservable )
+{
+	//Check if the name is stored in the map
+	if( Name.GetIndex() == -1 )
+	{
+		string thisName = Name.Name();
+		int nameIndex = StringProcessing::VectorContains( &allNames, &thisName );
+		if ( nameIndex == -1 )
+		{
+			cerr << "Observable name " << thisName << " not found (5)" << endl;
+			throw(4389);
+		}
+		else
+		{
+			Name.SetIndex( nameIndex );
+			allObservables[unsigned(Name.GetIndex())]->SetObservable(NewObservable);
+			return true;
+		}
+		//return false;
+	}
+	else
+	{
+		allObservables[unsigned(Name.GetIndex())]->SetObservable(NewObservable);
+		return true;
+	}
+}
+
 void DataPoint::AddObservable( string Name, Observable* NewObservable )
 {
 	if( StringProcessing::VectorContains( &allNames, &Name ) == -1 )
@@ -290,13 +317,13 @@ void DataPoint::Print() const
 		allObservables[i]->Print();
 	}
 
-        if( !allPseudoObservables.empty() )
-        {
-                for( unsigned int i=0; i< allPseudoObservables.size(); ++i )
-                {
-                        allPseudoObservables[i]->Print();
-                }
-        }
+	if( !allPseudoObservables.empty() )
+	{
+		for( unsigned int i=0; i< allPseudoObservables.size(); ++i )
+		{
+			allPseudoObservables[i]->Print();
+		}
+	}
 	cout << endl;
 }
 
@@ -336,12 +363,12 @@ void DataPoint::SetEventWeight( const double Input )
 	WeightValue = Input;
 }
 
-                void DataPoint::SetDiscreteIndexID( size_t thisID )
+void DataPoint::SetDiscreteIndexID( size_t thisID )
 {
 	storedID = thisID;
 }
-                                                                   
-                                size_t DataPoint::GetDiscreteIndexID() const
+
+size_t DataPoint::GetDiscreteIndexID() const
 {
 	return storedID;
 }

@@ -1683,7 +1683,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 			if( debug->DebugThisClass( "ComponentPlotter" ) )
 			{
 				cout << "ComponentPlotter: \tI got: " << integralvalue << endl;
-				InputPoint->Print();
+				thisPoint->Print();
 				cout << "ComponentPlotter: Using: " << plotPDF->GetLabel() << "\tProjecting Component: " << component << "\tObservable: " << observableName << endl;
 				full_boundary->Print();
 			}
