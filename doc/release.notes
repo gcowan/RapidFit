@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/10/18 Rob Currie
+  - Made the warning about the parameter changing due to limits a bit more obvious.
+  - Removed a dead object from TFoam, the class has some other objects which can be removed but these don't consume too much memory
+
 2013/10/17 Rob Currie
   - Added new SetObservable method to DataPoint allowing use of ObservableRef which may improve Foam generation of datasets
   - Modified Foam to use new datasets and fixed a minor memleak around Foam.cpp instances.

@@ -101,7 +101,6 @@ class Foam : public IDataGenerator
 		TRandom3 * rootRandom;					/*!	Pointer to the TRandom3 instance from the PDF provided			*/
 		vector< TFoam* > foamGenerators;			/*!	A vector of all TFoam instances for this PDF and PhaseSpace		*/
 		vector< IntegratorFunction* > storedIntegrator;		/*!	Vector of Integrator Functions Used as wrappers to this PDF from ROOT	*/
-		vector< DataPoint* > storedDatapoint;			/*!	A vector of the DataPoints that have been created before they were committed to a DataSet	*/
 		//int dataNumber;
 		vector< vector<double> > discreteCombinations;		/*!	A vector containing the values of all of the Discrete Combinations in the Phase-Space		*/
 		vector<string> allNames, discreteNames, continuousNames;/*!	The Names of the Doscrete and Continuous Observables in this PhaseSpace				*/

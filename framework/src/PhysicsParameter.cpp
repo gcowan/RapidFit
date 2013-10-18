@@ -33,20 +33,26 @@ PhysicsParameter::PhysicsParameter( string Name, double NewValue, double NewMini
 {
 	if ( maximum < minimum )
 	{
-		cerr << "Physics parameter \"" << Name << "\" has maximum less than minimum: values swapped" << endl;
+		cerr << endl;
+		cerr << "PhysicsParameter:: \"" << Name << "\" has maximum less than minimum: values swapped" << endl;
+		cerr << endl;
 		minimum = NewMaximum;
 		maximum = NewMinimum;
 	}
 
 	if ( value < minimum )
 	{
-		cerr << "Physics parameter \"" << Name << "\" has value less than minimum: value set to minimum" << endl;
+		cerr << endl;
+		cerr << "PhysicsParameter:: \"" << Name << "\" has value less than minimum: value set to minimum" << endl;
+		cerr << endl;
 		value = minimum;
 	}
 
 	if ( value > maximum )
 	{
-		cerr << "Physics parameter \"" << Name << "\" has value greater than maximum: value set to maximum" << endl;
+		cerr << endl;
+		cerr << "PhysicsParameter:: \"" << Name << "\" has value greater than maximum: value set to maximum" << endl;
+		cerr << endl;
 		value = maximum;
 	}
 

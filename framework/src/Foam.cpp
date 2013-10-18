@@ -34,7 +34,7 @@ using namespace::std;
 //Constructor with correct argument
 Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :
 	Open_Files(), InputPDF(NewPDF), generationFunction(), generationBoundary(NewBoundary), newDataSet(), rootRandom(), foamGenerators(),
-	storedIntegrator(), storedDatapoint(), discreteCombinations(), allNames(), discreteNames(), continuousNames(), discreteNames_ref(),
+	storedIntegrator(), discreteCombinations(), allNames(), discreteNames(), continuousNames(), discreteNames_ref(),
 	continuousNames_ref(), discreteValues(), minima(), ranges(), discreteNames_ref2(), continuousNames_ref2()
 {
 	rootRandom = InputPDF->GetRandomFunction();
@@ -320,7 +320,7 @@ void Foam::Init()
 		//Store the foam generator
 		foamGenerators.push_back( foamGenerator );
 		storedIntegrator.push_back( combinationFunction );
-		storedDatapoint.push_back( init_temporaryDataPoint );
+		delete init_temporaryDataPoint;
 	}
 
 	InputPDF->SetMCCacheStatus( true );
@@ -359,22 +359,17 @@ void Foam::RemoveGenerator()
 	{
 		//Double_t one, two;
 		//foamGenerators.back()->Finalize( one, two );
-		delete foamGenerators.back();
+		if( foamGenerators.back() != NULL ) delete foamGenerators.back();
 		foamGenerators.pop_back();
 	}
 	while( !storedIntegrator.empty() )
 	{
-		delete storedIntegrator.back();
+		if( storedIntegrator.back() != NULL ) delete storedIntegrator.back();
 		storedIntegrator.pop_back();
-	}
-	while( !storedDatapoint.empty() )
-	{
-		delete storedDatapoint.back();
-		storedDatapoint.pop_back();
 	}
 	while( !Open_Files.empty() )
 	{
-		Open_Files.back()->Close();
+		if( Open_Files.back() != NULL )	Open_Files.back()->Close();
 		//delete Open_Files.back();
 		Open_Files.pop_back();
 	}
