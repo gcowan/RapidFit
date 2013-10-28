@@ -49,10 +49,11 @@ CombinedMistagCalib::CombinedMistagCalib( PDFConfigurator* configurator ) : IMis
 	mistagDeltaP0Name_OSSS( configurator->getName("mistagDeltaP0_OSSS") ),
 	mistagDeltaSetPointName_OSSS( configurator->getName("mistagDeltaSetPoint_OSSS") ),
 	_IMistagCalib_OS(NULL), _IMistagCalib_SS(NULL), _IMistagCalib_OSSS(NULL),
-	_debugMistag(false), _onTuple(false)
+	_debugMistag(false), _onTuple(false), _floatCalib(false)
 {
 	_debugMistag = configurator->isTrue( "DebugMistagModel" );
 	_onTuple = !configurator->isTrue( "Mistag3fbModel" );
+	_floatCalib = configurator->isTrue( "FloatCombinedCalib" );
 
 	if( _debugMistag )
 	{
@@ -162,67 +163,79 @@ int CombinedMistagCalib::GetCombinedTag() const
 {
 	int decision = 0;
 
-	double p_OS = (1.-(double)_tagOS)*0.5 + ((double)_tagOS)*(1.-_mistagOS);
-	double p_SS = (1.-(double)_tagSS)*0.5 + ((double)_tagSS)*(1.-_mistagSS);
+	double p_B_OS = this->GetProbBOS();
+	double p_B_SS = this->GetProbBSS();
+	double p_B = p_B_OS * p_B_SS;
 
-	double _1_p_OS = (1.+(double)_tagOS)*0.5 - ((double)_tagOS)*(1.-_mistagOS);
-	double _1_p_SS = (1.+(double)_tagSS)*0.5 - ((double)_tagSS)*(1.-_mistagSS);
+	double p_Bb_OS = this->GetProbBbarOS();
+	double p_Bb_SS = this->GetProbBbarSS();
+	double p_Bb = p_Bb_OS * p_Bb_SS;
 
-	if( p_OS*p_SS > _1_p_OS*_1_p_SS ) decision = +1;
-	else if( p_OS*p_SS < _1_p_OS*_1_p_SS ) decision = -1;
+	if( p_B  > p_Bb ) decision = +1;
+	else if( p_B < p_Bb ) decision = -1;
 	else decision = 0;
 
 	return decision;
 }
 
-int CombinedMistagCalib::GetFloatedCombinedTag() const
+double CombinedMistagCalib::GetProbBOS() const
 {
-	return this->GetCombinedTag();
-}
-
-/*
-int CombinedMistagCalib::GetFloatedCombinedTag() const
-{
-	int decision = 0;
-
-	double p_OS = (1.-(double)_tagOS)*0.5;
-	if( _tagOS == 1 ) p_OS += ((double)_tagOS)*(1.-this->mistagOSB());
-	else if( _tagOS == -1 ) p_OS += ((double)_tagOS)*(1.-this->mistagOSBbar());
-
-	double p_SS = (1.-(double)_tagSS)*0.5;
-	if( _tagSS == 1 ) p_SS += ((double)_tagSS)*(1.-this->mistagSSB());
-	else if( _tagSS == -1 ) p_SS += ((double)_tagSS)*(1.-this->mistagSSBbar());
-
-	double _1_p_OS = (1.+(double)_tagOS)*0.5;
-	if( _tagOS == 1 ) _1_p_OS -= ((double)_tagOS)*(1.-this->mistagOSB());
-	else if( _tagOS == -1 ) _1_p_OS -= ((double)_tagOS)*(1.-this->mistagOSBbar());
-
-	double _1_p_SS = (1.+(double)_tagSS)*0.5;
-	if( _tagSS == 1 ) _1_p_SS -= ((double)_tagSS)*(1.-this->mistagSSB());
-	else if( _tagSS == -1 ) _1_p_SS -= ((double)_tagSS)*(1.-this->mistagSSBbar());
-
-	if( p_OS*p_SS > _1_p_OS*_1_p_SS ) decision = +1;
-	else if( p_OS*p_SS < _1_p_OS*_1_p_SS ) decision = -1;
-
-	return decision;
-}
-*/
-
-void CombinedMistagCalib::setObservables( const DataPoint* measurement )
-{
-	_tagOS = (int) measurement->GetObservable( tagOSName )->GetValue();
-	_mistagOS = measurement->GetObservable( mistagOSName )->GetValue();
-	_tagSS = (int) measurement->GetObservable( tagSSName )->GetValue();
-	_mistagSS = measurement->GetObservable( mistagSSName )->GetValue();
-
-	if( _onTuple )
+	if( !_floatCalib )
 	{
-		_combinedtag = this->GetCombinedTag();
+		return (1.-(double)_tagOS)*0.5 + ((double)_tagOS)*(1.-_mistagOS);
 	}
 	else
 	{
-		_combinedtag = this->GetFloatedCombinedTag();
+		return (1.-(double)_tagOS)*0.5 + ((double)_tagOS)*(1.-this->mistagOSB());
 	}
+}
+
+double CombinedMistagCalib::GetProbBbarOS() const
+{
+	if( !_floatCalib )
+	{
+		return (1.+(double)_tagOS)*0.5 - ((double)_tagOS)*(1.-_mistagOS);
+	}
+	else
+	{
+		return (1.+(double)_tagOS)*0.5 - ((double)_tagOS)*(1.-this->mistagOSBbar());
+	}
+}
+
+double CombinedMistagCalib::GetProbBSS() const
+{
+	if( !_floatCalib )
+	{
+		return (1.-(double)_tagSS)*0.5 + ((double)_tagSS)*(1.-_mistagSS);
+	}
+	else
+	{
+		return (1.-(double)_tagSS)*0.5 + ((double)_tagSS)*(1.-this->mistagSSB());
+	}
+}
+
+double CombinedMistagCalib::GetProbBbarSS() const
+{
+	if( !_floatCalib )
+	{
+		return (1.+(double)_tagSS)*0.5 - ((double)_tagSS)*(1.-_mistagSS);
+	}
+	else
+	{
+		return (1.+(double)_tagSS)*0.5 - ((double)_tagSS)*(1.-this->mistagSSBbar());
+	}
+}
+
+void CombinedMistagCalib::setObservables( const DataPoint* measurement )
+{
+	double readTagOS = measurement->GetObservable( tagOSName )->GetValue();
+	_tagOS = (readTagOS>=0.)?(int)ceil(readTagOS):(int)floor(readTagOS);
+	_mistagOS = measurement->GetObservable( mistagOSName )->GetValue();
+	double readTagSS = (int) measurement->GetObservable( tagSSName )->GetValue();
+	_tagSS = (readTagSS>=0.)?(int)ceil(readTagSS):(int)floor(readTagSS);
+	_mistagSS = measurement->GetObservable( mistagSSName )->GetValue();
+
+	_combinedtag = this->GetCombinedTag();
 
 	if( _tagOS != 0 && _tagSS == 0 ) _OSTagged = true;
 	else _OSTagged = false;

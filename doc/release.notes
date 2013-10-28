@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/10/28 Rob Currie
+  - Made some improvements to the CombinedMistag class including a more robust casting of the tags to ints
+  - Changed Copy by Constructor implemented PDF instances to not try to remove the cache, Foam should catch this and cry but this could introduce inefficiencies depending on the scope of objects
+  - Added command line info on how to just generate acceptance weights without histograms if you don't want the histograms (we can concoct scenarios where this is the case)
+
 2013/10/18 Rob Currie
   - Made the warning about the parameter changing due to limits a bit more obvious.
   - Removed a dead object from TFoam, the class has some other objects which can be removed but these don't consume too much memory

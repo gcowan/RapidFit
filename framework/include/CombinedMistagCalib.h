@@ -49,6 +49,11 @@ class CombinedMistagCalib : public IMistagCalib
 		double mistagOSBbar() const;
 		double mistagOSSSBbar() const;
 
+		double GetProbBOS() const;
+		double GetProbBSS() const;
+		double GetProbBbarOS() const;
+		double GetProbBbarSS() const;
+
 		double getFixedEta() const;
 		double getFloatedEta() const;
 
@@ -62,7 +67,6 @@ class CombinedMistagCalib : public IMistagCalib
 		double RealD1() const;
 
 		int GetCombinedTag() const;
-		int GetFloatedCombinedTag() const;
 
 		bool _OSTagged, _SSTagged, _OSSSTagged;
 
@@ -87,6 +91,8 @@ class CombinedMistagCalib : public IMistagCalib
 
 		bool _onTuple;
 		bool _useFixedEta;
+
+		bool _floatCalib;
 };
 
 #endif

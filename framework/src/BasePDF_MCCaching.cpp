@@ -90,7 +90,7 @@ void BasePDF_MCCaching::Remove_Cache()
 		while( !cached_files.empty() )
 		{
 			cached_files.back().append( ".root" );
-			remove ( cached_files.back().c_str() );
+			remove( cached_files.back().c_str() );
 			cached_files.pop_back();
 		}
 	}

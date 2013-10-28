@@ -114,6 +114,7 @@ void ParseCommandLine::RapidFitHelp()
 	cout << endl;
 	cout << "--calculateAcceptanceWeights" << endl;
 	cout << "       Calculate the Angular Acceptance Weights and Histograms for both Helicity and Transverse Basis and store the results in a .root file" << endl;
+	cout << "       Add --disableAngAccHisto to disable the generation of the Acceptance Histogram which can take a while" << endl;
 
 	cout << endl;
 	cout << "--calculateAcceptanceCoefficients" << endl;
