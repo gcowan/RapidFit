@@ -1,14 +1,14 @@
 /**
-  @class DoubleResolutionModel
+  @class Phis2012ResolutionModel
 
   A class for holding a sliced propertime acceptance
 
-  @author Pete Clarke
-  @data 2011-06-07
+  @author Dianne Ferguson
+  @data 2013-10-17
   */
 
 
-#include "DoubleResolutionModel.h"
+#include "Phis2012ResolutionModel.h"
 #include "StringProcessing.h"
 #include "Mathematics.h"
 
@@ -19,15 +19,18 @@
 
 using namespace::std;
 
-RESMODEL_CREATOR( DoubleResolutionModel );
- 
+RESMODEL_CREATOR( Phis2012ResolutionModel ); 
+
 //............................................
 // Constructor 
-DoubleResolutionModel::DoubleResolutionModel( PDFConfigurator* configurator, bool quiet ) :
-	resScaleName		( configurator->getName( "timeResolutionScale" ) ),
-	resScale2Name            ( configurator->getName( "timeResolutionScale2" ) ),
+Phis2012ResolutionModel::Phis2012ResolutionModel( PDFConfigurator* configurator, bool quiet ) :
 	timeResFracName            ( configurator->getName( "timeResFraction" ) ),
 	eventResolutionName	( configurator->getName( "eventResolution" ) ),
+	sfBarOffsetName		( configurator->getName( "sfBarOffset")),
+	sfBarSlopeName		( configurator->getName( "sfBarSlope")),
+	sfSigmaOffsetName	( configurator->getName( "sfSigmaOffset")),
+	sfSigmaSlopeName	( configurator->getName( "sfSigmaSlope")),
+	sigmaBarName		( configurator->getName(  "sigmaBar")),
 	numberComponents( 2 ), wantedComponent( 1 ), resFrac( 1. )
 {
 	if( !quiet) cout << "DoubleResolutionModel:: Instance created " << endl ;
@@ -36,27 +39,33 @@ DoubleResolutionModel::DoubleResolutionModel( PDFConfigurator* configurator, boo
 
 //..........................
 //This method allows the instance to add the parameters it needs to the list
-void DoubleResolutionModel::addParameters( vector<string> & parameterNames )
+void Phis2012ResolutionModel::addParameters( vector<string> & parameterNames )
 {
 	parameterNames.push_back( timeResFracName );
-	parameterNames.push_back( resScaleName );
-	parameterNames.push_back( resScale2Name );
+	parameterNames.push_back( sfBarOffsetName );
+	parameterNames.push_back( sfBarSlopeName );
+	parameterNames.push_back( sfSigmaOffsetName );
+	parameterNames.push_back( sfSigmaSlopeName );
+	parameterNames.push_back( sigmaBarName );
 	return;
 }
 
 //..........................
 //To take the current value of a parameter into the instance
-void DoubleResolutionModel::setParameters( ParameterSet & parameters )
+void Phis2012ResolutionModel::setParameters( ParameterSet & parameters )
 {
 	resFrac = parameters.GetPhysicsParameter( timeResFracName )->GetValue();
-	resScale = parameters.GetPhysicsParameter( resScaleName )->GetValue();
-	resScale2 = parameters.GetPhysicsParameter( resScale2Name )->GetValue();
+	sfBarOffset = parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue();
+	sfBarSlope = parameters.GetPhysicsParameter( sfBarSlopeName)->GetValue();
+	sfSigmaOffset = parameters.GetPhysicsParameter( sfSigmaOffsetName)->GetValue();
+	sfSigmaSlope = parameters.GetPhysicsParameter( sfSigmaSlopeName)->GetValue();
+	sigmaBar = parameters.GetPhysicsParameter( sigmaBarName)->GetValue();
 	return;
 }
 
 //..........................
 //This method allows the instance to add the specific observables it needs to the list
-void DoubleResolutionModel::addObservables( vector<string> & observableNames )
+void Phis2012ResolutionModel::addObservables( vector<string> & observableNames )
 {
 	observableNames.push_back( eventResolutionName );
 	return;
@@ -64,7 +73,7 @@ void DoubleResolutionModel::addObservables( vector<string> & observableNames )
 
 //..........................
 //To take the current value of an obserable into the instance
-void DoubleResolutionModel::setObservables( DataPoint * measurement )
+void Phis2012ResolutionModel::setObservables( DataPoint * measurement )
 {
 	eventResolution = measurement->GetObservable( eventResolutionName )->GetValue();
 	return;
@@ -72,11 +81,11 @@ void DoubleResolutionModel::setObservables( DataPoint * measurement )
 
 //..........................
 //To take the current value of an obserable into the instance
-bool DoubleResolutionModel::isPerEvent( ) {  return true; }
+bool Phis2012ResolutionModel::isPerEvent( ) {  return true; }
 
 //..............................
 // Primitive Functions
-double DoubleResolutionModel::Exp( double time, double gamma ) {
+double Phis2012ResolutionModel::Exp( double time, double gamma ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
 	returnable += Mathematics::Exp( time, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
@@ -85,7 +94,7 @@ double DoubleResolutionModel::Exp( double time, double gamma ) {
 	return returnable;
 }
 
-double DoubleResolutionModel::ExpInt( double tlow, double thigh, double gamma ) {
+double Phis2012ResolutionModel::ExpInt( double tlow, double thigh, double gamma ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
 	returnable += Mathematics::ExpInt( tlow, thigh, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
@@ -94,7 +103,7 @@ double DoubleResolutionModel::ExpInt( double tlow, double thigh, double gamma ) 
 	return returnable;
 }
 
-double DoubleResolutionModel::ExpSin( double time, double gamma, double dms ) {
+double Phis2012ResolutionModel::ExpSin( double time, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
 	returnable += Mathematics::ExpSin( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
@@ -103,7 +112,7 @@ double DoubleResolutionModel::ExpSin( double time, double gamma, double dms ) {
 	return returnable;
 }
 
-double DoubleResolutionModel::ExpSinInt( double tlow, double thigh, double gamma, double dms ) {
+double Phis2012ResolutionModel::ExpSinInt( double tlow, double thigh, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
 	returnable += Mathematics::ExpSinInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
@@ -112,7 +121,7 @@ double DoubleResolutionModel::ExpSinInt( double tlow, double thigh, double gamma
 	return returnable;
 }
 
-double DoubleResolutionModel::ExpCos( double time, double gamma, double dms ) {
+double Phis2012ResolutionModel::ExpCos( double time, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
 	returnable += Mathematics::ExpCos( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
@@ -121,7 +130,7 @@ double DoubleResolutionModel::ExpCos( double time, double gamma, double dms ) {
 	return returnable;
 }
 
-double DoubleResolutionModel::ExpCosInt( double tlow, double thigh, double gamma, double dms ) {
+double Phis2012ResolutionModel::ExpCosInt( double tlow, double thigh, double gamma, double dms ) {
 	//cout << " tlow" << tlow << "   thigh  "  << thigh << "   gamma  "  << gamma << "  dms  "  << dms  << "    res  " << eventResolution*resScale << endl;
 	double returnable = 0.;
 	this->requestComponent( 1 );
@@ -131,27 +140,37 @@ double DoubleResolutionModel::ExpCosInt( double tlow, double thigh, double gamma
 	return returnable;
 }
 
-double DoubleResolutionModel::GetThisScale()
+double Phis2012ResolutionModel::GetThisScale()
 {
         double thisRes = eventResolution;
-        if( wantedComponent == 1 ) { eventResolution *= resScale; }
-        else if( wantedComponent == 2 ) { eventResolution *= resScale2; }
+        if( wantedComponent == 1 ) { 
+		sfbar = sfBarOffset + (sfBarSlope/0.06)*(eventResolution - sigmaBar);
+		sfsigma = sfSigmaOffset + (sfSigmaSlope/0.06)*(eventResolution - sigmaBar);
+		resScale = -1.0*sqrt(resFrac/(1.0-resFrac))*sfsigma + sfbar;
+		eventResolution *= resScale; 
+	}
+        else if( wantedComponent == 2 ) { 
+		sfbar = sfBarOffset + (sfBarSlope/0.06)*(eventResolution - sigmaBar);
+		sfsigma = sfSigmaOffset + (sfSigmaSlope/0.06)*(eventResolution - sigmaBar);
+		resScale2 =sqrt((1.0-resFrac)/resFrac)*sfsigma + sfbar;
+		eventResolution *= resScale2; 
+	}
         else { eventResolution *= resScale; }
 	return thisRes;
 }
 
-unsigned int DoubleResolutionModel::numComponents()
+unsigned int Phis2012ResolutionModel::numComponents()
 {
 	return numberComponents;
 }
 
-void DoubleResolutionModel::requestComponent( unsigned int wanted )
+void Phis2012ResolutionModel::requestComponent( unsigned int wanted )
 {
 	wantedComponent = wanted;
 	return;
 }
 
-double DoubleResolutionModel::GetFraction( unsigned int input )
+double Phis2012ResolutionModel::GetFraction( unsigned int input )
 {
 	if( input == 1 )
 	{

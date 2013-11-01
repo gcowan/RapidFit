@@ -19,6 +19,7 @@
 
 using namespace::std;
 
+RESMODEL_CREATOR( DoubleFixedResModel ); 
 
 //............................................
 // Constructor 

@@ -7,12 +7,15 @@
  *  @date 2011-02-13
  */
 
+#include "ClassLookUp.h"
 #include "Mathematics.h"
 #include "PerEventResModel.h"
 #include "DoubleResolutionModel.h"
 #include "FixedResolutionModel.h"
+#include "IResolutionModel.h"
 #include "DoubleFixedResModel.h"
 #include "TripleFixedResModel.h"
+#include "Phis2012ResolutionModel.h"
 #include "Bs2JpsiPhi_Angluar_Terms.h"
 #include "Bs2JpsiPhi_Signal_v6.h"
 #include "SimpleMistagCalib.h"
@@ -80,7 +83,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
-	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false)
+	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false)
 {
 	componentIndex = 0;
 
@@ -104,6 +107,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
 	_useDoubleTres = configurator->isTrue( "useDoubleGaussTres" );
 	_useTripleTres = configurator->isTrue( "useTripleGaussTres" );
+	_useNewPhisres = configurator->isTrue( "useNewPhisres" );
 	_useNewMistagModel = configurator->isTrue( "useNewMistagModel" );
 	DebugFlag_v6 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
@@ -183,11 +187,23 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	// Choose resolution model according to flags
 	// For now hard coded.
 
+
    	if( _useEventResolution )
+	// get model name
+	// use class lookup
+	{
+		string resolutionModelName = configurator->getConfigurationValue( "ResolutionModel") ;
+		resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator );
+	}
+/*
 	{
 		if( _useDoubleTres )
 		{
 			resolutionModel = new DoubleResolutionModel( configurator, isCopy );
+		}
+		else if( _useNewPhisres )
+		{
+			resolutionModel = new Phis2012ResolutionModel( configurator, isCopy );
 		}
 		else
 		{
@@ -209,7 +225,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 			resolutionModel = new FixedResolutionModel( configurator, isCopy );
 		}
 	}
-
+*/
 	if( _useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( configurator );
 	else _mistagCalibModel = new SimpleMistagCalib( configurator );
 

@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/11/01 Dianne Ferguson
+  - Made changes so that the Resolution Model is now chosen using a configuration parameter within the PDF XML using the tag ResolutionModel.
+  - This has been implemented in the jpsiphi and jpsifzero v6 PDFs. 
+
 2013/10/28 Rob Currie
   - Made some improvements to the CombinedMistag class including a more robust casting of the tags to ints
   - Changed Copy by Constructor implemented PDF instances to not try to remove the cache, Foam should catch this and cry but this could introduce inefficiencies depending on the scope of objects

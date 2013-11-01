@@ -25,7 +25,12 @@
 
 using namespace::std;
 
+class IResolutionModel;
 //=======================================
+/*!
+ *  * @brief typedef for the class-factory objects which actually create the new class instances in memory
+ *   */
+typedef IResolutionModel* CreateResModel_t( PDFConfigurator* );
 
 class IResolutionModel
 {
@@ -58,6 +63,24 @@ class IResolutionModel
 
 		IResolutionModel() {};
 };
+
+#ifndef __CINT__
+
+/*!
+ * @brief Macro for adding a class lookup and copy function instance to the main function index
+ *
+ * This allows for any standard Configuration functions inherited from each PDF that must be called after the object has been initialized to be called here
+ *
+ * This allows for objects to be correctly configured without the PDF developer having to care about initializing the PDFs
+ * @return This Returns the PDF that has been constructed
+ */
+#define RESMODEL_CREATOR( X ) \
+        extern "C" IResolutionModel* CreateResModel_##X( PDFConfigurator* config ) { \
+                IResolutionModel* thisObject = (IResolutionModel*) new X( config ); \
+                return thisObject; \
+}
+
+#endif
 
 #endif
 

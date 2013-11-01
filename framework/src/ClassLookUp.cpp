@@ -13,6 +13,7 @@
 #include "ClassLookUp.h"
 #include "BasePDF.h"
 #include "IPDF.h"
+#include "IResolutionModel.h"
 #include "NormalisedSumPDF.h"
 #include "ProdPDF.h"
 #include "SumPDF.h"
@@ -133,6 +134,30 @@ IPDF* ClassLookUp::LookUpPDFName( string Name, PDFConfigurator* configurator )
 
 	return returnable_PDF;
 }
+//	Given a PDF object name we know that the PDF constructor is wrapped in an object with a derrived name
+IResolutionModel* ClassLookUp::LookUpResName( string Name, PDFConfigurator* configurator )
+{
+	string model_creator_Name = "CreateResModel_"+Name;
+
+	CreateResModel_t* model_creator = (CreateResModel_t*) ClassLookUp::getObject( model_creator_Name );
+
+	if( model_creator == NULL )
+	{
+		cerr << "Cannot Find Resolution Model Named: " << Name << " You probably provided the wrong name in your XML." << endl << endl;
+		exit(-15513);
+	}
+
+	IResolutionModel* returnable_Model = (IResolutionModel*) model_creator( configurator );
+
+//	returnable_Model->SetConfigurator( configurator );
+
+//	string thisLabel = configurator->GetModelLabel();
+
+//	if( !thisLabel.empty() ) returnable_Model->SetLabel( thisLabel );
+
+	return returnable_Model;
+}
+
 
 IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 {

@@ -17,6 +17,7 @@
 #include "ParameterSet.h"
 #include "DataPoint.h"
 #include "PDFConfigurator.h"
+#include "IResolutionModel.h"
 #include "Observable.h"
 //	System Headers
 #include <iostream>
@@ -29,7 +30,7 @@ using namespace::std;
 
 //=======================================
 
-class ResolutionModel
+class ResolutionModel : public IResolutionModel
 {
 public:
     
@@ -70,6 +71,11 @@ private:
     
     ObservableRef eventResolutionName;  // Event-by-event resolution observable
     double eventResolution ;
+
+    virtual unsigned int numComponents(){return 1;};
+    virtual void requestComponent( unsigned int ){return;};
+
+    virtual double GetFraction( unsigned int ){return 1.0;};
 
 };
 

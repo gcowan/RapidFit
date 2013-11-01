@@ -7,8 +7,10 @@
  *  @date 2013-07-17
  */
 
+#include "ClassLookUp.h"
 #include "Mathematics.h"
 #include "Bs2Jpsifzero_Signal_v6.h"
+#include "IResolutionModel.h"
 #include <iostream>
 #include <cmath>
 #include <iomanip>
@@ -19,66 +21,6 @@ using namespace::std;
 
 PDF_CREATOR( Bs2Jpsifzero_Signal_v6 );
 
-
-Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6( const Bs2Jpsifzero_Signal_v6& input ) : BasePDF( (BasePDF&) input )
-        , gammaName(input.gammaName), deltaGammaName(input.deltaGammaName), deltaMName(input.deltaMName), Phi_sName(input.Phi_sName)
-
-	, Aperp_sqName(input.Aperp_sqName)
-
-	, lambdaName(input.lambdaName), mistagName(input.mistagName)
-
-        , mistagP1Name(input.mistagP1Name), mistagP0Name(input.mistagP0Name), mistagSetPointName(input.mistagSetPointName), mistagDeltaP1Name(input.mistagDeltaP1Name)
-
-	, mistagDeltaP0Name(input.mistagDeltaP0Name), mistagDeltaSetPointName(input.mistagDeltaSetPointName)
-
-        , timeName(input.timeName)
-
-	, tagName(input.tagName)
-
-	, _useEventResolution(input._useEventResolution), _useTimeAcceptance(input._useTimeAcceptance)
-
-	, _numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly)
-
-        , _useCosAndSin(input._useCosAndSin), _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
-
-	, t(input.t)
-
-	, tag(input.tag), _gamma(input._gamma), dgam(input.dgam)
-
-	, Aperp_sq(input.Aperp_sq)
-
-	, delta_ms(input.delta_ms)
-
-	, phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag), _mistagP1(input._mistagP1), _mistagP0(input._mistagP0)
-
-	, _mistagSetPoint(input._mistagSetPoint)
-
-	, tlo(input.tlo), thi(input.thi), expL_stored(input.expL_stored), stored_AT(input.stored_AT)
-
-	, expH_stored(input.expH_stored), expSin_stored(input.expSin_stored), expCos_stored(input.expCos_stored), intExpL_stored(input.intExpL_stored)
-
-	, intExpH_stored(input.intExpH_stored), intExpSin_stored(input.intExpSin_stored), intExpCos_stored(input.intExpCos_stored), timeAcc(NULL)
-
-	, normalisationCacheValid(input.normalisationCacheValid)
-
-	, timeIntegralCacheValid(input.timeIntegralCacheValid)
-
-	, normalisationCacheUntagged(input.normalisationCacheUntagged)
-
-	, _expLObs(input._expLObs), _expHObs(input._expHObs), _expSinObs(input._expSinObs), _expCosObs(input._expCosObs), _intexpLObs(input._intexpLObs), _intexpHObs(input._intexpHObs)
-
-	, _intexpSinObs(input._intexpSinObs), _intexpCosObs(input._intexpCosObs), _intexpLObs_vec(input._intexpLObs_vec), _intexpHObs_vec(input._intexpHObs_vec)
-	
-	, _intexpSinObs_vec(input._intexpSinObs_vec), _intexpCosObs_vec(input._intexpCosObs_vec), timeBinNum(input.timeBinNum), _datapoint(NULL)
-
-	, Csp(input.Csp), lambda(input.lambda), _CC(input._CC), _DD(input._DD), _SS(input._SS), _mistagDeltaP1(input._mistagDeltaP1)
-
-	, _mistagDeltaP0(input._mistagDeltaP0), _mistagDeltaSetPoint(input._mistagDeltaSetPoint), stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah)
-
-{
-	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
-    resolutionModel = new ResolutionModel( *(input.resolutionModel) ) ;
-}
 
 //......................................
 //Constructor(s)
@@ -122,8 +64,6 @@ Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6(PDFConfigurator* configurator) : 
 	timeIntegralCacheValid(), normalisationCacheUntagged()
 {
 
-	std::cout << "Constructing PDF: Bs2Jpsifzero_Signal_v6 " << endl;
-
 	//...........................................
 	// Configure  options
 	_numericIntegralForce    = configurator->isTrue( "NumericIntegralForce") ;
@@ -132,29 +72,38 @@ Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6(PDFConfigurator* configurator) : 
 	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
 	_usePunziSigmat = configurator->isTrue( "UsePunziSigmat" ) ;
 	_usePunziMistag = configurator->isTrue( "UsePunziMistag" ) ;
+	bool isCopy = configurator->hasConfigurationValue( "RAPIDFIT_SAYS_THIS_IS_A_COPY", "True" );
+	if(!isCopy){cout << "Constructing PDF: Bs2Jpsifzero_Signal_v6 " << endl ;}
 
 	//...........................................
 	// Configure to use time acceptance machinery
 	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
 	if( useTimeAcceptance() ) {
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) ) {
-			timeAcc = new SlicedAcceptance( 0., 14.0, /*0.0157*/ 0.0112) ;
-			cout << "Bs2Jpsifzero_Signal_v6:: Constructing timeAcc: Upper time acceptance beta=0.0112 [0 < t < 14] " << endl ;
+			timeAcc = new SlicedAcceptance( 0., 14.0, /*0.0157*/ 0.0112, isCopy) ;
+			if(!isCopy){cout << "Bs2Jpsifzero_Signal_v6:: Constructing timeAcc: Upper time acceptance beta=0.0112 [0 < t < 14] " << endl ;}
 		}
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" ) {
-			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ) ) ;
-			cout << "Bs2Jpsifzero_Signal_v6:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
+			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ), isCopy ) ;
+			if(!isCopy){cout << "Bs2Jpsifzero_Signal_v6:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;}
 		}
 	}
 	else {
-		timeAcc = new SlicedAcceptance( 0., 14. ) ;
-		cout << "Bs2Jpsifzero_Signal_v6:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14]  " << endl ;
+		timeAcc = new SlicedAcceptance( 0., 14., isCopy ) ;
+		if(!isCopy){cout << "Bs2Jpsifzero_Signal_v6:: Constructing timeAcc: DEFAULT FLAT [0 < t < 14] " << endl ;}
 	}
     
-	resolutionModel = new ResolutionModel( configurator ) ;
-	if( resolutionModel->isPerEvent()  ) this->TurnCachingOff();
+	//resolutionModel = new ResolutionModel( configurator ) ;
+	//if( resolutionModel->isPerEvent()  ) this->TurnCachingOff();
 
 	this->SetNumericalNormalisation( false );
+
+        if( _useEventResolution )
+        {       
+                string resolutionModelName = configurator->getConfigurationValue( "ResolutionModel") ;
+                resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator );
+		this->TurnCachingOff();
+        }
 
 	//........................
 	// Now do some actual work
@@ -165,6 +114,7 @@ Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6(PDFConfigurator* configurator) : 
 	//c0  = new TCanvas;
 	//histCounter = 0;
 	//~PELC
+        this->SetCopyConstructorSafe( false );
 }
 
 //........................................................

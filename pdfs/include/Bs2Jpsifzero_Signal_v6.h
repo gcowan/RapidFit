@@ -15,7 +15,7 @@
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
 #include "SlicedAcceptance.h"
-#include "ResolutionModel.h"
+#include "IResolutionModel.h"
 #include "Mathematics.h"
 #include <iostream>
 #include <cstdlib>
@@ -35,7 +35,6 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 {
 	public:
 		Bs2Jpsifzero_Signal_v6( PDFConfigurator* );
-		Bs2Jpsifzero_Signal_v6( const Bs2Jpsifzero_Signal_v6& );
 		~Bs2Jpsifzero_Signal_v6();
 
 		// Mandatory RapidFit Methods
@@ -139,7 +138,7 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		inline bool useEventResolution() const {return _useEventResolution ; }
 		inline bool useTimeAcceptance() const { return _useTimeAcceptance ; }
 
-	        ResolutionModel * resolutionModel ;
+	        IResolutionModel * resolutionModel ;
 
 		// Othere things calculated later on the fly
 		double tlo, thi ;

@@ -1,7 +1,7 @@
 // $Id: Bs2JpsiPhi_Signal_v6.h,v 1.1 2009/12/06  Pete Clarke Exp $
 /** @class Bs2JpsiPhi_Signal_v6
  *
- *  This version startef the update from _v6 by movingdecay time resolution to a contained class.
+ *  This version startef the update from _v6_ires by movingdecay time resolution to a contained class.
  *
  *  @author Pete Clarke peter.clarke@ed.ac.uk
  *  @date 2013-06-00
@@ -229,7 +229,7 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		bool performingComponentProjection;
 		double _offsetToGammaForBetaFactor;
 
-		bool _useDoubleTres, _useTripleTres;
+		bool _useDoubleTres, _useTripleTres, _useNewPhisres;
 
 		bool _useNewMistagModel;
 

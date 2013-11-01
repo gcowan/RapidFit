@@ -13,6 +13,7 @@
 
 ///	RapidFit Headers
 #include "IPDF.h"
+#include "IResolutionModel.h"
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
 #include "IFitFunction.h"
@@ -49,6 +50,17 @@ class ClassLookUp
 		 * @return a pointer to a new IPDF instance which is a copy of the input PDF to the highest derived instance
 		 */
 		static IPDF* CopyPDF( const IPDF* InputPDF );
+
+		/*!
+		 * @brief Function to return a named ResolutionModel by looking for it's matching symbol in the compiled object
+		 * 
+		 * @param Name   Name of the Resolution Model as defined in the source
+		 *
+		 * @param config instance of a PDFConfigurator which always has to be accepted by the PDF
+		 *
+		 * @return returns a pointer to the ResolutionModel with the Name provided, NULL if it isn't found in the object itself
+		 */
+		static IResolutionModel* LookUpResName( string Name, PDFConfigurator* config );
 
 		/*!
 		 * @brief Function to return a named FitFunction by using a standard string comparison

@@ -19,7 +19,7 @@
 
 using namespace::std;
 
-
+RESMODEL_CREATOR( TripleFixedResModel );
 //............................................
 // Constructor 
 TripleFixedResModel::TripleFixedResModel( PDFConfigurator* configurator, bool quiet ) :
