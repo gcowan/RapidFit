@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/11/04 Dianne Ferguson
+  - Made changes to XMLConfigReader so an observable with no value must be defined with a range.
+
 2013/11/01 Dianne Ferguson
   - Made changes so that the Resolution Model is now chosen using a configuration parameter within the PDF XML using the tag ResolutionModel.
   - This has been implemented in the jpsiphi and jpsifzero v6 PDFs. 

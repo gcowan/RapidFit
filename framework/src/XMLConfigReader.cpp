@@ -1887,7 +1887,9 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 		double minimum = -99999.0;
 		double maximum = -99999.0;
 		vector<double> allValues;
-
+		bool gotValue=false;
+		bool gotMin=false;
+		bool gotMax=false;
 		//Loop over the tag children, which correspond to the parameter elements
 		vector< XMLTag* > elements = InputTag->GetChildren();
 		for ( unsigned int elementIndex = 0; elementIndex < elements.size(); ++elementIndex )
@@ -1898,14 +1900,17 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 			}
 			else if ( elements[elementIndex]->GetName() == "Minimum" )
 			{
+				gotMin=true;
 				minimum = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else if ( elements[elementIndex]->GetName() == "Maximum" )
 			{
+				gotMax=true;
 				maximum = XMLTag::GetDoubleValue( elements[elementIndex] );
 			}
 			else if ( elements[elementIndex]->GetName() == "Value" )
 			{
+				gotValue=true;
 				allValues.push_back( XMLTag::GetDoubleValue( elements[elementIndex] ) );
 			}
 			else if ( elements[elementIndex]->GetName() == "Unit" )
@@ -1926,7 +1931,15 @@ IConstraint * XMLConfigReader::GetConstraint( XMLTag * InputTag, string & Name )
 		if( tf1.empty() ) tf1 = Name;
 
 		IConstraint* returnable_const=NULL;
+		if(!gotValue)
+		{
+			if(gotMax&&gotMin){}
+			else{
+				cerr << "Observable needs a range! " << Name << endl;
+				exit(1);
+			}
 
+		}
 		//If there are discrete values, make a discrete constraint
 		if ( allValues.size() > 0 )
 		{
