@@ -135,7 +135,7 @@ IPDF* ClassLookUp::LookUpPDFName( string Name, PDFConfigurator* configurator )
 	return returnable_PDF;
 }
 //	Given a PDF object name we know that the PDF constructor is wrapped in an object with a derrived name
-IResolutionModel* ClassLookUp::LookUpResName( string Name, PDFConfigurator* configurator )
+IResolutionModel* ClassLookUp::LookUpResName( string Name, PDFConfigurator* configurator, bool quiet )
 {
 	string model_creator_Name = "CreateResModel_"+Name;
 
@@ -147,17 +147,10 @@ IResolutionModel* ClassLookUp::LookUpResName( string Name, PDFConfigurator* conf
 		exit(-15513);
 	}
 
-	IResolutionModel* returnable_Model = (IResolutionModel*) model_creator( configurator );
-
-//	returnable_Model->SetConfigurator( configurator );
-
-//	string thisLabel = configurator->GetModelLabel();
-
-//	if( !thisLabel.empty() ) returnable_Model->SetLabel( thisLabel );
+	IResolutionModel* returnable_Model = (IResolutionModel*) model_creator( configurator, quiet );
 
 	return returnable_Model;
 }
-
 
 IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 {
@@ -176,39 +169,22 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 		}
 		else
 		{
-		/*
-			//	These special case PDFs explicitly need to be declared here as they're special case objects heavily integrated into the framework
-			if( Name == "NormalisedSum" )
-			{
-				returnable_PDF = (IPDF*) new NormalisedSumPDF( *(const NormalisedSumPDF*) inputPDF );
-			}
-			else if( Name == "Prod" )
-			{
-				returnable_PDF = (IPDF*) new ProdPDF( *(const ProdPDF*) inputPDF );
-			}
-			else if( Name == "Sum" )
-			{
-				returnable_PDF = (IPDF*) new SumPDF( *(const SumPDF*) inputPDF );
-			}
-			else
-			{ */
-				//	Each PDF has a C wrapper function with an unmangled name of CopyPDF_SomePDF
-				string pdf_copy_Name = "CopyPDF_"+Name;
+			//	Each PDF has a C wrapper function with an unmangled name of CopyPDF_SomePDF
+			string pdf_copy_Name = "CopyPDF_"+Name;
 
-				//	Find this object in the object which has been loaded as a library
-				CopyPDF_t* pdf_copy = (CopyPDF_t*) ClassLookUp::getObject( pdf_copy_Name );
+			//	Find this object in the object which has been loaded as a library
+			CopyPDF_t* pdf_copy = (CopyPDF_t*) ClassLookUp::getObject( pdf_copy_Name );
 
-				if( pdf_copy == NULL )
-				{
-					cerr << "Cannot Find Copy Constructor for: " << Name << " This is highly unsual and was thought to be impossible... I cannot continue" << endl;
-					cerr << "You may have used SetName and incorrectly named the PDF, Use SetLabel if this is the case." << endl << endl;
-					exit(21841);
-				}
+			if( pdf_copy == NULL )
+			{
+				cerr << "Cannot Find Copy Constructor for: " << Name << " This is highly unsual and was thought to be impossible... I cannot continue" << endl;
+				cerr << "You may have used SetName and incorrectly named the PDF, Use SetLabel if this is the case." << endl << endl;
+				exit(21841);
+			}
 
-				//	Give the PDF object explicit knowledge of the path of it's constructor template
-				returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
-				inputPDF->SetCopyConstructor( pdf_copy );
-			//}
+			//	Give the PDF object explicit knowledge of the path of it's constructor template
+			returnable_PDF = (IPDF*) pdf_copy( *inputPDF );
+			inputPDF->SetCopyConstructor( pdf_copy );
 		}
 	}
 	else

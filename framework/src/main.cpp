@@ -757,7 +757,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 			{
 				for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
 				{
-					for( unsigned int j=0; j< WeightedDataSets[i]->GetDataNumber(); ++j )
+					for( unsigned int j=0; j< (unsigned) WeightedDataSets[i]->GetDataNumber(); ++j )
 					{
 						sum += WeightedDataSets[i]->GetDataPoint( j )->GetObservable( WeightsName )->GetValue();
 						sum_sq += WeightedDataSets[i]->GetDataPoint( j )->GetObservable( WeightsSquared )->GetValue();

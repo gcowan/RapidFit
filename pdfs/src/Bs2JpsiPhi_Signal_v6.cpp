@@ -105,9 +105,6 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	_usePlotComponents = configurator->isTrue( "PlotComponents" ) ;
 	_usePlotAllComponents = configurator->isTrue( "PlotAllComponents" ) ; 
 	_fitDirectlyForApara = configurator->isTrue( "FitDirectlyForApara" );
-	_useDoubleTres = configurator->isTrue( "useDoubleGaussTres" );
-	_useTripleTres = configurator->isTrue( "useTripleGaussTres" );
-	_useNewPhisres = configurator->isTrue( "useNewPhisres" );
 	_useNewMistagModel = configurator->isTrue( "useNewMistagModel" );
 	DebugFlag_v6 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
@@ -193,43 +190,20 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	// use class lookup
 	{
 		string resolutionModelName = configurator->getConfigurationValue( "ResolutionModel") ;
-		resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator );
+		if( resolutionModelName.empty() )
+		{
+			if( configurator->GetResolutionModel() == "DummyResolutionModel" )	resolutionModelName = "PerEventResModel";
+			else resolutionModelName = configurator->GetResolutionModel();
+		}
+		resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator, isCopy );
+
+		this->TurnCachingOff();
 	}
-/*
-	{
-		if( _useDoubleTres )
-		{
-			resolutionModel = new DoubleResolutionModel( configurator, isCopy );
-		}
-		else if( _useNewPhisres )
-		{
-			resolutionModel = new Phis2012ResolutionModel( configurator, isCopy );
-		}
-		else
-		{
-			resolutionModel = new PerEventResModel( configurator, isCopy );
-		}
-	}
-	else
-	{
-		if( _useDoubleTres )
-		{
-			resolutionModel = new DoubleFixedResModel( configurator, isCopy );
-		}
-		else if( _useTripleTres )
-		{
-			resolutionModel = new TripleFixedResModel( configurator, isCopy ); 
-		}
-		else
-		{
-			resolutionModel = new FixedResolutionModel( configurator, isCopy );
-		}
-	}
-*/
+
+	if( resolutionModel == NULL ) resolutionModel = ClassLookUp::LookUpResName( "DummyResolutionModel", configurator, isCopy );
+
 	if( _useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( configurator );
 	else _mistagCalibModel = new SimpleMistagCalib( configurator );
-
-	if( resolutionModel->isPerEvent()  ) this->TurnCachingOff();
 
 	//........................
 	// Now do some actual work

@@ -28,9 +28,9 @@ using namespace::std;
 class IResolutionModel;
 //=======================================
 /*!
- *  * @brief typedef for the class-factory objects which actually create the new class instances in memory
- *   */
-typedef IResolutionModel* CreateResModel_t( PDFConfigurator* );
+ * @brief typedef for the class-factory objects which actually create the new class instances in memory
+ */
+typedef IResolutionModel* CreateResModel_t( PDFConfigurator*, bool );
 
 class IResolutionModel
 {
@@ -75,8 +75,8 @@ class IResolutionModel
  * @return This Returns the PDF that has been constructed
  */
 #define RESMODEL_CREATOR( X ) \
-        extern "C" IResolutionModel* CreateResModel_##X( PDFConfigurator* config ) { \
-                IResolutionModel* thisObject = (IResolutionModel*) new X( config ); \
+        extern "C" IResolutionModel* CreateResModel_##X( PDFConfigurator* config, bool quiet ) { \
+                IResolutionModel* thisObject = (IResolutionModel*) new X( config, quiet ); \
                 return thisObject; \
 }
 

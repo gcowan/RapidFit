@@ -18,6 +18,7 @@
 
 using namespace::std;
 
+RESMODEL_CREATOR( PerEventResModel );
 
 //............................................
 // Constructor 

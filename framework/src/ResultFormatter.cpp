@@ -183,7 +183,7 @@ void ResultFormatter::PlotFitContours( FitResult * OutputData, string contourFil
 		{
 			TString confname = "";
 			confname +=confs[sigma-1];
-			confname += "\% C.L.";
+			confname += "% C.L.";
 
 			vector< pair< double, double > > sigmaContour = plotContour->GetPlot(sigma);
 

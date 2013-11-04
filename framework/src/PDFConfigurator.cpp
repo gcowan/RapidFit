@@ -7,7 +7,7 @@
 
   @author Pete Clarke
   @date 2011-05-01
- */
+  */
 
 #include "PDFConfigurator.h"
 #include "StringProcessing.h"
@@ -25,13 +25,14 @@ using namespace::std;
 
 ///..........................................
 //Default constructor & destructor
-PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), daughterPDFs(), thisPDFsBoundary(NULL), fractionNames(), PDFLabel("")
+PDFConfigurator::PDFConfigurator() : defaultNames(), replacementNames(), configParameters(), configValues(), daughterPDFs(), thisPDFsBoundary(NULL), fractionNames(), PDFLabel(""),
+	ResolutionModelName("DummyResolutionModel")
 {
 }
 
 PDFConfigurator::PDFConfigurator( const PDFConfigurator& input ) :
 	defaultNames( input.defaultNames ), replacementNames( input.replacementNames ), configParameters( input.configParameters ), configValues( input.configValues ),
-	daughterPDFs(), thisPDFsBoundary(NULL), fractionNames( input.fractionNames ), PDFLabel(input.PDFLabel)
+	daughterPDFs(), thisPDFsBoundary(NULL), fractionNames( input.fractionNames ), PDFLabel(input.PDFLabel), ResolutionModelName(input.ResolutionModelName)
 {
 	for( unsigned int i=0; i< input.daughterPDFs.size(); ++i )
 	{
@@ -134,7 +135,7 @@ string PDFConfigurator::getName( string defaultName )
 		{
 			//cout << " PDFConfig::sub[" << defaultName << "->" << replacementNames[ii] << "]" << endl;
 			return this->getName(replacementNames[ii]);
-//			return replacementNames[ii] ;
+			//			return replacementNames[ii] ;
 		}
 	}
 	return defaultName ;
@@ -266,3 +267,12 @@ string PDFConfigurator::GetPDFLabel() const
 	return PDFLabel;
 }
 
+void PDFConfigurator::SetResolutionModel( const string input )
+{
+	ResolutionModelName = input;
+}
+
+string PDFConfigurator::GetResolutionModel() const
+{
+	return ResolutionModelName;
+}

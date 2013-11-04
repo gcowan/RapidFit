@@ -1029,7 +1029,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 			    for (unsigned int i = lowerZ; i < upperZ; ++i)
 			    {
                     //tmp += ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi);
-                    tmp += TComplex::Exp(0.5*TComplex::I()*twoLambda*belle_phiZPsiPsi)*(ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi));
+                    tmp += TComplex::Exp(0.5*TComplex::I()*TComplex(twoLambda)*belle_phiZPsiPsi)*(ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi));
                     //std::cout << TComplex::Exp(0.5*TComplex::I()*twoLambda*belle_phiZPsiPsi) << " " << TComplex(cos(belle_phiZPsiPsi), 0.5*twoLambda*sin(belle_phiZPsiPsi)) << std::endl;
 			    }
 		}

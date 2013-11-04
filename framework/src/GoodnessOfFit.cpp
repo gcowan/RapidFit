@@ -531,7 +531,7 @@ namespace GoodnessOfFit
             double sum_weights_i = 0.;
             double T = 0.;
 			for ( int i = 0; i < n; i++ ){
-				if (i % 100 == 0) cout << "sumEvents - Event # " << i << "\t\t" << setprecision(4) << 100.*(double)i/(double)n << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
+				if (i % 100 == 0) cout << "sumEvents - Event # " << i << "\t\t" << setprecision(4) << 100.*(double)i/(double)n << "% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
                 DataPoint * event_i = data->GetDataPoint(i);
                 weight_i = getWeight( event_i );
                 sum_weights_i += weight_i;
@@ -562,7 +562,7 @@ namespace GoodnessOfFit
             double sum_weights_i = 0.;
 			double T = 0.;
 			for ( int i = 0; i < nD; i++){
-				if (i % 100 == 0) cout << "sumDataMCEvents - DataEvent # " << i << "\t\t" << setprecision(4) << 100.*(double)i/(double)nD << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
+				if (i % 100 == 0) cout << "sumDataMCEvents - DataEvent # " << i << "\t\t" << setprecision(4) << 100.*(double)i/(double)nD << "% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
 				DataPoint* event_i = data->GetDataPoint(i);
                 weight_i = getWeight( event_i );
                 sum_weights_i += weight_i;

@@ -1,5 +1,17 @@
 // $Id: release.notes $
 
+2013/11/04 Rob Currie
+  - Adding new script for dumping the content of a branch in a TTree to a .txt file...
+  - Adding small changes to the IResolution lookup method in ClassLookUp and the MODEL_CREATOR (fixing verbosity problem)
+  - Adding missing MODEL_CREATOR instances for missing models
+  - Adding new Dummy Model which has zero time resolution implemented explicitly. (This just makes life easier for turning models on/off)
+  - Adding new XMLTag <ResolutionModel> to the PDFConfigurator which defaults to the new Dummy Model (this is safe as by default you get no resolution information unless you ask for it)
+  - Updated XML in the unittest/1fb../... folder to work with latest changes which break backwards compatability
+  - Added make 'icc' to the Makefile to use the intel ICC compiler.
+      After some research this compiler works perfectly fine with RapidFit as long as you're using version > 11.1 which badly handles hardened binaries (we explicitly rely on this feature)
+      As a response to this I've fixed some minor formatting bugs this compiler complains about as well as a TComplex issue in DPTotalAmplitudePDF_withAcc_withBkg.cpp
+         (These fixes effect strings printed to screen or haven't been tested so be warned)
+
 2013/11/04 Dianne Ferguson
   - Made changes to XMLConfigReader so an observable with no value must be defined with a range.
 

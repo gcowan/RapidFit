@@ -60,7 +60,7 @@ class ClassLookUp
 		 *
 		 * @return returns a pointer to the ResolutionModel with the Name provided, NULL if it isn't found in the object itself
 		 */
-		static IResolutionModel* LookUpResName( string Name, PDFConfigurator* config );
+		static IResolutionModel* LookUpResName( string Name, PDFConfigurator* config, bool quiet=false );
 
 		/*!
 		 * @brief Function to return a named FitFunction by using a standard string comparison

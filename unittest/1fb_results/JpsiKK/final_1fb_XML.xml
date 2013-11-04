@@ -651,7 +651,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction990</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
@@ -687,7 +686,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction990</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
@@ -717,7 +715,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction990</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
@@ -747,7 +744,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction990</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
@@ -782,7 +778,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1008</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
@@ -818,7 +813,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1008</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
@@ -848,7 +842,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1008</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
@@ -878,7 +871,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1008</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
@@ -913,7 +905,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1016</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
@@ -949,7 +940,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1016</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
@@ -979,7 +969,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1016</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
@@ -1009,7 +998,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1016</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
@@ -1044,7 +1032,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1020</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
@@ -1080,7 +1067,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1020</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
@@ -1110,7 +1096,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1020</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
@@ -1140,7 +1125,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1020</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
@@ -1175,7 +1159,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1024</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
@@ -1211,7 +1194,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1024</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
@@ -1241,7 +1223,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1024</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
@@ -1271,7 +1252,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1024</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
@@ -1306,7 +1286,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1032</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
@@ -1342,7 +1321,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1032</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
@@ -1372,7 +1350,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1032</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
@@ -1402,7 +1379,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1032</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1DiMuon_Hlt2DiMuonDetached_Reweighted.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
@@ -1439,7 +1415,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction990</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
@@ -1475,7 +1450,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction990</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
@@ -1505,7 +1479,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction990</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
@@ -1535,7 +1508,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction990</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:990</AppendParameterNames>
@@ -1570,7 +1542,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1008</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
@@ -1604,7 +1575,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1008</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
@@ -1634,7 +1604,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1008</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
@@ -1664,7 +1633,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1008</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1008</AppendParameterNames>
@@ -1699,7 +1667,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1016</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
@@ -1735,7 +1702,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1016</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
@@ -1765,7 +1731,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1016</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
@@ -1795,7 +1760,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1016</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1016</AppendParameterNames>
@@ -1830,7 +1794,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1020</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
@@ -1866,7 +1829,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1020</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
@@ -1896,7 +1858,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1020</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
@@ -1926,7 +1887,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1020</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1020</AppendParameterNames>
@@ -1961,7 +1921,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1024</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
@@ -1997,7 +1956,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1024</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
@@ -2027,7 +1985,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1024</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
@@ -2057,7 +2014,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1024</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1024</AppendParameterNames>
@@ -2092,7 +2048,6 @@
 
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1032</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
@@ -2128,7 +2083,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1032</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
@@ -2158,7 +2112,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1032</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>
@@ -2188,7 +2141,6 @@
 	<ToFit>
 		<CommonPDF>True</CommonPDF>
 		<PDFConfigurator>
-			<FractionName>SignalFraction1032</FractionName>
 			<ConfigurationParameter>TimeAcceptanceFile:2011-1fbPaper/Bs_HltPropertimeAcceptance_PhiMassWindow30MeV_NextBestPVCut_Data_40bins_Hlt1TrackAndTrackMuonExcl_Hlt2DiMuonDetached.txt</ConfigurationParameter>
 			<AppendParameterNames>mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS</AppendParameterNames>
 			<AppendParameterNames>F_s:delta_s:Csp:1032</AppendParameterNames>

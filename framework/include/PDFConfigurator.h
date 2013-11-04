@@ -100,6 +100,10 @@ class PDFConfigurator
 
 		string GetPDFLabel() const;
 
+		void SetResolutionModel( const string input );
+
+		string GetResolutionModel() const;
+
 	private:
 
 		//      Uncopyable This Way!
@@ -117,6 +121,9 @@ class PDFConfigurator
 		vector<string> fractionNames;
 
 		string PDFLabel;
+
+		string ResolutionModelName;
+
 };
 
 #endif

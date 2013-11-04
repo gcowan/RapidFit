@@ -98,12 +98,22 @@ Bs2Jpsifzero_Signal_v6::Bs2Jpsifzero_Signal_v6(PDFConfigurator* configurator) : 
 
 	this->SetNumericalNormalisation( false );
 
-        if( _useEventResolution )
-        {       
-                string resolutionModelName = configurator->getConfigurationValue( "ResolutionModel") ;
-                resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator );
+	if( _useEventResolution )
+	// get model name
+	// use class lookup
+	{
+		string resolutionModelName = configurator->getConfigurationValue( "ResolutionModel") ;
+		if( resolutionModelName.empty() )
+		{
+			if( configurator->GetResolutionModel() == "DummyResolutionModel" )      resolutionModelName = "PerEventResModel";
+			else resolutionModelName = configurator->GetResolutionModel();
+		}
+		resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator, isCopy );
+
 		this->TurnCachingOff();
-        }
+	}
+
+	if( resolutionModel == NULL ) resolutionModel = ClassLookUp::LookUpResName( "DummyResolutionModel", configurator, isCopy );
 
 	//........................
 	// Now do some actual work

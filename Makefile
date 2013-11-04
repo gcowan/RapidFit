@@ -28,7 +28,9 @@ SVN_PDF_REV ="$(shell svnversion -n ./pdfs)"
 BUILD_DATE ="$(shell date +%H:%M_%F)"
 
 #		Compiler Flags
-CXXFLAGS_BASE  = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_PDF_REV) -DBUILD_DATE=$(BUILD_DATE) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
+CXXFLAGS_BASE_COMMON  = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_PDF_REV) -DBUILD_DATE=$(BUILD_DATE) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse2 -msse3 -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow
+
+CXXFLAGS_BASE = $(CXXFLAGS_BASE_COMMON) -Wmissing-noreturn -Wcast-align -msse -m3dnow
 
 CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_PDF_REV) -DBUILD_DATE=$(BUILD_DATE) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
@@ -161,6 +163,10 @@ clang: override CC=clang++
 clang: all
 clang-utils: override CC=clang++
 clang-utils: utils
+
+icc: override CC=icc
+icc: override CXXFLAGS_BASE=$(CXXFLAGS_BASE_COMMON)
+icc: all
 
 gcc46: override CC=g++-4.6
 gcc46: all
