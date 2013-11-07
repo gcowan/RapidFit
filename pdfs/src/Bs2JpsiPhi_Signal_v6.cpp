@@ -83,7 +83,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
-	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false)
+	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false), resolutionModel(NULL)
 {
 	componentIndex = 0;
 
@@ -162,7 +162,8 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	{
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) )
 		{
-			timeAcc = new SlicedAcceptance( 0., 14.0, 0.00826, isCopy) ;
+			//timeAcc = new SlicedAcceptance( 0., 14.0, 0.00826, isCopy) ;
+			timeAcc = new SlicedAcceptance( 0., 14.0, 0.00, isCopy) ;
 			if( !isCopy ) cout << "Bs2JpsiPhi_Signal_v6:: Constructing timeAcc: Upper time acceptance beta=0.00826 [0 < t < 14] " << endl ;
 		}
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" )
@@ -183,7 +184,6 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	//..........................................
 	// Choose resolution model according to flags
 	// For now hard coded.
-
 
    	if( _useEventResolution )
 	// get model name
@@ -249,7 +249,6 @@ void Bs2JpsiPhi_Signal_v6::MakePrototypes()
 		allObservables.push_back( phiName );
 		allObservables.push_back( cosPsiName );
 	}
-
 	//if(useEventResolution()) allObservables.push_back( eventResolutionName );    
 	resolutionModel->addObservables( allObservables );
 	_mistagCalibModel->addObservables( allObservables );

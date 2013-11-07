@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/11/07 Dianne Ferguson
+  - Ensure Bs2JpsiPhi PDF created with NULL resolutionModel.
+
 2013/11/04 Rob Currie
   - Adding new script for dumping the content of a branch in a TTree to a .txt file...
   - Adding small changes to the IResolution lookup method in ClassLookUp and the MODEL_CREATOR (fixing verbosity problem)
