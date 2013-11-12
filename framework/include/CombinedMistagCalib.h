@@ -55,7 +55,7 @@ class CombinedMistagCalib : public IMistagCalib
 		double GetProbBbarSS() const;
 
 		double getFixedEta() const;
-		double getFloatedEta() const;
+		double getFloatedMistag() const;
 
 		bool OSTagged() const;
 

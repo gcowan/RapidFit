@@ -490,7 +490,7 @@ double CombinedMistagCalib::getFixedEta() const
 }
 
 
-double CombinedMistagCalib::getFloatedEta() const
+double CombinedMistagCalib::getFloatedMistag() const
 {
 	double thisEta = 0.;
 	if( _tagOS == _tagSS )
@@ -506,7 +506,7 @@ double CombinedMistagCalib::getFloatedEta() const
 	}
 	else
 	{
-		if( _combinedtag == -1 )
+		if( this->GetCombinedTag() == -1 )
 		{
 			if( _mistagSS > _mistagOS )
 			{
@@ -632,7 +632,7 @@ double CombinedMistagCalib::mistagOSSSBbar() const
 	else
 	{
 		//      Mistag calculated using calibrated OS and SS so doesn't need calibrating
-		returnValue = this->getFloatedEta();
+		returnValue = this->getFloatedMistag();
 	}
 	if( returnValue > 0.5 ) returnValue = 0.5;
 	else if( returnValue < 0. ) returnValue = 0.;
@@ -680,7 +680,7 @@ double CombinedMistagCalib::mistagOSSSB() const
 	else
 	{
 		//	Mistag calculated using calibrated OS and SS so doesn't need calibrating
-		returnValue = this->getFloatedEta();
+		returnValue = this->getFloatedMistag();
 	}
 
 	if( returnValue > 0.5 ) returnValue = 0.5;

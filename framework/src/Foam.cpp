@@ -385,7 +385,7 @@ int Foam::GenerateData( int DataAmount )
 		int combinationIndex = 0;
 		int incrementValue = 1;
 		DataPoint * temporaryDataPoint = new DataPoint(allNames);
-		for ( int discreteIndex = int(discreteNames.size() - 1); discreteIndex >= 0; --discreteIndex )
+		for( int discreteIndex = int(discreteNames.size() - 1); discreteIndex >= 0; --discreteIndex )
 		{
 			//Create the discrete observable
 			Observable * temporaryObservable = generationBoundary->GetConstraint( *discreteNames_ref[unsigned(discreteIndex)] )->CreateObservable(rootRandom);

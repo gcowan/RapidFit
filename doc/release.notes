@@ -1,7 +1,12 @@
 // $Id: release.notes $
 
+2013/11/12 Rob Currie
+  - Adding small fix to make sure the original TRandom3 object is propagated when PDFs are copied without constructor.
+      This effects toys made using this new copy method and using a fixed seed. This DOES NOT effect anything relating to published results.
+  - Adding small modification to the CombinedMistag for the floated case to re-calculate the combined decision based on the current calibration.
+
 2013/11/07 Dianne Ferguson
-  - Ensure Bs2JpsiPhi PDF created with NULL resolutionModel.
+  - Ensure Bs2JpsiPhi PDF intialized with NULL resolutionModel.
 
 2013/11/04 Rob Currie
   - Adding new script for dumping the content of a branch in a TTree to a .txt file...
