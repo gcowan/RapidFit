@@ -106,6 +106,33 @@ template void DebugClass::Dump2File( const string, const vector<unsigned int> );
 template void DebugClass::Dump2File( const string, const vector<complex<int> > );
 template void DebugClass::Dump2File( const string, const vector<complex<double> > );
 
+template<class T> void DebugClass::AppendToFile( const string fileName, const vector<T> objects )
+{
+	stringstream fileAppend;
+
+	for( unsigned int i=0; i< objects.size(); ++i )
+	{
+		fileAppend << objects[i] << "\t";
+	}
+
+	fileAppend << endl;
+
+	ofstream outputFile;
+	outputFile.open( fileName.c_str(), std::fstream::app );
+
+	outputFile << fileAppend.str();
+
+	outputFile.close();
+}
+
+template void DebugClass::AppendToFile( const string fileName, const vector<int> objects );
+template void DebugClass::AppendToFile( const string fileName, const vector<char> objects );
+template void DebugClass::AppendToFile( const string fileName, const vector<string> objects );
+template void DebugClass::AppendToFile( const string fileName, const vector<double> objects );
+template void DebugClass::AppendToFile( const string fileName, const vector<unsigned int> objects );
+template void DebugClass::AppendToFile( const string fileName, const vector<complex<int> > objects );
+template void DebugClass::AppendToFile( const string fileName, const vector<complex<double> > objects );
+
 template<class T> void DebugClass::Dump2TTree( const string fileName, const vector<T> objects, const string ttreeName, const string branchName )
 {
 	TFile* thisFile = new TFile( fileName.c_str(), "RECREATE" );

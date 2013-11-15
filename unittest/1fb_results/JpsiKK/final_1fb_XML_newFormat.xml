@@ -559,7 +559,7 @@
 			#<ConfigurationParameter>OffsetToGammaForBetaFactor:0.00826</ConfigurationParameter>
 			<ConfigurationParameter>PlotComponents:True</ConfigurationParameter>
 			<ConfigurationParameter>useNewMistagModel:True</ConfigurationParameter>
-			<ConfigurationParameter>MistagUseTuple:True</ConfigurationParameter>
+			#<ConfigurationParameter>Mistag3fbModel:True</ConfigurationParameter>
 			<ResolutionModel>PerEventResModel</ResolutionModel>
 		</PDF>
 	</CommonPDF>

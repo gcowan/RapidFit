@@ -4,6 +4,7 @@
   - Adding small fix to make sure the original TRandom3 object is propagated when PDFs are copied without constructor.
       This effects toys made using this new copy method and using a fixed seed. This DOES NOT effect anything relating to published results.
   - Adding small modification to the CombinedMistag for the floated case to re-calculate the combined decision based on the current calibration.
+  - Added new supporting methods for appending the contents of a vector in a .txt file, this is VERY powerful for debugging
 
 2013/11/07 Dianne Ferguson
   - Ensure Bs2JpsiPhi PDF intialized with NULL resolutionModel.

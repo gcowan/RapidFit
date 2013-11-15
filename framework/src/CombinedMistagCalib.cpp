@@ -8,6 +8,7 @@
 #include "CombinedMistagCalib.h"
 #include "SimpleMistagCalib.h"
 #include "ObservableRef.h"
+#include "DebugClass.h"
 
 #include <iostream>
 #include <cmath>
@@ -48,43 +49,16 @@ CombinedMistagCalib::CombinedMistagCalib( PDFConfigurator* configurator ) : IMis
 	mistagDeltaP1Name_OSSS( configurator->getName("mistagDeltaP1_OSSS") ),
 	mistagDeltaP0Name_OSSS( configurator->getName("mistagDeltaP0_OSSS") ),
 	mistagDeltaSetPointName_OSSS( configurator->getName("mistagDeltaSetPoint_OSSS") ),
-	_IMistagCalib_OS(NULL), _IMistagCalib_SS(NULL), _IMistagCalib_OSSS(NULL),
 	_debugMistag(false), _onTuple(false), _floatCalib(false)
 {
 	_debugMistag = configurator->isTrue( "DebugMistagModel" );
-	_onTuple = !configurator->isTrue( "Mistag3fbModel" );
+	_onTuple = ! configurator->isTrue( "Mistag3fbModel" );
 	_floatCalib = configurator->isTrue( "FloatCombinedCalib" );
 
-	if( _debugMistag )
-	{
-		PDFConfigurator* OSCalib = new PDFConfigurator( *configurator );
-		OSCalib->appendParameterNames( "mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OS" );
-		OSCalib->addParameterSubstitution( "tag:tagdecision" );
-		OSCalib->addParameterSubstitution( "mistag:tagomega" );
-		PDFConfigurator* SSCalib = new PDFConfigurator( *configurator );
-		SSCalib->appendParameterNames( "mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_SS" );
-		SSCalib->addParameterSubstitution( "tag:tagdecision" );
-		SSCalib->addParameterSubstitution( "mistag:tagomega" );
-		PDFConfigurator* OSSSCalib = new PDFConfigurator( *configurator );
-		OSSSCalib->appendParameterNames( "mistagP0:mistagP1:mistagSetPoint:mistagDeltaP0:mistagDeltaP1:mistagDeltaSetPoint:_OSSS" );
-		OSSSCalib->addParameterSubstitution( "tag:tagdecision" );
-		OSSSCalib->addParameterSubstitution( "mistag:tagomega" );
-
-		_IMistagCalib_OS = new SimpleMistagCalib( OSCalib );
-		_IMistagCalib_SS = new SimpleMistagCalib( SSCalib );
-		_IMistagCalib_OSSS = new SimpleMistagCalib( OSSSCalib );
-
-		delete OSCalib;
-		delete SSCalib;
-		delete OSSSCalib;
-	}
 }
 
 CombinedMistagCalib::~CombinedMistagCalib()
 {
-	if( _IMistagCalib_OS != NULL ) delete _IMistagCalib_OS;
-	if( _IMistagCalib_SS != NULL ) delete _IMistagCalib_SS;
-	if( _IMistagCalib_OSSS != NULL ) delete _IMistagCalib_OSSS;
 }
 
 void CombinedMistagCalib::addParameters( vector<string>& parameterNames ) const
@@ -140,12 +114,6 @@ void CombinedMistagCalib::setParameters( const ParameterSet& parameters )
 		_mistagDeltaSetPoint_OSSS = parameters.GetPhysicsParameter( mistagDeltaSetPointName_OSSS )->GetValue();
 	}
 
-	if( _debugMistag )
-	{
-		_IMistagCalib_OS->setParameters( parameters );
-		_IMistagCalib_SS->setParameters( parameters );
-		_IMistagCalib_OSSS->setParameters( parameters );
-	}
 }
 
 
@@ -155,12 +123,14 @@ void CombinedMistagCalib::addObservables( vector<string>& observableNames ) cons
 	observableNames.push_back( mistagOSName );
 	observableNames.push_back( tagSSName );
 	observableNames.push_back( mistagSSName );
-	if( _debugMistag ) observableNames.push_back( tagCombName );
-	if( _debugMistag ) observableNames.push_back( mistagOSSSName );
+	if( _onTuple || _debugMistag ) observableNames.push_back( tagCombName );
+	if( _onTuple || _debugMistag ) observableNames.push_back( mistagOSSSName );
 }
 
 int CombinedMistagCalib::GetCombinedTag() const
 {
+	//if( _tagSS == _tagOS ) return _tagSS;
+
 	int decision = 0;
 
 	double p_B_OS = this->GetProbBOS();
@@ -180,7 +150,7 @@ int CombinedMistagCalib::GetCombinedTag() const
 
 double CombinedMistagCalib::GetProbBOS() const
 {
-	if( !_floatCalib )
+	if( true ) //!_floatCalib )
 	{
 		return (1.-(double)_tagOS)*0.5 + ((double)_tagOS)*(1.-_mistagOS);
 	}
@@ -192,7 +162,7 @@ double CombinedMistagCalib::GetProbBOS() const
 
 double CombinedMistagCalib::GetProbBbarOS() const
 {
-	if( !_floatCalib )
+	if( true )//!_floatCalib )
 	{
 		return (1.+(double)_tagOS)*0.5 - ((double)_tagOS)*(1.-_mistagOS);
 	}
@@ -204,7 +174,7 @@ double CombinedMistagCalib::GetProbBbarOS() const
 
 double CombinedMistagCalib::GetProbBSS() const
 {
-	if( !_floatCalib )
+	if( true ) //!_floatCalib )
 	{
 		return (1.-(double)_tagSS)*0.5 + ((double)_tagSS)*(1.-_mistagSS);
 	}
@@ -216,7 +186,7 @@ double CombinedMistagCalib::GetProbBSS() const
 
 double CombinedMistagCalib::GetProbBbarSS() const
 {
-	if( !_floatCalib )
+	if( true ) //!_floatCalib )
 	{
 		return (1.+(double)_tagSS)*0.5 - ((double)_tagSS)*(1.-_mistagSS);
 	}
@@ -235,7 +205,18 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	_tagSS = (readTagSS>=0.)?(int)ceil(readTagSS):(int)floor(readTagSS);
 	_mistagSS = measurement->GetObservable( mistagSSName )->GetValue();
 
-	_combinedtag = this->GetCombinedTag();
+	/*
+	   if( _onTuple )
+	   {
+	   double readTagOSSS = measurement->GetObservable( tagCombName )->GetValue();
+	   _combinedtag = (readTagOSSS>=0.)?(int)ceil(readTagOSSS):(int)floor(readTagOSSS);
+	   _mistagOSSS = measurement->GetObservable( mistagOSSSName )->GetValue();
+	   }
+	   else
+	   {
+	   _combinedtag = this->GetCombinedTag();
+	   }
+	   */
 
 	if( _tagOS != 0 && _tagSS == 0 ) _OSTagged = true;
 	else _OSTagged = false;
@@ -246,24 +227,11 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	if( _tagOS != 0 && _tagSS != 0 && _combinedtag != 0 ) _OSSSTagged = true;
 	else _OSSSTagged = false;
 
-	if( !_onTuple )
-	{
-		//_OSSSTagged = _OSTagged && _SSTagged;
-		if( _OSSSTagged )
-		{
-			_mistagOS = 0.5;
-			_mistagSS = 0.5;
-		}
-	}
-
 	if( _OSSSTagged )
 	{
 		_OSTagged = false;
 		_SSTagged = false;
 	}
-
-	if( _OSTagged ) _mistagSS = 0.5;
-	if( _SSTagged ) _mistagOS = 0.5;
 
 	_storedD1 = this->RealD1();
 	_storedD2 = this->RealD2();
@@ -272,183 +240,64 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	if( _debugMistag )
 	{
 
-		if( _OSTagged )
-		{
-			double thisEta = measurement->GetObservable( mistagOSSSName )->GetValue();
-			if( fabs( thisEta - _mistagOS ) > 1E-6 )
-			{
-				cout << thisEta << "\t\t" << _mistagOS << endl << endl;
-				exit(0);
-			}
-		}
+		double readTagOSSS = measurement->GetObservable( tagCombName )->GetValue();
+		int _tagOSSS = (readTagOSSS>=0.)?(int)ceil(readTagOSSS):(int)floor(readTagOSSS);
 
-		if( _SSTagged )
-		{
-			double thisEta = measurement->GetObservable( mistagOSSSName )->GetValue();
-			if( fabs( thisEta - _mistagSS ) > 1E-6 )
-			{
-				cout << thisEta << "\t\t" << _mistagSS << endl << endl;
-				exit(0);
-			}
-		}
+		double this_q = this->q();
+		int _calculated = (this_q>=0.)?(int)ceil(this_q):(int)floor(this_q);
 
+		vector<double> allData;
 
-		int thisTag = 0;
+		vector<int> tagdecisions;
+		tagdecisions.push_back( _tagOS );	allData.push_back( _tagOS );
+		tagdecisions.push_back( _tagSS );	allData.push_back( _tagSS );
+		tagdecisions.push_back( _tagOSSS );	allData.push_back( _tagOSSS );
+		tagdecisions.push_back( _calculated ); 	allData.push_back( _calculated );
 
-		if( _OSTagged ) thisTag = _tagOS;
-		if( _SSTagged ) thisTag = _tagSS;
-		if( _OSSSTagged ) thisTag = _combinedtag;
+		DebugClass::AppendToFile( "decisions.txt", tagdecisions );
 
-		bool diff = false;
-		if( thisTag != _combinedtag )
-		{
-			cout << "this" << "\t\t" << "combined" << endl;
-			cout << thisTag << "\t\t" << _combinedtag << endl;
-			diff = true;
-		}
+		_mistagOSSS = measurement->GetObservable( mistagOSSSName )->GetValue();
 
-		if( this->OSTagged() )
-		{
-			_IMistagCalib_OS->setObservables( measurement );
-			double OS_D1 = _IMistagCalib_OS->D1();
-			double OS_D2 = _IMistagCalib_OS->D2();
-			double OS_q = _IMistagCalib_OS->q();
-			double OS_mB = _IMistagCalib_OS->mistagB();
-			double OS_mBb = _IMistagCalib_OS->mistagBbar();
-			if( fabs( OS_D1 - _storedD1 ) > 1E-6 )
-			{
-				cout << " Diff OST D1 !!" << endl;
-				cout << _storedD1 << "\t" << OS_D1 << endl;
-				diff = true;
-			}
-			if( fabs( OS_D2 - _storedD2 ) > 1E-6 )
-			{
-				cout << " Diff OST D2 !!" << endl;
-				cout << _storedD2 << "\t" << OS_D2 << endl;
-				diff = true;
-			}
-			if( fabs( OS_q - _tagOS ) > 1E-6 )
-			{
-				cout << " Diff in OS Tag!!" << endl;
-				cout << _tagOS << "\t" << OS_q << endl;
-				diff = true;
-			}
-			if( fabs( OS_mB - this->mistagB() ) > 1E-6 )
-			{
-				cout << " Diff in OS mistagB!!" << endl;
-				cout << OS_mB << "\t" << this->mistagB() << endl;
-				diff = true;
-			}
-			if( fabs( OS_mBb - this->mistagBbar() ) > 1E-6 )
-			{
-				cout << " Diff in OS mistagBar!!" << endl;
-				cout << OS_mBb << "\t" << this->mistagBbar() << endl;
-				diff = true;
-			}
-			if( diff )
-			{
-				if( _onTuple ) cout << "TRUE" << endl;
-				else cout << "FALSE" << endl;
-				_IMistagCalib_OS->Print();
-				this->Print();
-			}
-		}
-		if( this->SSTagged() )
-		{
-			_IMistagCalib_SS->setObservables( measurement );
-			double OS_D1 = _IMistagCalib_SS->D1();
-			double OS_D2 = _IMistagCalib_SS->D2();
-			double OS_q = _IMistagCalib_SS->q();
-			double OS_mB = _IMistagCalib_SS->mistagB();
-			double OS_mBb = _IMistagCalib_SS->mistagBbar();
-			if( fabs( OS_D1 - _storedD1 ) > 1E-6 )
-			{
-				cout << " Diff SST D1 !!" << endl;
-				diff = true;
-			}
-			if( fabs( OS_D2 - _storedD2 ) > 1E-6 )
-			{
-				cout << " Diff SST D2 !!" << endl;
-				diff = true;
-			}
-			if( fabs( OS_q - _tagSS ) > 1E-6 )
-			{
-				cout << " Diff in OS Tag!!" << endl;
-				cout << _tagSS << "\t" << OS_q << endl;
-				diff = true;
-			}
-			if( fabs( OS_mB - this->mistagB() ) > 1E-6 )
-			{
-				cout << " Diff in SS mistagB!!" << endl;
-				cout << OS_mB << "\t" << this->mistagB() << endl;
-				diff = true;
-			}
-			if( fabs( OS_mBb - this->mistagBbar() ) > 1E-6 )
-			{
-				cout << " Diff in SS mistagBar!!" << endl;
-				cout << OS_mBb << "\t" << this->mistagBbar() << endl;
-				diff = true;
-			}
-			if( diff )
-			{
-				if( _onTuple ) cout << "TRUE" << endl;
-				else cout << "FALSE" << endl;
-				_IMistagCalib_SS->Print();
-				this->Print();
-			}
-		}
-		if( this->OSSSTagged() )
-		{
-			_IMistagCalib_OSSS->setObservables( measurement );
-			double OS_D1 = _IMistagCalib_OSSS->D1();
-			double OS_D2 = _IMistagCalib_OSSS->D2();
-			double OS_q = _IMistagCalib_OSSS->q();
-			double OS_mB = _IMistagCalib_OSSS->mistagB();
-			double OS_mBb = _IMistagCalib_OSSS->mistagBbar();
-			if( fabs( OS_D1 - _storedD1 ) > 1E-6 )
-			{
-				cout << " Diff OSSS D1 !!" << endl;
-				cout << _storedD1 << "\t" << OS_D1 << endl;
-				diff = true;
-			}
-			if( fabs( OS_D2 - _storedD2 ) > 1E-6 )
-			{
-				cout << " Diff OSSS D2 !!" << endl;
-				cout << _storedD2 << "\t" << OS_D2 << endl;
-				diff = true;
-			}
-			if( fabs( OS_q - _combinedtag ) > 1E-6 )
-			{
-				cout << " Diff in OS Tag!!" << endl;
-				cout << _combinedtag << "\t" << OS_q << endl;
-				diff = true;
-			}
-			if( fabs( OS_mB - this->mistagB() ) > 1E-6 )
-			{
-				cout << " Diff in OSSS mistagB!!" << endl;
-				cout << OS_mB << "\t" << this->mistagB() << endl;
-				diff = true;
-			}
-			if( fabs( OS_mBb - this->mistagBbar() ) > 1E-6 )
-			{
-				cout << " Diff in OSSS mistagBar!!" << endl;
-				cout << OS_mBb << "\t" << this->mistagBbar() << endl;
-				diff = true;
-			}
-			if( diff )
-			{
-				if( _onTuple ) cout << "TRUE" << endl;
-				else cout << "FALSE" << endl;
-				_IMistagCalib_OSSS->Print();
-				this->Print();
-			}
-		}
+		double calculated_mistag_2011 = this->getFixedEta();
+		double calculated_mistag_2013 = this->getFloatedMistag();
 
-		if( diff )
-		{
-			measurement->Print();
-			exit(0);
-		}
+		double oldval1, oldval2, oldval3, oldval4, oldval5, oldval6;
+
+		oldval1 = _mistagDeltaSetPoint_OS;
+		oldval2 = _mistagDeltaP1_OS;
+		oldval3 = _mistagDeltaP0_OS;
+
+		oldval4 = _mistagDeltaSetPoint_SS;
+		oldval5 = _mistagDeltaP1_SS;
+		oldval6 = _mistagDeltaP0_SS;
+
+		_mistagDeltaSetPoint_OS = 0.;
+		_mistagDeltaP1_OS = 0.;
+		_mistagDeltaP0_OS = 0.;
+		_mistagDeltaSetPoint_SS = 0.;
+		_mistagDeltaP1_SS = 0.;
+		_mistagDeltaP0_SS = 0.;
+
+		double calculated_mistag_2013_woAssym = this->getFloatedMistag();
+
+		_mistagDeltaSetPoint_OS = oldval1;
+		_mistagDeltaP1_OS = oldval2;
+		_mistagDeltaP0_OS = oldval3;
+		_mistagDeltaSetPoint_SS = oldval4;
+		_mistagDeltaP1_SS = oldval5;
+		_mistagDeltaP0_SS = oldval6;
+
+		vector<double> mistagvalues;
+		mistagvalues.push_back( _mistagOS );				allData.push_back( _mistagOS );
+		mistagvalues.push_back( _mistagSS );				allData.push_back( _mistagSS );
+		mistagvalues.push_back( _mistagOSSS );				allData.push_back( _mistagOSSS );
+		mistagvalues.push_back( calculated_mistag_2011 );		allData.push_back( calculated_mistag_2011 );
+		mistagvalues.push_back( calculated_mistag_2013 );		allData.push_back( calculated_mistag_2013 );
+		mistagvalues.push_back( calculated_mistag_2013_woAssym );	allData.push_back( calculated_mistag_2013_woAssym );
+
+		DebugClass::AppendToFile( "mistags.txt", tagdecisions );
+
+		DebugClass::AppendToFile( "AllData.txt", allData );
 	}
 }
 
@@ -506,26 +355,54 @@ double CombinedMistagCalib::getFloatedMistag() const
 	}
 	else
 	{
-		if( this->GetCombinedTag() == -1 )
+		if( _mistagSS > _mistagOS )
 		{
-			if( _mistagSS > _mistagOS )
+			if( _tagOS == -1 )
 			{
-				thisEta = ( this->mistagOSBbar() * ( 1. - this->mistagSSBbar() ) ) / ( this->mistagOSBbar() * ( 1. - this->mistagSSBbar() ) + ( 1. - this->mistagOSBbar() ) * this->mistagSSBbar() );
+				if( _tagSS == -1 )
+				{
+					thisEta = ( this->mistagOSBbar() * ( 1. - this->mistagSSBbar() ) ) / ( this->mistagOSBbar() * ( 1. - this->mistagSSBbar() ) + ( 1. - this->mistagOSBbar() ) * this->mistagSSBbar() );
+				}
+				else
+				{
+					thisEta = ( this->mistagOSBbar() * ( 1. - this->mistagSSB() ) ) / ( this->mistagOSBbar() * ( 1. - this->mistagSSB() ) + ( 1. - this->mistagOSBbar() ) * this->mistagSSB() );
+				}
 			}
 			else
 			{
-				thisEta = ( ( 1. - this->mistagOSBbar() ) * this->mistagSSBbar() ) / ( ( 1. - this->mistagOSBbar() ) * this->mistagSSBbar() + this->mistagOSBbar() * ( 1. - this->mistagSSBbar() ) );
+				if( _tagSS == -1 )
+				{
+					thisEta = ( this->mistagOSB() * ( 1. - this->mistagSSBbar() ) ) / ( this->mistagOSB() * ( 1. - this->mistagSSBbar() ) + ( 1. - this->mistagOSB() ) * this->mistagSSBbar() );
+				}
+				else
+				{
+					thisEta = ( this->mistagOSB() * ( 1. - this->mistagSSB() ) ) / ( this->mistagOSB() * ( 1. - this->mistagSSB() ) + ( 1. - this->mistagOSB() ) * this->mistagSSB() );
+				}
 			}
 		}
 		else
 		{
-			if( _mistagSS > _mistagOS )
+			if( _tagOS == -1 )
 			{
-				thisEta = ( this->mistagOSB() * ( 1. - this->mistagSSB() ) ) / ( this->mistagOSB() * ( 1. - this->mistagSSB() ) + ( 1. - this->mistagOSB() ) * this->mistagSSB() );
+				if( _tagSS == -1 )
+				{
+					thisEta = ( ( 1. - this->mistagOSBbar() ) * this->mistagSSBbar() ) / ( ( 1. - this->mistagOSBbar() ) * this->mistagSSBbar() + this->mistagOSBbar() * ( 1. - this->mistagSSBbar() ) );
+				}
+				else
+				{
+					thisEta = ( ( 1. - this->mistagOSBbar() ) * this->mistagSSB() ) / ( ( 1. - this->mistagOSBbar() ) * this->mistagSSB() + this->mistagOSBbar() * ( 1. - this->mistagSSB() ) );
+				}
 			}
 			else
 			{
-				thisEta = ( ( 1. - this->mistagOSB() ) * this->mistagSSB() ) / ( ( 1. - this->mistagOSB() ) * this->mistagSSB() + this->mistagOSB() * ( 1. - this->mistagSSB() ) );
+				if( _tagSS == -1 )
+				{
+					thisEta = ( ( 1. - this->mistagOSB() ) * this->mistagSSBbar() ) / ( ( 1. - this->mistagOSB() ) * this->mistagSSBbar() + this->mistagOSB() * ( 1. - this->mistagSSBbar() ) );
+				}
+				else
+				{
+					thisEta = ( ( 1. - this->mistagOSB() ) * this->mistagSSB() ) / ( ( 1. - this->mistagOSB() ) * this->mistagSSB() + this->mistagOSB() * ( 1. - this->mistagSSB() ) );
+				}
 			}
 		}
 	}
@@ -548,7 +425,8 @@ double CombinedMistagCalib::q() const
 	}
 	else if( this->OSSSTagged() )
 	{
-		returnValue = (double)_combinedtag;
+		if( _onTuple ) returnValue = (double)_combinedtag;
+		else returnValue = (double)this->GetCombinedTag();
 	}
 	else
 	{
@@ -600,9 +478,9 @@ double CombinedMistagCalib::mistagOSBbar() const
 	else if( _mistagOS < 0. ) returnValue = 0.;
 	else returnValue = _mistagP0_OS-(_mistagDeltaP0_OS*0.5) + (_mistagP1_OS-(_mistagDeltaP1_OS*0.5))*( _mistagOS - (_mistagSetPoint_OS-(_mistagDeltaSetPoint_OS*0.5)) );
 
-        if( returnValue > 0.5 ) returnValue = 0.5;
-        else if( returnValue < 0. ) returnValue = 0.;
-        return returnValue;
+	if( returnValue > 0.5 ) returnValue = 0.5;
+	else if( returnValue < 0. ) returnValue = 0.;
+	return returnValue;
 }
 
 double CombinedMistagCalib::mistagSSBbar() const
@@ -614,9 +492,9 @@ double CombinedMistagCalib::mistagSSBbar() const
 	else if( _mistagSS < 0. ) returnValue = 0.;
 	else returnValue = _mistagP0_SS-(_mistagDeltaP0_SS*0.5) + (_mistagP1_SS-(_mistagDeltaP1_SS*0.5))*( _mistagSS - (_mistagSetPoint_SS-(_mistagDeltaSetPoint_SS*0.5)) );
 
-        if( returnValue > 0.5 ) returnValue = 0.5;
-        else if( returnValue < 0. ) returnValue = 0.;
-        return returnValue;
+	if( returnValue > 0.5 ) returnValue = 0.5;
+	else if( returnValue < 0. ) returnValue = 0.;
+	return returnValue;
 }
 
 double CombinedMistagCalib::mistagOSSSBbar() const

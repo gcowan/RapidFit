@@ -49,6 +49,8 @@ class DebugClass
 
 		static string GetUniqueFileName();
 
+		template<class T> static void AppendToFile( const string fileName, const vector<T> objects );
+
 	private:
 
 		bool perform_debugging;

@@ -84,9 +84,6 @@ class CombinedMistagCalib : public IMistagCalib
 		ObservableRef mistagP1Name_OSSS, mistagP0Name_OSSS, mistagSetPointName_OSSS, mistagDeltaP1Name_OSSS, mistagDeltaP0Name_OSSS, mistagDeltaSetPointName_OSSS;
 
 		bool _debugMistag;
-		IMistagCalib* _IMistagCalib_OS;
-		IMistagCalib* _IMistagCalib_SS;
-		IMistagCalib* _IMistagCalib_OSSS;
 		ObservableRef mistagOSSSName;
 
 		bool _onTuple;

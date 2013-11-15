@@ -393,6 +393,9 @@ double FitFunction::Evaluate()
 		}
 	}
 
+//	cout << endl << "Goodbye!" << endl;
+//	exit(0);
+
 	return minimiseValue;
 }
 
