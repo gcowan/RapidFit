@@ -205,18 +205,7 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	_tagSS = (readTagSS>=0.)?(int)ceil(readTagSS):(int)floor(readTagSS);
 	_mistagSS = measurement->GetObservable( mistagSSName )->GetValue();
 
-	/*
-	   if( _onTuple )
-	   {
-	   double readTagOSSS = measurement->GetObservable( tagCombName )->GetValue();
-	   _combinedtag = (readTagOSSS>=0.)?(int)ceil(readTagOSSS):(int)floor(readTagOSSS);
-	   _mistagOSSS = measurement->GetObservable( mistagOSSSName )->GetValue();
-	   }
-	   else
-	   {
-	   _combinedtag = this->GetCombinedTag();
-	   }
-	   */
+	_combinedtag = this->GetCombinedTag();
 
 	if( _tagOS != 0 && _tagSS == 0 ) _OSTagged = true;
 	else _OSTagged = false;

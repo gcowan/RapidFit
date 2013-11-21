@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/11/21 Rob Currie
+  - Uploading small fix in new Combined tagging stuff again
+
 2013/11/12 Rob Currie
   - Adding small fix to make sure the original TRandom3 object is propagated when PDFs are copied without constructor.
       This effects toys made using this new copy method and using a fixed seed. This DOES NOT effect anything relating to published results.
