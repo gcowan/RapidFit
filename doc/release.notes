@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/11/26 Rob Currie
+  - Adding some minor debug output
+  - Adding ExternalConstMatrix class
+  - Making ExternalConstraint and ExternalConstMatrix inherit from IConstraintFunction which returns a Chi2 value
+  - Changing internal structure of ConstraintFunction wrapper class to use IConstraintFunction
+  - Adding new ExternalConstMatrix XML interface
+
 2013/11/21 Rob Currie
   - Uploading small fix in new Combined tagging stuff again
 

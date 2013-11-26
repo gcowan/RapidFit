@@ -1,5 +1,5 @@
 /*!
- * @class ExternalConstraint
+ * @class ExternalConstMatrix
  *
  * @brief A class that holds experimentally dervied constraints on fit parameters
  *
@@ -7,8 +7,8 @@
  */
 
 #pragma once
-#ifndef EXTERNAL_CONSTRAINT_H
-#define EXTERNAL_CONSTRAINT_H
+#ifndef EXTERNAL_CONSTMATRIX_H
+#define EXTERNAL_CONSTMATRIX_H
 
 #include "IConstraintFunction.h"
 //	System Headers
@@ -16,7 +16,7 @@
 
 using namespace::std;
 
-class ExternalConstraint : public IConstraintFunction
+class ExternalConstMatrix : public IConstraintFunction
 {
 	public:
 		/*!
@@ -28,17 +28,17 @@ class ExternalConstraint : public IConstraintFunction
 		 *
 		 * @param Error This is the Error on the Constraint 'width of the Gaussian'
 		 */
-		ExternalConstraint( string Name, double Value, double Error );
+		ExternalConstMatrix( string Name, string Value, string Error, string Correlations );
 
-		ExternalConstraint( const ExternalConstraint& input );
+		ExternalConstMatrix( const ExternalConstMatrix& input );
 
 		/*!
 		 * Destructor
 		 */
-		~ExternalConstraint();
+		~ExternalConstMatrix();
 
 		/*!
-		 * @brief Get the Name of the ExternalConstraint
+		 * @brief Get the Name of the ExternalConstMatrix
 		 *
 		 * @return Returns the name of the PhysicsParameter Being Constrained
 		 */
@@ -50,20 +50,6 @@ class ExternalConstraint : public IConstraintFunction
 
 		double GetChi2() const;
 
-		/*!
-		 * @brief Get the Value of the ExternalConstraint
-		 *
-		 * @return the Central Value of the Constraint
-		 */
-		double GetValue() const;
-
-		/*!
-		 * @brief Get the Error of the ExternalConstraint
-		 *
-		 * @return returns the Error on the Constraint
-		 */
-		double GetError() const;
-
 		void Print() const;
 
 		string XML() const;
@@ -72,8 +58,12 @@ class ExternalConstraint : public IConstraintFunction
 
 		bool isExternalMatrix() const;
 	private:
-		string name;		/*!	External Constraint Name		*/
-		double value, error;	/*!	External Constraint Value and Error	 */
+		string names;		/*!	External Constraint Name		*/
+		string values, errors;	/*!	External Constraint Value and Error	 */
+		string correlations;
+
+		vector<double> names_val, values_val, errors_val;
+		vector<vector<double> > corr_matrix;
 
 		ParameterSet* internalParameterSet;
 		vector<string> wantedParameters;

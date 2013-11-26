@@ -567,6 +567,14 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	config->XMLConstraints = config->xmlFile->GetConstraints();
 
+	if( config->debug != NULL )
+	{
+		if( config->debug->DebugThisClass( "main" ) )
+		{
+			cout << "main: Performing Fit" << endl;
+		}
+	}
+
 	config->GlobalResult = FitAssembler::DoSafeFit( config->theMinimiser, config->theFunction, config->argumentParameterSet,
 
 			config->pdfsAndData, config->XMLConstraints, config->Force_Continue_Flag, config->OutputLevel, config->debug );
@@ -678,19 +686,19 @@ int PerformMainFit( RapidFitConfiguration* config )
 			//Tell the PDF you want to copy the form of all continuous objects on the don't integrate list
 			for( unsigned int j=0; j< temp_pdf->GetDoNotIntegrateList().size(); ++j )
 			{
-				string observableName = temp_pdf->GetDoNotIntegrateList()[j];
-				IConstraint* temp_constr = temp_boundary->GetConstraint( observableName );
-				if( temp_constr != NULL )
-				{
-					if( temp_constr->IsDiscrete() == false )
-					{
-						PDFConfigurator* pdf_config = new PDFConfigurator();
-						pdf_config->addObservableToModel( observableName, config->pdfsAndData[i]->GetDataSet() );
-						//pdf_config->setFitFunc( "pol9" );
-						IPDF* observable_modeller = ClassLookUp::LookUpPDFName( "Observable_1D_distribution", pdf_config );
-						temp_pdf->SetObservableDistribution( observableName, observable_modeller );
-					}
-				}
+			string observableName = temp_pdf->GetDoNotIntegrateList()[j];
+			IConstraint* temp_constr = temp_boundary->GetConstraint( observableName );
+			if( temp_constr != NULL )
+			{
+			if( temp_constr->IsDiscrete() == false )
+			{
+			PDFConfigurator* pdf_config = new PDFConfigurator();
+			pdf_config->addObservableToModel( observableName, config->pdfsAndData[i]->GetDataSet() );
+			//pdf_config->setFitFunc( "pol9" );
+			IPDF* observable_modeller = ClassLookUp::LookUpPDFName( "Observable_1D_distribution", pdf_config );
+			temp_pdf->SetObservableDistribution( observableName, observable_modeller );
+			}
+			}
 			}
 			*/
 
@@ -992,14 +1000,14 @@ int calculateFitFractions( RapidFitConfiguration* config )
 {
 	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
 	ParameterSet * parset = config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
-    parset->SetPhysicsParameter("BkgFraction", 0., 0., 0., 0., "BkgFraction", "");
-    pdfAndData->SetPhysicsParameters( parset );//config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
+	parset->SetPhysicsParameter("BkgFraction", 0., 0., 0., 0., "BkgFraction", "");
+	pdfAndData->SetPhysicsParameters( parset );//config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
 
 	IDataSet * dataSet = pdfAndData->GetDataSet();
 	IPDF * pdf = pdfAndData->GetPDF();
 
 	RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( pdf, true, true );
-    double total_integral(0.);
+	double total_integral(0.);
 	double integral(0.);
 	double fraction(0.);
 	double sumOfFractions(0.);
@@ -1016,19 +1024,19 @@ int calculateFitFractions( RapidFitConfiguration* config )
 		ComponentRef * thisRef = new ComponentRef( pdfComponents[i], "dummyObservable" );
 		integral = testIntegrator->NumericallyIntegratePhaseSpace( dataSet->GetBoundary(), doNotIntegrate, thisRef );
 		if ( pdfComponents[i] == "0" )
-        {
-            total_integral = integral;
-            std::cout << "Total integral: " << total_integral << std::endl;
-        }
-        delete thisRef;
+		{
+			total_integral = integral;
+			std::cout << "Total integral: " << total_integral << std::endl;
+		}
+		delete thisRef;
 		fraction = integral/total_integral;
 		if ( pdfComponents[i] != "0" && pdfComponents[i] != "1-Z" )
-        {
-            std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
-		    fitFractions.push_back( fraction );
-		    sumOfFractions += fraction;
-        }
-        if ( pdfComponents[i] == "1-Z" ) std::cout << pdfComponents[i] << "\t fraction: " << 1. - fraction << std::endl;
+		{
+			std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
+			fitFractions.push_back( fraction );
+			sumOfFractions += fraction;
+		}
+		if ( pdfComponents[i] == "1-Z" ) std::cout << pdfComponents[i] << "\t fraction: " << 1. - fraction << std::endl;
 	}
 	std::cout << "Sum of fractions (not necessarily 1!): " << sumOfFractions << std::endl;
 

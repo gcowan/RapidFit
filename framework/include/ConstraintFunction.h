@@ -12,7 +12,9 @@
 
 ///	RapidFit Headers
 #include "ParameterSet.h"
+#include "IConstraintFunction.h"
 #include "ExternalConstraint.h"
+#include "ExternalConstMatrix.h"
 ///	System Headers
 #include <vector>
 
@@ -26,7 +28,7 @@ class ConstraintFunction
 		 *
 		 * @param Input   This is a list of the ExternalConstraints of parameters in the ParameterSet around their minima
 		 */
-		ConstraintFunction( const vector<ExternalConstraint*> Input );
+		ConstraintFunction( const vector<IConstraintFunction*> Input );
 
 		/*!
 		 * @brief Copy Constructor
@@ -77,7 +79,7 @@ class ConstraintFunction
 
 
 		vector< int > Found_Position;				/*	! Undocumented!	*/
-		vector< ExternalConstraint* > allConstraints;		/*	Internal list of all the External Constraints requested	*/
+		vector< IConstraintFunction* > allConstraints;		/*	Internal list of all the External Constraints requested	*/
 };
 
 #endif

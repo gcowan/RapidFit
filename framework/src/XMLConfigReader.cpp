@@ -1196,13 +1196,17 @@ ConstraintFunction * XMLConfigReader::GetConstraintFunction( XMLTag * InputTag )
 {
 	if ( InputTag->GetName() == "ConstraintFunction" )
 	{
-		vector< ExternalConstraint* > constraints;
+		vector< IConstraintFunction* > constraints;
 		vector< XMLTag* > functionComponents = InputTag->GetChildren();
 		for ( unsigned int componentIndex = 0; componentIndex < functionComponents.size(); ++componentIndex )
 		{
 			if ( functionComponents[componentIndex]->GetName() == "ExternalConstraint" )
 			{
-				constraints.push_back( GetExternalConstraint( functionComponents[componentIndex] ) );
+				constraints.push_back( (IConstraintFunction*)GetExternalConstraint( functionComponents[componentIndex] ) );
+			}
+			else if( functionComponents[componentIndex]->GetName() == "ExternalConstMatrix" )
+			{
+				constraints.push_back( (IConstraintFunction*)GetExternalConstMatrix( functionComponents[componentIndex] ) );
 			}
 		}
 
@@ -1256,6 +1260,57 @@ ExternalConstraint * XMLConfigReader::GetExternalConstraint( XMLTag * InputTag )
 	else
 	{
 		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"ExternalConstraint\"" << endl;
+		exit(1);
+	}
+}
+
+//Create an ExternalConstMatrix for the appropriate xml tag
+ExternalConstMatrix * XMLConfigReader::GetExternalConstMatrix( XMLTag * InputTag )
+{
+	if ( InputTag->GetName() == "ExternalConstMatrix" )
+	{
+		string names, values, errors, correlations;
+		bool hasNames=false, hasValues=false, hasErrors=false, hasCorrelations=false;
+		vector< XMLTag* > externalComponents = InputTag->GetChildren();
+		for ( unsigned int componentIndex = 0; componentIndex < externalComponents.size(); ++componentIndex )
+		{
+			if ( externalComponents[componentIndex]->GetName() == "Names" )
+			{
+				names = XMLTag::GetStringValue( externalComponents[componentIndex] );
+				hasNames=true;
+			}
+			else if ( externalComponents[componentIndex]->GetName() == "Values" )
+			{
+				values = XMLTag::GetStringValue( externalComponents[componentIndex] );
+				hasValues=true;
+			}
+			else if ( externalComponents[componentIndex]->GetName() == "Errors" )
+			{
+				errors = XMLTag::GetStringValue( externalComponents[componentIndex] );
+				hasErrors=true;
+			}
+			else if ( externalComponents[componentIndex]->GetName() == "Correlations" )
+			{
+				correlations = XMLTag::GetStringValue( externalComponents[componentIndex] );
+				hasCorrelations=true;
+			}
+			else
+			{
+				cerr << "Unrecognised constraint component: " << externalComponents[componentIndex]->GetName() << endl;
+				exit(1);
+			}
+		}
+		if( !hasNames || !hasValues || !hasErrors || !hasCorrelations )
+		{
+			cerr << "Incorrect xml tags provided to assemble \"ExternalConstMatrix\"" << endl;
+			exit(-87623);
+		}
+
+		return new ExternalConstMatrix( names, values, errors, correlations );
+	}
+	else
+	{
+		cerr << "Incorrect xml tag provided: \"" << InputTag->GetName() << "\" not \"ExternalConstMatrix\"" << endl;
 		exit(1);
 	}
 }

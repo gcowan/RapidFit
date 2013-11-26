@@ -276,6 +276,11 @@ class XMLConfigReader : public I_XMLConfigReader
 		ExternalConstraint * GetExternalConstraint( XMLTag* );
 
 		/*!
+		 * @brief Create an ExternalConstMatrix for the appropriate xml tag
+		 */
+		ExternalConstMatrix * GetExternalConstMatrix( XMLTag * InputTag );
+
+		/*!
 		 * @brief Construct a ScanParam object based on the XMLTag
 		 */
 		ScanParam * GetScanParam( XMLTag * InputTag );
