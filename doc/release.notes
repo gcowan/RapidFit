@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/11/28 Rob Currie
+  - Adding scripts/mkAngAccWeights.C which generates a .root file with the vector of the angular acceptance weights for use with the technology in RapidFit.
+      To use this you have to require that you don't want the angular acceptance histograms in the numerator. This is a known feature of using a set of weights to fit to be compatible with other groups.
+      If you want to generate projection plots you need to use the cod in RapidFit to generate the angular acceptance histograms
+  - Some minor code added and commented out for FitFunction, in time I will get around to adding this to make debugging output a bit cleaner
+  - Changed the Combined Mistag tag decision code to only be called when an event is doubly tagged. This avoids strange segfaults when it's called on single tagged events.
+  - Removing hard-coded 0.06 from the 2012 tRes model in RapidFit to be inline with the current ANA note for JpsiPhi
+
 2013/11/26 Rob Currie
   - Adding some minor debug output
   - Adding ExternalConstMatrix class

@@ -331,7 +331,7 @@ double FitFunction::Evaluate()
 		{
 			minimiseValue+=temp;
 		}
-		//cout << "temp: " << minimiseValue << endl;
+		//cout << endl << "temp: " << minimiseValue << endl << endl;
 	}
 
 	//Calculate the value of each constraint

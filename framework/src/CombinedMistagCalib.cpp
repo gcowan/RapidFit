@@ -129,7 +129,7 @@ void CombinedMistagCalib::addObservables( vector<string>& observableNames ) cons
 
 int CombinedMistagCalib::GetCombinedTag() const
 {
-	//if( _tagSS == _tagOS ) return _tagSS;
+	if( _tagSS == _tagOS ) return _tagSS;
 
 	int decision = 0;
 
@@ -150,7 +150,7 @@ int CombinedMistagCalib::GetCombinedTag() const
 
 double CombinedMistagCalib::GetProbBOS() const
 {
-	if( true ) //!_floatCalib )
+	if( !_floatCalib )
 	{
 		return (1.-(double)_tagOS)*0.5 + ((double)_tagOS)*(1.-_mistagOS);
 	}
@@ -162,7 +162,7 @@ double CombinedMistagCalib::GetProbBOS() const
 
 double CombinedMistagCalib::GetProbBbarOS() const
 {
-	if( true )//!_floatCalib )
+	if( !_floatCalib )
 	{
 		return (1.+(double)_tagOS)*0.5 - ((double)_tagOS)*(1.-_mistagOS);
 	}
@@ -174,7 +174,7 @@ double CombinedMistagCalib::GetProbBbarOS() const
 
 double CombinedMistagCalib::GetProbBSS() const
 {
-	if( true ) //!_floatCalib )
+	if( !_floatCalib )
 	{
 		return (1.-(double)_tagSS)*0.5 + ((double)_tagSS)*(1.-_mistagSS);
 	}
@@ -186,7 +186,7 @@ double CombinedMistagCalib::GetProbBSS() const
 
 double CombinedMistagCalib::GetProbBbarSS() const
 {
-	if( true ) //!_floatCalib )
+	if( !_floatCalib )
 	{
 		return (1.+(double)_tagSS)*0.5 - ((double)_tagSS)*(1.-_mistagSS);
 	}
@@ -205,8 +205,6 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	_tagSS = (readTagSS>=0.)?(int)ceil(readTagSS):(int)floor(readTagSS);
 	_mistagSS = measurement->GetObservable( mistagSSName )->GetValue();
 
-	_combinedtag = this->GetCombinedTag();
-
 	if( _tagOS != 0 && _tagSS == 0 ) _OSTagged = true;
 	else _OSTagged = false;
 
@@ -220,6 +218,7 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	{
 		_OSTagged = false;
 		_SSTagged = false;
+		_combinedtag = this->GetCombinedTag();
 	}
 
 	_storedD1 = this->RealD1();

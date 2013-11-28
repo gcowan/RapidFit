@@ -144,14 +144,14 @@ double Phis2012ResolutionModel::GetThisScale()
 {
         double thisRes = eventResolution;
         if( wantedComponent == 1 ) { 
-		sfbar = sfBarOffset + (sfBarSlope/0.06)*(eventResolution - sigmaBar);
-		sfsigma = sfSigmaOffset + (sfSigmaSlope/0.06)*(eventResolution - sigmaBar);
+		sfbar = sfBarOffset + (sfBarSlope)*(eventResolution - sigmaBar);
+		sfsigma = sfSigmaOffset + (sfSigmaSlope)*(eventResolution - sigmaBar);
 		resScale = -1.0*sqrt(resFrac/(1.0-resFrac))*sfsigma + sfbar;
 		eventResolution *= resScale; 
 	}
         else if( wantedComponent == 2 ) { 
-		sfbar = sfBarOffset + (sfBarSlope/0.06)*(eventResolution - sigmaBar);
-		sfsigma = sfSigmaOffset + (sfSigmaSlope/0.06)*(eventResolution - sigmaBar);
+		sfbar = sfBarOffset + (sfBarSlope)*(eventResolution - sigmaBar);
+		sfsigma = sfSigmaOffset + (sfSigmaSlope)*(eventResolution - sigmaBar);
 		resScale2 =sqrt((1.0-resFrac)/resFrac)*sfsigma + sfbar;
 		eventResolution *= resScale2; 
 	}
