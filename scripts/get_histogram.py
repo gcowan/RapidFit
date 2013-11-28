@@ -20,12 +20,11 @@ for name in names:
 	bins=histogram.GetNbinsX()
 	for index in range(bins):
 		bin=histogram.GetBin(index)		 
-		lower=histogram.GetBinLowEdge(bin)
-		width=histogram.GetBinWidth(bin)
-		number=histogram.GetBinContent(bin)  
+		lower=histogram.GetBinLowEdge(bin+1)
+		width=histogram.GetBinWidth(bin+1)
+		number=histogram.GetBinContent(bin+1)  
 		upper=lower+width
-		if bin is not 0:
-			output.write(str(lower)+' '+str(upper)+' '+str(number)+'\n')
+		output.write(str(lower)+' '+str(upper)+' '+str(number)+'\n')
 	output.close()
 	print name, bins
 

@@ -14,6 +14,7 @@
   - Making ExternalConstraint and ExternalConstMatrix inherit from IConstraintFunction which returns a Chi2 value
   - Changing internal structure of ConstraintFunction wrapper class to use IConstraintFunction
   - Adding new ExternalConstMatrix XML interface
+  - Updating histogram script for extracting a histogram from a root file and the histograms from the .root file for the 2013 Jpisphi analysis
 
 2013/11/21 Rob Currie
   - Uploading small fix in new Combined tagging stuff again
