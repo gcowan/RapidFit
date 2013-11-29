@@ -114,6 +114,9 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		ObservableRef cthetalName;
 		ObservableRef phihName;
 
+		ObservableRef BetaSName;
+		bool _useBetaSParameter;
+
 		double A0A0_value;
 		double APAP_value;
 		double ATAT_value;

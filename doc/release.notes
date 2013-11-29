@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/11/29 Rob Currie
+  - Adding minor additional fix to the Combined mistag calibration (circular loop was construced in very speicific cases in the logic so I'm now forgoing a check for the particles charge in the mistag calculations)
+  - Adding BetaS as an optional Physics Parameter for JpsiPhi
+  - PDFs now constructed by the XMLConfigReader are pre-configured to have the ParameterSet in the XML _ONLY_ if the XML alone has enough information to configure the PDF
+
 2013/11/28 Rob Currie
   - Adding scripts/mkAngAccWeights.C which generates a .root file with the vector of the angular acceptance weights for use with the technology in RapidFit.
       To use this you have to require that you don't want the angular acceptance histograms in the numerator. This is a known feature of using a set of weights to fit to be compatible with other groups.

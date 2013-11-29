@@ -2246,7 +2246,24 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	}
 
 	IPDF* returnable_pdf = GetNamedPDF( InputTag, InputBoundary, overloadConfigurator, false );
-	cout << returnable_pdf->GetLabel() << endl;
+        cout << "XMLConfigReader:: Constructed" << returnable_pdf->GetLabel() << endl;
+
+        ParameterSet* thisParameterSet = this->GetFitParameters();
+        vector<string> haveNames = thisParameterSet->GetAllNames();
+        vector<string> wantedNames = returnable_pdf->GetPrototypeParameterSet();
+        bool can_be_defined=true;
+        for( unsigned int i=0; i< wantedNames.size(); ++i )
+        {
+                if( StringProcessing::VectorContains( &haveNames, &(wantedNames[i]) ) == -1 )
+                {
+                        can_be_defined = false;
+                        break;
+                }
+        }
+
+        if( can_be_defined ) returnable_pdf->UpdatePhysicsParameters( thisParameterSet );
+
+        delete thisParameterSet;
 
 	returnable_pdf->SetRandomFunction( int(GetSeed()) );
 	returnable_pdf->SetMCCacheStatus( false );

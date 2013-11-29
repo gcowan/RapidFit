@@ -211,7 +211,7 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 	if( _tagOS == 0 && _tagSS != 0 ) _SSTagged = true;
 	else _SSTagged = false;
 
-	if( _tagOS != 0 && _tagSS != 0 && _combinedtag != 0 ) _OSSSTagged = true;
+	if( _tagOS != 0 && _tagSS != 0 ) _OSSSTagged = true;
 	else _OSSSTagged = false;
 
 	if( _OSSSTagged )
@@ -459,7 +459,7 @@ double CombinedMistagCalib::mistagBbar() const
 
 double CombinedMistagCalib::mistagOSBbar() const
 {
-	if( fabs(this->q()) < 0.5 ) return 0.5;
+	//if( fabs(this->q()) < 0.5 ) return 0.5;
 
 	double returnValue = 0.;
 	if( _mistagOS > 0.5 ) returnValue = 0.5;
@@ -473,7 +473,7 @@ double CombinedMistagCalib::mistagOSBbar() const
 
 double CombinedMistagCalib::mistagSSBbar() const
 {
-	if( fabs(this->q()) < 0.5 ) return 0.5;
+	//if( fabs(this->q()) < 0.5 ) return 0.5;
 
 	double returnValue = 0.;
 	if( _mistagSS > 0.5 ) returnValue = 0.5;
@@ -487,7 +487,7 @@ double CombinedMistagCalib::mistagSSBbar() const
 
 double CombinedMistagCalib::mistagOSSSBbar() const
 {
-	if( fabs(this->q()) < 0.5 ) return 0.5;
+	//if( fabs(this->q()) < 0.5 ) return 0.5;
 
 	double returnValue = 0.;
 	if( _onTuple )
@@ -507,7 +507,7 @@ double CombinedMistagCalib::mistagOSSSBbar() const
 
 double CombinedMistagCalib::mistagOSB() const
 {
-	if( fabs(this->q()) < 0.5 ) return 0.5;
+	//if( fabs(this->q()) < 0.5 ) return 0.5;
 
 	double returnValue = 0.;
 	if( _mistagOS > 0.5 ) returnValue = 0.5;
@@ -521,7 +521,7 @@ double CombinedMistagCalib::mistagOSB() const
 
 double CombinedMistagCalib::mistagSSB() const
 {
-	if( fabs(this->q()) < 0.5 ) return 0.5;
+	//if( fabs(this->q()) < 0.5 ) return 0.5;
 
 	double returnValue = 0.;
 	if( _mistagSS > 0.5 ) returnValue = 0.5;
@@ -535,7 +535,7 @@ double CombinedMistagCalib::mistagSSB() const
 
 double CombinedMistagCalib::mistagOSSSB() const
 {
-	if( fabs(this->q()) < 0.5 ) return 0.5;
+	//if( fabs(this->q()) < 0.5 ) return 0.5;
 
 	double returnValue = 0.;
 	if( _onTuple )

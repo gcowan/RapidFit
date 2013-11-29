@@ -24,6 +24,7 @@
 #include <iostream>
 #include <cmath>
 #include <iomanip>
+#include <stdlib.h>
 // #include "TF1.h"
 
 using namespace::std;
@@ -33,33 +34,34 @@ PDF_CREATOR( Bs2JpsiPhi_Signal_v6 );
 //......................................
 //Constructor(s)
 //New one with configurator
-Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : BasePDF(),
+Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : BasePDF()
 	// Physics parameters
-	gammaName				( configurator->getName("gamma") )
+	, gammaName			( configurator->getName("gamma") )
 	, deltaGammaName		( configurator->getName("deltaGamma") )
 	, deltaMName			( configurator->getName("deltaM") )
-	, Phi_sName				( configurator->getName("Phi_s") )
+	, Phi_sName			( configurator->getName("Phi_s") )
 	, Azero_sqName			( configurator->getName("Azero_sq") )
 	, Apara_sqName			( configurator->getName("Apara_sq") )
 	, Aperp_sqName			( configurator->getName("Aperp_sq") )
 	, delta_zeroName		( configurator->getName("delta_zero") )
 	, delta_paraName		( configurator->getName("delta_para") )
 	, delta_perpName		( configurator->getName("delta_perp") )
-	, As_sqName				( configurator->getName("F_s") )
+	, As_sqName			( configurator->getName("F_s") )
 	, delta_sName			( configurator->getName("delta_s") )
-	, CspName				( configurator->getName("Csp") )
+	, CspName			( configurator->getName("Csp") )
 	, cosdparName			( configurator->getName("cosdpar") ) //PELC-COSDPAR Special for fitting cosdpar separately
 	, cosphisName			( configurator->getName("cosphis") )
 	, sinphisName			( configurator->getName("sinphis") )
 	, lambdaName			( configurator->getName("lambda") )
 	// Observables
-	, timeName				( configurator->getName("time") )
+	, timeName			( configurator->getName("time") )
 	, cosThetaName			( configurator->getName("cosTheta") )
 	, cosPsiName			( configurator->getName("cosPsi") )
-	, phiName				( configurator->getName("phi") )
+	, phiName			( configurator->getName("phi") )
 	, cthetakName 			( configurator->getName("helcosthetaK") )
 	, cthetalName			( configurator->getName("helcosthetaL") )
-	, phihName				( configurator->getName("helphi") )
+	, phihName			( configurator->getName("helphi") )
+	, BetaSName			( configurator->getName("betaS") )
 	// Other things
 	, _useEventResolution(false)
 	, _useTimeAcceptance(false)
@@ -84,6 +86,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false), resolutionModel(NULL)
+	, _useBetaSParameter(false)
 {
 	componentIndex = 0;
 
@@ -108,15 +111,20 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	_useNewMistagModel = configurator->isTrue( "useNewMistagModel" );
 	DebugFlag_v6 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
-	string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
-	if( offsetToGammaForBetaFactor == "" )
+	_useBetaSParameter = configurator->isTrue( "floatBetaS" );
+
+	if( !_useBetaSParameter )
 	{
-		_offsetToGammaForBetaFactor = 0.0 ;
-	}
-	else
-	{
-		_offsetToGammaForBetaFactor = atof( offsetToGammaForBetaFactor.c_str() ) ;
-		if( !isCopy ) cout << "Bs2JpsiPhi_Signal_v6:: Adding OffsetToGammaForBetaFactor = " << _offsetToGammaForBetaFactor << endl ;
+		string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
+		if( offsetToGammaForBetaFactor == "" )
+		{
+			_offsetToGammaForBetaFactor = 0.0;
+		}
+		else
+		{
+			_offsetToGammaForBetaFactor = strtod( offsetToGammaForBetaFactor.c_str(), NULL ) ;
+			if( !isCopy ) cout << "Bs2JpsiPhi_Signal_v6:: Adding OffsetToGammaForBetaFactor = " << _offsetToGammaForBetaFactor << endl ;
+		}
 	}
     
 	//...............................................
@@ -162,8 +170,8 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	{
 		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) )
 		{
-			//timeAcc = new SlicedAcceptance( 0., 14.0, 0.00826, isCopy) ;
-			timeAcc = new SlicedAcceptance( 0., 14.0, 0.00, isCopy) ;
+			timeAcc = new SlicedAcceptance( 0., 14.0, 0.00826, isCopy) ;
+			//timeAcc = new SlicedAcceptance( 0., 14.0, 0.00, isCopy) ;
 			if( !isCopy ) cout << "Bs2JpsiPhi_Signal_v6:: Constructing timeAcc: Upper time acceptance beta=0.00826 [0 < t < 14] " << endl ;
 		}
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" )
@@ -288,6 +296,8 @@ void Bs2JpsiPhi_Signal_v6::MakePrototypes()
 	resolutionModel->addParameters( parameterNames );
 	_mistagCalibModel->addParameters( parameterNames );
 
+	if( _useBetaSParameter ) parameterNames.push_back( BetaSName );
+
 	allParameters = ParameterSet(parameterNames);
 }
 
@@ -336,6 +346,8 @@ bool Bs2JpsiPhi_Signal_v6::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	//Let the resolution model take its specific parameters out
 	resolutionModel->setParameters( allParameters );
 	_mistagCalibModel->setParameters( allParameters );
+
+	if( _useBetaSParameter ) _offsetToGammaForBetaFactor = allParameters.GetPhysicsParameter( BetaSName )->GetValue();
 
 	// Physics parameters.
 	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue() + _offsetToGammaForBetaFactor ;
