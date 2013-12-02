@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/12/02 Rob Currie
+  - fixed a bug in the SlicedAcceptance code so that the construcror doesn't attempt to read beyond the end of the acceptance .txt files
+
 2013/11/29 Rob Currie
   - Adding minor additional fix to the Combined mistag calibration (circular loop was construced in very speicific cases in the logic so I'm now forgoing a check for the particles charge in the mistag calculations)
   - Adding BetaS as an optional Physics Parameter for JpsiPhi

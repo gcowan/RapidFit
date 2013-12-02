@@ -97,6 +97,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b, bool quiet )
 	{
 		double this_th = tlow + is*dt;
 		slices.push_back( new AcceptanceSlice( tlow, this_th, dh ) );
+		cout << tlow << "   " <<  this_th << "  " << dh << endl;
 	}
 
 	//....done.....
@@ -163,6 +164,15 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 
 	if( !quiet ) cout << "Opening: " << fullFileName << endl;
 
+	int number_of_lines = 0;
+	std::string line;
+	std::ifstream myfile( fullFileName.c_str() );
+
+ 	while (std::getline(myfile, line))	++number_of_lines;
+
+	myfile.close();
+
+
 	ifstream in;
 	in.open(fullFileName.c_str());
 	if( in.fail() )
@@ -173,10 +183,14 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 
 	vector<double> lowEdge; vector<double> hiEdge; vector<double> binContent;
 	int ok = true;
+	unsigned int this_line=0;
 	while (ok)
 	{
-		lowEdge.push_back(stream(in));  hiEdge.push_back(stream(in)); binContent.push_back(stream(in) );
-		if (in.eof()  == true || in.good() == false) ok =false;
+		lowEdge.push_back(stream(in));
+		hiEdge.push_back(stream(in));
+		binContent.push_back(stream(in) );
+		++this_line;
+		if( in.eof()  == true || in.good() == false || this_line == number_of_lines ) ok =false;
 	}
 	in.close();
 
@@ -187,7 +201,9 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 		double height = binContent[is];
 		//cout << " Adding slice " << tlow << " /  " << thigh << " /  " << height << endl ;
 		slices.push_back( new AcceptanceSlice( this_tlow, this_thigh, height ) );
+		//cout << this_tlow << "  " << this_thigh << "  " << height << endl;
 	}
+	//exit(0);
 	if( !quiet ) cout << "Time Acc Slices: " << lowEdge.size() << endl;
 	if( lowEdge.size() == 1 )
 	{
@@ -195,6 +211,7 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 		exit(0);
 	}
 	//....done.....
+
 
 	_sortedSlices = this->isSorted();
 
