@@ -617,7 +617,7 @@ double Bs2JpsiPhi_Signal_v6::EvaluateTimeOnly(DataPoint * measurement)
 		bool c3 = (t>0.) && (returnValue <= 0.)  ;
 		if( (c1 || c3)  )
 		{
-			this->DebugPrint( " Bs2JpsiPhi_Signal_v6::EvaluateTimeOnly() returns <=0 or nan :" , returnValue ) ;
+			this->DebugPrintEvaluate( " Bs2JpsiPhi_Signal_v6::EvaluateTimeOnly() returns <=0 or nan :" , returnValue ) ;
 			if( std::isnan(returnValue) ) throw 10 ;
 			if( returnValue <= 0. ) throw 10 ;
 		}
@@ -665,7 +665,7 @@ double Bs2JpsiPhi_Signal_v6::Normalisation(DataPoint * measurement, PhaseSpaceBo
 			bool c2 = (returnValue <= 0.);
 			if( c1 || c2 )
 			{
-				this->DebugPrint( " Bs2JpsiPhi_Signal_v6::Normalisation() returns <=0 or nan :" , returnValue ) ;
+				this->DebugPrintNormalisation( " Bs2JpsiPhi_Signal_v6::Normalisation() returns <=0 or nan :" , returnValue ) ;
 				if( std::isnan(returnValue) ) throw 10 ;
 				if( returnValue <= 0. ) throw 10 ;
 			}
@@ -1144,14 +1144,56 @@ void Bs2JpsiPhi_Signal_v6::prepareCDS()
 }
 
 
+void Bs2JpsiPhi_Signal_v6::DebugPrintEvaluate( string message, double value ) const
+{
+	PDF_THREAD_LOCK
+
+
+	cout << "1: " << " A: " << CachedA1 << " * " << " T: " << timeFactorA0A0(  ) << " = " << CachedA1*timeFactorA0A0(  ) << endl;
+	cout << "2: " << " A: " << CachedA2 << " * " << " T: " << timeFactorAPAP(  ) << " = " << CachedA2*timeFactorAPAP(  ) << endl;
+	cout << "3: " << " A: " << CachedA3 << " * " << " T: " << timeFactorATAT(  ) << " = " << CachedA3*timeFactorATAT(  ) << endl;
+
+	cout << "4: " << " A: " << CachedA4 << " * " << " T: " << timeFactorImAPAT(  ) << " = " << CachedA4*timeFactorImAPAT(  ) << endl;
+	cout << "5: " << " A: " << CachedA5 << " * " << " T: " << timeFactorReA0AP(  ) << " = " << CachedA5*timeFactorReA0AP(  ) << endl;
+	cout << "6: " << " A: " << CachedA6 << " * " << " T: " << timeFactorImA0AT(  ) << " = " << CachedA6*timeFactorImA0AT(  ) << endl;
+
+	cout << "7: " << " A: " << CachedA7 << " * " << " T: " << timeFactorASAS(  ) << " = " << CachedA7*timeFactorASAS(  ) << endl;
+
+	cout << "8: " << " A: " << CachedA8 << " * " << " T: " << timeFactorReASAP(  ) << " = " << CachedA8*timeFactorReASAP(  ) << endl;
+	cout << "9: " << " A: " << CachedA9 << " * " << " T: " << timeFactorImASAT(  ) << " = " << CachedA9*timeFactorImASAT(  ) << endl;
+	cout << "10:" << " A: " << CachedA10 << " * " << " T: " << timeFactorReASA0(  ) << " = " << CachedA10*timeFactorReASA0(  ) << endl;
+
+	this->DebugPrint( message, value );
+	PDF_THREAD_UNLOCK
+}
+
+void Bs2JpsiPhi_Signal_v6::DebugPrintNormalisation( string message, double value ) const
+{
+        PDF_THREAD_LOCK
+
+	cout << "1: " << " A: " << A0()*A0() << " * " << " T: " << timeFactorA0A0Int(  ) << " * " << " Acc: " <<  angAccI1 << " = " << A0()*A0()*timeFactorA0A0Int(  ) * angAccI1 << endl;
+	cout << "2: " << " A: " << AP()*AP() << " * " << " T: " << timeFactorAPAPInt(  ) << " * " << " Acc: " <<  angAccI2 << " = " << AP()*AP()*timeFactorAPAPInt(  ) * angAccI2 << endl;
+	cout << "3: " << " A: " << AT()*AT() << " * " << " T: " << timeFactorATATInt(  ) << " * " << " Acc: " <<  angAccI3 << " = " << AT()*AT()*timeFactorATATInt(  ) * angAccI3 << endl;
+
+	cout << "4: " << " A: " << AP()*AT() << " * " << " T: " << timeFactorImAPATInt(  ) << " * " << " Acc: " <<  angAccI4 << " = " << AP()*AT()*timeFactorImAPATInt(  ) * angAccI4 << endl;
+	cout << "5: " << " A: " << A0()*AP() << " * " << " T: " << timeFactorReA0APInt(  ) << " * " << " Acc: " <<  angAccI5 << " = " << A0()*AP()*timeFactorReA0APInt(  ) * angAccI5 << endl;
+	cout << "6: " << " A: " << A0()*AT() << " * " << " T: " << timeFactorImA0ATInt(  ) << " * " << " Acc: " <<  angAccI6 << " = " << A0()*AT()*timeFactorImA0ATInt(  ) * angAccI6 << endl;
+
+	cout << "7: " << " A: " << AS()*AS() << " * " << " T: " << timeFactorASASInt(  ) << " * " << " Acc: " <<  angAccI7 << " = " << AS()*AS()*timeFactorASASInt(  ) * angAccI7 << endl;
+
+	cout << "8: " << " A: " << ASint()*AP() << " * " << " T: " << timeFactorReASAPInt(  ) << " * " << " Acc: " <<  angAccI8 << " = " << ASint()*AP()*timeFactorReASAPInt(  ) * angAccI8 << endl;
+	cout << "9: " << " A: " << ASint()*AT() << " * " << " T: " << timeFactorImASATInt(  ) << " * " << " Acc: " <<  angAccI9 << " = " << ASint()*AT()*timeFactorImASATInt(  ) * angAccI9 << endl;
+	cout << "10:" << " A: " << ASint()*A0() << " * " << " T: " << timeFactorReASA0Int(  ) << " * " << " Acc: " <<  angAccI10 << " = " << ASint()*A0()*timeFactorReASA0Int(  ) * angAccI10 << endl;
+
+        this->DebugPrint( message, value );
+        PDF_THREAD_UNLOCK
+}
 
 //===========================================================================================
 // Debug printout
 //===========================================================================================
 void Bs2JpsiPhi_Signal_v6::DebugPrint( string message, double value )  const
 {
-	PDF_THREAD_LOCK
-
 	if( !performingComponentProjection )
 	{
 		(void) message; (void) value;
@@ -1166,21 +1208,22 @@ void Bs2JpsiPhi_Signal_v6::DebugPrint( string message, double value )  const
 		cout << "   AP^2    " << AP()*AP() << endl;
 		cout << "   A0^2    " << A0()*A0() << endl;
 		cout << "   AS^2    " << AS()*AS() << endl;
+		cout << "   P-Wave  " << A0()*A0()+AP()*AP()+AT()*AT() << endl;
 		cout << "   ATOTAL  " << AS()*AS()+A0()*A0()+AP()*AP()+AT()*AT() << endl;
 		cout << "   delta_ms       " << delta_ms << endl;
 		//cout << "   mistag         " << mistag() << endl;
 		//cout << "   mistagP1       " << _mistagP1 << endl;
 		//cout << "   mistagP0       " << _mistagP0 << endl;
 		//cout << "   mistagSetPoint " << _mistagSetPoint << endl;
-		cout << " For event with:  " << endl;
+		cout << " For event with:" << endl;
 		//cout << "   time      " << t << endl ;
 		//cout << "   ctheta_tr " << ctheta_tr << endl ;
 		//cout << "   ctheta_1 " << ctheta_1 << endl ;
 		//cout << "   phi_tr " << phi_tr << endl ;
 		if( _datapoint ) _datapoint->Print();
+		cout << endl << " For ParameterSet:" << endl;
+		allParameters.Print();
 	}
-
-	PDF_THREAD_UNLOCK
 }
 
 

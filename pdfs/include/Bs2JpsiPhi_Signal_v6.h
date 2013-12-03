@@ -66,6 +66,9 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		//Calculate the PDF normalisation
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
+		void DebugPrintEvaluate( string message, double value ) const;
+		void DebugPrintNormalisation( string message, double value ) const;
+
 		int componentIndex;
 
 		//PELC For debugging purposes
@@ -321,8 +324,7 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 		//..................................
 		inline double timeFactorEven()  const
 		{
-			//if( t < 0.0 ) return 0.0 ;
-			const double result =
+			return
 				_mistagCalibModel->D1() * (
 						( 1.0 + cosphis() ) * expL( )
 						+ ( 1.0 - cosphis() ) * expH( )
@@ -331,25 +333,12 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 						( 2.0 * sinphis() ) * expSin( )
 						+ ( 2.0 * CC()      ) * expCos( )
 				       );
+		}
 
-			//DEBUG
-			if( DebugFlag_v6 )
-			{
-				if( result < 0 )
-				{
-					PDF_THREAD_LOCK
-					cout << " Bs2JpsiPhi_Signal_v6::timeFactorEven() : result < 0 " << endl ;
-					cout << " ->term1 " << ( 1.0 + cosphis() ) * expL( ) << endl ;
-					cout << " ->term2 " << ( 1.0 - cosphis() ) * expH( ) << endl ;
-					//cout << " ->term3 " << _mistagCalibModel->q() * ( 2.0 * sinphis()   ) * expSin( ) * (1.0 - 2.0*_mistagCalibModel->mistag()) << endl ;
-					cout << "   -->sin(phis) "  << sinphis() << endl ;
-					cout << "   -->expSin    "  << expSin() << endl ;
-					//cout << "   -->tagFrac   "  << _mistagCalibModel->mistag() << endl ;
-					//cout << "   -->delta_ms  "  << delta_ms << endl ;
-					PDF_THREAD_UNLOCK
-				}
-			}
-			return result;
+		void timeFactorEvenDebug() const
+		{
+			cout << "D1: " << _mistagCalibModel->D1() << " * ( " << ( 1.0 + cosphis() ) * expL( ) << " + " << ( 1.0 + cosphis() ) * expH( ) << " )" << endl;
+			cout << "D2: " << _mistagCalibModel->D2() << " * ( " << ( 2.0 * sinphis() ) * expSin( ) << " + " << + ( 2.0 * CC()      ) * expCos( ) << " )" << endl;
 		}
 
 		inline double timeFactorEvenInt()  const
@@ -365,11 +354,18 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 				       ) ;
 		}
 
+		void timeFactorEvenIntDebug() const
+		{
+			cout << "D1: " << _mistagCalibModel->D1() << "  intExpL(): " << intExpL() << "  intExpH(): " << intExpH() << endl;
+			cout << "D2: " << _mistagCalibModel->D2() << "  intExpSin(): " << intExpSin( ) << "  intExpCos(): " << intExpSin( ) << endl;
+			cout << "   " << _mistagCalibModel->D1() *( ( 1.0 + cosphis() )  * intExpL() + ( 1.0 - cosphis() )  * intExpH() ) << endl;
+			cout << " + " << _mistagCalibModel->D2() *( ( 2.0 * sinphis() ) * intExpSin( ) + ( 2.0 * CC()      ) * intExpCos( ) )<< endl;
+		}
+
 
 		//..................................
 		inline double timeFactorOdd(  )   const
 		{
-			//if( t < 0.0 ) return 0.0 ;
 			return
 				_mistagCalibModel->D1() * (
 						( 1.0 - cosphis() ) * expL( )

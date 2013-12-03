@@ -87,6 +87,9 @@ class Phis2012ResolutionModel : public IResolutionModel
 
 		ObservableRef timeResFracName;
 		double resFrac;
+
+		ObservableRef muName;
+		double mu;
 };
 
 #endif

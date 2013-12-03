@@ -30,7 +30,8 @@ Phis2012ResolutionModel::Phis2012ResolutionModel( PDFConfigurator* configurator,
 	sfBarSlopeName		( configurator->getName( "sfBarSlope")),
 	sfSigmaOffsetName	( configurator->getName( "sfSigmaOffset")),
 	sfSigmaSlopeName	( configurator->getName( "sfSigmaSlope")),
-	sigmaBarName		( configurator->getName(  "sigmaBar")),
+	sigmaBarName		( configurator->getName( "sigmaBar")),
+	muName			( configurator->getName( "timeResMu" )),
 	numberComponents( 2 ), wantedComponent( 1 ), resFrac( 1. )
 {
 	if( !quiet) cout << "DoubleResolutionModel:: Instance created " << endl ;
@@ -47,6 +48,7 @@ void Phis2012ResolutionModel::addParameters( vector<string> & parameterNames )
 	parameterNames.push_back( sfSigmaOffsetName );
 	parameterNames.push_back( sfSigmaSlopeName );
 	parameterNames.push_back( sigmaBarName );
+	parameterNames.push_back( muName );
 	return;
 }
 
@@ -60,6 +62,7 @@ void Phis2012ResolutionModel::setParameters( ParameterSet & parameters )
 	sfSigmaOffset = parameters.GetPhysicsParameter( sfSigmaOffsetName)->GetValue();
 	sfSigmaSlope = parameters.GetPhysicsParameter( sfSigmaSlopeName)->GetValue();
 	sigmaBar = parameters.GetPhysicsParameter( sigmaBarName)->GetValue();
+        mu = parameters.GetPhysicsParameter( muName )->GetValue();
 	return;
 }
 
@@ -88,45 +91,45 @@ bool Phis2012ResolutionModel::isPerEvent( ) {  return true; }
 double Phis2012ResolutionModel::Exp( double time, double gamma ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::Exp( time, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::Exp( time+mu, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::Exp( time, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::Exp( time+mu, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::ExpInt( double tlow, double thigh, double gamma ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpInt( tlow, thigh, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpInt( tlow+mu, thigh+mu, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpInt( tlow, thigh, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpInt( tlow+mu, thigh+mu, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::ExpSin( double time, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpSin( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpSin( time+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpSin( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpSin( time+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::ExpSinInt( double tlow, double thigh, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpSinInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpSinInt( tlow+mu, thigh+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpSinInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpSinInt( tlow+mu, thigh+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::ExpCos( double time, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpCos( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpCos( time+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpCos( time, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpCos( time+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
@@ -134,28 +137,29 @@ double Phis2012ResolutionModel::ExpCosInt( double tlow, double thigh, double gam
 	//cout << " tlow" << tlow << "   thigh  "  << thigh << "   gamma  "  << gamma << "  dms  "  << dms  << "    res  " << eventResolution*resScale << endl;
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpCosInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpCosInt( tlow+mu, thigh+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpCosInt( tlow, thigh, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpCosInt( tlow+mu, thigh+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::GetThisScale()
 {
         double thisRes = eventResolution;
-        if( wantedComponent == 1 ) { 
+        if( wantedComponent == 1 ) {
 		sfbar = sfBarOffset + (sfBarSlope)*(eventResolution - sigmaBar);
 		sfsigma = sfSigmaOffset + (sfSigmaSlope)*(eventResolution - sigmaBar);
 		resScale = -1.0*sqrt(resFrac/(1.0-resFrac))*sfsigma + sfbar;
-		eventResolution *= resScale; 
+		thisRes *= resScale; 
 	}
-        else if( wantedComponent == 2 ) { 
+        else if( wantedComponent == 2 ) {
 		sfbar = sfBarOffset + (sfBarSlope)*(eventResolution - sigmaBar);
 		sfsigma = sfSigmaOffset + (sfSigmaSlope)*(eventResolution - sigmaBar);
 		resScale2 =sqrt((1.0-resFrac)/resFrac)*sfsigma + sfbar;
-		eventResolution *= resScale2; 
+		thisRes *= resScale2; 
 	}
-        else { eventResolution *= resScale; }
+        else { thisRes *= resScale; }
+
 	return thisRes;
 }
 
@@ -172,11 +176,11 @@ void Phis2012ResolutionModel::requestComponent( unsigned int wanted )
 
 double Phis2012ResolutionModel::GetFraction( unsigned int input )
 {
-	if( input == 2 )
+	if( input == 1 )
 	{
 		return resFrac;
 	}
-	else if( input == 1 )
+	else if( input == 2 )
 	{
 		return (1.-resFrac);
 	}
