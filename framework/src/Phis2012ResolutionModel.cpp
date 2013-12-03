@@ -172,11 +172,11 @@ void Phis2012ResolutionModel::requestComponent( unsigned int wanted )
 
 double Phis2012ResolutionModel::GetFraction( unsigned int input )
 {
-	if( input == 1 )
+	if( input == 2 )
 	{
 		return resFrac;
 	}
-	else if( input == 2 )
+	else if( input == 1 )
 	{
 		return (1.-resFrac);
 	}
