@@ -700,6 +700,20 @@ void Bs2JpsiPhi_Signal_v6::preCalculateTimeIntegrals()
 	return;
 }
 
+void Bs2JpsiPhi_Signal_v6::preCalculateTimeIntegralsDebug() const
+{
+	cout << "Timey-Wimey stuff:" << endl;
+	cout << "expL_stored: " << expL_stored << endl;
+	cout << "expH_stored: " << expH_stored << endl;
+	cout << "expSin_stored: " << expSin_stored << endl;
+	cout << "expCos_stored: " << expCos_stored << endl;
+	cout << "intExpL_stored: " << intExpL_stored << endl;
+	cout << "intExpH_stored: " << intExpH_stored << endl;
+	cout << "intExpSin_stored: " << intExpSin_stored << endl;
+	cout << "intExpCos_stored: " << intExpCos_stored << endl;
+	cout << endl;
+}
+
 vector<string> Bs2JpsiPhi_Signal_v6::PDFComponents()
 {
 	vector<string> this_component_list;
@@ -1163,6 +1177,9 @@ void Bs2JpsiPhi_Signal_v6::DebugPrintEvaluate( string message, double value ) co
 	cout << "9: " << " A: " << CachedA9 << " * " << " T: " << timeFactorImASAT(  ) << " = " << CachedA9*timeFactorImASAT(  ) << endl;
 	cout << "10:" << " A: " << CachedA10 << " * " << " T: " << timeFactorReASA0(  ) << " = " << CachedA10*timeFactorReASA0(  ) << endl;
 
+	cout << endl;
+	this->preCalculateTimeIntegralsDebug();
+
 	this->DebugPrint( message, value );
 	PDF_THREAD_UNLOCK
 }
@@ -1184,6 +1201,9 @@ void Bs2JpsiPhi_Signal_v6::DebugPrintNormalisation( string message, double value
 	cout << "8: " << " A: " << ASint()*AP() << " * " << " T: " << timeFactorReASAPInt(  ) << " * " << " Acc: " <<  angAccI8 << " = " << ASint()*AP()*timeFactorReASAPInt(  ) * angAccI8 << endl;
 	cout << "9: " << " A: " << ASint()*AT() << " * " << " T: " << timeFactorImASATInt(  ) << " * " << " Acc: " <<  angAccI9 << " = " << ASint()*AT()*timeFactorImASATInt(  ) * angAccI9 << endl;
 	cout << "10:" << " A: " << ASint()*A0() << " * " << " T: " << timeFactorReASA0Int(  ) << " * " << " Acc: " <<  angAccI10 << " = " << ASint()*A0()*timeFactorReASA0Int(  ) * angAccI10 << endl;
+
+	cout << endl;
+	this->preCalculateTimeIntegralsDebug();
 
         this->DebugPrint( message, value );
         PDF_THREAD_UNLOCK

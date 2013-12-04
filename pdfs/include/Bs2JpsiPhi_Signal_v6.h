@@ -68,6 +68,7 @@ class Bs2JpsiPhi_Signal_v6 : public BasePDF
 
 		void DebugPrintEvaluate( string message, double value ) const;
 		void DebugPrintNormalisation( string message, double value ) const;
+		void preCalculateTimeIntegralsDebug() const;
 
 		int componentIndex;
 

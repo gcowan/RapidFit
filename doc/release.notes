@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/12/04 Rob Currie
+  - Adding small amount of debugging info to v6 the 1fb analysis is working as of this revision and a lot of smaller fixes have been put in over the past 24hr to fix bugs
+
 2013/12/02 Rob Currie
   - fixed a bug in the SlicedAcceptance code so that the construcror doesn't attempt to read beyond the end of the acceptance .txt files
 
