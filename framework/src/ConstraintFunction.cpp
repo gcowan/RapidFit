@@ -70,14 +70,18 @@ double ConstraintFunction::Evaluate( const ParameterSet * NewParameters )
 	}
 
 	unsigned int num_i=0;
-	vector< vector<IConstraintFunction*>::iterator > to_be_removed;
 	//Loop over all ExternalConstraints
 	for( vector<IConstraintFunction*>::iterator constraintIndex = allConstraints.begin(); constraintIndex != allConstraints.end(); ++constraintIndex, ++num_i )
 	{
-		bool canApply = (*constraintIndex)->CanApply( NewParameters );
+		bool canApply = false;
+		if( (*constraintIndex) != NULL ) canApply = (*constraintIndex)->CanApply( NewParameters );
 		if( !canApply )
 		{
-			to_be_removed.push_back( constraintIndex );
+			if( (*constraintIndex) != NULL )
+			{
+				delete (*constraintIndex);
+				(*constraintIndex) = NULL;
+			}
 			continue;
 		}
 		else
@@ -85,11 +89,6 @@ double ConstraintFunction::Evaluate( const ParameterSet * NewParameters )
 			(*constraintIndex)->SetPhysicsParameters( NewParameters );
 			constraintValue += (*constraintIndex)->GetChi2();
 		}
-	}
-
-	for( unsigned int i=0; i< to_be_removed.size(); ++i )
-	{
-		allConstraints.erase( to_be_removed[i] );
 	}
 
 	return 0.5 * constraintValue;
