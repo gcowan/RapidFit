@@ -202,6 +202,16 @@ double ExternalConstraint::GetChi2() const
 	}
 	else
 	{
+		//if( name == "mistagP1_OS" )
+		//{
+//			cout << endl;
+//			cout << name << ": " << internalParameterSet->GetPhysicsParameter(name)->GetValue() << endl;
+//			double parameterValuea = internalParameterSet->GetPhysicsParameter(name)->GetValue();
+//			cout << "value: " << value << endl;
+//			cout << "error: " << error << endl;
+//			cout << "Chi2:  " << ((parameterValuea - value ) / error)*((parameterValuea - value ) / error) << endl;
+//			cout << endl;
+		//}
 		double parameterValue = internalParameterSet->GetPhysicsParameter(name)->GetValue();
 		double gaussSqrt = (parameterValue - value ) / error;
 		returnable += gaussSqrt * gaussSqrt;

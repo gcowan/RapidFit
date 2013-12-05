@@ -30,6 +30,7 @@ ConstraintFunction::ConstraintFunction( const vector< IConstraintFunction* > New
 		{
 			allConstraints.push_back( (IConstraintFunction*)new ExternalConstMatrix( *(ExternalConstMatrix*)(*const_i) ) );
 		}
+		cout << "Adding Constraint: " << allConstraints.back()->GetName() << endl;
 	}
 }
 

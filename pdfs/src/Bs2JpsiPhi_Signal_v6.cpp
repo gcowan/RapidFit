@@ -61,7 +61,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	, cthetakName 			( configurator->getName("helcosthetaK") )
 	, cthetalName			( configurator->getName("helcosthetaL") )
 	, phihName			( configurator->getName("helphi") )
-	, BetaSName			( configurator->getName("betaS") )
+	, BetaName			( configurator->getName("beta") )
 	// Other things
 	, _useEventResolution(false)
 	, _useTimeAcceptance(false)
@@ -86,7 +86,7 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false), resolutionModel(NULL)
-	, _useBetaSParameter(false)
+	, _useBetaParameter(false)
 {
 	componentIndex = 0;
 
@@ -111,9 +111,9 @@ Bs2JpsiPhi_Signal_v6::Bs2JpsiPhi_Signal_v6(PDFConfigurator* configurator) : Base
 	_useNewMistagModel = configurator->isTrue( "useNewMistagModel" );
 	DebugFlag_v6 = !configurator->hasConfigurationValue( "DEBUG", "False" );
 
-	_useBetaSParameter = configurator->isTrue( "floatBetaS" );
+	_useBetaParameter = configurator->isTrue( "floatBeta" );
 
-	if( !_useBetaSParameter )
+	if( !_useBetaParameter )
 	{
 		string offsetToGammaForBetaFactor = configurator->getConfigurationValue( "OffsetToGammaForBetaFactor") ;
 		if( offsetToGammaForBetaFactor == "" )
@@ -296,7 +296,7 @@ void Bs2JpsiPhi_Signal_v6::MakePrototypes()
 	resolutionModel->addParameters( parameterNames );
 	_mistagCalibModel->addParameters( parameterNames );
 
-	if( _useBetaSParameter ) parameterNames.push_back( BetaSName );
+	if( _useBetaParameter ) parameterNames.push_back( BetaName );
 
 	allParameters = ParameterSet(parameterNames);
 }
@@ -347,7 +347,7 @@ bool Bs2JpsiPhi_Signal_v6::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	resolutionModel->setParameters( allParameters );
 	_mistagCalibModel->setParameters( allParameters );
 
-	if( _useBetaSParameter ) _offsetToGammaForBetaFactor = allParameters.GetPhysicsParameter( BetaSName )->GetValue();
+	if( _useBetaParameter ) _offsetToGammaForBetaFactor = allParameters.GetPhysicsParameter( BetaName )->GetValue();
 
 	// Physics parameters.
 	_gamma  = allParameters.GetPhysicsParameter( gammaName )->GetValue() + _offsetToGammaForBetaFactor ;
