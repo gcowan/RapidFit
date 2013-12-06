@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/12/06 Rob Currie
+  - Fixed bug in Phis 2012 resolution model so that the fractions are now consistent and the fraction in the XML refers to the fraction of the second Gaussian in the fit
+
 2013/12/05 Rob Currie
   - We are aware of the bug in XMLConfigReader to do with multiple ConstraintFunctions in a single ToFit segment... This hasn't been fixed but output has been added to show which Constraints are picked up
 
