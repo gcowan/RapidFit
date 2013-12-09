@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/12/09 Rob Currie
+  - Adding v7 pdf for JpsiPhi with multiple Phis and lambdas... this is also a drastic restructuring of the code to move all methods back to the .cpp
+
 2013/12/06 Rob Currie
   - Fixed bug in Phis 2012 resolution model so that the fractions are now consistent and the fraction in the XML refers to the fraction of the second Gaussian in the fit
 
