@@ -288,6 +288,7 @@ void Bs2JpsiPhi_Signal_v7::MakePrototypes()
 	{
 		parameterNames.push_back( cosphisName );
 		parameterNames.push_back( sinphisName );
+		parameterNames.push_back( lambdaName );
 	}
 	else if( _useMultiplePhis )
 	{
@@ -300,10 +301,11 @@ void Bs2JpsiPhi_Signal_v7::MakePrototypes()
 		parameterNames.push_back( lambda_perpName );
 		parameterNames.push_back( lambda_SName );
 	}
-	else {
+	else
+	{
 		parameterNames.push_back( phis_Name );
+		parameterNames.push_back( lambdaName );
 	}
-	parameterNames.push_back( lambdaName );
 
 	if( _fitDirectlyForApara )
 	{
@@ -418,18 +420,6 @@ bool Bs2JpsiPhi_Signal_v7::SetPhysicsParameters( ParameterSet* NewParameterSet )
 
 	delta_ms = allParameters.GetPhysicsParameter( deltaMName )->GetValue();
 
-	if(_useCosAndSin)
-	{
-		_cosphis = allParameters.GetPhysicsParameter( cosphisName )->GetValue();
-		_sinphis = allParameters.GetPhysicsParameter( sinphisName )->GetValue();
-	}
-	else
-	{
-		phi_s     = allParameters.GetPhysicsParameter( phis_Name )->GetValue();
-		_cosphis = cos(phi_s);
-		_sinphis = sin(phi_s);
-	}
-
 	if( _useMultiplePhis )
 	{
 		phis_zeroVal = allParameters.GetPhysicsParameter( phis_zeroName )->GetValue();
@@ -443,6 +433,20 @@ bool Bs2JpsiPhi_Signal_v7::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	}
 	else
 	{
+
+		if(_useCosAndSin)
+		{
+			_cosphis = allParameters.GetPhysicsParameter( cosphisName )->GetValue();
+			_sinphis = allParameters.GetPhysicsParameter( sinphisName )->GetValue();
+			phi_s = 0.5*( acos( _cosphis ) + asin( _sinphis ) );
+		}
+		else
+		{
+			phi_s     = allParameters.GetPhysicsParameter( phis_Name )->GetValue();
+			_cosphis = cos(phi_s);
+			_sinphis = sin(phi_s);
+		}
+
 		lambda = allParameters.GetPhysicsParameter( lambdaName )->GetValue();
 		if( !_useCosAndSin )
 		{
@@ -1192,7 +1196,7 @@ void Bs2JpsiPhi_Signal_v7::prepareCDS( double lambdaVal, double PhisVal )
 	double lambda_sq = lambdaVal*lambdaVal;
 	double inv_lambda = 1./(1.0 + lambda_sq);
 
-	double F1 = 2.0*lambda *inv_lambda;
+	double F1 = 2.0*lambdaVal *inv_lambda;
 	double F2 = (1.0 - lambda_sq) *inv_lambda;
 
 	if( !_useCosAndSin )
@@ -1237,7 +1241,7 @@ void Bs2JpsiPhi_Signal_v7::DebugPrintNormalisation( string message, double value
 {
 	PDF_THREAD_LOCK
 
-		cout << "1: " << " A: " << A0()*A0() << " * " << " T: " << timeFactorA0A0Int(  ) << " * " << " Acc: " <<  angAccI1 << " = " << A0()*A0()*timeFactorA0A0Int(  ) * angAccI1 << endl;
+	cout << "1: " << " A: " << A0()*A0() << " * " << " T: " << timeFactorA0A0Int(  ) << " * " << " Acc: " <<  angAccI1 << " = " << A0()*A0()*timeFactorA0A0Int(  ) * angAccI1 << endl;
 	cout << "2: " << " A: " << AP()*AP() << " * " << " T: " << timeFactorAPAPInt(  ) << " * " << " Acc: " <<  angAccI2 << " = " << AP()*AP()*timeFactorAPAPInt(  ) * angAccI2 << endl;
 	cout << "3: " << " A: " << AT()*AT() << " * " << " T: " << timeFactorATATInt(  ) << " * " << " Acc: " <<  angAccI3 << " = " << AT()*AT()*timeFactorATATInt(  ) * angAccI3 << endl;
 
