@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/12/06 Rob Currie
+  - Replacing exits with throws in XMLConfig Reader
+  - Adding some basic checks in MultiXML to reject duplicate definitions of objects, always take the first definition of an object
+
 2013/12/09 Rob Currie
   - Adding v7 pdf for JpsiPhi with multiple Phis and lambdas... this is also a drastic restructuring of the code to move all methods back to the .cpp
   - Cleaning up the ResolutionModel implementation such that the PDFConfigurator always returns a safe ResolutionModel name

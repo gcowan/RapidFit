@@ -1047,7 +1047,7 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 	if ( toFits.size() == 0 )
 	{
 		cerr << "No ToFit tags found in config file" << endl;
-		exit(1);
+		throw(1);
 	}
 	else
 	{
@@ -1159,8 +1159,8 @@ vector< ConstraintFunction* > XMLConfigReader::GetConstraints()
 	//Go through the collected ToFit elements
 	if ( toFits.size() == 0 )
 	{
-		cerr << "No ToFit tags found in config file" << endl;
-		exit(1);
+		cerr << "No ToFit tags found in config file(2)" << endl;
+		throw(1);
 	}
 	else
 	{

@@ -70,6 +70,8 @@ class ConstraintFunction
 		 */
 		vector<string> ConstrainedParameter() const;
 
+		vector<string> GetConstraintNames() const;
+
 	private:
 
 		/*!

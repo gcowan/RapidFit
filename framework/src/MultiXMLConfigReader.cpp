@@ -14,6 +14,7 @@
 #include "MultiXMLConfigReader.h"
 #include "XMLConfigReader.h"
 #include "I_XMLConfigReader.h"
+#include "StringProcessing.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -85,7 +86,16 @@ vector<PDFWithData*> MultiXMLConfigReader::GetPDFsAndData( vector<int> StartingV
 	vector<PDFWithData*> fullSet;
 	for( unsigned int i=0; i< XMLReaders.size(); ++i )
 	{
-		vector<PDFWithData*> thisSet = XMLReaders[i]->GetPDFsAndData();
+		vector<PDFWithData*> thisSet;
+		try
+		{
+			thisSet = XMLReaders[i]->GetPDFsAndData();
+		}
+		catch(...)
+		{
+			thisSet = vector<PDFWithData*>();
+		}
+
 		for( unsigned int j=0; j< thisSet.size(); ++j )
 		{
 			fullSet.push_back( thisSet[j] );
@@ -99,10 +109,44 @@ vector<ConstraintFunction* > MultiXMLConfigReader::GetConstraints()
 	vector<ConstraintFunction*> fullSet;
 	for( unsigned int i=0; i< XMLReaders.size(); ++i )
 	{
-		vector<ConstraintFunction*> thisSet = XMLReaders[i]->GetConstraints();
+		vector<ConstraintFunction*> thisSet;
+		try
+		{
+			thisSet = XMLReaders[i]->GetConstraints();
+		}
+		catch(...)
+		{
+			thisSet = vector<ConstraintFunction*>();
+		}
+
 		for( unsigned int j=0; j< thisSet.size(); ++j )
 		{
-			fullSet.push_back( thisSet[j] );
+			vector<string> knownNames;
+			for( unsigned int k=0; k< fullSet.size(); ++k )
+			{
+				vector<string> allNames_Full = fullSet[k]->GetConstraintNames();
+				for( unsigned int a=0; a< allNames_Full.size(); ++a )
+				{
+					knownNames.push_back( allNames_Full[a] );
+					//cout << "known: " << allNames_Full[a] << endl;
+				}
+			}
+
+			vector<string> theseNames = thisSet[j]->GetConstraintNames();
+			bool good = true;
+			for( unsigned int k=0; k< theseNames.size(); ++k )
+			{
+				if( StringProcessing::VectorContains( &knownNames, &(theseNames[k]) ) != -1 )
+				{
+					cout << "reject: " << theseNames[k] << endl;
+					good = false;
+					//break;
+				}
+			}
+			if( good )
+			{
+				fullSet.push_back( thisSet[j] );
+			}
 		}
 	}
 	return fullSet;

@@ -34,6 +34,16 @@ ConstraintFunction::ConstraintFunction( const vector< IConstraintFunction* > New
 	}
 }
 
+vector<string> ConstraintFunction::GetConstraintNames() const
+{
+	vector<string> allNames;
+	for( unsigned int i=0; i< allConstraints.size(); ++i )
+	{
+		allNames.push_back( allConstraints[i]->GetName() );
+	}
+	return allNames;
+}
+
 ConstraintFunction::ConstraintFunction( const ConstraintFunction& input ) : Found_Position( input.Found_Position ), allConstraints()
 {
 	for( vector<IConstraintFunction*>::const_iterator const_i = input.allConstraints.begin(); const_i != input.allConstraints.end(); ++const_i )
