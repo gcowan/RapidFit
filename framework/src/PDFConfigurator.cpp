@@ -170,7 +170,7 @@ void PDFConfigurator::addConfigurationParameter( string configString )
 
 // Method to return a configuration parameter value
 // If not found then returns " "
-string PDFConfigurator::getConfigurationValue( string configParam )
+string PDFConfigurator::getConfigurationValue( string configParam ) const
 {
 	for( unsigned int ii=0; ii<configParameters.size() ; ++ii )
 	{
@@ -197,6 +197,15 @@ bool PDFConfigurator::hasConfigurationValue( string configParam, string paramVal
 		}
 	}
 	return false ;
+}
+
+bool PDFConfigurator::hasConfigurationOption( string configParam ) const
+{
+	for( unsigned int i=0; i< configParameters.size(); ++i )
+	{
+		if( configParameters[i] == configParam ) return true;
+	}
+	return false;
 }
 
 // Method to check for a configuration parameter value boolean
@@ -267,12 +276,14 @@ string PDFConfigurator::GetPDFLabel() const
 	return PDFLabel;
 }
 
-void PDFConfigurator::SetResolutionModel( const string input )
-{
-	ResolutionModelName = input;
-}
-
 string PDFConfigurator::GetResolutionModel() const
 {
-	return ResolutionModelName;
+	if( this->hasConfigurationOption( "ResolutionModel" ) )
+	{
+		return this->getConfigurationValue( "ResolutionModel" );
+	}
+	else
+	{
+		return "DummyResolutionModel";
+	}
 }

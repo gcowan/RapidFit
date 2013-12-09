@@ -62,7 +62,7 @@ class PDFConfigurator
 		 *
 		 * @return
 		 */
-		string getConfigurationValue( string configParam );
+		string getConfigurationValue( string configParam ) const;
 
 		/*!
 		 * @brief
@@ -100,9 +100,9 @@ class PDFConfigurator
 
 		string GetPDFLabel() const;
 
-		void SetResolutionModel( const string input );
-
 		string GetResolutionModel() const;
+
+		bool hasConfigurationOption( string ) const;
 
 	private:
 

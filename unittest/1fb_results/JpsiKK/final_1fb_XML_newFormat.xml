@@ -560,7 +560,7 @@
 			<ConfigurationParameter>PlotComponents:True</ConfigurationParameter>
 			<ConfigurationParameter>useNewMistagModel:True</ConfigurationParameter>
 			#<ConfigurationParameter>Mistag3fbModel:True</ConfigurationParameter>
-			<ResolutionModel>PerEventResModel</ResolutionModel>
+			<ConfigurationParameter>ResolutionModel:PerEventResModel</ConfigurationParameter>
 		</PDF>
 	</CommonPDF>
 

@@ -2096,13 +2096,6 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* Inpu
 			   ++appendParamNum;
 			   */
 		}
-		else if ( pdfConfig[configIndex]->GetName() == "ResolutionModel" )
-		{
-			TString ThisNum; ThisNum+=subParamNum;
-			pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
-			configurator->SetResolutionModel( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
-			++appendParamNum;
-		}
 		else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
 		{
 			TString ThisNum; ThisNum+=configParamNum;
@@ -2218,13 +2211,6 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 				   configurator->appendOtherParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 				   ++appendParamNum;
 				   */
-			}
-			else if ( pdfConfig[configIndex]->GetName() == "ResolutionModel" )
-			{
-				TString ThisNum; ThisNum+=subParamNum;
-				pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
-				configurator->SetResolutionModel( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
-				++appendParamNum;
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{

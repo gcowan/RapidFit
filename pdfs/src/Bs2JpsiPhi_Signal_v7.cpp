@@ -204,18 +204,11 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 		// get model name
 		// use class lookup
 	{
-		string resolutionModelName = configurator->getConfigurationValue( "ResolutionModel") ;
-		if( resolutionModelName.empty() )
-		{
-			if( configurator->GetResolutionModel() == "DummyResolutionModel" )	resolutionModelName = "PerEventResModel";
-			else resolutionModelName = configurator->GetResolutionModel();
-		}
+		string resolutionModelName = configurator->GetResolutionModel();
 		resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator, isCopy );
 
 		this->TurnCachingOff();
 	}
-
-	if( resolutionModel == NULL ) resolutionModel = ClassLookUp::LookUpResName( "DummyResolutionModel", configurator, isCopy );
 
 	if( _useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( configurator );
 	else _mistagCalibModel = new SimpleMistagCalib( configurator );
@@ -1216,7 +1209,7 @@ void Bs2JpsiPhi_Signal_v7::DebugPrintEvaluate( string message, double value )
 	PDF_THREAD_LOCK
 
 
-	cout << "1: " << " A: " << CachedA1 << " * " << " T: " << timeFactorA0A0(  ) << " = " << CachedA1*timeFactorA0A0(  ) << endl;
+		cout << "1: " << " A: " << CachedA1 << " * " << " T: " << timeFactorA0A0(  ) << " = " << CachedA1*timeFactorA0A0(  ) << endl;
 	cout << "2: " << " A: " << CachedA2 << " * " << " T: " << timeFactorAPAP(  ) << " = " << CachedA2*timeFactorAPAP(  ) << endl;
 	cout << "3: " << " A: " << CachedA3 << " * " << " T: " << timeFactorATAT(  ) << " = " << CachedA3*timeFactorATAT(  ) << endl;
 
@@ -1241,7 +1234,7 @@ void Bs2JpsiPhi_Signal_v7::DebugPrintNormalisation( string message, double value
 {
 	PDF_THREAD_LOCK
 
-	cout << "1: " << " A: " << A0()*A0() << " * " << " T: " << timeFactorA0A0Int(  ) << " * " << " Acc: " <<  angAccI1 << " = " << A0()*A0()*timeFactorA0A0Int(  ) * angAccI1 << endl;
+		cout << "1: " << " A: " << A0()*A0() << " * " << " T: " << timeFactorA0A0Int(  ) << " * " << " Acc: " <<  angAccI1 << " = " << A0()*A0()*timeFactorA0A0Int(  ) * angAccI1 << endl;
 	cout << "2: " << " A: " << AP()*AP() << " * " << " T: " << timeFactorAPAPInt(  ) << " * " << " Acc: " <<  angAccI2 << " = " << AP()*AP()*timeFactorAPAPInt(  ) * angAccI2 << endl;
 	cout << "3: " << " A: " << AT()*AT() << " * " << " T: " << timeFactorATATInt(  ) << " * " << " Acc: " <<  angAccI3 << " = " << AT()*AT()*timeFactorATATInt(  ) * angAccI3 << endl;
 
