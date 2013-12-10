@@ -8,6 +8,10 @@
        These XML can be re-generated from the .root with RapidPlot
   - Added the --GetToyXML and --GetProjectionXML options to RapidPlot
   - Moved declaration of methods to main.h to make looking up the names and arguments of methods a little easier and would promote further modularising the main file
+  - Added check into the FitAssembler to check if the Observables being requested by the FitFunction for per-event weights or alphas are provided in the phase-space correctly
+       This involved moving the position at which the PDFWithData knows about the per-event weights in FitAssembler such that toys are generated and then tested higher up in the framework not in the PDFWithData
+       This is somehow a little less 'black-magic' and is done in a more coherent way that makes sense. The GetDataSet method will now only fail if there is a problem in generating the data in the first place.
+       (also it removes the knowledge of Weights from the PDFWithData container which shouldn't have been put there in the first place)
 
 2013/12/06 Rob Currie
   - Replacing exits with throws in XMLConfig Reader

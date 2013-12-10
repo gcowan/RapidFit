@@ -14,6 +14,7 @@
 #include "ObservableRef.h"
 #include "StringProcessing.h"
 #include "PseudoObservable.h"
+#include "DebugClass.h"
 //	System Headers
 #include <iostream>
 #include <stdlib.h>
@@ -112,6 +113,7 @@ Observable* DataPoint::GetObservable(string const Name, const bool silence ) con
 	if( nameIndex == -1 )
 	{
 		if( !silence ) cerr << "Observable name " << Name << " not found (2)" << endl;
+		DebugClass::SegFault();
 		//this->Print();
 		throw(-1543);
 		//return new Observable( Name, 0.0, 0.0, "NameNotFoundError");

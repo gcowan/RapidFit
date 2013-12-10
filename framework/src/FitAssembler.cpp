@@ -108,46 +108,46 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			fixed_set->SetResultParameter( ParamNames[i], param->GetValue(), param->GetValue(), 0., 0., 0., param->GetType(), param->GetUnit() );
 		}
 
-        if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "FitAssembler" ) )
-                {
-                        cout << "FitAssembler: Setting Fixed Physics Bottle" << endl;
-                }
-        }
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitAssembler" ) )
+			{
+				cout << "FitAssembler: Setting Fixed Physics Bottle" << endl;
+			}
+		}
 
 		IFitFunction* theFunction = FunctionConfig->GetFitFunction();
 		theFunction->SetPhysicsBottle(Bottle);
 
-        if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "FitAssembler" ) )
-                {
-                        cout << "FitAssembler: Evaluating DataSet" << endl;
-                }
-        }
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitAssembler" ) )
+			{
+				cout << "FitAssembler: Evaluating DataSet" << endl;
+			}
+		}
 
 		double someTest = theFunction->Evaluate();
 		cout << someTest << endl;
 		//exit(0);
 
-        if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "FitAssembler" ) )
-                {
-                        cout << "FitAssembler: Constructing Fixed Result" << endl;
-                }
-        }
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitAssembler" ) )
+			{
+				cout << "FitAssembler: Constructing Fixed Result" << endl;
+			}
+		}
 
 		FitResult* fixed_result = new FitResult( 0., fixed_set, 3, Bottle );
 
-        if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "FitAssembler" ) )
-                {
-                        cout << "FitAssembler: Setting Result Minimum Value" << endl;
-                }
-        }
+		if( debug != NULL )
+		{
+			if( debug->DebugThisClass( "FitAssembler" ) )
+			{
+				cout << "FitAssembler: Setting Result Minimum Value" << endl;
+			}
+		}
 
 		delete fixed_set;
 		fixed_result->SetMinimumValue(theFunction->Evaluate());
@@ -326,6 +326,17 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 		IDataSet* Requested_DataSet = BottleData[resultIndex]->GetDataSet();
 
+		if( FunctionConfig->GetWeightsWereUsed() )
+		{
+			vector<IPDF*> thisPDF = vector<IPDF*>( 1, BottleData[resultIndex]->GetPDF() );
+			vector<IDataSet*> thisData = vector<IDataSet*>( 1, Requested_DataSet );
+			string weightName, alphaName;
+			if( FunctionConfig->GetWeightsWereUsed() )	weightName = FunctionConfig->GetWeightName();
+			if( FunctionConfig->GetUseCustomAlpha() )	alphaName = FunctionConfig->GetAlphaName();
+			FitAssembler::CheckInputObs( thisPDF, thisData, weightName, alphaName, debug );
+			Requested_DataSet->UseEventWeights( FunctionConfig->GetWeightName() );
+		}
+
 		if( Requested_DataSet->GetDataNumber() > 0 )
 		{
 
@@ -422,7 +433,11 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	vector<IPDF*> thesePDFs = bottle->GetAllPDFs();
 	vector<IDataSet*> theseDataSets = bottle->GetAllDataSets();
-	FitAssembler::CheckInputObs( thesePDFs, theseDataSets, debug );
+
+	string weightName, alphaName;
+	if( FunctionConfig->GetWeightsWereUsed() ) weightName = FunctionConfig->GetWeightName();
+	if( FunctionConfig->GetUseCustomAlpha() ) alphaName = FunctionConfig->GetAlphaName();
+	FitAssembler::CheckInputObs( thesePDFs, theseDataSets, weightName, alphaName, debug );
 
 	FitResult * result = DoFit( MinimiserConfig, FunctionConfig, bottle, debug );
 
@@ -478,7 +493,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	return result;
 }
 
-void FitAssembler::CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDataSet*> allData, const DebugClass* debug )
+void FitAssembler::CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDataSet*> allData, const string WeightName, const string AlphaName, const DebugClass* debug )
 {
 	(void) debug;
 
@@ -490,8 +505,55 @@ void FitAssembler::CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDat
 	}
 	else
 	{
+		bool missing_any_all=false;
 		for( unsigned int i=0; i< allData.size(); ++i )
 		{
+
+			bool missing_any=false;
+
+			ObservableRef WeightRef(WeightName);
+			ObservableRef AlphaRef(AlphaName);
+
+			try
+			{
+				if( allData[i]->GetDataNumber() != 0 )
+				{
+
+					if( !WeightName.empty() )
+					{
+						Observable* WeightObs = allData[i]->GetDataPoint( 0 )->GetObservable( WeightRef );
+						if( WeightObs == NULL || WeightRef.GetIndex() < 0 )
+						{
+							missing_any = true;
+							cerr << "FitAssembler: Couldn't find Observable " << WeightName << " in DataPoint 0!" << endl;
+							cerr << "FitAssembler: Please check it is in the DataSet for the PDF to access it!" << endl;
+							cerr << "FitAssembler: This is likely being requested by your FitFunctionConfiguration!" << endl;
+							cerr << endl;
+						}
+					}
+
+					if( !AlphaName.empty() )
+					{
+						Observable* AlphaObs = allData[i]->GetDataPoint( 0 )->GetObservable( AlphaRef );
+						if( AlphaObs == NULL || AlphaRef.GetIndex() < 0 )
+						{
+							missing_any = true;
+							cerr << "FitAssembler: Couldn't find Observable " << AlphaName << " in DataPoint 0!" << endl;
+							cerr << "FitAssembler: Please check it is in the DataSet for the PDF to access it!" << endl;
+							cerr << "FitAssembler: This is likely being requested by your FitFunctionConfiguration!" << endl;
+							cerr << endl;
+						}
+					}
+				}
+			}
+			catch(...)
+			{
+				missing_any = true;
+				cerr << "FitAssembler: Error Getting WeightName of AlphaName: \"" << WeightName << "\" , \"" << AlphaName << "\"" << endl;
+				cerr << "FitAssembler: This is likely due to your FitFunction Requirements!" << endl;
+				cerr << endl;
+			}
+
 			if( allData[i] == NULL )
 			{
 				cerr << "FitAssembler: NULL Pointer to DataSet Please Fix!!!" << endl;
@@ -508,7 +570,6 @@ void FitAssembler::CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDat
 			{
 				wantedObservables.push_back( ObservableRef( AllPDFs[i]->GetPrototypeDataPoint()[j] ) );
 			}
-			bool missing_any=false;
 			for( unsigned int j=0; j< wantedObservables.size(); ++j )
 			{
 
@@ -559,9 +620,11 @@ void FitAssembler::CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDat
 					cerr << endl;
 				}
 			}
+			if( missing_any ) cerr << "Failure in DataSet: " << i+1 << " of " << allData.size() << endl;
 
-			if( missing_any ) exit(0);
+			missing_any_all = missing_any_all||missing_any;
 		}
+		if( missing_any_all ) exit(0);
 	}
 }
 
@@ -649,7 +712,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 
 	ParameterSet* internalBottleParameters = FitAssembler::CheckInputParams( BottleParameters, AllPDFs, allDataNum, debug );
 
-	FitAssembler::CheckInputObs( AllPDFs, AllData, debug );
+	FitAssembler::CheckInputObs( AllPDFs, AllData, FunctionConfig->GetWeightName(), FunctionConfig->GetAlphaName(), debug );
 
 	if ( AllPDFs.size() == AllData.size() )
 	{
@@ -910,14 +973,6 @@ FitResult * FitAssembler::DoSingleSafeFit( MinimiserConfiguration * MinimiserCon
 		cout.rdbuf(0);
 		cerr.rdbuf(0);
 		clog.rdbuf(0);
-	}
-
-	if( FunctionConfig->GetWeightsWereUsed() )
-	{
-		for( unsigned int i=0; i< BottleData.size(); ++i )
-		{
-			BottleData[i]->UseEventWeights( FunctionConfig->GetWeightName() );
-		}
 	}
 
 	FitResult* ReturnableFitResult=NULL;

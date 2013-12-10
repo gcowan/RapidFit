@@ -162,19 +162,6 @@ class PDFWithData
 
 		void SetDebug( DebugClass* debug );
 
-		/*!
-		 * @brief Set the Name of the Weights to use and the fact that Weights were used in the fit
-		 *
-		 * @param Name    This sets the name of the Weights to be used when Evaluating the DataSet
-		 *
-		 * @return Void
-		 */
-		void UseEventWeights( const string Name );
-
-		bool GetWeightsWereUsed() const;
-
-		string GetWeightName() const;
-
 	private:
 		/*!
 		 * Don't Copy the class this way!
@@ -192,9 +179,6 @@ class PDFWithData
 		mutable vector< IDataSet* > cached_data;	/*!	This is the internal Cache of DataSets that this instance 'looks after'			*/
 
 		mutable bool useCache;				/*!	Should PDFWithData return the last cached DataSet that it has (default false)		*/
-
-		string WeightName;
-		bool useWeights;
 
 		DebugClass* debug;
 };

@@ -21,7 +21,7 @@ using namespace::std;
 //Constructor with correct arguments
 PDFWithData::PDFWithData( IPDF * InputPDF, PhaseSpaceBoundary * InputBoundary, vector< DataSetConfiguration* > DataConfig ) :
 	fitPDF(ClassLookUp::CopyPDF(InputPDF)), inputBoundary(new PhaseSpaceBoundary(*InputBoundary)),  parametersAreSet(false),
-	dataSetMakers(), cached_data(), useCache(false), debug( new DebugClass(false) ), WeightName(""), useWeights(false)
+	dataSetMakers(), cached_data(), useCache(false), debug( new DebugClass(false) )
 {
 	if( DataConfig.size() < 1 || DataConfig.empty() )
 	{
@@ -171,8 +171,6 @@ IDataSet * PDFWithData::GetDataSet() const
 		newDataSet = cached_data.back();
 	}
 
-	if( useWeights ) newDataSet->UseEventWeights( WeightName );
-
 	newDataSet->Print();
 
 	cout << endl;
@@ -227,21 +225,5 @@ void PDFWithData::SetDebug( DebugClass* input_debug )
 {
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
-}
-
-void PDFWithData::UseEventWeights( const string Name )
-{
-	WeightName = Name;
-	useWeights = true;
-}
-
-bool PDFWithData::GetWeightsWereUsed() const
-{
-	return useWeights;
-}
-
-string PDFWithData::GetWeightName() const
-{
-	return WeightName;
 }
 

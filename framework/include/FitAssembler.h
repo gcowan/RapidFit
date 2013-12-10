@@ -106,7 +106,7 @@ class FitAssembler
 		 *
 		 * @return void
 		 */
-		static void CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDataSet*> allDataNum, const DebugClass* =NULL );
+		static void CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDataSet*> allDataNum, const string WeightName=string(), const string AlphaName=string(), const DebugClass* =NULL );
 
 		/*!
 		 * @brief This checks the given ParameterSet for the required Parameters
