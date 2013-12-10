@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/12/07 Rob Currie
+  - Updating the 2012 tAcc histogram .txt files and adding executable tag to get_histograms script
+
 2013/12/06 Rob Currie
   - Replacing exits with throws in XMLConfig Reader
   - Adding some basic checks in MultiXML to reject duplicate definitions of objects, always take the first definition of an object
