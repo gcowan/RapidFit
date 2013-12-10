@@ -109,42 +109,6 @@ void RapidFitExit()
 	cout << "Goodbye :)" << endl;
 }
 
-int BuildTemplateXML( RapidFitConfiguration* config );
-
-int ConfigureRapidFit( RapidFitConfiguration* config );
-
-int saveOneDataSet( RapidFitConfiguration* config );
-
-int testIntegrator( RapidFitConfiguration* config );
-
-int testComponentPlot( RapidFitConfiguration* config );
-
-int calculateFitFractions( RapidFitConfiguration* config );
-
-int calculateAcceptanceWeights( RapidFitConfiguration* config );
-
-int calculateAcceptanceCoefficients( RapidFitConfiguration* config );
-
-int calculateAcceptanceWeightsWithSwave( RapidFitConfiguration* config );
-
-int calculatePerEventAcceptance( RapidFitConfiguration* config );
-
-int PerformToyStudy( RapidFitConfiguration* config );
-
-int PerformMCStudy( RapidFitConfiguration* config );
-
-int PerformFCStudy( RapidFitConfiguration* config );
-
-int PerformMainFit( RapidFitConfiguration* config );
-
-int PerformLLScan( RapidFitConfiguration* config );
-
-int Perform2DLLScan( RapidFitConfiguration* config );
-
-int PerformJackKnife( RapidFitConfiguration* config );
-
-void SaveXML( RapidFitConfiguration* config );
-
 //	The 'meat' of the Code
 int RapidFit( vector<string> input )
 {
@@ -484,11 +448,32 @@ int PerformLLScan( RapidFitConfiguration* config )
 
 void SaveXML( RapidFitConfiguration* config )
 {
-	stringstream full_xml;
+	string full_xml = GenerateXML( config, config->generateToyXML );
 
+	string fileName = ResultFormatter::GetOutputFolder();
+	fileName.append("/");
+	string xml_filename = "outputXMLFile";
+	xml_filename.append( StringProcessing::TimeString() );
+	xml_filename.append( ".xml" );
+	fileName.append(xml_filename);
+	ofstream output_xmlFile;
+	output_xmlFile.open( fileName.c_str() );
+
+	output_xmlFile << full_xml;
+
+	output_xmlFile.close();
+
+	cout << endl << "Output XML Stored in:\t" << fileName << endl << endl;
+}
+
+string GenerateXML( RapidFitConfiguration* config, bool isForToys )
+{
+	stringstream full_xml;
 	full_xml << "<RapidFit>" << endl;
 	full_xml << endl;
-	if( config->generateToyXML == true )
+	full_xml << "<Seed>" << config->xmlFile->GetOriginalSeed() << "</Seed>" << endl;
+	full_xml << endl;
+	if( isForToys == true )
 	{
 		full_xml << config->GlobalResult->GetResultParameterSet()->ToyXML();
 		for( vector<PDFWithData*>::iterator toFit_i = config->pdfsAndData.begin(); toFit_i != config->pdfsAndData.end(); ++toFit_i )
@@ -522,20 +507,7 @@ void SaveXML( RapidFitConfiguration* config )
 	}
 	full_xml << "</RapidFit>" << endl;
 
-	string fileName = ResultFormatter::GetOutputFolder();
-	fileName.append("/");
-	string xml_filename = "outputXMLFile";
-	xml_filename.append( StringProcessing::TimeString() );
-	xml_filename.append( ".xml" );
-	fileName.append(xml_filename);
-	ofstream output_xmlFile;
-	output_xmlFile.open( fileName.c_str() );
-
-	output_xmlFile << full_xml.str() ;
-
-	output_xmlFile.close();
-
-	cout << endl << "Output XML Stored in:\t" << fileName << endl << endl;
+	return full_xml.str();
 }
 
 int PerformMainFit( RapidFitConfiguration* config )
@@ -810,7 +782,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 		//cout << "Writing Output Tuple to:\t" << fileName << endl;
 		//cout << "Output Folder:\t" << ResultFormatter::GetOutputFolder() << endl;
 		//cout << "Current Folder:\t" << gSystem->pwd() << endl;
-		ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs );
+		ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs, GenerateXML( config, false ), GenerateXML( config, true ) );
 		ResultFormatter::ReviewOutput( config->GlobalResult );
 	}
 

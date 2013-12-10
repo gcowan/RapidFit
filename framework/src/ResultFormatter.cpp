@@ -1037,7 +1037,7 @@ void ResultFormatter::AddBranch( TTree* inputTree, const string& BranchName, con
 }
 
 //Make pull plots from the output of a toy study
-void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVector* ToyResult, const vector<string> inputXML, const vector<string> runtimeArgs )
+void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVector* ToyResult, const vector<string> inputXML, const vector<string> runtimeArgs, const string XMLForProjections, const string XMLForToys )
 {
 	TFile * rootFile = new TFile( FileName.c_str(), "RECREATE" );
 	rootFile->SetCompressionLevel( 9 );
@@ -1213,6 +1213,32 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 
 		RuntimeTree->Write("",TObject::kOverwrite);
 	}
+
+	if( !XMLForProjections.empty() )
+	{
+		TTree* ProjectionXML = new TTree( "XMLForProjections", "XMLForProjections" );
+
+		string thisXML = XMLForProjections;
+
+		ProjectionXML->Branch( "ProjectionXML", "std::string", &thisXML );
+
+		ProjectionXML->Fill();
+
+		ProjectionXML->Write("",TObject::kOverwrite);
+	}
+
+        if( !XMLForToys.empty() )
+        {
+                TTree* ToyXML = new TTree( "XMLForToys", "XMLForToys" );
+
+                string thisXML = XMLForToys;
+
+                ToyXML->Branch( "ToyXML", "std::string", &thisXML );
+
+                ToyXML->Fill();
+
+                ToyXML->Write("",TObject::kOverwrite);
+        }
 
 	rootFile->Write("",TObject::kOverwrite);
 	rootFile->Close();

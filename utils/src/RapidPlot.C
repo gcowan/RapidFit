@@ -125,6 +125,12 @@ void helpFunction()
 	cout << "To how this fit was executed run with:" << endl << endl;
 	cout << "RapidPlot Global_Fit_Output.root --Summarise" << endl;
 	cout << endl;
+	cout << "To Get the XML to make a projection from a .root Global Fit Result from a fit output" << endl;
+	cout << "RapidPlot Global_Fit_Output.root --GetProjectionXML" << endl;
+	cout << endl;
+	cout << "To Get the XML to make a toy study from a .root Global Fit Result from a fit output" << endl;
+	cout << "RapidPlot Global_Fit_Output.root --GetToyXML" << endl;
+	cout << endl;
 }
 
 void Summarise( vector<string> input_filenames, vector<string> other_params )
@@ -219,6 +225,134 @@ void RestoreXML( vector<string> input_filenames, vector<string> other_params )
 	}
 }
 
+void GetToyXML( vector<string> input_filenames, vector<string> other_params )
+{
+	string SaveAs="--SaveAs";
+	string SaveAs2="-SaveAs";
+
+	TString XMLName = "ToyXMLFile_";
+
+	for( unsigned int i=0; i< other_params.size(); ++i )
+	{
+		string thisString = other_params[i];
+		size_t found = thisString.find(SaveAs);
+		size_t found2 = thisString.find(SaveAs2);
+
+		if( found2 != string::npos )
+		{
+			found = found2;
+		}
+
+		if( found != string::npos )
+		{
+			string newName = StringOperations::SplitString( thisString, ':' )[1];
+			string xmlext=".xml";
+			size_t foundext = newName.find(xmlext);
+			if( foundext != string::npos ) newName = StringOperations::SplitString( thisString, '.' )[0];
+
+			XMLName = newName.c_str();
+			XMLName.Append("_");
+		}
+	}
+
+	for( unsigned int i=0; i< input_filenames.size(); ++i )
+	{
+		TString thisXMLName = XMLName;
+
+		thisXMLName+=i; thisXMLName.Append("_");
+
+		thisXMLName.Append( StringOperations::TimeString() );
+
+		thisXMLName.Append( ".xml" );
+
+		TTree* runtimeXML = ROOT_File_Processing::GetTree( input_filenames[i], "XMLForToys" );
+
+		string* thisXML = new string();
+
+		runtimeXML->SetBranchAddress( "ToyXML", &thisXML );
+
+		runtimeXML->GetEntry(0);
+
+		cout << "Saving output XML to file:\t" << thisXMLName << endl;
+		cout << endl;
+
+		stringstream full_xml;
+
+		full_xml << (*thisXML) << endl;
+
+		ofstream output_xmlFile;
+		output_xmlFile.open( thisXMLName.Data() );
+
+		output_xmlFile << full_xml.str();
+
+		output_xmlFile.close();
+	}
+}
+
+void GetProjectionXML( vector<string> input_filenames, vector<string> other_params )
+{
+	string SaveAs="--SaveAs";
+	string SaveAs2="-SaveAs";
+
+	TString XMLName = "ProjectionXMLFile_";
+
+	for( unsigned int i=0; i< other_params.size(); ++i )
+	{
+		string thisString = other_params[i];
+		size_t found = thisString.find(SaveAs);
+		size_t found2 = thisString.find(SaveAs2);
+
+		if( found2 != string::npos )
+		{
+			found = found2;
+		}
+
+		if( found != string::npos )
+		{
+			string newName = StringOperations::SplitString( thisString, ':' )[1];
+			string xmlext=".xml";
+			size_t foundext = newName.find(xmlext);
+			if( foundext != string::npos ) newName = StringOperations::SplitString( thisString, '.' )[0];
+
+			XMLName = newName.c_str();
+			XMLName.Append("_");
+		}
+	}
+
+	for( unsigned int i=0; i< input_filenames.size(); ++i )
+	{
+		TString thisXMLName = XMLName;
+
+		thisXMLName+=i; thisXMLName.Append("_");
+
+		thisXMLName.Append( StringOperations::TimeString() );
+
+		thisXMLName.Append( ".xml" );
+
+		TTree* runtimeXML = ROOT_File_Processing::GetTree( input_filenames[i], "XMLForProjections" );
+
+		string* thisXML = new string();
+
+		runtimeXML->SetBranchAddress( "ProjectionXML", &thisXML );
+
+		runtimeXML->GetEntry(0);
+
+		cout << "Saving output XML to file:\t" << thisXMLName << endl;
+		cout << endl;
+
+		stringstream full_xml;
+
+		full_xml << (*thisXML) << endl;
+
+		ofstream output_xmlFile;
+		output_xmlFile.open( thisXMLName.Data() );
+
+		output_xmlFile << full_xml.str();
+
+		output_xmlFile.close();
+	}
+}
+
 int main( int argc, char* argv[] )
 {
 	//	Mute ROOT
@@ -265,6 +399,22 @@ int main( int argc, char* argv[] )
 	if( StringOperations::VectorContains( &other_params, &restoreXML ) != -1 || StringOperations::VectorContains( &other_params, &restoreXML2 ) != -1 )
 	{
 		RestoreXML( input_filenames, other_params );
+		exit(0);
+	}
+
+	string getPXML="--GetProjectionXML";
+	string getPXML2="-GetProjectionXML";
+	if( StringOperations::VectorContains( &other_params, &getPXML ) != -1 || StringOperations::VectorContains( &other_params, &getPXML2 ) != -1 )
+	{
+		GetProjectionXML( input_filenames, other_params );
+		exit(0);
+	}
+
+	string getTXML="--GetToyXML";
+	string getTXML2="-GetToyXML";
+	if( StringOperations::VectorContains( &other_params, &getTXML ) != -1 || StringOperations::VectorContains( &other_params, &getTXML2 ) != -1 )
+	{
+		GetToyXML( input_filenames, other_params );
 		exit(0);
 	}
 

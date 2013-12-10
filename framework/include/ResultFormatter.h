@@ -59,7 +59,8 @@ class ResultFormatter
 		//MakePullPlots chooses the appropriate method based on the first string argument
 		static void MakePullPlots( string, string, FitResultVector* );
 		static void FlatNTuplePullPlots( string, FitResultVector* );
-		static void WriteFlatNtuple( const string , const FitResultVector*, const vector<string> inputXML=vector<string>(), const vector<string> runtimeArgs=vector<string>() );
+		static void WriteFlatNtuple( const string , const FitResultVector*, const vector<string> inputXML=vector<string>(),
+				const vector<string> runtimeArgs=vector<string>(), const string=string(), const string=string() );
 		static void SeparateParameterPullPlots( string, FitResultVector* );
 
 		static vector<TString> get_branch_names( TTree* );

@@ -179,6 +179,7 @@ class XMLConfigReader : public I_XMLConfigReader
 
 		void SetDebug( DebugClass* input_debug );
 
+		unsigned int GetOriginalSeed() const;
 	private:
 		/*!
 		 * Don't Copy the class this way!
@@ -319,6 +320,8 @@ class XMLConfigReader : public I_XMLConfigReader
 		 * @brief This is an internal function which appends the label of each PDF to have a unique number which makes deciphering which PDF in a large fit exactly threw the error
 		 */
 		void AppendCommonNames( XMLTag* input, unsigned int &subParamNum, unsigned int &appendParamNum, unsigned int &configParamNum );
+
+		int _original_seed;
 };
 
 #endif

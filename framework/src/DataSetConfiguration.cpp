@@ -635,7 +635,7 @@ string DataSetConfiguration::XML() const
 	xml << "<DataSet>" << endl;
 	if( source == "Foam" )
 	{
-		xml << generatePDF->XML();
+		if( generatePDF != NULL ) xml << generatePDF->XML();
 	}
 	xml << "\t" << "<Source>" << source << "</Source>" << endl;
 	if( source == "File" || source == "FoamFile" )

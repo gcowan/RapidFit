@@ -7,6 +7,9 @@
 #define _STR(x) #x
 #define STR(x) _STR(x)
 
+#include "RapidFitConfiguration.h"
+
+#include <string>
 #include <vector>
 
 using namespace::std;
@@ -83,4 +86,46 @@ int RapidFit( vector<string> );
  * @defgroup FitObjects  Normal Fit Objects
  *
  */
+
+void RapidFitWelcome();
+
+void RapidFitExit();
+
+int BuildTemplateXML( RapidFitConfiguration* config );
+
+int ConfigureRapidFit( RapidFitConfiguration* config );
+
+int saveOneDataSet( RapidFitConfiguration* config );
+
+int testIntegrator( RapidFitConfiguration* config );
+
+int testComponentPlot( RapidFitConfiguration* config );
+
+int calculateFitFractions( RapidFitConfiguration* config );
+
+int calculateAcceptanceWeights( RapidFitConfiguration* config );
+
+int calculateAcceptanceCoefficients( RapidFitConfiguration* config );
+
+int calculateAcceptanceWeightsWithSwave( RapidFitConfiguration* config );
+
+int calculatePerEventAcceptance( RapidFitConfiguration* config );
+
+int PerformToyStudy( RapidFitConfiguration* config );
+
+int PerformMCStudy( RapidFitConfiguration* config );
+
+int PerformFCStudy( RapidFitConfiguration* config );
+
+int PerformMainFit( RapidFitConfiguration* config );
+
+int PerformLLScan( RapidFitConfiguration* config );
+
+int Perform2DLLScan( RapidFitConfiguration* config );
+
+int PerformJackKnife( RapidFitConfiguration* config );
+
+void SaveXML( RapidFitConfiguration* config );
+
+string GenerateXML( RapidFitConfiguration* config, bool isForToys );
 

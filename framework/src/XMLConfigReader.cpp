@@ -62,7 +62,7 @@ void XMLConfigReader::PrintTag( const XMLTag* thisTag )
 
 //Constructor with file name argument
 XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML, DebugClass* thisDebug ) : I_XMLConfigReader(),
-	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(thisDebug==NULL?new DebugClass(false):new DebugClass(*thisDebug) ), XMLValid(false)
+	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(thisDebug==NULL?new DebugClass(false):new DebugClass(*thisDebug) ), XMLValid(false), _original_seed(-999)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -2232,7 +2232,7 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	}
 
 	IPDF* returnable_pdf = GetNamedPDF( InputTag, InputBoundary, overloadConfigurator, false );
-        cout << "XMLConfigReader:: Constructed" << returnable_pdf->GetLabel() << endl;
+        cout << "XMLConfigReader:: Constructed " << returnable_pdf->GetLabel() << " PDF" << endl;
 
         ParameterSet* thisParameterSet = this->GetFitParameters();
         vector<string> haveNames = thisParameterSet->GetAllNames();
@@ -2319,6 +2319,7 @@ PrecalculatorConfig* XMLConfigReader::GetPrecalculatorConfig( )
 //	Return the Integer Seed used in RapidFit XML tag <Seed>SomeInt</Seed>
 unsigned int XMLConfigReader::GetSeed()
 {
+	unsigned int this_seed=0;
 	if( seed < 0 )
 	{
 		//Find the NumberRepeats tag
@@ -2334,13 +2335,16 @@ unsigned int XMLConfigReader::GetSeed()
 		seed = 0 ;
 		//If no such tag is found, report
 		cout << "Seed tag not found in config file, defaulting to TRandom3(0)." << endl;
-	} else  return unsigned(seed);
-	return 0;
+	} else  this_seed = unsigned(seed);
+
+	if( _original_seed < 0 ) _original_seed = this_seed;
+	return this_seed;
 }
 
 //	Set a new TRandom seed that is returned by the XMLFile
 void XMLConfigReader::SetSeed( unsigned int new_seed )
 {
+	_original_seed = (int)new_seed;
 	seed = (int)new_seed;
 }
 
@@ -2574,5 +2578,10 @@ void XMLConfigReader::SetDebug( DebugClass* input_debug )
 {
 	if( debug != NULL ) delete debug;
 	debug = new DebugClass( *input_debug );
+}
+
+unsigned int XMLConfigReader::GetOriginalSeed() const
+{
+	return (unsigned)_original_seed;
 }
 

@@ -161,6 +161,8 @@ class MultiXMLConfigReader : public I_XMLConfigReader
 
 		void SetDebug( DebugClass* input_debug );
 
+		unsigned int GetOriginalSeed() const;
+
 	private:
 		/*!
 		 * Don't Copy the class this way!

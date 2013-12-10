@@ -159,6 +159,7 @@ class I_XMLConfigReader
 
 		virtual void SetDebug( DebugClass* input_debug ) = 0;
 
+		virtual unsigned int GetOriginalSeed() const = 0;
 	protected:
 		/*!
 		 * Don't Copy the class this way!
@@ -175,5 +176,6 @@ class I_XMLConfigReader
 };
 
 #endif
+
 
 

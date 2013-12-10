@@ -2,6 +2,12 @@
 
 2013/12/07 Rob Currie
   - Updating the 2012 tAcc histogram .txt files and adding executable tag to get_histograms script
+  - Fixed bug in generating a toy XML from a toy study... This will only produce reproducible results when the SEED is known!
+  - Added Seed to the generated XML from RapidFit to capture the output from toys
+  - Added Projection and Toy XML to the Global Output from RapidFit in addition to the XML used to run the fit in the first place.
+       These XML can be re-generated from the .root with RapidPlot
+  - Added the --GetToyXML and --GetProjectionXML options to RapidPlot
+  - Moved declaration of methods to main.h to make looking up the names and arguments of methods a little easier and would promote further modularising the main file
 
 2013/12/06 Rob Currie
   - Replacing exits with throws in XMLConfig Reader

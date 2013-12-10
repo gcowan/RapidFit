@@ -199,6 +199,10 @@ unsigned int MultiXMLConfigReader::GetSeed()
 void MultiXMLConfigReader::SetSeed( unsigned int new_seed )
 {
 	storedSeed = new_seed;
+	for( unsigned int i=0; i< XMLReaders.size(); ++i )
+	{
+		XMLReaders[i]->SetSeed( new_seed );
+	}
 }
 
 void MultiXMLConfigReader::SetDebug( DebugClass* input_debug )
@@ -209,5 +213,10 @@ void MultiXMLConfigReader::SetDebug( DebugClass* input_debug )
 	}
         if( debug != NULL ) delete debug;
         debug = new DebugClass( *input_debug );
+}
+
+unsigned int MultiXMLConfigReader::GetOriginalSeed() const
+{
+	return XMLReaders[0]->GetOriginalSeed();
 }
 
