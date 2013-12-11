@@ -1,6 +1,10 @@
 // $Id: release.notes $
 
-2013/12/07 Rob Currie
+2013/12/11 Rob Currie
+  - Fixing -sign problem in Resolution model
+  - minor fix in ParameterSet cout
+
+2013/12/10 Rob Currie
   - Updating the 2012 tAcc histogram .txt files and adding executable tag to get_histograms script
   - Fixed bug in generating a toy XML from a toy study... This will only produce reproducible results when the SEED is known!
   - Added Seed to the generated XML from RapidFit to capture the output from toys

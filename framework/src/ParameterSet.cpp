@@ -39,7 +39,7 @@ ParameterSet::ParameterSet( vector<ParameterSet*> input, bool silent ) :
 				if( !silent )
 				{
 					cerr << "Physics Parameter: " << *param_i << " already defined." << endl;
-					cerr << "Using last definition of this Parameter." << endl;
+					cerr << "Using first definition of this Parameter." << endl;
 					(*set_i)->GetPhysicsParameter( temp_par )->Print();
 				}
 				//this->AddPhysicsParameter( ((*set_i)->GetPhysicsParameter( temp_par )) );

@@ -91,45 +91,45 @@ bool Phis2012ResolutionModel::isPerEvent( ) {  return true; }
 double Phis2012ResolutionModel::Exp( double time, double gamma ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::Exp( time+mu, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::Exp( time-mu, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::Exp( time+mu, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::Exp( time-mu, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::ExpInt( double tlow, double thigh, double gamma ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpInt( tlow+mu, thigh+mu, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpInt( tlow-mu, thigh-mu, gamma, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpInt( tlow+mu, thigh+mu, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpInt( tlow-mu, thigh-mu, gamma, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::ExpSin( double time, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpSin( time+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpSin( time-mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpSin( time+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpSin( time-mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::ExpSinInt( double tlow, double thigh, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpSinInt( tlow+mu, thigh+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpSinInt( tlow-mu, thigh-mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpSinInt( tlow+mu, thigh+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpSinInt( tlow-mu, thigh-mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
 double Phis2012ResolutionModel::ExpCos( double time, double gamma, double dms ) {
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpCos( time+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpCos( time-mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpCos( time+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpCos( time-mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
@@ -137,9 +137,9 @@ double Phis2012ResolutionModel::ExpCosInt( double tlow, double thigh, double gam
 	//cout << " tlow" << tlow << "   thigh  "  << thigh << "   gamma  "  << gamma << "  dms  "  << dms  << "    res  " << eventResolution*resScale << endl;
 	double returnable = 0.;
 	this->requestComponent( 1 );
-	returnable += Mathematics::ExpCosInt( tlow+mu, thigh+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
+	returnable += Mathematics::ExpCosInt( tlow-mu, thigh-mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 1 );
 	this->requestComponent( 2 );
-	returnable += Mathematics::ExpCosInt( tlow+mu, thigh+mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
+	returnable += Mathematics::ExpCosInt( tlow-mu, thigh-mu, gamma, dms, this->GetThisScale() ) * this->GetFraction( 2 );
 	return returnable;
 }
 
