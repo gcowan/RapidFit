@@ -158,7 +158,7 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 			}
 			if( this->GetOffSetNLL() )
 			{
-				total+= fit_thread_data[threadnum].dataPoint_Result[ point_num ]-averageNLL;
+				total+= (fit_thread_data[threadnum].dataPoint_Result[ point_num ]-averageNLL);
 			}
 			else
 			{
