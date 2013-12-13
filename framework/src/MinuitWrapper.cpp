@@ -562,7 +562,8 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	int mnpar, nparx, stat;
 	currentMinuitInstance->mnstat( min, edm, errdef, mnpar, nparx, stat );
 
-	cout << "Call: " << left << setw(5) << function->GetCallNum() << " NLL: " << setprecision(10) << fval << " minNLL: " << setprecision(10) << min << " EDM: " << setprecision(3) << setw(5) << edm;
+	cout << "Call: " << left << setw(5) << function->GetCallNum() << " NLL: " << setprecision(10) << fval << " minNLL: " << setprecision(10) << min;
+	cout << " deltaMin: "  << fval-min << " EDM: " << setprecision(3) << setw(5) << edm;
 	cout << " Status: " << setw(1) << stat << setw(20) << " " <<  "\r" << flush;
 }
 

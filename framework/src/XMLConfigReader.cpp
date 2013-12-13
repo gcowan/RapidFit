@@ -916,6 +916,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		bool integratorTest = true;
 		bool NormaliseWeights = false;
 		bool SingleNormaliseWeights = false;
+		bool OffSetNLL = false;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		RapidFitIntegratorConfig* thisConfig = new RapidFitIntegratorConfig();
 		if ( functionInfo.size() == 0 )
@@ -976,6 +977,10 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 				{
 					SingleNormaliseWeights = XMLTag::GetBooleanValue( functionInfo[childIndex] );
 				}
+				else if ( functionInfo[childIndex]->GetName() == "OffSetNLL" )
+				{
+					OffSetNLL = XMLTag::GetBooleanValue( functionInfo[childIndex] );
+				}
 				else
 				{
 					cerr << "Unrecognised FitFunction component: " << functionInfo[childIndex]->GetName() << endl;
@@ -1018,6 +1023,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		returnable_function->SetSingleNormaliseWeights( SingleNormaliseWeights );
 		returnable_function->SetIntegratorTest( integratorTest );
 		returnable_function->SetIntegratorConfig( thisConfig );
+		returnable_function->SetOffSetNLL( OffSetNLL );
 
 		delete thisConfig;
 		return returnable_function;

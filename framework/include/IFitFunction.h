@@ -7,7 +7,7 @@
  *
  * @author Benjamin M Wynne bwynne@cern.ch
  * @author Robert Currie rcurrie@cern.ch
-*/
+ */
 
 #pragma once
 #ifndef _I_FIT_FUNCTION_H
@@ -103,7 +103,7 @@ class IFitFunction
 		virtual bool GetWeightsWereUsed() const = 0;
 
 		virtual string GetWeightName() const = 0;
-		
+
 		/*!
 		 * @brief Set the IFitFunction to use Weights squared
 		 *
@@ -150,6 +150,10 @@ class IFitFunction
 		virtual void SetDebug( DebugClass* debug ) = 0;
 
 		virtual unsigned int GetCallNum() = 0;
+
+		virtual void SetOffSetNLL( const bool Input ) = 0;
+
+		virtual bool GetOffSetNLL() const = 0;
 
 	protected:
 		IFitFunction() {};

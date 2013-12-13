@@ -37,7 +37,7 @@ using namespace::std;
 FitFunction::FitFunction() :
 	Name("Unknown"), allData(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
-	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig())
+	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig()), startNLL(numeric_limits<double>::quiet_NaN())
 {
 }
 
@@ -393,8 +393,15 @@ double FitFunction::Evaluate()
 		}
 	}
 
-//	cout << endl << "Goodbye!" << endl;
-//	exit(0);
+	//	cout << endl << "Goodbye!" << endl;
+	//	exit(0);
+
+	if( startNLL != startNLL && this->GetOffSetNLL() )
+	{
+		startNLL = minimiseValue;
+		cout << endl << "Shifting NLL by:   " << setprecision(20) << -startNLL << endl;
+	}
+	if( this->GetOffSetNLL() )	minimiseValue-=startNLL;
 
 	return minimiseValue;
 }
@@ -480,5 +487,15 @@ void FitFunction::SetDebug( DebugClass* input_debug )
 unsigned int FitFunction::GetCallNum()
 {
 	return callNum;
+}
+
+void FitFunction::SetOffSetNLL( const bool Input )
+{
+	OffSetNLL = Input;
+}
+
+bool FitFunction::GetOffSetNLL() const
+{
+	return OffSetNLL;
 }
 

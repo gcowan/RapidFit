@@ -106,13 +106,18 @@ class FitFunctionConfiguration
 		 */
 		string XML() const;
 
-		void SetNormaliseWeights( bool Input );
+		void SetNormaliseWeights( const bool Input );
 
 		bool GetNormaliseWeights() const;
 
-		void SetSingleNormaliseWeights( bool Input );
+		void SetSingleNormaliseWeights( const bool Input );
 
 		bool GetSingleNormaliseWeights() const;
+
+		void SetOffSetNLL( const bool Input );
+
+		bool GetOffSetNLL() const;
+
 	private:
 
 		FitFunctionConfiguration( const FitFunctionConfiguration& input );
@@ -132,6 +137,8 @@ class FitFunctionConfiguration
 		bool SingleNormaliseWeights;
 		bool hasAlpha;
 		string alphaName;
+
+		bool OffSetNLL;
 };
 
 #endif

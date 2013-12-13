@@ -37,7 +37,7 @@ using namespace::std;
 pthread_mutex_t eval_lock;
 
 //Default constructor
-NegativeLogLikelihoodThreaded::NegativeLogLikelihoodThreaded() : FitFunction()
+NegativeLogLikelihoodThreaded::NegativeLogLikelihoodThreaded() : FitFunction(), averageNLL(numeric_limits<double>::quiet_NaN())
 {
 	Name="NegativeLogLikelihoodThreaded";
 }
@@ -133,6 +133,21 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 
 	double total=0;
 
+	if( averageNLL != averageNLL && this->GetOffSetNLL() )
+	{
+		averageNLL=0.;
+		for( unsigned int threadnum=0; threadnum< (unsigned)Threads; ++threadnum )
+		{
+			for( unsigned int point_num=0; point_num< fit_thread_data[threadnum].dataPoint_Result.size(); ++point_num )
+			{
+				if( fit_thread_data[threadnum].dataPoint_Result[ point_num ] >= DBL_MAX ) return DBL_MAX;
+
+				averageNLL += fit_thread_data[threadnum].dataPoint_Result[ point_num ];
+			}
+			averageNLL/=(double)TotalDataSet->GetDataNumber();
+		}
+	}
+
 	for( unsigned int threadnum=0; threadnum< (unsigned)Threads; ++threadnum )
 	{
 		for( unsigned int point_num=0; point_num< fit_thread_data[threadnum].dataPoint_Result.size(); ++point_num )
@@ -141,7 +156,14 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 			{
 				return DBL_MAX;
 			}
-			total+= fit_thread_data[threadnum].dataPoint_Result[ point_num ];
+			if( this->GetOffSetNLL() )
+			{
+				total+= fit_thread_data[threadnum].dataPoint_Result[ point_num ]-averageNLL;
+			}
+			else
+			{
+				total+= fit_thread_data[threadnum].dataPoint_Result[ point_num ];
+			}
 		}
 		vector<double> empty;
 		fit_thread_data[threadnum].dataPoint_Result.swap( empty );

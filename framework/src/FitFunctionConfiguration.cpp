@@ -22,7 +22,7 @@ using namespace::std;
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) :
 	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0),
 	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), SingleNormaliseWeights(false), alphaName("undefined"),
-	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() )
+	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() ), OffSetNLL(false)
 {
 }
 
@@ -30,7 +30,7 @@ FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) :
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) :
 	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0),
 	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), SingleNormaliseWeights(false), alphaName("undefined"),
-	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() )
+	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() ), OffSetNLL(false)
 {
 }
 
@@ -62,6 +62,8 @@ IFitFunction * FitFunctionConfiguration::GetFitFunction()
 	theFunction->SetThreads( Threads );
 
 	theFunction->SetIntegratorTest( testIntegrator );
+
+	theFunction->SetOffSetNLL( OffSetNLL );
 
 	return theFunction;
 }
@@ -167,5 +169,14 @@ bool FitFunctionConfiguration::GetNormaliseWeights() const
 bool FitFunctionConfiguration::GetSingleNormaliseWeights() const
 {
 	return SingleNormaliseWeights;
+}
+
+void FitFunctionConfiguration::SetOffSetNLL( const bool Input )
+{
+	OffSetNLL = Input;
+}
+bool FitFunctionConfiguration::GetOffSetNLL() const
+{
+	return OffSetNLL;
 }
 

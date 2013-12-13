@@ -1,5 +1,12 @@
 // $Id: release.notes $
 
+2013/12/13 Rob Currie
+  - Adding new feature to RapidFit
+       This (for NOW) is NOT enabled by default!
+       Add <OffSetNLL>True</OffSetNLL> within your <FitFunction> XML tag to allow RapidFit to redefine your NLL in the fit.
+       This redefines the NLL for each event as the ( NLL- [average NLL for this PDF] ) and then offsets the whole NLL for the fit by NLL(step_0)
+       This potentially has problems when starting far away from the minima but no more problems than the fit is starting with atm.
+
 2013/12/11 Rob Currie
   - Fixing -sign problem in Resolution model
   - minor fix in ParameterSet cout

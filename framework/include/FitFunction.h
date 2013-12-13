@@ -7,7 +7,7 @@
  *
  * @author Benjamin M Wynne bwynne@cern.ch
  * @author Robert Currie rcurrie@cern.ch
-*/
+ */
 
 #pragma once
 #ifndef FIT_FUNCTION_H
@@ -109,7 +109,7 @@ class FitFunction : public IFitFunction
 		bool GetWeightsWereUsed() const;
 
 		string GetWeightName() const;
-		
+
 		/*!
 		 * @brief Set the FitFunction to use Weights squared
 		 *
@@ -160,6 +160,11 @@ class FitFunction : public IFitFunction
 		vector<string> GetNotConstrainedList() const;
 
 		unsigned int GetCallNum();
+
+		void SetOffSetNLL( const bool Input );
+
+		bool GetOffSetNLL() const;
+
 	protected:
 		/*!
 		 * Don't Copy the class this way!
@@ -216,6 +221,9 @@ class FitFunction : public IFitFunction
 
 		vector<vector<IDataSet*> > stored_datasets;
 
+		double startNLL;
+
+		bool OffSetNLL;
 };
 
 #endif
