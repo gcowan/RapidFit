@@ -407,6 +407,7 @@
 		<SetIntegratorTest>False</SetIntegratorTest>
 		#<NormaliseWeights>True</NormaliseWeights>
 		#<Strategy>Petes</Strategy>
+		<OffSetNLL>True</OffSetNLL>
 	</FitFunction>
 
 

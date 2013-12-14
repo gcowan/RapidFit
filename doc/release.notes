@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/12/14 Rob Currie
+  - Fixing calculation of averageNLL over whole dataset in fit construction
+
 2013/12/13 Rob Currie
   - Adding new feature to RapidFit
        This (for NOW) is NOT enabled by default!

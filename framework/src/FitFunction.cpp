@@ -37,7 +37,7 @@ using namespace::std;
 FitFunction::FitFunction() :
 	Name("Unknown"), allData(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
-	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig()), startNLL(numeric_limits<double>::quiet_NaN())
+	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig()), averageNLL(numeric_limits<double>::quiet_NaN()), startNLL(numeric_limits<double>::quiet_NaN())
 {
 }
 
@@ -301,6 +301,43 @@ double FitFunction::Evaluate()
 #endif
 	double minimiseValue = 0.0;
 	double temp=0.;
+
+	if( std::isnan(averageNLL) && this->GetOffSetNLL() )
+	{
+		double runningNLL=0.;
+		double runningT=0.;
+		for( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
+		{
+			if( allData->GetResultDataSet( resultIndex )->GetDataNumber() == 0 )
+			{
+				if( callNum < 6 )
+				{
+					cerr << "Are you aware DataSet: " << resultIndex+1 << " has zero size?" << endl;
+				}
+				continue;
+			}
+			if( allData->GetResultDataSet( resultIndex )->GetDataNumber() < 1 )
+			{
+				temp = 0.;
+			}
+			else
+			{
+				temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex );
+			}
+			if( abs(temp) >= DBL_MAX )
+			{
+				return DBL_MAX;
+			}
+			else
+			{
+				runningNLL+=temp;
+			}
+			runningT+=(double)allData->GetResultDataSet( resultIndex )->GetDataNumber();
+		}
+
+		averageNLL = -runningNLL / runningT;
+
+	}
 	//Calculate the function value for each PDF-DataSet pair
 	for( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
 	{
@@ -396,12 +433,12 @@ double FitFunction::Evaluate()
 	//	cout << endl << "Goodbye!" << endl;
 	//	exit(0);
 
-	if( startNLL != startNLL && this->GetOffSetNLL() )
+	if( std::isnan(startNLL) && this->GetOffSetNLL() )
 	{
 		startNLL = minimiseValue;
 		cout << endl << "Shifting NLL by:   " << setprecision(20) << -startNLL << endl;
 	}
-	if( this->GetOffSetNLL() )	minimiseValue-=startNLL;
+	if( this->GetOffSetNLL() && !(std::isnan(startNLL)) )	minimiseValue-=startNLL;
 
 	return minimiseValue;
 }

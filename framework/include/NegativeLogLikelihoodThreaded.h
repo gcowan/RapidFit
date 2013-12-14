@@ -38,7 +38,6 @@ class NegativeLogLikelihoodThreaded : public FitFunction
 			static void* ThreadWork( void* );
 		#endif
 
-		double averageNLL;
 };
 
 #endif

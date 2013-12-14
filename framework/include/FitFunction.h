@@ -221,7 +221,7 @@ class FitFunction : public IFitFunction
 
 		vector<vector<IDataSet*> > stored_datasets;
 
-		double startNLL;
+		double startNLL, averageNLL;
 
 		bool OffSetNLL;
 };
