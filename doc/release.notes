@@ -3,6 +3,7 @@
 2013/12/16 Rob Currie
   - Adding sort steps to NLL Threaded to try and preserve numerical precision in NLL calculation
   - Adding some additional output to Minuit to try and offer assistance to show what it's doing
+  - Adding some additional XML output to assist debugging unmatched tags
 
 2013/12/14 Rob Currie
   - Fixing calculation of averageNLL over whole dataset in fit construction

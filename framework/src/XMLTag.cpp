@@ -283,6 +283,11 @@ void XMLTag::FindTagCloses( string TagName, vector<string> Content, vector<int> 
 	if ( LineNumbers.size() < 1 )
 	{
 		cerr << "Tag " << TagName << " is not closed" << endl;
+		cerr << "Contents:" << endl;
+		for( unsigned int i=0; i< Content.size(); ++i )
+		{
+			cerr << Content[i] << endl;
+		}
 		exit(1);
 	}
 }
