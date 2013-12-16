@@ -25,6 +25,9 @@ using namespace::std;
 class ParameterSet
 {
 	public:
+
+		static vector<string> DiffSets( ParameterSet* first, ParameterSet* second );
+
 		/*!
 		 * @brief This is the constructor which effectively merges all given ParameterSet objects
 		 *

@@ -31,10 +31,16 @@
 #include <iostream>
 #include <pthread.h>
 #include <float.h>
+#include <algorithm>
 
 using namespace::std;
 
 pthread_mutex_t eval_lock;
+
+bool NLLSort( double val1, double val2 )
+{
+	return fabs(val1) < fabs(val2);
+}
 
 //Default constructor
 NegativeLogLikelihoodThreaded::NegativeLogLikelihoodThreaded() : FitFunction()
@@ -133,6 +139,8 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 
 	double total=0;
 
+	vector<double> NLLValues;
+
 	for( unsigned int threadnum=0; threadnum< (unsigned)Threads; ++threadnum )
 	{
 		for( unsigned int point_num=0; point_num< fit_thread_data[threadnum].dataPoint_Result.size(); ++point_num )
@@ -141,17 +149,26 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 			{
 				return DBL_MAX;
 			}
+
 			if( this->GetOffSetNLL() && !std::isnan(averageNLL) )
 			{
-				total+= (fit_thread_data[threadnum].dataPoint_Result[ point_num ]-averageNLL);
+				NLLValues.push_back(fit_thread_data[threadnum].dataPoint_Result[ point_num ]-averageNLL);
 			}
 			else
 			{
-				total+= fit_thread_data[threadnum].dataPoint_Result[ point_num ];
+				NLLValues.push_back(fit_thread_data[threadnum].dataPoint_Result[ point_num ]);
 			}
+
 		}
 		vector<double> empty;
 		fit_thread_data[threadnum].dataPoint_Result.swap( empty );
+	}
+
+	sort( NLLValues.begin(), NLLValues.end(), NLLSort );
+
+	for( vector<double>::iterator this_i = NLLValues.begin(); this_i != NLLValues.end(); ++this_i )
+	{
+		total+=*this_i;
 	}
 
 	//delete [] fit_thread_data;

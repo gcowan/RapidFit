@@ -19,6 +19,8 @@ using namespace::std;
 class PhysicsParameter
 {
 	public:
+		static bool DiffParams( PhysicsParameter* first, PhysicsParameter* second );
+
 		PhysicsParameter( string );
 		PhysicsParameter( string, double, double, double, double, string, string );
 		PhysicsParameter( string, double, double, string, string );

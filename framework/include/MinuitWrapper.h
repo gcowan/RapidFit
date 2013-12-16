@@ -69,6 +69,7 @@ class MinuitWrapper : public IMinimiser
 
 		static void Function( Int_t&, Double_t*, Double_t&, Double_t*, Int_t );
 		static IFitFunction * function;
+		static ParameterSet* LastSet;
 
 		TMinuit * minuit;
 		FitResult * fitResult;

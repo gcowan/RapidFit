@@ -33,6 +33,8 @@ class StatisticsFunctions
 		 */
 		static double Mean( const vector<double> inputList );
 
+		static int firstDiff( double* first, double* second, unsigned int size );
+
 		/*!
 		 * @brief Returns the standard variance of the vector of elements that has been passed
 		 *

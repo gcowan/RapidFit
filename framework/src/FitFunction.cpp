@@ -30,6 +30,7 @@
 #include <float.h>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 using namespace::std;
 
@@ -299,13 +300,11 @@ double FitFunction::Evaluate()
 		thisWatch->Start();
 	}
 #endif
-	double minimiseValue = 0.0;
-	double temp=0.;
-
 	if( std::isnan(averageNLL) && this->GetOffSetNLL() )
 	{
 		double runningNLL=0.;
 		double runningT=0.;
+		vector<double> NLLs;
 		for( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
 		{
 			if( allData->GetResultDataSet( resultIndex )->GetDataNumber() == 0 )
@@ -318,26 +317,38 @@ double FitFunction::Evaluate()
 			}
 			if( allData->GetResultDataSet( resultIndex )->GetDataNumber() < 1 )
 			{
-				temp = 0.;
+				NLLs.push_back( 0. );
 			}
 			else
 			{
-				temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex );
+				NLLs.push_back( this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex ) );
 			}
-			if( abs(temp) >= DBL_MAX )
+			if( fabs(NLLs.back()) >= DBL_MAX )
 			{
 				return DBL_MAX;
 			}
 			else
 			{
-				runningNLL+=temp;
+				runningNLL+=NLLs.back();
 			}
 			runningT+=(double)allData->GetResultDataSet( resultIndex )->GetDataNumber();
 		}
 
-		averageNLL = -runningNLL / runningT;
+		sort( NLLs.begin(), NLLs.end() );
 
+		double nLL=0;
+		for( unsigned int i=0; i< NLLs.size(); ++i )
+		{
+			nLL+=NLLs[i];
+		}
+
+		averageNLL = - nLL / runningT;
 	}
+
+	double minimiseValue = 0.0;
+	double temp=0.;
+
+	vector<double> values;
 	//Calculate the function value for each PDF-DataSet pair
 	for( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
 	{
@@ -352,24 +363,33 @@ double FitFunction::Evaluate()
 		}
 		if( allData->GetResultDataSet( resultIndex )->GetDataNumber() < 1 )
 		{
-			temp = 0.;
+			values.push_back( 0. );
 		}
 		else
 		{
 			//cout << "Eval Set: " << allData->GetResultDataSet( resultIndex ) << "\t" << resultIndex << endl;
-			temp = this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex );
+			values.push_back( this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex ) );
 			//cout << "Result: " << temp << endl;
 		}
-		if( abs(temp) >= DBL_MAX )
+		if( fabs(values.back()) >= DBL_MAX )
 		{
 			return DBL_MAX;
 		}
 		else
 		{
-			minimiseValue+=temp;
+			minimiseValue+=values.back();
 		}
 		//cout << endl << "temp: " << minimiseValue << endl << endl;
 	}
+
+	sort( values.begin(), values.end() );
+
+	for( unsigned int i=0; i< values.size(); ++i )
+	{
+		temp+=values[i];
+	}
+
+	minimiseValue=temp;
 
 	//Calculate the value of each constraint
 	vector< ConstraintFunction* > constraints = allData->GetConstraints();

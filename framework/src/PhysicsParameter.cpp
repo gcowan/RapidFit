@@ -19,6 +19,11 @@ using namespace::std;
 
 const double default_val = -9999.;
 
+bool PhysicsParameter::DiffParams( PhysicsParameter* first, PhysicsParameter* second )
+{
+	return first->GetValue() == second->GetValue();
+}
+
 //Default constructor
 PhysicsParameter::PhysicsParameter( string Name ) :
 	name(Name), value(default_val), originalValue(default_val), minimum(default_val), maximum(default_val), stepSize(default_val),

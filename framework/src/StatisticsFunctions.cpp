@@ -18,6 +18,15 @@
 //#define DOUBLE_TOLERANCE DBL_MIN
 #define DOUBLE_TOLERANCE 1E-6
 
+int firstDiff( const double* first, const double* second, const unsigned int size )
+{
+	for( unsigned int i=0; i< size; ++i )
+	{
+		if( first[i] != second[i] ) return i;
+	}
+	return -1;
+}
+
 //Return the mean of a vector of doubles
 double StatisticsFunctions::Mean( const vector<double> Numbers )
 {

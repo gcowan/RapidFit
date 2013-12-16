@@ -39,6 +39,7 @@ using namespace::std;
 
 //	Required to act as a 'global' pointer to the RapidFit fitfunction member of the MinuitWrapper Class
 IFitFunction * MinuitWrapper::function = 0;
+ParameterSet* MinuitWrapper::LastSet = NULL;
 
 //Default constructor
 //MinuitWrapper::MinuitWrapper(): minuit(NULL), fitResult(NULL), contours(), print_verbosity( 0 ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) )
@@ -545,10 +546,19 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	//}
 
 	ParameterSet* test = function->GetParameterSet();
+	bool wasNULL = LastSet == NULL;
+	if( LastSet == NULL )
+	{
+		LastSet = new ParameterSet( *test );
+		LastSet->UpdatePhysicsParameters( (double*)xval, npar );
+	}
+
+	vector<string> thisTry;
 
 	try
 	{
 		test->UpdatePhysicsParameters( (double*)xval, npar );
+		thisTry = ParameterSet::DiffSets( test, LastSet );
 		function->SetParameterSet( test );
 		fval = function->Evaluate();
 	}
@@ -562,9 +572,26 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 	int mnpar, nparx, stat;
 	currentMinuitInstance->mnstat( min, edm, errdef, mnpar, nparx, stat );
 
-	cout << "Call: " << left << setw(5) << function->GetCallNum() << " NLL: " << setprecision(10) << fval << " minNLL: " << setprecision(10) << min;
-	cout << " deltaMin: "  << fval-min << " EDM: " << setprecision(3) << setw(5) << edm;
-	cout << " Status: " << setw(1) << stat << setw(20) << " " <<  "\r" << flush;
+	cout << "Call: " << left << setw(5) << function->GetCallNum() << " NLL: " << setprecision(18) << setw(20) << fval << " minNLL: " << setprecision(18) << setw(20) << min;
+	cout << " EDM: " << setprecision(10) << setw(15) << edm;
+	cout << " Status: " << setw(1) << stat << setw(5) << " ";
+
+	LastSet->UpdatePhysicsParameters( (double*)xval, npar );
+
+	if( !wasNULL )
+	{
+		if( !thisTry.empty() )
+		{
+			cout << " Trying: ";
+			cout << " " << thisTry[0] << " = " << setprecision(10) << setw(15) << LastSet->GetPhysicsParameter( thisTry[0] )->GetValue();
+			cout << " deltaMin: "  << setprecision(18) << setw(20) << fval-min;
+			cout << setw(20) << " ";
+		}
+	}
+
+	cout <<  "\r" << flush;
+
+	//delete test2;
 }
 
 //Return the result of minimisation

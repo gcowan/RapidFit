@@ -18,6 +18,28 @@
 
 using namespace::std;
 
+vector<string> ParameterSet::DiffSets( ParameterSet* first, ParameterSet* second )
+{
+	vector<string> firstNames = first->GetAllNames();
+	vector<string> secondNames = second->GetAllNames();
+	vector<string> differentParams;
+
+	for( unsigned int i=0; i< firstNames.size(); ++i )
+	{
+		if( StringProcessing::VectorContains( &secondNames, &(firstNames[i]) ) != -1 )
+		{
+			PhysicsParameter* firstParam = first->GetPhysicsParameter( firstNames[i] );
+			PhysicsParameter* secondParam = second->GetPhysicsParameter( secondNames[i] );
+
+			if( PhysicsParameter::DiffParams( firstParam, secondParam ) != true )
+			{
+				differentParams.push_back( firstNames[i] );
+			}
+		}
+	}
+	return differentParams;
+}
+
 ParameterSet::ParameterSet( vector<ParameterSet*> input, bool silent ) :
 	allParameters(), allNames(), uniqueID(0), allInternalNames(), allForeignNames()
 {
