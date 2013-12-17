@@ -583,7 +583,7 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 		if( !thisTry.empty() )
 		{
 			cout << " Trying: ";
-			cout << " " << thisTry[0] << " = " << setprecision(10) << setw(15) << LastSet->GetPhysicsParameter( thisTry[0] )->GetValue();
+			cout << " " << thisTry[0] << " = " << setprecision(10) << setw(15) << LastSet->GetPhysicsParameter( thisTry[0] )->GetBlindedValue();
 			cout << " deltaMin: "  << setprecision(18) << setw(20) << fval-min;
 			cout << setw(20) << " ";
 		}
