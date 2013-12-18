@@ -7,6 +7,7 @@
   @date 21-01-10
   */
 
+#include "TVectorD.h"
 #include "TMatrixT.h"
 ///	RapidFit Headers
 #include "ExternalConstMatrix.h"
@@ -48,15 +49,23 @@ ExternalConstMatrix::ExternalConstMatrix( string NewName, string NewValue, strin
 		flatCorrs.push_back( strtod( allCorrs[i].c_str(), NULL ) );
 	}
 
+
 	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
 		vector<double> thisRow;
-		for( unsigned int j=0; i< allNames.size(); ++j )
+		for( unsigned int j=0; j< allNames.size(); ++j )
 		{
 			thisRow.push_back( flatCorrs[i*allNames.size()+j] );
 		}
 		corr_matrix.push_back( thisRow );
 	}
+
+	/*
+	for( unsigned int i=0; i< allNames.size(); ++i )
+	{
+		cout << allNames[i] << endl;
+	}
+	*/
 
 	internalParameterSet = new ParameterSet( allNames );
 }
@@ -113,15 +122,15 @@ double ExternalConstMatrix::GetChi2() const
 {
 	double returnable=0.;
 
-	int dim = (int)names.size();
+	int dim = (int)internalParameterSet->GetAllNames().size();
 
-	TMatrixT<double> diff( dim, 1 );
-	TMatrixT<double> diff_T( 1, dim );
+	TVectorD diff( dim );
+	TVectorD diff_T( dim );
 
 	for( unsigned int i=0; i< (unsigned)dim; ++i )
 	{
-		diff( i, 0 ) =  internalParameterSet->GetPhysicsParameter( wantedParameters[i] )->GetValue() - values_val[i];
-		diff_T( 0, i ) = diff( i, 0 );
+		diff( i ) =  internalParameterSet->GetPhysicsParameter( wantedParameters[i] )->GetValue() - values_val[i];
+		diff_T( i ) = diff( i );
 	}
 
 	TMatrixT<double> cov_matrix( dim, dim );
@@ -133,11 +142,12 @@ double ExternalConstMatrix::GetChi2() const
 		}
 	}
 
-	TMatrixT<double> finalMatrix( 1, 1 );
+	TVectorD finalVector = cov_matrix * diff_T;
 
-	finalMatrix = diff * cov_matrix * diff_T;
-
-	returnable = finalMatrix( 0, 0 );
+	for( unsigned int i=0; i< (unsigned)dim; ++i )
+	{
+		returnable = diff( i ) * finalVector( i );
+	}
 
 	return returnable;
 }

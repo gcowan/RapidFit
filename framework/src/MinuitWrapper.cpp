@@ -560,11 +560,20 @@ void MinuitWrapper::Function( Int_t & npar, Double_t * grad, Double_t & fval, Do
 		test->UpdatePhysicsParameters( (double*)xval, npar );
 		thisTry = ParameterSet::DiffSets( test, LastSet );
 		function->SetParameterSet( test );
+	}
+	catch(...)
+	{
+		cerr << "Failed to set physics parameters" << endl;
+		throw(-99998);
+	}
+
+	try
+	{
 		fval = function->Evaluate();
 	}
 	catch(...)
 	{
-		cerr << "Failed to set physics parameters or Eval Function" << endl;
+		cerr << "Failed to Evaluate Function" << endl;
 		throw(-99999);
 	}
 
