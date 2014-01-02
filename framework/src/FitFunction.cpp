@@ -397,7 +397,7 @@ double FitFunction::Evaluate()
 	{
 		if( minimiseValue < DBL_MAX )
 		{
-			minimiseValue -= constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
+			minimiseValue += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
 		}
 		else
 		{
