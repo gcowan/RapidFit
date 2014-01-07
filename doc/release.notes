@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2014/01/07 Rob Currie
+  - Fixing minor bug in the ExpSinInt and ExpCosInt. Mathematics was calling an effective cerf function rather than the full cerf function for some function calls which it shouldn't be doing.
+  - Adding cerf functions to the Mathematics header
+  - Adding full cerf function for ExpSinInt and ExpCosInt rather than using the Re and Im equivalent which would be more computationally expensive
+  - Added updated .log output for 2011 1fb Paper analysis output
+
 2014/01/02 Rob Currie
   - Fixing bug to use constraints correctly in a fit
 

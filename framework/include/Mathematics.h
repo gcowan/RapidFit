@@ -60,6 +60,13 @@ namespace Mathematics
 	inline double Rootpi(){ return rootpi; }
 	inline double Pi(){ return _pi; }
 
+	complex<double> evalCerfApprox( double swt, double u, double c );
+	complex<double> evalCerf( double swt, double u, double c );
+
+	double evalCerfRe( double swt, double u, double c );
+
+	double evalCerfIm( double swt, double u, double c );
+
 	//--------------------------- exp and exp*sin and exp*cos time functions -------------------------
 	// time functions for use in PDFs with resolution
 
