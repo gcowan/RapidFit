@@ -287,3 +287,4 @@ string PDFConfigurator::GetResolutionModel() const
 		return "DummyResolutionModel";
 	}
 }
+

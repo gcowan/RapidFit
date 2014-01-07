@@ -113,7 +113,6 @@ void CombinedMistagCalib::setParameters( const ParameterSet& parameters )
 		_mistagDeltaP0_OSSS = parameters.GetPhysicsParameter( mistagDeltaP0Name_OSSS )->GetValue();
 		_mistagDeltaSetPoint_OSSS = parameters.GetPhysicsParameter( mistagDeltaSetPointName_OSSS )->GetValue();
 	}
-
 }
 
 

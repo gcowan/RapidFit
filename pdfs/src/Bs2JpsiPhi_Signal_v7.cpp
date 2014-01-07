@@ -159,15 +159,15 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 	else
 	{
 		angAcc = new AngularAcceptance( angAccFile, _angAccIgnoreNumerator, _useHelicityBasis, isCopy ) ;
-		angAccI1 = angAcc->af1() ;
-		angAccI2 = angAcc->af2() ;
-		angAccI3 = angAcc->af3() ;
-		angAccI4 = angAcc->af4() ;
-		angAccI5 = angAcc->af5() ;
-		angAccI6 = angAcc->af6() ;
-		angAccI7 = angAcc->af7() ;
-		angAccI8 = angAcc->af8() ;
-		angAccI9 = angAcc->af9() ;
+		angAccI1 = angAcc->af1()  ;
+		angAccI2 = angAcc->af2()  ;
+		angAccI3 = angAcc->af3()  ;
+		angAccI4 = angAcc->af4()  ;
+		angAccI5 = angAcc->af5()  ;
+		angAccI6 = angAcc->af6()  ;
+		angAccI7 = angAcc->af7()  ;
+		angAccI8 = angAcc->af8()  ;
+		angAccI9 = angAcc->af9()  ;
 		angAccI10 = angAcc->af10();
 	}
 	//...........................................
@@ -1142,21 +1142,27 @@ double Bs2JpsiPhi_Signal_v7::diffXsecNorm1()
 // The acceptance function information is all contained in the timeAcceptance member object,
 double Bs2JpsiPhi_Signal_v7::diffXsecCompositeNorm1(  )
 {
-	double tlo_boundary = tlo ;
-	double thi_boundary = thi ;
+	double tlo_boundary = tlo;
+	double thi_boundary = thi;
 	double returnValue = 0;
 
 	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
 	{
 		timeBinNum = islice;
 
-		tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
-		thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh();
-		if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * timeAcc->getSlice(islice)->height();
+		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
+
+		const double slice_lo = thisSlice->tlow();
+		const double slice_hi = thisSlice->thigh();
+
+		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
+		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
+		if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * thisSlice->height();
 	}
 
 	tlo = tlo_boundary;
 	thi = thi_boundary;
+
 	return returnValue;
 }
 
@@ -1208,8 +1214,7 @@ void Bs2JpsiPhi_Signal_v7::DebugPrintEvaluate( string message, double value )
 {
 	PDF_THREAD_LOCK
 
-
-		cout << "1: " << " A: " << CachedA1 << " * " << " T: " << timeFactorA0A0(  ) << " = " << CachedA1*timeFactorA0A0(  ) << endl;
+	cout << "1: " << " A: " << CachedA1 << " * " << " T: " << timeFactorA0A0(  ) << " = " << CachedA1*timeFactorA0A0(  ) << endl;
 	cout << "2: " << " A: " << CachedA2 << " * " << " T: " << timeFactorAPAP(  ) << " = " << CachedA2*timeFactorAPAP(  ) << endl;
 	cout << "3: " << " A: " << CachedA3 << " * " << " T: " << timeFactorATAT(  ) << " = " << CachedA3*timeFactorATAT(  ) << endl;
 
@@ -1234,7 +1239,7 @@ void Bs2JpsiPhi_Signal_v7::DebugPrintNormalisation( string message, double value
 {
 	PDF_THREAD_LOCK
 
-		cout << "1: " << " A: " << A0()*A0() << " * " << " T: " << timeFactorA0A0Int(  ) << " * " << " Acc: " <<  angAccI1 << " = " << A0()*A0()*timeFactorA0A0Int(  ) * angAccI1 << endl;
+	cout << "1: " << " A: " << A0()*A0() << " * " << " T: " << timeFactorA0A0Int(  ) << " * " << " Acc: " <<  angAccI1 << " = " << A0()*A0()*timeFactorA0A0Int(  ) * angAccI1 << endl;
 	cout << "2: " << " A: " << AP()*AP() << " * " << " T: " << timeFactorAPAPInt(  ) << " * " << " Acc: " <<  angAccI2 << " = " << AP()*AP()*timeFactorAPAPInt(  ) * angAccI2 << endl;
 	cout << "3: " << " A: " << AT()*AT() << " * " << " T: " << timeFactorATATInt(  ) << " * " << " Acc: " <<  angAccI3 << " = " << AT()*AT()*timeFactorATATInt(  ) * angAccI3 << endl;
 
@@ -1374,8 +1379,8 @@ double Bs2JpsiPhi_Signal_v7::timeFactorEven()  const
 {
 	return
 		_mistagCalibModel->D1() * (
-				( 1.0 + cosphis() ) * expL( )
-				+ ( 1.0 - cosphis() ) * expH( )
+				( 1.0 + cosphis() ) * expL()
+				+ ( 1.0 - cosphis() ) * expH()
 				) +
 		_mistagCalibModel->D2() * (
 				( 2.0 * sinphis() ) * expSin( )
@@ -1416,8 +1421,8 @@ double Bs2JpsiPhi_Signal_v7::timeFactorOdd(  )   const
 {
 	return
 		_mistagCalibModel->D1() * (
-				( 1.0 - cosphis() ) * expL( )
-				+ ( 1.0 + cosphis() ) * expH( )
+				( 1.0 - cosphis() ) * expL()
+				+ ( 1.0 + cosphis() ) * expH()
 				) +
 		_mistagCalibModel->D2() * (
 				-  ( 2.0 * sinphis() ) * expSin( )

@@ -508,18 +508,19 @@ namespace Mathematics
 			double deltaCos = -0.5/gamma/(1+wt*wt) * ( evalDifRe + wt*evalDifIm + RooMath::erf(-umax) - RooMath::erf(-umin) );
 			return deltaCos;
 		}
+		else
+		{
+			double real_tlow=tlow;
+			if( tlow < 0. ) real_tlow = 0. ;
 
-		double real_tlow=tlow;
-		if( tlow < 0. ) real_tlow = 0. ;
-
-		const double deltaM_tlow=deltaM*real_tlow;
-		const double gamma_deltaM = gamma*deltaM;
-		const double deltaM_thigh=deltaM*thigh;
-		return (
-				( exp(-gamma*real_tlow)* (gamma*cos(deltaM_tlow) - deltaM*sin(deltaM_tlow)))
-				-( exp(-gamma*thigh)* (gamma*cos(deltaM_thigh) - deltaM*sin(deltaM_thigh)))
-		       )/( gamma_deltaM*gamma_deltaM );
-
+			const double deltaM_tlow=deltaM*real_tlow;
+			const double gamma_deltaM = gamma*deltaM;
+			const double deltaM_thigh=deltaM*thigh;
+			return (
+					( exp(-gamma*real_tlow)* (gamma*cos(deltaM_tlow) - deltaM*sin(deltaM_tlow)))
+					-( exp(-gamma*thigh)* (gamma*cos(deltaM_thigh) - deltaM*sin(deltaM_thigh)))
+			       )/( gamma_deltaM*gamma_deltaM );
+		}
 	}
 
 
@@ -579,16 +580,18 @@ namespace Mathematics
 			double deltaSin = -0.5/gamma/(1.+wt*wt) * ( -evalDifIm +   wt*evalDifRe -   -wt*(RooMath::erf(-umax) - RooMath::erf(-umin)) ) ;
 			return deltaSin;
 		}
+		else
+		{
+			double real_tlow=tlow;
+			if( tlow < 0. ) real_tlow = 0. ;
 
-		double real_tlow=tlow;
-		if( tlow < 0. ) real_tlow = 0. ;
-
-		const double deltaM_tlow=deltaM*real_tlow;
-		const double gamma_deltaM = gamma*deltaM;
-		const double deltaM_thigh=deltaM*thigh;
-		return (	( exp(-gamma*real_tlow)* (gamma*sin(deltaM_tlow) + deltaM*cos(deltaM_tlow)))
-				-( exp(-gamma*thigh)* (gamma*sin(deltaM_thigh) + deltaM*cos(deltaM_thigh)))
-		       )/ ( gamma_deltaM * gamma_deltaM );
+			const double deltaM_tlow=deltaM*real_tlow;
+			const double gamma_deltaM = gamma*deltaM;
+			const double deltaM_thigh=deltaM*thigh;
+			return (	 ( exp(-gamma*real_tlow) * (gamma*sin(deltaM_tlow) + deltaM*cos(deltaM_tlow)) )
+					-( exp(-gamma*thigh) * (gamma*sin(deltaM_thigh) + deltaM*cos(deltaM_thigh)) )
+			       )/ ( gamma_deltaM * gamma_deltaM );
+		}
 	}
 
 	//......................................................................
@@ -943,6 +946,7 @@ namespace Mathematics
 		double phi(0.);
 		double cosPsi(0.);
 		double evalPDFraw(0.);
+		(void) evalPDFraw;
 		double evalPDFnorm(0.);
 		double val(0.);
 		double coeff(0.);
@@ -994,6 +998,7 @@ namespace Mathematics
 			double p1_st = sqrt(t1*t2)/mKpi/2.;
 			double p3    = sqrt(t31*t32)/mB/2.;
 			double pB = DPHelpers::daughterMomentum(mB, mPsi, mKpi);
+			(void) pB;
 			double evalPDFraw2 = p1_st*p3*0.94;
 			val = evalPDFraw2/evalPDFnorm;
 			//val = evalPDFraw2;
@@ -1078,7 +1083,7 @@ namespace Mathematics
 		}
 		double weight(0.);
 		unsigned int nSample(500000);
-		for ( int i = 0; i < nSample; i++ )
+		for ( int i = 0; i < (int)nSample; i++ )
 		{
 			double * point = new double[4];
 			double * point_mapped = new double[4];
@@ -1094,7 +1099,7 @@ namespace Mathematics
 			}
 			//cout << point_mapped[0] << " " << point_mapped[1] << " " << point_mapped[2] << " " << point_mapped[3] << " " << mKpi_range << endl;
 			weight = param->parameterisation( point_mapped , NULL);
-			tree->Fill(point_mapped[0], point_mapped[1], point_mapped[2], mKpi_range, weight);
+			tree->Fill( (Float_t)point_mapped[0], (Float_t)point_mapped[1], (Float_t)point_mapped[2], (Float_t)mKpi_range, (Float_t)weight);
 			delete point;
 			delete point_mapped;
 		}
@@ -1142,7 +1147,7 @@ namespace Mathematics
 		// Make some plots
 		gStyle->SetOptStat(0);
 		TCanvas * canvas = new TCanvas();
-		canvas->Divide(2,2);
+		canvas->Divide( 2, 2, (Float_t)0.01, (Float_t)0.01, 0 );
 		canvas->cd(1);
 		cosThetaAcc->Draw();
 		cosThetaAcc->SetMinimum(0);
