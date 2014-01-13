@@ -19,16 +19,17 @@
 #include <iostream>
 #include <stdlib.h>
 #include <iomanip>
+#include <limits>
 
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0)
+DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() )
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0)
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() )
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -51,7 +52,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 
 DataPoint::DataPoint( const DataPoint& input ) :
 	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(input.allPseudoObservables), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
-	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID)
+	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID), initialNLL( input.initialNLL )
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
@@ -373,5 +374,15 @@ void DataPoint::SetDiscreteIndexID( size_t thisID )
 size_t DataPoint::GetDiscreteIndexID() const
 {
 	return storedID;
+}
+
+void DataPoint::SetInitialNLL( const double input )
+{
+	initialNLL = input;
+}
+
+double DataPoint::GetInitialNLL() const
+{
+	return initialNLL;
 }
 

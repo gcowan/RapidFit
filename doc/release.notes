@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2014/01/13 Rob Currie
+  - Adding a store/get method for the 'initialNLL' for each DataPoint, the idea being that the scale of the NLL varying between datapoints is removed (as much as possible) from the fit by measuring the change within the fit
+  - Added an initial NLL for the constraint functions which also normalises these methods
+  - This is now used by default for NLLThreaded for the intialNLL per datapoint and the constraints in the FitFunction
+
 2014/01/07 Rob Currie
   - Fixing minor bug in the ExpSinInt and ExpCosInt. Mathematics was calling an effective cerf function rather than the full cerf function for some function calls which it shouldn't be doing.
   - Adding cerf functions to the Mathematics header

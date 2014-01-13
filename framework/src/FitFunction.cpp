@@ -38,7 +38,7 @@ using namespace::std;
 FitFunction::FitFunction() :
 	Name("Unknown"), allData(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
-	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig()), averageNLL(numeric_limits<double>::quiet_NaN()), startNLL(numeric_limits<double>::quiet_NaN())
+	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig()), initialConstraint( numeric_limits<double>::quiet_NaN() )
 {
 }
 
@@ -300,51 +300,6 @@ double FitFunction::Evaluate()
 		thisWatch->Start();
 	}
 #endif
-	if( std::isnan(averageNLL) && this->GetOffSetNLL() )
-	{
-		double runningNLL=0.;
-		double runningT=0.;
-		vector<double> NLLs;
-		for( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
-		{
-			if( allData->GetResultDataSet( resultIndex )->GetDataNumber() == 0 )
-			{
-				if( callNum < 6 )
-				{
-					cerr << "Are you aware DataSet: " << resultIndex+1 << " has zero size?" << endl;
-				}
-				continue;
-			}
-			if( allData->GetResultDataSet( resultIndex )->GetDataNumber() < 1 )
-			{
-				NLLs.push_back( 0. );
-			}
-			else
-			{
-				NLLs.push_back( this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex ) );
-			}
-			if( fabs(NLLs.back()) >= DBL_MAX )
-			{
-				return DBL_MAX;
-			}
-			else
-			{
-				runningNLL+=NLLs.back();
-			}
-			runningT+=(double)allData->GetResultDataSet( resultIndex )->GetDataNumber();
-		}
-
-		sort( NLLs.begin(), NLLs.end() );
-
-		double nLL=0;
-		for( unsigned int i=0; i< NLLs.size(); ++i )
-		{
-			nLL+=NLLs[i];
-		}
-
-		averageNLL = - nLL / runningT;
-	}
-
 	double minimiseValue = 0.0;
 	double temp=0.;
 
@@ -391,19 +346,29 @@ double FitFunction::Evaluate()
 
 	minimiseValue=temp;
 
+	double constraintScale = 0.;
 	//Calculate the value of each constraint
 	vector< ConstraintFunction* > constraints = allData->GetConstraints();
 	for (unsigned int constraintIndex = 0; constraintIndex < constraints.size(); ++constraintIndex )
 	{
-		if( minimiseValue < DBL_MAX )
+		if( fabs(minimiseValue) < DBL_MAX )
 		{
-			minimiseValue += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
+			constraintScale += constraints[constraintIndex]->Evaluate( allData->GetParameterSet() );
 		}
 		else
 		{
 			return DBL_MAX;
 		}
 	}
+
+	if( std::isnan(initialConstraint) )
+	{
+		initialConstraint = constraintScale;
+	}
+
+	constraintScale -= initialConstraint;
+
+	minimiseValue += constraintScale;
 
 	//time(&end);
 	++fit_calls;
@@ -453,12 +418,7 @@ double FitFunction::Evaluate()
 	//	cout << endl << "Goodbye!" << endl;
 	//	exit(0);
 
-	if( std::isnan(startNLL) && this->GetOffSetNLL() )
-	{
-		startNLL = minimiseValue;
-		cout << endl << "Shifting NLL by:   " << setprecision(20) << -startNLL << endl;
-	}
-	if( this->GetOffSetNLL() && !(std::isnan(startNLL)) )	minimiseValue-=startNLL;
+	//if( fit_calls == 2 ) exit(0);
 
 	return minimiseValue;
 }

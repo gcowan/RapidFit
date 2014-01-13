@@ -249,7 +249,14 @@ class DataPoint
 		 */
 		double GetEventWeight() const;
 
+		void SetInitialNLL( const double input );
+
+		double GetInitialNLL() const;
+
 	private:
+
+		double initialNLL;
+
 		/*!
 		 * Don't Copy the class this way!
 		 */

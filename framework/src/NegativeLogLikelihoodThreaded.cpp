@@ -145,18 +145,21 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 	{
 		for( unsigned int point_num=0; point_num< fit_thread_data[threadnum].dataPoint_Result.size(); ++point_num )
 		{
-			if( fit_thread_data[threadnum].dataPoint_Result[ point_num ] >= DBL_MAX )
+			if( fabs(fit_thread_data[threadnum].dataPoint_Result[ point_num ]) >= DBL_MAX )
 			{
 				return DBL_MAX;
 			}
 
-			if( this->GetOffSetNLL() && !std::isnan(averageNLL) )
+			DataPoint* thisPoint = fit_thread_data[threadnum].dataSubSet[ point_num ];
+
+			if( this->GetOffSetNLL() && !std::isnan(thisPoint->GetInitialNLL()) )
 			{
-				NLLValues.push_back(fit_thread_data[threadnum].dataPoint_Result[ point_num ]-averageNLL);
+				NLLValues.push_back(fit_thread_data[threadnum].dataPoint_Result[ point_num ] - thisPoint->GetInitialNLL() );
 			}
 			else
 			{
-				NLLValues.push_back(fit_thread_data[threadnum].dataPoint_Result[ point_num ]);
+				NLLValues.push_back( 0. );
+				thisPoint->SetInitialNLL( fit_thread_data[threadnum].dataPoint_Result[ point_num ] );
 			}
 
 		}
@@ -171,13 +174,11 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 		total+=*this_i;
 	}
 
-	//delete [] fit_thread_data;
 	delete [] Thread;
 
 	//cout << total << endl;
 	//exit(0);
 
-	//cout << total << endl;
 	return -total;
 }
 
