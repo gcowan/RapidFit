@@ -158,8 +158,15 @@ double NegativeLogLikelihoodThreaded::EvaluateDataSet( IPDF * FittingPDF, IDataS
 			}
 			else
 			{
-				NLLValues.push_back( 0. );
-				thisPoint->SetInitialNLL( fit_thread_data[threadnum].dataPoint_Result[ point_num ] );
+				if( this->GetOffSetNLL() )
+				{
+					NLLValues.push_back( 0. );
+					thisPoint->SetInitialNLL( fit_thread_data[threadnum].dataPoint_Result[ point_num ] );
+				}
+				else
+				{
+					NLLValues.push_back( fit_thread_data[threadnum].dataPoint_Result[ point_num ] );
+				}
 			}
 
 		}

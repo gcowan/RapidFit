@@ -916,7 +916,7 @@ FitFunctionConfiguration * XMLConfigReader::MakeFitFunction( XMLTag * FunctionTa
 		bool integratorTest = true;
 		bool NormaliseWeights = false;
 		bool SingleNormaliseWeights = false;
-		bool OffSetNLL = false;
+		bool OffSetNLL = true;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		RapidFitIntegratorConfig* thisConfig = new RapidFitIntegratorConfig();
 		if ( functionInfo.size() == 0 )
