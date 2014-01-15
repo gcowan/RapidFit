@@ -37,6 +37,8 @@ class CombinedMistagCalib : public IMistagCalib
 
 		double mistagB() const;
 
+		bool eventIsTagged() const;
+
 	protected:
 
 		CombinedMistagCalib( const CombinedMistagCalib& );
@@ -90,6 +92,8 @@ class CombinedMistagCalib : public IMistagCalib
 		bool _useFixedEta;
 
 		bool _floatCalib;
+
+		bool _untagged;
 };
 
 #endif

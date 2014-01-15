@@ -30,6 +30,8 @@ class IMistagCalib
 
 		virtual double mistagB() const = 0;
 
+		virtual bool eventIsTagged() const = 0;
+
 	protected:
 
 		IMistagCalib() {};

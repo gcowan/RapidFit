@@ -49,7 +49,7 @@ CombinedMistagCalib::CombinedMistagCalib( PDFConfigurator* configurator ) : IMis
 	mistagDeltaP1Name_OSSS( configurator->getName("mistagDeltaP1_OSSS") ),
 	mistagDeltaP0Name_OSSS( configurator->getName("mistagDeltaP0_OSSS") ),
 	mistagDeltaSetPointName_OSSS( configurator->getName("mistagDeltaSetPoint_OSSS") ),
-	_debugMistag(false), _onTuple(false), _floatCalib(false)
+	_debugMistag(false), _onTuple(false), _floatCalib(false), _untagged(false)
 {
 	_debugMistag = configurator->isTrue( "DebugMistagModel" );
 	_onTuple = ! configurator->isTrue( "Mistag3fbModel" );
@@ -220,9 +220,11 @@ void CombinedMistagCalib::setObservables( const DataPoint* measurement )
 		_combinedtag = this->GetCombinedTag();
 	}
 
+	if( (_tagOS == _tagSS) && (_tagOS == 0) ) _untagged = true;
+	else _untagged = false;
+
 	_storedD1 = this->RealD1();
 	_storedD2 = this->RealD2();
-
 
 	if( _debugMistag )
 	{
@@ -588,12 +590,26 @@ double CombinedMistagCalib::mistagB() const
 
 double CombinedMistagCalib::RealD1() const
 {
-	return 1.0 - this->q()*( this->mistagB() - this->mistagBbar() );
+	if( !_untagged )
+	{
+		return 1.0 - this->q()*( this->mistagB() - this->mistagBbar() );
+	}
+	else
+	{
+		return 1.;
+	}
 }
 
 double CombinedMistagCalib::RealD2() const
 {
-	return this->q()*( 1.0 - this->mistagB() - this->mistagBbar() );
+	if( !_untagged )
+	{
+		return this->q()*( 1.0 - this->mistagB() - this->mistagBbar() );
+	}
+	else
+	{
+		return 0.;
+	}
 }
 
 double CombinedMistagCalib::D1() const
@@ -630,5 +646,10 @@ void CombinedMistagCalib::Print() const
 	cout << "_mistagDeltaSetPoint_OSSS " << _mistagDeltaSetPoint_OS << endl;
 	cout << "this->mistagB()           " << this->mistagB() << endl;
 	cout << "this->mistagBbar()        " << this->mistagBbar() << endl;
+}
+
+bool CombinedMistagCalib::eventIsTagged() const
+{
+	return !_untagged;
 }
 

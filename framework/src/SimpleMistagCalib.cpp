@@ -204,4 +204,8 @@ void SimpleMistagCalib::Print() const
 	cout << "this->mistagBbar()   " << this->mistagBbar() << endl;
 }
 
+bool SimpleMistagCalib::eventIsTagged() const
+{
+	return (fabs(this->q()) > 0.5 );
+}
 

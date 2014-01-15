@@ -391,7 +391,7 @@
 	<Minimiser>
 		<MinimiserName>Minuit</MinimiserName>
 		<MaxSteps>100000</MaxSteps>
-		<GradTolerance>0.0001</GradTolerance>
+		#<GradTolerance>0.0001</GradTolerance>
 		<Quality>0</Quality>
 		#<ConfigureMinimiser>MinosErrors</ConfigureMinimiser>
 		#<ConfigureMinimiser>NoHesse</ConfigureMinimiser>
@@ -551,7 +551,7 @@
 
 	<CommonPDF>
 		<PDF>
-			<Name>Bs2JpsiPhi_Signal_v6</Name>
+			<Name>Bs2JpsiPhi_Signal_v7</Name>
 			<ConfigurationParameter>UseHelicityBasis:True</ConfigurationParameter>
 			<ConfigurationParameter>AngularAcceptanceFile:2011-1fbPaper/2011-AngularAcceptance-1fbPaper-UandB-30-20120706.root</ConfigurationParameter>
 			#<ConfigurationParameter>AngularAcceptanceIgnoreNumerator:True</ConfigurationParameter>

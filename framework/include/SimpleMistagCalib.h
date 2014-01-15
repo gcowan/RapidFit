@@ -33,6 +33,8 @@ class SimpleMistagCalib : public IMistagCalib
 
 		double mistagB() const;
 
+		bool eventIsTagged() const;
+
 	private:
 
 		double _tag, _mistag, _mistagP0, _mistagP1, _mistagSetPoint, _mistagDeltaP1, _mistagDeltaP0, _mistagDeltaSetPoint;

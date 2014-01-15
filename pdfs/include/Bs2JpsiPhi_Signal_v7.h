@@ -55,6 +55,8 @@ class Bs2JpsiPhi_Signal_v7 : public BasePDF
 
 	private:
 
+		bool _eventIsTagged;
+
 		void MakePrototypes();
 		void prepareCDS( double lambda, double Phis );
 
