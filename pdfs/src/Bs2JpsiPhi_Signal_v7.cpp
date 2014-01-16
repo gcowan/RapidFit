@@ -611,6 +611,8 @@ double Bs2JpsiPhi_Signal_v7::EvaluateTimeOnly(DataPoint * measurement)
 	resolutionModel->setObservables( measurement );
 	_mistagCalibModel->setObservables( measurement );
 
+	_eventIsTagged = _mistagCalibModel->eventIsTagged();
+
 	vector<double> angularData;
 
 	if( !_useHelicityBasis )
@@ -681,6 +683,8 @@ double Bs2JpsiPhi_Signal_v7::Normalisation(DataPoint * measurement, PhaseSpaceBo
 
 	resolutionModel->setObservables( measurement );
 	_mistagCalibModel->setObservables( measurement );
+
+	_eventIsTagged = _mistagCalibModel->eventIsTagged();
 
 	if( _numericIntegralForce ) return -1.;
 
