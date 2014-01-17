@@ -54,6 +54,8 @@ class IResolutionModel
 		virtual bool isPerEvent() = 0;
 
 		virtual ~IResolutionModel() {};
+
+		virtual bool CacheValid() const { return false; } ;
 	protected:
 
 		virtual unsigned int numComponents() = 0;

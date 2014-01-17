@@ -750,6 +750,10 @@ void Bs2JpsiPhi_Signal_v7::preCalculateTimeIntegrals()
 {
 	intExpL_stored = resolutionModel->ExpInt( tlo, thi, gamma_l() );
 	intExpH_stored = resolutionModel->ExpInt( tlo, thi, gamma_h() );
+}
+
+void Bs2JpsiPhi_Signal_v7::preCalculateSinusoidIntegrals()
+{
 	if( _eventIsTagged )
 	{
 		intExpSin_stored = resolutionModel->ExpSinInt( tlo, thi, gamma(), delta_ms );
@@ -1129,8 +1133,6 @@ double Bs2JpsiPhi_Signal_v7::diffXsecTimeOnly()
 
 double Bs2JpsiPhi_Signal_v7::diffXsecNorm1()
 {
-	preCalculateTimeIntegrals() ;//  Replaced by new Caching mechanism , but this cant be used when event resolution is selected
-
 	double norm =
 
 		A0()*A0() * timeFactorA0A0Int(  ) * angAccI1   +
@@ -1157,21 +1159,17 @@ double Bs2JpsiPhi_Signal_v7::diffXsecNorm1()
 	return norm ;
 }
 
-
-
-//....................................................
-// New method to calculate normalisation using a histogrammed "low-end" time acceptance function
-// The acceptance function information is all contained in the timeAcceptance member object,
-double Bs2JpsiPhi_Signal_v7::diffXsecCompositeNorm1(  )
+void Bs2JpsiPhi_Signal_v7::generateTimeIntegrals()
 {
+	double stored_gammaLInt=0.;
+	double stored_gammaHInt=0.;
+
 	double tlo_boundary = tlo;
 	double thi_boundary = thi;
-	double returnValue = 0;
 
 	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
 	{
 		timeBinNum = islice;
-
 		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
 
 		const double slice_lo = thisSlice->tlow();
@@ -1179,11 +1177,135 @@ double Bs2JpsiPhi_Signal_v7::diffXsecCompositeNorm1(  )
 
 		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
 		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
-		if( thi > tlo ) returnValue+= this->diffXsecNorm1(  ) * thisSlice->height();
+		if( thi > tlo )
+		{
+			this->preCalculateTimeIntegrals();
+			stored_gammaLInt += intExpL_stored * thisSlice->height();
+			stored_gammaHInt += intExpH_stored * thisSlice->height();
+		}
 	}
-
 	tlo = tlo_boundary;
 	thi = thi_boundary;
+
+	intExpL_stored = stored_gammaLInt;
+	intExpH_stored = stored_gammaHInt;
+}
+
+void Bs2JpsiPhi_Signal_v7::generateSinusoidIntegrals()
+{
+	double stored_ExpSinInt=0.;
+	double stored_ExpCosInt=0.;
+
+	double tlo_boundary = tlo;
+	double thi_boundary = thi;
+
+	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
+	{
+		timeBinNum = islice;
+		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
+
+		const double slice_lo = thisSlice->tlow();
+		const double slice_hi = thisSlice->thigh();
+
+		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
+		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
+		if( thi > tlo )
+		{
+			this->preCalculateSinusoidIntegrals();
+			stored_ExpSinInt += intExpSin_stored * thisSlice->height();
+			stored_ExpCosInt += intExpCos_stored * thisSlice->height();
+		}
+	}
+	tlo = tlo_boundary;
+	thi = thi_boundary;
+
+	intExpSin_stored = stored_ExpSinInt;
+	intExpCos_stored = stored_ExpCosInt;
+}
+
+void Bs2JpsiPhi_Signal_v7::ConstructTimeIntegrals()
+{
+	//this->generateIntegrals();
+
+	vector<double> perEventData = _datapoint->GetPerEventData();
+
+	if( perEventData.empty() || !resolutionModel->CacheValid() )
+	{
+		this->generateTimeIntegrals();
+		this->generateSinusoidIntegrals();
+		perEventData.clear();
+		perEventData.push_back( _gamma );
+		perEventData.push_back( dgam );
+		perEventData.push_back( delta_ms );
+		perEventData.push_back( intExpL_stored );
+		perEventData.push_back( intExpH_stored );
+		perEventData.push_back( intExpSin_stored );
+		perEventData.push_back( intExpCos_stored );
+		_datapoint->SetPerEventData( perEventData );
+	}
+	else if( _gamma != perEventData[0] )
+	{
+		this->generateTimeIntegrals();
+		this->generateSinusoidIntegrals();
+		perEventData.clear();
+		perEventData.push_back( _gamma );
+		perEventData.push_back( dgam );
+		perEventData.push_back( delta_ms );
+		perEventData.push_back( intExpL_stored );
+		perEventData.push_back( intExpH_stored );
+		perEventData.push_back( intExpSin_stored );
+		perEventData.push_back( intExpCos_stored );
+		_datapoint->SetPerEventData( perEventData );
+	}
+	else if( dgam != perEventData[1] )
+	{
+		intExpSin_stored = perEventData[5];
+		intExpCos_stored = perEventData[6];
+		this->generateTimeIntegrals();
+		perEventData.clear();
+		perEventData.push_back( _gamma );
+		perEventData.push_back( dgam );
+		perEventData.push_back( delta_ms );
+		perEventData.push_back( intExpL_stored );
+		perEventData.push_back( intExpH_stored );
+		perEventData.push_back( intExpSin_stored );
+		perEventData.push_back( intExpCos_stored );
+		_datapoint->SetPerEventData( perEventData );
+	}
+	else if( delta_ms != perEventData[2] )
+	{
+		intExpL_stored = perEventData[3];
+		intExpH_stored = perEventData[4];
+		this->generateSinusoidIntegrals();
+		perEventData.clear();
+		perEventData.push_back( _gamma );
+		perEventData.push_back( dgam );
+		perEventData.push_back( delta_ms );
+		perEventData.push_back( intExpL_stored );
+		perEventData.push_back( intExpH_stored );
+		perEventData.push_back( intExpSin_stored );
+		perEventData.push_back( intExpCos_stored );
+		_datapoint->SetPerEventData( perEventData );
+	}
+	else
+	{
+		intExpL_stored = perEventData[3];
+		intExpH_stored = perEventData[4];
+		intExpSin_stored = perEventData[5];
+		intExpCos_stored = perEventData[6];
+	}
+}
+
+//....................................................
+// New method to calculate normalisation using a histogrammed "low-end" time acceptance function
+// The acceptance function information is all contained in the timeAcceptance member object,
+double Bs2JpsiPhi_Signal_v7::diffXsecCompositeNorm1(  )
+{
+	double returnValue = 0;
+
+	this->ConstructTimeIntegrals();
+
+	returnValue = this->diffXsecNorm1();
 
 	return returnValue;
 }

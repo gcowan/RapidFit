@@ -24,12 +24,12 @@
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() )
+DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData()
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() )
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData()
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -52,7 +52,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 
 DataPoint::DataPoint( const DataPoint& input ) :
 	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(input.allPseudoObservables), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
-	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID), initialNLL( input.initialNLL )
+	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID), initialNLL( input.initialNLL ), PerEventData(input.PerEventData)
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
@@ -384,5 +384,20 @@ void DataPoint::SetInitialNLL( const double input )
 double DataPoint::GetInitialNLL() const
 {
 	return initialNLL;
+}
+
+vector<double> DataPoint::GetPerEventData() const
+{
+	return PerEventData;
+}
+
+void DataPoint::SetPerEventData( const vector<double> input )
+{
+	PerEventData = input;
+}
+
+void DataPoint::ClearPerEventData()
+{
+	PerEventData.clear();
 }
 

@@ -52,6 +52,8 @@ class PhysicsParameter
 		string GetType() const;
 		void SetType(string);
 
+		bool isFixed() const;
+
 		double GetOriginalValue() const;
 		void ForceOriginalValue( double );
 
@@ -81,6 +83,8 @@ class PhysicsParameter
 
 		string blindString;
 		double blindScale;
+
+		bool _isFixed;
 };
 
 #endif

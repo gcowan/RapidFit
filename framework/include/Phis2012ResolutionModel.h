@@ -53,6 +53,8 @@ class Phis2012ResolutionModel : public IResolutionModel
 
 		bool isPerEvent() ;
 
+		bool CacheValid() const;
+
 	protected:
 
 		unsigned int numComponents();
@@ -61,6 +63,7 @@ class Phis2012ResolutionModel : public IResolutionModel
 		double GetFraction( unsigned int );
 
 	private:
+		bool isCacheValid;
 
 		double GetThisScale();
 

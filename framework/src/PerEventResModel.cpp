@@ -25,7 +25,7 @@ RESMODEL_CREATOR( PerEventResModel );
 PerEventResModel::PerEventResModel( PDFConfigurator* configurator, bool quiet ) :
 	resScaleName		( configurator->getName("timeResolutionScale") ),
 	eventResolutionName	( configurator->getName("eventResolution") ),
-	numberComponents( 1 )
+	numberComponents( 1 ), isCacheValid(false)
 {
 	if( !quiet) cout << "PerEventResModel:: Instance created " << endl ;
 }
@@ -43,6 +43,7 @@ void PerEventResModel::addParameters( vector<string> & parameterNames )
 //To take the current value of a parameter into the instance
 void PerEventResModel::setParameters( ParameterSet & parameters )
 {
+	isCacheValid = ( resScale == parameters.GetPhysicsParameter( resScaleName )->GetValue() );
 	resScale = parameters.GetPhysicsParameter( resScaleName )->GetValue();
 	return;
 }
@@ -108,5 +109,10 @@ double PerEventResModel::GetFraction( unsigned int input )
 {
 	(void) input;
 	return 1.;
+}
+
+bool PerEventResModel::CacheValid() const
+{
+	return isCacheValid;
 }
 

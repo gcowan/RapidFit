@@ -67,6 +67,8 @@ class PerEventResModel : public IResolutionModel
 		void requestComponent( unsigned int );
 
 		double GetFraction( unsigned int );
+
+		bool CacheValid() const;
 	private:
 
 		ObservableRef resScaleName;			// Scale to multiply e-by-e resolution
@@ -76,6 +78,8 @@ class PerEventResModel : public IResolutionModel
 		double eventResolution ;
 
 		unsigned int numberComponents;
+
+		bool isCacheValid;
 };
 
 #endif

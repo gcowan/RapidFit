@@ -32,7 +32,7 @@ Phis2012ResolutionModel::Phis2012ResolutionModel( PDFConfigurator* configurator,
 	sfSigmaSlopeName	( configurator->getName( "sfSigmaSlope")),
 	sigmaBarName		( configurator->getName( "sigmaBar")),
 	muName			( configurator->getName( "timeResMu" )),
-	numberComponents( 2 ), wantedComponent( 1 ), resFrac( 1. )
+	numberComponents( 2 ), wantedComponent( 1 ), resFrac( 1. ), isCacheValid(false)
 {
 	if( !quiet) cout << "DoubleResolutionModel:: Instance created " << endl ;
 }
@@ -56,6 +56,26 @@ void Phis2012ResolutionModel::addParameters( vector<string> & parameterNames )
 //To take the current value of a parameter into the instance
 void Phis2012ResolutionModel::setParameters( ParameterSet & parameters )
 {
+	if( 	parameters.GetPhysicsParameter( timeResFracName )->isFixed() &&
+		parameters.GetPhysicsParameter( sfBarOffsetName)->isFixed() &&
+		parameters.GetPhysicsParameter( sfBarSlopeName)->isFixed() &&
+		parameters.GetPhysicsParameter( sfSigmaOffsetName)->isFixed() &&
+		parameters.GetPhysicsParameter( sfSigmaSlopeName)->isFixed() &&
+		parameters.GetPhysicsParameter( sigmaBarName)->isFixed() &&
+		parameters.GetPhysicsParameter( muName )->isFixed() )
+	{
+		isCacheValid = true;
+	}
+	else
+	{
+		isCacheValid = ( resFrac == parameters.GetPhysicsParameter( timeResFracName )->GetValue() )
+				&& ( sfBarOffset == parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue() )
+				&& ( sfBarSlope == parameters.GetPhysicsParameter( sfBarSlopeName)->GetValue() )
+				&& ( sfSigmaOffset == parameters.GetPhysicsParameter( sfSigmaOffsetName)->GetValue() )
+				&& ( sfSigmaSlope == parameters.GetPhysicsParameter( sfSigmaSlopeName)->GetValue() )
+				&& ( sigmaBar == parameters.GetPhysicsParameter( sigmaBarName)->GetValue() )
+				&& ( mu == parameters.GetPhysicsParameter( muName )->GetValue() );
+	}
 	resFrac = parameters.GetPhysicsParameter( timeResFracName )->GetValue();
 	sfBarOffset = parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue();
 	sfBarSlope = parameters.GetPhysicsParameter( sfBarSlopeName)->GetValue();
@@ -64,6 +84,11 @@ void Phis2012ResolutionModel::setParameters( ParameterSet & parameters )
 	sigmaBar = parameters.GetPhysicsParameter( sigmaBarName)->GetValue();
         mu = parameters.GetPhysicsParameter( muName )->GetValue();
 	return;
+}
+
+bool Phis2012ResolutionModel::CacheValid() const
+{
+	return isCacheValid;
 }
 
 //..........................

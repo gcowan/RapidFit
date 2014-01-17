@@ -54,6 +54,11 @@ class Bs2JpsiPhi_Signal_v7 : public BasePDF
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
+		void generateTimeIntegrals();
+		void generateSinusoidIntegrals();
+		void preCalculateSinusoidIntegrals();
+
+		void ConstructTimeIntegrals();
 
 		bool _eventIsTagged;
 
@@ -63,7 +68,7 @@ class Bs2JpsiPhi_Signal_v7 : public BasePDF
 		//void prepareTimeFac();
 		void SetupAngularTerms();
 
-		int timeBinNum;
+		unsigned int timeBinNum;
 
 		DataPoint* _datapoint;
 
@@ -411,7 +416,7 @@ class Bs2JpsiPhi_Signal_v7 : public BasePDF
 
 		inline double timeFactorReASA0Int( );
 
-};
+		};
 
 #endif
 

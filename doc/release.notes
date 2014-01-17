@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2014/01/17 Rob Currie
+  - Added boolean flag for tracking Resolution model changes
+  - Highly restructured JpsiPhi v7 PDF, this moves the time integral to only be performed over the time PDF
+       This has 2 advantages:
+       Much less code in a loop which is called, many, many times in fitting
+       The result of the integral is much easier to cache a it only depends on a few factors
+  - Added VERY SIMPLE per-event vector<double> stored in each DataPoint which is intended to store simple informatio
+
 2014/01/15 Rob Currie
   - Added some optimisations to v7 and the tagging codebase
 

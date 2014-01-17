@@ -253,7 +253,15 @@ class DataPoint
 
 		double GetInitialNLL() const;
 
+		vector<double> GetPerEventData() const;
+
+		void SetPerEventData( const vector<double> input );
+
+		void ClearPerEventData();
+
 	private:
+
+		vector<double> PerEventData;
 
 		double initialNLL;
 
