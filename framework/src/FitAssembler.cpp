@@ -59,6 +59,14 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, IFitFunction * TheFunct
 {
 	Minimiser->SetupFit( TheFunction );
 
+	cout << "Using Fixed Parameters:" << endl;
+	ParameterSet* fittingSet = TheFunction->GetParameterSet();
+	vector<string> FixedNames = fittingSet->GetAllFixedNames();
+	for( unsigned int i=0; i< FixedNames.size(); ++i )
+	{
+		cout << setw(25) << left << FixedNames[i] << fittingSet->GetPhysicsParameter( FixedNames[i] )->GetValue() << endl;
+	}
+
 	cout << "\nStarting Fit!" << endl;
 
 	SafeMinimise( Minimiser );
