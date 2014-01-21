@@ -138,7 +138,7 @@ vector<ConstraintFunction* > MultiXMLConfigReader::GetConstraints()
 			{
 				if( StringProcessing::VectorContains( &knownNames, &(theseNames[k]) ) != -1 )
 				{
-					cout << "reject: " << theseNames[k] << endl;
+					cout << "Rejecting multiple Constraint: " << theseNames[k] << endl;
 					good = false;
 					//break;
 				}

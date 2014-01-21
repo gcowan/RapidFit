@@ -14,6 +14,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <iomanip>
 
 using namespace::std;
 
@@ -30,7 +31,10 @@ ConstraintFunction::ConstraintFunction( const vector< IConstraintFunction* > New
 		{
 			allConstraints.push_back( (IConstraintFunction*)new ExternalConstMatrix( *(ExternalConstMatrix*)(*const_i) ) );
 		}
-		cout << "Adding Constraint: " << allConstraints.back()->GetName() << endl;
+		cout << "Adding Constraint: " << setw(25) << left << allConstraints.back()->GetName();
+		cout << setw(10) << left << allConstraints.back()->GetValueStr();
+		cout << " ± ";
+		cout << setw(10) << left << allConstraints.back()->GetErrorStr() << endl;
 	}
 }
 

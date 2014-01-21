@@ -45,6 +45,20 @@ ExternalConstraint::ExternalConstraint( string NewName, double NewValue, double 
 	internalParameterSet = new ParameterSet( wantedParameters );
 }
 
+string ExternalConstraint::GetValueStr() const
+{
+	stringstream this_stream;
+	this_stream << value;
+	return this_stream.str();
+}
+
+string ExternalConstraint::GetErrorStr() const
+{
+	stringstream this_stream;
+	this_stream << error;
+	return this_stream.str();
+}
+
 ExternalConstraint::ExternalConstraint( const ExternalConstraint& input ) :
 	name( input.name ), value( input.value ), error( input.error ), internalParameterSet(NULL), wantedParameters(input.wantedParameters)
 {

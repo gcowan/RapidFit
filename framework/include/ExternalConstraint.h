@@ -44,6 +44,10 @@ class ExternalConstraint : public IConstraintFunction
 		 */
 		string GetName() const;
 
+		string GetValueStr() const;
+
+		string GetErrorStr() const;
+
 		void SetPhysicsParameters( const ParameterSet* input );
 
 		bool CanApply( const ParameterSet* input ) const;

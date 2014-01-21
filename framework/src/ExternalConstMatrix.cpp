@@ -70,6 +70,16 @@ ExternalConstMatrix::ExternalConstMatrix( string NewName, string NewValue, strin
 	internalParameterSet = new ParameterSet( allNames );
 }
 
+string ExternalConstMatrix::GetValueStr() const
+{
+	return values;
+}
+
+string ExternalConstMatrix::GetErrorStr() const
+{
+	return errors;
+}
+
 ExternalConstMatrix::ExternalConstMatrix( const ExternalConstMatrix& input ) :
 	names(input.names), values(input.values), errors(input.errors), correlations(input.correlations), internalParameterSet(NULL), wantedParameters(input.wantedParameters),
 	names_val(input.names_val), values_val(input.values_val), errors_val(input.errors_val), corr_matrix(input.corr_matrix)

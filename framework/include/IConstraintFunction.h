@@ -38,6 +38,10 @@ class IConstraintFunction
 		 */
 		virtual string GetName() const = 0;
 
+		virtual string GetValueStr() const = 0;
+
+		virtual string GetErrorStr() const = 0;
+
 		virtual void SetPhysicsParameters( const ParameterSet* ) = 0;
 
 		virtual bool CanApply( const ParameterSet* input ) const = 0;
