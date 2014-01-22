@@ -20,6 +20,7 @@
 #include "Bs2JpsiPhi_Signal_v7.h"
 #include "SimpleMistagCalib.h"
 #include "CombinedMistagCalib.h"
+#include "MistagCalib3fb.h"
 
 #include <iostream>
 #include <cmath>
@@ -210,7 +211,8 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 		this->TurnCachingOff();
 	}
 
-	if( _useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( configurator );
+	//if( _useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( configurator );
+	if( _useNewMistagModel ) _mistagCalibModel = new MistagCalib3fb( configurator );
 	else _mistagCalibModel = new SimpleMistagCalib( configurator );
 
 	//........................

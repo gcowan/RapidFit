@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2014/01/22 Rob Currie
+  - Adding combined Mistag model described in 3fb JpsiPhi ana note and moving v7 to use this as the new mistag model in the code
+
 2014/01/21 Rob Currie
   - Adding some more output for fixed parameters in fits to make mistakes easier to spot and debug
   - Adding some more output in the handling of external constraints to make mistakes easier to spot and debug
