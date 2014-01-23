@@ -28,7 +28,7 @@ DoubleResolutionModel::DoubleResolutionModel( PDFConfigurator* configurator, boo
 	resScale2Name            ( configurator->getName( "timeResolutionScale2" ) ),
 	timeResFracName            ( configurator->getName( "timeResFraction" ) ),
 	eventResolutionName	( configurator->getName( "eventResolution" ) ),
-	numberComponents( 2 ), wantedComponent( 1 ), resFrac( 1. )
+	numberComponents( 2 ), wantedComponent( 1 ), resFrac( 1. ), isCacheValid(false)
 {
 	if( !quiet) cout << "DoubleResolutionModel:: Instance created " << endl ;
 }
@@ -48,10 +48,28 @@ void DoubleResolutionModel::addParameters( vector<string> & parameterNames )
 //To take the current value of a parameter into the instance
 void DoubleResolutionModel::setParameters( ParameterSet & parameters )
 {
+	if( parameters.GetPhysicsParameter( timeResFracName )->isFixed() &&
+		parameters.GetPhysicsParameter( resScaleName )->isFixed() &&
+		parameters.GetPhysicsParameter( resScale2Name )->isFixed() )
+	{
+		isCacheValid = true;
+	}
+	else
+	{
+		isCacheValid = (resFrac == parameters.GetPhysicsParameter( timeResFracName )->GetValue());
+		isCacheValid = isCacheValid && ( resScale == parameters.GetPhysicsParameter( resScaleName )->GetValue() );
+		isCacheValid = isCacheValid && ( resScale2 == parameters.GetPhysicsParameter( resScale2Name )->GetValue() );
+	}
+
 	resFrac = parameters.GetPhysicsParameter( timeResFracName )->GetValue();
 	resScale = parameters.GetPhysicsParameter( resScaleName )->GetValue();
 	resScale2 = parameters.GetPhysicsParameter( resScale2Name )->GetValue();
 	return;
+}
+
+bool DoubleResolutionModel::CacheValid() const
+{
+	return isCacheValid;
 }
 
 //..........................

@@ -49,6 +49,11 @@ void DummyResolutionModel::setParameters( ParameterSet & parameters )
 	return ;
 }
 
+bool DummyResolutionModel::CacheValid() const
+{
+	return true;
+}
+
 //..........................
 //This method allows the instance to add the specific observables it needs to the list
 void DummyResolutionModel::addObservables( vector<string> & observableNames )

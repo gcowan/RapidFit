@@ -53,6 +53,8 @@ class DoubleResolutionModel : public IResolutionModel
 
 		bool isPerEvent() ;
 
+		bool CacheValid() const;
+
 	protected:
 
 		unsigned int numComponents();
@@ -61,6 +63,8 @@ class DoubleResolutionModel : public IResolutionModel
 		double GetFraction( unsigned int );
 
 	private:
+
+		bool isCacheValid;
 
 		double GetThisScale();
 

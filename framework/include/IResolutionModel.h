@@ -55,7 +55,8 @@ class IResolutionModel
 
 		virtual ~IResolutionModel() {};
 
-		virtual bool CacheValid() const { return false; } ;
+		virtual bool CacheValid() const = 0;
+
 	protected:
 
 		virtual unsigned int numComponents() = 0;

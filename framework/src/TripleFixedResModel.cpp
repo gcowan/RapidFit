@@ -29,7 +29,7 @@ TripleFixedResModel::TripleFixedResModel( PDFConfigurator* configurator, bool qu
 	Resolution2FractionName		( configurator->getName( "timeResolution2Fraction" ) ),
 	Resolution3FractionName		( configurator->getName( "timeResolution3Fraction" ) ),
 	ResolutionScaleName		( configurator->getName( "timeResolutionScale" ) ),
-	numberComponents( 3 ), wantedComponent( 1 )
+	numberComponents( 3 ), wantedComponent( 1 ), isCacheValid(false)
 {
 	if( !quiet) cout << "TripleFixedResModel:: Instance created " << endl ;
 }
@@ -52,6 +52,25 @@ void TripleFixedResModel::addParameters( vector<string> & parameterNames )
 //To take the current value of a parameter into the instance
 void TripleFixedResModel::setParameters( ParameterSet & parameters )
 {
+	if( parameters.GetPhysicsParameter( ResolutionScaleName )->isFixed() && 
+		parameters.GetPhysicsParameter( Resolution1Name )->isFixed() &&
+		parameters.GetPhysicsParameter( Resolution2Name )->isFixed() &&
+		parameters.GetPhysicsParameter( Resolution3Name )->isFixed() &&
+		parameters.GetPhysicsParameter( Resolution2FractionName )->isFixed() &&
+		parameters.GetPhysicsParameter( Resolution3FractionName )->isFixed() )
+	{
+		isCacheValid = true;
+	}
+	else
+	{
+		isCacheValid = ( ResolutionScale == parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue() );
+		isCacheValid = isCacheValid && ( Resolution1 == parameters.GetPhysicsParameter( Resolution1Name )->GetValue() );
+		isCacheValid = isCacheValid && ( Resolution2 == parameters.GetPhysicsParameter( Resolution2Name )->GetValue() );
+		isCacheValid = isCacheValid && ( Resolution3 == parameters.GetPhysicsParameter( Resolution3Name )->GetValue() );
+		isCacheValid = isCacheValid && ( Resolution2Fraction == parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue() );
+		isCacheValid = isCacheValid && ( Resolution3Fraction == parameters.GetPhysicsParameter( Resolution3FractionName )->GetValue() );
+	}
+
 	ResolutionScale = parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue();
 	Resolution1 = parameters.GetPhysicsParameter( Resolution1Name )->GetValue();
 	Resolution2 = parameters.GetPhysicsParameter( Resolution2Name )->GetValue();
@@ -59,6 +78,11 @@ void TripleFixedResModel::setParameters( ParameterSet & parameters )
 	Resolution2Fraction = parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue();
 	Resolution3Fraction = parameters.GetPhysicsParameter( Resolution3FractionName )->GetValue();
 	return;
+}
+
+bool TripleFixedResModel::CacheValid() const
+{
+	return isCacheValid;
 }
 
 //..........................

@@ -143,8 +143,11 @@ IResolutionModel* ClassLookUp::LookUpResName( string Name, PDFConfigurator* conf
 
 	if( model_creator == NULL )
 	{
-		cerr << "Cannot Find Resolution Model Named: " << Name << " You probably provided the wrong name in your XML." << endl << endl;
-		exit(-15513);
+		cout << "Cannot Find Resolution Model Named: " << Name << " You probably provided the wrong name in your XML." << endl;
+		//exit(-15513);
+		cout << "Returning Dummy ResolutionModel: DummyResolutionModel" << endl << endl;
+		model_creator_Name = "CreateResModel_DummyResolutionModel";
+		model_creator = (CreateResModel_t*) ClassLookUp::getObject( model_creator_Name );
 	}
 
 	IResolutionModel* returnable_Model = (IResolutionModel*) model_creator( configurator, quiet );

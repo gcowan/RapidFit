@@ -63,6 +63,7 @@ class DummyResolutionModel : public IResolutionModel
 		double ExpCos_Wrapper( vector<double> input ) ;
 		double ExpCosInt_Wrapper( vector<double> input ) ;
 
+		bool CacheValid() const;
 
 	private:
 

@@ -2,7 +2,7 @@
   @class ResolutionModel
 
   A class for implementing a decay time resolution model
- 
+
   This one is a single Gaussian event-by-event model, with a single scale factor
 
   @author Pete Clarke
@@ -32,50 +32,53 @@ using namespace::std;
 
 class ResolutionModel : public IResolutionModel
 {
-public:
-    
-    ResolutionModel( PDFConfigurator* configurator, bool quiet=false ) ;
+	public:
 
-    void addParameters( vector<string> & parameterNames ) ;
-    void setParameters( ParameterSet & parameters ) ;
+		ResolutionModel( PDFConfigurator* configurator, bool quiet=false ) ;
 
-    void addObservables( vector<string> & observableNames ) ;
-    void setObservables( DataPoint * measurement ) ;
+		void addParameters( vector<string> & parameterNames ) ;
+		void setParameters( ParameterSet & parameters ) ;
 
-    double Exp( double time, double gamma ) ;
-    double ExpInt( double tlow, double thigh, double gamma ) ;
+		void addObservables( vector<string> & observableNames ) ;
+		void setObservables( DataPoint * measurement ) ;
 
-    double ExpSin( double time, double gamma, double dms ) ;
-    double ExpSinInt( double tlow, double thigh, double gamma, double dms ) ;
+		double Exp( double time, double gamma ) ;
+		double ExpInt( double tlow, double thigh, double gamma ) ;
 
-    double ExpCos( double time, double gamma, double dms ) ;
-    double ExpCosInt( double tlow, double thigh, double gamma, double dms ) ;
-    
-    bool isPerEvent() ;
+		double ExpSin( double time, double gamma, double dms ) ;
+		double ExpSinInt( double tlow, double thigh, double gamma, double dms ) ;
 
-    //Wrappers
-    double Exp_Wrapper( vector<double> input) ;
-    double ExpInt_Wrapper( vector<double> input ) ;
-    
-    double ExpSin_Wrapper( vector<double> input ) ;
-    double ExpSinInt_Wrapper( vector<double> input ) ;
-    
-    double ExpCos_Wrapper( vector<double> input ) ;
-    double ExpCosInt_Wrapper( vector<double> input ) ;
+		double ExpCos( double time, double gamma, double dms ) ;
+		double ExpCosInt( double tlow, double thigh, double gamma, double dms ) ;
 
-    
-private:
-    
-    ObservableRef resScaleName;			// Scale to multiply e-by-e resolution
-    double resScale ;
-    
-    ObservableRef eventResolutionName;  // Event-by-event resolution observable
-    double eventResolution ;
+		bool isPerEvent() ;
 
-    virtual unsigned int numComponents(){return 1;};
-    virtual void requestComponent( unsigned int ){return;};
+		//Wrappers
+		double Exp_Wrapper( vector<double> input) ;
+		double ExpInt_Wrapper( vector<double> input ) ;
 
-    virtual double GetFraction( unsigned int ){return 1.0;};
+		double ExpSin_Wrapper( vector<double> input ) ;
+		double ExpSinInt_Wrapper( vector<double> input ) ;
+
+		double ExpCos_Wrapper( vector<double> input ) ;
+		double ExpCosInt_Wrapper( vector<double> input ) ;
+
+		bool CacheValid() const;
+
+	private:
+
+		bool isCacheValid;
+
+		ObservableRef resScaleName;			// Scale to multiply e-by-e resolution
+		double resScale ;
+
+		ObservableRef eventResolutionName;  // Event-by-event resolution observable
+		double eventResolution ;
+
+		virtual unsigned int numComponents(){return 1;};
+		virtual void requestComponent( unsigned int ){return;};
+
+		virtual double GetFraction( unsigned int ){return 1.0;};
 
 };
 

@@ -28,7 +28,7 @@ DoubleFixedResModel::DoubleFixedResModel( PDFConfigurator* configurator, bool qu
 	Resolution2Name			( configurator->getName( "timeResolution2" ) ),
 	Resolution2FractionName		( configurator->getName( "timeResolution2Fraction" ) ),
 	ResolutionScaleName		( configurator->getName( "timeResolutionScale" ) ),
-	numberComponents( 2 ), wantedComponent( 1 )
+	numberComponents( 2 ), wantedComponent( 1 ), isCacheValid(false)
 {
 	if( !quiet) cout << "DoubleFixedResModel:: Instance created " << endl ;
 }
@@ -49,11 +49,30 @@ void DoubleFixedResModel::addParameters( vector<string> & parameterNames )
 //To take the current value of a parameter into the instance
 void DoubleFixedResModel::setParameters( ParameterSet & parameters )
 {
+	if( parameters.GetPhysicsParameter( ResolutionScaleName )->isFixed() &&
+		parameters.GetPhysicsParameter( Resolution1Name )->isFixed() &&
+		parameters.GetPhysicsParameter( Resolution2Name )->isFixed() &&
+		parameters.GetPhysicsParameter( Resolution2FractionName )->isFixed() )
+	{
+		isCacheValid = true;
+	}
+	else
+	{
+		isCacheValid = ( ResolutionScale == parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue() );
+		isCacheValid = isCacheValid && ( Resolution1 == parameters.GetPhysicsParameter( Resolution1Name )->GetValue() );
+		isCacheValid = isCacheValid && ( Resolution2 == parameters.GetPhysicsParameter( Resolution2Name )->GetValue() );
+		isCacheValid = isCacheValid && ( Resolution2Fraction == parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue() );
+	}
 	ResolutionScale = parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue();
 	Resolution1 = parameters.GetPhysicsParameter( Resolution1Name )->GetValue();
 	Resolution2 = parameters.GetPhysicsParameter( Resolution2Name )->GetValue();
 	Resolution2Fraction = parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue();
 	return;
+}
+
+bool DoubleFixedResModel::CacheValid() const
+{
+	return isCacheValid;
 }
 
 //..........................

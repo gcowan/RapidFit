@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2014/01/23 Rob Currie
+  - Adding functions to the remaining Resolution classes to pass information about whether a cache based on the calculations within each class is valid or not
+  - Adding safe default Resolution model to v7
+
 2014/01/22 Rob Currie
   - Adding combined Mistag model described in 3fb JpsiPhi ana note and moving v7 to use this as the new mistag model in the code
 

@@ -201,15 +201,19 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 	// Choose resolution model according to flags
 	// For now hard coded.
 
-	if( _useEventResolution )
+	//if( _useEventResolution )
 		// get model name
 		// use class lookup
-	{
+	//{
 		string resolutionModelName = configurator->GetResolutionModel();
 		resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator, isCopy );
 
-		this->TurnCachingOff();
-	}
+		if( _useEventResolution ) this->TurnCachingOff();
+	//}
+	//else
+	//{
+	//	resolutionModel = ClassLookUp::LookUpResName( "", configurator, isCopy );
+	//}
 
 	//if( _useNewMistagModel ) _mistagCalibModel = new CombinedMistagCalib( configurator );
 	if( _useNewMistagModel ) _mistagCalibModel = new MistagCalib3fb( configurator );
