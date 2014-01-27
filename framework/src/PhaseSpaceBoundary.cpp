@@ -150,6 +150,12 @@ pair< vector<ObservableRef>, vector<double> > PhaseSpaceBoundary::GetDiscreteInf
 		}
 	}
 
+	//	Remember to invalidate cache before exiting
+	for( unsigned int i=0; i< discreteInfoNames.size(); ++i )
+	{
+		discreteInfoNames[i].SetIndex( -1 );
+	}
+
 	if( discreteInfoNames.size() == discreteInfoValues.size() )
 	{
 		stored_pair = make_pair( discreteInfoNames, discreteInfoValues );

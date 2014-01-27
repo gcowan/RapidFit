@@ -63,6 +63,8 @@ class MemoryDataSet : public IDataSet
 
 		virtual void Print() const;
 
+		void PrintYield();
+
 		void ClearAllPseudoObservables();
 
 		void SafeAddDataPoint( DataPoint* NewDataPoint );

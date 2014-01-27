@@ -49,14 +49,28 @@ using namespace::std;
 //Constructor with correct arguments
 ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num, const DebugClass* Debug ) :
 	observableName( ObservableName ), weightName(), plotPDF( ClassLookUp::CopyPDF(NewPDF) ), plotData( NewDataSet ),
-	pdfIntegrator( NULL ), weightsWereUsed(false), weight_norm(1.),
-	discreteNames(), continuousNames(), full_boundary( new PhaseSpaceBoundary(*(NewDataSet->GetBoundary())) ), PlotFile( filename ),
+	pdfIntegrator( NULL ), weightsWereUsed(false), weight_norm(1.), discreteNames(), continuousNames(), full_boundary( NULL ), PlotFile( filename ),
 	total_points( (config!=NULL)?config->PDF_points:128 ), data_binning( (config!=NULL)?config->data_bins:100 ), pdfStr( PDFStr ),
 	logY( (config!=NULL)?config->logY:false ), logX( (config!=NULL)?config->logX:false ), this_config( config ), boundary_min( -99999 ), boundary_max( -99999 ), step_size( -99999 ),
 	onlyZero( (config!=NULL)?config->OnlyZero:false ), combination_integral(vector<double>()), ratioOfIntegrals(1,1.), wanted_weights(), format(),
 	data_subsets(), allCombinations(), combinationWeights(), combinationDescriptions(), observableValues(), binned_data(), total_components(),
-	chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num)
+	chi2(), N(), allPullData(), debug(NULL), PDFNum(PDF_Num), initialBoundary(NULL)
 {
+
+	initialBoundary = new PhaseSpaceBoundary( *plotData->GetBoundary() );
+
+	vector<string> allDescribedObservables = plotPDF->GetPrototypeDataPoint();
+	full_boundary = new PhaseSpaceBoundary( allDescribedObservables );
+
+	for( unsigned int i=0; i< allDescribedObservables.size(); ++i )
+	{
+		IConstraint* thisConst = initialBoundary->GetConstraint( allDescribedObservables[i] );
+		full_boundary->SetConstraint( allDescribedObservables[i], thisConst );
+		//cout << allDescribedObservables[i] << endl;
+	}
+
+	plotData->SetBoundary( full_boundary );
+	plotPDF->ChangePhaseSpace( full_boundary );
 
 	TH1::SetDefaultSumw2(true);
 
@@ -90,6 +104,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		delete thisIntConfig;
 	}
 
+	/*
 	vector<string> disc_contr = full_boundary->GetDiscreteNames();
 	vector<string> pdf_const = plotPDF->GetPrototypeDataPoint();
 	for( unsigned int i=0; i< disc_contr.size(); ++i )
@@ -98,9 +113,9 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		{
 			full_boundary->RemoveConstraint( disc_contr[i] );
 		}
-	}
-	plotPDF->ChangePhaseSpace( full_boundary );
-	NewDataSet->SetBoundary( full_boundary );
+	}*/
+	//plotPDF->ChangePhaseSpace( full_boundary );
+	//plotData->SetBoundary( full_boundary );
 
 	//////////////////////////////////////////////////////////////////
 	//Make the histogram of this observable
@@ -138,10 +153,27 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 
 	allCombinations_input = full_boundary->GetDiscreteCombinations();
 
-	for( unsigned int i=0; i< allCombinations_input.size(); ++i )
+	for( vector<DataPoint*>::iterator thisCombination = allCombinations_input.begin(); thisCombination != allCombinations_input.end(); ++thisCombination )
 	{
-		allCombinations.push_back( new DataPoint( *(allCombinations_input[i]) ) );
+		double thisNum = plotData->GetDataNumber( *thisCombination );
+		if( fabs(thisNum) > 1E-5 )
+		{
+			allCombinations.push_back( new DataPoint( *(*thisCombination) ) );
+		}
+		//(*thisCombination)->Print();
+		//cout << thisNum << "  " << plotData->GetDataNumber() << endl;
+
+		//if( thisNum == 0 ) exit(0);
 	}
+
+	cout << endl << "All Combinations with Data:" << endl;
+
+	cout << allCombinations.size() << endl << endl;
+
+//	for( unsigned int i=0; i< allCombinations_input.size(); ++i )
+//	{
+//		allCombinations.push_back( new DataPoint( *(allCombinations_input[i]) ) );
+//	}
 
 	if( debug != NULL )
 	{
@@ -242,6 +274,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	TH1::SetDefaultSumw2( true );
 
 	pdfIntegrator->ForceTestStatus( true );
+
+        plotData->SetBoundary( initialBoundary );
 }
 
 //Destructor
@@ -256,11 +290,15 @@ ComponentPlotter::~ComponentPlotter()
 	}
 	delete format;
 	if( debug != NULL ) delete debug;
+	if( initialBoundary != NULL ) delete initialBoundary;
+	if( full_boundary != NULL ) delete full_boundary;
 }
 
 //Create a root file containing a projection plot over one observable
 void ComponentPlotter::ProjectObservable()
 {
+        plotData->SetBoundary( full_boundary );
+
 	vector<string> doNotIntegrate = plotPDF->GetDoNotIntegrateList();
 
 	plotPDF->UnsetCache();
@@ -278,6 +316,8 @@ void ComponentPlotter::ProjectObservable()
 		cerr << "CANNOT PROJECT: " << observableName << endl;
 		return;
 	}
+
+        plotData->SetBoundary( initialBoundary );
 }
 
 //
@@ -1649,6 +1689,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 
 	ObservableRef thisObservableRef( ObservableName );
 
+	DataPoint* thisPoint = NULL;
 	//	Step over the whole observable range
 	for (int pointIndex = 0; pointIndex < PlotNumber; ++pointIndex )
 	{
@@ -1661,7 +1702,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		//	Set the value of Observable to the new step value
 		//	All other CONTINUOUS observables set to average of range
 		newObs = new Observable( string(ObservableName), observableValue, unit );
-		DataPoint* thisPoint = new DataPoint( *InputPoint );
+		thisPoint = new DataPoint( *InputPoint );
 		thisPoint->SetObservable( thisObservableRef, newObs );
 		delete newObs; newObs = NULL;
 
@@ -1690,7 +1731,15 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		}
 
 		pointValues->push_back( integralvalue );
-		delete thisPoint;
+		delete thisPoint; thisPoint = NULL;
+	}
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass("ComponentPlotter") )
+		{
+			DebugClass::Dump2File( "thisProjection.txt", *pointValues );
+		}
 	}
 
 	cout << "Finished Projecting" << endl;
@@ -1868,6 +1917,23 @@ double ComponentPlotter::PDF2DataNormalisation( const unsigned int combinationIn
 	normalisation /= combination_integral[ combinationIndex ];			//	Total Integral of the PDF	(We're plotting prob of PDF being at this point for a non-unitary PDF)
 
 	normalisation *= weight_norm;							//	Correct for the effect of non-unitary weights used in the fit
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "ComponentPlotter" ) )
+		{
+			cout << endl;
+			cout << "fabs(ratioOfIntegrals[ combinationIndex ]) : " << fabs(ratioOfIntegrals[ combinationIndex ]) << endl;
+			cout << "plotData->GetDataNumber( allCombinations[combinationIndex] ) : " << plotData->GetDataNumber( allCombinations[combinationIndex] ) << endl;
+			cout << "combinationIndex of allCombinations.size() : " << combinationIndex << " of " << allCombinations.size() << endl;
+			cout << "data_binning : " << data_binning << endl;
+			cout << "fabs( boundary_max-boundary_min ) : " << fabs( boundary_max-boundary_min ) << endl;
+			cout << "combination_integral[ combinationIndex ] : " << combination_integral[ combinationIndex ] << endl;
+			cout << "weight_norm : " << weight_norm << endl;
+			cout << "normalisation : " << normalisation << endl;
+			cout << endl;
+		}
+	}
 
 	return normalisation;
 }

@@ -531,7 +531,7 @@ vector<DataPoint*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, v
 	}
 
 	double* v = new double[ nDim ];
-	for (unsigned int i = 0; i < npoint; i++)
+	for( unsigned int i = 0; i < npoint; i++)
 	{
 		gsl_qrng_get( q, v );
 		for( unsigned int j = 0; j < nDim; j++)
@@ -571,7 +571,7 @@ vector<DataPoint*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, v
 
 		doEval_points.push_back( thisPoint );
 		//result += quickFunction->DoEval( point );
-		//delete[] point;
+		delete[] point;
 	}
 
 	delete[] integrationPoints;
@@ -711,6 +711,8 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 //	if( componentIndex != NULL ) cout << functionToWrap->GetName() << "\t" << thisConfig->wantedComponent->getComponentName() << ":\t" << functionToWrap->EvaluateComponent( thisDataSet->GetDataPoint( 0 ), thisConfig->wantedComponent ) << endl;
 
 	vector<double>* thisSet = MultiThreadedFunctions::ParallelEvaulate( functionToWrap, thisDataSet, thisConfig );
+
+	delete thisDataSet;
 
 //	DebugClass::Dump2TTree( DebugClass::GetUniqueROOTFileName(), *thisSet );
 

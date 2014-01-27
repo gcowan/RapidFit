@@ -451,7 +451,7 @@ void SaveXML( RapidFitConfiguration* config )
 	string full_xml = GenerateXML( config, config->generateToyXML );
 
 	string fileName = ResultFormatter::GetOutputFolder();
-	fileName.append("/");
+	if( fileName.empty() )	fileName.append("./");
 	string xml_filename = "outputXMLFile";
 	xml_filename.append( StringProcessing::TimeString() );
 	xml_filename.append( ".xml" );

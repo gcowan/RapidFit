@@ -449,7 +449,7 @@ class ComponentPlotter
 		TString pdfStr;						/*!	Used for seperating the different PDF components	*/
 		TFile* PlotFile;					/*!	Whole file where we write to data			*/
 		PhaseSpaceBoundary* full_boundary;			/*!	Copy of the PhaseSpaceBoundary passed to the constructor*/
-
+		PhaseSpaceBoundary* initialBoundary;
 
 
 		vector<string> discreteNames, continuousNames;		/*!	These lists are useful for keeping record of the discrete/continous observables	*/

@@ -21,7 +21,7 @@
 #include <math.h>
 #include <iomanip>
 
-#define DOUBLE_TOLERANCE_DATA 1E-6
+#define DOUBLE_TOLERANCE_DATA 1E-8
 
 using namespace::std;
 
@@ -116,7 +116,12 @@ int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint ) const
 	else
 	{
 		pair< vector<ObservableRef>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( templateDataPoint );
-		unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
+		//	for( unsigned int i=0; i< thisPointInfo.first.size(); ++i )
+		//	{
+		//		cout << i << " : " << string((thisPointInfo.first)[i]) << " = " << (thisPointInfo.second)[i] << endl;
+		//	}
+		vector<DataPoint*> thisSubSet = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
+		unsigned int dataPointNum = (unsigned)thisSubSet.size();
 		return (int) dataPointNum;
 	}
 }
@@ -190,26 +195,36 @@ vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<ObservableRef>
 	vector<DataPoint*> returnable_subset;
 	if( discreteParam.size() != discreteVal.size() )
 	{
-		cerr << "\n\n\t\tBadly Defined definitio`n of a subset, returning 0 events!\n\n" << endl;
+		cout << "\n\n\t\tBadly Defined definitio`n of a subset, returning 0 events!\n\n" << endl;
 		return returnable_subset;
 	}
 
+	DataPoint* data_i = NULL;
+	bool decision=true;
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
-		DataPoint* data_i = allData[i];
+		data_i = allData[i];
 
-		bool decision = true;       
+		decision = true;       
 		for( unsigned int j=0; j< discreteParam.size(); ++j )
 		{
+			//cout << string(discreteParam[j]) << " = " << data_i->GetObservable( discreteParam[j] )->GetValue() << " w: " << discreteVal[j] << "\t";
 			if( !( fabs( data_i->GetObservable( discreteParam[j] )->GetValue() - discreteVal[j] ) < DOUBLE_TOLERANCE_DATA ) )
 			{
 				decision = false;
 			}
 		}
 
+		//cout << endl;
+		//if( decision ) data_i->Print();
+
 		if( decision ) returnable_subset.push_back( data_i );
 
 	}
+
+	//cout << returnable_subset.size() << endl;
+
+	//exit(0);
 
 	return returnable_subset;
 }
@@ -229,16 +244,20 @@ vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<string> discre
 		return returnable_subset;
 	}
 
+	DataPoint* data_i = NULL;
+	bool decision=true;
+
+	vector<ObservableRef*> temp_ref;
+	for( unsigned int j=0; j< discreteParam.size(); ++j )
+	{
+		temp_ref.push_back( new ObservableRef( discreteParam[j] ) );
+	}
+
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
-		DataPoint* data_i = allData[i];
-		vector<ObservableRef*> temp_ref;
-		for( unsigned int j=0; j< discreteParam.size(); ++j )
-		{
-			temp_ref.push_back( new ObservableRef( discreteParam[j] ) );
-		}
+		data_i = allData[i];
 
-		bool decision = true;
+		decision = true;
 		for( unsigned int j=0; j< discreteParam.size(); ++j )
 		{
 			if( !( fabs( data_i->GetObservable( *(temp_ref[j]) )->GetValue() - discreteVal[j] ) < DOUBLE_TOLERANCE_DATA ) )
@@ -248,12 +267,12 @@ vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<string> discre
 		}
 
 		if( decision ) returnable_subset.push_back( data_i );
+	}
 
-		while( !temp_ref.empty() )
-		{
-			if( temp_ref.back() != NULL ) delete temp_ref.back();
-			temp_ref.pop_back();
-		}
+	while( !temp_ref.empty() )
+	{
+		if( temp_ref.back() != NULL ) delete temp_ref.back();
+		temp_ref.pop_back();
 	}
 
 	return returnable_subset;
@@ -308,6 +327,12 @@ void MemoryDataSet::NormaliseWeights()
 	}
 }
 
+void MemoryDataSet::PrintYield()
+{
+	cout << "Total Yield = " << this->Yield() << " ± " << this->YieldError() << endl;
+	this->Print();
+}
+
 void MemoryDataSet::Print() const
 {
 	if( this->GetWeightsWereUsed() && this->GetDataNumber() > 0 )
@@ -320,7 +345,7 @@ void MemoryDataSet::Print() const
 		double err=0.;
 		for( unsigned int i=0; i< allData.size(); ++i )
 		{
-			val=allData[i]->GetObservable( WeightName )->GetValue();
+			val=allData[i]->GetObservable( weightRef )->GetValue();
 			avr+=val;
 			avr_sq+=val*val;
 			err+=val*val;
@@ -342,8 +367,22 @@ void MemoryDataSet::Print() const
 					if( description[j] == '\t' ) description[j] = ' ';
 				}
 				pair< vector<ObservableRef>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
-				unsigned int dataPointNum = (unsigned)this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second ).size();
-				if( dataPointNum > 0 ) cout << "Combination: " << description << " has: " << dataPointNum << " events." << endl;
+				vector<DataPoint*> thisData = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
+				unsigned int dataPointNum = (unsigned)thisData.size();
+				double this_yield=0.;
+				if( this->GetWeightsWereUsed() )
+				{
+					for( unsigned int k=0; k< thisData.size(); ++k )
+					{
+						this_yield += thisData[k]->GetObservable( weightRef )->GetValue();
+					}
+				}
+				if( dataPointNum > 0 )
+				{
+					cout << "Combination: " << description << " has: " << dataPointNum << " events";
+					if( this->GetWeightsWereUsed() ) cout << " and " << this_yield << " yield." << endl;
+					else cout << "." << endl;
+				}
 			}
 		}
 	}

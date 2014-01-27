@@ -98,6 +98,8 @@ class IDataSet
 		 */
 		virtual void Print() const = 0;
 
+		virtual void PrintYield() = 0;
+
 		/*!
 		 * @brief Virtual Destructor
 		 */

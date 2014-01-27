@@ -343,6 +343,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 			if( FunctionConfig->GetUseCustomAlpha() )	alphaName = FunctionConfig->GetAlphaName();
 			FitAssembler::CheckInputObs( thisPDF, thisData, weightName, alphaName, debug );
 			Requested_DataSet->UseEventWeights( FunctionConfig->GetWeightName() );
+			Requested_DataSet->PrintYield();
 		}
 
 		if( Requested_DataSet->GetDataNumber() > 0 )
