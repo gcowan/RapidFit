@@ -212,6 +212,7 @@ IPDF* ClassLookUp::CopyPDF( const IPDF* inputPDF )
 		returnable_PDF->UpdatePhysicsParameters( SHOULDBESAFEPDF->GetPhysicsParameters() );
 		returnable_PDF->Can_Remove_Cache( false );
 		returnable_PDF->SetRandomFunction( inputPDF->GetRandomFunction() );
+		returnable_PDF->SetLabel( inputPDF->GetLabel() );
 	}
 
 	returnable_PDF->Can_Remove_Cache( false );

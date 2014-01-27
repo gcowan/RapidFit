@@ -7,6 +7,7 @@
   - Fixing bug to do with saving XML generated in fitting... this probably needs adressing more correctly as the output directory isn't being picked up by this method!
   - Making Integrator function more compatible with v7 PDF
   - Adding some additional output for weighted datasets to return the weighted yield for each subset before fitting begins, perhaps overly verbose but this isn't the end of the world and makes things easier 
+  - Adding some minor bugfixes to do with copying of PDFs through non-copy constructor
 
 2014/01/23 Rob Currie
   - Adding functions to the remaining Resolution classes to pass information about whether a cache based on the calculations within each class is valid or not

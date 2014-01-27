@@ -198,6 +198,8 @@ void RestoreXML( vector<string> input_filenames, vector<string> other_params )
 
 		thisXMLName.Append( ".xml" );
 
+		cout << "Requesting FittingXML" << endl;
+
 		TTree* runtimeXML = ROOT_File_Processing::GetTree( input_filenames[i], "FittingXML" );
 
 		vector<string>* thisXML = new vector<string>();
