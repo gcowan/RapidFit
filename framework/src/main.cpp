@@ -510,6 +510,232 @@ string GenerateXML( RapidFitConfiguration* config, bool isForToys )
 	return full_xml.str();
 }
 
+void WeightThisDataSet( RapidFitConfiguration* config )
+{
+	cout << "Weighting DataSet(s) with: " << endl;
+	if( config->calcConfig == NULL )
+	{
+		cerr << "No PreCalculator Defined in the XML" << endl;
+		cerr << "You need to add a section to your XML to tell this tool what PreCalculator to calculate event weights" << endl;
+		exit(7239);
+	}
+	else
+	{
+		//              Generate Weighted Datasets
+		vector<IDataSet*> WeightedDataSets;
+
+		if( config->calculator != NULL ) delete config->calculator;
+
+		config->calculator = config->calcConfig->GetPreCalculator( config->GlobalResult );
+
+		for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
+		{
+			cout << endl << "Weighting DataSet " << i+1 << endl;
+
+			IPrecalculator* thisCalculator = config->calculator;
+
+			IDataSet* inputData = config->pdfsAndData[i]->GetDataSet();
+			IPDF* inputPDF = config->pdfsAndData[i]->GetPDF();
+			IDataSet* weightedDataSet = thisCalculator->ProcessDataSet( inputData, inputPDF );
+			vector<IDataSet*> weightedDataSet_v; weightedDataSet_v.push_back( weightedDataSet );
+			//TString filename = config->calcConfig->GetFileName();
+			//filename.Append("_"); filename+=i; filename.Append(".root");
+			//cout << "Saving Weighted DataSet " << i << " as: " << filename << endl;
+			//ResultFormatter::MakeRootDataFile( filename.Data(), weightedDataSet_v );
+			//delete weightedDataSet;
+			//delete calculator;
+			WeightedDataSets.push_back( weightedDataSet );
+		}
+
+		double sum = 0.;
+		double sum_sq = 0.;
+		ObservableRef WeightsName( config->calcConfig->GetWeightName() );
+
+		if( config->calcConfig->GetConfig() == 1 ) config->calcConfig->SetConfig( 2 );
+		else if( config->calcConfig->GetConfig() == 2 ) config->calcConfig->SetConfig( 1 );
+
+		string bkgName = config->calcConfig->GetWeightName();
+		bkgName.append( "_bkg" );
+		config->calcConfig->SetWeightName( bkgName );
+
+		delete config->calculator;
+		config->calculator = config->calcConfig->GetPreCalculator( config->GlobalResult );
+
+		for( unsigned int i=0; i< WeightedDataSets.size(); ++i )
+		{
+			cout << endl << "Background Weighting DataSet " << i+1 << endl;
+
+			IPrecalculator* thisCalculator = config->calculator;
+
+			IDataSet* inputData = WeightedDataSets[i];
+			IPDF* inputPDF = config->pdfsAndData[i]->GetPDF();
+			IDataSet* weightedDataSet = thisCalculator->ProcessDataSet( inputData, inputPDF );
+			vector<IDataSet*> weightedDataSet_v; weightedDataSet_v.push_back( weightedDataSet );
+			TString filename = config->calcConfig->GetFileName();
+			filename.Append("_"); filename+=i; filename.Append(".root");
+			cout << "Saving Weighted DataSet " << i << " as: " << filename << endl;
+			ResultFormatter::MakeRootDataFile( filename.Data(), weightedDataSet_v );
+			//delete weightedDataSet;
+			//delete calculator;
+		}
+
+		//              Do Something With them :D
+		Observable* testObservable = WeightedDataSets[0]->GetDataPoint( 0 )->GetObservable( WeightsName );
+
+		double value=0.;
+		if( WeightsName.GetIndex() >= 0 )
+		{
+			for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
+			{
+				for( unsigned int j=0; j< (unsigned) WeightedDataSets[i]->GetDataNumber(); ++j )
+				{
+					value = WeightedDataSets[i]->GetDataPoint( j )->GetObservable( WeightsName )->GetValue();
+					sum += value;
+					sum_sq += value*value;
+				}
+			}
+			cout << endl;
+			cout << "Total of All sWeights: " << sum << endl;
+			cout << "With an Error of:      " << sqrt( sum_sq ) << endl;
+			cout << endl;
+		}
+
+		//              Delete them as they're local objects
+		for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
+		{
+			while( !WeightedDataSets.empty() )
+			{
+				if( WeightedDataSets.back() != NULL ) delete WeightedDataSets.back();
+				WeightedDataSets.pop_back();
+			}
+		}
+	}
+}
+
+void BuildTheseConstraints( RapidFitConfiguration* config )
+{
+	stringstream full_xml;
+
+	ResultParameterSet* resultParameters = config->GlobalResult->GetResultParameterSet();
+
+	vector<string> tobeConstrained = resultParameters->GetAllFloatNames();
+
+	full_xml << endl;
+
+	vector<ResultParameter*> ConstrainedParams;
+
+	for( unsigned int i=0; i< tobeConstrained.size(); ++i )
+	{
+		ResultParameter* thisParam = resultParameters->GetResultParameter( tobeConstrained[i] );
+
+		full_xml << thisParam->ToyXML();
+		full_xml << endl;
+
+		ConstrainedParams.push_back( thisParam );
+	}
+
+	full_xml << endl;
+
+	for( unsigned int i=0; i< ConstrainedParams.size(); ++i )
+	{
+		full_xml << ConstrainedParams[i]->ConstraintXML();
+		full_xml << endl;
+	}
+
+	full_xml << endl;
+
+
+	string fileName = ResultFormatter::GetOutputFolder();
+	fileName.append("/");
+	string xml_filename = "constraintXMLFile";
+	xml_filename.append( StringProcessing::TimeString() );
+	xml_filename.append( ".xml" );
+	fileName.append(xml_filename);
+	ofstream output_xmlFile;
+	output_xmlFile.open( fileName.c_str() );
+
+	output_xmlFile << full_xml.str() ;
+
+	output_xmlFile.close();
+
+	cout << endl << "Output XML Stored in:\t" << fileName << endl << endl;
+}
+
+void SaveOneFoam( RapidFitConfiguration* config )
+{
+	//For each dataset in the fit
+	for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
+	{
+		//Get the phasespace from the fit
+		PhaseSpaceBoundary* temp_boundary = config->pdfsAndData[i]->GetDataSet()->GetBoundary();
+
+		//Get the PDF from the fit with the CV from the fit still passed
+		IPDF* temp_pdf = config->pdfsAndData[i]->GetPDF();
+
+		/*
+		//Tell the PDF you want to copy the form of all continuous objects on the don't integrate list
+		for( unsigned int j=0; j< temp_pdf->GetDoNotIntegrateList().size(); ++j )
+		{
+		string observableName = temp_pdf->GetDoNotIntegrateList()[j];
+		IConstraint* temp_constr = temp_boundary->GetConstraint( observableName );
+		if( temp_constr != NULL )
+		{
+		if( temp_constr->IsDiscrete() == false )
+		{
+		PDFConfigurator* pdf_config = new PDFConfigurator();
+		pdf_config->addObservableToModel( observableName, config->pdfsAndData[i]->GetDataSet() );
+		//pdf_config->setFitFunc( "pol9" );
+		IPDF* observable_modeller = ClassLookUp::LookUpPDFName( "Observable_1D_distribution", pdf_config );
+		temp_pdf->SetObservableDistribution( observableName, observable_modeller );
+		}
+		}
+		}
+		*/
+
+		//Construct the configuration to give a Foam generator
+		DataSetConfiguration* temp_config = new DataSetConfiguration( "Foam", config->pdfsAndData[i]->GetDataSet()->GetDataNumber(), "", vector<string>(), vector<string>(), temp_pdf );
+		vector<DataSetConfiguration*> data_config; data_config.push_back( temp_config );
+		PDFWithData* pdf_data_to_fit = new PDFWithData( temp_pdf, temp_boundary, data_config );
+
+		ParameterSet* result_set = config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
+		pdf_data_to_fit->SetPhysicsParameters( result_set );
+
+		vector<IDataSet*> quickDataSet;
+		IDataSet* temp_dataSet = pdf_data_to_fit->GetDataSet();
+		quickDataSet.push_back( temp_dataSet );
+		string ext_dot=".";
+		vector<string> temp_strings = StringProcessing::SplitString( config->saveOneDataSetFileName, *(ext_dot.c_str()) );
+		TString FileName_Pre_Suffix = StringProcessing::CondenseStrings( temp_strings, 0, int(temp_strings.size() -1) );
+		TString number; number+=i;
+		TString real_saveOneDataSetFileName = TString( FileName_Pre_Suffix + "-" + number + ".root" );
+
+		ResultFormatter::MakeRootDataFile( string(real_saveOneDataSetFileName.Data()), quickDataSet );
+		delete temp_config;
+		delete pdf_data_to_fit;
+	}
+}
+
+void MakeOutputFolder( RapidFitConfiguration* config )
+{
+	//Output results
+	config->makeOutput->SetInputResults( config->GlobalResult->GetResultParameterSet() );
+	if( !config->doLLcontourFlag && ( !config->doFC_Flag && !config->doLLscanFlag  ) )
+	{
+		if( !config->disableLatexOutput )
+		{
+			config->makeOutput->OutputFitResult( config->GlobalFitResult->GetFitResult(0) );
+		}
+	}
+	string fileName = ResultFormatter::GetOutputFolder();
+	string fileName_ext=string( "Global_Fit_Result_"+StringProcessing::TimeString()+".root" );
+	fileName.append("/"); fileName.append( fileName_ext );
+	//cout << "Writing Output Tuple to:\t" << fileName << endl;
+	//cout << "Output Folder:\t" << ResultFormatter::GetOutputFolder() << endl;
+	//cout << "Current Folder:\t" << gSystem->pwd() << endl;
+	ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs, GenerateXML( config, false ), GenerateXML( config, true ) );
+	ResultFormatter::ReviewOutput( config->GlobalResult );
+}
+
 int PerformMainFit( RapidFitConfiguration* config )
 {
 	//	This is for code collapsing and to clearly outline the 'Fit' step of this file
@@ -570,51 +796,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	if( config->BuildConstraints )
 	{
-		stringstream full_xml;
-
-		ResultParameterSet* resultParameters = config->GlobalResult->GetResultParameterSet();
-
-		vector<string> tobeConstrained = resultParameters->GetAllFloatNames();
-
-		full_xml << endl;
-
-		vector<ResultParameter*> ConstrainedParams;
-
-		for( unsigned int i=0; i< tobeConstrained.size(); ++i )
-		{
-			ResultParameter* thisParam = resultParameters->GetResultParameter( tobeConstrained[i] );
-
-			full_xml << thisParam->ToyXML();
-			full_xml << endl;
-
-			ConstrainedParams.push_back( thisParam );
-		}
-
-		full_xml << endl;
-
-		for( unsigned int i=0; i< ConstrainedParams.size(); ++i )
-		{
-			full_xml << ConstrainedParams[i]->ConstraintXML();
-			full_xml << endl;
-		}
-
-		full_xml << endl;
-
-
-		string fileName = ResultFormatter::GetOutputFolder();
-		fileName.append("/");
-		string xml_filename = "constraintXMLFile";
-		xml_filename.append( StringProcessing::TimeString() );
-		xml_filename.append( ".xml" );
-		fileName.append(xml_filename);
-		ofstream output_xmlFile;
-		output_xmlFile.open( fileName.c_str() );
-
-		output_xmlFile << full_xml.str() ;
-
-		output_xmlFile.close();
-
-		cout << endl << "Output XML Stored in:\t" << fileName << endl << endl;
+		BuildTheseConstraints( config );
 	}
 
 	if( config->GlobalResult->GetFitStatus() < 3 )
@@ -645,120 +827,12 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	if( config->saveOneFoamDataSetFlag )
 	{
-		//For each dataset in the fit
-		for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
-		{
-			//Get the phasespace from the fit
-			PhaseSpaceBoundary* temp_boundary = config->pdfsAndData[i]->GetDataSet()->GetBoundary();
-
-			//Get the PDF from the fit with the CV from the fit still passed
-			IPDF* temp_pdf = config->pdfsAndData[i]->GetPDF();
-
-			/*
-			//Tell the PDF you want to copy the form of all continuous objects on the don't integrate list
-			for( unsigned int j=0; j< temp_pdf->GetDoNotIntegrateList().size(); ++j )
-			{
-			string observableName = temp_pdf->GetDoNotIntegrateList()[j];
-			IConstraint* temp_constr = temp_boundary->GetConstraint( observableName );
-			if( temp_constr != NULL )
-			{
-			if( temp_constr->IsDiscrete() == false )
-			{
-			PDFConfigurator* pdf_config = new PDFConfigurator();
-			pdf_config->addObservableToModel( observableName, config->pdfsAndData[i]->GetDataSet() );
-			//pdf_config->setFitFunc( "pol9" );
-			IPDF* observable_modeller = ClassLookUp::LookUpPDFName( "Observable_1D_distribution", pdf_config );
-			temp_pdf->SetObservableDistribution( observableName, observable_modeller );
-			}
-			}
-			}
-			*/
-
-			//Construct the configuration to give a Foam generator
-			DataSetConfiguration* temp_config = new DataSetConfiguration( "Foam", config->pdfsAndData[i]->GetDataSet()->GetDataNumber(), "", vector<string>(), vector<string>(), temp_pdf );
-			vector<DataSetConfiguration*> data_config; data_config.push_back( temp_config );
-			PDFWithData* pdf_data_to_fit = new PDFWithData( temp_pdf, temp_boundary, data_config );
-
-			ParameterSet* result_set = config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
-			pdf_data_to_fit->SetPhysicsParameters( result_set );
-
-			vector<IDataSet*> quickDataSet;
-			IDataSet* temp_dataSet = pdf_data_to_fit->GetDataSet();
-			quickDataSet.push_back( temp_dataSet );
-			string ext_dot=".";
-			vector<string> temp_strings = StringProcessing::SplitString( config->saveOneDataSetFileName, *(ext_dot.c_str()) );
-			TString FileName_Pre_Suffix = StringProcessing::CondenseStrings( temp_strings, 0, int(temp_strings.size() -1) );
-			TString number; number+=i;
-			TString real_saveOneDataSetFileName = TString( FileName_Pre_Suffix + "-" + number + ".root" );
-
-			ResultFormatter::MakeRootDataFile( string(real_saveOneDataSetFileName.Data()), quickDataSet );
-			delete temp_config;
-			delete pdf_data_to_fit;
-		}
+		SaveOneFoam( config );
 	}
 
 	if( config->WeightDataSet == true )
 	{
-		cout << "Weighting DataSet(s) with: " << endl;
-		if( config->calcConfig == NULL )
-		{
-			cerr << "No PreCalculator Defined in the XML" << endl;
-			cerr << "You need to add a section to your XML to tell this tool what PreCalculator to calculate event weights" << endl;
-			exit(7239);
-		}
-		else
-		{
-			//		Generate Weighted Datasets
-			vector<IDataSet*> WeightedDataSets;
-			for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
-			{
-				cout << endl << "Weighting DataSet " << i+1 << endl;
-				config->calculator = config->calcConfig->GetPreCalculator( config->GlobalResult );
-				IDataSet* weightedDataSet = config->calculator->ProcessDataSet( config->pdfsAndData[i]->GetDataSet(), config->pdfsAndData[i]->GetPDF() );
-				vector<IDataSet*> weightedDataSet_v; weightedDataSet_v.push_back( weightedDataSet );
-				TString filename = config->calcConfig->GetFileName();
-				filename.Append("_"); filename+=i; filename.Append(".root");
-				cout << "Saving Weighted DataSet " << i << " as: " << filename << endl;
-				ResultFormatter::MakeRootDataFile( filename.Data(), weightedDataSet_v );
-				//delete weightedDataSet;
-				//delete calculator;
-				WeightedDataSets.push_back( weightedDataSet );
-			}
-
-			//		Do Something With them :D
-			double sum = 0.;
-			double sum_sq = 0.;
-			ObservableRef WeightsName( "sWeight" );
-			ObservableRef WeightsSquared( "sWeightSq" );
-
-			Observable* testObservable = WeightedDataSets[0]->GetDataPoint( 0 )->GetObservable( WeightsName );
-
-			if( WeightsName.GetIndex() >= 0 )
-			{
-				for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
-				{
-					for( unsigned int j=0; j< (unsigned) WeightedDataSets[i]->GetDataNumber(); ++j )
-					{
-						sum += WeightedDataSets[i]->GetDataPoint( j )->GetObservable( WeightsName )->GetValue();
-						sum_sq += WeightedDataSets[i]->GetDataPoint( j )->GetObservable( WeightsSquared )->GetValue();
-					}
-				}
-				cout << endl;
-				cout << "Total of All sWeights: " << sum << endl;
-				cout << "With an Error of:      " << sqrt( sum_sq ) << endl;
-				cout << endl;
-			}
-
-			//		Delete them as they're local objects
-			for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )
-			{
-				while( !WeightedDataSets.empty() )
-				{
-					if( WeightedDataSets.back() != NULL ) delete WeightedDataSets.back();
-					WeightedDataSets.pop_back();
-				}
-			}
-		}
+		WeightThisDataSet( config );
 	}
 
 	//ResultFormatter::FlatNTuplePullPlots( string("Global_Fit.root"), GlobalFitResult );
@@ -767,23 +841,7 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	if( ( !RapidRun::isGridified() ) && ( config->Force_Continue_Flag || config->OutputLevel >= 0 ) )
 	{
-		//Output results
-		config->makeOutput->SetInputResults( config->GlobalResult->GetResultParameterSet() );
-		if( !config->doLLcontourFlag && ( !config->doFC_Flag && !config->doLLscanFlag  ) )
-		{
-			if( !config->disableLatexOutput )
-			{
-				config->makeOutput->OutputFitResult( config->GlobalFitResult->GetFitResult(0) );
-			}
-		}
-		string fileName = ResultFormatter::GetOutputFolder();
-		string fileName_ext=string( "Global_Fit_Result_"+StringProcessing::TimeString()+".root" );
-		fileName.append("/"); fileName.append( fileName_ext );
-		//cout << "Writing Output Tuple to:\t" << fileName << endl;
-		//cout << "Output Folder:\t" << ResultFormatter::GetOutputFolder() << endl;
-		//cout << "Current Folder:\t" << gSystem->pwd() << endl;
-		ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs, GenerateXML( config, false ), GenerateXML( config, true ) );
-		ResultFormatter::ReviewOutput( config->GlobalResult );
+		MakeOutputFolder( config );
 	}
 
 	//	If requested write the central value to a single file
@@ -798,7 +856,8 @@ int PerformMainFit( RapidFitConfiguration* config )
 		ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs );
 	}
 
-	if( config->GOF_Flag ) {
+	if( config->GOF_Flag )
+	{
 		PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
 		pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
 		IDataSet * data = pdfAndData->GetDataSet();

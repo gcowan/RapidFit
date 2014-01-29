@@ -18,7 +18,9 @@ class PrecalculatorConfig
 
 		void SetCalculatorName( string );
 		void SetWeightName( string );
+		string GetWeightName() const;
 		void SetConfig( unsigned int );
+		unsigned int GetConfig() const;
 		void SetFileName( string );
 		void SetAlpha( bool );
 		string GetFileName();

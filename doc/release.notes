@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2014/01/28 Rob Currie
+  - Re-writing some of the main.cpp file breaking out sections of code into separate functions to make parsing this file a bit easier
+  - Modifying the code to do the sWeighting in RapidFit to give you the sWeights for the signal and background species. This makes making the plots of each species a little easier and more certain :)
+  - Adding modified 1fb dataset which has the signal and background weights stored for posterity, this has the same final fit result as the 1fb data file but is useful for making plots
+  - Altering plotDists program from make extra used for plotting weighted species from an nTuple to have better formatting of axis labels
+
 2014/01/27 Rob Currie
   - Fixing memleaks in RapidFitIntegrator for GSL integration (gives slight performance boost)
   - Fixing ComponentPlotter to more elegantly change the phase-spaces used in integrations

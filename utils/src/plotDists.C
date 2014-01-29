@@ -252,11 +252,19 @@ int main( int argc, char* argv[] )
 
 		thisTH1->GetXaxis()->SetTitle( XaxisLabel );
 
-		TString YaxisLabel = "Candidates / (";
+		TString YaxisLabel = "Candidates / ( ";
 		stringstream thisStream;
-		thisStream << setprecision(2) << scientific << fabs(thisMax-thisMin)/((double)thisConfig.num_bins);
+		thisStream << setprecision(2) << fabs(thisMax-thisMin)/((double)thisConfig.num_bins);
 		YaxisLabel.Append( thisStream.str().c_str() );
-		YaxisLabel.Append( ")" );
+		TString YaxisUnit = EdStyle::GetParamRootUnit( thisParameterName );
+		if( StringProcessing::is_empty( YaxisUnit ) )
+		{
+		}
+		else
+		{
+			YaxisLabel.Append( " " ); YaxisLabel.Append( YaxisUnit );
+		}
+		YaxisLabel.Append( " )" );
 
 		thisTH1->GetYaxis()->SetTitle( YaxisLabel );
 

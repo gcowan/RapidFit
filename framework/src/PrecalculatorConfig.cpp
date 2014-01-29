@@ -23,9 +23,19 @@ void PrecalculatorConfig::SetWeightName( string input )
 	weightName = input;
 }
 
+string PrecalculatorConfig::GetWeightName() const
+{
+	return weightName;
+}
+
 void PrecalculatorConfig::SetConfig( unsigned int input )
 {
 	config = input;
+}
+
+unsigned int PrecalculatorConfig::GetConfig() const
+{
+	return config;
 }
 
 void PrecalculatorConfig::SetAlpha( bool input )
