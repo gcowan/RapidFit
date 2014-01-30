@@ -165,7 +165,7 @@ namespace Mathematics
 #if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,0)
                                 if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 #else
-                                if( !RooMathinit ) returnable = RooMath::ITPComplexErrFunc( z, 13 )*exp( -u*u );
+                                if( !RooMathinit ) RooComplex RooReturnable = RooMath::ITPComplexErrFunc( z, 13 )*exp( -u*u );
 #endif
                                 RooMathinit = true;
                                 pthread_mutex_unlock( &ROOT_Lock );
@@ -213,7 +213,7 @@ namespace Mathematics
 #if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,0)
 				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 #else
-				if( !RooMathinit ) returnable = RooMath::ITPComplexErrFuncRe( z, 13 )*exp( -u*u );
+				if( !RooMathinit ) RooComplex RooReturnable = RooMath::ITPComplexErrFuncRe( z, 13 )*exp( -u*u );
 #endif
 				RooMathinit = true;
 				pthread_mutex_unlock( &ROOT_Lock );
