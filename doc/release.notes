@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2014/01/31 Rob Currie
+  - Fixing minor bug in Physics Parameter
+
 2014/01/28 Rob Currie
   - Re-writing some of the main.cpp file breaking out sections of code into separate functions to make parsing this file a bit easier
   - Modifying the code to do the sWeighting in RapidFit to give you the sWeights for the signal and background species. This makes making the plots of each species a little easier and more certain :)

@@ -259,6 +259,7 @@ void PhysicsParameter::SetType(string NewType)
 	if( NewType == "Fixed" )
 	{
 		originalValue = this->GetBlindedValue();
+		type = "Fixed";
 		_isFixed = true;
 	}
 	else
