@@ -38,6 +38,7 @@ static vector<double> _global_range_minima;
 static vector<double> _global_range_maxima;
 static vector<string> _global_observable_names;
 static string GSLvalidFor;
+static DataPoint* _global_observable_DataPoint;
 
 class RapidFitIntegrator
 {
@@ -273,7 +274,8 @@ class RapidFitIntegrator
 
 		void SetDebug( DebugClass* debug );
 
-		static vector<DataPoint*> getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* templateDataPoint, vector<string> doIntegrate );
+		static vector<DataPoint*> getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* templateDataPoint, vector<string> doIntegrate,
+									PhaseSpaceBoundary* input );
 
 		static void clearGSLIntegrationPoints();
 	private:

@@ -137,6 +137,7 @@ Observable* DataPoint::GetObservable( const ObservableRef& object, const bool si
 		return allObservables[ (unsigned) object.GetIndex() ];
 	}
 	if( !silence ) cerr << "Observable name " << object.Name().c_str() << " not found (3)" << endl;
+	//DebugClass::SegFault();
 	throw(-20);
 }
 
@@ -317,6 +318,7 @@ void DataPoint::Print() const
 	cout << "DataPoint:" << endl;
 	for( unsigned int i=0; i< allObservables.size(); ++i )
 	{
+		cout << "Obs: " << allObservables[i] << " ";
 		allObservables[i]->Print();
 	}
 

@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/02/01 Rob Currie
+  - Fixing performance problems in ComponentProjections
+       Caching PDF objects between MultiThreaded calls.
+       This checks the PDF label to allow the user to trigger a change in the PDF used.
+       This improves ComponenPlotter first over MultiThreaded fits, should probably implement a global map to store different PDFs.
+       Removed the Clear vector of DataPoints for GSL from the RapidFitIntegrator instance. These should be a static global function call in the exit of RapidFit once this is known to be safe.
+  - Added some code to v7 to avoid calling expensive functions for certain components
+
 2014/01/31 Rob Currie
   - Fixing minor bug in Physics Parameter
 

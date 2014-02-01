@@ -373,6 +373,10 @@ vector<vector<double>* >* ComponentPlotter::MakeYProjectionData( string componen
 
 		allCombinations[combinationIndex]->SetPhaseSpaceBoundary( full_boundary );
 
+		cout << observableName << ": " << boundary_min << " <-> " << boundary_min + ( step_size * (total_points-1) ) << endl;
+
+		cout << "Starting Projection: " << combinationIndex+1 << " of " << allCombinations.size() <<"."<< endl;
+
 		//cout << "Combination: " << combinationIndex+1 << " is defined as:" << endl; allCombinations[combinationIndex]->Print();
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1680,8 +1684,6 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 	//Find the value of the observable projection at each data point
 	vector<double>* pointValues = new vector<double>();
 
-	cout << ObservableName << ": " << Minimum << " <-> " << Minimum + ( PlotInterval * (PlotNumber-1) ) << endl;
-
 	//	This class object has been created to speed up the communication between this class and the basePDF as it may pass through several PDF wrappers
 	ComponentRef* comp_obj = new ComponentRef( component, ObservableName );
 
@@ -1742,7 +1744,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 		}
 	}
 
-	cout << "Finished Projecting" << endl;
+	//cout << "Finished Projecting" << endl;
 
 	if( debug != NULL )
 	{

@@ -562,6 +562,7 @@
 			<ConfigurationParameter>useNewMistagModel:True</ConfigurationParameter>
 			#<ConfigurationParameter>Mistag3fbModel:True</ConfigurationParameter>
 			<ConfigurationParameter>ResolutionModel:PerEventResModel</ConfigurationParameter>
+			<ConfigurationParameter>DEBUG:False</ConfigurationParameter>
 		</PDF>
 	</CommonPDF>
 
@@ -573,27 +574,27 @@
 				<Maximum>14.0</Maximum>
 				<Unit>ps</Unit>
 			</Observable>
-			#<Observable>
-				#	<Name>cosTheta</Name>
-				#	<TF1>trcostheta</TF1>
-				#	<Minimum>-1.0</Minimum>
-				#	<Maximum>1.0</Maximum>
-				#	<Unit> </Unit>
-				#</Observable>
-			#<Observable>
-				#	<Name>phi</Name>
-				#	<TF1>trphi</TF1>
-				#	<Minimum>-3.14159</Minimum>
-				#	<Maximum>3.14159</Maximum>
-				#	<Unit>rad</Unit>
-				#</Observable>
-			#<Observable>
-				#	<Name>cosPsi</Name>
-				#	<TF1>trcospsi</TF1>
-				#	<Minimum>-1.0</Minimum>
-				#	<Maximum>1.0</Maximum>
-				#	<Unit> </Unit>
-				#</Observable>
+			<Observable>
+				<Name>cosTheta</Name>
+				<TF1>trcostheta</TF1>
+				<Minimum>-1.0</Minimum>
+				<Maximum>1.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>phi</Name>
+				<TF1>trphi</TF1>
+				<Minimum>-3.14159</Minimum>
+				<Maximum>3.14159</Maximum>
+				<Unit>rad</Unit>
+			</Observable>
+			<Observable>
+				<Name>cosPsi</Name>
+				<TF1>trcospsi</TF1>
+				<Minimum>-1.0</Minimum>
+				<Maximum>1.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
 			<Observable>
 				<Name>helcosthetaK</Name>
 				<Minimum>-1.0</Minimum>

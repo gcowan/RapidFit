@@ -9,6 +9,7 @@
 
 //	RapidFit Headers
 #include "Observable.h"
+#include "DebugClass.h"
 //	System Headers
 #include <iostream>
 #include <vector>

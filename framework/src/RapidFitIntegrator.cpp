@@ -192,7 +192,7 @@ RapidFitIntegrator::~RapidFitIntegrator()
 	if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
 	if( fastIntegrator != NULL ) delete fastIntegrator;
 	if( debug != NULL ) delete debug;
-	this->clearGSLIntegrationPoints();
+	//this->clearGSLIntegrationPoints();
 }
 
 //Return the integral over all observables
@@ -582,17 +582,38 @@ vector<DataPoint*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, v
 	return doEval_points;
 }
 
-vector<DataPoint*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* templateDataPoint, vector<string> doIntegrate )
+vector<DataPoint*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* templateDataPoint, vector<string> doIntegrate, PhaseSpaceBoundary* thisBound )
 {
 	pthread_mutex_lock( &GSL_DATAPOINT_GET_THREADLOCK );
-	if( ( number != _global_doEval_points.size() ) || ( ( _global_range_minima != minima ) || ( _global_range_maxima != maxima ) ) )
+
+	bool pointsGood = true;
+	if( _global_observable_DataPoint != NULL )
+	{
+		vector<string> allConsts = thisBound->GetDiscreteNames();
+		for( unsigned int i=0; i< allConsts.size(); ++i )
+		{
+			double haveVal = _global_observable_DataPoint->GetObservable( allConsts[i] )->GetValue();
+			double wantVal = templateDataPoint->GetObservable( allConsts[i] )->GetValue();
+
+			if( haveVal != wantVal )
+			{
+				pointsGood = false;
+				break;
+			}
+		}
+	}
+
+	if( ( number != _global_doEval_points.size() ) || (( ( _global_range_minima != minima ) || ( _global_range_maxima != maxima ) ) || !pointsGood ) )
 	{
 		clearGSLIntegrationPoints();
 		_global_doEval_points = initGSLDataPoints( number, maxima, minima, templateDataPoint, doIntegrate );
 		_global_range_minima = minima;
 		_global_range_maxima = maxima;
 		_global_observable_names = doIntegrate;
+		if( _global_observable_DataPoint != NULL ) delete _global_observable_DataPoint;
+		_global_observable_DataPoint = new DataPoint(*templateDataPoint);
 	}
+
 	pthread_mutex_unlock( &GSL_DATAPOINT_GET_THREADLOCK );
 	return _global_doEval_points;
 }
@@ -644,12 +665,12 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 			cout << endl;
 			for( unsigned int i=0; i< dontIntegrate.size(); ++i ) cout << dontIntegrate[i] << "\t";
 			cout << endl;
-			cout << componentIndex << endl;
+			cout << "Component: " << componentIndex << endl;
 			if( componentIndex != NULL ) cout << componentIndex->getComponentName() << endl;
 		}
 	}
 
-	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
+	for( unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
 	{
 		IConstraint * newConstraint = NULL;
 		try
@@ -686,11 +707,19 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	DataPoint* templateDataPoint = new DataPoint( *NewDataPoint );
 
-	vector<DataPoint*> doEval_points = RapidFitIntegrator::getGSLIntegrationPoints( GSLFixedPoints, maxima_v, minima_v, templateDataPoint, doIntegrate );
+	PhaseSpaceBoundary* thisBound = new PhaseSpaceBoundary( *NewBoundary );
+
+	vector<DataPoint*> doEval_points = RapidFitIntegrator::getGSLIntegrationPoints( GSLFixedPoints, maxima_v, minima_v, templateDataPoint, doIntegrate, thisBound );
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
+			cout << "RapidFitIntegrator:: " << doEval_points.size() << " GSL Points" << endl;
+		}
+	}
 
 	delete templateDataPoint;
-
-	PhaseSpaceBoundary* thisBound = new PhaseSpaceBoundary( *NewBoundary );
 
 	IDataSet* thisDataSet = new MemoryDataSet( thisBound, doEval_points );
 
@@ -710,7 +739,24 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 //	if( componentIndex != NULL ) cout << functionToWrap->GetName() << "\t" << thisConfig->wantedComponent->getComponentName() << ":\t" << functionToWrap->EvaluateComponent( thisDataSet->GetDataPoint( 0 ), thisConfig->wantedComponent ) << endl;
 
+	if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+                {
+			cout << "RapidFitIntegrator:: " << thisDataSet->GetDataNumber() << "  " << functionToWrap->GetLabel() << "  th: " << num_threads << endl;
+			thisDataSet->GetDataPoint( 0 )->Print();
+		}
+	}
+
 	vector<double>* thisSet = MultiThreadedFunctions::ParallelEvaulate( functionToWrap, thisDataSet, thisConfig );
+
+        if( debug != NULL )
+        {
+                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+                {
+			cout << "RapidFitIntegrator:: Finished Eval" << endl;
+		}
+	}
 
 	delete thisDataSet;
 

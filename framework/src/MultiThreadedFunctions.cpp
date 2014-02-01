@@ -60,6 +60,36 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate( vector<IPDF*> thisFun
 	}
 }
 
+vector<IPDF*> MultiThreadedFunctions::StoredFunctions = vector<IPDF*>();
+
+vector<IPDF*> MultiThreadedFunctions::GetFunctions( IPDF* thisFunction, unsigned int nThreads )
+{
+	if( !StoredFunctions.empty() )
+	{
+		if( thisFunction->GetLabel() == StoredFunctions[0]->GetLabel() && StoredFunctions.size() == nThreads )
+		{
+			/*for( unsigned int i=0; i< nThreads; ++i )
+			{
+				StoredFunctions[i]->UpdatePhysicsParameters( thisFunction->GetPhysicsParameters() );
+			}*/
+			return StoredFunctions;
+		}
+
+		while( !StoredFunctions.empty() )
+		{
+			if( StoredFunctions.back() != NULL ) delete StoredFunctions.back();
+			StoredFunctions.pop_back();
+		}
+	}
+
+	for( unsigned int i=0; i < nThreads; ++i )
+	{
+		StoredFunctions.push_back( ClassLookUp::CopyPDF( thisFunction ) );
+	}
+
+	return StoredFunctions;
+}
+
 vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( IPDF* thisFunction, IDataSet* thesePoints, unsigned int nThreads, ComponentRef* thisComponent )
 {
 	vector<IDataSet*> payLoad;
@@ -72,12 +102,7 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( IPDF* thisFun
 	}
 
 
-	vector<IPDF*> functions;
-	for( unsigned int i=0; i < nThreads; ++i )
-	{
-		functions.push_back( ClassLookUp::CopyPDF( thisFunction ) );
-	}
-
+	vector<IPDF*> functions = MultiThreadedFunctions::GetFunctions( thisFunction, nThreads );
 
 	vector<double>* returnable = MultiThreadedFunctions::ParallelEvaluate_pthreads( functions, payLoad, nThreads, thisComponent );
 
@@ -87,11 +112,6 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( IPDF* thisFun
 		if( payLoad.back() != NULL ) delete payLoad.back();
 
 		payLoad.pop_back();
-	}
-	while( !functions.empty() )
-	{
-		if( functions.back() != NULL ) delete functions.back();
-		functions.pop_back();
 	}
 
 	//for( unsigned int i=0; i< payLoad.size(); ++i ) if( payLoad[i] != NULL ) delete payLoad[i];
@@ -127,8 +147,21 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 	{
 		fit_thread_data[i].fittingPDF = thisFunction[i];
 		fit_thread_data[i].dataSet = thesePoints[i];
+		//thesePoints[i]->GetDataPoint(0)->Print();
 		fit_thread_data[i].dataPoint_Result.clear();
-		if( thisComponent != NULL ) fit_thread_data[i].thisComponent = new ComponentRef( *thisComponent );
+		if( thisComponent != NULL )
+		{
+			if( fit_thread_data[i].thisComponent != NULL )
+			{
+				if( fit_thread_data[i].thisComponent->getComponentNumber() == thisComponent->getComponentNumber() )
+				{
+					delete fit_thread_data[i].thisComponent;
+					fit_thread_data[i].thisComponent = new ComponentRef( *thisComponent );
+				}
+			}
+			else fit_thread_data[i].thisComponent = new ComponentRef( *thisComponent );
+		}
+		else fit_thread_data[i].thisComponent = NULL;
 	}
 
 	//cout << "Creating Threads" << endl;
@@ -176,6 +209,11 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 		}
 	}
 
+	//for( unsigned int i=0; i < nThreads; ++i )
+	//{
+	//	if( fit_thread_data[i].thisComponent != NULL ) delete fit_thread_data[i].thisComponent;
+	//}
+
 	//delete[] fit_thread_data;
 	//delete[] Thread;
 
@@ -187,12 +225,16 @@ void* MultiThreadedFunctions::Evaluate_pthread( void *input_data )
 	struct Fitting_Thread *thread_input = (struct Fitting_Thread*) input_data;
 
 	double value=0;
-	for( unsigned int i=0; i < (unsigned)thread_input->dataSet->GetDataNumber(); ++i )
+	IDataSet* myDataSet = thread_input->dataSet;
+	unsigned int number = (unsigned) myDataSet->GetDataNumber();
+	for( unsigned int i=0; i < number; ++i )
 	{
 		//pthread_mutex_t* debug_lock = thread_input->fittingPDF->DebugMutex();
+		//cout << i << endl;
+		//myDataSet->GetDataPoint( i )->Print();
 		try
 		{
-			value = thread_input->fittingPDF->Evaluate( thread_input->dataSet->GetDataPoint( i ) );
+			value = thread_input->fittingPDF->Evaluate( myDataSet->GetDataPoint( i ) );
 		}
 		catch( ... )
 		{
@@ -208,26 +250,28 @@ void* MultiThreadedFunctions::Evaluate_pthread( void *input_data )
 
 void* MultiThreadedFunctions::EvaluateComponent_pthread( void *input_data )
 {
-        struct Fitting_Thread *thread_input = (struct Fitting_Thread*) input_data;
- 
-        double value=0;
-        for( unsigned int i=0; i < (unsigned)thread_input->dataSet->GetDataNumber(); ++i )
-        {
-                //pthread_mutex_t* debug_lock = thread_input->fittingPDF->DebugMutex();
-                try
-                {
-                        value = thread_input->fittingPDF->EvaluateComponent( thread_input->dataSet->GetDataPoint( i ), thread_input->thisComponent );
-                }
-                catch( ... )
-                {
-                        value = DBL_MAX;
-                }
- 
-                thread_input->dataPoint_Result.push_back( value );
-        }
- 
-        //      Finished evaluating this thread
-        pthread_exit( NULL );
+	struct Fitting_Thread *thread_input = (struct Fitting_Thread*) input_data;
+
+	double value=0;
+	IDataSet* myDataSet = thread_input->dataSet;
+	unsigned int number = (unsigned) myDataSet->GetDataNumber();
+	for( unsigned int i=0; i < number; ++i )
+	{
+		//pthread_mutex_t* debug_lock = thread_input->fittingPDF->DebugMutex();
+		try
+		{
+			value = thread_input->fittingPDF->EvaluateComponent( myDataSet->GetDataPoint( i ), thread_input->thisComponent );
+		}
+		catch( ... )
+		{
+			value = DBL_MAX;
+		}
+
+		thread_input->dataPoint_Result.push_back( value );
+	}
+
+	//      Finished evaluating this thread
+	pthread_exit( NULL );
 }
 
 vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( IPDF* thisFunction, IDataSet* thesePoints, PhaseSpaceBoundary* thisBoundary, unsigned int nThreads )
@@ -260,6 +304,7 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( IPDF* thisFu
 
 	for( unsigned int i=0; i< payLoad.size(); ++i ) if( payLoad[i] != NULL ) delete payLoad[i];
 	for( unsigned int i=0; i< functions.size(); ++i ) if( functions[i] != NULL ) delete functions[i];
+	for( unsigned int i=0; i< boundaries.size(); ++i ) if( boundaries[i] != NULL ) delete boundaries[i];
 
 	return returnable;
 }

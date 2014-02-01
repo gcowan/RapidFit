@@ -54,6 +54,8 @@ class Bs2JpsiPhi_Signal_v7 : public BasePDF
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
+		bool RequireInterference;
+
 		void generateTimeIntegrals();
 		void generateSinusoidIntegrals();
 		void preCalculateSinusoidIntegrals();

@@ -93,7 +93,7 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false), resolutionModel(NULL),
-	_useBetaParameter(false), _useMultiplePhis(false)
+	_useBetaParameter(false), _useMultiplePhis(false), RequireInterference(true)
 {
 	componentIndex = 0;
 
@@ -736,7 +736,8 @@ void Bs2JpsiPhi_Signal_v7::preCalculateTimeFactors()
 {
 	expL_stored = resolutionModel->Exp( t, gamma_l() );
 	expH_stored = resolutionModel->Exp( t, gamma_h() );
-	if( _eventIsTagged )
+
+	if( _eventIsTagged && RequireInterference )
 	{
 		expSin_stored = resolutionModel->ExpSin( t, gamma(), delta_ms );
 		expCos_stored = resolutionModel->ExpCos( t, gamma(), delta_ms );
@@ -760,7 +761,7 @@ void Bs2JpsiPhi_Signal_v7::preCalculateTimeIntegrals()
 
 void Bs2JpsiPhi_Signal_v7::preCalculateSinusoidIntegrals()
 {
-	if( _eventIsTagged )
+	if( _eventIsTagged && RequireInterference )
 	{
 		intExpSin_stored = resolutionModel->ExpSinInt( tlo, thi, gamma(), delta_ms );
 		intExpCos_stored = resolutionModel->ExpCosInt( tlo, thi, gamma(), delta_ms );
@@ -827,6 +828,9 @@ double Bs2JpsiPhi_Signal_v7::EvaluateComponent( DataPoint* input, ComponentRef* 
 {
 	performingComponentProjection = true;
 	componentIndex = Component->getComponentNumber();
+
+	RequireInterference = false;
+
 	if( _usePlotComponents && !_usePlotAllComponents )
 	{
 		if( componentIndex == -1 )
@@ -836,21 +840,25 @@ double Bs2JpsiPhi_Signal_v7::EvaluateComponent( DataPoint* input, ComponentRef* 
 			{
 				Component->setComponentNumber( 1 );
 				componentIndex = 1;
+				RequireInterference = true;
 			}
 			else if( ComponentName.compare( "CP-Odd" ) == 0 )
 			{
 				Component->setComponentNumber( 2 );
 				componentIndex = 2;
+				RequireInterference = false;
 			}
 			else if( ComponentName.compare( "As" ) == 0 )
 			{
 				Component->setComponentNumber( 3 );
 				componentIndex = 3;
+				RequireInterference = false;
 			}
 			else
 			{
 				Component->setComponentNumber( 0 );
 				componentIndex = 0;
+				RequireInterference = true;
 			}
 		}
 	}
@@ -863,51 +871,61 @@ double Bs2JpsiPhi_Signal_v7::EvaluateComponent( DataPoint* input, ComponentRef* 
 			{
 				Component->setComponentNumber( 1 );
 				componentIndex = 1;
+				RequireInterference = false;
 			}
 			else if( ComponentName.compare( "AparaApara" ) == 0 )
 			{
 				Component->setComponentNumber( 2 );
 				componentIndex = 2;
+				RequireInterference = false;
 			}
 			else if( ComponentName.compare( "AperpAperp" ) == 0 )
 			{
 				Component->setComponentNumber( 3 );
 				componentIndex = 3;
+				RequireInterference = false;
 			}
 			else if( ComponentName.compare( "ImAparaAperp" ) == 0 )
 			{
 				Component->setComponentNumber( 4 );
 				componentIndex = 4;
+				RequireInterference = true;
 			}
 			else if( ComponentName.compare( "ReA0Apara" ) == 0 )
 			{
 				Component->setComponentNumber( 6 );
 				componentIndex = 5;
+				RequireInterference = true;
 			}
 			else if( ComponentName.compare( "ImA0Aperp" ) == 0 )
 			{
 				Component->setComponentNumber( 6 );
 				componentIndex = 6;
+				RequireInterference = true;
 			}
 			else if( ComponentName.compare( "AsAs" ) == 0 )
 			{
 				Component->setComponentNumber( 7 );
 				componentIndex = 7;
+				RequireInterference = false;
 			}
 			else if( ComponentName.compare( "ImAsApara" ) == 0 )
 			{
 				Component->setComponentNumber( 8 );
 				componentIndex = 8;
+				RequireInterference = true;
 			}
 			else if( ComponentName.compare( "ReAsAperp" ) == 0 )
 			{
 				Component->setComponentNumber( 9 );
 				componentIndex = 9;
+				RequireInterference = true;
 			}
 			else if( ComponentName.compare( "ImAsA0" ) == 0 )
 			{
 				Component->setComponentNumber( 10 );
 				componentIndex = 10;
+				RequireInterference = true;
 			}
 			else
 			{
@@ -918,6 +936,7 @@ double Bs2JpsiPhi_Signal_v7::EvaluateComponent( DataPoint* input, ComponentRef* 
 	}
 	else
 	{
+		RequireInterference = true;
 		return this->Evaluate( input );
 	}
 
@@ -925,6 +944,7 @@ double Bs2JpsiPhi_Signal_v7::EvaluateComponent( DataPoint* input, ComponentRef* 
 	componentIndex = 0;
 
 	performingComponentProjection = false;
+	RequireInterference = true;
 	return return_value;
 }
 

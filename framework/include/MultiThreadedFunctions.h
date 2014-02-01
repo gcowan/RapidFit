@@ -74,6 +74,9 @@ class MultiThreadedFunctions
 
 		static vector<double>* ParallelIntegrate_pthreads( vector<IPDF*> thisFunction, vector<IDataSet*> thesePoints, vector<PhaseSpaceBoundary*> thisBoundary, unsigned int nThreads );
 
+		static vector<IPDF*> GetFunctions( IPDF* thisFunction, unsigned int nThreads );
+
+		static vector<IPDF*> StoredFunctions;
 };
 
 #endif
