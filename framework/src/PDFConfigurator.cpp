@@ -229,7 +229,10 @@ string PDFConfigurator::XML() const
 	stringstream xml;
 	for( unsigned int i=0; i< configParameters.size(); ++i )
 	{
-		xml << "\t<ConfigurationParameter>" << configParameters[i] << ":" << configValues[i] << "</ConfigurationParameter>" << endl;
+		if( configParameters[i] != "RAPIDFIT_SAYS_THIS_IS_A_COPY" )
+		{
+			xml << "\t<ConfigurationParameter>" << configParameters[i] << ":" << configValues[i] << "</ConfigurationParameter>" << endl;
+		}
 	}
 	for( unsigned int i=0; i< defaultNames.size(); ++i )
 	{

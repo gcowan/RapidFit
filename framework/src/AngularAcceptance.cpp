@@ -66,8 +66,8 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bo
 	}
 	else
 	{
-		if( !IgnoreAcceptanceHisto ) useFlatAngularAcceptance = false ;
-		else useFlatAngularAcceptance = true;
+		if( IgnoreAcceptanceHisto ) useFlatAngularAcceptance = true;
+		else useFlatAngularAcceptance = false;
 
 		// Get the acceptance histogram
 
@@ -76,7 +76,7 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bo
 		if( !useFlatAngularAcceptance )
 		{
 
-			TFile* f =  TFile::Open(fullFileName.c_str());
+			TFile* f =  TFile::Open( fullFileName.c_str(), "READ" );
 
 			//cout << " AngularAcceptance::AngularAcceptance fileName: " <<  fullFileName << endl;
 
@@ -180,6 +180,8 @@ double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Ob
 
 		int globalbin = histo->GetBin( xbin, ybin, zbin );
 		double num_entries_bin = histo->GetBinContent(globalbin);
+
+		if( fabs( num_entries_bin) <= 0. ) cout << xbin << "  " << ybin << "  " << zbin << endl;
 
 		double acc = (double)num_entries_bin / average_bin_content;
 
@@ -341,4 +343,20 @@ void AngularAcceptance::processHistogram( bool quiet )
 	//cout << "Finishing processing angular acceptance histo" << endl;
 }
 
+void AngularAcceptance::Print() const
+{
+	cout << "AccWeights:" << endl;
+	cout << _af1 << " , " << _af2 << " , " << _af3 << " , " << _af4 << " , " << _af5 << " , " << _af6 << " , " << _af7 << " , " << _af8 << " , " << _af9 << " , " << _af10 << endl;
+
+	if( useFlatAngularAcceptance ) cout << "Using Flat Acceptance" << endl;
+	else cout << "NOT Using Flat Acceptance" << endl;
+
+	cout << "Using Histo at: " << histo << endl;
+
+	cout << "Histo has Dimension: " << nxbins << " x " << nybins << " x " << nzbins << endl;
+
+	cout << "Has a Total Number of " << total_num_entries << " bins" << endl;
+	cout << "With Average: " << average_bin_content << endl;
+
+}
 

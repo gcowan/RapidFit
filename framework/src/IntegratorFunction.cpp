@@ -177,6 +177,15 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 	if( currentPoint->GetPhaseSpaceBoundary() == NULL ) currentPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
 	currentPoint->ClearPerEventData();
 	currentPoint->ClearPseudoObservable();
+	vector<string> allObs=currentPoint->GetAllNames();
+	for( unsigned int i=0; i<allObs.size(); ++i )
+	{
+		Observable* thisObs = currentPoint->GetObservable( i );
+		thisObs->SetBinNumber(-1);
+		//thisObs->SetAcceptance(0.);
+		thisObs->SetBkgBinNumber(-1);
+		//thisObs->SetBkgAcceptance(0.);
+	}
 	unsigned int true_index=100;
 	//Load the array into the data point
 	for (unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )

@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/02/03 Rob Currie
+  - Fixing bugs in caching code for ComponentProjections
+  - Fixing bugs in v6 and v7 PDFs which ONLY effects projections
+  - Adding Print function to AngularAcceptance
+
 2013/02/01 Rob Currie
   - Fixing performance problems in ComponentProjections
        Caching PDF objects between MultiThreaded calls.

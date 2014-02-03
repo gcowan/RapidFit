@@ -53,6 +53,9 @@ class AngularAcceptance
 		// To get the acceptance for a given angular bin
 		double getValue( double cosPsi, double cosTheta, double phi ) const;
 		double getValue( Observable* cosPsi, Observable* cosTheta, Observable* phi ) const;
+
+		void Print() const;
+
 	private:	
 		AngularAcceptance& operator= ( const AngularAcceptance& );
 
@@ -70,7 +73,6 @@ class AngularAcceptance
 
 		string openFile( string fileName, bool quiet=false ) ;
 		void processHistogram( bool quiet=false ) ;
-
 };
 
 #endif

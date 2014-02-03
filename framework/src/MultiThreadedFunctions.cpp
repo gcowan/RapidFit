@@ -153,11 +153,11 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 		{
 			if( fit_thread_data[i].thisComponent != NULL )
 			{
-				if( fit_thread_data[i].thisComponent->getComponentNumber() == thisComponent->getComponentNumber() )
-				{
+				//if( fit_thread_data[i].thisComponent->getComponentNumber() == thisComponent->getComponentNumber() )
+				//{
 					delete fit_thread_data[i].thisComponent;
 					fit_thread_data[i].thisComponent = new ComponentRef( *thisComponent );
-				}
+				//}
 			}
 			else fit_thread_data[i].thisComponent = new ComponentRef( *thisComponent );
 		}

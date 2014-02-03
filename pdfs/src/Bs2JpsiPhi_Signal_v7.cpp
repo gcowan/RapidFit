@@ -144,7 +144,7 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 	{
 		if( angAccFile == "" ) cout << "Bs2JpsiPhi_Signal_v7:: Using flat angular acceptance " << endl ;
 		else cout << "Bs2JpsiPhi_Signal_v7:: Constructing angAcc using file: " << angAccFile << endl ;
-		angAcc = new AngularAcceptance( angAccFile, _angAccIgnoreNumerator, _useHelicityBasis ) ;
+		angAcc = new AngularAcceptance( angAccFile, _useHelicityBasis, _angAccIgnoreNumerator ) ;
 		angAccI1 = angAcc->af1() ;      cout << "  af1 = " << setprecision(6) << setw(15) << angAccI1 << setw(10) << " ";
 		angAccI2 = angAcc->af2() ;	cout << "  af2 = " << setprecision(6) << setw(15) << angAccI2 << setw(10) << " ";
 		angAccI3 = angAcc->af3() ;	cout << "  af3 = " << setprecision(6) << setw(15) << angAccI3 << endl ;
@@ -159,7 +159,7 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 	}
 	else
 	{
-		angAcc = new AngularAcceptance( angAccFile, _angAccIgnoreNumerator, _useHelicityBasis, isCopy ) ;
+		angAcc = new AngularAcceptance( angAccFile, _useHelicityBasis, _angAccIgnoreNumerator, isCopy ) ;
 		angAccI1 = angAcc->af1()  ;
 		angAccI2 = angAcc->af2()  ;
 		angAccI3 = angAcc->af3()  ;
@@ -567,6 +567,7 @@ double Bs2JpsiPhi_Signal_v7::Evaluate(DataPoint * measurement)
 		phi_h      = hphi_obs->GetValue();
 		ctheta_l   = thetaL_obs->GetValue();
 		angAcceptanceFactor = angAcc->getValue( thetaK_obs, thetaL_obs, hphi_obs );  // Histogram is generated in PDF basis!
+		//cout << angAcceptanceFactor << endl;
 	}
 	else
 	{
@@ -601,7 +602,18 @@ double Bs2JpsiPhi_Signal_v7::Evaluate(DataPoint * measurement)
 	}
 
 
-	if( ! _angAccIgnoreNumerator ) returnValue*=angAcceptanceFactor;
+	//if( !_angAccIgnoreNumerator ) returnValue*=angAcceptanceFactor;
+
+	//cout << angAcceptanceFactor << endl;
+	returnValue*=angAcceptanceFactor;
+
+	/*
+	if( fabs(angAcceptanceFactor) <= 0. )
+	{
+		angAcc->Print();
+		measurement->Print();
+		throw(0);
+	}*/
 
 	return returnValue;
 }

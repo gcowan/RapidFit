@@ -564,6 +564,16 @@ vector<DataPoint*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, v
 
 		DataPoint* thisPoint = new DataPoint( *templateDataPoint );
 
+		thisPoint->ClearPerEventData();
+		thisPoint->ClearPseudoObservable();
+		vector<string> allObs=thisPoint->GetAllNames();
+		for( unsigned int i=0; i<allObs.size(); ++i )
+		{
+			Observable* thisObs = thisPoint->GetObservable( i );
+			thisObs->SetBinNumber(-1);
+			thisObs->SetBkgBinNumber(-1);
+		}
+
 		for( unsigned int k=0; k< doIntegrate.size(); ++k )
 		{
 			thisPoint->SetObservable( doIntegrate[k], point[k], "noUnitsHere" );
@@ -612,6 +622,20 @@ vector<DataPoint*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int num
 		_global_observable_names = doIntegrate;
 		if( _global_observable_DataPoint != NULL ) delete _global_observable_DataPoint;
 		_global_observable_DataPoint = new DataPoint(*templateDataPoint);
+	}
+
+	vector<string> allObs = _global_doEval_points[0]->GetAllNames();
+	for( unsigned int i=0; i< _global_doEval_points.size(); ++i )
+	{
+		DataPoint* thisPoint = _global_doEval_points[i];
+		for( unsigned int j=0; j< allObs.size(); ++j )
+		{
+			Observable* thisObs = thisPoint->GetObservable( j );
+			thisObs->SetBinNumber( -1 );
+			thisObs->SetBkgBinNumber( -1 );
+		}
+		thisPoint->ClearPerEventData();
+		thisPoint->ClearPseudoObservable();
 	}
 
 	pthread_mutex_unlock( &GSL_DATAPOINT_GET_THREADLOCK );
