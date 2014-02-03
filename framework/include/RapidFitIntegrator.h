@@ -38,7 +38,6 @@ static vector<double> _global_range_minima;
 static vector<double> _global_range_maxima;
 static vector<string> _global_observable_names;
 static string GSLvalidFor;
-static DataPoint* _global_observable_DataPoint;
 
 class RapidFitIntegrator
 {

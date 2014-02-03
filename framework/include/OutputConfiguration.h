@@ -88,6 +88,13 @@ class OutputConfiguration
 		vector<CompPlotter_config*> proj_components;
 
 		DebugClass* debug;
+
+		static void MakeThisProjection( PhysicsBottle* resultBottle, unsigned int resultIndex, vector<CompPlotter_config*>::iterator projection_i,
+				vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
+				vector< pair<double,double> >& chi2_results, vector< vector<double> >& pullFunctionEvals, TFile* output_file, bool weightedEventsWereUsed, string weightName, DebugClass* debug );
+
+		static void MergeProjectionResults( vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
+				vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i, DebugClass* debug );
 };
 
 #endif

@@ -257,6 +257,160 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 	return;
 }
 
+void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsigned int resultIndex, vector<CompPlotter_config*>::iterator projection_i,
+		vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
+		vector< pair<double,double> >& chi2_results, vector< vector<double> >& pullFunctionEvals, TFile* output_file, bool weightedEventsWereUsed, string weightName, DebugClass* debug )
+{
+	string thisObservable = (*projection_i)->observableName;
+
+	vector<string> known_observables = resultBottle->GetResultPDF(resultIndex)->GetPrototypeDataPoint();
+	int num = StringProcessing::VectorContains( &known_observables, &thisObservable );
+
+	vector<string> bad_observables = resultBottle->GetResultPDF(resultIndex)->GetDoNotIntegrateList();
+	int num2 = StringProcessing::VectorContains( &bad_observables, &thisObservable );
+
+	if( num2 != -1 )
+	{
+		cerr << "Observable: " << thisObservable << " is on Do Not Integrate List, cannot perform projection!" << endl;
+		return;
+	}
+	if( num == -1 )
+	{
+		cerr << "Observable: " << thisObservable << " is not constrained by this PDF!" << endl;
+		return;
+	}
+
+	cout << "Projecting ToFit: " << resultIndex+1 << endl << endl;
+	TString PDFStr = "PDF_";PDFStr+=resultIndex;
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "OutputConfiguration" ) )
+		{
+			cout << "OutputConfiguration: Constructing ComponentPlotter: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
+		}
+	}
+
+	//      ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
+	ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex),
+
+			PDFStr, output_file, thisObservable, (*projection_i), resultIndex, debug );
+
+
+	thisPlotter->SetDebug( debug );
+
+	if( weightedEventsWereUsed ) thisPlotter->SetWeightsWereUsed( weightName );
+
+	allComponentPlotters.push_back( thisPlotter );
+
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "OutputConfiguration" ) )
+		{
+			cout << "OutputConfiguration: Requesting Projection: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
+		}
+	}
+
+	//      In ComponentPlotter this still does all of the work, but each ComponentPlotter object is created for each observable to allow you to do more easily
+	thisPlotter->ProjectObservable();
+
+	cout << "Projected" << endl;
+
+	if( (*projection_i)->CalcChi2 ) chi2_results.push_back( thisPlotter->GetChi2Numbers() );
+
+	pullFunctionEvals.push_back( thisPlotter->GetFunctionEval() );
+
+	all_datasets_for_all_results.push_back( thisPlotter->GetBinnedData()[0] );
+	all_components_for_all_results.push_back( thisPlotter->GetComponents()[0] );
+}
+
+void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
+						vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i, DebugClass* debug )
+{
+
+	int num=(int) all_components_for_all_results[0].size();
+	bool compatible=true;
+
+	for( unsigned int i=0; i< all_components_for_all_results.size(); ++i )
+	{
+		if( (int)all_components_for_all_results[i].size() != num ) compatible = false;
+	}
+
+	TGraphErrors* Total_BinnedData = NULL;
+
+	vector<TGraph*> Total_Components;
+
+	//      We only want to overlay the output when all of the PDFs have the same number of components
+	//      Eg it is difficult to justify trying to overlay data from JpsiPhi and Jpsif0 in one component plot, although I'm sure it's possible
+	if( compatible )
+	{
+
+		//      These static functions will take the global Random function from ROOT if need be, but lets not force that issue and give it an already initialized generator
+		//      This, alas is a ROOT solution to a ROOT problem, and it creates a MESS that often is left to some code outside of ROOT to cleanup!
+		Total_BinnedData = ComponentPlotter::MergeBinnedData( all_datasets_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
+
+		Total_Components = ComponentPlotter::MergeComponents( all_components_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
+
+		output_file->cd();
+		if( output_file->GetDirectory( "Total" ) == 0 ) output_file->mkdir( "Total" );
+		output_file->cd( "Total" );
+
+		ComponentPlotter::WriteData( Total_BinnedData, Total_Components, "Final_ProjectionData" );
+
+		ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data",
+
+				resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug );
+	}
+
+
+	vector<double> finalPullEvals;
+
+	if( (Total_BinnedData != NULL) && ((*projection_i)->DrawPull == true) )
+	{
+		for( unsigned int i=0; i< pullFunctionEvals[0].size(); ++i )            //      Loop over all Bins
+		{
+			double this_bin=0.;
+			for( unsigned int j=0; j< pullFunctionEvals.size(); ++j )       //      Loop over all PDFs (all ToFits)
+			{
+				this_bin+= pullFunctionEvals[j][i];
+			}
+			finalPullEvals.push_back( this_bin );
+		}
+
+		TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_PullPlot", resultBottle->GetResultPDF(0)->GetRandomFunction() );
+		(void) pullGraph;
+
+		ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(),
+				resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug, finalPullEvals );
+	}
+
+	CompPlotter_config* datasets_config = new CompPlotter_config( *(*projection_i) );
+	vector<TGraph*> allDataSubSets;
+	allDataSubSets.push_back( Total_Components.back() );
+	vector<string> datasetID; datasetID.push_back( "All Datasets" );
+	for( unsigned int i=0; i< all_components_for_all_results.size(); ++i )
+	{
+		allDataSubSets.push_back( all_components_for_all_results[i].back() );
+		allDataSubSets.back()->SetLineColor( (Color_t)(i+2) );
+		datasetID.push_back( resultBottle->GetResultPDF( i )->GetLabel() );
+	}
+
+	datasets_config->component_names = datasetID;
+	datasets_config->LegendTextSize = (Size_t)0.02;
+
+	ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets",
+			resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, debug );
+
+	if( !finalPullEvals.empty() )
+	{
+		ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets_wPulls",
+				resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, debug, finalPullEvals );
+	}
+
+	delete datasets_config;
+
+}
+
 void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 {
 	PhysicsBottle* resultBottle = TheResult->GetPhysicsBottle();
@@ -295,67 +449,8 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 		for( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 		{
-			string thisObservable = (*projection_i)->observableName;
-
-			vector<string> known_observables = resultBottle->GetResultPDF(resultIndex)->GetPrototypeDataPoint();
-			int num = StringProcessing::VectorContains( &known_observables, &thisObservable );
-
-			vector<string> bad_observables = resultBottle->GetResultPDF(resultIndex)->GetDoNotIntegrateList();
-			int num2 = StringProcessing::VectorContains( &bad_observables, &thisObservable );
-
-			if( num2 != -1 )
-			{
-				cerr << "Observable: " << thisObservable << " is on Do Not Integrate List, cannot perform projection!" << endl;
-				continue;
-			}
-			if( num == -1 )
-			{
-				cerr << "Observable: " << thisObservable << " is not constrained by this PDF!" << endl;
-				continue;
-			}
-
-			cout << "Projecting ToFit: " << resultIndex+1 << endl << endl;
-			TString PDFStr = "PDF_";PDFStr+=resultIndex;
-
-			if( debug != NULL )
-			{
-				if( debug->DebugThisClass( "OutputConfiguration" ) )
-				{
-					cout << "OutputConfiguration: Constructing ComponentPlotter: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
-				}
-			}
-
-			//	ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
-			ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex),
-
-					PDFStr, output_file, thisObservable, (*projection_i), resultIndex, debug );
-
-
-			thisPlotter->SetDebug( debug );
-
-			if( weightedEventsWereUsed ) thisPlotter->SetWeightsWereUsed( weightName );
-
-			allComponentPlotters.push_back( thisPlotter );
-
-			if( debug != NULL )
-                        {
-                                if( debug->DebugThisClass( "OutputConfiguration" ) )
-                                {
-                                        cout << "OutputConfiguration: Requesting Projection: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
-                                }
-                        }
-
-			//	In ComponentPlotter this still does all of the work, but each ComponentPlotter object is created for each observable to allow you to do more easily
-			thisPlotter->ProjectObservable();
-
-			cout << "Projected" << endl;
-
-			if( (*projection_i)->CalcChi2 ) chi2_results.push_back( thisPlotter->GetChi2Numbers() );
-
-			pullFunctionEvals.push_back( thisPlotter->GetFunctionEval() );
-
-			all_datasets_for_all_results.push_back( thisPlotter->GetBinnedData()[0] );
-			all_components_for_all_results.push_back( thisPlotter->GetComponents()[0] );
+			MakeThisProjection( resultBottle, resultIndex, projection_i, allComponentPlotters, all_datasets_for_all_results, all_components_for_all_results, chi2_results,
+					pullFunctionEvals, output_file, weightedEventsWereUsed, weightName, debug );
 		}
 
 		if( !chi2_results.empty() )
@@ -381,85 +476,9 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			rmdir( folderName.Data() );
 			continue;
 		}
-		int num=(int) all_components_for_all_results[0].size();
-		bool compatible=true;
 
-		for( unsigned int i=0; i< all_components_for_all_results.size(); ++i )
-		{
-			if( (int)all_components_for_all_results[i].size() != num ) compatible = false;
-		}
+		MergeProjectionResults(  allComponentPlotters, all_datasets_for_all_results, all_components_for_all_results, pullFunctionEvals, output_file, resultBottle, projection_i, debug );
 
-		TGraphErrors* Total_BinnedData = NULL;
-
-		vector<TGraph*> Total_Components;
-
-		//	We only want to overlay the output when all of the PDFs have the same number of components
-		//	Eg it is difficult to justify trying to overlay data from JpsiPhi and Jpsif0 in one component plot, although I'm sure it's possible
-		if( compatible )
-		{
-
-			//	These static functions will take the global Random function from ROOT if need be, but lets not force that issue and give it an already initialized generator
-			//	This, alas is a ROOT solution to a ROOT problem, and it creates a MESS that often is left to some code outside of ROOT to cleanup!
-			Total_BinnedData = ComponentPlotter::MergeBinnedData( all_datasets_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
-
-			Total_Components = ComponentPlotter::MergeComponents( all_components_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
-
-			output_file->cd();
-			if( output_file->GetDirectory( "Total" ) == 0 ) output_file->mkdir( "Total" );
-			output_file->cd( "Total" );
-
-			ComponentPlotter::WriteData( Total_BinnedData, Total_Components, "Final_ProjectionData" );
-
-			ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data",
-
-					resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug );
-		}
-
-		vector<double> finalPullEvals;
-
-		if( (Total_BinnedData != NULL) && ((*projection_i)->DrawPull == true) )
-		{
-			for( unsigned int i=0; i< pullFunctionEvals[0].size(); ++i )		//	Loop over all Bins
-			{
-				double this_bin=0.;
-				for( unsigned int j=0; j< pullFunctionEvals.size(); ++j )	//	Loop over all PDFs (all ToFits)
-				{
-					this_bin+= pullFunctionEvals[j][i];
-				}
-				finalPullEvals.push_back( this_bin );
-			}
-
-			TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_PullPlot", resultBottle->GetResultPDF(0)->GetRandomFunction() );
-			(void) pullGraph;
-
-			ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(),
-								resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug, finalPullEvals );
-		}
-
-		CompPlotter_config* datasets_config = new CompPlotter_config( *(*projection_i) );
-		vector<TGraph*> allDataSubSets;
-		allDataSubSets.push_back( Total_Components.back() );
-		vector<string> datasetID; datasetID.push_back( "All Datasets" );
-		for( unsigned int i=0; i< all_components_for_all_results.size(); ++i )
-		{
-			allDataSubSets.push_back( all_components_for_all_results[i].back() );
-			allDataSubSets.back()->SetLineColor( (Color_t)(i+2) );
-			datasetID.push_back( resultBottle->GetResultPDF( i )->GetLabel() );
-		}
-
-		datasets_config->component_names = datasetID;
-		datasets_config->LegendTextSize = (Size_t)0.02;
-
-		ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets",
-						resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, debug );
-
-		if( !finalPullEvals.empty() )
-		{
-			ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets_wPulls",
-						resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, debug, finalPullEvals );
-		}
-
-		delete datasets_config;
 
 		//	it is now safe to remove the instances of ComponentPlotter
 		for( vector<ComponentPlotter*>::iterator compP_i = allComponentPlotters.begin(); compP_i != allComponentPlotters.end(); ++compP_i )

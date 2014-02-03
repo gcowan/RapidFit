@@ -597,18 +597,21 @@ vector<DataPoint*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int num
 	pthread_mutex_lock( &GSL_DATAPOINT_GET_THREADLOCK );
 
 	bool pointsGood = true;
-	if( _global_observable_DataPoint != NULL )
+	if( !_global_doEval_points.empty() )
 	{
-		vector<string> allConsts = thisBound->GetDiscreteNames();
-		for( unsigned int i=0; i< allConsts.size(); ++i )
+		if( _global_doEval_points[0] != NULL )
 		{
-			double haveVal = _global_observable_DataPoint->GetObservable( allConsts[i] )->GetValue();
-			double wantVal = templateDataPoint->GetObservable( allConsts[i] )->GetValue();
-
-			if( haveVal != wantVal )
+			vector<string> allConsts = thisBound->GetDiscreteNames();
+			for( unsigned int i=0; i< allConsts.size(); ++i )
 			{
-				pointsGood = false;
-				break;
+				double haveVal = _global_doEval_points[0]->GetObservable( allConsts[i] )->GetValue();
+				double wantVal = templateDataPoint->GetObservable( allConsts[i] )->GetValue();
+
+				if( haveVal != wantVal )
+				{
+					pointsGood = false;
+					break;
+				}
 			}
 		}
 	}
@@ -620,8 +623,6 @@ vector<DataPoint*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int num
 		_global_range_minima = minima;
 		_global_range_maxima = maxima;
 		_global_observable_names = doIntegrate;
-		if( _global_observable_DataPoint != NULL ) delete _global_observable_DataPoint;
-		_global_observable_DataPoint = new DataPoint(*templateDataPoint);
 	}
 
 	vector<string> allObs = _global_doEval_points[0]->GetAllNames();

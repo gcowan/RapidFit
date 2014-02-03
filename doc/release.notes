@@ -4,6 +4,7 @@
   - Fixing bugs in caching code for ComponentProjections
   - Fixing bugs in v6 and v7 PDFs which ONLY effects projections
   - Adding Print function to AngularAcceptance
+  - Breaking out projection code in OutputConfiguration to make things a bit easier to parse by using static functions
 
 2013/02/01 Rob Currie
   - Fixing performance problems in ComponentProjections
