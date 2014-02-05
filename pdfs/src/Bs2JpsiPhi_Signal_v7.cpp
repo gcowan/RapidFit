@@ -9,13 +9,7 @@
 
 #include "ClassLookUp.h"
 #include "Mathematics.h"
-#include "PerEventResModel.h"
-#include "DoubleResolutionModel.h"
-#include "FixedResolutionModel.h"
-#include "IResolutionModel.h"
-#include "DoubleFixedResModel.h"
-#include "TripleFixedResModel.h"
-#include "Phis2012ResolutionModel.h"
+#include "TimeAccRes.h"
 #include "Bs2JpsiPhi_Angluar_Terms.h"
 #include "Bs2JpsiPhi_Signal_v7.h"
 #include "SimpleMistagCalib.h"
@@ -71,7 +65,7 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 	BetaName			( configurator->getName("beta") ), 
 	// Other things
 	_useEventResolution(false), 
-	_useTimeAcceptance(false), 
+	//_useTimeAcceptance(false), 
 	_useHelicityBasis(false), 
 	_numericIntegralForce(false), 
 	_numericIntegralTimeOnly(false), 
@@ -90,7 +84,7 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 	delta_perp(), delta_zero(), delta_s(), delta1(), delta2(), delta_ms(), phi_s(), _cosphis(), _sinphis(), 
 	angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(),
 	tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
-	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL),
+	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(),//, timeAcc(NULL),
 	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 	_fitDirectlyForApara(false), performingComponentProjection(false), _useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false), resolutionModel(NULL),
 	_useBetaParameter(false), _useMultiplePhis(false), RequireInterference(true)
@@ -171,44 +165,14 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 		angAccI9 = angAcc->af9()  ;
 		angAccI10 = angAcc->af10();
 	}
-	//...........................................
-	// Configure to use time acceptance machinery
-	_useTimeAcceptance = configurator->isTrue( "UseTimeAcceptance" ) ;
-	if( useTimeAcceptance() )
-	{
-		if( configurator->hasConfigurationValue( "TimeAcceptanceType", "Upper" ) )
-		{
-			timeAcc = new SlicedAcceptance( 0., 14.0, 0.00826, isCopy) ;
-			//timeAcc = new SlicedAcceptance( 0., 14.0, 0.00, isCopy) ;
-			if( !isCopy ) cout << "Bs2JpsiPhi_Signal_v7:: Constructing timeAcc: Upper time acceptance beta=0.00826 [0 < t < 14] " << endl ;
-		}
-		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" )
-		{
-			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ), isCopy ) ;
-			if( !isCopy ) cout << "Bs2JpsiPhi_Signal_v7:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
-		}
-	}
-
-	if( timeAcc == NULL )
-	{
-		timeAcc = new SlicedAcceptance( 0., 20., isCopy ) ;
-		if( !isCopy ) cout << "Bs2JpsiPhi_Signal_v7:: Constructing timeAcc: DEFAULT FLAT [0 < t < 20]  " << endl ;
-	}
 
 	this->SetNumericalNormalisation( false );
 
-	//..........................................
-	// Choose resolution model according to flags
-	// For now hard coded.
+	resolutionModel = new TimeAccRes( configurator, isCopy );
 
-	//if( _useEventResolution )
-		// get model name
-		// use class lookup
-	//{
-		string resolutionModelName = configurator->GetResolutionModel();
-		resolutionModel = ClassLookUp::LookUpResName( resolutionModelName, configurator, isCopy );
+	_useEventResolution = resolutionModel->isPerEvent();
 
-		if( _useEventResolution ) this->TurnCachingOff();
+	if( _useEventResolution ) this->TurnCachingOff();
 	//}
 	//else
 	//{
@@ -236,7 +200,7 @@ Bs2JpsiPhi_Signal_v7::Bs2JpsiPhi_Signal_v7(PDFConfigurator* configurator) : Base
 //Destructor
 Bs2JpsiPhi_Signal_v7::~Bs2JpsiPhi_Signal_v7()
 {
-	if( timeAcc != NULL ) delete timeAcc;
+	//if( timeAcc != NULL ) delete timeAcc;
 	if( angAcc != NULL ) delete angAcc;
 	if( resolutionModel != NULL ) delete resolutionModel;
 	if( _mistagCalibModel != NULL ) delete _mistagCalibModel;
@@ -1113,7 +1077,7 @@ double Bs2JpsiPhi_Signal_v7::diffXsec()
 
 	Observable* timeObs = _datapoint->GetObservable( timeName );
 	//if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
-	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, 0.0 );
+	//if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, 0.0 );
 	if( DebugFlag_v7 )
 	{
 		if( xsec < 0)
@@ -1150,7 +1114,7 @@ double Bs2JpsiPhi_Signal_v7::diffXsecTimeOnly()
 		ASint()*A0() * timeFactorReASA0(  ) * angAccI10 ;
 
 	Observable* timeObs = _datapoint->GetObservable( timeName );
-	if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, 0.0 );
+	//if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, 0.0 );
 
 	if( DebugFlag_v7 )
 	{
@@ -1199,66 +1163,12 @@ double Bs2JpsiPhi_Signal_v7::diffXsecNorm1()
 
 void Bs2JpsiPhi_Signal_v7::generateTimeIntegrals()
 {
-	double stored_gammaLInt=0.;
-	double stored_gammaHInt=0.;
-
-	double tlo_boundary = tlo;
-	double thi_boundary = thi;
-
-	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
-	{
-		timeBinNum = islice;
-		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
-
-		const double slice_lo = thisSlice->tlow();
-		const double slice_hi = thisSlice->thigh();
-
-		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
-		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
-		if( thi > tlo )
-		{
-			this->preCalculateTimeIntegrals();
-			stored_gammaLInt += intExpL_stored * thisSlice->height();
-			stored_gammaHInt += intExpH_stored * thisSlice->height();
-		}
-	}
-	tlo = tlo_boundary;
-	thi = thi_boundary;
-
-	intExpL_stored = stored_gammaLInt;
-	intExpH_stored = stored_gammaHInt;
+	this->preCalculateTimeIntegrals();
 }
 
 void Bs2JpsiPhi_Signal_v7::generateSinusoidIntegrals()
 {
-	double stored_ExpSinInt=0.;
-	double stored_ExpCosInt=0.;
-
-	double tlo_boundary = tlo;
-	double thi_boundary = thi;
-
-	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
-	{
-		timeBinNum = islice;
-		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
-
-		const double slice_lo = thisSlice->tlow();
-		const double slice_hi = thisSlice->thigh();
-
-		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
-		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
-		if( thi > tlo )
-		{
-			this->preCalculateSinusoidIntegrals();
-			stored_ExpSinInt += intExpSin_stored * thisSlice->height();
-			stored_ExpCosInt += intExpCos_stored * thisSlice->height();
-		}
-	}
-	tlo = tlo_boundary;
-	thi = thi_boundary;
-
-	intExpSin_stored = stored_ExpSinInt;
-	intExpCos_stored = stored_ExpCosInt;
+	this->preCalculateSinusoidIntegrals();
 }
 
 void Bs2JpsiPhi_Signal_v7::ConstructTimeIntegrals()

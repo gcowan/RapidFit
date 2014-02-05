@@ -14,7 +14,7 @@
 
 #include "BasePDF.h"
 #include "PDFConfigurator.h"
-#include "SlicedAcceptance.h"
+//#include "SlicedAcceptance.h"
 #include "IResolutionModel.h"
 #include "IMistagCalib.h"
 #include "AngularAcceptance.h"
@@ -247,9 +247,9 @@ class Bs2JpsiPhi_Signal_v7 : public BasePDF
 		void preCalculateTimeIntegrals();
 
 		//Time acceptance
-		bool _useTimeAcceptance;
-		inline bool useTimeAcceptance() const { return _useTimeAcceptance; }
-		SlicedAcceptance* timeAcc;
+		//bool _useTimeAcceptance;
+		//inline bool useTimeAcceptance() const { return _useTimeAcceptance; }
+		//SlicedAcceptance* timeAcc;
 
 		//Configurationparameters
 		bool _numericIntegralForce;

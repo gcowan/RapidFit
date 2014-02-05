@@ -224,19 +224,19 @@ double ProdPDF::Evaluate( DataPoint * NewDataPoint )
 	double termTwo = secondPDF->Evaluate( NewDataPoint );
 
 	double prod = termOne * termTwo;
-
+/*
 	if( std::isnan(prod) || prod <= 0. )
 	{
 		PDF_THREAD_LOCK
 
-			cout << "ProdPDF::Evaluate\t\t" << termOne << "\tx\t" << termTwo << endl;
+		cout << "ProdPDF::Evaluate\t\t" << termOne << "\tx\t" << termTwo << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-			throw(-653102);
+		throw(-653102);
 	}
-
+*/
 	return prod;
 }
 
@@ -248,18 +248,19 @@ double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 
 	double prod = termOne * termTwo;
 
+/*
 	if( std::isnan(prod) || prod <= 0. )
 	{
 		PDF_THREAD_LOCK
 
-			cout << "ProdPDF::EvaluateForNumerical\t\t" << termOne << "\tx\t" << termTwo << endl;
+		cout << "ProdPDF::EvaluateForNumerical\t\t" << termOne << "\tx\t" << termTwo << endl;
 
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
 		PDF_THREAD_UNLOCK
-			throw(-653102);
+		throw(-653102);
 	}
-
+*/
 	return prod;
 }
 

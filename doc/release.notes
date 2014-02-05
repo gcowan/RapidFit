@@ -5,6 +5,8 @@
   - Fixing bugs in v6 and v7 PDFs which ONLY effects projections
   - Adding Print function to AngularAcceptance
   - Breaking out projection code in OutputConfiguration to make things a bit easier to parse by using static functions
+  - Adding new TimeAccRes class to perform both time Acceptance and Resolution behind the users back through a sane interface
+  - Modifying Exponential and LL_3Dangular to show the benefits of using this new TimeAccRes class
 
 2013/02/01 Rob Currie
   - Fixing performance problems in ComponentProjections

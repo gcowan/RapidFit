@@ -14,7 +14,7 @@
 #include "TFile.h"
 #include "TH3D.h"
 
-#include "SlicedAcceptance.h"
+#include "IResolutionModel.h"
 #include "BasePDF.h"
 
 #include <vector>
@@ -33,8 +33,6 @@ class LongLivedBkg_3Dangular : public BasePDF
 		//Calculate the PDF value
 		virtual double Evaluate(DataPoint*);
 
-		virtual vector<string> GetDoNotIntegrateList();
-
 	protected:
 		//Calculate the PDF normalisation
 		virtual double Normalisation(PhaseSpaceBoundary*);
@@ -44,48 +42,15 @@ class LongLivedBkg_3Dangular : public BasePDF
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 
-		double buildPDFnumerator( unsigned int sigmaNum );
-		double buildPDFdenominator( double input_tau, double input_sigmaLL, double input_tlo, double input_thi, unsigned int thetaNum, unsigned int sigmaNum );
+		double angularFactor( DataPoint* );
 
-		double angularFactor( );
-
-		bool _usePunziSigmat;
 		bool _useTimeAcceptance;
-
-		//Time acceptance
-		SlicedAcceptance * timeAcc;
-
-		void InitializeCaching();
-		PseudoObservable LL1a_int;
-		PseudoObservable LL1b_int;
-		PseudoObservable LL2a_int;
-		PseudoObservable LL2b_int;
-
-		vector<PseudoObservable> LL1a_int_vec;
-		vector<PseudoObservable> LL1b_int_vec;
-		vector<PseudoObservable> LL2a_int_vec;
-		vector<PseudoObservable> LL2b_int_vec;
 
 		// Physics parameters
 		ObservableRef f_LL1Name;		// fraction of decay const 1
 		ObservableRef tauLL1Name;            // decay constant 1
 		ObservableRef tauLL2Name;            // decay constant 2
 
-		//Detector parameters
-		ObservableRef timeResLL1FracName; //fraction of timeres 1
-		ObservableRef sigmaLL1Name;	// time res sigma 1
-		ObservableRef sigmaLL2Name;	// time res sigma 2
-
-		// These contain the strings that correspond
-		// to the observable names that are used in the
-		// PDF.
-		ObservableRef timeName;		
-		ObservableRef resScaleName;
-		double timeOffset;
-		double resolutionScale;
-		ObservableRef eventResolutionName;
-		ObservableRef timeOffsetName;
-		bool _usePerEvent;
 		// For transversity angles
 		ObservableRef cosThetaName;	
 		ObservableRef phiName;			
@@ -95,6 +60,7 @@ class LongLivedBkg_3Dangular : public BasePDF
 		ObservableRef cthetalName;		
 		ObservableRef phihName;			
 
+		ObservableRef timeName;
 		ObservableRef timeconstName;
 
 		double tauLL1;
@@ -121,15 +87,19 @@ class LongLivedBkg_3Dangular : public BasePDF
 		double useHelicityBasis() { return _useHelicityBasis; }
 
 
+		TH1* histo;
+		TAxis* xaxis;
+		TAxis* yaxis;
+		TAxis* zaxis;
 		//Additions to deal with 3-D angular distribution via a histogram
-		TH3D *histo;
-		TAxis *xaxis, *yaxis, *zaxis;
 		int nxbins, nybins, nzbins;
 		double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
 		double total_num_entries;
 		bool useFlatAngularDistribution;
 
 		DataPoint* _datapoint;
+
+		IResolutionModel* resolutionModel;
 };
 
 #endif

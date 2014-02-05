@@ -1,4 +1,7 @@
 
+#ifndef _ACCEPTANCE_SLICE_H
+#define _ACCEPTANCE_SLICE_H
+
 #include <iostream>
 
 class AcceptanceSlice
@@ -51,4 +54,6 @@ class AcceptanceSlice
 		double _thigh;
 		double _height;
 };
+
+#endif
 

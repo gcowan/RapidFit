@@ -329,6 +329,7 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 
 	double sum=termOne + termTwo;
 
+	/*
 	if( std::isnan(sum) ||  sum <= 0. )
 	{
 		PDF_THREAD_LOCK
@@ -340,6 +341,7 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 		PDF_THREAD_UNLOCK
 		throw(-653102);
 	}
+	*/
 
 	//Return the sum
 	return sum;
@@ -384,6 +386,7 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
         }
 	//cout << "NSP numerical integrals " << firstIntegral << " , " << secondIntegral << endl;
 
+	/*
 	if( std::isnan(termOne) || std::isnan(termTwo) )
 	{
 		PDF_THREAD_LOCK
@@ -391,6 +394,7 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 		PDF_THREAD_UNLOCK
 	}
+	*/
 
 	//Return the sum
 	return termOne + termTwo;

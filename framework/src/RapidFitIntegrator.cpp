@@ -790,10 +790,21 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	if( thisConfig->wantedComponent != NULL ) delete thisConfig->wantedComponent;
 	delete thisConfig;
 
+	double number_points = (double)GSLFixedPoints;
+
 	double result=0.;
+	double thisNum=0.;
 	for( unsigned int i=0; i< thisSet->size(); ++i )
 	{
-		result+=thisSet->at( i );
+		thisNum=thisSet->at( i );
+		if( ( !std::isnan(thisNum) && fabs(thisNum)<DBL_MAX ) && ( !std::isinf(thisNum) ) )
+		{
+			result+=thisNum;
+		}
+		else// if( std::isnan(thisNum) || std::isinf(thisNum) )
+		{
+			--number_points;
+		}
 	}
 
 	//cout << result << endl;
@@ -814,7 +825,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	//cout << thisSet->size() << endl;
 
-	result /= ( (double)GSLFixedPoints / factor );
+	result /= ( number_points / factor );
 	
 	//cout << result << endl;
 
