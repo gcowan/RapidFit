@@ -657,7 +657,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 		else if( currentArgument == "--testRapidIntegrator" )			{	config.testRapidIntegratorFlag = true;			}
 		else if( currentArgument == "--calculateFitFractions" )			{	config.calculateFitFractionsFlag = true;		}
 		else if( currentArgument == "--calculateAcceptanceWeights" )		{	config.calculateAcceptanceWeights = true;		}
-		else if( currentArgument == "--calculateAcceptanceCoefficients" )		{	config.calculateAcceptanceCoefficients = true;		}
+		else if( currentArgument == "--calculateAcceptanceCoefficients" )       {	config.calculateAcceptanceCoefficients = true;		}
 		else if( currentArgument == "--calculateAcceptanceWeightsWithSwave" )	{	config.calculateAcceptanceWeightsWithSwave = true;	}
 		else if( currentArgument == "--calculatePerEventAcceptance" )		{	config.calculatePerEventAcceptance = true;		}
 		else if( currentArgument == "--doLLscan" )				{	config.doLLscanFlag = true;				}
@@ -677,6 +677,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 		else if( currentArgument == "--BuildConstraints" )			{	config.BuildConstraints = true;				}
 		else if( currentArgument == "--disableLatexOutput" )			{	config.disableLatexOutput = true;			}
 		else if( currentArgument == "--disableAngAccHisto" )			{	config.dontGenerateAcceptanceHistos = true;		}
+		else if( currentArgument == "--MultiDimChi2" )                          {       config.MultiDimChi2 = true;                             }
 
 		//	We didn't understand the argument to end up here
 		else

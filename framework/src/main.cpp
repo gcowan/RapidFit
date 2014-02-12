@@ -47,6 +47,7 @@
 #include "JackKnife.h"
 #include "RapidRun.h"
 #include "ResultFormatter.h"
+#include "MultiDimChi2.h"
 ///  System Headers
 #include <string>
 #include <vector>
@@ -736,6 +737,17 @@ void MakeOutputFolder( RapidFitConfiguration* config )
 	ResultFormatter::ReviewOutput( config->GlobalResult );
 }
 
+void PerformMultiDimChi2( RapidFitConfiguration* config )
+{
+	cout << "Passing over from main to MultiDimChi2 Test!" << endl;
+	vector<string> wantedObservables( 1, "time" );
+	vector<PDFWithData*> allObjects = config->pdfsAndData;
+	PhaseSpaceBoundary* thisBound = new PhaseSpaceBoundary( * allObjects[0]->GetDataSet()->GetBoundary() );
+	MultiDimChi2* thisTest = new MultiDimChi2( allObjects, thisBound, wantedObservables );
+
+	thisTest->PerformMuiltDimTest();
+}
+
 int PerformMainFit( RapidFitConfiguration* config )
 {
 	//	This is for code collapsing and to clearly outline the 'Fit' step of this file
@@ -823,6 +835,11 @@ int PerformMainFit( RapidFitConfiguration* config )
 		cout << "ALERT ALERT ALERT " << endl << endl;
 		cout << "Fit Status was 2, this means your correlation matrix was forced +ve def" << endl;
 		cout << "Carrying on Regardless, but, BUYER BEWARE!" << endl << endl;
+	}
+
+	if( config->MultiDimChi2 )
+	{
+		PerformMultiDimChi2( config );
 	}
 
 	if( config->saveOneFoamDataSetFlag )

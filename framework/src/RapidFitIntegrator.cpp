@@ -30,6 +30,7 @@
 #include <pthread.h>
 #include <exception>
 #include <pthread.h>
+#include <algorithm>
 
 #ifdef __RAPIDFIT_USE_GSL
 //	GSL for MC integration
@@ -367,9 +368,68 @@ void RapidFitIntegrator::SetPDF( IPDF* input )
 	functionToWrap = input;
 }
 
+/*
+   double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, IntegratorOneDim * oneDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
+   ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug )
+   {
+   NewDataPoint->Print();
+
+   IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
+   if( debug != NULL )
+   {
+   quickFunction->SetDebug( debug );
+   if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+   {
+   cout << "RapidFitIntegrator: 1D Setting Up Constraints" << endl;
+   }
+   }
+//cout << "here" << endl;
+//Find the observable range to integrate over
+IConstraint * newConstraint = NULL;
+try
+{
+newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
+}
+catch(...)
+{
+cerr << "RapidFitIntegrator: Could NOT find required Constraint " << doIntegrate[0] << " in Data PhaseSpaceBoundary" << endl;
+cerr << "RapidFitIntegrator: Please Fix this by Adding the Constraint to your PhaseSpace for PDF: " << functionToWrap->GetLabel() << endl;
+cerr << endl;
+exit(-8737);
+}
+//IConstraint * newConstraint = NewBoundary->GetConstraint( doIntegrate[0] );
+double minimum = newConstraint->GetMinimum();
+double maximum = newConstraint->GetMaximum();
+
+//cout << "here2" << endl;
+//cout << "1D Integration" << endl;
+//Do a 1D integration
+oneDimensionIntegrator->SetFunction(*quickFunction);
+
+//cout << "Performing 1DInt" << endl;
+double output = 0.;
+try{
+oneDimensionIntegrator->Integral( minimum, maximum );
+}
+catch(...)
+{
+cerr << "1D-Integrator Fell Over!" << endl;
+}
+cout << "1D:" << output << endl;
+
+//cout << "here3" << endl;
+delete quickFunction;
+
+return output;
+}*/
+
 double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, IntegratorOneDim * oneDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
 		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug )
 {
+	//NewDataPoint->Print();
+
+	(void) oneDimensionIntegrator;
+
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
 	if( debug != NULL )
 	{
@@ -397,14 +457,47 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 	double minimum = newConstraint->GetMinimum();
 	double maximum = newConstraint->GetMaximum();
 
-	//cout << "here2" << endl;
-	//cout << "1D Integration" << endl;
-	//Do a 1D integration
-	oneDimensionIntegrator->SetFunction(*quickFunction);
+	unsigned int n_eval = 10000;
+	double step = (maximum-minimum)/((double)n_eval);
 
-	//cout << "Performing 1DInt" << endl;
-	double output = oneDimensionIntegrator->Integral( minimum, maximum );
+	vector<DataPoint*> thesePoints;
+
+	for( unsigned int i=0; i< n_eval; ++i )
+	{
+		double thisPoint = minimum+step*((double)i);
+		thesePoints.push_back( new DataPoint( *NewDataPoint ) );
+		thesePoints[i]->SetObservable( doIntegrate[0], thisPoint, "noUnitsHere" );
+	}
+
+	vector<double> evals;
+	for( unsigned int i=0; i< n_eval; ++i )
+	{
+		try{
+			evals.push_back( functionToWrap->Evaluate( thesePoints[i] ) );
+		}
+		catch(...)
+		{
+			evals.push_back( 0. );
+			--n_eval;
+		}
+	}
+
+	sort( evals.begin(), evals.end() );
+
+	double output=0.;
+	for( unsigned int i=0; i< evals.size(); ++i )
+	{
+		output+= evals[i];
+	}
+
 	//cout << output << endl;
+	//cout << maximum-minimum << endl;
+	//cout << n_eval << endl;
+
+	double factor = maximum-minimum;
+	output /= ( ((double)n_eval) / factor );
+
+	//cout << "1D:" << output << endl;
 
 	//cout << "here3" << endl;
 	delete quickFunction;
@@ -482,7 +575,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegral( IPDF* functionToWrap, con
 	{
 		factor *= maxima[i]-minima[i];
 	}
-	result /= ( (double)integrationPoints[0].size() / factor );
+	result /= ( ((double)integrationPoints[0].size()) / factor );
 
 	//cout << "GSL :D" << endl;
 
@@ -567,9 +660,9 @@ vector<DataPoint*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, v
 		thisPoint->ClearPerEventData();
 		thisPoint->ClearPseudoObservable();
 		vector<string> allObs=thisPoint->GetAllNames();
-		for( unsigned int i=0; i<allObs.size(); ++i )
+		for( unsigned int j=0; j<allObs.size(); ++j )
 		{
-			Observable* thisObs = thisPoint->GetObservable( i );
+			Observable* thisObs = thisPoint->GetObservable( j );
 			thisObs->SetBinNumber(-1);
 			thisObs->SetBkgBinNumber(-1);
 		}
@@ -756,18 +849,18 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	if( componentIndex != NULL ) thisConfig->wantedComponent = new ComponentRef( *componentIndex );
 	else thisConfig->wantedComponent = NULL;
 
-//	thisDataSet->GetDataPoint( 0 )->Print();
+	//	thisDataSet->GetDataPoint( 0 )->Print();
 
-//	cout << functionToWrap->GetName() << "\t0:\t" << functionToWrap->Evaluate( thisDataSet->GetDataPoint( 0 ) ) << endl;
+	//	cout << functionToWrap->GetName() << "\t0:\t" << functionToWrap->Evaluate( thisDataSet->GetDataPoint( 0 ) ) << endl;
 
-//	cout << functionToWrap->GetName() << "\t100:\t" << functionToWrap->Evaluate( thisDataSet->GetDataPoint( 100 ) ) << endl;
+	//	cout << functionToWrap->GetName() << "\t100:\t" << functionToWrap->Evaluate( thisDataSet->GetDataPoint( 100 ) ) << endl;
 
-//	if( componentIndex != NULL ) cout << functionToWrap->GetName() << "\t" << thisConfig->wantedComponent->getComponentName() << ":\t" << functionToWrap->EvaluateComponent( thisDataSet->GetDataPoint( 0 ), thisConfig->wantedComponent ) << endl;
+	//	if( componentIndex != NULL ) cout << functionToWrap->GetName() << "\t" << thisConfig->wantedComponent->getComponentName() << ":\t" << functionToWrap->EvaluateComponent( thisDataSet->GetDataPoint( 0 ), thisConfig->wantedComponent ) << endl;
 
 	if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-                {
+	{
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
 			cout << "RapidFitIntegrator:: " << thisDataSet->GetDataNumber() << "  " << functionToWrap->GetLabel() << "  th: " << num_threads << endl;
 			thisDataSet->GetDataPoint( 0 )->Print();
 		}
@@ -775,17 +868,17 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	vector<double>* thisSet = MultiThreadedFunctions::ParallelEvaulate( functionToWrap, thisDataSet, thisConfig );
 
-        if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-                {
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
 			cout << "RapidFitIntegrator:: Finished Eval" << endl;
 		}
 	}
 
 	delete thisDataSet;
 
-//	DebugClass::Dump2TTree( DebugClass::GetUniqueROOTFileName(), *thisSet );
+	//	DebugClass::Dump2TTree( DebugClass::GetUniqueROOTFileName(), *thisSet );
 
 	if( thisConfig->wantedComponent != NULL ) delete thisConfig->wantedComponent;
 	delete thisConfig;
@@ -794,6 +887,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	double result=0.;
 	double thisNum=0.;
+	sort( thisSet->begin(), thisSet->end() );
 	for( unsigned int i=0; i< thisSet->size(); ++i )
 	{
 		thisNum=thisSet->at( i );
@@ -826,7 +920,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	//cout << thisSet->size() << endl;
 
 	result /= ( number_points / factor );
-	
+
 	//cout << result << endl;
 
 	delete thisSet;
@@ -836,10 +930,10 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	//cout << result << endl;
 
-        if( debug != NULL )
-        {
-                if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-                {
+	if( debug != NULL )
+	{
+		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		{
 			cout << result << endl;
 		}
 	}
@@ -947,7 +1041,15 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 		{
 			DataPoint* thisDataPoint = new DataPoint( *NewDataPoint );
 			thisDataPoint->SetPhaseSpaceBoundary( NewBoundary );
-			double returnVal = functionToWrap->Evaluate( thisDataPoint );
+			double returnVal=0.;
+			try{
+				returnVal = functionToWrap->Evaluate( thisDataPoint );
+				thisDataPoint->Print();
+			}
+			catch(...)
+			{
+				cerr << "Function fails to Evaluate!" << endl;
+			}
 			delete thisDataPoint;
 			return returnVal;
 		}
@@ -958,7 +1060,14 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			double returnVal=0.;
 			for( unsigned int i=0; i< DiscreteIntegrals.size(); ++i )
 			{
-				returnVal+=functionToWrap->Evaluate( DiscreteIntegrals[i] );
+				try{
+					returnVal+=functionToWrap->Evaluate( DiscreteIntegrals[i] );
+				}
+				catch(...)
+				{
+					cerr << "Function fails to Evaluate!" << endl;
+					DiscreteIntegrals[i]->Print();
+				}
 			}
 			while( !DiscreteIntegrals.empty() )
 			{
@@ -1181,7 +1290,7 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 		}
 	}
 
-	
+
 
 	if( testedIntegrable.size() <= 1 || doIntegrate.empty() )
 	{

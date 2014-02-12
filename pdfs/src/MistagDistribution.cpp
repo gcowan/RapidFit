@@ -40,7 +40,7 @@ void MistagDistribution::MakePrototypes()
 {
 	// Observables
 	allObservables.push_back( GFxName );
-	//allObservables.push_back( tagName );
+	allObservables.push_back( tagName );
 
 	//Make the parameter set
 	vector<string> parameterNames;
@@ -75,6 +75,7 @@ bool MistagDistribution::SetPhysicsParameters( ParameterSet * NewParameterSet )
 double MistagDistribution::Evaluate(DataPoint * measurement)
 {
 	if( measurement->GetObservable( tagName )->GetValue() == 0 ) return 1.;
+	//cout << measurement->GetObservable( tagName )->GetValue();
 	// Get the observable
 	double x = 0.5 - measurement->GetObservable( GFxName )->GetValue();
 
@@ -82,7 +83,7 @@ double MistagDistribution::Evaluate(DataPoint * measurement)
 
 	if( x > mu ) returnValue = TMath::GammaDist( x, gamma, mu, beta );
 	else if( shoulder > 0.0) returnValue = shoulder ;
-	else returnValue = 0.0000001 ;
+	else returnValue = 1E-9 ;
 
   	return returnValue;
 }
@@ -100,6 +101,6 @@ double MistagDistribution::Normalisation( DataPoint* input, PhaseSpaceBoundary *
 	}
 	if( input->GetObservable( tagName )->GetValue() == 0 ) return 1.;
 	//return -1.;
-	return 1.0  +  shoulder*mu;
+	return 1.0 +  shoulder*mu;
 }
 

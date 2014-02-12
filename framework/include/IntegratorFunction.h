@@ -177,7 +177,7 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		/*!
 		 * @brief Copy Constructor
 		 */
-		IntegratorFunction ( const IntegratorFunction& );
+		IntegratorFunction( const IntegratorFunction& );
 
 		/*!
 		 * @brief Assignment Operator
@@ -211,6 +211,8 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		PhaseSpaceBoundary* myPhaseSpaceBoundary;		/*!	Pointer to internally explorable PhaseSpace */
 
 		DebugClass* debug;
+
+		Double_t* xArray;
 };
 
 #endif

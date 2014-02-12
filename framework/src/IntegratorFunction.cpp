@@ -27,7 +27,7 @@ IntegratorFunction::IntegratorFunction( IPDF * InputFunction, const DataPoint * 
 	wrappedFunction(ClassLookUp::CopyPDF(InputFunction)), currentPoint(new DataPoint(*InputPoint) ), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese),
 	minima(), ranges(), cache_positions(), componentIndex( Index==NULL?NULL:(new ComponentRef(*Index)) ), newDataPoint(NULL), cache_lookup(),
 	lower_limit(new_lower_limit), upper_limit(new_upper_limit), generateFunc(false), integrateFunc(true), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *inputPhaseSpaceBoundary ) ),
-	debug(new DebugClass(false))
+	debug(new DebugClass(false)), xArray( new Double_t[1] )
 {
 	//	Chose to use perform the lookups in the constructor to keep the Eval statement as const as possible
 	vector<ObservableRef> lookups;
@@ -55,7 +55,7 @@ IntegratorFunction::IntegratorFunction( IPDF * InputFunction, const DataPoint * 
 	wrappedFunction(ClassLookUp::CopyPDF(InputFunction)), currentPoint(new DataPoint(*InputPoint) ), doIntegrate(IntegrateThese), dontIntegrate(DontIntegrateThese),
 	minima(InputMinima), ranges(InputRanges), cache_positions(), componentIndex(NULL), newDataPoint(NULL), cache_lookup(), lower_limit(InputMinima),
 	upper_limit(), generateFunc(true), integrateFunc(false), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *inputPhaseSpaceBoundary) ),
-	debug(new DebugClass(false))
+	debug(new DebugClass(false)), xArray( new Double_t[1] )
 {
 	//      Chose to use perform the lookups in the constructor to keep the Eval statement as const as possible
 	vector<ObservableRef> lookups;
@@ -92,14 +92,16 @@ IntegratorFunction::~IntegratorFunction()
 	if( myPhaseSpaceBoundary != NULL ) delete myPhaseSpaceBoundary;
 	if( componentIndex != NULL ) delete componentIndex;
 	if( debug != NULL ) delete debug;
+	if( xArray != NULL ) delete xArray;
 }
 
-IntegratorFunction::IntegratorFunction ( const IntegratorFunction& input ) :
+IntegratorFunction::IntegratorFunction( const IntegratorFunction& input ) :
 	IBaseFunctionMultiDim( input ), IBaseFunctionOneDim( input ), TFoamIntegrand( input ),
 	wrappedFunction( ClassLookUp::CopyPDF( input.wrappedFunction ) ), currentPoint( new DataPoint(*input.currentPoint) ), doIntegrate( input.doIntegrate ), dontIntegrate( input.dontIntegrate ),
 	minima( input.minima ), ranges( input.ranges ), cache_positions( input.cache_positions ), componentIndex( NULL ),
 	newDataPoint( new DataPoint(*input.newDataPoint) ), cache_lookup( input.cache_lookup ), lower_limit( input.lower_limit ), upper_limit( input.upper_limit ), generateFunc( input.generateFunc ),
-	integrateFunc( input.integrateFunc ), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *input.myPhaseSpaceBoundary ) ), debug( (input.debug==NULL)?NULL:new DebugClass(*input.debug) )
+	integrateFunc( input.integrateFunc ), myPhaseSpaceBoundary( new PhaseSpaceBoundary( *input.myPhaseSpaceBoundary ) ), debug( (input.debug==NULL)?NULL:new DebugClass(*input.debug) ),
+	xArray( new Double_t[1] )
 {
 	if( input.componentIndex != NULL )
 	{
@@ -320,10 +322,9 @@ double IntegratorFunction::DoEval( Double_t x ) const
 {
 	if ( doIntegrate.size() == 1 )
 	{
-		Double_t* xArray = new Double_t[1];
 		xArray[0] = x;
 		double return_val = DoEval(xArray);
-		delete [] xArray;
+		//cout << return_val << "\t";
 		return return_val;
 	}
 	else
@@ -333,7 +334,7 @@ double IntegratorFunction::DoEval( Double_t x ) const
 	}
 }
 
-Double_t IntegratorFunction::Density( Int_t ndim, Double_t * xArray )
+Double_t IntegratorFunction::Density( Int_t ndim, Double_t * thisArray )
 {
 	if ( ndim == int(doIntegrate.size()) )
 	{
@@ -341,7 +342,7 @@ Double_t IntegratorFunction::Density( Int_t ndim, Double_t * xArray )
 		double* transformedArray = new double[unsigned(ndim)];
 		for ( int observableIndex = 0; observableIndex < ndim; ++observableIndex )
 		{
-			transformedArray[unsigned(observableIndex)] = minima[unsigned(observableIndex)] + ( ranges[unsigned(observableIndex)] * xArray[unsigned(observableIndex)] );
+			transformedArray[unsigned(observableIndex)] = minima[unsigned(observableIndex)] + ( ranges[unsigned(observableIndex)] * thisArray[unsigned(observableIndex)] );
 		}
 		double return_val = DoEval(transformedArray);
 		delete [] transformedArray;

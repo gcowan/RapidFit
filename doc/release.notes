@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/02/12 Rob Currie
+  - Adding new MultiDimChi2 test into RapidFit
+  - Adding minor bugfixes into code
+  - 1D integrator does not appear to be working for me so I've temporarily replaced it with a 1D brute forcing method (I'll investigate more when I have time but for now this fix works as expected)
+
 2013/02/03 Rob Currie
   - Fixing bugs in caching code for ComponentProjections
   - Fixing bugs in v6 and v7 PDFs which ONLY effects projections

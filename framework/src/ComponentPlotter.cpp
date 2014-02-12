@@ -67,6 +67,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		IConstraint* thisConst = initialBoundary->GetConstraint( allDescribedObservables[i] );
 		full_boundary->SetConstraint( allDescribedObservables[i], thisConst );
 		//cout << allDescribedObservables[i] << endl;
+		delete thisConst;
 	}
 
 	plotData->SetBoundary( full_boundary );
@@ -1916,7 +1917,7 @@ double ComponentPlotter::PDF2DataNormalisation( const unsigned int combinationIn
 	double range = fabs( boundary_max-boundary_min );
 	normalisation *= range;								//	Correct for the range of the dataset	(absolute range of Observable being projected)
 
-	normalisation /= combination_integral[ combinationIndex ];			//	Total Integral of the PDF	(We're plotting prob of PDF being at this point for a non-unitary PDF)
+	normalisation /= combination_integral[ combinationIndex ];			//	Total Integral of the PDF	(We're plotting prob of PDF being at this point for a non-unitary PDF Evaluate)
 
 	normalisation *= weight_norm;							//	Correct for the effect of non-unitary weights used in the fit
 

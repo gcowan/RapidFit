@@ -73,7 +73,7 @@ class RapidFitIntegrator
 		 *
 		 * @param Input     RapidFitIntegrator instance to duplicate internal state of
 		 */
-		RapidFitIntegrator ( const RapidFitIntegrator& );
+		RapidFitIntegrator( const RapidFitIntegrator& );
 
 		/*!
 		 * Destructor Function

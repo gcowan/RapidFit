@@ -91,7 +91,8 @@ numberRepeats(),
 	configFileListFlag(),
 	configFileList(),
 	dontGenerateAcceptanceHistos(),
-	runtimeArgs()
+	runtimeArgs(),
+	MultiDimChi2()
 {
 		//Variables to store command line arguments
 		numberRepeats = 0;
@@ -187,6 +188,8 @@ numberRepeats(),
 
 		configFileListFlag = false;
 		configFileList = vector<string>();
+
+		MultiDimChi2 = false;
 }
 
 RapidFitConfiguration::~RapidFitConfiguration()

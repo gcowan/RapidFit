@@ -135,3 +135,5 @@ void BuildTheseConstraints( RapidFitConfiguration* config );
 
 void MakeOutputFolder( RapidFitConfiguration* config );
 
+void PerformMultiDimChi2( RapidFitConfiguration* config );
+

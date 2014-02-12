@@ -124,6 +124,7 @@ class RapidFitConfiguration
 
 		bool dontGenerateAcceptanceHistos;
 
+		bool MultiDimChi2;
 	private:
 		/*!
 		 * @brief DO NOT COPY THE CONFIGURATION OBJECT!!!!!
