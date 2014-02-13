@@ -261,7 +261,7 @@ class RapidFitIntegrator
 		 */
 		double NumericallyIntegrateDataPoint( DataPoint* InputDataPoint, PhaseSpaceBoundary* InputPhaseSpace, vector<string> DoNotIntegrate, ComponentRef* InputRef = NULL );
 
-		double AnallyticallyIntegrateDataPoint( DataPoint* InputDataPoint, PhaseSpaceBoundary* InputPhaseSpace );
+		//double AnallyticallyIntegrateDataPoint( DataPoint* InputDataPoint, PhaseSpaceBoundary* InputPhaseSpace );
 
 		/*!
 		 * @brief Return a list of unclaimed and un-Integrable observables within this phase-space

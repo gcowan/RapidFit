@@ -1018,10 +1018,12 @@ double RapidFitIntegrator::NumericallyIntegrateDataPoint( DataPoint* NewDataPoin
 	return this->DoNumericalIntegral( NewDataPoint, NewBoundary, DontIntegrateThese, componentIndex, true );
 }
 
+/*
 double RapidFitIntegrator::AnallyticallyIntegrateDataPoint( DataPoint* NewDataPoint, PhaseSpaceBoundary* NewBoundary )
 {
 	return functionToWrap->Normalisation( NewDataPoint, NewBoundary );
 }
+*/
 
 //Actually perform the numerical integration
 double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, const vector<string> DontIntegrateThese, ComponentRef* componentIndex, const bool IntegrateDataPoint )
