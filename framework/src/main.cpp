@@ -474,6 +474,7 @@ string GenerateXML( RapidFitConfiguration* config, bool isForToys )
 	full_xml << endl;
 	full_xml << "<Seed>" << config->xmlFile->GetOriginalSeed() << "</Seed>" << endl;
 	full_xml << endl;
+	vector<string> OriginalSources;
 	if( isForToys == true )
 	{
 		full_xml << config->GlobalResult->GetResultParameterSet()->ToyXML();
@@ -482,6 +483,7 @@ string GenerateXML( RapidFitConfiguration* config, bool isForToys )
 			vector<DataSetConfiguration*> gen_list = (*toFit_i)->GetAllDataSetConfigs();
 			for( vector<DataSetConfiguration*>::iterator gen_i = gen_list.begin(); gen_i != gen_list.end(); ++gen_i )
 			{
+				OriginalSources.push_back( (*gen_i)->GetSource() );
 				(*gen_i)->SetSource("Foam");
 			}
 		}
@@ -507,6 +509,20 @@ string GenerateXML( RapidFitConfiguration* config, bool isForToys )
 		full_xml << endl;
 	}
 	full_xml << "</RapidFit>" << endl;
+
+	if( isForToys == true )
+	{
+		unsigned int count=0;
+		for( vector<PDFWithData*>::iterator toFit_i = config->pdfsAndData.begin(); toFit_i != config->pdfsAndData.end(); ++toFit_i )
+		{
+			vector<DataSetConfiguration*> gen_list = (*toFit_i)->GetAllDataSetConfigs();
+			for( vector<DataSetConfiguration*>::iterator gen_i = gen_list.begin(); gen_i != gen_list.end(); ++gen_i )
+			{
+				(*gen_i)->SetSource( OriginalSources[count] );
+				++count;
+			}
+		}
+	}
 
 	return full_xml.str();
 }
@@ -733,14 +749,20 @@ void MakeOutputFolder( RapidFitConfiguration* config )
 	//cout << "Writing Output Tuple to:\t" << fileName << endl;
 	//cout << "Output Folder:\t" << ResultFormatter::GetOutputFolder() << endl;
 	//cout << "Current Folder:\t" << gSystem->pwd() << endl;
-	ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs, GenerateXML( config, false ), GenerateXML( config, true ) );
+	string XMLForProjections = GenerateXML( config, false );
+	string XMLForToys = GenerateXML( config, true );
+	ResultFormatter::WriteFlatNtuple( fileName, config->GlobalFitResult, config->xmlFile->GetXML(), config->runtimeArgs, XMLForProjections, XMLForToys );
 	ResultFormatter::ReviewOutput( config->GlobalResult );
 }
 
 void PerformMultiDimChi2( RapidFitConfiguration* config )
 {
 	cout << "Passing over from main to MultiDimChi2 Test!" << endl;
-	vector<string> wantedObservables( 1, "time" );
+	vector<string> wantedObservables;
+	//wantedObservables.push_back( "time" );
+	wantedObservables.push_back( "helcosthetaK" );
+	wantedObservables.push_back( "helcosthetaL" );
+	wantedObservables.push_back( "helphi" );
 	vector<PDFWithData*> allObjects = config->pdfsAndData;
 	PhaseSpaceBoundary* thisBound = new PhaseSpaceBoundary( * allObjects[0]->GetDataSet()->GetBoundary() );
 	MultiDimChi2* thisTest = new MultiDimChi2( allObjects, thisBound, wantedObservables );

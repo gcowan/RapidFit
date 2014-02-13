@@ -62,7 +62,7 @@ RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerica
 	ratioOfIntegrals(-1.), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL),
 	functionCanIntegrate(false), haveTestedIntegral(false), num_threads(4),
 	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(new DebugClass(false) ),
-	pseudoRandomIntegration( UsePseudoRandomIntegration ), GSLFixedPoints( __DEFAULT_RAPIDFIT_FIXEDINTEGRATIONPOINTS )
+	pseudoRandomIntegration( UsePseudoRandomIntegration ), GSLFixedPoints( __DEFAULT_RAPIDFIT_FIXEDINTEGRATIONPOINTS ), _storedConfig(NULL)
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,28,0)
@@ -79,7 +79,8 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 	fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
 	pseudoRandomIntegration(input.pseudoRandomIntegration), functionCanIntegrate( input.functionCanIntegrate ), haveTestedIntegral( true ),
 	RapidFitIntegratorNumerical( input.RapidFitIntegratorNumerical ), obs_check( input.obs_check ), checked_list( input.checked_list ),
-	debug((input.debug==NULL)?NULL:new DebugClass(*input.debug)), num_threads(input.num_threads), GSLFixedPoints( input.GSLFixedPoints )
+	debug((input.debug==NULL)?NULL:new DebugClass(*input.debug)), num_threads(input.num_threads), GSLFixedPoints( input.GSLFixedPoints ),
+	_storedConfig( input._storedConfig==NULL?NULL:new RapidFitIntegratorConfig( *input._storedConfig ) )
 {
 	//	We don't own the PDF so no need to duplicate it as we have to be told which one to use
 	//if( input.functionToWrap != NULL ) functionToWrap = ClassLookUp::CopyPDF( input.functionToWrap );
@@ -118,6 +119,15 @@ void RapidFitIntegrator::SetUpIntegrator( const RapidFitIntegratorConfig* config
 	this->SetMaxIntegrationSteps( config->MaxIntegrationSteps );
 	this->SetIntegrationAbsTolerance( config->IntegrationRelTolerance );
 	this->SetIntegrationRelTolerance( config->IntegrationAbsTolerance );
+	if( this->_storedConfig != NULL ) delete this->_storedConfig;
+	this->_storedConfig = NULL;
+	this->_storedConfig = new RapidFitIntegratorConfig( *config );
+}
+
+RapidFitIntegratorConfig* RapidFitIntegrator::GetIntegratorConfig() const
+{
+	if( this->_storedConfig == NULL ) this->_storedConfig = new RapidFitIntegratorConfig();
+	return _storedConfig;
 }
 
 void RapidFitIntegrator::SetMaxIntegrationSteps( const unsigned int input )
@@ -194,6 +204,7 @@ RapidFitIntegrator::~RapidFitIntegrator()
 	if( fastIntegrator != NULL ) delete fastIntegrator;
 	if( debug != NULL ) delete debug;
 	//this->clearGSLIntegrationPoints();
+	if( this->_storedConfig != NULL ) delete this->_storedConfig;
 }
 
 //Return the integral over all observables
@@ -308,11 +319,13 @@ vector<string> RapidFitIntegrator::DontNumericallyIntegrateList( const DataPoint
 	return dontIntegrate;
 }
 
-double RapidFitIntegrator::TestIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary )
+double RapidFitIntegrator::TestIntegral( DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, vector<string> DoNotIntegrate )
 {
 	NewDataPoint->SetPhaseSpaceBoundary( NewBoundary );
 	//Make a list of observables not to integrate
 	vector<string> dontIntegrate = functionToWrap->GetDoNotIntegrateList();
+
+	dontIntegrate = StringProcessing::CombineUniques( dontIntegrate, DoNotIntegrate );
 
 	double testIntegral = 0.;
 	try
@@ -779,10 +792,10 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
 		{
 			cout << "RapidFitIntegrator: Starting to use GSL PseudoRandomNumberThreaded :D" << endl;
-			for( unsigned int i=0; i< doIntegrate.size(); ++i ) cout << doIntegrate[i] << "\t";
-			cout << endl;
-			for( unsigned int i=0; i< dontIntegrate.size(); ++i ) cout << dontIntegrate[i] << "\t";
-			cout << endl;
+			//for( unsigned int i=0; i< doIntegrate.size(); ++i ) cout << doIntegrate[i] << "\t";
+			//cout << endl;
+			//for( unsigned int i=0; i< dontIntegrate.size(); ++i ) cout << dontIntegrate[i] << "\t";
+			//cout << endl;
 			cout << "Component: " << componentIndex << endl;
 			if( componentIndex != NULL ) cout << componentIndex->getComponentName() << endl;
 		}
@@ -846,6 +859,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	ThreadingConfig* thisConfig = new ThreadingConfig();
 	thisConfig->numThreads = num_threads;
 	thisConfig->MultiThreadingInstance = "pthreads";
+
 	if( componentIndex != NULL ) thisConfig->wantedComponent = new ComponentRef( *componentIndex );
 	else thisConfig->wantedComponent = NULL;
 
@@ -1004,6 +1018,11 @@ double RapidFitIntegrator::NumericallyIntegrateDataPoint( DataPoint* NewDataPoin
 	return this->DoNumericalIntegral( NewDataPoint, NewBoundary, DontIntegrateThese, componentIndex, true );
 }
 
+double RapidFitIntegrator::AnallyticallyIntegrateDataPoint( DataPoint* NewDataPoint, PhaseSpaceBoundary* NewBoundary )
+{
+	return functionToWrap->Normalisation( NewDataPoint, NewBoundary );
+}
+
 //Actually perform the numerical integration
 double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, const vector<string> DontIntegrateThese, ComponentRef* componentIndex, const bool IntegrateDataPoint )
 {
@@ -1041,6 +1060,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 		{
 			DataPoint* thisDataPoint = new DataPoint( *NewDataPoint );
 			thisDataPoint->SetPhaseSpaceBoundary( NewBoundary );
+			ratioOfIntegrals = 1.;
 			double returnVal=0.;
 			try{
 				returnVal = functionToWrap->Evaluate( thisDataPoint );
@@ -1057,6 +1077,7 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 		{
 			vector<DataPoint*> theseCombs = NewBoundary->GetDiscreteCombinations();
 			for( unsigned int i=0; i< theseCombs.size(); ++i ) DiscreteIntegrals.push_back( new DataPoint( *(theseCombs[i]) ) );
+			ratioOfIntegrals = 1.;
 			double returnVal=0.;
 			for( unsigned int i=0; i< DiscreteIntegrals.size(); ++i )
 			{
@@ -1296,6 +1317,7 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 	{
 		if( doIntegrate.empty() )
 		{
+			ratioOfIntegrals = 1.;
 			try{
 				value = functionToWrap->EvaluateComponent( NewDataPoint, Component );
 			}
@@ -1308,6 +1330,7 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 		}
 		else if( testedIntegrable.size() == 1 )
 		{
+			ratioOfIntegrals = 1.;
 			if( testedIntegrable[0] == ProjectThis )
 			{
 				try{

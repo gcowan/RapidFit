@@ -64,9 +64,9 @@ class MultiDimChi2
 
 		double CalculateTotalExpected( vector<double> thisBinCenter );
 
-		void ConstructBoundaries( PhaseSpaceBoundary* totalPhaseSpace );
+		void ConstructBoundaries( PhaseSpaceBoundary* totalPhaseSpace, vector<string> );
 
-		double PDF2DataNormalisation( unsigned int PDFNum, const unsigned int combinationIndex );
+		double PDF2DataNormalisation( unsigned int PDFNum, const unsigned int combinationIndex, DataPoint* thisDataPoint );
 
 		unsigned int data_binning;
 
@@ -74,11 +74,15 @@ class MultiDimChi2
 		vector<vector<double> > combinationIntegrals;
 		vector<double> weightNorms;
 
-		void ConstructIntegralsRatios();
+		void ConstructIntegralsRatios( vector<string> wantedObservables );
 
 		double CalculateRange( PhaseSpaceBoundary* thisBound );
 
 		void populateAllObjects( vector<PDFWithData*> allObjects );
+
+		double CorrectIntegral( double input_Integral, DataPoint* thisPoint, PhaseSpaceBoundary* thisPhaseSpace, RapidFitIntegrator* thisPDFIntegrator );
+
+		double CorrectYield( IDataSet* thisSet, DataPoint* thisPoint );
 };
 
 #endif

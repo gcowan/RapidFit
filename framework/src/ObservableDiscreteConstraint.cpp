@@ -145,7 +145,8 @@ void ObservableDiscreteConstraint::Print() const
 	{
 		cout << ",  " << allValues[i] ;
 	}
-	cout << "\tUnit: " << unit << endl;
+	cout << "\tUnit: " << unit;
+	cout << "\tDiscrete." << endl;
 }
 
 //	This is intentionally BAD BY DESIGN

@@ -126,6 +126,17 @@ int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint ) const
 	}
 }
 
+vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( DataPoint* templateDataPoint ) const
+{
+	if( templateDataPoint == NULL ) return allData;
+	else
+	{
+		pair< vector<ObservableRef>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( templateDataPoint );
+		vector<DataPoint*> thisSubSet = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
+		return thisSubSet;
+	}
+}
+
 //Get the data bound
 PhaseSpaceBoundary * MemoryDataSet::GetBoundary() const
 {

@@ -20,6 +20,7 @@
 #include "IMinimiser.h"
 #include "IDataGenerator.h"
 #include "IPrecalculator.h"
+#include "IConstraint.h"
 ///	System Headers
 #include <iostream>
 #include <vector>
@@ -127,6 +128,7 @@ class ClassLookUp
 		 */
 		static void* getObject( string Name );
 
+		static IConstraint* CopyConstraint( IConstraint* );
 };
 
 #endif

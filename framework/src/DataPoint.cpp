@@ -56,7 +56,10 @@ DataPoint::DataPoint( const DataPoint& input ) :
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
-		allObservables.push_back( new Observable(*(input.allObservables[i])) );
+		if( input.allObservables[i] != NULL )
+		{
+			allObservables.push_back( new Observable(*(input.allObservables[i])) );
+		}
 	}
 }
 
@@ -210,6 +213,7 @@ void DataPoint::AddObservable( string Name, double Value, string Unit, bool trus
 	{
 		this->AddObservable( Name, tempObservable );
 	}
+	delete tempObservable;
 }
 
 //Initialise observable

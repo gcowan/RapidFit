@@ -1,5 +1,6 @@
 
-
+#include "TH1D.h"
+#include "TCanvas.h"
 #include "THn.h"
 #include "MultiDimChi2.h"
 #include "PhaseSpaceBoundary.h"
@@ -8,18 +9,22 @@
 #include "StringProcessing.h"
 #include "IPDF.h"
 #include <string>
+#include <cmath>
 #include "ClassLookUp.h"
 #include "PDFWithData.h"
+#include "RapidFitIntegrator.h"
+#include "RapidFitIntegratorConfig.h"
 
 using namespace::std;
 
-MultiDimChi2::MultiDimChi2( vector<PDFWithData*> allObjects, PhaseSpaceBoundary* thisBound, vector<string> wantedObservables )
+MultiDimChi2::MultiDimChi2( vector<PDFWithData*> allObjects, PhaseSpaceBoundary* thisBound, vector<string> wantedObservables ) :
+	internalHisto(NULL), allBinCenters(NULL) 
 {
 	//	Populate PDF, DataSets and PhaseSpaceBoundaries to be used in this analysis
 	cout << "MultiDimChi2 Hello!" << endl << endl;
 	cout << "initializing objects" << endl;
 	this->populateAllObjects( allObjects );
-	this->ConstructBoundaries( thisBound );
+	this->ConstructBoundaries( thisBound, wantedObservables );
 
 	cout << "Deciding binning and constructing THnD" << endl;
 	//	Construct the Histogram object which contains all of the Data of Interest
@@ -31,7 +36,7 @@ MultiDimChi2::MultiDimChi2( vector<PDFWithData*> allObjects, PhaseSpaceBoundary*
 
 	cout << "Calculating the Numerical vs Analytical Ratios" << endl;
 	//	Construct the Ratios of the Numerical vs analytical Integrals (condensing the differenced between the PDF numerator and denominator to be a single number but what else can we do...)
-	this->ConstructIntegralsRatios();
+	this->ConstructIntegralsRatios( wantedObservables );
 
 	cout << "Constructing all of the Coordinates to perform a Chi2 test over" << endl;
 	//	Construct the full set of coordinates that the Chi2 test is to be run over
@@ -47,17 +52,23 @@ void MultiDimChi2::populateAllObjects( vector<PDFWithData*> allObjects )
 	{
 		allDataSets.push_back( allObjects[i]->GetDataSet() );	//      Copy Reference, don't take ownership!
 		allPDFs.push_back( ClassLookUp::CopyPDF( allObjects[i]->GetPDF() ) );	// 	More than likely going to cause something to change so lets make it on our copy, just incase
+		RapidFitIntegratorConfig* thisConf = allPDFs.back()->GetPDFIntegrator()->GetIntegratorConfig();
+		thisConf->useGSLIntegrator = true;
+		thisConf->numThreads = 16;
+		allPDFs.back()->GetPDFIntegrator()->SetUpIntegrator( thisConf );
 	}
 }
 
-void MultiDimChi2::ConstructIntegralsRatios()
+void MultiDimChi2::ConstructIntegralsRatios( vector<string> wanted_params )
 {
+	(void) wanted_params;
 	ratioOfIntegrals.clear();
 	combinationIntegrals.clear();
 	weightNorms.clear();
 
 	for( unsigned int PDFNum=0; PDFNum< allPDFs.size(); ++PDFNum )
 	{
+		cout << "\tCalculating Ratios for PDF: " << PDFNum+1 << endl;
 		IPDF* thisPDF = allPDFs[PDFNum];
 		RapidFitIntegrator* pdfIntegrator = thisPDF->GetPDFIntegrator();
 		IDataSet* thisData = allDataSets[PDFNum];
@@ -65,45 +76,63 @@ void MultiDimChi2::ConstructIntegralsRatios()
 		vector<double> thisCombination_integral;
 		PhaseSpaceBoundary* thisBound = allBoundaries[PDFNum];
 
-		vector<DataPoint*> allCombinations = allBoundaries[PDFNum]->GetDiscreteCombinations();
+		thisPDF->ChangePhaseSpace( thisBound );
+
+		vector<DataPoint*> allCombinations = thisBound->GetDiscreteCombinations();
+
+		//thisBound->Print();
+
 
 		for( unsigned int i=0; i< allCombinations.size(); ++i )
 		{
-			/*
-			   if( debug != NULL )
-			   {
-			   if( debug->DebugThisClass( "MultiDimChi2" ) )
-			   {
-			   cout << "MultiDimChi2:: Calculating Test integrals:\t" << i << endl;
-			   }
-			   }*/
+			thisratioOfIntegrals.push_back( 1. );
+			thisCombination_integral.push_back( 1. );
+
+			/*			cout << "\t\tCalculating Ratios for Combination: " << i+1 << " of " << allCombinations.size() << endl;
+			//allCombinations[i]->Print();
+			//
+			//   if( debug != NULL )
+			//   {
+			//   if( debug->DebugThisClass( "MultiDimChi2" ) )
+			//   {
+			//   cout << "MultiDimChi2:: Calculating Test integrals:\t" << i << endl;
+			//   }
+			//   }
 			pdfIntegrator->ForceTestStatus( false );
+
+			vector<string> doNotList = thisPDF->GetDoNotIntegrateList();
+			//doNotList = StringProcessing::CombineUniques( doNotList, wanted_params );
 			double thisIntegral = 0.;
 			try
 			{
-				thisIntegral = pdfIntegrator->NumericallyIntegrateDataPoint( allCombinations[i], thisBound, thisPDF->GetDoNotIntegrateList() );
+			//allCombinations[i]->SetPhaseSpaceBoundary( thisBound );
+			//cout << thisBound->DiscreteDescription( allCombinations[i] ) << endl;
+			thisIntegral = pdfIntegrator->NumericallyIntegrateDataPoint( allCombinations[i], thisBound, doNotList );
 			}
 			catch(...)
 			{
-				thisIntegral = 1.;
-				cout << endl << "CANNOT PROPERLY NORMALISE WHOLE PDF, THIS WILL LEAD TO NORMALISATION ISSUES OVER THE WHOLE PDF" << endl << endl;
+			thisIntegral = 1.;
+			cout << endl << "CANNOT PROPERLY NORMALISE WHOLE PDF, THIS WILL LEAD TO NORMALISATION ISSUES OVER THE WHOLE PDF" << endl << endl;
 			}
-			/*
-			   if( debug != NULL )
-			   {
-			   if( debug->DebugThisClass( "MultiDimChi2" ) )
-			   {
-			   cout << "MultiDimChi2:: Finished Inetgral" << endl;
-			   }
-			   }*/
+			//
+			//   if( debug != NULL )
+			//   {
+			//   if( debug->DebugThisClass( "MultiDimChi2" ) )
+			//   {
+			//   cout << "MultiDimChi2:: Finished Inetgral" << endl;
+			//   }
+			//   }
 
 			thisCombination_integral.push_back( thisIntegral );
 
 			if( thisPDF->GetNumericalNormalisation() == true ) thisratioOfIntegrals.push_back( 1. );
-			else
-			{
-				thisratioOfIntegrals.push_back( pdfIntegrator->GetRatioOfIntegrals() );
-			}
+			//else
+			//{
+			//	thisratioOfIntegrals.push_back( pdfIntegrator->GetRatioOfIntegrals() );
+			//}
+			thisratioOfIntegrals.push_back( 1. );
+
+*/
 		}
 
 		/*
@@ -121,7 +150,7 @@ void MultiDimChi2::ConstructIntegralsRatios()
 		if( thisratioOfIntegrals.size() == 0 || thisratioOfIntegrals.empty() ) thisratioOfIntegrals =vector<double> ( 1, 1. );
 
 		ratioOfIntegrals.push_back( thisratioOfIntegrals );
-		combinationIntegrals.push_back( thisCombination_integral );
+		//combinationIntegrals.push_back( thisCombination_integral );
 
 		double thisWeight_norm = 0.;
 		double weight_sum = thisData->GetSumWeights();
@@ -135,8 +164,13 @@ void MultiDimChi2::ConstructIntegralsRatios()
 		   {
 		   cout << "Weight Norm: " << weight_norm << endl;
 		   }
-		   }*/
+		   } */
 		weightNorms.push_back( thisWeight_norm );
+
+		cout << "Alpha: " << thisData->GetAlpha() << endl;
+		//weightNorms.back() /= thisData->GetAlpha();
+
+		pdfIntegrator->ForceTestStatus( true );
 	}
 }
 
@@ -145,6 +179,7 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 	nDim=0;
 	x_min.clear(); x_max.clear(); goodObservables.clear(); x_bins.clear();
 
+	cout << "\tDecicing Binning" << endl;
 	data_binning = 1;
 	unsigned int x_binning=0;
 	for( unsigned int i=0; i< wantedObservables.size(); ++i )
@@ -156,7 +191,9 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 			x_min.push_back( thisConstraint->GetMinimum() );
 			x_max.push_back( thisConstraint->GetMaximum() );
 			goodObservables.push_back( wantedObservables[i] );
-			x_binning = 10;
+			if( wantedObservables[i] == "time" ) x_binning = 4.;
+			else x_binning = 4;
+			//x_binning = 2;
 			x_bins.push_back( x_binning );
 			data_binning *= x_binning;
 			ThisObsBinning* thisDimension = new ThisObsBinning();
@@ -169,14 +206,17 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 		}
 	}
 
+	cout << "\tConstructing THnD" << endl;
 	if( internalHisto != NULL ) delete internalHisto;
 
+	cout << "\t\tinternal_Chi2nDim\t" << nDim << "\t" << x_bins[0] << "\t" << x_min[0] << "\t" << x_max[0] << endl;
 	internalHisto = new THnD( "internal_Chi2nDim", "internal_Chi2nDim", (int)nDim, &(x_bins[0]), &(x_min[0]), &(x_max[0]) );
 
 	vector<double> thisValues( goodObservables.size(), 0. );
 	double thisWeight = 0.;
 	DataPoint* thisPoint=NULL;
 
+	cout << "\tPopulating THnD" << endl;
 	for( unsigned int i=0; i< allDataSets.size(); ++i )
 	{
 		for( unsigned int j=0; j< (unsigned)allDataSets[i]->GetDataNumber(); ++j )
@@ -191,6 +231,15 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 		}
 	}
 
+	for( unsigned int i=0; i< theseDimensions.size(); ++i )
+	{
+		TH1D* h1 = internalHisto->Projection( i, "E" );
+		TString name("c");
+		name+=i;
+		TCanvas* c1 = new TCanvas( name, name );
+		h1->Draw("");
+		c1->Print("Output.pdf");
+	}
 }
 
 void MultiDimChi2::ConstructBinCenters()
@@ -247,6 +296,9 @@ void MultiDimChi2::PerformMuiltDimTest()
 		cout << "Calculating Number of Expected Events in Bin: " << histo_binNum << endl;
 
 		expected_events[binNum] = this->CalculateTotalExpected( thisBinCenter );
+
+		cout << "O: " << observed_events[binNum] << "  E: " << expected_events[binNum] << endl;
+		//exit(0);
 	}
 
 	cout << "Finished Looping over all coordinates!" << endl;
@@ -264,11 +316,21 @@ double MultiDimChi2::CalcChi2( vector<double> expected_events, vector<double> ob
 	double thisChi2=0.;
 	for( unsigned int i=0; i< expected_events.size(); ++i )
 	{
-		thisChi2 = expected_events[i] - observed_events[i] + observed_events[i]*log( observed_events[i] / expected_events[i] );
-		Chi2Value += thisChi2;
+		cout << "O: " << observed_events[i] << "  E: " << expected_events[i] << endl;
+		thisChi2 = expected_events[i] - observed_events[i] + observed_events[i] * log( observed_events[i] / expected_events[i] );
+		/*
+		//thisChi2 = expected_events[i] - observed_events[i] + observed_events[i]*log( observed_events[i] / expected_events[i] );
+		vector<double> thisBinCenter = allBinCenters->at( i );
+		int histo_binNum = (unsigned)internalHisto->GetBin( &(thisBinCenter[0]) );
+		thisChi2 = ( observed_events[i] - expected_events[i] ) / internalHisto->GetBinError( histo_binNum );
+		cout << thisChi2*thisChi2 << endl;
+		*/
+		if( !std::isnan(thisChi2) && !std::isinf(thisChi2) )
+		{
+			Chi2Value += thisChi2;
+		}
 	}
-	Chi2Value*=2.;
-	return Chi2Value;
+	return 2.*Chi2Value;
 }
 
 double MultiDimChi2::CalculateTotalExpected( vector<double> thisBinCenter )
@@ -279,6 +341,7 @@ double MultiDimChi2::CalculateTotalExpected( vector<double> thisBinCenter )
 	cout << "Calculating Expected Number of Events for this Bin" << endl;
 
 	IPDF* thisPDF=NULL;
+	IDataSet* thisDataSet=NULL;
 	DataPoint* thisDataPoint=NULL;
 
 	vector<ObservableRef> theseDim;
@@ -292,46 +355,94 @@ double MultiDimChi2::CalculateTotalExpected( vector<double> thisBinCenter )
 	for( unsigned int PDFNum=0; PDFNum< allPDFs.size(); ++PDFNum )
 	{
 		thisPDF = allPDFs[PDFNum];
+		thisDataSet = allDataSets[PDFNum];
 		RapidFitIntegrator* thisPDFIntegrator = thisPDF->GetPDFIntegrator();
+
+		thisPDFIntegrator->SetPDF( thisPDF );
+		thisPDFIntegrator->ForceTestStatus( false );
 
 		vector<string> doNotIntegrate = thisPDF->GetDoNotIntegrateList();
 
 		doNotIntegrate = StringProcessing::CombineUniques( doNotIntegrate, theseDimName );
 
-		PhaseSpaceBoundary* thisParamSet = allBoundaries[PDFNum];
+		PhaseSpaceBoundary* thisPhaseSpace = new PhaseSpaceBoundary( *allBoundaries[PDFNum] );
+		PhaseSpaceBoundary* thisPhaseSpace2 = new PhaseSpaceBoundary( *allBoundaries[PDFNum] );
 
-		vector<DataPoint*> theseDataPoints = thisParamSet->GetDiscreteCombinations();
+		vector<DataPoint*> theseDataPoints;
+		vector<DataPoint*> tempPoints = thisPhaseSpace->GetDiscreteCombinations();
+
+		for( unsigned int i=0; i< tempPoints.size(); ++i ) theseDataPoints.push_back( new DataPoint( *tempPoints[i] ) );
 
 		double thisResult=0.;
 
-		cout << "I have " << theseDataPoints.size()+1 << " integrals to perform for PhaseSpace: " << PDFNum+1 << endl;
+		cout << "\tI have " << theseDataPoints.size() << " integrals to perform for PhaseSpace: " << PDFNum+1 << endl;
 
 		for( unsigned int combinationNum = 0; combinationNum< theseDataPoints.size(); ++combinationNum )
 		{
-			thisDataPoint = theseDataPoints[combinationNum];
+			thisDataPoint = new DataPoint( *theseDataPoints[combinationNum] );
 
 			for( unsigned int i=0; i< theseDim.size(); ++i )
 			{
 				Observable* newObs = new Observable( string(theseDim[i]), thisBinCenter[i], "noUnits_Chi2" );
 				thisDataPoint->SetObservable( theseDim[i], newObs );
 				delete newObs;
+				double newMin = thisBinCenter[i]-0.5* theseDimensions[i]->thisStepSize;
+				double newMax = thisBinCenter[i]+0.5* theseDimensions[i]->thisStepSize;
+				thisPhaseSpace->SetConstraint( string(theseDim[i]), newMin, newMax, "noUnits_Chi2" );
+				//cout << string(theseDim[i]) << "  " << newMin << "  " << newMax << endl;
+			}
+			vector<string> discNames = thisPhaseSpace->GetDiscreteNames();
+			for( unsigned int i=0; i< discNames.size(); ++i )
+			{
+				double value = thisDataPoint->GetObservable( discNames[i] )->GetValue();
+				thisPhaseSpace->SetConstraint( discNames[i], vector<double>(1,value), "noUnits_Chi2" );
+				thisPhaseSpace2->SetConstraint( discNames[i], vector<double>(1,value), "noUnits_Chi2" );
 			}
 
-			cout << "Calculating Integral: " << combinationNum +1 << endl;
+			cout << "\tCalculating Integral: " << combinationNum +1 << endl;
 
-			double Integral = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisParamSet, doNotIntegrate ); 
+			
+			//thisPDFIntegrator->ForceTestStatus( false );
 
-			cout << "Integral = " << Integral << endl;
+			//double Ratio = thisPDFIntegrator->TestIntegral( thisDataPoint, thisPhaseSpace );
 
-			cout << "Scaling Integral to DataSet." << endl;
+			thisPDFIntegrator->ForceTestStatus( true );
 
-			double PDF2DataNorm = this->PDF2DataNormalisation( PDFNum, combinationNum );
+			double Total = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace2, thisPDF->GetDoNotIntegrateList() );
 
-			cout << "Scale = " << PDF2DataNorm << endl;
+			thisPDFIntegrator->clearGSLIntegrationPoints();
+			double Integral = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace, thisPDF->GetDoNotIntegrateList() );
+			
 
-			double thisYield=Integral*PDF2DataNorm;
+			/*
+			double Total = thisPDF->Integral( thisDataPoint, thisPhaseSpace2 );
 
-			cout << "Expected Yield for thisCombination = " << thisYield << endl;
+			double Integral = thisPDF->Integral( thisDataPoint, thisPhaseSpace );
+			*/
+			/*
+			thisPDFIntegrator->clearGSLIntegrationPoints();
+			//Integral = this->CorrectIntegral( Integral, thisDataPoint, thisPhaseSpace, thisPDFIntegrator );
+			double newMin = thisBinCenter[0]-0.5* theseDimensions[0]->thisStepSize;
+			thisDataPoint->SetObservable( "time", newMin, "noUnits_Chi2" );
+			double Integral2 = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace, doNotIntegrate );
+
+			thisPDFIntegrator->clearGSLIntegrationPoints();
+			double newMax = thisBinCenter[0]+0.5* theseDimensions[0]->thisStepSize;
+			thisDataPoint->SetObservable( "time", newMax, "noUnits_Chi2" );
+			double Integral3 = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace, doNotIntegrate );
+			*/
+			cout << "\tIntegral = " << Integral << endl;//" : " << Integral2 << " : " << Integral3 << endl;
+			cout << "\tTotal = " << Total << endl;
+
+			cout << "\tScaling Integral to DataSet." << endl;
+
+			double PDF2DataNorm = this->CorrectYield( thisDataSet, thisDataPoint );
+
+			cout << "\tScale = " << PDF2DataNorm << endl;
+
+			double thisYield = (Integral/Total) * PDF2DataNorm;
+
+			cout << "\tExpected Yield for thisCombination = " << thisYield << endl;
 
 			thisResult += thisYield;
 		}
@@ -339,9 +450,81 @@ double MultiDimChi2::CalculateTotalExpected( vector<double> thisBinCenter )
 		result_AllPDFs += thisResult;
 	}
 
-	cout << "Returning Expected Number of Events for this Coordinate" << endl;
+	cout << "\tReturning Expected Number of Events for this Coordinate" << endl;
 
 	return result_AllPDFs;
+}
+
+double MultiDimChi2::CorrectIntegral( double input_Integral, DataPoint* thisPoint, PhaseSpaceBoundary* thisPhaseSpace, RapidFitIntegrator* thisPDFIntegrator )
+{
+	double output_integral = input_Integral;
+
+	//	Correct for Non Unitary PDF
+	output_integral /= 1.;//hisPDFIntegrator->TestIntegral( thisPoint, thisPhaseSpace );
+
+	return output_integral;
+}
+
+double MultiDimChi2::CorrectYield( IDataSet* thisSet, DataPoint* thisPoint )
+{
+	double total_yield = 0.;
+	vector<DataPoint*> thesePoints = thisSet->GetDiscreteSubSet( thisPoint );
+	if( thisSet->GetWeightsWereUsed() )
+	{
+		ObservableRef thisRef( thisSet->GetWeightName() );
+		for( unsigned int i=0; i< thesePoints.size(); ++i )
+		{
+			bool isInRange = true;
+			/* for( unsigned int j=0; j< theseDimensions.size(); ++j )
+			{
+				double center = thisPoint->GetObservable( theseDimensions[j]->ObservableName )->GetValue();
+				double StepSize = theseDimensions[j]->thisStepSize;
+				double new_min = center-0.5*StepSize;
+				double new_max = center+0.5*StepSize;
+
+				double thisPointVal = thesePoints[i]->GetObservable( theseDimensions[j]->ObservableName )->GetValue();
+
+				if( thisPointVal > new_max || thisPointVal < new_min )
+				{
+					isInRange = false;
+					break;
+				}
+			} */
+
+			if( isInRange )
+			{
+				total_yield += thesePoints[i]->GetEventWeight();//GetObservable( thisRef )->GetValue();
+			}
+		}
+	}
+	else
+	{
+		for( unsigned int i=0; i< thesePoints.size(); ++i )
+		{
+			bool isInRange = true;
+			for( unsigned int j=0; j< theseDimensions.size(); ++j )
+			{
+				double center = thisPoint->GetObservable( theseDimensions[j]->ObservableName )->GetValue();
+				double StepSize = theseDimensions[j]->thisStepSize;
+				double new_min = center-0.5*StepSize;
+				double new_max = center+0.5*StepSize;
+
+				double thisPointVal = thesePoints[i]->GetObservable( theseDimensions[j]->ObservableName )->GetValue();
+
+				if( thisPointVal > new_max || thisPointVal < new_min )
+				{
+					isInRange = false;
+					break;
+				}
+			}
+
+			if( isInRange )
+			{
+				++total_yield;
+			}
+		}
+	}
+	return total_yield;
 }
 
 void MultiDimChi2::ConstructAllCoordinates()
@@ -363,22 +546,42 @@ void MultiDimChi2::ConstructAllCoordinates()
 	{
 		this->AddCoordinates( i );
 	}
+
+	/*
+	for( unsigned int i=0; i< allBinCenters->size(); ++i )
+	{
+		for( unsigned int j=0; j< allBinCenters->at(i).size(); ++j )
+		{
+			cout << (*allBinCenters)[i][j] << "  ";
+		}
+		cout << endl;
+	}
+	exit(0);
+	*/
 }
 
 void MultiDimChi2::AddCoordinates( unsigned int thisDim )
 {
+	cout << "Adding Coordinated for dimension: " << thisDim << endl;
+
 	unsigned int number_of_set_repeats = 1;
 	for( unsigned int i=0; i< thisDim; ++i )
 	{
 		number_of_set_repeats *= theseDimensions[i]->theseBins;
 	}
 
+	cout << "There are: " << (thisDim-0) << " dimensions 'outside' this one." << endl;
+
 	unsigned int number_of_individual_repeats = 1;
 
-	for( unsigned int i=thisDim; i< nDim; ++i )
+	for( unsigned int i=thisDim+1; i< nDim; ++i )
 	{
+		cout << i << "  " << theseDimensions[i]->theseBins << endl;
 		number_of_individual_repeats *= theseDimensions[i]->theseBins;
 	}
+
+	cout << "There are: " << ((nDim-1)-thisDim) << " dimensions 'inside' this one." << endl;
+	cout << number_of_set_repeats << "  x  " << number_of_individual_repeats << endl;
 
 	unsigned int global_count=0;
 	for( unsigned int i=0; i< number_of_set_repeats; ++i )
@@ -394,7 +597,7 @@ void MultiDimChi2::AddCoordinates( unsigned int thisDim )
 	}
 }
 
-void MultiDimChi2::ConstructBoundaries( PhaseSpaceBoundary* totalPhaseSpace )
+void MultiDimChi2::ConstructBoundaries( PhaseSpaceBoundary* totalPhaseSpace, vector<string> wanted_observables )
 {
 	for( unsigned int i=0; i< allPDFs.size(); ++i )
 	{
@@ -403,11 +606,15 @@ void MultiDimChi2::ConstructBoundaries( PhaseSpaceBoundary* totalPhaseSpace )
 		PhaseSpaceBoundary* thisPhaseSpace = allBoundaries.back();
 		for( unsigned int j=0; j< allDescribedObservables.size(); ++j )
 		{
-			IConstraint* thisConst = totalPhaseSpace->GetConstraint( allDescribedObservables[j] );
-			thisPhaseSpace->SetConstraint( allDescribedObservables[j], thisConst );
-			delete thisConst;
+			//	if( StringProcessing::VectorContains( wanted_observables, allDescribedObservables[j] ) == -1 )
+			{
+				IConstraint* thisConst = ClassLookUp::CopyConstraint( totalPhaseSpace->GetConstraint( allDescribedObservables[j] ) );
+				thisPhaseSpace->SetConstraint( allDescribedObservables[j], thisConst );
+				delete thisConst;
+			}
 		}
 		allPDFs[i]->ChangePhaseSpace( thisPhaseSpace );
+		allDataSets[i]->SetBoundary( thisPhaseSpace );
 	}
 }
 
@@ -424,26 +631,120 @@ double MultiDimChi2::CalculateRange( PhaseSpaceBoundary* thisBound )
 	return range;
 }
 
-double MultiDimChi2::PDF2DataNormalisation( unsigned int PDFDataNum, const unsigned int combinationIndex )
+double MultiDimChi2::PDF2DataNormalisation( unsigned int PDFDataNum, const unsigned int combinationIndex, DataPoint* thisDataPoint )
 {
+	IPDF* thisPDF = allPDFs[ PDFDataNum ];
 	IDataSet* thisDataSet = allDataSets[ PDFDataNum ];
 	PhaseSpaceBoundary* thisBound = allBoundaries[ PDFDataNum ];
 	double normalisation=1.;
 
-	normalisation *= fabs(ratioOfIntegrals[ PDFDataNum ][ combinationIndex ]);                    //      Attempt to correct for Numerical != analytical due to any constant factor due to numerical inaccuracy
+
+	PhaseSpaceBoundary* thisBound3 = new PhaseSpaceBoundary( *thisBound );
+	vector<string> wantedParams;
+	for( unsigned int i=0; i< theseDimensions.size(); ++i )
+	{
+		wantedParams.push_back( theseDimensions[i]->ObservableName );
+		double value = thisDataPoint->GetObservable( wantedParams.back() )->GetValue();
+		thisBound3->SetConstraint( theseDimensions[i]->ObservableName, vector<double>(1, value), "unitless" );
+	}
+	vector<string> fixed_param = thisBound3->GetDiscreteNames();
+	for( unsigned int i=0; i< fixed_param.size(); ++i )
+	{
+		double value = thisDataPoint->GetObservable( fixed_param[i] )->GetValue();
+		thisBound3->SetConstraint( fixed_param[i], vector<double>(1, value), "unitless" );
+	}
+
+	vector<string> doNotList = thisPDF->GetDoNotIntegrateList();
+	doNotList = StringProcessing::CombineUniques( doNotList, wantedParams );
+
+	RapidFitIntegrator* pdfIntegrator = thisPDF->GetPDFIntegrator();
+
+	pdfIntegrator->ForceTestStatus( false );
+	//doNotList = StringProcessing::CombineUniques( doNotList, wanted_params );
+	double thisIntegral = 0.;
+	//allCombinations[i]->SetPhaseSpaceBoundary( thisBound );
+	//cout << thisBound->DiscreteDescription( allCombinations[i] ) << endl;
+	double thisRatio =  pdfIntegrator->TestIntegral( thisDataPoint, thisBound3, doNotList );
+
+	cout << "\t\tScaling Based on Numerical/Analytical Ratio: " << 1./thisRatio << endl;
+	normalisation /= thisRatio;                    //      Attempt to correct for Numerical != analytical due to any constant factor due to numerical inaccuracy
 	//      (some constant close to 1. exactly 1. for numerical PDFs)
 
 	vector<DataPoint*> allCombinations = thisBound->GetDiscreteCombinations();
+	DataPoint* thisCombination = allCombinations[combinationIndex];
 
-	double dataNum = thisDataSet->GetDataNumber( allCombinations[combinationIndex] );
-	normalisation *= dataNum / (double) data_binning;                               //      Normalise to this density of events     (Num of events per bin in flatPDF)
+	double total_yield=0.;
 
-	double range = this->CalculateRange( thisBound );                                          //      Correct for the range of the dataset    (absolute range of Observable being projected)
-	normalisation *= range;
+	if( thisDataSet->GetWeightsWereUsed() )
+	{
+		vector<DataPoint*> thesePoints = thisDataSet->GetDiscreteSubSet( allCombinations[combinationIndex] );
 
-	normalisation /= combinationIntegrals[ PDFDataNum ][ combinationIndex ];                      //      Total Integral of the PDF       (We're plotting prob of PDF being at this point for a non-unitary PDF)
+		cout << thesePoints.size() << endl;
 
-	normalisation *= weightNorms[ PDFDataNum ];                                                   //      Correct for the effect of non-unitary weights used in the fit
+		ObservableRef thisWeight( thisDataSet->GetWeightName() );
+
+		for( unsigned int i=0; i< thesePoints.size(); ++i )
+		{
+			total_yield += thesePoints[i]->GetObservable( thisWeight )->GetValue();
+		}
+	}
+	else
+	{
+		total_yield = thisDataSet->GetDataNumber( allCombinations[combinationIndex] );
+	}	
+
+	double dataNum = total_yield;
+	//cout << "\t\tScaling Based on DataNumber in this Combination: " << dataNum / (double) data_binning << endl;
+	//normalisation *= dataNum / (double) data_binning;                               //      Normalise to this density of events     (Num of events per bin in flatPDF)
+
+
+	//double range = this->CalculateRange( thisBound );                                          //      Correct for the range of the dataset    (absolute range of Observable being projected)
+	//cout << "\t\tScaling Based on Range of binning: " << range << endl;
+	//normalisation *= range;
+
+	cout << total_yield << endl;
+
+	normalisation *= total_yield;
+
+	PhaseSpaceBoundary* thisBound2 = new PhaseSpaceBoundary( *thisBound );
+
+	for( unsigned int AxisNum=0; AxisNum< theseDimensions.size(); ++AxisNum )
+	{
+		double ThisStep = theseDimensions[AxisNum]->thisStepSize;
+
+		double centralValue = thisDataPoint->GetObservable( theseDimensions[AxisNum]->ObservableName )->GetValue();
+
+		double newMax = centralValue+0.5*ThisStep;
+		double newMin = centralValue-0.5*ThisStep;
+
+		cout << "\t\tConstructing New Constraint for: " << theseDimensions[AxisNum]->ObservableName << "\t" << newMin << " : " << newMax << endl;
+		thisBound2->SetConstraint( theseDimensions[AxisNum]->ObservableName, newMin, newMax, "noUnit_MultiDimChi2" );
+	}
+
+	//thisBound2->Print();
+
+	cout << "\t\tCalculating Bin Integral" << endl;
+	//thisDataPoint->Print();
+	//thisPDF->ChangePhaseSpace( thisBound2 );
+	//IPDF* newPDF = ClassLookUp::CopyPDF( thisPDF );
+	//cout << "Copied PDF" << endl;
+	//double someNum = newPDF->Normalisation( thisDataPoint, thisBound3 );
+	//cout << "Here" << endl;
+	//combinationIntegrals[ PDFDataNum ][ combinationIndex ] = someNum;
+
+	delete thisBound2;
+	//delete newPDF;
+
+	double someNum = pdfIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisBound3, doNotList );
+
+	//cout << "\t\tScaling Based on the Total Integral of the PDF: " << 1./combinationIntegrals[ PDFDataNum ][ combinationIndex ] << endl;
+	//normalisation /= combinationIntegrals[ PDFDataNum ][ combinationIndex ];                      //      Total Integral of the PDF       (We're plotting prob of PDF being at this point for a non-unitary PDF)
+
+	//cout << "\t\tScaling Based on the Total Integral of the PDF: " <<  1./ someNum << endl;
+	//normalisation /= someNum;
+
+	//cout << "\t\tScaling Based on the Weights in the DataSet: " << 1. / thisDataSet->GetAlpha() << endl;
+	//normalisation /= thisDataSet->GetAlpha();                                                   //      Correct for the effect of non-unitary weights used in the fit
 
 	/*
 	   if( debug != NULL )

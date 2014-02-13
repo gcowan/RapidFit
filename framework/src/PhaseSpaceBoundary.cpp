@@ -71,19 +71,7 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) 
 
 	uniqueID = reinterpret_cast<size_t>(this)+1;
 
-	if( NewBoundary.storedCombinationID == NewBoundary.uniqueID )
-	{
-        	for( unsigned int i=0; i< NewBoundary.StoredCombinations.size(); ++i )
-        	{
-        	        StoredCombinations.push_back( new DataPoint( *NewBoundary.StoredCombinations[i] ) );
-        	}
-
-		storedCombinationID = uniqueID;
-	}
-	else
-	{
-		storedCombinationID = 0;
-	}
+	storedCombinationID = 0;
 }
 
 //Destructor

@@ -11,6 +11,7 @@
 #include "SlicedAcceptance.h"
 #include "StringProcessing.h"
 
+#include <cmath>
 #include <stdio.h>
 #include <vector>
 #include <string>
@@ -97,7 +98,7 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b, bool quiet )
 	{
 		double this_th = tlow + is*dt;
 		slices.push_back( new AcceptanceSlice( tlow, this_th, dh ) );
-		cout << tlow << "   " <<  this_th << "  " << dh << endl;
+		//cout << tlow << "   " <<  this_th << "  " << dh << endl;
 	}
 
 	//....done.....
@@ -235,7 +236,8 @@ double SlicedAcceptance::getValue( const double t ) const
 		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
 		if( _sortedSlices ) if( t<slices[is]->thigh() ) break;
 	}
-	if( t == slices.back()->thigh() ) returnValue += slices.back()->height();
+	if( fabs( t - slices.front()->tlow() ) < 1E-6 ) returnValue += slices.front()->height();
+	if( fabs( t - slices.back()->thigh() ) < 1E-6 ) returnValue += slices.back()->height();
 	return returnValue;
 }
 
@@ -325,6 +327,8 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 			returnValue += slices.back()->height();
 		}
 	}
+
+	if( fabs( time->GetValue() - slices[0]->tlow() ) < 1E-5 ) returnValue = slices[0]->height();
 
 	time->SetBinNumber( finalBin );
 	time->SetAcceptance( returnValue );

@@ -166,7 +166,8 @@ bool ObservableContinuousConstraint::IsDiscrete() const
 
 void ObservableContinuousConstraint::Print() const
 {
-	cout << "Maximum: " << maximum << "\tMinimum: " << minimum << "\tUnit: " << unit << endl;
+	cout << "Maximum: " << maximum << "\tMinimum: " << minimum << "\tUnit: " << unit;
+	cout << "\tContinuous." << endl;
 }
 
 Observable* ObservableContinuousConstraint::GetMidRangeValue() const

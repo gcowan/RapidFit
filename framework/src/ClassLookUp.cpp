@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-*/
+  */
 
 //	ROOT Headers
 #include "TSystem.h"
@@ -29,6 +29,8 @@
 #include "JPsiPhiDataGenerator.h"
 #include "SWeightPrecalculator.h"
 #include "RapidRun.h"
+#include "ObservableDiscreteConstraint.h"
+#include "ObservableContinuousConstraint.h"
 
 //	System Headers
 #include <stdlib.h>
@@ -36,14 +38,14 @@
 #include <fstream>
 #include <iostream>
 #ifdef _WIN32
-	//#include "dummy.h"		//	This needs correcting
+//#include "dummy.h"		//	This needs correcting
 #elif __APPLE__
-	#include <mach-o/dyld.h>
-	#include <syslimits.h>
+#include <mach-o/dyld.h>
+#include <syslimits.h>
 #else
-	#include <linux/limits.h>
-	#include <unistd.h>
-	#include <stdint.h>
+#include <linux/limits.h>
+#include <unistd.h>
+#include <stdint.h>
 #endif
 
 //	Get the path of the running executable on this system
@@ -310,5 +312,19 @@ IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, string WeightNam
 		cerr << "Unrecognised precalculator name: " << Name << endl << endl;
 		exit(-2138);
 	}
+}
+
+IConstraint* ClassLookUp::CopyConstraint( IConstraint* thisConst )
+{
+	IConstraint* returnable=NULL;
+	if( thisConst->IsDiscrete() )
+	{
+		returnable = new ObservableDiscreteConstraint( *((ObservableDiscreteConstraint*) thisConst ));
+	}
+	else
+	{
+		returnable = new ObservableContinuousConstraint( *((ObservableContinuousConstraint*) thisConst ));
+	}
+	return returnable;
 }
 

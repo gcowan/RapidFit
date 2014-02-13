@@ -23,6 +23,7 @@
 #include "TFile.h"
 #include "TH3D.h"
 
+#include "DataPoint.h"
 #include "Observable.h"
 
 using namespace::std;
@@ -53,10 +54,21 @@ class AngularAcceptance
 		// To get the acceptance for a given angular bin
 		double getValue( double cosPsi, double cosTheta, double phi ) const;
 		double getValue( Observable* cosPsi, Observable* cosTheta, Observable* phi ) const;
+		double getValue( DataPoint* input ) const;
 
 		void Print() const;
 
-	private:	
+		double GetAvgBinContent() const { return average_bin_content; };
+		double GetNumEntries() const { return total_num_entries; };
+		double GetXmin() const { return xmin; };
+		double GetXmax() const { return xmax; };
+		double GetYmin() const { return ymin; };
+		double GetYmax() const { return ymax; };
+		double GetZmin() const { return zmin; };
+		double GetZmax() const { return zmax; };
+
+		double GetZeroBins() const { return zeroBins; };
+	private:
 		AngularAcceptance& operator= ( const AngularAcceptance& );
 
 		//	double stream(ifstream& stream) ;
@@ -69,10 +81,15 @@ class AngularAcceptance
 		int nxbins, nybins, nzbins;
 		double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
 		double total_num_entries;
-		double average_bin_content ;
+		double average_bin_content;
 
 		string openFile( string fileName, bool quiet=false ) ;
-		void processHistogram( bool quiet=false ) ;
+		double processHistogram( bool quiet=false ) ;
+
+		ObservableRef cosThetaName, cosPsiName, phiName, helcosthetaKName, helcosthetaLName, helphiName;
+		bool _useHelicityBasis;
+
+		double zeroBins;
 };
 
 #endif

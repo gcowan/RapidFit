@@ -664,8 +664,8 @@
 			</X_Param>
 			<Y_Param>
 				<Name>deltaGamma</Name>
-				<Minimum>-0.2</Minimum>
-				<Maximum>0.2</Maximum>
+				<Minimum>-0.6</Minimum>
+				<Maximum>0.6</Maximum>
 				<Points>20</Points>
 			</Y_Param>
 		</TwoDScan>

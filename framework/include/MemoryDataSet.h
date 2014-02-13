@@ -39,6 +39,7 @@ class MemoryDataSet : public IDataSet
 
 		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const;
 		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const;
+		virtual vector<DataPoint*> GetDiscreteSubSet( DataPoint* input ) const;
 
 		void Clear();
 

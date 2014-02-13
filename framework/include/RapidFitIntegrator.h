@@ -81,6 +81,7 @@ class RapidFitIntegrator
 		~RapidFitIntegrator();
 
 		void SetUpIntegrator( const RapidFitIntegratorConfig* config );
+		RapidFitIntegratorConfig* GetIntegratorConfig() const;
 
 		void SetMaxIntegrationSteps( const unsigned int );
 
@@ -165,7 +166,7 @@ class RapidFitIntegrator
 		 *
 		 * @warning If you compare the Numerical Integral to an Analytical for a PDF with per event Normalisation enabled expect some discrepancy which cannot be resolved!
 		 */
-		double TestIntegral( DataPoint* InputDataPoint, PhaseSpaceBoundary* InputPhaseSpace );
+		double TestIntegral( DataPoint* InputDataPoint, PhaseSpaceBoundary* InputPhaseSpace, vector<string> DoNotIntegrate=vector<string>() );
 
 		/*!
 		 * @brief Force the status of the Integration test
@@ -260,6 +261,7 @@ class RapidFitIntegrator
 		 */
 		double NumericallyIntegrateDataPoint( DataPoint* InputDataPoint, PhaseSpaceBoundary* InputPhaseSpace, vector<string> DoNotIntegrate, ComponentRef* InputRef = NULL );
 
+		double AnallyticallyIntegrateDataPoint( DataPoint* InputDataPoint, PhaseSpaceBoundary* InputPhaseSpace );
 
 		/*!
 		 * @brief Return a list of unclaimed and un-Integrable observables within this phase-space
@@ -411,6 +413,7 @@ class RapidFitIntegrator
 
 		static void ModifiyStoredPoints( DataPoint* NewDataPoint, string ProjectThis );
 
+		mutable RapidFitIntegratorConfig* _storedConfig;
 };
 
 #endif
