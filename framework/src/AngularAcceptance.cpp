@@ -5,13 +5,14 @@
 
   @author Pete Clarke
   @data 2012-03-29
- */
+  */
 
 
 #include "AngularAcceptance.h"
 #include "Mathematics.h"
 #include "StringProcessing.h"
 
+#include "TH3D.h"
 #include "TFile.h"
 #include "TTree.h"
 
@@ -23,6 +24,8 @@ AngularAcceptance::AngularAcceptance( const AngularAcceptance& input ) :
 	, histo(input.histo) , xaxis(input.xaxis), yaxis(input.yaxis), zaxis(input.zaxis), nxbins(input.nxbins), nybins(input.nybins), nzbins(input.nzbins)
 	, xmin(input.xmin), xmax(input.xmax), ymin(input.ymin), ymax(input.ymax), zmin(input.zmin), zmax(input.zmax), deltax(input.deltax), deltay(input.deltay), deltaz(input.deltaz)
 	, total_num_entries(input.total_num_entries), average_bin_content(input.average_bin_content)
+	, cosThetaName( input.cosThetaName ), cosPsiName( input.cosPsiName ), phiName( input.phiName ), helcosthetaKName( input.helcosthetaKName ), helcosthetaLName( input.helcosthetaLName ), helphiName( input.helphiName )
+	, _useHelicityBasis( input._useHelicityBasis ), zeroBins( input.zeroBins )
 {
 	TString Histo_Name="histo_";
 	TString XAxis_Name="Xaxis_";
@@ -30,15 +33,16 @@ AngularAcceptance::AngularAcceptance( const AngularAcceptance& input ) :
 	TString ZAxis_Name="Zaxis_";
 	size_t uniqueNum = reinterpret_cast<size_t>(this);
 	Histo_Name+=uniqueNum;
+	Histo_Name+="_Clone";
 	XAxis_Name+=uniqueNum;
 	YAxis_Name+=uniqueNum;
 	ZAxis_Name+=uniqueNum;
 	if( input.histo != NULL )
 	{
 		histo = (TH3D*)input.histo->Clone(Histo_Name);
-		xaxis = (TAxis*)histo->GetXaxis()->Clone(XAxis_Name);
-		yaxis = (TAxis*)histo->GetYaxis()->Clone(YAxis_Name);
-		zaxis = (TAxis*)histo->GetZaxis()->Clone(ZAxis_Name);
+		xaxis = (TAxis*)histo->GetXaxis();
+		yaxis = (TAxis*)histo->GetYaxis();
+		zaxis = (TAxis*)histo->GetZaxis();
 	}
 }
 
@@ -57,6 +61,8 @@ AngularAcceptance::~AngularAcceptance()
 AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bool IgnoreAcceptanceHisto, bool quiet ) :
 	_af1(1), _af2(1), _af3(1), _af4(0), _af5(0), _af6(0), _af7(1), _af8(0), _af9(0), _af10(0), useFlatAngularAcceptance(false)
 	, histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(), ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), average_bin_content()
+	, cosThetaName( "cosTheta" ), cosPsiName( "cosPsi" ), phiName( "phi" ), helcosthetaLName( "helcosthetaL" ), helcosthetaKName( "helcosthetaK" ), helphiName( "helphi" )
+	, _useHelicityBasis( useHelicityBasis ), zeroBins( 0 )
 {
 
 	//Initialise depending upon whether configuration parameter was found
@@ -73,19 +79,20 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bo
 
 		string fullFileName = StringProcessing::FindFileName( fileName, quiet );//this->openFile( fileName, quiet ) ;
 
+		TFile* f =  TFile::Open( fullFileName.c_str(), "READ" );
+
 		if( !useFlatAngularAcceptance )
 		{
+			if( !quiet ) cout << " AngularAcceptance::AngularAcceptance fileName: " <<  fullFileName << endl;
 
-			TFile* f =  TFile::Open( fullFileName.c_str(), "READ" );
-
-			//cout << " AngularAcceptance::AngularAcceptance fileName: " <<  fullFileName << endl;
-
-			if( useHelicityBasis ) {
-				histo = (TH3D*) f->Get("helacc"); //(fileName.c_str())));
+			if( _useHelicityBasis ) {
+				histo = (TH3D*) f->Get( "helacc" ); //(fileName.c_str())));
+				if( histo == NULL ) histo = (TH3D*) f->Get( "histoHel" );
 				if( !quiet ) cout << " AngularAcceptance::  Using heleicity basis" << endl ;
 			}
 			else {
 				histo = (TH3D*) f->Get("tracc"); //(fileName.c_str())));
+				if( histo == NULL ) histo = (TH3D*) f->Get( "histo" );
 				if( !quiet ) cout << " AngularAcceptance::  Using transversity basis" << endl ;
 			}
 
@@ -93,37 +100,38 @@ AngularAcceptance::AngularAcceptance( string fileName, bool useHelicityBasis, bo
 
 			if( histo == NULL )
 			{
+				gDirectory->ls();
 				cerr << "Cannot Open a Valid NTuple" << endl;
 				exit(0);
 			}
 			histo->SetDirectory(0);
 			size_t uniqueNum = reinterpret_cast<size_t>(this);
 			TString Histo_Name="Histo_";Histo_Name+=uniqueNum;
-			this->processHistogram( quiet );
-			f->Close();
+			zeroBins = this->processHistogram( quiet );
 		}
 
 		// Get the 10 angular factors
 
-		TFile* decayFile = TFile::Open( fullFileName.c_str(), "READ" );
-		TTree* decayTree = (TTree*) decayFile->Get( "tree" );
+		TTree* decayTree = (TTree*) f->Get( "tree" );
 
-		vector<double> *pvect = new vector<double>() ;
-		decayTree->SetBranchAddress("weights", &pvect ) ;
-		decayTree->GetEntry(0);
+		if( decayTree != NULL )
+		{
+			vector<double> *pvect = new vector<double>() ;
+			decayTree->SetBranchAddress("weights", &pvect ) ;
+			decayTree->GetEntry(0);
 
-		_af1=(*pvect)[0], _af2=(*pvect)[1], _af3=(*pvect)[2], _af4=(*pvect)[3], _af5=(*pvect)[4],
-			_af6=(*pvect)[5], _af7=(*pvect)[6], _af8=(*pvect)[7], _af9=(*pvect)[8], _af10=(*pvect)[9] ;
+			_af1=(*pvect)[0], _af2=(*pvect)[1], _af3=(*pvect)[2], _af4=(*pvect)[3], _af5=(*pvect)[4],
+				_af6=(*pvect)[5], _af7=(*pvect)[6], _af8=(*pvect)[7], _af9=(*pvect)[8], _af10=(*pvect)[9] ;
 
-		//for( int ii=0; ii <10; ii++) {
-		//	cout << "AcceptanceWeight "<<ii+1<< " = "  << (*pvect)[ii] << endl ;
-		//}
-		decayFile->Close();
+			//for( int ii=0; ii <10; ii++) {
+			//	cout << "AcceptanceWeight "<<ii+1<< " = "  << (*pvect)[ii] << endl ;
+			//}
+		}
+
+		f->Close();
 	}
 
 }
-
-
 
 //............................................
 // Return numerator for evaluate
@@ -148,6 +156,27 @@ double AngularAcceptance::getValue( double cosPsi, double cosTheta, double phi )
 	returnValue = num_entries_bin; /// (deltax * deltay * deltaz) / total_num_entries ;
 
 	return returnValue / average_bin_content;
+}
+
+double AngularAcceptance::getValue( DataPoint* measurement ) const
+{
+	Observable* ThetaObs = NULL;
+	Observable* PsiObs = NULL;
+	Observable* PhiObs = NULL;
+	if( _useHelicityBasis )
+	{
+		ThetaObs = measurement->GetObservable( cosThetaName );
+		PsiObs =  measurement->GetObservable( cosPsiName );
+		PhiObs = measurement->GetObservable( phiName );
+	}
+	else
+	{
+		ThetaObs = measurement->GetObservable( helcosthetaKName );
+		PsiObs = measurement->GetObservable( helcosthetaLName );
+		PhiObs = measurement->GetObservable( helphiName );
+	}
+
+	return this->getValue( ThetaObs, PsiObs, PhiObs );
 }
 
 double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Observable* phi ) const
@@ -263,7 +292,7 @@ string AngularAcceptance::openFile( string fileName, bool quiet )
 
 //............................................
 // Open the input file containing the acceptance
-void AngularAcceptance::processHistogram( bool quiet )
+double AngularAcceptance::processHistogram( bool quiet )
 {
 	TString XAxis_Name="XAxis_";
 	TString YAxis_Name="YAxis_";
@@ -303,7 +332,8 @@ void AngularAcceptance::processHistogram( bool quiet )
 	int total_num_bins = nxbins * nybins * nzbins;
 	double sum = 0;
 
-	vector<int> zero_bins;
+	double zeroBinNum = 0.;
+
 	//loop over each bin in histogram and print out how many zero bins there are
 	for (int i=1; i < nxbins+1; ++i)
 	{
@@ -315,32 +345,32 @@ void AngularAcceptance::processHistogram( bool quiet )
 				//cout << "Bin content: " << bin_content << endl;
 				if(bin_content<=0)
 				{
-					zero_bins.push_back(1);
+					++zeroBinNum;
 				}
 				//cout << " Zero bins " << zero_bins.size() << endl;}
-				else if (bin_content>0)
+				else
 				{
 					sum += bin_content;
 				}
-			}
 		}
 	}
+}
+average_bin_content = sum / total_num_bins;
 
-	average_bin_content = sum / total_num_bins;
+if( !quiet ) cout << "Total Bins: " << total_num_bins << "\tEmpty Bins: " << zeroBinNum << "\tAvg Bin Content: " << average_bin_content << endl;
 
-	if( !quiet ) cout << "Total Bins: " << total_num_bins << "\tEmpty Bins: " << zero_bins.size() << "\tAvg Bin Content: " << average_bin_content << endl;
+//cout << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events "  << endl;
+//cout << "Average number of entries of non-zero bins: " << average_bin_content <<  endl;
 
-	//cout << "For total number of bins " << total_num_bins << " there are " << zero_bins.size() << " bins containing zero events "  << endl;
-	//cout << "Average number of entries of non-zero bins: " << average_bin_content <<  endl;
+// Check.  This order works for both bases since phi is always the third one.
+if( (xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < (2.*TMath::Pi()-0.01) )
+{
+	cout << endl << "In AngularAcceptance::processHistogram: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
+	exit(1);
+}
 
-	// Check.  This order works for both bases since phi is always the third one.
-	if( (xmax-xmin) < 2. || (ymax-ymin) < 2. || (zmax-zmin) < (2.*TMath::Pi()-0.01) )
-	{
-		cout << endl << "In AngularAcceptance::processHistogram: The full angular range is not used in this histogram - the PDF does not support this case" << endl;
-		exit(1);
-	}
-
-	//cout << "Finishing processing angular acceptance histo" << endl;
+return zeroBinNum;
+//cout << "Finishing processing angular acceptance histo" << endl;
 }
 
 void AngularAcceptance::Print() const
