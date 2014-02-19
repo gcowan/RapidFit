@@ -167,7 +167,7 @@ ParameterSet::ParameterSet( vector<string> NewNames ) : allParameters(), allName
 		cerr << "WARNING: Cannot Generate a ParameterSet with 2 Occurances of the same name" << endl;
 		for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
 		{
-			cout << *str_i << endl;
+			cerr << *str_i << endl;
 		}
 		cerr << "This is harmless, but you will now have some merged PhysicsParameter(s)" << endl;
 	}

@@ -125,9 +125,9 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 	if( ( thisFunction.size() != thesePoints.size() ) || ( ( thesePoints.size() != nThreads ) || ( thisFunction.size() != nThreads ) ) )
 	{
 		cerr << "Catastrophy, exiting...." << endl;
-		cout << "nThreads: " << nThreads << endl;
-		cout << "thisFunction.size(): " << thisFunction.size() << endl;
-		cout << "thesePoints.size(): " << thesePoints.size() << endl;
+		cerr << "nThreads: " << nThreads << endl;
+		cerr << "thisFunction.size(): " << thisFunction.size() << endl;
+		cerr << "thesePoints.size(): " << thesePoints.size() << endl;
 		exit(87356);
 	}
 
@@ -170,8 +170,10 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 	for( unsigned int threadnum=0; threadnum< nThreads ; ++threadnum )
 	{
 		int status=0;
-		if( thisComponent == NULL ) status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::Evaluate_pthread, (void *) &fit_thread_data[threadnum] );
-		else status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::EvaluateComponent_pthread, (void *) &fit_thread_data[threadnum] );
+		if( thisComponent == NULL ) status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::Evaluate_pthread, (void *) &(fit_thread_data[threadnum]) );
+		else status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::EvaluateComponent_pthread, (void *) &(fit_thread_data[threadnum]) );
+
+		//cout << "status: " << status << endl;
 		if( status )
 		{
 			cerr << "ERROR:\tfrom pthread_create()\t" << status << "\t...Exiting\n" << endl;
@@ -340,10 +342,10 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( vector<IPDF*
 			|| ( ( ( thisFunction.size() != nThreads ) || ( thesePoints.size() != nThreads ) ) || ( theseBoundarys.size() != nThreads ) )      )
 	{
 		cerr << "Catastrophy, exiting...." << endl;
-		cout << "nThreads: " << nThreads << endl;
-		cout << "thisFunction.size(): " << thisFunction.size() << endl;
-		cout << "thesePoints.size(): " << thesePoints.size() << endl;
-		cout << "theseBoundarys.size(): " << theseBoundarys.size() << endl;
+		cerr << "nThreads: " << nThreads << endl;
+		cerr << "thisFunction.size(): " << thisFunction.size() << endl;
+		cerr << "thesePoints.size(): " << thesePoints.size() << endl;
+		cerr << "theseBoundarys.size(): " << theseBoundarys.size() << endl;
 		exit(87356);
 	}
 
@@ -379,7 +381,7 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( vector<IPDF*
 	//      Create the Threads and set them to be joinable
 	for( unsigned int threadnum=0; threadnum< nThreads ; ++threadnum )
 	{
-		int status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::Integrate_pthread, (void *) &fit_thread_data[threadnum] );
+		int status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::Integrate_pthread, (void *) &(fit_thread_data[threadnum]) );
 		if( status )
 		{
 			cerr << "ERROR:\tfrom pthread_create()\t" << status << "\t...Exiting\n" << endl;

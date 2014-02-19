@@ -107,6 +107,9 @@ namespace Mathematics
 	double ExpSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
 	double ExpSinInt_Wrapper( vector<double> input );
 
+	pair<double,double> ExpCosSin( double t, double gamma, double deltaM, double resolution );
+	pair<double,double> ExpCosSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution );
+
 	double expErfInt( double tlimit, double tau, double sigma);
 	double expErfInt_Wrapper( vector<double> input );
 

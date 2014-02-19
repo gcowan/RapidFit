@@ -230,7 +230,7 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 // Return numerator for evaluate
 double SlicedAcceptance::getValue( const double t ) const
 {
-	double returnValue = 0;
+	returnValue = 0;
 	for( unsigned int is = 0; is < slices.size() ; ++is )
 	{
 		if( (t>=slices[is]->tlow()) && (t<slices[is]->thigh()) ) returnValue += slices[is]->height();
@@ -258,10 +258,8 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 	}
 
 	double t = time->GetValue() - timeOffset;
-	double returnValue = 0;
-	unsigned int is = 0;
-
-	int finalBin = -1;
+	returnValue = 0;
+	finalBin = -1;
 
 	if( time->GetBinNumber() < 0 )
 	{
@@ -314,7 +312,7 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 	}
 	else
 	{
-		for( ; is < slices.size(); ++is )
+		for( unsigned int is=0; is < slices.size(); ++is )
 		{
 			if( (t >= slices[is]->tlow() ) && ( t < slices[is]->thigh() ) )
 			{
@@ -364,8 +362,8 @@ unsigned int SlicedAcceptance::findSliceNum( const Observable* time, const doubl
 {
 	double t = time->GetValue() - timeOffset;
 	if( time->GetBinNumber() >= 0 ) return (unsigned) time->GetBinNumber();
-	unsigned int is=0;
-	for( ; is < slices.size(); ++is )
+	unsigned int thisNum=0;
+	for( unsigned int is; is < slices.size(); ++is )
 	{
 		if( (t >= slices[is]->tlow() ) && ( t < slices[is]->thigh() ) )
 		{
@@ -375,10 +373,11 @@ unsigned int SlicedAcceptance::findSliceNum( const Observable* time, const doubl
 		{
 			continue;
 		}
+		++thisNum;
 	}
-	if( t == slices.back()->thigh() ) --is;
-	time->SetBinNumber( (int)is );
-	return is;
+	if( t == slices.back()->thigh() ) --thisNum;
+	time->SetBinNumber( (int)thisNum );
+	return thisNum;
 }
 
 bool SlicedAcceptance::isSorted() const

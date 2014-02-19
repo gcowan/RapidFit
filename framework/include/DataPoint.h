@@ -311,6 +311,8 @@ class DataPoint
 		size_t storedID;
 
 		double WeightValue;
+
+		mutable int nameIndex;
 };
 
 #endif

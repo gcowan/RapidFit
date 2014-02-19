@@ -40,7 +40,7 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
 		cerr << "WARNING: PhaseSpace Cannot be created with multiple occurances of the same Observable!" << endl;
 		for( vector<string>::iterator str_i = duplicates.begin(); str_i != duplicates.end(); ++str_i )
 		{
-			cout << *str_i << endl;
+			cerr << *str_i << endl;
 		}
 	}
 

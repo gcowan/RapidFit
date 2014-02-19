@@ -39,20 +39,23 @@ class TimeAccRes : public IResolutionModel
 		TimeAccRes( const TimeAccRes& );
 		~TimeAccRes();
 
-		void addParameters( vector<string> & parameterNames ) ;
-		void setParameters( ParameterSet & parameters ) ;
+		void addParameters( vector<string> & parameterNames );
+		void setParameters( ParameterSet & parameters );
 
-		void addObservables( vector<string> & observableNames ) ;
-		void setObservables( DataPoint * measurement ) ;
+		void addObservables( vector<string> & observableNames );
+		void setObservables( DataPoint * measurement );
 
-		double Exp( double time, double gamma ) ;
-		double ExpInt( double tlow, double thigh, double gamma ) ;
+		double Exp( double time, double gamma );
+		double ExpInt( double tlow, double thigh, double gamma );
 
-		double ExpSin( double time, double gamma, double dms ) ;
-		double ExpSinInt( double tlow, double thigh, double gamma, double dms ) ;
+		double ExpSin( double time, double gamma, double dms );
+		double ExpSinInt( double tlow, double thigh, double gamma, double dms );
 
-		double ExpCos( double time, double gamma, double dms ) ;
-		double ExpCosInt( double tlow, double thigh, double gamma, double dms ) ;
+		double ExpCos( double time, double gamma, double dms );
+		double ExpCosInt( double tlow, double thigh, double gamma, double dms );
+
+		pair<double, double> ExpCosSin( double time, double gamma, double dms );
+		pair<double, double> ExpCosSinInt( double tlow, double thigh, double gamma, double dms );
 
 		bool isPerEvent();
 

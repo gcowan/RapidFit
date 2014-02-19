@@ -90,6 +90,17 @@ class AngularAcceptance
 		bool _useHelicityBasis;
 
 		double zeroBins;
+
+		mutable int psi_num;
+		mutable int globalbin;
+		mutable double num_entries_bin;
+		mutable double _acc;
+		mutable int xbin;
+		mutable int ybin;
+		mutable int zbin;
+		mutable Observable* ThetaObs;
+		mutable Observable* PsiObs;
+		mutable Observable* PhiObs;
 };
 
 #endif

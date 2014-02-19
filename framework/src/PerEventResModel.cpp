@@ -116,3 +116,13 @@ bool PerEventResModel::CacheValid() const
 	return isCacheValid;
 }
 
+pair<double,double> PerEventResModel::ExpCosSin( double time, double gamma, double dms )
+{
+	return Mathematics::ExpCosSin( time, gamma, dms, eventResolution*resScale);
+}
+
+pair<double,double> PerEventResModel::ExpCosSinInt( double tlow, double thigh, double gamma, double dms )
+{
+	return Mathematics::ExpCosSinInt( tlow, thigh, gamma, dms, eventResolution*resScale);
+}
+

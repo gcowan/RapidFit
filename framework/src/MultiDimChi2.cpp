@@ -191,11 +191,12 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 			x_min.push_back( thisConstraint->GetMinimum() );
 			x_max.push_back( thisConstraint->GetMaximum() );
 			goodObservables.push_back( wantedObservables[i] );
-			if( wantedObservables[i] == "time" ) x_binning = 4.;
-			else x_binning = 4;
+			if( wantedObservables[i] == "time" ) x_binning = 30;
+			else x_binning = 5;
 			//x_binning = 2;
 			x_bins.push_back( x_binning );
 			data_binning *= x_binning;
+			cout << wantedObservables[i] << "  " << x_min.back() << "<->" << x_max.back() << "  /  " << x_binning << endl;
 			ThisObsBinning* thisDimension = new ThisObsBinning();
 			thisDimension->ObservableName = wantedObservables[i];
 			thisDimension->thisMin = x_min.back();
@@ -493,7 +494,7 @@ double MultiDimChi2::CorrectYield( IDataSet* thisSet, DataPoint* thisPoint )
 
 			if( isInRange )
 			{
-				total_yield += thesePoints[i]->GetEventWeight();//GetObservable( thisRef )->GetValue();
+				total_yield += thesePoints[i]->GetObservable( thisRef )->GetValue();
 			}
 		}
 	}

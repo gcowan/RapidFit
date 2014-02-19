@@ -57,24 +57,24 @@ void Phis2012ResolutionModel::addParameters( vector<string> & parameterNames )
 void Phis2012ResolutionModel::setParameters( ParameterSet & parameters )
 {
 	if( 	parameters.GetPhysicsParameter( timeResFracName )->isFixed() &&
-		parameters.GetPhysicsParameter( sfBarOffsetName)->isFixed() &&
-		parameters.GetPhysicsParameter( sfBarSlopeName)->isFixed() &&
-		parameters.GetPhysicsParameter( sfSigmaOffsetName)->isFixed() &&
-		parameters.GetPhysicsParameter( sfSigmaSlopeName)->isFixed() &&
-		parameters.GetPhysicsParameter( sigmaBarName)->isFixed() &&
-		parameters.GetPhysicsParameter( muName )->isFixed() )
+			parameters.GetPhysicsParameter( sfBarOffsetName)->isFixed() &&
+			parameters.GetPhysicsParameter( sfBarSlopeName)->isFixed() &&
+			parameters.GetPhysicsParameter( sfSigmaOffsetName)->isFixed() &&
+			parameters.GetPhysicsParameter( sfSigmaSlopeName)->isFixed() &&
+			parameters.GetPhysicsParameter( sigmaBarName)->isFixed() &&
+			parameters.GetPhysicsParameter( muName )->isFixed() )
 	{
 		isCacheValid = true;
 	}
 	else
 	{
 		isCacheValid = ( resFrac == parameters.GetPhysicsParameter( timeResFracName )->GetValue() )
-				&& ( sfBarOffset == parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue() )
-				&& ( sfBarSlope == parameters.GetPhysicsParameter( sfBarSlopeName)->GetValue() )
-				&& ( sfSigmaOffset == parameters.GetPhysicsParameter( sfSigmaOffsetName)->GetValue() )
-				&& ( sfSigmaSlope == parameters.GetPhysicsParameter( sfSigmaSlopeName)->GetValue() )
-				&& ( sigmaBar == parameters.GetPhysicsParameter( sigmaBarName)->GetValue() )
-				&& ( mu == parameters.GetPhysicsParameter( muName )->GetValue() );
+			&& ( sfBarOffset == parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue() )
+			&& ( sfBarSlope == parameters.GetPhysicsParameter( sfBarSlopeName)->GetValue() )
+			&& ( sfSigmaOffset == parameters.GetPhysicsParameter( sfSigmaOffsetName)->GetValue() )
+			&& ( sfSigmaSlope == parameters.GetPhysicsParameter( sfSigmaSlopeName)->GetValue() )
+			&& ( sigmaBar == parameters.GetPhysicsParameter( sigmaBarName)->GetValue() )
+			&& ( mu == parameters.GetPhysicsParameter( muName )->GetValue() );
 	}
 	resFrac = parameters.GetPhysicsParameter( timeResFracName )->GetValue();
 	sfBarOffset = parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue();
@@ -82,7 +82,7 @@ void Phis2012ResolutionModel::setParameters( ParameterSet & parameters )
 	sfSigmaOffset = parameters.GetPhysicsParameter( sfSigmaOffsetName)->GetValue();
 	sfSigmaSlope = parameters.GetPhysicsParameter( sfSigmaSlopeName)->GetValue();
 	sigmaBar = parameters.GetPhysicsParameter( sigmaBarName)->GetValue();
-        mu = parameters.GetPhysicsParameter( muName )->GetValue();
+	mu = parameters.GetPhysicsParameter( muName )->GetValue();
 	return;
 }
 
@@ -168,22 +168,42 @@ double Phis2012ResolutionModel::ExpCosInt( double tlow, double thigh, double gam
 	return returnable;
 }
 
+pair<double,double> Phis2012ResolutionModel::ExpCosSin( double time, double gamma, double dms ) {
+	this->requestComponent( 1 );
+	pair<double,double> one = Mathematics::ExpCosSin( time-mu, gamma, dms, this->GetThisScale() );
+	one.first *= this->GetFraction( 1 ); one.second *= this->GetFraction( 1 );
+	this->requestComponent( 2 );
+	pair<double,double> two = Mathematics::ExpCosSin( time-mu, gamma, dms, this->GetThisScale() );
+	two.first *= this->GetFraction( 2 ); two.second *= this->GetFraction( 2 );
+	return make_pair( one.first+two.first, one.second+two.second );
+}
+
+pair<double,double> Phis2012ResolutionModel::ExpCosSinInt( double tlow, double thigh, double gamma, double dms ) {
+	this->requestComponent( 1 );
+	pair<double,double> one = Mathematics::ExpCosSinInt( tlow-mu, thigh-mu, gamma, dms, this->GetThisScale() );
+	one.first *= this->GetFraction( 1 ); one.second *= this->GetFraction( 1 );
+	this->requestComponent( 2 );
+	pair<double,double> two = Mathematics::ExpCosSinInt( tlow-mu, thigh-mu, gamma, dms, this->GetThisScale() );
+	two.first *= this->GetFraction( 2 ); two.second *= this->GetFraction( 2 );
+	return make_pair( one.first+two.first, one.second+two.second );
+}
+
 double Phis2012ResolutionModel::GetThisScale()
 {
-        double thisRes = eventResolution;
-        if( wantedComponent == 1 ) {
+	double thisRes = eventResolution;
+	if( wantedComponent == 1 ) {
 		sfbar = sfBarOffset + (sfBarSlope)*(eventResolution - sigmaBar);
 		sfsigma = sfSigmaOffset + (sfSigmaSlope)*(eventResolution - sigmaBar);
 		resScale = -1.0*sqrt(resFrac/(1.0-resFrac))*sfsigma + sfbar;
 		thisRes *= resScale; 
 	}
-        else if( wantedComponent == 2 ) {
+	else if( wantedComponent == 2 ) {
 		sfbar = sfBarOffset + (sfBarSlope)*(eventResolution - sigmaBar);
 		sfsigma = sfSigmaOffset + (sfSigmaSlope)*(eventResolution - sigmaBar);
 		resScale2 =sqrt((1.0-resFrac)/resFrac)*sfsigma + sfbar;
 		thisRes *= resScale2; 
 	}
-        else { thisRes *= resScale; }
+	else { thisRes *= resScale; }
 
 	return thisRes;
 }

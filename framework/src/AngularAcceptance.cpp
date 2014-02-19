@@ -139,12 +139,6 @@ double AngularAcceptance::getValue( double cosPsi, double cosTheta, double phi )
 {
 	if( useFlatAngularAcceptance ) return 1. ;
 
-	double returnValue=0.;
-
-	int globalbin=-1;
-	int xbin=-1, ybin=-1, zbin=-1;
-	double num_entries_bin=-1.;
-
 	//Find global bin number for values of angles, find number of entries per bin, divide by volume per bin and normalise with total number of entries in the histogram
 	xbin = xaxis->FindFixBin( cosPsi ); if( xbin > nxbins ) xbin = nxbins;
 	ybin = yaxis->FindFixBin( cosTheta ); if( ybin > nybins ) ybin = nybins;
@@ -153,16 +147,13 @@ double AngularAcceptance::getValue( double cosPsi, double cosTheta, double phi )
 	globalbin = histo->GetBin( xbin, ybin, zbin );
 	num_entries_bin = histo->GetBinContent(globalbin);
 
-	returnValue = num_entries_bin; /// (deltax * deltay * deltaz) / total_num_entries ;
+	_acc = num_entries_bin / average_bin_content; /// (deltax * deltay * deltaz) / total_num_entries ;
 
-	return returnValue / average_bin_content;
+	return _acc;
 }
 
 double AngularAcceptance::getValue( DataPoint* measurement ) const
 {
-	Observable* ThetaObs = NULL;
-	Observable* PsiObs = NULL;
-	Observable* PhiObs = NULL;
 	if( _useHelicityBasis )
 	{
 		ThetaObs = measurement->GetObservable( cosThetaName );
@@ -183,7 +174,7 @@ double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Ob
 {
 	if( useFlatAngularAcceptance ) return 1.;
 
-	int psi_num = cosPsi->GetBinNumber();
+	psi_num = cosPsi->GetBinNumber();
 	//int theta_num = cosTheta->GetBinNumber();
 	//int phi_num = phi->GetBinNumber();
 
@@ -198,7 +189,6 @@ double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Ob
 		//	This has to be here to protect ROOT from breaking everything
 		//	GetBinContent is NOT a const function!!!
 		//	It will break the copy of the histogram in memory if you request an object out of scope
-		int xbin=-1, ybin=-1, zbin=-1;
 		xbin = xaxis->FindFixBin( cosPsi->GetValue() ); if( xbin > nxbins ) xbin = nxbins;
 		ybin = yaxis->FindFixBin( cosTheta->GetValue() ); if( ybin > nybins ) ybin = nybins;
 		zbin = zaxis->FindFixBin( phi->GetValue() ); if( zbin > nzbins ) zbin = nzbins;
@@ -207,18 +197,18 @@ double AngularAcceptance::getValue( Observable* cosPsi, Observable* cosTheta, Ob
 		cosTheta->SetBinNumber( ybin );
 		phi->SetBinNumber( zbin );
 
-		int globalbin = histo->GetBin( xbin, ybin, zbin );
-		double num_entries_bin = histo->GetBinContent(globalbin);
+		globalbin = histo->GetBin( xbin, ybin, zbin );
+		num_entries_bin = histo->GetBinContent(globalbin);
 
-		if( fabs( num_entries_bin) <= 0. ) cout << xbin << "  " << ybin << "  " << zbin << endl;
+		//if( fabs( num_entries_bin) <= 0. ) cout << xbin << "  " << ybin << "  " << zbin << "\t\t" << cosPsi->GetValue() << " " << cosTheta->GetValue() << " " << phi->GetValue() << endl;
 
-		double acc = (double)num_entries_bin / average_bin_content;
+		_acc = num_entries_bin / average_bin_content;
 
-		cosPsi->SetAcceptance( acc );
-		cosTheta->SetAcceptance( acc );
-		phi->SetAcceptance( acc );
+		cosPsi->SetAcceptance( _acc );
+		cosTheta->SetAcceptance( _acc );
+		phi->SetAcceptance( _acc );
 
-		return acc;
+		return _acc;
 	}
 
 	return -1.;

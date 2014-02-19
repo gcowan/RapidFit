@@ -155,50 +155,50 @@ namespace Mathematics
 	complex<double> evalCerf( double swt, double u, double c )
 	{
 #if ROOT_VERSION_CODE < ROOT_VERSION(5,34,10)
-                RooComplex z( swt*c, u+c );
-                complex<double> returnable = 0.;
-                if( (u+c) > -4.0 )
-                {
-                        if( !RooMathinit )
-                        {
-                                pthread_mutex_lock( &ROOT_Lock );
+		RooComplex z( swt*c, u+c );
+		complex<double> returnable = 0.;
+		if( (u+c) > -4.0 )
+		{
+			if( !RooMathinit )
+			{
+				pthread_mutex_lock( &ROOT_Lock );
 #if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,0)
-                                if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
+				if( !RooMathinit ) RooMath::initFastCERF( 800, -4.0, 4.0, 1000, -4.0, 6.0 );
 #else
-                                if( !RooMathinit ) RooComplex RooReturnable = RooMath::ITPComplexErrFunc( z, 13 )*exp( -u*u );
+				if( !RooMathinit ) RooComplex RooReturnable = RooMath::ITPComplexErrFunc( z, 13 )*exp( -u*u );
 #endif
-                                RooMathinit = true;
-                                pthread_mutex_unlock( &ROOT_Lock );
-                        }
-                        RooComplex thisRes = RooMath::ITPComplexErrFunc( z, 13 )*exp( -u*u );
+				RooMathinit = true;
+				pthread_mutex_unlock( &ROOT_Lock );
+			}
+			RooComplex thisRes = RooMath::ITPComplexErrFunc( z, 13 )*exp( -u*u );
 			returnable = complex<double>( thisRes.re(), thisRes.im() );
-                }
-                else
-                {
-                        returnable = evalCerfApprox( swt, u, c );
-                }
-                return returnable;
+		}
+		else
+		{
+			returnable = evalCerfApprox( swt, u, c );
+		}
+		return returnable;
 #else
-                complex<double> z_stl( swt*c, u+c );
-                complex<double> returnable = 0.;
-                if( (u+c) > -4.0 )
-                {
-                        if( !RooMathinit )
-                        {
-                                pthread_mutex_lock( &ROOT_Lock );
-                                if( !RooMathinit ) returnable = RooMath::faddeeva( z_stl )*exp( -u*u );
-                                RooMathinit = true;
-                                pthread_mutex_unlock( &ROOT_Lock );
-                        }
-                        returnable = RooMath::faddeeva( z_stl )*exp( -u*u );
-                }
-                else
-                {
-                        returnable = evalCerfApprox( swt, u, c );
-                }
-                return returnable;
+		complex<double> z_stl( swt*c, u+c );
+		complex<double> returnable = 0.;
+		if( (u+c) > -4.0 )
+		{
+			if( !RooMathinit )
+			{
+				pthread_mutex_lock( &ROOT_Lock );
+				if( !RooMathinit ) returnable = RooMath::faddeeva( z_stl )*exp( -u*u );
+				RooMathinit = true;
+				pthread_mutex_unlock( &ROOT_Lock );
+			}
+			returnable = RooMath::faddeeva( z_stl )*exp( -u*u );
+		}
+		else
+		{
+			returnable = evalCerfApprox( swt, u, c );
+		}
+		return returnable;
 #endif
-        }
+	}
 
 	double evalCerfRe( double swt, double u, double c )
 	{
@@ -484,6 +484,87 @@ namespace Mathematics
 
 	}
 
+	pair<double, double> ExpCosSin( double t, double gamma, double deltaM, double resolution )
+	{
+		if(resolution > 0.) {
+			const double c = gamma * resolution*_over_sqrt_2;
+			const double u = (t / resolution) *_over_sqrt_2 ;
+			const double wt = deltaM / gamma ;
+			const complex<double> _cerf_plus = evalCerf( wt,-u,c );
+			const complex<double> _cerf_minus = evalCerf( -wt,-u,c );
+
+			const double ExpCos =  ( _cerf_plus.real() + _cerf_minus.real() ) * 0.25;
+			const double ExpSin =  ( _cerf_plus.imag() - _cerf_minus.imag() ) * 0.25;
+			return make_pair( ExpCos, ExpSin );
+		}
+		else {
+			const double deltaM_t = deltaM * t;
+			const double exp_val = exp( -gamma *t );
+			const double ExpCos = exp_val * cos( deltaM_t );
+			const double ExpSin = exp_val * sin( deltaM_t );
+			return make_pair( ExpCos, ExpSin );
+		}
+	}
+
+
+	pair<double,double> ExpCosSinInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )
+	{
+		if( thigh < tlow ) {
+			std::cerr << " Mathematics::ExpInt: thigh is < tlow " << std::endl ;
+			return make_pair(-1.0,-1.0);
+		}
+
+		if( resolution > 0.) {
+			//Added by Pete after getting code from Yuehong 120118
+			const double c = gamma * resolution * _over_sqrt_2;
+			const double inv_res = 1./resolution;
+			const double umax = (thigh * inv_res ) *_over_sqrt_2 ;
+			const double umin = (tlow * inv_res ) *_over_sqrt_2 ;
+			const double wt = deltaM / gamma ;
+			complex<double> evalDif( evalCerf(-wt,-umax,c) - evalCerf(-wt,-umin,c) );
+
+			const double evalDifRe = evalDif.real();
+			const double evalDifIm = evalDif.imag();
+
+			const double factor = -0.5/gamma/(1+wt*wt);
+
+			const double erf_max = RooMath::erf(-umax);
+			const double erf_min = RooMath::erf(-umin);
+			const double deltaCos = factor * ( evalDifRe + wt*evalDifIm + erf_max - erf_min );
+			const double deltaSin = factor * ( -evalDifIm + wt*evalDifRe - -wt*(erf_max - erf_min) );
+
+			return make_pair( deltaCos, deltaSin );
+		}
+		else
+		{
+			double real_tlow=tlow;
+			if( tlow < 0. ) real_tlow = 0. ;
+
+			const double deltaM_tlow=deltaM*real_tlow;
+			const double gamma_deltaM = gamma*deltaM;
+			const double deltaM_thigh=deltaM*thigh;
+
+			const double factor = 1./( gamma_deltaM*gamma_deltaM );
+			const double exp_lo = exp(-gamma*real_tlow);
+			const double exp_hi = exp(-gamma*thigh);
+
+			const double sin_hi = sin(deltaM_thigh);
+			const double cos_hi = cos(deltaM_thigh);
+			const double sin_lo = sin(deltaM_tlow);
+			const double cos_lo = cos(deltaM_tlow);
+
+			const double expCos = ( ( exp_lo * ( gamma*cos_lo - deltaM*sin_lo ))
+					-( exp_hi * ( gamma*cos_hi - deltaM*sin_hi ))
+					) * factor;
+
+			const double expSin = ( ( exp_lo * ( gamma*sin_lo + deltaM*cos_lo ) )
+					-( exp_hi * ( gamma*sin_hi + deltaM*cos_hi ) )
+					) * factor;
+
+			return make_pair( expCos, expSin );
+		}
+	}
+
 	//.................................................................
 	// Evaluate integral of exponential X cosine with single time resolution
 	double ExpCosInt( double tlow, double thigh, double gamma, double deltaM, double resolution  )
@@ -546,8 +627,6 @@ namespace Mathematics
 			//double theReErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncRe(z) ) : ( 1.0 - RooMath::FastComplexErrFuncRe(z) );
 			//double theImErfc = (z.im()>-4.0) ? ( 1.0 - RooMath::FastComplexErrFuncIm(z) ) : ( 1.0 - RooMath::FastComplexErrFuncIm(z) );
 			//return theExp * ( theCos*theImErfc + theSin*theReErfc ) / 2.0 ;
-
-
 		}
 		else {
 			if( t < 0.0 ) return 0.0 ;

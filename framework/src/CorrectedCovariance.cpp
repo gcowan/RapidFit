@@ -135,6 +135,7 @@ RapidFitMatrix* CorrectedCovariance::GetCorrectedCovarianceMatrix( IMinimiser* t
 	RapidFitMatrix* Raw_Covariance_Matrix = thisMinimiser->GetCovarianceMatrix();
 
 	//	Get the 2nd Error Matrix
+	
 	thisMinimiser->GetFitFunction()->SetUseWeightsSquared( true );
 	thisMinimiser->CallHesse();
 	RapidFitMatrix* Raw_Covariance_Matrix_Weights_Squared = thisMinimiser->GetCovarianceMatrix();

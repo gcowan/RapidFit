@@ -395,6 +395,7 @@
 		<Quality>0</Quality>
 		#<ConfigureMinimiser>MinosErrors</ConfigureMinimiser>
 		#<ConfigureMinimiser>NoHesse</ConfigureMinimiser>
+		#<ConfigureMinimiser>RooFitErrors</ConfigureMinimiser>
 	</Minimiser>
 
 	<FitFunction>
@@ -407,7 +408,7 @@
 		<SetIntegratorTest>False</SetIntegratorTest>
 		#<NormaliseWeights>True</NormaliseWeights>
 		#<Strategy>Petes</Strategy>
-		<OffSetNLL>True</OffSetNLL>
+		#<OffSetNLL>False</OffSetNLL>
 	</FitFunction>
 
 

@@ -715,8 +715,10 @@ void Bs2JpsiPhi_Signal_v7::preCalculateTimeFactors()
 
 	if( _eventIsTagged && RequireInterference )
 	{
-		expSin_stored = resolutionModel->ExpSin( t, gamma(), delta_ms );
-		expCos_stored = resolutionModel->ExpCos( t, gamma(), delta_ms );
+		//expSin_stored = resolutionModel->ExpSin( t, gamma(), delta_ms );
+		//expCos_stored = resolutionModel->ExpCos( t, gamma(), delta_ms );
+		pair<double,double> thesePair = resolutionModel->ExpCosSin( t, gamma(), delta_ms );
+		expSin_stored = thesePair.second; expCos_stored = thesePair.first;
 	}
 	else
 	{
@@ -739,8 +741,10 @@ void Bs2JpsiPhi_Signal_v7::preCalculateSinusoidIntegrals()
 {
 	if( _eventIsTagged && RequireInterference )
 	{
-		intExpSin_stored = resolutionModel->ExpSinInt( tlo, thi, gamma(), delta_ms );
-		intExpCos_stored = resolutionModel->ExpCosInt( tlo, thi, gamma(), delta_ms );
+		pair<double,double> thesePair = resolutionModel->ExpCosSinInt( tlo, thi, gamma(), delta_ms );
+		intExpSin_stored = thesePair.second; intExpCos_stored = thesePair.first;
+//		intExpSin_stored = resolutionModel->ExpSinInt( tlo, thi, gamma(), delta_ms );
+//		intExpCos_stored = resolutionModel->ExpCosInt( tlo, thi, gamma(), delta_ms );
 	}
 	else
 	{

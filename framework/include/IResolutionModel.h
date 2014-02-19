@@ -51,6 +51,9 @@ class IResolutionModel
 		virtual double ExpCos( double time, double gamma, double dms ) = 0;
 		virtual double ExpCosInt( double tlow, double thigh, double gamma, double dms ) = 0;
 
+		virtual pair<double,double> ExpCosSin( double time, double gamma, double dms ) { return make_pair(0.,0.); };
+		virtual pair<double,double> ExpCosSinInt( double tlow, double thigh, double gamma, double dms ) { return make_pair(0.,0.); };
+
 		virtual bool isPerEvent() = 0;
 
 		virtual ~IResolutionModel() {};

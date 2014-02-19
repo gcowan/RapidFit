@@ -42,6 +42,8 @@
 #include <float.h>
 #include <cstdlib>
 #include <algorithm>
+
+#include <valgrind/callgrind.h>
 #define DOUBLE_TOLERANCE 1E-6
 
 using namespace::std;
@@ -67,7 +69,6 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		IConstraint* thisConst = initialBoundary->GetConstraint( allDescribedObservables[i] );
 		full_boundary->SetConstraint( allDescribedObservables[i], thisConst );
 		//cout << allDescribedObservables[i] << endl;
-		delete thisConst;
 	}
 
 	plotData->SetBoundary( full_boundary );
@@ -238,6 +239,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			cout << "ComponentPlotter:: Calculated the ratio of Integrals (analytic/numeric) to be:" << endl;
 			for( unsigned int i=0; i< ratioOfIntegrals.size(); ++i )
 			{
+				ratioOfIntegrals[i]=fabs(ratioOfIntegrals[i]);
 				cout << ratioOfIntegrals[i] << endl;
 			}
 		}
@@ -298,6 +300,8 @@ ComponentPlotter::~ComponentPlotter()
 //Create a root file containing a projection plot over one observable
 void ComponentPlotter::ProjectObservable()
 {
+	CALLGRIND_START_INSTRUMENTATION;
+
         plotData->SetBoundary( full_boundary );
 
 	vector<string> doNotIntegrate = plotPDF->GetDoNotIntegrateList();
@@ -319,6 +323,9 @@ void ComponentPlotter::ProjectObservable()
 	}
 
         plotData->SetBoundary( initialBoundary );
+
+	CALLGRIND_STOP_INSTRUMENTATION;
+	CALLGRIND_DUMP_STATS;
 }
 
 //

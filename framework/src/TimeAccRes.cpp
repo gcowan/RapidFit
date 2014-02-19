@@ -230,4 +230,42 @@ double TimeAccRes::ExpCosInt( double tlow, double thigh, double gamma, double dm
 	return returnable_ExpCosInt;
 }
 
+pair<double,double> TimeAccRes::ExpCosSinInt( double tlow, double thigh, double gamma, double dms )
+{
+	pair<double,double> returnable_ExpCosSinInt=make_pair(0.,0.);
+
+	double tlo_boundary = tlow;
+	double thi_boundary = thigh;
+
+	pair<double,double> thisExpCosSinInt = make_pair(0.,0.);
+
+	double tlo=0.;
+	double thi=0.;
+
+	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
+	{
+		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
+
+		const double slice_lo = thisSlice->tlow();
+		const double slice_hi = thisSlice->thigh();
+
+		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
+		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
+		if( thi > tlo )
+		{
+			thisExpCosSinInt = resolutionModel->ExpCosSinInt( tlo, thi, gamma, dms );
+			thisExpCosSinInt.first *= thisSlice->height(); thisExpCosSinInt.second *= thisSlice->height();
+			returnable_ExpCosSinInt.first += thisExpCosSinInt.first; returnable_ExpCosSinInt.second += thisExpCosSinInt.second;
+		}
+	}
+
+	return returnable_ExpCosSinInt;
+}
+
+pair<double,double> TimeAccRes::ExpCosSin( double time, double gamma, double dms )
+{
+	pair<double,double> thisPair = resolutionModel->ExpCosSin( time, gamma, dms );
+	thisPair.first *= timeAcc->getValue( time ); thisPair.second *= timeAcc->getValue( time );
+	return thisPair;
+}
 

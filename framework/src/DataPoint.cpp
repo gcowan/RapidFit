@@ -24,18 +24,18 @@
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData()
+DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex()
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData()
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex()
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
-	for (unsigned short int nameIndex = 0; nameIndex < NewNames.size(); nameIndex++)
+	for( nameIndex = 0; nameIndex < (int)NewNames.size(); ++nameIndex )
 	{
-		allObservables.push_back( new Observable(NewNames[nameIndex]) );
+		allObservables.push_back( new Observable(NewNames[(unsigned)nameIndex]) );
 	}
 	vector<string> duplicates;
 	allNames = StringProcessing::RemoveDuplicates( NewNames, duplicates );
@@ -52,7 +52,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 
 DataPoint::DataPoint( const DataPoint& input ) :
 	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(input.allPseudoObservables), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
-	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID), initialNLL( input.initialNLL ), PerEventData(input.PerEventData)
+	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID), initialNLL( input.initialNLL ), PerEventData(input.PerEventData), nameIndex()
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
@@ -113,7 +113,7 @@ Observable* DataPoint::GetObservable( unsigned int wanted ) const
 Observable* DataPoint::GetObservable(string const Name, const bool silence ) const
 {
 	//Check if the name is stored in the map
-	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
+	nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if( nameIndex == -1 )
 	{
 		if( !silence ) cerr << "Observable name " << Name << " not found (2)" << endl;
@@ -124,7 +124,7 @@ Observable* DataPoint::GetObservable(string const Name, const bool silence ) con
 	}
 	else
 	{
-		return allObservables[unsigned(nameIndex)];
+		return allObservables[(unsigned)nameIndex];
 	}
 }
 
@@ -148,7 +148,7 @@ Observable* DataPoint::GetObservable( const ObservableRef& object, const bool si
 bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 {
 	//Check if the name is stored in the map
-	int nameIndex = StringProcessing::VectorContains( &allNames, &Name );
+	nameIndex = StringProcessing::VectorContains( &allNames, &Name );
 	if ( nameIndex == -1 )
 	{
 		cerr << "Observable name " << Name << " not found (4)" << endl;
@@ -157,7 +157,7 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 	}
 	else
 	{
-		allObservables[unsigned(nameIndex)]->SetObservable(NewObservable);
+		allObservables[(unsigned)nameIndex]->SetObservable(NewObservable);
 		return true;
 	}
 }
@@ -168,8 +168,8 @@ bool DataPoint::SetObservable( ObservableRef& Name, Observable * NewObservable )
 	if( Name.GetIndex() == -1 )
 	{
 		string thisName = Name.Name();
-		int nameIndex = StringProcessing::VectorContains( &allNames, &thisName );
-		if ( nameIndex == -1 )
+		nameIndex = StringProcessing::VectorContains( &allNames, &thisName );
+		if( nameIndex == -1 )
 		{
 			cerr << "Observable name " << thisName << " not found (5)" << endl;
 			throw(4389);
@@ -177,14 +177,14 @@ bool DataPoint::SetObservable( ObservableRef& Name, Observable * NewObservable )
 		else
 		{
 			Name.SetIndex( nameIndex );
-			allObservables[unsigned(Name.GetIndex())]->SetObservable(NewObservable);
+			allObservables[(unsigned)nameIndex]->SetObservable(NewObservable);
 			return true;
 		}
 		//return false;
 	}
 	else
 	{
-		allObservables[unsigned(Name.GetIndex())]->SetObservable(NewObservable);
+		allObservables[(unsigned)Name.GetIndex()]->SetObservable(NewObservable);
 		return true;
 	}
 }
@@ -202,12 +202,12 @@ void DataPoint::AddObservable( string Name, Observable* NewObservable )
 	}
 }
 
-void DataPoint::AddObservable( string Name, double Value, string Unit, bool trusted, int nameIndex )
+void DataPoint::AddObservable( string Name, double Value, string Unit, bool trusted, int thisnameIndex )
 {
 	Observable *tempObservable = new Observable( Name, Value, Unit );
 	if( trusted )
 	{
-		allObservables[unsigned(nameIndex)]->SetObservable( tempObservable );
+		allObservables[(unsigned)thisnameIndex]->SetObservable( tempObservable );
 	}
 	else
 	{
@@ -217,14 +217,14 @@ void DataPoint::AddObservable( string Name, double Value, string Unit, bool trus
 }
 
 //Initialise observable
-bool DataPoint::SetObservable( string Name, double Value, string Unit, bool trusted, int nameIndex )
+bool DataPoint::SetObservable( string Name, double Value, string Unit, bool trusted, int thisnameIndex )
 {
 	Observable * temporaryObservable = new Observable( Name, Value, Unit );
 	bool returnValue=false;
 	if( trusted )
 	{
 		returnValue=true;
-		allObservables[unsigned(nameIndex)]->SetObservable( temporaryObservable );
+		allObservables[(unsigned)thisnameIndex]->SetObservable( temporaryObservable );
 	}
 	else
 	{

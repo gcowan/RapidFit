@@ -51,6 +51,9 @@ class Phis2012ResolutionModel : public IResolutionModel
 		double ExpCos( double time, double gamma, double dms ) ;
 		double ExpCosInt( double tlow, double thigh, double gamma, double dms ) ;
 
+		pair<double,double> ExpCosSin( double time, double gamma, double dms );
+		pair<double,double> ExpCosSinInt( double tlow, double thigh, double gamma, double dms );
+
 		bool isPerEvent() ;
 
 		bool CacheValid() const;

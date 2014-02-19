@@ -143,6 +143,9 @@ class SlicedAcceptance
 
 		mutable bool _hasChecked;
 		mutable bool _storedDecision;
+
+		mutable double returnValue;
+		mutable int finalBin;
 };
 
 #endif
