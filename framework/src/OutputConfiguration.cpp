@@ -316,7 +316,6 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 
 	//      In ComponentPlotter this still does all of the work, but each ComponentPlotter object is created for each observable to allow you to do more easily
 
-	/*
 	thisPlotter->ProjectObservable();
 
 	cout << "Projected" << endl;
@@ -327,8 +326,6 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 
 	all_datasets_for_all_results.push_back( thisPlotter->GetBinnedData()[0] );
 	all_components_for_all_results.push_back( thisPlotter->GetComponents()[0] );
-
-	*/
 }
 
 void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
