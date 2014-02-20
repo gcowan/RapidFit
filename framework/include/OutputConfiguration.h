@@ -95,6 +95,8 @@ class OutputConfiguration
 
 		static void MergeProjectionResults( vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
 				vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i, DebugClass* debug );
+
+		static void Chi2XCheck( FitResult* thisResult, vector<ComponentPlotter*> thesePlotters, string observableName, int nBins );
 };
 
 #endif

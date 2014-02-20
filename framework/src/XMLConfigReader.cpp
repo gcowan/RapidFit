@@ -790,6 +790,14 @@ CompPlotter_config* XMLConfigReader::getCompPlotterConfigs( XMLTag* CompTag )
 		{
 			returnable_config->YaxisLabelScale = XMLTag::GetDoubleValue( projComps[childIndex] );
 		}
+		else if( projComps[childIndex]->GetName() == "OnlyUseCombination" )
+		{
+			returnable_config->ForceCombinationNumber = XMLTag::GetIntegerValue( projComps[childIndex] );
+		}
+		else if( projComps[childIndex]->GetName() == "OnlyUseComponent" )
+		{
+			returnable_config->ForceComponentNumber = XMLTag::GetIntegerValue( projComps[childIndex] );
+		}
 		else
 		{
 			cerr << "XMLConfigurationReader: Sorry Don't understand XMLTag: " << projComps[childIndex]->GetName() << " ignoring!" << endl;

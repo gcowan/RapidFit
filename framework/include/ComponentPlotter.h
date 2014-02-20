@@ -253,7 +253,6 @@ class ComponentPlotter
 		 */
 		double operator() (double *x, double *p);
 
-
 		void SetDebug( DebugClass* debug );
 
 		static string XML( const int projectionType=1 );
@@ -515,6 +514,29 @@ class ComponentPlotter
 		DebugClass* debug;
 
 		int PDFNum;
+};
+
+class MultiComponentPlotter
+{
+	public:
+		MultiComponentPlotter( vector<ComponentPlotter*> thesePlotters ) :
+			storedPlotters( thesePlotters )
+	{
+	};
+
+		double operator() (double *x, double *p)
+		{
+			double returnable = 0.;
+			for( unsigned int i=0; i< storedPlotters.size(); ++i )
+			{
+				returnable += (*storedPlotters[i])( x, p );
+			}
+			cout << endl << "x[o]: " << x[0] << " = " << returnable << endl;
+			return returnable;
+		};
+
+	private:
+		vector<ComponentPlotter*> storedPlotters;
 };
 
 #endif

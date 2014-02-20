@@ -35,7 +35,7 @@ class CompPlotter_config
                         xmin(-99999), xmax(-99999), ymin(-99999), ymax(-99999), xtitle(""), ytitle(""), CalcChi2(false), Chi2Value(-99999), OnlyZero(false), ScaleNumerical(true), combination_names(),
 			DrawPull(false), LegendTextSize(0.05), addLHCb(false), TopRightLegend(true), TopLeftLegend(false), BottomRightLegend(false), BottomLeftLegend(false),
 			useLegend(true), LimitPulls(false), useSpline(true), addRightLHCb(false), integratorConfig(new RapidFitIntegratorConfig()), plotAllCombinations(true), defaultCombinationValue(0.),
-			XaxisTitleScale(1.), XaxisLabelScale(1.), YaxisTitleScale(1.), YaxisLabelScale(1.)
+			XaxisTitleScale(1.), XaxisLabelScale(1.), YaxisTitleScale(1.), YaxisLabelScale(1.), ForceCombinationNumber(-1), ForceComponentNumber(-1)
 		{}
 
 		~CompPlotter_config()
@@ -50,8 +50,9 @@ class CompPlotter_config
 			ScaleNumerical(input.ScaleNumerical), DrawPull(input.DrawPull), LegendTextSize(input.LegendTextSize), addLHCb(input.addLHCb), TopRightLegend(input.TopRightLegend),
 			TopLeftLegend(input.TopLeftLegend), BottomRightLegend(input.BottomRightLegend), BottomLeftLegend(input.BottomLeftLegend), useLegend(input.useLegend),
 			LimitPulls(input.LimitPulls), useSpline(input.useSpline), addRightLHCb(input.addRightLHCb), integratorConfig(NULL), combination_names(input.combination_names),
-			plotAllCombinations(input.plotAllCombinations), defaultCombinationValue(input.defaultCombinationValue),
-			XaxisTitleScale(input.XaxisTitleScale), XaxisLabelScale(input.XaxisLabelScale), YaxisTitleScale(input.YaxisTitleScale), YaxisLabelScale(input.YaxisLabelScale)
+			plotAllCombinations(input.plotAllCombinations), defaultCombinationValue(input.defaultCombinationValue), ForceCombinationNumber(input.ForceCombinationNumber),
+			XaxisTitleScale(input.XaxisTitleScale), XaxisLabelScale(input.XaxisLabelScale), YaxisTitleScale(input.YaxisTitleScale), YaxisLabelScale(input.YaxisLabelScale),
+			ForceComponentNumber(input.ForceComponentNumber)
 		{
 			if( input.integratorConfig != NULL ) integratorConfig = new RapidFitIntegratorConfig( *(input.integratorConfig) );
 		}
@@ -93,6 +94,8 @@ class CompPlotter_config
 		double YaxisTitleScale;
 		double YaxisLabelScale;
 
+		int ForceCombinationNumber;
+		int ForceComponentNumber;
 	private:
 		CompPlotter_config& operator= ( const CompPlotter_config& input );
 };

@@ -12,6 +12,9 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TCanvas.h"
+#include "TMath.h"
+#include "TH1.h"
+#include "TF1.h"
 //	RapidFit Headers
 #include "OutputConfiguration.h"
 #include "ResultFormatter.h"
@@ -312,6 +315,8 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 	}
 
 	//      In ComponentPlotter this still does all of the work, but each ComponentPlotter object is created for each observable to allow you to do more easily
+
+	/*
 	thisPlotter->ProjectObservable();
 
 	cout << "Projected" << endl;
@@ -322,10 +327,12 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 
 	all_datasets_for_all_results.push_back( thisPlotter->GetBinnedData()[0] );
 	all_components_for_all_results.push_back( thisPlotter->GetComponents()[0] );
+
+	*/
 }
 
 void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
-						vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i, DebugClass* debug )
+		vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i, DebugClass* debug )
 {
 
 	int num=(int) all_components_for_all_results[0].size();
@@ -411,6 +418,72 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 
 }
 
+void OutputConfiguration::Chi2XCheck( FitResult* thisResult, vector<ComponentPlotter*> thesePlotters, string thisObservable, int nBins )
+{
+	vector<IDataSet*> theseDataSets = thisResult->GetPhysicsBottle()->GetAllDataSets();
+
+	cout << "here" << endl;
+
+	TString complete = "Complete_DataSet_";
+	complete.Append( thisObservable );
+
+	PhaseSpaceBoundary* thisBound = theseDataSets[0]->GetBoundary();
+	IConstraint* thisConst = thisBound->GetConstraint( thisObservable );
+
+	TH1* thisHisto = new TH1D( complete, complete, nBins, thisConst->GetMinimum(), thisConst->GetMaximum() );
+
+	ObservableRef thisObsRef = ObservableRef( thisObservable );
+	bool weightsWereUsed = false;
+	for( unsigned int i=0; i< theseDataSets.size(); ++i )
+	{
+		weightsWereUsed = theseDataSets[i]->GetWeightsWereUsed();
+		ObservableRef weightRef;
+		if( weightsWereUsed )
+		{
+			weightRef = ObservableRef( theseDataSets[i]->GetWeightName() );
+		}
+		for( unsigned int j=0; j< (unsigned)theseDataSets[i]->GetDataNumber(); ++j )
+		{
+			if( weightsWereUsed  )
+			{
+				thisHisto->Fill( theseDataSets[i]->GetDataPoint(j)->GetObservable( thisObsRef )->GetValue(),
+						theseDataSets[i]->GetDataPoint(j)->GetObservable( weightRef )->GetValue() );
+			}
+			else
+			{
+				thisHisto->Fill( theseDataSets[i]->GetDataPoint(j)->GetObservable( thisObsRef )->GetValue() );
+			}
+		}
+	}
+
+	MultiComponentPlotter* multiFunction = new MultiComponentPlotter( thesePlotters );
+
+	TString completeF = "Complete_Function_";
+	completeF.Append( thisObservable );
+	TF1* completeFunction = new TF1( completeF, multiFunction, thisConst->GetMinimum(), thisConst->GetMaximum(), 1, "" );
+
+	TGraph* thisData = new TGraph( thisHisto );
+
+	double thisCompleteChi2 = thisData->Chisquare( completeFunction );
+
+	double nDoF=(double) nBins;
+
+	vector<string> paramList = thisResult->GetResultParameterSet()->GetAllNames();
+
+	for( unsigned int i=0; i< paramList.size(); ++i )
+	{
+		if( thisResult->GetResultParameterSet()->GetResultParameter( paramList[i] )->GetError() > 1E-99 ) --nDoF;
+	}
+
+	cout << endl;
+	cout << "\t\tChi2 X-check for " << thisObservable << ":" << endl;
+	cout << "\tChi2: " << thisCompleteChi2 << endl;
+	cout << "\tnDoF: " << nDoF << endl;
+	cout << "\tChi2/nDoF: " << thisCompleteChi2 / nDoF << endl;
+	cout << "\tp-value: " << TMath::Prob( thisCompleteChi2, nDoF ) << endl;
+	cout << endl;
+}
+
 void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 {
 	PhysicsBottle* resultBottle = TheResult->GetPhysicsBottle();
@@ -464,9 +537,14 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			}
 			double final_corrected_chi2 = total_chi2 / ( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. );
 			(*projection_i)->Chi2Value = final_corrected_chi2;
+			cout << "chi2: " << total_chi2 << "\t\t" << "nDoF: "<< ( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. ) << endl;
 
 			cout << endl << "\tFinal chi2/ndof = " << setprecision(10) << final_corrected_chi2 << endl << endl;
+			double pval = TMath::Prob( total_chi2, ( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. ) );
+			cout << "\tProbability of a chi2 exceeding this value of chi2 by chance is: " << pval << endl;
 		}
+
+		Chi2XCheck( TheResult, allComponentPlotters, (*projection_i)->observableName, (*projection_i)->data_bins );
 
 		if( all_components_for_all_results.empty() )
 		{
@@ -478,7 +556,6 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 		}
 
 		MergeProjectionResults(  allComponentPlotters, all_datasets_for_all_results, all_components_for_all_results, pullFunctionEvals, output_file, resultBottle, projection_i, debug );
-
 
 		//	it is now safe to remove the instances of ComponentPlotter
 		for( vector<ComponentPlotter*>::iterator compP_i = allComponentPlotters.begin(); compP_i != allComponentPlotters.end(); ++compP_i )

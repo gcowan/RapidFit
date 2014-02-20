@@ -135,7 +135,7 @@ template void DebugClass::AppendToFile( const string fileName, const vector<comp
 
 template<class T> void DebugClass::Dump2TTree( const string fileName, const vector<T> objects, const string ttreeName, const string branchName )
 {
-	TFile* thisFile = new TFile( fileName.c_str(), "RECREATE" );
+	TFile* thisFile = new TFile( fileName.c_str(), "UPDATE" );
 
 	TString TTreeName;
 	if( ttreeName.empty() ) TTreeName = "someTTree";

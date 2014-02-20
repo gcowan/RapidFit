@@ -14,6 +14,8 @@
 #include "PDFWithData.h"
 #include "RapidFitIntegrator.h"
 #include "RapidFitIntegratorConfig.h"
+#include "DebugClass.h"
+#include "TMath.h"
 
 using namespace::std;
 
@@ -191,7 +193,7 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 			x_min.push_back( thisConstraint->GetMinimum() );
 			x_max.push_back( thisConstraint->GetMaximum() );
 			goodObservables.push_back( wantedObservables[i] );
-			if( wantedObservables[i] == "time" ) x_binning = 30;
+			if( wantedObservables[i] == "time" ) x_binning = 100;
 			else x_binning = 5;
 			//x_binning = 2;
 			x_bins.push_back( x_binning );
@@ -218,8 +220,10 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 	DataPoint* thisPoint=NULL;
 
 	cout << "\tPopulating THnD" << endl;
+	ObservableRef weightName;
 	for( unsigned int i=0; i< allDataSets.size(); ++i )
 	{
+		weightName = ObservableRef( allDataSets[i]->GetWeightName() );
 		for( unsigned int j=0; j< (unsigned)allDataSets[i]->GetDataNumber(); ++j )
 		{
 			thisPoint = allDataSets[i]->GetDataPoint( j );
@@ -227,7 +231,7 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 			{
 				thisValues[k] = thisPoint->GetObservable( goodObservables[k] )->GetValue();
 			}
-			thisWeight = thisPoint->GetEventWeight();
+			thisWeight = thisPoint->GetObservable( weightName )->GetValue();
 			internalHisto->Fill( &(thisValues[0]), thisWeight );
 		}
 	}
@@ -280,6 +284,8 @@ void MultiDimChi2::PerformMuiltDimTest()
 
 	vector<double> observed_events( allBinCenters->size(), 0. );
 
+	vector<double> error_events( allBinCenters->size(), 0. );
+
 	unsigned int histo_binNum=0;
 	vector<double> thisBinCenter( (*allBinCenters)[0].size(), 0. );
 
@@ -289,6 +295,8 @@ void MultiDimChi2::PerformMuiltDimTest()
 		thisBinCenter = allBinCenters->at( binNum );
 
 		histo_binNum = (unsigned)internalHisto->GetBin( &(thisBinCenter[0]) );
+
+		cout << "Coordinate: " << binNum+1 << " of: " << allBinCenters->size() << endl;
 
 		cout << "Determining Number of Observed Events in Bin: " << histo_binNum << endl;
 
@@ -300,18 +308,39 @@ void MultiDimChi2::PerformMuiltDimTest()
 
 		cout << "O: " << observed_events[binNum] << "  E: " << expected_events[binNum] << endl;
 		//exit(0);
+
+		error_events[binNum] = internalHisto->GetBinError( histo_binNum );
 	}
 
 	cout << "Finished Looping over all coordinates!" << endl;
 
-	double TotalChi2 = this->CalcChi2( expected_events, observed_events );
+	double TotalChi2 = this->CalcChi2( expected_events, observed_events, error_events );
+
+	DebugClass::Dump2TTree( "file.root", expected_events, "TTree", "expected" );
+	DebugClass::Dump2TTree( "file2.root", observed_events, "TTree", "observed" );
+	DebugClass::Dump2TTree( "file3.root", error_events, "TTree", "error" );
+
+	vector<double> pull; for( unsigned int i=0; i< expected_events.size(); ++i ) pull.push_back( (observed_events[i] - expected_events[i])/error_events[i] );
+
+	DebugClass::Dump2TTree( "file4.root", pull, "TTree", "pull" );
+
+	unsigned int freeNum = 28;//this->CountnDoF( finalSet );
+
+	double binz=1.;
+	for( unsigned int i=0; i< theseDimensions.size(); ++i ) binz *= (double)theseDimensions[i]->theseBins;
+
+	double nDoF = binz - (double)freeNum;
+
+	cout << "chi2/nDoF: " << TotalChi2 / nDoF << endl;
+
+	cout << "p-value: " << TMath::Prob( TotalChi2, nDoF ) << endl;
 
 	cout << "The Total Chi2 = " << TotalChi2 << endl << endl;
 
 	return;
 }
 
-double MultiDimChi2::CalcChi2( vector<double> expected_events, vector<double> observed_events )
+double MultiDimChi2::CalcChi2( vector<double> expected_events, vector<double> observed_events, vector<double> errors )
 {
 	double Chi2Value=0.;
 	double thisChi2=0.;
@@ -322,8 +351,8 @@ double MultiDimChi2::CalcChi2( vector<double> expected_events, vector<double> ob
 		/*
 		//thisChi2 = expected_events[i] - observed_events[i] + observed_events[i]*log( observed_events[i] / expected_events[i] );
 		vector<double> thisBinCenter = allBinCenters->at( i );
-		int histo_binNum = (unsigned)internalHisto->GetBin( &(thisBinCenter[0]) );
-		thisChi2 = ( observed_events[i] - expected_events[i] ) / internalHisto->GetBinError( histo_binNum );
+		int histo_binNum = (unsigned)internalHisto->GetBin( &(thisBinCenter[i]) );
+		thisChi2 = ( observed_events[i] - expected_events[i] ) / errors[i];// internalHisto->GetBinError( histo_binNum );
 		cout << thisChi2*thisChi2 << endl;
 		*/
 		if( !std::isnan(thisChi2) && !std::isinf(thisChi2) )
@@ -372,7 +401,7 @@ double MultiDimChi2::CalculateTotalExpected( vector<double> thisBinCenter )
 		vector<DataPoint*> theseDataPoints;
 		vector<DataPoint*> tempPoints = thisPhaseSpace->GetDiscreteCombinations();
 
-		for( unsigned int i=0; i< tempPoints.size(); ++i ) theseDataPoints.push_back( new DataPoint( *tempPoints[i] ) );
+		for( unsigned int i=0; i< tempPoints.size(); ++i ) if( i == 5 ) theseDataPoints.push_back( new DataPoint( *tempPoints[i] ) );
 
 		double thisResult=0.;
 
@@ -411,7 +440,7 @@ double MultiDimChi2::CalculateTotalExpected( vector<double> thisBinCenter )
 
 			double Total = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace2, thisPDF->GetDoNotIntegrateList() );
 
-			thisPDFIntegrator->clearGSLIntegrationPoints();
+			//thisPDFIntegrator->clearGSLIntegrationPoints();
 			double Integral = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace, thisPDF->GetDoNotIntegrateList() );
 			
 
@@ -469,7 +498,7 @@ double MultiDimChi2::CorrectIntegral( double input_Integral, DataPoint* thisPoin
 double MultiDimChi2::CorrectYield( IDataSet* thisSet, DataPoint* thisPoint )
 {
 	double total_yield = 0.;
-	vector<DataPoint*> thesePoints = thisSet->GetDiscreteSubSet( thisPoint );
+	vector<DataPoint*> thesePoints = thisSet->GetDiscreteSubSet( NULL );
 	if( thisSet->GetWeightsWereUsed() )
 	{
 		ObservableRef thisRef( thisSet->GetWeightName() );
@@ -494,7 +523,7 @@ double MultiDimChi2::CorrectYield( IDataSet* thisSet, DataPoint* thisPoint )
 
 			if( isInRange )
 			{
-				total_yield += thesePoints[i]->GetObservable( thisRef )->GetValue();
+				total_yield += thesePoints[i]->GetObservable( thisRef )->GetValue();//GetEventWeight();//GetObservable( thisRef )->GetValue();
 			}
 		}
 	}
@@ -692,7 +721,7 @@ double MultiDimChi2::PDF2DataNormalisation( unsigned int PDFDataNum, const unsig
 	else
 	{
 		total_yield = thisDataSet->GetDataNumber( allCombinations[combinationIndex] );
-	}	
+	}
 
 	double dataNum = total_yield;
 	//cout << "\t\tScaling Based on DataNumber in this Combination: " << dataNum / (double) data_binning << endl;

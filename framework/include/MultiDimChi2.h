@@ -60,7 +60,7 @@ class MultiDimChi2
 
 		vector<PhaseSpaceBoundary*> allBoundaries;
 
-		double CalcChi2( vector<double> expected_events, vector<double> observed_events );
+		double CalcChi2( vector<double> expected_events, vector<double> observed_events, vector<double> );
 
 		double CalculateTotalExpected( vector<double> thisBinCenter );
 

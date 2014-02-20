@@ -155,17 +155,38 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 
 	allCombinations_input = full_boundary->GetDiscreteCombinations();
 
-	for( vector<DataPoint*>::iterator thisCombination = allCombinations_input.begin(); thisCombination != allCombinations_input.end(); ++thisCombination )
+        if( config->ForceCombinationNumber != -1 )
 	{
-		double thisNum = plotData->GetDataNumber( *thisCombination );
-		if( fabs(thisNum) > 1E-5 )
+		cout << "Requested ONLY to use Combination Number: " << config->ForceCombinationNumber << endl;
+		if( config->ForceCombinationNumber > allCombinations_input.size() )
 		{
-			allCombinations.push_back( new DataPoint( *(*thisCombination) ) );
+			cout << "CANNOT USE Combination Number: " << config->ForceCombinationNumber << " Ignoring!" << endl;
 		}
-		//(*thisCombination)->Print();
-		//cout << thisNum << "  " << plotData->GetDataNumber() << endl;
 
-		//if( thisNum == 0 ) exit(0);
+		unsigned int i=0;
+                for( vector<DataPoint*>::iterator thisCombination = allCombinations_input.begin(); thisCombination != allCombinations_input.end(); ++thisCombination, ++i )
+                {
+                        double thisNum = plotData->GetDataNumber( *thisCombination );
+                        if( fabs(thisNum) > 1E-5 && i == (config->ForceCombinationNumber-1) )
+                        {
+                                allCombinations.push_back( new DataPoint( *(*thisCombination) ) );
+                        }
+		}
+	}
+	else
+	{
+		for( vector<DataPoint*>::iterator thisCombination = allCombinations_input.begin(); thisCombination != allCombinations_input.end(); ++thisCombination )
+		{
+			double thisNum = plotData->GetDataNumber( *thisCombination );
+			if( fabs(thisNum) > 1E-5 )
+			{
+				allCombinations.push_back( new DataPoint( *(*thisCombination) ) );
+			}
+			//(*thisCombination)->Print();
+			//cout << thisNum << "  " << plotData->GetDataNumber() << endl;
+
+			//if( thisNum == 0 ) exit(0);
+		}
 	}
 
 	cout << endl << "All Combinations with Data:" << endl;
@@ -892,6 +913,14 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				for( unsigned int i=0; i< (unsigned) binned_data[0]->GetN(); ++i ) if( fabs(binned_data[combinationIndex]->GetY()[i]) <= 0 ) --N;
 
 				double n = (double) plotPDF->GetPhysicsParameters()->GetAllFloatNames().size();
+
+				/*
+				if( n< 1E-6 )
+				for( unsigned int i=0; i< plotPDF->GetPhysicsParameters()->GetAllFloatNames().size(); ++i )
+				{
+					if( plotPDF->GetPhysicsParameters()->GetPhysicsParameter( plotPDF->GetPhysicsParameters()->GetAllFloatNames()[i] )->GetError() > 1E-99 ) ++n;
+				}
+				*/
 
 				//cout << endl << chi2 << "\t" << chi2_2 << "\t" << N << "\t" << n << endl;
 
@@ -1918,7 +1947,9 @@ double ComponentPlotter::PDF2DataNormalisation( const unsigned int combinationIn
 	normalisation *= fabs(ratioOfIntegrals[ combinationIndex ]);			//	Attempt to correct for Numerical != analytical due to any constant factor due to numerical inaccuracy
 	//	(some constant close to 1. exactly 1. for numerical PDFs)
 
-	double dataNum = plotData->GetDataNumber( allCombinations[combinationIndex] );
+	double dataNum = 0.;
+	if( allCombinations.empty() || allCombinations.size() == 1 ) dataNum = plotData->GetDataNumber( NULL );
+	else dataNum = plotData->GetDataNumber( allCombinations[combinationIndex] );
 	normalisation *= dataNum / (double) data_binning;				//	Normalise to this density of events	(Num of events per bin in flatPDF)
 
 	double range = fabs( boundary_max-boundary_min );
