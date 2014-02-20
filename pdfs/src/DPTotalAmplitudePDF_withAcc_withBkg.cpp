@@ -1053,8 +1053,6 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 
 	//std::cout << result << " " << angularAcc << " " << p1_st << " " << p3 << " " << result*p1_st*p3 << std::endl;
 
-    double returnable_value = result * angularAcc * p1_st * p3;
-
     double background(0.);
 
     if ( (componentIndex == 0 || componentIndex == 13) && fraction > 0. )
@@ -1081,8 +1079,30 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
         }
     }
     }
+
+     if (true){                                                                                                                                                                                                                           
+     const double KINEBOUND(0.04);
+     const double bkpi = KINEBOUND * ( pow(massB-massPsi,2) - pow(0.493677+0.139570,2) );
+     const double bppi = KINEBOUND * ( pow(massB-0.493677,2) - pow(massPsi+0.139570,2) );
+     const double bkpi2 = bkpi/sqrt(2.0);
+     const double bppi2 = bppi/sqrt(2.0);
+     const double m23sq = m23*m23;
+     const double m13sq = belle_m13*belle_m13;
+ 
+     if( ! kine_limits( sqrt(m23sq), sqrt(m13sq) ) ) {angularAcc = 0.; background = 1e-6;}
+     if( ! kine_limits( sqrt(m23sq-bkpi), sqrt(m13sq) ) ) {angularAcc = 0.; background = 1e-6;}
+     if( ! kine_limits( sqrt(m23sq+bkpi), sqrt(m13sq) ) ) {angularAcc = 0.; background = 1e-6;}
+     if( ! kine_limits( sqrt(m23sq), sqrt(m13sq-bppi) ) ) {angularAcc = 0.; background = 1e-6;}
+     if( ! kine_limits( sqrt(m23sq), sqrt(m13sq+bppi) ) ) {angularAcc = 0.; background = 1e-6;}
+     if( ! kine_limits( sqrt(m23sq-bkpi2), sqrt(m13sq-bppi2) ) ) {angularAcc = 0.; background = 1e-6;}
+     if( ! kine_limits( sqrt(m23sq-bkpi2), sqrt(m13sq+bppi2) ) ) {angularAcc = 0.; background = 1e-6;}
+     if( ! kine_limits( sqrt(m23sq+bkpi2), sqrt(m13sq-bppi2) ) ) {angularAcc = 0.; background = 1e-6;}
+     if( ! kine_limits( sqrt(m23sq+bkpi2), sqrt(m13sq+bppi2) ) ) {angularAcc = 0.; background = 1e-6;}
+     }
+
     //cout << background << " " << fraction << " " << returnable_value << endl;
     //returnable_value = background;
+    double returnable_value = result * angularAcc * p1_st * p3;
     returnable_value = returnable_value + fraction*background;
 
 	if( std::isnan(returnable_value) || returnable_value < 0. ) return 0.;
@@ -1209,3 +1229,24 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Normalisation(PhaseSpaceBoundary * b
 	return -1.;
 }
 
+bool DPTotalAmplitudePDF_withAcc_withBkg::kine_limits(const double &ms, const double &mz)                                                                                                                                                
+{
+  const double m_k = 0.493677;
+  const double m_pi = 0.139570;
+  const double m_b = 5.2794;
+  const double m_psi = 3.686093;
+
+  if(ms < (m_k+m_pi)) return false;
+  if(ms > (m_b-m_psi)) return false;
+
+  if(mz < (m_psi+m_pi)) return false;
+  if(mz > (m_b-m_k)) return false;
+  double E2st = 0.5*(ms*ms-m_k*m_k+m_pi*m_pi)/ms;
+  double E3st = 0.5*(m_b*m_b-ms*ms-m_psi*m_psi)/ms;
+  double mmax = (E2st+E3st)*(E2st+E3st)- pow((sqrt(E2st*E2st-m_pi*m_pi)-sqrt(E3st*E3st-m_psi*m_psi)),2);
+  double mmin = (E2st+E3st)*(E2st+E3st)- pow((sqrt(E2st*E2st-m_pi*m_pi)+sqrt(E3st*E3st-m_psi*m_psi)),2);
+  if(mz<sqrt(mmin) ) return false;
+  if(mz>sqrt(mmax) ) return false;
+
+  return true;
+}
