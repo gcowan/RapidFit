@@ -38,8 +38,9 @@ class DPTotalAmplitudePDF_withAcc_withBkg : public BasePDF
 	private:
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
-        	vector<string> GetDoNotIntegrateList();
-		bool kine_limits(const double &, const double &);
+        vector<string> GetDoNotIntegrateList();
+        bool kine_limits(const double &, const double &);
+
 		// Experimental observables
 		ObservableRef m23Name;
 		ObservableRef cosTheta1Name;

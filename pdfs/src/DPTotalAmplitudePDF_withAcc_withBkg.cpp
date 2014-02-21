@@ -173,11 +173,11 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
 	// Construct all components we need
 	DPComponent * tmp;
 	// B0 --> Z+ K-
- 	//tmp=new DPZplusK(1,0,massB,4.430,0.100,0.493677,
- 	//		 0.13957018, 1.6, 1.6, massPsi, 1, 23); // spin 1 Z, for MC testing
+ 	tmp=new DPZplusK(1,0,massB,4.430,0.100,0.493677,
+ 			 0.13957018, 1.6, 1.6, massPsi, 1, 23); // spin 1 Z, for MC testing
 
-	tmp=new DPZplusK(0,1,massB,1.430,0.0100,0.493677,
-			0.13957018, 1.6, 1.6, massPsi, 0, 23); // spin 0 Z for datafit
+	//tmp=new DPZplusK(0,1,massB,1.430,0.0100,0.493677,
+	//		0.13957018, 1.6, 1.6, massPsi, 0, 23); // spin 0 Z for datafit
 	ZComponents.push_back(tmp);
 	// B0 --> J/psi K*
 	tmp=new DPJpsiKaon(0, 1, massB, 0.89594, 0.0487, 0.493677,
@@ -863,8 +863,8 @@ bool DPTotalAmplitudePDF_withAcc_withBkg::SetPhysicsParameters( ParameterSet * N
 	KpiComponents[7]->setResonanceParameters( massK52380, widthK52380 );
 	KpiComponents[8]->setResonanceParameters( massK800, widthK800 );
 	KpiComponents[9]->setResonanceParameters( a_LASS, r_LASS );
-	ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
-	//ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magA0Zplus, magA0Zplus, phaseA0Zplus, phaseA0Zplus, phaseA0Zplus);
+	//ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magApZplus, magAmZplus, phaseA0Zplus, phaseApZplus, phaseAmZplus);
+	ZComponents[0]  ->setHelicityAmplitudes(magA0Zplus, magA0Zplus, magA0Zplus, phaseA0Zplus, phaseA0Zplus, phaseA0Zplus);
 	KpiComponents[0]->setHelicityAmplitudes(magA0Kst892,  magApKst892, magAmKst892, phaseA0Kst892, phaseApKst892, phaseAmKst892);
 	KpiComponents[1]->setHelicityAmplitudes(magA0Kst1410, magApKst1410, magAmKst1410, phaseA0Kst1410, phaseApKst1410, phaseAmKst1410);
 	KpiComponents[2]->setHelicityAmplitudes(magA0Kst1680, magApKst1680, magAmKst1680, phaseA0Kst1680, phaseApKst1680, phaseAmKst1680);
@@ -1029,7 +1029,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 			    for (unsigned int i = lowerZ; i < upperZ; ++i)
 			    {
                     //tmp += ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi);
-                    tmp += TComplex::Exp(0.5*TComplex::I()*TComplex(twoLambda)*belle_phiZPsiPsi)*(ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi));
+                    tmp += TComplex::Exp(-0.5*TComplex::I()*TComplex(twoLambda)*belle_phiZPsiPsi)*(ZComponents[i]->amplitudeProperVars(belle_m13, belle_cosZ, belle_cosPsi_Z, belle_phiPsiZ, pionID, twoLambda, twoLambdaPsi));
                     //std::cout << TComplex::Exp(0.5*TComplex::I()*twoLambda*belle_phiZPsiPsi) << " " << TComplex(cos(belle_phiZPsiPsi), 0.5*twoLambda*sin(belle_phiZPsiPsi)) << std::endl;
 			    }
 		}
@@ -1080,7 +1080,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
     }
     }
 
-     if (true){                                                                                                                                                                                                                           
+     if (true){
      const double KINEBOUND(0.04);
      const double bkpi = KINEBOUND * ( pow(massB-massPsi,2) - pow(0.493677+0.139570,2) );
      const double bppi = KINEBOUND * ( pow(massB-0.493677,2) - pow(massPsi+0.139570,2) );
@@ -1088,7 +1088,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
      const double bppi2 = bppi/sqrt(2.0);
      const double m23sq = m23*m23;
      const double m13sq = belle_m13*belle_m13;
- 
+
      if( ! kine_limits( sqrt(m23sq), sqrt(m13sq) ) ) {angularAcc = 0.; background = 1e-6;}
      if( ! kine_limits( sqrt(m23sq-bkpi), sqrt(m13sq) ) ) {angularAcc = 0.; background = 1e-6;}
      if( ! kine_limits( sqrt(m23sq+bkpi), sqrt(m13sq) ) ) {angularAcc = 0.; background = 1e-6;}
@@ -1229,7 +1229,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Normalisation(PhaseSpaceBoundary * b
 	return -1.;
 }
 
-bool DPTotalAmplitudePDF_withAcc_withBkg::kine_limits(const double &ms, const double &mz)                                                                                                                                                
+bool DPTotalAmplitudePDF_withAcc_withBkg::kine_limits(const double &ms, const double &mz)
 {
   const double m_k = 0.493677;
   const double m_pi = 0.139570;
