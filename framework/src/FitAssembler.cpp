@@ -99,7 +99,6 @@ FitResult * FitAssembler::DoFit( IMinimiser * Minimiser, IFitFunction * TheFunct
 	for( int i=0; i< thisBottle->NumberResults(); ++i )
 	{
 		IDataSet* thisDataSet = thisBottle->GetResultDataSet( i );
-		thisDataSet->ClearAllPseudoObservables();
 	}
 
 	return final_result;
