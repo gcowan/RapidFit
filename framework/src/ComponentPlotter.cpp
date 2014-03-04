@@ -43,7 +43,9 @@
 #include <cstdlib>
 #include <algorithm>
 
+#ifdef __USE_VALGRIND
 #include <valgrind/callgrind.h>
+#endif
 #define DOUBLE_TOLERANCE 1E-6
 
 using namespace::std;
@@ -321,7 +323,9 @@ ComponentPlotter::~ComponentPlotter()
 //Create a root file containing a projection plot over one observable
 void ComponentPlotter::ProjectObservable()
 {
+#ifdef __USE_VALGRIND
 	CALLGRIND_START_INSTRUMENTATION;
+#endif
 
         plotData->SetBoundary( full_boundary );
 
@@ -345,8 +349,10 @@ void ComponentPlotter::ProjectObservable()
 
         plotData->SetBoundary( initialBoundary );
 
+#ifdef __USE_VALGRIND
 	CALLGRIND_STOP_INSTRUMENTATION;
 	CALLGRIND_DUMP_STATS;
+#endif
 }
 
 //

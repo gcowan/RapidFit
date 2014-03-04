@@ -13,7 +13,6 @@
 #include "DataPoint.h"
 #include "ObservableRef.h"
 #include "StringProcessing.h"
-#include "PseudoObservable.h"
 #include "DebugClass.h"
 //	System Headers
 #include <iostream>
@@ -24,12 +23,12 @@
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex()
+DataPoint::DataPoint() : allObservables(), allNames(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex()
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), allPseudoNames(), allPseudoObservables(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex()
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex()
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -51,7 +50,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 }
 
 DataPoint::DataPoint( const DataPoint& input ) :
-	allObservables(), allNames(input.allNames), allPseudoNames(input.allPseudoNames), allPseudoObservables(input.allPseudoObservables), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
+	allObservables(), allNames(input.allNames), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
 	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID), initialNLL( input.initialNLL ), PerEventData(input.PerEventData), nameIndex()
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
@@ -242,81 +241,6 @@ bool DataPoint::operator() ( pair<DataPoint*,ObservableRef> first, pair<DataPoin
 	return (param_val_1 < param_val_2 );
 }
 
-double DataPoint::GetPseudoObservable( PseudoObservable& Input, vector<double> Values )
-{
-	if(Input.GetIndex()<0)
-	{
-		string name = Input.GetName();
-		int lookup = StringProcessing::VectorContains( &allPseudoNames, &name );
-		if( lookup == -1 )
-		{
-			allPseudoObservables.push_back( &Input );
-			allPseudoNames.push_back( name );
-			Input.SetIndex( (int)allPseudoObservables.size()-1 );
-			allPseudoObservables.back()->SetIndex( (int)allPseudoObservables.size()-1 );
-		}
-		else
-		{
-			Input.SetIndex( lookup );
-			allPseudoObservables[ (unsigned)Input.GetIndex() ] = &Input;
-		}
-	}
-	else
-	{
-		if( Input.GetIndex()>(int)(allPseudoObservables.size()-1) )
-		{
-			string name = Input.GetName();
-			int lookup = StringProcessing::VectorContains( &allPseudoNames, &name );
-			if( lookup == -1 )
-			{
-				allPseudoObservables.push_back( &Input);
-				allPseudoNames.push_back( name );
-				Input.SetIndex( (int)allPseudoObservables.size()-1 );
-				allPseudoObservables.back()->SetIndex( (int)allPseudoObservables.size()-1 );
-			}
-			else
-			{
-				Input.SetIndex( lookup );
-				allPseudoObservables[ (unsigned)Input.GetIndex() ] = &Input;
-			}
-		}
-		else
-		{
-			Input = *(allPseudoObservables[ (unsigned)Input.GetIndex() ]);
-		}
-	}
-
-	PseudoObservable* thisObservable = (allPseudoObservables[ (unsigned)Input.GetIndex() ]);
-
-	double outputObservable = 0.;
-
-	if( Values.empty() )
-	{
-		if( !thisObservable->GetValid() )
-		{
-			vector<ObservableRef>* deps = thisObservable->GetDependencies();
-			vector<double> input;   input.resize( deps->size() );
-			unsigned int i=0;
-			for( vector<ObservableRef>::iterator dep_i = deps->begin(); dep_i != deps->end(); ++dep_i, ++i )
-			{
-				input[ i ] = ( this->GetObservable( *(dep_i) )->GetValue() );
-			}
-			thisObservable->SetInput( input );
-		}
-	}
-	else
-	{
-		if( !thisObservable->GetValid( Values ) )
-		{
-			thisObservable->SetInput( Values );
-		}
-	}
-
-	outputObservable = thisObservable->GetPseudoObservable();
-
-	return outputObservable;
-}
-
 void DataPoint::Print() const
 {
 	cout << "DataPoint:" << endl;
@@ -326,20 +250,7 @@ void DataPoint::Print() const
 		allObservables[i]->Print();
 	}
 
-	if( !allPseudoObservables.empty() )
-	{
-		for( unsigned int i=0; i< allPseudoObservables.size(); ++i )
-		{
-			allPseudoObservables[i]->Print();
-		}
-	}
 	cout << endl;
-}
-
-void DataPoint::ClearPseudoObservable()
-{
-	vector<string> name1;
-	allPseudoNames.swap( name1 );
 }
 
 PhaseSpaceBoundary* DataPoint::GetPhaseSpaceBoundary() const

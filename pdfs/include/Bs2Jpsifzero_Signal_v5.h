@@ -35,7 +35,6 @@ class Bs2Jpsifzero_Signal_v5 : public BasePDF
 {
 	public:
 		Bs2Jpsifzero_Signal_v5( PDFConfigurator* );
-		Bs2Jpsifzero_Signal_v5( const Bs2Jpsifzero_Signal_v5& );
 		~Bs2Jpsifzero_Signal_v5();
 
 		// Mandatory RapidFit Methods
@@ -57,21 +56,6 @@ class Bs2Jpsifzero_Signal_v5 : public BasePDF
 
 		void prepareTimeFac();
 //		void SetupAngularTerms();
-
-		PseudoObservable _expLObs;
-		PseudoObservable _expHObs;
-		PseudoObservable _expSinObs;
-		PseudoObservable _expCosObs;
-
-		PseudoObservable _intexpLObs;
-		PseudoObservable _intexpHObs;
-		PseudoObservable _intexpSinObs;
-		PseudoObservable _intexpCosObs;
-
-		vector<PseudoObservable> _intexpLObs_vec;
-		vector<PseudoObservable> _intexpHObs_vec;
-		vector<PseudoObservable> _intexpSinObs_vec;
-		vector<PseudoObservable> _intexpCosObs_vec;
 
 		int timeBinNum;
 
@@ -149,19 +133,7 @@ class Bs2Jpsifzero_Signal_v5 : public BasePDF
 //		ObservableRef cthetalName;
 ///		ObservableRef phihName;
 
-		// PseudoObservables which allow for some calculations to be cached per event during Runtime
 //		vector<ObservableRef> angularTermDependencies;
-
-		PseudoObservable A0A0_Obs;
-		PseudoObservable APAP_Obs;
-		PseudoObservable ATAT_Obs;
-		PseudoObservable ASAS_Obs;
-		PseudoObservable ImAPAT_Obs;
-		PseudoObservable ReA0AP_Obs;
-		PseudoObservable ImA0AT_Obs;
-		PseudoObservable ReASAP_Obs;
-		PseudoObservable ImASAT_Obs;
-		PseudoObservable ReASA0_Obs;
 
 		double A0A0_value;
 		double APAP_value;

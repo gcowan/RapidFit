@@ -671,7 +671,6 @@ vector<DataPoint*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, v
 		DataPoint* thisPoint = new DataPoint( *templateDataPoint );
 
 		thisPoint->ClearPerEventData();
-		thisPoint->ClearPseudoObservable();
 		vector<string> allObs=thisPoint->GetAllNames();
 		for( unsigned int j=0; j<allObs.size(); ++j )
 		{
@@ -742,7 +741,6 @@ vector<DataPoint*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int num
 			thisObs->SetBkgBinNumber( -1 );
 		}
 		thisPoint->ClearPerEventData();
-		thisPoint->ClearPseudoObservable();
 	}
 
 	pthread_mutex_unlock( &GSL_DATAPOINT_GET_THREADLOCK );

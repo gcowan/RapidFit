@@ -14,7 +14,6 @@
 ///	RapidFit Headers
 #include "Observable.h"
 #include "ObservableRef.h"
-#include "PseudoObservable.h"
 ///	System Headers
 #include <vector>
 #include <string>
@@ -94,26 +93,6 @@ class DataPoint
 		 * @return Void
 		 */
 		void RemoveObservable( const string Name );
-
-		/*!
-		 * @brief This allows you to add a new Psuedo-Observable to this DataPoint, useful when you have a per-event complex object which you don't want to calculate multiple times
-		 *
-		 * @param Input    This is the new PseudoObservable class which allows for all of the information required to be wrapped up in a convenient wrapper
-		 *
-		 * @param Input2   These are external per-event input used in the derrivation of a per-event value
-		 *
-		 * @return returns a pointer to an observable which can be interrogated in exactly the same way as a normal Observable object
-		 */
-		double GetPseudoObservable( PseudoObservable& Input, vector<double> Input2=vector<double>() );
-
-		/*!
-		 * @brief Remove all stored Pseudo-Observable Objects
-		 *
-		 * Removes all Pseudo-Observables Stored in this DataPoint
-		 *
-		 * @return Void
-		 */
-		void ClearPseudoObservable();
 
 		/*!
 		 * @brief Adds an Observable to This DataPoint
@@ -283,20 +262,6 @@ class DataPoint
 		 * A list of the names of all of the Observables in this DataPoint
 		 */
 		vector<string> allNames;
-
-		/*!
-		 *	This is Pseudo-Data i.e. it only varies event to event but it has been calculated at runtime
-		 */
-
-		/*!
-		 * A list of the names of the pseudo-Observables that exist in this DataPoint
-		 */
-		mutable vector<string> allPseudoNames;
-
-		/*!
-		 * A list of pointers to the pseudo-Observables that exist in the DataPoint
-		 */
-		mutable vector<PseudoObservable*> allPseudoObservables;
 
 		/*!
 		 * This is a pointer to the PhaseSpaceBoundary that this datapoint has been defined in

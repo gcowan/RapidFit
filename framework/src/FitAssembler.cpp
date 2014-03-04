@@ -26,14 +26,18 @@
 #include <fstream>
 #include <signal.h>
 
+#ifdef __USE_VALGRIND
 #include <valgrind/callgrind.h>
+#endif
 
 using namespace::std;
 
 //	We will catch any throw statments internal to the minimisation process
 void FitAssembler::SafeMinimise( IMinimiser* Minimiser )
 {
+#ifdef __USE_VALGRIND
 	CALLGRIND_START_INSTRUMENTATION;
+#endif
 	try
 	{
 		// Try a Fit, it it converges, continue to elsewhere in the program
@@ -55,8 +59,10 @@ void FitAssembler::SafeMinimise( IMinimiser* Minimiser )
 	{
 		cerr << "\n\n\n\t\t\tCaught Unknown Exception, THIS IS SERIOUS!!!\n\n\n" << endl;
 	}
+#ifdef __USE_VALGRIND
 	CALLGRIND_STOP_INSTRUMENTATION;
 	CALLGRIND_DUMP_STATS;
+#endif
 }
 
 //The final stage - do the minimisation

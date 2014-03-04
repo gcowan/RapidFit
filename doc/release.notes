@@ -1,5 +1,16 @@
 // $Id: release.notes $
 
+2013/03/04 Rob Currie
+  - Doing some house cleaning
+  - Removed PseudoObservable code... it was clear this was too complicated even if it ever worked
+  - Removed all reference to these objects in DapaPoint and elsewhere in framework
+  - Removed reference to PseudoObservable objects in several pdfs and pushed them back to using Mathematics:: static methods directly
+  - Added __USE_VALGRIND wrapper to valgrind code in FitAssembler and ComponentPlotter
+       This wraps code which of most interest to allow valgrind to be run skipping the 'boring stuff' which is known to not be the bottlenecks or problems in fitting
+  - Deprecating the JpsiPhi v5 pdf as we no longer need it so porting it to not use PseudoObs is wasted effort
+  - Changing the default use case to NOT offset the NLL during fitting
+  - Adding c++11 compile options to the Makefile
+
 2013/02/ Rob Currie
   - Adding CosSin functions and various bugfixes and improvements
 

@@ -62,14 +62,6 @@ MemoryDataSet::~MemoryDataSet()
 	}
 }
 
-void MemoryDataSet::ClearAllPseudoObservables()
-{
-	for( unsigned int i=0; i< allData.size(); ++i )
-	{
-		allData[i]->ClearPseudoObservable();
-	}
-}
-
 //Add a data point to the set
 bool MemoryDataSet::AddDataPoint( DataPoint* NewDataPoint )
 {

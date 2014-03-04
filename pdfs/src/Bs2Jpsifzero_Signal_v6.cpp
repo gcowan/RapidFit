@@ -247,7 +247,7 @@ double Bs2Jpsifzero_Signal_v6::Evaluate(DataPoint * measurement)
 
 	resolutionModel->setObservables( measurement ) ;
 	// Get observables into member variables
-        ATAT_value = measurement->GetPseudoObservable( ATAT_Obs );
+        ATAT_value = 1.;
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();
@@ -273,7 +273,7 @@ double Bs2Jpsifzero_Signal_v6::EvaluateTimeOnly(DataPoint * measurement)
 {
 	_datapoint = measurement;
 	// Get observables into member variables
-        ATAT_value = measurement->GetPseudoObservable( ATAT_Obs );
+        ATAT_value = 1.;
 	t = measurement->GetObservable( timeName )->GetValue() - timeOffset ;
 	tag = (int)measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();

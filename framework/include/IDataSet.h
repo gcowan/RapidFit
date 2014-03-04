@@ -131,8 +131,6 @@ class IDataSet
 
 		virtual void NormaliseWeights() = 0;
 
-		virtual void ClearAllPseudoObservables() = 0;
-
 	protected:
 		/*!
 		 * @brief Default Destructor

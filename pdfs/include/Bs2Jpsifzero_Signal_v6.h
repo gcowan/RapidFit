@@ -49,21 +49,6 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		double normalisationCacheUntagged ;
 		void prepareCDS();
 
-		PseudoObservable _expLObs;
-		PseudoObservable _expHObs;
-		PseudoObservable _expSinObs;
-		PseudoObservable _expCosObs;
-
-		PseudoObservable _intexpLObs;
-		PseudoObservable _intexpHObs;
-		PseudoObservable _intexpSinObs;
-		PseudoObservable _intexpCosObs;
-
-		vector<PseudoObservable> _intexpLObs_vec;
-		vector<PseudoObservable> _intexpHObs_vec;
-		vector<PseudoObservable> _intexpSinObs_vec;
-		vector<PseudoObservable> _intexpCosObs_vec;
-
 		int timeBinNum;
 
 		DataPoint* _datapoint;
@@ -102,8 +87,6 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 		// Observables
 		ObservableRef timeName;		// proper time
 		ObservableRef tagName;			// B tag
-
-		PseudoObservable ATAT_Obs;
 
 		double ATAT_value;
 

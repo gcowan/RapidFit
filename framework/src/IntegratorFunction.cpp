@@ -178,7 +178,6 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 {
 	if( currentPoint->GetPhaseSpaceBoundary() == NULL ) currentPoint->SetPhaseSpaceBoundary( myPhaseSpaceBoundary );
 	currentPoint->ClearPerEventData();
-	currentPoint->ClearPseudoObservable();
 	vector<string> allObs=currentPoint->GetAllNames();
 	for( unsigned int i=0; i<allObs.size(); ++i )
 	{
@@ -314,7 +313,8 @@ double IntegratorFunction::DoEval( const Double_t * x ) const
 	if( std::isnan(result) ) result = 0.;
 
 	//if( result == 0 ) newDataPoint->Print();
-	newDataPoint->ClearPseudoObservable();
+
+	currentPoint->ClearPerEventData();
 	return result;
 }
 

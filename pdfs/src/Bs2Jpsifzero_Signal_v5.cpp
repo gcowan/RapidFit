@@ -23,97 +23,6 @@ using namespace::std;
 PDF_CREATOR( Bs2Jpsifzero_Signal_v5 );
 
 
-Bs2Jpsifzero_Signal_v5::Bs2Jpsifzero_Signal_v5( const Bs2Jpsifzero_Signal_v5& input ) : BasePDF( (BasePDF&) input )
-        , gammaName(input.gammaName), deltaGammaName(input.deltaGammaName), deltaMName(input.deltaMName), Phi_sName(input.Phi_sName)//, Azero_sqName(input.Azero_sqName)
-
-	/*, Apara_sqName(input.Apara_sqName)*/, Aperp_sqName(input.Aperp_sqName)//, delta_zeroName(input.delta_zeroName), delta_paraName(input.delta_paraName)
-
-        //, delta_perpName(input.delta_perpName), As_sqName(input.As_sqName), delta_sName(input.delta_sName), CspName(input.CspName), cosdparName(input.cosdparName)
-
-	/*, cosphisName(input.cosphisName), sinphisName(input.sinphisName)*/, lambdaName(input.lambdaName), mistagName(input.mistagName)
-
-        , mistagP1Name(input.mistagP1Name), mistagP0Name(input.mistagP0Name), mistagSetPointName(input.mistagSetPointName), mistagDeltaP1Name(input.mistagDeltaP1Name)
-
-	, mistagDeltaP0Name(input.mistagDeltaP0Name), mistagDeltaSetPointName(input.mistagDeltaSetPointName), resScaleName(input.resScaleName)
-
-        , eventResolutionName(input.eventResolutionName), res1Name(input.res1Name), res2Name(input.res2Name), res3Name(input.res3Name)
-
-	, res2FractionName(input.res2FractionName), res3FractionName(input.res3FractionName), timeOffsetName(input.timeOffsetName)//, angAccI1Name(input.angAccI1Name)
-
-        //, angAccI2Name(input.angAccI2Name), angAccI3Name(input.angAccI3Name), angAccI4Name(input.angAccI4Name), angAccI5Name(input.angAccI5Name), angAccI6Name(input.angAccI6Name)
-
-	//, angAccI7Name(input.angAccI7Name), angAccI8Name(input.angAccI8Name), angAccI9Name(input.angAccI9Name), angAccI10Name(input.angAccI10Name)
-
-        , timeName(input.timeName)//, cosThetaName(input.cosThetaName), cosPsiName(input.cosPsiName), phiName(input.phiName)
-
-	/*, cthetakName(input.cthetakName), cthetalName(input.cthetalName), phihName(input.phihName)*/, tagName(input.tagName)
-
-	, _useEventResolution(input._useEventResolution), _useTimeAcceptance(input._useTimeAcceptance)//, _useHelicityBasis(input._useHelicityBasis)
-
-	, _numericIntegralForce(input._numericIntegralForce), _numericIntegralTimeOnly(input._numericIntegralTimeOnly)
-
-        , _useCosAndSin(input._useCosAndSin)/*, _useCosDpar(input._useCosDpar)*/, _usePunziMistag(input._usePunziMistag), _usePunziSigmat(input._usePunziSigmat)
-
-	/*, allowNegativeAsSq(input.allowNegativeAsSq), _usePlotComponents(input._usePlotComponents)*/, t(input.t)//, ctheta_tr(input.ctheta_tr), phi_tr(input.phi_tr)
-
-	/*, ctheta_1(input.ctheta_1), ctheta_k(input.ctheta_k), phi_h(input.phi_h), ctheta_l(input.ctheta_l)*/, tag(input.tag), _gamma(input._gamma), dgam(input.dgam)
-
-	, Aperp_sq(input.Aperp_sq), Apara_sq(input.Apara_sq), Azero_sq(input.Azero_sq), As_sq(input.As_sq), delta_para(input.delta_para)
-
-	, delta_perp(input.delta_perp), delta_zero(input.delta_zero), delta_s(input.delta_s), delta1(input.delta1), delta2(input.delta2), delta_ms(input.delta_ms)
-
-	, phi_s(input.phi_s), _cosphis(input._cosphis), _sinphis(input._sinphis), _mistag(input._mistag), _mistagP1(input._mistagP1), _mistagP0(input._mistagP0)
-
-	, _mistagSetPoint(input._mistagSetPoint), resolutionScale(input.resolutionScale), resolution1(input.resolution1), resolution2(input.resolution2)
-
-	, resolution3(input.resolution3), resolution2Fraction(input.resolution2Fraction), resolution3Fraction(input.resolution3Fraction), timeOffset(input.timeOffset)
-
-	//, angAccI1(input.angAccI1), angAccI2(input.angAccI2), angAccI3(input.angAccI3), angAccI4(input.angAccI4), angAccI5(input.angAccI5), angAccI6(input.angAccI6)
-
-	/*, angAccI7(input.angAccI7), angAccI8(input.angAccI8), angAccI9(input.angAccI9), angAccI10(input.angAccI10)*/, tlo(input.tlo), thi(input.thi), expL_stored(input.expL_stored)
-
-	, expH_stored(input.expH_stored), expSin_stored(input.expSin_stored), expCos_stored(input.expCos_stored), intExpL_stored(input.intExpL_stored)
-
-	, intExpH_stored(input.intExpH_stored), intExpSin_stored(input.intExpSin_stored), intExpCos_stored(input.intExpCos_stored), timeAcc(NULL)//, angAcc(NULL)
-
-	, normalisationCacheValid(input.normalisationCacheValid)//, CachedA1(input.CachedA1), CachedA2(input.CachedA2), CachedA3(input.CachedA3), CachedA4(input.CachedA4)
-
-	//, CachedA5(input.CachedA5), CachedA6(input.CachedA6), CachedA7(input.CachedA7), CachedA8(input.CachedA8), CachedA9(input.CachedA9), CachedA10(input.CachedA10)
-
-	, resolution(input.resolution), eventResolution(input.eventResolution), timeIntegralCacheValid(input.timeIntegralCacheValid), storeExpL(input.storeExpL), storeExpH(input.storeExpH)
-
-	, storeExpSin(input.storeExpSin), storeExpCos(input.storeExpCos), normalisationCacheUntagged(input.normalisationCacheUntagged)
-
-	, _expLObs(input._expLObs), _expHObs(input._expHObs), _expSinObs(input._expSinObs), _expCosObs(input._expCosObs), _intexpLObs(input._intexpLObs), _intexpHObs(input._intexpHObs)
-
-	, _intexpSinObs(input._intexpSinObs), _intexpCosObs(input._intexpCosObs), _intexpLObs_vec(input._intexpLObs_vec), _intexpHObs_vec(input._intexpHObs_vec)
-	
-	, _intexpSinObs_vec(input._intexpSinObs_vec), _intexpCosObs_vec(input._intexpCosObs_vec), timeBinNum(input.timeBinNum), _datapoint(NULL)//, componentIndex(input.componentIndex)
-
-	//, angularTermDependencies(input.angularTermDependencies)//, A0A0_Obs(input.A0A0_Obs), APAP_Obs(input.APAP_Obs), ATAT_Obs(input.ATAT_Obs), ASAS_Obs(input.ASAS_Obs)
-
-	//, ImAPAT_Obs(input.ImAPAT_Obs), ReA0AP_Obs(input.ReA0AP_Obs), ImA0AT_Obs(input.ImA0AT_Obs), ReASAP_Obs(input.ReASAP_Obs), ImASAT_Obs(input.ImASAT_Obs), ReASA0_Obs(input.ReASA0_Obs)
-
-	//, A0A0_value(input.A0A0_value), APAP_value(input.APAP_value), ATAT_value(input.ATAT_value), ASAS_value(input.ASAS_value), ImAPAT_value(input.ImAPAT_value)
-
-	//, ReA0AP_value(input.ReA0AP_value), ImA0AT_value(input.ImA0AT_value), ReASAP_value(input.ReASAP_value), ImASAT_value(input.ImASAT_value), ReASA0_value(input.ReASA0_value)
-
-	, Csp(input.Csp), cosdpar(input.cosdpar), lambda(input.lambda), _CC(input._CC), _DD(input._DD), _SS(input._SS), _mistagDeltaP1(input._mistagDeltaP1)
-
-	, _mistagDeltaP0(input._mistagDeltaP0), _mistagDeltaSetPoint(input._mistagDeltaSetPoint)//, _angAccIgnoreNumerator(input._angAccIgnoreNumerator)//, sin_delta_perp_s(input.sin_delta_perp_s)
-
-	//, cos_delta_perp_s(input.cos_delta_perp_s), sin_delta_zero_s(input.sin_delta_zero_s), cos_delta_zero_s(input.cos_delta_zero_s), sin_delta_para_s(input.sin_delta_para_s)
-
-	//, cos_delta_para_s(input.cos_delta_para_s), sin_delta1(input.sin_delta1), cos_delta1(input.cos_delta1), sin_delta2(input.sin_delta2), cos_delta2(input.cos_delta2)
-
-	/*, sin_delta_2_1(input.sin_delta_2_1), cos_delta_2_1(input.cos_delta_2_1)*/, stored_AT(input.stored_AT)//, stored_AP(input.stored_AP), stored_A0(input.stored_A0)
-
-	/*, stored_AS(input.stored_AS), stored_ASint(input.stored_ASint)*/, stored_gammal(input.stored_gammal), stored_gammah(input.stored_gammah)//, _fitDirectlyForApara(input._fitDirectlyForApara)
-{
-	//if( input.angAcc != NULL ) angAcc = new AngularAcceptance( *(input.angAcc) );
-	if( input.timeAcc != NULL ) timeAcc = new SlicedAcceptance( *(input.timeAcc) );
-}
-
 //......................................
 //Constructor(s)
 //New one with configurator
@@ -283,7 +192,7 @@ Bs2Jpsifzero_Signal_v5::Bs2Jpsifzero_Signal_v5(PDFConfigurator* configurator) : 
 	//histCounter = 0;
 	//~PELC
 
-	this->prepareTimeFac();
+	this->SetCopyConstructorSafe( false );
 //	lambda = 1.0;
 }
 /*
@@ -582,55 +491,6 @@ bool Bs2Jpsifzero_Signal_v5::SetPhysicsParameters( ParameterSet* NewParameterSet
 */
 	return result;
 }
-
-void Bs2Jpsifzero_Signal_v5::prepareTimeFac()
-{
-	//	Evaluate time functions
-	_expLObs = PseudoObservable( "expL_time" );
-	_expLObs.AddFunction( Mathematics::Exp_Wrapper );
-	_expHObs = PseudoObservable( "expH_time" );
-	_expHObs.AddFunction( Mathematics::Exp_Wrapper );
-	_expSinObs = PseudoObservable( "expSin_time" );
-	_expSinObs.AddFunction( Mathematics::ExpSin_Wrapper );
-	_expCosObs = PseudoObservable( "expCos_time" );
-	_expCosObs.AddFunction( Mathematics::ExpCos_Wrapper );
-
-	//	Normalise time functions
-	if( !useTimeAcceptance() )
-	{
-		_intexpLObs = PseudoObservable( "intexpL_time" );
-		_intexpLObs.AddFunction( Mathematics::ExpInt_Wrapper );
-		_intexpHObs = PseudoObservable( "intexpH_time" );
-		_intexpHObs.AddFunction( Mathematics::ExpInt_Wrapper );
-		_intexpSinObs = PseudoObservable( "intexpSin_time" );
-		_intexpSinObs.AddFunction( Mathematics::ExpSinInt_Wrapper );
-		_intexpCosObs = PseudoObservable( "intexpCos_time" );
-		_intexpCosObs.AddFunction( Mathematics::ExpCosInt_Wrapper );
-	}
-	else
-	{
-
-		// This Code DOES WORK, it just ends up consuming a HUGE amount of memory and as such ends up being a worse bottleneck than the one it was intended to remove
-
-		for( unsigned int i=0; i< timeAcc->numberOfSlices(); ++i )
-		{
-			TString _intexpLObs_vec_name="intexpL_time_"; _intexpLObs_vec_name+=i;
-			_intexpLObs_vec.push_back( PseudoObservable( _intexpLObs_vec_name.Data() ) );
-			_intexpLObs_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
-			TString _intexpHObs_vec_name="intexpH_time"; _intexpHObs_vec_name+=i;
-			_intexpHObs_vec.push_back( PseudoObservable( _intexpHObs_vec_name.Data() ) );
-			_intexpHObs_vec.back().AddFunction( Mathematics::ExpInt_Wrapper );
-			TString _intexpSinObs_vec_name="intexpSin_time"; _intexpSinObs_vec_name+=i;
-			_intexpSinObs_vec.push_back( PseudoObservable( _intexpSinObs_vec_name.Data() ) );
-			_intexpSinObs_vec.back().AddFunction( Mathematics::ExpSinInt_Wrapper );
-			TString _intexpCosObs_vec_name="intexpCos_time"; _intexpCosObs_vec_name+=i;
-			_intexpCosObs_vec.push_back( PseudoObservable( _intexpCosObs_vec_name.Data() ) );
-			_intexpCosObs_vec.back().AddFunction( Mathematics::ExpCosInt_Wrapper );
-		}
-
-	}
-}
-
 
 //.............................................................
 //Calculate the PDF value for a given set of observables for use by numeric integral
@@ -943,10 +803,10 @@ void Bs2Jpsifzero_Signal_v5::preCalculateTimeFactors()
 		vector<double> Exp_Input_2(3,0.); Exp_Input_2[0]=t; Exp_Input_2[1]=gamma_h(); Exp_Input_2[2]=resolution;
 		vector<double> Input_2(4,0.); Input_2[0]=t; Input_2[1]=gamma(); Input_2[2]=delta_ms; Input_2[3]=resolution;
 
-		expL_stored = _datapoint->GetPseudoObservable( _expLObs, Exp_Input_1 );
-		expH_stored = _datapoint->GetPseudoObservable( _expHObs, Exp_Input_2 );
-		expSin_stored = _datapoint->GetPseudoObservable( _expSinObs, Input_2 );
-		expCos_stored = _datapoint->GetPseudoObservable( _expCosObs, Input_2 );
+		expL_stored = Mathematics::Exp_Wrapper( Exp_Input_1 );
+		expH_stored = Mathematics::Exp_Wrapper( Exp_Input_2 );
+		expSin_stored = Mathematics::ExpSin_Wrapper( Input_2 );
+		expCos_stored = Mathematics::ExpCos_Wrapper( Input_2 );
 	}
 	else
 	{
@@ -968,17 +828,17 @@ void Bs2Jpsifzero_Signal_v5::preCalculateTimeIntegrals()
 	vector<double> Input_2(5,0.); Input_2[0]=tlo; Input_2[1]=thi; Input_2[2]=gamma(); Input_2[3]=delta_ms; Input_2[4]=resolution;
 	if( !useTimeAcceptance() && useEventResolution() )
 	{
-		intExpL_stored = _datapoint->GetPseudoObservable( _intexpLObs, Exp_Input_1 );
-		intExpH_stored = _datapoint->GetPseudoObservable( _intexpHObs, Exp_Input_2 );
-		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs, Input_2 );
-		intExpCos_stored = _datapoint->GetPseudoObservable( _intexpCosObs, Input_2 );
+		intExpL_stored = Mathematics::ExpInt_Wrapper( Exp_Input_1 );
+		intExpH_stored = Mathematics::ExpInt_Wrapper( Exp_Input_2 );
+		intExpSin_stored = Mathematics::ExpSinInt_Wrapper( Input_2 );
+		intExpCos_stored = Mathematics::ExpCosInt_Wrapper( Input_2 );
 	}
 	else if( useTimeAcceptance() && useEventResolution() )
 	{
-		intExpL_stored = _datapoint->GetPseudoObservable( _intexpLObs_vec[ (unsigned)timeBinNum ], Exp_Input_1 );
-		intExpH_stored = _datapoint->GetPseudoObservable( _intexpHObs_vec[ (unsigned)timeBinNum ], Exp_Input_2 );
-		intExpSin_stored = _datapoint->GetPseudoObservable( _intexpSinObs_vec[ (unsigned)timeBinNum ], Input_2 );
-		intExpCos_stored = _datapoint->GetPseudoObservable( _intexpCosObs_vec[ (unsigned)timeBinNum ], Input_2 );
+		intExpL_stored = Mathematics::ExpInt_Wrapper( Exp_Input_1 );
+		intExpH_stored = Mathematics::ExpInt_Wrapper( Exp_Input_2 );
+		intExpSin_stored = Mathematics::ExpSinInt_Wrapper( Input_2 );
+		intExpCos_stored = Mathematics::ExpCosInt_Wrapper( Input_2 );
 	}
 	else
 	{
