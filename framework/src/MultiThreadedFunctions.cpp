@@ -12,8 +12,9 @@
 
 using namespace::std;
 
-vector<double>* MultiThreadedFunctions::ParallelEvaulate( IPDF* thisFunction, IDataSet* thesePoints, ThreadingConfig* threadingInfo )
+vector<double>* MultiThreadedFunctions::ParallelEvaluate( IPDF* thisFunction, IDataSet* thesePoints, ThreadingConfig* threadingInfo )
 {
+	if( threadingInfo == NULL ) return MultiThreadedFunctions::ParallelEvaluate_pthreads( thisFunction, thesePoints, 4, NULL );
 	if( threadingInfo->MultiThreadingInstance == "pthreads" )
 	{
 		return MultiThreadedFunctions::ParallelEvaluate_pthreads( thisFunction, thesePoints, threadingInfo->numThreads, threadingInfo->wantedComponent );
@@ -24,8 +25,9 @@ vector<double>* MultiThreadedFunctions::ParallelEvaulate( IPDF* thisFunction, ID
 	}
 }
 
-vector<double>* MultiThreadedFunctions::ParallelEvaulate( vector<IPDF*> thisFunction, vector<IDataSet*> thesePoints, ThreadingConfig* threadingInfo )
+vector<double>* MultiThreadedFunctions::ParallelEvaluate( vector<IPDF*> thisFunction, vector<IDataSet*> thesePoints, ThreadingConfig* threadingInfo )
 {
+	if( threadingInfo == NULL ) return MultiThreadedFunctions::ParallelEvaluate_pthreads( thisFunction, thesePoints, 4, NULL );
 	if( threadingInfo->MultiThreadingInstance == "pthreads" )
 	{
 		return MultiThreadedFunctions::ParallelEvaluate_pthreads( thisFunction, thesePoints, threadingInfo->numThreads, threadingInfo->wantedComponent );
@@ -38,6 +40,7 @@ vector<double>* MultiThreadedFunctions::ParallelEvaulate( vector<IPDF*> thisFunc
 
 vector<double>* MultiThreadedFunctions::ParallelIntegrate( IPDF* thisFunction, IDataSet* thesePoints, PhaseSpaceBoundary* thisBoundary, ThreadingConfig* threadingInfo )
 {
+	if( threadingInfo == NULL ) return MultiThreadedFunctions::ParallelIntegrate_pthreads( thisFunction, thesePoints, thisBoundary, 4 );
 	if( threadingInfo->MultiThreadingInstance == "pthreads" )
 	{
 		return MultiThreadedFunctions::ParallelIntegrate_pthreads( thisFunction, thesePoints, thisBoundary, threadingInfo->numThreads );
@@ -50,6 +53,7 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate( IPDF* thisFunction, I
 
 vector<double>* MultiThreadedFunctions::ParallelIntegrate( vector<IPDF*> thisFunction, vector<IDataSet*> thesePoints, vector<PhaseSpaceBoundary*> thisBoundary, ThreadingConfig* threadingInfo )
 {
+	if( threadingInfo == NULL ) return MultiThreadedFunctions::ParallelIntegrate_pthreads( thisFunction, thesePoints, thisBoundary, 4 );
 	if( threadingInfo->MultiThreadingInstance == "pthreads" )
 	{
 		return MultiThreadedFunctions::ParallelIntegrate_pthreads( thisFunction, thesePoints, thisBoundary, threadingInfo->numThreads );
@@ -68,10 +72,10 @@ vector<IPDF*> MultiThreadedFunctions::GetFunctions( IPDF* thisFunction, unsigned
 	{
 		if( thisFunction->GetLabel() == StoredFunctions[0]->GetLabel() && StoredFunctions.size() == nThreads )
 		{
-			/*for( unsigned int i=0; i< nThreads; ++i )
+			for( unsigned int i=0; i< nThreads; ++i )
 			{
 				StoredFunctions[i]->UpdatePhysicsParameters( thisFunction->GetPhysicsParameters() );
-			}*/
+			}
 			return StoredFunctions;
 		}
 
@@ -286,15 +290,9 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( IPDF* thisFu
 		payLoad.push_back( (IDataSet*) new MemoryDataSet( thesePoints->GetBoundary(), datasets_data[i] ) );
 	}
 
-	double tempVal = thisFunction->Integral( payLoad[0]->GetDataPoint(0), thisBoundary );
+	double tempVal = thisFunction->Integral( payLoad[0]->GetDataPoint(0), thisBoundary ); (void) tempVal;
 
-	(void) tempVal;
-
-	vector<IPDF*> functions;
-	for( unsigned int i=0; i< nThreads; ++i )
-	{
-		functions.push_back( ClassLookUp::CopyPDF( thisFunction ) );
-	}
+	vector<IPDF*> functions = MultiThreadedFunctions::GetFunctions( thisFunction, nThreads );
 
 	vector<PhaseSpaceBoundary*> boundaries;
 	for( unsigned int i=0; i< nThreads; ++i )
@@ -304,8 +302,8 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( IPDF* thisFu
 
 	vector<double>* returnable = MultiThreadedFunctions::ParallelIntegrate_pthreads( functions, payLoad, boundaries, nThreads );
 
-	for( unsigned int i=0; i< payLoad.size(); ++i ) if( payLoad[i] != NULL ) delete payLoad[i];
-	for( unsigned int i=0; i< functions.size(); ++i ) if( functions[i] != NULL ) delete functions[i];
+	//for( unsigned int i=0; i< payLoad.size(); ++i ) if( payLoad[i] != NULL ) delete payLoad[i];
+	//for( unsigned int i=0; i< functions.size(); ++i ) if( functions[i] != NULL ) delete functions[i];
 	for( unsigned int i=0; i< boundaries.size(); ++i ) if( boundaries[i] != NULL ) delete boundaries[i];
 
 	return returnable;

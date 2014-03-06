@@ -27,9 +27,9 @@ class MultiThreadedFunctions
 {
 	public:
 
-		static vector<double>* ParallelEvaulate( IPDF* thisFunction, IDataSet* thesePoints, ThreadingConfig* threadingInfo );
+		static vector<double>* ParallelEvaluate( IPDF* thisFunction, IDataSet* thesePoints, ThreadingConfig* threadingInfo );
 
-		static vector<double>* ParallelEvaulate( vector<IPDF*> thisFunction, vector<IDataSet*> thesePoints, ThreadingConfig* threadingInfo );
+		static vector<double>* ParallelEvaluate( vector<IPDF*> thisFunction, vector<IDataSet*> thesePoints, ThreadingConfig* threadingInfo );
 
 		static vector<double>* ParallelIntegrate( IPDF* thisFunction, IDataSet* thesePoints, PhaseSpaceBoundary* thisBoundary, ThreadingConfig* threadingInfo );
 

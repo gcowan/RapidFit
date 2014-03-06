@@ -878,7 +878,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		}
 	}
 
-	vector<double>* thisSet = MultiThreadedFunctions::ParallelEvaulate( functionToWrap, thisDataSet, thisConfig );
+	vector<double>* thisSet = MultiThreadedFunctions::ParallelEvaluate( functionToWrap, thisDataSet, thisConfig );
 
 	if( debug != NULL )
 	{

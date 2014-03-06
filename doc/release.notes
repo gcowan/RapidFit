@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2013/03/06 Rob Currie
+  - Fixing typo in MutliThreaded code and adding a new step to update the PhysicsParameters in cached PDFs
+
 2013/03/04 Rob Currie
   - Doing some house cleaning
   - Removed PseudoObservable code... it was clear this was too complicated even if it ever worked
