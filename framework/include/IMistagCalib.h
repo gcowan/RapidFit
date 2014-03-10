@@ -16,7 +16,7 @@ class IMistagCalib
 		virtual void setParameters( const ParameterSet & parameters ) = 0;
 
 		virtual void addObservables( vector<string> & observableNames ) const = 0;
-		virtual void setObservables( const DataPoint * measurement ) = 0;
+		virtual void setObservables( DataPoint * measurement ) = 0;
 
 		virtual double D1() const = 0;
 

@@ -39,7 +39,7 @@ using namespace::std;
 DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, int starting_entry, PhaseSpaceBoundary* Boundary ) :
 	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
 	generatePDF(NULL), separateGeneratePDF(false), parametersAreSet(false), Start_Entry(starting_entry), DEBUG_DATA(false), internalBoundary(NULL),
-	internalRef(NULL), debug( new DebugClass(false) ), fileName("undefined")
+	internalRef(NULL), fileName("undefined")
 {
 	if( Boundary != NULL )
 	{
@@ -52,7 +52,7 @@ DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, 
 DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, string cut, vector<string> DataArguments, vector<string> DataArgumentNames, IPDF * DataPDF, PhaseSpaceBoundary* Boundary ) :
 	source(DataSource), cutString(cut), numberEvents(DataNumber), arguments(DataArguments), argumentNames(DataArgumentNames),
 	generatePDF( ClassLookUp::CopyPDF(DataPDF) ), separateGeneratePDF(true), parametersAreSet(false), Start_Entry(0), DEBUG_DATA(false), internalBoundary(NULL),
-	internalRef(NULL), debug( new DebugClass(false) ), fileName("undefined")
+	internalRef(NULL), fileName("undefined")
 {
 	if( Boundary != NULL )
 	{
@@ -64,7 +64,7 @@ DataSetConfiguration::DataSetConfiguration( string DataSource, long DataNumber, 
 DataSetConfiguration::DataSetConfiguration ( const DataSetConfiguration& input ) :
 	source(input.source), cutString(input.cutString), numberEvents(input.numberEvents), arguments(input.arguments), argumentNames(input.argumentNames),
 	generatePDF( (input.generatePDF==NULL)?NULL:ClassLookUp::CopyPDF(input.generatePDF) ), separateGeneratePDF(input.separateGeneratePDF), parametersAreSet(input.parametersAreSet),
-	Start_Entry(input.Start_Entry), DEBUG_DATA(input.DEBUG_DATA), internalBoundary(NULL), internalRef(NULL), debug( new DebugClass(*input.debug)), fileName( input.fileName )
+	Start_Entry(input.Start_Entry), DEBUG_DATA(input.DEBUG_DATA), internalBoundary(NULL), internalRef(NULL), fileName( input.fileName )
 {
 	if( input.internalBoundary != NULL )
 	{
@@ -78,7 +78,6 @@ DataSetConfiguration::~DataSetConfiguration()
 {
 	if( generatePDF != NULL ) delete generatePDF;
 	if( internalBoundary != NULL ) delete internalBoundary;
-	if( debug != NULL ) delete debug;
 }
 
 IPDF* DataSetConfiguration::GetGenerationPDF() const
@@ -657,12 +656,6 @@ string DataSetConfiguration::XML() const
 	xml << "</DataSet>" << endl;
 
 	return xml.str();
-}
-
-void DataSetConfiguration::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
 }
 
 PhaseSpaceBoundary* DataSetConfiguration::GetPhaseSpace() const

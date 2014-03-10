@@ -26,23 +26,19 @@
 using namespace::std;
 
 //Constructor
-BasePDF_Framework::BasePDF_Framework( IPDF* thisPDF ) : IPDF_Framework(), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ), debug_mutex(NULL), can_remove_mutex(true), debug(NULL),
+BasePDF_Framework::BasePDF_Framework( IPDF* thisPDF ) : IPDF_Framework(), PDFName("Base"), PDFLabel("Base"), copy_object( NULL ), debug_mutex(NULL), can_remove_mutex(true),
 	debuggingON(false), CopyConstructorIsSafe(true), thisConfig(NULL), myIntegrator(NULL)
 {
-	debug = new DebugClass();
 	debug_mutex = new pthread_mutex_t();
 
 	myIntegrator = new RapidFitIntegrator( thisPDF );
-	myIntegrator->SetDebug( debug );
 }
 
 BasePDF_Framework::BasePDF_Framework( const BasePDF_Framework& input ) : IPDF_Framework( input ),
 	PDFName( input.PDFName ), PDFLabel( input.PDFLabel ), copy_object( input.copy_object ),
-	thisConfig(NULL), debuggingON(input.debuggingON), debug_mutex(input.debug_mutex), can_remove_mutex(false), debug(NULL),
+	thisConfig(NULL), debuggingON(input.debuggingON), debug_mutex(input.debug_mutex), can_remove_mutex(false),
 	CopyConstructorIsSafe(input.CopyConstructorIsSafe), myIntegrator(NULL)
 {
-	debug = (input.debug==NULL)?NULL:new DebugClass(*input.debug);
-
 	if( input.thisConfig != NULL ) thisConfig = new PDFConfigurator( *(input.thisConfig) );
 
 	if( input.myIntegrator != NULL ) myIntegrator = new RapidFitIntegrator( *(input.myIntegrator) );
@@ -60,6 +56,7 @@ bool BasePDF_Framework::IsCopyConstructorSafe() const
 
 bool BasePDF_Framework::IsDebuggingON()
 {
+	debuggingON = DebugClass::DebugThisClass( "BasePDF" );
 	return debuggingON;
 }
 
@@ -68,7 +65,6 @@ BasePDF_Framework::~BasePDF_Framework()
 {
 	if( thisConfig != NULL ) delete thisConfig;
 	if( debug_mutex != NULL && can_remove_mutex == true ) delete debug_mutex;
-	if( debug != NULL ) delete debug;
 	if( myIntegrator != NULL ) delete myIntegrator;
 }
 
@@ -134,22 +130,6 @@ void BasePDF_Framework::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
 	can_remove_mutex = can_remove;
 	if( debug_mutex != NULL && can_remove_mutex ) delete debug_mutex;
 	debug_mutex = Input;
-}
-
-void BasePDF_Framework::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
-	if( myIntegrator != NULL ) myIntegrator->SetDebug( debug );
-
-	if( debug != NULL )
-	{
-		debuggingON = debug->DebugThisClass( "BasePDF" );
-	}
-	else
-	{
-		debuggingON = false;
-	}
 }
 
 void BasePDF_Framework::Print() const

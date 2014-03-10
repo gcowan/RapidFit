@@ -380,13 +380,6 @@ void ProdPDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
 	debug_mutex = Input;
 }
 
-void ProdPDF::SetDebug( DebugClass* input_debug )
-{
-	BasePDF::SetDebug( input_debug );
-	firstPDF->SetDebug( input_debug );
-	secondPDF->SetDebug( input_debug );
-}
-
 string ProdPDF::GetComponentName( ComponentRef* componentIndexObj )
 {
 	if( componentIndexObj == NULL ) return "Unknown";

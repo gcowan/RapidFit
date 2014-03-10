@@ -192,8 +192,6 @@ class SumPDF : public BasePDF
 
 		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
 
-		void SetDebug( DebugClass* input_debug );
-
 		/*!
 		 * @brief Returns the name of this Component
 		 *

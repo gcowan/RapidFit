@@ -273,8 +273,6 @@ class RapidFitIntegrator
 		 */
 		vector<string> DontNumericallyIntegrateList( const DataPoint*, vector<string> = vector<string>() );
 
-		void SetDebug( DebugClass* debug );
-
 		static vector<DataPoint*> getGSLIntegrationPoints( unsigned int number, vector<double> maxima, vector<double> minima, DataPoint* templateDataPoint, vector<string> doIntegrate,
 									PhaseSpaceBoundary* input );
 
@@ -317,7 +315,7 @@ class RapidFitIntegrator
 				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int GSLFixedPoints=10000 );
 
 		static double PseudoRandomNumberIntegralThreaded( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary, ComponentRef* componentIndex,
-				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int num_threads=4, unsigned int GSLFixedPoints=10000, DebugClass* debug=new DebugClass(false) );
+				vector<string> doIntegrate, vector<string> doNotIntegrate, unsigned int num_threads=4, unsigned int GSLFixedPoints=10000 );
 
 		/*!
 		 * @brief This is the Interface to The MuliDimentional Integral class within ROOT
@@ -327,7 +325,7 @@ class RapidFitIntegrator
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
 		static double MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* thisIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug=new DebugClass(false) );
+				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate );
 
 		/*!
 		 * @brief This is the Interface to the 1D Integrator class within ROOT
@@ -337,7 +335,7 @@ class RapidFitIntegrator
 		 * @return This Should return a double > 0 unless there has been an error
 		 */
 		static double OneDimentionIntegral( IPDF* functionToWrap, IntegratorOneDim * oneDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug=new DebugClass(false) );
+				ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate );
 
 		/*!
 		 * This stores the Ratio of the Integrals after the Comparison between Analytical and Numerical
@@ -399,8 +397,6 @@ class RapidFitIntegrator
 		 * @brief to let the user choose if they want to use MC integration using pseudo-random numbers.
 		 */
 		bool pseudoRandomIntegration;
-
-		DebugClass* debug;
 
 		unsigned int num_threads;
 

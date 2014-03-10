@@ -210,7 +210,7 @@ void StatisticsFunctions::DoDontIntegrateLists( IPDF * InputPDF, const PhaseSpac
 }
 
 //Perform data averaging
-vector<DataPoint*> StatisticsFunctions::DataAverage( const IDataSet * InputData, const vector< vector<double> > DiscreteCombinations,
+vector<DataPoint*> StatisticsFunctions::DataAverage( IDataSet * InputData, const vector< vector<double> > DiscreteCombinations,
 	const vector< vector<double> > DiscreteValues, const vector<string> DiscreteNames, const vector<string> ContinuousNames,
 	vector<string> & DataPointDescriptions, vector<double> & DataPointWeights )
 {

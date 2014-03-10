@@ -195,7 +195,7 @@ double CombinedMistagCalib::GetProbBbarSS() const
 	}
 }
 
-void CombinedMistagCalib::setObservables( const DataPoint* measurement )
+void CombinedMistagCalib::setObservables( DataPoint* measurement )
 {
 	double readTagOS = measurement->GetObservable( tagOSName )->GetValue();
 	_tagOS = (readTagOS>=0.)?(int)ceil(readTagOS):(int)floor(readTagOS);

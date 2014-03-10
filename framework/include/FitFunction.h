@@ -155,8 +155,6 @@ class FitFunction : public IFitFunction
 
 		virtual vector<string> ConstrainedParameter() const;
 
-		void SetDebug( DebugClass* debug );
-
 		vector<string> GetNotConstrainedList() const;
 
 		unsigned int GetCallNum();
@@ -210,8 +208,6 @@ class FitFunction : public IFitFunction
 		bool testIntegrator;			/*!	Undocumented	*/
 
 		bool weightsSquared;			/*!	Should Weights squared be used in evaluating the function	*/
-
-		DebugClass* debug;				/*!	Flag controlling the turning on/off of extra debug information	*/
 
 		string Name;
 

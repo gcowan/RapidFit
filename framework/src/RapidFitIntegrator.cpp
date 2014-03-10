@@ -7,7 +7,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-8
-  */
+ */
 
 //	ROOT Headers
 #include "RVersion.h"
@@ -61,7 +61,7 @@ using namespace::std;
 RapidFitIntegrator::RapidFitIntegrator( IPDF * InputFunction, bool ForceNumerical, bool UsePseudoRandomIntegration ) :
 	ratioOfIntegrals(-1.), fastIntegrator(NULL), functionToWrap(InputFunction), multiDimensionIntegrator(NULL), oneDimensionIntegrator(NULL),
 	functionCanIntegrate(false), haveTestedIntegral(false), num_threads(4),
-	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(), debug(new DebugClass(false) ),
+	RapidFitIntegratorNumerical( ForceNumerical ), obs_check(false), checked_list(),
 	pseudoRandomIntegration( UsePseudoRandomIntegration ), GSLFixedPoints( __DEFAULT_RAPIDFIT_FIXEDINTEGRATIONPOINTS ), _storedConfig(NULL)
 {
 	multiDimensionIntegrator = new AdaptiveIntegratorMultiDim();
@@ -79,7 +79,7 @@ RapidFitIntegrator::RapidFitIntegrator( const RapidFitIntegrator& input ) : rati
 	fastIntegrator( NULL ), functionToWrap( input.functionToWrap ), multiDimensionIntegrator( NULL ), oneDimensionIntegrator( NULL ),
 	pseudoRandomIntegration(input.pseudoRandomIntegration), functionCanIntegrate( input.functionCanIntegrate ), haveTestedIntegral( true ),
 	RapidFitIntegratorNumerical( input.RapidFitIntegratorNumerical ), obs_check( input.obs_check ), checked_list( input.checked_list ),
-	debug((input.debug==NULL)?NULL:new DebugClass(*input.debug)), num_threads(input.num_threads), GSLFixedPoints( input.GSLFixedPoints ),
+	num_threads(input.num_threads), GSLFixedPoints( input.GSLFixedPoints ),
 	_storedConfig( input._storedConfig==NULL?NULL:new RapidFitIntegratorConfig( *input._storedConfig ) )
 {
 	//	We don't own the PDF so no need to duplicate it as we have to be told which one to use
@@ -164,12 +164,9 @@ bool RapidFitIntegrator::GetUseGSLIntegrator() const
 void RapidFitIntegrator::SetUseGSLIntegrator( const bool input )
 {
 	pseudoRandomIntegration = input;
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			if( input ) cout << "Requesting GSL." << endl;
-		}
+		if( input ) cout << "Requesting GSL." << endl;
 	}
 }
 
@@ -177,12 +174,9 @@ void RapidFitIntegrator::SetFixedIntegralPoints( const unsigned int input )
 {
 	GSLFixedPoints = input;
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			cout << "Setting the Fixed number of Integration Points" << endl;
-		}
+		cout << "Setting the Fixed number of Integration Points" << endl;
 	}
 }
 
@@ -202,7 +196,6 @@ RapidFitIntegrator::~RapidFitIntegrator()
 	if( multiDimensionIntegrator != NULL ) delete multiDimensionIntegrator;
 	if( oneDimensionIntegrator != NULL ) delete oneDimensionIntegrator;
 	if( fastIntegrator != NULL ) delete fastIntegrator;
-	if( debug != NULL ) delete debug;
 	//this->clearGSLIntegrationPoints();
 	if( this->_storedConfig != NULL ) delete this->_storedConfig;
 }
@@ -437,20 +430,16 @@ return output;
 }*/
 
 double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, IntegratorOneDim * oneDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
 {
 	//NewDataPoint->Print();
 
 	(void) oneDimensionIntegrator;
 
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex );
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		quickFunction->SetDebug( debug );
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			cout << "RapidFitIntegrator: 1D Setting Up Constraints" << endl;
-		}
+		cout << "RapidFitIntegrator: 1D Setting Up Constraints" << endl;
 	}
 	//cout << "here" << endl;
 	//Find the observable range to integrate over
@@ -762,7 +751,7 @@ void RapidFitIntegrator::clearGSLIntegrationPoints()
 }
 
 double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToWrap, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, unsigned int num_threads, unsigned int GSLFixedPoints, DebugClass* debug )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, unsigned int num_threads, unsigned int GSLFixedPoints )
 {
 #ifdef __RAPIDFIT_USE_GSL
 
@@ -779,24 +768,21 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 	   {
 	   cout << dontIntegrate[i] << endl;
 	   }
-	   */
+	 */
 
 	//Make arrays of the observable ranges to integrate over
 	double* minima = new double[ doIntegrate.size() ];
 	double* maxima = new double[ doIntegrate.size() ];
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			cout << "RapidFitIntegrator: Starting to use GSL PseudoRandomNumberThreaded :D" << endl;
-			//for( unsigned int i=0; i< doIntegrate.size(); ++i ) cout << doIntegrate[i] << "\t";
-			//cout << endl;
-			//for( unsigned int i=0; i< dontIntegrate.size(); ++i ) cout << dontIntegrate[i] << "\t";
-			//cout << endl;
-			cout << "Component: " << componentIndex << endl;
-			if( componentIndex != NULL ) cout << componentIndex->getComponentName() << endl;
-		}
+		cout << "RapidFitIntegrator: Starting to use GSL PseudoRandomNumberThreaded :D" << endl;
+		//for( unsigned int i=0; i< doIntegrate.size(); ++i ) cout << doIntegrate[i] << "\t";
+		//cout << endl;
+		//for( unsigned int i=0; i< dontIntegrate.size(); ++i ) cout << dontIntegrate[i] << "\t";
+		//cout << endl;
+		cout << "Component: " << componentIndex << endl;
+		if( componentIndex != NULL ) cout << componentIndex->getComponentName() << endl;
 	}
 
 	for( unsigned int observableIndex = 0; observableIndex < doIntegrate.size(); ++observableIndex )
@@ -817,12 +803,9 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 		maxima[observableIndex] = (double)newConstraint->GetMaximum();
 	}
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			cout << "RapidFitIntegrator: Doing GSL stuff..." << endl;
-		}
+		cout << "RapidFitIntegrator: Doing GSL stuff..." << endl;
 	}
 
 	vector<double> minima_v, maxima_v;
@@ -840,12 +823,9 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	vector<DataPoint*> doEval_points = RapidFitIntegrator::getGSLIntegrationPoints( GSLFixedPoints, maxima_v, minima_v, templateDataPoint, doIntegrate, thisBound );
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			cout << "RapidFitIntegrator:: " << doEval_points.size() << " GSL Points" << endl;
-		}
+		cout << "RapidFitIntegrator:: " << doEval_points.size() << " GSL Points" << endl;
 	}
 
 	delete templateDataPoint;
@@ -869,23 +849,17 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	//	if( componentIndex != NULL ) cout << functionToWrap->GetName() << "\t" << thisConfig->wantedComponent->getComponentName() << ":\t" << functionToWrap->EvaluateComponent( thisDataSet->GetDataPoint( 0 ), thisConfig->wantedComponent ) << endl;
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			cout << "RapidFitIntegrator:: " << thisDataSet->GetDataNumber() << "  " << functionToWrap->GetLabel() << "  th: " << num_threads << endl;
-			thisDataSet->GetDataPoint( 0 )->Print();
-		}
+		cout << "RapidFitIntegrator:: " << thisDataSet->GetDataNumber() << "  " << functionToWrap->GetLabel() << "  th: " << num_threads << endl;
+		thisDataSet->GetDataPoint( 0 )->Print();
 	}
 
 	vector<double>* thisSet = MultiThreadedFunctions::ParallelEvaluate( functionToWrap, thisDataSet, thisConfig );
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			cout << "RapidFitIntegrator:: Finished Eval" << endl;
-		}
+		cout << "RapidFitIntegrator:: Finished Eval" << endl;
 	}
 
 	delete thisDataSet;
@@ -942,12 +916,9 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 
 	//cout << result << endl;
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-		{
-			cout << result << endl;
-		}
+		cout << result << endl;
 	}
 
 	return result;
@@ -958,7 +929,7 @@ double RapidFitIntegrator::PseudoRandomNumberIntegralThreaded( IPDF* functionToW
 }
 
 double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, AdaptiveIntegratorMultiDim* multiDimensionIntegrator, const DataPoint * NewDataPoint, const PhaseSpaceBoundary * NewBoundary,
-		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate, DebugClass* debug )
+		ComponentRef* componentIndex, vector<string> doIntegrate, vector<string> dontIntegrate )
 {
 	//Make arrays of the observable ranges to integrate over
 	double* minima = new double[ doIntegrate.size() ];
@@ -992,7 +963,6 @@ double RapidFitIntegrator::MultiDimentionIntegral( IPDF* functionToWrap, Adaptiv
 	}
 
 	IntegratorFunction* quickFunction = new IntegratorFunction( functionToWrap, NewDataPoint, doIntegrate, dontIntegrate, NewBoundary, componentIndex, minima_v, maxima_v );
-	if( debug != NULL ) quickFunction->SetDebug( debug );
 
 	multiDimensionIntegrator->SetFunction( *quickFunction );
 
@@ -1017,11 +987,11 @@ double RapidFitIntegrator::NumericallyIntegrateDataPoint( DataPoint* NewDataPoin
 }
 
 /*
-double RapidFitIntegrator::AnallyticallyIntegrateDataPoint( DataPoint* NewDataPoint, PhaseSpaceBoundary* NewBoundary )
-{
-	return functionToWrap->Normalisation( NewDataPoint, NewBoundary );
-}
-*/
+   double RapidFitIntegrator::AnallyticallyIntegrateDataPoint( DataPoint* NewDataPoint, PhaseSpaceBoundary* NewBoundary )
+   {
+   return functionToWrap->Normalisation( NewDataPoint, NewBoundary );
+   }
+ */
 
 //Actually perform the numerical integration
 double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, PhaseSpaceBoundary * NewBoundary, const vector<string> DontIntegrateThese, ComponentRef* componentIndex, const bool IntegrateDataPoint )
@@ -1135,50 +1105,38 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 			//Chose the one dimensional or multi-dimensional method
 			if( doIntegrate.size() == 1 )
 			{
-				if( debug != NULL )
+				if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 				{
-					if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-					{
-						cout << "RapidFitIntegrator: One Dimensional Integral" << endl;
-					}
+					cout << "RapidFitIntegrator: One Dimensional Integral" << endl;
 				}
 				pthread_mutex_lock( &one_dim_lock );
-				numericalIntegral += this->OneDimentionIntegral( functionToWrap, oneDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+				numericalIntegral += this->OneDimentionIntegral( functionToWrap, oneDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
 				//cout << "ret: " << numericalIntegral << endl;
 				pthread_mutex_unlock( &one_dim_lock );
 			}
 			else
 			{
-				if( debug != NULL )
+				if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 				{
-					if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-					{
-						cout << "RapidFitIntegrator: Multi Dimensional Integral" << endl;
-					}
+					cout << "RapidFitIntegrator: Multi Dimensional Integral" << endl;
 				}
 				if( !pseudoRandomIntegration )
 				{
 					pthread_mutex_lock( &multi_dim_lock );
-					numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+					numericalIntegral += this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
 					pthread_mutex_unlock( &multi_dim_lock );
 				}
 				else
 				{
-					if( debug != NULL )
+					if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 					{
-						if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-						{
-							cout << "RapidFitIntegrator: Using GSL PseudoRandomNumber :D" << endl;
-						}
+						cout << "RapidFitIntegrator: Using GSL PseudoRandomNumber :D" << endl;
 					}
 					//numericalIntegral += this->PseudoRandomNumberIntegral( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, GSLFixedPoints );
-					numericalIntegral += this->PseudoRandomNumberIntegralThreaded( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, num_threads, GSLFixedPoints, debug );
-					if( debug != NULL )
+					numericalIntegral += this->PseudoRandomNumberIntegralThreaded( functionToWrap, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, num_threads, GSLFixedPoints );
+					if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 					{
-						if( debug->DebugThisClass( "RapidFitIntegrator" ) )
-						{
-							cout << "RapidFitIntegrator: Finished: " << numericalIntegral << endl;
-						}
+						cout << "RapidFitIntegrator: Finished: " << numericalIntegral << endl;
 					}
 
 					if( numericalIntegral <= -99999. )
@@ -1191,13 +1149,13 @@ double RapidFitIntegrator::DoNumericalIntegral( const DataPoint * NewDataPoint, 
 						if( doIntegrate.size() == 1 )
 						{
 							pthread_mutex_lock( &one_dim_lock );
-							numericalIntegral = this->OneDimentionIntegral( functionToWrap, oneDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+							numericalIntegral = this->OneDimentionIntegral( functionToWrap, oneDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
 							pthread_mutex_unlock( &one_dim_lock );
 						}
 						else
 						{
 							pthread_mutex_lock( &multi_dim_lock );
-							numericalIntegral = this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate, debug );
+							numericalIntegral = this->MultiDimentionIntegral( functionToWrap, multiDimensionIntegrator, *dataPoint_i, NewBoundary, componentIndex, doIntegrate, dontIntegrate );
 							pthread_mutex_unlock( &multi_dim_lock );
 						}
 						this->SetUseGSLIntegrator( false );
@@ -1288,27 +1246,24 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 		}
 	}
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) )
 	{
-		if( debug->DebugThisClass( "RapidFitIntegrator" ) )
+		cout << endl << "Dont Integrate:" << endl;
+		for( unsigned int i=0; i< dontIntegrate.size(); ++i )
 		{
-			cout << endl << "Dont Integrate:" << endl;
-			for( unsigned int i=0; i< dontIntegrate.size(); ++i )
-			{
-				cout << dontIntegrate[i] << "  ";
-			}
-			cout << endl << "Do Integrate:" << endl;
-			for( unsigned int i=0; i< allIntegrable.size(); ++i )
-			{
-				cout << allIntegrable[i] << "  ";
-			}
-			cout << endl << "Left to Integrate:" << endl;
-			for( unsigned int i=0; i< doIntegrate.size(); ++i )
-			{
-				cout << doIntegrate[i] << " ";
-			}
-			cout << endl;
+			cout << dontIntegrate[i] << "  ";
 		}
+		cout << endl << "Do Integrate:" << endl;
+		for( unsigned int i=0; i< allIntegrable.size(); ++i )
+		{
+			cout << allIntegrable[i] << "  ";
+		}
+		cout << endl << "Left to Integrate:" << endl;
+		for( unsigned int i=0; i< doIntegrate.size(); ++i )
+		{
+			cout << doIntegrate[i] << " ";
+		}
+		cout << endl;
 	}
 
 
@@ -1368,12 +1323,5 @@ double RapidFitIntegrator::ProjectObservable( DataPoint* NewDataPoint, PhaseSpac
 void RapidFitIntegrator::ForceTestStatus( bool input )
 {
 	haveTestedIntegral = input;
-}
-
-void RapidFitIntegrator::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
-	//if( functionToWrap != NULL ) functionToWrap->SetDebug( input_debug );
 }
 

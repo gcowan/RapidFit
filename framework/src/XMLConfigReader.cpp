@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	RapidFit Headers
 #include "I_XMLConfigReader.h"
@@ -61,8 +61,8 @@ void XMLConfigReader::PrintTag( const XMLTag* thisTag )
 }
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML, DebugClass* thisDebug ) : I_XMLConfigReader(),
-	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), debug(thisDebug==NULL?new DebugClass(false):new DebugClass(*thisDebug) ), XMLValid(false), _original_seed(-999)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : I_XMLConfigReader(),
+	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), XMLValid(false), _original_seed(-999)
 {
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
@@ -110,16 +110,13 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 
 	cout << endl << endl << endl << "Finished Updating PDF Paths" << endl << endl << endl;
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "XMLConfigReader_TAG" ) )
 	{
-		if( debug->DebugThisClass( "XMLConfigReader_TAG" ) )
+		for( unsigned int childIndex=0; childIndex<children.size(); ++childIndex )
 		{
-			for( unsigned int childIndex=0; childIndex<children.size(); ++childIndex )
-			{
-				XMLConfigReader::PrintTag( children[childIndex] );
-			}
-			if( !debug->GetClassNames().empty() ) exit(0);
+			XMLConfigReader::PrintTag( children[childIndex] );
 		}
+		if( !DebugClass::GetClassNames().empty() ) exit(0);
 	}
 }
 
@@ -250,7 +247,6 @@ XMLConfigReader::~XMLConfigReader()
 {
 	if( All_XML_Tags != NULL ) delete All_XML_Tags;
 	//cout << "Hello from XMLConfigReader destructor" << endl;
-	if( debug != NULL ) delete debug;
 	/*	while( !fileTags.empty() )
 		{
 		if( fileTags.back() != NULL ) delete fileTags.back();
@@ -429,7 +425,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 				}
 			}
 		}
-		if( debug->DebugThisClass( "XMLConfigReader" ) ) cout << "XMLConfigReader:\tMinimiser: " << minimiserName << " requested in XML, creating" << endl;
+		if( DebugClass::DebugThisClass( "XMLConfigReader" ) ) cout << "XMLConfigReader:\tMinimiser: " << minimiserName << " requested in XML, creating" << endl;
 		returnableConfig = new MinimiserConfiguration( minimiserName, GetOutputConfiguration() );
 		returnableConfig->SetSteps( MAXIMUM_MINIMISATION_STEPS );
 		returnableConfig->SetTolerance( FINAL_GRADIENT_TOLERANCE );
@@ -437,7 +433,7 @@ MinimiserConfiguration * XMLConfigReader::MakeMinimiser( XMLTag * MinimiserTag )
 		returnableConfig->SetQuality( Quality );
 		returnableConfig->SetMultiMini( MultiMini );
 		returnableConfig->SetNSigma( nSigma );
-		if( debug->DebugThisClass( "XMLConfigReader" ) )
+		if( DebugClass::DebugThisClass( "XMLConfigReader" ) )
 		{
 			cout << "XMLConfigReader:\tMinimiser Configured With:\t" << endl;
 			cout << "XMLConfigReader:\tSteps:\t" << MAXIMUM_MINIMISATION_STEPS << endl;
@@ -531,7 +527,7 @@ OutputConfiguration * XMLConfigReader::MakeOutputConfiguration( XMLTag * OutputT
 			}
 		}
 
-		if( debug->DebugThisClass( "XMLConfigReader" ) )
+		if( DebugClass::DebugThisClass( "XMLConfigReader" ) )
 		{
 			cout << "XMLConfigReader:\tOutput Configuration Requested, Contructing." << endl;
 		}
@@ -1538,7 +1534,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		PhaseSpaceBoundary * dataBoundary=NULL;
 		vector<string> dataArguments, argumentNames;
 		bool boundaryFound = false;
-		vector< DataSetConfiguration* > dataSetMakers;
+		DataSetConfiguration* dataSetMaker = NULL;
 		bool generatePDFFlag = false;
 		IPDF * generatePDF=NULL;
 		XMLTag* generatePDFXML=NULL;
@@ -1555,7 +1551,7 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 			}
 			else if ( name == "Subset" )
 			{
-				dataSetMakers.push_back( MakeDataSetConfiguration( dataComponents[dataIndex], dataBoundary ) );
+				dataSetMaker = MakeDataSetConfiguration( dataComponents[dataIndex], dataBoundary );
 			}
 			else if ( name == "CutString" )
 			{
@@ -1628,11 +1624,11 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 		}
 
 		//If there are no separate data sources, go for backwards compatibility
-		if( dataSetMakers.size() < 1 )
+		if( dataSetMaker == NULL )
 		{
-			DataSetConfiguration * oldStyleConfig;
+			DataSetConfiguration * oldStyleConfig = NULL;
 
-			if(generatePDFFlag)
+			if( generatePDFFlag )
 			{
 				oldStyleConfig = new DataSetConfiguration( dataSource, numberEvents, cutString, dataArguments, argumentNames, generatePDF, dataBoundary );
 			}
@@ -1648,19 +1644,15 @@ PDFWithData * XMLConfigReader::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDF
 				}
 			}
 
-			dataSetMakers.push_back(oldStyleConfig);
+			dataSetMaker = oldStyleConfig;
 		}
 
 		//Make the objects
 		IPDF * fitPDF = GetPDF( FitPDFTag, dataBoundary, overloadConfigurator );
 		if( generatePDF != NULL ) delete generatePDF;
-		PDFWithData* returnable = new PDFWithData( fitPDF, dataBoundary, dataSetMakers );
+		PDFWithData* returnable = new PDFWithData( fitPDF, dataBoundary, dataSetMaker );
+		delete dataSetMaker;
 		if( fitPDF != NULL ) delete fitPDF;
-		while( !dataSetMakers.empty() )
-		{
-			if( dataSetMakers.back() != NULL ) delete dataSetMakers.back();
-			dataSetMakers.pop_back();
-		}
 		if( dataBoundary != NULL ) delete dataBoundary;
 		return returnable;
 	}
@@ -2108,7 +2100,7 @@ IPDF * XMLConfigReader::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* Inpu
 			   pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 			   configurator->appendOtherParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 			   ++appendParamNum;
-			   */
+			 */
 		}
 		else if ( pdfConfig[configIndex]->GetName() == "FractionName" )
 		{
@@ -2224,7 +2216,7 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 				   pdfConfig[configIndex]->AppendPath( ThisNum.Data() );
 				   configurator->appendOtherParameterNames( XMLTag::GetStringValue( pdfConfig[configIndex] ) );
 				   ++appendParamNum;
-				   */
+				 */
 			}
 			else if ( pdfConfig[configIndex]->GetName() == "ConfigurationParameter" )
 			{
@@ -2246,24 +2238,24 @@ IPDF * XMLConfigReader::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBou
 	}
 
 	IPDF* returnable_pdf = GetNamedPDF( InputTag, InputBoundary, overloadConfigurator, false );
-        cout << "XMLConfigReader:: Constructed " << returnable_pdf->GetLabel() << " PDF" << endl;
+	cout << "XMLConfigReader:: Constructed " << returnable_pdf->GetLabel() << " PDF" << endl;
 
-        ParameterSet* thisParameterSet = this->GetFitParameters();
-        vector<string> haveNames = thisParameterSet->GetAllNames();
-        vector<string> wantedNames = returnable_pdf->GetPrototypeParameterSet();
-        bool can_be_defined=true;
-        for( unsigned int i=0; i< wantedNames.size(); ++i )
-        {
-                if( StringProcessing::VectorContains( &haveNames, &(wantedNames[i]) ) == -1 )
-                {
-                        can_be_defined = false;
-                        break;
-                }
-        }
+	ParameterSet* thisParameterSet = this->GetFitParameters();
+	vector<string> haveNames = thisParameterSet->GetAllNames();
+	vector<string> wantedNames = returnable_pdf->GetPrototypeParameterSet();
+	bool can_be_defined=true;
+	for( unsigned int i=0; i< wantedNames.size(); ++i )
+	{
+		if( StringProcessing::VectorContains( &haveNames, &(wantedNames[i]) ) == -1 )
+		{
+			can_be_defined = false;
+			break;
+		}
+	}
 
-        if( can_be_defined ) returnable_pdf->UpdatePhysicsParameters( thisParameterSet );
+	if( can_be_defined ) returnable_pdf->UpdatePhysicsParameters( thisParameterSet );
 
-        delete thisParameterSet;
+	delete thisParameterSet;
 
 	returnable_pdf->SetRandomFunction( int(GetSeed()) );
 	returnable_pdf->SetMCCacheStatus( false );
@@ -2586,12 +2578,6 @@ vector<int> XMLConfigReader::GetAllStartEntries()
 		}
 	}
 	return StartEntries;
-}
-
-void XMLConfigReader::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
 }
 
 unsigned int XMLConfigReader::GetOriginalSeed() const

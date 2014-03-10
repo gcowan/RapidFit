@@ -537,13 +537,6 @@ void NormalisedSumPDF::SetDebugMutex( pthread_mutex_t* Input, bool can_remove )
 	debug_mutex = Input;
 }
 
-void NormalisedSumPDF::SetDebug( DebugClass* input_debug )
-{
-	BasePDF::SetDebug( input_debug );
-	firstPDF->SetDebug( input_debug );
-	secondPDF->SetDebug( input_debug );
-}
-
 string NormalisedSumPDF::GetComponentName( ComponentRef* componentIndexObj )
 {
 	if( componentIndexObj == NULL ) return "Unknown";

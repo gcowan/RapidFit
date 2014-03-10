@@ -45,13 +45,11 @@ class ScanStudies
 		 *
 		 * @Param output
 		 *
-		 * @Param debug
-		 *
 		 * @Param forceContinue
 		 */
 		static vector<FitResultVector*> ContourScan( MinimiserConfiguration* inputMinimiser, FitFunctionConfiguration* inputFunction, ParameterSet* inputParam,
 				const vector< PDFWithData* > inputPDFWithData, const vector< ConstraintFunction* > inputConstraints, OutputConfiguration* inputConfig,
-				const string param1, const string param2, const int output=-999, DebugClass* debug=NULL, bool forceContinue=false );
+				const string param1, const string param2, const int output=-999, bool forceContinue=false );
 
 		/*!
 		 * @brief Function to call to perform a SingleScan
@@ -70,21 +68,19 @@ class ScanStudies
 		 *
 		 * @Param output
 		 *
-		 * @Param debug
-		 *
 		 * @Param forceContinue
 		 */
 		static FitResultVector* SingleScan(  MinimiserConfiguration* inputMinimiser, FitFunctionConfiguration* inputFunction, ParameterSet* inputParam,
 				const vector< PDFWithData* > inputPDFWithData, const vector< ConstraintFunction* > inputConstraints, OutputConfiguration* inputConfig,
-				const string param, const int output=-999, DebugClass* debug=NULL, bool forceContinue=false );
+				const string param, const int output=-999, bool forceContinue=false );
 
 	private:
 
 		static void DoScan( MinimiserConfiguration *, FitFunctionConfiguration *, ParameterSet*, const vector< PDFWithData* >,
-				const vector< ConstraintFunction* >, ScanParam*, FitResultVector*, const int, DebugClass* debug, bool forceContinue=false );
+				const vector< ConstraintFunction* >, ScanParam*, FitResultVector*, const int, bool forceContinue=false );
 
 		static void DoScan2D( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, const vector< PDFWithData* >,
-				const vector< ConstraintFunction* >, const pair<ScanParam*, ScanParam* >, vector<FitResultVector*>*, const int, DebugClass* debug, bool forceContinue=false );
+				const vector< ConstraintFunction* >, const pair<ScanParam*, ScanParam* >, vector<FitResultVector*>*, const int, bool forceContinue=false );
 
 };
 

@@ -1,5 +1,13 @@
 // $Id: release.notes $
 
+2013/03/10 Rob Currie
+  - Converting the DebugClass to be a Sentinel class which means that only static methods are exposed and the object can't be created/destroyed
+       This removes the problems of passing the class around correctly everywhere to get Debugging output
+  - This adds very little overhead when Debugging isn't being called (i.e. a few if( false ) evaluations ) usage hasn't changed from the command line
+  - This touches a LOT of files, but makes putting future debugging statements into code and maintaining/understanding what is there much easier :)
+  - Changed PDFWithData to not use vectors... the class was half using them, half not, now it isn't and it's much, much easier to read
+       This just required removing a lot of dead code around the creation of a vector of size 1 to construct PDFWithData objects
+
 2013/03/06 Rob Currie
   - Fixing typo in MutliThreaded code and adding a new step to update the PhysicsParameters in cached PDFs
 

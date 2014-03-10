@@ -99,8 +99,6 @@ class ProdPDF : public BasePDF
 
 		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
 
-		void SetDebug( DebugClass* input_debug );
-
 		virtual string GetComponentName( ComponentRef* = NULL );
 	private:
 		//	Uncopyable!

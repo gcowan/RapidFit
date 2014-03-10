@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 #include "TRandom.h"
 
@@ -34,7 +34,7 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 	//Populate the map
 	for( nameIndex = 0; nameIndex < (int)NewNames.size(); ++nameIndex )
 	{
-		allObservables.push_back( new Observable(NewNames[(unsigned)nameIndex]) );
+		allObservables.push_back( Observable(NewNames[(unsigned)nameIndex]) );
 	}
 	vector<string> duplicates;
 	allNames = StringProcessing::RemoveDuplicates( NewNames, duplicates );
@@ -49,27 +49,43 @@ DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), 
 	}
 }
 
+//Assignment operator
+DataPoint& DataPoint::operator=( const DataPoint& NewPoint )
+{
+	if( &NewPoint != this )
+	{
+		this->allNames = NewPoint.allNames;
+		this->myPhaseSpaceBoundary = NewPoint.myPhaseSpaceBoundary;
+		this->thisDiscreteIndex = NewPoint.thisDiscreteIndex;
+		this->WeightValue = NewPoint.WeightValue;
+		this->storedID = NewPoint.storedID;
+		this->initialNLL = NewPoint.initialNLL;
+		this->PerEventData = NewPoint.PerEventData;
+		this->nameIndex = NewPoint.nameIndex;
+		for( unsigned int i=0; i< NewPoint.allObservables.size(); ++i )
+		{
+			this->allObservables.push_back( Observable( (NewPoint.allObservables[i]) ) );
+		}
+	}
+	else
+	{
+		return *(this);
+	}
+}
+
 DataPoint::DataPoint( const DataPoint& input ) :
 	allObservables(), allNames(input.allNames), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
 	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID), initialNLL( input.initialNLL ), PerEventData(input.PerEventData), nameIndex()
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
-		if( input.allObservables[i] != NULL )
-		{
-			allObservables.push_back( new Observable(*(input.allObservables[i])) );
-		}
+		allObservables.push_back( Observable( (input.allObservables[i])) );
 	}
 }
 
 //Destructor
 DataPoint::~DataPoint()
 {
-	while( !allObservables.empty() )
-	{
-		if( allObservables.back() != NULL ) { delete allObservables.back(); }
-		allObservables.pop_back();
-	}
 }
 
 //Retrieve names of all observables stored
@@ -81,10 +97,10 @@ vector<string> DataPoint::GetAllNames() const
 void DataPoint::RemoveObservable( const string input )
 {
 	vector<string>::iterator name_i = allNames.begin();
-	vector<Observable*>::iterator obs_i = allObservables.begin();
+	vector<Observable>::iterator obs_i = allObservables.begin();
 
 	vector<string>::iterator name_to_remove;
-	vector<Observable*>::iterator observable_to_remove;
+	vector<Observable>::iterator observable_to_remove;
 
 	for( ; name_i != allNames.end(); ++name_i, ++obs_i )
 	{
@@ -96,20 +112,18 @@ void DataPoint::RemoveObservable( const string input )
 		}
 	}
 
-	if( *observable_to_remove != NULL ) delete *observable_to_remove;
-
 	allNames.erase( name_to_remove );
 	allObservables.erase( observable_to_remove );
 }
 
-Observable* DataPoint::GetObservable( unsigned int wanted ) const
+Observable* DataPoint::GetObservable( unsigned int wanted )
 {
-	return allObservables[ wanted ];
+	return &(allObservables[ wanted ]);
 }
 
 //Retrieve an observable by its name
 //	!!!THIS IS VERY, VERY, VERY WASTEFUL FOR LARGE DATASETS!!!
-Observable* DataPoint::GetObservable(string const Name, const bool silence ) const
+Observable* DataPoint::GetObservable(string const Name, const bool silence )
 {
 	//Check if the name is stored in the map
 	nameIndex = StringProcessing::VectorContains( &allNames, &Name );
@@ -123,20 +137,20 @@ Observable* DataPoint::GetObservable(string const Name, const bool silence ) con
 	}
 	else
 	{
-		return allObservables[(unsigned)nameIndex];
+		return &(allObservables[(unsigned)nameIndex]);
 	}
 }
 
-Observable* DataPoint::GetObservable( const ObservableRef& object, const bool silence ) const
+Observable* DataPoint::GetObservable( const ObservableRef& object, const bool silence )
 {
 	if( object.GetIndex() < 0 )
 	{
 		object.SetIndex( StringProcessing::VectorContains( &allNames, object.NameRef()) );
-		if( object.GetIndex() >= 0 ) return allObservables[ (unsigned) object.GetIndex() ];
+		if( object.GetIndex() >= 0 ) return &(allObservables[ (unsigned) object.GetIndex() ]);
 	}
 	else
 	{
-		return allObservables[ (unsigned) object.GetIndex() ];
+		return &(allObservables[ (unsigned) object.GetIndex() ]);
 	}
 	if( !silence ) cerr << "Observable name " << object.Name().c_str() << " not found (3)" << endl;
 	//DebugClass::SegFault();
@@ -156,7 +170,7 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 	}
 	else
 	{
-		allObservables[(unsigned)nameIndex]->SetObservable(NewObservable);
+		allObservables[(unsigned)nameIndex].SetObservable(NewObservable);
 		return true;
 	}
 }
@@ -176,14 +190,14 @@ bool DataPoint::SetObservable( ObservableRef& Name, Observable * NewObservable )
 		else
 		{
 			Name.SetIndex( nameIndex );
-			allObservables[(unsigned)nameIndex]->SetObservable(NewObservable);
+			allObservables[(unsigned)nameIndex].SetObservable(NewObservable);
 			return true;
 		}
 		//return false;
 	}
 	else
 	{
-		allObservables[(unsigned)Name.GetIndex()]->SetObservable(NewObservable);
+		allObservables[(unsigned)Name.GetIndex()].SetObservable(NewObservable);
 		return true;
 	}
 }
@@ -193,7 +207,7 @@ void DataPoint::AddObservable( string Name, Observable* NewObservable )
 	if( StringProcessing::VectorContains( &allNames, &Name ) == -1 )
 	{
 		allNames.push_back( Name );
-		allObservables.push_back( new Observable(*NewObservable) );
+		allObservables.push_back( Observable(*NewObservable) );
 	}
 	else
 	{
@@ -206,7 +220,7 @@ void DataPoint::AddObservable( string Name, double Value, string Unit, bool trus
 	Observable *tempObservable = new Observable( Name, Value, Unit );
 	if( trusted )
 	{
-		allObservables[(unsigned)thisnameIndex]->SetObservable( tempObservable );
+		allObservables[(unsigned)thisnameIndex].SetObservable( tempObservable );
 	}
 	else
 	{
@@ -223,7 +237,7 @@ bool DataPoint::SetObservable( string Name, double Value, string Unit, bool trus
 	if( trusted )
 	{
 		returnValue=true;
-		allObservables[(unsigned)thisnameIndex]->SetObservable( temporaryObservable );
+		allObservables[(unsigned)thisnameIndex].SetObservable( temporaryObservable );
 	}
 	else
 	{
@@ -234,10 +248,10 @@ bool DataPoint::SetObservable( string Name, double Value, string Unit, bool trus
 }
 
 //	Used for Sorting DataPoints
-bool DataPoint::operator() ( pair<DataPoint*,ObservableRef> first, pair<DataPoint*,ObservableRef> second )
+bool DataPoint::operator() ( pair<DataPoint,ObservableRef> first, pair<DataPoint,ObservableRef> second )
 {
-	double param_val_1 = first.first->GetObservable( first.second )->GetValue();
-	double param_val_2 = second.first->GetObservable( second.second )->GetValue();
+	double param_val_1 = first.first.GetObservable( first.second )->GetValue();
+	double param_val_2 = second.first.GetObservable( second.second )->GetValue();
 	return (param_val_1 < param_val_2 );
 }
 
@@ -246,8 +260,8 @@ void DataPoint::Print() const
 	cout << "DataPoint:" << endl;
 	for( unsigned int i=0; i< allObservables.size(); ++i )
 	{
-		cout << "Obs: " << allObservables[i] << " ";
-		allObservables[i]->Print();
+		//cout << "Obs: " << allObservables[i] << " ";
+		allObservables[i].Print();
 	}
 
 	cout << endl;

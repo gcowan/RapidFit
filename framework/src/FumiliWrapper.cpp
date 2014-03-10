@@ -28,7 +28,7 @@ const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor
-FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) ), nSigma(1)
+FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), nSigma(1)
 {
 }
 
@@ -36,7 +36,6 @@ FumiliWrapper::FumiliWrapper() : function(NULL), RapidFunction(NULL), fitResult(
 FumiliWrapper::~FumiliWrapper()
 {
 	//delete minuit;
-	if( debug != NULL ) delete debug;
 }
 
 void FumiliWrapper::SetSteps( int newSteps )
@@ -225,12 +224,6 @@ void FumiliWrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
 	(void)Input;
 	return;
-}
-
-void FumiliWrapper::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
 }
 
 void FumiliWrapper::SetNSigma( int input )

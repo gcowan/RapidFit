@@ -23,7 +23,7 @@ class CombinedMistagCalib : public IMistagCalib
 		void setParameters( const ParameterSet& parameters );
 
 		void addObservables( vector<string>& observableNames ) const;
-		void setObservables( const DataPoint* measurement );
+		void setObservables( DataPoint* measurement );
 
 		double D1() const;
 

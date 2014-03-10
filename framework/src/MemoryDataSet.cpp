@@ -6,7 +6,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	RapidFit Headers
 #include "MemoryDataSet.h"
@@ -38,6 +38,19 @@ MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary, vector<DataPoint*
 	}
 }
 
+MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary, vector<DataPoint> inputData ) :
+	allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets(), WeightName(""), useWeights(false), alpha(1.), alphaName("uninitialized"), canDelete(false)
+{
+	for( unsigned int i=0; i< (unsigned)dataBoundary->GetNumberCombinations(); ++i )
+	{
+		allSubSets.push_back( -1 );
+	}
+	for( unsigned int i=0; i< inputData.size(); ++i )
+	{
+		this->SafeAddDataPoint( &(inputData[i]) );
+	}
+}
+
 //Constructor with correct argument
 MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary ) :
 	allData(), dataBoundary( new PhaseSpaceBoundary(*NewBoundary) ), allSubSets(), WeightName(""), useWeights(false), alpha(1.), alphaName("uninitialized"), canDelete(true)
@@ -52,14 +65,16 @@ MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary ) :
 MemoryDataSet::~MemoryDataSet()
 {
 	if( dataBoundary != NULL ) delete dataBoundary;
-	if( canDelete )
-	{
+
+	/*	if( canDelete )
+		{
 		while( !allData.empty() )
 		{
-			if( allData.back() != NULL ) delete allData.back();
-			allData.pop_back();
+		if( allData.back() != NULL ) delete allData.back();
+		allData.pop_back();
 		}
-	}
+		}
+	 */
 }
 
 //Add a data point to the set
@@ -67,8 +82,9 @@ bool MemoryDataSet::AddDataPoint( DataPoint* NewDataPoint )
 {
 	if( dataBoundary->IsPointInBoundary(NewDataPoint) )
 	{
-		allData.push_back( NewDataPoint );
-		allData.back()->SetPhaseSpaceBoundary( dataBoundary );
+		allData.push_back( DataPoint(*NewDataPoint) );
+		delete NewDataPoint;
+		allData.back().SetPhaseSpaceBoundary( dataBoundary );
 		return true;
 	}
 	else
@@ -82,17 +98,17 @@ bool MemoryDataSet::AddDataPoint( DataPoint* NewDataPoint )
 //Add a data point to the set
 void MemoryDataSet::SafeAddDataPoint( DataPoint* NewDataPoint )
 {
-	allData.push_back( NewDataPoint );
-	allData.back()->SetPhaseSpaceBoundary( dataBoundary );
+	allData.push_back( DataPoint(*NewDataPoint) );
+	allData.back().SetPhaseSpaceBoundary( dataBoundary );
 }
 
 //Retrieve the data point with the given index
-DataPoint * MemoryDataSet::GetDataPoint( int Index ) const
+DataPoint* MemoryDataSet::GetDataPoint( int Index )
 {
 	if ( Index < int(allData.size()) )
 	{
-		allData[unsigned(Index)]->SetPhaseSpaceBoundary( dataBoundary );
-		return allData[unsigned(Index)];
+		allData[unsigned(Index)].SetPhaseSpaceBoundary( dataBoundary );
+		return &(allData[unsigned(Index)]);
 	}
 	else
 	{
@@ -112,19 +128,19 @@ int MemoryDataSet::GetDataNumber( DataPoint* templateDataPoint ) const
 		//	{
 		//		cout << i << " : " << string((thisPointInfo.first)[i]) << " = " << (thisPointInfo.second)[i] << endl;
 		//	}
-		vector<DataPoint*> thisSubSet = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
+		vector<DataPoint> thisSubSet = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
 		unsigned int dataPointNum = (unsigned)thisSubSet.size();
 		return (int) dataPointNum;
 	}
 }
 
-vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( DataPoint* templateDataPoint ) const
+vector<DataPoint> MemoryDataSet::GetDiscreteSubSet( DataPoint* templateDataPoint ) const
 {
 	if( templateDataPoint == NULL ) return allData;
 	else
 	{
 		pair< vector<ObservableRef>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( templateDataPoint );
-		vector<DataPoint*> thisSubSet = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
+		vector<DataPoint> thisSubSet = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
 		return thisSubSet;
 	}
 }
@@ -144,12 +160,15 @@ void MemoryDataSet::SetBoundary( const PhaseSpaceBoundary* Input )
 //Empty the data set
 void MemoryDataSet::Clear()
 {
-	vector<DataPoint*> empty;
-	while( !allData.empty() )
-	{
-		if( allData.back() != NULL ) delete allData.back();
-		allData.pop_back();
-	}
+	/*
+	   vector<DataPoint*> empty;
+	   while( !allData.empty() )
+	   {
+	   if( allData.back() != NULL ) delete allData.back();
+	   allData.pop_back();
+	   }
+	 */
+	vector<DataPoint> empty;
 	allData.swap(empty);
 }
 
@@ -159,9 +178,9 @@ void MemoryDataSet::SortBy( string parameter )
 	cout << "Sorting" << endl;
 	if( allData.size() > 0 )
 	{
-		vector<pair<DataPoint*,ObservableRef> > allData_sort;
+		vector<pair<DataPoint,ObservableRef> > allData_sort;
 
-		for( vector<DataPoint*>::iterator data_i = allData.begin(); data_i != allData.end(); ++data_i )
+		for( vector<DataPoint>::iterator data_i = allData.begin(); data_i != allData.end(); ++data_i )
 		{
 			allData_sort.push_back( make_pair( *data_i, ObservableRef( parameter ) ) );
 		}
@@ -173,7 +192,7 @@ void MemoryDataSet::SortBy( string parameter )
 
 		while( !allData.empty() ) allData.pop_back();
 
-		for( vector<pair<DataPoint*,ObservableRef> >::iterator sort_i = allData_sort.begin(); sort_i != allData_sort.end(); ++sort_i )
+		for( vector<pair<DataPoint,ObservableRef> >::iterator sort_i = allData_sort.begin(); sort_i != allData_sort.end(); ++sort_i )
 		{
 			allData.push_back( sort_i->first );
 		}
@@ -188,31 +207,31 @@ IDataSet* MemoryDataSet::GetDiscreteDataSet( const vector<ObservableRef> discret
 	return (IDataSet*) new MemoryDataSet( this->GetBoundary(), GetDiscreteSubSet( discreteParam, discreteVal ) );
 }
 
-vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const
+vector<DataPoint> MemoryDataSet::GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const
 {
 	if( discreteParam.empty() || discreteVal.empty() )
 	{
 		return allData;
 	}
 
-	vector<DataPoint*> returnable_subset;
+	vector<DataPoint> returnable_subset;
 	if( discreteParam.size() != discreteVal.size() )
 	{
 		cout << "\n\n\t\tBadly Defined definitio`n of a subset, returning 0 events!\n\n" << endl;
 		return returnable_subset;
 	}
 
-	DataPoint* data_i = NULL;
+	//DataPoint data_i = NULL;
 	bool decision=true;
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
-		data_i = allData[i];
+		DataPoint data_i = allData[i];
 
 		decision = true;       
 		for( unsigned int j=0; j< discreteParam.size(); ++j )
 		{
 			//cout << string(discreteParam[j]) << " = " << data_i->GetObservable( discreteParam[j] )->GetValue() << " w: " << discreteVal[j] << "\t";
-			if( !( fabs( data_i->GetObservable( discreteParam[j] )->GetValue() - discreteVal[j] ) < DOUBLE_TOLERANCE_DATA ) )
+			if( !( fabs( data_i.GetObservable( discreteParam[j] )->GetValue() - discreteVal[j] ) < DOUBLE_TOLERANCE_DATA ) )
 			{
 				decision = false;
 			}
@@ -233,21 +252,21 @@ vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<ObservableRef>
 }
 
 
-vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const
+vector<DataPoint> MemoryDataSet::GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const
 {
 	if( discreteParam.empty() || discreteVal.empty() )
 	{
 		return allData;
 	}
 
-	vector<DataPoint*> returnable_subset;
+	vector<DataPoint> returnable_subset;
 	if( discreteParam.size() != discreteVal.size() )
 	{
 		cerr << "\n\n\t\tBadly Defined definition of a subset, returning 0 events!\n\n" << endl;
 		return returnable_subset;
 	}
 
-	DataPoint* data_i = NULL;
+	//DataPoint data_i = NULL;
 	bool decision=true;
 
 	vector<ObservableRef*> temp_ref;
@@ -258,12 +277,12 @@ vector<DataPoint*> MemoryDataSet::GetDiscreteSubSet( const vector<string> discre
 
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
-		data_i = allData[i];
+		DataPoint data_i = allData[i];
 
 		decision = true;
 		for( unsigned int j=0; j< discreteParam.size(); ++j )
 		{
-			if( !( fabs( data_i->GetObservable( *(temp_ref[j]) )->GetValue() - discreteVal[j] ) < DOUBLE_TOLERANCE_DATA ) )
+			if( !( fabs( data_i.GetObservable( *(temp_ref[j]) )->GetValue() - discreteVal[j] ) < DOUBLE_TOLERANCE_DATA ) )
 			{
 				decision = false;
 			}
@@ -309,7 +328,7 @@ void MemoryDataSet::UseEventWeights( const string Name )
 	useWeights = true;
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
-		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightName )->GetValue() );
+		allData[i].SetEventWeight( allData[i].GetObservable( WeightName )->GetValue() );
 	}
 }
 
@@ -321,7 +340,7 @@ void MemoryDataSet::NormaliseWeights()
 		double sum_Val2=0.;
 		for( unsigned int i=0; i< allData.size(); ++i )
 		{
-			double thisVal=allData[i]->GetEventWeight();
+			double thisVal=allData[i].GetEventWeight();
 			sum_Val += thisVal;
 			sum_Val2 += thisVal*thisVal;
 		}
@@ -336,7 +355,7 @@ void MemoryDataSet::PrintYield()
 	this->Print();
 }
 
-void MemoryDataSet::Print() const
+void MemoryDataSet::Print()
 {
 	if( this->GetWeightsWereUsed() && this->GetDataNumber() > 0 )
 	{
@@ -348,7 +367,7 @@ void MemoryDataSet::Print() const
 		double err=0.;
 		for( unsigned int i=0; i< allData.size(); ++i )
 		{
-			val=allData[i]->GetObservable( weightRef )->GetValue();
+			val=allData[i].GetObservable( weightRef )->GetValue();
 			avr+=val;
 			avr_sq+=val*val;
 			err+=val*val;
@@ -370,14 +389,14 @@ void MemoryDataSet::Print() const
 					if( description[j] == '\t' ) description[j] = ' ';
 				}
 				pair< vector<ObservableRef>, vector<double > > thisPointInfo = this->GetBoundary()->GetDiscreteInfo( combinations[i] );
-				vector<DataPoint*> thisData = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
+				vector<DataPoint> thisData = this->GetDiscreteSubSet( thisPointInfo.first, thisPointInfo.second );
 				unsigned int dataPointNum = (unsigned)thisData.size();
 				double this_yield=0.;
 				if( this->GetWeightsWereUsed() )
 				{
 					for( unsigned int k=0; k< thisData.size(); ++k )
 					{
-						this_yield += thisData[k]->GetObservable( weightRef )->GetValue();
+						this_yield += thisData[k].GetObservable( weightRef )->GetValue();
 					}
 				}
 				if( dataPointNum > 0 )
@@ -411,7 +430,7 @@ void MemoryDataSet::Print() const
 	}
 }
 
-double MemoryDataSet::GetSumWeights() const
+double MemoryDataSet::GetSumWeights()
 {
 	if( this->GetWeightsWereUsed() )
 	{
@@ -419,7 +438,7 @@ double MemoryDataSet::GetSumWeights() const
 		ObservableRef weightRef( WeightName );
 		for( unsigned int i=0; i< allData.size(); ++i )
 		{
-			total+=allData[i]->GetObservable( WeightName )->GetValue();
+			total+=allData[i].GetObservable( WeightName )->GetValue();
 		}
 		return total;
 	}
@@ -429,7 +448,7 @@ double MemoryDataSet::GetSumWeights() const
 	}
 }
 
-double MemoryDataSet::GetSumWeightsSq() const
+double MemoryDataSet::GetSumWeightsSq()
 {
 	if( this->GetWeightsWereUsed() )
 	{
@@ -437,7 +456,7 @@ double MemoryDataSet::GetSumWeightsSq() const
 		ObservableRef weightRef( WeightName );
 		for( unsigned int i=0; i< allData.size(); ++i )
 		{
-			total+=(allData[i]->GetObservable( WeightName )->GetValue()*allData[i]->GetObservable( WeightName )->GetValue());
+			total+=(allData[i].GetObservable( WeightName )->GetValue()*allData[i].GetObservable( WeightName )->GetValue());
 		}
 		return total;
 	}
@@ -453,13 +472,13 @@ void MemoryDataSet::ApplyAlpha( const double total_sum, const double total_sum_s
 	ObservableRef WeightNameRef( WeightName );
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
-		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightNameRef )->GetValue() * alpha );
+		allData[i].SetEventWeight( allData[i].GetObservable( WeightNameRef )->GetValue() * alpha );
 	}
 	cout << "alpha = " << setprecision(10) << total_sum << "  /  " << total_sum_sq << endl;
 	cout << "Correction Factor: " << setprecision(5) << fabs(alpha) << " applied to DataSet containing " << allData.size() << " events." << endl << endl;
 }
 
-double MemoryDataSet::GetAlpha() const
+double MemoryDataSet::GetAlpha()
 {
 	if( alphaName != "uninitialized" )
 	{
@@ -467,7 +486,7 @@ double MemoryDataSet::GetAlpha() const
 		ObservableRef alphaNameRef( alphaName );
 		for( unsigned int i=0; i< allData.size(); ++i )
 		{
-			alphaSum+=allData[i]->GetObservable( alphaNameRef )->GetValue();
+			alphaSum+=allData[i].GetObservable( alphaNameRef )->GetValue();
 		}
 		alphaSum/=(double)allData.size();
 		return fabs(alphaSum);
@@ -486,8 +505,8 @@ void MemoryDataSet::ApplyExternalAlpha( const string AlphaName )
 	double avr=0.;
 	for( unsigned int i=0; i< allData.size(); ++i )
 	{
-		double thisalpha = allData[i]->GetObservable( alphaNameRef )->GetValue();
-		allData[i]->SetEventWeight( allData[i]->GetObservable( WeightNameRef )->GetValue() * thisalpha );
+		double thisalpha = allData[i].GetObservable( alphaNameRef )->GetValue();
+		allData[i].SetEventWeight( allData[i].GetObservable( WeightNameRef )->GetValue() * thisalpha );
 		avr+=thisalpha;
 	}
 	avr/=(double)allData.size();

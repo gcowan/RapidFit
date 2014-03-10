@@ -49,7 +49,7 @@ ParameterSet* MinuitWrapper::LastSet = NULL;
 
 //Constructor with correct argument
 MinuitWrapper::MinuitWrapper( int NumberParameters, int output_level ) :
-	minuit(NULL), fitResult(NULL), contours(), print_verbosity( output_level ), maxSteps(), bestTolerance(), Options(), Quality(), debug(new DebugClass(false) ), nSigma(1)
+	minuit(NULL), fitResult(NULL), contours(), print_verbosity( output_level ), maxSteps(), bestTolerance(), Options(), Quality(), nSigma(1)
 {
 	minuit = new TMinuit( NumberParameters );
 }
@@ -59,7 +59,6 @@ MinuitWrapper::~MinuitWrapper()
 {
 	//cout << "hello from MinuitWrapper destructor" << endl;
 	delete minuit;
-	if( debug != NULL ) delete debug;
 }
 
 void MinuitWrapper::SetSteps( int newSteps )
@@ -624,12 +623,6 @@ void MinuitWrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 	}
 	cout << endl;
 	fitResult->ApplyCovarianceMatrix( Input );
-}
-
-void MinuitWrapper::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
 }
 
 void MinuitWrapper::SetNSigma( int input )

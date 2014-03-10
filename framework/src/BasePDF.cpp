@@ -29,9 +29,8 @@ using namespace::std;
 BasePDF::BasePDF() : BasePDF_Framework( this ), BasePDF_MCCaching(),
 	numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), requiresBoundary(false), cachingEnabled( true ), haveTestedIntegral( false ), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()),
-	debug_mutex(NULL), can_remove_mutex(true), debug(NULL), fixed_checked(false), isFixed(false), fixedID(0), _basePDFComponentStatus(false)
+	debug_mutex(NULL), can_remove_mutex(true), fixed_checked(false), isFixed(false), fixedID(0), _basePDFComponentStatus(false)
 {
-	debug = new DebugClass();
 	component_list.push_back( "0" );
 	debug_mutex = new pthread_mutex_t();
 }
@@ -42,7 +41,7 @@ BasePDF::BasePDF( const BasePDF& input ) : BasePDF_Framework( input ), BasePDF_M
 	component_list( input.component_list ), requiresBoundary( input.requiresBoundary ),
 	cachingEnabled( input.cachingEnabled ), haveTestedIntegral( input.haveTestedIntegral ),
 	discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL),
-	debug_mutex(input.debug_mutex), can_remove_mutex(false), debug(NULL), fixed_checked(input.fixed_checked), isFixed(input.isFixed), fixedID(input.fixedID),
+	debug_mutex(input.debug_mutex), can_remove_mutex(false), fixed_checked(input.fixed_checked), isFixed(input.isFixed), fixedID(input.fixedID),
 	_basePDFComponentStatus(input._basePDFComponentStatus)
 {
 	allParameters.SetPhysicsParameters( &(input.allParameters) );
@@ -52,10 +51,7 @@ BasePDF::BasePDF( const BasePDF& input ) : BasePDF_Framework( input ), BasePDF_M
 		(*cache_i) = -1;
 	}
 
-	debug = (input.debug==NULL)?NULL:new DebugClass(*input.debug);
-
 	this->GetPDFIntegrator()->SetPDF( this );
-	this->GetPDFIntegrator()->SetDebug( debug );
 }
 
 //Destructor
@@ -66,7 +62,6 @@ BasePDF::~BasePDF()
 	if( DiscreteCaches != NULL ) delete DiscreteCaches;
 	if( debug_mutex != NULL && can_remove_mutex == true ) delete debug_mutex;
 
-	if( debug != NULL ) delete debug;
 }
 
 void BasePDF::SetComponentStatus( const bool input )

@@ -96,7 +96,7 @@ void MistagCalib3fb::addObservables( vector<string>& observableNames ) const
 	observableNames.push_back( mistagSSName );
 }
 
-void MistagCalib3fb::setObservables( const DataPoint* measurement )
+void MistagCalib3fb::setObservables( DataPoint* measurement )
 {
 	double readTagOS = measurement->GetObservable( tagOSName )->GetValue();
 	_tagOS = (readTagOS>=0.)?(int)ceil(readTagOS):(int)floor(readTagOS);

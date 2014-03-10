@@ -109,7 +109,7 @@ class ComponentPlotter
 		 *
 		 * @warning This class will make copies of the PDF and config, however it will NOT make copies of the DataSet and file pointer which should always remain valid
 		 */
-		ComponentPlotter( IPDF* InputPDF, IDataSet* InputDataSet, TString PDFStr, TFile* filename, string Name, CompPlotter_config* config=NULL, int PDF_Num=0, const DebugClass* debug=NULL );
+		ComponentPlotter( IPDF* InputPDF, IDataSet* InputDataSet, TString PDFStr, TFile* filename, string Name, CompPlotter_config* config=NULL, int PDF_Num=0 );
 
 		/*!
 		 * @brief Destructor Function
@@ -174,7 +174,7 @@ class ComponentPlotter
 
 		static TGraphErrors* PullPlot1D( vector<double> input_bin_theory_data, TGraphErrors* input_data, string observableName, string CombinationDescription,
 
-				TRandom* rand = NULL, CompPlotter_config* conf=NULL, DebugClass* debug = NULL );
+				TRandom* rand = NULL, CompPlotter_config* conf=NULL );
 
 		/*!
 		 * @brief A Function which can correctly merge seperate datasets into a single TGraphErrors object
@@ -216,8 +216,6 @@ class ComponentPlotter
 		 *
 		 * @param config           This contains the Configuration from the XML, if none is provided this will go with whatever ROOT wants to do
 		 *
-		 * @param debug            Satandard Debugging class interface in RapidFit
-		 *
 		 * @param input_bin_theory_data  This contains the (optional) Data required to produce a plot of the residuals across the fit
 		 *
 		 * @return Void
@@ -225,7 +223,7 @@ class ComponentPlotter
 
 		static void OutputPlot( TGraphErrors* input_data, vector<TGraph*> input_components, string observableName, string CombinationDescription, PhaseSpaceBoundary* total_boundary,
 
-				TRandom* rand=NULL, CompPlotter_config* config=NULL, DebugClass* =NULL, vector<double> input_bin_theory_data=vector<double>() );
+				TRandom* rand=NULL, CompPlotter_config* config=NULL, vector<double> input_bin_theory_data=vector<double>() );
 
 		/*!
 		 * @breif helper function to write out the numerical data from the Final merged component plot into a TTree to make any post-projection work easier
@@ -252,8 +250,6 @@ class ComponentPlotter
 		 * @return This returns the Projection at the observable value X and allows the PDF to be truth for a Chi2 test
 		 */
 		double operator() (double *x, double *p);
-
-		void SetDebug( DebugClass* debug );
 
 		static string XML( const int projectionType=1 );
 
@@ -461,7 +457,7 @@ class ComponentPlotter
 		 * element 1 is discrete combination 1
 		 * element 2 is discrete combination 2 ... etc
 		 */
-		vector<vector<DataPoint*> > data_subsets;
+		vector<vector<DataPoint> > data_subsets;
 
 
 		/*!
@@ -510,8 +506,6 @@ class ComponentPlotter
 		bool onlyZero;				/*!	Should this class mimic the old Plotter behaviour?	*/
 
 		vector<double> allPullData;	/*!	This will store the value of the total PDF evaluated at each bin, lower edge, center, and upper edge	*/
-
-		DebugClass* debug;
 
 		int PDFNum;
 };

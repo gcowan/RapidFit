@@ -157,8 +157,6 @@ class I_XMLConfigReader
 		virtual void SetSeed( unsigned int new_seed ) = 0;
 
 
-		virtual void SetDebug( DebugClass* input_debug ) = 0;
-
 		virtual unsigned int GetOriginalSeed() const = 0;
 	protected:
 		/*!

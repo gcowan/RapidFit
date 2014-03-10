@@ -361,7 +361,7 @@ DataPoint* PhaseSpaceBoundary::GetMidPoint() const
 }
 
 
-string PhaseSpaceBoundary::DiscreteDescription( const DataPoint* input ) const
+string PhaseSpaceBoundary::DiscreteDescription( DataPoint* input ) const
 {
 	stringstream description;
 

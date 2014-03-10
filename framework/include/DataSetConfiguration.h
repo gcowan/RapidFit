@@ -136,8 +136,6 @@ class DataSetConfiguration
 		 */
 		string XML() const;
 
-		void SetDebug( DebugClass* input_debug );
-
 		PhaseSpaceBoundary* GetPhaseSpace() const;
 
 		int GetDataSetSize() const;
@@ -238,8 +236,6 @@ class DataSetConfiguration
 		PhaseSpaceBoundary* internalBoundary;	/*!	Internal pointer to the PhaseSpaceBoundary that corresponds to the DataSet last created or first one to be if one does not already exist */
 
 		IDataSet* internalRef;		/*!	This is the internal reference to the DataSet that has just been created. It is NOT to be destroyed here	*/
-
-		DebugClass* debug;
 
 		string fileName;
 };

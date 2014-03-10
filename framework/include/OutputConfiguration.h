@@ -65,7 +65,6 @@ class OutputConfiguration
 		void AddContour( const string, const string );
 		void AddScan( const string );
 
-		void SetDebug( DebugClass* debug );
 	private:
 		OutputConfiguration ( const OutputConfiguration& );
 		OutputConfiguration& operator= ( const OutputConfiguration& );
@@ -87,14 +86,12 @@ class OutputConfiguration
 
 		vector<CompPlotter_config*> proj_components;
 
-		DebugClass* debug;
-
 		static void MakeThisProjection( PhysicsBottle* resultBottle, unsigned int resultIndex, vector<CompPlotter_config*>::iterator projection_i,
 				vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
-				vector< pair<double,double> >& chi2_results, vector< vector<double> >& pullFunctionEvals, TFile* output_file, bool weightedEventsWereUsed, string weightName, DebugClass* debug );
+				vector< pair<double,double> >& chi2_results, vector< vector<double> >& pullFunctionEvals, TFile* output_file, bool weightedEventsWereUsed, string weightName );
 
 		static void MergeProjectionResults( vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
-				vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i, DebugClass* debug );
+				vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i );
 
 		static void Chi2XCheck( FitResult* thisResult, vector<ComponentPlotter*> thesePlotters, string observableName, int nBins );
 };

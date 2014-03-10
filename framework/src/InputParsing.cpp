@@ -253,8 +253,7 @@ PDFWithData * InputParsing::MakePDFWithData( string PDFName, string DataSource, 
 
 		//Make the configuration objects
 		string cutString = ""; // For now, just apply no cut
-		vector< DataSetConfiguration* > singleDataSet;
-		singleDataSet.push_back( new DataSetConfiguration( dataSourceName, dataAmount, cutString, dataArguments, argumentNames ) );
+		DataSetConfiguration* singleDataSet = new DataSetConfiguration( dataSourceName, dataAmount, cutString, dataArguments, argumentNames );
 		return new PDFWithData( newPDF, newBoundary, singleDataSet );
 	}
 	else

@@ -57,7 +57,7 @@ class FitAssembler
 		 * @return Returns a FitResult containing all of the information about what has been minimised and it's minimum Value
 		 */
 		static FitResult * DoSafeFit( MinimiserConfiguration* MinimiserConfig, FitFunctionConfiguration* Config, ParameterSet* Parameters, vector< PDFWithData* > PDFWithDataSet,
-				vector< ConstraintFunction* > Constraints, bool forceContinue=false, int verbosity =1, DebugClass* =NULL );
+				vector< ConstraintFunction* > Constraints, bool forceContinue=false, int verbosity =1 );
 
 		/*!
 		 * @brief This is the version of DoFit which works with IPDFs and DataSets separated out from PDFWithData
@@ -81,32 +81,14 @@ class FitAssembler
 		 * @return Returns a FitResult containing all of the information about what has been minimised and it's minimum Value
 		 */
 		static FitResult * DoFit( MinimiserConfiguration* MinimiserConfig, FitFunctionConfiguration* Config, ParameterSet* Parameters, vector< IPDF* > PDFs, vector< IDataSet* > DataSets,
-				vector< ConstraintFunction* > Constraints, DebugClass* =NULL );
-
-		/*!
-		 * @brief This Will perform Pete's Strategy of DoSafeFit which checks for Alternate Minimia in the Strong Phases of JpsiPhi
-		 */
-		static FitResult * Petes_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
-				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=1, DebugClass* =NULL);
-
-		/*!
-		 * @brief Undocumented
-		 */
-		static FitResult * PetesGamma_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
-				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=1, DebugClass* =NULL);
-
-		/*!
-		 * @brief This Will perform Rob's Strategy of DoSafeFit which checks for Alternate Minima in Strong Phases and dG and Phi_s in JpsiPhi
-		 */
-		static FitResult * Robs_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const ParameterSet*, const vector< PDFWithData* >,
-				const vector< ConstraintFunction* >, bool forceContinue=false, const int OutputLevel=1, DebugClass* =NULL);
+				vector< ConstraintFunction* > Constraints );
 
 		/*!
 		 * @brief This checks the given PDFs and DataSets to make sure that they are consistent and can be used for fitting
 		 *
 		 * @return void
 		 */
-		static void CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDataSet*> allDataNum, const string WeightName=string(), const string AlphaName=string(), const DebugClass* =NULL );
+		static void CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDataSet*> allDataNum, const string WeightName=string(), const string AlphaName=string() );
 
 		/*!
 		 * @brief This checks the given ParameterSet for the required Parameters
@@ -123,7 +105,7 @@ class FitAssembler
 		 *
 		 * @return Returns a ParamaterSet containing ONLY the parameters wanted by the PDFs during the fit
 		 */
-		static ParameterSet* CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs, const vector<int> allDataNum, DebugClass* =NULL );
+		static ParameterSet* CheckInputParams( const ParameterSet* givenParams, const vector<IPDF*> allPDFs, const vector<int> allDataNum );
 
 
 		/*!
@@ -132,6 +114,24 @@ class FitAssembler
 		static ParameterSet* GenerationParameters( const ParameterSet* checkedBottleParameters, const ParameterSet* BottleParameters );
 
 	private:
+
+		/*!
+		 * @brief This Will perform Pete's Strategy of DoSafeFit which checks for Alternate Minimia in the Strong Phases of JpsiPhi
+		 */
+		static FitResult * Petes_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
+				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=1 );
+
+		/*!
+		 * @brief Undocumented
+		 */
+		static FitResult * PetesGamma_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
+				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=1 );
+
+		/*!
+		 * @brief This Will perform Rob's Strategy of DoSafeFit which checks for Alternate Minima in Strong Phases and dG and Phi_s in JpsiPhi
+		 */
+		static FitResult * Robs_DoSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, const ParameterSet*, const vector< PDFWithData* >,
+				const vector< ConstraintFunction* >, bool forceContinue=false, const int OutputLevel=1 );
 
 		/*!
 		 * @brief This moves the 'safety' part of the DoFit into a dedicated function call which is much neater to work with
@@ -150,7 +150,7 @@ class FitAssembler
 		 * @return Returns the final checked FitResult
 		 */
 		static FitResult * DoSingleSafeFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
-				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=-1, DebugClass* =NULL );
+				vector< ConstraintFunction* >, bool forceContinue=false, int OutputLevel=-1 );
 
 		/*!
 		 * @brief Used for checking a ResultDataSet against the input Parameter to insert 'missing' parameters to avoid bugs downstream in further analysis in RapidFit
@@ -159,7 +159,7 @@ class FitAssembler
 		 *
 		 * These parameters are expected further up in RapidFit and this should be considered a User error at runtime more than a RapidFit error, performing the check keeps everything in balance
 		 */
-		static void CheckParameterSet( FitResult*, ParameterSet*, DebugClass* =NULL );
+		static void CheckParameterSet( FitResult*, ParameterSet* );
 
 
 		/*!
@@ -171,7 +171,7 @@ class FitAssembler
 		 *
 		 * @return Passes the FitResult up the chain
 		 */
-		static FitResult * DoFit( IMinimiser*, IFitFunction*, DebugClass* =NULL );
+		static FitResult * DoFit( IMinimiser*, IFitFunction* );
 
 		/*!
 		 * @brief Second DoFit - Used for Constructing a FitFunction for passing to the Minimiser
@@ -182,7 +182,7 @@ class FitAssembler
 		 *
 		 * @return Passes the FitResult up the chain
 		 */
-		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle*, DebugClass* );
+		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, PhysicsBottle* );
 
 		/*!
 		 * @brief First DoFit - Used For Constructing a PhysicsBottle to contain all of the 'Physics' input
@@ -194,7 +194,7 @@ class FitAssembler
 		 * @return Passes the FitResult up the chain
 		 */
 		static FitResult * DoFit( MinimiserConfiguration*, FitFunctionConfiguration*, ParameterSet*, vector< PDFWithData* >,
-				vector< ConstraintFunction* >, DebugClass* );
+				vector< ConstraintFunction* > );
 
 };
 

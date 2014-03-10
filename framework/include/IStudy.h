@@ -42,7 +42,6 @@ class IStudy
 				if( allResults != NULL ) delete allResults;	//Potentially causes SERIOUS PROBLEMS with unchecked code in RapidFit!!!
 				while( !allConstraints.empty() ) { if( allConstraints.back() != NULL ) { delete allConstraints.back(); } allConstraints.pop_back(); }
 			}
-			if( debug != NULL ) delete debug;
 		};
 
 		/*!
@@ -95,12 +94,6 @@ class IStudy
 			for( unsigned int i=0; i< allConstraints.size(); ++i ) { allConstraints[i]->Print(); cout << endl; }
 			cout << numberStudies << " numberStudies " << endl;
 		};
-
-		virtual void SetDebug( DebugClass* input_debug )
-		{
-			if( debug != NULL ) delete debug;
-			debug = new DebugClass( *input_debug );
-		}
 
 	private:
 		/*!
@@ -166,8 +159,6 @@ class IStudy
 		 */
 		bool delete_objects;
 
-		DebugClass* debug;
-
 		/*!
 		 * Provide a default constructor to initialize the objects to NULL or empty,
 		 *
@@ -175,7 +166,7 @@ class IStudy
 		 */
 		IStudy() :
 			pdfsAndData(), studyParameters(), theMinimiser(NULL), theFunction(NULL), allResults(NULL),
-			allConstraints(), numberStudies(-1), delete_objects(false), xmlConfig(NULL), debug(new DebugClass(false) )
+			allConstraints(), numberStudies(-1), delete_objects(false), xmlConfig(NULL)
 	{};
 };
 

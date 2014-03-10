@@ -51,7 +51,7 @@ class MultiXMLConfigReader : public I_XMLConfigReader
 {
 	public:
 
-		MultiXMLConfigReader( vector<string> fileNames, DebugClass* thisDebug );
+		MultiXMLConfigReader( vector<string> fileNames );
 
 		/*!
 		 * Default Destructor
@@ -159,8 +159,6 @@ class MultiXMLConfigReader : public I_XMLConfigReader
 		void SetSeed( unsigned int new_seed );
 
 
-		void SetDebug( DebugClass* input_debug );
-
 		unsigned int GetOriginalSeed() const;
 
 	private:
@@ -178,7 +176,6 @@ class MultiXMLConfigReader : public I_XMLConfigReader
 		int storedSeed;
 		int storedRepeats;
 
-		DebugClass* debug;
 };
 
 #endif

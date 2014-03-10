@@ -498,7 +498,7 @@ double MultiDimChi2::CorrectIntegral( double input_Integral, DataPoint* thisPoin
 double MultiDimChi2::CorrectYield( IDataSet* thisSet, DataPoint* thisPoint )
 {
 	double total_yield = 0.;
-	vector<DataPoint*> thesePoints = thisSet->GetDiscreteSubSet( NULL );
+	vector<DataPoint> thesePoints = thisSet->GetDiscreteSubSet( NULL );
 	if( thisSet->GetWeightsWereUsed() )
 	{
 		ObservableRef thisRef( thisSet->GetWeightName() );
@@ -523,7 +523,7 @@ double MultiDimChi2::CorrectYield( IDataSet* thisSet, DataPoint* thisPoint )
 
 			if( isInRange )
 			{
-				total_yield += thesePoints[i]->GetObservable( thisRef )->GetValue();//GetEventWeight();//GetObservable( thisRef )->GetValue();
+				total_yield += thesePoints[i].GetObservable( thisRef )->GetValue();//GetEventWeight();//GetObservable( thisRef )->GetValue();
 			}
 		}
 	}
@@ -539,7 +539,7 @@ double MultiDimChi2::CorrectYield( IDataSet* thisSet, DataPoint* thisPoint )
 				double new_min = center-0.5*StepSize;
 				double new_max = center+0.5*StepSize;
 
-				double thisPointVal = thesePoints[i]->GetObservable( theseDimensions[j]->ObservableName )->GetValue();
+				double thisPointVal = thesePoints[i].GetObservable( theseDimensions[j]->ObservableName )->GetValue();
 
 				if( thisPointVal > new_max || thisPointVal < new_min )
 				{
@@ -707,7 +707,7 @@ double MultiDimChi2::PDF2DataNormalisation( unsigned int PDFDataNum, const unsig
 
 	if( thisDataSet->GetWeightsWereUsed() )
 	{
-		vector<DataPoint*> thesePoints = thisDataSet->GetDiscreteSubSet( allCombinations[combinationIndex] );
+		vector<DataPoint> thesePoints = thisDataSet->GetDiscreteSubSet( allCombinations[combinationIndex] );
 
 		cout << thesePoints.size() << endl;
 
@@ -715,7 +715,7 @@ double MultiDimChi2::PDF2DataNormalisation( unsigned int PDFDataNum, const unsig
 
 		for( unsigned int i=0; i< thesePoints.size(); ++i )
 		{
-			total_yield += thesePoints[i]->GetObservable( thisWeight )->GetValue();
+			total_yield += thesePoints[i].GetObservable( thisWeight )->GetValue();
 		}
 	}
 	else

@@ -14,16 +14,19 @@ using namespace::std;
 class DebugClass
 {
 	public:
-		DebugClass( const bool=false );
-		DebugClass( const DebugClass& );
 
-		void SetDebugAll( const bool=true );
+		//	DebugClass Sentinel Functions
 
-		void SetClassNames( const vector<string> input );
+		static void SetDebugAll( const bool=true );
 
-		vector<string> GetClassNames() const;
+		static void SetClassNames( const vector<string> input );
 
-		bool DebugThisClass( const string name ) const;
+		static vector<string> GetClassNames();
+
+		static bool DebugThisClass( const string name );
+
+
+		//	HelperFunctions within this Sentinel
 
 		static void SegFault();
 
@@ -52,13 +55,17 @@ class DebugClass
 		template<class T> static void AppendToFile( const string fileName, const vector<T> objects );
 
 	private:
+		DebugClass();
+		~DebugClass();
 
 		bool perform_debugging;
-		vector<string> classes_to_debug;
 
 		static unsigned int GlobalCounter;
 
 		static map<string, string> extensions;
+
+		static bool DebugAllStatus;
+		static vector<string> classes_to_debug;
 };
 
 #endif

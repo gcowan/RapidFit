@@ -147,8 +147,6 @@ class IFitFunction
 		 */
 		virtual double UpErrorValue( const int n ) = 0;
 
-		virtual void SetDebug( DebugClass* debug ) = 0;
-
 		virtual unsigned int GetCallNum() = 0;
 
 		virtual void SetOffSetNLL( const bool Input ) = 0;

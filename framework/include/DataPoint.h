@@ -34,6 +34,7 @@ class DataPoint
 		 * @brief Correct Copy Constructor for DataPoints
 		 */
 		DataPoint( const DataPoint& );
+		DataPoint& operator= ( const DataPoint& );
 
 		/*!
 		 * @brief Correct Constructor which contains the name of all of the observables the class knows about
@@ -62,7 +63,7 @@ class DataPoint
 		 *
 		 * @return returns the Observable at the requested DataPoint, NULL if out of range
 		 */
-		Observable* GetObservable( unsigned int Input ) const;
+		Observable* GetObservable( unsigned int Input );
 
 		/*!
 		 * @brief This returns the Observable Requested by the Name
@@ -73,7 +74,7 @@ class DataPoint
 		 *
 		 * @return returns the Observable with the requested Name
 		 */
-		Observable* GetObservable( const string Name, const bool silence=false ) const;
+		Observable* GetObservable( const string Name, const bool silence=false );
 
 		/*!
 		 * @brief This returns the Observable Requested by the Name and stores the location
@@ -83,7 +84,7 @@ class DataPoint
 		 *
 		 * @return returns the Observable with the requested Name, or at the given location if it's already been found once before and it's location stored
 		 */
-		Observable* GetObservable( const ObservableRef& NameRef, const bool silence=false ) const;
+		Observable* GetObservable( const ObservableRef& NameRef, const bool silence=false );
 
 		/*!
 		 * @brief Remove the requested Observable
@@ -167,7 +168,7 @@ class DataPoint
 		 *
 		 * @return true/false result of a comparison
 		 */
-		bool operator() ( pair<DataPoint* , ObservableRef >, pair<DataPoint* , ObservableRef > );
+		bool operator() ( pair<DataPoint , ObservableRef >, pair<DataPoint , ObservableRef > );
 
 		/*!
 		 * @brief Output some debugging info
@@ -245,18 +246,13 @@ class DataPoint
 		double initialNLL;
 
 		/*!
-		 * Don't Copy the class this way!
-		 */
-		DataPoint& operator= ( const DataPoint& );
-
-		/*!
 		 *	This is REAL Data i.e. it was read in from a file
 		 */
 
 		/*!
 		 * A list of pointers to all of the Observables in this DataPoint
 		 */
-		vector<Observable*> allObservables;
+		vector<Observable> allObservables;
 
 		/*!
 		 * A list of the names of all of the Observables in this DataPoint

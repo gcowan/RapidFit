@@ -49,7 +49,7 @@ class PhaseSpaceBoundary
 
 		virtual void Print() const;
 
-		virtual string DiscreteDescription( const DataPoint* ) const;
+		virtual string DiscreteDescription( DataPoint* ) const;
 
 		virtual DataPoint* GetMidPoint() const;
 

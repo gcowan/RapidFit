@@ -127,8 +127,6 @@ class IPDF_Framework
 
 		virtual void SetDebugMutex( pthread_mutex_t* Input, bool =true ) = 0;
 
-		virtual void SetDebug( DebugClass* input_debug ) = 0;
-
 		virtual void Print() const = 0;
 
 		/*!

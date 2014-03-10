@@ -61,7 +61,6 @@ class MinuitWrapper : public IMinimiser
 
 		void ApplyCovarianceMatrix( RapidFitMatrix* Input );
 
-		void SetDebug( DebugClass* debug );
 	private:
 		//	Uncopyable!
 		MinuitWrapper ( const MinuitWrapper& );
@@ -82,7 +81,6 @@ class MinuitWrapper : public IMinimiser
 		int nSigma;
 		//ParameterSet* test;
 
-		DebugClass* debug;
 };
 
 #endif

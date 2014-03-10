@@ -213,8 +213,6 @@ class BasePDF_Framework : public virtual IPDF_Framework
 
 		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
 
-		void SetDebug( DebugClass* input_debug );
-
 		void Print() const;
 
 		/*!
@@ -250,9 +248,6 @@ class BasePDF_Framework : public virtual IPDF_Framework
 		pthread_mutex_t* debug_mutex;   /*!     This is the pthread mutex object which is to be used for thread-locking sections of code in the PDFs that is not thread safe, e.g. using streamers*/
 
 		bool can_remove_mutex;          /*!     This is internal to let the PDF know if it's safe to remove the shared mutex    */
-
-		DebugClass* debug;              /*!     This is the DebugClass which will allow you to turn on selective debugging at runtime   */
-
 
 		/*!
 		 * Don't Copy the PDF this way!

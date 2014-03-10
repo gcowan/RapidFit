@@ -138,12 +138,12 @@ void VectoredFeldmanCousins::InitalizeNewPDFWithData()
 		IPDF* PDFfromFit = ClassLookUp::CopyPDF( (*pdfdat_i)->GetPDF() );
 		stored_pdfs.push_back( PDFfromFit );
 
-		vector<DataSetConfiguration*> temp_datasetconfig;
+		//vector<DataSetConfiguration*> temp_datasetconfig;
 		DataSetConfiguration* configForToys = new DataSetConfiguration( "Foam", -1, "", empty_args, empty_arg_names, stored_pdfs.back() );
 		stored_dataconfigs.push_back( configForToys );
-		temp_datasetconfig.push_back( configForToys );
+		//temp_datasetconfig.push_back( configForToys );
 
-		PDFWithData* ToyPDFWithData = new PDFWithData( stored_pdfs.back(), allPhaseSpaces.back(), temp_datasetconfig );
+		PDFWithData* ToyPDFWithData = new PDFWithData( stored_pdfs.back(), allPhaseSpaces.back(), configForToys );
 		pdfsAndData.push_back( ToyPDFWithData );
 	}
 }

@@ -23,11 +23,12 @@ class MemoryDataSet : public IDataSet
 {
 	public:
 		MemoryDataSet( PhaseSpaceBoundary*, vector<DataPoint*> );
+		MemoryDataSet( PhaseSpaceBoundary*, vector<DataPoint> );
 		MemoryDataSet( PhaseSpaceBoundary* );
 		~MemoryDataSet();
 
 		//Interface functions
-		virtual DataPoint * GetDataPoint(int) const;
+		virtual DataPoint * GetDataPoint(int);
 		virtual bool AddDataPoint( DataPoint* );
 		virtual int GetDataNumber( DataPoint* templateDataPoint =NULL ) const;
 		virtual PhaseSpaceBoundary * GetBoundary() const;
@@ -37,9 +38,9 @@ class MemoryDataSet : public IDataSet
 
 		virtual IDataSet* GetDiscreteDataSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const;
 
-		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const;
-		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const;
-		virtual vector<DataPoint*> GetDiscreteSubSet( DataPoint* input ) const;
+		virtual vector<DataPoint> GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const;
+		virtual vector<DataPoint> GetDiscreteSubSet( const vector<string> discreteParam, const vector<double> discreteVal ) const;
+		virtual vector<DataPoint> GetDiscreteSubSet( DataPoint* input ) const;
 
 		void Clear();
 
@@ -53,16 +54,16 @@ class MemoryDataSet : public IDataSet
 		bool GetWeightsWereUsed() const;
 		void UseEventWeights( const string Name );
 
-		double GetSumWeights() const;
-		double GetSumWeightsSq() const;
+		double GetSumWeights();
+		double GetSumWeightsSq();
 		void ApplyAlpha( const double, const double );
-		double GetAlpha() const;
+		double GetAlpha();
 
 		void ApplyExternalAlpha( const string alphaName );
 
 		void NormaliseWeights();
 
-		virtual void Print() const;
+		virtual void Print();
 
 		void PrintYield();
 
@@ -72,7 +73,7 @@ class MemoryDataSet : public IDataSet
 		//	Uncopyable!
 		MemoryDataSet ( const MemoryDataSet& );
 		MemoryDataSet& operator = ( const MemoryDataSet& );
-		vector<DataPoint*> allData;
+		vector<DataPoint> allData;
 		PhaseSpaceBoundary * dataBoundary;
 		mutable vector<int> allSubSets;
 

@@ -85,7 +85,6 @@ numberRepeats(),
 	xmlFile(),
 	SoloContourResults(),
 	templatePDFs(),
-	debug(),
 	disableLatexOutput(),
 	BuildConstraints(),
 	configFileListFlag(),
@@ -179,8 +178,6 @@ numberRepeats(),
 		SoloContourResults = vector<FitResultVector*>();
 
 		templatePDFs = vector<string>();
-		debug = new DebugClass(false);
-		debug->SetClassNames(vector<string>(1,"default"));
 
 		BuildConstraints = false;
 

@@ -58,7 +58,7 @@ void SimpleMistagCalib::addObservables( vector<string>& observableNames ) const
 	observableNames.push_back( mistagName );
 }
 
-void SimpleMistagCalib::setObservables( const DataPoint* measurement )
+void SimpleMistagCalib::setObservables( DataPoint* measurement )
 {
 	_tag = measurement->GetObservable( tagName )->GetValue();
 	_mistag = measurement->GetObservable( mistagName )->GetValue();

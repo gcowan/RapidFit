@@ -632,11 +632,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 			{
 				++argumentIndex;
 				vector<string> class_names = StringProcessing::SplitString( argv[argumentIndex], ':' );
-				DebugClass* thisDebug = new DebugClass( false );
-				thisDebug->SetClassNames( class_names );
-
-				if( config.debug != NULL ) delete config.debug;
-				config.debug = thisDebug;
+				DebugClass::SetClassNames( class_names );
 			}
 		}
 		else if( currentArgument == "--SendOutput" )
@@ -673,7 +669,7 @@ int ParseCommandLine::ParseThisCommandLine( RapidFitConfiguration& config, vecto
 		else if( currentArgument == "--generateToyXML" )			{	config.generateToyXML = true;				}
 		else if( currentArgument == "--fixedTotalToys" )			{	config.fixedTotalToys = true;				}
 		else if( currentArgument == "--saveAllToys" )				{	config.saveAllToys = true;				}
-		else if( currentArgument == "--Debug" )	{  if( config.debug != NULL ){ delete config.debug;}	config.debug = new DebugClass(true);	}
+		else if( currentArgument == "--Debug" )					{	DebugClass::SetDebugAll( true );			}
 		else if( currentArgument == "--BuildConstraints" )			{	config.BuildConstraints = true;				}
 		else if( currentArgument == "--disableLatexOutput" )			{	config.disableLatexOutput = true;			}
 		else if( currentArgument == "--disableAngAccHisto" )			{	config.dontGenerateAcceptanceHistos = true;		}

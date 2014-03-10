@@ -32,7 +32,7 @@ class IDataSet
 		 *
 		 * @return Returns a Pointer to the DataPoint contained in the DataSet.
 		 */
-		virtual DataPoint * GetDataPoint( int Input ) const = 0;
+		virtual DataPoint * GetDataPoint( int Input ) = 0;
 
 		/*!
 		 * @brief Interface Function:
@@ -84,11 +84,11 @@ class IDataSet
 		 *
 		 * @return Returns a vector of DataPoints, This could be a seperate DataSet, but we do NOT duplicate the data or expect it to be changed/deleted this is effectively a wrapper to many calls to GetDataPoint
 		 */
-		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<string> Names, const vector<double> Values ) const = 0;
+		virtual vector<DataPoint> GetDiscreteSubSet( const vector<string> Names, const vector<double> Values ) const = 0;
 
-		virtual vector<DataPoint*> GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const = 0;
+		virtual vector<DataPoint> GetDiscreteSubSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const = 0;
 
-		virtual vector<DataPoint*> GetDiscreteSubSet( DataPoint* input ) const = 0;
+		virtual vector<DataPoint> GetDiscreteSubSet( DataPoint* input ) const = 0;
 
 		virtual IDataSet* GetDiscreteDataSet( const vector<ObservableRef> discreteParam, const vector<double> discreteVal ) const = 0;
 
@@ -98,7 +98,7 @@ class IDataSet
 		 *
 		 * @warning This gets stupidly verbose for large amounts of data so use with caution
 		 */
-		virtual void Print() const = 0;
+		virtual void Print() = 0;
 
 		virtual void PrintYield() = 0;
 
@@ -119,13 +119,13 @@ class IDataSet
 
 		virtual string GetWeightName() const = 0;
 
-		virtual double GetSumWeights() const = 0;
+		virtual double GetSumWeights() = 0;
 
-		virtual double GetSumWeightsSq() const = 0;
+		virtual double GetSumWeightsSq() = 0;
 
 		virtual void ApplyAlpha( const double, const double ) = 0;
 
-		virtual double GetAlpha() const =0;
+		virtual double GetAlpha() =0;
 
 		virtual void ApplyExternalAlpha( const string alphaName ) = 0;
 

@@ -30,14 +30,13 @@ const double STEP_SIZE = 0.01;
 
 //Default constructor
 Minuit2Wrapper::Minuit2Wrapper() :
-	function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), debug( new DebugClass(false) ), nSigma(1), minimum(NULL)
+	function(NULL), RapidFunction(NULL), fitResult(NULL), contours(), maxSteps(), bestTolerance(), Options(), Quality(), nSigma(1), minimum(NULL)
 {
 }
 
 //Destructor
 Minuit2Wrapper::~Minuit2Wrapper()
 {
-	if( debug != NULL ) delete debug;
 	if( minimum != NULL ) delete minimum;
 }
 
@@ -332,12 +331,6 @@ void Minuit2Wrapper::ApplyCovarianceMatrix( RapidFitMatrix* Input )
 {
 	(void)Input;
 	return;
-}
-
-void Minuit2Wrapper::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
 }
 
 void Minuit2Wrapper::SetNSigma( int input )

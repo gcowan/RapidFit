@@ -63,7 +63,7 @@ class XMLConfigReader : public I_XMLConfigReader
 		 *                   This allows us to construct sequential tests modify some part of the XML file each run
 		 *
 		 */
-		XMLConfigReader( string FileName, vector<pair<string,string> >* Override = NULL, DebugClass* thisDebug = NULL );
+		XMLConfigReader( string FileName, vector<pair<string,string> >* Override = NULL );
 
 		/*!
 		 * Default Destructor
@@ -176,8 +176,6 @@ class XMLConfigReader : public I_XMLConfigReader
 		 */
 		void SetSeed( unsigned int new_seed );
 
-
-		void SetDebug( DebugClass* input_debug );
 
 		unsigned int GetOriginalSeed() const;
 	private:
@@ -307,8 +305,6 @@ class XMLConfigReader : public I_XMLConfigReader
 		vector< XMLTag* > children;		/*!	All of the Children of the tag wholeFile	*/
 
 		int seed;				/*!	Random Seed	*/
-
-		DebugClass* debug;			/*!	Debug Class for controlling turning debug warnings on/off at runtime	*/
 
 		bool TestXML();				/*!	Internal method for determininig if an XML is valid on class Construction	*/
 

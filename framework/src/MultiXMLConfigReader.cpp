@@ -21,18 +21,16 @@
 
 using namespace::std;
 
-MultiXMLConfigReader::MultiXMLConfigReader( vector<string> fileNames, DebugClass* thisDebug ) : I_XMLConfigReader(), XMLReaders(), storedSeed(-1), storedRepeats(-1)
+MultiXMLConfigReader::MultiXMLConfigReader( vector<string> fileNames ) : I_XMLConfigReader(), XMLReaders(), storedSeed(-1), storedRepeats(-1)
 {
 	for( unsigned int i=0; i< fileNames.size(); ++i )
 	{
-		XMLReaders.push_back( new XMLConfigReader( fileNames[i], NULL, thisDebug ) );
+		XMLReaders.push_back( new XMLConfigReader( fileNames[i], NULL ) );
 	}
-	debug = new DebugClass( thisDebug );
 }
 
 MultiXMLConfigReader::~MultiXMLConfigReader()
 {
-	if( debug != NULL ) delete debug;
 	while( !XMLReaders.empty() )
 	{
 		if( XMLReaders.back() != NULL ) delete XMLReaders.back();
@@ -203,16 +201,6 @@ void MultiXMLConfigReader::SetSeed( unsigned int new_seed )
 	{
 		XMLReaders[i]->SetSeed( new_seed );
 	}
-}
-
-void MultiXMLConfigReader::SetDebug( DebugClass* input_debug )
-{
-	for( unsigned int i=0; i< XMLReaders.size(); ++i )
-	{
-		XMLReaders[i]->SetDebug( input_debug );
-	}
-        if( debug != NULL ) delete debug;
-        debug = new DebugClass( *input_debug );
 }
 
 unsigned int MultiXMLConfigReader::GetOriginalSeed() const

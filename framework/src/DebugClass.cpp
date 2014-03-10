@@ -17,45 +17,35 @@
 
 using namespace::std;
 
-DebugClass::DebugClass( const bool input ) : perform_debugging( input ), classes_to_debug()
-{
-}
+bool DebugClass::DebugAllStatus = false;
 
-DebugClass::DebugClass( const DebugClass& input ) :
-	perform_debugging(false), classes_to_debug()
-{
-	if( &input != NULL )
-	{
-		perform_debugging = input.perform_debugging;
-		classes_to_debug = input.classes_to_debug;
-	}
-}
+vector<string> DebugClass::classes_to_debug = vector<string>();
 
 void DebugClass::SetDebugAll( const bool input )
 {
-	perform_debugging = input;
+	DebugAllStatus = input;
 }
 
 void DebugClass::SetClassNames( const vector<string> input )
 {
-	classes_to_debug = input;
+	DebugClass::classes_to_debug = input;
 }
 
-vector<string> DebugClass::GetClassNames() const
+vector<string> DebugClass::GetClassNames()
 {
-	return classes_to_debug;
+	return DebugClass::classes_to_debug;
 }
 
-bool DebugClass::DebugThisClass( const string name ) const
+bool DebugClass::DebugThisClass( const string name )
 {
 	if( name.empty() ) return false;
-	if( perform_debugging )
+	if( DebugClass::DebugAllStatus )
 	{
 		return true;
 	}
 	else
 	{
-		if( classes_to_debug.empty() )
+		if( DebugClass::classes_to_debug.empty() )
 		{
 			return false;
 		}
@@ -64,7 +54,7 @@ bool DebugClass::DebugThisClass( const string name ) const
 			string thisName=name;
 			//cout << thisName << " : " << classes_to_debug[0] << endl;
 			int num = -1;
-			num = StringProcessing::VectorContains( &classes_to_debug, &thisName );
+			num = StringProcessing::VectorContains( &DebugClass::classes_to_debug, &thisName );
 			//cout << num << endl;
 			if( num == -1 ) return false;
 			else return true;

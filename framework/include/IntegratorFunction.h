@@ -184,8 +184,6 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		 */
 		IntegratorFunction& operator = ( const IntegratorFunction& );
 
-		void SetDebug( DebugClass* debug );
-
 		DataPoint* GetCurrentDataPoint() const;
 	private:
 
@@ -209,8 +207,6 @@ class IntegratorFunction : public IBaseFunctionMultiDim, public IBaseFunctionOne
 		bool generateFunc, integrateFunc;
 
 		PhaseSpaceBoundary* myPhaseSpaceBoundary;		/*!	Pointer to internally explorable PhaseSpace */
-
-		DebugClass* debug;
 
 		Double_t* xArray;
 };

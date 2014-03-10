@@ -45,7 +45,6 @@ class MinimiserConfiguration
 
 		string XML() const;
 
-		void SetDebug( DebugClass* debug );
 	private:
 		//	Uncopyable!
 		MinimiserConfiguration ( const MinimiserConfiguration& );
@@ -61,7 +60,6 @@ class MinimiserConfiguration
 		bool MultiMini;
 		int Quality;
 		int nSigma;
-		DebugClass* debug;
 };
 
 #endif

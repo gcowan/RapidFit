@@ -4,7 +4,7 @@
   A container for all information configuring RapidFit output
 
   @author Benjamin Wynne bwynne@cern.ch
-  */
+ */
 
 //	ROOT Headers
 #include "TSystem.h"
@@ -44,8 +44,7 @@ OutputConfiguration::OutputConfiguration( vector< pair< string, string > > Input
 	Global_Scan_List( ScanParameters ),
 	Global_2DScan_List( _2DScanParameters ),
 	Stored_Fit_Results(),
-	proj_components( Components ),
-	debug(new DebugClass() )
+	proj_components( Components )
 {
 }
 
@@ -262,7 +261,7 @@ void OutputConfiguration::OutputFitResult( FitResult * TheResult )
 
 void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsigned int resultIndex, vector<CompPlotter_config*>::iterator projection_i,
 		vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
-		vector< pair<double,double> >& chi2_results, vector< vector<double> >& pullFunctionEvals, TFile* output_file, bool weightedEventsWereUsed, string weightName, DebugClass* debug )
+		vector< pair<double,double> >& chi2_results, vector< vector<double> >& pullFunctionEvals, TFile* output_file, bool weightedEventsWereUsed, string weightName )
 {
 	string thisObservable = (*projection_i)->observableName;
 
@@ -286,32 +285,25 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 	cout << "Projecting ToFit: " << resultIndex+1 << endl << endl;
 	TString PDFStr = "PDF_";PDFStr+=resultIndex;
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "OutputConfiguration" ) )
 	{
-		if( debug->DebugThisClass( "OutputConfiguration" ) )
-		{
-			cout << "OutputConfiguration: Constructing ComponentPlotter: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
-		}
+		cout << "OutputConfiguration: Constructing ComponentPlotter: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
 	}
 
 	//      ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
 	ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex),
 
-			PDFStr, output_file, thisObservable, (*projection_i), resultIndex, debug );
+			PDFStr, output_file, thisObservable, (*projection_i), resultIndex );
 
 
-	thisPlotter->SetDebug( debug );
 
 	if( weightedEventsWereUsed ) thisPlotter->SetWeightsWereUsed( weightName );
 
 	allComponentPlotters.push_back( thisPlotter );
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "OutputConfiguration" ) )
 	{
-		if( debug->DebugThisClass( "OutputConfiguration" ) )
-		{
-			cout << "OutputConfiguration: Requesting Projection: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
-		}
+		cout << "OutputConfiguration: Requesting Projection: " << resultIndex+1 << " of " << resultBottle->NumberResults() << endl;
 	}
 
 	//      In ComponentPlotter this still does all of the work, but each ComponentPlotter object is created for each observable to allow you to do more easily
@@ -329,7 +321,7 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 }
 
 void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
-		vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i, DebugClass* debug )
+		vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i )
 {
 
 	int num=(int) all_components_for_all_results[0].size();
@@ -363,7 +355,7 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 
 		ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data",
 
-				resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug );
+				resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
 	}
 
 
@@ -385,7 +377,7 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 		(void) pullGraph;
 
 		ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(),
-				resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), debug, finalPullEvals );
+				resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), finalPullEvals );
 	}
 
 	CompPlotter_config* datasets_config = new CompPlotter_config( *(*projection_i) );
@@ -403,12 +395,12 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 	datasets_config->LegendTextSize = (Size_t)0.02;
 
 	ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets",
-			resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, debug );
+			resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config );
 
 	if( !finalPullEvals.empty() )
 	{
 		ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets_wPulls",
-				resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, debug, finalPullEvals );
+				resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, finalPullEvals );
 	}
 
 	delete datasets_config;
@@ -520,7 +512,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 		for( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 		{
 			MakeThisProjection( resultBottle, resultIndex, projection_i, allComponentPlotters, all_datasets_for_all_results, all_components_for_all_results, chi2_results,
-					pullFunctionEvals, output_file, weightedEventsWereUsed, weightName, debug );
+					pullFunctionEvals, output_file, weightedEventsWereUsed, weightName );
 		}
 
 		if( !chi2_results.empty() )
@@ -541,7 +533,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			cout << "\tProbability of a chi2 exceeding this value of chi2 by chance is: " << pval << endl;
 		}
 
-		Chi2XCheck( TheResult, allComponentPlotters, (*projection_i)->observableName, (*projection_i)->data_bins );
+		//Chi2XCheck( TheResult, allComponentPlotters, (*projection_i)->observableName, (*projection_i)->data_bins );
 
 		if( all_components_for_all_results.empty() )
 		{
@@ -552,7 +544,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			continue;
 		}
 
-		MergeProjectionResults(  allComponentPlotters, all_datasets_for_all_results, all_components_for_all_results, pullFunctionEvals, output_file, resultBottle, projection_i, debug );
+		MergeProjectionResults(  allComponentPlotters, all_datasets_for_all_results, all_components_for_all_results, pullFunctionEvals, output_file, resultBottle, projection_i );
 
 		//	it is now safe to remove the instances of ComponentPlotter
 		for( vector<ComponentPlotter*>::iterator compP_i = allComponentPlotters.begin(); compP_i != allComponentPlotters.end(); ++compP_i )
@@ -684,12 +676,6 @@ void OutputConfiguration::SetWeightsWereUsed( string _weightName )
 void OutputConfiguration::SetInputResults( ResultParameterSet* oneResult )
 {
 	Stored_Fit_Results.push_back( oneResult );
-}
-
-void OutputConfiguration::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
 }
 
 string OutputConfiguration::GetPullFileName() const

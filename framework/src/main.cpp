@@ -129,14 +129,11 @@ int RapidFit( vector<string> input )
 
 	int command_check = ParseCommandLine::ParseThisCommandLine( *thisConfig, input );
 
-	if( thisConfig->debug != NULL )
+	if( DebugClass::DebugThisClass( "main" ) )
 	{
-		if( thisConfig->debug->DebugThisClass( "main" ) )
-		{
-			cout << endl;
-			cout << "Finished Procesing Command Line" << endl;
-			cout << "main: Debugging Enabled" << endl;
-		}
+		cout << endl;
+		cout << "Finished Procesing Command Line" << endl;
+		cout << "main: Debugging Enabled" << endl;
 	}
 
 
@@ -151,24 +148,18 @@ int RapidFit( vector<string> input )
 		exit(0);
 	}
 
-	if( thisConfig->debug != NULL )
+	if( DebugClass::DebugThisClass( "main" ) )
 	{
-		if( thisConfig->debug->DebugThisClass( "main" ) )
-		{
-			cout << endl;
-			cout << "About to Configure RapidFit with the given XML and command line options" << endl;
-		}
+		cout << endl;
+		cout << "About to Configure RapidFit with the given XML and command line options" << endl;
 	}
 
 	ConfigureRapidFit( thisConfig );
 
-	if( thisConfig->debug != NULL )
+	if( DebugClass::DebugThisClass( "main" ) )
 	{
-		if( thisConfig->debug->DebugThisClass( "main" ) )
-		{
-			cout << endl;
-			cout << "RapidFit has been Configured and initial objects in XML/CommandLine have been constructed" << endl;
-		}
+		cout << endl;
+		cout << "RapidFit has been Configured and initial objects in XML/CommandLine have been constructed" << endl;
 	}
 
 	int main_fitResult=0;
@@ -303,7 +294,7 @@ int Perform2DLLScan( RapidFitConfiguration* config )
 
 		vector<FitResultVector*> Temp_Results = ScanStudies::ContourScan( config->theMinimiser, config->theFunction, config->argumentParameterSet,
 
-				config->pdfsAndData, config->xmlFile->GetConstraints(), config->makeOutput, name1, name2, config->OutputLevel2, config->debug, config->Force_Continue_Flag );
+				config->pdfsAndData, config->xmlFile->GetConstraints(), config->makeOutput, name1, name2, config->OutputLevel2, config->Force_Continue_Flag );
 
 		vector<FitResultVector*> Ordered_Results;
 
@@ -368,7 +359,7 @@ int PerformLLScan( RapidFitConfiguration* config )
 
 		FitResultVector* scan_result = ScanStudies::SingleScan( config->theMinimiser, config->theFunction, config->argumentParameterSet, config->pdfsAndData,
 
-				config->xmlFile->GetConstraints(), config->makeOutput, LLscanList[scan_num], config->OutputLevel2, config->debug, config->Force_Continue_Flag );
+				config->xmlFile->GetConstraints(), config->makeOutput, LLscanList[scan_num], config->OutputLevel2, config->Force_Continue_Flag );
 
 		scanSoloResults.push_back( scan_result );
 
@@ -384,12 +375,9 @@ int PerformLLScan( RapidFitConfiguration* config )
 
 			//config->GlobalResult->GetResultParameterSet()->GetResultParameter( LLscanList[scan_num] )->SetScanStatus( true );
 
-			if( config->debug != NULL )
+			if( DebugClass::DebugThisClass( "main" ) )
 			{
-				if( config->debug->DebugThisClass( "main" ) )
-				{
-					cout << "main: Constructing FeldmanCousins" << endl;
-				}
+				cout << "main: Constructing FeldmanCousins" << endl;
 			}
 
 			for( unsigned int i=0; i< config->pdfsAndData.size(); ++i )	config->pdfsAndData[i]->ClearCache();
@@ -398,12 +386,9 @@ int PerformLLScan( RapidFitConfiguration* config )
 					config->theFunction, config->xmlFile, config->pdfsAndData );
 			new_study->SetNumRepeats( config->numberRepeats );
 
-			if( config->debug != NULL )
+			if( DebugClass::DebugThisClass( "main" ) )
 			{
-				if( config->debug->DebugThisClass( "main" ) )
-				{
-					cout << "main: Starting FeldmanCousins" << endl;
-				}
+				cout << "main: Starting FeldmanCousins" << endl;
 			}
 
 			new_study->DoWholeStudy( config->OutputLevel2 );
@@ -480,12 +465,9 @@ string GenerateXML( RapidFitConfiguration* config, bool isForToys )
 		full_xml << config->GlobalResult->GetResultParameterSet()->ToyXML();
 		for( vector<PDFWithData*>::iterator toFit_i = config->pdfsAndData.begin(); toFit_i != config->pdfsAndData.end(); ++toFit_i )
 		{
-			vector<DataSetConfiguration*> gen_list = (*toFit_i)->GetAllDataSetConfigs();
-			for( vector<DataSetConfiguration*>::iterator gen_i = gen_list.begin(); gen_i != gen_list.end(); ++gen_i )
-			{
-				OriginalSources.push_back( (*gen_i)->GetSource() );
-				(*gen_i)->SetSource("Foam");
-			}
+			DataSetConfiguration* gen_i = (*toFit_i)->GetDataSetConfig();
+			OriginalSources.push_back( gen_i->GetSource() );
+			gen_i->SetSource("Foam");
 		}
 	}
 	else
@@ -515,12 +497,9 @@ string GenerateXML( RapidFitConfiguration* config, bool isForToys )
 		unsigned int count=0;
 		for( vector<PDFWithData*>::iterator toFit_i = config->pdfsAndData.begin(); toFit_i != config->pdfsAndData.end(); ++toFit_i )
 		{
-			vector<DataSetConfiguration*> gen_list = (*toFit_i)->GetAllDataSetConfigs();
-			for( vector<DataSetConfiguration*>::iterator gen_i = gen_list.begin(); gen_i != gen_list.end(); ++gen_i )
-			{
-				(*gen_i)->SetSource( OriginalSources[count] );
-				++count;
-			}
+			DataSetConfiguration* gen_conf = (*toFit_i)->GetDataSetConfig();
+			gen_conf->SetSource( OriginalSources[count] );
+			++count;
 		}
 	}
 
@@ -707,12 +686,11 @@ void SaveOneFoam( RapidFitConfiguration* config )
 		}
 		}
 		}
-		*/
+		 */
 
 		//Construct the configuration to give a Foam generator
 		DataSetConfiguration* temp_config = new DataSetConfiguration( "Foam", config->pdfsAndData[i]->GetDataSet()->GetDataNumber(), "", vector<string>(), vector<string>(), temp_pdf );
-		vector<DataSetConfiguration*> data_config; data_config.push_back( temp_config );
-		PDFWithData* pdf_data_to_fit = new PDFWithData( temp_pdf, temp_boundary, data_config );
+		PDFWithData* pdf_data_to_fit = new PDFWithData( temp_pdf, temp_boundary, temp_config );
 
 		ParameterSet* result_set = config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
 		pdf_data_to_fit->SetPhysicsParameters( result_set );
@@ -780,48 +758,36 @@ int PerformMainFit( RapidFitConfiguration* config )
 
 	cout << "\n\n\t\tStarting Fit to Find Global Minima!\n"<<endl;
 
-	if( config->debug != NULL )
+	if( DebugClass::DebugThisClass( "main" ) )
 	{
-		if( config->debug->DebugThisClass( "main" ) )
-		{
-			cout << "main: Starting Timer" << endl;
-		}
+		cout << "main: Starting Timer" << endl;
 	}
 
 	//Do the fit to find GLOBAL MINIMA
 	config->GlobalFitResult = new FitResultVector( config->argumentParameterSet->GetAllNames() );
 	config->GlobalFitResult->StartStopwatch();
 
-	if( config->debug != NULL )
+	if( DebugClass::DebugThisClass( "main" ) )
 	{
-		if( config->debug->DebugThisClass( "main" ) )
-		{
-			cout << "main: Requesting External Constraints from XML" << endl;
-		}
+		cout << "main: Requesting External Constraints from XML" << endl;
 	}
 
 	config->XMLConstraints = config->xmlFile->GetConstraints();
 
-	if( config->debug != NULL )
+	if( DebugClass::DebugThisClass( "main" ) )
 	{
-		if( config->debug->DebugThisClass( "main" ) )
-		{
-			cout << "main: Performing Fit" << endl;
-		}
+		cout << "main: Performing Fit" << endl;
 	}
 
 	config->GlobalResult = FitAssembler::DoSafeFit( config->theMinimiser, config->theFunction, config->argumentParameterSet,
 
-			config->pdfsAndData, config->XMLConstraints, config->Force_Continue_Flag, config->OutputLevel, config->debug );
+			config->pdfsAndData, config->XMLConstraints, config->Force_Continue_Flag, config->OutputLevel );
 
 	cout << "Finished Fitting :D" << endl;
 
-	if( config->debug != NULL )
+	if( DebugClass::DebugThisClass( "main" ) )
 	{
-		if( config->debug->DebugThisClass( "main" ) )
-		{
-			cout << "main: Stopping Timer" << endl;
-		}
+		cout << "main: Stopping Timer" << endl;
 	}
 
 	config->GlobalFitResult->AddFitResult( config->GlobalResult );
@@ -1435,13 +1401,12 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 	//Load config file(s)
 	if( config->configFileListFlag )
 	{
-		config->xmlFile = (I_XMLConfigReader*) new MultiXMLConfigReader( config->configFileList, config->debug );
+		config->xmlFile = (I_XMLConfigReader*) new MultiXMLConfigReader( config->configFileList );
 		config->configFileNameFlag = true;
 	}
 	else if( config->configFileNameFlag )
 	{
-		config->xmlFile = (I_XMLConfigReader*) new XMLConfigReader( config->configFileName, config->XMLOverrideList, config->debug );
-		//config->xmlFile->SetDebug( config->debug );
+		config->xmlFile = (I_XMLConfigReader*) new XMLConfigReader( config->configFileName, config->XMLOverrideList );
 		if( config->xmlFile->IsValid() )
 		{
 			cout << endl << "XML config file: " << config->configFileName << " loaded Successfully!" << endl << endl;
@@ -1491,7 +1456,6 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 
 	//Actually configure a fit: first configure the output
 	config->makeOutput = config->xmlFile->GetOutputConfiguration();
-	config->makeOutput->SetDebug( config->debug );
 
 	//	Command line arguments override the config file
 
@@ -1551,20 +1515,15 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 			for( unsigned int pdf_num=0; pdf_num< config->pdfsAndData.size(); ++pdf_num )
 			{
 				//	Get the DataSet in this PDFWithData
-				vector<DataSetConfiguration*> DataConfigs = config->pdfsAndData[pdf_num]->GetAllDataSetConfigs();
+				DataSetConfiguration* DataConfig = config->pdfsAndData[pdf_num]->GetDataSetConfig();
 				//	Loop over all DataSetConfiguration objects existing within this PDFWithData
-				for( unsigned int config_num=0; config_num < DataConfigs.size(); ++config_num )
+				//	If it's a file the data is never changed/destroyed
+				if( DataConfig->GetSource() != "File" )
 				{
-					//	If it's a file the data is never changed/destroyed
-					if( DataConfigs[config_num]->GetSource() != "File" )
-					{
-						cout << "SCAN REQUESTED, GENERATING AND CACHING DATA" << endl;
-						config->pdfsAndData[pdf_num]->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
-						vector<IDataSet*> gen_data;
-						gen_data.push_back( config->pdfsAndData[pdf_num]->GetDataSet() );		//	Generate a Foam DataSet
-						config->pdfsAndData[pdf_num]->AddCachedData( gen_data );		//	Cache it for the lifetime of a scan
-						config->pdfsAndData[pdf_num]->SetUseCache( true );
-					}
+					cout << "SCAN REQUESTED, GENERATING AND CACHING DATA" << endl;
+					config->pdfsAndData[pdf_num]->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
+					config->pdfsAndData[pdf_num]->AddCachedData( config->pdfsAndData[pdf_num]->GetDataSet() );		//	Cache it for the lifetime of a scan
+					config->pdfsAndData[pdf_num]->SetUseCache( true );
 				}
 			}
 		}
@@ -1649,14 +1608,14 @@ int BuildTemplateXML( RapidFitConfiguration* config )
 	for( ; PDF_i != requestedPDFs.end(); ++PDF_i, ++obs_i )
 	{
 		DataSetConfiguration* set_i = new DataSetConfiguration( "Foam", 10000, string(), vector<string>(), vector<string>(), ClassLookUp::CopyPDF( *PDF_i ), *obs_i );
-		vector<DataSetConfiguration*> input_vec_set( 1, set_i );
-		PDFWithData* toFit = new PDFWithData( ClassLookUp::CopyPDF( *PDF_i ), *obs_i, input_vec_set );
+		PDFWithData* toFit = new PDFWithData( ClassLookUp::CopyPDF( *PDF_i ), *obs_i, set_i );
 
 		xml << endl;
 		xml << toFit->XML() << endl;
 		xml << endl;
 
 		delete toFit;
+		delete set_i;
 	}
 	delete empty;
 	while( !RequiredObservables.empty() )

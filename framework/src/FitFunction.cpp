@@ -6,7 +6,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	ROOT Headers
 #include "TFile.h"
@@ -38,7 +38,7 @@ using namespace::std;
 FitFunction::FitFunction() :
 	Name("Unknown"), allData(), testDouble(), useWeights(false), weightObservableName(), Fit_File(NULL), Fit_Tree(NULL), branch_objects(), branch_names(), fit_calls(0),
 	Threads(-1), stored_pdfs(), StoredBoundary(), StoredDataSubSet(), StoredIntegrals(), finalised(false), fit_thread_data(NULL), testIntegrator( true ), weightsSquared( false ),
-	debug(new DebugClass(false) ), traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig()), initialConstraint( numeric_limits<double>::quiet_NaN() )
+	traceNum(0), step_time(-1), callNum(0), integrationConfig(new RapidFitIntegratorConfig()), initialConstraint( numeric_limits<double>::quiet_NaN() )
 {
 }
 
@@ -72,7 +72,6 @@ FitFunction::~FitFunction()
 		StoredIntegrals.pop_back();
 	}
 
-	if( debug != NULL ) delete debug;
 	if( integrationConfig != NULL ) delete integrationConfig;
 }
 
@@ -121,14 +120,11 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 	allData = new PhysicsBottle( *NewBottle );
 	if( Fit_File != NULL ) this->SetupTraceTree();
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "FitFunction" ) )
 	{
-		if( debug->DebugThisClass( "FitFunction" ) )
-		{
-			cout << "FitFunction: I am Performing a fit with " << NewBottle->NumberResults() << " seperate NLLs" << endl;
-			cout << "FitFunction: I am using the " << Name << " Fit Function to Evaluate" << endl;
-			cout << "FitFunction: I have been asked to use " << Threads << " parallel threads" << endl;
-		}
+		cout << "FitFunction: I am Performing a fit with " << NewBottle->NumberResults() << " seperate NLLs" << endl;
+		cout << "FitFunction: I am using the " << Name << " Fit Function to Evaluate" << endl;
+		cout << "FitFunction: I have been asked to use " << Threads << " parallel threads" << endl;
 	}
 
 	//Initialise the integrators
@@ -137,38 +133,29 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 		//	Update Internal ParameterSet in PDF
 		NewBottle->GetResultPDF(resultIndex)->UpdatePhysicsParameters( allData->GetParameterSet() );
 
-		if( debug != NULL )
+		if( DebugClass::DebugThisClass( "FitFunction" ) )
 		{
-			if( debug->DebugThisClass( "FitFunction" ) )
-			{
-				cout << "FitFunction: Constructing Integrator Object for ToFit " << resultIndex+1 << endl;
-			}
+			cout << "FitFunction: Constructing Integrator Object for ToFit " << resultIndex+1 << endl;
 		}
 
 		//RapidFitIntegrator * resultIntegrator =  new RapidFitIntegrator( NewBottle->GetResultPDF(resultIndex), false, gslIntegrator );
 		//resultIntegrator->SetDebug( debug );
 
-		if( debug != NULL )
+		if( DebugClass::DebugThisClass( "FitFunction" ) )
 		{
-			if( debug->DebugThisClass( "FitFunction" ) )
+			if( testIntegrator )
 			{
-				if( testIntegrator )
-				{
-					cout << "FitFunction: Performing Integrator test" << endl;
-				}
-				else
-				{
-					cout << "FitFunction: NOT Performing Integrator test" << endl;
-				}
+				cout << "FitFunction: Performing Integrator test" << endl;
+			}
+			else
+			{
+				cout << "FitFunction: NOT Performing Integrator test" << endl;
 			}
 		}
 
-		if( debug != NULL )
+		if( DebugClass::DebugThisClass( "FitFunction" ) )
 		{
-			if( debug->DebugThisClass( "FitFunction" ) )
-			{
-				cout << "FitFunction: Performing Integration Test" << endl;
-			}
+			cout << "FitFunction: Performing Integration Test" << endl;
 		}
 
 		double someVal=0.;
@@ -183,7 +170,6 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 			if( testIntegrator )
 			{
 				allData->GetResultPDF(resultIndex)->GetPDFIntegrator()->ForceTestStatus( false );
-				allData->GetResultPDF(resultIndex)->GetPDFIntegrator()->SetDebug( debug );
 				someVal = allData->GetResultPDF(resultIndex)->GetPDFIntegrator()->Integral(
 						allData->GetResultDataSet(resultIndex)->GetDataPoint( 0 ),
 						allData->GetResultDataSet(resultIndex)->GetBoundary() );
@@ -191,23 +177,17 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 		}
 		(void) someVal;
 
-		if( debug != NULL )
+		if( DebugClass::DebugThisClass( "FitFunction" ) )
 		{
-			if( debug->DebugThisClass( "FitFunction" ) )
-			{
-				cout << "FitFunction: Finished Performing Integration Test" << endl;
-			}
+			cout << "FitFunction: Finished Performing Integration Test" << endl;
 		}
 
 		if( Threads > 0 )
 		{
 			//      Create simple data subsets. We no longer care about the handles that IDataSet takes care of
-			if( debug != NULL )
+			if( DebugClass::DebugThisClass( "FitFunction" ) )
 			{
-				if( debug->DebugThisClass( "FitFunction" ) )
-				{
-					cout << "FitFunction: Splitting DataSet" << endl;
-				}
+				cout << "FitFunction: Splitting DataSet" << endl;
 			}
 			StoredDataSubSet.push_back( Threading::divideData( NewBottle->GetResultDataSet(resultIndex), Threads ) );
 			vector<IDataSet*> sets;
@@ -218,23 +198,16 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 			stored_datasets.push_back( sets );
 			for( int i=0; i< Threads; ++i )
 			{
-				if( debug != NULL )
+				if( DebugClass::DebugThisClass( "FitFunction" ) )
 				{
-					if( debug->DebugThisClass( "FitFunction" ) )
-					{
-						cout << "FitFunction: Cloning PhaseSpaceBoundary" << endl;
-					}
+					cout << "FitFunction: Cloning PhaseSpaceBoundary" << endl;
 				}
 				StoredBoundary.push_back( new PhaseSpaceBoundary( *(NewBottle->GetResultDataSet(resultIndex)->GetBoundary()) ) );
-				if( debug != NULL )
+				if( DebugClass::DebugThisClass( "FitFunction" ) )
 				{
-					if( debug->DebugThisClass( "FitFunction" ) )
-					{
-						cout << "FitFunction: CopyingPdf " << NewBottle->GetResultPDF( resultIndex )->GetLabel() << endl;
-					}
+					cout << "FitFunction: CopyingPdf " << NewBottle->GetResultPDF( resultIndex )->GetLabel() << endl;
 				}
 				stored_pdfs.push_back( ClassLookUp::CopyPDF( NewBottle->GetResultPDF( resultIndex ) ) );
-				stored_pdfs.back()->SetDebug( debug );
 				stored_pdfs.back()->SetUpIntegrator( integrationConfig );
 			}
 		}
@@ -245,12 +218,9 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 		fit_thread_data = new Fitting_Thread[ (unsigned) Threads ];
 	}
 
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "FitFunction" ) )
 	{
-		if( debug->DebugThisClass( "FitFunction" ) )
-		{
-			cout << "FitFunction: PhysicsBottle Set" << endl;
-		}
+		cout << "FitFunction: PhysicsBottle Set" << endl;
 	}
 }
 
@@ -407,12 +377,9 @@ double FitFunction::Evaluate()
 		this->GetParameterSet()->Print();
 		minimiseValue = DBL_MAX;
 	}
-	if( debug != NULL )
+	if( DebugClass::DebugThisClass( "FitFunction" ) )
 	{
-		if( debug->DebugThisClass( "FitFunction" ) )
-		{
-			cout << endl;
-		}
+		cout << endl;
 	}
 
 	//	cout << endl << "Goodbye!" << endl;
@@ -493,12 +460,6 @@ vector<string> FitFunction::ConstrainedParameter() const
 		allparams = StringProcessing::CombineUniques( allparams, allconstraints[i]->ConstrainedParameter() );
 	}
 	return allparams;
-}
-
-void FitFunction::SetDebug( DebugClass* input_debug )
-{
-	if( debug != NULL ) delete debug;
-	debug = new DebugClass( *input_debug );
 }
 
 unsigned int FitFunction::GetCallNum()

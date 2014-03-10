@@ -439,8 +439,6 @@ class BasePDF : public BasePDF_Framework, public BasePDF_MCCaching, public IPDF
 
 		bool can_remove_mutex;		/*!	This is internal to let the PDF know if it's safe to remove the shared mutex	*/
 
-		DebugClass* debug;		/*!	This is the DebugClass which will allow you to turn on selective debugging at runtime	*/
-
 		void ReallySetComponentStatus( const bool input );
 
 		bool ReallyGetComponentStatus() const;

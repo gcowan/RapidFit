@@ -126,7 +126,7 @@ class StatisticsFunctions
 		 *
 		 * @return
 		 */
-		static vector<DataPoint*> DataAverage( const IDataSet* inputDataSet, const vector< vector<double> > DiscreteCombinations, const vector< vector<double> > DiscreteValues,
+		static vector<DataPoint*> DataAverage( IDataSet* inputDataSet, const vector< vector<double> > DiscreteCombinations, const vector< vector<double> > DiscreteValues,
 				const vector<string> DiscreteNames, const vector<string> ContinuousNames, vector<string>& DataPointDescriptions, vector<double>& DataPointWeights );
 
 		/*!
