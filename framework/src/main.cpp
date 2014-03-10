@@ -413,14 +413,14 @@ int PerformLLScan( RapidFitConfiguration* config )
 			config->GlobalResult->GetResultParameterSet()->GetResultParameter( string(LLscanList[this_scan_num]) )->SetScanStatus( true );
 
 			//	The output file format is [0] = Global_CV, [1] = Scan_CV_1, [2] = Global_CV, [3] = Scan_CV_2 ...
-			for( int i=0; i< scanSoloResults[this_scan_num]->NumberResults(); ++i )
+			for( int i=0; i< scanSoloResults.back()->NumberResults(); ++i )
 			{
 				ammended_format.push_back( config->GlobalFitResult );
-				FitResultVector* temp_vec = new FitResultVector( scanSoloResults[this_scan_num]->GetAllNames() );
-				temp_vec->AddFitResult( scanSoloResults[this_scan_num]->GetFitResult( i ), false );
-				temp_vec->AddRealTime( scanSoloResults[this_scan_num]->GetRealTime(i) );
-				temp_vec->AddCPUTime( scanSoloResults[this_scan_num]->GetCPUTime(i) );
-				temp_vec->AddGLTime( scanSoloResults[this_scan_num]->GetGLTime(i) );
+				FitResultVector* temp_vec = new FitResultVector( scanSoloResults.back()->GetAllNames() );
+				temp_vec->AddFitResult( scanSoloResults.back()->GetFitResult( i ), false );
+				temp_vec->AddRealTime( scanSoloResults.back()->GetRealTime(i) );
+				temp_vec->AddCPUTime( scanSoloResults.back()->GetCPUTime(i) );
+				temp_vec->AddGLTime( scanSoloResults.back()->GetGLTime(i) );
 				ammended_format.push_back( temp_vec );
 			}
 			FitResultVector* corrected_format = new FitResultVector( ammended_format );
