@@ -68,7 +68,7 @@ class MistagCalib3fb : public IMistagCalib
 
 		double _storedD1, _storedD2;
 
-		ObservableRef tagOSName, tagSSName, mistagOSName, mistagSSName, tagCombName;
+		ObservableRef tagOSName, tagSSName, mistagOSName, mistagSSName;
 		ObservableRef mistagP1Name_OS, mistagP0Name_OS, mistagSetPointName_OS, mistagDeltaP1Name_OS, mistagDeltaP0Name_OS, mistagDeltaSetPointName_OS;
 		ObservableRef mistagP1Name_SS, mistagP0Name_SS, mistagSetPointName_SS, mistagDeltaP1Name_SS, mistagDeltaP0Name_SS, mistagDeltaSetPointName_SS;
 

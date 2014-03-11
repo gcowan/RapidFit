@@ -25,7 +25,6 @@ MistagCalib3fb::MistagCalib3fb( PDFConfigurator* configurator ) : IMistagCalib()
 	//	Observable Names
 	tagOSName( configurator->getName("tagdecision_os") ),
 	tagSSName( configurator->getName("tagdecision_ss") ),
-	tagCombName( configurator->getName("tagdecision") ),
 	mistagOSName( configurator->getName("tagomega_os") ),
 	mistagSSName( configurator->getName("tagomega_ss") ),
 	//	Physics Parameter Names

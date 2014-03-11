@@ -32,7 +32,6 @@ BasePDF::BasePDF() : BasePDF_Framework( this ), BasePDF_MCCaching(),
 	debug_mutex(NULL), can_remove_mutex(true), fixed_checked(false), isFixed(false), fixedID(0), _basePDFComponentStatus(false)
 {
 	component_list.push_back( "0" );
-	debug_mutex = new pthread_mutex_t();
 }
 
 BasePDF::BasePDF( const BasePDF& input ) : BasePDF_Framework( input ), BasePDF_MCCaching( input ),
@@ -46,9 +45,10 @@ BasePDF::BasePDF( const BasePDF& input ) : BasePDF_Framework( input ), BasePDF_M
 {
 	allParameters.SetPhysicsParameters( &(input.allParameters) );
 	DiscreteCaches = new vector<double>( input.DiscreteCaches->size() );
-	for( vector<double>::iterator cache_i = DiscreteCaches->begin(); cache_i != DiscreteCaches->end(); ++cache_i )
+	vector<double>::const_iterator _icache = input.DiscreteCaches->begin();
+	for( vector<double>::iterator cache_i = DiscreteCaches->begin(); cache_i != DiscreteCaches->end(); ++cache_i, ++_icache )
 	{
-		(*cache_i) = -1;
+		(*cache_i) = *_icache;
 	}
 
 	this->GetPDFIntegrator()->SetPDF( this );

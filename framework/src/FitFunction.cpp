@@ -274,6 +274,7 @@ double FitFunction::Evaluate()
 	double temp=0.;
 
 	vector<double> values;
+	if( DebugClass::DebugThisClass( "FitFunction" ) ) cout << endl;
 	//Calculate the function value for each PDF-DataSet pair
 	for( int resultIndex = 0; resultIndex < allData->NumberResults(); ++resultIndex )
 	{
@@ -296,16 +297,19 @@ double FitFunction::Evaluate()
 			values.push_back( this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex ) );
 			//cout << "Result: " << temp << endl;
 		}
+
 		if( fabs(values.back()) >= DBL_MAX )
 		{
 			return DBL_MAX;
 		}
 		else
 		{
-			minimiseValue+=values.back();
+			minimiseValue = values.back();
 		}
-		//cout << endl << "temp: " << minimiseValue << endl << endl;
+		if( DebugClass::DebugThisClass( "FitFunction" ) ) cout << "DataSet " << resultIndex << " : " << minimiseValue << endl;
 	}
+
+	if( DebugClass::DebugThisClass( "FitFunction" ) ) cout << endl;
 
 	sort( values.begin(), values.end() );
 
