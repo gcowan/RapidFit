@@ -7,7 +7,7 @@
 
   @author Greig A Cowan greig.cowan@cern.ch
   @date 2009-12-22
-  */
+ */
 
 ///	ROOT Headers
 #include "TNtuple.h"
@@ -113,11 +113,13 @@ namespace Mathematics
 	double expErfInt( double tlimit, double tau, double sigma)
 	{
 		const double sigma_2=sigma*sigma;
+		const double tau_2 = tau*tau;
+		const double inv_tau2 = 1./tau_2;
 		const double inv_r2_sigma = 1./(sqrt_2*sigma);
 		const double inv_r2_sigma_tau = inv_r2_sigma/tau;
 		const double tau_tlimit = tau*tlimit;
 		return 0.5 * (tau * ( erf( tlimit*inv_r2_sigma )
-					- exp( (sigma_2*0.5 - tau_tlimit)/(tau*tau) )
+					- exp( (sigma_2*0.5 - tau_tlimit)*inv_tau2 )
 					* erfc( (sigma_2 - tau_tlimit)*inv_r2_sigma_tau )
 				    )
 			     );
@@ -331,7 +333,7 @@ namespace Mathematics
 	   exp((gamma*(2*thigh + gamma*timeRes*timeRes - 2*tlow))*0.5) * Erfc((gamma*timeRes*timeRes - tlow )/(sqrt(2)*timeRes)) +
 	   exp( gamma*thigh)*Erfc(tlow/(sqrt(2)*timeRes))
 	   )/(2.*exp(gamma*thigh)*gamma)
-	   */
+	 */
 	double ExpInt( double tlow, double thigh, double gamma, double resolution  )
 	{
 		if( thigh < tlow )
@@ -343,7 +345,24 @@ namespace Mathematics
 		const double invgamma=1./gamma;
 		if( resolution > 0. )
 		{
-			return expErfInt(thigh, invgamma, resolution) - expErfInt(tlow, invgamma, resolution);
+			const double sigma_2=resolution*resolution;
+			const double tau_2 = invgamma*invgamma;
+			const double inv_tau2 = gamma*gamma;
+			const double inv_r2_sigma = 1./(sqrt_2*resolution);
+			const double inv_r2_sigma_tau = inv_r2_sigma*gamma;
+			const double tau_thigh = invgamma*thigh;
+			const double tau_tlow = invgamma*tlow;
+			const double half_invgamma = 0.5*invgamma;
+			const double half_sigma_2 = sigma_2*0.5;
+			const double int_tHigh = erf( thigh*inv_r2_sigma )
+				               - exp( (half_sigma_2 - tau_thigh )*inv_tau2 )
+				              * erfc( (sigma_2 - tau_thigh )*inv_r2_sigma_tau ) ;
+
+			const double int_tLow = erf( tlow*inv_r2_sigma )
+                                              - exp( (half_sigma_2 - tau_tlow )*inv_tau2 )
+					     * erfc( (sigma_2 - tau_tlow )*inv_r2_sigma_tau ) ;
+
+			return half_invgamma * ( int_tHigh - int_tLow );
 		}
 		else
 		{
@@ -1053,7 +1072,7 @@ namespace Mathematics
 			// Now need to calculate the normalisation when integrated over the 3 angles
 			Bd2JpsiKstar_sWave_Fscopy * bpdf = (Bd2JpsiKstar_sWave_Fscopy *) PDF;
 			evalPDFnorm = bpdf->NormAnglesOnlyForAcceptanceWeights(event, boundary);
-			*/
+			 */
 
 			/*
 			// for the Bd2JpsiK* time-angular analysis in transversity basis
@@ -1062,7 +1081,7 @@ namespace Mathematics
 			cosPsi   = event->GetObservable("cosPsi")->GetValue();
 			Bd2JpsiKstar_sWave_Fs_withAcc * bpdf = (Bd2JpsiKstar_sWave_Fs_withAcc *) PDF;
 			evalPDFnorm = bpdf->NormAnglesOnlyForAcceptanceWeights(event, boundary);
-			*/
+			 */
 
 			evalPDFraw = PDF->Evaluate( event );
 			//cout << "PDF evaluate " << evalPDFraw << " " << evalPDFnorm << " " << evalPDFraw/evalPDFnorm << endl;
@@ -1215,7 +1234,7 @@ namespace Mathematics
 		TH1D * cosThetaAccProj = h3->ProjectionX();
 		TH1D * phiAccProj = h3->ProjectionY();
 		TH1D * cosPsiAccProj = h3->ProjectionZ();
-		*/
+		 */
 
 		std::cout << cosThetaAccProj->Integral() << " " << numEvents << std::endl;
 		// Normalise the histograms for drawing

@@ -23,7 +23,7 @@ class DebugClass
 
 		static vector<string> GetClassNames();
 
-		static bool DebugThisClass( const string name );
+		static bool DebugThisClass( const string& name );
 
 
 		//	HelperFunctions within this Sentinel

@@ -36,7 +36,7 @@ vector<string> DebugClass::GetClassNames()
 	return DebugClass::classes_to_debug;
 }
 
-bool DebugClass::DebugThisClass( const string name )
+bool DebugClass::DebugThisClass( const string& name )
 {
 	if( name.empty() ) return false;
 	if( DebugClass::DebugAllStatus )
