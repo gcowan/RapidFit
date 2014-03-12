@@ -112,6 +112,7 @@ string BasePDF_Framework::XML() const
 void BasePDF_Framework::SetConfigurator( PDFConfigurator* config )
 {
 	if( thisConfig != NULL ) delete thisConfig;
+	if( DebugClass::DebugThisClass( "BasePDF_Framework" ) ) cout << "BasePDF_Framework:: Removed old Configuration, Adding new" << endl;
 	thisConfig = new PDFConfigurator( *config );
 }
 

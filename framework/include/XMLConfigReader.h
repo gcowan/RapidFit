@@ -116,7 +116,7 @@ class XMLConfigReader : public I_XMLConfigReader
 		/*!
 		 * @brief Returns the OutputConfiguration as defined in the XML
 		 *
-		 * @return Returns a Pointer to the OutputConfiguration which produces more detaild output around the fit minima
+		 * @return Returns a Pointer to the OutputConfiguration which produces more detailed output around the fit minima
 		 */
 		OutputConfiguration * GetOutputConfiguration();
 
@@ -204,99 +204,9 @@ class XMLConfigReader : public I_XMLConfigReader
 		 */
 		ParameterSet* GetRawFitParameters();
 
-		/*!
-		 * @brief Internal Function to create a single ParameterSet based on the provided XML
-		 */
-		ParameterSet * GetParameterSet( XMLTag* );
-
-		/*!
-		 * @brief Internal Function to create a single PhysicsParameter based on the provided XML
-		 */
-		PhysicsParameter * GetPhysicsParameter( XMLTag*, string& );
-
-		/*!
-		 * @brief Internal Function to create a single PhaseSpaceBoundary based on the provided XML
-		 */
-		PhaseSpaceBoundary * GetPhaseSpaceBoundary( XMLTag* );
-
-		/*!
-		 * @brief Construct a Constraint given the input XML, the name of the constraint is stored in the Name variable
-		 */
-		IConstraint * GetConstraint( XMLTag*, string& Name );
-
-		/*!
-		 * @brief Construct a PDFWithData based on the input XML Tags with a Starting value given by the integer StartVal
-		 */
-		PDFWithData * GetPDFWithData( XMLTag*, XMLTag*, int StartVal, XMLTag* overloadConfigurator=NULL );
-
-		/*!
-		 * @brief Use the LookUpNamedPDF in ClassLookUp to request and configure a PDF based on the given XML Tag
-		 */
-		IPDF * GetNamedPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag*, bool print=true );
-
-		/*!
-		 * @brief Construct a PDF based on the XMLTag with the given PhaseSpaceBoundary
-		 */
-		IPDF * GetPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag* overloadConfigurator, bool print=true );
-
-		/*!
-		 * @brief Construct a FitFunctionConfiguration based on the XMLTag
-		 */
-		FitFunctionConfiguration * MakeFitFunction( XMLTag* );
-
-		/*!
-		 * @brief Construct a MinimiserConfiguration based on the XMLTag
-		 */
-		MinimiserConfiguration * MakeMinimiser( XMLTag* );
-
-		/*!
-		 * @brief Get the required information to pass to the MinimiserConfiguration to Perform a Contour Scan
-		 */
-		pair< string, string > MakeContourPlot( XMLTag* );
-
-		/*!
-		 * @brief Contruct an OutputConfiguration instance based on the XMLTag
-		 */
-		OutputConfiguration * MakeOutputConfiguration( XMLTag* );
-
-		/*!
-		 * @brief Construct a DataSetConfiguration based on the XMLTag
-		 */
-		DataSetConfiguration * MakeDataSetConfiguration( XMLTag*, PhaseSpaceBoundary* );
-
-		/*!
-		 * @brief Construct a ConstraintFunction based on the XMLTag
-		 */
-		ConstraintFunction * GetConstraintFunction( XMLTag* );
-
-		/*!
-		 * @brief Construct a ExternalConstraint based on the XMLTag
-		 */
-		ExternalConstraint * GetExternalConstraint( XMLTag* );
-
-		/*!
-		 * @brief Create an ExternalConstMatrix for the appropriate xml tag
-		 */
-		ExternalConstMatrix * GetExternalConstMatrix( XMLTag * InputTag );
-
-		/*!
-		 * @brief Construct a ScanParam object based on the XMLTag
-		 */
-		ScanParam * GetScanParam( XMLTag * InputTag );
-
-		/*!
-		 * @brief Construct a Pair of ScanParam object based on the XMLTag
-		 */
-		pair<ScanParam*, ScanParam*> Get2DScanParam( XMLTag * InputTag );
-
-		/*!
-		 * @brief Construct a ComPlotter_config instance, was a struct now a class of public objects
-		 */
-		CompPlotter_config* getCompPlotterConfigs( XMLTag* CompTag );
-
 		PhaseSpaceBoundary* FindCommonPhaseSpace( XMLTag* PhaseTag = NULL );	/*!	Find the Common PhaseSpace for the whole fit, which is top level under RapidFit	*/
 
-		IPDF* FindCommonPDF( PhaseSpaceBoundary* override );	/*!	Find the CommonPDF and construct it (not currently used due to complex issues!)	*/
+		//IPDF* FindCommonPDF( PhaseSpaceBoundary* override );	/*!	Find the CommonPDF and construct it (not currently used due to complex issues!)	*/
 
 		XMLTag* FindCommonPDFXML();		/*!	Finds the CommonPDF object in the XML file which has to be a top level under RapidFit	*/
 

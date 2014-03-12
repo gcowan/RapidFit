@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
-  */
+ */
 
 //	RapidFit Headers
 #include "StringProcessing.h"
@@ -14,6 +14,7 @@
 #include "ObservableContinuousConstraint.h"
 #include "ObservableDiscreteConstraint.h"
 #include "ObservableRef.h"
+#include "ClassLookUp.h"
 //	System Headers
 #include <sstream>
 #include <iostream>
@@ -50,18 +51,13 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
 PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) :
 	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber), uniqueID(0), StoredCombinations(), storedCombinationID(0)
 {
+	if( DebugClass::DebugThisClass( "PhaseSpaceBoundary" ) ) cout << "PhaseSpaceBoundary:: Copying all Constraints" << endl;
 	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
+		if( DebugClass::DebugThisClass( "PhaseSpaceBoundary" ) ) cout << "PhaseSpaceBoundary:: Copying " << allNames[i] << endl;
 		if( NewBoundary.allConstraints[i] != NULL )
 		{
-			if( NewBoundary.allConstraints[i]->IsDiscrete() )
-			{
-				allConstraints.push_back( new ObservableDiscreteConstraint( *((ObservableDiscreteConstraint*)NewBoundary.allConstraints[i]) ));
-			}
-			else
-			{
-				allConstraints.push_back( new ObservableContinuousConstraint( *((ObservableContinuousConstraint*)NewBoundary.allConstraints[i]) ));
-			}
+			allConstraints.push_back( ClassLookUp::CopyConstraint( NewBoundary.allConstraints[i] ) );
 		}
 		else
 		{
@@ -482,13 +478,13 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	}
 
 	/*
-	if( this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() > 1 )
-	{
-		cout << "This DataPoint is:" << endl;
-		Input->Print();
-		cout << this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() << endl;
-	}
-	*/
+	   if( this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() > 1 )
+	   {
+	   cout << "This DataPoint is:" << endl;
+	   Input->Print();
+	   cout << this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() << endl;
+	   }
+	 */
 
 	//	Get all possible discrete combination datapoints and the names of all discrete observables
 	vector<DataPoint*> allCombinations = this->GetDiscreteCombinations();
@@ -554,10 +550,10 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 
 	//	Destory temporary objects
 	/*while	allCombinations.empty() )
-	{
-		if( allCombinations.back() != NULL ) delete allCombinations.back();
-		allCombinations.pop_back();
-	}*/
+	  {
+	  if( allCombinations.back() != NULL ) delete allCombinations.back();
+	  allCombinations.pop_back();
+	  }*/
 
 	//	Check for error
 	if( thisIndex == -1 )
@@ -595,10 +591,10 @@ int PhaseSpaceBoundary::GetNumberCombinations() const
 		DiscreteCombinationNumber = (int)thisMany.size();
 
 		/*while( !thisMany.empty() )
-		{
-			if( thisMany.back() != NULL ) delete thisMany.back();
-			thisMany.pop_back();
-		}*/
+		  {
+		  if( thisMany.back() != NULL ) delete thisMany.back();
+		  thisMany.pop_back();
+		  }*/
 	}
 
 	return DiscreteCombinationNumber;

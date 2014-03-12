@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/03/12 Rob Currie
+  - Broken out the XMLConfigReader object because it annoyed me too much in it's current form
+       This adds XMLObjectGenerator class which is full of static methods for generating common RapidFit objects from XML the XMLConfigReader should (ideally) do as little as possible with XML
+
 2013/03/10 Rob Currie
   - Converting the DebugClass to be a Sentinel class which means that only static methods are exposed and the object can't be created/destroyed
        This removes the problems of passing the class around correctly everywhere to get Debugging output

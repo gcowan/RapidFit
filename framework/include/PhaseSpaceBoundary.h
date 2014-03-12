@@ -1,11 +1,11 @@
 /**
-        @class PhaseSpaceBoundary
+  @class PhaseSpaceBoundary
 
-        A collection of constraints on observables, defining the phase space in which a data point exists
+  A collection of constraints on observables, defining the phase space in which a data point exists
 
-        @author Benjamin M Wynne bwynne@cern.ch
-	@date 2009-10-02
-*/
+  @author Benjamin M Wynne bwynne@cern.ch
+  @date 2009-10-02
+ */
 
 #pragma once
 #ifndef PHASE_SPACE_BOUNDARY_H
@@ -15,7 +15,7 @@
 #include "IConstraint.h"
 #include "DataPoint.h"
 #include "ObservableRef.h"
-//#include "IPDF.h"
+#include "XMLTag.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -29,7 +29,7 @@ class PhaseSpaceBoundary
 	public:
 		PhaseSpaceBoundary( const PhaseSpaceBoundary& );
 		PhaseSpaceBoundary( vector<string> );
-		virtual ~PhaseSpaceBoundary();
+		~PhaseSpaceBoundary();
 
 		vector<string> GetAllNames() const;
 		vector<string> GetDiscreteNames() const;

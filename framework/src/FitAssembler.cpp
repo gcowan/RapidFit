@@ -493,7 +493,7 @@ void FitAssembler::CheckInputObs( const vector<IPDF*> AllPDFs, const vector<IDat
 			catch(...)
 			{
 				missing_any = true;
-				cerr << "FitAssembler: Error Getting WeightName of AlphaName: \"" << WeightName << "\" , \"" << AlphaName << "\"" << endl;
+				cerr << "FitAssembler: Error Getting WeightName or AlphaName: \"" << WeightName << "\" , \"" << AlphaName << "\"" << endl;
 				cerr << "FitAssembler: This is likely due to your FitFunction Requirements!" << endl;
 				cerr << endl;
 			}

@@ -34,10 +34,12 @@ PDFConfigurator::PDFConfigurator( const PDFConfigurator& input ) :
 	defaultNames( input.defaultNames ), replacementNames( input.replacementNames ), configParameters( input.configParameters ), configValues( input.configValues ),
 	daughterPDFs(), thisPDFsBoundary(NULL), fractionNames( input.fractionNames ), PDFLabel(input.PDFLabel), ResolutionModelName(input.ResolutionModelName)
 {
+	if( DebugClass::DebugThisClass( "PDFConfigurator" ) ) cout << "PDFConfigurator:: Copying PDFs" << endl;
 	for( unsigned int i=0; i< input.daughterPDFs.size(); ++i )
 	{
 		daughterPDFs.push_back( ClassLookUp::CopyPDF( input.daughterPDFs[i] ) );
 	}
+	if( DebugClass::DebugThisClass( "PDFConfigurator" ) ) cout << "PDFConfigurator:: Copying PhaseSpaceBoundary" << endl;
 	if( input.thisPDFsBoundary != NULL ) thisPDFsBoundary = new PhaseSpaceBoundary( *(input.thisPDFsBoundary) );
 }
 
