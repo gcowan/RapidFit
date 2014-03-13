@@ -51,7 +51,7 @@ class MultiXMLConfigReader : public I_XMLConfigReader
 {
 	public:
 
-		MultiXMLConfigReader( vector<string> fileNames );
+		MultiXMLConfigReader( vector<string> fileNames, vector<pair<string, string> >* OverrideXML = NULL );
 
 		/*!
 		 * Default Destructor

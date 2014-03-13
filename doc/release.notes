@@ -1,5 +1,11 @@
 // $Id: release.notes $
 
+2013/03/13 Rob Currie
+  - Changing the BasePDF to not be on by default in DebugClass::DebugThisClass... this just causes far too much verbosity
+  - Adding the ability to combine OverrideXML with MultiXMLConfigReader
+  - Moving internally used XMLTag constructor to be private
+  - Adding RapidFit tutorial 3 which includes some information on useful code and some powerful lesser known features
+
 2013/03/12 Rob Currie
   - Broken out the XMLConfigReader object because it annoyed me too much in it's current form
        This adds XMLObjectGenerator class which is full of static methods for generating common RapidFit objects from XML the XMLConfigReader should (ideally) do as little as possible with XML

@@ -346,7 +346,6 @@ namespace Mathematics
 		if( resolution > 0. )
 		{
 			const double sigma_2=resolution*resolution;
-			const double tau_2 = invgamma*invgamma;
 			const double inv_tau2 = gamma*gamma;
 			const double inv_r2_sigma = 1./(sqrt_2*resolution);
 			const double inv_r2_sigma_tau = inv_r2_sigma*gamma;

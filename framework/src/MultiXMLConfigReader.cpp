@@ -21,12 +21,14 @@
 
 using namespace::std;
 
-MultiXMLConfigReader::MultiXMLConfigReader( vector<string> fileNames ) : I_XMLConfigReader(), XMLReaders(), storedSeed(-1), storedRepeats(-1)
+MultiXMLConfigReader::MultiXMLConfigReader( vector<string> fileNames, vector<pair<string, string> >* OverrideXML ) : I_XMLConfigReader(), XMLReaders(), storedSeed(-1), storedRepeats(-1)
 {
 	for( unsigned int i=0; i< fileNames.size(); ++i )
 	{
-		XMLReaders.push_back( new XMLConfigReader( fileNames[i], NULL ) );
+		TString thisNum; thisNum+=i+1;
+		XMLReaders.push_back( new XMLConfigReader( fileNames[i], OverrideXML, string(thisNum.Data()) ) );
 	}
+	if( DebugClass::DebugThisClass( "XMLConfigReader_TAG" ) ) if( !DebugClass::GetClassNames().empty() ) exit(0);
 }
 
 MultiXMLConfigReader::~MultiXMLConfigReader()

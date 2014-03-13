@@ -56,7 +56,7 @@ bool BasePDF_Framework::IsCopyConstructorSafe() const
 
 bool BasePDF_Framework::IsDebuggingON()
 {
-	debuggingON = DebugClass::DebugThisClass( "BasePDF" );
+	debuggingON = DebugClass::DebugThisClass( "BasePDF" ) && !DebugClass::GetClassNames().empty();
 	return debuggingON;
 }
 

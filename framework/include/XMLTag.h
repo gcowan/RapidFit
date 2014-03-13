@@ -26,16 +26,7 @@ class XMLTag
 		 *
 		 * @param Input   This contains a vector of pairs with each pair containing an absolute path of an XML tag and a new value to take
 		 */
-		XMLTag( vector<pair<string,string> >* Input =NULL );
-
-		/*!
-		 * @brief Constructor used internally to Generate a new XMLTag which has a knowledge of it's parent and can have children of it's own
-		 *
-		 * @param Name      Name of the new XMLTag
-		 * @param Children  Either children or contents of Tag
-		 * @param Parent    Pointer to the parent of this tag
-		 */
-		XMLTag( string Name, vector<string> Children, XMLTag* Parent = NULL );
+		XMLTag( vector<pair<string,string> >* Input =NULL, string GlobalPrepend=string() );
 
 		/*!
 		 * @brief Standard Destructor
@@ -140,6 +131,17 @@ class XMLTag
 
 		vector<string> GetRAWValue() const;
 	private:
+
+		/*!
+		 * @brief Constructor used internally to Generate a new XMLTag which has a knowledge of it's parent and can have children of it's own
+		 *
+		 * @param Name      Name of the new XMLTag
+		 * @param Children  Either children or contents of Tag
+		 * @param Parent    Pointer to the parent of this tag
+		 T>                 */
+		XMLTag( string Name, vector<string> Children, XMLTag* Parent = NULL );
+
+
 		/*!
 		 * Don't Copy the class this way!
 		 */

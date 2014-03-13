@@ -51,10 +51,10 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
 PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) :
 	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber), uniqueID(0), StoredCombinations(), storedCombinationID(0)
 {
-	if( DebugClass::DebugThisClass( "PhaseSpaceBoundary" ) ) cout << "PhaseSpaceBoundary:: Copying all Constraints" << endl;
+	if( DebugClass::DebugThisClass( "PhaseSpaceBoundary" ) && !DebugClass::GetClassNames().empty() ) cout << "PhaseSpaceBoundary:: Copying all Constraints" << endl;
 	for( unsigned int i=0; i< allNames.size(); ++i )
 	{
-		if( DebugClass::DebugThisClass( "PhaseSpaceBoundary" ) ) cout << "PhaseSpaceBoundary:: Copying " << allNames[i] << endl;
+		if( DebugClass::DebugThisClass( "PhaseSpaceBoundary" ) && !DebugClass::GetClassNames().empty() ) cout << "PhaseSpaceBoundary:: Copying " << allNames[i] << endl;
 		if( NewBoundary.allConstraints[i] != NULL )
 		{
 			allConstraints.push_back( ClassLookUp::CopyConstraint( NewBoundary.allConstraints[i] ) );

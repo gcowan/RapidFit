@@ -62,9 +62,11 @@ void XMLConfigReader::PrintTag( const XMLTag* thisTag )
 }
 
 //Constructor with file name argument
-XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML ) : I_XMLConfigReader(),
-	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(new XMLTag(OverrideXML)), children(), seed(-1), XMLValid(false), _original_seed(-999)
+XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >* OverrideXML, string GlobalPrepend ) : I_XMLConfigReader(),
+	fileName( FileName ), fileTags(), wholeFile(), All_XML_Tags(NULL), children(), seed(-1), XMLValid(false), _original_seed(-999)
 {
+	All_XML_Tags = new XMLTag(OverrideXML, GlobalPrepend);
+
 	//Open the config file
 	ifstream configFile( FileName.c_str() );
 	if ( !configFile.is_open() )
@@ -117,7 +119,7 @@ XMLConfigReader::XMLConfigReader( string FileName, vector<pair<string, string> >
 		{
 			XMLConfigReader::PrintTag( children[childIndex] );
 		}
-		if( !DebugClass::GetClassNames().empty() ) exit(0);
+		if( !DebugClass::GetClassNames().empty() && GlobalPrepend.empty() ) exit(0);
 	}
 }
 
@@ -500,18 +502,18 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 				{
 					int s_val_index = (int) pdfsAndData.size(); ++s_val_index;
 					XMLTag* common = this->FindCommonPDFXML();
-					int seed = int(GetSeed());
+					int this_seed = int(GetSeed());
 					ParameterSet* thisSet = this->GetFitParameters();
 					PhaseSpaceBoundary* thisPhaseSpaceBoundary = this->FindCommonPhaseSpace();
-					pdfsAndData.push_back( XMLObjectGenerator::GetPDFWithData( dataTag, pdfTag, Starting_Value[(unsigned)s_val_index], overloadConfigurator, common, thisSet, seed, thisPhaseSpaceBoundary ) );
+					pdfsAndData.push_back( XMLObjectGenerator::GetPDFWithData( dataTag, pdfTag, Starting_Value[(unsigned)s_val_index], overloadConfigurator, common, thisSet, this_seed, thisPhaseSpaceBoundary ) );
 					delete thisPhaseSpaceBoundary;
 					delete thisSet;
 				} else {
 					XMLTag* common = this->FindCommonPDFXML();
-					int seed = int(GetSeed());
+					int this_seed = int(GetSeed());
 					ParameterSet* thisSet = this->GetFitParameters();
 					PhaseSpaceBoundary* thisPhaseSpaceBoundary = this->FindCommonPhaseSpace();
-					pdfsAndData.push_back( XMLObjectGenerator::GetPDFWithData( dataTag, pdfTag, -1, overloadConfigurator, common, thisSet, seed, thisPhaseSpaceBoundary ) );
+					pdfsAndData.push_back( XMLObjectGenerator::GetPDFWithData( dataTag, pdfTag, -1, overloadConfigurator, common, thisSet, this_seed, thisPhaseSpaceBoundary ) );
 					delete thisPhaseSpaceBoundary;
 					delete thisSet;
 				}

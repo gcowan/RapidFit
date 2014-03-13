@@ -67,10 +67,7 @@ DataPoint& DataPoint::operator=( const DataPoint& NewPoint )
 			this->allObservables.push_back( Observable( (NewPoint.allObservables[i]) ) );
 		}
 	}
-	else
-	{
-		return *(this);
-	}
+	return *(this);
 }
 
 DataPoint::DataPoint( const DataPoint& input ) :

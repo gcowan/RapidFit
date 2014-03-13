@@ -1079,7 +1079,8 @@ double Bs2JpsiPhi_Signal_v7::diffXsec()
 		//}
 	}
 
-	Observable* timeObs = _datapoint->GetObservable( timeName );
+	//	Acceptance already included in TimeAccRes class
+	//Observable* timeObs = _datapoint->GetObservable( timeName );
 	//if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, timeOffset );
 	//if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, 0.0 );
 	if( DebugFlag_v7 )
@@ -1117,7 +1118,8 @@ double Bs2JpsiPhi_Signal_v7::diffXsecTimeOnly()
 		ASint()*AT() * timeFactorImASAT(  ) * angAccI9 +
 		ASint()*A0() * timeFactorReASA0(  ) * angAccI10 ;
 
-	Observable* timeObs = _datapoint->GetObservable( timeName );
+	//	Acceptance already included in TimeAccRes class
+	//Observable* timeObs = _datapoint->GetObservable( timeName );
 	//if( useTimeAcceptance() ) xsec = xsec * timeAcc->getValue( timeObs, 0.0 );
 
 	if( DebugFlag_v7 )

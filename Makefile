@@ -29,7 +29,7 @@ BUILD_DATE ="$(shell date +%H:%M_%F)"
 
 CXXFLAGS_BASE_MINIMAL = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_PDF_REV) -DBUILD_DATE=$(BUILD_DATE) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -pthread
 
-CXXFLAGS_BASE_WARNINGS = #-Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wall -Wno-non-virtual-dtor -Wno-reorder -Wshadow -Wmissing-noreturn -Wcast-align
+CXXFLAGS_BASE_WARNINGS = -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wall -Wno-non-virtual-dtor -Wno-reorder -Wshadow -Wmissing-noreturn -Wcast-align
 
 #		Compiler Flags
 CXXFLAGS_BASE_COMMON  = $(CXXFLAGS_BASE_MINIMAL) -D__ROOFIT_NOBANNER  $(CXXFLAGS_BASE_WARNINGS)
@@ -38,7 +38,7 @@ CXXFLAGS_BASE_OPT = -O3 -msse2 -msse3 -fmerge-all-constants -funroll-all-loops -
 
 #CXXFLAGS_BASE = $(CXXFLAGS_BASE_COMMON) -Wmissing-noreturn -Wcast-align -msse -m3dnow
 
-CXXFLAGS_BASE = -std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -finline-limit=2000 -fprefetch-loop-arrays -fmerge-all-constants 
+CXXFLAGS_BASE = -std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -finline-limit=2000 -fprefetch-loop-arrays -fmerge-all-constants $(CXXFLAGS_BASE_WARNINGS)
 
 CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_PDF_REV) -DBUILD_DATE=$(BUILD_DATE) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
@@ -168,6 +168,7 @@ cleanP  :
 
 #	Allow chosing of which compiler to use on systems with mutliple compilers
 clang: override CC=clang++
+clang: override CXXFLAGS_BASE=-std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -fprefetch-loop-arrays -fmerge-all-constants -Wall -Wextra -Wno-reorder
 clang: all
 clang-utils: override CC=clang++
 clang-utils: utils
@@ -184,6 +185,12 @@ gcc48: override CC=g++-4.8
 gcc48: all
 gcc49: override CC=g++-4.9
 gcc49: all
+
+valgrind: override CXXFLAGS_BASE+=-D__USE_VALGRIND
+valgrind: all
+
+valgrindPDF: override CXXFLAGS_BASE+=-D__USE_VALGRIND_INPDF
+valgrind: all
 
 gsl: override CXXFLAGS+= -D__RAPIDFIT_USE_GSL -D__RAPIDFIT_USE_GSL_MATH $(gsl-config --cflags)
 gsl: override LINKFLAGS+= -L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/lib -lgsl -lgslcblas -lm $(gsl-config --libs)

@@ -29,7 +29,7 @@ class PhaseSpaceBoundary
 	public:
 		PhaseSpaceBoundary( const PhaseSpaceBoundary& );
 		PhaseSpaceBoundary( vector<string> );
-		~PhaseSpaceBoundary();
+		virtual ~PhaseSpaceBoundary();
 
 		vector<string> GetAllNames() const;
 		vector<string> GetDiscreteNames() const;

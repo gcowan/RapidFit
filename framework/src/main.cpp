@@ -1401,7 +1401,7 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 	//Load config file(s)
 	if( config->configFileListFlag )
 	{
-		config->xmlFile = (I_XMLConfigReader*) new MultiXMLConfigReader( config->configFileList );
+		config->xmlFile = (I_XMLConfigReader*) new MultiXMLConfigReader( config->configFileList, config->XMLOverrideList );
 		config->configFileNameFlag = true;
 	}
 	else if( config->configFileNameFlag )

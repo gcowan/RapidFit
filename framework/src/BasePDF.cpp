@@ -209,7 +209,8 @@ bool BasePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 
 double BasePDF::GetCache( DataPoint* InputPoint, PhaseSpaceBoundary* NewBoundary )
 {
-	if( this->IsDebuggingON() )
+	bool DebugCheck = this->IsDebuggingON();
+	if( DebugCheck )
 	{
 		PDF_THREAD_LOCK
 			cout << "BasePDF: Requesting Cache For DataSet " << NewBoundary->GetDiscreteIndex( InputPoint ) << " of " << DiscreteCaches->size() << endl;
@@ -222,7 +223,7 @@ double BasePDF::GetCache( DataPoint* InputPoint, PhaseSpaceBoundary* NewBoundary
 
 	double thisVal = DiscreteCaches->at(thisIndex);
 
-	if( this->IsDebuggingON() )
+	if( DebugCheck )
 	{
 		PDF_THREAD_LOCK
 			cout << "BasePDF: Cache Value is " << thisVal << endl;

@@ -1,0 +1,254 @@
+\documentclass{beamer}
+\usetheme{Amsterdam}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{cmap}
+\usepackage{listings}
+\lstset{language=C}
+
+\title{\textbf{RapidFit}\newline~A developers Guide, Talk 3 of ?}
+\author{\textbf{Robert Currie}, Edinburgh University\newline\hspace{.5cm} \textcolor{white}{\textbf{\insertframenumber \vspace{-.33cm}/ \vspace{-.33cm}\inserttotalframenumber}}}
+\date{}
+
+\usepackage{color}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+
+\usepackage{pbox}
+
+\begin{document}
+
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  showstringspaces=false,
+  commentstyle=\color{gray}\upshape
+}
+
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  stringstyle=\color{black},
+  identifierstyle=\color{darkblue},
+  keywordstyle=\color{cyan},
+  morekeywords={xmlns,version,type}% list your attributes here
+}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\section{Intro}
+
+\begin{frame}
+ \frametitle{Introduction}
+ \begin{itemize}
+    \item Useful development tools in RapidFit
+    \item Useful debugging tools in RapidFit
+    \item Copying complex PDF objects
+    \item Advanced Fitting
+    \item RapidFit or RapidRun?
+ \end{itemize}
+\end{frame}
+
+\section{DevTools}
+
+\begin{frame}
+ \frametitle{Useful Development Tools}
+ There are some powerful commonly used functions coded up in various places in RapidFit:
+ \begin{itemize}
+   \item \textrm{ClassLookUp.h}\newline This class provides powerful tools for copying objects through interfaces
+   \item \textrm{StatisticsFunctions.h}\newline This class provides methods for processing vectors of lots of numbers efficiently
+   \item \textrm{StringProcessing.h}\newline This class provides methods for efficient (T)string manipulation
+   \item \textrm{EdStyle.h}\newline Very closely based on the LHCb style this provides static methods for outputting nice looking plots
+ \end{itemize}
+\end{frame}
+
+\section{DebugTools}
+
+\begin{frame}[fragile]
+\frametitle{Useful Debugging Tools}
+\footnotesize
+\textrm{DebugClass.h}\newline This class provides a lot of static methods for debugging your code in RapidFit.\newline
+\tiny\textit{(Technically this is a C++ sentinel with a lot of static methods bundled in but this is an aside...)}\newline\footnotesize
+
+This class has a very powerful method of:\newline \textrm{DebugClass::DebugThisClass( string myClassName );}\newline
+This method allows you to construct code and output in a similar way to the LHCb framework which isn't executed by default by RapidFit but can be turned on/off without recompiling.\newline
+
+Another set of methods are:
+\begin{itemize}
+  \item Dump2File( fileName, vector )
+  \item Dump2TTree( fileName, vector, TTreeName, TBranchName )
+  \item Dump2File( fileName, vector<vector> )
+\end{itemize}
+These allow you to quickly and easily dump the contents of a vector(<vector>) to a file from somewhere in RapidFit, useful for numerical debugging.
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Useful Debugging Tools Cont.}
+\footnotesize
+Usage:\newline
+\lstset{
+  language=C++
+}
+\begin{lstlisting}[tabsize=8]
+  if( DebugClass::DebugThisClass( "myCustomClass" ) )
+  {
+    cout << "Some value here is: " << someValue << endl;
+  }
+\end{lstlisting}
+
+Now this code will NOT run by default unless you execute RapidFit like:\newline
+\tiny\lstset{
+  language=C++
+}
+\begin{lstlisting}[tabsize=8]
+  ./bin/fitting -f myAmazingFitXML.xml --DebugClass myCustomClass
+  ./bin/fitting -f myAmazingFitXML.xml --Debug
+  ./bin/fitting -f myAmazingFitXML.xml --DebugClass SomeOtherClass:myCustomClass
+\end{lstlisting}\footnotesize
+
+Note: running with \textrm{- -Debug} will cause ALL of the debugging in RapiFit to be turned on, this is EXTREMELY verbose!
+
+\end{frame}
+
+\section{CopyingPDFs}
+
+\begin{frame}
+\frametitle{Copying Objects in RapidFit}
+\footnotesize
+Most classes in RapidFit have private pointers to objects. This allows for the scope of an object to be more easily seen (in this authors opinion).\newline
+
+As a result of this most objects require custom copy constructors to be written. Many methods of these already exist, and it is chosen that C++ objects should be copied through their copy-constructor with most copy by assignment operators being protected or private methods which are often not implemented.\newline
+
+Complex objects are passed through their interfaces and there exist abstract copy methods to perform a deep-copy the objects through their interface, these exist in \textrm{ClassLookUp.h}.\newline
+
+Many objects can be copied through their copy constructor with some exceptions such as IDataSet objects which should be instantiated once and passed by reference only due to their obviously large memory footprint.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Copying complex PDF objects}
+\footnotesize
+RapidFit allows you to run multi-threaded highly parallelized fits using your PDFs.
+This is a good thing.\newline
+
+However, if you insist on using the more advanced features of C++ be aware your class MUST be thread-safe and have a fully working copy constructor.\newline
+
+A LOT of work has been done in the framework which allows you to avoid the latter of these by calling:\newline \textrm{this->SetCopyConstructorSafe( false );}\newline within your PDF constructor.\newline\newline
+This causes RapidFit to create a new instance of your PDF rather than copying it. (This potentially slower and may introduce unknown bugs, it is safe, but shouldn't be used unless necesarry)
+
+\end{frame}
+
+\section{Fitting}
+\begin{frame}[fragile]
+\frametitle{Advanced Fitting}
+\footnotesize
+RapiFit allows for a lot of flexibility from the command line which can overload the options configured within the XML.\newline
+Remember:\newline \textbf{Commandline ALWAYS takes priority in configuring things}\newline
+
+You can run a fit with multiple XML files, this has several advantages/disadvantages.\newline
+\begin{lstlisting}[tabsize=8]
+  ./bin/fitting --files 2 myXMLfile1.xml myXMLFile2.xml
+\end{lstlisting}
+
+This will pick up multiple ToFit segments from multiple files using the FitFunction and Minimiser as configured in the first XML file.\newline
+When an object is defined in XML multiple times i.e. the same PhysicsParameter exists in 2 files, the first definition takes priority.\newline
+
+%The only known disadvantage is that the MultiXMLConfigReader class hasn't been coded up to provide all functions available in the XMLConfigReader.\newline
+%This class only concatonates the output from multiple XMLConfigReader instances so recycles existing code.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{XML Hacking}
+\footnotesize
+There are 2 VERY powerful tools at your disposal to change any XML object in the existing XML file(s).\newline
+
+\tiny\textrm{- -DebugClass XMLConfigReader\_TAG}\newline and\newline \textrm{- -OverrideXML /RapidFit/something/myTag newValue}.\newline
+
+\footnotesize
+The first option "\textrm{- -DebugClass XMLConfigReader\_TAG}" is a special case of the DebugClass as there is an intentional exit statement built into the code.\newline
+This will dump a lot of internal info about the XML file as it has been read into RapidFit including the path value and numbers of children for each XMLTag in RapidFit.\newline
+
+The second option "\textrm{- -OverrideXML /RapidFit/something/myTag newValue}" overrides the value of an XMLTag at the path: "\textrm{/RapidFit/something/myTag}" with the "\textrm{newValue}".
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A word on OverrideXML}
+\footnotesize
+Override is only possible due to RapidFit's (delicate) simple XML parser.\newline
+It would be nice to port RapidFit to use a proper XML parser however this would remove this powerful feature and make commenting out single lines of XML more difficult.\newline
+
+In RapidFit we can ignore a whole line of XML by pre-pending it with a '\#' symbol. THIS IS A RAPIDFIT-ISM.\newline
+The XML standard DOES NOT do this.\newline\newline
+However when developing a fit we have found this is quick and simple and easier than wrapping each single line in:
+\begin{lstlisting}
+"<!-- ...   --!>".
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{fitting vs RapidRun}
+\footnotesize
+As RapidFit can be compiled as a ROOT library (libRapidRun.so) RapidFit can be loaded by ROOT as part of a script.\newline
+
+This allows for potentially high level analyses to be relatively easily constructed e.g:
+\tiny
+\begin{lstlisting}
+#       We want ROOT
+import ROOT
+#       Import RapidFit
+ROOT.gSystem.Load("lib/libRapidRun")
+
+#       RapidFit arguments
+args = ROOT.TList()
+#       Construct a DataSet and Save it
+args.Add( ROOT.TObjString( "RapidFit" ) ) args.Add( ROOT.TObjString( "-f" ) )
+args.Add( ROOT.TObjString( "myXML.xml" ) ) args.Add( ROOT.TObjString( "--saveOneDataSet" ) )
+args.Add( ROOT.TObjString( "myTestFile.root" ) )
+
+#      Modify this DataSet
+someCustomFunction( "myTestFile.root" )
+
+#      Perform a fit to the Modified DataSet
+args.Add( ROOT.TObjString( "RapidFit" ) ) args.Add( ROOT.TObjString( "-f" ) )
+args.Add( ROOT.TObjString( "myXML.xml" ) ) args.Add( ROOT.TObjString( "--OverrideXML" ) )
+args.Add( ROOT.TObjString( "/RapidFit/ToFit0/DataSet/Source" ) ) args.Add( ROOT.TObjString( "File" ) )
+\end{lstlisting}
+
+\end{frame}
+
+\section{BugHunting}
+\begin{frame}
+\frametitle{Bonus! Some hints for spotting and crushing bugs}
+\tiny
+\begin{tabular}{l|l}\hline & \\
+\pbox{0.2\textwidth}{My Code leaks memory} & \pbox{0.7\textwidth}{try running with:\newline \textrm{valgrind - -tool=massif ./bin/fitting -f someXML.xml} and use massif-vizualiser to interporate your output} \\ & \\ \hline & \\
+\pbox{0.2\textwidth}{My Code is taking too long to run} & \pbox{0.7\textwidth}{try running with:\newline \textrm{valgrind - -tool=callgrind ./bin/fitting -f someXML.xml} and use kcachegrind to interporate your output} \\ & \\ \hline & \\
+\pbox{0.2\textwidth}{My Code crashes and I'm certain it's not my fault} & Try reading the stacktrace which ROOT generates and make sure it's not in your PDF, else contact the class author (or in RapidFit anyone else) \\ & \\ \hline & \\
+\pbox{0.25\textwidth}{I suspect there is a bug in my code} & \pbox{0.7\textwidth}{Compile it with 'make clang' and 'make debug' to see more output from the compilers about your code quality} \\ & \\ \hline
+\end{tabular}\newline\newline
+
+If you build with 'make valgrind' and run with 'valgrind - -tool=callgrind - -instr-atstart=no' valgrind will only benchmark projections and the code that is run during the fit, not the whole RapidFit framework.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusions}
+I've highlighted some of the pre-written tools and method within RapidFit to people. Please consider using them before re-inventing the wheel where possible.\newline
+
+I've pointed you to some debugging tools in the codebase. They're a little more powerful than the simple "cout" and "exit", but their use is up to you.\newline
+
+I've shown some powerful tools in OverrideXML, DebugClass and the pyROOT wrapping of RapidFit. Have fun fitting!
+
+\end{frame}
+
+\end{document}

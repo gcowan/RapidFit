@@ -19,7 +19,7 @@
 using namespace::std;
 
 //Default constructor w Override tags
-XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags ): children(), value(), name("RapidFit"), parent(NULL), path(""), forbidden(Override_Tags)
+XMLTag::XMLTag( vector<pair<string,string> >* Override_Tags, string GlobalPrepend ): children(), value(), name("RapidFit"), parent(NULL), path(GlobalPrepend), forbidden(Override_Tags)
 {
 }
 

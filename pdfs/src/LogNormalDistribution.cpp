@@ -81,11 +81,11 @@ bool LogNormalDistribution::SetPhysicsParameters( ParameterSet * NewParameterSet
 double LogNormalDistribution::Evaluate(DataPoint * measurement)
 {
 	// Get the observable
-	double x = measurement->GetObservable( LNxName )->GetValue();
+	double this_x = measurement->GetObservable( LNxName )->GetValue();
 	
 	double returnValue = 0.000000000001;
 
-	if ( x > theta1 && x > theta2 ) returnValue = f*TMath::LogNormal( x, sigma1, theta1, m1 ) + (1.-f)*TMath::LogNormal( x, sigma2, theta2, m2 );
+	if ( this_x > theta1 && x > theta2 ) returnValue = f*TMath::LogNormal( this_x, sigma1, theta1, m1 ) + (1.-f)*TMath::LogNormal( this_x, sigma2, theta2, m2 );
 
   	return returnValue;
 }
@@ -118,17 +118,17 @@ double LogNormalDistribution::EvaluateComponent( DataPoint* input, ComponentRef*
         int componentIndex = Component->getComponentNumber();
         if( componentIndex == -1 )
         {
-		double x = input->GetObservable( LNxName )->GetValue();
+		double this_x = input->GetObservable( LNxName )->GetValue();
                 string ComponentName = Component->getComponentName();
                 if( ComponentName.compare( "Log1" ) == 0 )
                 {
                         Component->setComponentNumber( 1 );
-			return f*TMath::LogNormal( x, sigma1, theta1, m1 );
+			return f*TMath::LogNormal( this_x, sigma1, theta1, m1 );
 		}
 		else if( ComponentName.compare( "Log2" ) == 0 )
 		{
 			Component->setComponentNumber( 2 );
-			return (1.-f)*TMath::LogNormal( x, sigma2, theta2, m2 );
+			return (1.-f)*TMath::LogNormal( this_x, sigma2, theta2, m2 );
 		}
 		else
 		{
@@ -138,13 +138,13 @@ double LogNormalDistribution::EvaluateComponent( DataPoint* input, ComponentRef*
 	}
 	else if( componentIndex == 1 )
 	{
-		double x = input->GetObservable( LNxName )->GetValue();
-		return f*TMath::LogNormal( x, sigma1, theta1, m1 );
+		double this_x = input->GetObservable( LNxName )->GetValue();
+		return f*TMath::LogNormal( this_x, sigma1, theta1, m1 );
 	}
 	else if( componentIndex == 2 )
 	{
-		double x = input->GetObservable( LNxName )->GetValue();
-		return (1.-f)*TMath::LogNormal( x, sigma2, theta2, m2 );
+		double this_x = input->GetObservable( LNxName )->GetValue();
+		return (1.-f)*TMath::LogNormal( this_x, sigma2, theta2, m2 );
 	}
 	else
 	{

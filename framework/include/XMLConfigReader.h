@@ -63,7 +63,7 @@ class XMLConfigReader : public I_XMLConfigReader
 		 *                   This allows us to construct sequential tests modify some part of the XML file each run
 		 *
 		 */
-		XMLConfigReader( string FileName, vector<pair<string,string> >* Override = NULL );
+		XMLConfigReader( string FileName, vector<pair<string,string> >* Override = NULL, string GlobalPrepend=string() );
 
 		/*!
 		 * Default Destructor
