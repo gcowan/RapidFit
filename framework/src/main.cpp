@@ -738,15 +738,16 @@ void PerformMultiDimChi2( RapidFitConfiguration* config )
 	cout << "Passing over from main to MultiDimChi2 Test!" << endl;
 	vector<string> wantedObservables;
 
-	//wantedObservables.push_back( "time" );
+	wantedObservables.push_back( "time" );
 
-	wantedObservables.push_back( "helcosthetaK" );
-	wantedObservables.push_back( "helcosthetaL" );
-	wantedObservables.push_back( "helphi" );
+//	wantedObservables.push_back( "helcosthetaK" );
+//	wantedObservables.push_back( "helcosthetaL" );
+	//wantedObservables.push_back( "helphi" );
 
 	vector<PDFWithData*> allObjects = config->pdfsAndData;
 	PhaseSpaceBoundary* thisBound = new PhaseSpaceBoundary( * allObjects[0]->GetDataSet()->GetBoundary() );
 	MultiDimChi2* thisTest = new MultiDimChi2( allObjects, thisBound, wantedObservables );
+
 
 	thisTest->PerformMuiltDimTest();
 }

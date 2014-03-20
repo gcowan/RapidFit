@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/03/20 Rob Currie
+  - Adding <RequiredParameterOrder> Tag to FitFunction, this allow you to order all or a subset of the Floated Parameters as they're exposed to Minuit
+        This takes a string which is a list of parameternames as seen by Minuit which are separated by ':'
+
 2013/03/13 Rob Currie
   - Changing the BasePDF to not be on by default in DebugClass::DebugThisClass... this just causes far too much verbosity
   - Adding the ability to combine OverrideXML with MultiXMLConfigReader

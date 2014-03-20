@@ -5,7 +5,7 @@
  * @brief Container that stores all information related to FitFunction configuration, and returns an appropriate instance of a FitFunction
  *
  * @author Benjamin M Wynne bwynne@cern.ch
-*/
+ */
 
 #pragma once
 #ifndef FIT_FUNCTION_CONFIGURATION_H
@@ -18,6 +18,7 @@
 #include "PhysicsBottle.h"
 #include "RapidFitIntegratorConfig.h"
 ///	System Headers
+#include <vector>
 #include <string>
 
 using namespace::std;
@@ -49,7 +50,7 @@ class FitFunctionConfiguration
 		 * Get a pointer to a newly constructed FitFunction
 		 */
 		IFitFunction * GetFitFunction();
-	
+
 		/*!
 		 * Were Weights Used?
 		 */
@@ -118,6 +119,10 @@ class FitFunctionConfiguration
 
 		bool GetOffSetNLL() const;
 
+		void SetFloatedParameterList( vector<string> Input );
+
+		vector<string> GetFloatedParameterList() const;
+
 	private:
 
 		FitFunctionConfiguration( const FitFunctionConfiguration& input );
@@ -139,6 +144,8 @@ class FitFunctionConfiguration
 		string alphaName;
 
 		bool OffSetNLL;
+
+		vector<string> _floatedParameterList;
 };
 
 #endif

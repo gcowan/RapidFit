@@ -193,8 +193,8 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 			x_min.push_back( thisConstraint->GetMinimum() );
 			x_max.push_back( thisConstraint->GetMaximum() );
 			goodObservables.push_back( wantedObservables[i] );
-			if( wantedObservables[i] == "time" ) x_binning = 100;
-			else x_binning = 5;
+			if( wantedObservables[i] == "time" ) x_binning = 50;
+			else x_binning = 4;
 			//x_binning = 2;
 			x_bins.push_back( x_binning );
 			data_binning *= x_binning;
@@ -227,11 +227,13 @@ void MultiDimChi2::ConstructInternalHisto( vector<string> wantedObservables, Pha
 		for( unsigned int j=0; j< (unsigned)allDataSets[i]->GetDataNumber(); ++j )
 		{
 			thisPoint = allDataSets[i]->GetDataPoint( j );
+			cout << "data:" << endl;
 			for( unsigned int k=0; k< goodObservables.size(); ++k )
 			{
 				thisValues[k] = thisPoint->GetObservable( goodObservables[k] )->GetValue();
 			}
-			thisWeight = thisPoint->GetObservable( weightName )->GetValue();
+			cout << "weights:" << endl;
+			thisWeight = 1.;//thisPoint->GetObservable( weightName )->GetValue();
 			internalHisto->Fill( &(thisValues[0]), thisWeight );
 		}
 	}
@@ -276,7 +278,7 @@ void MultiDimChi2::ConstructBinCenters()
 
 void MultiDimChi2::PerformMuiltDimTest()
 {
-	cout << "MultiDimChi2: About to Perform Chi2 Calculation" << endl;
+	cout << "MultiDimChi2: About to Perform Chi1 Calculation" << endl;
 	PhaseSpaceBoundary* thisBoundary=NULL;
 	(void) thisBoundary;
 
@@ -306,10 +308,9 @@ void MultiDimChi2::PerformMuiltDimTest()
 
 		expected_events[binNum] = this->CalculateTotalExpected( thisBinCenter );
 
-		cout << "O: " << observed_events[binNum] << "  E: " << expected_events[binNum] << endl;
-		//exit(0);
-
 		error_events[binNum] = internalHisto->GetBinError( histo_binNum );
+
+		cout << "O: " << observed_events[binNum] << "  E: " << expected_events[binNum] << "  Err: " << error_events[binNum] << endl;
 	}
 
 	cout << "Finished Looping over all coordinates!" << endl;
@@ -331,6 +332,8 @@ void MultiDimChi2::PerformMuiltDimTest()
 
 	double nDoF = binz - (double)freeNum;
 
+	cout << "nDoF: " << nDoF << endl;
+
 	cout << "chi2/nDoF: " << TotalChi2 / nDoF << endl;
 
 	cout << "p-value: " << TMath::Prob( TotalChi2, nDoF ) << endl;
@@ -346,7 +349,7 @@ double MultiDimChi2::CalcChi2( vector<double> expected_events, vector<double> ob
 	double thisChi2=0.;
 	for( unsigned int i=0; i< expected_events.size(); ++i )
 	{
-		cout << "O: " << observed_events[i] << "  E: " << expected_events[i] << endl;
+		cout << "O: " << observed_events[i] << "  E: " << expected_events[i] << "  Err: " << errors[i] << "  P: " << (observed_events[i]-expected_events[i])/errors[i] << endl;
 		thisChi2 = expected_events[i] - observed_events[i] + observed_events[i] * log( observed_events[i] / expected_events[i] );
 		/*
 		//thisChi2 = expected_events[i] - observed_events[i] + observed_events[i]*log( observed_events[i] / expected_events[i] );
@@ -401,7 +404,7 @@ double MultiDimChi2::CalculateTotalExpected( vector<double> thisBinCenter )
 		vector<DataPoint*> theseDataPoints;
 		vector<DataPoint*> tempPoints = thisPhaseSpace->GetDiscreteCombinations();
 
-		for( unsigned int i=0; i< tempPoints.size(); ++i ) if( i == 5 ) theseDataPoints.push_back( new DataPoint( *tempPoints[i] ) );
+		for( unsigned int i=0; i< tempPoints.size(); ++i ) /*if( i == 5 )*/ theseDataPoints.push_back( new DataPoint( *tempPoints[i] ) );
 
 		double thisResult=0.;
 
@@ -438,10 +441,11 @@ double MultiDimChi2::CalculateTotalExpected( vector<double> thisBinCenter )
 
 			thisPDFIntegrator->ForceTestStatus( true );
 
-			double Total = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace2, thisPDF->GetDoNotIntegrateList() );
+			thisDataPoint->SetPhaseSpaceBoundary( thisPhaseSpace );
+			double Total = thisPDF->Evaluate( thisDataPoint );// thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace2, thisPDF->GetDoNotIntegrateList() );
 
 			//thisPDFIntegrator->clearGSLIntegrationPoints();
-			double Integral = thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace, thisPDF->GetDoNotIntegrateList() );
+			double Integral = 1.;//thisPDFIntegrator->NumericallyIntegrateDataPoint( thisDataPoint, thisPhaseSpace, thisPDF->GetDoNotIntegrateList() );
 			
 
 			/*

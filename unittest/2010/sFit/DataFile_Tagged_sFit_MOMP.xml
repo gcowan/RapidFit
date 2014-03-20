@@ -660,13 +660,13 @@
 				<Name>Phi_s</Name>
 				<Minimum>-3.142</Minimum>
 				<Maximum>3.142</Maximum>
-				<Points>20</Points>
+				<Points>40</Points>
 			</X_Param>
 			<Y_Param>
 				<Name>deltaGamma</Name>
 				<Minimum>-0.6</Minimum>
 				<Maximum>0.6</Maximum>
-				<Points>20</Points>
+				<Points>40</Points>
 			</Y_Param>
 		</TwoDScan>
 	</Output>

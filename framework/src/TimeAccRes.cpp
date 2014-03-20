@@ -139,12 +139,16 @@ double TimeAccRes::ExpInt( double tlow, double thigh, double gamma )
 	double tlo=0.;
 	double thi=0.;
 
+	AcceptanceSlice* thisSlice = NULL;
+
+	double slice_lo=0.,slice_hi=0.;
+
 	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
 	{
-		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
+		thisSlice = timeAcc->getSlice(islice);
 
-		const double slice_lo = thisSlice->tlow();
-		const double slice_hi = thisSlice->thigh();
+		slice_lo = thisSlice->tlow();
+		slice_hi = thisSlice->thigh();
 
 		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
 		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
@@ -175,12 +179,16 @@ double TimeAccRes::ExpSinInt( double tlow, double thigh, double gamma, double dm
 	double tlo=0.;
 	double thi=0.;
 
+	AcceptanceSlice* thisSlice = NULL;
+
+	double slice_lo=0.,slice_hi=0.;
+
 	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
 	{
-		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
+		thisSlice = timeAcc->getSlice(islice);
 
-		const double slice_lo = thisSlice->tlow();
-		const double slice_hi = thisSlice->thigh();
+		double slice_lo = thisSlice->tlow();
+		double slice_hi = thisSlice->thigh();
 
 		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
 		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
@@ -211,18 +219,22 @@ double TimeAccRes::ExpCosInt( double tlow, double thigh, double gamma, double dm
 	double tlo=0.;
 	double thi=0.;
 
+	AcceptanceSlice* thisSlice = NULL;
+
+	double slice_lo=0.,slice_hi=0.;
+
 	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
 	{
-		AcceptanceSlice* thisSlice = timeAcc->getSlice(islice);
+		thisSlice = timeAcc->getSlice(islice);
 
-		const double slice_lo = thisSlice->tlow();
-		const double slice_hi = thisSlice->thigh();
+		slice_lo = thisSlice->tlow();
+		slice_hi = thisSlice->thigh();
 
 		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
 		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;
 		if( thi > tlo )
 		{
-			thisExpCosInt = resolutionModel->ExpSinInt( tlo, thi, gamma, dms );
+			thisExpCosInt = resolutionModel->ExpCosInt( tlo, thi, gamma, dms );
 			returnable_ExpCosInt += thisExpCosInt * thisSlice->height();
 		}
 	}

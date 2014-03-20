@@ -232,7 +232,9 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		cout << "FitAssembler: Sorting Parameters to get Floated Parameters first" << endl;
 	}
 
-	checkedBottleParameters->FloatedFirst();
+	vector<string> Wanted_List_OF_Floated_Parameters = FunctionConfig->GetFloatedParameterList();
+
+	checkedBottleParameters->FloatedFirst( Wanted_List_OF_Floated_Parameters );
 
 	ParameterSet* checkedGenerationParameters = GenerationParameters( checkedBottleParameters, BottleParameters );
 

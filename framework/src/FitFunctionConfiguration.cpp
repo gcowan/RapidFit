@@ -22,7 +22,7 @@ using namespace::std;
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) :
 	functionName(InputName), weightName(), hasWeight(false), wantTrace(false), TraceFileName(), traceCount(0),
 	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), SingleNormaliseWeights(false), alphaName("undefined"),
-	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() ), OffSetNLL(false)
+	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() ), OffSetNLL(false), _floatedParameterList()
 {
 }
 
@@ -30,7 +30,7 @@ FitFunctionConfiguration::FitFunctionConfiguration( string InputName ) :
 FitFunctionConfiguration::FitFunctionConfiguration( string InputName, string InputWeight ) :
 	functionName(InputName), weightName(InputWeight), hasWeight(true), wantTrace(false), TraceFileName(), traceCount(0),
 	Threads(0), Strategy(), testIntegrator(true), NormaliseWeights(false), SingleNormaliseWeights(false), alphaName("undefined"),
-	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() ), OffSetNLL(false)
+	hasAlpha(false), integratorConfig( new RapidFitIntegratorConfig() ), OffSetNLL(false), _floatedParameterList()
 {
 }
 
@@ -178,5 +178,15 @@ void FitFunctionConfiguration::SetOffSetNLL( const bool Input )
 bool FitFunctionConfiguration::GetOffSetNLL() const
 {
 	return OffSetNLL;
+}
+
+void FitFunctionConfiguration::SetFloatedParameterList( vector<string> Input )
+{
+	_floatedParameterList = Input;
+}
+
+vector<string> FitFunctionConfiguration::GetFloatedParameterList() const
+{
+	return _floatedParameterList;
 }
 

@@ -15,6 +15,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#include <algorithm>
 
 using namespace::std;
 
@@ -479,11 +480,72 @@ void ParameterSet::SetUniqueID( size_t input )
 	uniqueID = input;
 }
 
-void ParameterSet::FloatedFirst()
+void ParameterSet::FloatedFirst( vector<string> RequiredFloatedSort )
 {
 	++uniqueID;
-	vector<string> floated = this->GetAllFloatNames();
+	vector<string> floated;
+
+	if( RequiredFloatedSort.empty() )
+	{
+		floated = this->GetAllFloatNames();
+	}
+	else
+	{
+		vector<string> temp_list = this->GetAllFloatNames();
+		for( unsigned int i=0; i< RequiredFloatedSort.size(); ++i )
+		{
+			if( StringProcessing::VectorContains( temp_list, RequiredFloatedSort[i] ) != -1 )
+			{
+				floated.push_back( RequiredFloatedSort[i] );
+			}
+		}
+		for( unsigned int i=0; i< temp_list.size(); ++i )
+		{
+			if( StringProcessing::VectorContains( floated, temp_list[i] ) == -1 )
+			{
+				floated.push_back( temp_list[i] );
+			}
+		}
+	}
+
 	vector<string> fixed = this->GetAllFixedNames();
+
+	sort( fixed.begin(), fixed.end() );
+	//sort( floated.begin(), floated.end() );
+
+	/*
+	   floated.push_back( "gamma" );
+	   floated.push_back( "deltaGamma" );
+	   floated.push_back( "Aperp_sq" );
+	   floated.push_back( "Azero_sq" );
+	   floated.push_back( "F_s990" );
+	   floated.push_back( "F_s1008" );
+	   floated.push_back( "F_s1016" );
+	   floated.push_back( "F_s1020" );
+	   floated.push_back( "F_s1024" );
+	   floated.push_back( "F_s1032" );
+	   floated.push_back( "delta_perp" );
+	   floated.push_back( "Phi_s" );
+	   floated.push_back( "lambda" );
+	   floated.push_back( "delta_para" );
+	   floated.push_back( "delta_s990" );
+	   floated.push_back( "delta_s1008" );
+	   floated.push_back( "delta_s1016" );
+	   floated.push_back( "delta_s1020" );
+	   floated.push_back( "delta_s1024" );
+	   floated.push_back( "delta_s1032" );
+	   floated.push_back( "deltaM" );
+	   floated.push_back( "mistagP1_OS" );
+	   floated.push_back( "mistagDeltaP1_SS" );
+	   floated.push_back( "mistagP0_SS" );
+	   floated.push_back( "mistagDeltaP1_OS" );
+	   floated.push_back( "mistagP0_OS" );
+	   floated.push_back( "mistagDeltaP0_SS" );
+	   floated.push_back( "mistagP1_SS" );
+	   floated.push_back( "mistagDeltaP0_OS" );
+	   floated.push_back( "mistagSetPoint_OS" );
+	   floated.push_back( "mistagSetPoint_SS" );
+	   */
 
 	vector<PhysicsParameter*> sorted_parameters;
 	vector<string> sorted_names;

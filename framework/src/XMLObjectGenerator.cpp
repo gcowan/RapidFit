@@ -373,6 +373,7 @@ FitFunctionConfiguration * XMLObjectGenerator::MakeFitFunction( XMLTag * Functio
 		bool NormaliseWeights = false;
 		bool SingleNormaliseWeights = false;
 		bool OffSetNLL = false;//true;
+		vector<string> ParameterSortList;
 		vector< XMLTag* > functionInfo = FunctionTag->GetChildren();
 		RapidFitIntegratorConfig* thisConfig = new RapidFitIntegratorConfig();
 		if ( functionInfo.size() == 0 )
@@ -437,6 +438,11 @@ FitFunctionConfiguration * XMLObjectGenerator::MakeFitFunction( XMLTag * Functio
 				{
 					OffSetNLL = XMLTag::GetBooleanValue( functionInfo[childIndex] );
 				}
+				else if ( functionInfo[childIndex]->GetName() == "RequiredParameterOrder" )
+				{
+					string thisOrder = XMLTag::GetStringValue( functionInfo[childIndex] );
+					ParameterSortList = StringProcessing::SplitString( thisOrder, ':' );
+				}
 				else
 				{
 					cerr << "Unrecognised FitFunction component: " << functionInfo[childIndex]->GetName() << endl;
@@ -480,6 +486,7 @@ FitFunctionConfiguration * XMLObjectGenerator::MakeFitFunction( XMLTag * Functio
 		returnable_function->SetIntegratorTest( integratorTest );
 		returnable_function->SetIntegratorConfig( thisConfig );
 		returnable_function->SetOffSetNLL( OffSetNLL );
+		returnable_function->SetFloatedParameterList( ParameterSortList );
 
 		delete thisConfig;
 		return returnable_function;

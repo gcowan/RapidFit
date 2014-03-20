@@ -229,7 +229,7 @@ class ParameterSet
 		 *
 		 * @return void
 		 */
-		void FloatedFirst();
+		void FloatedFirst( vector<string> ParameterList=vector<string>() );
 
 	private:
 
