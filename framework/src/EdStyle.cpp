@@ -492,51 +492,51 @@ TString EdStyle::GetParamRootName( string Param_Name_orig )
 
 	} else if ( Param_Name == "mistagP1_OS" ) {
 
-		returnable_string = "#omega_{P1}^{OS}";
+		returnable_string = "#omega(P1)^{OS}";
 
 	} else if ( Param_Name == "mistagDeltaP1_OS" ) {
 
-		returnable_string = "#delta_{P1}^{OS}";
+		returnable_string = "#Delta(P1)^{OS}";
 
 	} else if ( Param_Name == "mistagP0_OS" ) {
 
-		returnable_string = "#omega_{P0}^{OS}";
+		returnable_string = "#omega(P0)^{OS}";
 
 	} else if ( Param_Name == "mistagDeltaP0_OS" ) {
 
-		returnable_string = "#delta_{P0}^{OS}";
+		returnable_string = "#Delta(P0)^{OS}";
 
 	} else if ( Param_Name == "mistagSetPoint_OS" ) {
 
-		returnable_string = "#bar{#omega}_{#omega^{OS}}";
+		returnable_string = "<#omega^{OS}>";
 
 	} else if ( Param_Name == "mistagDeltaSetPoint_OS" ) {
 
-		returnable_string = "#delta_{#bar{#omega}}^{OS}";
+		returnable_string = "#Delta<#omega^{OS}>";
 
 	} else if ( Param_Name == "mistagP1_SS" ) {
 
-		returnable_string = "#omega_{P1}^{SS}";
+		returnable_string = "#omega(P1)^{SS}";
 
 	} else if ( Param_Name == "mistagDeltaP1_SS" ) {
 
-		returnable_string = "#delta_{P1}^{SS}";
+		returnable_string = "#Delta(P1)^{SS}";
 
 	} else if ( Param_Name == "mistagP0_SS" ) {
 
-		returnable_string = "#omega_{P0}^{SS}";
+		returnable_string = "#omega(P0)^{SS}";
 
 	} else if ( Param_Name == "mistagDeltaP0_SS" ) {
 
-		returnable_string = "#delta_{P0}^{SS}";
+		returnable_string = "#Delta(P0)^{SS}";
 
 	} else if ( Param_Name == "mistagSetPoint_SS" ) {
 
-		returnable_string = "#bar{#omega}_{#omega^{SS}}";
+		returnable_string = "<#omega^{SS}>";
 
 	} else if ( Param_Name == "mistagDeltaSetPoint_SS" ) {
 
-		returnable_string = "#delta_{#bar{#omega}}^{SS}";
+		returnable_string = "#Delta<#omega^{SS}>";
 
 	} else if ( Param_Name == "mistagP1_OSSS" ) {
 
