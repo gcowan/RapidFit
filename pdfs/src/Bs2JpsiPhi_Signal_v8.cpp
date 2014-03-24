@@ -377,10 +377,10 @@ bool Bs2JpsiPhi_Signal_v8::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
 	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
 	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
-	//	delta_s	   = allParameters.GetPhysicsParameter( delta_sName )->GetValue();  /// This is the original
-	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue() +delta_perp ;   // This is the ambiguity inspired one with less corrn to delta_perp
-	delta_perpMinuspara = delta_perp -  delta_para ;
 	delta_perpMinuszero = delta_perp -  delta_zero ;
+	//	delta_s	   = allParameters.GetPhysicsParameter( delta_sName )->GetValue();  /// This is the original
+	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue() + delta_perpMinuszero;   // This is the ambiguity inspired one with less corrn to delta_perp
+	delta_perpMinuspara = delta_perp -  delta_para ;
 
 	if( _useCosDpar ) cosdpar = allParameters.GetPhysicsParameter( cosdparName )->GetValue(); //PELC-COSDPAR Special for fitting cosdpar separately
 
@@ -453,7 +453,7 @@ bool Bs2JpsiPhi_Signal_v8::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	cos_delta_perpMinuspara = cos(delta_perpMinuspara);
 	sin_delta_perpMinuszero = sin(delta_perpMinuszero);
 	cos_delta_perpMinuszero = cos(delta_perpMinuszero);
-	double PhaseDiff = delta_perpMinuszero - delta_perpMinuspara;
+	double PhaseDiff = delta_para;
 	sin_PhaseDiff = sin(PhaseDiff);
 	cos_PhaseDiff = cos(PhaseDiff);
 
@@ -580,8 +580,6 @@ double Bs2JpsiPhi_Signal_v8::Evaluate(DataPoint * measurement)
 	   throw(0);
 	   }*/
 
-	if( returnValue < 1E-25 ) returnValue = 1E-25;
-
 	return returnValue;
 }
 
@@ -702,8 +700,6 @@ double Bs2JpsiPhi_Signal_v8::Normalisation(DataPoint * measurement, PhaseSpaceBo
 		}
 	}
 
-	if( returnValue <= 1E-25 ) returnValue = 1E-25;
-
 	return returnValue;
 }
 
@@ -728,6 +724,8 @@ void Bs2JpsiPhi_Signal_v8::preCalculateTimeFactors()
 		expSin_stored = 0.;
 		expCos_stored = 0.;
 	}
+	_Expsinh_dGt = expL() - expH();
+	_Expcosh_dGt = expL() + expH();
 	return;
 }
 
@@ -1053,7 +1051,7 @@ double Bs2JpsiPhi_Signal_v8::diffXsec()
 			   AS()*AP() * timeFactorReASAP(  ) * angleFactorReASAP( ) +
 			   AS()*AT() * timeFactorImASAT(  ) * angleFactorImASAT( ) +
 			   AS()*A0() * timeFactorReASA0(  ) * angleFactorReASA0( ) ;
-			 */
+			   */
 
 			CachedA1 * timeFactorA0A0(  ) +
 			CachedA2 * timeFactorAPAP(  ) +
@@ -1251,6 +1249,9 @@ void Bs2JpsiPhi_Signal_v8::ConstructTimeIntegrals()
 		intExpSin_stored = perEventData[5];
 		intExpCos_stored = perEventData[6];
 	}
+
+	_int_Expsinh_dGt = intExpL() - intExpH();
+	_int_Expcosh_dGt = intExpL() + intExpH();	
 }
 
 //....................................................
@@ -1642,7 +1643,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorImAPATInt( )
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReA0AP( )
 {
-	this->prepareCDS( sqrt(lambda_zeroVal*lambda_perpVal), 0.5*(phis_zeroVal+phis_perpVal) );
+	this->prepareCDS( sqrt(lambda_zeroVal*lambda_paraVal), 0.5*(phis_zeroVal+phis_paraVal) );
 	if( _eventIsTagged )
 	{
 		return cos_PhaseDiff * (
@@ -1662,7 +1663,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReA0AP( )
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReA0APInt( )
 {
-	this->prepareCDS( sqrt(lambda_zeroVal*lambda_perpVal), 0.5*(phis_zeroVal+phis_perpVal) );
+	this->prepareCDS( sqrt(lambda_zeroVal*lambda_paraVal), 0.5*(phis_zeroVal+phis_paraVal) );
 	if( _eventIsTagged )
 	{
 		return cos_PhaseDiff * (
@@ -1764,7 +1765,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorASASInt( )
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReASAP( )
 {
-	this->prepareCDS( sqrt(lambda_SVal*lambda_perpVal), 0.5*(phis_SVal+phis_perpVal) );
+	this->prepareCDS( sqrt(lambda_SVal*lambda_paraVal), 0.5*(phis_SVal+phis_paraVal) );
 	if( _eventIsTagged )
 	{
 		return
@@ -1784,7 +1785,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReASAP( )
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReASAPInt( )
 {
-	this->prepareCDS( sqrt(lambda_SVal*lambda_perpVal), 0.5*(phis_SVal+phis_perpVal) );
+	this->prepareCDS( sqrt(lambda_SVal*lambda_paraVal), 0.5*(phis_SVal+phis_paraVal) );
 	if( _eventIsTagged )
 	{
 		return
@@ -1805,7 +1806,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReASAPInt( )
 
 double Bs2JpsiPhi_Signal_v8::timeFactorImASAT( )
 {
-	this->prepareCDS( sqrt(lambda_SVal*lambda_paraVal), 0.5*(phis_SVal+phis_paraVal) );
+	this->prepareCDS( sqrt(lambda_SVal*lambda_perpVal), 0.5*(phis_SVal+phis_perpVal) );
 	if( _eventIsTagged )
 	{
 		return sin_delta_perp_s * (
@@ -1825,13 +1826,13 @@ double Bs2JpsiPhi_Signal_v8::timeFactorImASAT( )
 
 double Bs2JpsiPhi_Signal_v8::timeFactorImASATInt( )
 {
-	this->prepareCDS( sqrt(lambda_SVal*lambda_paraVal), 0.5*(phis_SVal+phis_paraVal) );
+	this->prepareCDS( sqrt(lambda_SVal*lambda_perpVal), 0.5*(phis_SVal+phis_perpVal) );
 	if( _eventIsTagged )
 	{
 		return sin_delta_perp_s * (
 				_mistagCalibModel->D1() * (
-					int_Expsinh_dGt()
-					+ int_Expcosh_dGt() * cosphis()
+					int_Expsinh_dGt() * cosphis()
+					+ int_Expcosh_dGt()
 					) +
 				_mistagCalibModel->D2() * (
 					2.0  * ( CC() * intExpCos( ) - sinphis() * intExpSin( ) )
@@ -1839,7 +1840,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorImASATInt( )
 	}
 	else
 	{
-		return sin_delta_perp_s * ( int_Expsinh_dGt() + int_Expcosh_dGt() * cosphis() );
+		return sin_delta_perp_s * ( int_Expsinh_dGt() *cosphis() + int_Expcosh_dGt() );
 	}
 }
 
