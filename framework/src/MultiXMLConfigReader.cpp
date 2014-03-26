@@ -18,10 +18,11 @@
 //	System Headers
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace::std;
 
-MultiXMLConfigReader::MultiXMLConfigReader( vector<string> fileNames, vector<pair<string, string> >* OverrideXML ) : I_XMLConfigReader(), XMLReaders(), storedSeed(-1), storedRepeats(-1)
+MultiXMLConfigReader::MultiXMLConfigReader( vector<string> fileNames, vector<pair<string, string> >* OverrideXML ) : I_XMLConfigReader(), XMLReaders(), storedSeed(-1), storedRepeats(-1), _fileNames( fileNames )
 {
 	for( unsigned int i=0; i< fileNames.size(); ++i )
 	{
@@ -49,7 +50,25 @@ bool MultiXMLConfigReader::IsValid() const
 
 vector<string> MultiXMLConfigReader::GetXML() const
 {
-	return vector<string>();
+	vector<string> total_XML;
+
+	for( unsigned int i=0; i< XMLReaders.size(); ++i )
+	{
+		stringstream thisStream;
+		thisStream << "\n##########   " << _fileNames[i] << "   ##########\n\n\n";
+		total_XML.push_back( thisStream.str() );
+
+		vector<string> thisFile = XMLReaders[i]->GetXML();
+
+		for( unsigned int j=0; j< thisFile.size(); ++j )
+		{
+			total_XML.push_back( thisFile[j] );
+		}
+
+		total_XML.push_back( "\n\n\n##########   EOF   ##########\n\n\n" );
+	}
+
+	return total_XML;
 }
 
 ParameterSet* MultiXMLConfigReader::GetFitParameters( vector<string> CommandLineParam )

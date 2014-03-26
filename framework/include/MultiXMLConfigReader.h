@@ -176,6 +176,7 @@ class MultiXMLConfigReader : public I_XMLConfigReader
 		int storedSeed;
 		int storedRepeats;
 
+		vector<string> _fileNames;
 };
 
 #endif
