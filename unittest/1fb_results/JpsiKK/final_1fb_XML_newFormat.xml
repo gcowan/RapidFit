@@ -408,7 +408,7 @@
 		<SetIntegratorTest>False</SetIntegratorTest>
 		#<NormaliseWeights>True</NormaliseWeights>
 		#<Strategy>Petes</Strategy>
-		#<OffSetNLL>False</OffSetNLL>
+		<OffSetNLL>True</OffSetNLL>
 	</FitFunction>
 
 
@@ -552,7 +552,7 @@
 
 	<CommonPDF>
 		<PDF>
-			<Name>Bs2JpsiPhi_Signal_v7</Name>
+			<Name>Bs2JpsiPhi_Signal_v8</Name>
 			<ConfigurationParameter>UseHelicityBasis:True</ConfigurationParameter>
 			<ConfigurationParameter>AngularAcceptanceFile:2011-1fbPaper/2011-AngularAcceptance-1fbPaper-UandB-30-20120706.root</ConfigurationParameter>
 			#<ConfigurationParameter>AngularAcceptanceIgnoreNumerator:True</ConfigurationParameter>
