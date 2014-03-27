@@ -81,7 +81,7 @@ Bs2JpsiPhi_Signal_v8::Bs2JpsiPhi_Signal_v8(PDFConfigurator* configurator) : Base
 	//objects
 	t(), ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l(),
 	_gamma(), dgam(), Aperp_sq(), Apara_sq(), Azero_sq(), As_sq(), delta_para(),
-	delta_perp(), delta_zero(), delta_s(), delta_perpMinuspara(), delta_perpMinuszero(), delta_ms(), phi_s(), _cosphis(), _sinphis(), 
+	delta_perp(), delta_zero(), delta_s(), delta_perp_Minus_para(), delta_perp_Minus_zero(), delta_ms(), phi_s(), _cosphis(), _sinphis(), 
 	angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(),
 	tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(),//, timeAcc(NULL),
@@ -172,8 +172,6 @@ Bs2JpsiPhi_Signal_v8::Bs2JpsiPhi_Signal_v8(PDFConfigurator* configurator) : Base
 
 	_useEventResolution = resolutionModel->isPerEvent();
 
-	angularData = vector<double>(3, 0.);
-
 	if( _useEventResolution ) this->TurnCachingOff();
 	//}
 	//else
@@ -196,7 +194,6 @@ Bs2JpsiPhi_Signal_v8::Bs2JpsiPhi_Signal_v8(PDFConfigurator* configurator) : Base
 	//~PELC
 
 	this->SetCopyConstructorSafe( false );
-
 	}
 
 //........................................................
@@ -377,10 +374,10 @@ bool Bs2JpsiPhi_Signal_v8::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	delta_zero = allParameters.GetPhysicsParameter( delta_zeroName )->GetValue();
 	delta_para = allParameters.GetPhysicsParameter( delta_paraName )->GetValue();
 	delta_perp = allParameters.GetPhysicsParameter( delta_perpName )->GetValue();
-	delta_perpMinuszero = delta_perp -  delta_zero ;
 	//	delta_s	   = allParameters.GetPhysicsParameter( delta_sName )->GetValue();  /// This is the original
-	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue() + delta_perpMinuszero;   // This is the ambiguity inspired one with less corrn to delta_perp
-	delta_perpMinuspara = delta_perp -  delta_para ;
+	delta_s = allParameters.GetPhysicsParameter( delta_sName )->GetValue() +delta_perp ;   // This is the ambiguity inspired one with less corrn to delta_perp
+	delta_perp_Minus_para = delta_perp -  delta_para ;
+	delta_perp_Minus_zero = delta_perp -  delta_zero ;
 
 	if( _useCosDpar ) cosdpar = allParameters.GetPhysicsParameter( cosdparName )->GetValue(); //PELC-COSDPAR Special for fitting cosdpar separately
 
@@ -449,13 +446,12 @@ bool Bs2JpsiPhi_Signal_v8::SetPhysicsParameters( ParameterSet* NewParameterSet )
 	sin_delta_para_s = sin(delta_para_s);
 	cos_delta_para_s = cos(delta_para_s);
 
-	sin_delta_perpMinuspara = sin(delta_perpMinuspara);
-	cos_delta_perpMinuspara = cos(delta_perpMinuspara);
-	sin_delta_perpMinuszero = sin(delta_perpMinuszero);
-	cos_delta_perpMinuszero = cos(delta_perpMinuszero);
-	double PhaseDiff = delta_para;
-	sin_PhaseDiff = sin(PhaseDiff);
-	cos_PhaseDiff = cos(PhaseDiff);
+	sin_delta_perp_Minus_para = sin(delta_perp_Minus_para);
+	cos_delta_perp_Minus_para = cos(delta_perp_Minus_para);
+	sin_delta_perp_Minus_zero = sin(delta_perp_Minus_zero);
+	cos_delta_perp_Minus_zero = cos(delta_perp_Minus_zero);
+	sin_delta_para = sin(delta_para);
+	cos_delta_para = cos(delta_para);
 
 	return result;
 }
@@ -483,11 +479,13 @@ double Bs2JpsiPhi_Signal_v8::Evaluate(DataPoint * measurement)
 
 	_eventIsTagged = _mistagCalibModel->eventIsTagged();
 
+	vector<double> angularData;
+
 	if( !_useHelicityBasis )
 	{
-		angularData[0] = measurement->GetObservable( cosThetaName )->GetValue();
-		angularData[1] = measurement->GetObservable( cosPsiName )->GetValue();
-		angularData[2] = measurement->GetObservable( phiName )->GetValue();
+		angularData.push_back( measurement->GetObservable( cosThetaName )->GetValue() );
+		angularData.push_back( measurement->GetObservable( cosPsiName )->GetValue() );
+		angularData.push_back( measurement->GetObservable( phiName )->GetValue() );
 
 		A0A0_value = Bs2JpsiPhi_Angular_Terms::TangleFactorA0A0( angularData );
 		APAP_value = Bs2JpsiPhi_Angular_Terms::TangleFactorAPAP( angularData );
@@ -502,9 +500,9 @@ double Bs2JpsiPhi_Signal_v8::Evaluate(DataPoint * measurement)
 	}
 	else
 	{
-		angularData[0] = measurement->GetObservable( cthetakName )->GetValue();
-		angularData[1] = measurement->GetObservable( cthetalName )->GetValue();
-		angularData[2] = measurement->GetObservable( phihName )->GetValue();
+		angularData.push_back( measurement->GetObservable( cthetakName )->GetValue() );
+		angularData.push_back( measurement->GetObservable( cthetalName )->GetValue() );
+		angularData.push_back( measurement->GetObservable( phihName )->GetValue() );
 
 		A0A0_value = Bs2JpsiPhi_Angular_Terms::HangleFactorA0A0( angularData );
 		APAP_value = Bs2JpsiPhi_Angular_Terms::HangleFactorAPAP( angularData );
@@ -596,11 +594,13 @@ double Bs2JpsiPhi_Signal_v8::EvaluateTimeOnly(DataPoint * measurement)
 
 	_eventIsTagged = _mistagCalibModel->eventIsTagged();
 
+	vector<double> angularData;
+
 	if( !_useHelicityBasis )
 	{
-		angularData[0] = measurement->GetObservable( cosThetaName )->GetValue();
-		angularData[1] = measurement->GetObservable( cosPsiName )->GetValue();
-		angularData[2] = measurement->GetObservable( phiName )->GetValue();
+		angularData.push_back( measurement->GetObservable( cosThetaName )->GetValue() );
+		angularData.push_back( measurement->GetObservable( cosPsiName )->GetValue() );
+		angularData.push_back( measurement->GetObservable( phiName )->GetValue() );
 
 		A0A0_value = Bs2JpsiPhi_Angular_Terms::TangleFactorA0A0( angularData );
 		APAP_value = Bs2JpsiPhi_Angular_Terms::TangleFactorAPAP( angularData );
@@ -615,9 +615,9 @@ double Bs2JpsiPhi_Signal_v8::EvaluateTimeOnly(DataPoint * measurement)
 	}
 	else
 	{
-		angularData[0] = measurement->GetObservable( cthetakName )->GetValue();
-		angularData[1] = measurement->GetObservable( cthetalName )->GetValue();
-		angularData[2] = measurement->GetObservable( phihName )->GetValue();
+		angularData.push_back( measurement->GetObservable( cthetakName )->GetValue() );
+		angularData.push_back( measurement->GetObservable( cthetalName )->GetValue() );
+		angularData.push_back( measurement->GetObservable( phihName )->GetValue() );
 
 		A0A0_value = Bs2JpsiPhi_Angular_Terms::HangleFactorA0A0( angularData );
 		APAP_value = Bs2JpsiPhi_Angular_Terms::HangleFactorAPAP( angularData );
@@ -716,14 +716,15 @@ void Bs2JpsiPhi_Signal_v8::preCalculateTimeFactors()
 	{
 		expSin_stored = resolutionModel->ExpSin( t, gamma(), delta_ms );
 		expCos_stored = resolutionModel->ExpCos( t, gamma(), delta_ms );
-		//		pair<double,double> thesePair = resolutionModel->ExpCosSin( t, gamma(), delta_ms );
-		//		expSin_stored = thesePair.second; expCos_stored = thesePair.first;
+		//pair<double,double> thesePair = resolutionModel->ExpCosSin( t, gamma(), delta_ms );
+		//expSin_stored = thesePair.second; expCos_stored = thesePair.first;
 	}
 	else
 	{
 		expSin_stored = 0.;
 		expCos_stored = 0.;
 	}
+
 	_Expsinh_dGt = expL() - expH();
 	_Expcosh_dGt = expL() + expH();
 	return;
@@ -742,8 +743,8 @@ void Bs2JpsiPhi_Signal_v8::preCalculateSinusoidIntegrals()
 {
 	if( _eventIsTagged && RequireInterference )
 	{
-		//		pair<double,double> thesePair = resolutionModel->ExpCosSinInt( tlo, thi, gamma(), delta_ms );
-		//		intExpSin_stored = thesePair.second; intExpCos_stored = thesePair.first;
+		//pair<double,double> thesePair = resolutionModel->ExpCosSinInt( tlo, thi, gamma(), delta_ms );
+		//intExpSin_stored = thesePair.second; intExpCos_stored = thesePair.first;
 		intExpSin_stored = resolutionModel->ExpSinInt( tlo, thi, gamma(), delta_ms );
 		intExpCos_stored = resolutionModel->ExpCosInt( tlo, thi, gamma(), delta_ms );
 	}
@@ -1251,7 +1252,7 @@ void Bs2JpsiPhi_Signal_v8::ConstructTimeIntegrals()
 	}
 
 	_int_Expsinh_dGt = intExpL() - intExpH();
-	_int_Expcosh_dGt = intExpL() + intExpH();	
+	_int_Expcosh_dGt = intExpL() + intExpH();
 }
 
 //....................................................
@@ -1477,7 +1478,102 @@ void Bs2JpsiPhi_Signal_v8::DebugPrintNorm( string message, double value )
 	PDF_THREAD_UNLOCK
 }
 
-//...........................
+double Bs2JpsiPhi_Signal_v8::timeFactorEven()  const
+{
+	if( _eventIsTagged )
+	{
+		return
+			_mistagCalibModel->D1() * (
+					( 1.0 + cosphis() ) * expL()
+					+ ( 1.0 - cosphis() ) * expH()
+					) +
+			_mistagCalibModel->D2() * (
+					( 2.0 * sinphis() ) * expSin( )
+					+ ( 2.0 * CC()      ) * expCos( )
+					);
+	}
+	else
+	{
+		return ( 1.0 + cosphis() ) * expL() + ( 1.0 - cosphis() ) * expH();
+	}
+}
+
+void Bs2JpsiPhi_Signal_v8::timeFactorEvenDebug() const
+{
+	cout << "D1: " << _mistagCalibModel->D1() << " * ( " << ( 1.0 + cosphis() ) * expL( ) << " + " << ( 1.0 + cosphis() ) * expH( ) << " )" << endl;
+	cout << "D2: " << _mistagCalibModel->D2() << " * ( " << ( 2.0 * sinphis() ) * expSin( ) << " + " << + ( 2.0 * CC()      ) * expCos( ) << " )" << endl;
+}
+
+double Bs2JpsiPhi_Signal_v8::timeFactorEvenInt()  const
+{
+	if( _eventIsTagged )
+	{
+		return
+			_mistagCalibModel->D1() * (
+					( 1.0 + cosphis() )  * intExpL()
+					+ ( 1.0 - cosphis() )  * intExpH()
+					) +
+			_mistagCalibModel->D2() * (
+					( 2.0 * sinphis() ) * intExpSin( )
+					+  ( 2.0 * CC()      ) * intExpCos( )
+					);
+	}
+	else
+	{
+		return ( 1.0 + cosphis() ) * intExpL() + ( 1.0 - cosphis() ) * intExpH();
+	}
+}
+
+
+void Bs2JpsiPhi_Signal_v8::timeFactorEvenIntDebug() const
+{
+	cout << "D1: " << _mistagCalibModel->D1() << "  intExpL(): " << intExpL() << "  intExpH(): " << intExpH() << endl;
+	cout << "D2: " << _mistagCalibModel->D2() << "  intExpSin(): " << intExpSin( ) << "  intExpCos(): " << intExpSin( ) << endl;
+	cout << "   " << _mistagCalibModel->D1() *( ( 1.0 + cosphis() )  * intExpL() + ( 1.0 - cosphis() )  * intExpH() ) << endl;
+	cout << " + " << _mistagCalibModel->D2() *( ( 2.0 * sinphis() ) * intExpSin( ) + ( 2.0 * CC()      ) * intExpCos( ) )<< endl;
+}
+
+
+double Bs2JpsiPhi_Signal_v8::timeFactorOdd(  )   const
+{
+	if( _eventIsTagged )
+	{
+		return
+			_mistagCalibModel->D1() * (
+					( 1.0 - cosphis() ) * expL()
+					+ ( 1.0 + cosphis() ) * expH()
+					) +
+			_mistagCalibModel->D2() * (
+					-  ( 2.0 * sinphis() ) * expSin( )
+					+  ( 2.0 * CC()      ) * expCos( )
+					);
+	}
+	else
+	{
+		return ( 1.0 - cosphis() ) * expL() + ( 1.0 + cosphis() ) * expH();
+	}
+}
+
+double Bs2JpsiPhi_Signal_v8::timeFactorOddInt(  )  const
+{
+	if( _eventIsTagged )
+	{
+		return
+			_mistagCalibModel->D1() * (
+					( 1.0 - cosphis() ) * intExpL()
+					+ ( 1.0 + cosphis() ) * intExpH()
+					) +
+			_mistagCalibModel->D2() * (
+					-  ( 2.0 * sinphis() ) * intExpSin( )
+					+  ( 2.0 * CC()      ) * intExpCos( )
+					);
+	}
+	else
+	{
+		return ( 1.0 - cosphis() ) * intExpL() + ( 1.0 + cosphis() ) * intExpH();
+	}
+}
+
 double Bs2JpsiPhi_Signal_v8::timeFactorA0A0( )
 {
 	this->prepareCDS( lambda_zeroVal, phis_zeroVal );
@@ -1486,7 +1582,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorA0A0( )
 		return
 			_mistagCalibModel->D1() * (
 					Expcosh_dGt()
-					- Expsinh_dGt() * cosphis()
+					+ Expsinh_dGt() * cosphis()
 					) +
 			_mistagCalibModel->D2() * (
 					2.0  * ( CC() * expCos( ) + sinphis() * expSin( ) )
@@ -1494,7 +1590,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorA0A0( )
 	}
 	else
 	{
-		return Expcosh_dGt() - Expsinh_dGt() * cosphis();
+		return Expcosh_dGt() + Expsinh_dGt() * cosphis();
 	}
 }
 
@@ -1506,7 +1602,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorA0A0Int( )
 		return
 			_mistagCalibModel->D1() * (
 					int_Expcosh_dGt()
-					- int_Expsinh_dGt() * cosphis()
+					+ int_Expsinh_dGt() * cosphis()
 					) +
 			_mistagCalibModel->D2() * (
 					2.0  * ( CC() * intExpCos( ) + sinphis() * intExpSin( ) )
@@ -1514,90 +1610,89 @@ double Bs2JpsiPhi_Signal_v8::timeFactorA0A0Int( )
 	}
 	else
 	{
-		return int_Expcosh_dGt() - int_Expsinh_dGt() * cosphis();
+		return int_Expcosh_dGt() + int_Expsinh_dGt() * cosphis();
 	}
 }
 
-//...........................
-double Bs2JpsiPhi_Signal_v8::timeFactorATAT( )
-{
-	this->prepareCDS( lambda_perpVal, phis_perpVal );
-	if( _eventIsTagged )
-	{
-		return
-			_mistagCalibModel->D1() * (
-					Expcosh_dGt()
-					+ Expsinh_dGt() * cosphis()
-					) +
-			_mistagCalibModel->D2() * (
-					2.0  * ( CC() * expCos( ) - sinphis() * expSin( ) )
-					);
-	}
-	else
-	{
-		return Expcosh_dGt() + Expsinh_dGt( )* cosphis();
-	}
-}
 
-double Bs2JpsiPhi_Signal_v8::timeFactorATATInt( )
-{
-	this->prepareCDS( lambda_perpVal, phis_perpVal );
-	if( _eventIsTagged )
-	{
-		return
-			_mistagCalibModel->D1() * (
-					int_Expcosh_dGt()
-					+ int_Expsinh_dGt() * cosphis()
-					) +
-			_mistagCalibModel->D2() * (
-					2.0  * ( CC() * intExpCos( ) - sinphis() * intExpSin( ) )
-					);
-	}
-	else
-	{
-		return int_Expcosh_dGt() + int_Expsinh_dGt() *cosphis();
-	}
-}
-
-//...........................
 double Bs2JpsiPhi_Signal_v8::timeFactorAPAP( )
 {
-	this->prepareCDS( lambda_paraVal, phis_paraVal );
-	if( _eventIsTagged )
-	{
-		return
-			_mistagCalibModel->D1() * (
-					Expcosh_dGt()
-					- Expsinh_dGt() * cosphis()
-					) +
-			_mistagCalibModel->D2() * (
-					2.0  * ( CC() * expCos( ) + sinphis() * expSin( ) )
-					);
-	}
-	else
-	{
-		return Expcosh_dGt() - Expsinh_dGt() *cosphis();
-	}
+        this->prepareCDS( lambda_paraVal, phis_paraVal );
+        if( _eventIsTagged )
+        {
+                return
+                        _mistagCalibModel->D1() * (
+                                        Expcosh_dGt()
+                                        + Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * expCos( ) + sinphis() * expSin( ) )
+                                        );
+        }
+        else
+        {
+                return Expcosh_dGt() + Expsinh_dGt() * cosphis();
+        }
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorAPAPInt( )
 {
-	this->prepareCDS( lambda_paraVal, phis_paraVal );
-	if( _eventIsTagged )
-	{
-		return
-			_mistagCalibModel->D1() * (
-					int_Expcosh_dGt()
-					- int_Expsinh_dGt() * cosphis()
-					) +
-			_mistagCalibModel->D2() * (
-					2.0  * ( CC() * intExpCos( ) + sinphis() * intExpSin( ) )
-					);
-	}
-	else
-	{
-		return int_Expcosh_dGt() - int_Expsinh_dGt()*cosphis();
-	}
+        this->prepareCDS( lambda_paraVal, phis_paraVal );
+        if( _eventIsTagged )
+        {
+                return
+                        _mistagCalibModel->D1() * (
+                                        int_Expcosh_dGt()
+                                        + int_Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * intExpCos( ) + sinphis() * intExpSin( ) )
+                                        );
+        }
+        else
+        {
+                return int_Expcosh_dGt() + int_Expsinh_dGt() * cosphis();
+        }
+}
+
+double Bs2JpsiPhi_Signal_v8::timeFactorATAT( )
+{
+        this->prepareCDS( lambda_perpVal, phis_perpVal );
+        if( _eventIsTagged )
+        {
+                return
+                        _mistagCalibModel->D1() * (
+                                        Expcosh_dGt()
+                                        - Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * expCos( ) - sinphis() * expSin( ) )
+                                        );
+        }
+        else
+        {
+                return Expcosh_dGt() - Expsinh_dGt() * cosphis();
+        }
+}
+
+double Bs2JpsiPhi_Signal_v8::timeFactorATATInt( )
+{
+        this->prepareCDS( lambda_perpVal, phis_perpVal );
+        if( _eventIsTagged )
+        {
+                return
+                        _mistagCalibModel->D1() * (
+                                        int_Expcosh_dGt()
+                                        - int_Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * intExpCos( ) - sinphis() * intExpSin( ) )
+                                        );
+        }
+        else
+        {
+                return int_Expcosh_dGt() - int_Expsinh_dGt() * cosphis();
+        }
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorImAPAT( )
@@ -1608,16 +1703,16 @@ double Bs2JpsiPhi_Signal_v8::timeFactorImAPAT( )
 	{
 		return
 			_mistagCalibModel->D1() * (
-					Expsinh_dGt() * cos_delta_perpMinuspara * sinphis()
-					+ Expcosh_dGt() * sin_delta_perpMinuspara * CC()
+					( Expsinh_dGt() ) * cos_delta_perp_Minus_para * sinphis()
+					+ ( Expcosh_dGt() ) * sin_delta_perp_Minus_para * CC()
 					) +
 			_mistagCalibModel->D2() * (
-					2.0  * ( sin_delta_perpMinuspara*expCos( ) - cos_delta_perpMinuspara*cosphis()*expSin( ) )
+					2.0  * ( sin_delta_perp_Minus_para*expCos( ) - cos_delta_perp_Minus_para*cosphis()*expSin( ) )
 					);
 	}
 	else
 	{
-		return Expsinh_dGt() * cos_delta_perpMinuspara * sinphis() + Expcosh_dGt() * sin_delta_perpMinuspara * CC();
+		return ( Expsinh_dGt() ) * cos_delta_perp_Minus_para * sinphis() + ( Expcosh_dGt() ) * sin_delta_perp_Minus_para * CC();
 	}
 }
 
@@ -1628,57 +1723,57 @@ double Bs2JpsiPhi_Signal_v8::timeFactorImAPATInt( )
 	{
 		return
 			_mistagCalibModel->D1() * (
-					int_Expsinh_dGt() * cos_delta_perpMinuspara * sinphis()
-					+ int_Expcosh_dGt() * sin_delta_perpMinuspara * CC()
+					( int_Expsinh_dGt() ) * cos_delta_perp_Minus_para * sinphis()
+					+ ( int_Expcosh_dGt() ) * sin_delta_perp_Minus_para * CC()
 					) +
 			_mistagCalibModel->D2() * (
-					2.0  * ( sin_delta_perpMinuspara*intExpCos() - cos_delta_perpMinuspara*cosphis()*intExpSin() )
+					2.0  * ( sin_delta_perp_Minus_para*intExpCos() - cos_delta_perp_Minus_para*cosphis()*intExpSin() )
 					);
 	}
 	else
 	{
-		return int_Expsinh_dGt() * cos_delta_perpMinuspara * sinphis() + int_Expcosh_dGt() * sin_delta_perpMinuspara * CC();
+		return ( int_Expsinh_dGt() ) * cos_delta_perp_Minus_para * sinphis() +  ( int_Expcosh_dGt() ) * sin_delta_perp_Minus_para * CC();
 	}
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReA0AP( )
 {
-	this->prepareCDS( sqrt(lambda_zeroVal*lambda_paraVal), 0.5*(phis_zeroVal+phis_paraVal) );
-	if( _eventIsTagged )
-	{
-		return cos_PhaseDiff * (
-				_mistagCalibModel->D1() * (
-					Expcosh_dGt()
-					- Expsinh_dGt() * cosphis()
-					) +
-				_mistagCalibModel->D2() * (
-					2.0  * ( CC() * expCos( ) + sinphis() * expSin( ) )
-					) );
-	}
-	else
-	{
-		return cos_PhaseDiff* ( Expcosh_dGt() - Expsinh_dGt() *cosphis() );
-	}
+        this->prepareCDS( sqrt(lambda_zeroVal*lambda_perpVal), 0.5*(phis_zeroVal+phis_perpVal) );
+        if( _eventIsTagged )
+        {
+                return cos_delta_para * (
+                        _mistagCalibModel->D1() * (
+                                        Expcosh_dGt()
+                                        + Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * expCos( ) + sinphis() * expSin( ) )
+                                        )  );
+        }
+        else
+        {
+                return cos_delta_para * ( Expcosh_dGt() + Expsinh_dGt() * cosphis() );
+        }
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReA0APInt( )
 {
-	this->prepareCDS( sqrt(lambda_zeroVal*lambda_paraVal), 0.5*(phis_zeroVal+phis_paraVal) );
-	if( _eventIsTagged )
-	{
-		return cos_PhaseDiff * (
-				_mistagCalibModel->D1() * (
-					int_Expcosh_dGt()
-					- int_Expsinh_dGt() * cosphis()
-					) +
-				_mistagCalibModel->D2() * (
-					2.0  * ( CC() * intExpCos( ) + sinphis() * intExpSin( ) )
-					) );
-	}
-	else
-	{
-		return cos_PhaseDiff * ( int_Expcosh_dGt() - int_Expsinh_dGt() * cosphis() );
-	}
+        this->prepareCDS( sqrt(lambda_zeroVal*lambda_perpVal), 0.5*(phis_zeroVal+phis_perpVal) );
+        if( _eventIsTagged )
+        {
+                return cos_delta_para * (
+                        _mistagCalibModel->D1() * (
+                                        int_Expcosh_dGt()
+                                        + int_Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * intExpCos( ) + sinphis() * intExpSin( ) )
+                                        )  );
+        }
+        else
+        {
+                return cos_delta_para * ( int_Expcosh_dGt() + int_Expsinh_dGt() * cosphis() );
+        }
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorImA0AT(  )
@@ -1688,16 +1783,16 @@ double Bs2JpsiPhi_Signal_v8::timeFactorImA0AT(  )
 	{
 		return
 			_mistagCalibModel->D1() * (
-					Expsinh_dGt() * cos_delta_perpMinuszero * sinphis()
-					+ Expcosh_dGt() * sin_delta_perpMinuszero * CC()
+					( Expsinh_dGt() ) * cos_delta_perp_Minus_zero * sinphis()
+					+ ( Expcosh_dGt() ) * sin_delta_perp_Minus_zero * CC()
 					) +
 			_mistagCalibModel->D2() * (
-					2.0  * ( sin_delta_perpMinuszero*expCos( ) - cos_delta_perpMinuszero*cosphis()*expSin( ) )
+					2.0  * ( sin_delta_perp_Minus_zero*expCos( ) - cos_delta_perp_Minus_zero*cosphis()*expSin( ) )
 					);
 	}
 	else
 	{
-		return Expsinh_dGt() * cos_delta_perpMinuszero * sinphis() + Expcosh_dGt() * sin_delta_perpMinuszero * CC();
+		return ( Expsinh_dGt() ) * cos_delta_perp_Minus_zero * sinphis() + ( Expcosh_dGt() ) * sin_delta_perp_Minus_zero * CC();
 	}
 }
 
@@ -1708,70 +1803,68 @@ double Bs2JpsiPhi_Signal_v8::timeFactorImA0ATInt( )
 	{
 		return
 			_mistagCalibModel->D1() * (
-					int_Expsinh_dGt() * cos_delta_perpMinuszero * sinphis()
-					+ int_Expcosh_dGt() * sin_delta_perpMinuszero * CC()
+					( int_Expsinh_dGt()  ) * cos_delta_perp_Minus_zero * sinphis()
+					+ ( int_Expcosh_dGt()  ) * sin_delta_perp_Minus_zero * CC()
 					) +
 			_mistagCalibModel->D2() * (
-					2.0  * ( sin_delta_perpMinuszero*intExpCos() - cos_delta_perpMinuszero*cosphis()*intExpSin()  )
+					2.0  * ( sin_delta_perp_Minus_zero*intExpCos() - cos_delta_perp_Minus_zero*cosphis()*intExpSin()  )
 					);
 	}
 	else
 	{
-		return int_Expsinh_dGt() * cos_delta_perpMinuszero * sinphis() + int_Expcosh_dGt() * sin_delta_perpMinuszero * CC();
+		return ( int_Expsinh_dGt()  ) * cos_delta_perp_Minus_zero * sinphis() + ( int_Expcosh_dGt()  ) * sin_delta_perp_Minus_zero * CC();
 	}
 }
 
-
 double Bs2JpsiPhi_Signal_v8::timeFactorASAS( )
 {
-	this->prepareCDS( lambda_SVal, phis_SVal );
-	if( _eventIsTagged )
-	{
-		return
-			_mistagCalibModel->D1() * (
-					Expcosh_dGt()
-					+ Expsinh_dGt() * cosphis()
-					) +
-			_mistagCalibModel->D2() * (
-					2.0  * ( CC() * expCos( ) - sinphis() * expSin( ) )
-					);
-	}
-	else
-	{
-		return Expcosh_dGt() + Expsinh_dGt() * cosphis();
-	}
+        this->prepareCDS( lambda_SVal, phis_SVal );
+        if( _eventIsTagged )
+        {
+                return
+                        _mistagCalibModel->D1() * (
+                                        Expcosh_dGt()
+                                        - Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * expCos( ) - sinphis() * expSin( ) )
+                                        );
+        }
+        else
+        {
+                return Expcosh_dGt() - Expsinh_dGt() * cosphis();
+        }
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorASASInt( )
 {
-	this->prepareCDS( lambda_SVal, phis_SVal );
-	if( _eventIsTagged )
-	{
-		return
-			_mistagCalibModel->D1() * (
-					int_Expcosh_dGt()
-					+ int_Expsinh_dGt() * cosphis()
-					) +
-			_mistagCalibModel->D2() * (
-					2.0  * ( CC() * intExpCos( ) - sinphis() * intExpSin( ) )
-					);
-	}
-	else
-	{
-		return int_Expcosh_dGt() + int_Expsinh_dGt() * cosphis();
-	}
+        this->prepareCDS( lambda_SVal, phis_SVal );
+        if( _eventIsTagged )
+        {
+                return
+                        _mistagCalibModel->D1() * (
+                                        int_Expcosh_dGt()
+                                        - int_Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * intExpCos( ) - sinphis() * intExpSin( ) )
+                                        );
+        }
+        else
+        {
+                return int_Expcosh_dGt() - int_Expsinh_dGt() * cosphis();
+        }
 }
-
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReASAP( )
 {
-	this->prepareCDS( sqrt(lambda_SVal*lambda_paraVal), 0.5*(phis_SVal+phis_paraVal) );
+	this->prepareCDS( sqrt(lambda_SVal*lambda_perpVal), 0.5*(phis_SVal+phis_perpVal) );
 	if( _eventIsTagged )
 	{
 		return
 			_mistagCalibModel->D1() * (
-					Expsinh_dGt() * sin_delta_para_s * sinphis()
-					+ Expcosh_dGt() * cos_delta_para_s * CC()
+					( Expsinh_dGt() ) * sin_delta_para_s * sinphis()
+					+ ( Expcosh_dGt() ) * cos_delta_para_s * CC()
 					) +
 			_mistagCalibModel->D2() * (
 					2.0  * ( cos_delta_para_s*expCos( ) - sin_delta_para_s*cosphis()*expSin( ) )
@@ -1779,19 +1872,19 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReASAP( )
 	}
 	else
 	{
-		return Expsinh_dGt() * sin_delta_para_s * sinphis() + Expcosh_dGt() * cos_delta_para_s * CC();
+		return ( Expsinh_dGt() ) * sin_delta_para_s * sinphis() + ( Expcosh_dGt() ) * cos_delta_para_s * CC();
 	}
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReASAPInt( )
 {
-	this->prepareCDS( sqrt(lambda_SVal*lambda_paraVal), 0.5*(phis_SVal+phis_paraVal) );
+	this->prepareCDS( sqrt(lambda_SVal*lambda_perpVal), 0.5*(phis_SVal+phis_perpVal) );
 	if( _eventIsTagged )
 	{
 		return
 			_mistagCalibModel->D1() * (
-					int_Expsinh_dGt() * sin_delta_para_s * sinphis()
-					+ int_Expcosh_dGt() * cos_delta_para_s * CC()
+					( int_Expsinh_dGt() ) * sin_delta_para_s * sinphis()
+					+ ( int_Expcosh_dGt() ) * cos_delta_para_s * CC()
 					) +
 			_mistagCalibModel->D2() * (
 					2.0  * ( cos_delta_para_s*intExpCos() - sin_delta_para_s*cosphis()*intExpSin() )
@@ -1799,49 +1892,48 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReASAPInt( )
 	}
 	else
 	{
-		return int_Expsinh_dGt() * sin_delta_para_s * sinphis() + int_Expcosh_dGt() * cos_delta_para_s * CC();
+		return ( int_Expsinh_dGt() ) * sin_delta_para_s * sinphis() + ( int_Expcosh_dGt() ) * cos_delta_para_s * CC();
 	}
 }
 
-
 double Bs2JpsiPhi_Signal_v8::timeFactorImASAT( )
 {
-	this->prepareCDS( sqrt(lambda_SVal*lambda_perpVal), 0.5*(phis_SVal+phis_perpVal) );
-	if( _eventIsTagged )
-	{
-		return sin_delta_perp_s * (
-				_mistagCalibModel->D1() * (
-					Expsinh_dGt() * cosphis()
-					+ Expcosh_dGt()
-					) +
-				_mistagCalibModel->D2() * (
-					2.0  * ( CC() * expCos( ) - sinphis() * expSin( ) )
-					) );
-	}
-	else
-	{
-		return sin_delta_perp_s * ( Expsinh_dGt() * cosphis() + Expcosh_dGt() );
-	}
+        this->prepareCDS( sqrt(lambda_SVal*lambda_paraVal), 0.5*(phis_SVal+phis_paraVal) );
+        if( _eventIsTagged )
+        {
+                return sin_delta_perp_s * (
+                        _mistagCalibModel->D1() * (
+                                        Expcosh_dGt()
+                                        - Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * expCos( ) - sinphis() * expSin( ) )
+                                        )  );
+        }
+        else
+        {
+                return sin_delta_perp_s * ( Expcosh_dGt() - Expsinh_dGt() * cosphis() );
+        }
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorImASATInt( )
 {
-	this->prepareCDS( sqrt(lambda_SVal*lambda_perpVal), 0.5*(phis_SVal+phis_perpVal) );
-	if( _eventIsTagged )
-	{
-		return sin_delta_perp_s * (
-				_mistagCalibModel->D1() * (
-					int_Expsinh_dGt() * cosphis()
-					+ int_Expcosh_dGt()
-					) +
-				_mistagCalibModel->D2() * (
-					2.0  * ( CC() * intExpCos( ) - sinphis() * intExpSin( ) )
-					) );
-	}
-	else
-	{
-		return sin_delta_perp_s * ( int_Expsinh_dGt() *cosphis() + int_Expcosh_dGt() );
-	}
+        this->prepareCDS( sqrt(lambda_SVal*lambda_paraVal), 0.5*(phis_SVal+phis_paraVal) );
+        if( _eventIsTagged )
+        {
+                return sin_delta_perp_s * (
+                        _mistagCalibModel->D1() * (
+                                        int_Expcosh_dGt()
+                                        - int_Expsinh_dGt() * cosphis()
+                                        ) +
+                        _mistagCalibModel->D2() * (
+                                        2.0  * ( CC() * intExpCos( ) - sinphis() * intExpSin( ) )
+                                        )  );
+        }
+        else
+        {
+                return sin_delta_perp_s * ( int_Expcosh_dGt() - int_Expsinh_dGt() * cosphis() );
+        }
 }
 
 double Bs2JpsiPhi_Signal_v8::timeFactorReASA0( )
@@ -1851,8 +1943,8 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReASA0( )
 	{
 		return
 			_mistagCalibModel->D1() * (
-					Expsinh_dGt() * sin_delta_zero_s * sinphis()
-					+ Expcosh_dGt() * cos_delta_zero_s * CC()
+					( Expsinh_dGt() ) * sin_delta_zero_s * sinphis()
+					+ ( Expcosh_dGt() ) * cos_delta_zero_s * CC()
 					) +
 			_mistagCalibModel->D2() * (
 					2.0  * ( cos_delta_zero_s*expCos( ) - sin_delta_zero_s*cosphis()*expSin( ) )
@@ -1860,7 +1952,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReASA0( )
 	}
 	else
 	{
-		return Expsinh_dGt() * sin_delta_zero_s * sinphis() + Expcosh_dGt() * cos_delta_zero_s * CC();
+		return ( Expsinh_dGt() ) * sin_delta_zero_s * sinphis() + ( Expcosh_dGt() ) * cos_delta_zero_s * CC();
 	}
 }
 
@@ -1871,8 +1963,8 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReASA0Int( )
 	{
 		return
 			_mistagCalibModel->D1() * (
-					int_Expsinh_dGt() * sin_delta_zero_s * sinphis()
-					+ int_Expcosh_dGt() * cos_delta_zero_s * CC()
+					( int_Expsinh_dGt() ) * sin_delta_zero_s * sinphis()
+					+ ( int_Expcosh_dGt() ) * cos_delta_zero_s * CC()
 					) +
 			_mistagCalibModel->D2() * (
 					2.0  * ( cos_delta_zero_s*intExpCos() - sin_delta_zero_s*cosphis()*intExpSin() )
@@ -1880,7 +1972,7 @@ double Bs2JpsiPhi_Signal_v8::timeFactorReASA0Int( )
 	}
 	else
 	{
-		return int_Expsinh_dGt() * sin_delta_zero_s * sinphis() + int_Expcosh_dGt() * cos_delta_zero_s * CC();
+		return ( int_Expsinh_dGt() ) * sin_delta_zero_s * sinphis() + ( int_Expcosh_dGt() ) * cos_delta_zero_s * CC();
 	}
 }
 

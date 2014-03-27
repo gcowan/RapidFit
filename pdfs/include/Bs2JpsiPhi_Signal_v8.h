@@ -110,6 +110,14 @@ class Bs2JpsiPhi_Signal_v8 : public BasePDF
 		ObservableRef sinphisName;		// fitting cosphis and sinphis independently
 		ObservableRef lambdaName;		// magnitude of lambda
 
+		ObservableRef mistagName;		// mistag fraction  - may be used as observable also
+		ObservableRef mistagP1Name;		// mistag calib
+		ObservableRef mistagP0Name;		// mistag calib
+		ObservableRef mistagSetPointName;// mistag calib
+		ObservableRef mistagDeltaP1Name;		// mistag calib
+		ObservableRef mistagDeltaP0Name;		// mistag calib
+		ObservableRef mistagDeltaSetPointName;// mistag calib
+
 		// Observables
 		ObservableRef timeName;		// proper time
 		ObservableRef cosThetaName;	// cos of angle of mu+ wrt z-axis in Jpsi frame
@@ -191,8 +199,8 @@ class Bs2JpsiPhi_Signal_v8 : public BasePDF
 		double delta_perp;
 		double delta_zero;
 		double delta_s;
-		double delta_perpMinuspara;
-		double delta_perpMinuszero;
+		double delta_perp_Minus_para;
+		double delta_perp_Minus_zero;
 		double cosdpar; //PELC-COSDPAR Special for fitting cosdpar separately
 
 		double delta_ms;
@@ -267,12 +275,12 @@ class Bs2JpsiPhi_Signal_v8 : public BasePDF
 		double sin_delta_para_s;
 		double cos_delta_para_s;
 
-		double sin_delta_perpMinuspara;
-		double cos_delta_perpMinuspara;
-		double sin_delta_perpMinuszero;
-		double cos_delta_perpMinuszero;
-		double sin_PhaseDiff;
-		double cos_PhaseDiff;
+		double sin_delta_perp_Minus_para;
+		double cos_delta_perp_Minus_para;
+		double sin_delta_perp_Minus_zero;
+		double cos_delta_perp_Minus_zero;
+		double sin_delta_para;
+		double cos_delta_para;
 
 		//....................................
 		//Internal helper functions
@@ -300,7 +308,6 @@ class Bs2JpsiPhi_Signal_v8 : public BasePDF
 		double stored_gammah;
 		inline double gamma_h() const { return stored_gammah; }
 
-		double deltaGamma() const { return dgam; }
 		inline double gamma() const { return _gamma ; }
 
 		//.....................
@@ -337,6 +344,24 @@ class Bs2JpsiPhi_Signal_v8 : public BasePDF
 		void DebugPrint( string , double ) const;
 		void DebugPrintXsec( string , double );
 		void DebugPrintNorm( string , double );
+
+
+		//------------------------------------------------------------------------------
+		// These are the time factors and their analytic integrals for the one angle PDF
+
+		//..................................
+		inline double timeFactorEven()  const;
+
+		void timeFactorEvenDebug() const;
+
+		inline double timeFactorEvenInt()  const;
+
+		void timeFactorEvenIntDebug() const;
+
+		//..................................
+		inline double timeFactorOdd(  )  const;
+
+		inline double timeFactorOddInt(  )  const;
 
 
 		//----------------------------------------------------------
@@ -393,31 +418,27 @@ class Bs2JpsiPhi_Signal_v8 : public BasePDF
 
 		inline double timeFactorReASA0Int( );
 
+                double _Expsin_dMt;
+                double _Expcos_dMt;
+                double _int_Expsin_dMt;
+                double _int_Expcos_dMt;
 
-		double _Expsin_dMt;
-		double _Expcos_dMt;
-		double _int_Expsin_dMt;
-		double _int_Expcos_dMt;
+                double _Expsinh_dGt;
+                double _Expcosh_dGt;
+                double _int_Expsinh_dGt;
+                double _int_Expcosh_dGt;
 
-		double _Expsinh_dGt;
-		double _Expcosh_dGt;
-		double _int_Expsinh_dGt;
-		double _int_Expcosh_dGt;
+                inline double Expsin_dMt() { return _Expsin_dMt; };
+                inline double Expcos_dMt() { return _Expcos_dMt; };
 
-		inline double Expsin_dMt() { return _Expsin_dMt; };
-		inline double Expcos_dMt() { return _Expcos_dMt; };
+                inline double int_Expsin_dMt() { return _int_Expsin_dMt; };
+                inline double int_Expcos_dMt() { return _int_Expcos_dMt; };
 
-		inline double int_Expsin_dMt() { return _int_Expsin_dMt; };
-		inline double int_Expcos_dMt() { return _int_Expcos_dMt; };
+                inline double Expsinh_dGt() { return _Expsinh_dGt; };
+                inline double Expcosh_dGt() { return _Expcosh_dGt; };
 
-		inline double Expsinh_dGt() { return _Expsinh_dGt; };
-		inline double Expcosh_dGt() { return _Expcosh_dGt; };
-
-		inline double int_Expsinh_dGt() { return _int_Expsinh_dGt; };
-		inline double int_Expcosh_dGt() { return _int_Expcosh_dGt; };
-
-		vector<double> angularData;
-
+                inline double int_Expsinh_dGt() { return _int_Expsinh_dGt; };
+                inline double int_Expcosh_dGt() { return _int_Expcosh_dGt; };
 };
 
 #endif
