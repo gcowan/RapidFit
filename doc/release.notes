@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2013/03/30 Rob Currie
+  - Adding new RapidDiff program which summarises the difference between 2 fits. It uses the RapidFit .root format and atm dumps the raw table of numbers and the latex version to the terminal
+        I encourage that is people find this useful they hack at it as the program is very small making use of many functions within the utils codebase
+  - Taking this opportunity I moved some functions out from the RapidPlot.C program to make the file easier to parse
+
 2013/03/20 Rob Currie
   - Adding <RequiredParameterOrder> Tag to FitFunction, this allow you to order all or a subset of the Floated Parameters as they're exposed to Minuit
         This takes a string which is a list of parameternames as seen by Minuit which are separated by ':'

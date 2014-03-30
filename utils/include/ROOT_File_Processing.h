@@ -6,6 +6,7 @@
 #include "TString.h"
 #include "TClass.h"
 #include "TRandom3.h"
+#include "TTree.h"
 //	System Headers
 #include <vector>
 

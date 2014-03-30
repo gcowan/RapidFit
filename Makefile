@@ -222,8 +222,11 @@ $(OBJUTILDIR)/Mathematics.o: $(UTILSSRC)/Mathematics.C
 SHARED_UTIL_LIBS=$(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $(OBJUTILDIR)/Mathematics.o  $(OBJUTILDIR)/ROOT_File_Processing.o $(OBJUTILDIR)/Histo_Processing.o $(OBJDIR)/StringProcessing.o $(OBJDIR)/EdStyle.o $(OBJUTILDIR)/StringOperations.o  $(OBJUTILDIR)/Template_Functions.o $(OBJUTILDIR)/RapidFit_Output_File.o
 
 #       New mostly automated plotting tool taking the pain out of plotting RapidFit output
-$(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/RapidLL.o $(OBJUTILDIR)/Rapid2DLL.o $(OBJUTILDIR)/Toy_Study.o $(OBJUTILDIR)/Component_Projections.o $(OBJUTILDIR)/CorrMatrix.o $(SHARED_UTIL_LIBS)
+$(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/RapidLL.o $(OBJUTILDIR)/Rapid2DLL.o $(OBJUTILDIR)/Toy_Study.o $(OBJUTILDIR)/Component_Projections.o $(OBJUTILDIR)/CorrMatrix.o $(OBJUTILDIR)/XMLFunctions.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+$(EXEDIR)/RapidDiff: $(OBJUTILDIR)/RapidDiff.o $(SHARED_UTIL_LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+
 $(OBJUTILDIR)/RapidPlot.o: $(UTILSSRC)/RapidPlot.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 $(OBJUTILDIR)/RapidLL.o: $(UTILSSRC)/RapidLL.C
@@ -242,7 +245,10 @@ $(OBJUTILDIR)/Template_Functions.o: $(UTILSSRC)/Template_Functions.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 $(OBJUTILDIR)/CorrMatrix.o: $(UTILSSRC)/CorrMatrix.C
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
-
+$(OBJUTILDIR)/XMLFunctions.o: $(UTILSSRC)/XMLFunctions.C
+	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
+$(OBJUTILDIR)/RapidDiff.o: $(UTILSSRC)/RapidDiff.C
+	$(CXX) $(CXXFLAGSUTIL) -o $@ -c $<
 
 ###   Various tools for the utils directory
 
@@ -299,7 +305,7 @@ $(EXEDIR)/plotDists: $(OBJUTILDIR)/plotDists.o $(SHARED_UTIL_LIBS)
 $(OBJUTILDIR)/plotDists.o: $(UTILSSRC)/plotDists.C
 	$(CXX) $(CXXFLAGS) -I$(INCUTILS) -o $@ -c $<
 
-utils:	$(EXEDIR)/print $(EXEDIR)/RapidPlot
+utils:	$(EXEDIR)/print $(EXEDIR)/RapidPlot $(EXEDIR)/RapidDiff
 
 
 extra:	$(EXEDIR)/Per-Event $(EXEDIR)/lifetime_tool $(EXEDIR)/weighted $(EXEDIR)/ApplyWeights $(EXEDIR)/Compare $(EXEDIR)/tupleDiff $(EXEDIR)/AngularDist $(EXEDIR)/plotDists
