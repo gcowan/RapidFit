@@ -44,6 +44,11 @@ class MistagCalib3fb : public IMistagCalib
 		MistagCalib3fb( const MistagCalib3fb& );
 		MistagCalib3fb& operator=(const MistagCalib3fb );
 
+		double mistagOS() const;
+		double mistagSS() const;
+		double mistagOSOther() const;
+		double mistagSSOther() const;
+
 		double mistagSSB() const;
 		double mistagOSB() const;
 		double mistagSSBbar() const;

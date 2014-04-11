@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/04/11 Rob Currie
+  - Fixing Tagging Calibrations for JpsiPhi, now both the Combined and 3fb calibrations converge in the full fit to data.
+       These changes subtly move the results from the 1fb analysis but are compatible with published results and further reduce the small differences between Edinburgh, Heidelberg and Nikhef for the 1fb analysis.
+
 2013/03/30 Rob Currie
   - Adding new RapidDiff program which summarises the difference between 2 fits. It uses the RapidFit .root format and atm dumps the raw table of numbers and the latex version to the terminal
         I encourage that is people find this useful they hack at it as the program is very small making use of many functions within the utils codebase

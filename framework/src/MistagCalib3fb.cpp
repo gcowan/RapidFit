@@ -241,11 +241,75 @@ double MistagCalib3fb::mistagB() const
 	return returnValue;
 }
 
+double MistagCalib3fb::mistagOS() const
+{
+	if( _tagOS == 1 )
+	{
+		return this->mistagOSB();
+	}
+	else if( _tagOS == -1 )
+	{
+		return this->mistagOSBbar();
+	}
+	else
+	{
+		return 0.5;
+	}
+}
+
+double MistagCalib3fb::mistagOSOther() const
+{
+	if( _tagOS == 1 )
+	{
+		return this->mistagOSBbar();
+	}
+	else if( _tagOS == -1 )
+	{
+		return this->mistagOSB();
+	}
+	else
+	{
+		return 0.5;
+	}
+}
+
+double MistagCalib3fb::mistagSS() const
+{
+	if( _tagSS == 1 )
+	{
+		return this->mistagSSB();
+	}
+	else if( _tagSS == -1 )
+	{
+		return this->mistagSSBbar();
+	}
+	else
+	{
+		return 0.5;
+	}
+}
+
+double MistagCalib3fb::mistagSSOther() const
+{
+	if( _tagSS == 1 )
+	{
+		return this->mistagSSBbar();
+	}
+	else if( _tagSS == -1 )
+	{
+		return this->mistagSSB();
+	}
+	else
+	{
+		return 0.5;
+	}
+}
+
 double MistagCalib3fb::RealD1() const
 {
 	if( !_untagged )
 	{
-		return ( (1.+ _tagOS*(1.-2.*this->mistagOSB()) ) * (1.+ _tagSS*(1.-2.*this->mistagSSB())) + (1.- _tagOS*(1.-2.*this->mistagOSBbar()) ) * (1.- _tagSS*(1.-2.*this->mistagSSBbar())) );
+		return ( (1.+ _tagOS*(1.-2.*this->mistagOS()) ) * (1.+ _tagSS*(1.-2.*this->mistagSS())) + (1.-_tagOS*(1.-2.*this->mistagOS()) ) * (1.- _tagSS*(1.-2.*this->mistagSS())) );
 	}
 	else
 	{
@@ -257,7 +321,7 @@ double MistagCalib3fb::RealD2() const
 {
 	if( !_untagged )
 	{
-		return ( (1.+ _tagOS*(1.-2.*this->mistagOSB()) ) * (1.+ _tagSS*(1.-2.*this->mistagSSB())) - (1.- _tagOS*(1.-2.*this->mistagOSBbar()) ) * (1.- _tagSS*(1.-2.*this->mistagSSBbar())) );
+		return ( (1.+ _tagOS*(1.-2.*this->mistagOSOther()) ) * (1.+ _tagSS*(1.-2.*this->mistagSSOther())) - (1.- _tagOS*(1.-2.*this->mistagOSOther()) ) * (1.- _tagSS*(1.-2.*this->mistagSSOther())) );
 	}
 	else
 	{
