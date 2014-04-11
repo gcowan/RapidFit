@@ -604,7 +604,7 @@ double CombinedMistagCalib::RealD2() const
 {
 	if( !_untagged )
 	{
-		return this->q()*( 1.0 - this->mistagB() - this->mistagBbar() );
+		return this->q()*( 1.0 - this->mistagBbar() - this->mistagB() );
 	}
 	else
 	{
