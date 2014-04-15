@@ -2,6 +2,8 @@
 #include "TRandom3.h"
 #include "RapidFitRandom.h"
 
+#include <cmath>
+
 
 /*!
  * @brief Start a new TRandom3 instance with a given seed value
