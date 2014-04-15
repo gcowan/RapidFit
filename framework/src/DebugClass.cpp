@@ -67,7 +67,6 @@ void DebugClass::SegFault()
 {
 	int *p = NULL;
 	*p = 1;
-	return;
 }
 
 template<class T> void DebugClass::Dump2File( const string fileName, const vector<T> objects )

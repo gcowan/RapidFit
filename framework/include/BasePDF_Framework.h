@@ -1,83 +1,11 @@
 /*!
- * @class BasePDF
+ * @class BasePDF_Framework
  *
- * @brief   Class that provides a general implementation of most functions accessible through IPDF.
- *          Physics PDF can inherit from this to make a PDF without worrying about the details.
+ * @brief This Particular Framework makes use of the 
  *
- * It is intended that All Physics PDFs should inherit from this class in order to exploit a lot of pre-programmed features
+ * @author Robert Currie rcurrie@cern.ch
  *
- * All new PDFs need to provide the following:
- *
- * REQUIRED:
- *
- * Overload:
- *          Evaluate( DataPoint* )
- *             (Required or there is not point!)
- *
- *          Normalisation( DataPoint*, PhaseSpaceBoundary* ) and/or Normalisation( PhaseSpaceBoundary* ) or set 'forceNumerical=true;'
- *             (Required some way of Normalising the Evaluate Function, return 1 if it already is)
- *
- *
- * BEST PRACTICE:
- *
- * Overload:
- *          All of the above +
- *
- *          SetParameterSet( ParameterSet* )
- *             (This is only called once per IMinimiser call so pre-calculate as much as possible here to save repeating it for every event!)
- *
- * Re-Use the variables:
- *                      bool forceNumerical;
- *                      bool e_by_e_Normalisation;
- *                      vector<string> allObservables;
- *                      ParamaterSet allParameters;
- *                      vector<string> doNotIntegrateList;
- *                      bool cacheValid;
- *
- * The PDF can reimplement these, but if we can all stick to the same coding style then it makes life easier.
- *
- *
- * ADVANCED PDFs:
- *
- * Overload:
- *
- *          EvaluateComponent( DataPoint, ComponentRef* )
- *             (This only needs to be done once you want to look at things like CP eigenstates)
- *             (You can use the ComponentRef object to store the result of lookups to reduce the length of time doing this
- *
- *          Can Overload PDFComponents or simply store all PDF components in: vector<string> component_list;
- *
- *          GetPhysicsParameters()
- *             (Overloading this allows you to mix/match which parameters you want based on PDFConfigurator conditions)
- *
- *          GetPrototypeDataPoint()
- *             (Overloading this allows you to mix/match which observables you want based on the PDFConfigurator conditions)
- *
- *          GetDoNotIntegrateList()
- *             (Overloading this allows you to mix/match which observables you can't model based on the PDFConfigurator conditions)
- *
- *
- * EXPERT/DEVELOPER:
- *
- * Overload:
- *          All of the above +
- *
- *          Integral(DataPoint*,PhaseSpaceBoundary*)
- *             (This has interfaces directly with the RapidFitIntegrator)
- *
- *          EvaluateForNumericIntegral( DataPoint* )
- *             (This interfaces with the NumericalIntegrator class)
- *
- *          EvaluateForNumericGeneration( DataPoint* )
-*             (This interfaces with the Toy DataSet Generators like Foam)
-	*
-	*
-	*
-	*
-	* @author Benjamin M Wynne bwynne@cern.ch
-	* @author Robert Currie rcurrie@cern.ch
-	*
-	*/
+ */
 
 #pragma once
 #ifndef BASE_FRAMEWORK_PDF_H

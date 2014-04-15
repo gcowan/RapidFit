@@ -650,7 +650,6 @@ IPDF * XMLObjectGenerator::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* I
 	//Check if the name is recognised as a PDF
 	returnable_NamedPDF = ClassLookUp::LookUpPDFName( name, configurator );
 
-	//      returnable_NamedPDF->SetRandomFunction( GetSeed() );
 	return returnable_NamedPDF;
 }
 
@@ -792,7 +791,6 @@ DataSetConfiguration * XMLObjectGenerator::MakeDataSetConfiguration( XMLTag * Da
 		}
 
 		if( generatePDFFlag )   generatePDF = XMLObjectGenerator::GetPDF( PDFXML, DataBoundary, pdfOptions, common, thisParameterSet );
-		generatePDF->SetRandomFunction( seed );
 		generatePDF->SetMCCacheStatus( false );
 		delete thisParameterSet;
 
@@ -1632,7 +1630,6 @@ PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * Fit
 		if( generatePDFFlag == true )
 		{
 			generatePDF = XMLObjectGenerator::GetPDF( generatePDFXML, dataBoundary, pdfOptionXML, common, thisParameterSet );
-			generatePDF->SetRandomFunction( seed );
 			generatePDF->SetMCCacheStatus( false );
 		}
 
@@ -1668,7 +1665,6 @@ PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * Fit
 		}
 		//Make the objects
 		IPDF * fitPDF = XMLObjectGenerator::GetPDF( FitPDFTag, dataBoundary, overloadConfigurator, common, thisParameterSet );
-		fitPDF->SetRandomFunction( seed );
 		fitPDF->SetMCCacheStatus( false );
 
 		if( generatePDF != NULL ) delete generatePDF;

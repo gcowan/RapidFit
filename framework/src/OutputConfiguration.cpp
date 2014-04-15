@@ -21,6 +21,7 @@
 #include "ComponentPlotter.h"
 #include "ScanParam.h"
 #include "StringProcessing.h"
+#include "RapidFitRandom.h"
 //	System Headers
 #include <time.h>
 #include <stdlib.h>
@@ -343,9 +344,9 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 
 		//      These static functions will take the global Random function from ROOT if need be, but lets not force that issue and give it an already initialized generator
 		//      This, alas is a ROOT solution to a ROOT problem, and it creates a MESS that often is left to some code outside of ROOT to cleanup!
-		Total_BinnedData = ComponentPlotter::MergeBinnedData( all_datasets_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
+		Total_BinnedData = ComponentPlotter::MergeBinnedData( all_datasets_for_all_results, RapidFitRandom::GetRandomFunction() );
 
-		Total_Components = ComponentPlotter::MergeComponents( all_components_for_all_results, resultBottle->GetResultPDF(0)->GetRandomFunction() );
+		Total_Components = ComponentPlotter::MergeComponents( all_components_for_all_results, RapidFitRandom::GetRandomFunction() );
 
 		output_file->cd();
 		if( output_file->GetDirectory( "Total" ) == 0 ) output_file->mkdir( "Total" );
@@ -355,7 +356,7 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 
 		ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data",
 
-				resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i) );
+				resultBottle->GetResultDataSet(0)->GetBoundary(), RapidFitRandom::GetRandomFunction(), (*projection_i) );
 	}
 
 
@@ -373,11 +374,11 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 			finalPullEvals.push_back( this_bin );
 		}
 
-		TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_PullPlot", resultBottle->GetResultPDF(0)->GetRandomFunction() );
+		TGraphErrors* pullGraph = ComponentPlotter::PullPlot1D( finalPullEvals, Total_BinnedData, (*projection_i)->observableName, "_PullPlot", RapidFitRandom::GetRandomFunction() );
 		(void) pullGraph;
 
 		ComponentPlotter::OutputPlot( Total_BinnedData, Total_Components, (*projection_i)->observableName, "_All_Data_wPulls", resultBottle->GetResultDataSet(0)->GetBoundary(),
-				resultBottle->GetResultPDF(0)->GetRandomFunction(), (*projection_i), finalPullEvals );
+				RapidFitRandom::GetRandomFunction(), (*projection_i), finalPullEvals );
 	}
 
 	CompPlotter_config* datasets_config = new CompPlotter_config( *(*projection_i) );
@@ -395,12 +396,12 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 	datasets_config->LegendTextSize = (Size_t)0.02;
 
 	ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets",
-			resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config );
+			resultBottle->GetResultDataSet(0)->GetBoundary(), RapidFitRandom::GetRandomFunction(), datasets_config );
 
 	if( !finalPullEvals.empty() )
 	{
 		ComponentPlotter::OutputPlot( Total_BinnedData, allDataSubSets, (*projection_i)->observableName, "_All_SubSets_wPulls",
-				resultBottle->GetResultDataSet(0)->GetBoundary(), resultBottle->GetResultPDF(0)->GetRandomFunction(), datasets_config, finalPullEvals );
+				resultBottle->GetResultDataSet(0)->GetBoundary(), RapidFitRandom::GetRandomFunction(), datasets_config, finalPullEvals );
 	}
 
 	delete datasets_config;

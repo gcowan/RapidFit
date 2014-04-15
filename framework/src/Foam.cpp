@@ -17,6 +17,7 @@
 #include "PhaseSpaceBoundary.h"
 #include "ClassLookUp.h"
 #include "StringProcessing.h"
+#include "RapidFitRandom.h"
 //	System Headers
 #include <iostream>
 #include <cmath>
@@ -37,7 +38,7 @@ Foam::Foam( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) :
 	storedIntegrator(), discreteCombinations(), allNames(), discreteNames(), continuousNames(), discreteNames_ref(),
 	continuousNames_ref(), discreteValues(), minima(), ranges(), discreteNames_ref2(), continuousNames_ref2()
 {
-	rootRandom = InputPDF->GetRandomFunction();
+	rootRandom = RapidFitRandom::GetRandomFunction();
 
 	vector<string> constrainedObs = NewBoundary->GetAllNames();
 	vector<string> wantedObs = NewPDF->GetPrototypeDataPoint();
@@ -222,7 +223,7 @@ void Foam::Init()
 			TString Name = InputPDF->GetMCCacheNames()[combinationIndex];
 			TString RootName(Name); RootName.Append(".root");
 			TString FoamName("Foam_");FoamName+=combinationIndex;
-			rootRandom = InputPDF->GetRandomFunction();
+			rootRandom = RapidFitRandom::GetRandomFunction();
 			cout << "FOAM Cached, Re-Aquiring TFOAM TObject:\t" << Name << endl;
 
 			ifstream input_file;

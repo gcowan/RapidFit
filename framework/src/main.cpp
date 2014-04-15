@@ -48,6 +48,7 @@
 #include "RapidRun.h"
 #include "ResultFormatter.h"
 #include "MultiDimChi2.h"
+#include "RapidFitRandom.h"
 ///  System Headers
 #include <string>
 #include <vector>
@@ -1397,6 +1398,7 @@ int saveOneDataSet( RapidFitConfiguration* config )
 	}
 	return 0;
 }
+
 int ConfigureRapidFit( RapidFitConfiguration* config )
 {
 	//Load config file(s)
@@ -1448,6 +1450,8 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 	}
 
 	cout << "SEED being used is:\t" << config->xmlFile->GetSeed() << endl;
+
+	RapidFitRandom::SetRandomFunction( config->xmlFile->GetSeed() );
 
 	//	Command line arguments are passed and interpreted within the parser to override what is read from the XMLFile
 	if( config->parameterTemplateFlag )

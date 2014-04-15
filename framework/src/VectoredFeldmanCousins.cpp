@@ -3,6 +3,8 @@
 #include "ClassLookUp.h"
 #include "FitAssembler.h"
 #include "ParameterSet.h"
+#include "RapidFitRandom.h"
+#include <string>
 #include <iomanip>
 
 using namespace::std;
@@ -181,7 +183,7 @@ vector<IDataSet*> VectoredFeldmanCousins::GetNewDataSets( ParameterSet* input_pa
 		//vector<ParameterSet*> temp_vec( 1, input_params );
 		(*pdfdat_i)->SetPhysicsParameters( input_params );
 
-		TRandom3* new_rand = (*pdfdat_i)->GetPDF()->GetRandomFunction();
+		TRandom3* new_rand = RapidFitRandom::GetRandomFunction();
 
 		double num_wanted_events=-1;
 		if( sWeighted_study )
@@ -423,7 +425,7 @@ ParameterSet* VectoredFeldmanCousins::getParameterSet( ParameterSet* inputSet, R
 			ResultParameter* thisResult = inputResult->GetResultParameter( *param_i );
 			if( thisParameter->GetType() != "Fixed" && !thisResult->GetScanStatus() )
 			{
-				TRandom3* rand_gen = input_pdfsAndData[0]->GetPDF()->GetRandomFunction();
+				TRandom3* rand_gen = RapidFitRandom::GetRandomFunction();
 				double new_value = rand_gen->Gaus( thisResult->GetValue(), thisResult->GetError() );
 				thisParameter->SetBlindedValue( new_value );
 				thisParameter->SetStepSize( thisResult->GetError() );

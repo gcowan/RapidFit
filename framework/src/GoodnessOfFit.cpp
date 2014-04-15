@@ -112,7 +112,6 @@ namespace GoodnessOfFit
 			(*iter)->SetPhysicsParameters( parSetFromFit );
 			ulTime = static_cast<unsigned int>( time( NULL ));
 			pdf = (*iter)->GetPDF();
-			pdf->SetRandomFunction( (int)ulTime );
 			pdf->SetMCCacheStatus( false );
 
 			dataConfig = (*iter)->GetDataSetConfig();
@@ -153,7 +152,6 @@ namespace GoodnessOfFit
 
 			// First, generate some data from this PDF
 			pdfAndData->SetPhysicsParameters( parSet );
-			pdf->SetRandomFunction( (int)ulTime );
 			pdf->SetMCCacheStatus( false );
 			MemoryDataSet * subset = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, nData );
 			vector<IDataSet*> vectorData;
@@ -175,7 +173,6 @@ namespace GoodnessOfFit
 			}
 			// Generate large sample of MC
 			ulTime = static_cast<unsigned int>( time( NULL ));
-			pdf->SetRandomFunction( (int)ulTime );
 			pdf->SetMCCacheStatus( false );
 			MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
 

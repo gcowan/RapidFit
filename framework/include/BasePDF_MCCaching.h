@@ -83,9 +83,6 @@
 #ifndef BASE_MCCACHING_PDF_H
 #define BASE_MCCACHING_PDF_H
 
-	///	ROOT Headers
-#include "TRandom.h"
-#include "TRandom3.h"
 	///	RapidFit Headers
 #include "IPDF_MCCaching.h"
 #include "PhaseSpaceBoundary.h"
@@ -99,11 +96,11 @@
 #include <cmath>
 #include <pthread.h>
 
-	using namespace::std;
+using namespace::std;
 
-	class IPDF;
+class IPDF;
 
-	class BasePDF_MCCaching : public virtual IPDF_MCCaching
+class BasePDF_MCCaching : public virtual IPDF_MCCaching
 {
 	public:
 
@@ -151,31 +148,6 @@
 		vector<string> GetMCCacheNames() const;
 
 		/*!
-		 * @brief Start a new TRandom3 instance with a given seed value
-		 *
-		 * @param num   This is the new number to use as a seed for creating a new TRandom3 instance and delete the existing one
-		 *
-		 * @return Void
-		 */
-		void SetRandomFunction( int num );
-
-		/*!
-		 * @brief Replace TRandom3 instance with a new function
-		 *
-		 * @param Input This is the new TRandom3 function we want to associate with this PDF
-		 *
-		 * @return Void
-		 */
-		void SetRandomFunction( TRandom3* Input );
-
-		/*!
-		 * @brief Get the seed number used to initialise the random number gen
-		 *
-		 * @return Returns the number used as the seed of the TRandom3 instance
-		 */
-		int GetSeedNum() const;
-
-		/*!
 		 * @brief Remove the cached files
 		 *
 		 * This also Sets the cache validity as false
@@ -201,13 +173,6 @@
 		 * @return Void
 		 */
 		void AddCacheObject( string Name );
-
-		/*!
-		 * @brief Get the Random function stored in this PDF
-		 *
-		 * @return pointer to the TRandom3 instance inside the PDF
-		 */
-		TRandom3* GetRandomFunction() const;
 
 		void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary );
 
@@ -235,17 +200,6 @@
 		 * Does this PDF have an MC cache generator stored on disk, i.e. is there a TFoam object on disk
 		 */
 		bool hasCachedMCGenerator;
-
-		/*!
-		 * vector of a single TRandom3 object for this PDF, this allows us to have a reproducable result for a defined seed
-		 * the seed_function.empty() is used to see if this is defined, should probably check for NULL pointer, but oh well
-		 */
-		mutable TRandom3 * seed_function;
-
-		/*!
-		 * vector of single seed value used in the construction of the TRandom3, again should probably check for a null value, but oh well
-		 */
-		int seed_num;
 
 		/*!
 		 * Does this PDF control the on disk TFoam cache

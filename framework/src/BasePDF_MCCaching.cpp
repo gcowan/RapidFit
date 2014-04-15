@@ -7,8 +7,6 @@
  * @author Benjamin M Wynne bwynne@cern.ch
  * @author Robert Currie rcurrie@cern.ch
  */
-///	ROOT Headers
-#include "TRandom3.h"
 ///	RapidFit Headers
 #include "IPDF_MCCaching.h"
 #include "BasePDF_MCCaching.h"
@@ -26,13 +24,12 @@ using namespace::std;
 
 //Constructor
 BasePDF_MCCaching::BasePDF_MCCaching() : IPDF_MCCaching(),
-	cached_files(), hasCachedMCGenerator(false), seed_function(NULL), seed_num(0), do_i_control_the_cache(false)
+	cached_files(), hasCachedMCGenerator(false), do_i_control_the_cache(false)
 {
 }
 
 BasePDF_MCCaching::BasePDF_MCCaching( const BasePDF_MCCaching& input ) : IPDF_MCCaching(),
-	cached_files(input.cached_files), hasCachedMCGenerator(input.hasCachedMCGenerator), seed_function(input.seed_function),
-	seed_num(input.seed_num), do_i_control_the_cache(false)
+	cached_files(input.cached_files), hasCachedMCGenerator(input.hasCachedMCGenerator), do_i_control_the_cache(false)
 {
 }
 
@@ -40,35 +37,6 @@ BasePDF_MCCaching::BasePDF_MCCaching( const BasePDF_MCCaching& input ) : IPDF_MC
 BasePDF_MCCaching::~BasePDF_MCCaching()
 {
 	this->Remove_Cache();
-}
-
-//  Get a pointer to the seed function
-//  Using a pointer so we have one seed per normal study
-TRandom3 * BasePDF_MCCaching::GetRandomFunction() const
-{
-	if( seed_function == NULL ) seed_function = new TRandom3(0);
-	return seed_function;
-}
-
-//  Set the Random Generator to be some externally defined instance
-void BasePDF_MCCaching::SetRandomFunction( TRandom3 * new_function )
-{
-	if( seed_function != NULL ) delete seed_function;
-	seed_function = new TRandom3( *new_function );
-}
-
-//  Seed the Random Number Generator correctly
-void BasePDF_MCCaching::SetRandomFunction( int new_seed )
-{
-	seed_num = new_seed;
-	if( seed_function != NULL ) delete seed_function;
-	seed_function = new TRandom3( (unsigned)new_seed );
-}
-
-//  Return the numerical seed
-int BasePDF_MCCaching::GetSeedNum() const
-{
-	return seed_num;
 }
 
 //	Set the Status of a cache for the MC generator associated with this PDF

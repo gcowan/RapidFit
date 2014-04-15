@@ -15,7 +15,6 @@
 
 ///	ROOT Headers
 #include "TString.h"
-#include "TRandom3.h"
 ///	RapidFit Headers
 ///	System Headers
 #include <vector>
@@ -58,24 +57,6 @@ class IPDF_MCCaching
 
 		/*!
 		 * Interface Function:
-		 * Start a new TRandom3 instance with a given seed value
-		 */
-		virtual void SetRandomFunction( int ) = 0;
-
-		/*!
-		 * Interface Function:
-		 * Replace TRandom3 instance with a new function
-		 */
-		virtual void SetRandomFunction( TRandom3* ) = 0;
-
-		/*!
-		 * Interface Function:
-		 * Get the seed number used to initialise the random number gen
-		 */
-		virtual int GetSeedNum() const = 0;
-
-		/*!
-		 * Interface Function:
 		 * Remove the cached files
 		 */
 		virtual void Remove_Cache() = 0;
@@ -91,12 +72,6 @@ class IPDF_MCCaching
 		 * Add a virtual cache object
 		 */
 		virtual void AddCacheObject( string ) = 0;
-
-		/*!
-		 * Interface Function:
-		 * Get the Random function stored in this PDF
-		 */
-		virtual TRandom3* GetRandomFunction() const = 0;
 
 	protected:
 		/*!

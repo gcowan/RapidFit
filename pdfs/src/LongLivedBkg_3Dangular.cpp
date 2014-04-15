@@ -18,6 +18,7 @@
 #include "TAxis.h"
 #include "TH1.h"
 
+#include "RapidFitRandom.h"
 #include "StringProcessing.h"
 #include "TimeAccRes.h"
 
@@ -93,7 +94,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 		TString Name = histo->GetName();
 		TString Title = histo->GetTitle();
 		TString ext = "_";
-		ext+=this->GetRandomFunction()->Rndm();
+		ext+=RapidFitRandom::GetRandomFunction()->Rndm();
 		Name.Append(ext);
 		Title.Append(ext);
 

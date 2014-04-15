@@ -11,6 +11,7 @@
 //	RapidFit Headers
 #include "AcceptReject.h"
 #include "PhaseSpaceBoundary.h"
+#include "RapidFitRandom.h"
 //	System Headers
 #include <iostream>
 #include <math.h>
@@ -24,7 +25,7 @@ AcceptReject::AcceptReject( PhaseSpaceBoundary * NewBoundary, IPDF * NewPDF ) : 
 	generationBoundary(NewBoundary), dataNumber(0), newDataSet(), rootRandom(), moreThanMaximum(0.01), numberAttempts(0)
 {
 	newDataSet = new MemoryDataSet(generationBoundary);
-	rootRandom = NewPDF->GetRandomFunction();
+	rootRandom = RapidFitRandom::GetRandomFunction();
 }
 
 //Destructor

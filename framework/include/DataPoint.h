@@ -229,14 +229,37 @@ class DataPoint
 		 */
 		double GetEventWeight() const;
 
+		/*!
+		 * @breif This stores a double number which corresponds to a per-event NLL value
+		 *
+		 * @param input This is the initial NLL calculated by some PDF when performing a fit to data
+		 */
 		void SetInitialNLL( const double input );
 
+		/*!
+		 * @brief This Returns the double number which has been stored in this DataPoint corresponding to some initial NLL
+		 *
+		 * @return return some NLL value
+		 */
 		double GetInitialNLL() const;
 
+		/*!
+		 * @brief This returns a vector of values which have been temporarily stored within this DataPoint
+		 *
+		 * @return returns the internal vector of some some double values
+		 */
 		vector<double> GetPerEventData() const;
 
+		/*!
+		 * @brief This sets a vector internally in this datapoint to be equal to some input from a users PDF
+		 *
+		 * @warning This makes NO EFFORT TO CHEK whether the contents of the vector internally are empty are not or of any given size or type
+		 */
 		void SetPerEventData( const vector<double> input );
 
+		/*!
+		 * @brief This clears the vector of PerEvent Data values
+		 */
 		void ClearPerEventData();
 
 	private:

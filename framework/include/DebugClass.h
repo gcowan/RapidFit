@@ -28,7 +28,7 @@ class DebugClass
 
 		//	HelperFunctions within this Sentinel
 
-		static void SegFault();
+		static void SegFault() __attribute__ ((noreturn));
 
 		template<class T> static void Dump2File( const string fileName, const vector<T> objects );
 

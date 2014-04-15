@@ -34,7 +34,21 @@ class AngularAcceptance
 {
 	public:
 
-		// Constructors
+		/*!
+		  * @class AngularAcceptance
+		  *
+		  * @breif Constructor Function
+		  *
+		  * @param fileName Name of the file that contains the histogram to be used for angular Acceptance and the weights in a vector<double> TBranch in a TTree
+		  *
+		  * @param useHelicityBasis True: Look for the helicity Histogram object
+		  *                         False: Look for the transversity Histogram object
+		  *
+		  * @param IgnoreAcceptanceHisto if True the class will not attempt to open the acceptance Histogram for use in the numerator of the PDF
+		  *
+		  * @param quiet True: reduce the amount of cout stataments
+		  *              False: dump lots of info to cout
+		  */
 		AngularAcceptance( string fileName, bool useHelicityBasis, bool IgnoreAcceptanceHisto=false, bool quiet=false ) ;
 		~AngularAcceptance();
 		AngularAcceptance( const AngularAcceptance& );

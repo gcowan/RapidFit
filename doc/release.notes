@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2013/04/15 Rob Currie
+  - Moving RapidFit over to use a sentinel for Random number scope. This involved removing the Random functions from within a PDF and making a static sentinel to manage the TRandom3 object for RapidFit
+       This more than likely breaks any backwards compatibility with saved toy study numbers but makes the code much easier to read/understand and improves the randomness in a lot of areas of the code
+
 2013/04/11 Rob Currie
   - Fixing Tagging Calibrations for JpsiPhi, now both the Combined and 3fb calibrations converge in the full fit to data.
        These changes subtly move the results from the 1fb analysis but are compatible with published results and further reduce the small differences between Edinburgh, Heidelberg and Nikhef for the 1fb analysis.

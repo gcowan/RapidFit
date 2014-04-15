@@ -10,11 +10,11 @@ class AcceptanceSlice
 		/*!
 		 * @brief Constructor
 		 *
-		 * @param tl
+		 * @param tl Lower edge of the time Acceptance bin
 		 *
-		 * @param th
+		 * @param th Upper edge of the time Acceptance bin
 		 *
-		 * @param h
+		 * @param h Height of the time Acceptance bin
 		 *
 		 */
 		AcceptanceSlice( double tl, double th, double h ) : _tlow(tl), _thigh(th), _height(h) {}
@@ -25,20 +25,23 @@ class AcceptanceSlice
 		AcceptanceSlice( const AcceptanceSlice& input );
 
 		/*!
-		 * @brief
+		 * @brief Return the lower limit of the bin
 		 */
 		double tlow()   const { return _tlow ; }
 
 		/*!
-		 * @brief
+		 * @brief Return the upper limit of the bin
 		 */
 		double thigh()  const { return _thigh ; }
 
 		/*!
-		 * @brief
+		 * @brief Return the Height of the bin
 		 */
 		double height() const { return _height ; }
 
+		/*!
+		  * @brief Print the contents of the bin for debugging
+		  */
 		void Print() const { cout << "Min: " << _tlow << endl << "Max: " << _thigh << endl << "Height: " << _height << endl; }
 
 	private:

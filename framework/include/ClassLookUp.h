@@ -128,7 +128,14 @@ class ClassLookUp
 		 */
 		static void* getObject( string Name );
 
-		static IConstraint* CopyConstraint( IConstraint* );
+		/*!
+		 * @brief Performs a Copy of the Input Constraint object though the interface class
+		 *
+		 * @param Input  This is an input IConstraint of Discrete or Continuous type
+		 *
+		 * @return returns a new Constraint object
+		 */
+		static IConstraint* CopyConstraint( IConstraint* Input );
 };
 
 #endif
