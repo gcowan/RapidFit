@@ -146,6 +146,8 @@ string FitFunctionConfiguration::XML() const
 	if( testIntegrator == true ) xml << "True</SetIntegratorTest>" << endl;
 	if( testIntegrator == false ) xml << "False</SetIntegratorTest>" << endl;
 	if( !Strategy.empty() ) xml << "<Strategy>" << Strategy << "</Strategy>" << endl;
+	if( OffSetNLL == true ) xml << "<OffSetNLL>True</OffSetNLL>" << endl;
+	else xml << "<OffSetNLL>False</OffSetNLL>" << endl;
 	xml << "</FitFunction>" << endl;
 
 	return xml.str();

@@ -1,33 +1,39 @@
 // $Id: release.notes $
 
-2013/04/15 Rob Currie
+2014/04/23 Rob Currie
+  - Fixing Segfault in using compound CommonPDF objects in XML
+  - Adding OffSetNLL flat to FitFunction XML output
+  - Adding Print functionality to XMLTag object
+  - Adding some debug info and more output to RapidDiff
+
+2014/04/15 Rob Currie
   - Moving RapidFit over to use a sentinel for Random number scope. This involved removing the Random functions from within a PDF and making a static sentinel to manage the TRandom3 object for RapidFit
        This more than likely breaks any backwards compatibility with saved toy study numbers but makes the code much easier to read/understand and improves the randomness in a lot of areas of the code
 
-2013/04/11 Rob Currie
+2014/04/11 Rob Currie
   - Fixing Tagging Calibrations for JpsiPhi, now both the Combined and 3fb calibrations converge in the full fit to data.
        These changes subtly move the results from the 1fb analysis but are compatible with published results and further reduce the small differences between Edinburgh, Heidelberg and Nikhef for the 1fb analysis.
 
-2013/03/30 Rob Currie
+2014/03/30 Rob Currie
   - Adding new RapidDiff program which summarises the difference between 2 fits. It uses the RapidFit .root format and atm dumps the raw table of numbers and the latex version to the terminal
         I encourage that is people find this useful they hack at it as the program is very small making use of many functions within the utils codebase
   - Taking this opportunity I moved some functions out from the RapidPlot.C program to make the file easier to parse
 
-2013/03/20 Rob Currie
+2014/03/20 Rob Currie
   - Adding <RequiredParameterOrder> Tag to FitFunction, this allow you to order all or a subset of the Floated Parameters as they're exposed to Minuit
         This takes a string which is a list of parameternames as seen by Minuit which are separated by ':'
 
-2013/03/13 Rob Currie
+2014/03/13 Rob Currie
   - Changing the BasePDF to not be on by default in DebugClass::DebugThisClass... this just causes far too much verbosity
   - Adding the ability to combine OverrideXML with MultiXMLConfigReader
   - Moving internally used XMLTag constructor to be private
   - Adding RapidFit tutorial 3 which includes some information on useful code and some powerful lesser known features
 
-2013/03/12 Rob Currie
+2014/03/12 Rob Currie
   - Broken out the XMLConfigReader object because it annoyed me too much in it's current form
        This adds XMLObjectGenerator class which is full of static methods for generating common RapidFit objects from XML the XMLConfigReader should (ideally) do as little as possible with XML
 
-2013/03/10 Rob Currie
+2014/03/10 Rob Currie
   - Converting the DebugClass to be a Sentinel class which means that only static methods are exposed and the object can't be created/destroyed
        This removes the problems of passing the class around correctly everywhere to get Debugging output
   - This adds very little overhead when Debugging isn't being called (i.e. a few if( false ) evaluations ) usage hasn't changed from the command line
@@ -35,10 +41,10 @@
   - Changed PDFWithData to not use vectors... the class was half using them, half not, now it isn't and it's much, much easier to read
        This just required removing a lot of dead code around the creation of a vector of size 1 to construct PDFWithData objects
 
-2013/03/06 Rob Currie
+2014/03/06 Rob Currie
   - Fixing typo in MutliThreaded code and adding a new step to update the PhysicsParameters in cached PDFs
 
-2013/03/04 Rob Currie
+2014/03/04 Rob Currie
   - Doing some house cleaning
   - Removed PseudoObservable code... it was clear this was too complicated even if it ever worked
   - Removed all reference to these objects in DapaPoint and elsewhere in framework
@@ -49,15 +55,15 @@
   - Changing the default use case to NOT offset the NLL during fitting
   - Adding c++11 compile options to the Makefile
 
-2013/02/ Rob Currie
+2014/02/ Rob Currie
   - Adding CosSin functions and various bugfixes and improvements
 
-2013/02/12 Rob Currie
+2014/02/12 Rob Currie
   - Adding new MultiDimChi2 test into RapidFit
   - Adding minor bugfixes into code
   - 1D integrator does not appear to be working for me so I've temporarily replaced it with a 1D brute forcing method (I'll investigate more when I have time but for now this fix works as expected)
 
-2013/02/03 Rob Currie
+2014/02/03 Rob Currie
   - Fixing bugs in caching code for ComponentProjections
   - Fixing bugs in v6 and v7 PDFs which ONLY effects projections
   - Adding Print function to AngularAcceptance
@@ -65,7 +71,7 @@
   - Adding new TimeAccRes class to perform both time Acceptance and Resolution behind the users back through a sane interface
   - Modifying Exponential and LL_3Dangular to show the benefits of using this new TimeAccRes class
 
-2013/02/01 Rob Currie
+2014/02/01 Rob Currie
   - Fixing performance problems in ComponentProjections
        Caching PDF objects between MultiThreaded calls.
        This checks the PDF label to allow the user to trigger a change in the PDF used.

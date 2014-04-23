@@ -505,14 +505,16 @@ IPDF * XMLObjectGenerator::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* I
 	IPDF* returnable_NamedPDF=NULL;
 
 	vector< XMLTag* > pdfConfig = InputTag->GetChildren();
-	if( common != NULL )
+
+	if( overloadConfigurator != NULL )
 	{
-		vector<XMLTag*> optional = common->GetChildren();
+		vector<XMLTag*> optional = overloadConfigurator->GetChildren();
 		for( unsigned int i=0; i< optional.size(); ++i )
 		{
 			pdfConfig.push_back( optional[i] );
 		}
 	}
+
 	string name = InputTag->GetName();
 
 	if( name != "PDF" && name != "SumPDF" && name != "ProdPDF" && name != "NormalisedSumPDF" )
@@ -588,7 +590,7 @@ IPDF * XMLObjectGenerator::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* I
 		}
 		else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
 		{
-			IPDF* thisPDF = XMLObjectGenerator::GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, common, thisParameterSet, print );
+			IPDF* thisPDF = XMLObjectGenerator::GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, NULL, thisParameterSet, false );
 			configurator->AddDaughterPDF( thisPDF );
 			delete thisPDF;
 		}
@@ -598,6 +600,8 @@ IPDF * XMLObjectGenerator::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* I
 			exit(1);
 		}
 	}
+
+	cout << endl << endl << endl;
 
 	if( !configurator->empty() )
 	{
@@ -713,7 +717,7 @@ IPDF * XMLObjectGenerator::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		delete configurator;
 	}
 
-	IPDF* returnable_pdf = XMLObjectGenerator::GetNamedPDF( InputTag, InputBoundary, overloadConfigurator, common, thisParameterSet, false );
+	IPDF* returnable_pdf = XMLObjectGenerator::GetNamedPDF( InputTag, InputBoundary, overloadConfigurator, common, thisParameterSet );
 	cout << "XMLConfigReader:: Constructed " << returnable_pdf->GetLabel() << " PDF" << endl;
 
 	vector<string> haveNames = thisParameterSet->GetAllNames();

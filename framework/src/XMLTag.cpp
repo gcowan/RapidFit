@@ -42,6 +42,19 @@ XMLTag::~XMLTag()
 	}
 }
 
+void XMLTag::Print() const
+{
+	if( this->children.empty() && !this->GetValue().empty() ) cout << endl;
+	cout << "<" << this->GetName() << ">";
+	if( !this->GetValue().empty() ) cout << this->GetValue()[0];
+	//else cout << endl;
+	for( unsigned int i=0; i< this->children.size(); ++i )
+	{
+		this->children[i]->Print();
+	}
+	cout << "</" << this->GetName() << ">" << endl;
+}
+
 vector<pair<string,string> >* XMLTag::GetForbidden() const
 {
 	return forbidden;

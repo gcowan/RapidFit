@@ -1464,11 +1464,14 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 
 	//	Command line arguments override the config file
 
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting Minimiser Configuration from XML" << endl;
 	//	If the Minimiser wasn't defined at runtime consult the XML
 	if( !config->theMinimiserFlag )
 	{
 		config->theMinimiser = config->xmlFile->GetMinimiserConfiguration();
 	}
+
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting Contour Configuration from XML" << endl;
 	//	If the range for a Contour Scan was provided at runtime
 	if( config->defineContourFlag )
 	{
@@ -1479,6 +1482,7 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 			config->makeOutput->AddContour( config->Contour_X[i], config->Contour_Y[i] );
 		}
 	}
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting Scan Configuration from XML" << endl;
 	//	If the range for a Scan was provided at runtime
 	if( config->defineScanFlag )
 	{
@@ -1489,6 +1493,8 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 			config->makeOutput->AddScan( config->Scan_X[i] );
 		}
 	}
+
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting Function Configuration from XML" << endl;
 	//	The Minimisation Function hasn't been defined yet, request one from the XML
 	if( !config->theFunctionFlag )
 	{
@@ -1496,29 +1502,35 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 		// If weights were specified then we need to let the output plotting know
 		if( config->theFunction->GetWeightsWereUsed() ) config->makeOutput->SetWeightsWereUsed( config->theFunction->GetWeightName() ) ;
 	}
+
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting number of Repeats from XML" << endl;
 	//	The number of repeats hasn't been defined at runtime, look in the XML
 	if( !config->numberRepeatsFlag )
 	{
 		config->numberRepeats = config->xmlFile->GetNumberRepeats();
 	}
 
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting ParameterSet from XML" << endl;
 	//      No Parameter Template had been provided, look in the XML
 	if( !config->parameterTemplateFlag )
 	{
 		config->argumentParameterSet = config->xmlFile->GetFitParameters( config->CommandLineParamvector );
 	}
 
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting PDFWithData from XML" << endl;
 	//	PDFs used in fits and the dataset to be fit to hasn't been defined at the command line
 	if( config->pdfsAndData.size() == 0 )
 	{
 		//	Read in from XML
 		config->pdfsAndData = config->xmlFile->GetPDFsAndData();
+
 		//	If we are performing a scan we want to check for Data Generation instances and generate/store the data in a cache for future use
 		if( config->doLLscanFlag || ( config->doLLcontourFlag || config->doFC_Flag ) )
 		{
 			//	Loop over all ToFits containing data
 			for( unsigned int pdf_num=0; pdf_num< config->pdfsAndData.size(); ++pdf_num )
 			{
+				if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting DataSetConfiguration from XML" << endl;
 				//	Get the DataSet in this PDFWithData
 				DataSetConfiguration* DataConfig = config->pdfsAndData[pdf_num]->GetDataSetConfig();
 				//	Loop over all DataSetConfiguration objects existing within this PDFWithData
@@ -1534,6 +1546,7 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 		}
 	}
 
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting Pull Configuration from XML" << endl;
 	//	Do Pulls?
 	if( config->doPullsFlag )
 	{
@@ -1543,6 +1556,8 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 	{
 		config->doPullsFlag = config->makeOutput->DoPullPlots();
 	}
+
+	if( DebugClass::DebugThisClass( "main" ) ) cout << "Requesting Plotting Config from XML" << endl;
 	//	Do Plotting
 	if( config->doPlottingFlag )
 	{

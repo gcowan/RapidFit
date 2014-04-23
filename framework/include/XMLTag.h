@@ -130,6 +130,8 @@ class XMLTag
 		static double GetTF1Eval( const XMLTag* input );
 
 		vector<string> GetRAWValue() const;
+
+		void Print() const;
 	private:
 
 		/*!

@@ -7,6 +7,8 @@
 
 #include "TTree.h"
 #include "TString.h"
+#include "TH1D.h"
+#include "TCanvas.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -118,8 +120,27 @@ int main( int argc, char* argv[] )
 
 	cout << endl << endl;
 
-	return 0;
+	vector<double> nums1, nums2;
+	for( unsigned int i=0; i< common.size(); ++i )
+	{
+		nums1.push_back( CV_diffs[i] / Err_1[i] );
+		nums2.push_back( CV_diffs[i] / Err_2[i] );
+	}
 
+	TCanvas* c1 = new TCanvas( "c1", "c1" );
+	TH1* th1 = new TH1D( "th1", "th1", 10, -3, 3 );
+	for( unsigned int i=0; i< common.size(); ++i ) th1->Fill( nums1[i] );
+	th1->Draw();
+	c1->Update();
+	c1->Print("c1.pdf");
+	TCanvas* c2 = new TCanvas( "c2", "c2" );
+	TH1* th2 = new TH1D( "th2", "th2", 10, -3, 3 );
+	for( unsigned int i=0; i< common.size(); ++i ) th2->Fill( nums2[i] );
+	th2->Draw();
+	c2->Update();
+	c2->Print("c2.pdf");
+
+	return 0;
 }
 
 string buildLatexTable( vector<TString> params, vector<double> CV1, vector<double> Err1, vector<double> CV2, vector<double> Err2 )
@@ -137,6 +158,31 @@ string buildLatexTable( vector<TString> params, vector<double> CV1, vector<doubl
 	thisTable << "\\begin{document}" << endl;
 	thisTable << endl;
 	thisTable << "\\renewcommand{\\arraystretch}{1.25}" << endl;
+
+	thisTable << "\\begin{table}" << endl;
+	thisTable << "\\hspace*{-3.cm}\\begin{tabular}{@{}l|c|c|c|c|c|c@{}}" << endl;
+	thisTable << setw( 30 ) << "Parameter   & " << "   " << setw( 29 ) << " Result1    & " << setw( 29 ) << " Result2    & ";
+	thisTable << setw( 15 ) << " Diff in CV & " << setw( 10 ) << " Error Ratio & ";
+	thisTable << setw( 20 ) << " ( Diff in CV ) / Err1 & " << setw( 20 ) << " ( Diff in CV ) / Err2 " << " \\\\" << endl;
+	for( unsigned int i=0; i< params.size(); ++i )
+	{
+		double CVDiff = CV1[i]-CV2[i];
+		thisTable << setw( 30 ) << EdStyle::GetParamLatexName( params[i] ) << " & ";
+		thisTable << setw( 13 ) << CV1[i] << " $\\pm$ " << setw( 13 ) << Err1[i] << " & ";
+		thisTable << setw( 13 ) << CV2[i] << " $\\pm$ " << setw( 13 ) << Err2[i] << " & ";
+		thisTable << setw( 13 ) << CVDiff << " & ";
+		thisTable << setw( 13 ) << Err1[i] / Err2[i] << " & ";
+		if( fabs(CVDiff / Err1[i]) > 0.1 ) thisTable << setw( 20 ) << " \\textbf{" << CVDiff / Err1[i] << "} & ";
+		else thisTable << setw( 20 ) << CVDiff / Err1[i] << " & ";
+		if( fabs(CVDiff / Err2[i]) > 0.1 ) thisTable << setw( 20 ) << " \\textbf{" << CVDiff / Err2[i] << "} \\\\" << endl;
+		else thisTable << setw( 20 ) << CVDiff / Err2[i] << " \\\\" << endl;
+	}
+	thisTable << "\\end{tabular}" << endl;
+	thisTable << "\\end{table}" << endl;
+	thisTable << endl << endl;
+	thisTable << "\\clearage" << endl;
+	thisTable << endl << endl;
+
 	thisTable << "\\begin{table}" << endl;
 	thisTable << "\\hspace*{-3.cm}\\begin{tabular}{@{}l|c|c|c|c|c|c|c|c@{}}" << endl;
 	thisTable << setw( 30 ) << "Parameter   & " << "   " << setw( 29 ) << " Result1    & " << setw( 29 ) << " Result2    & ";

@@ -464,12 +464,16 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 
 	vector<DataPoint*> thesePoints;
 
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) ) cout << "RapidFitIntegrator:: Constructing Points" << endl;
+
 	for( unsigned int i=0; i< n_eval; ++i )
 	{
 		double thisPoint = minimum+step*((double)i);
 		thesePoints.push_back( new DataPoint( *NewDataPoint ) );
 		thesePoints[i]->SetObservable( doIntegrate[0], thisPoint, "noUnitsHere" );
 	}
+
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) ) cout << "RapidFitIntegrator:: Evaluating Points" << endl;
 
 	vector<double> evals;
 	for( unsigned int i=0; i< n_eval; ++i )
@@ -484,7 +488,11 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 		}
 	}
 
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) ) cout << "RapidFitIntegrator:: Sorting Results" << endl;
+
 	sort( evals.begin(), evals.end() );
+
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) ) cout << "RapidFitIntegrator:: Adding Results" << endl;
 
 	double output=0.;
 	for( unsigned int i=0; i< evals.size(); ++i )
@@ -503,6 +511,8 @@ double RapidFitIntegrator::OneDimentionIntegral( IPDF* functionToWrap, Integrato
 
 	//cout << "here3" << endl;
 	delete quickFunction;
+
+	if( DebugClass::DebugThisClass( "RapidFitIntegrator" ) ) cout << "RapidFitIntegrator:: Returning Integral" << endl;
 
 	return output;
 }

@@ -43,22 +43,32 @@ NormalisedSumPDF::NormalisedSumPDF( PDFConfigurator* config ) : BasePDF(), proto
 	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL)
 {
 
-	if( config->GetFractionNames().size() != 1 )
+	vector<string> FractionNames = StringProcessing::CombineUniques( config->GetFractionNames(), vector<string>() );
+
+	if( FractionNames.size() != 1 )
 	{
 		cerr << "NormalisedSumPDF requires ONLY 1 Fraction" << endl;
+		for( unsigned int i=0; i< FractionNames.size(); ++i )
+		{
+			cerr << i << " :\t" << FractionNames[i] << endl;
+		}
 		exit(-564893);
 	}
 
 	if( config->GetDaughterPDFs().size() != 2 )
 	{
 		cerr << "NormalisedSumPDF requires ONLY 2 daughter PDFs" << endl;
+		for( unsigned int i=0; i< config->GetDaughterPDFs().size(); ++i )
+		{
+			cout << config->GetDaughterPDFs()[i]->GetName() << endl;
+		}
 		exit(-54263);
 	}
 	else
 	{
 		firstPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[0] );
 		secondPDF = ClassLookUp::CopyPDF( config->GetDaughterPDFs()[1] );
-		fractionName = config->getName( config->GetFractionNames()[0] );
+		fractionName = config->getName( FractionNames[0] );
 		if( config->GetPhaseSpaceBoundary() != NULL ) integrationBoundary = new PhaseSpaceBoundary( *(config->GetPhaseSpaceBoundary()) );
 	}
 
