@@ -37,9 +37,9 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 	gSystem->cd( "MatrixPlots" );
 
 	gStyle->SetPalette(1);
-	if( StringOperations::VectorContains( other_params, "--noLegend" ) == -1 )
+	if( StringOperations::VectorContains( other_params, "--Legend" ) != -1 )
 	{
-		gStyle->SetPadRightMargin( (Float_t)0.2375 );
+		gStyle->SetPadRightMargin( (Float_t)0.25 );
 	}
 	else
 	{
@@ -100,7 +100,7 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 				matrixPlot->SetTitle("Correlation Matrix");
 				c1->SetTitle("Correlation Matrix");
 
-				if( StringOperations::VectorContains( other_params, "--noLegend" ) != -1 )
+				if( StringOperations::VectorContains( other_params, "--Legend" ) == -1 )
 				{
 					for( unsigned int k=0; k< thisNames->size(); ++k )
 					{
@@ -126,7 +126,7 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 					thisLegend->Draw("SAME");
 				}
 
-				if( StringOperations::VectorContains( other_params, "--noLegend" ) != -1 )
+				if( StringOperations::VectorContains( other_params, "--Legend" ) == -1 )
 				{
 					matrixPlot->GetXaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
 					matrixPlot->GetYaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
