@@ -224,19 +224,19 @@ double ProdPDF::Evaluate( DataPoint * NewDataPoint )
 	double termTwo = secondPDF->Evaluate( NewDataPoint );
 
 	double prod = termOne * termTwo;
-/*
-	if( std::isnan(prod) || prod <= 0. )
-	{
-		PDF_THREAD_LOCK
+	/*
+	   if( std::isnan(prod) || prod <= 0. )
+	   {
+	   PDF_THREAD_LOCK
 
-		cout << "ProdPDF::Evaluate\t\t" << termOne << "\tx\t" << termTwo << endl;
+	   cout << "ProdPDF::Evaluate\t\t" << termOne << "\tx\t" << termTwo << endl;
 
-		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
+	   cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
-		PDF_THREAD_UNLOCK
-		throw(-653102);
-	}
-*/
+	   PDF_THREAD_UNLOCK
+	   throw(-653102);
+	   }
+	 */
 	return prod;
 }
 
@@ -248,19 +248,19 @@ double ProdPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 
 	double prod = termOne * termTwo;
 
-/*
-	if( std::isnan(prod) || prod <= 0. )
-	{
-		PDF_THREAD_LOCK
+	/*
+	   if( std::isnan(prod) || prod <= 0. )
+	   {
+	   PDF_THREAD_LOCK
 
-		cout << "ProdPDF::EvaluateForNumerical\t\t" << termOne << "\tx\t" << termTwo << endl;
+	   cout << "ProdPDF::EvaluateForNumerical\t\t" << termOne << "\tx\t" << termTwo << endl;
 
-		cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
+	   cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
 
-		PDF_THREAD_UNLOCK
-		throw(-653102);
-	}
-*/
+	   PDF_THREAD_UNLOCK
+	   throw(-653102);
+	   }
+	 */
 	return prod;
 }
 
@@ -425,5 +425,13 @@ string ProdPDF::GetComponentName( ComponentRef* componentIndexObj )
 
 	}
 	return "Invalid-Prob";
+}
+
+vector<IPDF*> ProdPDF::GetChildren() const
+{
+	vector<IPDF*> thisVec;
+	thisVec.push_back( firstPDF );
+	thisVec.push_back( secondPDF );
+	return thisVec;
 }
 

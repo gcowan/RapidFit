@@ -72,3 +72,25 @@ size_t ObservableRef::GetExternalID() const
 	return externID;
 }
 
+void ObservableRef::SetIndexMap( const size_t thisID, const int index ) const
+{
+	DiscreteIndexMap.insert( pair<size_t,int>(thisID, index) );
+}
+
+bool ObservableRef::FindIndexID( const size_t thisID ) const
+{
+	return (DiscreteIndexMap.find( thisID ) != DiscreteIndexMap.end() );
+}
+
+int ObservableRef::GetIndexMap( const size_t thisID ) const
+{
+	if( this->FindIndexID( thisID ) )
+	{
+		return DiscreteIndexMap.at( thisID );
+	}
+	else
+	{
+		return -1;
+	}	
+}
+

@@ -156,6 +156,10 @@ class BasePDF_Framework : public virtual IPDF_Framework
 
 		void ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary );
 
+		virtual PhaseSpaceBoundary* GetPhaseSpace() const;
+
+		virtual vector<IPDF*> GetChildren() const;
+
 	protected:
 
 		/*!

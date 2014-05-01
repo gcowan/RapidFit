@@ -154,3 +154,13 @@ void BasePDF_Framework::ChangePhaseSpace( PhaseSpaceBoundary * InputBoundary )
         return;
 }
 
+PhaseSpaceBoundary* BasePDF_Framework::GetPhaseSpace() const
+{
+	return NULL;
+}
+
+vector<IPDF*> BasePDF_Framework::GetChildren() const
+{
+	return vector<IPDF*>();
+}
+

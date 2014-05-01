@@ -23,12 +23,15 @@
 using namespace::std;
 
 //	Required for Sorting
-DataPoint::DataPoint() : allObservables(), allNames(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex()
+DataPoint::DataPoint() : allObservables(), allNames(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1),
+	WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex(), DiscreteIndexMap()
 {
 }
 
 //Constructor with correct arguments
-DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), myPhaseSpaceBoundary(NULL), thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ), PerEventData(), nameIndex()
+DataPoint::DataPoint( vector<string> NewNames ) : allObservables(), allNames(), myPhaseSpaceBoundary(NULL),
+	thisDiscreteIndex(-1), WeightValue(1.), storedID(0), initialNLL( numeric_limits<double>::quiet_NaN() ),
+	PerEventData(), nameIndex(), DiscreteIndexMap()
 {
 	allObservables.reserve( NewNames.size() );
 	//Populate the map
@@ -66,13 +69,15 @@ DataPoint& DataPoint::operator=( const DataPoint& NewPoint )
 		{
 			this->allObservables.push_back( Observable( (NewPoint.allObservables[i]) ) );
 		}
+		this->DiscreteIndexMap = NewPoint.DiscreteIndexMap;
 	}
 	return *(this);
 }
 
 DataPoint::DataPoint( const DataPoint& input ) :
 	allObservables(), allNames(input.allNames), myPhaseSpaceBoundary(input.myPhaseSpaceBoundary),
-	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID), initialNLL( input.initialNLL ), PerEventData(input.PerEventData), nameIndex()
+	thisDiscreteIndex(input.thisDiscreteIndex), WeightValue(input.WeightValue), storedID(input.storedID),
+	initialNLL( input.initialNLL ), PerEventData(input.PerEventData), nameIndex(), DiscreteIndexMap(input.DiscreteIndexMap)
 {
 	for( unsigned int i=0; i< input.allObservables.size(); ++i )
 	{
@@ -327,5 +332,32 @@ void DataPoint::SetPerEventData( const vector<double> input )
 void DataPoint::ClearPerEventData()
 {
 	PerEventData.clear();
+}
+
+void DataPoint::SetDiscreteIndexIDMap( size_t thisID, int index )
+{
+	DiscreteIndexMap.insert( pair<size_t,int>(thisID, index) );
+}
+
+bool DataPoint::FindDiscreteIndexID( size_t thisID )
+{
+	return (DiscreteIndexMap.find( thisID ) != DiscreteIndexMap.end() );
+}
+
+int DataPoint::GetDiscreteIndexMap( size_t thisID )
+{
+	if( this->FindDiscreteIndexID( thisID ) )
+	{
+		return DiscreteIndexMap.at( thisID );
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+void DataPoint::ClearDiscreteIndexMap()
+{
+	DiscreteIndexMap.clear();
 }
 

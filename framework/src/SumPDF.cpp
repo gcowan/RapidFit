@@ -422,3 +422,11 @@ string SumPDF::GetComponentName( ComponentRef* componentIndexObj )
 	return "Invalid-Sum";
 }
 
+vector<IPDF*> SumPDF::GetChildren() const
+{
+	vector<IPDF*> thisVec;
+	thisVec.push_back( firstPDF );
+	thisVec.push_back( secondPDF );
+	return thisVec;
+}
+

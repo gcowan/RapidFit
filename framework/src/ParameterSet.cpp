@@ -8,6 +8,7 @@
   */
 
 //	RapidFit Headers
+#include "RapidFitRandom.h"
 #include "StringProcessing.h"
 #include "ObservableRef.h"
 #include "ParameterSet.h"
@@ -89,7 +90,7 @@ ParameterSet::ParameterSet( const ParameterSet& input ) :
 		else allParameters.push_back( NULL );
 	}
 
-	uniqueID = reinterpret_cast<size_t>(this)+1;
+	uniqueID = input.uniqueID;//reinterpret_cast<size_t>(this)+1;
 }
 
 ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
@@ -108,7 +109,7 @@ ParameterSet& ParameterSet::operator= ( const ParameterSet& input )
 		this->allNames = input.allNames;
 		this->allInternalNames = input.allInternalNames;
 		this->allForeignNames = input.allForeignNames;
-		this->uniqueID = reinterpret_cast<size_t>(this)+1;
+		this->uniqueID = input.uniqueID;//reinterpret_cast<size_t>(this)+1;
 	}
 	return *this;
 }
@@ -358,7 +359,9 @@ bool ParameterSet::AddPhysicsParameter( const PhysicsParameter* NewParameter, bo
 		allInternalNames.push_back( allNames[i] );
 		allForeignNames.push_back( allNames[i] );
 	}
-	++uniqueID;
+                  double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+                  int largeRandomOffSet = (int) largeRandomNumber;
+                uniqueID+=(unsigned)largeRandomOffSet;
 	return true;
 }
 
@@ -393,7 +396,9 @@ bool ParameterSet::AddPhysicsParameters( const ParameterSet * NewParameterSet, b
 		allInternalNames.push_back( ObservableRef(allNames[i]) );
 		allForeignNames.push_back( ObservableRef(allNames[i]) );
 	}
-	++uniqueID;
+                  double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+                  int largeRandomOffSet = (int) largeRandomNumber;
+                uniqueID+=(unsigned)largeRandomOffSet;
 	return true;
 }
 
@@ -482,7 +487,9 @@ void ParameterSet::SetUniqueID( size_t input )
 
 void ParameterSet::FloatedFirst( vector<string> RequiredFloatedSort )
 {
-	++uniqueID;
+                  double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+                  int largeRandomOffSet = (int) largeRandomNumber;
+                uniqueID+=(unsigned)largeRandomOffSet;
 	vector<string> floated;
 
 	if( RequiredFloatedSort.empty() )

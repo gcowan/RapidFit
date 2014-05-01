@@ -17,6 +17,8 @@
 ///	System Headers
 #include <vector>
 #include <string>
+#include <cstring>
+#include <map>
 
 using namespace::std;
 
@@ -213,6 +215,11 @@ class DataPoint
 
 		size_t GetDiscreteIndexID() const;
 
+		void SetDiscreteIndexIDMap( size_t thisID, int index );
+		bool FindDiscreteIndexID( size_t thisID );
+		int GetDiscreteIndexMap( size_t thisID );
+		void ClearDiscreteIndexMap();
+
 		/*!
 		 * @brief Sets the even weight to be used for fitting/projecting etc.
 		 *
@@ -297,6 +304,8 @@ class DataPoint
 		double WeightValue;
 
 		mutable int nameIndex;
+
+		map< size_t, int > DiscreteIndexMap;
 };
 
 #endif

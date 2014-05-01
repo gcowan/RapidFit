@@ -127,6 +127,17 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 
 		IFitFunction* theFunction = FunctionConfig->GetFitFunction();
+
+		vector<IDataSet*> allDataSets = Bottle->GetAllDataSets();
+		for( unsigned int i=0; i< allDataSets.size(); ++i )
+		{
+			unsigned int num= (unsigned)allDataSets[i]->GetDataNumber();
+			for( unsigned int j=0; j< num; ++j )
+			{
+				allDataSets[i]->GetDataPoint( (int)j )->ClearDiscreteIndexMap();
+			}
+		}
+
 		theFunction->SetPhysicsBottle(Bottle);
 
 		if( DebugClass::DebugThisClass( "FitAssembler" ) )

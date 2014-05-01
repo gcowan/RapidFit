@@ -65,17 +65,20 @@ class PhaseSpaceBoundary
 
 		size_t GetID() const;
 
+		void ClearDiscreteCombinations();
+
 	private:
 		PhaseSpaceBoundary& operator=(const PhaseSpaceBoundary&);
 		vector< IConstraint* > allConstraints;
 		vector<string> allNames;
+
 		mutable int DiscreteCombinationNumber;
+		mutable size_t storedCombinationNumberID;
 
 		mutable size_t uniqueID;
 
 		mutable vector<DataPoint*> StoredCombinations;
 		mutable size_t storedCombinationID;
-
 };
 
 #endif

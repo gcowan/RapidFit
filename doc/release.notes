@@ -1,5 +1,15 @@
 // $Id: release.notes $
 
+2014/04/26 Rob Currie
+  - This represents a change in methodology of how some of the internals of RapidFit are now handled
+          The UniqueID of a PhaseSpaceBounday and a ParameterSet instances is now copied as part of the copy and = operator functions
+          The UniqueID is also incremented using a random number between 0 and 1E10 this makes the possibility of 2 objects of the same type colliding mathematically very small but non-zero
+       The advantage of this is that fits with large numbers of unique ID-s O(1k) will now run as expected, albeit with a large-ish memory overhead +O(200<Mb)
+       This memory overhead was always present in RapidFit by design but is now better used and cleared when not needed
+  - This makes several fits much, much faster in RapidFit at the cost of memory usage increasing (marginally for most cases but a LOT for )
+  - I've also added new functions to access internal objects and all children of highly derrived PDFs
+       We still don't have a NormalisedSumPDF for >2 children but we have everything in place to construct one
+
 2014/04/23 Rob Currie
   - Fixing Segfault in using compound CommonPDF objects in XML
   - Adding OffSetNLL flat to FitFunction XML output

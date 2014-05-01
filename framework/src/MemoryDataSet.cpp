@@ -65,16 +65,6 @@ MemoryDataSet::MemoryDataSet( PhaseSpaceBoundary* NewBoundary ) :
 MemoryDataSet::~MemoryDataSet()
 {
 	if( dataBoundary != NULL ) delete dataBoundary;
-
-	/*	if( canDelete )
-		{
-		while( !allData.empty() )
-		{
-		if( allData.back() != NULL ) delete allData.back();
-		allData.pop_back();
-		}
-		}
-	 */
 }
 
 //Add a data point to the set
@@ -377,7 +367,7 @@ void MemoryDataSet::Print()
 		err = sqrt(err);
 		//err = sqrt( avr_sq - avr*avr );
 		cout << "DataSet contains a total of:     " << total << " ± " << err << "     SIGNAL events.(" << allData.size() << " total). In " << this->GetBoundary()->GetNumberCombinations() << " Discrete DataSets." << endl;
-		if( this->GetBoundary()->GetNumberCombinations() > 1 )
+		if( this->GetBoundary()->GetNumberCombinations() > 1 && this->GetBoundary()->GetNumberCombinations() < 20 )
 		{
 			vector<DataPoint*> combinations = this->GetBoundary()->GetDiscreteCombinations();
 			for( unsigned int i=0; i< combinations.size(); ++i )
@@ -411,7 +401,7 @@ void MemoryDataSet::Print()
 	else
 	{
 		cout << "DataSet contains a total of:     " << allData.size() << "     events. In " << this->GetBoundary()->GetNumberCombinations() << " Discrete DataSets." << endl;
-		if( this->GetBoundary()->GetNumberCombinations() > 1 )
+		if( this->GetBoundary()->GetNumberCombinations() > 1 && this->GetBoundary()->GetNumberCombinations() < 20 )
 		{
 			vector<DataPoint*> combinations = this->GetBoundary()->GetDiscreteCombinations();
 			for( unsigned int i=0; i< combinations.size(); ++i )

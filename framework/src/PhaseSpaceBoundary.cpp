@@ -15,6 +15,7 @@
 #include "ObservableDiscreteConstraint.h"
 #include "ObservableRef.h"
 #include "ClassLookUp.h"
+#include "RapidFitRandom.h"
 //	System Headers
 #include <sstream>
 #include <iostream>
@@ -26,7 +27,8 @@
 
 //Constructor with correct arguments
 PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
-	allConstraints(), allNames(), DiscreteCombinationNumber(-1), uniqueID(0), storedCombinationID(9999), StoredCombinations()
+	allConstraints(), allNames(), DiscreteCombinationNumber(-1), uniqueID(0), storedCombinationID(9999), StoredCombinations(),
+	storedCombinationNumberID(9999)
 {
 	allConstraints.reserve(NewNames.size());
 	//Populate the map
@@ -49,7 +51,8 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const vector<string> NewNames ) :
 }
 
 PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) :
-	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber), uniqueID(0), StoredCombinations(), storedCombinationID(0)
+	allConstraints(), allNames( NewBoundary.allNames ), DiscreteCombinationNumber(NewBoundary.DiscreteCombinationNumber),
+	uniqueID(0), StoredCombinations(), storedCombinationID(0), storedCombinationNumberID(0)
 {
 	if( DebugClass::DebugThisClass( "PhaseSpaceBoundary" ) && !DebugClass::GetClassNames().empty() ) cout << "PhaseSpaceBoundary:: Copying all Constraints" << endl;
 	for( unsigned int i=0; i< allNames.size(); ++i )
@@ -65,19 +68,38 @@ PhaseSpaceBoundary::PhaseSpaceBoundary( const PhaseSpaceBoundary& NewBoundary ) 
 		}
 	}
 
-	uniqueID = reinterpret_cast<size_t>(this)+1;
+	uniqueID = NewBoundary.uniqueID; //reinterpret_cast<size_t>(this)+1;
 
-	storedCombinationID = 0;
+	for( unsigned int i=0; i< NewBoundary.StoredCombinations.size(); ++i )
+	{
+		if( NewBoundary.StoredCombinations.at(i) != NULL )
+		{
+			StoredCombinations.push_back( new DataPoint( *(NewBoundary.StoredCombinations.at(i)) ) );
+		}
+		else
+		{
+			StoredCombinations.push_back( NULL );
+		}
+	}
+
+	storedCombinationID = NewBoundary.storedCombinationID;
+	storedCombinationNumberID = NewBoundary.storedCombinationNumberID;
 }
 
 //Destructor
 PhaseSpaceBoundary::~PhaseSpaceBoundary()
 {
+	this->ClearDiscreteCombinations();
+}
+
+void PhaseSpaceBoundary::ClearDiscreteCombinations()
+{
+	storedCombinationID = 0;
 	while( !StoredCombinations.empty() )
-	{
-		if( StoredCombinations.back() != NULL ) delete StoredCombinations.back();
-		StoredCombinations.pop_back();
-	}
+        {
+                if( StoredCombinations.back() != NULL ) delete StoredCombinations.back();
+                StoredCombinations.pop_back();
+        }
 }
 
 //Return the names of all bounds stored
@@ -174,7 +196,9 @@ void PhaseSpaceBoundary::RemoveConstraint( string Name )
 		allNames.erase( remove_name );
 		if( *remove_const != NULL ) delete *remove_const;
 		allConstraints.erase( remove_const );
-		++uniqueID;
+		double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+		int largeRandomOffSet = (int) largeRandomNumber;
+		uniqueID+=(unsigned)largeRandomOffSet;
 	}
 }
 
@@ -239,7 +263,9 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 		return true;
 	}
 
-	++uniqueID;
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+	int largeRandomOffSet = (int) largeRandomNumber;
+	uniqueID+=(unsigned)largeRandomOffSet;
 }
 
 //Initialise bound
@@ -248,7 +274,9 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, double Minimum, double Maxi
 	ObservableContinuousConstraint * newConstraint = new ObservableContinuousConstraint( Name, Minimum, Maximum, Unit );
 	bool returnValue = this->SetConstraint( Name, newConstraint );
 	delete newConstraint;
-	++uniqueID;
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+	int largeRandomOffSet = (int) largeRandomNumber;
+	uniqueID+=(unsigned)largeRandomOffSet;
 	return returnValue;
 }
 
@@ -257,7 +285,9 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, vector<double> Values, stri
 	ObservableDiscreteConstraint * newConstraint = new ObservableDiscreteConstraint( Name, Values, Unit );
 	bool returnValue = this->SetConstraint( Name, newConstraint );
 	delete newConstraint;
-	++uniqueID;
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+	int largeRandomOffSet = (int) largeRandomNumber;
+	uniqueID+=(unsigned)largeRandomOffSet;
 	return returnValue;
 }
 
@@ -279,7 +309,9 @@ void PhaseSpaceBoundary::AddConstraint( string Name, IConstraint* NewConstraint,
 		if( overwrite ) this->SetConstraint( Name, NewConstraint );
 	}
 
-	++uniqueID;
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+	int largeRandomOffSet = (int) largeRandomNumber;
+	uniqueID+=(unsigned)largeRandomOffSet;
 }
 
 //Returns whether a point is within the boundary
@@ -467,13 +499,13 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 {
 	(void) silence;
 	//	Exit on simple case
-	int thisIndex = Input->GetDiscreteIndex();
-	size_t thisID = Input->GetDiscreteIndexID();
-	if( thisIndex != -1 && thisID == uniqueID ) return (unsigned)thisIndex;
+	int thisIndex = Input->GetDiscreteIndexMap( uniqueID );
+	bool IDFound = Input->FindDiscreteIndexID( uniqueID );
+	if( thisIndex != -1 && IDFound ) return (unsigned)thisIndex;
 
 	if( this->GetDiscreteNames().empty() || (this->GetDiscreteNames().size() == 1) )
 	{
-		Input->SetDiscreteIndex( 0 );
+		Input->SetDiscreteIndexIDMap( uniqueID, 0 );
 		return 0;
 	}
 
@@ -510,6 +542,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	bool match=true;
 	double wanted_val=0., this_val=0.;
 	string thisName;
+
 	//	Loop over all possible combinations
 	for( int index=0 ; comb_i != end_comb_i; ++comb_i, ++index )
 	{
@@ -542,18 +575,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		}
 	}
 
-	//if( this->GetConstraint(this->GetDiscreteNames()[0])->GetValues().size() > 1 )
-	//{
-	//	cout << "This Index is: " << thisIndex << endl;
-	//	//exit(-520);
-	//}
-
-	//	Destory temporary objects
-	/*while	allCombinations.empty() )
-	  {
-	  if( allCombinations.back() != NULL ) delete allCombinations.back();
-	  allCombinations.pop_back();
-	  }*/
+	//this->ClearDiscreteCombinations();
 
 	//	Check for error
 	if( thisIndex == -1 )
@@ -565,20 +587,18 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		cerr << "This is a SERIOUS MISCONFIGURATION!!! Exiting :(" << endl;
 		Input->Print();
 		this->Print();
-		//exit(-99865);
 		DebugClass::SegFault();
 	}
 
 	//	Store and return the lookup of the DataPoint's index
-	Input->SetDiscreteIndex( thisIndex );
-	Input->SetDiscreteIndexID( uniqueID );
+	Input->SetDiscreteIndexIDMap( uniqueID, thisIndex );
 	return (unsigned)thisIndex;
 }
 
 
 int PhaseSpaceBoundary::GetNumberCombinations() const
 {
-	if( DiscreteCombinationNumber != -1 ) return DiscreteCombinationNumber;
+	if( DiscreteCombinationNumber != -1 && storedCombinationNumberID == uniqueID ) return DiscreteCombinationNumber;
 
 	vector<DataPoint*> thisMany = this->GetDiscreteCombinations();
 
@@ -597,6 +617,7 @@ int PhaseSpaceBoundary::GetNumberCombinations() const
 		  }*/
 	}
 
+	storedCombinationNumberID = uniqueID;
 	return DiscreteCombinationNumber;
 }
 

@@ -56,11 +56,11 @@ FitFunction::~FitFunction()
 	}
 	if( fit_thread_data != NULL ) delete [] fit_thread_data;
 	//if( allData != NULL ) delete allData;
-	while( !StoredBoundary.empty() )
-	{
-		if( StoredBoundary.back() != NULL ) delete StoredBoundary.back();
-		StoredBoundary.pop_back();
-	}
+	/*while( !StoredBoundary.empty() )
+	  {
+	  if( StoredBoundary.back() != NULL ) delete StoredBoundary.back();
+	  StoredBoundary.pop_back();
+	  }*/
 	while( !stored_pdfs.empty() )
 	{
 		if( stored_pdfs.back() != NULL ) delete stored_pdfs.back();
@@ -198,11 +198,11 @@ void FitFunction::SetPhysicsBottle( const PhysicsBottle * NewBottle )
 			stored_datasets.push_back( sets );
 			for( int i=0; i< Threads; ++i )
 			{
-				if( DebugClass::DebugThisClass( "FitFunction" ) )
-				{
-					cout << "FitFunction: Cloning PhaseSpaceBoundary" << endl;
-				}
-				StoredBoundary.push_back( new PhaseSpaceBoundary( *(NewBottle->GetResultDataSet(resultIndex)->GetBoundary()) ) );
+				/*if( DebugClass::DebugThisClass( "FitFunction" ) )
+				  {
+				  cout << "FitFunction: Cloning PhaseSpaceBoundary" << endl;
+				  }*/
+				StoredBoundary.push_back( NewBottle->GetResultDataSet(resultIndex)->GetBoundary() );
 				if( DebugClass::DebugThisClass( "FitFunction" ) )
 				{
 					cout << "FitFunction: CopyingPdf " << NewBottle->GetResultPDF( resultIndex )->GetLabel() << endl;
@@ -296,6 +296,8 @@ double FitFunction::Evaluate()
 			//cout << "Eval Set: " << allData->GetResultDataSet( resultIndex ) << "\t" << resultIndex << endl;
 			values.push_back( this->EvaluateDataSet( allData->GetResultPDF( resultIndex ), allData->GetResultDataSet( resultIndex ), resultIndex ) );
 			//cout << "Result: " << temp << endl;
+
+			ClearPhaseSpaceCaches( allData->GetResultDataSet( resultIndex ) );
 		}
 
 		if( fabs(values.back()) >= DBL_MAX )
@@ -479,5 +481,31 @@ void FitFunction::SetOffSetNLL( const bool Input )
 bool FitFunction::GetOffSetNLL() const
 {
 	return OffSetNLL;
+}
+
+void FitFunction::ClearPhaseSpaceCaches( IDataSet* thisDataSet )
+{
+	for( unsigned int i=0; i< stored_pdfs.size(); ++i )
+	{
+		ClearPDF( stored_pdfs[i] );
+	}
+	for( unsigned int i=0; i< StoredBoundary.size(); ++i  )
+	{
+		StoredBoundary[i]->ClearDiscreteCombinations();
+	}
+	thisDataSet->GetBoundary()->ClearDiscreteCombinations();
+}
+
+void FitFunction::ClearPDF( IPDF* thisPDF )
+{
+	if( thisPDF->GetPhaseSpace() != NULL )
+	{
+		thisPDF->GetPhaseSpace()->ClearDiscreteCombinations();
+	}
+	vector<IPDF*> children = thisPDF->GetChildren();
+	for( unsigned int i=0; i< children.size(); ++i )
+	{
+		ClearPDF( children[i] );
+	}
 }
 

@@ -29,7 +29,7 @@ using namespace::std;
 BasePDF::BasePDF() : BasePDF_Framework( this ), BasePDF_MCCaching(),
 	numericalNormalisation(false), allParameters( vector<string>() ), allObservables(), doNotIntegrateList(), observableDistNames(), observableDistributions(),
 	component_list(), requiresBoundary(false), cachingEnabled( true ), haveTestedIntegral( false ), discrete_Normalisation( false ), DiscreteCaches(new vector<double>()),
-	debug_mutex(NULL), can_remove_mutex(true), fixed_checked(false), isFixed(false), fixedID(0), _basePDFComponentStatus(false)
+	debug_mutex(NULL), can_remove_mutex(true), fixed_checked(false), isFixed(false), fixedID(0), _basePDFComponentStatus(false), stored_boundary(NULL), stored_point(NULL), stored_index(0)
 {
 	component_list.push_back( "0" );
 }
@@ -41,7 +41,7 @@ BasePDF::BasePDF( const BasePDF& input ) : BasePDF_Framework( input ), BasePDF_M
 	cachingEnabled( input.cachingEnabled ), haveTestedIntegral( input.haveTestedIntegral ),
 	discrete_Normalisation( input.discrete_Normalisation ), DiscreteCaches(NULL),
 	debug_mutex(input.debug_mutex), can_remove_mutex(false), fixed_checked(input.fixed_checked), isFixed(input.isFixed), fixedID(input.fixedID),
-	_basePDFComponentStatus(input._basePDFComponentStatus)
+	_basePDFComponentStatus(input._basePDFComponentStatus), stored_boundary(input.stored_boundary), stored_index(input.stored_index), stored_point(input.stored_point)
 {
 	allParameters.SetPhysicsParameters( &(input.allParameters) );
 	DiscreteCaches = new vector<double>( input.DiscreteCaches->size() );
@@ -109,7 +109,7 @@ bool BasePDF::CacheValid( DataPoint* InputPoint, PhaseSpaceBoundary* InputBounda
 	//	Care about the input
 	this->CheckCaches( InputBoundary );
 
-	unsigned int cacheIndex = InputBoundary->GetDiscreteIndex( InputPoint );
+	unsigned int cacheIndex = this->GetThisIndex( InputBoundary, InputPoint );
 
 	double norm = DiscreteCaches->at(cacheIndex);
 
@@ -143,7 +143,7 @@ void BasePDF::SetCache( double input, DataPoint* InputPoint, PhaseSpaceBoundary*
 	if( this->IsDebuggingON() )
 	{
 		PDF_THREAD_LOCK
-			cout << "BasePDF: Setting Cache. Discrete DataSet " << InputBoundary->GetDiscreteIndex( InputPoint ) << " Value: " << input << endl;
+			cout << "BasePDF: Setting Cache. Discrete DataSet " << this->GetThisIndex( InputBoundary, InputPoint ) << " Value: " << input << endl;
 		PDF_THREAD_UNLOCK
 	}
 
@@ -151,7 +151,7 @@ void BasePDF::SetCache( double input, DataPoint* InputPoint, PhaseSpaceBoundary*
 	/*!
 	 * Get the Number Corresponding to the Unique Combination that this DataPoint is in
 	 */
-	unsigned int thisIndex = InputBoundary->GetDiscreteIndex( InputPoint );
+	unsigned int thisIndex = this->GetThisIndex( InputBoundary, InputPoint );
 
 	DiscreteCaches->at(thisIndex) = input;
 
@@ -207,19 +207,31 @@ bool BasePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	return true;
 }
 
+unsigned int BasePDF::GetThisIndex( PhaseSpaceBoundary* NewBoundary, DataPoint* thisPoint )
+{
+	if( stored_boundary == NewBoundary && stored_point == thisPoint ) return stored_index;
+	else
+	{
+		stored_index = NewBoundary->GetDiscreteIndex( thisPoint );
+		stored_boundary = NewBoundary;
+		stored_point = thisPoint;
+		return stored_index;
+	}
+}
+
 double BasePDF::GetCache( DataPoint* InputPoint, PhaseSpaceBoundary* NewBoundary )
 {
 	bool DebugCheck = this->IsDebuggingON();
 	if( DebugCheck )
 	{
 		PDF_THREAD_LOCK
-			cout << "BasePDF: Requesting Cache For DataSet " << NewBoundary->GetDiscreteIndex( InputPoint ) << " of " << DiscreteCaches->size() << endl;
+			cout << "BasePDF: Requesting Cache For DataSet " << this->GetThisIndex( NewBoundary, InputPoint ) << " of " << DiscreteCaches->size() << endl;
 		PDF_THREAD_UNLOCK
 	}
 
 	this->CheckCaches( NewBoundary );
 
-	unsigned int thisIndex = NewBoundary->GetDiscreteIndex( InputPoint );
+	unsigned int thisIndex = this->GetThisIndex( NewBoundary, InputPoint );
 
 	double thisVal = DiscreteCaches->at(thisIndex);
 

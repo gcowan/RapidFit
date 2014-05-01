@@ -128,13 +128,13 @@ int main( int argc, char* argv[] )
 	}
 
 	TCanvas* c1 = new TCanvas( "c1", "c1" );
-	TH1* th1 = new TH1D( "th1", "th1", 10, -3, 3 );
+	TH1* th1 = new TH1D( "th1", "th1", 25, -3, 3 );
 	for( unsigned int i=0; i< common.size(); ++i ) th1->Fill( nums1[i] );
 	th1->Draw();
 	c1->Update();
 	c1->Print("c1.pdf");
 	TCanvas* c2 = new TCanvas( "c2", "c2" );
-	TH1* th2 = new TH1D( "th2", "th2", 10, -3, 3 );
+	TH1* th2 = new TH1D( "th2", "th2", 25, -3, 3 );
 	for( unsigned int i=0; i< common.size(); ++i ) th2->Fill( nums2[i] );
 	th2->Draw();
 	c2->Update();

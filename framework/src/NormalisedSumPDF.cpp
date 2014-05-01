@@ -432,7 +432,7 @@ vector<string> NormalisedSumPDF::GetDoNotIntegrateList()
 
 bool NormalisedSumPDF::GetNumericalNormalisation() const
 {
-	return firstPDF->GetNumericalNormalisation() || secondPDF->GetNumericalNormalisation();
+	return false;//firstPDF->GetNumericalNormalisation() || secondPDF->GetNumericalNormalisation();
 }
 
 //Return the function value at the given point
@@ -588,4 +588,18 @@ string NormalisedSumPDF::GetComponentName( ComponentRef* componentIndexObj )
 	}
 	return "Invalid-NormalisedSum";
 }
+
+PhaseSpaceBoundary* NormalisedSumPDF::GetPhaseSpace() const
+{
+	return integrationBoundary;
+}
+
+vector<IPDF*> NormalisedSumPDF::GetChildren() const
+{
+	vector<IPDF*> thisVec;
+	thisVec.push_back( firstPDF );
+	thisVec.push_back( secondPDF );
+	return thisVec;
+}
+
 

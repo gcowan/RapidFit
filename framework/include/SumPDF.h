@@ -201,6 +201,8 @@ class SumPDF : public BasePDF
 		 */
 		virtual string GetComponentName( ComponentRef* = NULL );
 
+		vector<IPDF*> GetChildren() const;
+
 	private:
 		//	Uncopyable!
 		//SumPDF ( const SumPDF& );

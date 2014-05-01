@@ -100,6 +100,8 @@ class ProdPDF : public BasePDF
 		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
 
 		virtual string GetComponentName( ComponentRef* = NULL );
+
+		vector<IPDF*> GetChildren() const;
 	private:
 		//	Uncopyable!
 		//ProdPDF ( const ProdPDF& );
@@ -121,4 +123,5 @@ class ProdPDF : public BasePDF
 };
 
 #endif
+
 

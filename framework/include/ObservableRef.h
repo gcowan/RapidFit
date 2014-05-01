@@ -3,6 +3,7 @@
 #ifndef ObservableRef_H
 #define ObservableRef_H
 
+#include <map>
 #include <vector>
 #include <string>
 
@@ -57,6 +58,10 @@ class ObservableRef
 		 */
 		int GetIndex() const;
 
+		void SetIndexMap( const size_t thisID, const int index ) const;
+		bool FindIndexID( const size_t thisID ) const;
+		int GetIndexMap( const size_t thisID ) const;
+
 		/*!
 		 * @brief
 		 *
@@ -96,6 +101,8 @@ class ObservableRef
 		string Observable_Name;
 		mutable int Observable_Index;
 		mutable size_t externID;
+
+		mutable map< size_t, int > DiscreteIndexMap;
 };
 
 #endif

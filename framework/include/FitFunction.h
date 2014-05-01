@@ -220,6 +220,9 @@ class FitFunction : public IFitFunction
 		bool OffSetNLL;
 
 		double initialConstraint;
+
+		void ClearPhaseSpaceCaches( IDataSet* thisDataSet );
+		void ClearPDF( IPDF* thisPDF );
 };
 
 #endif

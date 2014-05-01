@@ -445,6 +445,12 @@ class BasePDF : public BasePDF_Framework, public BasePDF_MCCaching, public IPDF
 
 	private:
 
+		unsigned int GetThisIndex( PhaseSpaceBoundary* NewBoundary, DataPoint* thisPoint );
+
+		unsigned int stored_index;
+		DataPoint* stored_point;
+		PhaseSpaceBoundary* stored_boundary;
+
 		bool numericalNormalisation;                  /*!     Does this PDF require Numerical Integration, or has Numerical Integration been requested?       */
 
 		bool cachingEnabled;	/*!	Does this PDF require event by event normalisation	*/
