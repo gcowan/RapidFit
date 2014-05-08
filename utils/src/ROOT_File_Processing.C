@@ -10,6 +10,7 @@
 #include "TGraph2D.h"
 #include "TIterator.h"
 #include "TKey.h"
+#include "TObject.h"
 
 #include "ROOT_File_Processing.h"
 #include "Template_Functions.h"
@@ -21,6 +22,8 @@
 #include <fstream>
 
 using namespace::std;
+
+ClassImp( ROOT_File_Processing );
 
 //	Open a .root file without barfing if it doesn't exist, really this should be handled by ROOT SILENTLY && INTERNALLY
 TFile* ROOT_File_Processing::OpenFile( string filename, string ReadWrite )
@@ -87,7 +90,7 @@ TTree* ROOT_File_Processing::GetTree( string filename, string tuplename )
 
 	get_TTree_list_here( &all_Trees );
 
-	vector<string> tree_names = return_second(all_Trees);
+	vector<string> tree_names = Template_Functions::return_second(all_Trees);
 
 	//cout << tuplename << "\t" << all_Trees.size() << endl;
 	//print( all_Trees );
@@ -309,5 +312,10 @@ TObject* ROOT_File_Processing::open_object( pair<string,string> details )
 	gDirectory->cd( Original_Path );
 
 	return object;
+}
+
+void ROOT_File_Processing::Print()
+{
+	cout << "Hello From ROOT_File_Processing!" << endl;
 }
 

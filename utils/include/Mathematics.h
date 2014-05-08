@@ -3,13 +3,14 @@
 
 #include "TPolyMarker3D.h"
 #include "TF1.h"
+#include "TObject.h"
 
 #include <vector>
 #include <algorithm>
 
 using namespace::std;
 
-class Mathematics
+class Mathematics : public TObject
 {
 	public:
 
@@ -24,7 +25,7 @@ class Mathematics
 		 * @brief This will find all of the unique coordinates stored in a 1D vector of doubles
 		 * 
 		 * @return Returns the unique doubles each wrapped in a vector in a larger vector
-		*/
+		 */
 		static vector<vector<Double_t> > Unique_Coords( vector<Double_t> input );
 
 		/*!
@@ -84,6 +85,13 @@ class Mathematics
 		 *
 		 */
 		static bool Sort_second_Double( pair<double,double> one_pair, pair<double,double> two_pair );
+
+		static void Print();
+
+		Mathematics() {};
+		virtual ~Mathematics() {};
+		ClassDef( Mathematics, 1 );
+
 };
 
 #endif

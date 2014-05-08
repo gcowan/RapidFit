@@ -201,7 +201,7 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 
 	gSystem->mkdir( Output_Dir );
 
-        vector<TString> free_param = RapidFit_Output_File::get_free_parameters( input_tree );
+	vector<TString> free_param = RapidFit_Output_File::get_free_parameters( input_tree );
 
 	vector<TString> all_parameters, all_parameter_values, all_parameter_errors, all_parameter_pulls;
 
@@ -228,24 +228,24 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 	vector<TString> to_be_removed;
 	for( vector<TString>::iterator j=all_parameter_values.begin(); j!= all_parameter_values.end(); ++j )
 	{
-		TString temp = StringOperations::RemoveSuffix( *j, value_suffix );
-		temp+=error_suffix;
-		//	If I have a value, but NOT an error then it was a fixed parameter
-		if( StringOperations::VectorContains( all_parameter_errors, temp ) == -1 )
-		{
-			to_be_removed.push_back( *j );
-		}
+	TString temp = StringOperations::RemoveSuffix( *j, value_suffix );
+	temp+=error_suffix;
+	//	If I have a value, but NOT an error then it was a fixed parameter
+	if( StringOperations::VectorContains( all_parameter_errors, temp ) == -1 )
+	{
+	to_be_removed.push_back( *j );
+	}
 	}
 
 	for( vector<TString>::iterator j= to_be_removed.begin(); j!= to_be_removed.end(); ++j )
 	{
-		int position = StringOperations::VectorContains( all_parameter_values, *j );
-		if( position != -1 ) all_parameter_values.erase( all_parameter_values.begin() + position );
+	int position = StringOperations::VectorContains( all_parameter_values, *j );
+	if( position != -1 ) all_parameter_values.erase( all_parameter_values.begin() + position );
 	}*/
 
 	vector<vector<TString> > all; all.push_back( all_parameter_values ); all.push_back( all_parameter_errors ); all.push_back( all_parameter_pulls );
 
-	vector<TString> all_parameter_plots = concatonnate( all );
+	vector<TString> all_parameter_plots = Template_Functions::concatonnate( all );
 
 	cout << all_parameter_plots.size() << " Plots to Draw" << endl;
 
@@ -368,6 +368,7 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		Histogram_Processing::Silent_Print( c1, Output_Dir+"/"+all_parameter_plots[j]+"_c_thru.pdf" );
 		Histogram_Processing::Silent_Print( c1, Output_Dir+"/"+all_parameter_plots[j]+"_c_thru.C" );
 	}
+
 	cout << "Finished" << setw(40) << " " << endl;
 	cout << endl;
 	ProcessTableContent( latexTable, all_parameter_plots, table_content );
@@ -414,5 +415,10 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 	gSystem->cd("..");
 
 	return 0;
+}
+
+void ToyStudyAnalysis::Print()
+{
+	cout << "Hello From ToyStudyAnalysis!" << endl;
 }
 

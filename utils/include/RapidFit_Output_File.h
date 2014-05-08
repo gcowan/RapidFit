@@ -4,6 +4,7 @@
 #include "TString.h"
 #include "TTree.h"
 #include "TRandom3.h"
+#include "TObject.h"
 
 #include <vector>
 #include <string>
@@ -11,7 +12,7 @@
 using namespace::std;
 
 //	Collection of functions for handling RapidFit output files
-class RapidFit_Output_File
+class RapidFit_Output_File : public TObject
 {
 	public:
 		static double GetCV_val( TTree* input_tree, TString param_name, bool append=true );
@@ -51,6 +52,11 @@ class RapidFit_Output_File
 		//      Check that the Global Minima as defined at entry 0 within the file is actually the best minima or not
 		static void Check_Minima( TTree* input_tree, TString Cut_String, Float_t* Global_Best_NLL, TString NLL, TString param1_val, TString param2_val );
 
+		static void Print();
+
+                RapidFit_Output_File() {};
+                virtual ~RapidFit_Output_File() {};
+                ClassDef( RapidFit_Output_File, 1 );
 };
 
 //	Some useful constant strings

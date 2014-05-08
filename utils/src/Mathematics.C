@@ -276,3 +276,10 @@ bool Mathematics::Unique_2D_Double( pair<double,double> one_pair, pair<double,do
 	bool y_same = fabs(one_pair.second - two_pair.second) < 1E-3 ;
 	return x_same && y_same;
 }
+
+void Mathematics::Print()
+{
+	cout << "Hello From Mathematics!" << endl;
+}
+
+

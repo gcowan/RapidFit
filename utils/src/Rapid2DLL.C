@@ -155,10 +155,10 @@ void Rapid2DLL::get_Plotting_Data( TTree* input_tree, TString Draw_String, TStri
 		nll_data_rotated.push_back( temp );
 	}
 
-	nll_data = rotate( nll_data );
-	nll_data_rotated = rotate( nll_data_rotated );
-	coords = rotate( coords );
-	coords_rotated = rotate( coords_rotated );
+	nll_data = Template_Functions::rotate( nll_data );
+	nll_data_rotated = Template_Functions::rotate( nll_data_rotated );
+	coords = Template_Functions::rotate( coords );
+	coords_rotated = Template_Functions::rotate( coords_rotated );
 }
 
 
@@ -256,7 +256,7 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 
 	cout << "Constructing Contours" << endl;
 
-	vector<double> cont_levels = return_first( Rapid2DLL::GetContour( "2DLL" ) );
+	vector<double> cont_levels = Template_Functions::return_first( Rapid2DLL::GetContour( "2DLL" ) );
 
 	vector<TMultiGraph*> nll_contours = Histogram_Processing::GetContoursFromTH2( nll_hist, cont_levels, rand );
 	vector<TMultiGraph*> nll_contours_rotated = Histogram_Processing::GetContoursFromTH2( nll_hist_rotated, cont_levels, rand );
@@ -273,7 +273,7 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 	cont_num=0;
 	for( vector<TMultiGraph*>::iterator cont_i = nll_contours.begin(); cont_i != nll_contours.end(); ++cont_i, ++cont_num )
 	{
-		named_nll_contours.push_back( make_pair( *cont_i, return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
+		named_nll_contours.push_back( make_pair( *cont_i, Template_Functions::return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
 	}
 	TString filename( controlled_parameter1 + "_" + controlled_parameter2 + ".pdf" );
 	Rapid2DLL::Plot_Contours( controlled_parameter1, controlled_parameter2, nll_hist, named_nll_contours, filename, rand, other_params );
@@ -286,7 +286,7 @@ int Rapid2DLL::PlotRapidFit2DLL( TString controlled_parameter1, TString controll
 	cont_num=0;
 	for( vector<TMultiGraph*>::iterator cont_i = nll_contours_rotated.begin(); cont_i != nll_contours_rotated.end(); ++cont_i, ++cont_num )
 	{
-		named_nll_contours_rotated.push_back( make_pair( *cont_i, return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
+		named_nll_contours_rotated.push_back( make_pair( *cont_i, Template_Functions::return_second( Rapid2DLL::GetContour( "2DLL" ) )[cont_num] ) );
 	}
 	TString filename_rotated( controlled_parameter2 + "_" + controlled_parameter1 + ".pdf" );
 	Rapid2DLL::Plot_Contours( controlled_parameter2, controlled_parameter1, nll_hist_rotated, named_nll_contours_rotated, filename_rotated, rand, other_params );
@@ -449,7 +449,7 @@ void Rapid2DLL::Plot_Free_Parameters( TTree* input_tree, TString controlled_para
 			param_data.push_back( temp );
 		}
 
-		param_data = rotate(param_data);
+		param_data = Template_Functions::rotate(param_data);
 
 		TGraph2D* param_graph = Histogram_Processing::Get_TGraph2D( param_data, rand );
 		TH1* param_hist = param_graph->GetHistogram();
@@ -480,5 +480,8 @@ void Rapid2DLL::Plot_Free_Parameters( TTree* input_tree, TString controlled_para
 	return;
 }
 
-
+void Rapid2DLL::Print()
+{
+	cout << "Hello From Rapid2LL!" << endl;
+}
 

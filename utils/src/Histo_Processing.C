@@ -29,6 +29,7 @@
 #include "StringOperations.h"
 #include "TTree_Processing.h"
 #include "Mathematics.h"
+#include "Template_Functions.h"
 //	System Headers
 #include <math.h>
 #include <iomanip>
@@ -40,6 +41,8 @@
 #include <float.h>
 
 using namespace::std;
+
+ClassImp( Histogram_Processing );
 
 //  This has been adapted from the original code in RapidFits Statistics code
 //  It is intended to take a histogram and automatically rebin according to this function
@@ -302,8 +305,8 @@ TH1* Histogram_Processing::Get_TH1( const vector<Double_t>& input, TRandom* rand
 		cout << "NO 1D INPUT DATA TO PLOT" << endl;
 		return NULL;
 	}
-	double input_min = get_minimum( input );
-	double input_max = get_maximum( input );
+	double input_min = Template_Functions::get_minimum( input );
+	double input_max = Template_Functions::get_maximum( input );
 	if( X_MIN > -DBL_MAX ) input_min = X_MIN;
 	if( X_MAX < DBL_MAX ) input_max = X_MAX;
 	TString rand_num; rand_num += rand->Rndm();
@@ -406,7 +409,8 @@ TH2* Histogram_Processing::Get_TH2( const vector<vector<Double_t> >& input, TRan
 	{
 		weight = vector<double>( input[0].size(), 1. );
 	}
-	TH2* returnable_hist = new TH2D( "TH2_"+rand_num, "TH2_"+rand_num, bins1, get_minimum(X_data), get_maximum(X_data), bins2, get_minimum(Y_data), get_maximum(Y_data) );
+	TH2* returnable_hist = new TH2D( "TH2_"+rand_num, "TH2_"+rand_num, bins1, Template_Functions::get_minimum(X_data), Template_Functions::get_maximum(X_data),
+										bins2, Template_Functions::get_minimum(Y_data), Template_Functions::get_maximum(Y_data) );
 	vector<Double_t>::const_iterator index_x = X_data.begin();
 	vector<Double_t>::const_iterator index_y = Y_data.begin();
 	vector<Double_t>::const_iterator index_e = X_data.end();
@@ -461,7 +465,9 @@ TH3* Histogram_Processing::Get_TH3( const vector<vector<Double_t> >& input, TRan
 	vector<Double_t> X_data = input[0];
 	vector<Double_t> Y_data = input[1];
 	vector<Double_t> Z_data = input[2];
-	TH3* returnable_hist = new TH3D( "TH3_"+rand_num, "TH3_"+rand_num, bins1, get_minimum(X_data), get_maximum(X_data), bins2, get_minimum(Y_data), get_maximum(Y_data), bins3, get_minimum(Z_data), get_maximum(Z_data) );
+	TH3* returnable_hist = new TH3D( "TH3_"+rand_num, "TH3_"+rand_num, bins1, Template_Functions::get_minimum(X_data), Template_Functions::get_maximum(X_data),
+						bins2, Template_Functions::get_minimum(Y_data), Template_Functions::get_maximum(Y_data),
+						bins3, Template_Functions::get_minimum(Z_data), Template_Functions::get_maximum(Z_data) );
 	vector<Double_t>::const_iterator index_x = X_data.begin();
 	vector<Double_t>::const_iterator index_y = Y_data.begin();
 	vector<Double_t>::const_iterator index_z = Z_data.begin();
@@ -598,5 +604,10 @@ vector<TMultiGraph*> Histogram_Processing::GetContoursFromTH2( TH2* input_th2, c
 	c1->Close();
 
 	return returnable_Contours;
+}
+
+void Histogram_Processing::Print()
+{
+	cout << "Hello From Histogram_Processing!" << endl;
 }
 

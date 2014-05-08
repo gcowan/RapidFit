@@ -331,3 +331,8 @@ void RapidFit_Output_File::Check_Minima( TTree* input_tree, TString Cut_String, 
 	}
 }
 
+void RapidFit_Output_File::Print()
+{
+	cout << "Hello From RapidFit_Output_File!" << endl;
+}
+

@@ -4,17 +4,20 @@
 #include "TString.h"
 #include "TRandom3.h"
 #include "TTree.h"
+#include "TObject.h"
 
 #include <vector>
 
 using namespace::std;
 
-class ToyStudyAnalysis
+class ToyStudyAnalysis : public TObject
 {
 	public:
 		static int Toy_Study( TTree* input_trees, TRandom3* rand_gen, vector<string> OtherOptions );
 
 		static void Help();
+
+		static void Print();
 
 	private:
 
@@ -31,6 +34,11 @@ class ToyStudyAnalysis
 		static void ProcessImageContent( stringstream& latex, vector<TString> all_parameter_plots );
 
 		static void ProcessTableContent( stringstream& latex, vector<TString> all_parameter_plots, vector<pair<pair<double,double>,pair<double,double> > > table_content );
+
+	public:
+		ToyStudyAnalysis() {};
+		virtual ~ToyStudyAnalysis() {};
+		ClassDef( ToyStudyAnalysis, 1 );
 };
 
 #endif

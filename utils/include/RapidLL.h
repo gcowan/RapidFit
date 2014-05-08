@@ -6,13 +6,15 @@
 #include "TTree.h"
 #include "TRandom3.h"
 #include "TGraph.h"
+#include "TMultiGraph.h"
+#include "TObject.h"
 
 #include <vector>
 #include <string>
 
 using namespace::std;
 
-class RapidLL
+class RapidLL : public TObject
 {
 	public:
 		static unsigned int GetFunctionLineWidth();
@@ -32,6 +34,13 @@ class RapidLL
 		static TGraph* LL_Plot( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString NLL, TString param, TRandom3* rand );
 
 		static void OverlayMutliplePlots( TMultiGraph* graph );
+
+		static void Print();
+
+		RapidLL() {};
+		virtual ~RapidLL() {};
+		ClassDef( RapidLL, 1 );
+
 };
 
 #endif

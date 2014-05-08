@@ -326,7 +326,7 @@ TGraph* RapidLL::LL_Plot( TTree* input_TTree, TString Cut_String, double Global_
 	TGraph* new_graph = NULL;
 	pair<vector<double>,vector<double> > data = LL_Plot_Histo( input_TTree, Cut_String, Global_Best_NLL, NLL, param );
 
-	vector<pair<double,double> > filter = reparam( data );
+	vector<pair<double,double> > filter = Template_Functions::reparam( data );
 	sort( filter.begin(), filter.end(), Mathematics::Sort_first_Double );
 	sort( filter.begin(), filter.end(), Mathematics::Sort_second_Double );
 
@@ -334,7 +334,7 @@ TGraph* RapidLL::LL_Plot( TTree* input_TTree, TString Cut_String, double Global_
 	it = unique( filter.begin(), filter.end(), Mathematics::Unique_2D_Double );
 
 	filter.resize( unsigned(it - filter.begin()) );
-	pair<vector<double>,vector<double> > plottable = reparam( filter );
+	pair<vector<double>,vector<double> > plottable = Template_Functions::reparam( filter );
 
 	unsigned int size = (unsigned) plottable.first.size();
 	double* temp1 = new double[size]; double* temp2 = new double[size];
@@ -425,5 +425,10 @@ void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 	newOverlay2->Print(Name+".C");
 
 	return;
+}
+
+void RapidLL::Print()
+{
+	cout << "Hello From RapidLL!" << endl;
 }
 

@@ -1,5 +1,27 @@
 // $Id: release.notes $
 
+2014/05/08 Rob Currie
+  - Adding ROOT wrappers to most of the code in the utils folder.
+    This has the benifit of making a LOT of useul functions directly accessible from CINT/pyROOT which should make life easier in future developments.
+    I STRONGLY encourage people working with the .root output from RapidFit to consider looking at the code in the utils folder as many classes have been made available
+    including:
+               ROOT_File_Processing   Functions to access ROOT files and objects from files in a quick way, i.e. 1 line to open a TTree in a .root file
+               TTree_Processing       Functions to access and add to TTree objects, i.e. Buffer_Branch, AddBranch and getting the names/types of all branches already in a TTree
+               Histogram_Processing   Get Optimal binning and TH1/TH2/TH3 objects from vectors of data rather than having to jump through the usual hoops to construct the objects
+               RapidFit_Output_File   Get the parameters which were free/fixed in a fit and the parameters used to construct a study in a fit
+               StringOperations       Common String manipulation operations such as finding if a string is within a vector of strings
+               Template_Functions     Functions for the manipulation of vectors and nested vectors such as sort, finding maximum/minimum, concatonating, printing and so on
+               XMLUtilFunctions       Functions for regenerating an XML from a RapidFit output file
+               Mathematics            Some common functions for fitting and such
+               RapidLL                Functions for Generating LLScans from RapidFit output
+               Rapid2DLL              Functions for Generating 2DLLContors from RapidFit output
+               ToyStudyAnalysis       Perform a ToyStudy analysis of a given input
+
+    I will make an effort to make this codebase even more modular to benifit from being available from interactive scripts
+
+2014/05/06 Rob Currie
+  - Adding XML used to generate sWeighted dataset for 1fb JpsiKK analysis for posterity
+
 2014/04/26 Rob Currie
   - This represents a change in methodology of how some of the internals of RapidFit are now handled
           The UniqueID of a PhaseSpaceBounday and a ParameterSet instances is now copied as part of the copy and = operator functions

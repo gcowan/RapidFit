@@ -7,13 +7,15 @@
 #include "TRandom3.h"
 #include "TH2D.h"
 #include "TGraph2D.h"
+#include "TMultiGraph.h"
+#include "TObject.h"
 
 #include <vector>
 #include <string>
 
 using namespace::std;
 
-class Rapid2DLL
+class Rapid2DLL : public TObject
 {
 	public:
 
@@ -38,12 +40,18 @@ class Rapid2DLL
 		static void Plot_Free_Parameters( TTree* input_tree, TString controlled_parameter1, TString controlled_parameter2, TRandom3* rand );
 
 		static void Plot_Contours( TString controlled_parameter1, TString controlled_parameter2, TH1* nll_hist,
-					vector<pair<TMultiGraph*,TString> > nll_contours, TString filename, TRandom* rand, vector<string> other_options );
+				vector<pair<TMultiGraph*,TString> > nll_contours, TString filename, TRandom* rand, vector<string> other_options );
+
+		static void Print();
+
+		Rapid2DLL() {};
+		virtual ~Rapid2DLL() {};
+		ClassDef( Rapid2DLL, 1 );
 
 	private:
 
 		static void get_Plotting_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom* rand, vector<vector<Double_t> >& nll_data,
-					vector<vector<Double_t> >& nll_data_rotated, vector<vector<Double_t> >& coords, vector<vector<Double_t> >& );
+				vector<vector<Double_t> >& nll_data_rotated, vector<vector<Double_t> >& coords, vector<vector<Double_t> >& );
 
 };
 

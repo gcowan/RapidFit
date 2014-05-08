@@ -9,6 +9,7 @@
 #include "TCanvas.h"
 #include "TPolyMarker3D.h"
 #include "Mathematics.h"
+#include "TObject.h"
 
 #include "EdStyle.h"
 #include "TTree_Processing.h"
@@ -18,6 +19,8 @@
 #include <iostream>
 
 using namespace::std;
+
+ClassImp( TTree_Processing );
 
 vector<int> TTree_Processing::get_Event_Number( vector<pair<string,string> > *found_names )
 {
@@ -361,3 +364,7 @@ void TTree_Processing::AddBranch( TTree* input_tree, string title, vector<bool> 
 	}
 }
 
+void TTree_Processing::Print()
+{
+	cout << "Hello From TTree_Processing!" << endl;
+}

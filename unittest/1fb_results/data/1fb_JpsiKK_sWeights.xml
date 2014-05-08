@@ -1,0 +1,1088 @@
+<RapidFit>
+
+	//================================================
+	// Formal Parameters to be fitted or fixed
+
+	<ParameterSet>
+
+
+		//........................................
+		// Parameters which can be fixed for Scans
+
+		//Fractions
+
+		//Fraction of signal : Unbiased
+		<PhysicsParameter>
+			<Name>SignalFraction990</Name>
+			<Value>0.68</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFraction1008</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFraction1016</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFraction1020</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFraction1024</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFraction1032</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>SignalFractionB990</Name>
+			<Value>0.68</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFractionB1008</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFractionB1016</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFractionB1020</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFractionB1024</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>SignalFractionB1032</Name>
+			<Value>0.62</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+
+		// Mass
+
+		<PhysicsParameter>
+			<Name>alphaM_pr</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr990</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1008</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1016</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1020</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1024</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1032</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr990B</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1008B</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1016B</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1020B</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1024B</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>alphaM_pr1032B</Name>
+			<Value>0.0017</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>f_sig_m1</Name>
+			<Value>0.803</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.00001</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>sigma_m1</Name>
+			<Value>6.45</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>100.0</Maximum>
+			<Type>Free</Type>
+			<Unit>MeV/c^{2}</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>ratio_21</Name>
+			<Value>2.258</Value>
+			<Minimum>1.0</Minimum>
+			<Maximum>10.0</Maximum>
+			<Type>Free</Type>
+			<Unit>MeV/c^{2}</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>m_Bs</Name>
+			<Value>5368.0</Value>
+			<Type>Free</Type>
+			<Unit>MeV/c^{2}</Unit>
+		</PhysicsParameter>
+
+		// LL lifetimes
+
+		<PhysicsParameter>
+			<Name>f_LL1</Name>
+			<Value>0.99285</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>tau_LL1</Name>
+			<Value>0.15</Value>
+			<Minimum>0.01</Minimum>
+			<Maximum>0.5</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>tau_LL2</Name>
+			<Value>1.0</Value>
+			<Minimum>0.05</Minimum>
+			<Maximum>3.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+
+
+		//.........
+		<PhysicsParameter>
+			<Name>f_LL1Biased</Name>
+			<Value>0.99285</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>1.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>tau_LL1Biased</Name>
+			<Value>0.15</Value>
+			<Minimum>0.01</Minimum>
+			<Maximum>0.5</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>tau_LL2Biased</Name>
+			<Value>1.0</Value>
+			<Minimum>0.05</Minimum>
+			<Maximum>3.0</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>.................................
+		// Parameters which cant be fixed for scans
+
+		// True Physics Parameters for signal
+
+		<PhysicsParameter>
+			<Name>gamma</Name>
+			<Value>0.67</Value>
+			<Minimum>0.0</Minimum>
+			<Maximum>2.0</Maximum>
+			<Type>Free</Type>
+			<Unit>ps^{-1}</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>deltaGamma</Name>
+			<Value>0.13</Value>
+			<Minimum>-0.1</Minimum>
+			<Maximum>0.3</Maximum>
+			<Type>Free</Type>
+			<Unit>ps^{-1}</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Aperp_sq</Name>
+			<Value>0.25</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.5</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Azero_sq</Name>
+			<Value>0.50</Value>
+			<Type>Free</Type>
+			<Minimum>0.</Minimum>
+			<Maximum>0.8</Maximum>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_para</Name>
+			<Value>3.3</Value>
+			<Maximum>6.3</Maximum>
+			<Minimum>-6.3</Minimum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_perp</Name>
+			<Value>2.9</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_zero</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>F_s</Name>
+			<Value>0.02</Value>
+			<Minimum>0.</Minimum>
+			<Maximum>0.25</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>delta_s</Name>
+			<Value>0.0</Value>
+			<Minimum>-6.3</Minimum>
+			<Maximum>6.3</Maximum>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Csp</Name>
+			<Value>0.496</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>deltaM</Name>
+			<Value>17.63</Value>
+			<Type>Free</Type>
+			<Unit>ps-1</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>Phi_s</Name>
+			<Value>0.00</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>lambda</Name>
+			<Value>1.0</Value>
+			<Type>Free</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+
+
+		//..................................
+		// Detector Parameters
+
+		//Signal PDF time resolution parameters for double gaussian model.
+
+		<PhysicsParameter>
+			<Name>timeResolutionScale</Name>
+			<Value>1.45</Value>
+			<Type>Free</Type>
+			<Unit>unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>timeResolution1</Name>
+			<Value>0.0434</Value>
+			<Type>Fixed</Type>
+			<Unit>ps</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>timeResolution2</Name>
+			<Value>0.0853</Value>
+			<Type>Fixed</Type>
+			<Unit>ps</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>timeResolution3</Name>
+			<Value>0.513</Value>
+			<Type>Fixed</Type>
+			<Unit>ps</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>timeResolution2Fraction</Name>
+			<Value>0.165</Value>
+			<Type>Fixed</Type>
+			<Unit>unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>timeResolution3Fraction</Name>
+			<Value>0.0017</Value>
+			<Type>Fixed</Type>
+			<Unit>unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>timeOffset</Name>                 //Leave at Zero, this is not used anywhere yet.
+			<Value>0.000</Value>
+			<Type>Fixed</Type>
+			<Unit>ps</Unit>
+		</PhysicsParameter>
+
+
+
+		// Mistag parameters
+
+		// Mistag calibration
+		<PhysicsParameter>
+			<Name>mistagP1_OS</Name>
+			<Value>1.00</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagP0_OS</Name>
+			<Value>0.392</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagSetPoint_OS</Name>
+			<Value>0.392</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP1_OS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP0_OS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaSetPoint_OS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+
+		// Mistag calibration
+		<PhysicsParameter>
+			<Name>mistagP1_SS</Name>
+			<Value>1.000</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagP0_SS</Name>
+			<Value>0.350</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagSetPoint_SS</Name>
+			<Value>0.350</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP1_SS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP0_SS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaSetPoint_SS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+
+		// Mistag calibration
+		<PhysicsParameter>
+			<Name>mistagP1_OSSS</Name>
+			<Value>1.000</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagP0_OSSS</Name>
+			<Value>0.0</Value>
+			<Type>Free</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagSetPoint_OSSS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP1_OSSS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaP0_OSSS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+		<PhysicsParameter>
+			<Name>mistagDeltaSetPoint_OSSS</Name>
+			<Value>0.0</Value>
+			<Type>Fixed</Type>
+			<Unit> </Unit>
+		</PhysicsParameter>
+
+
+
+		//............................................
+		// Background model
+
+		//Long lived time resolution components
+
+		<PhysicsParameter>
+			<Name>timeResLL1Frac</Name>
+			<Value>1.0</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>sigma_LL1</Name>
+			<Value>0.00</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+		<PhysicsParameter>
+			<Name>sigma_LL2</Name>
+			<Value>0.00</Value>
+			<Type>Fixed</Type>
+			<Unit>Unitless</Unit>
+		</PhysicsParameter>
+
+
+	</ParameterSet>
+
+
+	//==========================================
+	// Specify which minimiser to use.
+
+	<Minimiser>
+		<MinimiserName>Minuit</MinimiserName>
+		<MaxSteps>100000</MaxSteps>
+		<GradTolerance>0.0001</GradTolerance>
+		<Quality>1</Quality>
+	</Minimiser>
+
+	<FitFunction>
+		<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
+		<Threads>16</Threads>
+		#<Strategy>Petes</Strategy>
+	</FitFunction>
+
+
+	<NumberRepeats>1</NumberRepeats>
+
+
+
+	//==========================================
+	// Specify the fit
+
+	//...................................
+	// This applies a constraint on deltaM
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>deltaM</Name>
+				<Value>17.63</Value>
+				<Error>0.11</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>timeResolutionScale</Name>
+				<Value>1.45</Value>
+				<Error>0.06</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	// This applies a constraint on mistag scale
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP1_OS</Name>
+				<Value>1.000</Value>
+				<Error>0.023</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP0_OS</Name>
+				<Value>0.392</Value>
+				<Error>0.008</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagDeltaP0_OS</Name>
+				<Value>0.000</Value>
+				<Error>1.0</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP1_SS</Name>
+				<Value>1.000</Value>
+				<Error>0.16</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP0_SS</Name>
+				<Value>0.350</Value>
+				<Error>0.017</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagDeltaP0_SS</Name>
+				<Value>0.000</Value>
+				<Error>1.0</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagP0_OSSS</Name>
+				<Value>0.000</Value>
+				<Error>0.078</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>mistagDeltaP0_OSSS</Name>
+				<Value>0.000</Value>
+				<Error>1.0</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+	// ....................
+	// Attempt to constrain LLscan on the amplitudes
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>ATOTAL</Name>
+				<Value>1.0</Value>
+				<Error>0.00001</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+	// ....................
+	// Attempt to constrain GH and GL positive
+	<ToFit>
+		<ConstraintFunction>
+			<ExternalConstraint>
+				<Name>GLandGH</Name>
+				<Value>0.0</Value>
+				<Error>0.00001</Error>
+			</ExternalConstraint>
+		</ConstraintFunction>
+	</ToFit>
+
+	<CommonPhaseSpace>
+		<PhaseSpaceBoundary>
+			<Observable>
+				<Name>time</Name>
+				<Minimum>0.3</Minimum>
+				<Maximum>14.0</Maximum>
+				<Unit>ps</Unit>
+			</Observable>
+			<Observable>
+				<Name>trcostheta</Name>
+				<Minimum>-1.0</Minimum>
+				<Maximum>1.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>trphi</Name>
+				<Minimum>-3.142</Minimum>
+				<Maximum>3.142</Maximum>
+				<Unit>rad</Unit>
+			</Observable>
+			<Observable>
+				<Name>trcospsi</Name>
+				<Minimum>-1.0</Minimum>
+				<Maximum>1.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>helcosthetaK</Name>
+				<Minimum>-1.0</Minimum>
+				<Maximum>1.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>helphi</Name>
+				#<TF1>(helphi+TMath::Pi()-(helphi>0.)*(2.*TMath::Pi()))</TF1>
+				<Minimum>-3.142</Minimum>
+				<Maximum>3.142</Maximum>
+				<Unit>rad</Unit>
+			</Observable>
+			<Observable>
+				<Name>helcosthetaL</Name>
+				<Minimum>-1.0</Minimum>
+				<Maximum>1.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>tagdecision</Name>
+				<Value>1.</Value>
+				<Value>0.</Value>
+				<Value>-1.</Value>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>tagdecision_os</Name>
+				<Value>1.0</Value>
+				<Value>0.</Value>
+				<Value>-1.0</Value>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>tagdecision_ss</Name>
+				<Value>1.0</Value>
+				<Value>0.</Value>
+				<Value>-1.0</Value>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>tagomega</Name>
+				<Minimum>0.</Minimum>
+				<Maximum>0.5</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>tagomega_os</Name>
+				<Minimum>0.</Minimum>
+				<Maximum>0.5</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>tagomega_ss</Name>
+				<Minimum>0.</Minimum>
+				<Maximum>0.5</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>mass</Name>
+				<Minimum>5200.0</Minimum>
+				<Maximum>5550.0</Maximum>
+				<Unit>MeV/c^{2}</Unit>
+			</Observable>
+			<Observable>
+				<Name>sigmat</Name>
+				<Minimum>0.0</Minimum>
+				<Maximum>0.12</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>mdau2</Name>
+				<Minimum>990.0</Minimum>
+				<Maximum>1050.0</Maximum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>selA</Name>
+				<Value>1.</Value>
+				<Value>0.</Value>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>selB</Name>
+				<Value>1.</Value>
+				<Value>0.</Value>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>eventNumber</Name>
+				<Maximum>1E99</Maximum>
+				<Minimum>0</Minimum>
+				<Unit> </Unit>
+			</Observable>
+			<Observable>
+				<Name>runNumber</Name>
+				<Maximum>1E99</Maximum>
+				<Minimum>0</Minimum>
+				<Unit> </Unit>
+			</Observable>
+		</PhaseSpaceBoundary>
+	</CommonPhaseSpace>
+
+	<CommonPDF>
+		<NormalisedSumPDF>
+			<FractionName>FitFraction</FractionName>
+			<PDF>
+				<Name>BsMass</Name>
+				#<ConfigurationParameter>PlotComponents:False</ConfigurationParameter>
+			</PDF>
+			<PDF>
+				<Name>Bs2JpsiPhiMassBkg</Name>
+			</PDF>
+		</NormalisedSumPDF>
+	</CommonPDF>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFraction990</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:990</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>990&&1008>mdau2&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFraction1008</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1008&&1016>mdau2&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFraction1016</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1016&&1020>mdau2&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFraction1020</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1020&&1024>mdau2&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFraction1024</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1024&&1032>mdau2&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFraction1032</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1032&&1050>mdau2&&(selA==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFractionB990</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:990</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>990&&1008>mdau2&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFractionB1008</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1008</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1008&&1016>mdau2&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFractionB1016</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1016</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1016&&1020>mdau2&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFractionB1020</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1020</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1020&&1024>mdau2&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFractionB1024</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1024</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1024&&1032>mdau2&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+	<ToFit>
+		<PDFConfigurator>
+			<ParameterSubstitution>FitFraction:SignalFractionB1032</ParameterSubstitution>
+			<AppendParameterNames>alphaM_pr:1032</AppendParameterNames>
+		</PDFConfigurator>
+		<CommonPDF>True</CommonPDF>
+		<DataSet>
+			<Source>File</Source>
+			<FileName>Bs2JpsiPhi_ntupleB_for_fitting_20121012_MagDownMagUp.root</FileName>
+			<CutString>mdau2>1032&&1050>mdau2&&(selB==1)</CutString>
+			<NumberEvents>10000000</NumberEvents>
+			<CommonPhaseSpace>True</CommonPhaseSpace>
+		</DataSet>
+	</ToFit>
+
+
+
+	<Precalculator>
+		<Name>SWeightPrecalculator</Name>          # This is the same for everyone sWeighting their data
+		<WeightName>sWeight</WeightName>           # This is the name of the new branch that is created in the output nTuple
+		<OutputFile>1fbUBB-6binSigNEW.root</OutputFile> # This is the name of the output nTuple you want to create
+		<Config>1</Config>                         # 1: default, this is 1 or 2 depending on whether fraction 1 of 2 in the NormalisedSumPDF is the signal PDF
+		#<UseAlpha>True</UseAlpha>
+	</Precalculator>
+
+	<Output>
+		<ComponentProjection>
+			<Name>mass</Name>
+			<DrawPulls>True</DrawPulls>
+			<CalcChi2>True</CalcChi2>
+		</ComponentProjection>
+	</Output>
+
+</RapidFit>
+
+
+

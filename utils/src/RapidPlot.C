@@ -36,10 +36,9 @@
 #include "ROOT_File_Processing.h"
 #include "TTree_Processing.h"
 #include "Histo_Processing.h"
-#include "Component_Projections.h"
 #include "RapidFit_Output_File.h"
 #include "CorrMatrix.h"
-#include "XMLFunctions.h"
+#include "XMLUtilFunctions.h"
 //	System Headers
 #include <vector>
 #include <string>
@@ -204,7 +203,7 @@ int main( int argc, char* argv[] )
 	string restoreXML2="-RestoreXML";
 	if( StringOperations::VectorContains( &other_params, &restoreXML ) != -1 || StringOperations::VectorContains( &other_params, &restoreXML2 ) != -1 )
 	{
-		RestoreXML( input_filenames, other_params );
+		XMLUtilFunctions::RestoreXML( input_filenames, other_params );
 		exit(0);
 	}
 
@@ -212,7 +211,7 @@ int main( int argc, char* argv[] )
 	string getPXML2="-GetProjectionXML";
 	if( StringOperations::VectorContains( &other_params, &getPXML ) != -1 || StringOperations::VectorContains( &other_params, &getPXML2 ) != -1 )
 	{
-		GetProjectionXML( input_filenames, other_params );
+		XMLUtilFunctions::GetProjectionXML( input_filenames, other_params );
 		exit(0);
 	}
 
@@ -220,7 +219,7 @@ int main( int argc, char* argv[] )
 	string getTXML2="-GetToyXML";
 	if( StringOperations::VectorContains( &other_params, &getTXML ) != -1 || StringOperations::VectorContains( &other_params, &getTXML2 ) != -1 )
 	{
-		GetToyXML( input_filenames, other_params );
+		XMLUtilFunctions::GetToyXML( input_filenames, other_params );
 		exit(0);
 	}
 

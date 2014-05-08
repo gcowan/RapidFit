@@ -32,10 +32,10 @@ int main( int argc, char* argv[] )
 
 		//	Empty the vector, populate it with all TTree objects in the file,
 		//	and, print the results.
-		clear( &found_names );
+		Template_Functions::clear( &found_names );
 		ROOT_File_Processing::get_TTree_list_here( &found_names );
 		cout << "FOUND: " << found_names.size() << " TTREE OBJECTS:" << endl;
-		print( found_names );
+		Template_Functions::print( found_names );
 		for( unsigned int i=0; i< found_names.size(); ++i )
 		{
 			cout << endl << "For Tree: " << found_names[i].first <<found_names[i].second << ":" << endl;
@@ -54,39 +54,39 @@ int main( int argc, char* argv[] )
 		}
 
 
-		clear( &found_names );
+		Template_Functions::clear( &found_names );
 		ROOT_File_Processing::get_TNtuple_list_here( &found_names );
 		cout << endl <<"FOUND: " << found_names.size() << " TNTUPLE OBJECTS:" << endl;
-		print( found_names );
+		Template_Functions::print( found_names );
 
-		clear( &found_names );
+		Template_Functions::clear( &found_names );
 		ROOT_File_Processing::get_TH1_list_here( &found_names );
 		cout << endl <<"FOUND: " << found_names.size() << " TH1 OBJECTS:" << endl;
-		print( found_names );
+		Template_Functions::print( found_names );
 
 
-	        clear( &found_names );
+		Template_Functions::clear( &found_names );
 		ROOT_File_Processing::get_TH2_list_here( &found_names );
-	        cout << endl <<"FOUND: " << found_names.size() << " TH2 OBJECTS:" << endl;
-		print( found_names );
+		cout << endl <<"FOUND: " << found_names.size() << " TH2 OBJECTS:" << endl;
+		Template_Functions::print( found_names );
 
 
-		clear( &found_names );
+		Template_Functions::clear( &found_names );
 		ROOT_File_Processing::get_TH3_list_here( &found_names );
-	        cout << endl <<"FOUND: " << found_names.size() << " TH3 OBJECTS:" << endl;
-		print( found_names );
+		cout << endl <<"FOUND: " << found_names.size() << " TH3 OBJECTS:" << endl;
+		Template_Functions::print( found_names );
 
 
-		clear( &found_names );
-	        ROOT_File_Processing::get_TGraph_list_here( &found_names );
-	        cout << endl <<"FOUND: " << found_names.size() << " TGraph OBJECTS:" << endl;
-		print( found_names );
+		Template_Functions::clear( &found_names );
+		ROOT_File_Processing::get_TGraph_list_here( &found_names );
+		cout << endl <<"FOUND: " << found_names.size() << " TGraph OBJECTS:" << endl;
+		Template_Functions::print( found_names );
 
 
-		clear( &found_names );
-	        ROOT_File_Processing::get_TGraph2D_list_here( &found_names );
-	        cout << endl <<"FOUND: " << found_names.size() << " TGraph2D OBJECTS:" << endl;
-		print( found_names );
+		Template_Functions::clear( &found_names );
+		ROOT_File_Processing::get_TGraph2D_list_here( &found_names );
+		cout << endl <<"FOUND: " << found_names.size() << " TGraph2D OBJECTS:" << endl;
+		Template_Functions::print( found_names );
 
 		cout << endl;
 

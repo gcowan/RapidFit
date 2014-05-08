@@ -386,7 +386,7 @@ pair<vector<double>*, vector<double>* > FeldmanCousinsAnalysis::Get_Best_CV( TTr
 void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& controlled_parameter_name, TRandom3* rand, vector<string>& OtherOptions )
 {
 	cout << "Starting FC Analysis" << endl;
-	print( controlled_parameter_name );
+	Template_Functions::print( controlled_parameter_name );
 
 	(void) OtherOptions;
 
@@ -421,7 +421,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 
 	//      return the *UNIQUE* corrdinates contained in the input_tree from the Draw_String after applying the Cut_String
 	vector<vector<Double_t> > Grid_Coordinates = TTree_Processing::Plotter_Data( input_tree, Grid_Draw_String, Grid_Cut_String, rand );
-	Grid_Coordinates = rotate( Grid_Coordinates );
+	Grid_Coordinates = Template_Functions::rotate( Grid_Coordinates );
 
 	//	Output for the user
 	cout << "DIMENTION: " << Grid_Coordinates[0].size() << "\t" << "COORDINATES: " << Grid_Coordinates.size() << endl;
@@ -670,8 +670,8 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 			total.push_back( (*Fixed_Toy_NLL)[i] - (*Free_Toy_NLL)[i] );
 		}
 
-		TH1* total_th1 = Histogram_Processing::Get_TH1( total, rand , 100, get_minimum(total), get_maximum(total) );
-		TH1* acc_th1 = Histogram_Processing::Get_TH1( Toy_DLL_Dist, rand , 100, get_minimum(total), get_maximum(total) );
+		TH1* total_th1 = Histogram_Processing::Get_TH1( total, rand , 100, Template_Functions::get_minimum(total), Template_Functions::get_maximum(total) );
+		TH1* acc_th1 = Histogram_Processing::Get_TH1( Toy_DLL_Dist, rand , 100, Template_Functions::get_minimum(total), Template_Functions::get_maximum(total) );
 		//TH1* rej_th1 = Histogram_Processing::Get_TH1( other_dist, rand , 100, get_minimum(total), get_maximum(total) );
 
 		total_th1->SetMarkerColor( 1 ); total_th1->SetLineColor( 1 );

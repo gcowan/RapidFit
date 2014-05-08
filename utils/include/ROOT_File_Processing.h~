@@ -6,14 +6,12 @@
 #include "TString.h"
 #include "TClass.h"
 #include "TRandom3.h"
-#include "TTree.h"
-#include "TObject.h"
 //	System Headers
 #include <vector>
 
 using namespace::std;
 
-class ROOT_File_Processing : public TObject
+class ROOT_File_Processing
 {
 	public:
 
@@ -79,13 +77,8 @@ class ROOT_File_Processing : public TObject
 
 
 		//	Open an object which is at pair.first with name pair.second
+
 		static TObject* open_object( pair<string,string> );
-
-		static void Print();
-
-		ROOT_File_Processing() {};
-		virtual ~ROOT_File_Processing() {};
-		ClassDef( ROOT_File_Processing, 1 );
 
 };
 

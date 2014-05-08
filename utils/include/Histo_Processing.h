@@ -14,6 +14,7 @@
 #include "TCanvas.h"
 #include "TPaveText.h"
 #include "TMultiGraph.h"
+#include "TObject.h"
 ///	Utils Headers
 #include "Template_Functions.h"
 ///	System Headers
@@ -23,7 +24,7 @@
 
 using namespace::std;
 
-class Histogram_Processing
+class Histogram_Processing : public TObject
 {
 	public:
 
@@ -209,6 +210,12 @@ class Histogram_Processing
 		 * @return Returns a vector of pointer to new TMultiGraph objects which you can use normal
 		 */
 		static vector<TMultiGraph*> GetContoursFromTH2( TH2* input_th2, const vector<double>& contour_list, TRandom* rand );
+
+		static void Print();
+
+		Histogram_Processing() {};
+		virtual ~Histogram_Processing() {};
+		ClassDef( Histogram_Processing, 1 );
 };
 
 #endif

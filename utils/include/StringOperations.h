@@ -4,6 +4,7 @@
 //	ROOT Headers
 #include "TString.h"
 #include "TPaveText.h"
+#include "TObject.h"
 //	System Headers
 #include <string>
 #include <vector>
@@ -11,7 +12,7 @@
 
 using namespace::std;
 
-class StringOperations
+class StringOperations : public TObject
 {
 	public:
 
@@ -91,6 +92,13 @@ class StringOperations
 
 		//	Return a flat string of the current time
 		static string TimeString();
+
+		static void Print();
+
+		StringOperations() {};
+		virtual ~StringOperations() {};
+		ClassDef( StringOperations, 1 );
+
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include "TTree.h"
 #include "TBranch.h"
 
+#include "XMLUtilFunctions.h"
 #include "StringOperations.h"
 #include "ROOT_File_Processing.h"
 
@@ -15,7 +16,7 @@
 
 using namespace::std;
 
-void RestoreXML( vector<string> input_filenames, vector<string> other_params )
+void XMLUtilFunctions::RestoreXML( vector<string> input_filenames, vector<string> other_params )
 {
 	string SaveAs="--SaveAs";
 	string SaveAs2="-SaveAs";
@@ -84,7 +85,7 @@ void RestoreXML( vector<string> input_filenames, vector<string> other_params )
 	}
 }
 
-void GetToyXML( vector<string> input_filenames, vector<string> other_params )
+void XMLUtilFunctions::GetToyXML( vector<string> input_filenames, vector<string> other_params )
 {
 	string SaveAs="--SaveAs";
 	string SaveAs2="-SaveAs";
@@ -148,7 +149,7 @@ void GetToyXML( vector<string> input_filenames, vector<string> other_params )
 	}
 }
 
-void GetProjectionXML( vector<string> input_filenames, vector<string> other_params )
+void XMLUtilFunctions::GetProjectionXML( vector<string> input_filenames, vector<string> other_params )
 {
 	string SaveAs="--SaveAs";
 	string SaveAs2="-SaveAs";
@@ -211,3 +212,9 @@ void GetProjectionXML( vector<string> input_filenames, vector<string> other_para
 		output_xmlFile.close();
 	}
 }
+
+void XMLUtilFunctions::Print()
+{
+	cout << "Hello From XMLUtilFunctions!" << endl;
+}
+

@@ -4,6 +4,7 @@
 //	ROOT Headers
 #include "TString.h"
 #include "TPaveText.h"
+#include "Template_Functions.h"
 //	System Headers
 #include <string>
 #include <vector>
@@ -99,18 +100,6 @@ template<class T, class U> std::vector<U> swap( vector<pair<T,U> > input )
 		output_vec.push_back( new_pair );
 	}
 	return output_vec;
-}
-
-//	empty a vector
-template<class T> void clear ( vector<T>* input )
-{
-	while( !input->empty() ) { input->pop_back(); }
-}
-
-//	empty a vector of pairs
-template<class T, class U> void clear ( vector<pair<T,U> >* input )
-{
-	while( !input->empty() ) { input->pop_back(); }
 }
 
 //      Pass this an array of strings and it will find all strings matching a substring

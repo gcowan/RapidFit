@@ -566,5 +566,8 @@ string StringOperations::TimeString()
 	return returnable_time;
 }
 
-
+void StringOperations::Print()
+{
+	cout << "Hello From StringOperations!" << endl;
+}
 
