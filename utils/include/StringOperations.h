@@ -21,7 +21,7 @@ class StringOperations : public TObject
 
 		//	Add the LHCb label to plots
 		//	use false at the end to simulation
-		static TPaveText* addLHCbLabel(TString footer, bool DATA=true);
+		//static TPaveText* addLHCbLabel(TString footer, bool DATA=true);
 
 		//	Remove the suffix which is after the "deliminator" character
 		//	For multiple occurances of the character the last on in the whitrong is chosen
