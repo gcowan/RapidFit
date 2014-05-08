@@ -193,16 +193,16 @@ int main( int argc, char* argv[] )
 
 	gStyle->SetOptStat(0);
 
-	TH1* gamma_histo = new TH1D( "gamma_dist", "gamma_dist", gammaS_value.size(), get_minimum(gammaS_value), get_maximum(gammaS_value) );
-	TH1* gammaErr_histo = new TH1D( "gammaErr_dist", "gammaErr_dist", gammaS_error.size(), get_minimum(gammaS_error), get_maximum(gammaS_error) );
-	TH1* gammaPull_histo = new TH1D( "gammaPull_dist", "gammaPull_dist", gammaS_pull.size(), get_minimum(gammaS_pull), get_maximum(gammaS_pull) );
+	TH1* gamma_histo = new TH1D( "gamma_dist", "gamma_dist", gammaS_value.size(), Template_Functions::get_minimum(gammaS_value), Template_Functions::get_maximum(gammaS_value) );
+	TH1* gammaErr_histo = new TH1D( "gammaErr_dist", "gammaErr_dist", gammaS_error.size(), Template_Functions::get_minimum(gammaS_error), Template_Functions::get_maximum(gammaS_error) );
+	TH1* gammaPull_histo = new TH1D( "gammaPull_dist", "gammaPull_dist", gammaS_pull.size(), Template_Functions::get_minimum(gammaS_pull), Template_Functions::get_maximum(gammaS_pull) );
 	for( unsigned int i=0; i< gammaS_value.size(); ++i ) gamma_histo->Fill( gammaS_value[i] );
 	for( unsigned int i=0; i< gammaS_error.size(); ++i ) gammaErr_histo->Fill( gammaS_error[i] );
 	for( unsigned int i=0; i< gammaS_pull.size(); ++i ) gammaPull_histo->Fill( gammaS_pull[i] );
 
-	TH1* dGamma_histo = new TH1D( "deltaGamma_dist", "deltaGamma_dist", deltaGammaS_value.size(), get_minimum(deltaGammaS_value), get_maximum(deltaGammaS_value) );
-	TH1* dGammaErr_histo = new TH1D( "deltaGammaErr_dist", "deltaGammaErr_dist", deltaGammaS_error.size(), get_minimum(deltaGammaS_error), get_maximum(deltaGammaS_error) );
-	TH1* dGammaPull_histo = new TH1D( "deltaGammaPull_dist", "deltaGammaPull_dist", deltaGammaS_pull.size(), get_minimum(deltaGammaS_pull), get_maximum(deltaGammaS_pull) );
+	TH1* dGamma_histo = new TH1D( "deltaGamma_dist", "deltaGamma_dist", deltaGammaS_value.size(), Template_Functions::get_minimum(deltaGammaS_value), Template_Functions::get_maximum(deltaGammaS_value) );
+	TH1* dGammaErr_histo = new TH1D( "deltaGammaErr_dist", "deltaGammaErr_dist", deltaGammaS_error.size(), Template_Functions::get_minimum(deltaGammaS_error), Template_Functions::get_maximum(deltaGammaS_error) );
+	TH1* dGammaPull_histo = new TH1D( "deltaGammaPull_dist", "deltaGammaPull_dist", deltaGammaS_pull.size(), Template_Functions::get_minimum(deltaGammaS_pull), Template_Functions::get_maximum(deltaGammaS_pull) );
 	for( unsigned int i=0; i< gammaS_value.size(); ++i ) dGamma_histo->Fill( deltaGammaS_value[i] );
 	for( unsigned int i=0; i< gammaS_error.size(); ++i ) dGammaErr_histo->Fill( deltaGammaS_error[i] );
 	for( unsigned int i=0; i< gammaS_pull.size(); ++i ) dGammaPull_histo->Fill( deltaGammaS_pull[i] );
@@ -364,22 +364,22 @@ int main( int argc, char* argv[] )
 
 		int rebin_factor=1;
 
-		TH1* delta_gamma_histo = new TH1D( "gammadiff_dist", "gammadiff_dist", gamma_diff.size(), get_minimum(gamma_diff), get_maximum(gamma_diff) );
+		TH1* delta_gamma_histo = new TH1D( "gammadiff_dist", "gammadiff_dist", gamma_diff.size(), Template_Functions::get_minimum(gamma_diff), Template_Functions::get_maximum(gamma_diff) );
 		for( unsigned int i=0; i< gamma_diff.size(); ++i ) delta_gamma_histo->Fill( gamma_diff[i] );
 
-		TH1* delta_dGamma_histo = new TH1D( "dGammadiff_dist", "dGammadiff_dist", deltaGamma_diff.size(), get_minimum(deltaGamma_diff), get_maximum(deltaGamma_diff) );
+		TH1* delta_dGamma_histo = new TH1D( "dGammadiff_dist", "dGammadiff_dist", deltaGamma_diff.size(), Template_Functions::get_minimum(deltaGamma_diff), Template_Functions::get_maximum(deltaGamma_diff) );
 		for( unsigned int i=0; i< deltaGamma_diff.size(); ++i ) delta_dGamma_histo->Fill( deltaGamma_diff[i] );
 
 		int gamma_bins=33;
 		int dGamma_bins=33;
 
-		//TH1* gamma_truth =new TH1D( "gamma_tru", "gamma_tru", angGammaTrudiff.size(), get_minimum(angGammaTrudiff), get_maximum(angGammaTrudiff) );
-		TH1* gamma_truth =new TH1D( "gamma_tru", "gamma_tru", gamma_bins, get_minimum(angGammaTrudiff), get_maximum(angGammaTrudiff) );
+		//TH1* gamma_truth =new TH1D( "gamma_tru", "gamma_tru", angGammaTrudiff.size(), Template_Functions::get_minimum(angGammaTrudiff), Template_Functions::get_maximum(angGammaTrudiff) );
+		TH1* gamma_truth =new TH1D( "gamma_tru", "gamma_tru", gamma_bins, Template_Functions::get_minimum(angGammaTrudiff), Template_Functions::get_maximum(angGammaTrudiff) );
 		for( unsigned int i=0; i< angGammaTrudiff.size(); ++i ) gamma_truth->Fill( angGammaTrudiff[i] );
 		//Histogram_Processing::OptimallyRebin( gamma_truth );
 		gamma_truth->SetLineColor( 2 );
-		//TH1* gamma_untag =new TH1D( "gamma_untag", "gamma_untag", untagGammaTrudiff.size(), get_minimum(angGammaTrudiff), get_maximum(angGammaTrudiff) );
-		TH1* gamma_untag =new TH1D( "gamma_untag", "gamma_untag", gamma_bins, get_minimum(angGammaTrudiff), get_maximum(angGammaTrudiff) );
+		//TH1* gamma_untag =new TH1D( "gamma_untag", "gamma_untag", untagGammaTrudiff.size(), Template_Functions::get_minimum(angGammaTrudiff), Template_Functions::get_maximum(angGammaTrudiff) );
+		TH1* gamma_untag =new TH1D( "gamma_untag", "gamma_untag", gamma_bins, Template_Functions::get_minimum(angGammaTrudiff), Template_Functions::get_maximum(angGammaTrudiff) );
 		for( unsigned int i=0; i< untagGammaTrudiff.size(); ++i ) gamma_untag->Fill( untagGammaTrudiff[i] );
 		//Histogram_Processing::OptimallyRebin( gamma_untag );
 		gamma_untag->SetLineColor( 3 );
@@ -387,13 +387,13 @@ int main( int argc, char* argv[] )
 		rebin_factor = int( ( (double) gamma_untag->GetNbinsX() ) / ( (double) gamma_truth->GetNbinsX() ) );
 		//gamma_untag->Rebin( rebin_factor ); gamma_untag->SetLineColor( 3 );
 
-		//TH1* dGamma_truth = new TH1D( "deltaGamma_tru", "deltaGamma_tru", angdGammaTrudiff.size(), get_minimum(angdGammaTrudiff), get_maximum(angdGammaTrudiff) );
-		TH1* dGamma_truth = new TH1D( "deltaGamma_tru", "deltaGamma_tru", dGamma_bins, get_minimum(angdGammaTrudiff), get_maximum(angdGammaTrudiff) );
+		//TH1* dGamma_truth = new TH1D( "deltaGamma_tru", "deltaGamma_tru", angdGammaTrudiff.size(), Template_Functions::get_minimum(angdGammaTrudiff), Template_Functions::get_maximum(angdGammaTrudiff) );
+		TH1* dGamma_truth = new TH1D( "deltaGamma_tru", "deltaGamma_tru", dGamma_bins, Template_Functions::get_minimum(angdGammaTrudiff), Template_Functions::get_maximum(angdGammaTrudiff) );
 		for( unsigned int i=0; i< angdGammaTrudiff.size(); ++i ) dGamma_truth->Fill( angdGammaTrudiff[i] );
 		//Histogram_Processing::OptimallyRebin( dGamma_truth );
 		dGamma_truth->SetLineColor( 2 );
-		//TH1* dGamma_untag =new TH1D( "deltaGamma_untag", "deltaGamma_untag", untagdGammaTrudiff.size(), get_minimum(angdGammaTrudiff), get_maximum(angdGammaTrudiff) );
-		TH1* dGamma_untag =new TH1D( "deltaGamma_untag", "deltaGamma_untag", dGamma_bins, get_minimum(angdGammaTrudiff), get_maximum(angdGammaTrudiff) );
+		//TH1* dGamma_untag =new TH1D( "deltaGamma_untag", "deltaGamma_untag", untagdGammaTrudiff.size(), Template_Functions::get_minimum(angdGammaTrudiff), Template_Functions::get_maximum(angdGammaTrudiff) );
+		TH1* dGamma_untag =new TH1D( "deltaGamma_untag", "deltaGamma_untag", dGamma_bins, Template_Functions::get_minimum(angdGammaTrudiff), Template_Functions::get_maximum(angdGammaTrudiff) );
 		for( unsigned int i=0; i< untagdGammaTrudiff.size(); ++i ) dGamma_untag->Fill( untagdGammaTrudiff[i] );
 		//Histogram_Processing::OptimallyRebin( dGamma_untag );
 		dGamma_untag->SetLineColor( 3 );

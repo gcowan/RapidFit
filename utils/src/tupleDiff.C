@@ -145,19 +145,19 @@ int main( int argc, char* argv[] )
 
 	TFile* residuals = new TFile("Residuals.root","RECREATE");
 
-	TH1D* Edi_costhetaL = new TH1D( "Edires_costhetaL", "costhetaL" , 100, get_minimum(Edires_costhetaL), get_maximum(Edires_costhetaL) );
-	TH1D* Edi_costhetaK = new TH1D( "Edires_costhetaK", "costhetaK" , 100, get_minimum(Edires_costhetaK), get_maximum(Edires_costhetaK) );
-	TH1D* Edi_phi = new TH1D( "Edires_phi", "phi" , 100, get_minimum(Edires_phi), get_maximum(Edires_phi) );
-	TH1D* Edi_mass = new TH1D( "Edires_mass", "mass" , 100, get_minimum(Edires_mass), get_maximum(Edires_mass) );
-	TH1D* Edi_time = new TH1D( "Edires_time", "time" , 100, get_minimum(Edires_time), get_maximum(Edires_time) );
+	TH1D* Edi_costhetaL = new TH1D( "Edires_costhetaL", "costhetaL" , 100, Template_Functions::get_minimum(Edires_costhetaL), Template_Functions::get_maximum(Edires_costhetaL) );
+	TH1D* Edi_costhetaK = new TH1D( "Edires_costhetaK", "costhetaK" , 100, Template_Functions::get_minimum(Edires_costhetaK), Template_Functions::get_maximum(Edires_costhetaK) );
+	TH1D* Edi_phi = new TH1D( "Edires_phi", "phi" , 100, Template_Functions::get_minimum(Edires_phi), Template_Functions::get_maximum(Edires_phi) );
+	TH1D* Edi_mass = new TH1D( "Edires_mass", "mass" , 100, Template_Functions::get_minimum(Edires_mass), Template_Functions::get_maximum(Edires_mass) );
+	TH1D* Edi_time = new TH1D( "Edires_time", "time" , 100, Template_Functions::get_minimum(Edires_time), Template_Functions::get_maximum(Edires_time) );
 
-	TH1D* HD_costhetaL = new TH1D( "HDres_costhetaL", "costhetaL" , 100, get_minimum(HDres_costhetaL), get_maximum(HDres_costhetaL) );
-	TH1D* HD_costhetaK = new TH1D( "HDres_costhetaK", "costhetaK" , 100, get_minimum(HDres_costhetaK), get_maximum(HDres_costhetaK) );
-	TH1D* HD_phi = new TH1D( "HDres_phi", "phi" , 100, get_minimum(HDres_phi), get_maximum(HDres_phi) );
-	TH1D* HD_mass = new TH1D( "HDres_mass", "mass" , 100, get_minimum(HDres_mass), get_maximum(HDres_mass) );
-	TH1D* HD_time = new TH1D( "HDres_time", "time" , 100, get_minimum(HDres_time), get_maximum(HDres_time) );
+	TH1D* HD_costhetaL = new TH1D( "HDres_costhetaL", "costhetaL" , 100, Template_Functions::get_minimum(HDres_costhetaL), Template_Functions::get_maximum(HDres_costhetaL) );
+	TH1D* HD_costhetaK = new TH1D( "HDres_costhetaK", "costhetaK" , 100, Template_Functions::get_minimum(HDres_costhetaK), Template_Functions::get_maximum(HDres_costhetaK) );
+	TH1D* HD_phi = new TH1D( "HDres_phi", "phi" , 100, Template_Functions::get_minimum(HDres_phi), Template_Functions::get_maximum(HDres_phi) );
+	TH1D* HD_mass = new TH1D( "HDres_mass", "mass" , 100, Template_Functions::get_minimum(HDres_mass), Template_Functions::get_maximum(HDres_mass) );
+	TH1D* HD_time = new TH1D( "HDres_time", "time" , 100, Template_Functions::get_minimum(HDres_time), Template_Functions::get_maximum(HDres_time) );
 
-	TH2D* mass_diff = new TH2D( "sWeightDiff", "diff", 100, get_minimum(*MastermassData), get_maximum(*MastermassData), 100, get_minimum(sWeightDiff), get_maximum(sWeightDiff) );
+	TH2D* mass_diff = new TH2D( "sWeightDiff", "diff", 100, Template_Functions::get_minimum(*MastermassData), Template_Functions::get_maximum(*MastermassData), 100, Template_Functions::get_minimum(sWeightDiff), Template_Functions::get_maximum(sWeightDiff) );
 
 	for( unsigned int i=0; i< Edires_costhetaL.size(); ++i )
 	{

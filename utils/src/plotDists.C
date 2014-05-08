@@ -222,10 +222,10 @@ int main( int argc, char* argv[] )
 		Double_t thisMin=0.;
 		Double_t thisMax=0.;
 
-		if( thisConfig.explicit_min <= -DBL_MAX )	thisMin = get_minimum( *thisData );
+		if( thisConfig.explicit_min <= -DBL_MAX )	thisMin = Template_Functions::get_minimum( *thisData );
 		else						thisMin = thisConfig.explicit_min;
 
-		if( thisConfig.explicit_max >= DBL_MAX )	thisMax = get_maximum( *thisData );
+		if( thisConfig.explicit_max >= DBL_MAX )	thisMax = Template_Functions::get_maximum( *thisData );
 		else						thisMax = thisConfig.explicit_max;
 
 		TH1* thisTH1 = new TH1D( TH1Name, TH1Name, thisConfig.num_bins, thisMin, thisMax );
