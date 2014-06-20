@@ -120,6 +120,8 @@ class ProdPDF : public BasePDF
 		vector<string> doNotIntegrateList;
 		IPDF * firstPDF;
 		IPDF * secondPDF;
+
+		bool _plotComponents;
 };
 
 #endif

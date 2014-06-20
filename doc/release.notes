@@ -1,5 +1,9 @@
 // $Id: release.notes $
 
+2014/06/20 Rob Currie
+  - Adding the optional XML tag <ConfigurationParameter>DontPlotComponents:True</ConfigurationParameter> to the NormalisedSum, Prod and Sum PDFs
+       This allows you to use complex PDFs for projections but to ignore certain complex parts of the PDF structure
+
 2014/05/08 Rob Currie
   - Adding ROOT wrappers to most of the code in the utils folder.
     This has the benifit of making a LOT of useul functions directly accessible from CINT/pyROOT which should make life easier in future developments.

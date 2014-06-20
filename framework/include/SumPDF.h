@@ -217,6 +217,7 @@ class SumPDF : public BasePDF
 		double firstFraction, firstIntegralCorrection, secondIntegralCorrection;
 		string fractionName;
 		PhaseSpaceBoundary * integrationBoundary;
+		bool _plotComponents;
 };
 
 #endif

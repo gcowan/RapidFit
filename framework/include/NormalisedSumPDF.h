@@ -100,6 +100,8 @@ class NormalisedSumPDF : public BasePDF
 		double firstFraction, firstIntegralCorrection, secondIntegralCorrection;
 		ObservableRef fractionName;
 		PhaseSpaceBoundary * integrationBoundary;
+
+		bool _plotComponents;
 };
 
 #endif

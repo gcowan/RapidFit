@@ -22,7 +22,7 @@ PDF_CREATOR( SumPDF );
 
 SumPDF::SumPDF( const SumPDF& input ) : BasePDF( (BasePDF) input ), prototypeDataPoint(input.prototypeDataPoint), prototypeParameterSet(input.prototypeParameterSet), doNotIntegrateList(input.doNotIntegrateList),
 	firstPDF(ClassLookUp::CopyPDF(input.firstPDF) ), secondPDF( ClassLookUp::CopyPDF(input.secondPDF) ), firstFraction(input.firstFraction), firstIntegralCorrection(input.firstIntegralCorrection),
-	secondIntegralCorrection(input.secondIntegralCorrection), fractionName(input.fractionName)
+	secondIntegralCorrection(input.secondIntegralCorrection), fractionName(input.fractionName), _plotComponents( input._plotComponents )
 {
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
@@ -32,7 +32,7 @@ SumPDF::SumPDF( const SumPDF& input ) : BasePDF( (BasePDF) input ), prototypeDat
 //SumPDF::SumPDF( IPDF * FirstPDF, IPDF * SecondPDF, PhaseSpaceBoundary * InputBoundary, string FractionName ) : prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF( ClassLookUp::CopyPDF(FirstPDF) ), secondPDF( ClassLookUp::CopyPDF(SecondPDF) ), firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(FractionName)
 
 SumPDF::SumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL), firstFraction(0.5),
-	firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL)
+	firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL), _plotComponents( true )
 {
 	if( config->GetFractionNames().size() != 1 )                                                                                                                                                                                         
 	{         
@@ -63,9 +63,7 @@ SumPDF::SumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), pro
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
 	secondPDF->SetDebugMutex( this->DebugMutex(), false );
 
-	//this->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
-	//secondPDF->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
-	//firstPDF->SetComponentStatus( firstPDF->GetComponentStatus() || secondPDF->GetComponentStatus() );
+	if( config->isTrue( "DontPlotComponents" ) ) _plotComponents = false;
 }
 
 void SumPDF::SetComponentStatus( const bool input )
@@ -82,6 +80,8 @@ bool SumPDF::GetComponentStatus() const
 
 vector<string> SumPDF::PDFComponents()
 {
+	if( !_plotComponents ) return vector<string>( 1, "0" );
+
 	vector<string> firstpdf_components;
 	for( unsigned int i=0; i< firstPDF->PDFComponents().size(); ++i )
 	{
@@ -289,6 +289,8 @@ vector<string> SumPDF::GetDoNotIntegrateList()
 //Return the components of the function value at the given point
 double SumPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRef* componentIndexObj )
 {
+	if( !_plotComponents ) return this->Evaluate( NewDataPoint );
+
 	string componentIndex = componentIndexObj->getComponentName();
 	int component_num = componentIndexObj->getComponentNumber();
 	if( component_num == -1 )

@@ -833,6 +833,7 @@ namespace Mathematics
 			//dontIntegrate.push_back("tag");
 			dontIntegrate.push_back("tag");
 			//evalPDFnorm = rapidInt->DoNumericalIntegral( event, boundary, dontIntegrate );
+
 			if( usePDF )
 			{
 				evalPDFnorm = PDF->EvaluateTimeOnly( event );
@@ -842,9 +843,11 @@ namespace Mathematics
 				evalPDFnorm = rapidInt->NumericallyIntegrateDataPoint( event, boundary, dontIntegrate );
 			}
 			val = evalPDFraw/evalPDFnorm;
+
 			//val = 1./(8*TMath::Pi());
 			//cout << f[0] << " " << f[1]<< " " <<  f[2]<< " " <<  f[3]<< " " <<  f[4]<< " " <<  f[5]<< " " << f[6]<< " " <<  f[7]<< " " <<  f[8]<< " " <<  f[9]<< endl;
 			//cout << time << " " << cosTheta  << " " << phi << " " << cosPsi << " " << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
+
 			for (int i = 0; i < numAngularTerms; i++)
 			{
 				Sum[i] = Sum[i] + f[i]/val;

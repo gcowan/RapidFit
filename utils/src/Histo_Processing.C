@@ -145,7 +145,9 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 	if( result->Status() != 0 )	chi_2_gaus = DBL_MAX;
 
 	//  The GammaDist function originally complained of invalid results (A LOT) and giving it sensible starting points was a way around this
-	my_gamma->SetParameters( local_histogram->GetFunction( "gaus" )->GetParameter( 0 ), local_histogram->GetFunction( "gaus" )->GetParameter( 1 ), local_histogram->GetFunction( "gaus" )->GetParameter( 2 ) );
+	my_gamma->SetParameters( local_histogram->GetFunction( "gaus" )->GetParameter( 0 ),
+                                 local_histogram->GetFunction( "gaus" )->GetParameter( 1 ),
+                                 local_histogram->GetFunction( "gaus" )->GetParameter( 2 ) );
 
 	//  Try Landau function
 	result = new TFitResult( local_histogram->Fit ( "mylandau", Fit_Options ) );
@@ -159,6 +161,7 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 	TString fit_type;
 
 	//  Determine which function gives the lowest fit chi squared
+	//  This should strictly be chi2/nDoF but each function has the same nDoF due to the chosen parameterization
 	if( fabs(chi_2_landau) < fabs(chi_2_gaus) )  fit_type.Append( "mylandau" );
 	else  if( fabs(chi_2_gamma_f) < fabs(chi_2_gaus) )  fit_type.Append( "gammaf" );
 	else  fit_type.Append( "gaus" );
