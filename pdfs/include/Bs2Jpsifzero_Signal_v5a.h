@@ -106,6 +106,7 @@ class Bs2Jpsifzero_Signal_v5a : public BasePDF
 
 		ObservableRef eventResolutionName;			// Scale to multiply all Gaussians with
 		ObservableRef resScaleName;			// Scale to multiply all Gaussians with
+		ObservableRef resOffsetName;			// Scale to multiply all Gaussians with
 		ObservableRef res1Name;				// time resolution narrow
 		ObservableRef res2Name;				// time resolution wide
 		ObservableRef res3Name;				// time resolution tail
@@ -208,6 +209,7 @@ class Bs2Jpsifzero_Signal_v5a : public BasePDF
 		double resolution ;
 		double eventResolution ;
 		double resolutionScale ;
+		double resolutionOffset ;
 		double resolution1 ;
 		double resolution2 ;
 		double resolution3 ;

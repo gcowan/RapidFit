@@ -52,6 +52,7 @@ Bs2Jpsifzero_Signal_v5a::Bs2Jpsifzero_Signal_v5a(PDFConfigurator* configurator) 
 	, mistagDeltaSetPointName ( configurator->getName("mistagDeltaSetPoint") )
 	// Detector parameters
 	, resScaleName			( configurator->getName("timeResolutionScale") )
+	, resOffsetName			( configurator->getName("timeResolutionOffset") )
 	, eventResolutionName	( configurator->getName("eventResolution") )
 	, res1Name				( configurator->getName("timeResolution1") )
 	, res2Name				( configurator->getName("timeResolution2") )
@@ -98,7 +99,7 @@ Bs2Jpsifzero_Signal_v5a::Bs2Jpsifzero_Signal_v5a(PDFConfigurator* configurator) 
 	,t()/*, ctheta_tr(), phi_tr(), ctheta_1(), ctheta_k(), phi_h(), ctheta_l()*/, tag(),
 	_gamma(), dgam(), Aperp_sq(), //Apara_sq(), Azero_sq(), As_sq(), delta_para(),
 	/*delta_perp(), delta_zero(), delta_s(), delta1(), delta2(),*/ delta_ms(), phi_s(), _cosphis(), _sinphis(), _mistag(), _mistagP1(), _mistagP0(), _mistagSetPoint(),
-	resolutionScale(), resolution1(), resolution2(), resolution3(), resolution2Fraction(), resolution3Fraction(), timeOffset(),
+	resolutionScale(), resolutionOffset(),resolution1(), resolution2(), resolution3(), resolution2Fraction(), resolution3Fraction(), timeOffset(),
 	//angAccI1(), angAccI2(), angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(),
 	tlo(), thi(), expL_stored(), expH_stored(), expSin_stored(), expCos_stored(),
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(), timeAcc(NULL), normalisationCacheValid(false),
@@ -347,6 +348,7 @@ void Bs2Jpsifzero_Signal_v5a::MakePrototypes()
 	parameterNames.push_back( mistagDeltaSetPointName );
 
 	parameterNames.push_back( resScaleName );
+	parameterNames.push_back( resOffsetName );
 	if( ! useEventResolution() )
 	{
 		parameterNames.push_back( res1Name );
@@ -478,6 +480,7 @@ bool Bs2Jpsifzero_Signal_v5a::SetPhysicsParameters( ParameterSet* NewParameterSe
 
 	// Detector parameters
 	resolutionScale		= allParameters.GetPhysicsParameter( resScaleName )->GetValue();
+	resolutionOffset	= allParameters.GetPhysicsParameter( resOffsetName )->GetValue();
 	if( ! useEventResolution() ) {
 		resolution1         = allParameters.GetPhysicsParameter( res1Name )->GetValue();
 		resolution2         = allParameters.GetPhysicsParameter( res2Name )->GetValue();
@@ -652,7 +655,7 @@ double Bs2Jpsifzero_Signal_v5a::Evaluate(DataPoint * measurement)
 	else if( useEventResolution() )
 	{
 		// Event-by-event resolution has been selected
-		resolution = eventResolution * resolutionScale ;
+		resolution = eventResolution * resolutionScale + resolutionOffset;
 		returnValue = this->diffXsec( );
 	}
 	else
@@ -662,17 +665,17 @@ double Bs2Jpsifzero_Signal_v5a::Evaluate(DataPoint * measurement)
 		double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
 		if(resolution1Fraction > 0 )
 		{
-			resolution = resolution1 * resolutionScale ;
+			resolution = resolution1 * resolutionScale + resolutionOffset;
 			val1 = this->diffXsec( );
 		}
 		if(resolution2Fraction > 0 )
 		{
-			resolution = resolution2 * resolutionScale ;
+			resolution = resolution2 * resolutionScale + resolutionOffset;
 			val2 = this->diffXsec( );
 		}
 		if(resolution3Fraction > 0 )
 		{
-			resolution = resolution3 * resolutionScale ;
+			resolution = resolution3 * resolutionScale + resolutionOffset;
 			val3 = this->diffXsec( );
 		}
 		returnValue = resolution1Fraction*val1 + resolution2Fraction*val2 + resolution3Fraction*val3 ;
@@ -735,22 +738,22 @@ double Bs2Jpsifzero_Signal_v5a::EvaluateTimeOnly(DataPoint * measurement)
 		returnValue = this->diffXsecTimeOnly( );
 	}
 	else if( useEventResolution() ) {
-		resolution = eventResolution * resolutionScale ;
+		resolution = eventResolution * resolutionScale + resolutionOffset;
 		returnValue = this->diffXsecTimeOnly( );
 	}
 	else {
 		double val1=0. , val2=0., val3=0. ;
 		double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
 		if(resolution1Fraction > 0 ) {
-			resolution = resolution1 * resolutionScale ;
+			resolution = resolution1 * resolutionScale + resolutionOffset;
 			val1 = this->diffXsecTimeOnly( );
 		}
 		if(resolution2Fraction > 0 ) {
-			resolution = resolution2 * resolutionScale ;
+			resolution = resolution2 * resolutionScale + resolutionOffset;
 			val2 = this->diffXsecTimeOnly( );
 		}
 		if(resolution3Fraction > 0 ) {
-			resolution = resolution3 * resolutionScale ;
+			resolution = resolution3 * resolutionScale + resolutionOffset;
 			val3 = this->diffXsecTimeOnly( );
 		}
 		returnValue = resolution1Fraction*val1 + resolution2Fraction*val2 + resolution3Fraction*val3 ;
@@ -816,7 +819,7 @@ double Bs2Jpsifzero_Signal_v5a::Normalisation(DataPoint * measurement, PhaseSpac
 	if( useEventResolution() )
 	{
 		if( resolutionScale <=0. ) resolution = 0. ;
-		else resolution = eventResolution * resolutionScale ;
+		else resolution = eventResolution * resolutionScale + resolutionOffset;
 		returnValue = this->diffXsecCompositeNorm1( 0 );
 	}
 	else //We are not going to use event by event resolution so we can use all the caching machinery
@@ -850,17 +853,17 @@ double Bs2Jpsifzero_Signal_v5a::Normalisation(DataPoint * measurement, PhaseSpac
 				double resolution1Fraction = 1. - resolution2Fraction - resolution3Fraction ;
 				if(resolution1Fraction > 0 )
 				{
-					resolution = resolution1 * resolutionScale ;
+					resolution = resolution1 * resolutionScale + resolutionOffset;
 					val1 = this->diffXsecCompositeNorm1( 1 );
 				}
 				if(resolution2Fraction > 0 )
 				{
-					resolution = resolution2 * resolutionScale ;
+					resolution = resolution2 * resolutionScale + resolutionOffset;
 					val2 = this->diffXsecCompositeNorm1( 2 );
 				}
 				if(resolution3Fraction > 0 )
 				{
-					resolution = resolution3 * resolutionScale ;
+					resolution = resolution3 * resolutionScale + resolutionOffset;
 					val3 = this->diffXsecCompositeNorm1( 3 );
 				}
 				returnValue = resolution1Fraction*val1 + resolution2Fraction*val2 + resolution3Fraction*val3 ;
@@ -1426,7 +1429,7 @@ void Bs2Jpsifzero_Signal_v5a::CacheTimeIntegrals()
 	if( useEventResolution() )
 	{
 		unsigned int ires = 0;
-		resolution = eventResolution * resolutionScale;
+		resolution = eventResolution * resolutionScale + resolutionOffset;
 		for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice )
 		{
 			tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
@@ -1457,9 +1460,9 @@ void Bs2Jpsifzero_Signal_v5a::CacheTimeIntegrals()
 		{
 
 			if( ires==0 ) resolution = 0.0;
-			if( ires==1 ) resolution = resolution1 * resolutionScale;
-			if( ires==2 ) resolution = resolution2 * resolutionScale;
-			if( ires==3 ) resolution = resolution3 * resolutionScale;
+			if( ires==1 ) resolution = resolution1 * resolutionScale+ resolutionOffset;
+			if( ires==2 ) resolution = resolution2 * resolutionScale+ resolutionOffset;
+			if( ires==3 ) resolution = resolution3 * resolutionScale+ resolutionOffset;
 
 			for( unsigned int islice = 0; islice < (unsigned)timeAcc->numberOfSlices(); ++islice )
 			{
