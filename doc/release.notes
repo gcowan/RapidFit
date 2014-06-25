@@ -1,5 +1,8 @@
 // $Id: release.notes $
 
+2014/06/25 Conor Fitzpatrick
+  - Updated Bs2Jpsifzero PDF to v8 in order to make use of the internal mistag calibration handling
+
 2014/06/20 Rob Currie
   - Adding the optional XML tag <ConfigurationParameter>DontPlotComponents:True</ConfigurationParameter> to the NormalisedSum, Prod and Sum PDFs
        This allows you to use complex PDFs for projections but to ignore certain complex parts of the PDF structure
