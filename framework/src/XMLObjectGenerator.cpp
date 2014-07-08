@@ -1606,7 +1606,7 @@ PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * Fit
 					exit(8972);
 				}
 			}
-			else if ( name == "PDFConfiguration" )
+			else if ( name == "PDFConfigurator" )
 			{
 				pdfOptionXML = dataComponents[dataIndex];
 			}
