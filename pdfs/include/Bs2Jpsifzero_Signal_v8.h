@@ -252,6 +252,8 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		//SlicedAcceptance* timeAcc;
 
 		//Configurationparameters
+
+		bool _cpEven;
 		bool _numericIntegralForce;
 		bool _numericIntegralTimeOnly;
 		bool _useCosAndSin;

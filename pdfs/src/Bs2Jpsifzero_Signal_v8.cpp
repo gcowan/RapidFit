@@ -64,6 +64,7 @@ Bs2Jpsifzero_Signal_v8::Bs2Jpsifzero_Signal_v8(PDFConfigurator* configurator) : 
 	phihName			( configurator->getName("helphi") ), 
 */	BetaName			( configurator->getName("beta") ), 
 	// Other things
+	_cpEven(false), 
 	_useEventResolution(false), 
 	_numericIntegralForce(false), 
 	_numericIntegralTimeOnly(false), 
@@ -98,6 +99,7 @@ Bs2Jpsifzero_Signal_v8::Bs2Jpsifzero_Signal_v8(PDFConfigurator* configurator) : 
 	// Configure  options
 	_numericIntegralForce    = configurator->isTrue( "NumericIntegralForce") ;
 	_numericIntegralTimeOnly = configurator->isTrue( "NumericIntegralTimeOnly" ) ;
+	_cpEven = configurator->isTrue( "CPEven" ) ;
 	_useEventResolution = configurator->isTrue( "UseEventResolution" ) ;
 	_useCosAndSin = configurator->isTrue( "UseCosAndSin" ) ;
 	//_useCosDpar = configurator->isTrue( "UseCosDpar" ) ;
@@ -342,7 +344,13 @@ bool Bs2Jpsifzero_Signal_v8::SetPhysicsParameters( ParameterSet* NewParameterSet
 	}
 	*/
 	//Aperp_sq = allParameters.GetPhysicsParameter( Aperp_sqName )->GetValue();
+if(_cpEven){
+	Aperp_sq=0.0;
+	Azero_sq=1.0;
+}else{
 	Aperp_sq=1.0;
+	Azero_sq=0.0;
+}
 	/*if( (Aperp_sq < 0.) || (Aperp_sq > 1.)  )
 	{
 		cout << "Warning in Bs2Jpsifzero_Signal_v8::SetPhysicsParameters: Aperp_sq <0 or >1 but left as is" <<  endl;
@@ -430,7 +438,7 @@ bool Bs2Jpsifzero_Signal_v8::SetPhysicsParameters( ParameterSet* NewParameterSet
 	this->prepareCDS( lambda, phi_s );
 
 	stored_AT = Aperp_sq > 0. ? sqrt(Aperp_sq) : 0.;
-	//stored_A0 = Azero_sq > 0. ? sqrt(Azero_sq) : 0.;
+	stored_A0 = Azero_sq > 0. ? sqrt(Azero_sq) : 0.;
 	//stored_AP = Apara_sq > 0. ? sqrt(Apara_sq) : 0.;
 	//stored_AS = As_sq > 0. ? sqrt(As_sq) : 0.;
 	//stored_ASint = stored_AS * Csp;
@@ -940,7 +948,7 @@ double Bs2Jpsifzero_Signal_v8::diffXsec()
 	preCalculateTimeFactors();
 
 	//double xsec=-1.;
-	double xsec=AT() * AT() * timeFactorATAT(  ); 
+	double xsec=AT() * AT() * timeFactorATAT(  ) + A0() * A0() * timeFactorA0A0(  ); 
 /*
 	if( _usePlotAllComponents && !_usePlotComponents )
 	{
@@ -1112,7 +1120,7 @@ double Bs2Jpsifzero_Signal_v8::diffXsecTimeOnly()
 
 	double xsec =
 
-//		A0()*A0() * timeFactorA0A0(  ) * angAccI1 +
+		A0()*A0() * timeFactorA0A0(  ) + //* angAccI1 +
 //		AP()*AP() * timeFactorAPAP(  ) * angAccI2 +
 		AT()*AT() * timeFactorATAT(  ); //* angAccI3 +
 
@@ -1151,7 +1159,7 @@ double Bs2Jpsifzero_Signal_v8::diffXsecNorm1()
 {
 	double norm =
 
-//		A0()*A0() * timeFactorA0A0Int(  ) * angAccI1   +
+		A0()*A0() * timeFactorA0A0Int(  ) + //* angAccI1   +
 //		AP()*AP() * timeFactorAPAPInt(  ) * angAccI2   +
 		AT()*AT() * timeFactorATATInt(  ); //* angAccI3   +
 
