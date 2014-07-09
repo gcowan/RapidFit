@@ -1,5 +1,10 @@
 // $Id: release.notes $
 
+2014/07/09 Rob Currie
+  - Fixing bug where by if the user was to request for a CommonPDF to be used in generation then the CommonPDF wasn't picked up and the FitPDF was leading to unintentional behaviour
+       If the user requests ONLY a PDFConfigurator this will have the effect of adding these PDF configuration options to the FitPDF
+       In order to get the CommonPDF with a custom configuration you need to request <CommonPDF>True</CommonPDF> as well
+
 2014/06/25 Conor Fitzpatrick
   - Updated Bs2Jpsifzero PDF to v8 in order to make use of the internal mistag calibration handling
 

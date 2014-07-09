@@ -5,7 +5,7 @@
 
   @author Benjamin M Wynne bwynne@cern.ch
   @date 2009-10-02
- */
+  */
 
 //	RapidFit Headers
 #include "I_XMLConfigReader.h"
@@ -686,7 +686,7 @@ PhaseSpaceBoundary* XMLConfigReader::FindCommonPhaseSpace( XMLTag* PhaseTag )
    }
    return NULL;
    }
- */
+   */
 
 XMLTag* XMLConfigReader::FindCommonPDFXML()
 {

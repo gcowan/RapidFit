@@ -1622,6 +1622,15 @@ PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * Fit
 					Starting_Value = XMLTag::GetIntegerValue( dataComponents[dataIndex] );
 				}
 			}
+			else if ( name == "CommonPDF" )
+			{
+				string value = XMLTag::GetStringValue( dataComponents[dataIndex] );
+				if( value == "True" )
+				{
+					generatePDFXML = common;
+					generatePDFFlag = true;
+				}
+			}
 			else
 			{
 				cerr << "Unrecognised data set component: " << name << endl;
