@@ -216,6 +216,10 @@ SHARED_UTIL_LIBS=$(OBJDIR)/StringProcessing.o $(OBJUTILDIR)/TTree_Processing.o $
 $(EXEDIR)/RapidPlot: $(OBJUTILDIR)/RapidPlot.o $(OBJUTILDIR)/DoFCAnalysis.o $(OBJUTILDIR)/OutputPlots.o $(OBJUTILDIR)/CorrMatrix.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 
+
+$(EXEDIR)/RapidToyDiff: $(OBJUTILDIR)/RapidToyDiff.o $(SHARED_UTIL_LIBS)
+	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
+
 $(EXEDIR)/RapidDiff: $(OBJUTILDIR)/RapidDiff.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 
@@ -253,7 +257,8 @@ $(EXEDIR)/Per-Event: $(OBJUTILDIR)/Per-Event.o $(SHARED_UTIL_LIBS)
 $(EXEDIR)/plotDists: $(OBJUTILDIR)/plotDists.o $(SHARED_UTIL_LIBS)
 	$(CXX) -o $@ $^ $(LINKFLAGS) $(ROOTLIBS)
 
-utils:	$(EXEDIR)/print $(EXEDIR)/RapidPlot $(EXEDIR)/RapidDiff
+
+utils:	$(EXEDIR)/print $(EXEDIR)/RapidPlot $(EXEDIR)/RapidDiff $(EXEDIR)/RapidToyDiff
 
 extra:	$(EXEDIR)/Per-Event $(EXEDIR)/lifetime_tool $(EXEDIR)/weighted $(EXEDIR)/ApplyWeights $(EXEDIR)/Compare $(EXEDIR)/tupleDiff $(EXEDIR)/AngularDist $(EXEDIR)/plotDists
 
