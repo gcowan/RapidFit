@@ -83,7 +83,7 @@ int main( int argc, char* argv[] )
 	             gStyle->SetOptFit(111);
 
 	TString Output_Dir;
-	Output_Dir = "ToyStudy_Output_"; Output_Dir.Append( StringOperations::TimeString() );
+	Output_Dir = "DiffToyStudy_Output_"; Output_Dir.Append( StringOperations::TimeString() );
 	gSystem->mkdir( Output_Dir );
 
 	TTree* RapidFitResult_1 = ROOT_File_Processing::GetFirstTree( argv[1], "READ" );
