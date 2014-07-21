@@ -273,6 +273,12 @@ vector<string> PDFConfigurator::GetFractionNames() const
 
 void PDFConfigurator::SetPDFLabel( const string input )
 {
+	if( PDFLabel != "" && PDFLabel != input )
+	{
+		cerr << "PDFLabel is: " << PDFLabel << endl;
+		cerr << "Can't be changed to: " << input << endl;
+		exit(0);
+	}
 	PDFLabel = input;
 }
 

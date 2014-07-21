@@ -196,7 +196,7 @@ void PhaseSpaceBoundary::RemoveConstraint( string Name )
 		allNames.erase( remove_name );
 		if( *remove_const != NULL ) delete *remove_const;
 		allConstraints.erase( remove_const );
-		double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+		double largeRandomNumber = 1E10 * RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 		int largeRandomOffSet = (int) largeRandomNumber;
 		uniqueID+=(unsigned)largeRandomOffSet;
 	}
@@ -263,7 +263,7 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, IConstraint * NewConstraint
 		return true;
 	}
 
-	double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 	int largeRandomOffSet = (int) largeRandomNumber;
 	uniqueID+=(unsigned)largeRandomOffSet;
 }
@@ -274,7 +274,7 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, double Minimum, double Maxi
 	ObservableContinuousConstraint * newConstraint = new ObservableContinuousConstraint( Name, Minimum, Maximum, Unit );
 	bool returnValue = this->SetConstraint( Name, newConstraint );
 	delete newConstraint;
-	double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 	int largeRandomOffSet = (int) largeRandomNumber;
 	uniqueID+=(unsigned)largeRandomOffSet;
 	return returnValue;
@@ -285,7 +285,7 @@ bool PhaseSpaceBoundary::SetConstraint( string Name, vector<double> Values, stri
 	ObservableDiscreteConstraint * newConstraint = new ObservableDiscreteConstraint( Name, Values, Unit );
 	bool returnValue = this->SetConstraint( Name, newConstraint );
 	delete newConstraint;
-	double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 	int largeRandomOffSet = (int) largeRandomNumber;
 	uniqueID+=(unsigned)largeRandomOffSet;
 	return returnValue;
@@ -309,7 +309,7 @@ void PhaseSpaceBoundary::AddConstraint( string Name, IConstraint* NewConstraint,
 		if( overwrite ) this->SetConstraint( Name, NewConstraint );
 	}
 
-	double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 	int largeRandomOffSet = (int) largeRandomNumber;
 	uniqueID+=(unsigned)largeRandomOffSet;
 }

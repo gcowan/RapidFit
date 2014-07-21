@@ -217,12 +217,6 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 	for( unsigned int i=0; i< BottleData.size(); ++i )
 	{
 		allPDFs.push_back( BottleData[i]->GetPDF() );
-		//	This is here to force the Random Number generators out of sync for a fixed Seed!
-		//for( unsigned int j=0; j<i; ++j )
-		//{
-		//	someVal = allPDFs.back()->GetRandomFunction()->Rndm();
-		//	(void) someVal;
-		//}
 	}
 
 	if( DebugClass::DebugThisClass( "FitAssembler" ) )
@@ -261,26 +255,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 		BottleData[resultIndex]->SetPhysicsParameters( checkedGenerationParameters );
 
-		/*if( DebugClass::DebugThisClass( "FitAssembler" ) )
-		{
-			cout << "Dsyncing Random Number Generators between PDFs" << endl;
-		}*/
-
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
-		/*for( unsigned int i=0; i<resultIndex; ++i )
-		{
-			DataSetConfiguration* thisConfig = BottleData[resultIndex]->GetDataSetConfig();
-			if( thisConfig!= NULL )
-			{
-				IPDF* thisGen = thisConfig->GetGenerationPDF();
-				if( thisGen != NULL )
-				{
-					someVal = thisGen->GetRandomFunction()->Rndm();
-				}
-			}
-			someVal = BottleData[resultIndex]->GetPDF()->GetRandomFunction()->Rndm();
-			(void) someVal;
-		}*/
 
 		IPDF* genPDF = BottleData[resultIndex]->GetDataSetConfig()->GetGenerationPDF();
 

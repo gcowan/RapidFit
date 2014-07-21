@@ -3,6 +3,13 @@
 2014/07/21 Rob Currie
   - Fixed STUPID bug where ROOT 5.34.18 can't cope with generating dictionaries with empty header files...
   - Removing unique instance of a Random function being called in the pdfs folder. This has unknown consequence.
+  - Fixing a very subtle but very, VERY annoying bug with toys.
+       Originally the Random function in RapidFit was used for just Physics Sim and everything was good.
+       Then I started to use the Random function to allow for controlling if cached objects needed to be updated or not based on unique identifiers.
+       (using a number rather than something more powerful but this was intended to be optimal)
+       The unintended consequence of this was that code intended to avoid collisions caused the physics results to be unreproducible in a way that only showed in real life and not in any by-hand testing.
+       This has now been fixed through the introduction of a second TRandom3 object into the random number sentinal.
+       The objective is that ONLY code related to physics simulation, i.e. MC generation should use the vanilla functions while code in the framework and elsewhere using the Random numbers to generate unique identifies can use a second random number generator which does not effect the physics code.
 
 2014/07/18 Conor Fitzpatrick
   - Added RapidToyDiff to utils

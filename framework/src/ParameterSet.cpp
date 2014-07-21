@@ -359,9 +359,9 @@ bool ParameterSet::AddPhysicsParameter( const PhysicsParameter* NewParameter, bo
 		allInternalNames.push_back( allNames[i] );
 		allForeignNames.push_back( allNames[i] );
 	}
-                  double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
-                  int largeRandomOffSet = (int) largeRandomNumber;
-                uniqueID+=(unsigned)largeRandomOffSet;
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
+	int largeRandomOffSet = (int) largeRandomNumber;
+	uniqueID+=(unsigned)largeRandomOffSet;
 	return true;
 }
 
@@ -396,9 +396,9 @@ bool ParameterSet::AddPhysicsParameters( const ParameterSet * NewParameterSet, b
 		allInternalNames.push_back( ObservableRef(allNames[i]) );
 		allForeignNames.push_back( ObservableRef(allNames[i]) );
 	}
-                  double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
-                  int largeRandomOffSet = (int) largeRandomNumber;
-                uniqueID+=(unsigned)largeRandomOffSet;
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
+	int largeRandomOffSet = (int) largeRandomNumber;
+	uniqueID+=(unsigned)largeRandomOffSet;
 	return true;
 }
 
@@ -487,9 +487,9 @@ void ParameterSet::SetUniqueID( size_t input )
 
 void ParameterSet::FloatedFirst( vector<string> RequiredFloatedSort )
 {
-                  double largeRandomNumber = 1E10 * RapidFitRandom::GetRandomFunction()->Rndm();
-                  int largeRandomOffSet = (int) largeRandomNumber;
-                uniqueID+=(unsigned)largeRandomOffSet;
+	double largeRandomNumber = 1E10 * RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
+	int largeRandomOffSet = (int) largeRandomNumber;
+	uniqueID+=(unsigned)largeRandomOffSet;
 	vector<string> floated;
 
 	if( RequiredFloatedSort.empty() )

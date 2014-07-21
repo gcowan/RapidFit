@@ -38,11 +38,11 @@ class XMLObjectGenerator
 
 		static FitFunctionConfiguration * MakeFitFunction( XMLTag* );
 
-		static IPDF * GetNamedPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag*, XMLTag*, ParameterSet* thisParameterSet, bool print=true );
+		static IPDF * GetNamedPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag*, ParameterSet* thisParameterSet, bool print=true );
 
-		static IPDF * GetPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag* overloadConfigurator, XMLTag* common, ParameterSet* thisParameterSet, bool print=true );
+		static IPDF * GetPDF( XMLTag*, PhaseSpaceBoundary*, XMLTag* overloadConfigurator, ParameterSet* thisParameterSet, bool print=true );
 
-		static DataSetConfiguration * MakeDataSetConfiguration( XMLTag*, PhaseSpaceBoundary*, XMLTag* common, ParameterSet* thisParameterSet, int seed );
+		static DataSetConfiguration * MakeDataSetConfiguration( XMLTag*, PhaseSpaceBoundary*, XMLTag* common, ParameterSet* thisParameterSet );
 
 		static MinimiserConfiguration * MakeMinimiser( XMLTag*, OutputConfiguration* );
 
@@ -62,7 +62,7 @@ class XMLObjectGenerator
 
 		static OutputConfiguration * MakeOutputConfiguration( XMLTag* );
 
-		static PDFWithData * GetPDFWithData( XMLTag*, XMLTag*, int StartVal, XMLTag* overloadConfigurator, XMLTag* common, ParameterSet* thisParameterSet, int seed, PhaseSpaceBoundary* thisPhaseSpaceBoundary );
+		static PDFWithData * GetPDFWithData( XMLTag*, XMLTag*, int StartVal, XMLTag* overloadConfigurator, XMLTag* common, ParameterSet* thisParameterSet, PhaseSpaceBoundary* thisPhaseSpaceBoundary );
 
 	private:
 		XMLObjectGenerator();

@@ -499,7 +499,7 @@ FitFunctionConfiguration * XMLObjectGenerator::MakeFitFunction( XMLTag * Functio
 }
 
 //Create a PDF from an appropriate xml tag
-IPDF * XMLObjectGenerator::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* InputBoundary, XMLTag* overloadConfigurator, XMLTag* common, ParameterSet* thisParameterSet, bool print )
+IPDF * XMLObjectGenerator::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* InputBoundary, XMLTag* overloadConfigurator, ParameterSet* thisParameterSet, bool print )
 {
 	(void) print;
 	IPDF* returnable_NamedPDF=NULL;
@@ -590,7 +590,7 @@ IPDF * XMLObjectGenerator::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* I
 		}
 		else if( pdfConfig[configIndex]->GetName() == "PDF" || pdfConfig[configIndex]->GetName() == "SumPDF" || pdfConfig[configIndex]->GetName() == "NormalisedSumPDF" || pdfConfig[configIndex]->GetName() == "ProdPDF" )
 		{
-			IPDF* thisPDF = XMLObjectGenerator::GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, NULL, thisParameterSet, false );
+			IPDF* thisPDF = XMLObjectGenerator::GetPDF( pdfConfig[configIndex], InputBoundary, overloadConfigurator, thisParameterSet, false );
 			configurator->AddDaughterPDF( thisPDF );
 			delete thisPDF;
 		}
@@ -658,7 +658,7 @@ IPDF * XMLObjectGenerator::GetNamedPDF( XMLTag * InputTag, PhaseSpaceBoundary* I
 }
 
 //Choose one of the PDF instantiation methods
-IPDF * XMLObjectGenerator::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator, XMLTag* common, ParameterSet* thisParameterSet, bool print )
+IPDF * XMLObjectGenerator::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * InputBoundary, XMLTag* overloadConfigurator, ParameterSet* thisParameterSet, bool print )
 {
 	if( overloadConfigurator != NULL && print )
 	{
@@ -717,7 +717,7 @@ IPDF * XMLObjectGenerator::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 		delete configurator;
 	}
 
-	IPDF* returnable_pdf = XMLObjectGenerator::GetNamedPDF( InputTag, InputBoundary, overloadConfigurator, common, thisParameterSet );
+	IPDF* returnable_pdf = XMLObjectGenerator::GetNamedPDF( InputTag, InputBoundary, overloadConfigurator, thisParameterSet );
 	cout << "XMLConfigReader:: Constructed " << returnable_pdf->GetLabel() << " PDF" << endl;
 
 	vector<string> haveNames = thisParameterSet->GetAllNames();
@@ -737,7 +737,7 @@ IPDF * XMLObjectGenerator::GetPDF( XMLTag * InputTag, PhaseSpaceBoundary * Input
 	return returnable_pdf;
 }
 //Collect the information needed to make a data set
-DataSetConfiguration * XMLObjectGenerator::MakeDataSetConfiguration( XMLTag * DataTag, PhaseSpaceBoundary * DataBoundary, XMLTag* common, ParameterSet* thisParameterSet, int seed )
+DataSetConfiguration * XMLObjectGenerator::MakeDataSetConfiguration( XMLTag * DataTag, PhaseSpaceBoundary * DataBoundary, XMLTag* common, ParameterSet* thisParameterSet )
 {
 	//Check the tag actually is a data set
 	if ( DataTag->GetName() == "Subset" )
@@ -794,7 +794,7 @@ DataSetConfiguration * XMLObjectGenerator::MakeDataSetConfiguration( XMLTag * Da
 			}
 		}
 
-		if( generatePDFFlag )   generatePDF = XMLObjectGenerator::GetPDF( PDFXML, DataBoundary, pdfOptions, common, thisParameterSet );
+		if( generatePDFFlag )   generatePDF = XMLObjectGenerator::GetPDF( PDFXML, DataBoundary, pdfOptions, thisParameterSet );
 		generatePDF->SetMCCacheStatus( false );
 		delete thisParameterSet;
 
@@ -1534,7 +1534,7 @@ OutputConfiguration * XMLObjectGenerator::MakeOutputConfiguration( XMLTag * Outp
 }
 
 //Collect the information needed to make a data set
-PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDFTag, int Starting_Value, XMLTag* overloadConfigurator, XMLTag* common, ParameterSet* thisParameterSet, int seed, PhaseSpaceBoundary* thisPhaseSpaceBoundary )
+PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * FitPDFTag, int Starting_Value, XMLTag* overloadConfigurator, XMLTag* common, ParameterSet* thisParameterSet, PhaseSpaceBoundary* thisPhaseSpaceBoundary )
 {
 	//Check the tag actually is a data set
 	if ( DataTag->GetName() == "DataSet" )
@@ -1562,7 +1562,7 @@ PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * Fit
 			}
 			else if ( name == "Subset" )
 			{
-				dataSetMaker = XMLObjectGenerator::MakeDataSetConfiguration( dataComponents[dataIndex], dataBoundary, common, thisParameterSet, seed );
+				dataSetMaker = XMLObjectGenerator::MakeDataSetConfiguration( dataComponents[dataIndex], dataBoundary, common, thisParameterSet );
 			}
 			else if ( name == "CutString" )
 			{
@@ -1642,7 +1642,7 @@ PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * Fit
 
 		if( generatePDFFlag == true )
 		{
-			generatePDF = XMLObjectGenerator::GetPDF( generatePDFXML, dataBoundary, pdfOptionXML, common, thisParameterSet );
+			generatePDF = XMLObjectGenerator::GetPDF( generatePDFXML, dataBoundary, pdfOptionXML, thisParameterSet );
 			generatePDF->SetMCCacheStatus( false );
 		}
 
@@ -1677,7 +1677,7 @@ PDFWithData * XMLObjectGenerator::GetPDFWithData( XMLTag * DataTag, XMLTag * Fit
 			dataSetMaker = oldStyleConfig;
 		}
 		//Make the objects
-		IPDF * fitPDF = XMLObjectGenerator::GetPDF( FitPDFTag, dataBoundary, overloadConfigurator, common, thisParameterSet );
+		IPDF * fitPDF = XMLObjectGenerator::GetPDF( FitPDFTag, dataBoundary, overloadConfigurator, thisParameterSet );
 		fitPDF->SetMCCacheStatus( false );
 
 		if( generatePDF != NULL ) delete generatePDF;

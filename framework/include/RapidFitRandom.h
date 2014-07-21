@@ -34,11 +34,20 @@ class RapidFitRandom
 		static int GetSeedNum();
 
 		/*!
-		 * @brief Get the Random function stored in this PDF
+		 * @brief Get the Random function stored for Physics Sim
 		 *
-		 * @return pointer to the TRandom3 instance inside the PDF
+		 * @return pointer to the TRandom3 instance inside the centinel
 		 */
 		static TRandom3* GetRandomFunction();
+
+		/*!
+		 * @brief Get the Random function intended to be used for internal framework use
+		 *
+		 * @return pointer to the TRandom3 instance for framework inside the centinel
+		 */
+		static TRandom3* GetFrameworkRandomFunction();
+
+		static int GetSeedNumFramework();
 
 	private:
 
@@ -47,6 +56,8 @@ class RapidFitRandom
 		 * the seed_function.empty() is used to see if this is defined, should probably check for NULL pointer, but oh well
 		 */
 		static TRandom3 * seed_function;
+
+		static TRandom3 * seed_function_Framework;
 
 		/*!
 		 * vector of single seed value used in the construction of the TRandom3, again should probably check for a null value, but oh well

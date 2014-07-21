@@ -669,7 +669,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			//	Save all of the X and Y data in the TTree
 			TString TTree_name( "TTree_" ); TTree_name+=componentIndex; TTree_name.Append("_"); TTree_name+=combinationIndex;
 			TString TTree_title( TTree_name );
-			TTree_name.Append("_");TTree_name += RapidFitRandom::GetRandomFunction()->Rndm();
+			TTree_name.Append("_");TTree_name += RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 
 			string TTreeName( TTree_name.Data() );
 			replace( TTreeName.begin(), TTreeName.end(), '.', '_' );
@@ -718,7 +718,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 			TString Data_Name("Raw_Data_"); Data_Name+=componentIndex; Data_Name.Append("_");Data_Name+=combinationIndex;
 			TString Data_Title( Data_Name );
-			Data_Name.Append("_"); Data_Name += RapidFitRandom::GetRandomFunction()->Rndm();
+			Data_Name.Append("_"); Data_Name += RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 
 			TTree* raw_data = new TTree( Data_Name, Data_Title );
 
@@ -740,7 +740,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			//	Bin the data for this combination
 			TH1* data_plot = this->FormatData( combinationIndex );
 			TString ext("_"); ext+=componentIndex; ext.Append("_"); ext+=combinationIndex;
-			ext.Append("_"); ext+=RapidFitRandom::GetRandomFunction()->Rndm();
+			ext.Append("_"); ext+=RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 			string cleanExt( ext.Data() );
 			replace( cleanExt.begin(), cleanExt.end(), '.', '_' );
 			data_plot->SetName( data_plot->GetName() + TString(cleanExt.c_str()) );
@@ -749,7 +749,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 			//	Plot the component on this combination and save the TCanvas
 			TString Graph_Name("TGraph_");Graph_Name+=componentIndex;
 			Graph_Name.Append("_");Graph_Name+=combinationIndex;
-			Graph_Name.Append("_");Graph_Name+=RapidFitRandom::GetRandomFunction()->Rndm();
+			Graph_Name.Append("_");Graph_Name+=RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 
 			string graphCleanName( Graph_Name.Data() );
 			replace( graphCleanName.begin(), graphCleanName.end(), '.', '_' );
@@ -759,7 +759,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 			TString Canvas_Name("TCanvas_");Canvas_Name+=componentIndex;
 			Canvas_Name.Append("_");Canvas_Name+=combinationIndex;
-			Canvas_Name.Append("_");Canvas_Name+=RapidFitRandom::GetRandomFunction()->Rndm();
+			Canvas_Name.Append("_");Canvas_Name+=RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 
 			string CanvasCleanName( Canvas_Name.Data() );
 			replace( CanvasCleanName.begin(), CanvasCleanName.end(), '.', '_' );
@@ -817,7 +817,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		{
 			TGraph* data_graph = new TGraph( total_points,  &((*(*(*X_values)[componentIndex])[combinationIndex])[0]),  &((*(*(*Y_values)[componentIndex])[combinationIndex])[0]) );
 			TString data_name("data_"+combinationIndexstr+"_");data_name+=componentIndex;
-			data_name.Append("_"); data_name+=RapidFitRandom::GetRandomFunction()->Rndm();
+			data_name.Append("_"); data_name+=RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 
 			string dataCleanName( data_name );
 			replace( dataCleanName.begin(), dataCleanName.end(), '.', '_' );
@@ -831,7 +831,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		total_components.push_back( these_components );
 
 		TH1* data_plot = this->FormatData( combinationIndex );
-		TString ext("_"); ext+=combinationIndex; ext.Append("_"); ext+=RapidFitRandom::GetRandomFunction()->Rndm();
+		TString ext("_"); ext+=combinationIndex; ext.Append("_"); ext+=RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 		string cleanExt( ext.Data() );
 		replace( cleanExt.begin(), cleanExt.end(), '.', '_' );
 		data_plot->SetName( data_plot->GetName() + TString(cleanExt.c_str()) );
@@ -866,7 +866,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		temp->logX = logX;
 
 		//	Static function so has to be told everything about what you want to plot!
-		this->OutputPlot( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), RapidFitRandom::GetRandomFunction(), temp );
+		this->OutputPlot( binned_data.back(), these_components, observableName, desc, plotData->GetBoundary(), RapidFitRandom::GetFrameworkRandomFunction(), temp );
 
 		if( this_config != NULL )
 		{
@@ -915,13 +915,13 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				/*
 				   TString graphName("Chi2Graph");
 				   TString graphTitle(graphName);
-				   graphName+=plotPDF->GetRandomFunction()->Rndm();
+				   graphName+=plotPDF->GetFrameworkRandomFunction()->Rndm();
 				   TGraph* tf1_graph = new TGraph( fitting_function );
 				   tf1_graph->SetTitle( graphTitle );
 				   tf1_graph->SetName( graphName );
 
 				   TString Chi2Title("Chi2Title");
-				   TString Chi2Name(Chi2Title); Chi2Name+=plotPDF->GetRandomFunction()->Rndm();
+				   TString Chi2Name(Chi2Title); Chi2Name+=plotPDF->GetFrameworkRandomFunction()->Rndm();
 				   TCanvas* Chi2test = EdStyle::RapidFitCanvas( Chi2Name, Chi2Title );
 				   binned_data.back()->Draw("AP");
 				   tf1_graph->Draw("C");
@@ -958,7 +958,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 
 				cout << endl << "Making Plots" << endl;
 
-				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc_pull.Data(), RapidFitRandom::GetRandomFunction(), this_config );
+				TGraphErrors* pullPlot = ComponentPlotter::PullPlot1D( allPullData, binned_data.back(), observableName, desc_pull.Data(), RapidFitRandom::GetFrameworkRandomFunction(), this_config );
 
 				/*
 				   for( unsigned int i=0; i< (unsigned)binned_data[combinationIndex]->GetN(); ++i )
@@ -967,7 +967,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				   }
 				 */
 
-				this->OutputPlot( binned_data.back(), these_components, observableName, string(desc_pull.Data()), plotData->GetBoundary(), RapidFitRandom::GetRandomFunction(), temp, allPullData );
+				this->OutputPlot( binned_data.back(), these_components, observableName, string(desc_pull.Data()), plotData->GetBoundary(), RapidFitRandom::GetFrameworkRandomFunction(), temp, allPullData );
 				(void)pullPlot;
 			}
 		}
@@ -1015,12 +1015,12 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 		if( temp->combination_names.empty() )	temp->component_names = combDescs;
 		else temp->component_names = temp->combination_names;
 
-		ComponentPlotter::OutputPlot( binned_data[0], allZerothComponents, observableName, desc, plotData->GetBoundary(), RapidFitRandom::GetRandomFunction(), temp );
+		ComponentPlotter::OutputPlot( binned_data[0], allZerothComponents, observableName, desc, plotData->GetBoundary(), RapidFitRandom::GetFrameworkRandomFunction(), temp );
 
 		if( !allPullData.empty() )
 		{
 			desc.append("_wPulls");
-			ComponentPlotter::OutputPlot( binned_data[0], allZerothComponents, observableName, desc, plotData->GetBoundary(), RapidFitRandom::GetRandomFunction(), temp, allPullData );
+			ComponentPlotter::OutputPlot( binned_data[0], allZerothComponents, observableName, desc, plotData->GetBoundary(), RapidFitRandom::GetFrameworkRandomFunction(), temp, allPullData );
 		}
 
 		delete temp;

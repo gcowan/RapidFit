@@ -502,18 +502,16 @@ vector< PDFWithData* > XMLConfigReader::GetPDFsAndData( vector<int> Starting_Val
 				{
 					int s_val_index = (int) pdfsAndData.size(); ++s_val_index;
 					XMLTag* common = this->FindCommonPDFXML();
-					int this_seed = int(GetSeed());
 					ParameterSet* thisSet = this->GetFitParameters();
 					PhaseSpaceBoundary* thisPhaseSpaceBoundary = this->FindCommonPhaseSpace();
-					pdfsAndData.push_back( XMLObjectGenerator::GetPDFWithData( dataTag, pdfTag, Starting_Value[(unsigned)s_val_index], overloadConfigurator, common, thisSet, this_seed, thisPhaseSpaceBoundary ) );
+					pdfsAndData.push_back( XMLObjectGenerator::GetPDFWithData( dataTag, pdfTag, Starting_Value[(unsigned)s_val_index], overloadConfigurator, common, thisSet, thisPhaseSpaceBoundary ) );
 					delete thisPhaseSpaceBoundary;
 					delete thisSet;
 				} else {
 					XMLTag* common = this->FindCommonPDFXML();
-					int this_seed = int(GetSeed());
 					ParameterSet* thisSet = this->GetFitParameters();
 					PhaseSpaceBoundary* thisPhaseSpaceBoundary = this->FindCommonPhaseSpace();
-					pdfsAndData.push_back( XMLObjectGenerator::GetPDFWithData( dataTag, pdfTag, -1, overloadConfigurator, common, thisSet, this_seed, thisPhaseSpaceBoundary ) );
+					pdfsAndData.push_back( XMLObjectGenerator::GetPDFWithData( dataTag, pdfTag, -1, overloadConfigurator, common, thisSet, thisPhaseSpaceBoundary ) );
 					delete thisPhaseSpaceBoundary;
 					delete thisSet;
 				}
