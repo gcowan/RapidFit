@@ -11,6 +11,10 @@
        This has now been fixed through the introduction of a second TRandom3 object into the random number sentinal.
        The objective is that ONLY code related to physics simulation, i.e. MC generation should use the vanilla functions while code in the framework and elsewhere using the Random numbers to generate unique identifies can use a second random number generator which does not effect the physics code.
 
+       ATTENTION USERS!!! ALWAYS make comparisons of fits to toys using the SAME version of RapidFit from svn.
+       i.e. all toys generated after this fix has been applied ARE NOT the same as the toys generated before the fix. This can't be helped due to the nature of the bug that has been fixed.
+       Much thanks goes to Conor for finding and identifying the nature of this bug as it's not subtle!
+
 2014/07/18 Conor Fitzpatrick
   - Added RapidToyDiff to utils
 	This tool is so that you can compare toys generated with the same seed but fit with a different configuration. It plots the difference in the parameter values toy-per-toy, so you _must_ use --fixedTotalToys in both toy studies to ensure fits which fall over don't desynchronise the toy datasets. 
