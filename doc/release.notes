@@ -2,6 +2,7 @@
 
 2014/07/21 Rob Currie
   - Fixed STUPID bug where ROOT 5.34.18 can't cope with generating dictionaries with empty header files...
+  - Removing unique instance of a Random function being called in the pdfs folder. This has unknown consequence.
 
 2014/07/18 Conor Fitzpatrick
   - Added RapidToyDiff to utils

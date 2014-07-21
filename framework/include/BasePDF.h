@@ -83,9 +83,6 @@
 #ifndef BASE_PDF_H
 #define BASE_PDF_H
 
-///	ROOT Headers
-#include "TRandom.h"
-#include "TRandom3.h"
 ///	RapidFit Headers
 #include "IPDF.h"
 #include "BasePDF_Framework.h"

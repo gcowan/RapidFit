@@ -261,10 +261,10 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 		}
 		BottleData[resultIndex]->SetPhysicsParameters( checkedGenerationParameters );
 
-		if( DebugClass::DebugThisClass( "FitAssembler" ) )
+		/*if( DebugClass::DebugThisClass( "FitAssembler" ) )
 		{
 			cout << "Dsyncing Random Number Generators between PDFs" << endl;
-		}
+		}*/
 
 		IPDF* Requested_PDF = BottleData[resultIndex]->GetPDF();
 		/*for( unsigned int i=0; i<resultIndex; ++i )

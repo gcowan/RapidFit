@@ -7,8 +7,6 @@
  * @author Benjamin M Wynne bwynne@cern.ch
  * @author Robert Currie rcurrie@cern.ch
  */
-///	ROOT Headers
-#include "TRandom3.h"
 ///	RapidFit Headers
 #include "BasePDF.h"
 #include "BasePDF_Framework.h"

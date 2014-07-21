@@ -15,7 +15,6 @@
 
 ///	ROOT Headers
 #include "TString.h"
-#include "TRandom3.h"
 ///	RapidFit Headers
 #include "IPDF_MCCaching.h"
 #include "IPDF_Framework.h"
