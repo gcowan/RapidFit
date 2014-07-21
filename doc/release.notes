@@ -1,8 +1,11 @@
 // $Id: release.notes $
+
+2014/07/21 Rob Currie
+  - Fixed STUPID bug where ROOT 5.34.18 can't cope with generating dictionaries with empty header files...
+
 2014/07/18 Conor Fitzpatrick
   - Added RapidToyDiff to utils
 	This tool is so that you can compare toys generated with the same seed but fit with a different configuration. It plots the difference in the parameter values toy-per-toy, so you _must_ use --fixedTotalToys in both toy studies to ensure fits which fall over don't desynchronise the toy datasets. 
-
 
 2014/07/09 Rob Currie
   - Fixing bug where by if the user was to request for a CommonPDF to be used in generation then the CommonPDF wasn't picked up and the FitPDF was leading to unintentional behaviour
