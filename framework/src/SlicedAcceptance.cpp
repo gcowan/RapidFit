@@ -10,6 +10,9 @@
 
 #include "SlicedAcceptance.h"
 #include "StringProcessing.h"
+#include "TFile.h"
+#include "TH1F.h"
+#include "TRandom3.h"
 
 #include <cmath>
 #include <stdio.h>
@@ -104,14 +107,14 @@ SlicedAcceptance::SlicedAcceptance( double tl, double th, double b, bool quiet )
 	//....done.....
 	_sortedSlices = this->isSorted();
 
-        if( _sortedSlices )
-        {
+	if( _sortedSlices )
+	{
 		if( !quiet ) cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
-        }
-        else
-        {
+	}
+	else
+	{
 		if( !quiet ) cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
-        }
+	}
 }
 
 
@@ -143,14 +146,14 @@ SlicedAcceptance::SlicedAcceptance( string s, bool quiet ) :
 	//....done.....
 	_sortedSlices = this->isSorted();
 
-        if( _sortedSlices )
-        {
+	if( _sortedSlices )
+	{
 		if( !quiet ) cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
-        }
-        else
-        {
+	}
+	else
+	{
 		if( !quiet ) cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
-        }
+	}
 }
 
 //............................................
@@ -169,7 +172,7 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 	std::string line;
 	std::ifstream myfile( fullFileName.c_str() );
 
- 	while (std::getline(myfile, line))	++number_of_lines;
+	while (std::getline(myfile, line))	++number_of_lines;
 
 	myfile.close();
 
@@ -207,6 +210,99 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 	//exit(0);
 	if( !quiet ) cout << "Time Acc Slices: " << lowEdge.size() << endl;
 	if( lowEdge.size() == 1 )
+	{
+		cout << "SlicedAcceptance: SERIOUS ERROR" << endl;
+		exit(0);
+	}
+	//....done.....
+
+
+	_sortedSlices = this->isSorted();
+
+	if( _sortedSlices )
+	{
+		if( !quiet ) cout << "Sliced Acceptance is using sorted horizontal slices" << endl;
+	}
+	else
+	{
+		if( !quiet ) cout << "Sliced Acceptance is NOT using sorted horizontal slices" << endl;
+	}
+}
+
+//............................................
+// Constructor for accpetance from a ROOT Tfile
+SlicedAcceptance::SlicedAcceptance( string type, string fileName,string histName, bool fluctuate, bool quiet ) :
+	slices(), nullSlice(new AcceptanceSlice(0.,0.,0.)), tlow(), thigh(), beta(), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.), _hasChecked(false), _storedDecision(false)
+{
+	if(!quiet) cout << "Root file being used for acceptance" << endl;
+	(void)type;
+	if( type != "RootFile" ) {   }//do nothing for now
+
+	string fullFileName = StringProcessing::FindFileName( fileName, quiet );
+
+	if( !quiet ) cout << "Opening: " << fullFileName << endl;
+
+	TFile* file = TFile::Open(TString(fullFileName));
+ 	if(!quiet) cout << "File " << fullFileName << " opened!" << endl;
+	TH1F* histo = (TH1F*)file->Get(TString(histName));
+	if(!quiet) cout << "Histo " << histName << " opened!" << endl;
+	histo->Draw();
+	if(!quiet) cout << "Histo " << histName << " drawn!" << endl;
+//	histo->Sumw2();
+
+	if(fluctuate){
+	cout << "WARNING! You have fluctuated the acceptance." << endl;
+	cout << "WARNING! This is for systematic studies only. " << endl;
+	cout << "WARNING! Projections and pull fits will have a different fluctuated acceptance to the PDF you fit with." << endl;
+	cout << "WARNING! ONLY USE FluctuateAcceptance:True FOR SYSTEMATIC STUDIES" << endl;
+	TRandom3 * rng = new TRandom3(0);	
+	//Randomly fluctuate bin contents within error: 
+	for (int l = 1; l <= histo->GetNbinsX(); ++l){
+	if(!quiet)	cout << "Bin content and error before: " << histo->GetBinContent(l) << "+/-" << histo->GetBinError(l);
+		histo->SetBinContent(l,rng->Gaus(histo->GetBinContent(l),histo->GetBinError(l)));
+	if(!quiet)	cout <<  " and after: " << histo->GetBinContent(l) << "+/-" << histo->GetBinError(l) << endl;
+	}
+	delete rng;
+	}
+
+	histo->Scale(1./(histo->GetBinContent(histo->GetMaximumBin())));
+	histo->SetMinimum(0);
+
+
+	double maxend = histo->GetBinLowEdge(histo->GetNbinsX()) + histo->GetBinWidth(histo->GetNbinsX());
+	double height;
+	double start;
+	double end  = histo->GetBinLowEdge(histo->GetNbinsX()) + histo->GetBinWidth(histo->GetNbinsX());
+	double dheight;
+	for (int l = 1; l <= histo->GetNbinsX(); ++l){
+		height = histo->GetBinContent(l);
+		dheight = height;
+		for (int n = l; n>0; n--){
+			if(histo->GetBinContent(n)<height){
+				dheight = height - histo->GetBinContent(n);
+				cout << l << " " << n << " " << dheight << endl;
+				break;
+			}
+		}
+		start = histo->GetBinLowEdge(l);
+		end = maxend;
+		for (int m = l; m <= histo->GetNbinsX(); ++m){
+			double thisbinheight = histo->GetBinContent(m);
+			if(thisbinheight<height){
+				end = histo->GetBinLowEdge(m);
+				break;
+			}
+		}
+		slices.push_back( new AcceptanceSlice( start, end, dheight ) );
+	if(!quiet)	cout << start << "	" << end << "      " << dheight << endl;
+	}
+	histo->Delete();
+//	delete histo;
+	file->Close();
+	delete file;
+
+	if( !quiet ) cout << "Time Acc Slices: " << slices.size() << endl;
+	if( slices.size() == 1 )
 	{
 		cout << "SlicedAcceptance: SERIOUS ERROR" << endl;
 		exit(0);
@@ -273,7 +369,7 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 			{
 				cout << "TIME BELOW ACCEPTANCE HISTO!!!" << endl;
 			}
-	
+
 			cout << " time: " << time->GetValue() << " offset: " << timeOffset << " min: " << this->GetMin() << endl;
 			this->Print();
 			throw(-987643);

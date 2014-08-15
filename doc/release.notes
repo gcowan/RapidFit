@@ -1,4 +1,16 @@
 // $Id: release.notes $
+2014/08/15 Conor Fitzpatrick
+  - Modified SlicedAceeptance and TimeAccRes so that now acceptance histograms can be loaded directly from a ROOT file. This is backwards compatible. If you configure your XML with 
+   <ConfigurationParameter>TimeAcceptanceFile:MyAcceptanceSlices.txt</ConfigurationParameter> 
+  you will get what you always have. Now, if you use the following instead: 
+   <ConfigurationParameter>TimeAcceptanceRootFile:MyAcceptanceHistos.root</ConfigurationParameter>
+   <ConfigurationParameter>TimeAcceptanceHisto:AcceptanceHistoNameInRootFile</ConfigurationParameter>
+  the TH1F corresponding to your acceptance will be loaded and the slices computed internally. This saves you a step outside of rapidfit to make the slices yourself. 
+  The real advantage is for systematic studies. If you made the acceptance from a sample with finite MC stats, you need a systematic. Fitting to your data with the new syntax, setting repeats to some large number and adding the line: 
+  <ConfigurationParameter>FluctuateAcceptance:True</ConfigurationParameter>
+  means that the error on the histogram bins will be used to determine a systematic: At each repeat the histogram bins are fluctuated around their central value with a random Gaussian of width equal to their bin error. You can then use RapidPlot on the pullPlots.root output to see how your central value is distributed amongst the fluctuated acceptance. 
+  There is one issue: If you turn on FluctuateAcceptance, the acceptance gets fluctuated differently for each instantiation of the PDF. That means once per tag category and again when making the projections: The PDF you project will have a different fluctuated acceptance to the PDF you actually fit to. There's no reason to fluctuate the acceptance anyway for a projection, but it is important you know this unexpected behavior. 
+  
 
 2014/07/21 Rob Currie
   - Fixed STUPID bug where ROOT 5.34.18 can't cope with generating dictionaries with empty header files...

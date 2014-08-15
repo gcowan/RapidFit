@@ -60,6 +60,15 @@ class SlicedAcceptance
 		 *
 		 */
 		SlicedAcceptance( string s, bool quiet=false );
+		/*!
+		 * @brief
+		 *
+		 * @param s1
+		 *
+		 * @param s2
+		 *
+		 */
+		SlicedAcceptance( string s1, string s2, string s3,bool fluctuate =false, bool quiet=false  );
 
 		/*!
 		 * @brief

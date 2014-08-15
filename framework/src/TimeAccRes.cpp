@@ -51,10 +51,23 @@ void TimeAccRes::ConfigTimeAcc( PDFConfigurator* configurator, bool quiet )
 			//timeAcc = new SlicedAcceptance( 0., 14.0, 0.00, quiet) ;
 			if( !quiet ) cout << "TimeAccRes:: Constructing timeAcc: Upper time acceptance beta=0.00826 [0 < t < 14] " << endl ;
 		}
+
 		else if( configurator->getConfigurationValue( "TimeAcceptanceFile" ) != "" )
 		{
 			timeAcc = new SlicedAcceptance( "File" , configurator->getConfigurationValue( "TimeAcceptanceFile" ), quiet ) ;
 			if( !quiet ) cout << "TimeAccRes:: Constructing timeAcc: using file: " << configurator->getConfigurationValue( "TimeAcceptanceFile" ) << endl ;
+		}
+		
+		else if( configurator->getConfigurationValue( "TimeAcceptanceRootFile" ) != "" ) //CF: adding root histo parsing for fluctuation studies
+		{
+			if(configurator->getConfigurationValue("FluctuateAcceptance") == "True"){
+			timeAcc = new SlicedAcceptance( "RootFile" , configurator->getConfigurationValue( "TimeAcceptanceRootFile" ), configurator->getConfigurationValue( "TimeAcceptanceHisto" ), true, quiet ) ;
+			if( !quiet ) cout << "TimeAccRes:: Constructing timeAcc: using root file: " << configurator->getConfigurationValue( "TimeAcceptanceRootFile" ) << endl ;
+			}else{
+			timeAcc = new SlicedAcceptance( "RootFile" , configurator->getConfigurationValue( "TimeAcceptanceRootFile" ),  configurator->getConfigurationValue( "TimeAcceptanceHisto" ), false ,quiet ) ;
+			if( !quiet ) cout << "TimeAccRes:: Constructing timeAcc: using fluctuated root file: " << configurator->getConfigurationValue( "TimeAcceptanceRootFile" ) << endl ;
+			
+			}
 		}
 	}
 
