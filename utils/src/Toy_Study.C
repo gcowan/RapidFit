@@ -317,8 +317,8 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 		input_tree->Draw( all_parameter_plots[j], cut_str, "goff" );
 
 		TH1* input_histo = (TH1*) input_tree->GetHistogram();
-		TString Histo_Name( all_parameter_plots[j] );
-		Histo_Name+=rand_gen->Rndm();
+		TString Histo_Name("Histo");
+		Histo_Name+=all_parameter_plots[j];
 		input_histo->SetName( Histo_Name );
 
 		Histogram_Processing::OptimallyRebin( input_histo );
@@ -327,7 +327,7 @@ int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<s
 
 		Histogram_Processing::Silent_Fit( input_histo, fit_type );
 
-		TString Canvas_Name("Canvas");	Canvas_Name+=rand_gen->Rndm();
+		TString Canvas_Name("Canvas");	Canvas_Name+=all_parameter_plots[j];
 		TCanvas* c1 = EdStyle::RapidFitCanvas( Canvas_Name, Canvas_Name );
 		Histogram_Processing::Silent_Draw( c1, input_histo );
 		TAxis* x_axis = input_histo->GetXaxis();

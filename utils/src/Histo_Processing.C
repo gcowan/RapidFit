@@ -134,8 +134,8 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 
 
 	TString Fit_Options( "Q" );			// Reduce the verbosity slamming the user during this internal procedure
-	TF1* my_landau = Mathematics::landau_func(); (void) my_landau;
-	TF1* my_gamma = Mathematics::gamma_func(); (void) my_gamma; // this is used from the global state not here... this displeases me...
+//	TF1* my_landau = Mathematics::landau_func(); (void) my_landau;
+//	TF1* my_gamma = Mathematics::gamma_func(); (void) my_gamma; // this is used from the global state not here... this displeases me...
 
 	TFitResult* result = NULL;
 
@@ -145,26 +145,27 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 	if( result->Status() != 0 )	chi_2_gaus = DBL_MAX;
 
 	//  The GammaDist function originally complained of invalid results (A LOT) and giving it sensible starting points was a way around this
-	my_gamma->SetParameters( local_histogram->GetFunction( "gaus" )->GetParameter( 0 ),
-                                 local_histogram->GetFunction( "gaus" )->GetParameter( 1 ),
-                                 local_histogram->GetFunction( "gaus" )->GetParameter( 2 ) );
+//	my_gamma->SetParameters( local_histogram->GetFunction( "gaus" )->GetParameter( 0 ),
+//                                 local_histogram->GetFunction( "gaus" )->GetParameter( 1 ),
+//                                 local_histogram->GetFunction( "gaus" )->GetParameter( 2 ) );
 
 	//  Try Landau function
-	result = new TFitResult( local_histogram->Fit ( "mylandau", Fit_Options ) );
-	Double_t chi_2_landau ( local_histogram->GetFunction ( "mylandau" )->GetChisquare() );
-	if( result->Status() != 0 )	chi_2_landau = DBL_MAX;
+//	result = new TFitResult( local_histogram->Fit ( "mylandau", Fit_Options ) );
+//	Double_t chi_2_landau ( local_histogram->GetFunction ( "mylandau" )->GetChisquare() );
+//	if( result->Status() != 0 )	chi_2_landau = DBL_MAX;
 
-	result = new TFitResult( local_histogram->Fit ( "gammaf", Fit_Options ) );
-	Double_t chi_2_gamma_f ( local_histogram->GetFunction( "gammaf" )->GetChisquare() );
-	if( result->Status() != 0 )	chi_2_gamma_f = DBL_MAX;
+//	result = new TFitResult( local_histogram->Fit ( "gammaf", Fit_Options ) );
+//	Double_t chi_2_gamma_f ( local_histogram->GetFunction( "gammaf" )->GetChisquare() );
+//	if( result->Status() != 0 )	chi_2_gamma_f = DBL_MAX;
 
 	TString fit_type;
 
 	//  Determine which function gives the lowest fit chi squared
 	//  This should strictly be chi2/nDoF but each function has the same nDoF due to the chosen parameterization
-	if( fabs(chi_2_landau) < fabs(chi_2_gaus) )  fit_type.Append( "mylandau" );
-	else  if( fabs(chi_2_gamma_f) < fabs(chi_2_gaus) )  fit_type.Append( "gammaf" );
-	else  fit_type.Append( "gaus" );
+//	if( fabs(chi_2_landau) < fabs(chi_2_gaus) )  fit_type.Append( "mylandau" );
+//	else  if( fabs(chi_2_gamma_f) < fabs(chi_2_gaus) )  fit_type.Append( "gammaf" );
+//	else  fit_type.Append( "gaus" );
+	fit_type.Append( "gaus" );
 
 	//      Reset Std Output Streams
 	if( OutputLevel <= -1 )
@@ -236,6 +237,9 @@ void Histogram_Processing::Silent_Draw( TCanvas* c1, TH1* input_histo, TString o
 		gErrorIgnoreLevel = kFatal;
 	}
 	input_histo->Draw(options);
+
+	c1->Update();
+	input_histo->GetYaxis()->SetRangeUser(0.0,c1->GetUymax()*1.5);
 	c1->Update();
 	//      Reset Std Output Streams
 	if( OutputLevel <= -1 )

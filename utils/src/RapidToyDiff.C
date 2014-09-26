@@ -40,7 +40,11 @@ void MakePlot(TH1* hist, TString Name, TString dir){
 	TAxis* x_axis = hist->GetXaxis();
 	string units;
 	units = " " + EdStyle::GetParamRootUnit( EdStyle::Remove_Suffix(Name) );
+	if(!EdStyle::GetParamRootName(Name).Contains("ull")){
 	x_axis->SetTitle( EdStyle::GetParamRootName( EdStyle::Remove_Suffix(Name )) + " " + EdStyle::Get_Suffix(Name) + units.c_str() );
+	}else{
+	x_axis->SetTitle( EdStyle::GetParamRootName( EdStyle::Remove_Suffix(Name )) + " " + EdStyle::Get_Suffix(Name) );
+	}
 	hist->SetTitle( "Toy Study " + EdStyle::GetParamRootName( Name ) + " difference" );
 
 	c1->Update();
@@ -79,6 +83,12 @@ int main( int argc, char* argv[] )
 		cout << endl;
 		exit(-1);
 	}
+
+	        //      Setup the Canvas and such
+		              EdStyle* RapidFit_Style = new EdStyle();
+		                      RapidFit_Style->SetStyle();
+
+
 	     gStyle->SetOptStat(0);
 	             gStyle->SetOptFit(111);
 

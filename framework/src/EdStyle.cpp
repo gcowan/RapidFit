@@ -146,7 +146,7 @@ void EdStyle::SetStyle()
 	// look of the statistics box:
 	gStyle->SetStatBorderSize( 0 );
 	gStyle->SetStatFont( EdStyle::GetLHCbFont() );
-	gStyle->SetStatFontSize( (Float_t)0.05 );
+	gStyle->SetStatFontSize( (Float_t)0.04 );
 	gStyle->SetStatX( (Float_t)0.9 );
 	gStyle->SetStatY( (Float_t)0.9 );
 	gStyle->SetStatW( (Float_t)0.25 );
@@ -1046,6 +1046,7 @@ int EdStyle::Test_Suffix( string arg )
 	sufficies.push_back( "_error" );
 	sufficies.push_back( "_gen" );
 	sufficies.push_back( "_pull" );
+	sufficies.push_back( "_perToyPull" );
 	sufficies.push_back( "_scan" );
 	int suffix_index = -1;
 
@@ -1068,6 +1069,7 @@ string EdStyle::Remove_Suffix( string arg )
 	sufficies.push_back( "_error" );
 	sufficies.push_back( "_gen" );
 	sufficies.push_back( "_pull" );
+	sufficies.push_back( "_perToyPull" );
 	sufficies.push_back( "_scan" );
 	int suffix_index = -1;
 	size_t found;
@@ -1100,6 +1102,7 @@ string EdStyle::Get_Suffix( string arg )
 	sufficies_output.push_back( " error" );
 	sufficies_output.push_back( " gen" );
 	sufficies_output.push_back( " pull" );
+	sufficies_output.push_back( " per-toy pull" );
 	sufficies_output.push_back( " scan" );
 	int suffix_index= Test_Suffix( arg );
 
@@ -1227,7 +1230,7 @@ TPaveText* EdStyle::RightLHCbLabel()
 
 Size_t EdStyle::GetLHCbTextSize()
 {
-	return (Size_t)0.072;
+	return (Size_t)0.07;
 }
 
 Size_t EdStyle::GetLHCbAxisTextSize()
