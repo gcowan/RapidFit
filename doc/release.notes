@@ -1,4 +1,7 @@
 // $Id: release.notes $
+2014/11/05 Greig Cowan
+  - Used svn2git to import repository to GitHub.
+
 2014/08/15 Conor Fitzpatrick
   - Modified SlicedAceeptance and TimeAccRes so that now acceptance histograms can be loaded directly from a ROOT file. This is backwards compatible. If you configure your XML with 
    <ConfigurationParameter>TimeAcceptanceFile:MyAcceptanceSlices.txt</ConfigurationParameter> 
