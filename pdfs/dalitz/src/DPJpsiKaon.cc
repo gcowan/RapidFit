@@ -54,7 +54,7 @@ spinKaon(spin),
   else if ( mShape == "NR" )
   {
     std::cout<<"Using nonresonant component\n";
-    massShape = new DPNonresonant(mR, gammaR, LR, m1, m2, RR);
+    massShape = new DPNonresonant();
   }
   else
   {
@@ -158,7 +158,7 @@ DPJpsiKaon::DPJpsiKaon( const DPJpsiKaon& input ) : DPComponent( input ),
   }
   else if ( input.mShape == "NR" )
   {
-    massShape = new DPNonresonant(input.mR, input.gammaR, input.LR, input.m1, input.m2, input.RR);
+    massShape = new DPNonresonant();
   }
   else
   {
