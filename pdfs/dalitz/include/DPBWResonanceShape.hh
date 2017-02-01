@@ -18,7 +18,7 @@ class DPBWResonanceShape: public virtual DPMassShape
 
     TComplex massShape(double m);
 
-    void setParameters(double* pars){};
+    void setParameters(double* pars);
 
   private:
 

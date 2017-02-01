@@ -107,6 +107,11 @@ double DPBWResonanceShape::daughterMomentum(double m)
   return momentum;
 }
 
+void DPBWResonanceShape::setParameters(double* pars)
+{
+  setResonanceParameters(pars[0],pars[1]);
+}
+
 void DPBWResonanceShape::setResonanceParameters( double mass, double sigma )
 {
 	//std::cout << "DPBWResonanceShape setting " << mass << std::endl;
