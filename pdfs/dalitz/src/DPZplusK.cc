@@ -2,10 +2,6 @@
 #include "DPZplusK.hh"
 #include "DPBWResonanceShape.hh"
 #include "DPBarrierFactor.hh"
-#include "DPBarrierL0.hh"
-#include "DPBarrierL1.hh"
-#include "DPBarrierL2.hh"
-#include "DPBarrierL3.hh"
 #include "DPHelpers.hh"
 
 #include <iostream>
@@ -42,34 +38,13 @@ DPZplusK::DPZplusK(int fLB, int fLR, double fmB, double fmR,
   {
     massShape = new DPBWResonanceShape(mR, gammaR, LR, m2, mJpsi, RR);
   }
-	switch (LB)
-	{
-		case 0: barrierB=new DPBarrierL0(RB);
-			break;
-		case 1: barrierB=new DPBarrierL1(RB);
-			break;
-		case 2: barrierB=new DPBarrierL2(RB);
-			break;
-		case 3: barrierB=new DPBarrierL3(RB);
-			break;
-		default: std::cout<<"WARNING DPZplusK (LB): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
-			 barrierB=new DPBarrierL0(RB);
-			 break;
-	}
-	switch (LR)
-	{
-		case 0: barrierR=new DPBarrierL0(RR);
-			break;
-		case 1: barrierR=new DPBarrierL1(RR);
-			break;
-		case 2: barrierR=new DPBarrierL2(RR);
-			break;
-		case 3: barrierR=new DPBarrierL3(RR);
-			break;
-		default: std::cout<<"WARNING DPZplusK (LR): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
-			 barrierR=new DPBarrierL0(RR);
-			 break;
-	}
+  double m_min = m1 + m2;
+  double m_max = mB - mJpsi;
+  double m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
+  double pB0 = DPHelpers::daughterMomentum(mB, mJpsi, m0_eff);
+  double pR0 = DPHelpers::daughterMomentum(mR, m1, m2);
+  barrierB = new DPBarrierFactor(LB,RB,pB0);
+  barrierR = new DPBarrierFactor(LR,RR,pR0);
 	switch(spin)
 	{
 		case 0: wigner=new DPWignerFunctionJ0();
@@ -123,34 +98,8 @@ DPZplusK::DPZplusK( const DPZplusK& input ) : DPComponent( input ),
   {
     massShape = new DPBWResonanceShape(input.mR, input.gammaR, input.LR, input.m2, input.mJpsi, input.RR);
   }
-	switch (input.LB)
-	{
-		case 0: barrierB=new DPBarrierL0(input.RB);
-			break;
-		case 1: barrierB=new DPBarrierL1(input.RB);
-			break;
-		case 2: barrierB=new DPBarrierL2(input.RB);
-			break;
-		case 3: barrierB=new DPBarrierL3(input.RB);
-			break;
-		default: std::cout<<"WARNING DPZplusK (LB): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
-			 barrierB=new DPBarrierL0(input.RB);
-			 break;
-	}
-	switch (input.LR)
-	{
-		case 0: barrierR=new DPBarrierL0(input.RR);
-			break;
-		case 1: barrierR=new DPBarrierL1(input.RR);
-			break;
-		case 2: barrierR=new DPBarrierL2(input.RR);
-			break;
-		case 3: barrierR=new DPBarrierL3(input.RR);
-			break;
-		default: std::cout<<"WARNING DPZplusK (LR): Do not know which barrier factor to use.  Using L=0 and you should check what are you doing.\n";
-			 barrierR=new DPBarrierL0(input.RR);
-			 break;
-	}
+  barrierB = new DPBarrierFactor(*input.barrierB);
+  barrierR = new DPBarrierFactor(*input.barrierR);
 	if( input.wigner != NULL )
 	{
 		switch(input.spinZplus)
@@ -248,10 +197,10 @@ TComplex DPZplusK::amplitudeProperVars(double m13, double cosTheta1,
   double orbitalFactor = TMath::Power(pB/mB, LB)*
       TMath::Power(pR/m13, LR);
 
-	double barrierFactor = barrierB->barrier(pB0, pB)*
-		barrierR->barrier(pR0, pR);
-
-	TComplex massFactor = massShape->massShape(m13);
+	double barrierFactor = barrierB->barrier(pB)*
+		barrierR->barrier(pR);
+	std::complex<double> tmpmassfactor = massShape->massShape(m13);
+	TComplex massFactor(tmpmassfactor.real(),tmpmassfactor.imag());
 
 
 	// Angular part
@@ -289,6 +238,6 @@ void DPZplusK::setResonanceParameters(double mass, double sigma)
 {
     mR = mass;
     gammaR = sigma;
-	massShape->setResonanceParameters( mass, sigma );
+	massShape->setParameters( {mass, sigma} );
     //std::cout << mR << std::endl;
 }

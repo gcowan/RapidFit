@@ -2,22 +2,10 @@
 
 #include <iostream>
 
-DPNonresonant::DPNonresonant()
+std::complex<double> DPNonresonant::massShape(const double m) const
 {
-}
-
-DPNonresonant::DPNonresonant(const DPNonresonant& other) : DPMassShape(other)
-{
-}
-
-DPNonresonant::~DPNonresonant()
-{
-}
-
-TComplex DPNonresonant::massShape(double m)
-{
-  (void)m;
-  TComplex result(1,0);
-  return result;
+	(void)m;
+	std::complex<double> result(1,0);
+	return result;
 }
 
