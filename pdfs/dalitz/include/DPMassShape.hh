@@ -1,23 +1,14 @@
 #ifndef DP_MASS_SHAPE
 #define DP_MASS_SHAPE
-
-#include "TComplex.h"
-#include <iostream>
-
+#include <complex>
+#include <vector>
 class DPMassShape
 {
-
-  public:
-
-    DPMassShape() {};
-    DPMassShape( const DPMassShape& ) {};
-    virtual ~DPMassShape() { };//std::cout << "MassShape destructor" << std::endl; };
-
-    virtual TComplex massShape(double m) = 0;
-
-    virtual void setResonanceParameters(double mass, double sigma) = 0;
-
-    virtual void setParameters(double* pars) = 0;
+	public:
+		DPMassShape() {};
+		DPMassShape(const DPMassShape&) {};
+		~DPMassShape() {};
+		virtual std::complex<double> massShape(const double m) const = 0;
+		virtual void setParameters(const std::vector<double>& pars) = 0;
 };
-
 #endif
