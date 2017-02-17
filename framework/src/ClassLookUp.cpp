@@ -28,6 +28,7 @@
 #include "AcceptReject.h"
 #include "JPsiPhiDataGenerator.h"
 #include "SWeightPrecalculator.h"
+#include "EfficiencyWeightPreCalculator.h"
 #include "RapidRun.h"
 #include "ObservableDiscreteConstraint.h"
 #include "ObservableContinuousConstraint.h"
@@ -306,6 +307,10 @@ IPrecalculator * ClassLookUp::LookUpPrecalculator( string Name, string WeightNam
 	{
 		return new SWeightPrecalculator( inputResult, WeightName, config );
 	}
+        else if ( Name == "EfficiencyWeightPreCalculator" )
+        {
+                return new EfficiencyWeightPreCalculator( inputResult, WeightName, config );
+        }
 	else
 	{
 		cerr << "Unrecognised precalculator name: " << Name << endl << endl;
