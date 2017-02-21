@@ -20,7 +20,8 @@
 #include <vector>
 #include <string>
 
-using namespace::std;
+using std::vector;
+using std::string;
 
 class NormalisedSumPDF : public BasePDF
 {
@@ -91,8 +92,8 @@ class NormalisedSumPDF : public BasePDF
 		NormalisedSumPDF& operator=(const NormalisedSumPDF&);
 		void MakePrototypes( PhaseSpaceBoundary* );
 
-		double GetFirstIntegral( DataPoint* );
-		double GetSecondIntegral( DataPoint* );
+		double firstIntegral;
+		double secondIntegral;
 
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;
 		IPDF * firstPDF;
@@ -102,6 +103,7 @@ class NormalisedSumPDF : public BasePDF
 		PhaseSpaceBoundary * integrationBoundary;
 
 		bool _plotComponents;
+		bool inEvaluate = false;
 };
 
 #endif
