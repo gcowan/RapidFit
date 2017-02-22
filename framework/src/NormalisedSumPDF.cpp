@@ -341,6 +341,24 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 	return termOne + termTwo;
 }
 
+double NormalisedSumPDF::GetFirstIntegral( DataPoint* NewDataPoint )
+{
+	if(firstPDF->GetNumericalNormalisation())
+	{
+		return firstIntegral;
+	}
+	return firstPDF->Integral( NewDataPoint, integrationBoundary ) * firstIntegralCorrection;
+}
+
+double NormalisedSumPDF::GetSecondIntegral( DataPoint* NewDataPoint )
+{
+	if(secondPDF->GetNumericalNormalisation())
+	{
+		return secondIntegral;
+	}
+	return secondPDF->Integral( NewDataPoint, integrationBoundary ) * secondIntegralCorrection;
+}
+
 //Return the function value at the given point
 double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 {
@@ -367,24 +385,6 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	//Return the sum
 	inEvaluate = false;
 	return termOne + termTwo;
-}
-
-double NormalisedSumPDF::GetFirstIntegral( DataPoint* NewDataPoint )
-{
-	if(firstPDF->GetNumericalNormalisation())
-	{
-		return firstIntegral;
-	}
-	return firstPDF->Integral( NewDataPoint, integrationBoundary ) * firstIntegralCorrection;
-}
-
-double NormalisedSumPDF::GetSecondIntegral( DataPoint* NewDataPoint )
-{
-	if(secondPDF->GetNumericalNormalisation())
-	{
-		return secondIntegral;
-	}
-	return secondPDF->Integral( NewDataPoint, integrationBoundary ) * secondIntegralCorrection;
 }
 
 //Return a prototype data point
