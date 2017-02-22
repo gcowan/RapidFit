@@ -301,8 +301,14 @@ double NormalisedSumPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBound
 	(void)NewBoundary;
 	// Calculate and cache the integrals
 	DataPoint pdp(prototypeDataPoint);
-	firstIntegral = firstPDF->Integral( &pdp, integrationBoundary ) * firstIntegralCorrection;
-	secondIntegral = secondPDF->Integral( &pdp, integrationBoundary ) * secondIntegralCorrection;
+	if(firstPDF->GetNumericalNormalisation())
+	{
+		firstIntegral = firstPDF->Integral( &pdp, integrationBoundary ) * firstIntegralCorrection;
+	}
+	if(secondPDF->GetNumericalNormalisation())
+	{
+		secondIntegral = secondPDF->Integral( &pdp, integrationBoundary ) * secondIntegralCorrection;
+	}
 	//The evaluate method already returns a normalised value
 	return 1.0;
 }
@@ -316,18 +322,18 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 
 	if( firstFraction >= 1. )
 	{
-		termOne = ( firstPDF->Evaluate( NewDataPoint ) ) / firstIntegral;
+		termOne = ( firstPDF->Evaluate( NewDataPoint ) ) / GetFirstIntegral( NewDataPoint );
 	}
 	else if( firstFraction <= 0. )
 	{
-		termTwo = ( secondPDF->Evaluate( NewDataPoint ) ) / secondIntegral;
+		termTwo = ( secondPDF->Evaluate( NewDataPoint ) ) / GetSecondIntegral( NewDataPoint );
 	}
 	else
 	{
 		//Calculate the integrals of the PDFs
 		//Get the PDFs' values, normalised and weighted by firstFraction
-		termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / firstIntegral;
-		termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+		termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / GetFirstIntegral( NewDataPoint );
+		termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / GetSecondIntegral( NewDataPoint );
 	}
 
 	//Return the sum
@@ -344,18 +350,18 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 
 	if( firstFraction >= 1. )
 	{
-		termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / firstIntegral;
+		termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / GetFirstIntegral( NewDataPoint );
 	}
 	else if( firstFraction <= 0. )
 	{
-		termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / secondIntegral;
+		termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / GetSecondIntegral( NewDataPoint );
 	}
 	else
 	{
 		//Calculate the integrals of the PDFs
 		//Get the PDFs' values, normalised and weighted by firstFraction
-		termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / firstIntegral;
-		termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+		termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / GetFirstIntegral( NewDataPoint );
+		termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / GetSecondIntegral( NewDataPoint );
 	}
 
 	//Return the sum
@@ -363,7 +369,23 @@ double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 	return termOne + termTwo;
 }
 
+double NormalisedSumPDF::GetFirstIntegral( DataPoint* NewDataPoint )
+{
+	if(firstPDF->GetNumericalNormalisation())
+	{
+		return firstIntegral;
+	}
+	return firstPDF->Integral( NewDataPoint, integrationBoundary ) * firstIntegralCorrection;
+}
 
+double NormalisedSumPDF::GetSecondIntegral( DataPoint* NewDataPoint )
+{
+	if(secondPDF->GetNumericalNormalisation())
+	{
+		return secondIntegral;
+	}
+	return secondPDF->Integral( NewDataPoint, integrationBoundary ) * secondIntegralCorrection;
+}
 
 //Return a prototype data point
 vector<string> NormalisedSumPDF::GetPrototypeDataPoint()
@@ -420,19 +442,19 @@ double NormalisedSumPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRe
 	{
 		case 1:
 			//      We want a component from the first PDF, integrate over the second PDF
-			termOne = firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / firstIntegral;
+			termOne = firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / GetFirstIntegral( NewDataPoint );
 			termTwo = 0.;
 			break;
 
 		case 2:
 			//      We want a component from the second PDF, integrate over the first PDF
 			termOne = 0.;
-			termTwo = secondPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / secondIntegral;
+			termTwo = secondPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / GetSecondIntegral( NewDataPoint );
 			break;
 
 		case 0:
-			termOne = firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / firstIntegral;
-			termTwo = secondPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / secondIntegral;
+			termOne = firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / GetFirstIntegral( NewDataPoint );
+			termTwo = secondPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / GetSecondIntegral( NewDataPoint );
 			break;
 
 		default:
