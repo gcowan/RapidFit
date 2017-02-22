@@ -35,7 +35,7 @@ NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (
 }
 
 NormalisedSumPDF::NormalisedSumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL),
-	firstFraction(0.5), firstIntegral(1), firstIntegralCorrection(), secondIntegral(1), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL), _plotComponents( true )
+	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL), _plotComponents( true )
 {
 
 	vector<string> FractionNames = StringProcessing::CombineUniques( config->GetFractionNames(), vector<string>() );
@@ -248,6 +248,15 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 			}
 		}
 	}
+	// Make sure the cached integrals have the right indices. Set everything to 1 to avoid division by zero. Old cache is invalid anyway.
+	firstIntegral.clear();
+	secondIntegral.clear();
+	for(DataPoint* pdp: integrationBoundary->GetDiscreteCombinations())
+	{
+		unsigned int DPindex = integrationBoundary->GetDiscreteIndex(pdp);
+		firstIntegral[DPindex] = 1.;
+		secondIntegral[DPindex] = 1.;
+	}
 }
 
 //Destructor
@@ -300,14 +309,11 @@ double NormalisedSumPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBound
 	(void)NewDataPoint;
 	(void)NewBoundary;
 	// Calculate and cache the integrals
-	DataPoint pdp(prototypeDataPoint);
-	if(firstPDF->GetNumericalNormalisation())
+	for(DataPoint* pdp: integrationBoundary->GetDiscreteCombinations())
 	{
-		firstIntegral = firstPDF->Integral( &pdp, integrationBoundary ) * firstIntegralCorrection;
-	}
-	if(secondPDF->GetNumericalNormalisation())
-	{
-		secondIntegral = secondPDF->Integral( &pdp, integrationBoundary ) * secondIntegralCorrection;
+		unsigned int DPindex = integrationBoundary->GetDiscreteIndex(pdp);
+		firstIntegral[DPindex] = firstPDF->Integral( pdp, integrationBoundary ) * firstIntegralCorrection;
+		secondIntegral[DPindex] = secondPDF->Integral( pdp, integrationBoundary ) * secondIntegralCorrection;
 	}
 	//The evaluate method already returns a normalised value
 	return 1.0;
@@ -341,22 +347,16 @@ double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 	return termOne + termTwo;
 }
 
-double NormalisedSumPDF::GetFirstIntegral( DataPoint* NewDataPoint )
+double NormalisedSumPDF::GetFirstIntegral( DataPoint* NewDataPoint ) const
 {
-	if(firstPDF->GetNumericalNormalisation())
-	{
-		return firstIntegral;
-	}
-	return firstPDF->Integral( NewDataPoint, integrationBoundary ) * firstIntegralCorrection;
+	unsigned int DPindex = integrationBoundary->GetDiscreteIndex(NewDataPoint);
+	return firstIntegral.at(DPindex);
 }
 
-double NormalisedSumPDF::GetSecondIntegral( DataPoint* NewDataPoint )
+double NormalisedSumPDF::GetSecondIntegral( DataPoint* NewDataPoint ) const
 {
-	if(secondPDF->GetNumericalNormalisation())
-	{
-		return secondIntegral;
-	}
-	return secondPDF->Integral( NewDataPoint, integrationBoundary ) * secondIntegralCorrection;
+	unsigned int DPindex = integrationBoundary->GetDiscreteIndex(NewDataPoint);
+	return secondIntegral.at(DPindex);
 }
 
 //Return the function value at the given point

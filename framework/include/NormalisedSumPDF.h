@@ -19,9 +19,11 @@
 //	System Headers
 #include <vector>
 #include <string>
+#include <map>
 
 using std::vector;
 using std::string;
+using std::map;
 
 class NormalisedSumPDF : public BasePDF
 {
@@ -92,10 +94,9 @@ class NormalisedSumPDF : public BasePDF
 		NormalisedSumPDF& operator=(const NormalisedSumPDF&);
 		void MakePrototypes( PhaseSpaceBoundary* );
 
-		double GetFirstIntegral( DataPoint* );
-		double firstIntegral;
-		double GetSecondIntegral( DataPoint* );
-		double secondIntegral;
+		double GetFirstIntegral( DataPoint* ) const;
+		double GetSecondIntegral( DataPoint* ) const;
+		map<unsigned int, double> firstIntegral, secondIntegral;
 
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;
 		IPDF * firstPDF;
