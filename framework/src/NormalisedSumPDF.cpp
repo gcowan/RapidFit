@@ -306,15 +306,10 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Return the integral of the function over the given boundary
 double NormalisedSumPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
-	(void)NewDataPoint;
-	(void)NewBoundary;
 	// Calculate and cache the integrals
-	for(DataPoint* pdp: integrationBoundary->GetDiscreteCombinations())
-	{
-		unsigned int DPindex = integrationBoundary->GetDiscreteIndex(pdp);
-		firstIntegral[DPindex] = firstPDF->Integral( pdp, integrationBoundary ) * firstIntegralCorrection;
-		secondIntegral[DPindex] = secondPDF->Integral( pdp, integrationBoundary ) * secondIntegralCorrection;
-	}
+	unsigned int DPindex = NewBoundary->GetDiscreteIndex(NewDataPoint);
+	firstIntegral[DPindex] = firstPDF->Integral( NewDataPoint, NewBoundary ) * firstIntegralCorrection;
+	secondIntegral[DPindex] = secondPDF->Integral( NewDataPoint, NewBoundary ) * secondIntegralCorrection;
 	//The evaluate method already returns a normalised value
 	return 1.0;
 }
