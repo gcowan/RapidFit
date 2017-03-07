@@ -21,6 +21,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <cmath>
+#include <signal.h>
 
 #define DOUBLE_TOLERANCE_PHASE 1E-6
 
@@ -587,7 +588,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		cerr << "This is a SERIOUS MISCONFIGURATION!!! Exiting :(" << endl;
 		Input->Print();
 		this->Print();
-		exit(-1);
+		raise(SIGSEGV); // Deliberate segfault to get stack trace
 	}
 
 	//	Store and return the lookup of the DataPoint's index

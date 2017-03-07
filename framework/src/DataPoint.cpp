@@ -132,10 +132,7 @@ Observable* DataPoint::GetObservable(string const Name, const bool silence )
 	if( nameIndex == -1 )
 	{
 		if( !silence ) cerr << "Observable name " << Name << " not found (2)" << endl;
-		DebugClass::SegFault();
-		//this->Print();
 		throw(-1543);
-		//return new Observable( Name, 0.0, 0.0, "NameNotFoundError");
 	}
 	else
 	{
@@ -155,7 +152,6 @@ Observable* DataPoint::GetObservable( const ObservableRef& object, const bool si
 		return &(allObservables[ (unsigned) object.GetIndex() ]);
 	}
 	if( !silence ) cerr << "Observable name " << object.Name().c_str() << " not found (3)" << endl;
-	//DebugClass::SegFault();
 	throw(-20);
 }
 
@@ -168,7 +164,6 @@ bool DataPoint::SetObservable( string Name, Observable * NewObservable )
 	{
 		cerr << "Observable name " << Name << " not found (4)" << endl;
 		throw(438);
-		//return false;
 	}
 	else
 	{
