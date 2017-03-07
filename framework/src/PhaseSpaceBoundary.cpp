@@ -587,7 +587,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		cerr << "This is a SERIOUS MISCONFIGURATION!!! Exiting :(" << endl;
 		Input->Print();
 		this->Print();
-		DebugClass::SegFault();
+		exit(-1);
 	}
 
 	//	Store and return the lookup of the DataPoint's index
@@ -646,5 +646,31 @@ void PhaseSpaceBoundary::CheckPhaseSpace( IPDF* toCheck ) const
 size_t PhaseSpaceBoundary::GetID() const
 {
 	return uniqueID;
+}
+
+bool PhaseSpaceBoundary::operator==(const PhaseSpaceBoundary& other) const
+{
+	unsigned numConstraints = allConstraints.size();
+	if(numConstraints != other.allConstraints.size() || GetNumberCombinations() != other.GetNumberCombinations()) return false;
+	for(unsigned iConstraint = 0; iConstraint < numConstraints; iConstraint++)
+	{
+		bool discrete = allConstraints[iConstraint]->IsDiscrete();
+		if(discrete != other.allConstraints[iConstraint]->IsDiscrete()) return false;
+		if(discrete) // both discrete, so compare GetValues
+		{// http://en.cppreference.com/w/cpp/container/vector/operator_cmp this is fine :)
+			if(allConstraints[iConstraint]->GetValues() != other.allConstraints[iConstraint]->GetValues()) return false;
+		}
+		else // both continuous, so compare GetMinimum and GetMaximum
+		{
+			if(allConstraints[iConstraint]->GetMinimum() != other.allConstraints[iConstraint]->GetMinimum()
+			|| allConstraints[iConstraint]->GetMaximum() != other.allConstraints[iConstraint]->GetMaximum()) return false;
+		}
+	}
+	return true;
+}
+
+bool PhaseSpaceBoundary::operator!=(const PhaseSpaceBoundary& other) const
+{
+	return !((*this)==other);
 }
 

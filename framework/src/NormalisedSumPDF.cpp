@@ -304,6 +304,11 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Return the integral of the function over the given boundary
 double NormalisedSumPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
+	// Check we're working with the same boundary, otherwise the local stored integrals might not be valid
+	if((*NewBoundary) != (*integrationBoundary))
+	{
+		cerr << "The boundary passed to NormalisedSumPDF::Normalisation doesn't match the stored integrationBoundary!" << endl;
+	}
 	// Calculate and cache the integrals
 	double firstIntegralResult = firstPDF->Integral( NewDataPoint, NewBoundary ) * firstIntegralCorrection;
 	double secondIntegralResult = secondPDF->Integral( NewDataPoint, NewBoundary ) * secondIntegralCorrection;
