@@ -49,7 +49,11 @@
 #endif
 #define DOUBLE_TOLERANCE 1E-6
 
-using namespace::std;
+using std::stringstream;
+using std::setw;
+using std::setprecision;
+using std::flush;
+using std::left;
 
 //Constructor with correct arguments
 ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TString PDFStr, TFile* filename, string ObservableName, CompPlotter_config* config, int PDF_Num ) :
@@ -131,7 +135,8 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 
 	boundary_min = full_boundary->GetConstraint( observableName )->GetMinimum();
 	boundary_max = full_boundary->GetConstraint( observableName )->GetMaximum();
-
+	if(config->xmax > -99999) boundary_max = config->xmax;
+	if(config->xmin > -99999) boundary_min = config->xmin;
 	step_size = ( boundary_max - boundary_min ) / (double)( total_points - 1 );
 
 	//Work out what to plot
@@ -208,6 +213,13 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	if( config != NULL )
 	{
 		if( !config->combination_names.empty() ) combinationDescriptions = config->combination_names;
+	}
+
+	// Hack to get the internal cached values for NormalisedSumPDF to work
+	if(plotPDF->GetName()=="NormalisedSumPDF")
+	{
+		for(auto combination: allCombinations)
+			plotPDF->GetPDFIntegrator()->Integral( combination, full_boundary );
 	}
 
 	for( unsigned int i=0; i< allCombinations.size(); ++i )
@@ -1896,7 +1908,7 @@ double ComponentPlotter::operator() (double *x, double *p)
 
 	delete comp_obj;
 
-	cout << "Value At: " << left << setw(5) << setprecision(3) << x[0] << "\tis:\t" << setprecision(4) << integral_value << setw(20) << " " <<  "\r" << flush;
+	cout << "Value At: " << left << setw(5) << setprecision(3) << x[0] << "\t is:\t" << setprecision(4) << integral_value << setw(20) << " " <<  "\r" << flush;
 
 	return integral_value;
 }
