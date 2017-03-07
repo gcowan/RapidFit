@@ -475,8 +475,7 @@ void NormalisedSumPDF::SetCachingEnabled( bool input )
 
 bool NormalisedSumPDF::GetCachingEnabled() const
 {
-//	return firstPDF->GetCachingEnabled() && secondPDF->GetCachingEnabled();
-	return false; // We always want Normalisation() to be called in order to update the local cached values of the component PDF integrals
+	return firstPDF->GetCachingEnabled() && secondPDF->GetCachingEnabled();
 }
 
 void NormalisedSumPDF::SetCachedIntegrals(array<double,2> IntegralResult, DataPoint* NewDataPoint, PhaseSpaceBoundary* NewBoundary)
