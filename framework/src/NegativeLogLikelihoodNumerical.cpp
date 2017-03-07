@@ -22,6 +22,7 @@
 #include "RooMath.h"
 //	RapidFit Headers
 #include "NegativeLogLikelihoodNumerical.h"
+#include "NormalisedSumPDF.h"
 #include "ClassLookUp.h"
 //	System Headers
 #include <stdlib.h>
@@ -33,7 +34,6 @@
 #include "TFile.h"
 #include "TNtuple.h"
 
-using namespace::std;
 
 pthread_mutex_t _n_eval_lock;
 pthread_mutex_t _n_int_lock;
@@ -56,6 +56,13 @@ double NegativeLogLikelihoodNumerical::EvaluateDataSet( IPDF * FittingPDF, IData
 
 	//	Have to provide a datapoint even though one is _not_ expected to be explicitly used for this fittting function
 	double this_integral = FittingPDF->GetPDFIntegrator()->Integral( TotalDataSet->GetDataPoint(0), TotalDataSet->GetBoundary() );
+
+	if(FittingPDF->GetName()=="NormalisedSumPDF")
+	{
+		std::array<double,2> IntegralResult = static_cast<NormalisedSumPDF*>(FittingPDF)->GetCachedIntegrals(TotalDataSet->GetDataPoint(0), TotalDataSet->GetBoundary());
+		for(auto PDF: stored_pdfs)
+			static_cast<NormalisedSumPDF*>(PDF)->SetCachedIntegrals(IntegralResult, TotalDataSet->GetDataPoint(0), TotalDataSet->GetBoundary());
+	}
 
 	if( TotalDataSet->GetDataNumber() == 0 ) return 0.;
 
