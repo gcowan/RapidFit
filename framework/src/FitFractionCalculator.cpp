@@ -49,10 +49,15 @@ void FitFractionCalculator::WriteToFile(std::string filename)
 		if(createtree) OutputTree = std::unique_ptr<TTree>(new TTree(treename.c_str(),"Fit fractions"));
 		for(auto& fraction: combination.second)
 		{
+			std::string branchname = fraction.first;
+			// Remove all punctuation because ROOT interprets the branch name as a TFormula when drawings
+			branchname.erase(std::remove_if(branchname.begin(), branchname.end(), &ispunct), branchname.end());
+			// Avoid purely-numerical branch names for the same reason as above
+			branchname = "component_" + branchname;
 			if(createtree)
-				OutputTree->Branch(fraction.first.c_str(),&fraction.second);
+				OutputTree->Branch(branchname.c_str(),&fraction.second);
 			else
-				OutputTree->SetBranchAddress(fraction.first.c_str(),&fraction.second);
+				OutputTree->SetBranchAddress(branchname.c_str(),&fraction.second);
 		}
 		OutputTree->Fill();
 		OutputTree->Write();
