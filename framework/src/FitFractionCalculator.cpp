@@ -7,16 +7,15 @@
 
 FitFractionCalculator::FitFractionCalculator(IPDF& pdf, PhaseSpaceBoundary& boundary) : storedBoundary(boundary)
 {
-	RapidFitIntegrator testIntegrator( &pdf, true, true );
 	vector<std::string> doNotIntegrate = pdf.GetDoNotIntegrateList();
 	for(const auto& combination: storedBoundary.GetDiscreteCombinations())
 	{
 		int i = GetIndex(combination);
-		double TotalIntegral = testIntegrator.Integral(combination, &storedBoundary);
+		double TotalIntegral = pdf.GetPDFIntegrator()->Integral(combination, &storedBoundary);
 		for(const auto& ComponentName: pdf.PDFComponents())
 		{
 			ComponentRef thisRef( ComponentName, "dummyObservable" );
-			ComponentFitFractions[i][ComponentName] = testIntegrator.NumericallyIntegrateDataPoint(combination, &storedBoundary, doNotIntegrate, &thisRef);
+			ComponentFitFractions[i][ComponentName] = pdf.GetPDFIntegrator()->NumericallyIntegrateDataPoint(combination, &storedBoundary, doNotIntegrate, &thisRef);
 			ComponentFitFractions[i][ComponentName] /= TotalIntegral;
 		}
 	}
