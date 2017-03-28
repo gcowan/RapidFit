@@ -1,5 +1,8 @@
 #include "FitFractionCalculator.h"
 #include <memory>
+#include <algorithm>
+#include <cctype>
+#include <iomanip>
 #include "TTree.h"
 
 FitFractionCalculator::FitFractionCalculator(IPDF& pdf, PhaseSpaceBoundary& boundary) : storedBoundary(boundary)
@@ -32,7 +35,7 @@ void FitFractionCalculator::Print() const
 	{
 		std::cout << "Fit fractions in combination " << combination.first << "\n";
 		for(const auto& fraction: combination.second)
-			std::cout << fraction.first << "\t" << fraction.second << "\n";
+			std::cout << std::setw(30) << fraction.first << " : " << fraction.second << "\n";
 		std::cout << std::endl;
 	}
 }
@@ -51,7 +54,7 @@ void FitFractionCalculator::WriteToFile(std::string filename)
 		{
 			std::string branchname = fraction.first;
 			// Remove all punctuation because ROOT interprets the branch name as a TFormula when drawings
-			branchname.erase(std::remove_if(branchname.begin(), branchname.end(), &ispunct), branchname.end());
+			branchname.erase(std::remove_if(branchname.begin(), branchname.end(), ::ispunct), branchname.end());
 			// Avoid purely-numerical branch names for the same reason as above
 			branchname = "component_" + branchname;
 			if(createtree)
