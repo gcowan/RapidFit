@@ -52,7 +52,7 @@ void FitFractionCalculator::WriteToFile(std::string filename)
 		for(auto& fraction: combination.second)
 		{
 			std::string branchname = fraction.first;
-			// Remove all punctuation because ROOT interprets the branch name as a TFormula when drawings
+			// Remove all punctuation because ROOT interprets the branch name as a TFormula when drawing
 			branchname.erase(std::remove_if(branchname.begin(), branchname.end(), ::ispunct), branchname.end());
 			// Avoid purely-numerical branch names for the same reason as above
 			branchname = "component_" + branchname;
@@ -62,7 +62,7 @@ void FitFractionCalculator::WriteToFile(std::string filename)
 				OutputTree->SetBranchAddress(branchname.c_str(),&fraction.second);
 		}
 		OutputTree->Fill();
-		OutputTree->Write();
+		OutputTree->Write("",TObject::kOverwrite);
 	}
 	OutputFile->Close();
 }

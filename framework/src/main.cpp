@@ -164,7 +164,7 @@ int RapidFit( vector<string> input )
 		cout << "RapidFit has been Configured and initial objects in XML/CommandLine have been constructed" << endl;
 	}
 
-	int main_fitResult=0;
+	int main_fitResult=-1;
 
 	//	Work out what we want to do, now that everything is configured
 
