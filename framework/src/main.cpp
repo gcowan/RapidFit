@@ -983,6 +983,24 @@ int PerformToyStudy( RapidFitConfiguration* config )
 		delete XMLConstraints.back();
 		XMLConstraints.pop_back();
 	}
+
+	if(config->calculateFitFractionsFlag)
+	{
+		// Get data and PDF. Set PDF parameters to the result of the fit
+		PDFWithData * pdfAndData = config->pdfsAndData[0];
+		PhaseSpaceBoundary * boundary = pdfAndData->GetDataSet()->GetBoundary();
+		IPDF * pdf = pdfAndData->GetPDF();
+		for(unsigned iResult = 0; iResult < fitResults->size(); iResult++ )
+		{
+			// Calculate the fit fractions
+			ParameterSet* parset = (*fitResults)[iResult]->GetResultParameterSet()->GetDummyParameterSet();
+			pdfAndData->SetPhysicsParameters( parset );
+			FitFractionCalculator ffcalc(*pdf, *boundary);
+			ffcalc.Print();
+			ffcalc.WriteToFile("fitFractions.root");
+		}
+	}
+
 	delete newStudy;
 
 	return 0;
