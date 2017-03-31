@@ -49,6 +49,7 @@
 #include "ResultFormatter.h"
 #include "MultiDimChi2.h"
 #include "RapidFitRandom.h"
+#include "FitFractionCalculator.h"
 ///  System Headers
 #include <string>
 #include <vector>
@@ -163,7 +164,7 @@ int RapidFit( vector<string> input )
 		cout << "RapidFit has been Configured and initial objects in XML/CommandLine have been constructed" << endl;
 	}
 
-	int main_fitResult=0;
+	int main_fitResult=-1;
 
 	//	Work out what we want to do, now that everything is configured
 
@@ -982,6 +983,24 @@ int PerformToyStudy( RapidFitConfiguration* config )
 		delete XMLConstraints.back();
 		XMLConstraints.pop_back();
 	}
+
+	if(config->calculateFitFractionsFlag)
+	{
+		// Get data and PDF. Set PDF parameters to the result of the fit
+		PDFWithData * pdfAndData = config->pdfsAndData[0];
+		PhaseSpaceBoundary * boundary = pdfAndData->GetDataSet()->GetBoundary();
+		IPDF * pdf = pdfAndData->GetPDF();
+		for(unsigned iResult = 0; iResult < fitResults->size(); iResult++ )
+		{
+			// Calculate the fit fractions
+			ParameterSet* parset = (*fitResults)[iResult]->GetResultParameterSet()->GetDummyParameterSet();
+			pdfAndData->SetPhysicsParameters( parset );
+			FitFractionCalculator ffcalc(*pdf, *boundary);
+			ffcalc.Print();
+			ffcalc.WriteToFile("fitFractions.root");
+		}
+	}
+
 	delete newStudy;
 
 	return 0;
@@ -1039,56 +1058,17 @@ TH1D* ProjectAxis( TH3* input_histo, TString axis, TString name )
 
 int calculateFitFractions( RapidFitConfiguration* config )
 {
+	// Get data and PDF. Set PDF parameters to the result of the fit
 	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
 	ParameterSet * parset = config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet();
-	parset->SetPhysicsParameter("BkgFraction", 0., 0., 0., 0., "BkgFraction", "");
-	pdfAndData->SetPhysicsParameters( parset );//config->GlobalResult->GetResultParameterSet()->GetDummyParameterSet() );
-
-	IDataSet * dataSet = pdfAndData->GetDataSet();
+	pdfAndData->SetPhysicsParameters( parset );
+	PhaseSpaceBoundary * boundary = pdfAndData->GetDataSet()->GetBoundary();
 	IPDF * pdf = pdfAndData->GetPDF();
+	// Calculate the fit fractions
+	FitFractionCalculator ffcalc(*pdf, *boundary);
+	ffcalc.Print();
+	ffcalc.WriteToFile("fitFractions.root");
 
-	RapidFitIntegrator * testIntegrator = new RapidFitIntegrator( pdf, true, true );
-	double total_integral(0.);
-	double integral(0.);
-	double fraction(0.);
-	double sumOfFractions(0.);
-
-	TFile * f = TFile::Open("fitFractions.root", "RECREATE");
-	TTree * tree = new TTree("tree", "tree containing fit fractions");
-
-	vector<double> fitFractions;
-	vector<string> doNotIntegrate;
-	vector<string> pdfComponents = pdf->PDFComponents();
-	pdfComponents = StringProcessing::MoveElementToStart( pdfComponents, "0" );
-	for( unsigned int i = 0; i < pdfComponents.size(); ++i )
-	{
-		ComponentRef * thisRef = new ComponentRef( pdfComponents[i], "dummyObservable" );
-		integral = testIntegrator->NumericallyIntegratePhaseSpace( dataSet->GetBoundary(), doNotIntegrate, thisRef );
-		if ( pdfComponents[i] == "0" )
-		{
-			total_integral = integral;
-			std::cout << "Total integral: " << total_integral << std::endl;
-		}
-		delete thisRef;
-		fraction = integral/total_integral;
-		if ( pdfComponents[i] != "0" && pdfComponents[i] != "1-Z" )
-		{
-			std::cout << pdfComponents[i] << "\t fraction: " << fraction << std::endl;
-			fitFractions.push_back( fraction );
-			sumOfFractions += fraction;
-		}
-		if ( pdfComponents[i] == "1-Z" ) std::cout << pdfComponents[i] << "\t fraction: " << 1. - fraction << std::endl;
-	}
-	std::cout << "Sum of fractions (not necessarily 1!): " << sumOfFractions << std::endl;
-
-	fitFractions.push_back( sumOfFractions );
-	tree->Branch("fractions", "std::vector<double>", &fitFractions);
-	tree->Fill();
-	f->Write();
-	f->Close();
-
-	delete testIntegrator;
-	delete pdfAndData;
 	return 1;
 }
 
