@@ -35,6 +35,7 @@
 #include "TNtuple.h"
 
 
+
 pthread_mutex_t _n_eval_lock;
 pthread_mutex_t _n_int_lock;
 
@@ -55,13 +56,20 @@ double NegativeLogLikelihoodNumerical::EvaluateDataSet( IPDF * FittingPDF, IData
 	(void) FittingPDF;
 
 	//	Have to provide a datapoint even though one is _not_ expected to be explicitly used for this fittting function
-	double this_integral = FittingPDF->GetPDFIntegrator()->Integral( TotalDataSet->GetDataPoint(0), TotalDataSet->GetBoundary() );
-
-	if(FittingPDF->GetName()=="NormalisedSumPDF")
+	std::map<int,double> this_integral;
+	
+	PhaseSpaceBoundary* this_boundary = TotalDataSet->GetBoundary();
+	std::vector<DataPoint*> allCombinations = this_boundary->GetDiscreteCombinations();
+	for(DataPoint* combination : allCombinations)
 	{
-		std::array<double,2> IntegralResult = static_cast<NormalisedSumPDF*>(FittingPDF)->GetCachedIntegrals(TotalDataSet->GetDataPoint(0), TotalDataSet->GetBoundary());
-		for(auto PDF: stored_pdfs)
-			static_cast<NormalisedSumPDF*>(PDF)->SetCachedIntegrals(IntegralResult, TotalDataSet->GetDataPoint(0), TotalDataSet->GetBoundary());
+		int dpindex = this_boundary->GetDiscreteIndex(combination);
+		this_integral[dpindex] = FittingPDF->GetPDFIntegrator()->Integral( combination, this_boundary );
+		if(FittingPDF->GetName()=="NormalisedSumPDF")
+		{
+			std::array<double,2> IntegralResult = static_cast<NormalisedSumPDF*>(FittingPDF)->GetCachedIntegrals(combination, this_boundary);
+			for(auto& PDF: stored_pdfs)
+				static_cast<NormalisedSumPDF*>(PDF)->SetCachedIntegrals(IntegralResult, combination, this_boundary);
+		}
 	}
 
 	if( TotalDataSet->GetDataNumber() == 0 ) return 0.;
@@ -93,7 +101,6 @@ double NegativeLogLikelihoodNumerical::EvaluateDataSet( IPDF * FittingPDF, IData
 		fit_thread_data[threadnum].fittingPDF = stored_pdfs[((unsigned)number)*(unsigned)Threads + threadnum];
 		fit_thread_data[threadnum].useWeights = useWeights;					//	Defined in the fitfunction baseclass
 		fit_thread_data[threadnum].FitBoundary = StoredBoundary[(unsigned)Threads*((unsigned)number)+threadnum];
-		//fit_thread_data[threadnum].ResultIntegrator = StoredIntegrals[(unsigned)Threads*((unsigned)number)+threadnum];
 		fit_thread_data[threadnum].stored_integral = this_integral;
 		fit_thread_data[threadnum].dataPoint_Result = vector<double>();
 		fit_thread_data[threadnum].weightsSquared = weightsSquared;
@@ -161,7 +168,6 @@ void* NegativeLogLikelihoodNumerical::ThreadWork( void *input_data )
 	//TFile * file = TFile::Open("integral.root", "UPDATE");
 	//TNtuple * ntuple = new TNtuple("test_good","test", "value");
 	//TNtuple * ntuple = new TNtuple("integral","test", "integral");
-	//bool isnorm = thread_input->fittingPDF->GetName()=="NormalisedSum";
 	for( vector<DataPoint*>::iterator data_i=thread_input->dataSubSet.begin(); data_i != thread_input->dataSubSet.end(); ++data_i, ++num )
 	{
 		try
@@ -175,7 +181,8 @@ void* NegativeLogLikelihoodNumerical::ThreadWork( void *input_data )
 
 		try
 		{
-			integral = thread_input->stored_integral;// ResultIntegrator->Integral( *data_i, thread_input->FitBoundary );
+			int index = thread_input->FitBoundary->GetDiscreteIndex( *data_i );
+			integral = thread_input->stored_integral.at(index);
 		}
 		catch( ... )
 		{
