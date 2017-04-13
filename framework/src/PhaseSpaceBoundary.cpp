@@ -504,7 +504,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	bool IDFound = Input->FindDiscreteIndexID( uniqueID );
 	if( thisIndex != -1 && IDFound ) return (unsigned)thisIndex;
 
-	if( this->GetDiscreteNames().empty() || (this->GetDiscreteNames().size() == 1) )
+	if( this->GetDiscreteNames().empty() || (this->GetDiscreteCombinations().size() == 1) )
 	{
 		Input->SetDiscreteIndexIDMap( uniqueID, 0 );
 		return 0;
