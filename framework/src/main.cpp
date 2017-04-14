@@ -747,8 +747,7 @@ void PerformMultiDimChi2( RapidFitConfiguration* config )
 	//wantedObservables.push_back( "helphi" );
 
 	vector<PDFWithData*> allObjects = config->pdfsAndData;
-	PhaseSpaceBoundary* thisBound = new PhaseSpaceBoundary( * allObjects[0]->GetDataSet()->GetBoundary() );
-	MultiDimChi2* thisTest = new MultiDimChi2( allObjects, thisBound, wantedObservables );
+	MultiDimChi2* thisTest = new MultiDimChi2( allObjects, wantedObservables );
 
 
 	thisTest->PerformMuiltDimTest();
