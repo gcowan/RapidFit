@@ -21,6 +21,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <cmath>
+#include <signal.h>
 
 #define DOUBLE_TOLERANCE_PHASE 1E-6
 
@@ -503,7 +504,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 	bool IDFound = Input->FindDiscreteIndexID( uniqueID );
 	if( thisIndex != -1 && IDFound ) return (unsigned)thisIndex;
 
-	if( this->GetDiscreteNames().empty() || (this->GetDiscreteNames().size() == 1) )
+	if( this->GetDiscreteNames().empty() || (this->GetDiscreteCombinations().size() == 1) )
 	{
 		Input->SetDiscreteIndexIDMap( uniqueID, 0 );
 		return 0;
@@ -587,7 +588,7 @@ unsigned int PhaseSpaceBoundary::GetDiscreteIndex( DataPoint* Input, const bool 
 		cerr << "This is a SERIOUS MISCONFIGURATION!!! Exiting :(" << endl;
 		Input->Print();
 		this->Print();
-		DebugClass::SegFault();
+		raise(SIGSEGV); // Deliberate segfault to get stack trace
 	}
 
 	//	Store and return the lookup of the DataPoint's index
@@ -646,5 +647,31 @@ void PhaseSpaceBoundary::CheckPhaseSpace( IPDF* toCheck ) const
 size_t PhaseSpaceBoundary::GetID() const
 {
 	return uniqueID;
+}
+
+bool PhaseSpaceBoundary::operator==(const PhaseSpaceBoundary& other) const
+{
+	unsigned numConstraints = allConstraints.size();
+	if(numConstraints != other.allConstraints.size() || GetNumberCombinations() != other.GetNumberCombinations()) return false;
+	for(unsigned iConstraint = 0; iConstraint < numConstraints; iConstraint++)
+	{
+		bool discrete = allConstraints[iConstraint]->IsDiscrete();
+		if(discrete != other.allConstraints[iConstraint]->IsDiscrete()) return false;
+		if(discrete) // both discrete, so compare GetValues
+		{// http://en.cppreference.com/w/cpp/container/vector/operator_cmp this is fine :)
+			if(allConstraints[iConstraint]->GetValues() != other.allConstraints[iConstraint]->GetValues()) return false;
+		}
+		else // both continuous, so compare GetMinimum and GetMaximum
+		{
+			if(allConstraints[iConstraint]->GetMinimum() != other.allConstraints[iConstraint]->GetMinimum()
+			|| allConstraints[iConstraint]->GetMaximum() != other.allConstraints[iConstraint]->GetMaximum()) return false;
+		}
+	}
+	return true;
+}
+
+bool PhaseSpaceBoundary::operator!=(const PhaseSpaceBoundary& other) const
+{
+	return !((*this)==other);
 }
 

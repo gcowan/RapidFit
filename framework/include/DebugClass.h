@@ -28,12 +28,6 @@ class DebugClass
 
 		//	HelperFunctions within this Sentinel
 
-		#ifndef __CINT__
-			static void SegFault() __attribute__ ((noreturn));
-		#else
-			static void SegFault();
-		#endif
-
 		template<class T> static void Dump2File( const string fileName, const vector<T> objects );
 
 		template<class T> static void Dump2TTree( const string fileName, const vector<T> objects, const string ttreeName="", const string branchName="" );

@@ -20,7 +20,8 @@
 #include <vector>
 #include <string>
 
-using namespace::std;
+using std::vector;
+using std::string;
 
 class IPDF;
 
@@ -66,6 +67,9 @@ class PhaseSpaceBoundary
 		size_t GetID() const;
 
 		void ClearDiscreteCombinations();
+
+		bool operator==(const PhaseSpaceBoundary&) const;
+		bool operator!=(const PhaseSpaceBoundary&) const;
 
 	private:
 		PhaseSpaceBoundary& operator=(const PhaseSpaceBoundary&);

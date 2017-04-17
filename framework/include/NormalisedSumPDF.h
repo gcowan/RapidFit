@@ -17,10 +17,15 @@
 #include "RapidFitIntegrator.h"
 #include "ComponentRef.h"
 //	System Headers
+#include <array>
 #include <vector>
 #include <string>
+#include <map>
 
-using namespace::std;
+using std::array;
+using std::vector;
+using std::string;
+using std::map;
 
 class NormalisedSumPDF : public BasePDF
 {
@@ -74,6 +79,10 @@ class NormalisedSumPDF : public BasePDF
 
 		void SetCachingEnabled( bool Input );
 
+		array<double,2> GetCachedIntegrals(DataPoint*, PhaseSpaceBoundary* ) const;
+
+		void SetCachedIntegrals(array<double,2>, DataPoint*, PhaseSpaceBoundary* );
+
 		string XML() const;
 
 		void SetDebugMutex( pthread_mutex_t* Input, bool =true );
@@ -91,8 +100,9 @@ class NormalisedSumPDF : public BasePDF
 		NormalisedSumPDF& operator=(const NormalisedSumPDF&);
 		void MakePrototypes( PhaseSpaceBoundary* );
 
-		double GetFirstIntegral( DataPoint* );
-		double GetSecondIntegral( DataPoint* );
+		double GetFirstIntegral( DataPoint* ) const;
+		double GetSecondIntegral( DataPoint* ) const;
+		map<unsigned int, double> firstIntegral, secondIntegral;
 
 		vector<string> prototypeDataPoint, prototypeParameterSet, doNotIntegrateList;
 		IPDF * firstPDF;
@@ -102,6 +112,7 @@ class NormalisedSumPDF : public BasePDF
 		PhaseSpaceBoundary * integrationBoundary;
 
 		bool _plotComponents;
+		bool inEvaluate = false;
 };
 
 #endif

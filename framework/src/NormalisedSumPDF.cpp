@@ -20,12 +20,11 @@
 
 PDF_CREATOR( NormalisedSumPDF );
 
-using namespace::std;
 
 NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (BasePDF) input ),
 	prototypeDataPoint( input.prototypeDataPoint ), prototypeParameterSet( input.prototypeParameterSet ), doNotIntegrateList( input.doNotIntegrateList ),
 	firstPDF( ClassLookUp::CopyPDF( input.firstPDF ) ), secondPDF( ClassLookUp::CopyPDF( input.secondPDF ) ),
-	firstFraction( input.firstFraction ), firstIntegralCorrection( input.firstIntegralCorrection ), secondIntegralCorrection( input.secondIntegralCorrection ),
+	firstFraction( input.firstFraction ), firstIntegral( input.firstIntegral ), firstIntegralCorrection( input.firstIntegralCorrection ), secondIntegral( input.secondIntegral ), secondIntegralCorrection( input.secondIntegralCorrection ),
 	fractionName( input.fractionName ), integrationBoundary(NULL), _plotComponents( input._plotComponents )
 {
 	firstPDF->SetDebugMutex( this->DebugMutex(), false );
@@ -37,7 +36,6 @@ NormalisedSumPDF::NormalisedSumPDF( const NormalisedSumPDF& input ) : BasePDF( (
 NormalisedSumPDF::NormalisedSumPDF( PDFConfigurator* config ) : BasePDF(), prototypeDataPoint(), prototypeParameterSet(), doNotIntegrateList(), firstPDF(NULL), secondPDF(NULL),
 	firstFraction(0.5), firstIntegralCorrection(), secondIntegralCorrection(), fractionName(), integrationBoundary(NULL), _plotComponents( true )
 {
-
 	vector<string> FractionNames = StringProcessing::CombineUniques( config->GetFractionNames(), vector<string>() );
 
 	if( FractionNames.size() != 1 )
@@ -87,7 +85,6 @@ NormalisedSumPDF::NormalisedSumPDF( PDFConfigurator* config ) : BasePDF(), proto
 	allParameters.AddPhysicsParameters( secondPDF->GetPhysicsParameters(), false );
 	PhysicsParameter* frac_param = new PhysicsParameter( fractionName );
 	allParameters.AddPhysicsParameter( frac_param, false );
-
 }
 
 void NormalisedSumPDF::SetComponentStatus( const bool input )
@@ -248,12 +245,24 @@ void NormalisedSumPDF::MakePrototypes( PhaseSpaceBoundary * InputBoundary )
 			}
 		}
 	}
+	// Make sure the cached integrals have the right indices. Set everything to 1 to avoid division by zero. Old cache is invalid anyway.
+	firstIntegral.clear();
+	secondIntegral.clear();
+	for(DataPoint* pdp: integrationBoundary->GetDiscreteCombinations())
+	{
+		unsigned int DPindex = integrationBoundary->GetDiscreteIndex(pdp);
+		firstIntegral[DPindex] = 1.;
+		secondIntegral[DPindex] = 1.;
+	}
 }
 
 //Destructor
 NormalisedSumPDF::~NormalisedSumPDF()
 {
-	//cout << "Hello from Normalised destructor" << endl;
+	if(inEvaluate)
+	{
+		cout << "NormalisedSumPDF: Help! My destructor is being called while I'm in the middle of Evaluate()!" << endl;
+	}
 	if( firstPDF != NULL ) delete firstPDF;
 	if( secondPDF != NULL ) delete secondPDF;
 	if( integrationBoundary != NULL ) delete integrationBoundary;
@@ -262,6 +271,7 @@ NormalisedSumPDF::~NormalisedSumPDF()
 //Set the function parameters
 bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
+	UnsetCache();
 	PhysicsParameter * newFraction = NewParameterSet->GetPhysicsParameter(fractionName);
 	if ( newFraction->GetUnit() == "NameNotFoundError" )
 	{
@@ -270,16 +280,17 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 	}
 	else
 	{
+		// Update the fraction
 		double newFractionValue = newFraction->GetValue();
-
 		//Stupidity check
 		if ( newFractionValue > 1.0 || newFractionValue < 0.0 )
 		{
-			//cerr << "Requested impossible fraction: " << newFractionValue << endl;
-			//return false;
+			cerr << "Requested impossible fraction: " << newFractionValue << endl;
+			return false;
 		}
 		else
 		{
+			// Update the physics parameters of the PDFs
 			firstFraction = newFractionValue;
 			firstPDF->UpdatePhysicsParameters( NewParameterSet );
 			secondPDF->UpdatePhysicsParameters( NewParameterSet );
@@ -293,120 +304,85 @@ bool NormalisedSumPDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Return the integral of the function over the given boundary
 double NormalisedSumPDF::Normalisation( DataPoint* NewDataPoint, PhaseSpaceBoundary * NewBoundary )
 {
-	(void)NewDataPoint;
-	(void)NewBoundary;
-	//The evaluate method already returns a normalised value
+	// Check we're working with the same boundary, otherwise the local stored integrals might not be valid
+	if((*NewBoundary) != (*integrationBoundary))
+	{
+		cerr << "The boundary passed to NormalisedSumPDF::Normalisation doesn't match the stored integrationBoundary!" << endl;
+	}
+	// Calculate and cache the integrals
+	double firstIntegralResult = firstPDF->Integral( NewDataPoint, NewBoundary ) * firstIntegralCorrection;
+	double secondIntegralResult = secondPDF->Integral( NewDataPoint, NewBoundary ) * secondIntegralCorrection;
+	SetCachedIntegrals({firstIntegralResult,secondIntegralResult}, NewDataPoint, NewBoundary);
 	return 1.0;
 }
 
 //Return the function value at the given point
 double NormalisedSumPDF::Evaluate( DataPoint* NewDataPoint )
 {
-	if( firstFraction > 1.0 || firstFraction < 0.0 )
-	{
-		cerr << "Requested impossible fraction: " << firstFraction << endl;
-		return DBL_MAX;
-	}
-
+	inEvaluate = true;
 	double termOne=0.;
 	double termTwo=0.;
 
-	double firstIntegral=0.;
-	double secondIntegral=0.;
 	if( firstFraction >= 1. )
 	{
-		firstIntegral = this->GetFirstIntegral( NewDataPoint );
-		termOne = ( firstPDF->Evaluate( NewDataPoint ) ) / firstIntegral;
+		termOne = ( firstPDF->Evaluate( NewDataPoint ) ) / GetFirstIntegral( NewDataPoint );
 	}
 	else if( firstFraction <= 0. )
 	{
-		secondIntegral = this->GetSecondIntegral( NewDataPoint );
-		termTwo = ( secondPDF->Evaluate( NewDataPoint ) ) / secondIntegral;
+		termTwo = ( secondPDF->Evaluate( NewDataPoint ) ) / GetSecondIntegral( NewDataPoint );
 	}
 	else
 	{
 		//Calculate the integrals of the PDFs
-		firstIntegral = this->GetFirstIntegral( NewDataPoint );
-		secondIntegral = this->GetSecondIntegral( NewDataPoint );
 		//Get the PDFs' values, normalised and weighted by firstFraction
-		termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / firstIntegral;
-		termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+		termOne = ( firstPDF->Evaluate( NewDataPoint ) * firstFraction ) / GetFirstIntegral( NewDataPoint );
+		termTwo = ( secondPDF->Evaluate( NewDataPoint ) * ( 1 - firstFraction ) ) / GetSecondIntegral( NewDataPoint );
 	}
 
-	double sum=termOne + termTwo;
-
-	/*
-	   if( std::isnan(sum) ||  sum <= 0. )
-	   {
-	   PDF_THREAD_LOCK
-
-	   cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
-
-	   cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
-
-	   PDF_THREAD_UNLOCK
-	   throw(-653102);
-	   }
-	 */
-
 	//Return the sum
-	return sum;
+	inEvaluate = false;
+	return termOne + termTwo;
 }
 
-double NormalisedSumPDF::GetFirstIntegral( DataPoint* NewDataPoint )
+double NormalisedSumPDF::GetFirstIntegral( DataPoint* NewDataPoint ) const
 {
-	return firstPDF->Integral( NewDataPoint, integrationBoundary ) * firstIntegralCorrection;
+	unsigned int DPindex = integrationBoundary->GetDiscreteIndex(NewDataPoint);
+	return firstIntegral.at(DPindex);
 }
 
-double NormalisedSumPDF::GetSecondIntegral( DataPoint* NewDataPoint )
+double NormalisedSumPDF::GetSecondIntegral( DataPoint* NewDataPoint ) const
 {
-	return secondPDF->Integral( NewDataPoint, integrationBoundary ) * secondIntegralCorrection;
+	unsigned int DPindex = integrationBoundary->GetDiscreteIndex(NewDataPoint);
+	return secondIntegral.at(DPindex);
 }
 
 //Return the function value at the given point
 double NormalisedSumPDF::EvaluateForNumericIntegral( DataPoint * NewDataPoint )
 {
+	inEvaluate = true;
 	double termOne=0.;
 	double termTwo=0.;
 
-	double firstIntegral=0.;
-	double secondIntegral=0.;
 	if( firstFraction >= 1. )
 	{
-		firstIntegral = this->GetFirstIntegral( NewDataPoint );
-		termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / firstIntegral;
+		termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / GetFirstIntegral( NewDataPoint );
 	}
 	else if( firstFraction <= 0. )
 	{
-		secondIntegral = this->GetSecondIntegral( NewDataPoint );
-		termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / secondIntegral;
+		termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) ) / GetSecondIntegral( NewDataPoint );
 	}
 	else
 	{
 		//Calculate the integrals of the PDFs
-		firstIntegral = this->GetFirstIntegral( NewDataPoint );
-		secondIntegral = this->GetSecondIntegral( NewDataPoint );
 		//Get the PDFs' values, normalised and weighted by firstFraction
-		termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / firstIntegral;
-		termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / secondIntegral;
+		termOne = ( firstPDF->EvaluateForNumericIntegral( NewDataPoint ) * firstFraction ) / GetFirstIntegral( NewDataPoint );
+		termTwo = ( secondPDF->EvaluateForNumericIntegral( NewDataPoint ) * ( 1 - firstFraction ) ) / GetSecondIntegral( NewDataPoint );
 	}
-	//cout << "NSP numerical integrals " << firstIntegral << " , " << secondIntegral << endl;
-
-	/*
-	   if( std::isnan(termOne) || std::isnan(termTwo) )
-	   {
-	   PDF_THREAD_LOCK
-	   cout << termOne*firstIntegral << "/" << firstIntegral << "\t+\t" << termTwo*secondIntegral << "/" << secondIntegral << endl;
-	   cout << firstPDF->GetLabel() << "\t\t\t\t\t" << secondPDF->GetLabel() << endl << endl;
-	   PDF_THREAD_UNLOCK
-	   }
-	 */
 
 	//Return the sum
+	inEvaluate = false;
 	return termOne + termTwo;
 }
-
-
 
 //Return a prototype data point
 vector<string> NormalisedSumPDF::GetPrototypeDataPoint()
@@ -428,19 +404,18 @@ vector<string> NormalisedSumPDF::GetDoNotIntegrateList()
 
 bool NormalisedSumPDF::GetNumericalNormalisation() const
 {
-	return false;//firstPDF->GetNumericalNormalisation() || secondPDF->GetNumericalNormalisation();
+	return false;
 }
 
 //Return the function value at the given point
 double NormalisedSumPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRef* componentIndexObj )
 {
+	inEvaluate = true;
 	if( !_plotComponents ) return this->Evaluate( NewDataPoint );
 
 	if( componentIndexObj == NULL ) return this->Evaluate( NewDataPoint );
 	string componentIndex = componentIndexObj->getComponentName();
 	int component_num = componentIndexObj->getComponentNumber();
-
-	//cout << endl << componentIndexObj->getComponentName() << endl;
 
 	if( component_num == -1 || componentIndexObj->getSubComponent() == NULL )
 	{
@@ -448,12 +423,7 @@ double NormalisedSumPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRe
 		componentIndexObj->setComponentNumber( component_num );
 		componentIndexObj->addSubComponent( StringProcessing::RemoveFirstNumber( componentIndex ) );
 	}
-	//cout << "Eval Component: " << component_num << "\tAsking for " << StringProcessing::RemoveFirstNumber( componentIndex ) << endl << endl;
-
-	double returnable_value = -1.;
-
-	double termOne = -1.;
-	double termTwo = -1.;
+	inEvaluate = false;
 
 	//      All components are:
 	//                              0       :       total of the whole NormalisedSumPDF
@@ -465,36 +435,26 @@ double NormalisedSumPDF::EvaluateComponent( DataPoint* NewDataPoint, ComponentRe
 	{
 		case 1:
 			//      We want a component from the first PDF, integrate over the second PDF
-			termOne = firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / this->GetFirstIntegral( NewDataPoint );
-			termTwo = 0.;
+			return firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) * firstFraction / GetFirstIntegral( NewDataPoint );
 			break;
 
 		case 2:
 			//      We want a component from the second PDF, integrate over the first PDF
-			termOne = 0.;
-			termTwo = secondPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / this->GetSecondIntegral( NewDataPoint );
+			return secondPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) * (1.-firstFraction) / GetSecondIntegral( NewDataPoint );
 			break;
 
 		case 0:
-			termOne = firstPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / this->GetFirstIntegral( NewDataPoint );
-			termTwo = secondPDF->EvaluateComponent( NewDataPoint, componentIndexObj->getSubComponent() ) / this->GetSecondIntegral( NewDataPoint );
+			//      We want the total PDF
+			return Evaluate(NewDataPoint);
 			break;
 
 		default:
-
-			returnable_value = 0;//this->EvaluateForNumericIntegral( NewDataPoint );
-			return returnable_value;
+			std::cerr << "Unrecognised component index " << component_num << "\n";
+			return 0;
+			break;
 	}
-
-	termOne = ( termOne * firstFraction );
-	termTwo = ( termTwo * (1.-firstFraction) );
-
-
-	//cout << "NormSum:\t" << setw(3) << componentIndex << " : " << component_num << " : " << StringProcessing::RemoveFirstNumber( componentIndex ) << "\t\t" << termOne+termTwo << " _:_ " << termOne << " , " << termTwo << "\t" << firstIntegral << " , " << secondIntegral << "\t" << this->GetLabel() << endl;
-
-	returnable_value = termOne + termTwo;
-
-	return returnable_value;
+	std::cerr << "Someone broke the switch statement in NormalisedSumPDF::EvaluateComponent\n";
+	return 0;
 }
 
 IPDF* NormalisedSumPDF::GetFirstPDF() const
@@ -522,6 +482,19 @@ bool NormalisedSumPDF::GetCachingEnabled() const
 {
 	return firstPDF->GetCachingEnabled() && secondPDF->GetCachingEnabled();
 }
+
+void NormalisedSumPDF::SetCachedIntegrals(array<double,2> IntegralResult, DataPoint* NewDataPoint, PhaseSpaceBoundary* NewBoundary)
+{
+	unsigned int DPindex = NewBoundary->GetDiscreteIndex(NewDataPoint);
+	firstIntegral[DPindex] = IntegralResult[0];
+	secondIntegral[DPindex] = IntegralResult[1];
+}
+
+array<double,2> NormalisedSumPDF::GetCachedIntegrals(DataPoint* NewDataPoint, PhaseSpaceBoundary* ) const
+{
+	return {GetFirstIntegral(NewDataPoint),GetSecondIntegral(NewDataPoint)};
+}
+
 
 string NormalisedSumPDF::XML() const
 {
@@ -577,7 +550,7 @@ string NormalisedSumPDF::GetComponentName( ComponentRef* componentIndexObj )
 				return secondPDF->GetComponentName( componentIndexObj->getSubComponent() );
 
 			case 0:
-				//	We wanr this PDF
+				//	We want this PDF
 				return this->GetLabel();
 
 			default:
@@ -594,10 +567,7 @@ PhaseSpaceBoundary* NormalisedSumPDF::GetPhaseSpace() const
 
 vector<IPDF*> NormalisedSumPDF::GetChildren() const
 {
-	vector<IPDF*> thisVec;
-	thisVec.push_back( firstPDF );
-	thisVec.push_back( secondPDF );
-	return thisVec;
+	return {firstPDF, secondPDF};
 }
 
 
