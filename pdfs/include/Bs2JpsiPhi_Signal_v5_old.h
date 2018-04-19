@@ -17,7 +17,6 @@
 #include "SlicedAcceptance.h"
 #include "AngularAcceptance.h"
 #include "Mathematics.h"
-#include "RooComplex.h"
 #include <iostream>
 #include <cstdlib>
 #include <float.h>
