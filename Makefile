@@ -101,9 +101,8 @@ OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJD
 ##Dependencies
 
 LINKER=ld
-LINKFLAGS= -lpthread
-
-LIBS=-lstdc++
+LINKFLAGS= -lpthread -Wl,-export-dynamic
+LIBS=-static-libstdc++
 
 CXXFLAGSUTIL = $(CXXFLAGS_BASE) -I$(INCUTILS) $(ROOTCFLAGS) -Iframework/include
 CXXFLAGS     = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
