@@ -5,7 +5,6 @@
 #define RAPIDFIT_MATRIX_H
 
 ///     ROOT Headers
-#include "TMatrixD.h"
 #include "TMatrixDSym.h"
 ///	System Headers
 #include <vector>

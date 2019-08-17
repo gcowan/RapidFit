@@ -31,11 +31,9 @@
 #include <pthread.h>
 
 #ifdef __CINT__ 
-#undef __GNUC__ 
 #define _SYS__SELECT_H_
 struct pthread_mutex_t;
 #undef __SYS__SELECT_H_
-#define __GNUC__
 #endif
 
 using namespace::std;
