@@ -101,9 +101,8 @@ OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJD
 ##Dependencies
 
 LINKER=ld
-LINKFLAGS= -lpthread
-
-LIBS=-lstdc++
+LINKFLAGS= -lpthread -Wl,-export-dynamic
+LIBS=-static-libstdc++
 
 CXXFLAGSUTIL = $(CXXFLAGS_BASE) -I$(INCUTILS) $(ROOTCFLAGS) -Iframework/include
 CXXFLAGS     = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
@@ -275,8 +274,8 @@ lib:    $(LIBDIR)/libRapidRun.so $(LIBDIR)/libUtils.so
 #	We want to place the output dictionary in the Build directory as this is CODE that is NOT to be editted by the $USER!
 $(OBJDIR)/rapidfit_dict.cpp: framework/include/RapidRun.h framework/include/LinkDef.h
 	@echo "Building RapidFit Root Dictionary:"
-	@echo "rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c -I\"$(PWD)/framework/include\" $^"
-	@rootcint -f $(OBJDIR)/rapidfit_dict.cpp -c -I"$(PWD)/framework/include" $^
+	@echo "rootcling -f $(OBJDIR)/rapidfit_dict.cpp -c -I\"$(PWD)/framework/include\" $^"
+	@rootcling -f $(OBJDIR)/rapidfit_dict.cpp -c -I"$(PWD)/framework/include" $^
 
 #	Compile the class that root has generated for us which is the linker interface to root	(i.e. dictionaries & such)
 $(OBJDIR)/rapidfit_dict.o: $(OBJDIR)/rapidfit_dict.cpp
@@ -295,8 +294,8 @@ $(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS)
 
 $(OBJUTILDIR)/utilsDict.cpp: $(UTILHEADERS) $(INCUTILS)/LinkDef.h
 	@echo "Building Utils Root Dictionary:"
-	@echo "rootcint -f $(OBJUTILDIR)/utilsDict.cpp -c -I"$(PWD)" $^"
-	@rootcint -f $(OBJUTILDIR)/utilsDict.cpp -c -I"$(PWD)" $^
+	@echo "rootcling -f $(OBJUTILDIR)/utilsDict.cpp -c -I"$(PWD)" $^"
+	@rootcling -f $(OBJUTILDIR)/utilsDict.cpp -c -I"$(PWD)" $^
 
 $(OBJUTILDIR)/utilsDict.o: $(OBJUTILDIR)/utilsDict.cpp
 	$(CXX) $(CXXFLAGSUTIL) -o $@ -I"$(PWD)" -c $<

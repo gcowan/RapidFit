@@ -264,6 +264,7 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 		vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
 		vector< pair<double,double> >& chi2_results, vector< vector<double> >& pullFunctionEvals, TFile* output_file, bool weightedEventsWereUsed, string weightName )
 {
+	cout << "hello" << endl;
 	string thisObservable = (*projection_i)->observableName;
 
 	vector<string> known_observables = resultBottle->GetResultPDF(resultIndex)->GetPrototypeDataPoint();
