@@ -264,6 +264,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	{
 		if( config->component_names.empty() )
 		{
+
 			if( plotPDF->GetName() == plotPDF->GetLabel() )
 			{
 				config->component_names.push_back( plotPDF->GetName() );
@@ -278,7 +279,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 			{
 				ComponentRef* thisRef = new ComponentRef( pdfComponents[i], observableName );
 				if( pdfComponents[i] != "0" ) config->component_names.push_back( plotPDF->GetComponentName( thisRef ) );
-				delete thisRef;
+				// delete thisRef; //apparently this causes everything to barf
 			}
 		}
 	}
@@ -806,6 +807,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 	//
 	//	This definitely works and isn't quite so bad as I feares but knowing which component we are using is a pain
 	//
+
 	for( unsigned int combinationIndex=0; combinationIndex < (*X_values)[0]->size(); ++combinationIndex )
 	{
 		TString combinationIndexstr;combinationIndexstr+=combinationIndex;
@@ -875,7 +877,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				cout << endl;
 				cout << "Calculating Chi^2:" << endl;
 
-				TF1* fitting_function = new TF1( "total_PDF", this, boundary_min, boundary_max, 1, "" );        //      I REFUSE to pass the class name
+				TF1* fitting_function = new TF1( "total_PDF", this, boundary_min, boundary_max, 1 );        //      I REFUSE to pass the class name
 				//chi2 = binned_data.back()->Chisquare( fitting_function );
 
 				//double chi2_2 = 0.;
@@ -930,6 +932,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				 */
 			}
 
+
 			if( combinationIndex == 0 && this_config->DrawPull == true )
 			{
 				cout << endl;
@@ -971,7 +974,7 @@ void ComponentPlotter::WriteOutput( vector<vector<vector<double>* >* >* X_values
 				(void)pullPlot;
 			}
 		}
-		delete temp;
+		//delete temp;// attempt to stop barfing
 	}
 
 	//	If there is more than 1 combination it's useful to plot the total's on the same graph with total component 0
@@ -1767,7 +1770,7 @@ vector<double>* ComponentPlotter::ProjectObservableComponent( DataPoint* InputPo
 
 	//cout << "Returning pointValues" << endl;
 
-	delete comp_obj;
+	//delete comp_obj;// again causes everything to barf with ROOT6
 
 	return pointValues;
 }
@@ -1864,7 +1867,7 @@ vector<vector<TGraph*> > ComponentPlotter::GetComponents()
 
 double ComponentPlotter::operator() (double *x, double *p)
 {
-	(void) p;			//	NOT USED OR UNDERSTOOD IN THIS CONTEXT
+	(void) *p;
 	double fixed_obs_val = x[0];
 
 	Observable* oldObs=NULL;

@@ -249,7 +249,7 @@ class ComponentPlotter
 		 *
 		 * @return This returns the Projection at the observable value X and allows the PDF to be truth for a Chi2 test
 		 */
-		double operator() (double *x, double *p);
+		double operator() (double *x, double* p);
 
 		static string XML( const int projectionType=1 );
 
@@ -518,12 +518,12 @@ class MultiComponentPlotter
 	{
 	};
 
-		double operator() (double *x, double *p)
+		double operator() (double *x, double* p)
 		{
 			double returnable = 0.;
 			for( unsigned int i=0; i< storedPlotters.size(); ++i )
 			{
-				returnable += (*storedPlotters[i])( x, p );
+				returnable += (*storedPlotters[i])( x , p);
 			}
 			cout << endl << "x[o]: " << x[0] << " = " << returnable << endl;
 			return returnable;

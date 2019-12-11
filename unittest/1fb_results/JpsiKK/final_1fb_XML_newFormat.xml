@@ -402,7 +402,7 @@
 		<AlphaName>alpha</AlphaName>
 		<WeightName>sWeight</WeightName>
 		<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
-		<Threads>16</Threads>
+		<Threads>14</Threads>
 		#<UseGSLNumericalIntegration>True</UseGSLNumericalIntegration>
 		#<FixedIntegrationPoints>1000000</FixedIntegrationPoints>
 		<SetIntegratorTest>False</SetIntegratorTest>
@@ -557,7 +557,7 @@
 			<ConfigurationParameter>AngularAcceptanceFile:2011-1fbPaper/2011-AngularAcceptance-1fbPaper-UandB-30-20120706.root</ConfigurationParameter>
 			#<ConfigurationParameter>AngularAcceptanceIgnoreNumerator:True</ConfigurationParameter>
 			<ConfigurationParameter>UseTimeAcceptance:True</ConfigurationParameter>
-			<ConfigurationParameter>UseEventResolution:True</ConfigurationParameter>
+			<ConfigurationParameter>UseEventResolution:False</ConfigurationParameter>
 			#<ConfigurationParameter>OffsetToGammaForBetaFactor:0.00826</ConfigurationParameter>
 			<ConfigurationParameter>PlotComponents:True</ConfigurationParameter>
 			<ConfigurationParameter>useNewMistagModel:True</ConfigurationParameter>
@@ -1047,6 +1047,14 @@
 		</DataSet>
 	</ToFit>
 
+<Output>
+#<ComponentProjection>helphi</ComponentProjection>
+<Scan>
+<Name>gamma</Name>
+<Sigma>3</Sigma>
+<Points>10</Points>
+</Scan>
+</Output>
 
 </RapidFit>
 
