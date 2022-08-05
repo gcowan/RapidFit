@@ -68,6 +68,6 @@ void FitFractionCalculator::WriteToFile(std::string filename)
 }
 int FitFractionCalculator::GetIndex(DataPoint* combination) const
 {
-	return storedBoundary.GetDiscreteIndex(combination);
+	return (int)storedBoundary.GetDiscreteIndex(combination);
 }
 

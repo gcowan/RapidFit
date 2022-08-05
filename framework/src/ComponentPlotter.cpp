@@ -158,7 +158,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 	if( config->ForceCombinationNumber != -1 )
 	{
 		cout << "Requested ONLY to use Combination Number: " << config->ForceCombinationNumber << endl;
-		if( config->ForceCombinationNumber > allCombinations_input.size() )
+		if( config->ForceCombinationNumber > (int)allCombinations_input.size() )
 		{
 			cout << "CANNOT USE Combination Number: " << config->ForceCombinationNumber << " Ignoring!" << endl;
 		}
@@ -167,7 +167,7 @@ ComponentPlotter::ComponentPlotter( IPDF * NewPDF, IDataSet * NewDataSet, TStrin
 		for( vector<DataPoint*>::iterator thisCombination = allCombinations_input.begin(); thisCombination != allCombinations_input.end(); ++thisCombination, ++i )
 		{
 			double thisNum = plotData->GetDataNumber( *thisCombination );
-			if( fabs(thisNum) > 1E-5 && i == (config->ForceCombinationNumber-1) )
+			if( (fabs(thisNum) > 1E-5) && ((int)i == (config->ForceCombinationNumber-1)) )
 			{
 				allCombinations.push_back( new DataPoint( *(*thisCombination) ) );
 			}

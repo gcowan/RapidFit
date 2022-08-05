@@ -50,6 +50,7 @@ NegativeLogLikelihoodThreadedNew::~NegativeLogLikelihoodThreadedNew()
 //Return the negative log likelihood for a PDF/DataSet result
 double NegativeLogLikelihoodThreadedNew::EvaluateDataSet( IPDF * FittingPDF, IDataSet * TotalDataSet, int number )
 {
+	(void) number;
 	if( TotalDataSet->GetDataNumber() == 0 ) return 0.;
 
 	if( Threads <= 0 )
@@ -83,7 +84,7 @@ double NegativeLogLikelihoodThreadedNew::EvaluateDataSet( IPDF * FittingPDF, IDa
 	{
 		for( unsigned int i=0; i< values->size(); ++i )
 		{
-			double weight = TotalDataSet->GetDataPoint( i )->GetEventWeight();
+			double weight = TotalDataSet->GetDataPoint( (int)i )->GetEventWeight();
 			total += log( (*values)[i] / (*integrals)[i] ) * weight;
 		}
 	}

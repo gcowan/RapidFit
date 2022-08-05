@@ -74,7 +74,8 @@ void BasePDF::ReallySetComponentStatus( const bool input )
 
 bool BasePDF::GetComponentStatus() const
 {
-	return this->GetComponentStatus();
+	//return this->GetComponentStatus();
+	return false;
 }
 
 bool BasePDF::ReallyGetComponentStatus() const

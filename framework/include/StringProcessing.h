@@ -155,7 +155,7 @@ class StringProcessing
 		 *
 		 * @return This is is a new vector of strings assembled from the unique entries in the inputVec 
 		 */
-		static vector<string> RemoveDuplicates( const vector<string> inputVec, vector<string>& duplicated = *((vector<string>*) NULL) );
+		static vector<string> RemoveDuplicates( const vector<string> inputVec, vector<string>& duplicated );
 
 		/*!
 		 * @brief This routine performs a lookup for the stringRef object within the vectorRef and returns the location of the found string (-1 if not found)

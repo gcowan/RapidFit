@@ -46,7 +46,8 @@ void PerEventResModelWithOffset::addParameters( vector<string> & parameterNames 
 //To take the current value of a parameter into the instance
 void PerEventResModelWithOffset::setParameters( ParameterSet & parameters )
 {
-	isCacheValid = ( (resScale == parameters.GetPhysicsParameter( resScaleName )->GetValue()) && (resOffset == parameters.GetPhysicsParameter( resOffsetName )->GetValue()));
+	isCacheValid =(resScale - parameters.GetPhysicsParameter( resScaleName )->GetValue()) <= numeric_limits<double>::epsilon();
+        isCacheValid = isCacheValid && ((resOffset - parameters.GetPhysicsParameter( resOffsetName )->GetValue()) <= numeric_limits<double>::epsilon());
 	resScale = parameters.GetPhysicsParameter( resScaleName )->GetValue();
 	resOffset = parameters.GetPhysicsParameter( resOffsetName )->GetValue();
 	return;

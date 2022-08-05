@@ -16,7 +16,7 @@ void RapidFitRandom::SetRandomFunction( int num )
 {
 	RapidFitRandom::seed_num = num;
 	if( RapidFitRandom::seed_function != NULL ) delete RapidFitRandom::seed_function;
-	RapidFitRandom::seed_function = new TRandom3( RapidFitRandom::seed_num );
+	RapidFitRandom::seed_function = new TRandom3( (unsigned int)RapidFitRandom::seed_num );
 }
 
 /*!
@@ -30,7 +30,7 @@ void RapidFitRandom::SetRandomFunction( TRandom3* Input )
 {
 	RapidFitRandom::seed_num = (int)ceil(Input->Rndm() * 1E5);
 	if( RapidFitRandom::seed_function != NULL ) delete RapidFitRandom::seed_function;
-	RapidFitRandom::seed_function = new TRandom3( RapidFitRandom::seed_num );
+	RapidFitRandom::seed_function = new TRandom3( (unsigned int)RapidFitRandom::seed_num );
 }
 
 /*!
@@ -54,12 +54,12 @@ TRandom3* RapidFitRandom::GetRandomFunction()
 	{
 		if( RapidFitRandom::seed_num < 0 )
 		{
-			RapidFitRandom::seed_function = new TRandom3( (unsigned)seed_num );
-			RapidFitRandom::seed_num = (unsigned) RapidFitRandom::seed_num;
+			RapidFitRandom::seed_function = new TRandom3( (unsigned int)seed_num );
+			RapidFitRandom::seed_num = (int) RapidFitRandom::seed_num;
 		}
 		else
 		{
-			RapidFitRandom::seed_function = new TRandom3( seed_num );
+			RapidFitRandom::seed_function = new TRandom3( (unsigned int)seed_num );
 		}
 	}
 	return RapidFitRandom::seed_function;
@@ -79,7 +79,7 @@ TRandom3* RapidFitRandom::GetFrameworkRandomFunction()
 
 int RapidFitRandom::GetSeedNumFramework()
 {
-	return RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
+	return (int)RapidFitRandom::GetFrameworkRandomFunction()->Rndm();
 }
 
 /*!

@@ -29,7 +29,7 @@ class RapidRun : public TObject
 		static bool isGridified();
 
 	private:
-		std::auto_ptr<TList> args;
+		std::shared_ptr<TList> args;
 
 		static bool runningOnGrid;
 

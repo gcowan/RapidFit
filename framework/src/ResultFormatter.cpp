@@ -1065,7 +1065,7 @@ void ResultFormatter::WriteFlatNtuple( const string FileName, const FitResultVec
 		vector<int> ParameterScanStatus, ParameterFixedStatus;
 		for( unsigned int resultNum=0; resultNum< (unsigned)ToyResult->NumberResults(); ++resultNum )
 		{
-			ResultParameter* thisParam = ToyResult->GetFitResult( (unsigned)resultNum )->GetResultParameterSet()->GetResultParameter( thisParamName );
+			ResultParameter* thisParam = ToyResult->GetFitResult( (int)resultNum )->GetResultParameterSet()->GetResultParameter( thisParamName );
 
 			ParameterValues.push_back( thisParam->GetValue() );
 			ParameterErrors.push_back( thisParam->GetError() );

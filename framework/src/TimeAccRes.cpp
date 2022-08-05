@@ -200,8 +200,8 @@ double TimeAccRes::ExpSinInt( double tlow, double thigh, double gamma, double dm
 	{
 		thisSlice = timeAcc->getSlice(islice);
 
-		double slice_lo = thisSlice->tlow();
-		double slice_hi = thisSlice->thigh();
+		slice_lo = thisSlice->tlow();
+		slice_hi = thisSlice->thigh();
 
 		tlo = tlo_boundary > slice_lo ? tlo_boundary : slice_lo;
 		thi = thi_boundary < slice_hi ? thi_boundary : slice_hi;

@@ -42,7 +42,7 @@
 //#include "dummy.h"		//	This needs correcting
 #elif __APPLE__
 #include <mach-o/dyld.h>
-#include <syslimits.h>
+//#include <syslimits.h>
 #else
 #include <linux/limits.h>
 #include <unistd.h>

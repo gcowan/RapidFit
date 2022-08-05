@@ -64,7 +64,7 @@ namespace JackKnife
 		double jackknifed_value = 0.;
 
 		MemoryDataSet * subset = new MemoryDataSet( phase );
-		int nData = dataset->Yield();	
+		int nData = (int)dataset->Yield();	
                 string fileName = ResultFormatter::GetOutputFolder();
                 fileName.append("/jackknife.root");         
 		TFile * outputFile = new TFile("jackknife.root", "RECREATE");	
@@ -109,7 +109,7 @@ namespace JackKnife
 		distances->Sumw2();
 
 		char buff[10];
-		sprintf( buff, "%f", level );
+		printf( buff, "%f", level );
 		TF1 * line = new TF1("line", buff, 0, 1);
 		line->SetLineColor(kBlue);
 

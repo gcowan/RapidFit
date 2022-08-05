@@ -644,7 +644,7 @@ vector<DataPoint*> RapidFitIntegrator::initGSLDataPoints( unsigned int number, v
 			integrationPoints[j].push_back( v[j] );
 		}
 	}
-	delete v;
+	delete[] v;
 	gsl_qrng_free(q);
 	//cout << "Freed GSL Integration Tool" << endl;
 	//pthread_mutex_unlock( &gsl_mutex );
@@ -711,7 +711,7 @@ vector<DataPoint*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int num
 				double haveVal = _global_doEval_points[0]->GetObservable( allConsts[i] )->GetValue();
 				double wantVal = templateDataPoint->GetObservable( allConsts[i] )->GetValue();
 
-				if( haveVal != wantVal )
+				if( (haveVal - wantVal) <= numeric_limits<double>::epsilon() )
 				{
 					pointsGood = false;
 					break;

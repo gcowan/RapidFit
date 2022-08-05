@@ -10,7 +10,7 @@ TEMPCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags)
 
 #		Include Root files as system headers as they're NOT standards complient and we do not want to waste time fixing them!
 #		ROOT has some broken backwards compatability for OSX so won't claim to be a set of system headers
-ROOTCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags | awk -F "-I" '{print $$1" -isystem"$$2}' )
+ROOTCFLAGS   = $(shell $(ROOTSYS)/bin/root-config --cflags | awk -F "-I" '{print $$1" -isystem"$$2}' )
 ROOTLIBS     = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --libs)
 ROOTGLIBS    = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --glibs)
 
@@ -23,11 +23,10 @@ RM           = rm -f
 
 #	We can ignore 99% of Makefile modifications it builds and links or it doesn't normally
 #	We can ignore pdf modifications, 95% of all work is exploring the effect of changing a pdf so you don't care about benchmarking the version I claim
-SVN_REV ="$(shell svnversion -n ./framework)"
-SVN_PDF_REV ="$(shell svnversion -n ./pdfs)"
+SVN_REV ="$(shell git rev-parse HEAD)"
 BUILD_DATE ="$(shell date +%H:%M_%F)"
 
-CXXFLAGS_BASE_MINIMAL = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_PDF_REV) -DBUILD_DATE=$(BUILD_DATE) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -pthread
+CXXFLAGS_BASE_MINIMAL = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_REV) -DBUILD_DATE=$(BUILD_DATE) -D_GNU_SOURCE -D__USE_GNU -fPIC -pthread
 
 CXXFLAGS_BASE_WARNINGS = -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wall -Wno-non-virtual-dtor -Wno-reorder -Wshadow -Wmissing-noreturn -Wcast-align
 
@@ -38,7 +37,7 @@ CXXFLAGS_BASE_OPT = -O3 -msse2 -msse3 -fmerge-all-constants -funroll-all-loops -
 
 #CXXFLAGS_BASE = $(CXXFLAGS_BASE_COMMON) -Wmissing-noreturn -Wcast-align -msse -m3dnow
 
-CXXFLAGS_BASE = -std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -finline-limit=2000 -fprefetch-loop-arrays -fmerge-all-constants $(CXXFLAGS_BASE_WARNINGS)
+CXXFLAGS_BASE = -std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -fmerge-all-constants $(CXXFLAGS_BASE_WARNINGS)
 
 CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_PDF_REV) -DBUILD_DATE=$(BUILD_DATE) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
@@ -101,21 +100,22 @@ OUTPUT  = $(OBJDIR)/*.o $(OBJPDFDIR)/*.o $(EXEDIR)/fitting $(LIBDIR)/*.so $(OBJD
 ##Dependencies
 
 LINKER=ld
-LINKFLAGS= -lpthread -Wl,-export-dynamic
-LIBS=-static-libstdc++
+LINKFLAGS= -lpthread -rdynamic
+#LIBS=-static-libstdc++
 
 CXXFLAGSUTIL = $(CXXFLAGS_BASE) -I$(INCUTILS) $(ROOTCFLAGS) -Iframework/include
 CXXFLAGS     = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
 CXXFLAGS_LIB = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
 
-LIBLINKFLAGS = -pie -m64
+#LIBLINKFLAGS = -m64
+LIBLINKFLAGS =
 
 # OS X
 DARWIN=Darwin
-ifeq ($(UNAME),$(Darwin))
+ifeq ("$(UNAME)","Darwin")
 	CXXFLAGS+= -fPIE
 	CXXFLAGSUTIL+= -fPIE
-	LINKFLAGS+= $(shell if [ "$(shell root-config --arch | grep 32)" = "" ]; then echo " -m64"; else echo ""; fi) -Wl,-rpath,$(LD_LIBRARY_PATH)
+	LINKFLAGS+= -Wl,-rpath,$(LD_LIBRARY_PATH)
 else
 	CXXFLAGS+= -fPIE
 	CXXFLAGSUTIL+= -fPIE
@@ -171,7 +171,7 @@ cleanP  :
 
 #	Allow chosing of which compiler to use on systems with mutliple compilers
 clang: override CC=clang++
-clang: override CXXFLAGS_BASE=-std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -fprefetch-loop-arrays -fmerge-all-constants -Wall -Wextra -Wno-reorder
+clang: override CXXFLAGS_BASE=-std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -fmerge-all-constants -Wall -Wextra -Wno-reorder
 clang: all
 clang-utils: override CC=clang++
 clang-utils: utils
@@ -196,7 +196,7 @@ valgrindPDF: override CXXFLAGS_BASE+=-D__USE_VALGRIND_INPDF
 valgrind: all
 
 gsl: override CXXFLAGS+= -D__RAPIDFIT_USE_GSL -D__RAPIDFIT_USE_GSL_MATH $(gsl-config --cflags)
-gsl: override LINKFLAGS+= -L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/lib -lgsl -lgslcblas -lm $(gsl-config --libs)
+gsl: override LINKFLAGS+= -lgsl -lgslcblas -lm $(gsl-config --libs)
 gsl: all
 
 #	Have a build option that SCREAMS at the user for potential mistakes!!!
@@ -276,6 +276,7 @@ $(OBJDIR)/rapidfit_dict.cpp: framework/include/RapidRun.h framework/include/Link
 	@echo "Building RapidFit Root Dictionary:"
 	@echo "rootcling -f $(OBJDIR)/rapidfit_dict.cpp -c -I\"$(PWD)/framework/include\" $^"
 	@rootcling -f $(OBJDIR)/rapidfit_dict.cpp -c -I"$(PWD)/framework/include" $^
+	@cp $(OBJDIR)/rapidfit_dict_rdict.pcm $(EXEDIR)/rapidfit_dict_rdict.pcm
 
 #	Compile the class that root has generated for us which is the linker interface to root	(i.e. dictionaries & such)
 $(OBJDIR)/rapidfit_dict.o: $(OBJDIR)/rapidfit_dict.cpp

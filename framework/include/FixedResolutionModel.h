@@ -74,7 +74,7 @@ class FixedResolutionModel : public IResolutionModel
 		unsigned int wantedComponent;
 
 		ObservableRef timeResFracName;
-		double resFrac;
+		//double resFrac;
 };
 
 #endif

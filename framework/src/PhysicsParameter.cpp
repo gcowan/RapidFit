@@ -21,7 +21,7 @@ const double default_val = -9999.;
 
 bool PhysicsParameter::DiffParams( PhysicsParameter* first, PhysicsParameter* second )
 {
-	return first->GetValue() == second->GetValue();
+	return (first->GetValue() - second->GetValue()) <= numeric_limits<double>::epsilon();
 }
 
 //Default constructor

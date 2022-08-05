@@ -351,7 +351,7 @@ void MemoryDataSet::Print()
 	{
 		double total=0.;
 		double avr=0.;
-		double avr_sq=0.;
+		//double avr_sq=0.;
 		double val=0.;
 		ObservableRef weightRef( WeightName );
 		double err=0.;
@@ -359,11 +359,11 @@ void MemoryDataSet::Print()
 		{
 			val=allData[i].GetObservable( weightRef )->GetValue();
 			avr+=val;
-			avr_sq+=val*val;
+			//avr_sq+=val*val;
 			err+=val*val;
 		}
 		total=avr;
-		avr/=(double)allData.size(); avr_sq/=(double)allData.size();
+		avr/=(double)allData.size(); //avr_sq/=(double)allData.size();
 		err = sqrt(err);
 		//err = sqrt( avr_sq - avr*avr );
 		cout << "DataSet contains a total of:     " << total << " ± " << err << "     SIGNAL events.(" << allData.size() << " total). In " << this->GetBoundary()->GetNumberCombinations() << " Discrete DataSets." << endl;

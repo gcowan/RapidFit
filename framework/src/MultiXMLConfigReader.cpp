@@ -217,7 +217,7 @@ unsigned int MultiXMLConfigReader::GetSeed()
 
 void MultiXMLConfigReader::SetSeed( unsigned int new_seed )
 {
-	storedSeed = new_seed;
+	storedSeed = (int)new_seed;
 	for( unsigned int i=0; i< XMLReaders.size(); ++i )
 	{
 		XMLReaders[i]->SetSeed( new_seed );

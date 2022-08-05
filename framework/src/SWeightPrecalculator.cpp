@@ -133,7 +133,7 @@ IDataSet * SWeightPrecalculator::ProcessDataSet( IDataSet * InputData, IPDF* Inp
 
 	//Now loop through input data, calculate sWeights and make a new DataSet
 	vector<string> allObservables = InputData->GetBoundary()->GetAllNames();
-	vector<string>::iterator observableIterator;
+	//vector<string>::iterator observableIterator;
 	allObservables.push_back(weightName);
 
 	vector<DataPoint*> allPoints;

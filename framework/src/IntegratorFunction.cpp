@@ -91,7 +91,7 @@ IntegratorFunction::~IntegratorFunction()
 	if( newDataPoint != NULL ) delete newDataPoint;
 	if( myPhaseSpaceBoundary != NULL ) delete myPhaseSpaceBoundary;
 	if( componentIndex != NULL ) delete componentIndex;
-	if( xArray != NULL ) delete xArray;
+	if( xArray != NULL ) delete[] xArray;
 }
 
 IntegratorFunction::IntegratorFunction( const IntegratorFunction& input ) :

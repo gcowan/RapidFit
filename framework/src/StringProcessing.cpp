@@ -159,7 +159,6 @@ vector<int> StringProcessing::StringPositions( const string Input, const string 
 
 vector<string> StringProcessing::RemoveDuplicates( const vector<string> input, vector<string>& duplicated )
 {
-	if( &duplicated == NULL ) duplicated = vector<string>();
 	vector<string> output, temp;
 	for( vector<string>::const_iterator string_i = input.begin(); string_i != input.end(); ++string_i )
 	{
