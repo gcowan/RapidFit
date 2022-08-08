@@ -32,7 +32,7 @@ class PerEventErrorHistogram : public BasePDF
 		virtual double Normalisation(PhaseSpaceBoundary*);
 
 	private:
-		PerEventErrorHistogram& operator=( const PerEventErrorHistogram& );
+		//PerEventErrorHistogram& operator=( const PerEventErrorHistogram& );
 		void MakePrototypes();
 		vector<string> GetDoNotIntegrateList();
 		bool SetPhysicsParameters(ParameterSet*);

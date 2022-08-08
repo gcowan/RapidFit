@@ -32,7 +32,7 @@ class PerEventMistagHistogram : public BasePDF
 		virtual double Normalisation(PhaseSpaceBoundary*);
 
 	private:
-		PerEventMistagHistogram& operator=( const PerEventMistagHistogram& );
+		//PerEventMistagHistogram& operator=( const PerEventMistagHistogram& );
 		void MakePrototypes();
 		vector<string> GetDoNotIntegrateList();
 		bool SetPhysicsParameters(ParameterSet*);

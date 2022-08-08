@@ -188,15 +188,15 @@ double Bs2JpsiPhi_Angular_Terms::TangleFactorReASA0( vector<double> input )
 // Angle factors for three angle PDFs  in helicity basis
 
 //........ for one angle tests ...................
-double Bs2JpsiPhi_Angular_Terms::HangleFactorEven( vector<double> input )
+__attribute__((__noreturn__)) double Bs2JpsiPhi_Angular_Terms::HangleFactorEven( vector<double> input )
 {
 	(void) input;
-	cout<<"No Helicity One Angle Formula Yet"<<endl; exit(1); return 0;
+	cout<<"No Helicity One Angle Formula Yet"<<endl; exit(1);
 }
-double Bs2JpsiPhi_Angular_Terms::HangleFactorOdd( vector<double> input )
+__attribute__((__noreturn__)) double Bs2JpsiPhi_Angular_Terms::HangleFactorOdd( vector<double> input )
 {
 	(void) input;
-	cout<<"No Helicity One Angle Formula Yet"<<endl; exit(1); return 0;
+	cout<<"No Helicity One Angle Formula Yet"<<endl; exit(1);
 }
 
 

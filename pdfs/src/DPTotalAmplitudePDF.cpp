@@ -272,7 +272,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
 
 		vector<int> zero_bins;
                 //loop over each bin in histogram and print out how many zero bins there are
-                int idx[4] = {0,0,0,0};
+                //int idx[4] = {0,0,0,0};
                 for (int i=1; i < nxbins+1; ++i)
                 {
                         for (int j=1; j < nybins+1; ++j)
@@ -281,7 +281,7 @@ DPTotalAmplitudePDF::DPTotalAmplitudePDF( PDFConfigurator* configurator) :
                                 {
                                         for (int l=1; l < nmbins+1; ++l)
                                         {
-                                                idx[0] = i; idx[1] = j; idx[2] = k; idx[3] = l;
+                                                //idx[0] = i; idx[1] = j; idx[2] = k; idx[3] = l;
                                                 double bin_content = 0.;//histo->GetBinContent(idx); // why does this not work anymore?
                                                 //cout << "Bin content: " << bin_content << endl;
                                                 if(bin_content<=0)

@@ -38,7 +38,7 @@ class LongLivedBkg_3Dangular : public BasePDF
 		virtual double Normalisation(PhaseSpaceBoundary*);
 
 	private:
-		LongLivedBkg_3Dangular& operator=( const LongLivedBkg_3Dangular& );
+		//LongLivedBkg_3Dangular& operator=( const LongLivedBkg_3Dangular& );
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 

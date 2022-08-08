@@ -34,7 +34,7 @@ class LongLivedBkg : public BasePDF
 		virtual double Norm(PhaseSpaceBoundary*);
 
 	private:
-		LongLivedBkg& operator=( const LongLivedBkg& );
+		//LongLivedBkg& operator=( const LongLivedBkg& );
 		void MakePrototypes();
 		bool SetPhysicsParameters(ParameterSet*);
 		double buildPDFnumerator();

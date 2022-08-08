@@ -51,7 +51,7 @@ double DPWignerFunctionGeneral::function(double cosTheta, double n, double m)
     jmax=(int)(j+m);
   }
 
-  double prefactor=fact((int)(j+n))*fact((int)(j-n))*fact((int)(j+m))*fact((int)(j-m));
+  double prefactor=(double)(fact((int)(j+n))*fact((int)(j-n))*fact((int)(j+m))*fact((int)(j-m)));
   prefactor=TMath::Sqrt(prefactor);
 
 //  std::cout<<"Wigner: "<<j<<" "<<n<<" "<<m<<" ";
@@ -64,7 +64,7 @@ double DPWignerFunctionGeneral::function(double cosTheta, double n, double m)
   for (int s=jmin;s<=jmax;++s)
   {
     result+=TMath::Power(-1,n-m+s)/
-       (fact(int(j+m-s))*fact((int)(s))*fact((int)(n-m+s))*fact((int)(j-n-s)))*
+       (double)((fact(int(j+m-s))*fact((int)(s))*fact((int)(n-m+s))*fact((int)(j-n-s))))*
        TMath::Power(cos,2*j+m-n-2*s)*
        TMath::Power(sin,n-m+2*s);
 //    std::cout<<"Wigner s-loop: "<<s<<" "<<n-m+s<<" "<<(fact(j+m-s)*fact(s)*fact(n-m+s)*fact(j-n-s))
