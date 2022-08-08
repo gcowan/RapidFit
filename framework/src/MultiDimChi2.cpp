@@ -82,7 +82,7 @@ void MultiDimChi2::PerformMuiltDimTest() const
 		// Calculate the chi2 by summing over all bins
 		double TotalChi2 = CalcChi2(expected_events, observed_events, error_events);
 		// Get the number of degrees of freedom
-		double nDoF = nbins - thisPDF->GetPhysicsParameters()->GetAllFloatNames().size();
+		double nDoF = (double)(nbins - thisPDF->GetPhysicsParameters()->GetAllFloatNames().size());
 		// Print the result
 		std::cout << DataHist.GetNdimensions() << "D chi2 result";
 		if(allObjects.size() > 1) std::cout << " for fit #" << obj_counter;

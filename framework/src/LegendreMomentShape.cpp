@@ -67,14 +67,14 @@ void LegendreMomentShape::Open(const std::string filename)
 	}
 	double**** c = newcoefficients();
 		// Set up the 4D array and prepare to read from the tree
-	char branchtitle[10]; // the letter "c" + four 2-digit numbers + 1 for luck
+	char branchtitle[50]; // the letter "c" + four 2-digit numbers + 1 for luck
 	// Seriously I don't expect *any* 2-digit numbers
 	for ( int l = 0; l < l_max; l++ )
 		for ( int i = 0; i < i_max; i++ )
 			for ( int k = 0; k < k_max; k++ )
 				for ( int j = 0; j < j_max; j++ )
 				{
-					snprintf(branchtitle,10,"c%d%d%d%d",l,i,k,j);
+					snprintf(branchtitle,50,"c%d%d%d%d",l,i,k,j);
 					tree->SetBranchAddress(branchtitle,&c[l][i][k][j]);
 				}
 	tree->GetEntry(0);
@@ -105,8 +105,8 @@ void LegendreMomentShape::Save(const std::string filename)
 			for ( int k = 0; k < k_max; k++ )
 				for ( int j = 0; j < j_max; j++ )
 				{
-					char branchname[5];
-					snprintf(branchname,5,"c%d%d%d%d",l,i,k,j);
+					char branchname[50];
+					snprintf(branchname,50,"c%d%d%d%d",l,i,k,j);
 					outputTree->Branch(branchname,&c[l][i][k][j],((std::string)branchname+"/D").c_str());
 				}
 	// Pass the non-zero coefficients

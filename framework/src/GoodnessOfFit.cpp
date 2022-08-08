@@ -460,8 +460,8 @@ namespace GoodnessOfFit
                 cout << "Boostrap #" << i << endl;
 				double T = permutationCore( data, mc, i );
 				bootstrappedTvalues.push_back(T);
-				char buffer[20];
-				snprintf( buffer, 20, "Tperm%i = %f", i, T );
+				char buffer[30];
+				snprintf( buffer, 30, "Tperm%i = %f", i, T );
 				cout << buffer << endl;
 			}
 			return bootstrappedTvalues;

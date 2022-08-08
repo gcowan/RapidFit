@@ -14,6 +14,7 @@
 //	System Headers
 #include <iostream>
 #include <sstream>
+#include <limits>
 
 using namespace::std;
 
