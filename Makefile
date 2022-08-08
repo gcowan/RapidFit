@@ -28,7 +28,7 @@ BUILD_DATE ="$(shell date +%H:%M_%F)"
 
 CXXFLAGS_BASE_MINIMAL = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_REV) -DBUILD_DATE=$(BUILD_DATE) -D_GNU_SOURCE -D__USE_GNU -fPIC -pthread
 
-CXXFLAGS_BASE_WARNINGS = -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wall -Wno-non-virtual-dtor -Wno-reorder -Wshadow -Wmissing-noreturn -Wcast-align -Wextra -Wabi
+CXXFLAGS_BASE_WARNINGS = -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wall -Wno-non-virtual-dtor -Wno-reorder -Wshadow -Wmissing-noreturn -Wcast-align -Wextra
 
 #		Compiler Flags
 CXXFLAGS_BASE_COMMON  = $(CXXFLAGS_BASE_MINIMAL) -D__ROOFIT_NOBANNER
