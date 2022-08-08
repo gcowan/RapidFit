@@ -12,6 +12,7 @@ PDF_CREATOR( SimpleGauss );
 SimpleGauss::SimpleGauss( PDFConfigurator* config ) :
   xName( "x" ), sigmaName( "sigma" )
 {
+  (void) config;
   this->MakePrototypes();
 }
 
@@ -34,6 +35,7 @@ double SimpleGauss::Evaluate( DataPoint* input )
 
 double SimpleGauss::Normalisation( PhaseSpaceBoundary* range )
 {
+  (void) range;
   double sigmaVal = allParameters.GetPhysicsParameter( sigmaName )->GetValue();
   double denominator = (sigmaVal*sqrt(2.*Mathematics::Pi()));
   return denominator;

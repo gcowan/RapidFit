@@ -106,11 +106,11 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		double AparaAs;
 		double AperpAs;
 		double AzeroAs;
-                double delta_zero;
+                //double delta_zero;
                 double delta_para;
                 double delta_perp;
 		double delta_s;
-                double omega;
+                //double omega;
                 double timeRes;	 // This is the member variable used in the "builder" functions
                 double timeRes1; // These are the physics parameters varied in the fit and passed from the XML
                 double timeRes2;
@@ -125,7 +125,7 @@ class Bd2JpsiKstar_sWave : public BasePDF
 		double angAccI8;
 		double angAccI9;
 		double angAccI10;
-		double Ap_sq, Ap;
+		//double Ap_sq, Ap;
 
 		bool _useTimeAcceptance ;
 		inline bool useTimeAcceptance() const { return _useTimeAcceptance ; }

@@ -98,7 +98,7 @@ namespace GoodnessOfFit
 		PhaseSpaceBoundary * phase = NULL;
 		DataSetConfiguration * dataConfig = NULL;
 		MemoryDataSet * mc = NULL;
-		unsigned int ulTime = 0;
+		//unsigned int ulTime = 0;
 		unsigned int nData = 0;
 		vector<IDataSet*> mcData;
 
@@ -110,7 +110,7 @@ namespace GoodnessOfFit
 			phase = data.back()->GetBoundary();
 
 			(*iter)->SetPhysicsParameters( parSetFromFit );
-			ulTime = static_cast<unsigned int>( time( NULL ));
+			//ulTime = static_cast<unsigned int>( time( NULL ));
 			pdf = (*iter)->GetPDF();
 			pdf->SetMCCacheStatus( false );
 
@@ -145,7 +145,7 @@ namespace GoodnessOfFit
 		dataConfig->SetSource( "Foam" );
 		bool model = false;
 		double pvalue = 0.;
-		unsigned int ulTime = static_cast<unsigned int>( time( NULL ));
+		//unsigned int ulTime = static_cast<unsigned int>( time( NULL ));
 		for ( int i = 0; i < repeats; )
 		{
 			cout << "Ensemble " << i << endl;
@@ -172,7 +172,7 @@ namespace GoodnessOfFit
 				}
 			}
 			// Generate large sample of MC
-			ulTime = static_cast<unsigned int>( time( NULL ));
+			//ulTime = static_cast<unsigned int>( time( NULL ));
 			pdf->SetMCCacheStatus( false );
 			MemoryDataSet * mcData = (MemoryDataSet*)dataConfig->MakeDataSet( phase, pdf, 10*nData );
 
@@ -196,7 +196,7 @@ namespace GoodnessOfFit
 		calculateUstatisticNum(pdf, data, phase, distances);
 
 		char buff[10];
-		sprintf( buff, "%f", level );
+		snprintf( buff, 10, "%f", level );
 		TF1 * line = new TF1("line", buff, 0, 1);
 		line->SetLineColor(kBlue);
 
@@ -293,7 +293,7 @@ namespace GoodnessOfFit
 		double U = 0;
 		DataPoint * event_i = 0;
 		DataPoint * event_j = 0;
-		DataPoint * closest = 0;
+		//DataPoint * closest = 0;
 		bool firstEvent = true;
 		size_t dimension = (pdf->GetPrototypeDataPoint()).size();
 		if ( dimension == 7 ) dimension = 5;
@@ -320,7 +320,7 @@ namespace GoodnessOfFit
 				if (distance < smallest_distance)
 				{
 					smallest_distance = distance;
-					closest = event_j;
+					//closest = event_j;
 				}
 			}
 			sd = smallest_distance;
@@ -420,7 +420,7 @@ namespace GoodnessOfFit
             std::cout << "GC: calculating T stat for data" << std::endl;
             double T = calculateTstatistic( data, mcData );
 			char buffer[20];
-			sprintf( buffer, "Tdata = %f", T );
+			snprintf( buffer, 20, "Tdata = %f", T );
 			cout << buffer << endl;
 
 			int nPerm = 25;
@@ -439,7 +439,7 @@ namespace GoodnessOfFit
 	    	
             TFile * outputFile = new TFile(fileName.c_str(), "RECREATE");
             TNtuple * ntuple = new TNtuple("tvalues", "tvalues", "T:Tdata:pvalue");
-            for ( int i = 0; i < nPerm; i++ ) ntuple->Fill(Tvalues[i], T, pvalue);
+            for ( int i = 0; i < nPerm; i++ ) ntuple->Fill((float)Tvalues[(size_t)i], (float)T, (float)pvalue);
             ntuple->Write();
             outputFile->Close();
             delete outputFile;
@@ -461,7 +461,7 @@ namespace GoodnessOfFit
 				double T = permutationCore( data, mc, i );
 				bootstrappedTvalues.push_back(T);
 				char buffer[20];
-				sprintf( buffer, "Tperm%i = %f", i, T );
+				snprintf( buffer, 20, "Tperm%i = %f", i, T );
 				cout << buffer << endl;
 			}
 			return bootstrappedTvalues;
@@ -635,7 +635,7 @@ namespace GoodnessOfFit
 					yVal = 0.;
 				}
 				distance += ( (xVal - yVal)*(xVal - yVal) );
-				//sprintf(buffer, " %f %f %f", xVar->GetValue(), yVar->GetValue(), sqrt(distance));
+				//snprintf(buffer, 100 " %f %f %f", xVar->GetValue(), yVar->GetValue(), sqrt(distance));
 				//cout << (*xIter) << buffer << endl;
 				++xIter, ++yIter;
 				if ( xIter == xListOfNames.end() || yIter == yListOfNames.end() ) break;

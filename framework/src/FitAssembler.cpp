@@ -212,7 +212,7 @@ FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFu
 FitResult * FitAssembler::DoFit( MinimiserConfiguration * MinimiserConfig, FitFunctionConfiguration * FunctionConfig, ParameterSet* BottleParameters,
 		vector< PDFWithData* > BottleData, vector< ConstraintFunction* > BottleConstraints )
 {
-	double someVal;
+	//double someVal;
 	vector<IPDF*> allPDFs;
 	for( unsigned int i=0; i< BottleData.size(); ++i )
 	{

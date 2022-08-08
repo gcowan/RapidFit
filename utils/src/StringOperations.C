@@ -76,7 +76,7 @@ TString StringOperations::prettyPrint(Double_t value)
 {
 	char pretty[20];
 	TString prettyString;
-	sprintf (pretty, "%1.3g",value);
+	snprintf(pretty, 20, "%1.3g",value);
 	prettyString = pretty;
 	return prettyString;
 }
@@ -87,8 +87,8 @@ TString StringOperations::prettyPrint(Double_t val, Double_t err)
 	TString outstr = "$";
 	char errstr[20];
 	char valstr[20];
-	Int_t n = sprintf (errstr, "%1.1g",err);
-	sprintf(valstr,"%1.*f",n-2,val);
+	Int_t n = snprintf(errstr, 20, "%1.1g",err);
+	snprintf(valstr,20,"%1.*f",n-2,val);
 	outstr += valstr;
 	outstr += "\\pm";
 	outstr += errstr;

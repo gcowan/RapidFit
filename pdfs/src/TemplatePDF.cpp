@@ -69,6 +69,7 @@ vector<string> TemplatePDF::PDFComponents()
 bool TemplatePDF::SetPhysicsParameters( ParameterSet * NewParameterSet )
 {
 	allParameters.SetPhysicsParameters( NewParameterSet );
+	return true;
 }
 
 double TemplatePDF::EvaluateComponent( DataPoint* measurement, ComponentRef* Component )

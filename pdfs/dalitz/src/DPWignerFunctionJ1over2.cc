@@ -7,8 +7,8 @@
 double DPWignerFunctionJ1over2::function(double cosTheta, double mm, double nn)
 {
 
-  int m=(int)2*mm;
-  int n=(int)2*nn;
+  int m=2*(int)mm;
+  int n=2*(int)nn;
   double theta=TMath::ACos(cosTheta);
   if ( m == 1 )
   {

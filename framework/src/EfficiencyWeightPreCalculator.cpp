@@ -27,10 +27,11 @@ EfficiencyWeightPreCalculator::EfficiencyWeightPreCalculator( FitResult* InputRe
 {
 }
 
-void EfficiencyWeightPreCalculator::SetApplyAlphaCorrection( bool b ){}
+void EfficiencyWeightPreCalculator::SetApplyAlphaCorrection( bool b ){ (void)b; }
 
 void EfficiencyWeightPreCalculator::ConfigurePDFs( IPDF* InputPDF )
 {
+	(void)InputPDF;
 	ParameterSet* inputSet = inputResult->GetResultParameterSet()->GetDummyParameterSet();
 	signalPDF->UpdatePhysicsParameters( inputSet );
 }
@@ -51,7 +52,7 @@ IDataSet * EfficiencyWeightPreCalculator::ProcessDataSet( IDataSet * InputData, 
 
 	//Now loop through input data, calculate sWeights and make a new DataSet
 	vector<string> allObservables = InputData->GetBoundary()->GetAllNames();
-	vector<string>::iterator observableIterator;
+	//vector<string>::iterator observableIterator;
 	allObservables.push_back(weightName);
 
 	vector<DataPoint*> allPoints;

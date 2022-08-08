@@ -56,9 +56,9 @@ void DoubleResolutionModel::setParameters( ParameterSet & parameters )
 	}
 	else
 	{
-		isCacheValid = (resFrac == parameters.GetPhysicsParameter( timeResFracName )->GetValue());
-		isCacheValid = isCacheValid && ( resScale == parameters.GetPhysicsParameter( resScaleName )->GetValue() );
-		isCacheValid = isCacheValid && ( resScale2 == parameters.GetPhysicsParameter( resScale2Name )->GetValue() );
+		isCacheValid = (abs(resFrac - parameters.GetPhysicsParameter( timeResFracName )->GetValue()) <= numeric_limits<float>::epsilon());
+		isCacheValid = isCacheValid && ( abs(resScale - parameters.GetPhysicsParameter( resScaleName )->GetValue()) <= numeric_limits<float>::epsilon() );
+		isCacheValid = isCacheValid && ( abs(resScale2 - parameters.GetPhysicsParameter( resScale2Name )->GetValue()) <= numeric_limits<float>::epsilon() );
 	}
 
 	resFrac = parameters.GetPhysicsParameter( timeResFracName )->GetValue();

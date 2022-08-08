@@ -22,7 +22,7 @@ int firstDiff( const double* first, const double* second, const unsigned int siz
 {
 	for( unsigned int i=0; i< size; ++i )
 	{
-		if( first[i] != second[i] ) return i;
+		if( abs(first[i] - second[i]) >= numeric_limits<float>::epsilon() ) return (int)i;
 	}
 	return -1;
 }
@@ -296,7 +296,7 @@ vector<DataPoint*> StatisticsFunctions::DataAverage( IDataSet * InputData, const
 
 			//Make the description
 			char value[100];
-			sprintf( value, "%f", DiscreteCombinations[combinationIndex][discreteIndex] );
+			snprintf( value, 100, "%f", DiscreteCombinations[combinationIndex][discreteIndex] );
 			string addToDescription;
 			if ( discreteIndex == DiscreteNames.size() - 1 )
 			{

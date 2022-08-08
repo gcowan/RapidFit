@@ -23,7 +23,7 @@ vector<vector<Double_t> > Mathematics::Unique_Coords( vector<Double_t> input )
 	sort( output_temp.begin(), output_temp.end() );
 	vector<Double_t>::iterator len;
 	len = unique( output_temp.begin(), output_temp.end(), double_equals_test );
-	output_temp.resize( len - output_temp.begin() );
+	output_temp.resize( (unsigned int)(len - output_temp.begin() ));
 	vector<vector<Double_t> > output( 1, output_temp );
 	return output;
 }
@@ -45,7 +45,7 @@ vector<vector<Double_t> > Mathematics::Unique_Coords( vector<pair<Double_t,Doubl
 	bool temp_decision_2 = true;
 
 	//      Run over all of the points contained within the TPolyMarker3D object
-	for( int i=0; i< number_of_points; ++i )
+	for( unsigned int i=0; i< (unsigned int)number_of_points; ++i )
 	{
 		//      Assume we haven't seen this point yet
 		add_point = true;
@@ -92,7 +92,7 @@ vector<vector<Double_t> > Mathematics::Unique_Coords( vector<vector<Double_t> > 
 	bool add_point = true;
 
 	//      Run over all of the points contained within the TPolyMarker3D object
-	for( int i=0; i< number_of_points; ++i )
+	for( unsigned int i=0; i< (unsigned int)number_of_points; ++i )
 	{
 		//      Assume we haven't seen this point yet
 		add_point = true;

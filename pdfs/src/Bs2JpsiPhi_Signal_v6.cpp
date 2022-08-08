@@ -1107,7 +1107,7 @@ double Bs2JpsiPhi_Signal_v6::diffXsecCompositeNorm1(  )
 
 	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
 	{
-		timeBinNum = islice;
+		timeBinNum = (int)islice;
 
 		tlo = tlo_boundary > timeAcc->getSlice(islice)->tlow() ? tlo_boundary : timeAcc->getSlice(islice)->tlow();
 		thi = thi_boundary < timeAcc->getSlice(islice)->thigh() ? thi_boundary : timeAcc->getSlice(islice)->thigh();

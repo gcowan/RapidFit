@@ -318,9 +318,9 @@ double Bd2JpsiKstar_sWave_Fs_withAcc::buildPDFnumerator()
 
     // The time dependent amplitudes as defined in roadmap Eqns 48 -> 59  //No tagging so only need 2 (h± pg 72)
     // First for the B
-    double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
-    double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
-    double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
+    //double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
+    //double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
+    //double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
 
     getTimeDependentAmplitudes( AzeroAzeroB, AparaAparaB, AperpAperpB
             , ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB

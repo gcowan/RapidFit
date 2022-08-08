@@ -742,10 +742,10 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	cosTheta1 = measurement->GetObservable( cosTheta1Name )->GetValue();
 	cosTheta2 = measurement->GetObservable( cosTheta2Name )->GetValue();
 	phi       = measurement->GetObservable( phiName )->GetValue();
-	pionID    = measurement->GetObservable( pionIDName )->GetValue();
+	pionID    = (int)measurement->GetObservable( pionIDName )->GetValue();
 
 	int globalbin = -1;
-        int xbin = -1, ybin = -1, zbin = -1, mbin = -1;
+        //int xbin = -1, ybin = -1, zbin = -1, mbin = -1;
 
 	double angularAcc = 1.;
 	double angularAccCosTheta1 = 1.;
@@ -806,12 +806,12 @@ double DPTotalAmplitudePDF::Evaluate(DataPoint * measurement)
 	unsigned int upperZ = 0;
 
 	// And this switchs things to deal with the Z components.
-        if ( componentIndex > KpiComponents.size() )
+        if ( componentIndex > (int)KpiComponents.size() )
 	{
 		lower = 0;
 		upper = 0;
-		lowerZ = (unsigned)(componentIndex - KpiComponents.size() - 1);
-                upperZ = (unsigned)(componentIndex - KpiComponents.size());
+		lowerZ = (unsigned)((unsigned int)componentIndex - KpiComponents.size() - 1);
+                upperZ = (unsigned)((unsigned int)componentIndex - KpiComponents.size());
 
 	}
 

@@ -60,8 +60,8 @@ spinKaon(spin),
   double m0_eff = m_min + (m_max - m_min)*(1+tanh( (mR - (m_min+m_max)/2.)/(m_max - m_min)))/2;
   double pB0 = DPHelpers::daughterMomentum(mB, mJpsi, m0_eff);
   double pR0 = DPHelpers::daughterMomentum(mR, m1, m2);
-  barrierB = new DPBarrierFactor(LB,RB,pB0);
-  barrierR = new DPBarrierFactor(LR,RR,pR0);
+  barrierB = new DPBarrierFactor((unsigned int)LB,RB,pB0);
+  barrierR = new DPBarrierFactor((unsigned int)LR,RR,pR0);
   switch(spinKaon)
   {
     case 0: wigner=new DPWignerFunctionJ0();
@@ -158,6 +158,7 @@ TComplex DPJpsiKaon::amplitude(double m23, double cosTheta1,
 			       double cosTheta2, double phi,
 			       int twoLambda, int twoLambdaPsi, int pionID = -211)
 {
+  (void) pionID;
   TComplex result(0,0);
   // Muon helicity
   if ( twoLambda != 2 && twoLambda != -2 ) // Not right option
@@ -251,5 +252,6 @@ TComplex DPJpsiKaon::amplitudeProperVars(double m23, double cosTheta1,
 					 double cosTheta2, double phi, int pionID,
                              int twoLambda, int twoLambdaPsi)
 {
+  (void) pionID;
   return amplitude(m23,cosTheta1, cosTheta2, phi, twoLambda, twoLambdaPsi);
 }

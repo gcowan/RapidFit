@@ -34,7 +34,7 @@
 </PDF>
 <DataSet>
 <Source>Foam</Source>
-<NumberEvents>10000</NumberEvents>
+<NumberEvents>1000000</NumberEvents>
 <PhaseSpaceBoundary>
 <Observable>
 <Name>x</Name>
@@ -47,4 +47,5 @@
 <Output>
 <Projection>x</Projection>
 </Output>
+<Seed>12345</Seed>
 </RapidFit>

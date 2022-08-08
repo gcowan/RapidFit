@@ -460,9 +460,9 @@ double Bd2JpsiKstar_sWave_Fs::buildPDFnumerator()
 
 	// The time dependent amplitudes as defined in roadmap Eqns 48 -> 59  //No tagging so only need 2 (h± pg 72)
 	// First for the B
-	double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
-	double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
-	double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
+	//double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
+	//double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
+	//double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
 
 	getTimeDependentAmplitudes( AzeroAzeroB, AparaAparaB, AperpAperpB
 			, ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB
@@ -1152,12 +1152,12 @@ double Bd2JpsiKstar_sWave_Fs::EvaluateComponent(DataPoint * measurement, Compone
 	return this->Evaluate( measurement );
 }
 
-void Bd2JpsiKstar_sWave_Fs::getAngularFunctionsHelicity( double &f1, double &f2, double &f3, double &f4, double &f5, double &f6, double &f7, double &f8, double &f9, double &f10, double cosThetal, double phi, double cosThetaK )
+void Bd2JpsiKstar_sWave_Fs::getAngularFunctionsHelicity( double &f1, double &f2, double &f3, double &f4, double &f5, double &f6, double &f7, double &f8, double &f9, double &f10, double _cosThetal, double _phi, double _cosThetaK )
 {
    	vector<double> input ;
-    input.push_back(cosThetaK) ;
-    input.push_back(cosThetal) ;
-    input.push_back( phi ) ;
+    input.push_back(_cosThetaK) ;
+    input.push_back(_cosThetal) ;
+    input.push_back( _phi ) ;
     f1 = Bs2JpsiPhi_Angular_Terms::HangleFactorA0A0( input ) ;
     f2 = Bs2JpsiPhi_Angular_Terms::HangleFactorAPAP( input ) ;
     f3 = Bs2JpsiPhi_Angular_Terms::HangleFactorATAT( input ) ;
@@ -1172,12 +1172,12 @@ void Bd2JpsiKstar_sWave_Fs::getAngularFunctionsHelicity( double &f1, double &f2,
     return ;
 }
 
-void Bd2JpsiKstar_sWave_Fs::getAngularFunctionsTransversity( double &f1, double &f2, double &f3, double &f4, double &f5, double &f6, double &f7, double &f8, double &f9, double &f10, double cosTheta, double phi, double cosPsi )
+void Bd2JpsiKstar_sWave_Fs::getAngularFunctionsTransversity( double &f1, double &f2, double &f3, double &f4, double &f5, double &f6, double &f7, double &f8, double &f9, double &f10, double _cosTheta, double _phi, double _cosPsi )
 {
    	vector<double> input ;
-    input.push_back(cosTheta) ;
-    input.push_back(cosPsi) ;
-    input.push_back( phi ) ;
+    input.push_back(_cosTheta) ;
+    input.push_back(_cosPsi) ;
+    input.push_back( _phi ) ;
     f1 = Bs2JpsiPhi_Angular_Terms::TangleFactorA0A0( input ) ;
     f2 = Bs2JpsiPhi_Angular_Terms::TangleFactorAPAP( input ) ;
     f3 = Bs2JpsiPhi_Angular_Terms::TangleFactorATAT( input ) ;

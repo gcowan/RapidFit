@@ -267,10 +267,10 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 	cout << "hello" << endl;
 	string thisObservable = (*projection_i)->observableName;
 
-	vector<string> known_observables = resultBottle->GetResultPDF(resultIndex)->GetPrototypeDataPoint();
+	vector<string> known_observables = resultBottle->GetResultPDF((int)resultIndex)->GetPrototypeDataPoint();
 	int num = StringProcessing::VectorContains( &known_observables, &thisObservable );
 
-	vector<string> bad_observables = resultBottle->GetResultPDF(resultIndex)->GetDoNotIntegrateList();
+	vector<string> bad_observables = resultBottle->GetResultPDF((int)resultIndex)->GetDoNotIntegrateList();
 	int num2 = StringProcessing::VectorContains( &bad_observables, &thisObservable );
 
 	if( num2 != -1 )
@@ -293,9 +293,9 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 	}
 
 	//      ComponentPlotter requires a PDF, Dataset, output_file, Observable to project, a plot configuration object and a string for the path for where the output for this PDF belongs
-	ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF(resultIndex), resultBottle->GetResultDataSet(resultIndex),
+	ComponentPlotter* thisPlotter = new ComponentPlotter( resultBottle->GetResultPDF((int)resultIndex), resultBottle->GetResultDataSet((int)resultIndex),
 
-			PDFStr, output_file, thisObservable, (*projection_i), resultIndex );
+			PDFStr, output_file, thisObservable, (*projection_i), (int)resultIndex );
 
 
 
@@ -325,7 +325,7 @@ void OutputConfiguration::MakeThisProjection( PhysicsBottle* resultBottle, unsig
 void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& allComponentPlotters, vector<TGraphErrors*>& all_datasets_for_all_results, vector<vector<TGraph*> >& all_components_for_all_results,
 		vector< vector<double> >& pullFunctionEvals, TFile* output_file, PhysicsBottle* resultBottle, vector<CompPlotter_config*>::iterator projection_i )
 {
-
+	(void)allComponentPlotters;
 	int num=(int) all_components_for_all_results[0].size();
 	bool compatible=true;
 
@@ -390,7 +390,7 @@ void OutputConfiguration::MergeProjectionResults( vector<ComponentPlotter*>& all
 	{
 		allDataSubSets.push_back( all_components_for_all_results[i].back() );
 		allDataSubSets.back()->SetLineColor( (Color_t)(i+2) );
-		datasetID.push_back( resultBottle->GetResultPDF( i )->GetLabel() );
+		datasetID.push_back( resultBottle->GetResultPDF( (int)i )->GetLabel() );
 	}
 
 	datasets_config->component_names = datasetID;
@@ -437,12 +437,12 @@ void OutputConfiguration::Chi2XCheck( FitResult* thisResult, vector<ComponentPlo
 		{
 			if( weightsWereUsed  )
 			{
-				thisHisto->Fill( theseDataSets[i]->GetDataPoint(j)->GetObservable( thisObsRef )->GetValue(),
-						theseDataSets[i]->GetDataPoint(j)->GetObservable( weightRef )->GetValue() );
+				thisHisto->Fill( theseDataSets[i]->GetDataPoint((int)j)->GetObservable( thisObsRef )->GetValue(),
+						theseDataSets[i]->GetDataPoint((int)j)->GetObservable( weightRef )->GetValue() );
 			}
 			else
 			{
-				thisHisto->Fill( theseDataSets[i]->GetDataPoint(j)->GetObservable( thisObsRef )->GetValue() );
+				thisHisto->Fill( theseDataSets[i]->GetDataPoint((int)j)->GetObservable( thisObsRef )->GetValue() );
 			}
 		}
 	}
@@ -471,7 +471,7 @@ void OutputConfiguration::Chi2XCheck( FitResult* thisResult, vector<ComponentPlo
 	cout << "\tChi2: " << thisCompleteChi2 << endl;
 	cout << "\tnDoF: " << nDoF << endl;
 	cout << "\tChi2/nDoF: " << thisCompleteChi2 / nDoF << endl;
-	cout << "\tp-value: " << TMath::Prob( thisCompleteChi2, nDoF ) << endl;
+	cout << "\tp-value: " << TMath::Prob( thisCompleteChi2, (int)nDoF ) << endl;
 	cout << endl;
 }
 
@@ -513,7 +513,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 
 		for( int resultIndex = 0; resultIndex < resultBottle->NumberResults(); ++resultIndex )
 		{
-			MakeThisProjection( resultBottle, resultIndex, projection_i, allComponentPlotters, all_datasets_for_all_results, all_components_for_all_results, chi2_results,
+			MakeThisProjection( resultBottle, (unsigned)resultIndex, projection_i, allComponentPlotters, all_datasets_for_all_results, all_components_for_all_results, chi2_results,
 					pullFunctionEvals, output_file, weightedEventsWereUsed, weightName );
 		}
 
@@ -531,7 +531,7 @@ void OutputConfiguration::OutputCompProjections( FitResult* TheResult )
 			cout << "chi2: " << total_chi2 << "\t\t" << "nDoF: "<< ( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. ) << endl;
 
 			cout << endl << "\tFinal chi2/ndof = " << setprecision(10) << final_corrected_chi2 << endl << endl;
-			double pval = TMath::Prob( total_chi2, ( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. ) );
+			double pval = TMath::Prob( total_chi2, (int)( total_N - (double)resultBottle->GetResultPDF(0)->GetPhysicsParameters()->GetAllFloatNames().size() - 1. ) );
 			cout << "\tProbability of a chi2 exceeding this value of chi2 by chance is: " << pval << endl;
 		}
 

@@ -62,6 +62,7 @@ void MakePlot(TH1* hist, TString Name, TString dir){
 	c1->Update();
 
 	TF1* fitted = hist->GetFunction( FitType );
+	(void) fitted;
 
 	Histogram_Processing::Silent_Print( c1, dir+"/"+Name+"_c_thru.png" );
 	Histogram_Processing::Silent_Print( c1, dir+"/"+Name+"_c_thru.pdf" );

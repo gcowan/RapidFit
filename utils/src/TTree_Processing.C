@@ -195,13 +195,15 @@ vector<vector<Double_t> >* TTree_Processing::Buffer_Multiple_Branches( TTree* in
 vector<vector<Double_t> > TTree_Processing::Plotter_Data( TTree* input_tree, TString Draw_String, TString Cut_String, TRandom* random, int upper_lim )
 {
 	if( random == NULL ) random = gRandom;
-	if( upper_lim == -1 ) upper_lim = input_tree->GetEntries();
+	if( upper_lim == -1 ) upper_lim = (int)input_tree->GetEntries();
 	//      Plot the graph using TTree->Draw()
 	//      The resulting graph (TH3) contains empty axis and a TPolyMarker3D object
 	input_tree->SetEstimate(input_tree->GetEntries());  // Fix the size of the array of doubles to be created (There will never be more than this
 	TDirectory* temp_path = gDirectory;
+	(void) temp_path;
 	TString canv_name = "Plot_Data_"; canv_name += random->Rndm()*1000;
 	TCanvas* temp_canv = EdStyle::RapidFitCanvas( canv_name, canv_name );
+	(void) temp_canv;
 	//	Cannot implement goff in the case of 3D data that we wish to be in TPolyMarker3D form
 	input_tree->Draw( Draw_String, Cut_String, "", upper_lim, 0 );
 

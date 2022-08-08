@@ -157,7 +157,7 @@ double OptimisedDoubleGauss::EvaluateComponent( DataPoint* input, ComponentRef* 
   if( compRef->getComponentNumber() != -1 )
   {
     //  We know what the corresponding componentIndex is so lets use it
-    componentIndex = compRef->getComponentNumber();
+    componentIndex = (unsigned int)compRef->getComponentNumber();
   }
   else
   {
@@ -188,6 +188,8 @@ double OptimisedDoubleGauss::EvaluateComponent( DataPoint* input, ComponentRef* 
   //  componentIndex has now been set corresponding to which component we want to Evaluate
   //  This code could re-use Evaluate to reduce the code
 
-  return this->Evaluate( input );
+  double output = this->Evaluate( input );
+  componentIndex = 0;
+  return output;
 }
 

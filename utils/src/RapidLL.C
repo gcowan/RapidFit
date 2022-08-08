@@ -50,12 +50,12 @@ using namespace::std;
 
 unsigned int RapidLL::GetFunctionLineWidth()
 {
-	return EdStyle::GetLHCbFunctionLineWidth();
+	return (unsigned int)EdStyle::GetLHCbFunctionLineWidth();
 }
 
 unsigned int RapidLL::GetAxisWidth()
 {
-	return EdStyle::GetLHCbAxisLineWidth();
+	return (unsigned int)EdStyle::GetLHCbAxisLineWidth();
 }
 
 /*int RapidLL::PlotRapidFitLL( TTree* input_tree, TString controlled_parameter, TRandom3* rand, vector<string> other_params )
@@ -106,14 +106,14 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 
 	input_tree->Draw( param_val,"","goff",1,0 );
 	double notgenvalue = input_tree->GetV1()[0];
-	TString notgen; notgen+=notgenvalue;
+	TString _notgen; _notgen+=notgenvalue;
 
 	TString output_path("RapidFit_LLScan_");
 	output_path.Append( controlled_parameter );
 	output_path.Append( "_" + StringOperations::TimeString() );
 
 	//      Make OutputDir
-	TDirectory* output_dir=NULL;
+	//TDirectory* output_dir=NULL;
 
 	TString pwd = TString( gSystem->WorkingDirectory() );
 
@@ -133,7 +133,7 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 		}
 	}
 	gSystem->cd( output_path );
-	output_dir=gDirectory;
+	//output_dir=gDirectory;
 
 
 	//	Setup Objects for Plotting
@@ -291,8 +291,9 @@ TGraph* RapidLL::PlotRapidLL( TString controlled_parameter, TTree* input_tree, T
 	return color_graph;
 }
 
-pair<vector<double>,vector<double> > RapidLL::LL_Plot_Histo( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString NLL, TString param )
+pair<vector<double>,vector<double> > RapidLL::LL_Plot_Histo( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString _NLL, TString param )
 {
+	(void) _NLL;
 	TString cut_val; cut_val+=Global_Best_NLL;
 	TString Draw_String = "("+NLL+"-"+cut_val+"):"+param;
 
@@ -321,10 +322,10 @@ pair<vector<double>,vector<double> > RapidLL::LL_Plot_Histo( TTree* input_TTree,
 
 
 
-TGraph* RapidLL::LL_Plot( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString NLL, TString param, TRandom3* rand )
+TGraph* RapidLL::LL_Plot( TTree* input_TTree, TString Cut_String, double Global_Best_NLL, TString _NLL, TString param, TRandom3* rand )
 {
 	TGraph* new_graph = NULL;
-	pair<vector<double>,vector<double> > data = LL_Plot_Histo( input_TTree, Cut_String, Global_Best_NLL, NLL, param );
+	pair<vector<double>,vector<double> > data = LL_Plot_Histo( input_TTree, Cut_String, Global_Best_NLL, _NLL, param );
 
 	vector<pair<double,double> > filter = Template_Functions::reparam( data );
 	sort( filter.begin(), filter.end(), Mathematics::Sort_first_Double );
@@ -351,7 +352,7 @@ TGraph* RapidLL::LL_Plot( TTree* input_TTree, TString Cut_String, double Global_
 	new_graph->SetName( rand_str_.c_str() );
 	new_graph->SetTitle("");
 
-	new_graph->SetLineWidth( RapidLL::GetFunctionLineWidth() );
+	new_graph->SetLineWidth( (Width_t)RapidLL::GetFunctionLineWidth() );
 
 	return new_graph;
 }
@@ -374,18 +375,18 @@ void RapidLL::OverlayMutliplePlots( TMultiGraph* GraphsToOverlay )
 	GraphsToOverlay->Draw("A");
 	newOverlay->Update();
 
-	for( unsigned int i=0; i< GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
+	for( unsigned int i=0; i< (unsigned int)GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
 	{
-		TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At(i);
+		TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At((int)i);
 		thisGraph->SetLineColor( (Color_t)(i+1) );
 		thisGraph->SetMarkerColor( (Color_t)(i+1) );
 		thisGraph->SetFillColor( kWhite );
 	}
 	GraphsToOverlay->Draw("PC");
 	newOverlay->Update();
-	for( unsigned int i=0; i< GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
+	for( unsigned int i=0; i< (unsigned int)GraphsToOverlay->GetListOfGraphs()->Capacity(); ++i )
 	{
-		TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At(i);
+		TGraph* thisGraph = (TGraph*) GraphsToOverlay->GetListOfGraphs()->At((int)i);
 		TString Name="#Delta Log Likelihood Function ";Name+=(i+1);
 		thisLegend->AddEntry( thisGraph, Name );
 	}

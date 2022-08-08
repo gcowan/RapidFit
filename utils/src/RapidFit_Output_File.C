@@ -307,18 +307,18 @@ vector<string> RapidFit_Output_File::get_control_parameters( TTree* input_tree )
 }
 
 //      Check that the Global Minima as defined at entry 0 within the file is actually the best minima or not
-void RapidFit_Output_File::Check_Minima( TTree* input_tree, TString Cut_String, Float_t* Global_Best_NLL, TString NLL, TString param1_val, TString param2_val )
+void RapidFit_Output_File::Check_Minima( TTree* input_tree, TString Cut_String, Float_t* Global_Best_NLL, TString _NLL, TString param1_val, TString param2_val )
 {
 	TTree* wanted = input_tree->CopyTree( Cut_String, "fast", input_tree->GetEntries() );
 
-	Float_t Global_Min_NLL = Float_t( wanted->GetMinimum( NLL ) );
+	Float_t Global_Min_NLL = Float_t( wanted->GetMinimum( _NLL ) );
 
 	//      Only if we have a better minima Minuit did NOT find
 	if( (Global_Min_NLL-*Global_Best_NLL) < 0 )
 	{
 		TString Global_Min_NLL_Str;
 		Global_Min_NLL_Str+=Global_Min_NLL;
-		TString Catch( "abs(" + NLL + "-" + Global_Min_NLL_Str + ")<" + double_tolerance);
+		TString Catch( "abs(" + _NLL + "-" + Global_Min_NLL_Str + ")<" + double_tolerance);
 		TTree* local_best = wanted->CopyTree( Catch, "fast", wanted->GetEntries() );
 		//      GetMinimum == GetMaximum == Get 0th event
 		double true_X = local_best->GetMinimum(param1_val);

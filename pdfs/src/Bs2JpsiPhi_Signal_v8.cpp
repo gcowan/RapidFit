@@ -1199,7 +1199,7 @@ void Bs2JpsiPhi_Signal_v8::ConstructTimeIntegrals()
 		perEventData.push_back( intExpCos_stored );
 		_datapoint->SetPerEventData( perEventData );
 	}
-	else if( _gamma != perEventData[0] )
+	else if( abs(_gamma - perEventData[0]) >= numeric_limits<float>::epsilon() )
 	{
 		this->generateTimeIntegrals();
 		this->generateSinusoidIntegrals();
@@ -1213,7 +1213,7 @@ void Bs2JpsiPhi_Signal_v8::ConstructTimeIntegrals()
 		perEventData.push_back( intExpCos_stored );
 		_datapoint->SetPerEventData( perEventData );
 	}
-	else if( dgam != perEventData[1] )
+	else if( abs(dgam - perEventData[1]) >= numeric_limits<float>::epsilon() )
 	{
 		intExpSin_stored = perEventData[5];
 		intExpCos_stored = perEventData[6];
@@ -1228,7 +1228,7 @@ void Bs2JpsiPhi_Signal_v8::ConstructTimeIntegrals()
 		perEventData.push_back( intExpCos_stored );
 		_datapoint->SetPerEventData( perEventData );
 	}
-	else if( delta_ms != perEventData[2] )
+	else if( abs(delta_ms - perEventData[2]) >= numeric_limits<float>::epsilon() )
 	{
 		intExpL_stored = perEventData[3];
 		intExpH_stored = perEventData[4];

@@ -401,7 +401,7 @@
 		<AlphaName>alpha</AlphaName>
 		<WeightName>sWeight</WeightName>
 		<FunctionName>NegativeLogLikelihoodThreaded</FunctionName>
-		<Threads>16</Threads>
+		<Threads>14</Threads>
 		#<UseGSLNumericalIntegration>True</UseGSLNumericalIntegration>
 		#<FixedIntegrationPoints>1000000</FixedIntegrationPoints>
 		<SetIntegratorTest>False</SetIntegratorTest>

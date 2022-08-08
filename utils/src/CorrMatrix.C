@@ -77,17 +77,17 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 				int dim = (int)sqrt(thisMatrix->size());
 				//cout << dim << " x " << dim << endl;
 				TMatrixDSym* newMatrix = new TMatrixDSym( dim );
-				vector<vector<double> > thisMatrixData( dim, vector<double>(dim, 0.) );
-				for( unsigned int k1=0; k1 < dim; ++k1 )
+				vector<vector<double> > thisMatrixData( (unsigned int)dim, vector<double>((unsigned int)dim, 0.) );
+				for( unsigned int k1=0; k1 < (unsigned int)dim; ++k1 )
 				{
-					double drow = (*thisMatrix)[ k1*dim + k1 ];
-					for( unsigned int k2=0; k2< dim; ++k2 )
+					double drow = (*thisMatrix)[ k1*(unsigned int)dim + k1 ];
+					for( unsigned int k2=0; k2< (unsigned int)dim; ++k2 )
 					{
-						double dcol = (*thisMatrix)[ k2*dim + k2 ];
-						double covariance = (*thisMatrix)[ k1*dim + k2 ];
+						double dcol = (*thisMatrix)[ k2*(unsigned int)dim + k2 ];
+						double covariance = (*thisMatrix)[ k1*(unsigned int)dim + k2 ];
 						//cout << "k1: " << k1 << " k2: " << k2 << "\t" << covariance / sqrt(fabs(drow * dcol)) << endl;
 						double thisVal = covariance / sqrt(fabs(drow * dcol));
-						(*newMatrix)( k1, k2 ) = thisVal;
+						(*newMatrix)( (int)k1, (int)k2 ) = thisVal;
 						thisMatrixData[k1][k2] = thisVal;
 					}
 				}
@@ -104,8 +104,8 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 				{
 					for( unsigned int k=0; k< thisNames->size(); ++k )
 					{
-						matrixPlot->GetXaxis()->SetBinLabel( k+1, EdStyle::GetParamRootName( TString((*thisNames)[k].c_str()) ) );
-						matrixPlot->GetYaxis()->SetBinLabel( k+1, EdStyle::GetParamRootName( TString((*thisNames)[k].c_str()) ) );
+						matrixPlot->GetXaxis()->SetBinLabel( (int)k+1, EdStyle::GetParamRootName( TString((*thisNames)[k].c_str()) ) );
+						matrixPlot->GetYaxis()->SetBinLabel( (int)k+1, EdStyle::GetParamRootName( TString((*thisNames)[k].c_str()) ) );
 					}
 				}
 				else
@@ -116,8 +116,8 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 					for( unsigned int k=0; k< thisNames->size(); ++k )
 					{
 						TString num; num+=k;
-						matrixPlot->GetXaxis()->SetBinLabel( k+1, num );
-						matrixPlot->GetYaxis()->SetBinLabel( k+1, num );
+						matrixPlot->GetXaxis()->SetBinLabel( (int)k+1, num );
+						matrixPlot->GetYaxis()->SetBinLabel( (int)k+1, num );
 
 						TString thisEntry = num;
 						thisEntry.Append(" "); thisEntry.Append( EdStyle::GetParamRootName( TString((*thisNames)[k].c_str()) ) );
@@ -130,13 +130,13 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 				{
 					matrixPlot->GetXaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
 					matrixPlot->GetYaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
-					matrixPlot->GetZaxis()->SetLabelSize( (Float_t)0.6*lhcbTSize );
+					matrixPlot->GetZaxis()->SetLabelSize( (Float_t)0.6*(Float_t)lhcbTSize );
 				}
 				else
 				{
 					matrixPlot->GetXaxis()->SetLabelSize( (Float_t)0.8*(Float_t)lhcbTSize );
 					matrixPlot->GetYaxis()->SetLabelSize( (Float_t)0.8*(Float_t)lhcbTSize );
-					matrixPlot->GetZaxis()->SetLabelSize( (Float_t)0.8*lhcbTSize );
+					matrixPlot->GetZaxis()->SetLabelSize( (Float_t)0.8*(Float_t)lhcbTSize );
 				}
 				matrixPlot->LabelsOption("v");
 				matrixPlot->GetZaxis()->SetRangeUser( -1., 1. );
@@ -153,13 +153,13 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 		cout << endl;
 	}
 
-	unsigned int dim = allData[0].size();
+	unsigned int dim = (unsigned int)allData[0].size();
 	vector<vector<TH1*> > allHistos;
 	if( corr_trees[0]->GetEntries() > 5 )
 	{
-		for( unsigned int i=0; i< dim; ++i )
+		for( unsigned int i=0; i< (unsigned int)dim; ++i )
 		{
-			for( unsigned int j=0; i< dim; ++j )
+			for( unsigned int j=0; j< (unsigned int)dim; ++j )
 			{
 				vector<double> thisElement;
 				for( unsigned int k=0; k< allData.size(); ++k )
@@ -167,6 +167,7 @@ void CorrMatrix::Analyse( const vector<TTree*> corr_trees, const vector<string> 
 					thisElement.push_back( allData[k][i][j] );
 				}
 				TH1* thisHisto = Histogram_Processing::Get_TH1( thisElement );
+				(void) thisHisto;
 			}
 		}
 	}

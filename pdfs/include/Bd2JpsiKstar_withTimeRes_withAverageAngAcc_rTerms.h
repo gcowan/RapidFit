@@ -37,7 +37,7 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms : public BasePDF
 		double cachedAparaAperpIntB, cachedAzeroAparaIntB, cachedAzeroAperpIntB;
 
 		double cachedSinDeltaPerpPara, cachedCosDeltaPara, cachedSinDeltaPerp;
-		double cachedCosSqDeltaM;
+		//double cachedCosSqDeltaM;
 
 		double cachedAzero, cachedApara, cachedAperp;
 		bool normalisationCacheValid, evaluationCacheValid;
@@ -90,7 +90,7 @@ class Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms : public BasePDF
                 double delta_zero;
                 double delta_para;
                 double delta_perp;
-                double omega;
+                //double omega;
                 double timeRes;	 // This is the member variable used in the "builder" functions
                 double timeRes1; // These are the physics parameters varied in the fit and passed from the XML
                 double timeRes2;

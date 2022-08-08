@@ -97,7 +97,7 @@ vector<IPDF*> MultiThreadedFunctions::GetFunctions( IPDF* thisFunction, unsigned
 vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( IPDF* thisFunction, IDataSet* thesePoints, unsigned int nThreads, ComponentRef* thisComponent )
 {
 	vector<IDataSet*> payLoad;
-	vector<vector<DataPoint*> > datasets_data = Threading::divideData( thesePoints, nThreads );
+	vector<vector<DataPoint*> > datasets_data = Threading::divideData( thesePoints, (int)nThreads );
 
 
 	for( unsigned int i=0; i < nThreads; ++i )
@@ -136,7 +136,7 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 	}
 
 	//      1 thread per core
-	pthread_t* Thread = MultiThreadedFunctions::GetFittingThreads( nThreads );//new pthread_t[ nThreads ];
+	pthread_t* local_Thread = MultiThreadedFunctions::GetFittingThreads( nThreads );//new pthread_t[ nThreads ];
 	pthread_attr_t attrib;
 
 	//      Threads HAVE to be joinable
@@ -174,8 +174,8 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 	for( unsigned int threadnum=0; threadnum< nThreads ; ++threadnum )
 	{
 		int status=0;
-		if( thisComponent == NULL ) status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::Evaluate_pthread, (void *) &(fit_thread_data[threadnum]) );
-		else status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::EvaluateComponent_pthread, (void *) &(fit_thread_data[threadnum]) );
+		if( thisComponent == NULL ) status = pthread_create( &local_Thread[threadnum], &attrib, MultiThreadedFunctions::Evaluate_pthread, (void *) &(fit_thread_data[threadnum]) );
+		else status = pthread_create( &local_Thread[threadnum], &attrib, MultiThreadedFunctions::EvaluateComponent_pthread, (void *) &(fit_thread_data[threadnum]) );
 
 		//cout << "status: " << status << endl;
 		if( status )
@@ -190,7 +190,7 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 	//      Join the Threads
 	for( unsigned int threadnum=0; threadnum< nThreads ; ++threadnum )
 	{
-		int status = pthread_join( Thread[threadnum], NULL);
+		int status = pthread_join( local_Thread[threadnum], NULL);
 		if( status )
 		{
 			cerr << "Error Joining a Thread:\t" << threadnum << "\t:\t" << status << "\t...Exiting\n" << endl;
@@ -201,7 +201,7 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 	pthread_attr_destroy(&attrib);
 
 	unsigned int size=0;
-	for( unsigned int i=0; i< thesePoints.size(); ++i ) size+=thesePoints[i]->GetDataNumber();
+	for( unsigned int i=0; i< thesePoints.size(); ++i ) size+=(unsigned int)thesePoints[i]->GetDataNumber();
 
 	vector<double>* final_output = new vector<double>( size, 0. );
 
@@ -221,7 +221,7 @@ vector<double>* MultiThreadedFunctions::ParallelEvaluate_pthreads( vector<IPDF*>
 	//}
 
 	//delete[] fit_thread_data;
-	//delete[] Thread;
+	//delete[] local_Thread;
 
 	return final_output;
 }
@@ -240,7 +240,7 @@ void* MultiThreadedFunctions::Evaluate_pthread( void *input_data )
 		//myDataSet->GetDataPoint( i )->Print();
 		try
 		{
-			value = thread_input->fittingPDF->Evaluate( myDataSet->GetDataPoint( i ) );
+			value = thread_input->fittingPDF->Evaluate( myDataSet->GetDataPoint( (int)i ) );
 		}
 		catch( ... )
 		{
@@ -266,7 +266,7 @@ void* MultiThreadedFunctions::EvaluateComponent_pthread( void *input_data )
 		//pthread_mutex_t* debug_lock = thread_input->fittingPDF->DebugMutex();
 		try
 		{
-			value = thread_input->fittingPDF->EvaluateComponent( myDataSet->GetDataPoint( i ), thread_input->thisComponent );
+			value = thread_input->fittingPDF->EvaluateComponent( myDataSet->GetDataPoint( (int)i ), thread_input->thisComponent );
 		}
 		catch( ... )
 		{
@@ -283,7 +283,7 @@ void* MultiThreadedFunctions::EvaluateComponent_pthread( void *input_data )
 vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( IPDF* thisFunction, IDataSet* thesePoints, PhaseSpaceBoundary* thisBoundary, unsigned int nThreads )
 {
 	vector<IDataSet*> payLoad;
-	vector<vector<DataPoint*> > datasets_data = Threading::divideData( thesePoints, nThreads );
+	vector<vector<DataPoint*> > datasets_data = Threading::divideData( thesePoints, (int)nThreads );
 
 	for( unsigned int i=0; i < nThreads; ++i )
 	{
@@ -319,7 +319,7 @@ void* MultiThreadedFunctions::Integrate_pthread( void *input_data )
 		//pthread_mutex_t* debug_lock = thread_input->fittingPDF->DebugMutex();
 		try
 		{
-			value = thread_input->fittingPDF->Integral( thread_input->dataSet->GetDataPoint(i), thread_input->FitBoundary );
+			value = thread_input->fittingPDF->Integral( thread_input->dataSet->GetDataPoint((int)i), thread_input->FitBoundary );
 		}
 		catch( ... )
 		{
@@ -354,7 +354,7 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( vector<IPDF*
 	}
 
 	//      1 thread per core
-	pthread_t* Thread = MultiThreadedFunctions::GetFittingThreads( nThreads );//new pthread_t[ nThreads ];
+	pthread_t* local_Thread = MultiThreadedFunctions::GetFittingThreads( nThreads );//new pthread_t[ nThreads ];
 	pthread_attr_t attrib;
 
 	//      Threads HAVE to be joinable
@@ -379,7 +379,7 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( vector<IPDF*
 	//      Create the Threads and set them to be joinable
 	for( unsigned int threadnum=0; threadnum< nThreads ; ++threadnum )
 	{
-		int status = pthread_create( &Thread[threadnum], &attrib, MultiThreadedFunctions::Integrate_pthread, (void *) &(fit_thread_data[threadnum]) );
+		int status = pthread_create( &local_Thread[threadnum], &attrib, MultiThreadedFunctions::Integrate_pthread, (void *) &(fit_thread_data[threadnum]) );
 		if( status )
 		{
 			cerr << "ERROR:\tfrom pthread_create()\t" << status << "\t...Exiting\n" << endl;
@@ -392,7 +392,7 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( vector<IPDF*
 	//      Join the Threads
 	for( unsigned int threadnum=0; threadnum< nThreads ; ++threadnum )
 	{
-		int status = pthread_join( Thread[threadnum], NULL);
+		int status = pthread_join( local_Thread[threadnum], NULL);
 		if( status )
 		{
 			cerr << "Error Joining a Thread:\t" << threadnum << "\t:\t" << status << "\t...Exiting\n" << endl;
@@ -403,7 +403,7 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( vector<IPDF*
 	pthread_attr_destroy(&attrib);
 
 	unsigned int size=0;
-	for( unsigned int i=0; i< thesePoints.size(); ++i ) size+=thesePoints[i]->GetDataNumber();
+	for( unsigned int i=0; i< thesePoints.size(); ++i ) size+=(unsigned int)thesePoints[i]->GetDataNumber();
 
 	vector<double>* final_output = new vector<double>( size, 0. );
 
@@ -418,7 +418,7 @@ vector<double>* MultiThreadedFunctions::ParallelIntegrate_pthreads( vector<IPDF*
 	}
 
 	//delete[] fit_thread_data;
-	//delete[] Thread;
+	//delete[] local_Thread;
 	return final_output;
 }
 

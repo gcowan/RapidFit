@@ -428,7 +428,7 @@ template<class T> int Template_Functions::get_optimal_histo_bins( const vector<T
 	double width = 3.49 * sqrt( variance ) * pow( (double)input.size(), -(1.0/3.0) );
 
 	double range = get_maximum( input ) - get_minimum( input );
-	int wanted_bins = ceil( range / width );
+	int wanted_bins = (int)ceil( range / width );
 
 	return wanted_bins;
 }
@@ -487,7 +487,7 @@ void Template_Functions::PrintPrimatives( TList* thisList )
 
 	for( unsigned int i=0; i< (unsigned) thisList->GetSize(); ++i )
 	{
-		TObject* objPointer = thisList->At( i );
+		TObject* objPointer = thisList->At( (int)i );
 		TString Name = objPointer->GetName();
 		TString Type = objPointer->IsA()->GetImplFileName();
 		cout << "Name: " << Name << "\tType: " << Type << "\tAt: " << objPointer << endl;

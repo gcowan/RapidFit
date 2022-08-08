@@ -25,7 +25,7 @@ int main( int argc, char* argv[] )
 	//	Setup the variables that I need
 	vector<pair<string,string> > found_names;
 
-	for( unsigned int fileNum =1; fileNum < argc; ++fileNum )
+	for( unsigned int fileNum =1; fileNum < (unsigned int)argc; ++fileNum )
 	{
 		TFile* input = new TFile( TString( argv[fileNum] ), "READ" );
 
@@ -92,7 +92,7 @@ int main( int argc, char* argv[] )
 
 		input->Close();
 
-		if( fileNum != argc-1 ) cout << endl << "--------------------------------------------------------" << endl << endl;
+		if( fileNum != (unsigned int)(argc-1) ) cout << endl << "--------------------------------------------------------" << endl << endl;
 	}
 
 	return 0;

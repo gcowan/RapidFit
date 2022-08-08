@@ -48,6 +48,7 @@ double SimpleDoubleGauss::Evaluate( DataPoint* input )
 
 double SimpleDoubleGauss::Normalisation( PhaseSpaceBoundary* range )
 {
+  (void) range;
   //  Read Physics Parameters
   double sigma1Val = allParameters.GetPhysicsParameter( sigma1Name )->GetValue();
   double sigma2Val = allParameters.GetPhysicsParameter( sigma2Name )->GetValue();
@@ -85,7 +86,7 @@ double SimpleDoubleGauss::EvaluateComponent( DataPoint* input, ComponentRef* com
   if( compRef->getComponentNumber() != -1 )
   {
     //  We know what the corresponding componentIndex is so lets use it
-    componentIndex = compRef->getComponentNumber();
+    componentIndex = (unsigned int)compRef->getComponentNumber();
   }
   else
   {

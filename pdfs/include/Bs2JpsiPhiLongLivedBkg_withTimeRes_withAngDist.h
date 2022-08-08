@@ -57,7 +57,7 @@ class Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist : public BasePDF
 		double sigmaLL1; // These are the physics parameters varied in the fit and passed from the XML;
 		double sigmaLL2;
                 double timeResLL1Frac;
-		double f_Jpsi;
+		//double f_Jpsi;
 		double f_NoJpsi;
 		double tlow, thigh; // integration limits
 

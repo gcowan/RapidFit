@@ -25,12 +25,12 @@ using namespace::std;
 
 unsigned int Rapid2DLL::GetFunctionLineWidth()
 {
-	return EdStyle::GetLHCbFunctionLineWidth();
+	return (unsigned int)EdStyle::GetLHCbFunctionLineWidth();
 }
 
 unsigned int Rapid2DLL::GetAxisWidth()
 {
-	return EdStyle::GetLHCbAxisLineWidth();
+	return (unsigned int)EdStyle::GetLHCbAxisLineWidth();
 }
 
 //	This was 0.04 because it looked sensible but the EB font size is 0.060...
@@ -346,7 +346,7 @@ void Rapid2DLL::Plot_Contours( TString controlled_parameter1, TString controlled
 	TLegend* leg = new TLegend( 0.675, 0.725, 0.9, 0.925 );
 	leg->SetFillColor( kWhite );
 	leg->SetFillStyle( EdStyle::GetTransparentFillStyle() );
-	leg->SetTextSize( 0.050 );//EdStyle::GetLHCbTextSize() );
+	leg->SetTextSize( (float)0.050 );//EdStyle::GetLHCbTextSize() );
 	leg->SetTextFont( EdStyle::GetLHCbFont() );
 
 	//TString TCanvas_Namea("TCanvas_");TCanvas_Namea+=rand->Rndm();
@@ -376,7 +376,7 @@ void Rapid2DLL::Plot_Contours( TString controlled_parameter1, TString controlled
 		TList* this_cont = cont_i->first->GetListOfGraphs();
 		for( unsigned int i=0; i< (unsigned)this_cont->GetSize(); ++i )
 		{
-			TGraph* this_part = (TGraph*) this_cont->At( i );
+			TGraph* this_part = (TGraph*) this_cont->At( (int)i );
 			this_part->SetLineColor( (Color_t)Rapid2DLL::GetColors( cont_num ) );
 			this_part->SetLineStyle( (Style_t)Rapid2DLL::GetStyle( cont_num ) );
 			this_part->SetLineWidth( (Width_t)Rapid2DLL::GetFunctionLineWidth() );

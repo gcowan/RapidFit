@@ -19,10 +19,10 @@ double LegendreMomentShape::Moment(const int l, const int i, const int k, const 
 		Y_jk *= sqrt(2) * cos(k * phi);
 	return Q_l * P_i * Y_jk;
 }
-LegendreMomentShape::LegendreMomentShape() : init(true), copied(false)
+LegendreMomentShape::LegendreMomentShape() : init(true) //, copied(false)
 {
 }
-LegendreMomentShape::LegendreMomentShape(std::string filename) : init(true), copied(false)
+LegendreMomentShape::LegendreMomentShape(std::string filename) : init(true) //, copied(false)
 {
 	Open(filename);
 }
@@ -31,7 +31,7 @@ LegendreMomentShape::LegendreMomentShape(const LegendreMomentShape& copy) :
 	, mKK_max(copy.mKK_max)
 	, coeffs(copy.coeffs)
 	, init(copy.init)
-	, copied(true)
+	//, copied(true)
 {
 }
 LegendreMomentShape::~LegendreMomentShape()
@@ -74,7 +74,7 @@ void LegendreMomentShape::Open(const std::string filename)
 			for ( int k = 0; k < k_max; k++ )
 				for ( int j = 0; j < j_max; j++ )
 				{
-					sprintf(branchtitle,"c%d%d%d%d",l,i,k,j);
+					snprintf(branchtitle,10,"c%d%d%d%d",l,i,k,j);
 					tree->SetBranchAddress(branchtitle,&c[l][i][k][j]);
 				}
 	tree->GetEntry(0);
@@ -95,7 +95,7 @@ void LegendreMomentShape::Save(const std::string filename)
 	TTree* outputTree = new TTree("LegendreMomentsTree","");
 	char branchtitle[20];
 	double**** c = newcoefficients();
-	sprintf(branchtitle,"c[%d][%d][%d][%d]/D",l_max,i_max,k_max,j_max);
+	snprintf(branchtitle,20,"c[%d][%d][%d][%d]/D",l_max,i_max,k_max,j_max);
 	outputTree->Branch("c",c,branchtitle);
 	outputTree->Branch("mKK_min",&mKK_min,"mKK_min/D");
 	outputTree->Branch("mKK_max",&mKK_max,"mKK_max/D");
@@ -106,7 +106,7 @@ void LegendreMomentShape::Save(const std::string filename)
 				for ( int j = 0; j < j_max; j++ )
 				{
 					char branchname[5];
-					sprintf(branchname,"c%d%d%d%d",l,i,k,j);
+					snprintf(branchname,5,"c%d%d%d%d",l,i,k,j);
 					outputTree->Branch(branchname,&c[l][i][k][j],((std::string)branchname+"/D").c_str());
 				}
 	// Pass the non-zero coefficients
@@ -196,16 +196,16 @@ double LegendreMomentShape::Evaluate(const double mKK, const double phi, const d
 }
 double**** LegendreMomentShape::newcoefficients() const
 {
-	double**** c = new double***[l_max];
+	double**** c = new double***[(unsigned int)l_max];
 	for ( int l = 0; l < l_max; l++ )
 	{
-		c[l] = new double**[i_max];
+		c[l] = new double**[(unsigned int)i_max];
 		for ( int i = 0; i < i_max; i++ )
 		{
-			c[l][i] = new double*[k_max];
+			c[l][i] = new double*[(unsigned int)k_max];
 			for ( int k = 0; k < k_max; k++ )
 			{
-				c[l][i][k] = new double[j_max];
+				c[l][i][k] = new double[(unsigned int)j_max];
 				for ( int j = 0; j < j_max; j++ )
 					c[l][i][k][j] = 0;
 			}

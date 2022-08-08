@@ -67,7 +67,7 @@ int Threading::numCores()
 					sysctl(nm, 2, &count, &len, NULL, 0);
 					if(count < 1) { count = 1; }
 				}
-				num_cores = count;
+				num_cores = (int)count;
 #else			//	Linux
 				num_cores = (int) sysconf(_SC_NPROCESSORS_ONLN);
 #endif
@@ -136,7 +136,7 @@ vector<IDataSet*> Threading::divideDataSet( IDataSet* input, unsigned int subset
 		vector<DataPoint*> temp_dataset;
 		for( unsigned int i=0; i< subset_size; ++i )
 		{
-			temp_dataset.push_back( input->GetDataPoint( setnum * subset_size + i ) );
+			temp_dataset.push_back( input->GetDataPoint( (int)(setnum * subset_size + i) ) );
 		}
 		output_datasets.push_back( new MemoryDataSet( input->GetBoundary(), temp_dataset ) );
 	}
@@ -146,7 +146,7 @@ vector<IDataSet*> Threading::divideDataSet( IDataSet* input, unsigned int subset
 	{
 		for( unsigned int i= subsets*subset_size; i< (unsigned) input->GetDataNumber(); ++i )
 		{
-			((MemoryDataSet*)output_datasets.back())->SafeAddDataPoint( input->GetDataPoint( i ) );
+			((MemoryDataSet*)output_datasets.back())->SafeAddDataPoint( input->GetDataPoint( (int)i ) );
 		}
 	}
 

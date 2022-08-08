@@ -29,7 +29,7 @@ Bs2PhiKKComponent::Bs2PhiKKComponent(PDFConfigurator* config, std::string _phina
 		BsBFradius = PhysPar(config,"BsBFradius");
 		KKBFradius = PhysPar(config,"KKBFradius");
 		Bsbarrier = DPBarrierFactor(  0,1.0,0);
-		KKbarrier = DPBarrierFactor(JKK,3.0,0);
+		KKbarrier = DPBarrierFactor((unsigned int)JKK,3.0,0);
 	}
 	// KK resonance parameters
 	// Breit Wigner
@@ -237,8 +237,8 @@ Bs2PhiKKComponent::amplitude_t Bs2PhiKKComponent::Amplitude(const datapoint_t& d
 	for(const auto& A : Ahel)
 	{
 		int lambda = A.first;
-		angularPart[false] += HelAmp[lambda+1] * F(lambda, phi, ctheta_1, ctheta_2);
-		angularPart[true] += HelAmp[lambda+1] * F(lambda, -phi, -ctheta_1, -ctheta_2);
+		angularPart[false] += HelAmp[(unsigned int)lambda+1] * F(lambda, phi, ctheta_1, ctheta_2);
+		angularPart[true] += HelAmp[(unsigned int)lambda+1] * F(lambda, -phi, -ctheta_1, -ctheta_2);
 	}
 	std::complex<double> massPart = KKLineShape->massShape(mKK);
 	if(std::isnan(fraction.value)) std::cerr << "\tFraction is nan" << std::endl;

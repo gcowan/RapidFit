@@ -13,6 +13,7 @@ SimpleGauss3D::SimpleGauss3D( PDFConfigurator* config ) :
   xName( "x" ), yName( "y" ), zName( "z" ),
   sigmaName( "sigma" ), sigma2Name( "sigma2" ), sigma3Name( "sigma3" )
 {
+  (void) config;
   this->MakePrototypes();
 }
 
@@ -47,6 +48,7 @@ double SimpleGauss3D::Evaluate( DataPoint* input )
 
 double SimpleGauss3D::Normalisation( PhaseSpaceBoundary* range )
 {
+  (void) range;
   double sigmaVal = allParameters.GetPhysicsParameter( sigmaName )->GetValue();
   double sigma2Val = allParameters.GetPhysicsParameter( sigma2Name )->GetValue();
   double sigma3Val = allParameters.GetPhysicsParameter( sigma3Name )->GetValue();

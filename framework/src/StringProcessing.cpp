@@ -413,7 +413,7 @@ vector<string> StringProcessing::Convert( const vector<TString> input )
 	}
 	return output;
 }
-//      Chosen to use sprintf as itoa is not supported everywhere...
+//      Chosen to use snprintf as itoa is not supported everywhere...
 
 string StringProcessing::AddNumberToLeft( const string& input_str, const int& num2add )
 {

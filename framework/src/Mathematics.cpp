@@ -788,16 +788,16 @@ namespace Mathematics
 		double cosTheta, phi, cosPsi, time; (void) time;
 		double evalPDFraw, evalPDFnorm, val;
 		int numEvents = dataSet->GetDataNumber();
-		for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
+		for (int i = 0; i < numAngularTerms; ++i) xi[i] = 0.0;
 
 		double Sum[numAngularTerms];
 		double Sum_sq[numAngularTerms][numAngularTerms];
 		double cov[numAngularTerms][numAngularTerms];
 		double cor[numAngularTerms][numAngularTerms];
 
-		for (int i = 0; i < numAngularTerms; i++) {
+		for (int i = 0; i < numAngularTerms; ++i) {
 			Sum[i] = 0.0;
-			for (int k = 0; k < numAngularTerms; k++) {
+			for (int k = 0; k < numAngularTerms; ++k) {
 				cov[i][k] = 0.0;
 				Sum_sq[i][k] = 0.0;
 			}
@@ -814,7 +814,7 @@ namespace Mathematics
 		}
 		bool usePDF = testEval>=0. && !(std::isnan(testEval));
 
-		for (int e = 0; e < numEvents; e++)
+		for (int e = 0; e < numEvents; ++e)
 		{
 			if (e % 1000 == 0) cout << "Event # " << e << "\t\t" << setprecision(4) << 100.*(double)e/(double)numEvents << "\% Complete\b\b\b\b\b\b\b\r\r\r\r\r\r\r\r\r\r\r";
 			DataPoint * event = dataSet->GetDataPoint(e);
@@ -849,12 +849,12 @@ namespace Mathematics
 			//cout << f[0] << " " << f[1]<< " " <<  f[2]<< " " <<  f[3]<< " " <<  f[4]<< " " <<  f[5]<< " " << f[6]<< " " <<  f[7]<< " " <<  f[8]<< " " <<  f[9]<< endl;
 			//cout << time << " " << cosTheta  << " " << phi << " " << cosPsi << " " << evalPDFraw << " " << evalPDFnorm << " " << val << endl;
 
-			for (int i = 0; i < numAngularTerms; i++)
+			for (int i = 0; i < numAngularTerms; ++i)
 			{
 				Sum[i] = Sum[i] + f[i]/val;
 				xi[i] += f[i]/val;
 
-				for (int k = 0; k < numAngularTerms; k++)
+				for (int k = 0; k < numAngularTerms; ++k)
 				{
 					Sum_sq[i][k] += f[i]/val*f[k]/val;
 				}
@@ -864,9 +864,9 @@ namespace Mathematics
 		cout << endl;
 
 		cout << "Covariance matrix " << endl;
-		for (int i = 0; i < numAngularTerms; i++)
+		for (int i = 0; i < numAngularTerms; ++i)
 		{
-			for (int k = 0; k < numAngularTerms; k++)
+			for (int k = 0; k < numAngularTerms; ++k)
 			{
 				cov[i][k] = 1./numEvents/numEvents * ( Sum_sq[i][k] - Sum[i]*Sum[k]/numEvents);
 				cout << cov[i][k] << "\t";
@@ -875,9 +875,9 @@ namespace Mathematics
 		}
 
 		cout << "Correlation matrix " << endl;
-		for (int i = 0; i < numAngularTerms; i++)
+		for (int i = 0; i < numAngularTerms; ++i)
 		{
-			for (int k = 0; k < numAngularTerms; k++)
+			for (int k = 0; k < numAngularTerms; ++k)
 			{
 				cor[i][k] = cov[i][k]/(sqrt(cov[i][i])*sqrt(cov[k][k]));
 				cout << cor[i][k] << "\t";
@@ -886,7 +886,7 @@ namespace Mathematics
 		}
 
 		cout << "Weight +- error " << endl;
-		for (int i = 0; i < numAngularTerms; i++)
+		for (int i = 0; i < numAngularTerms; ++i)
 		{
 			cout << fixed << setprecision(5) << xi[i]/numEvents << " \\pm " << sqrt(cov[i][i]) << endl;
 			weights.push_back(xi[i]/numEvents);
@@ -917,13 +917,13 @@ namespace Mathematics
 			double P_i(0.);  // cosPsi
 			double Y_jk(0.); // cosTheta, phi
 #ifdef __RAPIDFIT_USE_GSL
-			for ( int l = 0; l < l_max+1; l++ )
+			for ( int l = 0; l < l_max+1; ++l )
 			{
-				for ( int i = 0; i < i_max+1; i++ )
+				for ( int i = 0; i < i_max+1; ++i )
 				{
-					for ( int k = 0; k < k_max+1; k++ )
+					for ( int k = 0; k < k_max+1; ++k )
 					{
-						for ( int j = 0; j < j_max+1; j++ ) // must have l >= k
+						for ( int j = 0; j < j_max+1; ++j ) // must have l >= k
 						{
 							if (j < k) continue;
 							Q_l  = gsl_sf_legendre_Pl     (l,    mKpi);
@@ -973,7 +973,7 @@ namespace Mathematics
 		const double mBs  = 5.36677;
 		const double mPhi= 1.019461;
 		int numEvents = dataSet->GetDataNumber();
-		for (int e = 0; e < numEvents; e++)
+		for (int e = 0; e < numEvents; ++e)
 		{
 			// Retrieve the data point
 			DataPoint * event = dataSet->GetDataPoint(e);
@@ -985,7 +985,7 @@ namespace Mathematics
 			double p1_st  = DPHelpers::daughterMomentum(mKK, mK, mK);
 			double p3     = DPHelpers::daughterMomentum(mBs,mKK,mPhi);
 			double val    = p1_st*p3;
-			dataacctree->Fill(mKK, phi, ctheta_1, ctheta_2, 1./val);
+			dataacctree->Fill((float)mKK, (float)phi, (float)ctheta_1, (float)ctheta_2, (float)(1./val));
 		}
 		// Now sample the acceptance surface so that we can make projections to check that it looks sensible
 		TNtuple * sampledtree = new TNtuple("sampledtuple", "", "mKK:phi:ctheta_1:ctheta_2:weight");
@@ -1002,19 +1002,19 @@ namespace Mathematics
 		unsigned int nSample(500000);
 		vector<double> minima = {lms.mKK_min,-M_PI,-1,-1};
 		vector<double> maxima = {lms.mKK_max,+M_PI,+1,+1};
-		for ( int i = 0; i < (int)nSample; i++ )
+		for ( int i = 0; i < (int)nSample; ++i )
 		{
 			double* point = new double[4];
 			double mKK, phi, ctheta_1, ctheta_2, weight;
 			vector<double*> point_mapped = {&mKK, &phi, &ctheta_1, &ctheta_2}; // So these can be looped over
 			gsl_qrng_get( q, point );
-			for ( int j = 0; j < 4; j++ )
+			for ( unsigned int j = 0; j < 4; ++j )
 			{
 				*point_mapped[j] = point[j] * (maxima[j] - minima[j]) + minima[j];
 			}
 			weight = std::erf(186*(mKK)-2*mK)*lms.Evaluate(mKK, phi, ctheta_1, ctheta_2);
-			sampledtree->Fill(mKK, phi, ctheta_1, ctheta_2, weight);
-			delete point;
+			sampledtree->Fill((float)mKK, (float)phi, (float)ctheta_1, (float)ctheta_2, (float)weight);
+			delete[] point;
 		}
 		TFile * acceptance_file = TFile::Open("sampled_LegendreMomentShape.root","RECREATE");
 		sampledtree->Write();
@@ -1038,9 +1038,9 @@ namespace Mathematics
 		double cosTheta, phi, cosPsi, time; (void) time;
 		double evalPDFraw, evalPDFnorm, evalPDFnorm2, val;		(void) evalPDFnorm2;	//	shutup gcc for unused param!
 		int numEvents = dataSet->GetDataNumber();
-		for (int i = 0; i < numAngularTerms; i++) xi[i] = 0.0;
+		for (int i = 0; i < numAngularTerms; ++i) xi[i] = 0.0;
 
-		for (int e = 0; e < numEvents; e++)
+		for (int e = 0; e < numEvents; ++e)
 		{
 			if (e % 10000 == 0) cout << "Event # " << e << endl;
 			DataPoint * event = dataSet->GetDataPoint(e);
@@ -1070,7 +1070,7 @@ namespace Mathematics
 
 			val = evalPDFraw  / evalPDFnorm;
 
-			for (int i = 0; i < numAngularTerms; i++) //For each event work out 10 f values, and 10 xi values and find the average
+			for (int i = 0; i < numAngularTerms; ++i) //For each event work out 10 f values, and 10 xi values and find the average
 			{
 				xi[i] +=  weight * f[i] / val; ///1501544.3013043751;
 			}

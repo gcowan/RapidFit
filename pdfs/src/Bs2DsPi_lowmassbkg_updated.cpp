@@ -130,7 +130,7 @@ Bs2DsPi_lowmassbkg_updated::~Bs2DsPi_lowmassbkg_updated()
 double Bs2DsPi_lowmassbkg_updated::Evaluate(DataPoint * measurement)
 {
 	// Observable
-	double mass = measurement->GetObservable( massName )->GetValue();
+	mass = measurement->GetObservable( massName )->GetValue();
 
 
 	int globalbin = histo->FindBin(mass);

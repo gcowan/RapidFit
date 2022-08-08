@@ -5,7 +5,7 @@ DPBarrierFactor::DPBarrierFactor() : radius(3.1)
 {
 	function = &DPBarrierFactor::FunctionL0;
 }
-DPBarrierFactor::DPBarrierFactor(const unsigned _spin, const double _radius,  const double p0) : spin(_spin), radius(_radius)
+DPBarrierFactor::DPBarrierFactor(const unsigned int _spin, const double _radius,  const double p0) : spin((int)_spin), radius(_radius)
 {
 	if(std::isnan(radius)) std::cerr << "\t\tDPBarrier radius is nan " << std::endl;
 	switch(spin)

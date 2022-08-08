@@ -163,7 +163,7 @@ DPTotalAmplitudePDF_withAcc_withBkg::DPTotalAmplitudePDF_withAcc_withBkg( PDFCon
     , massPsi(3.686093) // psi(2S)
     , massB(5.2794) // B0
 //    , massB(5.36677) // B_s0
-	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., massB)
+	, pMuPlus(0., 0., 0., 0.), pMuMinus(0., 0., 0., 0.), pPi(0., 0., 0., 0.), pK(0., 0., 0., 0.), pB(0., 0., 0., 5.2794)
 	, cosARefs(0.)
 {
 	MakePrototypes();
@@ -893,7 +893,7 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	//cosPsiZ = measurement->GetObservable( cosPsiZName )->GetValue();
 	//phiZ       = measurement->GetObservable( phiZName )->GetValue();
 	//alpha      = measurement->GetObservable( alphaName )->GetValue();
-	pionID    = measurement->GetObservable( pionIDName )->GetValue();
+	pionID    = (int)measurement->GetObservable( pionIDName )->GetValue();
     double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
     //double m23_mapped = (m23 - 0.64)/(1.68 - 0.64)*2. + (-1); // should really do this in a generic way
 
@@ -980,12 +980,12 @@ double DPTotalAmplitudePDF_withAcc_withBkg::Evaluate(DataPoint * measurement)
 	unsigned int upperZ = 0;
 
 	// And this switchs things to deal with the Z components.
-    if ( (unsigned)componentIndex > KpiComponents.size() )
+    if ( componentIndex > (int)KpiComponents.size() )
 	{
 		lower = 0;
 		upper = 0;
-		lowerZ = (unsigned)(componentIndex - KpiComponents.size() - 1);
-                upperZ = (unsigned)(componentIndex - KpiComponents.size());
+		lowerZ = (unsigned int)((unsigned int)componentIndex - KpiComponents.size() - 1);
+                upperZ = (unsigned int)((unsigned int)componentIndex - KpiComponents.size());
 
 	}
 

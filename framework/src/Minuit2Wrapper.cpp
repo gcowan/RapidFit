@@ -25,7 +25,7 @@
 
 //const double MAXIMUM_MINIMISATION_STEPS = 100000.0;//800.0;
 //const double FINAL_GRADIENT_TOLERANCE = 0.01;//;0.001;
-const double STEP_SIZE = 0.01;
+//const double STEP_SIZE = 0.01;
 //const int MINUIT_QUALITY = 2;
 
 //Default constructor

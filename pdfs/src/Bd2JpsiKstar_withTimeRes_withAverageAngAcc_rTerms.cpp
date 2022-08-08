@@ -23,7 +23,7 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Bd2JpsiKstar_withTimeRes_with
 	cachedAperpAperpIntB(), cachedAparaAperpIntB(),
 	cachedAzeroAparaIntB(), cachedAzeroAperpIntB(),
 	cachedSinDeltaPerpPara(), cachedCosDeltaPara(),
-	cachedSinDeltaPerp(), cachedCosSqDeltaM(),
+	cachedSinDeltaPerp(),// cachedCosSqDeltaM(),
 	cachedAzero(), cachedApara(), cachedAperp(),
 
 
@@ -61,7 +61,7 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc_rTerms::Bd2JpsiKstar_withTimeRes_with
 	, gamma(), deltaMs(), R_alpha(), R_beta(), Azero_sq(),
 	Apara_sq(), Aperp_sq(), AzeroApara(), AzeroAperp(),
 	AparaAperp(), delta_zero(), delta_para(), delta_perp(),
-	omega(), timeRes(), timeRes1(), timeRes2(),
+	timeRes(), timeRes1(), timeRes2(),// omega(),
 	timeRes1Frac(), angAccI1(), angAccI2(), angAccI3(),
 	angAccI4(), angAccI5(), angAccI6(), time(), cosTheta(),
 	phi(), cosPsi(), KstarFlavour(), tlow(), thigh()

@@ -711,7 +711,7 @@ vector<DataPoint*> RapidFitIntegrator::getGSLIntegrationPoints( unsigned int num
 				double haveVal = _global_doEval_points[0]->GetObservable( allConsts[i] )->GetValue();
 				double wantVal = templateDataPoint->GetObservable( allConsts[i] )->GetValue();
 
-				if( (haveVal - wantVal) <= numeric_limits<double>::epsilon() )
+				if( abs(haveVal - wantVal) <= numeric_limits<float>::epsilon() )
 				{
 					pointsGood = false;
 					break;

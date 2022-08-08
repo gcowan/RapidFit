@@ -109,7 +109,7 @@ namespace JackKnife
 		distances->Sumw2();
 
 		char buff[10];
-		printf( buff, "%f", level );
+		snprintf( buff, 10, "%f", level );
 		TF1 * line = new TF1("line", buff, 0, 1);
 		line->SetLineColor(kBlue);
 

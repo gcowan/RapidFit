@@ -182,10 +182,10 @@ void ROOT_File_Processing::get_object_list( TString current_path, vector<pair<st
 
 			for( vector<pair<string,string> >::iterator found_i=found_names->begin(); found_i!=found_names->end(); ++found_i )
 			{
-				string full_name = found_i->first;
-				full_name.append( string("/") );
-				full_name.append( found_i->second );
-				all_found_names.push_back( full_name );
+				string _full_name = found_i->first;
+				_full_name.append( string("/") );
+				_full_name.append( found_i->second );
+				all_found_names.push_back( _full_name );
 			}
 
 			//  If this is an object of the wanted type we foud ignore it

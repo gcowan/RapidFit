@@ -46,7 +46,7 @@ class Bs2Jpsifzero_Signal_v6 : public BasePDF
 
 	private:
 		void MakePrototypes();
-		double normalisationCacheUntagged ;
+		//double normalisationCacheUntagged ;
 		void prepareCDS();
 
 		int timeBinNum;

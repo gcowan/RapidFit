@@ -145,7 +145,7 @@ void FeldmanCousinsAnalysis::Plot_Nuisance_Parameters( TTree* input_tree, TStrin
 
 			for( unsigned int i=0; i != param_data_free->size(); ++i )
 			{
-				double strong_upper = 2.5, strong_lower = 1.;
+				//double strong_upper = 2.5, strong_lower = 1.;
 
 				//if( (*nll_free_As)[i] > 0.012 && (*nll_fixed_As)[i] > 0.012 )
 				//{
@@ -434,7 +434,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 	gSystem->mkdir("RapidFit_FC_distributions");
 	gSystem->cd("RapidFit_FC_distributions");
 
-	TDirectory* here = gDirectory;
+	//TDirectory* here = gDirectory;
 
 	cout << endl;
 
@@ -1043,17 +1043,17 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 
 	//	make 1-sqrt(CL) Plot
 
-	TGraph* FC_graph = new TGraph( sqrt_1_minus_FC_X.size(), &(sqrt_1_minus_FC_X[0]), &(sqrt_1_minus_FC_Y[0]) );
+	TGraph* FC_graph = new TGraph( (int)sqrt_1_minus_FC_X.size(), &(sqrt_1_minus_FC_X[0]), &(sqrt_1_minus_FC_Y[0]) );
 	FC_graph->SetTitle("");
 	FC_graph->SetLineColor(2);
 	FC_graph->SetMarkerColor(2);
 
-	TGraph* Data_Graph = new TGraph( sqrt_1_minus_Theory_X.size(), &(sqrt_1_minus_Theory_X[0]), &(sqrt_1_minus_Theory_Y[0]) );
+	TGraph* Data_Graph = new TGraph( (int)sqrt_1_minus_Theory_X.size(), &(sqrt_1_minus_Theory_X[0]), &(sqrt_1_minus_Theory_Y[0]) );
 	Data_Graph->SetTitle( "" );
 	Data_Graph->SetLineColor(4);
 	Data_Graph->SetMarkerColor(4);
 
-	TGraph* Theory_Graph = new TGraph( sqrt_1_minus_Data_X.size(), &(sqrt_1_minus_Data_X[0]), &(sqrt_1_minus_Data_Y[0]) );
+	TGraph* Theory_Graph = new TGraph( (int)sqrt_1_minus_Data_X.size(), &(sqrt_1_minus_Data_X[0]), &(sqrt_1_minus_Data_Y[0]) );
 	Theory_Graph->SetTitle( "" );
 	Theory_Graph->SetLineColor(3);
 	Theory_Graph->SetMarkerColor(3);
@@ -1138,6 +1138,7 @@ void FeldmanCousinsAnalysis::DoFCAnalysis( TTree* input_tree, vector<string>& co
 
 vector<OutputPlots*> FeldmanCousinsAnalysis::Plot_2D( vector<pair<vector<double>,double> > ALL_CL_FROM_FC, vector<pair<vector<double>,double> > DATA_DLL, vector<double> Global_CV, vector<double> Global_CV_err, TRandom3* rand )
 {
+	(void) rand;
 	(void) ALL_CL_FROM_FC;
 	(void) DATA_DLL;
 	(void) Global_CV;

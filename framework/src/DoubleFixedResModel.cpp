@@ -58,10 +58,10 @@ void DoubleFixedResModel::setParameters( ParameterSet & parameters )
 	}
 	else
 	{
-		isCacheValid = ( ResolutionScale == parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue() );
-		isCacheValid = isCacheValid && ( Resolution1 == parameters.GetPhysicsParameter( Resolution1Name )->GetValue() );
-		isCacheValid = isCacheValid && ( Resolution2 == parameters.GetPhysicsParameter( Resolution2Name )->GetValue() );
-		isCacheValid = isCacheValid && ( Resolution2Fraction == parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue() );
+		isCacheValid = ( (ResolutionScale - parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue()) <= numeric_limits<double>::epsilon() );
+		isCacheValid = isCacheValid && ( (Resolution1 - parameters.GetPhysicsParameter( Resolution1Name )->GetValue()) <= numeric_limits<double>::epsilon() );
+		isCacheValid = isCacheValid && ( (Resolution2 - parameters.GetPhysicsParameter( Resolution2Name )->GetValue()) <= numeric_limits<double>::epsilon() );
+		isCacheValid = isCacheValid && ( (Resolution2Fraction - parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue()) <= numeric_limits<double>::epsilon() );
 	}
 	ResolutionScale = parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue();
 	Resolution1 = parameters.GetPhysicsParameter( Resolution1Name )->GetValue();

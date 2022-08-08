@@ -455,7 +455,7 @@ vector<DataPoint*> Plotter::GetDiscreteCombinations( vector<double> & DataPointW
 
 			//Make the description
 			char value[100];
-			sprintf( value, "%f", discreteCombinations[combinationIndex][discreteIndex] );
+			snprintf( value, 100, "%f", discreteCombinations[combinationIndex][discreteIndex] );
 			string addToDescription;
 			if ( discreteIndex == discreteNames.size() - 1 )
 			{

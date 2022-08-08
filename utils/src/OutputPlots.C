@@ -14,27 +14,27 @@ OutputPlots::OutputPlots( TString Plot_Type, TCanvas* inputCanv, TObject* inputG
 
 void OutputPlots::SetDrawString( TString DrawOptions )
 {
-	
+(void) DrawOptions;	
 }
 
 void OutputPlots::Draw( TString DrawOptions )
 {
-	
+(void) DrawOptions;
 }
 
 void OutputPlots::Write( TString fileName )
 {
-	
+(void) fileName;
 }
 
 void OutputPlots::SetResolution( int x, int y )
 {
-	
+(void) x; (void) y;
 }
 
 vector<TObject*> OutputPlots::GetInternalGraphs()
 {
-	
+return vector<TObject*>();
 }
 
 TString OutputPlots::GetPlotType()

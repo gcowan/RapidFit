@@ -54,7 +54,7 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		virtual double Normalisation(DataPoint*, PhaseSpaceBoundary*);
 
 	private:
-		bool RequireInterference;
+		//bool RequireInterference;
 
 		void generateTimeIntegrals();
 		void generateSinusoidIntegrals();
@@ -70,7 +70,7 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		//void prepareTimeFac();
 //		void SetupAngularTerms();
 
-		unsigned int timeBinNum;
+		//unsigned int timeBinNum;
 
 		DataPoint* _datapoint;
 
@@ -94,7 +94,7 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		ObservableRef deltaMName;		// delta mass
 		ObservableRef Azero_sqName;	// amplitude
 		ObservableRef Apara_sqName;	// amplitude
-		bool _fitDirectlyForApara;
+		//bool _fitDirectlyForApara;
 		ObservableRef Aperp_sqName;	// amplitude
 		ObservableRef As_sqName;		// amplitude
 		ObservableRef CspName;		// amplitude
@@ -129,7 +129,7 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 
 		ObservableRef BetaName;
 		bool _useBetaParameter;
-		bool _useMultiplePhis;
+		//bool _useMultiplePhis;
 
 		ObservableRef phis_zeroName;
 		ObservableRef phis_paraName;
@@ -162,7 +162,7 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 
 		// Measured Event Observables
 		double t;
-		int tag;
+		//int tag;
 		// Transversity angles
 		//double ctheta_tr;
 		//double phi_tr;
@@ -179,10 +179,10 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		double dgam;
 
 		double Aperp_sq;
-		double Apara_sq;
+		//double Apara_sq;
 		double Azero_sq;
-		double As_sq;
-		double Csp;
+		//double As_sq;
+		//double Csp;
 /*		double CachedA1;
 		double CachedA2;
 		double CachedA3;
@@ -195,13 +195,13 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		double CachedA10;
 		void CacheAmplitudesAndAngles();
 */
-		double delta_para;
-		double delta_perp;
-		double delta_zero;
-		double delta_s;
-		double delta_perp_Minus_para;
-		double delta_perp_Minus_zero;
-		double cosdpar; //PELC-COSDPAR Special for fitting cosdpar separately
+		//double delta_para;
+		//double delta_perp;
+		//double delta_zero;
+		//double delta_s;
+		//double delta_perp_Minus_para;
+		//double delta_perp_Minus_zero;
+		//double cosdpar; //PELC-COSDPAR Special for fitting cosdpar separately
 
 		double delta_ms;
 		double phi_s;
@@ -257,7 +257,7 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		bool _numericIntegralForce;
 		bool _numericIntegralTimeOnly;
 		bool _useCosAndSin;
-		bool _useCosDpar;
+		//bool _useCosDpar;
 		bool _usePunziSigmat;
 		bool _usePunziMistag;
 //		bool allowNegativeAsSq;
@@ -266,12 +266,12 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		bool performingComponentProjection;
 		double _offsetToGammaForBetaFactor;
 
-		bool _useDoubleTres, _useTripleTres, _useNewPhisres;
+		//bool _useDoubleTres, _useTripleTres, _useNewPhisres;
 
 		bool _useNewMistagModel;
 
 		double sin_delta_perp_s;
-		double cos_delta_perp_s;
+		//double cos_delta_perp_s;
 		double sin_delta_zero_s;
 		double cos_delta_zero_s;
 		double sin_delta_para_s;
@@ -281,7 +281,7 @@ class Bs2Jpsifzero_Signal_v8 : public BasePDF
 		double cos_delta_perp_Minus_para;
 		double sin_delta_perp_Minus_zero;
 		double cos_delta_perp_Minus_zero;
-		double sin_delta_para;
+		//double sin_delta_para;
 		double cos_delta_para;
 
 		//....................................

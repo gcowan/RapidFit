@@ -32,7 +32,7 @@ MultiDimChi2::MultiDimChi2(const std::vector<PDFWithData*>& _allObjects, vector<
 		}
 		// Construct the histogram and add it to the container
 		std::string histname = "BinnedData_"+std::to_string(obj_counter);
-		BinnedData.push_back(std::unique_ptr<THnD>(new THnD(histname.c_str(), "", x_bins.size(), x_bins.data(), x_min.data(), x_max.data())));
+		BinnedData.push_back(std::unique_ptr<THnD>(new THnD(histname.c_str(), "", (int)x_bins.size(), x_bins.data(), x_min.data(), x_max.data())));
 		// Get the weight name, if it exists
 		bool weighted = thisDataSet->GetWeightsWereUsed();
 		ObservableRef weightName;
@@ -59,7 +59,7 @@ void MultiDimChi2::PerformMuiltDimTest() const
 	for(const auto PDFAndData: allObjects)
 	{
 		// Retrieve the binned data hist
-		const THnD& DataHist = *BinnedData[obj_counter];
+		const THnD& DataHist = *BinnedData[(size_t)obj_counter];
 		obj_counter++;
 		// Get the PDF and the boundary
 		IPDF* thisPDF = PDFAndData->GetPDF();
@@ -70,7 +70,7 @@ void MultiDimChi2::PerformMuiltDimTest() const
 		unsigned nbins = 1;
 		for(unsigned iobs = 0; iobs < Observables.size(); iobs++)
 		{
-			nbins *= DataHist.GetAxis(iobs)->GetNbins();
+			nbins *= (unsigned int)DataHist.GetAxis((int)iobs)->GetNbins();
 		}
 		for(unsigned binNum = 0; binNum < nbins; binNum++)
 		{
@@ -90,7 +90,7 @@ void MultiDimChi2::PerformMuiltDimTest() const
 		std::cout << std::setw(12) << "chi2: " << TotalChi2 << "\n";
 		std::cout << std::setw(12) << "nDoF: " << nDoF << "\n";
 		std::cout << std::setw(12) << "chi2/nDoF: " << TotalChi2 / nDoF << "\n";
-		std::cout << std::setw(12) << "p-value: " << TMath::Prob( TotalChi2, nDoF ) << "\n";
+		std::cout << std::setw(12) << "p-value: " << TMath::Prob( TotalChi2, (int)nDoF ) << "\n";
 		std::cout << std::endl;
 	}
 	return;
@@ -100,9 +100,9 @@ std::vector<int> MultiDimChi2::GetIndices(unsigned binNum, const THnD& DataHist)
 	std::vector<int> indices;
 	for(unsigned iobs = 0; iobs < Observables.size(); iobs++)
 	{
-		int nbins = DataHist.GetAxis(iobs)->GetNbins();
-		indices.push_back((binNum % nbins) + 1);
-		binNum /= nbins;
+		int nbins = DataHist.GetAxis((int)iobs)->GetNbins();
+		indices.push_back((int)((binNum % (unsigned int)nbins) + 1));
+		binNum /= (unsigned int)nbins;
 	}
 	return indices;
 }
@@ -129,8 +129,8 @@ double MultiDimChi2::CalculateExpected(IPDF& thisPDF, PhaseSpaceBoundary& fullPh
 		PhaseSpaceBoundary binPhaseSpace(fullPhaseSpace);
 		for(unsigned iobs = 0; iobs < Observables.size(); iobs++)
 		{
-			double newMin = DataHist.GetAxis(iobs)->GetBinLowEdge(indices[iobs]);
-			double newMax = DataHist.GetAxis(iobs)->GetBinUpEdge(indices[iobs]);
+			double newMin = DataHist.GetAxis((int)iobs)->GetBinLowEdge(indices[iobs]);
+			double newMax = DataHist.GetAxis((int)iobs)->GetBinUpEdge(indices[iobs]);
 			binPhaseSpace.SetConstraint(Observables[iobs], newMin, newMax, "noUnits_Chi2");
 		}
 		// Get the integral over the bin

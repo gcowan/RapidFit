@@ -10,7 +10,7 @@
 
 double CalculateAngles::HelCos_Tomasz(const double & ms,const double &mz,const int style)
 {
-  double m_b(5.2794),m_psi(3.686093),m_k(0.493677),m_pi(0.139570),m_mu(0.1056583715);
+  double m_b(5.2794),m_psi(3.686093),m_k(0.493677),m_pi(0.139570);//,m_mu(0.1056583715);
   //style = 0, K*, style =1, Z, style = 2, between axis
 
   if(style == 0){
@@ -176,7 +176,7 @@ Float_t CalculateAngles::planeAngle1_Tomasz(TLorentzVector particleFrame,
   //cout <<"cosPhi  " << cosPhi <<endl;
   double phi    = acos( cosPhi ) ;
 
-  return ( sinPhi > 0.0 ? phi : -phi ) ;
+  return ( sinPhi > 0.0 ? (float)phi : -(float)phi ) ;
 }
 
 
@@ -265,8 +265,8 @@ double CalculateAngles::decayAngleChi
   TVector3 n_MuMu = ((pMplus_KpiMuMu.Vect()).Cross(pMminus_KpiMuMu.Vect())).Unit();
 
   // Calculate polar angles
-  double cos_thetaK = ((pKplus_Kpi.Vect()).Unit()).Dot(e_z_Kpi );
-  double cos_thetaL = ((pMplus_MuMu.Vect()).Unit()).Dot(e_z_MuMu);
+  //double cos_thetaK = ((pKplus_Kpi.Vect()).Unit()).Dot(e_z_Kpi );
+  //double cos_thetaL = ((pMplus_MuMu.Vect()).Unit()).Dot(e_z_MuMu);
 
   // Calculate phi
   double cos_phi = ( n_KPi.Dot( n_MuMu ) );
@@ -299,6 +299,8 @@ void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
 						double* dphi,
 						int pion_ID)
 {
+  (void) pB;
+  (void) pion_ID;
   TLorentzVector _muPlus(pMuPlus);
   TLorentzVector _muMinus(pMuMinus);
   TLorentzVector _KPlus(pK);
@@ -308,7 +310,7 @@ void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
   TLorentzVector _b(pMuPlus + pMuMinus + pPi + pK);
 
   // If we are not in B0 rest frame, boost there
-  if ( _b.BoostVector().Mag() != 0 )
+  if ( abs(_b.BoostVector().Mag()) >= std::numeric_limits<float>::epsilon() )
   {
     _psi.    Boost(-1.0*_b.BoostVector());
     _z.      Boost(-1.0*_b.BoostVector());
@@ -367,6 +369,7 @@ void CalculateAngles::calculateFinalStateMomenta_GOLD(double mB0, double m23, do
 						 TLorentzVector& pPi,
 						 TLorentzVector& pK)
 {
+  (void) pion_ID;
 /*
   if (pion_ID > 0){ // anti-B0
     if(phi >0) phi = TMath::Pi() - phi;

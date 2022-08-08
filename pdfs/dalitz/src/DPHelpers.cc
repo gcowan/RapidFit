@@ -22,10 +22,10 @@ void DPHelpers::calculateFinalStateMomentaBelle(double m_b, double ms, double m_
       const double p2 = p*p;
       const double q2 = q*q;
 
-      const double ep = ( sqrt((m_psi*m_psi+p2)*(m*m+p2))+p2 )/m;
-      const double pp = sqrt(ep*ep-m_psi*m_psi);
+      //const double ep = ( sqrt((m_psi*m_psi+p2)*(m*m+p2))+p2 )/m;
+      //const double pp = sqrt(ep*ep-m_psi*m_psi);
 
-      const double spsipi = m_psi*m_psi + m_pi*m_pi + 2.0*( ep*sqrt(m_pi*m_pi+q2) - pp*q*cospi );
+      //const double spsipi = m_psi*m_psi + m_pi*m_pi + 2.0*( ep*sqrt(m_pi*m_pi+q2) - pp*q*cospi );
 
       TLorentzVector p_psi_b(0,0,p,sqrt(m_psi*m_psi+p2));
       TLorentzVector p_ks_b(0,0,-p,sqrt(m*m+p2));
@@ -89,7 +89,7 @@ void DPHelpers::Belle(const TLorentzVector & _pMuPlus,
 
   // ============== B0 rest frame ========================
 
-  if ( pB.BoostVector().Mag() != 0 )
+  if ( abs(pB.BoostVector().Mag()) >= std::numeric_limits<float>::epsilon() )
   {
     pMuPlus.Boost(-pB.BoostVector());
     pMuMinus.Boost(-pB.BoostVector());

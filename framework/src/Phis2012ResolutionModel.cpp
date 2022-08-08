@@ -68,13 +68,13 @@ void Phis2012ResolutionModel::setParameters( ParameterSet & parameters )
 	}
 	else
 	{
-		isCacheValid = ( resFrac == parameters.GetPhysicsParameter( timeResFracName )->GetValue() )
-			&& ( sfBarOffset == parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue() )
-			&& ( sfBarSlope == parameters.GetPhysicsParameter( sfBarSlopeName)->GetValue() )
-			&& ( sfSigmaOffset == parameters.GetPhysicsParameter( sfSigmaOffsetName)->GetValue() )
-			&& ( sfSigmaSlope == parameters.GetPhysicsParameter( sfSigmaSlopeName)->GetValue() )
-			&& ( sigmaBar == parameters.GetPhysicsParameter( sigmaBarName)->GetValue() )
-			&& ( mu == parameters.GetPhysicsParameter( muName )->GetValue() );
+		isCacheValid = ( abs(resFrac - parameters.GetPhysicsParameter( timeResFracName )->GetValue()) <= numeric_limits<float>::epsilon() )
+			&& ( abs(sfBarOffset - parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue()) <= numeric_limits<float>::epsilon() )
+			&& ( abs(sfBarSlope - parameters.GetPhysicsParameter( sfBarSlopeName)->GetValue()) <= numeric_limits<float>::epsilon() )
+			&& ( abs(sfSigmaOffset - parameters.GetPhysicsParameter( sfSigmaOffsetName)->GetValue()) <= numeric_limits<float>::epsilon() )
+			&& ( abs(sfSigmaSlope - parameters.GetPhysicsParameter( sfSigmaSlopeName)->GetValue()) <= numeric_limits<float>::epsilon() )
+			&& ( abs(sigmaBar - parameters.GetPhysicsParameter( sigmaBarName)->GetValue()) <= numeric_limits<float>::epsilon() )
+			&& ( abs(mu - parameters.GetPhysicsParameter( muName )->GetValue()) <= numeric_limits<float>::epsilon() );
 	}
 	resFrac = parameters.GetPhysicsParameter( timeResFracName )->GetValue();
 	sfBarOffset = parameters.GetPhysicsParameter( sfBarOffsetName)->GetValue();

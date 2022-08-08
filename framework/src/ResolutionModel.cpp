@@ -43,7 +43,7 @@ void ResolutionModel::addParameters( vector<string> & parameterNames )
 //To take the current value of a parameter into the instance
 void ResolutionModel::setParameters( ParameterSet & parameters )
 {
-	isCacheValid = ( resScale == parameters.GetPhysicsParameter( resScaleName )->GetValue() );
+	isCacheValid = ( abs(resScale - parameters.GetPhysicsParameter( resScaleName )->GetValue()) <= numeric_limits<float>::epsilon() );
 	resScale = parameters.GetPhysicsParameter( resScaleName )->GetValue();
 	return ;
 }

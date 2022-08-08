@@ -74,10 +74,10 @@ bool MistagDistribution::SetPhysicsParameters( ParameterSet * NewParameterSet )
 //Calculate the function value
 double MistagDistribution::Evaluate(DataPoint * measurement)
 {
-	if( measurement->GetObservable( tagName )->GetValue() == 0 ) return 1.;
+	if( abs(measurement->GetObservable( tagName )->GetValue()) <= std::numeric_limits<double>::epsilon() ) return 1.;
 	//cout << measurement->GetObservable( tagName )->GetValue();
 	// Get the observable
-	double x = 0.5 - measurement->GetObservable( GFxName )->GetValue();
+	x = 0.5 - measurement->GetObservable( GFxName )->GetValue();
 
 	double returnValue ;
 
@@ -99,7 +99,7 @@ double MistagDistribution::Normalisation( DataPoint* input, PhaseSpaceBoundary *
 	{
 		return this->Evaluate( input );
 	}
-	if( input->GetObservable( tagName )->GetValue() == 0 ) return 1.;
+	if( abs(input->GetObservable( tagName )->GetValue()) <= std::numeric_limits<double>::epsilon() ) return 1.;
 	//return -1.;
 	return 1.0 +  shoulder*mu;
 }

@@ -17,7 +17,7 @@ DPGLassShape::DPGLassShape(double mRR, double gammaRR, int L, double mm1, double
 	,phaseB(0)
 {
 	pR0=DPHelpers::daughterMomentum(mR,m1,m2);
-	barrier = DPBarrierFactor(LR,RR,pR0);
+	barrier = DPBarrierFactor((unsigned int)LR,RR,pR0);
 }
 
 DPGLassShape::DPGLassShape(const DPGLassShape& other) : DPMassShape(other)

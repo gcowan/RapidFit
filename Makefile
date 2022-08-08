@@ -28,16 +28,17 @@ BUILD_DATE ="$(shell date +%H:%M_%F)"
 
 CXXFLAGS_BASE_MINIMAL = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_REV) -DBUILD_DATE=$(BUILD_DATE) -D_GNU_SOURCE -D__USE_GNU -fPIC -pthread
 
-CXXFLAGS_BASE_WARNINGS = -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wall -Wno-non-virtual-dtor -Wno-reorder -Wshadow -Wmissing-noreturn -Wcast-align
+CXXFLAGS_BASE_WARNINGS = -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wall -Wno-non-virtual-dtor -Wno-reorder -Wshadow -Wmissing-noreturn -Wcast-align -Wextra -Wabi
 
 #		Compiler Flags
-CXXFLAGS_BASE_COMMON  = $(CXXFLAGS_BASE_MINIMAL) -D__ROOFIT_NOBANNER  $(CXXFLAGS_BASE_WARNINGS)
+CXXFLAGS_BASE_COMMON  = $(CXXFLAGS_BASE_MINIMAL) -D__ROOFIT_NOBANNER
 
 CXXFLAGS_BASE_OPT = -O3 -msse2 -msse3 -fmerge-all-constants -funroll-all-loops -fno-common -m3dnow
 
 #CXXFLAGS_BASE = $(CXXFLAGS_BASE_COMMON) -Wmissing-noreturn -Wcast-align -msse -m3dnow
 
-CXXFLAGS_BASE = -std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -fmerge-all-constants $(CXXFLAGS_BASE_WARNINGS)
+CXXFLAGS_COMPILE_BASE = -std=c++11 $(CXXFLAGS_BASE_COMMON) -O3 -msse2 -msse3 -m3dnow -ftree-vectorize -fmerge-all-constants
+CXXFLAGS_BASE = $(CXXFLAGS_COMPILE_BASE) $(CXXFLAGS_BASE_WARNINGS)
 
 CXX_FLAGS_LITE = -DSVN_REV=$(SVN_REV) -DSVN_PDF_REV=$(SVN_PDF_REV) -DBUILD_DATE=$(BUILD_DATE) -rdynamic -D_GNU_SOURCE -D__USE_GNU -fPIC -O3 -msse -msse2 -msse3 -m3dnow -ansi -fmerge-all-constants -funroll-all-loops -fno-common -D__ROOFIT_NOBANNER -Wconversion -Wextra -Wsign-compare -Wfloat-equal -Wmissing-noreturn -Wall -Wno-non-virtual-dtor -Wno-reorder -pthread -Wshadow -Wcast-align
 
@@ -104,8 +105,11 @@ LINKFLAGS= -lpthread -rdynamic
 #LIBS=-static-libstdc++
 
 CXXFLAGSUTIL = $(CXXFLAGS_BASE) -I$(INCUTILS) $(ROOTCFLAGS) -Iframework/include
+CXXFLAGSUTILDICT = $(CXXFLAGS_COMPILE_BASE) -I$(INCUTILS) $(ROOTCFLAGS) -Iframework/include
 CXXFLAGS     = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
+CXXFLAGSDICT = $(CXXFLAGS_COMPILE_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
 CXXFLAGS_LIB = $(CXXFLAGS_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
+CXXFLAGS_LIBDICT = $(CXXFLAGS_COMPILE_BASE) -I$(INCDIR) -I$(INCPDFDIR) -I$(INCDALITZDIR) -I$(INCGSL) $(ROOTCFLAGS)
 
 #LIBLINKFLAGS = -m64
 LIBLINKFLAGS =
@@ -280,7 +284,7 @@ $(OBJDIR)/rapidfit_dict.cpp: framework/include/RapidRun.h framework/include/Link
 
 #	Compile the class that root has generated for us which is the linker interface to root	(i.e. dictionaries & such)
 $(OBJDIR)/rapidfit_dict.o: $(OBJDIR)/rapidfit_dict.cpp
-	$(CXX) $(CXXFLAGS) -o $@ -I"$(PWD)" -c $<
+	$(CXX) $(CXXFLAGSDICT) -o $@ -I"$(PWD)" -c $<
 
 #	Class which has a dictionary generated for it, think of this as the equivalent to int main() in a CINT-y Universe
 $(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp
@@ -290,7 +294,6 @@ $(OBJDIR)/RapidRun.o: $(SRCDIR)/RapidRun.cpp
 $(LIBDIR)/libRapidRun.so: $(OBJDIR)/RapidRun.o $(OBJDIR)/rapidfit_dict.o $(OBJS) $(PDFOBJS) $(DALITZOBJS)
 	$(CXX) $(LIBLINKFLAGS) $(LINKFLAGS) -o $@ $^ $(LIBS) $(ROOTLIBS) $(EXTRA_ROOTLIBS) $(LINKGSL)
 
-
 #	This Generates the C++ file which is the interface between ROOT and the utils library
 
 $(OBJUTILDIR)/utilsDict.cpp: $(UTILHEADERS) $(INCUTILS)/LinkDef.h
@@ -298,8 +301,9 @@ $(OBJUTILDIR)/utilsDict.cpp: $(UTILHEADERS) $(INCUTILS)/LinkDef.h
 	@echo "rootcling -f $(OBJUTILDIR)/utilsDict.cpp -c -I"$(PWD)" $^"
 	@rootcling -f $(OBJUTILDIR)/utilsDict.cpp -c -I"$(PWD)" $^
 
+CFLAGS:=$(filter-out -Wall, $(CFLAGS))
 $(OBJUTILDIR)/utilsDict.o: $(OBJUTILDIR)/utilsDict.cpp
-	$(CXX) $(CXXFLAGSUTIL) -o $@ -I"$(PWD)" -c $<
+	$(CXX) $(CXXFLAGSUTILDICT) -o $@ -I"$(PWD)" -c $<
 
 #	This is the Utils library which exposes a LOT of pre-written useful functions to the user
 $(LIBDIR)/libUtils.so: $(SHARED_UTIL_LIBS) $(OBJUTILDIR)/print.o

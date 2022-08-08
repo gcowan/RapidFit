@@ -250,7 +250,7 @@ double Bs2PhiKKSignal::Convolve(MsqFunc_t EvaluateMsq, const Bs2PhiKKComponent::
 	const double res2 = mKKrespars.at("sigma2");
 	const double frac = mKKrespars.at("frac");
 	const double nsigma = mKKrespars.at("nsigma");
-	const int nsteps = mKKrespars.at("nsteps");
+	const int nsteps = (int)mKKrespars.at("nsteps");
 	const double resolution = frac*res1+(1-frac)*res2;
 	// Can't do this if we're too close to threshold: it starts returning nan
 	if(datapoint[0] - nsigma*resolution > 2*Bs2PhiKKComponent::mK)
@@ -268,7 +268,7 @@ double Bs2PhiKKSignal::Convolve(MsqFunc_t EvaluateMsq, const Bs2PhiKKComponent::
 /*Stuff that factors out of the time integral*********************************/
 double Bs2PhiKKSignal::Acceptance(const Bs2PhiKKComponent::datapoint_t& datapoint) const
 {
-	double acceptance;
+	double acceptance=0.;
 	if(acceptance_moments)
 	{
 		acceptance = acc_m->Evaluate(datapoint);

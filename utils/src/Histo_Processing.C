@@ -141,8 +141,9 @@ TString Histogram_Processing::Best_Fit_Function( TH1* local_histogram, int Outpu
 
 	//  Try Gaussian function
 	result = new TFitResult( local_histogram->Fit ( "gaus", Fit_Options ) );
-	Double_t chi_2_gaus ( local_histogram->GetFunction ( "gaus" )->GetChisquare() );
-	if( result->Status() != 0 )	chi_2_gaus = DBL_MAX;
+	(void) result;
+	//Double_t chi_2_gaus ( local_histogram->GetFunction ( "gaus" )->GetChisquare() );
+	//if( result->Status() != 0 )	chi_2_gaus = DBL_MAX;
 
 	//  The GammaDist function originally complained of invalid results (A LOT) and giving it sensible starting points was a way around this
 //	my_gamma->SetParameters( local_histogram->GetFunction( "gaus" )->GetParameter( 0 ),
@@ -222,7 +223,7 @@ void Histogram_Processing::Silent_Draw( TCanvas* c1, TH1* input_histo, TString o
 
 	streambuf *cout_bak=NULL, *cerr_bak=NULL, *clog_bak=NULL;
 
-	int thisErr = gErrorIgnoreLevel;
+	//int thisErr = gErrorIgnoreLevel;
 	//      If the user wanted silence we point the Std Output Streams to /dev/null
 	if( OutputLevel <= -1 )
 	{
@@ -247,7 +248,7 @@ void Histogram_Processing::Silent_Draw( TCanvas* c1, TH1* input_histo, TString o
 		cout.rdbuf(cout_bak);
 		cerr.rdbuf(cerr_bak);
 		clog.rdbuf(clog_bak);
-		thisErr = gErrorIgnoreLevel;
+		//thisErr = gErrorIgnoreLevel;
 	}
 }
 
@@ -288,7 +289,8 @@ TH1* Histogram_Processing::Get_Histo( TTree* input_tree, TString draw_str, TStri
 	replace( rand_num.begin(), rand_num.end(), '.', '_' );
 	rand_str = rand_num.c_str();
 	input_tree->Draw( draw_str, weight_str, "goff" );
-	TH1* output_histo = (TH1*)((TH1*)(input_tree->GetHistogram())->Clone(output_histo->GetName()+rand_str));
+	TH1* output_histo = (TH1*)input_tree->GetHistogram();
+	output_histo = (TH1*)output_histo->Clone(output_histo->GetName()+rand_str);
 	return output_histo;
 }
 
@@ -359,7 +361,7 @@ TGraph* Histogram_Processing::Get_TGraph( const vector<vector<Double_t> >& input
 	if( rand == NULL ) rand = gRandom;
 	if( input.empty() ) return NULL;
 
-	TGraph* returnable_graph = new TGraph( input[0].size(), &(input[0][0]), &(input[1][0]) );
+	TGraph* returnable_graph = new TGraph( (int)input[0].size(), &(input[0][0]), &(input[1][0]) );
 
 	TString TGraph_Name("TGraph_"); TGraph_Name+=rand->Rndm();
         string rand_num( TGraph_Name.Data() );
@@ -378,7 +380,7 @@ TGraph2D* Histogram_Processing::Get_TGraph2D( const vector<vector<Double_t> >& i
 	if( input.empty() ) return NULL;
 	if( input.size() != 3 ) return NULL;
 
-	TGraph2D* returnable_TGraph2D = new TGraph2D( input[0].size(), const_cast<Double_t*>(&(input[0][0])), const_cast<Double_t*>(&(input[1][0])), const_cast<Double_t*>(&(input[2][0])) );
+	TGraph2D* returnable_TGraph2D = new TGraph2D( (int)input[0].size(), const_cast<Double_t*>(&(input[0][0])), const_cast<Double_t*>(&(input[1][0])), const_cast<Double_t*>(&(input[2][0])) );
 
 	TString TGraph2D_Name("TGraph2D_"); TGraph2D_Name+=rand->Rndm();
         string rand_num( TGraph2D_Name.Data() );
@@ -526,7 +528,7 @@ TH3* Histogram_Processing::Plot_3D( const vector<double>& X, const vector<double
 
 TH1* Histogram_Processing::Plot( const vector<vector<double> >& input, TString Filename, TString Option, TRandom* rand )
 {
-	if( rand = NULL ) rand = gRandom;
+	if( rand == NULL ) rand = gRandom;
 	if( input.empty() ) return NULL;
 	if( input.size() == 1 ) return Histogram_Processing::Plot_1D( input[0], Filename, Option, rand );
 	if( input.size() == 2 ) return (TH1*) Histogram_Processing::Plot_2D( input[0], input[1], Filename, Option, rand );
@@ -537,6 +539,7 @@ TH1* Histogram_Processing::Plot( const vector<vector<double> >& input, TString F
 //	Originally Written by Conor Fitzpatrick
 TPaveText* Histogram_Processing::addLHCbLabel(TString footer, bool final/*, bool DATA*/)
 {
+	(void) footer;
 	//TPaveText * label = new TPaveText(0.18, 0.77, 0.18, 0.88,"BRNDC");
 	TPaveText* label = new TPaveText( gStyle->GetPadLeftMargin() + 0.08, 
 			0.87 - gStyle->GetPadTopMargin(),
@@ -569,7 +572,7 @@ vector<TMultiGraph*> Histogram_Processing::GetContoursFromTH2( TH2* input_th2, c
         TCanvas_Name = rand_str_.c_str();
 	TCanvas* c1 = EdStyle::RapidFitCanvas( TCanvas_Name, TCanvas_Name );
 
-	input_th2->SetContour( contour_list.size(), &(contour_list[0]) );
+	input_th2->SetContour( (int)contour_list.size(), &(contour_list[0]) );
 
 	input_th2->Draw("cont LIST");
 	c1->Update();
@@ -583,19 +586,19 @@ vector<TMultiGraph*> Histogram_Processing::GetContoursFromTH2( TH2* input_th2, c
 	replace( rand_str2.begin(), rand_str2.end(), '.', '_' );
 	rand_str = rand_str2.c_str();
 
-	for( unsigned int i=0; i< generated_contours->GetSize(); ++i )
+	for( unsigned int i=0; i< (unsigned int)generated_contours->GetSize(); ++i )
 	{
 		TString Contour_Name( "Contour_"+rand_str+"_" ); Contour_Name+=i;
 
 		TMultiGraph* this_contour = new TMultiGraph( Contour_Name, Contour_Name );
 
-		TList* contour_parts = (TList*) generated_contours->At(i);
+		TList* contour_parts = (TList*) generated_contours->At((int)i);
 
-		for( unsigned int j=0; j< contour_parts->GetSize(); ++j )
+		for( unsigned int j=0; j< (unsigned int)contour_parts->GetSize(); ++j )
 		{
 			TString Part_Name( "Contour_"+rand_str+"_" ); Part_Name+=i;
 			Part_Name.Append("_"); Part_Name+=j;
-			TGraph* this_part = (TGraph*) contour_parts->At(j);
+			TGraph* this_part = (TGraph*) contour_parts->At((int)j);
 
 			TGraph* copy_this_part = new TGraph( *this_part );
 

@@ -185,11 +185,11 @@ class Bd2JpsiKstar_sWave_Fscopy : public BasePDF
     */
 		//double tlow, thigh; // Integration limits
 
-		TH3D *histo;
-        TAxis *xaxis, *yaxis, *zaxis;
-        int nxbins, nybins, nzbins;
-        double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
-        double total_num_entries;
+		//TH3D *histo;
+        //TAxis *xaxis, *yaxis, *zaxis;
+        //int nxbins, nybins, nzbins;
+        //double xmin, xmax, ymin, ymax, zmin, zmax, deltax, deltay, deltaz;
+        //double total_num_entries;
 
 
 		double buildPDFnumerator();

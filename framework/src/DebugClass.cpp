@@ -67,6 +67,7 @@ void DebugClass::SegFault()
 {
 	int *p = NULL;
 	*p = 1;
+	throw "error";
 }
 
 template<class T> void DebugClass::Dump2File( const string fileName, const vector<T> objects )
@@ -147,7 +148,7 @@ template<class T> void DebugClass::Dump2TTree( const string fileName, const vect
 
 	TBranch* thisBranch = thisTTree->Branch( BranchName, &someObject, BranchName+output_ext );
 
-	thisTTree->SetEntries( objects.size() );
+	thisTTree->SetEntries( (unsigned int)objects.size() );
 
 	for( unsigned int i=0; i< objects.size(); ++i )
 	{
@@ -228,7 +229,7 @@ template<class T> void DebugClass::Dump2TTree( const string fileName, const vect
 
 		TBranch* thisBranch = thisTTree->Branch( BranchName, &someObject, BranchName+output_ext );
 
-		thisTTree->SetEntries( objects.size() );
+		thisTTree->SetEntries( (unsigned int)objects.size() );
 
 		for( unsigned int j=0; j< objects[i].size(); ++j )
 		{

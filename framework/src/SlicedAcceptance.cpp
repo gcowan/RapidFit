@@ -31,7 +31,7 @@ AcceptanceSlice::AcceptanceSlice( const AcceptanceSlice& input ) :
 SlicedAcceptance::SlicedAcceptance( double tl, double th, bool quiet ) :
 	slices(), nullSlice( new AcceptanceSlice(0.,0.,0.) ), tlow(tl), thigh(th), beta(0), _sortedSlices(false), maxminset(false), t_min(0.), t_max(0.)
 {
-
+	(void)quiet;
 	//Reality checks
 	if( tl > th )
 	{
@@ -194,7 +194,7 @@ SlicedAcceptance::SlicedAcceptance( string type, string fileName, bool quiet ) :
 		hiEdge.push_back(stream(in));
 		binContent.push_back(stream(in) );
 		++this_line;
-		if( in.eof()  == true || in.good() == false || this_line == number_of_lines ) ok =false;
+		if( in.eof()  == true || in.good() == false || this_line == (unsigned int)number_of_lines ) ok =false;
 	}
 	in.close();
 
@@ -344,7 +344,7 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 	if( time->GetBinNumber() != -1 )
 	{
 		//#pragma GCC diagnostic ignored "-Wfloat-equal"
-		if( time->GetOffSet() == timeOffset ) return time->GetAcceptance();
+		if( abs(time->GetOffSet() - timeOffset) <= numeric_limits<float>::epsilon() ) return time->GetAcceptance();
 		//#pragma GCC diagnostic pop
 		else
 		{
@@ -397,7 +397,7 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 	}
 	else
 	{
-		finalBin = this->findSliceNum( time, timeOffset );
+		finalBin = (int)this->findSliceNum( time, timeOffset );
 	}
 
 	//cout << finalBin << endl;
@@ -416,7 +416,7 @@ double SlicedAcceptance::getValue( const Observable* time, const double timeOffs
 			}
 		}
 
-		if( t == slices.back()->thigh() )
+		if( abs(t - slices.back()->thigh()) <= numeric_limits<float>::epsilon() )
 		{
 			returnValue += slices.back()->height();
 		}
@@ -459,7 +459,7 @@ unsigned int SlicedAcceptance::findSliceNum( const Observable* time, const doubl
 	double t = time->GetValue() - timeOffset;
 	if( time->GetBinNumber() >= 0 ) return (unsigned) time->GetBinNumber();
 	unsigned int thisNum=0;
-	for( unsigned int is; is < slices.size(); ++is )
+	for( unsigned int is=0; is < slices.size(); ++is )
 	{
 		if( (t >= slices[is]->tlow() ) && ( t < slices[is]->thigh() ) )
 		{
@@ -471,7 +471,7 @@ unsigned int SlicedAcceptance::findSliceNum( const Observable* time, const doubl
 		}
 		++thisNum;
 	}
-	if( t == slices.back()->thigh() ) --thisNum;
+	if( abs(t - slices.back()->thigh()) <= numeric_limits<float>::epsilon() ) --thisNum;
 	time->SetBinNumber( (int)thisNum );
 	return thisNum;
 }

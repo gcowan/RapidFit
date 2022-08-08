@@ -829,7 +829,7 @@ unsigned int XMLConfigReader::GetSeed()
 		cout << "Seed tag not found in config file, defaulting to TRandom3(0)." << endl;
 	} else  this_seed = unsigned(seed);
 
-	if( _original_seed < 0 ) _original_seed = this_seed;
+	if( _original_seed < 0 ) _original_seed = (int)this_seed;
 	return this_seed;
 }
 

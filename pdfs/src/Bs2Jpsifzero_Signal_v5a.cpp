@@ -1359,7 +1359,7 @@ double Bs2Jpsifzero_Signal_v5a::diffXsecCompositeNorm1( int resolutionIndex )
 
 	for( unsigned int islice = 0; islice < (unsigned) timeAcc->numberOfSlices(); ++islice )
 	{
-		timeBinNum = islice;
+		timeBinNum = (int)islice;
 		//De cache the time integrals  (unles using event Resolution
 		/*if( ! useEventResolution() )*/ this->deCacheTimeIntegrals( (unsigned)resolutionIndex, islice );
 

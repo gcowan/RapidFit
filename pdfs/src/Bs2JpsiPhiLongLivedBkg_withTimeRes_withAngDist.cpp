@@ -36,7 +36,7 @@ Bs2JpsiPhiLongLivedBkg_withTimeRes_withAngDist::Bs2JpsiPhiLongLivedBkg_withTimeR
         , cosPsiName    ( configurator->getName("cosPsi") )
 
 	, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(),
-	sigmaLL2(), timeResLL1Frac(), f_Jpsi(), f_NoJpsi(),
+	sigmaLL2(), timeResLL1Frac(), f_NoJpsi(), //f_Jpsi(),
 	tlow(), thigh(), time(), cosTheta(), phi(), cosPsi()
 
 {

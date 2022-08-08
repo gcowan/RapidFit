@@ -14,7 +14,7 @@ DPLassShape::DPLassShape(double mRR, double gammaRR, int L, double mm1, double m
 	,r(rr)
 {
 	pR0=DPHelpers::daughterMomentum(mR,m1,m2);
-	barrier = DPBarrierFactor(LR,RR,pR0);
+	barrier = DPBarrierFactor((unsigned int)LR,RR,pR0);
 }
 
 DPLassShape::DPLassShape(const DPLassShape& other) : DPMassShape(other)

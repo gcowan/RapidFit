@@ -314,7 +314,7 @@ void Foam::Init()
 		Open_Files.push_back( MC_Cache );
 		//Debug
 		//char filename[100];
-		//sprintf( filename, "DebugFoamPlot.%d.c", combinationIndex );
+		//snprintf( filename, 100, "DebugFoamPlot.%d.c", combinationIndex );
 		//foamGenerator->RootPlot2dim(filename);
 		//foamGenerator->PrintCells();
 

@@ -63,8 +63,8 @@ Bd2JpsiKstar_sWave::Bd2JpsiKstar_sWave(PDFConfigurator* configurator ) :
 
 	, timeconstraintName( "time" )
 	, gamma(), Azero_sq(), Apara_sq(), Aperp_sq(), As_sq(), AzeroApara(), AzeroAperp(), AparaAperp(), AparaAs(), AperpAs(), AzeroAs(),
-	delta_zero(), delta_para(), delta_perp(), delta_s(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(),
-	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), Ap_sq(), Ap(), time(), cosTheta(), phi(),
+	delta_para(), delta_perp(), delta_s(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(),// delta_zero(), omega(),
+	angAccI3(), angAccI4(), angAccI5(), angAccI6(), angAccI7(), angAccI8(), angAccI9(), angAccI10(), time(), cosTheta(), phi(),// Ap_sq(), Ap(),
 	cosPsi(), KstarFlavour(), tlo(), thi(), useFlatAngularDistribution(true)
 {
 	MakePrototypes();
@@ -374,9 +374,9 @@ double Bd2JpsiKstar_sWave::buildPDFnumerator()
 
 	// The time dependent amplitudes as defined in roadmap Eqns 48 -> 59  //No tagging so only need 2 (h± pg 72)
 	// First for the B
-	double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
-	double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
-	double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
+	//double AzeroAzeroB, AparaAparaB, AperpAperpB, AsAsB;
+	//double ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB;
+	//double ReAparaAsB, ImAperpAsB, ReAzeroAsB;
 
 	getTimeDependentAmplitudes( AzeroAzeroB, AparaAparaB, AperpAperpB
 			, ImAparaAperpB, ReAzeroAparaB, ImAzeroAperpB

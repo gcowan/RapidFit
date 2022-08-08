@@ -578,7 +578,7 @@ void WeightThisDataSet( RapidFitConfiguration* config )
 		}
 
 		//              Do Something With them :D
-		Observable* testObservable = WeightedDataSets[0]->GetDataPoint( 0 )->GetObservable( WeightsName );
+		//Observable* testObservable = WeightedDataSets[0]->GetDataPoint( 0 )->GetObservable( WeightsName );
 
 		double value=0.;
 		if( WeightsName.GetIndex() >= 0 )
@@ -587,7 +587,7 @@ void WeightThisDataSet( RapidFitConfiguration* config )
 			{
 				for( unsigned int j=0; j< (unsigned) WeightedDataSets[i]->GetDataNumber(); ++j )
 				{
-					value = WeightedDataSets[i]->GetDataPoint( j )->GetObservable( WeightsName )->GetValue();
+					value = WeightedDataSets[i]->GetDataPoint( (int)j )->GetObservable( WeightsName )->GetValue();
 					sum += value;
 					sum_sq += value*value;
 				}
@@ -1076,7 +1076,7 @@ int calculateAcceptanceCoefficients( RapidFitConfiguration* config )
 	PDFWithData * pdfAndData = config->xmlFile->GetPDFsAndData()[0];
 	pdfAndData->SetPhysicsParameters( config->xmlFile->GetFitParameters() );
 	IDataSet * dataSet = pdfAndData->GetDataSet();
-	int nMCEvents = dataSet->GetDataNumber();
+	//int nMCEvents = dataSet->GetDataNumber();
 	IPDF * pdf = pdfAndData->GetPDF();
 
 	return Mathematics::calculateAcceptanceCoefficients(dataSet, pdf);
@@ -1430,7 +1430,7 @@ int ConfigureRapidFit( RapidFitConfiguration* config )
 
 	cout << "SEED being used is:\t" << config->xmlFile->GetSeed() << endl;
 
-	RapidFitRandom::SetRandomFunction( config->xmlFile->GetSeed() );
+	RapidFitRandom::SetRandomFunction( (int)config->xmlFile->GetSeed() );
 
 	//	Command line arguments are passed and interpreted within the parser to override what is read from the XMLFile
 	if( config->parameterTemplateFlag )

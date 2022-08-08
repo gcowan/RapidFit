@@ -86,7 +86,8 @@ Bs2Jpsifzero_Signal_v8::Bs2Jpsifzero_Signal_v8(PDFConfigurator* configurator) : 
 	intExpL_stored(), intExpH_stored(), intExpSin_stored(), intExpCos_stored(),//, timeAcc(NULL),
 //	CachedA1(), CachedA2(), CachedA3(), CachedA4(), CachedA5(), CachedA6(), CachedA7(), CachedA8(), CachedA9(), CachedA10(),
 //	_fitDirectlyForApara(false), performingComponentProjection(false), 
-	_useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false), resolutionModel(NULL),
+	//_useDoubleTres(false), _useTripleTres(false), _useNewPhisres(false),
+	resolutionModel(NULL),
 	_useBetaParameter(false) 
 {
 	//componentIndex = 0;
@@ -1213,7 +1214,7 @@ void Bs2Jpsifzero_Signal_v8::ConstructTimeIntegrals()
 		perEventData.push_back( intExpCos_stored );
 		_datapoint->SetPerEventData( perEventData );
 	}
-	else if( _gamma != perEventData[0] )
+	else if( abs(_gamma - perEventData[0]) >= numeric_limits<float>::epsilon() )
 	{
 		this->generateTimeIntegrals();
 		this->generateSinusoidIntegrals();
@@ -1227,7 +1228,7 @@ void Bs2Jpsifzero_Signal_v8::ConstructTimeIntegrals()
 		perEventData.push_back( intExpCos_stored );
 		_datapoint->SetPerEventData( perEventData );
 	}
-	else if( dgam != perEventData[1] )
+	else if( abs(dgam - perEventData[1]) >= numeric_limits<float>::epsilon() )
 	{
 		intExpSin_stored = perEventData[5];
 		intExpCos_stored = perEventData[6];
@@ -1242,7 +1243,7 @@ void Bs2Jpsifzero_Signal_v8::ConstructTimeIntegrals()
 		perEventData.push_back( intExpCos_stored );
 		_datapoint->SetPerEventData( perEventData );
 	}
-	else if( delta_ms != perEventData[2] )
+	else if( abs(delta_ms - perEventData[2]) >= numeric_limits<float>::epsilon() )
 	{
 		intExpL_stored = perEventData[3];
 		intExpH_stored = perEventData[4];

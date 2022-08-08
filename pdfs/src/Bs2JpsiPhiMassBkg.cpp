@@ -59,6 +59,7 @@ bool Bs2JpsiPhiMassBkg::SetPhysicsParameters( ParameterSet* input )
 	PDF_ScaleFactor = 1./exp( -alphaM_pr * 5366.0 );
 
 	inv_alphaM_pr = 1./alphaM_pr;
+	return true;
 }
 
 //Calculate the function value

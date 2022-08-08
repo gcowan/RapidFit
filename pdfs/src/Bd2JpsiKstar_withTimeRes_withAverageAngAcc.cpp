@@ -22,7 +22,7 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverage
 	cachedAparaAparaIntB(), cachedAperpAperpIntB(),
 	cachedAparaAperpIntB(), cachedAzeroAparaIntB(),
 	cachedAzeroAperpIntB(), cachedSinDeltaPerpPara(),
-	cachedCosDeltaPara(), cachedSinDeltaPerp(), cachedCosSqDeltaM(),
+	cachedCosDeltaPara(), cachedSinDeltaPerp(),// cachedCosSqDeltaM(),
 	cachedAzero(), cachedApara(), cachedAperp(),
 
 	// Physics parameters
@@ -56,7 +56,7 @@ Bd2JpsiKstar_withTimeRes_withAverageAngAcc::Bd2JpsiKstar_withTimeRes_withAverage
 
 	, timeconstraintName( configurator->getName("time") )
 	, gamma(), deltaMs(), Azero_sq(), Apara_sq(), Aperp_sq(), delta_zero(), delta_para(), delta_perp(), AzeroApara(),
-	AzeroAperp(), AparaAperp(), omega(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(), angAccI3(), angAccI4(),
+	AzeroAperp(), AparaAperp(), timeRes(), timeRes1(), timeRes2(), timeRes1Frac(), angAccI1(), angAccI2(), angAccI3(), angAccI4(),// omega(),
 	angAccI5(), angAccI6(), time(), cosTheta(), phi(), cosPsi(), KstarFlavour(), tlow(), thigh()
 {
 	MakePrototypes();

@@ -63,12 +63,12 @@ void TripleFixedResModel::setParameters( ParameterSet & parameters )
 	}
 	else
 	{
-		isCacheValid = ( ResolutionScale == parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue() );
-		isCacheValid = isCacheValid && ( Resolution1 == parameters.GetPhysicsParameter( Resolution1Name )->GetValue() );
-		isCacheValid = isCacheValid && ( Resolution2 == parameters.GetPhysicsParameter( Resolution2Name )->GetValue() );
-		isCacheValid = isCacheValid && ( Resolution3 == parameters.GetPhysicsParameter( Resolution3Name )->GetValue() );
-		isCacheValid = isCacheValid && ( Resolution2Fraction == parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue() );
-		isCacheValid = isCacheValid && ( Resolution3Fraction == parameters.GetPhysicsParameter( Resolution3FractionName )->GetValue() );
+		isCacheValid = ( abs(ResolutionScale - parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue()) <= numeric_limits<float>::epsilon() );
+		isCacheValid = isCacheValid && ( abs(Resolution1 - parameters.GetPhysicsParameter( Resolution1Name )->GetValue()) <= numeric_limits<float>::epsilon() );
+		isCacheValid = isCacheValid && ( abs(Resolution2 - parameters.GetPhysicsParameter( Resolution2Name )->GetValue()) <= numeric_limits<float>::epsilon() );
+		isCacheValid = isCacheValid && ( abs(Resolution3 - parameters.GetPhysicsParameter( Resolution3Name )->GetValue()) <= numeric_limits<float>::epsilon() );
+		isCacheValid = isCacheValid && ( abs(Resolution2Fraction - parameters.GetPhysicsParameter( Resolution2FractionName )->GetValue()) <= numeric_limits<float>::epsilon() );
+		isCacheValid = isCacheValid && ( abs(Resolution3Fraction - parameters.GetPhysicsParameter( Resolution3FractionName )->GetValue()) <= numeric_limits<float>::epsilon() );
 	}
 
 	ResolutionScale = parameters.GetPhysicsParameter( ResolutionScaleName )->GetValue();

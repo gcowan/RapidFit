@@ -139,8 +139,8 @@ double ExternalConstMatrix::GetChi2() const
 
 	for( unsigned int i=0; i< (unsigned)dim; ++i )
 	{
-		diff( i ) =  internalParameterSet->GetPhysicsParameter( wantedParameters[i] )->GetValue() - values_val[i];
-		diff_T( i ) = diff( i );
+		diff( (int)i ) =  internalParameterSet->GetPhysicsParameter( wantedParameters[i] )->GetValue() - values_val[i];
+		diff_T( (int)i ) = diff( (int)i );
 	}
 
 	TMatrixT<double> cov_matrix( dim, dim );
@@ -148,7 +148,7 @@ double ExternalConstMatrix::GetChi2() const
 	{
 		for( unsigned int j=0; j< (unsigned)dim; ++j )
 		{
-			cov_matrix( i, j ) =  corr_matrix[i][j]*errors_val[i]*errors_val[j];
+			cov_matrix( (int)i, (int)j ) =  corr_matrix[i][j]*errors_val[i]*errors_val[j];
 		}
 	}
 
@@ -156,7 +156,7 @@ double ExternalConstMatrix::GetChi2() const
 
 	for( unsigned int i=0; i< (unsigned)dim; ++i )
 	{
-		returnable = diff( i ) * finalVector( i );
+		returnable = diff( (int)i ) * finalVector( (int)i );
 	}
 
 	return returnable;

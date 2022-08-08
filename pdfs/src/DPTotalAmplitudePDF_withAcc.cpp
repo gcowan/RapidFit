@@ -869,7 +869,7 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 	cosTheta1 = measurement->GetObservable( cosTheta1Name )->GetValue();
 	cosTheta2 = measurement->GetObservable( cosTheta2Name )->GetValue();
 	phi       = measurement->GetObservable( phiName )->GetValue();
-	pionID    = measurement->GetObservable( pionIDName )->GetValue();
+	pionID    = (int)measurement->GetObservable( pionIDName )->GetValue();
     double m23_mapped = (m23 - 0.64)/(1.59 - 0.64)*2. + (-1); // should really do this in a generic way
 
 #ifdef __RAPIDFIT_USE_GSL
@@ -933,21 +933,21 @@ double DPTotalAmplitudePDF_withAcc::Evaluate(DataPoint * measurement)
 	unsigned int upperZ = 0;
 
 	// And this switchs things to deal with the Z components.
-        if ( componentIndex > KpiComponents.size() )
+        if ( componentIndex > (int)KpiComponents.size() )
 	{
 		lower = 0;
 		upper = 0;
-		lowerZ = (unsigned)(componentIndex - KpiComponents.size() - 1);
-                upperZ = (unsigned)(componentIndex - KpiComponents.size());
+		lowerZ = (unsigned int)((unsigned int)componentIndex - KpiComponents.size() - 1);
+                upperZ = (unsigned int)((unsigned int)componentIndex - KpiComponents.size());
 
 	}
 
 	// Finally, for the total of all components
 	if ( componentIndex == 0 ) {
 		lower  = 0;
-		upper  = (unsigned)KpiComponents.size();
+		upper  = (unsigned int)KpiComponents.size();
 		lowerZ = 0;
-		upperZ = (unsigned)ZComponents.size();
+		upperZ = (unsigned int)ZComponents.size();
 	}
 
 	// Now sum over final state helicities (this is not general code, but

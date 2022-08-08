@@ -96,8 +96,10 @@ PerEventAngularAcceptance::PerEventAngularAcceptance( string fileName, string tu
 	partsAndRes.push_back("Jpsi");
 	partsAndRes.push_back("B");
 
-	TVector3 boosttoJpsi(0,0,0), boostBackToLabFromJpsi(0,0,0);
-	TVector3 boosttoB(0,0,0), boostBackToLabFromB(0,0,0);
+	boosttoJpsi = TVector3(0,0,0);
+	boostBackToLabFromJpsi = TVector3(0,0,0);
+	boosttoB = TVector3(0,0,0);
+	boostBackToLabFromB = TVector3(0,0,0);
 
 	vector<string>::iterator particleIterator;
 	for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
@@ -355,10 +357,11 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
 
 		//cout << w_sum_gen << endl;
 		// Now do the sum of the generated distributions
-		vector<string>::iterator particleIterator;
-		for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
+		vector<string>::iterator local_particleIterator;
+		string particle;
+		for ( local_particleIterator = particles.begin(); local_particleIterator != particles.end(); ++local_particleIterator )
 		{
-			string particle = *particleIterator;
+			particle = *local_particleIterator;
 			cosThetaMuHistosPredicted[particle]->Add(cosThetaMuTmpHistos[particle], 1/w_sum_gen);
 			cosThetaKHistosPredicted[particle]->Add(cosThetaKTmpHistos[particle], 1/w_sum_gen);
 			pHistosPredicted[particle]->Add(pTmpHistos[particle], 1/w_sum_gen);
@@ -371,10 +374,11 @@ void PerEventAngularAcceptance::loopOnReconstructedBs()
 			pptTmpHistos[particle]->Reset();
 		}
 	}
+	string particle;
 	// Now divide the predicted distributions by the actual reconstructed distribution to get the efficiency
 	for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
 	{
-		string particle = *particleIterator;
+		particle = *particleIterator;
 		//pHistosPredicted[particle]->Divide(pHistosEffRatioPrev[particle]);//, 1., 1., "b");
 		pHistosEffRatio[particle]->Divide(pHistos[particle], pHistosPredicted[particle], 1., 1., "b");
 		pHistosEffRatio[particle]->Multiply(pHistosEffRatioPrev[particle]);
@@ -491,10 +495,11 @@ void PerEventAngularAcceptance::generateEventsAndCalculateFgivenB()
 		   cout << w_angular << " " << w_sum_gen << endl;
 		   */
 
-		vector<string>::iterator particleIterator;
-		for ( particleIterator = particles.begin(); particleIterator != particles.end(); ++particleIterator )
+		vector<string>::iterator local_particleIterator;
+		string particle;
+		for ( local_particleIterator = particles.begin(); local_particleIterator != particles.end(); ++local_particleIterator )
 		{
-			string particle = *particleIterator;
+			particle = *local_particleIterator;
 			cosThetaMuTmpHistos[particle]->Fill(cosThetaMu, w_ev);
 			cosThetaKTmpHistos[particle]->Fill(cosThetaK, w_ev);
 			pTmpHistos[particle]->Fill(newP[particle]->P(), w_ev);//w_no_eff[particle]);//w_ev);
@@ -570,19 +575,19 @@ void PerEventAngularAcceptance::writeHistos()
 
 double PerEventAngularAcceptance::effMuonP(TLorentzVector P)
 {
-	double p = P.P();
+	double _p = P.P();
 	double pt = P.Pt();
 	double py = P.Py();
 	double pz = P.Pz();
 
-	//cout << pz <<  " " << p << " " << pt << " " << pt/p << " " << fabs(py/p) << endl;
+	//cout << pz <<  " " << _p << " " << pt << " " << pt/_p << " " << fabs(py/_p) << endl;
 
 	if (pz<0) return 0;
-	if (p<pmin) return 0;
+	if (_p<pmin) return 0;
 	if (pt<ptmin) return 0;
-	if (pt/p<amin || pt/p>amax || fabs(py/p)>aymax) return 0;
+	if (pt/_p<amin || pt/_p>amax || fabs(py/_p)>aymax) return 0;
 
-	int j1 = int ((p-pmin)/pbinWidth) + 1;
+	int j1 = int ((_p-pmin)/pbinWidth) + 1;
 	if (j1 > pbins) j1 = pbins;
 	int j2 = int ((pt-ptmin)/ptbinWidth) + 1;
 	if (j2 > ptbins) j2 = ptbins;
@@ -592,17 +597,17 @@ double PerEventAngularAcceptance::effMuonP(TLorentzVector P)
 
 double PerEventAngularAcceptance::effMuonM(TLorentzVector P)
 {
-	double p = P.P();
+	double _p = P.P();
 	double pt = P.Pt();
 	double py = P.Py();
 	double pz = P.Pz();
 
 	if (pz < 0) return 0;
-	if (p < pmin) return 0;
+	if (_p < pmin) return 0;
 	if (pt < ptmin) return 0;
-	if (pt/p < amin || pt/p > amax || fabs(py/p) > aymax) return 0;
+	if (pt/_p < amin || pt/_p > amax || fabs(py/_p) > aymax) return 0;
 
-	int j1 = int ((p-pmin)/pbinWidth) + 1;
+	int j1 = int ((_p-pmin)/pbinWidth) + 1;
 	if(j1 > pbins) j1 = pbins;
 	int j2 = int ((pt-ptmin)/ptbinWidth) + 1;
 	if(j2 > ptbins) j2 = ptbins;
@@ -613,17 +618,17 @@ double PerEventAngularAcceptance::effMuonM(TLorentzVector P)
 double PerEventAngularAcceptance::effKaon(TLorentzVector P)
 {
 
-	double p = P.P();
+	double _p = P.P();
 	double pt = P.Pt();
 	double py = P.Py();
 	double pz = P.Pz();
 
 	if (pz < 0) return 0;
-	if (p < pmin) return 0;
+	if (_p < pmin) return 0;
 	if (pt < ptmin) return 0;
-	if (pt/p < amin || pt/p > amax || fabs(py/p) > aymax) return 0;
+	if (pt/_p < amin || pt/_p > amax || fabs(py/_p) > aymax) return 0;
 
-	int j1 = int ((p-pmin)/pbinWidth) + 1;
+	int j1 = int ((_p-pmin)/pbinWidth) + 1;
 	if(j1 > pbins) j1 = pbins;
 	int j2 = int ((pt-ptmin)/ptbinWidth) + 1;
 	if(j2 > ptbins) j2 = ptbins;

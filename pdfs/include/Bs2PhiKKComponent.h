@@ -21,7 +21,7 @@ class Bs2PhiKKComponent
 		Bs2PhiKKComponent() {}
 		Bs2PhiKKComponent(PDFConfigurator*, std::string, std::string, int, std::string); // config, phi name, resonance name, spin
 		Bs2PhiKKComponent(const Bs2PhiKKComponent&);
-		~Bs2PhiKKComponent();
+		virtual ~Bs2PhiKKComponent();
 		Bs2PhiKKComponent& operator=(const Bs2PhiKKComponent&);
 		void SetPhysicsParameters(ParameterSet* pars);
 		std::vector<ObservableRef> GetPhysicsParameters() const;
@@ -42,7 +42,7 @@ class Bs2PhiKKComponent
 			PhysPar(ObservableRef _name, double _value) : name(_name), value(_value) {}
 			PhysPar(PDFConfigurator* config, std::string _name) : name(config->getName(_name)), value(0) {}
 			PhysPar(PDFConfigurator* config, std::string _name, double _value) : name(config->getName(_name)), value(_value) {}
-			PhysPar(const PhysPar& other) : value(other.value), name(other.name) {}
+			//PhysPar(const PhysPar& other) : value(other.value), name(other.name) {}
 			void Update(const ParameterSet* pars) {value = pars->GetPhysicsParameter(name)->GetValue(); if(std::isnan(value)) std::cerr << name.Name() << " has been given a nan value!" << std::endl; }
 			double value;
 			ObservableRef name;
@@ -60,7 +60,7 @@ class Bs2PhiKKComponent
 		// Resonance parameters
 		std::vector<PhysPar> KKpars; // Mass and width of Breit Wigner, or mass, g_pipi and R=(g_KK/g_pipi) of Flatte. Empty for non-resonant
 		// Fixed parameters
-		int Jphi; // Spin of the phi (P-wave, 1)
+		//int Jphi; // Spin of the phi (P-wave, 1)
 		int JKK; // Spin of the KK resonance (0, 1 or 2)
 		std::string lineshape; // Choose the resonance shape: "BW", "FT" or "NR"
 		void Initialise();

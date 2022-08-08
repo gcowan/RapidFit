@@ -129,6 +129,7 @@ double Exponential::Evaluate(DataPoint * measurement)
 
 double Exponential::Normalisation( DataPoint * measurement, PhaseSpaceBoundary * boundary )
 {
+	(void) measurement;
 	IConstraint* timeC = boundary->GetConstraint( timeConst );
 	double tlow = timeC->GetMinimum();
 	double thigh = timeC->GetMaximum();

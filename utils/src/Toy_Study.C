@@ -105,7 +105,7 @@ void ToyStudyAnalysis::ProcessImageContent( stringstream& latex, vector<TString>
 
 	latex << "\\begin{figure}" << endl;
 
-	for( int i=0; i< num_params; ++i )
+	for( unsigned int i=0; i< (unsigned int)num_params; ++i )
 	{
 		if( (i%5 == 0) && (i != 0) )
 		{
@@ -134,14 +134,14 @@ void ToyStudyAnalysis::ProcessTableContent( stringstream& latex, vector<TString>
 
 	latex << setprecision(3);
 
-	for( int i=0; i<num_params; ++i  )
+	for( unsigned int i=0; i< (unsigned int)num_params; ++i  )
 	{
 		string param_name = EdStyle::Remove_Suffix( all_parameter_plots[i] ).Data();
 
 		latex << string(EdStyle::GetParamLatexName( param_name ) ) << " & ";
-		latex << table_content[i+num_params].first.first << " & ";
-		latex << table_content[i+num_params+num_params].first.first << " \\pm ";
-		latex << table_content[i+num_params+num_params].first.second << "\\\\" << endl;
+		latex << table_content[i+(unsigned int)num_params].first.first << " & ";
+		latex << table_content[i+(unsigned int)num_params+(unsigned int)num_params].first.first << " \\pm ";
+		latex << table_content[i+(unsigned int)num_params+(unsigned int)num_params].first.second << "\\\\" << endl;
 	}
 }
 
@@ -158,6 +158,7 @@ void ToyStudyAnalysis::Help()
 
 int ToyStudyAnalysis::Toy_Study( TTree* input_tree, TRandom3* rand_gen, vector<string> OtherOptions )
 {
+	(void) rand_gen;
 	bool noPullCuts=false;
 
 	for( unsigned int i=0; i< OtherOptions.size(); ++i )
