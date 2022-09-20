@@ -42,7 +42,7 @@ LongLivedBkg_3Dangular::LongLivedBkg_3Dangular( PDFConfigurator* config ) :
 	, cthetalName		( config->getName("helcosthetaL") )
 	, phihName			( config->getName("helphi") )
 	, timeconstName		( config->getName("time") )
-, tauLL1(), tauLL2(), f_LL1(), sigmaLL(), sigmaLL1(), sigmaLL2(), timeResLL1Frac(), tlow(), thigh(), time(), cos1(),
+, tauLL1(), tauLL2(), f_LL1(), tlow(), thigh(), time(), cos1(),
 	cos2(), phi(), histo(), xaxis(), yaxis(), zaxis(), nxbins(), nybins(), nzbins(), xmin(), xmax(), ymin(),
 	ymax(), zmin(), zmax(), deltax(), deltay(), deltaz(), total_num_entries(), useFlatAngularDistribution(true),
 	_useHelicityBasis(false), _useTimeAcceptance(false)

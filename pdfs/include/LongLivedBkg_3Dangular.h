@@ -66,10 +66,10 @@ class LongLivedBkg_3Dangular : public BasePDF
 		double tauLL1;
 		double tauLL2;
 		double f_LL1;
-		double sigmaLL; 
-		double sigmaLL1; 
-		double sigmaLL2;
-		double timeResLL1Frac;
+		//double sigmaLL; 
+		//double sigmaLL1; 
+		//double sigmaLL2;
+		//double timeResLL1Frac;
 
 		double tlow, thigh; // time integration limits
 
