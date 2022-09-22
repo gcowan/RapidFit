@@ -89,7 +89,7 @@ void DPHelpers::Belle(const TLorentzVector & _pMuPlus,
 
   // ============== B0 rest frame ========================
 
-  if ( abs(pB.BoostVector().Mag()) >= std::numeric_limits<float>::epsilon() )
+  if ( abs((int)pB.BoostVector().Mag()) >= std::numeric_limits<float>::epsilon() )
   {
     pMuPlus.Boost(-pB.BoostVector());
     pMuMinus.Boost(-pB.BoostVector());

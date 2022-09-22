@@ -310,7 +310,7 @@ void CalculateAngles::calculateZplusAngles_GOLD(TLorentzVector& pB,
   TLorentzVector _b(pMuPlus + pMuMinus + pPi + pK);
 
   // If we are not in B0 rest frame, boost there
-  if ( abs(_b.BoostVector().Mag()) >= std::numeric_limits<float>::epsilon() )
+  if ( abs((int)_b.BoostVector().Mag()) >= std::numeric_limits<float>::epsilon() )
   {
     _psi.    Boost(-1.0*_b.BoostVector());
     _z.      Boost(-1.0*_b.BoostVector());

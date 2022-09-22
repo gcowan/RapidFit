@@ -6,13 +6,13 @@ CC=g++
 
 
 #		ROOT
-TEMPCFLAGS   = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --cflags)
+TEMPCFLAGS   = -L$(ROOTSYS)/lib64 $(shell $(ROOTSYS)/bin/root-config --cflags)
 
 #		Include Root files as system headers as they're NOT standards complient and we do not want to waste time fixing them!
 #		ROOT has some broken backwards compatability for OSX so won't claim to be a set of system headers
 ROOTCFLAGS   = $(shell $(ROOTSYS)/bin/root-config --cflags | awk -F "-I" '{print $$1" -isystem"$$2}' )
-ROOTLIBS     = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --libs)
-ROOTGLIBS    = -L$(ROOTSYS)/lib $(shell $(ROOTSYS)/bin/root-config --glibs)
+ROOTLIBS     = -L$(ROOTSYS)/lib64 $(shell $(ROOTSYS)/bin/root-config --libs)
+ROOTGLIBS    = -L$(ROOTSYS)/lib64 $(shell $(ROOTSYS)/bin/root-config --glibs)
 
 #               On some Systems with Mathmore compiled, sometimes things need to be resolved against it... I don't know why
 EXTRA_ROOTLIBS=-lTreePlayer -lHtml -lThread -lMinuit -lMinuit2 -lRooFit -lRooStats -lRooFitCore -lFoam $(shell if [ "$(shell root-config --features | grep mathmore)" == "" ]; then echo "" ; else echo "-lMathMore" ; fi)
@@ -52,12 +52,9 @@ UTILSSRC  = utils/src
 INCDIR    = framework/include
 INCPDFDIR = pdfs/include
 INCUTILS  = utils/include
-INCGSL_1  = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "$(shell gsl-config --cflags)"; else echo ""; fi )
-LINKGSL_1 = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "$(shell gsl-config --libs)"; else echo ""; fi )
-USE_GSL_1 = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "-D__RAPIDFIT_USE_GSL"; else echo ""; fi )
-INCGSL    = $(shell if test -d /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include; then echo "-I/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include"; else echo ${INCGSL_1}; fi )
-LINKGSL   = $(shell if test -d /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include; then echo "-L/sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/lib -lgsl -lgslcblas -lm"; else echo ${LINKGSL_1}; fi )
-USE_GSL   = $(shell if test -d /sw/lib/lcg/external/GSL/1.10/x86_64-slc5-gcc43-opt/include; then echo "-D__RAPIDFIT_USE_GSL"; else echo ${USE_GSL_1}; fi )
+INCGSL    = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "$(shell gsl-config --cflags)"; else echo ""; fi )
+LINKGSL   = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "$(shell gsl-config --libs)"; else echo ""; fi )
+USE_GSL   = $(shell if command -v gsl-config >/dev/null 2>&1; then echo "-D__RAPIDFIT_USE_GSL"; else echo ""; fi )
 OBJDIR    = framework/build
 OBJPDFDIR = pdfs/build
 OBJUTILDIR= utils/build

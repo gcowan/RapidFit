@@ -93,7 +93,7 @@ Bs2JpsiPhi_Signal_v8::Bs2JpsiPhi_Signal_v8(PDFConfigurator* configurator) : Base
 
 	bool isCopy = configurator->hasConfigurationValue( "RAPIDFIT_SAYS_THIS_IS_A_COPY", "True" );
 
-	if( !isCopy ) std::cout << "Constructing PDF: Bs2JpsiPhi_Signal_v8 " << endl;
+	//if( !isCopy ) std::cout << "Constructing PDF: Bs2JpsiPhi_Signal_v8 " << std::endl;
 
 	//...........................................
 	// Configure  options

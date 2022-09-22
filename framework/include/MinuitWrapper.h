@@ -28,7 +28,7 @@ using namespace::std;
 
 void Function( Int_t&, Double_t*, Double_t&, Double_t*, Int_t);
 
-static TMinuit* currentMinuitInstance;
+static TMinuit* currentMinuitInstance __attribute__ ((used));
 
 class MinuitWrapper : public IMinimiser
 {
